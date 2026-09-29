@@ -96,7 +96,7 @@ test("„nicht beantwortet“ und „möchte ich nicht angeben“ sind verschied
 
   const bewusst = compareV21(
     side([{ blockId: "G01", value: { optionId: opt("G01", 0) } }]),
-    side([{ blockId: "G01", missingCode: "withheld" }]),
+    side([{ blockId: "G01", missingCode: "prefer_not_to_say" }]),
   );
   assert.equal(find(bewusst, "G01").why, "withheld_b");
 });
@@ -105,10 +105,10 @@ test("keine dieser Lagen heißt „unterschiedlich“", () => {
   // „Fehlt“ darf nicht aussehen wie „passt nicht“.
   for (const result of [
     compareV21({}, {}),
-    compareV21(side([{ blockId: "G01", missingCode: "withheld" }]), {}),
+    compareV21(side([{ blockId: "G01", missingCode: "prefer_not_to_say" }]), {}),
     compareV21(
-      side([{ blockId: "G01", missingCode: "withheld" }]),
-      side([{ blockId: "G01", missingCode: "withheld" }]),
+      side([{ blockId: "G01", missingCode: "prefer_not_to_say" }]),
+      side([{ blockId: "G01", missingCode: "prefer_not_to_say" }]),
     ),
   ]) {
     assert.equal(find(result, "G01").state, "no_basis");

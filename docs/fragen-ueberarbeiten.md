@@ -27,7 +27,7 @@ Was trotzdem noch auffällt, steht unten. Gesucht ist für jede Frage, die dir s
 
 1. **Großgeschriebenes „Du“ und „Dein“** — durchgehend, aus der Master-Fassung übernommen. Der Rest der Anwendung sagt „du“. Das ist eine Entscheidung, die einmal fällt und dann für alle 52 Fragen gilt; ich habe sie nicht selbst getroffen.
 2. **„Wenn …: Wie häufig …“** — ein Bedingungssatz im Vorspann, dann die Frage. Das ist präzise und zwingt zum Zweimallesen. Eine kurze Situation als eigener Satz davor liest sich leichter als ein Doppelpunkt mitten drin.
-3. **5 Fragen sind Situationen ohne Fragesatz** (W02, W03, W04, W05, W06). Sie beschreiben eine Lage und enden mit einem Punkt; was gefragt ist, steht erst in den Antworten. Beim Ausfüllen fehlt der Moment, in dem klar wird, was man eigentlich beantworten soll.
+3. **0 Fragen sind Situationen ohne Fragesatz** (). Sie beschreiben eine Lage und enden mit einem Punkt; was gefragt ist, steht erst in den Antworten. Beim Ausfüllen fehlt der Moment, in dem klar wird, was man eigentlich beantworten soll.
 4. **Die Kennungen haben Lücken** — B02, B03, G02, G03, K02, R07, R08, R11, S05, U02 fehlen. Das ist kein Fehler: Die Master-Fassung hat sie gestrichen. Die übrigen behalten ihre Nummer, weil eine Umnummerierung gespeicherte Antworten auf andere Fragen zeigen ließe.
 
 ---
@@ -43,7 +43,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn Du zwischen mehreren realistischen Möglichkeiten entscheiden musst: Wie häufig stellst Du ihre Vor- und Nachteile gegenüber, bevor Du Dich festlegst?
+> Du musst zwischen mehreren realistischen Möglichkeiten entscheiden. Wie häufig vergleichst du ihre Vor- und Nachteile, bevor du dich festlegst?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -64,9 +64,9 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn eine wichtige Entscheidung davon abhängt, ob eine Annahme stimmt: Wie häufig prüfst Du, welche Informationen für oder gegen diese Annahme sprechen?
+> Eine wichtige Entscheidung hängt davon ab, ob eine Annahme stimmt. Wie häufig prüfst du, welche Informationen für oder gegen diese Annahme sprechen?
 >
-> _„Zum Beispiel die Annahme, dass genügend Kund:innen für ein Angebot bezahlen würden.“_
+> _Zum Beispiel die Annahme, dass genügend Kund:innen für ein Angebot bezahlen würden._
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -89,7 +89,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn Du Dich in einem Thema gut auskennst: Wie stark fließt Dein erster Eindruck normalerweise in Deine Entscheidung ein?
+> Du kennst dich in einem Thema gut aus. Wie stark fließt dein erster Eindruck normalerweise in deine Entscheidung ein?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -110,7 +110,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn mehrere Möglichkeiten nach den verfügbaren Informationen ähnlich gut erscheinen: Wie stark lässt Du Deine Erfahrung oder Dein Gefühl dafür mitentscheiden, was besser passt?
+> Mehrere Möglichkeiten erscheinen nach den verfügbaren Informationen ähnlich gut. Wie stark lässt du dann deine Erfahrung oder dein Gefühl mitentscheiden?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -131,7 +131,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Die verfügbaren Zahlen sprechen für eine Option, Dein Gefühl eher dagegen. Wie stark beziehst Du dieses Gefühl in Deine weitere Entscheidung ein?
+> Die verfügbaren Zahlen sprechen für eine Option, dein Gefühl eher dagegen. Wie stark beziehst du dieses Gefühl in deine weitere Entscheidung ein?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -154,7 +154,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Dir fehlen noch Informationen für eine Entscheidung. Ein kleiner Test könnte Dir zusätzliche Hinweise geben. Wie wahrscheinlich ist es, dass Du diesen Test startest, statt zunächst weiter Informationen zu sammeln?
+> Dir fehlen noch Informationen für eine Entscheidung. Ein kleiner Test könnte zusätzliche Hinweise liefern. Wie wahrscheinlich ist es, dass du den Test startest, statt zunächst weiter Informationen zu sammeln?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -175,7 +175,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Zwei Vorgehensweisen erscheinen beide sinnvoll. Ein kleiner Test könnte zeigen, welche in der Praxis besser funktioniert. Wie wahrscheinlich ist es, dass Du zunächst einen solchen Test machst?
+> Zwei Vorgehensweisen erscheinen beide sinnvoll. Ein kleiner Test könnte zeigen, welche in der Praxis besser funktioniert. Wie wahrscheinlich ist es, dass du zunächst einen solchen Test machst?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -196,7 +196,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Eine Entscheidung ist noch nicht endgültig und lässt sich mit wenig Aufwand korrigieren. Wie wahrscheinlich ist es, dass Du zunächst eine vorläufige Richtung festlegst?
+> Eine Entscheidung ist noch nicht endgültig und lässt sich mit wenig Aufwand korrigieren. Wie wahrscheinlich ist es, dass du zunächst eine vorläufige Richtung festlegst?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -219,7 +219,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Du merkst während eines Gesprächs, dass Du eine geplante Entscheidung anders siehst. Sie ist wichtig, aber nicht dringend. Wann sprichst Du Deinen Einwand normalerweise zum ersten Mal?
+> Während eines Gesprächs merkst du, dass du eine geplante Entscheidung anders siehst. Sie ist wichtig, aber nicht dringend. Wann sprichst du deinen Einwand zum ersten Mal an?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -240,7 +240,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Du hast Bedenken, kannst aber noch nicht genau erklären, woran sie liegen. Was entspricht eher Deinem Vorgehen?
+> Du hast Bedenken, kannst sie aber noch nicht genau begründen. Was entspricht dann eher deinem Vorgehen?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -263,7 +263,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn Du inhaltlich anderer Meinung bist: Welcher Einstieg passt normalerweise eher zu Dir?
+> Du bist inhaltlich anderer Meinung. Welcher Einstieg passt dann am ehesten zu dir?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -286,7 +286,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wenn Dir ein Vorschlag nicht sinnvoll erscheint: Wie wahrscheinlich ist es, dass Du ausdrücklich sagst, dass Du ihm nicht zustimmst?
+> Ein Vorschlag erscheint dir nicht sinnvoll. Wie wahrscheinlich ist es, dass du ausdrücklich sagst, dass du ihm nicht zustimmst?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -309,7 +309,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wie wohl fühlst Du Dich damit, wenn es für ein Ergebnis mehrere plausible Erklärungen gibt und unklar ist, welche davon zutrifft?
+> Wie wohl fühlst du dich, wenn für dasselbe Ergebnis mehrere plausible Erklärungen offen sind und noch unklar ist, welche davon zutrifft?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -330,7 +330,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wie wohl fühlst Du Dich damit, wenn über mehrere Wochen noch offen ist, welche von zwei möglichen Richtungen Euer Vorhaben nehmen wird?
+> Wie wohl fühlst du dich, wenn über mehrere Wochen offen bleibt, welche von zwei möglichen Richtungen euer Vorhaben nehmen wird?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -351,7 +351,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wie wohl fühlst Du Dich damit, wenn Ihr zu derselben Idee unterschiedliche oder widersprüchliche Rückmeldungen bekommt und noch nicht klar ist, welche davon relevanter ist?
+> Wie wohl fühlst du dich, wenn ihr zu derselben Idee widersprüchliche Rückmeldungen bekommt und noch nicht klar ist, welche davon relevanter sind?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -372,7 +372,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Jetzt:**
 
-> Wie wohl fühlst Du Dich damit, wenn eine wichtige Frage für eine Weile keine eindeutige Antwort hat?
+> Wie wohl fühlst du dich, wenn eine wichtige Frage eine Zeit lang keine eindeutige Antwort hat?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -399,7 +399,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wenn Dein Verantwortungsbereich klar geregelt ist: Wie selbstständig möchtest Du dort normalerweise über das Vorgehen entscheiden?
+> Dein Verantwortungsbereich ist klar geregelt. Wie selbstständig möchtest du dort normalerweise über das Vorgehen entscheiden?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -420,7 +420,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wenn Du innerhalb eines vereinbarten Budgets bleiben kannst: Wie selbstständig möchtest Du über Ausgaben in Deinem Bereich entscheiden?
+> Für deinen Bereich gibt es ein vereinbartes Budget. Wie selbstständig möchtest du innerhalb dieses Rahmens über Ausgaben entscheiden?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -441,7 +441,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wenn mehrere sinnvolle Vorgehensweisen möglich sind: Wie selbstständig möchtest Du in Deinem Bereich auswählen können, welchen Weg Du gehst?
+> In deinem Bereich sind mehrere sinnvolle Vorgehensweisen möglich. Wie selbstständig möchtest du entscheiden, welchen Weg du gehst?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -462,7 +462,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wenn sich während der Arbeit etwas ändert: Wie frei möchtest Du einen vereinbarten Plan in Deinem Bereich selbst anpassen können?
+> Während der Arbeit ändert sich etwas. Wie frei möchtest du einen vereinbarten Plan in deinem Bereich selbst anpassen können?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -483,7 +483,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wann zeigst Du anderen Foundern normalerweise einen Zwischenstand aus Deinem Bereich?
+> Wann zeigst du anderen Foundern normalerweise einen Zwischenstand aus deinem Bereich?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -506,7 +506,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie früh möchtest Du von einer wichtigen Richtungsänderung in einem anderen Bereich erfahren?
+> In einem anderen Bereich zeichnet sich eine wichtige Richtungsänderung ab. Wann möchtest du davon erfahren?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -529,7 +529,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu Dir?
+> Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu dir?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -577,15 +577,15 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welche Vorstellung hast Du aktuell davon, was in den nächsten drei Jahren mit Deinen Unternehmensanteilen passieren soll?
+> Welche Vorstellung hast du aktuell für deine Unternehmensanteile in den nächsten drei Jahren?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
-1. langfristig beteiligt bleiben/kein Verkauf geplant
-2. teilweiser Verkauf grundsätzlich möglich
-3. gezielt auf vollständigen Verkauf hinarbeiten
-4. abhängig von Bedingungen
-5. Möglichkeiten offenhalten
+1. Ich möchte langfristig beteiligt bleiben und plane aktuell keinen Verkauf.
+2. Ein teilweiser Verkauf wäre für mich grundsätzlich möglich.
+3. Ich möchte gezielt auf einen späteren vollständigen Verkauf hinarbeiten.
+4. Das hängt für mich von bestimmten Bedingungen ab.
+5. Ich möchte mir alle Möglichkeiten offenhalten.
 
 **Wer nicht antworten kann:** „habe ich noch nicht entschieden“ · „möchte ich nicht angeben“
 
@@ -598,7 +598,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie stehst Du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?
+> Wie stehst du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?
 
 **Antworten** (4, Reihenfolge und Anzahl bleiben):
 
@@ -618,9 +618,9 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welches konkrete Ergebnis sollte das Vorhaben aus Deiner Sicht in den nächsten zwölf Monaten erreicht haben?
+> Welches konkrete Ergebnis sollte das Vorhaben aus deiner Sicht in den nächsten zwölf Monaten erreichen?
 >
-> _Auch ein Lernergebnis kann ein legitimes Ziel sein._
+> _Auch ein klares Lernergebnis kann ein Ziel sein – zum Beispiel eine Annahme zu prüfen oder bewusst zu entscheiden, einen Ansatz nicht weiterzuverfolgen._
 
 **Antwortform:** structured_text — keine feste Auswahl.
 
@@ -635,7 +635,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie möchtest Du Deine eigene Rolle im Unternehmen in etwa drei Jahren gestalten?
+> Welche Rolle möchtest du in etwa drei Jahren selbst im Unternehmen haben?
 
 **Antworten** (6, Reihenfolge und Anzahl bleiben):
 
@@ -659,7 +659,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie viele Stunden pro Woche kannst Du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?
+> Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?
 
 **Antwortform:** number_range — keine feste Auswahl.
 
@@ -674,7 +674,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie viele Stunden pro Woche erwartest Du in den nächsten zwölf Wochen ungefähr von [Name]?
+> Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen ungefähr von [Name]?
 
 **Antwortform:** person_number_range — keine feste Auswahl.
 
@@ -691,9 +691,9 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welche regelmäßigen Zeiten könntest Du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?
+> Welche regelmäßigen Zeiten könntest du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?
 >
-> _Wochenplaner mit verfügbaren Zeitfenstern und ausdrücklich nicht verfügbaren Zeiten._
+> _Private Gründe für nicht verfügbare Zeiten müssen nicht angegeben werden._
 
 **Antwortform:** time_windows — keine feste Auswahl.
 
@@ -710,7 +710,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ab wann brauchst Du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben für Deinen Lebensunterhalt?
+> Ab wann brauchst du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben, um deinen Lebensunterhalt zu decken?
 
 **Antworten** (3, Reihenfolge und Anzahl bleiben):
 
@@ -729,7 +729,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welche monatliche Auszahlung brauchst Du ab diesem Zeitpunkt ungefähr mindestens?
+> Welche monatliche Auszahlung brauchst du ab diesem Zeitpunkt ungefähr mindestens?
 
 **Erscheint nur**, wenn R04 beantwortet ist.
 
@@ -748,7 +748,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Unter welchen Bedingungen könntest Du Dir vorstellen, das Vorhaben zu Deiner beruflichen Haupttätigkeit zu machen?
+> Unter welchen Bedingungen könntest du dir vorstellen, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?
 
 **Antworten** (7, Reihenfolge und Anzahl bleiben):
 
@@ -771,7 +771,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Angenommen, Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für Deine weitere Mitarbeit gelten?
+> Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für deine weitere Mitarbeit gelten?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -792,7 +792,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wie wichtig ist es Dir persönlich, dieses konkrete Vorhaben weiterzuführen?
+> Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -815,7 +815,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wann sollten diese Angaben aus Deiner Sicht spätestens noch einmal überprüft werden?
+> Wann sollten diese Angaben spätestens wieder überprüft werden?
 
 **Antworten** (2, Reihenfolge und Anzahl bleiben):
 
@@ -835,7 +835,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ihr seid Euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich nicht einig. Die Entscheidung betrifft andere Bereiche nicht wesentlich. Welche Regel wäre Dir am liebsten?
+> Ihr seid euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich uneinig. Andere Bereiche sind nicht wesentlich betroffen. Welche Regel soll in so einem Fall gelten?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -858,7 +858,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ihr erreicht bei einer wichtigen Entscheidung bis zum vereinbarten Zeitpunkt keine Einigung. Welche Lösungen sollten dann grundsätzlich möglich sein?
+> Ihr findet bis zum vereinbarten Zeitpunkt keine Einigung über eine wichtige Entscheidung. Welche Lösungen sollten dann grundsätzlich möglich sein?
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
@@ -879,7 +879,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Bei welchen Entscheidungen sollten aus Deiner Sicht grundsätzlich alle Founder zustimmen?
+> Bei welchen Entscheidungen sollten aus deiner Sicht grundsätzlich alle Founder zustimmen?
 
 **Antworten** (6, Reihenfolge und Anzahl bleiben):
 
@@ -905,7 +905,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wo liegt für Dich aktuell die persönliche Obergrenze für zusätzliches eigenes Geld, das Du in das Vorhaben investieren würdest – auch wenn Du einkalkulieren musst, dass Du es vollständig verlieren könntest?
+> Welchen zusätzlichen Betrag an eigenem Geld würdest du aktuell höchstens in das Vorhaben investieren, wenn du einkalkulierst, dass du ihn vollständig verlieren könntest?
 
 **Antwortform:** money_range — keine feste Auswahl.
 
@@ -922,7 +922,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Welche finanzielle Mindestreserve sollte aus Deiner Sicht bestehen bleiben, bevor Ihr zusätzliches Geld in ein größeres Vorhaben investiert?
+> Welche finanzielle Mindestreserve sollte bestehen bleiben, bevor ihr zusätzliches Geld in ein größeres Vorhaben steckt?
 
 **Antwortform:** number_range — keine feste Auswahl.
 
@@ -937,7 +937,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Wenn ein Vorhaben einen spürbaren Teil Eurer Zeit oder Eures Budgets beansprucht: Welche Absicherungen wären Dir vorher wichtig?
+> Ein Vorhaben würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Welche Absicherungen wären dir vorher wichtig?
 
 **Antworten** (6, Reihenfolge und Anzahl bleiben):
 
@@ -963,7 +963,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ihr habt eine neue Finanzplanung erstellt, einige Zahlen sind aber noch nicht sicher. Aktuell besteht keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wann sollte das Team davon erfahren?
+> Ihr habt eine neue Finanzplanung erstellt, aber einige Zahlen sind noch unsicher. Es besteht aktuell keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wie würdest du mit der vorläufigen Planung umgehen?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -978,7 +978,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Eine Person arbeitet schon lange mit Euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung.
+> Eine Person arbeitet schon lange mit euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung. Wie würdest du in dieser Situation eher vorgehen?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -993,7 +993,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten.
+> Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten. Wie würdest du zwischen den beiden Angeboten entscheiden?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -1008,7 +1008,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben.
+> Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben. Wie würdest du über das weitere Vorgehen entscheiden?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -1023,7 +1023,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen.
+> Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen. Wie würdest du das zusätzliche Budget eher einsetzen?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -1038,7 +1038,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich.
+> Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich. Wie würdest du den zusätzlichen Bonus eher verteilen?
 
 **Antwortform:** value_case — keine feste Auswahl.
 
@@ -1055,7 +1055,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Gibt es Vorgehensweisen oder Entscheidungen, die für Dich im Unternehmen grundsätzlich nicht infrage kommen?
+> Gibt es Vorgehensweisen oder Entscheidungen, die für dich im Unternehmen grundsätzlich nicht infrage kommen?
 
 **Antwortform:** free_text_repeatable — keine feste Auswahl.
 
@@ -1072,7 +1072,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Woran würdest Du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?
+> Woran würdest du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?
 
 **Erscheint nur**, wenn L01 beantwortet ist.
 
@@ -1089,7 +1089,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 
 **Jetzt:**
 
-> Was sollte passieren, wenn Ihr Euch nicht einig seid, ob eine für Dich wichtige Grenze in einer konkreten Situation betroffen ist?
+> Was sollte passieren, wenn ihr euch nicht einig seid, ob eine für dich wichtige Grenze in einer konkreten Situation betroffen ist?
 
 **Erscheint nur**, wenn L01 beantwortet ist.
 

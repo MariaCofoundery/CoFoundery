@@ -29,9 +29,9 @@ test("was offen ist, steht in einem eigenen Abschnitt", () => {
   // beantworteten Fragen gemischt waere er versteckt.
   const report = buildAlignmentReport([
     scale("A01", 3),
-    row({ block_id: "S02", answer_format: "single_choice", missing_code: "undecided" }),
+    row({ block_id: "S02", answer_format: "single_choice", missing_code: "not_decided" }),
     row({ block_id: "L01", answer_format: "free_text", missing_code: "confidential_first" }),
-    row({ block_id: "B01", answer_format: "money_range", missing_code: "withheld" }),
+    row({ block_id: "B01", answer_format: "money_range", missing_code: "prefer_not_to_say" }),
   ]);
 
   assert.deepEqual(report.open.map((entry) => entry.entry.blockId), ["S02", "L01"]);

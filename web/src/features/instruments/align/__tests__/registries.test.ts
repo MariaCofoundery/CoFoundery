@@ -46,39 +46,90 @@ const flach = quelle.replace(/\s+/g, " ");
  */
 const flachOhneMaskierung = flach.replace(/\\([[\]*_`])/g, "$1");
 
-test("jeder Fragetext steht so im Quelldokument - oder die Abweichung ist verzeichnet", () => {
-  const begruendet = JSON.stringify(
-    SCOPES.map((scope) => REGISTRIES[scope].deviationsFromSource),
-  );
+/**
+ * Die zweite Quelle: das Sprachreview.
+ *
+ * ---------------------------------------------------------------------------
+ * ZWEI DOKUMENTE, ZWEI FRAGEN
+ * ---------------------------------------------------------------------------
+ *
+ * Die Master-Arbeitsfassung sagt, WAS gefragt wird. Das Sprachreview vom
+ * 29.09.2026 sagt, WIE es dasteht. Seitdem stammt der Wortlaut aus dem Review
+ * und nicht mehr aus der Master-Fassung - und beides muss geprüft werden,
+ * sonst könnte eine Umformulierung ein anderes Konstrukt einführen, ohne dass
+ * es auffällt.
+ *
+ * Deshalb hier: Der Wortlaut muss im Review stehen, und die Frage selbst muss
+ * es in der Master-Fassung geben.
+ */
+const review = readFileSync(
+  join(
+    process.cwd(), "..", "docs",
+    "CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
+  ),
+  "utf8",
+).replace(/\s+/g, " ");
 
+/**
+ * S01 wird nicht umformuliert, sondern ersetzt.
+ *
+ * Das Sprachreview sagt zu S01 nur „siehe Abschnitt 2“ und baut die Frage dort
+ * als sechs Wichtigkeiten neu auf (S01a bis S01f plus S01_top). Solange das
+ * nicht gebaut ist, steht die alte Mehrfachauswahl noch da - mit dem Wortlaut
+ * der Master-Fassung und ohne Eintrag im Review.
+ *
+ * Die Ausnahme steht hier NAMENTLICH und nicht als weiche Regel: Sobald S01
+ * ersetzt ist, faellt sie auf, weil die Kennung dann nicht mehr existiert.
+ */
+const NOCH_NICHT_UEBERARBEITET = new Set(["S01"]);
+
+test("jeder Fragetext steht so im Sprachreview", () => {
   for (const item of alleItems()) {
-    if (flach.includes(item.prompt)) continue;
+    if (NOCH_NICHT_UEBERARBEITET.has(item.itemId)) continue;
+    if (review.includes(item.prompt)) continue;
 
-    assert.ok(
-      flachOhneMaskierung.includes(item.prompt) ||
-        // L02/L03: die Redaktionsmarke am Ende ist gestrichen, der Satz davor
-        // steht woertlich in der Quelle.
-        flachOhneMaskierung.includes(item.prompt.replace(/\?$/, "")),
-      `${item.itemId}: der Fragetext steht nicht in der Quelle:\n${item.prompt}`,
-    );
+    // W02 bis W06 stehen im Dokument als zwei Bloecke: erst die Lage, dann die
+    // Frage. Zusammengesetzt ergeben sie den Fragetext - und deshalb wird
+    // SATZWEISE geprueft statt am Stueck. Erfinden laesst sich damit trotzdem
+    // nichts: Jeder Satz muss dort stehen.
+    for (const satz of item.prompt.split(/(?<=\.)\s+/)) {
+      assert.ok(
+        review.includes(satz.trim()),
+        `${item.itemId}: dieser Satz steht nicht im Sprachreview:\n${satz}`,
+      );
+    }
+  }
+});
 
+test("jede Frage gibt es auch in der fachlichen Quelle", () => {
+  // Das Sprachreview darf umformulieren, nicht erfinden. Eine Kennung, die es
+  // in der Master-Fassung nicht gibt, waere eine neue Frage ohne fachliche
+  // Grundlage - und die braeuchte eine eigene Kennung und eine eigene
+  // Begruendung.
+  for (const item of alleItems()) {
     assert.ok(
-      begruendet.includes(item.itemId),
-      `${item.itemId}: weicht von der Quelle ab, ohne dass es verzeichnet ist`,
+      new RegExp(`\\*\\*${item.itemId}\\*\\*`).test(flach),
+      `${item.itemId} steht in keiner Master-Fassung`,
     );
   }
 });
 
-test("jede Antwortmöglichkeit steht so in der Quelle - oder ist als Abweichung verzeichnet", () => {
+test("die Gegenprobe: ein erfundener Wortlaut faellt auf", () => {
+  // Ohne sie koennte die Pruefung oben alles durchlassen, wenn das Dokument
+  // nur lang genug ist.
+  assert.ok(!review.includes("Wie sehr vertraust du deinem Bauchgefuehl?"));
+});
+
+test("jede Antwortmöglichkeit steht in einer der beiden Quellen - oder ist als Abweichung verzeichnet", () => {
   // Der Waechter hat beim Bauen meine eigene Umformulierung gefangen (R12,
   // „Datum“ → „an einem bestimmten Datum“). Genau so soll er arbeiten: Was
-  // nicht in der Quelle steht, muss begruendet dastehen - nicht am Test
+  // nicht in einer Quelle steht, muss begruendet dastehen - nicht am Test
   // vorbei.
   const begruendet = JSON.stringify(SCOPES.map((scope) => REGISTRIES[scope].deviationsFromSource));
 
   for (const item of alleItems()) {
     for (const option of item.options) {
-      if (flach.includes(option.label)) continue;
+      if (flach.includes(option.label) || review.includes(option.label)) continue;
       assert.ok(
         begruendet.includes(item.itemId),
         `${item.itemId}/${option.optionId}: „${option.label}“ steht weder in der Quelle ` +

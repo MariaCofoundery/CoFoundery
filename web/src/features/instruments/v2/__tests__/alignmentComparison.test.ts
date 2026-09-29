@@ -37,7 +37,7 @@ test("gleiche und verschiedene Kategorien werden benannt, nicht bewertet", () =>
 });
 
 test("ein fehlender Grund macht den Vergleich unmöglich, nicht negativ", () => {
-  const a = buildReadout([row({ block_id: "B01", answer_format: "money_range", missing_code: "withheld" })]);
+  const a = buildReadout([row({ block_id: "B01", answer_format: "money_range", missing_code: "prefer_not_to_say" })]);
   const b = buildReadout([row({ block_id: "B01", answer_format: "money_range", value: { min: 5000, currency: "EUR" } })]);
   const compared = compareBlocks(a, b);
 

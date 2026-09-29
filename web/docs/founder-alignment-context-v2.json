@@ -113,8 +113,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: ein verlässlich tragfähiges Einkommen; starkes Wachstum in einem größeren Markt; eine klar benannte gesellschaftliche oder ökologische Wirkung; ein verkaufsfähiges Unternehmen aufbauen; ein fachlich anspruchsvolles Vorhaben verwirklichen; mehrere gleich wichtige Ziele – bitte benennen; ein anderes Ziel – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -154,8 +154,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: ich möchte langfristig beteiligt bleiben; ein Verkauf ist eine mögliche Option; ich möchte auf einen Verkauf hinarbeiten; das hängt von bestimmten Bedingungen ab – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -195,8 +195,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: ich möchte ohne externes Eigenkapital aufbauen; ich möchte es als Möglichkeit offenhalten; ich möchte gezielt externes Eigenkapital suchen; für mich hängt es von Bedingungen ab – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -217,8 +217,8 @@
         "Freitext: Ergebnis, erkennbare Erfüllung, Zieldatum"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Strukturierter Freitext: Freitext: Ergebnis, erkennbare Erfüllung, Zieldatum; noch offen; möchte ich nicht angeben",
@@ -258,8 +258,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: überwiegend im Unternehmen belassen; zwischen Unternehmen und Ausschüttung aufteilen; überwiegend ausschütten; je nach vereinbarter finanzieller Lage entscheiden; noch offen; möchte ich nicht angeben",
@@ -304,8 +304,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: operativ mitarbeiten; vor allem führen und organisieren; vor allem fachlich gestalten; vor allem als Anteilseigner beteiligt sein; eine andere oder kombinierte Rolle – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -324,8 +324,8 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Freitext: Freitext: Ereignis oder Bedingung; noch offen; möchte ich nicht angeben",
@@ -350,8 +350,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Freitext: Freitext oder: kein solches Ziel festgelegt; noch offen; möchte ich nicht angeben",
@@ -372,8 +372,8 @@
         "0 ist zulässig"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Originaleinheit Stunden/Woche; Unter- und Obergrenze getrennt speichern. Kein Reverse.",
       "answerSpecSource": "Zahl/Bereich: Zahl oder Bereich in Stunden/Woche; 0 ist zulässig; noch offen; möchte ich nicht angeben",
@@ -398,8 +398,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Stunden/Woche je Empfänger; nicht über Personen mitteln. Kein Reverse.",
       "answerSpecSource": "Personenbezogene Zahl/Bereich: pro Person oder geplanter Rolle: Zahl/Bereich in Stunden/Woche; keine feste Erwartung; noch offen; möchte ich nicht angeben",
@@ -429,8 +429,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Zeitfenster: Wochentage und Zeitfenster; nur nach Vereinbarung; keine festen gemeinsamen Zeiten; noch offen; möchte ich nicht angeben",
@@ -466,8 +466,8 @@
       "fieldNotes": [],
       "missing": [
         "cannot_assess",
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: ab sofort; ab einem Datum – bitte angeben; innerhalb der nächsten zwölf Monate voraussichtlich nicht; noch nicht einschätzbar; noch offen; möchte ich nicht angeben",
@@ -488,8 +488,8 @@
         "brutto/netto kennzeichnen"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Originalbetrag mit Währung und Bezugsbasis; nicht automatisch zwischen Ländern vergleichen. Kein Reverse.",
       "answerSpecSource": "Geldbetrag/Bereich: Betrag oder Bereich pro Monat in vereinbarter Währung; brutto/netto kennzeichnen; noch offen; möchte ich nicht angeben",
@@ -539,8 +539,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Mehrfachwahl mit Bedingungen: ich arbeite bereits vollständig daran; wenn eine bestimmte Auszahlung gesichert ist; wenn eine Finanzierung oder ein Meilenstein erreicht ist; ab einem möglichen Datum; ein vollständiger Wechsel ist aktuell nicht geplant; andere Bedingung – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -561,8 +561,8 @@
         "Bedingungen optional"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Zusatzstunden; nicht als Commitment-Punkte zählen. Kein Reverse.",
       "answerSpecSource": "Zahl/Bereich: zusätzliche Stunden/Woche oder: keinen; Bedingungen optional; noch offen; möchte ich nicht angeben",
@@ -583,8 +583,8 @@
         "Gründe müssen nicht genannt werden"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Zeitfenster: Zeitfenster; Gründe müssen nicht genannt werden; noch offen; möchte ich nicht angeben",
@@ -624,8 +624,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: bis zu einem Datum; bis ein neu vereinbartes Ergebnis erreicht ist; das möchte ich dann gemeinsam neu entscheiden; unter diesen Bedingungen nicht weiter; noch offen; möchte ich nicht angeben",
@@ -670,8 +670,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "1–5 ordinal, separat; keine Vermischung mit Stunden oder Geld. Kein Reverse.",
       "answerSpecSource": "Wichtigkeitsrating: gar nicht wichtig; wenig wichtig; mittel wichtig; ziemlich wichtig; sehr wichtig; noch offen; möchte ich nicht angeben",
@@ -696,8 +696,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "withheld",
-        "undecided"
+        "prefer_not_to_say",
+        "not_decided"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Freitext: freiwilliger Freitext; keine absehbare Veränderung; möchte ich nicht angeben; noch offen; möchte ich nicht angeben",
@@ -716,8 +716,8 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Datum; kein psychologischer Score. Kein Reverse.",
       "answerSpecSource": "Datum: Datum; noch offen; möchte ich nicht angeben",
@@ -738,8 +738,8 @@
         "0"
       ],
       "missing": [
-        "withheld",
-        "undecided"
+        "prefer_not_to_say",
+        "not_decided"
       ],
       "scoring": "Grenze in Originaleinheit, nicht aus anderem Finanzwissen schätzen. Kein Reverse.",
       "answerSpecSource": "Geldbetrag/Bereich: Betrag/Bereich mit Währung; 0; möchte ich nicht angeben; noch offen; möchte ich nicht angeben",
@@ -779,8 +779,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: grundsätzlich nicht; nur bis zu einer von mir genannten Höchstgrenze; das möchte ich erst nach Prüfung des konkreten Falls entscheiden; andere Bedingung – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -807,8 +807,8 @@
         "0"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Wochen; Risiko domänenspezifisch dokumentieren. Kein Reverse.",
       "answerSpecSource": "Zahl/Bereich: Wochen oder Bereich; 0; hängt vom Versuch ab – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -829,8 +829,8 @@
         "wenn noch keine Ausgaben bestehen: zunächst Ausgabenplan klären"
       ],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Monate; Bezugsbudget und Datum speichern. Kein Reverse.",
       "answerSpecSource": "Zahl/Bereich: Monate der laufenden Ausgaben; wenn noch keine Ausgaben bestehen: zunächst Ausgabenplan klären; noch offen; möchte ich nicht angeben",
@@ -880,8 +880,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominale Anforderungen, keine Summe der Absicherungen. Kein Reverse.",
       "answerSpecSource": "Mehrfachwahl: kleiner Vorversuch; feste Ausgabenobergrenze; vorher vereinbarte Abbruchbedingung; externe Prüfung; für den konkreten Fall keine zusätzliche Absicherung; andere – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -900,8 +900,8 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Freitext: Freitext: konkrete Folge; noch offen; möchte ich nicht angeben",
@@ -946,8 +946,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: die verantwortliche Person nach Anhörung; eine benannte Person für diese Entscheidung; Mehrheit der Founder; alle Founder gemeinsam; abhängig von der Entscheidung – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -992,8 +992,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: noch am selben Tag fortsetzen; einen konkreten Folgetermin vereinbaren; schriftlich die offenen Punkte sammeln und dann einen Termin vereinbaren; eine neutrale Person für die Fortsetzung hinzunehmen; andere Vorgehensweise – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -1038,8 +1038,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Einzelauswahl: vorab benannte Person entscheidet; zeitlich begrenzter Versuch; externe Moderation oder Beratung; Entscheidung bis zu einer neuen Frist aussetzen; anderer vereinbarter Weg; noch offen; möchte ich nicht angeben",
@@ -1089,8 +1089,8 @@
       ],
       "fieldNotes": [],
       "missing": [
-        "undecided",
-        "withheld"
+        "not_decided",
+        "prefer_not_to_say"
       ],
       "scoring": "Nominal; keine Mittelwertbildung und keine Rangfolge. Kein Reverse.",
       "answerSpecSource": "Mehrfachwahl: Anteile und Aufnahme neuer Founder; größere finanzielle Verpflichtungen; grundlegende Richtungsänderung; Verkauf des Unternehmens; Änderung persönlicher Zusagen; andere – bitte benennen; noch offen; möchte ich nicht angeben",
@@ -1109,7 +1109,7 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
+        "not_decided",
         "confidential_first"
       ],
       "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Selbst benannte Grenze; nicht als Integritätswert verrechnen.",
@@ -1128,7 +1128,7 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
+        "not_decided",
         "confidential_first"
       ],
       "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Operationalisierung der Grenze statt abstraktem Wertebekenntnis.",
@@ -1147,7 +1147,7 @@
       "options": [],
       "fieldNotes": [],
       "missing": [
-        "undecided",
+        "not_decided",
         "confidential_first"
       ],
       "scoring": "Kein numerischer Wert; Vereinbarung und Status dokumentieren. Verfahren für unklare Fälle; keine automatische Mehrheitsüberstimmung.",

@@ -65,7 +65,7 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 /** Auslassungsgründe, die ein Gesprächsanlass sind - und die, die keiner sind. */
-const OPEN_CODES = new Set(["undecided", "cannot_assess", "confidential_first"]);
+const OPEN_CODES = new Set(["not_decided", "cannot_assess", "confidential_first"]);
 
 export function buildAlignmentReport(
   rows: readonly StoredAnswerRow[],

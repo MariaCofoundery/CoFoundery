@@ -47,7 +47,7 @@ select extensions.throws_ok(
 
 select extensions.throws_ok(
   $$insert into public.alignment_answers (assessment_id, block_id, answer_format, value, missing_code)
-    values ('a2000010-0010-4010-8010-000000000010', 'A01', 'F', '{"scale":3}', 'withheld')$$,
+    values ('a2000010-0010-4010-8010-000000000010', 'A01', 'F', '{"scale":3}', 'prefer_not_to_say')$$,
   '23514',
   null,
   'beides zugleich wird abgelehnt'
@@ -61,7 +61,7 @@ select extensions.lives_ok(
 
 select extensions.lives_ok(
   $$insert into public.alignment_answers (assessment_id, block_id, answer_format, missing_code)
-    values ('a2000010-0010-4010-8010-000000000010', 'A02', 'F', 'withheld')$$,
+    values ('a2000010-0010-4010-8010-000000000010', 'A02', 'F', 'prefer_not_to_say')$$,
   'ein Grund allein geht'
 );
 
@@ -93,7 +93,7 @@ select extensions.throws_ok(
 
 select extensions.lives_ok(
   $$insert into public.alignment_answers (assessment_id, block_id, answer_format, missing_code)
-    values ('a2000010-0010-4010-8010-000000000010', 'S07', 'free_text', 'undecided')$$,
+    values ('a2000010-0010-4010-8010-000000000010', 'S07', 'free_text', 'not_decided')$$,
   'derselbe Sachverhalt als Grund geht'
 );
 
@@ -233,7 +233,7 @@ select extensions.is(
 select extensions.lives_ok(
   $$insert into public.alignment_answers
       (assessment_id, block_id, answer_format, missing_code, marked_for_discussion, change_condition)
-    values ('a2000010-0010-4010-8010-000000000010', 'G01', 'single_choice', 'undecided',
+    values ('a2000010-0010-4010-8010-000000000010', 'G01', 'single_choice', 'not_decided',
             true, 'Wenn wir die Bereiche klar aufgeteilt haben.')$$,
   'noch offen und trotzdem zur Besprechung markiert'
 );

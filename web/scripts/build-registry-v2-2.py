@@ -59,18 +59,158 @@ SCOPES = {
 # fuer die Ablage nicht: Ein Auslassungsgrund darf nie als Wert gespeichert
 # werden - genau so ist er in v1 unsichtbar geworden und wurde mitgemittelt.
 MISSING_AUS_OPTION = {
-    "nicht angeben":                    ("withheld", "möchte ich nicht angeben"),
-    "noch offen":                       ("undecided", "habe ich noch nicht entschieden"),
-    "noch nicht entschieden":           ("undecided", "habe ich noch nicht entschieden"),
-    "noch nicht geklärt":               ("undecided", "haben wir noch nicht geklärt"),
-    "noch nicht festgelegt":            ("undecided", "habe ich noch nicht festgelegt"),
-    "noch nicht klar entschieden":      ("undecided", "habe ich noch nicht entschieden"),
-    "noch unklar":                      ("undecided", "ist mir noch unklar"),
+    "nicht angeben":                    ("prefer_not_to_say", "möchte ich nicht angeben"),
+    "noch offen":                       ("not_decided", "habe ich noch nicht entschieden"),
+    "noch nicht entschieden":           ("not_decided", "habe ich noch nicht entschieden"),
+    "noch nicht geklärt":               ("not_clarified", "haben wir noch nicht geklärt"),
+    "noch nicht festgelegt":            ("not_decided", "habe ich noch nicht festgelegt"),
+    "noch nicht klar entschieden":      ("not_decided", "habe ich noch nicht entschieden"),
+    "noch unklar":                      ("not_decided", "ist mir noch unklar"),
     "noch nicht einschätzbar":          ("cannot_assess", "kann ich noch nicht einschätzen"),
     "noch keine Einschätzung":          ("cannot_assess", "kann ich noch nicht einschätzen"),
     "zunächst vertraulich klären":      ("confidential_first", "möchte ich zunächst vertraulich klären"),
     "zunächst nur für mich festhalten": ("confidential_first", "möchte ich zunächst nur für mich festhalten"),
 }
+
+# ---------------------------------------------------------------------------
+# DAS SPRACHREVIEW LIEGT UEBER DER QUELLE
+# ---------------------------------------------------------------------------
+#
+# Die Master-Arbeitsfassung sagt, WAS gefragt wird. Das Sprachreview vom
+# 29.09.2026 sagt, WIE es dasteht - Wortlaut, Hinweise, Kleinschreibung von
+# "du", und je Item der passende Auslassungsgrund.
+#
+# ZWEI DOKUMENTE UND NICHT EINES. Die Master-Fassung in die neuen Wortlaute
+# umzuschreiben waere einfacher und falsch: Sie ist die fachliche Quelle, das
+# Review eine redaktionelle Schicht darueber. Verschmolzen liesse sich spaeter
+# nicht mehr sagen, was gemessen werden SOLL und was wir daraus gemacht haben.
+#
+# Deshalb wird hier ueberlagert und jede Ueberlagerung verzeichnet.
+REVIEW = "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md"
+
+# Ohne eigene Beschriftung im Dokument: der uebliche Satz zum Code.
+MISSING_LABEL = {
+    "cannot_assess":      "kann ich noch nicht einschätzen",
+    "not_decided":        "habe ich noch nicht entschieden",
+    "not_clarified":      "haben wir noch nicht geklärt",
+    "prefer_not_to_say":  "möchte ich nicht angeben",
+    "confidential_first": "möchte ich zunächst vertraulich klären",
+}
+
+
+def _zitate(text):
+    """Alle Zitatbloecke ('> ...' in Folge), je zu einem Satz zusammengezogen."""
+    bloecke, aktuell = [], []
+    for zeile in text.split("\n"):
+        if zeile.startswith("> "):
+            aktuell.append(zeile[2:].strip())
+        elif zeile.strip() == ">":
+            aktuell.append("")
+        else:
+            if aktuell:
+                bloecke.append(re.sub(r"\s+", " ", " ".join(aktuell)).strip())
+                aktuell = []
+    if aktuell:
+        bloecke.append(re.sub(r"\s+", " ", " ".join(aktuell)).strip())
+    return bloecke
+
+
+def _nummern_nach(text, marke):
+    i = text.find(marke)
+    if i < 0:
+        return None
+    out = []
+    for zeile in text[i + len(marke):].split("\n"):
+        z = zeile.strip()
+        m = re.match(r"^\d+\.\s+(.*)$", z)
+        if m:
+            out.append(m.group(1).strip())
+        elif out and z:
+            break
+    return out or None
+
+
+def _codes_nach(text, marke):
+    i = text.find(marke)
+    if i < 0:
+        return None
+    rest = text[i + len(marke):]
+    inline = re.findall(r"`([a-z_]+)`", rest.split("\n", 1)[0])
+    if inline:
+        return inline
+    out = []
+    for zeile in rest.split("\n"):
+        z = zeile.strip()
+        if z.startswith("- "):
+            out.extend(re.findall(r"`?([a-z_]+)`?", z[2:].strip()))
+        elif out and z:
+            break
+    return out or None
+
+
+def _labels_nach(text):
+    if "UI-Label:" in text:
+        nach = _zitate(text[text.index("UI-Label:"):])
+        if nach:
+            return [nach[0]]
+    m = re.search(r"^UI:\s*$", text, flags=re.M)
+    if m:
+        labels = []
+        for zeile in text[m.end():].split("\n"):
+            z = zeile.strip()
+            if z.startswith("- "):
+                labels.append(z[2:].strip())
+            elif labels and z:
+                break
+        if labels:
+            return labels
+    return None
+
+
+def sprachreview():
+    """Das Review als `{Kennung: {prompt, hint, options, missing, ...}}`."""
+    text = io.open(REVIEW, encoding="utf-8").read()
+    out = {}
+    for block in re.split(r"^### ", text, flags=re.M)[1:]:
+        kopf, koerper = block.split("\n", 1)
+        kennung = kopf.strip().split(" ")[0]
+        if not re.match(r"^[A-Z][0-9]{2}[a-z]?$", kennung):
+            continue
+
+        eintrag = {}
+        # Szenario + Frage gehoeren zusammen: W02 bis W06 beschreiben eine Lage
+        # und stellen danach die Frage. Beides ist die Frage.
+        if "Frage:" in koerper and "Szenario:" in koerper:
+            szenario = _zitate(koerper[:koerper.index("Frage:")])
+            frage = _zitate(koerper[koerper.index("Frage:"):])
+            if szenario and frage:
+                eintrag["prompt"] = f"{szenario[0]} {frage[0]}"
+        else:
+            q = _zitate(koerper.split("Hinweis:")[0])
+            if q:
+                eintrag["prompt"] = q[0]
+
+        if "Hinweis:" in koerper:
+            nach = _zitate(koerper[koerper.index("Hinweis:"):])
+            if nach:
+                eintrag["hint"] = nach[0]
+
+        codes = _codes_nach(koerper, "Auslassung:")
+        if codes:
+            eintrag["missing"] = codes
+        labels = _labels_nach(koerper)
+        if labels:
+            eintrag["missingLabels"] = labels
+
+        neue_labels = _nummern_nach(koerper, "Antwortlabels:")
+        if neue_labels:
+            eintrag["options"] = neue_labels
+        unveraendert = _nummern_nach(koerper, "Antworten unverändert:")
+        if unveraendert:
+            eintrag["unchanged"] = unveraendert
+
+        out[kennung] = eintrag
+    return out
 
 # ---------------------------------------------------------------------------
 # DAS ANTWORTFORMAT JE ITEM
@@ -257,6 +397,69 @@ def format_von(item_id):
     return "single_choice"
 
 ausgabe = []
+# ---------------------------------------------------------------------------
+# DAS SPRACHREVIEW UEBERLAGERN - MIT HARTEN PRUEFUNGEN
+# ---------------------------------------------------------------------------
+#
+# Es wird laut abgebrochen statt still uebersprungen. Ein Review, das die
+# Haelfte der Fragen erreicht und die andere nicht, waere schlimmer als keins:
+# Die Oberflaeche saehe halb ueberarbeitet aus, und niemand wuesste, welche
+# Haelfte welche ist.
+
+REVIEW_ITEMS = sprachreview()
+
+_unbekannt = sorted(k for k in REVIEW_ITEMS if k not in items and not k.startswith("S01"))
+if _unbekannt:
+    raise SystemExit(f"Sprachreview nennt Fragen, die es nicht gibt: {_unbekannt}")
+
+_ohne_review = sorted(k for k in items if k not in REVIEW_ITEMS)
+if _ohne_review:
+    raise SystemExit(f"Diese Fragen stehen nicht im Sprachreview: {_ohne_review}")
+
+for item_id, review in REVIEW_ITEMS.items():
+    if item_id not in items:
+        continue
+    it = items[item_id]
+
+    # "Antworten unveraendert" ist eine Zusage des Dokuments. Stimmt sie nicht,
+    # hat sich eine Seite bewegt, ohne es der anderen zu sagen - und
+    # gespeicherte Antworten zeigen auf die Stelle, nicht auf den Text.
+    if review.get("unchanged") and review["unchanged"] != it["options"]:
+        raise SystemExit(
+            f"{item_id}: 'Antworten unveraendert' stimmt nicht mit der Quelle ueberein\n"
+            f"  Quelle:   {it['options']}\n"
+            f"  Review:   {review['unchanged']}"
+        )
+
+    if review.get("options"):
+        if len(review["options"]) != len(it["options"]):
+            raise SystemExit(
+                f"{item_id}: das Review aendert die ANZAHL der Antworten "
+                f"({len(it['options'])} -> {len(review['options'])}). "
+                "Reihenfolge und Anzahl muessen bleiben."
+            )
+        it["options"] = review["options"]
+
+    if review.get("prompt"):
+        it["prompt"] = review["prompt"]
+    if review.get("hint"):
+        it["hint"] = review["hint"]
+
+    if review.get("missing"):
+        labels = review.get("missingLabels")
+        if labels and len(labels) != len(review["missing"]):
+            raise SystemExit(
+                f"{item_id}: {len(review['missing'])} Auslassungsgruende, "
+                f"aber {len(labels)} Beschriftungen"
+            )
+        it["missing"] = [
+            {
+                "code": code,
+                "label": labels[i] if labels else MISSING_LABEL[code],
+            }
+            for i, code in enumerate(review["missing"])
+        ]
+
 for n, item_id in enumerate(reihenfolge, start=1):
     it = items[item_id]
     fmt = format_von(item_id)
@@ -308,6 +511,7 @@ for scope, meta in SCOPES.items():
         ("status", "draft"),
         ("createdAt", "2026-09-29"),
         ("source", SRC),
+        ("editorialSource", REVIEW),
         ("validity", meta["validity"]),
         ("overallScore", False),
         ("dimensionScores", False),
@@ -317,6 +521,18 @@ for scope, meta in SCOPES.items():
                 ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
                 ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
                 ("decidedBy", "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1."),
+                ("source", REVIEW),
+                ("reason", "Die Master-Fassung sagt, WAS gefragt wird; das Review sagt, WIE es dasteht - Kleinschreibung von 'du', Bedingungssaetze als eigene Saetze, echte Fragesaetze bei W02 bis W06. Anzahl und Reihenfolge der Antworten bleiben, sonst zeigten gespeicherte Antworten auf etwas anderes."),
+                ("decidedBy", "Maria, 29.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Auslassungsgruende heissen not_decided, not_clarified und prefer_not_to_say."),
+                ("source", REVIEW + ", Abschnitt 3"),
+                ("reason", "Bisher hiessen sie undecided und withheld, und 'haben wir noch nicht geklaert' war kein eigener Code, sondern ein Sonderfall von undecided. Zwei Vokabulare nebeneinander waeren eine zweite Wahrheit; 'technical' bleibt zusaetzlich, weil ein technischer Fehlschlag keine Auskunft der Person ist."),
+                ("decidedBy", "Maria, 29.09.2026"),
             ]),
             collections.OrderedDict([
                 ("what", "Markdown-Maskierung entfernt: '\\[Name\\]' wird '[Name]'."),

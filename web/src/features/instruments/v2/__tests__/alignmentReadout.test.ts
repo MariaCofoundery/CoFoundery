@@ -74,9 +74,9 @@ test("es gibt keinen Skalenindex, keinen Mittelwert, keine Gesamtzahl", () => {
 // ---------------------------------------------------------------------------
 
 test("ein Auslassungsgrund bleibt ein Grund und wird nie zur Mitte", () => {
-  const entry = one(row({ block_id: "A01", answer_format: "F", missing_code: "withheld" }));
+  const entry = one(row({ block_id: "A01", answer_format: "F", missing_code: "prefer_not_to_say" }));
   assert.equal(entry.answered, false);
-  assert.equal(entry.missing!.code, "withheld");
+  assert.equal(entry.missing!.code, "prefer_not_to_say");
   assert.equal(entry.missing!.label, "möchte ich nicht angeben");
 
   // Kein Zahlenwert irgendwo - nicht null, nicht 0, nicht die 3.
@@ -89,7 +89,7 @@ test("nicht vergleichbar heißt nicht schlecht", () => {
   // Teil F2: „Für vertrauliche Finanzangaben ist Auslassen kein negativer
   // Befund. Die betreffenden Felder erscheinen lediglich als nicht
   // vergleichbar."
-  const withheld = one(row({ block_id: "B01", answer_format: "money_range", missing_code: "withheld" }));
+  const withheld = one(row({ block_id: "B01", answer_format: "money_range", missing_code: "prefer_not_to_say" }));
   assert.equal(withheld.comparable, false);
 
   const answered = one(row({

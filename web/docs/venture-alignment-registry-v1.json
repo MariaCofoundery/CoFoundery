@@ -6,6 +6,7 @@
   "status": "draft",
   "createdAt": "2026-09-29",
   "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md",
+  "editorialSource": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
   "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person kann bei zwei Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.",
   "overallScore": false,
   "dimensionScores": false,
@@ -15,6 +16,18 @@
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
       "decidedBy": "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"
+    },
+    {
+      "what": "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1.",
+      "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
+      "reason": "Die Master-Fassung sagt, WAS gefragt wird; das Review sagt, WIE es dasteht - Kleinschreibung von 'du', Bedingungssaetze als eigene Saetze, echte Fragesaetze bei W02 bis W06. Anzahl und Reihenfolge der Antworten bleiben, sonst zeigten gespeicherte Antworten auf etwas anderes.",
+      "decidedBy": "Maria, 29.09.2026"
+    },
+    {
+      "what": "Auslassungsgruende heissen not_decided, not_clarified und prefer_not_to_say.",
+      "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 3",
+      "reason": "Bisher hiessen sie undecided und withheld, und 'haben wir noch nicht geklaert' war kein eigener Code, sondern ein Sonderfall von undecided. Zwei Vokabulare nebeneinander waeren eine zweite Wahrheit; 'technical' bleibt zusaetzlich, weil ein technischer Fehlschlag keine Auskunft der Person ist.",
+      "decidedBy": "Maria, 29.09.2026"
     },
     {
       "what": "Markdown-Maskierung entfernt: '\\[Name\\]' wird '[Name]'.",
@@ -54,7 +67,7 @@
       "itemId": "U01",
       "order": 1,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wenn Dein Verantwortungsbereich klar geregelt ist: Wie selbstständig möchtest Du dort normalerweise über das Vorgehen entscheiden?",
+      "prompt": "Dein Verantwortungsbereich ist klar geregelt. Wie selbstständig möchtest du dort normalerweise über das Vorgehen entscheiden?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -101,7 +114,7 @@
       "itemId": "U03",
       "order": 2,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wenn Du innerhalb eines vereinbarten Budgets bleiben kannst: Wie selbstständig möchtest Du über Ausgaben in Deinem Bereich entscheiden?",
+      "prompt": "Für deinen Bereich gibt es ein vereinbartes Budget. Wie selbstständig möchtest du innerhalb dieses Rahmens über Ausgaben entscheiden?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -148,7 +161,7 @@
       "itemId": "U04",
       "order": 3,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wenn mehrere sinnvolle Vorgehensweisen möglich sind: Wie selbstständig möchtest Du in Deinem Bereich auswählen können, welchen Weg Du gehst?",
+      "prompt": "In deinem Bereich sind mehrere sinnvolle Vorgehensweisen möglich. Wie selbstständig möchtest du entscheiden, welchen Weg du gehst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -195,7 +208,7 @@
       "itemId": "U05",
       "order": 4,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wenn sich während der Arbeit etwas ändert: Wie frei möchtest Du einen vereinbarten Plan in Deinem Bereich selbst anpassen können?",
+      "prompt": "Während der Arbeit ändert sich etwas. Wie frei möchtest du einen vereinbarten Plan in deinem Bereich selbst anpassen können?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -242,7 +255,7 @@
       "itemId": "K01",
       "order": 5,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wann zeigst Du anderen Foundern normalerweise einen Zwischenstand aus Deinem Bereich?",
+      "prompt": "Wann zeigst du anderen Foundern normalerweise einen Zwischenstand aus deinem Bereich?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -289,7 +302,7 @@
       "itemId": "K03",
       "order": 6,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Wie früh möchtest Du von einer wichtigen Richtungsänderung in einem anderen Bereich erfahren?",
+      "prompt": "In einem anderen Bereich zeichnet sich eine wichtige Richtungsänderung ab. Wann möchtest du davon erfahren?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -336,7 +349,7 @@
       "itemId": "K04",
       "order": 7,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu Dir?",
+      "prompt": "Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu dir?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -432,7 +445,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -443,48 +456,48 @@
       "itemId": "S02",
       "order": 9,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welche Vorstellung hast Du aktuell davon, was in den nächsten drei Jahren mit Deinen Unternehmensanteilen passieren soll?",
+      "prompt": "Welche Vorstellung hast du aktuell für deine Unternehmensanteile in den nächsten drei Jahren?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
         {
           "optionId": "S02_o1",
-          "label": "langfristig beteiligt bleiben/kein Verkauf geplant",
+          "label": "Ich möchte langfristig beteiligt bleiben und plane aktuell keinen Verkauf.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S02_o2",
-          "label": "teilweiser Verkauf grundsätzlich möglich",
+          "label": "Ein teilweiser Verkauf wäre für mich grundsätzlich möglich.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S02_o3",
-          "label": "gezielt auf vollständigen Verkauf hinarbeiten",
+          "label": "Ich möchte gezielt auf einen späteren vollständigen Verkauf hinarbeiten.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S02_o4",
-          "label": "abhängig von Bedingungen",
+          "label": "Das hängt für mich von bestimmten Bedingungen ab.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S02_o5",
-          "label": "Möglichkeiten offenhalten",
+          "label": "Ich möchte mir alle Möglichkeiten offenhalten.",
           "requiresText": false,
           "exclusive": false
         }
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -494,7 +507,7 @@
       "itemId": "S03",
       "order": 10,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Wie stehst Du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?",
+      "prompt": "Wie stehst du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -525,11 +538,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -539,8 +552,8 @@
       "itemId": "S04",
       "order": 11,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welches konkrete Ergebnis sollte das Vorhaben aus Deiner Sicht in den nächsten zwölf Monaten erreicht haben?",
-      "hint": "Auch ein Lernergebnis kann ein legitimes Ziel sein.",
+      "prompt": "Welches konkrete Ergebnis sollte das Vorhaben aus deiner Sicht in den nächsten zwölf Monaten erreichen?",
+      "hint": "Auch ein klares Lernergebnis kann ein Ziel sein – zum Beispiel eine Annahme zu prüfen oder bewusst zu entscheiden, einen Ansatz nicht weiterzuverfolgen.",
       "answerFormat": "structured_text",
       "options": [],
       "missing": [
@@ -555,7 +568,7 @@
       "itemId": "S06",
       "order": 12,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Wie möchtest Du Deine eigene Rolle im Unternehmen in etwa drei Jahren gestalten?",
+      "prompt": "Welche Rolle möchtest du in etwa drei Jahren selbst im Unternehmen haben?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -598,7 +611,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "ist mir noch unklar"
         }
       ],
@@ -609,17 +622,17 @@
       "itemId": "R01",
       "order": 13,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie viele Stunden pro Woche kannst Du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?",
+      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?",
       "hint": null,
       "answerFormat": "number_range",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -629,13 +642,13 @@
       "itemId": "R02",
       "order": 14,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie viele Stunden pro Woche erwartest Du in den nächsten zwölf Wochen ungefähr von [Name]?",
+      "prompt": "Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen ungefähr von [Name]?",
       "hint": null,
       "answerFormat": "person_number_range",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_clarified",
           "label": "haben wir noch nicht geklärt"
         }
       ],
@@ -645,8 +658,8 @@
       "itemId": "R03",
       "order": 15,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Welche regelmäßigen Zeiten könntest Du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?",
-      "hint": "Wochenplaner mit verfügbaren Zeitfenstern und ausdrücklich nicht verfügbaren Zeiten.",
+      "prompt": "Welche regelmäßigen Zeiten könntest du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?",
+      "hint": "Private Gründe für nicht verfügbare Zeiten müssen nicht angegeben werden.",
       "answerFormat": "time_windows",
       "options": [],
       "missing": [
@@ -661,7 +674,7 @@
       "itemId": "R04",
       "order": 16,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Ab wann brauchst Du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben für Deinen Lebensunterhalt?",
+      "prompt": "Ab wann brauchst du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben, um deinen Lebensunterhalt zu decken?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -690,7 +703,7 @@
           "label": "kann ich noch nicht einschätzen"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -700,7 +713,7 @@
       "itemId": "R05",
       "order": 17,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Welche monatliche Auszahlung brauchst Du ab diesem Zeitpunkt ungefähr mindestens?",
+      "prompt": "Welche monatliche Auszahlung brauchst du ab diesem Zeitpunkt ungefähr mindestens?",
       "hint": null,
       "answerFormat": "money_range",
       "options": [],
@@ -717,7 +730,7 @@
       "itemId": "R06",
       "order": 18,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Unter welchen Bedingungen könntest Du Dir vorstellen, das Vorhaben zu Deiner beruflichen Haupttätigkeit zu machen?",
+      "prompt": "Unter welchen Bedingungen könntest du dir vorstellen, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -766,7 +779,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -776,7 +789,7 @@
       "itemId": "R09",
       "order": 19,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Angenommen, Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für Deine weitere Mitarbeit gelten?",
+      "prompt": "Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für deine weitere Mitarbeit gelten?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -813,7 +826,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -823,7 +836,7 @@
       "itemId": "R10",
       "order": 20,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie wichtig ist es Dir persönlich, dieses konkrete Vorhaben weiterzuführen?",
+      "prompt": "Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -870,7 +883,7 @@
       "itemId": "R12",
       "order": 21,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wann sollten diese Angaben aus Deiner Sicht spätestens noch einmal überprüft werden?",
+      "prompt": "Wann sollten diese Angaben spätestens wieder überprüft werden?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -889,7 +902,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht festgelegt"
         }
       ],
@@ -899,7 +912,7 @@
       "itemId": "G01",
       "order": 22,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Ihr seid Euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich nicht einig. Die Entscheidung betrifft andere Bereiche nicht wesentlich. Welche Regel wäre Dir am liebsten?",
+      "prompt": "Ihr seid euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich uneinig. Andere Bereiche sind nicht wesentlich betroffen. Welche Regel soll in so einem Fall gelten?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -946,7 +959,7 @@
       "itemId": "G04",
       "order": 23,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Ihr erreicht bei einer wichtigen Entscheidung bis zum vereinbarten Zeitpunkt keine Einigung. Welche Lösungen sollten dann grundsätzlich möglich sein?",
+      "prompt": "Ihr findet bis zum vereinbarten Zeitpunkt keine Einigung über eine wichtige Entscheidung. Welche Lösungen sollten dann grundsätzlich möglich sein?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -983,7 +996,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -993,7 +1006,7 @@
       "itemId": "G05",
       "order": 24,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Bei welchen Entscheidungen sollten aus Deiner Sicht grundsätzlich alle Founder zustimmen?",
+      "prompt": "Bei welchen Entscheidungen sollten aus deiner Sicht grundsätzlich alle Founder zustimmen?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1036,7 +1049,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht festgelegt"
         }
       ],
@@ -1046,17 +1059,17 @@
       "itemId": "B01",
       "order": 25,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Wo liegt für Dich aktuell die persönliche Obergrenze für zusätzliches eigenes Geld, das Du in das Vorhaben investieren würdest – auch wenn Du einkalkulieren musst, dass Du es vollständig verlieren könntest?",
+      "prompt": "Welchen zusätzlichen Betrag an eigenem Geld würdest du aktuell höchstens in das Vorhaben investieren, wenn du einkalkulierst, dass du ihn vollständig verlieren könntest?",
       "hint": null,
       "answerFormat": "money_range",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1066,7 +1079,7 @@
       "itemId": "B04",
       "order": 26,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Welche finanzielle Mindestreserve sollte aus Deiner Sicht bestehen bleiben, bevor Ihr zusätzliches Geld in ein größeres Vorhaben investiert?",
+      "prompt": "Welche finanzielle Mindestreserve sollte bestehen bleiben, bevor ihr zusätzliches Geld in ein größeres Vorhaben steckt?",
       "hint": null,
       "answerFormat": "number_range",
       "options": [],
@@ -1076,11 +1089,11 @@
           "label": "kann ich noch nicht einschätzen"
         },
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1090,7 +1103,7 @@
       "itemId": "B05",
       "order": 27,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Wenn ein Vorhaben einen spürbaren Teil Eurer Zeit oder Eures Budgets beansprucht: Welche Absicherungen wären Dir vorher wichtig?",
+      "prompt": "Ein Vorhaben würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Welche Absicherungen wären dir vorher wichtig?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1133,7 +1146,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1143,13 +1156,13 @@
       "itemId": "W01",
       "order": 28,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr habt eine neue Finanzplanung erstellt, einige Zahlen sind aber noch nicht sicher. Aktuell besteht keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wann sollte das Team davon erfahren?",
+      "prompt": "Ihr habt eine neue Finanzplanung erstellt, aber einige Zahlen sind noch unsicher. Es besteht aktuell keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wie würdest du mit der vorläufigen Planung umgehen?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1175,13 +1188,13 @@
       "itemId": "W02",
       "order": 29,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Eine Person arbeitet schon lange mit Euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung.",
+      "prompt": "Eine Person arbeitet schon lange mit euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung. Wie würdest du in dieser Situation eher vorgehen?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1207,13 +1220,13 @@
       "itemId": "W03",
       "order": 30,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten.",
+      "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten. Wie würdest du zwischen den beiden Angeboten entscheiden?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1239,13 +1252,13 @@
       "itemId": "W04",
       "order": 31,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben.",
+      "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben. Wie würdest du über das weitere Vorgehen entscheiden?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1271,13 +1284,13 @@
       "itemId": "W05",
       "order": 32,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen.",
+      "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen. Wie würdest du das zusätzliche Budget eher einsetzen?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1303,13 +1316,13 @@
       "itemId": "W06",
       "order": 33,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich.",
+      "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich. Wie würdest du den zusätzlichen Bonus eher verteilen?",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],
@@ -1335,7 +1348,7 @@
       "itemId": "L01",
       "order": 34,
       "section": "L – persönliche Grenzen",
-      "prompt": "Gibt es Vorgehensweisen oder Entscheidungen, die für Dich im Unternehmen grundsätzlich nicht infrage kommen?",
+      "prompt": "Gibt es Vorgehensweisen oder Entscheidungen, die für dich im Unternehmen grundsätzlich nicht infrage kommen?",
       "hint": null,
       "answerFormat": "free_text_repeatable",
       "options": [],
@@ -1345,7 +1358,7 @@
           "label": "möchte ich zunächst nur für mich festhalten"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1355,13 +1368,13 @@
       "itemId": "L02",
       "order": 35,
       "section": "L – persönliche Grenzen",
-      "prompt": "Woran würdest Du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?",
+      "prompt": "Woran würdest du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?",
       "hint": null,
       "answerFormat": "free_text_per_entry",
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht festgelegt"
         },
         {
@@ -1376,7 +1389,7 @@
       "itemId": "L03",
       "order": 36,
       "section": "L – persönliche Grenzen",
-      "prompt": "Was sollte passieren, wenn Ihr Euch nicht einig seid, ob eine für Dich wichtige Grenze in einer konkreten Situation betroffen ist?",
+      "prompt": "Was sollte passieren, wenn ihr euch nicht einig seid, ob eine für dich wichtige Grenze in einer konkreten Situation betroffen ist?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1419,7 +1432,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         }
       ],

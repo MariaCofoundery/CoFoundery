@@ -45,7 +45,7 @@ insert into public.alignment_answers (assessment_id, block_id, answer_format, va
 
 -- Der Stille hat ausdruecklich nicht geantwortet.
 insert into public.alignment_answers (assessment_id, block_id, answer_format, missing_code) values
-  ('e1000040-0040-4040-8040-000000000040','A01','F','withheld'),
+  ('e1000040-0040-4040-8040-000000000040','A01','F','prefer_not_to_say'),
   ('e1000040-0040-4040-8040-000000000040','A02','F','cannot_assess');
 
 set local role authenticated;

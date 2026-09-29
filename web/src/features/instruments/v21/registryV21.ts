@@ -38,10 +38,24 @@ import registryJson from "../../../../docs/founder-alignment-registry-v2-1.json"
  */
 
 export type MissingCode =
+  /** Kann ich noch nicht einschätzen — über mich selbst. */
   | "cannot_assess"
-  | "undecided"
-  | "withheld"
+  /** Habe ich noch nicht entschieden — mein eigener Plan. */
+  | "not_decided"
+  /** Haben wir noch nicht geklärt — es hängt an mehr als einer Person. */
+  | "not_clarified"
+  /** Möchte ich nicht angeben. */
+  | "prefer_not_to_say"
+  /** Möchte ich zunächst nur für mich festhalten. */
   | "confidential_first"
+  /**
+   * Ein technischer Fehlschlag - KEINE Auskunft der Person.
+   *
+   * Steht nicht im Sprachreview, weil er dort nichts zu suchen hat: Die vier
+   * anderen sind Dinge, die jemand sagt. Dieser ist ein Fehler bei uns, und
+   * ihn mit ihnen zu verwechseln hiesse, einem Menschen eine Haltung
+   * zuzuschreiben, die er nie geäußert hat.
+   */
   | "technical";
 
 /**

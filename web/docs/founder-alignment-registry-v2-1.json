@@ -47,12 +47,12 @@
       "note": "Aussage ueber den eigenen Klaerungsstand."
     },
     {
-      "code": "undecided",
-      "note": "Noch nicht festgelegt oder im Fall nicht entscheidbar. Die Beschriftung steht am Item."
+      "code": "not_decided",
+      "note": "Noch nicht festgelegt oder im Fall nicht entscheidbar. Die Beschriftung steht am Item. Hiess bis zum 29.09.2026 undecided - umbenannt mit dem Sprachreview v0.1."
     },
     {
-      "code": "withheld",
-      "note": "Bewusst nicht angegeben. Kein negativer Befund."
+      "code": "prefer_not_to_say",
+      "note": "Bewusst nicht angegeben. Kein negativer Befund. Hiess bis zum 29.09.2026 withheld."
     },
     {
       "code": "confidential_first",
@@ -650,11 +650,11 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -708,11 +708,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -760,11 +760,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -806,11 +806,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -864,11 +864,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -922,11 +922,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -979,11 +979,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1019,11 +1019,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1040,11 +1040,11 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1061,11 +1061,11 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1089,11 +1089,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1124,11 +1124,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1174,7 +1174,7 @@
           "label": "kann ich noch nicht einschätzen"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1214,11 +1214,11 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1280,11 +1280,11 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "habe ich noch nicht entschieden"
         },
         {
-          "code": "withheld",
+          "code": "prefer_not_to_say",
           "label": "möchte ich nicht angeben"
         }
       ],
@@ -1320,7 +1320,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1368,7 +1368,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1416,7 +1416,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1464,7 +1464,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1512,7 +1512,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1560,7 +1560,7 @@
       ],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "kann ich noch nicht entscheiden"
         }
       ],
@@ -1589,7 +1589,7 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "dazu habe ich noch keine konkrete Angabe"
         },
         {
@@ -1610,7 +1610,7 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "dazu habe ich noch keine konkrete Angabe"
         },
         {
@@ -1632,7 +1632,7 @@
       "options": [],
       "missing": [
         {
-          "code": "undecided",
+          "code": "not_decided",
           "label": "dazu habe ich noch keine konkrete Angabe"
         },
         {

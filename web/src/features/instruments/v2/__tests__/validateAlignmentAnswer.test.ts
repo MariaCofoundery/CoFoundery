@@ -33,7 +33,7 @@ test("ein Block nimmt nur die Auslassungsgründe, die er anbietet", () => {
 
   // A01 ist eine Präferenzfrage. „Noch offen" gibt es dort nicht: Es geht um
   // ein gewünschtes Vorgehen, nicht um eine Festlegung, die noch aussteht.
-  assert.equal(reasonOf(answer({ blockId: "A01", missingCode: "undecided" })), "missing_code_not_offered");
+  assert.equal(reasonOf(answer({ blockId: "A01", missingCode: "not_decided" })), "missing_code_not_offered");
 
   // Und „vertraulich klären" gibt es nur bei den Grenzfragen.
   assert.equal(reasonOf(answer({ blockId: "L01", missingCode: "confidential_first" })), null);
@@ -48,7 +48,7 @@ test("eine Wertekarte hat überhaupt keinen Auslassungsgrund", () => {
   // Aussage über den Fall, nicht über die eigene Auskunftsbereitschaft. Wer
   // das zu einem Missing-Code macht, verliert genau diese Unterscheidung.
   assert.deepEqual(offeredMissingCodes("W01"), []);
-  assert.equal(reasonOf(answer({ blockId: "W01", missingCode: "withheld" })), "missing_code_not_offered");
+  assert.equal(reasonOf(answer({ blockId: "W01", missingCode: "prefer_not_to_say" })), "missing_code_not_offered");
   assert.equal(
     reasonOf(answer({
       blockId: "W01",
@@ -129,7 +129,7 @@ test("ein Grund kommt nie als Wert durch", () => {
     "missing_reason_as_value"
   );
   // Derselbe Sachverhalt, richtig ausgedrückt:
-  assert.equal(reasonOf(answer({ blockId: "S07", missingCode: "undecided" })), null);
+  assert.equal(reasonOf(answer({ blockId: "S07", missingCode: "not_decided" })), null);
 });
 
 test("Skalenstufen sind ganze Zahlen von eins bis fünf", () => {
@@ -229,7 +229,7 @@ test("Format und Block müssen zueinander passen", () => {
     // sind, um ihn ueberhaupt hinzuschreiben, ist der Beweis dafuer - der
     // Pruefer muss ihn trotzdem abfangen, weil Daten vom Client keinen Typ
     // mitbringen.
-    reasonOf({ blockId: "A01", answerFormat: "F", value: { scale: 3 }, missingCode: "withheld" } as unknown as AlignmentAnswer),
+    reasonOf({ blockId: "A01", answerFormat: "F", value: { scale: 3 }, missingCode: "prefer_not_to_say" } as unknown as AlignmentAnswer),
     "value_xor_missing"
   );
 });

@@ -62,12 +62,12 @@
       "note": "Kein fehlender Wert im statistischen Sinn, sondern eine Angabe."
     },
     {
-      "code": "withheld",
+      "code": "prefer_not_to_say",
       "label": "möchte ich nicht angeben",
       "note": "Bei vertraulichen Angaben kein negativer Befund - nur nicht vergleichbar."
     },
     {
-      "code": "undecided",
+      "code": "not_decided",
       "label": "noch offen",
       "note": "NICHT dasselbe wie 'kann ich noch nicht einschaetzen': hier hat sich jemand nicht festgelegt, dort kann jemand nicht beurteilen. R04 bietet beide nebeneinander an. Fuer das Produkt ist das kein fehlender Wert, sondern der Treffer - genau hierueber waere zu sprechen."
     },

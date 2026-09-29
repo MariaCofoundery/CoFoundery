@@ -58,11 +58,11 @@ FORMAT = {
 MISSING = {
   "einschaetzen":        [("cannot_assess", "kann ich noch nicht einschätzen")],
   "einschaetzen_privat": [("cannot_assess", "kann ich noch nicht einschätzen"),
-                          ("withheld", "möchte ich nicht angeben")],
-  "offen":               [("undecided", "habe ich noch nicht entschieden"),
-                          ("withheld", "möchte ich nicht angeben")],
-  "entscheiden":         [("undecided", "kann ich noch nicht entscheiden")],
-  "grenzen":             [("undecided", "dazu habe ich noch keine konkrete Angabe"),
+                          ("prefer_not_to_say", "möchte ich nicht angeben")],
+  "offen":               [("not_decided", "habe ich noch nicht entschieden"),
+                          ("prefer_not_to_say", "möchte ich nicht angeben")],
+  "entscheiden":         [("not_decided", "kann ich noch nicht entscheiden")],
+  "grenzen":             [("not_decided", "dazu habe ich noch keine konkrete Angabe"),
                           ("confidential_first", "möchte ich zunächst vertraulich klären")],
 }
 
@@ -171,8 +171,8 @@ doc = collections.OrderedDict([
     ("sections", sections),
     ("missingCodes", [
         collections.OrderedDict([("code", "cannot_assess"), ("note", "Aussage ueber den eigenen Klaerungsstand.")]),
-        collections.OrderedDict([("code", "undecided"), ("note", "Noch nicht festgelegt oder im Fall nicht entscheidbar. Die Beschriftung steht am Item.")]),
-        collections.OrderedDict([("code", "withheld"), ("note", "Bewusst nicht angegeben. Kein negativer Befund.")]),
+        collections.OrderedDict([("code", "not_decided"), ("note", "Noch nicht festgelegt oder im Fall nicht entscheidbar. Die Beschriftung steht am Item. Hiess bis zum 29.09.2026 undecided - umbenannt mit dem Sprachreview v0.1.")]),
+        collections.OrderedDict([("code", "prefer_not_to_say"), ("note", "Bewusst nicht angegeben. Kein negativer Befund. Hiess bis zum 29.09.2026 withheld.")]),
         collections.OrderedDict([("code", "confidential_first"), ("note", "Bitte um ein Gespraech unter vier Augen. Eine offene Tuer.")]),
         collections.OrderedDict([("code", "technical"), ("note", "Technisch fehlend. Nie mit den anderen vermischen.")]),
     ]),

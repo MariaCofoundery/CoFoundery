@@ -46,15 +46,15 @@ test("nirgends entsteht eine Zahl, mit der sich rechnen ließe", () => {
 test("ein Auslassungsgrund erscheint mit seinem eigenen Satz", () => {
   // Nicht als leeres Feld: Das ist der Unterschied zu v1, wo aus einer
   // Auslassung stillschweigend die Mitte wurde.
-  const entry = readAnswer({ blockId: "G01", missingCode: "undecided" })!;
+  const entry = readAnswer({ blockId: "G01", missingCode: "not_decided" })!;
   assert.equal(entry.value, null);
-  assert.deepEqual(entry.missing, { code: "undecided", label: "habe ich noch nicht entschieden" });
+  assert.deepEqual(entry.missing, { code: "not_decided", label: "habe ich noch nicht entschieden" });
 });
 
 test("ein Grund, den die Frage nicht anbietet, wird nicht geglättet", () => {
   // K01 bietet nur cannot_assess. Eine erfundene Beschriftung dafür wäre eine
   // Auskunft, die niemand gegeben hat.
-  const entry = readAnswer({ blockId: "K01", missingCode: "withheld" })!;
+  const entry = readAnswer({ blockId: "K01", missingCode: "prefer_not_to_say" })!;
   assert.equal(entry.missing, null);
   assert.equal(entry.value, null);
 });

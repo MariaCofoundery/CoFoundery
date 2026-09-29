@@ -66,7 +66,7 @@ test("wer nichts geteilt hat, wird nicht aussortiert", () => {
   // jemanden - es zählt nur nicht mit.
   const mine = buildReadout([scale("A01", 3), scale("A02", 3)]);
   const theirs = buildReadout([
-    row({ block_id: "A01", answer_format: "F", missing_code: "withheld" }),
+    row({ block_id: "A01", answer_format: "F", missing_code: "prefer_not_to_say" }),
     row({ block_id: "A02", answer_format: "F", missing_code: "cannot_assess" }),
   ]);
   const verdict = judgeTopic(topic("P_A"), mine, theirs);

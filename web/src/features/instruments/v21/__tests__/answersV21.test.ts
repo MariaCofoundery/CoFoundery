@@ -39,7 +39,7 @@ test("ein Auslassungsgrund, den die Frage nicht anbietet, wird abgewiesen", () =
   // K01 bietet nur cannot_assess an. withheld wäre dort eine Erfindung.
   assert.deepEqual(offeredMissingCodesV21("K01"), ["cannot_assess"]);
   assert.equal(
-    reasonOf(validateAnswerV21({ blockId: "K01", missingCode: "withheld" })),
+    reasonOf(validateAnswerV21({ blockId: "K01", missingCode: "prefer_not_to_say" })),
     "missing_code_not_offered",
   );
   assert.equal(reasonOf(validateAnswerV21({ blockId: "K01", missingCode: "cannot_assess" })), "ok");
@@ -181,7 +181,7 @@ test("eine Anschlussfrage ohne Voraussetzung wird abgewiesen", () => {
   };
   assert.equal(reasonOf(validateFollowUpV21(followUp, null)), "follow_up_without_basis");
   assert.equal(
-    reasonOf(validateFollowUpV21(followUp, { blockId: "L01", missingCode: "withheld" })),
+    reasonOf(validateFollowUpV21(followUp, { blockId: "L01", missingCode: "prefer_not_to_say" })),
     "follow_up_without_basis",
   );
 });

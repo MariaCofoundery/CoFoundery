@@ -142,7 +142,7 @@ test("derselbe Auslassungsgrund trägt je nach Frage einen anderen Satz", () => 
   // Code hätte zwei davon falsch gemacht - deshalb hängt sie am Item.
   const labels = new Set(
     getItemsV21().flatMap((item) =>
-      item.missing.filter((entry) => entry.code === "undecided").map((entry) => entry.label)),
+      item.missing.filter((entry) => entry.code === "not_decided").map((entry) => entry.label)),
   );
   assert.equal(labels.size, 3, `undecided hat ${labels.size} statt 3 Formulierungen`);
   assert.ok(labels.has("habe ich noch nicht entschieden"));

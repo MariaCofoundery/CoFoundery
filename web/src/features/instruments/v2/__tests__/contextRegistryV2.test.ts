@@ -84,22 +84,22 @@ test("beim Übertragen in Felder geht kein Segment der Quelle verloren", () => {
 
 test("noch offen und vertraulich klären sind eigene Gründe", () => {
   const codes = new Set(ALIGNMENT_REGISTRY_V2.missingCodes.map((entry) => entry.code));
-  assert.ok(codes.has("undecided"));
+  assert.ok(codes.has("not_decided"));
   assert.ok(codes.has("confidential_first"));
 
   // R04 BIETET BEIDE NEBENEINANDER AN - das ist der Beweis, dass „noch offen“
   // und „kann ich noch nicht einschätzen“ nicht dasselbe sind. Würde man sie
   // zusammenlegen, verlöre genau diese Frage eine Antwortmöglichkeit.
   const r04 = getContextBlocks().find((block) => block.blockId === "R04")!;
-  assert.ok(r04.missing.includes("undecided"));
+  assert.ok(r04.missing.includes("not_decided"));
   assert.ok(r04.missing.includes("cannot_assess"));
 
   // Die Grenzfragen bieten kein „möchte ich nicht angeben“, sondern die Bitte
   // um ein Gespräch unter vier Augen. Das ist eine offene Tür, keine
   // geschlossene, und darf nicht zu „verweigert“ werden.
   for (const block of getContextBlocks("L")) {
-    assert.deepEqual(block.missing, ["undecided", "confidential_first"], block.blockId);
-    assert.ok(!block.missing.includes("withheld"), block.blockId);
+    assert.deepEqual(block.missing, ["not_decided", "confidential_first"], block.blockId);
+    assert.ok(!block.missing.includes("prefer_not_to_say"), block.blockId);
   }
 
   // Und jeder Block bietet jeden Grund höchstens einmal an: die Quelle nennt

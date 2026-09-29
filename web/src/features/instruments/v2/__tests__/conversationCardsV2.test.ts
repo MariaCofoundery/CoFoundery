@@ -182,7 +182,7 @@ test("fehlende Angaben stehen nicht auf der Agenda, aber im Block", () => {
   // Agenda - man kann nicht besprechen, was niemand gesagt hat. Aber „im MVP
   // bleiben alle Antworten zugänglich“, und wer den Block öffnet, soll den
   // richtigen Satz lesen statt gar nichts.
-  const a = buildReadout([row({ block_id: "B01", answer_format: "money_range", missing_code: "withheld" })]);
+  const a = buildReadout([row({ block_id: "B01", answer_format: "money_range", missing_code: "prefer_not_to_say" })]);
   const b = buildReadout([row({ block_id: "B01", answer_format: "money_range", value: { min: 5000, currency: "EUR" } })]);
   const comparisons = compareBlocks(a, b);
 

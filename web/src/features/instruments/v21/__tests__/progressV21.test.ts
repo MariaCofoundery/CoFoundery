@@ -40,7 +40,7 @@ test("mit einer Grenze erscheinen sie", () => {
 test("wer L01 auslässt, bekommt die Anschlussfragen auch nicht", () => {
   // „Möchte ich nicht angeben“ ist eine zulässige Antwort. Daraus dann zwei
   // unbeantwortbare Fragen zu machen, wäre eine Strafe für eine Haltung.
-  const visible = visibleItemIds({ L01: { blockId: "L01", missingCode: "withheld" } });
+  const visible = visibleItemIds({ L01: { blockId: "L01", missingCode: "prefer_not_to_say" } });
   assert.ok(!visible.includes("L02"));
 });
 
@@ -107,7 +107,7 @@ test("die Hilfsprüfungen sagen, was sie sagen sollen", () => {
 
   assert.equal(hasEntries(grenze("e1")), true);
   assert.equal(hasEntries({ blockId: "L01", value: { entries: [] } }), false);
-  assert.equal(hasEntries({ blockId: "L01", missingCode: "withheld" }), false);
+  assert.equal(hasEntries({ blockId: "L01", missingCode: "prefer_not_to_say" }), false);
   assert.equal(hasEntries(null), false);
 });
 

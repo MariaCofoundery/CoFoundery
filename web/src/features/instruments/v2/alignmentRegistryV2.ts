@@ -51,9 +51,9 @@ export type MissingCode = {
   code:
     | "cannot_assess"
     | "not_relevant"
-    | "withheld"
+    | "prefer_not_to_say"
     /** Nicht festgelegt - anders als „kann ich nicht einschaetzen". */
-    | "undecided"
+    | "not_decided"
     /** Bittet um ein Gespraech unter vier Augen. Keine Verweigerung. */
     | "confidential_first"
     | "technical";

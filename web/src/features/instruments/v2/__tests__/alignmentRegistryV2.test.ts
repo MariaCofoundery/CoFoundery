@@ -125,13 +125,13 @@ test("die Auslassungsgründe sind getrennt und werden nie zur Mitte", () => {
   assert.deepEqual(codes, [
     "cannot_assess",
     "not_relevant",
-    "withheld",
+    "prefer_not_to_say",
     // Am 27.09.2026 mit Schritt 1b dazugekommen. Die Kontextfragen brauchen
     // beide, und keiner von ihnen ließ sich auf die vorhandenen abbilden:
     // „noch offen" kommt in der Quelle 67-mal vor und meint eine fehlende
     // Festlegung, nicht ein fehlendes Urteil - R04 bietet beide nebeneinander
     // an. Und „vertraulich klären" ist eine offene Tür, keine geschlossene.
-    "undecided",
+    "not_decided",
     "confidential_first",
     "technical",
   ]);

@@ -147,7 +147,7 @@ test("zu einer unbeantworteten Frage gibt es keine Karte", () => {
 test("zu einer zurückgehaltenen Antwort schon - aber ohne Vorwurf", () => {
   const karten = cardsFor(
     [{ blockId: "G01", value: { optionId: opt("G01", 0) } }],
-    [{ blockId: "G01", missingCode: "withheld" }],
+    [{ blockId: "G01", missingCode: "prefer_not_to_say" }],
   );
   assert.equal(karten.length, 1);
   assert.match(karten[0].meaning, /bewusster Schritt|respektiert/);
