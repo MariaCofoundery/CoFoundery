@@ -9,10 +9,16 @@ select extensions.plan(5);
 -- Welche Fassung vorgelegt wird - und welche nicht
 -- ---------------------------------------------------------------------------
 
+-- STAND 29.09.2026: v2.1 ist archiviert.
+--
+-- Die Master-Arbeitsfassung v0.2 vergibt andere Kennungen - und in zwei
+-- Faellen dieselbe Kennung fuer eine andere Frage. Deshalb loest v2.2 sie ab.
+-- Archiviert und nicht geloescht: Die Kennung steht an jeder Antwort als
+-- Fremdschluessel, und in Production gibt es Antworten.
 select extensions.is(
   (select status from public.instruments where id = 'founder-alignment-v2-1'),
-  'draft',
-  'v2.1 existiert und wird niemandem vorgelegt');
+  'archived',
+  'v2.1 ist archiviert, seit v2.2 sie abgeloest hat - und weiterhin da');
 
 select extensions.is(
   (select status from public.instruments where id = 'founder-alignment-v2'),

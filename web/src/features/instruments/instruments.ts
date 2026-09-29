@@ -52,6 +52,16 @@ export const INSTRUMENT_IDS = [
    * die Antworten aus zwei Zeitraeumen nebeneinanderlegt.
    */
   "founder-alignment-v2-1",
+  /**
+   * Seit 29.09.2026, Status `draft`.
+   *
+   * Warum schon wieder eine neue Kennung: Die Master-Arbeitsfassung v0.2
+   * vergibt andere IDs als v2.1 - und in zwei Faellen dieselbe ID fuer eine
+   * andere Frage (U04, K02). Eine gespeicherte Antwort merkt sich die Kennung;
+   * dieselbe mit neuer Bedeutung weiterzufuehren wuerde alte Antworten
+   * lautlos umdeuten.
+   */
+  "founder-alignment-v2-2",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
@@ -84,6 +94,15 @@ export const ALIGNMENT_V2_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2";
  * v2-Verweise stillschweigend auf v2.1 umgebogen.
  */
 export const ALIGNMENT_V21_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-1";
+
+/**
+ * Die Fassung, an der jetzt gebaut wird.
+ *
+ * Wieder eine eigene Konstante neben den anderen: Ein umbenannter Wert haette
+ * alle bisherigen v2.1-Verweise stillschweigend auf v2.2 umgebogen - und genau
+ * das ist der Fehler, gegen den die neue Fassung ueberhaupt gebaut wird.
+ */
+export const ALIGNMENT_V22_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-2";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);

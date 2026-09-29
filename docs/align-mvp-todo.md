@@ -11,7 +11,7 @@ Abhängigkeit: Was oben steht, blockiert das darunter.
 
 ## Zuerst zu entscheiden — nicht von mir
 
-### ☐ 1. Die Item-Kennungen zusammenführen
+### ☑ 1. Die Item-Kennungen zusammenführen — entschieden: v2.2
 
 Die Master-Fassung benutzt für dieselben Fragen andere IDs, und in zwei Fällen
 dieselbe ID für eine andere Frage.
@@ -33,7 +33,7 @@ Zwei Wege: entweder zieht die Master-Fassung die gebauten IDs nach, oder es
 wird eine neue Instrumentfassung (v2.2) mit eigener Kennung — dann bleiben
 bisherige Antworten unter v2.1 gültig und lesbar.
 
-### ☐ 2. Zahlen im Report: ja oder nein
+### ☑ 2. Zahlen im Report — entschieden: keine
 
 `MVP-Spec §5` rechnet `mean(A01, A02)` und zeigt „4.4 / 5".
 `Master §8.1` verbietet genau das: „geordnete Kategorien dürfen intern codiert,
