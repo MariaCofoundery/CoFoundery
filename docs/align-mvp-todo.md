@@ -64,8 +64,11 @@ U/K liegt beim **Vorhaben**, nicht beim Profil — die Quelle sagt „beim
 Teamstart bestätigen“, und das ist nicht portabel. Bestätigen statt neu
 beantworten löst die Oberfläche durch Vorbelegen.
 
-Offen bleibt: **Vorhaben anlegen oder wählen** als Ablauf. Es gibt
-`founder_teams` als Zuhause, aber keinen Weg dorthin.
+Der Ablauf **Vorhaben anlegen oder wählen** ist inzwischen gebaut: Wer keins
+hat, bekommt eins über `create_solo_venture()` (SECURITY DEFINER, weil auf
+`founder_teams` nur SELECT-Policies liegen und Teams sonst ausschließlich durch
+Trigger entstehen); wer mehrere hat, wird gefragt statt geraten; das Dashboard
+listet sie mit Stand.
 
 ---
 
@@ -183,6 +186,56 @@ Dabei gefunden und behoben: Die Formregel fürs **Ausblenden** war enger als die
 fürs **Antworten** (`^[A-Z][0-9]{2}$` gegen `^[A-Z][0-9]{2}[a-z]?$`). G02a und
 G02b ließen sich beantworten, aber nicht zurückhalten — die engere Regel stand
 ausgerechnet auf der schützenden Seite. Migration 20261081120000.
+
+## Offen, aber nie auf der Liste gewesen
+
+Stand 29.09.2026. Nicht nummeriert, weil es keine Punkte aus den beiden
+Dokumenten sind — beim Bauen aufgefallen.
+
+### ☐ Forschungsdaten der beiden Bögen
+
+Die Einwilligung fragt breit: „deine Antworten und Nutzungsdaten pseudonymisiert
+für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams". Sie würde
+die beiden Bögen also decken.
+
+Aufgezeichnet wird trotzdem nichts: `trackServerResearchEvent` kennt nur
+`founder_base_v2` und `values_v2`, und `resolveResearchItem` weist alles andere
+ab. Wer einwilligt und die neuen Bögen ausfüllt, trägt zur Forschung nichts bei
+— ohne dass es jemandem gesagt wird.
+
+**Warum ich das nicht einfach gebaut habe:** Ein Forschungsereignis braucht
+Item, Dimension und Antwortwert. „Dimension" gibt es hier bewusst nicht — es
+werden keine Dimensionswerte gebildet. Was stattdessen das Analyseobjekt ist,
+ist eine Modellentscheidung und keine Verdrahtung.
+
+Nicht zu verwechseln mit der **Pretest-Messung** (`alignment_item_views`): Die
+läuft seit dem 29.09.2026 für beide Bögen und hängt nicht an der Einwilligung,
+weil sie den Vorgang misst und nicht die Person.
+
+### ☐ Einmal im Browser durchklicken
+
+Serverseitig ist der ganze Weg abgelaufen: ausfüllen, abgeben, Bericht,
+freigeben, vergleichen, Advisor-Ansicht, Discovery. Was dabei nicht geprüft
+werden kann, ist das Verhalten im Browser — Tippen, Autospeichern,
+Zwischenzustände. Genau dort lag der gemeldete Speicherfehler.
+
+### ☐ Fragen an die Gutachterin
+
+- Die vier Verhaltensitems (A91/U91/K91/T91) stehen auf `proposal`.
+- `confidential_first` als eigener Auslassungsgrund — ja oder nein.
+- Die Abweichung „jede Frage ohne eigenen Auslassungsgrund bekommt ‚kann ich
+  noch nicht einschätzen'" (steht in `deviationsFromSource`, von mir
+  entschieden und zur Bestätigung vorgelegt).
+
+### ☐ v2 und v2.1 abräumen
+
+Beide sind `archived`, und der Umstiegshinweis erscheint nicht mehr. Die Seiten
+unter `/founder-alignment/pilot/*`, die Registratur v2.1 und
+`dashboardVersionData.ts` stehen aber noch — für alle, die v2.1 ausgefüllt
+haben und ihren Bericht behalten sollen. Wann das weg kann, hängt daran, ob
+dort noch Antworten liegen.
+
+---
 
 ## Schon vorhanden — nicht neu bauen
 
