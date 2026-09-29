@@ -8,6 +8,7 @@ import { buildAdvisorSelfReport, hasUsableAlignment } from "@/features/advisor/a
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getAdvisorAlignmentV21 } from "@/features/instruments/v21/advisorAlignmentV21";
+import { getAdvisorAlignViews } from "@/features/instruments/align/advisorView";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -75,6 +76,7 @@ export default async function AdvisorPersonPage({
   // Freigabe eine Aussage ueber den Menschen machen, ein Schloss waere eine
   // Aufforderung, danach zu fragen.
   const alignmentV21 = await getAdvisorAlignmentV21(userId);
+  const alignViews = await getAdvisorAlignViews(userId);
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-10">
@@ -261,6 +263,34 @@ export default async function AdvisorPersonPage({
           </div>
         </section>
       )}
+
+      {alignViews.map((view) => (
+        <section key={view.scope} className="mt-10">
+          <h2 className="text-xl font-semibold text-slate-950">
+            {view.label}
+            {view.ventureName && (
+              <span className="ml-2 text-base font-normal text-slate-500">
+                · {view.ventureName}
+              </span>
+            )}
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine
+            Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl
+            und keine Einordnung.
+          </p>
+          <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Du siehst {view.visible.count} von {view.visible.of} Fragen. Was fehlt, kann
+            zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus
+            nicht unterscheiden.
+          </p>
+
+          <div className="mt-6">
+            <ReportViewV21 sections={view.sections} />
+          </div>
+        </section>
+      ))}
 
       {/* DIE HANDAKTE GANZ UNTEN - nach allem, worueber sie handelt. Sie
           gehoert dem Advisor und war nie fuer die begleitete Person

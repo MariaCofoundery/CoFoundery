@@ -190,6 +190,35 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("der Advisor sieht die beiden neuen Bögen mit derselben Beschränkung", () => {
+  const page = readFileSync(
+    join("src", "app", "(product)", "advisor", "person", "[userId]", "page.tsx"), "utf8");
+  // Beide Boegen, und beide durch dieselbe Ansicht - die Pruefung oben
+  // („kein canMark“) liest dieselbe Datei und gilt damit auch hier.
+  assert.match(page, /getAdvisorAlignViews/);
+  assert.match(page, /alignViews\.map/);
+});
+
+test("eine fehlende Freigabe wird dem Advisor nicht als Aussage angezeigt", () => {
+  const view = readFileSync(
+    join("src", "features", "instruments", "align", "advisorView.ts"), "utf8");
+
+  // Kommen keine Zeilen zurueck, gibt es keinen Abschnitt. Ein leerer Kasten
+  // oder ein Schloss waere eine Auskunft ueber einen Menschen, die niemand
+  // gegeben hat.
+  assert.match(view, /rows\.length === 0\) return null/);
+
+  // Und die Zahl daneben zaehlt SICHTBARE Fragen, nicht zurueckgehaltene.
+  // Von hier aus sieht „nicht freigegeben“ genauso aus wie „nicht
+  // beantwortet“ - eine Zahl, die beides „zurueckgehalten“ nennt, behauptet
+  // eine Entscheidung, die es vielleicht nie gab.
+  assert.match(view, /visible: \{ count/);
+  assert.ok(
+    !/withheld|zurueckgehalten: /.test(view),
+    "die Advisor-Ansicht zaehlt Zurueckgehaltenes",
+  );
+});
+
 test("die neuen Bögen holen ihre FRAGEN aus den eigenen Registraturen", () => {
   // Sie duerfen v2.1-Bausteine benutzen - Pruefung, Eingabefeld,
   // Lesbarmachung. Die Fragen aus v2.1 zu ziehen waere etwas anderes: Dann
