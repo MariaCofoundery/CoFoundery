@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import {
+  TRANSITION_TO_ALIGN,
   TRANSITION_V21,
   REMIND_AFTER_DAYS,
   isTransitionDecision,
@@ -24,7 +25,22 @@ async function userId() {
  * Zeile. Eine Entscheidung ist hier eine Auskunft darüber, was jemand gerade
  * will, und keine Tür, die zufällt.
  */
-export async function decideTransitionV21(decision: TransitionDecision): Promise<Result> {
+/**
+ * Welcher Umstieg gemeint ist.
+ *
+ * Ohne Angabe der alte (v1 auf v2.1) - so, wie die Seiten es bisher riefen.
+ * `"align"` ist der Umstieg auf die beiden getrennten Bögen.
+ */
+export type TransitionTarget = "v21" | "align";
+
+function paar(target: TransitionTarget) {
+  return target === "align" ? TRANSITION_TO_ALIGN : TRANSITION_V21;
+}
+
+export async function decideTransitionV21(
+  decision: TransitionDecision,
+  target: TransitionTarget = "v21",
+): Promise<Result> {
   if (!isTransitionDecision(decision) || decision === "pending") {
     return { ok: false, reason: "unknown_decision", detail: String(decision) };
   }
@@ -35,8 +51,8 @@ export async function decideTransitionV21(decision: TransitionDecision): Promise
   const { error } = await supabase.from("instrument_transitions").upsert(
     {
       user_id: id,
-      from_instrument_id: TRANSITION_V21.from,
-      to_instrument_id: TRANSITION_V21.to,
+      from_instrument_id: paar(target).from,
+      to_instrument_id: paar(target).to,
       decision,
       decided_at: new Date().toISOString(),
       // Eine getroffene Entscheidung braucht keine Erinnerung mehr - und die
@@ -58,7 +74,9 @@ export async function decideTransitionV21(decision: TransitionDecision): Promise
  * wiederkommt, wird nach dem dritten Mal weggeklickt, ohne gelesen zu werden -
  * danach ist er wertlos, egal was drinsteht.
  */
-export async function postponeTransitionV21(): Promise<Result> {
+export async function postponeTransitionV21(
+  target: TransitionTarget = "v21",
+): Promise<Result> {
   const { supabase, userId: id } = await userId();
   if (!id) return { ok: false, reason: "not_authenticated" };
 
@@ -68,8 +86,8 @@ export async function postponeTransitionV21(): Promise<Result> {
   const { error } = await supabase.from("instrument_transitions").upsert(
     {
       user_id: id,
-      from_instrument_id: TRANSITION_V21.from,
-      to_instrument_id: TRANSITION_V21.to,
+      from_instrument_id: paar(target).from,
+      to_instrument_id: paar(target).to,
       decision: "pending",
       decided_at: null,
       remind_after: remindAfter.toISOString(),

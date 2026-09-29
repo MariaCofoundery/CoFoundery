@@ -5,9 +5,15 @@ import { needsConfirmation } from "@/features/instruments/align/needsConfirmatio
 import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { connectedPartners } from "@/features/instruments/connectedPartners";
 import {
+  CURRENT_INSTRUMENT_ID,
   FOUNDER_PROFILE_INSTRUMENT_ID,
   VENTURE_ALIGNMENT_INSTRUMENT_ID,
 } from "@/features/instruments/instruments";
+import {
+  shouldAnnounce,
+  TRANSITION_TO_ALIGN,
+  type TransitionDecision,
+} from "@/features/instruments/v21/transitionV21";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -51,6 +57,17 @@ export type AlignDashboardState = {
   /** Verbunden UND hat einen der beiden Bögen freigegeben. */
   partners: { userId: string; label: string; ready: boolean }[];
   show: boolean;
+  /**
+   * „Es gibt eine neue Fassung" — nur für Menschen, die die bisherige kennen.
+   *
+   * Wer gerade erst anfängt, soll keinen Hinweis auf eine Neufassung von
+   * etwas bekommen, das er nie gesehen hat.
+   */
+  announce: boolean;
+  /** Was die Person zum Umstieg entschieden hat. */
+  decision: TransitionDecision;
+  /** Hat sie die bisherige Fassung abgegeben? Dann bleibt ihr Report. */
+  hasPrevious: boolean;
 };
 
 const NOTHING: AlignDashboardState = {
@@ -58,6 +75,9 @@ const NOTHING: AlignDashboardState = {
   ventures: [],
   partners: [],
   show: false,
+  announce: false,
+  decision: "pending",
+  hasPrevious: false,
 };
 
 export async function getAlignDashboardState(
@@ -89,6 +109,25 @@ export async function getAlignDashboardState(
       const id = row.assessment_id as string;
       answeredBy.set(id, (answeredBy.get(id) ?? 0) + 1);
     }
+
+    // Die bisherige Fassung - fuer den Hinweis und fuer den Satz "deine Daten
+    // bleiben". Beides gilt nur fuer Menschen, die sie ueberhaupt haben.
+    const { data: vorher } = await supabase
+      .from("assessments")
+      .select("id, submitted_at")
+      .eq("user_id", userId)
+      .eq("instrument_id", CURRENT_INSTRUMENT_ID)
+      .limit(1);
+
+    const { data: transition } = await supabase
+      .from("instrument_transitions")
+      .select("decision, remind_after")
+      .eq("user_id", userId)
+      .eq("from_instrument_id", TRANSITION_TO_ALIGN.from)
+      .eq("to_instrument_id", TRANSITION_TO_ALIGN.to)
+      .maybeSingle();
+
+    const decision = (transition?.decision ?? "pending") as TransitionDecision;
 
     const profileRow = rows.find(
       (row) => row.instrument_id === FOUNDER_PROFILE_INSTRUMENT_ID,
@@ -139,6 +178,14 @@ export async function getAlignDashboardState(
       },
       ventures: ventureStates,
       partners: await partnersFor(userId),
+      announce: shouldAnnounce({
+        hasPreviousAssessment: (vorher ?? []).length > 0,
+        transition: transition
+          ? { decision, remindAfter: transition.remind_after ?? null }
+          : null,
+      }),
+      decision,
+      hasPrevious: (vorher ?? []).some((row) => row.submitted_at),
       // Der Kasten steht auf jedem Founder-Dashboard, auch auf einem leeren:
       // Er IST der Weg zu den beiden Boegen. Ein Kasten, der erst erscheint,
       // wenn man angefangen hat, koennte nie den ersten Anfang tragen.

@@ -4,7 +4,7 @@ import {
   getSectionsV21,
   type RegistryItemV21,
 } from "@/features/instruments/v21/registryV21";
-import { getBehaviourItems, behaviourItemFor } from "@/features/instruments/v21/behaviourV21";
+import { getBehaviourItems, behaviourItemFor } from "@/features/instruments/align/behaviourItems";
 
 /**
  * Den Fragebogen v2.1 zum Lesen ausgeben.

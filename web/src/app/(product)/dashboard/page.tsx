@@ -46,6 +46,7 @@ import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
 import { TransitionAnnounce } from "@/features/instruments/v21/TransitionAnnounce";
 import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
 import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
+import { AlignAnnounce } from "@/features/instruments/align/AlignAnnounce";
 import { AlignCard } from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -626,6 +627,8 @@ export default async function DashboardPage({
         eine Antwort auf eine Frage, die man erst stellt, wenn man sie
         vermisst.
       */}
+      {alignState.announce && <AlignAnnounce />}
+
       <AlignCard state={alignState} />
 
       {versionState.announce && <TransitionAnnounce />}

@@ -1,5 +1,9 @@
-import behaviourJson from "../../../../docs/founder-alignment-behaviour-v2-1.json";
-import { getItemV21, type MissingCode } from "@/features/instruments/v21/registryV21";
+import behaviourJson from "../../../../docs/align-behaviour-items-v0-2.json";
+import type { MissingCode } from "@/features/instruments/v21/registryV21";
+import {
+  getItemV22,
+  type AssessmentScope,
+} from "@/features/instruments/align/registries";
 
 /**
  * Vier Verhaltensfragen als Gegenprobe zu den Wunschfragen.
@@ -10,9 +14,22 @@ import { getItemV21, type MissingCode } from "@/features/instruments/v21/registr
  *
  * Sie stehen nicht im fachlich geprüften Quelldokument. Der Wächtertest auf
  * der Registratur prüft jeden Fragetext wörtlich gegen diese Quelle - er
- * würde bei jedem zusätzlichen Item zu Recht anschlagen. Diese vier sind ein
- * Vorschlag, und der Unterschied zwischen geprüft und vorgeschlagen soll auch
- * an der Datei ablesbar sein, nicht nur in einem Kommentar.
+ * würde bei jedem zusätzlichen Item zu Recht anschlagen. Der Unterschied
+ * zwischen geprüft und noch nicht vorgelegt soll an der Datei ablesbar sein,
+ * nicht nur in einem Kommentar.
+ *
+ * ---------------------------------------------------------------------------
+ * STATUS: candidate_for_pretest
+ * ---------------------------------------------------------------------------
+ *
+ * Die Gutachterin hat am 29.09.2026 alle vier auf `revise` gesetzt und
+ * überarbeitet - und ausdrücklich entschieden, dass sie danach NICHT
+ * automatisch in den Fragebogen wandern. Erst ein Pretest entscheidet, ob sie
+ * in den Produktbogen kommen, in einen optionalen Deep Dive, in ein
+ * Forschungsmodul oder gar nicht.
+ *
+ * `candidate_for_pretest` ist deshalb kein Zwischenschritt auf dem Weg nach
+ * oben, sondern ein eigener Zustand: überarbeitet, aber nicht vorgelegt.
  *
  * ---------------------------------------------------------------------------
  * WAS EIN UNTERSCHIED BEDEUTET - UND WAS NICHT
@@ -53,8 +70,34 @@ export type BehaviourOption = {
 
 export type BehaviourItem = {
   itemId: string;
-  /** Die Wunschfrage, zu der diese Frage die Gegenprobe ist. */
+  /**
+   * In welchen Bogen die Frage gehört.
+   *
+   * A91 und T91 fragen nach der Person und sind portabel. U91 und K91 hängen
+   * am konkreten Vorhaben - an Rollen, Entscheidungsrechten,
+   * Informationsstrukturen -, und nennen es deshalb auch in der Frage.
+   */
+  module: AssessmentScope;
+  /** Die Frage, zu der diese hier den konkreten Fall danebenstellt. */
   crossChecks: string;
+  /**
+   * Woran sich jemand erinnern soll.
+   *
+   * ABSICHTLICH VERSCHIEDEN: sechs Monate für die seltenen Ereignisse, drei
+   * für die häufigen. Eine einheitliche Zahl wäre Ordnung auf Kosten der
+   * Erinnerbarkeit.
+   */
+  referencePeriod: string;
+  referencePeriodNote?: string;
+  /**
+   * Steht der Zeitraum auch im Fragetext?
+   *
+   * Er MUSS dort stehen — sonst ist es wieder „wie häufig", die Frage, bei
+   * der niemand weiß, woran er sich erinnern soll. Bei `U91` steht er nicht
+   * dort; das Feld hält die Lücke fest, statt sie zu schließen, indem jemand
+   * einen Satz erfindet, den die Gutachterin nicht geschrieben hat.
+   */
+  referencePeriodInPrompt: boolean;
   section: string;
   order: number;
   answerFormat: "single_choice";
@@ -67,11 +110,24 @@ export type BehaviourItem = {
 
 export type BehaviourSet = {
   setId: string;
-  status: "proposal" | "active" | "archived";
+  /**
+   * `candidate_for_pretest`: überarbeitet, aber nicht vorgelegt.
+   *
+   * Es gibt bewusst keinen Wert „approved" dazwischen - nach dem Pretest wird
+   * entschieden, wohin sie gehören, und das ist eine andere Entscheidung als
+   * „der Text ist in Ordnung".
+   */
+  status: "candidate_for_pretest" | "active" | "archived";
   createdAt: string;
-  belongsTo: string;
+  basedOn: string;
+  supersedes?: string;
   notes: string[];
   reportingRule: string;
+  /** Sätze, die so dastehen dürfen. */
+  reportingExamples: string[];
+  /** Und Sätze, die nie dastehen dürfen. Ein Unterschied ist kein Vorwurf. */
+  forbiddenPhrasings: string[];
+  pretestMetrics: string[];
   items: BehaviourItem[];
 };
 
@@ -81,14 +137,31 @@ function assertBehaviourSet(set: BehaviourSet): BehaviourSet {
   };
 
   for (const item of set.items) {
-    // Eine Gegenprobe ohne die Frage, zu der sie gehört, prüft nichts gegen.
-    if (!getItemV21(item.crossChecks)) {
-      fail(`${item.itemId}: ${item.crossChecks} gibt es in v2.1 nicht`);
+    // Die Frage, zu der diese hier den konkreten Fall danebenstellt, muss es
+    // geben - UND IM SELBEN BOGEN. Genau daran ist T91 aufgefallen: Es war
+    // auf T03 gebaut, und T03 hat die Master-Fassung gestrichen.
+    const gegenstueck = getItemV22(item.crossChecks);
+    if (!gegenstueck) {
+      fail(`${item.itemId}: ${item.crossChecks} gibt es in keinem Bogen`);
+    }
+    if (gegenstueck!.retired) {
+      fail(`${item.itemId}: ${item.crossChecks} ist zurueckgezogen`);
     }
     // Ohne Bezugszeitraum ist es wieder „wie häufig" - die Frage, an der
-    // niemand weiß, woran er sich erinnern soll.
-    if (!/vergangenen drei Monaten/.test(item.prompt)) {
-      fail(`${item.itemId}: kein Bezugszeitraum im Fragetext`);
+    // niemand weiß, woran er sich erinnern soll. Die Zahl steht am Item und
+    // nicht hier, weil sie je Frage verschieden ist.
+    //
+    // WO ER FEHLT, MUSS ES DRANSTEHEN. `referencePeriodInPrompt: false` ist
+    // kein Freibrief, sondern eine offene Stelle mit Namen - eine stille
+    // Ausnahme wäre nach dem zweiten Mal keine Ausnahme mehr.
+    const imText = item.prompt.includes(
+      item.referencePeriod.replace("6 Monate", "sechs Monaten").replace("3 Monate", "drei Monaten"),
+    );
+    if (imText !== item.referencePeriodInPrompt) {
+      fail(
+        `${item.itemId}: referencePeriodInPrompt sagt ${item.referencePeriodInPrompt}, ` +
+          `im Fragetext steht der Zeitraum ${imText ? "aber schon" : "nicht"}`,
+      );
     }
     // Ohne diesen Ausweg erzwingt die Frage ein Verhalten, das es nie gab.
     if (!item.options.some((option) => option.noOccasion)) {
@@ -145,7 +218,7 @@ export function crossCheck(input: {
   behaviourOptionId: string | null;
 }): CrossCheckOutcome {
   const behaviourItem = behaviourItemFor(input.wishItemId);
-  const wishItem = getItemV21(input.wishItemId);
+  const wishItem = getItemV22(input.wishItemId);
   if (!behaviourItem || !wishItem) return { kind: "no_basis", why: "missing_answer" };
 
   if (!input.wishOptionId || !input.behaviourOptionId) {
@@ -194,7 +267,7 @@ function rankDistance(
   const comparable = new Set(["K01", "T03"]);
   if (!comparable.has(wishItemId)) return null;
 
-  const wishItem = getItemV21(wishItemId)!;
+  const wishItem = getItemV22(wishItemId)!;
   // Die letzte Option von K01 und T03 ist nominal („je nach Aufgabe", „hängt
   // von der Tragweite ab“). Sie hat keinen Platz in einer Reihenfolge.
   const wishRank = wishItem.options.findIndex((option) => option.optionId === wishOptionId);

@@ -1,6 +1,7 @@
 import {
   ALIGNMENT_V21_INSTRUMENT_ID,
   CURRENT_INSTRUMENT_ID,
+  FOUNDER_PROFILE_INSTRUMENT_ID,
 } from "@/features/instruments/instruments";
 
 /**
@@ -27,6 +28,27 @@ import {
 export const TRANSITION_V21 = {
   from: CURRENT_INSTRUMENT_ID,
   to: ALIGNMENT_V21_INSTRUMENT_ID,
+} as const;
+
+/**
+ * Der Umstieg, um den es jetzt geht: v1 auf die beiden getrennten Bögen.
+ *
+ * ---------------------------------------------------------------------------
+ * ZIEL IST DAS ARBEITSPROFIL, NICHT BEIDE
+ * ---------------------------------------------------------------------------
+ *
+ * Die Entscheidung wird einmal getroffen und gilt für den Umstieg als Ganzes.
+ * Sie an beiden Bögen zu führen hieße, jemanden zweimal dasselbe zu fragen -
+ * und es gäbe einen Zustand „für das Profil umgestiegen, für das Vorhaben
+ * nicht", den niemand gemeint hat.
+ *
+ * Das Arbeitsprofil steht dafür, weil es der Bogen ist, der v1 wirklich
+ * ablöst: Es gilt für die Person, so wie v1 es tat. Das Venture-Alignment ist
+ * daneben etwas Neues und nicht der Ersatz für etwas Altes.
+ */
+export const TRANSITION_TO_ALIGN = {
+  from: CURRENT_INSTRUMENT_ID,
+  to: FOUNDER_PROFILE_INSTRUMENT_ID,
 } as const;
 
 export const TRANSITION_DECISIONS = ["pending", "keep_previous", "retake"] as const;

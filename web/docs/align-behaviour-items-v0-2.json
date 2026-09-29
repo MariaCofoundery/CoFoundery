@@ -1,0 +1,205 @@
+{
+  "setId": "align-behaviour-items-v0-2",
+  "status": "candidate_for_pretest",
+  "createdAt": "2026-09-29",
+  "basedOn": "docs/CoFoundery_ALIGN_Verhaltensitems_Gutachterinnenreview_v0.1.md",
+  "supersedes": "founder-alignment-behaviour-v2-1",
+  "notes": [
+    "STATUS candidate_for_pretest, nicht approved. Die Gutachterin hat am 29.09.2026 alle vier auf 'revise' gesetzt und ueberarbeitet - aufgenommen werden sie erst nach einem Pretest. Bis dahin: optionale Verhaltensanker, Pretest-Items, Forschungsbausteine.",
+    "Sie pruefen NICHT, ob die regulaere Antwort stimmt. Sie ergaenzen das allgemeine Selbstbild beziehungsweise die gewuenschte Arbeitsweise um einen konkreten juengsten Fall. Eine Abweichung kann durch Situation, Rolle oder Rahmenbedingungen entstanden sein.",
+    "A02 gegen A91 ist NICHT 'Wunsch gegen Wirklichkeit'. A02 fragt bereits nach der typischen Haeufigkeit - der Vergleich lautet 'allgemeine Selbsteinschaetzung gegen letzten konkreten Fall'. Bei U04 gegen U91 ist es tatsaechlich der gewuenschte Spielraum gegen das zuletzt realisierte Verhalten.",
+    "'Kam nicht vor' ist eine inhaltliche ANTWORT und kein Auslassungsgrund. Wer in dem Zeitraum keine solche Entscheidung getroffen hat, hat etwas gesagt und nichts verschwiegen. cannot_assess bleibt ausschliesslich 'daran kann ich mich nicht sicher erinnern' - beides technisch nicht gleichbehandeln.",
+    "Die Bezugszeitraeume sind ABSICHTLICH verschieden: sechs Monate fuer die seltenen Ereignisse (wichtige Entscheidung, Einwand), drei Monate fuer die haeufigen (Verantwortungsbereich, Zwischenstand). Eine kuenstliche Vereinheitlichung waere Ordnung auf Kosten der Erinnerbarkeit. Vorlaeufig - im Pretest zu pruefen.",
+    "U91 und K91 haengen am konkreten Vorhaben: an Rollen, Entscheidungsrechten, Informationsstrukturen. Als portables Personenverhalten waeren sie nicht sinnvoll, deshalb gehoeren sie ins Venture-Alignment und nennen das Vorhaben in der Frage.",
+    "OFFEN: In U91 steht der Bezugszeitraum NICHT im Fragetext. Das Review setzt fuer U91 '3 Monate oder seit Beginn des Vorhabens', der ueberarbeitete Satz nennt aber nur 'die letzte Entscheidung, die in diesem Vorhaben ... fiel'. Damit fehlt genau das, weswegen die vier Items ueberhaupt Zeitraeume bekommen haben. Der Wortlaut bleibt so, wie die Gutachterin ihn geschrieben hat - `referencePeriodInPrompt: false` haelt die Luecke fest, bis sie entschieden ist."
+  ],
+  "reportingRule": "Nie als Uebereinstimmungsmass, nie als Gueltigkeitsurteil, nie als Zahl. Ausgabe ist ein Satz, der beides nebeneinanderstellt und offen laesst, woran es lag.",
+  "reportingExamples": [
+    "Du gibst allgemein an, zentrale Annahmen haeufig zu pruefen. Bei deiner letzten wichtigen Entscheidung hast du die zentralen Annahmen teilweise geprueft.",
+    "Du moechtest in deinem Verantwortungsbereich weitgehend selbststaendig entscheiden. Bei deiner letzten Entscheidung hast du auf die Zustimmung einer anderen Person gewartet.",
+    "Das kann an der konkreten Situation, euren Rollen oder den geltenden Entscheidungsregeln gelegen haben."
+  ],
+  "forbiddenPhrasings": [
+    "Deine Antwort zu A02 stimmt nicht mit A91 ueberein.",
+    "Du ueberschaetzt deine analytische Arbeitsweise.",
+    "Deine Angaben sind inkonsistent."
+  ],
+  "pretestMetrics": [
+    "Anteil 'kam nicht vor' - viele: Zeitraum moeglicherweise zu kurz oder Ereignis zu selten",
+    "Anteil 'daran kann ich mich nicht sicher erinnern' - viele: Zeitraum moeglicherweise zu lang oder Frage zu unspezifisch",
+    "Bearbeitungszeit",
+    "Abbruchquote",
+    "Rueckfragen und Verstaendnisschwierigkeiten",
+    "Freitextfeedback"
+  ],
+  "items": [
+    {
+      "itemId": "A91",
+      "module": "founder_profile",
+      "crossChecks": "A02",
+      "section": "A – Analytische Prüfung",
+      "order": 1,
+      "answerFormat": "single_choice",
+      "referencePeriod": "6 Monate",
+      "prompt": "Denk an die letzte wichtige Entscheidung, die du in den vergangenen sechs Monaten getroffen hast. Hast du vor der Entscheidung geprüft, ob eine oder mehrere zentrale Annahmen zutreffen?",
+      "hint": "Gemeint ist jede Form des Nachprüfens: nachrechnen, nachlesen, jemanden fragen oder etwas ausprobieren.",
+      "options": [
+        {
+          "optionId": "A91_o1",
+          "label": "ja, ich habe die zentralen Annahmen vor der Entscheidung geprüft"
+        },
+        {
+          "optionId": "A91_o2",
+          "label": "teilweise – ich habe nur einen Teil der zentralen Annahmen geprüft"
+        },
+        {
+          "optionId": "A91_o3",
+          "label": "nein"
+        },
+        {
+          "optionId": "A91_o4",
+          "label": "in den vergangenen sechs Monaten stand keine solche Entscheidung an",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Kein Beleg für Analysefähigkeit und kein Gegenbeweis zu A02 - dort steht bereits die typische Häufigkeit, nicht ein Wunsch.",
+      "referencePeriodInPrompt": true
+    },
+    {
+      "itemId": "T91",
+      "module": "founder_profile",
+      "crossChecks": "T01",
+      "section": "T/D – Unterschiede ansprechen und formulieren",
+      "order": 2,
+      "answerFormat": "single_choice",
+      "referencePeriod": "6 Monate",
+      "prompt": "Denk an das letzte Mal in den vergangenen sechs Monaten, als du eine wichtige, aber nicht dringende geplante Entscheidung anders gesehen hast als die anderen. Wann hast du deinen Einwand zum ersten Mal angesprochen?",
+      "hint": "",
+      "options": [
+        {
+          "optionId": "T91_o1",
+          "label": "noch im laufenden Gespräch"
+        },
+        {
+          "optionId": "T91_o2",
+          "label": "nach dem Gespräch, aber noch am selben Arbeitstag"
+        },
+        {
+          "optionId": "T91_o3",
+          "label": "am nächsten Arbeitstag"
+        },
+        {
+          "optionId": "T91_o4",
+          "label": "nach mehr als einem Arbeitstag"
+        },
+        {
+          "optionId": "T91_o5",
+          "label": "ich habe den Einwand nicht angesprochen",
+          "outsideSequence": true,
+          "whyOutside": "Nicht angesprochen ist kein späterer Zeitpunkt, sondern etwas anderes. Ein Abstand zwischen dieser Antwort und einem Zeitpunkt wäre eine Zahl zwischen zwei Dingen ohne gemeinsame Skala."
+        },
+        {
+          "optionId": "T91_o6",
+          "label": "in den vergangenen sechs Monaten kam eine solche Situation nicht vor",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Die Stufen entsprechen denen aus T01, damit beides nebeneinander lesbar ist - T01 misst seit dem Review vom 29.09.2026 ebenfalls ausschließlich den Zeitpunkt.",
+      "referencePeriodInPrompt": true
+    },
+    {
+      "itemId": "U91",
+      "module": "venture_alignment",
+      "crossChecks": "U04",
+      "section": "U/K – Zusammenarbeit: Spielraum und Information",
+      "order": 3,
+      "answerFormat": "single_choice",
+      "referencePeriod": "3 Monate",
+      "referencePeriodNote": "oder seit Beginn des Vorhabens, falls es jünger ist",
+      "prompt": "Denk an die letzte Entscheidung, die in diesem Vorhaben in deinen klar zugeordneten Verantwortungsbereich fiel. Hast du sie getroffen, ohne vorher die Zustimmung anderer einzuholen?",
+      "hint": "Gemeint ist Zustimmung, nicht Information. Jemanden zu informieren oder Rücksprache zu halten ist etwas anderes, als auf ein Ja zu warten.",
+      "options": [
+        {
+          "optionId": "U91_o1",
+          "label": "ja, ich habe selbst entschieden"
+        },
+        {
+          "optionId": "U91_o2",
+          "label": "ich habe vorher Rücksprache gehalten, hätte aber selbst entscheiden dürfen"
+        },
+        {
+          "optionId": "U91_o3",
+          "label": "ich habe auf die Zustimmung einer anderen Person gewartet"
+        },
+        {
+          "optionId": "U91_o4",
+          "label": "in diesem Zeitraum hatte ich in diesem Vorhaben keinen eigenen Verantwortungsbereich",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Gewünschter Entscheidungsspielraum (U04) gegen zuletzt realisiertes Verhalten in diesem Vorhaben. Eine Abweichung ist keine Inkonsistenz.",
+      "referencePeriodInPrompt": false
+    },
+    {
+      "itemId": "K91",
+      "module": "venture_alignment",
+      "crossChecks": "K01",
+      "section": "U/K – Zusammenarbeit: Spielraum und Information",
+      "order": 4,
+      "answerFormat": "single_choice",
+      "referencePeriod": "3 Monate",
+      "referencePeriodNote": "oder seit Beginn des Vorhabens, falls es jünger ist",
+      "prompt": "Denk an das letzte Mal in den vergangenen drei Monaten, als du in diesem Vorhaben anderen Foundern einen Zwischenstand aus deinem Bereich gezeigt hast. In welchem Zustand war der Zwischenstand zu diesem Zeitpunkt?",
+      "hint": "",
+      "options": [
+        {
+          "optionId": "K91_o1",
+          "label": "erste Ideen oder Skizzen – vieles war noch offen"
+        },
+        {
+          "optionId": "K91_o2",
+          "label": "die Richtung war klarer, aber noch vieles offen"
+        },
+        {
+          "optionId": "K91_o3",
+          "label": "ein erster brauchbarer Stand"
+        },
+        {
+          "optionId": "K91_o4",
+          "label": "das Ergebnis war weitgehend fertig"
+        },
+        {
+          "optionId": "K91_o5",
+          "label": "ich habe in diesem Zeitraum keinen Zwischenstand gezeigt",
+          "noOccasion": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "daran kann ich mich nicht sicher erinnern"
+        }
+      ],
+      "note": "Berichtetes Verhalten im letzten konkreten Fall. Die Stufen entsprechen denen aus K01, damit beides nebeneinander lesbar ist. Keine numerische Differenz berechnen.",
+      "referencePeriodInPrompt": true
+    }
+  ]
+}

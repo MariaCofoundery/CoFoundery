@@ -11,7 +11,8 @@ import {
 import { ALIGNMENT_REGISTRY_V2 } from "@/features/instruments/v2/alignmentRegistryV2";
 import { CONTEXT_REGISTRY_V2 } from "@/features/instruments/v2/contextRegistryV2";
 import { REGISTRY_V21 } from "@/features/instruments/v21/registryV21";
-import { BEHAVIOUR_SET_V21 } from "@/features/instruments/v21/behaviourV21";
+import { BEHAVIOUR_SET_V21 } from "@/features/instruments/align/behaviourItems";
+import { getItemsV22, SCOPES } from "@/features/instruments/align/registries";
 
 /**
  * Die Liste der Fassungen steht an drei Orten. Sie darf nicht auseinanderlaufen.
@@ -79,11 +80,23 @@ test("auch v2.1 wird noch niemandem vorgelegt", () => {
   assert.equal(REGISTRY_V21.status, "draft");
 });
 
-test("die Verhaltensfragen sind ein Vorschlag und haengen an v2.1", () => {
-  // Sie sind nicht fachlich geprueft. Solange das hier `proposal` ist, kann
-  // niemand sie fuer geprueft halten, nur weil sie im selben Ordner liegen.
-  assert.equal(BEHAVIOUR_SET_V21.status, "proposal");
-  assert.equal(BEHAVIOUR_SET_V21.belongsTo, ALIGNMENT_V21_INSTRUMENT_ID);
+test("die Verhaltensfragen werden niemandem vorgelegt", () => {
+  // UEBERARBEITET, ABER NICHT VORGELEGT. Die Gutachterin hat sie am
+  // 29.09.2026 auf `revise` gesetzt, ueberarbeitet und ausdruecklich
+  // entschieden, dass sie danach NICHT automatisch in den Fragebogen wandern.
+  // Erst ein Pretest entscheidet, wohin sie gehoeren.
+  //
+  // Solange das hier `candidate_for_pretest` ist, kann niemand sie fuer
+  // freigegeben halten, nur weil sie im selben Ordner liegen.
+  assert.equal(BEHAVIOUR_SET_V21.status, "candidate_for_pretest");
+
+  // Und sie stehen wirklich in keinem Bogen.
+  const kennungen = new Set(BEHAVIOUR_SET_V21.items.map((item) => item.itemId));
+  for (const scope of SCOPES) {
+    for (const item of getItemsV22(scope)) {
+      assert.ok(!kennungen.has(item.itemId), `${item.itemId} steht im Fragebogen`);
+    }
+  }
 });
 
 test("die Migration archiviert v2 und laesst genau eine Fassung aktiv", () => {

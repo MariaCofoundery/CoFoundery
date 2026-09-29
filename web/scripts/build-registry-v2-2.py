@@ -457,6 +457,28 @@ _ohne_review = sorted(k for k in items if k not in REVIEW_ITEMS)
 if _ohne_review:
     raise SystemExit(f"Diese Fragen stehen nicht im Sprachreview: {_ohne_review}")
 
+# ---------------------------------------------------------------------------
+# NACHTRAG AUS DEM GUTACHTERINNENREVIEW DER VERHALTENSITEMS
+# ---------------------------------------------------------------------------
+#
+# Abschnitt 7 des Reviews vom 29.09.2026: T01 soll ausschliesslich den
+# ZEITPUNKT des ersten Ansprechens messen. Die vierte Antwort nannte bisher
+# ein Motiv ("spaeter, wenn ich meine Sicht weiter sortiert habe") - und ein
+# Motiv gehoert inhaltlich zu T02, wo nach dem Vorgehen bei unklaren Bedenken
+# gefragt wird.
+#
+# NUR DIE BESCHRIFTUNG, NICHT DIE STELLE. Die Antwort bleibt die vierte und
+# behaelt ihre Kennung `T01_o4`. Gespeicherte Antworten zeigen auf die Stelle,
+# nicht auf den Text - haetten wir sie verschoben oder gestrichen, zeigten sie
+# danach auf etwas anderes.
+NACHTRAG_REVIEW = {
+    "T01": {
+        "options": {
+            3: "nach mehr als einem Arbeitstag",  # vierte Antwort, Index 3
+        },
+    },
+}
+
 for item_id, review in REVIEW_ITEMS.items():
     if item_id not in items:
         continue
@@ -480,6 +502,13 @@ for item_id, review in REVIEW_ITEMS.items():
                 "Reihenfolge und Anzahl muessen bleiben."
             )
         it["options"] = review["options"]
+
+    nachtrag = NACHTRAG_REVIEW.get(item_id)
+    if nachtrag:
+        for stelle, beschriftung in nachtrag.get("options", {}).items():
+            if stelle >= len(it["options"]):
+                raise SystemExit(f"{item_id}: Nachtrag zeigt auf Antwort {stelle + 1}, die es nicht gibt")
+            it["options"][stelle] = beschriftung
 
     if review.get("prompt"):
         it["prompt"] = review["prompt"]
@@ -625,6 +654,12 @@ for scope, meta in SCOPES.items():
                 ("source", REVIEW),
                 ("reason", "Die Master-Fassung sagt, WAS gefragt wird; das Review sagt, WIE es dasteht - Kleinschreibung von 'du', Bedingungssaetze als eigene Saetze, echte Fragesaetze bei W02 bis W06. Anzahl und Reihenfolge der Antworten bleiben, sonst zeigten gespeicherte Antworten auf etwas anderes."),
                 ("decidedBy", "Maria, 29.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "T01: die vierte Antwort heisst 'nach mehr als einem Arbeitstag' statt 'spaeter, wenn ich meine Sicht weiter sortiert habe'."),
+                ("source", "Gutachterinnenreview der Verhaltensitems v0.1, Abschnitt 7"),
+                ("reason", "T01 soll ausschliesslich den ZEITPUNKT des ersten Ansprechens messen. Ein Motiv gehoert inhaltlich zu T02. Nur die Beschriftung aendert sich - die Antwort bleibt die vierte und behaelt ihre Kennung, sonst zeigten gespeicherte Antworten danach auf etwas anderes."),
+                ("decidedBy", "Gutachterin, 29.09.2026"),
             ]),
             collections.OrderedDict([
                 ("what", "S01 ist zurueckgezogen und durch S01a bis S01f plus S01_top ersetzt."),

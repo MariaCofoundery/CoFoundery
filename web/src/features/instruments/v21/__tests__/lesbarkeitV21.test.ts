@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { getItemsV21, REGISTRY_V21 } from "@/features/instruments/v21/registryV21";
-import { getBehaviourItems, BEHAVIOUR_SET_V21 } from "@/features/instruments/v21/behaviourV21";
+import { getBehaviourItems, BEHAVIOUR_SET_V21 } from "@/features/instruments/align/behaviourItems";
 
 /**
  * Was ein Mensch zu sehen bekommt, ist auf Deutsch geschrieben.

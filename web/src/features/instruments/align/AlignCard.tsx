@@ -46,6 +46,19 @@ export function AlignCard({ state }: { state: AlignDashboardState }) {
         Fragen, über die ihr sprechen könnt.
       </p>
 
+      {/* DER SATZ, DER DIE EIGENTLICHE SORGE BEANTWORTET. Wer nicht weiss, ob
+          sein bisheriger Report verschwindet, entscheidet nicht ueber die neue
+          Fassung, sondern ueber das Risiko. */}
+      {state.hasPrevious && (
+        <p className="mt-2 text-sm leading-7 text-slate-600">
+          Deine bisherigen Antworten und dein Report bleiben —{" "}
+          <Link href="/me/profile" className="underline">
+            hier
+          </Link>
+          , unverändert und auch weiterhin.
+        </p>
+      )}
+
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
           <p className="text-sm font-medium text-slate-900">Wie du arbeitest</p>

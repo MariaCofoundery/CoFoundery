@@ -24,6 +24,12 @@
       "decidedBy": "Maria, 29.09.2026"
     },
     {
+      "what": "T01: die vierte Antwort heisst 'nach mehr als einem Arbeitstag' statt 'spaeter, wenn ich meine Sicht weiter sortiert habe'.",
+      "source": "Gutachterinnenreview der Verhaltensitems v0.1, Abschnitt 7",
+      "reason": "T01 soll ausschliesslich den ZEITPUNKT des ersten Ansprechens messen. Ein Motiv gehoert inhaltlich zu T02. Nur die Beschriftung aendert sich - die Antwort bleibt die vierte und behaelt ihre Kennung, sonst zeigten gespeicherte Antworten danach auf etwas anderes.",
+      "decidedBy": "Gutachterin, 29.09.2026"
+    },
+    {
       "what": "S01 ist zurueckgezogen und durch S01a bis S01f plus S01_top ersetzt.",
       "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 2",
       "reason": "Die alte S01 war eine Mehrfachauswahl. Eine NICHT getroffene Wahl laesst drei Dinge offen: unwichtig, wichtig aber nicht das wichtigste, oder nur einem noch wichtigeren zum Opfer gefallen. Fuer ein Bild ueber die Richtung eines Vorhabens ist das zu grob - und aus einer Mehrfachauswahl eine Abstufung zu RECHNEN waere eine erfundene. Die alte Frage bleibt in der Registratur, damit gespeicherte Antworten lesbar bleiben, wird aber nicht mehr vorgelegt und nicht umgerechnet.",
@@ -471,7 +477,7 @@
         },
         {
           "optionId": "T01_o4",
-          "label": "später, wenn ich meine Sicht weiter sortiert habe",
+          "label": "nach mehr als einem Arbeitstag",
           "requiresText": false,
           "exclusive": false
         },

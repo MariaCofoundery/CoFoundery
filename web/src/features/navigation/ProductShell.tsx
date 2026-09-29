@@ -311,6 +311,16 @@ export function ProductShell({
                         currentPathname.startsWith("/me/profile"),
                     },
                     {
+                      // DIE NEUE FASSUNG GEHOERT INS MENUE. Sie war nur ueber
+                      // eine Karte auf dem Dashboard erreichbar - wer woanders
+                      // stand, musste erst dorthin zurueck. Genau das war bei
+                      // Fragebogen und Report schon einmal das Problem.
+                      href: "/founder-alignment/profil",
+                      label: t("alignNewVersion"),
+                      isActive: (currentPathname: string) =>
+                        currentPathname.startsWith("/founder-alignment"),
+                    },
+                    {
                       href: "/founder-library",
                       label: t("alignLibrary"),
                       isActive: (currentPathname: string) =>
