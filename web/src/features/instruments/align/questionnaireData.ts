@@ -26,17 +26,42 @@ import type { ItemView, SectionView } from "@/features/instruments/v21/questionn
  * Person, die gerade antwortet.
  */
 
-export function buildSections(scope: AssessmentScope): SectionView[] {
+/**
+ * Wer mit `[Name]` gemeint ist.
+ *
+ * ---------------------------------------------------------------------------
+ * R02 FRAGT NACH EINER ERWARTUNG AN EINE BESTIMMTE PERSON
+ * ---------------------------------------------------------------------------
+ *
+ * „Wie viele Stunden pro Woche erwartest Du … ungefähr von [Name]?“ Der
+ * Platzhalter steht in der Quelle und gehört zur Frage - eine Erwartung ohne
+ * Gegenüber ist keine Erwartung. Bis zum 29.09.2026 stand er wörtlich auf dem
+ * Bildschirm, samt der Maskierung aus dem Markdown.
+ *
+ * DER ERSATZ IST NIE LEER. Ohne Namen steht „der anderen Person“ da - dritte
+ * Person, also grammatisch richtig, und ehrlicher als eine eckige Klammer, die
+ * wie ein Fehler aussieht.
+ */
+export const OHNE_NAMEN = "der anderen Person";
+
+export function withPartner(prompt: string, partnerName?: string | null): string {
+  return prompt.replace(/\[Name\]/g, partnerName?.trim() || OHNE_NAMEN);
+}
+
+export function buildSections(
+  scope: AssessmentScope,
+  partnerName?: string | null,
+): SectionView[] {
   return getSectionsV22(scope).map(({ section, items }) => ({
     section,
-    items: items.map(toView),
+    items: items.map((item) => toView(item, partnerName)),
   }));
 }
 
-function toView(item: RegistryItemV22): ItemView {
+function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
   return {
     itemId: item.itemId,
-    prompt: item.prompt,
+    prompt: withPartner(item.prompt, partnerName),
     hint: item.hint,
     // Die Formate von v2.2 sind eine Teilmenge derer von v2.1 - das Feld kennt
     // sie alle.
@@ -90,11 +115,14 @@ export function answerableOf(item: RegistryItemV22): AnswerableItem {
  * und scheitert an `next/headers`. Eine reine Funktion gehört in ein reines
  * Modul.
  */
-export function readableItems(scope: AssessmentScope): ReadableItem[] {
+export function readableItems(
+  scope: AssessmentScope,
+  partnerName?: string | null,
+): ReadableItem[] {
   return getItemsV22(scope).map((item) => ({
     itemId: item.itemId,
     section: item.section,
-    prompt: item.prompt,
+    prompt: withPartner(item.prompt, partnerName),
     answerFormat: item.answerFormat,
     options: item.options.map((option) => ({
       optionId: option.optionId,

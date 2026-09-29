@@ -35,11 +35,36 @@ const quelle = readFileSync(
 /** Zeilenumbrüche zusammenziehen: Im Dokument sind Sätze umbrochen. */
 const flach = quelle.replace(/\s+/g, " ");
 
-test("jeder Fragetext steht so im Quelldokument", () => {
+/**
+ * Dieselbe Quelle, nur ohne die Schreibweise des Dokuments.
+ *
+ * Markdown maskiert eckige Klammern („\\[Name\\]“), und React setzt Text so,
+ * wie er dasteht - der Backslash war bis zum 29.09.2026 auf dem Bildschirm zu
+ * sehen. Die Maskierung herauszunehmen ist keine Umformulierung, aber auch
+ * nicht nichts: Deshalb wird sie hier NICHT stillschweigend geglaettet,
+ * sondern verlangt, dass die Frage in den dokumentierten Abweichungen steht.
+ */
+const flachOhneMaskierung = flach.replace(/\\([[\]*_`])/g, "$1");
+
+test("jeder Fragetext steht so im Quelldokument - oder die Abweichung ist verzeichnet", () => {
+  const begruendet = JSON.stringify(
+    SCOPES.map((scope) => REGISTRIES[scope].deviationsFromSource),
+  );
+
   for (const item of alleItems()) {
+    if (flach.includes(item.prompt)) continue;
+
     assert.ok(
-      flach.includes(item.prompt),
+      flachOhneMaskierung.includes(item.prompt) ||
+        // L02/L03: die Redaktionsmarke am Ende ist gestrichen, der Satz davor
+        // steht woertlich in der Quelle.
+        flachOhneMaskierung.includes(item.prompt.replace(/\?$/, "")),
       `${item.itemId}: der Fragetext steht nicht in der Quelle:\n${item.prompt}`,
+    );
+
+    assert.ok(
+      begruendet.includes(item.itemId),
+      `${item.itemId}: weicht von der Quelle ab, ohne dass es verzeichnet ist`,
     );
   }
 });

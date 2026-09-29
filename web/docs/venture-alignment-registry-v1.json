@@ -17,6 +17,18 @@
       "decidedBy": "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"
     },
     {
+      "what": "Markdown-Maskierung entfernt: '\\[Name\\]' wird '[Name]'.",
+      "source": "Master-Arbeitsfassung v0.2, R02",
+      "reason": "Der Backslash ist Schreibweise des Dokuments, nicht Teil der Frage. React setzt Text so, wie er dasteht - bis zum 29.09.2026 war er auf dem Bildschirm zu sehen. '[Name]' bleibt als Platzhalter und wird beim Anzeigen durch den Namen ersetzt.",
+      "decidedBy": "Claude, 29.09.2026"
+    },
+    {
+      "what": "Redaktionsmarke '[nur wenn relevant]' aus L02 und L03 gestrichen.",
+      "source": "Master-Arbeitsfassung v0.2, L02/L03",
+      "reason": "Eine Anweisung an die Redaktion, keine Frage an einen Menschen. Die Bedingung steht als showAfter='L01' in der Registratur und WIRKT dort, statt danebenzustehen.",
+      "decidedBy": "Claude, 29.09.2026"
+    },
+    {
       "what": "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'.",
       "source": "Master-Arbeitsfassung v0.2, R12",
       "reason": "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum.",
@@ -617,7 +629,7 @@
       "itemId": "R02",
       "order": 14,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie viele Stunden pro Woche erwartest Du in den nächsten zwölf Wochen ungefähr von \\[Name\\]?",
+      "prompt": "Wie viele Stunden pro Woche erwartest Du in den nächsten zwölf Wochen ungefähr von [Name]?",
       "hint": null,
       "answerFormat": "person_number_range",
       "options": [],
@@ -1343,7 +1355,7 @@
       "itemId": "L02",
       "order": 35,
       "section": "L – persönliche Grenzen",
-      "prompt": "Woran würdest Du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist? **\\[nur wenn relevant\\]**",
+      "prompt": "Woran würdest Du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?",
       "hint": null,
       "answerFormat": "free_text_per_entry",
       "options": [],
@@ -1364,7 +1376,7 @@
       "itemId": "L03",
       "order": 36,
       "section": "L – persönliche Grenzen",
-      "prompt": "Was sollte passieren, wenn Ihr Euch nicht einig seid, ob eine für Dich wichtige Grenze in einer konkreten Situation betroffen ist? **\\[nur wenn relevant\\]**",
+      "prompt": "Was sollte passieren, wenn Ihr Euch nicht einig seid, ob eine für Dich wichtige Grenze in einer konkreten Situation betroffen ist?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [

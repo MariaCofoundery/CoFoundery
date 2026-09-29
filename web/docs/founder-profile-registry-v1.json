@@ -17,6 +17,18 @@
       "decidedBy": "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"
     },
     {
+      "what": "Markdown-Maskierung entfernt: '\\[Name\\]' wird '[Name]'.",
+      "source": "Master-Arbeitsfassung v0.2, R02",
+      "reason": "Der Backslash ist Schreibweise des Dokuments, nicht Teil der Frage. React setzt Text so, wie er dasteht - bis zum 29.09.2026 war er auf dem Bildschirm zu sehen. '[Name]' bleibt als Platzhalter und wird beim Anzeigen durch den Namen ersetzt.",
+      "decidedBy": "Claude, 29.09.2026"
+    },
+    {
+      "what": "Redaktionsmarke '[nur wenn relevant]' aus L02 und L03 gestrichen.",
+      "source": "Master-Arbeitsfassung v0.2, L02/L03",
+      "reason": "Eine Anweisung an die Redaktion, keine Frage an einen Menschen. Die Bedingung steht als showAfter='L01' in der Registratur und WIRKT dort, statt danebenzustehen.",
+      "decidedBy": "Claude, 29.09.2026"
+    },
+    {
       "what": "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'.",
       "source": "Master-Arbeitsfassung v0.2, R12",
       "reason": "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum.",

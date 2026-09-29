@@ -1,5 +1,6 @@
 import "server-only";
 
+import { connectedPartners } from "@/features/instruments/connectedPartners";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -144,4 +145,56 @@ export async function resolveVenture(
     return { venture: await createVentureFor(), choices: [] };
   }
   return { venture: null, choices: ventures };
+}
+
+/**
+ * Wer im Vorhaben sonst noch dabei ist - wenn es genau eine Person ist.
+ *
+ * ---------------------------------------------------------------------------
+ * NUR BEI GENAU EINER, UND DAS IST DER PUNKT
+ * ---------------------------------------------------------------------------
+ *
+ * R02 fragt: „Wie viele Stunden erwartest Du von [Name]?“ Bei zwei
+ * Mitgründenden ist nicht bestimmt, wer gemeint ist - eine Zahl, die einmal
+ * die Erwartung an eine Person und einmal die Summe für zwei meint, ist
+ * unbrauchbar, und geraten wäre sie schlimmer als offen.
+ *
+ * ---------------------------------------------------------------------------
+ * DER NAME KOMMT AUS DER EINLADUNG, NICHT AUS DEM PROFIL
+ * ---------------------------------------------------------------------------
+ *
+ * Erster Versuch war `person_core.display_name`. Die Zeilensicherheit gibt
+ * ihn Mitgründenden nicht heraus - die Abfrage kam leer zurück, und die
+ * Ersetzung wäre totes Bedienelement gewesen: sieht aus wie eine Funktion,
+ * feuert nie.
+ *
+ * Lesbar ist die Beschriftung aus der Einladung. Genau die steht auch im
+ * Dashboard neben „mit X vergleichen“, also heißt dieselbe Person an beiden
+ * Stellen gleich.
+ *
+ * Ist sie nicht zu haben, bleibt „der anderen Person“ stehen. Das ist ungenau
+ * und ehrlich; ein Name wäre genau und vielleicht falsch.
+ */
+export async function solePartnerName(
+  ventureId: string,
+  selfUserId: string,
+): Promise<string | null> {
+  try {
+    const supabase = await createClient();
+
+    const { data: members } = await supabase
+      .from("founder_team_members")
+      .select("user_id")
+      .eq("team_id", ventureId)
+      .neq("user_id", selfUserId);
+
+    if (!members || members.length !== 1) return null;
+
+    const partners = await connectedPartners(selfUserId);
+    const treffer = partners.find((partner) => partner.userId === members[0].user_id);
+
+    return treffer?.label.trim() || null;
+  } catch {
+    return null;
+  }
 }

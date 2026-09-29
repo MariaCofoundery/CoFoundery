@@ -4,6 +4,7 @@ import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
 import { VENTURE_ALIGNMENT, getItemsV22 } from "@/features/instruments/align/registries";
+import { withPartner } from "@/features/instruments/align/questionnaireData";
 import { getShareState } from "@/features/instruments/align/shareData";
 import { ShareForm } from "@/features/instruments/align/ShareForm";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
@@ -103,7 +104,7 @@ export default async function VentureAnswersPage({
               hiddenByRecipient={teilen.hiddenByRecipient}
               items={getItemsV22("venture_alignment").map((item) => ({
                 itemId: item.itemId,
-                prompt: item.prompt,
+                prompt: withPartner(item.prompt),
               }))}
             />
           </div>

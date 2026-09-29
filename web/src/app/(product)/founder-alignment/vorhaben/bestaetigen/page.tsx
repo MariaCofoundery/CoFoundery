@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import { ConfirmClient } from "@/features/instruments/align/ConfirmClient";
 import type { ConfirmEntry } from "@/features/instruments/align/ConfirmVentureAnswers";
 import { itemsThatAge, itemsThatKeep } from "@/features/instruments/align/whatAges";
-import { resolveVenture } from "@/features/instruments/align/ventureResolution";
-import { readableItems } from "@/features/instruments/align/questionnaireData";
+import { resolveVenture, solePartnerName } from "@/features/instruments/align/ventureResolution";
+import { readableItems, withPartner } from "@/features/instruments/align/questionnaireData";
 import { readAnswer } from "@/features/instruments/v21/readoutV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -63,8 +63,12 @@ export default async function ConfirmPage({
   // anderem Wortlaut und teils anderen Antwortmoeglichkeiten. Dann stuende
   // hier eine Beschriftung aus dem falschen Bogen, und bei den uebrigen zwoelf
   // saehe eine vorhandene Antwort aus wie keine.
+  // Hier wird bestaetigt, was man ueber eine bestimmte Person gesagt hat -
+  // also steht ihr Name in der Frage, wenn es genau eine ist.
+  const partnerName = await solePartnerName(venture.id, auth.user.id);
+
   const lesbar = new Map(
-    readableItems("venture_alignment").map((item) => [item.itemId, item]),
+    readableItems("venture_alignment", partnerName).map((item) => [item.itemId, item]),
   );
 
   const toEntry = (itemId: string, prompt: string): ConfirmEntry => {
@@ -76,8 +80,10 @@ export default async function ConfirmPage({
     return { itemId, prompt, entry: readAnswer(answer, [], lesbar.get(itemId)) };
   };
 
-  const ages = itemsThatAge().map((item) => toEntry(item.itemId, item.prompt));
-  const keeps = itemsThatKeep().map((item) => toEntry(item.itemId, item.prompt));
+  const ages = itemsThatAge().map((item) =>
+    toEntry(item.itemId, withPartner(item.prompt, partnerName)));
+  const keeps = itemsThatKeep().map((item) =>
+    toEntry(item.itemId, withPartner(item.prompt, partnerName)));
 
   // Wer dazugekommen ist - fuer den Satz "X ist jetzt dabei".
   const { data: members } = await supabase

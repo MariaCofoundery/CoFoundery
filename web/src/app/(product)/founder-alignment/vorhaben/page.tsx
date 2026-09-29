@@ -3,7 +3,7 @@ import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { VentureHeader } from "@/features/instruments/align/VentureHeader";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
 import { getItemsV22, VENTURE_ALIGNMENT } from "@/features/instruments/align/registries";
-import { resolveVenture } from "@/features/instruments/align/ventureResolution";
+import { resolveVenture, solePartnerName } from "@/features/instruments/align/ventureResolution";
 import { needsConfirmation } from "@/features/instruments/align/needsConfirmation";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -58,6 +58,10 @@ export default async function VentureAlignmentPage({
   }
 
   const supabase = await createClient();
+
+  // R02 fragt nach einer Erwartung an eine bestimmte Person. Steht genau eine
+  // im Vorhaben, steht ihr Name in der Frage - sonst "der anderen Person".
+  const partnerName = await solePartnerName(venture.id, auth.user.id);
 
   const { data: assessment } = await supabase
     .from("assessments")
@@ -121,7 +125,7 @@ export default async function VentureAlignmentPage({
         <Questionnaire
           scope="venture_alignment"
           ventureId={venture.id}
-          sections={buildSections("venture_alignment")}
+          sections={buildSections("venture_alignment", partnerName)}
           answerable={answerable}
           initialAnswers={initialAnswers}
           submitted={Boolean(assessment?.submitted_at)}

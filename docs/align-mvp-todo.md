@@ -44,9 +44,15 @@ Ein Balken ohne Beschriftung sagt dasselbe, ohne Genauigkeit zu behaupten.
 
 ### ☐ 3. Die Fragen sprachlich überarbeiten
 
-Läuft bei Maria. Vorlage: `docs/fragebogen-v2-1-ueberarbeitung.md`.
-Betrifft Formulierungen, nicht Struktur — Reihenfolge und Anzahl der Antworten
-bleiben, sonst zeigen gespeicherte Antworten ins Leere.
+Läuft bei Maria. Vorlage: **`docs/fragen-ueberarbeiten.md`** (52 Fragen, beide
+Bögen). Betrifft Formulierungen, nicht Struktur — Reihenfolge und Anzahl der
+Antworten bleiben, sonst zeigen gespeicherte Antworten ins Leere.
+
+Die alte Vorlage `fragebogen-v2-1-ueberarbeitung.md` ist am 29.09.2026
+gelöscht worden: Sie enthielt die 36 Fragen von v2.1 in Wortlauten, die es
+nicht mehr gibt. Die Master-Arbeitsfassung v0.2 hat sie bereits umformuliert,
+und aus ihr sind die beiden Bögen gebaut — geprüft, jeder Fragetext und jede
+Antwortmöglichkeit steht wörtlich dort.
 
 ### ☑ 3b. Founder-Profil und Venture-Alignment trennen — gebaut
 

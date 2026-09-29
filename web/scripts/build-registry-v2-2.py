@@ -153,6 +153,37 @@ STANDARD_MISSING = {"code": "cannot_assess", "label": "kann ich noch nicht einsc
 
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# MARKDOWN IST SCHREIBWEISE DER QUELLE, NICHT TEIL DER FRAGE
+# ---------------------------------------------------------------------------
+#
+# GEFUNDEN AM 29.09.2026. Drei Dinge aus der Master-Fassung standen woertlich
+# im Fragebogen:
+#
+#   R02  "... ungefaehr von \[Name\]?"   - die Maskierung fuer eckige Klammern
+#   L02  "... ueberschritten ist? **\[nur wenn relevant\]**"
+#   L03  dasselbe
+#
+# React setzt Text so, wie er dasteht: Der Backslash war zu sehen. Und "[nur
+# wenn relevant]" ist eine Anweisung an die Redaktion, keine Frage an einen
+# Menschen - die Bedingung steht ohnehin als `showAfter` in der Registratur und
+# wirkt dort, statt danebenzustehen.
+#
+# `[Name]` BLEIBT als Platzhalter stehen. Er gehoert zur Frage: R02 fragt nach
+# einer Erwartung an eine bestimmte Person. Ersetzt wird er beim Anzeigen, wo
+# man weiss, wer gemeint ist.
+
+REDAKTIONSMARKEN = ("[nur wenn relevant]",)
+
+
+def entmaskieren(text: str) -> str:
+    """Nimmt die Markdown-Maskierung heraus und streicht Redaktionsmarken."""
+    text = re.sub(r"\\([\[\]*_`])", r"\1", text)
+    for marke in REDAKTIONSMARKEN:
+        text = text.replace(f"**{marke}**", "").replace(marke, "")
+    return re.sub(r"\s+", " ", text).strip()
+
+
 roh = io.open(SRC, encoding="utf-8").read()
 absaetze = [re.sub(r"\s+", " ", a).strip() for a in re.split(r"\n\s*\n", roh)]
 
@@ -171,7 +202,8 @@ for a in absaetze:
         aktuell = m.group(1)
         reihenfolge.append(aktuell)
         items[aktuell] = {
-            "itemId": aktuell, "section": abschnitt or "", "prompt": m.group(2).strip(),
+            "itemId": aktuell, "section": abschnitt or "",
+            "prompt": entmaskieren(m.group(2)),
             "options": [], "missing": [], "hint": None, "note": None,
             "concerns": None, "paths": None, "followUp": None,
         }
@@ -285,6 +317,18 @@ for scope, meta in SCOPES.items():
                 ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
                 ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
                 ("decidedBy", "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Markdown-Maskierung entfernt: '\\[Name\\]' wird '[Name]'."),
+                ("source", "Master-Arbeitsfassung v0.2, R02"),
+                ("reason", "Der Backslash ist Schreibweise des Dokuments, nicht Teil der Frage. React setzt Text so, wie er dasteht - bis zum 29.09.2026 war er auf dem Bildschirm zu sehen. '[Name]' bleibt als Platzhalter und wird beim Anzeigen durch den Namen ersetzt."),
+                ("decidedBy", "Claude, 29.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Redaktionsmarke '[nur wenn relevant]' aus L02 und L03 gestrichen."),
+                ("source", "Master-Arbeitsfassung v0.2, L02/L03"),
+                ("reason", "Eine Anweisung an die Redaktion, keine Frage an einen Menschen. Die Bedingung steht als showAfter='L01' in der Registratur und WIRKT dort, statt danebenzustehen."),
+                ("decidedBy", "Claude, 29.09.2026"),
             ]),
             collections.OrderedDict([
                 ("what", "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'."),
