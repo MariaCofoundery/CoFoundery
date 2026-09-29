@@ -112,13 +112,31 @@ Was die beiden gebauten Bilder NICHT zeigen: Fragen ohne Reihenfolge
 eine zu zeichnen wäre eine Behauptung über Nähe. Sie stehen in der Liste
 darunter.
 
-### ☐ 7. Deep-Dive-Routing
+### ☑ 7. Deep-Dive-Routing — gebaut
 
-`MVP-Spec §17/§18`: CTA-Karten aus dem Report in die Vertiefungsbereiche.
-Der Report erzeugt keine Vereinbarung — er leitet weiter.
+CTA-Karten am Ende jedes Vergleichsabschnitts, in `DeepDiveCards.tsx`.
 
-Die Routen müssen an die vorhandene App-Struktur angepasst werden; die im
-Dokument (`/align/decisions`) gibt es nicht.
+Die Vertiefungsbereiche mussten nicht gebaut werden — es gibt sie: der
+**Founder-Setup-Katalog** mit 20 Themen, je mit Stand, Fassung und Bestätigung
+von beiden. `/align/decisions` aus dem Dokument existiert nicht und wird auch
+nicht angelegt; die Zuordnung steht in `deepDive.ts`.
+
+Drei Regeln, die dabei entstanden sind:
+
+- **Es wird nichts geschrieben.** Der Report leitet weiter, mehr nicht (§17).
+  Eine vorbelegte Notiz aus einem Zweiervergleich landete in einem Thema, das
+  dem ganzen Team gehört — wer zu dritt ist, hätte damit Antworten an jemanden
+  weitergegeben, dem sie niemand freigegeben hat.
+- **Nur bei einem gemeinsamen Vorhaben.** Wer mit jemandem vergleicht, der
+  nicht im selben `founder_team` ist, hat keinen Ort für eine Vereinbarung.
+- **Die Phase entscheidet mit.** Vor der Gründung nur Themen der Phase
+  `before` — der Katalog sagt selbst, dass „Founder-Exit" vor der Rechtsform
+  Lärm ist.
+
+Zuordnung je **Abschnitt**, nicht je Frage: je Frage wäre genauer und nach der
+ersten Umformulierung falsch. `S – Ziele & strategische Richtung` hat bewusst
+kein Thema — der Katalog hat nichts für Ziele, und ein erfundener Link wäre
+schlimmer als keiner.
 
 ### ☐ 8. S01 als sechs Wichtigkeiten
 

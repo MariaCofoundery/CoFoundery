@@ -3,10 +3,11 @@ import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21"
 import { ExpectationGapsView } from "@/features/instruments/v21/ExpectationGapsView";
 import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
 import { DifferenceMap } from "@/features/instruments/align/AlignMaps";
+import { DeepDiveCards } from "@/features/instruments/align/DeepDiveCards";
 import { buildScopeComparison } from "@/features/instruments/align/comparisonData";
 import { registryOf } from "@/features/instruments/align/registries";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
-import { getRequestUser } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
  * Zwei Menschen nebeneinander - Arbeitsprofil und Vorhaben getrennt.
@@ -41,6 +42,25 @@ export default async function AlignComparePage({
   }
 
   const { venture } = await resolveVenture(auth.user.id, gewaehlt);
+
+  // ---------------------------------------------------------------------------
+  // GIBT ES EINEN GEMEINSAMEN ORT?
+  // ---------------------------------------------------------------------------
+  //
+  // Die Vertiefungskarten fuehren ins Founder-Setup, und das gehoert einem
+  // Vorhaben. Wer mit jemandem vergleicht, der nicht darin ist, hat keinen
+  // gemeinsamen Ort, an dem eine Vereinbarung stehen koennte - dann waere die
+  // Einladung "haltet das fest" eine Einladung ins Leere.
+  const supabase = await createClient();
+  const { data: gemeinsam } = venture
+    ? await supabase
+        .from("founder_team_members")
+        .select("user_id")
+        .eq("team_id", venture.id)
+        .eq("user_id", partnerId)
+        .maybeSingle()
+    : { data: null };
+  const zusammenImVorhaben = Boolean(gemeinsam);
 
   const profil = await buildScopeComparison(
     "founder_profile", auth.user.id, partnerId, null,
@@ -122,6 +142,19 @@ export default async function AlignComparePage({
                   nameB="Die andere Person"
                 />
               </div>
+
+              {/* GANZ UNTEN. Wer bis hierher gelesen hat, weiss, worueber er
+                  sprechen will - vorher waere die Einladung, es festzuhalten,
+                  eine Einladung, es abzukuerzen. */}
+              {venture && zusammenImVorhaben && (
+                <div className="mt-8">
+                  <DeepDiveCards
+                    scope="venture_alignment"
+                    teamId={venture.id}
+                    teamContext={venture.teamContext}
+                  />
+                </div>
+              )}
             </>
           )}
         </section>
@@ -166,6 +199,16 @@ export default async function AlignComparePage({
               nameB="Die andere Person"
             />
           </div>
+
+          {venture && zusammenImVorhaben && (
+            <div className="mt-8">
+              <DeepDiveCards
+                scope="founder_profile"
+                teamId={venture.id}
+                teamContext={venture.teamContext}
+              />
+            </div>
+          )}
           </>
         )}
       </section>
