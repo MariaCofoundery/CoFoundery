@@ -22,10 +22,14 @@ import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/read
  * andere Antwort ist eine andere Antwort - ob das viel bedeutet, weiß das
  * Gespräch und nicht dieses Modul.
  *
- * Bei geordneten Stufen wird die Zahl der Stufen dazwischen genannt, weil sie
- * beim Lesen hilft: „zwei Stufen auseinander“ ist eine Beschreibung. Sie ist
- * kein Maß und wird nirgends summiert - ein Test hält fest, dass aus keiner
- * Vergleichsliste eine Zahl entsteht.
+ * UND KEINE ZAHL, AUCH KEINE KLEINE. Hier stand bis zum 29.09.2026 „zwei
+ * Stufen auseinander“ - gedacht als Beschreibung, gelesen als Maß. Maria beim
+ * Durchsehen der Reportspezifikation: „keine Zahlen im Report, die sind
+ * irreführend.“ Sie hat recht: Eine Zahl neben zwei Antworten wird zu der
+ * Zahl, über die man spricht, und die beiden Antworten treten dahinter zurück.
+ *
+ * Der Abstand wird weiterhin BERECHNET - er entscheidet, ob zwei Antworten als
+ * gleich oder unterschiedlich gelten. Er verlässt dieses Modul nur nicht mehr.
  *
  * ---------------------------------------------------------------------------
  * „FEHLT“ SIEHT NICHT AUS WIE „PASST NICHT“
@@ -52,8 +56,6 @@ export type ItemComparison = {
   a: ReadoutEntry | null;
   b: ReadoutEntry | null;
   state: ComparisonState;
-  /** Bei geordneten Stufen: wie viele Stufen dazwischen. Kein Maß. */
-  stepsApart: number | null;
   why:
     | "withheld_a" | "withheld_b" | "withheld_both"
     | "unanswered_a" | "unanswered_b" | "unanswered_both"
@@ -84,7 +86,6 @@ function compareItem(
     prompt: item.prompt,
     a: a ?? null,
     b: b ?? null,
-    stepsApart: null as number | null,
   };
 
   // Erst die Gründe, warum es nichts zu vergleichen gibt - und zwar getrennt,
@@ -111,15 +112,10 @@ function compareValues(
   switch (a.kind) {
     case "ordinal": {
       const other = b as typeof a;
+      // Eine Stufe daneben ist noch nicht dieselbe Antwort. Der Abstand
+      // entscheidet hier - und bleibt hier.
       const steps = Math.abs(a.position - other.position);
-      return {
-        ...base,
-        // Die Stufenzahl beschreibt, sie bewertet nicht. Es gibt keinen
-        // Schwellwert, ab dem „unterschiedlich“ zu „problematisch“ wird.
-        stepsApart: steps,
-        state: steps === 0 ? "same" : "different",
-        why: null,
-      };
+      return { ...base, state: steps === 0 ? "same" : "different", why: null };
     }
 
     case "choice": {

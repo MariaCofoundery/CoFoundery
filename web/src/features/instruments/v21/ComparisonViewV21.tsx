@@ -14,8 +14,12 @@ import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
  * dasselbe antworten, sind nicht das Ziel - sie sind nur ähnlich.
  *
  * Deshalb sind die Zustände in Grau gesetzt und unterscheiden sich durch das
- * WORT, nicht durch die Farbe. Nur „steht nebeneinander“ und „darüber wolltet
- * ihr sprechen“ bekommen einen Rahmen, weil sie zum Lesen einladen.
+ * WORT, nicht durch die Farbe.
+ *
+ * UND KEINE ZAHL. Hier stand „zwei Stufen auseinander“ - gedacht als
+ * Beschreibung, gelesen als Maß. Eine Zahl neben zwei Antworten wird zu der
+ * Zahl, über die man spricht, und die beiden Antworten treten dahinter zurück.
+ * Was zählt, steht in den beiden Spalten.
  */
 
 const STATE_LABEL: Record<ItemComparison["state"], string> = {
@@ -117,13 +121,6 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
                 </div>
               )}
 
-              {item.stepsApart !== null && item.stepsApart > 0 && (
-                // Eine Beschreibung, kein Maß: Es gibt keinen Schwellwert, ab
-                // dem „unterschiedlich“ zu „problematisch“ wird.
-                <p className="mt-3 text-xs text-slate-500">
-                  {item.stepsApart === 1 ? "eine Stufe" : `${item.stepsApart} Stufen`} auseinander
-                </p>
-              )}
             </div>
           ))}
         </section>

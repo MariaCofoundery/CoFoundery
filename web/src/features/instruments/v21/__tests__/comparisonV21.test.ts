@@ -26,25 +26,36 @@ test("dieselbe Stufe heißt gleich, eine andere heißt anders", () => {
     side([{ blockId: "A01", value: { optionId: opt("A01", 2) } }]),
   );
   assert.equal(find(gleich, "A01").state, "same");
-  assert.equal(find(gleich, "A01").stepsApart, 0);
 
   const anders = compareV21(
     side([{ blockId: "A01", value: { optionId: opt("A01", 0) } }]),
     side([{ blockId: "A01", value: { optionId: opt("A01", 3) } }]),
   );
   assert.equal(find(anders, "A01").state, "different");
-  assert.equal(find(anders, "A01").stepsApart, 3);
 });
 
-test("zwei Handlungswahlen bekommen KEINEN Abstand", () => {
-  // Eine nominale Kategorie mit einem Abstand zu versehen wäre eine
-  // Behauptung über Nähe, die es nicht gibt.
+test("nirgends im Vergleich steht eine Zahl", () => {
+  // Hier stand bis zum 29.09.2026 "zwei Stufen auseinander" - gedacht als
+  // Beschreibung, gelesen als Mass. Eine Zahl neben zwei Antworten wird zu
+  // DER Zahl, ueber die man spricht, und die beiden Antworten treten dahinter
+  // zurueck.
   const result = compareV21(
-    side([{ blockId: "K01", value: { optionId: opt("K01", 0) } }]),
-    side([{ blockId: "K01", value: { optionId: opt("K01", 4) } }]),
+    side([{ blockId: "A01", value: { optionId: opt("A01", 0) } }]),
+    side([{ blockId: "A01", value: { optionId: opt("A01", 4) } }]),
   );
-  assert.equal(find(result, "K01").state, "different");
-  assert.equal(find(result, "K01").stepsApart, null);
+  const item = find(result, "A01");
+  assert.ok(!("stepsApart" in item), "der Abstand verlaesst den Vergleich wieder");
+  // Die Unterscheidung selbst bleibt - sie wird nur nicht beziffert.
+  assert.equal(item.state, "different");
+});
+
+test("eine Stufe daneben ist nicht dieselbe Antwort", () => {
+  // Der Abstand wird weiterhin BERECHNET, er bleibt nur im Modul.
+  const result = compareV21(
+    side([{ blockId: "A01", value: { optionId: opt("A01", 2) } }]),
+    side([{ blockId: "A01", value: { optionId: opt("A01", 3) } }]),
+  );
+  assert.equal(find(result, "A01").state, "different");
 });
 
 test("nirgends entsteht ein Gesamtwert oder eine Passungszahl", () => {
@@ -139,7 +150,6 @@ test("Zahlen und Zusagen stehen nebeneinander, nicht verrechnet", () => {
     side([{ blockId: "R01", value: { number: 30, unit: "Stunden pro Woche" } }]),
   );
   assert.equal(find(result, "R01").state, "side_by_side");
-  assert.equal(find(result, "R01").stepsApart, null);
 });
 
 test("die Abschnitte stehen in der Reihenfolge der Quelle", () => {

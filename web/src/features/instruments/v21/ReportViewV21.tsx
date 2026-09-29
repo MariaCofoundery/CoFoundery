@@ -13,9 +13,13 @@ import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/read
  * hat keine Normstichprobe, keine bestätigten Faktoren und ausdrücklich keine
  * Dimensionswerte.
  *
- * Bei geordneten Stufen wird die Stelle als Punktreihe gezeigt („3 von 5“),
- * weil das beim Lesen hilft. Sie steht NEBEN der Beschriftung und nie an ihrer
- * Stelle: Wer nur die Punkte sieht, liest wieder einen Messwert.
+ * Bei geordneten Stufen zeigt eine Punktreihe, WELCHE der Antworten gewählt
+ * wurde. Das ist keine berechnete Zahl, sondern ein Bild der Antwort selbst -
+ * und es steht NEBEN der Beschriftung, nie an ihrer Stelle.
+ *
+ * Der Unterschied zu einem Messwert: Hier wird nichts zusammengerechnet. „4.4
+ * von 5“ wäre ein Mittelwert aus mehreren Fragen und damit eine Behauptung
+ * über eine Skala, die es nicht gibt.
  *
  * Bei einer Handlungswahl gibt es keine Punktreihe. Eine Wahl ohne Rangfolge
  * hat keine Stelle, und eine zu zeigen wäre eine Behauptung über Nähe.
@@ -237,10 +241,14 @@ function Value({ value }: { value: ReadoutValue }) {
  */
 function Dots({ position, of }: { position: number; of: number }) {
   return (
-    <span
-      className="flex shrink-0 items-center gap-1"
-      aria-label={`Stufe ${position} von ${of}`}
-    >
+    /*
+      AUSDRUECKLICH VERSTECKT FUER VORLESEPROGRAMME.
+      Die Beschriftung der gewaehlten Antwort steht direkt daneben im Text -
+      "manchmal". Die Punkte zeigen dasselbe noch einmal als Bild. Ein
+      aria-label "Stufe 3 von 5" wuerde daraus eine Zahl machen, die sonst
+      niemand sieht.
+    */
+    <span className="flex shrink-0 items-center gap-1" aria-hidden>
       {Array.from({ length: of }, (_, index) => (
         <span
           key={index}
