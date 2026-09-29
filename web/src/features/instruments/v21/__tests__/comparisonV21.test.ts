@@ -168,8 +168,10 @@ test("die Agenda nennt, was anders ist - ohne Rangfolge nach Schwere", () => {
   );
   const agenda = agendaV21(result);
   const a01 = agenda.find((entry) => entry.itemId === "A01")!;
-  assert.equal(a01.why, "different");
-  assert.ok(!agenda.some((entry) => entry.itemId === "A02"), "Gleiches steht nicht drauf");
+  assert.equal(a01.kind, "preference");
+  // Gleiches steht drauf - aber in der eigenen Gruppe. Ein Report, der nur
+  // Unterschiede zeigt, liest sich wie eine Maengelliste.
+  assert.equal(agenda.find((entry) => entry.itemId === "A02")?.kind, "shared");
 
   // Kein Feld, das eine Schwere behauptet.
   assert.ok(!/"severity"|"rank"|"priority"|"risk"/i.test(JSON.stringify(agenda)));
@@ -183,7 +185,7 @@ test("eine Markierung kommt auf die Agenda, auch wenn beide dasselbe geantwortet
     side([{ blockId: "A02", value: { optionId: opt("A02", 0) } }]),
   );
   const agenda = agendaV21(result, ["A02"]);
-  assert.equal(agenda.find((entry) => entry.itemId === "A02")?.why, "marked");
+  assert.equal(agenda.find((entry) => entry.itemId === "A02")?.kind, "marked");
 });
 
 test("was niemand beantwortet hat, steht nicht auf der Agenda", () => {
@@ -259,5 +261,87 @@ test("die Markierung EINER Person reicht für die Agenda", () => {
       rows: [{ block_id: "A02", value: { optionId: opt("A02", 0) }, missing_code: null }],
     },
   );
-  assert.equal(result.agenda.find((entry) => entry.itemId === "A02")?.why, "marked");
+  assert.equal(result.agenda.find((entry) => entry.itemId === "A02")?.kind, "marked");
+});
+
+// ---------------------------------------------------------------------------
+// Die Ordnung der Agenda - nach Art, nicht nach Schwere
+// ---------------------------------------------------------------------------
+
+test("Zusagen und Regeln stehen vor Arbeitspräferenzen", () => {
+  // Nicht weil sie schwerer waeren, sondern weil sie konkreter sind: Ueber
+  // eine Zahl laesst sich am Dienstag reden, ueber "wie ihr mit Unsicherheit
+  // umgeht" erst nach einem Gespraech.
+  const result = compareV21(
+    side([
+      { blockId: "A01", value: { optionId: opt("A01", 0) } },
+      { blockId: "G01", value: { optionId: opt("G01", 0) } },
+    ]),
+    side([
+      { blockId: "A01", value: { optionId: opt("A01", 4) } },
+      { blockId: "G01", value: { optionId: opt("G01", 1) } },
+    ]),
+  );
+  const agenda = agendaV21(result);
+  const arten = agenda.map((entry) => entry.kind);
+  assert.deepEqual(arten, ["commitment", "preference"]);
+  assert.equal(agenda[0].itemId, "G01");
+});
+
+test("Gemeinsamkeiten stehen aktiv drauf, nicht nur Unterschiede", () => {
+  // Ein Report, der nur Unterschiede zeigt, liest sich wie eine Maengelliste.
+  const result = compareV21(
+    side([{ blockId: "A01", value: { optionId: opt("A01", 2) } }]),
+    side([{ blockId: "A01", value: { optionId: opt("A01", 2) } }]),
+  );
+  const agenda = agendaV21(result);
+  assert.equal(agenda.length, 1);
+  assert.equal(agenda[0].kind, "shared");
+  assert.equal(agenda[0].state, "same");
+});
+
+test("eine Markierung steht vor allen Gruppen", () => {
+  const result = compareV21(
+    side([
+      { blockId: "A01", value: { optionId: opt("A01", 0) } },
+      { blockId: "G01", value: { optionId: opt("G01", 0) } },
+    ]),
+    side([
+      { blockId: "A01", value: { optionId: opt("A01", 4) } },
+      { blockId: "G01", value: { optionId: opt("G01", 1) } },
+    ]),
+  );
+  const agenda = agendaV21(result, ["A01"]);
+  assert.equal(agenda[0].itemId, "A01");
+  assert.equal(agenda[0].kind, "marked");
+});
+
+test("innerhalb einer Gruppe bleibt die Reihenfolge des Fragebogens", () => {
+  // Kein Rang innerhalb der Gruppe: Es gibt keinen Schwellwert, ab dem ein
+  // Unterschied "ernster" wird.
+  const result = compareV21(
+    side([
+      { blockId: "X01", value: { optionId: opt("X01", 0) } },
+      { blockId: "A01", value: { optionId: opt("A01", 0) } },
+    ]),
+    side([
+      { blockId: "X01", value: { optionId: opt("X01", 4) } },
+      { blockId: "A01", value: { optionId: opt("A01", 4) } },
+    ]),
+  );
+  const agenda = agendaV21(result).filter((entry) => entry.kind === "preference");
+  const quelle = getItemsV21().map((item) => item.itemId);
+  const sortiert = [...agenda].sort(
+    (a, b) => quelle.indexOf(a.itemId) - quelle.indexOf(b.itemId),
+  );
+  assert.deepEqual(agenda.map((e) => e.itemId), sortiert.map((e) => e.itemId));
+});
+
+test("die Gruppen tragen weiterhin keine Zahl und keine Schwere", () => {
+  const result = compareV21(
+    side([{ blockId: "G01", value: { optionId: opt("G01", 0) } }]),
+    side([{ blockId: "G01", value: { optionId: opt("G01", 1) } }]),
+  );
+  const asText = JSON.stringify(agendaV21(result));
+  assert.ok(!/"severity"|"rank"|"priority"|"risk"|"score"|"weight"/i.test(asText));
 });

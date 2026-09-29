@@ -52,7 +52,7 @@ bleiben, sonst zeigen gespeicherte Antworten ins Leere.
 
 ## Bauen — unabhängig von 1 und 2
 
-### ☐ 4. Erwartungsdifferenzen (R01 gegen R02)
+### ☑ 4. Erwartungsdifferenzen (R01 gegen R02) — gebaut
 
 **Die wichtigste Lücke.** `MVP-Spec §16` nennt sie Priorität 1, und zu Recht:
 „Maria sagt 12–16 Stunden zu, Alex erwartet 25." Das ist der konkreteste
@@ -65,7 +65,7 @@ Frage; eine gerichtete Erwartung fällt dabei durch.
 Gerichtet heißt: A→B ist etwas anderes als B→A. Beide zu einer Zahl zu machen
 hieße, zwei Beziehungen zu einer zu verschmelzen.
 
-### ☐ 5. Relevanzlogik im Teamreport
+### ☑ 5. Relevanzlogik im Teamreport — gebaut
 
 `MVP-Spec §16`: Erwartungsdifferenzen zuerst, dann konkrete Ziele und Regeln,
 dann Arbeitspräferenzen, dann Gemeinsamkeiten. Gemeinsamkeiten **aktiv

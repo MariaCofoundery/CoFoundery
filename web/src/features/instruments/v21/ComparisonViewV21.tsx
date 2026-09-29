@@ -36,6 +36,20 @@ const WHY_LABEL: Record<NonNullable<ItemComparison["why"]>, string> = {
   no_common_ground: "die beiden Antworten haben keine gemeinsame Grundlage",
 };
 
+/**
+ * Die Gruppen in ihrer Reihenfolge - und mit Ueberschriften, die keine
+ * Wertung tragen.
+ *
+ * "Gemeinsamkeiten" steht ausdruecklich MIT drin: Ein Report, der nur
+ * Unterschiede zeigt, liest sich wie eine Maengelliste, und das ist er nicht.
+ */
+const AGENDA_GROUPS: { kind: string; label: string }[] = [
+  { kind: "marked", label: "Ihr habt es markiert" },
+  { kind: "commitment", label: "Zusagen, Ziele und Regeln" },
+  { kind: "preference", label: "Wie ihr arbeitet" },
+  { kind: "shared", label: "Worin ihr euch einig seid" },
+];
+
 type Props = { comparison: ComparisonV21; nameA: string; nameB: string };
 
 export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
@@ -44,8 +58,8 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
       <section className="rounded-xl border border-slate-200 bg-slate-50 p-5">
         <h2 className="text-base font-semibold text-slate-900">Worüber ihr sprechen könnt</h2>
         <p className="mt-1 text-sm text-slate-600">
-          In der Reihenfolge des Fragebogens, nicht nach Wichtigkeit — die kennt ihr
-          besser als wir.
+          Gruppiert nach Art, nicht nach Wichtigkeit: Zusagen und Regeln sind konkreter
+          als Arbeitspräferenzen — schwerer sind sie deshalb nicht.
         </p>
         {comparison.agenda.length === 0 ? (
           <p className="mt-3 text-sm text-slate-700">
@@ -53,19 +67,27 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
             noch zu wenig beantwortet ist.
           </p>
         ) : (
-          <ul className="mt-3 space-y-1.5">
-            {comparison.agenda.map((entry) => (
-              <li key={entry.itemId} className="text-sm text-slate-800">
-                <span className="text-slate-500">{entry.section} — </span>
-                {entry.prompt}
-                {entry.why === "marked" && (
-                  <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-xs text-white">
-                    markiert
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 space-y-4">
+            {AGENDA_GROUPS.map((group) => {
+              const entries = comparison.agenda.filter((entry) => entry.kind === group.kind);
+              if (entries.length === 0) return null;
+              return (
+                <div key={group.kind}>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {group.label}
+                  </p>
+                  <ul className="mt-1 space-y-1.5">
+                    {entries.map((entry) => (
+                      <li key={entry.itemId} className="text-sm text-slate-800">
+                        <span className="text-slate-500">{entry.section} — </span>
+                        {entry.prompt}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
         )}
       </section>
 

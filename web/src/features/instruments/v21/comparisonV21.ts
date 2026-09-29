@@ -173,40 +173,86 @@ function compareValues(
 /**
  * Worüber zuerst sprechen.
  *
- * KEINE RANGFOLGE NACH SCHWERE. Die Reihenfolge ist die des Fragebogens, und
- * die Auswahl ist: alles, was nicht gleich ist, plus alles, was jemand zum
- * Gespräch markiert hat. Eine Sortierung nach „Konfliktpotenzial“ wäre genau
- * die Bewertung, die dieses Instrument nicht vornehmen darf - und sie würde
- * die Aufmerksamkeit von dem wegziehen, was die beiden selbst wichtig finden.
+ * ---------------------------------------------------------------------------
+ * NACH ART GEORDNET, NICHT NACH SCHWERE
+ * ---------------------------------------------------------------------------
+ *
+ * Der Unterschied ist wichtig, weil hier vorher bewusst gar nicht sortiert
+ * wurde: Eine Rangfolge nach Schwere würde einen Schwellwert behaupten, ab dem
+ * ein Unterschied „ernst“ wird - und den gibt es nicht.
+ *
+ * Diese Gruppen sind keine Schwere, sondern eine Art von Aussage:
+ *
+ *   `commitment` - konkrete Zusagen und Regeln. Zahlen und Festlegungen, über
+ *                  die sich am Dienstag reden lässt.
+ *   `preference` - Arbeitspräferenzen. Sie brauchen erst ein Gespräch, bevor
+ *                  sie etwas bedeuten.
+ *   `shared`     - Gemeinsamkeiten. Sie werden AKTIV gezeigt, nicht nur
+ *                  Unterschiede - sonst liest sich jeder Report wie eine
+ *                  Mängelliste.
+ *
+ * Innerhalb jeder Gruppe bleibt die Reihenfolge die des Fragebogens. Kein Rang
+ * innerhalb der Gruppe, keine Zahl darüber.
+ *
+ * Eine MARKIERUNG steht vor allem anderen. Wer sagt „darüber möchte ich
+ * sprechen“, hat einen Grund, den kein Vergleich kennt.
  */
+export type AgendaKind = "marked" | "commitment" | "preference" | "shared";
+
+export type AgendaEntry = {
+  itemId: string;
+  section: string;
+  prompt: string;
+  kind: AgendaKind;
+  /** Warum es hier steht - `same` nur bei `shared`. */
+  state: ComparisonState;
+};
+
+/**
+ * Konkrete Zusagen und Regeln - oder Arbeitspräferenz?
+ *
+ * Am Buchstaben der Kennung, weil der die Herkunft trägt: S(Ziele),
+ * R(Ressourcen), G(Regeln), B(Risikogrenzen), W(Prioritäten), L(Grenzen)
+ * gehören zum Vorhaben. A/I/E/U/K/T/D/X beschreiben, wie jemand arbeitet.
+ */
+function kindOf(itemId: string): "commitment" | "preference" {
+  return /^[SRGBWL]/.test(itemId) ? "commitment" : "preference";
+}
+
 export function agendaV21(
   comparison: { section: string; items: ItemComparison[] }[],
   markedForDiscussion: readonly string[] = [],
-): { itemId: string; section: string; prompt: string; why: "marked" | "different" | "side_by_side" }[] {
+): AgendaEntry[] {
   const marked = new Set(markedForDiscussion);
-  const agenda: ReturnType<typeof agendaV21> = [];
+  const gruppen: Record<AgendaKind, AgendaEntry[]> = {
+    marked: [], commitment: [], preference: [], shared: [],
+  };
 
   for (const group of comparison) {
     for (const item of group.items) {
+      const eintrag = (kind: AgendaKind): AgendaEntry => ({
+        itemId: item.itemId,
+        section: item.section,
+        prompt: item.prompt,
+        kind,
+        state: item.state,
+      });
+
       if (marked.has(item.itemId)) {
-        // Eine Markierung steht ganz oben in der Begründung - auch wenn beide
-        // dasselbe geantwortet haben. Wer sagt „darüber möchte ich sprechen“,
-        // hat einen Grund, den kein Vergleich kennt.
-        agenda.push({ ...pick(item), why: "marked" });
+        gruppen.marked.push(eintrag("marked"));
         continue;
       }
-      if (item.state === "different" || item.state === "partly_same") {
-        agenda.push({ ...pick(item), why: "different" });
+      // Was niemand beantwortet hat, steht nicht drauf: Sonst waere die
+      // Agenda voll mit Fragen, ueber die es nichts zu sagen gibt.
+      if (item.state === "no_basis") continue;
+
+      if (item.state === "same") {
+        gruppen.shared.push(eintrag("shared"));
         continue;
       }
-      if (item.state === "side_by_side") {
-        agenda.push({ ...pick(item), why: "side_by_side" });
-      }
+      gruppen[kindOf(item.itemId)].push(eintrag(kindOf(item.itemId)));
     }
   }
-  return agenda;
-}
 
-function pick(item: ItemComparison) {
-  return { itemId: item.itemId, section: item.section, prompt: item.prompt };
+  return [...gruppen.marked, ...gruppen.commitment, ...gruppen.preference, ...gruppen.shared];
 }
