@@ -32,7 +32,37 @@ type Props = {
 };
 
 const SKILLS = ["Tech", "Sales", "Marketing", "Product", "Operations", "Finance", "Allrounder", "Sonstiges"] as const;
-const INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
+/**
+ * Was jemand hier zuerst tun moechte.
+ *
+ * ---------------------------------------------------------------------------
+ * JE NACH PLAN EINE ANDERE LISTE, UND ZWAR AUS EINEM GRUND
+ * ---------------------------------------------------------------------------
+ *
+ * Maria am 29.09.2026, nach einem Test als Advisor: "Da kam dann auch die
+ * Frage... die war ein bisschen unverstaendlich."
+ *
+ * Sie hatte recht. Ein Advisor bekam "Suche", "Partner-Match" und
+ * "Selbsttest" angeboten - drei Antworten darauf, wen man zum Gruenden sucht.
+ * Keine davon beschreibt Beratung. Wer eine Frage gestellt bekommt, auf die
+ * keine der Antworten passt, sucht den Fehler bei sich.
+ *
+ * Die bisherigen drei Werte bleiben unveraendert gueltig: Profile, die es
+ * schon gibt, tragen sie.
+ */
+const FOUNDER_INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
+const ADVISOR_INTENTIONS = ["Begleiten", "Teamklaerung", "Selbsttest"] as const;
+const INTENTIONS = [...FOUNDER_INTENTIONS, ...ADVISOR_INTENTIONS] as const;
+
+function intentionsForPlan(plan: OnboardingPlan | ""): readonly string[] {
+  if (plan === "advisor") return ADVISOR_INTENTIONS;
+  // Ohne gewaehlten Plan die Founder-Liste: Diese Folie kommt nach der
+  // Planwahl, der leere Fall ist also nur der Typ und kein Zustand.
+  // "Beides" bekommt beide Listen ohne Doppelung - wer gruendet UND begleitet,
+  // soll nicht raten muessen, welche Haelfte gemeint ist.
+  if (plan === "both") return [...new Set([...FOUNDER_INTENTIONS, ...ADVISOR_INTENTIONS])];
+  return FOUNDER_INTENTIONS;
+}
 
 /**
  * Zwei Wege, ein Formular.
@@ -213,11 +243,11 @@ export function ProfileBasicsForm({
     return t(`skills.${skill}`);
   }
 
-  function intentionDisplayLabel(intentionValue: (typeof INTENTIONS)[number]) {
+  function intentionDisplayLabel(intentionValue: string) {
     return t(`intentions.${intentionValue}.label`);
   }
 
-  function intentionDescription(intentionValue: (typeof INTENTIONS)[number]) {
+  function intentionDescription(intentionValue: string) {
     return t(`intentions.${intentionValue}.description`);
   }
 
@@ -667,7 +697,7 @@ export function ProfileBasicsForm({
 
           {activeStep === "intention" ? (
             <div className="grid gap-3">
-              {INTENTIONS.map((entry) =>
+              {intentionsForPlan(plan).map((entry) =>
                 renderChoiceCard({
                   id: entry,
                   title: intentionDisplayLabel(entry),

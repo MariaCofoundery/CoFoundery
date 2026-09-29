@@ -26,7 +26,23 @@ export type ResearchTrackPayload = {
 
 const RESEARCH_FLOW_PREFIX = "research_flow_v1:";
 const TRACK_ENDPOINT = "/api/research/track";
-export type ResearchConsentState = "undecided" | "accepted" | "declined";
+/**
+ * `unknown` heisst NICHT `undecided`.
+ *
+ * Maria am 29.09.2026: "Ich wurde beim Einloggen auch gleich mal gefragt, ob
+ * ich an Forschung teilnehmen will... ansonsten reicht es ja wirklich nur,
+ * dass man das einmal macht."
+ *
+ * Der Grund lag im Laden: Schlaegt die Abfrage fehl, galt das bisher als
+ * "noch nie gefragt" - und der Dialog kam wieder, obwohl laengst entschieden
+ * war. Wer zweimal gefragt wird, glaubt beim zweiten Mal nicht mehr, dass
+ * seine Antwort zaehlt.
+ *
+ * Deshalb ein eigener Zustand. Er zeigt keinen Dialog, und er gilt wie
+ * `undecided` als "keine Einwilligung" - im Zweifel wird nichts fuer Forschung
+ * verwendet. Nicht fragen ist der harmlosere Fehler; falsch verwenden nicht.
+ */
+export type ResearchConsentState = "undecided" | "unknown" | "accepted" | "declined";
 let researchConsentState: ResearchConsentState = "undecided";
 
 export function configureResearchConsentState(state: ResearchConsentState) {

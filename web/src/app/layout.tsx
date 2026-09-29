@@ -90,7 +90,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         getIncomingPendingConnectContactCount(supabase, user.id).catch(() => 0),
         getUnreadConnectMessageCount(supabase).catch(() => 0),
         getWaitingInAppNoticeCount(supabase).catch(() => 0),
-        getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "undecided" as const),
+        // NICHT "undecided": Ein Lesefehler ist keine fehlende Entscheidung.
+        getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(
+          () => "unknown" as const,
+        ),
       ])
     : [
         {

@@ -73,7 +73,7 @@ export default async function AccountPage({
     Promise.resolve(supabase.from("notification_opt_ins").select("kind").eq("user_id", user.id))
       .then(({ data }) => data ?? [])
       .catch((): { kind: string }[] => []),
-    getResearchConsentState(supabase, user.id).catch(() => "undecided" as const),
+    getResearchConsentState(supabase, user.id).catch(() => "unknown" as const),
     // Offene Einladungen an die AKTUELLE Adresse. Die Policy auf participants
     // ordnet ueber die Mailadresse im Token zu - nach einem Wechsel greift sie
     // nicht mehr. Die Zeilen sind durch genau diese Policy sichtbar, es

@@ -11,6 +11,11 @@ export function ResearchConsentSettings({ initialState }: { initialState: Resear
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState(false);
   const active = state === "accepted";
+  // `unknown` heisst: Wir konnten deinen Stand gerade nicht lesen. Ihn als
+  // "aus" darzustellen waere die sichere Richtung fuer die Daten und die
+  // falsche fuer die Person - sie koennte glauben, ihre Zustimmung sei
+  // verschwunden. Also steht es dabei.
+  const unreadable = state === "unknown";
 
   const update = (next: "accepted" | "declined") => {
     setError(false);
@@ -27,6 +32,9 @@ export function ResearchConsentSettings({ initialState }: { initialState: Resear
       <h3 id="research-settings-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600">{t("description")}</p>
       <p className="mt-3 text-sm text-slate-700">{t("statusLabel")} <strong>{active ? t("active") : t("inactive")}</strong></p>
+      {unreadable ? (
+        <p className="mt-2 text-sm text-amber-800">{t("unreadable")}</p>
+      ) : null}
       <button type="button" disabled={pending} onClick={() => update(active ? "declined" : "accepted")} className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60">{active ? t("withdraw") : t("activate")}</button>
       {active ? <p className="mt-3 text-xs leading-5 text-slate-500">{t("withdrawal")}</p> : null}
       {error ? <p role="alert" className="mt-3 text-sm text-red-700">{t("error")}</p> : null}

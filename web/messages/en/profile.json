@@ -21,8 +21,8 @@
           "hint": "A rough direction is enough. It gets more specific on its own."
         },
         "intention": {
-          "title": "What are you working on right now?",
-          "hint": "This sets the context for everything you'll meet here."
+          "title": "What would you like to do here first?",
+          "hint": "This sets the context for what you see here — and you can change it any time."
         },
         "avatar": {
           "title": "Want to add a picture?",
@@ -131,6 +131,14 @@
       "Selbsttest": {
         "label": "Self-check",
         "description": "You first want to understand your own profile and way of working more clearly."
+      },
+      "Begleiten": {
+        "label": "Supporting teams",
+        "description": "You work with founders in an advisory role and want to make their collaboration clearer."
+      },
+      "Teamklaerung": {
+        "label": "Working with one team",
+        "description": "You are supporting a specific team and want to surface differences and expectations."
       }
     }
   },

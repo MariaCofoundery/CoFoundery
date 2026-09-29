@@ -16,6 +16,7 @@
     "activate": "Enable participation",
     "withdraw": "End participation",
     "withdrawal": "After you stop, we store no new research data and delete what can still be attributed to you.\n\nWhat cannot be undone: analyses in which your answers have already been combined with those of others. Your share cannot be subtracted back out of a frequency across a hundred people, and what has been published stays published.",
-    "error": "We couldn't update this setting right now. Please try again."
+    "error": "We couldn't update this setting right now. Please try again.",
+    "unreadable": "We could not read your saved choice just now, so it shows as inactive here. Your earlier decision is unaffected — please check again later."
   }
 }

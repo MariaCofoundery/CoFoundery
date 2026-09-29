@@ -21,8 +21,8 @@
           "hint": "Eine grobe Richtung reicht. Genauer wird es später von selbst."
         },
         "intention": {
-          "title": "Woran arbeitest du gerade?",
-          "hint": "Das setzt den Kontext für alles, was dir hier begegnet."
+          "title": "Was möchtest du hier als Erstes tun?",
+          "hint": "Das setzt den Kontext für alles, was dir hier begegnet – und lässt sich jederzeit ändern."
         },
         "avatar": {
           "title": "Magst du ein Bild dazulegen?",
@@ -131,6 +131,14 @@
       "Selbsttest": {
         "label": "Selbsttest",
         "description": "Du willst dein eigenes Profil und deine Arbeitsweise erst einmal sauber einordnen."
+      },
+      "Begleiten": {
+        "label": "Teams begleiten",
+        "description": "Du arbeitest beratend mit Gründerinnen und Gründern und willst ihre Zusammenarbeit klarer machen."
+      },
+      "Teamklaerung": {
+        "label": "Ein Team klären",
+        "description": "Du begleitest gerade ein bestimmtes Team und willst Unterschiede und Erwartungen sichtbar machen."
       }
     }
   },

@@ -9,7 +9,14 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 import { randomUUID } from "node:crypto";
 
-const ALLOWED_INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
+/**
+ * Die bisherigen drei bleiben gueltig - Profile, die es schon gibt, tragen
+ * sie. Dazu zwei fuer Advisor, denen keine der drei passte.
+ */
+const ALLOWED_INTENTIONS = [
+  "Suche", "Partner-Match", "Selbsttest",
+  "Begleiten", "Teamklaerung",
+] as const;
 
 function normalizeRedirectTarget(value: FormDataEntryValue | null, fallback: string) {
   const normalized = String(value ?? "").trim();
