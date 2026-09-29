@@ -82,17 +82,33 @@ export function progressV21(answers: Record<string, AlignmentAnswerV21>): {
  * nichts mehr zeigt. Sie verschwindet nicht von selbst - und stillschweigend
  * zu löschen, was jemand geschrieben hat, wäre der schlechtere Weg. Also
  * benennen, damit die Oberfläche fragen kann.
+ *
+ * ---------------------------------------------------------------------------
+ * DIE PAARE KOMMEN VON AUSSEN
+ * ---------------------------------------------------------------------------
+ *
+ * Erweitert am 29.09.2026. Vorher stand hier fest, welche Frage auf welcher
+ * aufbaut - nach v2.1. Das Venture-Alignment hat dieselbe Stelle (L01 nennt
+ * Grenzen, L02 beschreibt sie einzeln), aber die Warnung erschien dort nie:
+ * `getItemV21` kannte die Frage nicht, also wurde nichts gemeldet.
+ *
+ * Ohne Angabe bleibt es bei v2.1 - die Seiten, die darauf zeigen, rufen weiter
+ * auf, wie sie es taten.
  */
-export function orphanedFollowUps(answers: Record<string, AlignmentAnswerV21>): {
+export function orphanedFollowUps(
+  answers: Record<string, AlignmentAnswerV21>,
+  /** `{ Anschlussfrage: Grundfrage }` - ohne Angabe die Paare aus v2.1. */
+  pairs?: Record<string, string>,
+): {
   itemId: string;
   entryIds: string[];
 }[] {
   const orphans: { itemId: string; entryIds: string[] }[] = [];
 
-  for (const [itemId, basisId] of Object.entries(FOLLOW_UPS)) {
+  for (const [itemId, basisId] of Object.entries(pairs ?? FOLLOW_UPS)) {
     const answer = answers[itemId];
     if (!answer || answer.missingCode !== undefined || !answer.value) continue;
-    if (!getItemV21(itemId)) continue;
+    if (!pairs && !getItemV21(itemId)) continue;
 
     const perEntry = (answer.value as { perEntry?: Record<string, string> }).perEntry;
     if (!perEntry) continue;

@@ -62,6 +62,7 @@ export default async function ProfileAnswersPage() {
 
           <ReportViewV21
             sections={report.sections}
+            orphans={report.orphans}
             marked={report.marked}
             canMark
             markScope="founder_profile"

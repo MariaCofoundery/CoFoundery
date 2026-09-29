@@ -5,8 +5,9 @@ import {
   registryOf,
   type AssessmentScope,
 } from "@/features/instruments/align/registries";
-import { readableItems } from "@/features/instruments/align/questionnaireData";
+import { followUpPairs, readableItems } from "@/features/instruments/align/questionnaireData";
 import { readAll, type ReadoutEntry } from "@/features/instruments/v21/readoutV21";
+import { orphanedFollowUps } from "@/features/instruments/v21/progressV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import {
   FOUNDER_PROFILE_INSTRUMENT_ID,
@@ -42,6 +43,14 @@ export type ScopeReport = {
    * das sagt, hat recht, unabhängig davon, wie nah die Antworten liegen.
    */
   marked: string[];
+  /**
+   * Was nach einer Änderung ins Leere zeigt.
+   *
+   * Wer in L01 eine Grenze streicht, lässt eine Antwort auf L02 zurück, die auf
+   * nichts mehr zeigt. Sie wird nicht stillschweigend gelöscht - sie wird
+   * benannt, damit die Person entscheiden kann.
+   */
+  orphans: { itemId: string; entryIds: string[] }[];
 };
 
 export async function getScopeReport(
@@ -90,5 +99,6 @@ export async function getScopeReport(
     answered: rows.length,
     of: getItemsV22(scope).length,
     marked: rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
+    orphans: orphanedFollowUps(answers, followUpPairs(scope)),
   };
 }

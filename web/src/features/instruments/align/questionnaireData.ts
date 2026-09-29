@@ -133,3 +133,28 @@ export function readableItems(
     ratingOptions: item.ratingOptions,
   }));
 }
+
+/**
+ * Welche Anschlussfrage auf welcher Grundfrage aufbaut.
+ *
+ * ---------------------------------------------------------------------------
+ * ABGELEITET, NICHT AUFGEZÄHLT
+ * ---------------------------------------------------------------------------
+ *
+ * Eine feste Liste wäre nach dem ersten neuen Item falsch. Die Regel stattdessen:
+ * Eine Frage, die je Eintrag geschrieben wird (`free_text_per_entry`), hängt an
+ * der Frage, die die Einträge anlegt — und `showAfter` sagt, an welcher.
+ *
+ * Wozu: Wer in L01 eine Grenze streicht, lässt eine Antwort auf L02 zurück, die
+ * auf nichts mehr zeigt. Sie wird nicht stillschweigend gelöscht — sie wird
+ * benannt, damit die Person entscheiden kann.
+ */
+export function followUpPairs(scope: AssessmentScope): Record<string, string> {
+  const pairs: Record<string, string> = {};
+  for (const item of getItemsV22(scope)) {
+    if (item.answerFormat === "free_text_per_entry" && item.showAfter) {
+      pairs[item.itemId] = item.showAfter;
+    }
+  }
+  return pairs;
+}

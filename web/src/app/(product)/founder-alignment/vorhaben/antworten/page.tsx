@@ -95,6 +95,7 @@ export default async function VentureAnswersPage({
 
           <ReportViewV21
             sections={report.sections}
+            orphans={report.orphans}
             marked={report.marked}
             canMark
             markScope="venture_alignment"
