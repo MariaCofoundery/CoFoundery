@@ -50,16 +50,16 @@ bleiben, sonst zeigen gespeicherte Antworten ins Leere.
 
 ### ☑ 3b. Founder-Profil und Venture-Alignment trennen — gebaut
 
-Zwei Fassungen mit eigenen Kennungen (,
-),  trägt den Scope,
- das Vorhaben.
+Zwei Fassungen mit eigenen Kennungen (`founder-profile-v1`,
+`venture-alignment-v1`). `assessments.module` trägt den Scope,
+`assessments.venture_id` das Vorhaben.
 
 U/K liegt beim **Vorhaben**, nicht beim Profil — die Quelle sagt „beim
 Teamstart bestätigen“, und das ist nicht portabel. Bestätigen statt neu
 beantworten löst die Oberfläche durch Vorbelegen.
 
 Offen bleibt: **Vorhaben anlegen oder wählen** als Ablauf. Es gibt
- als Zuhause, aber keinen Weg dorthin.
+`founder_teams` als Zuhause, aber keinen Weg dorthin.
 
 ---
 
