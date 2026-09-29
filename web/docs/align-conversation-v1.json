@@ -1,0 +1,343 @@
+{
+  "instrumentIds": [
+    "founder-profile-v1",
+    "venture-alignment-v1"
+  ],
+  "createdAt": "2026-09-29",
+  "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md, Abschnitt 8.2; docs/CoFoundery_Align_v2_Fachreview.html, Abschnitt 5",
+  "note": [
+    "Der Vierschritt aus Abschnitt 8.2 der Master-Fassung: beobachtete Antwort, moegliche Bedeutung, konkrete Klaerungsfrage, ueberpruefbare Vereinbarung.",
+    "Die Texte stammen aus einer gepruaften Bibliothek und werden nicht erzeugt. Eine KI darf Antwortgruende nicht ergaenzen, wenn sie nicht erhoben wurden - ein formulierter Grund liest sich wie eine Beobachtung, auch wenn er geraten ist.",
+    "Fuenf Karten sind woertlich an den Beispielen der fachlichen Durchsicht gebaut und stehen mit Quellenangabe dabei.",
+    "Die Kennungen sind die von v2.2. In v2.1 hiess der Einwand-Zeitpunkt T03 und die Informationsregel K02 - hier sind es T01 und K04. Eine Karte mit der alten Kennung haette nie ausgeloest."
+  ],
+  "forbidden": [
+    "Du bist direkter",
+    "vermeidet Konflikte",
+    "Alignment betraegt",
+    "unterschiedliche Fairnesswerte",
+    "kein Konfliktpotenzial",
+    "Commitment-Abstand betraegt",
+    "hohes Konfliktrisiko",
+    "meint es nicht ernst",
+    "eure Werte sind kompatibel",
+    "passt gut zusammen",
+    "passt nicht zusammen"
+  ],
+  "cards": [
+    {
+      "id": "einwand_zeitpunkt",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "T01"
+        ]
+      },
+      "observed": "Bei einem Einwand möchte {a} {aAnswer}. {b} möchte {bAnswer}.",
+      "meaning": "Das beschreibt zwei gewünschte Zeitpunkte, keine Eigenschaften. Beide Wege haben Gründe, die hier nicht erhoben wurden.",
+      "question": "Wie macht ihr einen Einwand früh sichtbar, und wann besprecht ihr ihn ausführlich?",
+      "agreement": [
+        "ein Signal für „ich sehe das anders“",
+        "ein fester Zeitpunkt zum Besprechen"
+      ],
+      "source": "Fachreview, Abschnitt 5, erstes Beispiel"
+    },
+    {
+      "id": "einwand_formulierung",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "T02",
+          "D01",
+          "D02"
+        ]
+      },
+      "observed": "{a} geht so vor: {aAnswer}. {b} so: {bAnswer}.",
+      "meaning": "Das beschreibt, wie jemand einen Einwand in Worte fasst. Es sagt nichts darüber, wie ernst er ihn meint.",
+      "question": "Woran erkennt ihr beim anderen, dass ein Einwand wichtig ist?",
+      "agreement": [
+        "ein Zeichen für „das ist mir wichtig“",
+        "was dann passiert"
+      ],
+      "source": "abgeleitet aus Abschnitt 5, Muster „Vorgehen statt Eigenschaft“"
+    },
+    {
+      "id": "abwaegen_und_gefuehl",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "A01",
+          "A02",
+          "I01",
+          "I02",
+          "I03"
+        ]
+      },
+      "observed": "{a} sagt {aAnswer}, {b} sagt {bAnswer}.",
+      "meaning": "Abwägen und Erfahrungsgefühl sind keine Gegensätze — beides kann bei derselben Person stark sein. Was hier steht, ist eine Angabe über das gewünschte Vorgehen.",
+      "question": "Bei welcher Art von Entscheidung wollt ihr wie vorgehen?",
+      "agreement": [
+        "eine Art von Entscheidung",
+        "wie ihr dabei vorgeht",
+        "wann ihr das überprüft"
+      ],
+      "source": "Master-Fassung, Abschnitt 8.1: A und I nie zu einem Wert verschmelzen"
+    },
+    {
+      "id": "erproben",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "E01",
+          "E02",
+          "E03"
+        ]
+      },
+      "observed": "Bei einem kleinen, korrigierbaren Schritt sagt {a} {aAnswer}. {b} sagt {bAnswer}.",
+      "meaning": "Das beschreibt, wie wahrscheinlich jemand einen Test startet — nicht, wie gründlich er arbeitet.",
+      "question": "Was ist für euch ein kleiner Test, und was ist schon eine Richtungsentscheidung?",
+      "agreement": [
+        "was als Test gilt",
+        "was er höchstens kosten darf"
+      ],
+      "source": "abgeleitet aus Abschnitt 5"
+    },
+    {
+      "id": "offene_lage",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "X01",
+          "X02",
+          "X03",
+          "X04"
+        ]
+      },
+      "observed": "Wenn etwas länger offen bleibt, fühlt {a} sich {aAnswer}, {b} {bAnswer}.",
+      "meaning": "Das ist berichtetes Erleben, keine Belastbarkeit. Wer sich unwohl fühlt, hält es deshalb nicht schlechter aus.",
+      "question": "Was hilft euch, wenn etwas eine Weile offen bleiben muss?",
+      "agreement": [
+        "ein Zwischenstand-Rhythmus",
+        "wann ihr entscheidet, auch ohne volle Klarheit"
+      ],
+      "source": "abgeleitet aus Abschnitt 5; Master-Fassung X: „nicht wie gut Du damit klarkommen solltest“"
+    },
+    {
+      "id": "informationsregel",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "K03",
+          "K04"
+        ]
+      },
+      "observed": "{a} möchte {aAnswer}. {b} bevorzugt {bAnswer}.",
+      "meaning": "Zwei Regeln für denselben Zweck. Welche passt, hängt von eurer Arbeitsweise ab und nicht davon, wer recht hat.",
+      "question": "Welche Standardregel passt für eure Zusammenarbeit?",
+      "agreement": [
+        "eine Standardregel",
+        "was davon abweichen darf",
+        "wann ihr sie überprüft"
+      ],
+      "source": "Fachreview, Abschnitt 5, zweites Beispiel"
+    },
+    {
+      "id": "wertefall_regel",
+      "trigger": {
+        "kind": "value_case_differs"
+      },
+      "observed": "Im beschriebenen Fall wählt {a} {aAnswer}. {b} wählt {bAnswer}.",
+      "meaning": "Das ist eine Entscheidung zu einem ausgedachten Fall, keine Aussage über Grundhaltungen.",
+      "question": "Welche Regel möchtet ihr vereinbaren, bevor die nächste vergleichbare Situation kommt?",
+      "agreement": [
+        "eine Regel für diesen Fall",
+        "wer entscheidet, wenn sie nicht passt"
+      ],
+      "source": "Fachreview, Abschnitt 5, drittes Beispiel"
+    },
+    {
+      "id": "gleicher_weg_andere_gruende",
+      "trigger": {
+        "kind": "item_same",
+        "itemIds": [
+          "K01",
+          "K03",
+          "T01",
+          "G01",
+          "S02"
+        ]
+      },
+      "observed": "Hier habt ihr denselben Weg gewählt: {aAnswer}.",
+      "meaning": "Derselbe Weg kann aus verschiedenen Gründen entstehen. Welche das sind, steht in keiner Antwort.",
+      "question": "Welche Bedingungen waren euch dabei jeweils wichtig?",
+      "agreement": [
+        "was der Weg voraussetzt",
+        "woran ihr merkt, dass er nicht mehr passt"
+      ],
+      "source": "Fachreview, Abschnitt 5, viertes Beispiel"
+    },
+    {
+      "id": "zeit_und_erwartung",
+      "trigger": {
+        "kind": "item_side_by_side",
+        "itemIds": [
+          "R01",
+          "R02",
+          "R03"
+        ]
+      },
+      "observed": "Für die nächsten zwölf Wochen nennt {a} {aAnswer}. {b} nennt {bAnswer}.",
+      "meaning": "Das beschreibt eure Angaben, nicht eure Einsatzbereitschaft. Eine Vereinbarung kann die Erwartung ändern.",
+      "question": "Sollen Rolle, Ziel oder Erwartung angepasst werden?",
+      "agreement": [
+        "die Rolle",
+        "eine konkrete Zusage",
+        "ein gemeinsamer Prüftermin"
+      ],
+      "source": "Fachreview, Abschnitt 5, fünftes Beispiel"
+    },
+    {
+      "id": "geld_und_absicherung",
+      "trigger": {
+        "kind": "item_side_by_side",
+        "itemIds": [
+          "B01",
+          "B04",
+          "R05"
+        ]
+      },
+      "observed": "{a} nennt {aAnswer}. {b} nennt {bAnswer}.",
+      "meaning": "Zwei Angaben zu dem, was jemand einsetzen kann oder braucht. Sie hängen an Lebenssituationen, die hier nicht erhoben wurden.",
+      "question": "Welche Ausgaben wollt ihr gemeinsam beschließen, und ab welcher Höhe?",
+      "agreement": [
+        "eine Schwelle",
+        "wer sie beschließt",
+        "wann ihr sie überprüft"
+      ],
+      "source": "abgeleitet aus Abschnitt 5, Muster „Angaben statt Eigenschaften“"
+    },
+    {
+      "id": "absicherungen_teils_gleich",
+      "trigger": {
+        "kind": "item_partly_same",
+        "itemIds": [
+          "B05",
+          "G04",
+          "G05"
+        ]
+      },
+      "observed": "Ihr habt teilweise dasselbe gewählt: {shared}. {a} nennt zusätzlich {aOnly}, {b} nennt {bOnly}.",
+      "meaning": "Eine Überschneidung heißt nicht, dass der Rest unwichtig ist. Was jemand zusätzlich nennt, kann für ihn das Entscheidende sein.",
+      "question": "Welche davon wollt ihr gemeinsam festlegen, und welche bleibt die Sache einer Person?",
+      "agreement": [
+        "eine gemeinsame Liste",
+        "was jede Person für sich behält"
+      ],
+      "source": "abgeleitet aus Abschnitt 5"
+    },
+    {
+      "id": "eigenstaendigkeit",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "U01",
+          "U03",
+          "U04",
+          "U05",
+          "G01"
+        ]
+      },
+      "observed": "{a} möchte {aAnswer}. {b} möchte {bAnswer}.",
+      "meaning": "Das beschreibt gewünschte Spielräume in einem vereinbarten Bereich. Ohne vereinbarte Bereiche lässt sich die Frage nicht beantworten.",
+      "question": "Welche Bereiche gehören wem, und was gehört ausdrücklich zusammen entschieden?",
+      "agreement": [
+        "die Bereiche",
+        "was immer gemeinsam entschieden wird"
+      ],
+      "source": "abgeleitet aus Abschnitt 5"
+    },
+    {
+      "id": "ziele_teils_gleich",
+      "trigger": {
+        "kind": "item_partly_same",
+        "itemIds": [
+          "S01",
+          "S06"
+        ]
+      },
+      "observed": "Ihr nennt beide {shared}. {a} nennt außerdem {aOnly}, {b} nennt {bOnly}.",
+      "meaning": "Mehrere Ziele nebeneinander sind kein Widerspruch. Sie werden erst einer, wenn dieselbe Woche für beide reichen muss.",
+      "question": "Welches Ziel hat Vorrang, wenn ihr euch entscheiden müsst?",
+      "agreement": [
+        "eine Rangfolge für den Konfliktfall",
+        "wann ihr sie überprüft"
+      ],
+      "source": "abgeleitet aus Abschnitt 5"
+    },
+    {
+      "id": "exit_und_kapital",
+      "trigger": {
+        "kind": "item_differs",
+        "itemIds": [
+          "S02",
+          "S03",
+          "R06",
+          "R09"
+        ]
+      },
+      "observed": "{a} sagt {aAnswer}. {b} sagt {bAnswer}.",
+      "meaning": "Das sind Vorstellungen über einen Zeitraum, keine Festlegungen. Sie ändern sich mit dem, was das Vorhaben tut.",
+      "question": "Was müsste eintreten, damit ihr das gemeinsam neu entscheidet?",
+      "agreement": [
+        "ein Anlass zum Neuentscheiden",
+        "wer dann entscheidet"
+      ],
+      "source": "abgeleitet aus Abschnitt 5"
+    },
+    {
+      "id": "grenze_genannt",
+      "trigger": {
+        "kind": "item_answered",
+        "itemIds": [
+          "L01"
+        ]
+      },
+      "observed": "{a} hat eine persönliche Grenze benannt.",
+      "meaning": "Eine Grenze ist eine Angabe darüber, was für jemanden nicht geht. Sie ist nicht verhandelbar wie eine Präferenz.",
+      "question": "Woran merkt ihr rechtzeitig, dass ihr in die Nähe dieser Grenze kommt?",
+      "agreement": [
+        "ein frühes Zeichen",
+        "wie ihr dann vorgeht"
+      ],
+      "source": "Master-Fassung, Abschnitt 6: L erfasst Grenzen, nicht Integritätspunkte"
+    },
+    {
+      "id": "zurueckgehalten",
+      "trigger": {
+        "kind": "withheld"
+      },
+      "observed": "Zu dieser Frage liegt von einer Person keine Antwort vor.",
+      "meaning": "Nicht geteilt ist nicht dasselbe wie nicht vorhanden. Es kann ein bewusster Schritt sein, und dann gehört er respektiert.",
+      "question": "Braucht ihr diese Angabe für eine Entscheidung, die ansteht — oder kann sie offen bleiben?",
+      "agreement": [
+        "ob sie gebraucht wird",
+        "bis wann"
+      ],
+      "source": "Master-Fassung, Abschnitt 8.4: „nicht geteilt“ ist nicht „fehlendes Commitment“"
+    },
+    {
+      "id": "markiert",
+      "trigger": {
+        "kind": "marked"
+      },
+      "observed": "Eine von euch hat diese Frage zum Gespräch markiert.",
+      "meaning": "Der Grund dafür steht in keiner Antwort. Er kann mit der Frage zu tun haben oder mit etwas, das dahintersteht.",
+      "question": "Was hat dich dazu gebracht, das zu markieren?",
+      "agreement": [
+        "was daraus folgt",
+        "ob es etwas zu vereinbaren gibt"
+      ],
+      "source": "eigene Karte: eine Markierung ist ein Wunsch an das Gespräch"
+    }
+  ]
+}

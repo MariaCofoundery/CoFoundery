@@ -1,9 +1,11 @@
 import {
   getSectionsV22,
+  getItemsV22,
   type AssessmentScope,
   type RegistryItemV22,
 } from "@/features/instruments/align/registries";
 import type { AnswerableItem } from "@/features/instruments/v21/answersV21";
+import type { ReadableItem } from "@/features/instruments/v21/readoutV21";
 import type { ItemView, SectionView } from "@/features/instruments/v21/questionnaireDataV21";
 
 /**
@@ -78,4 +80,28 @@ export function answerableOf(item: RegistryItemV22): AnswerableItem {
     concerns: item.concerns,
     ratingOptions: item.ratingOptions,
   };
+}
+
+/**
+ * Die Fragen eines Bogens in der Form, die die Lesbarmachung braucht.
+ *
+ * HIER UND NICHT IN `reportData`. Dort steht `server-only`, und ein Test, der
+ * nur die Fragen braucht, zöge damit die ganze Datenbankanbindung mit herein -
+ * und scheitert an `next/headers`. Eine reine Funktion gehört in ein reines
+ * Modul.
+ */
+export function readableItems(scope: AssessmentScope): ReadableItem[] {
+  return getItemsV22(scope).map((item) => ({
+    itemId: item.itemId,
+    section: item.section,
+    prompt: item.prompt,
+    answerFormat: item.answerFormat,
+    options: item.options.map((option) => ({
+      optionId: option.optionId,
+      label: option.label,
+    })),
+    missing: item.missing,
+    concerns: item.concerns,
+    ratingOptions: item.ratingOptions,
+  }));
 }

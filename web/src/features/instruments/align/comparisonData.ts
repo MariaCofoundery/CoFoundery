@@ -1,7 +1,8 @@
 import "server-only";
 
 import { registryOf, type AssessmentScope } from "@/features/instruments/align/registries";
-import { readableItems, INSTRUMENT_OF } from "@/features/instruments/align/reportData";
+import { INSTRUMENT_OF } from "@/features/instruments/align/reportData";
+import { readableItems } from "@/features/instruments/align/questionnaireData";
 import { readAnswer, type ReadoutEntry } from "@/features/instruments/v21/readoutV21";
 import {
   compareV21,
@@ -10,6 +11,7 @@ import {
   type AgendaEntry,
 } from "@/features/instruments/v21/comparisonV21";
 import { expectationGapsV21, type ExpectationResult } from "@/features/instruments/v21/expectationsV21";
+import { buildCards, type ConversationCard } from "@/features/instruments/align/conversationCards";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,6 +40,8 @@ export type ScopeComparison = {
   expectations: ExpectationResult | null;
   /** Hat überhaupt jemand geantwortet? Sonst ist ein leerer Vergleich irreführend. */
   hasAnything: boolean;
+  /** Die Gesprächskarten zu diesem Bogen - aus einer geprüften Sammlung. */
+  cards: ConversationCard[];
 };
 
 type Side = Record<string, ReadoutEntry>;
@@ -102,10 +106,18 @@ export async function buildScopeComparison(
   const bogen = { items: readableItems(scope), sections: registryOf(scope).sections };
   const sections = compareV21(a.entries, b.entries, bogen);
 
+  const marked = [...a.marked, ...b.marked];
+
   return {
     scope,
     sections,
-    agenda: agendaV21(sections, [...a.marked, ...b.marked]),
+    cards: buildCards({
+      comparison: sections,
+      markedItemIds: marked,
+      nameA: "Du",
+      nameB: "Die andere Person",
+    }),
+    agenda: agendaV21(sections, marked),
     expectations:
       scope === "venture_alignment"
         ? expectationGapsV21({

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
 import { ExpectationGapsView } from "@/features/instruments/v21/ExpectationGapsView";
+import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
 import { buildScopeComparison } from "@/features/instruments/align/comparisonData";
 import { registryOf } from "@/features/instruments/align/registries";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
@@ -89,7 +90,17 @@ export default async function AlignComparePage({
                   />
                 </div>
               )}
+              {/* DIE KARTEN VOR DER TABELLE. Wer zuerst die Tabelle sieht,
+                  hat schon gedeutet, bevor die Frage danebensteht - und die
+                  Karten sind genau dafuer da, das zu verhindern. */}
               <div className="mt-6">
+                <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
+                <div className="mt-3">
+                  <ConversationCardsView cards={vorhaben.cards} />
+                </div>
+              </div>
+
+              <div className="mt-8">
                 <ComparisonViewV21
                   comparison={{
                     sections: vorhaben.sections,
@@ -117,7 +128,15 @@ export default async function AlignComparePage({
             Zum Arbeitsprofil hat noch niemand von euch abgegeben.
           </p>
         ) : (
+          <>
           <div className="mt-6">
+            <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
+            <div className="mt-3">
+              <ConversationCardsView cards={profil.cards} />
+            </div>
+          </div>
+
+          <div className="mt-8">
             <ComparisonViewV21
               comparison={{
                 sections: profil.sections,
@@ -129,6 +148,7 @@ export default async function AlignComparePage({
               nameB="Die andere Person"
             />
           </div>
+          </>
         )}
       </section>
     </main>

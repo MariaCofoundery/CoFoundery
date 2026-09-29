@@ -5,7 +5,8 @@ import {
   registryOf,
   type AssessmentScope,
 } from "@/features/instruments/align/registries";
-import { readAll, type ReadableItem, type ReadoutEntry } from "@/features/instruments/v21/readoutV21";
+import { readableItems } from "@/features/instruments/align/questionnaireData";
+import { readAll, type ReadoutEntry } from "@/features/instruments/v21/readoutV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import {
   FOUNDER_PROFILE_INSTRUMENT_ID,
@@ -26,23 +27,6 @@ export const INSTRUMENT_OF: Record<AssessmentScope, string> = {
   founder_profile: FOUNDER_PROFILE_INSTRUMENT_ID,
   venture_alignment: VENTURE_ALIGNMENT_INSTRUMENT_ID,
 };
-
-/** Die Fragen eines Bogens in der Form, die die Lesbarmachung braucht. */
-export function readableItems(scope: AssessmentScope): ReadableItem[] {
-  return getItemsV22(scope).map((item) => ({
-    itemId: item.itemId,
-    section: item.section,
-    prompt: item.prompt,
-    answerFormat: item.answerFormat,
-    options: item.options.map((option) => ({
-      optionId: option.optionId,
-      label: option.label,
-    })),
-    missing: item.missing,
-    concerns: item.concerns,
-    ratingOptions: item.ratingOptions,
-  }));
-}
 
 export type ScopeReport = {
   sections: { section: string; entries: ReadoutEntry[] }[];
