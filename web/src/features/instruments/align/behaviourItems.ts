@@ -93,11 +93,21 @@ export type BehaviourItem = {
    * Steht der Zeitraum auch im Fragetext?
    *
    * Er MUSS dort stehen — sonst ist es wieder „wie häufig", die Frage, bei
-   * der niemand weiß, woran er sich erinnern soll. Bei `U91` steht er nicht
-   * dort; das Feld hält die Lücke fest, statt sie zu schließen, indem jemand
-   * einen Satz erfindet, den die Gutachterin nicht geschrieben hat.
+   * der niemand weiß, woran er sich erinnern soll.
+   *
+   * Bei `U91` fehlte er nach der ersten Überarbeitung; das Feld hat die Lücke
+   * festgehalten, bis die Gutachterin sie am 29.09.2026 geschlossen hat. Es
+   * bleibt stehen, weil die nächste Überarbeitung dieselbe Lücke wieder
+   * aufreißen kann.
    */
   referencePeriodInPrompt: boolean;
+  /**
+   * Beurteilung durch die Gutachterin.
+   *
+   * Steht am ITEM und nicht nur am Satz: Nach dem Pretest kann eines von
+   * ihnen in den Produktbogen wandern und ein anderes nicht.
+   */
+  reviewStatus: "candidate_for_pretest" | "approved" | "rejected";
   section: string;
   order: number;
   answerFormat: "single_choice";
@@ -176,6 +186,13 @@ function assertBehaviourSet(set: BehaviourSet): BehaviourSet {
       }
     }
     if (item.missing.length === 0) fail(`${item.itemId}: kein Auslassungsgrund`);
+
+    // Der Bezugszeitraum steht seit dem 29.09.2026 bei ALLEN vier im Text.
+    // Ein Item ohne ihn waere wieder die Frage, bei der niemand weiss, woran
+    // er sich erinnern soll - und das Feld allein macht ihn nicht lesbar.
+    if (!item.referencePeriodInPrompt) {
+      fail(`${item.itemId}: der Bezugszeitraum steht nur in den Metadaten`);
+    }
   }
   return set;
 }

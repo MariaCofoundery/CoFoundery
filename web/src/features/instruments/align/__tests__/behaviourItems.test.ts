@@ -27,6 +27,11 @@ test("die Verhaltensfragen stehen NICHT in der geprüften Quelle", () => {
 test("der Status steht in der Datei, nicht nur in einem Kommentar", () => {
   assert.equal(BEHAVIOUR_SET_V21.status, "candidate_for_pretest");
   assert.match(BEHAVIOUR_SET_V21.basedOn, /Gutachterinnenreview/);
+
+  // Und je Item - nach dem Pretest kann eines wandern und ein anderes nicht.
+  for (const item of getBehaviourItems()) {
+    assert.equal(item.reviewStatus, "candidate_for_pretest", item.itemId);
+  }
 });
 
 test("jede Verhaltensfrage gehört zu einer Frage, die es wirklich gibt", () => {
@@ -72,11 +77,13 @@ test("jede Frage nennt ihren Bezugszeitraum - oder die Lücke steht dabei", () =
     );
   }
 
-  // U91 ist die eine offene Stelle - mit Namen, nicht als stille Ausnahme.
-  // Der ueberarbeitete Satz nennt nur "die letzte Entscheidung, die in diesem
-  // Vorhaben ... fiel" und laesst offen, wie weit zurueck.
+  // KEINE AUSNAHME MEHR. U91 hatte den Zeitraum nach der ersten
+  // Ueberarbeitung nur in den Metadaten; die Gutachterin hat ihn am
+  // 29.09.2026 in den Satz zurueckgeholt - "wenn wir die Verhaltensitems
+  // gerade deshalb mit einem definierten Erinnerungszeitraum bauen, darf der
+  // Zeitraum nicht nur in Metadaten stehen".
   const ohne = getBehaviourItems().filter((item) => !item.referencePeriodInPrompt);
-  assert.deepEqual(ohne.map((item) => item.itemId), ["U91"]);
+  assert.deepEqual(ohne, []);
 });
 
 test("jede Frage lässt zu, dass die Situation nicht vorkam", () => {
@@ -176,4 +183,23 @@ test("eine fehlende Antwort auf einer der beiden Seiten ergibt keinen Vergleich"
     crossCheck({ wishItemId: "K01", wishOptionId: "K01_o1", behaviourOptionId: null }),
     { kind: "no_basis", why: "missing_answer" },
   );
+});
+
+test("ein junges Vorhaben ändert den Fragetext nicht", () => {
+  // Gutachterin am 29.09.2026: Den Satz auf "seit Beginn des Vorhabens"
+  // umzubauen machte Frage und Vergleich unnoetig variabel. Drei Monate ist
+  // der Bezugszeitraum; ist das Vorhaben erst sechs Wochen alt, beziehen sich
+  // die Antworten faktisch eben auf diese sechs Wochen.
+  for (const item of getBehaviourItems()) {
+    assert.ok(
+      !/seit Beginn|seit dem Start/.test(item.prompt),
+      `${item.itemId}: der Fragetext baut sich um`,
+    );
+  }
+
+  // Der Hinweis dafuer steht daneben, nicht im Satz.
+  for (const itemId of ["U91", "K91"]) {
+    const item = getBehaviourItems().find((entry) => entry.itemId === itemId)!;
+    assert.match(item.referencePeriodNote ?? "", /jünger als drei Monate/);
+  }
 });

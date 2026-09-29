@@ -11,7 +11,7 @@
     "'Kam nicht vor' ist eine inhaltliche ANTWORT und kein Auslassungsgrund. Wer in dem Zeitraum keine solche Entscheidung getroffen hat, hat etwas gesagt und nichts verschwiegen. cannot_assess bleibt ausschliesslich 'daran kann ich mich nicht sicher erinnern' - beides technisch nicht gleichbehandeln.",
     "Die Bezugszeitraeume sind ABSICHTLICH verschieden: sechs Monate fuer die seltenen Ereignisse (wichtige Entscheidung, Einwand), drei Monate fuer die haeufigen (Verantwortungsbereich, Zwischenstand). Eine kuenstliche Vereinheitlichung waere Ordnung auf Kosten der Erinnerbarkeit. Vorlaeufig - im Pretest zu pruefen.",
     "U91 und K91 haengen am konkreten Vorhaben: an Rollen, Entscheidungsrechten, Informationsstrukturen. Als portables Personenverhalten waeren sie nicht sinnvoll, deshalb gehoeren sie ins Venture-Alignment und nennen das Vorhaben in der Frage.",
-    "OFFEN: In U91 steht der Bezugszeitraum NICHT im Fragetext. Das Review setzt fuer U91 '3 Monate oder seit Beginn des Vorhabens', der ueberarbeitete Satz nennt aber nur 'die letzte Entscheidung, die in diesem Vorhaben ... fiel'. Damit fehlt genau das, weswegen die vier Items ueberhaupt Zeitraeume bekommen haben. Der Wortlaut bleibt so, wie die Gutachterin ihn geschrieben hat - `referencePeriodInPrompt: false` haelt die Luecke fest, bis sie entschieden ist."
+    "Der Fragetext wird NICHT dynamisch umgebaut, wenn ein Vorhaben juenger als drei Monate ist. Gutachterin am 29.09.2026: Das machte Frage und Vergleich unnoetig variabel. Drei Monate ist der Bezugszeitraum; ist das Vorhaben erst sechs Wochen alt, beziehen sich die Antworten faktisch eben auf diese sechs Wochen. Ein kleiner Hinweis in der Oberflaeche sagt das - `referencePeriodNote`."
   ],
   "reportingRule": "Nie als Uebereinstimmungsmass, nie als Gueltigkeitsurteil, nie als Zahl. Ausgabe ist ein Satz, der beides nebeneinanderstellt und offen laesst, woran es lag.",
   "reportingExamples": [
@@ -69,7 +69,8 @@
         }
       ],
       "note": "Berichtetes Verhalten im letzten konkreten Fall. Kein Beleg für Analysefähigkeit und kein Gegenbeweis zu A02 - dort steht bereits die typische Häufigkeit, nicht ein Wunsch.",
-      "referencePeriodInPrompt": true
+      "referencePeriodInPrompt": true,
+      "reviewStatus": "candidate_for_pretest"
     },
     {
       "itemId": "T91",
@@ -117,7 +118,8 @@
         }
       ],
       "note": "Berichtetes Verhalten im letzten konkreten Fall. Die Stufen entsprechen denen aus T01, damit beides nebeneinander lesbar ist - T01 misst seit dem Review vom 29.09.2026 ebenfalls ausschließlich den Zeitpunkt.",
-      "referencePeriodInPrompt": true
+      "referencePeriodInPrompt": true,
+      "reviewStatus": "candidate_for_pretest"
     },
     {
       "itemId": "U91",
@@ -127,8 +129,8 @@
       "order": 3,
       "answerFormat": "single_choice",
       "referencePeriod": "3 Monate",
-      "referencePeriodNote": "oder seit Beginn des Vorhabens, falls es jünger ist",
-      "prompt": "Denk an die letzte Entscheidung, die in diesem Vorhaben in deinen klar zugeordneten Verantwortungsbereich fiel. Hast du sie getroffen, ohne vorher die Zustimmung anderer einzuholen?",
+      "referencePeriodNote": "Wenn das Vorhaben jünger als drei Monate ist, beziehe dich auf die Zeit seit dem Start.",
+      "prompt": "Denk an die letzte Entscheidung, die in den vergangenen drei Monaten in diesem Vorhaben in deinen klar zugeordneten Verantwortungsbereich fiel. Hast du sie getroffen, ohne vorher die Zustimmung anderer einzuholen?",
       "hint": "Gemeint ist Zustimmung, nicht Information. Jemanden zu informieren oder Rücksprache zu halten ist etwas anderes, als auf ein Ja zu warten.",
       "options": [
         {
@@ -145,7 +147,7 @@
         },
         {
           "optionId": "U91_o4",
-          "label": "in diesem Zeitraum hatte ich in diesem Vorhaben keinen eigenen Verantwortungsbereich",
+          "label": "In den vergangenen drei Monaten hatte ich in diesem Vorhaben keinen eigenen Verantwortungsbereich.",
           "noOccasion": true
         }
       ],
@@ -156,7 +158,8 @@
         }
       ],
       "note": "Gewünschter Entscheidungsspielraum (U04) gegen zuletzt realisiertes Verhalten in diesem Vorhaben. Eine Abweichung ist keine Inkonsistenz.",
-      "referencePeriodInPrompt": false
+      "referencePeriodInPrompt": true,
+      "reviewStatus": "candidate_for_pretest"
     },
     {
       "itemId": "K91",
@@ -166,7 +169,7 @@
       "order": 4,
       "answerFormat": "single_choice",
       "referencePeriod": "3 Monate",
-      "referencePeriodNote": "oder seit Beginn des Vorhabens, falls es jünger ist",
+      "referencePeriodNote": "Wenn das Vorhaben jünger als drei Monate ist, beziehe dich auf die Zeit seit dem Start.",
       "prompt": "Denk an das letzte Mal in den vergangenen drei Monaten, als du in diesem Vorhaben anderen Foundern einen Zwischenstand aus deinem Bereich gezeigt hast. In welchem Zustand war der Zwischenstand zu diesem Zeitpunkt?",
       "hint": "",
       "options": [
@@ -199,7 +202,8 @@
         }
       ],
       "note": "Berichtetes Verhalten im letzten konkreten Fall. Die Stufen entsprechen denen aus K01, damit beides nebeneinander lesbar ist. Keine numerische Differenz berechnen.",
-      "referencePeriodInPrompt": true
+      "referencePeriodInPrompt": true,
+      "reviewStatus": "candidate_for_pretest"
     }
   ]
 }
