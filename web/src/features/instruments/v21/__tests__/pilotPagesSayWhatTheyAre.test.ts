@@ -56,6 +56,7 @@ const ERLAUBT = [
   join("src", "app", "(product)", "founder-alignment", "profil") + sep,
   join("src", "app", "(product)", "founder-alignment", "vorhaben") + sep,
   join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
+  join("src", "app", "(product)", "founder-alignment", "suche") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
