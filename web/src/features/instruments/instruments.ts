@@ -61,7 +61,20 @@ export const INSTRUMENT_IDS = [
    * dieselbe mit neuer Bedeutung weiterzufuehren wuerde alte Antworten
    * lautlos umdeuten.
    */
-  "founder-alignment-v2-2",
+  /**
+   * Seit 29.09.2026 zwei Fassungen statt einer, mit eigenen Kennungen.
+   *
+   * Die Master-Arbeitsfassung nennt vier Baender mit VERSCHIEDENER
+   * Gueltigkeit: Das Arbeitsprofil ist portabel, die Venture-Angaben gelten
+   * fuer ein Vorhaben und einen Zeitraum. Ein Fragebogen kann nicht beides
+   * sein.
+   *
+   * Und sie koennen getrennt wachsen. Bisher hiess jede Aenderung an einem
+   * Teil eine neue Gesamtfassung - v2, v2.1, v2.2 in drei Tagen, obwohl sich
+   * jedes Mal nur ein Teil geaendert hat.
+   */
+  "founder-profile-v1",
+  "venture-alignment-v1",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
@@ -96,13 +109,14 @@ export const ALIGNMENT_V2_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2";
 export const ALIGNMENT_V21_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-1";
 
 /**
- * Die Fassung, an der jetzt gebaut wird.
+ * Die beiden Fassungen, an denen jetzt gebaut wird.
  *
- * Wieder eine eigene Konstante neben den anderen: Ein umbenannter Wert haette
- * alle bisherigen v2.1-Verweise stillschweigend auf v2.2 umgebogen - und genau
- * das ist der Fehler, gegen den die neue Fassung ueberhaupt gebaut wird.
+ * Wieder eigene Konstanten neben den anderen: Ein umbenannter Wert haette alle
+ * bisherigen Verweise stillschweigend umgebogen - und genau das ist der
+ * Fehler, gegen den neue Fassungen ueberhaupt entstehen.
  */
-export const ALIGNMENT_V22_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-2";
+export const FOUNDER_PROFILE_INSTRUMENT_ID: InstrumentId = "founder-profile-v1";
+export const VENTURE_ALIGNMENT_INSTRUMENT_ID: InstrumentId = "venture-alignment-v1";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);

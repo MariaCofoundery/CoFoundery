@@ -4,13 +4,21 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
-  REGISTRY_V22,
+  FOUNDER_PROFILE,
+  VENTURE_ALIGNMENT,
+  REGISTRIES,
+  SCOPES,
   getItemsV22,
   getItemV22,
   getSectionsV22,
+  findItem,
   assertRegistryV22,
+  type AssessmentScope,
   type RegistryV22,
-} from "@/features/instruments/v22/registryV22";
+} from "@/features/instruments/align/registries";
+
+/** Alle Fragen beider Bögen - fürs Prüfen gegen die gemeinsame Quelle. */
+const alleItems = () => SCOPES.flatMap((scope) => getItemsV22(scope));
 
 /**
  * Die Registratur wird gegen ihre Quelle gehalten.
@@ -28,7 +36,7 @@ const quelle = readFileSync(
 const flach = quelle.replace(/\s+/g, " ");
 
 test("jeder Fragetext steht so im Quelldokument", () => {
-  for (const item of getItemsV22()) {
+  for (const item of alleItems()) {
     assert.ok(
       flach.includes(item.prompt),
       `${item.itemId}: der Fragetext steht nicht in der Quelle:\n${item.prompt}`,
@@ -41,9 +49,9 @@ test("jede Antwortmöglichkeit steht so in der Quelle - oder ist als Abweichung 
   // „Datum“ → „an einem bestimmten Datum“). Genau so soll er arbeiten: Was
   // nicht in der Quelle steht, muss begruendet dastehen - nicht am Test
   // vorbei.
-  const begruendet = JSON.stringify(REGISTRY_V22.deviationsFromSource);
+  const begruendet = JSON.stringify(SCOPES.map((scope) => REGISTRIES[scope].deviationsFromSource));
 
-  for (const item of getItemsV22()) {
+  for (const item of alleItems()) {
     for (const option of item.options) {
       if (flach.includes(option.label)) continue;
       assert.ok(
@@ -60,7 +68,7 @@ test("die Gegenprobe: eine unbegründete Umformulierung fällt auf", () => {
   // ueberhaupt eine Abweichung gibt.
   const erfunden = "eine Antwort, die so niemand geschrieben hat";
   assert.ok(!flach.includes(erfunden));
-  assert.ok(!JSON.stringify(REGISTRY_V22.deviationsFromSource).includes(erfunden));
+  assert.ok(!JSON.stringify(SCOPES.map((s) => REGISTRIES[s].deviationsFromSource)).includes(erfunden));
 });
 
 test("die Registratur erfindet keine Fragen", () => {
@@ -68,27 +76,27 @@ test("die Registratur erfindet keine Fragen", () => {
     [...quelle.matchAll(/^\*\*([A-Z][0-9]{2})\*\*/gm)].map((match) => match[1]),
   );
   assert.ok(inQuelle.size >= 50, `zu wenige Items in der Quelle gefunden: ${inQuelle.size}`);
-  for (const item of getItemsV22()) {
+  for (const item of alleItems()) {
     assert.ok(inQuelle.has(item.itemId), `${item.itemId} steht nicht in der Quelle`);
   }
-  assert.equal(getItemsV22().length, inQuelle.size, "es fehlen Fragen aus der Quelle");
+  assert.equal(alleItems().length, inQuelle.size, "es fehlen Fragen aus der Quelle");
 });
 
-test("weder Gesamtwert noch Dimensionswerte", () => {
-  // Die Quelle sagt es selbst, Abschnitt 8.1: geordnete Kategorien duerfen
-  // intern codiert, aber nicht als Messwerte ausgegeben werden.
-  assert.equal(REGISTRY_V22.overallScore, false);
-  assert.equal(REGISTRY_V22.dimensionScores, false);
-  const asText = JSON.stringify(REGISTRY_V22);
-  assert.ok(!/"weight"|"score"\s*:\s*\d|"points"|"mean"/.test(asText));
+test("weder Gesamtwert noch Dimensionswerte - in beiden Bögen", () => {
+  for (const scope of SCOPES) {
+    const registry = REGISTRIES[scope];
+    assert.equal(registry.overallScore, false, scope);
+    assert.equal(registry.dimensionScores, false, scope);
+    assert.ok(!/"weight"|"score"\s*:\s*\d|"points"|"mean"/.test(JSON.stringify(registry)), scope);
+  }
 });
 
 test("A und I stehen nebeneinander, nicht gegeneinander", () => {
   // "A und I niemals zu einem Analytisch-vs.-Intuitiv-Gesamtwert
   // verschmelzen" - Abschnitt 8.1 der Quelle. Beide koennen gleichzeitig hoch
   // sein; eine Achse dazwischen waere eine erfundene Gegensaetzlichkeit.
-  const a = getItemsV22().filter((item) => item.itemId.startsWith("A"));
-  const i = getItemsV22().filter((item) => item.itemId.startsWith("I"));
+  const a = alleItems().filter((item) => item.itemId.startsWith("A"));
+  const i = alleItems().filter((item) => item.itemId.startsWith("I"));
   assert.ok(a.length >= 2 && i.length >= 3);
   assert.notEqual(a[0].section, i[0].section, "A und I liegen im selben Abschnitt");
 });
@@ -108,7 +116,7 @@ test("die fünf Stufen sind als ordinal gekennzeichnet, Handlungswahlen nicht", 
 test("jede Frage lässt sich auslassen", () => {
   // Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Daran
   // ist v1 gescheitert.
-  for (const item of getItemsV22()) {
+  for (const item of alleItems()) {
     assert.ok(item.missing.length >= 1, `${item.itemId}: kein Auslassungsgrund`);
     for (const entry of item.missing) {
       assert.ok(entry.label.length > 3, `${item.itemId}: Grund ohne Satz`);
@@ -124,7 +132,7 @@ test("kein Auslassungsgrund ist als Antwortmöglichkeit stehen geblieben", () =>
     "nicht angeben", "noch nicht entschieden", "noch offen",
     "noch nicht einschätzbar", "zunächst vertraulich klären",
   ];
-  for (const item of getItemsV22()) {
+  for (const item of alleItems()) {
     for (const option of item.options) {
       assert.ok(
         !verraeter.includes(option.label),
@@ -135,15 +143,16 @@ test("kein Auslassungsgrund ist als Antwortmöglichkeit stehen geblieben", () =>
 });
 
 test("jede Abweichung von der Quelle ist begründet und verantwortet", () => {
-  assert.ok(REGISTRY_V22.deviationsFromSource.length >= 1);
-  for (const abweichung of REGISTRY_V22.deviationsFromSource) {
+  const alle = SCOPES.flatMap((scope) => REGISTRIES[scope].deviationsFromSource);
+  assert.ok(alle.length >= 1);
+  for (const abweichung of alle) {
     assert.ok(abweichung.reason.length > 30, "Abweichung ohne Begründung");
     assert.ok(abweichung.decidedBy.length > 0, "Abweichung ohne Verantwortlichen");
   }
 });
 
 test("die Wertefälle haben beide Anliegen und beide Wege", () => {
-  const faelle = getItemsV22().filter((item) => item.answerFormat === "value_case");
+  const faelle = alleItems().filter((item) => item.answerFormat === "value_case");
   assert.equal(faelle.length, 6);
   for (const fall of faelle) {
     assert.equal(fall.concerns?.length, 2, `${fall.itemId}: Anliegen`);
@@ -155,7 +164,7 @@ test("die Wertefälle haben beide Anliegen und beide Wege", () => {
 });
 
 test("eine Anschlussfrage hängt an einer Frage, die es gibt", () => {
-  const anschluss = getItemsV22().filter((item) => item.showAfter);
+  const anschluss = alleItems().filter((item) => item.showAfter);
   assert.ok(anschluss.length >= 2, "keine Anschlussfragen gefunden");
   for (const item of anschluss) {
     assert.ok(getItemV22(item.showAfter!), `${item.itemId} → ${item.showAfter}`);
@@ -163,10 +172,16 @@ test("eine Anschlussfrage hängt an einer Frage, die es gibt", () => {
 });
 
 test("die Abschnitte decken alle Fragen ab und keiner ist leer", () => {
-  const sections = getSectionsV22();
-  assert.equal(sections.reduce((sum, s) => sum + s.items.length, 0), getItemsV22().length);
-  for (const section of sections) {
-    assert.ok(section.items.length > 0, `Abschnitt ohne Fragen: ${section.section}`);
+  for (const scope of SCOPES) {
+    const sections = getSectionsV22(scope);
+    assert.equal(
+      sections.reduce((sum, entry) => sum + entry.items.length, 0),
+      getItemsV22(scope).length,
+      scope,
+    );
+    for (const section of sections) {
+      assert.ok(section.items.length > 0, `${scope}: Abschnitt ohne Fragen: ${section.section}`);
+    }
   }
 });
 
@@ -174,15 +189,70 @@ test("die Prüfung beim Laden schlägt an, wenn etwas fehlt", () => {
   // Ohne diesen Test waere nicht belegt, dass assertRegistryV22 ueberhaupt
   // etwas tut - eine Pruefung, die nie ausloest, sieht aus wie eine, die
   // schuetzt.
-  const ohneAusweg = JSON.parse(JSON.stringify(REGISTRY_V22)) as RegistryV22;
+  const ohneAusweg = JSON.parse(JSON.stringify(FOUNDER_PROFILE)) as RegistryV22;
   ohneAusweg.items[0].missing = [];
   assert.throws(() => assertRegistryV22(ohneAusweg), /kein Auslassungsgrund/);
 
-  const mitWert = JSON.parse(JSON.stringify(REGISTRY_V22)) as RegistryV22;
+  const mitWert = JSON.parse(JSON.stringify(FOUNDER_PROFILE)) as RegistryV22;
   (mitWert as unknown as { dimensionScores: boolean }).dimensionScores = true;
   assert.throws(() => assertRegistryV22(mitWert), /Dimensionswert/);
 
-  const verwaist = JSON.parse(JSON.stringify(REGISTRY_V22)) as RegistryV22;
+  const verwaist = JSON.parse(JSON.stringify(VENTURE_ALIGNMENT)) as RegistryV22;
   verwaist.items[0].showAfter = "Z99";
   assert.throws(() => assertRegistryV22(verwaist), /das es nicht gibt/);
+});
+
+// ---------------------------------------------------------------------------
+// Die Teilung selbst
+// ---------------------------------------------------------------------------
+
+test("die beiden Bögen teilen die Fragen vollständig und ohne Überschneidung", () => {
+  const profil = getItemsV22("founder_profile").map((item) => item.itemId);
+  const venture = getItemsV22("venture_alignment").map((item) => item.itemId);
+
+  const doppelt = profil.filter((id) => venture.includes(id));
+  assert.deepEqual(doppelt, [], "diese Fragen stehen in beiden Bögen");
+  assert.equal(profil.length + venture.length, alleItems().length);
+  assert.ok(profil.length >= 10 && venture.length >= 20);
+});
+
+test("das Arbeitsprofil enthält nur, was portabel ist", () => {
+  // Die Quelle, Abschnitt 1: A/I/E/T/D/X sind "relativ portabel". U/K sind es
+  // NICHT - sie sind "team-/rollenabhaengig" und gehoeren deshalb zum
+  // Vorhaben, obwohl sie wie Praeferenzen aussehen.
+  for (const item of getItemsV22("founder_profile")) {
+    assert.match(item.itemId, /^[AIETDX]/, `${item.itemId} gehört nicht ins Arbeitsprofil`);
+  }
+  for (const item of getItemsV22("venture_alignment")) {
+    assert.match(item.itemId, /^[UKSRGBWL]/, `${item.itemId} gehört nicht zum Vorhaben`);
+  }
+  // Und zwar konkret: U und K liegen beim Vorhaben.
+  assert.equal(findItem("U01")?.scope, "venture_alignment");
+  assert.equal(findItem("K01")?.scope, "venture_alignment");
+});
+
+test("jeder Bogen sagt, wofür seine Antworten gelten", () => {
+  // Ohne diesen Satz waere die Teilung eine Ordnerstruktur und keine Aussage.
+  assert.match(FOUNDER_PROFILE.validity, /portabel|Person/i);
+  assert.match(VENTURE_ALIGNMENT.validity, /Vorhaben|Zeitraum/i);
+  assert.notEqual(FOUNDER_PROFILE.validity, VENTURE_ALIGNMENT.validity);
+});
+
+test("die beiden Fassungen tragen eigene Kennungen und können getrennt wachsen", () => {
+  // Der Grund fuer die Teilung: Bisher hiess jede Aenderung an einem Teil eine
+  // neue Gesamtfassung - v2, v2.1, v2.2 in drei Tagen.
+  assert.notEqual(FOUNDER_PROFILE.instrumentId, VENTURE_ALIGNMENT.instrumentId);
+  for (const scope of SCOPES) {
+    assert.equal(REGISTRIES[scope].scope, scope);
+    assert.equal(REGISTRIES[scope].status, "draft");
+  }
+});
+
+test("eine Frage lässt sich finden, ohne ihren Bogen zu kennen - mit Bogen als Antwort", () => {
+  // Wer nur das Item bekaeme, muesste danach raten, wo die Antwort hingehoert -
+  // und genau diese Unklarheit soll die Teilung beseitigen.
+  const gefunden = findItem("R01");
+  assert.equal(gefunden?.scope, "venture_alignment");
+  assert.equal(gefunden?.item.itemId, "R01");
+  assert.equal(findItem("Z99"), null);
 });

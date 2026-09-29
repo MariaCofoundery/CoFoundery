@@ -11,7 +11,44 @@ Heuristik im Parser. Wer eine Zuordnung anzweifelt, findet sie an einer Stelle.
 import collections, io, json, re
 
 SRC = "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md"
-OUT = "web/docs/founder-alignment-registry-v2-2.json"
+
+# ---------------------------------------------------------------------------
+# ZWEI FASSUNGEN, NICHT EINE
+# ---------------------------------------------------------------------------
+#
+# Die Master-Fassung nennt in Abschnitt 1 vier Baender mit VERSCHIEDENER
+# Gueltigkeit: Das Arbeitsprofil ist "relativ portabel", U/K sind
+# "team-/rollenabhaengig", S/R/G/B "vorhabensspezifisch und zeitgebunden",
+# W/L "optional/adaptiv".
+#
+# Ein Fragebogen kann nicht gleichzeitig portabel und zeitgebunden sein. Wer
+# beides in eine Fassung giesst, muss spaeter bei jeder Antwort rekonstruieren,
+# ob R01 = 15 Stunden "allgemein" oder "fuer dieses Vorhaben im September"
+# hiess - und das steht dann nirgends.
+#
+# Deshalb zwei Fassungen mit eigenen Kennungen, die sich unabhaengig
+# weiterentwickeln koennen. Bisher hiess jede Aenderung an einem Teil eine neue
+# Gesamtfassung: v2, v2.1, v2.2 - dreimal in drei Tagen.
+#
+# U/K LIEGT BEIM VORHABEN, nicht beim Profil. Die Quelle sagt "beim Teamstart
+# bestaetigen" - das ist nicht portabel. Bestaetigen statt neu beantworten
+# loest die Oberflaeche, indem sie die letzte Antwort vorbelegt.
+SCOPES = {
+    "founder_profile": {
+        "id": "founder-profile-v1",
+        "label": "Founder-Arbeitsprofil",
+        "letters": "AIETDX",
+        "out": "web/docs/founder-profile-registry-v1.json",
+        "validity": "Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - und sollte regelmaessig bestaetigt werden.",
+    },
+    "venture_alignment": {
+        "id": "venture-alignment-v1",
+        "label": "Venture-Alignment",
+        "letters": "UKSRGBWL",
+        "out": "web/docs/venture-alignment-registry-v1.json",
+        "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person kann bei zwei Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.",
+    },
+}
 
 # ---------------------------------------------------------------------------
 # WAS IN DER ANTWORTLISTE IN WAHRHEIT EIN AUSLASSUNGSGRUND IST
@@ -224,42 +261,49 @@ for n, item_id in enumerate(reihenfolge, start=1):
         eintrag["showAfter"] = FOLGT_AUF[item_id]
     ausgabe.append(eintrag)
 
-doc = collections.OrderedDict([
-    ("instrumentId", "founder-alignment-v2-2"),
-    ("registryVersion", "2.2.0"),
-    ("status", "draft"),
-    ("createdAt", "2026-09-29"),
-    ("source", SRC),
-    ("overallScore", False),
-    ("dimensionScores", False),
-    ("deviationsFromSource", [
-        collections.OrderedDict([
-            ("what", "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'."),
-            ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
-            ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
-            ("decidedBy", "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"),
-        ]),
-        collections.OrderedDict([
-            ("what", "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'."),
-            ("source", "Master-Arbeitsfassung v0.2, R12"),
-            ("reason", "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum. Die Bedeutung bleibt, nur der Satz wird lesbar."),
-            ("decidedBy", "Claude, 29.09.2026"),
-        ]),
-    ]),
-    ("notes", [
-        "Erzeugt aus der Master-Arbeitsfassung v0.2. Die Zuordnungen, die sich aus dem Fliesstext nicht eindeutig lesen lassen - Antwortformat, ordinal gegen nominal, und was in der Antwortliste in Wahrheit ein Auslassungsgrund ist - stehen ausdruecklich im Generator.",
-        "KEIN GESAMTWERT UND KEINE DIMENSIONSWERTE. Die Quelle sagt es selbst (Abschnitt 8.1): geordnete Kategorien duerfen intern codiert, aber nicht automatisch als psychologische Messwerte ausgegeben werden.",
-        "A und I werden niemals zu einem Analytisch-gegen-Intuitiv-Wert verschmolzen. Beide koennen gleichzeitig hoch sein.",
-    ]),
-    ("sections", list(dict.fromkeys(i["section"] for i in ausgabe if i["section"]))),
-    ("items", ausgabe),
-])
+for scope, meta in SCOPES.items():
+    teil = [i for i in ausgabe if i["itemId"][0] in meta["letters"]]
+    # Reihenfolge innerhalb der Fassung neu vergeben - sonst beginnt
+    # Venture-Alignment bei 24.
+    for n, eintrag in enumerate(teil, start=1):
+        eintrag["order"] = n
 
-io.open(OUT, "w", encoding="utf-8").write(json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    doc = collections.OrderedDict([
+        ("instrumentId", meta["id"]),
+        ("scope", scope),
+        ("label", meta["label"]),
+        ("registryVersion", "1.0.0"),
+        ("status", "draft"),
+        ("createdAt", "2026-09-29"),
+        ("source", SRC),
+        ("validity", meta["validity"]),
+        ("overallScore", False),
+        ("dimensionScores", False),
+        ("deviationsFromSource", [
+            collections.OrderedDict([
+                ("what", "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'."),
+                ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
+                ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
+                ("decidedBy", "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"),
+            ]),
+            collections.OrderedDict([
+                ("what", "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'."),
+                ("source", "Master-Arbeitsfassung v0.2, R12"),
+                ("reason", "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum."),
+                ("decidedBy", "Claude, 29.09.2026"),
+            ]),
+        ]),
+        ("notes", [
+            "Erzeugt aus der Master-Arbeitsfassung v0.2. Die Zuordnungen, die sich aus dem Fliesstext nicht eindeutig lesen lassen, stehen ausdruecklich im Generator.",
+            "KEIN GESAMTWERT UND KEINE DIMENSIONSWERTE. Die Quelle sagt es selbst (Abschnitt 8.1).",
+            "A und I werden niemals zu einem Analytisch-gegen-Intuitiv-Wert verschmolzen. Beide koennen gleichzeitig hoch sein.",
+        ]),
+        ("sections", list(dict.fromkeys(i["section"] for i in teil if i["section"]))),
+        ("items", teil),
+    ])
+    io.open(meta["out"], "w", encoding="utf-8").write(
+        json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
 
-from collections import Counter
-print(len(ausgabe), "Items")
-print("Formate:", dict(Counter(i["answerFormat"] for i in ausgabe)))
-print("Abschnitte:", len(doc["sections"]))
-print("ohne Optionen:", [i["itemId"] for i in ausgabe if not i["options"] and i["answerFormat"] in ("ordinal_choice","single_choice","multi_choice")])
-print("ohne Auslassungsgrund:", [i["itemId"] for i in ausgabe if not i["missing"]])
+    from collections import Counter
+    print(f'{meta["id"]}: {len(teil)} Items, {len(doc["sections"])} Abschnitte,',
+          dict(Counter(i["answerFormat"] for i in teil)))

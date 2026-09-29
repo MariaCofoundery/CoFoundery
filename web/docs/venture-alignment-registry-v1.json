@@ -1,9 +1,12 @@
 {
-  "instrumentId": "founder-alignment-v2-2",
-  "registryVersion": "2.2.0",
+  "instrumentId": "venture-alignment-v1",
+  "scope": "venture_alignment",
+  "label": "Venture-Alignment",
+  "registryVersion": "1.0.0",
   "status": "draft",
   "createdAt": "2026-09-29",
   "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md",
+  "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person kann bei zwei Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.",
   "overallScore": false,
   "dimensionScores": false,
   "deviationsFromSource": [
@@ -16,22 +19,17 @@
     {
       "what": "R12: die Antwort 'Datum' heisst 'an einem bestimmten Datum - bitte angeben'.",
       "source": "Master-Arbeitsfassung v0.2, R12",
-      "reason": "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum. Die Bedeutung bleibt, nur der Satz wird lesbar.",
+      "reason": "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum.",
       "decidedBy": "Claude, 29.09.2026"
     }
   ],
   "notes": [
-    "Erzeugt aus der Master-Arbeitsfassung v0.2. Die Zuordnungen, die sich aus dem Fliesstext nicht eindeutig lesen lassen - Antwortformat, ordinal gegen nominal, und was in der Antwortliste in Wahrheit ein Auslassungsgrund ist - stehen ausdruecklich im Generator.",
-    "KEIN GESAMTWERT UND KEINE DIMENSIONSWERTE. Die Quelle sagt es selbst (Abschnitt 8.1): geordnete Kategorien duerfen intern codiert, aber nicht automatisch als psychologische Messwerte ausgegeben werden.",
+    "Erzeugt aus der Master-Arbeitsfassung v0.2. Die Zuordnungen, die sich aus dem Fliesstext nicht eindeutig lesen lassen, stehen ausdruecklich im Generator.",
+    "KEIN GESAMTWERT UND KEINE DIMENSIONSWERTE. Die Quelle sagt es selbst (Abschnitt 8.1).",
     "A und I werden niemals zu einem Analytisch-gegen-Intuitiv-Wert verschmolzen. Beide koennen gleichzeitig hoch sein."
   ],
   "sections": [
-    "A – Analytische Prüfung",
-    "I – Nutzung von Erfahrungsintuition",
-    "E – Frühes Erproben",
     "U/K – Zusammenarbeit: Spielraum und Information",
-    "T/D – Unterschiede ansprechen und formulieren",
-    "X – Wohlbefinden bei offener Informationslage",
     "S – Ziele & strategische Richtung",
     "R – Ressourcen & tatsächliche Zusagen",
     "G – Entscheidungs- und Teamregeln",
@@ -41,384 +39,8 @@
   ],
   "items": [
     {
-      "itemId": "A01",
-      "order": 1,
-      "section": "A – Analytische Prüfung",
-      "prompt": "Wenn Du zwischen mehreren realistischen Möglichkeiten entscheiden musst: Wie häufig stellst Du ihre Vor- und Nachteile gegenüber, bevor Du Dich festlegst?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "A01_o1",
-          "label": "nie",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A01_o2",
-          "label": "selten",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A01_o3",
-          "label": "manchmal",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A01_o4",
-          "label": "häufig",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A01_o5",
-          "label": "fast immer",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "A02",
-      "order": 2,
-      "section": "A – Analytische Prüfung",
-      "prompt": "Wenn eine wichtige Entscheidung davon abhängt, ob eine Annahme stimmt: Wie häufig prüfst Du, welche Informationen für oder gegen diese Annahme sprechen?",
-      "hint": "„Zum Beispiel die Annahme, dass genügend Kund:innen für ein Angebot bezahlen würden.“",
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "A02_o1",
-          "label": "nie",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A02_o2",
-          "label": "selten",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A02_o3",
-          "label": "manchmal",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A02_o4",
-          "label": "häufig",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "A02_o5",
-          "label": "fast immer",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "I01",
-      "order": 3,
-      "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Wenn Du Dich in einem Thema gut auskennst: Wie stark fließt Dein erster Eindruck normalerweise in Deine Entscheidung ein?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "I01_o1",
-          "label": "gar nicht",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I01_o2",
-          "label": "eher wenig",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I01_o3",
-          "label": "mittel",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I01_o4",
-          "label": "stark",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I01_o5",
-          "label": "sehr stark",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "I02",
-      "order": 4,
-      "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Wenn mehrere Möglichkeiten nach den verfügbaren Informationen ähnlich gut erscheinen: Wie stark lässt Du Deine Erfahrung oder Dein Gefühl dafür mitentscheiden, was besser passt?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "I02_o1",
-          "label": "gar nicht",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I02_o2",
-          "label": "eher wenig",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I02_o3",
-          "label": "mittel",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I02_o4",
-          "label": "stark",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I02_o5",
-          "label": "sehr stark",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "I03",
-      "order": 5,
-      "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Die verfügbaren Zahlen sprechen für eine Option, Dein Gefühl eher dagegen. Wie stark beziehst Du dieses Gefühl in Deine weitere Entscheidung ein?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "I03_o1",
-          "label": "gar nicht",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I03_o2",
-          "label": "eher wenig",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I03_o3",
-          "label": "mittel",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I03_o4",
-          "label": "stark",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "I03_o5",
-          "label": "sehr stark",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "E01",
-      "order": 6,
-      "section": "E – Frühes Erproben",
-      "prompt": "Dir fehlen noch Informationen für eine Entscheidung. Ein kleiner Test könnte Dir zusätzliche Hinweise geben. Wie wahrscheinlich ist es, dass Du diesen Test startest, statt zunächst weiter Informationen zu sammeln?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "E01_o1",
-          "label": "sehr unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E01_o2",
-          "label": "eher unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E01_o3",
-          "label": "teils/teils",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E01_o4",
-          "label": "eher wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E01_o5",
-          "label": "sehr wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "E02",
-      "order": 7,
-      "section": "E – Frühes Erproben",
-      "prompt": "Zwei Vorgehensweisen erscheinen beide sinnvoll. Ein kleiner Test könnte zeigen, welche in der Praxis besser funktioniert. Wie wahrscheinlich ist es, dass Du zunächst einen solchen Test machst?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "E02_o1",
-          "label": "sehr unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E02_o2",
-          "label": "eher unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E02_o3",
-          "label": "teils/teils",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E02_o4",
-          "label": "eher wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E02_o5",
-          "label": "sehr wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "E03",
-      "order": 8,
-      "section": "E – Frühes Erproben",
-      "prompt": "Eine Entscheidung ist noch nicht endgültig und lässt sich mit wenig Aufwand korrigieren. Wie wahrscheinlich ist es, dass Du zunächst eine vorläufige Richtung festlegst?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "E03_o1",
-          "label": "sehr unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E03_o2",
-          "label": "eher unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E03_o3",
-          "label": "teils/teils",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E03_o4",
-          "label": "eher wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "E03_o5",
-          "label": "sehr wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
       "itemId": "U01",
-      "order": 9,
+      "order": 1,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wenn Dein Verantwortungsbereich klar geregelt ist: Wie selbstständig möchtest Du dort normalerweise über das Vorgehen entscheiden?",
       "hint": null,
@@ -465,7 +87,7 @@
     },
     {
       "itemId": "U03",
-      "order": 10,
+      "order": 2,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wenn Du innerhalb eines vereinbarten Budgets bleiben kannst: Wie selbstständig möchtest Du über Ausgaben in Deinem Bereich entscheiden?",
       "hint": null,
@@ -512,7 +134,7 @@
     },
     {
       "itemId": "U04",
-      "order": 11,
+      "order": 3,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wenn mehrere sinnvolle Vorgehensweisen möglich sind: Wie selbstständig möchtest Du in Deinem Bereich auswählen können, welchen Weg Du gehst?",
       "hint": null,
@@ -559,7 +181,7 @@
     },
     {
       "itemId": "U05",
-      "order": 12,
+      "order": 4,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wenn sich während der Arbeit etwas ändert: Wie frei möchtest Du einen vereinbarten Plan in Deinem Bereich selbst anpassen können?",
       "hint": null,
@@ -606,7 +228,7 @@
     },
     {
       "itemId": "K01",
-      "order": 13,
+      "order": 5,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wann zeigst Du anderen Foundern normalerweise einen Zwischenstand aus Deinem Bereich?",
       "hint": null,
@@ -653,7 +275,7 @@
     },
     {
       "itemId": "K03",
-      "order": 14,
+      "order": 6,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Wie früh möchtest Du von einer wichtigen Richtungsänderung in einem anderen Bereich erfahren?",
       "hint": null,
@@ -700,7 +322,7 @@
     },
     {
       "itemId": "K04",
-      "order": 15,
+      "order": 7,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
       "prompt": "Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu Dir?",
       "hint": null,
@@ -746,384 +368,8 @@
       "note": "Nominal; keine Rangfolge."
     },
     {
-      "itemId": "T01",
-      "order": 16,
-      "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Du merkst während eines Gesprächs, dass Du eine geplante Entscheidung anders siehst. Sie ist wichtig, aber nicht dringend. Wann sprichst Du Deinen Einwand normalerweise zum ersten Mal?",
-      "hint": null,
-      "answerFormat": "single_choice",
-      "options": [
-        {
-          "optionId": "T01_o1",
-          "label": "noch im laufenden Gespräch",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T01_o2",
-          "label": "nach dem Gespräch, aber am selben Arbeitstag",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T01_o3",
-          "label": "am nächsten Arbeitstag",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T01_o4",
-          "label": "später, wenn ich meine Sicht weiter sortiert habe",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T01_o5",
-          "label": "situationsabhängig",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "T02",
-      "order": 17,
-      "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Du hast Bedenken, kannst aber noch nicht genau erklären, woran sie liegen. Was entspricht eher Deinem Vorgehen?",
-      "hint": null,
-      "answerFormat": "single_choice",
-      "options": [
-        {
-          "optionId": "T02_o1",
-          "label": "direkt ansprechen und Unklarheit benennen",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T02_o2",
-          "label": "kurz erwähnen und später genauer darauf zurückkommen",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T02_o3",
-          "label": "erst für mich sortieren und dann ansprechen",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T02_o4",
-          "label": "erst ansprechen, wenn ich es ziemlich genau benennen kann",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "T02_o5",
-          "label": "situationsabhängig",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": "Vorerst nicht als lineare Skala verrechnen."
-    },
-    {
-      "itemId": "D01",
-      "order": 18,
-      "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Wenn Du inhaltlich anderer Meinung bist: Welcher Einstieg passt normalerweise eher zu Dir?",
-      "hint": null,
-      "answerFormat": "single_choice",
-      "options": [
-        {
-          "optionId": "D01_o1",
-          "label": "„Ich sehe das anders, weil …“",
-          "requiresText": true,
-          "exclusive": false
-        },
-        {
-          "optionId": "D01_o2",
-          "label": "„Ich habe bei dem Punkt noch Bedenken …“",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D01_o3",
-          "label": "„Wie würde unser Vorschlag mit … umgehen?“",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D01_o4",
-          "label": "„Ich würde gern noch eine andere Möglichkeit anschauen …“",
-          "requiresText": true,
-          "exclusive": false
-        },
-        {
-          "optionId": "D01_o5",
-          "label": "anders",
-          "requiresText": true,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": "Nominale Gesprächspräferenz, kein Direktheitsscore."
-    },
-    {
-      "itemId": "D02",
-      "order": 19,
-      "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Wenn Dir ein Vorschlag nicht sinnvoll erscheint: Wie wahrscheinlich ist es, dass Du ausdrücklich sagst, dass Du ihm nicht zustimmst?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "D02_o1",
-          "label": "sehr unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D02_o2",
-          "label": "eher unwahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D02_o3",
-          "label": "teils/teils",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D02_o4",
-          "label": "eher wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "D02_o5",
-          "label": "sehr wahrscheinlich",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "X01",
-      "order": 20,
-      "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst Du Dich damit, wenn es für ein Ergebnis mehrere plausible Erklärungen gibt und unklar ist, welche davon zutrifft?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "X01_o1",
-          "label": "sehr unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X01_o2",
-          "label": "eher unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X01_o3",
-          "label": "weder wohl noch unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X01_o4",
-          "label": "eher wohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X01_o5",
-          "label": "sehr wohl",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "X02",
-      "order": 21,
-      "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst Du Dich damit, wenn über mehrere Wochen noch offen ist, welche von zwei möglichen Richtungen Euer Vorhaben nehmen wird?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "X02_o1",
-          "label": "sehr unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X02_o2",
-          "label": "eher unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X02_o3",
-          "label": "weder wohl noch unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X02_o4",
-          "label": "eher wohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X02_o5",
-          "label": "sehr wohl",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "X03",
-      "order": 22,
-      "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst Du Dich damit, wenn Ihr zu derselben Idee unterschiedliche oder widersprüchliche Rückmeldungen bekommt und noch nicht klar ist, welche davon relevanter ist?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "X03_o1",
-          "label": "sehr unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X03_o2",
-          "label": "eher unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X03_o3",
-          "label": "weder wohl noch unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X03_o4",
-          "label": "eher wohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X03_o5",
-          "label": "sehr wohl",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
-      "itemId": "X04",
-      "order": 23,
-      "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst Du Dich damit, wenn eine wichtige Frage für eine Weile keine eindeutige Antwort hat?",
-      "hint": null,
-      "answerFormat": "ordinal_choice",
-      "options": [
-        {
-          "optionId": "X04_o1",
-          "label": "sehr unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X04_o2",
-          "label": "eher unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X04_o3",
-          "label": "weder wohl noch unwohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X04_o4",
-          "label": "eher wohl",
-          "requiresText": false,
-          "exclusive": false
-        },
-        {
-          "optionId": "X04_o5",
-          "label": "sehr wohl",
-          "requiresText": false,
-          "exclusive": false
-        }
-      ],
-      "missing": [
-        {
-          "code": "cannot_assess",
-          "label": "kann ich noch nicht einschätzen"
-        }
-      ],
-      "note": ""
-    },
-    {
       "itemId": "S01",
-      "order": 24,
+      "order": 8,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welche Ergebnisse möchtest Du mit dem Unternehmen in den nächsten drei Jahren erreichen?",
       "hint": null,
@@ -1183,7 +429,7 @@
     },
     {
       "itemId": "S02",
-      "order": 25,
+      "order": 9,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welche Vorstellung hast Du aktuell davon, was in den nächsten drei Jahren mit Deinen Unternehmensanteilen passieren soll?",
       "hint": null,
@@ -1234,7 +480,7 @@
     },
     {
       "itemId": "S03",
-      "order": 26,
+      "order": 10,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Wie stehst Du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?",
       "hint": null,
@@ -1279,7 +525,7 @@
     },
     {
       "itemId": "S04",
-      "order": 27,
+      "order": 11,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welches konkrete Ergebnis sollte das Vorhaben aus Deiner Sicht in den nächsten zwölf Monaten erreicht haben?",
       "hint": "Auch ein Lernergebnis kann ein legitimes Ziel sein.",
@@ -1295,7 +541,7 @@
     },
     {
       "itemId": "S06",
-      "order": 28,
+      "order": 12,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Wie möchtest Du Deine eigene Rolle im Unternehmen in etwa drei Jahren gestalten?",
       "hint": null,
@@ -1349,7 +595,7 @@
     },
     {
       "itemId": "R01",
-      "order": 29,
+      "order": 13,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie viele Stunden pro Woche kannst Du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?",
       "hint": null,
@@ -1369,7 +615,7 @@
     },
     {
       "itemId": "R02",
-      "order": 30,
+      "order": 14,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie viele Stunden pro Woche erwartest Du in den nächsten zwölf Wochen ungefähr von \\[Name\\]?",
       "hint": null,
@@ -1385,7 +631,7 @@
     },
     {
       "itemId": "R03",
-      "order": 31,
+      "order": 15,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Welche regelmäßigen Zeiten könntest Du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?",
       "hint": "Wochenplaner mit verfügbaren Zeitfenstern und ausdrücklich nicht verfügbaren Zeiten.",
@@ -1401,7 +647,7 @@
     },
     {
       "itemId": "R04",
-      "order": 32,
+      "order": 16,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Ab wann brauchst Du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben für Deinen Lebensunterhalt?",
       "hint": null,
@@ -1440,7 +686,7 @@
     },
     {
       "itemId": "R05",
-      "order": 33,
+      "order": 17,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Welche monatliche Auszahlung brauchst Du ab diesem Zeitpunkt ungefähr mindestens?",
       "hint": null,
@@ -1457,7 +703,7 @@
     },
     {
       "itemId": "R06",
-      "order": 34,
+      "order": 18,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Unter welchen Bedingungen könntest Du Dir vorstellen, das Vorhaben zu Deiner beruflichen Haupttätigkeit zu machen?",
       "hint": null,
@@ -1516,7 +762,7 @@
     },
     {
       "itemId": "R09",
-      "order": 35,
+      "order": 19,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Angenommen, Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für Deine weitere Mitarbeit gelten?",
       "hint": null,
@@ -1563,7 +809,7 @@
     },
     {
       "itemId": "R10",
-      "order": 36,
+      "order": 20,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie wichtig ist es Dir persönlich, dieses konkrete Vorhaben weiterzuführen?",
       "hint": null,
@@ -1610,7 +856,7 @@
     },
     {
       "itemId": "R12",
-      "order": 37,
+      "order": 21,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wann sollten diese Angaben aus Deiner Sicht spätestens noch einmal überprüft werden?",
       "hint": null,
@@ -1639,7 +885,7 @@
     },
     {
       "itemId": "G01",
-      "order": 38,
+      "order": 22,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Ihr seid Euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich nicht einig. Die Entscheidung betrifft andere Bereiche nicht wesentlich. Welche Regel wäre Dir am liebsten?",
       "hint": null,
@@ -1686,7 +932,7 @@
     },
     {
       "itemId": "G04",
-      "order": 39,
+      "order": 23,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Ihr erreicht bei einer wichtigen Entscheidung bis zum vereinbarten Zeitpunkt keine Einigung. Welche Lösungen sollten dann grundsätzlich möglich sein?",
       "hint": null,
@@ -1733,7 +979,7 @@
     },
     {
       "itemId": "G05",
-      "order": 40,
+      "order": 24,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Bei welchen Entscheidungen sollten aus Deiner Sicht grundsätzlich alle Founder zustimmen?",
       "hint": null,
@@ -1786,7 +1032,7 @@
     },
     {
       "itemId": "B01",
-      "order": 41,
+      "order": 25,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Wo liegt für Dich aktuell die persönliche Obergrenze für zusätzliches eigenes Geld, das Du in das Vorhaben investieren würdest – auch wenn Du einkalkulieren musst, dass Du es vollständig verlieren könntest?",
       "hint": null,
@@ -1806,7 +1052,7 @@
     },
     {
       "itemId": "B04",
-      "order": 42,
+      "order": 26,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Welche finanzielle Mindestreserve sollte aus Deiner Sicht bestehen bleiben, bevor Ihr zusätzliches Geld in ein größeres Vorhaben investiert?",
       "hint": null,
@@ -1830,7 +1076,7 @@
     },
     {
       "itemId": "B05",
-      "order": 43,
+      "order": 27,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Wenn ein Vorhaben einen spürbaren Teil Eurer Zeit oder Eures Budgets beansprucht: Welche Absicherungen wären Dir vorher wichtig?",
       "hint": null,
@@ -1883,7 +1129,7 @@
     },
     {
       "itemId": "W01",
-      "order": 44,
+      "order": 28,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr habt eine neue Finanzplanung erstellt, einige Zahlen sind aber noch nicht sicher. Aktuell besteht keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wann sollte das Team davon erfahren?",
       "hint": null,
@@ -1915,7 +1161,7 @@
     },
     {
       "itemId": "W02",
-      "order": 45,
+      "order": 29,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Eine Person arbeitet schon lange mit Euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung.",
       "hint": null,
@@ -1947,7 +1193,7 @@
     },
     {
       "itemId": "W03",
-      "order": 46,
+      "order": 30,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten.",
       "hint": null,
@@ -1979,7 +1225,7 @@
     },
     {
       "itemId": "W04",
-      "order": 47,
+      "order": 31,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben.",
       "hint": null,
@@ -2011,7 +1257,7 @@
     },
     {
       "itemId": "W05",
-      "order": 48,
+      "order": 32,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen.",
       "hint": null,
@@ -2043,7 +1289,7 @@
     },
     {
       "itemId": "W06",
-      "order": 49,
+      "order": 33,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich.",
       "hint": null,
@@ -2075,7 +1321,7 @@
     },
     {
       "itemId": "L01",
-      "order": 50,
+      "order": 34,
       "section": "L – persönliche Grenzen",
       "prompt": "Gibt es Vorgehensweisen oder Entscheidungen, die für Dich im Unternehmen grundsätzlich nicht infrage kommen?",
       "hint": null,
@@ -2095,7 +1341,7 @@
     },
     {
       "itemId": "L02",
-      "order": 51,
+      "order": 35,
       "section": "L – persönliche Grenzen",
       "prompt": "Woran würdest Du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist? **\\[nur wenn relevant\\]**",
       "hint": null,
@@ -2116,7 +1362,7 @@
     },
     {
       "itemId": "L03",
-      "order": 52,
+      "order": 36,
       "section": "L – persönliche Grenzen",
       "prompt": "Was sollte passieren, wenn Ihr Euch nicht einig seid, ob eine für Dich wichtige Grenze in einer konkreten Situation betroffen ist? **\\[nur wenn relevant\\]**",
       "hint": null,

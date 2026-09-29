@@ -1,28 +1,29 @@
-import registryJson from "../../../../docs/founder-alignment-registry-v2-2.json";
+import founderProfileJson from "../../../../docs/founder-profile-registry-v1.json";
+import ventureAlignmentJson from "../../../../docs/venture-alignment-registry-v1.json";
 
 /**
- * Das Instrument v2.2 als Daten.
+ * Zwei Fragebögen, nicht einer.
  *
  * ---------------------------------------------------------------------------
- * WARUM ES v2.2 GIBT
+ * WARUM GETEILT
  * ---------------------------------------------------------------------------
  *
- * Die Master-Arbeitsfassung v0.2 vom 29.09.2026 hat die bisherigen
- * Arbeitsfassungen zusammengeführt - und dabei ANDERE KENNUNGEN vergeben als
- * v2.1. In zwei Fällen dieselbe Kennung für eine andere Frage:
+ * Die Master-Arbeitsfassung nennt vier Bänder mit VERSCHIEDENER Gültigkeit:
+ * Das Arbeitsprofil ist „relativ portabel“, U/K sind „team-/rollenabhängig“,
+ * S/R/G/B „vorhabensspezifisch und zeitgebunden“.
  *
- *   `U04` hieß in v2.1 „entscheiden, ohne Zustimmung einzuholen“ und heißt
- *   hier „auswählen, welchen Weg du gehst“.
- *   `K02` gab es in v2.1 als Informationsregel; die steht hier unter `K04`.
+ * Ein Fragebogen kann nicht gleichzeitig portabel und zeitgebunden sein. Wer
+ * beides in eine Fassung gießt, muss später bei jeder Antwort rekonstruieren,
+ * ob „15 Stunden“ allgemein galt oder für dieses Vorhaben im September - und
+ * das steht dann nirgends.
  *
- * Eine gespeicherte Antwort merkt sich die Kennung. Dieselbe Kennung mit neuer
- * Bedeutung heißt: Alte Antworten bedeuten etwas anderes, ohne dass es jemand
- * merkt. Genau deshalb gibt es eine neue Fassung statt einer Korrektur - zum
- * zweiten Mal, aus demselben Grund.
+ * Und die Fassungen können sich getrennt weiterentwickeln. Bisher hieß jede
+ * Änderung an einem Teil eine neue Gesamtfassung: v2, v2.1, v2.2 - dreimal in
+ * drei Tagen, obwohl sich jedes Mal nur ein Teil geändert hat.
  *
- * v2 und v2.1 werden archiviert. Nicht gelöscht: Die Kennung steht in
- * `alignment_answers` als Fremdschlüssel, und wer seinen Fragebogen ausgefüllt
- * hat, soll ihn weiter lesen können.
+ * U/K LIEGT BEIM VORHABEN, nicht beim Profil. Die Quelle sagt „beim Teamstart
+ * bestätigen“ - das ist nicht portabel. „Bestätigen“ statt „neu beantworten“
+ * löst die Oberfläche, indem sie die letzte Antwort vorbelegt.
  *
  * ---------------------------------------------------------------------------
  * WAS DIESE FASSUNG NICHT BEHAUPTET
@@ -86,8 +87,21 @@ export type RegistryItemV22 = {
   showAfter?: string;
 };
 
+/**
+ * Wozu ein Fragebogen gehört.
+ *
+ * `founder_profile` gehört zur Person, `venture_alignment` zu einem Vorhaben.
+ * Der Unterschied steht an der Ablage und nicht nur im Namen: Eine Antwort
+ * ohne Vorhaben ist etwas anderes als dieselbe Antwort mit einem.
+ */
+export type AssessmentScope = "founder_profile" | "venture_alignment";
+
 export type RegistryV22 = {
   instrumentId: string;
+  scope: AssessmentScope;
+  label: string;
+  /** Wie lange und wofür diese Antworten gelten - steht in der Oberfläche. */
+  validity: string;
   registryVersion: string;
   status: "draft" | "active" | "archived";
   createdAt: string;
@@ -109,8 +123,15 @@ export type RegistryV22 = {
  */
 export function assertRegistryV22(registry: RegistryV22): RegistryV22 {
   const fail = (message: string): never => {
-    throw new Error(`registry_v2_2_invalid: ${message}`);
+    throw new Error(`registry_invalid (${registry.instrumentId}): ${message}`);
   };
+
+  // JEDE FASSUNG SAGT, WOFUER SIE GILT. Ohne diesen Satz waere die Teilung
+  // eine Ordnerstruktur und keine Aussage.
+  if (!registry.validity?.trim()) fail("keine Angabe zur Gültigkeit");
+  if (!["founder_profile", "venture_alignment"].includes(registry.scope)) {
+    fail(`unbekannter Scope ${registry.scope}`);
+  }
 
   // KEINE ZAHL, NIRGENDS. Die Entscheidung vom 29.09.2026 steht hier als
   // Prüfung und nicht nur als Vorsatz.
@@ -171,21 +192,50 @@ export function assertRegistryV22(registry: RegistryV22): RegistryV22 {
   return registry;
 }
 
-export const REGISTRY_V22 = assertRegistryV22(registryJson as unknown as RegistryV22);
+export const FOUNDER_PROFILE = assertRegistryV22(founderProfileJson as unknown as RegistryV22);
+export const VENTURE_ALIGNMENT = assertRegistryV22(ventureAlignmentJson as unknown as RegistryV22);
 
-export const INSTRUMENT_V22_ID = REGISTRY_V22.instrumentId;
+export const REGISTRIES: Record<AssessmentScope, RegistryV22> = {
+  founder_profile: FOUNDER_PROFILE,
+  venture_alignment: VENTURE_ALIGNMENT,
+};
 
-export function getItemsV22(): RegistryItemV22[] {
-  return [...REGISTRY_V22.items].sort((a, b) => a.order - b.order);
+export const SCOPES = Object.keys(REGISTRIES) as AssessmentScope[];
+
+export function registryOf(scope: AssessmentScope): RegistryV22 {
+  return REGISTRIES[scope];
+}
+
+export function getItemsV22(scope: AssessmentScope): RegistryItemV22[] {
+  return [...registryOf(scope).items].sort((a, b) => a.order - b.order);
+}
+
+/**
+ * Eine Frage suchen - ohne zu wissen, zu welchem Bogen sie gehört.
+ *
+ * Gibt den Scope MIT heraus. Wer nur das Item bekommt, muss danach raten, wo
+ * die Antwort hingehört - und genau diese Unklarheit soll die Teilung
+ * beseitigen.
+ */
+export function findItem(
+  itemId: string,
+): { item: RegistryItemV22; scope: AssessmentScope } | null {
+  for (const scope of SCOPES) {
+    const item = registryOf(scope).items.find((entry) => entry.itemId === itemId);
+    if (item) return { item, scope };
+  }
+  return null;
 }
 
 export function getItemV22(itemId: string): RegistryItemV22 | null {
-  return REGISTRY_V22.items.find((item) => item.itemId === itemId) ?? null;
+  return findItem(itemId)?.item ?? null;
 }
 
-export function getSectionsV22(): { section: string; items: RegistryItemV22[] }[] {
-  return REGISTRY_V22.sections.map((section) => ({
+export function getSectionsV22(
+  scope: AssessmentScope,
+): { section: string; items: RegistryItemV22[] }[] {
+  return registryOf(scope).sections.map((section) => ({
     section,
-    items: getItemsV22().filter((item) => item.section === section),
+    items: getItemsV22(scope).filter((item) => item.section === section),
   }));
 }

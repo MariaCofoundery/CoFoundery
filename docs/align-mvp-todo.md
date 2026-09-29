@@ -48,6 +48,19 @@ Läuft bei Maria. Vorlage: `docs/fragebogen-v2-1-ueberarbeitung.md`.
 Betrifft Formulierungen, nicht Struktur — Reihenfolge und Anzahl der Antworten
 bleiben, sonst zeigen gespeicherte Antworten ins Leere.
 
+### ☑ 3b. Founder-Profil und Venture-Alignment trennen — gebaut
+
+Zwei Fassungen mit eigenen Kennungen (,
+),  trägt den Scope,
+ das Vorhaben.
+
+U/K liegt beim **Vorhaben**, nicht beim Profil — die Quelle sagt „beim
+Teamstart bestätigen“, und das ist nicht portabel. Bestätigen statt neu
+beantworten löst die Oberfläche durch Vorbelegen.
+
+Offen bleibt: **Vorhaben anlegen oder wählen** als Ablauf. Es gibt
+ als Zuhause, aber keinen Weg dorthin.
+
 ---
 
 ## Bauen — unabhängig von 1 und 2
