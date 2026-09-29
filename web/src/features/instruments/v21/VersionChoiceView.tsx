@@ -19,6 +19,18 @@ import {
  * Und der unangenehme Satz steht oben: Wer wechselt, während sein Mitgründer
  * bleibt, kann sich mit ihm nicht vergleichen. Das erst unten zu schreiben
  * hieße, auf die Leute zu setzen, die nicht zu Ende lesen.
+ *
+ * ---------------------------------------------------------------------------
+ * SEIT DIE ZWISCHENFASSUNG ARCHIVIERT IST, GIBT ES HIER NICHTS MEHR ZU WÄHLEN
+ * ---------------------------------------------------------------------------
+ *
+ * Diese Seite lud bis zum 29.09.2026 dazu ein, „die neue Fassung auszufüllen“ -
+ * und meinte damit v2.1, die inzwischen archiviert ist. Eine Einladung in eine
+ * Sackgasse, an der zweiten Stelle nach dem Dashboard-Kasten.
+ *
+ * Die Seite bleibt trotzdem: Wer damals gewechselt ist, soll nachlesen können,
+ * wofür er sich entschieden hat. Sie erklärt jetzt nur, statt anzubieten - und
+ * zeigt den Weg dorthin, wo es weitergeht.
  */
 
 type Props = {
@@ -26,14 +38,32 @@ type Props = {
   hasPrevious: boolean;
   /** Und die neue? */
   hasNext: boolean;
+  /** Ist die Zwischenfassung inzwischen archiviert? Dann wird nicht mehr gewählt. */
+  archived?: boolean;
 };
 
-export function VersionChoiceView({ hasPrevious, hasNext }: Props) {
+export function VersionChoiceView({ hasPrevious, hasNext, archived = false }: Props) {
   return (
     <div className="space-y-8">
-      <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        {MIXED_COMPARISON_WARNING}
-      </p>
+      {archived ? (
+        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          Diese Zwischenfassung ist archiviert. Sie wird niemandem mehr vorgelegt, und
+          wer sie ausgefüllt hat, behält seine Antworten. Weiter geht es mit zwei
+          getrennten Fragebögen —{" "}
+          <Link href="/founder-alignment/profil" className="underline">
+            wie du arbeitest
+          </Link>{" "}
+          und{" "}
+          <Link href="/founder-alignment/vorhaben" className="underline">
+            was dir bei eurem Vorhaben wichtig ist
+          </Link>
+          .
+        </p>
+      ) : (
+        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {MIXED_COMPARISON_WARNING}
+        </p>
+      )}
 
       <section>
         <h2 className="text-lg font-semibold text-slate-900">Was sich unterscheidet</h2>
@@ -74,12 +104,30 @@ export function VersionChoiceView({ hasPrevious, hasNext }: Props) {
           }
         />
         <Choice
-          title="Die neue Fassung ausfüllen"
+          title={archived ? "Die Zwischenfassung" : "Die neue Fassung ausfüllen"}
           consequence={CHOICE_CONSEQUENCES.retake}
           action={
-            <Link href="/founder-alignment/pilot" className="text-sm text-slate-900 underline">
-              {hasNext ? "Weiter ausfüllen" : "Zur neuen Fassung"}
-            </Link>
+            archived ? (
+              // KEINE EINLADUNG MEHR. Wer sie ausgefuellt hat, kommt an seine
+              // Antworten - wer nicht, soll nicht hineingeschickt werden.
+              hasNext ? (
+                <Link
+                  href="/founder-alignment/pilot/report"
+                  className="text-sm text-slate-900 underline"
+                >
+                  Deine Antworten dazu
+                </Link>
+              ) : (
+                <p className="text-sm text-slate-500">
+                  Archiviert — du hast sie nicht ausgefüllt, und das musst du auch nicht
+                  mehr.
+                </p>
+              )
+            ) : (
+              <Link href="/founder-alignment/pilot" className="text-sm text-slate-900 underline">
+                {hasNext ? "Weiter ausfüllen" : "Zur neuen Fassung"}
+              </Link>
+            )
           }
         />
       </section>

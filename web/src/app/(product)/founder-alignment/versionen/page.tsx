@@ -30,21 +30,34 @@ export default async function VersionChoicePage() {
   const has = (instrumentId: string) =>
     (rows ?? []).some((row) => row.instrument_id === instrumentId);
 
+  // Was die Datenbank ueber die Fassung sagt, nicht was der Code annimmt.
+  const { data: instrument } = await supabase
+    .from("instruments")
+    .select("status")
+    .eq("id", ALIGNMENT_V21_INSTRUMENT_ID)
+    .maybeSingle();
+  const archived = instrument?.status === "archived";
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <NavV21 current="/founder-alignment/versionen" />
 
       <h1 className="text-2xl font-semibold text-slate-900">Zwei Fassungen des Tests</h1>
       <p className="mt-4 text-slate-700">
-        Wir haben den Fragebogen überarbeitet, nachdem eine fachliche Durchsicht Fehler
-        darin gefunden hat. Die neue Fassung ist noch im Test — deshalb bleibt die
-        bisherige, und du entscheidest selbst.
+        {archived
+          ? "Diese Seite hat einmal eine Wahl angeboten. Sie steht hier weiter, damit "
+            + "nachlesbar bleibt, worin sich die Fassungen unterschieden haben — "
+            + "gewählt wird nichts mehr."
+          : "Wir haben den Fragebogen überarbeitet, nachdem eine fachliche Durchsicht "
+            + "Fehler darin gefunden hat. Die neue Fassung ist noch im Test — deshalb "
+            + "bleibt die bisherige, und du entscheidest selbst."}
       </p>
 
       <div className="mt-10">
         <VersionChoiceView
           hasPrevious={has(CURRENT_INSTRUMENT_ID)}
           hasNext={has(ALIGNMENT_V21_INSTRUMENT_ID)}
+          archived={archived}
         />
       </div>
     </main>

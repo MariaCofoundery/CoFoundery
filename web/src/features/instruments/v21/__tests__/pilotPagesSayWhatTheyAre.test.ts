@@ -190,6 +190,34 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("eine archivierte Fassung laedt nirgends mehr zum Ausfuellen ein", () => {
+  // Zwei Stellen taten es: der Dashboard-Kasten und die Versionsseite. Beide
+  // meinten v2.1, die inzwischen archiviert ist - eine Einladung in eine
+  // Sackgasse, und zwar neben der Einladung zu den Boegen, die wirklich neu
+  // sind.
+  //
+  // Geprueft wird, dass beide den Status LESEN. Eine Annahme im Code wuerde
+  // beim naechsten Statuswechsel wieder falsch.
+  for (const datei of [
+    join("src", "features", "instruments", "v21", "dashboardVersionData.ts"),
+    join("src", "app", "(product)", "founder-alignment", "versionen", "page.tsx"),
+  ]) {
+    const text = readFileSync(datei, "utf8");
+    assert.match(text, /from\("instruments"\)/, `${datei} fragt den Status nicht ab`);
+    assert.match(text, /=== "archived"/, datei);
+  }
+
+  // Und die Ansicht macht daraus wirklich etwas anderes, statt den Status nur
+  // entgegenzunehmen.
+  const ansicht = readFileSync(
+    join("src", "features", "instruments", "v21", "VersionChoiceView.tsx"), "utf8");
+  assert.match(ansicht, /archived \? /);
+
+  const karte = readFileSync(
+    join("src", "features", "instruments", "v21", "VersionArchiveCard.tsx"), "utf8");
+  assert.match(karte, /!archived && \(/);
+});
+
 test("was gelesen wird, muss sich auch setzen lassen", () => {
   // „Darueber moechte ich sprechen“ wurde in den neuen Boegen GELESEN -
   // agendaV21 stellt markierte Fragen vor alle anderen, und die
