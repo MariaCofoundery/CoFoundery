@@ -40,7 +40,22 @@ const INSTRUMENT: Record<AssessmentScope, string> = {
   venture_alignment: VENTURE_ALIGNMENT_INSTRUMENT_ID,
 };
 
-async function draftFor(scope: AssessmentScope) {
+/**
+ * Der laufende Entwurf.
+ *
+ * ---------------------------------------------------------------------------
+ * DAS GEMEINTE VORHABEN WIRD DURCHGEREICHT, NICHT ERRATEN
+ * ---------------------------------------------------------------------------
+ *
+ * Vorher stand hier `resolveVenture(userId)` ohne die Wahl der Person. Wer in
+ * zwei Vorhaben ist, konnte den Fragebogen damit oeffnen - die Seite fragt ja,
+ * welches gemeint ist - und dann nichts speichern: `resolveVenture` gibt bei
+ * mehreren `null` zurueck, und der Aufruf warf `venture_ambiguous`.
+ *
+ * Gefunden am 29.09.2026. Es ist derselbe Fehler wie auf der
+ * Bestaetigungsseite: Die Wahl steht in der Adresse und kam nicht bis hierher.
+ */
+async function draftFor(scope: AssessmentScope, preferredVentureId?: string) {
   const supabase = await createClient();
   const { data: auth, error: authError } = await supabase.auth.getUser();
   if (authError || !auth?.user?.id) throw new Error("not_authenticated");
@@ -50,7 +65,7 @@ async function draftFor(scope: AssessmentScope) {
   // leer - die Datenbank weist es sonst ab.
   let ventureId: string | null = null;
   if (scope === "venture_alignment") {
-    const { venture } = await resolveVenture(userId);
+    const { venture } = await resolveVenture(userId, preferredVentureId);
     if (!venture) throw new Error("venture_ambiguous");
     ventureId = venture.id;
   }
@@ -89,6 +104,7 @@ async function draftFor(scope: AssessmentScope) {
 export async function saveAnswer(
   scope: AssessmentScope,
   answer: AlignmentAnswerV21,
+  ventureId?: string,
 ): Promise<Result> {
   const item = registryOf(scope).items.find((entry) => entry.itemId === answer.blockId);
   // Eine Frage aus dem ANDEREN Bogen wird abgewiesen, nicht stillschweigend
@@ -98,7 +114,7 @@ export async function saveAnswer(
   const verdict = validateAnswerV21(answer, answerableOf(item));
   if (!verdict.ok) return verdict;
 
-  const { supabase, assessment } = await draftFor(scope);
+  const { supabase, assessment } = await draftFor(scope, ventureId);
 
   const { error } = await supabase.from("alignment_answers").upsert(
     {
@@ -120,12 +136,13 @@ export async function saveAnswer(
 export async function clearAnswer(
   scope: AssessmentScope,
   itemId: string,
+  ventureId?: string,
 ): Promise<Result> {
   if (!registryOf(scope).items.some((entry) => entry.itemId === itemId)) {
     return { ok: false, reason: "unknown_block", detail: itemId };
   }
 
-  const { supabase, assessment } = await draftFor(scope);
+  const { supabase, assessment } = await draftFor(scope, ventureId);
   const { error } = await supabase
     .from("alignment_answers")
     .delete()
@@ -145,8 +162,9 @@ export async function clearAnswer(
  */
 export async function submitScope(
   scope: AssessmentScope,
+  ventureId?: string,
 ): Promise<Result & { missing?: string[] }> {
-  const { supabase, assessment } = await draftFor(scope);
+  const { supabase, assessment } = await draftFor(scope, ventureId);
 
   const { data: rows, error: readError } = await supabase
     .from("alignment_answers")

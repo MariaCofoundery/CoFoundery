@@ -120,6 +120,7 @@ export default async function VentureAlignmentPage({
       <div className="mt-10">
         <Questionnaire
           scope="venture_alignment"
+          ventureId={venture.id}
           sections={buildSections("venture_alignment")}
           answerable={answerable}
           initialAnswers={initialAnswers}

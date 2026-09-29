@@ -190,6 +190,32 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("die Pretest-Messung laeuft fuer die Bögen, die vorgelegt werden", () => {
+  // Sie hing an v2.1 fest. Die beiden Boegen, die jetzt tatsaechlich
+  // ausgefuellt werden, zeichneten nichts auf - die Auswertung in
+  // docs/pretest-auswertung.md haette null Zeilen geliefert, und gemerkt
+  // haette man es erst nach dem Pilot.
+  const fragebogen = readFileSync(
+    join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");
+
+  // Beide Haelften: was gesehen wurde und was beantwortet wurde. Nur eine
+  // davon ergaebe Dauer ohne Abbruchstelle oder umgekehrt.
+  assert.match(fragebogen, /noteItemSeen\(frisch, scope/);
+  assert.match(fragebogen, /noteItemAnswered\(itemId, scope/);
+
+  const aktionen = readFileSync(
+    join("src", "features", "instruments", "v21", "itemViewActions.ts"), "utf8");
+  assert.match(aktionen, /INSTRUMENT_OF\[scope\]/, "die Messung kennt nur v2.1");
+
+  // Und sie legt nichts an. resolveVenture wuerde ein Vorhaben erzeugen -
+  // eine Messung darf nichts entstehen lassen, was ohne sie nicht da waere.
+  // Ohne Kommentare geprueft: Die Datei ERKLAERT, warum sie es nicht tut.
+  const ohneKommentar = aktionen
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "");
+  assert.ok(!/resolveVenture/.test(ohneKommentar), "die Messung legt ein Vorhaben an");
+});
+
 test("in den Übersichtsbildern wird nichts zusammengerechnet", () => {
   // Entschieden am 29.09.2026: keine Zahlen im Report, sie sind irrefuehrend.
   // Die Gefahr ist nicht das Bild, sondern der naechste Schritt: Erst wird ein

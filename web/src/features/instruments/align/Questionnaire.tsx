@@ -1,17 +1,29 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/AnswerFieldV21";
 import type { SectionView } from "@/features/instruments/v21/questionnaireDataV21";
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import type { AnswerableItem } from "@/features/instruments/v21/answersV21";
 import { clearAnswer, saveAnswer, submitScope } from "@/features/instruments/align/answerActions";
+import {
+  noteItemAnswered,
+  noteItemSeen,
+} from "@/features/instruments/v21/itemViewActions";
 import type { AssessmentScope } from "@/features/instruments/align/registries";
 
 type SaveState = "idle" | "saving" | "saved" | "incomplete" | "error";
 
 type Props = {
   scope: AssessmentScope;
+  /**
+   * Zu welchem Vorhaben die Antworten gehören.
+   *
+   * Beim Arbeitsprofil `null`. Beim Venture-Bogen muss es MITKOMMEN: Wer in
+   * zwei Vorhaben ist, hat auf der Seite davor gewählt, und ohne diese Angabe
+   * würde die Serveraktion neu raten - und bei mehreren aufgeben.
+   */
+  ventureId?: string | null;
   sections: SectionView[];
   /** Was die Antwortprüfung je Frage braucht - ohne die ganze Registratur. */
   answerable: Record<string, AnswerableItem>;
@@ -38,7 +50,7 @@ type Props = {
  * sonst nichts. Keine Auswertung beim Ausfüllen, am Ende keine Zahl.
  */
 export function Questionnaire({
-  scope, sections, answerable, initialAnswers, submitted,
+  scope, ventureId = null, sections, answerable, initialAnswers, submitted,
 }: Props) {
   const [answers, setAnswers] = useState<Record<string, DraftV21>>(initialAnswers);
   const [states, setStates] = useState<Record<string, SaveState>>({});
@@ -70,6 +82,46 @@ export function Questionnaire({
     );
   }).length;
 
+  /**
+   * Die Messung für den Pretest - und sie darf das Ausfüllen nicht stören.
+   *
+   * ---------------------------------------------------------------------------
+   * SIE FEHLTE FÜR GENAU DIE BÖGEN, DIE VORGELEGT WERDEN
+   * ---------------------------------------------------------------------------
+   *
+   * Aufgezeichnet wurde bisher nur v2.1. Die fachliche Durchsicht verlangt für
+   * den Pilot Ausfülldauer, Auslassungsgründe und Abbruchstellen - „das darf
+   * nicht durch bloßes Bauchgefühl entschieden werden“ steht dort wörtlich.
+   * Ohne diese Zeilen hätte die Auswertung nach dem Pilot null Zeilen
+   * geliefert, und gemerkt hätte man es erst danach.
+   *
+   * Kein await im Klickpfad, kein Blockieren, keine Fehlermeldung: Eine
+   * Messung, die den gemessenen Vorgang behindert, misst am Ende sich selbst.
+   */
+  const gesehen = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const frisch = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => entry.target.getAttribute("data-item-id"))
+          .filter(
+            (itemId): itemId is string => Boolean(itemId) && !gesehen.current.has(itemId!),
+          );
+        if (frisch.length === 0) return;
+        for (const itemId of frisch) gesehen.current.add(itemId);
+        void noteItemSeen(frisch, scope, ventureId ?? undefined).catch(() => {});
+      },
+      // Halb sichtbar reicht: Wer eine Frage nur beim Scrollen streift, hat sie
+      // nicht gelesen - wer sie zur Haelfte vor sich hat, schon.
+      { threshold: 0.5 },
+    );
+
+    for (const node of document.querySelectorAll("[data-item-id]")) observer.observe(node);
+    return () => observer.disconnect();
+  }, [scope, ventureId, sections]);
+
   const persist = useCallback(
     (itemId: string, draft: DraftV21) => {
       clearTimeout(timers.current[itemId]);
@@ -89,16 +141,23 @@ export function Questionnaire({
         try {
           const result =
             stand === "empty"
-              ? await clearAnswer(scope, itemId)
-              : await saveAnswer(scope, {
-                  blockId: itemId,
-                  ...(draft.missingCode
-                    ? { missingCode: draft.missingCode }
-                    : { value: draft.value }),
-                } as AlignmentAnswerV21);
+              ? await clearAnswer(scope, itemId, ventureId ?? undefined)
+              : await saveAnswer(
+                  scope,
+                  {
+                    blockId: itemId,
+                    ...(draft.missingCode
+                      ? { missingCode: draft.missingCode }
+                      : { value: draft.value }),
+                  } as AlignmentAnswerV21,
+                  ventureId ?? undefined,
+                );
 
           setStates((current) => ({ ...current, [itemId]: result.ok ? "saved" : "error" }));
           setErrors((current) => ({ ...current, [itemId]: result.ok ? "" : result.reason }));
+          if (result.ok && stand === "complete") {
+            void noteItemAnswered(itemId, scope, ventureId ?? undefined).catch(() => {});
+          }
         } catch {
           // Wirft die Serveraktion, blieb die Anzeige sonst fuer immer auf
           // "wird gespeichert". Das sieht aus wie Speichern und ist keines.
@@ -107,7 +166,7 @@ export function Questionnaire({
         }
       }, 600);
     },
-    [scope, answerable],
+    [scope, ventureId, answerable],
   );
 
   return (
@@ -206,7 +265,7 @@ export function Questionnaire({
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             onClick={async () => {
               setSubmitting(true);
-              const result = await submitScope(scope);
+              const result = await submitScope(scope, ventureId ?? undefined);
               setSubmitting(false);
               if (result.ok) {
                 setIsSubmitted(true);

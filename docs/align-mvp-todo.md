@@ -189,4 +189,4 @@ ausgerechnet auf der schützenden Seite. Migration 20261081120000.
 | Keine Ampel (§13.1) | `ComparisonViewV21`, bewusst Graustufen |
 | Vergleich nur bei gleicher Fassung (§8.1) | `assertComparableV21`, wirft |
 | KI-Regeln (§29/§30) | als Testmuster gegen erzeugte Karten |
-| Pretest-Messung (§10) | `alignment_item_views`, `docs/pretest-auswertung.md` |
+| Pretest-Messung (§10) | `alignment_item_views`, `docs/pretest-auswertung.md` — seit 29.09.2026 auch für die beiden neuen Bögen, vorher nur v2.1 |
