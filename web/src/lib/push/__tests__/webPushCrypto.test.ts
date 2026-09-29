@@ -251,3 +251,52 @@ test("ein unbrauchbarer VAPID-Schluessel faellt beim Bauen auf", () => {
     /bad_vapid_public_key/
   );
 });
+
+test("ein gueltiger Schluessel mit fuehrendem Nullbyte wird angenommen", () => {
+  // DER FALL, DEN DER ZUFALLSSCHLUESSEL OBEN NUR GELEGENTLICH TRIFFT.
+  //
+  // Der private Schluessel ist eine Zahl; Node gibt sie in Minimallaenge
+  // heraus. Beginnt sie mit einem Nullbyte, sind es 31 Byte statt 32 - bei
+  // etwa jedem 256. Schluessel. Genau so einer hat den Lauf am 29.09.2026 rot
+  // gemacht, und in Production waere daraus ein sporadisches
+  // "bad_vapid_private_key" geworden, an das niemand ein fehlendes Nullbyte
+  // geknuepft haette.
+  //
+  // Hier wird so lange erzeugt, bis der Fall eintritt - und nicht gehofft.
+  let short: ReturnType<typeof createECDH> | null = null;
+  for (let attempt = 0; attempt < 5000 && !short; attempt += 1) {
+    const candidate = createECDH("prime256v1");
+    candidate.generateKeys();
+    if (candidate.getPrivateKey().length < 32) short = candidate;
+  }
+  if (!short) {
+    // Nie eingetreten: Dann prueft dieser Test nichts - und sagt es.
+    assert.fail("in 5000 Versuchen kein Schluessel mit fuehrendem Nullbyte");
+  }
+
+  const keys = {
+    publicKey: bufferToBase64Url(short.getPublicKey()),
+    privateKey: bufferToBase64Url(short.getPrivateKey()),
+    subject: "mailto:hallo@cofoundery.de",
+  };
+  const { token } = buildVapidAuthorization(
+    "https://web.push.apple.com/abc123", keys, 1_700_000_000);
+  assert.equal(token.split(".").length, 3);
+});
+
+test("ein zu langer Schluessel bleibt ein Fehler", () => {
+  // Auffuellen ja, alles durchlassen nein: 33 Byte sind kein P-256-Schluessel.
+  assert.throws(
+    () =>
+      buildVapidAuthorization(
+        "https://web.push.apple.com/abc123",
+        {
+          publicKey: bufferToBase64Url(Buffer.alloc(65, 4)),
+          privateKey: bufferToBase64Url(Buffer.alloc(33, 7)),
+          subject: "mailto:hallo@cofoundery.de",
+        },
+        1_700_000_000,
+      ),
+    /bad_vapid_private_key/,
+  );
+});

@@ -161,7 +161,31 @@ export function buildVapidAuthorization(
   const publicKey = base64UrlToBuffer(keys.publicKey);
   const privateKey = base64UrlToBuffer(keys.privateKey);
   if (publicKey.length !== AS_PUBLIC_LENGTH) throw new Error("bad_vapid_public_key");
-  if (privateKey.length !== 32) throw new Error("bad_vapid_private_key");
+
+  /**
+   * EIN GUELTIGER SCHLUESSEL KANN KUERZER ALS 32 BYTE SEIN.
+   *
+   * Der private Schluessel ist eine Zahl. Node gibt sie in Minimallaenge
+   * heraus: Beginnt sie mit einem Nullbyte, sind es 31 Byte statt 32 - bei
+   * etwa jedem 256. Schluessel. `npx web-push generate-vapid-keys` kodiert
+   * genau diese Zahl.
+   *
+   * Vorher wurde so ein Schluessel abgewiesen. Der Fehler waere in Production
+   * aufgetreten, sporadisch, mit der Meldung "bad_vapid_private_key" - und
+   * niemand haette an ein fehlendes Nullbyte gedacht. Gefunden hat ihn ein
+   * Test, der bei jedem Lauf einen neuen Schluessel erzeugt und deshalb
+   * irgendwann den Fall traf.
+   *
+   * Deshalb links auffuellen statt ablehnen. Zu LANG bleibt ein Fehler: Das
+   * waere kein P-256-Schluessel.
+   */
+  if (privateKey.length === 0 || privateKey.length > 32) {
+    throw new Error("bad_vapid_private_key");
+  }
+  const scalar =
+    privateKey.length === 32
+      ? privateKey
+      : Buffer.concat([Buffer.alloc(32 - privateKey.length), privateKey]);
 
   const header = { typ: "JWT", alg: "ES256" };
   const body = {
@@ -182,7 +206,8 @@ export function buildVapidAuthorization(
     key: {
       kty: "EC",
       crv: "P-256",
-      d: privateKey.toString("base64url"),
+      // Aufgefuellt: Das JWK-Feld d verlangt die volle Laenge.
+      d: scalar.toString("base64url"),
       x: publicKey.subarray(1, 33).toString("base64url"),
       y: publicKey.subarray(33, 65).toString("base64url"),
     },
