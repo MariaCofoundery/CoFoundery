@@ -124,3 +124,54 @@ markierte könnte belanglos sein.
 
 Wenn du magst, baue ich die erste Abfrage als Seite im Produkt — dann musst du
 nicht in die Supabase-Konsole. Aber erst nach der Einwilligung, nicht davor.
+
+---
+
+## Nachtrag 29.09.2026: Liegen in v2 und v2.1 überhaupt Antworten?
+
+**Wozu:** `/founder-alignment/pilot/*`, die Registratur v2.1 und
+`dashboardVersionData.ts` stehen nur noch für Menschen da, die v2.1 ausgefüllt
+haben. Ob sie weg können, hängt daran, ob es solche Menschen gibt — und das
+sehe ich von hier aus nicht, weil die Produktionsdatenbank nicht erreichbar
+ist. Lokal ist die Frage sinnlos: Dort liegt nur die Testwelt.
+
+Im SQL-Editor der Konsole, gegen **Produktion**:
+
+```sql
+select
+  assessment.instrument_id,
+  count(distinct assessment.user_id)                as menschen,
+  count(distinct assessment.id)                     as fragebogen,
+  count(*) filter (where assessment.submitted_at is not null) as abgegeben,
+  count(answer.*)                                   as antworten,
+  max(answer.answered_at)                           as zuletzt
+from public.assessments assessment
+left join public.alignment_answers answer
+  on answer.assessment_id = assessment.id
+where assessment.instrument_id in ('founder-alignment-v2', 'founder-alignment-v2-1')
+group by 1
+order by 1;
+```
+
+**Wie das Ergebnis zu lesen ist:**
+
+| Ergebnis | Was es heißt |
+|---|---|
+| keine Zeilen | Niemand hat v2 oder v2.1 je angefasst — beides kann ersatzlos weg, samt Seiten, Registratur und Umstiegslogik. |
+| Zeilen mit `antworten = 0` | Jemand hat den Fragebogen geöffnet und nichts eingetragen. Der leere Entwurf darf verschwinden; die Seiten auch. |
+| Zeilen mit Antworten | Es gibt Menschen, die etwas geschrieben haben. Dann bleiben die Leseseiten (`/pilot/report`, der Vergleich), und nur der **Schreibweg** kann weg. |
+
+Die Umstiegsentscheidungen stehen separat — auch eine Entscheidung ohne
+Antworten ist eine Auskunft, die jemand gegeben hat:
+
+```sql
+select decision, count(*), max(created_at)
+from public.instrument_transitions
+where to_instrument_id = 'founder-alignment-v2-1'
+group by 1;
+```
+
+**Nicht löschen, ohne das gesehen zu haben.** `assessments.instrument_id` hat
+`on delete restrict` auf `instruments` — die Datenbank würde das Löschen einer
+Fassung mit Antworten ohnehin verweigern. Bei den Seiten im Code gibt es diese
+Bremse nicht.
