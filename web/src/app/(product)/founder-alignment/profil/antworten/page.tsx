@@ -2,6 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getScopeReport } from "@/features/instruments/align/reportData";
+import { getShareState } from "@/features/instruments/align/shareData";
+import { ShareForm } from "@/features/instruments/align/ShareForm";
+import { getItemsV22 } from "@/features/instruments/align/registries";
 import { FOUNDER_PROFILE } from "@/features/instruments/align/registries";
 import { getRequestUser } from "@/lib/supabase/server";
 
@@ -19,6 +22,7 @@ export default async function ProfileAnswersPage() {
   }
 
   const report = await getScopeReport(auth.user.id, "founder_profile");
+  const teilen = await getShareState(auth.user.id, "founder_profile", null);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -49,6 +53,22 @@ export default async function ProfileAnswersPage() {
             )}
           </p>
           <ReportViewV21 sections={report.sections} />
+
+          {/* UNTER den Antworten: Wer bis hierher scrollt, hat gesehen, was er
+              teilt. */}
+          <div className="mt-10">
+            <ShareForm
+              scope="founder_profile"
+              ventureId={null}
+              label="Dein Arbeitsprofil"
+              recipients={teilen.recipients}
+              hiddenByRecipient={teilen.hiddenByRecipient}
+              items={getItemsV22("founder_profile").map((item) => ({
+                itemId: item.itemId,
+                prompt: item.prompt,
+              }))}
+            />
+          </div>
         </div>
       )}
     </main>
