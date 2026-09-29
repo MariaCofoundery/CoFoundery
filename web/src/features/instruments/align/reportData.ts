@@ -1,7 +1,7 @@
 import "server-only";
 
 import {
-  getItemsV22,
+  offeredItemsV22,
   registryOf,
   type AssessmentScope,
 } from "@/features/instruments/align/registries";
@@ -97,7 +97,7 @@ export async function getScopeReport(
     }),
     submittedAt: (assessment.submitted_at as string | null) ?? null,
     answered: rows.length,
-    of: getItemsV22(scope).length,
+    of: offeredItemsV22(scope).length,
     marked: rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
     orphans: orphanedFollowUps(answers, followUpPairs(scope)),
   };

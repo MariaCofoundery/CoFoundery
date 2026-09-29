@@ -52,15 +52,21 @@ export function buildSections(
   scope: AssessmentScope,
   partnerName?: string | null,
 ): SectionView[] {
-  return getSectionsV22(scope).map(({ section, items }) => ({
-    section,
-    items: items.map((item) => toView(item, partnerName)),
-  }));
+  return getSectionsV22(scope)
+    .map(({ section, items }) => ({
+      section,
+      // AUSSER DEN ZURUECKGEZOGENEN. Sie bleiben in der Registratur, damit
+      // gespeicherte Antworten lesbar bleiben - vorgelegt werden sie nicht
+      // mehr.
+      items: items.filter((item) => !item.retired).map((item) => toView(item, partnerName)),
+    }))
+    .filter((group) => group.items.length > 0);
 }
 
 function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
   return {
     itemId: item.itemId,
+    groupPrompt: item.groupPrompt ?? null,
     prompt: withPartner(item.prompt, partnerName),
     hint: item.hint,
     // Die Formate von v2.2 sind eine Teilmenge derer von v2.1 - das Feld kennt
@@ -104,6 +110,7 @@ export function answerableOf(item: RegistryItemV22): AnswerableItem {
     missing: item.missing,
     concerns: item.concerns,
     ratingOptions: item.ratingOptions,
+    maxChoices: item.maxChoices,
   };
 }
 

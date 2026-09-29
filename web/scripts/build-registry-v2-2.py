@@ -235,7 +235,12 @@ ORDINAL = {
 # Ausdruecklich nominal - teils, weil die Quelle es sagt, teils, weil es
 # Handlungs- oder Regelwahlen sind.
 NOMINAL = {"K01", "K03", "K04", "T01", "T02", "D01", "G01", "S02", "S03", "R09", "R12"}
-MULTI = {"S01", "S06", "G04", "G05", "B05", "R06", "L03"}
+MULTI = {"S01", "S06", "G04", "G05", "B05", "R06", "L03", "S01_top"}
+
+# Die sechs Wichtigkeiten aus dem Sprachreview: geordnete Stufen, je Ziel eine.
+# Sie werden NIE zu einem Wert verrechnet - sie sind nebeneinander wichtig,
+# nicht gegeneinander.
+ORDINAL |= {"S01a", "S01b", "S01c", "S01d", "S01e", "S01f"}
 
 # Formate ausserhalb von Auswahl
 SONDERFORMAT = {
@@ -406,6 +411,35 @@ ausgabe = []
 # Die Oberflaeche saehe halb ueberarbeitet aus, und niemand wuesste, welche
 # Haelfte welche ist.
 
+def s01_neu():
+    """
+    S01 als sechs Wichtigkeiten - aus Abschnitt 2 des Sprachreviews.
+
+    -----------------------------------------------------------------------
+    WARUM S01 NICHT UMFORMULIERT, SONDERN ERSETZT WIRD
+    -----------------------------------------------------------------------
+
+    Die alte S01 war eine Mehrfachauswahl. Eine NICHT getroffene Wahl laesst
+    drei Dinge offen: Das Ziel ist unwichtig, es ist wichtig aber nicht das
+    wichtigste, oder es fiel nur einem noch wichtigeren zum Opfer. Fuer ein
+    Bild ueber die Richtung eines Vorhabens ist das zu grob - und aus einer
+    Mehrfachauswahl eine Abstufung zu RECHNEN waere eine erfundene.
+    """
+    text = io.open(REVIEW, encoding="utf-8").read()
+    teil = text[text.index("# 2. Entscheidung zu S01"):text.index("# 3. Globale Entscheidung")]
+
+    gemeinsam = _zitate(teil[teil.index("### Gemeinsame Frage"):teil.index("### S01a")])[0]
+    skala = _nummern_nach(teil, "Antwortskala für alle sechs Items:")
+    top_frage = _zitate(teil[teil.index("## 2.3"):])[0]
+
+    ziele = []
+    for kennung in ["S01a", "S01b", "S01c", "S01d", "S01e", "S01f"]:
+        block = teil[teil.index(f"### {kennung}"):]
+        ziele.append((kennung, _zitate(block)[0]))
+
+    return gemeinsam, skala, top_frage, ziele
+
+
 REVIEW_ITEMS = sprachreview()
 
 _unbekannt = sorted(k for k in REVIEW_ITEMS if k not in items and not k.startswith("S01"))
@@ -460,6 +494,54 @@ for item_id, review in REVIEW_ITEMS.items():
             for i, code in enumerate(review["missing"])
         ]
 
+# ---------------------------------------------------------------------------
+# S01: die alte Frage bleibt stehen, die neuen treten daneben
+# ---------------------------------------------------------------------------
+#
+# DIE ALTE WIRD NICHT GELOESCHT. An ihr koennen Antworten haengen, und eine
+# Kennung zu streichen, auf die gespeicherte Zeilen zeigen, macht sie
+# unlesbar. Sie wird nur nicht mehr vorgelegt: `retired` heisst "im Bericht
+# ja, im Fragebogen nein".
+#
+# Umrechnen waere die dritte Moeglichkeit und die schlechteste: Aus "genannt
+# oder nicht" eine Stufe zwischen eins und fuenf zu machen, hiesse sich eine
+# Wichtigkeit auszudenken, die niemand angegeben hat.
+
+_gemeinsam, _skala, _top_frage, _ziele = s01_neu()
+
+items["S01"]["retired"] = True
+
+_s01_neu = []
+for kennung, ziel in _ziele:
+    _s01_neu.append((kennung, collections.OrderedDict([
+        ("itemId", kennung),
+        ("section", items["S01"]["section"]),
+        ("groupPrompt", _gemeinsam),
+        ("prompt", ziel),
+        ("hint", None),
+        ("options", list(_skala)),
+        ("missing", [{"code": "not_decided", "label": MISSING_LABEL["not_decided"]}]),
+        ("note", "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander."),
+        ("concerns", None), ("paths", None), ("followUp", None),
+    ])))
+
+_s01_neu.append(("S01_top", collections.OrderedDict([
+    ("itemId", "S01_top"),
+    ("section", items["S01"]["section"]),
+    ("groupPrompt", None),
+    ("prompt", _top_frage),
+    ("hint", None),
+    ("options", [ziel for _, ziel in _ziele]),
+    ("missing", [{"code": "not_decided", "label": MISSING_LABEL["not_decided"]}]),
+    ("note", "Welche ein oder zwei Ziele aktuell vorgehen. Die Zahl der Haken ist keine Auskunft - hoechstens zwei sind erlaubt, weniger ist kein Mangel."),
+    ("maxChoices", 2),
+    ("concerns", None), ("paths", None), ("followUp", None),
+])))
+
+for kennung, eintrag in _s01_neu:
+    items[kennung] = eintrag
+    reihenfolge.insert(reihenfolge.index("S01") + len([k for k, _ in _s01_neu[:_s01_neu.index((kennung, eintrag))]]) + 1, kennung)
+
 for n, item_id in enumerate(reihenfolge, start=1):
     it = items[item_id]
     fmt = format_von(item_id)
@@ -485,6 +567,12 @@ for n, item_id in enumerate(reihenfolge, start=1):
         ("missing", it["missing"] or [dict(STANDARD_MISSING)]),
         ("note", it["note"] or ""),
     ])
+    if it.get("groupPrompt"):
+        eintrag["groupPrompt"] = it["groupPrompt"]
+    if it.get("maxChoices"):
+        eintrag["maxChoices"] = it["maxChoices"]
+    if it.get("retired"):
+        eintrag["retired"] = True
     if it["concerns"]:
         eintrag["concerns"] = it["concerns"]
         eintrag["paths"] = it["paths"]
@@ -526,6 +614,12 @@ for scope, meta in SCOPES.items():
                 ("what", "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1."),
                 ("source", REVIEW),
                 ("reason", "Die Master-Fassung sagt, WAS gefragt wird; das Review sagt, WIE es dasteht - Kleinschreibung von 'du', Bedingungssaetze als eigene Saetze, echte Fragesaetze bei W02 bis W06. Anzahl und Reihenfolge der Antworten bleiben, sonst zeigten gespeicherte Antworten auf etwas anderes."),
+                ("decidedBy", "Maria, 29.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "S01 ist zurueckgezogen und durch S01a bis S01f plus S01_top ersetzt."),
+                ("source", REVIEW + ", Abschnitt 2"),
+                ("reason", "Die alte S01 war eine Mehrfachauswahl. Eine NICHT getroffene Wahl laesst drei Dinge offen: unwichtig, wichtig aber nicht das wichtigste, oder nur einem noch wichtigeren zum Opfer gefallen. Fuer ein Bild ueber die Richtung eines Vorhabens ist das zu grob - und aus einer Mehrfachauswahl eine Abstufung zu RECHNEN waere eine erfundene. Die alte Frage bleibt in der Registratur, damit gespeicherte Antworten lesbar bleiben, wird aber nicht mehr vorgelegt und nicht umgerechnet."),
                 ("decidedBy", "Maria, 29.09.2026"),
             ]),
             collections.OrderedDict([

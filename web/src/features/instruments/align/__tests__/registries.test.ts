@@ -71,21 +71,21 @@ const review = readFileSync(
 ).replace(/\s+/g, " ");
 
 /**
- * S01 wird nicht umformuliert, sondern ersetzt.
+ * Zurückgezogene Fragen werden nicht mehr überarbeitet.
  *
- * Das Sprachreview sagt zu S01 nur „siehe Abschnitt 2“ und baut die Frage dort
- * als sechs Wichtigkeiten neu auf (S01a bis S01f plus S01_top). Solange das
- * nicht gebaut ist, steht die alte Mehrfachauswahl noch da - mit dem Wortlaut
- * der Master-Fassung und ohne Eintrag im Review.
+ * Die alte S01 steht noch in der Registratur, damit gespeicherte Antworten
+ * lesbar bleiben - im Sprachreview hat sie keinen Wortlaut mehr, weil sie
+ * niemandem mehr vorgelegt wird. Einen Wortlaut von ihr zu verlangen hiesse,
+ * eine Frage zu pflegen, die es nicht mehr gibt.
  *
- * Die Ausnahme steht hier NAMENTLICH und nicht als weiche Regel: Sobald S01
- * ersetzt ist, faellt sie auf, weil die Kennung dann nicht mehr existiert.
+ * Die Liste ist leer und bleibt es hoffentlich: Sie ist da, damit eine
+ * Ausnahme benannt werden MUSS, statt sich als weiche Regel einzuschleichen.
  */
-const NOCH_NICHT_UEBERARBEITET = new Set(["S01"]);
+const NOCH_NICHT_UEBERARBEITET = new Set<string>([]);
 
 test("jeder Fragetext steht so im Sprachreview", () => {
   for (const item of alleItems()) {
-    if (NOCH_NICHT_UEBERARBEITET.has(item.itemId)) continue;
+    if (NOCH_NICHT_UEBERARBEITET.has(item.itemId) || item.retired) continue;
     if (review.includes(item.prompt)) continue;
 
     // W02 bis W06 stehen im Dokument als zwei Bloecke: erst die Lage, dann die
@@ -107,6 +107,10 @@ test("jede Frage gibt es auch in der fachlichen Quelle", () => {
   // Grundlage - und die braeuchte eine eigene Kennung und eine eigene
   // Begruendung.
   for (const item of alleItems()) {
+    // S01a bis S01f und S01_top gibt es in der Master-Fassung nicht - sie
+    // entstehen erst im Sprachreview, das S01 ausdruecklich ERSETZT statt
+    // umzuformulieren. Die Begruendung steht in den Abweichungen.
+    if (/^S01[a-f]$|^S01_/.test(item.itemId)) continue;
     assert.ok(
       new RegExp(`\\*\\*${item.itemId}\\*\\*`).test(flach),
       `${item.itemId} steht in keiner Master-Fassung`,
@@ -152,10 +156,32 @@ test("die Registratur erfindet keine Fragen", () => {
     [...quelle.matchAll(/^\*\*([A-Z][0-9]{2})\*\*/gm)].map((match) => match[1]),
   );
   assert.ok(inQuelle.size >= 50, `zu wenige Items in der Quelle gefunden: ${inQuelle.size}`);
+
+  // Die sieben S01-Nachfolger stehen im Sprachreview, nicht in der
+  // Master-Fassung: Dort wird S01 ERSETZT statt umformuliert, und die
+  // Begruendung steht in den Abweichungen. Sie werden deshalb hier
+  // ausdruecklich benannt und nicht ueber ein Muster durchgewinkt - kaeme ein
+  // achter dazu, faellt er auf.
+  const AUS_DEM_SPRACHREVIEW = new Set([
+    "S01a", "S01b", "S01c", "S01d", "S01e", "S01f", "S01_top",
+  ]);
+
   for (const item of alleItems()) {
+    if (AUS_DEM_SPRACHREVIEW.has(item.itemId)) {
+      assert.ok(
+        review.includes(item.itemId),
+        `${item.itemId} steht in keiner der beiden Quellen`,
+      );
+      continue;
+    }
     assert.ok(inQuelle.has(item.itemId), `${item.itemId} steht nicht in der Quelle`);
   }
-  assert.equal(alleItems().length, inQuelle.size, "es fehlen Fragen aus der Quelle");
+
+  assert.equal(
+    alleItems().length,
+    inQuelle.size + AUS_DEM_SPRACHREVIEW.size,
+    "es fehlen Fragen aus einer der beiden Quellen",
+  );
 });
 
 test("weder Gesamtwert noch Dimensionswerte - in beiden Bögen", () => {

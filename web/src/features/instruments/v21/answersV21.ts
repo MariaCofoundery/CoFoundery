@@ -99,6 +99,14 @@ export type AnswerableItem = {
   missing: { code: MissingCode; label: string }[];
   concerns?: string[];
   ratingOptions?: string[];
+  /**
+   * Höchstens so viele Haken bei `multi_choice`.
+   *
+   * Eine Obergrenze und keine Vorgabe: Weniger ist kein Mangel. Sie steht
+   * hier, weil die Prüfung sie kennen muss — eine Grenze, die nur die
+   * Oberfläche durchsetzt, ist keine.
+   */
+  maxChoices?: number;
   followup?: {
     options?: { optionId: string; label: string; exclusive: boolean }[];
     multiple?: boolean;
@@ -156,6 +164,14 @@ export function validateAnswerV21(
       if (new Set(chosen).size !== chosen.length) return no("duplicate_option", answer.blockId);
       for (const id of chosen) {
         if (!optionIds.has(id)) return no("unknown_option", `${answer.blockId}: ${id}`);
+      }
+
+      // EINE OBERGRENZE UND KEINE VORGABE. S01_top laesst hoechstens zwei
+      // Ziele zu; eines ist genauso gueltig. Die Grenze steht hier und nicht
+      // nur im Eingabefeld - eine Grenze, die nur die Oberflaeche durchsetzt,
+      // ist keine.
+      if (item.maxChoices !== undefined && chosen.length > item.maxChoices) {
+        return no("too_many_options", `${answer.blockId}: ${chosen.length} > ${item.maxChoices}`);
       }
 
       const exclusive = exclusiveOptionOf(item);

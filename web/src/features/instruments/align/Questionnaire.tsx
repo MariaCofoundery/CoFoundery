@@ -208,9 +208,17 @@ export function Questionnaire({
           <section key={section.section} className="space-y-6">
             <h2 className="text-lg font-semibold text-slate-900">{section.section}</h2>
 
-            {shown.map((item) => {
+            {shown.map((item, index) => {
               const draft = answers[item.itemId] ?? {};
               const state = states[item.itemId] ?? "idle";
+              // EINMAL UEBER DER GRUPPE, NICHT SECHSMAL. S01a bis S01f fragen
+              // dasselbe ueber je ein anderes Ziel; die Frage sechsmal zu
+              // wiederholen waere Laerm, sie wegzulassen liesse sechs Saetze
+              // ohne Frage stehen.
+              const gruppenfrage =
+                item.groupPrompt && item.groupPrompt !== shown[index - 1]?.groupPrompt
+                  ? item.groupPrompt
+                  : null;
               return (
                 <div
                   key={item.itemId}
@@ -222,6 +230,11 @@ export function Questionnaire({
                       : "border-slate-200 bg-white",
                   ].join(" ")}
                 >
+                  {gruppenfrage && (
+                    <p className="mb-3 border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
+                      {gruppenfrage}
+                    </p>
+                  )}
                   <p className="text-base text-slate-900">{item.prompt}</p>
                   {item.hint && <p className="mt-1 text-sm text-slate-500">{item.hint}</p>}
 
@@ -296,6 +309,8 @@ function errorText(reason?: string): string {
       return "Bitte beschreibe kurz, was du meinst.";
     case "exclusive_option_with_others":
       return "Diese Antwort schließt die anderen aus.";
+    case "too_many_options":
+      return "Bitte höchstens zwei auswählen.";
     case "missing_currency":
       return "Bitte wähle eine Währung.";
     case "missing_unit":

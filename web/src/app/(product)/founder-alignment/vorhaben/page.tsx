@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { VentureHeader } from "@/features/instruments/align/VentureHeader";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
-import { getItemsV22, VENTURE_ALIGNMENT } from "@/features/instruments/align/registries";
+import { getItemsV22, offeredItemsV22, VENTURE_ALIGNMENT } from "@/features/instruments/align/registries";
 import { resolveVenture, solePartnerName } from "@/features/instruments/align/ventureResolution";
 import { needsConfirmation } from "@/features/instruments/align/needsConfirmation";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -116,7 +116,7 @@ export default async function VentureAlignmentPage({
         Was dir bei diesem Vorhaben wichtig ist
       </h1>
       <p className="mt-4 text-slate-700">
-        {getItemsV22("venture_alignment").length} Fragen zu Zielen, Zusagen, Regeln und
+        {offeredItemsV22("venture_alignment").length} Fragen zu Zielen, Zusagen, Regeln und
         Grenzen. Sie gelten für dieses eine Vorhaben.
       </p>
       <p className="mt-2 text-sm text-slate-500">{VENTURE_ALIGNMENT.validity}</p>

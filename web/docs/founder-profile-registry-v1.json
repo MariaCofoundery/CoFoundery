@@ -24,6 +24,12 @@
       "decidedBy": "Maria, 29.09.2026"
     },
     {
+      "what": "S01 ist zurueckgezogen und durch S01a bis S01f plus S01_top ersetzt.",
+      "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 2",
+      "reason": "Die alte S01 war eine Mehrfachauswahl. Eine NICHT getroffene Wahl laesst drei Dinge offen: unwichtig, wichtig aber nicht das wichtigste, oder nur einem noch wichtigeren zum Opfer gefallen. Fuer ein Bild ueber die Richtung eines Vorhabens ist das zu grob - und aus einer Mehrfachauswahl eine Abstufung zu RECHNEN waere eine erfundene. Die alte Frage bleibt in der Registratur, damit gespeicherte Antworten lesbar bleiben, wird aber nicht mehr vorgelegt und nicht umgerechnet.",
+      "decidedBy": "Maria, 29.09.2026"
+    },
+    {
       "what": "Auslassungsgruende heissen not_decided, not_clarified und prefer_not_to_say.",
       "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 3",
       "reason": "Bisher hiessen sie undecided und withheld, und 'haben wir noch nicht geklaert' war kein eigener Code, sondern ein Sonderfall von undecided. Zwei Vokabulare nebeneinander waeren eine zweite Wahrheit; 'technical' bleibt zusaetzlich, weil ein technischer Fehlschlag keine Auskunft der Person ist.",

@@ -27,6 +27,13 @@ export type OptionView = {
 
 export type ItemView = {
   itemId: string;
+  /**
+   * Eine Frage über mehreren Items.
+   *
+   * S01a bis S01f fragen sechsmal dasselbe über je ein anderes Ziel. Die
+   * Oberfläche zeigt sie einmal, wenn sie sich ändert.
+   */
+  groupPrompt?: string | null;
   prompt: string;
   hint: string | null;
   answerFormat: AnswerFormatV21;

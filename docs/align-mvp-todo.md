@@ -42,11 +42,23 @@ aber nicht automatisch als psychologische Messwerte ausgegeben werden".
 Die beiden Dokumente widersprechen sich. Mein Vorschlag: Grafik ja, Zahl nein.
 Ein Balken ohne Beschriftung sagt dasselbe, ohne Genauigkeit zu behaupten.
 
-### ☐ 3. Die Fragen sprachlich überarbeiten
+### ☑ 3. Die Fragen sprachlich überarbeitet — Sprachreview v0.1
 
-Läuft bei Maria. Vorlage: **`docs/fragen-ueberarbeiten.md`** (52 Fragen, beide
-Bögen). Betrifft Formulierungen, nicht Struktur — Reihenfolge und Anzahl der
-Antworten bleiben, sonst zeigen gespeicherte Antworten ins Leere.
+Maria hat am 29.09.2026 geliefert:
+`docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md`.
+
+**Das Dokument ist die Quelle, nicht meine Abschrift.** Der Generator liest es
+und legt es über die Master-Arbeitsfassung — zwei Dokumente und nicht eines:
+Die Master-Fassung sagt, *was* gefragt wird, das Review, *wie* es dasteht.
+Zusammengeschrieben ließe sich später nicht mehr sagen, was gemessen werden
+soll und was wir daraus gemacht haben.
+
+Der Generator bricht ab, wenn eine Frage im Review fehlt, wenn er eine nennt,
+die es nicht gibt, wenn „Antworten unverändert" nicht stimmt, oder wenn eine
+Umformulierung die Anzahl der Antworten ändert.
+
+Mitgekommen: `du/dein` klein, Bedingungssätze als eigene Sätze, echte
+Fragesätze für W02–W06, und je Item der passende Auslassungsgrund.
 
 Die alte Vorlage `fragebogen-v2-1-ueberarbeitung.md` ist am 29.09.2026
 gelöscht worden: Sie enthielt die 36 Fragen von v2.1 in Wortlauten, die es
@@ -147,10 +159,20 @@ ersten Umformulierung falsch. `S – Ziele & strategische Richtung` hat bewusst
 kein Thema — der Katalog hat nichts für Ziele, und ein erfundener Link wäre
 schlimmer als keiner.
 
-### ☐ 8. S01 als sechs Wichtigkeiten
+### ☑ 8. S01 als sechs Wichtigkeiten — gebaut
 
-Voraussetzung für die Venture-Direction-Grafik. Ändert das Item — hängt
-deshalb an Entscheidung 1.
+`S01a`–`S01f` (je eine geordnete Wichtigkeit) plus `S01_top` (höchstens zwei
+Ziele). Die alte `S01` ist **zurückgezogen, nicht gelöscht**: `retired: true`
+heißt im Bericht ja, im Fragebogen nein. Eine Kennung zu streichen, auf die
+gespeicherte Antworten zeigen, macht sie unlesbar.
+
+**Nichts wird umgerechnet.** Aus „genannt oder nicht" eine Stufe zwischen eins
+und fünf zu machen hieße, sich eine Wichtigkeit auszudenken, die niemand
+angegeben hat.
+
+Die gemeinsame Frage steht einmal über den sechs Zielen — sechsmal wäre Lärm,
+keinmal ließe sechs Sätze ohne Frage stehen. Die Obergrenze von zwei bei
+`S01_top` prüft die Serverfunktion, nicht nur das Eingabefeld.
 
 ---
 

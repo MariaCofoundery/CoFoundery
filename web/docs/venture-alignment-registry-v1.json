@@ -24,6 +24,12 @@
       "decidedBy": "Maria, 29.09.2026"
     },
     {
+      "what": "S01 ist zurueckgezogen und durch S01a bis S01f plus S01_top ersetzt.",
+      "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 2",
+      "reason": "Die alte S01 war eine Mehrfachauswahl. Eine NICHT getroffene Wahl laesst drei Dinge offen: unwichtig, wichtig aber nicht das wichtigste, oder nur einem noch wichtigeren zum Opfer gefallen. Fuer ein Bild ueber die Richtung eines Vorhabens ist das zu grob - und aus einer Mehrfachauswahl eine Abstufung zu RECHNEN waere eine erfundene. Die alte Frage bleibt in der Registratur, damit gespeicherte Antworten lesbar bleiben, wird aber nicht mehr vorgelegt und nicht umgerechnet.",
+      "decidedBy": "Maria, 29.09.2026"
+    },
+    {
       "what": "Auslassungsgruende heissen not_decided, not_clarified und prefer_not_to_say.",
       "source": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md, Abschnitt 3",
       "reason": "Bisher hiessen sie undecided und withheld, und 'haben wir noch nicht geklaert' war kein eigener Code, sondern ein Sonderfall von undecided. Zwei Vokabulare nebeneinander waeren eine zweite Wahrheit; 'technical' bleibt zusaetzlich, weil ein technischer Fehlschlag keine Auskunft der Person ist.",
@@ -450,11 +456,354 @@
         }
       ],
       "note": "",
+      "retired": true,
       "followUpQuestion": "Welche ein oder zwei Ziele sind Dir aktuell am wichtigsten?"
     },
     {
-      "itemId": "S02",
+      "itemId": "S01a",
       "order": 9,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01a_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01a_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01a_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01a_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01a_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01b",
+      "order": 10,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01b_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01b_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01b_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01b_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01b_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01c",
+      "order": 11,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01c_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01c_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01c_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01c_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01c_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01d",
+      "order": 12,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01d_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01d_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01d_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01d_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01d_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01e",
+      "order": 13,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01e_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01e_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01e_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01e_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01e_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01f",
+      "order": 14,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Mehr unternehmerische und persönliche Unabhängigkeit erreichen.",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "S01f_o1",
+          "label": "gar nicht wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01f_o2",
+          "label": "eher wenig wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01f_o3",
+          "label": "mittel",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01f_o4",
+          "label": "ziemlich wichtig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01f_o5",
+          "label": "sehr wichtig",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
+      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?"
+    },
+    {
+      "itemId": "S01_top",
+      "order": 15,
+      "section": "S – Ziele & strategische Richtung",
+      "prompt": "Welche ein oder zwei dieser Ziele sind dir aktuell besonders wichtig?",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "S01_top_o1",
+          "label": "Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_top_o2",
+          "label": "Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_top_o3",
+          "label": "Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_top_o4",
+          "label": "Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_top_o5",
+          "label": "Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "S01_top_o6",
+          "label": "Mehr unternehmerische und persönliche Unabhängigkeit erreichen.",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Welche ein oder zwei Ziele aktuell vorgehen. Die Zahl der Haken ist keine Auskunft - hoechstens zwei sind erlaubt, weniger ist kein Mangel.",
+      "maxChoices": 2
+    },
+    {
+      "itemId": "S02",
+      "order": 16,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welche Vorstellung hast du aktuell für deine Unternehmensanteile in den nächsten drei Jahren?",
       "hint": null,
@@ -505,7 +854,7 @@
     },
     {
       "itemId": "S03",
-      "order": 10,
+      "order": 17,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Wie stehst du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?",
       "hint": null,
@@ -550,7 +899,7 @@
     },
     {
       "itemId": "S04",
-      "order": 11,
+      "order": 18,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welches konkrete Ergebnis sollte das Vorhaben aus deiner Sicht in den nächsten zwölf Monaten erreichen?",
       "hint": "Auch ein klares Lernergebnis kann ein Ziel sein – zum Beispiel eine Annahme zu prüfen oder bewusst zu entscheiden, einen Ansatz nicht weiterzuverfolgen.",
@@ -566,7 +915,7 @@
     },
     {
       "itemId": "S06",
-      "order": 12,
+      "order": 19,
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welche Rolle möchtest du in etwa drei Jahren selbst im Unternehmen haben?",
       "hint": null,
@@ -620,7 +969,7 @@
     },
     {
       "itemId": "R01",
-      "order": 13,
+      "order": 20,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?",
       "hint": null,
@@ -640,7 +989,7 @@
     },
     {
       "itemId": "R02",
-      "order": 14,
+      "order": 21,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen ungefähr von [Name]?",
       "hint": null,
@@ -656,7 +1005,7 @@
     },
     {
       "itemId": "R03",
-      "order": 15,
+      "order": 22,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Welche regelmäßigen Zeiten könntest du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?",
       "hint": "Private Gründe für nicht verfügbare Zeiten müssen nicht angegeben werden.",
@@ -672,7 +1021,7 @@
     },
     {
       "itemId": "R04",
-      "order": 16,
+      "order": 23,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Ab wann brauchst du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben, um deinen Lebensunterhalt zu decken?",
       "hint": null,
@@ -711,7 +1060,7 @@
     },
     {
       "itemId": "R05",
-      "order": 17,
+      "order": 24,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Welche monatliche Auszahlung brauchst du ab diesem Zeitpunkt ungefähr mindestens?",
       "hint": null,
@@ -728,7 +1077,7 @@
     },
     {
       "itemId": "R06",
-      "order": 18,
+      "order": 25,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Unter welchen Bedingungen könntest du dir vorstellen, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?",
       "hint": null,
@@ -787,7 +1136,7 @@
     },
     {
       "itemId": "R09",
-      "order": 19,
+      "order": 26,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für deine weitere Mitarbeit gelten?",
       "hint": null,
@@ -834,7 +1183,7 @@
     },
     {
       "itemId": "R10",
-      "order": 20,
+      "order": 27,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?",
       "hint": null,
@@ -881,7 +1230,7 @@
     },
     {
       "itemId": "R12",
-      "order": 21,
+      "order": 28,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Wann sollten diese Angaben spätestens wieder überprüft werden?",
       "hint": null,
@@ -910,7 +1259,7 @@
     },
     {
       "itemId": "G01",
-      "order": 22,
+      "order": 29,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Ihr seid euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich uneinig. Andere Bereiche sind nicht wesentlich betroffen. Welche Regel soll in so einem Fall gelten?",
       "hint": null,
@@ -957,7 +1306,7 @@
     },
     {
       "itemId": "G04",
-      "order": 23,
+      "order": 30,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Ihr findet bis zum vereinbarten Zeitpunkt keine Einigung über eine wichtige Entscheidung. Welche Lösungen sollten dann grundsätzlich möglich sein?",
       "hint": null,
@@ -1004,7 +1353,7 @@
     },
     {
       "itemId": "G05",
-      "order": 24,
+      "order": 31,
       "section": "G – Entscheidungs- und Teamregeln",
       "prompt": "Bei welchen Entscheidungen sollten aus deiner Sicht grundsätzlich alle Founder zustimmen?",
       "hint": null,
@@ -1057,7 +1406,7 @@
     },
     {
       "itemId": "B01",
-      "order": 25,
+      "order": 32,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Welchen zusätzlichen Betrag an eigenem Geld würdest du aktuell höchstens in das Vorhaben investieren, wenn du einkalkulierst, dass du ihn vollständig verlieren könntest?",
       "hint": null,
@@ -1077,7 +1426,7 @@
     },
     {
       "itemId": "B04",
-      "order": 26,
+      "order": 33,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Welche finanzielle Mindestreserve sollte bestehen bleiben, bevor ihr zusätzliches Geld in ein größeres Vorhaben steckt?",
       "hint": null,
@@ -1101,7 +1450,7 @@
     },
     {
       "itemId": "B05",
-      "order": 27,
+      "order": 34,
       "section": "B – konkrete Risikogrenzen & Absicherung",
       "prompt": "Ein Vorhaben würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Welche Absicherungen wären dir vorher wichtig?",
       "hint": null,
@@ -1154,7 +1503,7 @@
     },
     {
       "itemId": "W01",
-      "order": 28,
+      "order": 35,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr habt eine neue Finanzplanung erstellt, aber einige Zahlen sind noch unsicher. Es besteht aktuell keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wie würdest du mit der vorläufigen Planung umgehen?",
       "hint": null,
@@ -1186,7 +1535,7 @@
     },
     {
       "itemId": "W02",
-      "order": 29,
+      "order": 36,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Eine Person arbeitet schon lange mit euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung. Wie würdest du in dieser Situation eher vorgehen?",
       "hint": null,
@@ -1218,7 +1567,7 @@
     },
     {
       "itemId": "W03",
-      "order": 30,
+      "order": 37,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten. Wie würdest du zwischen den beiden Angeboten entscheiden?",
       "hint": null,
@@ -1250,7 +1599,7 @@
     },
     {
       "itemId": "W04",
-      "order": 31,
+      "order": 38,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben. Wie würdest du über das weitere Vorgehen entscheiden?",
       "hint": null,
@@ -1282,7 +1631,7 @@
     },
     {
       "itemId": "W05",
-      "order": 32,
+      "order": 39,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen. Wie würdest du das zusätzliche Budget eher einsetzen?",
       "hint": null,
@@ -1314,7 +1663,7 @@
     },
     {
       "itemId": "W06",
-      "order": 33,
+      "order": 40,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
       "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich. Wie würdest du den zusätzlichen Bonus eher verteilen?",
       "hint": null,
@@ -1346,7 +1695,7 @@
     },
     {
       "itemId": "L01",
-      "order": 34,
+      "order": 41,
       "section": "L – persönliche Grenzen",
       "prompt": "Gibt es Vorgehensweisen oder Entscheidungen, die für dich im Unternehmen grundsätzlich nicht infrage kommen?",
       "hint": null,
@@ -1366,7 +1715,7 @@
     },
     {
       "itemId": "L02",
-      "order": 35,
+      "order": 42,
       "section": "L – persönliche Grenzen",
       "prompt": "Woran würdest du in einer konkreten Situation erkennen, dass diese Grenze erreicht oder überschritten ist?",
       "hint": null,
@@ -1387,7 +1736,7 @@
     },
     {
       "itemId": "L03",
-      "order": 36,
+      "order": 43,
       "section": "L – persönliche Grenzen",
       "prompt": "Was sollte passieren, wenn ihr euch nicht einig seid, ob eine für dich wichtige Grenze in einer konkreten Situation betroffen ist?",
       "hint": null,

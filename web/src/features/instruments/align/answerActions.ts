@@ -176,6 +176,10 @@ export async function submitScope(
   const beantwortet = new Set((rows ?? []).map((row) => row.block_id));
   const missing = getItemsV22(scope)
     .filter((item) => {
+      // Zurueckgezogene Fragen werden nicht mehr vorgelegt - sie zu verlangen
+      // hiesse, eine Abgabe an einer Frage scheitern zu lassen, die niemand
+      // zu sehen bekommt.
+      if (item.retired) return false;
       // Anschlussfragen zaehlen nur, wenn ihre Voraussetzung beantwortet ist.
       // Sie zu verlangen hiesse, jemanden fuer eine zulaessige Antwort zu
       // bestrafen.

@@ -5,7 +5,7 @@ import { readableItems } from "@/features/instruments/align/questionnaireData";
 import { INSTRUMENT_OF } from "@/features/instruments/align/reportData";
 import { readAll, type ReadoutEntry } from "@/features/instruments/v21/readoutV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
-import { getItemsV22 } from "@/features/instruments/align/registries";
+import { offeredItemsV22 } from "@/features/instruments/align/registries";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -103,7 +103,7 @@ async function viewOf(
       items: readableItems(scope),
       sections: registryOf(scope).sections,
     }),
-    visible: { count: rows.length, of: getItemsV22(scope).length },
+    visible: { count: rows.length, of: offeredItemsV22(scope).length },
     ventureName,
   };
 }

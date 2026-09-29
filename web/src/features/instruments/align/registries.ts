@@ -99,6 +99,29 @@ export type RegistryItemV22 = {
   followUpQuestion?: string;
   /** Erscheint erst, wenn diese Frage beantwortet ist. */
   showAfter?: string;
+  /**
+   * Eine Frage, die über mehreren Items steht.
+   *
+   * S01a bis S01f fragen sechsmal dasselbe über je ein anderes Ziel. Die Frage
+   * sechsmal zu wiederholen wäre Lärm; sie wegzulassen ließe sechs Sätze ohne
+   * Frage stehen. Also steht sie einmal darüber, und die Oberfläche zeigt sie,
+   * wenn sie sich ändert.
+   */
+  groupPrompt?: string;
+  /**
+   * Höchstens so viele Haken.
+   *
+   * Nur bei `multi_choice`. Weniger ist ausdrücklich kein Mangel — die Zahl
+   * der Haken ist keine Auskunft, sondern eine Obergrenze.
+   */
+  maxChoices?: number;
+  /**
+   * Wird nicht mehr vorgelegt, bleibt aber lesbar.
+   *
+   * Eine Kennung zu streichen, auf die gespeicherte Antworten zeigen, macht
+   * sie unlesbar. `retired` heißt deshalb: im Bericht ja, im Fragebogen nein.
+   */
+  retired?: boolean;
 };
 
 /**
@@ -218,6 +241,18 @@ export const SCOPES = Object.keys(REGISTRIES) as AssessmentScope[];
 
 export function registryOf(scope: AssessmentScope): RegistryV22 {
   return REGISTRIES[scope];
+}
+
+/**
+ * Die Fragen, die jemandem noch vorgelegt werden.
+ *
+ * `getItemsV22` gibt ALLE zurück, auch zurückgezogene — sonst ließen sich
+ * gespeicherte Antworten darauf nicht mehr lesen. Wo gezählt wird („8 von 16
+ * beantwortet“), sind die zurückgezogenen aber nicht gemeint: Eine Frage, die
+ * niemand zu sehen bekommt, darf niemandem als offen angerechnet werden.
+ */
+export function offeredItemsV22(scope: AssessmentScope): RegistryItemV22[] {
+  return getItemsV22(scope).filter((item) => !item.retired);
 }
 
 export function getItemsV22(scope: AssessmentScope): RegistryItemV22[] {

@@ -1,6 +1,6 @@
 # CoFoundery Align — Fragen zum Überarbeiten
 
-_Erzeugt am 2026-09-29 aus den beiden aktuellen Bögen (52 Fragen)._
+_Erzeugt am 2026-09-29 aus den beiden aktuellen Bögen (59 Fragen)._
 
 ## Worum es geht
 
@@ -27,7 +27,7 @@ Was trotzdem noch auffällt, steht unten. Gesucht ist für jede Frage, die dir s
 
 1. **Großgeschriebenes „Du“ und „Dein“** — durchgehend, aus der Master-Fassung übernommen. Der Rest der Anwendung sagt „du“. Das ist eine Entscheidung, die einmal fällt und dann für alle 52 Fragen gilt; ich habe sie nicht selbst getroffen.
 2. **„Wenn …: Wie häufig …“** — ein Bedingungssatz im Vorspann, dann die Frage. Das ist präzise und zwingt zum Zweimallesen. Eine kurze Situation als eigener Satz davor liest sich leichter als ein Doppelpunkt mitten drin.
-3. **0 Fragen sind Situationen ohne Fragesatz** (). Sie beschreiben eine Lage und enden mit einem Punkt; was gefragt ist, steht erst in den Antworten. Beim Ausfüllen fehlt der Moment, in dem klar wird, was man eigentlich beantworten soll.
+3. **6 Fragen sind Situationen ohne Fragesatz** (S01a, S01b, S01c, S01d, S01e, S01f). Sie beschreiben eine Lage und enden mit einem Punkt; was gefragt ist, steht erst in den Antworten. Beim Ausfüllen fehlt der Moment, in dem klar wird, was man eigentlich beantworten soll.
 4. **Die Kennungen haben Lücken** — B02, B03, G02, G03, K02, R07, R08, R11, S05, U02 fehlen. Das ist kein Fehler: Die Master-Fassung hat sie gestrichen. Die übrigen behalten ihre Nummer, weil eine Umnummerierung gespeicherte Antworten auf andere Fragen zeigen ließe.
 
 ---
@@ -565,6 +565,168 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 5. fachlich/technologisch anspruchsvolle Idee
 6. mehr unternehmerische Unabhängigkeit
 7. anderes Ziel _(mit Textfeld)_
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01a
+
+**Jetzt:**
+
+> Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01b
+
+**Jetzt:**
+
+> Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01c
+
+**Jetzt:**
+
+> Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01d
+
+**Jetzt:**
+
+> Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01e
+
+**Jetzt:**
+
+> Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01f
+
+**Jetzt:**
+
+> Mehr unternehmerische und persönliche Unabhängigkeit erreichen.
+
+**Antworten** (5, Reihenfolge und Anzahl bleiben):
+
+1. gar nicht wichtig
+2. eher wenig wichtig
+3. mittel
+4. ziemlich wichtig
+5. sehr wichtig
+
+**Muss weiterhin messen:** Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.
+
+**Wer nicht antworten kann:** „habe ich noch nicht entschieden“
+
+**Neu:**
+
+> 
+
+
+### S01_top
+
+**Jetzt:**
+
+> Welche ein oder zwei dieser Ziele sind dir aktuell besonders wichtig?
+
+**Antworten** (6, Reihenfolge und Anzahl bleiben):
+
+1. Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.
+2. Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.
+3. Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.
+4. Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.
+5. Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.
+6. Mehr unternehmerische und persönliche Unabhängigkeit erreichen.
+
+**Muss weiterhin messen:** Welche ein oder zwei Ziele aktuell vorgehen. Die Zahl der Haken ist keine Auskunft - hoechstens zwei sind erlaubt, weniger ist kein Mangel.
 
 **Wer nicht antworten kann:** „habe ich noch nicht entschieden“
 
