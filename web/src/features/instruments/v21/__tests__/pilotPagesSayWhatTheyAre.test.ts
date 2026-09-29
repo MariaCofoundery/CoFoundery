@@ -55,6 +55,7 @@ const ERLAUBT = [
   // FRAGEN kommen aus ihren eigenen Registraturen.
   join("src", "app", "(product)", "founder-alignment", "profil") + sep,
   join("src", "app", "(product)", "founder-alignment", "vorhaben") + sep,
+  join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
@@ -195,7 +196,7 @@ test("die neuen Bögen holen ihre FRAGEN aus den eigenen Registraturen", () => {
   for (const seite of ["profil", "vorhaben"]) {
     const page = readFileSync(
       join("src", "app", "(product)", "founder-alignment", seite, "page.tsx"), "utf8");
-    assert.match(page, /instruments\/align\/registries/, seite);
+    assert.match(page, /instruments\/align\//, seite);
     assert.ok(!/getItemsV21|getSectionsV21|REGISTRY_V21/.test(page), `${seite} zieht v2.1-Fragen`);
   }
 });

@@ -1,4 +1,5 @@
 import { getItemV21, getItemsV21, REGISTRY_V21 } from "@/features/instruments/v21/registryV21";
+import type { ReadableItem } from "@/features/instruments/v21/readoutV21";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/readoutV21";
 
 /**
@@ -63,13 +64,27 @@ export type ItemComparison = {
     | null;
 };
 
+/**
+ * Der Vergleich - für v2.1 oder für einen der beiden neuen Bögen.
+ *
+ * `bogen` gibt die Fragen und Abschnitte vor. Ohne Angabe ist es v2.1.
+ *
+ * WARUM DAS HIER BESONDERS ZAEHLT: Arbeitsprofil und Venture-Alignment werden
+ * GETRENNT verglichen. Zwei Menschen können beim Arbeitsprofil
+ * nebeneinanderstehen und beim Vorhaben noch gar nichts gesagt haben - beides
+ * in eine Liste zu werfen hiesse, eine Luecke im einen als Aussage im anderen
+ * zu lesen.
+ */
 export function compareV21(
   a: Record<string, ReadoutEntry>,
   b: Record<string, ReadoutEntry>,
+  bogen?: { items: ReadableItem[]; sections: string[] },
 ): { section: string; items: ItemComparison[] }[] {
-  const items = getItemsV21().map((item) => compareItem(item.itemId, a[item.itemId], b[item.itemId]));
+  const fragen = bogen?.items ?? getItemsV21();
+  const items = fragen.map((item) =>
+    compareItem(item.itemId, a[item.itemId], b[item.itemId], item));
 
-  return REGISTRY_V21.sections
+  return (bogen?.sections ?? REGISTRY_V21.sections)
     .map((section) => ({ section, items: items.filter((entry) => entry.section === section) }))
     .filter((group) => group.items.length > 0);
 }
@@ -78,8 +93,9 @@ function compareItem(
   itemId: string,
   a: ReadoutEntry | undefined,
   b: ReadoutEntry | undefined,
+  known?: { itemId: string; section: string; prompt: string },
 ): ItemComparison {
-  const item = getItemV21(itemId)!;
+  const item = known ?? getItemV21(itemId)!;
   const base = {
     itemId,
     section: item.section,

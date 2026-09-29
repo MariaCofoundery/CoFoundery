@@ -80,11 +80,31 @@ export type ReadoutEntry = {
  * darf aber nicht stillschweigend geschehen - deshalb `null` und nicht ein
  * erfundener Platzhalter, und die Oberfläche sagt es dazu.
  */
+/**
+ * Die Frage, wie sie zum Lesen gebraucht wird.
+ *
+ * Hereingereicht, damit die beiden neuen Bögen (Arbeitsprofil,
+ * Venture-Alignment) dieselbe Lesbarmachung benutzen können. Eine zweite
+ * Kopie würde nach dem ersten Unterschied auseinanderlaufen - und zwar
+ * lautlos, weil beide richtig aussehen.
+ */
+export type ReadableItem = {
+  itemId: string;
+  section: string;
+  prompt: string;
+  answerFormat: string;
+  options: { optionId: string; label: string }[];
+  missing: { code: MissingCode; label: string }[];
+  concerns?: string[];
+  ratingOptions?: string[];
+};
+
 export function readAnswer(
   answer: AlignmentAnswerV21,
   basisEntries: { entryId: string; text: string }[] = [],
+  known?: ReadableItem,
 ): ReadoutEntry | null {
-  const item = getItemV21(answer.blockId);
+  const item = (known ?? getItemV21(answer.blockId)) as ReadableItem | null;
   if (!item) return null;
 
   const base = { itemId: item.itemId, section: item.section, prompt: item.prompt };
@@ -101,7 +121,7 @@ export function readAnswer(
 }
 
 function valueOf(
-  item: RegistryItemV21,
+  item: ReadableItem,
   value: Record<string, unknown>,
   basisEntries: { entryId: string; text: string }[],
 ): ReadoutValue | null {
@@ -212,12 +232,28 @@ function valueOf(
         })),
       };
     }
+
+    default:
+      // EIN UNBEKANNTES FORMAT WIRD NICHT GERATEN.
+      //
+      // `null` heisst hier "laesst sich nicht lesen", und die Ansicht sagt das
+      // auch: "Diese Antwort laesst sich nicht lesen. Das ist ein Fehler bei
+      // uns - sie ist gespeichert und nicht verloren." Ein erfundener
+      // Platzhalter waere schlimmer, weil er wie eine Auskunft aussieht.
+      return null;
   }
 }
 
 /** Alle Antworten eines Fragebogens, in der Reihenfolge der Quelle. */
+/**
+ * Alle Antworten, in der Reihenfolge der Quelle.
+ *
+ * `bogen` gibt die Fragen und Abschnitte vor. Ohne Angabe ist es v2.1 - so
+ * war es vorher, und so bleibt es für die Seiten, die darauf zeigen.
+ */
 export function readAll(
   answers: Record<string, AlignmentAnswerV21>,
+  bogen?: { items: ReadableItem[]; sections: string[] },
 ): { section: string; entries: ReadoutEntry[] }[] {
   const basis = answers.L01;
   const basisEntries =
@@ -225,17 +261,19 @@ export function readAll(
       ? ((basis.value as { entries?: { entryId: string; text: string }[] }).entries ?? [])
       : [];
 
+  const nachId = new Map((bogen?.items ?? []).map((item) => [item.itemId, item]));
+
   const read = new Map<string, ReadoutEntry>();
   for (const answer of Object.values(answers)) {
-    const entry = readAnswer(answer, basisEntries);
+    const entry = readAnswer(answer, basisEntries, nachId.get(answer.blockId));
     if (entry) read.set(entry.itemId, entry);
   }
 
   // Die Reihenfolge kommt aus der QUELLE, nicht aus der Ablage. Sonst haengt
   // sie davon ab, in welcher Reihenfolge jemand geantwortet hat - und zwei
   // Berichte derselben Person saehen nach einem Nachtrag anders aus.
-  const order = getItemsV21();
-  return REGISTRY_V21.sections
+  const order = bogen?.items ?? getItemsV21();
+  return (bogen?.sections ?? REGISTRY_V21.sections)
     .map((section) => ({
       section,
       entries: order
