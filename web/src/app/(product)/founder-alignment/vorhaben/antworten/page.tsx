@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { VentureDirection, WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
@@ -28,12 +30,15 @@ export default async function VentureAnswersPage({
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/antworten")}`);
   }
 
+  const navState = await getAlignNavState(auth.user.id);
+
   const { venture: gewaehlt } = await searchParams;
   const { venture, choices } = await resolveVenture(auth.user.id, gewaehlt);
 
   if (!venture) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} />
         <h1 className="text-2xl font-semibold text-slate-900">Welches Vorhaben?</h1>
         <ul className="mt-6 space-y-2">
           {choices.map((entry) => (
@@ -56,6 +61,7 @@ export default async function VentureAnswersPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

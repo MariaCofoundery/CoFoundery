@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
@@ -22,11 +24,14 @@ export default async function ProfileAnswersPage() {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/profil/antworten")}`);
   }
 
+  const navState = await getAlignNavState(auth.user.id);
+
   const report = await getScopeReport(auth.user.id, "founder_profile");
   const teilen = await getShareState(auth.user.id, "founder_profile", null);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/profil/antworten" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

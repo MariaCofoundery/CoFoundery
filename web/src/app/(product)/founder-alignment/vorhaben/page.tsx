@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { VentureHeader } from "@/features/instruments/align/VentureHeader";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
@@ -26,6 +28,8 @@ export default async function VentureAlignmentPage({
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben")}`);
   }
 
+  const navState = await getAlignNavState(auth.user.id);
+
   const { venture: gewaehlt } = await searchParams;
   const { venture, choices } = await resolveVenture(auth.user.id, gewaehlt);
 
@@ -35,6 +39,7 @@ export default async function VentureAlignmentPage({
   if (!venture) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vorhaben" state={navState} />
         <h1 className="text-2xl font-semibold text-slate-900">Für welches Vorhaben?</h1>
         <p className="mt-3 text-slate-700">
           Du bist in mehreren. Deine Angaben zu Zeit, Geld und Zielen gelten jeweils
@@ -106,6 +111,7 @@ export default async function VentureAlignmentPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vorhaben" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { DiscoveryTopicsForm } from "@/features/instruments/align/DiscoveryTopicsForm";
 import { DiscoveryVerdicts, type VerdictRow } from "@/features/instruments/align/DiscoveryVerdicts";
 import { getDiscoveryTopics } from "@/features/instruments/align/discoveryTopics";
@@ -19,6 +21,8 @@ export default async function AlignSearchPage() {
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/suche")}`);
   }
+
+  const navState = await getAlignNavState(auth.user.id);
 
   const supabase = await createClient();
 
@@ -69,6 +73,7 @@ export default async function AlignSearchPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/suche" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

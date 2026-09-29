@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
 import { ExpectationGapsView } from "@/features/instruments/v21/ExpectationGapsView";
 import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
@@ -41,6 +43,7 @@ export default async function AlignComparePage({
     );
   }
 
+  const navState = await getAlignNavState(auth.user.id);
   const { venture } = await resolveVenture(auth.user.id, gewaehlt);
 
   // ---------------------------------------------------------------------------
@@ -73,6 +76,7 @@ export default async function AlignComparePage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vergleich" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

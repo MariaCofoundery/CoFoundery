@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
 import { getItemsV22, FOUNDER_PROFILE } from "@/features/instruments/align/registries";
@@ -17,6 +19,8 @@ export default async function FounderProfilePage() {
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/profil")}`);
   }
+
+  const navState = await getAlignNavState(auth.user.id);
 
   const supabase = await createClient();
 
@@ -49,6 +53,7 @@ export default async function FounderProfilePage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/profil" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

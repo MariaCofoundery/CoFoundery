@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { AlignNav } from "@/features/instruments/align/AlignNav";
+import { getAlignNavState } from "@/features/instruments/align/navState";
 import { ConfirmClient } from "@/features/instruments/align/ConfirmClient";
 import type { ConfirmEntry } from "@/features/instruments/align/ConfirmVentureAnswers";
 import { itemsThatAge, itemsThatKeep } from "@/features/instruments/align/whatAges";
@@ -25,6 +27,8 @@ export default async function ConfirmPage({
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/bestaetigen")}`);
   }
+
+  const navState = await getAlignNavState(auth.user.id);
 
   // Wer in zwei Vorhaben ist, kommt mit dem gemeinten hierher. Ohne die
   // Angabe gaebe resolveVenture null zurueck und die Seite schickte ihn
@@ -104,6 +108,7 @@ export default async function ConfirmPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <AlignNav current="/founder-alignment/vorhaben/bestaetigen" state={navState} />
       <ConfirmClient
         ventureId={venture.id}
         ventureName={venture.name}
