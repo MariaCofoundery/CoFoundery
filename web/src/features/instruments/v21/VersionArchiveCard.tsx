@@ -35,9 +35,13 @@ type Props = {
   previous: { submitted: boolean; reportHref: string | null };
   next: { started: boolean; submitted: boolean };
   connectionsNext: ArchiveConnection[];
+  /** Ist diese Fassung inzwischen archiviert? Dann ist sie kein Angebot mehr. */
+  archived: boolean;
 };
 
-export function VersionArchiveCard({ decision, previous, next, connectionsNext }: Props) {
+export function VersionArchiveCard({
+  decision, previous, next, connectionsNext, archived,
+}: Props) {
   return (
     <section
       id="dashboard-block-versions"
@@ -73,9 +77,9 @@ export function VersionArchiveCard({ decision, previous, next, connectionsNext }
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
           <p className="text-sm font-medium text-slate-900">
-            Neue Fassung
-            <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-normal text-amber-900">
-              im Test
+            {archived ? "Zwischenfassung" : "Neue Fassung"}
+            <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-normal text-slate-700">
+              {archived ? "archiviert" : "im Test"}
             </span>
           </p>
           <p className="mt-1 text-xs text-slate-500">
@@ -86,9 +90,14 @@ export function VersionArchiveCard({ decision, previous, next, connectionsNext }
                 : "noch nicht ausgefüllt"}
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
-            <Link href="/founder-alignment/pilot" className="text-slate-900 underline">
-              {next.started ? "Weiter ausfüllen" : "Ausprobieren"}
-            </Link>
+            {/* EINE ARCHIVIERTE FASSUNG LAEDT NICHT MEHR EIN. Wer sie
+                angefangen hat, kommt an seine Antworten - aber "Ausprobieren"
+                waere eine Einladung in eine Sackgasse. */}
+            {!archived && (
+              <Link href="/founder-alignment/pilot" className="text-slate-900 underline">
+                {next.started ? "Weiter ausfüllen" : "Ausprobieren"}
+              </Link>
+            )}
             {next.submitted && (
               <>
                 <Link href="/founder-alignment/pilot/report" className="text-slate-900 underline">

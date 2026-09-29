@@ -168,6 +168,40 @@ async function seedPersonCore(admin: SupabaseClient, userId: string, person: Per
 }
 
 /**
+ * Die Rolle - und damit der Zugang.
+ *
+ * ---------------------------------------------------------------------------
+ * OHNE DIESE ZEILE IST DIE TESTWELT KEINE FOUNDER-WELT
+ * ---------------------------------------------------------------------------
+ *
+ * `has_founder_assessment_access()` fragt nach einem Eintrag in `profiles` mit
+ * der Rolle `founder`. Fehlt er, weist die Zeilensicherheit JEDEN Schreibweg
+ * an `assessments` ab - der Fragebogen laedt, die Fragen stehen da, und beim
+ * Speichern kommt eine rote Meldung. Genau so gemeldet am 29.09.2026:
+ * „Als Lokal kann ich mir das gerade leider nicht angucken, da gibt es
+ * irgendwie Fehler.“
+ *
+ * `person_core` allein reicht dafuer nicht. Es beschreibt den Menschen, nicht
+ * seine Rolle im Produkt - und die Policies fragen nach der Rolle.
+ *
+ * Die Rollen stehen hier AUSDRUECKLICH und nicht ueber den Spaltenvorgabewert
+ * `{founder}`: Pia ist Advisorin, und ein Vorgabewert haette sie stillschweigend
+ * zur Founderin gemacht.
+ */
+async function seedProfile(
+  admin: SupabaseClient,
+  userId: string,
+  displayName: string,
+  roles: string[],
+) {
+  const { error } = await admin.from("profiles").upsert(
+    { user_id: userId, display_name: displayName, roles, updated_at: new Date().toISOString() },
+    { onConflict: "user_id" }
+  );
+  if (error) throw error;
+}
+
+/**
  * Was sie mitbringt - quer ueber mehrere Familien, damit die Deckungskarte
  * etwas zu zeigen hat und nicht nur eine Familie eingefaerbt ist.
  *
@@ -584,6 +618,12 @@ async function main() {
     expertise: ["Programmleitung"],
     industries: ["Gesundheit"],
   });
+
+  // Die Rolle zuerst - ohne sie weist die Zeilensicherheit alles Weitere ab.
+  await seedProfile(admin, founder, "Nora Testerin", ["founder"]);
+  await seedProfile(admin, second, "Ben Testfounder", ["founder"]);
+  await seedProfile(admin, third, "Carla Testfounderin", ["founder"]);
+  await seedProfile(admin, advisor, "Pia Beraterin", ["advisor"]);
 
   // Unterschiedliche Bereiche je Person, damit die Rollenlage etwas zu zeigen
   // hat: Ueberschneidungen, Luecken und offene Stellen.

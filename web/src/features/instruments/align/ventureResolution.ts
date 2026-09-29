@@ -82,34 +82,42 @@ export async function findVentures(userId: string): Promise<Venture[]> {
 /**
  * Ein Vorhaben für jemanden, der noch keins hat.
  *
- * `pre_founder` als Kontext: Wer allein anfängt, ist per Definition noch nicht
- * in einem bestehenden Team. Beim Annehmen der ersten Einladung muss der
- * Kontext übereinstimmen, damit übernommen wird - eine falsche Voreinstellung
- * hier würde die Übernahme stillschweigend verhindern.
+ * OHNE BENUTZERKENNUNG, UND DAS IST DER UNTERSCHIED. Angelegt wird für die
+ * aufrufende Person, nicht für eine beliebige - die Funktion in der Datenbank
+ * nimmt `auth.uid()` und lässt sich nicht auf jemand anderen richten. Eine
+ * Kennung als Parameter würde das Gegenteil versprechen.
+ *
+ * `pre_founder` als Kontext setzt die Datenbankfunktion: Wer allein anfängt,
+ * ist per Definition noch nicht in einem bestehenden Team. Beim Annehmen der
+ * ersten Einladung muss der Kontext übereinstimmen, damit übernommen wird -
+ * ein falscher Wert würde die Übernahme stillschweigend verhindern.
  */
-export async function createVentureFor(userId: string): Promise<Venture | null> {
+export async function createVentureFor(): Promise<Venture | null> {
   const supabase = await createClient();
 
-  const { data: team, error } = await supabase
+  // UEBER EINE FUNKTION UND NICHT DIREKT. Auf `founder_teams` und
+  // `founder_team_members` liegen ausschliesslich SELECT-Policies - Teams
+  // entstehen sonst nur durch Trigger beim Annehmen einer Einladung oder beim
+  // Start eines Vergleichs. Ein direktes Insert von hier aus wurde von der
+  // Zeilensicherheit abgewiesen, still: Der Aufruf gab `null` zurueck, die
+  // Seite fragte "Fuer welches Vorhaben?" und bot nichts an.
+  const { data: id, error } = await supabase.rpc("create_solo_venture");
+  if (error || !id) return null;
+
+  const { data: team } = await supabase
     .from("founder_teams")
-    .insert({ team_context: "pre_founder" })
     .select("id, name, team_context")
-    .single();
+    .eq("id", id)
+    .maybeSingle();
 
-  if (error || !team) return null;
-
-  const { error: memberError } = await supabase
-    .from("founder_team_members")
-    .insert({ team_id: team.id, user_id: userId });
-
-  // Ein Vorhaben ohne Mitglied waere ein Waisenkind: Niemand koennte es
-  // spaeter finden, und die Uebernahme beim Einladen wuerde es nicht sehen.
-  if (memberError) return null;
+  if (!team) return null;
 
   return {
     id: team.id as string,
     name: (team.name as string | null) ?? null,
-    teamContext: "pre_founder",
+    teamContext: team.team_context as Venture["teamContext"],
+    // Die Funktion gibt nur ein Vorhaben zurueck, in dem diese Person allein
+    // steht - sonst legt sie ein neues an.
     alone: true,
   };
 }
@@ -133,7 +141,7 @@ export async function resolveVenture(
   }
   if (ventures.length === 1) return { venture: ventures[0], choices: ventures };
   if (ventures.length === 0) {
-    return { venture: await createVentureFor(userId), choices: [] };
+    return { venture: await createVentureFor(), choices: [] };
   }
   return { venture: null, choices: ventures };
 }

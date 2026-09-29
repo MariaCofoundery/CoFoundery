@@ -190,6 +190,27 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("Gesprächskarten bekommen Namen und kein „Du“", () => {
+  // Die Kartenvorlagen stehen in der dritten Person: „{a} sagt {aAnswer}“.
+  // „Du“ dort einzusetzen ergibt „Du sagt manchmal“ - beim Durchklicken am
+  // 29.09.2026 genau so gesehen. Die Tabelle daneben darf „Du“ behalten:
+  // dort ist es ein Spaltenkopf und kein Satz.
+  const dateien = [
+    join("src", "features", "instruments", "align", "comparisonData.ts"),
+    join("src", "app", "(product)", "founder-alignment", "pilot", "compare", "[partnerId]", "page.tsx"),
+  ];
+  for (const datei of dateien) {
+    const text = readFileSync(datei, "utf8");
+    const aufruf = text.match(/buildCards(?:V21)?\(\{[\s\S]*?\}\)/);
+    assert.ok(aufruf, `${datei} baut keine Karten mehr`);
+    assert.ok(
+      !/nameA:\s*"Du"/.test(aufruf[0]),
+      `${datei} setzt „Du“ in einen Satz in der dritten Person`,
+    );
+    assert.match(aufruf[0], /nameA:/, datei);
+  }
+});
+
 test("die neuen Bögen lesen ihre Antworten nie gegen die v2.1-Registratur", () => {
   // readAnswer ohne Frage faellt auf v2.1 zurueck. 24 der 36 Venture-Kennungen
   // gibt es dort auch - mit anderem Wortlaut und teils anderen Antworten. Der

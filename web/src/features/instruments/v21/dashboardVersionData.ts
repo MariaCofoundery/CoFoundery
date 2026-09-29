@@ -31,6 +31,13 @@ export type DashboardVersionState = {
   connectionsNext: ArchiveConnection[];
   /** Ob der Abschnitt überhaupt gezeigt wird. */
   show: boolean;
+  /**
+   * Ist v2.1 inzwischen archiviert?
+   *
+   * Dann ist sie kein Angebot mehr, sondern ein Archiv - und der Kasten darf
+   * nicht "Ausprobieren" sagen.
+   */
+  archived: boolean;
 };
 
 const NOTHING: DashboardVersionState = {
@@ -40,6 +47,7 @@ const NOTHING: DashboardVersionState = {
   next: { started: false, submitted: false },
   connectionsNext: [],
   show: false,
+  archived: false,
 };
 
 export async function getDashboardVersionState(
@@ -61,6 +69,18 @@ export async function getDashboardVersionState(
     const hasPrevious = rows.some((row) => row.instrument_id === CURRENT_INSTRUMENT_ID);
     const nextRows = rows.filter((row) => row.instrument_id === ALIGNMENT_V21_INSTRUMENT_ID);
 
+    // WAS DIE DATENBANK UEBER DIE FASSUNG SAGT, NICHT WAS DER CODE ANNIMMT.
+    // v2.1 ist seit dem Umstieg auf die beiden getrennten Boegen archiviert.
+    // Eine Einladung "probier die neue Fassung aus" waere danach eine
+    // Einladung in eine Sackgasse - und stuende neben der Einladung zu den
+    // Boegen, die wirklich neu sind.
+    const { data: instrument } = await supabase
+      .from("instruments")
+      .select("status")
+      .eq("id", ALIGNMENT_V21_INSTRUMENT_ID)
+      .maybeSingle();
+    const archived = instrument?.status === "archived";
+
     const { data: transition } = await supabase
       .from("instrument_transitions")
       .select("decision, remind_after")
@@ -76,12 +96,14 @@ export async function getDashboardVersionState(
     };
 
     return {
-      announce: shouldAnnounce({
-        hasPreviousAssessment: hasPrevious,
-        transition: transition
-          ? { decision, remindAfter: transition.remind_after ?? null }
-          : null,
-      }),
+      announce:
+        !archived &&
+        shouldAnnounce({
+          hasPreviousAssessment: hasPrevious,
+          transition: transition
+            ? { decision, remindAfter: transition.remind_after ?? null }
+            : null,
+        }),
       decision,
       previous: {
         submitted: previousSubmitted,
@@ -97,6 +119,7 @@ export async function getDashboardVersionState(
       // steht auf jedem Dashboard ein Kasten ueber eine Fassung, die die
       // Person nie gesehen hat.
       show: decision !== "pending" || next.started,
+      archived,
     };
   } catch {
     return NOTHING;

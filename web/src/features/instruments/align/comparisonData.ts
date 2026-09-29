@@ -13,6 +13,7 @@ import {
 import { expectationGapsV21, type ExpectationResult } from "@/features/instruments/v21/expectationsV21";
 import { buildCards, type ConversationCard } from "@/features/instruments/align/conversationCards";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
+import { displayNameOf } from "@/features/instruments/displayName";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -114,8 +115,8 @@ export async function buildScopeComparison(
     cards: buildCards({
       comparison: sections,
       markedItemIds: marked,
-      nameA: "Du",
-      nameB: "Die andere Person",
+      nameA: await displayNameOf(mine, "Du"),
+      nameB: await displayNameOf(theirs, "Die andere Person"),
     }),
     agenda: agendaV21(sections, marked),
     expectations:

@@ -81,8 +81,16 @@ insert into public.alignment_answers (assessment_id, block_id, answer_format, va
   ('f2000201-0201-4201-8201-000000000201', 'R01', 'number_range',
    '{"number": 5, "unit": "Stunden pro Woche"}'::jsonb);
 
+-- NUR DIE ANTWORTEN DIESER PRUEFUNG. Ein `count(*)` ueber alle R01 war
+-- gruen, solange die Datenbank leer war - am 29.09.2026 beim Durchklicken
+-- standen echte Antworten darin, und die Pruefung fiel um, ohne dass sich an
+-- der Regel etwas geaendert haette.
 select extensions.is(
-  (select count(*)::int from public.alignment_answers where block_id = 'R01'),
+  (select count(*)::int from public.alignment_answers
+    where block_id = 'R01'
+      and assessment_id in (
+        'f2000200-0200-4200-8200-000000000200',
+        'f2000201-0201-4201-8201-000000000201')),
   2,
   'dieselbe Frage, zwei Vorhaben, zwei Antworten - ohne dass eine die andere ueberschreibt');
 

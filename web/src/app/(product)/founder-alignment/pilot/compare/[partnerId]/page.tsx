@@ -9,6 +9,7 @@ import {
   type StoredRow,
 } from "@/features/instruments/v21/comparisonDataV21";
 import { ALIGNMENT_V21_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import { displayNameOf } from "@/features/instruments/displayName";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -104,13 +105,18 @@ export default async function CompareV21Page({
     },
   );
 
+  // NICHT „Du“. Die Kartenvorlagen stehen in der dritten Person („{a} sagt
+  // {aAnswer}“); „Du“ ergaebe „Du sagt manchmal“. Die Tabelle darunter behaelt
+  // ihre Spaltenkoepfe - dort ist „Du“ eine Beschriftung und kein Satz.
+  const eigenerName = await displayNameOf(auth.user.id, "Du");
+
   const cards = buildCardsV21({
     comparison: comparison.sections,
     markedItemIds: [
       ...mine.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
       ...theirs.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
     ],
-    nameA: "Du",
+    nameA: eigenerName,
     nameB: "Die andere Person",
   });
 

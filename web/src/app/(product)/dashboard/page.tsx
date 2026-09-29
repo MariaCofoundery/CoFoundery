@@ -636,6 +636,7 @@ export default async function DashboardPage({
           previous={versionState.previous}
           next={versionState.next}
           connectionsNext={versionState.connectionsNext}
+          archived={versionState.archived}
         />
       )}
 

@@ -58,8 +58,17 @@ select extensions.is(
   'a3000100-0100-4100-8100-000000000100',
   'das allein begonnene Vorhaben wird uebernommen, nicht ersetzt');
 
+-- NUR DIE VORHABEN DIESER PRUEFUNG. Ein `count(*)` ueber die ganze Tabelle
+-- war gruen, solange die Datenbank leer war - am 29.09.2026 beim
+-- Durchklicken lagen echte Vorhaben darin, und die Pruefung fiel um, ohne
+-- dass sich an der Regel etwas geaendert haette.
 select extensions.is(
-  (select count(*)::int from public.founder_teams),
+  (select count(distinct team.id)::int
+     from public.founder_teams team
+     join public.founder_team_members mitglied on mitglied.team_id = team.id
+    where mitglied.user_id in (
+      'a3000001-0001-4001-8001-000000000001',
+      'a3000002-0002-4002-8002-000000000002')),
   1,
   'und es entsteht kein zweites daneben');
 
