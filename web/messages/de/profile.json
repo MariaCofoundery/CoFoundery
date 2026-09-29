@@ -68,7 +68,8 @@
       "areas": {
         "align": {
           "name": "Align",
-          "text": "Hier klärst du, wie du arbeitest und entscheidest – und wie gut das mit jemand anderem zusammenpasst. Kein Persönlichkeitstest, sondern eine Grundlage für ehrliche Gespräche."
+          "text": "Hier klärst du, wie du arbeitest und entscheidest – und wie gut das mit jemand anderem zusammenpasst. Kein Persönlichkeitstest, sondern eine Grundlage für ehrliche Gespräche.",
+          "textAdvisor": "Hier siehst du, was die Menschen, die du begleitest, dir freigegeben haben – ihre Antworten und wo sie auseinanderliegen. Du füllst hier selbst nichts aus."
         },
         "find": {
           "name": "Find",
@@ -82,7 +83,8 @@
       "areasLater": "Die übrigen Bereiche nimmst du jederzeit dazu – in deinem Profil, mit einem Haken.",
       "startConnectButton": "Weiter zu Connect",
       "planChangeableConnect": "Und wenn du später doch gründen willst, schalten wir dir Align und Find frei – schreib uns einfach.",
-      "areasLaterConnect": "Align und Find stehen dir offen, sobald du willst – melde dich kurz bei uns, dann schalten wir sie frei."
+      "areasLaterConnect": "Align und Find stehen dir offen, sobald du willst – melde dich kurz bei uns, dann schalten wir sie frei.",
+      "nonDiagnosticHintAdvisor": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft den Teams, die du begleitest, ihre Zusammenarbeit früh klarer und belastbarer zu machen."
     },
     "avatar": {
       "title": "Avatar",

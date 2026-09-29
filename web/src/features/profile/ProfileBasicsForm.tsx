@@ -95,6 +95,17 @@ type ProductArea = "align" | "find" | "connect";
  * Deshalb ist die Frage "was hast du vor" und nicht "waehle deine Bereiche":
  * Man kann Find nicht ohne Align haben - es ist dieselbe Rolle.
  */
+/**
+ * Welcher Text zu welchem Bereich gehoert - je nach Plan.
+ *
+ * Nur dort, wo derselbe Bereich etwas anderes bedeutet. Fuer Find und Connect
+ * ist er fuer alle gleich; fuer Align nicht.
+ */
+function areaTextKey(area: ProductArea, plan: OnboardingPlan | ""): string {
+  if (area === "align" && plan === "advisor") return "onboarding.areas.align.textAdvisor";
+  return `onboarding.areas.${area}.text`;
+}
+
 function areasForPlan(plan: OnboardingPlan): ProductArea[] {
   if (plan === "connect") return ["connect"];
   if (plan === "advisor") return ["align", "connect"];
@@ -560,8 +571,16 @@ export function ProfileBasicsForm({
               <p className="text-base font-semibold text-slate-950">
                 {t(`onboarding.areas.${area}.name`)}
               </p>
+              {/*
+                DER TEXT HAENGT AM PLAN, nicht nur am Bereich.
+                "Hier klaerst du, wie DU arbeitest" beschreibt die Founder-Sicht.
+                Ein Advisor sieht in Align die Menschen, die er begleitet - er
+                fuellt dort nichts aus. Derselbe Satz waere fuer ihn schlicht
+                falsch, und zwar auf eine Art, die man erst merkt, wenn man
+                vergeblich gesucht hat.
+              */}
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                {t(`onboarding.areas.${area}.text`)}
+                {t(areaTextKey(area, plan))}
               </p>
             </div>
           ))}
@@ -576,7 +595,12 @@ export function ProfileBasicsForm({
         ) : null}
 
         <div className="rounded-2xl border border-violet-200/70 bg-[linear-gradient(120deg,rgba(124,58,237,.06),rgba(34,211,238,.08))] px-5 py-4">
-          <p className="text-sm leading-7 text-slate-800">{t("onboarding.nonDiagnosticHint")}</p>
+          {/* Der Schlusssatz - der eine, den man sich merkt. "Es hilft DIR"
+              stimmt fuer einen Advisor nicht; ihm hilft es bei den Teams, die
+              er begleitet. */}
+          <p className="text-sm leading-7 text-slate-800">
+            {t(plan === "advisor" ? "onboarding.nonDiagnosticHintAdvisor" : "onboarding.nonDiagnosticHint")}
+          </p>
         </div>
       </div>
     );

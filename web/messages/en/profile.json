@@ -68,7 +68,8 @@
       "areas": {
         "align": {
           "name": "Align",
-          "text": "Here you work out how you work and decide – and how well that fits with someone else. Not a personality test, but a basis for honest conversations."
+          "text": "Here you work out how you work and decide – and how well that fits with someone else. Not a personality test, but a basis for honest conversations.",
+          "textAdvisor": "Here you see what the people you support have shared with you — their answers and where they differ. You do not fill anything in here yourself."
         },
         "find": {
           "name": "Find",
@@ -82,7 +83,8 @@
       "areasLater": "You can add the other areas whenever you like – in your profile, with one checkbox.",
       "startConnectButton": "Continue to Connect",
       "planChangeableConnect": "And if you decide to found something later, we'll open up Align and Find – just drop us a line.",
-      "areasLaterConnect": "Align and Find are open to you whenever you want – just get in touch and we'll unlock them."
+      "areasLaterConnect": "Align and Find are open to you whenever you want – just get in touch and we'll unlock them.",
+      "nonDiagnosticHintAdvisor": "CoFoundery Align is not a personality test. It helps the teams you support make their collaboration clearer and more robust, early on."
     },
     "avatar": {
       "title": "Avatar",

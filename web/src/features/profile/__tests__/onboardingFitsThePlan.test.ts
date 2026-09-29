@@ -104,3 +104,75 @@ test("die Liste hängt wirklich am Plan", () => {
   assert.match(form, /intentionsForPlan\(plan\)\.map/);
   assert.match(form, /plan === "advisor"\) return ADVISOR_INTENTIONS/);
 });
+
+// ---------------------------------------------------------------------------
+// Der ganze Einstieg, Folie fuer Folie, fuer alle vier Wahlmoeglichkeiten
+// ---------------------------------------------------------------------------
+
+test("jede Folie, die jemand bekommt, hat in beiden Sprachen Titel und Hinweis", () => {
+  // Ein fehlender Text zeigt den Schluessel an - "onboarding.steps.focus.hint"
+  // mitten im Einstieg.
+  const alleSchritte = [...(form.match(/ONBOARDING_STEPS_FULL = \[([^\]]+)\]/)?.[1] ?? "")
+    .matchAll(/"(\w+)"/g)].map((match) => match[1]);
+  assert.ok(alleSchritte.length >= 6, `nur ${alleSchritte.length} Schritte gefunden`);
+
+  for (const locale of ["de", "en"]) {
+    const steps = texts(locale).basicsForm.onboarding.steps;
+    for (const step of alleSchritte) {
+      assert.ok(steps[step]?.title?.trim(), `${locale}: ${step} ohne Titel`);
+      assert.ok(steps[step]?.hint?.trim(), `${locale}: ${step} ohne Hinweis`);
+    }
+  }
+});
+
+test("„Nur Netzwerk“ bekommt keine Folie, deren Antworten es für ihn nicht gibt", () => {
+  // Schwerpunkt und Absicht sind auf Produktrollen zugeschnitten. Wer nur ins
+  // Netzwerk will, bekommt sie deshalb gar nicht erst.
+  const kurz = [...(form.match(/ONBOARDING_STEPS_CONNECT = \[([^\]]+)\]/)?.[1] ?? "")
+    .matchAll(/"(\w+)"/g)].map((match) => match[1]);
+  assert.ok(kurz.length >= 3);
+  for (const nurProduktrolle of ["focus", "intention", "avatar"]) {
+    assert.ok(!kurz.includes(nurProduktrolle), `„Nur Netzwerk“ bekommt ${nurProduktrolle}`);
+  }
+});
+
+test("der Bereich Align wird dem Advisor anders erklärt als dem Founder", () => {
+  // „Hier klaerst du, wie DU arbeitest“ beschreibt die Founder-Sicht. Ein
+  // Advisor fuellt in Align nichts aus - er sieht, was ihm freigegeben wurde.
+  assert.match(form, /areaTextKey\(area, plan\)/);
+  assert.match(form, /plan === "advisor"\) return "onboarding\.areas\.align\.textAdvisor"/);
+
+  for (const locale of ["de", "en"]) {
+    const areas = (texts(locale).basicsForm.onboarding as unknown as {
+      areas: Record<string, Record<string, string>>;
+    }).areas;
+    assert.ok(areas.align.textAdvisor?.trim(), `${locale}: kein Advisor-Text für Align`);
+    assert.notEqual(
+      areas.align.textAdvisor,
+      areas.align.text,
+      `${locale}: derselbe Text - dann war die Unterscheidung umsonst`,
+    );
+  }
+});
+
+test("der Schlusssatz spricht den Advisor nicht als Ausfüllenden an", () => {
+  for (const locale of ["de", "en"]) {
+    const onboarding = texts(locale).basicsForm.onboarding as unknown as Record<string, string>;
+    assert.ok(onboarding.nonDiagnosticHintAdvisor?.trim(), `${locale}: kein Schlusssatz für Advisor`);
+    assert.notEqual(onboarding.nonDiagnosticHintAdvisor, onboarding.nonDiagnosticHint, locale);
+  }
+});
+
+test("wo dasselbe für alle gilt, gibt es auch nur einen Text", () => {
+  // Gegenprobe zur Rollenunterscheidung: Sie soll die Ausnahme bleiben. Find
+  // und Connect bedeuten fuer alle dasselbe - dort waeren zwei Texte zwei
+  // Stellen, die auseinanderlaufen koennen.
+  for (const locale of ["de", "en"]) {
+    const areas = (texts(locale).basicsForm.onboarding as unknown as {
+      areas: Record<string, Record<string, string>>;
+    }).areas;
+    for (const area of ["find", "connect"]) {
+      assert.ok(!areas[area].textAdvisor, `${locale}: ${area} hat einen Sondertext ohne Not`);
+    }
+  }
+});
