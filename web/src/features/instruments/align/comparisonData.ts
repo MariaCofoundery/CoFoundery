@@ -43,6 +43,14 @@ export type ScopeComparison = {
   hasAnything: boolean;
   /** Die Gesprächskarten zu diesem Bogen - aus einer geprüften Sammlung. */
   cards: ConversationCard[];
+  /**
+   * Wie die beiden in Sätzen heißen.
+   *
+   * Steht hier, damit Karten und Bild dieselben Namen benutzen. Zweimal
+   * nachzuschlagen ginge auch - bis eine Seite „Ben“ sagt und die andere
+   * „Die andere Person“, und niemand weiß, ob das zwei Leute sind.
+   */
+  names: { a: string; b: string };
 };
 
 type Side = Record<string, ReadoutEntry>;
@@ -109,14 +117,20 @@ export async function buildScopeComparison(
 
   const marked = [...a.marked, ...b.marked];
 
+  const names = {
+    a: await displayNameOf(mine, "Du"),
+    b: await displayNameOf(theirs, "Die andere Person"),
+  };
+
   return {
     scope,
     sections,
+    names,
     cards: buildCards({
       comparison: sections,
       markedItemIds: marked,
-      nameA: await displayNameOf(mine, "Du"),
-      nameB: await displayNameOf(theirs, "Die andere Person"),
+      nameA: names.a,
+      nameB: names.b,
     }),
     agenda: agendaV21(sections, marked),
     expectations:

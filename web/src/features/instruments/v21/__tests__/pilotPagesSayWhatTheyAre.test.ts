@@ -190,6 +190,37 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("in den Übersichtsbildern wird nichts zusammengerechnet", () => {
+  // Entschieden am 29.09.2026: keine Zahlen im Report, sie sind irrefuehrend.
+  // Die Gefahr ist nicht das Bild, sondern der naechste Schritt: Erst wird ein
+  // Abschnittsmittel gerechnet, dann steht es daneben, dann steht im Bericht
+  // "ihr liegt 1,4 auseinander" - genau den Weg ist v1 gegangen.
+  //
+  // Geprueft wird deshalb das Rechnen, nicht die Darstellung: Wo kein
+  // Mittelwert entsteht, kann auch keiner angezeigt werden.
+  for (const datei of [
+    join("src", "features", "instruments", "align", "AlignMaps.tsx"),
+    join("src", "features", "instruments", "align", "mapRows.ts"),
+  ]) {
+    // Ohne Kommentare: Die Dateien ERKLAEREN, warum hier kein Mittelwert
+    // entsteht - und das Wort im Kommentar ist kein Mittelwert.
+    const code = readFileSync(datei, "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\/\/[^\n]*/g, "");
+    for (const verboten of ["toFixed", "Math.round", ".reduce(", "rows.length /", "/ rows.length"]) {
+      assert.ok(!code.includes(verboten), `${datei} rechnet: ${verboten}`);
+    }
+  }
+
+  // Und kein "Stufe 3 von 5" als Vorlesetext - dieselbe Zahl, nur unsichtbar.
+  // Die Beschriftung der Antwort steht als echter Text daneben und traegt die
+  // Bedeutung; die Punkte sind Dekoration.
+  const maps = readFileSync(
+    join("src", "features", "instruments", "align", "AlignMaps.tsx"), "utf8");
+  assert.ok(!/aria-label/.test(maps), "die Bilder tragen einen Vorlesetext mit Zahl");
+  assert.match(maps, /aria-hidden="true"/);
+});
+
 test("Gesprächskarten bekommen Namen und kein „Du“", () => {
   // Die Kartenvorlagen stehen in der dritten Person: „{a} sagt {aAnswer}“.
   // „Du“ dort einzusetzen ergibt „Du sagt manchmal“ - beim Durchklicken am

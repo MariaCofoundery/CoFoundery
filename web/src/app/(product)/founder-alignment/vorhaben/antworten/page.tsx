@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
+import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
 import { VENTURE_ALIGNMENT, getItemsV22 } from "@/features/instruments/align/registries";
 import { getShareState } from "@/features/instruments/align/shareData";
@@ -84,6 +85,13 @@ export default async function VentureAnswersPage({
               <> · abgegeben am {new Date(report.submittedAt).toLocaleDateString("de-DE")}</>
             )}
           </p>
+          {/* DAS BILD VOR DER LISTE. Es zeigt dieselben Antworten kompakt -
+              wer den Ueberblick hat, liest die Liste anders als jemand, der
+              sich durch sechzehn Kaesten arbeitet. */}
+          <div className="mb-8">
+            <WorkMap sections={report.sections} />
+          </div>
+
           <ReportViewV21 sections={report.sections} />
 
           <div className="mt-10">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
+import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
 import { getShareState } from "@/features/instruments/align/shareData";
 import { ShareForm } from "@/features/instruments/align/ShareForm";
@@ -52,6 +53,13 @@ export default async function ProfileAnswersPage() {
               <> · abgegeben am {new Date(report.submittedAt).toLocaleDateString("de-DE")}</>
             )}
           </p>
+          {/* DAS BILD VOR DER LISTE. Es zeigt dieselben Antworten kompakt -
+              wer den Ueberblick hat, liest die Liste anders als jemand, der
+              sich durch sechzehn Kaesten arbeitet. */}
+          <div className="mb-8">
+            <WorkMap sections={report.sections} />
+          </div>
+
           <ReportViewV21 sections={report.sections} />
 
           {/* UNTER den Antworten: Wer bis hierher scrollt, hat gesehen, was er

@@ -88,16 +88,29 @@ Heute ist die Agenda in der Reihenfolge des Fragebogens. Das war eine bewusste
 Entscheidung gegen eine Sortierung nach Schwere — die Kategorien hier sind
 aber keine Schwere, sondern Art. Das geht.
 
-### ☐ 6. Grafiken
+### ◐ 6. Grafiken — zwei von vier gebaut
 
-Nichts davon existiert.
+- ☑ **Founder Work Map** — `WorkMap` in `AlignMaps.tsx`, auf beiden
+  Antwortseiten und in der Advisor-Ansicht. Ein Punkt je Antwort, kein
+  Abschnittswert: `mean(A01, A02)` würde behaupten, dass die Fragen eines
+  Abschnitts dasselbe messen und sich verrechnen lassen — dafür gibt es weder
+  Normstichprobe noch bestätigte Faktoren.
+- ☑ **Team Difference Map** — `DifferenceMap`, Hantel je Frage auf der
+  Vergleichsseite. Nur wo beide geantwortet haben und beide Skalen gleich lang
+  sind. Keine Abstandszahl: `stepsApart` ist bewusst entfernt.
+- ☐ **Venture Direction** — braucht Punkt 8 (S01 als sechs Wichtigkeiten).
+  Heute ist S01 eine Mehrfachauswahl; ein Radar daraus wäre eine erfundene
+  Abstufung zwischen „genannt“ und „nicht genannt“.
+- ☐ **Dot Plot ab drei Personen** — es gibt keinen Dreiervergleich. Der
+  Vergleich ist durchgängig auf zwei Personen gebaut (`compareV21(a, b)`), und
+  das ist keine Lücke in der Grafik, sondern im Modell darunter.
 
-- ☐ Founder Work Map (A/I/E/U/X) — Balken, kein Radar
-- ☐ Venture Direction — Radar auf Desktop, Balken auf Mobil
-- ☐ Team Difference Map — Dumbbell bei zwei Personen
-- ☐ Dot Plot ab drei Personen
+Ohne Rot/Grün und ohne Zahl — Entscheidung 2.
 
-Alle ohne Rot/Grün und ohne Prozentzahl. Hängt an Entscheidung 2.
+Was die beiden gebauten Bilder NICHT zeigen: Fragen ohne Reihenfolge
+(`single_choice`). Eine Handlungswahl hat keine Stelle auf einer Achse, und
+eine zu zeichnen wäre eine Behauptung über Nähe. Sie stehen in der Liste
+darunter.
 
 ### ☐ 7. Deep-Dive-Routing
 

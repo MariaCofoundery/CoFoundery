@@ -9,6 +9,7 @@ import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getAdvisorAlignmentV21 } from "@/features/instruments/v21/advisorAlignmentV21";
 import { getAdvisorAlignViews } from "@/features/instruments/align/advisorView";
+import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -285,6 +286,10 @@ export default async function AdvisorPersonPage({
             zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus
             nicht unterscheiden.
           </p>
+
+          <div className="mt-6">
+            <WorkMap sections={view.sections} />
+          </div>
 
           <div className="mt-6">
             <ReportViewV21 sections={view.sections} />

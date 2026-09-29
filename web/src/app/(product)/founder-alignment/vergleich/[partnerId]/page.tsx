@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
 import { ExpectationGapsView } from "@/features/instruments/v21/ExpectationGapsView";
 import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
+import { DifferenceMap } from "@/features/instruments/align/AlignMaps";
 import { buildScopeComparison } from "@/features/instruments/align/comparisonData";
 import { registryOf } from "@/features/instruments/align/registries";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
@@ -90,9 +91,18 @@ export default async function AlignComparePage({
                   />
                 </div>
               )}
-              {/* DIE KARTEN VOR DER TABELLE. Wer zuerst die Tabelle sieht,
-                  hat schon gedeutet, bevor die Frage danebensteht - und die
-                  Karten sind genau dafuer da, das zu verhindern. */}
+              {/* DAS BILD VOR DEN KARTEN, DIE KARTEN VOR DER TABELLE.
+                  Wer zuerst die Tabelle sieht, hat schon gedeutet, bevor die
+                  Frage danebensteht. Das Bild zeigt, WO es etwas zu
+                  besprechen gibt, die Karten sagen, WIE. */}
+              <div className="mt-6">
+                <DifferenceMap
+                  sections={vorhaben.sections}
+                  nameA={vorhaben.names.a}
+                  nameB={vorhaben.names.b}
+                />
+              </div>
+
               <div className="mt-6">
                 <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
                 <div className="mt-3">
@@ -129,6 +139,14 @@ export default async function AlignComparePage({
           </p>
         ) : (
           <>
+          <div className="mt-6">
+            <DifferenceMap
+              sections={profil.sections}
+              nameA={profil.names.a}
+              nameB={profil.names.b}
+            />
+          </div>
+
           <div className="mt-6">
             <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
             <div className="mt-3">
