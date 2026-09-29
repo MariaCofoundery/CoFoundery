@@ -93,7 +93,13 @@ export default async function VentureAnswersPage({
             <WorkMap sections={report.sections} />
           </div>
 
-          <ReportViewV21 sections={report.sections} />
+          <ReportViewV21
+            sections={report.sections}
+            marked={report.marked}
+            canMark
+            markScope="venture_alignment"
+            markVentureId={venture.id}
+          />
 
           <div className="mt-10">
             <ShareForm

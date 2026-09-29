@@ -1,4 +1,5 @@
 import { MarkV21 } from "@/features/instruments/v21/MarkV21";
+import type { MarkScope } from "@/features/instruments/v21/markActionsV21";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/readoutV21";
 
 /**
@@ -43,9 +44,14 @@ type Props = {
    * Wer markieren können soll, muss es hinschreiben.
    */
   canMark?: boolean;
+  /** Zu welchem Bogen die Markierung gehört. Ohne Angabe v2.1. */
+  markScope?: MarkScope;
+  markVentureId?: string;
 };
 
-export function ReportViewV21({ sections, orphans = [], marked = [], canMark = false }: Props) {
+export function ReportViewV21({
+  sections, orphans = [], marked = [], canMark = false, markScope, markVentureId,
+}: Props) {
   return (
     <div className="space-y-10">
       {orphans.length > 0 && (
@@ -86,7 +92,12 @@ export function ReportViewV21({ sections, orphans = [], marked = [], canMark = f
               </div>
 
               {canMark && (
-                <MarkV21 itemId={entry.itemId} initial={marked.includes(entry.itemId)} />
+                <MarkV21
+                  itemId={entry.itemId}
+                  initial={marked.includes(entry.itemId)}
+                  scope={markScope}
+                  ventureId={markVentureId}
+                />
               )}
             </div>
           ))}

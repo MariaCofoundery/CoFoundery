@@ -34,6 +34,14 @@ export type ScopeReport = {
   /** Wie viele der Fragen dieses Bogens beantwortet sind. */
   answered: number;
   of: number;
+  /**
+   * Worüber diese Person sprechen möchte.
+   *
+   * KEINE AUSSAGE ÜBER DIE ANTWORT. Die Agenda stellt markierte Fragen vor
+   * alle anderen, und die Gesprächskarten haben dafür eine eigene Regel: Wer
+   * das sagt, hat recht, unabhängig davon, wie nah die Antworten liegen.
+   */
+  marked: string[];
 };
 
 export async function getScopeReport(
@@ -59,7 +67,7 @@ export async function getScopeReport(
 
   const { data: rows } = await supabase
     .from("alignment_answers")
-    .select("block_id, value, missing_code")
+    .select("block_id, value, missing_code, marked_for_discussion")
     .eq("assessment_id", assessment.id);
 
   if (!rows || rows.length === 0) return null;
@@ -81,5 +89,6 @@ export async function getScopeReport(
     submittedAt: (assessment.submitted_at as string | null) ?? null,
     answered: rows.length,
     of: getItemsV22(scope).length,
+    marked: rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
   };
 }

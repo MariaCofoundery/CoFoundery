@@ -60,7 +60,12 @@ export default async function ProfileAnswersPage() {
             <WorkMap sections={report.sections} />
           </div>
 
-          <ReportViewV21 sections={report.sections} />
+          <ReportViewV21
+            sections={report.sections}
+            marked={report.marked}
+            canMark
+            markScope="founder_profile"
+          />
 
           {/* UNTER den Antworten: Wer bis hierher scrollt, hat gesehen, was er
               teilt. */}

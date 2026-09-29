@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { setDiscussionMarkV21 } from "@/features/instruments/v21/markActionsV21";
+import {
+  setDiscussionMarkV21,
+  type MarkScope,
+} from "@/features/instruments/v21/markActionsV21";
 
 /**
  * Der Haken am eigenen Bericht.
@@ -10,7 +13,18 @@ import { setDiscussionMarkV21 } from "@/features/instruments/v21/markActionsV21"
  * möchte. Deshalb steht er hier und nicht im Fragebogen: Beim Ausfüllen weiß
  * niemand, was ein Thema wird.
  */
-export function MarkV21({ itemId, initial }: { itemId: string; initial: boolean }) {
+export function MarkV21({
+  itemId,
+  initial,
+  scope = "v21",
+  ventureId,
+}: {
+  itemId: string;
+  initial: boolean;
+  /** Welcher Bogen - ohne Angabe v2.1, so wie die Seiten es bisher taten. */
+  scope?: MarkScope;
+  ventureId?: string;
+}) {
   const [marked, setMarked] = useState(initial);
   const [failed, setFailed] = useState(false);
   const [pending, start] = useTransition();
@@ -29,7 +43,7 @@ export function MarkV21({ itemId, initial }: { itemId: string; initial: boolean 
           setMarked(next);
           setFailed(false);
           start(async () => {
-            const result = await setDiscussionMarkV21(itemId, next);
+            const result = await setDiscussionMarkV21(itemId, next, scope, ventureId);
             if (!result.ok) {
               setMarked(!next);
               setFailed(true);

@@ -190,6 +190,36 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("was gelesen wird, muss sich auch setzen lassen", () => {
+  // „Darueber moechte ich sprechen“ wurde in den neuen Boegen GELESEN -
+  // agendaV21 stellt markierte Fragen vor alle anderen, und die
+  // Gespraechskarten haben dafuer eine eigene Regel. Setzen liess es sich
+  // nicht: Die Antwortseiten boten den Haken nicht an, und die Serveraktion
+  // suchte nur v2.1-Fragebogen. Ein Vorrang fuer etwas, das niemand ausloesen
+  // kann.
+  for (const [seite, scope] of [
+    ["profil", "founder_profile"],
+    ["vorhaben", "venture_alignment"],
+  ] as const) {
+    const page = readFileSync(
+      join("src", "app", "(product)", "founder-alignment", seite, "antworten", "page.tsx"),
+      "utf8",
+    );
+    assert.match(page, /canMark/, `${seite}: kein Haken`);
+    assert.match(page, new RegExp(`markScope="${scope}"`), `${seite}: falscher Bogen`);
+    assert.match(page, /marked=\{report\.marked\}/, `${seite}: der Haken kennt seinen Stand nicht`);
+  }
+
+  // Das Vorhaben braucht ausserdem das gemeinte: Wer in zwei Vorhaben ist,
+  // markierte sonst in beiden - und in einem davon eine Frage, die er dort
+  // nie beantwortet hat.
+  const vorhaben = readFileSync(
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "antworten", "page.tsx"),
+    "utf8",
+  );
+  assert.match(vorhaben, /markVentureId=/);
+});
+
 test("die Pretest-Messung laeuft fuer die Bögen, die vorgelegt werden", () => {
   // Sie hing an v2.1 fest. Die beiden Boegen, die jetzt tatsaechlich
   // ausgefuellt werden, zeichneten nichts auf - die Auswertung in
