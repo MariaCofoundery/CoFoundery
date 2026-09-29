@@ -1,6 +1,6 @@
 # CoFoundery Align — Fragebogen v2.1
 
-_Erzeugt am 2026-09-28 aus der Registratur. Nicht von Hand ändern — Änderungen gehören in die Quelle und dann hierher über `npm run export:questionnaire`._
+_Erzeugt am 2026-09-29 aus der Registratur. Nicht von Hand ändern — Änderungen gehören in die Quelle und dann hierher über `npm run export:questionnaire`._
 
 **Stand:** 2.1.0, Status draft. 36 Fragen in 20 Abschnitten.
 
