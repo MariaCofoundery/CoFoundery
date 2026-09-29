@@ -59,8 +59,8 @@ const OK = { ok: true } as const;
 const no = (reason: string, detail?: string): AnswerVerdictV21 => ({ ok: false, reason, detail });
 
 /** Welche Auslassungsgründe DIESE Frage anbietet - nicht welche es gibt. */
-export function offeredMissingCodesV21(blockId: string): MissingCode[] {
-  return getItemV21(blockId)?.missing.map((entry) => entry.code) ?? [];
+export function offeredMissingCodesV21(blockId: string, known?: AnswerableItem): MissingCode[] {
+  return (known ?? getItemV21(blockId))?.missing.map((entry) => entry.code) ?? [];
 }
 
 /**
@@ -71,18 +71,50 @@ export function offeredMissingCodesV21(blockId: string): MissingCode[] {
  * keine sechste Möglichkeit neben fünf anderen, sondern die Aussage, dass
  * keine davon zutrifft.
  */
-export function exclusiveOptionOf(item: RegistryItemV21): string | null {
+export function exclusiveOptionOf(item: AnswerableItem): string | null {
   return item.options.find((option) => option.exclusive)?.optionId ?? null;
 }
 
 const has = <K extends string>(value: object, key: K): value is Record<K, unknown> => key in value;
 
-export function validateAnswerV21(answer: AlignmentAnswerV21): AnswerVerdictV21 {
-  const item = getItemV21(answer.blockId);
+/**
+ * Die Frage, gegen die geprüft wird - normalerweise aus der Registratur v2.1.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM SIE HEREINGEREICHT WERDEN KANN
+ * ---------------------------------------------------------------------------
+ *
+ * Seit dem 29.09.2026 gibt es zwei weitere Fragebögen (Arbeitsprofil und
+ * Venture-Alignment). Sie benutzen dieselben Antwortformate und bräuchten
+ * dieselben Regeln - eine zweite Kopie dieser Datei würde nach dem ersten
+ * Unterschied auseinanderlaufen, und zwar lautlos: Beide sähen richtig aus.
+ *
+ * Deshalb hier ein Parameter statt eines Nachbaus. Wer nichts übergibt,
+ * bekommt v2.1 wie bisher.
+ */
+export type AnswerableItem = {
+  itemId: string;
+  answerFormat: string;
+  options: { optionId: string; label: string; requiresText: boolean; exclusive: boolean }[];
+  missing: { code: MissingCode; label: string }[];
+  concerns?: string[];
+  ratingOptions?: string[];
+  followup?: {
+    options?: { optionId: string; label: string; exclusive: boolean }[];
+    multiple?: boolean;
+    triggerOptionId?: string;
+  };
+};
+
+export function validateAnswerV21(
+  answer: AlignmentAnswerV21,
+  known?: AnswerableItem,
+): AnswerVerdictV21 {
+  const item = (known ?? getItemV21(answer.blockId)) as AnswerableItem | null;
   if (!item) return no("unknown_block", answer.blockId);
 
   if (answer.missingCode !== undefined) {
-    if (!offeredMissingCodesV21(answer.blockId).includes(answer.missingCode)) {
+    if (!offeredMissingCodesV21(answer.blockId, item).includes(answer.missingCode)) {
       // Ein Grund, den die Frage nicht anbietet, ist entweder ein Fehler in der
       // Oberfläche oder eine Antwort, die jemand hineingeschrieben hat.
       return no("missing_code_not_offered", `${answer.blockId}: ${answer.missingCode}`);
@@ -271,6 +303,15 @@ export function validateAnswerV21(answer: AlignmentAnswerV21): AnswerVerdictV21 
       }
       return OK;
     }
+
+    default:
+      // EIN UNBEKANNTES FORMAT IST EIN FEHLER, KEIN DURCHLASS.
+      //
+      // Seit die Frage hereingereicht werden kann, koennte sie aus einer
+      // anderen Registratur stammen. Faende sich dort ein Format, das hier
+      // niemand kennt, waere ein stilles `return OK` das Schlimmste: Die
+      // Antwort ginge ungeprueft in die Ablage.
+      return no("unknown_format", `${item.itemId}: ${item.answerFormat}`);
   }
 }
 
@@ -321,7 +362,7 @@ export function validateFollowUpV21(
  * Menschen.
  */
 function followUpVerdict(
-  item: RegistryItemV21,
+  item: AnswerableItem,
   chosenOptionId: string,
   value: object,
 ): AnswerVerdictV21 {
@@ -363,7 +404,7 @@ function followUpVerdict(
  * welche - eine Antwort, die aussieht wie eine Auskunft und keine ist.
  */
 function requiredTextPresent(
-  item: RegistryItemV21,
+  item: AnswerableItem,
   chosen: string[],
   value: object,
 ): AnswerVerdictV21 {
@@ -414,8 +455,9 @@ export type Completeness = "empty" | "incomplete" | "complete";
 export function completenessV21(
   itemId: string,
   value: Record<string, unknown> | undefined,
+  known?: AnswerableItem,
 ): Completeness {
-  const item = getItemV21(itemId);
+  const item = (known ?? getItemV21(itemId)) as AnswerableItem | null;
   if (!item || !value) return "empty";
 
   const filled = (entry: unknown): boolean => {
@@ -515,5 +557,11 @@ export function completenessV21(
       if (written.length === 0) return "empty";
       return "complete";
     }
+
+    default:
+      // Unbekanntes Format: nicht als vollstaendig durchwinken. "incomplete"
+      // heisst hier, dass nicht gespeichert wird - und das ist richtig, denn
+      // geprueft werden koennte es danach auch nicht.
+      return nothing ? "empty" : "incomplete";
   }
 }

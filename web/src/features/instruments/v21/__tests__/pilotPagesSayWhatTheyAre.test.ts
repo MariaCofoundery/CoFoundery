@@ -49,6 +49,12 @@ const ERLAUBT = [
   // Die Advisor-Seite: Sie zeigt fremde Antworten, wenn sie freigegeben sind.
   // Ein eigener Test unten haelt fest, dass sie dort nichts anfassen kann.
   join("src", "app", "(product)", "advisor", "person") + sep,
+  // Die beiden neuen Boegen (Arbeitsprofil, Venture-Alignment). Sie benutzen
+  // die Antwortpruefung, das Eingabefeld und die Lesbarmachung von v2.1 -
+  // bewusst, damit es nicht zwei Kopien gibt, die auseinanderlaufen. Die
+  // FRAGEN kommen aus ihren eigenen Registraturen.
+  join("src", "app", "(product)", "founder-alignment", "profil") + sep,
+  join("src", "app", "(product)", "founder-alignment", "vorhaben") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;
@@ -182,7 +188,19 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
-test("die Testfassung wird nur von den Pilotseiten, der Wahlseite, dem Dashboard und der Advisor-Seite erreicht", () => {
+test("die neuen Bögen holen ihre FRAGEN aus den eigenen Registraturen", () => {
+  // Sie duerfen v2.1-Bausteine benutzen - Pruefung, Eingabefeld,
+  // Lesbarmachung. Die Fragen aus v2.1 zu ziehen waere etwas anderes: Dann
+  // stuenden dort 36 statt 16, und die Teilung waere Dekoration.
+  for (const seite of ["profil", "vorhaben"]) {
+    const page = readFileSync(
+      join("src", "app", "(product)", "founder-alignment", seite, "page.tsx"), "utf8");
+    assert.match(page, /instruments\/align\/registries/, seite);
+    assert.ok(!/getItemsV21|getSectionsV21|REGISTRY_V21/.test(page), `${seite} zieht v2.1-Fragen`);
+  }
+});
+
+test("die Testfassung wird nur von den bewusst eingetragenen Stellen erreicht", () => {
   // Nicht mehr „nur unter debug“, aber weiterhin an einer Stelle: Ein Link aus
   // dem Dashboard ist in Ordnung, ein zweiter Fragebogen an anderer Stelle
   // nicht. Wer v2.1 einbindet, soll es bewusst tun.

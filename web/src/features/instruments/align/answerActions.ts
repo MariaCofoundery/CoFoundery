@@ -1,0 +1,179 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import {
+  FOUNDER_PROFILE_INSTRUMENT_ID,
+  VENTURE_ALIGNMENT_INSTRUMENT_ID,
+} from "@/features/instruments/instruments";
+import {
+  getItemsV22,
+  registryOf,
+  type AssessmentScope,
+} from "@/features/instruments/align/registries";
+import { answerableOf } from "@/features/instruments/align/questionnaireData";
+import {
+  validateAnswerV21,
+  type AlignmentAnswerV21,
+} from "@/features/instruments/v21/answersV21";
+import { resolveVenture } from "@/features/instruments/align/ventureResolution";
+
+/**
+ * Speichern, zurücknehmen, abgeben - für beide Bögen.
+ *
+ * ---------------------------------------------------------------------------
+ * DER SCOPE ENTSCHEIDET, WO DIE ANTWORT LANDET
+ * ---------------------------------------------------------------------------
+ *
+ * Das Arbeitsprofil gehört zur Person: ein Fragebogen, kein Vorhaben. Das
+ * Venture-Alignment gehört zu EINEM Vorhaben - dieselbe Person kann bei zwei
+ * Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.
+ *
+ * Deshalb wird der Entwurf je Scope gesucht UND angelegt. Ein Fragebogen ohne
+ * diese Unterscheidung wäre genau die Unklarheit, wegen der geteilt wurde:
+ * Hieß „15 Stunden“ allgemein oder für dieses Vorhaben im September?
+ */
+
+type Result = { ok: true } | { ok: false; reason: string; detail?: string };
+
+const INSTRUMENT: Record<AssessmentScope, string> = {
+  founder_profile: FOUNDER_PROFILE_INSTRUMENT_ID,
+  venture_alignment: VENTURE_ALIGNMENT_INSTRUMENT_ID,
+};
+
+async function draftFor(scope: AssessmentScope) {
+  const supabase = await createClient();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  if (authError || !auth?.user?.id) throw new Error("not_authenticated");
+  const userId = auth.user.id;
+
+  // Nur der Venture-Bogen braucht ein Vorhaben. Beim Arbeitsprofil bleibt es
+  // leer - die Datenbank weist es sonst ab.
+  let ventureId: string | null = null;
+  if (scope === "venture_alignment") {
+    const { venture } = await resolveVenture(userId);
+    if (!venture) throw new Error("venture_ambiguous");
+    ventureId = venture.id;
+  }
+
+  const suche = supabase
+    .from("assessments")
+    .select("id, submitted_at")
+    .eq("user_id", userId)
+    .eq("module", scope)
+    .eq("instrument_id", INSTRUMENT[scope])
+    .is("submitted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const { data: existing } = ventureId
+    ? await suche.eq("venture_id", ventureId).maybeSingle()
+    : await suche.is("venture_id", null).maybeSingle();
+
+  if (existing) return { supabase, assessment: existing, ventureId };
+
+  const { data: created, error } = await supabase
+    .from("assessments")
+    .insert({
+      user_id: userId,
+      module: scope,
+      instrument_id: INSTRUMENT[scope],
+      venture_id: ventureId,
+    })
+    .select("id, submitted_at")
+    .single();
+
+  if (error || !created) throw new Error(error?.message ?? "draft_create_failed");
+  return { supabase, assessment: created, ventureId };
+}
+
+export async function saveAnswer(
+  scope: AssessmentScope,
+  answer: AlignmentAnswerV21,
+): Promise<Result> {
+  const item = registryOf(scope).items.find((entry) => entry.itemId === answer.blockId);
+  // Eine Frage aus dem ANDEREN Bogen wird abgewiesen, nicht stillschweigend
+  // angenommen - sonst laege eine Venture-Antwort im Arbeitsprofil.
+  if (!item) return { ok: false, reason: "unknown_block", detail: answer.blockId };
+
+  const verdict = validateAnswerV21(answer, answerableOf(item));
+  if (!verdict.ok) return verdict;
+
+  const { supabase, assessment } = await draftFor(scope);
+
+  const { error } = await supabase.from("alignment_answers").upsert(
+    {
+      assessment_id: assessment.id,
+      block_id: answer.blockId,
+      answer_format: item.answerFormat,
+      value: answer.value ?? null,
+      missing_code: answer.missingCode ?? null,
+      answered_at: new Date().toISOString(),
+    },
+    { onConflict: "assessment_id,block_id" },
+  );
+
+  if (error) return { ok: false, reason: "save_failed", detail: error.message };
+  return { ok: true };
+}
+
+/** Eine Antwort zurücknehmen. Danach gilt die Frage wieder als offen. */
+export async function clearAnswer(
+  scope: AssessmentScope,
+  itemId: string,
+): Promise<Result> {
+  if (!registryOf(scope).items.some((entry) => entry.itemId === itemId)) {
+    return { ok: false, reason: "unknown_block", detail: itemId };
+  }
+
+  const { supabase, assessment } = await draftFor(scope);
+  const { error } = await supabase
+    .from("alignment_answers")
+    .delete()
+    .eq("assessment_id", assessment.id)
+    .eq("block_id", itemId);
+
+  if (error) return { ok: false, reason: "clear_failed", detail: error.message };
+  return { ok: true };
+}
+
+/**
+ * Abgeben.
+ *
+ * Verlangt Vollständigkeit - für jede Frage gibt es ein Wort, notfalls ein
+ * Auslassungsgrund. Eine fehlende Zeile ist deshalb ein Versehen und keine
+ * Haltung.
+ */
+export async function submitScope(
+  scope: AssessmentScope,
+): Promise<Result & { missing?: string[] }> {
+  const { supabase, assessment } = await draftFor(scope);
+
+  const { data: rows, error: readError } = await supabase
+    .from("alignment_answers")
+    .select("block_id")
+    .eq("assessment_id", assessment.id);
+
+  if (readError) return { ok: false, reason: "read_failed", detail: readError.message };
+
+  const beantwortet = new Set((rows ?? []).map((row) => row.block_id));
+  const missing = getItemsV22(scope)
+    .filter((item) => {
+      // Anschlussfragen zaehlen nur, wenn ihre Voraussetzung beantwortet ist.
+      // Sie zu verlangen hiesse, jemanden fuer eine zulaessige Antwort zu
+      // bestrafen.
+      if (item.showAfter && !beantwortet.has(item.showAfter)) return false;
+      return !beantwortet.has(item.itemId);
+    })
+    .map((item) => item.itemId);
+
+  if (missing.length > 0) return { ok: false, reason: "incomplete", missing };
+
+  const { error } = await supabase
+    .from("assessments")
+    .update({ submitted_at: new Date().toISOString() })
+    .eq("id", assessment.id)
+    .is("submitted_at", null);
+
+  if (error) return { ok: false, reason: "submit_failed", detail: error.message };
+  return { ok: true };
+}
