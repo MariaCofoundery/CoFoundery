@@ -147,19 +147,36 @@ deshalb an Entscheidung 1.
 
 ## Im Dokument selbst ändern
 
-### ☐ 9. Datenmodell (`MVP-Spec §19–21`) streichen oder umschreiben
+### ☑ 9. Datenmodell (`MVP-Spec §19–21`) umgeschrieben
 
-Beschreibt Tabellen, die es gibt, unter anderen Namen: `AssessmentResponse`
-ist `alignment_answers`. Sonst baut jemand daneben.
+Nicht gestrichen, sondern ersetzt durch das, was wirklich gebaut ist — mit
+Begründung je Unterschied, damit die Abweichung nicht wie ein Versehen
+aussieht:
 
-### ☐ 10. `visibility` je Antwort (`§24`) klarstellen
+- `assessmentVersion` als Text → `instrument_id` mit Status
+  (`draft`/`active`/`archived`). Eine Fassung, die nur als Text dasteht, lässt
+  sich nicht archivieren.
+- vier `value*`-Spalten → ein `value jsonb` plus `answer_format`. Vier
+  Spalten, von denen drei leer sind, laden dazu ein, in `valueNumeric` zu
+  rechnen.
+- `missing_code` fehlte im Vorschlag ganz und ist der Kern.
+- **Keine Snapshots.** Sie enthielten gerechnete Abschnittswerte — die gibt es
+  nicht, also wäre es eine Ablage für eine Zahl, die nie entsteht.
+- **Kein gespeichertes `TeamComparison`.** Der Vergleich wird gerechnet, kennt
+  keine `value: number` und ist auf zwei Personen gebaut.
 
-Gebaut ist etwas anderes und mehr: Das Ausblenden hängt an der **Freigabe**,
-nicht an der Antwort. Damit kann dieselbe Antwort Person A gezeigt und Person
-B verborgen werden. Eine Spalte `visibility` am Item wäre eine zweite
-Wahrheit, die nichts tut.
+### ☑ 10. `visibility` je Antwort (`§24`) klargestellt
 
----
+Sichtbarkeit hängt an der **Freigabe**, nicht an der Antwort — und zwar je
+Empfänger (`alignment_shares` + `alignment_share_hidden_blocks`). Dieselbe
+Antwort kann Person A gezeigt und Person B verborgen werden; eine Spalte an der
+Antwort könnte das nicht ausdrücken. Und `"private" | "team" | "advisor"` ist
+keine Leiter: „Advisor" ist nicht mehr als „Team", sondern etwas anderes.
+
+Dabei gefunden und behoben: Die Formregel fürs **Ausblenden** war enger als die
+fürs **Antworten** (`^[A-Z][0-9]{2}$` gegen `^[A-Z][0-9]{2}[a-z]?$`). G02a und
+G02b ließen sich beantworten, aber nicht zurückhalten — die engere Regel stand
+ausgerechnet auf der schützenden Seite. Migration 20261081120000.
 
 ## Schon vorhanden — nicht neu bauen
 

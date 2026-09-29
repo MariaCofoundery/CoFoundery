@@ -828,144 +828,125 @@ Routes an bestehende App-Struktur anpassen.
 
 ---
 
-# 19. Datenmodell — Vorschlag
+# 19. Datenmodell — wie es gebaut ist
 
-## assessment_response
+> **Überarbeitet am 29.09.2026.** Hier stand ein Vorschlag mit den Typen
+> `AssessmentResponse`, `FounderProfileSnapshot` und
+> `VentureDirectionSnapshot`. Die Tabellen gibt es — unter anderen Namen und
+> mit einer anderen Aufteilung. Der Vorschlag stehen zu lassen hieße, dass
+> jemand danebenbaut.
 
-```ts
-type AssessmentResponse = {
-  id: string
-  userId: string
-  assessmentVersion: string
-  ventureId?: string
-  itemId: string
+## Was wirklich existiert
 
-  valueNumeric?: number
-  valueText?: string
-  valueOption?: string
-  valueOptions?: string[]
+```sql
+assessments (
+  id, user_id,
+  module          assessment_module,   -- 'founder_profile' | 'venture_alignment' | 'base' | 'values'
+  instrument_id   text references instruments(id),
+  venture_id      uuid references founder_teams(id),
+  submitted_at, answers_confirmed_at, created_at
+)
 
-  visibility: "private" | "team" | "advisor"
-  answeredAt: string
-}
+alignment_answers (
+  assessment_id, block_id,             -- Primärschlüssel; block_id ~ '^[A-Z][0-9]{2}[a-z]?$'
+  answer_format   text,
+  value           jsonb,               -- Form je nach answer_format
+  missing_code    text,                -- ENTWEDER value ODER missing_code, nie beides
+  marked_for_discussion boolean,
+  change_condition text,
+  answered_at, language
+)
 ```
+
+Drei Unterschiede zum Vorschlag, und jeder hat einen Grund:
+
+**`assessmentVersion` als Zeichenkette gibt es nicht.** Stattdessen
+`instrument_id` mit Fremdschlüssel auf `instruments`, wo jede Fassung einen
+Status hat (`draft` / `active` / `archived`). Eine Fassung, die nur als Text in
+einer Spalte steht, lässt sich nicht archivieren, ohne dass jemand jede Zeile
+anfasst.
+
+**`valueNumeric` / `valueText` / `valueOption` / `valueOptions` gibt es nicht.**
+Ein `value jsonb` plus `answer_format`. Vier Spalten, von denen je nach Format
+drei leer sind, laden dazu ein, in `valueNumeric` zu rechnen — und genau das
+soll nicht passieren (§8.1 der Master-Fassung).
+
+**`missing_code` fehlt im Vorschlag ganz.** Er ist aber der Kern: „Kann ich
+noch nicht einschätzen" ist eine Auskunft, keine Lücke. Ein leeres Feld und ein
+benannter Auslassungsgrund sind zwei verschiedene Dinge, und in v1 wurde aus
+dem einen stillschweigend die Mitte.
+
+**`visibility` steht nicht an der Antwort** — siehe §24.
+
+## Es gibt keine Snapshots
+
+`FounderProfileSnapshot` und `VentureDirectionSnapshot` sind nicht gebaut, und
+zwar mit Absicht.
+
+Beide enthalten gerechnete Werte (`workMap.analyticalReview?: number`). Die
+gibt es nicht: Es werden keine Abschnittswerte gebildet, weil dafür weder
+Normstichprobe noch bestätigte Faktoren vorliegen. Ein Snapshot wäre eine
+Ablage für eine Zahl, die nie entsteht.
+
+Der Bericht wird jedes Mal aus den Antworten gelesen (`readAll` in
+`readoutV21.ts`). Das ist langsamer und richtig: Eine abgelegte Auswertung
+läuft von den Antworten weg, sobald sich die Lesbarmachung ändert — und dann
+zeigen zwei Seiten verschiedene Dinge, ohne dass es jemand merkt.
 
 ---
 
-## founder_profile_snapshot
+# 20. Team Comparison Model — gibt es nicht als Ablage
 
-```ts
-type FounderProfileSnapshot = {
-  userId: string
-  assessmentVersion: string
+> **Überarbeitet am 29.09.2026.**
 
-  workMap: {
-    analyticalReview?: number
-    experientialIntuition?: number
-    earlyExperimentation?: number
-    decisionAutonomy?: number
-    opennessComfort?: number
-  }
+`TeamComparison` beschreibt ein gespeichertes Vergleichsobjekt mit
+`values: { userId, value: number }[]`. Gebaut ist etwas anderes:
 
-  qualitative: {
-    informationStyle?: string
-    objectionTiming?: string
-    disagreementStyle?: string
-  }
+- Der Vergleich wird **berechnet, nicht abgelegt** — `compareV21(a, b, bogen)`
+  liest beide Seiten und stellt sie nebeneinander. Es gibt keine Tabelle
+  `team_comparisons`.
+- Er kennt **keine `value: number`**. Eine geordnete Antwort trägt Beschriftung
+  und Stelle (`position`, `of`), und die Stelle heißt absichtlich nicht
+  `value`, damit niemand versucht, damit zu rechnen.
+- Er ist auf **zwei Personen** gebaut. `members: string[]` legt eine
+  Teamgröße > 2 nahe; die gibt es nicht (siehe §23 und Punkt 6 der To-do).
+- **`workMapComparison` / `ventureDirectionComparison` als eigene Blöcke** gibt
+  es nicht. Verglichen wird je Bogen und je Abschnitt, weil Arbeitsprofil und
+  Vorhaben verschiedene Gültigkeiten haben.
 
-  generatedAt: string
-}
-```
+Was es stattdessen gibt: `ScopeComparison` in `comparisonData.ts` — je Bogen
+die Abschnitte, eine Agenda nach Art (nicht nach Schwere), die
+Erwartungsdifferenzen R01/R02 und die Gesprächskarten.
 
 ---
 
-## venture_direction_snapshot
+# 21. Comparison Finding — teilweise gebaut, anders benannt
 
-```ts
-type VentureDirectionSnapshot = {
-  userId: string
-  ventureId: string
-  assessmentVersion: string
+> **Überarbeitet am 29.09.2026.**
 
-  priorities: {
-    substance?: number
-    growth?: number
-    exit?: number
-    impact?: number
-    independence?: number
-    realization?: number
-  }
+Die Idee stimmt, die Form nicht.
 
-  topPriorities: string[]
-}
-```
+`AgendaEntry` in `comparisonV21.ts` hat die Kategorien
+`marked | commitment | preference | shared` statt
+`expectation_difference | strategic_difference | workstyle_difference |
+similarity`. Sie ordnen nach **Art**, nicht nach Schwere: Zusagen und Regeln
+sind konkreter als Arbeitspräferenzen — schwerer sind sie deshalb nicht.
+`marked` steht davor und kommt nicht aus dem Vergleich, sondern aus der
+Markierung „darüber möchte ich sprechen": Wer das sagt, hat recht, unabhängig
+davon, wie nah die Antworten liegen.
 
----
+**`interpretation?: string` gibt es nicht als Feld an einem Befund.** Deutung
+steht in den Gesprächskarten, und die kommen aus einer geprüften Sammlung
+(`align-conversation-v1.json`) und nicht aus einem erzeugten Satz. Ein
+Deutungsfeld am Befund wäre die Einladung, es mit einem Modell zu füllen —
+und niemand im Gespräch könnte einem solchen Satz ansehen, dass ihn niemand
+gesagt hat.
 
-# 20. Team Comparison Model
-
-```ts
-type TeamComparison = {
-  ventureId: string
-  assessmentVersion: string
-  members: string[]
-
-  workMapComparison: {
-    dimension: string
-    values: {
-      userId: string
-      value: number
-    }[]
-  }[]
-
-  ventureDirectionComparison: {
-    dimension: string
-    values: {
-      userId: string
-      value: number
-    }[]
-  }[]
-
-  expectationDifferences: ComparisonFinding[]
-  strategicDifferences: ComparisonFinding[]
-  workStyleDifferences: ComparisonFinding[]
-  similarities: ComparisonFinding[]
-
-  suggestedDeepDives: DeepDiveSuggestion[]
-}
-```
-
----
-
-# 21. Comparison Finding
-
-```ts
-type ComparisonFinding = {
-  id: string
-  category:
-    | "expectation_difference"
-    | "strategic_difference"
-    | "workstyle_difference"
-    | "similarity"
-
-  topic: string
-
-  evidence: {
-    userId: string
-    label: string
-    value: string | number
-  }[]
-
-  summary: string
-  interpretation?: string
-
-  suggestedModule?:
-    | "decisions"
-    | "collaboration"
-    | "founder_setup"
-    | "custom_topic"
-}
-```
+**`suggestedModule`** ist gebaut, aber anders: `deepDive.ts` bildet
+**Abschnitt → Founder-Setup-Thema** ab. Die Module `"decisions"` /
+`"collaboration"` / `"custom_topic"` gibt es in dieser Anwendung nicht; es gibt
+den Founder-Setup-Katalog mit 20 Themen, und die Karten zeigen dorthin, ohne
+etwas zu schreiben (§17).
 
 ---
 
@@ -1044,33 +1025,57 @@ Empfehlung für MVP:
 
 ---
 
-# 24. Privacy
+# 24. Privacy — die Freigabe entscheidet, nicht die Antwort
 
-Sensible Felder:
+> **Überarbeitet am 29.09.2026.** Hier stand `visibility = "private" | "team" |
+> "advisor"` je Antwort. Gebaut ist etwas anderes — und mehr.
+
+Sensible Felder (unverändert richtig):
 
 - B01 persönlicher Geldverlust
 - R05 persönlicher Mindestbedarf
 - L persönliche Grenzen
 - ggf. B02 persönliche Haftung
 
-Jede Antwort hat Sichtbarkeit:
+## Warum keine Spalte an der Antwort
 
-```ts
-visibility = "private" | "team" | "advisor"
+Eine Antwort hat keine Sichtbarkeit. Sichtbarkeit entsteht erst, wenn jemand
+teilt — und zwar **je Empfänger**:
+
+```sql
+alignment_shares            (assessment_id, recipient_user_id, revoked_at)
+alignment_share_hidden_blocks (share_id, block_id)
 ```
 
-Wichtig:
+Dieselbe Antwort kann damit Person A gezeigt und Person B verborgen werden.
+Genau das braucht man: Was man dem Mitgründer sagt, sagt man nicht
+zwangsläufig dem Advisor, und umgekehrt. Eine Spalte `visibility` an der
+Antwort könnte das nicht ausdrücken — sie wäre eine zweite Wahrheit, die
+entweder nichts tut oder der ersten widerspricht.
 
-"private" / "not shared" niemals als fehlend interpretieren.
+Die drei Stufen `"private" | "team" | "advisor"` sind außerdem keine Leiter.
+„Advisor" ist nicht mehr als „Team", sondern etwas anderes.
 
-Teamreport:
+## Was daraus folgt
+
+Ausgeblendete Antworten kommen **gar nicht erst mit** — das entscheiden die
+Policies auf `alignment_answers`, nicht der Code darüber. Die Regel
 
 ```ts
-if (!shared) {
-  doNotCompare()
-  doNotInfer()
-}
+if (!shared) { doNotCompare(); doNotInfer(); }
 ```
+
+ist damit nicht eine Vorsichtsmaßnahme im Report, sondern eine Eigenschaft der
+Datenbank: Es gibt nichts zu vergleichen, weil nichts ankommt.
+
+**„Nicht geteilt" ≠ „fehlt" — und von außen sind sie nicht zu unterscheiden.**
+Deshalb sagt keine Ansicht „zurückgehalten". Der Advisor sieht „du siehst N von
+M Fragen", nicht „N Fragen wurden dir vorenthalten": Eine Zahl, die beides
+gleich nennt, behauptet eine Entscheidung, die vielleicht nie getroffen wurde.
+
+Beide Formregeln für `block_id` sind seit Migration 20261081120000 dieselbe.
+Vorher war die Regel fürs Ausblenden enger als die fürs Antworten — ausgerechnet
+auf der schützenden Seite.
 
 ---
 
