@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
 import { ConversationCardsView } from "@/features/instruments/v21/ConversationCardsView";
+import { ExpectationGapsView } from "@/features/instruments/v21/ExpectationGapsView";
 import { buildCardsV21 } from "@/features/instruments/v21/conversationCardsV21";
 import {
   buildComparisonV21,
@@ -127,10 +128,22 @@ export default async function CompareV21Page({
         heißt, dass ihr darüber noch nicht gesprochen habt.
       </p>
 
+      {/* GANZ OBEN: die konkreteste Aussage, die dieser Vergleich hergibt.
+          Zwei Zahlen, ueber die sich am Dienstag reden laesst - waehrend
+          "ihr geht unterschiedlich mit Unsicherheit um" ein Gespraech
+          braucht, bevor es etwas bedeutet. */}
+      <div className="mt-10">
+        <ExpectationGapsView
+          result={comparison.expectations}
+          nameA="Du"
+          nameB="Die andere Person"
+        />
+      </div>
+
       {/* DIE KARTEN VOR DEM VERGLEICH. Wer zuerst die Tabelle sieht, hat
           schon gedeutet, bevor die Frage danebensteht - und die Karten sind
           genau dafuer da, das zu verhindern. */}
-      <section className="mt-10">
+      <section className="mt-12">
         <h2 className="text-lg font-semibold text-slate-900">Gesprächskarten</h2>
         <p className="mt-1 text-sm text-slate-600">
           Aus einer geprüften Sammlung, nicht erzeugt. Zu jeder Karte steht, was

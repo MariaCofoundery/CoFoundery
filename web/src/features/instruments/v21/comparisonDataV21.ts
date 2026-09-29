@@ -5,6 +5,10 @@ import {
   agendaV21,
   type ItemComparison,
 } from "@/features/instruments/v21/comparisonV21";
+import {
+  expectationGapsV21,
+  type ExpectationResult,
+} from "@/features/instruments/v21/expectationsV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 
 /**
@@ -34,6 +38,14 @@ export type ComparisonV21 = {
   agenda: ReturnType<typeof agendaV21>;
   /** Was jemand zurückgehalten hat - genannt, nicht als Antwort getarnt. */
   notShared: { itemId: string; side: "a" | "b" }[];
+  /**
+   * Was jemand zusagt gegen das, was von ihm erwartet wird.
+   *
+   * Steht getrennt von den Themen, weil es etwas anderes ist: Eine
+   * unterschiedliche Antwort ist ein Gesprächsthema, eine Erwartungsdifferenz
+   * ist eine Zahl, über die sich am Dienstag reden lässt.
+   */
+  expectations: ExpectationResult;
 };
 
 /**
@@ -77,6 +89,10 @@ export function buildComparisonV21(a: SideInput, b: SideInput): ComparisonV21 {
 
   return {
     sections,
+    expectations: expectationGapsV21({
+      a: { offer: readA.R01 ?? null, expectations: readA.R02 ?? null },
+      b: { offer: readB.R01 ?? null, expectations: readB.R02 ?? null },
+    }),
     agenda: agendaV21(sections, marked),
     notShared: [
       ...[...withheldA].map((itemId) => ({ itemId, side: "a" as const })),
