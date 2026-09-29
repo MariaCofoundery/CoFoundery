@@ -9,6 +9,7 @@ import {
   type TransitionDecision,
 } from "@/features/instruments/v21/transitionV21";
 import type { ArchiveConnection } from "@/features/instruments/v21/VersionArchiveCard";
+import { connectedPartners } from "@/features/instruments/connectedPartners";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -112,24 +113,10 @@ export async function getDashboardVersionState(
 async function connectionsFor(userId: string): Promise<ArchiveConnection[]> {
   const supabase = await createClient();
 
-  const { data: invitations } = await supabase
-    .from("invitations")
-    .select("inviter_user_id, invitee_user_id, inviter_display_name, label")
-    .eq("status", "accepted")
-    .is("revoked_at", null)
-    .or(`inviter_user_id.eq.${userId},invitee_user_id.eq.${userId}`);
-
-  const partners = new Map<string, string>();
-  for (const row of invitations ?? []) {
-    const other = row.inviter_user_id === userId ? row.invitee_user_id : row.inviter_user_id;
-    if (!other || other === userId) continue;
-    const label =
-      (row.inviter_user_id === userId ? row.label : row.inviter_display_name) ??
-      row.label ??
-      "Mitgründer:in";
-    if (!partners.has(other)) partners.set(other, label);
-  }
-  if (partners.size === 0) return [];
+  // Wer verbunden ist, steht an einer Stelle - sonst heisst dieselbe Person
+  // hier anders als im Kasten daneben.
+  const partners = await connectedPartners(userId);
+  if (partners.length === 0) return [];
 
   // Freigegeben heisst: Ich sehe ihre Antworten. Genau das prueft diese
   // Abfrage - ueber dieselben Policies wie ueberall, nicht ueber eine
@@ -151,9 +138,9 @@ async function connectionsFor(userId: string): Promise<ArchiveConnection[]> {
 
   const ready = new Set((theirs ?? []).map((row) => row.user_id as string));
 
-  return [...partners.entries()].map(([id, label]) => ({
-    userId: id,
-    label,
-    ready: ready.has(id),
+  return partners.map((partner) => ({
+    userId: partner.userId,
+    label: partner.label,
+    ready: ready.has(partner.userId),
   }));
 }

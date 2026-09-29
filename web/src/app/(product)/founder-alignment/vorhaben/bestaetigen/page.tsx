@@ -3,6 +3,7 @@ import { ConfirmClient } from "@/features/instruments/align/ConfirmClient";
 import type { ConfirmEntry } from "@/features/instruments/align/ConfirmVentureAnswers";
 import { itemsThatAge, itemsThatKeep } from "@/features/instruments/align/whatAges";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
+import { readableItems } from "@/features/instruments/align/questionnaireData";
 import { readAnswer } from "@/features/instruments/v21/readoutV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -15,13 +16,21 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * bestätigt wurde. Wer die Seite direkt aufruft, sieht sie trotzdem: Ein Blick
  * auf die eigenen Angaben ist nie falsch.
  */
-export default async function ConfirmPage() {
+export default async function ConfirmPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ venture?: string }>;
+}) {
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/bestaetigen")}`);
   }
 
-  const { venture } = await resolveVenture(auth.user.id);
+  // Wer in zwei Vorhaben ist, kommt mit dem gemeinten hierher. Ohne die
+  // Angabe gaebe resolveVenture null zurueck und die Seite schickte ihn
+  // zurueck an den Fragebogen - ausgerechnet den, der ihn hergeschickt hat.
+  const { venture: gewaehlt } = await searchParams;
+  const { venture } = await resolveVenture(auth.user.id, gewaehlt);
   if (!venture) redirect("/founder-alignment/vorhaben");
 
   const supabase = await createClient();
@@ -48,13 +57,23 @@ export default async function ConfirmPage() {
   if (!rows || rows.length === 0) redirect("/founder-alignment/vorhaben");
 
   const byId = new Map(rows.map((row) => [row.block_id, row]));
+
+  // DIE FRAGE MUSS MITGEGEBEN WERDEN. Ohne sie greift readAnswer auf die
+  // v2.1-Registratur zurueck, und 24 der 36 Kennungen gibt es dort auch - mit
+  // anderem Wortlaut und teils anderen Antwortmoeglichkeiten. Dann stuende
+  // hier eine Beschriftung aus dem falschen Bogen, und bei den uebrigen zwoelf
+  // saehe eine vorhandene Antwort aus wie keine.
+  const lesbar = new Map(
+    readableItems("venture_alignment").map((item) => [item.itemId, item]),
+  );
+
   const toEntry = (itemId: string, prompt: string): ConfirmEntry => {
     const row = byId.get(itemId);
     if (!row) return { itemId, prompt, entry: null };
     const answer = (row.missing_code
       ? { blockId: itemId, missingCode: row.missing_code }
       : { blockId: itemId, value: row.value }) as AlignmentAnswerV21;
-    return { itemId, prompt, entry: readAnswer(answer) };
+    return { itemId, prompt, entry: readAnswer(answer, [], lesbar.get(itemId)) };
   };
 
   const ages = itemsThatAge().map((item) => toEntry(item.itemId, item.prompt));

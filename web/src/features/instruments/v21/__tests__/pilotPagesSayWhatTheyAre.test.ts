@@ -190,6 +190,30 @@ test("der Advisor kann fremde Antworten nicht anfassen", () => {
   assert.match(view, /canMark = false/);
 });
 
+test("die neuen Bögen lesen ihre Antworten nie gegen die v2.1-Registratur", () => {
+  // readAnswer ohne Frage faellt auf v2.1 zurueck. 24 der 36 Venture-Kennungen
+  // gibt es dort auch - mit anderem Wortlaut und teils anderen Antworten. Der
+  // Rueckfall ist also nicht leer, sondern falsch: Beschriftungen aus dem
+  // falschen Bogen, und bei den uebrigen zwoelf saehe eine vorhandene Antwort
+  // aus wie keine.
+  const files = [
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "bestaetigen", "page.tsx"),
+  ];
+  for (const file of files) {
+    const text = readFileSync(file, "utf8");
+    const aufrufe = text.match(/readAnswer\([^)]*\)/g) ?? [];
+    // Sonst bestuende die Pruefung eine Datei, die readAnswer gar nicht mehr
+    // benutzt - und niemand merkte, dass sie nichts mehr prueft.
+    assert.ok(aufrufe.length > 0, `${file} ruft readAnswer nicht mehr auf`);
+    for (const aufruf of aufrufe) {
+      assert.ok(
+        aufruf.split(",").length >= 3,
+        `${file}: ${aufruf} gibt die Frage nicht mit`,
+      );
+    }
+  }
+});
+
 test("der Advisor sieht die beiden neuen Bögen mit derselben Beschränkung", () => {
   const page = readFileSync(
     join("src", "app", "(product)", "advisor", "person", "[userId]", "page.tsx"), "utf8");

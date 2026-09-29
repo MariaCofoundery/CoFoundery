@@ -46,6 +46,8 @@ import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
 import { TransitionAnnounce } from "@/features/instruments/v21/TransitionAnnounce";
 import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
 import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
+import { AlignCard } from "@/features/instruments/align/AlignCard";
+import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
 type DashboardSearchParams = {
@@ -176,6 +178,7 @@ export default async function DashboardPage({
   // Erst hier, nicht oben im grossen Promise.all: Wer kein Founder ist, wird
   // vorher weitergeleitet und soll diese Abfragen nicht bezahlen.
   const versionState = await getDashboardVersionState(user.id);
+  const alignState = await getAlignDashboardState(user.id);
 
   let invitationRows = initialInvitationRows;
   let runsResult = initialRunsResult;
@@ -616,6 +619,15 @@ export default async function DashboardPage({
         gerade erst anfaengt, soll keinen Hinweis auf eine Neufassung von etwas
         bekommen, das er nie gesehen hat.
       */}
+      {/*
+        DIE BEIDEN BOEGEN ZUERST, DAS ARCHIV DANACH.
+        Wer hier ankommt, soll den Weg zu dem finden, was jetzt gilt. Der
+        Kasten darunter erklaert, wo das Bisherige geblieben ist - das ist
+        eine Antwort auf eine Frage, die man erst stellt, wenn man sie
+        vermisst.
+      */}
+      <AlignCard state={alignState} />
+
       {versionState.announce && <TransitionAnnounce />}
 
       {versionState.show && (
