@@ -238,28 +238,42 @@ Nicht zu verwechseln mit der **Pretest-Messung** (`alignment_item_views`): Die
 läuft seit dem 29.09.2026 für beide Bögen und hängt nicht an der Einwilligung,
 weil sie den Vorgang misst und nicht die Person.
 
-### ☐ Einmal im Browser durchklicken
+### ☐ Einmal im Browser durchklicken — **der nächste Schritt**
 
-Serverseitig ist der ganze Weg abgelaufen: ausfüllen, abgeben, Bericht,
-freigeben, vergleichen, Advisor-Ansicht, Discovery. Was dabei nicht geprüft
-werden kann, ist das Verhalten im Browser — Tippen, Autospeichern,
-Zwischenzustände. Genau dort lag der gemeldete Speicherfehler.
+Gutachterin am 29.09.2026: vollständiger manueller Test des ganzen Flows,
+alle Fehler dokumentieren. Ausdrücklich genannt: Autospeichern, Neuladen,
+Zurücknavigation, Auslassungsgründe, `S01a`–`S01f`/`S01_top`, Freigabe,
+Vergleich, Deep-Dive-Routing.
 
-### ☐ Fragen an die Gutachterin
+Serverseitig ist der ganze Weg abgelaufen. Was dabei nicht geprüft werden
+kann, ist das Verhalten im Browser — Tippen, Autospeichern, Zwischenzustände.
+Genau dort lag der gemeldete Speicherfehler.
 
-- Die vier Verhaltensitems (A91/U91/K91/T91) stehen auf `proposal`.
-- `confidential_first` als eigener Auslassungsgrund — ja oder nein.
-- Die Abweichung „jede Frage ohne eigenen Auslassungsgrund bekommt ‚kann ich
-  noch nicht einschätzen'" (steht in `deviationsFromSource`, von mir
-  entschieden und zur Bestätigung vorgelegt).
+Ablaufplan: `docs/browser-durchgang.md`.
 
-### ☐ v2 und v2.1 abräumen
+### ☑ Fragen an die Gutachterin — beantwortet am 29.09.2026
 
-Beide sind `archived`, und der Umstiegshinweis erscheint nicht mehr. Die Seiten
-unter `/founder-alignment/pilot/*`, die Registratur v2.1 und
-`dashboardVersionData.ts` stehen aber noch — für alle, die v2.1 ausgefüllt
-haben und ihren Bericht behalten sollen. Wann das weg kann, hängt daran, ob
-dort noch Antworten liegen.
+- ☑ `confidential_first` **bleibt** eigener Auslassungsgrund.
+- ☑ Die Abweichung ist **bestätigt**: Ohne spezifischeren Grund bekommt ein
+  Item `cannot_assess`. Vorrang haben `not_decided`, `not_clarified`,
+  `prefer_not_to_say`, `confidential_first`. Steht so in
+  `deviationsFromSource`.
+- ◐ Die vier Verhaltensitems **bleiben auf `proposal`**, bis ihre Texte
+  einzeln reviewt sind. Vorlage dafür: `docs/verhaltensitems-review.md`.
+- ☑ Forschungslogging der neuen Bögen ist **kein Release-Blocker**. Keine
+  künstlichen Dimensionswerte einführen; Forschung künftig item- und
+  konstruktbezogen planen.
+
+### ☑ v2 und v2.1 — entschieden: archiviert lassen, nicht löschen
+
+Gutachterin am 29.09.2026: beide archiviert lassen, solange noch Antworten
+oder Reports daran hängen könnten. Damit ist die Frage beantwortet und die
+SQL-Abfrage in `daten-aus-supabase-ziehen.md` nur noch informativ.
+
+Die Seiten unter `/founder-alignment/pilot/*`, die Registratur v2.1 und
+`dashboardVersionData.ts` bleiben also stehen. Keine der beiden lädt noch zum
+Ausfüllen ein — der Umstiegshinweis und der Knopf „ausprobieren" lesen den
+Status aus der Datenbank und verschwinden bei `archived`.
 
 ---
 

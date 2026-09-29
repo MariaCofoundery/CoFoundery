@@ -12,10 +12,10 @@
   "dimensionScores": false,
   "deviationsFromSource": [
     {
-      "what": "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'.",
+      "what": "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'. Spezifische Gruende haben Vorrang.",
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
-      "decidedBy": "Claude, 29.09.2026 - Maria zur Bestaetigung vorzulegen"
+      "decidedBy": "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."
     },
     {
       "what": "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1.",
