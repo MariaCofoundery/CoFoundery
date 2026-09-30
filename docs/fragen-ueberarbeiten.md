@@ -1,6 +1,6 @@
 # CoFoundery Align — Fragen zum Überarbeiten
 
-_Erzeugt am 2026-09-29 aus den beiden aktuellen Bögen (59 Fragen)._
+_Erzeugt am 2026-09-30 aus den beiden aktuellen Bögen (59 Fragen)._
 
 ## Worum es geht
 
@@ -226,7 +226,7 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 1. noch im laufenden Gespräch
 2. nach dem Gespräch, aber am selben Arbeitstag
 3. am nächsten Arbeitstag
-4. später, wenn ich meine Sicht weiter sortiert habe
+4. nach mehr als einem Arbeitstag
 5. situationsabhängig
 
 **Wer nicht antworten kann:** „kann ich noch nicht einschätzen“
@@ -267,11 +267,11 @@ _Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - un
 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
-1. „Ich sehe das anders, weil …“ _(mit Textfeld)_
+1. „Ich sehe das anders, weil …“
 2. „Ich habe bei dem Punkt noch Bedenken …“
 3. „Wie würde unser Vorschlag mit … umgehen?“
-4. „Ich würde gern noch eine andere Möglichkeit anschauen …“ _(mit Textfeld)_
-5. anders _(mit Textfeld)_
+4. „Ich würde gern noch eine andere Möglichkeit anschauen …“
+5. anders
 
 **Muss weiterhin messen:** Nominale Gesprächspräferenz, kein Direktheitsscore.
 
@@ -1002,7 +1002,7 @@ _Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person 
 **Antworten** (5, Reihenfolge und Anzahl bleiben):
 
 1. verantwortliche Person entscheidet nach Anhörung
-2. vorher benannte andere Person entscheidet nach Rücksprache _(mit Textfeld)_
+2. vorher benannte andere Person entscheidet nach Rücksprache
 3. Mehrheit entscheidet
 4. nur bei Zustimmung aller
 5. abhängig von Entscheidungsart

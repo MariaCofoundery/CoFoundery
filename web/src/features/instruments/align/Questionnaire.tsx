@@ -58,6 +58,18 @@ export function Questionnaire({
   const [missingAfterSubmit, setMissingAfterSubmit] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(submitted);
   const [submitting, setSubmitting] = useState(false);
+  /** Warum die Abgabe nicht geklappt hat. Leer heißt: kein Versuch gescheitert. */
+  const [submitError, setSubmitError] = useState("");
+
+  /**
+   * Steht etwas auf dem Schirm, das nicht in der Datenbank ist?
+   *
+   * DANN DARF NICHT ABGEGEBEN WERDEN. Sonst friert die Abgabe einen Stand
+   * ein, den die Person vor sich sieht und der so nirgends gespeichert ist -
+   * und danach laesst er sich nicht mehr ändern.
+   */
+  const nichtGespeichert = () =>
+    Object.entries(states).filter(([, state]) => state === "error" || state === "saving");
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const allItems = useMemo(() => sections.flatMap((section) => section.items), [sections]);
@@ -252,13 +264,26 @@ export function Questionnaire({
                   </div>
 
                   <div className="mt-3 flex items-center gap-3 text-xs">
-                    {state === "saving" && <span className="text-slate-500">wird gespeichert…</span>}
-                    {state === "saved" && <span className="text-slate-500">gespeichert</span>}
+                    {state === "saving" && <span className="text-slate-500">Speichern …</span>}
+                    {state === "saved" && <span className="text-slate-500">Gespeichert</span>}
                     {state === "incomplete" && (
                       <span className="text-slate-400">noch nicht vollständig</span>
                     )}
                     {state === "error" && (
-                      <span className="text-rose-700">{errorText(errors[item.itemId])}</span>
+                      <span className="text-rose-700">
+                        {errorText(errors[item.itemId])}{" "}
+                        {/* WIEDERHOLEN STEHT DANEBEN, NICHT IRGENDWO. Ein
+                            Fehler ohne Ausweg zwingt dazu, die Antwort noch
+                            einmal anzuklicken - und wer das tut, weiss nicht,
+                            ob er sie damit aendert oder nur wiederholt. */}
+                        <button
+                          type="button"
+                          className="underline"
+                          onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
+                        >
+                          Erneut versuchen
+                        </button>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -277,22 +302,47 @@ export function Questionnaire({
             disabled={submitting}
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             onClick={async () => {
+              if (nichtGespeichert().length > 0) {
+                setSubmitError("unsaved");
+                return;
+              }
               setSubmitting(true);
-              const result = await submitScope(scope, ventureId ?? undefined);
-              setSubmitting(false);
-              if (result.ok) {
-                setIsSubmitted(true);
-                setMissingAfterSubmit([]);
-              } else {
-                setMissingAfterSubmit(result.missing ?? []);
+              setSubmitError("");
+              try {
+                const result = await submitScope(scope, ventureId ?? undefined);
+                if (result.ok) {
+                  setIsSubmitted(true);
+                  setMissingAfterSubmit([]);
+                } else {
+                  setMissingAfterSubmit(result.missing ?? []);
+                  // Fehlende Antworten stehen an den Fragen selbst. Alles
+                  // andere - ein abgewiesener Schreibversuch, ein Lesefehler -
+                  // stand vorher NIRGENDS: Der Knopf sprang zurueck, und es
+                  // sah aus, als haette man nichts getan.
+                  if (result.reason !== "incomplete") setSubmitError(result.reason);
+                }
+              } catch {
+                // OHNE DAS BLIEB DER KNOPF FUER IMMER AUF "wird abgegeben".
+                // Gemeldet am 30.09.2026. Beim Speichern war es schon
+                // abgefangen, beim Abgeben nicht - und da faellt es am
+                // meisten auf, weil man danach wartet.
+                setSubmitError("unreachable");
+              } finally {
+                setSubmitting(false);
               }
             }}
           >
-            {submitting ? "wird abgegeben…" : "Abgeben"}
+            {submitting ? "Profil wird erstellt…" : "Founder-Profil erstellen"}
           </button>
           <p className="mt-2 text-sm text-slate-600">
-            Danach lassen sich die Antworten nicht mehr ändern.
+            Mit dem Absenden schließt du diesen Durchgang ab.
           </p>
+
+          {submitError && (
+            <p role="alert" className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
+              {submitErrorText(submitError)}
+            </p>
+          )}
         </div>
       )}
     </div>
@@ -303,6 +353,28 @@ export function Questionnaire({
  * `option_needs_text` ist für uns eine brauchbare Auskunft und für die Person
  * davor keine. Die Kennung bleibt in der Antwort der Serverfunktion.
  */
+/**
+ * Was bei einer gescheiterten Abgabe dastehen soll.
+ *
+ * Getrennt von `errorText`, weil es andere Fehler sind: Dort geht es um eine
+ * einzelne Antwort, hier um den ganzen Durchgang. Und in beiden Fällen gilt
+ * derselbe Satz - die Antworten sind noch da.
+ */
+function submitErrorText(reason: string): string {
+  switch (reason) {
+    case "unsaved":
+      return "Eine Antwort ist noch nicht gespeichert. Bitte warte kurz oder versuche sie erneut zu speichern.";
+    case "unreachable":
+      return "Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.";
+    case "no_permission":
+      return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet. Deine Antworten sind noch da.";
+    case "venture_ambiguous":
+      return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
+    default:
+      return "Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.";
+  }
+}
+
 function errorText(reason?: string): string {
   switch (reason) {
     case "option_needs_text":
@@ -326,7 +398,9 @@ function errorText(reason?: string): string {
     case "venture_ambiguous":
       return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
     case "unreachable":
-      return "Keine Verbindung — deine Eingabe steht noch da, ist aber nicht gespeichert.";
+      return "Verbindung unterbrochen — diese Änderung ist noch nicht gespeichert.";
+    case "no_permission":
+      return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet.";
     default:
       return "Das konnte nicht gespeichert werden.";
   }

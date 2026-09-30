@@ -554,7 +554,7 @@
         {
           "optionId": "D01_o1",
           "label": "„Ich sehe das anders, weil …“",
-          "requiresText": true,
+          "requiresText": false,
           "exclusive": false
         },
         {
@@ -572,13 +572,13 @@
         {
           "optionId": "D01_o4",
           "label": "„Ich würde gern noch eine andere Möglichkeit anschauen …“",
-          "requiresText": true,
+          "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "D01_o5",
           "label": "anders",
-          "requiresText": true,
+          "requiresText": false,
           "exclusive": false
         }
       ],

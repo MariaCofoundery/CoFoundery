@@ -320,6 +320,35 @@ STANDARD_MISSING = {"code": "cannot_assess", "label": "kann ich noch nicht einsc
 
 REDAKTIONSMARKEN = ("[nur wenn relevant]",)
 
+# ---------------------------------------------------------------------------
+# WO EIN TEXTFELD AUFGEHT - UND SONST NIRGENDS
+# ---------------------------------------------------------------------------
+#
+# Vorher entschied das ein Muster: Wer "ander", "weitere" oder "bitte" in der
+# Beschriftung hatte, bekam ein Feld. Das ging bei D01 daneben, wo die
+# Antworten FORMULIERUNGEN sind: "Ich sehe das anders, weil ..." und "Ich
+# wuerde gern noch eine andere Moeglichkeit anschauen ..." enthalten beide
+# "ander" - und oeffneten ein Feld, in das niemand etwas schreiben wollte.
+# Gemeldet am 30.09.2026.
+#
+# Auch bei G01 traf es die falsche: "vorher benannte andere Person entscheidet
+# nach Ruecksprache" ist eine Regel und keine Einladung zum Schreiben.
+#
+# UX-Regel aus der Spezifikation: Feste Auswahlfragen erzeugen keine
+# zusaetzlichen Textfelder, ausser es steht ausdruecklich hier.
+BRAUCHT_TEXTFELD = {
+    ("K04", "andere Regel"),
+    ("S01", "anderes Ziel"),
+    ("S06", "andere Vorstellung"),
+    ("R06", "andere Bedingung"),
+    ("R09", "andere Vorgehensweise"),
+    ("R12", "an einem bestimmten Datum – bitte angeben"),
+    ("G04", "anderer Weg"),
+    ("G05", "weitere"),
+    ("B05", "andere Absicherung"),
+    ("L03", "andere Regel"),
+}
+
 
 def entmaskieren(text: str) -> str:
     """Nimmt die Markdown-Maskierung heraus und streicht Redaktionsmarken."""
@@ -587,7 +616,7 @@ for n, item_id in enumerate(reihenfolge, start=1):
         collections.OrderedDict([
             ("optionId", f"{item_id}_o{i}"),
             ("label", label),
-            ("requiresText", bool(re.search(r"ander|weitere|bitte", label, re.I))),
+            ("requiresText", (item_id, label) in BRAUCHT_TEXTFELD),
             ("exclusive", label.startswith("keine ") or label.startswith("aktuell nicht")),
         ])
         for i, label in enumerate(it["options"], start=1)

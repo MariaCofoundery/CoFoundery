@@ -55,10 +55,26 @@ const INSTRUMENT: Record<AssessmentScope, string> = {
  * Gefunden am 29.09.2026. Es ist derselbe Fehler wie auf der
  * Bestaetigungsseite: Die Wahl steht in der Adresse und kam nicht bis hierher.
  */
-async function draftFor(scope: AssessmentScope, preferredVentureId?: string) {
+/**
+ * ERWARTBARE FEHLSCHLAEGE SIND ERGEBNISSE, KEINE AUSNAHMEN.
+ *
+ * Vorher warf diese Funktion. Eine geworfene Serveraktion kommt im Browser
+ * als abgelehntes Versprechen an, und das sah dort aus wie ein Netzfehler:
+ * „Keine Verbindung - deine Eingabe ist nicht gespeichert." Gemeldet am
+ * 30.09.2026. Wer keine Founder-Rolle hat oder in zwei Vorhaben steht, hat
+ * aber kein Netzproblem, sondern eines, das man ihm sagen kann.
+ */
+type Draft =
+  | { ok: true; supabase: Awaited<ReturnType<typeof createClient>>; assessment: { id: string; submitted_at: string | null }; ventureId: string | null }
+  | { ok: false; reason: string; detail?: string };
+
+async function draftFor(
+  scope: AssessmentScope,
+  preferredVentureId?: string,
+): Promise<Draft> {
   const supabase = await createClient();
   const { data: auth, error: authError } = await supabase.auth.getUser();
-  if (authError || !auth?.user?.id) throw new Error("not_authenticated");
+  if (authError || !auth?.user?.id) return { ok: false, reason: "not_authenticated" };
   const userId = auth.user.id;
 
   // Nur der Venture-Bogen braucht ein Vorhaben. Beim Arbeitsprofil bleibt es
@@ -66,7 +82,7 @@ async function draftFor(scope: AssessmentScope, preferredVentureId?: string) {
   let ventureId: string | null = null;
   if (scope === "venture_alignment") {
     const { venture } = await resolveVenture(userId, preferredVentureId);
-    if (!venture) throw new Error("venture_ambiguous");
+    if (!venture) return { ok: false, reason: "venture_ambiguous" };
     ventureId = venture.id;
   }
 
@@ -84,7 +100,7 @@ async function draftFor(scope: AssessmentScope, preferredVentureId?: string) {
     ? await suche.eq("venture_id", ventureId).maybeSingle()
     : await suche.is("venture_id", null).maybeSingle();
 
-  if (existing) return { supabase, assessment: existing, ventureId };
+  if (existing) return { ok: true, supabase, assessment: existing, ventureId };
 
   const { data: created, error } = await supabase
     .from("assessments")
@@ -97,8 +113,16 @@ async function draftFor(scope: AssessmentScope, preferredVentureId?: string) {
     .select("id, submitted_at")
     .single();
 
-  if (error || !created) throw new Error(error?.message ?? "draft_create_failed");
-  return { supabase, assessment: created, ventureId };
+  // Die Zeilensicherheit weist ab, wer keine Founder-Rolle hat. Das ist kein
+  // Netzfehler und darf auch nicht so heissen.
+  if (error || !created) {
+    return {
+      ok: false,
+      reason: error?.code === "42501" ? "no_permission" : "draft_create_failed",
+      detail: error?.message,
+    };
+  }
+  return { ok: true, supabase, assessment: created, ventureId };
 }
 
 export async function saveAnswer(
@@ -114,7 +138,9 @@ export async function saveAnswer(
   const verdict = validateAnswerV21(answer, answerableOf(item));
   if (!verdict.ok) return verdict;
 
-  const { supabase, assessment } = await draftFor(scope, ventureId);
+  const draft = await draftFor(scope, ventureId);
+  if (!draft.ok) return draft;
+  const { supabase, assessment } = draft;
 
   const { error } = await supabase.from("alignment_answers").upsert(
     {
@@ -142,7 +168,10 @@ export async function clearAnswer(
     return { ok: false, reason: "unknown_block", detail: itemId };
   }
 
-  const { supabase, assessment } = await draftFor(scope, ventureId);
+  const draft = await draftFor(scope, ventureId);
+  if (!draft.ok) return draft;
+  const { supabase, assessment } = draft;
+
   const { error } = await supabase
     .from("alignment_answers")
     .delete()
@@ -164,7 +193,9 @@ export async function submitScope(
   scope: AssessmentScope,
   ventureId?: string,
 ): Promise<Result & { missing?: string[] }> {
-  const { supabase, assessment } = await draftFor(scope, ventureId);
+  const draft = await draftFor(scope, ventureId);
+  if (!draft.ok) return draft;
+  const { supabase, assessment } = draft;
 
   const { data: rows, error: readError } = await supabase
     .from("alignment_answers")

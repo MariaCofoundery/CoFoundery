@@ -1286,7 +1286,7 @@
         {
           "optionId": "G01_o2",
           "label": "vorher benannte andere Person entscheidet nach Rücksprache",
-          "requiresText": true,
+          "requiresText": false,
           "exclusive": false
         },
         {
