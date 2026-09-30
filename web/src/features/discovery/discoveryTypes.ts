@@ -104,6 +104,21 @@ export type DiscoveryMustHaves = {
    * und die Suche hält sich daran.
    */
   requiredCapabilityAreasAny: string[];
+  /**
+   * Suchstatus und Startzeitpunkt — als Kriterium, nicht nur am Profil.
+   *
+   * Beides stand bis zum 30.09.2026 nur AM PROFIL: Man konnte sagen, ab wann
+   * man loslegen will, aber nicht danach suchen. Abschnitt 5.1 der FIND-Spec
+   * zählt beide zum praktischen Rahmen.
+   *
+   * MEHRERE WERTE, WEIL DER RAHMEN EIN BEREICH IST. „Jetzt oder in den
+   * nächsten drei Monaten" ist eine sinnvolle Suche; „genau in den nächsten
+   * drei Monaten" wäre eine künstliche Schärfe.
+   *
+   * Leer heißt wie überall: kein Kriterium.
+   */
+  acceptedSearchIntents: DiscoverySearchIntent[];
+  acceptedStartHorizons: DiscoveryStartHorizon[];
   desiredLocationRegion: string | null;
   requiredIndustriesAny: string[];
   acceptedCommitmentLevels: DiscoveryCommitmentLevel[];

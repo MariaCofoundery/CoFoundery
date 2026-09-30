@@ -3,10 +3,21 @@ import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
 export type DiscoverySearchBriefCriterion =
   | { key: "role"; values: string[] }
   | { key: "expertise"; values: string[] }
+  | { key: "capability"; values: string[] }
   | { key: "location"; values: string[] }
   | { key: "remote"; values: string[] }
-  | { key: "availability"; values: string[] };
+  | { key: "availability"; values: string[] }
+  | { key: "searchIntent"; values: string[] }
+  | { key: "startHorizon"; values: string[] };
 
+/**
+ * Wonach gerade gefiltert wird — vollstaendig.
+ *
+ * JEDES KRITERIUM, DAS DIE LISTE KUERZT, STEHT HIER. Ein Filter, der still
+ * wirkt, ist derselbe Fehler wie eine Fehlermeldung ohne Grund: Man sieht
+ * weniger Menschen und weiss nicht, warum. Wer hier etwas ergaenzt, das die
+ * Datenbankfunktion prueft, ergaenzt es auch dort.
+ */
 export function getDiscoverySearchBriefCriteria(
   filters: DiscoveryMustHaves
 ): DiscoverySearchBriefCriterion[] {
@@ -16,6 +27,9 @@ export function getDiscoverySearchBriefCriteria(
   }
   if (filters.requiredExpertiseAny.length > 0) {
     criteria.push({ key: "expertise", values: filters.requiredExpertiseAny });
+  }
+  if (filters.requiredCapabilityAreasAny.length > 0) {
+    criteria.push({ key: "capability", values: filters.requiredCapabilityAreasAny });
   }
   if (filters.desiredLocationRegion) {
     criteria.push({ key: "location", values: [filters.desiredLocationRegion] });
@@ -28,6 +42,12 @@ export function getDiscoverySearchBriefCriteria(
       key: "availability",
       values: [String(filters.minimumAvailabilityHoursPerWeek)],
     });
+  }
+  if (filters.acceptedSearchIntents.length > 0) {
+    criteria.push({ key: "searchIntent", values: filters.acceptedSearchIntents });
+  }
+  if (filters.acceptedStartHorizons.length > 0) {
+    criteria.push({ key: "startHorizon", values: filters.acceptedStartHorizons });
   }
   return criteria;
 }

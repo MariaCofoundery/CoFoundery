@@ -146,6 +146,8 @@ test("Alignment signals neither rank candidates nor add a score", () => {
     requiredRolesAny: [],
     requiredExpertiseAny: [],
     requiredCapabilityAreasAny: [],
+    acceptedSearchIntents: [],
+    acceptedStartHorizons: [],
     desiredLocationRegion: null,
     requiredIndustriesAny: [],
     acceptedCommitmentLevels: [],

@@ -52,6 +52,8 @@ const filters: DiscoveryMustHaves = {
   requiredRolesAny: ["tech"],
   requiredExpertiseAny: ["ai"],
   requiredCapabilityAreasAny: [],
+  acceptedSearchIntents: [],
+  acceptedStartHorizons: [],
   desiredLocationRegion: "berlin",
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],

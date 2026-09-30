@@ -128,12 +128,12 @@ $$;
 select pg_temp.assert_true(
   has_function_privilege(
     'authenticated',
-    'public.search_founder_discovery_profiles_v2(text[],text[],text,text[],smallint,integer,integer,text[])',
+    'public.search_founder_discovery_profiles_v2(text[],text[],text,text[],smallint,integer,integer,text[],text[],text[])',
     'EXECUTE'
   )
   and not has_function_privilege(
     'anon',
-    'public.search_founder_discovery_profiles_v2(text[],text[],text,text[],smallint,integer,integer,text[])',
+    'public.search_founder_discovery_profiles_v2(text[],text[],text,text[],smallint,integer,integer,text[],text[],text[])',
     'EXECUTE'
   ),
   'search function grants are not authenticated-only'

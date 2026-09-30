@@ -67,6 +67,8 @@ function defaultMustHaves(): FounderSearchPreferences["mustHaves"] {
     requiredRolesAny: [],
     requiredExpertiseAny: [],
     requiredCapabilityAreasAny: [],
+    acceptedSearchIntents: [],
+    acceptedStartHorizons: [],
     desiredLocationRegion: null,
     requiredIndustriesAny: [],
     acceptedCommitmentLevels: [],
@@ -80,7 +82,19 @@ function roleLabel(t: DiscoveryT, role: DiscoveryFounderRole) {
   return t(`roles.${role}`);
 }
 
-function SearchBrief({ preferences, t }: { preferences: FounderSearchPreferences; t: DiscoveryT }) {
+function SearchBrief({
+  preferences,
+  t,
+  capabilityLabel,
+}: {
+  preferences: FounderSearchPreferences;
+  t: DiscoveryT;
+  /**
+   * Die Beschriftungen der Faehigkeitsbereiche stehen in einem eigenen
+   * Sprachpaket - deshalb kommt die Aufloesung von aussen herein.
+   */
+  capabilityLabel: (areaId: string) => string;
+}) {
   const criteria = getDiscoverySearchBriefCriteria(preferences.mustHaves);
   const labels = criteria.flatMap((criterion) => {
     if (criterion.key === "role") {
@@ -91,6 +105,16 @@ function SearchBrief({ preferences, t }: { preferences: FounderSearchPreferences
     }
     if (criterion.key === "availability") {
       return [t("v2.search.minimumHoursChip", { hours: Number(criterion.values[0]) })];
+    }
+    if (criterion.key === "capability") {
+      return criterion.values.map(capabilityLabel);
+    }
+    // Die kurze Fassung - dieselbe, die auch auf den Karten steht.
+    if (criterion.key === "searchIntent") {
+      return criterion.values.map((intent) => t(`searchIntents.${intent}.short`));
+    }
+    if (criterion.key === "startHorizon") {
+      return criterion.values.map((horizon) => t(`startHorizons.${horizon}.short`));
     }
     return criterion.values;
   });
@@ -172,6 +196,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   // gegen die etwas passen koennte.
   const tFind = await getTranslations("find.points");
   const tFindSearch = await getTranslations("find.search");
+  const tCapability = await getTranslations("capability");
   const ownPreferences = await getOwnPreferences(user.id);
   const hasSearchPreferences = ownPreferences.preferences.some(
     (entry) => entry.importance > 0,
@@ -232,7 +257,13 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
 
         <FindTabs active={mode === "search" ? "search" : "explore"} />
 
-        {mode === "search" ? <SearchBrief preferences={preferences} t={t} /> : null}
+        {mode === "search" ? (
+          <SearchBrief
+            preferences={preferences}
+            t={t}
+            capabilityLabel={(areaId: string) => tCapability(`areaLabels.${areaId}`)}
+          />
+        ) : null}
 
         {mode === "search" ? <section id="search" className={CARD_CLASS}>
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">

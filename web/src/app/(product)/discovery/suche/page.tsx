@@ -47,6 +47,8 @@ const LEERE_KRITERIEN: DiscoveryMustHaves = {
   requiredRolesAny: [],
   requiredExpertiseAny: [],
   requiredCapabilityAreasAny: [],
+  acceptedSearchIntents: [],
+  acceptedStartHorizons: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],
@@ -213,6 +215,16 @@ export default async function SearchPreferencesPage({
               minimumAvailability: tDiscovery("v2.search.minimumAvailability"),
               remote: tDiscovery("v2.search.remote"),
               remoteLabel: (mode: string) => tDiscovery(`remoteModes.${mode}`),
+              // Dieselben Beschriftungen wie am Profil - die kurze Form,
+              // weil hier vier davon untereinander stehen.
+              searchIntent: t("searchIntent"),
+              searchIntentHelp: t("searchIntentHelp"),
+              searchIntentLabel: (intent: string) =>
+                tDiscovery(`searchIntents.${intent}.short`),
+              startHorizon: t("startHorizon"),
+              startHorizonHelp: t("startHorizonHelp"),
+              startHorizonLabel: (horizon: string) =>
+                tDiscovery(`startHorizons.${horizon}.long`),
               apply: tDiscovery("v2.search.apply"),
               applying: tDiscovery("v2.search.applying"),
               reset: tDiscovery("v2.search.reset"),

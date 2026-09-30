@@ -2,9 +2,13 @@ import {
   DISCOVERY_REMOTE_MODE_OPTIONS,
   DISCOVERY_ROLE_OPTIONS,
 } from "@/features/discovery/discoveryConfig";
-import type {
-  DiscoveryMustHaves,
-  DiscoveryRemoteMode,
+import {
+  DISCOVERY_SEARCH_INTENTS,
+  DISCOVERY_START_HORIZONS,
+  type DiscoveryMustHaves,
+  type DiscoveryRemoteMode,
+  type DiscoverySearchIntent,
+  type DiscoveryStartHorizon,
 } from "@/features/discovery/discoveryTypes";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -23,6 +27,12 @@ export type PracticalSearchCopy = {
   minimumAvailability: string;
   remote: string;
   remoteLabel: (mode: string) => string;
+  searchIntent: string;
+  searchIntentHelp: string;
+  searchIntentLabel: (intent: string) => string;
+  startHorizon: string;
+  startHorizonHelp: string;
+  startHorizonLabel: (horizon: string) => string;
   apply: string;
   applying: string;
   reset: string;
@@ -145,6 +155,54 @@ export function PracticalSearchForm({
               )}
             />
           ))}
+        </div>
+      </div>
+
+      {/* ---------------------------------------------------------------
+          WANN, UND WIE ERNST GERADE
+
+          Beides stand bis zum 30.09.2026 nur am Profil: Man konnte sagen,
+          ab wann man loslegen will, aber nicht danach suchen. Abschnitt
+          5.1 der Spec zaehlt beide zum praktischen Rahmen.
+
+          Der Hinweis unter jeder Gruppe sagt dasselbe wie die leere
+          Auswahl - nur vorher: Wer hier etwas ankreuzt, sieht die nicht
+          mehr, die dort noch nichts angegeben haben.
+          --------------------------------------------------------------- */}
+      <div className="grid gap-5 md:grid-cols-2">
+        <div>
+          <p className="text-sm font-semibold text-slate-900">{copy.searchIntent}</p>
+          <div className="mt-2 grid gap-2">
+            {DISCOVERY_SEARCH_INTENTS.map((intent) => (
+              <Checkbox
+                key={intent}
+                name="acceptedSearchIntents"
+                value={intent}
+                label={copy.searchIntentLabel(intent)}
+                checked={mustHaves.acceptedSearchIntents.includes(
+                  intent as DiscoverySearchIntent,
+                )}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-xs leading-5 text-slate-500">{copy.searchIntentHelp}</p>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-slate-900">{copy.startHorizon}</p>
+          <div className="mt-2 grid gap-2">
+            {DISCOVERY_START_HORIZONS.map((horizon) => (
+              <Checkbox
+                key={horizon}
+                name="acceptedStartHorizons"
+                value={horizon}
+                label={copy.startHorizonLabel(horizon)}
+                checked={mustHaves.acceptedStartHorizons.includes(
+                  horizon as DiscoveryStartHorizon,
+                )}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-xs leading-5 text-slate-500">{copy.startHorizonHelp}</p>
         </div>
       </div>
 

@@ -41,6 +41,8 @@ const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   requiredRolesAny: [],
   requiredExpertiseAny: [],
   requiredCapabilityAreasAny: [],
+  acceptedSearchIntents: [],
+  acceptedStartHorizons: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],
@@ -185,6 +187,17 @@ export function normalizeMustHaves(value: unknown): DiscoveryMustHaves {
       value.requiredCapabilityAreasAny ?? value.required_capability_areas_any,
       DISCOVERY_TEXT_LIMITS.expertise
     ).slice(0, DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas),
+    // Dieselben Werte wie am Profil und keine zweiten. Gesucht wird gegen
+    // das, was dort steht - ein eigenes Vokabular fuer die Suche haette
+    // nichts, wogegen es pruefen koennte.
+    acceptedSearchIntents: normalizeAllowedArray(
+      value.acceptedSearchIntents ?? value.accepted_search_intents,
+      DISCOVERY_SEARCH_INTENTS
+    ),
+    acceptedStartHorizons: normalizeAllowedArray(
+      value.acceptedStartHorizons ?? value.accepted_start_horizons,
+      DISCOVERY_START_HORIZONS
+    ),
     desiredLocationRegion:
       normalizeText(
         value.desiredLocationRegion ?? value.desired_location_region,

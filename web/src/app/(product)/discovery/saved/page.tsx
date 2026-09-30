@@ -17,6 +17,8 @@ const EMPTY_MUST_HAVES: FounderSearchPreferences["mustHaves"] = {
   requiredRolesAny: [],
   requiredExpertiseAny: [],
   requiredCapabilityAreasAny: [],
+  acceptedSearchIntents: [],
+  acceptedStartHorizons: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],

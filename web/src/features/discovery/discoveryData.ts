@@ -498,6 +498,8 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
     requiredRolesAny: unknown;
     requiredExpertiseAny: unknown;
     requiredCapabilityAreasAny: unknown;
+    acceptedSearchIntents: unknown;
+    acceptedStartHorizons: unknown;
     desiredLocationRegion: unknown;
     acceptedRemoteModes: unknown;
     minimumAvailabilityHoursPerWeek: unknown;
@@ -514,6 +516,8 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
     requiredRolesAny: input.requiredRolesAny,
     requiredExpertiseAny: input.requiredExpertiseAny,
     requiredCapabilityAreasAny: input.requiredCapabilityAreasAny,
+    acceptedSearchIntents: input.acceptedSearchIntents,
+    acceptedStartHorizons: input.acceptedStartHorizons,
     desiredLocationRegion: input.desiredLocationRegion,
     acceptedRemoteModes: input.acceptedRemoteModes,
     minimumAvailabilityHoursPerWeek: input.minimumAvailabilityHoursPerWeek,
@@ -528,6 +532,8 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
         requiredRolesAny: practicalMustHaves.requiredRolesAny,
         requiredExpertiseAny: practicalMustHaves.requiredExpertiseAny,
         requiredCapabilityAreasAny: practicalMustHaves.requiredCapabilityAreasAny,
+        acceptedSearchIntents: practicalMustHaves.acceptedSearchIntents,
+        acceptedStartHorizons: practicalMustHaves.acceptedStartHorizons,
         desiredLocationRegion: practicalMustHaves.desiredLocationRegion,
         acceptedRemoteModes: practicalMustHaves.acceptedRemoteModes,
         minimumAvailabilityHoursPerWeek:
@@ -627,6 +633,11 @@ export async function getDiscoveryCandidatesForCurrentUser(
     // Datenbankfunktion prueft das; hier wird nur uebergeben, wonach gesucht
     // wird.
     p_capability_areas: mustHaves.requiredCapabilityAreasAny,
+    // WER DORT NICHTS ANGEGEBEN HAT, FAELLT BEI EINER SUCHE DANACH HERAUS.
+    // Ein leeres Feld ist keine Antwort - "vielleicht passt es ja doch"
+    // waere geraten. Wer nichts waehlt, sieht weiterhin alle.
+    p_search_intents: mustHaves.acceptedSearchIntents,
+    p_start_horizons: mustHaves.acceptedStartHorizons,
   });
 
   if (error) {
