@@ -1,0 +1,60 @@
+{
+  "search": {
+    "title": "Deine Suche",
+    "subline": "Hier legst du fest, was dir bei einem möglichen Co-Founder wichtig ist.",
+    "private": "Diese Angaben sind privat. Sie steuern, was dir vorgeschlagen wird — auf deinem Profil stehen sie nicht, und niemand sieht sie.",
+    "themesTitle": "Wie soll die Person zu dir passen?",
+    "themesIntro": "Neben Erfahrung und Verfügbarkeit kann auch entscheidend sein, wie ihr arbeitet. Du kannst auswählen, bei welchen Themen dir Ähnlichkeit wichtig ist – und wo du dir bewusst jemanden mit einem anderen Ansatz wünschst.",
+    "themesNote": "Unterschiedlich bedeutet dabei nicht automatisch möglichst gegensätzlich. Es geht darum, ob du dir bewusst eine andere Perspektive oder Arbeitsweise wünschst.",
+    "directionLabel": "Was wäre dir hier lieber?",
+    "importanceLabel": "Wie wichtig ist dir das?",
+    "directions": {
+      "similar": "eher ähnlich wie ich",
+      "complementary": "bewusst etwas anders",
+      "neutral": "ist mir egal"
+    },
+    "importances": {
+      "1": "eher wichtig",
+      "2": "wichtig",
+      "3": "sehr wichtig"
+    },
+    "themes": {
+      "decision_weighing": {
+        "title": "Entscheidungen abwägen",
+        "text": "Wie gründlich werden Möglichkeiten, Vor- und Nachteile oder Annahmen geprüft?"
+      },
+      "experience_intuition": {
+        "title": "Erfahrung & Bauchgefühl",
+        "text": "Wie viel Gewicht haben Erfahrung und erster Eindruck bei einer Entscheidung?"
+      },
+      "experimentation": {
+        "title": "Ausprobieren & Lernen",
+        "text": "Wie früh wird etwas ausprobiert, wenn noch Informationen fehlen?"
+      },
+      "raising_objections": {
+        "title": "Einwände ansprechen",
+        "text": "Wie schnell wird ein Einwand sichtbar gemacht, statt ihn erst mitzunehmen?"
+      },
+      "voicing_disagreement": {
+        "title": "Widerspruch formulieren",
+        "text": "Wie deutlich wird Widerspruch benannt, wenn er wichtig ist?"
+      },
+      "open_questions": {
+        "title": "Mit offenen Fragen umgehen",
+        "text": "Wie geht jemand damit um, wenn etwas eine Zeit lang unentschieden bleibt?"
+      }
+    },
+    "save": "Präferenzen speichern",
+    "saving": "Wird gespeichert …",
+    "saved": "Gespeichert",
+    "saveFailed": "Das hat gerade nicht geklappt. Deine Auswahl steht noch da. Bitte versuche es erneut.",
+    "changeLater": "Du kannst das jederzeit ändern.",
+    "emptyTitle": "Du hast noch keine Matching-Präferenzen festgelegt.",
+    "emptyText": "FIND kann dir trotzdem Profile zeigen – nur ohne Aussage dazu, welche Arbeitsweisen besonders gut zu dem passen, was du suchst.",
+    "staleTitle": "Deine Auswahl gehört zu einer älteren Fassung des Arbeitsprofils.",
+    "staleText": "Die Fragen haben sich geändert. Schau kurz drüber und speichere neu, damit sie wieder zu dem passt, was gefragt wird.",
+    "needsProfileTitle": "Dafür fehlt noch dein Arbeitsprofil.",
+    "needsProfileText": "Die Themen kommen aus den Fragen dazu, wie du arbeitest. Ohne deine eigenen Antworten gibt es nichts zu vergleichen.",
+    "needsProfileCta": "Zum Arbeitsprofil"
+  }
+}

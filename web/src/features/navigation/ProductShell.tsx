@@ -344,6 +344,16 @@ export function ProductShell({
     label: t("areaFind"),
     isActive: (currentPathname) => currentPathname.startsWith("/discovery"),
     badge: { kind: "intro", count: incomingOpenRequestCount },
+    // DIE EIGENE SUCHE GEHOERT INS MENUE, NICHT AUF EINE KARTE. Genau das war
+    // beim Fragebogen und beim Report schon einmal das Problem: Wer woanders
+    // stand, musste erst irgendwohin zurueck, um sie zu finden.
+    subItems: [
+      {
+        href: "/discovery/suche",
+        label: t("findYourSearch"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/suche"),
+      },
+    ],
   };
 
   const connectItem: NavigationItem = {

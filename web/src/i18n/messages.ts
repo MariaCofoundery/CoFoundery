@@ -11,6 +11,7 @@ import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDirection from "../../messages/de/direction.json";
 import deDiscovery from "../../messages/de/discovery.json";
+import deFind from "../../messages/de/find.json";
 import deFeedback from "../../messages/de/feedback.json";
 import deFounderLibrary from "../../messages/de/founderLibrary.json";
 import deFounderInTheWild from "../../messages/de/founderInTheWild.json";
@@ -35,6 +36,7 @@ import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDirection from "../../messages/en/direction.json";
 import enDiscovery from "../../messages/en/discovery.json";
+import enFind from "../../messages/en/find.json";
 import enFeedback from "../../messages/en/feedback.json";
 import enFounderLibrary from "../../messages/en/founderLibrary.json";
 import enFounderInTheWild from "../../messages/en/founderInTheWild.json";
@@ -62,6 +64,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: deDashboard,
     direction: deDirection,
     discovery: deDiscovery,
+    find: deFind,
     feedback: deFeedback,
     founderLibrary: deFounderLibrary,
     founderInTheWild: deFounderInTheWild,
@@ -88,6 +91,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: enDashboard,
     direction: enDirection,
     discovery: enDiscovery,
+    find: enFind,
     feedback: enFeedback,
     founderLibrary: enFounderLibrary,
     founderInTheWild: enFounderInTheWild,

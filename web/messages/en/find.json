@@ -1,0 +1,60 @@
+{
+  "search": {
+    "title": "Your search",
+    "subline": "Here you define what matters to you in a potential co-founder.",
+    "private": "These settings are private. They shape what you are shown — they are not on your profile, and nobody sees them.",
+    "themesTitle": "How should the person fit you?",
+    "themesIntro": "Besides experience and availability, how you work can be decisive. You can choose the topics where similarity matters to you — and where you deliberately want someone with a different approach.",
+    "themesNote": "Different does not automatically mean as opposite as possible. It is about whether you deliberately want another perspective or way of working.",
+    "directionLabel": "What would you prefer here?",
+    "importanceLabel": "How important is that to you?",
+    "directions": {
+      "similar": "rather similar to me",
+      "complementary": "deliberately different",
+      "neutral": "does not matter to me"
+    },
+    "importances": {
+      "1": "somewhat important",
+      "2": "important",
+      "3": "very important"
+    },
+    "themes": {
+      "decision_weighing": {
+        "title": "Weighing decisions",
+        "text": "How thoroughly are options, pros and cons or assumptions examined?"
+      },
+      "experience_intuition": {
+        "title": "Experience & gut feeling",
+        "text": "How much weight do experience and first impressions carry in a decision?"
+      },
+      "experimentation": {
+        "title": "Trying things & learning",
+        "text": "How early is something tried out when information is still missing?"
+      },
+      "raising_objections": {
+        "title": "Raising objections",
+        "text": "How quickly is an objection made visible rather than carried along?"
+      },
+      "voicing_disagreement": {
+        "title": "Voicing disagreement",
+        "text": "How clearly is disagreement named when it matters?"
+      },
+      "open_questions": {
+        "title": "Living with open questions",
+        "text": "How does someone deal with something staying undecided for a while?"
+      }
+    },
+    "save": "Save preferences",
+    "saving": "Saving …",
+    "saved": "Saved",
+    "saveFailed": "That did not work just now. Your selection is still here. Please try again.",
+    "changeLater": "You can change this at any time.",
+    "emptyTitle": "You have not set any matching preferences yet.",
+    "emptyText": "FIND can still show you profiles — just without saying which ways of working fit what you are looking for.",
+    "staleTitle": "Your selection belongs to an older version of the working profile.",
+    "staleText": "The questions have changed. Take a quick look and save again so it matches what is being asked.",
+    "needsProfileTitle": "Your working profile is still missing.",
+    "needsProfileText": "The topics come from the questions about how you work. Without your own answers there is nothing to compare.",
+    "needsProfileCta": "To the working profile"
+  }
+}
