@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import { saveDiscoveryPreferences } from "@/features/find/preferenceActions";
 import type { ThemePreference } from "@/features/find/discoveryMatch";
@@ -68,7 +68,28 @@ export function SearchPreferencesForm({
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
   const [pending, start] = useTransition();
 
-  const setDirection = (themeId: string, direction: Direction) =>
+  /**
+   * Die Messung für den Pretest — Abschnitt 29.
+   *
+   * Je Thema: wie oft jemand es geändert hat, bevor er gespeichert hat, und
+   * wie lange er ab der ersten Berührung gebraucht hat. Beides sagt etwas
+   * darüber, ob eine Frage klar ist: Wer dreimal umentscheidet, hat sie
+   * anders gelesen als beim ersten Mal.
+   *
+   * Im `ref` und nicht im Zustand: Es soll nichts neu zeichnen. Eine Messung,
+   * die den gemessenen Vorgang beeinflusst, misst am Ende sich selbst.
+   */
+  const messung = useRef<Record<string, { changes: number; seit: number }>>({});
+  const notiere = (themeId: string) => {
+    const vorher = messung.current[themeId];
+    messung.current[themeId] = {
+      changes: (vorher?.changes ?? 0) + 1,
+      seit: vorher?.seit ?? Date.now(),
+    };
+  };
+
+  const setDirection = (themeId: string, direction: Direction) => {
+    notiere(themeId);
     setState((current) => ({
       ...current,
       [themeId]: {
@@ -80,9 +101,12 @@ export function SearchPreferencesForm({
           direction === "neutral" ? 0 : current[themeId].importance === 0 ? 1 : current[themeId].importance,
       },
     }));
+  };
 
-  const setImportance = (themeId: string, importance: Importance) =>
+  const setImportance = (themeId: string, importance: Importance) => {
+    notiere(themeId);
     setState((current) => ({ ...current, [themeId]: { ...current[themeId], importance } }));
+  };
 
   return (
     <div className="space-y-4">
@@ -165,8 +189,14 @@ export function SearchPreferencesForm({
           onClick={() =>
             start(async () => {
               setStatus("idle");
+              const jetzt = Date.now();
               const result = await saveDiscoveryPreferences(
                 themeIds.map((themeId) => ({ themeId, ...state[themeId] })),
+                Object.entries(messung.current).map(([themeId, gemessen]) => ({
+                  themeId,
+                  changes: gemessen.changes,
+                  durationMs: jetzt - gemessen.seit,
+                })),
               );
               setStatus(result.ok ? "saved" : "error");
             })

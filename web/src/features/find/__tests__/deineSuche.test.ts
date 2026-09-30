@@ -234,3 +234,25 @@ test("„Entdecken“ und „Gezielt suchen“ heißen jetzt, was sie tun", () =
   assert.equal(en.v2.modes.explore, "For you");
   assert.equal(en.v2.modes.search, "Search & filter");
 });
+
+test("der Pretest misst je Thema, was Abschnitt 29 verlangt", () => {
+  const actions = readFileSync(join("src", "features", "find", "preferenceActions.ts"), "utf8");
+  const form = readFileSync(join("src", "features", "find", "SearchPreferencesForm.tsx"), "utf8");
+
+  // Richtung, Gewicht, Änderungen vor dem Speichern, Dauer. Die „neutral
+  // rate" ergibt sich aus den Richtungen und braucht keine eigene Zeile.
+  assert.match(actions, /eventName: "find_search_preference_saved"/);
+  assert.match(actions, /choiceValue: gewaehlt\?\.direction \?\? "neutral"/);
+  assert.match(actions, /importance: gewaehlt\?\.importance \?\? 0/);
+  assert.match(actions, /changes: gemessen\?\.changes \?\? 0/);
+  assert.match(actions, /durationMs: gemessen\?\.durationMs/);
+
+  // JE THEMA, AUCH BEI „EGAL". Sonst liesse sich die neutral rate gar nicht
+  // bilden - es fehlten genau die Zeilen, um die es dabei geht.
+  assert.match(actions, /THEME_IDS\.map\(async \(themeId\)/);
+
+  // Und sie darf das Speichern nicht kosten.
+  assert.match(actions, /await messen\(auth\.user\.id/);
+  assert.match(actions, /\} catch \{/);
+  assert.match(form, /const messung = useRef</);
+});

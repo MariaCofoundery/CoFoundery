@@ -9,6 +9,7 @@ import {
   type Importance,
 } from "@/features/find/discoveryThemes";
 import { normalizePreference, type ThemePreference } from "@/features/find/discoveryMatch";
+import { trackServerResearchEvent } from "@/features/research/server";
 import { createClient } from "@/lib/supabase/server";
 
 type Result = { ok: true } | { ok: false; reason: string; detail?: string };
@@ -28,8 +29,19 @@ type Result = { ok: true } | { ok: false; reason: string; detail?: string };
  * Fragen bezieht (Spec, Abschnitt 28). Ohne sie würde eine Auswahl, die zu
  * anderen Fragen getroffen wurde, stillschweigend weiterbenutzt.
  */
+/**
+ * Was der Pretest je Thema wissen will.
+ *
+ * Abschnitt 29 der FIND-Spec: gewählte Richtung, gewähltes Gewicht, wie oft
+ * jemand es geändert hat, bevor er gespeichert hat, und wie lange er dafür
+ * gebraucht hat. Die „neutral rate" ergibt sich aus den Richtungen und braucht
+ * keine eigene Zeile.
+ */
+export type ThemeMeasurement = { themeId: string; changes: number; durationMs: number };
+
 export async function saveDiscoveryPreferences(
   preferences: readonly ThemePreference[],
+  measurement: readonly ThemeMeasurement[] = [],
 ): Promise<Result> {
   const bereinigt: ThemePreference[] = [];
   for (const entry of preferences) {
@@ -97,5 +109,55 @@ export async function saveDiscoveryPreferences(
   );
   if (insertError) return { ok: false, reason: "save_failed", detail: insertError.message };
 
+  await messen(auth.user.id, bereinigt, measurement);
   return { ok: true };
+}
+
+/**
+ * Die Messung für den Pretest.
+ *
+ * ---------------------------------------------------------------------------
+ * SIE DARF DAS SPEICHERN NICHT KOSTEN
+ * ---------------------------------------------------------------------------
+ *
+ * Kein Fehler von hier erreicht die Person: Wer seine Suche festlegt, hat
+ * damit nichts zu tun. Deshalb steht sie NACH dem Schreiben und schluckt, was
+ * sie wirft — eine Messung, die den gemessenen Vorgang behindert, misst am
+ * Ende sich selbst.
+ *
+ * Ob überhaupt etwas für die Forschung abgelegt wird, entscheidet die
+ * Einwilligung — das prüft `trackServerResearchEvent` selbst.
+ */
+async function messen(
+  userId: string,
+  preferences: readonly ThemePreference[],
+  measurement: readonly ThemeMeasurement[],
+): Promise<void> {
+  const proThema = new Map(measurement.map((entry) => [entry.themeId, entry]));
+
+  await Promise.all(
+    THEME_IDS.map(async (themeId) => {
+      const gewaehlt = preferences.find((entry) => entry.themeId === themeId);
+      const gemessen = proThema.get(themeId);
+      try {
+        await trackServerResearchEvent({
+          eventName: "find_search_preference_saved",
+          userId,
+          questionId: themeId,
+          // „Egal" ist eine Wahl und keine fehlende Angabe - sie steht hier
+          // genauso da wie die anderen beiden. Sonst liesse sich die
+          // „neutral rate" aus Abschnitt 29 gar nicht bilden.
+          choiceValue: gewaehlt?.direction ?? "neutral",
+          answerChanged: (gemessen?.changes ?? 0) > 0,
+          durationMs: gemessen?.durationMs,
+          properties: {
+            importance: gewaehlt?.importance ?? 0,
+            changes: gemessen?.changes ?? 0,
+          },
+        });
+      } catch {
+        // Siehe oben.
+      }
+    }),
+  );
 }
