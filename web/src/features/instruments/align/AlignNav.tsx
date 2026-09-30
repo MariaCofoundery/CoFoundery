@@ -63,11 +63,11 @@ export function AlignNav({
       label: "Was du aufbauen willst",
       matches: (path: string) => path.startsWith("/founder-alignment/vorhaben"),
     },
-    {
-      href: "/founder-alignment/suche",
-      label: "Wonach du suchst",
-      matches: (path: string) => path.startsWith("/founder-alignment/suche"),
-    },
+    // "Wonach du suchst" stand hier bis zum 30.09.2026. Es ist nach FIND
+    // gezogen: Die FIND-Spec, Abschnitt 1, ordnet die Frage fachlich dorthin -
+    // ALIGN klaert, wie man arbeitet und was man aufbauen will; wen man dafuer
+    // sucht, gehoert zur Suche. Zwei Orte fuer dieselbe Frage waeren zwei
+    // Suchen, die nichts voneinander wissen.
   ];
 
   return (

@@ -91,11 +91,11 @@ export default async function DiscoverySearchesPage({
                       .map((areaId) => capability(`areaLabels.${areaId}`))
                       .join(", ")}`
                   : null,
-                search.alignmentDimensions.length
-                  ? `${t("v2.searches.criteria.alignment")}: ${search.alignmentDimensions
-                      .map((dimension) => t(`v2.alignment.dimensions.${dimension}`))
-                      .join(", ")}`
-                  : null,
+                // Die alten Alignment-Dimensionen standen hier als Kriterium.
+                // Sie haben nie gefiltert - sie erzeugten nur einen Zusatz in
+                // der Benachrichtigung - und die FIND-Spec streicht sie in
+                // Abschnitt 20. Eine Zeile ueber ein Kriterium, das nichts
+                // tut, ist schlimmer als keine.
               ].filter((line): line is string => line !== null);
 
               return (

@@ -103,7 +103,10 @@ export function AlignCard({ state }: { state: AlignDashboardState }) {
                 >
                   Deine Antworten
                 </Link>
-                <Link href="/founder-alignment/suche" className="text-slate-900 underline">
+                {/* "Wonach du suchst" fuehrt jetzt nach FIND: Dort steht die
+                    Suche, und zwar vollstaendig - mit praktischem Rahmen,
+                    Faehigkeiten und Arbeitsweisen. */}
+                <Link href="/discovery/suche" className="text-slate-900 underline">
                   Wonach du suchst
                 </Link>
               </>

@@ -127,13 +127,23 @@ test("the status is shown once, not as a row of pseudo-switches", () => {
 // ---------------------------------------------------------------------------
 // Das Private steht nicht im selben Kasten wie das Sichtbare
 // ---------------------------------------------------------------------------
-test("the private alignment block has its own frame", () => {
+test("der private Block verweist auf „Deine Suche“ statt eigener Kategorien", () => {
+  // GEAENDERT AM 30.09.2026. Hier standen sechs Kategorien zur Auswahl -
+  // Unternehmenslogik, Entscheidungslogik, Arbeitsstruktur, Commitment,
+  // Risikoorientierung, Konfliktstil -, dazu je eine Wichtigkeit und
+  // "aehnlich oder ergaenzend". Die FIND-Spec streicht sie in Abschnitt 20.
+  //
+  // Die Eigenschaft, die diese Pruefung schuetzt, bleibt: Das Private steht
+  // NICHT im Formular fuer das oeffentliche Profil.
   const page = source(PAGE);
-  assert.match(page, /\$\{CARD_CLASS\}[^`]*border-violet-100 bg-violet-50\/50/);
   const profileForm = page.indexOf("<form action={saveProfileDraft}");
-  const alignment = page.indexOf("border-violet-100 bg-violet-50/50");
+  const hinweis = page.indexOf('href="/discovery/suche"');
   const formEnd = page.indexOf("</form>", profileForm);
-  assert.ok(formEnd < alignment, "der private Block liegt ausserhalb des Profilformulars");
+  assert.ok(hinweis > 0, "kein Weg zur eigenen Suche");
+  assert.ok(formEnd < hinweis, "der private Block liegt im Profilformular");
+
+  // Und die alten Kategorien sind hier nicht mehr einstellbar.
+  assert.ok(!page.includes("DiscoveryAlignmentPreferencesEditor"));
 });
 
 // ---------------------------------------------------------------------------
@@ -558,9 +568,13 @@ test("the six dimensions appear only once the box is ticked", () => {
   // hervorruft - getrennt haette die Seite einen Zustand fuehren muessen,
   // den nur diese Komponente braucht.
   assert.match(editor, /name="discoveryV2AlignmentEnabled"/);
+
+  // GEAENDERT AM 30.09.2026: Die Seite bindet den Editor nicht mehr ein. Das
+  // Bauteil bleibt vorerst stehen - es hat noch eine Serveraktion und Daten
+  // hinter sich, und beides faellt in einem eigenen Schritt.
   const page = codeOnly(PAGE);
   assert.doesNotMatch(page, /name="discoveryV2AlignmentEnabled"/);
-  assert.match(page, /initialEnabled=\{loadedPreferences\?\.discoveryV2AlignmentEnabled/);
+  assert.ok(!page.includes("<DiscoveryAlignmentPreferencesEditor"));
 });
 
 test("switching alignment off does not forget the chosen dimensions", () => {

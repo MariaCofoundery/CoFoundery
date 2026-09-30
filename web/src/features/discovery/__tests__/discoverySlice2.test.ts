@@ -202,8 +202,13 @@ test("own Alignment context stays owner-only and serializes qualitative labels w
 
   assert.match(source, /getOwnDiscoveryV2AlignmentTendencies/);
   assert.match(source, /\.eq\("user_id", normalizedOwnerUserId\)/);
-  assert.match(editorPage, /ownTendencies=\{ownAlignmentTendencies\}/);
-  assert.doesNotMatch(candidatePage, /getOwnDiscoveryV2AlignmentTendencies|ownAlignmentTendencies/);
+  // GEAENDERT AM 30.09.2026: Die eigenen Tendenzen wurden auf der Profilseite
+  // angezeigt, neben den sechs alten Kategorien. Beides ist weg (FIND-Spec,
+  // Abschnitt 20). Was diese Pruefung schuetzt, gilt weiter und sogar
+  // strenger: Sie tauchen auf KEINER der beiden Seiten mehr auf.
+  for (const page of [editorPage, candidatePage]) {
+    assert.doesNotMatch(page, /getOwnDiscoveryV2AlignmentTendencies|ownAlignmentTendencies/);
+  }
   assert.match(publicTypes, /DiscoveryOwnAlignmentTendency[\s\S]*tendency:[\s\S]*label: string/);
   assert.doesNotMatch(publicTypes, /DiscoveryOwnAlignmentTendency[\s\S]{0,180}(score|rawAnswer)/);
 });

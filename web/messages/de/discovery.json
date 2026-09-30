@@ -367,7 +367,10 @@
       "more": "Weitere Bereiche",
       "add": "Auswählen",
       "remove": "Entfernen",
-      "full": "Drei sind ausgewählt – das ist das Maximum. Entferne einen, wenn du einen anderen aufnehmen willst."
+      "full": "Drei sind ausgewählt – das ist das Maximum. Entferne einen, wenn du einen anderen aufnehmen willst.",
+      "movedTitle": "Deine Matching-Präferenzen stehen jetzt in „Deine Suche“",
+      "movedText": "Dort legst du fest, bei welchen Themen dir Ähnlichkeit wichtig ist und wo du dir bewusst einen anderen Ansatz wünschst — zusammen mit dem praktischen Rahmen und den Fähigkeiten, die du suchst. Die früheren Kategorien hier stammten aus einer älteren Fassung und wirken nicht mehr.",
+      "movedCta": "Zu deiner Suche"
     },
     "results": {
       "eyebrow": "Suchen & filtern",

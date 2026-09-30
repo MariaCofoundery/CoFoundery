@@ -31,23 +31,33 @@ test("jede Seite der neuen Fassung hat einen Weg zurück", () => {
   // neuen Fassung hatte KEINE einen Weg hinaus - gebaut wurde Seite fuer
   // Seite, und der Weg dazwischen ist liegen geblieben.
   const seiten = seitenDerNeuenFassung();
-  assert.ok(seiten.length >= 7, `zu wenige Seiten gefunden: ${seiten.length}`);
+  assert.ok(seiten.length >= 6, `zu wenige Seiten gefunden: ${seiten.length}`);
 
   for (const seite of seiten) {
     const text = readFileSync(seite, "utf8");
+    // Eine Weiterleitung braucht keine Leiste: Sie zeigt nichts, sie schickt
+    // weiter. `/founder-alignment/suche` ist seit dem 30.09.2026 eine.
+    if (/^\s*redirect\(/m.test(text) && !text.includes("<main")) continue;
     assert.match(text, /<AlignNav/, `${seite}: keine Leiste, kein Weg zurueck`);
   }
 });
 
-test("die Leiste zeigt zurück und auf die drei Bereiche", () => {
+test("die Leiste zeigt zurück und auf die zwei Bereiche", () => {
   const nav = readFileSync(
     join("src", "features", "instruments", "align", "AlignNav.tsx"), "utf8");
 
   assert.match(nav, /href="\/dashboard"/);
   assert.match(nav, /← Übersicht/);
-  for (const ziel of ["/founder-alignment/profil", "/founder-alignment/vorhaben", "/founder-alignment/suche"]) {
+  for (const ziel of ["/founder-alignment/profil", "/founder-alignment/vorhaben"]) {
     assert.ok(nav.includes(ziel), ziel);
   }
+
+  // GEAENDERT AM 30.09.2026: "Wonach du suchst" war der dritte Eintrag und ist
+  // nach FIND gezogen. Die FIND-Spec ordnet die Frage in Abschnitt 1 fachlich
+  // dorthin: ALIGN klaert, wie man arbeitet und was man aufbauen will; wen man
+  // dafuer sucht, gehoert zur Suche. Zwei Orte fuer dieselbe Frage waeren zwei
+  // Suchen, die nichts voneinander wissen - und genau das war bis heute so.
+  assert.ok(!nav.includes("/founder-alignment/suche"), "der alte Reiter steht noch da");
 
   // EINE TUER JE SACHE: Wer abgegeben hat, kommt zu seinen Antworten, sonst
   // zum Fragebogen. Zwei Eintraege nebeneinander waeren zwei Orte fuer

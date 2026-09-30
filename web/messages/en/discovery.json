@@ -367,7 +367,10 @@
       "more": "Other areas",
       "add": "Select",
       "remove": "Remove",
-      "full": "Three are selected – that's the maximum. Remove one if you'd like to add another."
+      "full": "Three are selected – that's the maximum. Remove one if you'd like to add another.",
+      "movedTitle": "Your matching preferences now live in “Your search”",
+      "movedText": "That is where you define which topics call for similarity and where you deliberately want a different approach — together with the practical frame and the skills you are looking for. The earlier categories here came from an older version and no longer apply.",
+      "movedCta": "To your search"
     },
     "results": {
       "eyebrow": "Search & filter",

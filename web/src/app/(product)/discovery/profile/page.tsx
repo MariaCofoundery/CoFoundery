@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import {
   DISCOVERY_COMMITMENT_OPTIONS,
   DISCOVERY_ROLE_OPTIONS,
@@ -12,20 +12,15 @@ import {
 import {
   pauseDiscoveryProfileAction,
   publishDiscoveryProfileFromFormAction,
-  saveDiscoveryV2AlignmentPreferencesAction,
   saveDiscoveryProfileDraftAction,
 } from "@/features/discovery/discoveryActions";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { discoveryRoleLabels } from "@/features/discovery/discoveryPresentation";
 import {
   getOwnDiscoveryProfile,
-  getOwnSearchPreferences,
 } from "@/features/discovery/discoveryData";
 import {
-  getOwnDiscoveryAssessmentSignalReadiness,
-  getOwnDiscoveryV2AlignmentTendencies,
 } from "@/features/discovery/discoveryAssessmentSignals";
-import { DiscoveryAlignmentPreferencesEditor } from "@/features/discovery/DiscoveryAlignmentPreferencesEditor";
 import { DiscoveryAvailabilityField } from "@/features/discovery/DiscoveryAvailabilityField";
 import { DiscoveryChoiceField } from "@/features/discovery/DiscoveryChoiceField";
 import { DiscoveryRoleField } from "@/features/discovery/DiscoveryRoleField";
@@ -54,7 +49,6 @@ import {
 } from "@/features/discovery/discoveryTypes";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
-import { normalizeLocale } from "@/i18n/config";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD_CLASS =
@@ -374,12 +368,13 @@ export default async function DiscoveryProfilePage({
     redirect("/advisor/dashboard");
   }
 
-  const locale = normalizeLocale(await getLocale());
-  const [loadedProfile, loadedPreferences, alignmentReadiness, ownAlignmentTendencies, core] = await Promise.all([
+  // Drei Abfragen sind hier weggefallen: Sie haben das alte
+  // Alignment-Formular gefuettert - Suchvorgaben, Bereitschaft und die
+  // eigenen Tendenzen zu den sechs alten Kategorien. Das Formular gibt es
+  // nicht mehr (FIND-Spec, Abschnitt 20), und Abfragen fuer etwas, das
+  // niemand mehr anzeigt, sind Abfragen zu viel.
+  const [loadedProfile, core] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
-    getOwnSearchPreferences(user.id),
-    getOwnDiscoveryAssessmentSignalReadiness(user.id),
-    getOwnDiscoveryV2AlignmentTendencies({ ownerUserId: user.id, locale }),
     getPersonCore(supabase, user.id),
   ]);
   const params = await searchParams;
@@ -443,14 +438,6 @@ export default async function DiscoveryProfilePage({
     "use server";
     const result = await pauseDiscoveryProfileAction();
     redirect(buildDiscoveryProfilePauseRedirect(result));
-  }
-
-  async function saveAlignmentPreferences(formData: FormData) {
-    "use server";
-    const result = await saveDiscoveryV2AlignmentPreferencesAction(formData);
-    redirect(
-      `/discovery/profile?preferences${result.ok ? "Result=preferences_saved" : "Error=preferences_save_failed"}`
-    );
   }
 
   return (
@@ -873,50 +860,41 @@ export default async function DiscoveryProfilePage({
             ) : null}
           </section>
 
-          {/* Eigener Rahmen: Das hier ist privat und gehoert nicht in
-              denselben Kasten wie das, was andere sehen sollen. */}
+          {/* ---------------------------------------------------------------
+              DIE ALTEN ALIGNMENT-PRIORITAETEN SIND WEG
+              ---------------------------------------------------------------
+
+              Hier standen sechs Kategorien zur Auswahl - Unternehmenslogik,
+              Entscheidungslogik, Arbeitsstruktur, Commitment,
+              Risikoorientierung, Konfliktstil -, dazu je eine Wichtigkeit und
+              "aehnlich oder ergaenzend". Die FIND-Spec streicht sie in
+              Abschnitt 20: Sie stammen aus einer aelteren Architektur und
+              vermischen venturebezogene Themen mit portablen
+              Arbeitspraeferenzen.
+
+              An ihrer Stelle steht "Deine Suche" - dieselbe Frage, mit den
+              sechs Themen des Arbeitsprofils, drei Richtungen und einem
+              Gewicht. Und sie steht dort ZUSAMMEN mit dem praktischen Rahmen
+              und den Faehigkeiten, statt an einer dritten Stelle.
+
+              Ein Verweis und kein zweites Formular: Zwei Orte fuer dieselbe
+              Frage waren genau das Problem. */}
           <section
-            className={`${CARD_CLASS} discovery-rise border-violet-100 bg-violet-50/50`}
+            className={`${CARD_CLASS} discovery-rise`}
             style={{ "--rise-delay": "180ms" } as CSSProperties}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               {t("v2.alignment.eyebrow")}
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              {t("v2.alignment.choose")}
+              {t("v2.alignment.movedTitle")}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("v2.alignment.description")}
+              {t("v2.alignment.movedText")}
             </p>
-            {alignmentReadiness.hasSubmittedBaseAssessment ? (
-              <form action={saveAlignmentPreferences} className="mt-4">
-                <DiscoveryAlignmentPreferencesEditor
-                  initialEnabled={loadedPreferences?.discoveryV2AlignmentEnabled ?? false}
-                  initialPreferences={
-                    loadedPreferences?.discoveryV2AlignmentPreferences ?? {}
-                  }
-                  ownTendencies={ownAlignmentTendencies}
-                />
-                <p className="mt-4 text-xs leading-5 text-violet-900">
-                  {t("v2.alignment.transparency")}
-                </p>
-                <p className="mt-2 text-xs leading-5 text-slate-500">
-                  {t("v2.alignment.disclaimer")}
-                </p>
-                <SubmitButton
-                  label={t("profile.intent.saveAlignment")}
-                  pendingLabel={t("profile.actions.saving")}
-                  className={`${PRIMARY_BUTTON_CLASS} mt-4`}
-                />
-              </form>
-            ) : (
-              <div className="mt-4 rounded-2xl bg-white p-4">
-                <p className="text-sm text-slate-600">{t("v2.alignment.unavailable")}</p>
-                <Link href="/me/base?next=/discovery/profile" className={`${SECONDARY_BUTTON_CLASS} mt-3`}>
-                  {t("common.fillBaseQuestions")}
-                </Link>
-              </div>
-            )}
+            <Link href="/discovery/suche" className={`${SECONDARY_BUTTON_CLASS} mt-4`}>
+              {t("v2.alignment.movedCta")}
+            </Link>
           </section>
           </div>
 
