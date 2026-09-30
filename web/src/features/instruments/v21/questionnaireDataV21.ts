@@ -57,6 +57,15 @@ export type ItemView = {
   paths: string[] | null;
   ratingOptions: string[] | null;
   ratingMissing: string | null;
+  /**
+   * Höchstens so viele Haken — bei `multi_choice`.
+   *
+   * Sie stand nur in der Antwortprüfung. Damit erfuhr man von der Grenze
+   * erst, wenn man sie überschritten hatte: dritter Haken, rote Meldung,
+   * Haken wieder weg. Eine Grenze, die man sieht, bevor man dagegenläuft, ist
+   * keine Fehlermeldung wert.
+   */
+  maxChoices: number | null;
   /** Die Texte des Dreischritt-Musters — sonst stehen dort Knöpfe ohne Frage. */
   valueCase: {
     importancePrompt: string;
@@ -115,6 +124,7 @@ export function buildSectionsV21(): SectionView[] {
         // die Wegwahl, wie sie war - der Bogen ist archiviert.
         paths: null,
         ratingOptions: item.ratingOptions ?? null,
+        maxChoices: null,
         valueCase: null,
         ratingMissing: item.ratingMissing ?? null,
         fields: item.fields ?? null,

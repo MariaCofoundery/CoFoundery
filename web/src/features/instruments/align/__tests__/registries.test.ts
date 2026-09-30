@@ -115,10 +115,35 @@ const quelleFuer = (scope: AssessmentScope) =>
  */
 const NOCH_NICHT_UEBERARBEITET = new Set<string>([]);
 
+/**
+ * Fragen, deren Wortlaut nach den Dokumenten entschieden wurde.
+ *
+ * B04: Das UX-Review Teil 2 verlangt „Betrag in EUR", die
+ * Master-Arbeitsfassung „Monate laufender Ausgaben" - zwei verschiedene
+ * Fragen. Maria hat sich am 30.09.2026 für die Monate entschieden und die
+ * Frage dafür neu geschrieben.
+ */
+const NACHTRAEGE = new Set(["B04"]);
+
+test("jeder Nachtrag ist begründet und nicht bloß anders", () => {
+  const deviations = VENTURE_ALIGNMENT.deviationsFromSource ?? [];
+  for (const itemId of NACHTRAEGE) {
+    const eintrag = deviations.find((entry) => entry.what.startsWith(`${itemId} `));
+    assert.ok(eintrag, `${itemId}: kein Eintrag in deviationsFromSource`);
+    assert.match(eintrag!.decidedBy, /Maria/);
+    assert.ok(eintrag!.reason.length > 150, `${itemId}: die Begründung ist zu knapp`);
+  }
+});
+
 test("jeder Fragetext steht so in seinem Review", () => {
   for (const scope of SCOPES) {
   for (const item of getItemsV22(scope)) {
     if (NOCH_NICHT_UEBERARBEITET.has(item.itemId) || item.retired) continue;
+    // Ein Nachtrag ist eine Entscheidung NACH den Dokumenten und steht
+    // deshalb in keinem. Er ist nicht frei erfunden: Die Begruendung steht in
+    // `deviationsFromSource`, und die zweite Pruefung unten haelt fest, dass
+    // sie dort steht.
+    if (NACHTRAEGE.has(item.itemId)) continue;
     const review = quelleFuer(scope);
     if (review.includes(item.prompt) || uxReview2.includes(item.prompt)) continue;
 

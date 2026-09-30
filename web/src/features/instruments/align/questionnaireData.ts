@@ -84,6 +84,7 @@ function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
     concerns: item.concerns ?? null,
     paths: item.paths ?? null,
     ratingOptions: item.ratingOptions ?? null,
+    maxChoices: item.maxChoices ?? null,
     valueCase: item.valueCase ?? null,
     ratingMissing: item.ratingMissing ?? null,
     fields: null,

@@ -119,6 +119,22 @@ export function Questionnaire({
   );
 
   /**
+   * Beim Schrittwechsel nach oben.
+   *
+   * GEMELDET AM 30.09.2026: „Wenn man weiter klickt, sollte man immer im
+   * nächsten Bereich oben landen." Der Knopf steht unten; ohne diesen Sprung
+   * beginnt der nächste Schritt mitten in seinen Fragen, und die Überleitung,
+   * die erklärt, worum es jetzt geht, hat man nie gesehen.
+   *
+   * `auto` und nicht `smooth`: Wer zügig durchklickt, wartet sonst bei jedem
+   * Schritt auf eine Animation.
+   */
+  const zuSchritt = (naechster: number) => {
+    setStep(naechster);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  /**
    * Der Arbeitstitel des Vorhabens.
    *
    * Er wird beim Weitergehen gespeichert und nicht mit einem eigenen
@@ -177,8 +193,38 @@ export function Questionnaire({
     return () => observer.disconnect();
   }, [scope, ventureId, sections]);
 
+  /**
+   * Wie lange gewartet wird, bevor gespeichert wird.
+   *
+   * ---------------------------------------------------------------------------
+   * BEIM TIPPEN LÄNGER
+   * ---------------------------------------------------------------------------
+   *
+   * GEMELDET AM 30.09.2026: „Bei ,Was sollte dieses Vorhaben erreichen'
+   * speichert es immer nach einem Buchstaben, das ist etwas lästig."
+   *
+   * Sechshundert Millisekunden reichen beim Ankreuzen und sind beim Schreiben
+   * zu kurz: Wer einen Satz formuliert, macht laufend längere Pausen als das —
+   * und sieht dann bei jedem Nachdenken „Speichern …". Beim Tippen wird
+   * deshalb gewartet, bis jemand wirklich fertig ist; und wer das Feld
+   * verlässt, hat es ohnehin.
+   */
+  const TIPPEN = new Set([
+    "structured_text",
+    "free_text",
+    "free_text_repeatable",
+    "free_text_per_entry",
+    "number_range",
+    "person_number_range",
+    "money_range",
+    "time_windows",
+    "date",
+  ]);
+  const wartezeit = (itemId: string) =>
+    TIPPEN.has(answerable[itemId]?.answerFormat ?? "") ? 2000 : 600;
+
   const persist = useCallback(
-    (itemId: string, draft: DraftV21) => {
+    (itemId: string, draft: DraftV21, sofort = false) => {
       clearTimeout(timers.current[itemId]);
 
       const stand =
@@ -219,10 +265,23 @@ export function Questionnaire({
           setStates((current) => ({ ...current, [itemId]: "error" }));
           setErrors((current) => ({ ...current, [itemId]: "unreachable" }));
         }
-      }, 600);
+      }, sofort ? 0 : wartezeit(itemId));
     },
     [scope, ventureId, answerable],
   );
+
+  /**
+   * Was noch im Warten steht, jetzt speichern.
+   *
+   * Wer ein Feld verlässt, ist damit fertig — darauf noch zwei Sekunden zu
+   * warten, hiesse zweimal dasselbe zu wissen. Und wer in derselben Sekunde
+   * abgibt, hätte sonst einen ungespeicherten Stand.
+   */
+  const jetztSpeichern = (itemId: string) => {
+    if (!timers.current[itemId]) return;
+    const draft = answers[itemId];
+    if (draft) persist(itemId, draft, true);
+  };
 
   /**
    * Was am Ende dasteht.
@@ -377,6 +436,9 @@ export function Questionnaire({
     <div
       key={item.itemId}
       data-item-id={item.itemId}
+      // WER DAS FELD VERLAESST, IST FERTIG. React laesst `blur` steigen,
+      // deshalb steht es an der Karte und nicht an jedem Feld darin.
+      onBlur={() => jetztSpeichern(item.itemId)}
       className={[
         "rounded-xl border p-5",
         missingAfterSubmit.includes(item.itemId)
@@ -419,6 +481,7 @@ export function Questionnaire({
           <div
             key={item.itemId}
             data-item-id={item.itemId}
+            onBlur={() => jetztSpeichern(item.itemId)}
             className={[
               "-mx-2 px-2 py-4",
               missingAfterSubmit.includes(item.itemId) ? "bg-amber-50/60" : "",
@@ -466,7 +529,7 @@ export function Questionnaire({
 
     const weiter = () => {
       if (!namensfrage || !name.trim() || !ventureId) {
-        setStep(1);
+        zuSchritt(1);
         return;
       }
       // OHNE NAMEN GEHT ES AUCH WEITER. Er ist eine Beschriftung und keine
@@ -477,7 +540,7 @@ export function Questionnaire({
         .catch(() => {})
         .finally(() => {
           setNameLaeuft(false);
-          setStep(1);
+          zuSchritt(1);
         });
     };
 
@@ -525,7 +588,7 @@ export function Questionnaire({
           {namensfrage && (
             <button
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => zuSchritt(1)}
               className="text-sm text-slate-600 underline"
             >
               {namensfrage.skip}
@@ -609,7 +672,7 @@ export function Questionnaire({
         {schirm.step > 1 && (
           <button
             type="button"
-            onClick={() => setStep(schirm.step - 1)}
+            onClick={() => zuSchritt(schirm.step - 1)}
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
           >
             Zurück
@@ -618,7 +681,7 @@ export function Questionnaire({
         {!letzter && (
           <button
             type="button"
-            onClick={() => setStep(schirm.step + 1)}
+            onClick={() => zuSchritt(schirm.step + 1)}
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
           >
             Weiter

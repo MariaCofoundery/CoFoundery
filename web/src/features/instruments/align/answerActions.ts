@@ -145,6 +145,26 @@ async function draftFor(
     .select("id, submitted_at")
     .single();
 
+  // ---------------------------------------------------------------------------
+  // WER ZU ZWEIT ANKOMMT, NIMMT DEN ERSTEN ENTWURF
+  // ---------------------------------------------------------------------------
+  //
+  // Der Autospeicher feuert je Frage einzeln. Wer zwei Fragen kurz
+  // hintereinander beantwortet, loest zwei Aufrufe aus - beide finden oben
+  // keinen Entwurf und beide legen einen an. Seit dem 30.09.2026 laesst die
+  // Datenbank das nicht mehr zu (`assessments_one_open_draft_uidx`), und der
+  // Verlierer sucht hier einfach noch einmal.
+  //
+  // OHNE DIESE ZEILEN WAERE DER INDEX EINE NEUE FEHLERMELDUNG. Vorher gingen
+  // beide durch, und die Antworten verteilten sich auf zwei Entwuerfe - die
+  // Seite las den neueren und zeigte die Haelfte.
+  if (error?.code === "23505") {
+    const { data: gefunden } = ventureId
+      ? await suche.eq("venture_id", ventureId).maybeSingle()
+      : await suche.is("venture_id", null).maybeSingle();
+    if (gefunden) return { ok: true, supabase, assessment: gefunden, ventureId };
+  }
+
   // Jeder Fehlschlag bekommt seinen eigenen Namen. "Konnte nicht gespeichert
   // werden" ist fuer die Person davor keine Auskunft, sondern eine Einladung,
   // es noch einmal zu versuchen - und bei zwei dieser Faelle hat das nie

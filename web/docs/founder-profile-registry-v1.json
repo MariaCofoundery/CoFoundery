@@ -13,6 +13,12 @@
   "dimensionScores": false,
   "deviationsFromSource": [
     {
+      "what": "B04 fragt nach Monaten und sagt es in der Frage: 'Wie viele Monate sollten die laufenden Kosten des Vorhabens aus deiner Sicht mindestens gedeckt sein, bevor ihr zusaetzliches Geld investiert?'",
+      "source": "Wortlaut von Maria, 30.09.2026 - steht in keinem der Dokumente",
+      "reason": "Das UX-Review Teil 2 verlangt fuer B04 'Betrag in EUR', die Master-Arbeitsfassung 'Monate laufender Ausgaben'. Das sind zwei verschiedene Fragen - '3 Monate' oder '15.000 Euro' -, und keine Umformulierung kann beide sein. Maria hat sich fuer die Monate entschieden und die Frage dafuer neu geschrieben: Vorher nannte die Frage keine Einheit, und die Einheit unter dem Zahlenfeld trug die halbe Frage.",
+      "decidedBy": "Maria, 30.09.2026"
+    },
+    {
       "what": "S01a bis S01f tragen die kurzen Zielzeilen aus dem UX-Review; S01_top bekommt dieselben Texte als Antworten.",
       "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md, Abschnitt 6",
       "reason": "Das Review stellt die sechs Ziele als einen Block dar - eine Frage darueber, sechs Zeilen darunter. Wo der Kopf den Rahmen traegt, muss ihn nicht jede Zeile mitschleppen: 'Deutlich wachsen und einen groesseren Markt erreichen' statt 'Das Unternehmen deutlich wachsen lassen und ...'. S01_top fragt, welche ein oder zwei davon vorgehen - seine Antworten SIND diese sechs Ziele. Zwei Fassungen desselben Ziels untereinander auf einem Bildschirm waeren zwei verschiedene Ziele fuer jeden, der sie liest.",

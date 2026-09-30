@@ -498,7 +498,10 @@ VALUE_CASE = {"W01", "W02", "W03", "W04", "W05", "W06"}
 # Item und nicht in die Oberflaeche.
 EINHEIT = {
     "R01": "Stunden pro Woche",
-    "B04": "Monate laufender Ausgaben",
+    # "Monate" und nicht "Monate laufender Ausgaben": WOVON die Monate handeln,
+    # steht seit dem 30.09.2026 in der Frage selbst. Eine Einheit ist die
+    # Beschriftung eines Zahlenfeldes und kein Platz fuer eine Erklaerung.
+    "B04": "Monate",
 }
 
 # Der freiwillige Zusatz unter dem Zahlenfeld. Auch der war fuer R01
@@ -756,6 +759,25 @@ NACHTRAG_REVIEW = {
             3: "nach mehr als einem Arbeitstag",  # vierte Antwort, Index 3
         },
     },
+    # -----------------------------------------------------------------------
+    # B04 - DIE FRAGE SAGT JETZT, WOVON DIE MONATE HANDELN
+    # -----------------------------------------------------------------------
+    #
+    # Wortlaut von Maria am 30.09.2026. Vorher stand da "Welche finanzielle
+    # Reserve sollte fuer dich mindestens bestehen bleiben" und darunter ein
+    # Zahlenfeld mit der Einheit "Monate laufender Ausgaben" - die Frage nannte
+    # keine Einheit, und die Einheit trug die halbe Frage.
+    #
+    # Das UX-Review Teil 2 hatte hier "Betrag in EUR" verlangt; die
+    # Master-Arbeitsfassung sagt "Monate laufender Ausgaben". Zwei verschiedene
+    # Fragen - "3 Monate" oder "15.000 Euro". Maria hat sich fuer die Monate
+    # entschieden und die Frage dafuer neu geschrieben.
+    "B04": {
+        "prompt": "Wie viele Monate sollten die laufenden Kosten des Vorhabens "
+                  "aus deiner Sicht mindestens gedeckt sein, bevor ihr "
+                  "zusätzliches Geld investiert?",
+        "hint": "Gemeint ist die finanzielle Reserve des Vorhabens.",
+    },
 }
 
 for item_id, review in REVIEW_ITEMS.items():
@@ -781,13 +803,6 @@ for item_id, review in REVIEW_ITEMS.items():
                 "Reihenfolge und Anzahl muessen bleiben."
             )
         it["options"] = review["options"]
-
-    nachtrag = NACHTRAG_REVIEW.get(item_id)
-    if nachtrag:
-        for stelle, beschriftung in nachtrag.get("options", {}).items():
-            if stelle >= len(it["options"]):
-                raise SystemExit(f"{item_id}: Nachtrag zeigt auf Antwort {stelle + 1}, die es nicht gibt")
-            it["options"][stelle] = beschriftung
 
     if review.get("prompt"):
         it["prompt"] = review["prompt"]
@@ -940,6 +955,27 @@ for item_id, it in items.items():
     if len(it["concerns"] or []) != 2 or len(it["paths"] or []) != 2:
         raise SystemExit(f"{item_id}: braucht genau zwei Aspekte und zwei Wege")
 
+# ---------------------------------------------------------------------------
+# DER NACHTRAG STEHT GANZ AM ENDE - ER IST DAS LETZTE WORT
+# ---------------------------------------------------------------------------
+#
+# Er lag bisher mitten im Sprachreview-Durchlauf und galt damit nur fuer
+# Fragen, die dort ueberhaupt vorkommen - und ein spaeterer Durchlauf haette
+# ihn ueberschrieben. Was hier steht, ist eine Entscheidung nach allen
+# Dokumenten; sie muss nach ihnen kommen.
+for item_id, nachtrag in NACHTRAG_REVIEW.items():
+    if item_id not in items:
+        raise SystemExit(f"Der Nachtrag nennt {item_id} - die Frage gibt es nicht")
+    it = items[item_id]
+    for stelle, beschriftung in nachtrag.get("options", {}).items():
+        if stelle >= len(it["options"]):
+            raise SystemExit(f"{item_id}: Nachtrag zeigt auf Antwort {stelle + 1}, die es nicht gibt")
+        it["options"][stelle] = beschriftung
+    if nachtrag.get("prompt"):
+        it["prompt"] = nachtrag["prompt"]
+    if nachtrag.get("hint"):
+        it["hint"] = nachtrag["hint"]
+
 # DIESELBEN SECHS ZIELE, DERSELBE WORTLAUT.
 #
 # S01_top fragt, welche ein oder zwei der sechs gerade vorgehen - seine
@@ -1024,6 +1060,12 @@ for scope, meta in SCOPES.items():
         ("overallScore", False),
         ("dimensionScores", False),
         ("deviationsFromSource", [
+            collections.OrderedDict([
+                ("what", "B04 fragt nach Monaten und sagt es in der Frage: 'Wie viele Monate sollten die laufenden Kosten des Vorhabens aus deiner Sicht mindestens gedeckt sein, bevor ihr zusaetzliches Geld investiert?'"),
+                ("source", "Wortlaut von Maria, 30.09.2026 - steht in keinem der Dokumente"),
+                ("reason", "Das UX-Review Teil 2 verlangt fuer B04 'Betrag in EUR', die Master-Arbeitsfassung 'Monate laufender Ausgaben'. Das sind zwei verschiedene Fragen - '3 Monate' oder '15.000 Euro' -, und keine Umformulierung kann beide sein. Maria hat sich fuer die Monate entschieden und die Frage dafuer neu geschrieben: Vorher nannte die Frage keine Einheit, und die Einheit unter dem Zahlenfeld trug die halbe Frage."),
+                ("decidedBy", "Maria, 30.09.2026"),
+            ]),
             collections.OrderedDict([
                 ("what", "S01a bis S01f tragen die kurzen Zielzeilen aus dem UX-Review; S01_top bekommt dieselben Texte als Antworten."),
                 ("source", UX_REVIEW_2 + ", Abschnitt 6"),

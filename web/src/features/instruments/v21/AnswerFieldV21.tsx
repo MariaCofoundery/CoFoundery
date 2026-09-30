@@ -225,6 +225,23 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
     const texts = (value.texts as Record<string, string> | undefined) ?? {};
     const exclusive = item.options.find((option) => option.exclusive)?.optionId;
 
+    /**
+     * Voll — und dann sind die übrigen aus.
+     *
+     * GEMELDET AM 30.09.2026: „Bei ,welche ein oder zwei davon stehen weit
+     * oben' sollten die anderen nicht mehr anklickbar sein, wenn 2 gewählt
+     * wurden. Steht zwar dann als Fehler, aber das wäre eine bessere
+     * Erfahrung."
+     *
+     * Stimmt: Eine Grenze, gegen die man erst läuft und dann eine rote
+     * Meldung bekommt, ist eine Falle. Sie steht weiterhin auch in der
+     * Prüfung — eine Grenze, die nur die Oberfläche durchsetzt, ist keine.
+     */
+    const voll =
+      item.maxChoices !== null &&
+      item.maxChoices !== undefined &&
+      chosen.length >= item.maxChoices;
+
     const toggle = (optionId: string) => {
       const isExclusive = optionId === exclusive;
       // „Keine zusätzliche Absicherung“ neben drei angekreuzten Absicherungen
@@ -255,13 +272,15 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
             key={option.optionId}
             className={`${optionRow} ${
               chosen.includes(option.optionId) ? "border-slate-900 bg-slate-50" : "border-slate-200"
-            }`}
+            } ${voll && !chosen.includes(option.optionId) ? "opacity-45" : ""}`}
           >
             <input
               type="checkbox"
               className="mt-0.5"
               checked={chosen.includes(option.optionId)}
-              disabled={disabled}
+              // Was schon angehakt ist, bleibt anklickbar - sonst käme man
+              // aus der vollen Auswahl nicht mehr heraus.
+              disabled={disabled || (voll && !chosen.includes(option.optionId))}
               onChange={() => toggle(option.optionId)}
             />
             <span className="flex-1">
