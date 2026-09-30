@@ -95,6 +95,19 @@ export type RegistryItemV22 = {
   concerns?: string[];
   paths?: string[];
   ratingOptions?: string[];
+  /**
+   * Die Texte des Dreischritt-Musters — für `value_case`.
+   *
+   * Sie stehen einmal im UX-Review Teil 2 und gelten für alle sechs W-Fragen.
+   * Am Item, weil das Bauteil ein Item bekommt und keine Registratur; erzeugt,
+   * also ohne Gefahr, auseinanderzulaufen.
+   */
+  valueCase?: {
+    importancePrompt: string;
+    pathPrompt: string;
+    otherLabel: string;
+    unknownLabel: string;
+  };
   ratingMissing?: string;
   followUpQuestion?: string;
   /** Erscheint erst, wenn diese Frage beantwortet ist. */
@@ -238,6 +251,12 @@ export function assertRegistryV22(registry: RegistryV22): RegistryV22 {
       if (item.concerns?.length !== 2) fail(`${item.itemId}: braucht genau zwei Anliegen`);
       if (item.paths?.length !== 2) fail(`${item.itemId}: braucht genau zwei Wege`);
       if (item.ratingOptions?.length !== 5) fail(`${item.itemId}: braucht fünf Wichtigkeitsstufen`);
+      // OHNE DIE TEXTE DES MUSTERS STUENDEN DORT ZWEI SKALEN UND VIER
+      // KNOEPFE OHNE FRAGE. Bis zum 30.09.2026 war es fast so: Die Wegwahl
+      // trug die Aspekte als Beschriftung - ein Aspekt ist aber kein Weg.
+      if (!item.valueCase?.importancePrompt || !item.valueCase?.pathPrompt) {
+        fail(`${item.itemId}: braucht die Texte des Dreischritt-Musters`);
+      }
     }
 
     if (item.showAfter && !known.has(item.showAfter)) {

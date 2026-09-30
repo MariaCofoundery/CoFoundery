@@ -114,20 +114,120 @@ UX_REVIEW = "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md"
 UX_REVIEW_2 = "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md"
 
 
+KENNUNG_2 = r"[A-Z][0-9]{2}(?:[a-z]|_[a-z]+)?"
+
+
+def _kennungen_kopf(kopf):
+    """Welche Fragen eine Ueberschrift des Reviews benennt.
+
+    Vier Formen: `K01`, `U01 — Vorgehen im eigenen Bereich`, `S01_top` und der
+    Bereich `S01a–S01f — Ziele`. Der Bereich wird aufgezaehlt, weil dort sechs
+    Fragen gemeint sind und nicht eine.
+    """
+    kopf = kopf.strip()
+    bereich = re.match(rf"^({KENNUNG_2})\s*[–—-]\s*({KENNUNG_2})\b", kopf)
+    if bereich:
+        von = re.match(r"^([A-Z][0-9]{2})([a-z])$", bereich.group(1))
+        bis = re.match(r"^([A-Z][0-9]{2})([a-z])$", bereich.group(2))
+        if not (von and bis and von.group(1) == bis.group(1)):
+            raise SystemExit(f"Bereich nicht lesbar: {kopf!r}")
+        return [von.group(1) + chr(c)
+                for c in range(ord(von.group(2)), ord(bis.group(2)) + 1)]
+    einzeln = re.match(rf"^({KENNUNG_2})\b", kopf)
+    return [einzeln.group(1)] if einzeln else []
+
+
+def w_muster():
+    """Das gemeinsame Dreischritt-Muster der W-Fragen aus Abschnitt 11.
+
+    ---------------------------------------------------------------------------
+    DREI SCHRITTE, UND ZWAR IN DIESER REIHENFOLGE
+    ---------------------------------------------------------------------------
+
+    Kurzes Szenario, zwei GETRENNTE Wichtigkeitsbewertungen, danach die
+    Wegwahl. Die beiden Bewertungen werden ausdruecklich nicht zu einer
+    Entscheidung verrechnet - das Review sagt es woertlich. Wer beide Aspekte
+    hoch bewertet, hat nicht widersprochen; er hat einen Zielkonflikt
+    beschrieben, und genau darum wird danach der Weg gefragt.
+
+    Die Texte stehen einmal im Review und gelten fuer alle sechs. Sie landen
+    an jedem Item, weil das Bauteil, das sie anzeigt, ein Item bekommt und
+    keine Registratur - erzeugt, also ohne Gefahr, auseinanderzulaufen.
+    """
+    text = io.open(UX_REVIEW_2, encoding="utf-8").read()
+    i = text.index("## 11. Abschnitt 7")
+    block = text[i:text.index("\n## ", i)]
+
+    treffer = re.search(r"^User-facing:\s*\n+```(?:text)?\n(.*?)```", block, flags=re.M | re.S)
+    if not treffer:
+        raise SystemExit("Abschnitt 11: der user-facing Block fehlt")
+    schema = treffer.group(1)
+
+    fragen = [z.strip() for z in schema.split("\n") if z.strip().endswith("?")]
+    if len(fragen) != 2:
+        raise SystemExit(f"Abschnitt 11: erwartet werden zwei Fragen, gefunden: {fragen}")
+
+    # Die zweite Frage hat einen Vorsatz auf der Zeile darueber: "Wenn du dich
+    # in dieser Situation entscheiden muesstest:".
+    vorsatz = re.search(r"^(.+:)\n" + re.escape(fragen[1]) + r"$", schema, flags=re.M)
+
+    wahl = [re.sub(r"^○\s*", "", z.strip()) for z in schema.split("\n")
+            if z.strip().startswith("○") and "..." not in z]
+    if len(wahl) < 4:
+        raise SystemExit(f"Abschnitt 11: erwartet werden vier Wege, gefunden: {wahl}")
+
+    muster = collections.OrderedDict([
+        ("importancePrompt", fragen[0]),
+        # "A" und "B" im Review stehen fuer die zwei Wege des Items selbst -
+        # sie sind Platzhalter und keine Beschriftung. Die letzten zwei sind
+        # fuer alle sechs gleich.
+        ("pathPrompt", f"{vorsatz.group(1)} {fragen[1]}" if vorsatz else fragen[1]),
+        ("otherLabel", wahl[-2]),
+        ("unknownLabel", wahl[-1]),
+    ])
+
+    # --- Und je Frage: Szenario und die zwei Aspekte ----------------------
+    items = {}
+    for teil in re.split(r"^### ", block, flags=re.M)[1:]:
+        kopf, koerper = teil.split("\n", 1)
+        kennung = kopf.strip()
+        if not re.match(r"^W\d{2}$", kennung):
+            continue
+        eintrag = {}
+        # Nur W01 bekommt im Review ein neues, kuerzeres Szenario. Bei den
+        # anderen bleibt das der Master-Arbeitsfassung - es gibt keins, das
+        # man uebernehmen koennte, und eins zu erfinden waere keine Uebernahme.
+        szenario = _zitat_nach(koerper, "Szenario:")
+        if szenario:
+            eintrag["prompt"] = szenario
+        aspekte = [re.sub(r"^-\s*", "", z.strip()) for z in koerper.split("\n")
+                   if z.strip().startswith("- ")]
+        if aspekte:
+            if len(aspekte) != 2:
+                raise SystemExit(f"{kennung}: {len(aspekte)} Aspekte statt zwei")
+            eintrag["concerns"] = aspekte
+        if eintrag:
+            items[kennung] = eintrag
+
+    if len(items) != 6:
+        raise SystemExit(f"Abschnitt 11 nennt {len(items)} W-Fragen statt sechs")
+    return muster, items
+
+
 def ux_review_2():
     """Wortlaute, Hinweise und Antwortbeschriftungen aus dem UX-Review Teil 2."""
     text = io.open(UX_REVIEW_2, encoding="utf-8").read()
     out = {}
     for block in re.split(r"^### ", text, flags=re.M)[1:]:
         kopf, koerper = block.split("\n", 1)
-        kennung = kopf.strip().split(" ")[0].split("—")[0].strip()
-        if not re.match(r"^[A-Z][0-9]{2}$", kennung):
+        kennungen = _kennungen_kopf(kopf)
+        if not kennungen:
             continue
         # W01 bis W06 bleiben aussen vor. Dort steht unter "Szenario:" eine
         # verkuerzte Lage, und Abschnitt 11 baut die sechs ohnehin auf ein
         # Dreischritt-Muster um - eine halbe Uebernahme waere schlimmer als
         # keine.
-        if kennung.startswith("W"):
+        if kennungen[0].startswith("W"):
             continue
 
         eintrag = {}
@@ -135,16 +235,37 @@ def ux_review_2():
         # Dokument schreibt beides - "Frage:" in Abschnitt 4, direkt darunter
         # in Abschnitt 9 und 10.
         frage = _zitat_nach(koerper, "Frage:") or _erstes_zitat(koerper)
-        if frage:
-            eintrag["prompt"] = frage
         hinweis = _zitat_nach(koerper, "Hinweis:")
         if hinweis:
             eintrag["hint"] = hinweis
         labels = _nummern_nach(koerper, "Neue Antwortlabels:")
         if labels:
             eintrag["options"] = labels
+
+        # DIE SECHS ZIELE SIND EIN BLOCK UND KEINE SECHS FRAGEN.
+        #
+        # Das Review: "Als gemeinsamer Block darstellen, nicht als sechs
+        # grosse unabhaengige Fragekarten." Ueber ihnen steht eine Frage, und
+        # jede Zeile ist ein Ziel - "Deutlich wachsen und einen groesseren
+        # Markt erreichen" statt "Das Unternehmen deutlich wachsen lassen
+        # und einen groesseren Markt erreichen". Wo der Kopf den Rahmen
+        # traegt, muss ihn nicht jede Zeile noch einmal mitschleppen.
+        if len(kennungen) > 1:
+            gemeinsam = _zitat_nach(koerper, "Gemeinsame Frage:")
+            ziele = _nummern_nach(koerper, "Ziele:")
+            if not ziele or len(ziele) != len(kennungen):
+                raise SystemExit(
+                    f"{kopf.strip()}: {len(kennungen)} Fragen, aber "
+                    f"{len(ziele or [])} Zeilen. Die Zuordnung waere geraten."
+                )
+            for kennung, ziel in zip(kennungen, ziele):
+                out[kennung] = dict(eintrag, prompt=ziel, groupPrompt=gemeinsam)
+            continue
+
+        if frage:
+            eintrag["prompt"] = frage
         if eintrag:
-            out[kennung] = eintrag
+            out[kennungen[0]] = eintrag
     return out
 
 
@@ -772,6 +893,65 @@ for item_id, ux in UX2_ITEMS.items():
         it["prompt"] = ux["prompt"]
     if ux.get("hint"):
         it["hint"] = ux["hint"]
+    if ux.get("groupPrompt"):
+        it["groupPrompt"] = ux["groupPrompt"]
+
+# ---------------------------------------------------------------------------
+# DAS DREISCHRITT-MUSTER DER W-FRAGEN
+# ---------------------------------------------------------------------------
+_W_MUSTER, _W_ITEMS = w_muster()
+
+for item_id, w in _W_ITEMS.items():
+    if item_id not in items:
+        raise SystemExit(f"Abschnitt 11 nennt {item_id} - die Frage gibt es nicht")
+    it = items[item_id]
+    if w.get("prompt"):
+        it["prompt"] = w["prompt"]
+    if w.get("concerns"):
+        if len(it["concerns"] or []) != len(w["concerns"]):
+            raise SystemExit(f"{item_id}: Abschnitt 11 aendert die Anzahl der Aspekte")
+        it["concerns"] = w["concerns"]
+
+# DAS SZENARIO STELLT KEINE FRAGE MEHR.
+#
+# Die Fragen stellt das Muster: erst nach der Wichtigkeit der zwei Aspekte,
+# dann nach dem Weg. Die Master-Arbeitsfassung endet bei W02 bis W06 zusaetzlich
+# mit "Wie wuerdest du in dieser Situation eher vorgehen?" - dieselbe Frage in
+# anderen Worten, zwei Zeilen darueber. Das Review zeigt es an W01 selbst: Dort
+# steht unter "Szenario:" nur die Lage und keine Frage.
+#
+# Gestrichen wird nur ein letzter Satz, der ein Fragesatz IST. Bleibt danach
+# nichts uebrig, bricht der Generator ab, statt ein leeres Szenario zu liefern.
+for item_id in [k for k in items if k.startswith("W")]:
+    it = items[item_id]
+    saetze = re.findall(r"[^.?!]+[.?!]", it["prompt"])
+    if not saetze or not saetze[-1].strip().endswith("?"):
+        continue
+    rest = "".join(saetze[:-1]).strip()
+    if not rest:
+        raise SystemExit(f"{item_id}: ohne die Frage bleibt kein Szenario uebrig")
+    it["prompt"] = rest
+
+# Und jede Frage dieses Formats bekommt die Texte des Musters.
+for item_id, it in items.items():
+    if format_von(item_id) != "value_case":
+        continue
+    it["valueCase"] = _W_MUSTER
+    if len(it["concerns"] or []) != 2 or len(it["paths"] or []) != 2:
+        raise SystemExit(f"{item_id}: braucht genau zwei Aspekte und zwei Wege")
+
+# DIESELBEN SECHS ZIELE, DERSELBE WORTLAUT.
+#
+# S01_top fragt, welche ein oder zwei der sechs gerade vorgehen - seine
+# Antworten SIND die sechs Ziele. Stuende darueber die kurze Fassung und
+# darunter die lange, waere dasselbe Ziel zweimal verschieden formuliert, auf
+# demselben Bildschirm, untereinander. Die Reihenfolge bleibt, die Anzahl
+# bleibt; nur der Text folgt den Zielen, zu denen er gehoert.
+_ziel_kennungen = [k for k, _ziel, _kurz in _ziele]
+_neue_ziele = [items[k]["prompt"] for k in _ziel_kennungen]
+if len(_neue_ziele) != len(items["S01_top"]["options"]):
+    raise SystemExit("S01_top hat nicht so viele Antworten wie es Ziele gibt")
+items["S01_top"]["options"] = _neue_ziele
 
 for n, item_id in enumerate(reihenfolge, start=1):
     it = items[item_id]
@@ -804,6 +984,8 @@ for n, item_id in enumerate(reihenfolge, start=1):
         eintrag["conditionHint"] = BEDINGUNGSHINWEIS[item_id]
     if it.get("groupPrompt"):
         eintrag["groupPrompt"] = it["groupPrompt"]
+    if it.get("valueCase"):
+        eintrag["valueCase"] = it["valueCase"]
     if it.get("shortLabel"):
         eintrag["shortLabel"] = it["shortLabel"]
     if it.get("maxChoices"):
@@ -842,6 +1024,30 @@ for scope, meta in SCOPES.items():
         ("overallScore", False),
         ("dimensionScores", False),
         ("deviationsFromSource", [
+            collections.OrderedDict([
+                ("what", "S01a bis S01f tragen die kurzen Zielzeilen aus dem UX-Review; S01_top bekommt dieselben Texte als Antworten."),
+                ("source", UX_REVIEW_2 + ", Abschnitt 6"),
+                ("reason", "Das Review stellt die sechs Ziele als einen Block dar - eine Frage darueber, sechs Zeilen darunter. Wo der Kopf den Rahmen traegt, muss ihn nicht jede Zeile mitschleppen: 'Deutlich wachsen und einen groesseren Markt erreichen' statt 'Das Unternehmen deutlich wachsen lassen und ...'. S01_top fragt, welche ein oder zwei davon vorgehen - seine Antworten SIND diese sechs Ziele. Zwei Fassungen desselben Ziels untereinander auf einem Bildschirm waeren zwei verschiedene Ziele fuer jeden, der sie liest."),
+                ("decidedBy", "Maria, 30.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Bei W02 bis W06 entfaellt der letzte Satz des Szenarios, wenn er eine Frage ist."),
+                ("source", UX_REVIEW_2 + ", Abschnitt 11"),
+                ("reason", "Das Muster stellt die Fragen: erst nach der Wichtigkeit der zwei Aspekte, dann nach dem Weg. Die Master-Arbeitsfassung endet zusaetzlich mit 'Wie wuerdest du in dieser Situation eher vorgehen?' - dieselbe Frage in anderen Worten, zwei Zeilen darueber. Das Review zeigt es an W01 selbst: Dort steht unter 'Szenario:' nur die Lage. Gestrichen wird nur ein Satz, der ein Fragesatz IST; bleibt danach nichts uebrig, bricht der Generator ab."),
+                ("decidedBy", "Claude, 30.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Die Texte des Dreischritt-Musters stehen an jeder Frage des Formats 'value_case'."),
+                ("source", UX_REVIEW_2 + ", Abschnitt 11"),
+                ("reason", "Im Review stehen sie einmal und gelten fuer alle sechs. Sie landen am Item, weil das Bauteil, das sie anzeigt, ein Item bekommt und keine Registratur - erzeugt, also ohne Gefahr, auseinanderzulaufen. Die Wegwahl trug bis zum 30.09.2026 die ANLIEGEN als Beschriftung; 'frueh wissen, wie sich die finanzielle Situation entwickeln koennte' ist aber der Grund fuer einen Weg und keiner."),
+                ("decidedBy", "Claude, 30.09.2026"),
+            ]),
+            collections.OrderedDict([
+                ("what", "Zehn Antworten oeffnen ein Textfeld, und zwar ein verlangtes: K04/L03 'andere Regel', S01 'anderes Ziel', S06 'andere Vorstellung', R06 'andere Bedingung', R09 'andere Vorgehensweise', G04 'anderer Weg', G05 'weitere', B05 'andere Absicherung', R12 'an einem bestimmten Datum'."),
+                ("source", UX_REVIEW_2 + ", Abschnitt 16"),
+                ("reason", "Das Review verlangt, jede solche Antwort einzeln zu pruefen und Freitext nur zu rendern, wo er ausdruecklich gewollt ist. Geprueft am 30.09.2026: Die Master-Arbeitsfassung nennt Freitext nur als Antwortformat (S04, L01, L02) und bei keiner dieser zehn Antworten ausdruecklich. Sie bleiben trotzdem, weil sie OHNE den Text nichts aussagen - 'andere Regel' als Auskunft ist keine -, und sie sind verlangt und nicht optional, weil eine leere 'andere Regel' dasselbe waere wie keine Antwort. Die Liste ist ein namentlicher Erlaubnisschein im Generator; ein Muster ueber Wortbestandteile hatte am 29.09.2026 bei D01 Felder geoeffnet, in die niemand etwas schreiben wollte."),
+                ("decidedBy", "Claude, 30.09.2026 - die Pruefung verlangt das Review, das Ergebnis ist noch nicht bestaetigt."),
+            ]),
             collections.OrderedDict([
                 ("what", "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'. Spezifische Gruende haben Vorrang."),
                 ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),

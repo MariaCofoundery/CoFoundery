@@ -82,7 +82,9 @@ function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
     })),
     offeredMissing: item.missing.map((entry) => ({ code: entry.code, label: entry.label })),
     concerns: item.concerns ?? null,
+    paths: item.paths ?? null,
     ratingOptions: item.ratingOptions ?? null,
+    valueCase: item.valueCase ?? null,
     ratingMissing: item.ratingMissing ?? null,
     fields: null,
     conditionalFields: null,
@@ -139,6 +141,7 @@ export function readableItems(
     })),
     missing: item.missing,
     concerns: item.concerns,
+    paths: item.paths,
     ratingOptions: item.ratingOptions,
   }));
 }

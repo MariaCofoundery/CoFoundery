@@ -96,6 +96,8 @@ export type ReadableItem = {
   options: { optionId: string; label: string }[];
   missing: { code: MissingCode; label: string }[];
   concerns?: string[];
+  /** Die beiden Wege — ohne sie stand im Bericht ein Anliegen als Weg. */
+  paths?: string[];
   ratingOptions?: string[];
 };
 
@@ -168,9 +170,14 @@ function valueOf(
           importance: { label: stufen[rank - 1] ?? String(rank), position: rank, of: stufen.length },
         };
       });
+      // DER GEWAEHLTE WEG UND NICHT DAS ANLIEGEN. „Welchen Weg wuerdest du
+      // zuerst waehlen?" wurde mit „frueh wissen, wie sich die finanzielle
+      // Situation entwickeln koennte" beantwortet - das ist der Grund fuer
+      // einen Weg und keiner. Im Bericht stand damit etwas, das niemand
+      // angeklickt hatte.
       const paths: Record<string, string> = {
-        A: item.concerns?.[0] ?? "das erste Anliegen",
-        B: item.concerns?.[1] ?? "das zweite Anliegen",
+        A: item.paths?.[0] ?? item.concerns?.[0] ?? "der erste Weg",
+        B: item.paths?.[1] ?? item.concerns?.[1] ?? "der zweite Weg",
         other: "etwas anderes",
         unknown: "noch nicht entschieden",
       };

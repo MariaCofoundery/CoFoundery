@@ -331,15 +331,44 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
    * zwei Polen: Beide Anliegen dürfen sehr wichtig sein. Genau daran erkennt
    * man die Menschen, für die der Fall wirklich schwer ist.
    */
+  /**
+   * Der Wertefall - drei Schritte.
+   *
+   * ---------------------------------------------------------------------------
+   * SZENARIO, ZWEI WICHTIGKEITEN, DANN DER WEG
+   * ---------------------------------------------------------------------------
+   *
+   * Das UX-Review Teil 2, Abschnitt 11, gibt das Muster vor: kurzes Szenario,
+   * zwei GETRENNTE Wichtigkeitsbewertungen, anschliessend die Wegwahl. Und es
+   * sagt ausdruecklich dazu: die beiden Bewertungen nicht zu einer „richtigen"
+   * Entscheidung verrechnen. Wer beides hoch bewertet, hat nicht
+   * widersprochen - er hat den Zielkonflikt beschrieben, um den es hier geht.
+   *
+   * ---------------------------------------------------------------------------
+   * DIE WEGWAHL ZEIGTE BIS ZUM 30.09.2026 DIE ANLIEGEN
+   * ---------------------------------------------------------------------------
+   *
+   * „Welchen Weg wuerdest du zuerst waehlen?" und darunter „frueh wissen, wie
+   * sich die finanzielle Situation entwickeln koennte" - das ist kein Weg,
+   * das ist der Grund fuer einen. Die zwei Wege standen die ganze Zeit in der
+   * Registratur (`paths`) und kamen in der Oberflaeche nie an.
+   */
   function ValueCase() {
-    const paths = [
-      { key: "A", label: item.concerns?.[0] ?? "das erste Anliegen" },
-      { key: "B", label: item.concerns?.[1] ?? "das zweite Anliegen" },
-      { key: "other", label: "etwas anderes" },
-      { key: "unknown", label: "ich kann das noch nicht entscheiden" },
+    const muster = item.valueCase;
+    const wege = [
+      // Ohne die Wege bleiben die Anliegen die letzte Notloesung - besser als
+      // ein leerer Knopf, aber der Wachtest in `registries.ts` laesst einen
+      // Bogen ohne Wege ohnehin nicht durch.
+      { key: "A", label: item.paths?.[0] ?? item.concerns?.[0] ?? "der erste Weg" },
+      { key: "B", label: item.paths?.[1] ?? item.concerns?.[1] ?? "der zweite Weg" },
+      { key: "other", label: muster?.otherLabel ?? "etwas anderes" },
+      { key: "unknown", label: muster?.unknownLabel ?? "ich kann das noch nicht entscheiden" },
     ];
     return (
       <div className="space-y-5">
+        {muster && (
+          <p className="text-sm font-medium text-slate-900">{muster.importancePrompt}</p>
+        )}
         {(["A", "B"] as const).map((side, index) => (
           <div key={side}>
             <p className="text-sm text-slate-800">{item.concerns?.[index]}</p>
@@ -367,12 +396,12 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           </div>
         ))}
 
-        <div>
-          <p className="text-sm text-slate-800">
-            Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?
+        <div className="border-t border-slate-200 pt-5">
+          <p className="text-sm font-medium text-slate-900">
+            {muster?.pathPrompt ?? "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?"}
           </p>
           <div className="mt-2 space-y-2">
-            {paths.map((path) => (
+            {wege.map((path) => (
               <label
                 key={path.key}
                 className={`${optionRow} ${

@@ -45,8 +45,25 @@ export type ItemView = {
   offeredMissing: { code: MissingCode; label: string }[];
   /** Für Wertefälle: die beiden Anliegen und die Wichtigkeitsstufen. */
   concerns: string[] | null;
+  /**
+   * Die beiden Wege — was man in dieser Lage tun würde.
+   *
+   * Sie standen in der Registratur und kamen hier nie an: Die Wegwahl zeigte
+   * stattdessen die ANLIEGEN als Beschriftung. „früh wissen, wie sich die
+   * finanzielle Situation entwickeln könnte" ist aber kein Weg, sondern der
+   * Grund für einen — die Frage „welchen Weg würdest du wählen?" war damit
+   * nicht beantwortbar.
+   */
+  paths: string[] | null;
   ratingOptions: string[] | null;
   ratingMissing: string | null;
+  /** Die Texte des Dreischritt-Musters — sonst stehen dort Knöpfe ohne Frage. */
+  valueCase: {
+    importancePrompt: string;
+    pathPrompt: string;
+    otherLabel: string;
+    unknownLabel: string;
+  } | null;
   /** Für Eingabemasken: die benannten Felder, etwa Wochentag/von/bis/Zeitzone. */
   fields: string[] | null;
   /**
@@ -94,7 +111,11 @@ export function buildSectionsV21(): SectionView[] {
         })),
         offeredMissing: item.missing.map((entry) => ({ code: entry.code, label: entry.label })),
         concerns: item.concerns ?? null,
+        // v2.1 kennt weder die Wege noch die Texte des Musters. Dort bleibt
+        // die Wegwahl, wie sie war - der Bogen ist archiviert.
+        paths: null,
         ratingOptions: item.ratingOptions ?? null,
+        valueCase: null,
         ratingMissing: item.ratingMissing ?? null,
         fields: item.fields ?? null,
         conditionalFields: item.conditionalFields ?? null,

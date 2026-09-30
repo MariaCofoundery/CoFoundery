@@ -13,6 +13,30 @@
   "dimensionScores": false,
   "deviationsFromSource": [
     {
+      "what": "S01a bis S01f tragen die kurzen Zielzeilen aus dem UX-Review; S01_top bekommt dieselben Texte als Antworten.",
+      "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md, Abschnitt 6",
+      "reason": "Das Review stellt die sechs Ziele als einen Block dar - eine Frage darueber, sechs Zeilen darunter. Wo der Kopf den Rahmen traegt, muss ihn nicht jede Zeile mitschleppen: 'Deutlich wachsen und einen groesseren Markt erreichen' statt 'Das Unternehmen deutlich wachsen lassen und ...'. S01_top fragt, welche ein oder zwei davon vorgehen - seine Antworten SIND diese sechs Ziele. Zwei Fassungen desselben Ziels untereinander auf einem Bildschirm waeren zwei verschiedene Ziele fuer jeden, der sie liest.",
+      "decidedBy": "Maria, 30.09.2026"
+    },
+    {
+      "what": "Bei W02 bis W06 entfaellt der letzte Satz des Szenarios, wenn er eine Frage ist.",
+      "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md, Abschnitt 11",
+      "reason": "Das Muster stellt die Fragen: erst nach der Wichtigkeit der zwei Aspekte, dann nach dem Weg. Die Master-Arbeitsfassung endet zusaetzlich mit 'Wie wuerdest du in dieser Situation eher vorgehen?' - dieselbe Frage in anderen Worten, zwei Zeilen darueber. Das Review zeigt es an W01 selbst: Dort steht unter 'Szenario:' nur die Lage. Gestrichen wird nur ein Satz, der ein Fragesatz IST; bleibt danach nichts uebrig, bricht der Generator ab.",
+      "decidedBy": "Claude, 30.09.2026"
+    },
+    {
+      "what": "Die Texte des Dreischritt-Musters stehen an jeder Frage des Formats 'value_case'.",
+      "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md, Abschnitt 11",
+      "reason": "Im Review stehen sie einmal und gelten fuer alle sechs. Sie landen am Item, weil das Bauteil, das sie anzeigt, ein Item bekommt und keine Registratur - erzeugt, also ohne Gefahr, auseinanderzulaufen. Die Wegwahl trug bis zum 30.09.2026 die ANLIEGEN als Beschriftung; 'frueh wissen, wie sich die finanzielle Situation entwickeln koennte' ist aber der Grund fuer einen Weg und keiner.",
+      "decidedBy": "Claude, 30.09.2026"
+    },
+    {
+      "what": "Zehn Antworten oeffnen ein Textfeld, und zwar ein verlangtes: K04/L03 'andere Regel', S01 'anderes Ziel', S06 'andere Vorstellung', R06 'andere Bedingung', R09 'andere Vorgehensweise', G04 'anderer Weg', G05 'weitere', B05 'andere Absicherung', R12 'an einem bestimmten Datum'.",
+      "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md, Abschnitt 16",
+      "reason": "Das Review verlangt, jede solche Antwort einzeln zu pruefen und Freitext nur zu rendern, wo er ausdruecklich gewollt ist. Geprueft am 30.09.2026: Die Master-Arbeitsfassung nennt Freitext nur als Antwortformat (S04, L01, L02) und bei keiner dieser zehn Antworten ausdruecklich. Sie bleiben trotzdem, weil sie OHNE den Text nichts aussagen - 'andere Regel' als Auskunft ist keine -, und sie sind verlangt und nicht optional, weil eine leere 'andere Regel' dasselbe waere wie keine Antwort. Die Liste ist ein namentlicher Erlaubnisschein im Generator; ein Muster ueber Wortbestandteile hatte am 29.09.2026 bei D01 Felder geoeffnet, in die niemand etwas schreiben wollte.",
+      "decidedBy": "Claude, 30.09.2026 - die Pruefung verlangt das Review, das Ergebnis ist noch nicht bestaetigt."
+    },
+    {
       "what": "Jedes Item ohne eigenen Auslassungsgrund bekommt 'kann ich noch nicht einschätzen'. Spezifische Gruende haben Vorrang.",
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
@@ -524,14 +548,14 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Wirtschaftliche Tragfähigkeit"
     },
     {
       "itemId": "S01b",
       "order": 10,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.",
+      "prompt": "Deutlich wachsen und einen größeren Markt erreichen.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -573,14 +597,14 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Wachstum & Skalierung"
     },
     {
       "itemId": "S01c",
       "order": 11,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
+      "prompt": "Einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -622,14 +646,14 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Gesellschaftliche / ökologische Wirkung"
     },
     {
       "itemId": "S01d",
       "order": 12,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.",
+      "prompt": "Ein Unternehmen aufbauen, das später teilweise oder vollständig verkauft werden könnte.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -671,7 +695,7 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Exit-Perspektive"
     },
     {
@@ -720,7 +744,7 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Fachliche / technologische Verwirklichung"
     },
     {
@@ -769,14 +793,14 @@
         }
       ],
       "note": "Wichtigkeit EINES Ziels. Die sechs werden nie zu einem Wert verrechnet - sie sind nebeneinander wichtig, nicht gegeneinander.",
-      "groupPrompt": "Wie wichtig sind dir für dieses konkrete Vorhaben die folgenden Ziele in den nächsten drei Jahren?",
+      "groupPrompt": "Wie wichtig sind dir diese Ziele in den nächsten drei Jahren?",
       "shortLabel": "Unternehmerische Unabhängigkeit"
     },
     {
       "itemId": "S01_top",
       "order": 15,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welche ein oder zwei dieser Ziele sind dir aktuell besonders wichtig?",
+      "prompt": "Und welche ein oder zwei davon stehen für dich gerade besonders weit oben?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -788,19 +812,19 @@
         },
         {
           "optionId": "S01_top_o2",
-          "label": "Das Unternehmen deutlich wachsen lassen und einen größeren Markt erreichen.",
+          "label": "Deutlich wachsen und einen größeren Markt erreichen.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S01_top_o3",
-          "label": "Mit dem Unternehmen einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
+          "label": "Einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "S01_top_o4",
-          "label": "Ein Unternehmen aufbauen, das perspektivisch teilweise oder vollständig verkauft werden kann.",
+          "label": "Ein Unternehmen aufbauen, das später teilweise oder vollständig verkauft werden könnte.",
           "requiresText": false,
           "exclusive": false
         },
@@ -1533,7 +1557,7 @@
       "itemId": "W01",
       "order": 35,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr habt eine neue Finanzplanung erstellt, aber einige Zahlen sind noch unsicher. Es besteht aktuell keine Gefahr, dass zugesagte Zahlungen nicht geleistet werden können. Wie würdest du mit der vorläufigen Planung umgehen?",
+      "prompt": "Ihr habt eine neue Finanzplanung erstellt, aber einige Zahlen sind noch unsicher. Akut sind alle zugesagten Zahlungen abgesichert.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1544,9 +1568,15 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
-        "Das Team weiß früh, wie sich die finanzielle Situation entwickeln könnte",
-        "Finanzielle Informationen sind möglichst gut geprüft, bevor sie geteilt werden"
+        "früh wissen, wie sich die finanzielle Situation entwickeln könnte",
+        "Informationen möglichst gut prüfen, bevor sie geteilt werden"
       ],
       "paths": [
         "vorläufige Planung jetzt teilen und Unsicherheiten markieren",
@@ -1565,7 +1595,7 @@
       "itemId": "W02",
       "order": 36,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Eine Person arbeitet schon lange mit euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung. Wie würdest du in dieser Situation eher vorgehen?",
+      "prompt": "Eine Person arbeitet schon lange mit euch zusammen. Die Anforderungen ihrer Rolle haben sich verändert und sie erfüllt einige davon aktuell noch nicht. Für eine Übergangslösung steht Budget zur Verfügung.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1576,6 +1606,12 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
         "Kontinuität in einer bewährten Zusammenarbeit",
         "Rolle und aktuelle Fähigkeiten passen gut zueinander"
@@ -1597,7 +1633,7 @@
       "itemId": "W03",
       "order": 37,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten. Wie würdest du zwischen den beiden Angeboten entscheiden?",
+      "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1608,8 +1644,14 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
-        "direkte gesellschaftliche/ökologische Wirkung",
+        "direkte gesellschaftliche / ökologische Wirkung",
         "zusätzlicher finanzieller Spielraum"
       ],
       "paths": [
@@ -1629,7 +1671,7 @@
       "itemId": "W04",
       "order": 38,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben. Wie würdest du über das weitere Vorgehen entscheiden?",
+      "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1640,6 +1682,12 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
         "vor dem Start gemeinsames Verständnis herstellen",
         "Änderung zeitnah umsetzen und anschließend überprüfen"
@@ -1661,7 +1709,7 @@
       "itemId": "W05",
       "order": 39,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen. Wie würdest du das zusätzliche Budget eher einsetzen?",
+      "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1672,6 +1720,12 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
         "zusätzlicher finanzieller Puffer",
         "früher Erkenntnisgewinn über den Markt"
@@ -1693,7 +1747,7 @@
       "itemId": "W06",
       "order": 40,
       "section": "W – Prioritäten in konkreten Zielkonflikten",
-      "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich. Wie würdest du den zusätzlichen Bonus eher verteilen?",
+      "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich.",
       "hint": null,
       "answerFormat": "value_case",
       "options": [],
@@ -1704,6 +1758,12 @@
         }
       ],
       "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
       "concerns": [
         "alle erhalten einen gleichen Anteil am gemeinsamen Erfolg",
         "unterschiedliche Beiträge werden bei der Verteilung berücksichtigt"
