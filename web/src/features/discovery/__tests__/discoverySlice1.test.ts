@@ -12,6 +12,7 @@ const emptyFilters: DiscoveryMustHaves = {
   acceptedRemoteModes: [],
   requiredRolesAny: [],
   requiredExpertiseAny: [],
+  requiredCapabilityAreasAny: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],

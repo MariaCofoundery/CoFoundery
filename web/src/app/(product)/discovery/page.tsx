@@ -66,6 +66,7 @@ function defaultMustHaves(): FounderSearchPreferences["mustHaves"] {
     acceptedRemoteModes: [],
     requiredRolesAny: [],
     requiredExpertiseAny: [],
+    requiredCapabilityAreasAny: [],
     desiredLocationRegion: null,
     requiredIndustriesAny: [],
     acceptedCommitmentLevels: [],

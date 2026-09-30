@@ -56,11 +56,22 @@ export function PracticalSearchForm({
   action,
   resetAction,
   copy,
+  skills,
 }: {
   mustHaves: DiscoveryMustHaves;
   action: (formData: FormData) => void | Promise<void>;
   resetAction: () => void | Promise<void>;
   copy: PracticalSearchCopy;
+  /**
+   * Die zweite Ebene — „Was soll die Person mitbringen?"
+   *
+   * IM SELBEN FORMULAR UND NICHT IN EINEM ZWEITEN. Die Serveraktion schreibt
+   * alle praktischen Kriterien zusammen; zwei Formulare würden einander beim
+   * Speichern leeren — wer die Rahmenbedingungen speichert, löschte damit die
+   * Fähigkeiten. Getrennt sind sie durch die Überschriften, nicht durch das
+   * Formular.
+   */
+  skills?: { title: string; intro: string; node: React.ReactNode };
 }) {
   return (
     <form action={action} className="grid gap-5">
@@ -136,6 +147,14 @@ export function PracticalSearchForm({
           ))}
         </div>
       </div>
+
+      {skills && (
+        <section className="border-t border-slate-200 pt-6">
+          <h2 className="text-xl font-semibold text-slate-900">{skills.title}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{skills.intro}</p>
+          <div className="mt-4">{skills.node}</div>
+        </section>
+      )}
 
       <div className="flex flex-wrap gap-3">
         <SubmitButton

@@ -129,6 +129,66 @@ test("wer noch nichts gespeichert hat, bekommt leere Felder und keinen Fehler", 
   assert.match(suche, /searchPreferences\?\.mustHaves \?\? LEERE_KRITERIEN/);
 });
 
+test("nach Fähigkeiten wird gegen das Vokabular gesucht, nicht gegen Freitext", () => {
+  const suche = readFileSync(
+    join("src", "app", "(product)", "discovery", "suche", "page.tsx"),
+    "utf8",
+  );
+  assert.match(suche, /<CapabilityPicker/);
+  assert.match(suche, /getCapabilityVocabulary/);
+
+  // IM SELBEN FORMULAR. Zwei Formulare würden einander beim Speichern leeren:
+  // Wer die Rahmenbedingungen speichert, löschte damit die Fähigkeiten.
+  const form = readFileSync(
+    join("src", "features", "find", "PracticalSearchForm.tsx"),
+    "utf8",
+  );
+  assert.match(form, /skills\?: \{ title: string; intro: string; node: React\.ReactNode \}/);
+  const picker = readFileSync(
+    join("src", "features", "find", "CapabilityPicker.tsx"),
+    "utf8",
+  );
+  assert.match(picker, /type="hidden" name="requiredCapabilityAreasAny"/);
+});
+
+test("keine Checkbox-Wand", () => {
+  // 54 Bereiche in elf Familien. Alle gleichzeitig offen heißt: niemand liest
+  // sie, alle haken das an, was oben steht. Spec, Abschnitt 5.2.
+  const picker = readFileSync(
+    join("src", "features", "find", "CapabilityPicker.tsx"),
+    "utf8",
+  );
+  assert.match(picker, /copy\.searchPlaceholder/);
+  assert.match(picker, /copy\.showAll/);
+  assert.ok(!/type="checkbox"/.test(picker), "die Bereiche stehen wieder als Ankreuzliste da");
+
+  // Und eine Obergrenze: Ein Filter über die Hälfte der Bereiche findet fast
+  // jeden.
+  assert.match(picker, /current\.length >= max/);
+});
+
+test("wer seine Bereiche privat hält, erfährt es beim Einstellen", () => {
+  // Entschieden von Maria am 30.09.2026: "Wer das verstecken möchte, der wird
+  // halt nicht gezeigt" - und das soll man wissen, bevor man es einstellt,
+  // nicht danach.
+  const profil = readFileSync(
+    join("src", "app", "(product)", "profile", "page.tsx"),
+    "utf8",
+  );
+  assert.match(profil, /level === "private" &&/);
+  assert.match(profil, /disclosure\.privateNotFound/);
+
+  for (const locale of ["de", "en"]) {
+    const capability = JSON.parse(
+      readFileSync(join("messages", locale, "capability.json"), "utf8"),
+    );
+    assert.ok(capability.disclosure.privateNotFound?.trim(), locale);
+  }
+
+  // Und beim Suchen steht derselbe Sachverhalt aus der anderen Richtung.
+  assert.match(String(de.skillsPrivacy), /privat/i);
+});
+
 test("die eigene Suche steht im Menü", () => {
   // Sie war sonst nur über eine Karte erreichbar - wer woanders steht, müsste
   // erst dorthin zurück. Genau das war bei Fragebogen und Report schon

@@ -60,10 +60,17 @@
     "practicalIntro": "Some things simply have to fit in practice. Here you can define which conditions matter for your search.",
     "skillsTitle": "What should the person bring?",
     "skillsIntro": "Which skills or roles would be particularly helpful for your venture?",
-    "skillsPending": "That is coming next. Until then, use the expertise field above.",
     "resultsLink": "To the results",
     "savedFeedback": "Saved.",
-    "saveFailedFeedback": "That did not work just now. Please try again."
+    "saveFailedFeedback": "That did not work just now. Please try again.",
+    "skillsSearchPlaceholder": "Search a skill …",
+    "skillsShowAll": "Browse all areas",
+    "skillsHideAll": "Collapse areas",
+    "skillsNoMatch": "We find no area for that.",
+    "skillsSelected": "Selected",
+    "skillsRemove": "Remove {label}",
+    "skillsLimit": "More than {max} areas is no longer a search. Remove one to pick another.",
+    "skillsPrivacy": "The search matches what people entered in their skills interview and made visible. Anyone keeping their areas private does not appear here — that is each person’s own choice."
   },
   "points": {
     "title": "Why might this be interesting?",

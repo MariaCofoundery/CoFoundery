@@ -362,7 +362,8 @@
     "areas_depth_on_contact": "People you're connected with see more",
     "areas_depth_on_contactHint": "For everyone else it stays at the topics. Anyone whose connection you've accepted also sees how much experience you have – and what you'd like to take on, and what you'd rather not.",
     "note": "Two things always hold: nobody ever gets to see your evidence. And on public pages – the ones anyone on the web can open – none of this ever appears.",
-    "submit": "Save choice"
+    "submit": "Save choice",
+    "privateNotFound": "As long as your areas are private, a search by skills will not find you. That is not a drawback but your choice — everything else in your profile still makes you findable."
   },
   "foreign": {
     "title": "What this person brings"

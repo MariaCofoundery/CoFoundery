@@ -51,6 +51,7 @@ const filters: DiscoveryMustHaves = {
   acceptedRemoteModes: ["remote"],
   requiredRolesAny: ["tech"],
   requiredExpertiseAny: ["ai"],
+  requiredCapabilityAreasAny: [],
   desiredLocationRegion: "berlin",
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],

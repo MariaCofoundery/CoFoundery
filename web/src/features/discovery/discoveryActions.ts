@@ -298,6 +298,7 @@ export async function saveDiscoveryV2SearchPreferencesAction(
     await upsertOwnDiscoveryV2SearchPreferences(userId, {
       requiredRolesAny: getStringList(formData, ["requiredRolesAny"]),
       requiredExpertiseAny: getStringList(formData, ["requiredExpertiseAny"]),
+      requiredCapabilityAreasAny: getStringList(formData, ["requiredCapabilityAreasAny"]),
       desiredLocationRegion: getFirstString(formData, ["desiredLocationRegion"]),
       acceptedRemoteModes: getStringList(formData, ["acceptedRemoteModes"]),
       minimumAvailabilityHoursPerWeek: getFirstString(formData, [

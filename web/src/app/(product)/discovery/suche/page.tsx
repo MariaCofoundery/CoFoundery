@@ -5,6 +5,9 @@ import { getTranslations } from "next-intl/server";
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
 import { getOwnSearchPreferences } from "@/features/discovery/discoveryData";
 import { PracticalSearchForm } from "@/features/find/PracticalSearchForm";
+import { CapabilityPicker } from "@/features/find/CapabilityPicker";
+import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
+import { DISCOVERY_SELECTION_LIMITS } from "@/features/discovery/discoveryConfig";
 import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
 
 import { THEME_IDS } from "@/features/find/discoveryThemes";
@@ -43,6 +46,7 @@ const LEERE_KRITERIEN: DiscoveryMustHaves = {
   acceptedRemoteModes: [],
   requiredRolesAny: [],
   requiredExpertiseAny: [],
+  requiredCapabilityAreasAny: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],
@@ -92,6 +96,10 @@ export default async function SearchPreferencesPage({
       .maybeSingle(),
     getOwnSearchPreferences(auth.user.id),
   ]);
+
+  const tCapability = await getTranslations("capability");
+  const vocabulary = await getCapabilityVocabulary(supabase);
+  const kriterien = searchPreferences?.mustHaves ?? LEERE_KRITERIEN;
 
   const copy: SearchPreferencesCopy = {
     directionLabel: t("directionLabel"),
@@ -188,7 +196,7 @@ export default async function SearchPreferencesPage({
             // Wer noch nichts gespeichert hat, bekommt leere Felder und
             // keinen Fehler: Eine Suche ohne Kriterien ist eine gueltige
             // Suche.
-            mustHaves={searchPreferences?.mustHaves ?? LEERE_KRITERIEN}
+            mustHaves={kriterien}
             action={savePractical}
             resetAction={resetPractical}
             copy={{
@@ -208,6 +216,51 @@ export default async function SearchPreferencesPage({
               apply: tDiscovery("v2.search.apply"),
               applying: tDiscovery("v2.search.applying"),
               reset: tDiscovery("v2.search.reset"),
+            }}
+            skills={{
+              title: t("skillsTitle"),
+              intro: t("skillsIntro"),
+              node: (
+                <>
+                  <CapabilityPicker
+                    areas={vocabulary.areas
+                      .slice()
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((area) => ({
+                        areaId: area.area_id,
+                        familyId: area.family_id,
+                        label: tCapability(`areaLabels.${area.area_id}`),
+                      }))}
+                    families={vocabulary.families
+                      .slice()
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((family) => ({
+                        familyId: family.family_id,
+                        label: tCapability(`families.${family.family_id}`),
+                      }))}
+                    initial={kriterien.requiredCapabilityAreasAny}
+                    max={DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas}
+                    copy={{
+                      searchPlaceholder: t("skillsSearchPlaceholder"),
+                      showAll: t("skillsShowAll"),
+                      hideAll: t("skillsHideAll"),
+                      noMatch: t("skillsNoMatch"),
+                      selected: t("skillsSelected"),
+                      removeTemplate: t("skillsRemove", { label: "{label}" }),
+                      limitReached: t("skillsLimit", {
+                        max: DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas,
+                      }),
+                    }}
+                  />
+                  {/* WER SEINE BEREICHE PRIVAT HAELT, WIRD DARUEBER NICHT
+                      GEFUNDEN. Das steht hier, weil man es beim Suchen wissen
+                      muss - und am Schalter selbst, weil man es beim
+                      Einstellen wissen muss. */}
+                  <p className="mt-4 text-xs leading-5 text-slate-500">
+                    {t("skillsPrivacy")}
+                  </p>
+                </>
+              ),
             }}
           />
         </div>

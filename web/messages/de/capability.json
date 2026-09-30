@@ -362,7 +362,8 @@
     "areas_depth_on_contact": "Wer mit dir verbunden ist, sieht mehr",
     "areas_depth_on_contactHint": "Für alle anderen bleibt es bei den Themen. Wessen Verbindung du angenommen hast, sieht zusätzlich, wie viel Erfahrung du hast – und was du gern übernehmen möchtest und was lieber nicht.",
     "note": "Zwei Dinge gelten immer: Deine Belege bekommt niemand zu sehen. Und auf öffentlichen Seiten – denen, die jede und jeder im Netz aufrufen kann – steht davon nie etwas.",
-    "submit": "Auswahl speichern"
+    "submit": "Auswahl speichern",
+    "privateNotFound": "Solange deine Bereiche privat sind, wirst du über eine Suche nach Fähigkeiten nicht gefunden. Das ist kein Nachteil, sondern deine Entscheidung — über alles andere, was in deinem Profil steht, findet man dich weiterhin."
   },
   "foreign": {
     "title": "Was diese Person mitbringt"

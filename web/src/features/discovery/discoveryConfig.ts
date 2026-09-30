@@ -33,6 +33,9 @@ export const DISCOVERY_SELECTION_LIMITS = {
   industries: 5,
   expertise: 8,
   requiredExpertise: 8,
+  // Mehr als zwoelf Bereiche sind keine Suche mehr, sondern eine Liste: Bei
+  // 54 Bereichen findet ein Filter ueber die Haelfte davon fast jeden.
+  requiredCapabilityAreas: 12,
   priorityWeightsAboveZero: 5,
 } as const;
 

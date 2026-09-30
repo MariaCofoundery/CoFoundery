@@ -497,6 +497,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
   input: {
     requiredRolesAny: unknown;
     requiredExpertiseAny: unknown;
+    requiredCapabilityAreasAny: unknown;
     desiredLocationRegion: unknown;
     acceptedRemoteModes: unknown;
     minimumAvailabilityHoursPerWeek: unknown;
@@ -512,6 +513,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
   const practicalMustHaves = normalizeMustHaves({
     requiredRolesAny: input.requiredRolesAny,
     requiredExpertiseAny: input.requiredExpertiseAny,
+    requiredCapabilityAreasAny: input.requiredCapabilityAreasAny,
     desiredLocationRegion: input.desiredLocationRegion,
     acceptedRemoteModes: input.acceptedRemoteModes,
     minimumAvailabilityHoursPerWeek: input.minimumAvailabilityHoursPerWeek,
@@ -525,6 +527,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
         ...(existing?.mustHaves ?? normalizeMustHaves(null)),
         requiredRolesAny: practicalMustHaves.requiredRolesAny,
         requiredExpertiseAny: practicalMustHaves.requiredExpertiseAny,
+        requiredCapabilityAreasAny: practicalMustHaves.requiredCapabilityAreasAny,
         desiredLocationRegion: practicalMustHaves.desiredLocationRegion,
         acceptedRemoteModes: practicalMustHaves.acceptedRemoteModes,
         minimumAvailabilityHoursPerWeek:
@@ -620,6 +623,10 @@ export async function getDiscoveryCandidatesForCurrentUser(
     p_min_availability: mustHaves.minimumAvailabilityHoursPerWeek,
     p_page_size: pageSize,
     p_offset: (page - 1) * pageSize,
+    // WER SEINE BEREICHE PRIVAT HAELT, WIRD DARUEBER NICHT GEFUNDEN. Die
+    // Datenbankfunktion prueft das; hier wird nur uebergeben, wonach gesucht
+    // wird.
+    p_capability_areas: mustHaves.requiredCapabilityAreasAny,
   });
 
   if (error) {

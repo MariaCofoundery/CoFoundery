@@ -15,6 +15,7 @@ const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   acceptedRemoteModes: [],
   requiredRolesAny: [],
   requiredExpertiseAny: [],
+  requiredCapabilityAreasAny: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],

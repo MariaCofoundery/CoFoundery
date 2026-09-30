@@ -737,6 +737,15 @@ export default async function ProfilePage({
                       ? t("disclosure.areasHint", { examples: disclosureExamples })
                       : t(`disclosure.${level}Hint`)}
                   </span>
+                  {/* WAS ES KOSTET, STEHT DANEBEN. Entschieden von Maria am
+                      30.09.2026: Wer seine Bereiche privat haelt, wird ueber
+                      eine Suche nach Faehigkeiten nicht gefunden - und das
+                      soll man beim Einstellen wissen und nicht danach. */}
+                  {level === "private" && (
+                    <span className="mt-2 block rounded-xl bg-amber-50/70 px-3 py-2 text-xs leading-5 text-amber-900">
+                      {t("disclosure.privateNotFound")}
+                    </span>
+                  )}
                 </span>
               </label>
             ))}

@@ -92,6 +92,18 @@ export type DiscoveryMustHaves = {
   acceptedRemoteModes: DiscoveryRemoteMode[];
   requiredRolesAny: DiscoveryFounderRole[];
   requiredExpertiseAny: string[];
+  /**
+   * Gesuchte Fähigkeitsbereiche — aus dem Capability-Vokabular.
+   *
+   * NICHT DASSELBE WIE `requiredExpertiseAny`: Das ist Freitext, den jemand
+   * über sich schreibt. Hier stehen Kennungen aus den 54 Bereichen, die auch
+   * das Fähigkeiten-Interview benutzt.
+   *
+   * WER SEINE BEREICHE PRIVAT HÄLT, WIRD DARÜBER NICHT GEFUNDEN. Das
+   * entscheidet jede Person selbst über `person_core.capability_disclosure`,
+   * und die Suche hält sich daran.
+   */
+  requiredCapabilityAreasAny: string[];
   desiredLocationRegion: string | null;
   requiredIndustriesAny: string[];
   acceptedCommitmentLevels: DiscoveryCommitmentLevel[];

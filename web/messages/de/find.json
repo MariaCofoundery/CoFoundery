@@ -60,10 +60,17 @@
     "practicalIntro": "Manche Dinge müssen einfach praktisch zusammenpassen. Hier kannst du festlegen, welche Rahmenbedingungen für deine Suche relevant sind.",
     "skillsTitle": "Was soll die Person mitbringen?",
     "skillsIntro": "Welche Fähigkeiten oder Rollen wären für dein Vorhaben besonders hilfreich?",
-    "skillsPending": "Das kommt als Nächstes. Bis dahin steht oben das Feld für Expertise.",
     "resultsLink": "Zu den Ergebnissen",
     "savedFeedback": "Gespeichert.",
-    "saveFailedFeedback": "Das hat gerade nicht geklappt. Bitte versuche es erneut."
+    "saveFailedFeedback": "Das hat gerade nicht geklappt. Bitte versuche es erneut.",
+    "skillsSearchPlaceholder": "Fähigkeit suchen …",
+    "skillsShowAll": "Alle Bereiche ansehen",
+    "skillsHideAll": "Bereiche zuklappen",
+    "skillsNoMatch": "Dazu finden wir keinen Bereich.",
+    "skillsSelected": "Ausgewählt",
+    "skillsRemove": "{label} entfernen",
+    "skillsLimit": "Mehr als {max} Bereiche sind keine Suche mehr. Nimm einen weg, um einen anderen zu wählen.",
+    "skillsPrivacy": "Gesucht wird gegen das, was Menschen in ihrem Fähigkeiten-Interview eingetragen und freigegeben haben. Wer seine Bereiche privat hält, erscheint hier nicht — das entscheidet jede Person selbst."
   },
   "points": {
     "title": "Warum könnte das interessant sein?",

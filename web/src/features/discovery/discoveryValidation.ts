@@ -40,6 +40,7 @@ const DEFAULT_MUST_HAVES: DiscoveryMustHaves = {
   acceptedRemoteModes: [],
   requiredRolesAny: [],
   requiredExpertiseAny: [],
+  requiredCapabilityAreasAny: [],
   desiredLocationRegion: null,
   requiredIndustriesAny: [],
   acceptedCommitmentLevels: [],
@@ -180,6 +181,10 @@ export function normalizeMustHaves(value: unknown): DiscoveryMustHaves {
       value.requiredExpertiseAny ?? value.required_expertise_any,
       DISCOVERY_TEXT_LIMITS.expertise
     ).slice(0, DISCOVERY_SELECTION_LIMITS.requiredExpertise),
+    requiredCapabilityAreasAny: normalizeStringArray(
+      value.requiredCapabilityAreasAny ?? value.required_capability_areas_any,
+      DISCOVERY_TEXT_LIMITS.expertise
+    ).slice(0, DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas),
     desiredLocationRegion:
       normalizeText(
         value.desiredLocationRegion ?? value.desired_location_region,
