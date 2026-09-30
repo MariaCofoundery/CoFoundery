@@ -3,10 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { DisclosedCapability } from "@/features/capability/DisclosedCapability";
 import { getDisclosedCapability } from "@/features/capability/capabilityData";
-import {
-  getActiveDiscoveryProfileById,
-  getDiscoveryV2AlignmentContextForCandidate,
-} from "@/features/discovery/discoveryData";
+import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
 import { getOwnSavedDiscoveryProfileIds } from "@/features/discovery/discoverySavesData";
@@ -15,6 +12,10 @@ import {
   requestDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
+import { getCandidateMatch } from "@/features/find/matchData";
+import { matchPoints, type MatchPointKind } from "@/features/find/matchPoints";
+import { getOwnPreferences } from "@/features/find/preferenceData";
+import { MatchPointsView, type MatchPointsCopy } from "@/features/find/MatchPointsView";
 import {
   resolveDiscoveryIntroFeedback,
   type DiscoveryIntroActionState,
@@ -321,13 +322,45 @@ export default async function DiscoveryProfileDetailPage({
   const memberPhoto = (await getMemberPhotos(supabase, [profile.userId])).get(profile.userId);
 
   const isOwner = profile.userId === user.id;
-  const [introRequest, alignmentContext, savedProfileIds] = isOwner
-    ? [null, { preferences: {}, signals: [] }, new Set<string>()]
+  // `getDiscoveryV2AlignmentContextForCandidate` faellt hier weg: Die alten
+  // Alignment-Dimensionen stehen nicht mehr auf dieser Seite, und eine
+  // Abfrage fuer etwas, das niemand mehr anzeigt, ist eine Abfrage zu viel.
+  const [introRequest, savedProfileIds] = isOwner
+    ? [null, new Set<string>()]
     : await Promise.all([
         getDiscoveryIntroRequestForProfile(user.id, profile.id),
-        getDiscoveryV2AlignmentContextForCandidate(user.id, profile.userId),
         getOwnSavedDiscoveryProfileIds(user.id),
       ]);
+  // ---------------------------------------------------------------------------
+  // WARUM KOENNTE DAS INTERESSANT SEIN?
+  // ---------------------------------------------------------------------------
+  //
+  // Auf dem Profil ALLE Punkte - wer hier ist, hat sich fuer diese Person
+  // entschieden und will lesen. Auf der Ergebniskarte sind es hoechstens zwei.
+  const tFind = await getTranslations("find.points");
+  const tFindSearch = await getTranslations("find.search");
+  const ownPreferences = isOwner
+    ? { preferences: [] }
+    : await getOwnPreferences(user.id);
+  const hasSearchPreferences = ownPreferences.preferences.some(
+    (entry) => entry.importance > 0,
+  );
+  const findMatch = isOwner
+    ? { match: { themes: [], rankingScore: null, weightedThemes: 0 }, mutualStrongPoints: [] }
+    : await getCandidateMatch(user.id, profile.userId);
+  const findMatchPoints = matchPoints(
+    findMatch.match.themes,
+    findMatch.mutualStrongPoints,
+  );
+  const matchCopy: MatchPointsCopy = {
+    title: tFind("title"),
+    themeTitle: (themeId: string) => tFindSearch(`themes.${themeId}.title`),
+    kindTitle: (kind: MatchPointKind) => tFind(`kinds.${kind}.title`),
+    kindText: (kind: MatchPointKind, name: string) => tFind(`kinds.${kind}.text`, { name }),
+    noPreferences: tFind("noPreferences"),
+    noPreferencesCta: tFind("noPreferencesCta"),
+  };
+
   // Die Bedingungen prueft get_disclosed_capability; hier wird nur nicht
   // gefragt, wenn es das eigene Profil ist.
   const disclosedCapability = isOwner
@@ -497,57 +530,28 @@ export default async function DiscoveryProfileDetailPage({
           </dl>
         </section>
 
-        {!isOwner && alignmentContext.signals.length > 0 ? (
+        {/* ---------------------------------------------------------------
+            WARUM KOENNTE DAS INTERESSANT SEIN?
+            ---------------------------------------------------------------
+
+            Hier standen bis zum 30.09.2026 die sechs alten
+            Alignment-Dimensionen: Unternehmenslogik, Entscheidungslogik,
+            Arbeitsstruktur, Commitment, Risikoorientierung, Konfliktstil -
+            mit "dieselbe grobe Tendenz" daneben. Diese Kategorien stammen aus
+            einer aelteren Architektur und vermischen venturebezogene Themen
+            mit portablen Arbeitspraeferenzen; die FIND-Spec streicht sie in
+            Abschnitt 20 ausdruecklich.
+
+            AUF DEM PROFIL ALLE PUNKTE, AUF DER KARTE ZWEI. Wer hier ist, hat
+            sich fuer diese Person entschieden und will lesen. */}
+        {!isOwner ? (
           <section className={CARD_CLASS}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
-              {t("detail.alignment.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              {t("detail.alignment.title")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("detail.alignment.description")}
-            </p>
-            <div className="mt-5 grid gap-3">
-              {alignmentContext.signals.map((entry) => {
-                const preference = alignmentContext.preferences[entry.dimension];
-                if (!preference) return null;
-                return (
-                  <article key={entry.dimension} className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4">
-                    <h3 className="font-semibold text-slate-950">
-                      {t(`v2.alignment.dimensions.${entry.dimension}`)}
-                    </h3>
-                    <p className="mt-2 text-sm text-slate-700">
-                      {t(`v2.alignment.importance.${preference.importance}`)} ·{" "}
-                      {t(`v2.alignment.relation.${preference.relationPreference}`)}
-                    </p>
-                    <p className="mt-2 text-sm font-medium text-violet-900">
-                      {t(`v2.alignment.signals.${entry.signal}`)}
-                    </p>
-                    {preference.relationPreference === "prefer_similar" &&
-                    entry.signal === "different_tendency" ? (
-                      <p className="mt-2 text-sm leading-6 text-slate-700">
-                        {t("detail.alignment.preferenceDiffers")}
-                      </p>
-                    ) : null}
-                    <details className="mt-3 rounded-xl bg-white px-3 py-2">
-                      <summary className="cursor-pointer text-sm font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-100">
-                        {t("detail.alignment.whatItCanMean")}
-                      </summary>
-                      <p className="mt-2 text-sm leading-6 text-slate-700">
-                        {t(`v2.alignment.info.${entry.dimension}.body`)}
-                      </p>
-                      <p className="mt-2 text-sm font-medium leading-6 text-slate-800">
-                        {t(`v2.alignment.info.${entry.dimension}.conversation`)}
-                      </p>
-                    </details>
-                  </article>
-                );
-              })}
-            </div>
-            <p className="mt-5 border-t border-violet-100 pt-4 text-xs leading-5 text-slate-500">
-              {t("v2.alignment.disclaimer")}
-            </p>
+            <MatchPointsView
+              points={findMatchPoints}
+              candidateName={profile.displayName}
+              copy={matchCopy}
+              hasPreferences={hasSearchPreferences}
+            />
           </section>
         ) : null}
 

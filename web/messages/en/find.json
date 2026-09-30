@@ -56,5 +56,40 @@
     "needsProfileTitle": "Your working profile is still missing.",
     "needsProfileText": "The topics come from the questions about how you work. Without your own answers there is nothing to compare.",
     "needsProfileCta": "To the working profile"
+  },
+  "points": {
+    "title": "Why might this be interesting?",
+    "noPreferences": "You have not yet defined how someone should fit you — so nothing about ways of working is shown here.",
+    "noPreferencesCta": "Define your search",
+    "nothing": "There is nothing to say about ways of working here yet.",
+    "kinds": {
+      "mutual_strong": {
+        "title": "A strong match point for both of you",
+        "text": "You have both marked this topic as important, and your ways of working fit what each of you is looking for."
+      },
+      "strong_match": {
+        "title": "Strong match point",
+        "text": "You approach this similarly – and that is exactly what matters to you in matching."
+      },
+      "interesting_complement": {
+        "title": "An interesting complement",
+        "text": "Here you deliberately want someone who works differently. {name} does bring a different approach."
+      },
+      "worth_a_look": {
+        "title": "Worth a closer look",
+        "text": "How someone works matters to you on this topic. Your answers are noticeably apart here."
+      },
+      "difference_without_weight": {
+        "title": "A difference without much weight",
+        "text": "You work differently here. For your matching you have not marked this area as important."
+      }
+    },
+    "counts": {
+      "strong": "{count, plural, =1 {1 strong match point} other {# strong match points}}",
+      "complement": "{count, plural, =1 {1 interesting complement} other {# interesting complements}}",
+      "neutral": "{count, plural, =1 {1 topic neutral} other {# topics neutral}}",
+      "open": "{count, plural, =1 {1 topic still open} other {# topics still open}}"
+    },
+    "insufficient": "We do not have enough information yet for a meaningful match point on this."
   }
 }

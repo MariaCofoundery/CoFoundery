@@ -56,5 +56,40 @@
     "needsProfileTitle": "Dafür fehlt noch dein Arbeitsprofil.",
     "needsProfileText": "Die Themen kommen aus den Fragen dazu, wie du arbeitest. Ohne deine eigenen Antworten gibt es nichts zu vergleichen.",
     "needsProfileCta": "Zum Arbeitsprofil"
+  },
+  "points": {
+    "title": "Warum könnte das interessant sein?",
+    "noPreferences": "Du hast noch nicht festgelegt, wie jemand zu dir passen soll — deshalb steht hier nichts zur Arbeitsweise.",
+    "noPreferencesCta": "Deine Suche festlegen",
+    "nothing": "Zu den Arbeitsweisen gibt es hier noch nichts zu sagen.",
+    "kinds": {
+      "mutual_strong": {
+        "title": "Für euch beide ein starker Matchpunkt",
+        "text": "Ihr habt dieses Thema beide als wichtig markiert, und eure Arbeitsweisen passen hier zu dem, was ihr jeweils sucht."
+      },
+      "strong_match": {
+        "title": "Starker Matchpunkt",
+        "text": "Ihr geht hier ähnlich vor – und genau das ist dir beim Matching wichtig."
+      },
+      "interesting_complement": {
+        "title": "Spannende Ergänzung",
+        "text": "Du suchst hier bewusst jemanden, der etwas anders arbeitet als du. {name} bringt tatsächlich einen anderen Ansatz mit."
+      },
+      "worth_a_look": {
+        "title": "Hier lohnt sich ein genauerer Blick",
+        "text": "Dir ist bei diesem Thema wichtig, wie jemand arbeitet. Eure Antworten liegen hier spürbar auseinander."
+      },
+      "difference_without_weight": {
+        "title": "Unterschied ohne großes Gewicht",
+        "text": "Hier arbeitet ihr unterschiedlich. Für dein Matching hast du diesen Bereich aber nicht als wichtig markiert."
+      }
+    },
+    "counts": {
+      "strong": "{count, plural, =1 {1 starker Matchpunkt} other {# starke Matchpunkte}}",
+      "complement": "{count, plural, =1 {1 spannende Ergänzung} other {# spannende Ergänzungen}}",
+      "neutral": "{count, plural, =1 {1 Thema neutral} other {# Themen neutral}}",
+      "open": "{count, plural, =1 {1 Thema noch offen} other {# Themen noch offen}}"
+    },
+    "insufficient": "Dazu haben wir noch nicht genug Angaben für einen belastbaren Matchpunkt."
   }
 }

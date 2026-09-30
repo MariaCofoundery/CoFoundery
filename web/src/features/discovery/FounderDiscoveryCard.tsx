@@ -7,8 +7,9 @@ import {
   compactDiscoveryValues,
   discoveryRoleLabels,
 } from "@/features/discovery/discoveryPresentation";
+import { MatchPointsView, type MatchPointsCopy } from "@/features/find/MatchPointsView";
+import type { MatchPoint } from "@/features/find/matchPoints";
 import type {
-  DiscoveryAlignmentDimension,
   DiscoveryCandidate,
   DiscoveryFounderRole,
   DiscoveryPracticalMatch,
@@ -86,6 +87,7 @@ export function FounderDiscoveryCard({
   saved,
   photo,
   showMatchReasons = true,
+  match,
 }: {
   candidate: DiscoveryCandidate;
   preferences: FounderSearchPreferences["mustHaves"];
@@ -94,6 +96,21 @@ export function FounderDiscoveryCard({
   /** Nur gesetzt, wenn diese Person ihr Bild fuer Mitglieder freigegeben hat. */
   photo?: MemberPhoto;
   showMatchReasons?: boolean;
+  /**
+   * Die Matchpunkte dieser Person — je Thema einer, hoechstens zwei.
+   *
+   * ERSETZT DIE ALTEN ALIGNMENT-SIGNALE. Hier standen bis zum 30.09.2026
+   * "Commitment · dieselbe grobe Tendenz" und ebenso Unternehmenslogik,
+   * Risikoorientierung, Konfliktstil. Diese Kategorien stammen aus einer
+   * aelteren Architektur und vermischen venturebezogene Themen mit
+   * portablen Arbeitspraeferenzen - die FIND-Spec streicht sie in
+   * Abschnitt 20 ausdruecklich.
+   */
+  match?: {
+    points: readonly MatchPoint[];
+    copy: MatchPointsCopy;
+    hasPreferences: boolean;
+  };
 }) {
   const { profile } = candidate;
   const roles = compactDiscoveryValues(
@@ -160,13 +177,13 @@ export function FounderDiscoveryCard({
         </section>
       ) : null}
 
-      {showMatchReasons && (candidate.alignmentSignals?.length ?? 0) > 0 ? (
-        <section className="mt-3 border-t border-violet-100 pt-4 text-xs leading-5 text-violet-900">
-          <p className="font-semibold">{t("v2.cards.alignmentSignals")}</p>
-          <ul className="mt-1 space-y-1">
-            {candidate.alignmentSignals?.slice(0, 2).map((entry) => <li key={entry.dimension}>{t(`v2.alignment.dimensions.${entry.dimension as DiscoveryAlignmentDimension}`)} · {t(`v2.alignment.signals.${entry.signal}`)}</li>)}
-          </ul>
-        </section>
+      {showMatchReasons && match ? (
+        <MatchPointsView
+          points={match.points}
+          candidateName={profile.displayName}
+          copy={match.copy}
+          hasPreferences={match.hasPreferences}
+        />
       ) : null}
 
       <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">

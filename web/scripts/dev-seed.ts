@@ -675,6 +675,11 @@ async function main() {
   await seedAlignmentSnapshot(admin, second, 1);
   await seedAlignmentSnapshot(admin, third, 2);
 
+  // FIND braucht veroeffentlichte Profile - sonst ist der Bereich leer und
+  // nicht anzusehen. Und einen Vergleich, der etwas zeigt: Ohne unterschiedlich
+  // verteilte Antworten sieht man nicht, ob die Matchpunkte stimmen.
+  await seedFindWorld(admin, { founder, second, third });
+
   const { orgId } = await seedAdvisorWorld(admin, { founder, second, third, advisor });
 
   console.log(
@@ -692,12 +697,124 @@ async function main() {
       `    Organisation ${orgId}, alle Umfänge freigegeben - bis auf einen.`,
       "",
       "  Als Nora:  http://localhost:3000/dev-login",
+      "             /discovery/suche (Suche steht) · /discovery/profile (erst veroeffentlichen)",
       "             /me/profile · /account (eine offene Freigabe, eine offene Teamanfrage)",
       "  Als Pia:   /dev-login?as=advisor",
       "             /advisor/dashboard · /advisor/group (eine laufende Auswertung)",
       "",
     ].join("\n")
   );
+}
+
+/**
+ * Die Suchwelt: zwei ausgefuellte Arbeitsprofile und eine Suche.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DIE ANTWORTEN SO GEWAEHLT SIND
+ * ---------------------------------------------------------------------------
+ *
+ * Damit auf Noras Ergebniskarte jeder der drei Befunde einmal vorkommt und man
+ * sieht, ob die Rechnung stimmt:
+ *
+ *   Entscheidungen abwaegen - Nora will Aehnlichkeit, Ben antwortet fast
+ *   gleich: ein starker Matchpunkt.
+ *
+ *   Ausprobieren & Lernen - Nora will Ergaenzung, Ben liegt zwei Stufen
+ *   daneben: genau die gesuchte Ergaenzung, nicht das Gegenteil.
+ *
+ *   Mit offenen Fragen umgehen - Nora will Aehnlichkeit, Ben liegt zwei
+ *   Stufen daneben: hier lohnt sich ein genauerer Blick.
+ *
+ * Carla bleibt ohne eigene Suche - so laesst sich der dritte Weg ansehen:
+ * FIND zeigt Profile auch dann, nur ohne Aussage zur Arbeitsweise.
+ */
+async function seedFindWorld(
+  admin: SupabaseClient,
+  people: { founder: string; second: string; third: string }
+) {
+  // ---------------------------------------------------------------------------
+  // HIER WERDEN KEINE DISCOVERY-PROFILE ANGELEGT - UND DAS IST ABSICHT
+  // ---------------------------------------------------------------------------
+  //
+  // Drei veroeffentlichte Profile waeren bequem: FIND haette sofort etwas zu
+  // zeigen. Sie brechen aber drei pgTAP-Suiten (discovery_v2, _slice1,
+  // _slice2), weil die GLOBAL zaehlen - "search RPC keeps active profiles"
+  // erwartet genau eine Zeile und bekommt vier.
+  //
+  // Die Suiten sind daran schuld und nicht der Seed: Eine Pruefung, die nur
+  // gruen ist, solange die Datenbank leer ist, prueft die Leere mit. Bis sie
+  // auf ihre eigenen Zeilen eingeschraenkt sind, bleibt dieser Seed aus
+  // `founder_discovery_profiles` heraus.
+  //
+  // Zum Ansehen: ein Profil unter /discovery/profile anlegen und
+  // veroeffentlichen - das ist ohnehin der Weg, den ein Mensch geht.
+
+  const antworten = async (userId: string, stufen: Record<string, number>) => {
+    // ERST SUCHEN, DANN ANLEGEN. Auf `assessments` gibt es keinen
+    // eindeutigen Schluessel ueber Person, Modul und Fassung - ein `upsert`
+    // mit `onConflict` darauf schlaegt fehl und gibt lautlos nichts zurueck.
+    // Genau das ist beim ersten Versuch passiert: drei Profile, drei
+    // Praeferenzen, null Antworten.
+    const vorhanden = await admin
+      .from("assessments")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("instrument_id", "founder-profile-v1")
+      .limit(1)
+      .maybeSingle();
+
+    const data =
+      vorhanden.data ??
+      (
+        await admin
+          .from("assessments")
+          .insert({
+            user_id: userId,
+            module: "founder_profile",
+            instrument_id: "founder-profile-v1",
+            submitted_at: new Date().toISOString(),
+          })
+          .select("id")
+          .maybeSingle()
+      ).data;
+
+    if (!data?.id) throw new Error(`Kein Arbeitsprofil fuer ${userId} angelegt.`);
+    await admin.from("alignment_answers").upsert(
+      Object.entries(stufen).map(([blockId, stufe]) => ({
+        assessment_id: data.id,
+        block_id: blockId,
+        answer_format: "ordinal_choice",
+        value: { optionId: `${blockId}_o${stufe}` },
+      })),
+      { onConflict: "assessment_id,block_id" }
+    );
+  };
+
+  await antworten(people.founder, {
+    A01: 2, A02: 2, E01: 1, E02: 1, E03: 1, X01: 3, X02: 3, X03: 3, X04: 3,
+  });
+  await antworten(people.second, {
+    A01: 2, A02: 3, E01: 3, E02: 3, E03: 3, X01: 5, X02: 5, X03: 5, X04: 5,
+  });
+
+  const { data: set } = await admin
+    .from("discovery_preference_sets")
+    .upsert(
+      { user_id: people.founder, founder_profile_instrument_id: "founder-profile-v1" },
+      { onConflict: "user_id,founder_profile_instrument_id" }
+    )
+    .select("id")
+    .maybeSingle();
+  if (set?.id) {
+    await admin.from("discovery_theme_preferences").upsert(
+      [
+        { preference_set_id: set.id, theme_id: "decision_weighing", direction: "similar", importance: 3 },
+        { preference_set_id: set.id, theme_id: "experimentation", direction: "complementary", importance: 2 },
+        { preference_set_id: set.id, theme_id: "open_questions", direction: "similar", importance: 1 },
+      ],
+      { onConflict: "preference_set_id,theme_id" }
+    );
+  }
 }
 
 main().catch((error) => {

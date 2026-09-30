@@ -9,6 +9,11 @@ import {
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
 import { DiscoverySavedSearchForm } from "@/features/discovery/DiscoverySavedSearchForm";
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
+import { getCandidateMatch } from "@/features/find/matchData";
+import { matchPoints } from "@/features/find/matchPoints";
+import { getOwnPreferences } from "@/features/find/preferenceData";
+import type { MatchPointsCopy } from "@/features/find/MatchPointsView";
+import type { MatchPointKind } from "@/features/find/matchPoints";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import {
   getDiscoveryCandidatesForCurrentUser,
@@ -181,6 +186,47 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
     supabase,
     result.candidates.map((candidate) => candidate.profile.userId)
   );
+  // ---------------------------------------------------------------------------
+  // WARUM KOENNTE DAS INTERESSANT SEIN?
+  // ---------------------------------------------------------------------------
+  //
+  // Je Kandidat:in die Matchpunkte - hoechstens zwei auf einer Karte, damit
+  // sie eine Karte bleibt. Die lange Fassung steht auf dem Profil.
+  //
+  // NUR IM SUCHMODUS. Beim Stoebern ("Fuer dich") gibt es keine Suchvorgaben,
+  // gegen die etwas passen koennte.
+  const tFind = await getTranslations("find.points");
+  const tFindSearch = await getTranslations("find.search");
+  const ownPreferences = await getOwnPreferences(user.id);
+  const hasSearchPreferences = ownPreferences.preferences.some(
+    (entry) => entry.importance > 0,
+  );
+
+  const matchCopy: MatchPointsCopy = {
+    title: tFind("title"),
+    themeTitle: (themeId: string) => tFindSearch(`themes.${themeId}.title`),
+    kindTitle: (kind: MatchPointKind) => tFind(`kinds.${kind}.title`),
+    kindText: (kind: MatchPointKind, name: string) => tFind(`kinds.${kind}.text`, { name }),
+    noPreferences: tFind("noPreferences"),
+    noPreferencesCta: tFind("noPreferencesCta"),
+  };
+
+  const matchByUserId = new Map<string, { points: ReturnType<typeof matchPoints> }>();
+  if (mode === "search") {
+    // Nacheinander und nicht alles auf einmal: Zwoelf Karten waeren zwoelf
+    // gleichzeitige Abfragen, und eine Liste ist kein Grund, die Datenbank zu
+    // ueberfahren.
+    for (const candidate of result.candidates) {
+      const { match, mutualStrongPoints } = await getCandidateMatch(
+        user.id,
+        candidate.profile.userId,
+      );
+      matchByUserId.set(candidate.profile.userId, {
+        points: matchPoints(match.themes, mutualStrongPoints, 2),
+      });
+    }
+  }
+
   const isActive = profile?.status === "active";
   const saved = searchParamValue(resolvedSearchParams.searchResult);
 
@@ -316,7 +362,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
 
         {(mode === "explore" || isActive) && result.candidates.length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-2">
-            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} />)}
+            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} match={{ points: matchByUserId.get(candidate.profile.userId)?.points ?? [], copy: matchCopy, hasPreferences: hasSearchPreferences }} />)}
           </div>
         ) : (
           <section className={CARD_CLASS}>

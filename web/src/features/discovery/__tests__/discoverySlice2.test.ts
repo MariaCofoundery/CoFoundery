@@ -174,7 +174,13 @@ test("profile editor and cards only render explicitly stored intent and horizon"
   assert.match(editor, /name="startHorizon"/);
   assert.match(search, /profile\.searchIntent \?/);
   assert.match(search, /profile\.startHorizon \?/);
-  assert.match(search, /alignmentSignals\?\.slice\(0, 2\)/);
+  // GEAENDERT AM 30.09.2026. Hier stand `alignmentSignals?.slice(0, 2)` - die
+  // Karte zeigte zwei der sechs alten Dimensionen (Unternehmenslogik,
+  // Commitment, Risikoorientierung ...) mit "dieselbe grobe Tendenz" daneben.
+  // Die FIND-Spec streicht diese Kategorien in Abschnitt 20; an ihrer Stelle
+  // stehen die Matchpunkte der neuen Themen.
+  assert.match(search, /<MatchPointsView/);
+  assert.doesNotMatch(search, /v2\.alignment\.dimensions/);
   assert.doesNotMatch(search, /high_intent|serious_founder|startHorizon.*ventureStage/);
 });
 
