@@ -55,13 +55,49 @@ type Result = { ok: true } | { ok: false; reason: string; detail?: string };
  * Erfolg haben kann, ist schlimmer als gar keiner. Er lässt jemanden zehnmal
  * klicken und dann glauben, er habe etwas falsch gemacht.
  */
+/**
+ * Warum die Datenbank nein gesagt hat.
+ *
+ * ---------------------------------------------------------------------------
+ * DREI CODES REICHTEN NICHT
+ * ---------------------------------------------------------------------------
+ *
+ * Alles ausser drei Codes landete bei `draft_create_failed` - und das hatte
+ * keinen eigenen Satz in der Oberflaeche. Heraus kam "Das konnte nicht
+ * gespeichert werden" mit einem Knopf "Erneut versuchen", der nie half.
+ *
+ * Die wichtigste Ergaenzung sind die drei Codes fuer "das gibt es hier nicht":
+ * fehlende Spalte, fehlende Tabelle, fehlende Funktion. Sie heissen alle
+ * dasselbe - die Datenbank ist nicht auf dem Stand der Anwendung -, und genau
+ * dafuer gibt es schon einen Satz, der sagt, dass Wiederholen nicht hilft.
+ * Am 30.09.2026 war das bereits einmal die Ursache, damals sichtbar an einem
+ * anderen Code.
+ */
 function grundFuer(error: { code?: string } | null): string {
   switch (error?.code) {
     case "42501":
       return "no_permission";
+
+    // Die Datenbank kennt etwas nicht, das die Anwendung erwartet: eine
+    // Spalte, eine Tabelle, eine Funktion, ein Wert einer Aufzaehlung.
     case "22P02":
     case "23503":
+    case "42703":
+    case "42P01":
+    case "42883":
+    case "42704":
       return "setup_missing";
+
+    // Eine Pruefregel hat die Antwort abgelehnt. Wiederholen aendert daran
+    // nichts - dieselbe Antwort wird dieselbe Ablehnung bekommen.
+    case "23514":
+      return "value_rejected";
+
+    // Zwei Schreibversuche gleichzeitig. Der zweite kann Erfolg haben.
+    case "40001":
+    case "40P01":
+      return "unreachable";
+
     default:
       return "draft_create_failed";
   }

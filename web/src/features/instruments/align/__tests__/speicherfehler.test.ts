@@ -34,7 +34,11 @@ test("der Wiederholen-Knopf steht nur, wo Wiederholen helfen kann", () => {
   // Ein Knopf, der nie Erfolg haben kann, laesst jemanden zehnmal klicken und
   // dann glauben, er habe etwas falsch gemacht.
   assert.match(fragebogen, /kannWiederholen\(errors\[item\.itemId\]\) &&/);
-  assert.match(fragebogen, /reason !== "setup_missing" && reason !== "no_permission"/);
+  // GEAENDERT AM 30.09.2026. Vorher stand der Knopf bei allem ausser zwei
+  // Faellen - auch bei einer Antwort, die die Pruefung ablehnt. Dort kann ein
+  // zweiter Versuch nie Erfolg haben: dieselbe Antwort, dieselbe Ablehnung.
+  // Jetzt nur noch bei der unterbrochenen Leitung.
+  assert.match(fragebogen, /return reason === "unreachable";/);
 });
 
 test("jeder Grund hat einen Satz, der etwas sagt", () => {

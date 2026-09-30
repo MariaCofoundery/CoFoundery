@@ -720,7 +720,13 @@ export function Questionnaire({
  * der Knopf eine Lüge.
  */
 function kannWiederholen(reason?: string): boolean {
-  return reason !== "setup_missing" && reason !== "no_permission";
+  // NUR DIE UNTERBROCHENE LEITUNG. Vorher stand der Knopf bei allem ausser
+  // zwei Faellen - auch bei einer Antwort, die die Pruefung ablehnt. Dort
+  // kann ein zweiter Versuch nie Erfolg haben: Es wuerde dieselbe Antwort
+  // noch einmal geschickt und dieselbe Ablehnung kommen. Wer zehnmal klickt
+  // und dann glaubt, er habe etwas falsch gemacht, hat recht - nur war es
+  // nicht das Klicken.
+  return reason === "unreachable";
 }
 
 function submitErrorText(reason: string): string {
@@ -736,11 +742,11 @@ function submitErrorText(reason: string): string {
     case "venture_ambiguous":
       return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
     default:
-      return "Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.";
+      return `Das hat gerade nicht geklappt (${reason}). Deine Antworten sind noch da — sag uns bitte Bescheid.`;
   }
 }
 
-function errorText(reason?: string): string {
+function errorText(reason = "unbekannt"): string {
   switch (reason) {
     case "option_needs_text":
       return "Bitte beschreibe kurz, was du meinst.";
@@ -768,7 +774,26 @@ function errorText(reason?: string): string {
       return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet.";
     case "setup_missing":
       return "Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Ein zweiter Versuch hilft hier nicht.";
+    case "value_rejected":
+      return "Diese Antwort hat die Datenbank abgelehnt. Das ist ein Fehler bei uns — bitte sag uns, bei welcher Frage es passiert ist.";
+    case "draft_create_failed":
+      return "Der Fragebogen konnte nicht angelegt werden. Das liegt an uns, nicht an dir — bitte sag uns Bescheid.";
+
+    // ---------------------------------------------------------------------------
+    // JEDER FEHLSCHLAG OHNE NAMEN SAH GLEICH AUS
+    // ---------------------------------------------------------------------------
+    //
+    // GEMELDET AM 30.09.2026: "Es kommt eine Meldung, dass es nicht
+    // gespeichert werden kann, und erneut versuchen." Genau diese Meldung -
+    // und sie sagte weder ihr noch mir, WAS schiefging. Von den
+    // fuenfunddreissig Gruenden, die die Antwortpruefung kennt, hatten zwoelf
+    // einen Satz; die uebrigen dreiundzwanzig sahen alle so aus.
+    //
+    // Deshalb steht der Grund jetzt dabei. Nicht schoen, aber in einer
+    // Testfassung ist eine Kennung, die man weitersagen kann, mehr wert als
+    // ein glatter Satz, der nichts sagt. Und der Satz sagt dazu, dass es an
+    // uns liegt und nicht an der Person.
     default:
-      return "Das konnte nicht gespeichert werden.";
+      return `Das konnte nicht gespeichert werden (${reason}). Das liegt an uns, nicht an dir — sag uns bitte, bei welcher Frage es passiert ist.`;
   }
 }
