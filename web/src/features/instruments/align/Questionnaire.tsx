@@ -272,17 +272,22 @@ export function Questionnaire({
                     {state === "error" && (
                       <span className="text-rose-700">
                         {errorText(errors[item.itemId])}{" "}
-                        {/* WIEDERHOLEN STEHT DANEBEN, NICHT IRGENDWO. Ein
-                            Fehler ohne Ausweg zwingt dazu, die Antwort noch
-                            einmal anzuklicken - und wer das tut, weiss nicht,
-                            ob er sie damit aendert oder nur wiederholt. */}
-                        <button
-                          type="button"
-                          className="underline"
-                          onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
-                        >
-                          Erneut versuchen
-                        </button>
+                        {/* WIEDERHOLEN NUR, WO WIEDERHOLEN HELFEN KANN.
+                            Gemeldet am 30.09.2026: "Erneut versuchen" stand
+                            da, half aber nicht - die Ursache lag in der
+                            Datenbank und nicht in der Leitung. Ein Knopf, der
+                            nie Erfolg haben kann, laesst jemanden zehnmal
+                            klicken und dann glauben, er habe etwas falsch
+                            gemacht. */}
+                        {kannWiederholen(errors[item.itemId]) && (
+                          <button
+                            type="button"
+                            className="underline"
+                            onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
+                          >
+                            Erneut versuchen
+                          </button>
+                        )}
                       </span>
                     )}
                   </div>
@@ -360,6 +365,18 @@ export function Questionnaire({
  * einzelne Antwort, hier um den ganzen Durchgang. Und in beiden Fällen gilt
  * derselbe Satz - die Antworten sind noch da.
  */
+/**
+ * Hilft ein zweiter Versuch?
+ *
+ * Nur bei Fehlern, die vorbeigehen können: eine unterbrochene Verbindung, ein
+ * Schreibversuch, der gerade abgewiesen wurde. Eine fehlende Fassung in der
+ * Datenbank und eine fehlende Rolle gehen nicht von selbst vorbei — dort wäre
+ * der Knopf eine Lüge.
+ */
+function kannWiederholen(reason?: string): boolean {
+  return reason !== "setup_missing" && reason !== "no_permission";
+}
+
 function submitErrorText(reason: string): string {
   switch (reason) {
     case "unsaved":
@@ -368,6 +385,8 @@ function submitErrorText(reason: string): string {
       return "Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.";
     case "no_permission":
       return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet. Deine Antworten sind noch da.";
+    case "setup_missing":
+      return "Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Deine Antworten sind noch da; bitte sag uns Bescheid.";
     case "venture_ambiguous":
       return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
     default:
@@ -401,6 +420,8 @@ function errorText(reason?: string): string {
       return "Verbindung unterbrochen — diese Änderung ist noch nicht gespeichert.";
     case "no_permission":
       return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet.";
+    case "setup_missing":
+      return "Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Ein zweiter Versuch hilft hier nicht.";
     default:
       return "Das konnte nicht gespeichert werden.";
   }

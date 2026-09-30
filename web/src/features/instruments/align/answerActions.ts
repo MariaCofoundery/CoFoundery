@@ -35,6 +35,38 @@ import { resolveVenture } from "@/features/instruments/align/ventureResolution";
 
 type Result = { ok: true } | { ok: false; reason: string; detail?: string };
 
+/**
+ * Was die Datenbank abgewiesen hat - in Worten statt in Fehlercodes.
+ *
+ * ---------------------------------------------------------------------------
+ * "SETUP_MISSING" IST DER FALL, DEN NIEMAND ERRAET
+ * ---------------------------------------------------------------------------
+ *
+ * Gemeldet am 30.09.2026: Speichern geht nicht, „Erneut versuchen" hilft
+ * nicht. Die Ursache lag nicht im Code, sondern daneben - die Migrationen
+ * waren in der Produktionsdatenbank nie eingespielt. Dort gibt es die beiden
+ * Fassungen nicht, und der Modulwert `founder_profile` fehlt im Aufzählungstyp.
+ *
+ * Postgres sagt dazu `22P02` (unbekannter Wert in einer Aufzählung) oder
+ * `23503` (Fremdschlüssel zeigt ins Leere). Beides heißt dasselbe: Diese
+ * Datenbank kennt den Fragebogen nicht.
+ *
+ * WARUM DAS EINEN EIGENEN NAMEN BRAUCHT: Ein Wiederholen-Knopf, der nie
+ * Erfolg haben kann, ist schlimmer als gar keiner. Er lässt jemanden zehnmal
+ * klicken und dann glauben, er habe etwas falsch gemacht.
+ */
+function grundFuer(error: { code?: string } | null): string {
+  switch (error?.code) {
+    case "42501":
+      return "no_permission";
+    case "22P02":
+    case "23503":
+      return "setup_missing";
+    default:
+      return "draft_create_failed";
+  }
+}
+
 const INSTRUMENT: Record<AssessmentScope, string> = {
   founder_profile: FOUNDER_PROFILE_INSTRUMENT_ID,
   venture_alignment: VENTURE_ALIGNMENT_INSTRUMENT_ID,
@@ -113,14 +145,12 @@ async function draftFor(
     .select("id, submitted_at")
     .single();
 
-  // Die Zeilensicherheit weist ab, wer keine Founder-Rolle hat. Das ist kein
-  // Netzfehler und darf auch nicht so heissen.
+  // Jeder Fehlschlag bekommt seinen eigenen Namen. "Konnte nicht gespeichert
+  // werden" ist fuer die Person davor keine Auskunft, sondern eine Einladung,
+  // es noch einmal zu versuchen - und bei zwei dieser Faelle hat das nie
+  // Erfolg.
   if (error || !created) {
-    return {
-      ok: false,
-      reason: error?.code === "42501" ? "no_permission" : "draft_create_failed",
-      detail: error?.message,
-    };
+    return { ok: false, reason: grundFuer(error), detail: error?.message };
   }
   return { ok: true, supabase, assessment: created, ventureId };
 }
@@ -154,7 +184,7 @@ export async function saveAnswer(
     { onConflict: "assessment_id,block_id" },
   );
 
-  if (error) return { ok: false, reason: "save_failed", detail: error.message };
+  if (error) return { ok: false, reason: grundFuer(error), detail: error.message };
   return { ok: true };
 }
 
