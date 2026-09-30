@@ -236,15 +236,15 @@
     "subtitle": "Find founders who fit what you are looking for right now.",
     "editProfile": "Edit search profile",
     "modes": {
-      "label": "Discovery mode",
-      "explore": "Explore",
-      "search": "Search"
+      "label": "View",
+      "explore": "For you",
+      "search": "Search & filter"
     },
     "explore": {
-      "eyebrow": "Explore",
-      "title": "Explore founders",
+      "eyebrow": "For you",
+      "title": "Profiles that could fit you",
       "count": "{count, plural, =0 {No profiles yet} =1 {One published profile} other {# published profiles}}",
-      "emptyTitle": "No founders to explore yet",
+      "emptyTitle": "No profiles for you yet",
       "emptyText": "Founders will appear here once they publish their Discovery profiles."
     },
     "search": {
@@ -370,8 +370,8 @@
       "full": "Three are selected – that's the maximum. Remove one if you'd like to add another."
     },
     "results": {
-      "eyebrow": "Results",
-      "title": "Discover founders",
+      "eyebrow": "Search & filter",
+      "title": "Profiles matching your criteria",
       "count": "{count, plural, =0 {No profiles} =1 {One profile} other {# profiles}} match your practical filters.",
       "emptyTitle": "No profiles with these filters",
       "emptyText": "There are currently no profiles that meet every selected criterion. You can adjust your search or reset all filters.",
@@ -889,8 +889,9 @@
   },
   "mine": {
     "label": "My area",
-    "profile": "My search profile",
-    "searches": "My searches",
-    "saved": "Saved"
+    "profile": "Your FIND profile",
+    "searches": "Saved searches",
+    "saved": "Saved",
+    "yourSearch": "Your search"
   }
 }

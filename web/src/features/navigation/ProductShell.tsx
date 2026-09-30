@@ -344,16 +344,10 @@ export function ProductShell({
     label: t("areaFind"),
     isActive: (currentPathname) => currentPathname.startsWith("/discovery"),
     badge: { kind: "intro", count: incomingOpenRequestCount },
-    // DIE EIGENE SUCHE GEHOERT INS MENUE, NICHT AUF EINE KARTE. Genau das war
-    // beim Fragebogen und beim Report schon einmal das Problem: Wer woanders
-    // stand, musste erst irgendwohin zurueck, um sie zu finden.
-    subItems: [
-      {
-        href: "/discovery/suche",
-        label: t("findYourSearch"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/suche"),
-      },
-    ],
+    // KEINE UNTEREINTRAEGE HIER. Die Ziele von FIND stehen in der Reihe
+    // "Deins" auf jeder FIND-Seite - dasselbe Muster wie in Connect. Beides
+    // gleichzeitig waeren zwei Wege zu denselben vier Seiten, und man lernt
+    // sich dann an, in beiden zu suchen.
   };
 
   const connectItem: NavigationItem = {

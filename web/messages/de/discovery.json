@@ -236,15 +236,15 @@
     "subtitle": "Finde Founder, die zu dem passen, was du gerade suchst.",
     "editProfile": "Suchprofil bearbeiten",
     "modes": {
-      "label": "Discovery-Modus",
-      "explore": "Entdecken",
-      "search": "Gezielt suchen"
+      "label": "Ansicht",
+      "explore": "Für dich",
+      "search": "Suchen & filtern"
     },
     "explore": {
-      "eyebrow": "Entdecken",
-      "title": "Founder entdecken",
+      "eyebrow": "Für dich",
+      "title": "Profile, die zu dir passen könnten",
       "count": "{count, plural, =0 {Noch keine Profile} =1 {Ein veröffentlichtes Profil} other {# veröffentlichte Profile}}",
-      "emptyTitle": "Noch keine Founder zu entdecken",
+      "emptyTitle": "Noch keine Profile für dich",
       "emptyText": "Sobald weitere Founder ihr Discovery-Profil veröffentlichen, erscheinen sie hier."
     },
     "search": {
@@ -370,8 +370,8 @@
       "full": "Drei sind ausgewählt – das ist das Maximum. Entferne einen, wenn du einen anderen aufnehmen willst."
     },
     "results": {
-      "eyebrow": "Ergebnisse",
-      "title": "Founder entdecken",
+      "eyebrow": "Suchen & filtern",
+      "title": "Profile zu deinen Kriterien",
       "count": "{count, plural, =0 {Keine Profile} =1 {Ein Profil} other {# Profile}} entsprechen deinen praktischen Filtern.",
       "emptyTitle": "Keine Profile mit diesen Filtern",
       "emptyText": "Aktuell gibt es keine Profile, die alle gewählten Kriterien erfüllen. Du kannst deine Suche anpassen oder alle Filter zurücksetzen.",
@@ -889,8 +889,9 @@
   },
   "mine": {
     "label": "Mein Bereich",
-    "profile": "Mein Suchprofil",
-    "searches": "Meine Suchen",
-    "saved": "Gemerkte"
+    "profile": "Dein FIND-Profil",
+    "searches": "Gespeicherte Suchen",
+    "saved": "Gemerkte",
+    "yourSearch": "Deine Suche"
   }
 }

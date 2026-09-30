@@ -189,19 +189,46 @@ test("wer seine Bereiche privat hält, erfährt es beim Einstellen", () => {
   assert.match(String(de.skillsPrivacy), /privat/i);
 });
 
-test("die eigene Suche steht im Menü", () => {
-  // Sie war sonst nur über eine Karte erreichbar - wer woanders steht, müsste
-  // erst dorthin zurück. Genau das war bei Fragebogen und Report schon
-  // einmal das Problem.
+test("die eigene Suche steht auf jeder FIND-Seite", () => {
+  // ---------------------------------------------------------------------------
+  // GEAENDERT AM 30.09.2026
+  // ---------------------------------------------------------------------------
+  //
+  // Zuerst stand sie als einziger Eintrag im globalen Menue, die drei anderen
+  // Ziele von FIND in der Reihe "Mein Bereich" auf der Seite - zwei Muster
+  // fuer denselben Bereich. Jetzt stehen alle vier an derselben Stelle, so
+  // wie in Connect auch: Ein bestehender Wachtest verlangt genau das.
+  const nav = readFileSync(
+    join("src", "features", "discovery", "DiscoveryMineNav.tsx"),
+    "utf8",
+  );
+  assert.match(nav, /href: "\/discovery\/suche"/);
+
+  // Und nicht zweimal: Zwei Wege zu denselben Seiten heißt, dass man sich
+  // angewöhnt, in beiden zu suchen.
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"),
     "utf8",
   );
-  assert.match(shell, /href: "\/discovery\/suche"/);
-  assert.match(shell, /t\("findYourSearch"\)/);
+  assert.ok(!/href: "\/discovery\/suche"/.test(shell));
 
   for (const locale of ["de", "en"]) {
-    const nav = readFileSync(join("messages", locale, "navigation.json"), "utf8");
-    assert.match(nav, /"findYourSearch"/, locale);
+    const discovery = JSON.parse(
+      readFileSync(join("messages", locale, "discovery.json"), "utf8"),
+    );
+    assert.ok(discovery.mine.yourSearch?.trim(), locale);
   }
+});
+
+test("„Entdecken“ und „Gezielt suchen“ heißen jetzt, was sie tun", () => {
+  // Spec, Abschnitt 18: „Für dich" macht klar, dass dort bereits Präferenzen
+  // und Matchlogik wirken; „Suchen & filtern" ist verständlicher als
+  // „Gezielt suchen".
+  const de = JSON.parse(readFileSync(join("messages", "de", "discovery.json"), "utf8"));
+  assert.equal(de.v2.modes.explore, "Für dich");
+  assert.equal(de.v2.modes.search, "Suchen & filtern");
+
+  const en = JSON.parse(readFileSync(join("messages", "en", "discovery.json"), "utf8"));
+  assert.equal(en.v2.modes.explore, "For you");
+  assert.equal(en.v2.modes.search, "Search & filter");
 });

@@ -21,10 +21,17 @@ import { getTranslations } from "next-intl/server";
  * Besitz. Es bleibt ein Link fuer sich, so wie in Connect die Kontakte.
  */
 
+// DIE REIHENFOLGE IST EIN WEG UND KEINE ABLAGE: erst was ich suche, dann wie
+// ich mich zeige, dann was ich mir gemerkt habe, dann das Aufgehobene.
+//
+// "Deine Suche" stand seit dem 30.09.2026 als einziger Eintrag im globalen
+// Menue, die anderen drei hier - zwei Muster fuer denselben Bereich. Jetzt
+// stehen alle vier an derselben Stelle, so wie in Connect auch.
 const LINKS = [
+  { key: "yourSearch", href: "/discovery/suche" },
   { key: "profile", href: "/discovery/profile" },
-  { key: "searches", href: "/discovery/searches" },
   { key: "saved", href: "/discovery/saved" },
+  { key: "searches", href: "/discovery/searches" },
 ] as const;
 
 export async function DiscoveryMineNav() {

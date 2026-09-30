@@ -51,6 +51,5 @@
   "menuAttentionBadge": "{count, plural, =0 {Nothing open} one {1 open item in the menu} other {# open items in the menu}}",
   "alignOwnProfile": "Full picture",
   "alignNewVersion": "New version (beta)",
-  "breadcrumbLabel": "Where you are",
-  "findYourSearch": "Your search"
+  "breadcrumbLabel": "Where you are"
 }
