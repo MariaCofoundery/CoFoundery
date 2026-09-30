@@ -11,6 +11,7 @@ import {
   noteItemSeen,
 } from "@/features/instruments/v21/itemViewActions";
 import type { AssessmentScope } from "@/features/instruments/align/registries";
+import type { ScreenSet } from "@/features/instruments/align/screens";
 
 type SaveState = "idle" | "saving" | "saved" | "incomplete" | "error";
 
@@ -29,6 +30,14 @@ type Props = {
   answerable: Record<string, AnswerableItem>;
   initialAnswers: Record<string, DraftV21>;
   submitted: boolean;
+  /**
+   * Sieben Bildschirme statt einer langen Liste.
+   *
+   * Nur das Arbeitsprofil hat sie — das Venture-Alignment ist laut UX-Review
+   * ausdrücklich noch nicht durchgearbeitet, und eine halbe Überarbeitung
+   * wäre dort schlimmer als keine. Ohne diese Angabe bleibt alles, wie es war.
+   */
+  screens?: ScreenSet | null;
 };
 
 /**
@@ -50,7 +59,7 @@ type Props = {
  * sonst nichts. Keine Auswertung beim Ausfüllen, am Ende keine Zahl.
  */
 export function Questionnaire({
-  scope, ventureId = null, sections, answerable, initialAnswers, submitted,
+  scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens = null,
 }: Props) {
   const [answers, setAnswers] = useState<Record<string, DraftV21>>(initialAnswers);
   const [states, setStates] = useState<Record<string, SaveState>>({});
@@ -71,6 +80,17 @@ export function Questionnaire({
   const nichtGespeichert = () =>
     Object.entries(states).filter(([, state]) => state === "error" || state === "saving");
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  /**
+   * Schritt 0 ist die Einleitung, 1 bis 7 sind die Bildschirme.
+   *
+   * WER SCHON GEANTWORTET HAT, LIEST DIE EINLEITUNG NICHT NOCH EINMAL. Sie
+   * begrüßt und erklärt, worum es geht - beim dritten Mal ist sie eine Tür,
+   * die man jedes Mal aufschieben muss.
+   */
+  const [step, setStep] = useState(() =>
+    screens && Object.keys(initialAnswers).length === 0 ? 0 : 1,
+  );
 
   const allItems = useMemo(() => sections.flatMap((section) => section.items), [sections]);
 
@@ -180,6 +200,243 @@ export function Questionnaire({
     },
     [scope, ventureId, answerable],
   );
+
+  /**
+   * Der Abgabeknopf - einmal geschrieben, von beiden Wegen benutzt.
+   *
+   * Er steht hinter der letzten Frage und nicht über der ersten: Abgeben ist
+   * das Letzte, was man tut.
+   */
+  function abgabeKnopf() {
+    return (
+      <div>
+  <button
+              type="button"
+              disabled={submitting}
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              onClick={async () => {
+                if (nichtGespeichert().length > 0) {
+                  setSubmitError("unsaved");
+                  return;
+                }
+                setSubmitting(true);
+                setSubmitError("");
+                try {
+                  const result = await submitScope(scope, ventureId ?? undefined);
+                  if (result.ok) {
+                    setIsSubmitted(true);
+                    setMissingAfterSubmit([]);
+                  } else {
+                    setMissingAfterSubmit(result.missing ?? []);
+                    // Fehlende Antworten stehen an den Fragen selbst. Alles
+                    // andere - ein abgewiesener Schreibversuch, ein Lesefehler -
+                    // stand vorher NIRGENDS: Der Knopf sprang zurueck, und es
+                    // sah aus, als haette man nichts getan.
+                    if (result.reason !== "incomplete") setSubmitError(result.reason);
+                  }
+                } catch {
+                  // OHNE DAS BLIEB DER KNOPF FUER IMMER AUF "wird abgegeben".
+                  // Gemeldet am 30.09.2026. Beim Speichern war es schon
+                  // abgefangen, beim Abgeben nicht - und da faellt es am
+                  // meisten auf, weil man danach wartet.
+                  setSubmitError("unreachable");
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              {submitting ? "Profil wird erstellt…" : "Founder-Profil erstellen"}
+            </button>
+            <p className="mt-2 text-sm text-slate-600">
+              Mit dem Absenden schließt du diesen Durchgang ab.
+            </p>
+  
+            {submitError && (
+              <p role="alert" className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
+                {submitErrorText(submitError)}
+              </p>
+            )}
+      </div>
+    );
+  }
+
+  /**
+   * Eine Frage mit ihrem Feld und ihrem Zustand.
+   *
+   * Als Funktion, weil sie von zwei Wegen gebraucht wird: von den sieben
+   * Bildschirmen des Arbeitsprofils und von der Abschnittsliste des
+   * Venture-Alignments. Zwei Kopien liefen nach dem ersten Unterschied
+   * auseinander - und zwar lautlos, weil beide richtig aussehen.
+   */
+  const frageKarte = (item: SectionView["items"][number], gruppenfrage: string | null) => {
+    const draft = answers[item.itemId] ?? {};
+    const state = states[item.itemId] ?? "idle";
+    return (
+      <div
+        key={item.itemId}
+        data-item-id={item.itemId}
+        className={[
+          "rounded-xl border p-5",
+          missingAfterSubmit.includes(item.itemId)
+            ? "border-amber-300 bg-amber-50/40"
+            : "border-slate-200 bg-white",
+        ].join(" ")}
+      >
+        {gruppenfrage && (
+          <p className="mb-3 border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
+            {gruppenfrage}
+          </p>
+        )}
+        <p className="text-base text-slate-900">{item.prompt}</p>
+        {item.hint && <p className="mt-1 text-sm text-slate-500">{item.hint}</p>}
+
+        <div className="mt-4">
+          <AnswerFieldV21
+            item={item}
+            draft={draft}
+            basisEntries={basisEntries}
+            disabled={isSubmitted}
+            onChange={(next) => {
+              setAnswers((current) => ({ ...current, [item.itemId]: next }));
+              persist(item.itemId, next);
+            }}
+          />
+        </div>
+
+        <div className="mt-3 flex items-center gap-3 text-xs">
+          {state === "saving" && <span className="text-slate-500">Speichern …</span>}
+          {state === "saved" && <span className="text-slate-500">Gespeichert</span>}
+          {state === "incomplete" && (
+            <span className="text-slate-400">noch nicht vollständig</span>
+          )}
+          {state === "error" && (
+            <span className="text-rose-700">
+              {errorText(errors[item.itemId])}{" "}
+              {/* WIEDERHOLEN NUR, WO WIEDERHOLEN HELFEN KANN. Ein Knopf, der
+                  nie Erfolg haben kann, laesst jemanden zehnmal klicken und
+                  dann glauben, er habe etwas falsch gemacht. */}
+              {kannWiederholen(errors[item.itemId]) && (
+                <button
+                  type="button"
+                  className="underline"
+                  onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
+                >
+                  Erneut versuchen
+                </button>
+              )}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const sichtbar = (item: SectionView["items"][number]) =>
+    !item.basisItemId || basisEntries.length > 0;
+
+  // ---------------------------------------------------------------------------
+  // DIE EINLEITUNG
+  // ---------------------------------------------------------------------------
+  if (screens && step === 0) {
+    return (
+      <div className="max-w-2xl space-y-5">
+        <h1 className="text-2xl font-semibold text-slate-900">{screens.intro.title}</h1>
+        {screens.intro.paragraphs.map((absatz) => (
+          <p key={absatz} className="text-base leading-7 text-slate-700">
+            {absatz}
+          </p>
+        ))}
+        {/* KEINE ZEITANGABE. Das UX-Review: erst im Pretest messen. Eine
+            geratene Zahl waere ein Versprechen, das niemand geprueft hat. */}
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white"
+        >
+          {screens.intro.cta}
+        </button>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // SIEBEN BILDSCHIRME
+  // ---------------------------------------------------------------------------
+  if (screens) {
+    const schirm = screens.screens.find((entry) => entry.step === step) ?? screens.screens[0];
+    const letzter = schirm.step === screens.screens.length;
+    const fragen = schirm.items
+      .map((itemId) => allItems.find((item) => item.itemId === itemId))
+      .filter((item): item is SectionView["items"][number] => item !== undefined)
+      .filter(sichtbar);
+
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div>
+          {/* "Schritt 3 von 7" und nicht "7 von 16 Fragen" - das eine liest
+              sich wie ein Weg, das andere wie eine Pruefung. */}
+          <p className="text-sm text-slate-500">
+            Schritt {schirm.step} von {screens.screens.length}
+          </p>
+          <div className="mt-2 h-1 w-full rounded-full bg-slate-200">
+            <div
+              className="h-1 rounded-full bg-slate-900 transition-all"
+              style={{ width: `${(schirm.step / screens.screens.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {schirm.transition && (
+          <p className="text-lg font-medium text-slate-900">{schirm.transition}</p>
+        )}
+        {schirm.subline && <p className="text-base text-slate-600">{schirm.subline}</p>}
+
+        {schirm.groupPrompt && (
+          <p className="text-base font-medium text-slate-900">{schirm.groupPrompt}</p>
+        )}
+
+        <div className="space-y-5">
+          {fragen.map((item) => frageKarte(item, null))}
+        </div>
+
+        {missingAfterSubmit.length > 0 && (
+          <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Es fehlen noch {missingAfterSubmit.length} Antworten. Für jede Frage gibt es
+            auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts
+            hinschreiben, was du nicht meinst.
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
+          {schirm.step > 1 && (
+            <button
+              type="button"
+              onClick={() => setStep(schirm.step - 1)}
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
+            >
+              Zurück
+            </button>
+          )}
+          {!letzter && (
+            <button
+              type="button"
+              onClick={() => setStep(schirm.step + 1)}
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+            >
+              Weiter
+            </button>
+          )}
+          {letzter && !isSubmitted && abgabeKnopf()}
+        </div>
+
+        {letzter && isSubmitted && (
+          <p className="text-sm font-medium text-slate-900">
+            Abgegeben. Deine Antworten stehen in deinem Founder-Profil.
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
@@ -298,57 +555,8 @@ export function Questionnaire({
         );
       })}
 
-      {/* Abgeben ist das Letzte, was man tut - der Knopf steht hinter der
-          letzten Frage und nicht ueber der ersten. */}
       {!isSubmitted && (
-        <div className="border-t border-slate-200 pt-6">
-          <button
-            type="button"
-            disabled={submitting}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            onClick={async () => {
-              if (nichtGespeichert().length > 0) {
-                setSubmitError("unsaved");
-                return;
-              }
-              setSubmitting(true);
-              setSubmitError("");
-              try {
-                const result = await submitScope(scope, ventureId ?? undefined);
-                if (result.ok) {
-                  setIsSubmitted(true);
-                  setMissingAfterSubmit([]);
-                } else {
-                  setMissingAfterSubmit(result.missing ?? []);
-                  // Fehlende Antworten stehen an den Fragen selbst. Alles
-                  // andere - ein abgewiesener Schreibversuch, ein Lesefehler -
-                  // stand vorher NIRGENDS: Der Knopf sprang zurueck, und es
-                  // sah aus, als haette man nichts getan.
-                  if (result.reason !== "incomplete") setSubmitError(result.reason);
-                }
-              } catch {
-                // OHNE DAS BLIEB DER KNOPF FUER IMMER AUF "wird abgegeben".
-                // Gemeldet am 30.09.2026. Beim Speichern war es schon
-                // abgefangen, beim Abgeben nicht - und da faellt es am
-                // meisten auf, weil man danach wartet.
-                setSubmitError("unreachable");
-              } finally {
-                setSubmitting(false);
-              }
-            }}
-          >
-            {submitting ? "Profil wird erstellt…" : "Founder-Profil erstellen"}
-          </button>
-          <p className="mt-2 text-sm text-slate-600">
-            Mit dem Absenden schließt du diesen Durchgang ab.
-          </p>
-
-          {submitError && (
-            <p role="alert" className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
-              {submitErrorText(submitError)}
-            </p>
-          )}
-        </div>
+        <div className="border-t border-slate-200 pt-6">{abgabeKnopf()}</div>
       )}
     </div>
   );

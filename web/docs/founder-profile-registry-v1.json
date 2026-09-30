@@ -7,6 +7,7 @@
   "createdAt": "2026-09-29",
   "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md",
   "editorialSource": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
+  "uxSource": "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md",
   "validity": "Relativ portabel. Gilt fuer die Person, nicht fuer ein bestimmtes Vorhaben - und sollte regelmaessig bestaetigt werden.",
   "overallScore": false,
   "dimensionScores": false,
@@ -16,6 +17,12 @@
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
       "decidedBy": "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."
+    },
+    {
+      "what": "Arbeitsprofil: Wortlaute und Hinweise aus dem UX-Review v0.2 (liegt ueber dem Sprachreview).",
+      "source": "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md",
+      "reason": "Am Stueck gelesen klangen die Fragen nach Fragebogen: dreimal 'wie haeufig', dreimal derselbe Satzbau. Das Review kuerzt und variiert, ohne das Konstrukt zu verschieben. Bei X01 bis X04 faellt der Fragekopf weg, weil er einmal ueber dem Block steht - sonst stuende viermal 'Wie wohl fuehlst du dich, wenn ...' untereinander.",
+      "decidedBy": "Maria, 30.09.2026"
     },
     {
       "what": "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1.",
@@ -77,7 +84,7 @@
       "itemId": "A01",
       "order": 1,
       "section": "A – Analytische Prüfung",
-      "prompt": "Du musst zwischen mehreren realistischen Möglichkeiten entscheiden. Wie häufig vergleichst du ihre Vor- und Nachteile, bevor du dich festlegst?",
+      "prompt": "Du hast mehrere realistische Möglichkeiten vor dir. Wie oft vergleichst du ihre Vor- und Nachteile, bevor du dich festlegst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -124,8 +131,8 @@
       "itemId": "A02",
       "order": 2,
       "section": "A – Analytische Prüfung",
-      "prompt": "Eine wichtige Entscheidung hängt davon ab, ob eine Annahme stimmt. Wie häufig prüfst du, welche Informationen für oder gegen diese Annahme sprechen?",
-      "hint": "Zum Beispiel die Annahme, dass genügend Kund:innen für ein Angebot bezahlen würden.",
+      "prompt": "Eine wichtige Entscheidung hängt davon ab, ob eine Annahme stimmt. Wie oft prüfst du gezielt, was dafür oder dagegen spricht?",
+      "hint": "Zum Beispiel: Zahlen Kund:innen tatsächlich für das Angebot?",
       "answerFormat": "ordinal_choice",
       "options": [
         {
@@ -171,7 +178,7 @@
       "itemId": "I01",
       "order": 3,
       "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Du kennst dich in einem Thema gut aus. Wie stark fließt dein erster Eindruck normalerweise in deine Entscheidung ein?",
+      "prompt": "Du kennst dich mit einem Thema gut aus. Wie viel Gewicht hat dein erster Eindruck bei deiner Entscheidung?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -218,7 +225,7 @@
       "itemId": "I02",
       "order": 4,
       "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Mehrere Möglichkeiten erscheinen nach den verfügbaren Informationen ähnlich gut. Wie stark lässt du dann deine Erfahrung oder dein Gefühl mitentscheiden?",
+      "prompt": "Mehrere Möglichkeiten sehen nach den verfügbaren Infos ähnlich gut aus. Wie viel Gewicht gibst du dann deiner Erfahrung oder deinem Gefühl?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -265,8 +272,8 @@
       "itemId": "I03",
       "order": 5,
       "section": "I – Nutzung von Erfahrungsintuition",
-      "prompt": "Die verfügbaren Zahlen sprechen für eine Option, dein Gefühl eher dagegen. Wie stark beziehst du dieses Gefühl in deine weitere Entscheidung ein?",
-      "hint": null,
+      "prompt": "Die Zahlen sprechen für eine Option, dein Gefühl dagegen. Wie stark nimmst du dieses Gefühl als zusätzliches Signal ernst?",
+      "hint": "Es geht nicht darum, ob du deinem Gefühl folgst – sondern ob du es bei deiner Entscheidung berücksichtigst.",
       "answerFormat": "ordinal_choice",
       "options": [
         {
@@ -312,7 +319,7 @@
       "itemId": "E01",
       "order": 6,
       "section": "E – Frühes Erproben",
-      "prompt": "Dir fehlen noch Informationen für eine Entscheidung. Ein kleiner Test könnte zusätzliche Hinweise liefern. Wie wahrscheinlich ist es, dass du den Test startest, statt zunächst weiter Informationen zu sammeln?",
+      "prompt": "Du könntest noch weiter recherchieren – oder mit einem kleinen Test neue Informationen gewinnen. Wie wahrscheinlich ist es, dass du zuerst testest?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -359,7 +366,7 @@
       "itemId": "E02",
       "order": 7,
       "section": "E – Frühes Erproben",
-      "prompt": "Zwei Vorgehensweisen erscheinen beide sinnvoll. Ein kleiner Test könnte zeigen, welche in der Praxis besser funktioniert. Wie wahrscheinlich ist es, dass du zunächst einen solchen Test machst?",
+      "prompt": "Zwei Wege erscheinen beide sinnvoll. Statt dich direkt festzulegen, könntest du beide zunächst in kleinem Rahmen ausprobieren. Wie wahrscheinlich ist es, dass du sie so vergleichst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -406,7 +413,7 @@
       "itemId": "E03",
       "order": 8,
       "section": "E – Frühes Erproben",
-      "prompt": "Eine Entscheidung ist noch nicht endgültig und lässt sich mit wenig Aufwand korrigieren. Wie wahrscheinlich ist es, dass du zunächst eine vorläufige Richtung festlegst?",
+      "prompt": "Eine Entscheidung lässt sich leicht korrigieren. Wie wahrscheinlich ist es, dass du trotzdem schon eine vorläufige Richtung festlegst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -453,7 +460,7 @@
       "itemId": "T01",
       "order": 9,
       "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Während eines Gesprächs merkst du, dass du eine geplante Entscheidung anders siehst. Sie ist wichtig, aber nicht dringend. Wann sprichst du deinen Einwand zum ersten Mal an?",
+      "prompt": "Im Gespräch merkst du: Du siehst eine geplante, wichtige Entscheidung anders. Sie ist nicht dringend. Wann sprichst du deinen Einwand zum ersten Mal an?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -500,7 +507,7 @@
       "itemId": "T02",
       "order": 10,
       "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Du hast Bedenken, kannst sie aber noch nicht genau begründen. Was entspricht dann eher deinem Vorgehen?",
+      "prompt": "Du hast Bedenken, kannst aber noch nicht genau sagen, warum. Was passt dann eher zu dir?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -547,7 +554,7 @@
       "itemId": "D01",
       "order": 11,
       "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Du bist inhaltlich anderer Meinung. Welcher Einstieg passt dann am ehesten zu dir?",
+      "prompt": "Du bist inhaltlich anderer Meinung. Welche Formulierung würdest du am ehesten wählen?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -594,7 +601,7 @@
       "itemId": "D02",
       "order": 12,
       "section": "T/D – Unterschiede ansprechen und formulieren",
-      "prompt": "Ein Vorschlag erscheint dir nicht sinnvoll. Wie wahrscheinlich ist es, dass du ausdrücklich sagst, dass du ihm nicht zustimmst?",
+      "prompt": "Ein Vorschlag erscheint dir nicht sinnvoll. Wie wahrscheinlich ist es, dass du ausdrücklich sagst, dass du nicht zustimmst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -641,7 +648,7 @@
       "itemId": "X01",
       "order": 13,
       "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst du dich, wenn für dasselbe Ergebnis mehrere plausible Erklärungen offen sind und noch unklar ist, welche davon zutrifft?",
+      "prompt": "Für ein Ergebnis gibt es mehrere plausible Erklärungen – und noch ist unklar, welche davon zutrifft.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -688,7 +695,7 @@
       "itemId": "X02",
       "order": 14,
       "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst du dich, wenn über mehrere Wochen offen bleibt, welche von zwei möglichen Richtungen euer Vorhaben nehmen wird?",
+      "prompt": "Über mehrere Wochen bleibt offen, welche von zwei Richtungen euer Vorhaben nehmen wird.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -735,7 +742,7 @@
       "itemId": "X03",
       "order": 15,
       "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst du dich, wenn ihr zu derselben Idee widersprüchliche Rückmeldungen bekommt und noch nicht klar ist, welche davon relevanter sind?",
+      "prompt": "Ihr bekommt zu derselben Idee widersprüchliche Rückmeldungen – und noch ist unklar, welche davon relevanter sind.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
@@ -782,7 +789,7 @@
       "itemId": "X04",
       "order": 16,
       "section": "X – Wohlbefinden bei offener Informationslage",
-      "prompt": "Wie wohl fühlst du dich, wenn eine wichtige Frage eine Zeit lang keine eindeutige Antwort hat?",
+      "prompt": "Eine wichtige Frage bleibt eine Zeit lang ohne eindeutige Antwort.",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [

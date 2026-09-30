@@ -3,7 +3,8 @@ import { AlignNav } from "@/features/instruments/align/AlignNav";
 import { getAlignNavState } from "@/features/instruments/align/navState";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
-import { getItemsV22, FOUNDER_PROFILE } from "@/features/instruments/align/registries";
+import { screenSet } from "@/features/instruments/align/screens";
+import { getItemsV22, getItemV22 } from "@/features/instruments/align/registries";
 import { FOUNDER_PROFILE_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -57,17 +58,15 @@ export default async function FounderProfilePage() {
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>
-      <h1 className="text-2xl font-semibold text-slate-900">Wie du arbeitest</h1>
-      <p className="mt-4 text-slate-700">
-        {getItemsV22("founder_profile").length} Fragen dazu, wie du entscheidest,
-        Unterschiede ansprichst und mit offenen Fragen umgehst. Es gibt keine richtigen
-        Antworten und am Ende keine Punktzahl.
-      </p>
-      <p className="mt-2 text-sm text-slate-500">{FOUNDER_PROFILE.validity}</p>
-
-      <div className="mt-10">
+      {/* KEINE UEBERSCHRIFT UND KEINE FRAGENZAHL MEHR. Die Einleitung des
+          Fragebogens traegt beides - "16 Fragen dazu, wie du entscheidest"
+          stand hier zusaetzlich und widersprach den sieben Schritten, in die
+          das UX-Review sie portioniert. Zwei Ueberschriften uebereinander
+          waeren ausserdem zwei Anfaenge. */}
+      <div className="mt-6">
         <Questionnaire
           scope="founder_profile"
+          screens={screenSet((itemId) => Boolean(getItemV22(itemId)))}
           sections={buildSections("founder_profile")}
           answerable={answerable}
           initialAnswers={initialAnswers}

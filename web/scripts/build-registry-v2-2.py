@@ -88,6 +88,42 @@ MISSING_AUS_OPTION = {
 # Deshalb wird hier ueberlagert und jede Ueberlagerung verzeichnet.
 REVIEW = "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md"
 
+# ---------------------------------------------------------------------------
+# UND DARUEBER NOCH DAS UX-REVIEW
+# ---------------------------------------------------------------------------
+#
+# Dritte Schicht, dritte Frage. Die Master-Fassung sagt, WAS gefragt wird. Das
+# Sprachreview sagt, WIE es dasteht. Das UX-Review vom 30.09.2026 sagt, wie es
+# sich LIEST, wenn man es am Stueck durchgeht: kuerzere Saetze, "wie oft" statt
+# "wie haeufig", und bei X01 bis X04 faellt der Fragekopf weg, weil er einmal
+# ueber dem Block steht.
+#
+# Nur fuer das Arbeitsprofil. Das Venture-Alignment ist laut Dokument
+# ausdruecklich noch nicht durchgearbeitet - dort waere eine halbe
+# Ueberarbeitung schlimmer als keine.
+UX_REVIEW = "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md"
+
+
+def ux_review():
+    """Wortlaute und Hinweise aus dem UX-Review - nur Items des Arbeitsprofils."""
+    text = io.open(UX_REVIEW, encoding="utf-8").read()
+    out = {}
+    for block in re.split(r"^### ", text, flags=re.M)[1:]:
+        kopf, koerper = block.split("\n", 1)
+        kennung = kopf.strip().split(" ")[0]
+        if not re.match(r"^[A-Z][0-9]{2}$", kennung):
+            continue
+        eintrag = {}
+        q = _zitate(koerper.split("Hinweis")[0])
+        if q:
+            eintrag["prompt"] = q[0]
+        if "Hinweis" in koerper:
+            nach = _zitate(koerper[koerper.index("Hinweis"):])
+            if nach:
+                eintrag["hint"] = nach[0]
+        out[kennung] = eintrag
+    return out
+
 # Ohne eigene Beschriftung im Dokument: der uebliche Satz zum Code.
 MISSING_LABEL = {
     "cannot_assess":      "kann ich noch nicht einschätzen",
@@ -477,6 +513,7 @@ def s01_neu():
 
 
 REVIEW_ITEMS = sprachreview()
+UX_ITEMS = ux_review()
 
 _unbekannt = sorted(k for k in REVIEW_ITEMS if k not in items and not k.startswith("S01"))
 if _unbekannt:
@@ -608,6 +645,23 @@ for kennung, eintrag in _s01_neu:
     items[kennung] = eintrag
     reihenfolge.insert(reihenfolge.index("S01") + len([k for k, _ in _s01_neu[:_s01_neu.index((kennung, eintrag))]]) + 1, kennung)
 
+# Das UX-Review zuletzt - es liegt ueber allem anderen.
+_profil = {i for i in items if i in UX_ITEMS}
+_fehlend = sorted(
+    k for k in items
+    if k[0] in SCOPES["founder_profile"]["letters"] and k not in UX_ITEMS
+)
+if _fehlend:
+    raise SystemExit(f"Diese Fragen des Arbeitsprofils fehlen im UX-Review: {_fehlend}")
+
+for item_id, ux in UX_ITEMS.items():
+    if item_id not in items:
+        raise SystemExit(f"Das UX-Review nennt {item_id} - die Frage gibt es nicht")
+    if ux.get("prompt"):
+        items[item_id]["prompt"] = ux["prompt"]
+    if ux.get("hint"):
+        items[item_id]["hint"] = ux["hint"]
+
 for n, item_id in enumerate(reihenfolge, start=1):
     it = items[item_id]
     fmt = format_von(item_id)
@@ -668,6 +722,7 @@ for scope, meta in SCOPES.items():
         ("createdAt", "2026-09-29"),
         ("source", SRC),
         ("editorialSource", REVIEW),
+        ("uxSource", UX_REVIEW if scope == "founder_profile" else None),
         ("validity", meta["validity"]),
         ("overallScore", False),
         ("dimensionScores", False),
@@ -677,6 +732,12 @@ for scope, meta in SCOPES.items():
                 ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
                 ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
                 ("decidedBy", "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."),
+            ]),
+            collections.OrderedDict([
+                ("what", "Arbeitsprofil: Wortlaute und Hinweise aus dem UX-Review v0.2 (liegt ueber dem Sprachreview)."),
+                ("source", UX_REVIEW),
+                ("reason", "Am Stueck gelesen klangen die Fragen nach Fragebogen: dreimal 'wie haeufig', dreimal derselbe Satzbau. Das Review kuerzt und variiert, ohne das Konstrukt zu verschieben. Bei X01 bis X04 faellt der Fragekopf weg, weil er einmal ueber dem Block steht - sonst stuende viermal 'Wie wohl fuehlst du dich, wenn ...' untereinander."),
+                ("decidedBy", "Maria, 30.09.2026"),
             ]),
             collections.OrderedDict([
                 ("what", "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1."),

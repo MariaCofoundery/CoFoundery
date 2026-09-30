@@ -71,6 +71,25 @@ const review = readFileSync(
 ).replace(/\s+/g, " ");
 
 /**
+ * Und die dritte Schicht: das UX-Review.
+ *
+ * Das Arbeitsprofil ist am 30.09.2026 noch einmal ueberarbeitet worden - am
+ * Stueck gelesen klangen die Fragen nach Fragebogen. Seine Wortlaute stehen
+ * seitdem dort und nicht mehr im Sprachreview.
+ *
+ * Das Venture-Alignment ist ausdruecklich NICHT dabei: "Separat als UX-Flow
+ * ueberarbeiten. Nicht automatisch Master-Sprache 1:1 in die UI uebernehmen."
+ * Eine halbe Ueberarbeitung waere dort schlimmer als keine.
+ */
+const uxReview = readFileSync(
+  join(process.cwd(), "..", "docs", "ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md"),
+  "utf8",
+).replace(/\s+/g, " ");
+
+const quelleFuer = (scope: AssessmentScope) =>
+  scope === "founder_profile" ? uxReview : review;
+
+/**
  * Zurückgezogene Fragen werden nicht mehr überarbeitet.
  *
  * Die alte S01 steht noch in der Registratur, damit gespeicherte Antworten
@@ -83,9 +102,11 @@ const review = readFileSync(
  */
 const NOCH_NICHT_UEBERARBEITET = new Set<string>([]);
 
-test("jeder Fragetext steht so im Sprachreview", () => {
-  for (const item of alleItems()) {
+test("jeder Fragetext steht so in seinem Review", () => {
+  for (const scope of SCOPES) {
+  for (const item of getItemsV22(scope)) {
     if (NOCH_NICHT_UEBERARBEITET.has(item.itemId) || item.retired) continue;
+    const review = quelleFuer(scope);
     if (review.includes(item.prompt)) continue;
 
     // W02 bis W06 stehen im Dokument als zwei Bloecke: erst die Lage, dann die
@@ -95,9 +116,10 @@ test("jeder Fragetext steht so im Sprachreview", () => {
     for (const satz of item.prompt.split(/(?<=\.)\s+/)) {
       assert.ok(
         review.includes(satz.trim()),
-        `${item.itemId}: dieser Satz steht nicht im Sprachreview:\n${satz}`,
+        `${item.itemId}: dieser Satz steht in keinem Review:\n${satz}`,
       );
     }
+  }
   }
 });
 
@@ -133,7 +155,11 @@ test("jede Antwortmöglichkeit steht in einer der beiden Quellen - oder ist als 
 
   for (const item of alleItems()) {
     for (const option of item.options) {
-      if (flach.includes(option.label) || review.includes(option.label)) continue;
+      if (
+        flach.includes(option.label) ||
+        review.includes(option.label) ||
+        uxReview.includes(option.label)
+      ) continue;
       assert.ok(
         begruendet.includes(item.itemId),
         `${item.itemId}/${option.optionId}: „${option.label}“ steht weder in der Quelle ` +

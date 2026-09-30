@@ -1,0 +1,106 @@
+{
+  "screensId": "align-screens-profile-v0-2",
+  "scope": "founder_profile",
+  "source": "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md",
+  "createdAt": "2026-09-30",
+  "notes": [
+    "Die Reihenfolge und die Zuordnung der Fragen stammen aus dem UX-Review. Die internen Abschnittsnamen (A, I, E, T/D, X) erscheinen NICHT in der Oberflaeche - sie bleiben in der Registratur und sind dort weiter die Grundlage der Auswertung.",
+    "Sieben Schritte statt sechzehn Fragen. Der Fortschritt heisst 'Schritt 3 von 7' - '7 von 16 Fragen' liest sich wie eine Pruefung.",
+    "Bildschirm 7 erbt die gemeinsame Frage vom vorhergehenden: Das Dokument sagt dort nur 'Gemeinsame Skala wie Screen 6', die Fragen sind aber ebenfalls als Situationen ohne Frage formuliert."
+  ],
+  "intro": {
+    "title": "Wie arbeitest du als Founder?",
+    "paragraphs": [
+      "Schön, dass du da bist.",
+      "Nimm dir für die nächsten Fragen in Ruhe etwas Zeit und antworte möglichst so, wie es für dich im echten Alltag meistens passt – nicht so, wie es idealerweise sein sollte.",
+      "ALIGN besteht aus mehreren Teilen.",
+      "Im ersten Teil geht es um dich: Wie du Entscheidungen angehst, mit offenen Situationen umgehst und unterschiedliche Sichtweisen ansprichst.",
+      "Danach schauen wir auf dein konkretes Vorhaben und eure Zusammenarbeit.",
+      "Es gibt kein richtig oder falsch. Wenn du etwas gerade nicht einschätzen kannst, kannst du das einfach angeben."
+    ],
+    "cta": "Starten",
+    "duration": null
+  },
+  "screens": [
+    {
+      "step": 1,
+      "title": "Entscheidungen",
+      "transition": "Starten wir mit Entscheidungen.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "A01",
+        "A02"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Erfahrung & Bauchgefühl",
+      "transition": "Nicht jede Entscheidung lässt sich komplett ausrechnen.",
+      "subline": "Wie viel Raum gibst du deiner Erfahrung und deinem Gefühl?",
+      "groupPrompt": null,
+      "items": [
+        "I01",
+        "I02",
+        "I03"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Ausprobieren & Lernen",
+      "transition": "Und was machst du, wenn noch Informationen fehlen?",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "E01",
+        "E02",
+        "E03"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Einwände sichtbar machen",
+      "transition": "Nicht jede Uneinigkeit muss sofort ausdiskutiert werden. Uns interessiert eher, wann du sie sichtbar machst.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "T01",
+        "T02"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Widerspruch formulieren",
+      "transition": "Und wenn du widersprichst: Wie klingt das bei dir?",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "D01",
+        "D02"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Wenn noch nicht alles klar ist I",
+      "transition": "Zum Schluss geht es um Situationen, in denen noch nicht alles klar ist.",
+      "subline": null,
+      "groupPrompt": "Wie wohl fühlst du dich jeweils damit?",
+      "items": [
+        "X01",
+        "X02"
+      ]
+    },
+    {
+      "step": 7,
+      "title": "Wenn noch nicht alles klar ist II",
+      "transition": "Noch zwei Situationen.",
+      "subline": null,
+      "groupPrompt": "Wie wohl fühlst du dich jeweils damit?",
+      "items": [
+        "X03",
+        "X04"
+      ],
+      "groupPromptInherited": true
+    }
+  ]
+}

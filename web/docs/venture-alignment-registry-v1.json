@@ -7,6 +7,7 @@
   "createdAt": "2026-09-29",
   "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md",
   "editorialSource": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
+  "uxSource": null,
   "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person kann bei zwei Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.",
   "overallScore": false,
   "dimensionScores": false,
@@ -16,6 +17,12 @@
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
       "decidedBy": "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."
+    },
+    {
+      "what": "Arbeitsprofil: Wortlaute und Hinweise aus dem UX-Review v0.2 (liegt ueber dem Sprachreview).",
+      "source": "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md",
+      "reason": "Am Stueck gelesen klangen die Fragen nach Fragebogen: dreimal 'wie haeufig', dreimal derselbe Satzbau. Das Review kuerzt und variiert, ohne das Konstrukt zu verschieben. Bei X01 bis X04 faellt der Fragekopf weg, weil er einmal ueber dem Block steht - sonst stuende viermal 'Wie wohl fuehlst du dich, wenn ...' untereinander.",
+      "decidedBy": "Maria, 30.09.2026"
     },
     {
       "what": "Wortlaut, Hinweise und Auslassungsgruende je Item aus dem Sprachreview v0.1.",
