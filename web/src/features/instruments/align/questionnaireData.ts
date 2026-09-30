@@ -67,6 +67,8 @@ function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
   return {
     itemId: item.itemId,
     groupPrompt: item.groupPrompt ?? null,
+    unit: item.unit ?? null,
+    conditionHint: item.conditionHint ?? null,
     prompt: withPartner(item.prompt, partnerName),
     hint: item.hint,
     // Die Formate von v2.2 sind eine Teilmenge derer von v2.1 - das Feld kennt

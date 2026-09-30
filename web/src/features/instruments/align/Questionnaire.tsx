@@ -323,6 +323,16 @@ export function Questionnaire({
           />
         </div>
 
+        {wartendeAnschlussfragen(item.itemId) > 0 && (
+          <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            Wenn du hier etwas einträgst, kommen{" "}
+            {wartendeAnschlussfragen(item.itemId) === 1
+              ? "eine Anschlussfrage"
+              : `${wartendeAnschlussfragen(item.itemId)} Anschlussfragen`}{" "}
+            dazu. Ohne Eintrag gibt es dazu nichts zu fragen.
+          </p>
+        )}
+
         <div className="mt-3 flex items-center gap-3 text-xs">
           {state === "saving" && <span className="text-slate-500">Speichern …</span>}
           {state === "saved" && <span className="text-slate-500">Gespeichert</span>}
@@ -353,6 +363,26 @@ export function Questionnaire({
 
   const sichtbar = (item: SectionView["items"][number]) =>
     !item.basisItemId || basisEntries.length > 0;
+
+  /**
+   * Wie viele Anschlussfragen an dieser Frage hängen — und noch nicht da sind.
+   *
+   * ---------------------------------------------------------------------------
+   * EIN LEERER PLATZ ERKLÄRT SICH NICHT VON SELBST
+   * ---------------------------------------------------------------------------
+   *
+   * Gemeldet am 30.09.2026: „In der aktuellen gerenderten Fassung endet der
+   * Bereich nach L01." Das stimmt — und ist so gewollt: L02 fragt zu jeder
+   * einzelnen Grenze, und ohne Grenze gibt es nichts zu fragen.
+   *
+   * Nur weiß das niemand, der davorsitzt. Wer L01 leer lässt, sieht einen
+   * Abschnitt mit einer Frage und hält ihn für vollständig. Ein Satz dazu
+   * kostet nichts und nimmt den Verdacht, hier fehle etwas.
+   */
+  const wartendeAnschlussfragen = (itemId: string) =>
+    basisEntries.length > 0
+      ? 0
+      : allItems.filter((item) => item.basisItemId === itemId).length;
 
   // ---------------------------------------------------------------------------
   // DIE EINLEITUNG

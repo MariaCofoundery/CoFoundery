@@ -1004,7 +1004,9 @@
           "label": "möchte ich nicht angeben"
         }
       ],
-      "note": ""
+      "note": "",
+      "unit": "Stunden pro Woche",
+      "conditionHint": "Falls der Umfang schwankt: unter welchen Bedingungen? (freiwillig)"
     },
     {
       "itemId": "R02",
@@ -1465,7 +1467,8 @@
           "label": "möchte ich nicht angeben"
         }
       ],
-      "note": ""
+      "note": "",
+      "unit": "Monate laufender Ausgaben"
     },
     {
       "itemId": "B05",

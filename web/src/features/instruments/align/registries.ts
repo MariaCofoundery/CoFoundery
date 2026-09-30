@@ -131,6 +131,16 @@ export type RegistryItemV22 = {
    * sie unlesbar. `retired` heißt deshalb: im Bericht ja, im Fragebogen nein.
    */
   retired?: boolean;
+  /**
+   * Worin gezählt wird — bei `number_range`.
+   *
+   * Sie stand bis zum 30.09.2026 fest im Eingabefeld, weil es sie zuerst nur
+   * für eine Frage gab. Beim zweiten Item derselben Form war sie dann falsch,
+   * und zwar still: Ein Feld mit einer falschen Einheit sieht aus wie ein Feld.
+   */
+  unit?: string;
+  /** Der freiwillige Zusatz unter dem Zahlenfeld — auch er gehört ans Item. */
+  conditionHint?: string;
 };
 
 /**

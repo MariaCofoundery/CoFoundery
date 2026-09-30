@@ -430,7 +430,10 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
   }
 
   function NumberRange() {
-    const unit = "Stunden pro Woche";
+    // DIE EINHEIT KOMMT VOM ITEM. Sie stand hier fest, weil es diese Form
+    // zuerst nur fuer eine Frage gab - bei der zweiten stand dann "Stunden pro
+    // Woche" neben einer Frage nach einer finanziellen Reserve.
+    const unit = item.unit ?? "";
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
@@ -448,15 +451,19 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               })
             }
           />
-          <span className="text-sm text-slate-600">{unit}</span>
+          {unit && <span className="text-sm text-slate-600">{unit}</span>}
         </div>
-        <input
-          className={box}
-          placeholder="Falls der Umfang schwankt: unter welchen Bedingungen? (freiwillig)"
-          value={(value.condition as string) ?? ""}
-          disabled={disabled}
-          onChange={(event) => patch({ condition: event.target.value })}
-        />
+        {/* Auch der Zusatz gehoert ans Item: "Falls der Umfang schwankt" war
+            fuer die Stundenfrage geschrieben und stand bei der Geldfrage mit. */}
+        {item.conditionHint && (
+          <input
+            className={box}
+            placeholder={item.conditionHint}
+            value={(value.condition as string) ?? ""}
+            disabled={disabled}
+            onChange={(event) => patch({ condition: event.target.value })}
+          />
+        )}
       </div>
     );
   }

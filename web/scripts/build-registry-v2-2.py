@@ -296,6 +296,30 @@ SONDERFORMAT = {
 VALUE_CASE = {"W01", "W02", "W03", "W04", "W05", "W06"}
 
 # ---------------------------------------------------------------------------
+# WORIN GEZAEHLT WIRD
+# ---------------------------------------------------------------------------
+#
+# GEMELDET AM 30.09.2026: Bei B04 stand "Stunden pro Woche" neben dem
+# Zahlenfeld - bei einer Frage nach einer finanziellen Reserve. Die Einheit war
+# im Eingabefeld fest verdrahtet, weil es sie zuerst nur fuer R01 gab. Beim
+# zweiten Item derselben Form war sie dann falsch, und zwar still: Ein Feld mit
+# einer falschen Einheit sieht aus wie ein Feld.
+#
+# Die Einheit steht in der Master-Fassung - "Zahl/Bereich in Stunden pro Woche"
+# bei R01, "Monate laufender Ausgaben" bei B04 - und gehoert deshalb an das
+# Item und nicht in die Oberflaeche.
+EINHEIT = {
+    "R01": "Stunden pro Woche",
+    "B04": "Monate laufender Ausgaben",
+}
+
+# Der freiwillige Zusatz unter dem Zahlenfeld. Auch der war fuer R01
+# geschrieben ("Falls der Umfang schwankt") und stand bei B04 mit.
+BEDINGUNGSHINWEIS = {
+    "R01": "Falls der Umfang schwankt: unter welchen Bedingungen? (freiwillig)",
+}
+
+# ---------------------------------------------------------------------------
 # WO EIN "OPTIONSTEXT" IN WAHRHEIT EIN EINGABEFELD IST
 # ---------------------------------------------------------------------------
 #
@@ -687,6 +711,10 @@ for n, item_id in enumerate(reihenfolge, start=1):
         ("missing", it["missing"] or [dict(STANDARD_MISSING)]),
         ("note", it["note"] or ""),
     ])
+    if item_id in EINHEIT:
+        eintrag["unit"] = EINHEIT[item_id]
+    if item_id in BEDINGUNGSHINWEIS:
+        eintrag["conditionHint"] = BEDINGUNGSHINWEIS[item_id]
     if it.get("groupPrompt"):
         eintrag["groupPrompt"] = it["groupPrompt"]
     if it.get("shortLabel"):

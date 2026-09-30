@@ -27,6 +27,9 @@ export type OptionView = {
 
 export type ItemView = {
   itemId: string;
+  /** Worin gezählt wird — bei `number_range`. Ohne Angabe: keine Einheit. */
+  unit?: string | null;
+  conditionHint?: string | null;
   /**
    * Eine Frage über mehreren Items.
    *
