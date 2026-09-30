@@ -1,0 +1,170 @@
+{
+  "screensId": "align-screens-venture-v0-1",
+  "scope": "venture_alignment",
+  "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md",
+  "createdAt": "2026-09-30",
+  "notes": [
+    "Die Reihenfolge und die Zuordnung der Fragen stammen aus dem UX-Review. Die internen Abschnittsnamen erscheinen NICHT in der Oberflaeche - sie bleiben in der Registratur und sind dort weiter die Grundlage der Auswertung.",
+    "9 Schritte statt 42 Fragen. Der Fortschritt heisst 'Schritt 3 von 9' - '9 von 42 Fragen' liest sich wie eine Pruefung.",
+    "Anschlussfragen stehen bei ihrer Grundfrage: R05 nach R04 (Schritt 4); L02 nach L01 (Schritt 9); L03 nach L01 (Schritt 9). Die Dokumente fuehren sie nicht als eigenen Punkt auf.",
+    "Neun Schritte, obwohl das Review als Beispiel 'Schritt 2 von 8' nennt: Es zaehlt die Abschnitte 1, 1b, 2 bis 8 - acht Nummern, neun Abschnitte. Der Abschnitt 1b hat einen eigenen Uebergang, eine eigene Ueberschrift und eigene Fragen. Eine Anzeige 'Schritt 9 von 8' waere genau der Widerspruch, den Abschnitt 14 des Reviews abschafft."
+  ],
+  "intro": {
+    "title": "Was du aufbauen willst",
+    "paragraphs": [
+      "Jetzt geht es um dein konkretes Vorhaben.",
+      "Was möchtest du damit erreichen? Was kannst du realistisch einbringen? Und welche Erwartungen, Regeln oder Grenzen sind dir dabei wichtig?",
+      "Manche Dinge sind vielleicht schon ziemlich klar, andere noch nicht. Beides ist völlig okay. Gerade offene Punkte können später helfen, wichtige Gespräche sichtbar zu machen."
+    ],
+    "cta": "Weiter",
+    "duration": null
+  },
+  "nameQuestion": {
+    "title": "Wie heißt dein Vorhaben?",
+    "subline": "Ein Arbeitstitel reicht völlig.",
+    "placeholder": "z. B. Made2Found oder Projekt X",
+    "cta": "Weiter",
+    "skip": "Später"
+  },
+  "screens": [
+    {
+      "step": 1,
+      "label": "1",
+      "title": "Wie möchtest du zusammenarbeiten?",
+      "transition": "Wenn Verantwortlichkeiten klar verteilt sind: Wie viel Spielraum möchtest du in deinem Bereich haben?",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "U01",
+        "U03",
+        "U04",
+        "U05"
+      ]
+    },
+    {
+      "step": 2,
+      "label": "1b",
+      "title": "Wie viel Einblick möchtest du gegenseitig haben?",
+      "transition": "Gute Zusammenarbeit heißt nicht für alle dasselbe. Manche möchten früh eingebunden sein, andere lieber dann, wenn etwas konkreter wird.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "K01",
+        "K03",
+        "K04"
+      ]
+    },
+    {
+      "step": 3,
+      "label": "2",
+      "title": "Was soll daraus werden?",
+      "transition": "Menschen bauen Unternehmen aus ganz unterschiedlichen Gründen auf. Was ist dir bei diesem Vorhaben besonders wichtig?",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "S01a",
+        "S01b",
+        "S01c",
+        "S01d",
+        "S01e",
+        "S01f",
+        "S01_top",
+        "S02",
+        "S03",
+        "S04",
+        "S06"
+      ]
+    },
+    {
+      "step": 4,
+      "label": "3",
+      "title": "Was kannst du wirklich einbringen?",
+      "transition": "Jetzt wird es konkreter.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06"
+      ]
+    },
+    {
+      "step": 5,
+      "label": "4",
+      "title": "Wenn etwas nicht nach Plan läuft",
+      "transition": "Nicht jedes Vorhaben entwickelt sich so, wie man es am Anfang erwartet. Was wäre dir dann wichtig?",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "R09",
+        "R10",
+        "R12"
+      ]
+    },
+    {
+      "step": 6,
+      "label": "5",
+      "title": "Wie wollt ihr Entscheidungen treffen?",
+      "transition": "Unterschiede gehören dazu. Spannend wird es dann, wenn klar ist, wie ihr trotzdem zu einer Entscheidung kommt.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "G01",
+        "G04",
+        "G05"
+      ]
+    },
+    {
+      "step": 7,
+      "label": "6",
+      "title": "Geld, Risiko & Absicherung",
+      "transition": "Geld und persönliches Risiko können sehr unterschiedliche Grenzen haben. Hier geht es nicht darum, was „mutig“ oder „richtig“ ist – sondern darum, was für dich realistisch passt.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "B01",
+        "B04",
+        "B05"
+      ]
+    },
+    {
+      "step": 8,
+      "label": "7",
+      "title": "Wenn zwei Dinge gleichzeitig wichtig sind",
+      "transition": "Manchmal sind zwei Dinge gleichzeitig sinnvoll – aber sie ziehen in unterschiedliche Richtungen.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "W01",
+        "W02",
+        "W03",
+        "W04",
+        "W05",
+        "W06"
+      ]
+    },
+    {
+      "step": 9,
+      "label": "8",
+      "title": "Was für dich nicht infrage kommt",
+      "transition": "Zum Schluss geht es um persönliche Grenzen. Nicht alles muss verhandelbar sein.",
+      "subline": null,
+      "groupPrompt": null,
+      "items": [
+        "L01",
+        "L02",
+        "L03"
+      ]
+    }
+  ],
+  "closing": {
+    "title": "Geschafft.",
+    "text": "Schau noch einmal kurz über deine Angaben. Wenn alles für dich passt, kannst du diesen Teil abschließen.",
+    "cta": "Auswertung erstellen",
+    "ctaBusy": "Auswertung wird erstellt …",
+    "subline": "Mit dem Absenden schließt du diesen Durchgang ab."
+  }
+}

@@ -21,7 +21,7 @@
     "db:test": "node scripts/db-test.mjs",
     "export:rework": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/export-rework-template.ts",
     "export:questionnaire": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/export-questionnaire-v21.ts",
-    "build:screens": "cd .. && python3 web/scripts/build-screens-profile.py"
+    "build:screens": "cd .. && python3 web/scripts/build-screens.py"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

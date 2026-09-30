@@ -23,8 +23,9 @@ import { getRequestUser } from "@/lib/supabase/server";
 export default async function VentureAnswersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ venture?: string }>;
+  searchParams: Promise<{ venture?: string; erstellt?: string }>;
 }) {
+  const { erstellt } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/antworten")}`);
@@ -65,6 +66,38 @@ export default async function VentureAnswersPage({
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>
+      {/* ---------------------------------------------------------------
+          DER MOMENT NACH DEM ABSENDEN
+          ---------------------------------------------------------------
+
+          Gemeldet am 30.09.2026: Nach dem Absenden passierte nichts
+          Spuerbares. Hier liegt der laengste Teil hinter einem - und das darf
+          man sehen. Der Kasten steht nur beim ersten Mal da; wer die Seite
+          spaeter wieder aufruft, braucht keine Gratulation mehr. */}
+      {erstellt === "1" && (
+        <section className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
+          <h2 className="text-xl font-semibold text-slate-950">
+            Das steht jetzt für {venture.name ?? "dein Vorhaben"}.
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-700">
+            Unten siehst du deine Angaben — und oben auf einen Blick, wohin es gehen
+            soll. Wenn jemand dazukommt, lässt sich daraus ein Vergleich machen.
+          </p>
+          {/* EIN WEG UND NICHT ZWEI. Beim Arbeitsprofil steht hier "Weiter:
+              Was du aufbauen willst" - dort kommt noch ein Teil. Hier kommt
+              keiner mehr, und "Später" neben "Zur Übersicht" waere zweimal
+              derselbe Weg mit zwei Namen. */}
+          <div className="mt-4">
+            <Link
+              href="/dashboard"
+              className="inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+            >
+              Zur Übersicht
+            </Link>
+          </div>
+        </section>
+      )}
+
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
         {venture.name ?? "Ohne Namen"}
       </p>

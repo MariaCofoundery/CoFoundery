@@ -50,10 +50,15 @@ export default async function ProfileAnswersPage({
           die Seite spaeter wieder aufruft, braucht keine Gratulation mehr. */}
       {erstellt === "1" && (
         <section className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
-          <h2 className="text-xl font-semibold text-slate-950">Geschafft.</h2>
+          {/* NICHT NOCH EINMAL „Geschafft." - das stand eine Seite vorher
+              ueber dem Abgabeknopf. Zweimal dasselbe Wort klingt wie eine
+              Aufnahme, die haengt. */}
+          <h2 className="text-xl font-semibold text-slate-950">
+            Dein Arbeitsprofil steht.
+          </h2>
           <p className="mt-2 text-sm leading-7 text-slate-700">
-            Dein Arbeitsprofil steht. Unten siehst du, was du geantwortet hast — und
-            oben auf einen Blick, wie sich das verteilt.
+            Unten siehst du, was du geantwortet hast — und oben auf einen Blick, wie
+            sich das verteilt.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link

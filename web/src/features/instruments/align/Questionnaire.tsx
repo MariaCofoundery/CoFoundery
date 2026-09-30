@@ -7,6 +7,7 @@ import type { SectionView } from "@/features/instruments/v21/questionnaireDataV2
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import type { AnswerableItem } from "@/features/instruments/v21/answersV21";
 import { clearAnswer, saveAnswer, submitScope } from "@/features/instruments/align/answerActions";
+import { setVentureName } from "@/features/instruments/align/ventureActions";
 import {
   noteItemAnswered,
   noteItemSeen,
@@ -32,13 +33,21 @@ type Props = {
   initialAnswers: Record<string, DraftV21>;
   submitted: boolean;
   /**
-   * Sieben Bildschirme statt einer langen Liste.
+   * Schritte statt einer langen Liste.
    *
-   * Nur das Arbeitsprofil hat sie — das Venture-Alignment ist laut UX-Review
-   * ausdrücklich noch nicht durchgearbeitet, und eine halbe Überarbeitung
-   * wäre dort schlimmer als keine. Ohne diese Angabe bleibt alles, wie es war.
+   * Beide Bögen haben sie seit dem 30.09.2026 — das Arbeitsprofil sieben, das
+   * Venture-Alignment neun. Ohne diese Angabe bleibt die Abschnittsliste, wie
+   * sie war.
    */
-  screens?: ScreenSet | null;
+  screens: ScreenSet;
+  /**
+   * Wie das Vorhaben heißt — oder `null`, solange niemand es benannt hat.
+   *
+   * DIE FRAGE STEHT AUF DER STARTSEITE. „Wie heißt dein Vorhaben?" ist die
+   * erste Frage des zweiten Teils, nicht ein Feld in einem Verwaltungsbereich.
+   * Steht schon ein Name da, wird nicht gefragt.
+   */
+  ventureName?: string | null;
   /**
    * Wohin es nach dem Abgeben geht.
    *
@@ -73,8 +82,8 @@ type Props = {
  * sonst nichts. Keine Auswertung beim Ausfüllen, am Ende keine Zahl.
  */
 export function Questionnaire({
-  scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens = null,
-  afterSubmit = null,
+  scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens,
+  ventureName = null, afterSubmit = null,
 }: Props) {
   const [answers, setAnswers] = useState<Record<string, DraftV21>>(initialAnswers);
   const [states, setStates] = useState<Record<string, SaveState>>({});
@@ -105,8 +114,18 @@ export function Questionnaire({
    * die man jedes Mal aufschieben muss.
    */
   const [step, setStep] = useState(() =>
-    screens && Object.keys(initialAnswers).length === 0 ? 0 : 1,
+    Object.keys(initialAnswers).length === 0 ? 0 : 1,
   );
+
+  /**
+   * Der Arbeitstitel des Vorhabens.
+   *
+   * Er wird beim Weitergehen gespeichert und nicht mit einem eigenen
+   * Speicherknopf: Ein Feld, das man ausfüllt, und ein Knopf, der weitergeht,
+   * sind ein Schritt und nicht zwei.
+   */
+  const [name, setName] = useState(ventureName ?? "");
+  const [nameLaeuft, setNameLaeuft] = useState(false);
 
   const allItems = useMemo(() => sections.flatMap((section) => section.items), [sections]);
 
@@ -116,19 +135,6 @@ export function Questionnaire({
       ?.entries;
     return (entries ?? []).filter((entry) => entry.text.trim() !== "");
   }, [answers]);
-
-  const visible = useMemo(
-    () => allItems.filter((item) => !item.basisItemId || basisEntries.length > 0),
-    [allItems, basisEntries],
-  );
-
-  const answered = visible.filter((item) => {
-    const draft = answers[item.itemId];
-    return (
-      Boolean(draft?.missingCode) ||
-      completenessV21(item.itemId, draft?.value, answerable[item.itemId]) === "complete"
-    );
-  }).length;
 
   /**
    * Die Messung für den Pretest - und sie darf das Ausfüllen nicht stören.
@@ -218,6 +224,22 @@ export function Questionnaire({
   );
 
   /**
+   * Was am Ende dasteht.
+   *
+   * ---------------------------------------------------------------------------
+   * DER KNOPF HIESS IN BEIDEN BOEGEN „FOUNDER-PROFIL ERSTELLEN"
+   * ---------------------------------------------------------------------------
+   *
+   * Im zweiten Teil erstellt man aber kein Profil, sondern beschreibt ein
+   * Vorhaben — das UX-Review sagt es wörtlich: „Nicht: Founder-Profil
+   * erstellen". Die Beschriftung stand hier im Bauteil und galt damit für
+   * alles, was das Bauteil anzeigt. Jetzt steht sie im Review, wird von dort
+   * erzeugt, und `screens.ts` weist einen Bogen ab, dessen Knopf wieder so
+   * heißt.
+   */
+  const abschluss = screens.closing;
+
+  /**
    * Der Abgabeknopf - einmal geschrieben, von beiden Wegen benutzt.
    *
    * Er steht hinter der letzten Frage und nicht über der ersten: Abgeben ist
@@ -265,11 +287,11 @@ export function Questionnaire({
                 }
               }}
             >
-              {submitting ? "Profil wird erstellt…" : "Founder-Profil erstellen"}
+              {submitting ? abschluss.ctaBusy : abschluss.cta}
             </button>
-            <p className="mt-2 text-sm text-slate-600">
-              Mit dem Absenden schließt du diesen Durchgang ab.
-            </p>
+            {abschluss.subline && (
+              <p className="mt-2 text-sm text-slate-600">{abschluss.subline}</p>
+            )}
   
             {submitError && (
               <p role="alert" className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
@@ -365,6 +387,22 @@ export function Questionnaire({
     !item.basisItemId || basisEntries.length > 0;
 
   /**
+   * Die gemeinsame Frage — einmal über der Gruppe, nicht über jeder Frage.
+   *
+   * S01a bis S01f fragen dasselbe über je ein anderes Ziel. Die Frage sechsmal
+   * zu wiederholen wäre Lärm, sie weglassen ließe sechs Sätze ohne Frage
+   * stehen. Das UX-Review Teil 2: „Als gemeinsamer Block darstellen, nicht als
+   * sechs große unabhängige Fragekarten."
+   */
+  const gruppenfrageVor = (
+    reihe: SectionView["items"][number][],
+    index: number,
+  ): string | null => {
+    const frage = reihe[index]?.groupPrompt;
+    return frage && frage !== reihe[index - 1]?.groupPrompt ? frage : null;
+  };
+
+  /**
    * Wie viele Anschlussfragen an dieser Frage hängen — und noch nicht da sind.
    *
    * ---------------------------------------------------------------------------
@@ -387,7 +425,30 @@ export function Questionnaire({
   // ---------------------------------------------------------------------------
   // DIE EINLEITUNG
   // ---------------------------------------------------------------------------
-  if (screens && step === 0) {
+  if (step === 0) {
+    // Gefragt wird nur, wenn noch keiner dasteht. Wer sein Vorhaben schon
+    // benannt hat, soll nicht bei jedem Durchgang wieder danach gefragt
+    // werden - umbenennen geht im Kopf der Seite.
+    const namensfrage =
+      screens.nameQuestion && !ventureName && ventureId ? screens.nameQuestion : null;
+
+    const weiter = () => {
+      if (!namensfrage || !name.trim() || !ventureId) {
+        setStep(1);
+        return;
+      }
+      // OHNE NAMEN GEHT ES AUCH WEITER. Er ist eine Beschriftung und keine
+      // Bedingung: Ein fehlgeschlagener Schreibversuch darf niemanden vor
+      // dem Fragebogen stehen lassen, den er ausfuellen wollte.
+      setNameLaeuft(true);
+      void setVentureName(ventureId, name)
+        .catch(() => {})
+        .finally(() => {
+          setNameLaeuft(false);
+          setStep(1);
+        });
+    };
+
     return (
       <div className="max-w-2xl space-y-5">
         <h1 className="text-2xl font-semibold text-slate-900">{screens.intro.title}</h1>
@@ -398,107 +459,96 @@ export function Questionnaire({
         ))}
         {/* KEINE ZEITANGABE. Das UX-Review: erst im Pretest messen. Eine
             geratene Zahl waere ein Versprechen, das niemand geprueft hat. */}
-        <button
-          type="button"
-          onClick={() => setStep(1)}
-          className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white"
-        >
-          {screens.intro.cta}
-        </button>
-      </div>
-    );
-  }
 
-  // ---------------------------------------------------------------------------
-  // SIEBEN BILDSCHIRME
-  // ---------------------------------------------------------------------------
-  if (screens) {
-    const schirm = screens.screens.find((entry) => entry.step === step) ?? screens.screens[0];
-    const letzter = schirm.step === screens.screens.length;
-    const fragen = schirm.items
-      .map((itemId) => allItems.find((item) => item.itemId === itemId))
-      .filter((item): item is SectionView["items"][number] => item !== undefined)
-      .filter(sichtbar);
-
-    return (
-      <div className="max-w-2xl space-y-6">
-        <div>
-          {/* "Schritt 3 von 7" und nicht "7 von 16 Fragen" - das eine liest
-              sich wie ein Weg, das andere wie eine Pruefung. */}
-          <p className="text-sm text-slate-500">
-            Schritt {schirm.step} von {screens.screens.length}
-          </p>
-          <div className="mt-2 h-1 w-full rounded-full bg-slate-200">
-            <div
-              className="h-1 rounded-full bg-slate-900 transition-all"
-              style={{ width: `${(schirm.step / screens.screens.length) * 100}%` }}
-            />
+        {namensfrage && (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <label className="block text-base font-medium text-slate-900">
+              {namensfrage.title}
+              {namensfrage.subline && (
+                <span className="mt-1 block text-sm font-normal text-slate-600">
+                  {namensfrage.subline}
+                </span>
+              )}
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder={namensfrage.placeholder ?? undefined}
+                className="mt-3 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-slate-500"
+              />
+            </label>
           </div>
-        </div>
-
-        {schirm.transition && (
-          <p className="text-lg font-medium text-slate-900">{schirm.transition}</p>
-        )}
-        {schirm.subline && <p className="text-base text-slate-600">{schirm.subline}</p>}
-
-        {schirm.groupPrompt && (
-          <p className="text-base font-medium text-slate-900">{schirm.groupPrompt}</p>
         )}
 
-        <div className="space-y-5">
-          {fragen.map((item) => frageKarte(item, null))}
-        </div>
-
-        {missingAfterSubmit.length > 0 && (
-          <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Es fehlen noch {missingAfterSubmit.length} Antworten. Für jede Frage gibt es
-            auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts
-            hinschreiben, was du nicht meinst.
-          </p>
-        )}
-
-        <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
-          {schirm.step > 1 && (
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            disabled={nameLaeuft}
+            onClick={weiter}
+            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {namensfrage ? namensfrage.cta : screens.intro.cta}
+          </button>
+          {/* „Später" ist kein zweiter Weg, sondern derselbe ohne Namen -
+              deshalb ein Link und kein Knopf. */}
+          {namensfrage && (
             <button
               type="button"
-              onClick={() => setStep(schirm.step - 1)}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
+              onClick={() => setStep(1)}
+              className="text-sm text-slate-600 underline"
             >
-              Zurück
+              {namensfrage.skip}
             </button>
           )}
-          {!letzter && (
-            <button
-              type="button"
-              onClick={() => setStep(schirm.step + 1)}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-            >
-              Weiter
-            </button>
-          )}
-          {letzter && !isSubmitted && abgabeKnopf()}
         </div>
-
-        {letzter && isSubmitted && (
-          <p className="text-sm font-medium text-slate-900">
-            Abgegeben. Deine Antworten stehen in deinem Founder-Profil.
-          </p>
-        )}
       </div>
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // DIE SCHRITTE
+  // ---------------------------------------------------------------------------
+  const schirm = screens.screens.find((entry) => entry.step === step) ?? screens.screens[0];
+  const letzter = schirm.step === screens.screens.length;
+  const fragen = schirm.items
+    .map((itemId) => allItems.find((item) => item.itemId === itemId))
+    .filter((item): item is SectionView["items"][number] => item !== undefined)
+    .filter(sichtbar);
 
   return (
-    <div className="space-y-10">
-      <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 py-3 backdrop-blur">
-        <p className="text-sm text-slate-600">
-          {answered} von {visible.length} beantwortet
+    <div className="max-w-2xl space-y-6">
+      <div>
+        {/* "Schritt 3 von 7" und nicht "7 von 16 Fragen" - das eine liest
+            sich wie ein Weg, das andere wie eine Pruefung.
+
+            DAZU, WORUM ES GERADE GEHT. Gemeldet am 30.09.2026: "ich weiss
+            nicht, wo ich bin". Eine Schrittzahl allein sagt, wie weit man
+            ist, aber nicht, woran man sitzt. Klein und in einer Zeile mit dem
+            Zaehler - eine zweite Ueberschrift ueber dem Uebergang waere ein
+            zweiter Anfang. */}
+        <p className="text-sm text-slate-500">
+          Schritt {schirm.step} von {screens.screens.length}
+          <span className="text-slate-400"> · </span>
+          <span className="text-slate-600">{schirm.title}</span>
         </p>
-        {isSubmitted && (
-          <p className="mt-1 text-sm font-medium text-slate-900">
-            Abgegeben. Antworten lassen sich nicht mehr ändern.
-          </p>
-        )}
+        <div className="mt-2 h-1 w-full rounded-full bg-slate-200">
+          <div
+            className="h-1 rounded-full bg-slate-900 transition-all"
+            style={{ width: `${(schirm.step / screens.screens.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {schirm.transition && (
+        <p className="text-lg font-medium text-slate-900">{schirm.transition}</p>
+      )}
+      {schirm.subline && <p className="text-base text-slate-600">{schirm.subline}</p>}
+
+      {schirm.groupPrompt && (
+        <p className="text-base font-medium text-slate-900">{schirm.groupPrompt}</p>
+      )}
+
+      <div className="space-y-5">
+        {fragen.map((item, index) => frageKarte(item, gruppenfrageVor(fragen, index)))}
       </div>
 
       {missingAfterSubmit.length > 0 && (
@@ -509,104 +559,43 @@ export function Questionnaire({
         </p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p>
-          Unter jeder Frage stehen Antworten wie „kann ich noch nicht einschätzen“.
-          Das sind vollwertige Antworten, keine Notlösungen — es ist besser, sie zu
-          wählen, als etwas anzukreuzen, das du nicht meinst.
-        </p>
+      {/* DER MOMENT VOR DEM ABSENDEN. Vorher stand hier nur ein Knopf;
+          jetzt steht davor, was er tut - und dass man vorher noch einmal
+          schauen darf. */}
+      {letzter && !isSubmitted && (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <h2 className="text-xl font-semibold text-slate-950">{abschluss.title}</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-700">{abschluss.text}</p>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
+        {schirm.step > 1 && (
+          <button
+            type="button"
+            onClick={() => setStep(schirm.step - 1)}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
+          >
+            Zurück
+          </button>
+        )}
+        {!letzter && (
+          <button
+            type="button"
+            onClick={() => setStep(schirm.step + 1)}
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+          >
+            Weiter
+          </button>
+        )}
+        {letzter && !isSubmitted && abgabeKnopf()}
       </div>
 
-      {sections.map((section) => {
-        const shown = section.items.filter(
-          (item) => !item.basisItemId || basisEntries.length > 0,
-        );
-        if (shown.length === 0) return null;
-
-        return (
-          <section key={section.section} className="space-y-6">
-            <h2 className="text-lg font-semibold text-slate-900">{section.section}</h2>
-
-            {shown.map((item, index) => {
-              const draft = answers[item.itemId] ?? {};
-              const state = states[item.itemId] ?? "idle";
-              // EINMAL UEBER DER GRUPPE, NICHT SECHSMAL. S01a bis S01f fragen
-              // dasselbe ueber je ein anderes Ziel; die Frage sechsmal zu
-              // wiederholen waere Laerm, sie wegzulassen liesse sechs Saetze
-              // ohne Frage stehen.
-              const gruppenfrage =
-                item.groupPrompt && item.groupPrompt !== shown[index - 1]?.groupPrompt
-                  ? item.groupPrompt
-                  : null;
-              return (
-                <div
-                  key={item.itemId}
-                  data-item-id={item.itemId}
-                  className={[
-                    "rounded-xl border p-5",
-                    missingAfterSubmit.includes(item.itemId)
-                      ? "border-amber-300 bg-amber-50/40"
-                      : "border-slate-200 bg-white",
-                  ].join(" ")}
-                >
-                  {gruppenfrage && (
-                    <p className="mb-3 border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
-                      {gruppenfrage}
-                    </p>
-                  )}
-                  <p className="text-base text-slate-900">{item.prompt}</p>
-                  {item.hint && <p className="mt-1 text-sm text-slate-500">{item.hint}</p>}
-
-                  <div className="mt-4">
-                    <AnswerFieldV21
-                      item={item}
-                      draft={draft}
-                      basisEntries={basisEntries}
-                      disabled={isSubmitted}
-                      onChange={(next) => {
-                        setAnswers((current) => ({ ...current, [item.itemId]: next }));
-                        persist(item.itemId, next);
-                      }}
-                    />
-                  </div>
-
-                  <div className="mt-3 flex items-center gap-3 text-xs">
-                    {state === "saving" && <span className="text-slate-500">Speichern …</span>}
-                    {state === "saved" && <span className="text-slate-500">Gespeichert</span>}
-                    {state === "incomplete" && (
-                      <span className="text-slate-400">noch nicht vollständig</span>
-                    )}
-                    {state === "error" && (
-                      <span className="text-rose-700">
-                        {errorText(errors[item.itemId])}{" "}
-                        {/* WIEDERHOLEN NUR, WO WIEDERHOLEN HELFEN KANN.
-                            Gemeldet am 30.09.2026: "Erneut versuchen" stand
-                            da, half aber nicht - die Ursache lag in der
-                            Datenbank und nicht in der Leitung. Ein Knopf, der
-                            nie Erfolg haben kann, laesst jemanden zehnmal
-                            klicken und dann glauben, er habe etwas falsch
-                            gemacht. */}
-                        {kannWiederholen(errors[item.itemId]) && (
-                          <button
-                            type="button"
-                            className="underline"
-                            onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
-                          >
-                            Erneut versuchen
-                          </button>
-                        )}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </section>
-        );
-      })}
-
-      {!isSubmitted && (
-        <div className="border-t border-slate-200 pt-6">{abgabeKnopf()}</div>
+      {letzter && isSubmitted && (
+        <p className="text-sm font-medium text-slate-900">
+          Abgegeben. Deine Antworten stehen{" "}
+          {scope === "founder_profile" ? "in deinem Founder-Profil" : "bei diesem Vorhaben"}.
+        </p>
       )}
     </div>
   );

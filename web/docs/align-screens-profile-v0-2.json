@@ -4,9 +4,10 @@
   "source": "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md",
   "createdAt": "2026-09-30",
   "notes": [
-    "Die Reihenfolge und die Zuordnung der Fragen stammen aus dem UX-Review. Die internen Abschnittsnamen (A, I, E, T/D, X) erscheinen NICHT in der Oberflaeche - sie bleiben in der Registratur und sind dort weiter die Grundlage der Auswertung.",
-    "Sieben Schritte statt sechzehn Fragen. Der Fortschritt heisst 'Schritt 3 von 7' - '7 von 16 Fragen' liest sich wie eine Pruefung.",
-    "Bildschirm 7 erbt die gemeinsame Frage vom vorhergehenden: Das Dokument sagt dort nur 'Gemeinsame Skala wie Screen 6', die Fragen sind aber ebenfalls als Situationen ohne Frage formuliert."
+    "Die Reihenfolge und die Zuordnung der Fragen stammen aus dem UX-Review. Die internen Abschnittsnamen erscheinen NICHT in der Oberflaeche - sie bleiben in der Registratur und sind dort weiter die Grundlage der Auswertung.",
+    "7 Schritte statt 16 Fragen. Der Fortschritt heisst 'Schritt 3 von 7' - '7 von 16 Fragen' liest sich wie eine Pruefung.",
+    "Bildschirm 7 erbt die gemeinsame Frage vom vorhergehenden: Das Dokument sagt dort nur 'Gemeinsame Skala wie Screen 6', die Fragen sind aber ebenfalls als Situationen ohne Frage formuliert.",
+    "Ueberschriften ohne Frage, uebergangen: WICHTIG: keine Textfelder bei D01."
   ],
   "intro": {
     "title": "Wie arbeitest du als Founder?",
@@ -21,9 +22,11 @@
     "cta": "Starten",
     "duration": null
   },
+  "nameQuestion": null,
   "screens": [
     {
       "step": 1,
+      "label": "1",
       "title": "Entscheidungen",
       "transition": "Starten wir mit Entscheidungen.",
       "subline": null,
@@ -35,6 +38,7 @@
     },
     {
       "step": 2,
+      "label": "2",
       "title": "Erfahrung & Bauchgefühl",
       "transition": "Nicht jede Entscheidung lässt sich komplett ausrechnen.",
       "subline": "Wie viel Raum gibst du deiner Erfahrung und deinem Gefühl?",
@@ -47,6 +51,7 @@
     },
     {
       "step": 3,
+      "label": "3",
       "title": "Ausprobieren & Lernen",
       "transition": "Und was machst du, wenn noch Informationen fehlen?",
       "subline": null,
@@ -59,6 +64,7 @@
     },
     {
       "step": 4,
+      "label": "4",
       "title": "Einwände sichtbar machen",
       "transition": "Nicht jede Uneinigkeit muss sofort ausdiskutiert werden. Uns interessiert eher, wann du sie sichtbar machst.",
       "subline": null,
@@ -70,6 +76,7 @@
     },
     {
       "step": 5,
+      "label": "5",
       "title": "Widerspruch formulieren",
       "transition": "Und wenn du widersprichst: Wie klingt das bei dir?",
       "subline": null,
@@ -81,6 +88,7 @@
     },
     {
       "step": 6,
+      "label": "6",
       "title": "Wenn noch nicht alles klar ist I",
       "transition": "Zum Schluss geht es um Situationen, in denen noch nicht alles klar ist.",
       "subline": null,
@@ -92,6 +100,7 @@
     },
     {
       "step": 7,
+      "label": "7",
       "title": "Wenn noch nicht alles klar ist II",
       "transition": "Noch zwei Situationen.",
       "subline": null,
@@ -102,5 +111,12 @@
       ],
       "groupPromptInherited": true
     }
-  ]
+  ],
+  "closing": {
+    "title": "Geschafft.",
+    "text": "Schau noch einmal kurz über deine Antworten. Wenn alles für dich passt, kannst du diesen Teil abschließen und dein Founder-Profil erstellen.",
+    "cta": "Founder-Profil erstellen",
+    "ctaBusy": "Profil wird erstellt …",
+    "subline": "Mit dem Absenden schließt du diesen Durchgang ab."
+  }
 }

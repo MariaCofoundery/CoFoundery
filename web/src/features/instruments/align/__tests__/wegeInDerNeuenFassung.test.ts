@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { screenSet } from "@/features/instruments/align/screens";
+import { getItemV22 } from "@/features/instruments/align/registries";
+
 const WURZEL = join("src", "app", "(product)", "founder-alignment");
 
 /** Alle Seiten der neuen Fassung - ohne die archivierte Testfassung. */
@@ -96,9 +99,16 @@ test("der zweite Bereich heißt überall gleich", () => {
   for (const datei of [
     join("src", "features", "instruments", "align", "AlignNav.tsx"),
     join("src", "features", "instruments", "align", "AlignCard.tsx"),
-    join("src", "app", "(product)", "founder-alignment", "vorhaben", "page.tsx"),
   ]) {
     const text = readFileSync(datei, "utf8");
     assert.match(text, /Was du aufbauen willst/, datei);
   }
+
+  // Auf der Seite selbst steht der Name nicht mehr von Hand: Er ist die
+  // Überschrift der Startseite des Fragebogens und kommt aus dem UX-Review.
+  // Zwei Überschriften übereinander wären zwei Anfänge.
+  assert.equal(
+    screenSet("venture_alignment", (itemId) => Boolean(getItemV22(itemId))).intro.title,
+    "Was du aufbauen willst",
+  );
 });

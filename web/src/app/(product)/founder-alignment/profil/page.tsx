@@ -66,7 +66,7 @@ export default async function FounderProfilePage() {
       <div className="mt-6">
         <Questionnaire
           scope="founder_profile"
-          screens={screenSet((itemId) => Boolean(getItemV22(itemId)))}
+          screens={screenSet("founder_profile", (itemId: string) => Boolean(getItemV22(itemId)))}
           afterSubmit="/founder-alignment/profil/antworten?erstellt=1"
           sections={buildSections("founder_profile")}
           answerable={answerable}

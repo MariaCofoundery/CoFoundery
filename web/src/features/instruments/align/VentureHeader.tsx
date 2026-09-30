@@ -27,7 +27,15 @@ export function VentureHeader({
   needsConfirmation: boolean;
 }) {
   const [name, setName] = useState(venture.name ?? "");
-  const [open, setOpen] = useState(!venture.name);
+  /**
+   * Zu ist der Normalfall.
+   *
+   * GEFRAGT WIRD AUF DER STARTSEITE. Solange die Frage nach dem Namen hier
+   * stand, ging sie im Kopf der Seite unter - und sie stand offen, sobald
+   * kein Name da war, also auch mitten im Ausfüllen. Sie ist jetzt der erste
+   * Schritt des Fragebogens; hier bleibt der Weg zum Umbenennen.
+   */
+  const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
   const router = useRouter();
 
