@@ -279,32 +279,29 @@ export function ProductShell({
       // Align hatte als einziger Bereich keine eigene Navigation. Beide Seiten
       // waren nur vom Dashboard aus erreichbar - wer woanders stand, musste
       // erst dorthin zurueck.
+      // ---------------------------------------------------------------------
+      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE
+      // ---------------------------------------------------------------------
+      //
+      // Vorher stand "Verbindungen" vorn. Man faengt aber bei sich selbst an:
+      // erst das eigene Bild, dann der Test, dann die anderen, dann das
+      // Nachlesen. Wer die Reihe von links nach rechts liest, liest damit die
+      // Reihenfolge, in der die Sachen im Leben vorkommen.
       subItems:
         resolvedActiveView === "advisor"
           ? undefined
           : [
-              {
-                href: "/connections",
-                label: t("alignConnections"),
-                isActive: (currentPathname: string) =>
-                  currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
-              },
               ...(hasFounder
                 ? [
-                    // GEMELDET AM 21.09.2026: Der eigene Report war nur ueber
-                    // zwei Statuskarten auf dem Dashboard erreichbar, und die
-                    // heissen nach dem Schritt ("Werte"), nicht nach dem
-                    // Ergebnis. Hier steht er beim Namen und von jeder
-                    // Align-Seite aus.
+                    // GEAENDERT AM 22.09.2026: Hier stand `/me/report`.
+                    // Marias Beobachtung nach dem ersten Blick auf das
+                    // Founderprofil: "Das gehoert oben in die Leiste statt
+                    // mein Report, da ist ja auch der Report im Prinzip
+                    // drin." Stimmt - das Gesamtbild zeigt denselben
+                    // Selbstbericht und daneben, was sonst noch da ist. Zwei
+                    // Eintraege fuer dasselbe Ergebnis waeren zwei Orte, an
+                    // denen man nachsieht.
                     {
-                      // GEAENDERT AM 22.09.2026: Hier stand `/me/report`.
-                      // Marias Beobachtung nach dem ersten Blick auf das
-                      // Founderprofil: "Das gehoert oben in die Leiste statt
-                      // mein Report, da ist ja auch der Report im Prinzip
-                      // drin." Stimmt - das Gesamtbild zeigt denselben
-                      // Selbstbericht und daneben, was sonst noch da ist. Zwei
-                      // Eintraege fuer dasselbe Ergebnis waeren zwei Orte, an
-                      // denen man nachsieht.
                       href: "/me/profile",
                       label: t("alignOwnProfile"),
                       isActive: (currentPathname: string) =>
@@ -320,6 +317,16 @@ export function ProductShell({
                       isActive: (currentPathname: string) =>
                         currentPathname.startsWith("/founder-alignment"),
                     },
+                  ]
+                : []),
+              {
+                href: "/connections",
+                label: t("alignConnections"),
+                isActive: (currentPathname: string) =>
+                  currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
+              },
+              ...(hasFounder
+                ? [
                     {
                       href: "/founder-library",
                       label: t("alignLibrary"),
