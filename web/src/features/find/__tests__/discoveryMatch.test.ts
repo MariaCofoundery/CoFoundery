@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import {
   DISCOVERY_THEMES,
@@ -47,6 +49,56 @@ test("sechs Themen, und jede Frage des Bogens steht in genau einem", () => {
     [...zugeordnet].sort(),
     offeredItemsV22("founder_profile").map((item) => item.itemId).sort(),
   );
+});
+
+test("die Kopie in der Datenbank stimmt mit der Zuordnung im Code überein", () => {
+  // ---------------------------------------------------------------------------
+  // WARUM ES EINE KOPIE GIBT
+  // ---------------------------------------------------------------------------
+  //
+  // `discovery_theme_distances` darf die Gruppierung nicht vom Aufrufer
+  // entgegennehmen: Wer sie bestimmen kann, fragt je Frage ein eigenes „Thema"
+  // ab und bekommt damit doch die einzelnen Abstände - und daraus die
+  // Antworten der anderen Person. Also steht sie in einer Tabelle.
+  //
+  // Eine Kopie veraltet. Dieser Test ist der Grund, warum sie es nicht tut.
+  const sql = readFileSync(
+    join("..", "supabase", "migrations", "20261086120000_discovery_theme_distances.sql"),
+    "utf8",
+  );
+  const start = sql.indexOf("insert into public.discovery_theme_items");
+  assert.ok(start > 0, "die Zuordnung steht nicht in der Migration");
+  const block = sql.slice(start, sql.indexOf("on conflict", start));
+
+  const inDatenbank = new Map<string, { themeId: string; steps: number; outside: string[] }>();
+  for (const match of block.matchAll(
+    /\('founder-profile-v1','([A-Z][0-9]{2})','([a-z_]+)',([0-9]+),'\{([^}]*)\}'\)/g,
+  )) {
+    inDatenbank.set(match[1], {
+      themeId: match[2],
+      steps: Number(match[3]),
+      outside: match[4] ? match[4].split(",") : [],
+    });
+  }
+
+  const imCode = new Map<string, { themeId: string; steps: number; outside: string[] }>();
+  for (const entry of DISCOVERY_THEMES) {
+    for (const item of entry.items) {
+      // Nur die Fragen, aus denen eine Zahl wird - D01 und T02 stehen nicht in
+      // der Tabelle, weil sie keinen Abstand erzeugen.
+      if (!item.numeric) continue;
+      imCode.set(item.itemId, {
+        themeId: entry.themeId,
+        steps: stepsOf(item),
+        outside: [...item.outsideSequence],
+      });
+    }
+  }
+
+  assert.deepEqual([...inDatenbank.keys()].sort(), [...imCode.keys()].sort());
+  for (const [itemId, erwartet] of imCode) {
+    assert.deepEqual(inDatenbank.get(itemId), erwartet, itemId);
+  }
 });
 
 test("D01 und T02 gehören zum Thema, erzeugen aber keine Zahl", () => {

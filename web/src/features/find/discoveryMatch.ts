@@ -162,12 +162,24 @@ export type ThemeResult = {
  *
  * Gerichtet: Der Wunsch kommt von `self`, die Abstände sind symmetrisch.
  */
-export function themeFit(
-  theme: DiscoveryTheme,
-  preference: ThemePreference,
-  self: Answers,
-  other: Answers,
-): ThemeResult {
+/**
+ * Der mittlere Abstand eines Themas — schon ausgerechnet.
+ *
+ * Zwei Wege führen hierher, und sie müssen dasselbe Urteil ergeben: aus
+ * beiden Antwortsätzen im Speicher (`themeFit`) oder aus der Datenbank, wenn
+ * die andere Person ihre Antworten nicht herausgeben darf
+ * (`discovery_theme_distances`). Gerechnet wird deshalb nur einmal — hier
+ * darunter.
+ */
+export type ThemeDistance = {
+  themeId: string;
+  comparable: number;
+  of: number;
+  meanDistance: number | null;
+};
+
+/** Der Abstand eines Themas aus zwei Antwortsätzen. */
+export function themeDistance(theme: DiscoveryTheme, self: Answers, other: Answers): ThemeDistance {
   const numeric = theme.items.filter((item) => item.numeric);
   const distances: number[] = [];
 
@@ -180,21 +192,42 @@ export function themeFit(
     distances.push(itemDistance(a, b, stepsOf(item)));
   }
 
-  const base = {
+  return {
     themeId: theme.themeId,
-    direction: preference.direction,
-    importance: preference.importance,
     comparable: distances.length,
     of: numeric.length,
+    meanDistance: distances.length
+      ? distances.reduce((sum, value) => sum + value, 0) / distances.length
+      : null,
+  };
+}
+
+/**
+ * Das Urteil zu einem Thema — aus Abstand und Wunsch.
+ *
+ * DIE EINZIGE STELLE, AN DER GEURTEILT WIRD. Wo die Abstände herkommen, ist
+ * ihr gleich.
+ */
+export function judgeTheme(preference: ThemePreference, distances: ThemeDistance): ThemeResult {
+  const base = {
+    themeId: distances.themeId,
+    direction: preference.direction,
+    importance: preference.importance,
+    comparable: distances.comparable,
+    of: distances.of,
   };
 
   // MINDESTABDECKUNG. Ein Thema aus vier Fragen, von denen eine vergleichbar
   // ist, ergibt eine Zahl - aber keine, auf die man jemanden ansprechen will.
-  if (numeric.length === 0 || distances.length / numeric.length < MIN_COVERAGE) {
+  if (
+    distances.of === 0 ||
+    distances.meanDistance === null ||
+    distances.comparable / distances.of < MIN_COVERAGE
+  ) {
     return { ...base, verdict: "insufficient_data", fit: null, distance: null };
   }
 
-  const distance = distances.reduce((sum, value) => sum + value, 0) / distances.length;
+  const distance = distances.meanDistance;
   const fit =
     preference.direction === "similar"
       ? fitSimilar(distance)
@@ -203,6 +236,15 @@ export function themeFit(
         : null;
 
   return { ...base, verdict: verdictOf(preference, fit, distance), fit, distance };
+}
+
+export function themeFit(
+  theme: DiscoveryTheme,
+  preference: ThemePreference,
+  self: Answers,
+  other: Answers,
+): ThemeResult {
+  return judgeTheme(preference, themeDistance(theme, self, other));
 }
 
 function verdictOf(
@@ -244,23 +286,50 @@ export type DirectedMatch = {
   weightedThemes: number;
 };
 
+/** Kein Wunsch ist nicht dasselbe wie „egal“ — aber es rechnet sich gleich. */
+const OHNE_WUNSCH = (themeId: string): ThemePreference => ({
+  themeId,
+  direction: "neutral",
+  importance: 0,
+});
+
 export function directedMatch(
   preferences: readonly ThemePreference[],
   self: Answers,
   other: Answers,
 ): DirectedMatch {
-  const byTheme = new Map(preferences.map((entry) => [entry.themeId, entry]));
+  return judgeAll(
+    preferences,
+    DISCOVERY_THEMES.map((theme) => themeDistance(theme, self, other)),
+  );
+}
 
+/**
+ * Dasselbe Urteil, wenn die Abstände aus der Datenbank kommen.
+ *
+ * Die Suche darf die Antworten der anderen Person nicht lesen — die Freigabe
+ * von Antworten läuft über `alignment_shares` und ist eine ausdrückliche
+ * Entscheidung. `discovery_theme_distances` sieht beide Seiten und gibt je
+ * Thema nur drei Zahlen heraus; geurteilt wird hier, mit denselben Regeln.
+ */
+export function judgeAll(
+  preferences: readonly ThemePreference[],
+  distances: readonly ThemeDistance[],
+): DirectedMatch {
+  const byTheme = new Map(preferences.map((entry) => [entry.themeId, entry]));
+  const byDistance = new Map(distances.map((entry) => [entry.themeId, entry]));
+
+  // Die Reihenfolge kommt aus der Themenliste und nicht aus der Datenbank:
+  // Ein Thema, zu dem nichts zurückkam, fehlt sonst stillschweigend.
   const themes = DISCOVERY_THEMES.map((theme) =>
-    themeFit(
-      theme,
-      byTheme.get(theme.themeId) ?? {
+    judgeTheme(
+      byTheme.get(theme.themeId) ?? OHNE_WUNSCH(theme.themeId),
+      byDistance.get(theme.themeId) ?? {
         themeId: theme.themeId,
-        direction: "neutral",
-        importance: 0,
+        comparable: 0,
+        of: theme.items.filter((item) => item.numeric).length,
+        meanDistance: null,
       },
-      self,
-      other,
     ),
   );
 
