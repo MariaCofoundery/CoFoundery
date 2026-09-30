@@ -442,8 +442,8 @@
     }
   },
   "profile": {
-    "title": "Dein Co-Founder-Suchprofil",
-    "subtitle": "So sehen dich Menschen, die mit dir gründen könnten. Du entscheidest, wann es sichtbar wird – und kannst es jederzeit wieder pausieren.",
+    "title": "Dein FIND-Profil",
+    "subtitle": "So sehen dich Menschen, die mit dir gründen könnten. Wonach DU suchst, steht in „Deine Suche“ und bleibt privat.",
     "status": {
       "eyebrow": "Status",
       "activeHint": "Eingeloggte Mitglieder können dein Profil in der Co-Founder-Suche finden.",
@@ -482,7 +482,7 @@
     },
     "publicProfile": {
       "eyebrow": "Öffentliches Suchprofil",
-      "title": "Was andere sehen dürfen",
+      "title": "So sehen dich andere",
       "description": "Diese Angaben werden erst sichtbar, wenn du dein Profil veröffentlichst.",
       "displayName": "Anzeigename",
       "displayNamePlaceholder": "z. B. Sascha",
@@ -551,16 +551,16 @@
       }
     },
     "brings": {
-      "title": "Was du mitbringst",
-      "description": "Deine Rollen und der zeitliche Rahmen, den du aktuell wirklich halten kannst."
+      "title": "Das bringst du mit",
+      "description": "Deine Rollen — höchstens drei, damit erkennbar bleibt, wofür du stehst."
     },
     "seeking": {
-      "title": "Wen du suchst",
+      "title": "Das suchst du",
       "description": "Diese Rollen stehen in deinem sichtbaren Profil. Deine Filter für die Ergebnisliste sind etwas anderes und bleiben privat."
     },
     "venture": {
-      "eyebrow": "Deine Gründungsrichtung",
-      "title": "Wie du gründen willst",
+      "eyebrow": "Dein aktueller Rahmen",
+      "title": "Wie viel Zeit, wie weit, wohin",
       "description": "Drei Angaben, an denen andere sehen, ob Tempo, Anspruch und Zeitpunkt passen. Es geht nicht darum, wie ernst du es meinst, sondern was aktuell realistisch ist. Fahr über eine Antwort, dann steht da, was sie bedeutet.",
       "commitment": "Wie viel Platz hat Gründen gerade in deinem Leben?",
       "stage": "Wie weit ist deine Idee?",

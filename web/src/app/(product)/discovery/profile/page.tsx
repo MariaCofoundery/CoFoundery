@@ -582,6 +582,31 @@ export default async function DiscoveryProfilePage({
                       }}
                     />
                   </div>
+                </div>
+              </div>
+
+              <div className={INNER_SECTION_CLASS}>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    {t("profile.venture.eyebrow")}
+                  </p>
+                  <h2 className="mt-2 text-xl font-semibold text-slate-950">
+                    {t("profile.venture.title")}
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {t("profile.venture.description")}
+                  </p>
+
+                  {/* -----------------------------------------------------
+                      DIE ZEIT GEHOERT ZUM RAHMEN, NICHT ZU DEN FAEHIGKEITEN
+                      -----------------------------------------------------
+
+                      Die Wochenstunden standen unter "Was du mitbringst" -
+                      zwischen den Rollen. Damit las sich der Zeitrahmen wie
+                      eine Faehigkeit. Die FIND-Spec, Abschnitt 19, trennt
+                      beides: "Das bringst du mit" sind Rollen und
+                      Faehigkeiten, "Dein aktueller Rahmen" sind Stunden,
+                      Ort, Start und Gruendungsstatus. */}
                   <label>
                     <span className={LABEL_CLASS}>{t("profile.publicProfile.availabilityV2")}</span>
                     {/* Die Einheit gehoert ans Feld, nicht in die Frage allein:
@@ -633,20 +658,6 @@ export default async function DiscoveryProfilePage({
                       }}
                     />
                   </fieldset>
-                </div>
-              </div>
-
-              <div className={INNER_SECTION_CLASS}>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    {t("profile.venture.eyebrow")}
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold text-slate-950">
-                    {t("profile.venture.title")}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {t("profile.venture.description")}
-                  </p>
                 </div>
 
                 {/* Untereinander statt in drei Spalten: Die Antworten sind

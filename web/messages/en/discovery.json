@@ -442,8 +442,8 @@
     }
   },
   "profile": {
-    "title": "Your co-founder search profile",
-    "subtitle": "This is how people who might found with you will see you. You decide when it becomes visible – and can pause it again at any time.",
+    "title": "Your FIND profile",
+    "subtitle": "This is how people who might found with you see you. What YOU are looking for lives in “Your search” and stays private.",
     "status": {
       "eyebrow": "Status",
       "activeHint": "Signed-in members can find your profile in the co-founder search.",
@@ -482,7 +482,7 @@
     },
     "publicProfile": {
       "eyebrow": "Public search profile",
-      "title": "What others may see",
+      "title": "How others see you",
       "description": "These details only become visible once you publish your profile.",
       "displayName": "Display name",
       "displayNamePlaceholder": "e.g. Sascha",
@@ -552,15 +552,15 @@
     },
     "brings": {
       "title": "What you bring",
-      "description": "Your roles and the amount of time you can actually keep to right now."
+      "description": "Your roles — at most three, so it stays clear what you stand for."
     },
     "seeking": {
-      "title": "Who you are looking for",
+      "title": "What you are looking for",
       "description": "These roles appear in your visible profile. Your filters for the result list are something else and stay private."
     },
     "venture": {
-      "eyebrow": "Your founding direction",
-      "title": "How you want to found",
+      "eyebrow": "Your current frame",
+      "title": "How much time, how far, where to",
       "description": "Three entries that let others see whether pace, ambition and timing fit. This is not about how seriously you mean it, but about what is realistic right now. Hover over an answer to see what it means.",
       "commitment": "How much room does founding have in your life right now?",
       "stage": "How far along is your idea?",

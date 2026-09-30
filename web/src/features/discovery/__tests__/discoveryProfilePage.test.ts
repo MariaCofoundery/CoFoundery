@@ -826,3 +826,34 @@ test("a foreign profile never speaks in the first person", () => {
   const page = source(PAGE.replace("profile/page.tsx", "[profileId]/page.tsx"));
   assert.match(page, /isOwner \? \([\s\S]{0,160}detail\.editOwn/);
 });
+
+// ---------------------------------------------------------------------------
+// Vier Abschnitte, jeder mit einer Aufgabe (FIND-Spec, Abschnitt 19)
+// ---------------------------------------------------------------------------
+test("die Zeit gehört zum Rahmen, nicht zu den Fähigkeiten", () => {
+  // Die Wochenstunden standen unter „Was du mitbringst" - zwischen den
+  // Rollen. Damit las sich der Zeitrahmen wie eine Fähigkeit.
+  const page = source(PAGE);
+  const brings = page.indexOf('t("profile.brings.title")');
+  const rahmen = page.indexOf('t("profile.venture.eyebrow")');
+  const stunden = page.indexOf('name="availabilityHoursPerWeek"');
+  assert.ok(brings > 0 && rahmen > brings, "die Abschnitte stehen nicht in dieser Reihenfolge");
+  assert.ok(stunden > rahmen, "die Stunden stehen noch bei den Fähigkeiten");
+
+  // Und die Flexibilität bleibt bei der Stundenzahl: Sie sagt erst zusammen
+  // mit ihr, was sie bedeutet.
+  const flex = page.indexOf('t("profile.publicProfile.availabilityFlexTitle")');
+  assert.ok(flex > stunden && flex - stunden < 3000, "die Nachfrage steht nicht bei der Zahl");
+});
+
+test("die Seite sagt, dass sie das Öffentliche zeigt", () => {
+  // Sie hieß „Dein Co-Founder-Suchprofil" und mischte damit zwei Dinge: was
+  // andere sehen und wonach man sucht. Das zweite steht seit dem 30.09.2026
+  // in „Deine Suche".
+  for (const locale of ["de", "en"]) {
+    const profile = JSON.parse(readFileSync(`messages/${locale}/discovery.json`, "utf8"))
+      .profile as Record<string, { title?: string } | string>;
+    assert.match(String((profile.publicProfile as { title: string }).title), /sehen|see/i);
+    assert.match(String(profile.subtitle), /Deine Suche|Your search/);
+  }
+});
