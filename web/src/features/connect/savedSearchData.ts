@@ -9,7 +9,14 @@ export type SavedSearch = SavedSearchCriteria & {
   context: "connect" | "discovery";
   label: string;
   notify: boolean;
-  alignmentDimensions: string[];
+  /**
+   * Die Matching-Präferenzen zum Zeitpunkt des Speicherns.
+   *
+   * Aufzeichnung, kein Filter: Um zu prüfen, ob eine Arbeitsweise passt,
+   * braucht es die Antworten BEIDER Personen — und wer gerade erst ein Profil
+   * veröffentlicht, hat den Bogen oft nicht ausgefüllt.
+   */
+  discoveryPreferences: { themeId: string; direction: string; importance: number }[];
   createdAt: string;
 };
 
@@ -29,7 +36,7 @@ type Row = {
   connect_category: string | null;
   include_listings: boolean;
   include_problems: boolean;
-  alignment_dimensions: string[];
+      discovery_preferences: unknown;
   notify: boolean;
   created_at: string;
 };
@@ -51,7 +58,11 @@ function toSavedSearch(row: Row): SavedSearch {
     connectCategory: row.connect_category,
     includeListings: row.include_listings,
     includeProblems: row.include_problems,
-    alignmentDimensions: row.alignment_dimensions,
+    discoveryPreferences: (row.discovery_preferences ?? []) as {
+      themeId: string;
+      direction: string;
+      importance: number;
+    }[],
     notify: row.notify,
     createdAt: row.created_at,
   };

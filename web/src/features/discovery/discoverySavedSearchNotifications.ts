@@ -43,7 +43,6 @@ export async function notifyDiscoverySavedSearchMatches(profile: SearchableDisco
         locations: string[];
         remote_mode: string | null;
         capability_area_ids: string[];
-        alignment_dimensions: string[];
       }[]
     ).map((row) => ({
       id: row.id,
@@ -54,7 +53,6 @@ export async function notifyDiscoverySavedSearchMatches(profile: SearchableDisco
       locations: row.locations,
       remoteMode: row.remote_mode,
       capabilityAreaIds: row.capability_area_ids,
-      alignmentDimensions: row.alignment_dimensions,
     }));
     if (!searches.length) return;
 
@@ -90,7 +88,6 @@ export async function notifyDiscoverySavedSearchMatches(profile: SearchableDisco
         displayName: profile.displayName,
         headline: profile.headline,
         reasons: match.reasons,
-        hasAlignmentFilter: match.hasAlignmentFilter,
         url: `${origin}/discovery`,
         locale: recipient.locale,
       });

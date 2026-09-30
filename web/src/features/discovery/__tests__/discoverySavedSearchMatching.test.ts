@@ -19,7 +19,6 @@ const search = (over: Partial<DiscoverySavedSearchCriteria> = {}): DiscoverySave
   locations: [],
   remoteMode: null,
   capabilityAreaIds: [],
-  alignmentDimensions: [],
   ...over,
 });
 
@@ -75,16 +74,16 @@ test("nobody matches their own profile", () => {
   assert.equal(matchDiscoverySavedSearch(criteria, profile()), null);
 });
 
-test("the alignment filter is carried, not applied here", () => {
-  // Die Tendenz entsteht aus den Antworten der suchenden Person und laesst
-  // sich beim Veroeffentlichen nicht berechnen - die Sitzung gehoert der
-  // neuen Person.
-  const match = matchDiscoverySavedSearch(
-    search({ topics: ["Architektur"], alignmentDimensions: ["decision_logic"] }),
-    profile()
-  );
+test("Arbeitsweisen werden hier nicht geprüft", () => {
+  // GEAENDERT AM 30.09.2026: Hier stand der alte Alignment-Filter, der als
+  // Zusatz in der Meldung erschien und nie gefiltert hat. Er ist weg
+  // (FIND-Spec, Abschnitt 20).
+  //
+  // An der Sache aendert das nichts: Ob eine Arbeitsweise passt, laesst sich
+  // beim Veroeffentlichen nicht berechnen - dafuer braeuchte es die Antworten
+  // BEIDER Personen, und die Sitzung gehoert der neuen.
+  const match = matchDiscoverySavedSearch(search({ topics: ["Architektur"] }), profile());
   assert.ok(match);
-  assert.equal(match.hasAlignmentFilter, true, "die Meldung sagt dazu, dass noch ein Filter wirkt");
 
   const matcherSource = source("src/features/discovery/discoverySavedSearchMatching.ts");
   // Und hier wird keine Tendenz berechnet - kein zweiter Ort fuer das

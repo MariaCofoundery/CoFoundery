@@ -27,9 +27,10 @@ export default async function DiscoverySearchesPage({
 }: {
   searchParams?: Promise<Record<string, string | undefined>>;
 }) {
-  const [t, capability, params] = await Promise.all([
+  const [t, capability, tFind, params] = await Promise.all([
     getTranslations("discovery"),
     getTranslations("capability"),
+    getTranslations("find.search"),
     searchParams ? searchParams : Promise.resolve({} as Record<string, string | undefined>),
   ]);
 
@@ -106,13 +107,37 @@ export default async function DiscoverySearchesPage({
                       <li key={line}>· {line}</li>
                     ))}
                   </ul>
-                  {/* Die Einschraenkung gehoert neben das Kriterium, nicht in
-                      eine Fussnote: Sonst wundert sich jemand, warum die Liste
-                      kuerzer ist als die Meldung. */}
-                  {search.alignmentDimensions.length ? (
-                    <p className="mt-3 text-xs leading-5 text-slate-500">
-                      {t("v2.searches.alignmentHint")}
-                    </p>
+                  {/* ---------------------------------------------------------
+                      WAS GESUCHT WURDE - UND WAS DAVON FILTERT
+                      ---------------------------------------------------------
+
+                      Die Matching-Praeferenzen stehen dabei, weil die Suche
+                      sie festhaelt (Abschnitt 23). Sie filtern aber nicht:
+                      Dafuer braeuchte es die Antworten BEIDER Personen, und
+                      wer gerade erst ein Profil veroeffentlicht, hat den
+                      Bogen oft nicht ausgefuellt.
+
+                      Hier stand bis zum 30.09.2026 ein Hinweis auf die alten
+                      Alignment-Dimensionen - einen Filter, den es nie gab. */}
+                  {search.discoveryPreferences.length ? (
+                    <div className="mt-3 border-t border-slate-100 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                        {t("v2.searches.criteria.themes")}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {search.discoveryPreferences
+                          .map(
+                            (entry) =>
+                              `${tFind(`themes.${entry.themeId}.title`)} — ${tFind(
+                                `directions.${entry.direction}`,
+                              )}`,
+                          )
+                          .join(" · ")}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-slate-500">
+                        {t("v2.searches.themesHint")}
+                      </p>
+                    </div>
                   ) : null}
 
                   <div className="mt-4 flex flex-wrap items-center gap-3">

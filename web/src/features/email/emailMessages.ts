@@ -608,7 +608,12 @@ export function getSavedSearchEmailCopy(
 /** Die Meldung ueber ein neues Suchprofil, das zu einer Suche passt. */
 export function getDiscoverySavedSearchEmailCopy(
   locale: AppLocale,
-  input: { displayName: string; headline: string; reasons: string[]; hasAlignmentFilter: boolean }
+  // `hasAlignmentFilter` ist am 30.09.2026 weggefallen. Die Meldung sagte
+  // dazu, dass die Liste beim Ansehen kuerzer sein koenne, weil zusaetzlich
+  // nach Alignment-Tendenzen gefiltert werde. Diesen Filter gibt es nicht
+  // mehr (FIND-Spec, Abschnitt 20) - der Satz waere jetzt eine Warnung vor
+  // etwas, das nicht passiert.
+  input: { displayName: string; headline: string; reasons: string[] }
 ) {
   if (locale === "en") {
     return {
@@ -619,9 +624,7 @@ export function getDiscoverySavedSearchEmailCopy(
       intro: `${input.displayName} – ${input.headline}`,
       reasonsTitle: "It matches these criteria of yours:",
       reasons: input.reasons,
-      alignmentNote: input.hasAlignmentFilter
-        ? "Your search also filters by alignment tendency. That comparison needs your own answers, so it happens when you open the list – there may be fewer profiles there."
-        : null,
+      alignmentNote: null,
       cta: "Open Discovery",
       note: "This is a hit on the search you saved – not a recommendation, and not a statement about whether you fit together.",
       settings: "You can switch off notifications for a saved search at any time.",
@@ -639,9 +642,7 @@ export function getDiscoverySavedSearchEmailCopy(
     intro: `${input.displayName} – ${input.headline}`,
     reasonsTitle: "Das trifft auf diese deiner Kriterien zu:",
     reasons: input.reasons,
-    alignmentNote: input.hasAlignmentFilter
-      ? "Deine Suche filtert zusätzlich nach Alignment-Tendenz. Dieser Vergleich braucht deine eigenen Antworten und passiert deshalb erst beim Öffnen der Liste – dort stehen möglicherweise weniger Profile."
-      : null,
+      alignmentNote: null,
     cta: "Discovery öffnen",
     note: "Das ist ein Treffer auf die Suche, die du gespeichert hast – keine Empfehlung, und keine Aussage darüber, ob ihr zusammenpasst.",
     settings: "Du kannst die Benachrichtigung für eine gespeicherte Suche jederzeit abschalten.",

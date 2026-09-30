@@ -34,7 +34,6 @@ export type DiscoverySavedSearchCriteria = {
   locations: string[];
   remoteMode: string | null;
   capabilityAreaIds: string[];
-  alignmentDimensions: string[];
 };
 
 export type SearchableDiscoveryProfile = {
@@ -63,12 +62,6 @@ export type DiscoverySavedSearchMatch = {
   searchId: string;
   userId: string;
   reasons: DiscoverySavedSearchReason[];
-  /**
-   * Ob diese Suche zusaetzlich einen Alignment-Filter traegt. Die Meldung sagt
-   * das dazu, damit niemand ueberrascht ist, wenn die Liste beim Ansehen
-   * kuerzer ist als die Zahl in der Mail.
-   */
-  hasAlignmentFilter: boolean;
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();
@@ -141,13 +134,15 @@ export function matchDiscoverySavedSearch(
     reasons.push({ key: "capability", value: hit });
   }
 
+  // KEIN ABONNEMENT AUF ALLE NEUEN PROFILE. Abschnitt 24 der FIND-Spec: Eine
+  // Meldung braucht mindestens ein Kriterium, das wirklich zugetroffen hat.
+  // Ohne diese Zeile wuerde jede Suche bei jedem neuen Profil melden.
   if (!reasons.length) return null;
 
   return {
     searchId: criteria.id,
     userId: criteria.userId,
     reasons,
-    hasAlignmentFilter: criteria.alignmentDimensions.length > 0,
   };
 }
 

@@ -422,7 +422,8 @@
         "locations": "Place",
         "capabilities": "Capabilities",
         "remote": "Way of working",
-        "alignment": "Alignment dimensions"
+        "alignment": "Alignment dimensions",
+        "themes": "Ways of working"
       },
       "alignmentHint": "Alignment dimensions apply to the result list, not to the email.",
       "notifyOn": "Turn notification on",
@@ -438,7 +439,8 @@
         "deleted": "The search was deleted."
       },
       "error": "That did not work. Please try again.",
-      "back": "Back to search"
+      "back": "Back to search",
+      "themesHint": "These record what you were looking for. Whether a way of working fits can only be said once both have filled in the questionnaire — notifications therefore follow the criteria above."
     }
   },
   "profile": {

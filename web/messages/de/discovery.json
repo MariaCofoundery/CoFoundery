@@ -422,7 +422,8 @@
         "locations": "Ort",
         "capabilities": "Fähigkeiten",
         "remote": "Arbeitsweise",
-        "alignment": "Alignment-Dimensionen"
+        "alignment": "Alignment-Dimensionen",
+        "themes": "Arbeitsweisen"
       },
       "alignmentHint": "Die Alignment-Dimensionen wirken in der Ergebnisliste, nicht in der E-Mail.",
       "notifyOn": "Benachrichtigung einschalten",
@@ -438,7 +439,8 @@
         "deleted": "Die Suche wurde gelöscht."
       },
       "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
-      "back": "Zurück zur Suche"
+      "back": "Zurück zur Suche",
+      "themesHint": "Diese Angaben halten fest, wonach du gesucht hast. Ob eine Arbeitsweise passt, lässt sich erst sagen, wenn beide den Bogen ausgefüllt haben — benachrichtigt wird deshalb nach den Kriterien darüber."
     }
   },
   "profile": {

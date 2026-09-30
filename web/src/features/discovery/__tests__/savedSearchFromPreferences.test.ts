@@ -55,16 +55,33 @@ test("Der Ort wird zu genau einem Eintrag", () => {
   assert.deepEqual(buildDiscoverySearchCriteria(preferences()).locations, []);
 });
 
-test("Alignment-Dimensionen zaehlen nur, wenn Alignment eingeschaltet ist", () => {
-  const off = buildDiscoverySearchCriteria(
-    preferences({}, { discoveryV2AlignmentEnabled: false, discoveryV2AlignmentDimensions: ["decision_logic"] })
+test("die Faehigkeitsbereiche kommen aus der Suche, nicht aus einem Formular", () => {
+  // Bis zum 30.09.2026 wurden sie aus einem eigenen Feld gelesen. Seit sie in
+  // "Deine Suche" stehen, waere das ein zweiter Ort fuer dieselbe Angabe.
+  const row = buildDiscoverySearchCriteria(
+    preferences({ requiredCapabilityAreasAny: ["b2b_sales", "fundraising"] })
   );
-  assert.deepEqual(off.alignment_dimensions, []);
+  assert.deepEqual(row.capability_area_ids, ["b2b_sales", "fundraising"]);
+});
 
-  const on = buildDiscoverySearchCriteria(
-    preferences({}, { discoveryV2AlignmentEnabled: true, discoveryV2AlignmentDimensions: ["decision_logic"] })
-  );
-  assert.deepEqual(on.alignment_dimensions, ["decision_logic"]);
+test("die Matching-Praeferenzen kommen mit - aber nur die gewichteten", () => {
+  // Abschnitt 23: Die gespeicherte Suche enthaelt sie. "Egal" ist keine
+  // Praeferenz, und sechs Zeilen "egal" waeren eine Aufzeichnung ohne Inhalt.
+  const row = buildDiscoverySearchCriteria(preferences(), [
+    { themeId: "decision_weighing", direction: "similar", importance: 3 },
+    { themeId: "experimentation", direction: "neutral", importance: 0 },
+  ]);
+  assert.deepEqual(row.discovery_preferences, [
+    { themeId: "decision_weighing", direction: "similar", importance: 3 },
+  ]);
+});
+
+test("die alten Alignment-Dimensionen sind raus", () => {
+  // Sie zaehlten als Kriterium und haben nie gefiltert: Eine Suche, in der NUR
+  // sie standen, war ein Abonnement auf jedes neue Profil - genau das, was
+  // Abschnitt 24 ausschliesst.
+  const row = buildDiscoverySearchCriteria(preferences());
+  assert.ok(!("alignment_dimensions" in row));
 });
 
 test("Ohne Praeferenzen entsteht eine leere Suche - die Datenbank weist sie ab", () => {
@@ -73,7 +90,8 @@ test("Ohne Praeferenzen entsteht eine leere Suche - die Datenbank weist sie ab",
     topics: [],
     industries: [],
     locations: [],
+    capability_area_ids: [],
+    discovery_preferences: [],
     remote_mode: null,
-    alignment_dimensions: [],
   });
 });

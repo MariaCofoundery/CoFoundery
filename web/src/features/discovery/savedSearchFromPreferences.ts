@@ -1,3 +1,4 @@
+import type { ThemePreference } from "@/features/find/discoveryMatch";
 import type { FounderSearchPreferences } from "@/features/discovery/discoveryTypes";
 
 /**
@@ -24,14 +25,13 @@ export type DiscoverySearchCriteriaRow = {
   industries: string[];
   locations: string[];
   remote_mode: string | null;
-  alignment_dimensions: string[];
+  capability_area_ids: string[];
+  discovery_preferences: ThemePreference[];
 };
 
 export function buildDiscoverySearchCriteria(
-  preferences: Pick<
-    FounderSearchPreferences,
-    "mustHaves" | "discoveryV2AlignmentEnabled" | "discoveryV2AlignmentDimensions"
-  > | null
+  preferences: Pick<FounderSearchPreferences, "mustHaves"> | null,
+  themePreferences: readonly ThemePreference[] = [],
 ): DiscoverySearchCriteriaRow {
   const mustHaves = preferences?.mustHaves;
 
@@ -44,8 +44,9 @@ export function buildDiscoverySearchCriteria(
     locations: mustHaves?.desiredLocationRegion ? [mustHaves.desiredLocationRegion] : [],
     remote_mode:
       mustHaves?.acceptedRemoteModes.length === 1 ? mustHaves.acceptedRemoteModes[0] : null,
-    alignment_dimensions: preferences?.discoveryV2AlignmentEnabled
-      ? preferences.discoveryV2AlignmentDimensions
-      : [],
+    capability_area_ids: (mustHaves?.requiredCapabilityAreasAny ?? []).slice(0, 8),
+    // Nur die gewichteten: "egal" ist keine Praeferenz, und sechs Zeilen
+    // "egal" waeren eine Aufzeichnung ohne Inhalt.
+    discovery_preferences: themePreferences.filter((entry) => entry.importance > 0),
   };
 }

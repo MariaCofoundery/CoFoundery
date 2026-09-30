@@ -8,7 +8,6 @@ type Params = {
   displayName: string;
   headline: string;
   reasons: DiscoverySavedSearchReason[];
-  hasAlignmentFilter: boolean;
   url: string;
   locale?: EmailLocaleInput;
 };
@@ -42,7 +41,6 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
     displayName: params.displayName,
     headline: params.headline,
     reasons: describeReasons(params.reasons, locale),
-    hasAlignmentFilter: params.hasAlignmentFilter,
   });
   const url = escapeHtml(params.url);
   const privacyUrl = escapeHtml(getEmailPrivacyUrl(locale));
@@ -86,7 +84,6 @@ export async function sendDiscoverySavedSearchEmail(params: Params): Promise<Res
     displayName: params.displayName,
     headline: params.headline,
     reasons: describeReasons(params.reasons, locale),
-    hasAlignmentFilter: params.hasAlignmentFilter,
   });
 
   const response = await fetch("https://api.resend.com/emails", {

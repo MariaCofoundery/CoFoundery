@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getOwnPreferences } from "@/features/find/preferenceData";
 import { getOwnSearchPreferences } from "@/features/discovery/discoveryData";
 import { buildDiscoverySearchCriteria } from "@/features/discovery/savedSearchFromPreferences";
 import { createClient } from "@/lib/supabase/server";
@@ -48,14 +49,16 @@ export async function saveDiscoverySearchAction(formData: FormData) {
   }
 
   const preferences = await getOwnSearchPreferences(user.id).catch(() => null);
+  // Die Suche wird so festgehalten, wie sie steht - nicht so, wie ein
+  // Formular sie gerade mitschickt. "Deine Suche" ist der eine Ort.
+  const { preferences: themen } = await getOwnPreferences(user.id);
 
   const { error } = await client.from("saved_searches").insert({
     user_id: user.id,
     context: "discovery",
     label,
     query: "",
-    ...buildDiscoverySearchCriteria(preferences),
-    capability_area_ids: parseAreaIds(formData.getAll("capability_area_ids")),
+    ...buildDiscoverySearchCriteria(preferences, themen),
     include_listings: false,
     include_problems: false,
   });
