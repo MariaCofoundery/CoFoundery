@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { AlignDashboardState } from "@/features/instruments/align/dashboardData";
+import { screenSet } from "@/features/instruments/align/screens";
+import type { AssessmentScope } from "@/features/instruments/align/registries";
 
 /**
  * Der Weg zu den beiden Bögen - vom Dashboard aus.
@@ -22,6 +24,26 @@ import type { AlignDashboardState } from "@/features/instruments/align/dashboard
  * Zahlentyp, den es in Align gibt - und er steht hier, damit man weiß, ob man
  * noch etwas zu tun hat.
  */
+/**
+ * Wie viele Schritte ein Bogen hat.
+ *
+ * ---------------------------------------------------------------------------
+ * SCHRITTE UND NICHT FRAGEN
+ * ---------------------------------------------------------------------------
+ *
+ * Hier stand „43 Fragen zu Zielen, Zusagen, Regeln und Grenzen". Zwei Fehler
+ * in einer Zeile: Die 43 zählte die zurückgezogene S01 mit, die niemand mehr
+ * vorgelegt bekommt — im Bericht stand daneben „von 42". Und das UX-Review
+ * Teil 2, Abschnitt 14, will die Einzelfragenzahl gar nicht mehr sehen:
+ * „stattdessen Abschnittsfortschritt / Steps".
+ *
+ * Gezählt wird, was die Person vor sich haben wird, und die Zahl steht an
+ * einer Stelle — in der Bildschirmdatei, aus der auch der Fragebogen zählt.
+ */
+function schritte(scope: AssessmentScope): number {
+  return screenSet(scope, () => true).screens.length;
+}
+
 export function AlignCard({ state }: { state: AlignDashboardState }) {
   const mehrere = state.ventures.length > 1;
 
@@ -64,10 +86,10 @@ export function AlignCard({ state }: { state: AlignDashboardState }) {
           <p className="text-sm font-medium text-slate-900">Wie du arbeitest</p>
           <p className="mt-1 text-xs text-slate-500">
             {state.profile.submitted
-              ? `abgegeben — ${state.profile.answered} von ${state.profile.of} beantwortet`
+              ? "abgegeben"
               : state.profile.started
-                ? `${state.profile.answered} von ${state.profile.of} beantwortet`
-                : `${state.profile.of} Fragen, gilt unabhängig vom Vorhaben`}
+                ? "angefangen"
+                : `${schritte("founder_profile")} Schritte, gilt unabhängig vom Vorhaben`}
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             <Link href="/founder-alignment/profil" className="text-slate-900 underline">
@@ -120,10 +142,10 @@ export function AlignCard({ state }: { state: AlignDashboardState }) {
                   )}
                   <p className="text-xs text-slate-500">
                     {venture.submitted
-                      ? `abgegeben — ${venture.answered} von ${venture.of} beantwortet`
+                      ? "abgegeben"
                       : venture.started
-                        ? `${venture.answered} von ${venture.of} beantwortet`
-                        : `${venture.of} Fragen zu Zielen, Zusagen, Regeln und Grenzen`}
+                        ? "angefangen"
+                        : `${schritte("venture_alignment")} Abschnitte zu Zielen, Zusagen, Regeln und Grenzen`}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-3 text-sm">
                     <Link

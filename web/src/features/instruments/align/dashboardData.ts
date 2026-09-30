@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getItemsV22 } from "@/features/instruments/align/registries";
+import { offeredItemsV22 } from "@/features/instruments/align/registries";
 import { needsConfirmation } from "@/features/instruments/align/needsConfirmation";
 import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { connectedPartners } from "@/features/instruments/connectedPartners";
@@ -68,6 +68,25 @@ export type AlignDashboardState = {
   decision: TransitionDecision;
   /** Hat sie die bisherige Fassung abgegeben? Dann bleibt ihr Report. */
   hasPrevious: boolean;
+  /**
+   * Kennt sie die bisherige Fassung überhaupt?
+   *
+   * ---------------------------------------------------------------------------
+   * WER NEU ANFÄNGT, SOLL NICHT ZWISCHEN ZWEI FASSUNGEN WÄHLEN MÜSSEN
+   * ---------------------------------------------------------------------------
+   *
+   * Das Dashboard zeigte bis zum 30.09.2026 jedem den alten Fragebogen als
+   * erste Karte — auch jemandem, der sich gerade angemeldet hatte. Der neue
+   * stand hundertfünfzig Zeilen weiter unten. „Alte Fassung, neue Fassung,
+   * wähle" ist eine Frage an Menschen, die eine Geschichte mit dem Produkt
+   * haben; für alle anderen ist es eine Entscheidung über etwas, das sie nie
+   * gesehen haben.
+   *
+   * ANGEFANGEN ZÄHLT, NICHT NUR ABGEGEBEN. Wer mitten im alten Bogen steckt,
+   * muss ihn zu Ende bringen können — ihm den Weg dorthin wegzunehmen, wäre
+   * schlimmer als eine Karte zu viel.
+   */
+  knowsPrevious: boolean;
 };
 
 const NOTHING: AlignDashboardState = {
@@ -78,6 +97,10 @@ const NOTHING: AlignDashboardState = {
   announce: false,
   decision: "pending",
   hasPrevious: false,
+  // IM ZWEIFEL SICHTBAR. Geht die Abfrage schief, weiss niemand, ob jemand
+  // die bisherige Fassung hat - und dann ist ein Weg zu viel besser als ein
+  // weggenommener zu einem halb ausgefuellten Bogen.
+  knowsPrevious: true,
 };
 
 export async function getAlignDashboardState(
@@ -158,7 +181,11 @@ export async function getAlignDashboardState(
         started: answered > 0,
         submitted: Boolean(row?.submitted_at),
         answered,
-        of: getItemsV22("venture_alignment").length,
+        // ZURUECKGEZOGENE FRAGEN ZAEHLEN NICHT MIT. S01 ist durch S01a bis
+        // S01f und S01_top ersetzt und bleibt nur in der Registratur, damit
+        // alte Antworten lesbar bleiben. Mitgezaehlt stand auf dem Dashboard
+        // "43 Fragen" und im Bericht "von 42" - dieselbe Sache, zwei Zahlen.
+        of: offeredItemsV22("venture_alignment").length,
         confirm: needsConfirmation({
           confirmedAt: (row?.answers_confirmed_at as string | null) ?? null,
           otherJoinedAt: (members ?? [])
@@ -174,7 +201,7 @@ export async function getAlignDashboardState(
         started: profileAnswered > 0,
         submitted: Boolean(profileRow?.submitted_at),
         answered: profileAnswered,
-        of: getItemsV22("founder_profile").length,
+        of: offeredItemsV22("founder_profile").length,
       },
       ventures: ventureStates,
       partners: await partnersFor(userId),
@@ -186,6 +213,7 @@ export async function getAlignDashboardState(
       }),
       decision,
       hasPrevious: (vorher ?? []).some((row) => row.submitted_at),
+      knowsPrevious: (vorher ?? []).length > 0,
       // Der Kasten steht auf jedem Founder-Dashboard, auch auf einem leeren:
       // Er IST der Weg zu den beiden Boegen. Ein Kasten, der erst erscheint,
       // wenn man angefangen hat, koennte nie den ersten Anfang tragen.

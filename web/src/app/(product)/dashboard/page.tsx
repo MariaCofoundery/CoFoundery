@@ -272,6 +272,10 @@ export default async function DashboardPage({
   const contextualValuesHref = contextualInvitationId
     ? `/me/values?invitationId=${encodeURIComponent(contextualInvitationId)}`
     : "/me/values";
+  // EINMAL GEBAUT UND AN EINER VON ZWEI STELLEN GEZEIGT. Zwei Aufrufe im
+  // Baum waeren zwei Kaesten, sobald eine Bedingung einmal nicht stimmt.
+  const alignKasten = <AlignCard state={alignState} />;
+
   const founderAlignmentState = resolveFounderAlignmentFoundationState({
     submitted: hasSubmittedBase,
     started: hasStartedBase,
@@ -472,6 +476,22 @@ export default async function DashboardPage({
         />
       </section>
 
+      {/* ---------------------------------------------------------------
+          DIE BISHERIGE FASSUNG - NUR FUER DIE, DIE SIE HABEN
+          ---------------------------------------------------------------
+
+          Hier standen drei Karten, und die erste zeigte auf den alten
+          Fragebogen. Sie stand auf JEDEM Dashboard, auch auf dem von
+          jemandem, der sich gerade angemeldet hatte - der neue Bogen kam
+          hundertfuenfzig Zeilen weiter unten. Wer neu anfaengt, sieht jetzt
+          nur noch die beiden neuen Boegen; wer im alten steckt, findet ihn
+          weiter an derselben Stelle.
+
+          DER WEG ZU FIND BLEIBT. Die Discovery-Karte stand ebenfalls hier;
+          der Block "Entdecken" weiter unten fuehrt seit immer auch dorthin. */}
+      {!alignState.knowsPrevious ? (
+        alignKasten
+      ) : (
       <section id="dashboard-block-foundation" className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6" style={staggerStyle(90)}>
         <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("foundation.eyebrow")}</p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("foundation.title")}</h2>
@@ -502,6 +522,7 @@ export default async function DashboardPage({
           />
         </div>
       </section>
+      )}
 
       <section
         id="dashboard-block-connections"
@@ -629,7 +650,9 @@ export default async function DashboardPage({
       */}
       {alignState.announce && <AlignAnnounce />}
 
-      <AlignCard state={alignState} />
+      {/* Oben steht er nur fuer Menschen ohne die bisherige Fassung - fuer
+          alle anderen hier, hinter dem, was sie schon kennen. */}
+      {alignState.knowsPrevious && alignKasten}
 
       {versionState.announce && <TransitionAnnounce />}
 

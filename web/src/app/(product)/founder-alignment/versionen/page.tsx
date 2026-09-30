@@ -30,6 +30,21 @@ export default async function VersionChoicePage() {
   const has = (instrumentId: string) =>
     (rows ?? []).some((row) => row.instrument_id === instrumentId);
 
+  // ---------------------------------------------------------------------------
+  // WER KEINE DER BEIDEN FASSUNGEN HAT, HAT HIER NICHTS ZU WAEHLEN
+  // ---------------------------------------------------------------------------
+  //
+  // Diese Seite erklaert einen Unterschied zwischen zwei Fassungen eines
+  // Fragebogens. Wer sich gerade angemeldet hat, kennt keine davon - fuer ihn
+  // ist es die Geschichte eines Produkts, das er noch nicht benutzt hat, und
+  // eine Entscheidung ueber etwas, das er nie gesehen hat.
+  //
+  // Keine Fehlerseite: Die Seite ist nicht verboten, sie ist nur leer. Der
+  // Weg dorthin, wo es etwas zu tun gibt, ist die richtige Antwort.
+  if (!has(CURRENT_INSTRUMENT_ID) && !has(ALIGNMENT_V21_INSTRUMENT_ID)) {
+    redirect("/founder-alignment/profil");
+  }
+
   // Was die Datenbank ueber die Fassung sagt, nicht was der Code annimmt.
   const { data: instrument } = await supabase
     .from("instruments")

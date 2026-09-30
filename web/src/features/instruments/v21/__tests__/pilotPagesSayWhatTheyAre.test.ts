@@ -144,10 +144,18 @@ test("die Wahlseite nennt beide Fassungen und empfiehlt keine", () => {
     join("src", "app", "(product)", "founder-alignment", "versionen", "page.tsx"), "utf8");
   assert.match(page, /CURRENT_INSTRUMENT_ID/);
   assert.match(page, /ALIGNMENT_V21_INSTRUMENT_ID/);
-  // Sie erzwingt nichts: kein redirect ausser dem zum Login.
+  // SIE ERZWINGT KEINE FASSUNG. Zwei Umleitungen sind erlaubt und nur diese
+  // zwei: die zum Login, und die fuer Menschen, die KEINE der beiden
+  // Fassungen haben. Fuer sie gibt es hier nichts zu waehlen - die Seite
+  // erklaert den Unterschied zwischen zwei Fragebogen, von denen sie keinen
+  // kennen. Wer eine der beiden hat, bleibt hier und entscheidet selbst.
   const redirects = page.match(/redirect\(/g) ?? [];
-  assert.equal(redirects.length, 1, "die Wahlseite leitet irgendwohin um");
+  assert.equal(redirects.length, 2, "die Wahlseite leitet irgendwohin um");
   assert.match(page, /login/);
+  assert.match(
+    page,
+    /if \(!has\(CURRENT_INSTRUMENT_ID\) && !has\(ALIGNMENT_V21_INSTRUMENT_ID\)\) \{\s*redirect\("\/founder-alignment\/profil"\);/,
+  );
 });
 
 test("das Dashboard fuehrt zur Testfassung, enthaelt sie aber nicht", () => {
