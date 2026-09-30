@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(8);
+select extensions.plan(10);
 
 -- ---------------------------------------------------------------------------
 -- Der Vergleich gibt Abstaende heraus, keine Antworten
@@ -162,6 +162,44 @@ select extensions.throws_ok(
   '42501',
   null,
   'ohne Founder-Rolle keine Auskunft');
+
+-- ---------------------------------------------------------------------------
+-- 9. Die Suche der anderen Person ist fuer Angemeldete nicht aufrufbar
+-- ---------------------------------------------------------------------------
+--
+-- DAS IST DER KERN DIESER FUNKTION. Eine Funktion, die die angemeldete Person
+-- aufrufen darf, darf ihr BROWSER aufrufen - dort liegt dieselbe Sitzung und
+-- derselbe oeffentliche Schluessel. "Nur der Server" heisst: nur mit dem
+-- Dienstschluessel.
+set local request.jwt.claims =
+  '{"sub":"e1000001-0001-4001-8001-000000000001","role":"authenticated"}';
+select extensions.throws_ok(
+  $$select * from public.discovery_preferences_for_match(
+      'e1000001-0001-4001-8001-000000000001',
+      'e1000002-0002-4002-8002-000000000002')$$,
+  '42501',
+  null,
+  'angemeldet ist die fremde Suche nicht abrufbar');
+
+-- ---------------------------------------------------------------------------
+-- 10. Mit dem Dienstschluessel schon - und nur fuer sichtbare Profile
+-- ---------------------------------------------------------------------------
+reset role;
+insert into public.discovery_preference_sets (id, user_id, founder_profile_instrument_id)
+values ('e1500002-0002-4002-8002-00000000000f',
+        'e1000002-0002-4002-8002-000000000002', 'founder-profile-v1');
+insert into public.discovery_theme_preferences
+  (preference_set_id, theme_id, direction, importance)
+values ('e1500002-0002-4002-8002-00000000000f', 'decision_weighing', 'similar', 2);
+
+set local role service_role;
+select extensions.is(
+  (select importance::int from public.discovery_preferences_for_match(
+     'e1000001-0001-4001-8001-000000000001',
+     'e1000002-0002-4002-8002-000000000002')
+   where theme_id = 'decision_weighing'),
+  2,
+  'mit dem Dienstschluessel kommt die Suche zurueck');
 
 select * from extensions.finish();
 

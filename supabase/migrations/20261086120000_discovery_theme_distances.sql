@@ -177,54 +177,78 @@ revoke all on function public.discovery_theme_distances(uuid) from public, anon;
 grant execute on function public.discovery_theme_distances(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
--- Hat die andere Person ueberhaupt eine Suche festgelegt?
+-- Die Suche der anderen Person - fuer den Server, nicht fuer den Browser
 -- ---------------------------------------------------------------------------
 --
--- Spec, Abschnitt 13: "[Name] hat fuer die eigene Suche noch keine
--- Matching-Praeferenzen festgelegt." Dieser Satz braucht ein Ja oder Nein und
--- sonst nichts - nicht die Themen, nicht die Richtungen, nicht die Gewichte.
--- Die stehen unter Zeilensicherheit und bleiben dort.
+-- Abschnitt 16 der Spec: "Fuer euch beide ein starker Matchpunkt." Dieser Satz
+-- setzt voraus, dass die eine Seite weiss, ob die andere dasselbe Thema
+-- gewichtet hat und ob ihr Wunsch erfuellt ist. Beurteilt wird das in
+-- TypeScript, mit denselben Regeln wie alles andere - also muessen die
+-- Praeferenzen der anderen Person dorthin gelangen.
+--
+-- ENTSCHIEDEN VON MARIA AM 30.09.2026: Sie duerfen den Server erreichen und
+-- nicht den Browser.
+--
+-- ---------------------------------------------------------------------------
+-- WARUM DAS NICHT MIT `grant ... to authenticated` GEHT
+-- ---------------------------------------------------------------------------
+--
+-- Eine Funktion, die die angemeldete Person aufrufen darf, darf ihr BROWSER
+-- aufrufen: Dort liegt dieselbe Sitzung und derselbe oeffentliche Schluessel.
+-- "Nur der Server" heisst deshalb: nur mit dem Dienstschluessel, und der
+-- verlaesst den Server nie.
+--
+-- Damit gibt es kein `auth.uid()` mehr - der Dienstschluessel ist niemand.
+-- Wer fragt, steht deshalb als Parameter da, und die Funktion prueft dieselben
+-- Regeln wie die Liste. Der Server setzt dort die angemeldete Person ein.
 
-create or replace function public.discovery_has_preferences(p_user_id uuid)
-returns boolean
+create or replace function public.discovery_preferences_for_match(
+  p_viewer uuid,
+  p_candidate uuid
+)
+returns table (theme_id text, direction text, importance smallint)
 language plpgsql
 stable
 security definer
 set search_path = ''
 as $$
 begin
-  if auth.uid() is null then
-    raise exception 'not_authenticated' using errcode = '42501';
+  if p_viewer is null or p_candidate is null or p_viewer = p_candidate then
+    raise exception 'discovery_self_match' using errcode = '22023';
   end if;
-  if not public.is_current_user_discovery_founder() then
+
+  -- Dieselben Huerden wie ueberall in der Suche: Wer fragt, muss suchen
+  -- duerfen, und wer gefunden wird, muss sich gezeigt haben.
+  if not exists (
+    select 1 from public.profiles pr
+    where pr.user_id = p_viewer and 'founder' = any (coalesce(pr.roles, '{}'::text[]))
+  ) then
     raise exception 'not_a_discovery_founder' using errcode = '42501';
   end if;
-  -- Dieselbe Huerde wie die Liste; ueber die eigene Suche darf man immer
-  -- Auskunft bekommen.
-  if p_user_id <> auth.uid() and not exists (
+  if not exists (
     select 1 from public.founder_discovery_profiles p
-    where p.user_id = p_user_id and p.status = 'active'
+    where p.user_id = p_candidate and p.status = 'active'
   ) then
     raise exception 'candidate_not_discoverable' using errcode = '42501';
   end if;
 
-  return exists (
-    select 1
-    from public.discovery_theme_preferences pref
-    join public.discovery_preference_sets s on s.id = pref.preference_set_id
-    where s.user_id = p_user_id
-      and s.founder_profile_instrument_id = 'founder-profile-v1'
-      -- "sechsmal egal" ist keine festgelegte Suche.
-      and pref.importance > 0
-  );
+  return query
+  select pref.theme_id, pref.direction, pref.importance
+  from public.discovery_theme_preferences pref
+  join public.discovery_preference_sets s on s.id = pref.preference_set_id
+  where s.user_id = p_candidate
+    and s.founder_profile_instrument_id = 'founder-profile-v1';
 end;
 $$;
 
-comment on function public.discovery_has_preferences(uuid) is
-  'Ja oder nein: Hat diese Person fuer ihre Suche etwas gewichtet? Gibt die '
-  'Praeferenzen selbst nicht heraus - die sind privat.';
+comment on function public.discovery_preferences_for_match(uuid, uuid) is
+  'Die Suchpraeferenzen einer Person, damit der Server beurteilen kann, ob ein '
+  'Thema fuer BEIDE ein Matchpunkt ist. Nur mit dem Dienstschluessel '
+  'aufrufbar - der Browser bekommt sie nie zu sehen.';
 
-revoke all on function public.discovery_has_preferences(uuid) from public, anon;
-grant execute on function public.discovery_has_preferences(uuid) to authenticated;
+-- KEIN ZUGRIFF FUER ANGEMELDETE. Das ist der Kern dieser Funktion.
+revoke all on function public.discovery_preferences_for_match(uuid, uuid)
+  from public, anon, authenticated;
+grant execute on function public.discovery_preferences_for_match(uuid, uuid) to service_role;
 
 commit;
