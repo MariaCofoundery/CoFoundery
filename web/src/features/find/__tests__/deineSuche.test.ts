@@ -95,6 +95,40 @@ test("es gibt kein Absenden und keinen Abschluss", () => {
   }
 });
 
+test("die praktischen Kriterien stehen in der Suche, nicht bei den Treffern", () => {
+  // Bis zum 30.09.2026 standen Rolle, Expertise, Region, Remote und
+  // Mindeststunden eingeklappt ueber den Treffern - mitten zwischen dem
+  // oeffentlichen Profil und der Ergebnisliste. Die Spec nennt genau diese
+  // Mischung in Abschnitt 3 als Grund fuer den Umbau.
+  const suche = readFileSync(
+    join("src", "app", "(product)", "discovery", "suche", "page.tsx"),
+    "utf8",
+  );
+  assert.match(suche, /<PracticalSearchForm/);
+  assert.match(suche, /t\("practicalTitle"\)/);
+
+  const ergebnisse = readFileSync(
+    join("src", "app", "(product)", "discovery", "page.tsx"),
+    "utf8",
+  );
+  assert.ok(!/name="requiredRolesAny"/.test(ergebnisse), "die Felder stehen noch bei den Treffern");
+  assert.ok(!/saveDiscoveryV2SearchPreferencesAction/.test(ergebnisse) || /resetSearch/.test(ergebnisse));
+  // Der Weg dorthin steht da, wo das Formular war.
+  assert.match(ergebnisse, /href="\/discovery\/suche"/);
+
+  // Und was gerade gilt, steht weiter oben - man sieht, wonach gefiltert
+  // wird, ohne die Felder vor sich zu haben.
+  assert.match(ergebnisse, /<SearchBrief/);
+});
+
+test("wer noch nichts gespeichert hat, bekommt leere Felder und keinen Fehler", () => {
+  const suche = readFileSync(
+    join("src", "app", "(product)", "discovery", "suche", "page.tsx"),
+    "utf8",
+  );
+  assert.match(suche, /searchPreferences\?\.mustHaves \?\? LEERE_KRITERIEN/);
+});
+
 test("die eigene Suche steht im Menü", () => {
   // Sie war sonst nur über eine Karte erreichbar - wer woanders steht, müsste
   // erst dorthin zurück. Genau das war bei Fragebogen und Report schon

@@ -2,6 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
+import { getOwnSearchPreferences } from "@/features/discovery/discoveryData";
+import { PracticalSearchForm } from "@/features/find/PracticalSearchForm";
+import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
+
 import { THEME_IDS } from "@/features/find/discoveryThemes";
 import { getOwnPreferences } from "@/features/find/preferenceData";
 import {
@@ -32,16 +37,50 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * aber gegen die eigenen Antworten, und die gibt es dann nicht. Das steht
  * hier als Hinweis und nicht als Sperre: Die Auswahl darf man vorher treffen.
  */
-export default async function SearchPreferencesPage() {
+/** Eine Suche ohne Kriterien — der Zustand vor der ersten Eingabe. */
+const LEERE_KRITERIEN: DiscoveryMustHaves = {
+  minimumAvailabilityHoursPerWeek: null,
+  acceptedRemoteModes: [],
+  requiredRolesAny: [],
+  requiredExpertiseAny: [],
+  desiredLocationRegion: null,
+  requiredIndustriesAny: [],
+  acceptedCommitmentLevels: [],
+  acceptedVentureStages: [],
+  acceptedVentureGoals: [],
+};
+
+export default async function SearchPreferencesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ gespeichert?: string }>;
+}) {
+  const { gespeichert } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/suche")}`);
   }
 
   const t = await getTranslations("find.search");
+  const tDiscovery = await getTranslations("discovery");
   const supabase = await createClient();
 
-  const [{ preferences, stale }, { data: assessment }] = await Promise.all([
+  // Dieselbe Aktion wie vorher auf der Ergebnisseite - nur landet man danach
+  // wieder hier und nicht bei den Treffern: Diese Seite legt fest, sie sucht
+  // nicht.
+  async function savePractical(formData: FormData) {
+    "use server";
+    const result = await saveDiscoveryV2SearchPreferencesAction(formData);
+    redirect(`/discovery/suche?gespeichert=${result.ok ? "1" : "0"}`);
+  }
+
+  async function resetPractical() {
+    "use server";
+    const result = await saveDiscoveryV2SearchPreferencesAction(new FormData());
+    redirect(`/discovery/suche?gespeichert=${result.ok ? "1" : "0"}`);
+  }
+
+  const [{ preferences, stale }, { data: assessment }, searchPreferences] = await Promise.all([
     getOwnPreferences(auth.user.id),
     supabase
       .from("assessments")
@@ -51,6 +90,7 @@ export default async function SearchPreferencesPage() {
       .not("submitted_at", "is", null)
       .limit(1)
       .maybeSingle(),
+    getOwnSearchPreferences(auth.user.id),
   ]);
 
   const copy: SearchPreferencesCopy = {
@@ -117,6 +157,65 @@ export default async function SearchPreferencesPage() {
         </section>
       )}
 
+      {gespeichert && (
+        <p
+          role="status"
+          className={`mt-6 rounded-2xl px-4 py-3 text-sm ${
+            gespeichert === "1"
+              ? "bg-emerald-50 text-emerald-900"
+              : "bg-rose-50 text-rose-900"
+          }`}
+        >
+          {gespeichert === "1" ? t("savedFeedback") : t("saveFailedFeedback")}
+        </p>
+      )}
+
+      {/* ------------------------------------------------------------------
+          1 — Was muss praktisch passen?
+
+          Diese Felder standen bis zum 30.09.2026 eingeklappt ueber den
+          Treffern. Dort mischten sich drei Ebenen: das oeffentliche Profil,
+          die privaten Suchkriterien und die Ergebnisse - die FIND-Spec nennt
+          genau das in Abschnitt 3 als Grund fuer den Umbau.
+          ------------------------------------------------------------------ */}
+      <section className="mt-10">
+        <h2 className="text-xl font-semibold text-slate-900">{t("practicalTitle")}</h2>
+        <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">
+          {t("practicalIntro")}
+        </p>
+        <div className="mt-6">
+          <PracticalSearchForm
+            // Wer noch nichts gespeichert hat, bekommt leere Felder und
+            // keinen Fehler: Eine Suche ohne Kriterien ist eine gueltige
+            // Suche.
+            mustHaves={searchPreferences?.mustHaves ?? LEERE_KRITERIEN}
+            action={savePractical}
+            resetAction={resetPractical}
+            copy={{
+              role: tDiscovery("v2.search.role"),
+              // Dieselbe Aufloesung wie in der Ergebnisliste: "anderes" traegt
+              // den selbst eingetragenen Text, alles andere seine Beschriftung.
+              roleLabel: (role: string) => tDiscovery(`roles.${role}`),
+              expertise: tDiscovery("v2.search.expertise"),
+              expertisePlaceholder: tDiscovery("v2.search.expertisePlaceholder"),
+              expertiseHelp: tDiscovery("v2.search.expertiseHelp"),
+              location: tDiscovery("v2.search.location"),
+              locationPlaceholder: tDiscovery("v2.search.locationPlaceholder"),
+              locationHelp: tDiscovery("v2.search.locationHelp"),
+              minimumAvailability: tDiscovery("v2.search.minimumAvailability"),
+              remote: tDiscovery("v2.search.remote"),
+              remoteLabel: (mode: string) => tDiscovery(`remoteModes.${mode}`),
+              apply: tDiscovery("v2.search.apply"),
+              applying: tDiscovery("v2.search.applying"),
+              reset: tDiscovery("v2.search.reset"),
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------
+          3 — Wie soll die Person zu dir passen?
+          ------------------------------------------------------------------ */}
       <section className="mt-10">
         <h2 className="text-xl font-semibold text-slate-900">{t("themesTitle")}</h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("themesIntro")}</p>
@@ -126,6 +225,12 @@ export default async function SearchPreferencesPage() {
           <SearchPreferencesForm themeIds={THEME_IDS} initial={preferences} copy={copy} />
         </div>
       </section>
+
+      <p className="mt-10 border-t border-slate-200 pt-6 text-sm">
+        <Link href="/discovery?mode=search" className="font-medium text-slate-900 underline">
+          {t("resultsLink")}
+        </Link>
+      </p>
     </main>
   );
 }

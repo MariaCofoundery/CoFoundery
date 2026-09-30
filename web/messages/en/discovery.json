@@ -279,7 +279,9 @@
         "label": "Please give your search a name (2 to 80 characters).",
         "empty": "Without a single criterion we cannot remember the search."
       },
-      "applying": "Applying …"
+      "applying": "Applying …",
+      "criteriaMoved": "Your search criteria now live in one place: in “Your search”. That is also where you define how someone should fit you.",
+      "toYourSearch": "Open your search"
     },
     "alignment": {
       "eyebrow": "Optional",

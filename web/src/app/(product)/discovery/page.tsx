@@ -2,10 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
-import {
-  DISCOVERY_REMOTE_MODE_OPTIONS,
-  DISCOVERY_ROLE_OPTIONS,
-} from "@/features/discovery/discoveryConfig";
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
 import { DiscoverySavedSearchForm } from "@/features/discovery/DiscoverySavedSearchForm";
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
@@ -27,13 +23,11 @@ import {
 } from "@/features/discovery/discoveryPresentation";
 import {
   type DiscoveryFounderRole,
-  type DiscoveryRemoteMode,
   type FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
-import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -80,26 +74,6 @@ function defaultMustHaves(): FounderSearchPreferences["mustHaves"] {
   };
 }
 
-function Checkbox({
-  name,
-  value,
-  label,
-  checked,
-  disabled = false,
-}: {
-  name: string;
-  value: string;
-  label: string;
-  checked: boolean;
-  disabled?: boolean;
-}) {
-  return (
-    <label className={`flex min-h-11 items-center gap-3 rounded-2xl border px-3 py-2 text-sm ${disabled ? "border-slate-100 bg-slate-50 text-slate-400" : "border-slate-200 bg-white text-slate-700"}`}>
-      <input type="checkbox" name={name} value={value} defaultChecked={checked} disabled={disabled} className="h-4 w-4 rounded border-slate-300 text-slate-950 focus:ring-2 focus:ring-slate-300" />
-      <span>{label}</span>
-    </label>
-  );
-}
 
 function roleLabel(t: DiscoveryT, role: DiscoveryFounderRole) {
   return t(`roles.${role}`);
@@ -230,12 +204,6 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   const isActive = profile?.status === "active";
   const saved = searchParamValue(resolvedSearchParams.searchResult);
 
-  async function saveSearch(formData: FormData) {
-    "use server";
-    const actionResult = await saveDiscoveryV2SearchPreferencesAction(formData);
-    redirect(`/discovery?mode=search&searchResult=${actionResult.ok ? "saved" : "failed"}#search`);
-  }
-
   async function resetSearch() {
     "use server";
     const actionResult = await saveDiscoveryV2SearchPreferencesAction(new FormData());
@@ -295,50 +263,24 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
             </p>
           ) : null}
 
-          <form action={saveSearch} className="mt-5 grid gap-6">
-            <details className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-              <summary className="cursor-pointer text-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">{t("v2.search.practicalTitle")}</summary>
-              <div className="mt-5 grid gap-5">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{t("v2.search.role")}</p>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    {DISCOVERY_ROLE_OPTIONS.map((option) => (
-                      <Checkbox key={option.value} name="requiredRolesAny" value={option.value} label={roleLabel(t, option.value)} checked={preferences.mustHaves.requiredRolesAny.includes(option.value)} />
-                    ))}
-                  </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <label>
-                    <span className="text-sm font-semibold text-slate-900">{t("v2.search.expertise")}</span>
-                    <input name="requiredExpertiseAny" defaultValue={preferences.mustHaves.requiredExpertiseAny.join(", ")} className={FIELD_CLASS} placeholder={t("v2.search.expertisePlaceholder")} />
-                    <span className="mt-1 block text-xs leading-5 text-slate-500">{t("v2.search.expertiseHelp")}</span>
-                  </label>
-                  <label>
-                    <span className="text-sm font-semibold text-slate-900">{t("v2.search.location")}</span>
-                    <input name="desiredLocationRegion" defaultValue={preferences.mustHaves.desiredLocationRegion ?? ""} className={FIELD_CLASS} placeholder={t("v2.search.locationPlaceholder")} />
-                    <span className="mt-1 block text-xs leading-5 text-slate-500">{t("v2.search.locationHelp")}</span>
-                  </label>
-                  <label>
-                    <span className="text-sm font-semibold text-slate-900">{t("v2.search.minimumAvailability")}</span>
-                    <input name="minimumAvailabilityHoursPerWeek" type="number" min={1} max={100} defaultValue={preferences.mustHaves.minimumAvailabilityHoursPerWeek ?? ""} className={FIELD_CLASS} placeholder="20" />
-                  </label>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{t("v2.search.remote")}</p>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                    {DISCOVERY_REMOTE_MODE_OPTIONS.map((option) => (
-                      <Checkbox key={option.value} name="acceptedRemoteModes" value={option.value} label={t(`remoteModes.${option.value}`)} checked={preferences.mustHaves.acceptedRemoteModes.includes(option.value as DiscoveryRemoteMode)} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </details>
+          {/* ---------------------------------------------------------------
+              DIE KRITERIEN STEHEN JETZT IN "DEINE SUCHE"
+              ---------------------------------------------------------------
 
-            <div className="flex flex-wrap gap-3">
-              <SubmitButton label={t("v2.search.apply")} pendingLabel={t("v2.search.applying")} className={PRIMARY_CTA_CLASS} />
-              <button formAction={resetSearch} className={SECONDARY_CTA_CLASS}>{t("v2.search.reset")}</button>
-            </div>
-          </form>
+              Hier stand ein Aufklapper mit Rolle, Expertise, Region, Remote
+              und Mindeststunden - mitten zwischen dem oeffentlichen Profil
+              und den Treffern. Die FIND-Spec nennt genau diese Mischung in
+              Abschnitt 3 als Grund fuer den Umbau: Alles Private gehoert an
+              EINEN Ort, und der heisst "Deine Suche".
+
+              Was gerade gilt, steht weiter oben im Ueberblick - man sieht
+              also, wonach gefiltert wird, ohne die Felder vor sich zu haben. */}
+          <p className="mt-5 text-sm leading-6 text-slate-600">
+            {t("v2.search.criteriaMoved")}
+          </p>
+          <Link href="/discovery/suche" className={`${PRIMARY_CTA_CLASS} mt-4`}>
+            {t("v2.search.toYourSearch")}
+          </Link>
         </section> : null}
 
         {mode === "search" ? (

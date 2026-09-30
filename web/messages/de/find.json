@@ -55,7 +55,15 @@
     "staleText": "Die Fragen haben sich geändert. Schau kurz drüber und speichere neu, damit sie wieder zu dem passt, was gefragt wird.",
     "needsProfileTitle": "Dafür fehlt noch dein Arbeitsprofil.",
     "needsProfileText": "Die Themen kommen aus den Fragen dazu, wie du arbeitest. Ohne deine eigenen Antworten gibt es nichts zu vergleichen.",
-    "needsProfileCta": "Zum Arbeitsprofil"
+    "needsProfileCta": "Zum Arbeitsprofil",
+    "practicalTitle": "Was muss praktisch passen?",
+    "practicalIntro": "Manche Dinge müssen einfach praktisch zusammenpassen. Hier kannst du festlegen, welche Rahmenbedingungen für deine Suche relevant sind.",
+    "skillsTitle": "Was soll die Person mitbringen?",
+    "skillsIntro": "Welche Fähigkeiten oder Rollen wären für dein Vorhaben besonders hilfreich?",
+    "skillsPending": "Das kommt als Nächstes. Bis dahin steht oben das Feld für Expertise.",
+    "resultsLink": "Zu den Ergebnissen",
+    "savedFeedback": "Gespeichert.",
+    "saveFailedFeedback": "Das hat gerade nicht geklappt. Bitte versuche es erneut."
   },
   "points": {
     "title": "Warum könnte das interessant sein?",

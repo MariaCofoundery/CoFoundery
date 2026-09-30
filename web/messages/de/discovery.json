@@ -279,7 +279,9 @@
         "label": "Bitte gib deiner Suche einen Namen (2 bis 80 Zeichen).",
         "empty": "Ohne ein einziges Kriterium können wir die Suche nicht merken."
       },
-      "applying": "Wird angewendet …"
+      "applying": "Wird angewendet …",
+      "criteriaMoved": "Deine Suchkriterien stehen jetzt an einer Stelle: in „Deine Suche“. Dort legst du auch fest, wie jemand zu dir passen soll.",
+      "toYourSearch": "Deine Suche öffnen"
     },
     "alignment": {
       "eyebrow": "Optional",
