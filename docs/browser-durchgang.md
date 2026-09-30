@@ -1,6 +1,7 @@
 # Der Durchgang im Browser
 
-**Stand 29.09.2026.** Verlangt von der Gutachterin als nächster Schritt.
+**Stand 30.09.2026.** Verlangt von der Gutachterin als nächster Schritt.
+Die Punkte 10 bis 15 sind mit den beiden UX-Reviews dazugekommen.
 
 Serverseitig ist alles abgelaufen, was sich ohne Browser ablaufen lässt:
 ausfüllen, abgeben, Bericht, freigeben, vergleichen, Advisor-Ansicht,
@@ -133,11 +134,88 @@ Nur falls du ein zweites anlegst (über eine zweite Einladung):
 
 ---
 
+## 10. Die Schritte — beide Bögen
+
+**Neu am 30.09.2026.** Vorher war jeder Bogen eine lange Liste; jetzt sind es
+sieben Schritte im Arbeitsprofil und neun im zweiten Teil. Der Schrittwechsel
+passiert im Browser und sonst nirgends — serverseitig ist immer nur der erste
+Schritt zu sehen.
+
+- [ ] `/founder-alignment/profil` beginnt mit der Einleitung und
+      **verspricht keine Dauer**. „Starten" führt zu Schritt 1 von 7.
+- [ ] Wer schon geantwortet hat, landet direkt auf Schritt 1 — die Einleitung
+      begrüßt nicht zum dritten Mal.
+- [ ] `Zurück` und `Weiter` verlieren keine Antwort. Eine Antwort auf
+      Schritt 2 steht noch da, wenn du über 3 und zurück auf 2 gehst.
+- [ ] Auf **jedem** Schritt steht oben „Schritt x von n" und daneben, worum es
+      geht. Nirgends steht zusätzlich eine Fragenzahl.
+- [ ] Der Abgabeknopf steht nur auf dem **letzten** Schritt, mit „Geschafft."
+      darüber.
+- [ ] Im zweiten Teil heißt er **„Auswertung erstellen"** und nicht
+      „Founder-Profil erstellen".
+
+## 11. Die Startseite des zweiten Teils
+
+- [ ] Hat das Vorhaben noch keinen Namen, fragt die Startseite danach —
+      **und nur sie**. Im Kopf der Seite steht dann nichts dazu.
+- [ ] „Weiter" mit Namen: Der Name steht danach im Kopf der Seite.
+- [ ] „Später" ohne Namen: Es geht trotzdem weiter. Der Bogen lässt sich
+      vollständig ausfüllen und abgeben.
+- [ ] Hat es schon einen Namen, wird nicht gefragt.
+
+## 12. Die sechs Ziele und die sechs Zielkonflikte
+
+- [ ] Schritt 3 zeigt die sechs Ziele als **einen** Kasten mit einer Frage
+      oben — nicht als sechs Kästen.
+- [ ] Darunter stehen `S01_top`, `S02`, `S03`, `S04`, `S06` als eigene Fragen.
+      `S01_top` nimmt **höchstens zwei** Haken.
+- [ ] Schritt 8 (`W01`–`W06`): Szenario, darunter „Wie wichtig sind dir dabei
+      diese beiden Aspekte?" mit zwei Skalen, darunter die Wegwahl.
+- [ ] **Die Wegwahl nennt Wege**, nicht die Aspekte: bei `W01` „vorläufige
+      Planung jetzt teilen und Unsicherheiten markieren" und „offene Zahlen
+      erst prüfen …". Stünden dort die Aspekte, wäre es der alte Fehler.
+- [ ] Beide Aspekte auf „sehr wichtig" ist erlaubt und erzeugt **keine**
+      Meldung und keine abgeleitete Entscheidung.
+- [ ] Kein Szenario endet mit einer eigenen Frage.
+
+## 13. L01 und die Anschlussfragen
+
+- [ ] Schritt 9 zeigt zunächst nur `L01` — mit dem Hinweis, dass
+      Anschlussfragen dazukommen, wenn du etwas einträgst.
+- [ ] Nach einem Eintrag erscheinen `L02` und `L03`, in dieser Reihenfolge.
+- [ ] Bei `R04` dasselbe mit `R05`.
+
+## 14. Nach dem Absenden
+
+- [ ] Arbeitsprofil: Es geht auf die Antwortseite, dort steht „Dein
+      Arbeitsprofil steht." und ein Weg weiter zum zweiten Teil.
+- [ ] Zweiter Teil: Es geht auf die Antwortseite **dieses Vorhabens**, dort
+      steht sein Name.
+- [ ] Beide Kästen erscheinen **nur beim ersten Mal** — beim erneuten Aufruf
+      der Antwortseite nicht mehr.
+
+## 15. Textfelder
+
+Zehn Antworten öffnen absichtlich ein Feld: `K04`/`L03` „andere Regel",
+`S06` „andere Vorstellung", `R06` „andere Bedingung", `R09` „andere
+Vorgehensweise", `G04` „anderer Weg", `G05` „weitere", `B05` „andere
+Absicherung", `R12` „an einem bestimmten Datum".
+
+- [ ] Bei diesen zehn erscheint das Feld, und zwar erst nach dem Anklicken.
+- [ ] **Sonst nirgends.** Besonders `D01` im Arbeitsprofil: dort sind die
+      Antworten Formulierungen („Ich sehe das anders, weil …") und öffneten
+      bis zum 29.09.2026 ein Feld.
+- [ ] Ein leeres Feld verhindert das Abgeben und sagt, warum.
+
+---
+
 ## Was ich schon weiß und was nicht
 
 **Geprüft, serverseitig:** Alle Seiten antworten, alle Schreibwege gehen durch
 die Zeilensicherheit, die Registraturen stimmen mit ihren beiden Quellen
-überein, 2346 Tests.
+überein, 2399 Tests. Angemeldet durchgeklickt wurden alle Seiten
+beider Bögen — aber immer nur der erste Schritt: Der Schrittwechsel passiert
+im Browser.
 
 **Ungeprüft:** alles oben. Jeder Punkt in dieser Liste ist ein Ort, an dem ich
 nicht hinsehen konnte.
