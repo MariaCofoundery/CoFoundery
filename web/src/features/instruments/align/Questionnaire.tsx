@@ -14,6 +14,7 @@ import {
 } from "@/features/instruments/v21/itemViewActions";
 import type { AssessmentScope } from "@/features/instruments/align/registries";
 import type { ScreenSet } from "@/features/instruments/align/screens";
+import { questionBlocks } from "@/features/instruments/align/questionBlocks";
 
 type SaveState = "idle" | "saving" | "saved" | "incomplete" | "error";
 
@@ -310,29 +311,17 @@ export function Questionnaire({
    * Venture-Alignments. Zwei Kopien liefen nach dem ersten Unterschied
    * auseinander - und zwar lautlos, weil beide richtig aussehen.
    */
-  const frageKarte = (item: SectionView["items"][number], gruppenfrage: string | null) => {
+  const frageInhalt = (item: SectionView["items"][number], klein = false) => {
     const draft = answers[item.itemId] ?? {};
     const state = states[item.itemId] ?? "idle";
     return (
-      <div
-        key={item.itemId}
-        data-item-id={item.itemId}
-        className={[
-          "rounded-xl border p-5",
-          missingAfterSubmit.includes(item.itemId)
-            ? "border-amber-300 bg-amber-50/40"
-            : "border-slate-200 bg-white",
-        ].join(" ")}
-      >
-        {gruppenfrage && (
-          <p className="mb-3 border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
-            {gruppenfrage}
-          </p>
-        )}
-        <p className="text-base text-slate-900">{item.prompt}</p>
+      <>
+        <p className={klein ? "text-sm text-slate-900" : "text-base text-slate-900"}>
+          {item.prompt}
+        </p>
         {item.hint && <p className="mt-1 text-sm text-slate-500">{item.hint}</p>}
 
-        <div className="mt-4">
+        <div className={klein ? "mt-2" : "mt-4"}>
           <AnswerFieldV21
             item={item}
             draft={draft}
@@ -379,28 +368,71 @@ export function Questionnaire({
             </span>
           )}
         </div>
-      </div>
+      </>
     );
   };
 
-  const sichtbar = (item: SectionView["items"][number]) =>
-    !item.basisItemId || basisEntries.length > 0;
+  /** Eine Frage in ihrer eigenen Karte. */
+  const frageKarte = (item: SectionView["items"][number]) => (
+    <div
+      key={item.itemId}
+      data-item-id={item.itemId}
+      className={[
+        "rounded-xl border p-5",
+        missingAfterSubmit.includes(item.itemId)
+          ? "border-amber-300 bg-amber-50/40"
+          : "border-slate-200 bg-white",
+      ].join(" ")}
+    >
+      {frageInhalt(item)}
+    </div>
+  );
 
   /**
-   * Die gemeinsame Frage — einmal über der Gruppe, nicht über jeder Frage.
+   * Mehrere Fragen mit derselben Frage darüber — in EINER Karte.
    *
-   * S01a bis S01f fragen dasselbe über je ein anderes Ziel. Die Frage sechsmal
-   * zu wiederholen wäre Lärm, sie weglassen ließe sechs Sätze ohne Frage
-   * stehen. Das UX-Review Teil 2: „Als gemeinsamer Block darstellen, nicht als
-   * sechs große unabhängige Fragekarten."
+   * ---------------------------------------------------------------------------
+   * EIN BLOCK UND NICHT SECHS KARTEN
+   * ---------------------------------------------------------------------------
+   *
+   * Das UX-Review Teil 2 zu den sechs Zielen: „Als gemeinsamer Block
+   * darstellen, nicht als sechs große unabhängige Fragekarten." Sechs Kästen
+   * mit Rahmen und Abstand sehen aus wie sechs Fragen; es ist eine Frage über
+   * sechs Zeilen, und wer sie vergleichen soll, muss sie nebeneinander sehen.
+   *
+   * Teil 1 sagt dasselbe für seine Skalenblöcke („Items mit gleicher Skala in
+   * einer gemeinsamen Abschnittskarte").
    */
-  const gruppenfrageVor = (
+  const gruppenKarte = (
+    gruppenfrage: string,
     reihe: SectionView["items"][number][],
-    index: number,
-  ): string | null => {
-    const frage = reihe[index]?.groupPrompt;
-    return frage && frage !== reihe[index - 1]?.groupPrompt ? frage : null;
-  };
+  ) => (
+    <div
+      key={`gruppe-${reihe[0].itemId}`}
+      className="rounded-xl border border-slate-200 bg-white p-5"
+    >
+      <p className="border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
+        {gruppenfrage}
+      </p>
+      <div className="divide-y divide-slate-100">
+        {reihe.map((item) => (
+          <div
+            key={item.itemId}
+            data-item-id={item.itemId}
+            className={[
+              "-mx-2 px-2 py-4",
+              missingAfterSubmit.includes(item.itemId) ? "bg-amber-50/60" : "",
+            ].join(" ")}
+          >
+            {frageInhalt(item, true)}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const sichtbar = (item: SectionView["items"][number]) =>
+    !item.basisItemId || basisEntries.length > 0;
 
   /**
    * Wie viele Anschlussfragen an dieser Frage hängen — und noch nicht da sind.
@@ -548,7 +580,11 @@ export function Questionnaire({
       )}
 
       <div className="space-y-5">
-        {fragen.map((item, index) => frageKarte(item, gruppenfrageVor(fragen, index)))}
+        {questionBlocks(fragen).map((block) =>
+          block.groupPrompt && block.items.length > 1
+            ? gruppenKarte(block.groupPrompt, block.items)
+            : block.items.map(frageKarte),
+        )}
       </div>
 
       {missingAfterSubmit.length > 0 && (
