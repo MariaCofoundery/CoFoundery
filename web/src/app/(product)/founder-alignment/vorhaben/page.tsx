@@ -117,7 +117,14 @@ export default async function VentureAlignmentPage({
         Testfassung
       </p>
 
-      <VentureHeader venture={venture} needsConfirmation={frageBestaetigung} />
+      {/* Der Fragebogen beginnt mit der Einleitung, solange nichts beantwortet
+          ist - und fragt dort nach dem Namen. Dann fragt der Kopf nicht auch
+          noch danach. */}
+      <VentureHeader
+        venture={venture}
+        needsConfirmation={frageBestaetigung}
+        introAsks={!venture.name && Object.keys(initialAnswers).length === 0}
+      />
 
       {/* KEINE UEBERSCHRIFT UND KEINE FRAGENZAHL MEHR. Hier stand "Was du
           aufbauen willst" und darunter dieselbe Einleitung, die der Fragebogen

@@ -22,9 +22,18 @@ import type { Venture } from "@/features/instruments/align/ventureResolution";
 export function VentureHeader({
   venture,
   needsConfirmation,
+  introAsks = false,
 }: {
   venture: Venture;
   needsConfirmation: boolean;
+  /**
+   * Fragt die Startseite des Fragebogens gerade selbst nach dem Namen?
+   *
+   * DANN NICHT NOCH EINMAL HIER. Beim Durchklicken am 30.09.2026 stand auf
+   * demselben Bildschirm oben klein „Ohne Namen — benennen" und darunter groß
+   * „Wie heißt dein Vorhaben?". Zweimal dieselbe Frage, und die kleine zuerst.
+   */
+  introAsks?: boolean;
 }) {
   const [name, setName] = useState(venture.name ?? "");
   /**
@@ -92,17 +101,19 @@ export function VentureHeader({
           </div>
         </div>
       ) : (
-        <p className="text-sm text-slate-600">
-          <span className="font-medium text-slate-900">{venture.name ?? "Ohne Namen"}</span>
-          {venture.alone && <span className="text-slate-500"> — bisher nur du</span>}
-          <button
-            type="button"
-            className="ml-3 text-slate-500 underline"
-            onClick={() => setOpen(true)}
-          >
-            {venture.name ? "umbenennen" : "benennen"}
-          </button>
-        </p>
+        !introAsks && (
+          <p className="text-sm text-slate-600">
+            <span className="font-medium text-slate-900">{venture.name ?? "Ohne Namen"}</span>
+            {venture.alone && <span className="text-slate-500"> — bisher nur du</span>}
+            <button
+              type="button"
+              className="ml-3 text-slate-500 underline"
+              onClick={() => setOpen(true)}
+            >
+              {venture.name ? "umbenennen" : "benennen"}
+            </button>
+          </p>
+        )
       )}
     </div>
   );
