@@ -365,8 +365,34 @@ export function ProductShell({
   // Die zweite Reihe gehoert zu dem Bereich, in dem man gerade ist. Steht man
   // nirgends drin, gibt es sie nicht - eine leere Leiste waere ein Balken ohne
   // Aussage.
-  const activeAreaSubItems =
-    navigationItems.find((item) => item.isActive(pathname))?.subItems ?? [];
+  const activeArea = navigationItems.find((item) => item.isActive(pathname));
+  const activeAreaSubItems = activeArea?.subItems ?? [];
+
+  // ---------------------------------------------------------------------
+  // WO BIN ICH
+  // ---------------------------------------------------------------------
+  //
+  // GEMELDET AM 30.09.2026: „Ich weiss nicht, wo ich bin. Ich weiss nicht,
+  // wie ich easy irgendwo anders hinkomme." Das ist nicht dasselbe wie ein
+  // fehlender Zurueck-Link - die gibt es fast ueberall. Es fehlt die
+  // ORTSANGABE: Man steht auf einer Seite und sieht eine Ueberschrift, aber
+  // nicht, wo sie liegt.
+  //
+  // DIE KRUMEN KOMMEN AUS DEM NAVIGATIONSBAUM, NICHT AUS DEM PFAD. Aus dem
+  // Pfad gebaut stuende dort „Teams › 3f2a-91c8-… › Setup“ - eine Kennung,
+  // die niemandem etwas sagt und die Zeile unbrauchbar macht. Aus dem Baum
+  // kommen nur Namen, die wir selbst vergeben haben.
+  //
+  // Deshalb hoechstens zwei Stufen: Bereich und Unterbereich. Tiefer weiss
+  // der Baum nichts, und zu raten waere schlimmer als zu schweigen - die
+  // Ueberschrift der Seite steht ohnehin direkt darunter.
+  const activeSubItem = activeAreaSubItems.find((subItem) => subItem.isActive(pathname));
+  const breadcrumb = activeArea
+    ? [
+        { href: activeArea.href, label: activeArea.label },
+        ...(activeSubItem ? [{ href: activeSubItem.href, label: activeSubItem.label }] : []),
+      ]
+    : [];
 
   // Auf dem Telefon steht statt der ganzen Reihe ein Knopf. Was dahinter
   // liegt, muss trotzdem sichtbar bleiben - deshalb traegt der Knopf die Summe
@@ -691,6 +717,44 @@ export function ProductShell({
             </div>
           ) : null}
         </header>
+
+        {/* ---------------------------------------------------------------
+            AUF JEDER EBENE UND AUF JEDEM GERAET
+            ---------------------------------------------------------------
+
+            Die zweite Reihe gibt es erst ab 1024 Pixeln und nur bei Align.
+            Diese Zeile gibt es immer - gerade auf dem Telefon, wo die
+            Bereiche hinter einem Knopf liegen und man sonst gar nicht sieht,
+            worin man steht.
+
+            EIN EINTRAG IST NUR DANN „HIER“, WENN ER WIRKLICH HIER IST.
+            Erster Anlauf markierte immer den letzten - auf
+            /connect/listings/abc stand dann „Connect“ als aktuelle Seite, und
+            der Weg nach /connect war weg. Verglichen wird deshalb die
+            Adresse, nicht die Position in der Liste. */}
+        {breadcrumb.length > 0 ? (
+          <nav
+            aria-label={t("breadcrumbLabel")}
+            className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 md:px-10 xl:px-12"
+          >
+            <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+              {breadcrumb.map((krume, index) => (
+                <li key={krume.href} className="flex items-center gap-1.5">
+                  {index > 0 ? <span aria-hidden="true">›</span> : null}
+                  {krume.href === pathname ? (
+                    <span aria-current="page" className="font-medium text-slate-700">
+                      {krume.label}
+                    </span>
+                  ) : (
+                    <Link href={krume.href} className="hover:text-slate-900 hover:underline">
+                      {krume.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        ) : null}
 
         {children}
         {hasFounder && researchConsentState === "undecided" ? (

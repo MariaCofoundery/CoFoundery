@@ -49,9 +49,15 @@ test("die Unterseiten stehen in einer eigenen Reihe, nicht neben den Bereichen",
 
 test("die Reihe erscheint nur im aktiven Bereich", () => {
   // Eine leere Leiste wäre ein Balken ohne Aussage.
+  //
+  // GEAENDERT AM 30.09.2026: Hier stand der Ausdruck woertlich
+  // (`navigationItems.find(...)?.subItems`). Seit die Brotkrumenzeile
+  // denselben aktiven Bereich braucht, steht er einmal als `activeArea` da -
+  // die Pruefung haengt jetzt an der Sache und nicht an der Schreibweise.
   const shell = source(SHELL);
   assert.match(shell, /activeAreaSubItems\.length > 0 \?/);
-  assert.match(shell, /navigationItems\.find\(\(item\) => item\.isActive\(pathname\)\)\?\.subItems/);
+  assert.match(shell, /const activeArea = navigationItems\.find\(\(item\) => item\.isActive\(pathname\)\)/);
+  assert.match(shell, /const activeAreaSubItems = activeArea\?\.subItems/);
 });
 
 test("Align leuchtet auch in der Library, weil sie dort hingehört", () => {

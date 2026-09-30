@@ -50,5 +50,6 @@
   "menuClose": "Schließen",
   "menuAttentionBadge": "{count, plural, =0 {Nichts Offenes} one {1 offener Punkt im Menü} other {# offene Punkte im Menü}}",
   "alignOwnProfile": "Gesamtbild",
-  "alignNewVersion": "Neue Fassung (Test)"
+  "alignNewVersion": "Neue Fassung (Test)",
+  "breadcrumbLabel": "Wo du bist"
 }
