@@ -68,3 +68,37 @@ test("die Leiste legt kein Vorhaben an", () => {
   assert.ok(!/resolveVenture/.test(code));
   assert.match(code, /findVentures/);
 });
+
+test("nach dem Absenden passiert etwas", () => {
+  // GEMELDET AM 30.09.2026: Nach „Founder-Profil erstellen“ blieb man stehen,
+  // wo man war, und ein Satz sagte, es sei abgegeben. Das ist der Moment, in
+  // dem die meiste Arbeit hinter einem liegt.
+  const seite = readFileSync(
+    join("src", "app", "(product)", "founder-alignment", "profil", "page.tsx"), "utf8");
+  assert.match(seite, /afterSubmit="\/founder-alignment\/profil\/antworten\?erstellt=1"/);
+
+  const fragebogen = readFileSync(
+    join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");
+  assert.match(fragebogen, /if \(afterSubmit\) router\.push\(afterSubmit\)/);
+
+  // Und dort steht dann etwas - samt Weg in den naechsten Abschnitt.
+  const ziel = readFileSync(
+    join("src", "app", "(product)", "founder-alignment", "profil", "antworten", "page.tsx"),
+    "utf8");
+  assert.match(ziel, /erstellt === "1"/);
+  assert.match(ziel, /Weiter: Was du aufbauen willst/);
+  assert.match(ziel, /href="\/founder-alignment\/vorhaben"/);
+});
+
+test("der zweite Bereich heißt überall gleich", () => {
+  // „Euer Vorhaben“ setzt ein Wir voraus, das es oft noch nicht gibt -
+  // Solo-Foundernde und Leute vor der Co-Founder-Suche fielen damit durch.
+  for (const datei of [
+    join("src", "features", "instruments", "align", "AlignNav.tsx"),
+    join("src", "features", "instruments", "align", "AlignCard.tsx"),
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "page.tsx"),
+  ]) {
+    const text = readFileSync(datei, "utf8");
+    assert.match(text, /Was du aufbauen willst/, datei);
+  }
+});

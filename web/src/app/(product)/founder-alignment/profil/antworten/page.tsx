@@ -18,7 +18,12 @@ import { getRequestUser } from "@/lib/supabase/server";
  * Mittelwert über mehrere Fragen. „4.4 von 5“ wäre eine Behauptung über eine
  * Skala, die es nicht gibt.
  */
-export default async function ProfileAnswersPage() {
+export default async function ProfileAnswersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erstellt?: string }>;
+}) {
+  const { erstellt } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/profil/antworten")}`);
@@ -35,6 +40,38 @@ export default async function ProfileAnswersPage() {
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>
+      {/* ---------------------------------------------------------------
+          DER MOMENT NACH DEM ABSENDEN
+          ---------------------------------------------------------------
+
+          Gemeldet am 30.09.2026: Nach "Founder-Profil erstellen" passierte
+          nichts Spuerbares. Hier liegt die meiste Arbeit hinter einem - und
+          das darf man sehen. Der Kasten steht nur beim ersten Mal da; wer
+          die Seite spaeter wieder aufruft, braucht keine Gratulation mehr. */}
+      {erstellt === "1" && (
+        <section className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
+          <h2 className="text-xl font-semibold text-slate-950">Geschafft.</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-700">
+            Dein Arbeitsprofil steht. Unten siehst du, was du geantwortet hast — und
+            oben auf einen Blick, wie sich das verteilt.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/founder-alignment/vorhaben"
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+            >
+              Weiter: Was du aufbauen willst
+            </Link>
+            <Link
+              href="/dashboard"
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
+            >
+              Später
+            </Link>
+          </div>
+        </section>
+      )}
+
       <h1 className="text-2xl font-semibold text-slate-900">Wie du arbeitest</h1>
       <p className="mt-4 text-slate-700">
         Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein

@@ -4,7 +4,7 @@ import { getAlignNavState } from "@/features/instruments/align/navState";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
 import { VentureHeader } from "@/features/instruments/align/VentureHeader";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
-import { getItemsV22, offeredItemsV22, VENTURE_ALIGNMENT } from "@/features/instruments/align/registries";
+import { getItemsV22 } from "@/features/instruments/align/registries";
 import { resolveVenture, solePartnerName } from "@/features/instruments/align/ventureResolution";
 import { needsConfirmation } from "@/features/instruments/align/needsConfirmation";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -119,13 +119,23 @@ export default async function VentureAlignmentPage({
       <VentureHeader venture={venture} needsConfirmation={frageBestaetigung} />
 
       <h1 className="mt-4 text-2xl font-semibold text-slate-900">
-        Was dir bei diesem Vorhaben wichtig ist
+        Was du aufbauen willst
       </h1>
+      {/* DIE TECHNISCHE EINLEITUNG IST WEG. Hier stand "42 Fragen zu Zielen,
+          Zusagen, Regeln und Grenzen" und darunter "Gilt fuer EIN Vorhaben und
+          einen Zeitraum. Nicht uebertragbar ..." - eine Auskunft ueber das
+          Instrument an jemanden, der gerade anfangen will. Die Gueltigkeit
+          gehoert in den Bericht, nicht vor den Fragebogen. */}
       <p className="mt-4 text-slate-700">
-        {offeredItemsV22("venture_alignment").length} Fragen zu Zielen, Zusagen, Regeln und
-        Grenzen. Sie gelten für dieses eine Vorhaben.
+        Jetzt geht es um dein konkretes Vorhaben. Was möchtest du damit erreichen? Was
+        kannst du realistisch einbringen? Und welche Erwartungen, Regeln oder Grenzen
+        sind dir dabei wichtig?
       </p>
-      <p className="mt-2 text-sm text-slate-500">{VENTURE_ALIGNMENT.validity}</p>
+      <p className="mt-3 text-slate-700">
+        Manche Dinge sind vielleicht schon ziemlich klar, andere noch nicht. Beides ist
+        völlig okay — gerade offene Punkte können später helfen, wichtige Gespräche
+        sichtbar zu machen.
+      </p>
 
       <div className="mt-10">
         <Questionnaire

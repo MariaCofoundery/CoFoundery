@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/AnswerFieldV21";
 import type { SectionView } from "@/features/instruments/v21/questionnaireDataV21";
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
@@ -38,6 +39,19 @@ type Props = {
    * wäre dort schlimmer als keine. Ohne diese Angabe bleibt alles, wie es war.
    */
   screens?: ScreenSet | null;
+  /**
+   * Wohin es nach dem Abgeben geht.
+   *
+   * ---------------------------------------------------------------------------
+   * ES MUSS ETWAS PASSIEREN
+   * ---------------------------------------------------------------------------
+   *
+   * Gemeldet am 30.09.2026: Nach „Founder-Profil erstellen“ blieb man stehen,
+   * wo man war, und ein Satz sagte, es sei abgegeben. Das ist der Moment, in
+   * dem die meiste Arbeit hinter einem liegt — und er fühlte sich an wie
+   * nichts.
+   */
+  afterSubmit?: string | null;
 };
 
 /**
@@ -60,6 +74,7 @@ type Props = {
  */
 export function Questionnaire({
   scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens = null,
+  afterSubmit = null,
 }: Props) {
   const [answers, setAnswers] = useState<Record<string, DraftV21>>(initialAnswers);
   const [states, setStates] = useState<Record<string, SaveState>>({});
@@ -80,6 +95,7 @@ export function Questionnaire({
   const nichtGespeichert = () =>
     Object.entries(states).filter(([, state]) => state === "error" || state === "saving");
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const router = useRouter();
 
   /**
    * Schritt 0 ist die Einleitung, 1 bis 7 sind die Bildschirme.
@@ -226,6 +242,10 @@ export function Questionnaire({
                   if (result.ok) {
                     setIsSubmitted(true);
                     setMissingAfterSubmit([]);
+                    // NICHT STEHENBLEIBEN. Der Knopf schliesst den laengsten
+                    // Teil ab - danach gehoert man woandershin, und zwar
+                    // dorthin, wo das Ergebnis steht.
+                    if (afterSubmit) router.push(afterSubmit);
                   } else {
                     setMissingAfterSubmit(result.missing ?? []);
                     // Fehlende Antworten stehen an den Fragen selbst. Alles
