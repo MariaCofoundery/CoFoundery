@@ -86,6 +86,19 @@ const uxReview = readFileSync(
   "utf8",
 ).replace(/\s+/g, " ");
 
+/**
+ * Und Teil 2 für das Venture-Alignment.
+ *
+ * Er ändert dort nicht nur Fragetexte, sondern ANTWORTBESCHRIFTUNGEN — „sehr
+ * wenig selbstständig" zwingt jeden, das erst zu übersetzen. W01 bis W06 sind
+ * ausgenommen: Sie werden in einer eigenen Runde auf ein Dreischritt-Muster
+ * umgebaut, und eine halbe Übernahme wäre schlimmer als keine.
+ */
+const uxReview2 = readFileSync(
+  join(process.cwd(), "..", "docs", "ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md"),
+  "utf8",
+).replace(/\s+/g, " ");
+
 const quelleFuer = (scope: AssessmentScope) =>
   scope === "founder_profile" ? uxReview : review;
 
@@ -107,7 +120,7 @@ test("jeder Fragetext steht so in seinem Review", () => {
   for (const item of getItemsV22(scope)) {
     if (NOCH_NICHT_UEBERARBEITET.has(item.itemId) || item.retired) continue;
     const review = quelleFuer(scope);
-    if (review.includes(item.prompt)) continue;
+    if (review.includes(item.prompt) || uxReview2.includes(item.prompt)) continue;
 
     // W02 bis W06 stehen im Dokument als zwei Bloecke: erst die Lage, dann die
     // Frage. Zusammengesetzt ergeben sie den Fragetext - und deshalb wird
@@ -115,7 +128,7 @@ test("jeder Fragetext steht so in seinem Review", () => {
     // nichts: Jeder Satz muss dort stehen.
     for (const satz of item.prompt.split(/(?<=\.)\s+/)) {
       assert.ok(
-        review.includes(satz.trim()),
+        review.includes(satz.trim()) || uxReview2.includes(satz.trim()),
         `${item.itemId}: dieser Satz steht in keinem Review:\n${satz}`,
       );
     }
@@ -158,7 +171,8 @@ test("jede Antwortmöglichkeit steht in einer der beiden Quellen - oder ist als 
       if (
         flach.includes(option.label) ||
         review.includes(option.label) ||
-        uxReview.includes(option.label)
+        uxReview.includes(option.label) ||
+        uxReview2.includes(option.label)
       ) continue;
       assert.ok(
         begruendet.includes(item.itemId),

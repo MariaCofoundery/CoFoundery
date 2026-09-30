@@ -103,6 +103,73 @@ REVIEW = "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md"
 # Ueberarbeitung schlimmer als keine.
 UX_REVIEW = "docs/ALIGN_UX_QA_Teil1_Founderprofil_v0.2.md"
 
+# Und dasselbe fuer den zweiten Bereich.
+#
+# Der grosse Unterschied zu Teil 1: Hier aendern sich nicht nur Fragetexte,
+# sondern ANTWORTBESCHRIFTUNGEN. "sehr wenig selbststaendig" zwingt jeden, das
+# erst zu uebersetzen; "die meisten Schritte vorher abstimmen" sagt, wie es im
+# Alltag aussieht. Die Reihenfolge bleibt von wenig zu viel eigenem Spielraum,
+# die Anzahl bleibt, die Kennungen bleiben - gespeicherte Antworten zeigen auf
+# die Stelle und nicht auf den Text.
+UX_REVIEW_2 = "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md"
+
+
+def ux_review_2():
+    """Wortlaute, Hinweise und Antwortbeschriftungen aus dem UX-Review Teil 2."""
+    text = io.open(UX_REVIEW_2, encoding="utf-8").read()
+    out = {}
+    for block in re.split(r"^### ", text, flags=re.M)[1:]:
+        kopf, koerper = block.split("\n", 1)
+        kennung = kopf.strip().split(" ")[0].split("—")[0].strip()
+        if not re.match(r"^[A-Z][0-9]{2}$", kennung):
+            continue
+        # W01 bis W06 bleiben aussen vor. Dort steht unter "Szenario:" eine
+        # verkuerzte Lage, und Abschnitt 11 baut die sechs ohnehin auf ein
+        # Dreischritt-Muster um - eine halbe Uebernahme waere schlimmer als
+        # keine.
+        if kennung.startswith("W"):
+            continue
+
+        eintrag = {}
+        # Mit Marke, wo es eine gibt; sonst das erste Zitat im Block. Das
+        # Dokument schreibt beides - "Frage:" in Abschnitt 4, direkt darunter
+        # in Abschnitt 9 und 10.
+        frage = _zitat_nach(koerper, "Frage:") or _erstes_zitat(koerper)
+        if frage:
+            eintrag["prompt"] = frage
+        hinweis = _zitat_nach(koerper, "Hinweis:")
+        if hinweis:
+            eintrag["hint"] = hinweis
+        labels = _nummern_nach(koerper, "Neue Antwortlabels:")
+        if labels:
+            eintrag["options"] = labels
+        if eintrag:
+            out[kennung] = eintrag
+    return out
+
+
+def _erstes_zitat(text):
+    """Das erste Zitat im Block - aber nicht das eines Hinweises."""
+    vor_hinweis = text.split("Hinweis:")[0]
+    bloecke = _zitate(vor_hinweis)
+    return bloecke[0] if bloecke else None
+
+
+def _zitat_nach(text, marke):
+    """Der Zitatblock direkt nach einer Marke - mehrzeilig zusammengezogen."""
+    i = text.find(marke)
+    if i < 0:
+        return None
+    teile = []
+    for zeile in text[i + len(marke):].split("\n"):
+        if zeile.startswith("> "):
+            teile.append(zeile[2:].strip())
+        elif zeile.strip() == ">":
+            teile.append("")
+        elif teile:
+            break
+    return re.sub(r"\s+", " ", " ".join(teile)).strip() or None
+
 
 def ux_review():
     """Wortlaute und Hinweise aus dem UX-Review - nur Items des Arbeitsprofils."""
@@ -538,6 +605,7 @@ def s01_neu():
 
 REVIEW_ITEMS = sprachreview()
 UX_ITEMS = ux_review()
+UX2_ITEMS = ux_review_2()
 
 _unbekannt = sorted(k for k in REVIEW_ITEMS if k not in items and not k.startswith("S01"))
 if _unbekannt:
@@ -686,6 +754,25 @@ for item_id, ux in UX_ITEMS.items():
     if ux.get("hint"):
         items[item_id]["hint"] = ux["hint"]
 
+# Teil 2 zuletzt - er gilt fuer das Venture-Alignment.
+for item_id, ux in UX2_ITEMS.items():
+    if item_id not in items:
+        raise SystemExit(f"Das UX-Review Teil 2 nennt {item_id} - die Frage gibt es nicht")
+    it = items[item_id]
+    if ux.get("options"):
+        if len(ux["options"]) != len(it["options"]):
+            raise SystemExit(
+                f"{item_id}: Teil 2 aendert die ANZAHL der Antworten "
+                f"({len(it['options'])} -> {len(ux['options'])}). "
+                "Reihenfolge und Anzahl muessen bleiben - gespeicherte Antworten "
+                "zeigen auf die Stelle und nicht auf den Text."
+            )
+        it["options"] = ux["options"]
+    if ux.get("prompt"):
+        it["prompt"] = ux["prompt"]
+    if ux.get("hint"):
+        it["hint"] = ux["hint"]
+
 for n, item_id in enumerate(reihenfolge, start=1):
     it = items[item_id]
     fmt = format_von(item_id)
@@ -750,7 +837,7 @@ for scope, meta in SCOPES.items():
         ("createdAt", "2026-09-29"),
         ("source", SRC),
         ("editorialSource", REVIEW),
-        ("uxSource", UX_REVIEW if scope == "founder_profile" else None),
+        ("uxSource", UX_REVIEW if scope == "founder_profile" else UX_REVIEW_2),
         ("validity", meta["validity"]),
         ("overallScore", False),
         ("dimensionScores", False),
@@ -760,6 +847,12 @@ for scope, meta in SCOPES.items():
                 ("source", "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen"),
                 ("reason", "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten."),
                 ("decidedBy", "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."),
+            ]),
+            collections.OrderedDict([
+                ("what", "Venture-Alignment: Wortlaute, Hinweise und Antwortbeschriftungen aus dem UX-Review Teil 2 v0.1."),
+                ("source", UX_REVIEW_2),
+                ("reason", "Wo ein Konstrukt ueber abstrakte Begriffe wie 'Selbststaendigkeit' erfasst wird, sollen die Antworten zeigen, wie das im Alltag aussieht - 'sehr wenig selbststaendig' zwingt jeden, das erst zu uebersetzen. Die Reihenfolge bleibt von wenig zu viel eigenem Spielraum, die Anzahl bleibt, die Kennungen bleiben."),
+                ("decidedBy", "Maria, 30.09.2026"),
             ]),
             collections.OrderedDict([
                 ("what", "Arbeitsprofil: Wortlaute und Hinweise aus dem UX-Review v0.2 (liegt ueber dem Sprachreview)."),

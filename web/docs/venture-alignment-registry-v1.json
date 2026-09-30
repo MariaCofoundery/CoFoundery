@@ -7,7 +7,7 @@
   "createdAt": "2026-09-29",
   "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md",
   "editorialSource": "docs/CoFoundery_ALIGN_Sprachreview_S01_MissingReasons_v0.1.md",
-  "uxSource": null,
+  "uxSource": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md",
   "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Nicht uebertragbar: Dieselbe Person kann bei zwei Vorhaben verschiedene Zusagen machen, ohne sich zu widersprechen.",
   "overallScore": false,
   "dimensionScores": false,
@@ -17,6 +17,12 @@
       "source": "Master-Arbeitsfassung v0.2, Abschnitt 4: dort nur die fuenf Stufen",
       "reason": "Ohne Ausweg muss jemand eine Stufe ankreuzen, die er nicht meint. Genau daran ist v1 gescheitert: 'nicht beantwortet' war ein Zustand ohne Aussage, und die Auswertung hat geraten.",
       "decidedBy": "Gutachterin, 29.09.2026 - ausdruecklich bestaetigt. Vorrangregel: not_decided, not_clarified, prefer_not_to_say und confidential_first gehen cannot_assess vor."
+    },
+    {
+      "what": "Venture-Alignment: Wortlaute, Hinweise und Antwortbeschriftungen aus dem UX-Review Teil 2 v0.1.",
+      "source": "docs/ALIGN_UX_QA_Teil2_Was_du_aufbauen_willst_v0.1.md",
+      "reason": "Wo ein Konstrukt ueber abstrakte Begriffe wie 'Selbststaendigkeit' erfasst wird, sollen die Antworten zeigen, wie das im Alltag aussieht - 'sehr wenig selbststaendig' zwingt jeden, das erst zu uebersetzen. Die Reihenfolge bleibt von wenig zu viel eigenem Spielraum, die Anzahl bleibt, die Kennungen bleiben.",
+      "decidedBy": "Maria, 30.09.2026"
     },
     {
       "what": "Arbeitsprofil: Wortlaute und Hinweise aus dem UX-Review v0.2 (liegt ueber dem Sprachreview).",
@@ -86,37 +92,37 @@
       "itemId": "U01",
       "order": 1,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Dein Verantwortungsbereich ist klar geregelt. Wie selbstständig möchtest du dort normalerweise über das Vorgehen entscheiden?",
+      "prompt": "Wenn dein Verantwortungsbereich klar ist: Wie möchtest du im Alltag entscheiden, wie du ein Ziel erreichst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
         {
           "optionId": "U01_o1",
-          "label": "sehr wenig selbstständig",
+          "label": "ich möchte das Vorgehen grundsätzlich gemeinsam abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U01_o2",
-          "label": "eher wenig",
+          "label": "ich möchte die meisten Schritte vorher abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U01_o3",
-          "label": "teils/teils",
+          "label": "teils selbst entscheiden, teils abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U01_o4",
-          "label": "eher selbstständig",
+          "label": "meist selbst entscheiden und bei wichtigen Punkten Rücksprache halten",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U01_o5",
-          "label": "sehr selbstständig",
+          "label": "in meinem Bereich selbst entscheiden und nur bei größeren Auswirkungen abstimmen",
           "requiresText": false,
           "exclusive": false
         }
@@ -133,37 +139,37 @@
       "itemId": "U03",
       "order": 2,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Für deinen Bereich gibt es ein vereinbartes Budget. Wie selbstständig möchtest du innerhalb dieses Rahmens über Ausgaben entscheiden?",
+      "prompt": "Für deinen Bereich gibt es ein vereinbartes Budget. Wie möchtest du innerhalb dieses Rahmens über Ausgaben entscheiden?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
         {
           "optionId": "U03_o1",
-          "label": "sehr wenig selbstständig",
+          "label": "Ausgaben grundsätzlich vorher gemeinsam abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U03_o2",
-          "label": "eher wenig",
+          "label": "die meisten Ausgaben vorher abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U03_o3",
-          "label": "teils/teils",
+          "label": "kleinere Ausgaben selbst entscheiden, größere gemeinsam",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U03_o4",
-          "label": "eher selbstständig",
+          "label": "meist selbst entscheiden und nur größere oder ungewöhnliche Ausgaben abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U03_o5",
-          "label": "sehr selbstständig",
+          "label": "innerhalb des vereinbarten Budgets selbst entscheiden",
           "requiresText": false,
           "exclusive": false
         }
@@ -180,37 +186,37 @@
       "itemId": "U04",
       "order": 3,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "In deinem Bereich sind mehrere sinnvolle Vorgehensweisen möglich. Wie selbstständig möchtest du entscheiden, welchen Weg du gehst?",
+      "prompt": "Wenn mehrere sinnvolle Wege möglich sind: Wie möchtest du entscheiden, welchen du gehst?",
       "hint": null,
       "answerFormat": "ordinal_choice",
       "options": [
         {
           "optionId": "U04_o1",
-          "label": "sehr wenig selbstständig",
+          "label": "gemeinsam entscheiden, welchen Weg wir nehmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U04_o2",
-          "label": "eher wenig",
+          "label": "vorher Rücksprache halten und den Weg meist gemeinsam festlegen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U04_o3",
-          "label": "teils/teils",
+          "label": "je nach Situation gemeinsam oder selbst entscheiden",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U04_o4",
-          "label": "eher selbstständig",
+          "label": "Input einholen und dann meist selbst entscheiden",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U04_o5",
-          "label": "sehr selbstständig",
+          "label": "im eigenen Verantwortungsbereich selbst entscheiden",
           "requiresText": false,
           "exclusive": false
         }
@@ -227,37 +233,37 @@
       "itemId": "U05",
       "order": 4,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Während der Arbeit ändert sich etwas. Wie frei möchtest du einen vereinbarten Plan in deinem Bereich selbst anpassen können?",
-      "hint": null,
+      "prompt": "Wenn sich während der Arbeit etwas verändert: Wie möchtest du mit Anpassungen an einem vereinbarten Plan umgehen?",
+      "hint": "Gute Zusammenarbeit heißt nicht für alle dasselbe. Manche möchten früh eingebunden sein, andere lieber dann, wenn etwas konkreter wird.",
       "answerFormat": "ordinal_choice",
       "options": [
         {
           "optionId": "U05_o1",
-          "label": "gar nicht frei",
+          "label": "Änderungen am vereinbarten Plan gemeinsam entscheiden",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U05_o2",
-          "label": "eher wenig frei",
+          "label": "die meisten Änderungen vorher abstimmen",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U05_o3",
-          "label": "teils/teils",
+          "label": "kleinere Änderungen selbst, größere gemeinsam entscheiden",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U05_o4",
-          "label": "eher frei",
+          "label": "meist selbst anpassen und bei größeren Änderungen Rücksprache halten",
           "requiresText": false,
           "exclusive": false
         },
         {
           "optionId": "U05_o5",
-          "label": "sehr frei",
+          "label": "im eigenen Bereich selbst anpassen und andere informieren, wenn es für sie relevant ist",
           "requiresText": false,
           "exclusive": false
         }
@@ -321,7 +327,7 @@
       "itemId": "K03",
       "order": 6,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "In einem anderen Bereich zeichnet sich eine wichtige Richtungsänderung ab. Wann möchtest du davon erfahren?",
+      "prompt": "In einem anderen Bereich zeichnet sich eine wichtige Änderung ab. Wann möchtest du davon erfahren?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -368,7 +374,7 @@
       "itemId": "K04",
       "order": 7,
       "section": "U/K – Zusammenarbeit: Spielraum und Information",
-      "prompt": "Welche Form von Überblick über andere Bereiche passt im Alltag am besten zu dir?",
+      "prompt": "Welche Art von Überblick über andere Bereiche wäre für dich im Alltag am hilfreichsten?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -824,7 +830,7 @@
       "itemId": "S02",
       "order": 16,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welche Vorstellung hast du aktuell für deine Unternehmensanteile in den nächsten drei Jahren?",
+      "prompt": "Wie denkst du heute über deine Beteiligung am Unternehmen?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -875,7 +881,7 @@
       "itemId": "S03",
       "order": 17,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Wie stehst du aktuell dazu, externes Kapital aufzunehmen und dafür Unternehmensanteile abzugeben?",
+      "prompt": "Wie offen bist du dafür, externe Investor:innen aufzunehmen und dafür Unternehmensanteile abzugeben?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -920,8 +926,8 @@
       "itemId": "S04",
       "order": 18,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welches konkrete Ergebnis sollte das Vorhaben aus deiner Sicht in den nächsten zwölf Monaten erreichen?",
-      "hint": "Auch ein klares Lernergebnis kann ein Ziel sein – zum Beispiel eine Annahme zu prüfen oder bewusst zu entscheiden, einen Ansatz nicht weiterzuverfolgen.",
+      "prompt": "Was sollte dieses Vorhaben aus deiner Sicht in den nächsten zwölf Monaten konkret erreichen?",
+      "hint": "Auch ein klares Lernergebnis kann ein Ziel sein – zum Beispiel eine wichtige Annahme zu prüfen oder bewusst zu entscheiden, einen Ansatz nicht weiterzuverfolgen.",
       "answerFormat": "structured_text",
       "options": [],
       "missing": [
@@ -936,7 +942,7 @@
       "itemId": "S06",
       "order": 19,
       "section": "S – Ziele & strategische Richtung",
-      "prompt": "Welche Rolle möchtest du in etwa drei Jahren selbst im Unternehmen haben?",
+      "prompt": "Wenn du ungefähr drei Jahre vorausblickst: Welche Rolle möchtest du dann am liebsten im Unternehmen haben?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -990,7 +996,7 @@
       "itemId": "R01",
       "order": 20,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für das Vorhaben einplanen?",
+      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für dieses Vorhaben einplanen?",
       "hint": null,
       "answerFormat": "number_range",
       "options": [],
@@ -1029,7 +1035,7 @@
       "order": 22,
       "section": "R – Ressourcen & tatsächliche Zusagen",
       "prompt": "Welche regelmäßigen Zeiten könntest du in den nächsten zwölf Wochen für gemeinsame Arbeit freihalten?",
-      "hint": "Private Gründe für nicht verfügbare Zeiten müssen nicht angegeben werden.",
+      "hint": "Private Gründe für nicht verfügbare Zeiten musst du nicht angeben.",
       "answerFormat": "time_windows",
       "options": [],
       "missing": [
@@ -1044,7 +1050,7 @@
       "itemId": "R04",
       "order": 23,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Ab wann brauchst du voraussichtlich regelmäßige Auszahlungen aus dem Vorhaben, um deinen Lebensunterhalt zu decken?",
+      "prompt": "Ab wann müsstest du voraussichtlich regelmäßig Geld aus dem Vorhaben bekommen, damit du deinen Lebensunterhalt damit abdecken kannst?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -1100,7 +1106,7 @@
       "itemId": "R06",
       "order": 25,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Unter welchen Bedingungen könntest du dir vorstellen, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?",
+      "prompt": "Was müsste passieren, damit du dir vorstellen könntest, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1159,7 +1165,7 @@
       "itemId": "R09",
       "order": 26,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Ihr erreicht einen wichtigen vereinbarten Meilenstein nicht. Was sollte dann für deine weitere Mitarbeit gelten?",
+      "prompt": "Angenommen, ein wichtiger vereinbarter Meilenstein wird nicht erreicht. Wie möchtest du dann über deine weitere Mitarbeit entscheiden?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -1253,7 +1259,7 @@
       "itemId": "R12",
       "order": 28,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wann sollten diese Angaben spätestens wieder überprüft werden?",
+      "prompt": "Wann wäre ein guter Zeitpunkt, diese Zusagen und Erwartungen gemeinsam wieder anzuschauen?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -1282,7 +1288,7 @@
       "itemId": "G01",
       "order": 29,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Ihr seid euch bei einer wichtigen Entscheidung in einem klar zugeordneten Verantwortungsbereich uneinig. Andere Bereiche sind nicht wesentlich betroffen. Welche Regel soll in so einem Fall gelten?",
+      "prompt": "Ihr seid euch bei einer wichtigen Entscheidung uneinig. Sie liegt klar im Verantwortungsbereich einer Person und betrifft die anderen Bereiche nicht wesentlich. Welche Regel sollte dann gelten?",
       "hint": null,
       "answerFormat": "single_choice",
       "options": [
@@ -1329,7 +1335,7 @@
       "itemId": "G04",
       "order": 30,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Ihr findet bis zum vereinbarten Zeitpunkt keine Einigung über eine wichtige Entscheidung. Welche Lösungen sollten dann grundsätzlich möglich sein?",
+      "prompt": "Ihr kommt bis zum vereinbarten Zeitpunkt bei einer wichtigen Entscheidung zu keiner Einigung. Welche Wege sollten dann grundsätzlich möglich sein?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1376,7 +1382,7 @@
       "itemId": "G05",
       "order": 31,
       "section": "G – Entscheidungs- und Teamregeln",
-      "prompt": "Bei welchen Entscheidungen sollten aus deiner Sicht grundsätzlich alle Founder zustimmen?",
+      "prompt": "Bei welchen Entscheidungen sollten aus deiner Sicht immer alle Founder zustimmen?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1429,7 +1435,7 @@
       "itemId": "B01",
       "order": 32,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Welchen zusätzlichen Betrag an eigenem Geld würdest du aktuell höchstens in das Vorhaben investieren, wenn du einkalkulierst, dass du ihn vollständig verlieren könntest?",
+      "prompt": "Wie viel eigenes Geld würdest du aktuell höchstens zusätzlich investieren, wenn du einkalkulierst, dass du den Betrag vollständig verlieren könntest?",
       "hint": null,
       "answerFormat": "money_range",
       "options": [],
@@ -1449,7 +1455,7 @@
       "itemId": "B04",
       "order": 33,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Welche finanzielle Mindestreserve sollte bestehen bleiben, bevor ihr zusätzliches Geld in ein größeres Vorhaben steckt?",
+      "prompt": "Welche finanzielle Reserve sollte für dich mindestens bestehen bleiben, bevor zusätzliches Geld in das Vorhaben fließt?",
       "hint": null,
       "answerFormat": "number_range",
       "options": [],
@@ -1474,7 +1480,7 @@
       "itemId": "B05",
       "order": 34,
       "section": "B – konkrete Risikogrenzen & Absicherung",
-      "prompt": "Ein Vorhaben würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Welche Absicherungen wären dir vorher wichtig?",
+      "prompt": "Ein Schritt würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Was wäre dir wichtig, bevor ihr loslegt?",
       "hint": null,
       "answerFormat": "multi_choice",
       "options": [
@@ -1719,7 +1725,7 @@
       "itemId": "L01",
       "order": 41,
       "section": "L – persönliche Grenzen",
-      "prompt": "Gibt es Vorgehensweisen oder Entscheidungen, die für dich im Unternehmen grundsätzlich nicht infrage kommen?",
+      "prompt": "Gibt es Entscheidungen oder Vorgehensweisen, die für dich grundsätzlich nicht infrage kommen?",
       "hint": null,
       "answerFormat": "free_text_repeatable",
       "options": [],
