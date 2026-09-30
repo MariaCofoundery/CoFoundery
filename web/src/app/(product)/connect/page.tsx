@@ -12,7 +12,6 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
 import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
-import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { generateConnectSuggestions } from "@/features/connect/connectSuggestionData";
@@ -64,7 +63,6 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
               gemacht haben. */}
           <div className="flex flex-col items-start gap-2 sm:items-end">
             {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
-            <ConnectMineNav />
           </div>
         </div>
       </header>

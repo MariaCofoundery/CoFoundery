@@ -201,6 +201,10 @@ test("Explore reuses the narrow paginated RPC without private filters or alignme
   assert.match(source, /p_page_size: pageSize/);
   assert.match(source, /p_offset: \(page - 1\) \* pageSize/);
   assert.match(page, /showMatchReasons=\{mode === "search"\}/);
-  assert.match(page, /\["explore", "search"\]/);
-  assert.match(page, /t\(`v2\.modes\.\$\{item\}`\)/);
+  // GEAENDERT AM 30.09.2026: Die Reiterreihe stand im Seitenquelltext und
+  // steht jetzt in `FindTabs` - zusammen mit "Gemerkte" als drittem
+  // Ausschnitt, und damit auch auf der Gemerkt-Seite.
+  assert.match(page, /<FindTabs active=\{mode === "search" \? "search" : "explore"\}/);
+  const tabs = readFileSync("src/features/discovery/FindTabs.tsx", "utf8");
+  assert.match(tabs, /t\(`v2\.modes\.\$\{tab\.key\}`\)/);
 });

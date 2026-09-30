@@ -26,6 +26,8 @@ type Props = {
   avatarImageUrl?: string | null;
   incomingOpenRequestCount: number;
   incomingConnectContactCount: number;
+  /** Wie viele Vorschlaege auf eine Entscheidung warten. */
+  connectSuggestionCount?: number;
   unreadConnectMessageCount: number;
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
@@ -52,7 +54,20 @@ type NavigationItem = {
    * vorher unlesbar gemacht: fuenf Eintraege, die drei verschiedene Sorten
    * waren. Eine eigene Ebene loest das, ohne die Seiten zu verstecken.
    */
-  subItems?: { href: string; label: string; isActive: (pathname: string) => boolean }[];
+  subItems?: {
+    href: string;
+    label: string;
+    isActive: (pathname: string) => boolean;
+    /**
+     * Eine Zahl neben dem Namen — wenn dort etwas wartet.
+     *
+     * NICHT ROT. Rot ist fuer das reserviert, wo ein Mensch auf eine Antwort
+     * wartet: eine Anfrage, eine Nachricht. Ein Vorschlag wartet nicht, und
+     * eine rote Zahl, die auch fuer Unwichtiges leuchtet, verliert ihre
+     * Bedeutung fuer das Wichtige.
+     */
+    count?: { value: number; label: string };
+  }[];
 };
 
 type NavigationOverride = {
@@ -195,12 +210,14 @@ export function ProductShell({
   avatarImageUrl = null,
   incomingOpenRequestCount,
   incomingConnectContactCount,
+  connectSuggestionCount = 0,
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
 }: Props) {
   const pathname = usePathname();
   const t = useTranslations("navigation");
+  const tConnect = useTranslations("connect");
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
@@ -344,10 +361,45 @@ export function ProductShell({
     label: t("areaFind"),
     isActive: (currentPathname) => currentPathname.startsWith("/discovery"),
     badge: { kind: "intro", count: incomingOpenRequestCount },
-    // KEINE UNTEREINTRAEGE HIER. Die Ziele von FIND stehen in der Reihe
-    // "Deins" auf jeder FIND-Seite - dasselbe Muster wie in Connect. Beides
-    // gleichzeitig waeren zwei Wege zu denselben vier Seiten, und man lernt
-    // sich dann an, in beiden zu suchen.
+    // ---------------------------------------------------------------------
+    // EINE REGEL FUER ALLE DREI BEREICHE
+    // ---------------------------------------------------------------------
+    //
+    // GEWUENSCHT AM 30.09.2026: "Wenn das Menue tatsaechlich einheitlich ist,
+    // so wie wir das bei Align gemacht haben, fuer diese anderen beiden
+    // Bereiche auch, dann ist das ordentlicher."
+    //
+    // Die Regel, nach der sich entscheidet, was hier steht und was auf der
+    // Seite bleibt:
+    //
+    //   HIER stehen ZIELE - Orte, an die man geht: das Eigene und das
+    //   Aufgehobene. Sie sind von ueberall erreichbar, tragen die Krume und
+    //   sagen damit, wo man ist.
+    //
+    //   AUF DER SEITE bleiben AUSSCHNITTE - welchen Teil derselben Sache man
+    //   gerade ansieht. "Fuer dich" und "Suchen & filtern" sind zwei Blicke
+    //   auf dieselben Profile, nicht zwei Orte.
+    //
+    // Vorher war es umgekehrt verteilt: ALIGN hatte seine Ziele hier, FIND
+    // und Connect je eine eigene Reihe auf der Seite - drei Bereiche, zwei
+    // Muster, und auf den Unterseiten fehlte die Reihe teilweise ganz.
+    subItems: [
+      {
+        href: "/discovery/suche",
+        label: t("findYourSearch"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/suche"),
+      },
+      {
+        href: "/discovery/profile",
+        label: t("findProfile"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/profile"),
+      },
+      {
+        href: "/discovery/searches",
+        label: t("findSearches"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/searches"),
+      },
+    ],
   };
 
   const connectItem: NavigationItem = {
@@ -355,6 +407,43 @@ export function ProductShell({
     label: t("areaConnect"),
     isActive: (currentPathname) => currentPathname.startsWith("/connect"),
     badge: { kind: "attention", count: connectAttentionCount },
+    // Dieselbe Regel wie oben: die eigenen Sachen hier, die Reiter ueber die
+    // Inhalte ("Menschen", "Unternehmen", "Angebote", "Ungeloestes") bleiben
+    // auf der Seite - sie tragen Zaehler, und ein Reiter ohne Zahl laesst
+    // einen ins Leere klicken.
+    subItems: [
+      {
+        href: "/connect/profile",
+        label: t("connectProfile"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/profile"),
+      },
+      {
+        href: "/connect/my",
+        label: t("connectListings"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/my"),
+      },
+      {
+        href: "/connect/ventures/mine",
+        label: t("connectVentures"),
+        isActive: (currentPathname: string) =>
+          currentPathname.startsWith("/connect/ventures/mine"),
+      },
+      {
+        href: "/connect/suggestions",
+        label: t("connectSuggestions"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/suggestions"),
+        // Marias Frage war: "Wo sehe ich dann, wer mir vorgeschlagen wird?"
+        // Ein Link allein beantwortet sie nur fuer den, der ohnehin nachsieht.
+        ...(connectSuggestionCount > 0
+          ? {
+              count: {
+                value: connectSuggestionCount,
+                label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }),
+              },
+            }
+          : {}),
+      },
+    ],
   };
 
   const navigationItems: NavigationItem[] = [
@@ -715,6 +804,14 @@ export function ProductShell({
                     }`}
                   >
                     {subItem.label}
+                    {subItem.count ? (
+                      <span
+                        aria-label={subItem.count.label}
+                        className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 py-0.5 text-[.68rem] font-semibold leading-none text-slate-700"
+                      >
+                        {Math.min(subItem.count.value, 99)}
+                      </span>
+                    ) : null}
                   </Link>
                 ))}
               </nav>

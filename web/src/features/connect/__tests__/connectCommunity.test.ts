@@ -79,7 +79,9 @@ test("Unternehmen sind durchsuchbar, und die eigenen bleiben verwaltbar", () => 
   for (const path of [
     "src/features/connect/connectVentureActions.ts",
     "src/features/connect/ConnectVentureForm.tsx",
-    "src/features/connect/ConnectMineNav.tsx",
+    // Die eigene Reihe ist am 30.09.2026 in die Leiste gezogen - dort steht
+    // der Weg zu den eigenen Unternehmen jetzt.
+    "src/features/navigation/ProductShell.tsx",
   ]) {
     const code = codeOnly(path);
     const stale = [...code.matchAll(/["'`]\/connect\/ventures(?!\/mine)/g)];

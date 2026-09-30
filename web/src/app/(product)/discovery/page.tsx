@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { FindTabs } from "@/features/discovery/FindTabs";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/discoveryActions";
 import { DiscoverySavedSearchForm } from "@/features/discovery/DiscoverySavedSearchForm";
 import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard";
@@ -224,25 +224,13 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
               <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("v2.title")}</h1>
               <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("v2.subtitle")}</p>
             </div>
-            <DiscoveryMineNav />
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>{t("index.openRequests")}</Link>
           </div>
         </header>
 
-        <nav aria-label={t("v2.modes.label")} className="grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-1 sm:w-fit">
-          {(["explore", "search"] as const).map((item) => (
-            <Link
-              key={item}
-              href={`/discovery?mode=${item}`}
-              aria-current={mode === item ? "page" : undefined}
-              className={`min-h-11 rounded-xl px-5 py-2.5 text-center text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200 ${mode === item ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"}`}
-            >
-              {t(`v2.modes.${item}`)}
-            </Link>
-          ))}
-        </nav>
+        <FindTabs active={mode === "search" ? "search" : "explore"} />
 
         {mode === "search" ? <SearchBrief preferences={preferences} t={t} /> : null}
 

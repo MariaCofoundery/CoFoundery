@@ -1,10 +1,16 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const SHELL = "src/features/navigation/ProductShell.tsx";
+const CONNECT_PAGES = [
+  "src/app/(product)/connect/page.tsx",
+  "src/app/(product)/connect/problems/page.tsx",
+  "src/app/(product)/connect/people/page.tsx",
+  "src/app/(product)/connect/suggestions/page.tsx",
+];
 const DISCOVERY_PAGES = [
   "src/app/(product)/discovery/page.tsx",
   "src/app/(product)/discovery/saved/page.tsx",
@@ -76,45 +82,92 @@ test("die Advisor-Ansicht bekommt die Align-Unterseiten nicht", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Der Weg zum Eigenen in Find
+// Eine Regel fuer alle drei Bereiche
 // ---------------------------------------------------------------------------
-test("aus Find führt ein Weg zum eigenen Suchprofil", () => {
-  const nav = source("src/features/discovery/DiscoveryMineNav.tsx");
-  for (const href of ["/discovery/profile", "/discovery/searches", "/discovery/saved"]) {
-    assert.ok(nav.includes(`"${href}"`), `${href} ist von Find aus nicht erreichbar`);
+//
+// GEWUENSCHT AM 30.09.2026: "Wenn das Menue tatsaechlich einheitlich ist, so
+// wie wir das bei Align gemacht haben, fuer diese anderen beiden Bereiche
+// auch, dann ist das ordentlicher."
+//
+// Vorher hatte ALIGN seine Ziele in der Leiste, FIND und Connect je eine
+// eigene Reihe auf der Seite - drei Bereiche, zwei Muster, und auf den
+// Unterseiten fehlte die Reihe teilweise ganz.
+//
+// Die Regel: ZIELE in die Leiste, AUSSCHNITTE auf die Seite.
+
+test("alle drei Bereiche tragen ihre Ziele in der Leiste", () => {
+  const shell = source(SHELL);
+  for (const href of [
+    // Align
+    "/me/profile",
+    "/connections",
+    "/founder-library",
+    // Find
+    "/discovery/suche",
+    "/discovery/profile",
+    "/discovery/searches",
+    // Connect
+    "/connect/profile",
+    "/connect/my",
+    "/connect/ventures/mine",
+    "/connect/suggestions",
+  ]) {
+    assert.ok(shell.includes(`href: "${href}"`), `${href} steht nicht in der Leiste`);
   }
-  assert.match(nav, /aria-label=\{t\("mine\.label"\)\}/);
 });
 
-test("der Weg steht auf jeder Find-Seite, nicht nur auf der Übersicht", () => {
-  // "Meine Suchen" war vorher überhaupt nur aus dem Speichern-Formular heraus
-  // erreichbar - praktisch eine Sackgasse.
-  for (const page of DISCOVERY_PAGES) {
-    assert.match(source(page), /<DiscoveryMineNav \/>/, `${page} hat keinen Weg zum Eigenen`);
+test("die eigenen Reihen auf den Seiten sind weg", () => {
+  // Zwei Wege zu denselben Seiten heissen, dass man sich angewoehnt, in
+  // beiden zu suchen.
+  for (const weg of [
+    "src/features/discovery/DiscoveryMineNav.tsx",
+    "src/features/connect/ConnectMineNav.tsx",
+  ]) {
+    assert.ok(!existsSync(weg), `${weg} gibt es noch`);
+  }
+  for (const page of [...DISCOVERY_PAGES, ...CONNECT_PAGES]) {
+    const text = source(page);
+    assert.ok(!/MineNav/.test(text), `${page} traegt noch eine eigene Reihe`);
   }
 });
 
-test("Find und Connect zeigen denselben Weg an derselben Stelle", () => {
-  // Zwei Bereiche, zwei Muster zu lernen, wäre die schlechtere Hälfte von
-  // beidem. Beide Gruppen heißen gleich und sehen gleich aus.
-  const find = source("src/features/discovery/DiscoveryMineNav.tsx");
-  const connect = source("src/features/connect/ConnectMineNav.tsx");
-  for (const shared of ["mine.label", "min-h-11", "focus-visible:ring-2", "rounded-full border"]) {
-    assert.ok(find.includes(shared) && connect.includes(shared), `${shared} fehlt in einer der beiden`);
+test("Ausschnitte bleiben auf der Seite - und auf jeder, zu der sie gehoeren", () => {
+  // "Fuer dich", "Suchen & filtern" und "Gemerkte" sind drei Blicke auf
+  // dieselben Profile und keine drei Orte. Die Spec nennt sie in Abschnitt 2
+  // als gleichrangige Reiter - das sind sie, nur auf der Flaeche.
+  const tabs = source("src/features/discovery/FindTabs.tsx");
+  for (const href of ["/discovery", "/discovery?mode=search", "/discovery/saved"]) {
+    assert.ok(tabs.includes(`"${href}"`), `${href} fehlt in der Reiterreihe`);
+  }
+  for (const page of [
+    "src/app/(product)/discovery/page.tsx",
+    "src/app/(product)/discovery/saved/page.tsx",
+  ]) {
+    assert.match(source(page), /<FindTabs/, `${page} hat keine Reiterreihe`);
   }
 
+  // Connect macht es genauso - und behaelt seine Zaehler, weil ein Reiter
+  // ohne Zahl einen ins Leere klicken laesst.
+  assert.match(source("src/features/connect/ConnectTabs.tsx"), /tabs\.map/);
+});
+
+test("die Leiste benennt jedes Ziel in beiden Sprachen", () => {
   for (const locale of ["de", "en"]) {
-    const discovery = JSON.parse(readFileSync(`messages/${locale}/discovery.json`, "utf8")) as {
-      mine: Record<string, string>;
-    };
-    const connectCopy = JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
-      mine: Record<string, string>;
-    };
-    assert.equal(
-      discovery.mine.label,
-      connectCopy.mine.label,
-      `${locale}: die Gruppe heißt in Find anders als in Connect`
-    );
+    const nav = JSON.parse(readFileSync(`messages/${locale}/navigation.json`, "utf8")) as Record<
+      string,
+      string
+    >;
+    for (const key of [
+      "findYourSearch",
+      "findProfile",
+      "findSearches",
+      "connectProfile",
+      "connectListings",
+      "connectVentures",
+      "connectSuggestions",
+    ]) {
+      assert.ok(nav[key], `${locale}: ${key} fehlt`);
+    }
   }
 });
 

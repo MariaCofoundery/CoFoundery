@@ -212,19 +212,28 @@ test("der Weg dorthin sagt, dass etwas dort liegt", () => {
   // in "Meine Sachen" beantwortete sie nur fuer den, der ohnehin nachsieht.
   // Und weil ausdruecklich NICHTS per Mail hinausgeht, ist dieses Zeichen die
   // einzige Stelle, an der ein Vorschlag sich bemerkbar machen kann.
-  const nav = codeOnly("src/features/connect/ConnectMineNav.tsx");
-  assert.match(nav, /countOpenConnectSuggestions/);
-  assert.match(nav, /link\.key === "suggestions" && suggestionCount > 0/);
+  //
+  // UMGEZOGEN AM 30.09.2026: Die Zahl stand an der eigenen Reihe in Connect.
+  // Seit alle drei Bereiche ihre Ziele in der Leiste tragen, steht sie dort -
+  // und damit auf JEDER Connect-Seite statt nur auf dreien.
+  const layout = codeOnly("src/app/layout.tsx");
+  assert.match(layout, /countOpenConnectSuggestions/);
+  assert.match(layout, /connectSuggestionCount=\{connectSuggestionCount\}/);
+
+  const shell = codeOnly("src/features/navigation/ProductShell.tsx");
+  assert.match(shell, /connectSuggestionCount > 0/);
 
   // NICHT ROT. Rot ist in Connect fuer das reserviert, wo ein Mensch auf eine
   // Antwort wartet - eine Anfrage, eine Nachricht. Ein Vorschlag wartet nicht,
   // und eine rote Zahl, die auch fuer Unwichtiges leuchtet, verliert ihre
   // Bedeutung fuer das Wichtige.
-  assert.doesNotMatch(nav, /bg-red/, "die Vorschlagszahl leuchtet wie eine Anfrage");
+  const zahl = shell.slice(shell.indexOf("subItem.count ?"), shell.indexOf("subItem.count ?") + 400);
+  assert.doesNotMatch(zahl, /bg-red/, "die Vorschlagszahl leuchtet wie eine Anfrage");
 
   // Die Zahl braucht einen vorlesbaren Namen - "3" allein sagt einem
   // Screenreader nichts.
-  assert.match(nav, /aria-label=\{t\("mine\.suggestionCount"/);
+  assert.match(shell, /aria-label=\{subItem\.count\.label\}/);
+  assert.match(shell, /tConnect\("mine\.suggestionCount", \{ count: connectSuggestionCount \}\)/);
   for (const locale of ["de", "en"]) {
     const mine = (
       JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {

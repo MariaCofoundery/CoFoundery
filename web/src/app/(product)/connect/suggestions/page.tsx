@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { dismissConnectSuggestionAction } from "@/features/connect/connectSuggestionActions";
 import {
@@ -56,7 +55,6 @@ export default async function ConnectSuggestionsPage() {
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("suggestions.text")}</p>
 
       <div className="mt-5">
-        <ConnectMineNav />
       </div>
 
       {suggestions.length === 0 ? (

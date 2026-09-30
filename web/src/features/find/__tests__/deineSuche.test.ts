@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { DIRECTIONS, THEME_IDS } from "@/features/find/discoveryThemes";
@@ -198,25 +198,27 @@ test("die eigene Suche steht auf jeder FIND-Seite", () => {
   // Ziele von FIND in der Reihe "Mein Bereich" auf der Seite - zwei Muster
   // fuer denselben Bereich. Jetzt stehen alle vier an derselben Stelle, so
   // wie in Connect auch: Ein bestehender Wachtest verlangt genau das.
-  const nav = readFileSync(
-    join("src", "features", "discovery", "DiscoveryMineNav.tsx"),
-    "utf8",
-  );
-  assert.match(nav, /href: "\/discovery\/suche"/);
-
-  // Und nicht zweimal: Zwei Wege zu denselben Seiten heißt, dass man sich
-  // angewöhnt, in beiden zu suchen.
+  //
+  // GEAENDERT AM 30.09.2026, zweimal am selben Tag: erst ins globale Menü,
+  // dann zurück in die Reihe auf der Seite, dann wieder ins Menü - diesmal
+  // aber zusammen mit FIND und Connect, sodass alle drei Bereiche dasselbe
+  // Muster haben. Maria: „Wenn das Menü tatsächlich einheitlich ist, so wie
+  // wir das bei Align gemacht haben, für diese anderen beiden Bereiche auch,
+  // dann ist das ordentlicher."
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"),
     "utf8",
   );
-  assert.ok(!/href: "\/discovery\/suche"/.test(shell));
+  assert.match(shell, /href: "\/discovery\/suche"/);
+  assert.match(shell, /t\("findYourSearch"\)/);
+
+  // Und nicht zweimal: Zwei Wege zu denselben Seiten heißt, dass man sich
+  // angewöhnt, in beiden zu suchen.
+  assert.ok(!existsSync(join("src", "features", "discovery", "DiscoveryMineNav.tsx")));
 
   for (const locale of ["de", "en"]) {
-    const discovery = JSON.parse(
-      readFileSync(join("messages", locale, "discovery.json"), "utf8"),
-    );
-    assert.ok(discovery.mine.yourSearch?.trim(), locale);
+    const nav = JSON.parse(readFileSync(join("messages", locale, "navigation.json"), "utf8"));
+    assert.ok(nav.findYourSearch?.trim(), locale);
   }
 });
 

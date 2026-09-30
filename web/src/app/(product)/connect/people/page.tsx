@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
-import { ConnectMineNav } from "@/features/connect/ConnectMineNav";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectPeople, getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import {
@@ -50,7 +49,6 @@ export default async function ConnectPeoplePage({
             <h1 className="text-3xl font-semibold tracking-[-.03em]">{t("people.title")}</h1>
             <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("people.text")}</p>
           </div>
-          <ConnectMineNav />
         </header>
 
         <ConnectTabs active="people" counts={counts} />

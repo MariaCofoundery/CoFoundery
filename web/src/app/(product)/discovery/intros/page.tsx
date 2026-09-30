@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { DiscoveryMineNav } from "@/features/discovery/DiscoveryMineNav";
 import {
   cancelDiscoveryIntroAction,
   respondDiscoveryIntroAction,
@@ -355,7 +354,6 @@ export default async function DiscoveryIntrosPage({
                 {t("intros.title")}
               </h1>
             </div>
-            <DiscoveryMineNav />
           </div>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
             {t("intros.subtitle")}
