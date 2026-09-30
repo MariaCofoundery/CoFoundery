@@ -15,7 +15,12 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * Auswahl und keine Frage nach einem Team: Wer es einmal ausgefüllt hat, hat
  * es - auch beim zweiten Vorhaben.
  */
-export default async function FounderProfilePage() {
+export default async function FounderProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ invitationId?: string }>;
+}) {
+  const { invitationId } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/founder-alignment/profil")}`);
@@ -24,6 +29,20 @@ export default async function FounderProfilePage() {
   const navState = await getAlignNavState(auth.user.id);
 
   const supabase = await createClient();
+
+  // WARUM MAN HIER IST. Wer ueber eine Einladung kommt, hat nicht nach einem
+  // Fragebogen gesucht - ohne einen Satz dazu steht er in etwas, das er nicht
+  // gesucht hat. Der Name steht auf der Einladung selbst; in einer
+  // Profiltabelle verdeckt die Zeilensicherheit ihn zu Recht.
+  const einladender = invitationId
+    ? (
+        await supabase
+          .from("invitations")
+          .select("inviter_display_name")
+          .eq("id", invitationId)
+          .maybeSingle()
+      ).data?.inviter_display_name ?? null
+    : null;
 
   const { data: assessment } = await supabase
     .from("assessments")
@@ -63,6 +82,16 @@ export default async function FounderProfilePage() {
           stand hier zusaetzlich und widersprach den sieben Schritten, in die
           das UX-Review sie portioniert. Zwei Ueberschriften uebereinander
           waeren ausserdem zwei Anfaenge. */}
+      {einladender && (
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-slate-50/70 px-5 py-4">
+          <p className="text-sm leading-7 text-slate-700">
+            Du bist über die Einladung von{" "}
+            <span className="font-medium text-slate-900">{einladender}</span> hier. Fang
+            mit diesem Bogen an — danach könnt ihr eure Antworten nebeneinanderlegen.
+          </p>
+        </section>
+      )}
+
       <div className="mt-6">
         <Questionnaire
           scope="founder_profile"

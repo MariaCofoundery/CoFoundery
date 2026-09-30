@@ -24,6 +24,8 @@ import {
   resolveActiveInvitationIdForCurrentUser,
 } from "@/features/onboarding/invitationFlow";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
+import { PreviousVersionNote } from "@/features/instruments/align/PreviousVersionNote";
+import { createClient } from "@/lib/supabase/server";
 
 type MeBaseSearchParams = {
   invitationId?: string;
@@ -194,6 +196,27 @@ export default async function MeBasePage({
     choice_value: choiceValue,
   }));
 
+  // ---------------------------------------------------------------------------
+  // WER HIER SITZT, SOLL WISSEN, DASS ES EINE NEUERE FASSUNG GIBT
+  // ---------------------------------------------------------------------------
+  //
+  // Eine Einladung fuehrt dorthin, wo die einladende Person arbeitet - das ist
+  // richtig, sonst haetten die beiden am Ende nichts Gemeinsames. Aber es darf
+  // nicht unbemerkt passieren: Man fuellt sonst einen Fragebogen aus und
+  // erfaehrt danach, dass es einen neueren gibt.
+  //
+  // Der Name steht auf der Einladung selbst (`inviter_display_name`) und nicht
+  // in einer Profiltabelle - dort verdeckt die Zeilensicherheit ihn zu Recht.
+  const einladender = params.invitationId
+    ? (
+        await (await createClient())
+          .from("invitations")
+          .select("inviter_display_name")
+          .eq("id", params.invitationId)
+          .maybeSingle()
+      ).data?.inviter_display_name ?? null
+    : null;
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-12">
       <div className="mb-5 flex items-center justify-between">
@@ -204,6 +227,8 @@ export default async function MeBasePage({
           {t("backToDashboard")}
         </a>
       </div>
+
+      <PreviousVersionNote inviterName={einladender} />
 
       <section className="mb-5 rounded-2xl border border-slate-200/70 bg-slate-50/72 px-5 py-4">
         <p className="text-sm leading-7 text-slate-700">

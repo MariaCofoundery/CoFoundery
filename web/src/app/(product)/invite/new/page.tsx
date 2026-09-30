@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
 import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
+import { InviteVersionNote } from "@/features/instruments/align/InviteVersionNote";
+import { worksWithPrevious } from "@/features/instruments/align/invitationVersion";
 import { getRequestUser } from "@/lib/supabase/server";
 
 export default async function NewInvitePage() {
@@ -14,6 +16,11 @@ export default async function NewInvitePage() {
     redirect("/login?next=/invite/new");
   }
 
+  // WER EINLAEDT, ENTSCHEIDET UEBER BEIDE. Die Einladung fuehrt dorthin, wo
+  // die einladende Person arbeitet - bisher fiel diese Entscheidung, ohne
+  // dass jemand sie bemerkt haette.
+  const bisherigeFassung = await worksWithPrevious(user.id);
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
       <div className="mb-6">
@@ -25,6 +32,7 @@ export default async function NewInvitePage() {
         </a>
       </div>
       <div className="space-y-6">
+        {bisherigeFassung && <InviteVersionNote />}
         <MatchingStartBlock />
         <CoFounderInviteForm />
       </div>

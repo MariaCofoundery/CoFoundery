@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import {
   buildInvitationDashboardHref,
   resolveInvitationContinueTarget,
+  type InvitationContinueLabelKey,
 } from "@/features/onboarding/invitationFlow";
 import {
   inviteFlowDebugQueryEnabled,
@@ -116,7 +117,7 @@ function renderErrorState(title: string, t: InviteT) {
   );
 }
 
-function localizeNextStepLabel(labelKey: "report" | "completion" | "base" | "values", t: InviteT) {
+function localizeNextStepLabel(labelKey: InvitationContinueLabelKey, t: InviteT) {
   return t(`nextLabels.${labelKey}`);
 }
 

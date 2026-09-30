@@ -1,9 +1,16 @@
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
+import { versionOfInvitation } from "@/features/instruments/align/invitationVersion";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
-export type InvitationContinueLabelKey = "report" | "completion" | "base" | "values";
+export type InvitationContinueLabelKey =
+  | "report"
+  | "completion"
+  | "base"
+  | "values"
+  /** Die neuen Bögen — für Einladungen von Menschen ohne die bisherige Fassung. */
+  | "align";
 
 export type InvitationContinueResolution =
   | {
@@ -49,6 +56,17 @@ export function buildInvitationQuestionnaireHref(
 
   const pathname = module === "base" ? "/me/base" : "/me/values";
   return `${pathname}?${search.toString()}`;
+}
+
+/**
+ * Der Weg in die neuen Bögen — mit der Einladung im Gepäck.
+ *
+ * Die Kennung kommt mit, damit auf der anderen Seite steht, warum man dort
+ * ist: „Du bist über die Einladung von … hier." Ohne sie landet jemand in
+ * einem Fragebogen, den er nicht gesucht hat.
+ */
+export function buildInvitationAlignHref(invitationId: string) {
+  return `/founder-alignment/profil?invitationId=${encodeURIComponent(invitationId)}`;
 }
 
 export function buildInvitationStartHref(invitationId: string) {
@@ -129,6 +147,31 @@ export async function resolveInvitationContinueTarget(
     } satisfies Extract<InvitationContinueResolution, { ok: true }>;
     logInviteFlowDebug("invitationFlow:resolve_result", result);
     return result;
+  }
+
+  // ---------------------------------------------------------------------------
+  // WOHIN DIE EINLADUNG FUEHRT, ENTSCHEIDET DIE EINLADENDE PERSON
+  // ---------------------------------------------------------------------------
+  //
+  // Bis zum 30.09.2026 fuehrte jede Einladung in die bisherige Fassung - auch
+  // zwischen zwei Menschen, die beide gerade erst angekommen waren. Beide
+  // fuellten einen Fragebogen aus, den es in dieser Form nicht mehr gibt.
+  //
+  // Umgekehrt gilt es genauso: Wer mit der bisherigen Fassung einlaedt, fuehrt
+  // die andere Person ebenfalls dorthin. Sonst haetten die beiden am Ende zwei
+  // Boegen und nichts Gemeinsames.
+  if ((await versionOfInvitation(normalizedInvitationId)) === "align") {
+    const neu = {
+      ok: true,
+      invitationId: normalizedInvitationId,
+      mode: decision.mode,
+      labelKey: "align",
+      label: "Zu deinem Arbeitsprofil",
+      resolvedHref: buildInvitationAlignHref(normalizedInvitationId),
+      entryHref: buildInvitationStartHref(normalizedInvitationId),
+    } satisfies Extract<InvitationContinueResolution, { ok: true }>;
+    logInviteFlowDebug("invitationFlow:resolve_result", neu);
+    return neu;
   }
 
   const nextModule = decision.missing_modules.includes("base") ? "base" : "values";

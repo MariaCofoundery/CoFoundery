@@ -9,7 +9,10 @@ import {
   ensureReportRunForInvitation,
   getInvitationJoinDecision,
 } from "@/features/reporting/actions";
-import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
+import {
+  buildInvitationDashboardHref,
+  resolveInvitationContinueTarget,
+} from "@/features/onboarding/invitationFlow";
 import { getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
@@ -232,6 +235,14 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
   }
 
   if (decision.mode === "needs_questionnaires") {
+    // DIESELBE ENTSCHEIDUNG WIE BEIM EINSTIEG UND NICHT EINE ZWEITE. Wer ueber
+    // eine Einladung ohne bisherige Fassung kommt, hat die neuen Boegen vor
+    // sich - hier noch einmal in den alten zu schicken, waere derselbe Weg
+    // mit zwei Zielen.
+    const ziel = await resolveInvitationContinueTarget(invitationId);
+    if (ziel.ok && ziel.labelKey === "align") {
+      redirect(ziel.resolvedHref);
+    }
     const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
     redirect(buildQuestionnaireHref(invitationId, nextModule));
   }

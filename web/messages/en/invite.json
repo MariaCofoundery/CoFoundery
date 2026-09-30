@@ -64,7 +64,8 @@
       "report": "Go to report",
       "completion": "Go to completion",
       "base": "Go to foundation questionnaire",
-      "values": "Go to values module"
+      "values": "Go to values module",
+      "align": "To your working profile"
     }
   },
   "teamInvite": {
