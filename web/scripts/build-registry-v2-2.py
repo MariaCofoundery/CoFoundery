@@ -673,10 +673,34 @@ for a in absaetze:
 
 # ---------------------------------------------------------------------------
 
+# Formate, bei denen Antworten zur Auswahl stehen.
+MIT_ANTWORTEN = (
+    "ordinal_choice",
+    "single_choice",
+    "multi_choice",
+    "multi_choice_priority",
+)
+
+
 def format_von(item_id):
     if item_id in VALUE_CASE:  return "value_case"
     if item_id in SONDERFORMAT: return SONDERFORMAT[item_id]
-    if item_id in MULTI:       return "multi_choice"
+    if item_id in MULTI:
+        # ---------------------------------------------------------------
+        # EINE MEHRFACHAUSWAHL MIT ANSCHLUSSFRAGE IST EINE MIT VORRANG
+        # ---------------------------------------------------------------
+        #
+        # GEMELDET AM 30.09.2026: S06 liess sich nicht speichern -
+        # "priority_not_offered". Die Master-Arbeitsfassung stellt dort nach
+        # der Mehrfachauswahl die Frage "Was waere voraussichtlich Deine
+        # wichtigste Rolle?", die Oberflaeche bot sie an, und die
+        # Antwortpruefung wies den Vorrang ab: Er ist nur bei
+        # `multi_choice_priority` erlaubt, und S06 war `multi_choice`.
+        #
+        # Eine REGEL und keine Liste: Wo der Bogen nach dem Wichtigsten
+        # fragt, ist der Vorrang Teil der Antwort. Sonst haette die naechste
+        # Frage mit Anschluss denselben Fehler.
+        return "multi_choice_priority" if items[item_id].get("followUp") else "multi_choice"
     if item_id in ORDINAL:     return "ordinal_choice"
     if item_id in NOMINAL:     return "single_choice"
     return "single_choice"
@@ -1010,7 +1034,12 @@ for n, item_id in enumerate(reihenfolge, start=1):
         ("prompt", it["prompt"]),
         ("hint", it["hint"]),
         ("answerFormat", fmt),
-        ("options", optionen if fmt in ("ordinal_choice", "single_choice", "multi_choice") else []),
+        # DIE LISTE DER FORMATE MIT ANTWORTEN STEHT AN EINER STELLE. Sie
+        # stand hier als Aufzaehlung, und als `multi_choice_priority`
+        # dazukam, verlor S06 lautlos alle Antworten - der Test ueber die
+        # Textfelder hat es gefangen, sichtbar gewesen waere es als leere
+        # Frage auf dem Bildschirm.
+        ("options", optionen if fmt in MIT_ANTWORTEN else []),
         ("missing", it["missing"] or [dict(STANDARD_MISSING)]),
         ("note", it["note"] or ""),
     ])

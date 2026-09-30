@@ -65,6 +65,17 @@ export type AnswerFormatV22 =
   /** Eine Wahl ohne Rangfolge: Handlung, Regel, Zeitpunkt. */
   | "single_choice"
   | "multi_choice"
+  /**
+   * Mehrfachauswahl mit einer Nachfrage nach dem Wichtigsten.
+   *
+   * GEMELDET AM 30.09.2026: S06 liess sich nicht speichern. Die
+   * Master-Arbeitsfassung stellt dort nach der Mehrfachauswahl die Frage „Was
+   * wäre voraussichtlich Deine wichtigste Rolle?", die Oberfläche bot sie an —
+   * und die Antwortprüfung wies den Vorrang ab, weil das Format ihn nicht
+   * vorsah. Wo der Bogen nach dem Wichtigsten fragt, ist der Vorrang Teil der
+   * Antwort.
+   */
+  | "multi_choice_priority"
   | "money_range"
   | "number_range"
   | "person_number_range"

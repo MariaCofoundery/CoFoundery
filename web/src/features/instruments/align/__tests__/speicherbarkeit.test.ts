@@ -3,7 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { offeredItemsV22, SCOPES, type RegistryItemV22 } from "@/features/instruments/align/registries";
+import {
+  getItemsV22,
+  getItemV22,
+  offeredItemsV22,
+  SCOPES,
+  type RegistryItemV22,
+} from "@/features/instruments/align/registries";
 import { answerableOf } from "@/features/instruments/align/questionnaireData";
 import { completenessV21, validateAnswerV21 } from "@/features/instruments/v21/answersV21";
 
@@ -40,6 +46,16 @@ function antwortFuer(item: RegistryItemV22): Record<string, unknown> | null {
     case "multi_choice":
       return {
         optionIds: [ersteOption.optionId],
+        ...(ersteOption.requiresText ? { texts: text(ersteOption) } : {}),
+      };
+    case "multi_choice_priority":
+      // MIT VORRANG. Genau diese Zeile fehlte, als S06 sich nicht speichern
+      // liess: Die Oberfläche bot die Nachfrage nach dem Wichtigsten an, das
+      // Format sah sie nicht vor, und keine Prüfung hat die beiden
+      // miteinander verglichen.
+      return {
+        optionIds: [ersteOption.optionId],
+        priorityOptionId: ersteOption.optionId,
         ...(ersteOption.requiresText ? { texts: text(ersteOption) } : {}),
       };
     case "number_range":
@@ -129,6 +145,34 @@ test("jeder Grund, den die Prüfung kennt, hat einen Satz", () => {
 
   // Entweder ein eigener Satz - oder der Grund steht in der Meldung.
   assert.match(fragebogen, /\(\$\{reason\}\)/);
+});
+
+test("wo nach dem Wichtigsten gefragt wird, ist der Vorrang Teil der Antwort", () => {
+  // GEMELDET AM 30.09.2026: S06 liess sich nicht speichern
+  // („priority_not_offered"). Die Master-Arbeitsfassung stellt dort nach der
+  // Mehrfachauswahl die Frage „Was wäre voraussichtlich Deine wichtigste
+  // Rolle?", die Oberfläche bot sie an — und die Antwortprüfung wies den
+  // Vorrang ab, weil das Format ihn nicht vorsah.
+  //
+  // Eine Regel und keine Liste: Sonst hätte die nächste Frage mit Anschluss
+  // denselben Fehler.
+  for (const scope of SCOPES) {
+    for (const item of getItemsV22(scope)) {
+      if (!item.followUpQuestion) continue;
+      if (!item.answerFormat.startsWith("multi_choice")) continue;
+      assert.equal(
+        item.answerFormat,
+        "multi_choice_priority",
+        `${item.itemId} fragt nach dem Wichtigsten, nimmt die Antwort aber nicht an`,
+      );
+    }
+  }
+
+  assert.equal(getItemV22("S06")!.answerFormat, "multi_choice_priority");
+  assert.match(getItemV22("S06")!.followUpQuestion!, /wichtigste Rolle/);
+  // Und die Antworten stehen noch da: Mit dem neuen Format fielen sie zuerst
+  // weg, weil die Liste der Formate mit Auswahl es nicht kannte.
+  assert.equal(getItemV22("S06")!.options.length, 6);
 });
 
 test("„Erneut versuchen“ steht nur, wo ein zweiter Versuch helfen kann", () => {

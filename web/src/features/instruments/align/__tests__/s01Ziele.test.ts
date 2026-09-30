@@ -89,7 +89,11 @@ test("aus der alten Mehrfachauswahl wird nichts umgerechnet", () => {
   // Geprueft wird das an der Struktur: Die alte Frage hat sieben Antworten,
   // die neuen je fuenf Stufen - es gibt keine Abbildung, die das leistet.
   const alt = getItemV22("S01")!;
-  assert.equal(alt.answerFormat, "multi_choice");
+  // GEAENDERT AM 30.09.2026: Die alte Frage traegt eine Anschlussfrage nach
+  // dem Wichtigsten und heisst deshalb `multi_choice_priority`. An der Sache
+  // aendert das nichts - sie bleibt zurueckgezogen und wird nicht mehr
+  // vorgelegt.
+  assert.equal(alt.answerFormat, "multi_choice_priority");
   assert.equal(alt.options.length, 7);
 
   // Und die neuen Kennungen sind wirklich neu: keine teilt sich eine mit der

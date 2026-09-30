@@ -453,7 +453,7 @@
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Welche Ergebnisse möchtest Du mit dem Unternehmen in den nächsten drei Jahren erreichen?",
       "hint": null,
-      "answerFormat": "multi_choice",
+      "answerFormat": "multi_choice_priority",
       "options": [
         {
           "optionId": "S01_o1",
@@ -974,7 +974,7 @@
       "section": "S – Ziele & strategische Richtung",
       "prompt": "Wenn du ungefähr drei Jahre vorausblickst: Welche Rolle möchtest du dann am liebsten im Unternehmen haben?",
       "hint": null,
-      "answerFormat": "multi_choice",
+      "answerFormat": "multi_choice_priority",
       "options": [
         {
           "optionId": "S06_o1",
