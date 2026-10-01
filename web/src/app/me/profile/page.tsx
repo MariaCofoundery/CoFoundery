@@ -390,11 +390,11 @@ export default async function FounderProfilePage() {
                 industries: t("base.industries"),
                 linkedin: t("base.linkedin"),
                 empty: t("base.empty"),
-                completeHref: "/profile",
+                completeHref: "/profile?step=identity",
                 completeCta: t("base.completeCta"),
               }}
             />
-            <EditLink href="/profile" label={t("edit")} />
+            <EditLink href="/profile?step=identity" label={t("edit")} />
           </>
         )}
 
@@ -523,13 +523,13 @@ export default async function FounderProfilePage() {
                   />
                 </ProfileDetails>
               ) : null}
-              <EditLink href="/profile" label={t("edit")} />
+              <EditLink href="/profile?step=strengths" label={t("edit")} />
             </>
           ) : (
             <MissingSection
               title={t("strengthsSection.empty")}
               text={t("strengthsSection.intro")}
-              href="/profile"
+              href="/profile?step=strengths"
               cta={t("strengthsSection.emptyCta")}
             />
           )
@@ -565,7 +565,7 @@ export default async function FounderProfilePage() {
                   basis: t("coverage.basis"),
                 }}
               />
-              <EditLink href="/profile" label={t("edit")} />
+              <EditLink href="/profile?step=areas" label={t("edit")} />
             </>
           ) : (
             <MissingSection
@@ -810,7 +810,7 @@ export default async function FounderProfilePage() {
               </ProfileDetails>
             </div>
 
-            <EditLink href="/connect/profile" label={t("edit")} />
+            <EditLink href="/profile?step=resources" label={t("edit")} />
           </section>
         )}
       </ProfilePart>

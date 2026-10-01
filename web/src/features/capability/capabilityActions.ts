@@ -185,7 +185,9 @@ export async function saveCapabilityOwnershipAction(formData: FormData) {
   }
 
   revalidatePath("/profile");
-  redirect("/profile?saved=snapshot");
+  // Zurueck zur Station, nicht an den Seitenanfang: Wer die drei Schritte
+  // durchlaufen hat, soll dort stehen, wo das Ergebnis steht.
+  redirect("/profile?saved=snapshot#mitbringen");
 }
 
 /** Entfernt einen erzaehlten Beleg. Der Eintrag selbst bleibt bestehen. */
@@ -199,7 +201,7 @@ export async function deleteCapabilityEvidenceAction(formData: FormData) {
   if (error) back("evidence", "save");
 
   revalidatePath("/profile");
-  redirect("/profile?saved=evidence_removed");
+  redirect("/profile?step=evidence&saved=evidence_removed");
 }
 
 /**
@@ -217,9 +219,9 @@ export async function saveCapabilityDisclosureAction(formData: FormData) {
     .eq("user_id", user.id);
   if (error) {
     revalidatePath("/profile");
-    redirect("/profile?error=save");
+    redirect("/profile?step=sichtbarkeit&error=save");
   }
 
   revalidatePath("/profile");
-  redirect("/profile?saved=disclosure");
+  redirect("/profile?saved=disclosure#besides");
 }

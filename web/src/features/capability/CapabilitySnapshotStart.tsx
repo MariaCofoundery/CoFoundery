@@ -234,7 +234,10 @@ export function CapabilitySnapshotStart({
             {t("evidence.submit")}
           </button>
         </noscript>
-        <Link href="/profile?step=areas" className="text-sm font-semibold text-slate-600 hover:underline">
+        <Link
+          href="/profile?step=areas"
+          className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:underline"
+        >
           {t("evidence.skip")}
         </Link>
       </div>

@@ -209,8 +209,20 @@ test("nichts auf der Seite behauptet einen zuhoerenden Coach", () => {
 
 test("das Gespraech ist vom Profil aus zu finden", () => {
   // Eine Seite, die niemand findet, ist keine.
+  //
+  // NACHGEZOGEN AM 01.10.2026: Der Link stand als festes `href` auf
+  // `/profile`. Seit „Ueber dich" entsteht er in `aboutYou.ts` - die Station
+  // „Was du mitbringst" fuehrt dorthin -, und die Seite setzt ihn aus dem
+  // Modell. Die Zusage ist dieselbe, die Quelle eine andere.
+  assert.match(
+    source("src/features/profile/aboutYou.ts"),
+    /"\/profile\/interview"/,
+    "kein Weg ins Gespraech",
+  );
+  // Und die Seite setzt die Wege aus dem Modell, statt eigene zu erfinden.
   const profile = source("src/app/(product)/profile/page.tsx");
-  assert.match(profile, /href="\/profile\/interview"/);
+  assert.match(profile, /stations\.map\(\(station\) => \(/);
+  assert.match(profile, /href: \(station\.next \?\? station\.steps\[0\]\)\.href/);
 
   // Und die Meldungen danach erscheinen: Unbekannte Schluessel wuerden als
   // roher Pfad auf der Seite landen.

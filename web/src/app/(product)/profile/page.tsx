@@ -42,6 +42,22 @@ import { LinkedInField } from "@/features/profile/LinkedInField";
 import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
+import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
+import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
+import {
+  buildAboutYou,
+  recommendNextStep,
+  isMarkableStep,
+  type AboutYouStation as AboutYouStationModel,
+  type StationId,
+  type StepId,
+} from "@/features/profile/aboutYou";
+import { getAboutYouFacts } from "@/features/profile/aboutYouData";
+import { AboutYouStation } from "@/features/profile/AboutYouStation";
+import { SectionMarkToggle } from "@/features/profile/SectionMarkToggle";
+import { buildFounderProfileCoverage } from "@/features/reporting/founderProfileCoverage";
+import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
+import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -51,6 +67,45 @@ const hint = "mt-1 block text-xs leading-5 text-slate-500";
 const primary =
   "min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold";
 const secondary = "inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold";
+
+/**
+ * Die Schritte, die diese Seite selbst traegt.
+ *
+ * `evidence`, `areas` und `ownership` gab es vorher und sie bleiben Wort fuer
+ * Wort - sie stehen in Links, in Lesezeichen und in den Weiterleitungen der
+ * Erfassungsaktionen.
+ *
+ * `identity`, `strengths`, `resources` und `sichtbarkeit` sind am 01.10.2026
+ * dazugekommen: Diese vier Abschnitte lagen bis dahin alle gleichzeitig auf
+ * der Startansicht. Sie haben jetzt eine eigene Adresse, damit die Uebersicht
+ * eine Uebersicht sein kann und damit die Bearbeiten-Links aus "Das bist du"
+ * irgendwo landen koennen.
+ */
+const PAGE_STEPS = [
+  "evidence",
+  "areas",
+  "ownership",
+  "identity",
+  "strengths",
+  "resources",
+  "sichtbarkeit",
+] as const;
+type PageStep = (typeof PAGE_STEPS)[number];
+const isPageStep = (value: unknown): value is PageStep =>
+  typeof value === "string" && (PAGE_STEPS as readonly string[]).includes(value);
+
+/** Zu welcher Station ein Schritt gehoert - fuer den Weg zurueck. */
+const STATION_OF_STEP: Record<StepId, StationId> = {
+  basis: "basis",
+  arbeitsweise: "arbeitsweise",
+  gespraech: "mitbringen",
+  faehigkeiten: "mitbringen",
+  erfahrung: "mitbringen",
+  verantwortung: "mitbringen",
+  staerken: "mitbringen",
+  antrieb: "antrieb",
+  ressourcen: "ressourcen",
+};
 
 // Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
 const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure", "interview_done"];
@@ -69,9 +124,14 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, tDirection, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers] = await Promise.all([
+  const [t, tDirection, tProfile, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers, resources] = await Promise.all([
     getTranslations("capability"),
     getTranslations("direction"),
+    // DIESELBEN SAETZE WIE AUF „DAS BIST DU". Die Deckungskarte, die
+    // Rollenliste und die Kurzvorstellung sind dort schon beschriftet; ihre
+    // Texte hier ein zweites Mal zu schreiben hiesse, zwei Fassungen
+    // derselben Erklaerung zu pflegen - und sie laufen auseinander.
+    getTranslations("profile.founderProfile"),
     getLocale(),
     searchParams,
     getCapabilityVocabulary(supabase),
@@ -101,9 +161,14 @@ export default async function ProfilePage({
     getUnsortedInterviewAnswers(supabase)
       .then((answers) => answers.length)
       .catch(() => 0),
+    // Netzwerk, Zugaenge und Angebote. Sie gehoeren zur Person und nicht zu
+    // Connect - deshalb liegen sie seit dem 01.10.2026 auch hier. Der
+    // kanonische Speicher bleibt `person_resources`; dies ist eine zweite
+    // Tuer, keine zweite Tabelle.
+    getOwnPersonResources(supabase).catch((): PersonResource[] => []),
   ]);
 
-  const step = isSnapshotStep(params.step) ? params.step : null;
+  const step = isPageStep(params.step) ? params.step : null;
   // Nur bekannte Schluessel an t() geben. Ein manipulierter Query-Parameter
   // wuerde sonst als roher Schluesselpfad auf der Seite landen: next-intl
   // wirft bei einem fehlenden Schluessel nicht, es loggt einen IntlError und
@@ -130,11 +195,92 @@ export default async function ProfilePage({
   const returnPath = parseIdentityReturnPath(params.next);
   const identityGaps = getIdentityGaps(core);
 
+  // ------------------------------------------------------------------------
+  // DIE FUENF STATIONEN
+  //
+  // Sie entstehen aus dem Bestand und speichern nichts. Was abgeleitet werden
+  // kann, wird abgeleitet; fuer die drei Bereiche ohne ableitbares Ende steht
+  // `person_section_marks` daneben. Siehe `features/profile/aboutYou.ts`.
+  // ------------------------------------------------------------------------
+  const facts = await getAboutYouFacts(supabase, user.id, {
+    core,
+    entries,
+    strengthCount: strengths.length,
+  });
+  const stations = buildAboutYou(facts);
+  const naechster = recommendNextStep(stations);
+  const coverage = buildFounderProfileCoverage(entries, areas, families);
+  const confirmedResources = resources.filter((resource) => resource.status === "confirmed");
+
+  /**
+   * Der kleine Payoff auf der Karte.
+   *
+   * EIN SATZ AUS DEN EIGENEN ANGABEN - keine Punktzahl, kein „gut gemacht",
+   * keine Einordnung. Die ausfuehrliche Fassung steht nach dem Erfassen auf
+   * der Schrittseite und vollstaendig auf „Das bist du".
+   *
+   * Ist noch nichts da, steht hier nichts. Ein Satz ueber nichts waere ein
+   * Hinweis auf eine Luecke, und Luecken sind hier keine.
+   */
+  const satz = (text: string) => (
+    <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">{text}</p>
+  );
+
+  const stationPayoff = (station: AboutYouStationModel) => {
+    switch (station.id) {
+      case "basis": {
+        const name = core?.display_name?.trim();
+        const headline = core?.headline?.trim();
+        if (!name && !headline) return null;
+        return satz([name, headline].filter(Boolean).join(" — "));
+      }
+      case "arbeitsweise":
+        if (facts.workSubmitted) return satz(t("aboutYou.payoff.workDone"));
+        if (facts.workAnswers > 0)
+          return satz(t("aboutYou.payoff.workStarted", { count: facts.workAnswers }));
+        return null;
+      case "mitbringen":
+        if (facts.areaCount === 0 && facts.strengthCount === 0) return null;
+        return satz(
+          t("aboutYou.payoff.bring", {
+            areas: facts.areaCount,
+            levelled: facts.levelledCount,
+            strengths: facts.strengthCount,
+          })
+        );
+      case "antrieb":
+        if (facts.directionStatements === 0) return null;
+        return satz(t("aboutYou.payoff.direction", { count: facts.directionStatements }));
+      case "ressourcen":
+        if (facts.confirmedResources === 0 && facts.pendingResources === 0) return null;
+        return satz(
+          t("aboutYou.payoff.resources", {
+            confirmed: facts.confirmedResources,
+            pending: facts.pendingResources,
+          })
+        );
+    }
+  };
+
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 md:px-8">
+      {/* DER WEG ZURUECK, auf jeder Schrittseite. Vorher gab es ihn nur im
+          dreiteiligen Faehigkeitsablauf; wer ueber einen Bearbeiten-Link
+          hereinkam, hatte nur den Browser-Zurueck. */}
+      {step ? (
+        <Link
+          href="/profile"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 hover:text-slate-900"
+        >
+          {t("aboutYou.backToOverview")}
+        </Link>
+      ) : null}
+
       <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t("eyebrow")}</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">{t("title")}</h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("text")}</p>
+      {/* DIE SEITE FAENGT NICHT MIT FORMULARFELDERN AN. Was hier steht, ist
+          die Zusage: nicht alles auf einmal, und kein Pflichtformular. */}
+      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("aboutYou.intro")}</p>
       {/* DER WEG ZUM ZUSAMMENGESTELLTEN PROFIL, neu am 22.09.2026. Diese Seite
           hier ist die Werkbank - Angaben eintragen, Bereiche sortieren,
           Sichtbarkeit setzen. Was daraus entsteht, lag auf drei Seiten
@@ -159,13 +305,13 @@ export default async function ProfilePage({
         <p role="status" className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{t(`notices.${notice}`)}</p>
       ) : null}
 
-      {step ? (
+      {isSnapshotStep(step) ? (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
           {/* Erledigte Schritte sahen genauso aus wie kommende - die Anzeige
               zeigte, wo man ist, aber nicht, was schon sitzt. */}
           <ol className="flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
             {(["evidence", "areas", "ownership"] as const).map((name, index) => {
-              const position = ["evidence", "areas", "ownership"].indexOf(step);
+              const position = ["evidence", "areas", "ownership"].indexOf(step ?? "");
               const done = index < position;
               return (
                 <li
@@ -187,60 +333,89 @@ export default async function ProfilePage({
           {/* Der Fluss hatte keinen Ausgang: nur vorwaerts oder einen Schritt
               zurueck. Wer spaeter weitermachen will, brauchte den
               Browser-Zurueck. Eingetragenes bleibt ohnehin gespeichert. */}
-          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:underline">
+          <Link
+            href="/profile"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:underline"
+          >
             {t("steps.later")}
           </Link>
         </div>
       ) : null}
 
-      {/* DER WEG INS GESPRAECH, und zwar vor dem einzelnen Textfeld: Wer acht
-          Fragen beantwortet hat, braucht das Feld darunter meist nicht mehr -
-          umgekehrt bleibt es aber der schnelle Weg fuer eine einzelne Sache,
-          die einem gerade einfaellt. Beides fuehrt in denselben Ablauf. */}
-      {!step ? (
-        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-5 sm:p-7">
-          <h2 className="text-lg font-semibold text-slate-950">{t("interview.title")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-700">{t("interview.text")}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t("interview.guidanceTime")}</p>
+      {/* ==================================================================
+          DIE UEBERSICHT - FUENF STATIONEN
 
-          {/* WARTENDE ANTWORTEN STEHEN VOR DEM ANFANGEN. Wer acht Fragen
-              beantwortet und nicht eingeordnet hat, hat noch nichts im Profil -
-              und ein zweites Gespraech zu beginnen waere die falsche naechste
-              Handlung. */}
-          {unsortedAnswers > 0 ? (
-            <div className="mt-4">
-              <p className="text-sm font-medium text-slate-900">
-                {t("interview.sortPending", { count: unsortedAnswers })}
+          Vorher lagen hier alle Abschnitte gleichzeitig: Gespraech,
+          Staerken, Richtung, Identitaet, Auswertung, Liste, Vergleich,
+          Freigabe, Kontexte. Das war die Pflegeseite, und sie sah aus wie
+          ein langes Formular.
+
+          Jetzt steht hier, was es gibt und was als Naechstes dran waere -
+          und die Formulare haben eigene Adressen.
+
+          KEIN GESAMTFORTSCHRITT, auch nicht nebenbei: Es gibt keine Zahl
+          ueber die Stationen, keinen Anteil und keine Reihenfolge.
+          ================================================================== */}
+      {step === null ? (
+        <>
+          {/* „Weiter dort, wo du aufgehoert hast" - ein Vorschlag, kein
+              Zwang. Es wird nichts umgeleitet und nichts gesperrt; die
+              anderen Stationen bleiben anwaehlbar. Gibt es nichts mehr,
+              steht hier nichts: Ein Satz ins Leere klaenge nach Aufgabe. */}
+          {naechster ? (
+            <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+                {t("aboutYou.next.eyebrow")}
               </p>
-              <Link href="/profile/interview/sort" className={`${primary} mt-3`}>
-                {t("interview.sortCta")}
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-800">
+                {/* WARTENDE ANTWORTEN HABEN IHREN EIGENEN SATZ, und es ist
+                    derselbe wie vorher: „Drei Antworten warten darauf,
+                    eingeordnet zu werden." „Als Naechstes koenntest du"
+                    waere untertrieben fuer etwas, das schon getan ist und
+                    nur noch nirgends steht - und die Zahl gehoert dazu. */}
+                {naechster.urgent
+                  ? t("interview.sortPending", { count: unsortedAnswers })
+                  : t(`aboutYou.next.steps.${naechster.id}`)}
+              </p>
+              <Link href={naechster.href} className={`${primary} mt-4 inline-flex items-center`}>
+                {naechster.urgent ? t("interview.sortCta") : t("aboutYou.next.cta")}
               </Link>
-            </div>
-          ) : (
-            <Link href="/profile/interview" className={`${primary} mt-4`}>
-              {t("interview.start")}
-            </Link>
-          )}
-        </section>
-      ) : null}
+            </section>
+          ) : null}
 
-      {step === null ? (
-        <StrengthsSection strengths={strengths} proposals={strengthProposals} />
-      ) : null}
-
-      {/* DAS ZWEITE GESPRAECH, neu am 22.09.2026. Es steht als eigener
-          Abschnitt und nicht als zweiter Knopf im Faehigkeitsabschnitt: Es ist
-          eine andere Perspektive (was treibt mich an), kein weiterer Schritt
-          derselben. Beide koennen gleichzeitig offen sein - die Datenbank
-          laesst je Art ein Gespraech zu. */}
-      {step === null ? (
-        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-6">
-          <h2 className="text-xl font-semibold">{tDirection("title")}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{tDirection("text")}</p>
-          <Link href="/profile/direction" className={`${primary} mt-4`}>
-            {tDirection("start")}
-          </Link>
-        </section>
+          <div className="mt-6 grid gap-4">
+            {stations.map((station) => (
+              <AboutYouStation
+                key={station.id}
+                id={station.id}
+                title={t(`aboutYou.stations.${station.id}.title`)}
+                text={t(`aboutYou.stations.${station.id}.text`)}
+                status={station.status}
+                statusLabel={t(`aboutYou.status.${station.status}`)}
+                payoff={stationPayoff(station)}
+                substeps={
+                  // Nur die grosse Station. Eine Liste mit einem Eintrag
+                  // waere eine Liste, die etwas verspricht.
+                  station.steps.length > 1
+                    ? station.steps.map((schritt) => ({
+                        id: schritt.id,
+                        label: t(`aboutYou.steps.${schritt.id}`),
+                        status: schritt.status,
+                        statusLabel: t(`aboutYou.status.${schritt.status}`),
+                        href: schritt.href,
+                      }))
+                    : undefined
+                }
+                cta={{
+                  // Fuer jetzt fertig heisst nicht abgeschlossen: Auch dann
+                  // fuehrt ein Weg hinein, nur heisst er anders.
+                  label: t(`aboutYou.cta.${station.status}`),
+                  href: (station.next ?? station.steps[0]).href,
+                }}
+              />
+            ))}
+          </div>
+        </>
       ) : null}
 
       {/* Schritt 1: die erzaehlte Sache, dann die Rueckfrage, was davon
@@ -307,6 +482,35 @@ export default async function ProfilePage({
         </form>
       ) : null}
 
+      {/* WAS DARAUS ENTSTANDEN IST - die Deckungskarte, dieselbe wie auf
+          „Das bist du". Keine neue Auswertung und keine zweite Fassung
+          derselben Grafik. */}
+      {step === "areas" && entries.length > 0 ? (
+        <div className="mt-8">
+          <CoverageMap
+            coverage={coverage}
+            copy={{
+              title: tProfile("coverage.title"),
+              intro: tProfile("coverage.intro"),
+              familyLabel: (familyId) => t(`families.${familyId}`),
+              stateLabel: (state) => tProfile(`coverage.states.${state}`),
+              familyCount: (entered, total) => tProfile("coverage.familyCount", { entered, total }),
+              familyUnspoken: tProfile("coverage.familyUnspoken"),
+              basis: tProfile("coverage.basis"),
+            }}
+          />
+          <SectionMarkToggle
+            section="faehigkeiten"
+            marked={facts.marks.has("faehigkeiten")}
+            copy={{
+              markedNote: t("aboutYou.mark.markedNote"),
+              mark: t("aboutYou.mark.mark"),
+              unmark: t("aboutYou.mark.unmark"),
+            }}
+          />
+        </div>
+      ) : null}
+
       {/* Schritt 3: Ownership. Bewusst als Verneinung gefragt - das ist die
           Frage, die sonst niemand stellt, und sie klaert spaeter viel. */}
       {step === "ownership" ? (
@@ -356,11 +560,32 @@ export default async function ProfilePage({
         </form>
       ) : null}
 
-      {/* Ergebnis. Es entsteht direkt nach dem ersten Schritt, damit der Nutzen
-          nicht davon abhaengt, dass jemand alles ausfuellt. */}
-      {/* Identitaet. Der eine Ort, an dem sie bearbeitet wird - der Trigger aus
-          20260907180000 verteilt sie in Basis-, Discovery- und Connect-Profil. */}
-      {step === null ? (
+      {/* KOENNEN IST NICHT WOLLEN. Die Rollenliste nach Faltin zaehlt die
+          Bereiche, die ins Team gehoeren UND verantwortet werden sollen -
+          die Erfahrungsstufe wird dabei nicht verrechnet. */}
+      {step === "ownership" && entries.length > 0 ? (
+        <div className="mt-8">
+          <CoverageRoles
+            coverage={coverage}
+            copy={{
+              rolesTitle: tProfile("coverage.rolesTitle"),
+              rolesIntro: tProfile("coverage.rolesIntro"),
+              rolesNone: tProfile("coverage.rolesNone"),
+              rolesOpen: (count) => tProfile("coverage.rolesOpen", { count }),
+              rolesCaveat: tProfile("coverage.rolesCaveat"),
+              areaLabel,
+            }}
+          />
+        </div>
+      ) : null}
+
+      {/* Identitaet. Der eine Ort, an dem sie bearbeitet wird - der Kern
+          propagiert sie in Basis-, Discovery- und Connect-Profil.
+
+          EIGENE ADRESSE SEIT DEM 01.10.2026. Das Formular stand bis dahin
+          mitten auf der Startansicht, zwischen Staerken und Auswertung -
+          eines von neun Dingen gleichzeitig. */}
+      {step === "identity" ? (
         <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
           {/* Reist mit, damit das Speichern zurueckfuehrt, wo es hergekommen
               ist - siehe parseIdentityReturnPath fuer die Allowlist. */}
@@ -393,6 +618,19 @@ export default async function ProfilePage({
               Frage, wer es sehen darf. Sie gehoert zur Identitaet, nicht in
               einen eigenen Abschnitt - es ist dieselbe Entscheidung wie Name
               und Headline, nur fuer das Gesicht. */}
+          {/* DREI KLEINE GRUPPEN STATT EINES LANGEN FORMULARS.
+
+              Elf Felder untereinander sind ein Antrag. Die Gruppen beantworten
+              je eine Frage - wer du bist, wo und wie du arbeitest, woran -,
+              und man kann eine davon ausfuellen und aufhoeren.
+
+              `fieldset`/`legend` und nicht `div`/`h3`: Dieselbe Gliederung,
+              die man sieht, hoert auch, wer das Formular vorgelesen bekommt. */}
+          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
+            <legend className="text-sm font-semibold text-slate-900">
+              {t("aboutYou.groups.who")}
+            </legend>
+
           <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
             <input
               type="checkbox"
@@ -427,6 +665,12 @@ export default async function ProfilePage({
             <textarea name="bio" rows={4} maxLength={1200} defaultValue={core?.bio ?? ""} className={field} />
             <span className={hint}>{t("identity.bioHint")}</span>
           </label>
+          </fieldset>
+
+          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
+            <legend className="text-sm font-semibold text-slate-900">
+              {t("aboutYou.groups.where")}
+            </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">
               {t("identity.region")}
@@ -445,6 +689,12 @@ export default async function ProfilePage({
               </select>
             </label>
           </div>
+          </fieldset>
+
+          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
+            <legend className="text-sm font-semibold text-slate-900">
+              {t("aboutYou.groups.what")}
+            </legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">
               {t("identity.expertise")}
@@ -495,6 +745,7 @@ export default async function ProfilePage({
               fileUnsupported: t("identity.cv.fileUnsupported"),
             }}
           />
+          </fieldset>
 
           {/* Das LinkedIn-Profil steht hier und nicht in einem eigenen
               Bereich: Es ist dieselbe Art Angabe wie Name und Headline - eine
@@ -583,9 +834,94 @@ export default async function ProfilePage({
         </form>
       ) : null}
 
+      {/* SO SIEHT ES AUS. Dieselbe Darstellung wie auf „Das bist du" - wer
+          gerade Bio und Branchen eingetragen hat, sieht hier, was daraus
+          geworden ist, und muss dafuer nicht die Seite wechseln. */}
+      {step === "identity" ? (
+        <div className="mt-8">
+          <FounderProfileBase
+            core={core}
+            copy={{
+              title: t("aboutYou.payoffTitles.identity"),
+              region: tProfile("base.region"),
+              remoteMode: (mode) => t(`remoteModes.${mode}`),
+              expertise: tProfile("base.expertise"),
+              industries: tProfile("base.industries"),
+              linkedin: tProfile("base.linkedin"),
+              empty: tProfile("base.empty"),
+              completeHref: "/profile?step=identity",
+              completeCta: tProfile("base.completeCta"),
+            }}
+          />
+        </div>
+      ) : null}
+
+      {/* DEINE STAERKEN. Dieselbe Komponente wie vorher, nur an einer eigenen
+          Adresse: Sie ist Erfassung und Ergebnis in einem - die Vorschlaege
+          stehen oben, die bestaetigten Saetze darunter. */}
+      {step === "strengths" ? (
+        <>
+          <StrengthsSection strengths={strengths} proposals={strengthProposals} />
+          <SectionMarkToggle
+            section="staerken"
+            marked={facts.marks.has("staerken")}
+            copy={{
+              markedNote: t("aboutYou.mark.markedNote"),
+              mark: t("aboutYou.mark.mark"),
+              unmark: t("aboutYou.mark.unmark"),
+            }}
+          />
+        </>
+      ) : null}
+
+      {/* NETZWERK, ZUGAENGE UND ANGEBOTE.
+
+          Sie lagen bisher nur unter /connect/profile. Das war die Stelle, an
+          der die Vorschlaege ENTSTEHEN - aus den dort veroeffentlichten
+          Texten -, aber nicht die Stelle, zu der sie GEHOEREN: Ein Netzwerk
+          ist eine Eigenschaft der Person und nicht eines Produktbereichs.
+
+          Dieselbe Komponente, dieselbe Tabelle, dieselben beiden Aktionen.
+          Keine Kopie, kein zweites Ressourcenmodell - eine zweite Tuer. In
+          Connect bleibt alles, wo es war: Wo ein Vorschlag entstanden ist,
+          darf er auch weiterhin auftauchen. */}
+      {step === "resources" ? (
+        <>
+          <ResourceProposalSection proposals={resources} />
+          {resources.length === 0 ? (
+            <section className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
+              <h2 className="text-lg font-semibold text-slate-900">
+                {t("aboutYou.resources.emptyTitle")}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                {t("aboutYou.resources.emptyText")}
+              </p>
+              {isConnectMember ? (
+                <Link href="/connect/profile" className={`${secondary} mt-4`}>
+                  {t("aboutYou.resources.emptyCta")}
+                </Link>
+              ) : null}
+            </section>
+          ) : null}
+          <SectionMarkToggle
+            section="ressourcen"
+            marked={facts.marks.has("ressourcen")}
+            copy={{
+              markedNote: t("aboutYou.mark.markedNote"),
+              mark: t("aboutYou.mark.mark"),
+              unmark: t("aboutYou.mark.unmark"),
+            }}
+          />
+        </>
+      ) : null}
+
       {/* Die Auswertung steht vor der Liste: Wer die Schritte ausgefuellt hat,
-          soll ein Ergebnis sehen und nicht zuerst seine eigene Eingabe. */}
-      {step === null ? (
+          soll ein Ergebnis sehen und nicht zuerst seine eigene Eingabe.
+
+          SEIT DEM 01.10.2026 AM ERFAHRUNGSSCHRITT. Sie ist der Payoff zu
+          genau diesem Schritt und stand vorher auf der Startansicht, wo sie
+          mit acht anderen Abschnitten um Aufmerksamkeit rang. */}
+      {step === "evidence" ? (
         <CapabilityReadoutSection
           readout={readout}
           copy={{
@@ -606,7 +942,7 @@ export default async function ProfilePage({
         />
       ) : null}
 
-      {step === null ? (
+      {step === "evidence" ? (
         <section className="mt-8">
           {/* Der Abschnittstitel: Er stand vorher als h1 ueber der ganzen
               Seite und beschrieb damit nur einen von sechs Abschnitten. */}
@@ -649,7 +985,7 @@ export default async function ProfilePage({
                                     confirmLabel={t("summary.removeEvidenceConfirm")}
                                     cancelLabel={t("summary.removeEvidenceCancel")}
                                     pendingLabel={t("pending.save")}
-                                    className="text-xs font-semibold text-slate-500 underline underline-offset-2"
+                                    className="inline-flex min-h-11 items-center text-xs font-semibold text-slate-500 underline underline-offset-2"
                                     confirmClassName="min-h-11 rounded-full border border-rose-200 bg-rose-50 px-4 text-xs font-semibold text-rose-900"
                                   />
                                 </form>
@@ -672,6 +1008,38 @@ export default async function ProfilePage({
               </div>
             </div>
           )}
+        </section>
+      ) : null}
+
+      {/* ==================================================================
+          WAS DANEBEN LIEGT
+
+          Freigabe, Vergleich, Kontexte: drei Dinge, die zur Pflege gehoeren,
+          aber keine Station sind. Eine Station ist etwas, das man ueber sich
+          erfasst; dies hier sind Entscheidungen darueber, was damit geschieht.
+
+          Deshalb stehen sie unter einer leisen Ueberschrift am Ende und nicht
+          als sechste und siebte Karte dazwischen.
+          ================================================================== */}
+      {step === null && (entries.length > 0 || comparablePeople.length > 0 || isConnectMember || hasDiscovery) ? (
+        <h2
+          id="besides"
+          className="mt-12 scroll-mt-20 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+        >
+          {t("aboutYou.besides")}
+        </h2>
+      ) : null}
+
+      {/* Die Freigabe hat seit dem 01.10.2026 eine eigene Adresse. Als
+          Formular zwischen den Abschnitten war sie eine Entscheidung, die man
+          im Vorbeigehen traf. */}
+      {step === null && entries.length > 0 ? (
+        <section className="mt-4 rounded-3xl border border-slate-200 bg-white p-6">
+          <h3 className="text-base font-semibold text-slate-900">{t("disclosure.title")}</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("disclosure.text")}</p>
+          <Link href="/profile?step=sichtbarkeit" className={`${secondary} mt-4`}>
+            {t("aboutYou.disclosureCta")}
+          </Link>
         </section>
       ) : null}
 
@@ -701,7 +1069,7 @@ export default async function ProfilePage({
       {/* Die Freigabe. Eigener Abschnitt, weil es eine eigene Entscheidung ist:
           was ich eingetragen habe und wie weit ich es weitergebe sind zwei
           Fragen. Erscheint nur, wenn es ueberhaupt etwas freizugeben gibt. */}
-      {step === null && entries.length > 0 ? (
+      {step === "sichtbarkeit" ? (
         <form action={saveCapabilityDisclosureAction} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
           <div>
             <h2 className="text-xl font-semibold">{t("disclosure.title")}</h2>

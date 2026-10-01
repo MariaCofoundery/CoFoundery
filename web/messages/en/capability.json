@@ -1,7 +1,6 @@
 {
   "eyebrow": "Your profile",
   "title": "About you",
-  "text": "Everything about you in one place: who you are, what you bring, what you share of it – and the comparison with people you are connected to.",
   "identity": {
     "title": "Who you are",
     "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
@@ -701,5 +700,94 @@
     "internal_onlyHint": "Handing this over means handing over the company.",
     "componentHint": "This exists as a finished service — often better than doing it on the side.",
     "dependsHint": "Whether this belongs in the team depends on what you build."
+  },
+  "aboutYou": {
+    "intro": "This is where your founder profile takes shape, step by step. You do not have to do it all at once — add whatever fits right now.",
+    "backToOverview": "← Back to „About you“",
+    "besides": "Alongside this",
+    "disclosureCta": "Set visibility",
+    "status": {
+      "open": "Not started",
+      "started": "In progress",
+      "doneForNow": "Done for now"
+    },
+    "cta": {
+      "open": "Start",
+      "started": "Continue",
+      "doneForNow": "Review and add"
+    },
+    "stations": {
+      "basis": {
+        "title": "You & your background",
+        "text": "Name, short introduction, region, areas of expertise — what others read about you first. You enter it once and it applies everywhere."
+      },
+      "arbeitsweise": {
+        "title": "How you work",
+        "text": "The founder questionnaire: how you decide, test, disagree and deal with open questions. Self-report, not a test result."
+      },
+      "mitbringen": {
+        "title": "What you bring",
+        "text": "From situations you describe to your capabilities and your experience, through to the question of what you want to own — and what someone else should."
+      },
+      "antrieb": {
+        "title": "What drives you",
+        "text": "Six questions about the themes, problems and changes you keep coming back to. This is the part a CV does not give you."
+      },
+      "ressourcen": {
+        "title": "Network & resources",
+        "text": "Access, contacts and offers you can bring in. They belong to you, not to a single part of the product."
+      }
+    },
+    "steps": {
+      "basis": "Your details",
+      "arbeitsweise": "The founder questionnaire",
+      "gespraech": "Learning from situations",
+      "faehigkeiten": "Your capabilities",
+      "erfahrung": "Placing your experience",
+      "verantwortung": "Choosing responsibility",
+      "staerken": "Your strengths",
+      "antrieb": "The conversation",
+      "ressourcen": "Your entries"
+    },
+    "next": {
+      "eyebrow": "Pick up where you left off",
+      "cta": "Continue",
+      "steps": {
+        "basis": "Next, you could add your short introduction.",
+        "arbeitsweise": "Next, you could fill in the founder questionnaire.",
+        "gespraech": "Next, you could describe a few situations in the conversation.",
+        "faehigkeiten": "Next, you could choose the areas you bring something to.",
+        "erfahrung": "Next, you could place how far you have come in your areas.",
+        "verantwortung": "Next, you could say what you want to own — and what someone else should.",
+        "staerken": "Next, you could record which ways of working show up in you.",
+        "antrieb": "Next, you could have the conversation about what drives you.",
+        "ressourcen": "Next, you could look at the access and contacts that have been recognised."
+      }
+    },
+    "payoff": {
+      "workDone": "Your working profile is in.",
+      "workStarted": "{count, plural, =1 {One answer saved} other {# answers saved}}.",
+      "bring": "{areas, plural, =0 {No areas entered yet} =1 {One area entered} other {# areas entered}}, {levelled} of them with an experience level · {strengths, plural, =0 {no strengths yet} =1 {one strength} other {# strengths}}.",
+      "direction": "{count, plural, =1 {One confirmed statement} other {# confirmed statements}} about what drives you.",
+      "resources": "{confirmed, plural, =0 {Nothing confirmed yet} =1 {One confirmed entry} other {# confirmed entries}}{pending, plural, =0 {} =1 {, one suggestion is waiting for you} other {, # suggestions are waiting for you}}."
+    },
+    "payoffTitles": {
+      "identity": "This is how it looks"
+    },
+    "mark": {
+      "markedNote": "You have marked this area as „done for now“. That does not mean finished — you can add to it any time, and the mark stays.",
+      "mark": "I am done with this for now",
+      "unmark": "Undo the mark"
+    },
+    "resources": {
+      "emptyTitle": "Nothing here yet",
+      "emptyText": "Access, contacts and offers currently come out of your own Connect texts: what you write there is offered to you here as a suggestion with its evidence, and you decide. There is no way to add one by hand yet.",
+      "emptyCta": "To your Connect profile"
+    },
+    "groups": {
+      "who": "Who you are",
+      "where": "Where and how you work",
+      "what": "What you work on"
+    }
   }
 }

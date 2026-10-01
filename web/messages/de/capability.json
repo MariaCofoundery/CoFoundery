@@ -1,7 +1,6 @@
 {
   "eyebrow": "Dein Profil",
   "title": "Über dich",
-  "text": "Hier steht alles über dich an einem Ort: wer du bist, was du mitbringst, was du davon weitergibst – und der Vergleich mit Menschen, mit denen du verbunden bist.",
   "identity": {
     "title": "Wer du bist",
     "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
@@ -701,5 +700,94 @@
     "internal_onlyHint": "Wer das abgibt, gibt das Unternehmen ab.",
     "componentHint": "Das gibt es als fertige Leistung — oft besser, als man es nebenbei selbst machen würde.",
     "dependsHint": "Ob das ins Team gehört, hängt davon ab, was ihr baut."
+  },
+  "aboutYou": {
+    "intro": "Hier entsteht Schritt für Schritt dein persönliches Founder-Profil. Du musst nicht alles auf einmal machen — ergänze einfach, was für dich gerade passt.",
+    "backToOverview": "← Zurück zu „Über dich“",
+    "besides": "Was daneben liegt",
+    "disclosureCta": "Sichtbarkeit einstellen",
+    "status": {
+      "open": "Noch offen",
+      "started": "Begonnen",
+      "doneForNow": "Für jetzt fertig"
+    },
+    "cta": {
+      "open": "Anfangen",
+      "started": "Weitermachen",
+      "doneForNow": "Ansehen und ergänzen"
+    },
+    "stations": {
+      "basis": {
+        "title": "Du & dein Hintergrund",
+        "text": "Name, Kurzvorstellung, Region, Fachgebiete — das, was andere zuerst von dir lesen. Eingetragen wird es einmal und gilt überall."
+      },
+      "arbeitsweise": {
+        "title": "Wie du arbeitest",
+        "text": "Der Founder-Bogen: wie du entscheidest, erprobst, widersprichst und mit offenen Fragen umgehst. Selbstauskunft, kein Testergebnis."
+      },
+      "mitbringen": {
+        "title": "Was du mitbringst",
+        "text": "Von erzählten Situationen über deine Fähigkeiten und deine Erfahrung bis zu der Frage, was du davon verantworten willst — und was lieber jemand anders."
+      },
+      "antrieb": {
+        "title": "Was dich antreibt",
+        "text": "Sechs Fragen nach Themen, Problemen und Veränderungen, die dich immer wieder anziehen. Das ist der Teil, den ein Lebenslauf nicht hergibt."
+      },
+      "ressourcen": {
+        "title": "Netzwerk & Ressourcen",
+        "text": "Zugänge, Kontakte und Angebote, die du einbringen kannst. Sie gehören zu dir und nicht zu einem einzelnen Produktbereich."
+      }
+    },
+    "steps": {
+      "basis": "Deine Angaben",
+      "arbeitsweise": "Der Founder-Bogen",
+      "gespraech": "Aus Situationen lernen",
+      "faehigkeiten": "Deine Fähigkeiten",
+      "erfahrung": "Erfahrung einordnen",
+      "verantwortung": "Verantwortung wählen",
+      "staerken": "Deine Stärken",
+      "antrieb": "Das Gespräch",
+      "ressourcen": "Deine Einträge"
+    },
+    "next": {
+      "eyebrow": "Weiter dort, wo du aufgehört hast",
+      "cta": "Weitermachen",
+      "steps": {
+        "basis": "Als Nächstes könntest du deine Kurzvorstellung ergänzen.",
+        "arbeitsweise": "Als Nächstes könntest du den Founder-Bogen ausfüllen.",
+        "gespraech": "Als Nächstes könntest du im Gespräch von ein paar Situationen erzählen.",
+        "faehigkeiten": "Als Nächstes könntest du auswählen, in welchen Bereichen du etwas mitbringst.",
+        "erfahrung": "Als Nächstes könntest du einordnen, wie weit du in deinen Bereichen gekommen bist.",
+        "verantwortung": "Als Nächstes könntest du sagen, was du davon verantworten willst — und was lieber jemand anders.",
+        "staerken": "Als Nächstes könntest du festhalten, welche Arbeitsweisen sich bei dir zeigen.",
+        "antrieb": "Als Nächstes könntest du das Gespräch darüber führen, was dich antreibt.",
+        "ressourcen": "Als Nächstes könntest du ansehen, welche Zugänge und Kontakte schon erkannt wurden."
+      }
+    },
+    "payoff": {
+      "workDone": "Dein Arbeitsprofil liegt vor.",
+      "workStarted": "{count, plural, =1 {Eine Antwort ist gespeichert} other {# Antworten sind gespeichert}}.",
+      "bring": "{areas, plural, =0 {Noch keine Bereiche eingetragen} =1 {Ein Bereich eingetragen} other {# Bereiche eingetragen}}, davon {levelled} mit Erfahrungsstufe · {strengths, plural, =0 {noch keine Stärken} =1 {eine Stärke} other {# Stärken}}.",
+      "direction": "{count, plural, =1 {Eine bestätigte Aussage} other {# bestätigte Aussagen}} darüber, was dich antreibt.",
+      "resources": "{confirmed, plural, =0 {Noch nichts bestätigt} =1 {Ein bestätigter Eintrag} other {# bestätigte Einträge}}{pending, plural, =0 {} =1 {, ein Vorschlag wartet auf dich} other {, # Vorschläge warten auf dich}}."
+    },
+    "payoffTitles": {
+      "identity": "So sieht das aus"
+    },
+    "mark": {
+      "markedNote": "Du hast diesen Bereich als „für jetzt fertig“ markiert. Das heißt nicht abgeschlossen — du kannst jederzeit etwas ergänzen, ohne dass die Markierung verfällt.",
+      "mark": "Damit bin ich für jetzt durch",
+      "unmark": "Markierung zurücknehmen"
+    },
+    "resources": {
+      "emptyTitle": "Hier ist noch nichts",
+      "emptyText": "Zugänge, Kontakte und Angebote entstehen bisher aus deinen eigenen Connect-Texten: Was du dort schreibst, wird dir hier als Vorschlag mit Beleg angeboten, und du entscheidest. Von Hand eintragen lässt sich hier noch nichts.",
+      "emptyCta": "Zum Connect-Profil"
+    },
+    "groups": {
+      "who": "Wer du bist",
+      "where": "Wo und wie du arbeitest",
+      "what": "Woran du arbeitest"
+    }
   }
 }

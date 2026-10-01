@@ -199,12 +199,31 @@ test("wartende Antworten stehen im Profil vor dem naechsten Gespraech", () => {
   // Wer acht Fragen beantwortet und nicht eingeordnet hat, hat noch nichts im
   // Profil - und ein zweites Gespraech zu beginnen waere die falsche naechste
   // Handlung.
+  //
+  // NACHGEZOGEN AM 01.10.2026: Die Regel stand als Bedingung mitten im
+  // Abschnitt auf `/profile`. Seit „Ueber dich" steht sie an zwei Stellen in
+  // `aboutYou.ts` - einmal fuer den Weg, einmal fuer den Vorrang -, und die
+  // Seite zeigt sie an. Geprueft wird deshalb beides.
+  const modell = source("src/features/profile/aboutYou.ts");
+
+  // Der Weg: wartende Antworten fuehren zum Einordnen, nicht ins Gespraech.
+  assert.match(modell, /facts\.unsortedAnswers > 0 \? "\/profile\/interview\/sort" : "\/profile\/interview"/);
+
+  // Der Vorrang: Sie gehen allem anderen vor - auch dem, was schon begonnen
+  // ist. Es ist der einzige Zustand, in dem Arbeit getan ist und nichts zu
+  // sehen.
+  assert.match(modell, /step\.urgent/);
+  const empfehlung = modell.slice(modell.indexOf("export function recommendNextStep"));
+  const dringendAt = empfehlung.indexOf("if (dringend) return dringend;");
+  const sonstAt = empfehlung.indexOf("return nextOf(alle);");
+  assert.ok(dringendAt > 0, "der Vorrang fehlt");
+  assert.ok(dringendAt < sonstAt, "das Begonnene geht den wartenden Antworten vor");
+
+  // Und die Seite sagt es mit der Zahl, nicht mit „als Naechstes koenntest du".
   const profile = source("src/app/(product)/profile/page.tsx");
-  assert.match(profile, /unsortedAnswers > 0 \?/);
-  const pendingAt = profile.indexOf('t("interview.sortPending"');
-  const startAt = profile.indexOf('t("interview.start")');
-  assert.ok(pendingAt > 0 && pendingAt < startAt, "der Hinweis steht nach dem Startknopf");
-  assert.match(profile, /href="\/profile\/interview\/sort"/);
+  assert.match(profile, /naechster\.urgent/);
+  assert.match(profile, /t\("interview\.sortPending", \{ count: unsortedAnswers \}\)/);
+  assert.match(profile, /t\("interview\.sortCta"\)/);
 
   for (const locale of ["de", "en"]) {
     const interview = (

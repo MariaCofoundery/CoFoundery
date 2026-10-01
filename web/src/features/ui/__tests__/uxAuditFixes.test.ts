@@ -137,11 +137,27 @@ test("removing a narrated evidence asks first", () => {
 test("the snapshot flow can be left at any step", () => {
   const page = source("src/app/(product)/profile/page.tsx");
   assert.match(page, /t\("steps\.later"\)/);
-  assert.match(page, /<Link href="\/profile"/, "ein Weg zur Uebersicht");
+  assert.match(page, /href="\/profile"/, "ein Weg zur Uebersicht");
 
   for (const locale of ["de", "en"]) {
     const steps = readJson(`messages/${locale}/capability.json`).steps as Record<string, string>;
     assert.ok(steps.later, `${locale}: steps.later fehlt`);
+  }
+});
+
+test("jeder Schritt hat einen Weg zurueck, nicht nur die drei im Fluss", () => {
+  // ERWEITERT AM 01.10.2026. „Später fortsetzen" stand nur in der
+  // dreiteiligen Schrittanzeige. Seit „Ueber dich" gibt es sieben Schritte -
+  // und wer ueber einen Bearbeiten-Link aus „Das bist du" hereinkommt, hatte
+  // sonst nur den Browser-Zurueck.
+  const page = source("src/app/(product)/profile/page.tsx");
+  const kopf = page.slice(0, page.indexOf('{t("eyebrow")}'));
+  assert.match(kopf, /\{step \? \(/, "der Rueckweg haengt nicht am Schritt");
+  assert.match(kopf, /aboutYou\.backToOverview/);
+
+  for (const locale of ["de", "en"]) {
+    const about = readJson(`messages/${locale}/capability.json`).aboutYou as Record<string, string>;
+    assert.ok(about.backToOverview?.trim(), `${locale}: backToOverview fehlt`);
   }
 });
 

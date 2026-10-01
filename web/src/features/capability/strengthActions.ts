@@ -20,16 +20,25 @@ import { createClient } from "@/lib/supabase/server";
  * zwar besonders dann, wenn er zum ersten Mal beides nebeneinander sieht.
  */
 
-const PATH = "/profile";
+/**
+ * Wohin es nach dem Speichern zurueckgeht.
+ *
+ * SEIT DEM 01.10.2026 AUF DIE SCHRITTSEITE. Die Staerken lagen bis dahin auf
+ * der Startansicht von `/profile`; der Anker reichte, um wieder dort zu
+ * stehen. Jetzt haben sie eine eigene Adresse - ohne sie landete man nach dem
+ * Hinzufuegen einer Staerke auf der Uebersicht und muesste sich den Weg
+ * zurueck selbst suchen.
+ */
+const PATH = "/profile?step=strengths";
 const ANCHOR = "#strengths";
 
 function back(error: string): never {
-  revalidatePath(PATH);
-  redirect(`${PATH}?error=${encodeURIComponent(error)}${ANCHOR}`);
+  revalidatePath("/profile");
+  redirect(`${PATH}&error=${encodeURIComponent(error)}${ANCHOR}`);
 }
 
 function done(): never {
-  revalidatePath(PATH);
+  revalidatePath("/profile");
   revalidatePath("/me/profile");
   redirect(`${PATH}${ANCHOR}`);
 }

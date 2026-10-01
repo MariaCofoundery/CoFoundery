@@ -74,8 +74,13 @@ export async function saveIdentityAction(formData: FormData) {
   // Identitaet in einer Sackgasse: Die Kontextseite schickt einen hierher,
   // und von hier fuehrt nichts zurueck.
   const returnPath = parseIdentityReturnPath(formData.get("next"));
+  // SEIT DEM 01.10.2026 MIT `step=identity`. Das Formular stand bis dahin auf
+  // der Startansicht; ein Rueckweg nach `/profile` landete also darauf. Jetzt
+  // ist die Startansicht die Uebersicht - ohne den Schritt kaeme man nach dem
+  // Speichern weder beim Formular noch bei dem Ergebnis an, und der Rueckweg
+  // nach Connect oder FIND waere verschwunden.
   const back = (query: string) =>
-    `/profile?${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+    `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
 
   if (!linkedin.ok) {
     redirect(back("error=linkedin"));
@@ -165,7 +170,7 @@ async function saveRoles(
   returnPath: string | null
 ) {
   const back = (query: string) =>
-    `/profile?${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+    `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
 
   if (!formData.has("roles")) return;
 
