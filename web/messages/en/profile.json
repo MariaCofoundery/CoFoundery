@@ -321,6 +321,23 @@
       "self": "entered by you",
       "model": "suggested from your texts, confirmed by you"
     },
-    "edit": "Edit"
+    "edit": "Edit",
+    "print": {
+      "chooseTitle": "Create a PDF",
+      "badgeShort": "Short profile",
+      "badgeFull": "Full profile",
+      "shortText": "A compact overview for a first conversation or to pass on.",
+      "fullText": "Your fuller founder dossier for an accelerator, an advisor or deeper conversations.",
+      "back": "← Back to „This is you“",
+      "cta": "Print or save as PDF",
+      "switchToShort": "The short profile instead",
+      "switchToFull": "The full profile instead",
+      "privacy": "The full profile contains more personal detail about how you work, what you can do and what you are after. Before you pass it on, check whether you want to share these contents with that person or organisation.",
+      "legacyLabel": "Include the earlier evaluation",
+      "legacyApply": "Apply",
+      "workAnswers": "Your answers",
+      "more": "{count, plural, =1 {One further entry is in the full profile} other {# further entries are in the full profile}}.",
+      "footer": "Created with {brand} · {date}"
+    }
   }
 }

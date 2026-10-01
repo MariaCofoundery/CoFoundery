@@ -33,7 +33,13 @@ export function FounderProfileCapability({
     areaLabel: (areaId: string) => string;
     levelLabel: (level: number) => string;
     wishLabel: (wish: string) => string;
-    evidenceCount: (count: number) => string;
+    /**
+     * Darf fehlen. In der Druckfassung steht sie nicht: Dort sagt „3 Belege"
+     * nichts, was der Leser nachsehen koennte - die Belege selbst bleiben
+     * ohnehin draussen. Auf der eigenen Seite ist sie eine Auskunft ueber den
+     * eigenen Bestand und deshalb nuetzlich.
+     */
+    evidenceCount?: ((count: number) => string) | null;
     noLevel: string;
   };
 }) {
@@ -57,7 +63,7 @@ export function FounderProfileCapability({
               {entry.ownership_wish ? (
                 <span className="text-slate-800">{copy.wishLabel(entry.ownership_wish)}</span>
               ) : null}
-              {entry.evidence.length > 0 ? (
+              {copy.evidenceCount && entry.evidence.length > 0 ? (
                 <span className="text-xs text-slate-500">{copy.evidenceCount(entry.evidence.length)}</span>
               ) : null}
             </span>

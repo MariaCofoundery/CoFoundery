@@ -648,6 +648,54 @@ body {
     font-variant-ligatures: none !important;
     font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "hlig" 0 !important;
   }
+
+  /* -------------------------------------------------------------------------
+     „Das bist du" als Dokument
+     -------------------------------------------------------------------------
+     Nur fuer die beiden Druckfassungen unter /me/profile/print. Die Regeln
+     daneben gelten weiter fuer alle Druckseiten; was hier steht, braucht ein
+     mehrseitiges Dokument und sonst niemand.
+     ------------------------------------------------------------------------- */
+
+  /* EINE UEBERSCHRIFT ALLEIN AM SEITENENDE ist das haeufigste Missgeschick
+     beim Drucken von Webseiten: Der Leser blaettert um und findet den Anfang
+     eines Abschnitts, der auf der Seite davor angekuendigt wurde. */
+  .profile-print-root h1,
+  .profile-print-root h2,
+  .profile-print-root h3 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+    break-inside: avoid;
+  }
+
+  /* LANGE LISTEN DUERFEN UMBRECHEN. `page-section` traegt sonst
+     `break-inside: avoid` - bei 54 Faehigkeitsbereichen oder 40 Aussagen
+     heisst das entweder eine fast leere Seite davor oder ein Block, der
+     ueber den Rand laeuft. Natuerlich umbrechen ist beides nicht. */
+  .profile-print-root .page-section {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  /* Kurze Kaesten dagegen bleiben zusammen - eine Verantwortungsgruppe mit
+     drei Eintraegen ueber zwei Seiten liest niemand. */
+  .profile-print-root .print-keep {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Keine Hintergruende und keine Rahmen aus der Bildschirmfassung: Auf
+     Papier kostet jede Flaeche Toner und bringt nichts. Die Bedeutung
+     traegt der Text. */
+  .profile-print-root [class*="bg-slate-50"],
+  .profile-print-root [class*="bg-white"] {
+    background: transparent !important;
+  }
+
+  .profile-print-root ul,
+  .profile-print-root ol {
+    break-inside: auto;
+  }
 }
 
 /* ---------------------------------------------------------------------------

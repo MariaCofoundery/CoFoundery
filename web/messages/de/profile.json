@@ -321,6 +321,23 @@
       "self": "von dir eingetragen",
       "model": "aus deinen Texten vorgeschlagen, von dir bestätigt"
     },
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "print": {
+      "chooseTitle": "PDF erstellen",
+      "badgeShort": "Kurzprofil",
+      "badgeFull": "Ausführliches Profil",
+      "shortText": "Kompakte Übersicht für ein erstes Gespräch oder zum Weitergeben.",
+      "fullText": "Dein vollständigeres Founder-Dossier für Accelerator, Advisor oder vertiefte Gespräche.",
+      "back": "← Zurück zu „Das bist du“",
+      "cta": "Drucken oder als PDF sichern",
+      "switchToShort": "Stattdessen das Kurzprofil",
+      "switchToFull": "Stattdessen das ausführliche Profil",
+      "privacy": "Das ausführliche Profil enthält mehr persönliche Angaben zu deiner Arbeitsweise, deinen Fähigkeiten und deinen Zielen. Prüfe vor dem Weitergeben, ob du diese Inhalte mit der anderen Person oder Organisation teilen möchtest.",
+      "legacyLabel": "Frühere Auswertung mit aufnehmen",
+      "legacyApply": "Übernehmen",
+      "workAnswers": "Deine Antworten",
+      "more": "{count, plural, =1 {Ein weiterer Eintrag steht im ausführlichen Profil} other {# weitere Einträge stehen im ausführlichen Profil}}.",
+      "footer": "Erstellt mit {brand} · {date}"
+    }
   }
 }

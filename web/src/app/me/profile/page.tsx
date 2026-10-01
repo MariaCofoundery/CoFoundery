@@ -1,31 +1,23 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
 import { RESOURCE_KINDS } from "@/features/ai/resourceExtraction";
-import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
-import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
-import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
+import type { PersonResource } from "@/features/ai/personResources";
 import { DIRECTION_FACETS } from "@/features/direction/directionInterviewGuide";
-import { getDirectionStatements } from "@/features/direction/directionStatementData";
-import { getPersonStrengths } from "@/features/capability/strengthData";
+import { getProfileReadModel } from "@/features/reporting/profileReadModel";
+// Die beiden Zahlen stehen seit dem 01.10.2026 neben der Seite: Die
+// Druckfassung zeigt dieselbe Dichte, und zwei Zahlen fuer dieselbe
+// Zusammenfassung laufen auseinander.
+import { DIRECTION_PER_FACET, STRENGTHS_IN_SUMMARY } from "@/features/reporting/profileSummary";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
-import { getScopeReport } from "@/features/instruments/align/reportData";
-import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
-import { getPersonCore } from "@/features/profile/personCoreData";
-import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
-import { buildFounderProfileCoverage } from "@/features/reporting/founderProfileCoverage";
-import { buildOwnershipGroups } from "@/features/reporting/ownershipGroups";
-import { getProfileFreshness } from "@/features/reporting/profileFreshness";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
 import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
-import { OpenDetailsForPrint } from "@/features/reporting/OpenDetailsForPrint";
-import { PrintReportButton } from "@/features/reporting/PrintReportButton";
+import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
 import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
 import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePillar";
@@ -102,10 +94,6 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * Advisors laeuft getrennt darueber, was die Person je Bereich erlaubt hat.
  */
 
-/** Wie viele Staerken offen stehen, bevor der Rest in den Aufklapper geht. */
-const STRENGTHS_IN_SUMMARY = 5;
-/** Wie viele Richtungssaetze je Rubrik offen stehen. */
-const DIRECTION_PER_FACET = 2;
 
 type SectionId =
   | "ueber-dich"
@@ -126,68 +114,39 @@ export default async function FounderProfilePage() {
   if (!user) redirect("/login?next=/me/profile");
 
   const supabase = await createClient();
-  const [
-    t,
-    tCapability,
-    tDirection,
-    tNote,
+
+  // DIE DATEN LIEGEN WOANDERS - seit dem 01.10.2026 in `profileReadModel.ts`.
+  // Diese Seite und die Druckfassung zeigen dasselbe Bild; zweimal geladen
+  // hiesse, zwei Staende derselben Sache zu pflegen, und zwar lautlos.
+  const [t, tCapability, tDirection, tNote, modell] = await Promise.all([
+    getTranslations("profile.founderProfile"),
+    getTranslations("capability"),
+    getTranslations("direction.statements.facets"),
+    getTranslations("report.instrumentNote"),
+    getProfileReadModel(supabase, user.id, locale),
+  ]);
+
+  const {
     core,
     report,
     workProfile,
     vocabulary,
     entries,
+    orderedEntries,
     directionStatements,
     strengths,
-    resources,
+    confirmedResources,
     freshness,
     ventures,
-  ] = await Promise.all([
-    getTranslations("profile.founderProfile"),
-    getTranslations("capability"),
-    getTranslations("direction.statements.facets"),
-    getTranslations("report.instrumentNote"),
-    getPersonCore(supabase, user.id),
-    // Der Altbestand. Er steht seit dem 30.09.2026 nicht mehr an erster
-    // Stelle - siehe Abschnitt 2.
-    getLatestSelfAlignmentReport({ locale }),
-    // Das aktuelle Arbeitsprofil. Dieselbe Funktion, die auch die
-    // Advisor-Ansicht liest - keine zweite Auswertung daneben.
-    getScopeReport(user.id, "founder_profile").catch(() => null),
-    getCapabilityVocabulary(supabase),
-    getOwnCapabilityEntries(supabase, user.id),
-    getDirectionStatements(supabase),
-    getPersonStrengths(supabase),
-    // Nur Bestaetigtes. Ein offener Vorschlag ist eine Modellbehauptung und
-    // darf nirgends wie eine Aussage der Person aussehen.
-    getOwnPersonResources(supabase).catch(() => []),
-    // Wie alt dieses Bild ist - ueber alle Quellen, nicht nur ueber einen
-    // Fragebogen. Siehe `profileFreshness.ts`.
-    getProfileFreshness(supabase, user.id).catch(() => null),
-    // Nur Name und Weg dorthin. Keine Antworten, keine Zusagen.
-    findVentures(user.id).catch(() => []),
-  ]);
+    readout,
+    coverage,
+    ownershipGroups,
+    growingInto,
+    deepAreas,
+    handsOver,
+  } = modell;
 
   const areaLabel = (areaId: string) => tCapability(`areaLabels.${areaId}`);
-  const readout = buildCapabilityReadout(entries, vocabulary.areas, vocabulary.families);
-  const coverage = buildFounderProfileCoverage(entries, vocabulary.areas, vocabulary.families);
-  const ownershipGroups = buildOwnershipGroups(entries, vocabulary.areas);
-  // Die Reihenfolge des Vokabulars, nicht die der Datenbank: Sonst stehen die
-  // Bereiche in der Folge, in der jemand sie eingetragen hat.
-  const areaOrder = new Map(vocabulary.areas.map((area) => [area.area_id, area.sort_order]));
-  const orderedEntries = entries
-    .slice()
-    .sort((a, b) => (areaOrder.get(a.area_id) ?? 0) - (areaOrder.get(b.area_id) ?? 0));
-
-  // Zwei Ableitungen ohne eigenen Speicher: wohin jemand wachsen will, und
-  // die Bereiche, in denen Tiefe eingetragen ist.
-  const growingInto =
-    readout.findings.find((finding) => finding.key === "growingInto")?.areaIds ?? [];
-  const deepAreas = orderedEntries
-    .filter((entry) => (entry.application_level ?? 0) >= DEPTH_LEVEL)
-    .map((entry) => entry.area_id);
-  const handsOver =
-    readout.findings.find((finding) => finding.key === "canButHandsOver")?.areaIds ?? [];
-  const confirmedResources = resources.filter((resource) => resource.status === "confirmed");
 
   /**
    * Ob der Aufklapper ueberhaupt etwas hinzufuegt.
@@ -291,10 +250,6 @@ export default async function FounderProfilePage() {
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-4xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
-      {/* Beim Drucken geht alles auf - sonst fehlt in der weitergegebenen
-          Fassung genau der Teil, den man weitergeben wollte. */}
-      <OpenDetailsForPrint />
-
       <div className="no-print mb-8 flex items-center justify-between">
         {/* `min-h-11`: 44 px, gemessen statt angenommen. Vorher 38. */}
         <a
@@ -303,7 +258,6 @@ export default async function FounderProfilePage() {
         >
           {t("backToDashboard")}
         </a>
-        <PrintReportButton eventName="founder_profile_print_clicked" module="base" />
       </div>
 
       {/* ------------------------------------------------------------------
@@ -327,6 +281,22 @@ export default async function FounderProfilePage() {
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{t("head.intro")}</p>
         {asOf ? <p className="mt-3 text-xs text-slate-500">{asOf}</p> : null}
       </section>
+
+      {/* ZWEI FASSUNGEN ZUM WEITERGEBEN.
+
+          Hier stand bis zum 01.10.2026 ein einzelner Knopf „Als PDF
+          speichern" - und was darin landete, hing davon ab, welche Aufklapper
+          gerade offen waren. Jetzt fuehrt der Weg auf eine eigene Seite,
+          deren Inhalt in der Adresse steht. */}
+      <ProfilePdfChoice
+        copy={{
+          title: t("print.chooseTitle"),
+          shortTitle: t("print.badgeShort"),
+          shortText: t("print.shortText"),
+          fullTitle: t("print.badgeFull"),
+          fullText: t("print.fullText"),
+        }}
+      />
 
       {/* ------------------------------------------------------------------
           DER SPRUNGBALKEN

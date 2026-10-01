@@ -77,7 +77,12 @@ test("die Seite zeigt keine Erzaehlungen und keine offenen Vorschlaege", () => {
 
   // Und eine Modellbehauptung darf nicht wie eine Aussage der Person
   // aussehen.
-  assert.match(page, /resource\.status === "confirmed"/);
+  // NACHGEZOGEN AM 01.10.2026: Die Liste entsteht im gemeinsamen Lesemodell,
+  // das die Seite und die beiden Druckfassungen benutzen.
+  assert.match(
+    codeOnly(join("src", "features", "reporting", "profileReadModel.ts")),
+    /resource\.status === "confirmed"/,
+  );
   assert.ok(!/"pending"|"rejected"/.test(page), "offene Vorschläge auf der Seite");
 });
 

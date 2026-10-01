@@ -15,12 +15,23 @@ import type { ReactNode } from "react";
  * herausgekommen ist; was er selbst geantwortet hat, weiss er.
  *
  * NATIVES `details`, KEIN ZUSTAND IN REACT. Damit funktioniert es ohne
- * JavaScript, die Suche im Browser findet auch eingeklappten Text, und der
- * Ausdruck kann es oeffnen (`OpenDetailsForPrint`).
+ * JavaScript und die Suche im Browser findet auch eingeklappten Text.
  *
- * `data-profile-details` IST DER GRIFF FUER DEN DRUCK. Ohne dieses Merkmal
- * druckt sich die Seite mit zugeklappten Bereichen, und dann fehlt in der
- * weitergegebenen Fassung genau der Teil, den man weitergeben wollte.
+ * ---------------------------------------------------------------------------
+ * GEDRUCKT WIRD HIER NICHTS MEHR - SEIT DEM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * Bis dahin klappte ein Bauteil (`OpenDetailsForPrint`) beim Drucken alle
+ * diese Kaesten auf, damit in der weitergegebenen Fassung nicht genau der
+ * Teil fehlte, den man weitergeben wollte.
+ *
+ * Es ist entfallen, weil die Zusage anders eingeloest wird: Die beiden
+ * Druckfassungen liegen unter `/me/profile/print` und haben gar keine
+ * Aufklapper. Damit haengt ihr Inhalt auch nicht mehr davon ab, was jemand
+ * auf der Leseseite vorher angeklickt hatte.
+ *
+ * `data-profile-details` bleibt als Merkmal stehen: Es kostet nichts und
+ * macht diese Kaesten auffindbar, ohne fremde `details` mitzunehmen.
  */
 export function ProfileDetails({
   summary,

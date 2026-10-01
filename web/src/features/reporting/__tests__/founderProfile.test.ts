@@ -10,6 +10,15 @@ const codeOnly = (path: string) =>
     .replace(/(^|[^:])\/\/.*$/gm, "$1");
 
 const PAGE = "src/app/me/profile/page.tsx";
+/**
+ * DIE DATEN LIEGEN SEIT DEM 01.10.2026 NEBEN DER SEITE.
+ *
+ * `/me/profile` und die beiden Druckfassungen zeigen dasselbe Bild und lesen
+ * deshalb dieselbe Funktion. Die Zusagen darueber, WOHER etwas kommt, gelten
+ * jetzt dort; die darueber, WAS die Seite zeigt, weiterhin hier.
+ */
+const MODELL = "src/features/reporting/profileReadModel.ts";
+const DRUCK = "src/app/me/profile/print/page.tsx";
 const CAPABILITY = "src/features/reporting/FounderProfileCapability.tsx";
 const BASE = "src/features/reporting/FounderProfileBase.tsx";
 
@@ -29,13 +38,17 @@ test("das Profil liest die vorhandenen Quellen und legt keine neue an", () => {
   // auseinander, wenn jemand eine Angabe zurueckzieht - wer seine
   // Sichtbarkeit aendert, aber in einer zweiten Tabelle steht die Angabe noch,
   // hat nicht widerrufen, sondern nur den einen Ort geaendert, den er kannte.
-  const page = codeOnly(PAGE);
-  assert.match(page, /getPersonCore/);
-  assert.match(page, /getLatestSelfAlignmentReport/);
-  assert.match(page, /getOwnCapabilityEntries/);
-  // Kein Schreibzugriff, keine eigene Tabelle, keine Server Action.
-  assert.doesNotMatch(page, /\.insert\(|\.update\(|\.upsert\(|"use server"/);
-  assert.doesNotMatch(page, /founder_profiles|person_profile_snapshots/);
+  const modell = codeOnly(MODELL);
+  assert.match(modell, /getPersonCore/);
+  assert.match(modell, /getLatestSelfAlignmentReport/);
+  assert.match(modell, /getOwnCapabilityEntries/);
+  // Kein Schreibzugriff, keine eigene Tabelle, keine Server Action - und zwar
+  // weder im Modell noch auf einer der drei Seiten, die es lesen.
+  for (const datei of [MODELL, PAGE, DRUCK]) {
+    const quelle = codeOnly(datei);
+    assert.doesNotMatch(quelle, /\.insert\(|\.update\(|\.upsert\(|"use server"/, datei);
+    assert.doesNotMatch(quelle, /founder_profiles|person_profile_snapshots/, datei);
+  }
 });
 
 test("das Selbstbild wird nicht nachgebaut, sondern dasselbe Bauteil benutzt", () => {
@@ -89,8 +102,14 @@ test("die vierte Säule zeigt nur Bestätigtes - und keine Geschichten", () => {
   // ausdruckt und weitergibt, gehören die Aussagen - nicht die Geschichten,
   // aus denen sie entstanden sind.
   const page = codeOnly(PAGE);
-  assert.match(page, /getDirectionStatements/);
-  assert.doesNotMatch(page, /getDirectionAnswers|direction_statement_proposals/);
+  assert.match(codeOnly(MODELL), /getDirectionStatements/);
+  for (const datei of [MODELL, PAGE, DRUCK]) {
+    assert.doesNotMatch(
+      codeOnly(datei),
+      /getDirectionAnswers|direction_statement_proposals/,
+      datei,
+    );
+  }
   const view = codeOnly("src/features/reporting/FounderProfileDirection.tsx");
   assert.doesNotMatch(view, /quote|evidence|answer/);
   // Und ein fehlender Teil wird benannt, mit dem Weg dorthin.
@@ -126,16 +145,18 @@ test("die Seite ist die eigene und gibt nichts frei", () => {
   // Acceleratoren ist ein eigenes Vorhaben mit eigener Einwilligung.
   const page = codeOnly(PAGE);
   assert.match(page, /redirect\("\/login\?next=\/me\/profile"\)/);
-  assert.match(page, /getOwnCapabilityEntries\(supabase, user\.id\)/);
+  assert.match(codeOnly(MODELL), /getOwnCapabilityEntries\(supabase, userId\)/);
   // Kein Fremdzugriff: keine userId aus Parametern, keine Freigabe-RPC.
   assert.doesNotMatch(page, /params|searchParams|get_disclosed_capability|advisor/);
-  assert.match(page, /PrintReportButton/);
+  // Der Weg zum Weitergeben fuehrt auf eine eigene Seite - seit dem
+  // 01.10.2026 mit einer Wahl davor statt eines einzelnen Knopfes.
+  assert.match(page, /<ProfilePdfChoice/);
 });
 
 test("die Bereiche stehen in der Reihenfolge des Vokabulars", () => {
   // Sonst in der Folge, in der jemand sie eingetragen hat - und das liest sich
   // wie eine Rangfolge, die niemand gemeint hat.
-  assert.match(codeOnly(PAGE), /areaOrder\.get\(a\.area_id\)/);
+  assert.match(codeOnly(MODELL), /areaOrder\.get\(a\.area_id\)/);
 });
 
 test("die Profilseite fuehrt zum zusammengestellten Profil", () => {
@@ -207,7 +228,7 @@ test("die Arbeitsweise steht auch im Gesamtbild - aber ohne den Deutungshinweis"
   // Das war inkonsequent - das Gesamtbild ist die Seite, die man weitergibt.
   const page = codeOnly(PAGE);
   assert.match(page, /<FounderProfileStrengths/);
-  assert.match(page, /getPersonStrengths/);
+  assert.match(codeOnly(MODELL), /getPersonStrengths/);
 
   const view = codeOnly("src/features/reporting/FounderProfileStrengths.tsx");
   // Beide Blicke stehen da - das ist der Ertrag des Perspektivwechsels.
@@ -301,7 +322,7 @@ test("der Stand kommt aus allen Quellen - oder gar nicht", () => {
   // Nicht aus einem Fragebogen: Wer gestern seine Faehigkeiten ueberarbeitet
   // und den Bogen vor einem halben Jahr abgegeben hat, laese sonst
   // "Stand: vor sechs Monaten" ueber einem Bild von gestern.
-  assert.match(page, /getProfileFreshness\(supabase, user\.id\)/);
+  assert.match(codeOnly(MODELL), /getProfileFreshness\(supabase, userId\)/);
   assert.match(page, /freshness\s*\?/);
 
   const quelle = codeOnly("src/features/reporting/profileFreshness.ts");
@@ -323,12 +344,16 @@ test("Venture-Angaben bleiben draussen - bis auf Namen und Weg dorthin", () => {
   const page = codeOnly(PAGE);
   // Was zu einem Vorhaben festgehalten ist, gilt fuer DIESES Vorhaben und
   // einen Zeitraum. Ein Profil mit Venture-Zusagen darin vermischt beides.
-  assert.match(page, /findVentures/);
+  assert.match(codeOnly(MODELL), /findVentures/);
   assert.match(page, /ventures\.text/);
-  assert.ok(
-    !/venture_alignment|getScopeReport\(user\.id, "venture/.test(page),
-    "die Seite liest Venture-Antworten",
-  );
+  // Weder die Seite noch die Druckfassung noch das Modell lesen Antworten zu
+  // einem Vorhaben: Die gelten fuer EIN Vorhaben und einen Zeitraum.
+  for (const datei of [MODELL, PAGE, DRUCK]) {
+    assert.ok(
+      !/venture_alignment|getScopeReport\((user\.id|userId), "venture/.test(codeOnly(datei)),
+      `${datei} liest Venture-Antworten`,
+    );
+  }
 });
 
 test("die Farbe sagt, welche Saeule - nicht, wie gut", () => {
@@ -393,17 +418,26 @@ test("die Voreinstellung bleibt ausfuehrlich - die Berichtsseite aendert sich ni
   assert.ok(!reportPage.includes("density"), "die Berichtsseite gibt keine Dichte an");
 });
 
-test("beim Drucken geht alles wieder auf", () => {
+test("was gedruckt wird, haengt nicht mehr an einem Aufklapper", () => {
+  // ERSETZT AM 01.10.2026. Vorher klappte `OpenDetailsForPrint` beim Drucken
+  // alles auf - und damit hing der Inhalt des PDFs daran, was jemand vorher
+  // angeklickt hatte. Zwei Menschen mit demselben Profil bekamen zwei
+  // verschiedene Dokumente.
+  //
+  // Die Zusage dahinter ist dieselbe geblieben: In der weitergegebenen
+  // Fassung fehlt nicht der Teil, den man weitergeben wollte. Eingeloest wird
+  // sie jetzt von einer eigenen Seite, deren Inhalt in der Adresse steht.
   const page = codeOnly(PAGE);
-  // Das Gesamtbild ist die Fassung, die weitergegeben wird. Ein zugeklapptes
-  // `details` im PDF waere kein Schoenheitsfehler, sondern ein leeres Profil.
-  assert.match(page, /<OpenDetailsForPrint \/>/);
+  assert.ok(!page.includes("OpenDetailsForPrint"), "die Seite klappt beim Drucken wieder auf");
 
-  const opener = codeOnly("src/features/reporting/OpenDetailsForPrint.tsx");
-  assert.match(opener, /beforeprint/);
-  // Und danach steht die Seite wieder so da wie vorher.
-  assert.match(opener, /afterprint/);
-  assert.match(opener, /data-profile-details/);
+  const druck = codeOnly(DRUCK);
+  // Kein Aufklapper im Dokument - auch kein geerbter: Der Altbestand kommt
+  // mit `density="full"` und damit flach.
+  assert.ok(!/<ProfileDetails|<details/.test(druck), "ein Aufklapper im Dokument");
+  assert.match(druck, /density="full"/);
+
+  // Und der Modus kommt aus der Adresse.
+  assert.match(druck, /parsePrintMode\(params\.mode\)/);
 });
 
 test("die Grafik ist eine Deckungskarte und kein Netzdiagramm", () => {
@@ -440,7 +474,7 @@ test("die Arbeitsweise kommt aus dem aktuellen Bogen", () => {
 
   // Dieselbe Funktion wie in der Advisor-Ansicht. Eine zweite Auswertung
   // daneben waere ein zweiter Ort, an dem etwas anderes stehen kann.
-  assert.match(page, /getScopeReport\(user\.id, "founder_profile"\)/);
+  assert.match(codeOnly(MODELL), /getScopeReport\(userId, "founder_profile"\)/);
   assert.match(page, /<WorkMap sections=\{workProfile\.sections\}/);
   assert.match(page, /<ReportViewV21/);
 });
@@ -502,15 +536,22 @@ test("die kleinen Ableitungen zeigen nur Bestaetigtes und behaupten keine Luecke
   // Aufforderung, sich etwas vorzuwerfen.
   assert.match(page, /growingInto\.intro/);
   assert.match(page, /entwicklung: growingInto\.length > 0/);
+  // Und in der Druckfassung entfaellt er genauso - ohne Hinweis, denn der
+  // richtete sich dort an jemanden, der nichts daran aendern kann.
+  assert.match(codeOnly(DRUCK), /growingInto\.length > 0 \?/);
 
   // Von den fuenf Befunden der Auswertung steht genau einer auf der Seite:
   // "kann es, will es abgeben". Die anderen sagen dasselbe wie die Gruppen,
   // nur gedeutet.
-  assert.match(page, /finding\.key === "canButHandsOver"/);
+  assert.match(codeOnly(MODELL), /finding\.key === "canButHandsOver"/);
   assert.ok(!/<CapabilityReadoutSection/.test(page), "die gedeutete Auswertung steht wieder da");
 
   // Ressourcen: nur `confirmed`. Ein offener Vorschlag ist eine
-  // Modellbehauptung und darf nicht wie eine Aussage der Person aussehen.
-  assert.match(page, /resource\.status === "confirmed"/);
-  assert.ok(!/"pending"/.test(page), "die Seite kennt offene Vorschlaege");
+  // Modellbehauptung und darf nicht wie eine Aussage der Person aussehen -
+  // und das gilt fuer die Seite wie fuer die beiden Druckfassungen, weil sie
+  // dieselbe Liste bekommen.
+  assert.match(codeOnly(MODELL), /resource\.status === "confirmed"/);
+  for (const datei of [MODELL, PAGE, DRUCK]) {
+    assert.ok(!/"pending"/.test(codeOnly(datei)), `${datei} kennt offene Vorschlaege`);
+  }
 });

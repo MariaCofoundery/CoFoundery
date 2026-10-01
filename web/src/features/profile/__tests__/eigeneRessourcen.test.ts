@@ -134,7 +134,10 @@ test("ein offener Vorschlag steht nirgends wie eine Angabe der Person", () => {
   // Dieselbe Regel wie seit Phase 2: „Das bist du" liest nur Bestaetigtes,
   // und das manuelle Eintragen aendert daran nichts - es erzeugt direkt
   // bestaetigte Zeilen.
-  assert.match(codeOnly(LESEN), /resource\.status === "confirmed"/);
+  assert.match(
+    codeOnly(join("src", "features", "reporting", "profileReadModel.ts")),
+    /resource\.status === "confirmed"/,
+  );
   assert.match(codeOnly(SEITE), /resources\.filter\(\(resource\) => resource\.status === "confirmed"\)/);
 });
 
