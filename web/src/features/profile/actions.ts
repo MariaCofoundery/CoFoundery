@@ -7,8 +7,14 @@ import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
 import { createClient } from "@/lib/supabase/server";
+// Die Speicherwege liegen seit dem 01.10.2026 daneben: Das Formular unter
+// „Ueber dich" benutzt dieselben, und zwei Fassungen von „alte Datei
+// loeschen" waeren zwei verschiedene Regeln.
+import {
+  deleteStoredAvatarIfOwned,
+  uploadAvatarToStorage,
+} from "@/features/profile/avatarStorage";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
-import { randomUUID } from "node:crypto";
 
 /**
  * Die bisherigen drei bleiben gueltig - Profile, die es schon gibt, tragen
@@ -78,95 +84,12 @@ function parseAvatarImageUrl(value: FormDataEntryValue | null) {
   return null;
 }
 
-function parseStoredAvatarPath(value: string | null | undefined) {
-  const normalized = (value ?? "").trim();
-  if (!normalized.startsWith("avatars/")) {
-    return null;
-  }
-
-  const objectPath = normalized.slice("avatars/".length);
-  return objectPath.length > 0 ? objectPath : null;
-}
-
 function sanitizeExistingAvatarUrl(value: string | null | undefined) {
   const normalized = (value ?? "").trim();
   if (!normalized || normalized.startsWith("data:image/")) {
     return null;
   }
   return normalized;
-}
-
-function decodeDataUrlImage(value: string) {
-  const match = value.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
-  if (!match) {
-    return null;
-  }
-
-  const mimeType = match[1];
-  const base64 = match[2];
-  const buffer = Buffer.from(base64, "base64");
-  if (buffer.length === 0) {
-    return null;
-  }
-
-  return {
-    mimeType,
-    buffer,
-  };
-}
-
-function extensionForMimeType(mimeType: string) {
-  switch (mimeType) {
-    case "image/png":
-      return "png";
-    case "image/webp":
-      return "webp";
-    case "image/gif":
-      return "gif";
-    default:
-      return "jpg";
-  }
-}
-
-async function uploadAvatarToStorage(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-  dataUrl: string
-) {
-  const decoded = decodeDataUrlImage(dataUrl);
-  if (!decoded) {
-    return { path: null, error: "avatar_decode_failed" as const };
-  }
-
-  if (decoded.buffer.byteLength > 2 * 1024 * 1024) {
-    return { path: null, error: "avatar_too_large" as const };
-  }
-
-  const extension = extensionForMimeType(decoded.mimeType);
-  const filePath = `${userId}/${Date.now()}-${randomUUID()}.${extension}`;
-  const result = await supabase.storage.from("avatars").upload(filePath, decoded.buffer, {
-    contentType: decoded.mimeType,
-    upsert: false,
-  });
-
-  if (result.error) {
-    return { path: null, error: result.error.message ?? "avatar_upload_failed" as const };
-  }
-
-  return { path: `avatars/${filePath}`, error: null as string | null };
-}
-
-async function deleteStoredAvatarIfOwned(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-  avatarUrl: string | null | undefined
-) {
-  const objectPath = parseStoredAvatarPath(avatarUrl);
-  if (!objectPath || !objectPath.startsWith(`${userId}/`)) {
-    return;
-  }
-
-  await supabase.storage.from("avatars").remove([objectPath]);
 }
 
 export async function upsertProfileBasicsAction(formData: FormData) {

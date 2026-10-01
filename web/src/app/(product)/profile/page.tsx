@@ -42,6 +42,7 @@ import { LinkedInField } from "@/features/profile/LinkedInField";
 import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
+import { ProfilePhotoField } from "@/features/profile/ProfilePhotoField";
 import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
 import { RESOURCE_LABEL_MAX } from "@/features/ai/resourceExtraction";
@@ -127,6 +128,8 @@ const SAVED_KEYS = [
   "resource_added",
   "resource_updated",
   "resource_removed",
+  "photo",
+  "photo_removed",
 ];
 const ERROR_KEYS = [
   "narrative",
@@ -138,6 +141,9 @@ const ERROR_KEYS = [
   "strength_length",
   "resource_empty",
   "resource_duplicate",
+  "photo_empty",
+  "photo_too_large",
+  "photo_save",
 ];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
@@ -153,7 +159,7 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, tDirection, tProfile, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, currentRoles, comparablePeople, unsortedAnswers, resources] = await Promise.all([
+  const [t, tDirection, tProfile, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, basisProfil, comparablePeople, unsortedAnswers, resources] = await Promise.all([
     getTranslations("capability"),
     getTranslations("direction"),
     // DIESELBEN SAETZE WIE AUF „DAS BIST DU". Die Deckungskarte, die
@@ -179,9 +185,17 @@ export default async function ProfilePage({
     hasFounderDiscoveryAccess(user.id, supabase).catch(() => false),
     // Rollen liegen weiterhin auf profiles; person_core traegt Identitaet,
     // nicht Zugehoerigkeit.
-    Promise.resolve(supabase.from("profiles").select("roles").eq("user_id", user.id).maybeSingle())
-      .then(({ data }) => normalizeProfileRoles(data?.roles ?? null))
-      .catch((): ProfileRole[] => []),
+    // Rollen UND Bild: Beides liegt auf `profiles` - die Identitaet im Kern,
+    // Rollen und Avatar daneben (siehe Bericht zu Phase 1.5).
+    Promise.resolve(
+      supabase.from("profiles").select("roles, avatar_id, avatar_url").eq("user_id", user.id).maybeSingle()
+    )
+      .then(({ data }) => ({
+        roles: normalizeProfileRoles(data?.roles ?? null),
+        avatarId: (data?.avatar_id as string | null) ?? null,
+        avatarUrl: (data?.avatar_url as string | null) ?? null,
+      }))
+      .catch(() => ({ roles: [] as ProfileRole[], avatarId: null, avatarUrl: null })),
     // Wer verglichen werden darf. Eine leere Liste ist der Normalfall am
     // Anfang und laesst den Abschnitt einfach entfallen.
     getComparablePeople(supabase, user.id).catch((): ComparablePerson[] => []),
@@ -197,6 +211,7 @@ export default async function ProfilePage({
     getOwnPersonResources(supabase).catch((): PersonResource[] => []),
   ]);
 
+  const currentRoles = basisProfil.roles;
   const step = isPageStep(params.step) ? params.step : null;
   // Nur bekannte Schluessel an t() geben. Ein manipulierter Query-Parameter
   // wuerde sonst als roher Schluesselpfad auf der Seite landen: next-intl
@@ -614,6 +629,35 @@ export default async function ProfilePage({
           EIGENE ADRESSE SEIT DEM 01.10.2026. Das Formular stand bis dahin
           mitten auf der Startansicht, zwischen Staerken und Auswertung -
           eines von neun Dingen gleichzeitig. */}
+      {/* DEIN FOTO. Es stand bis zum 01.10.2026 nur im Einstiegsassistenten;
+          hier gab es den Haken „duerfen andere es sehen" - ohne Bild daneben
+          und ohne Weg, es zu aendern.
+
+          Vor dem Formular und nicht darin: Der Kern und das Bild liegen in
+          verschiedenen Tabellen, und ein Formular in einem Formular gibt es
+          in HTML nicht. */}
+      {step === "identity" ? (
+        <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
+          <ProfilePhotoField
+            displayName={core?.display_name?.trim() || ""}
+            avatarId={basisProfil.avatarId}
+            avatarUrl={basisProfil.avatarUrl}
+            copy={{
+              title: t("identity.photo.title"),
+              help: t("identity.photo.help"),
+              add: t("identity.photo.add"),
+              change: t("identity.photo.change"),
+              chooseIllustration: t("identity.photo.chooseIllustration"),
+              closeIllustrations: t("identity.photo.closeIllustrations"),
+              remove: t("identity.photo.remove"),
+              save: t("identity.photo.save"),
+              pending: t("pending.save"),
+              preview: t("identity.photo.preview"),
+            }}
+          />
+        </section>
+      ) : null}
+
       {step === "identity" ? (
         <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
           {/* Reist mit, damit das Speichern zurueckfuehrt, wo es hergekommen

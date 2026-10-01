@@ -68,6 +68,7 @@ export async function getProfileReadModel(
     resources,
     freshness,
     ventures,
+    photo,
   ] = await Promise.all([
     getPersonCore(supabase, userId),
     // Der Altbestand. Er wird nicht mit dem aktuellen Bogen verrechnet -
@@ -86,6 +87,24 @@ export async function getProfileReadModel(
     getProfileFreshness(supabase, userId).catch(() => null),
     // Nur Name und Weg dorthin. Keine Antworten, keine Zusagen.
     findVentures(userId).catch(() => []),
+    // Das persoenliche Foto. Es liegt auf `profiles` - dort, wo auch die
+    // Rollen liegen; der Kern traegt die Identitaet. Gelesen wird es nur,
+    // nie geschrieben: Geaendert wird es unter „Ueber dich".
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("avatar_id, avatar_url")
+          .eq("user_id", userId)
+          .maybeSingle();
+        return {
+          avatarId: (data?.avatar_id as string | null) ?? null,
+          avatarUrl: (data?.avatar_url as string | null) ?? null,
+        };
+      } catch {
+        return { avatarId: null, avatarUrl: null };
+      }
+    })(),
   ]);
 
   const readout = buildCapabilityReadout(entries, vocabulary.areas, vocabulary.families);
@@ -127,6 +146,7 @@ export async function getProfileReadModel(
     confirmedResources,
     freshness,
     ventures,
+    photo,
     readout,
     coverage,
     ownershipGroups,

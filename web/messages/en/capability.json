@@ -89,6 +89,17 @@
       "clear": "Clear text",
       "chosenCount": "selected",
       "fileUnsupported": "We can't read that file. Plain text only (.txt or .md) – for a PDF or Word document, copy the contents straight into the field."
+    },
+    "photo": {
+      "title": "Your photo",
+      "help": "A picture or an illustration. Who gets to see it you decide below, and separately in Connect.",
+      "add": "Add a photo",
+      "change": "Change photo",
+      "chooseIllustration": "Choose an illustration",
+      "closeIllustrations": "Close the selection",
+      "remove": "Remove photo",
+      "save": "Save photo",
+      "preview": "This is how it looks"
     }
   },
   "steps": {
@@ -329,7 +340,10 @@
     "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it.",
     "strength_length": "One sentence, at most two hundred characters.",
     "resource_empty": "Please choose a type and write a short sentence for it.",
-    "resource_duplicate": "You already have exactly that one."
+    "resource_duplicate": "You already have exactly that one.",
+    "photo_empty": "Please choose a picture or an illustration.",
+    "photo_too_large": "That picture is too large. Please choose a smaller one.",
+    "photo_save": "The photo could not be saved."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",
@@ -339,7 +353,9 @@
     "interview_done": "The conversation is finished. Your answers are ready to be sorted into areas.",
     "resource_added": "Resource added.",
     "resource_updated": "Resource changed.",
-    "resource_removed": "Resource removed."
+    "resource_removed": "Resource removed.",
+    "photo": "Photo saved.",
+    "photo_removed": "Photo removed."
   },
   "pending": {
     "save": "Saving …"

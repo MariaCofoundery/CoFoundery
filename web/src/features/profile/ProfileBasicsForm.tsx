@@ -6,6 +6,9 @@ import { upsertProfileBasicsAction } from "@/features/profile/actions";
 import { completeConnectOnboardingAction } from "@/features/profile/onboardingActions";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
+// Herausgeloest, damit „Ueber dich" dieselbe Verkleinerung benutzt und nicht
+// eine zweite mit einer anderen Zahl darin.
+import { toAvatarDataUrl } from "@/features/profile/avatarImage";
 import {
   PROFILE_ROLE_OPTIONS,
   normalizeProfileRoles,
@@ -928,38 +931,4 @@ export function ProfileBasicsForm({
       </form>
     </section>
   );
-}
-
-async function toAvatarDataUrl(file: File) {
-  const imageBitmapUrl = URL.createObjectURL(file);
-
-  try {
-    const image = await loadImage(imageBitmapUrl);
-    const maxSize = 320;
-    const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
-    const width = Math.max(1, Math.round(image.width * scale));
-    const height = Math.max(1, Math.round(image.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-
-    if (!context) {
-      throw new Error("avatar_canvas_unavailable");
-    }
-
-    context.drawImage(image, 0, 0, width, height);
-    return canvas.toDataURL("image/jpeg", 0.82);
-  } finally {
-    URL.revokeObjectURL(imageBitmapUrl);
-  }
-}
-
-function loadImage(src: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new window.Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("avatar_image_load_failed"));
-    image.src = src;
-  });
 }

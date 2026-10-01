@@ -48,6 +48,20 @@ export function ProfileAvatar({
   const initials = buildInitials(displayName);
   const librarySrc = getAvatarSrc(avatarId);
   const resolvedSrc = librarySrc ?? resolveProfileAvatarUrl(imageUrl);
+
+  /**
+   * `alt=""` HEISST: DAS BILD IST SCHMUCK.
+   *
+   * Gebraucht ueberall dort, wo der Name direkt daneben steht - im Kopf von
+   * „Ueber dich", in „Das bist du" und in den beiden Druckfassungen. Ein
+   * Alternativtext waere dort eine zweite Fassung desselben, und im Druck
+   * stuende er genau dann mitten in der Ueberschrift, wenn das Bild nicht
+   * laedt: „Foto Nora Testerin".
+   *
+   * Der Platzhalter mit den Initialen ist dann ebenfalls Schmuck und wird
+   * verborgen - ein leeres `aria-label` waere schlechter als keins.
+   */
+  const dekorativ = alt === "";
   const resolvedAlt = alt ?? `Avatar von ${displayName}`;
 
   if (resolvedSrc) {
@@ -77,7 +91,8 @@ export function ProfileAvatar({
         fallbackClassName ||
         `${className} flex items-center justify-center bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-slate-700`
       }
-      aria-label={resolvedAlt}
+      aria-hidden={dekorativ || undefined}
+      aria-label={dekorativ ? undefined : resolvedAlt}
     >
       <span className="font-semibold">{initials || "F"}</span>
     </div>

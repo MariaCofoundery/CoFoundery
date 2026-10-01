@@ -18,6 +18,7 @@ import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
 import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
@@ -139,6 +140,7 @@ export default async function FounderProfilePage() {
     confirmedResources,
     freshness,
     ventures,
+    photo,
     readout,
     coverage,
     ownershipGroups,
@@ -272,7 +274,25 @@ export default async function FounderProfilePage() {
           ------------------------------------------------------------------ */}
       <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
         <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("eyebrow")}</p>
-        <h1 className="mt-3 text-3xl font-semibold text-slate-900">{displayName}</h1>
+
+        {/* DAS FOTO - gelesen, nicht gespeichert. Geaendert wird es unter
+            „Ueber dich"; hier gibt es keinen Upload.
+
+            `alt=""`: Der Name steht direkt daneben. Ein Alternativtext waere
+            eine zweite Fassung desselben - und im Druck stuende er mitten in
+            der Ueberschrift, wenn das Bild nicht laedt. */}
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          {photo.avatarId || photo.avatarUrl ? (
+            <ProfileAvatar
+              displayName={displayName}
+              avatarId={photo.avatarId}
+              imageUrl={photo.avatarUrl}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+            />
+          ) : null}
+          <h1 className="text-3xl font-semibold text-slate-900">{displayName}</h1>
+        </div>
         {core?.headline?.trim() ? (
           <p className="mt-2 text-sm font-medium text-slate-700">{core.headline}</p>
         ) : null}

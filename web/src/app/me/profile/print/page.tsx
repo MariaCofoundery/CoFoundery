@@ -17,6 +17,7 @@ import { FounderProfileDirection } from "@/features/reporting/FounderProfileDire
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { getProfileReadModel } from "@/features/reporting/profileReadModel";
 import { DIRECTION_PER_FACET, STRENGTHS_IN_SUMMARY } from "@/features/reporting/profileSummary";
 import {
@@ -150,6 +151,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
     confirmedResources,
     freshness,
     ventures,
+    photo,
     readout,
     coverage,
     ownershipGroups,
@@ -223,7 +225,20 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
           {t("eyebrow")} · {voll ? t("print.badgeFull") : t("print.badgeShort")}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">{displayName}</h1>
+        {/* IM DRUCK IST DAS BILD SCHMUCK - `alt=""`. Laedt es nicht, steht
+            dort nichts; ein Alternativtext stuende sonst mitten im Namen. */}
+        <div className="mt-2 flex flex-wrap items-center gap-4">
+          {photo.avatarId || photo.avatarUrl ? (
+            <ProfileAvatar
+              displayName={displayName}
+              avatarId={photo.avatarId}
+              imageUrl={photo.avatarUrl}
+              alt=""
+              className="h-20 w-20 shrink-0 rounded-2xl object-cover"
+            />
+          ) : null}
+          <h1 className="text-3xl font-semibold tracking-tight">{displayName}</h1>
+        </div>
         {core?.headline?.trim() ? (
           <p className="mt-1 text-sm font-medium text-slate-700">{core.headline}</p>
         ) : null}
