@@ -131,6 +131,92 @@ test("beide Sprachen haben dieselben Saetze fuer die neue Seite", () => {
   assert.match(sections.step, /\{index\}/);
 });
 
+test("die Nummer sagt, wo man steht - nicht, wie viel noch fehlt", () => {
+  // GEMELDET AM 01.10.2026: „Auch wenn das technisch nur die Position meint,
+  // liest es sich wie ein Fortschrittsindikator."
+  //
+  // „x von y" ist die Schreibweise von Ladebalken und
+  // Einrichtungsassistenten. Auf einer Seite, die zusammenstellt, was jemand
+  // über sich festgehalten hat, gibt es kein Fertig.
+  for (const locale of ["de", "en"]) {
+    const step = (bundle(locale).sections as Record<string, string>).step;
+    assert.match(step, /\{index\}/, `${locale}: die Nummer fehlt`);
+    assert.ok(!step.includes("{total}"), `${locale}: die Gesamtzahl steht wieder da`);
+    // Auch ausgeschrieben nicht: „Abschnitt 4 von 9", „4/9".
+    assert.ok(
+      !/\b(von|of)\b|\//.test(step),
+      `${locale}: die Zählweise setzt die Nummer wieder ins Verhältnis: ${step}`,
+    );
+  }
+
+  // Und die Seite reicht keine Gesamtzahl mehr durch.
+  const aufruf = /t\("sections\.step", \{([\s\S]*?)\}\)/.exec(codeOnly(PAGE))?.[1];
+  assert.ok(aufruf, "die Nummer wird nicht mehr über `sections.step` gebildet");
+  assert.ok(!/total/.test(aufruf), "die Seite gibt die Gesamtzahl weiter");
+
+  // Die alte Kachelübersicht ist samt ihren Wörtern weg. Sie hieß
+  // `overview.ready` / `overview.open` - „ausgefüllt" und „noch offen" je
+  // Säule - und war ein Fortschrittsbalken in anderer Schreibweise.
+  for (const locale of ["de", "en"]) {
+    assert.equal(bundle(locale).overview, undefined, `${locale}: die Kachelübersicht lebt noch`);
+    assert.equal(bundle(locale).pillars, undefined, `${locale}: die vier Säulen leben noch`);
+  }
+});
+
+test("der Sprungbalken schiebt sich, statt die halbe Seite zu fuellen", () => {
+  // GEMESSEN AM 01.10.2026 im Browser: Bei 320 px standen acht Sprungmarken
+  // in sieben Zeilen und 356 px hoch - fast ein ganzer Bildschirm
+  // Inhaltsverzeichnis vor dem ersten Inhalt.
+  const page = codeOnly(PAGE);
+  const liste = /<ul className="([^"]*)">\s*\{sections/.exec(page)?.[1];
+  assert.ok(liste, "der Sprungbalken ist keine Liste mehr");
+
+  // Unter `sm` eine Zeile zum Schieben...
+  assert.match(liste, /overflow-x-auto/);
+  // ...darüber wie bisher Umbruch.
+  assert.match(liste, /sm:flex-wrap/);
+  // Und `flex-wrap` steht nicht ohne Stufe da - sonst bricht er doch wieder um.
+  assert.ok(
+    !/(^|\s)flex-wrap/.test(liste),
+    `der Balken bricht auch am Telefon um: ${liste}`,
+  );
+
+  // Die Seite darf dadurch nicht breiter werden: Der Rollbereich gehört der
+  // Liste, und ihre Punkte schrumpfen nicht.
+  assert.match(page, /<li key=\{section\.id\} className="shrink-0">/);
+});
+
+test("ein Aufklapper, der nichts hinzufuegt, erscheint nicht", () => {
+  // GEMELDET AM 01.10.2026: Bei wenig Inhalt zeigte er dieselben Sätze noch
+  // einmal, nur mit der Herkunft daneben.
+  const page = codeOnly(PAGE);
+
+  assert.match(page, /const mehrStaerken = strengths\.length > STRENGTHS_IN_SUMMARY/);
+  assert.match(page, /const mehrRichtung = DIRECTION_FACETS\.some\(/);
+  assert.match(page, /\{mehrStaerken \? \(\s*<ProfileDetails/);
+  assert.match(page, /\{mehrRichtung \? \(\s*<ProfileDetails/);
+
+  // Die andere Lösung wäre gewesen, die Herkunft an jeden Satz der
+  // Zusammenfassung zu hängen. Sie ist die schlechtere: Neben jeder Aussage
+  // gelesen, macht sie aus Aussagen eine Liste von Fußnoten. Deshalb steht
+  // `originLabel` weiterhin nur dort, wo auch `ProfileDetails` steht.
+  const zusammenfassung = page.indexOf("limit={STRENGTHS_IN_SUMMARY}");
+  assert.ok(page.indexOf("originLabel={originLabel}") > zusammenfassung);
+});
+
+test("was man antippen soll, ist gross genug zum Antippen", () => {
+  // GEMESSEN AM 01.10.2026: „Bearbeiten" war 21 px hoch und steht neunmal
+  // auf dieser Seite; „Zurück zur Übersicht" 38 px.
+  const page = codeOnly(PAGE);
+  for (const treffer of page.matchAll(/className="([^"]*\binline-flex\b[^"]*)"/g)) {
+    assert.match(
+      treffer[1],
+      /min-h-11/,
+      `ein Tippziel ohne Mindesthöhe: ${treffer[1].slice(0, 70)}`,
+    );
+  }
+});
+
 test("die Herkunft steht in normaler Sprache, nicht als technischer Wert", () => {
   for (const locale of ["de", "en"]) {
     const origins = bundle(locale).origins as Record<string, string>;

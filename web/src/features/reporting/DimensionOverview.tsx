@@ -46,7 +46,10 @@ function DimensionOverviewRow({
   rightLabel: string;
 }) {
   return (
-    <article className="rounded-xl border border-slate-200/70 bg-slate-50/55 px-4 py-3">
+    // `min-w-0`: Ein Rasterkind geht von sich aus nicht unter seine
+    // Mindestinhaltsbreite. Auf „Das bist du" liegt diese Uebersicht tief
+    // verschachtelt, und bei 320 px ragte sie zwei Pixel heraus.
+    <article className="min-w-0 rounded-xl border border-slate-200/70 bg-slate-50/55 px-4 py-3">
       <p className="text-sm font-medium text-slate-800">{label}</p>
       <DimensionScale
         score={score}

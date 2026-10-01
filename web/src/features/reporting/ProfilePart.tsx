@@ -51,7 +51,13 @@ export function ProfilePart({
         <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${farbe}`}>
           {eyebrow}
         </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">{title}</h2>
+        {/* GROESSER ALS DER ABSCHNITT DARUNTER. Vorher 24 px gegen 20 px -
+            vier Pixel Unterschied sind beim Ueberfliegen keine Hierarchie,
+            und die Seite las sich als eine Reihe gleich grosser Kaesten.
+            28 px gegen 20 px gegen 14 px sind drei erkennbare Ebenen. */}
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-[1.75rem]">
+          {title}
+        </h2>
       </header>
 
       {children}

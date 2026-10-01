@@ -58,7 +58,11 @@ export function FounderProfileDirection({
    * Fehler. `null` heisst "steht schon darueber", nicht "hat keinen Namen".
    */
     title?: string | null;
-    intro: string;
+    /**
+     * Darf fehlen. Im Aufklapper stand sie bis zum 01.10.2026 ein zweites
+     * Mal, Wort fuer Wort wie darueber in der Zusammenfassung.
+     */
+    intro?: string | null;
     facetLabel: (facet: string) => string;
   };
 }) {
@@ -81,7 +85,9 @@ export function FounderProfileDirection({
       {copy.title ? (
         <h2 className="text-base font-semibold text-slate-900">{copy.title}</h2>
       ) : null}
-      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{copy.intro}</p>
+      {copy.intro ? (
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{copy.intro}</p>
+      ) : null}
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
         {groups.map((group) => (

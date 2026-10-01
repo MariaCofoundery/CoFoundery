@@ -28,53 +28,51 @@ import type { ReactNode } from "react";
  * Bedeutung (Bruchstelle, Luecke); waere der Abschnitt selbst bernsteinfarben,
  * liesse sich beides nicht mehr unterscheiden.
  *
- * NUMMERIERT, weil eine Nummer sagt "neun Abschnitte, du bist beim zweiten" -
- * und genau das fehlte: Die Seite hatte keinen erkennbaren Anfang und kein
- * Ende. Es ist eine Position, kein Fortschritt: Es steht nirgends, wie viele
- * davon "erledigt" sind.
+ * ---------------------------------------------------------------------------
+ * "ABSCHNITT 4", NICHT "4 VON 9" - SEIT DEM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * Hier stand bis dahin "4 von 9". Gemeint war eine Position; gelesen wurde
+ * ein Fortschritt. "x von y" ist die Schreibweise von Ladebalken, Umfragen
+ * und Einrichtungsassistenten - ueberall dort heisst sie "noch fuenf, dann
+ * bist du fertig". Auf einer Seite, die zusammenstellt, was jemand ueber sich
+ * festgehalten hat, gibt es kein Fertig, und die Gesamtzahl macht aus zwei
+ * leeren Abschnitten eine offene Rechnung.
+ *
+ * Die Nummer bleibt, die Gesamtzahl geht. "Abschnitt 4" sagt, wo man steht,
+ * und behauptet nichts ueber den Rest.
+ *
+ * SIE STEHT ALS AUGENBRAUE, NICHT MEHR ALS PLAKETTE. Eine Zahl in einem
+ * eingefaerbten Kreis ist die Form, in der Einrichtungsassistenten ihre
+ * Schritte zeigen - und sie war mit 10 px die kleinste Schrift der Seite.
+ * Als Zeile in der Farbe des Teils ist sie eine Beschriftung.
  */
 
 export const PILLAR_TONES = ["slate", "indigo", "emerald", "violet"] as const;
 export type PillarTone = (typeof PILLAR_TONES)[number];
 
-const TONE: Record<PillarTone, { rule: string; eyebrow: string; badge: string }> = {
-  slate: {
-    rule: "bg-slate-300",
-    eyebrow: "text-slate-500",
-    badge: "bg-slate-100 text-slate-600",
-  },
-  indigo: {
-    rule: "bg-indigo-400",
-    eyebrow: "text-indigo-600",
-    badge: "bg-indigo-50 text-indigo-700",
-  },
-  emerald: {
-    rule: "bg-emerald-400",
-    eyebrow: "text-emerald-700",
-    badge: "bg-emerald-50 text-emerald-700",
-  },
-  violet: {
-    rule: "bg-violet-400",
-    eyebrow: "text-violet-600",
-    badge: "bg-violet-50 text-violet-700",
-  },
+const TONE: Record<PillarTone, { rule: string; eyebrow: string }> = {
+  slate: { rule: "bg-slate-300", eyebrow: "text-slate-500" },
+  indigo: { rule: "bg-indigo-400", eyebrow: "text-indigo-600" },
+  emerald: { rule: "bg-emerald-400", eyebrow: "text-emerald-700" },
+  violet: { rule: "bg-violet-400", eyebrow: "text-violet-600" },
 };
 
 export function ProfilePillar({
   id,
   tone,
   step,
-  eyebrow,
   title,
   intro,
   children,
 }: {
   id: string;
   tone: PillarTone;
-  /** "2 von 9" - als fertiger Text, damit die Zaehlweise uebersetzbar bleibt. */
+  /**
+   * "Abschnitt 2" - als fertiger Text, damit die Zaehlweise uebersetzbar
+   * bleibt. OHNE GESAMTZAHL, siehe oben.
+   */
   step: string;
-  /** Darf fehlen, wenn der Teil darueber schon sagt, worum es geht. */
-  eyebrow?: string | null;
   /** Darf fehlen, wenn der Teil darueber denselben Namen traegt. */
   title?: string | null;
   intro?: string | null;
@@ -90,14 +88,9 @@ export function ProfilePillar({
         <span aria-hidden className={`mt-1 h-10 w-1 shrink-0 rounded-full ${toneClasses.rule}`} />
         <div className="min-w-0">
           <p
-            className={`flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] ${toneClasses.eyebrow}`}
+            className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${toneClasses.eyebrow}`}
           >
-            {eyebrow ? <span>{eyebrow}</span> : null}
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-medium tracking-normal ${toneClasses.badge}`}
-            >
-              {step}
-            </span>
+            {step}
           </p>
           {title ? (
             <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>

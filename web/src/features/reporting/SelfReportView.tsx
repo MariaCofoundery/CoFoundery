@@ -98,7 +98,13 @@ export function SelfReportView({ report, density = "full", detailsHint = null }:
     <>
       <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-8 print:rounded-none print:border-none print:bg-white print:px-0 print:py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-4xl">
+          {/* `min-w-0`: Diese Fassung stand frueher allein auf einer Seite.
+              Auf „Das bist du" liegt sie drei Ebenen tief - Seitenrand,
+              Aufklapper, Kasten - und bei 320 px blieben 182 px uebrig. Ohne
+              `min-w-0` weigert sich ein Flex-Kind, unter seine
+              Mindestinhaltsbreite zu gehen, und schob die Seite seitlich auf.
+              Gemessen am 01.10.2026: Seite 343 px breit bei 320 px Fenster. */}
+          <div className="min-w-0 max-w-4xl">
             <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
               {chrome.sections.corePattern}
             </p>
@@ -533,7 +539,7 @@ function renderCompactValuesSection(report: SelfAlignmentReport, chrome: SelfRep
         <div className="mt-4">
           <a
             href="/me/values"
-            className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
           >
             {chrome.labels.startValues}
           </a>

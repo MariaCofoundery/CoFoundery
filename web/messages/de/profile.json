@@ -226,18 +226,6 @@
       "unanswered": "noch offen",
       "subtitle": "Arbeitsweisen aus deinen Situationen"
     },
-    "pillars": {
-      "step": "{index} von {total}",
-      "base": "Grundlage",
-      "work": "Arbeitsweise",
-      "bring": "Fähigkeiten",
-      "direction": "Richtung"
-    },
-    "overview": {
-      "title": "Das bist du — in vier Teilen",
-      "ready": "ausgefüllt",
-      "open": "noch offen"
-    },
     "detailsHint": "{count, plural, =1 {1 Abschnitt} other {# Abschnitte}}",
     "coverage": {
       "title": "Worüber du gesprochen hast",
@@ -266,7 +254,7 @@
       "threeTitle": "Was dich antreibt"
     },
     "sections": {
-      "step": "{index} von {total}",
+      "step": "Abschnitt {index}",
       "about": "Über dich",
       "work": "Wie du arbeitest",
       "strengths": "Deine Stärken",
@@ -303,7 +291,7 @@
     },
     "strengthsSection": {
       "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
-      "detailsSummary": "Alle Stärken ansehen",
+      "detailsSummary": "Alle Stärken mit ihrer Herkunft",
       "more": "{count, plural, =1 {Eine weitere im Aufklapper} other {# weitere im Aufklapper}}",
       "empty": "Hier sind noch keine bestätigten Stärken festgehalten.",
       "emptyCta": "Stärken festhalten"

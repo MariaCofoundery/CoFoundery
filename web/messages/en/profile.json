@@ -226,18 +226,6 @@
       "unanswered": "open",
       "subtitle": "Working styles from your situations"
     },
-    "pillars": {
-      "step": "{index} of {total}",
-      "base": "Basics",
-      "work": "Working style",
-      "bring": "Capabilities",
-      "direction": "Direction"
-    },
-    "overview": {
-      "title": "This is you — in four parts",
-      "ready": "filled in",
-      "open": "still open"
-    },
     "detailsHint": "{count, plural, =1 {1 section} other {# sections}}",
     "coverage": {
       "title": "What you have talked about",
@@ -266,7 +254,7 @@
       "threeTitle": "What drives you"
     },
     "sections": {
-      "step": "{index} of {total}",
+      "step": "Section {index}",
       "about": "About you",
       "work": "How you work",
       "strengths": "Your strengths",
@@ -303,7 +291,7 @@
     },
     "strengthsSection": {
       "intro": "Ways of working from situations you told — with your own assessment and what you assume others would say.",
-      "detailsSummary": "See all strengths",
+      "detailsSummary": "All strengths, with where they came from",
       "more": "{count, plural, =1 {One more in the panel} other {# more in the panel}}",
       "empty": "No confirmed strengths recorded here yet.",
       "emptyCta": "Record strengths"

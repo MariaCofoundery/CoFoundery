@@ -88,7 +88,7 @@ export function FounderProfileBase({
           <p className="text-sm leading-7 text-slate-600">{copy.empty}</p>
           <a
             href={copy.completeHref}
-            className="no-print mt-3 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className="no-print mt-3 inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
           >
             {copy.completeCta}
           </a>

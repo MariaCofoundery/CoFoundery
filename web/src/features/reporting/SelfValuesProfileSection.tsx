@@ -53,7 +53,7 @@ export function SelfValuesProfileSection({ report }: Props) {
           <div className="mt-4">
             <a
               href="/me/values"
-              className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
             >
               Werte Add-on starten
             </a>

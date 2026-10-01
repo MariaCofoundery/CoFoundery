@@ -20,8 +20,10 @@ type ReportActionButtonProps = {
   disabled?: boolean;
 };
 
+// `min-h-11`: 44 px. Gemessen am 01.10.2026 waren es 42 - knapp unter der
+// Groesse, die man am Telefon zuverlaessig trifft.
 const BASE_CLASS =
-  "inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] cursor-pointer";
+  "inline-flex min-h-11 items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] cursor-pointer";
 
 const VARIANT_CLASS: Record<NonNullable<ReportActionButtonProps["variant"]>, string> = {
   primary:

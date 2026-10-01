@@ -189,6 +189,31 @@ export default async function FounderProfilePage() {
     readout.findings.find((finding) => finding.key === "canButHandsOver")?.areaIds ?? [];
   const confirmedResources = resources.filter((resource) => resource.status === "confirmed");
 
+  /**
+   * Ob der Aufklapper ueberhaupt etwas hinzufuegt.
+   *
+   * GEMELDET AM 01.10.2026: Bei wenig Inhalt zeigte er dieselben Saetze noch
+   * einmal, nur mit der Herkunft daneben. Fuenf lange Saetze ein zweites Mal
+   * zu lesen, um drei Woerter Herkunft zu finden, ist ein schlechter Tausch -
+   * und es nimmt dem Aufklapper die Bedeutung: Wer einmal nachsieht und
+   * dasselbe findet, klappt den naechsten nicht mehr auf.
+   *
+   * Die Herkunft an jeden Satz der Zusammenfassung zu haengen, waere die
+   * andere Loesung und die schlechtere: Neben jeder Aussage gelesen, macht
+   * sie aus Aussagen eine Liste von Fussnoten.
+   *
+   * Die Ressourcen behalten ihren Aufklapper, auch wenn er nichts hinzuzaehlt.
+   * Dort stehen oben kurze Schlagworte in Gruppen und unten eine Liste mit
+   * Art und Herkunft - zwei Darstellungen, nicht dieselbe zweimal. Sein Name
+   * sagt das auch ("Woher diese Eintraege stammen").
+   */
+  const mehrStaerken = strengths.length > STRENGTHS_IN_SUMMARY;
+  const mehrRichtung = DIRECTION_FACETS.some(
+    (facet) =>
+      directionStatements.filter((statement) => statement.facet === facet).length >
+      DIRECTION_PER_FACET
+  );
+
   const displayName = core?.display_name?.trim() || t("unnamed");
   const asOf = freshness
     ? t("head.asOf", {
@@ -209,10 +234,11 @@ export default async function FounderProfilePage() {
     { id: "ressourcen", title: t("sections.resources") },
     { id: "antrieb", title: t("sections.direction") },
   ];
+  // "Abschnitt 4" - OHNE GESAMTZAHL. Siehe `ProfilePillar`: "4 von 9" war
+  // als Position gemeint und wurde als Fortschritt gelesen.
   const nummer = (id: SectionId) =>
     t("sections.step", {
       index: sections.findIndex((section) => section.id === id) + 1,
-      total: sections.length,
     });
   const detailsHint = (count: number) => t("detailsHint", { count });
   const originLabel = (origin: string) => t(`origins.${origin}`);
@@ -270,9 +296,10 @@ export default async function FounderProfilePage() {
       <OpenDetailsForPrint />
 
       <div className="no-print mb-8 flex items-center justify-between">
+        {/* `min-h-11`: 44 px, gemessen statt angenommen. Vorher 38. */}
         <a
           href="/dashboard"
-          className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+          className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-700"
         >
           {t("backToDashboard")}
         </a>
@@ -313,14 +340,24 @@ export default async function FounderProfilePage() {
           eine Seite, die man am Stueck liest.
           ------------------------------------------------------------------ */}
       <nav aria-label={t("head.jumpTo")} className="no-print mt-6">
-        <ul className="flex flex-wrap gap-2">
+        {/* UNTER `sm` EINE ZEILE ZUM SCHIEBEN, DARUEBER UMBRUCH.
+
+            Gemessen am 01.10.2026 im Browser: Bei 320 px standen acht
+            Sprungmarken in sieben Zeilen und 356 px hoch - fast ein ganzer
+            Bildschirm Inhaltsverzeichnis, bevor der Inhalt anfaengt. Bei
+            375 px waren es sechs Zeilen.
+
+            `-mx-6 px-6` laesst die Zeile bis an den Bildschirmrand laufen,
+            damit man sieht, dass dort noch etwas kommt. Der Rollbereich ist
+            der der Liste; die Seite selbst wird dadurch nicht breiter. */}
+        <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
           {sections
             .filter((section) => zeigt[section.id])
             .map((section) => (
-              <li key={section.id}>
+              <li key={section.id} className="shrink-0">
                 <a
                   href={`#${section.id}`}
-                  className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white/80 px-4 text-sm text-slate-700 transition-colors hover:border-slate-300 hover:bg-white"
+                  className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-slate-200 bg-white/80 px-4 text-sm text-slate-700 transition-colors hover:border-slate-300 hover:bg-white"
                 >
                   {section.title}
                 </a>
@@ -464,30 +501,28 @@ export default async function FounderProfilePage() {
                   unanswered: t("strengths.unanswered"),
                 }}
               />
-              <ProfileDetails
-                summary={t("strengthsSection.detailsSummary")}
-                hint={
-                  strengths.length > STRENGTHS_IN_SUMMARY
-                    ? t("strengthsSection.more", {
-                        count: strengths.length - STRENGTHS_IN_SUMMARY,
-                      })
-                    : null
-                }
-              >
-                <FounderProfileStrengths
-                  strengths={strengths}
-                  originLabel={originLabel}
-                  copy={{
-                    title: null,
-                    intro: null,
-                    self: t("strengths.self"),
-                    reflected: (who) => t("strengths.reflected", { who }),
-                    frequency: (value) => tCapability(`strengths.frequencies.${value}`),
-                    group: (value) => tCapability(`strengths.groups.${value}`),
-                    unanswered: t("strengths.unanswered"),
-                  }}
-                />
-              </ProfileDetails>
+              {mehrStaerken ? (
+                <ProfileDetails
+                  summary={t("strengthsSection.detailsSummary")}
+                  hint={t("strengthsSection.more", {
+                    count: strengths.length - STRENGTHS_IN_SUMMARY,
+                  })}
+                >
+                  <FounderProfileStrengths
+                    strengths={strengths}
+                    originLabel={originLabel}
+                    copy={{
+                      title: null,
+                      intro: null,
+                      self: t("strengths.self"),
+                      reflected: (who) => t("strengths.reflected", { who }),
+                      frequency: (value) => tCapability(`strengths.frequencies.${value}`),
+                      group: (value) => tCapability(`strengths.groups.${value}`),
+                      unanswered: t("strengths.unanswered"),
+                    }}
+                  />
+                </ProfileDetails>
+              ) : null}
               <EditLink href="/profile" label={t("edit")} />
             </>
           ) : (
@@ -815,21 +850,23 @@ export default async function FounderProfilePage() {
                   facetLabel: (facet) => tDirection(facet),
                 }}
               />
-              <ProfileDetails
-                summary={t("directionSection.detailsSummary")}
-                hint={detailsHint(directionStatements.length)}
-              >
-                <FounderProfileDirection
-                  statements={directionStatements}
-                  facets={DIRECTION_FACETS}
-                  originLabel={originLabel}
-                  copy={{
-                    title: null,
-                    intro: t("direction.intro"),
-                    facetLabel: (facet) => tDirection(facet),
-                  }}
-                />
-              </ProfileDetails>
+              {mehrRichtung ? (
+                <ProfileDetails
+                  summary={t("directionSection.detailsSummary")}
+                  hint={detailsHint(directionStatements.length)}
+                >
+                  <FounderProfileDirection
+                    statements={directionStatements}
+                    facets={DIRECTION_FACETS}
+                    originLabel={originLabel}
+                    copy={{
+                      title: null,
+                      intro: null,
+                      facetLabel: (facet) => tDirection(facet),
+                    }}
+                  />
+                </ProfileDetails>
+              ) : null}
               <EditLink href="/profile/direction" label={t("edit")} />
             </>
           ) : (
@@ -927,7 +964,12 @@ export default async function FounderProfilePage() {
 function EditLink({ href, label }: { href: string; label: string }) {
   return (
     <p className="no-print mt-4">
-      <Link href={href} className="text-sm font-medium text-slate-700 underline underline-offset-2">
+      {/* `min-h-11`: Ein Textlink ist 21 px hoch. Am Telefon ist das kein
+          Ziel, das man trifft - und er steht neunmal auf dieser Seite. */}
+      <Link
+        href={href}
+        className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 underline underline-offset-2"
+      >
         {label}
       </Link>
     </p>
@@ -964,7 +1006,7 @@ function MissingSection({
       <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{text}</p>
       <a
         href={href}
-        className="mt-3 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
       >
         {cta}
       </a>

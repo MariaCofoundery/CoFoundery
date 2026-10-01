@@ -280,6 +280,22 @@ test("kein Abschnitt hat zwei Aufklapper ineinander", () => {
   assert.equal(tiefe, 0, "ein Aufklapper ist nicht geschlossen");
 });
 
+test("die sechs Abfragen fuer den Stand laufen nebeneinander", () => {
+  // GEFRAGT AM 01.10.2026: "prüfen, ob diese Abfragen parallel laufen".
+  //
+  // Sie tun es - `Promise.all` ueber die Quellen, und der Aufruf selbst
+  // haengt im `Promise.all` der Seite. Sechs Rundwege bleiben sechs
+  // Rundwege; sie kosten aber nur einen davon an Zeit. Nacheinander waeren
+  // es sechs, und genau das soll dieser Test verhindern - nicht die Zahl der
+  // Abfragen, sondern ihre Reihenfolge.
+  const quelle = codeOnly("src/features/reporting/profileFreshness.ts");
+  assert.match(quelle, /await Promise\.all\(\s*QUELLEN\.map\(/);
+  assert.ok(
+    !/for \(const quelle of QUELLEN\)/.test(quelle),
+    "die Quellen werden nacheinander abgefragt",
+  );
+});
+
 test("der Stand kommt aus allen Quellen - oder gar nicht", () => {
   const page = codeOnly(PAGE);
   // Nicht aus einem Fragebogen: Wer gestern seine Faehigkeiten ueberarbeitet
@@ -321,7 +337,11 @@ test("die Farbe sagt, welche Saeule - nicht, wie gut", () => {
   // Deshalb sitzt sie nur am Rahmen: Augenbraue, Randlinie, Zaehler. Waere
   // eine Saeule bernsteinfarben hinterlegt, liesse sich die Bedeutungsfarbe
   // innen (Bruchstelle, Luecke) nicht mehr davon unterscheiden.
-  assert.match(pillar, /rule:|eyebrow:|badge:/);
+  assert.match(pillar, /rule:|eyebrow:/);
+  // Die Plakette ist am 01.10.2026 entfallen: eine Zahl in einem
+  // eingefaerbten Kreis ist die Form, in der Einrichtungsassistenten ihre
+  // Schritte zeigen.
+  assert.ok(!pillar.includes("badge"), "der Zaehler sitzt wieder in einer Plakette");
   for (const semantic of ["amber", "rose", "red", "green-"]) {
     assert.ok(!pillar.includes(semantic), `keine Bedeutungsfarbe als Saeulenfarbe: ${semantic}`);
   }
