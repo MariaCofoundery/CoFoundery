@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(13);
+select extensions.plan(14);
 
 -- ---------------------------------------------------------------------------
 -- Die Identitaet fliesst nur noch in eine Richtung
@@ -32,34 +32,39 @@ insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_co
 ('00000000-0000-0000-0000-000000000000','fd000000-0000-4000-8000-000000000001','authenticated','authenticated','sync-a@example.com','',now(),'{}','{}',now(),now());
 
 -- ---------------------------------------------------------------------------
--- 1. Basisprofil -> Kern: nur der Name, und nur uebergangsweise
+-- 1. Das Basisprofil erreicht den Kern gar nicht mehr
 -- ---------------------------------------------------------------------------
 --
--- Fuenf Stellen schreiben `profiles.display_name`, ohne ueber den Kern zu
--- gehen: saveProfileBasicsAction (Einstieg), updateDisplayNameAction,
--- saveDisplayName, saveDisplayNameB und dev-seed. Ohne diesen Weg haette
--- jemand nach dem Einstieg einen Namen in `profiles` und keinen im Kern - und
--- der Kern ist das, was ueberall angezeigt wird.
-insert into public.profiles(user_id, display_name, roles) values
-('fd000000-0000-4000-8000-000000000001','Maria Beispiel',array['founder']);
-select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria Beispiel', 'der Name aus dem Einstieg wandert in den Kern');
+-- Bis zum 01.10.2026 trug ein Trigger den Namen von `profiles` in den Kern.
+-- Er war noetig, weil fuenf Stellen direkt nach `profiles` schrieben. Die
+-- schreiben jetzt in den Kern (`features/profile/displayNameWrite.ts`), und
+-- Migration 20261093120000 hat den Trigger entfernt.
+--
+-- Der Kern traegt den Namen hier zuerst, so wie es die Anwendung tut.
+insert into public.profiles(user_id, roles) values
+('fd000000-0000-4000-8000-000000000001',array['founder']);
+update public.person_core set display_name = 'Maria Beispiel'
+where user_id='fd000000-0000-4000-8000-000000000001';
+select extensions.is((select display_name from public.profiles where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Maria Beispiel', 'der Kern traegt den Namen ins Basisprofil');
 
--- Die Headline nicht. Sie hat keinen eigenstaendigen Schreibweg auf
--- `profiles`: saveProfileBasicsAction reicht den vorhandenen Wert
--- unveraendert durch, sonst schreibt dort nur die Propagation aus dem Kern.
+-- Und zurueck geht nichts mehr - weder der Name noch die Headline.
 update public.person_core set headline = 'Aus dem Kern'
 where user_id='fd000000-0000-4000-8000-000000000001';
-update public.profiles set headline = 'Aus dem Basisprofil'
+update public.profiles set display_name = 'Direkt in profiles', headline = 'Aus dem Basisprofil'
 where user_id='fd000000-0000-4000-8000-000000000001';
-select extensions.is((select headline from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Aus dem Kern', 'eine Headline auf profiles erreicht den Kern NICHT mehr');
-
--- LEER GILT NICHT ALS EINGABE. Die Regel stammt aus 20260907140000 und gilt
--- unveraendert: Ein auf Leerzeichen gesetzter Name loescht nichts.
-update public.profiles set display_name = '   ' where user_id='fd000000-0000-4000-8000-000000000001';
 select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria Beispiel', 'ein auf Leerzeichen gesetzter Name ueberschreibt den Kern NICHT');
+  'Maria Beispiel', 'ein Schreibvorgang auf profiles erreicht den Kern NICHT mehr');
+select extensions.is((select headline from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Aus dem Kern', 'auch die Headline nicht');
+
+-- KEINE SCHLEIFE. Gaebe es sie, waere schon das Update oben mit
+-- "stack depth limit exceeded" abgebrochen; dass hier etwas steht, ist der
+-- Beweis. Zusaetzlich: Der Kern hat genau einmal geschrieben.
+update public.person_core set display_name = 'Maria B.'
+where user_id='fd000000-0000-4000-8000-000000000001';
+select extensions.is((select display_name from public.profiles where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Maria B.', 'der Kern ueberschreibt eine direkte Eingabe in profiles beim naechsten Mal');
 
 -- ---------------------------------------------------------------------------
 -- 2. Der Kern verteilt weiterhin

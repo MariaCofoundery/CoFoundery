@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
+import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
@@ -232,6 +233,28 @@ export async function upsertProfileBasicsAction(formData: FormData) {
       await deleteStoredAvatarIfOwned(supabase, user.id, nextAvatarUrl);
     }
     redirect(withError(errorRedirectTo, error.message ?? "profile_save_failed"));
+  }
+
+  // ---------------------------------------------------------------------------
+  // DER NAME GEHOERT IN DEN KERN
+  // ---------------------------------------------------------------------------
+  //
+  // Diese Aktion schreibt `profiles` weiter - sie traegt Rollen, Avatar,
+  // Schwerpunkt und Absicht, und die liegen dort. Der NAME ist seit dem
+  // 01.10.2026 etwas anderes: Er ist Identitaet, und die ist in `person_core`
+  // kanonisch. Frueher trug ihn ein Trigger von `profiles` dorthin; jetzt
+  // laeuft es andersherum.
+  //
+  // NACH dem Upsert und nicht davor: Wer gerade erst anfaengt, hat noch keine
+  // `profiles`-Zeile, und die Propagation aus dem Kern legt keine an. Erst die
+  // Zeile, dann der Kern - dann steht der Name an beiden Stellen.
+  //
+  // Ein Fehler hier ist dieselbe Art Fehler wie oben: Der Kern ist permissiv,
+  // ein aktives Connect-Profil ist streng. Wer den Namen auf ein Zeichen
+  // kuerzt, bekommt eine Abweisung statt eines stillen Widerspruchs.
+  const coreName = await writeDisplayNameToCore(supabase, user.id, displayName);
+  if (!coreName.ok) {
+    redirect(withError(errorRedirectTo, coreName.reason));
   }
 
   if (avatarToDeleteAfterSave) {

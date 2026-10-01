@@ -188,14 +188,14 @@ async function seedPersonCore(admin: SupabaseClient, userId: string, person: Per
  * `{founder}`: Pia ist Advisorin, und ein Vorgabewert haette sie stillschweigend
  * zur Founderin gemacht.
  */
-async function seedProfile(
-  admin: SupabaseClient,
-  userId: string,
-  displayName: string,
-  roles: string[],
-) {
+async function seedProfile(admin: SupabaseClient, userId: string, roles: string[]) {
+  // OHNE `display_name`. Der Name ist Identitaet und steht seit dem
+  // 01.10.2026 ausschliesslich in `person_core`; nach `profiles` traegt ihn
+  // die Propagation. Ihn hier noch einmal zu schreiben hiesse, im Seed einen
+  // Weg zu benutzen, den die Anwendung nicht mehr hat - und ein Seed, der
+  // anders schreibt als das Produkt, prueft das Produkt nicht.
   const { error } = await admin.from("profiles").upsert(
-    { user_id: userId, display_name: displayName, roles, updated_at: new Date().toISOString() },
+    { user_id: userId, roles, updated_at: new Date().toISOString() },
     { onConflict: "user_id" }
   );
   if (error) throw error;
@@ -586,6 +586,22 @@ async function main() {
   const third = await ensureTestUser(anon, THIRD_EMAIL);
   const advisor = await ensureTestUser(anon, ADVISOR_EMAIL);
 
+  // ---------------------------------------------------------------------------
+  // ERST DIE ROLLE, DANN DER MENSCH
+  // ---------------------------------------------------------------------------
+  //
+  // Die Rolle zuerst, weil die Zeilensicherheit ohne sie alles Weitere abweist.
+  //
+  // Und seit dem 01.10.2026 auch aus einem zweiten Grund: `seedProfile`
+  // schreibt den Namen nicht mehr mit. Er kommt aus `person_core`, und die
+  // Propagation traegt ihn nach `profiles` - aber nur in eine Zeile, die es
+  // schon gibt. In dieser Reihenfolge laeuft der Seed genau den Weg, den die
+  // Anwendung auch laeuft.
+  await seedProfile(admin, founder, ["founder"]);
+  await seedProfile(admin, second, ["founder"]);
+  await seedProfile(admin, third, ["founder"]);
+  await seedProfile(admin, advisor, ["advisor"]);
+
   await seedPersonCore(admin, founder, {
     displayName: "Nora Testerin",
     headline: "Baut Werkzeuge für Pflegeteams",
@@ -618,12 +634,6 @@ async function main() {
     expertise: ["Programmleitung"],
     industries: ["Gesundheit"],
   });
-
-  // Die Rolle zuerst - ohne sie weist die Zeilensicherheit alles Weitere ab.
-  await seedProfile(admin, founder, "Nora Testerin", ["founder"]);
-  await seedProfile(admin, second, "Ben Testfounder", ["founder"]);
-  await seedProfile(admin, third, "Carla Testfounderin", ["founder"]);
-  await seedProfile(admin, advisor, "Pia Beraterin", ["advisor"]);
 
   // Unterschiedliche Bereiche je Person, damit die Rollenlage etwas zu zeigen
   // hat: Ueberschneidungen, Luecken und offene Stellen.

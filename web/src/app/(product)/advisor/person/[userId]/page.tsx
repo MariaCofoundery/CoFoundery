@@ -63,11 +63,15 @@ export default async function AdvisorPersonPage({
   // Nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
   if (view.grantedScopes.length === 0) notFound();
 
-  const [t, tCapability, tDirection, tNote] = await Promise.all([
+  const [t, tCapability, tDirection, tNote, tAlign] = await Promise.all([
     getTranslations("advisor.personView"),
     getTranslations("capability"),
     getTranslations("direction.statements.facets"),
     getTranslations("report.instrumentNote"),
+    // Dieselben Saetze wie auf dem eigenen Profil, aus derselben Datei. Sie
+    // standen hier fest verdrahtet und auf Deutsch - in einer englischen
+    // Sitzung las ein Advisor deutsche Absaetze.
+    getTranslations("alignment.advisor"),
   ]);
 
   // DIE NEUE FASSUNG - nur wenn sie freigegeben ist.
@@ -246,17 +250,14 @@ export default async function AdvisorPersonPage({
       {alignmentV21 && (
         <section className="mt-10">
           <h2 className="text-xl font-semibold text-slate-950">
-            Antworten aus der neuen Fassung
+            {tAlign("newVersionTitle")}
           </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine
-            Auswertung — was hier steht, sind die Antworten selbst. Es gibt dazu keine
-            Punktzahl und keine Einordnung.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
           <p className="mt-1 text-sm text-slate-500">
-            Du siehst {alignmentV21.visible.count} von {alignmentV21.visible.of} Fragen.
-            Was fehlt, kann zurückgehalten oder nicht beantwortet sein — das lässt sich
-            von hier aus nicht unterscheiden.
+            {tAlign("visible", {
+              count: alignmentV21.visible.count,
+              of: alignmentV21.visible.of,
+            })}
           </p>
 
           <div className="mt-6">
@@ -275,16 +276,14 @@ export default async function AdvisorPersonPage({
               </span>
             )}
           </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine
-            Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl
-            und keine Einordnung.
-          </p>
+          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
+          {/* Die Gueltigkeitsangabe kommt aus der Registratur und ist dort
+              nur auf Deutsch hinterlegt. Sie ist Inhalt des Instruments, kein
+              Oberflaechentext - sie hier zu uebersetzen hiesse, sie zu
+              verdoppeln. */}
           <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
           <p className="mt-1 text-sm text-slate-500">
-            Du siehst {view.visible.count} von {view.visible.of} Fragen. Was fehlt, kann
-            zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus
-            nicht unterscheiden.
+            {tAlign("visible", { count: view.visible.count, of: view.visible.of })}
           </p>
 
           <div className="mt-6">

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { createClient } from "@/lib/supabase/server";
 import {
   getLatestAssessmentAnswers,
@@ -50,8 +51,10 @@ async function resolveModuleForQuestion(questionId: string): Promise<ModuleKey> 
 
 export async function getParticipantB(_sessionId: string) {
   const { supabase, user } = await getUserOrRedirect();
-  const { data: profile } = await supabase
-    .from("profiles")
+  // AUS DEM KERN - wie in `actions.ts`. Gerade hier zaehlt es: Wer als
+  // Partner:in eingeladen wurde, hat oft noch gar keine `profiles`-Zeile.
+  const { data: core } = await supabase
+    .from("person_core")
     .select("display_name")
     .eq("user_id", user.id)
     .maybeSingle();
@@ -62,7 +65,7 @@ export async function getParticipantB(_sessionId: string) {
       role: "partner",
       user_id: user.id,
       invited_email: user.email?.toLowerCase() ?? null,
-      display_name: normalizeDisplayName(profile?.display_name ?? null),
+      display_name: normalizeDisplayName(core?.display_name ?? null),
       completed_at: null,
       created_at: null,
       requested_scope: "basis",
@@ -73,18 +76,14 @@ export async function getParticipantB(_sessionId: string) {
 
 export async function saveDisplayNameB(_sessionId: string, displayName: string | null) {
   const { supabase, user } = await getUserOrRedirect();
-  const normalized = normalizeDisplayName(displayName);
 
-  const { error } = await supabase.from("profiles").upsert(
-    {
-      user_id: user.id,
-      display_name: normalized,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
+  const result = await writeDisplayNameToCore(
+    supabase,
+    user.id,
+    normalizeDisplayName(displayName)
   );
 
-  if (error) {
+  if (!result.ok) {
     return { ok: false, error: "update_failed" } as const;
   }
 

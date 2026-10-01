@@ -1,3 +1,5 @@
+import { getFormatter, getTranslations } from "next-intl/server";
+
 import { MarkV21 } from "@/features/instruments/v21/MarkV21";
 import type { MarkScope } from "@/features/instruments/v21/markActionsV21";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/readoutV21";
@@ -49,17 +51,30 @@ type Props = {
   markVentureId?: string;
 };
 
-export function ReportViewV21({
+export async function ReportViewV21({
   sections, orphans = [], marked = [], canMark = false, markScope, markVentureId,
 }: Props) {
+  // SERVERKOMPONENTE, und das bleibt sie. Alle sechs Stellen, die sie
+  // benutzen, sind Seiten - das eigene Profil, die Advisor-Ansicht, der
+  // Vergleich, die beiden Antwortenseiten und der Pilot. Damit kommen die
+  // Texte aus derselben Quelle wie ueberall, und es gibt keine zweite
+  // Uebersetzung fuer die Advisor-Ansicht.
+  const t = await getTranslations("alignment.report");
+  // Betraege und Daten tragen das Format der gelesenen Sprache, nicht
+  // "de-DE". Ein Datum im deutschen Format in einer englischen Seite ist
+  // dieselbe Art Fehler wie ein deutscher Satz dort.
+  const format = await getFormatter();
+  const copy: ValueCopy = {
+    priority: (value: string) => t("priority", { value }),
+    path: (value: string) => t("path", { value }),
+    noExpectation: t("noExpectation"),
+  };
+
   return (
     <div className="space-y-10">
       {orphans.length > 0 && (
         <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Zu {orphans.length === 1 ? "einer Frage" : `${orphans.length} Fragen`} steht
-          unten eine Antwort, die sich auf eine Grenze bezieht, die du inzwischen
-          gestrichen hast. Sie ist nicht gelöscht — du kannst sie stehen lassen oder
-          im Fragebogen überschreiben.
+          {t("orphans", { count: orphans.length })}
         </p>
       )}
 
@@ -77,17 +92,14 @@ export function ReportViewV21({
                   // wird deshalb wie eine Antwort gesetzt, nicht ausgegraut.
                   <p className="text-base text-slate-900">
                     <span className="mr-2 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                      offen
+                      {t("openBadge")}
                     </span>
                     {entry.missing.label}
                   </p>
                 ) : entry.value ? (
-                  <Value value={entry.value} />
+                  <Value value={entry.value} copy={copy} format={format} />
                 ) : (
-                  <p className="text-sm text-rose-700">
-                    Diese Antwort lässt sich nicht lesen. Das ist ein Fehler bei uns —
-                    sie ist gespeichert und nicht verloren.
-                  </p>
+                  <p className="text-sm text-rose-700">{t("unreadable")}</p>
                 )}
               </div>
 
@@ -107,7 +119,28 @@ export function ReportViewV21({
   );
 }
 
-function Value({ value }: { value: ReadoutValue }) {
+/**
+ * Die Texte reisen als Werte herunter, nicht als Uebersetzer.
+ *
+ * `Value` ist keine Komponente mit eigener Lebensdauer, sondern eine
+ * Verzweigung ueber die Art der Antwort. Sie selbst asynchron zu machen hiesse,
+ * fuer jede einzelne Antwort die Sprachdatei anzufragen.
+ */
+type ValueCopy = {
+  priority: (value: string) => string;
+  path: (value: string) => string;
+  noExpectation: string;
+};
+
+function Value({
+  value,
+  copy,
+  format,
+}: {
+  value: ReadoutValue;
+  copy: ValueCopy;
+  format: Awaited<ReturnType<typeof getFormatter>>;
+}) {
   switch (value.kind) {
     case "ordinal":
       return (
@@ -134,7 +167,7 @@ function Value({ value }: { value: ReadoutValue }) {
             ))}
           </ul>
           {value.priority && (
-            <p className="mt-1 text-sm text-slate-600">Vorrang: {value.priority}</p>
+            <p className="mt-1 text-sm text-slate-600">{copy.priority(value.priority)}</p>
           )}
           {value.texts.map((text) => (
             <p key={text} className="mt-1 text-sm text-slate-600">
@@ -156,7 +189,7 @@ function Value({ value }: { value: ReadoutValue }) {
               </div>
             </div>
           ))}
-          <p className="pt-1 text-base text-slate-900">Weg: {value.path}</p>
+          <p className="pt-1 text-base text-slate-900">{copy.path(value.path)}</p>
         </div>
       );
 
@@ -175,7 +208,7 @@ function Value({ value }: { value: ReadoutValue }) {
       // stillschweigend verglichen werden.
       return (
         <p className="text-base text-slate-900">
-          {value.amount.toLocaleString("de-DE")} {value.currency}
+          {format.number(value.amount)} {value.currency}
         </p>
       );
 
@@ -186,7 +219,7 @@ function Value({ value }: { value: ReadoutValue }) {
             <li key={index}>
               {row.person}:{" "}
               {row.number === null ? (
-                <span className="text-slate-600">keine feste Erwartung</span>
+                <span className="text-slate-600">{copy.noExpectation}</span>
               ) : (
                 `${row.number} ${row.unit}`
               )}
@@ -210,7 +243,7 @@ function Value({ value }: { value: ReadoutValue }) {
     case "date":
       return (
         <p className="text-base text-slate-900">
-          {new Date(value.date).toLocaleDateString("de-DE", {
+          {format.dateTime(new Date(value.date), {
             day: "numeric", month: "long", year: "numeric",
           })}
         </p>

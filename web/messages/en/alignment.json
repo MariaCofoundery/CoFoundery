@@ -73,7 +73,28 @@
     "instrument": "Version: {instrument}",
     "emptyTitle": "Nothing here yet.",
     "emptyIntro": "Once you have filled in the questionnaire, your answers appear here — sorted and without any rating.",
-    "emptyAction": "Go to the questionnaire"
+    "emptyAction": "Go to the questionnaire",
+    "orphans": "For {count, plural, =1 {one question} other {# questions}} there is an answer below that refers to a limit you have since removed. It is not deleted — you can leave it as it is or overwrite it in the questionnaire.",
+    "openBadge": "open",
+    "unreadable": "This answer cannot be read. That is a fault on our side — it is saved and not lost.",
+    "priority": "Priority: {value}",
+    "path": "Path: {value}",
+    "noExpectation": "no fixed expectation"
+  },
+  "maps": {
+    "workTitle": "At a glance",
+    "workIntro": "Your answers side by side — one dot per answer, at the position you chose. No section value and no score: this is the same as below, only more compact. Questions without an order appear below only.",
+    "differenceTitle": "Where you differ",
+    "differenceIntro": "Only the questions you both answered and that have an order. A wide gap does not mean something is wrong — it means you have not talked about it yet.",
+    "directionTitle": "Where this should go",
+    "directionIntro": "Six goals side by side, each with the weight you gave it. They are not added up — none comes at the cost of another, and there is no total.",
+    "directionFirst": "first",
+    "directionNoAnswer": "not stated yet"
+  },
+  "advisor": {
+    "newVersionTitle": "Answers from the new version",
+    "selfReportNote": "Self-report, not a test result. There is no evaluation for this version yet — what you see are the answers themselves. No score and no classification.",
+    "visible": "You see {count} of {of} questions. What is missing may be withheld or unanswered — from here the two cannot be told apart."
   },
   "compare": {
     "title": "The two of you",

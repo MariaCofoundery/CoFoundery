@@ -73,7 +73,28 @@
     "instrument": "Fassung: {instrument}",
     "emptyTitle": "Hier ist noch nichts.",
     "emptyIntro": "Sobald du den Fragebogen ausgefüllt hast, stehen deine Angaben hier — geordnet und ohne Bewertung.",
-    "emptyAction": "Zum Fragebogen"
+    "emptyAction": "Zum Fragebogen",
+    "orphans": "Zu {count, plural, =1 {einer Frage} other {# Fragen}} steht unten eine Antwort, die sich auf eine Grenze bezieht, die du inzwischen gestrichen hast. Sie ist nicht gelöscht — du kannst sie stehen lassen oder im Fragebogen überschreiben.",
+    "openBadge": "offen",
+    "unreadable": "Diese Antwort lässt sich nicht lesen. Das ist ein Fehler bei uns — sie ist gespeichert und nicht verloren.",
+    "priority": "Vorrang: {value}",
+    "path": "Weg: {value}",
+    "noExpectation": "keine feste Erwartung"
+  },
+  "maps": {
+    "workTitle": "Auf einen Blick",
+    "workIntro": "Deine Antworten nebeneinander — ein Punkt je Antwort, an der Stelle, die du gewählt hast. Kein Abschnittswert und keine Punktzahl: Was hier steht, ist dasselbe wie unten, nur kompakter. Fragen ohne Reihenfolge stehen nur unten.",
+    "differenceTitle": "Wo ihr auseinanderliegt",
+    "differenceIntro": "Nur die Fragen, die ihr beide beantwortet habt und die eine Reihenfolge haben. Ein weiter Abstand heißt nicht, dass etwas nicht passt — er heißt, dass ihr darüber noch nicht gesprochen habt.",
+    "directionTitle": "Wohin es gehen soll",
+    "directionIntro": "Sechs Ziele nebeneinander, jedes mit der Wichtigkeit, die du ihm gegeben hast. Sie werden nicht verrechnet — keins geht auf Kosten eines anderen, und es gibt keine Summe.",
+    "directionFirst": "zuerst",
+    "directionNoAnswer": "noch keine Angabe"
+  },
+  "advisor": {
+    "newVersionTitle": "Antworten aus der neuen Fassung",
+    "selfReportNote": "Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl und keine Einordnung.",
+    "visible": "Du siehst {count} von {of} Fragen. Was fehlt, kann zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus nicht unterscheiden."
   },
   "compare": {
     "title": "Ihr beide",

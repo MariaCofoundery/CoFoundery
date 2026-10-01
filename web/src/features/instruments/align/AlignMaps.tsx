@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 import {
@@ -71,7 +73,7 @@ function Punktreihe({ position, of }: { position: number; of: number }) {
  * das Bild, nicht um die Einzelfrage. Der volle Fragetext hängt trotzdem an
  * der Zeile, für alle, die ihn wissen wollen.
  */
-export function WorkMap({
+export async function WorkMap({
   sections,
 }: {
   sections: { section: string; entries: ReadoutEntry[] }[];
@@ -84,14 +86,12 @@ export function WorkMap({
   // Ueberschrift saehe aus, als fehlte etwas.
   if (gruppen.length === 0) return null;
 
+  const t = await getTranslations("alignment.maps");
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h2 className="text-base font-semibold text-slate-900">Auf einen Blick</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Deine Antworten nebeneinander — ein Punkt je Antwort, an der Stelle, die du
-        gewählt hast. Kein Abschnittswert und keine Punktzahl: Was hier steht, ist
-        dasselbe wie unten, nur kompakter. Fragen ohne Reihenfolge stehen nur unten.
-      </p>
+      <h2 className="text-base font-semibold text-slate-900">{t("workTitle")}</h2>
+      <p className="mt-1 text-sm text-slate-600">{t("workIntro")}</p>
 
       <div className="mt-5 space-y-5">
         {gruppen.map((group) => (
@@ -135,7 +135,7 @@ export function WorkMap({
  * auseinander“ behauptet, dass zwei Stufen bei jeder Frage dasselbe bedeuten.
  * Die Länge der Linie sagt genug.
  */
-export function DifferenceMap({
+export async function DifferenceMap({
   sections,
   nameA,
   nameB,
@@ -148,14 +148,12 @@ export function DifferenceMap({
 
   if (gruppen.length === 0) return null;
 
+  const t = await getTranslations("alignment.maps");
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h2 className="text-base font-semibold text-slate-900">Wo ihr auseinanderliegt</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Nur die Fragen, die ihr beide beantwortet habt und die eine Reihenfolge haben.
-        Ein weiter Abstand heißt nicht, dass etwas nicht passt — er heißt, dass ihr
-        darüber noch nicht gesprochen habt.
-      </p>
+      <h2 className="text-base font-semibold text-slate-900">{t("differenceTitle")}</h2>
+      <p className="mt-1 text-sm text-slate-600">{t("differenceIntro")}</p>
 
       <p className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-600">
         <span className="flex items-center gap-1.5">
@@ -247,7 +245,7 @@ function Hantel({ a, b, of }: { a: number; b: number; of: number }) {
  * keinen Punkt ganz links. Er bekommt seinen Satz — sonst sähe eine
  * unentschiedene Richtung aus wie eine abgelehnte.
  */
-export function VentureDirection({
+export async function VentureDirection({
   entries,
   items,
 }: {
@@ -259,14 +257,12 @@ export function VentureDirection({
 
   if (beantwortet.length === 0) return null;
 
+  const t = await getTranslations("alignment.maps");
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h2 className="text-base font-semibold text-slate-900">Wohin es gehen soll</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Sechs Ziele nebeneinander, jedes mit der Wichtigkeit, die du ihm gegeben hast.
-        Sie werden nicht verrechnet — keins geht auf Kosten eines anderen, und es gibt
-        keine Summe.
-      </p>
+      <h2 className="text-base font-semibold text-slate-900">{t("directionTitle")}</h2>
+      <p className="mt-1 text-sm text-slate-600">{t("directionIntro")}</p>
 
       <ul className="mt-5 space-y-3">
         {rows.map((row) => (
@@ -278,7 +274,7 @@ export function VentureDirection({
                   voranstellen, weil es gerade dran ist. */}
               {row.top && (
                 <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] text-white">
-                  zuerst
+                  {t("directionFirst")}
                 </span>
               )}
             </span>
@@ -290,7 +286,7 @@ export function VentureDirection({
                 </>
               ) : (
                 <span className="text-sm text-slate-500">
-                  {row.missing?.label ?? "noch keine Angabe"}
+                  {row.missing?.label ?? t("directionNoAnswer")}
                 </span>
               )}
             </span>

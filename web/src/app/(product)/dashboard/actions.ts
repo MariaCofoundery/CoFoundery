@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "crypto";
 import { redirect } from "next/navigation";
 import { type TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
+import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendCoFounderInviteEmail } from "@/lib/email/sendCoFounderInviteEmail";
@@ -121,13 +122,15 @@ async function createInvitation(params: {
     return { ok: false, error: "self_invite_not_allowed" };
   }
 
-  const { data: inviterProfile } = await supabase
-    .from("profiles")
+  // AUS DEM KERN. Dort steht der Name seit dem 01.10.2026 kanonisch, und die
+  // Zeile gibt es fuer jedes Konto - eine `profiles`-Zeile nicht.
+  const { data: inviterCore } = await supabase
+    .from("person_core")
     .select("display_name")
     .eq("user_id", user.id)
     .maybeSingle();
   const inviterDisplayName =
-    (inviterProfile as { display_name?: string | null } | null)?.display_name?.trim() ||
+    (inviterCore as { display_name?: string | null } | null)?.display_name?.trim() ||
     inviterEmail ||
     "Co-Founder";
 
@@ -314,17 +317,14 @@ export async function updateDisplayNameAction(formData: FormData) {
   }
 
   const displayName = normalizeDisplayName(formData.get("displayName"));
-  const { error } = await supabase.from("profiles").upsert(
-    {
-      user_id: user.id,
-      display_name: displayName,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
-  );
 
-  if (error) {
-    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  // In den Kern, nicht nach `profiles`. Dorthin traegt ihn die Propagation
+  // aus 20260907180000 - frueher lief es umgekehrt, und damit konnte eine
+  // Nebentabelle die kanonische Identitaet aendern.
+  const result = await writeDisplayNameToCore(supabase, user.id, displayName);
+
+  if (!result.ok) {
+    redirect(`/dashboard?error=${encodeURIComponent(result.reason)}`);
   }
 
   redirect("/dashboard");
