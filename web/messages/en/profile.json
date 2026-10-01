@@ -185,7 +185,7 @@
     "workProfile": {
       "title": "How you work",
       "intro": "Your answers from the founder working profile — how you decide, test, disagree and deal with open questions.",
-      "note": "Self-report, not a test result. There is no evaluation for this version yet — what you see are the answers themselves. No score and no classification.",
+      "note": "Self-report, not a test result.",
       "answered": "{answered} of {of} questions answered",
       "detailsSummary": "Your answers"
     },

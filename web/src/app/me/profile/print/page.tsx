@@ -8,6 +8,7 @@ import { groupEntriesByFamily } from "@/features/capability/capabilityTypes";
 import { DIRECTION_FACETS } from "@/features/direction/directionInterviewGuide";
 import { BRAND_NAME } from "@/features/brand";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
+import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
@@ -267,6 +268,13 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
           </p>
           <div className="mt-4">
             <WorkMap sections={workProfile.sections} />
+          </div>
+
+          {/* IN BEIDEN FASSUNGEN. Erst damit ist der Arbeitsprofil-Teil des
+              Kurzprofils ueberhaupt zu verstehen: Vorher standen dort
+              Punktreihen und sonst nichts. */}
+          <div className="mt-5">
+            <WorkProfileSynthesisView sections={workProfile.sections} heading="h3" />
           </div>
 
           {/* NUR IN DER LANGFASSUNG: die Antworten selbst, mit ihren

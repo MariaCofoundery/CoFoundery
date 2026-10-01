@@ -10,6 +10,7 @@ import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getAdvisorAlignmentV21 } from "@/features/instruments/v21/advisorAlignmentV21";
 import { getAdvisorAlignViews } from "@/features/instruments/align/advisorView";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
+import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -288,6 +289,18 @@ export default async function AdvisorPersonPage({
 
           <div className="mt-6">
             <WorkMap sections={view.sections} />
+          </div>
+
+          {/* DIESELBE BESCHREIBUNG - UND NUR UEBER DAS FREIGEGEBENE.
+
+              `view.sections` enthaelt genau die Antworten, die diese Person
+              freigegeben hat; nicht freigegebene kommen gar nicht erst mit
+              (die Policies entscheiden das, nicht diese Seite). Die
+              Beschreibung entsteht aus derselben Liste - es gibt also keinen
+              Weg, ueber eine Zusammenfassung mehr zu erfahren als ueber die
+              Antworten selbst. */}
+          <div className="mt-6">
+            <WorkProfileSynthesisView sections={view.sections} heading="h3" />
           </div>
 
           <div className="mt-6">

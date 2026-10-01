@@ -10,6 +10,7 @@ import { getProfileReadModel } from "@/features/reporting/profileReadModel";
 // Zusammenfassung laufen auseinander.
 import { DIRECTION_PER_FACET, STRENGTHS_IN_SUMMARY } from "@/features/reporting/profileSummary";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
+import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
@@ -395,6 +396,14 @@ export default async function FounderProfilePage() {
 
                 <div className="mt-5">
                   <WorkMap sections={workProfile.sections} />
+                </div>
+
+                {/* WAS SICH IN DEN ANTWORTEN ZEIGT - die Ebene zwischen Bild
+                    und Liste, neu am 01.10.2026. Sie steht OFFEN: Die
+                    Rohantworten sind das Nachschlagewerk und bleiben
+                    eingeklappt; dies hier ist das Ergebnis. */}
+                <div className="mt-5">
+                  <WorkProfileSynthesisView sections={workProfile.sections} heading="h3" />
                 </div>
 
                 <div className="mt-4">

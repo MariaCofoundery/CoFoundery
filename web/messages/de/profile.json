@@ -185,7 +185,7 @@
     "workProfile": {
       "title": "Wie du arbeitest",
       "intro": "Deine Antworten aus dem Founder-Arbeitsprofil — wie du entscheidest, erprobst, widersprichst und mit offenen Fragen umgehst.",
-      "note": "Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl und keine Einordnung.",
+      "note": "Selbstauskunft, kein Testergebnis.",
       "answered": "{answered} von {of} Fragen beantwortet",
       "detailsSummary": "Deine Antworten"
     },

@@ -116,14 +116,22 @@ test("die englische Fassung traegt dieselbe Einschraenkung", () => {
   const note = en.advisor.selfReportNote;
   assert.match(note, /Self-report/);
   assert.match(note, /not a test result/);
-  assert.match(note, /No score/i);
 
   // Und dasselbe auf dem eigenen Profil.
   const profil = JSON.parse(source(join("messages", "en", "profile.json"))) as {
     founderProfile: { workProfile: Record<string, string> };
   };
   assert.match(profil.founderProfile.workProfile.note, /Self-report/);
-  assert.match(profil.founderProfile.workProfile.note, /No score/i);
+
+  // NACHGEZOGEN AM 01.10.2026: „Keine Punktzahl" stand bis dahin in diesem
+  // einen Satz, zusammen mit „zu dieser Fassung gibt es noch keine
+  // Auswertung". Der zweite Teil stimmt nicht mehr, seit es die beschreibende
+  // Zusammenfassung gibt - der erste schon, und er steht jetzt an ihr. Sie
+  // erscheint auf allen drei Oberflaechen, auch beim Advisor.
+  const syn = (en.synthesis ?? {}) as Record<string, string>;
+  assert.match(syn.note, /not a score/i);
+  assert.match(syn.note, /not a diagnosis/i);
+  assert.match((bundle("de").synthesis as Record<string, string>).note, /keine Punktzahl/i);
 });
 
 test("die Advisor-Ansicht hat keine eigene Uebersetzung der ALIGN-Saetze", () => {

@@ -93,7 +93,7 @@
   },
   "advisor": {
     "newVersionTitle": "Answers from the new version",
-    "selfReportNote": "Self-report, not a test result. There is no evaluation for this version yet — what you see are the answers themselves. No score and no classification.",
+    "selfReportNote": "Self-report, not a test result.",
     "visible": "You see {count} of {of} questions. What is missing may be withheld or unanswered — from here the two cannot be told apart."
   },
   "compare": {
@@ -151,6 +151,149 @@
       "met": "matches",
       "unmet": "does not match",
       "unknown": "cannot be judged"
+    }
+  },
+  "synthesis": {
+    "title": "What shows in your answers",
+    "intro": "Put together from the answers you gave — question by question, with no score and no comparison to anyone else. Where your answers within a theme pull apart, that is what it says.",
+    "tooFew": "There are not enough answers here yet for a connected description.",
+    "note": "The descriptions summarise your answers; they are not a diagnosis, not a comparison against a norm and not a score.",
+    "shortLabels": {
+      "A01": "comparing the options",
+      "A02": "testing an assumption",
+      "I01": "first impression in a familiar field",
+      "I02": "gut feeling when options look equal",
+      "I03": "gut feeling against the numbers",
+      "E01": "testing instead of researching further",
+      "E02": "trying two paths in parallel",
+      "E03": "settling provisionally when reversible",
+      "T01": "when an objection comes",
+      "T02": "concerns without a clear reason",
+      "D01": "how disagreement sounds",
+      "D02": "saying you do not agree",
+      "X01": "several explanations open",
+      "X02": "direction open for longer",
+      "X03": "conflicting feedback",
+      "X04": "an important question unanswered"
+    },
+    "themes": {
+      "weighing": {
+        "title": "Weighing decisions",
+        "low": "Before you commit, you rarely compare systematically and rarely check an assumption on purpose.",
+        "middle": "Comparing and checking are part of how you decide — but not with every decision.",
+        "high": "Before you commit, you compare the options and check what speaks for your assumptions."
+      },
+      "experience": {
+        "title": "Experience & gut feeling",
+        "low": "You do not automatically treat your first impression or your gut feeling as a basis for deciding.",
+        "middle": "Experience and gut feeling count for you without being decisive.",
+        "high": "You give your experience and your gut feeling clear weight when you decide."
+      },
+      "trying": {
+        "title": "Trying things & learning",
+        "low": "Trying something out before thinking it through further is not really your way.",
+        "middle": "Trying things out happens with you, but it is not the first move.",
+        "high": "Where something can be tried out, you tend to do that rather than think further."
+      },
+      "differences": {
+        "title": "Raising differences"
+      },
+      "openQuestions": {
+        "title": "Living with open questions",
+        "low": "When something stays open, you tend to find that uncomfortable.",
+        "middle": "You can live with open situations without being comfortable in them.",
+        "high": "You get on well with situations that stay open."
+      }
+    },
+    "items": {
+      "A01": {
+        "low": "You rarely compare several options systematically before you commit.",
+        "middle": "You sometimes compare the options before you commit.",
+        "high": "With several options in front of you, you usually weigh their pros and cons before you commit."
+      },
+      "A02": {
+        "low": "You rarely check on purpose whether an important assumption holds.",
+        "middle": "You sometimes check on purpose whether an important assumption holds.",
+        "high": "When a decision rests on an assumption, you usually check what speaks for and against it."
+      },
+      "I01": {
+        "low": "In fields you know well, your first impression carries little weight.",
+        "middle": "In fields you know well, your first impression counts for something.",
+        "high": "In fields you know well, your first impression carries a lot of weight."
+      },
+      "I02": {
+        "low": "When several options look about equally good, you give your experience little weight.",
+        "middle": "When several options look about equally good, your experience counts for something.",
+        "high": "When several options look about equally good, experience tends to decide it for you."
+      },
+      "I03": {
+        "low": "When the numbers favour one option and your gut says otherwise, you tend to follow the numbers.",
+        "middle": "When the numbers favour one option and your gut says otherwise, you take the feeling partly as a signal.",
+        "high": "When numbers and gut feeling pull against each other, you clearly take the feeling as an extra signal."
+      },
+      "E01": {
+        "low": "Before testing, you tend to research further.",
+        "middle": "Whether you test first or research further depends on the situation for you.",
+        "high": "You like small tests when they bring new information faster than more research would."
+      },
+      "E02": {
+        "low": "Trying two paths in parallel on a small scale is not really your way.",
+        "middle": "Trying two paths in parallel does happen with you.",
+        "high": "When two paths both look sensible, you tend to try both on a small scale rather than commit at once."
+      },
+      "E03": {
+        "low": "Even with easily reversible decisions, you tend not to settle on a provisional direction.",
+        "middle": "With easily reversible decisions, you sometimes settle on a provisional direction.",
+        "high": "When a decision is easy to reverse, you tend to set a provisional direction already."
+      },
+      "D02": {
+        "low": "You tend not to say outright that you do not agree with a proposal.",
+        "middle": "Whether you say outright that you do not agree depends on the situation for you.",
+        "high": "When a proposal does not seem sound to you, you tend to say outright that you do not agree."
+      },
+      "X01": {
+        "low": "Several plausible explanations for one result tend to make you uncomfortable.",
+        "middle": "You can live with several plausible explanations side by side.",
+        "high": "Several plausible explanations for one result are something you are comfortable with."
+      },
+      "X02": {
+        "low": "Weeks of uncertainty about which direction the venture takes tend to make you uncomfortable.",
+        "middle": "You can live with a direction that stays open for weeks.",
+        "high": "Weeks of uncertainty about which direction the venture takes are something you get on with."
+      },
+      "X03": {
+        "low": "Conflicting feedback on the same idea tends to make you uncomfortable.",
+        "middle": "You can live with conflicting feedback on the same idea.",
+        "high": "You take conflicting feedback on the same idea calmly."
+      },
+      "X04": {
+        "low": "An important question staying unanswered for a while tends to make you uncomfortable.",
+        "middle": "You can live with an important question staying unanswered for a while.",
+        "high": "An important question staying unanswered for a while is something you are comfortable with."
+      }
+    },
+    "choices": {
+      "T01": {
+        "0": "You raise an objection to an important decision while the conversation is still going.",
+        "1": "You raise an objection after the conversation, but on the same working day.",
+        "2": "You raise an objection the next working day.",
+        "3": "You raise an objection once more than a working day has passed.",
+        "4": "When you raise an objection depends on the situation for you."
+      },
+      "T02": {
+        "0": "Concerns you cannot name precisely yet, you raise directly and say that they are still unclear.",
+        "1": "Concerns you cannot name precisely yet, you mention briefly and come back to in more detail later.",
+        "2": "Concerns you cannot name precisely yet, you sort out for yourself first and then raise.",
+        "3": "You raise concerns once you can name them fairly precisely.",
+        "4": "How you handle concerns that are still unclear depends on the situation for you."
+      },
+      "D01": {
+        "0": "When you disagree, you are most likely to say so directly: „I see that differently, because …“",
+        "1": "When you disagree, you are most likely to name your concerns: „I still have reservations on that point …“",
+        "2": "When you disagree, you are most likely to ask how the proposal would deal with your objection.",
+        "3": "When you disagree, you are most likely to bring another option into play.",
+        "4": "None of the offered wordings fits how you disagree."
+      }
     }
   }
 }

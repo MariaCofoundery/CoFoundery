@@ -8,6 +8,10 @@ import {
   directionRows,
   type DirectionRow,
 } from "@/features/instruments/align/mapRows";
+import {
+  WORK_PROFILE_ITEM_IDS,
+  themeOfItem,
+} from "@/features/instruments/align/workProfileSynthesis";
 import type { ReadoutEntry as Entry } from "@/features/instruments/v21/readoutV21";
 
 /**
@@ -68,10 +72,27 @@ function Punktreihe({ position, of }: { position: number; of: number }) {
 /**
  * Das eigene Arbeitsprofil auf einen Blick.
  *
- * Die Abschnittsüberschrift trägt die Bedeutung, die Zeile die Antwort. Welche
- * Frage zu welcher Zeile gehört, steht in der Liste darunter - hier geht es um
- * das Bild, nicht um die Einzelfrage. Der volle Fragetext hängt trotzdem an
- * der Zeile, für alle, die ihn wissen wollen.
+ * ---------------------------------------------------------------------------
+ * JEDE ZEILE SAGT, WORAUF SIE ANTWORTET - SEIT DEM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * Vorher stand je Zeile nur die gewaehlte Stufe: eine Punktreihe und daneben
+ * „haeufig". Welche Frage das war, stand in der Liste darunter - und damit war
+ * das Bild ohne die Liste nicht zu lesen. Drei Zeilen mit „eher wahrscheinlich"
+ * untereinander sagen nichts, solange nicht dabeisteht, worueber.
+ *
+ * Jetzt traegt jede Zeile eine kurze Beschriftung. Nicht die ganze Frage: Die
+ * steht weiterhin an der Zeile (`title`) und ausgeschrieben in der Liste. Die
+ * Beschriftung muss nur eindeutig genug sein, dass man das Bild versteht, ohne
+ * etwas aufzuklappen.
+ *
+ * NUR FUER DAS ARBEITSPROFIL. Der Vorhaben-Bogen hat keine solchen
+ * Beschriftungen; dort bleibt die Zeile, wie sie war. Deshalb wird je Frage
+ * nachgesehen, statt eine Beschriftung zu erzwingen.
+ *
+ * UND DIE UEBERSCHRIFT IST DIE DES MENSCHEN. Die Registratur heisst weiterhin
+ * „A – Analytische Pruefung"; darueber steht „Entscheidungen abwaegen". Zwei
+ * Namen fuer dieselbe Sache, und der technische bleibt, wo er hingehoert.
  */
 export async function WorkMap({
   sections,
@@ -87,6 +108,13 @@ export async function WorkMap({
   if (gruppen.length === 0) return null;
 
   const t = await getTranslations("alignment.maps");
+  const tSyn = await getTranslations("alignment.synthesis");
+  const kurz = (itemId: string) =>
+    WORK_PROFILE_ITEM_IDS.has(itemId) ? tSyn(`shortLabels.${itemId}`) : null;
+  const themenname = (itemId: string) => {
+    const theme = themeOfItem(itemId);
+    return theme ? tSyn(`themes.${theme}.title`) : null;
+  };
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -97,15 +125,23 @@ export async function WorkMap({
         {gruppen.map((group) => (
           <div key={group.section}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {group.section}
+              {themenname(group.rows[0]?.itemId ?? "") ?? group.section}
             </p>
-            <ul className="mt-2 space-y-1.5">
-              {group.rows.map((row) => (
-                <li key={row.itemId} className="flex items-center gap-3" title={row.prompt}>
-                  <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                  <span className="text-sm text-slate-900">{row.ordinal.label}</span>
-                </li>
-              ))}
+            <ul className="mt-2 space-y-2.5">
+              {group.rows.map((row) => {
+                const beschriftung = kurz(row.itemId);
+                return (
+                  <li key={row.itemId} title={row.prompt}>
+                    {beschriftung ? (
+                      <p className="text-xs leading-5 text-slate-600">{beschriftung}</p>
+                    ) : null}
+                    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${beschriftung ? "mt-0.5" : ""}`}>
+                      <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
+                      <span className="text-sm text-slate-900">{row.ordinal.label}</span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}

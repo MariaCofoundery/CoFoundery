@@ -93,7 +93,7 @@
   },
   "advisor": {
     "newVersionTitle": "Antworten aus der neuen Fassung",
-    "selfReportNote": "Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl und keine Einordnung.",
+    "selfReportNote": "Selbstauskunft, kein Testergebnis.",
     "visible": "Du siehst {count} von {of} Fragen. Was fehlt, kann zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus nicht unterscheiden."
   },
   "compare": {
@@ -151,6 +151,149 @@
       "met": "passt",
       "unmet": "passt nicht",
       "unknown": "nicht beurteilbar"
+    }
+  },
+  "synthesis": {
+    "title": "Was sich in deinen Antworten zeigt",
+    "intro": "Zusammengefasst aus den Antworten, die du gegeben hast — Frage für Frage, ohne Punktzahl und ohne Vergleich mit anderen. Wo deine Antworten innerhalb eines Themas auseinandergehen, steht das auch so da.",
+    "tooFew": "Dazu liegen bisher noch zu wenige Antworten für eine zusammenhängende Beschreibung vor.",
+    "note": "Die Beschreibungen fassen deine Antworten zusammen; sie sind keine Diagnose, kein Normvergleich und keine Punktzahl.",
+    "shortLabels": {
+      "A01": "Möglichkeiten vergleichen",
+      "A02": "Annahmen gezielt prüfen",
+      "I01": "erster Eindruck im vertrauten Thema",
+      "I02": "Gefühl bei ähnlich guten Optionen",
+      "I03": "Gefühl gegen die Zahlen",
+      "E01": "testen statt weiter recherchieren",
+      "E02": "zwei Wege parallel ausprobieren",
+      "E03": "vorläufig festlegen, wenn korrigierbar",
+      "T01": "wann ein Einwand kommt",
+      "T02": "Bedenken ohne klaren Grund",
+      "D01": "wie Widerspruch klingt",
+      "D02": "ausdrücklich nicht zustimmen",
+      "X01": "mehrere Erklärungen offen",
+      "X02": "Richtung länger offen",
+      "X03": "widersprüchliche Rückmeldungen",
+      "X04": "wichtige Frage ohne Antwort"
+    },
+    "themes": {
+      "weighing": {
+        "title": "Entscheidungen abwägen",
+        "low": "Bevor du dich festlegst, vergleichst du selten systematisch durch und prüfst Annahmen selten gezielt nach.",
+        "middle": "Vergleichen und Nachprüfen gehören für dich dazu — aber nicht bei jeder Entscheidung.",
+        "high": "Bevor du dich festlegst, vergleichst du die Möglichkeiten und prüfst nach, was für deine Annahmen spricht."
+      },
+      "experience": {
+        "title": "Erfahrung & Bauchgefühl",
+        "low": "Deinen ersten Eindruck und dein Gefühl nutzt du nicht automatisch als Entscheidungsgrundlage.",
+        "middle": "Erfahrung und Gefühl wiegen bei dir mit, ohne den Ausschlag zu geben.",
+        "high": "Deiner Erfahrung und deinem Gefühl gibst du deutliches Gewicht, wenn du entscheidest."
+      },
+      "trying": {
+        "title": "Ausprobieren & Lernen",
+        "low": "Etwas auszuprobieren, bevor du weiterdenkst, liegt dir eher nicht.",
+        "middle": "Ausprobieren kommt bei dir vor, ist aber nicht der erste Weg.",
+        "high": "Wo sich etwas ausprobieren lässt, tust du das eher, als weiter zu überlegen."
+      },
+      "differences": {
+        "title": "Unterschiede ansprechen"
+      },
+      "openQuestions": {
+        "title": "Mit offenen Fragen umgehen",
+        "low": "Wenn etwas offen bleibt, ist dir das eher unangenehm.",
+        "middle": "Offene Lagen hältst du aus, ohne dich darin wohlzufühlen.",
+        "high": "Mit offenen Lagen kommst du gut zurecht."
+      }
+    },
+    "items": {
+      "A01": {
+        "low": "Mehrere Möglichkeiten vergleichst du selten systematisch, bevor du dich festlegst.",
+        "middle": "Möglichkeiten vergleichst du manchmal, bevor du dich festlegst.",
+        "high": "Liegen mehrere Möglichkeiten vor dir, vergleichst du meist ihre Vor- und Nachteile, bevor du dich festlegst."
+      },
+      "A02": {
+        "low": "Ob eine wichtige Annahme stimmt, prüfst du selten gezielt nach.",
+        "middle": "Ob eine wichtige Annahme stimmt, prüfst du manchmal gezielt nach.",
+        "high": "Hängt eine Entscheidung an einer Annahme, prüfst du meist gezielt, was dafür und dagegen spricht."
+      },
+      "I01": {
+        "low": "In Themen, die du gut kennst, hat dein erster Eindruck wenig Gewicht.",
+        "middle": "In Themen, die du gut kennst, wiegt dein erster Eindruck mit.",
+        "high": "In Themen, die du gut kennst, hat dein erster Eindruck viel Gewicht."
+      },
+      "I02": {
+        "low": "Sehen mehrere Möglichkeiten ähnlich gut aus, gibst du deiner Erfahrung wenig Gewicht.",
+        "middle": "Sehen mehrere Möglichkeiten ähnlich gut aus, wiegt deine Erfahrung mit.",
+        "high": "Sehen mehrere Möglichkeiten ähnlich gut aus, entscheidet bei dir eher die Erfahrung."
+      },
+      "I03": {
+        "low": "Sprechen die Zahlen für eine Option und dein Gefühl dagegen, folgst du eher den Zahlen.",
+        "middle": "Sprechen die Zahlen für eine Option und dein Gefühl dagegen, nimmst du das Gefühl teilweise als Signal.",
+        "high": "Stehen Zahlen und Gefühl gegeneinander, nimmst du das Gefühl deutlich als zusätzliches Signal ernst."
+      },
+      "E01": {
+        "low": "Bevor du testest, recherchierst du eher weiter.",
+        "middle": "Ob du erst testest oder weiter recherchierst, hängt bei dir von der Lage ab.",
+        "high": "Kleine Tests nutzt du gern, wenn sie schneller neue Informationen liefern als weitere Recherche."
+      },
+      "E02": {
+        "low": "Zwei Wege parallel im Kleinen auszuprobieren passt eher nicht zu dir.",
+        "middle": "Zwei Wege parallel auszuprobieren kommt bei dir vor.",
+        "high": "Erscheinen zwei Wege sinnvoll, probierst du eher beide im Kleinen aus, statt dich gleich festzulegen."
+      },
+      "E03": {
+        "low": "Auch bei leicht korrigierbaren Entscheidungen legst du dich eher nicht vorläufig fest.",
+        "middle": "Bei leicht korrigierbaren Entscheidungen legst du dich manchmal vorläufig fest.",
+        "high": "Lässt sich eine Entscheidung leicht korrigieren, legst du eher schon eine vorläufige Richtung fest."
+      },
+      "D02": {
+        "low": "Dass du einem Vorschlag nicht zustimmst, sagst du eher nicht ausdrücklich.",
+        "middle": "Ob du ausdrücklich sagst, dass du nicht zustimmst, hängt bei dir von der Lage ab.",
+        "high": "Erscheint dir ein Vorschlag nicht sinnvoll, sagst du eher ausdrücklich, dass du nicht zustimmst."
+      },
+      "X01": {
+        "low": "Gibt es für ein Ergebnis mehrere plausible Erklärungen, ist dir das eher unangenehm.",
+        "middle": "Mehrere plausible Erklärungen nebeneinander hältst du aus.",
+        "high": "Gibt es für ein Ergebnis mehrere plausible Erklärungen, fühlst du dich damit wohl."
+      },
+      "X02": {
+        "low": "Bleibt über Wochen offen, welche Richtung euer Vorhaben nimmt, ist dir das eher unangenehm.",
+        "middle": "Eine über Wochen offene Richtung hältst du aus.",
+        "high": "Bleibt über Wochen offen, welche Richtung euer Vorhaben nimmt, kommst du damit gut zurecht."
+      },
+      "X03": {
+        "low": "Widersprüchliche Rückmeldungen zur selben Idee sind dir eher unangenehm.",
+        "middle": "Widersprüchliche Rückmeldungen zur selben Idee hältst du aus.",
+        "high": "Widersprüchliche Rückmeldungen zur selben Idee nimmst du gelassen."
+      },
+      "X04": {
+        "low": "Bleibt eine wichtige Frage länger ohne eindeutige Antwort, ist dir das eher unangenehm.",
+        "middle": "Eine wichtige Frage ohne eindeutige Antwort hältst du eine Weile aus.",
+        "high": "Bleibt eine wichtige Frage länger ohne eindeutige Antwort, fühlst du dich damit wohl."
+      }
+    },
+    "choices": {
+      "T01": {
+        "0": "Einen Einwand zu einer wichtigen Entscheidung sprichst du noch im laufenden Gespräch an.",
+        "1": "Einen Einwand sprichst du nach dem Gespräch an, aber noch am selben Arbeitstag.",
+        "2": "Einen Einwand sprichst du am nächsten Arbeitstag an.",
+        "3": "Einen Einwand sprichst du an, wenn mehr als ein Arbeitstag vergangen ist.",
+        "4": "Wann du einen Einwand ansprichst, machst du von der Situation abhängig."
+      },
+      "T02": {
+        "0": "Bedenken, die du noch nicht genau benennen kannst, sprichst du direkt an und sagst dazu, dass es noch unklar ist.",
+        "1": "Bedenken, die du noch nicht genau benennen kannst, erwähnst du kurz und kommst später genauer darauf zurück.",
+        "2": "Bedenken, die du noch nicht genau benennen kannst, sortierst du erst für dich und sprichst sie dann an.",
+        "3": "Bedenken sprichst du an, wenn du sie ziemlich genau benennen kannst.",
+        "4": "Wie du mit noch unklaren Bedenken umgehst, machst du von der Situation abhängig."
+      },
+      "D01": {
+        "0": "Bist du anderer Meinung, sagst du das am ehesten direkt: „Ich sehe das anders, weil …“",
+        "1": "Bist du anderer Meinung, benennst du am ehesten deine Bedenken: „Ich habe bei dem Punkt noch Bedenken …“",
+        "2": "Bist du anderer Meinung, fragst du am ehesten nach, wie der Vorschlag mit deinem Einwand umgehen würde.",
+        "3": "Bist du anderer Meinung, bringst du am ehesten eine weitere Möglichkeit ins Spiel.",
+        "4": "Für deinen Widerspruch passt keine der angebotenen Formulierungen."
+      }
     }
   }
 }
