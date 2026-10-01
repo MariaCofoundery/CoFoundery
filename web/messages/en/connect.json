@@ -770,7 +770,7 @@
       "offering": "{count, plural, one {1 offer} other {# offers}}",
       "seeking": "{count, plural, one {1 request} other {# requests}}"
     },
-    "yours": "That's you"
+    "yours": "Yours"
   },
   "suggestions": {
     "title": "For you",

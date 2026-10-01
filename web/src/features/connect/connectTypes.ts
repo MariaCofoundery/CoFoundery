@@ -91,6 +91,17 @@ export type PublicConnectProblem = Pick<ConnectProblem,
   author_profile_slug: string | null;
 };
 
+/**
+ * Wie lang die Bio in Connect sein darf.
+ *
+ * DIESELBE ZAHL WIE IM KERN. `person_core_bio_len` erlaubt 1200 Zeichen,
+ * `founder_discovery_profiles_bio_length_check` auch, und seit
+ * 20261092120000 `network_profiles_text_check` ebenfalls. Drei Tabellen, eine
+ * Zahl - sobald eine davon kleiner ist, kuerzt sie fuer alle, weil die Bio
+ * aus dem Kern kommt und die Kontextzeile eine Kopie ist.
+ */
+export const CONNECT_BIO_MAX = 1200;
+
 export const VENTURE_MAX = 5;
 export const VENTURE_NAME_MIN = 2;
 export const VENTURE_NAME_MAX = 80;

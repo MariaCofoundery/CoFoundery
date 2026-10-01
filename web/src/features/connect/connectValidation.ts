@@ -1,4 +1,4 @@
-import { CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_OPEN_TO_FORMATS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES, CONNECT_ROLES, CONNECT_VENTURE_STAGES, categorySupportsRemoteMode, categorySupportsVentureStage, isOneOf } from "@/features/connect/connectTypes";
+import { CONNECT_BIO_MAX, CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_OPEN_TO_FORMATS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES, CONNECT_ROLES, CONNECT_VENTURE_STAGES, categorySupportsRemoteMode, categorySupportsVentureStage, isOneOf } from "@/features/connect/connectTypes";
 
 function text(value: FormDataEntryValue | null, max: number) { return String(value ?? "").trim().slice(0, max); }
 export class ConnectValidationError extends Error {
@@ -48,8 +48,17 @@ export function parseConnectProfile(formData: FormData, identity: ConnectIdentit
   const remote = identity?.remote_mode ?? null;
   return {
     display_name: text(identity?.display_name ?? null, 80), headline: text(identity?.headline ?? null, 160),
-    // Der Kern erlaubt 1200 Zeichen, Connect 800 - hier wird gekappt, nicht abgewiesen.
-    bio: text(identity?.bio ?? null, 800), location_region: optional(identity?.location_region ?? null, 120),
+    // 1200 - DIESELBE ZAHL WIE IM KERN UND IN FIND.
+    //
+    // Hier standen bis zum 30.09.2026 achthundert. Gekappt wurde nicht
+    // abgewiesen, und der Rueck-Trigger schrieb den gekuerzten Wert in den
+    // Kern zurueck: Jedes Speichern eines Connect-Profils kostete die letzten
+    // vierhundert Zeichen der Bio. Nachgemessen, 1000 rein, 800 raus.
+    //
+    // Der Trigger ist seit 20261092120000 weg, und diese Zahl ist die
+    // kanonische aus `person_core_bio_len`. Wer sie senkt, kuerzt wieder fuer
+    // alle.
+    bio: text(identity?.bio ?? null, CONNECT_BIO_MAX), location_region: optional(identity?.location_region ?? null, 120),
     remote_mode: isOneOf(CONNECT_REMOTE_MODES, remote) ? remote : null,
     expertise: (identity?.expertise ?? []).slice(0, 8).map((item) => item.slice(0, 60)),
     industries: (identity?.industries ?? []).slice(0, 5).map((item) => item.slice(0, 80)),

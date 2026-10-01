@@ -1,11 +1,16 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getOwnPersonResources } from "@/features/ai/personResources";
+import { RESOURCE_KINDS } from "@/features/ai/resourceExtraction";
 import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { DIRECTION_FACETS } from "@/features/direction/directionInterviewGuide";
 import { getDirectionStatements } from "@/features/direction/directionStatementData";
 import { getPersonStrengths } from "@/features/capability/strengthData";
+import { WorkMap } from "@/features/instruments/align/AlignMaps";
+import { getScopeReport } from "@/features/instruments/align/reportData";
+import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
 import { buildFounderProfileCoverage } from "@/features/reporting/founderProfileCoverage";
@@ -95,19 +100,39 @@ export default async function FounderProfilePage() {
   if (!user) redirect("/login?next=/me/profile");
 
   const supabase = await createClient();
-  const [t, tCapability, tDirection, tNote, core, report, vocabulary, entries, directionStatements, strengths] =
-    await Promise.all([
-      getTranslations("profile.founderProfile"),
-      getTranslations("capability"),
-      getTranslations("direction.statements.facets"),
-      getTranslations("report.instrumentNote"),
-      getPersonCore(supabase, user.id),
-      getLatestSelfAlignmentReport({ locale }),
-      getCapabilityVocabulary(supabase),
-      getOwnCapabilityEntries(supabase, user.id),
-      getDirectionStatements(supabase),
-      getPersonStrengths(supabase),
-    ]);
+  const [
+    t,
+    tCapability,
+    tDirection,
+    tNote,
+    core,
+    report,
+    workProfile,
+    vocabulary,
+    entries,
+    directionStatements,
+    strengths,
+    resources,
+  ] = await Promise.all([
+    getTranslations("profile.founderProfile"),
+    getTranslations("capability"),
+    getTranslations("direction.statements.facets"),
+    getTranslations("report.instrumentNote"),
+    getPersonCore(supabase, user.id),
+    // Der Altbestand. Er steht seit dem 30.09.2026 nicht mehr an erster
+    // Stelle - siehe Saeule 2.
+    getLatestSelfAlignmentReport({ locale }),
+    // Das aktuelle Arbeitsprofil. Dieselbe Funktion, die auch die
+    // Advisor-Ansicht liest - keine zweite Auswertung daneben.
+    getScopeReport(user.id, "founder_profile").catch(() => null),
+    getCapabilityVocabulary(supabase),
+    getOwnCapabilityEntries(supabase, user.id),
+    getDirectionStatements(supabase),
+    getPersonStrengths(supabase),
+    // Nur Bestaetigtes. Ein offener Vorschlag ist eine Modellbehauptung und
+    // darf nirgends wie eine Aussage der Person aussehen.
+    getOwnPersonResources(supabase).catch(() => []),
+  ]);
 
   const areaLabel = (areaId: string) => tCapability(`areaLabels.${areaId}`);
   const readout = buildCapabilityReadout(entries, vocabulary.areas, vocabulary.families);
@@ -118,6 +143,13 @@ export default async function FounderProfilePage() {
   const orderedEntries = entries
     .slice()
     .sort((a, b) => (areaOrder.get(a.area_id) ?? 0) - (areaOrder.get(b.area_id) ?? 0));
+
+  // Zwei kleine Ableitungen, die es laengst gibt und die bisher niemand zu
+  // sehen bekam: der Entwicklungsbefund aus der Capability-Auswertung, und
+  // die bestaetigten Zugaenge. Beide ohne eigenen Speicher.
+  const growingInto =
+    readout.findings.find((finding) => finding.key === "growingInto")?.areaIds ?? [];
+  const confirmedResources = resources.filter((resource) => resource.status === "confirmed");
 
   const displayName = core?.display_name?.trim() || t("unnamed");
   const hasBase =
@@ -135,7 +167,11 @@ export default async function FounderProfilePage() {
       tone: "indigo",
       eyebrow: t("pillars.work"),
       title: t("strengths.title"),
-      done: Boolean(report),
+      // AM NEUEN BOGEN, NICHT MEHR AM ALTEN. Wer heute ein Konto anlegt,
+      // bekommt den v1-Fragebogen nicht mehr angeboten - diese Saeule galt
+      // fuer ihn deshalb dauerhaft als "noch offen", egal was er ausgefuellt
+      // hatte.
+      done: Boolean(workProfile) || Boolean(report),
     },
     {
       id: "saeule-was",
@@ -254,16 +290,91 @@ export default async function FounderProfilePage() {
         eyebrow={pillars[1].eyebrow}
         title={pillars[1].title}
       >
-        {report ? (
-          <SelfReportView report={report} density="summary" detailsHint={detailsHint} />
+        {/* ----------------------------------------------------------------
+            DAS AKTUELLE ARBEITSPROFIL
+
+            Hier stand bis zum 30.09.2026 der v1-Bericht. Der Bogen dahinter
+            wird neuen Konten seit demselben Tag nicht mehr angeboten - diese
+            Stelle blieb fuer sie also dauerhaft leer, und ihr Hinweis
+            verlinkte auf einen Fragebogen, den sie nie zu sehen bekommen.
+
+            Gelesen wird mit derselben Funktion wie in der Advisor-Ansicht.
+            Zwei Auswertungen desselben Bogens waeren zwei Orte, an denen
+            etwas Verschiedenes stehen kann.
+
+            KEINE PUNKTZAHL UND KEINE DEUTUNG. Die Registratur sagt
+            `overallScore: false` und `dimensionScores: false`; die WorkMap
+            setzt einen Punkt je Antwort und rechnet nichts zusammen.
+            ---------------------------------------------------------------- */}
+        {workProfile ? (
+          <section>
+            <h3 className="text-base font-semibold text-slate-900">{t("workProfile.title")}</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">
+              {t("workProfile.intro")}
+            </p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+              {t("workProfile.note")}
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              {t("workProfile.answered", {
+                answered: workProfile.answered,
+                of: workProfile.of,
+              })}
+            </p>
+
+            <div className="mt-5">
+              <WorkMap sections={workProfile.sections} />
+            </div>
+
+            <ProfileDetails
+              summary={t("workProfile.detailsSummary")}
+              hint={detailsHint(workProfile.sections.length)}
+            >
+              <ReportViewV21
+                sections={workProfile.sections}
+                orphans={workProfile.orphans}
+                marked={workProfile.marked}
+              />
+            </ProfileDetails>
+          </section>
         ) : (
           <MissingPillar
-            title={t("missingReport.title")}
-            text={t("missingReport.text")}
-            href="/me/base"
-            cta={t("missingReport.cta")}
+            title={t("missingWorkProfile.title")}
+            text={t("missingWorkProfile.text")}
+            href="/founder-alignment/profil"
+            cta={t("missingWorkProfile.cta")}
           />
         )}
+
+        {/* ----------------------------------------------------------------
+            DER ALTBESTAND - DARUNTER, ZUGEKLAPPT, DATIERT
+
+            Nur fuer Menschen, die den frueheren Bogen tatsaechlich abgegeben
+            haben. Er wird NICHT mit dem neuen verrechnet: keine gemeinsame
+            Skala, keine gemeinsame Karte, keine Zuordnung alter Dimensionen
+            auf neue Abschnitte. Zwei Fassungen messen nicht dasselbe, und
+            eine gemeinsame Darstellung waere eine Behauptung ueber
+            Vergleichbarkeit.
+            ---------------------------------------------------------------- */}
+        {report ? (
+          <ProfileDetails
+            summary={`${t("legacyReport.title")} — ${t("legacyReport.dated", {
+              date: report.createdAt
+                ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                    new Date(report.createdAt)
+                  )
+                : "—",
+            })}`}
+            hint={null}
+          >
+            <p className="max-w-3xl text-sm leading-6 text-slate-500">
+              {t("legacyReport.text")}
+            </p>
+            <div className="mt-4">
+              <SelfReportView report={report} density="summary" detailsHint={detailsHint} />
+            </div>
+          </ProfileDetails>
+        ) : null}
 
         <FounderProfileStrengths
           strengths={strengths}
@@ -316,7 +427,16 @@ export default async function FounderProfilePage() {
             />
 
             <CapabilityReadoutSection
-              readout={readout}
+              // OHNE "WOHIN DU WACHSEN WILLST". Der Befund steht auf dieser
+              // Seite eigenstaendig darunter - zwischen den anderen vier ist
+              // er die einzige Stelle, an der jemand ueber etwas Unfertiges
+              // spricht, und dort liest er sich als Einschraenkung. Auf
+              // /profile bleibt die Auswertung vollstaendig: Dort wird
+              // gepflegt, nicht gezeigt.
+              readout={{
+                ...readout,
+                findings: readout.findings.filter((finding) => finding.key !== "growingInto"),
+              }}
               copy={{
                 title: tCapability("readout.title"),
                 coverage: tCapability("readout.coverage", {
@@ -360,6 +480,76 @@ export default async function FounderProfilePage() {
             cta={t("missingCapability.cta")}
           />
         )}
+
+        {/* ----------------------------------------------------------------
+            WOHIN DU WACHSEN WILLST
+
+            Abgeleitet, nicht gespeichert: Wunsch `grow_into`, oder `own` bei
+            einer Stufe unter vier. Beides heisst "da will ich hin" und nicht
+            "da fehlt mir etwas" - deshalb der eigene Kasten und der Satz
+            darunter.
+
+            KEIN LEERZUSTAND. Nichts hier ist eine gueltige Antwort; ein
+            "hier koennte stehen, woran du arbeitest" waere die Aufforderung,
+            sich etwas vorzuwerfen.
+            ---------------------------------------------------------------- */}
+        {growingInto.length > 0 ? (
+          <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-semibold">{t("growingInto.title")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              {t("growingInto.intro")}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {growingInto.map((areaId) => (
+                <li key={areaId} className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800">
+                  {areaLabel(areaId)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* ----------------------------------------------------------------
+            WAS DU SONST MITBRINGST
+
+            Netzwerk, Zugaenge, Angebote - erhoben aus eigenen Texten, bis
+            heute nur in Connect sichtbar.
+
+            NUR BESTAETIGTES. Ein offener Vorschlag ist eine
+            Modellbehauptung; hier stuende er wie eine Aussage der Person.
+            Entschieden wird weiterhin dort, wo der Vorschlag entstanden ist.
+            ---------------------------------------------------------------- */}
+        {confirmedResources.length > 0 ? (
+          <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-semibold">{t("resources.title")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              {t("resources.intro")}
+            </p>
+            <div className="mt-5 space-y-4">
+              {RESOURCE_KINDS.map((kind) => {
+                const darin = confirmedResources.filter((resource) => resource.kind === kind);
+                if (darin.length === 0) return null;
+                return (
+                  <div key={kind}>
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                      {t(`resources.kinds.${kind}`)}
+                    </h3>
+                    <ul className="mt-2 flex flex-wrap gap-2">
+                      {darin.map((resource) => (
+                        <li
+                          key={resource.id}
+                          className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
+                        >
+                          {resource.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </ProfilePillar>
 
       {/* ------------------------------------------------------------------

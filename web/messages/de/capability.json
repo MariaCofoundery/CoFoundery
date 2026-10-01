@@ -1,6 +1,6 @@
 {
-  "eyebrow": "Profil",
-  "title": "Dein Profil",
+  "eyebrow": "Dein Profil",
+  "title": "Über dich",
   "text": "Hier steht alles über dich an einem Ort: wer du bist, was du mitbringst, was du davon weitergibst – und der Vergleich mit Menschen, mit denen du verbunden bist.",
   "identity": {
     "title": "Wer du bist",
@@ -655,7 +655,7 @@
       }
     }
   },
-  "viewFounderProfile": "Gesamtbild ansehen",
+  "viewFounderProfile": "„Das bist du“ ansehen",
   "strengths": {
     "title": "Deine Arbeitsweise",
     "text": "Sätze darüber, wie du arbeitest — aus Situationen, die du erzählt hast. Zu jedem kannst du zwei Dinge sagen: wie oft es sich bei dir zeigt, und was Menschen sagen würden, die dich erlebt haben.",

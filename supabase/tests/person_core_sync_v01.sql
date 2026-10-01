@@ -2,75 +2,132 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(14);
+select extensions.plan(13);
+
+-- ---------------------------------------------------------------------------
+-- Die Identitaet fliesst nur noch in eine Richtung
+-- ---------------------------------------------------------------------------
+--
+-- Diese Datei hielt bis zum 30.09.2026 das Gegenteil fest: dass ein
+-- Connect- oder Discovery-Profil seine Identitaet in den Kern zurueckschreibt.
+-- Das war in Phase 2 des Profil-Zusammenzugs richtig - damals hatten beide
+-- Formulare eigene Identitaetsfelder.
+--
+-- Heute nehmen beide Formulare die Identitaet AUS dem Kern entgegen, und der
+-- Rueckweg hat nur noch Schaden angerichtet: Connect kappte die Bio auf 800
+-- Zeichen und schrieb den gekuerzten Wert zurueck. Gemessen wurden 1000 rein
+-- und 800 raus. Migration 20261092120000 hat beide Rueck-Trigger entfernt und
+-- die Bio-Grenze angeglichen.
+--
+-- Was diese Datei jetzt festhaelt, ist die Zielarchitektur:
+--
+--     person_core
+--         ↓
+--     veroeffentlichte Kopien (network_profiles, founder_discovery_profiles)
+--
+-- Die Gegenrichtung gibt es nur noch fuer `profiles.display_name`, und nur
+-- uebergangsweise - Abschnitt 1.
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','fd000000-0000-4000-8000-000000000001','authenticated','authenticated','sync-a@example.com','',now(),'{}','{}',now(),now());
 
 -- ---------------------------------------------------------------------------
--- 1. Basisprofil -> Kern
+-- 1. Basisprofil -> Kern: nur der Name, und nur uebergangsweise
 -- ---------------------------------------------------------------------------
+--
+-- Fuenf Stellen schreiben `profiles.display_name`, ohne ueber den Kern zu
+-- gehen: saveProfileBasicsAction (Einstieg), updateDisplayNameAction,
+-- saveDisplayName, saveDisplayNameB und dev-seed. Ohne diesen Weg haette
+-- jemand nach dem Einstieg einen Namen in `profiles` und keinen im Kern - und
+-- der Kern ist das, was ueberall angezeigt wird.
 insert into public.profiles(user_id, display_name, roles) values
 ('fd000000-0000-4000-8000-000000000001','Maria Beispiel',array['founder']);
 select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria Beispiel', 'Basisprofil-Insert wandert in den Kern');
+  'Maria Beispiel', 'der Name aus dem Einstieg wandert in den Kern');
 
-update public.profiles set headline = 'Product Strategist' where user_id='fd000000-0000-4000-8000-000000000001';
+-- Die Headline nicht. Sie hat keinen eigenstaendigen Schreibweg auf
+-- `profiles`: saveProfileBasicsAction reicht den vorhandenen Wert
+-- unveraendert durch, sonst schreibt dort nur die Propagation aus dem Kern.
+update public.person_core set headline = 'Aus dem Kern'
+where user_id='fd000000-0000-4000-8000-000000000001';
+update public.profiles set headline = 'Aus dem Basisprofil'
+where user_id='fd000000-0000-4000-8000-000000000001';
 select extensions.is((select headline from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Product Strategist', 'Basisprofil-Update wandert in den Kern');
-select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria Beispiel', 'ein Update an einem anderen Feld laesst den Namen unberuehrt');
+  'Aus dem Kern', 'eine Headline auf profiles erreicht den Kern NICHT mehr');
 
--- ---------------------------------------------------------------------------
--- 2. Leer gilt nicht als Eingabe
--- ---------------------------------------------------------------------------
--- Die Mitgliedschaft entsteht per Trigger aus profiles.roles.
-insert into public.network_profiles(user_id) values ('fd000000-0000-4000-8000-000000000001');
-select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria Beispiel', 'leeres Connect-Profil ueberschreibt den echten Namen NICHT');
-select extensions.ok((select expertise is null from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'leeres Array aus dem Connect-Profil landet nicht im Kern');
-
+-- LEER GILT NICHT ALS EINGABE. Die Regel stammt aus 20260907140000 und gilt
+-- unveraendert: Ein auf Leerzeichen gesetzter Name loescht nichts.
 update public.profiles set display_name = '   ' where user_id='fd000000-0000-4000-8000-000000000001';
 select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
   'Maria Beispiel', 'ein auf Leerzeichen gesetzter Name ueberschreibt den Kern NICHT');
 
 -- ---------------------------------------------------------------------------
--- 3. Echte Werte aus dem Connect-Profil
+-- 2. Der Kern verteilt weiterhin
 -- ---------------------------------------------------------------------------
-update public.network_profiles
-set display_name = 'Maria B.', expertise = array['Product','Sales'], remote_mode = 'hybrid'
+-- Die Mitgliedschaft entsteht per Trigger aus profiles.roles.
+insert into public.network_profiles(user_id) values ('fd000000-0000-4000-8000-000000000001');
+insert into public.founder_discovery_profiles(user_id) values ('fd000000-0000-4000-8000-000000000001');
+
+update public.person_core set
+  display_name = 'Maria aus dem Kern',
+  bio = 'Eine Biografie, die im Kern gepflegt wird.',
+  location_region = 'Berlin',
+  expertise = array['Product','Sales']
 where user_id='fd000000-0000-4000-8000-000000000001';
+
+select extensions.is((select display_name from public.network_profiles where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Maria aus dem Kern', 'der Kern verteilt weiterhin nach Connect');
+select extensions.is((select bio from public.founder_discovery_profiles where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Eine Biografie, die im Kern gepflegt wird.', 'der Kern verteilt weiterhin nach FIND');
+
+-- ---------------------------------------------------------------------------
+-- 3. Connect schreibt den Kern nicht mehr
+-- ---------------------------------------------------------------------------
+update public.network_profiles set
+  display_name = 'In Connect umbenannt',
+  bio = 'Eine Bio, die nur in Connect steht.',
+  location_region = 'Hamburg',
+  remote_mode = 'onsite',
+  expertise = array['Nur Connect']
+where user_id='fd000000-0000-4000-8000-000000000001';
+
 select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Maria B.', 'echter Name aus dem Connect-Profil gewinnt als letzte Schreibung');
-select extensions.is((select expertise from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  array['Product','Sales'], 'Expertise wandert in den Kern');
-select extensions.is((select remote_mode from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'hybrid', 'Connect-remote_mode wandert in den Kern');
-
--- ---------------------------------------------------------------------------
--- 4. Discovery: remote_mode wandert bewusst nicht
--- ---------------------------------------------------------------------------
-insert into public.founder_discovery_profiles(user_id, bio, location_region, remote_mode) values
-('fd000000-0000-4000-8000-000000000001','Eine Biografie aus dem Discovery-Profil.','Berlin','onsite');
+  'Maria aus dem Kern', 'ein Connect-Schreibvorgang aendert den Namen im Kern nicht');
 select extensions.is((select bio from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Eine Biografie aus dem Discovery-Profil.', 'Discovery-Bio wandert in den Kern');
+  'Eine Biografie, die im Kern gepflegt wird.', 'ein Connect-Schreibvorgang aendert die Bio im Kern nicht');
 select extensions.is((select location_region from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'Berlin', 'Discovery-Region wandert in den Kern');
-select extensions.is((select remote_mode from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  'hybrid', 'Discovery-remote_mode wandert NICHT - der Default dort ist nicht von einer Wahl unterscheidbar');
+  'Berlin', 'ein Connect-Schreibvorgang aendert die Region im Kern nicht');
 
 -- ---------------------------------------------------------------------------
--- 5. Kein Feldwechsel, keine Schreibung
+-- 4. FIND schreibt den Kern nicht mehr
 -- ---------------------------------------------------------------------------
--- Ein Update, das nur ein nicht synchronisiertes Feld anfasst, darf den Kern
--- nicht beruehren. Geprueft ueber updated_at, das der Kern-Trigger sonst setzt.
-select set_config('test.core_updated_at',
-  (select updated_at::text from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'), true);
-update public.founder_discovery_profiles set availability_hours_per_week = 30
+update public.founder_discovery_profiles set
+  display_name = 'In FIND umbenannt',
+  bio = 'Eine Bio, die nur in FIND steht.',
+  location_region = 'Muenchen'
 where user_id='fd000000-0000-4000-8000-000000000001';
-select extensions.is((select updated_at::text from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
-  current_setting('test.core_updated_at'), 'ein Update ohne synchronisierte Feldaenderung schreibt den Kern nicht');
+
+select extensions.is((select display_name from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Maria aus dem Kern', 'ein FIND-Schreibvorgang aendert den Namen im Kern nicht');
+select extensions.is((select bio from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
+  'Eine Biografie, die im Kern gepflegt wird.', 'ein FIND-Schreibvorgang aendert die Bio im Kern nicht');
+
+-- ---------------------------------------------------------------------------
+-- 5. Die 1200 Zeichen ueberleben
+-- ---------------------------------------------------------------------------
+--
+-- DER GEMESSENE FALL. Vorher: 1200 rein, 800 raus. Connect nimmt jetzt
+-- dieselbe Laenge an wie der Kern, und selbst wenn dort etwas kuerzte, kaeme
+-- es nicht mehr zurueck.
+update public.person_core set bio = repeat('x', 1200)
+where user_id='fd000000-0000-4000-8000-000000000001';
+select extensions.is((select char_length(bio) from public.network_profiles where user_id='fd000000-0000-4000-8000-000000000001'),
+  1200, 'Connect nimmt eine 1200-Zeichen-Bio an');
+
+update public.network_profiles set headline = 'Irgendetwas anderes'
+where user_id='fd000000-0000-4000-8000-000000000001';
+select extensions.is((select char_length(bio) from public.person_core where user_id='fd000000-0000-4000-8000-000000000001'),
+  1200, 'nach einem Connect-Schreibvorgang steht die Bio im Kern unveraendert');
 
 -- ---------------------------------------------------------------------------
 -- 6. Sichtbarkeit bleibt unveraendert

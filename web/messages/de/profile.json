@@ -148,7 +148,7 @@
     "submit": "Los geht's"
   },
   "founderProfile": {
-    "eyebrow": "Founderprofil",
+    "eyebrow": "Das bist du",
     "unnamed": "Dein Profil",
     "intro": "Alles, was du über dich erarbeitet hast, an einem Ort: wer du bist, wie du arbeitest und was du mitbringst. Diese Seite ist nur für dich sichtbar. Wenn du sie weitergeben willst, druckst du sie aus oder speicherst sie als PDF.",
     "backToDashboard": "Zurück zur Übersicht",
@@ -168,6 +168,36 @@
       "noLevel": "Stufe noch offen",
       "detailsSummary": "Deine Bereiche im Einzelnen",
       "detailsHint": "{count, plural, =1 {1 Bereich} other {# Bereiche}}"
+    },
+    "growingInto": {
+      "title": "Wohin du wachsen willst",
+      "intro": "Bereiche, in die du dich hineinentwickeln möchtest — aus deinen eigenen Angaben. Das ist eine Absicht und keine Lücke."
+    },
+    "resources": {
+      "title": "Was du sonst mitbringst",
+      "intro": "Nur, was du bestätigt hast. Vorschläge, über die du noch nicht entschieden hast, stehen hier nicht.",
+      "kinds": {
+        "network": "Netzwerk",
+        "access": "Zugänge",
+        "offer": "Angebote"
+      }
+    },
+    "workProfile": {
+      "title": "Wie du arbeitest",
+      "intro": "Deine Antworten aus dem Founder-Arbeitsprofil — wie du entscheidest, erprobst, widersprichst und mit offenen Fragen umgehst.",
+      "note": "Selbstauskunft, kein Testergebnis. Zu dieser Fassung gibt es noch keine Auswertung — was hier steht, sind die Antworten selbst. Keine Punktzahl und keine Einordnung.",
+      "answered": "{answered} von {of} Fragen beantwortet",
+      "detailsSummary": "Deine Antworten"
+    },
+    "missingWorkProfile": {
+      "title": "Du hast dein Founder-Arbeitsprofil noch nicht ausgefüllt.",
+      "text": "Sechzehn Fragen dazu, wie du entscheidest, erprobst und Unterschiede ansprichst. Keine Punktzahl — am Ende stehen deine Antworten, und die kannst du jederzeit ändern.",
+      "cta": "Wie du arbeitest starten"
+    },
+    "legacyReport": {
+      "title": "Deine frühere Auswertung",
+      "dated": "Stand: {date}",
+      "text": "Aus dem früheren Fragebogen. Sie misst etwas anderes als das Arbeitsprofil darüber und wird damit nicht verrechnet — zwei Fassungen, zwei getrennte Aussagen."
     },
     "missingReport": {
       "title": "Dein Selbstbild fehlt noch",
@@ -204,7 +234,7 @@
       "direction": "Richtung"
     },
     "overview": {
-      "title": "Dein Gesamtbild in vier Teilen",
+      "title": "Das bist du — in vier Teilen",
       "ready": "ausgefüllt",
       "open": "noch offen"
     },

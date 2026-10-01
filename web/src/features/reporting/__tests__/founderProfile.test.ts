@@ -111,7 +111,12 @@ test("eine fehlende Saeule wird benannt, aber nicht mitgedruckt", () => {
   // Anliegen: Der Hinweis erscheint auf dem Bildschirm und nicht im
   // Ausdruck, und er sieht wie ein Platzhalter aus, nicht wie Inhalt.
   assert.match(page, /className="no-print[^"]*border-dashed/);
-  assert.match(page, /href="\/me\/base"/);
+  // NACHGEZOGEN AM 30.09.2026: Hier stand `/me/base` - der alte Fragebogen.
+  // Neue Konten bekommen ihn nicht mehr angeboten; der Hinweis schickte sie
+  // also an eine Stelle, die es fuer sie nicht gibt. Der Weg fuehrt jetzt zum
+  // aktuellen Arbeitsprofil, und `/me/base` darf hier nicht mehr stehen.
+  assert.match(page, /href="\/founder-alignment\/profil"/);
+  assert.doesNotMatch(page, /href="\/me\/base"/);
   assert.match(page, /href="\/profile\/interview"/);
 });
 
@@ -285,7 +290,12 @@ test("die eigene Bereichsliste ist eingeklappt, die Auswertung steht offen", () 
   // Auswertung, und die eigenen Antworten auf Wunsch.
   const map = page.indexOf("<CoverageMap");
   const readout = page.indexOf("<CapabilityReadoutSection");
-  const details = page.indexOf("<ProfileDetails");
+  // NACHGEZOGEN AM 30.09.2026: Hier stand `indexOf("<ProfileDetails")`. Seit
+  // die Saeule "Wie du arbeitest" ihre Antworten ebenfalls einklappt, findet
+  // das den falschen Aufklapper - einen, der weiter oben auf der Seite steht.
+  // Gemeint war immer der um die eigene Bereichsliste.
+  const liste = page.indexOf("<FounderProfileCapability");
+  const details = page.lastIndexOf("<ProfileDetails", liste);
   assert.ok(map > 0 && readout > map, "die Auswertung folgt auf die Karte");
   assert.ok(details > readout, "die eigene Liste steht zuletzt und eingeklappt");
   assert.match(page, /<ProfileDetails[\s\S]{0,400}<FounderProfileCapability/);
@@ -331,4 +341,87 @@ test("die Grafik ist eine Deckungskarte und kein Netzdiagramm", () => {
   assert.match(view, /copy\.familyCount|copy\.familyUnspoken/);
   // Und die Karte sagt selbst, worauf sie beruht.
   assert.match(view, /copy\.basis/);
+});
+
+// ---------------------------------------------------------------------------
+// Die Saeule "Wie du arbeitest" liest den aktuellen Bogen
+// ---------------------------------------------------------------------------
+//
+// UMGESTELLT AM 30.09.2026. Vorher stand hier `getLatestSelfAlignmentReport`
+// mit `founder-compatibility-v1`. Dieser Bogen wird neuen Konten seit
+// demselben Tag nicht mehr angeboten - fuer sie blieb die Saeule dauerhaft
+// leer, und ihr Hinweis verlinkte auf einen Fragebogen, den sie nie sahen.
+
+test("die Arbeitsweise kommt aus dem aktuellen Bogen", () => {
+  const page = codeOnly(PAGE);
+
+  // Dieselbe Funktion wie in der Advisor-Ansicht. Eine zweite Auswertung
+  // daneben waere ein zweiter Ort, an dem etwas anderes stehen kann.
+  assert.match(page, /getScopeReport\(user\.id, "founder_profile"\)/);
+  assert.match(page, /<WorkMap sections=\{workProfile\.sections\}/);
+  assert.match(page, /<ReportViewV21/);
+});
+
+test("das Arbeitsprofil bekommt keine Punktzahl und keine Deutung", () => {
+  // Die Registratur sagt `overallScore: false` und `dimensionScores: false`.
+  // Was hier stehen darf, sind die Antworten - und die Karte, die je Antwort
+  // einen Punkt setzt, ohne zu rechnen.
+  const page = codeOnly(PAGE);
+  // KEIN `typ` IM MUSTER: Mit `i` traefe `[A-Z]` jeden Buchstaben, und
+  // `type PillarTone` waere ein Treffer. Die Liste nennt deshalb nur Woerter,
+  // die wirklich nach Verrechnung klingen.
+  assert.ok(
+    !/(score|mittelwert|average|punktzahl|percentile|typologie|typology)/i.test(page),
+    "auf der Seite steht ein Wort, das nach Verrechnung klingt",
+  );
+
+  // Und der Bogen sagt selbst, was er ist. Drei Saetze, solange er `draft`
+  // traegt: Selbstauskunft, keine Auswertung, keine Einordnung.
+  for (const locale of ["de", "en"]) {
+    const block = (
+      JSON.parse(source(`messages/${locale}/profile.json`)) as {
+        founderProfile: { workProfile: Record<string, string> };
+      }
+    ).founderProfile.workProfile;
+    assert.ok(block.note?.trim(), `${locale}: der Hinweis fehlt`);
+    assert.ok(
+      /Selbstauskunft|Self-report/.test(block.note),
+      `${locale}: der Hinweis sagt nicht, dass es eine Selbstauskunft ist`,
+    );
+  }
+});
+
+test("der alte Bericht steht darunter, datiert und zugeklappt - und wird nicht verrechnet", () => {
+  const page = codeOnly(PAGE);
+
+  // Nur bei Menschen, die ihn tatsaechlich haben.
+  assert.match(page, /\{report \?\s*\(\s*<ProfileDetails/);
+  // Datiert: Ohne Stand liest sich eine alte Auswertung wie eine aktuelle.
+  assert.match(page, /legacyReport\.dated/);
+  // Und er steht NACH dem neuen Bogen. Wer zuerst die alte Auswertung sieht,
+  // haelt sie fuer die Hauptsache.
+  const neu = page.indexOf("workProfile.title");
+  const alt = page.indexOf("legacyReport.title");
+  assert.ok(neu > 0 && alt > neu, "der Altbestand steht vor dem aktuellen Bogen");
+
+  // KEINE GEMEINSAME DARSTELLUNG. Die WorkMap bekommt ausschliesslich die
+  // Abschnitte des neuen Bogens; nichts wird aus `report` hineingereicht.
+  assert.doesNotMatch(page, /<WorkMap[^>]*report/);
+  assert.doesNotMatch(page, /workProfile[\s\S]{0,80}\breport\.(scores|dimensions)/);
+});
+
+test("die kleinen Ableitungen zeigen nur Bestaetigtes und behaupten keine Luecke", () => {
+  const page = codeOnly(PAGE);
+
+  // "Wohin du wachsen willst" steht eigenstaendig - und deshalb nicht noch
+  // einmal in der Auswertung daneben.
+  assert.match(page, /growingInto\.title/);
+  assert.match(page, /finding\.key !== "growingInto"/);
+  // Kein Leerzustand: Nichts ist eine gueltige Antwort.
+  assert.match(page, /growingInto\.length > 0 \? \(/);
+
+  // Ressourcen: nur `confirmed`. Ein offener Vorschlag ist eine
+  // Modellbehauptung und darf nicht wie eine Aussage der Person aussehen.
+  assert.match(page, /resource\.status === "confirmed"/);
+  assert.ok(!/"pending"/.test(page), "die Seite kennt offene Vorschlaege");
 });

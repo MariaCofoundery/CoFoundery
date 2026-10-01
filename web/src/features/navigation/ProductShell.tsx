@@ -750,14 +750,28 @@ export function ProductShell({
                     {t("messages")}
                   </MobileMenuLink>
                 ) : null}
+                {/* DIE BEIDEN PERSOENLICHEN SEITEN STEHEN NEBENEINANDER.
+                    "Das bist du" haengt sonst allein unter Align - und liest
+                    laengst mehr als Align: Faehigkeiten, Staerken, Richtung.
+                    Wer nur Connect oder nur Find nutzt, kaeme dort nie hin,
+                    obwohl die Seite fuer ihn genauso funktioniert. */}
                 {!isSuspendedConnectOnly ? (
-                  <MobileMenuLink
-                    href="/profile"
-                    active={pathname.startsWith("/profile")}
-                    onNavigate={closeMenu}
-                  >
-                    {t("profile")}
-                  </MobileMenuLink>
+                  <>
+                    <MobileMenuLink
+                      href="/profile"
+                      active={pathname.startsWith("/profile")}
+                      onNavigate={closeMenu}
+                    >
+                      {t("profile")}
+                    </MobileMenuLink>
+                    <MobileMenuLink
+                      href="/me/profile"
+                      active={pathname.startsWith("/me/profile")}
+                      onNavigate={closeMenu}
+                    >
+                      {t("alignOwnProfile")}
+                    </MobileMenuLink>
+                  </>
                 ) : null}
                 <MobileMenuLink href="/account" active={pathname.startsWith("/account")} onNavigate={closeMenu}>
                   {t("account")}
@@ -975,15 +989,29 @@ function ProfileMenu({
           className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 bg-white/96 p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)] backdrop-blur-xl"
           role="menu"
         >
+          {/* Erst pflegen, dann ansehen - dieselbe Reihenfolge wie im
+              Mobilmenue. "Das bist du" steht hier, weil es fuer jeden
+              funktioniert, der ein Konto hat: Es liest Faehigkeiten,
+              Staerken und Richtung, nicht nur Align. */}
           {!accountOnly ? (
-            <Link
-              href="/profile"
-              onClick={() => setIsOpen(false)}
-              className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
-              role="menuitem"
-            >
-              {t("editProfile")}
-            </Link>
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+                role="menuitem"
+              >
+                {t("editProfile")}
+              </Link>
+              <Link
+                href="/me/profile"
+                onClick={() => setIsOpen(false)}
+                className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+                role="menuitem"
+              >
+                {t("alignOwnProfile")}
+              </Link>
+            </>
           ) : null}
           <Link
             href="/account"

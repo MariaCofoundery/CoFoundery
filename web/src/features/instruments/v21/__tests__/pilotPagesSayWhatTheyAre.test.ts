@@ -57,6 +57,12 @@ const ERLAUBT = [
   join("src", "app", "(product)", "founder-alignment", "vorhaben") + sep,
   join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
   join("src", "app", "(product)", "founder-alignment", "suche") + sep,
+  // Das eigene Gesamtbild. Seit dem 30.09.2026 zeigt es das aktuelle
+  // Arbeitsprofil statt des v1-Berichts - mit derselben Lesbarmachung wie
+  // die Advisor-Seite, die dieselben Antworten schon zeigte. Wer neu
+  // anfaengt, bekommt den v1-Bogen nicht mehr; ohne diesen Eintrag waere die
+  // Saeule fuer ihn dauerhaft leer geblieben.
+  join("src", "app", "me", "profile") + sep,
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;

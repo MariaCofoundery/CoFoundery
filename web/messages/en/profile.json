@@ -148,7 +148,7 @@
     "submit": "Let's start"
   },
   "founderProfile": {
-    "eyebrow": "Founder profile",
+    "eyebrow": "This is you",
     "unnamed": "Your profile",
     "intro": "Everything you have worked out about yourself in one place: who you are, how you work and what you bring. This page is visible only to you. To pass it on, print it or save it as a PDF.",
     "backToDashboard": "Back to overview",
@@ -168,6 +168,36 @@
       "noLevel": "Level still open",
       "detailsSummary": "Your areas in detail",
       "detailsHint": "{count, plural, =1 {1 area} other {# areas}}"
+    },
+    "growingInto": {
+      "title": "Where you want to grow",
+      "intro": "Areas you want to grow into — from your own entries. That is an intention, not a gap."
+    },
+    "resources": {
+      "title": "What else you bring",
+      "intro": "Only what you confirmed. Proposals you have not decided on do not appear here.",
+      "kinds": {
+        "network": "Network",
+        "access": "Access",
+        "offer": "Offers"
+      }
+    },
+    "workProfile": {
+      "title": "How you work",
+      "intro": "Your answers from the founder working profile — how you decide, test, disagree and deal with open questions.",
+      "note": "Self-report, not a test result. There is no evaluation for this version yet — what you see are the answers themselves. No score and no classification.",
+      "answered": "{answered} of {of} questions answered",
+      "detailsSummary": "Your answers"
+    },
+    "missingWorkProfile": {
+      "title": "You have not filled in your founder working profile yet.",
+      "text": "Sixteen questions about how you decide, test and raise differences. No score — what you get are your answers, and you can change them at any time.",
+      "cta": "Start How you work"
+    },
+    "legacyReport": {
+      "title": "Your earlier evaluation",
+      "dated": "As of: {date}",
+      "text": "From the earlier questionnaire. It measures something different from the working profile above and is not combined with it — two versions, two separate statements."
     },
     "missingReport": {
       "title": "Your self-report is still missing",
@@ -204,7 +234,7 @@
       "direction": "Direction"
     },
     "overview": {
-      "title": "Your profile in four parts",
+      "title": "This is you — in four parts",
       "ready": "filled in",
       "open": "still open"
     },

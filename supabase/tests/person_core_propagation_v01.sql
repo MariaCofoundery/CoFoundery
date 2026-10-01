@@ -61,18 +61,26 @@ select extensions.is((select visibility from public.network_profiles where user_
   'members_only', 'der Kern aendert die Sichtbarkeit nicht');
 
 -- ---------------------------------------------------------------------------
--- 4. Kein Kreislauf, und beide Richtungen bleiben stimmig
+-- 4. Kein Kreislauf - und keine Gegenrichtung mehr
 -- ---------------------------------------------------------------------------
 -- Der Schleifenschutz greift ueber pg_trigger_depth. Kaeme es zu einer
 -- Endlosschleife, wuerde bereits das Update oben mit stack depth exceeded
--- abbrechen; dass die Assertions laufen, ist der Beweis. Zusaetzlich muss die
--- Gegenrichtung weiterhin funktionieren.
+-- abbrechen; dass die Assertions laufen, ist der Beweis.
+--
+-- Hier stand bis zum 30.09.2026 das Gegenteil: dass ein Connect-Schreibvorgang
+-- die Headline in den Kern traegt. Migration 20261092120000 hat diesen Weg
+-- entfernt - er hat die Bio auf 800 Zeichen gekuerzt (Bestandsaufnahme v2,
+-- Abschnitt 4.2). Der Kern ist jetzt die einzige Quelle der Identitaet, und
+-- die Kontextzeilen sind veroeffentlichte Kopien.
 update public.network_profiles set headline = 'Headline aus Connect'
 where user_id='ff000000-0000-4000-8000-000000000001';
-select extensions.is((select headline from public.person_core where user_id='ff000000-0000-4000-8000-000000000001'),
-  'Headline aus Connect', 'Kontext -> Kern funktioniert weiterhin');
+-- Der Kern hatte hier nie eine Headline - und bekommt aus Connect auch keine.
+select extensions.ok((select headline is null from public.person_core where user_id='ff000000-0000-4000-8000-000000000001'),
+  'ein Connect-Schreibvorgang erreicht den Kern NICHT mehr');
+-- Und damit auch nicht den Umweg ueber den Kern nach FIND. Dort steht der
+-- Spaltendefault '', weil die Zeile ohne Headline angelegt wurde.
 select extensions.is((select headline from public.founder_discovery_profiles where user_id='ff000000-0000-4000-8000-000000000001'),
-  'Alte Headline', 'die Gegenrichtung verteilt nicht weiter - sonst waere der Schleifenschutz umgangen');
+  '', 'und wandert damit auch nicht ueber den Kern nach FIND');
 
 -- ---------------------------------------------------------------------------
 -- 5. Keine Zeilen aus dem Nichts

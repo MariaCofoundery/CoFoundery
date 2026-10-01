@@ -1,6 +1,6 @@
 {
-  "eyebrow": "Profile",
-  "title": "Your profile",
+  "eyebrow": "Your profile",
+  "title": "About you",
   "text": "Everything about you in one place: who you are, what you bring, what you share of it – and the comparison with people you are connected to.",
   "identity": {
     "title": "Who you are",
@@ -655,7 +655,7 @@
       }
     }
   },
-  "viewFounderProfile": "See the full picture",
+  "viewFounderProfile": "See “This is you”",
   "strengths": {
     "title": "How you work",
     "text": "Sentences about how you work — from situations you told. For each you can say two things: how often it shows up, and what people who have worked with you would say.",

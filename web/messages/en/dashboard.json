@@ -9,7 +9,7 @@
     "heroConnections": "Your connections",
     "heroConnectionsCount": "{count, plural, =0 {No connection yet} one {1 connection} other {# connections}}",
     "heroFind": "Find people",
-    "heroOwnProfile": "Full picture"
+    "heroOwnProfile": "This is you"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
