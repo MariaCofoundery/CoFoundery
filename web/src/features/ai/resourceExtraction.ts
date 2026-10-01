@@ -36,7 +36,19 @@ export type ResourceProposal = {
 
 /** Mehr als das sind aus einem einzelnen Text keine Funde, sondern Fantasie. */
 const MAX_PROPOSALS = 5;
-const MAX_LABEL_LENGTH = 160;
+
+/**
+ * Wie lang eine Ressource sein darf - DIESELBEN ZAHLEN WIE IN DER DATENBANK.
+ *
+ * `person_resources_label_check` prueft `char_length(btrim(label))` zwischen 3
+ * und 160. Die Zahlen standen hier schon, seit das Modell Vorschlaege macht;
+ * seit dem 01.10.2026 traegt sie auch das Formular, in dem Menschen eine
+ * Ressource von Hand eintragen. Drei Stellen, eine Zahl - sobald eine davon
+ * kleiner ist, kuerzt sie fuer alle, und sobald eine groesser ist, wird eine
+ * Eingabe erst beim Speichern abgewiesen.
+ */
+export const RESOURCE_LABEL_MIN = 3;
+export const RESOURCE_LABEL_MAX = 160;
 const MIN_QUOTE_LENGTH = 12;
 
 const SCHEMA = {
@@ -100,7 +112,7 @@ export function validateResourceProposals(answer: unknown, sourceText: string): 
 
     const label = typeof candidate.label === "string" ? candidate.label.trim() : "";
     const quote = typeof candidate.quote === "string" ? candidate.quote.trim() : "";
-    if (label.length < 3 || label.length > MAX_LABEL_LENGTH) continue;
+    if (label.length < RESOURCE_LABEL_MIN || label.length > RESOURCE_LABEL_MAX) continue;
 
     // Der Beleg muss im Text stehen. Ein kurzes Zitat belegt nichts - ein
     // einzelnes Wort findet sich in jedem Text.

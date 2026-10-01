@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(14);
+select extensions.plan(21);
 
 -- ---------------------------------------------------------------------------
 -- Eine Person mit einer veroeffentlichten Anzeige, ein Arbeiter
@@ -202,6 +202,107 @@ select extensions.is(
   (select count(*)::int from public.person_resources where user_id = 'f1000000-0000-4000-8000-000000000001'),
   2,
   'what was already proposed stays - it was published at the time'
+);
+
+-- ---------------------------------------------------------------------------
+-- VON HAND PFLEGEN - SEIT DEM 01.10.2026
+-- ---------------------------------------------------------------------------
+--
+-- „Ueber dich" traegt jetzt ein Formular fuer eigene Ressourcen. Es brauchte
+-- dafuer keine Spalte und keine Policy: Die Tabelle konnte das von Anfang an.
+-- Was sie koennen MUSS, haelt dieser Abschnitt fest.
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
+-- Den eigenen Eintrag aendern - Text und Art.
+update public.person_resources
+   set label = 'Kontakte in die Pharmaindustrie, vor allem Zulassung', kind = 'access'
+ where label = 'Kontakte in die Pharmaindustrie';
+
+select extensions.is(
+  (select kind from public.person_resources
+     where label = 'Kontakte in die Pharmaindustrie, vor allem Zulassung'),
+  'access',
+  'the person can change their own entry, type included'
+);
+
+-- UND DIE HERKUNFT BLEIBT, WAS SIE WAR. Die Anwendung schreibt `origin` nie;
+-- waere es anders, machte ein spaeteres Bearbeiten aus einem bestaetigten
+-- Modellvorschlag rueckwirkend eine eigene Eingabe.
+select extensions.is(
+  (select origin from public.person_resources
+     where label = 'Kontakte in die Pharmaindustrie, vor allem Zulassung'),
+  'self',
+  'and its origin is untouched'
+);
+
+-- Leer ist keine Eingabe. Die Bedingung in der Datenbank faengt auch das ab,
+-- was an einem Formular vorbei kommt.
+select extensions.throws_ok(
+  $$update public.person_resources set label = '   '
+      where label = 'Kontakte in die Pharmaindustrie, vor allem Zulassung'$$,
+  '23514',
+  null,
+  'a label of spaces is refused'
+);
+
+-- Derselbe Eintrag zweimal ist eine Dublette und kein zweiter Zugang.
+select extensions.throws_ok(
+  $$insert into public.person_resources(user_id, kind, label)
+      values ('f1000000-0000-4000-8000-000000000001','access','  kontakte IN die Pharmaindustrie, vor allem Zulassung ')$$,
+  '23505',
+  null,
+  'the same entry twice is refused, regardless of case and spaces'
+);
+
+-- ---------------------------------------------------------------------------
+-- Fremde Ressourcen sind unberuehrbar
+-- ---------------------------------------------------------------------------
+set local role postgres;
+insert into public.person_resources(user_id, kind, label) values
+('f1000000-0000-4000-8000-000000000002','offer','Fremde Ressource');
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
+update public.person_resources set label = 'Uebernommen' where label = 'Fremde Ressource';
+delete from public.person_resources where label = 'Fremde Ressource';
+
+set local role postgres;
+select extensions.is(
+  (select label from public.person_resources
+     where user_id = 'f1000000-0000-4000-8000-000000000002'),
+  'Fremde Ressource',
+  'a resource of another person can neither be changed nor deleted'
+);
+
+-- ---------------------------------------------------------------------------
+-- Entfernen heisst entfernen
+-- ---------------------------------------------------------------------------
+--
+-- KEIN SOFT DELETE. `rejected` ist der Zustand eines VORSCHLAGS, den jemand
+-- nicht wollte, und er bleibt stehen, damit derselbe Vorschlag nicht
+-- wiederkommt. Ein eigener Eintrag hat nichts, was wiederkommen koennte.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
+delete from public.person_resources
+ where label = 'Kontakte in die Pharmaindustrie, vor allem Zulassung';
+
+select extensions.is(
+  (select count(*)::int from public.person_resources where origin = 'self'),
+  0,
+  'deleting means gone, not hidden'
+);
+
+-- Der bestaetigte Modellvorschlag daneben bleibt davon unberuehrt.
+set local role postgres;
+select extensions.is(
+  (select count(*)::int from public.person_resources
+     where user_id = 'f1000000-0000-4000-8000-000000000001' and origin = 'model'),
+  1,
+  'and it takes nothing else with it'
 );
 
 select * from extensions.finish();

@@ -327,14 +327,19 @@
     "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first.",
     "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to.",
     "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it.",
-    "strength_length": "One sentence, at most two hundred characters."
+    "strength_length": "One sentence, at most two hundred characters.",
+    "resource_empty": "Please choose a type and write a short sentence for it.",
+    "resource_duplicate": "You already have exactly that one."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",
     "evidence_removed": "The entry was removed.",
     "identity": "Your details are saved.",
     "disclosure": "Your sharing setting is saved.",
-    "interview_done": "The conversation is finished. Your answers are ready to be sorted into areas."
+    "interview_done": "The conversation is finished. Your answers are ready to be sorted into areas.",
+    "resource_added": "Resource added.",
+    "resource_updated": "Resource changed.",
+    "resource_removed": "Resource removed."
   },
   "pending": {
     "save": "Saving …"
@@ -769,7 +774,7 @@
       "workStarted": "{count, plural, =1 {One answer saved} other {# answers saved}}.",
       "bring": "{areas, plural, =0 {No areas entered yet} =1 {One area entered} other {# areas entered}}, {levelled} of them with an experience level · {strengths, plural, =0 {no strengths yet} =1 {one strength} other {# strengths}}.",
       "direction": "{count, plural, =1 {One confirmed statement} other {# confirmed statements}} about what drives you.",
-      "resources": "{confirmed, plural, =0 {Nothing confirmed yet} =1 {One confirmed entry} other {# confirmed entries}}{pending, plural, =0 {} =1 {, one suggestion is waiting for you} other {, # suggestions are waiting for you}}."
+      "resources": "{confirmed, plural, =0 {Nothing recorded yet} =1 {One resource recorded} other {# resources recorded}}{pending, plural, =0 {} =1 {, one suggestion is waiting for you} other {, # suggestions are waiting for you}}."
     },
     "payoffTitles": {
       "identity": "This is how it looks"
@@ -780,9 +785,25 @@
       "unmark": "Undo the mark"
     },
     "resources": {
-      "emptyTitle": "Nothing here yet",
-      "emptyText": "Access, contacts and offers currently come out of your own Connect texts: what you write there is offered to you here as a suggestion with its evidence, and you decide. There is no way to add one by hand yet.",
-      "emptyCta": "To your Connect profile"
+      "ownTitle": "Your resources",
+      "ownText": "The network, access and offers you bring. So far this is visible to you only.",
+      "empty": "This is where you can record the network, the access or the resources you bring.",
+      "add": "Add a resource",
+      "kindField": "Type",
+      "labelField": "Description",
+      "labelHint": "One short sentence, {max} characters at most.",
+      "save": "Save",
+      "edit": "Edit",
+      "remove": "Remove",
+      "removeQuestion": "Really remove this resource?",
+      "removeConfirm": "Yes, remove it",
+      "removeCancel": "Cancel",
+      "fromProposal": "Taken from a suggestion — the sentence stays as it stood there.",
+      "examples": {
+        "network": "Contacts at clinics in the Berlin area",
+        "access": "Access to a founder community",
+        "offer": "Experience with social media strategy"
+      }
     },
     "groups": {
       "who": "Who you are",

@@ -44,6 +44,8 @@ import { getPersonCore } from "@/features/profile/personCoreData";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
+import { RESOURCE_LABEL_MAX } from "@/features/ai/resourceExtraction";
+import { OwnResourcesSection } from "@/features/profile/OwnResourcesSection";
 import {
   buildAboutYou,
   recommendNextStep,
@@ -107,9 +109,36 @@ const STATION_OF_STEP: Record<StepId, StationId> = {
   ressourcen: "ressourcen",
 };
 
-// Muessen mit den Schluesseln in messages/*/capability.json uebereinstimmen.
-const SAVED_KEYS = ["snapshot", "evidence_removed", "identity", "disclosure", "interview_done"];
-const ERROR_KEYS = ["narrative", "area", "save", "published_incomplete", "roles", "linkedin", "strength_length"];
+// Muessen mit den Schluesseln in messages/<sprache>/capability.json
+// uebereinstimmen.
+//
+// DER STERN STAND HIER FRUEHER ALS PFADMUSTER. Er ist am 01.10.2026
+// verschwunden, weil `messages/` gefolgt von Stern-Schraegstrich fuer jede
+// Testhilfe, die Kommentare entfernt, ein geoeffneter Blockkommentar ist -
+// und dann verschwand ab hier der halbe Rest der Datei, lautlos. Gefunden
+// von einem Test, der eine Zeile nicht fand, die dasteht.
+
+const SAVED_KEYS = [
+  "snapshot",
+  "evidence_removed",
+  "identity",
+  "disclosure",
+  "interview_done",
+  "resource_added",
+  "resource_updated",
+  "resource_removed",
+];
+const ERROR_KEYS = [
+  "narrative",
+  "area",
+  "save",
+  "published_incomplete",
+  "roles",
+  "linkedin",
+  "strength_length",
+  "resource_empty",
+  "resource_duplicate",
+];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
 const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
@@ -887,22 +916,38 @@ export default async function ProfilePage({
           darf er auch weiterhin auftauchen. */}
       {step === "resources" ? (
         <>
-          <ResourceProposalSection proposals={resources} />
-          {resources.length === 0 ? (
-            <section className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {t("aboutYou.resources.emptyTitle")}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                {t("aboutYou.resources.emptyText")}
-              </p>
-              {isConnectMember ? (
-                <Link href="/connect/profile" className={`${secondary} mt-4`}>
-                  {t("aboutYou.resources.emptyCta")}
-                </Link>
-              ) : null}
-            </section>
-          ) : null}
+          {/* ZUERST DIE EIGENEN, DANN DIE VORSCHLAEGE. Was dasteht, gehoert
+              der Person; was vorgeschlagen ist, wartet auf eine Entscheidung
+              und ist deshalb das Zweite.
+
+              DIE DREI NAMEN SIND DIESELBEN WIE AUF „DAS BIST DU"
+              (`profile.founderProfile.resources.kinds`). Dieselbe Sache an
+              zwei Orten verschieden zu benennen waere eine zweite Sache. */}
+          <OwnResourcesSection
+            resources={confirmedResources}
+            copy={{
+              title: t("aboutYou.resources.ownTitle"),
+              text: t("aboutYou.resources.ownText"),
+              kindLabel: (kind) => tProfile(`resources.kinds.${kind}`),
+              example: (kind) => t(`aboutYou.resources.examples.${kind}`),
+              addSummary: t("aboutYou.resources.add"),
+              kindField: t("aboutYou.resources.kindField"),
+              labelField: t("aboutYou.resources.labelField"),
+              labelHint: t("aboutYou.resources.labelHint", { max: RESOURCE_LABEL_MAX }),
+              save: t("aboutYou.resources.save"),
+              pending: t("pending.save"),
+              edit: t("aboutYou.resources.edit"),
+              remove: t("aboutYou.resources.remove"),
+              removeQuestion: t("aboutYou.resources.removeQuestion"),
+              removeConfirm: t("aboutYou.resources.removeConfirm"),
+              removeCancel: t("aboutYou.resources.removeCancel"),
+              fromProposal: t("aboutYou.resources.fromProposal"),
+              empty: t("aboutYou.resources.empty"),
+            }}
+          />
+          {/* Nur noch das Offene: Das Bestaetigte steht darueber, und zwar
+              mit Knoepfen. */}
+          <ResourceProposalSection proposals={resources} showConfirmed={false} />
           <SectionMarkToggle
             section="ressourcen"
             marked={facts.marks.has("ressourcen")}

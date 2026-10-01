@@ -327,14 +327,19 @@
     "published_incomplete": "Dein veröffentlichtes Connect-Profil braucht Name, Headline und einen etwas längeren Text über dich. Bitte ergänze die Angabe oder stelle das Connect-Profil vorher auf Entwurf.",
     "roles": "Mindestens eine Rolle muss gesetzt bleiben. Ohne Rolle hätte die Plattform keinen Bereich, in den sie dich führen kann.",
     "linkedin": "Diese Adresse können wir nicht als LinkedIn-Profil erkennen. Sie muss zu linkedin.com führen – gespeichert haben wir sie deshalb nicht.",
-    "strength_length": "Ein Satz, höchstens zweihundert Zeichen."
+    "strength_length": "Ein Satz, höchstens zweihundert Zeichen.",
+    "resource_empty": "Bitte wähle eine Art und schreibe einen kurzen Satz dazu.",
+    "resource_duplicate": "Das steht schon genau so bei dir."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",
     "evidence_removed": "Der Eintrag wurde entfernt.",
     "identity": "Deine Angaben sind gespeichert.",
     "disclosure": "Deine Freigabe ist gespeichert.",
-    "interview_done": "Das Gespräch ist abgeschlossen. Deine Antworten stehen bereit, um in Bereiche eingeordnet zu werden."
+    "interview_done": "Das Gespräch ist abgeschlossen. Deine Antworten stehen bereit, um in Bereiche eingeordnet zu werden.",
+    "resource_added": "Ressource hinzugefügt.",
+    "resource_updated": "Ressource geändert.",
+    "resource_removed": "Ressource entfernt."
   },
   "pending": {
     "save": "Wird gespeichert …"
@@ -769,7 +774,7 @@
       "workStarted": "{count, plural, =1 {Eine Antwort ist gespeichert} other {# Antworten sind gespeichert}}.",
       "bring": "{areas, plural, =0 {Noch keine Bereiche eingetragen} =1 {Ein Bereich eingetragen} other {# Bereiche eingetragen}}, davon {levelled} mit Erfahrungsstufe · {strengths, plural, =0 {noch keine Stärken} =1 {eine Stärke} other {# Stärken}}.",
       "direction": "{count, plural, =1 {Eine bestätigte Aussage} other {# bestätigte Aussagen}} darüber, was dich antreibt.",
-      "resources": "{confirmed, plural, =0 {Noch nichts bestätigt} =1 {Ein bestätigter Eintrag} other {# bestätigte Einträge}}{pending, plural, =0 {} =1 {, ein Vorschlag wartet auf dich} other {, # Vorschläge warten auf dich}}."
+      "resources": "{confirmed, plural, =0 {Noch nichts festgehalten} =1 {Eine Ressource festgehalten} other {# Ressourcen festgehalten}}{pending, plural, =0 {} =1 {, ein Vorschlag wartet auf dich} other {, # Vorschläge warten auf dich}}."
     },
     "payoffTitles": {
       "identity": "So sieht das aus"
@@ -780,9 +785,25 @@
       "unmark": "Markierung zurücknehmen"
     },
     "resources": {
-      "emptyTitle": "Hier ist noch nichts",
-      "emptyText": "Zugänge, Kontakte und Angebote entstehen bisher aus deinen eigenen Connect-Texten: Was du dort schreibst, wird dir hier als Vorschlag mit Beleg angeboten, und du entscheidest. Von Hand eintragen lässt sich hier noch nichts.",
-      "emptyCta": "Zum Connect-Profil"
+      "ownTitle": "Deine Ressourcen",
+      "ownText": "Was du an Netzwerk, Zugängen und Angeboten mitbringst. Sichtbar ist das bisher nur für dich.",
+      "empty": "Hier kannst du festhalten, welches Netzwerk, welche Zugänge oder welche Ressourcen du mitbringst.",
+      "add": "Ressource hinzufügen",
+      "kindField": "Art",
+      "labelField": "Beschreibung",
+      "labelHint": "Ein kurzer Satz, höchstens {max} Zeichen.",
+      "save": "Speichern",
+      "edit": "Bearbeiten",
+      "remove": "Entfernen",
+      "removeQuestion": "Ressource wirklich entfernen?",
+      "removeConfirm": "Ja, entfernen",
+      "removeCancel": "Abbrechen",
+      "fromProposal": "Aus einem Vorschlag übernommen — der Satz bleibt, wie er dort stand.",
+      "examples": {
+        "network": "Kontakte zu Kliniken im Raum Berlin",
+        "access": "Zugang zu einer Founder-Community",
+        "offer": "Erfahrung mit Social-Media-Strategie"
+      }
     },
     "groups": {
       "who": "Wer du bist",

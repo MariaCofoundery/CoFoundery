@@ -17,10 +17,31 @@ import type { PersonResource } from "@/features/ai/personResources";
  * gleichrangige Handlung daneben, sondern als leiser Weg. Und "Bestätigen" ist
  * nicht vorausgewaehlt - es gibt kein Formular, das man versehentlich
  * abschickt.
+ *
+ * ---------------------------------------------------------------------------
+ * `showConfirmed` - SEIT DEM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * In Connect ist dies der einzige Ort fuer Ressourcen: Dort stehen offene
+ * Vorschlaege und bestaetigte Eintraege untereinander, wie bisher.
+ *
+ * Auf "Ueber dich" stehen die bestaetigten Eintraege darueber in einer
+ * eigenen Liste - mit Bearbeiten und Entfernen. Dieselben Saetze ein zweites
+ * Mal darunter zu wiederholen, nur ohne Knoepfe, waere dieselbe Doppelung,
+ * die auf "Das bist du" gerade entfernt wurde. Dann zeigt dieser Abschnitt
+ * nur noch, was auf eine Entscheidung wartet.
  */
-export async function ResourceProposalSection({ proposals }: { proposals: PersonResource[] }) {
+export async function ResourceProposalSection({
+  proposals,
+  showConfirmed = true,
+}: {
+  proposals: PersonResource[];
+  showConfirmed?: boolean;
+}) {
   const pending = proposals.filter((proposal) => proposal.status === "pending");
-  const confirmed = proposals.filter((proposal) => proposal.status === "confirmed");
+  const confirmed = showConfirmed
+    ? proposals.filter((proposal) => proposal.status === "confirmed")
+    : [];
   if (pending.length === 0 && confirmed.length === 0) return null;
 
   const t = await getTranslations("connect.resources");
