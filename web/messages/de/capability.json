@@ -145,7 +145,7 @@
   },
   "ownership": {
     "title": "Was davon möchtest du nicht dauerhaft verantworten?",
-    "text": "Etwas zu können heißt nicht, dauerhaft dafür verantwortlich sein zu wollen. Diese Unterscheidung früh zu klären erspart später viele Missverständnisse.",
+    "text": "Etwas zu können heißt nicht, dauerhaft dafür verantwortlich sein zu wollen. Es lohnt sich, diese Unterscheidung früh zu besprechen.",
     "noEntries": "Du hast bisher keine Bereiche ausgewählt.",
     "submit": "Snapshot abschließen",
     "back": "Zurück"
@@ -224,14 +224,14 @@
     "levelUnset": "keine Stufe angegeben",
     "wishUnset": "kein Wunsch angegeben",
     "overlap": {
-      "high": "Ihr habt fast überall beide etwas eingetragen. Das heißt: viel gemeinsame Sprache über die Arbeit – und wahrscheinlich auch gemeinsame blinde Flecken.",
+      "high": "Ihr habt fast überall beide etwas eingetragen – viel Überschneidung in dem, was ihr mitbringt. Ob es Bereiche gibt, die keiner von euch abdeckt, lohnt sich gemeinsam anzusehen.",
       "balanced": "Eure Angaben überschneiden sich teilweise und ergänzen sich teilweise.",
-      "low": "Ihr habt kaum dieselben Bereiche eingetragen. Das heißt: viel Ergänzung – und wenig gemeinsame Sprache darüber, wie die Arbeit des anderen aussieht."
+      "low": "Ihr habt kaum dieselben Bereiche eingetragen – ihr ergänzt euch stark. Wie die Arbeit des anderen in seinen Bereichen aussieht, lohnt sich zu besprechen."
     },
     "states": {
       "contested": {
         "title": "Beide wollen es verantworten",
-        "text": "Hier beansprucht ihr dieselbe Zuständigkeit. Das ist die Frage, die in Gründungsteams meist zu spät gestellt wird – und ungeklärte Zuständigkeit wirkt sich messbar schlecht aus. Klärt sie, bevor sie sich als Konflikt äußert."
+        "text": "Hier beansprucht ihr beide dieselbe Zuständigkeit. Noch ist nicht geklärt, wer die Verantwortung übernimmt – dieser Punkt sollte zwischen euch besprochen werden."
       },
       "openPosition": {
         "title": "Niemand will es verantworten",
@@ -647,7 +647,7 @@
     "states": {
       "contested": {
         "label": "Mehrere wollen verantworten",
-        "text": "Zwei oder mehr beanspruchen dieselbe Zuständigkeit. Das klärt sich nicht von selbst und wird später teuer – es braucht ein Gespräch darüber, wer entscheidet, nicht darüber, wer mehr kann."
+        "text": "Zwei oder mehr beanspruchen dieselbe Zuständigkeit. Noch ist nicht geklärt, wer hier entscheidet – darüber lohnt sich ein Gespräch, nicht darüber, wer mehr kann."
       },
       "gap": {
         "label": "Will niemand, kann niemand",
@@ -659,7 +659,7 @@
       },
       "claimedShallow": {
         "label": "Gewollt, noch ohne Tiefe",
-        "text": "Jemand will das verantworten und hat es nach eigener Angabe noch nicht wiederholt angewandt. Das ist in Ordnung, wenn es ausgesprochen ist – und riskant, wenn alle es für erledigt halten."
+        "text": "Jemand will das verantworten und hat es nach eigener Angabe noch nicht wiederholt angewandt. Das ist in Ordnung – wichtig ist, dass es im Team ausgesprochen ist und nicht als erledigt gilt."
       },
       "handoverPath": {
         "label": "Übergabe möglich",

@@ -92,7 +92,7 @@
     "directionNoAnswer": "not stated yet"
   },
   "advisor": {
-    "newVersionTitle": "Answers from the new version",
+    "newVersionTitle": "Answers from an earlier version of the questionnaire",
     "selfReportNote": "Self-report, not a test result.",
     "visible": "You see {count} of {of} questions. What is missing may be withheld or unanswered — from here the two cannot be told apart."
   },

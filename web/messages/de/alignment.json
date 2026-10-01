@@ -92,7 +92,7 @@
     "directionNoAnswer": "noch keine Angabe"
   },
   "advisor": {
-    "newVersionTitle": "Antworten aus der neuen Fassung",
+    "newVersionTitle": "Antworten aus einer früheren Fassung des Fragebogens",
     "selfReportNote": "Selbstauskunft, kein Testergebnis.",
     "visible": "Du siehst {count} von {of} Fragen. Was fehlt, kann zurückgehalten oder nicht beantwortet sein — das lässt sich von hier aus nicht unterscheiden."
   },

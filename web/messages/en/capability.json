@@ -145,7 +145,7 @@
   },
   "ownership": {
     "title": "Which of these do you not want to own long term?",
-    "text": "Being able to do something does not mean wanting to be responsible for it. Settling that distinction early saves a lot of misunderstanding later.",
+    "text": "Being able to do something does not mean wanting to be responsible for it. It is worth discussing that distinction early.",
     "noEntries": "You have not selected any areas yet.",
     "submit": "Finish snapshot",
     "back": "Back"
@@ -224,14 +224,14 @@
     "levelUnset": "no level given",
     "wishUnset": "no preference given",
     "overlap": {
-      "high": "You have both entered something almost everywhere. That means plenty of shared language about the work – and probably shared blind spots too.",
+      "high": "You have both entered something almost everywhere – a lot of overlap in what you bring. Whether there are areas neither of you covers is worth looking at together.",
       "balanced": "Your entries overlap in part and complement each other in part.",
-      "low": "You have barely entered the same areas. That means a lot of complementarity – and little shared language about what the other one's work looks like."
+      "low": "You have barely entered the same areas – you complement each other strongly. What the other one's work looks like in their areas is worth talking about."
     },
     "states": {
       "contested": {
         "title": "Both of you want to own it",
-        "text": "You are claiming the same responsibility here. This is the question founding teams usually ask too late – and unsettled responsibility has a measurably poor effect. Settle it before it shows up as conflict."
+        "text": "You both claim the same responsibility here. It is not yet settled who takes it on – this is a point to discuss between you."
       },
       "openPosition": {
         "title": "Nobody wants to own it",
@@ -647,7 +647,7 @@
     "states": {
       "contested": {
         "label": "Several want to own it",
-        "text": "Two or more claim the same responsibility. This does not resolve itself and gets expensive later – it needs a conversation about who decides, not about who is better at it."
+        "text": "Two or more claim the same responsibility. It is not yet settled who decides here – that is worth a conversation, not who is better at it."
       },
       "gap": {
         "label": "Nobody wants it, nobody can",
@@ -659,7 +659,7 @@
       },
       "claimedShallow": {
         "label": "Wanted, not yet deep",
-        "text": "Somebody wants to own this and, by their own account, has not applied it repeatedly yet. That is fine when it is said out loud – and risky when everybody considers it settled."
+        "text": "Somebody wants to own this and, by their own account, has not applied it repeatedly yet. That is fine – what matters is that it is said out loud in the team and not treated as settled."
       },
       "handoverPath": {
         "label": "Handover possible",

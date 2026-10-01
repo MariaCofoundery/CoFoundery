@@ -115,3 +115,26 @@ test("ein offener Hinweis landet nicht im Ausdruck", () => {
   // Fest positionierte Ebenen druckt Chrome auf JEDE Seite.
   assert.match(source(join("src", "features", "research", "ResearchConsentNotice.tsx")), /fixed inset-0[^"]*print:hidden/);
 });
+
+test("Phase 6.1: keine empirische Behauptung in den Rollenvergleichen", () => {
+  // Das Produkt sagt, es messe nichts - dann darf kein Satz behaupten, etwas
+  // wirke sich „messbar" aus, werde „teuer" oder sei „riskant".
+  const verboten = /messbar|teuer|riskant|blinde Flecken|erspart|measurab|expensive|risky|blind spots|saves a lot/i;
+  for (const locale of ["de", "en"]) {
+    const c = messages(locale, "capability");
+    const texte = [
+      ...Object.values(c.comparison.states).map((s) => (s as { text: string }).text),
+      ...Object.values(c.team.states).map((s) => (s as { text: string }).text),
+      ...Object.values(c.comparison.overlap),
+      c.ownership.text,
+    ];
+    for (const text of texte) assert.doesNotMatch(String(text), verboten, `${locale}: ${text}`);
+  }
+});
+
+test("Phase 6.1: die fruehere Fassung heisst nicht mehr „neu“", () => {
+  for (const locale of ["de", "en"]) {
+    const titel = messages(locale, "alignment").advisor.newVersionTitle;
+    assert.doesNotMatch(titel, /neue|new|aktuell|current|v2/i, locale);
+  }
+});
