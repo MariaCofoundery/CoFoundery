@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { PRODUCT_FULL_NAME, PRODUCT_NAME } from "@/features/brand";
 
 /**
  * Das Web-App-Manifest - die Datei, die aus der Seite auf dem Telefon etwas
@@ -30,11 +31,11 @@ export default function manifest(): MetadataRoute.Manifest {
     // Die Kennung festschreiben, damit ein spaeteres Aendern von `start_url`
     // die App auf dem Geraet nicht zu einer anderen macht.
     id: "/",
-    name: "CoFoundery Align",
+    name: PRODUCT_FULL_NAME,
     // Unter dem Symbol ist nach etwa zwoelf Zeichen Schluss.
-    short_name: "CoFoundery",
+    short_name: PRODUCT_NAME,
     description:
-      "CoFoundery Align verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil.",
+      `${PRODUCT_FULL_NAME} verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil.`,
     start_url: "/start",
     scope: "/",
     display: "standalone",

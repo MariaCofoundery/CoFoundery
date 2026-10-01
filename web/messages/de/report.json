@@ -77,6 +77,7 @@
     "sections": {
       "corePattern": "1. Kernmuster",
       "profileNow": "So funktioniert dein Profil gerade",
+      "profileThen": "Was die frühere Auswertung beschrieben hat",
       "everyday": "2. So wirkst du im Alltag",
       "teamBreak": "3. Wo es im Team kippt",
       "misreadings": "4. Wie andere dich lesen könnten",
@@ -92,6 +93,7 @@
       "typicalSituation": "Typische Situation:",
       "dimensionOverviewEyebrow": "Übersicht",
       "dimensionOverviewTitle": "Dein aktueller Stand in 6 Dimensionen",
+      "dimensionOverviewTitleThen": "6 Dimensionen – Stand der früheren Auswertung",
       "valuesFallback": "Schließe das Werte-Add-on ab, um eine verdichtete Werte-Einordnung zu erhalten.",
       "startValues": "Werte Add-on starten",
       "everydaySignals": "Zeigt sich im Alltag",

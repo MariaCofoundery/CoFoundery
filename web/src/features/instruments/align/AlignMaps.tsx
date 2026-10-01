@@ -93,11 +93,25 @@ function Punktreihe({ position, of }: { position: number; of: number }) {
  * UND DIE UEBERSCHRIFT IST DIE DES MENSCHEN. Die Registratur heisst weiterhin
  * „A – Analytische Pruefung"; darueber steht „Entscheidungen abwaegen". Zwei
  * Namen fuer dieselbe Sache, und der technische bleibt, wo er hingehoert.
+ *
+ * ---------------------------------------------------------------------------
+ * IM DRUCK DICHTER - MIT DENSELBEN DATEN (`density="print"`, Phase 6)
+ * ---------------------------------------------------------------------------
+ *
+ * Mit dreizehn beschrifteten Zeilen brauchte die Karte im Druck fast eine
+ * ganze A4-Seite (976 px). Weggelassen wird dafuer nichts: dieselben Zeilen,
+ * dieselben Kurzlabels, dieselbe Punktreihe, dieselbe Antwort, und weiterhin
+ * keine Zahl und kein Mittelwert. Nur die Abstaende sind kleiner, und die
+ * Themen stehen in zwei Spalten nebeneinander - ein Thema bricht nie ueber
+ * zwei Spalten. Auf dem Bildschirm bleibt die Karte einspaltig und
+ * grosszuegig; unter 640 px auch die Druckansicht.
  */
 export async function WorkMap({
   sections,
+  density = "screen",
 }: {
   sections: { section: string; entries: ReadoutEntry[] }[];
+  density?: "screen" | "print";
 }) {
   // Welche Antwort eine Stelle bekommt, entscheidet mapRows.ts - dort ist es
   // geprueft. Hier wird nur gezeichnet.
@@ -116,28 +130,30 @@ export async function WorkMap({
     return theme ? tSyn(`themes.${theme}.title`) : null;
   };
 
+  const dicht = density === "print";
+
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+    <section className={`rounded-2xl border border-slate-200 bg-white ${dicht ? "p-4" : "p-5"}`}>
       <h2 className="text-base font-semibold text-slate-900">{t("workTitle")}</h2>
       <p className="mt-1 text-sm text-slate-600">{t("workIntro")}</p>
 
-      <div className="mt-5 space-y-5">
+      <div className={dicht ? "mt-3 gap-x-6 sm:columns-2" : "mt-5 space-y-5"}>
         {gruppen.map((group) => (
-          <div key={group.section}>
+          <div key={group.section} className={dicht ? "mb-3 break-inside-avoid" : undefined}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
               {themenname(group.rows[0]?.itemId ?? "") ?? group.section}
             </p>
-            <ul className="mt-2 space-y-2.5">
+            <ul className={dicht ? "mt-1 space-y-1" : "mt-2 space-y-2.5"}>
               {group.rows.map((row) => {
                 const beschriftung = kurz(row.itemId);
                 return (
                   <li key={row.itemId} title={row.prompt}>
                     {beschriftung ? (
-                      <p className="text-xs leading-5 text-slate-600">{beschriftung}</p>
+                      <p className={`text-xs text-slate-600 ${dicht ? "leading-4" : "leading-5"}`}>{beschriftung}</p>
                     ) : null}
-                    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${beschriftung ? "mt-0.5" : ""}`}>
+                    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${beschriftung && !dicht ? "mt-0.5" : ""}`}>
                       <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                      <span className="text-sm text-slate-900">{row.ordinal.label}</span>
+                      <span className={dicht ? "text-xs leading-4 text-slate-900" : "text-sm text-slate-900"}>{row.ordinal.label}</span>
                     </div>
                   </li>
                 );

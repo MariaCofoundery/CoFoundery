@@ -5,9 +5,11 @@ import { type SelfAlignmentReport } from "@/features/reporting/selfReportTypes";
 type Props = {
   scores: SelfAlignmentReport["scoresA"];
   locale?: string | null;
+  /** Fuer den Altbestand: keine Ueberschrift, die „aktuell" sagt. */
+  title?: string;
 };
 
-export function DimensionOverview({ scores, locale }: Props) {
+export function DimensionOverview({ scores, locale, title }: Props) {
   const overview = getDimensionOverviewContent(scores, locale);
 
   return (
@@ -16,7 +18,7 @@ export function DimensionOverview({ scores, locale }: Props) {
         <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
           {overview.eyebrow}
         </p>
-        <h3 className="mt-2 text-base font-semibold text-slate-900">{overview.title}</h3>
+        <h3 className="mt-2 text-base font-semibold text-slate-900">{title ?? overview.title}</h3>
       </div>
 
       <div className="mt-5 grid gap-x-6 gap-y-4 md:grid-cols-2">

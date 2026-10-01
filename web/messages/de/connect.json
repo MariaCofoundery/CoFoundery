@@ -152,7 +152,7 @@
     "profileConfirm": "Ich möchte mein Connect-Profil mit diesen Angaben öffentlich veröffentlichen.",
     "listingConfirm": "Ich möchte diesen Eintrag mit diesen Angaben öffentlich veröffentlichen.",
     "publicFields": "Öffentlich sichtbar werden:",
-    "profileFields": "Name, Headline, Über mich, Connect-Rollen, Expertise, Branchen & Themen, Region und – nur bei separater Freigabe – dein Foto.",
+    "profileFields": "Name, Headline, Über mich, Connect-Rollen, Expertise, Branchen & Themen, Region. Kein Foto – öffentliche Seiten zeigen immer deine Initialen.",
     "listingFields": "Richtung, Kategorie, Titel, Kontext, Themen, Branchen, geografischer und zeitlicher Rahmen sowie eine begrenzte Owner-Identität.",
     "openPublicPage": "Öffentliche Seite ansehen"
   },
@@ -315,7 +315,8 @@
       "helper": "Dein Profilbild erscheint innerhalb von CoFoundery bei deinem Connect-Profil und deinen Connect-Einträgen.",
       "fallbackName": "Connect-Mitglied",
       "keep": "Aktuelles Connect-Bild beibehalten",
-      "existing": "Vorhandenes CoFoundery-Profilbild verwenden",
+      "existing": "Mein vorhandenes Profilfoto verwenden",
+      "existingHint": "Connect bekommt davon eine eigene Kopie. Änderst oder entfernst du dein Foto unter „Über dich“, zieht Connect nach.",
       "none": "Kein Profilbild",
       "upload": "Anderes Bild verwenden"
     },
@@ -380,7 +381,7 @@
     "incomplete": "Ergänze alle notwendigen Angaben für die Veröffentlichung.",
     "public_confirmation": "Bitte bestätige die öffentliche Veröffentlichung ausdrücklich.",
     "save": "Speichern war nicht möglich. Bitte prüfe deine Angaben.",
-    "photo_reuse": "Das vorhandene Profilbild konnte nicht sicher übernommen werden.",
+    "photo_reuse": "Dein Profilfoto konnte nicht übernommen werden. Prüfe unter „Über dich“, ob eins gespeichert ist, oder lade hier ein eigenes hoch.",
     "photo_upload": "Das Bild konnte nicht gespeichert werden. Nutze JPG, PNG oder WebP bis 2 MB.",
     "profile": "Veröffentliche zuerst dein Connect-Profil.",
     "too_many_topics": "Bitte gib höchstens 8 Themen oder Expertisen an.",

@@ -9,6 +9,7 @@ import { getPublicProfileLinkedInUrl } from "@/features/profile/linkedInData";
 import { LinkedInLink } from "@/features/profile/LinkedInLink";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { PRODUCT_NAME } from "@/features/brand";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -16,10 +17,10 @@ export const revalidate = 0;
 export async function generateMetadata({ params }: { params: Promise<{ publicSlug: string }> }): Promise<Metadata> {
   const { publicSlug } = await params;
   const profile = await getPublicConnectProfile(await createClient(), publicSlug).catch(() => null);
-  if (!profile) return { title: "Connect | CoFoundery", robots: { index: false, follow: false } };
+  if (!profile) return { title: `Connect | ${PRODUCT_NAME}`, robots: { index: false, follow: false } };
   const canonical = `${getPublicAppOrigin()}/connect/p/${profile.public_slug}`;
   return {
-    title: `${profile.display_name} – ${profile.headline} | CoFoundery Connect`,
+    title: `${profile.display_name} – ${profile.headline} | ${PRODUCT_NAME} Connect`,
     description: profile.bio.slice(0, 155),
     alternates: { canonical },
     robots: { index: true, follow: true },

@@ -8,6 +8,7 @@ import { getConnectBlockState } from "@/features/connect/connectData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { PRODUCT_NAME } from "@/features/brand";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,9 +16,9 @@ export const revalidate = 0;
 export async function generateMetadata({ params }: { params: Promise<{ publicSlug: string }> }): Promise<Metadata> {
   const { publicSlug } = await params;
   const listing = await getPublicConnectListing(await createClient(), publicSlug).catch(() => null);
-  if (!listing) return { title: "Connect | CoFoundery", robots: { index: false, follow: false } };
+  if (!listing) return { title: `Connect | ${PRODUCT_NAME}`, robots: { index: false, follow: false } };
   const canonical = `${getPublicAppOrigin()}/connect/l/${listing.public_slug}`;
-  return { title: `${listing.title} | CoFoundery Connect`, description: listing.summary.slice(0, 155), alternates: { canonical }, robots: { index: true, follow: true } };
+  return { title: `${listing.title} | ${PRODUCT_NAME} Connect`, description: listing.summary.slice(0, 155), alternates: { canonical }, robots: { index: true, follow: true } };
 }
 
 export default async function PublicConnectListingPage({ params }: { params: Promise<{ publicSlug: string }> }) {

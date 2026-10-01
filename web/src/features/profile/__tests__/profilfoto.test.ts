@@ -18,6 +18,8 @@ const DAS_BIST_DU = join("src", "app", "me", "profile", "page.tsx");
 const DRUCK = join("src", "app", "me", "profile", "print", "page.tsx");
 const MODELL = join("src", "features", "reporting", "profileReadModel.ts");
 const CONNECT = join("src", "features", "connect", "connectActions.ts");
+const CONNECT_FOTO = join("src", "features", "connect", "connectBasePhoto.ts");
+const EINSTIEG = join("src", "features", "profile", "actions.ts");
 
 /**
  * Das persönliche Foto.
@@ -35,9 +37,10 @@ test("eine Quelle, und sie liegt weiter auf profiles", () => {
   // sondern das Original - siehe Bericht zu Phase 1.5 („profiles traegt
   // Rollen und Avatar").
   const tabellen = [...aktionen.matchAll(/\.from\("(\w+)"\)/g)].map((treffer) => treffer[1]);
-  // `profiles` ist die Quelle; `network_profiles` wird nur NACHGEZOGEN, wenn
-  // Connect das Basisfoto benutzt - siehe eigene Zusage weiter unten.
-  assert.deepEqual([...new Set(tabellen)].sort(), ["network_profiles", "profiles"]);
+  // `profiles` ist die Quelle. `network_profiles` wird nur NACHGEZOGEN, wenn
+  // Connect das Basisfoto benutzt - seit Phase 6 in `connectBasePhoto.ts`,
+  // siehe eigene Zusage weiter unten.
+  assert.deepEqual([...new Set(tabellen)].sort(), ["profiles"]);
   assert.ok(!aktionen.includes("person_core"), "die Aktion fasst den Kern an");
 
   // Und die beiden Felder schliessen sich aus - zwei gesetzte hiessen zwei
@@ -135,25 +138,27 @@ test("Connect schreibt nicht in die kanonische Quelle zurueck", () => {
 
   // Und es kennt die drei Quellen, die es schon vorher kannte - keine
   // vierte, keine neue Regel daneben.
-  assert.match(connect, /photo_source: "profile_avatar"/);
+  assert.match(codeOnly(CONNECT_FOTO), /photo_source: "profile_avatar"/);
   assert.match(connect, /photo_source: "network_upload"/);
+  assert.ok(!/\.from\("profiles"\)/.test(codeOnly(CONNECT_FOTO)), "der Nachzug liest oder schreibt profiles");
 });
 
 test("Connect zieht nach, wenn es das Basisfoto benutzt", () => {
-  // Wer dort „mein vorhandenes Bild verwenden" waehlt, bekommt eine KOPIE der
-  // Kennung in die Zeile - anders koennen die oeffentlichen Seiten sie nicht
-  // ausliefern. Ohne Nachzug hiesse das: das Bild, das ich an dem Tag hatte.
+  // Wer dort „mein vorhandenes Profilfoto verwenden" waehlt, bekommt eine
+  // KOPIE in die Zeile - eine Kennung oder eine eigene Datei. Ohne Nachzug
+  // hiesse das: das Bild, das ich an dem Tag hatte. Wie der Nachzug sich
+  // verhaelt, pruefen die Faelle in `connectBasePhoto.test.ts`; hier steht nur,
+  // dass alle Wege ihn benutzen.
   const aktionen = codeOnly(AKTIONEN);
 
   // Nur dort, wo Connect das Basisfoto benutzt - ein eigenes Connect-Bild
   // bleibt unberuehrt.
-  assert.match(aktionen, /\.eq\("photo_source", "profile_avatar"\)/);
-  // Geaendert: die neue Kennung. Entfernt: die Zeile wird geleert.
-  assert.match(aktionen, /\{ photo_avatar_id: avatarId \}/);
-  assert.match(aktionen, /\{ photo_source: null, photo_avatar_id: null \}/);
+  assert.match(codeOnly(CONNECT_FOTO), /\.eq\("photo_source", "profile_avatar"\)/);
 
-  // Und zwar bei allen drei Wegen: Illustration, eigenes Bild, Entfernen.
-  assert.equal([...aktionen.matchAll(/connectNachziehen\(/g)].length, 4);
+  // Und zwar bei allen drei Wegen: Illustration, eigenes Bild, Entfernen -
+  // und im Einstieg, der dasselbe Foto aendert.
+  assert.equal([...aktionen.matchAll(/syncConnectBasePhoto\(/g)].length, 3);
+  assert.match(codeOnly(EINSTIEG), /syncConnectBasePhoto\(/);
 
   // Das ist kein Rueckweg: Die kanonische Quelle traegt nach aussen, Connect
   // schreibt weiterhin nichts zurueck.

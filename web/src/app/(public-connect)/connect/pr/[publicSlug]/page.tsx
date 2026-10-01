@@ -6,6 +6,7 @@ import { PublicConnectShell } from "@/features/connect/PublicConnectShell";
 import { getPublicConnectProblem } from "@/features/connect/publicConnectData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { PRODUCT_NAME } from "@/features/brand";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,10 +20,10 @@ export async function generateMetadata({
   const problem = await getPublicConnectProblem(await createClient(), publicSlug).catch(() => null);
   // Kein Eintrag heisst hier auch: zurueckgezogen oder nie freigegeben. In
   // beiden Faellen darf die Seite nicht in den Index.
-  if (!problem) return { title: "Connect | CoFoundery", robots: { index: false, follow: false } };
+  if (!problem) return { title: `Connect | ${PRODUCT_NAME}`, robots: { index: false, follow: false } };
 
   return {
-    title: `${problem.title} | CoFoundery Connect`,
+    title: `${problem.title} | ${PRODUCT_NAME} Connect`,
     description: problem.description.slice(0, 155),
     alternates: { canonical: `${getPublicAppOrigin()}/connect/pr/${problem.public_slug}` },
     robots: { index: true, follow: true },

@@ -77,6 +77,7 @@
     "sections": {
       "corePattern": "1. Core pattern",
       "profileNow": "How your profile currently works",
+      "profileThen": "What the earlier evaluation described",
       "everyday": "2. How you show up day to day",
       "teamBreak": "3. Where things can tip in a team",
       "misreadings": "4. How others might read you",
@@ -92,6 +93,7 @@
       "typicalSituation": "Typical situation:",
       "dimensionOverviewEyebrow": "Overview",
       "dimensionOverviewTitle": "Your current profile across 6 dimensions",
+      "dimensionOverviewTitleThen": "6 dimensions – as of the earlier evaluation",
       "valuesFallback": "Complete the values add-on to receive a condensed values interpretation.",
       "startValues": "Start values add-on",
       "everydaySignals": "Shows up day to day",

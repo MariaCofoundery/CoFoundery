@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { getMarketingContent } from "@/data/marketing";
+import { PRODUCT_FULL_NAME } from "@/features/brand";
 
 function NavLink({
   href,
@@ -69,7 +70,7 @@ export function LandingTopNav() {
             <Link href="/" className="flex min-w-0 items-center">
               <Image
                 src="/cofoundery-align-logo.svg"
-                alt="CoFoundery Align"
+                alt={PRODUCT_FULL_NAME}
                 width={190}
                 height={40}
                 className="h-9 w-auto max-w-[172px] md:h-10 md:max-w-[190px]"

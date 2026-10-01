@@ -83,7 +83,7 @@
   },
   "maps": {
     "workTitle": "Auf einen Blick",
-    "workIntro": "Deine Antworten nebeneinander — ein Punkt je Antwort, an der Stelle, die du gewählt hast. Kein Abschnittswert und keine Punktzahl: Was hier steht, ist dasselbe wie unten, nur kompakter. Fragen ohne Reihenfolge stehen nur unten.",
+    "workIntro": "Deine Antworten nebeneinander — ein Punkt je Antwort, an der Stelle, die du gewählt hast, ohne Abschnittswert. Was hier steht, ist dasselbe wie unten, nur kompakter. Fragen ohne Reihenfolge stehen nur unten.",
     "differenceTitle": "Wo ihr auseinanderliegt",
     "differenceIntro": "Nur die Fragen, die ihr beide beantwortet habt und die eine Reihenfolge haben. Ein weiter Abstand heißt nicht, dass etwas nicht passt — er heißt, dass ihr darüber noch nicht gesprochen habt.",
     "directionTitle": "Wohin es gehen soll",
@@ -155,7 +155,7 @@
   },
   "synthesis": {
     "title": "Was sich in deinen Antworten zeigt",
-    "intro": "Zusammengefasst aus den Antworten, die du gegeben hast — Frage für Frage, ohne Punktzahl und ohne Vergleich mit anderen. Wo deine Antworten innerhalb eines Themas auseinandergehen, steht das auch so da.",
+    "intro": "Zusammengefasst aus den Antworten, die du gegeben hast — Frage für Frage. Wo deine Antworten innerhalb eines Themas auseinandergehen, steht das auch so da.",
     "tooFew": "Dazu liegen bisher noch zu wenige Antworten für eine zusammenhängende Beschreibung vor.",
     "note": "Die Beschreibungen fassen deine Antworten zusammen; sie sind keine Diagnose, kein Normvergleich und keine Punktzahl.",
     "shortLabels": {

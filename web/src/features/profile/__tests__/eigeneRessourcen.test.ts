@@ -107,7 +107,10 @@ test("leer wird nicht gespeichert, und die Grenzen kommen aus einer Quelle", () 
     !/\b160\b|\b3\b/.test(aktionen.replace(/RESOURCE_LABEL_(MIN|MAX)/g, "")),
     "eine Grenze steht noch einmal von Hand da",
   );
-  assert.match(codeOnly(ABSCHNITT), /maxLength=\{RESOURCE_LABEL_MAX\}/);
+  // Seit Phase 6 traegt eine kleine Client-Komponente das Feld (das Beispiel
+  // folgt der gewaehlten Art); die Grenze reicht der Abschnitt hinein.
+  assert.match(codeOnly(ABSCHNITT), /labelMax=\{RESOURCE_LABEL_MAX\}/);
+  assert.match(codeOnly(join("src", "features", "profile", "ResourceKindFields.tsx")), /maxLength=\{labelMax\}/);
 });
 
 test("eigene Eintraege und Vorschlaege sind zwei Listen", () => {
@@ -229,4 +232,22 @@ test("der Leerzustand haengt nicht mehr an Connect", () => {
 
   // Und das Formular steht offen, wenn noch nichts da ist.
   assert.match(codeOnly(ABSCHNITT), /open=\{resources\.length === 0\}/);
+});
+
+test("das Beispiel folgt der gewaehlten Art", () => {
+  // Vorher kam der Platzhalter serverseitig fest mit: Wer von „Netzwerk" auf
+  // „Zugang" wechselte, sah weiter das Netzwerk-Beispiel.
+  const feld = codeOnly(join("src", "features", "profile", "ResourceKindFields.tsx"));
+  assert.match(feld, /^"use client";/);
+  assert.match(feld, /onChange=\{\(event\) => setKind\(event\.target\.value\)\}/);
+  assert.match(feld, /placeholder=\{example\}/);
+  // Dieselben Feldnamen wie vorher - das Formular drumherum speichert.
+  assert.match(feld, /name="kind"/);
+  assert.match(feld, /name="label"/);
+  // Und je Art ein eigenes Beispiel, in beiden Sprachen.
+  for (const sprache of ["de", "en"]) {
+    const texte = JSON.parse(readFileSync(join("messages", sprache, "capability.json"), "utf8"));
+    const beispiele = texte.aboutYou.resources.examples;
+    assert.equal(new Set(["network", "access", "offer"].map((k) => beispiele[k])).size, 3, sprache);
+  }
 });

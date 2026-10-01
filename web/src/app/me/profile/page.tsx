@@ -331,7 +331,14 @@ export default async function FounderProfilePage() {
           eine Seite, die man am Stueck liest.
           ------------------------------------------------------------------ */}
       <nav aria-label={t("head.jumpTo")} className="no-print mt-6">
-        {/* UNTER `sm` EINE ZEILE ZUM SCHIEBEN, DARUEBER UMBRUCH.
+        {/* UNTER `lg` EINE ZEILE ZUM SCHIEBEN, DARUEBER UMBRUCH.
+
+            Bis Phase 6 lag die Grenze bei `sm` (640 px). Nachgemessen am
+            01.10.2026: Neun Sprungmarken brauchen zusammen rund 1490 px. Bei
+            768 und 820 px wurden daraus drei Zeilen und 148 px - auf einem
+            Tablet wieder ein Inhaltsverzeichnis vor dem Inhalt. Erst ab
+            1024 px (848 px Spalte) sind es zwei Zeilen; das ist die
+            Desktop-Fassung, und die bleibt umbrechend.
 
             Gemessen am 01.10.2026 im Browser: Bei 320 px standen acht
             Sprungmarken in sieben Zeilen und 356 px hoch - fast ein ganzer
@@ -341,7 +348,7 @@ export default async function FounderProfilePage() {
             `-mx-6 px-6` laesst die Zeile bis an den Bildschirmrand laufen,
             damit man sieht, dass dort noch etwas kommt. Der Rollbereich ist
             der der Liste; die Seite selbst wird dadurch nicht breiter. */}
-        <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
+        <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 lg:mx-0 lg:flex-wrap lg:overflow-x-visible lg:px-0 lg:pb-0">
           {sections
             .filter((section) => zeigt[section.id])
             .map((section) => (
@@ -473,7 +480,7 @@ export default async function FounderProfilePage() {
                   {t("legacyReport.text")}
                 </p>
                 <div className="mt-4">
-                  <SelfReportView report={report} density="summary" detailsHint={detailsHint} />
+                  <SelfReportView report={report} density="summary" detailsHint={detailsHint} legacy />
                 </div>
               </ProfileDetails>
             ) : null}

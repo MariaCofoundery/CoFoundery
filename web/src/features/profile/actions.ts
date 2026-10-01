@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
+import { syncConnectBasePhoto } from "@/features/connect/connectBasePhoto";
 import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
 import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
@@ -180,6 +181,12 @@ export async function upsertProfileBasicsAction(formData: FormData) {
     redirect(withError(errorRedirectTo, coreName.reason));
   }
 
+  // Auch der Einstieg aendert das Basisfoto - Connect zieht dann genauso nach
+  // wie unter „Ueber dich", aber nur, wenn sich am Bild etwas getan hat.
+  if (avatarImageUrl || (existingProfile?.avatar_id ?? null) !== avatarId) {
+    await syncConnectBasePhoto(supabase, user.id, { avatar_id: avatarId, avatar_url: nextAvatarUrl });
+  }
+
   if (avatarToDeleteAfterSave) {
     await deleteStoredAvatarIfOwned(supabase, user.id, avatarToDeleteAfterSave);
   }
@@ -207,6 +214,7 @@ export async function upsertProfileBasicsAction(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/founder-alignment/workbook");
+  revalidatePath("/connect", "layout");
   revalidatePath(successRedirectTo);
 
   redirect(successRedirectTo);

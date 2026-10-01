@@ -173,9 +173,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         currentAvatarId={profile?.photo_avatar_id}
         currentPhotoUrl={connectPhotoUrl(profile)}
         existingAvatarId={baseProfile?.avatar_id}
+        existingImageUrl={baseProfile?.avatar_url}
         copy={{
           title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
-          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
+          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), existingHint: t("profile.photo.existingHint"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
           // Entfernt am 18.09.2026: vier weitere Schluessel wurden hier
           // durchgereicht, die es in den Texten nie gab und die
           // ConnectPhotoField auch nie gelesen hat. Sichtbar war davon nichts -

@@ -176,10 +176,12 @@ test("der Sprungbalken schiebt sich, statt die halbe Seite zu fuellen", () => {
   const liste = /<ul className="([^"]*)">\s*\{sections/.exec(page)?.[1];
   assert.ok(liste, "der Sprungbalken ist keine Liste mehr");
 
-  // Unter `sm` eine Zeile zum Schieben...
+  // Unter `lg` eine Zeile zum Schieben - seit Phase 6 auch auf dem Tablet:
+  // Bei 768 und 820 px waren es sonst drei Zeilen und 148 px...
   assert.match(liste, /overflow-x-auto/);
-  // ...darüber wie bisher Umbruch.
-  assert.match(liste, /sm:flex-wrap/);
+  // ...erst ab 1024 px wie bisher Umbruch.
+  assert.match(liste, /lg:flex-wrap/);
+  assert.ok(!/(^|\s)(sm|md):flex-wrap/.test(liste), `der Balken bricht auf dem Tablet um: ${liste}`);
   // Und `flex-wrap` steht nicht ohne Stufe da - sonst bricht er doch wieder um.
   assert.ok(
     !/(^|\s)flex-wrap/.test(liste),

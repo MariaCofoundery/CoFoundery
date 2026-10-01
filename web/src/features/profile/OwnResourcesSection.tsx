@@ -5,6 +5,7 @@ import {
   deleteResourceAction,
   updateResourceAction,
 } from "@/features/profile/resourceActions";
+import { ResourceKindFields } from "@/features/profile/ResourceKindFields";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -208,32 +209,18 @@ function Felder({
   kind: ResourceKind | null;
   label: string;
 }) {
-  const gewaehlt = kind ?? RESOURCE_KINDS[0];
-
   return (
-    <div className="grid gap-4">
-      <label className="block text-sm font-medium text-slate-900">
-        {copy.kindField}
-        <select name="kind" defaultValue={gewaehlt} className={feld}>
-          {RESOURCE_KINDS.map((eintrag) => (
-            <option key={eintrag} value={eintrag}>
-              {copy.kindLabel(eintrag)}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="block text-sm font-medium text-slate-900">
-        {copy.labelField}
-        <input
-          name="label"
-          defaultValue={label}
-          maxLength={RESOURCE_LABEL_MAX}
-          placeholder={copy.example(gewaehlt)}
-          className={feld}
-        />
-        <span className="mt-1 block text-xs leading-5 text-slate-500">{copy.labelHint}</span>
-      </label>
-    </div>
+    <ResourceKindFields
+      kinds={RESOURCE_KINDS.map((eintrag) => ({
+        kind: eintrag,
+        label: copy.kindLabel(eintrag),
+        example: copy.example(eintrag),
+      }))}
+      initialKind={kind ?? RESOURCE_KINDS[0]}
+      label={label}
+      labelMax={RESOURCE_LABEL_MAX}
+      fieldClassName={feld}
+      copy={{ kindField: copy.kindField, labelField: copy.labelField, labelHint: copy.labelHint }}
+    />
   );
 }

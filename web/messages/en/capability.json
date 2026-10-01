@@ -2,12 +2,12 @@
   "eyebrow": "Your profile",
   "title": "About you",
   "identity": {
-    "title": "Who you are",
+    "title": "You & your background",
     "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
     "name": "Name",
     "headline": "Headline",
     "headlineHint": "One sentence saying what you do.",
-    "bio": "About you",
+    "bio": "Short introduction",
     "bioHint": "What should people know about your work?",
     "region": "Region",
     "regionHint": "Roughly is enough: Berlin, Rhine-Main, North Rhine-Westphalia.",
@@ -30,14 +30,14 @@
     "gaps": {
       "displayName": "A name with at least {min} characters",
       "headline": "A headline with at least {min} characters",
-      "bio": "A text about you with at least {min} characters"
+      "bio": "A short introduction with at least {min} characters"
     },
     "backTo": {
       "connect": "Back to the Connect profile",
       "discovery": "Back to the search profile"
     },
     "photoVisibleLabel": "Make my photo visible to signed-in members",
-    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: public pages hang off that, so you decide the photo there separately.",
+    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: there you decide separately whether your photo appears – Connect then gets its own copy.",
     "linkedin": {
       "title": "LinkedIn",
       "urlLabel": "Your LinkedIn profile",
@@ -192,24 +192,24 @@
     "basis": "This readout only places your own entries side by side – experience level and ownership preference. It reads nothing into them, and an empty field only means nothing is written there.",
     "findings": {
       "anchor": {
-        "title": "This is where you want to carry the responsibility",
-        "text": "These are the areas you want to be permanently in charge of. In a founding conversation, this is your claim."
+        "title": "Responsibility you want to take on",
+        "text": "In these areas you want to be in charge for the long term. In a founding conversation, this is where the division of roles starts."
       },
       "canButHandsOver": {
-        "title": "You can do this – you just do not want to keep it",
-        "text": "You stated depth here and still said someone else should own it permanently. That is not a contradiction but the most important input for dividing roles: you can be counted on when it matters, yet this is not your seat."
+        "title": "Experience in place – responsibility better handed over",
+        "text": "In these areas you bring practical experience but do not want to own them for the long term. That is not a contradiction but important input for dividing roles: you can support here, while the responsibility should sit with someone else."
       },
       "growingInto": {
-        "title": "This is where you want to grow into it",
-        "text": "Responsibility yes, depth of experience not yet. That can be planned for – once it is said out loud."
+        "title": "Responsibility you want to grow into",
+        "text": "You want to take on responsibility here but do not yet have much experience. That can be planned for – once it is discussed openly."
       },
       "contributes": {
-        "title": "Here you contribute without leading it",
-        "text": "You get involved but do not want to be in charge. That tends to ease a division of roles rather than restrict it."
+        "title": "Contributing without being in charge",
+        "text": "You get involved here but do not want to be in charge. That tends to make dividing roles easier rather than harder."
       },
       "undecided": {
-        "title": "Here it is still open what you want",
-        "text": "No ownership preference given, or explicitly still unclear. That is a good place for a conversation to start."
+        "title": "Still open",
+        "text": "You have not stated an ownership preference here, or have explicitly left it open. A good place to start a conversation."
       }
     }
   },
@@ -235,11 +235,11 @@
       },
       "openPosition": {
         "title": "Nobody wants to own it",
-        "text": "Neither of you wants to be permanently in charge here. Whether that is a problem depends on what your venture needs – which we do not know. All we say is: it is not filled."
+        "text": "Neither of you wants to be permanently in charge here. Whether that is a problem depends on what your venture needs – which we do not know. All that can be said is: nobody is in charge here yet."
       },
       "bothShallow": {
         "title": "Wanted, but without depth yet",
-        "text": "At least one of you wants to take this on, and neither has stated deep experience here. As a team you are thin at this point."
+        "text": "At least one of you wants to take this on, and neither has stated deep experience here. As a team you have little experience at this point."
       },
       "handoverPath": {
         "title": "A path that can be planned",
@@ -651,7 +651,7 @@
       },
       "gap": {
         "label": "Nobody wants it, nobody can",
-        "text": "Nobody wished for the responsibility here and nobody stated depth. This is the only situation that forces a decision: hire, commission – or deliberately leave it and say that it is left."
+        "text": "Nobody wished for the responsibility here and nobody stated depth. This is the only situation that forces a decision: hire, commission – or deliberately leave it open and record that."
       },
       "openPosition": {
         "label": "Somebody can, nobody wants to",
@@ -663,7 +663,7 @@
       },
       "handoverPath": {
         "label": "Handover possible",
-        "text": "One wants to grow into it, another has depth and does not want to keep the responsibility. That is the most comfortable case: a path you can plan."
+        "text": "One wants to grow into it, another has depth and does not want to keep the responsibility. That is a transition you can plan."
       },
       "settled": {
         "label": "Owned",

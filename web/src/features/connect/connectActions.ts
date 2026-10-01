@@ -14,10 +14,8 @@ import {
 } from "@/features/connect/connectNotifications";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnectMessageBody, parseConnectListing, parseConnectProfile, listingPublishable, profilePublishable } from "./connectValidation";
-import { normalizeAvatarId } from "@/features/profile/avatarLibrary";
+import { CONNECT_PHOTO_BUCKET, connectValuesForBasePhoto } from "@/features/connect/connectBasePhoto";
 import { randomUUID } from "node:crypto";
-
-const CONNECT_PHOTO_BUCKET = "network-profile-images";
 
 async function context() {
   const client = await createClient();
@@ -73,11 +71,14 @@ export async function saveConnectProfileAction(formData: FormData) {
   if (photoChoice === "none") {
     photoValues = { ...photoValues, photo_source: null, photo_avatar_id: null, photo_path: null };
   } else if (photoChoice === "existing") {
+    // Eine Illustration wird als Kennung uebernommen, ein eigenes Basisfoto
+    // als eigene Kopie im Connect-Eimer - das Original bleibt privat. Siehe
+    // `connectBasePhoto.ts`.
     const base = await getProfileBasicsRow(client, user.id).catch(() => null);
-    const avatarId = normalizeAvatarId(base?.avatar_id);
-    if (avatarId) {
-      photoValues = { ...photoValues, photo_source: "profile_avatar", photo_avatar_id: avatarId, photo_path: null };
-    } else redirect("/connect/profile?error=photo_reuse");
+    const reused = await connectValuesForBasePhoto(client, user.id, base);
+    if (!reused.photo_source) redirect("/connect/profile?error=photo_reuse");
+    if (reused.photo_path) uploadedPath = reused.photo_path;
+    photoValues = { ...photoValues, ...reused };
   } else if (photoChoice === "upload") {
     const upload = await uploadConnectPhoto(client, user.id, String(formData.get("photo_image_data") ?? ""));
     if (!upload) redirect("/connect/profile?error=photo_upload");

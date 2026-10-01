@@ -437,9 +437,11 @@
     "direction": "Was ihr wichtig ist",
     "self": "Selbst",
     "scopeNote": "Die Erzählungen aus den Gesprächen sind hier nie enthalten — sie werden nicht freigegeben, in keinem Umfang.",
-    "alignment": "Selbstbild aus dem Fragebogen",
-    "alignmentAsOf": "Stand: {date}. So sah es aus, als diese Person ihren Report zuletzt gerechnet hat — nicht unbedingt heute.",
-    "alignmentNoDate": "Der Stand dieses Abbilds ist nicht bekannt."
+    "workProfileTitle": "Founder-Arbeitsprofil",
+    "workProfileNotShared": "Für das aktuelle Founder-Arbeitsprofil liegt dir keine Freigabe vor.",
+    "legacyTitle": "Frühere Auswertung – Stand {date}",
+    "legacyTitleNoDate": "Frühere Auswertung – Stand unbekannt",
+    "legacyText": "Aus dem früheren Fragebogen, so wie diese Person ihn damals gerechnet hat — nicht unbedingt ihr heutiger Stand. Er misst etwas anderes als das Arbeitsprofil und wird damit nicht verrechnet. Die Texte sind an die Person selbst gerichtet."
   },
   "group": {
     "back": "Zurück zur Organisation",

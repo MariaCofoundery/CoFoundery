@@ -282,7 +282,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
             {t("workProfile.answered", { answered: workProfile.answered, of: workProfile.of })}
           </p>
           <div className="mt-4">
-            <WorkMap sections={workProfile.sections} />
+            <WorkMap sections={workProfile.sections} density="print" />
           </div>
 
           {/* IN BEIDEN FASSUNGEN. Erst damit ist der Arbeitsprofil-Teil des
@@ -516,7 +516,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
           </p>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{t("legacyReport.text")}</p>
           <div className="mt-4">
-            <SelfReportView report={report} density="full" detailsHint={() => ""} />
+            <SelfReportView report={report} density="full" detailsHint={() => ""} legacy />
           </div>
         </Abschnitt>
       ) : null}

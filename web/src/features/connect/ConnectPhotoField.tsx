@@ -10,20 +10,23 @@ export function ConnectPhotoField({
   currentAvatarId,
   currentPhotoUrl,
   existingAvatarId,
+  existingImageUrl,
   copy,
 }: {
   displayName: string;
   currentAvatarId?: string | null;
   currentPhotoUrl?: string | null;
   existingAvatarId?: string | null;
+  /** Das eigene Basisfoto (`avatars/…`). Die Vorschau sieht nur die Person selbst. */
+  existingImageUrl?: string | null;
   copy: Record<string, string>;
 }) {
   const hasCurrent = Boolean(currentAvatarId || currentPhotoUrl);
-  const hasExisting = Boolean(existingAvatarId);
+  const hasExisting = Boolean(existingAvatarId || existingImageUrl);
   const [choice, setChoice] = useState<Choice>(hasCurrent ? "keep" : "none");
   const [uploaded, setUploaded] = useState("");
   const preview = choice === "existing"
-    ? { avatarId: existingAvatarId, imageUrl: null }
+    ? { avatarId: existingAvatarId, imageUrl: existingAvatarId ? null : existingImageUrl }
     : choice === "upload"
       ? { avatarId: null, imageUrl: uploaded }
       : choice === "none"
@@ -46,6 +49,7 @@ export function ConnectPhotoField({
       <div className="grid flex-1 gap-2 text-sm">
         {hasCurrent ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "keep"} onChange={() => setChoice("keep")} />{copy.keep}</label> : null}
         {hasExisting ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "existing"} onChange={() => setChoice("existing")} />{copy.existing}</label> : null}
+        {hasExisting && choice === "existing" && copy.existingHint ? <p className="-mt-1 pl-7 text-xs leading-5 text-slate-500">{copy.existingHint}</p> : null}
         <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "none"} onChange={() => setChoice("none")} />{copy.none}</label>
       </div>
     </div>

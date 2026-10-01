@@ -83,7 +83,7 @@
   },
   "maps": {
     "workTitle": "At a glance",
-    "workIntro": "Your answers side by side — one dot per answer, at the position you chose. No section value and no score: this is the same as below, only more compact. Questions without an order appear below only.",
+    "workIntro": "Your answers side by side — one dot per answer, at the position you chose, with no section value. This is the same as below, only more compact. Questions without an order appear below only.",
     "differenceTitle": "Where you differ",
     "differenceIntro": "Only the questions you both answered and that have an order. A wide gap does not mean something is wrong — it means you have not talked about it yet.",
     "directionTitle": "Where this should go",
@@ -155,7 +155,7 @@
   },
   "synthesis": {
     "title": "What shows in your answers",
-    "intro": "Put together from the answers you gave — question by question, with no score and no comparison to anyone else. Where your answers within a theme pull apart, that is what it says.",
+    "intro": "Put together from the answers you gave — question by question. Where your answers within a theme pull apart, that is what it says.",
     "tooFew": "There are not enough answers here yet for a connected description.",
     "note": "The descriptions summarise your answers; they are not a diagnosis, not a comparison against a norm and not a score.",
     "shortLabels": {

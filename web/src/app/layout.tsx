@@ -16,6 +16,7 @@ import { I18nProvider } from "@/i18n/I18nProvider";
 import { getMessages } from "@/i18n/messages";
 import { DEFAULT_PUBLIC_APP_ORIGIN, getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { PRODUCT_FULL_NAME, PRODUCT_NAME } from "@/features/brand";
 
 const spectral = localFont({
   src: [
@@ -39,16 +40,16 @@ const unbounded = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getPublicAppOrigin() || DEFAULT_PUBLIC_APP_ORIGIN),
-  title: "CoFoundery Align | Co-Founder Matching mit Werte-Fokus",
+  title: `${PRODUCT_FULL_NAME} | Co-Founder Matching mit Werte-Fokus`,
   description:
-    "CoFoundery Align verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung.",
-  applicationName: "CoFoundery Align",
+    `${PRODUCT_FULL_NAME} verbindet Mitgründer:innen nach Werten, Vision und Arbeitsstil. Werte zuerst – Fähigkeiten als Ergänzung.`,
+  applicationName: PRODUCT_FULL_NAME,
   // Auf dem Startbildschirm eines iPhones ist unter dem Symbol nach etwa
   // zwoelf Zeichen Schluss. Ohne `title` stand dort der Seitentitel bis zum
   // ersten Abschneiden - also "CoFoundery Al...".
   appleWebApp: {
     capable: true,
-    title: "CoFoundery",
+    title: PRODUCT_NAME,
     statusBarStyle: "default",
   },
   // Die Symbole selbst liegen als Dateien: `src/app/icon.png` fuer den

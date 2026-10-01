@@ -516,7 +516,7 @@
       "availabilityPlaceholder": "e.g. 20",
       "availabilityV2": "How many hours per week can you realistically put in right now?",
       "identityTitle": "This comes from your profile",
-      "identityText": "Name, headline, about you, region, expertise, industries and way of working are kept in one place. Changes there appear here immediately.",
+      "identityText": "Name, headline, short introduction, region, expertise, industries and way of working are kept in one place. Changes there appear here immediately.",
       "identityLink": "Save and edit profile",
       "identityMissing": "No entries yet. Without a name, a headline and a text about you, your search profile cannot be published.",
       "identityExpertise": "Expertise",

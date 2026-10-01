@@ -8,6 +8,7 @@ import {
   deleteStoredAvatarIfOwned,
   uploadAvatarToStorage,
 } from "@/features/profile/avatarStorage";
+import { syncConnectBasePhoto } from "@/features/connect/connectBasePhoto";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -58,6 +59,8 @@ const ZURUECK = "/profile?step=identity";
 function zurueck(query: string): never {
   revalidatePath("/profile");
   revalidatePath("/me/profile");
+  // Connect kann das Basisfoto als Kopie tragen - siehe `syncConnectBasePhoto`.
+  revalidatePath("/connect", "layout");
   redirect(`${ZURUECK}&${query}#foto`);
 }
 
@@ -70,57 +73,11 @@ async function kontext() {
 }
 
 /**
- * Connect zieht nach, wenn es das Basisfoto benutzt.
- *
- * ---------------------------------------------------------------------------
- * EINE KOPIE, DIE SONST VERALTET
- * ---------------------------------------------------------------------------
- *
- * Wer in Connect „mein vorhandenes Bild verwenden" waehlt, bekommt dort die
- * Kennung der Illustration IN DIE ZEILE GESCHRIEBEN - `photo_source` steht auf
- * `profile_avatar`, `photo_avatar_id` traegt die Kopie. Das muss so sein: Die
- * oeffentlichen Connect-Seiten werden auch ohne Anmeldung ausgeliefert und
- * koennen `profiles` gar nicht lesen.
- *
- * Ohne diesen Nachzug hiesse „mein vorhandenes Bild verwenden" also: das Bild,
- * das ich an dem Tag hatte. Wer seins danach aendert, haette zwei; wer seins
- * loescht, haette in Connect weiter das alte stehen - genau das, was eine
- * Loeschung verhindern soll.
- *
- * ---------------------------------------------------------------------------
- * DIE RICHTUNG STIMMT
- * ---------------------------------------------------------------------------
- *
- * Das ist kein Rueckweg: Die kanonische Quelle traegt ihre Aenderung nach
- * aussen, so wie `propagate_person_core_to_context_rows` es fuer Name und Bio
- * tut. Connect schreibt weiterhin nichts zurueck.
- *
- * NUR WO CONNECT DAS BASISFOTO BENUTZT. Ein eigenes Connect-Bild
- * (`network_upload`) bleibt unberuehrt - es ist eine eigene Entscheidung fuer
- * ein anderes Publikum.
+ * Connect zieht nach, wenn es das Basisfoto benutzt - siehe
+ * `features/connect/connectBasePhoto.ts`. Eine Illustration wird als Kennung
+ * uebernommen, ein eigenes Bild als eigene Kopie im Connect-Eimer; ein eigenes
+ * Connect-Bild (`network_upload`) bleibt unberuehrt.
  */
-async function connectNachziehen(
-  client: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-  avatarId: string | null
-) {
-  try {
-    await client
-      .from("network_profiles")
-      .update(
-        avatarId
-          ? { photo_avatar_id: avatarId }
-          : { photo_source: null, photo_avatar_id: null }
-      )
-      .eq("user_id", userId)
-      .eq("photo_source", "profile_avatar");
-  } catch {
-    // Ein misslungener Nachzug darf das Speichern des eigenen Bildes nicht
-    // kosten. Connect zeigt dann kurz das alte - beim naechsten Speichern
-    // dort wird es ohnehin neu gesetzt.
-  }
-}
-
 /** Was gerade gespeichert ist - gebraucht, um die alte Datei loszuwerden. */
 async function aktuellesBild(client: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const { data } = await client
@@ -144,7 +101,7 @@ export async function saveProfilePhotoAction(formData: FormData): Promise<void> 
       .eq("user_id", user.id);
     if (error) zurueck("error=photo_save");
 
-    await connectNachziehen(client, user.id, avatarId);
+    await syncConnectBasePhoto(client, user.id, { avatar_id: avatarId, avatar_url: null });
     await deleteStoredAvatarIfOwned(client, user.id, vorher);
     zurueck("saved=photo");
   }
@@ -170,12 +127,9 @@ export async function saveProfilePhotoAction(formData: FormData): Promise<void> 
     zurueck("error=photo_save");
   }
 
-  // Das eigene Bild laesst sich in Connect nicht uebernehmen - dort gibt es
-  // nur die Illustration oder einen eigenen Upload. Wer also von einer
-  // Illustration auf ein eigenes Bild wechselt, hat in Connect keine Vorlage
-  // mehr; die Zeile wird geleert statt auf eine Illustration zu zeigen, die
-  // nicht mehr gilt.
-  await connectNachziehen(client, user.id, null);
+  // Nutzt Connect das Basisfoto, bekommt es eine neue Kopie - und die alte
+  // Kopie verschwindet. Erst danach das alte Original.
+  await syncConnectBasePhoto(client, user.id, { avatar_id: null, avatar_url: path });
   await deleteStoredAvatarIfOwned(client, user.id, vorher);
   zurueck("saved=photo");
 }
@@ -197,7 +151,7 @@ export async function removeProfilePhotoAction(): Promise<void> {
     .eq("user_id", user.id);
   if (error) zurueck("error=photo_save");
 
-  await connectNachziehen(client, user.id, null);
+  await syncConnectBasePhoto(client, user.id, null);
   await deleteStoredAvatarIfOwned(client, user.id, vorher);
   zurueck("saved=photo_removed");
 }

@@ -437,9 +437,11 @@
     "direction": "What matters to them",
     "self": "Self",
     "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope.",
-    "alignment": "Self-report from the questionnaire",
-    "alignmentAsOf": "As of {date}. This is how it looked when this person last computed their report — not necessarily today.",
-    "alignmentNoDate": "The date of this snapshot is unknown."
+    "workProfileTitle": "Founder working profile",
+    "workProfileNotShared": "You have not been given access to the current founder working profile.",
+    "legacyTitle": "Earlier evaluation – as of {date}",
+    "legacyTitleNoDate": "Earlier evaluation – date unknown",
+    "legacyText": "From the earlier questionnaire, as this person calculated it at the time — not necessarily where they stand today. It measures something different from the working profile and is not combined with it. The texts are addressed to the person themselves."
   },
   "group": {
     "back": "Back to the organisation",

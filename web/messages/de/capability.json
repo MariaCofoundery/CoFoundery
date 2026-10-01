@@ -2,12 +2,12 @@
   "eyebrow": "Dein Profil",
   "title": "Über dich",
   "identity": {
-    "title": "Wer du bist",
+    "title": "Du & dein Hintergrund",
     "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
     "name": "Name",
     "headline": "Headline",
     "headlineHint": "Ein Satz, der sagt, was du tust.",
-    "bio": "Über dich",
+    "bio": "Kurzvorstellung",
     "bioHint": "Was sollte man über deine Arbeit wissen?",
     "region": "Region",
     "regionHint": "Grob reicht: Berlin, Rhein-Main, Nordrhein-Westfalen.",
@@ -30,14 +30,14 @@
     "gaps": {
       "displayName": "Ein Name mit mindestens {min} Zeichen",
       "headline": "Eine Headline mit mindestens {min} Zeichen",
-      "bio": "Ein Text über dich mit mindestens {min} Zeichen"
+      "bio": "Eine Kurzvorstellung mit mindestens {min} Zeichen"
     },
     "backTo": {
       "connect": "Zurück zum Connect-Profil",
       "discovery": "Zurück zum Suchprofil"
     },
     "photoVisibleLabel": "Mein Bild für eingeloggte Mitglieder sichtbar machen",
-    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort hängen öffentliche Seiten dran, deshalb entscheidest du das Bild dort getrennt.",
+    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort entscheidest du getrennt, ob dein Foto erscheint – Connect bekommt dann eine eigene Kopie.",
     "linkedin": {
       "title": "LinkedIn",
       "urlLabel": "Dein LinkedIn-Profil",
@@ -192,24 +192,24 @@
     "basis": "Diese Auswertung stellt nur deine eigenen Angaben nebeneinander – Erfahrungsstufe und Verantwortungswunsch. Sie deutet nichts hinein, und ein leeres Feld heißt nur, dass dort nichts steht.",
     "findings": {
       "anchor": {
-        "title": "Hier willst du die Verantwortung tragen",
-        "text": "Das sind die Bereiche, für die du dauerhaft zuständig sein willst. In einem Gründungsgespräch ist das dein Anspruch."
+        "title": "Verantwortung, die du übernehmen willst",
+        "text": "In diesen Bereichen möchtest du dauerhaft zuständig sein. Für ein Gründungsgespräch ist das der Ausgangspunkt der Rollenverteilung."
       },
       "canButHandsOver": {
-        "title": "Das kannst du – behalten willst du es nicht",
-        "text": "Du hast hier Tiefe angegeben und trotzdem, dass es dauerhaft jemand anders übernehmen soll. Das ist kein Widerspruch, sondern die wichtigste Information für die Rollenverteilung: Ihr könnt auf dich zählen, wenn es brennt, aber es ist nicht dein Platz."
+        "title": "Erfahrung vorhanden – Verantwortung lieber abgeben",
+        "text": "In diesen Bereichen bringst du praktische Erfahrung mit, möchtest sie aber nicht dauerhaft verantworten. Das ist kein Widerspruch, sondern eine wichtige Angabe für die Rollenverteilung: Du kannst hier unterstützen, die Zuständigkeit sollte aber bei jemand anderem liegen."
       },
       "growingInto": {
-        "title": "Hier willst du hineinwachsen",
-        "text": "Verantwortung ja, Erfahrung noch nicht in der Tiefe. Das lässt sich planen – wenn es ausgesprochen ist."
+        "title": "Verantwortung, in die du hineinwachsen willst",
+        "text": "Hier möchtest du Verantwortung übernehmen, hast aber noch wenig Erfahrung. Das lässt sich planen – wenn es offen besprochen wird."
       },
       "contributes": {
-        "title": "Hier arbeitest du mit, ohne es zu führen",
-        "text": "Du bringst dich ein, willst die Zuständigkeit aber nicht. Das entlastet eine Rollenverteilung eher, als dass es sie einschränkt."
+        "title": "Mitarbeit ohne Zuständigkeit",
+        "text": "Du bringst dich hier ein, möchtest die Zuständigkeit aber nicht übernehmen. Das erleichtert eine Rollenverteilung eher, als dass es sie einschränkt."
       },
       "undecided": {
-        "title": "Hier ist noch offen, was du willst",
-        "text": "Kein Verantwortungswunsch angegeben oder ausdrücklich noch unklar. Das ist ein guter Punkt, an dem ein Gespräch anfangen kann."
+        "title": "Noch offen",
+        "text": "Hier hast du keinen Verantwortungswunsch angegeben oder ihn ausdrücklich offen gelassen. Ein guter Punkt, um ein Gespräch zu beginnen."
       }
     }
   },
@@ -235,11 +235,11 @@
       },
       "openPosition": {
         "title": "Niemand will es verantworten",
-        "text": "Keiner von euch will hier dauerhaft zuständig sein. Ob das ein Problem ist, hängt daran, was euer Vorhaben braucht – das wissen wir nicht. Wir sagen nur: besetzt ist es nicht."
+        "text": "Keiner von euch will hier dauerhaft zuständig sein. Ob das ein Problem ist, hängt daran, was euer Vorhaben braucht – das wissen wir nicht. Festhalten lässt sich nur: Zuständig ist hier noch niemand."
       },
       "bothShallow": {
         "title": "Gewollt, aber noch ohne Tiefe",
-        "text": "Mindestens einer von euch will das übernehmen, und keiner hat hier tiefe Erfahrung angegeben. Als Team seid ihr an dieser Stelle dünn."
+        "text": "Mindestens einer von euch will das übernehmen, und keiner hat hier tiefe Erfahrung angegeben. Als Team habt ihr an dieser Stelle wenig Erfahrung."
       },
       "handoverPath": {
         "title": "Ein Weg, der planbar ist",
@@ -651,7 +651,7 @@
       },
       "gap": {
         "label": "Will niemand, kann niemand",
-        "text": "Hier hat sich niemand die Verantwortung gewünscht und niemand Tiefe angegeben. Das ist die einzige Lage, die eine Entscheidung erzwingt: einstellen, beauftragen – oder bewusst lassen und sagen, dass es liegt."
+        "text": "Hier hat sich niemand die Verantwortung gewünscht und niemand Tiefe angegeben. Das ist die einzige Lage, die eine Entscheidung erzwingt: einstellen, beauftragen – oder bewusst offen lassen und das festhalten."
       },
       "openPosition": {
         "label": "Kann jemand, will niemand",
@@ -663,7 +663,7 @@
       },
       "handoverPath": {
         "label": "Übergabe möglich",
-        "text": "Einer will hineinwachsen, ein anderer hat Tiefe und will die Zuständigkeit nicht behalten. Das ist der angenehmste Fall: ein Weg, den man planen kann."
+        "text": "Einer will hineinwachsen, ein anderer hat Tiefe und will die Zuständigkeit nicht behalten. Das ist ein Übergang, den man planen kann."
       },
       "settled": {
         "label": "Verantwortet",

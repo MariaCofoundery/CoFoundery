@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
+import { PRODUCT_FULL_NAME, PRODUCT_NAME } from "@/features/brand";
 
 export function PublicConnectShell({ children }: { children: React.ReactNode }) {
   return <div className="min-h-screen bg-slate-50 text-slate-950">
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4 md:px-8">
-        <Link href="/" aria-label="CoFoundery">
+        <Link href="/" aria-label={PRODUCT_NAME}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/cofoundery-align-logo.svg" alt="CoFoundery Align" width={200} height={70} className="h-9 w-auto" />
+          <img src="/cofoundery-align-logo.svg" alt={PRODUCT_FULL_NAME} width={200} height={70} className="h-9 w-auto" />
         </Link>
         <PublicLanguageSwitcher />
       </div>

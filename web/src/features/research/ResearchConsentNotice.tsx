@@ -20,7 +20,7 @@ export function ResearchConsentNotice({ onDecision }: { onDecision: (state: Rese
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/30 p-4 backdrop-blur-sm md:items-center" role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/30 p-4 backdrop-blur-sm md:items-center print:hidden" role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="research-consent-title" aria-describedby="research-consent-body" className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl md:p-8">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
         <h2 id="research-consent-title" className="mt-3 text-2xl font-semibold text-slate-950">{t("title")}</h2>

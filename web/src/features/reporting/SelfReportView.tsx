@@ -61,6 +61,16 @@ type Props = {
   density?: SelfReportDensity;
   /** "4 Abschnitte" am eingeklappten Rand - sonst klickt niemand. */
   detailsHint?: ((count: number) => string) | null;
+  /**
+   * Der v1-Bericht als Altbestand - seit Phase 6 (01.10.2026).
+   *
+   * Er steht heute nur noch zugeklappt und datiert unter dem aktuellen
+   * Arbeitsprofil. Seine eigenen Ueberschriften sagten dabei weiter „So
+   * funktioniert dein Profil gerade" und „Dein aktueller Stand in 6
+   * Dimensionen" - mitten unter „Frühere Auswertung". Mit `legacy` sagen sie,
+   * was es ist. Der Inhalt bleibt, wie er gerechnet wurde.
+   */
+  legacy?: boolean;
 };
 
 type CoreParagraph = {
@@ -76,7 +86,7 @@ type InterpretationBlock = SelfReportMisreadingBlock;
 
 type LeverBlock = SelfReportLeverBlock;
 
-export function SelfReportView({ report, density = "full", detailsHint = null }: Props) {
+export function SelfReportView({ report, density = "full", detailsHint = null, legacy = false }: Props) {
   const chrome = getSelfReportChrome(report.locale);
   const reportContent = getReportContent(report.locale);
   const selection = buildSelfReportSelection(report.scoresA);
@@ -109,9 +119,13 @@ export function SelfReportView({ report, density = "full", detailsHint = null }:
               {chrome.sections.corePattern}
             </p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-900">
-              {chrome.sections.profileNow}
+              {legacy ? chrome.sections.profileThen : chrome.sections.profileNow}
             </h2>
-            <DimensionOverview scores={report.scoresA} locale={report.locale} />
+            <DimensionOverview
+              scores={report.scoresA}
+              locale={report.locale}
+              title={legacy ? chrome.labels.dimensionOverviewTitleThen : undefined}
+            />
             <div className="mt-5 space-y-4">
               {coreParagraphs.map((paragraph) => (
                 <article key={paragraph.text} className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">

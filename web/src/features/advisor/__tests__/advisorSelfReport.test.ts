@@ -128,7 +128,15 @@ test("die Person schreibt ihr Abbild selbst - und es darf fehlschlagen", () => {
 test("die Anzeige nennt den Stand und zeigt nichts ohne Werte", () => {
   const page = codeOnly(PAGE);
   assert.match(page, /hasUsableAlignment\(alignment\)/);
-  assert.match(page, /alignmentAsOf/);
+  assert.match(page, /legacyTitle/);
+
+  // Seit Phase 6: nie als „aktueller Stand". Der fruehere Bericht steht
+  // zugeklappt NACH dem aktuellen Arbeitsprofil, und seine Ueberschriften
+  // sagen, dass er frueher ist.
+  assert.match(page, /<SelfReportView[\s\S]{0,400}density="summary"\s+legacy/);
+  assert.ok(page.indexOf("alignViews.map(") < page.indexOf("<SelfReportView"), "v1 steht vor dem Arbeitsprofil");
+  assert.match(page, /<details[^>]*>[\s\S]{0,600}legacyTitle/);
+  assert.ok(!/<details[^>]*\sopen/.test(page), "der fruehere Bericht ist aufgeklappt");
   // In der kurzen Dichte: Wer hier liest, entscheidet über Menschen - eine
   // Wand aus Text ist dabei kein Vorteil.
   assert.match(page, /density="summary"/);

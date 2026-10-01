@@ -14,15 +14,28 @@ test("Connect photos use an explicit private projection and never imply public p
   assert.doesNotMatch(migration, /network_profile_images[^\n]*public_read|for select to (public|anon)/);
 });
 
-test("only the neutral avatar library is explicitly reusable from the public Founder avatar contract", () => {
+test("the base photo reaches Connect only as a Connect-owned copy, never as the private original", () => {
+  // Bis Phase 6 liess sich nur eine Bibliotheks-Illustration uebernehmen. Seit
+  // dem 01.10.2026 auch ein eigenes Basisfoto - als KOPIE im Connect-Eimer.
+  // Das Original bleibt im privaten avatars-Eimer und wird nie auf Connect
+  // verwiesen.
   const actions = source("src/features/connect/connectActions.ts");
+  const copy = source("src/features/connect/connectBasePhoto.ts");
   const field = source("src/features/connect/ConnectPhotoField.tsx");
   assert.match(field, /photo_choice/);
   assert.match(field, /choice === "existing"/);
-  assert.match(actions, /normalizeAvatarId\(base\?\.avatar_id\)/);
-  assert.doesNotMatch(actions, /storage\.from\("avatars"\)\.download|profile_copy/);
+  assert.match(actions, /connectValuesForBasePhoto\(client, user\.id, base\)/);
+  assert.doesNotMatch(actions, /storage\.from\("avatars"\)/);
   assert.match(actions, /CONNECT_PHOTO_BUCKET/);
   assert.doesNotMatch(actions, /update[\s\S]{0,80}profiles[\s\S]{0,80}avatar_url/);
+
+  // Gelesen wird das Original nur unter dem eigenen Praefix, geschrieben nur in
+  // den Connect-Eimer, und nie als oeffentliche oder signierte URL.
+  assert.match(copy, /source\.startsWith\(`\$\{userId\}\/`\)/);
+  assert.match(copy, /storage\.from\("avatars"\)\.download\(source\)/);
+  assert.doesNotMatch(copy, /storage\.from\("avatars"\)\.(upload|remove|update|move|copy)/);
+  assert.doesNotMatch(copy, /getPublicUrl|createSignedUrl/);
+  assert.doesNotMatch(copy, /\.from\("profiles"\)/);
 });
 
 test("photo removal and replacement clean only owner Connect objects", () => {

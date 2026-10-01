@@ -14,6 +14,7 @@ import { getConnectAttentionCount, getMessagesAttentionCount } from "@/features/
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
+import { PRODUCT_FULL_NAME } from "@/features/brand";
 
 type Props = {
   children: React.ReactNode;
@@ -522,7 +523,7 @@ export function ProductShell({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/cofoundery-align-logo.svg"
-                  alt="CoFoundery Align"
+                  alt={PRODUCT_FULL_NAME}
                   width={200}
                   height={70}
                   className="block h-8 w-auto shrink-0 md:h-9"

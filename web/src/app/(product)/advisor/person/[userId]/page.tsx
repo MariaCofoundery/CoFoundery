@@ -82,6 +82,7 @@ export default async function AdvisorPersonPage({
   // Freigabe eine Aussage ueber den Menschen machen, ein Schloss waere eine
   // Aufforderung, danach zu fragen.
   const alignmentV21 = await getAdvisorAlignmentV21(userId);
+  const hasLegacy = hasUsableAlignment(alignment);
   const alignViews = await getAdvisorAlignViews(userId);
 
   return (
@@ -129,39 +130,71 @@ export default async function AdvisorPersonPage({
       ) : null}
 
       {/* ----------------------------------------------------------------
-          Das Selbstbild aus dem Fragebogen.
+          DER AKTUELLE STAND ZUERST - SEIT PHASE 6 (01.10.2026)
 
-          DIE ZAHLEN SIND FREIGEGEBEN, DIE ANTWORTEN NICHT. Was hier steht,
-          entsteht aus einem abgelegten Abbild (Migration 20261047120000) -
-          die Rohantworten sieht niemand ausser der Person selbst, auch nach
-          dieser Freigabe nicht.
+          Vorher stand hier der v1-Bericht: „So funktioniert dein Profil
+          gerade", „Dein aktueller Stand in 6 Dimensionen" - als Hauptinhalt,
+          auch wenn es laengst ein Arbeitsprofil gab, und erst recht, wenn
+          dafuer keine Freigabe vorlag. Ein Advisor las das als heutigen Stand.
 
-          IN DER KURZEN DICHTE, wie im Gesamtbild: Das Kernmuster offen, die
-          Ausfuehrungen eingeklappt. Wer hier liest, entscheidet ueber
-          Menschen - eine Wand aus Text ist dabei kein Vorteil.
+          Jetzt: die freigegebenen ALIGN-Ansichten hier oben, der v1-Bericht
+          zugeklappt und datiert ganz unten.
           ---------------------------------------------------------------- */}
-      {hasUsableAlignment(alignment) && alignment ? (
-        <section className="mt-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("alignment")}</h2>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            {alignment.updatedAt
-              ? t("alignmentAsOf", {
-                  date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-                    new Date(alignment.updatedAt)
-                  ),
-                })
-              : t("alignmentNoDate")}
+      {alignViews.map((view) => (
+        <section key={view.scope} className="mt-8">
+          <h2 className="text-xl font-semibold text-slate-950">
+            {view.label}
+            {view.ventureName && (
+              <span className="ml-2 text-base font-normal text-slate-500">
+                · {view.ventureName}
+              </span>
+            )}
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
+          {/* Die Gueltigkeitsangabe kommt aus der Registratur und ist dort
+              nur auf Deutsch hinterlegt. Sie ist Inhalt des Instruments, kein
+              Oberflaechentext - sie hier zu uebersetzen hiesse, sie zu
+              verdoppeln. */}
+          <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {tAlign("visible", { count: view.visible.count, of: view.visible.of })}
           </p>
-          <div className="mt-3">
-            <SelfReportView
-              report={buildAdvisorSelfReport({
-                alignment,
-                locale,
-                name: view.base?.displayName ?? t("unnamed"),
-              })}
-              density="summary"
-            />
+
+          <div className="mt-6">
+            <WorkMap sections={view.sections} />
           </div>
+
+          {/* DIESELBE BESCHREIBUNG - UND NUR UEBER DAS FREIGEGEBENE.
+
+              `view.sections` enthaelt genau die Antworten, die diese Person
+              freigegeben hat; nicht freigegebene kommen gar nicht erst mit
+              (die Policies entscheiden das, nicht diese Seite). Die
+              Beschreibung entsteht aus derselben Liste - es gibt also keinen
+              Weg, ueber eine Zusammenfassung mehr zu erfahren als ueber die
+              Antworten selbst. */}
+          <div className="mt-6">
+            <WorkProfileSynthesisView sections={view.sections} heading="h3" />
+          </div>
+
+          <div className="mt-6">
+            <ReportViewV21 sections={view.sections} />
+          </div>
+        </section>
+      ))}
+
+      {/* KEINE FREIGABE - NEUTRAL GESAGT, UND NUR NEBEN DEM ALTBESTAND.
+
+          Die Regel dieser Seite gilt weiter: Was nicht freigegeben ist,
+          erscheint gar nicht. Mit EINER Ausnahme: Liegt ein frueherer Bericht
+          vor, das aktuelle Arbeitsprofil aber nicht, steht hier ein Satz.
+          Sonst waere der fruehere Bericht das Einzige, was nach „wie sie
+          arbeitet" aussieht - und genau das hat ihn zum aktuellen Stand
+          gemacht. Der Satz sagt nichts ueber den Menschen: nicht, ob das
+          Profil ausgefuellt ist, und keine Aufforderung, danach zu fragen. */}
+      {hasLegacy && !alignViews.some((entry) => entry.scope === "founder_profile") ? (
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-slate-900">{t("workProfileTitle")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">{t("workProfileNotShared")}</p>
         </section>
       ) : null}
 
@@ -267,47 +300,51 @@ export default async function AdvisorPersonPage({
         </section>
       )}
 
-      {alignViews.map((view) => (
-        <section key={view.scope} className="mt-10">
-          <h2 className="text-xl font-semibold text-slate-950">
-            {view.label}
-            {view.ventureName && (
-              <span className="ml-2 text-base font-normal text-slate-500">
-                · {view.ventureName}
-              </span>
-            )}
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
-          {/* Die Gueltigkeitsangabe kommt aus der Registratur und ist dort
-              nur auf Deutsch hinterlegt. Sie ist Inhalt des Instruments, kein
-              Oberflaechentext - sie hier zu uebersetzen hiesse, sie zu
-              verdoppeln. */}
-          <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
-          <p className="mt-1 text-sm text-slate-500">
-            {tAlign("visible", { count: view.visible.count, of: view.visible.of })}
-          </p>
+      {/* ----------------------------------------------------------------
+          DER FRUEHERE BERICHT (v1) - GETRENNT, DATIERT, ZUGEKLAPPT.
 
-          <div className="mt-6">
-            <WorkMap sections={view.sections} />
+          DIE ZAHLEN SIND FREIGEGEBEN, DIE ANTWORTEN NICHT. Was hier steht,
+          entsteht aus einem abgelegten Abbild (Migration 20261047120000) -
+          die Rohantworten sieht niemand ausser der Person selbst, auch nach
+          dieser Freigabe nicht.
+
+          Nie als „aktueller Stand": Die Ueberschrift nennt das Datum, die
+          eigenen Ueberschriften des Berichts sagen `legacy`, und er wird mit
+          dem Arbeitsprofil weder verrechnet noch verglichen. IN DER KURZEN
+          DICHTE, wie im Gesamtbild.
+          ---------------------------------------------------------------- */}
+      {hasLegacy && alignment ? (
+        <details className="group mt-10 rounded-2xl border border-slate-200 bg-white/70">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 [&::-webkit-details-marker]:hidden">
+            <span aria-hidden className="text-slate-400 transition-transform group-open:rotate-90 motion-reduce:transition-none">▸</span>
+            <span>
+              {alignment.updatedAt
+                ? t("legacyTitle", {
+                    date: new Intl.DateTimeFormat(locale, {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }).format(new Date(alignment.updatedAt)),
+                  })
+                : t("legacyTitleNoDate")}
+            </span>
+          </summary>
+          <div className="px-4 pb-5">
+            <p className="max-w-3xl text-sm leading-6 text-slate-600">{t("legacyText")}</p>
+            <div className="mt-4">
+              <SelfReportView
+                report={buildAdvisorSelfReport({
+                  alignment,
+                  locale,
+                  name: view.base?.displayName ?? t("unnamed"),
+                })}
+                density="summary"
+                legacy
+              />
+            </div>
           </div>
-
-          {/* DIESELBE BESCHREIBUNG - UND NUR UEBER DAS FREIGEGEBENE.
-
-              `view.sections` enthaelt genau die Antworten, die diese Person
-              freigegeben hat; nicht freigegebene kommen gar nicht erst mit
-              (die Policies entscheiden das, nicht diese Seite). Die
-              Beschreibung entsteht aus derselben Liste - es gibt also keinen
-              Weg, ueber eine Zusammenfassung mehr zu erfahren als ueber die
-              Antworten selbst. */}
-          <div className="mt-6">
-            <WorkProfileSynthesisView sections={view.sections} heading="h3" />
-          </div>
-
-          <div className="mt-6">
-            <ReportViewV21 sections={view.sections} />
-          </div>
-        </section>
-      ))}
+        </details>
+      ) : null}
 
       {/* DIE HANDAKTE GANZ UNTEN - nach allem, worueber sie handelt. Sie
           gehoert dem Advisor und war nie fuer die begleitete Person

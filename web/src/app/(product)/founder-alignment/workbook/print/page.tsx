@@ -10,6 +10,7 @@ import {
   resolveWorkbookContentSteps,
 } from "@/features/reporting/workbookContent/workbookContent";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { PRODUCT_FULL_NAME } from "@/features/brand";
 
 const DECISION_RULES_STEP_ID = "decision_rules";
 
@@ -162,7 +163,7 @@ export default async function FounderAlignmentWorkbookPrintPage({
                   className="h-9 w-auto max-w-[190px] print:h-7"
                 >
                   <span className="text-sm font-semibold tracking-[0.08em] text-slate-900">
-                    CoFoundery Align
+                    {PRODUCT_FULL_NAME}
                   </span>
                 </object>
                 <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-slate-500">

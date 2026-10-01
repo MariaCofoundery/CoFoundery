@@ -152,7 +152,7 @@
     "profileConfirm": "I want to publish my Connect profile publicly with these details.",
     "listingConfirm": "I want to publish this listing publicly with these details.",
     "publicFields": "Publicly visible:",
-    "profileFields": "Name, headline, about text, Connect roles, expertise, industries & topics, region and – only with separate permission – your photo.",
+    "profileFields": "Name, headline, about text, Connect roles, expertise, industries & topics, region. No photo – public pages always show your initials.",
     "listingFields": "Direction, category, title, context, topics, industries, geographic and content timeframe plus a limited owner identity.",
     "openPublicPage": "View public page"
   },
@@ -315,7 +315,8 @@
       "helper": "Your profile photo appears inside CoFoundery on your Connect profile and Connect listings.",
       "fallbackName": "Connect member",
       "keep": "Keep current Connect photo",
-      "existing": "Use existing CoFoundery profile image",
+      "existing": "Use my existing profile photo",
+      "existingHint": "Connect gets its own copy. If you change or remove your photo under “About you”, Connect follows.",
       "none": "No profile photo",
       "upload": "Use a different image"
     },
@@ -380,7 +381,7 @@
     "incomplete": "Complete the required information before publishing.",
     "public_confirmation": "Please explicitly confirm public publication.",
     "save": "Could not save. Please check your details.",
-    "photo_reuse": "The existing profile image could not be copied securely.",
+    "photo_reuse": "Your profile photo could not be used. Check under “About you” that one is saved, or upload your own here.",
     "photo_upload": "The image could not be saved. Use JPG, PNG or WebP up to 2 MB.",
     "profile": "Publish your Connect profile first.",
     "too_many_topics": "Please enter no more than 8 topics or areas of expertise.",
