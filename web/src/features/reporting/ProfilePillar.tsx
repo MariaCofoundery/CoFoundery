@@ -1,26 +1,37 @@
 import type { ReactNode } from "react";
 
 /**
- * Eine der vier Saeulen des Gesamtbilds.
+ * Ein Abschnitt von "Das bist du".
  *
  * GEMELDET AM 24.09.2026: "Ich hatte mir jetzt noch mal das Profil angeschaut
  * und ich finde, da muessten viel mehr Sachen zusammengeklappt sein. [...] Es
  * ist viel zu erschlagend und es muesste bitte noch mal ein bisschen sortiert
  * werden. Auch gerne ein bisschen farbig."
  *
- * Vorher standen dreizehn gleich aussehende weisse Kaesten untereinander. Die
- * vier Saeulen waren in der Sprache laengst da - "Wer du bist", "Wie du
- * arbeitest", "Was du mitbringst", "Was dir wichtig ist" -, nur nicht als
- * Struktur sichtbar. Diese Huelle macht sie sichtbar.
+ * Vorher standen dreizehn gleich aussehende weisse Kaesten untereinander.
+ * Diese Huelle gibt jedem Teil einen Rahmen und eine Nummer.
  *
- * DIE FARBE SAGT "WELCHE SAEULE", NICHT "WIE GUT". Das ist der Grund, warum
+ * ---------------------------------------------------------------------------
+ * AUS VIER SAEULEN WURDEN NEUN ABSCHNITTE - AM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * Die vier Saeulen trugen sehr verschieden grosse Inhalte, und unter "Was du
+ * mitbringst" lagen vier verschiedene Fragen in einem Block. Jetzt tragen
+ * `ProfilePart` die drei Teile und diese Huelle die neun Abschnitte darin.
+ *
+ * Das `eyebrow` ist seitdem freiwillig: Wenn der Teil darueber schon sagt,
+ * worum es geht, waere es dasselbe Wort zweimal untereinander.
+ *
+ * DIE FARBE SAGT "WELCHER TEIL", NICHT "WIE GUT". Das ist der Grund, warum
  * sie nur am Rahmen sitzt - Augenbraue, Randlinie, Zaehler - und nie auf einer
  * Inhaltskarte. Innen bleiben Bernstein und Rose reserviert fuer ihre
- * Bedeutung (Bruchstelle, Luecke); waere die Saeule selbst bernsteinfarben,
+ * Bedeutung (Bruchstelle, Luecke); waere der Abschnitt selbst bernsteinfarben,
  * liesse sich beides nicht mehr unterscheiden.
  *
- * NUMMERIERT, weil eine Nummer sagt "vier Teile, du bist beim zweiten" - und
- * genau das fehlte: Die Seite hatte keinen erkennbaren Anfang und kein Ende.
+ * NUMMERIERT, weil eine Nummer sagt "neun Abschnitte, du bist beim zweiten" -
+ * und genau das fehlte: Die Seite hatte keinen erkennbaren Anfang und kein
+ * Ende. Es ist eine Position, kein Fortschritt: Es steht nirgends, wie viele
+ * davon "erledigt" sind.
  */
 
 export const PILLAR_TONES = ["slate", "indigo", "emerald", "violet"] as const;
@@ -60,10 +71,12 @@ export function ProfilePillar({
 }: {
   id: string;
   tone: PillarTone;
-  /** "2 von 4" - als fertiger Text, damit die Zaehlweise uebersetzbar bleibt. */
+  /** "2 von 9" - als fertiger Text, damit die Zaehlweise uebersetzbar bleibt. */
   step: string;
-  eyebrow: string;
-  title: string;
+  /** Darf fehlen, wenn der Teil darueber schon sagt, worum es geht. */
+  eyebrow?: string | null;
+  /** Darf fehlen, wenn der Teil darueber denselben Namen traegt. */
+  title?: string | null;
   intro?: string | null;
   children: ReactNode;
 }) {
@@ -79,14 +92,16 @@ export function ProfilePillar({
           <p
             className={`flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] ${toneClasses.eyebrow}`}
           >
-            {eyebrow}
+            {eyebrow ? <span>{eyebrow}</span> : null}
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-medium tracking-normal ${toneClasses.badge}`}
             >
               {step}
             </span>
           </p>
-          <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
+          {title ? (
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
+          ) : null}
           {intro ? (
             <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{intro}</p>
           ) : null}

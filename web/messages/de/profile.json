@@ -256,6 +256,83 @@
       "rolesNone": "Bisher keiner. Entweder sind die besprochenen Bereiche einkaufbar, oder du hast bei ihnen noch keinen Verantwortungswunsch angegeben.",
       "rolesOpen": "{count, plural, =1 {Ein weiterer Bereich gehört ins Team, du möchtest ihn aber nicht verantworten} other {# weitere Bereiche gehören ins Team, du möchtest sie aber nicht verantworten}} — das ist keine Lücke bei dir, sondern eine offene Frage im Vorhaben.",
       "rolesCaveat": "Das sagt nicht, wie gut du es kannst. Es sagt, dass du es übernehmen möchtest und dass es sich nicht einkaufen lässt."
-    }
+    },
+    "parts": {
+      "one": "Teil I",
+      "two": "Teil II",
+      "three": "Teil III",
+      "oneTitle": "Wer du bist",
+      "twoTitle": "Was du mitbringst",
+      "threeTitle": "Was dich antreibt"
+    },
+    "sections": {
+      "step": "{index} von {total}",
+      "about": "Über dich",
+      "work": "Wie du arbeitest",
+      "strengths": "Deine Stärken",
+      "capability": "Deine Fähigkeiten",
+      "depth": "Erfahrung & Tiefe",
+      "ownership": "Was du verantworten willst",
+      "growing": "Wohin du wachsen willst",
+      "resources": "Netzwerk, Zugänge & Ressourcen",
+      "direction": "Was dich antreibt"
+    },
+    "head": {
+      "intro": "Hier kommt zusammen, was du über dich als Founder festgehalten und erarbeitet hast — wie du arbeitest, was du mitbringst und was dich antreibt.",
+      "asOf": "Stand vom {date}",
+      "jumpTo": "Zu einem Abschnitt springen"
+    },
+    "depth": {
+      "intro": "Wie weit du in den eingetragenen Bereichen gekommen bist — nach deiner eigenen Einschätzung.",
+      "counts": "In {levelled} von {areas} eingetragenen Bereichen hast du eine Erfahrungsstufe angegeben.",
+      "depthTitle": "Hier hast du besonders viel praktische Erfahrung festgehalten",
+      "depthNone": "Du hast noch keinen Bereich auf den oberen Stufen eingetragen. Das ist eine Auskunft über deine Angaben, nicht über dich.",
+      "noLevels": "Du hast Bereiche eingetragen, aber noch keine Erfahrungsstufen.",
+      "detailsSummary": "Alle Bereiche mit ihrer Stufe"
+    },
+    "ownership": {
+      "intro": "Können und Wollen sind zwei verschiedene Dinge. Etwas gut zu können und es trotzdem lieber abzugeben, ist eine gültige Antwort — und oft die nützlichste.",
+      "detailsSummary": "Alle Bereiche nach deinem Wunsch",
+      "groups": {
+        "own": "Möchte ich verantwortlich übernehmen",
+        "contribute": "Möchte ich aktiv beitragen",
+        "handsOver": "Lieber eine andere Person oder extern",
+        "open": "Noch offen"
+      },
+      "empty": "Du hast noch nicht gesagt, was du davon verantworten willst."
+    },
+    "strengthsSection": {
+      "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
+      "detailsSummary": "Alle Stärken ansehen",
+      "more": "{count, plural, =1 {Eine weitere im Aufklapper} other {# weitere im Aufklapper}}",
+      "empty": "Hier sind noch keine bestätigten Stärken festgehalten.",
+      "emptyCta": "Stärken festhalten"
+    },
+    "directionSection": {
+      "detailsSummary": "Alle Aussagen mit ihrer Herkunft",
+      "empty": "Was dich antreibt, ist hier noch nicht festgehalten."
+    },
+    "resourcesSection": {
+      "empty": "Hier stehen Netzwerk, Zugänge und Angebote, sobald du welche bestätigt hast.",
+      "detailsSummary": "Woher diese Einträge stammen"
+    },
+    "ventures": {
+      "title": "Deine Vorhaben",
+      "text": "Was du zu einem Vorhaben festgehalten hast, gilt für dieses Vorhaben und einen Zeitraum — nicht für dich als Person. Deshalb steht es nicht hier.",
+      "cta": "Vorhaben ansehen"
+    },
+    "whatThisIs": {
+      "title": "Was diese Seite zeigt — und was nicht",
+      "text": "„Das bist du“ führt Angaben zusammen, die du selbst gemacht oder bestätigt hast. Es ist keine Bewertung deiner Persönlichkeit und keine Erfolgsprognose.",
+      "private": "Die Seite ist nur für dich sichtbar."
+    },
+    "origins": {
+      "own_words": "von dir geschrieben",
+      "confirmed_proposal": "aus einem Gespräch, von dir bestätigt",
+      "edited_proposal": "aus einem Gespräch, von dir umformuliert",
+      "self": "von dir eingetragen",
+      "model": "aus deinen Texten vorgeschlagen, von dir bestätigt"
+    },
+    "edit": "Bearbeiten"
   }
 }

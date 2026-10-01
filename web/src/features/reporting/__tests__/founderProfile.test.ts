@@ -97,13 +97,13 @@ test("die vierte Säule zeigt nur Bestätigtes - und keine Geschichten", () => {
   assert.match(page, /href="\/profile\/direction"/);
 });
 
-test("eine fehlende Saeule wird benannt, aber nicht mitgedruckt", () => {
+test("ein fehlender Abschnitt wird benannt, aber nicht mitgedruckt", () => {
   // Ein Profil, dem ohne Hinweis ein Drittel fehlt, sieht aus wie ein
   // vollstaendiges Profil einer Person, ueber die es wenig zu sagen gibt.
   // Im weitergegebenen Ausdruck waere der Hinweis dagegen eine Aufforderung
   // an die falsche Person.
   const page = codeOnly(PAGE);
-  assert.match(page, /MissingPillar/);
+  assert.match(page, /MissingSection/);
   // NACHGEZOGEN AM 24.09.2026: Hier stand der vollstaendige Klassenname
   // samt `mt-6`. Den Abstand setzt seit dem Umbau die Saeule, nicht mehr
   // der Hinweis - der Test fiel damit ueber eine Aenderung, die mit
@@ -236,20 +236,83 @@ const COVERAGE_VIEW = "src/features/reporting/CoverageMap.tsx";
 const COVERAGE_DATA = "src/features/reporting/founderProfileCoverage.ts";
 const REPORT_PAGE = "src/features/reporting/IndividualReportPageContent.tsx";
 
-test("die Seite steht in vier Saeulen, jede mit eigener Farbe", () => {
+test("die Seite steht in drei Teilen mit neun Abschnitten", () => {
   const page = codeOnly(PAGE);
 
-  // Die Saeulen waren in der Sprache laengst da, nur nie als Struktur.
-  const tones = [...page.matchAll(/tone: "(\w+)"/g)].map((match) => match[1]);
-  assert.deepEqual(tones, ["slate", "indigo", "emerald", "violet"]);
+  // UMGEBAUT AM 01.10.2026. Vorher vier Saeulen - sie trugen sehr verschieden
+  // grosse Inhalte, und unter "Was du mitbringst" lagen vier verschiedene
+  // Fragen in einem Block.
+  assert.equal([...page.matchAll(/<ProfilePart/g)].length, 3);
 
-  // Und sie sind einmal als Daten beschrieben, damit der Ueberblick oben und
-  // die Abschnitte darunter nicht auseinanderlaufen koennen.
-  assert.equal([...page.matchAll(/<ProfilePillar/g)].length, 4);
-  assert.match(page, /pillars\.map\(/);
-  for (const index of [0, 1, 2, 3]) {
-    assert.match(page, new RegExp(`id=\\{pillars\\[${index}\\]\\.id\\}`));
+  // Die Abschnitte stehen einmal als Daten. Der Sprungbalken oben und die
+  // Ueberschriften darunter duerfen nicht auseinanderlaufen.
+  const ids = [...page.matchAll(/id: "([a-z-]+)", title: t\("sections\.\w+"\)/g)].map(
+    (treffer) => treffer[1],
+  );
+  assert.deepEqual(ids, [
+    "ueber-dich",
+    "arbeitsweise",
+    "staerken",
+    "faehigkeiten",
+    "erfahrung",
+    "verantwortung",
+    "entwicklung",
+    "ressourcen",
+    "antrieb",
+  ]);
+  assert.match(page, /\.filter\(\(section\) => zeigt\[section\.id\]\)/);
+
+  // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe.
+  const tones = [...page.matchAll(/tone="(\w+)"/g)].map((treffer) => treffer[1]);
+  assert.deepEqual([...new Set(tones)].sort(), ["emerald", "indigo", "violet"]);
+});
+
+test("kein Abschnitt hat zwei Aufklapper ineinander", () => {
+  // Zwei verschachtelte Ebenen haetten dasselbe Problem wie vorher die
+  // dreizehn weissen Kaesten: Man sieht nicht, was offen ist, und klappt am
+  // Ende alles auf.
+  const page = codeOnly(PAGE);
+  let tiefe = 0;
+  for (const treffer of page.matchAll(/<ProfileDetails|<\/ProfileDetails>/g)) {
+    tiefe += treffer[0].startsWith("</") ? -1 : 1;
+    assert.ok(tiefe <= 1, "ein Aufklapper steckt in einem anderen");
   }
+  assert.equal(tiefe, 0, "ein Aufklapper ist nicht geschlossen");
+});
+
+test("der Stand kommt aus allen Quellen - oder gar nicht", () => {
+  const page = codeOnly(PAGE);
+  // Nicht aus einem Fragebogen: Wer gestern seine Faehigkeiten ueberarbeitet
+  // und den Bogen vor einem halben Jahr abgegeben hat, laese sonst
+  // "Stand: vor sechs Monaten" ueber einem Bild von gestern.
+  assert.match(page, /getProfileFreshness\(supabase, user\.id\)/);
+  assert.match(page, /freshness\s*\?/);
+
+  const quelle = codeOnly("src/features/reporting/profileFreshness.ts");
+  for (const tabelle of [
+    "person_core",
+    "person_capability_entries",
+    "person_strengths",
+    "direction_statements",
+    "person_resources",
+    "assessments",
+  ]) {
+    assert.ok(quelle.includes(`"${tabelle}"`), `${tabelle} zaehlt nicht mit`);
+  }
+  // Lieber kein Stand als ein falscher.
+  assert.match(quelle, /if \(gueltig\.length === 0\) return null/);
+});
+
+test("Venture-Angaben bleiben draussen - bis auf Namen und Weg dorthin", () => {
+  const page = codeOnly(PAGE);
+  // Was zu einem Vorhaben festgehalten ist, gilt fuer DIESES Vorhaben und
+  // einen Zeitraum. Ein Profil mit Venture-Zusagen darin vermischt beides.
+  assert.match(page, /findVentures/);
+  assert.match(page, /ventures\.text/);
+  assert.ok(
+    !/venture_alignment|getScopeReport\(user\.id, "venture/.test(page),
+    "die Seite liest Venture-Antworten",
+  );
 });
 
 test("die Farbe sagt, welche Saeule - nicht, wie gut", () => {
@@ -283,22 +346,22 @@ test("die Ausfuehrungen sind eingeklappt, die Zusammenfassung nicht", () => {
   assert.ok(!report.includes("summaryText"), "keine eigene Kurzfassung der Texte");
 });
 
-test("die eigene Bereichsliste ist eingeklappt, die Auswertung steht offen", () => {
+test("die Landkarte steht offen, die eigene Liste im Aufklapper", () => {
   const page = codeOnly(PAGE);
 
-  // Genau die Reihenfolge, nach der gefragt wurde: erst das Bild, dann die
-  // Auswertung, und die eigenen Antworten auf Wunsch.
+  // Abschnitt 4 zeigt die Deckungskarte, Abschnitt 5 die Liste mit den
+  // Stufen - in dieser Reihenfolge, und die Liste eingeklappt.
   const map = page.indexOf("<CoverageMap");
-  const readout = page.indexOf("<CapabilityReadoutSection");
-  // NACHGEZOGEN AM 30.09.2026: Hier stand `indexOf("<ProfileDetails")`. Seit
-  // die Saeule "Wie du arbeitest" ihre Antworten ebenfalls einklappt, findet
-  // das den falschen Aufklapper - einen, der weiter oben auf der Seite steht.
-  // Gemeint war immer der um die eigene Bereichsliste.
   const liste = page.indexOf("<FounderProfileCapability");
   const details = page.lastIndexOf("<ProfileDetails", liste);
-  assert.ok(map > 0 && readout > map, "die Auswertung folgt auf die Karte");
-  assert.ok(details > readout, "die eigene Liste steht zuletzt und eingeklappt");
-  assert.match(page, /<ProfileDetails[\s\S]{0,400}<FounderProfileCapability/);
+  assert.ok(map > 0 && liste > map, "die Liste steht vor der Karte");
+  assert.ok(details > map, "die eigene Liste steht nicht in einem Aufklapper");
+
+  // Die Rollen nach Faltin sind ein eigener Abschnitt, nicht mehr ein
+  // Anhaengsel unter der Karte: Worueber gesprochen wurde und was jemand
+  // uebernehmen will, sind zwei Fragen.
+  assert.match(page, /<CoverageRoles/);
+  assert.ok(page.indexOf("<CoverageRoles") > map, "die Rollen stehen vor der Karte");
 });
 
 test("die Voreinstellung bleibt ausfuehrlich - die Berichtsseite aendert sich nicht", () => {
@@ -400,7 +463,7 @@ test("der alte Bericht steht darunter, datiert und zugeklappt - und wird nicht v
   assert.match(page, /legacyReport\.dated/);
   // Und er steht NACH dem neuen Bogen. Wer zuerst die alte Auswertung sieht,
   // haelt sie fuer die Hauptsache.
-  const neu = page.indexOf("workProfile.title");
+  const neu = page.indexOf("workProfile.intro");
   const alt = page.indexOf("legacyReport.title");
   assert.ok(neu > 0 && alt > neu, "der Altbestand steht vor dem aktuellen Bogen");
 
@@ -413,12 +476,18 @@ test("der alte Bericht steht darunter, datiert und zugeklappt - und wird nicht v
 test("die kleinen Ableitungen zeigen nur Bestaetigtes und behaupten keine Luecke", () => {
   const page = codeOnly(PAGE);
 
-  // "Wohin du wachsen willst" steht eigenstaendig - und deshalb nicht noch
-  // einmal in der Auswertung daneben.
-  assert.match(page, /growingInto\.title/);
-  assert.match(page, /finding\.key !== "growingInto"/);
-  // Kein Leerzustand: Nichts ist eine gueltige Antwort.
-  assert.match(page, /growingInto\.length > 0 \? \(/);
+  // "Wohin du wachsen willst" ist ein eigener Abschnitt - und entfaellt
+  // ganz, wenn nichts da ist. Kein Leerzustand: Nichts ist eine gueltige
+  // Antwort, und "hier koennte stehen, woran du arbeitest" waere die
+  // Aufforderung, sich etwas vorzuwerfen.
+  assert.match(page, /growingInto\.intro/);
+  assert.match(page, /entwicklung: growingInto\.length > 0/);
+
+  // Von den fuenf Befunden der Auswertung steht genau einer auf der Seite:
+  // "kann es, will es abgeben". Die anderen sagen dasselbe wie die Gruppen,
+  // nur gedeutet.
+  assert.match(page, /finding\.key === "canButHandsOver"/);
+  assert.ok(!/<CapabilityReadoutSection/.test(page), "die gedeutete Auswertung steht wieder da");
 
   // Ressourcen: nur `confirmed`. Ein offener Vorschlag ist eine
   // Modellbehauptung und darf nicht wie eine Aussage der Person aussehen.

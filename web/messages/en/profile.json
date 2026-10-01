@@ -256,6 +256,83 @@
       "rolesNone": "None so far. Either the areas you discussed are buyable, or you have not yet said whether you want to own them.",
       "rolesOpen": "{count, plural, =1 {One more area belongs on the team, but you do not want to own it} other {# more areas belong on the team, but you do not want to own them}} — that is not a gap in you, it is an open question in the venture.",
       "rolesCaveat": "This does not say how good you are at it. It says you want to take it on, and that it cannot be bought in."
-    }
+    },
+    "parts": {
+      "one": "Part I",
+      "two": "Part II",
+      "three": "Part III",
+      "oneTitle": "Who you are",
+      "twoTitle": "What you bring",
+      "threeTitle": "What drives you"
+    },
+    "sections": {
+      "step": "{index} of {total}",
+      "about": "About you",
+      "work": "How you work",
+      "strengths": "Your strengths",
+      "capability": "Your capabilities",
+      "depth": "Experience & depth",
+      "ownership": "What you want to own",
+      "growing": "Where you want to grow",
+      "resources": "Network, access & resources",
+      "direction": "What drives you"
+    },
+    "head": {
+      "intro": "This brings together what you have recorded and worked out about yourself as a founder — how you work, what you bring and what drives you.",
+      "asOf": "As of {date}",
+      "jumpTo": "Jump to a section"
+    },
+    "depth": {
+      "intro": "How far you have come in the areas you entered — by your own assessment.",
+      "counts": "You gave an experience level in {levelled} of {areas} areas you entered.",
+      "depthTitle": "Here you recorded a lot of hands-on experience",
+      "depthNone": "You have not entered any area at the upper levels yet. That says something about your entries, not about you.",
+      "noLevels": "You entered areas, but no experience levels yet.",
+      "detailsSummary": "All areas with their level"
+    },
+    "ownership": {
+      "intro": "Being able to do something and wanting to own it are two different things. Being good at something and still handing it over is a valid answer — often the most useful one.",
+      "detailsSummary": "All areas by what you want",
+      "groups": {
+        "own": "I want to own this",
+        "contribute": "I want to contribute actively",
+        "handsOver": "Rather someone else, or external",
+        "open": "Still open"
+      },
+      "empty": "You have not said yet what you want to own."
+    },
+    "strengthsSection": {
+      "intro": "Ways of working from situations you told — with your own assessment and what you assume others would say.",
+      "detailsSummary": "See all strengths",
+      "more": "{count, plural, =1 {One more in the panel} other {# more in the panel}}",
+      "empty": "No confirmed strengths recorded here yet.",
+      "emptyCta": "Record strengths"
+    },
+    "directionSection": {
+      "detailsSummary": "All statements with their origin",
+      "empty": "What drives you is not recorded here yet."
+    },
+    "resourcesSection": {
+      "empty": "Network, access and offers appear here once you confirm some.",
+      "detailsSummary": "Where these entries come from"
+    },
+    "ventures": {
+      "title": "Your ventures",
+      "text": "What you recorded about a venture holds for that venture and a period of time — not for you as a person. That is why it is not here.",
+      "cta": "See ventures"
+    },
+    "whatThisIs": {
+      "title": "What this page shows — and what it does not",
+      "text": "“This is you” brings together what you stated or confirmed yourself. It is not an assessment of your personality and not a prediction of success.",
+      "private": "This page is visible only to you."
+    },
+    "origins": {
+      "own_words": "written by you",
+      "confirmed_proposal": "from a conversation, confirmed by you",
+      "edited_proposal": "from a conversation, rewritten by you",
+      "self": "entered by you",
+      "model": "suggested from your texts, confirmed by you"
+    },
+    "edit": "Edit"
   }
 }

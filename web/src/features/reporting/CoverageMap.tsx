@@ -47,13 +47,6 @@ export function CoverageMap({
     familyCount: (entered: number, total: number) => string;
     familyUnspoken: string;
     basis: string;
-    /** Welche Rollen abgedeckt sind - nach Faltin. */
-    rolesTitle: string;
-    rolesIntro: string;
-    rolesNone: string;
-    rolesOpen: (count: number) => string;
-    rolesCaveat: string;
-    areaLabel: (areaId: string) => string;
   };
 }) {
   if (coverage.enteredCount === 0) return null;
@@ -113,53 +106,85 @@ export function CoverageMap({
         ))}
       </ul>
 
-      {/* ------------------------------------------------------------------
-          Welche Rollen abgedeckt sind.
-
-          NACH FALTIN, und erst zwei Bedingungen zusammen sagen etwas: Der
-          Bereich gehoert ins Team - was einkaufbar ist, braucht dort
-          niemanden -, UND die Person will ihn verantworten. Etwas zu koennen
-          ist nicht dasselbe wie es zu uebernehmen.
-
-          KEINE NOTE. Die Anwendungsstufe wird hier nicht verrechnet; eine
-          "Rollendeckung" mit einer Zahl waere wieder eine Bewertung von
-          Menschen. Es ist eine Liste, keine Punktzahl.
-          ------------------------------------------------------------------ */}
-      <div className="mt-6 border-t border-slate-200 pt-5">
-        <h3 className="text-sm font-semibold text-slate-900">{copy.rolesTitle}</h3>
-        <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{copy.rolesIntro}</p>
-
-        {coverage.roles.covered.length > 0 ? (
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {coverage.roles.covered.map((areaId) => (
-              <li
-                key={areaId}
-                className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-900"
-              >
-                {copy.areaLabel(areaId)}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-3 text-sm leading-6 text-slate-500">{copy.rolesNone}</p>
-        )}
-
-        {/* Besprochen, gehoert ins Team - und niemand will es uebernehmen.
-            Das ist keine Luecke im Menschen, sondern eine offene Frage im
-            Vorhaben, und sie gehoert genannt. */}
-        {coverage.roles.spokenNotOwned.length > 0 ? (
-          <p className="mt-3 text-xs leading-5 text-slate-500">
-            {copy.rolesOpen(coverage.roles.spokenNotOwned.length)}
-          </p>
-        ) : null}
-
-        <p className="mt-3 text-xs leading-5 text-slate-500">{copy.rolesCaveat}</p>
-      </div>
-
       {/* Worauf die Karte beruht, gehoert darunter - sonst liest sie sich als
           Befund ueber einen Menschen statt als Auskunft ueber den Umfang
           seiner eigenen Angaben. */}
       <p className="mt-4 text-xs leading-5 text-slate-500">{copy.basis}</p>
+    </div>
+  );
+}
+
+/**
+ * Welche Rollen abgedeckt sind - nach Faltin.
+ *
+ * ---------------------------------------------------------------------------
+ * EIGENE KOMPONENTE SEIT DEM 01.10.2026
+ * ---------------------------------------------------------------------------
+ *
+ * Sie stand bis dahin unter der Deckungskarte, im selben Kasten. Auf der neuen
+ * Seite sind das zwei verschiedene Abschnitte: Die Karte sagt, worueber
+ * gesprochen wurde, die Rollen sagen, was jemand uebernehmen will. Das ist
+ * nicht dieselbe Frage, und beides untereinander in einem Rahmen liest sich,
+ * als waere es eine.
+ *
+ * ---------------------------------------------------------------------------
+ * ZWEI BEDINGUNGEN, UND ERST ZUSAMMEN SAGEN SIE ETWAS
+ * ---------------------------------------------------------------------------
+ *
+ * Der Bereich gehoert ins Team - was einkaufbar ist, braucht dort niemanden -,
+ * UND die Person will ihn verantworten. Etwas zu koennen ist nicht dasselbe
+ * wie es zu uebernehmen.
+ *
+ * KEINE NOTE. Die Anwendungsstufe wird hier nicht verrechnet; eine
+ * "Rollendeckung" mit einer Zahl waere wieder eine Bewertung von Menschen. Es
+ * ist eine Liste, keine Punktzahl.
+ */
+export function CoverageRoles({
+  coverage,
+  copy,
+}: {
+  coverage: Coverage;
+  copy: {
+    rolesTitle: string;
+    rolesIntro: string;
+    rolesNone: string;
+    rolesOpen: (count: number) => string;
+    rolesCaveat: string;
+    areaLabel: (areaId: string) => string;
+  };
+}) {
+  if (coverage.enteredCount === 0) return null;
+
+  return (
+    <div className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+      <h3 className="text-base font-semibold text-slate-900">{copy.rolesTitle}</h3>
+      <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{copy.rolesIntro}</p>
+
+      {coverage.roles.covered.length > 0 ? (
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {coverage.roles.covered.map((areaId) => (
+            <li
+              key={areaId}
+              className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-900"
+            >
+              {copy.areaLabel(areaId)}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm leading-6 text-slate-500">{copy.rolesNone}</p>
+      )}
+
+      {/* Besprochen, gehoert ins Team - und niemand will es uebernehmen.
+          Das ist keine Luecke im Menschen, sondern eine offene Frage im
+          Vorhaben, und sie gehoert genannt. */}
+      {coverage.roles.spokenNotOwned.length > 0 ? (
+        <p className="mt-3 text-xs leading-5 text-slate-500">
+          {copy.rolesOpen(coverage.roles.spokenNotOwned.length)}
+        </p>
+      ) : null}
+
+      <p className="mt-3 text-xs leading-5 text-slate-500">{copy.rolesCaveat}</p>
     </div>
   );
 }
