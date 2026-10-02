@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendFeedbackNotification } from "@/lib/email/sendFeedbackNotification";
 import {
   sanitizeProductFeedbackSubmission,
   type ProductFeedbackSubmissionInput,
@@ -47,6 +48,17 @@ export async function submitProductFeedbackAction(
 
   if (error) {
     return { ok: false, reason: "insert_failed" };
+  }
+
+  // The insert is complete. Notification failures must never change its result.
+  try {
+    const notification = await sendFeedbackNotification({ ...value, userId: user.id });
+    if (!notification.ok) {
+      console.warn("[feedback] notification_not_sent", notification.error);
+    }
+  } catch {
+    // Do not log provider exceptions: they can contain feedback or addresses.
+    console.warn("[feedback] notification_not_sent", "unexpected_mail_error");
   }
 
   return { ok: true };
