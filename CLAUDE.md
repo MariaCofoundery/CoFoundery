@@ -34,7 +34,7 @@ cd web
 node --import ./scripts/register-ts-alias.mjs --test --experimental-strip-types <path-to-test-file> [more files...]
 ```
 
-`npm run test:founder-compat` is a hardcoded fast subset (scoring/reporting/questionnaire) for work on the compatibility model — a convenience, not a gate. Nothing is gated: **there is no CI in this repo** (no GitHub Actions workflow, no `vercel.json`), so no test, typecheck or lint runs automatically on push, and Vercel deploys `main` on a successful `next build` alone. `npm run ci:check` is the manual stand-in and has to actually be run.
+`npm run test:founder-compat` is a hardcoded fast subset (scoring/reporting/questionnaire) for work on the compatibility model — a convenience, not a gate. Nothing is gated: **there is no CI in this repo** (no GitHub Actions workflow), so no test, typecheck or lint runs automatically on push, and Vercel deploys `main` on a successful `next build` alone. `npm run ci:check` is the manual stand-in and has to actually be run. `web/vercel.json` exists and configures the daily CONNECT suggestion cron (`0 7 * * *`); it is not a CI test gate.
 
 Supabase/DB logic is tested separately with pgTAP suites in `supabase/tests/*.sql` (see below).
 

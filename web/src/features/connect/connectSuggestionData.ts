@@ -5,18 +5,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ConnectProfile } from "./connectTypes";
 
 /**
- * Die Vorschlaege an mich.
- *
- * ERZEUGT WERDEN SIE BEIM HINSEHEN. Es gibt in diesem Projekt keinen Cron, und
- * eine Handvoll Mengenschnitte braucht keinen: `generate_connect_suggestions`
- * laeuft, wenn jemand die Seite oeffnet, und legt hoechstens drei je Woche an.
- * Wer nicht hinsieht, bekommt auch keine - genau das heisst "nur in der
- * Plattform".
- *
- * Nichts davon geht per Mail hinaus. Dafuer gibt es (noch) keinen Weg, und das
- * ist Absicht: Ein Vorschlag geht nicht von einem Menschen aus, der sich
- * gemeldet hat - "an, bis man es abbestellt" waere hier die falsche
- * Voreinstellung. Der Schalter kommt zusammen mit dem Mailweg.
+ * Vorschläge entstehen beim Öffnen der Seite und durch den täglichen,
+ * authentifizierten CONNECT-Cron. Die vorhandene Wochengrenze gilt für beide.
+ * E-Mails sind separat opt-in; der Mailweg liegt in suggestionNotifications.ts.
  */
 
 export type ConnectSuggestion = {

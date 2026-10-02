@@ -21,12 +21,7 @@ export async function dismissConnectSuggestionAction(suggestionId: string): Prom
   if (!user) return;
 
   const supabase = await createClient();
-  await supabase
-    .from("connect_suggestions")
-    .update({ dismissed_at: new Date().toISOString() })
-    .eq("id", suggestionId)
-    // Ausdruecklich, obwohl die Policy dasselbe tut.
-    .eq("recipient_user_id", user.id);
+  await supabase.rpc("dismiss_connect_suggestion", { p_suggestion_id: suggestionId });
 
   revalidatePath("/connect/suggestions");
 }

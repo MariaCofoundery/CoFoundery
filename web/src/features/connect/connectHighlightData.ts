@@ -26,12 +26,6 @@ import type { ConnectListing, ConnectProfile, ConnectVenture } from "./connectTy
  *
  * WAS SPAETER DAZUKOMMT, und wofuer der Platz schon steht:
  *
- *   `selection` beschreibt, WAS erscheinen darf. Heute reicht die Uebersicht
- *   nichts herein, also alles. Spaeter kommt das aus einer Kampagne ("im
- *   Pride-Monat diese Unternehmen", "soziale Vorhaben") - und die Auswahl
- *   bleibt eine Angabe an dieser Funktion, statt dass eine zweite Mechanik
- *   daneben entsteht.
- *
  *   `disclosure` sagt, WARUM etwas hier steht. Heute immer "none": Zufall
  *   braucht keine Erklaerung. Fuer bezahlte Plaetze ist die Kennzeichnung
  *   nicht Geschmackssache, sondern Pflicht (§ 5a UWG) - deshalb steht das Feld
@@ -75,18 +69,6 @@ export type ConnectHighlight = {
   disclosure: HighlightDisclosure;
 };
 
-/**
- * Was erscheinen darf. Leer heisst: alles.
- *
- * Der Platz fuer die Kampagnen, die noch nicht existieren. Bewusst als reine
- * Angabe und nicht als zweiter Weg in die Datenbank.
- */
-export type ConnectHighlightSelection = {
-  kinds?: readonly HighlightKind[];
-  topics?: readonly string[];
-  industries?: readonly string[];
-};
-
 /** Aus wie vielen der neuesten Eintraege je Sorte gemischt wird. */
 const WINDOW = 30;
 
@@ -101,95 +83,65 @@ function shuffle<T>(items: T[]) {
   return copy;
 }
 
-function allows(selection: ConnectHighlightSelection, kind: HighlightKind) {
-  return !selection.kinds || selection.kinds.includes(kind);
-}
-
-function matchesTags(
-  selection: ConnectHighlightSelection,
-  tags: { topics?: string[] | null; industries?: string[] | null }
-) {
-  const topics = tags.topics ?? [];
-  const industries = tags.industries ?? [];
-  if (selection.topics?.length && !selection.topics.some((topic) => topics.includes(topic))) {
-    return false;
-  }
-  if (
-    selection.industries?.length &&
-    !selection.industries.some((industry) => industries.includes(industry))
-  ) {
-    return false;
-  }
-  return true;
-}
-
 export async function getConnectHighlights(
   client: SupabaseClient,
   currentUserId: string,
-  limit = 3,
-  selection: ConnectHighlightSelection = {}
+  limit = 3
 ): Promise<ConnectHighlight[]> {
-  const wantsListing = allows(selection, "seeking") || allows(selection, "offering");
-  const wantsVenture = allows(selection, "venture");
-  const wantsPerson = allows(selection, "person");
-
   const [listingResult, ventureResult, personResult] = await Promise.all([
-    wantsListing
-      ? client
-          .from("network_listings")
-          .select("*")
-          .eq("status", "active")
-          .gt("expires_at", new Date().toISOString())
-          .order("published_at", { ascending: false })
-          .limit(WINDOW)
-      : Promise.resolve({ data: [] }),
-    wantsVenture
-      ? client
-          .from("network_ventures")
-          .select("*")
-          .eq("status", "active")
-          .order("created_at", { ascending: false })
-          .limit(WINDOW)
-      : Promise.resolve({ data: [] }),
-    wantsPerson
-      ? client
-          .from("network_profiles")
-          .select("*")
-          .eq("status", "active")
-          // Kein Ausschluss der eigenen Person mehr (21.09.2026): Sich selbst
-          // im Highlight zu sehen ist eine kleine Freude, und die Karte sagt
-          // dazu, dass es die eigene ist.
-          .order("published_at", { ascending: false })
-          .limit(WINDOW)
-      : Promise.resolve({ data: [] }),
+    client
+      .from("network_listings")
+      .select("*")
+      .eq("status", "active")
+      .gt("expires_at", new Date().toISOString())
+      .order("published_at", { ascending: false })
+      .limit(WINDOW),
+    client
+      .from("network_ventures")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(WINDOW),
+    client
+      .from("network_profiles")
+      .select("*")
+      .eq("status", "active")
+      // Kein Ausschluss der eigenen Person mehr (21.09.2026): Sich selbst
+      // im Highlight zu sehen ist eine kleine Freude, und die Karte sagt
+      // dazu, dass es die eigene ist.
+      .order("published_at", { ascending: false })
+      .limit(WINDOW),
   ]);
 
   const listings = (listingResult.data ?? []) as ConnectListing[];
   const ventures = (ventureResult.data ?? []) as ConnectVenture[];
   const people = (personResult.data ?? []) as ConnectProfile[];
 
-  // Der Mensch zu jeder Anzeige und jedem Unternehmen steckt bei den Anzeigen
-  // schon im Datensatz; fuer Unternehmen wird er aus den geladenen Profilen
-  // genommen. Fehlt er dort, bleibt die Karte ohne Gesicht - das ist besser
-  // als eine zweite Abfrage je Eintrag.
-  const profileByUserId = new Map(people.map((person) => [person.user_id, person]));
+  const ownerIds = [...new Set([
+    ...listings.map((listing) => listing.owner_user_id),
+    ...ventures.map((venture) => venture.owner_user_id),
+    ...people.map((person) => person.user_id),
+  ])];
+  if (!ownerIds.length) return [];
+  const { data: owners, error: ownerError } = await client.rpc("get_connect_highlight_owners", { p_user_ids: ownerIds });
+  // Missing consent, membership or block information must never allow a card.
+  if (ownerError || !owners) return [];
+  const profileByUserId = new Map((owners as ConnectProfile[]).map((person) => [person.user_id, person]));
 
   const candidates: ConnectHighlight[] = [];
 
   for (const listing of listings) {
     const kind: HighlightKind = listing.direction === "seeking" ? "seeking" : "offering";
-    if (!allows(selection, kind)) continue;
-    if (!matchesTags(selection, listing)) continue;
+    const owner = profileByUserId.get(listing.owner_user_id);
+    if (!owner) continue;
 
-    const profileValue = listing.network_profiles;
-    const owner = (Array.isArray(profileValue) ? profileValue[0] : profileValue) ?? null;
     candidates.push({
       kind,
       id: listing.id,
       title: listing.title,
       text: listing.summary,
       href: `/connect/listings/${listing.id}`,
-      person: owner ?? profileByUserId.get(listing.owner_user_id) ?? null,
+      person: owner,
       has: null,
       isOwn: listing.owner_user_id === currentUserId,
       disclosure: "none",
@@ -197,7 +149,7 @@ export async function getConnectHighlights(
   }
 
   for (const venture of ventures) {
-    if (!matchesTags(selection, {})) continue;
+    if (!profileByUserId.has(venture.owner_user_id)) continue;
     candidates.push({
       kind: "venture",
       id: venture.id,
@@ -216,9 +168,7 @@ export async function getConnectHighlights(
   }
 
   for (const person of people) {
-    if (!matchesTags(selection, { topics: person.expertise, industries: person.industries })) {
-      continue;
-    }
+    if (!profileByUserId.has(person.user_id)) continue;
     candidates.push({
       kind: "person",
       id: person.user_id,

@@ -268,7 +268,7 @@ test("erzeugt wird beim Hinsehen, nicht von einem Zeitplan", () => {
 test("weggeklickt heisst nicht geloescht", () => {
   // Sonst kaeme derselbe Vorschlag in der naechsten Woche wieder.
   const actions = codeOnly("src/features/connect/connectSuggestionActions.ts");
-  assert.match(actions, /dismissed_at: new Date\(\)\.toISOString\(\)/);
+  assert.match(actions, /rpc\("dismiss_connect_suggestion"/);
   assert.doesNotMatch(actions, /\.delete\(\)/);
   assert.match(codeOnly(DATA), /\.is\("dismissed_at", null\)/);
 

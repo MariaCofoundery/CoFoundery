@@ -7,8 +7,8 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import {
   getDisclosedOwnCapabilityAreas,
   getSavedSearchesForMatching,
-} from "./savedSearchData";
-import { matchSavedSearches, type SearchableConnectSubject } from "./savedSearchMatching";
+} from "@/features/connect/savedSearchData";
+import { matchSavedSearches, type SearchableConnectSubject } from "@/features/connect/savedSearchMatching";
 
 /**
  * Der Abgleich, der beim Veroeffentlichen laeuft.
@@ -39,11 +39,6 @@ export async function notifySavedSearchMatches(
     if (!matches.length) return;
 
     const origin = getPublicAppOrigin();
-    const path =
-      subject.kind === "listing"
-        ? `/connect/listings/${subject.id}`
-        : `/connect/problems/${subject.id}`;
-
     for (const match of matches) {
       // Hoechstens einmal je Treffer: Ein erneutes Veroeffentlichen - etwa nach
       // dem Verlaengern - loest keine zweite Meldung aus.
@@ -65,12 +60,22 @@ export async function notifySavedSearchMatches(
       const recipient = await getNotificationRecipient(match.userId);
       if (!recipient) continue;
 
+      // Reauthorize after claiming and recipient lookup. A stored hit is not
+      // permission to send after a block, suspension or content withdrawal.
+      const { data: deliveries, error: deliveryError } = await client.rpc("get_connect_saved_search_delivery", {
+        p_saved_search_id: match.searchId,
+        p_subject_kind: subject.kind,
+        p_subject_id: subject.id,
+      });
+      const delivery = deliveries?.[0] as { recipient_user_id: string; title: string; path: string } | undefined;
+      if (deliveryError || !delivery || delivery.recipient_user_id !== match.userId) continue;
+
       await sendSavedSearchEmail({
         recipientEmail: recipient.email,
         subjectKind: subject.kind,
-        title: subject.title,
+        title: delivery.title,
         reasons: match.reasons,
-        url: `${origin}${path}`,
+        url: `${origin}${delivery.path}`,
         locale: recipient.locale,
       });
     }

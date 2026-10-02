@@ -1,10 +1,9 @@
 import "server-only";
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash } from "node:crypto";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 const CONNECT_SIGNUP_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32,128}$/;
-const CONNECT_SIGNUP_TTL_MS = 60 * 60 * 1000;
 
 type AuthenticatedClient = {
   auth: {
@@ -29,39 +28,9 @@ function sha256(value: string) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function normalizeEmail(value: string) {
-  return value.trim().toLowerCase();
-}
-
 export function normalizeConnectSignupToken(value: string | null | undefined) {
   const token = (value ?? "").trim();
   return CONNECT_SIGNUP_TOKEN_PATTERN.test(token) ? token : null;
-}
-
-export async function issueConnectSignupIntent(email: string) {
-  const privileged = createPrivilegedClient();
-  if (!privileged) return null;
-
-  const token = randomBytes(32).toString("base64url");
-  const emailHash = sha256(normalizeEmail(email));
-  const now = new Date();
-
-  await privileged
-    .from("network_signup_intents")
-    .delete()
-    .lt("expires_at", now.toISOString());
-  await privileged
-    .from("network_signup_intents")
-    .delete()
-    .eq("email_hash", emailHash);
-
-  const { error } = await privileged.from("network_signup_intents").insert({
-    email_hash: emailHash,
-    token_hash: sha256(token),
-    expires_at: new Date(now.getTime() + CONNECT_SIGNUP_TTL_MS).toISOString(),
-  });
-
-  return error ? null : token;
 }
 
 export async function revokeConnectSignupIntent(token: string) {

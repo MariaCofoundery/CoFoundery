@@ -111,17 +111,11 @@ test("alle vier Sorten koennen erscheinen, und jede sagt, was sie ist", () => {
   }
 });
 
-test("der Platz fuer Kampagnen steht schon, aber es gibt noch keine", () => {
-  // `selection` ist die eine Stelle, an der spaeter eine Kampagne eingreift -
-  // damit keine zweite Mechanik daneben entsteht. Heute reicht die Uebersicht
-  // nichts herein.
+test("Highlights prüfen die Freigabe aller Besitzer ohne Kampagnenfilter", () => {
   const data = codeOnly(DATA);
-  assert.match(data, /export type ConnectHighlightSelection/);
-  assert.match(data, /selection: ConnectHighlightSelection = \{\}/);
-  assert.match(data, /kinds\?: readonly HighlightKind\[\]/);
-
-  const page = codeOnly(PAGE);
-  assert.match(page, /getConnectHighlights\(client, user\.id\)/);
+  assert.match(data, /get_connect_highlight_owners/);
+  assert.doesNotMatch(data, /ConnectHighlightSelection/);
+  assert.match(codeOnly(PAGE), /getConnectHighlights\(client, user\.id\)/);
 });
 
 test("man darf sich selbst im Highlight sehen - und erfaehrt es", () => {
