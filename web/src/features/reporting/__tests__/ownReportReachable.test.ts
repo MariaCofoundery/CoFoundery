@@ -40,21 +40,14 @@ test("das Ergebnis steht im Kopfbereich des Dashboards, beim Namen genannt", () 
   // Oben bei den anderen Hauptwegen, nicht unten bei den Statuskarten.
   const heroAt = dashboard.indexOf("hero.heroConnections");
   const ownReportAt = dashboard.indexOf("hero.heroOwnProfile");
-  const cardsAt = dashboard.indexOf("foundation.alignment.title");
+  const cardsAt = dashboard.indexOf("<AlignCard");
   assert.ok(heroAt > 0 && ownReportAt > heroAt && ownReportAt < cardsAt);
 });
 
-test("nur wenn es einen Report gibt", () => {
-  // Ein Weg zu einer Seite, die "noch nichts da" sagt, ist kein Weg. Und die
-  // Bedingung ist dieselbe, unter der die Statuskarten dorthin verlinken -
-  // eine dritte Wahrheit daneben waere sofort die naechste, die
-  // auseinanderlaeuft.
+test("das eigene Gesamtprofil hängt nicht vom alten v1-Report ab", () => {
   const dashboard = codeOnly(DASHBOARD);
-  assert.match(
-    dashboard,
-    /hasIndividualReport =\s*founderAlignmentState === "result_available" \|\| valuesFoundationState === "completed"/
-  );
-  assert.match(dashboard, /\{hasIndividualReport \? \(/);
+  assert.doesNotMatch(dashboard, /hasIndividualReport/);
+  assert.match(dashboard, /href="\/me\/profile"/);
 });
 
 test("und von jeder Align-Seite aus, nicht nur vom Dashboard", () => {

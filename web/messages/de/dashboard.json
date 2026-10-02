@@ -760,5 +760,45 @@
     "q3": "Ein stabiles Team entsteht selten aus Gleichheit, sondern aus gut geklärten Unterschieden.",
     "q4": "Wenn zwei Founder dieselbe Richtung sehen, werden Entscheidungen leichter und Konflikte kleiner.",
     "q5": "Manchmal ist der produktivste Fortschritt nicht mehr Tempo, sondern eine bessere Absprache."
+  },
+  "workProfile": {
+    "eyebrow": "Deine Arbeitsweise und deine Vorhaben",
+    "title": "Founder-Arbeitsprofil",
+    "description": "Fragen zu deiner Arbeitsweise – als Grundlage für Gespräche über Zusammenarbeit. Die Angaben zu deinem Vorhaben bleiben davon getrennt.",
+    "profileTitle": "Wie du arbeitest",
+    "migrationTitle": "Es gibt inzwischen ein neues Founder-Arbeitsprofil.",
+    "migrationDescription": "Das neue Arbeitsprofil betrachtet deine Arbeitsweisen konkreter. Deine frühere Auswertung und deine bisherigen Antworten bleiben erhalten; der alte Bericht wird nicht überschrieben.",
+    "actions": {
+      "new": "Dein Founder-Arbeitsprofil erstellen",
+      "legacy": "Neues Arbeitsprofil erstellen",
+      "started": "Arbeitsprofil fortsetzen",
+      "completed": "Arbeitsprofil ansehen"
+    },
+    "completed": "Abgeschlossen",
+    "started": "Begonnen",
+    "steps": "{count} Schritte, unabhängig vom Vorhaben",
+    "answers": "Deine Antworten",
+    "search": "Wonach du suchst",
+    "ventureTitle": "Was du aufbauen willst",
+    "ventureDescription": "Zeit, Geld, Ziele und Regeln – für ein Vorhaben, nicht allgemein.",
+    "begin": "Anfangen",
+    "continue": "Weiter ausfüllen",
+    "unnamed": "Ohne Namen",
+    "onlyYou": " – nur du",
+    "ventureSteps": "{count} Abschnitte zu Zielen, Zusagen, Regeln und Grenzen",
+    "confirm": "Jemand ist dazugekommen – sieh deine Angaben noch einmal an",
+    "comparisonTitle": "Nebeneinander",
+    "comparisonEmpty": "Vergleichen könnt ihr euch, sobald ihr verbunden seid, beide abgegeben und einander freigegeben habt.",
+    "compare": "Mit {name} vergleichen",
+    "notShared": "{name} – hat noch nichts freigegeben",
+    "unavailable": "Dein Arbeitsprofil konnte gerade nicht geladen werden. Bitte lade die Seite erneut."
+  },
+  "legacy": {
+    "title": "Frühere Auswertungen",
+    "description": "Diese älteren Fassungen und Antworten bleiben erhalten. Sie gehören nicht zum aktuellen Founder-Arbeitsprofil.",
+    "report": "Frühere Auswertung ansehen",
+    "values": "Enthält dein früheres Werteprofil.",
+    "versions": "Ältere Fassungen und Antworten",
+    "answers": "Zum Archiv der früheren Fassungen"
   }
 }

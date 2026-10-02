@@ -760,5 +760,45 @@
     "q3": "A stable team rarely comes from sameness, but from well-clarified differences.",
     "q4": "When two founders see the same direction, decisions get easier and conflicts get smaller.",
     "q5": "Sometimes the most productive progress is not more speed, but a better agreement."
+  },
+  "workProfile": {
+    "eyebrow": "How you work and what you want to build",
+    "title": "Founder working profile",
+    "description": "Questions about how you work – a starting point for conversations about collaboration. Information about your venture stays separate.",
+    "profileTitle": "How you work",
+    "migrationTitle": "A new founder working profile is now available.",
+    "migrationDescription": "The new working profile looks at your ways of working more concretely. Your earlier assessment and previous answers are preserved; your old report will not be overwritten.",
+    "actions": {
+      "new": "Create your founder working profile",
+      "legacy": "Create a new working profile",
+      "started": "Continue working profile",
+      "completed": "View working profile"
+    },
+    "completed": "Completed",
+    "started": "Started",
+    "steps": "{count} steps, independent of a venture",
+    "answers": "Your answers",
+    "search": "What you are looking for",
+    "ventureTitle": "What you want to build",
+    "ventureDescription": "Time, money, goals and rules – for a venture, not in general.",
+    "begin": "Start",
+    "continue": "Continue",
+    "unnamed": "Unnamed",
+    "onlyYou": " – just you",
+    "ventureSteps": "{count} sections on goals, commitments, rules and boundaries",
+    "confirm": "Someone has joined – review your information",
+    "comparisonTitle": "Side by side",
+    "comparisonEmpty": "You can compare once you are connected, have both submitted and shared your answers with each other.",
+    "compare": "Compare with {name}",
+    "notShared": "{name} – has not shared anything yet",
+    "unavailable": "Your working profile could not be loaded. Please reload the page."
+  },
+  "legacy": {
+    "title": "Earlier assessments",
+    "description": "These earlier versions and answers are preserved. They are separate from your current founder working profile.",
+    "report": "View earlier assessment",
+    "values": "Includes your earlier values profile.",
+    "versions": "Earlier versions and answers",
+    "answers": "Open the archive of earlier versions"
   }
 }

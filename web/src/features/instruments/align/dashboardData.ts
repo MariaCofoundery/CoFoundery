@@ -35,7 +35,7 @@ import { createClient } from "@/lib/supabase/server";
  * SIE WIRFT NICHT
  * ---------------------------------------------------------------------------
  *
- * Geht etwas schief, fehlt der Kasten. Ein Fehler beim Laden einer Nebensache
+ * Geht etwas schief, zeigt der Kasten einen Ladehinweis. Ein Fehler dieser Abfrage
  * darf nicht die Startseite kosten.
  */
 
@@ -68,24 +68,7 @@ export type AlignDashboardState = {
   decision: TransitionDecision;
   /** Hat sie die bisherige Fassung abgegeben? Dann bleibt ihr Report. */
   hasPrevious: boolean;
-  /**
-   * Kennt sie die bisherige Fassung überhaupt?
-   *
-   * ---------------------------------------------------------------------------
-   * WER NEU ANFÄNGT, SOLL NICHT ZWISCHEN ZWEI FASSUNGEN WÄHLEN MÜSSEN
-   * ---------------------------------------------------------------------------
-   *
-   * Das Dashboard zeigte bis zum 30.09.2026 jedem den alten Fragebogen als
-   * erste Karte — auch jemandem, der sich gerade angemeldet hatte. Der neue
-   * stand hundertfünfzig Zeilen weiter unten. „Alte Fassung, neue Fassung,
-   * wähle" ist eine Frage an Menschen, die eine Geschichte mit dem Produkt
-   * haben; für alle anderen ist es eine Entscheidung über etwas, das sie nie
-   * gesehen haben.
-   *
-   * ANGEFANGEN ZÄHLT, NICHT NUR ABGEGEBEN. Wer mitten im alten Bogen steckt,
-   * muss ihn zu Ende bringen können — ihm den Weg dorthin wegzunehmen, wäre
-   * schlimmer als eine Karte zu viel.
-   */
+  /** Hat einen alten Basisfragebogen, auch als Entwurf: Zugang zum Archiv. */
   knowsPrevious: boolean;
 };
 
@@ -97,10 +80,8 @@ const NOTHING: AlignDashboardState = {
   announce: false,
   decision: "pending",
   hasPrevious: false,
-  // IM ZWEIFEL SICHTBAR. Geht die Abfrage schief, weiss niemand, ob jemand
-  // die bisherige Fassung hat - und dann ist ein Weg zu viel besser als ein
-  // weggenommener zu einem halb ausgefuellten Bogen.
-  knowsPrevious: true,
+  // A failed read must not invent a new-user or legacy state.
+  knowsPrevious: false,
 };
 
 export async function getAlignDashboardState(
@@ -109,23 +90,27 @@ export async function getAlignDashboardState(
   try {
     const supabase = await createClient();
 
-    const { data: assessments } = await supabase
+    const { data: assessments, error: assessmentsError } = await supabase
       .from("assessments")
       .select("id, instrument_id, venture_id, submitted_at, answers_confirmed_at")
       .eq("user_id", userId)
-      .in("instrument_id", [FOUNDER_PROFILE_INSTRUMENT_ID, VENTURE_ALIGNMENT_INSTRUMENT_ID]);
+      .in("instrument_id", [FOUNDER_PROFILE_INSTRUMENT_ID, VENTURE_ALIGNMENT_INSTRUMENT_ID])
+      .order("created_at", { ascending: false });
+    if (assessmentsError) throw assessmentsError;
 
     const rows = assessments ?? [];
 
     // Eine Abfrage fuer alle Boegen zusammen. Je Bogen einzeln zu zaehlen
     // waere dieselbe Zahl in mehr Runden - und das Dashboard macht schon
     // genug davon.
-    const { data: answers } = rows.length
+    const { data: answers, error: answersError } = rows.length
       ? await supabase
           .from("alignment_answers")
           .select("assessment_id")
           .in("assessment_id", rows.map((row) => row.id))
-      : { data: [] };
+      : { data: [], error: null };
+
+    if (answersError) throw answersError;
 
     const answeredBy = new Map<string, number>();
     for (const row of answers ?? []) {
@@ -135,12 +120,13 @@ export async function getAlignDashboardState(
 
     // Die bisherige Fassung - fuer den Hinweis und fuer den Satz "deine Daten
     // bleiben". Beides gilt nur fuer Menschen, die sie ueberhaupt haben.
-    const { data: vorher } = await supabase
+    const { data: vorher, error: previousError } = await supabase
       .from("assessments")
       .select("id, submitted_at")
       .eq("user_id", userId)
       .eq("instrument_id", CURRENT_INSTRUMENT_ID)
-      .limit(1);
+      .eq("module", "base");
+    if (previousError) throw previousError;
 
     const { data: transition } = await supabase
       .from("instrument_transitions")
@@ -205,8 +191,8 @@ export async function getAlignDashboardState(
       },
       ventures: ventureStates,
       partners: await partnersFor(userId),
-      announce: shouldAnnounce({
-        hasPreviousAssessment: (vorher ?? []).length > 0,
+      announce: !profileRow?.submitted_at && profileAnswered === 0 && shouldAnnounce({
+        hasPreviousAssessment: (vorher ?? []).some((row) => Boolean(row.submitted_at)),
         transition: transition
           ? { decision, remindAfter: transition.remind_after ?? null }
           : null,

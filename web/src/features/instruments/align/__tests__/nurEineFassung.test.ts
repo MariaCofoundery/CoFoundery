@@ -27,30 +27,12 @@ const daten = lies("src", "features", "instruments", "align", "dashboardData.ts"
 const versionen = lies(
   "src", "app", "(product)", "founder-alignment", "versionen", "page.tsx");
 
-test("der Block mit der bisherigen Fassung hängt an knowsPrevious", () => {
-  assert.match(dashboard, /!alignState\.knowsPrevious \? \(/);
-  assert.match(dashboard, /id="dashboard-block-foundation"/);
-
-  // ANGEFANGEN ZAEHLT, NICHT NUR ABGEGEBEN. Wer mitten im alten Bogen steckt,
-  // muss ihn zu Ende bringen können.
-  assert.match(daten, /knowsPrevious: \(vorher \?\? \[\]\)\.length > 0/);
-  assert.match(daten, /hasPrevious: \(vorher \?\? \[\]\)\.some\(\(row\) => row\.submitted_at\)/);
-});
-
-test("im Zweifel bleibt der alte Weg sichtbar", () => {
-  // Geht die Abfrage schief, weiß niemand, ob jemand die bisherige Fassung
-  // hat - und dann ist ein Weg zu viel besser als ein weggenommener zu einem
-  // halb ausgefüllten Bogen.
-  const leer = daten.slice(daten.indexOf("const NOTHING"), daten.indexOf("const NOTHING") + 600);
-  assert.match(leer, /knowsPrevious: true/);
-});
-
-test("der neue Kasten steht genau einmal auf der Seite", () => {
-  // Einmal gebaut, an einer von zwei Stellen gezeigt: Zwei Aufrufe im Baum
-  // wären zwei Kästen, sobald eine Bedingung einmal nicht stimmt.
+test("das aktuelle Arbeitsprofil steht unabhängig von Legacy genau einmal oben", () => {
   assert.equal(dashboard.split("<AlignCard").length - 1, 1);
-  assert.match(dashboard, /const alignKasten = <AlignCard state=\{alignState\} \/>;/);
-  assert.match(dashboard, /\{alignState\.knowsPrevious && alignKasten\}/);
+  assert.ok(dashboard.indexOf("<AlignCard") < dashboard.indexOf('id="dashboard-legacy-title"'));
+  assert.ok(!dashboard.includes("<AlignAnnounce"));
+  assert.ok(!dashboard.includes("<TransitionAnnounce"));
+  assert.match(dashboard, /hasSubmittedBase && <Link href="\/me\/report"/);
 });
 
 test("die Versionsseite schickt weiter, wo es nichts zu wählen gibt", () => {
@@ -65,8 +47,8 @@ test("der Kasten zählt Schritte und nicht Fragen", () => {
   // Fehler in einer Zeile: Die 43 zählte die zurückgezogene S01 mit, und das
   // UX-Review Teil 2, Abschnitt 14, will die Einzelfragenzahl gar nicht mehr
   // sehen.
-  assert.match(karte, /schritte\("founder_profile"\)\} Schritte/);
-  assert.match(karte, /schritte\("venture_alignment"\)\} Abschnitte/);
+  assert.match(karte, /t\("steps", \{ count: schritte\("founder_profile"\)/);
+  assert.match(karte, /t\("ventureSteps", \{ count: schritte\("venture_alignment"\)/);
   assert.ok(!/\$\{state\.profile\.of\}/.test(karte), "die Fragenzahl steht wieder da");
   assert.ok(!/\$\{venture\.of\}/.test(karte), "die Fragenzahl steht wieder da");
 

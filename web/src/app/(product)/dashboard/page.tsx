@@ -17,8 +17,6 @@ import { buildFounderDashboardConnections } from "@/features/dashboard/founderDa
 import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
   resolveDiscoveryFoundationState,
-  resolveFounderAlignmentFoundationState,
-  resolveValuesFoundationState,
 } from "@/features/dashboard/founderDashboardV2";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
@@ -43,10 +41,8 @@ import {
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
-import { TransitionAnnounce } from "@/features/instruments/v21/TransitionAnnounce";
 import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
 import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
-import { AlignAnnounce } from "@/features/instruments/align/AlignAnnounce";
 import { AlignCard } from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
@@ -266,30 +262,7 @@ export default async function DashboardPage({
       ? `/report/${encodeURIComponent(contextualInvitation.id)}`
       : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
     : null;
-  const contextualBaseHref = contextualInvitationId
-    ? `/me/base?invitationId=${encodeURIComponent(contextualInvitationId)}`
-    : "/me/base";
-  const contextualValuesHref = contextualInvitationId
-    ? `/me/values?invitationId=${encodeURIComponent(contextualInvitationId)}`
-    : "/me/values";
-  // EINMAL GEBAUT UND AN EINER VON ZWEI STELLEN GEZEIGT. Zwei Aufrufe im
-  // Baum waeren zwei Kaesten, sobald eine Bedingung einmal nicht stimmt.
-  const alignKasten = <AlignCard state={alignState} />;
-
-  const founderAlignmentState = resolveFounderAlignmentFoundationState({
-    submitted: hasSubmittedBase,
-    started: hasStartedBase,
-  });
-  // Dieselben zwei Bedingungen, unter denen die Statuskarten unten auf
-  // /me/report verlinken. Eine dritte Wahrheit daneben waere sofort die
-  // naechste, die auseinanderlaeuft.
-  const valuesFoundationState = resolveValuesFoundationState({
-    submitted: hasSubmittedValues,
-    started: hasStartedValues,
-  });
   const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
-  const hasIndividualReport =
-    founderAlignmentState === "result_available" || valuesFoundationState === "completed";
   const connectionOverview = await getFounderDashboardConnectionsV2({
     currentUserId: user.id,
     teams: founderTeams,
@@ -324,7 +297,11 @@ export default async function DashboardPage({
     console.error("dashboard tasks load failed", error);
     return [];
   });
-  const taskPresentations = dashboardTasks.map((task) =>
+  // Legacy invitation tasks remain actionable; generic old questionnaires are
+  // no longer promoted as current personal modules.
+  const taskPresentations = dashboardTasks.filter((task) =>
+    task.id !== "personal:founder-alignment" && task.id !== "personal:values"
+  ).map((task) =>
     presentDashboardTask(task, t, setupT)
   );
   const collaborationSpotlightHref = founderTeams[0]?.id
@@ -369,7 +346,8 @@ export default async function DashboardPage({
         label={t("sectionNavigation.label")}
         sections={[
           { id: "dashboard-block-tasks", label: t("sectionNavigation.tasks") },
-          { id: "dashboard-block-foundation", label: t("sectionNavigation.foundation") },
+          { id: "dashboard-block-align", label: t("workProfile.title") },
+          { id: "dashboard-block-foundation", label: t("foundation.discovery.title") },
           { id: "dashboard-block-connections", label: t("sectionNavigation.connections") },
           { id: "dashboard-block-explore", label: t("sectionNavigation.explore") },
           { id: "dashboard-block-outlook", label: t("sectionNavigation.outlook") },
@@ -417,24 +395,13 @@ export default async function DashboardPage({
                 >
                   {t("hero.heroFind")}
                 </Link>
-                {/* DER EIGENE REPORT, hier oben und beim Namen genannt.
-                    Gemeldet am 21.09.2026: Er war nur ueber zwei Statuskarten
-                    weiter unten erreichbar - und die heissen nach dem SCHRITT
-                    ("Werte"), nicht nach dem Ergebnis. Wer sein Ergebnis
-                    nochmal ansehen will, sucht "mein Report" und nicht
-                    "Werte-Fundament".
-
-                    Nur wenn es einen gibt: Ein Weg zu einer Seite, die "noch
-                    nichts da" sagt, ist kein Weg. Die Karten fuehren weiter
-                    zum Fragebogen, das bleibt ihre Aufgabe. */}
-                {hasIndividualReport ? (
-                  <Link
-                    href="/me/profile"
-                    className="inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100"
-                  >
-                    {t("hero.heroOwnProfile")}
-                  </Link>
-                ) : null}
+                {/* Das Gesamtprofil ist auch ohne historischen Assessment-Report erreichbar. */}
+                <Link
+                  href="/me/profile"
+                  className="inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100"
+                >
+                  {t("hero.heroOwnProfile")}
+                </Link>
               </div>
 
               <div className="mt-5">
@@ -476,53 +443,18 @@ export default async function DashboardPage({
         />
       </section>
 
-      {/* ---------------------------------------------------------------
-          DIE BISHERIGE FASSUNG - NUR FUER DIE, DIE SIE HABEN
-          ---------------------------------------------------------------
+      <AlignCard state={alignState} />
 
-          Hier standen drei Karten, und die erste zeigte auf den alten
-          Fragebogen. Sie stand auf JEDEM Dashboard, auch auf dem von
-          jemandem, der sich gerade angemeldet hatte - der neue Bogen kam
-          hundertfuenfzig Zeilen weiter unten. Wer neu anfaengt, sieht jetzt
-          nur noch die beiden neuen Boegen; wer im alten steckt, findet ihn
-          weiter an derselben Stelle.
-
-          DER WEG ZU FIND BLEIBT. Die Discovery-Karte stand ebenfalls hier;
-          der Block "Entdecken" weiter unten fuehrt seit immer auch dorthin. */}
-      {!alignState.knowsPrevious ? (
-        alignKasten
-      ) : (
-      <section id="dashboard-block-foundation" className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6" style={staggerStyle(90)}>
-        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("foundation.eyebrow")}</p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("foundation.title")}</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{t("foundation.description")}</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <FoundationCard
-            title={t("foundation.alignment.title")}
-            description={t("foundation.alignment.description")}
-            status={t(`foundation.alignment.states.${founderAlignmentState}`)}
-            href={founderAlignmentState === "result_available" ? "/me/report" : contextualBaseHref}
-            action={t(`foundation.alignment.actions.${founderAlignmentState}`)}
-          />
-          <FoundationCard
-            title={t("foundation.values.title")}
-            description={t("foundation.values.description")}
-            status={t(`foundation.values.states.${valuesFoundationState}`)}
-            badge={t("foundation.values.optionalBadge")}
-            href={valuesFoundationState === "completed" ? "/me/report" : contextualValuesHref}
-            action={t(`foundation.values.actions.${valuesFoundationState}`)}
-          />
-          <FoundationCard
-            title={t("foundation.discovery.title")}
-            eyebrow={t("foundation.discovery.eyebrow")}
-            description={t("foundation.discovery.description")}
-            status={t(`foundation.discovery.states.${discoveryFoundationState}`)}
-            href="/discovery/profile"
-            action={t("foundation.discovery.action")}
-          />
-        </div>
+      <section id="dashboard-block-foundation" className="mb-8">
+        <FoundationCard
+          title={t("foundation.discovery.title")}
+          eyebrow={t("foundation.discovery.eyebrow")}
+          description={t("foundation.discovery.description")}
+          status={t(`foundation.discovery.states.${discoveryFoundationState}`)}
+          href="/discovery/profile"
+          action={t("foundation.discovery.action")}
+        />
       </section>
-      )}
 
       <section
         id="dashboard-block-connections"
@@ -635,35 +567,26 @@ export default async function DashboardPage({
         </details>
       </section>
 
-      {/*
-        DER HINWEIS AUF DIE NEUE FASSUNG.
-        Er erscheint nur fuer Menschen, die die bisherige Fassung kennen - wer
-        gerade erst anfaengt, soll keinen Hinweis auf eine Neufassung von etwas
-        bekommen, das er nie gesehen hat.
-      */}
-      {/*
-        DIE BEIDEN BOEGEN ZUERST, DAS ARCHIV DANACH.
-        Wer hier ankommt, soll den Weg zu dem finden, was jetzt gilt. Der
-        Kasten darunter erklaert, wo das Bisherige geblieben ist - das ist
-        eine Antwort auf eine Frage, die man erst stellt, wenn man sie
-        vermisst.
-      */}
-      {alignState.announce && <AlignAnnounce />}
-
-      {/* Oben steht er nur fuer Menschen ohne die bisherige Fassung - fuer
-          alle anderen hier, hinter dem, was sie schon kennen. */}
-      {alignState.knowsPrevious && alignKasten}
-
-      {versionState.announce && <TransitionAnnounce />}
-
-      {versionState.show && (
-        <VersionArchiveCard
-          decision={versionState.decision}
-          previous={versionState.previous}
-          next={versionState.next}
-          connectionsNext={versionState.connectionsNext}
-          archived={versionState.archived}
-        />
+      {(hasSubmittedBase || alignState.knowsPrevious || versionState.next.started) && (
+        <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="dashboard-legacy-title">
+          <h2 id="dashboard-legacy-title" className="font-semibold">{t("legacy.title")}</h2>
+          <p className="mt-2 text-sm text-slate-600">{t("legacy.description")}</p>
+          {hasSubmittedBase && <Link href="/me/report" className="mt-3 inline-block text-sm underline">{t("legacy.report")}</Link>}
+          {hasSubmittedBase && hasSubmittedValues && <p className="mt-2 text-sm text-slate-600">{t("legacy.values")}</p>}
+          <details className="mt-3 text-sm">
+            <summary className="cursor-pointer">{t("legacy.versions")}</summary>
+            <Link href="/founder-alignment/versionen" className="my-3 inline-block underline">{t("legacy.answers")}</Link>
+            {versionState.next.started && (
+              <VersionArchiveCard
+                decision={versionState.decision}
+                previous={versionState.previous}
+                next={versionState.next}
+                connectionsNext={versionState.connectionsNext}
+                archived={versionState.archived}
+              />
+            )}
+          </details>
+        </section>
       )}
 
       <section

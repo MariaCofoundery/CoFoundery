@@ -111,7 +111,7 @@ test("der zweite Bereich heißt überall gleich", () => {
     join("src", "features", "instruments", "align", "AlignCard.tsx"),
   ]) {
     const text = readFileSync(datei, "utf8");
-    assert.match(text, /Was du aufbauen willst/, datei);
+    assert.match(text, /Was du aufbauen willst|t\("ventureTitle"\)/, datei);
   }
 
   // Auf der Seite selbst steht der Name nicht mehr von Hand: Er ist die

@@ -166,7 +166,8 @@ test("personal hero, quote, foundation and connections remain visible", () => {
   assert.match(dashboardSource, /t\("hero\.quoteEyebrow"\)/);
   assert.match(dashboardSource, /dashboard-block-foundation/);
   assert.match(dashboardSource, /dashboard-block-connections/);
-  assert.match(dashboardSource, /foundation\.values\.optionalBadge/);
+  assert.doesNotMatch(dashboardSource, /foundation\.values\.optionalBadge/);
+  assert.match(dashboardSource, /<AlignCard state=\{alignState\}/);
   assert.match(dashboardSource, /getOwnDiscoveryProfile/);
   assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|prioritizedTask|buildDashboardV2HeroPanel/);
 });

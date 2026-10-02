@@ -170,7 +170,7 @@ test("das Dashboard fuehrt zur Testfassung, enthaelt sie aber nicht", () => {
   // Antwort zu geben, und beide wuerden auseinanderlaufen.
   const page = readFileSync(
     join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
-  assert.match(page, /TransitionAnnounce/);
+  assert.ok(!page.includes("<TransitionAnnounce"), "archived pilot is not promoted");
   assert.match(page, /VersionArchiveCard/);
   for (const verboten of ["QuestionnaireV21", "AnswerFieldV21", "saveAnswerV21", "ReportViewV21"]) {
     assert.ok(!page.includes(verboten), `das Dashboard enthaelt ${verboten}`);
@@ -183,7 +183,7 @@ test("der Hinweis erscheint nicht fuer Menschen, die die alte Fassung nicht kenn
   // Fragebogen sehen.
   const page = readFileSync(
     join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
-  assert.match(page, /versionState\.announce && <TransitionAnnounce/);
+  assert.ok(!page.includes("<TransitionAnnounce"));
 });
 
 test("der Advisor kann fremde Antworten nicht anfassen", () => {
