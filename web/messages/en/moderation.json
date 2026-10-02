@@ -1,0 +1,58 @@
+{
+  "entry": "Internal: moderate reports",
+  "back": "Back to account",
+  "title": "Moderate reports",
+  "contextLimit": "Reports refer to a conversation or contact request, not to an individual message. Private message histories are not loaded here.",
+  "filter": "Status",
+  "all": "All – open first",
+  "apply": "Apply",
+  "saved": "Report saved.",
+  "error": "Reports could not be loaded or the change could not be saved. Please try again.",
+  "empty": "No reports for this selection.",
+  "reporter": "Reporter",
+  "reported": "Reported person",
+  "noName": "No display name available",
+  "origin": "Origin",
+  "description": "Report description",
+  "noComment": "No description provided.",
+  "references": "Context and references",
+  "reportId": "Report ID",
+  "conversation": "Conversation",
+  "contactRequest": "Contact request",
+  "participantA": "Participant A",
+  "participantB": "Participant B",
+  "problem": "Problem",
+  "approach": "Approach",
+  "findIntro": "FIND intro",
+  "note": "Internal moderation note",
+  "noteHint": "Visible only to platform admins. Maximum 2,000 characters.",
+  "saveNote": "Save note",
+  "saving": "Saving …",
+  "lastAction": "Last edited: {at} · {by}",
+  "deletedAdmin": "Deleted admin account",
+  "pages": "Report list pages",
+  "previous": "Previous page",
+  "next": "Next page",
+  "statuses": {
+    "open": "Open",
+    "reviewed": "Reviewed",
+    "closed": "Closed"
+  },
+  "categories": {
+    "spam": "Spam",
+    "harassment": "Harassment",
+    "misleading": "Misleading",
+    "other": "Other"
+  },
+  "origins": {
+    "contact_request": "Contact request",
+    "problem_interest": "I would work on this",
+    "find_intro": "FIND intro",
+    "unavailable": "Origin no longer available"
+  },
+  "actions": {
+    "open": "Reopen",
+    "reviewed": "Mark as reviewed",
+    "closed": "Close"
+  }
+}

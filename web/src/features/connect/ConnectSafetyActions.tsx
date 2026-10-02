@@ -22,7 +22,7 @@ export function ConnectSafetyActions({ otherUserId, contactRequestId, conversati
         <input type="hidden" name="other_user_id" value={otherUserId} /><input type="hidden" name="return_to" value={returnTo} />
         <ConnectSubmitButton label={copy.block} pendingLabel={copy.blocking} className="min-h-11 text-sm font-semibold text-slate-600 underline-offset-4 hover:underline" />
       </form> : null}
-      <details className="w-full sm:w-auto">
+      <details data-network-report className="w-full min-w-0 sm:w-auto">
         <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-600">{copy.report}</summary>
         <form action={reportConnectInteractionAction} className="mt-2 w-full space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:w-96">
           <input type="hidden" name="contact_request_id" value={contactRequestId} /><input type="hidden" name="conversation_id" value={conversationId ?? ""} /><input type="hidden" name="return_to" value={returnTo} />

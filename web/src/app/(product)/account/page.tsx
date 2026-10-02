@@ -1,3 +1,4 @@
+import { AdminModerationLink } from "@/features/moderation/AdminModerationLink";
 import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { PersonAccessSection } from "@/features/advisor/PersonAccessSection";
 import { getPersonAccessRequesters } from "@/features/advisor/personAccessData";
@@ -163,6 +164,7 @@ export default async function AccountPage({
           }
         />
       </section>
+      <AdminModerationLink />
     </main>
   );
 }

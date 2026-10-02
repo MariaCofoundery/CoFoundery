@@ -1,0 +1,58 @@
+{
+  "entry": "Intern: Meldungen moderieren",
+  "back": "Zurück zum Konto",
+  "title": "Meldungen moderieren",
+  "contextLimit": "Meldungen beziehen sich auf eine Unterhaltung oder Kontaktanfrage, nicht auf eine einzelne Nachricht. Private Nachrichtenverläufe werden hier nicht geladen.",
+  "filter": "Status",
+  "all": "Alle – offen zuerst",
+  "apply": "Anzeigen",
+  "saved": "Meldung gespeichert.",
+  "error": "Die Meldungen konnten nicht geladen oder die Änderung nicht gespeichert werden. Bitte erneut versuchen.",
+  "empty": "Keine Meldungen für diese Auswahl.",
+  "reporter": "Meldende Person",
+  "reported": "Gemeldete Person",
+  "noName": "Kein Anzeigename vorhanden",
+  "origin": "Ursprung",
+  "description": "Beschreibung der Meldung",
+  "noComment": "Keine Beschreibung angegeben.",
+  "references": "Kontext und Referenzen",
+  "reportId": "Meldungs-ID",
+  "conversation": "Unterhaltung",
+  "contactRequest": "Kontaktanfrage",
+  "participantA": "Teilnehmende Person A",
+  "participantB": "Teilnehmende Person B",
+  "problem": "Problem",
+  "approach": "Lösungsansatz",
+  "findIntro": "FIND-Intro",
+  "note": "Interne Moderationsnotiz",
+  "noteHint": "Nur für Plattform-Admins sichtbar. Maximal 2.000 Zeichen.",
+  "saveNote": "Notiz speichern",
+  "saving": "Wird gespeichert …",
+  "lastAction": "Zuletzt bearbeitet: {at} · {by}",
+  "deletedAdmin": "Gelöschter Adminaccount",
+  "pages": "Seiten der Meldungsliste",
+  "previous": "Vorherige Seite",
+  "next": "Nächste Seite",
+  "statuses": {
+    "open": "Offen",
+    "reviewed": "Geprüft",
+    "closed": "Geschlossen"
+  },
+  "categories": {
+    "spam": "Spam",
+    "harassment": "Belästigung",
+    "misleading": "Irreführend",
+    "other": "Sonstiges"
+  },
+  "origins": {
+    "contact_request": "Kontaktanfrage",
+    "problem_interest": "Ich würde daran arbeiten",
+    "find_intro": "FIND-Intro",
+    "unavailable": "Ursprung nicht mehr verfügbar"
+  },
+  "actions": {
+    "open": "Wieder öffnen",
+    "reviewed": "Als geprüft markieren",
+    "closed": "Schließen"
+  }
+}
