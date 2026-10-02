@@ -16,6 +16,7 @@ import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnectMessageBody, parseConnectListing, parseConnectProfile, listingPublishable, profilePublishable } from "./connectValidation";
 import { CONNECT_PHOTO_BUCKET, connectValuesForBasePhoto } from "@/features/connect/connectBasePhoto";
 import { randomUUID } from "node:crypto";
+import { requireSignedInForMessages } from "@/features/connect/conversationAccess";
 
 async function context() {
   const client = await createClient();
@@ -33,11 +34,11 @@ function refreshContacts(listingId?: string) {
 function refreshMessaging(conversationId?: string) {
   refreshContacts();
   revalidatePath("/", "layout");
-  if (conversationId) revalidatePath(`/connect/messages/${conversationId}`);
+  if (conversationId) revalidatePath(`/messages/${conversationId}`);
 }
 function safeConnectRedirect(value: FormDataEntryValue | null, fallback = "/connect/contacts") {
   const path = String(value ?? "").trim();
-  return path.startsWith("/connect") && !path.startsWith("//") ? path : fallback;
+  return (path.startsWith("/connect") || /^\/messages\/[0-9a-f-]+$/i.test(path)) && !path.startsWith("//") ? path : fallback;
 }
 
 export async function saveConnectProfileAction(formData: FormData) {
@@ -272,26 +273,26 @@ export async function cancelConnectContactAction(formData: FormData) {
 }
 
 export async function sendConnectMessageAction(formData: FormData) {
-  const { client, user } = await context();
+  const { client, user } = await requireSignedInForMessages();
   const conversationId = String(formData.get("conversation_id") ?? "").trim();
   const body = normalizeConnectMessageBody(formData.get("body"));
   if (!conversationId) redirect("/connect/contacts?error=message");
-  if (!body) redirect(`/connect/messages/${conversationId}?error=message`);
+  if (!body) redirect(`/messages/${conversationId}?error=message`);
   const { data: messageId, error } = await client.rpc("send_network_message", {
     p_conversation_id: conversationId,
     p_body: body,
   });
-  if (error) redirect(`/connect/messages/${conversationId}?error=${error.message.includes("interaction_blocked") ? "blocked" : "message"}`);
+  if (error) redirect(`/messages/${conversationId}?error=${error.message.includes("interaction_blocked") ? "blocked" : "message"}`);
   if (messageId) {
     const sender = await getOwnConnectProfile(client, user.id);
     await notifyConnectMessage(client, String(messageId), conversationId, sender?.display_name ?? null);
   }
   refreshMessaging(conversationId);
-  redirect(`/connect/messages/${conversationId}?sent=1`);
+  redirect(`/messages/${conversationId}?sent=1`);
 }
 
 export async function blockConnectUserAction(formData: FormData) {
-  const { client } = await context();
+  const { client } = await requireSignedInForMessages();
   const otherUserId = String(formData.get("other_user_id") ?? "").trim();
   const returnTo = safeConnectRedirect(formData.get("return_to"));
   if (!otherUserId) redirect(`${returnTo}?error=safety`);
@@ -301,7 +302,7 @@ export async function blockConnectUserAction(formData: FormData) {
 }
 
 export async function unblockConnectUserAction(formData: FormData) {
-  const { client } = await context();
+  const { client } = await requireSignedInForMessages();
   const otherUserId = String(formData.get("other_user_id") ?? "").trim();
   const returnTo = safeConnectRedirect(formData.get("return_to"));
   if (!otherUserId) redirect(`${returnTo}?error=safety`);
@@ -311,24 +312,25 @@ export async function unblockConnectUserAction(formData: FormData) {
 }
 
 export async function reportConnectInteractionAction(formData: FormData) {
-  const { client } = await context();
+  const { client } = await requireSignedInForMessages();
   const contactRequestId = String(formData.get("contact_request_id") ?? "").trim();
+  const conversationId = String(formData.get("conversation_id") ?? "").trim();
   const category = String(formData.get("category") ?? "");
   const comment = String(formData.get("comment") ?? "").trim();
   const returnTo = safeConnectRedirect(formData.get("return_to"));
-  if (!contactRequestId || !["spam", "harassment", "misleading", "other"].includes(category) || comment.length > 1000) {
+  if ((!conversationId && !contactRequestId) || !["spam", "harassment", "misleading", "other"].includes(category) || comment.length > 1000) {
     redirect(`${returnTo}?error=report`);
   }
-  const { error } = await client.rpc("report_network_interaction", {
-    p_contact_request_id: contactRequestId,
-    p_category: category,
-    p_comment: comment || null,
-  });
+  // A conversation ID takes precedence; never fall back after a denied RPC.
+  const report = { p_category: category, p_comment: comment || null };
+  const { error } = conversationId
+    ? await client.rpc("report_network_conversation", { ...report, p_conversation_id: conversationId })
+    : await client.rpc("report_network_interaction", { ...report, p_contact_request_id: contactRequestId });
   redirect(`${returnTo}?${error ? "error=report" : "safety=reported"}`);
 }
 
 export async function markConnectConversationReadAction(conversationId: string) {
-  const { client } = await context();
+  const { client } = await requireSignedInForMessages();
   const { error } = await client.rpc("mark_network_conversation_read", {
     p_conversation_id: conversationId,
   });

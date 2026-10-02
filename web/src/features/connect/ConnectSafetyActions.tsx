@@ -3,9 +3,10 @@
 import { blockConnectUserAction, reportConnectInteractionAction, unblockConnectUserAction } from "./connectActions";
 import { ConnectSubmitButton } from "./ConnectSubmitButton";
 
-export function ConnectSafetyActions({ otherUserId, contactRequestId, returnTo, blockedByMe, interactionBlocked, copy }: {
+export function ConnectSafetyActions({ otherUserId, contactRequestId, conversationId, returnTo, blockedByMe, interactionBlocked, copy }: {
   otherUserId: string;
   contactRequestId: string;
+  conversationId?: string;
   returnTo: string;
   blockedByMe: boolean;
   interactionBlocked: boolean;
@@ -24,7 +25,7 @@ export function ConnectSafetyActions({ otherUserId, contactRequestId, returnTo, 
       <details className="w-full sm:w-auto">
         <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-600">{copy.report}</summary>
         <form action={reportConnectInteractionAction} className="mt-2 w-full space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:w-96">
-          <input type="hidden" name="contact_request_id" value={contactRequestId} /><input type="hidden" name="return_to" value={returnTo} />
+          <input type="hidden" name="contact_request_id" value={contactRequestId} /><input type="hidden" name="conversation_id" value={conversationId ?? ""} /><input type="hidden" name="return_to" value={returnTo} />
           <label className="block text-sm font-medium">{copy.reportCategory}<select name="category" required className="mt-2 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3">
             {(["spam", "harassment", "misleading", "other"] as const).map((category) => <option key={category} value={category}>{copy[category]}</option>)}
           </select></label>

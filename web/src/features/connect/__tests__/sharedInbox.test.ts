@@ -210,3 +210,25 @@ test("die Gesprächsliste ist aus der Kontaktseite heraus verlinkt, nicht dupliz
   const contacts = codeOnly("src/app/(product)/connect/contacts/page.tsx");
   assert.doesNotMatch(contacts, /href=\{`\/connect\/messages\//);
 });
+
+// Phase 7.1: page access alone was insufficient; actions still required CONNECT.
+test("shared-inbox message and safety actions authenticate without requiring CONNECT", () => {
+  const actions = codeOnly("src/features/connect/connectActions.ts");
+  for (const name of ["sendConnectMessageAction", "markConnectConversationReadAction", "blockConnectUserAction", "unblockConnectUserAction", "reportConnectInteractionAction"]) {
+    const start = actions.indexOf(`export async function ${name}`);
+    assert.ok(start >= 0);
+    const next = actions.indexOf("export async function ", start + 1);
+    const body = actions.slice(start, next < 0 ? undefined : next);
+    assert.match(body, /await requireSignedInForMessages\(\)/, name);
+    assert.doesNotMatch(body, /await context\(\)/, name);
+  }
+});
+
+test("conversation safety carries its shared context and retains the contact-only report path", () => {
+  const safety = codeOnly("src/features/connect/ConnectSafetyActions.tsx");
+  assert.match(safety, /name="conversation_id" value=\{conversationId/);
+  assert.match(codeOnly(CONVERSATION), /conversationId=\{conversationId\}/);
+  const actions = codeOnly("src/features/connect/connectActions.ts");
+  assert.match(actions, /rpc\("report_network_conversation", \{ \.\.\.report, p_conversation_id: conversationId \}\)/);
+  assert.match(actions, /rpc\("report_network_interaction", \{ \.\.\.report, p_contact_request_id: contactRequestId \}\)/);
+});

@@ -68,7 +68,7 @@ export default async function ConversationPage({
         {/* Bei drei Urspruengen in einem Postfach muss dastehen, woher das
             Gespraech kommt - sonst raet man beim Lesen. */}
         <p className="mt-2 text-xs font-medium uppercase tracking-[.14em] text-slate-500">{t(`messages.origins.${conversation.origin}`)}</p>
-        {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} returnTo={`/messages/${conversationId}`} blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={{
+        {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} conversationId={conversationId} returnTo={`/messages/${conversationId}`} blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={{
           blockedState: t("safety.blockedState"), unblock: t("safety.unblock"), unblocking: t("safety.unblocking"), blockConfirm: t("safety.blockConfirm"),
           block: t("safety.block"), blocking: t("safety.blocking"), report: t("safety.report"), reportCategory: t("safety.reportCategory"), reportComment: t("safety.reportComment"),
           reportSubmit: t("safety.reportSubmit"), reporting: t("safety.reporting"), spam: t("safety.categories.spam"), harassment: t("safety.categories.harassment"),
