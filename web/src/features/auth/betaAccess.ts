@@ -81,7 +81,14 @@ export function canCreateAccountFromPath(nextPath: string) {
     return false;
   }
 
+  if (isTeamIntakeInvitePath(path)) return true;
+
   return ACCOUNT_CREATING_PREFIXES.some(
     (prefix) => path === prefix || path.startsWith(prefix.endsWith("/") ? prefix : `${prefix}/`)
   );
+}
+
+/** Only the purpose-bound token invitation enables intake registration. */
+export function isTeamIntakeInvitePath(path: string) {
+  return /^\/team-intake\/invite\/[0-9a-f]{48}$/.test(path);
 }

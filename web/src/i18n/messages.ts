@@ -1,3 +1,5 @@
+import deIntake from "../../messages/de/intake.json";
+import enIntake from "../../messages/en/intake.json";
 import type { AbstractIntlMessages } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
 import deAlignment from "../../messages/de/alignment.json";
@@ -55,6 +57,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
+    intake: deIntake,
     alignment: deAlignment,
     assessment: deAssessment,
     account: deAccount,
@@ -83,6 +86,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workbook: deWorkbook as unknown as AbstractIntlMessages,
   },
   en: {
+    intake: enIntake,
     alignment: enAlignment,
     assessment: enAssessment,
     account: enAccount,

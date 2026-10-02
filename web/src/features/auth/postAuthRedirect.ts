@@ -1,3 +1,4 @@
+import { isTeamIntakeInvitePath } from "@/features/auth/betaAccess";
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
@@ -82,7 +83,12 @@ export async function resolvePostAuthRedirectPath(
 ) {
   const normalizedNext = normalizePath(nextPath);
 
-  if (isJoinContinuationPath(normalizedNext) || isAdvisorInviteContinuationPath(normalizedNext)) {
+  // Intake has its own explicit consent; unrelated profile onboarding must not swallow its return path.
+  if (
+    isJoinContinuationPath(normalizedNext) || isAdvisorInviteContinuationPath(normalizedNext) ||
+    isTeamIntakeInvitePath(normalizedNext) || normalizedNext === "/team-intake" ||
+    /^\/team-intake\/[0-9a-f-]{36}$/.test(normalizedNext)
+  ) {
     return normalizedNext;
   }
 

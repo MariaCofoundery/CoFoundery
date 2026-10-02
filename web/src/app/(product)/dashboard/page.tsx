@@ -372,6 +372,7 @@ export default async function DashboardPage({
                   <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.15rem]">
                     {t("hero.greeting", { name: displayName })}
                   </h1>
+                  <Link href="/team-intake" className="inline-block min-h-11 py-3 text-sm underline">Team Context</Link>
                 </div>
               </div>
 
