@@ -1,5 +1,5 @@
 {
-  "entry": "Internal: moderate reports",
+  "entry": "Moderation",
   "back": "Back to account",
   "title": "Moderate reports",
   "contextLimit": "Reports refer to a conversation or contact request, not to an individual message. Private message histories are not loaded here.",
@@ -54,5 +54,6 @@
     "open": "Reopen",
     "reviewed": "Mark as reviewed",
     "closed": "Close"
-  }
+  },
+  "administration": "Administration"
 }

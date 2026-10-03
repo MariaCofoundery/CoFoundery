@@ -426,16 +426,16 @@
     "create": "Ein Problem schildern",
     "createTitle": "Was siehst du, das gelöst gehört?",
     "createText": "Beschreib es so konkret, dass jemand ohne deinen Hintergrund versteht, worum es geht – wen es betrifft, und was heute daran fehlt.",
-    "backToBoard": "Zurück zum Ungelösten",
+    "backToBoard": "Zurück zum Problembereich",
     "searchPlaceholder": "Suche in Titel, Beschreibung, Themen und Orten",
     "intentLabel": "Was die Person vorhat",
     "allIntents": "Alle",
     "unknownAuthor": "Ohne Profil",
     "interestCount": "{count, plural, =0 {Noch niemand würde mitarbeiten} one {1 Person würde mitarbeiten} other {# Personen würden mitarbeiten}}",
-    "emptyFirst": "Hier ist noch nichts.",
-    "emptyFirstText": "Das erste Problem ist das schwerste. Schildere etwas, das dir in deinem Umfeld auffällt – auch wenn du selbst keine Lösung dafür hast.",
+    "emptyFirst": "Welches Problem fällt dir auf?",
+    "emptyFirstText": "Hier sammeln Mitglieder beobachtete Probleme und Herausforderungen. Mach den Anfang – eine fertige Lösung brauchst du dafür nicht.",
     "emptyFiltered": "Dazu passt gerade nichts.",
-    "emptyFilteredText": "Setz die Eingrenzung zurück oder schildere selbst, was dir auffällt.",
+    "emptyFilteredText": "Setz die Filter zurück oder suche mit weniger Kriterien.",
     "intents": {
       "observation": "Beobachtung",
       "wants_to_build": "Sucht Mitgründer",
@@ -860,5 +860,26 @@
     "identity": "So erscheinst du",
     "contribution": "Was du einbringst & wie man dich ansprechen kann",
     "ownVentures": "Meine Unternehmen & Projekte"
+  },
+  "problemHub": {
+    "nav": "Problem → Potenzial",
+    "title": "Aus Problemen kann ziemlich Gutes entstehen.",
+    "opening": "Manchmal beginnt eine gute Idee nicht mit einem Geistesblitz, sondern mit etwas, das nervt, fehlt oder immer wieder nicht funktioniert.",
+    "purpose": "Genau dafür ist dieser Bereich da. Hier sammeln wir Probleme und Herausforderungen, die Menschen in ihrem Alltag, in Unternehmen oder in der Gesellschaft beobachten.",
+    "possibilities": "Vielleicht braucht es einfach eine bessere Lösung. Vielleicht entsteht daraus ein gemeinsames Projekt. Und manchmal steckt darin sogar der Anfang einer richtig guten Geschäftsidee.",
+    "closing": "Nicht jedes Problem braucht ein Startup. Aber viele gute Ideen beginnen mit der Frage: Warum ist das eigentlich immer noch so?",
+    "discover": "Probleme entdecken",
+    "create": "Problem eintragen",
+    "view": "Problem ansehen",
+    "processTitle": "So kann es weitergehen",
+    "steps": {
+      "notice": "Problem sehen",
+      "perspectives": "Perspektiven sammeln",
+      "together": "gemeinsam weiterdenken",
+      "possibility": "Lösung, Projekt oder Vorhaben"
+    },
+    "workspaceHint": "Wenn ihr gemeinsam weiterdenken möchtet, könnt ihr einen privaten Arbeitsraum nutzen. Nur ausdrücklich eingeladene Personen sehen den Raum und seine Inhalte.",
+    "workspaces": "Zu deinen privaten Arbeitsräumen",
+    "filterTitle": "Probleme eingrenzen"
   }
 }

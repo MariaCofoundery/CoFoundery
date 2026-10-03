@@ -1,5 +1,5 @@
 {
-  "entry": "Intern: Meldungen moderieren",
+  "entry": "Moderation",
   "back": "Zurück zum Konto",
   "title": "Meldungen moderieren",
   "contextLimit": "Meldungen beziehen sich auf eine Unterhaltung oder Kontaktanfrage, nicht auf eine einzelne Nachricht. Private Nachrichtenverläufe werden hier nicht geladen.",
@@ -54,5 +54,6 @@
     "open": "Wieder öffnen",
     "reviewed": "Als geprüft markieren",
     "closed": "Schließen"
-  }
+  },
+  "administration": "Administration"
 }

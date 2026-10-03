@@ -426,16 +426,16 @@
     "create": "Describe a problem",
     "createTitle": "What do you see that ought to be solved?",
     "createText": "Describe it concretely enough that someone without your background understands it – who it affects, and what is missing today.",
-    "backToBoard": "Back to Unsolved",
+    "backToBoard": "Back to the problem hub",
     "searchPlaceholder": "Search titles, descriptions, topics and places",
     "intentLabel": "What the person intends",
     "allIntents": "All",
     "unknownAuthor": "No profile",
     "interestCount": "{count, plural, =0 {Nobody would work on it yet} one {1 person would work on it} other {# people would work on it}}",
-    "emptyFirst": "Nothing here yet.",
-    "emptyFirstText": "The first problem is the hardest. Describe something you notice around you – even if you have no solution for it.",
+    "emptyFirst": "What problem have you noticed?",
+    "emptyFirstText": "This is where members share problems and challenges they have noticed. Start with an observation — you do not need a solution yet.",
     "emptyFiltered": "Nothing matches right now.",
-    "emptyFilteredText": "Reset the filters, or describe what you notice yourself.",
+    "emptyFilteredText": "Reset the filters or try fewer criteria.",
     "intents": {
       "observation": "Observation",
       "wants_to_build": "Looking for co-founders",
@@ -860,5 +860,26 @@
     "identity": "How you appear",
     "contribution": "What you bring & how to approach you",
     "ownVentures": "My companies & projects"
+  },
+  "problemHub": {
+    "nav": "Problem → Potential",
+    "title": "Good things can start with a problem.",
+    "opening": "Sometimes a good idea starts with something frustrating, missing or repeatedly going wrong, rather than a flash of inspiration.",
+    "purpose": "That is what this space is for. Here we collect problems and challenges people notice in everyday life, in organisations or in society.",
+    "possibilities": "Perhaps a better solution is all it needs. Perhaps it becomes a shared project. And sometimes it could even be the beginning of a promising business idea.",
+    "closing": "Not every problem needs a startup. But many good ideas start with the question: Why is this still happening?",
+    "discover": "Explore problems",
+    "create": "Add a problem",
+    "view": "View problem",
+    "processTitle": "Where it could go next",
+    "steps": {
+      "notice": "Notice a problem",
+      "perspectives": "Gather perspectives",
+      "together": "Explore it together",
+      "possibility": "A solution, project or venture"
+    },
+    "workspaceHint": "To explore a problem together, you can use a private workspace. Only people explicitly invited can see the space and its contents.",
+    "workspaces": "Go to your private workspaces",
+    "filterTitle": "Filter problems"
   }
 }

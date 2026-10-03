@@ -108,6 +108,7 @@ test("alle drei Bereiche tragen ihre Ziele in der Leiste", () => {
     "/discovery/searches",
     // Connect
     "/connect",
+    "/connect/problems",
     "/connect/my",
     "/connect/suggestions",
   ]) {

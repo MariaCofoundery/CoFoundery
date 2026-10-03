@@ -30,9 +30,9 @@ test("highlight diversity counts owners, preserves own marker and accepts proble
   for (let i = 0; i < 20; i++) { const result = pickAcrossKinds([...same, make("b", "venture", "b"), make("c", "seeking", "c")], 3); assert.equal(new Set(result.map(x => x.person?.user_id)).size, 3); assert.ok(result.find(x => x.person?.user_id === "a")?.isOwn); }
   assert.equal(pickAcrossKinds([make("d", "problem", "p")], 3)[0].kind, "problem");
 });
-test("closed beta has three areas, four discovery types and private management links", () => {
+test("closed beta has four areas, four discovery types and private management links", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  for (const key of ["beta.discover", "suggestions.title", "beta.mine"]) assert.ok(shell.includes(key));
+  for (const key of ["beta.discover", "problemHub.nav", "suggestions.title", "beta.mine"]) assert.ok(shell.includes(key));
   const tabs = readFileSync("src/features/connect/ConnectTabs.tsx", "utf8"); assert.ok(!tabs.includes("/connect/workspaces"));
   const own = readFileSync("src/features/connect/ConnectMyNavigation.tsx", "utf8");
   for (const path of ["/connect/profile", "/connect/my", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"]) assert.ok(own.includes(path));

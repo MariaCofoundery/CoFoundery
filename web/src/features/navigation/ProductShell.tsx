@@ -408,12 +408,11 @@ export function ProductShell({
     label: t("areaConnect"),
     isActive: (currentPathname) => currentPathname.startsWith("/connect"),
     badge: { kind: "attention", count: connectAttentionCount },
-    // Dieselbe Regel wie oben: die eigenen Sachen hier, die Reiter ueber die
-    // Inhalte ("Menschen", "Unternehmen", "Angebote", "Ungeloestes") bleiben
-    // auf der Seite - sie tragen Zaehler, und ein Reiter ohne Zahl laesst
-    // einen ins Leere klicken.
+    // Der Problem-Hub hat einen eigenen Einstieg. Die Discovery-Reiter mit
+    // Bestandszaehlern bleiben zusaetzlich auf den jeweiligen Uebersichtsseiten.
     subItems: [
-      { href: "/connect", label: tConnect("beta.discover"), isActive: (path: string) => path === "/connect" || /^\/connect\/(people|problems|listings)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")) },
+      { href: "/connect", label: tConnect("beta.discover"), isActive: (path: string) => path === "/connect" || /^\/connect\/(people|listings)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")) },
+      { href: "/connect/problems", label: tConnect("problemHub.nav"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
       { href: "/connect/suggestions", label: tConnect("suggestions.title"), isActive: (path: string) => path.startsWith("/connect/suggestions"), ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}) },
       { href: "/connect/my", label: tConnect("beta.mine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
     ],

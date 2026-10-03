@@ -11,7 +11,7 @@ import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/c
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "min-w-0 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
+const card = "min-w-0 break-words rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
 const field =
   "min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const action = "inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold";
@@ -47,163 +47,143 @@ export default async function ConnectProblemsPage({
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">{t("problems.title")}</h1>
-          <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("problems.text")}</p>
+      <header className="rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50/70 via-white to-cyan-50/50 p-5 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-widest text-violet-700">{t("problemHub.nav")}</p>
+        <h1 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">{t("problemHub.title")}</h1>
+        <div className="mt-5 max-w-2xl space-y-3 leading-7 text-slate-700">
+          {(["opening", "purpose", "possibilities", "closing"] as const).map((paragraph) => (
+            <p key={paragraph}>{t(`problemHub.${paragraph}`)}</p>
+          ))}
         </div>
-      </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="#probleme" className={`${action} bg-slate-900 text-white hover:bg-slate-800`}>{t("problemHub.discover")}</Link>
+          <Link href="/connect/problems/new" className={`${action} border border-slate-200 bg-white hover:bg-slate-50`}>{t("problemHub.create")}</Link>
+        </div>
+      </header>
 
-      {/* Dieselbe Reiterleiste wie auf den anderen beiden Seiten: Drei
-          Adressen, eine Flaeche. Der frueher hier stehende Zurueck-Link ist
-          damit ueberfluessig - man wechselt den Reiter. */}
-      <div className="mt-5">
+      <section aria-labelledby="problem-process-title" className="mt-6 rounded-2xl bg-slate-50 p-5">
+        <h2 id="problem-process-title" className="font-semibold">{t("problemHub.processTitle")}</h2>
+        <ol className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-sm font-medium text-slate-700">
+          {(["notice", "perspectives", "together", "possibility"] as const).map((step, index) => (
+            <li key={step} className="flex gap-3">
+              {index > 0 ? <span aria-hidden="true" className="text-violet-600">→</span> : null}
+              <span>{t(`problemHub.steps.${step}`)}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{t("problemHub.workspaceHint")}</p>
+        <Link href="/connect/workspaces" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline underline-offset-4">{t("problemHub.workspaces")}</Link>
+      </section>
+
+      <section id="probleme" aria-labelledby="problem-list-title" className="mt-8 scroll-mt-24">
+        <h2 id="problem-list-title" className="mb-4 text-2xl font-semibold">{t("problemHub.discover")}</h2>
         <ConnectTabs active="problems" counts={tabCounts} />
-      </div>
+        {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
 
-      {errorKey ? (
-        <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
-          {t(`errors.${errorKey}`)}
-        </p>
-      ) : null}
+        <section className={`${card} mt-6`}>
+          <h3 className="text-lg font-semibold">{t("problemHub.filterTitle")}</h3>
+          <form action="/connect/problems#probleme" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <input
+              name="q"
+              type="search"
+              defaultValue={filters.q}
+              className={`${field} sm:col-span-2 lg:col-span-3`}
+              placeholder={t("problems.searchPlaceholder")}
+              aria-label={t("problems.searchPlaceholder")}
+            />
+            <select name="intent" defaultValue={filters.intent || ""} className={field} aria-label={t("problems.intentLabel")}>
+              <option value="">{t("problems.allIntents")}</option>
+              {CONNECT_PROBLEM_INTENTS.map((value) => (
+                <option key={value} value={value}>
+                  {t(`problems.intents.${value}`)}
+                </option>
+              ))}
+            </select>
+            <select
+              name="geographic_scope"
+              defaultValue={filters.geographic_scope || ""}
+              className={field}
+              aria-label={t("filters.scope")}
+            >
+              <option value="">{t("filters.allScopes")}</option>
+              {CONNECT_GEOGRAPHIC_SCOPES.map((value) => (
+                <option key={value} value={value}>
+                  {t(`scopes.${value}`)}
+                </option>
+              ))}
+            </select>
+            <button type="submit" className={`${action} border border-slate-200`}>
+              {t("filters.apply")}
+            </button>
+          </form>
+        </section>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/connect/problems/new" className={`${action} bg-[color:var(--brand-primary)]`}>
-          {t("problems.create")}
-        </Link>
-      </div>
-
-      {/* Wozu das Brett da ist.
-          Der erste Absatz steht offen, weil ohne ihn niemand weiss, warum hier
-          Probleme statt Ideen stehen. Der Rest ist eingeklappt: Wer das einmal
-          gelesen hat, will es beim zweiten Besuch nicht wieder ueber der Liste
-          haben. */}
-      <section className={`${card} mt-6 border-violet-100 bg-violet-50/40`}>
-        <h2 className="text-lg font-semibold">{t("problems.usageTitle")}</h2>
-        <p className="mt-2 leading-7 text-slate-700">{t("problems.usageLead")}</p>
-
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-semibold text-violet-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200">
-            {t("problems.usageWaysTitle")}
-          </summary>
-          <ul className="mt-3 space-y-3 text-sm leading-6 text-slate-700">
-            {(["read", "join", "write"] as const).map((way) => (
-              <li key={way} className="flex gap-3">
-                <span aria-hidden className="text-violet-700">
-                  ·
-                </span>
-                <span>{t(`problems.usageWays.${way}`)}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* Die Einschraenkung gehoert dazu, nicht ans Ende einer AGB:
-              Ein Brett, das Geschaeftsideen verspricht, waere unehrlich. */}
-          <h3 className="mt-5 text-sm font-semibold text-slate-900">
-            {t("problems.usageCaveatTitle")}
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t("problems.usageCaveat")}</p>
-          <p className="mt-3 text-sm leading-6 text-slate-600">{t("problems.usageNext")}</p>
-        </details>
-      </section>
-
-      <section className={`${card} mt-6`}>
-        <h2 className="text-lg font-semibold">{t("filters.title")}</h2>
-        <form className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <input
-            name="q"
-            type="search"
-            defaultValue={filters.q}
-            className={`${field} sm:col-span-2 lg:col-span-3`}
-            placeholder={t("problems.searchPlaceholder")}
-            aria-label={t("problems.searchPlaceholder")}
-          />
-          <select name="intent" defaultValue={filters.intent || ""} className={field} aria-label={t("problems.intentLabel")}>
-            <option value="">{t("problems.allIntents")}</option>
-            {CONNECT_PROBLEM_INTENTS.map((value) => (
-              <option key={value} value={value}>
-                {t(`problems.intents.${value}`)}
-              </option>
-            ))}
-          </select>
-          <select
-            name="geographic_scope"
-            defaultValue={filters.geographic_scope || ""}
-            className={field}
-            aria-label={t("filters.scope")}
-          >
-            <option value="">{t("filters.allScopes")}</option>
-            {CONNECT_GEOGRAPHIC_SCOPES.map((value) => (
-              <option key={value} value={value}>
-                {t(`scopes.${value}`)}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className={`${action} border border-slate-200`}>
-            {t("filters.apply")}
-          </button>
-        </form>
-      </section>
-
-      {problems.length ? (
-        <section aria-label={t("problems.title")} className="mt-6 space-y-4">
-          {problems.map((problem) => {
-            const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
-            return (
-              <article key={problem.id} className={card}>
-                <p className="text-xs font-semibold uppercase tracking-[.16em] text-violet-700">
-                  {t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}
-                </p>
-                <h3 className="mt-2 text-xl font-semibold">
-                  <Link href={`/connect/problems/${problem.id}`} className="hover:underline">
-                    {problem.title}
-                  </Link>
-                </h3>
-                <p className="mt-2 line-clamp-3 leading-7 text-slate-700">{problem.description}</p>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-                  <span>{problem.author_user_id === null
-                    ? t("problems.formerMember")
-                    : author?.display_name ?? t("problems.unknownAuthor")}</span>
-                  {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
-                  <span className="flex flex-wrap gap-x-3">
-                    {problem.confirmation_count > 0 ? (
-                      <span>
-                        {t("problems.confirmationsCount", { count: problem.confirmation_count })}
-                      </span>
-                    ) : null}
-                    <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
-                  </span>
-                </div>
-                {problem.locations.length || problem.topics.length ? (
-                  <p className="mt-3 text-sm text-slate-500">
-                    {[...problem.locations, ...problem.topics].join(" · ")}
+        {problems.length ? (
+          <section aria-label={t("problemHub.discover")} className="mt-6 space-y-4">
+            {problems.map((problem) => {
+              const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
+              return (
+                <article key={problem.id} className={card}>
+                  <p className="text-xs font-semibold uppercase tracking-[.16em] text-violet-700">
+                    {t(`problems.intents.${problem.author_intent}`)}
                   </p>
-                ) : null}
-              </article>
-            );
-          })}
-        </section>
-      ) : (
-        <section className={`${card} mt-6 text-center`}>
-          <h2 className="text-xl font-semibold">
-            {t(isFiltered ? "problems.emptyFiltered" : "problems.emptyFirst")}
-          </h2>
-          <p className="mt-2 text-sm text-slate-600">
-            {t(isFiltered ? "problems.emptyFilteredText" : "problems.emptyFirstText")}
-          </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            {isFiltered ? (
-              <Link href="/connect/problems" className={`${action} border border-slate-200`}>
-                {t("empty.reset")}
+                  <h3 className="mt-2 break-words text-xl font-semibold">
+                    <Link href={`/connect/problems/${problem.id}`} className="hover:underline">
+                      {problem.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-2 line-clamp-3 leading-7 text-slate-700">{problem.description}</p>
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+                    <span>{problem.author_user_id === null
+                      ? t("problems.formerMember")
+                      : author?.display_name ?? t("problems.unknownAuthor")}</span>
+                    {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
+                    <span className="flex flex-wrap gap-x-3">
+                      {problem.confirmation_count > 0 ? (
+                        <span>
+                          {t("problems.confirmationsCount", { count: problem.confirmation_count })}
+                        </span>
+                      ) : null}
+                      <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+                    </span>
+                  </div>
+                  {problem.locations.length || problem.geographic_scope ? (
+                    <p className="mt-3 text-sm text-slate-500">
+                      {[...problem.locations, ...(problem.geographic_scope ? [t(`scopes.${problem.geographic_scope}`)] : [])].join(" · ")}
+                    </p>
+                  ) : null}
+                  {problem.topics.length ? (
+                    <ul aria-label={t("form.topics")} className="mt-3 flex flex-wrap gap-2">
+                      {problem.topics.map((topic) => <li key={topic} className="max-w-full rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">{topic}</li>)}
+                    </ul>
+                  ) : null}
+                  <Link href={`/connect/problems/${problem.id}`} className={`${action} mt-4 border border-slate-200 hover:bg-slate-50`}>{t("problemHub.view")}</Link>
+                </article>
+              );
+            })}
+          </section>
+        ) : (
+          <section className={`${card} mt-6 text-center`}>
+            <h3 className="text-xl font-semibold">
+              {t(isFiltered ? "problems.emptyFiltered" : "problems.emptyFirst")}
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              {t(isFiltered ? "problems.emptyFilteredText" : "problems.emptyFirstText")}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              {isFiltered ? (
+                <Link href="/connect/problems#probleme" className={`${action} border border-slate-200`}>
+                  {t("empty.reset")}
+                </Link>
+              ) : null}
+              <Link href="/connect/problems/new" className={`${action} bg-[color:var(--brand-primary)]`}>
+                {t("problems.create")}
               </Link>
-            ) : null}
-            <Link href="/connect/problems/new" className={`${action} bg-[color:var(--brand-primary)]`}>
-              {t("problems.create")}
-            </Link>
-          </div>
-        </section>
-      )}
-    <ConnectPagination path="/connect/problems" filters={filters} count={problemsRows.length} />
-</main>
+            </div>
+          </section>
+        )}
+        <ConnectPagination path="/connect/problems" filters={filters} count={problemsRows.length} />
+      </section>
+    </main>
   );
 }
