@@ -23,6 +23,7 @@ export async function ConnectTabs({
   counts: { people: number; ventures: number; listings: number; problems: number };
 }) {
   const t = await getTranslations("connect");
+  const w = await getTranslations("problemWorkspace");
 
   const tabs: { key: Tab; href: string; count: number }[] = [
     { key: "people", href: "/connect/people", count: counts.people },
@@ -59,6 +60,7 @@ export async function ConnectTabs({
           </Link>
         );
       })}
+      <Link href="/connect/workspaces" className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-slate-600">{w("title")}</Link>
     </nav>
   );
 }

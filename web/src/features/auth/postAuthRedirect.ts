@@ -1,4 +1,4 @@
-import { isTeamIntakeInvitePath } from "@/features/auth/betaAccess";
+import { isTeamIntakeInvitePath, isProblemWorkspaceInvitePath } from "@/features/auth/betaAccess";
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
@@ -87,6 +87,8 @@ export async function resolvePostAuthRedirectPath(
   if (
     isJoinContinuationPath(normalizedNext) || isAdvisorInviteContinuationPath(normalizedNext) ||
     isTeamIntakeInvitePath(normalizedNext) || normalizedNext === "/team-intake" ||
+    isProblemWorkspaceInvitePath(normalizedNext) || normalizedNext === "/connect/workspaces" ||
+    /^\/connect\/workspaces\/[0-9a-f-]{36}$/.test(normalizedNext) ||
     /^\/team-intake\/[0-9a-f-]{36}$/.test(normalizedNext)
   ) {
     return normalizedNext;

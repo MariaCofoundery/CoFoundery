@@ -55,6 +55,7 @@ export default async function ConnectProblemPage({
   // Entwuerfe anderer Menschen liefert die Datenbank gar nicht erst aus.
   if (!problem) notFound();
 
+  const workspaceText = await getTranslations("problemWorkspace");
   const isAuthor = problem.author_user_id === user.id;
   const isPublished = problem.status === "active";
   const [authors, ownInterest, interests, hasProfile, confirmations, ownConfirmation, approaches] =
@@ -133,6 +134,7 @@ export default async function ConnectProblemPage({
         </p>
       ) : null}
 
+      {isAuthor && isPublished && <Link href={`/connect/workspaces/new?problem=${problem.id}`} className="mt-4 inline-flex min-h-11 items-center rounded-full border px-5 py-3 text-sm font-semibold">{workspaceText("new")}</Link>}
       <article className={`${card} mt-5`}>
         <p className="text-xs font-semibold uppercase tracking-[.16em] text-violet-700">
           {t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}

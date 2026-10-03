@@ -1,3 +1,5 @@
+import deProblemWorkspace from "../../messages/de/problemWorkspace.json";
+import enProblemWorkspace from "../../messages/en/problemWorkspace.json";
 import deIntake from "../../messages/de/intake.json";
 import enIntake from "../../messages/en/intake.json";
 import type { AbstractIntlMessages } from "next-intl";
@@ -58,6 +60,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
     intake: deIntake,
+    problemWorkspace: deProblemWorkspace,
     alignment: deAlignment,
     assessment: deAssessment,
     account: deAccount,
@@ -87,6 +90,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   },
   en: {
     intake: enIntake,
+    problemWorkspace: enProblemWorkspace,
     alignment: enAlignment,
     assessment: enAssessment,
     account: enAccount,
