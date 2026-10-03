@@ -29,10 +29,12 @@ export function ConnectProblemForm({
   problem,
   canPublish,
   t,
+  previewLabel,
 }: {
   action: (formData: FormData) => void | Promise<void>;
-  problem?: ConnectProblem;
+  problem?: Pick<ConnectProblem, "id" | "title" | "description" | "author_intent" | "geographic_scope" | "locations" | "topics" | "industries" | "outlives_account" | "visibility" | "status">;
   canPublish: boolean;
+  previewLabel?: string;
   t: T;
 }) {
   const isPublished = problem?.status === "active";
@@ -180,7 +182,9 @@ export function ConnectProblemForm({
         {/* Beim Bearbeiten eines veroeffentlichten Problems gibt es nur einen
             Knopf: Speichern aendert nichts am Zustand. Zurueckziehen und als
             geloest markieren stehen auf der Detailseite, wo sie hingehoeren. */}
-        {isPublished ? (
+        {previewLabel ? (
+          <SubmitButton label={previewLabel} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border px-5 py-3 font-semibold" />
+        ) : isPublished ? (
           <SubmitButton
             label={t("problems.form.saveChanges")}
             pendingLabel={t("pending.save")}

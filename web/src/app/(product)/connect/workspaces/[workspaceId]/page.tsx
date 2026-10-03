@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WorkspaceDevelopment } from "@/features/connect/workspaces/WorkspaceDevelopment";
 import { getTranslations } from "next-intl/server";
 import { readWorkspace } from "@/features/connect/workspaces/data";
 import {
@@ -313,6 +314,7 @@ export default async function Page({
           </section>
         ))}
       </section>
+      <WorkspaceDevelopment workspace={w} />
       {owner && active && (
         <details className={card}>
           <summary className="cursor-pointer py-3">{t("archive")}</summary>

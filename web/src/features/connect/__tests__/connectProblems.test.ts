@@ -227,7 +227,9 @@ test("drafts are reachable, and there is no second overview", () => {
 
 test("the form exists once, for creating and editing", () => {
   const form = source("src/features/connect/ConnectProblemForm.tsx");
-  assert.match(form, /problem\?: ConnectProblem/);
+  // Workspace previews reuse the same editor with only its editable fields,
+  // without inventing counters, author identities or other read-model data.
+  assert.match(form, /problem\?: Pick<ConnectProblem,/);
   for (const page of [NEW, "src/app/(product)/connect/problems/[problemId]/edit/page.tsx"]) {
     assert.match(source(page), /<ConnectProblemForm/, `${page} baut das Formular selbst`);
   }
