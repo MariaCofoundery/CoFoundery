@@ -75,6 +75,7 @@ export const INSTRUMENT_IDS = [
    */
   "founder-profile-v1",
   "venture-alignment-v1",
+  "founder-workstyle-pretest-8-5a-v1",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 

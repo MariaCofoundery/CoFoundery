@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { setResearchConsentAction } from "@/features/research/actions";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
@@ -31,6 +32,7 @@ export function ResearchConsentSettings({ initialState }: { initialState: Resear
     <section className="mt-5 border-t border-slate-200 pt-5" aria-labelledby="research-settings-title">
       <h3 id="research-settings-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600">{t("description")}</p>
+      <Link href="/research/workstyle-pretest" className="mt-3 inline-flex min-h-11 items-center underline">{t("workstylePretest")}</Link>
       <p className="mt-3 text-sm text-slate-700">{t("statusLabel")} <strong>{active ? t("active") : t("inactive")}</strong></p>
       {unreadable ? (
         <p className="mt-2 text-sm text-amber-800">{t("unreadable")}</p>

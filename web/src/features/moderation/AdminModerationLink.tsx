@@ -14,6 +14,7 @@ export async function AdminModerationLink() {
       <nav aria-label={t("administration")} className="mt-3 flex flex-wrap gap-3">
         <Link href="/admin/moderation" className="inline-flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-4 font-semibold text-slate-700 hover:bg-slate-100">{t("entry")}</Link>
         <Link href="/admin/problem-radar" className="inline-flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-4 font-semibold text-slate-700 hover:bg-slate-100">{radar("title")}</Link>
+        <Link href="/admin/research/workstyle-pretest" className="inline-flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-4 font-semibold text-slate-700 hover:bg-slate-100">Workstyle Research-Pretest</Link>
       </nav>
     </section>
   );

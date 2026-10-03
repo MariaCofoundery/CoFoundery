@@ -2,6 +2,8 @@
 
 Stand: 03.10.2026. Ausgangscommit: `c17b965`.
 
+Nachtrag 04.10.2026: Der Auftraggeber hat den bislang fehlenden Pool vollständig geliefert. Die hier dokumentierte Stop-Entscheidung beschreibt den damaligen Auditstand. Die anschließende additive Umsetzung und ihre Prüfungen stehen im [Implementierungsbericht](research/phase-8/phase-8.5a-implementation.md).
+
 **Entscheidung: Stop nach dem Audit gemäß Aufgabenstellung.** Keine Migration, neue Route oder Produktänderung. Die vorhandenen Person-, Team-, Assessment- und Freigabestrukturen sind weitgehend wiederverwendbar. Die verbindliche Inhaltsgrundlage „Phase-8.4-v0.2-Pool“ einschließlich vereinbarter Core-Auswahl ist jedoch im untersuchten Repository nicht identifizierbar. Außerdem darf ein kombinierter Core-/Research-Bogen nicht ungeprüft in die bestehende assessmentweite Antwortfreigabe aufgenommen werden: Diese kennt keine Research-Klassifikation.
 
 ## Prüfgrundlage und Grenzen

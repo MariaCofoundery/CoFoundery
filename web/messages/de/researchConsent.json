@@ -17,6 +17,7 @@
     "withdraw": "Teilnahme beenden",
     "withdrawal": "Nach dem Beenden speichern wir keine neuen Forschungsdaten mehr, und die noch dir zuordenbaren löschen wir.\n\nWas sich nicht rückgängig machen lässt: Auswertungen, in denen deine Angaben bereits mit denen anderer zusammengefasst wurden. Aus einer Häufigkeit über hundert Menschen lässt sich dein Anteil nicht wieder herausrechnen, und was veröffentlicht wurde, bleibt veröffentlicht.",
     "error": "Die Einstellung konnte gerade nicht geändert werden. Bitte versuche es erneut.",
-    "unreadable": "Wir konnten deinen gespeicherten Stand gerade nicht lesen. Hier steht deshalb „nicht aktiv“ — deine frühere Entscheidung ist davon nicht betroffen. Schau später noch einmal nach."
+    "unreadable": "Wir konnten deinen gespeicherten Stand gerade nicht lesen. Hier steht deshalb „nicht aktiv“ — deine frühere Entscheidung ist davon nicht betroffen. Schau später noch einmal nach.",
+    "workstylePretest": "Workstyle-Pretest: teilnehmen oder Einwilligung verwalten"
   }
 }
