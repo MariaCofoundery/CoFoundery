@@ -1,3 +1,5 @@
+import { ConnectPagination } from "@/features/connect/ConnectPagination";
+import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -9,7 +11,7 @@ import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/c
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "rounded-3xl border border-slate-200 bg-white p-6";
+const card = "min-w-0 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
 const field =
   "min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const action = "inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold";
@@ -28,10 +30,11 @@ export default async function ConnectProblemsPage({
 }) {
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client, user } = await requireConnectMember("/connect/problems");
-  const [problems, tabCounts] = await Promise.all([
+  const [problemsRows, tabCounts] = await Promise.all([
     getActiveConnectProblems(client, filters),
     getConnectTabCounts(client, user.id),
   ]);
+  const problems = problemsRows.slice(0, CONNECT_PAGE_SIZE);
   const authors = await getConnectProfilesByUserIds(
     client,
     problems.map((problem) => problem.author_user_id).filter((id): id is string => id !== null)
@@ -200,6 +203,7 @@ export default async function ConnectProblemsPage({
           </div>
         </section>
       )}
-    </main>
+    <ConnectPagination path="/connect/problems" filters={filters} count={problemsRows.length} />
+</main>
   );
 }

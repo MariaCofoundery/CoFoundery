@@ -397,7 +397,7 @@ test("the sitemap points at addresses that actually exist", () => {
   assert.match(fn, /'\/connect\/pr\/'/);
 
   const robots = source("src/app/robots.ts");
-  assert.match(robots, /"\/connect\/pr\/"/, "und der Pfad ist fuer Suchmaschinen freigegeben");
+  assert.match(robots, /"\/connect"/, "und der Pfad ist fuer Suchmaschinen freigegeben");
 });
 
 test("the visibility copy names what stays inside", () => {

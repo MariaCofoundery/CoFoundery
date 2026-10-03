@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 type Tab = "people" | "ventures" | "listings" | "problems";
 
 /**
- * Drei Reiter, drei Adressen - eine Flaeche.
+ * Vier Discoveryarten. Private Arbeitsräume stehen in Mein CONNECT.
  *
  * Bewusst kein gemischter Feed: Ein Mischfeed braucht eine Rangfolge, und
  * Rangfolgen sind genau das, was dieses Produkt ueberall vermeidet. Reiter
@@ -23,22 +23,20 @@ export async function ConnectTabs({
   counts: { people: number; ventures: number; listings: number; problems: number };
 }) {
   const t = await getTranslations("connect");
-  const w = await getTranslations("problemWorkspace");
+
 
   const tabs: { key: Tab; href: string; count: number }[] = [
     { key: "people", href: "/connect/people", count: counts.people },
-    // Dazugekommen am 21.09.2026: Unternehmen gab es nur als eigene, unter
-    // /connect/ventures. Auf einer Personenkarte stand "2 Unternehmen", und es
-    // fuehrte kein Weg dorthin.
-    { key: "ventures", href: "/connect/ventures", count: counts.ventures },
     { key: "listings", href: "/connect", count: counts.listings },
     { key: "problems", href: "/connect/problems", count: counts.problems },
+    { key: "ventures", href: "/connect/ventures", count: counts.ventures },
   ];
 
   return (
     <nav
       aria-label={t("tabs.label")}
-      className="flex flex-wrap gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
+      title={t("beta.total")}
+      className="flex flex-wrap gap-1 rounded-2xl border border-slate-200/80 bg-white/90 p-1"
     >
       {tabs.map((tab) => {
         const isActive = tab.key === active;
@@ -60,7 +58,6 @@ export async function ConnectTabs({
           </Link>
         );
       })}
-      <Link href="/connect/workspaces" className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-slate-600">{w("title")}</Link>
     </nav>
   );
 }

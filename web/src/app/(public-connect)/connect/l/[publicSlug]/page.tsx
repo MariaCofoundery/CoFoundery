@@ -1,3 +1,5 @@
+import { CONNECT_PUBLIC_ROLLOUT_ENABLED } from "@/features/connect/connectRollout";
+import { openClosedBetaSlug } from "@/features/connect/closedBetaSlug";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,6 +16,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: Promise<{ publicSlug: string }> }): Promise<Metadata> {
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return { title: "Connect", robots: { index: false, follow: false } };
   const { publicSlug } = await params;
   const listing = await getPublicConnectListing(await createClient(), publicSlug).catch(() => null);
   if (!listing) return { title: `Connect | ${PRODUCT_NAME}`, robots: { index: false, follow: false } };
@@ -23,6 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ publicSlu
 
 export default async function PublicConnectListingPage({ params }: { params: Promise<{ publicSlug: string }> }) {
   const { publicSlug } = await params;
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return openClosedBetaSlug("l", publicSlug);
   const client = await createClient();
   const [t, locale, listing, auth] = await Promise.all([
     getTranslations("connect"), getLocale(), getPublicConnectListing(client, publicSlug).catch(() => null), getRequestUser(),

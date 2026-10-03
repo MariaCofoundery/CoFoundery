@@ -1,4 +1,5 @@
 "use server";
+import { connectPublicationVisibility } from "@/features/connect/connectRollout";
 
 import { savedPublicationStatus } from "@/features/connect/connectLifecycle";
 import { revalidatePath } from "next/cache";
@@ -59,7 +60,7 @@ function resolveProblemVisibility(
   currentVisibility: string | null | undefined,
   onMissingConsent: () => never
 ) {
-  const wanted = formData.get("visibility") === "public" ? "public" : "members_only";
+  const wanted = connectPublicationVisibility(formData.get("visibility"));
   if (wanted === "public" && currentVisibility !== "public") {
     if (formData.get("confirm_public_visibility") !== "yes") onMissingConsent();
   }

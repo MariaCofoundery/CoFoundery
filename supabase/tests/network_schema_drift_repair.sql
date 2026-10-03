@@ -4,6 +4,8 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select extensions.plan(17);
 
+-- Remove the later view only inside this rollback-only historical upgrade scenario.
+drop view public.connect_discovery_listings;
 drop index if exists public.network_listings_locations_idx;
 drop index if exists public.network_listings_scope_idx;
 alter table public.network_listings

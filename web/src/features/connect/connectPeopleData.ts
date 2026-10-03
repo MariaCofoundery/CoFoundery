@@ -1,4 +1,5 @@
 import "server-only";
+import { connectOffset } from "@/features/connect/connectBrowsePage";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ConnectListing, ConnectProfile } from "./connectTypes";
@@ -6,6 +7,7 @@ import type { ConnectListing, ConnectProfile } from "./connectTypes";
 type Client = SupabaseClient;
 
 export type ConnectPeopleFilters = {
+  page?: string;
   q?: string;
   role?: string;
   expertise?: string;
@@ -17,9 +19,7 @@ export type ConnectPeopleFilters = {
 
 export type ConnectPerson = ConnectProfile & { ventureCount: number };
 
-function escapeLike(term: string) {
-  return term.replace(/[\\%_]/g, (match) => `\\${match}`);
-}
+
 
 /**
  * Menschen im Netzwerk.
@@ -33,68 +33,16 @@ function escapeLike(term: string) {
  */
 export async function getConnectPeople(
   client: Client,
-  currentUserId: string,
+  _currentUserId: string,
   filters: ConnectPeopleFilters
 ) {
-  let query = client
-    .from("network_profiles")
-    .select("*")
-    .eq("status", "active")
-    .neq("user_id", currentUserId)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(60);
-
-  if (filters.role) query = query.contains("network_roles", [filters.role]);
-  if (filters.remote_mode) query = query.eq("remote_mode", filters.remote_mode);
-  if (filters.open_to) query = query.contains("open_to_formats", [filters.open_to]);
-
-  const region = (filters.region ?? "").trim();
-  if (region) query = query.ilike("location_region", `%${escapeLike(region)}%`);
-
-  const expertise = (filters.expertise ?? "").trim();
-  if (expertise) query = query.contains("expertise", [expertise]);
-
-  const industry = (filters.industry ?? "").trim();
-  if (industry) query = query.contains("industries", [industry]);
-
-  const { data, error } = await query;
-  if (error) return [];
-  let profiles = (data ?? []) as ConnectProfile[];
-
-  // Der Suchbegriff greift auch auf die Unternehmen zu - "wir machen X fuer
-  // Y" ist genau das, wonach jemand sucht. Deshalb zwei Abfragen statt einer:
-  // Postgrest kann ueber eine Fremdtabelle nicht filtern, ohne sie
-  // einzubetten, und einbetten wuerde die Eintraege ungefragt mitliefern.
-  const term = (filters.q ?? "").trim();
-  if (term) {
-    const pattern = `%${escapeLike(term)}%`;
-    const { data: ventureOwners } = await client
-      .from("network_ventures")
-      .select("owner_user_id")
-      .eq("status", "active")
-      .ilike("search_text", pattern);
-    const matchedByVenture = new Set(
-      ((ventureOwners ?? []) as { owner_user_id: string }[]).map((row) => row.owner_user_id)
-    );
-
-    const needle = term.toLocaleLowerCase("de-DE");
-    profiles = profiles.filter((profile) => {
-      if (matchedByVenture.has(profile.user_id)) return true;
-      const haystack = [
-        profile.display_name,
-        profile.headline,
-        profile.bio,
-        profile.network_reach ?? "",
-        profile.contact_note ?? "",
-        ...profile.expertise,
-        ...profile.industries,
-        profile.location_region ?? "",
-      ]
-        .join(" ")
-        .toLocaleLowerCase("de-DE");
-      return haystack.includes(needle);
-    });
-  }
+  const { data, error } = await client.rpc("search_connect_people", {
+    p_q: (filters.q ?? "").trim(), p_role: filters.role ?? "", p_expertise: (filters.expertise ?? "").trim(),
+    p_industry: (filters.industry ?? "").trim(), p_region: (filters.region ?? "").trim(), p_remote: filters.remote_mode ?? "",
+    p_open_to: filters.open_to ?? "", p_offset: connectOffset(filters.page),
+  });
+  if (error) throw new Error("network_people_load_failed");
+  const profiles = (data ?? []) as ConnectProfile[];
 
   const ventureCounts = await countVenturesByOwner(
     client,
@@ -112,7 +60,7 @@ async function countVenturesByOwner(client: Client, ownerIds: string[]) {
   if (ownerIds.length === 0) return counts;
 
   const { data } = await client
-    .from("network_ventures")
+    .from("connect_discovery_ventures")
     .select("owner_user_id")
     .eq("status", "active")
     .in("owner_user_id", ownerIds);
@@ -137,16 +85,16 @@ export async function getConnectTabCounts(client: Client, currentUserId: string)
       .eq("status", "active")
       .neq("user_id", currentUserId),
     client
-      .from("network_ventures")
+      .from("connect_discovery_ventures")
       .select("id", { count: "exact", head: true })
       .eq("status", "active"),
     client
-      .from("network_listings")
+      .from("connect_discovery_listings")
       .select("id", { count: "exact", head: true })
       .eq("status", "active")
       .gt("expires_at", new Date().toISOString()),
     client
-      .from("network_problems")
+      .from("connect_discovery_problems")
       .select("id", { count: "exact", head: true })
       .eq("status", "active"),
   ]);
@@ -190,7 +138,7 @@ export async function getConnectPerson(client: Client, userId: string) {
 /** Die veroeffentlichten Anzeigen eines Menschen, frisch zuerst. */
 export async function getActiveConnectListingsByOwner(client: Client, ownerUserId: string) {
   const { data } = await client
-    .from("network_listings")
+    .from("connect_discovery_listings")
     .select("*")
     .eq("owner_user_id", ownerUserId)
     .eq("status", "active")
@@ -202,7 +150,7 @@ export async function getActiveConnectListingsByOwner(client: Client, ownerUserI
 /** Das Ungelöste eines Menschen. */
 export async function getActiveConnectProblemsByAuthor(client: Client, authorUserId: string) {
   const { data } = await client
-    .from("network_problems")
+    .from("connect_discovery_problems")
     .select("id, title, description, author_intent, topics, industries, created_at")
     .eq("author_user_id", authorUserId)
     .eq("status", "active")

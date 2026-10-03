@@ -1,4 +1,11 @@
 begin;
+-- Historical public capability regression ONLY within this rolled-back test.
+-- Closed-beta defaults are asserted separately in connect_closed_beta_710b.sql.
+create or replace function public.connect_public_rollout_enabled() returns boolean language sql stable security definer set search_path='' as $$select true$$;
+alter table public.network_profiles disable trigger a0_connect_beta_visibility;
+alter table public.network_listings disable trigger a0_connect_beta_visibility;
+alter table public.network_problems disable trigger a0_connect_beta_visibility;
+
 select no_plan();
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values('77000000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','phase77-1@example.invalid',now(),'{}','{}',now(),now());
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values('77000000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','phase77-2@example.invalid',now(),'{}','{}',now(),now());

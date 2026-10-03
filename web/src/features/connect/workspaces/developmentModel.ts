@@ -1,3 +1,4 @@
+import { connectPublicationVisibility } from "@/features/connect/connectRollout";
 import type { ConnectProblem } from "@/features/connect/connectTypes";
 export type PublicationFields = Pick<
   ConnectProblem,
@@ -64,7 +65,7 @@ export function publicationFields(form: FormData): PublicationFields {
     locations: list(form.get("locations"), 3),
     topics: list(form.get("topics"), 8),
     industries: list(form.get("industries"), 5),
-    visibility: form.get("visibility") === "public" ? "public" : "members_only",
+    visibility: connectPublicationVisibility(form.get("visibility")),
     outlives_account: form.get("outlives_account") === "yes",
   };
 }

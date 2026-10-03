@@ -115,7 +115,7 @@ test("private workspace paths are disallowed without blocking public CONNECT pat
   assert.ok(!Array.isArray(rule));
   if (!Array.isArray(rule)) {
     assert.ok(rule.disallow?.includes("/connect/workspaces"));
-    assert.ok(rule.allow?.includes("/connect/pr/"));
+    assert.ok(rule.disallow?.includes("/connect"));
   }
 });
 test("invite email has generic purpose and token link, no private workspace title or entry data", () => {

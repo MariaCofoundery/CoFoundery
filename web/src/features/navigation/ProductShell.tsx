@@ -413,37 +413,9 @@ export function ProductShell({
     // auf der Seite - sie tragen Zaehler, und ein Reiter ohne Zahl laesst
     // einen ins Leere klicken.
     subItems: [
-      {
-        href: "/connect/profile",
-        label: t("connectProfile"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/profile"),
-      },
-      {
-        href: "/connect/my",
-        label: t("connectListings"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/my"),
-      },
-      {
-        href: "/connect/ventures/mine",
-        label: t("connectVentures"),
-        isActive: (currentPathname: string) =>
-          currentPathname.startsWith("/connect/ventures/mine"),
-      },
-      {
-        href: "/connect/suggestions",
-        label: t("connectSuggestions"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/connect/suggestions"),
-        // Marias Frage war: "Wo sehe ich dann, wer mir vorgeschlagen wird?"
-        // Ein Link allein beantwortet sie nur fuer den, der ohnehin nachsieht.
-        ...(connectSuggestionCount > 0
-          ? {
-              count: {
-                value: connectSuggestionCount,
-                label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }),
-              },
-            }
-          : {}),
-      },
+      { href: "/connect", label: tConnect("beta.discover"), isActive: (path: string) => path === "/connect" || /^\/connect\/(people|problems|listings)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")) },
+      { href: "/connect/suggestions", label: tConnect("suggestions.title"), isActive: (path: string) => path.startsWith("/connect/suggestions"), ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}) },
+      { href: "/connect/my", label: tConnect("beta.mine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
     ],
   };
 
@@ -855,7 +827,7 @@ export function ProductShell({
           >
             <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
               {breadcrumb.map((krume, index) => (
-                <li key={krume.href} className="flex items-center gap-1.5">
+                <li key={`${index}:${krume.href}`} className="flex items-center gap-1.5">
                   {index > 0 ? <span aria-hidden="true">›</span> : null}
                   {krume.href === pathname ? (
                     <span aria-current="page" className="font-medium text-slate-700">

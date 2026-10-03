@@ -11,7 +11,7 @@ import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "rounded-3xl border border-slate-200 bg-white p-6";
+const card = "min-w-0 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
 const SAVED_KEYS = ["created", "deleted"];
 
 /**
@@ -25,6 +25,7 @@ export default async function ConnectSearchesPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  const capability = await getTranslations("capability");
   const [t, params] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client } = await requireConnectMember("/connect/searches");
   const searches = await getOwnSavedSearches(client, "connect");
@@ -33,7 +34,7 @@ export default async function ConnectSearchesPage({
   const errorKey = knownKey(params.error, CONNECT_ERROR_KEYS);
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
+    <main className="mx-auto max-w-3xl break-words px-5 py-10">
       <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
         ← {t("navigation.overview")}
       </Link>
@@ -60,7 +61,7 @@ export default async function ConnectSearchesPage({
               search.industries.length ? `${t("form.industries")}: ${search.industries.join(", ")}` : null,
               search.locations.length ? `${t("searches.criteria.locations")}: ${search.locations.join(", ")}` : null,
               search.capabilityAreaIds.length
-                ? `${t("searches.criteria.capabilities")}: ${search.capabilityAreaIds.join(", ")}`
+                ? `${t("searches.criteria.capabilities")}: ${search.capabilityAreaIds.map((id) => capability.has(`areaLabels.${id}`) ? capability(`areaLabels.${id}`) : t("searches.unknownCapability")).join(", ")}`
                 : null,
               search.geographicScope ? `${t("filters.scope")}: ${t(`scopes.${search.geographicScope}`)}` : null,
               search.remoteMode ? `${t("filters.remote")}: ${t(`remote.${search.remoteMode}`)}` : null,

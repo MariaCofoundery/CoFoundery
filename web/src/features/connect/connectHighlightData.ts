@@ -2,38 +2,16 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { ConnectListing, ConnectProfile, ConnectVenture } from "./connectTypes";
+import type { ConnectListing, ConnectProfile, ConnectVenture, ConnectProblem } from "./connectTypes";
 
 /**
- * Das Highlight-Feld: ein Blick auf etwas, das man nicht gesucht hat.
- *
- * Die Uebersicht zeigt Anzeigen nach Aktualitaet. Wer nicht taeglich
- * hereinschaut, sieht damit immer nur den oberen Rand - und nie das
- * Unternehmen, das vor drei Wochen dazukam, oder den Menschen, dessen Profil
- * gut passt, aber keine Anzeige hat.
- *
- * ZUFALL UND NICHT PASSUNG. Was hier erscheint, wird gemischt und nicht
- * bewertet. Eine Rangfolge waere genau das, was dieses Produkt an allen
- * anderen Stellen vermeidet - und sie waere hier besonders heikel, weil ein
- * Highlight wie eine Empfehlung DES HAUSES gelesen wird.
- *
- * DIE EHRLICHE GRENZE DES VERFAHRENS: Gemischt wird aus einem Fenster der
- * jeweils neuesten Eintraege, nicht aus dem gesamten Bestand. Wer seit einem
- * Jahr dabei ist und nichts geaendert hat, erscheint also nicht. Das ist der
- * Preis dafuer, ohne `order by random()` ueber die ganze Tabelle auszukommen -
- * und bei einem Netzwerk dieser Groesse noch kein Problem. Sobald das Fenster
- * kleiner ist als der Bestand, gehoert hier ein zufaelliger Versatz hin.
- *
- * WAS SPAETER DAZUKOMMT, und wofuer der Platz schon steht:
- *
- *   `disclosure` sagt, WARUM etwas hier steht. Heute immer "none": Zufall
- *   braucht keine Erklaerung. Fuer bezahlte Plaetze ist die Kennzeichnung
- *   nicht Geschmackssache, sondern Pflicht (§ 5a UWG) - deshalb steht das Feld
- *   von Anfang an im Typ und wird von Anfang an angezeigt. Ein Feld, das erst
- *   mit dem Geld dazukommt, wird beim Einbau vergessen.
+ * Neutrale Discovery: je Objektgruppe höchstens 30 aktuell zulässige Kandidaten.
+ * RLS, Mitgliedschaft, Status, Blockierung und Consent werden vor dem Limit geprüft.
+ * Die Auswahl mischt Objektarten und zeigt höchstens eine Karte je Besitzer.
+ * Das ist weder personalisiertes Ranking noch eine Auswahl aus dem Gesamtbestand.
  */
 
-export const HIGHLIGHT_KINDS = ["seeking", "offering", "venture", "person"] as const;
+export const HIGHLIGHT_KINDS = ["seeking", "offering", "venture", "person", "problem"] as const;
 export type HighlightKind = (typeof HIGHLIGHT_KINDS)[number];
 
 /** Warum steht das hier? */
@@ -70,7 +48,7 @@ export type ConnectHighlight = {
 };
 
 /** Aus wie vielen der neuesten Eintraege je Sorte gemischt wird. */
-const WINDOW = 30;
+// The DB applies eligibility before its bounded 30-row window.
 
 function shuffle<T>(items: T[]) {
   // Fisher-Yates. Kein sort(() => Math.random() - 0.5): Das ist nicht
@@ -88,39 +66,22 @@ export async function getConnectHighlights(
   currentUserId: string,
   limit = 3
 ): Promise<ConnectHighlight[]> {
-  const [listingResult, ventureResult, personResult] = await Promise.all([
-    client
-      .from("network_listings")
-      .select("*")
-      .eq("status", "active")
-      .gt("expires_at", new Date().toISOString())
-      .order("published_at", { ascending: false })
-      .limit(WINDOW),
-    client
-      .from("network_ventures")
-      .select("*")
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(WINDOW),
-    client
-      .from("network_profiles")
-      .select("*")
-      .eq("status", "active")
-      // Kein Ausschluss der eigenen Person mehr (21.09.2026): Sich selbst
-      // im Highlight zu sehen ist eine kleine Freude, und die Karte sagt
-      // dazu, dass es die eigene ist.
-      .order("published_at", { ascending: false })
-      .limit(WINDOW),
+  const [listingResult, ventureResult, personResult, problemResult] = await Promise.all([
+    client.rpc("list_connect_highlight_candidates", { p_kind: "listing" }),
+    client.rpc("list_connect_highlight_candidates", { p_kind: "venture" }),
+    client.rpc("list_connect_highlight_candidates", { p_kind: "person" }),
+    client.rpc("list_connect_highlight_candidates", { p_kind: "problem" }),
   ]);
-
   const listings = (listingResult.data ?? []) as ConnectListing[];
   const ventures = (ventureResult.data ?? []) as ConnectVenture[];
   const people = (personResult.data ?? []) as ConnectProfile[];
+  const problems = (problemResult.data ?? []) as ConnectProblem[];
 
   const ownerIds = [...new Set([
     ...listings.map((listing) => listing.owner_user_id),
     ...ventures.map((venture) => venture.owner_user_id),
     ...people.map((person) => person.user_id),
+    ...problems.flatMap((problem) => problem.author_user_id ? [problem.author_user_id] : []),
   ])];
   if (!ownerIds.length) return [];
   const { data: owners, error: ownerError } = await client.rpc("get_connect_highlight_owners", { p_user_ids: ownerIds });
@@ -197,6 +158,14 @@ export async function getConnectHighlights(
   // Jetzt reihum: aus jeder Sorte einer, in zufaelliger Sortenfolge, und erst
   // wenn eine Sorte leer ist, ruecken die anderen nach. Bei drei Plaetzen und
   // vier Sorten sieht man damit drei VERSCHIEDENE Dinge, sobald es sie gibt.
+  for (const problem of problems) {
+    const owner = problem.author_user_id ? profileByUserId.get(problem.author_user_id) : null;
+    if (!owner) continue;
+    candidates.push({ kind: "problem", id: problem.id, title: problem.title, text: problem.description,
+      href: `/connect/problems/${problem.id}`, person: owner, has: null,
+      isOwn: owner.user_id === currentUserId, disclosure: "none" });
+  }
+
   const chosen = pickAcrossKinds(candidates, limit);
 
   await attachWhatPeopleHave(client, chosen);
@@ -220,12 +189,13 @@ export function pickAcrossKinds(candidates: ConnectHighlight[], limit: number) {
 
   const queues = shuffle([...byKind.keys()]).map((kind) => shuffle(byKind.get(kind) ?? []));
   const chosen: ConnectHighlight[] = [];
+  const owners = new Set<string>();
 
   while (chosen.length < limit && queues.some((queue) => queue.length > 0)) {
     for (const queue of queues) {
       if (chosen.length >= limit) break;
       const next = queue.shift();
-      if (next) chosen.push(next);
+      if (next && next.person && !owners.has(next.person.user_id)) { owners.add(next.person.user_id); chosen.push(next); }
     }
   }
 

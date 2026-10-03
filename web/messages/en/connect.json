@@ -53,7 +53,7 @@
   "actions": {
     "seek": "I'm looking for something",
     "offer": "I can offer something",
-    "cofounder": "Find a Co-Founder",
+    "cofounder": "Find a co-founder → FIND",
     "my": "My listings",
     "contacts": "Contacts",
     "profile": "Connect profile",
@@ -148,7 +148,7 @@
     "profileTitle": "Connect profile visibility",
     "listingTitle": "Visibility of this listing",
     "membersOnly": "CoFoundery members only",
-    "public": "Public",
+    "public": "Public (currently unavailable)",
     "profilePublicHint": "Your published Connect profile can be opened without signing in and found by search engines.",
     "listingPublicHint": "This listing can be opened without signing in and found through search engines.",
     "profileConfirm": "I want to publish my Connect profile publicly with these details.",
@@ -290,7 +290,7 @@
     }
   },
   "my": {
-    "title": "My connect listings",
+    "title": "My contributions",
     "create": "Create a new listing",
     "empty": "No listings with this status.",
     "untitled": "Untitled draft",
@@ -413,7 +413,12 @@
     "venture_audience": "Say in at least 20 characters who it is for.",
     "venture_logo": "The logo could not be saved. JPG, PNG or WebP, 2 MB maximum.",
     "venture_limit": "Five entries is the maximum.",
-    "venture_website": "We can't open that address. It needs to be a web address, for example cofoundery.com – and it has to be reachable over https. So we haven't saved it."
+    "venture_website": "We can't open that address. It needs to be a web address, for example cofoundery.com – and it has to be reachable over https. So we haven't saved it.",
+    "publish_title": "Publication needs a title with at least 5 characters.",
+    "publish_summary": "Publication needs a description with at least 20 characters.",
+    "publish_profile": "Publish your complete CONNECT profile first. Your contribution remains a draft.",
+    "publish_conflict": "This contribution has changed. Reload the page and review its current state.",
+    "publish_membership": "You need active CONNECT membership to publish this contribution."
   },
   "problems": {
     "title": "What people see unsolved",
@@ -582,19 +587,19 @@
     "outlivesApproachHint": "This approach sits on someone else's page. Without this, it disappears from there along with your account."
   },
   "searches": {
-    "title": "Saved searches",
-    "text": "What you saved you do not have to enter again – and when something new matches, we let you know.",
-    "saveTitle": "Save this selection",
-    "saveText": "We will tell you about new entries and descriptions that meet all of your criteria.",
+    "title": "My notification rules",
+    "text": "Manage notifications about new offers, requests and problems. These rules do not search people or companies & projects.",
+    "saveTitle": "Create a notification rule",
+    "saveText": "These criteria apply to new offers, requests and problems, not people or companies. Additional capabilities are notification criteria, not filters of the list above.",
     "labelPlaceholder": "Name, e.g. Sales in Berlin",
     "save": "Save search",
     "open": "View saved searches",
     "emptyTitle": "No saved search yet.",
-    "emptyText": "Narrow down what you are looking for in the overview and save it. After that you do not have to keep checking yourself.",
+    "emptyText": "Set criteria under Discover for new offers, requests and problems. People and companies are not searched.",
     "emptyCta": "To the overview",
-    "scopeBoth": "Applies to entries and Unsolved.",
-    "scopeListings": "Applies to entries only.",
-    "scopeProblems": "Applies to Unsolved only.",
+    "scopeBoth": "For new offers, requests and problems.",
+    "scopeListings": "For new offers & requests.",
+    "scopeProblems": "For new problems.",
     "notifyOn": "Turn notifications on",
     "notifyOff": "Turn notifications off",
     "notifyStateOn": "You will be notified.",
@@ -613,7 +618,8 @@
       "deleted": "Search deleted."
     },
     "capabilitiesTitle": "Require particular capabilities",
-    "capabilitiesText": "Only entries from people who have disclosed at least one of these areas will trigger a notification. Anyone keeping their capabilities private never shows up here."
+    "capabilitiesText": "Only entries from people who have disclosed at least one of these areas will trigger a notification. Anyone keeping their capabilities private never shows up here.",
+    "unknownCapability": "Additional capability area"
   },
   "ventures": {
     "title": "What you have built",
@@ -664,7 +670,7 @@
     "saved": "The entry is saved.",
     "deleted": "The entry was deleted.",
     "openLinkHint": "Opens the website in a new window",
-    "directoryTitle": "Companies in the network",
+    "directoryTitle": "Companies & projects",
     "directoryText": "What the people here are working on. Every entry shows who is behind it – one click takes you to them.",
     "ofPersonTitle": "What this person works on",
     "searchPlaceholder": "Name, what it does, audience",
@@ -676,14 +682,15 @@
     "personBehind": "Who is behind it",
     "alsoByPerson": "Also by this person",
     "hideQuestion": "Hide this presentation from CONNECT? Your actual venture and existing conversations remain. You can show it again later.",
-    "showQuestion": "Show this saved presentation in CONNECT again? This does not change your venture or its founder memberships."
+    "showQuestion": "Show this saved presentation in CONNECT again? This does not change your venture or its founder memberships.",
+    "emptyDirectoryText": "This is where members share companies, projects and activities. Add your own presentation under My CONNECT."
   },
   "tabs": {
     "label": "Areas in Connect",
     "people": "People",
     "listings": "Offers & requests",
-    "problems": "Unsolved",
-    "ventures": "Companies"
+    "problems": "Problems",
+    "ventures": "Companies & projects"
   },
   "people": {
     "title": "People in the network",
@@ -723,7 +730,7 @@
   "postSomething": "Post something",
   "resultCount": "{count, plural, =0 {No entry} one {1 entry} other {# entries}}",
   "filtersLabel": "Filters",
-  "rememberSearch": "Remember this search",
+  "rememberSearch": "Set up notifications for new contributions",
   "post": {
     "title": "Post something yourself",
     "text": "Say what you're looking for or offering – or find someone to found with."
@@ -760,12 +767,13 @@
   },
   "highlight": {
     "title": "From the network",
-    "randomNote": "Picked at random, changes on every visit",
+    "randomNote": "A changing random selection of current eligible content — not a personal recommendation.",
     "kinds": {
       "seeking": "Looking for",
       "offering": "Offering",
-      "venture": "Company",
-      "person": "Profile"
+      "venture": "Companies & projects",
+      "person": "Profile",
+      "problem": "Problem"
     },
     "disclosures": {
       "editorial": "Highlighted by us",
@@ -792,7 +800,7 @@
     "emptyTitle": "Nothing fitting right now",
     "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precise your profile is, and above all: the sooner you write down what you are looking for, the more turns up.",
     "emptyCta": "Complete your profile",
-    "note": "At most three suggestions a week, and they stay in the platform – none of this goes out by email. We do not suggest requests: whoever is looking for something should decide for themselves whom to approach.",
+    "note": "At most three new suggestions within seven days. New suggestions can also appear while you are away. Email and push follow your settings. Notifications contain only a count and a link, not suggested names or content titles.",
     "emptyCtaAsk": "Post a request"
   },
   "lifecycle": {
@@ -839,5 +847,18 @@
     },
     "historyOnly": "This conversation remains readable. New messages are currently unavailable because a CONNECT membership or the original conversation context is no longer active.",
     "restrictedProblem": "This problem version is restricted and cannot be republished by its author."
+  },
+  "beta": {
+    "visibility": "CONNECT is in closed beta. Your content is visible only to signed-in active CONNECT members.",
+    "reviewPublication": "Review publication",
+    "discover": "Discover",
+    "mine": "My CONNECT",
+    "page": "Page {page} · {count} results on this page",
+    "next": "Next",
+    "previous": "Previous",
+    "total": "Visible content",
+    "identity": "How you appear",
+    "contribution": "What you bring & how to approach you",
+    "ownVentures": "My companies & projects"
   }
 }

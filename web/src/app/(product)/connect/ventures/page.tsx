@@ -1,3 +1,5 @@
+import { ConnectPagination } from "@/features/connect/ConnectPagination";
+import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
@@ -32,10 +34,11 @@ export default async function ConnectVentureDirectoryPage({
   const { client, user } = await requireConnectMember("/connect/ventures");
 
   const term = (params.q ?? "").trim();
-  const [ventures, counts] = await Promise.all([
-    getActiveConnectVentures(client, term),
+  const [venturesRows, counts] = await Promise.all([
+    getActiveConnectVentures(client, term, params.page),
     getConnectTabCounts(client, user.id),
   ]);
+  const ventures = venturesRows.slice(0, CONNECT_PAGE_SIZE);
 
   // Der Mensch zu jedem Unternehmen, in einer Abfrage statt einer je Karte.
   // getConnectProfilesByUserIds gibt bereits eine Map zurueck.
@@ -80,6 +83,8 @@ export default async function ConnectVentureDirectoryPage({
           <h2 className="text-lg font-semibold text-slate-900">
             {term ? t("ventures.emptySearch") : t("ventures.emptyDirectory")}
           </h2>
+          {term ? <Link href="/connect/ventures" className="mt-4 inline-flex min-h-11 items-center rounded-full border px-5 text-sm">{t("empty.reset")}</Link> : null}
+          <p className="mt-2 text-sm text-slate-600">{t("ventures.emptyDirectoryText")}</p>
           <Link
             href="/connect/ventures/mine"
             className="mt-4 inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -104,7 +109,7 @@ export default async function ConnectVentureDirectoryPage({
                     />
                   ) : null}
                   <div className="min-w-0">
-                    <h2 className="truncate text-lg font-semibold text-slate-950">
+                    <h2 className="break-words text-lg font-semibold text-slate-950">
                       <Link href={`/connect/ventures/${venture.id}`} className="hover:underline">
                         {venture.name}
                       </Link>
@@ -115,7 +120,7 @@ export default async function ConnectVentureDirectoryPage({
                   </div>
                 </div>
 
-                <p className="mt-3 text-sm leading-6 text-slate-700">{venture.what_it_does}</p>
+                <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-700">{venture.what_it_does}</p>
                 {venture.audience ? (
                   <p className="mt-2 text-sm leading-6 text-slate-500">
                     {t("ventures.audienceLabel")}: {venture.audience}
@@ -154,6 +159,7 @@ export default async function ConnectVentureDirectoryPage({
           })}
         </section>
       )}
-    </main>
+    <ConnectPagination path="/connect/ventures" filters={params} count={venturesRows.length} />
+</main>
   );
 }

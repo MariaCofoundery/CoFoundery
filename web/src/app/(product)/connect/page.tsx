@@ -1,3 +1,5 @@
+import { ConnectPagination } from "@/features/connect/ConnectPagination";
+import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -26,13 +28,14 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
     .some((key) => (filters[key] ?? "").trim().length > 0);
-  const { client, user } = await requireConnectMember(); const [listings, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id),
+  const { client, user } = await requireConnectMember(); const [listingsRows, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id),
     // ERZEUGT WIRD AUCH HIER, nicht nur auf der Vorschlagsseite. Sonst waere
     // die Zahl in "Meine Sachen" fuer jeden null, der die Unterseite noch nie
     // geoeffnet hat - und damit waere der Hinweis genau fuer die nutzlos, die
     // er erreichen soll. Das Wochenbudget von drei gilt unveraendert; ist es
     // aufgebraucht, kehrt der Aufruf nach einer Zaehlung zurueck.
     generateConnectSuggestions(client)]);
+  const listings = listingsRows.slice(0, CONNECT_PAGE_SIZE);
   // Wie viele Kriterien gesetzt sind - danach richtet sich, ob die
   // Eingrenzung offen oder eingeklappt erscheint.
   const activeFilterCount = ["direction", "category", "remote_mode", "geographic_scope", "topic", "industry"].filter((key) => (filters[key] ?? "").trim().length > 0).length;
@@ -40,18 +43,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   const cofounderHref = coFounderBridgeHref(hasProfileRole(baseProfile?.roles, "founder"));
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
     <div className="mx-auto max-w-6xl space-y-6">
-      {/* ---------------------------------------------------------------
-          Zwei Haelften, und sie sahen gleich aus.
-
-          Vorher standen die drei Knoepfe zum Einstellen direkt ueber der
-          Reiterleiste und die wiederum direkt ueber dem Suchfeld: drei
-          Reihen Bedienelemente hintereinander, alle gleich gewichtet. Man
-          musste lesen, um zu verstehen, was wovon ist.
-
-          Jetzt zuerst SELBST ETWAS BEITRAGEN - abgesetzt in einem eigenen
-          Kasten mit Ueberschrift -, dann eine Trennlinie, dann SCHAUEN, WAS
-          DA IST mit Reitern, Suche und Treffern.
-          --------------------------------------------------------------- */}
+      {/* Orientierung, Discoveryarten, Highlights, Beitrag und Suche. */}
       <header>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -67,24 +59,24 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
       </header>
 
-      <section className="rounded-3xl border border-slate-200/70 bg-white/70 p-5">
-        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("post.title")}</p>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("post.text")}</p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Link href="/connect/listings/new?direction=seeking" className={`${action} bg-[color:var(--brand-primary)] text-slate-950`}>{t("actions.seek")}</Link>
-          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link>
-          <Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link>
-        </div>
-      </section>
-
-      <ConnectHighlight highlights={highlights} />
-
       <div className="border-t border-slate-200/80 pt-7">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("browse.title")}</p>
         <div className="mt-4">
           <ConnectTabs active="listings" counts={tabCounts} />
         </div>
       </div>
+
+
+      <ConnectHighlight highlights={highlights} />
+      <section className="rounded-2xl bg-slate-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("post.title")}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("post.text")}</p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Link href="/connect/listings/new?direction=seeking" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.seek")}</Link>
+          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link>
+          <Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link>
+        </div>
+      </section>
 
       {/* Ein Suchfeld oben, die Eingrenzung eingeklappt. Vorher war es ein
           Formular mit fuenf Feldern ueber den Treffern - das fuehlt sich an
@@ -103,17 +95,6 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
             aria-label={t("filters.search")}
           />
         </div>
-        {/* NACHGESCHAERFT AM 21.09.2026: "Ich meine eigentlich, dass der ganze
-            Bereich unter den Filtern auch weg sollte. Also auch Filter
-            anwenden, diese Suche merken und so weiter, dieses ganze Feld, was
-            da ist, sollte erst da sein, wenn ich es aufklappe."
-            Also liegt jetzt AUCH der Anwenden-Knopf hier drin, samt
-            Zuruecksetzen und Trefferzahl. Sichtbar bleibt das Suchfeld und
-            eine Zeile.
-            Dass der Knopf eingeklappt ist, nimmt die Suche nicht weg: Er
-            bleibt im Formular, und damit sendet die Eingabetaste im Suchfeld
-            weiterhin ab - das ist bei einem einzelnen Suchfeld ohnehin der
-            Weg, den die meisten nehmen. */}
         <details className="w-full" open={activeFilterCount > 0}>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -126,12 +107,13 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
             Trefferzahl steht daneben und beantwortet die Frage, ob das
             Eingrenzen etwas gebracht hat - sie gehoert deshalb hierhin, neben
             die Regler, und nicht ueber die Treffer, die man ohnehin sieht. */}
+        </details>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
           {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
           <span className="ml-auto text-sm text-slate-500">{t("resultCount", { count: listings.length })}</span>
         </div>
-        </details>
+
       </form>
         {/* AUCH EINGEKLAPPT, seit dem 21.09.2026: Dieser Block war der Rest der
             grossen Filterflaeche - mit der Faehigkeiten-Auswahl darin war er
@@ -187,5 +169,6 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
       </section>}
     </div>
-  </main>;
+  <ConnectPagination path="/connect" filters={filters} count={listingsRows.length} />
+</main>;
 }

@@ -1,3 +1,5 @@
+import { ConnectPagination } from "@/features/connect/ConnectPagination";
+import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -33,10 +35,11 @@ export default async function ConnectPeoplePage({
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client, user } = await requireConnectMember("/connect/people");
 
-  const [people, counts] = await Promise.all([
+  const [peopleRows, counts] = await Promise.all([
     getConnectPeople(client, user.id, filters),
     getConnectTabCounts(client, user.id),
   ]);
+  const people = peopleRows.slice(0, CONNECT_PAGE_SIZE);
 
   const activeFilters = FILTER_KEYS.filter((key) => (filters[key] ?? "").trim().length > 0);
   const isFiltered = activeFilters.length > 0 || (filters.q ?? "").trim().length > 0;
@@ -252,6 +255,7 @@ export default async function ConnectPeoplePage({
           </section>
         )}
       </div>
-    </main>
+    <ConnectPagination path="/connect/people" filters={filters} count={peopleRows.length} />
+</main>
   );
 }

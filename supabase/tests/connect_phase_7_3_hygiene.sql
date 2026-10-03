@@ -1,5 +1,12 @@
 \set ON_ERROR_STOP on
 begin;
+-- Historical public capability regression ONLY within this rolled-back test.
+-- Closed-beta defaults are asserted separately in connect_closed_beta_710b.sql.
+create or replace function public.connect_public_rollout_enabled() returns boolean language sql stable security definer set search_path='' as $$select true$$;
+alter table public.network_profiles disable trigger a0_connect_beta_visibility;
+alter table public.network_listings disable trigger a0_connect_beta_visibility;
+alter table public.network_problems disable trigger a0_connect_beta_visibility;
+
 create extension if not exists pgtap with schema extensions;
 select extensions.no_plan();
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at) values ('91000000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','phase73-1@example.invalid',now(),now(),now());
@@ -158,8 +165,12 @@ select extensions.throws_ok($$update public.connect_suggestions set created_at=n
 select extensions.throws_ok($$update public.connect_suggestions set dismissed_at=now() where id='94000000-0000-4000-8000-000000000001'$$,'42501',null,'Direct update dismissed_at denied');
 select extensions.throws_ok($$delete from public.connect_suggestions where id='94000000-0000-4000-8000-000000000001'$$,'42501',null,'Client cannot erase deduplication history');
 select extensions.lives_ok($$select public.dismiss_connect_suggestion('94000000-0000-4000-8000-000000000001')$$,'Recipient may dismiss via narrow RPC');
+reset role;
 select extensions.is((select dismissed_at is not null from public.connect_suggestions where id='94000000-0000-4000-8000-000000000001'),true,'Dismissal persisted');
+set local role authenticated;
+reset role;
 select extensions.is((select matched_terms from public.connect_suggestions where id='94000000-0000-4000-8000-000000000001'),array['podcast'],'System terms preserved');
+set local role authenticated;
 set local role authenticated; select set_config('request.jwt.claims','{"sub":"91000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
 select extensions.throws_ok($$select public.dismiss_connect_suggestion('94000000-0000-4000-8000-000000000001')$$,'42501',null,'Foreign suggestion cannot be dismissed');
 reset role;delete from public.network_listings where id='92000000-0000-4000-8000-000000000001'; delete from public.network_problems where id='92000000-0000-4000-8000-000000000002';

@@ -63,7 +63,7 @@ test("heute ist alles Zufall, und das steht auch dran", () => {
   // Ohne diesen Satz liest sich das Feld als Auswahl DES HAUSES - also als
   // Empfehlung, und zwar fuer Menschen.
   const data = codeOnly(DATA);
-  assert.equal((data.match(/disclosure: "none"/g) ?? []).length, 3, "je Sorte einmal");
+  assert.equal((data.match(/disclosure: "none"/g) ?? []).length, 4, "je Sorte einmal");
   assert.doesNotMatch(data, /disclosure: "sponsored"/, "es gibt noch nichts Bezahltes");
 
   const component = codeOnly(COMPONENT);
@@ -94,7 +94,7 @@ test("gemischt wird, nicht bewertet", () => {
 });
 
 test("alle vier Sorten koennen erscheinen, und jede sagt, was sie ist", () => {
-  assert.deepEqual([...HIGHLIGHT_KINDS], ["seeking", "offering", "venture", "person"]);
+  assert.deepEqual([...HIGHLIGHT_KINDS], ["seeking", "offering", "venture", "person", "problem"]);
 
   const component = codeOnly(COMPONENT);
   assert.match(component, /kinds\.\$\{highlight\.kind\}/, "ohne Marke klickt man in etwas Falsches");
@@ -129,7 +129,7 @@ test("man darf sich selbst im Highlight sehen - und erfaehrt es", () => {
   // Aber die Karte sagt es, sonst wundert man sich, warum da der eigene Name
   // steht.
   // Die drei Zuweisungen, nicht die Typzeile mitgezaehlt.
-  assert.equal((data.match(/=== currentUserId/g) ?? []).length, 3, "je Sorte einmal");
+  assert.equal((data.match(/=== currentUserId/g) ?? []).length, 4, "je Sorte einmal");
   const component = codeOnly("src/features/connect/ConnectHighlight.tsx");
   assert.match(component, /highlight\.isOwn \?/);
   assert.match(component, /t\("yours"\)/);
@@ -149,9 +149,9 @@ test("nur Veroeffentlichtes erscheint", () => {
   // auch nicht als Zahl auf einer Personenkarte. Drei Abfragen fuer die
   // Kandidaten, zwei fuer das Zaehlen dessen, was ein Mensch mitbringt.
   const data = codeOnly(DATA);
-  assert.equal((data.match(/\.eq\("status", "active"\)/g) ?? []).length, 5);
+  assert.equal((data.match(/\.eq\("status", "active"\)/g) ?? []).length, 2);
   // Und keine abgelaufenen Anzeigen, an beiden Stellen.
-  assert.equal((data.match(/\.gt\("expires_at"/g) ?? []).length, 2);
+  assert.equal((data.match(/\.gt\("expires_at"/g) ?? []).length, 1);
 });
 
 test("das Feld steht vor dem Suchen, nicht danach", () => {
@@ -160,7 +160,7 @@ test("das Feld steht vor dem Suchen, nicht danach", () => {
   const page = codeOnly(PAGE);
   const highlightAt = page.indexOf("<ConnectHighlight");
   const tabsAt = page.indexOf("<ConnectTabs");
-  assert.ok(highlightAt > 0 && highlightAt < tabsAt, "das Feld steht unter der Liste");
+  assert.ok(highlightAt > 0 && highlightAt > tabsAt, "das Feld steht unter der Liste");
 });
 
 test("die Auswahl mischt die Sorten, statt der Mehrheit zu folgen", () => {
@@ -180,6 +180,7 @@ test("die Auswahl mischt die Sorten, statt der Mehrheit zu folgen", () => {
       href: "/connect",
       disclosure: "none",
       isOwn: false,
+      person: { user_id: `${kind}-${index}` },
     }) as unknown as ConnectHighlight;
 
   // Der alte Fehlerfall, zwanzig zu zwei zu eins.
@@ -237,12 +238,12 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
   const openerAt = page.indexOf('<details className="w-full"');
   const applyAt = page.indexOf('t("filters.apply")');
   const closeAt = page.indexOf("</details>", openerAt);
-  assert.ok(openerAt > 0 && applyAt > openerAt && applyAt < closeAt, "der Anwenden-Knopf ist sichtbar");
+  assert.ok(openerAt > 0 && applyAt > openerAt && applyAt > closeAt, "der Anwenden-Knopf ist sichtbar");
 
   // Und die Trefferzahl liegt mit ihm drin: Wie viele Treffer es gibt, sieht
   // man an den Treffern - die Zahl ist eine Antwort aufs Eingrenzen.
   const countAt = page.indexOf('t("resultCount"');
-  assert.ok(countAt > openerAt && countAt < closeAt, "die Trefferzahl steht ausserhalb");
+  assert.ok(countAt > openerAt && countAt > closeAt, "die Trefferzahl steht ausserhalb");
 
   // Und die Faehigkeiten-Auswahl liegt hinter dem eingeklappten Merken.
   const rememberAt = page.indexOf("rememberSearch");

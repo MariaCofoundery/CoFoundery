@@ -1,6 +1,13 @@
 \set ON_ERROR_STOP on
 
 begin;
+-- Historical public capability regression ONLY within this rolled-back test.
+-- Closed-beta defaults are asserted separately in connect_closed_beta_710b.sql.
+create or replace function public.connect_public_rollout_enabled() returns boolean language sql stable security definer set search_path='' as $$select true$$;
+alter table public.network_profiles disable trigger a0_connect_beta_visibility;
+alter table public.network_listings disable trigger a0_connect_beta_visibility;
+alter table public.network_problems disable trigger a0_connect_beta_visibility;
+
 create extension if not exists pgtap with schema extensions;
 select extensions.plan(14);
 

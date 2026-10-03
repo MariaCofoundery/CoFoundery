@@ -1,4 +1,11 @@
 begin;
+-- Historical public capability regression ONLY within this rolled-back test.
+-- Closed-beta defaults are asserted separately in connect_closed_beta_710b.sql.
+create or replace function public.connect_public_rollout_enabled() returns boolean language sql stable security definer set search_path='' as $$select true$$;
+alter table public.network_profiles disable trigger a0_connect_beta_visibility;
+alter table public.network_listings disable trigger a0_connect_beta_visibility;
+alter table public.network_problems disable trigger a0_connect_beta_visibility;
+
 select plan(12);
 
 -- ---------------------------------------------------------------------------
@@ -63,13 +70,11 @@ select is(
   'ohne Freigabe gibt die oeffentliche Funktion nichts heraus'
 );
 
--- Und die Tabelle selbst gibt anonymen Aufrufern nichts: Die Policies gelten
--- nur "to authenticated", es kommt also keine Fehlermeldung, sondern schlicht
--- keine Zeile.
-select is(
-  (select count(*) from public.network_problems),
-  0::bigint,
-  'anonyme Aufrufer sehen in der Tabelle selbst keine einzige Zeile'
+-- Public projection does not grant direct table access, even in this future-mode test.
+select throws_ok(
+  $$select * from public.network_problems$$,
+  '42501', null,
+  'anonymous callers have no direct problem table grant'
 );
 
 -- ---------------------------------------------------------------------------

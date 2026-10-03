@@ -36,7 +36,7 @@ const ERROR_KEYS = [
 export default async function ConnectProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/profile");
   const [profile, baseProfile, core, params, resources] = await Promise.all([getOwnConnectProfile(client, user.id), getProfileBasicsRow(client, user.id).catch(() => null), getPersonCore(client, user.id), searchParams, getOwnPersonResources(client)]);
-  const continuation = params.next?.startsWith("/connect/l/") && !params.next.startsWith("//") ? params.next : "";
+  const continuation = params.next?.startsWith("/connect") && !params.next.includes("\\") && !params.next.startsWith("//") ? params.next : "";
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   return <main className="mx-auto max-w-4xl px-5 py-10">
@@ -51,7 +51,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           Diese Seite entscheidet nur noch das Kontextspezifische: Rollen, Foto
           und Sichtbarkeit. */}
       <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-        <h2 className="text-sm font-semibold">{t("profile.identityTitle")}</h2>
+        <h2 className="text-sm font-semibold">{t("beta.identity")}</h2>
         {core?.display_name ? (
           <div className="mt-3 space-y-1 text-sm text-slate-700">
             <p className="font-medium">{core.display_name}</p>
@@ -66,6 +66,25 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           {t("profile.identityLink")}
         </Link>
       </section>
+      <ConnectPhotoField
+        displayName={profile?.display_name || baseProfile?.display_name || ""}
+        currentAvatarId={profile?.photo_avatar_id}
+        currentPhotoUrl={connectPhotoUrl(profile)}
+        existingAvatarId={baseProfile?.avatar_id}
+        existingImageUrl={baseProfile?.avatar_url}
+        copy={{
+          title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
+          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), existingHint: t("profile.photo.existingHint"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
+          // Entfernt am 18.09.2026: vier weitere Schluessel wurden hier
+          // durchgereicht, die es in den Texten nie gab und die
+          // ConnectPhotoField auch nie gelesen hat. Sichtbar war davon nichts -
+          // aber next-intl wirft bei einem unbekannten Schluessel nicht, es
+          // loggt einen IntlError und gibt den Pfad zurueck. Das waren vier
+          // Fehler im Log bei jedem Aufbau dieser Seite.
+        }}
+      />
+
+      <h2 className="border-t pt-6 text-lg font-semibold">{t("beta.contribution")}</h2>
       <fieldset><legend className="text-sm font-medium">{t("profile.roles")}</legend><p className={hint}>{t("profile.rolesHint")}</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{CONNECT_ROLES.map((role) => <label key={role} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"><input type="checkbox" name="network_roles" value={role} defaultChecked={profile?.network_roles.includes(role)} />{t(`roles.${role}`)}</label>)}</div></fieldset>
       {/* Die Unternehmen liegen auf einer eigenen Seite: Fuenf Eintraege mit
           je fuenf Feldern haetten dieses Formular auf das Dreifache gebracht,
@@ -169,23 +188,6 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         {t("profile.membersOnlyNote")}
       </p>
 
-      <ConnectPhotoField
-        displayName={profile?.display_name || baseProfile?.display_name || ""}
-        currentAvatarId={profile?.photo_avatar_id}
-        currentPhotoUrl={connectPhotoUrl(profile)}
-        existingAvatarId={baseProfile?.avatar_id}
-        existingImageUrl={baseProfile?.avatar_url}
-        copy={{
-          title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
-          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), existingHint: t("profile.photo.existingHint"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
-          // Entfernt am 18.09.2026: vier weitere Schluessel wurden hier
-          // durchgereicht, die es in den Texten nie gab und die
-          // ConnectPhotoField auch nie gelesen hat. Sichtbar war davon nichts -
-          // aber next-intl wirft bei einem unbekannten Schluessel nicht, es
-          // loggt einen IntlError und gibt den Pfad zurueck. Das waren vier
-          // Fehler im Log bei jedem Aufbau dieser Seite.
-        }}
-      />
       <ConnectVisibilityField initial={profile?.visibility} copy={{
         title: t("visibility.profileTitle"), membersOnly: t("visibility.membersOnly"), public: t("visibility.public"),
         publicHint: t("visibility.profilePublicHint"), confirm: t("visibility.profileConfirm"),

@@ -41,9 +41,9 @@ const OWN_PAGES = [
 test("aus Connect führt ein Weg zum Eigenen", () => {
   // Bis 19.09.2026 gab es keinen: Die Seiten existierten, aber der einzige
   // Link dorthin stand im zentralen Profil - also in einem anderen Bereich.
-  const shell = source(SHELL);
+  const shell = source(SHELL) + source("src/features/connect/ConnectMyNavigation.tsx");
   for (const href of OWN_PAGES) {
-    assert.ok(shell.includes(`href: "${href}"`), `${href} ist von Connect aus nicht erreichbar`);
+    assert.ok(shell.includes(`"${href}"`), `${href} ist von Connect aus nicht erreichbar`);
   }
 });
 

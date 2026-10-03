@@ -1,3 +1,5 @@
+import { CONNECT_PUBLIC_ROLLOUT_ENABLED } from "@/features/connect/connectRollout";
+import { openClosedBetaSlug } from "@/features/connect/closedBetaSlug";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,6 +17,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: Promise<{ publicSlug: string }> }): Promise<Metadata> {
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return { title: "Connect", robots: { index: false, follow: false } };
   const { publicSlug } = await params;
   const profile = await getPublicConnectProfile(await createClient(), publicSlug).catch(() => null);
   if (!profile) return { title: `Connect | ${PRODUCT_NAME}`, robots: { index: false, follow: false } };
@@ -29,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ publicSlu
 
 export default async function PublicConnectProfilePage({ params }: { params: Promise<{ publicSlug: string }> }) {
   const { publicSlug } = await params;
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return openClosedBetaSlug("p", publicSlug);
   const client = await createClient();
   const [t, profile, listings, ventures, linkedInUrl] = await Promise.all([
     getTranslations("connect"),
@@ -73,6 +77,6 @@ export default async function PublicConnectProfilePage({ params }: { params: Pro
     </article>)}</div></section> : null}
 
     {listings.length ? <section className="mt-10"><h2 className="text-2xl font-semibold">{t("public.publicListings")}</h2><div className="mt-5 grid gap-4 sm:grid-cols-2">{listings.map((listing) => <article key={listing.public_slug} className="rounded-3xl border border-slate-200 bg-white p-5"><p className="text-xs font-semibold uppercase tracking-[.14em] text-violet-700">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p><h3 className="mt-3 text-xl font-semibold">{listing.title}</h3><p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">{listing.summary}</p><Link href={`/connect/l/${listing.public_slug}`} className="mt-5 inline-flex min-h-11 items-center font-semibold text-violet-800 hover:underline">{t("actions.details")}</Link></article>)}</div></section> : null}
-    <section className="mt-10 rounded-3xl bg-slate-900 p-6 text-white md:p-8"><h2 className="text-xl font-semibold">{t("public.aboutTitle")}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{t("public.aboutText")}</p><Link href="/start?intent=connect" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-white px-5 font-semibold text-slate-900">{t("public.joinConnect")}</Link></section>
+    <section className="mt-10 rounded-3xl bg-slate-900 p-6 text-white md:p-8"><h2 className="text-xl font-semibold">{t("public.aboutTitle")}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{t("public.aboutText")}</p><Link href={`/start?next=${encodeURIComponent(`/connect/p/${publicSlug}`)}`} className="mt-5 inline-flex min-h-11 items-center rounded-full bg-white px-5 font-semibold text-slate-900">{t("public.joinConnect")}</Link></section>
   </main></PublicConnectShell>;
 }

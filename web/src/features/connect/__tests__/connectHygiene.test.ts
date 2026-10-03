@@ -23,7 +23,11 @@ function highlightClient(rows: Record<string, Row[]>, eligible: string[], fail =
       };
       return builder;
     },
-    async rpc(name: string, args: { p_user_ids: string[] }) {
+    async rpc(name: string, args: { p_user_ids: string[]; p_kind?: string }) {
+      if (name === "list_connect_highlight_candidates") {
+        const table = ({ listing: "network_listings", venture: "network_ventures", person: "network_profiles", problem: "network_problems" } as Record<string,string>)[args.p_kind ?? ""];
+        return { data: (rows[table] ?? []).filter((row) => row.status === "active" && (!row.expires_at || String(row.expires_at) > new Date().toISOString())), error: null };
+      }
       assert.equal(name, "get_connect_highlight_owners"); requested.push(...args.p_user_ids);
       return { data: eligible.map((user_id) => ({ user_id, display_name: user_id })), error: fail ? {} : null };
     },
@@ -36,7 +40,7 @@ const highlightRows = () => ({
 });
 test("every current highlight kind uses the same authorized owner", async () => {
   const { client } = highlightClient(highlightRows(), ["owner"]);
-  assert.deepEqual((await getConnectHighlights(client, "viewer", 10)).map((x) => x.kind).sort(), ["offering", "person", "seeking", "venture"]);
+  const result = await getConnectHighlights(client, "viewer", 10); assert.equal(result.length, 1); assert.equal(result[0].person?.user_id, "owner");
 });
 for (const reason of ["suggestable=false", "outgoing block", "incoming block", "paused owner", "suspended owner"]) {
   test(`DB refusal (${reason}) excludes all owner objects from highlights`, async () => {
@@ -60,7 +64,7 @@ test("listing owners outside newest profile window are explicitly authorized", a
   const { client, requested } = highlightClient(rows, ["owner"]);
   const results = await getConnectHighlights(client, "viewer", 10);
   assert.ok(requested.includes("owner"));
-  assert.equal(results.length, 3); assert.ok(results.every((row) => row.person?.user_id === "owner"));
+  assert.equal(results.length, 1); assert.ok(results.every((row) => row.person?.user_id === "owner"));
 });
 
 // Exercise the actual publishing notification flow, mocking only DB/recipient
@@ -109,20 +113,21 @@ for (const failure of ["claim", "authorization-error", "wrong-recipient", "opt-o
   });
 }
 
-test("member CONNECT routes inherit noindex while public slug routes remain indexable", () => {
+test("CONNECT is noindex and public slug capability stays behind the closed-beta gate", () => {
   const layout = readFileSync("src/app/(product)/connect/layout.tsx", "utf8");
   assert.match(layout, /index: false, follow: false/);
   for (const route of ["p", "l", "pr"]) {
     const source = readFileSync(`src/app/(public-connect)/connect/${route}/[publicSlug]/page.tsx`, "utf8");
-    assert.match(source, /index: true, follow: true/);
+    assert.match(source, /if \(!CONNECT_PUBLIC_ROLLOUT_ENABLED\)/);
+    assert.match(source, /openClosedBetaSlug/);
   }
   for (const file of readdirSync("src/app/(product)/connect", { recursive: true }).map(String).filter((x) => x.endsWith("page.tsx"))) {
     assert.doesNotMatch(readFileSync(`src/app/(product)/connect/${file}`, "utf8"), /index: true/);
   }
   const rules = robots().rules as { disallow: string[]; allow: string[] };
   for (const section of ["problems", "people", "ventures", "searches", "suggestions", "contacts", "profile", "my"]) assert.ok(rules.disallow.includes(`/connect/${section}`));
-  assert.ok(!rules.disallow.includes("/connect"));
+  assert.ok(rules.disallow.includes("/connect"));
   for (const path of ["/connect/p/", "/connect/l/", "/connect/pr/"]) {
-    assert.ok(rules.allow.includes(path)); assert.ok(!rules.disallow.some((rule) => path.startsWith(rule)));
+    assert.ok(rules.disallow.some((rule) => path.startsWith(rule))); assert.ok(!rules.allow.includes(path));
   }
 });

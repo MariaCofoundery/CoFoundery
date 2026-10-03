@@ -24,9 +24,8 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
  *
  *   Mail - nur mit ausdruecklicher Zustimmung. `wants_email` traegt sie.
  *
- * Diese Datei fragt nichts nachtraeglich nach und entscheidet nichts neu: Zwei
- * Stellen, die dasselbe beurteilen, waere genau die Stelle, an der ein
- * Versprechen auseinanderlaeuft.
+ * Vor der Zustellung prüft derselbe DB-Vertrag die aktuelle Nutzbarkeit erneut.
+ * Nicht mehr verfügbare Vorschläge lösen keine Meldung aus.
  *
  * WAS IN DER MELDUNG STEHT: eine Zahl. Nicht, WER oder WAS vorgeschlagen
  * wurde. Eine Mail landet in Postfaechern, die wir nicht kennen, und eine
@@ -114,6 +113,7 @@ export async function runSuggestionNotifications(
   const client = privilegedClient();
   if (!client) return { ok: false, reason: "missing_service_role" };
 
+  const since = new Date().toISOString();
   const { data, error } = await client.rpc("prepare_suggestion_notifications", {
     p_limit: limit,
   });
@@ -130,9 +130,11 @@ export async function runSuggestionNotifications(
 
   for (const row of rows) {
     try {
+      const { data: available, error: unavailable } = await client.rpc("count_connect_notification_delivery", { p_recipient: row.recipient_user_id, p_since: since });
+      if (unavailable || !available) continue;
       const result = await deliverSuggestionNotification({
         recipientUserId: row.recipient_user_id,
-        count: row.new_count,
+        count: Math.min(row.new_count, Number(available)),
         withEmail: row.wants_email === true,
       });
       pushed += result.pushed;

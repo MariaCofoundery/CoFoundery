@@ -1,3 +1,5 @@
+import { CONNECT_PUBLIC_ROLLOUT_ENABLED } from "@/features/connect/connectRollout";
+import { openClosedBetaSlug } from "@/features/connect/closedBetaSlug";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -16,6 +18,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ publicSlug: string }>;
 }): Promise<Metadata> {
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return { title: "Connect", robots: { index: false, follow: false } };
   const { publicSlug } = await params;
   const problem = await getPublicConnectProblem(await createClient(), publicSlug).catch(() => null);
   // Kein Eintrag heisst hier auch: zurueckgezogen oder nie freigegeben. In
@@ -44,6 +47,7 @@ export default async function PublicConnectProblemPage({
   params: Promise<{ publicSlug: string }>;
 }) {
   const { publicSlug } = await params;
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return openClosedBetaSlug("pr", publicSlug);
   const client = await createClient();
   const [t, problem, auth] = await Promise.all([
     getTranslations("connect"),

@@ -46,7 +46,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
           <Link
             key={`${highlight.kind}:${highlight.id}`}
             href={highlight.href}
-            className="connect-highlight-card flex flex-col rounded-2xl border border-slate-200 bg-white/92 p-4 shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:border-violet-300"
+            className="connect-highlight-card flex min-w-0 flex-col break-words rounded-2xl border border-slate-200 bg-white/92 p-4 shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:border-violet-300"
           >
             <p className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
               {t(`kinds.${highlight.kind}`)}

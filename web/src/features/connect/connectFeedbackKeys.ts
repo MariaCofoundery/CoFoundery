@@ -7,6 +7,7 @@
  */
 
 export const CONNECT_ERROR_KEYS = [
+  "publish_title", "publish_summary", "publish_profile", "publish_conflict", "publish_membership",
   "identity_incomplete",
   "roles_missing",
   "incomplete",

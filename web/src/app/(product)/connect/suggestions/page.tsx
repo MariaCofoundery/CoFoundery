@@ -8,26 +8,8 @@ import {
   getOwnConnectSuggestions,
 } from "@/features/connect/connectSuggestionData";
 
-/**
- * Was dich interessieren koennte.
- *
- * GEBAUT AM 21.09.2026. Vier Sorten: Angebote, Unternehmen, Ungeloestes - und
- * Menschen, aber nur die, die es im Profil erlauben. Einen Menschen
- * vorzuschlagen ist eine Aussage darueber, wer wem als passend gilt; deshalb
- * der eigene Schalter, und deshalb stehen Menschen in der Erzeugung zuletzt:
- * Wer etwas eingestellt hat, hat schon gesagt, dass er angesprochen werden
- * moechte - ein Profil allein sagt das nicht.
- *
- * SIE ENTSTEHEN BEIM HINSEHEN. Kein Zeitplan, kein Hintergrundlauf: Der Aufruf
- * unten erzeugt hoechstens drei je Woche. Das ist die technische Fassung von
- * "nur in der Plattform" - wer nicht hinsieht, bekommt nichts, und per Mail
- * geht ohnehin nichts hinaus.
- *
- * OHNE SPRACHMODELL. Die Treffer kommen aus Feldern, die Menschen selbst
- * eingetragen haben, und jeder Vorschlag zeigt das Wort, das ihn ausgeloest
- * hat. Ein Modell koennte spaeter den Satz formulieren, warum etwas passt -
- * finden muss es nichts.
- */
+/** Begriffsvorschläge können hier oder automatisch entstehen. Aktuelle
+ * Sichtbarkeit wird beim Lesen, Zählen und vor Benachrichtigungen neu geprüft. */
 export default async function ConnectSuggestionsPage() {
   const { client } = await requireConnectMember("/connect/suggestions");
   const t = await getTranslations("connect");
@@ -54,8 +36,6 @@ export default async function ConnectSuggestionsPage() {
       </h1>
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("suggestions.text")}</p>
 
-      <div className="mt-5">
-      </div>
 
       {suggestions.length === 0 ? (
         <section className={`${card} mt-6`}>

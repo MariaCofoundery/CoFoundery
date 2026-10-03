@@ -1,4 +1,5 @@
 import "server-only";
+import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ConnectVenture, PublicConnectVenture } from "./connectTypes";
@@ -54,13 +55,13 @@ export function ventureLogoUrl(venture: Pick<ConnectVenture, "id" | "logo_path" 
  * Wie bei den Menschen sortiert nach Aktualitaet und nie nach Passung: Sobald
  * Unternehmen sortiert werden, ist es eine Rangliste.
  */
-export async function getActiveConnectVentures(client: Client, term?: string) {
+export async function getActiveConnectVentures(client: Client, term?: string, page?: string) {
   let query = client
-    .from("network_ventures")
+    .from("connect_discovery_ventures")
     .select("*")
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(60);
+    .order("id", { ascending: true }).range(connectOffset(page), connectOffset(page) + CONNECT_PAGE_SIZE);
 
   const trimmed = (term ?? "").trim();
   if (trimmed) {

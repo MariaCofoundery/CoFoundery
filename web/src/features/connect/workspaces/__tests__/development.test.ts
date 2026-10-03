@@ -67,7 +67,7 @@ test("public visibility and existing retention preference survive preview", () =
   form.set("geographic_scope", "europe");
   form.set("industries", "A,B,C,D,E,F");
   const result = publicationFields(form);
-  assert.equal(result.visibility, "public");
+  assert.equal(result.visibility, "members_only");
   assert.equal(result.outlives_account, true);
   assert.equal(result.industries.length, 5);
   assert.deepEqual(publicationPayload(JSON.stringify(result)), result);

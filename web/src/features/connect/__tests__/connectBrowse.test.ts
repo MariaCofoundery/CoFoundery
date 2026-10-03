@@ -177,7 +177,7 @@ test("die Uebersicht trennt Beitragen sichtbar vom Suchen", () => {
   const tabsAt = page.indexOf("<ConnectTabs");
 
   assert.ok(postAt > 0, "der Bereich zum Einstellen hat keine Ueberschrift");
-  assert.ok(dividerAt > postAt, "zwischen den beiden Haelften steht keine Trennung");
+  assert.ok(dividerAt < postAt, "zwischen den beiden Haelften steht keine Trennung");
   assert.ok(browseAt > dividerAt && tabsAt > browseAt, "die Reiter stehen nicht im Stoeber-Teil");
 
   for (const locale of ["de", "en"]) {

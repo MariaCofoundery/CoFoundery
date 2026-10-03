@@ -81,7 +81,7 @@ test("Unternehmen sind durchsuchbar, und die eigenen bleiben verwaltbar", () => 
     "src/features/connect/ConnectVentureForm.tsx",
     // Die eigene Reihe ist am 30.09.2026 in die Leiste gezogen - dort steht
     // der Weg zu den eigenen Unternehmen jetzt.
-    "src/features/navigation/ProductShell.tsx",
+    "src/features/connect/ConnectMyNavigation.tsx",
   ]) {
     const code = codeOnly(path);
     const stale = [...code.matchAll(/["'`]\/connect\/ventures(?!\/mine)/g)];
@@ -116,7 +116,7 @@ test("nichts davon sortiert Menschen oder Unternehmen nach Passung", () => {
   // suchen: "match" ist der uebliche Parametername in replace-Funktionen und
   // stand sofort als falscher Treffer da.)
   const orders = [...fn.matchAll(/\.order\("([a-z_]+)"/g)].map((hit) => hit[1]);
-  assert.deepEqual(orders, ["created_at"]);
+  assert.deepEqual(orders, ["created_at", "id"]);
 });
 
 test("jeder neue Text steht in beiden Sprachen da", () => {

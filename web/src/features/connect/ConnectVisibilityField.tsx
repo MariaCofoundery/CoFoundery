@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { CONNECT_PUBLIC_ROLLOUT_ENABLED } from "@/features/connect/connectRollout";
 import { useState } from "react";
 import type { ConnectVisibility } from "./connectTypes";
 
@@ -10,6 +12,8 @@ type Copy = {
 
 export function ConnectVisibilityField({ initial = "members_only", copy }: { initial?: ConnectVisibility; copy: Copy }) {
   const [visibility, setVisibility] = useState<ConnectVisibility>(initial);
+  const t = useTranslations("connect");
+  if (!CONNECT_PUBLIC_ROLLOUT_ENABLED) return <fieldset className="rounded-2xl border border-slate-200 p-5"><legend className="px-1 text-sm font-semibold">{copy.title}</legend><input type="hidden" name="visibility" value="members_only" /><p className="font-medium">{copy.membersOnly}</p><p className="mt-2 text-sm leading-6 text-slate-600">{t("beta.visibility")}</p></fieldset>;
   const firstPublicTransition = initial !== "public" && visibility === "public";
   return <fieldset className="rounded-2xl border border-slate-200 p-5">
     <legend className="px-1 text-sm font-semibold">{copy.title}</legend>

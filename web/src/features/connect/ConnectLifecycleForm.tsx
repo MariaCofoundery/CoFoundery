@@ -19,7 +19,7 @@ export function ConnectLifecycleForm({
       {actions.map((action) => (
         <details key={action} className="rounded-xl border p-3">
           <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">
-            {t(`lifecycle.listing.${action}`)}
+            {t(action === "publish" ? "beta.reviewPublication" : `lifecycle.listing.${action}`)}
           </summary>
           <form action={changeConnectListingStatusAction} className="space-y-4">
             <input type="hidden" name="id" value={id} />

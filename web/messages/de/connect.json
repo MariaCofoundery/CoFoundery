@@ -53,7 +53,7 @@
   "actions": {
     "seek": "Ich suche etwas",
     "offer": "Ich biete etwas",
-    "cofounder": "Co-Founder finden",
+    "cofounder": "Co-Founder suchen → FIND",
     "my": "Meine Einträge",
     "contacts": "Kontakte",
     "profile": "Connect-Profil",
@@ -148,7 +148,7 @@
     "profileTitle": "Sichtbarkeit des Connect-Profils",
     "listingTitle": "Sichtbarkeit dieses Eintrags",
     "membersOnly": "Nur für CoFoundery-Mitglieder",
-    "public": "Öffentlich",
+    "public": "Öffentlich (derzeit nicht verfügbar)",
     "profilePublicHint": "Dein veröffentlichtes Connect-Profil kann ohne Login aufgerufen und von Suchmaschinen gefunden werden.",
     "listingPublicHint": "Dieser Eintrag kann ohne Login aufgerufen und über Suchmaschinen gefunden werden.",
     "profileConfirm": "Ich möchte mein Connect-Profil mit diesen Angaben öffentlich veröffentlichen.",
@@ -290,7 +290,7 @@
     }
   },
   "my": {
-    "title": "Meine Connect-Einträge",
+    "title": "Meine Beiträge",
     "create": "Neuen Eintrag erstellen",
     "empty": "Keine Einträge in diesem Status.",
     "untitled": "Unbenannter Entwurf",
@@ -413,7 +413,12 @@
     "venture_audience": "Sag mit mindestens 20 Zeichen, für wen das ist.",
     "venture_logo": "Das Logo konnte nicht gespeichert werden. JPG, PNG oder WebP, maximal 2 MB.",
     "venture_limit": "Fünf Einträge sind das Maximum.",
-    "venture_website": "Diese Adresse können wir nicht öffnen. Sie muss eine Webadresse sein, zum Beispiel cofoundery.de – und sie muss über https erreichbar sein. Gespeichert haben wir sie deshalb nicht."
+    "venture_website": "Diese Adresse können wir nicht öffnen. Sie muss eine Webadresse sein, zum Beispiel cofoundery.de – und sie muss über https erreichbar sein. Gespeichert haben wir sie deshalb nicht.",
+    "publish_title": "Für die Veröffentlichung fehlt ein Titel mit mindestens 5 Zeichen.",
+    "publish_summary": "Für die Veröffentlichung fehlt eine Beschreibung mit mindestens 20 Zeichen.",
+    "publish_profile": "Veröffentliche zuerst dein vollständiges CONNECT-Profil. Dein Beitrag bleibt als Entwurf erhalten.",
+    "publish_conflict": "Der Beitrag wurde inzwischen geändert. Lade die Seite neu und prüfe den aktuellen Stand.",
+    "publish_membership": "Du brauchst eine aktive CONNECT-Mitgliedschaft, um diesen Beitrag zu veröffentlichen."
   },
   "problems": {
     "title": "Ungelöstes, das jemand sieht",
@@ -582,19 +587,19 @@
     "outlivesApproachHint": "Dieser Ansatz steht auf der Seite einer anderen Person. Ohne Häkchen verschwindet er dort mit deinem Konto."
   },
   "searches": {
-    "title": "Gespeicherte Suchen",
-    "text": "Was du gespeichert hast, musst du nicht wieder eingeben – und wenn etwas Neues dazu passt, sagen wir dir Bescheid.",
-    "saveTitle": "Diese Eingrenzung speichern",
-    "saveText": "Wir melden dir neue Einträge und Schilderungen, die auf alle deine Kriterien zutreffen.",
+    "title": "Meine Benachrichtigungsregeln",
+    "text": "Hier verwaltest du Benachrichtigungen zu neuen Angeboten, Gesuchen und Problemen. Diese Regeln durchsuchen nicht Menschen oder Unternehmen & Projekte.",
+    "saveTitle": "Benachrichtigungsregel erstellen",
+    "saveText": "Diese Kriterien gelten für neue Angebote, Gesuche und Probleme – nicht für Personen oder Unternehmen. Zusätzliche Fähigkeiten sind Benachrichtigungskriterien, keine Filter der Liste oben.",
     "labelPlaceholder": "Name, z. B. Vertrieb in Berlin",
     "save": "Suche speichern",
     "open": "Gespeicherte Suchen ansehen",
     "emptyTitle": "Noch keine gespeicherte Suche.",
-    "emptyText": "Grenze in der Übersicht ein, wonach du suchst, und speichere es. Danach musst du nicht mehr selbst nachsehen.",
+    "emptyText": "Lege bei Entdecken Kriterien für neue Angebote, Gesuche und Probleme fest. Personen und Unternehmen werden nicht durchsucht.",
     "emptyCta": "Zur Übersicht",
-    "scopeBoth": "Gilt für Einträge und Ungelöstes.",
-    "scopeListings": "Gilt nur für Einträge.",
-    "scopeProblems": "Gilt nur für Ungelöstes.",
+    "scopeBoth": "Für neue Angebote, Gesuche und Probleme.",
+    "scopeListings": "Für neue Angebote & Gesuche.",
+    "scopeProblems": "Für neue Probleme.",
     "notifyOn": "Benachrichtigung einschalten",
     "notifyOff": "Benachrichtigung ausschalten",
     "notifyStateOn": "Du wirst benachrichtigt.",
@@ -613,7 +618,8 @@
       "deleted": "Suche gelöscht."
     },
     "capabilitiesTitle": "Bestimmte Fähigkeiten verlangen",
-    "capabilitiesText": "Nur Einträge von Menschen, die mindestens einen dieser Bereiche freigegeben haben, lösen eine Meldung aus. Wer seine Fähigkeiten privat hält, taucht hier nie auf."
+    "capabilitiesText": "Nur Einträge von Menschen, die mindestens einen dieser Bereiche freigegeben haben, lösen eine Meldung aus. Wer seine Fähigkeiten privat hält, taucht hier nie auf.",
+    "unknownCapability": "Weiterer Fähigkeitsbereich"
   },
   "ventures": {
     "title": "Was du aufgebaut hast",
@@ -664,7 +670,7 @@
     "saved": "Der Eintrag ist gespeichert.",
     "deleted": "Der Eintrag wurde gelöscht.",
     "openLinkHint": "Öffnet die Webseite in einem neuen Fenster",
-    "directoryTitle": "Unternehmen im Netzwerk",
+    "directoryTitle": "Unternehmen & Projekte",
     "directoryText": "Woran die Menschen hier arbeiten. An jedem Eintrag steht, wer dahinter steht – ein Klick führt zu ihr oder ihm.",
     "ofPersonTitle": "Woran diese Person arbeitet",
     "searchPlaceholder": "Name, Tätigkeit, Zielgruppe",
@@ -676,14 +682,15 @@
     "personBehind": "Wer dahinter steht",
     "alsoByPerson": "Ebenfalls von dieser Person",
     "hideQuestion": "Diese Darstellung aus CONNECT verbergen? Dein eigentliches Vorhaben und bestehende Gespräche bleiben erhalten. Du kannst sie später wieder zeigen.",
-    "showQuestion": "Diese gespeicherte Darstellung wieder in CONNECT zeigen? Dein Vorhaben und seine Founder-Mitgliedschaften ändern sich dadurch nicht."
+    "showQuestion": "Diese gespeicherte Darstellung wieder in CONNECT zeigen? Dein Vorhaben und seine Founder-Mitgliedschaften ändern sich dadurch nicht.",
+    "emptyDirectoryText": "Hier erscheinen freigegebene Unternehmen, Projekte und Tätigkeiten unserer Mitglieder. Du kannst deine eigene Darstellung unter Mein CONNECT ergänzen."
   },
   "tabs": {
     "label": "Bereiche in Connect",
     "people": "Menschen",
     "listings": "Angebote & Gesuche",
-    "problems": "Ungelöstes",
-    "ventures": "Unternehmen"
+    "problems": "Probleme",
+    "ventures": "Unternehmen & Projekte"
   },
   "people": {
     "title": "Menschen im Netzwerk",
@@ -723,7 +730,7 @@
   "postSomething": "Etwas einstellen",
   "resultCount": "{count, plural, =0 {Kein Eintrag} one {1 Eintrag} other {# Einträge}}",
   "filtersLabel": "Filter",
-  "rememberSearch": "Diese Suche merken",
+  "rememberSearch": "Benachrichtigung zu neuen Beiträgen einrichten",
   "post": {
     "title": "Selbst etwas einstellen",
     "text": "Sag, was du suchst oder anbietest – oder finde jemanden zum Gründen."
@@ -760,12 +767,13 @@
   },
   "highlight": {
     "title": "Aus dem Netzwerk",
-    "randomNote": "Zufällig ausgewählt, wechselt bei jedem Aufruf",
+    "randomNote": "Eine wechselnde Zufallsauswahl aus aktuellen freigegebenen Inhalten – keine persönliche Empfehlung.",
     "kinds": {
       "seeking": "Sucht",
       "offering": "Bietet",
-      "venture": "Unternehmen",
-      "person": "Profil"
+      "venture": "Unternehmen & Projekte",
+      "person": "Profil",
+      "problem": "Problem"
     },
     "disclosures": {
       "editorial": "Von uns hervorgehoben",
@@ -792,7 +800,7 @@
     "emptyTitle": "Gerade nichts Passendes",
     "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer dein Profil ist, und vor allem: je eher du aufschreibst, was du suchst, desto mehr findet sich.",
     "emptyCta": "Profil ergänzen",
-    "note": "Höchstens drei Vorschläge pro Woche, und sie bleiben in der Plattform – per E-Mail geht davon nichts hinaus. Gesuche schlagen wir nicht vor: Wer etwas sucht, soll selbst entscheiden, wen er anspricht.",
+    "note": "Höchstens drei neue Vorschläge innerhalb von sieben Tagen. Neue Hinweise können auch entstehen, wenn du gerade nicht hier bist. E-Mail und Push richten sich nach deinen Einstellungen. Benachrichtigungen nennen nur die Anzahl und einen Link, keine vorgeschlagenen Namen oder Inhaltstitel.",
     "emptyCtaAsk": "Gesuch einstellen"
   },
   "lifecycle": {
@@ -839,5 +847,18 @@
     },
     "historyOnly": "Diese Unterhaltung bleibt lesbar. Neue Nachrichten sind derzeit nicht möglich, weil eine CONNECT-Teilnahme oder der ursprüngliche Gesprächskontext nicht mehr aktiv ist.",
     "restrictedProblem": "Diese Problemfassung ist gesperrt und kann nicht selbst wieder veröffentlicht werden."
+  },
+  "beta": {
+    "visibility": "CONNECT läuft als geschlossene Beta. Deine Inhalte sind nur für eingeloggte aktive CONNECT-Mitglieder sichtbar.",
+    "reviewPublication": "Veröffentlichung prüfen",
+    "discover": "Entdecken",
+    "mine": "Mein CONNECT",
+    "page": "Seite {page} · {count} Ergebnisse auf dieser Seite",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "total": "Sichtbarer Bestand",
+    "identity": "So erscheinst du",
+    "contribution": "Was du einbringst & wie man dich ansprechen kann",
+    "ownVentures": "Meine Unternehmen & Projekte"
   }
 }

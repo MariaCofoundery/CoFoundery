@@ -1,4 +1,5 @@
 import "server-only";
+import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ConnectBlockedMember, ConnectBlockState, ConnectContactRequest, ConnectConversation, ConnectListing, ConnectMessage, ConnectProfile } from "./connectTypes";
 import { CONNECT_CATEGORIES, CONNECT_DIRECTIONS, CONNECT_GEOGRAPHIC_SCOPES, CONNECT_REMOTE_MODES, isOneOf } from "./connectTypes";
@@ -41,7 +42,7 @@ export async function getOwnConnectListings(client: Client, userId: string) {
   return (data ?? []) as ConnectListing[];
 }
 export async function getActiveConnectListings(client: Client, filters: Record<string, string | undefined>) {
-  let query = client.from("network_listings").select("*, network_profiles(*)").eq("status", "active").gt("expires_at", new Date().toISOString()).order("published_at", { ascending: false }).limit(50);
+  let query = client.from("connect_discovery_listings").select("*, network_profiles(*)").eq("status", "active").gt("expires_at", new Date().toISOString()).order("published_at", { ascending: false }).order("id", { ascending: true }).range(connectOffset(filters.page), connectOffset(filters.page) + CONNECT_PAGE_SIZE);
   if (isOneOf(CONNECT_DIRECTIONS, filters.direction)) query = query.eq("direction", filters.direction);
   if (isOneOf(CONNECT_CATEGORIES, filters.category)) query = query.eq("category", filters.category);
   if (isOneOf(CONNECT_REMOTE_MODES, filters.remote_mode)) query = query.eq("remote_mode", filters.remote_mode);

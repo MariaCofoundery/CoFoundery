@@ -45,7 +45,7 @@ export function resolveProductEntryPath(
   if (!hasFounder && !hasAdvisor && hasConnect) {
     if (nextPath === "/account") return nextPath;
     if (!connectProfileReady) {
-      return nextPath.startsWith("/connect/l/")
+      return nextPath.startsWith("/connect")
         ? `/connect/profile?next=${encodeURIComponent(nextPath)}`
         : "/connect/profile";
     }

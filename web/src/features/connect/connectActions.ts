@@ -1,5 +1,8 @@
 "use server";
+import { connectPublicationVisibility } from "@/features/connect/connectRollout";
 
+import { normalizeSafeInternalPath } from "@/features/auth/safeInternalPath";
+import { connectPublishError } from "@/features/connect/connectPublishError";
 import { savedPublicationStatus } from "@/features/connect/connectLifecycle";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -38,8 +41,8 @@ function refreshMessaging(conversationId?: string) {
   if (conversationId) revalidatePath(`/messages/${conversationId}`);
 }
 function safeConnectRedirect(value: FormDataEntryValue | null, fallback = "/connect/contacts") {
-  const path = String(value ?? "").trim();
-  return (path.startsWith("/connect") || /^\/messages\/[0-9a-f-]+$/i.test(path)) && !path.startsWith("//") ? path : fallback;
+  const path = normalizeSafeInternalPath(String(value ?? ""), fallback);
+  return (/^\/connect(?:[/?#]|$)/.test(path) || /^\/messages\/[0-9a-f-]+$/i.test(path)) ? path : fallback;
 }
 
 export async function saveConnectProfileAction(formData: FormData) {
@@ -65,7 +68,7 @@ export async function saveConnectProfileAction(formData: FormData) {
   if (currentProfile.error) redirect("/connect/profile?error=save");
   const nextProfileStatus = currentProfile.data?.status === "active" ? "active" : publish ? "active" : currentProfile.data?.status ?? "draft";
   if (nextProfileStatus === "active" && !profilePublishable(values)) redirect("/connect/profile?error=identity_incomplete");
-  const profileVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
+  const profileVisibility = connectPublicationVisibility(formData.get("visibility"));
   if (profileVisibility === "public" && currentProfile.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect("/connect/profile?error=public_confirmation");
   }
@@ -105,7 +108,7 @@ export async function saveConnectProfileAction(formData: FormData) {
   }
   refresh();
   if (currentProfile.data?.public_slug) revalidatePath(`/connect/p/${currentProfile.data.public_slug}`);
-  if (publish && !currentProfile.data) redirect(safeConnectRedirect(formData.get("next"), "/connect?profile=published"));
+  if (publish && formData.get("next")) redirect(safeConnectRedirect(formData.get("next"), "/connect?profile=published"));
   redirect(`/connect/profile?saved=${nextProfileStatus === "active" ? "published" : "draft"}`);
 }
 
@@ -135,7 +138,7 @@ export async function saveConnectListingAction(formData: FormData) {
   if (currentListing.error || (id && !currentListing.data)) redirect("/connect/my?error=save");
   const nextStatus = savedPublicationStatus(currentListing.data?.status, publish);
   if (nextStatus === "active" && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
-  const listingVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
+  const listingVisibility = connectPublicationVisibility(formData.get("visibility"));
   if (listingVisibility === "public" && currentListing.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=public_confirmation`);
   }
@@ -190,7 +193,11 @@ export async function changeConnectListingStatusAction(formData: FormData) {
     p_kind: "listing", p_id: id, p_action: intent,
     p_expected: formData.get("expected"), p_confirm: true,
   });
-  if (error) redirect("/connect/my?error=save");
+  if (error) {
+    const reason = connectPublishError(error.message);
+    if (reason === "publish_title" || reason === "publish_summary") redirect(`/connect/listings/${id}/edit?error=${reason}`);
+    redirect(`/connect/my?error=${reason}`);
+  }
   revalidatePath("/connect/l/[publicSlug]", "page");
   refresh(); redirect(`/connect/my?changed=${intent}`);
 }
