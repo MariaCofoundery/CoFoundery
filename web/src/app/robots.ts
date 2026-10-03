@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     // "/connect$" blocks only the member browse itself. Without the anchor the
     // prefix would also cover the public /connect/p/ and /connect/l/ pages.
-    rules: { userAgent: "*", allow: ["/", "/connect/p/", "/connect/l/", "/connect/pr/"], disallow: ["/connect/workspaces", "/team-intake", "/api/", "/dashboard", "/account", "/advisor/", "/discovery", "/profile", "/connect$", "/connect/contacts", "/connect/messages", "/connect/my", "/connect/profile", "/connect/listings/", "/connect/problems", "/connect/people", "/connect/ventures", "/connect/searches", "/connect/suggestions"] },
+    rules: { userAgent: "*", allow: ["/", "/connect/p/", "/connect/l/", "/connect/pr/"], disallow: ["/admin/problem-radar", "/connect/workspaces", "/team-intake", "/api/", "/dashboard", "/account", "/advisor/", "/discovery", "/profile", "/connect$", "/connect/contacts", "/connect/messages", "/connect/my", "/connect/profile", "/connect/listings/", "/connect/problems", "/connect/people", "/connect/ventures", "/connect/searches", "/connect/suggestions"] },
     sitemap: `${origin}/sitemap.xml`,
   };
 }

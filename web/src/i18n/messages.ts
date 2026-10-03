@@ -1,3 +1,5 @@
+import deRadar from "../../messages/de/radar.json";
+import enRadar from "../../messages/en/radar.json";
 import deProblemWorkspace from "../../messages/de/problemWorkspace.json";
 import enProblemWorkspace from "../../messages/en/problemWorkspace.json";
 import deIntake from "../../messages/de/intake.json";
@@ -59,6 +61,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
+    radar: deRadar,
     intake: deIntake,
     problemWorkspace: deProblemWorkspace,
     alignment: deAlignment,
@@ -89,6 +92,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workbook: deWorkbook as unknown as AbstractIntlMessages,
   },
   en: {
+    radar: enRadar,
     intake: enIntake,
     problemWorkspace: enProblemWorkspace,
     alignment: enAlignment,
