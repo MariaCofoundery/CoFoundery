@@ -11,6 +11,7 @@ export type WorkspaceEntry = {
   id: string;
   author_user_id: string;
   author_name: string;
+  radar_import?: boolean;
   type: EntryType;
   content: string;
   source_url: string | null;

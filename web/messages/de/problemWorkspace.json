@@ -130,5 +130,6 @@
     "backWorkspace": "Zurück zum Arbeitsraum",
     "save": "Opportunity speichern",
     "saving": "Wird gespeichert …"
-  }
+  },
+  "radarImport": "Radar-Startkontext · Die angegebene Person hat den Import übernommen, nicht die externe Quelle verfasst. Spätere eigene Bearbeitungen werden getrennt erhalten."
 }

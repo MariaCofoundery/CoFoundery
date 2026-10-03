@@ -130,5 +130,6 @@
     "backWorkspace": "Back to workspace",
     "save": "Save opportunity",
     "saving": "Saving …"
-  }
+  },
+  "radarImport": "Radar starting context · The named person performed the import, not authored the external source. Later independent edits are retained separately."
 }

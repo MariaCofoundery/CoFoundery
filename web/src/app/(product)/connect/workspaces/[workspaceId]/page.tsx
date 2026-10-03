@@ -243,6 +243,11 @@ export default async function Page({
                 .filter((e) => e.type === type)
                 .map((e) => (
                   <article key={e.id} className={card}>
+                    {e.radar_import && (
+                      <p className="text-sm text-slate-600">
+                        {t("radarImport")}
+                      </p>
+                    )}
                     <p className="whitespace-pre-wrap break-words leading-7">
                       {e.content}
                     </p>
