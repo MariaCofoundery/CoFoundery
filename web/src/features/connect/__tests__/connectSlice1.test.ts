@@ -96,7 +96,7 @@ test("a Connect profile stays a draft unless publishing is asked for, and public
   assert.equal(profilePublishable(parseConnectProfile(form, null)), false);
   const action = readFileSync("src/features/connect/connectActions.ts", "utf8");
   // Veroeffentlichen bleibt ein eigener Klick; ohne intent=publish Entwurf.
-  assert.match(action, /status: publish \? "active" : "draft"/); assert.doesNotMatch(action, /linkedin_url/);
+  assert.match(action, /status: nextProfileStatus/); assert.doesNotMatch(action, /linkedin_url/);
 });
 
 test("home layout and empty state support low-liquidity counts without ranking", () => {

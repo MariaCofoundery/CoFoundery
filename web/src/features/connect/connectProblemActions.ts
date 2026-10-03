@@ -1,5 +1,6 @@
 "use server";
 
+import { savedPublicationStatus } from "@/features/connect/connectLifecycle";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -225,8 +226,7 @@ export async function withdrawConnectProblemInterestAction(formData: FormData) {
   const approachId = String(formData.get("approach_id") ?? "").trim() || null;
   const path = `/connect/problems/${problemId}`;
 
-  // Mit dem Interesse faellt ein daraus entstandenes Gespraech weg - das
-  // sagt die Rueckfrage in der Oberflaeche, nicht erst der Effekt.
+  // Die Herkunft wird geloest; bestehende Nachrichten bleiben als Verlauf erhalten.
   let removal = client
     .from("network_problem_interests")
     .delete()
@@ -273,24 +273,23 @@ export async function updateConnectProblemStatusAction(formData: FormData) {
   const next = String(formData.get("status") ?? "");
   const path = `/connect/problems/${problemId}`;
 
-  if (next !== "withdrawn" && next !== "resolved" && next !== "active") {
+  if (next !== "withdrawn" && next !== "resolved" && next !== "active" && next !== "delete") {
     back(path, "save");
   }
 
-  const { error } = await client
-    .from("network_problems")
-    .update({
-      status: next,
-      published_at: next === "active" ? new Date().toISOString() : undefined,
-      resolved_at: next === "resolved" ? new Date().toISOString() : null,
-    })
-    .eq("id", problemId)
-    .eq("author_user_id", user.id);
+  if (formData.get("confirm") !== "on") back(path,"save");
+  const { error } = await client.rpc("transition_connect_content", {
+    p_kind: "problem", p_id: problemId, p_action: next,
+    p_expected: formData.get("expected"), p_confirm: true,
+  });
 
   if (error) {
     back(path, error.message.includes("active_network_profile_required") ? "identity_incomplete" : "save");
   }
 
+  revalidatePath("/connect/pr/[publicSlug]", "page");
+  revalidatePath("/sitemap.xml");
+  if (next === "delete") { revalidatePath("/connect/my"); redirect("/connect/my"); }
   if (next === "active") {
     const published = await getConnectProblem(client, problemId);
     if (published) {
@@ -360,7 +359,7 @@ export async function updateConnectProblemAction(formData: FormData) {
 
   // Ein veroeffentlichtes Problem bleibt veroeffentlicht. Ein Entwurf wird es
   // nur, wenn der Veroeffentlichen-Knopf gedrueckt wurde.
-  const nextStatus = existing.status === "active" ? "active" : publish ? "active" : "draft";
+  const nextStatus = savedPublicationStatus(existing.status, publish);
 
   const { error } = await client
     .from("network_problems")

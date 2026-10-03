@@ -142,3 +142,8 @@ export async function claimWorkspaceInviteAction(token: string) {
   revalidatePath("/connect/workspaces");
   redirect(`/connect/workspaces/${data}`);
 }
+
+export async function restoreWorkspaceAction(id: string, form: FormData) {
+  if (form.get("confirm") !== "on") finish(id, true);
+  await mutate(id, "restore_problem_workspace", { p_confirm: true });
+}

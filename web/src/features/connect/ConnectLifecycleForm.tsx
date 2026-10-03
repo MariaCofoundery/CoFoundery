@@ -1,34 +1,49 @@
 "use client";
-
 import { useTranslations } from "next-intl";
 import { changeConnectListingStatusAction } from "./connectActions";
-import { ConnectSubmitButton } from "./ConnectSubmitButton";
-
-
-/**
- * Holt seine Texte selbst - siehe ConnectListingForm. Eine Funktion als Prop
- * an ein Browser-Bauteil laesst React nicht zu; hier stand dasselbe `t={t}`,
- * und /connect/my waere aus demselben Grund abgestuerzt.
- */
-export function ConnectLifecycleForm({ id, status }: { id: string; status: string }) {
+import { SubmitButton } from "@/features/ui/SubmitButton";
+export function ConnectLifecycleForm({
+  id,
+  status,
+}: {
+  id: string;
+  status: string;
+}) {
   const t = useTranslations("connect");
-  const button = (intent: "pause" | "complete" | "publish" | "renew", className: string) => (
-    <ConnectSubmitButton
-      intent={intent}
-      label={t(`actions.${intent}`)}
-      pendingLabel={t(`pending.${intent}`)}
-      className={className}
-    />
-  );
+  const actions =
+    status === "active"
+      ? ["pause", "complete", "delete"]
+      : [status === "draft" ? "publish" : "renew", "delete"];
   return (
-    <form action={changeConnectListingStatusAction} className="flex flex-wrap gap-2">
-      <input type="hidden" name="id" value={id} />
-      {status === "active" ? (
-        <>
-          {button("pause", "min-h-11 rounded-full border px-3 py-2 text-sm")}
-          {button("complete", "min-h-11 rounded-full border px-3 py-2 text-sm")}
-        </>
-      ) : button(status === "draft" ? "publish" : "renew", "min-h-11 rounded-full bg-slate-900 px-3 py-2 text-sm text-white")}
-    </form>
+    <div className="w-full space-y-2">
+      {actions.map((action) => (
+        <details key={action} className="rounded-xl border p-3">
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">
+            {t(`lifecycle.listing.${action}`)}
+          </summary>
+          <form action={changeConnectListingStatusAction} className="space-y-4">
+            <input type="hidden" name="id" value={id} />
+            <input type="hidden" name="intent" value={action} />
+            <input
+              type="hidden"
+              name="expected"
+              value={status === "expired" ? "active" : status}
+            />
+            <p className="text-sm leading-6">
+              {t(`lifecycle.listingConsequences.${action}`)}
+            </p>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="checkbox" name="confirm" required className="mt-1" />
+              {t("lifecycle.confirmConsequences")}
+            </label>
+            <SubmitButton
+              label={t(`lifecycle.listing.${action}`)}
+              pendingLabel={t("lifecycle.saving")}
+              className="min-h-11 rounded-xl border px-4 py-2 text-sm"
+            />
+          </form>
+        </details>
+      ))}
+    </div>
   );
 }

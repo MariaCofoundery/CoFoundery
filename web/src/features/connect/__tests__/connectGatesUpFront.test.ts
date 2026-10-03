@@ -52,7 +52,7 @@ test("the publish button is not offered when the database would refuse it", () =
   const form = source(FORM);
   // enforce_network_publication greift nur bei status='active' - der Entwurf
   // geht also ohne Profil, das Veroeffentlichen nicht.
-  assert.match(form, /canPublish \? \(/);
+  assert.match(form, /canPublish &&/);
   assert.match(form, /intent="draft"/, "der Entwurf bleibt immer moeglich");
 
   for (const page of [NEW_LISTING, EDIT_LISTING]) {

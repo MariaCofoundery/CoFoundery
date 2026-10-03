@@ -45,7 +45,7 @@ export const CONNECT_ERROR_KEYS = [
 /** success.profile.* und success.listing.* teilen dieselben zwei Zustaende. */
 export const CONNECT_PUBLICATION_KEYS = ["draft", "published"] as const;
 
-export const CONNECT_LIFECYCLE_KEYS = ["publish", "pause", "renew", "complete"] as const;
+export const CONNECT_LIFECYCLE_KEYS = ["publish", "pause", "renew", "complete", "delete"] as const;
 
 export const CONNECT_CONTACT_KEYS = ["accepted", "declined", "canceled"] as const;
 

@@ -9,6 +9,7 @@ import type {
 import { OpportunityForm } from "@/features/connect/workspaces/OpportunityForm";
 import {
   archiveOpportunityAction,
+  restoreOpportunityAction,
   linkOpportunityVentureAction,
 } from "@/features/connect/workspaces/developmentActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -85,6 +86,34 @@ export default async function Page({
             ))}
         </section>
       )}
+      {w.role === "owner" &&
+        w.status === "active" &&
+        o.status === "archived" && (
+          <details className={card}>
+            <summary className="min-h-11 cursor-pointer py-3">
+              {t("restoreOpportunity")}
+            </summary>
+            <form
+              action={restoreOpportunityAction.bind(null, w.id, o.id)}
+              className="space-y-4"
+            >
+              <label className="flex items-start gap-3">
+                <input
+                  name="confirm"
+                  type="checkbox"
+                  required
+                  className="mt-1"
+                />
+                {t("restoreOpportunityHelp")}
+              </label>
+              <SubmitButton
+                label={t("restoreOpportunity")}
+                pendingLabel={t("saving")}
+                className={button}
+              />
+            </form>
+          </details>
+        )}
       {editable && (
         <details className={card}>
           <summary className="cursor-pointer py-3">{common("edit")}</summary>
@@ -201,6 +230,34 @@ export default async function Page({
           )}
         </section>
       )}
+      {w.role === "owner" &&
+        w.status === "active" &&
+        o.status === "archived" && (
+          <details className={card}>
+            <summary className="min-h-11 cursor-pointer py-3">
+              {t("restoreOpportunity")}
+            </summary>
+            <form
+              action={restoreOpportunityAction.bind(null, w.id, o.id)}
+              className="space-y-4"
+            >
+              <label className="flex items-start gap-3">
+                <input
+                  name="confirm"
+                  type="checkbox"
+                  required
+                  className="mt-1"
+                />
+                {t("restoreOpportunityHelp")}
+              </label>
+              <SubmitButton
+                label={t("restoreOpportunity")}
+                pendingLabel={t("saving")}
+                className={button}
+              />
+            </form>
+          </details>
+        )}
       {editable && (
         <details className={card}>
           <summary className="cursor-pointer py-3">

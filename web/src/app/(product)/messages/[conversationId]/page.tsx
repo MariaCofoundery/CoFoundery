@@ -41,6 +41,7 @@ export default async function ConversationPage({
   if (!conversation) notFound();
   // Die Gegenseite kann gegangen sein. Dann gibt es kein Profil, keinen
   // Blockzustand und keinen Namen - und das ist ein Zustand, kein Fehler.
+  const { data: canSend } = await client.rpc("can_send_network_conversation", { p_conversation: conversationId });
   const counterpartGone = conversation.counterpart_user_id === null;
   const [messages, profiles, blockState] = await Promise.all([
     getConnectMessages(client, conversationId),
@@ -95,7 +96,7 @@ export default async function ConversationPage({
       {counterpartGone ? <div className="mt-5 rounded-2xl bg-slate-100 p-4">
         <p className="text-sm font-semibold text-slate-900">{t("messages.counterpartGoneTitle")}</p>
         <p className="mt-1 text-sm leading-6 text-slate-700">{t("messages.counterpartGoneText")}</p>
-      </div> : blockState.interaction_blocked ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700">{t("safety.chatStopped")}</p> : <form action={sendConnectMessageAction} className="sticky max-sm:static [@media(max-height:750px)]:static group-has-[[data-network-report][open]]/conversation:static bottom-3 mt-5 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
+      </div> : blockState.interaction_blocked ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm text-slate-700">{t("safety.chatStopped")}</p> : !canSend ? <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm">{t("lifecycle.historyOnly")}</p> : <form action={sendConnectMessageAction} className="sticky max-sm:static [@media(max-height:750px)]:static group-has-[[data-network-report][open]]/conversation:static bottom-3 mt-5 rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:p-5">
         <input type="hidden" name="conversation_id" value={conversationId} />
         <label htmlFor="network-message" className="text-sm font-semibold text-slate-900">{t("messages.composeLabel")}</label>
         <textarea id="network-message" name="body" required maxLength={2000} rows={3} className="mt-2 w-full resize-y rounded-2xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-4 focus:ring-slate-100" aria-describedby="network-message-hint" />

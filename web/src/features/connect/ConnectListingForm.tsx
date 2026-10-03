@@ -72,10 +72,10 @@ export function ConnectListingForm({ listing, direction, category, canPublish = 
       previewTitle: t("visibility.publicFields"), previewItems: t("visibility.listingFields"),
     }} />
     <div className="flex flex-wrap gap-3">
-      {canPublish ? (
-        <ConnectSubmitButton intent="publish" label={t("actions.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold" />
+      {canPublish && (!listing || listing.status === "draft" || listing.status === "active") ? (
+        <ConnectSubmitButton intent="publish" label={t(listing?.status === "active" ? "actions.save" : "actions.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold" />
       ) : null}
-      <ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold" />
+      {listing?.status !== "active" && <ConnectSubmitButton intent="draft" label={t(listing && listing.status !== "draft" ? "actions.save" : "actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold" />}
     </div>
   </form>;
 }

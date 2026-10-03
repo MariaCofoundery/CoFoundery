@@ -1,5 +1,5 @@
 begin;
-select plan(14);
+select plan(16);
 
 -- ---------------------------------------------------------------------------
 -- Aufbau: Autorin mit Problem, Interessent, Unbeteiligter
@@ -153,7 +153,7 @@ select throws_ok(
 );
 
 -- ---------------------------------------------------------------------------
--- Zurueckgezogenes Interesse nimmt das Gespraech mit
+-- Zurueckgezogenes Interesse bewahrt den bestehenden Verlauf
 -- ---------------------------------------------------------------------------
 set local request.jwt.claims = '{"sub":"b2222222-2222-4222-8222-222222222222","role":"authenticated"}';
 delete from public.network_problem_interests where id = 'f6666666-6666-4666-8666-666666666666';
@@ -161,9 +161,11 @@ delete from public.network_problem_interests where id = 'f6666666-6666-4666-8666
 set local request.jwt.claims = '{"sub":"a1111111-1111-4111-8111-111111111111","role":"authenticated"}';
 select is(
   (select count(*)::int from public.list_network_conversations()),
-  0,
-  'wer sein Interesse zurueckzieht, nimmt das Gespraech mit - es haengt daran'
+  1,
+  'zurueckgezogenes Interesse bewahrt den lesbaren Verlauf'
 );
 
+select is((select origin from public.list_network_conversations() limit 1),'history','Missing interest is labelled as retained history, not FIND');
+select is((select public.can_send_network_conversation(conversation_id) from public.list_network_conversations() limit 1),false,'Retained history cannot receive new messages');
 select * from finish();
 rollback;

@@ -165,7 +165,7 @@ export type ConnectConversation = {
    * und ohne aus einem fehlenden `listing_id` zu schliessen, das auch bei
    * einer ausgetretenen Person leer ist.
    */
-  origin: "connect_contact" | "connect_problem" | "discovery_intro";
+  origin: "connect_contact" | "connect_problem" | "discovery_intro" | "history";
 };
 
 export type ConnectMessage = {
@@ -224,6 +224,7 @@ export const PROBLEM_INTEREST_NOTE_MIN = 10;
 export const PROBLEM_INTEREST_NOTE_MAX = 500;
 
 export type ConnectProblem = {
+  moderation_blocked?: boolean;
   id: string;
   /**
    * Leer heisst: Die Person hat ihr Konto geloescht und den Text anonym

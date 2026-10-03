@@ -1,3 +1,4 @@
+import { ConnectParticipationSection } from "@/features/connect/ConnectParticipationSection";
 import { AdminModerationLink } from "@/features/moderation/AdminModerationLink";
 import { getOwnOutlivableContent } from "@/features/connect/connectProblemData";
 import { PersonAccessSection } from "@/features/advisor/PersonAccessSection";
@@ -31,7 +32,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; connectError?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -134,6 +135,7 @@ export default async function AccountPage({
         status={status}
       />
 
+      <ConnectParticipationSection error={params.connectError === "1"} />
       <AccountDataSection>
         <ResearchConsentSettings initialState={researchConsentState} />
         {/* Wo gerechnet wird, gehoert zu "deine Daten" - nicht in eine

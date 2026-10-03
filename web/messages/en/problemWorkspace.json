@@ -58,7 +58,7 @@
   "by": "By {name}",
   "archive": "Archive workspace",
   "archiveCheck": "End editing and revoke pending invitations",
-  "archiveHelp": "Archived workspaces remain readable by authorized members. New entries and invitations are disabled. Access can still be removed.",
+  "archiveHelp": "Archived workspaces remain readable for authorized members. The owner can explicitly reopen them; old invitations remain revoked.",
   "private": "Private workspace",
   "privacy": "Nothing here is automatically published: no names, entries or sources.",
   "sourceProblem": "Linked CONNECT problem you own",
@@ -126,10 +126,15 @@
     "linkedRestricted": "Linked to a venture. Details are visible only to already authorized team members.",
     "unnamedVenture": "Unnamed venture",
     "archiveOpportunity": "Archive opportunity",
-    "archiveHelp": "Stop editing this opportunity. Linked ventures and published problems remain intact.",
+    "archiveHelp": "Stop editing this opportunity. Linked ventures and published problems remain intact.The owner can explicitly reopen this opportunity later.",
     "backWorkspace": "Back to workspace",
     "save": "Save opportunity",
-    "saving": "Saving …"
+    "saving": "Saving …",
+    "restoreOpportunity": "Reopen opportunity",
+    "restoreOpportunityHelp": "This opportunity becomes editable again in the active private workspace. Its venture link remains unchanged; the venture and public content are not modified."
   },
-  "radarImport": "Radar starting context · The named person performed the import, not authored the external source. Later independent edits are retained separately."
+  "radarImport": "Radar starting context · The named person performed the import, not authored the external source. Later independent edits are retained separately.",
+  "restore": "Reopen workspace",
+  "restoreHelp": "This private workspace becomes editable again with its existing members. Revoked invitations and old tokens stay invalid. Published problems and archived opportunities do not change.",
+  "restoreConfirm": "I want to reopen this workspace with these consequences."
 }

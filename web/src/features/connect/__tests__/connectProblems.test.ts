@@ -239,7 +239,7 @@ test("editing keeps a published problem published", () => {
   const actions = source(ACTIONS);
   // Sonst wuerde ein Speichern die Veroeffentlichung versehentlich
   // zuruecknehmen - und die Interessierten saehen den Eintrag nicht mehr.
-  assert.match(actions, /existing\.status === "active" \? "active"/);
+  assert.match(actions, /savedPublicationStatus\(existing.status, publish\)/);
   assert.match(source("src/app/(product)/connect/problems/[problemId]/edit/page.tsx"), /redirect\(`\/connect\/problems\/\$\{problemId\}`\)/);
 });
 

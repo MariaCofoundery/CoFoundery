@@ -1,5 +1,6 @@
 \set ON_ERROR_STOP on
 
+begin;
 create extension if not exists pgtap with schema extensions;
 select extensions.plan(17);
 
@@ -107,3 +108,5 @@ select extensions.ok(
 
 delete from auth.users where id in ('ad300000-0000-4000-8000-000000000001','ad300000-0000-4000-8000-000000000002');
 select * from extensions.finish();
+
+rollback;

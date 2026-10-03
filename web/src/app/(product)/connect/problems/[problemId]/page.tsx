@@ -1,3 +1,4 @@
+import { ProblemLifecycleControls } from "@/features/connect/ProblemLifecycleControls";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -7,7 +8,6 @@ import { ConnectProfileRequired } from "@/features/connect/ConnectProfileRequire
 import {
   acceptConnectProblemInterestAction,
   expressConnectProblemInterestAction,
-  updateConnectProblemStatusAction,
   withdrawConnectProblemInterestAction,
 } from "@/features/connect/connectProblemActions";
 import {
@@ -210,29 +210,8 @@ export default async function ConnectProblemPage({
               {t("problems.openPublicPage")}
             </Link>
           ) : null}
-          <div className="mt-4 flex flex-wrap gap-3">
-            {problem.status === "draft" ? (
-              <form action={updateConnectProblemStatusAction}>
-                <input type="hidden" name="problem_id" value={problem.id} />
-                <input type="hidden" name="status" value="active" />
-                <SubmitButton label={t("problems.publish")} pendingLabel={t("pending.publish")} className={primary} />
-              </form>
-            ) : null}
-            {problem.status === "active" ? (
-              <>
-                <form action={updateConnectProblemStatusAction}>
-                  <input type="hidden" name="problem_id" value={problem.id} />
-                  <input type="hidden" name="status" value="resolved" />
-                  <SubmitButton label={t("problems.markResolved")} pendingLabel={t("pending.save")} className={secondary} />
-                </form>
-                <form action={updateConnectProblemStatusAction}>
-                  <input type="hidden" name="problem_id" value={problem.id} />
-                  <input type="hidden" name="status" value="withdrawn" />
-                  <SubmitButton label={t("problems.withdraw")} pendingLabel={t("pending.save")} className={secondary} />
-                </form>
-              </>
-            ) : null}
-          </div>
+          <Link href={`/connect/problems/${problem.id}/edit`} className="mt-3 inline-flex min-h-11 items-center underline">{t("actions.edit")}</Link>
+          <ProblemLifecycleControls problem={problem} />
         </section>
       ) : null}
 

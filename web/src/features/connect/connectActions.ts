@@ -1,5 +1,6 @@
 "use server";
 
+import { savedPublicationStatus } from "@/features/connect/connectLifecycle";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -60,7 +61,10 @@ export async function saveConnectProfileAction(formData: FormData) {
     });
     redirect(`/connect/profile?error=${identityGaps.length ? "identity_incomplete" : "roles_missing"}`);
   }
-  const currentProfile = await client.from("network_profiles").select("photo_path,photo_source,photo_avatar_id,visibility,public_slug").eq("user_id", user.id).maybeSingle();
+  const currentProfile = await client.from("network_profiles").select("status,published_at,photo_path,photo_source,photo_avatar_id,visibility,public_slug").eq("user_id", user.id).maybeSingle();
+  if (currentProfile.error) redirect("/connect/profile?error=save");
+  const nextProfileStatus = currentProfile.data?.status === "active" ? "active" : publish ? "active" : currentProfile.data?.status ?? "draft";
+  if (nextProfileStatus === "active" && !profilePublishable(values)) redirect("/connect/profile?error=identity_incomplete");
   const profileVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
   if (profileVisibility === "public" && currentProfile.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect("/connect/profile?error=public_confirmation");
@@ -87,8 +91,8 @@ export async function saveConnectProfileAction(formData: FormData) {
     photoValues = { ...photoValues, photo_source: "network_upload", photo_avatar_id: null, photo_path: upload };
   }
   const { error } = await client.from("network_profiles").upsert({
-    user_id: user.id, ...values, status: publish ? "active" : "draft",
-    published_at: publish ? new Date().toISOString() : null, visibility: profileVisibility, ...photoValues,
+    user_id: user.id, ...values, status: nextProfileStatus,
+    published_at: nextProfileStatus === "active" ? currentProfile.data?.published_at ?? new Date().toISOString() : currentProfile.data?.published_at ?? null, visibility: profileVisibility, ...photoValues,
   }, { onConflict: "user_id" });
   if (error) {
     if (uploadedPath) await client.storage.from(CONNECT_PHOTO_BUCKET).remove([uploadedPath]);
@@ -102,7 +106,7 @@ export async function saveConnectProfileAction(formData: FormData) {
   refresh();
   if (currentProfile.data?.public_slug) revalidatePath(`/connect/p/${currentProfile.data.public_slug}`);
   if (publish && !currentProfile.data) redirect(safeConnectRedirect(formData.get("next"), "/connect?profile=published"));
-  redirect(`/connect/profile?saved=${publish ? "published" : "draft"}`);
+  redirect(`/connect/profile?saved=${nextProfileStatus === "active" ? "published" : "draft"}`);
 }
 
 async function uploadConnectPhoto(client: Awaited<ReturnType<typeof createClient>>, userId: string, value: string) {
@@ -126,16 +130,19 @@ export async function saveConnectListingAction(formData: FormData) {
   if (values.starts_on && values.ends_on && values.ends_on < values.starts_on) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=invalid_dates`);
   if (publish && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
   const currentListing = id
-    ? await client.from("network_listings").select("visibility,public_slug").eq("id", id).eq("owner_user_id", user.id).maybeSingle()
-    : { data: null };
+    ? await client.from("network_listings").select("status,published_at,expires_at,visibility,public_slug").eq("id", id).eq("owner_user_id", user.id).maybeSingle()
+    : { data: null, error: null };
+  if (currentListing.error || (id && !currentListing.data)) redirect("/connect/my?error=save");
+  const nextStatus = savedPublicationStatus(currentListing.data?.status, publish);
+  if (nextStatus === "active" && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
   const listingVisibility = formData.get("visibility") === "public" ? "public" : "members_only";
   if (listingVisibility === "public" && currentListing.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=public_confirmation`);
   }
-  const payload = { owner_user_id: user.id, ...values, status: publish ? "active" : "draft",
+  const payload = { owner_user_id: user.id, ...values, status: nextStatus,
     visibility: listingVisibility,
-    published_at: publish ? new Date().toISOString() : null,
-    expires_at: publish ? new Date(Date.now() + 60 * 86400000).toISOString() : null };
+    published_at: currentListing.data?.published_at ?? (nextStatus === "active" ? new Date().toISOString() : null),
+    expires_at: currentListing.data?.expires_at ?? (nextStatus === "active" ? new Date(Date.now() + 60 * 86400000).toISOString() : null) };
   const result = id
     ? await client.from("network_listings").update(payload).eq("id", id).eq("owner_user_id", user.id).select("id,public_slug").single()
     : await client.from("network_listings").insert(payload).select("id,public_slug").single();
@@ -143,7 +150,7 @@ export async function saveConnectListingAction(formData: FormData) {
 
   // Abgleich mit gespeicherten Suchen, im Moment des Erscheinens. Nur beim
   // Veroeffentlichen: Ein Entwurf ist fuer niemanden sichtbar.
-  if (publish) {
+  if (nextStatus === "active" && currentListing.data?.status !== "active") {
     await notifySavedSearchMatches(client, {
       kind: "listing",
       id: result.data.id,
@@ -172,22 +179,19 @@ export async function saveConnectListingAction(formData: FormData) {
 
   refresh();
   if (result.data.public_slug) revalidatePath(`/connect/l/${result.data.public_slug}`);
-  redirect(`/connect/listings/${result.data.id}?saved=${publish ? "published" : "draft"}`);
+  redirect(`/connect/listings/${result.data.id}?saved=${nextStatus === "active" ? "published" : "draft"}`);
 }
 
 export async function changeConnectListingStatusAction(formData: FormData) {
-  const { client, user } = await context(); const id = String(formData.get("id") ?? "");
+  const { client } = await context(); const id = String(formData.get("id") ?? "");
   const intent = String(formData.get("intent") ?? "");
-  const updates: Record<string, string | null> = intent === "pause" ? { status: "paused" }
-    : intent === "complete" ? { status: "completed" }
-    : intent === "renew" ? { status: "active", published_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60 * 86400000).toISOString() }
-    : intent === "publish" ? { status: "active", published_at: new Date().toISOString(), expires_at: new Date(Date.now() + 60 * 86400000).toISOString() }
-    : {};
-  if (Object.keys(updates).length) {
-    const { data, error } = await client.from("network_listings").update(updates).eq("id", id).eq("owner_user_id", user.id).select("public_slug").maybeSingle();
-    if (error) redirect("/connect/my?error=save");
-    if (data?.public_slug) revalidatePath(`/connect/l/${data.public_slug}`);
-  }
+  if (formData.get("confirm") !== "on") redirect("/connect/my?error=save");
+  const { error } = await client.rpc("transition_connect_content", {
+    p_kind: "listing", p_id: id, p_action: intent,
+    p_expected: formData.get("expected"), p_confirm: true,
+  });
+  if (error) redirect("/connect/my?error=save");
+  revalidatePath("/connect/l/[publicSlug]", "page");
   refresh(); redirect(`/connect/my?changed=${intent}`);
 }
 

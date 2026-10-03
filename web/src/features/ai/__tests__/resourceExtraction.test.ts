@@ -151,7 +151,7 @@ test("nur veroeffentlichte Texte werden ausgewertet", () => {
 
   const actions = codeOnly("src/features/connect/connectActions.ts");
   const enqueueAt = actions.indexOf('p_job_type: "connect_resource_extraction"');
-  const publishAt = actions.indexOf("if (publish) {");
+  const publishAt = actions.indexOf('if (nextStatus === "active" && currentListing.data?.status !== "active") {');
   assert.ok(publishAt > 0 && enqueueAt > publishAt, "die Aufgabe entsteht ausserhalb des publish-Zweigs");
 });
 

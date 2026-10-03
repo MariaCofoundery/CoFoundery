@@ -64,7 +64,8 @@
     "pause": "Pausieren",
     "complete": "Als erledigt markieren",
     "renew": "60 Tage verlängern",
-    "back": "Zurück zum Connect"
+    "back": "Zurück zum Connect",
+    "save": "Änderungen speichern"
   },
   "navigation": {
     "overview": "Zur Connect-Übersicht",
@@ -81,7 +82,7 @@
   },
   "success": {
     "profile": {
-      "draft": "Entwurf gespeichert.",
+      "draft": "Änderungen gespeichert. Dein Profil bleibt unveröffentlicht.",
       "published": "Connect-Profil veröffentlicht."
     },
     "listing": {
@@ -92,7 +93,8 @@
       "publish": "Eintrag veröffentlicht.",
       "pause": "Eintrag pausiert.",
       "complete": "Eintrag als erledigt markiert.",
-      "renew": "Eintrag um 60 Tage verlängert."
+      "renew": "Eintrag um 60 Tage verlängert.",
+      "delete": "Das Listing wurde gelöscht. Bestehende Gespräche bleiben erhalten."
     }
   },
   "filters": {
@@ -283,7 +285,8 @@
     "origins": {
       "connect_contact": "Aus einer Kontaktanfrage",
       "connect_problem": "Aus einem ungelösten Problem",
-      "discovery_intro": "Aus einem Intro in Find"
+      "discovery_intro": "Aus einem Intro in Find",
+      "history": "Frühere Unterhaltung"
     }
   },
   "my": {
@@ -462,7 +465,7 @@
     "profileRequiredTitle": "Veröffentlichen geht erst mit Profil",
     "profileRequiredText": "Als Entwurf kannst du jederzeit speichern. Veröffentlichen lässt sich ein Problem erst, wenn dein Connect-Profil aktiv ist – sonst kann niemand darauf antworten.",
     "ownTitle": "Dein Eintrag",
-    "ownText": "Zurückziehen macht ihn für andere unsichtbar. Als gelöst zu markieren lässt ihn stehen, aber beendet die Suche.",
+    "ownText": "Zurückgezogene und gelöste Probleme sind für andere nicht mehr sichtbar. Du kannst sie bewusst wieder öffnen. Löschen entfernt die Problemfassung endgültig; bestehende Unterhaltungen bleiben erhalten.",
     "publish": "Jetzt veröffentlichen",
     "markResolved": "Als gelöst markieren",
     "withdraw": "Zurückziehen",
@@ -479,7 +482,7 @@
     "yourInterestTitle": "Das hast du geschrieben",
     "yourInterestText": "Nur die einstellende Person sieht deinen Namen. Für alle anderen zählt nur die Zahl.",
     "withdrawInterest": "Interesse zurückziehen",
-    "withdrawInterestQuestion": "Wirklich zurückziehen? Ein Gespräch, das daraus entstanden ist, verschwindet damit auch.",
+    "withdrawInterestQuestion": "Dein Interesse wird entfernt. Ein bestehendes Gespräch bleibt als Verlauf erhalten; daraus entsteht kein neuer Kontakt.",
     "withdrawInterestConfirm": "Ja, zurückziehen",
     "withdrawInterestCancel": "Doch nicht",
     "interestProfileRequiredTitle": "Zuerst dein Connect-Profil",
@@ -648,7 +651,7 @@
     "show": "Wieder zeigen",
     "hiddenNote": "Verborgen. Nur du siehst diesen Eintrag.",
     "delete": "Eintrag löschen",
-    "deleteQuestion": "Diesen Eintrag wirklich löschen? Das lässt sich nicht rückgängig machen.",
+    "deleteQuestion": "Diese CONNECT-Darstellung endgültig löschen? Das eigentliche Vorhaben, sein Founder-Team und bestehende Gespräche bleiben erhalten. Die Darstellung kann nicht wiederhergestellt werden.",
     "deleteConfirm": "Ja, löschen",
     "deleteCancel": "Doch nicht",
     "limitReached": "Fünf Einträge sind das Maximum. Lösch oder verbirg einen, um Platz zu machen.",
@@ -671,7 +674,9 @@
     "emptySearch": "Dazu ist gerade nichts eingetragen.",
     "addOwn": "Eigenes Unternehmen eintragen",
     "personBehind": "Wer dahinter steht",
-    "alsoByPerson": "Ebenfalls von dieser Person"
+    "alsoByPerson": "Ebenfalls von dieser Person",
+    "hideQuestion": "Diese Darstellung aus CONNECT verbergen? Dein eigentliches Vorhaben und bestehende Gespräche bleiben erhalten. Du kannst sie später wieder zeigen.",
+    "showQuestion": "Diese gespeicherte Darstellung wieder in CONNECT zeigen? Dein Vorhaben und seine Founder-Mitgliedschaften ändern sich dadurch nicht."
   },
   "tabs": {
     "label": "Bereiche in Connect",
@@ -789,5 +794,50 @@
     "emptyCta": "Profil ergänzen",
     "note": "Höchstens drei Vorschläge pro Woche, und sie bleiben in der Plattform – per E-Mail geht davon nichts hinaus. Gesuche schlagen wir nicht vor: Wer etwas sucht, soll selbst entscheiden, wen er anspricht.",
     "emptyCtaAsk": "Gesuch einstellen"
+  },
+  "lifecycle": {
+    "participation": "Deine CONNECT-Teilnahme",
+    "active": "Du nimmst an CONNECT teil. Die Veröffentlichung deines Profils und deiner Inhalte steuerst du separat.",
+    "inactive": "Du hast CONNECT verlassen. Dein CONNECT-Profil und deine aktiven CONNECT-Inhalte sind nicht mehr veröffentlicht.",
+    "suspended": "Deine CONNECT-Mitgliedschaft ist gesperrt. Eine selbstständige Reaktivierung ist nicht möglich.",
+    "leave": "CONNECT verlassen",
+    "return": "Zu CONNECT zurückkehren",
+    "leaveConsequences": "Dein CONNECT-Profil verschwindet aus der Suche. Aktive Listings werden zurückgezogen, Probleme zurückgezogen und Venture-Darstellungen verborgen. Eigene Arbeitsräume werden archiviert; aus fremden Arbeitsräumen trittst du aus. Ausstehende Workspace-Einladungen an dich und zu deinen Räumen werden widerrufen, offene Kontaktanfragen beendet und CONNECT-Suchbenachrichtigungen ausgeschaltet. Bestehende Gespräche bleiben als Verlauf erhalten; neue CONNECT-Kommunikation ist bis zur Rückkehr gesperrt. Founder-, ALIGN- und FIND-Daten sowie dein Account bleiben erhalten. Eine Rückkehr veröffentlicht nichts automatisch. Eigene Lösungsansätze werden zurückgezogen und eigene Interessen entfernt.",
+    "returnConsequences": "Du erhältst wieder Zugang zu CONNECT. Prüfe und veröffentliche dein Profil anschließend ausdrücklich. Listings, Probleme, Venture-Darstellungen, Arbeitsräume und Suchbenachrichtigungen bleiben deaktiviert. Frühere fremde Workspace-Mitgliedschaften und Einladungen werden nicht wiederhergestellt.",
+    "returnHint": "Willkommen zurück. Prüfe dein Profil und veröffentliche es bewusst. Deine anderen Inhalte, Arbeitsräume und Suchbenachrichtigungen bleiben unverändert deaktiviert.",
+    "reviewProfile": "CONNECT-Profil prüfen",
+    "confirmConsequences": "Ich habe diese Folgen gelesen und bestätige diese Aktion.",
+    "saving": "Wird gespeichert …",
+    "error": "Die Aktion konnte nicht ausgeführt werden. Bitte lade den aktuellen Stand neu.",
+    "public": "Sichtbarkeit: öffentlich",
+    "members": "Sichtbarkeit: CONNECT-Mitglieder",
+    "problem": {
+      "active": "Problem erneut veröffentlichen / öffnen",
+      "withdrawn": "Veröffentlichung zurückziehen",
+      "resolved": "Problem als gelöst markieren",
+      "delete": "Problem endgültig löschen"
+    },
+    "problemConsequences": {
+      "active": "Diese Fassung wird mit der angezeigten Sichtbarkeit erneut aktiv. Prüfe insbesondere, ob ein als gelöst markiertes Problem tatsächlich erneut besteht. Eine Moderations- oder Mitgliedschaftssperre verhindert die Wiederveröffentlichung. Private Arbeitsdaten bleiben unverändert.",
+      "withdrawn": "Das Problem verschwindet aus CONNECT und seiner öffentlichen Seite. Neue Interessen und Auslieferungen enden. Gespräche und private Arbeitsräume bleiben erhalten. Eine spätere ausdrückliche Wiederveröffentlichung ist möglich.",
+      "resolved": "Das Problem wird nicht mehr aktiv angeboten. Es bleibt bei deinen Inhalten als gelöst erhalten. Gespräche und private Räume bleiben bestehen. Erneutes Öffnen erfordert eine eigene Bestätigung.",
+      "delete": "Die Problemfassung, ihre Lösungsansätze und Interessen werden endgültig gelöscht. Bestehende Gespräche bleiben als Verlauf erhalten. Private Arbeitsräume und Ventures werden nicht gelöscht; ihre Problemverknüpfung wird gelöst. Keine Wiederherstellung."
+    },
+    "listing": {
+      "pause": "Veröffentlichung zurückziehen",
+      "complete": "Listing als erledigt markieren",
+      "publish": "Listing veröffentlichen",
+      "renew": "Listing erneut veröffentlichen",
+      "delete": "Listing endgültig löschen"
+    },
+    "listingConsequences": {
+      "pause": "Das Listing verschwindet aus CONNECT und seiner öffentlichen Seite. Keine neuen Kontaktanfragen oder Vorschläge. Bestehende Gespräche bleiben erhalten. Du kannst später ausdrücklich erneut veröffentlichen.",
+      "complete": "Das Listing wird als erledigt aus den aktiven Inhalten entfernt. Gespräche bleiben erhalten. Eine erneute Veröffentlichung ist nur bewusst möglich.",
+      "publish": "Die gespeicherte Fassung wird mit ihrer gewählten Sichtbarkeit für 60 Tage aktiv. Bestehende Gesprächsrechte ändern sich nicht.",
+      "renew": "Die gespeicherte Fassung wird mit ihrer bisherigen Sichtbarkeit für 60 Tage erneut aktiv. Prüfe sie vor der Bestätigung über „Details“.",
+      "delete": "Das Listing wird endgültig gelöscht und nicht mehr ausgeliefert. Offene Kontaktanfragen dazu werden beendet. Bereits bestehende Gespräche und Nachrichten bleiben erhalten. Keine Wiederherstellung."
+    },
+    "historyOnly": "Diese Unterhaltung bleibt lesbar. Neue Nachrichten sind derzeit nicht möglich, weil eine CONNECT-Teilnahme oder der ursprüngliche Gesprächskontext nicht mehr aktiv ist.",
+    "restrictedProblem": "Diese Problemfassung ist gesperrt und kann nicht selbst wieder veröffentlicht werden."
   }
 }

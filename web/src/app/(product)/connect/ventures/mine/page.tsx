@@ -10,7 +10,6 @@ import { ConnectVentureForm } from "@/features/connect/ConnectVentureForm";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { VENTURE_MAX } from "@/features/connect/connectTypes";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
-import { SubmitButton } from "@/features/ui/SubmitButton";
 import { knownKey } from "@/i18n/knownKey";
 
 const card = "rounded-3xl border border-slate-200 bg-white p-6";
@@ -141,7 +140,11 @@ export default async function ConnectVenturesPage({
                     name="status"
                     value={venture.status === "hidden" ? "active" : "hidden"}
                   />
-                  <SubmitButton
+                  <ConfirmSubmitButton
+                    question={t(venture.status === "hidden" ? "ventures.showQuestion" : "ventures.hideQuestion")}
+                    confirmLabel={t(venture.status === "hidden" ? "ventures.show" : "ventures.hide")}
+                    cancelLabel={t("ventures.deleteCancel")}
+                    confirmClassName="min-h-11 rounded-full border px-4 text-sm"
                     label={t(venture.status === "hidden" ? "ventures.show" : "ventures.hide")}
                     pendingLabel={t("pending.save")}
                     className="min-h-11 rounded-full border border-slate-200 px-4 text-sm font-semibold"

@@ -37,7 +37,7 @@ export function ConnectProblemForm({
   previewLabel?: string;
   t: T;
 }) {
-  const isPublished = problem?.status === "active";
+  const isPublished = !!problem && problem.status !== "draft";
 
   return (
     <form action={action} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">

@@ -42,6 +42,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   return <main className="mx-auto max-w-4xl px-5 py-10">
     <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
     <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold">{t("profile.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("profile.text")}</p>
+    {params.returned === "1" ? <p role="status" className="my-4 rounded-xl bg-slate-50 p-4">{t("lifecycle.returnHint")}</p> : null}
     {saved ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
     {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
     <form action={saveConnectProfileAction} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
@@ -192,7 +193,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
       }} />
       {profile?.visibility === "public" && profile.status === "active" ? <Link href={`/connect/p/${profile.public_slug}`} className="inline-flex min-h-11 items-center font-semibold text-violet-800 hover:underline">{t("visibility.openPublicPage")}</Link> : null}
       <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("profile.consent")} <Link href="/datenschutz" className="font-semibold underline underline-offset-2">{t("profile.privacyLink")}</Link></p>
-      <div className="flex flex-wrap gap-3"><ConnectSubmitButton intent="publish" label={t("profile.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold" /><ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 text-sm font-semibold" /></div>
+      <div className="flex flex-wrap gap-3"><ConnectSubmitButton intent="publish" label={t(profile?.status === "active" ? "actions.save" : "profile.publish")} pendingLabel={t("pending.publish")} className="min-h-11 rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold" />{profile?.status !== "active" && <ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-11 rounded-full border border-slate-200 px-5 text-sm font-semibold" />}</div>
     </form>
 
     {/* Die Zugaenge stehen NEBEN dem Formular und nicht darin: Sie sind keine

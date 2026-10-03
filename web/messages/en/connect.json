@@ -64,7 +64,8 @@
     "pause": "Pause",
     "complete": "Mark complete",
     "renew": "Renew for 60 days",
-    "back": "Back to Connect"
+    "back": "Back to Connect",
+    "save": "Save changes"
   },
   "navigation": {
     "overview": "Back to Connect overview",
@@ -81,7 +82,7 @@
   },
   "success": {
     "profile": {
-      "draft": "Draft saved.",
+      "draft": "Changes saved. Your profile remains unpublished.",
       "published": "Connect profile published."
     },
     "listing": {
@@ -92,7 +93,8 @@
       "publish": "Listing published.",
       "pause": "Listing paused.",
       "complete": "Listing marked complete.",
-      "renew": "Listing renewed for 60 days."
+      "renew": "Listing renewed for 60 days.",
+      "delete": "The listing was deleted. Existing conversations remain."
     }
   },
   "filters": {
@@ -283,7 +285,8 @@
     "origins": {
       "connect_contact": "From a contact request",
       "connect_problem": "From something unsolved",
-      "discovery_intro": "From an intro in Find"
+      "discovery_intro": "From an intro in Find",
+      "history": "Earlier conversation"
     }
   },
   "my": {
@@ -462,7 +465,7 @@
     "profileRequiredTitle": "Publishing needs a profile first",
     "profileRequiredText": "You can save a draft at any time. A problem can only be published once your Connect profile is active – otherwise nobody can respond to it.",
     "ownTitle": "Your entry",
-    "ownText": "Withdrawing hides it from others. Marking it solved leaves it standing but ends the search.",
+    "ownText": "Withdrawn and resolved problems are no longer visible to others. You can explicitly reopen them. Deletion permanently removes the problem version; existing conversations remain.",
     "publish": "Publish now",
     "markResolved": "Mark as solved",
     "withdraw": "Withdraw",
@@ -479,7 +482,7 @@
     "yourInterestTitle": "This is what you wrote",
     "yourInterestText": "Only the person who posted it sees your name. For everyone else, only the number counts.",
     "withdrawInterest": "Withdraw interest",
-    "withdrawInterestQuestion": "Really withdraw? A conversation that came from it will disappear too.",
+    "withdrawInterestQuestion": "Your interest will be removed. An existing conversation remains as history; no new contact is created.",
     "withdrawInterestConfirm": "Yes, withdraw",
     "withdrawInterestCancel": "Keep it",
     "interestProfileRequiredTitle": "Your Connect profile comes first",
@@ -648,7 +651,7 @@
     "show": "Show again",
     "hiddenNote": "Hidden. Only you see this entry.",
     "delete": "Delete entry",
-    "deleteQuestion": "Really delete this entry? This cannot be undone.",
+    "deleteQuestion": "Permanently delete this CONNECT presentation? The actual venture, its founder team and existing conversations remain. This presentation cannot be restored.",
     "deleteConfirm": "Yes, delete",
     "deleteCancel": "Not now",
     "limitReached": "Five entries is the maximum. Delete or hide one to make room.",
@@ -671,7 +674,9 @@
     "emptySearch": "Nothing is entered for that right now.",
     "addOwn": "Add your own company",
     "personBehind": "Who is behind it",
-    "alsoByPerson": "Also by this person"
+    "alsoByPerson": "Also by this person",
+    "hideQuestion": "Hide this presentation from CONNECT? Your actual venture and existing conversations remain. You can show it again later.",
+    "showQuestion": "Show this saved presentation in CONNECT again? This does not change your venture or its founder memberships."
   },
   "tabs": {
     "label": "Areas in Connect",
@@ -789,5 +794,50 @@
     "emptyCta": "Complete your profile",
     "note": "At most three suggestions a week, and they stay in the platform – none of this goes out by email. We do not suggest requests: whoever is looking for something should decide for themselves whom to approach.",
     "emptyCtaAsk": "Post a request"
+  },
+  "lifecycle": {
+    "participation": "Your CONNECT participation",
+    "active": "You participate in CONNECT. Profile and content publication are controlled separately.",
+    "inactive": "You have left CONNECT. Your CONNECT profile and previously active CONNECT content are no longer published.",
+    "suspended": "Your CONNECT membership is suspended. You cannot reactivate it yourself.",
+    "leave": "Leave CONNECT",
+    "return": "Return to CONNECT",
+    "leaveConsequences": "Your CONNECT profile leaves discovery. Active listings and problems are withdrawn and venture displays hidden. Your workspaces are archived; you leave other people’s workspaces. Pending workspace invitations to you or your spaces are revoked, pending contact requests canceled and CONNECT saved-search notifications disabled. Existing conversations remain as history; new CONNECT communication is paused until you return. Founder, ALIGN, FIND and your account remain intact. Returning republishes nothing automatically.Your approaches are withdrawn and your expressions of interest are removed.",
+    "returnConsequences": "You regain access to CONNECT. Review and explicitly publish your profile afterwards. Listings, problems, venture displays, workspaces and search notifications remain inactive. Former memberships in others’ workspaces and invitations are not restored.",
+    "returnHint": "Welcome back. Review and deliberately publish your profile. Your other content, workspaces and search notifications remain inactive.",
+    "reviewProfile": "Review CONNECT profile",
+    "confirmConsequences": "I have read these consequences and confirm this action.",
+    "saving": "Saving …",
+    "error": "The action could not be completed. Please reload the current state.",
+    "public": "Visibility: public",
+    "members": "Visibility: CONNECT members",
+    "problem": {
+      "active": "Republish / reopen problem",
+      "withdrawn": "Withdraw publication",
+      "resolved": "Mark problem resolved",
+      "delete": "Permanently delete problem"
+    },
+    "problemConsequences": {
+      "active": "This version becomes active with the displayed visibility. Check whether a previously resolved problem has actually reoccurred. Moderation or membership restrictions prevent republication. Private workspace data stays unchanged.",
+      "withdrawn": "The problem disappears from CONNECT and its public page. New interests and delivery stop. Conversations and private workspaces remain. You can explicitly republish later.",
+      "resolved": "The problem is no longer actively offered. It remains in your content as resolved. Conversations and private spaces remain. Reopening requires a separate confirmation.",
+      "delete": "The problem version, its approaches and interests are permanently deleted. Existing conversations remain as history. Private workspaces and ventures are not deleted; problem references are detached. No restore is available."
+    },
+    "listing": {
+      "pause": "Withdraw publication",
+      "complete": "Mark listing completed",
+      "publish": "Publish listing",
+      "renew": "Republish listing",
+      "delete": "Permanently delete listing"
+    },
+    "listingConsequences": {
+      "pause": "The listing disappears from CONNECT and its public page. No new contact requests or suggestions. Existing conversations remain. You can explicitly republish later.",
+      "complete": "The listing is marked completed and removed from active content. Conversations remain. Republication requires an explicit action.",
+      "publish": "The saved version becomes active with its selected visibility for 60 days. Existing conversation rights do not change.",
+      "renew": "The saved version becomes active again with its previous visibility for 60 days. Review it via Details before confirming.",
+      "delete": "The listing is permanently deleted and no longer delivered. Pending contact requests for it are canceled. Existing conversations and messages remain. No restore is available."
+    },
+    "historyOnly": "This conversation remains readable. New messages are currently unavailable because a CONNECT membership or the original conversation context is no longer active.",
+    "restrictedProblem": "This problem version is restricted and cannot be republished by its author."
   }
 }

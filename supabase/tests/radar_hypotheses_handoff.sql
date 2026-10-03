@@ -159,5 +159,15 @@ select throws_ok($$select * from public.radar_workspace_handoff_items$$,'42501',
 reset role;
 select ok(not has_table_privilege('authenticated',c.oid,'SELECT,INSERT,UPDATE,DELETE'),'No direct client grants: '||c.relname) from pg_class c where c.relnamespace='public'::regnamespace and c.relname in('radar_hypotheses','radar_hypothesis_signals','radar_hypothesis_events','radar_workspace_handoffs','radar_workspace_handoff_items');
 select ok(c.relrowsecurity,'RLS: '||c.relname) from pg_class c where c.relnamespace='public'::regnamespace and c.relname in('radar_hypotheses','radar_hypothesis_signals','radar_hypothesis_events','radar_workspace_handoffs','radar_workspace_handoff_items');
+-- Phase 7.9: entry/account lifecycle must not leave provenance read paths.
+set local role authenticated;
+select lives_ok($$select public.delete_problem_workspace_entry(pg_temp.id('w'),pg_temp.id('import'))$$,'Owner can delete radar-origin entry');
+reset role;
+select is((select count(*)::int from public.radar_workspace_handoff_items where entry_id=pg_temp.id('import')),0,'Deleted entry has no remaining import permission path');
+select ok(exists(select 1 from public.network_problem_workspace_entries where id=pg_temp.id('own')),'Deleting imported entry leaves independent private entry');
+select lives_ok($$delete from auth.users where id='78c00000-0000-4000-8000-000000000001'$$,'Account deletion with radar handoff succeeds');
+select is((select count(*)::int from public.network_problem_workspaces where id=pg_temp.id('w')),0,'Owner account deletion removes private radar-derived workspace');
+select is((select count(*)::int from public.radar_workspace_handoffs where workspace_id=pg_temp.id('w')),0,'Owner deletion removes handoff provenance');
+select ok(not exists(select 1 from public.radar_workspace_handoff_items i left join public.network_problem_workspace_entries e on e.id=i.entry_id where e.id is null),'No dangling imported entry pointers after account deletion');
 select * from finish();
 rollback;

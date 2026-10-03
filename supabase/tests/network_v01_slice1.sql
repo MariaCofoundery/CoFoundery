@@ -42,7 +42,7 @@ select extensions.is((select count(*)::int from public.network_profiles where us
 select extensions.lives_ok($$update public.network_profiles set headline='Updated founder headline' where user_id=auth.uid()$$,'owner updates profile');
 select extensions.is((select count(*)::int from public.network_listings),5,'owner reads every listing lifecycle state including expired');
 select extensions.lives_ok($$update public.network_listings set status='paused' where id='b1000000-0000-4000-8000-000000000001'$$,'owner pauses');
-select extensions.lives_ok($$update public.network_listings set status='completed' where id='b1000000-0000-4000-8000-000000000003'$$,'owner completes');
+select extensions.throws_ok($$update public.network_listings set status='completed' where id='b1000000-0000-4000-8000-000000000003'$$,'42501','explicit_lifecycle_required','paused lifecycle changes require explicit RPC');
 select extensions.lives_ok($$update public.network_listings set status='active',published_at=now(),expires_at=now()+interval '60 days' where id='b1000000-0000-4000-8000-000000000002'$$,'owner publishes or renews');
 select extensions.is((select category from public.network_listings where id='b1000000-0000-4000-8000-000000000002'),'sparring','listing category remains generic and excludes co-founder');
 

@@ -58,7 +58,7 @@
   "by": "Von {name}",
   "archive": "Arbeitsraum archivieren",
   "archiveCheck": "Bearbeitung beenden und offene Einladungen widerrufen",
-  "archiveHelp": "Archivierte Räume bleiben für berechtigte Mitglieder lesbar. Neue Einträge und Einladungen sind gesperrt. Zugänge können weiterhin entfernt werden.",
+  "archiveHelp": "Archivierte Arbeitsräume bleiben für berechtigte Mitglieder lesbar. Der Owner kann sie ausdrücklich wieder öffnen; alte Einladungen bleiben widerrufen.",
   "private": "Privater Arbeitsraum",
   "privacy": "Nichts aus diesem Raum wird automatisch veröffentlicht: keine Namen, Einträge oder Quellen.",
   "sourceProblem": "Verknüpftes eigenes CONNECT-Problem",
@@ -126,10 +126,15 @@
     "linkedRestricted": "Mit einem Vorhaben verbunden. Details sind nur für bereits berechtigte Teammitglieder sichtbar.",
     "unnamedVenture": "Vorhaben ohne Namen",
     "archiveOpportunity": "Opportunity archivieren",
-    "archiveHelp": "Diese Opportunity nicht mehr bearbeiten. Verknüpfte Vorhaben und veröffentlichte Probleme bleiben bestehen.",
+    "archiveHelp": "Diese Opportunity nicht mehr bearbeiten. Verknüpfte Vorhaben und veröffentlichte Probleme bleiben bestehen. Der Owner kann die Opportunity später ausdrücklich wieder öffnen.",
     "backWorkspace": "Zurück zum Arbeitsraum",
     "save": "Opportunity speichern",
-    "saving": "Wird gespeichert …"
+    "saving": "Wird gespeichert …",
+    "restoreOpportunity": "Opportunity wieder öffnen",
+    "restoreOpportunityHelp": "Diese Opportunity wird im aktiven privaten Arbeitsraum wieder bearbeitbar. Ihre Venture-Verknüpfung bleibt unverändert; das Venture und öffentliche Inhalte werden nicht verändert."
   },
-  "radarImport": "Radar-Startkontext · Die angegebene Person hat den Import übernommen, nicht die externe Quelle verfasst. Spätere eigene Bearbeitungen werden getrennt erhalten."
+  "radarImport": "Radar-Startkontext · Die angegebene Person hat den Import übernommen, nicht die externe Quelle verfasst. Spätere eigene Bearbeitungen werden getrennt erhalten.",
+  "restore": "Arbeitsraum wieder öffnen",
+  "restoreHelp": "Dieser private Arbeitsraum wird wieder bearbeitbar. Die bestehende Besetzung bleibt unverändert. Widerrufene Einladungen und alte Tokens bleiben ungültig. Veröffentlichte Probleme und archivierte Opportunities ändern sich nicht.",
+  "restoreConfirm": "Ich möchte diesen Arbeitsraum mit diesen Folgen wieder öffnen."
 }

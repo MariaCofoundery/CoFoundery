@@ -130,3 +130,12 @@ export async function linkOpportunityVentureAction(
   revalidatePath("/dashboard");
   redirect(`${path}?saved=1`);
 }
+
+export async function restoreOpportunityAction(id: string, opportunity: string, form: FormData) {
+  const path = `/connect/workspaces/${id}/opportunities/${opportunity}`;
+  const { client } = await workspaceSession(path);
+  if (!workspaceId(id) || !workspaceId(opportunity) || form.get("confirm") !== "on") redirect(`${path}?error=1`);
+  const { error } = await client.rpc("restore_problem_opportunity", { p_workspace: id, p_opportunity: opportunity, p_confirm: true });
+  if (error) redirect(`${path}?error=1`);
+  refresh(id); revalidatePath(path); redirect(`${path}?saved=1`);
+}

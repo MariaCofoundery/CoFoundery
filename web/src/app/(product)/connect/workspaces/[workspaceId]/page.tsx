@@ -14,6 +14,7 @@ import {
 import {
   updateWorkspaceAction,
   archiveWorkspaceAction,
+  restoreWorkspaceAction,
   deleteWorkspaceEntryAction,
   setWorkspaceMemberAction,
   revokeWorkspaceInviteAction,
@@ -66,6 +67,26 @@ export default async function Page({
       )}
       {query.saved && <p role="status">{t("saved")}</p>}
       {!active && <p>{t("archiveHelp")}</p>}
+      {!active && owner && (
+        <details className={card}>
+          <summary className="min-h-11 cursor-pointer">{t("restore")}</summary>
+          <form
+            action={restoreWorkspaceAction.bind(null, w.id)}
+            className="space-y-4"
+          >
+            <p>{t("restoreHelp")}</p>
+            <label className="flex items-start gap-3">
+              <input name="confirm" type="checkbox" required className="mt-1" />
+              {t("restoreConfirm")}
+            </label>
+            <SubmitButton
+              label={t("restore")}
+              pendingLabel={t("saving")}
+              className={button}
+            />
+          </form>
+        </details>
+      )}
       {owner && active && (
         <details className={card}>
           <summary className="cursor-pointer py-2 font-semibold">

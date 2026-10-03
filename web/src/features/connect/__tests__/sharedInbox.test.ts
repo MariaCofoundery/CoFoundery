@@ -141,12 +141,12 @@ test("jedes Gespräch sagt, woraus es entstanden ist", () => {
         messages: { origins: Record<string, string> };
       }
     ).messages;
-    for (const origin of ["connect_contact", "connect_problem", "discovery_intro"]) {
+    for (const origin of ["connect_contact", "connect_problem", "discovery_intro", "history"]) {
       assert.ok(messages.origins?.[origin], `${locale}: origins.${origin} fehlt`);
     }
     assert.equal(
       new Set(Object.values(messages.origins)).size,
-      3,
+      4,
       `${locale}: zwei Ursprünge sagen dasselbe`
     );
   }
