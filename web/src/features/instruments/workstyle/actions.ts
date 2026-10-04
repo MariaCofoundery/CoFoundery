@@ -2,11 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { parseWorkstyleAnswer } from "@/features/instruments/workstyle/answers";
+import { parseWorkstyleAnswer, parseWorkstyleV3Answer } from "@/features/instruments/workstyle/answers";
 import { assertWorkstylePretestReady, workstyleRegistryFor } from "@/features/instruments/workstyle/registry";
 import { getMyWorkstylePretest, type ResearchContext, type ResearchFeedback } from "@/features/instruments/workstyle/data";
 import consentText from "../../../../docs/founder-workstyle-research-consent-v1.json";
 import consentV2 from "../../../../docs/founder-workstyle-research-consent-v2.json";
+import consentV3 from "../../../../docs/founder-workstyle-research-consent-v3.json";
 
 const root = "/research/workstyle-pretest";
 const failure = { ok: false as const, error: "Das konnte nicht gespeichert werden. Bitte lade deinen Stand neu und versuche es noch einmal." };
@@ -16,7 +17,7 @@ export async function startWorkstylePretest(consent: boolean, context: ResearchC
   assertWorkstylePretestReady(version);
   const client = await createClient();
   const { data, error } = await client.rpc("start_workstyle_pretest", {
-    p_consent_version: (version === "8.5a-v2" ? consentV2 : consentText).consent_version, p_context: context, p_new: newAssessment,
+    p_consent_version: (version === "8.5a-v3" ? consentV3 : version === "8.5a-v2" ? consentV2 : consentText).consent_version, p_context: context, p_new: newAssessment,
   });
   if (error) return failure;
   revalidatePath(root);
@@ -95,4 +96,24 @@ export async function finishWorkstyleV2(assessmentId: string, input: unknown, re
   revalidatePath(root);
   return { ok: true as const, session: { ...session, completed_at: (data as { completed_at: string }).completed_at,
     answers: [...session.answers.filter(a => a.item_key !== answer.item_key), answer] } };
+}
+
+export async function saveWorkstyleV3(assessmentId: string, itemKey: string, input: unknown, responseTimeMs: number, finalize = false) {
+  const session = await getMyWorkstylePretest("8.5a-v3");
+  if (!session || session.assessment_id !== assessmentId || session.withdrawn_at) return failure;
+  let answer;
+  try {
+    answer = parseWorkstyleV3Answer(itemKey, workstyleRegistryFor("8.5a-v3").pool_version, input);
+  } catch { return failure; }
+  const client = await createClient();
+  const { data, error } = await client.rpc("save_workstyle_pretest_v3", {
+    p_assessment_id: assessmentId, p_item_key: answer.item_key, p_item_version: answer.item_version,
+    p_response_value: answer.response_value, p_response_option: answer.response_option, p_missing_reason: answer.missing_reason,
+    p_rendered_order: answer.rendered_order, p_finalize: finalize,
+    p_response_time_ms: Number.isFinite(responseTimeMs) ? Math.min(86400000, Math.max(0, Math.round(responseTimeMs))) : null,
+  });
+  if (error) return failure;
+  const saved = data as { completed_at: string | null; answer: typeof session.answers[number] };
+  if (finalize) revalidatePath(root);
+  return { ok: true as const, answer: saved.answer, completed_at: saved.completed_at };
 }

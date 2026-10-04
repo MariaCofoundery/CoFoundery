@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { WorkstyleForm } from "@/features/instruments/workstyle/registry";
 import { checkWorkstyleTeamReadiness, type WorkstyleTeamInputs } from "@/features/instruments/workstyle/teamReadiness";
 
-export type ResearchAnswer = { item_key: string; item_version: string; response_value: number | null; missing_reason: "cannot_assess" | null };
+export type ResearchAnswer = { item_key: string; item_version: string; response_value: number | null; response_option?: string | null; rendered_order?: string[] | null; answered_at?: string; missing_reason: "cannot_assess" | null };
 export type ResearchContext = { founder_experience: "none" | "first_venture" | "multiple_ventures" | "0" | "1" | "2-3" | "4-5" | "6_plus" | "prefer_not_to_say"; team_size: "solo" | "two" | "larger" | "no_venture"; venture_phase?: string };
 export type ResearchFeedback = { clear_realistic_items?: string[]; clarity?: number; unclear_items?: string[]; unclear_text?: string; unsuitable_items?: string[]; unsuitable_text?: string; desirable?: boolean; desirable_items?: string[]; other?: string };
 export type ResearchRow = {

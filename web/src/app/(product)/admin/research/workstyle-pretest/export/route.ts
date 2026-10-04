@@ -4,8 +4,8 @@ import type { ResearchRow } from "@/features/instruments/workstyle/data";
 
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
-  const version = new URL(request.url).searchParams.get("version") ?? "8.5a-v2";
-  if (!["8.5a-v1", "8.5a-v2"].includes(version)) return new Response("Unbekannte Version", { status: 400 });
+  const version = new URL(request.url).searchParams.get("version") ?? "8.5a-v3";
+  if (!["8.5a-v1", "8.5a-v2", "8.5a-v3"].includes(version)) return new Response("Unbekannte Version", { status: 400 });
   const client = await requirePlatformAdmin();
   const { data, error } = await client.rpc("get_workstyle_research_dataset_version", { p_assessment_version: version });
   if (error) return new Response("Export nicht verfügbar", { status: 503, headers: { "Cache-Control": "no-store" } });

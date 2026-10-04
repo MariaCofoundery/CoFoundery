@@ -19,6 +19,10 @@ export function checkWorkstyleTeamReadiness(input: WorkstyleTeamInputs): Worksty
     try { registry = workstyleRegistryFor(person.assessment_version); } catch { return { status: "not_ready" }; }
     if (person.assessment_version !== first.assessment_version || person.instrument_id !== workstyleInstrumentId(person.assessment_version)
       || person.instrument_id !== first.instrument_id || person.manifest_version !== registry.registry_version || person.manifest_version !== first.manifest_version || person.venture_instrument !== "venture-alignment-v1" || person.access_status !== "explicit_share_or_owner") return { status: "not_ready" };
+    if (person.assessment_version === "8.5a-v3" && registry.core_item_keys.some(key => {
+      const item = registry.items.find(item => item.item_key === key);
+      return !item || item.scientific_status !== "core" || item.research_only || item.area_status !== "development_area";
+    })) return { status: "not_ready" };
     const core = new Map(person.core.map(answer => [answer.item_key, answer]));
     if (core.size !== registry.core_item_keys.length || person.core.length !== registry.core_item_keys.length || registry.core_item_keys.some(key => core.get(key)?.item_version !== registry.items.find(item => item.item_key === key)?.item_version)) return { status: "not_ready" };
     const ventureKeys = new Set(person.venture_alignment.map(answer => answer.item_key));

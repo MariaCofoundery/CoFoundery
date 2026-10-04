@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import consentText from "../../../../docs/founder-workstyle-research-consent-v2.json";
-import { WORKSTYLE_PRETEST_V2, workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
-import { startWorkstylePretest, saveWorkstyleAnswer, saveWorkstyleFeedback, withdrawWorkstyleResearch, finishWorkstyleV2, setWorkstylePosition } from "@/features/instruments/workstyle/actions";
+import consentV2 from "../../../../docs/founder-workstyle-research-consent-v2.json";
+import consentV3 from "../../../../docs/founder-workstyle-research-consent-v3.json";
+import { workstyleResponseOptions, workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
+import { startWorkstylePretest, saveWorkstyleAnswer, saveWorkstyleFeedback, withdrawWorkstyleResearch, finishWorkstyleV2, setWorkstylePosition, saveWorkstyleV3 } from "@/features/instruments/workstyle/actions";
 import { WorkstyleFeedback } from "@/features/instruments/workstyle/WorkstylePretest";
 import type { PretestSession, ResearchAnswer, ResearchContext } from "@/features/instruments/workstyle/data";
 
 const button = "inline-flex min-h-12 items-center justify-center rounded-xl bg-violet-800 px-6 py-3 font-semibold text-white disabled:opacity-50";
 const field = "mt-2 block w-full rounded-xl border border-slate-300 bg-white p-3";
-const items = workstyleSessionItems("8.5a-v2", null);
+const versionItems = { "8.5a-v2": workstyleSessionItems("8.5a-v2", null), "8.5a-v3": workstyleSessionItems("8.5a-v3", null) };
 
-function Question({ item, initial, pending, last, onSave }: { item: WorkstyleItem; initial?: ResearchAnswer; pending: boolean; last: boolean; onSave: (value: number | "cannot_assess", elapsed: number) => void }) {
-  const [value, setValue] = useState<number | "cannot_assess" | null>(initial?.missing_reason ?? initial?.response_value ?? null);
+function Question({ item, initial, pending, last, onSave }: { item: WorkstyleItem; initial?: ResearchAnswer; pending: boolean; last: boolean; onSave: (value: number | string, elapsed: number) => void }) {
+  const [value, setValue] = useState<number | string | null>(initial?.missing_reason ?? initial?.response_option ?? initial?.response_value ?? null);
   const [started] = useState(() => Date.now());
   const question = useRef<HTMLLegendElement>(null);
   useEffect(() => {
@@ -20,15 +21,18 @@ function Question({ item, initial, pending, last, onSave }: { item: WorkstyleIte
     question.current?.scrollIntoView({ block: "start" });
   }, []);
   // Visual separation only: concatenate these two substrings to recover the exact supplied prompt.
-  const split = item.prompt.lastIndexOf("Wie ");
+  const split = Math.max(0, item.prompt.lastIndexOf("Wie "), item.prompt.lastIndexOf("Was "));
   return <form onSubmit={event => { event.preventDefault(); if (value !== null) onSave(value, Date.now() - started); }}>
     <fieldset disabled={pending}>
       <legend ref={question} tabIndex={-1} className="mb-7 mt-6 w-full outline-none">
         <span className="block text-xl leading-8 text-slate-700">{item.prompt.slice(0, split)}</span>
         <span className="mt-4 block text-2xl font-semibold leading-9">{item.prompt.slice(split)}</span>
       </legend>
+      {item.response_format === "comparative" && <div className="mb-6 grid gap-3" aria-label="Zwei Vorgehensweisen">
+        {item.alternatives?.map(alternative => <p key={alternative.option_id} className="rounded-xl border border-slate-200 bg-white/50 p-4 leading-7"><strong className="mr-2">{alternative.option_id}</strong>{alternative.label}</p>)}
+      </div>}
       <div className="grid gap-3">
-        {WORKSTYLE_PRETEST_V2.response_formats[item.response_format].map(option => <label key={option.value} className={`flex min-h-14 cursor-pointer items-center gap-4 rounded-xl border px-5 py-4 ${value === option.value ? "border-violet-700 bg-violet-50" : "border-slate-200"}`}>
+        {workstyleResponseOptions(item).map(option => <label key={option.value} className={`flex min-h-14 cursor-pointer items-center gap-4 rounded-xl border px-5 py-4 ${value === option.value ? "border-violet-700 bg-violet-50" : "border-slate-200"}`}>
           <input type="radio" name={item.item_key} value={option.value} checked={value === option.value} onChange={() => setValue(option.value)} />{option.label}
         </label>)}
         <label className="mt-2 flex min-h-14 cursor-pointer items-center gap-4 rounded-xl border border-dashed border-slate-300 px-5 py-4">
@@ -40,7 +44,9 @@ function Question({ item, initial, pending, last, onSave }: { item: WorkstyleIte
   </form>;
 }
 
-export function WorkstylePretestV2({ initialSession }: { initialSession: PretestSession | null }) {
+export function WorkstylePretestV2({ initialSession, version = "8.5a-v2" }: { initialSession: PretestSession | null; version?: "8.5a-v2" | "8.5a-v3" }) {
+  const items = versionItems[version];
+  const consentText = version === "8.5a-v3" ? consentV3 : consentV2;
   const [session, setSession] = useState(initialSession);
   const [stage, setStage] = useState<"intro" | "consent" | "context">("intro");
   const [consent, setConsent] = useState(false);
@@ -72,7 +78,7 @@ export function WorkstylePretestV2({ initialSession }: { initialSession: Pretest
       {stage === "context" && <form className="space-y-6" onSubmit={event => {
         event.preventDefault(); const data = new FormData(event.currentTarget);
         run(async () => {
-          const result = await startWorkstylePretest(consent, { founder_experience: String(data.get("experience")) as ResearchContext["founder_experience"], team_size: String(data.get("team")) as ResearchContext["team_size"], venture_phase: String(data.get("phase")) }, retake, "8.5a-v2");
+          const result = await startWorkstylePretest(consent, { founder_experience: String(data.get("experience")) as ResearchContext["founder_experience"], team_size: String(data.get("team")) as ResearchContext["team_size"], venture_phase: String(data.get("phase")) }, retake, version);
           if (!result.ok) return setError(result.error);
           setSession(result.session); setPosition(result.session.resume_position ?? 0); setFeedbackDone(false);
         });
@@ -87,7 +93,18 @@ export function WorkstylePretestV2({ initialSession }: { initialSession: Pretest
       <progress className="h-1 w-full accent-violet-600" max={items.length} value={position} aria-label="Fortschritt" />
       <Question key={items[position].item_key} item={items[position]} initial={session.answers.find(answer => answer.item_key === items[position].item_key)} pending={pending} last={position === items.length - 1} onSave={(value, elapsed) => run(async () => {
         const input = { response_value: value === "cannot_assess" ? null : value, missing_reason: value === "cannot_assess" ? value : null };
-        if (position === items.length - 1) {
+        if (version === "8.5a-v3") {
+          const result = await saveWorkstyleV3(session.assessment_id, items[position].item_key, {
+            response_value: typeof value === "number" ? value : null,
+            response_option: typeof value === "string" && value !== "cannot_assess" ? value : null,
+            missing_reason: value === "cannot_assess" ? "cannot_assess" : null,
+            rendered_order: items[position].rendered_order ?? null,
+          }, elapsed, position === items.length - 1);
+          if (!result.ok) return setError(result.error);
+          setSession({ ...session, completed_at: result.completed_at, resume_position: Math.min(position + 1, items.length - 1),
+            answers: [...session.answers.filter(answer => answer.item_key !== result.answer.item_key), result.answer] });
+          if (!result.completed_at) setPosition(position + 1);
+        } else if (position === items.length - 1) {
           const result = await finishWorkstyleV2(session.assessment_id, input, elapsed);
           if (!result.ok) return setError(result.error);
           setSession(result.session);
@@ -107,7 +124,7 @@ export function WorkstylePretestV2({ initialSession }: { initialSession: Pretest
     {active && session.completed_at && <>
       <h2 className="text-2xl font-semibold">Danke für deine Teilnahme.</h2><p className="mt-3">Deine Antworten sind gespeichert. Dein Arbeitsprofil bleibt privat.</p>
       {!feedbackDone ? <WorkstyleFeedback v2 items={items} pending={pending} onSkip={() => setFeedbackDone(true)} onSave={feedback => run(async () => {
-        const result = await saveWorkstyleFeedback(session.assessment_id, feedback, "8.5a-v2");
+        const result = await saveWorkstyleFeedback(session.assessment_id, feedback, version);
         if (!result.ok) return setError(result.error); setFeedbackDone(true);
       })} /> : <p role="status" className="mt-4">Alles erledigt. Danke für deine Teilnahme.</p>}
       <button className="mt-6 min-h-11 underline" disabled={pending} onClick={() => { setSession(null); setStage("consent"); setConsent(false); setRetake(true); }}>Späteren Stand neu erheben</button>

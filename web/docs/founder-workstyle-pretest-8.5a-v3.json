@@ -1,0 +1,2141 @@
+{
+  "assessment_key": "founder-workstyle-pretest",
+  "assessment_version": "8.5a-v3",
+  "pool_version": "8.4-v0.4",
+  "registry_version": "3.0.0",
+  "source": "docs/research/phase-8/phase-8.4-v0.4-workstyle-development-instrument.md",
+  "status": "candidate_for_pretest",
+  "declared_counts": {
+    "pool": 52,
+    "core": 29
+  },
+  "actual_counts": {
+    "pool": 52,
+    "core": 29,
+    "research_only": 23
+  },
+  "scientific_counts": {
+    "core": 29,
+    "core_research": 6,
+    "candidate_core": 4,
+    "research": 13
+  },
+  "core_item_keys": [
+    "ORG-01",
+    "EXP-01",
+    "VOICE-01",
+    "AMB-01",
+    "EL-01",
+    "EVI-01",
+    "EXP-02",
+    "ORG-03",
+    "AMB-02",
+    "VOICE-02",
+    "EVI-02",
+    "EXP-03",
+    "AMB-04",
+    "ORG-04",
+    "EL-02",
+    "EXP-04",
+    "VOICE-03",
+    "EL-05",
+    "AMB-05",
+    "ORG-02",
+    "EVI-03",
+    "EL-04",
+    "VOICE-04",
+    "EVI-05",
+    "EXP-06",
+    "VOICE-05",
+    "ORG-07",
+    "EVI-06",
+    "ORG-08"
+  ],
+  "design": "fixed",
+  "presentation_variant": "mixed-v1",
+  "item_order": [
+    "ORG-01",
+    "EXP-01",
+    "VOICE-01",
+    "AMB-01",
+    "DEC-01",
+    "EL-01",
+    "EVI-01",
+    "EXP-02",
+    "ORG-03",
+    "AMB-02",
+    "EL-03",
+    "VOICE-02",
+    "EVI-02",
+    "DEC-02",
+    "EXP-03",
+    "FS-R1",
+    "AMB-04",
+    "ORG-04",
+    "EL-02",
+    "EXP-04",
+    "VOICE-03",
+    "EL-05",
+    "DEC-03",
+    "AMB-05",
+    "ORG-02",
+    "EVI-03",
+    "EL-04",
+    "ORG-05",
+    "EXP-05",
+    "VOICE-04",
+    "AMB-06",
+    "DEC-04",
+    "EVI-05",
+    "ORG-06",
+    "EVI-04",
+    "FS-R2",
+    "EXP-06",
+    "VOICE-05",
+    "AMB-03",
+    "ORG-07",
+    "EVI-06",
+    "EL-06",
+    "VOICE-06",
+    "DEC-R1",
+    "AMB-R1",
+    "VOICE-R1",
+    "EVI-R1",
+    "ORG-08",
+    "EL-R1",
+    "EXP-R1",
+    "ORG-R1",
+    "DEC-R2"
+  ],
+  "forms": {},
+  "response_formats": {
+    "likelihood": [
+      {
+        "value": 1,
+        "label": "sehr unwahrscheinlich"
+      },
+      {
+        "value": 2,
+        "label": "eher unwahrscheinlich"
+      },
+      {
+        "value": 3,
+        "label": "teils/teils"
+      },
+      {
+        "value": 4,
+        "label": "eher wahrscheinlich"
+      },
+      {
+        "value": 5,
+        "label": "sehr wahrscheinlich"
+      }
+    ],
+    "influence": [
+      {
+        "value": 1,
+        "label": "gar nicht"
+      },
+      {
+        "value": 2,
+        "label": "eher wenig"
+      },
+      {
+        "value": 3,
+        "label": "teilweise"
+      },
+      {
+        "value": 4,
+        "label": "eher stark"
+      },
+      {
+        "value": 5,
+        "label": "sehr stark"
+      }
+    ],
+    "seriousness": [
+      {
+        "value": 1,
+        "label": "gar nicht ernst"
+      },
+      {
+        "value": 2,
+        "label": "eher wenig ernst"
+      },
+      {
+        "value": 3,
+        "label": "teilweise"
+      },
+      {
+        "value": 4,
+        "label": "eher ernst"
+      },
+      {
+        "value": 5,
+        "label": "sehr ernst"
+      }
+    ],
+    "ambiguity_discomfort": [
+      {
+        "value": 1,
+        "label": "überhaupt nicht unangenehm"
+      },
+      {
+        "value": 2,
+        "label": "eher nicht unangenehm"
+      },
+      {
+        "value": 3,
+        "label": "teils/teils"
+      },
+      {
+        "value": 4,
+        "label": "eher unangenehm"
+      },
+      {
+        "value": 5,
+        "label": "sehr unangenehm"
+      }
+    ]
+  },
+  "missing_options": {
+    "cannot_assess": "Kann ich noch nicht einschätzen"
+  },
+  "scoring": {
+    "overall_score": false,
+    "construct_scores": false,
+    "compatibility_score": false,
+    "validated_short_scale": false
+  },
+  "comparison_requirements": [
+    "same_core_assessment_version",
+    "same_manifest_version",
+    "same_item_versions",
+    "explicit_product_sharing",
+    "exclude_research_only",
+    "exclude_candidate_areas"
+  ],
+  "items": [
+    {
+      "item_key": "ORG-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Bei einem größeren Vorhaben: Wie wahrscheinlich ist es, dass du dir zuerst konkrete nächste Schritte klarmachst, bevor du richtig loslegst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine Situation kommt dir sofort bekannt vor. Du kannst noch nicht genau sagen, warum, erkennst aber ein Muster von früher. Wie ernst nimmst du diesen Eindruck?",
+      "stem": null,
+      "response_format": "seriousness",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "VOICE-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ihr seid euch bei einer Entscheidung eigentlich schon einig. Dir fällt aber noch ein Punkt auf, der dagegen spricht. Wie wahrscheinlich ist es, dass du ihn trotzdem noch ansprichst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du bekommst zur selben Idee völlig unterschiedliche Rückmeldungen und kannst noch nicht einschätzen, welche davon wichtiger ist. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "DEC-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "candidate_core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast die wichtigsten Informationen für eine Entscheidung, vollständige Sicherheit gibt es aber noch nicht. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich lasse die Entscheidung lieber noch etwas offen, falls noch etwas Relevantes auftaucht."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich lege mich mit dem jetzigen Stand fest und ändere die Entscheidung später, wenn es einen guten Grund dafür gibt."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du schwankst zwischen zwei Wegen und beide lassen sich im Kleinen ausprobieren. Wie wahrscheinlich ist es, dass du erst etwas testest, bevor du dich festlegst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-01",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast drei Möglichkeiten vor dir und eine davon gefällt dir spontan am besten. Wie wahrscheinlich ist es, dass du gezielt nach Gründen suchst, die gegen deinen Favoriten sprechen?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Auf dem Papier sieht eine Lösung überzeugend aus. Aus ähnlichen Situationen kennst du aber Dinge, die dich skeptisch machen. Wie stark beeinflusst diese Erfahrung deine Einschätzung?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "ORG-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Mehrere wichtige Aufgaben konkurrieren gleichzeitig um deine Aufmerksamkeit. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich halte mehrere davon parallel in Bewegung, damit nichts ganz stehen bleibt."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich konzentriere mich stärker auf wenige Dinge und akzeptiere, dass anderes warten muss."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Es gibt mehrere plausible Erklärungen, aber gerade lässt sich nicht klären, welche stimmt. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast etwas ausprobiert und bekommst ein Ergebnis, mit dem du so nicht gerechnet hast. Was passiert bei dir eher als Nächstes?",
+      "stem": null,
+      "response_format": "behavioral",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "label": "Ich schaue erst einmal, ob sich das Ergebnis noch einmal zeigt."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich versuche zunächst zu verstehen, wodurch es entstanden sein könnte."
+        },
+        {
+          "option_id": "C",
+          "label": "Ich verändere etwas und probiere eine nächste Variante aus."
+        },
+        {
+          "option_id": "D",
+          "label": "Ich nutze das Ergebnis zusammen mit dem, was ich sonst schon weiß, für die nächste Entscheidung."
+        },
+        {
+          "option_id": "E",
+          "label": "Ich formuliere daraus eine neue Frage, die ich als Nächstes überprüfen möchte."
+        }
+      ],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "VOICE-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du erfährst etwas Unangenehmes, das für eure gemeinsame Arbeit wichtig ist. Wie wahrscheinlich ist es, dass du es zeitnah ansprichst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine wichtige Entscheidung hängt an einer Annahme, bei der du dir nicht sicher bist. Wie wahrscheinlich ist es, dass du versuchst, genau diese Annahme zu prüfen, bevor du dich festlegst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "DEC-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "candidate_core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Zwei Möglichkeiten sind weiterhin plausibel. Du könntest noch weiter recherchieren, erwartest aber nicht, dass sich dadurch das Bild grundlegend verändert. Was liegt dir eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich schaue trotzdem noch etwas genauer hin, bevor ich mich festlege."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich entscheide mit dem, was ich inzwischen weiß."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Zwei Möglichkeiten sehen nach den verfügbaren Informationen ungefähr gleich gut aus. Eine davon erinnert dich stark an eine ähnliche Situation, die du schon erlebt hast. Wie stark beeinflusst diese Erfahrung deine Entscheidung?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "FS-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Aktives Perspektivensuchen",
+      "area_key": "FS",
+      "area_status": "research_facet",
+      "scientific_status": "research",
+      "facet": "aktives Perspektivensuchen",
+      "facet_status": "source_defined",
+      "prompt": "Du hast zu einer wichtigen Frage schon eine eigene Einschätzung. Wie wahrscheinlich ist es, dass du gezielt jemanden fragst, von dem du eine andere Sicht erwartest?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Neue Informationen machen die Lage nicht klarer, sondern eröffnen noch weitere mögliche Erklärungen. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "ORG-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine Aufgabe dauert deutlich länger als gedacht. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich versuche zunächst, die Aufgabe wie geplant zu Ende zu bringen, bevor ich den Rest neu sortiere."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich passe meinen weiteren Plan früh an die neue Situation an."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ihr habt zwei plausible Ansätze und kommt im Gespräch nicht wirklich weiter. Beide ließen sich mit wenig Aufwand ausprobieren. Wie wahrscheinlich ist es, dass du einen Test vorschlägst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du stehst vor einem Problem, das du in ähnlicher Form schon mehrfach erlebt hast. Wie stark nutzt du diese Erfahrungen, um einzuschätzen, worauf es diesmal ankommen könnte?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "VOICE-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein schwieriges Thema wurde vertagt und danach nicht wieder aufgegriffen. Für dich ist aber noch etwas Wichtiges offen. Wie wahrscheinlich ist es, dass du das Thema selbst wieder ansprichst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein erster Versuch bringt keine klare Antwort. Wie wahrscheinlich ist es, dass du gezielt etwas veränderst und es noch einmal probierst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "DEC-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "candidate_core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ihr habt die wichtigsten Argumente für zwei Richtungen besprochen. Einige kleinere Fragen sind noch offen. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich möchte die offenen Punkte möglichst noch klären, bevor die Entscheidung steht."
+        },
+        {
+          "option_id": "B",
+          "label": "Für mich kann die Entscheidung trotzdem schon stehen."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ihr müsst mit einem Thema weiterarbeiten, obwohl eine wichtige Frage noch offen ist. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "ORG-02",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine Aufgabe läuft über mehrere Wochen und niemand setzt dir Zwischentermine. Wie wahrscheinlich ist es, dass du dir selbst Punkte setzt, an denen du schaust, wo du stehst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast dich entschieden. Am nächsten Tag bekommst du neue Informationen, die deutlich dagegen sprechen. Wie wahrscheinlich ist es, dass du deine Entscheidung noch einmal ernsthaft überprüfst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du bist unsicher, wie andere auf eine Idee, ein Angebot oder einen Lösungsansatz reagieren würden. Mit überschaubarem Aufwand könntest du eine einfache Version zeigen oder ausprobieren lassen. Wie wahrscheinlich ist es, dass du das früh machst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "ORG-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Über längere Zeit kommt mehr Arbeit rein, als du realistisch schaffen kannst. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich versuche, möglichst viel davon weiterzuführen und verschiebe eher im Kleinen."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich ziehe irgendwann eine klare Grenze und entscheide neu, was warten oder wegfallen muss."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine Situation ähnelt etwas, das du schon kennst, aber nicht in allen Punkten. Wie stark nutzt du deine Erfahrung trotzdem als Orientierung?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Transfer von Erfahrung auf nur teilweise ähnliche Situationen."
+    },
+    {
+      "item_key": "VOICE-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Eine Entscheidung wird getroffen, die du fachlich für falsch hältst. Wie wahrscheinlich ist es, dass du sagst, dass du sie anders einschätzt?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Zwei Menschen, deren Einschätzung du sehr ernst nimmst, beurteilen dieselbe Situation völlig unterschiedlich. Im Moment lässt sich nicht klären, wer eher recht hat. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "DEC-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "candidate_core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Für die nächsten Wochen braucht ihr eine Richtung. Ihr wisst aber schon, dass ihr später noch einmal neu entscheiden könnt. Was liegt dir eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich halte die Möglichkeiten noch möglichst lange offen."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich entscheide mich für eine vorläufige Richtung und arbeite erst einmal damit."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Jemand im Team sieht eine Sache anders als du und bringt einen Punkt, den du nachvollziehen kannst. Wie wahrscheinlich ist es, dass du deine eigene Einschätzung noch einmal prüfst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "ORG-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Niemand gibt dir vor, wann oder in welcher Reihenfolge etwas erledigt werden muss. Wie stark strukturierst du dir den Ablauf selbst?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-04",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein für euer Vorhaben wichtiges Ergebnis fällt deutlich anders aus als erwartet. Was beschreibt am ehesten, wie du damit umgehst?",
+      "stem": null,
+      "response_format": "behavioral",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "label": "Ich nehme erst einmal zur Kenntnis, dass es anders gelaufen ist, und beobachte, ob sich das wiederholt."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich schaue, ob es einen naheliegenden Grund gibt, der die Abweichung erklärt."
+        },
+        {
+          "option_id": "C",
+          "label": "Ich vergleiche einige mögliche Erklärungen und entscheide dann, ob ich weiter nachgehen will."
+        },
+        {
+          "option_id": "D",
+          "label": "Ich versuche herauszufinden, welche Erklärung am besten zu dem Ergebnis passt."
+        },
+        {
+          "option_id": "E",
+          "label": "Ich prüfe bewusst auch Erklärungen, die meiner ersten Vermutung widersprechen."
+        }
+      ],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "FS-R2",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Aktives Perspektivensuchen",
+      "area_key": "FS",
+      "area_status": "research_facet",
+      "scientific_status": "research",
+      "facet": "aktives Perspektivensuchen",
+      "facet_status": "source_defined",
+      "prompt": "Du kommst bei einer schwierigen Frage nicht weiter. Was liegt dir eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich versuche erst noch selbst, eine klarere Einschätzung zu entwickeln."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich hole relativ früh eine andere Perspektive dazu."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EXP-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ihr müsst entscheiden, obwohl noch nicht alle Informationen da sind. Du kennst das Thema aber sehr gut. Wie stark stützt du dich dann zusätzlich auf deine Erfahrung?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "VOICE-05",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Die Runde möchte ein Thema abschließen, aber für dich ist ein wichtiger Punkt noch offen. Wie wahrscheinlich ist es, dass du sagst, dass du noch nicht so weit bist?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-03",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Bei einer wichtigen Entwicklung sind mehrere Ausgänge möglich, aber gerade lässt sich keiner davon verlässlich vorhersagen. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Ambiguität vs. allgemeine Zukunftsunsicherheit."
+    },
+    {
+      "item_key": "ORG-07",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du arbeitest gerade konzentriert an etwas Wichtigem und eine ebenfalls wichtige neue Anfrage kommt rein. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich unterbreche relativ schnell und kümmere mich um das Neue."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich halte zunächst an dem fest, woran ich gerade arbeite."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EVI-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Zwei Quellen, die du grundsätzlich für seriös hältst, widersprechen sich bei einer wichtigen Frage. Wie wahrscheinlich ist es, dass du genauer prüfst, woher der Unterschied kommt?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein erster Versuch spricht gegen deine ursprüngliche Idee. Wie wahrscheinlich ist es, dass du daraus eine neue Frage für den nächsten Versuch ableitest?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "experimentelles Lernen vs. Beharrlichkeit/Persistenz."
+    },
+    {
+      "item_key": "VOICE-06",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast einem Plan zunächst zugestimmt und merkst später, dass du ihn inzwischen anders siehst. Wie wahrscheinlich ist es, dass du das selbst wieder ansprichst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Voice vs. EVI/Revidieren."
+    },
+    {
+      "item_key": "DEC-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Bei einer wichtigen Entscheidung gibt es keinen Zeitdruck. Die wesentlichen Informationen liegen aber vor. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ohne Zeitdruck lasse ich die Entscheidung lieber noch etwas offen."
+        },
+        {
+          "option_id": "B",
+          "label": "Wenn ich genug weiß, lege ich mich auch ohne äußeren Zeitdruck fest."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "AMB-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Ambiguitätstoleranz",
+      "area_key": "AMB",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du planst die nächsten Wochen, obwohl sich zwei wichtige Rahmenbedingungen noch deutlich verändern könnten. Wie unangenehm ist das für dich?",
+      "stem": null,
+      "response_format": "ambiguity_discomfort",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Ambiguität vs. Planungs-/Zukunftsunsicherheit."
+    },
+    {
+      "item_key": "VOICE-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Konstruktive Voice / sachlicher Dissens",
+      "area_key": "VOICE",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Im Team sind sich alle schnell einig. Du siehst aber noch ein Risiko. Wie wahrscheinlich ist es, dass du es trotzdem ansprichst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Voice vs. Konformitätsresistenz."
+    },
+    {
+      "item_key": "EVI-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Im Team gibt es schnell Zustimmung für eine Lösung. Dir fallen noch offene Punkte auf. Wie wahrscheinlich ist es, dass du gezielt prüfst, was gegen die Lösung sprechen könnte?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "EVI vs. Voice / Konformität."
+    },
+    {
+      "item_key": "ORG-08",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "core",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Dein Plan funktioniert grundsätzlich noch, aber mehrere kleinere Dinge laufen anders als gedacht. Was beschreibt dich eher?",
+      "stem": null,
+      "response_format": "comparative",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "strong_a",
+          "label": "deutlich eher A"
+        },
+        {
+          "option_id": "lean_a",
+          "label": "eher A"
+        },
+        {
+          "option_id": "lean_b",
+          "label": "eher B"
+        },
+        {
+          "option_id": "strong_b",
+          "label": "deutlich eher B"
+        }
+      ],
+      "alternatives": [
+        {
+          "option_id": "A",
+          "label": "Ich ändere meinen Plan erst, wenn die Abweichungen wirklich relevant werden."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich passe meinen Plan lieber schon bei kleineren Veränderungen an."
+        }
+      ],
+      "rendered_order": [
+        "A",
+        "B"
+      ],
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "core",
+      "research_only": false,
+      "product_status": "pretest_comparison_candidate",
+      "form": null,
+      "note": null
+    },
+    {
+      "item_key": "EL-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du willst etwas Neues ausprobieren. Wie wahrscheinlich ist es, dass du dir vorher klarmachst, woran du erkennen würdest, ob der Versuch dir weiterhilft?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Workstyle vs. Methodenkompetenz."
+    },
+    {
+      "item_key": "EXP-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Erfahrungsbasierte Urteilsnutzung",
+      "area_key": "EXP",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du kennst dich mit einem Thema gut aus und hast ziemlich schnell ein Gefühl dafür, was funktionieren könnte. Wie stark beeinflusst dieser erste Eindruck deine weitere Einschätzung?",
+      "stem": null,
+      "response_format": "influence",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "erfahrungsbasierte Mustererkennung vs. unspezifisches Bauchgefühl/Affekt."
+    },
+    {
+      "item_key": "ORG-R1",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Arbeitsorganisation & Selbststeuerung",
+      "area_key": "ORG",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast zugesagt, etwas bis zu einem bestimmten Zeitpunkt fertigzustellen. Wie wahrscheinlich ist es, dass du zwischendurch prüfst, ob du noch im Plan bist?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Founder-Selbststeuerung vs. allgemeine Gewissenhaftigkeit."
+    },
+    {
+      "item_key": "DEC-R2",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Entscheidungsschwelle / Decision Commitment Threshold",
+      "area_key": "DEC",
+      "area_status": "candidate_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Zwei Wege sind weiterhin ungefähr gleich plausibel. Wie wahrscheinlich ist es, dass du dich trotzdem für einen davon festlegst, auch wenn keine neue Information hinzukommt?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "new",
+      "source_status": "new",
+      "source_status_explicit": false,
+      "source_note": "Entwicklung gemäß v0.4-Spezifikation; keine versionenübergreifende Itemgleichsetzung",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": null
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { workstyleRegistryFor, workstyleSessionItems } from "@/features/instruments/workstyle/registry";
+import { workstyleRegistryFor, workstyleSessionItems, workstyleResponseOptions, workstyleInstrumentId } from "@/features/instruments/workstyle/registry";
 import type { ResearchRow } from "@/features/instruments/workstyle/data";
 
 export function median(values: readonly number[]): number | null {
@@ -13,11 +13,14 @@ export function workstyleStatistics(input: readonly ResearchRow[], version = "8.
   const rows = input.filter(row => row.assessment_version === version);
   const forms = (version === "8.5a-v1" ? (["A", "B", "C"] as const) : []).map(form => ({ form, n: rows.filter(row => row.form === form).length }));
   function itemStats(itemKey: string, group: readonly ResearchRow[]) {
+    const item = registry.items.find(item => item.item_key === itemKey)!;
+    const options = workstyleResponseOptions(item);
     const eligible = group.filter(row => workstyleSessionItems(row.assessment_version, row.form).some(item => item.item_key === itemKey));
     const answers = eligible.flatMap(row => row.answers.filter(answer => answer.item_key === itemKey && answer.item_version === registry.items.find(item => item.item_key === itemKey)?.item_version));
     const missing = answers.filter(answer => answer.missing_reason !== null).length;
     return { n: answers.length, eligible: eligible.length, missing, missingPercent: answers.length ? missing / answers.length * 100 : null,
-      distribution: [1, 2, 3, 4, 5].map(value => answers.filter(answer => answer.response_value === value && answer.missing_reason === null).length),
+      distribution: options.map(option => answers.filter(answer => (typeof option.value === "number" ? answer.response_value === option.value : answer.response_option === option.value) && answer.missing_reason === null).length),
+      distributionLabels: options.map(option => String(option.value)),
       medianTimeMs: median(eligible.flatMap(row => typeof row.timings[itemKey] === "number" ? [row.timings[itemKey]] : [])),
       flags: { clearRealistic: eligible.filter(row => row.feedback?.clear_realistic_items?.includes(itemKey)).length, unclear: eligible.filter(row => row.feedback?.unclear_items?.includes(itemKey)).length,
         unsuitable: eligible.filter(row => row.feedback?.unsuitable_items?.includes(itemKey)).length,
@@ -28,7 +31,7 @@ export function workstyleStatistics(input: readonly ResearchRow[], version = "8.
   for (const row of incomplete) {
     const items = workstyleSessionItems(row.assessment_version, row.form);
     const firstMissing = items.findIndex(item => !row.answers.some(answer => answer.item_key === item.item_key));
-    const openPosition = version === "8.5a-v2" ? row.resume_position ?? firstMissing : firstMissing;
+    const openPosition = version !== "8.5a-v1" ? row.resume_position ?? firstMissing : firstMissing;
     const label = openPosition === -1 ? "Abgabe ausstehend" : `${openPosition + 1}: ${items[openPosition].item_key}`;
     dropPositions.set(label, (dropPositions.get(label) ?? 0) + 1);
   }
@@ -52,6 +55,18 @@ export function workstyleLongExport(input: readonly ResearchRow[], version = "8.
     if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
     return `"${text.replaceAll('"', '""')}"`;
   };
+  if (version === "8.5a-v3") {
+    const v3Header = ["session_id", "assessment_key", "instrument_id", "assessment_version", "manifest_version", "item_key", "item_version", "construct", "facet", "area_status", "scientific_status", "usage", "research_only", "response_format", "item_position", "presentation_variant", "raw_answer", "response_value", "response_option", "missing_reason", "response_state", "rendered_ab_order", "context_group", "founder_experience", "venture_phase", "started_at", "answered_at", "finalized_at", "response_time_ms", "consent_version"];
+    const data = rows.flatMap(row => workstyleSessionItems(row.assessment_version, row.form).map((item, index) => {
+      const answer = row.answers.find(answer => answer.item_key === item.item_key && answer.item_version === item.item_version);
+      return [row.session_id, registry.assessment_key, workstyleInstrumentId(version), row.assessment_version, row.manifest_version ?? registry.registry_version,
+        item.item_key, item.item_version, item.construct, item.facet, item.area_status, item.scientific_status, item.usage, item.research_only, item.response_format,
+        index + 1, registry.presentation_variant, answer?.response_option ?? answer?.response_value, answer?.response_value, answer?.response_option,
+        answer?.missing_reason, !answer ? "not_answered" : answer.missing_reason ? "missing" : "answered", answer?.rendered_order?.join("|"),
+        row.context.team_size, row.context.founder_experience, row.context.venture_phase, row.started_at, answer?.answered_at, row.completed_at, row.timings[item.item_key], row.consent_version];
+    }));
+    return [v3Header, ...data].map(row => row.map(cell).join(",")).join("\r\n") + "\r\n";
+  }
   const data = rows.flatMap(row => workstyleSessionItems(row.assessment_version, row.form).map(item => {
     const answer = row.answers.find(answer => answer.item_key === item.item_key);
     return [row.session_id, row.form, row.assessment_version, registry.registry_version, item.item_key, answer?.item_version ?? item.item_version, item.usage, item.research_only,
