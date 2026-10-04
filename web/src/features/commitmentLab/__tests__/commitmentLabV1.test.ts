@@ -184,12 +184,14 @@ test("handoff offers only explicit Setup targets and never confirms an agreement
   assert.doesNotMatch(action, /founder_team_setup_confirmations/);
 });
 
-test("homebase keeps pair Commitment Lab optional after current Founder Setup", () => {
+test("homebase keeps pair Commitment Lab optional in 'Vertiefen', apart from Setup and history", () => {
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
-  const alignment = page.indexOf('id="team-alignment"');
+  const deepen = page.indexOf('t("groups.discover.title")');
   const lab = page.indexOf('id="commitment-lab-title"');
   const setup = page.indexOf('id="team-setup-title"');
-  assert.ok(setup >= 0 && alignment > setup && lab > alignment);
+  const alignment = page.indexOf('id="team-alignment"');
+  // Phase 9.4B: Vertiefen (zu zweit) -> Vereinbaren -> Rueckblick.
+  assert.ok(deepen >= 0 && lab > deepen && setup > lab && alignment > setup);
   assert.match(page, /startedLabRelationships\.has\(entry\.relationshipId\)/);
   assert.match(page, /is_commitment_lab_complete/);
   assert.match(page, /completedLabRelationships\.has\(entry\.relationshipId\)/);

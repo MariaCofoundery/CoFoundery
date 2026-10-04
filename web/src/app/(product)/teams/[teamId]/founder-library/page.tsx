@@ -25,9 +25,6 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
     getTranslations("founderLibrary"),
     getTranslations("teams.teamNavigation"),
   ]);
-  const teamLabel = team.name ?? team.members
-    .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
-    .join(" + ");
 
   return (
     <FounderLibraryView
@@ -42,8 +39,8 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
           active="library"
           labels={{
             ariaLabel: navigationT("ariaLabel"),
-            context: navigationT("context", { team: teamLabel }),
             overview: navigationT("overview"),
+            workstyle: navigationT("workstyle"),
             setup: navigationT("setup"),
             library: navigationT("library"),
             alignment: navigationT("alignment"),

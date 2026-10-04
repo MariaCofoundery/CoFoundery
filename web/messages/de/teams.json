@@ -2,21 +2,16 @@
   "homebase": {
     "membersInvite": "Weitere Person in dieses Team einladen",
     "membersFull": "Dieses Team hat vier Mitglieder. Weitere Einladungen sind nicht möglich.",
-    "pairScope": {
-      "title": "Optionale Vertiefungen",
-      "description": "Diese Vertiefungen finden zwischen zwei Teammitgliedern statt. Beim Commitment Lab steht das jeweilige Paar dabei. Ergebnisse gelten für dieses Paar, nicht automatisch für das gesamte Team. RMM und Founder in the Wild sind derzeit nur für Zweierteams startbar; eine Paarauswahl für größere Teams ist noch nicht verfügbar."
-    },
     "eyebrow": "Founder-Team",
-    "title": "Unsere Zusammenarbeit",
     "back": "Zurück zu Verbindungen",
     "context": {
       "preFounder": "Ihr prüft eine gemeinsame Gründung",
       "existingTeam": "Ihr arbeitet bereits als Founder-Team zusammen"
     },
     "founders": {
-      "title": "Founder",
       "fallback": "Founder {index}",
-      "avatarAlt": "Profil von {name}"
+      "avatarAlt": "Profil von {name}",
+      "count": "{count, plural, one {# Founder} other {# Founder}}"
     },
     "setup": {
       "title": "Founder Setup",
@@ -28,7 +23,8 @@
         "title": "Founder Setup: Advisor-Freigabe wartet auf deine Zustimmung",
         "description": "Prüfe die separate Freigabe bestätigter Founder-Setup-Inhalte.",
         "cta": "Prüfen"
-      }
+      },
+      "document": "Dokument ansehen"
     },
     "alignment": {
       "title": "Alignment",
@@ -87,32 +83,85 @@
       }
     },
     "groups": {
-      "whereToStart": "Ihr seid gerade erst zusammengekommen. Fangt links oben an: Read My Mind dauert ein paar Minuten und zeigt euch sofort, wo ihr euch richtig eingeschätzt habt – und wo nicht.",
-      "discover": {
-        "title": "Einander kennenlernen",
-        "text": "Kurze Runden, unabhängig beantwortet und dann gemeinsam aufgedeckt. Kein Test, keine Auswertung – es geht um den Moment, in dem ihr merkt, dass ihr etwas anders seht."
-      },
+      "whereToStart": "Ihr seid gerade erst zusammengekommen. Ein leichter Einstieg ist Read My Mind hier unter „Vertiefen“: ein paar Minuten, und ihr seht, wo ihr euch richtig eingeschätzt habt – und wo nicht.",
       "understand": {
-        "title": "Euch verstehen",
-        "text": "Was aus euren Antworten herausgekommen ist, und die Themen, die eine längere Unterhaltung verdienen."
+        "title": "Verstehen",
+        "text": "Wie ihr arbeitet, was ihr mit diesem Vorhaben vorhabt und was jede und jeder einbringt – als Grundlage für eure Gespräche."
+      },
+      "discover": {
+        "title": "Vertiefen",
+        "text": "Freiwillige Formate, die ihr jeweils zu zweit macht. Was dabei herauskommt, gilt für dieses Paar – nicht automatisch für das ganze Team."
       },
       "commit": {
-        "title": "Verbindlich werden",
-        "text": "Hier wird aus Gesprächen etwas, auf das ihr euch berufen könnt. Das ist der unbequeme Teil – und der, der später zählt."
+        "title": "Vereinbaren",
+        "text": "Was ihr besprochen habt, haltet ihr im Founder Setup gemeinsam fest. Gültig ist, was alle aktuellen Mitglieder bestätigt haben."
       },
       "resources": {
         "title": "Zum Nachschlagen"
       }
+    },
+    "header": {
+      "advisors": "Begleitung: {names}"
+    },
+    "journey": {
+      "label": "Stand eurer Bereiche",
+      "items": {
+        "work": "Deine Arbeitsweise",
+        "venture": "Deine Angaben zum Vorhaben",
+        "report": "Euer Zusammenspiel",
+        "setup": "Founder Setup"
+      },
+      "assessment": {
+        "unavailable": "Status nicht verfügbar",
+        "present": "Vorhanden",
+        "inProgress": "In Arbeit",
+        "open": "Noch offen"
+      },
+      "report": {
+        "unavailable": "Status nicht verfügbar",
+        "available": "Verfügbar",
+        "shareMissing": "Freigabe fehlt",
+        "notAvailable": "Noch nicht verfügbar"
+      },
+      "setup": {
+        "unavailable": "Status nicht verfügbar",
+        "confirmed": "Bestätigte Themen vorhanden",
+        "clarifying": "In Klärung",
+        "open": "Offen"
+      }
+    },
+    "understand": {
+      "workstyle": {
+        "title": "Euer Zusammenspiel",
+        "text": "So arbeitet ihr zusammen: wo sich eure Arbeitsweisen ähneln, wo sie sich unterscheiden und worüber es sich zu sprechen lohnt.",
+        "action": "Ansehen"
+      },
+      "venture": {
+        "title": "Was ihr aufbauen wollt",
+        "text": "Ziele, Zeit, Geld, Risiko und Erwartungen an dieses Vorhaben – jede Person antwortet für sich.",
+        "begin": "Beginnen",
+        "continue": "Fortsetzen",
+        "view": "Deine Angaben ansehen"
+      },
+      "roles": {
+        "title": "Was ihr einbringt",
+        "text": "Erfahrung, gewünschte Verantwortung und was ihr lieber abgebt oder extern löst – nebeneinander, ohne Bewertung.",
+        "action": "Ansehen"
+      }
+    },
+    "deepen": {
+      "pair": "Ihr zwei: {names}",
+      "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
     }
   },
   "teamNavigation": {
     "ariaLabel": "Bereiche des Founder-Teams",
-    "context": "Bereiche für {team}",
     "overview": "Übersicht",
     "setup": "Founder Setup",
-    "library": "Founder Library",
-    "alignment": "Alignment",
-    "roles": "Rollen"
+    "library": "Library",
+    "alignment": "Frühere Auswertungen",
+    "roles": "Fähigkeiten & Rollen",
+    "workstyle": "Euer Zusammenspiel"
   },
   "commitmentLab": {
     "title": "Commitment Lab",

@@ -54,7 +54,6 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   const ownReady = isCommitmentLabFounderReady(ownEntry);
   const entriesByUser = new Map(lab.founderEntries.map((entry) => [entry.userId, entry]));
   const bothReady = lab.participantUserIds.every((id) => isCommitmentLabFounderReady(entriesByUser.get(id) ?? null));
-  const teamLabel = lab.team.name ?? lab.team.members.map((member, index) => member.displayName ?? `Founder ${index + 1}`).join(" + ");
   const threads = groupCommitmentLabDiscussion(lab.discussion);
   const date = new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium", timeStyle: "short" });
   // Null heisst: Das Konto ist geloescht. Der Beitrag bleibt stehen, damit die
@@ -96,7 +95,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
         <p className="mt-3 text-sm font-medium text-slate-700">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
       </header>
-      <FounderTeamNavigation teamId={teamId} active="alignment" labels={{ ariaLabel: navigationT("ariaLabel"), context: navigationT("context", { team: teamLabel }), overview: navigationT("overview"), setup: navigationT("setup"), library: navigationT("library"), alignment: navigationT("alignment"), roles: navigationT("roles") }} />
+      <FounderTeamNavigation teamId={teamId} active="overview" labels={{ ariaLabel: navigationT("ariaLabel"), overview: navigationT("overview"), workstyle: navigationT("workstyle"), setup: navigationT("setup"), library: navigationT("library"), alignment: navigationT("alignment"), roles: navigationT("roles") }} />
       {feedback ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedback}`)}</p> : null}
 
       <CommitmentLabMarkerProvider initialMarkers={ownEntry?.discussionMarkers ?? []}>

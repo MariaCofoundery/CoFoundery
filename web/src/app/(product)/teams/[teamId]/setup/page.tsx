@@ -34,9 +34,6 @@ export default async function FounderSetupPage({ params }: Props) {
     getTranslations("teams.teamNavigation"),
   ]);
   const counts = countFounderSetupStatuses(setup);
-  const teamLabel = setup.members
-    .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
-    .join(" + ");
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
@@ -65,8 +62,8 @@ export default async function FounderSetupPage({ params }: Props) {
         active="setup"
         labels={{
           ariaLabel: navigationT("ariaLabel"),
-          context: navigationT("context", { team: teamLabel }),
           overview: navigationT("overview"),
+          workstyle: navigationT("workstyle"),
           setup: navigationT("setup"),
           library: navigationT("library"),
           alignment: navigationT("alignment"),

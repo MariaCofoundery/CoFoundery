@@ -2,21 +2,16 @@
   "homebase": {
     "membersInvite": "Invite another person to this team",
     "membersFull": "This team has four members. No further invitations are available.",
-    "pairScope": {
-      "title": "Optional deep dives",
-      "description": "These deep dives involve two team members. Commitment Lab identifies the pair explicitly. Results apply to that pair, not automatically to the whole team. RMM and Founder in the Wild currently start only in two-person teams; pair selection for larger teams is not available."
-    },
     "eyebrow": "Founder team",
-    "title": "Our collaboration",
     "back": "Back to connections",
     "context": {
       "preFounder": "You are exploring founding a company together",
       "existingTeam": "You already work together as a founder team"
     },
     "founders": {
-      "title": "Founders",
       "fallback": "Founder {index}",
-      "avatarAlt": "Profile for {name}"
+      "avatarAlt": "Profile for {name}",
+      "count": "{count, plural, one {# founder} other {# founders}}"
     },
     "setup": {
       "title": "Founder Setup",
@@ -28,7 +23,8 @@
         "title": "Founder Setup: advisor sharing awaits your approval",
         "description": "Review the separate sharing of confirmed Founder Setup content.",
         "cta": "Review"
-      }
+      },
+      "document": "View document"
     },
     "alignment": {
       "title": "Alignment",
@@ -87,32 +83,85 @@
       }
     },
     "groups": {
-      "whereToStart": "You've only just come together. Start at the top: Read My Mind takes a few minutes and shows you straight away where you read each other right – and where you didn't.",
-      "discover": {
-        "title": "Getting to know each other",
-        "text": "Short rounds, answered independently and then revealed together. Not a test, not an assessment – it's about the moment you notice you see something differently."
-      },
+      "whereToStart": "You have only just come together. An easy start is Read My Mind here under “Go deeper”: a few minutes, and you see where you read each other right – and where you did not.",
       "understand": {
-        "title": "Understanding each other",
-        "text": "What came out of your answers, and the topics that deserve a longer conversation."
+        "title": "Understand",
+        "text": "How you work, what you want from this venture and what each of you brings – as a basis for your conversations."
+      },
+      "discover": {
+        "title": "Go deeper",
+        "text": "Optional formats you do as a pair. What comes out of them applies to that pair – not automatically to the whole team."
       },
       "commit": {
-        "title": "Making it binding",
-        "text": "This is where conversations turn into something you can point back to. The uncomfortable part – and the one that counts later."
+        "title": "Agree",
+        "text": "What you have discussed, you record together in Founder Setup. What counts is what all current members have confirmed."
       },
       "resources": {
         "title": "For reference"
       }
+    },
+    "header": {
+      "advisors": "Accompanied by {names}"
+    },
+    "journey": {
+      "label": "Where your areas stand",
+      "items": {
+        "work": "How you work",
+        "venture": "Your venture answers",
+        "report": "How you work together",
+        "setup": "Founder Setup"
+      },
+      "assessment": {
+        "unavailable": "Status unavailable",
+        "present": "Available",
+        "inProgress": "In progress",
+        "open": "Not started yet"
+      },
+      "report": {
+        "unavailable": "Status unavailable",
+        "available": "Available",
+        "shareMissing": "Sharing missing",
+        "notAvailable": "Not available yet"
+      },
+      "setup": {
+        "unavailable": "Status unavailable",
+        "confirmed": "Confirmed topics",
+        "clarifying": "Being clarified",
+        "open": "Open"
+      }
+    },
+    "understand": {
+      "workstyle": {
+        "title": "How you work together",
+        "text": "Where your ways of working are similar, where they differ and what is worth talking about.",
+        "action": "View"
+      },
+      "venture": {
+        "title": "What you want to build",
+        "text": "Goals, time, money, risk and expectations for this venture – each person answers on their own.",
+        "begin": "Start",
+        "continue": "Continue",
+        "view": "View your answers"
+      },
+      "roles": {
+        "title": "What you bring",
+        "text": "Experience, the responsibility you want and what you would rather hand over or source externally – side by side, without rating.",
+        "action": "View"
+      }
+    },
+    "deepen": {
+      "pair": "The two of you: {names}",
+      "twoOnly": "Read My Mind and Founder in the Wild can currently only be started in teams of exactly two founders. You use the Commitment Lab with the people you are directly connected with."
     }
   },
   "teamNavigation": {
     "ariaLabel": "Founder team areas",
-    "context": "Areas for {team}",
     "overview": "Overview",
     "setup": "Founder Setup",
-    "library": "Founder Library",
-    "alignment": "Alignment",
-    "roles": "Roles"
+    "library": "Library",
+    "alignment": "Earlier results",
+    "roles": "Skills & roles",
+    "workstyle": "How you work together"
   },
   "commitmentLab": {
     "title": "Commitment Lab",

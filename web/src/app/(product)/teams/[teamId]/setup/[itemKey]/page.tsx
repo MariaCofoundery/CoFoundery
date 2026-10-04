@@ -76,9 +76,6 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
       ? setup.members[index].displayName ?? t("founderFallback", { index: index + 1 })
       : t("founderFallback", { index: 1 });
   };
-  const teamLabel = setup.members
-    .map((member, index) => member.displayName ?? t("founderFallback", { index: index + 1 }))
-    .join(" + ");
   const saveAction = saveFounderSetupWorkingStateAction.bind(null, teamId, itemKey);
   const proposeAction = proposeFounderSetupRevisionAction.bind(null, teamId, itemKey);
   const confirmAction = confirmFounderSetupRevisionAction.bind(null, teamId, itemKey);
@@ -182,8 +179,8 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
         active="setup"
         labels={{
           ariaLabel: navigationT("ariaLabel"),
-          context: navigationT("context", { team: teamLabel }),
           overview: navigationT("overview"),
+          workstyle: navigationT("workstyle"),
           setup: navigationT("setup"),
           library: navigationT("library"),
           alignment: navigationT("alignment"),

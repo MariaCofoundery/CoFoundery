@@ -60,8 +60,8 @@ export default async function TeamRolesPage({
         active="roles"
         labels={{
           ariaLabel: navigationT("ariaLabel"),
-          context: navigationT("context"),
           overview: navigationT("overview"),
+          workstyle: navigationT("workstyle"),
           setup: navigationT("setup"),
           library: navigationT("library"),
           alignment: navigationT("alignment"),

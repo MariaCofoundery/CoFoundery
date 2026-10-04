@@ -9,6 +9,8 @@ import { saveProductSnapshot } from "@/features/reporting/workstyle/actions";
 import { TeamWorkstyleReport } from "@/features/reporting/workstyle/TeamWorkstyleReport";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import type { ProductTeam } from "@/features/reporting/workstyle/model";
+import { getTranslations } from "next-intl/server";
+import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Euer Zusammenspiel",
@@ -39,12 +41,31 @@ export default async function Page({
   if (query.snapshot && (!snapshot || snapshot.input.team_id !== teamId))
     notFound();
   const team = snapshot?.input ?? current;
+  const navigationT = await getTranslations("teams.teamNavigation");
   return (
     <main className="ws-report mx-auto max-w-6xl px-5 py-10">
       <div className="ws-no-print mb-5">
         <Link href={membership ? `/teams/${teamId}` : "/advisor"} className="underline">
           {membership ? "Zum Team" : "Zum Advisor-Bereich"}
         </Link>
+        {/* Phase 9.4B: Die Teamnavigation auch hier - nur fuer Mitglieder
+            (Advisor erreichen den Report ueber ihre eigene Freigabe) und nie
+            im Druck. */}
+        {membership ? (
+          <FounderTeamNavigation
+            teamId={teamId}
+            active="workstyle"
+            labels={{
+              ariaLabel: navigationT("ariaLabel"),
+              overview: navigationT("overview"),
+              workstyle: navigationT("workstyle"),
+              roles: navigationT("roles"),
+              setup: navigationT("setup"),
+              library: navigationT("library"),
+              alignment: navigationT("alignment"),
+            }}
+          />
+        ) : null}
       </div>
       <header className="mb-10">
         <p className="text-sm text-slate-500">

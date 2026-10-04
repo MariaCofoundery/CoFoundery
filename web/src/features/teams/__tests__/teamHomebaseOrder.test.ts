@@ -27,7 +27,7 @@ const groups = (locale: string) =>
  *
  * Jetzt drei Gruppen in der Reihenfolge, in der ein Paar sich bewegt.
  */
-test("Phase 9.2: Setup ist vor den optionalen Vertiefungen erreichbar", () => {
+test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben erreichbar", () => {
   const page = source(PAGE);
   const at = (needle: string) => {
     const index = page.indexOf(needle);
@@ -35,22 +35,68 @@ test("Phase 9.2: Setup ist vor den optionalen Vertiefungen erreichbar", () => {
     return index;
   };
 
-  const discover = at('t("groups.discover.title")');
-  const understand = at('t("alignment.history")');
-  const commit = at('t("groups.commit.title")');
+  const header = at('aria-labelledby="team-founders-title"');
+  const status = at("<TeamJourneyStatus");
+  const understand = at('t("groups.understand.title")');
+  const deepen = at('t("groups.discover.title")');
+  const agree = at('t("groups.commit.title")');
+  const resources = at('t("groups.resources.title")');
+  const history = at('id="team-alignment"');
+  const advisor = at("<FounderRelationshipAdvisorPanel");
 
-  assert.ok(discover < understand, "verstehen steht vor kennenlernen");
-  assert.ok(understand < commit, "verbindlich werden steht vor verstehen");
+  // Die Ebenen in der Reihenfolge, in der ein Team sie benutzt.
+  assert.ok(header < status && status < understand, "Kopf und Statuszeile stehen oben");
+  assert.ok(understand < deepen && deepen < agree, "die drei Ebenen stehen nicht in Reihenfolge");
+  assert.ok(agree < resources && resources < history && history < advisor, "Nachschlagen und Rueckblick stehen nicht am Ende");
 
-  // Und die Angebote sitzen in ihrer Gruppe.
-  assert.ok(at("<ReadMyMindHomebaseCard") > discover);
-  assert.ok(at("<FounderInTheWildHomebaseCard") > discover);
-  assert.ok(at("<FounderInTheWildHomebaseCard") < understand, "ein Lab steht im falschen Abschnitt");
-  assert.ok(at('id="team-alignment"') < understand);
-  assert.ok(at('t("agreements.title")') > understand);
-  assert.ok(at('id="team-alignment"') < commit);
-  assert.ok(at('aria-labelledby="commitment-lab-title"') > commit);
-  assert.ok(at('aria-labelledby="team-setup-title"') < discover);
+  // Jedes Angebot sitzt in seiner Ebene.
+  for (const entry of ["/workstyle`}", "ventureHref(team.id, journey.venture)", "/roles`}"]) {
+    assert.ok(at(entry) > understand && at(entry) < deepen, `${entry} steht nicht unter Verstehen`);
+  }
+  for (const entry of ['aria-labelledby="commitment-lab-title"', "<ReadMyMindHomebaseCard", "<FounderInTheWildHomebaseCard"]) {
+    assert.ok(at(entry) > deepen && at(entry) < agree, `${entry} steht nicht unter Vertiefen`);
+  }
+  assert.ok(at('aria-labelledby="team-setup-title"') > agree && at('aria-labelledby="team-setup-title"') < resources);
+  assert.ok(at("<FounderLibraryHomebaseCard") > resources && at("<FounderLibraryHomebaseCard") < history);
+  assert.ok(at('t("agreements.title")') > history, "historische Notizen stehen ausserhalb des Rueckblicks");
+
+  // Die Zusage aus Phase 9.2 bleibt: Founder Setup ist vor den optionalen
+  // Vertiefungen erreichbar - ueber die Statuszeile im Kopf und die
+  // Teamnavigation, beide oberhalb von "Vertiefen".
+  assert.match(source("src/features/teams/TeamJourneyStatus.tsx"), /href: `\/teams\/\$\{team\}\/setup`/);
+  assert.match(source("src/features/teams/FounderTeamNavigation.tsx"), /key: "setup" as const/);
+  assert.ok(at("<FounderTeamNavigation") < deepen);
+});
+
+test("die Statuszeile behaelt vier getrennte Zustaende ohne Gesamtwert", () => {
+  const status = source("src/features/teams/TeamJourneyStatus.tsx");
+  const page = source(PAGE);
+  // Nur Code pruefen - die Kommentare verneinen genau diese Woerter.
+  const codeOnly = (text: string) =>
+    text.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  for (const key of ["work", "venture", "report", "setup"]) {
+    assert.match(status, new RegExp(`key: "${key}"`));
+  }
+  assert.doesNotMatch(codeOnly(`${status}\n${page}`), /\bpercent|Prozent|\d\s*%|\bprogress\b|Fortschritt|teamHealth|\bvon 4\b|\bof 4\b/i);
+  // Bestaetigt heisst weiterhin: von allen aktuellen Mitgliedern.
+  assert.match(status, /currentConfirmedRevision/);
+  assert.match(status, /rosterConfirmationMissing/);
+  for (const locale of ["de", "en"]) {
+    const journey = (readJson(`messages/${locale}/teams.json`).homebase as Record<string, unknown>).journey as Record<string, Record<string, string>>;
+    assert.deepEqual(Object.keys(journey.items), ["work", "venture", "report", "setup"]);
+  }
+});
+
+test("Vertiefen zeigt nur vorhandene Paare und erfindet keine", () => {
+  const page = source(PAGE);
+  // Die Paarliste kommt ausschliesslich aus den bestehenden Relationships
+  // des Readmodels - kein Kombinieren der Mitglieder zu theoretischen Paaren.
+  assert.match(page, /team\.alignment\.map\(\(entry\) =>/);
+  assert.doesNotMatch(page, /members\.flatMap|combinations|allPairs|createRelationship|ensure_founder_team_for_relationship/);
+  // Ab drei Mitgliedern steht das Paar an jeder Zeile, und RMM/FitW sagen
+  // ehrlich, dass sie nur zu zweit startbar sind.
+  assert.match(page, /!isPairTeam \? \(\s*<p[^>]*>\{commitmentT\("pair"/);
+  assert.match(page, /t\("deepen\.twoOnly"\)/);
 });
 
 test("die vier Alignment-Links sagen, was dahinter liegt", () => {
@@ -85,7 +131,7 @@ test("ein neues Paar bekommt einen Startpunkt genannt", () => {
   // Absichtlich nur aus dem, was die Seite ohnehin weiss - ein falscher Rat
   // ist schlechter als keiner.
   assert.match(page, /const isNewPair =/);
-  assert.match(page, /!setupState\?\.started/);
+  assert.match(page, /!setup\?\.started/);
   assert.match(page, /startedLabRelationships\.size === 0/);
   assert.match(page, /\{isNewPair \? \(/);
 

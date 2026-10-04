@@ -79,21 +79,23 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   const en = JSON.parse(readFileSync(new URL("../../../../messages/en/collaborationLab.json", import.meta.url), "utf8"));
   const dashboardDe = JSON.parse(readFileSync(new URL("../../../../messages/de/dashboard.json", import.meta.url), "utf8"));
   const dashboardEn = JSON.parse(readFileSync(new URL("../../../../messages/en/dashboard.json", import.meta.url), "utf8"));
-  // Phase 9.2: optional pair experiences follow the current report and Setup.
+  // Phase 9.4B: Read My Mind steht im Bereich "Vertiefen" - nach dem
+  // paarbezogenen Commitment Lab und vor "Vereinbaren". Founder Setup bleibt
+  // ueber Statuszeile und Teamnavigation von oben erreichbar (siehe
+  // teamHomebaseOrder.test.ts).
   const cardPosition = homebase.lastIndexOf("<ReadMyMindHomebaseCard");
   assert.ok(cardPosition > 0, "die Karte steht nicht mehr auf der Teamseite");
   assert.ok(
-    cardPosition < homebase.indexOf("commitment-lab-title"),
-    "Read My Mind steht wieder hinter dem Commitment Lab"
-  );
-  assert.ok(
-    cardPosition > homebase.indexOf("team-setup-title"),
-    "Phase 9.2: optionale Vertiefung darf Setup nicht vorangestellt sein"
-  );
-  // Und in der ersten Gruppe, nicht irgendwo davor.
-  assert.ok(
     cardPosition > homebase.indexOf('t("groups.discover.title")'),
     "die Karte steht ausserhalb der Gruppe, zu der sie gehoert"
+  );
+  assert.ok(
+    cardPosition > homebase.indexOf("commitment-lab-title"),
+    "Read My Mind steht vor dem Commitment Lab"
+  );
+  assert.ok(
+    cardPosition < homebase.indexOf('t("groups.commit.title")'),
+    "Read My Mind steht ausserhalb von Vertiefen"
   );
   assert.match(form, /type=\{multi \? "checkbox" : "radio"\}/);
   assert.match(form, /disabled=\{!complete \|\| allLocked\}/);
