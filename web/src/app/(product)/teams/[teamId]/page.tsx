@@ -267,14 +267,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
         />
 
 
-        <div className="mt-2">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            {t("groups.understand.title")}
-          </h2>
-          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.understand.text")}</p>
-        </div>
         <details id="team-alignment" className="rounded-2xl border border-slate-200 p-4">
-          <summary className="cursor-pointer font-medium">Frühere Paarreports und Workbooks</summary>
+          <summary className="cursor-pointer font-medium">{t("alignment.history")}</summary>
         <section
           className={`${SECTION_CLASS} scroll-mt-32`}
           aria-labelledby="team-alignment-title"
@@ -294,13 +288,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             <div className="mt-5 grid gap-4">
               {team.alignment.map((entry) => {
                 const participants = pairName(entry.participantUserIds, names, fallback);
-                // Vier Links hiessen "Report ansehen", "Matching-Report
-                // ansehen", "Matching Workspace oeffnen" und "Alignment
-                // vertiefen" - zwei davon "Report", und keiner sagte, was
-                // dahinter liegt. Jetzt in der Reihenfolge, in der man sie
-                // braucht, mit Namen, die die Sache nennen. Der aeltere
-                // Report steht zuletzt und leise: Er stammt aus der Zeit vor
-                // dem Matching-Report und ist nur noch fuer den Rueckblick da.
+                // All links here are historical and never create new drafts.
                 const hasLinks = Boolean(
                   entry.workbook ||
                     entry.matchingWorkspace ||
@@ -324,9 +312,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
                         ) : null}
                         {entry.workbook ? (
                           <Link href={entry.workbook.href} className={LINK_CLASS}>
-                            {entry.workbook.exists
-                              ? t("alignment.workbook")
-                              : t("alignment.continue")}
+                            {t("alignment.workbook")}
                           </Link>
                         ) : null}
                         {entry.matchingWorkspace ? (
@@ -354,29 +340,6 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </div>
           )}
         </section>
-        </details>
-
-        <div className="mt-2">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            {t("groups.commit.title")}
-          </h2>
-          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.commit.text")}</p>
-        </div>
-        {team.alignment.length > 0 ? (
-          <section className={SECTION_CLASS} aria-labelledby="commitment-lab-title">
-            <h2 id="commitment-lab-title" className="text-xl font-semibold text-slate-950">{commitmentT("title")}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{commitmentT("description")}</p>
-            <div className="mt-5 grid gap-3">
-              {team.alignment.map((entry) => {
-                const participants = pairName(entry.participantUserIds, names, fallback);
-                const started = startedLabRelationships.has(entry.relationshipId);
-                const completed = completedLabRelationships.has(entry.relationshipId);
-                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>{completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}</div><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(completed ? "view" : started ? "continue" : "start")}</Link></article>;
-              })}
-            </div>
-          </section>
-        ) : null}
-
         <section className={SECTION_CLASS} aria-labelledby="team-agreements-title">
           <h2 id="team-agreements-title" className="text-xl font-semibold text-slate-950">
             {t("agreements.title")}
@@ -416,6 +379,30 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </ul>
           )}
         </section>
+
+        </details>
+
+        <div className="mt-2">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {t("groups.commit.title")}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.commit.text")}</p>
+        </div>
+        {team.alignment.length > 0 ? (
+          <section className={SECTION_CLASS} aria-labelledby="commitment-lab-title">
+            <h2 id="commitment-lab-title" className="text-xl font-semibold text-slate-950">{commitmentT("title")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{commitmentT("description")}</p>
+            <div className="mt-5 grid gap-3">
+              {team.alignment.map((entry) => {
+                const participants = pairName(entry.participantUserIds, names, fallback);
+                const started = startedLabRelationships.has(entry.relationshipId);
+                const completed = completedLabRelationships.has(entry.relationshipId);
+                return <article key={entry.relationshipId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>{completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}</div><Link href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`} className={LINK_CLASS}>{commitmentT(completed ? "view" : started ? "continue" : "start")}</Link></article>;
+              })}
+            </div>
+          </section>
+        ) : null}
+
 
         <div className="mt-2">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">

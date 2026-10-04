@@ -1,4 +1,5 @@
 import "server-only";
+import { LEGACY_ALIGNMENT_READ_ONLY, assertLegacyAlignmentWritable } from "@/features/reporting/history/legacyWrites";
 
 import { createClient as createSupabaseServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
@@ -239,6 +240,7 @@ export async function createOrGetMatchingWorkspaceAgreement(params: {
   workspaceId: string;
   userId: string;
 }): Promise<MatchingWorkspaceAgreementSummary> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) assertLegacyAlignmentWritable();
   const normalizedWorkspaceId = assertWorkspaceId(params.workspaceId);
   const normalizedUserId = assertUserId(params.userId);
   const existing = await getMatchingWorkspaceAgreementForWorkspace(
@@ -281,6 +283,7 @@ export async function updateMatchingWorkspaceAgreementSection(params: {
   notes: string;
   agreement: string;
 }): Promise<MatchingWorkspaceAgreementSummary> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) assertLegacyAlignmentWritable();
   const normalizedWorkspaceId = assertWorkspaceId(params.workspaceId);
   const normalizedUserId = assertUserId(params.userId);
   const normalizedSectionInput = normalizeMatchingWorkspaceAgreementSectionInput({

@@ -616,5 +616,46 @@
       "teamResponded": "Das Team hat eine Antwort hinterlegt.",
       "teamCanRespond": "Die Founder können anschließend kurz reagieren."
     }
+  },
+  "history": {
+    "title": "Frühere Workbook-Auswertung",
+    "notice": "Historischer Arbeitsstand, nur lesbar. Texte, Reaktionen und Zustimmungen zeigen den damaligen Paar-Kontext. Sie sind keine bestätigten Vereinbarungen eures heutigen Teams. Aktuelle Themen klärt und bestätigt ihr im Founder Setup.",
+    "updated": "Zuletzt gespeichert",
+    "navigation": "Weitere Ansichten",
+    "setup": "Zum Founder Setup",
+    "connections": "Zu deinen Verbindungen",
+    "report": "Euer Zusammenspiel",
+    "print": "Historischen Stand drucken",
+    "content": "Gespeicherter historischer Inhalt",
+    "fields": {
+      "steps": "Themen",
+      "founderA": "Person A",
+      "founderB": "Person B",
+      "agreement": "Damals notierter Vereinbarungstext",
+      "founderAApproved": "Damals: Zustimmung Person A",
+      "founderBApproved": "Damals: Zustimmung Person B",
+      "advisorNotes": "Frühere Advisor-Notizen",
+      "reflectionNote": "Gesprächsnotiz",
+      "workspaceV2": "Gesprächsverlauf",
+      "entries": "Beiträge",
+      "reactions": "Damals erfasste Reaktionen",
+      "structuredOutputs": "Damals festgehaltene Ergebnisse",
+      "openPoints": "Offene Punkte",
+      "content": "Text",
+      "advisorClosing": "Früherer Advisor-Abschluss",
+      "founderReaction": "Frühere Founder-Reaktion",
+      "vision_direction": "Richtung & Vision",
+      "roles_responsibility": "Rollen & Verantwortung",
+      "decision_rules": "Entscheidungsregeln",
+      "commitment_load": "Verbindlichkeit & Belastung",
+      "collaboration_conflict": "Zusammenarbeit & Konflikt",
+      "ownership_risk": "Verantwortung & Risiko",
+      "values_guardrails": "Werte & Grenzen",
+      "alignment_90_days": "Die nächsten 90 Tage",
+      "alignment_open_points": "Damals offene Punkte",
+      "advisor_closing": "Früherer Advisor-Abschluss",
+      "text": "Text",
+      "signal": "Gespeicherte Reaktion (damalige Fassung)"
+    }
   }
 }

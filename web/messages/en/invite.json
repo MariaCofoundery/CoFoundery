@@ -1,8 +1,7 @@
 {
   "join": {
-      "teamFull": "The team already has four members. Another person cannot join.",
-      "teamChanged": "The team context has changed. Please clarify the invitation with the person who invited you.",
-
+    "teamFull": "The team already has four members. Another person cannot join.",
+    "teamChanged": "The team context has changed. Please clarify the invitation with the person who invited you.",
     "loadingTitle": "Checking invitation",
     "loadingDescription": "We are processing your invitation link.",
     "sessionCheckFailedTitle": "Sign-in could not be checked",
@@ -29,7 +28,6 @@
     "errors": {
       "teamFull": "The team already has four members. Another person cannot join.",
       "teamChanged": "The team context has changed. Please clarify the invitation with the person who invited you.",
-
       "invalidToken": "Invalid link",
       "expired": "Link expired",
       "revoked": "Invitation revoked",
@@ -56,7 +54,7 @@
         "text": "The flow helps you make expectations, differences, and fit visible before entering closer collaboration."
       }
     },
-    "profileIntro": "Set up your core profile briefly. CoFoundery uses your name, role, focus, and intention so reports, matching, and the workbook can connect cleanly to your profile.",
+    "profileIntro": "Set up your core profile briefly. Your name, role, focus and intention connect your profile with reports and team context.",
     "profileOptional": "You can add more profile details later.",
     "profileBasicsTitle": "Your profile basics",
     "profile": {

@@ -203,7 +203,7 @@
       },
       "matching": {
         "title": "Start shared Cofoundery Matching",
-        "description": "After that, you can deepen the collaboration with the existing matching and workbook."
+        "description": "Then view “How you work together” in your team and discuss shared agreements in Founder Setup."
       }
     },
     "candidateEyebrow": "Candidate suggestions",
@@ -792,7 +792,7 @@
     "subtitle": "If you both want to, you can next explore your expectations around roles, commitment and collaboration together.",
     "safetyNote": "Your shared Alignment view is prepared only after both of you consent to this step.",
     "existingContextTitle": "You already have a shared area",
-    "existingContextText": "You already have a shared area – from an earlier invitation to co-founder matching. Your alignment, your workbook and everything you have worked on together live there. CoFoundery does not create the same shared context twice.",
+    "existingContextText": "You already share a context from an earlier invitation. We reuse it; earlier reports remain accessible.",
     "profilesEyebrow": "Involved profiles",
     "profilesTitle": "Your Discovery profiles",
     "profilesText": "These are the details you intentionally published through Discovery. Private search priorities and assessment answers stay hidden.",

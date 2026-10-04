@@ -1,4 +1,5 @@
 import "server-only";
+import { LEGACY_ALIGNMENT_READ_ONLY, assertLegacyAlignmentWritable } from "@/features/reporting/history/legacyWrites";
 
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -142,6 +143,7 @@ export async function startWorkspaceFromMatchingSession(params: {
   matchingSessionId: string;
   userId: string;
 }): Promise<MatchingWorkspaceSummary> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) assertLegacyAlignmentWritable();
   const normalizedSessionId = assertMatchingSessionId(params.matchingSessionId);
   const normalizedUserId = assertUserId(params.userId);
   const existing = await getMatchingWorkspaceForSession(normalizedSessionId, normalizedUserId);

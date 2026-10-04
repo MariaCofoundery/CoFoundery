@@ -1,5 +1,7 @@
 "use server";
 
+import { LEGACY_ALIGNMENT_READ_ONLY } from "@/features/reporting/history/legacyWrites";
+
 import { revalidatePath } from "next/cache";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
 import { resolveRelationshipIdForInvitation } from "@/features/reporting/relationshipAdvisorAccess";
@@ -29,6 +31,7 @@ export async function handoffWorkbookDeepDiveReflectionToFounderSetup(
   invitationId: string,
   stepId: WorkbookDeepDivePilotStepId
 ): Promise<WorkbookDeepDiveHandoffResult> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) return { ok: false, reason: "unavailable" };
   const normalizedInvitationId = invitationId.trim();
   if (!normalizedInvitationId || !isWorkbookDeepDivePilotStep(stepId)) {
     return { ok: false, reason: "unavailable" };
@@ -145,6 +148,7 @@ export async function handoffWorkbookOpenPointReflectionToFounderSetup(
   openPointId: string,
   setupKey: string
 ): Promise<WorkbookDeepDiveHandoffResult> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) return { ok: false, reason: "unavailable" };
   const normalizedInvitationId = invitationId.trim();
   const normalizedPointId = openPointId.trim();
   if (!normalizedInvitationId || !normalizedPointId || !isFounderSetupItemKey(setupKey)) {

@@ -8,7 +8,7 @@ const codeOnly = (path: string) =>
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .replace(/(^|[^:])\/\/.*$/gm, "$1");
 
-const WORKBOOK_PAGE = "src/app/(product)/founder-alignment/workbook/page.tsx";
+const WORKBOOK_PAGE = "src/features/reporting/history/HistoricalWorkbookPage.tsx";
 const ADVISOR_SURFACES = [
   "src/app/(product)/advisor/dashboard/page.tsx",
   "src/app/(product)/advisor/report/page.tsx",
@@ -40,14 +40,14 @@ test("die Tür ist zu, nicht nur unverlinkt", () => {
   // Ein Bereich, den man nur noch ueber eine gemerkte Adresse erreicht, ist der
   // schlechteste Zustand: gepflegt wird er nicht mehr, benutzt aber doch.
   const page = codeOnly(WORKBOOK_PAGE);
-  assert.match(page, /if \(advisorContext\) \{/, "der Parameter wird nicht abgewiesen");
+  assert.match(page, /params\.advisorContext/, "der Parameter wird nicht abgewiesen");
 
   // UND die zweite Haelfte: `hasRelationshipAdvisorAccess` haengt NICHT am
   // Parameter. Ohne diese Pruefung kaeme eine begleitende Person weiterhin
   // hinein, indem sie das Kuerzel einfach weglaesst.
   assert.match(
     page,
-    /if \(data\.currentUserRole === "advisor"\) \{\s*redirect\(/,
+    /legacy\.currentUserRole === "advisor"\) redirect\(/,
     "die Rolle wird nicht abgewiesen - der Riegel ist Fassade"
   );
   // Der RUECKGABEBLOCK, nicht der Typ oben: Dort steht der erste Treffer für
@@ -73,8 +73,8 @@ test("die Workbook-Seite trägt keine Advisor-Zweige mehr", () => {
   // Und die beiden zeichengleichen Aufrufe der Workbook-Komponente sind einer.
   assert.equal(
     (page.match(/<FounderAlignmentWorkbookClient/g) ?? []).length,
-    1,
-    "die identische Verzweigung ist zurück"
+    0,
+    "ein historischer Reader darf keinen Editor mehr einbinden"
   );
 });
 

@@ -1,8 +1,7 @@
 {
   "join": {
-      "teamFull": "Das Team hat bereits vier Mitglieder. Ein weiterer Beitritt ist nicht möglich.",
-      "teamChanged": "Die Teamzuordnung hat sich geändert. Bitte kläre die Einladung mit der einladenden Person.",
-
+    "teamFull": "Das Team hat bereits vier Mitglieder. Ein weiterer Beitritt ist nicht möglich.",
+    "teamChanged": "Die Teamzuordnung hat sich geändert. Bitte kläre die Einladung mit der einladenden Person.",
     "loadingTitle": "Einladung wird geprüft",
     "loadingDescription": "Wir verarbeiten deinen Einladungslink.",
     "sessionCheckFailedTitle": "Anmeldung konnte nicht geprüft werden",
@@ -29,7 +28,6 @@
     "errors": {
       "teamFull": "Das Team hat bereits vier Mitglieder. Ein weiterer Beitritt ist nicht möglich.",
       "teamChanged": "Die Teamzuordnung hat sich geändert. Bitte kläre die Einladung mit der einladenden Person.",
-
       "invalidToken": "Link ungültig",
       "expired": "Link abgelaufen",
       "revoked": "Einladung widerrufen",
@@ -56,7 +54,7 @@
         "text": "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen."
       }
     },
-    "profileIntro": "Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention braucht CoFoundery, damit Reports, Matching und Workbook sauber mit deinem Profil arbeiten können.",
+    "profileIntro": "Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention verbinden dein Profil mit Reports und Teamkontext.",
     "profileOptional": "Weitere Profildaten kannst du später optional ergänzen.",
     "profileBasicsTitle": "Deine Profil-Basics",
     "profile": {

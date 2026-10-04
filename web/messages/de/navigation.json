@@ -20,7 +20,7 @@
   "profileFallback": "Profil",
   "report": "Report",
   "reportContextHelp": "Wähle den Founder-Kontext, dessen Report du öffnen willst.",
-  "workbook": "Workbook",
+  "workbook": "Früherer Workbookstand",
   "workbookContextHelp": "Wähle den Founder-Kontext, in dem du weiterarbeiten willst.",
   "teamContexts": {
     "existingTeam": "Bestehendes Team",
@@ -28,7 +28,7 @@
   },
   "statusLabels": {
     "reportReady": "Report bereit",
-    "workbookReady": "Workbook bereit",
+    "workbookReady": "Früherer Workbookstand vorhanden",
     "completed": "Abgeschlossen",
     "inProgress": "In Arbeit"
   },

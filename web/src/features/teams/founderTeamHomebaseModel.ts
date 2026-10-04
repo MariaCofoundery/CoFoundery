@@ -1,6 +1,6 @@
 import { normalizeMatchingWorkspaceAgreementSections } from "@/features/matchingCore/matchingWorkspaceAgreementTypes";
 import { sanitizeFounderAlignmentWorkbookPayload } from "@/features/reporting/founderAlignmentWorkbook";
-import { buildWorkbookHref, buildWorkbookIntroHref } from "@/features/reporting/workbookNavigation";
+import { buildWorkbookHref } from "@/features/reporting/workbookNavigation";
 
 export type FounderTeamContext = "pre_founder" | "existing_team";
 
@@ -319,17 +319,8 @@ export function buildFounderTeamHomebaseReadModel(params: {
             createdAt: classicReport.created_at,
           }
         : null,
-      workbook: classicReport
-        ? {
-            href: workbook
-              ? buildWorkbookHref(classicReport.invitation_id, normalizeTeamContext(rows.team!.team_context))
-              : buildWorkbookIntroHref(
-                  classicReport.invitation_id,
-                  normalizeTeamContext(rows.team!.team_context)
-                ),
-            updatedAt: workbook?.updated_at ?? classicReport.created_at,
-            exists: Boolean(workbook),
-          }
+      workbook: classicReport && workbook
+        ? { href: buildWorkbookHref(workbook.invitation_id, normalizeTeamContext(rows.team!.team_context)), updatedAt: workbook.updated_at, exists: true }
         : null,
       matchingReport: matchingReport
         ? {

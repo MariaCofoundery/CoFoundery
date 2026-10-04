@@ -23,9 +23,9 @@
     "freeBetaTitle": "Dieser Report ist in der aktuellen Testphase vollständig geöffnet.",
     "freeBetaText": "Später kann die Freischaltung über einen Team- oder Report-Zugang laufen.",
     "unrenderableText": "Der Report ist freigeschaltet, aber die Detailauswertung ist für diesen alten Datensatz noch nicht renderbar.",
-    "workbookTitle": "Manche Unterschiede versteht man erst im Gespräch.",
-    "workbookText": "Vertieft ausgewählte Themen gemeinsam, vergleicht eure Perspektiven und haltet fest, was ihr daraus für eure Zusammenarbeit mitnehmt.",
-    "workbookCta": "Alignment vertiefen"
+    "workbookTitle": "Gesprächspunkte gemeinsam klären",
+    "workbookText": "Aktuelle Themen, Revisionen und Bestätigungen gehören ins Founder Setup. Frühere Reportbefunde sind Gesprächsanlässe, keine Vereinbarung.",
+    "workbookCta": "Zur aktuellen Zusammenarbeit"
   },
   "session": {
     "emptyTitle": "Euer Alignment ist noch nicht bereit.",
@@ -49,7 +49,9 @@
     "prepareWorkspaceTitle": "Möchtet ihr weiter zusammenarbeiten?",
     "prepareWorkspaceText": "Wenn ihr euch weiter kennenlernen oder bereits gemeinsam aufbauen möchtet, könnt ihr jetzt einen gemeinsamen Bereich in CoFoundery starten.",
     "prepareWorkspaceSafety": "Damit erstellt ihr einen gemeinsamen Arbeitsbereich. Das ist keine Aussage darüber, ob oder wie ihr miteinander gründet.",
-    "startWorkspace": "Zusammenarbeit starten"
+    "startWorkspace": "Zusammenarbeit starten",
+    "historicalWorkspace": "Früherer Matching-Arbeitsstand",
+    "currentReport": "Euer Zusammenspiel"
   },
   "view": {
     "matchingReport": "Matching-Report",

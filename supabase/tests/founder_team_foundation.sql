@@ -315,7 +315,7 @@ select set_config(
   '{"sub":"87777777-7777-4777-8777-777777777777","email":"discovery-a@example.com","role":"authenticated"}',
   true
 );
-set local role authenticated;
+-- Historical workspace reconstruction runs as owner; public creation is retired (Phase 9.3).
 do $$
 declare
   v_first_workspace_id uuid;

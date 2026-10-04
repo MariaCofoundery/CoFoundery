@@ -70,5 +70,18 @@
         }
       }
     }
+  },
+  "history": {
+    "title": "Historical matching workspace",
+    "notice": "Read-only. These seven areas contain earlier drafts and notes, not unanimously confirmed team agreements. Current agreements belong in Founder Setup. Nothing is transferred automatically.",
+    "setup": "Open Founder Setup",
+    "report": "How you work together",
+    "connections": "Your connections",
+    "empty": "No draft was saved for this historical workspace.",
+    "fields": {
+      "notes": "Notes",
+      "agreement": "Earlier agreement draft",
+      "updatedAt": "Last saved"
+    }
   }
 }

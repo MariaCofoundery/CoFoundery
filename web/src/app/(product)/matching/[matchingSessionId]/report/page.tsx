@@ -16,14 +16,13 @@ import { compareFounders, type FounderScores } from "@/features/reporting/founde
 import { buildFounderMatchingSelection } from "@/features/reporting/founderMatchingSelection";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
-import { startWorkspaceFromMatchingSessionAction } from "@/features/matchingCore/matchingWorkspaceActions";
 import {
   resolveMatchingWorkspaceFeedback,
-  type MatchingWorkspaceStartResult,
 } from "@/features/matchingCore/matchingWorkspaceFeedback";
 import { getMatchingWorkspaceForSession } from "@/features/matchingCore/matchingWorkspaceData";
 import type { MatchingWorkspaceSummary } from "@/features/matchingCore/matchingWorkspaceTypes";
-import { getRequestUser } from "@/lib/supabase/server";
+import { currentTeamForPeople } from "@/features/teams/currentJourneyData";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ matchingSessionId: string }>;
@@ -44,20 +43,6 @@ function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function workspaceResultUrl(
-  matchingSessionId: string,
-  result: MatchingWorkspaceStartResult
-) {
-  const params = new URLSearchParams();
-
-  if (result.ok) {
-    params.set("workspaceResult", result.reason);
-  } else {
-    params.set("workspaceError", result.reason);
-  }
-
-  return `/matching/${matchingSessionId}/report?${params.toString()}`;
-}
 
 function isFounderDimensionKey(value: string): value is FounderDimensionKey {
   return (FOUNDER_DIMENSION_ORDER as readonly string[]).includes(value);
@@ -145,68 +130,8 @@ function PageMessage({ message, ok }: { message: string | null; ok: boolean }) {
   );
 }
 
-function WorkspacePanel({
-  matchingSessionId,
-  workspace,
-  t,
-}: {
-  matchingSessionId: string;
-  workspace: MatchingWorkspaceSummary | null;
-  t: ReportT;
-}) {
-  async function startWorkspace() {
-    "use server";
-    const result = await startWorkspaceFromMatchingSessionAction(matchingSessionId);
-    redirect(workspaceResultUrl(matchingSessionId, result));
-  }
-
-  if (workspace) {
-    return (
-      <section className="no-print mb-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.04)] md:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-          {t("session.workspaceEyebrow")}
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          {t("session.workspaceReadyTitle")}
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-emerald-950">
-          {t("session.workspaceReadyText")}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link href={`/workspaces/${workspace.workspace.id}`} className={PRIMARY_CTA_CLASS}>
-            {t("session.openWorkspace")}
-          </Link>
-          <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>
-            {t("common.backToIntros")}
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="no-print mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.05)] md:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-        {t("common.nextStep")}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        {t("session.prepareWorkspaceTitle")}
-      </h2>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        {t("session.prepareWorkspaceText")}
-      </p>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        {t("session.prepareWorkspaceSafety")}
-      </p>
-      <div className="mt-5">
-        <form action={startWorkspace}>
-          <button type="submit" className={PRIMARY_CTA_CLASS}>
-            {t("session.startWorkspace")}
-          </button>
-        </form>
-      </div>
-    </section>
-  );
+function WorkspacePanel({ workspace, t }: { workspace: MatchingWorkspaceSummary | null; t: ReportT }) {
+  return workspace ? <details className="my-5 rounded-xl border border-slate-200 p-4"><summary>{t("session.historicalWorkspace")}</summary><Link className="mt-3 inline-block underline" href={`/workspaces/${workspace.workspace.id}`}>{t("session.historicalWorkspace")}</Link></details> : null;
 }
 
 export default async function MatchingSessionReportPage({ params, searchParams }: PageProps) {
@@ -252,6 +177,13 @@ export default async function MatchingSessionReportPage({ params, searchParams }
     ? t(workspaceFeedback.messageKey)
     : null;
 
+  const client = await createClient();
+  const { data: participants } = await client.from("matching_session_participants")
+    .select("user_id").eq("matching_session_id", matchingSessionId).eq("status", "active").eq("role", "founder");
+  const other = participants?.find((person) => person.user_id !== user.id);
+  const teamId = other ? await currentTeamForPeople(client, user.id, other.user_id) : null;
+  const currentHref = teamId ? `/teams/${teamId}/setup` : "/connections";
+
   const payload = summary.reportRun.payload;
   // Die Sprache der LESENDEN Person, nicht die, in der gebaut wurde: Zwei
   // Menschen teilen sich einen Report, und wer ihn ausgeloest hat, entscheidet
@@ -289,7 +221,11 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         message={workspaceFeedbackMessage}
         ok={workspaceFeedback?.ok ?? false}
       />
-      <WorkspacePanel matchingSessionId={matchingSessionId} workspace={workspace} t={t} />
+      <nav className="no-print mb-6 flex flex-wrap gap-3">
+        <Link className={PRIMARY_CTA_CLASS} href={currentHref}>{t("legacy.workbookCta")}</Link>
+        {teamId ? <Link className={SECONDARY_CTA_CLASS} href={`/teams/${teamId}/workstyle`}>{t("session.currentReport")}</Link> : null}
+      </nav>
+      <WorkspacePanel workspace={workspace} t={t} />
 
       <FounderMatchingView
         participantAName={participantAName}
@@ -299,7 +235,7 @@ export default async function MatchingSessionReportPage({ params, searchParams }
         valuesProfileA={null}
         valuesProfileB={null}
         founderReport={founderReport}
-        workbookHref="#"
+        workbookHref={currentHref}
         teamContext={payload.teamContext}
         reportContext="matching_session"
         showUnlockSection={false}

@@ -391,3 +391,19 @@ test("homebase and dashboard system copy stay structurally parallel in DE and EN
   assert.match(dashboardConnections, /`\/teams\/\$\{encodeURIComponent\(team\.id\)\}`/);
   assert.match(dashboardCards, /href=\{team\.href\}/);
 });
+
+test("historical workbook link keeps its own invitation, even after a newer report", () => {
+  const rows = emptyRows({
+    relationships: [{id:"rel-ab",user_a_id:aliceId,user_b_id:bobId,founder_team_id:teamId,created_at:"2026-08-01"}],
+    classicReports: [
+      {id:"old",relationship_id:"rel-ab",invitation_id:"old-invite",created_at:"2026-08-01",payload:{}},
+      {id:"new",relationship_id:"rel-ab",invitation_id:"new-invite",created_at:"2026-09-01",payload:{}},
+    ],
+    workbooks: [{invitation_id:"old-invite",updated_at:"2026-08-02",payload:{steps:{}}}],
+  });
+  const model = buildFounderTeamHomebaseReadModel({currentUserId:aliceId,teamId,rows});
+  assert.match(model!.alignment[0].workbook!.href,/old-invite/);
+  rows.workbooks=[];
+  const without = buildFounderTeamHomebaseReadModel({currentUserId:aliceId,teamId,rows});
+  assert.equal(without!.alignment[0].workbook,null);
+});

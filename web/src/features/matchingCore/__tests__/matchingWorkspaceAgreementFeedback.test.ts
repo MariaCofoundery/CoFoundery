@@ -111,6 +111,6 @@ test("workspace page no longer exposes the legacy agreement free-text channel", 
   const legacyStatusParameter = ["agreement", "Ok"].join("");
   assert.equal(pageSource.includes(legacyMessageParameter), false);
   assert.equal(pageSource.includes(legacyStatusParameter), false);
-  assert.match(pageSource, /agreementResult/);
-  assert.match(pageSource, /agreementError/);
+  assert.match(pageSource, /getMatchingWorkspaceAgreementForWorkspace/);
+  assert.doesNotMatch(pageSource, /createOrGetMatchingWorkspaceAgreement|<form|<textarea/);
 });

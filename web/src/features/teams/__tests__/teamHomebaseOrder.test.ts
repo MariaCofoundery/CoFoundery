@@ -36,7 +36,7 @@ test("Phase 9.2: Setup ist vor den optionalen Vertiefungen erreichbar", () => {
   };
 
   const discover = at('t("groups.discover.title")');
-  const understand = at('t("groups.understand.title")');
+  const understand = at('t("alignment.history")');
   const commit = at('t("groups.commit.title")');
 
   assert.ok(discover < understand, "verstehen steht vor kennenlernen");
@@ -46,7 +46,8 @@ test("Phase 9.2: Setup ist vor den optionalen Vertiefungen erreichbar", () => {
   assert.ok(at("<ReadMyMindHomebaseCard") > discover);
   assert.ok(at("<FounderInTheWildHomebaseCard") > discover);
   assert.ok(at("<FounderInTheWildHomebaseCard") < understand, "ein Lab steht im falschen Abschnitt");
-  assert.ok(at('id="team-alignment"') > understand);
+  assert.ok(at('id="team-alignment"') < understand);
+  assert.ok(at('t("agreements.title")') > understand);
   assert.ok(at('id="team-alignment"') < commit);
   assert.ok(at('aria-labelledby="commitment-lab-title"') > commit);
   assert.ok(at('aria-labelledby="team-setup-title"') < discover);

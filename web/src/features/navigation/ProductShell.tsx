@@ -333,7 +333,7 @@ export function ProductShell({
                       href: "/me/profile/workstyle",
                       label: t("alignNewVersion"),
                       isActive: (currentPathname: string) =>
-                        currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest") || currentPathname.startsWith("/founder-alignment"),
+                        currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest"),
                     },
                   ]
                 : []),

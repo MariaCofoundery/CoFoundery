@@ -2,8 +2,10 @@
   "homebase": {
     "membersInvite": "Invite another person to this team",
     "membersFull": "This team has four members. No further invitations are available.",
-    "pairScope": {"title": "Optional deep dives", "description": "These deep dives involve two team members. Commitment Lab identifies the pair explicitly. Results apply to that pair, not automatically to the whole team. RMM and Founder in the Wild currently start only in two-person teams; pair selection for larger teams is not available."},
-
+    "pairScope": {
+      "title": "Optional deep dives",
+      "description": "These deep dives involve two team members. Commitment Lab identifies the pair explicitly. Results apply to that pair, not automatically to the whole team. RMM and Founder in the Wild currently start only in two-person teams; pair selection for larger teams is not available."
+    },
     "eyebrow": "Founder team",
     "title": "Our collaboration",
     "back": "Back to connections",
@@ -35,17 +37,18 @@
       "noArtifacts": "No reports or shared work areas are available for this connection yet.",
       "pair": "Alignment between {names}",
       "report": "View the older report",
-      "workbook": "Go deeper on topics",
+      "workbook": "Earlier workbook record",
       "continue": "Go deeper on topics",
       "matchingReport": "Your shared report",
-      "workspace": "Your agreements"
+      "workspace": "Historical matching workspace",
+      "history": "Earlier reports and working notes"
     },
     "agreements": {
-      "title": "Agreements",
-      "description": "Entry points to the areas where you have already captured agreements.",
+      "title": "Historical notes and drafts",
+      "description": "These earlier pair records are not confirmed agreements of your current team.",
       "empty": "No shared agreements have been captured yet.",
-      "workbook": "Agreements in the workbook",
-      "workspace": "Agreements in the matching workspace",
+      "workbook": "Earlier workbook notes",
+      "workspace": "Earlier workspace drafts",
       "open": "Open",
       "pair": "Between {names}"
     },

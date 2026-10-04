@@ -616,5 +616,46 @@
       "teamResponded": "The team has added a response.",
       "teamCanRespond": "The founders can add a brief response afterwards."
     }
+  },
+  "history": {
+    "title": "Earlier workbook record",
+    "notice": "Read-only historical record. Texts, reactions and approvals reflect the pair context at the time. They are not confirmed agreements of your current team. Discuss and confirm current topics in Founder Setup.",
+    "updated": "Last saved",
+    "navigation": "Other views",
+    "setup": "Open Founder Setup",
+    "connections": "Your connections",
+    "report": "How you work together",
+    "print": "Print historical record",
+    "content": "Saved historical content",
+    "fields": {
+      "steps": "Topics",
+      "founderA": "Person A",
+      "founderB": "Person B",
+      "agreement": "Agreement text recorded at the time",
+      "founderAApproved": "Then: approval by person A",
+      "founderBApproved": "Then: approval by person B",
+      "advisorNotes": "Earlier advisor notes",
+      "reflectionNote": "Discussion note",
+      "workspaceV2": "Discussion history",
+      "entries": "Entries",
+      "reactions": "Reactions recorded at the time",
+      "structuredOutputs": "Outputs recorded at the time",
+      "openPoints": "Open points",
+      "content": "Text",
+      "advisorClosing": "Earlier advisor closing",
+      "founderReaction": "Earlier founder reaction",
+      "vision_direction": "Direction & vision",
+      "roles_responsibility": "Roles & responsibility",
+      "decision_rules": "Decision rules",
+      "commitment_load": "Commitment & workload",
+      "collaboration_conflict": "Collaboration & conflict",
+      "ownership_risk": "Ownership & risk",
+      "values_guardrails": "Values & boundaries",
+      "alignment_90_days": "The next 90 days",
+      "alignment_open_points": "Earlier open points",
+      "advisor_closing": "Earlier advisor closing",
+      "text": "Text",
+      "signal": "Saved response (earlier version)"
+    }
   }
 }

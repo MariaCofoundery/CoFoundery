@@ -17,7 +17,7 @@ export const steps = [
   {
     step: "03",
     title: "Gemeinsam weiterarbeiten",
-    text: "Danach stehen Matching-Report und gemeinsames Workbook bereit, um Entscheidungen sauber weiterzuführen.",
+    text: "Danach stehen Matching-Report und Founder Setup bereit, um Entscheidungen sauber weiterzuführen.",
   },
 ];
 
@@ -158,7 +158,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     openNavigation: "Navigation öffnen",
   },
   hero: {
-    supportPoints: [`${BASE_QUESTION_COUNT} strukturierte Fragen`, "Klarer Matching-Report", "Gemeinsames Workbook"],
+    supportPoints: [`${BASE_QUESTION_COUNT} strukturierte Fragen`, "Klarer Matching-Report", "Founder Setup"],
     founderSignals: [
       {
         title: "Founder A",
@@ -227,7 +227,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
   features: [
     { title: "Strukturierter Vergleich", text: "Ihr beantwortet gezielte Fragen zu Zusammenarbeit, Entscheidungen und Verantwortung." },
     { title: "Matching-Report", text: "Ihr seht, wo ihr gleich tickt – und wo Unterschiede relevant werden." },
-    { title: "Gemeinsames Workbook", text: "Ihr übersetzt Erkenntnisse in konkrete Vereinbarungen für euren Alltag." },
+    { title: "Founder Setup", text: "Ihr übersetzt Erkenntnisse in konkrete Vereinbarungen für euren Alltag." },
   ],
   home: {
     audienceEyebrow: "Für wen",
@@ -237,7 +237,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     problemTitle: "Die meisten Gründerprobleme beginnen lange vor der Krise.",
     problemParagraphs: [
       "Selten scheitert Zusammenarbeit erst dann, wenn Druck sichtbar wird. Oft sind Unterschiede schon viel früher angelegt: in ungeklärter Entscheidungslogik, diffuser Verantwortung und in Annahmen, die nie sauber ausgesprochen wurden.",
-      "Genau dort setzt CoFoundery Align an. Die Plattform macht diese Unterschiede früh sichtbar und übersetzt sie in einen Matching-Report und ein gemeinsames Workbook, damit aus vagem Bauchgefühl echte Klärung wird.",
+      "Genau dort setzt CoFoundery Align an. Die Plattform macht diese Unterschiede früh sichtbar und übersetzt sie in einen Matching-Report und ein Founder Setup, damit aus vagem Bauchgefühl echte Klärung wird.",
     ],
     problemCards: [
       { title: "Entscheidungslogik", text: "Wer entscheidet wann, worauf wird bestanden und wie viel Unklarheit ist noch tragbar, bevor ein Team kippt?" },
@@ -246,7 +246,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     ],
     productEyebrow: "Produkt",
     productTitle: "Ein klarer Vergleich, der weiterarbeitet",
-    productText: "CoFoundery Align bleibt nicht bei einem Test stehen. Der Vergleich wird in einen Matching-Report und in ein gemeinsames Workbook übersetzt, damit aus Erkenntnis konkrete Zusammenarbeit wird.",
+    productText: "CoFoundery Align bleibt nicht bei einem Test stehen. Der Vergleich wird in einen Matching-Report und in ein Founder Setup übersetzt, damit aus Erkenntnis konkrete Zusammenarbeit wird.",
     approachEyebrow: "Ansatz",
     approachTitle: "Was CoFoundery Align anders macht",
     approachParagraphs: [
@@ -257,7 +257,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     ],
     approachCards: [
       { title: "Matching-Report", text: "Macht Unterschiede, tragende Gemeinsamkeiten und relevante Spannungsfelder klar lesbar." },
-      { title: "Gemeinsames Workbook", text: "Hilft dabei, aus Erkenntnissen klare Vereinbarungen und nächste Schritte für den Alltag zu machen." },
+      { title: "Founder Setup", text: "Hilft dabei, aus Erkenntnissen klare Vereinbarungen und nächste Schritte für den Alltag zu machen." },
       { title: "Begleitender Advisor-Kontext", text: "Advisors, Accelerators oder Investoren können strukturiert begleiten, ohne die Founder-Perspektive zu überlagern." },
     ],
     dimensionsEyebrow: "Dimensionen",
@@ -282,17 +282,17 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     stanceLink: "Unsere Haltung",
   },
   faqs: [
-    { q: "Ist CoFoundery Align ein Persönlichkeitstest?", a: "Nein. CoFoundery Align ist ein strukturierter Entscheidungs- und Arbeitsraum für Gründungsteams: mit Vergleich, Matching-Report und gemeinsamem Workbook." },
+    { q: "Ist CoFoundery Align ein Persönlichkeitstest?", a: "Nein. CoFoundery Align ist ein strukturierter Entscheidungs- und Arbeitsraum für Gründungsteams: mit Vergleich, Matching-Report und Founder Setup." },
     { q: "Wann wird der Report freigeschaltet?", a: "Sobald beide Personen den Basisfragebogen abgeschlossen haben. Das Werte-Add-on erscheint nur dann im gemeinsamen Ergebnis, wenn es angefordert und von beiden abgeschlossen wurde." },
-    { q: "Ist das nur für neue Founder-Teams gedacht?", a: "Nein. Der Flow unterscheidet bewusst zwischen Pre-Founder Matching und bestehenden Founder-Teams, damit Sprache, Matching-Report und Workbook zum Kontext passen." },
+    { q: "Ist das nur für neue Founder-Teams gedacht?", a: "Nein. Der Flow unterscheidet bewusst zwischen Pre-Founder Matching und bestehenden Founder-Teams, damit Sprache, Matching-Report und Founder Setup zum Kontext passen." },
     { q: "Brauchen wir dafür einen Advisor?", a: "Nein. Founder können den gesamten Flow allein nutzen. Ein Advisor kann optional später strukturiert eingebunden werden." },
-    { q: "Wie wird mit E-Mail und Daten umgegangen?", a: "Die E-Mail-Adresse wird zweckgebunden für Einladung und Zuordnung zur Session verwendet. Antworten dienen ausschließlich der Profil-, Report- und Workbook-Erstellung." },
+    { q: "Wie wird mit E-Mail und Daten umgegangen?", a: "Die E-Mail-Adresse wird zweckgebunden für Einladung und Zuordnung zur Session verwendet. Antworten dienen ausschließlich der Profil- und Reporterstellung entsprechend den jeweiligen Freigaben." },
   ],
   howItWorks: {
     panels: [
       { step: "1", title: "Startet mit eurem Profil", text: "Ihr beantwortet strukturierte Fragen zu Zusammenarbeit, Entscheidungen, Konflikten und Verantwortung.", label: "Selbstbild sichtbar machen" },
       { step: "2", title: "Seht, wo ihr zusammenpasst", text: "Der Matching-Report zeigt, wo ihr gleich tickt, wo ihr unterschiedlich entscheidet und wo daraus Spannungen entstehen können.", label: "Gemeinsamkeiten, Unterschiede, Spannungen" },
-      { step: "3", title: "Macht daraus klare Regeln", text: "Im Workbook klärt ihr die Punkte, die später sonst Reibung erzeugen würden – und haltet konkrete Vereinbarungen fest.", label: "Von Analyse zu Vereinbarung" },
+      { step: "3", title: "Macht daraus klare Regeln", text: "Im Founder Setup klärt ihr die Punkte, die später sonst Reibung erzeugen würden – und haltet konkrete Vereinbarungen fest.", label: "Von Analyse zu Vereinbarung" },
     ],
     profileEyebrow: "Profil",
     questionCountLabel: `${BASE_QUESTION_COUNT} Fragen`,
@@ -315,7 +315,7 @@ const MARKETING_CONTENT_DE: MarketingContent = {
     perspectiveBLines: ["Erst einordnen, dann ansprechen.", "Mehr Abgleich bei strategischen Themen."],
     sharedRuleEyebrow: "Gemeinsame Regel",
     sharedRule: "Konflikte sprechen wir innerhalb von 24 Stunden an und klären sie in einem festen Gespräch.",
-    workbookBadge: "Workbook",
+    workbookBadge: "Founder Setup",
     progressLabel: "Schritt {current} von {total}",
     eyebrow: "So funktioniert CoFoundery Align",
     title: "Drei Schritte zu einem stärkeren Founder-Team",
@@ -373,7 +373,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     openNavigation: "Open navigation",
   },
   hero: {
-    supportPoints: [`${BASE_QUESTION_COUNT} structured questions`, "Clear matching report", "Shared workbook"],
+    supportPoints: [`${BASE_QUESTION_COUNT} structured questions`, "Clear matching report", "Founder Setup"],
     founderSignals: [
       {
         title: "Founder A",
@@ -442,7 +442,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
   features: [
     { title: "Structured comparison", text: "You answer focused questions about collaboration, decisions and responsibility." },
     { title: "Matching report", text: "You see where you think similarly and where differences become relevant." },
-    { title: "Shared workbook", text: "You turn insights into concrete agreements for everyday collaboration." },
+    { title: "Founder Setup", text: "You turn insights into concrete agreements for everyday collaboration." },
   ],
   home: {
     audienceEyebrow: "For whom",
@@ -452,7 +452,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     problemTitle: "Most founder problems start long before the crisis.",
     problemParagraphs: [
       "Collaboration rarely breaks only when pressure becomes visible. Differences are often present much earlier: in unclear decision logic, diffuse responsibility and assumptions that were never made explicit.",
-      "That is where Cofoundery Align starts. The platform makes these differences visible early and turns them into a matching report and shared workbook, so vague intuition can become real clarification.",
+      "That is where Cofoundery Align starts. The platform makes these differences visible early and turns them into a matching report and Founder Setup, so vague intuition can become real clarification.",
     ],
     problemCards: [
       { title: "Decision logic", text: "Who decides when, what needs to be protected and how much uncertainty can the team still carry before it tilts?" },
@@ -461,7 +461,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     ],
     productEyebrow: "Product",
     productTitle: "A clear comparison that keeps working",
-    productText: "Cofoundery Align does not stop at a test. The comparison becomes a matching report and a shared workbook, so insight can turn into concrete collaboration.",
+    productText: "Cofoundery Align does not stop at a test. The comparison becomes a matching report and a Founder Setup, so insight can turn into concrete collaboration.",
     approachEyebrow: "Approach",
     approachTitle: "What makes Cofoundery Align different",
     approachParagraphs: [
@@ -472,7 +472,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     ],
     approachCards: [
       { title: "Matching report", text: "Makes differences, shared foundations and relevant areas to align on easier to read." },
-      { title: "Shared workbook", text: "Helps turn insights into clear agreements and next steps for everyday work." },
+      { title: "Founder Setup", text: "Helps turn insights into clear agreements and next steps for everyday work." },
       { title: "Advisor-supported context", text: "Advisors, accelerators or investors can support the process without overshadowing the founder perspective." },
     ],
     dimensionsEyebrow: "Dimensions",
@@ -497,17 +497,17 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     stanceLink: "Our point of view",
   },
   faqs: [
-    { q: "Is Cofoundery Align a personality test?", a: "No. Cofoundery Align is a structured decision and working space for founder teams: with comparison, matching report and shared workbook." },
+    { q: "Is Cofoundery Align a personality test?", a: "No. Cofoundery Align is a structured decision and working space for founder teams: with comparison, matching report and Founder Setup." },
     { q: "When is the report unlocked?", a: "As soon as both people complete the foundation questionnaire. The values add-on only appears in the shared result when it was requested and completed by both sides." },
-    { q: "Is this only for new founder teams?", a: "No. The flow deliberately distinguishes between pre-founder matching and existing founder teams, so the language, report and workbook fit the context." },
+    { q: "Is this only for new founder teams?", a: "No. The flow deliberately distinguishes between pre-founder matching and existing founder teams, so the language, report and Founder Setup fit the context." },
     { q: "Do we need an advisor?", a: "No. Founders can use the full flow on their own. An advisor can optionally be added later in a structured way." },
-    { q: "How are email and data handled?", a: "The email address is used for invitation and session assignment. Answers are used only to create profiles, reports and workbooks." },
+    { q: "How are email and data handled?", a: "The email address is used for invitation and session assignment. Answers are used only to create profiles and reports under their respective sharing permissions." },
   ],
   howItWorks: {
     panels: [
       { step: "1", title: "Start with your profile", text: "You answer structured questions about collaboration, decisions, conflict and responsibility.", label: "Make your working assumptions visible" },
       { step: "2", title: "See where you align", text: "The matching report shows where you think similarly, where you decide differently and where tensions may emerge.", label: "Common ground, differences, tensions" },
-      { step: "3", title: "Turn it into clear rules", text: "In the workbook, you clarify the points that would otherwise create friction later and capture concrete agreements.", label: "From analysis to agreement" },
+      { step: "3", title: "Turn it into clear rules", text: "In Founder Setup, you clarify the points that would otherwise create friction later and capture concrete agreements.", label: "From analysis to agreement" },
     ],
     profileEyebrow: "Profile",
     questionCountLabel: `${BASE_QUESTION_COUNT} questions`,
@@ -530,7 +530,7 @@ const MARKETING_CONTENT_EN: MarketingContent = {
     perspectiveBLines: ["First understand, then address.", "More alignment on strategic topics."],
     sharedRuleEyebrow: "Shared rule",
     sharedRule: "We address conflicts within 24 hours and clarify them in a dedicated conversation.",
-    workbookBadge: "Workbook",
+    workbookBadge: "Founder Setup",
     progressLabel: "Step {current} of {total}",
     eyebrow: "How Cofoundery Align works",
     title: "Three steps toward a stronger founder team",

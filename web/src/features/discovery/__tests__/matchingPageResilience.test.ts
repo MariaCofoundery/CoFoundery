@@ -120,7 +120,7 @@ test("der Hinweis auf die bestehende Verbindung führt auch dorthin", () => {
     // sich wie ein Fehler des Produkts.
     assert.match(
       prep.existingContextText,
-      locale === "de" ? /Co-Founder-Matching/ : /co-founder matching/,
+      locale === "de" ? /früheren Einladung/ : /earlier invitation/,
       `${locale}: der Text erklärt die Herkunft nicht`
     );
   }

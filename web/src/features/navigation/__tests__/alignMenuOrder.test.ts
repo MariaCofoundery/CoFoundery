@@ -39,5 +39,10 @@ test("Verbindungen steht auch ohne Founder-Rolle da", () => {
 test("die neue Fassung bleibt im Menü aktiv, egal auf welcher ihrer Seiten man steht", () => {
   // Ein Reiter, der sich beim Anklicken aufloest, war hier schon einmal das
   // Problem.
-  assert.match(shell, /href: "\/me\/profile\/workstyle"[\s\S]{0,420}startsWith\("\/founder-alignment"\)/);
+  assert.match(shell, /href: "\/me\/profile\/workstyle"[\s\S]{0,420}startsWith\("\/research\/workstyle-pretest"\)/);
+});
+
+test("historical workbook is not labeled as the current workstyle", () => {
+  const item = shell.slice(shell.indexOf('href: "/me/profile/workstyle"'),shell.indexOf('href: "/connections"'));
+  assert.doesNotMatch(item,/founder-alignment/);
 });

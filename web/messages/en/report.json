@@ -23,9 +23,9 @@
     "freeBetaTitle": "This report is fully unlocked during the current test phase.",
     "freeBetaText": "Later, unlocking can run through team or report access.",
     "unrenderableText": "The report is unlocked, but the detailed analysis cannot be rendered for this older data set yet.",
-    "workbookTitle": "Some differences only become clear through conversation.",
-    "workbookText": "Explore selected topics together, compare your perspectives, and capture what you want to take forward in your collaboration.",
-    "workbookCta": "Alignment deep dive"
+    "workbookTitle": "Discuss your conversation points",
+    "workbookText": "Current topics, revisions and confirmations belong in Founder Setup. Earlier report observations are discussion prompts, not agreements.",
+    "workbookCta": "Open current collaboration"
   },
   "session": {
     "emptyTitle": "Your Alignment is not ready yet.",
@@ -49,7 +49,9 @@
     "prepareWorkspaceTitle": "Would you like to keep working together?",
     "prepareWorkspaceText": "If you want to keep getting to know each other or are already building together, you can now start a shared area in CoFoundery.",
     "prepareWorkspaceSafety": "This creates a shared workspace. It does not state whether or how you will found a company together.",
-    "startWorkspace": "Start collaborating"
+    "startWorkspace": "Start collaborating",
+    "historicalWorkspace": "Earlier matching workspace",
+    "currentReport": "How you work together"
   },
   "view": {
     "matchingReport": "Matching report",

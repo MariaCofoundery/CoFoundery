@@ -1,5 +1,7 @@
 "use server";
 
+import { LEGACY_ALIGNMENT_READ_ONLY } from "@/features/reporting/history/legacyWrites";
+
 import { randomBytes } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -1141,6 +1143,7 @@ export async function saveFounderAlignmentWorkbook({
   expectedUpdatedAt,
   patches,
 }: SaveFounderAlignmentWorkbookInput): Promise<SaveFounderAlignmentWorkbookResult> {
+  if (LEGACY_ALIGNMENT_READ_ONLY) return { ok: false, reason: "forbidden" };
   const normalizedInvitationId = invitationId.trim();
   if (!normalizedInvitationId) {
     return { ok: false, reason: "missing_invitation" };

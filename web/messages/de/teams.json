@@ -2,8 +2,10 @@
   "homebase": {
     "membersInvite": "Weitere Person in dieses Team einladen",
     "membersFull": "Dieses Team hat vier Mitglieder. Weitere Einladungen sind nicht möglich.",
-    "pairScope": {"title": "Optionale Vertiefungen", "description": "Diese Vertiefungen finden zwischen zwei Teammitgliedern statt. Beim Commitment Lab steht das jeweilige Paar dabei. Ergebnisse gelten für dieses Paar, nicht automatisch für das gesamte Team. RMM und Founder in the Wild sind derzeit nur für Zweierteams startbar; eine Paarauswahl für größere Teams ist noch nicht verfügbar."},
-
+    "pairScope": {
+      "title": "Optionale Vertiefungen",
+      "description": "Diese Vertiefungen finden zwischen zwei Teammitgliedern statt. Beim Commitment Lab steht das jeweilige Paar dabei. Ergebnisse gelten für dieses Paar, nicht automatisch für das gesamte Team. RMM und Founder in the Wild sind derzeit nur für Zweierteams startbar; eine Paarauswahl für größere Teams ist noch nicht verfügbar."
+    },
     "eyebrow": "Founder-Team",
     "title": "Unsere Zusammenarbeit",
     "back": "Zurück zu Verbindungen",
@@ -35,17 +37,18 @@
       "noArtifacts": "Für diese Verbindung liegen noch keine Reports oder gemeinsamen Arbeitsbereiche vor.",
       "pair": "Alignment zwischen {names}",
       "report": "Älterer Report ansehen",
-      "workbook": "Themen vertiefen",
+      "workbook": "Frühere Workbook-Auswertung",
       "continue": "Themen vertiefen",
       "matchingReport": "Euer gemeinsamer Report",
-      "workspace": "Eure Vereinbarungen"
+      "workspace": "Historischer Matching-Arbeitsstand",
+      "history": "Frühere Auswertungen und Arbeitsstände"
     },
     "agreements": {
-      "title": "Vereinbarungen",
-      "description": "Einstiege zu den Bereichen, in denen ihr bereits Vereinbarungen festgehalten habt.",
+      "title": "Historische Notizen und Entwürfe",
+      "description": "Diese früheren Paarstände sind keine bestätigten Vereinbarungen eures aktuellen Teams.",
       "empty": "Noch keine gemeinsamen Vereinbarungen festgehalten.",
-      "workbook": "Vereinbarungen im Workbook",
-      "workspace": "Vereinbarungen im Matching Workspace",
+      "workbook": "Frühere Workbooknotizen",
+      "workspace": "Frühere Workspace-Entwürfe",
       "open": "Öffnen",
       "pair": "Zwischen {names}"
     },

@@ -115,7 +115,7 @@ test("loads English feedback and advisor messages", () => {
   assert.equal(advisor.dashboard?.statuses?.reportReady, "Report ready");
   assert.equal(advisor.report?.backToDashboard, "Back to advisor dashboard");
   assert.equal(advisor.report?.save, "Save");
-  assert.equal(advisor.invite?.openWorkbook, "Open workbook");
+  assert.equal(advisor.invite?.openWorkbook, "View earlier workbook record");
   assert.equal(navigation.statusLabels?.inProgress, "In progress");
   assert.equal(navigation.teamContexts?.existingTeam, "Existing team");
 });

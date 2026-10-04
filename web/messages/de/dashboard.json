@@ -615,7 +615,7 @@
     "eyebrow": "Aktuell in der Testphase kostenlos.",
     "title": "Starte euer Matching",
     "stepInvite": "Du lädst deinen Co-Founder ein.",
-    "stepReport": "Danach bekommt ihr euren Matching-Report und arbeitet gemeinsam im Workbook.",
+    "stepReport": "Danach führt euch „Euer Zusammenspiel“ zu Gesprächspunkten und Founder Setup.",
     "inviteCta": "Co-Founder einladen",
     "supportCta": "Testphase unterstützen (39 €)",
     "paymentWindowHint": "Die Zahlung öffnet ein neues Fenster. Danach könnt ihr hier einfach weitermachen.",
@@ -625,7 +625,7 @@
   "coFounderInviteForm": {
     "title": "Co-Founder einladen",
     "targetTeam": "Einladung zu „{name}“. Die Person tritt diesem bestehenden Team bei. Arbeitsweise und Freigaben bleiben persönliche Entscheidungen.",
-      "intro": "Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.",
+    "intro": "Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.",
     "label": {
       "projectName": "Name eures Teams oder Projekts",
       "email": "E-Mail-Adresse"
@@ -659,7 +659,7 @@
     },
     "modules": {
       "label": "Module",
-      "help": "Für den produktiven Founder-Flow startet ihr mit Basis und optional Werte. Report und Workbook bauen anschließend auf diesen beiden Modulen auf.",
+      "help": "Diese Module gehören zur früheren Erhebung. Eure aktuelle Arbeitsweise und gemeinsame Vereinbarungen findet ihr im Team über „Euer Zusammenspiel“ und Founder Setup.",
       "baseActive": "Basis (aktiv)",
       "valuesOptional": "Werte (optional)",
       "selectedBasis": "Basis",

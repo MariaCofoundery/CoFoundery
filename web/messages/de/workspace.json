@@ -70,5 +70,18 @@
         }
       }
     }
+  },
+  "history": {
+    "title": "Historischer Matching-Arbeitsstand",
+    "notice": "Nur lesbar. Diese sieben Bereiche enthalten frühere Entwürfe und Notizen, keine einstimmig bestätigten Teamvereinbarungen. Aktuelle Vereinbarungen entstehen ausschließlich im Founder Setup. Es wird nichts automatisch übernommen.",
+    "setup": "Zum Founder Setup",
+    "report": "Euer Zusammenspiel",
+    "connections": "Zu deinen Verbindungen",
+    "empty": "Für diesen historischen Arbeitsraum wurde kein Entwurf gespeichert.",
+    "fields": {
+      "notes": "Notizen",
+      "agreement": "Früherer Vereinbarungsentwurf",
+      "updatedAt": "Zuletzt gespeichert"
+    }
   }
 }

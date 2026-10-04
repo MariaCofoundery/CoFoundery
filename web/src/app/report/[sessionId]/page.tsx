@@ -24,7 +24,7 @@ import {
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { ReportAutoRefresh } from "@/features/reporting/ReportAutoRefresh";
 import { getLegacyReportAccessState } from "@/features/reporting/reportAccess";
-import { buildWorkbookIntroHref } from "@/features/reporting/workbookNavigation";
+import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { type TeamScoringResult } from "@/features/scoring/founderScoring";
 import { ResearchPageTracker } from "@/features/research/ResearchPageTracker";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -156,7 +156,8 @@ export default async function ReportPage({ params }: PageProps) {
     toFounderScores(founderScoring, "B")
   );
   const selection = buildFounderMatchingSelection(compareResult);
-  const workbookHref = buildWorkbookIntroHref(snapshot.invitationId, teamContext);
+  const currentTeamId = await currentTeamForInvitation(await createClient(), user.id, snapshot.invitationId);
+  const workbookHref = currentTeamId ? `/teams/${currentTeamId}/setup` : "/connections";
   const legacyReportAccess = getLegacyReportAccessState({ isLocked: true });
   const isLegacyReportLocked = !legacyReportAccess.isUnlocked;
   // Diese Seite baute den Text schon beim Anzeigen neu - nur eben in der

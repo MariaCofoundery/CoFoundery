@@ -125,7 +125,7 @@ export function getCoFounderInviteEmailCopy(
         ? `${inviterName} invited you to Cofoundery Align`
         : "You’ve been invited to Cofoundery Align",
       preheader:
-        "Personal invitation to Cofoundery Align: shared report and workbook for your co-founder dynamics.",
+        "Personal invitation to Cofoundery Align: shared report and Founder Setup for your collaboration.",
       eyebrow: "Personal invitation",
       greeting: "Hi,",
       inviterLine: inviterName
@@ -136,7 +136,7 @@ export function getCoFounderInviteEmailCopy(
       listTitle: "What to expect",
       bullets: [
         "a structured matching report about collaboration, roles, and decision logic",
-        "a shared workbook to capture key tensions and agreements concretely",
+        "Founder Setup to discuss topics and explicitly confirm shared agreements",
         "a clear shared conversation frame instead of vague impressions",
       ],
       teamLabel: "Team/project",
@@ -160,7 +160,7 @@ export function getCoFounderInviteEmailCopy(
       ? `${inviterName} lädt dich zu eurem Cofoundery Align ein`
       : "Einladung zu eurem Cofoundery Align",
     preheader:
-      "Persönliche Einladung zu Cofoundery Align: gemeinsamer Report und Workbook für eure Co-Founder-Dynamik.",
+      "Persönliche Einladung zu Cofoundery Align: gemeinsamer Report und Founder Setup für eure Zusammenarbeit.",
     eyebrow: "Persönliche Einladung",
     greeting: "Hi,",
     inviterLine: inviterName
@@ -171,7 +171,7 @@ export function getCoFounderInviteEmailCopy(
     listTitle: "Was euch erwartet",
     bullets: [
       "ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik",
-      "ein gemeinsames Workbook, um zentrale Spannungen und Vereinbarungen konkret festzuhalten",
+      "Founder Setup, um Themen zu besprechen und gemeinsame Vereinbarungen ausdrücklich zu bestätigen",
       "ein klarer gemeinsamer Gesprächsrahmen statt vager Eindrücke",
     ],
     teamLabel: "Team/Projekt",

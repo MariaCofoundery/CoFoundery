@@ -203,7 +203,7 @@
       },
       "matching": {
         "title": "Gemeinsames Cofoundery-Matching starten",
-        "description": "Danach könnt ihr eure Zusammenarbeit mit dem bestehenden Matching und Workbook vertiefen."
+        "description": "Danach könnt ihr im Team „Euer Zusammenspiel“ ansehen und gemeinsame Vereinbarungen in Founder Setup klären."
       }
     },
     "candidateEyebrow": "Kandidat:innenvorschläge",
@@ -792,7 +792,7 @@
     "subtitle": "Wenn ihr beide möchtet, könnt ihr als Nächstes eure Erwartungen an Rollen, Commitment und Zusammenarbeit gemeinsam prüfen.",
     "safetyNote": "Euer gemeinsamer Alignment-Blick wird erst vorbereitet, wenn ihr beide diesem Schritt zugestimmt habt.",
     "existingContextTitle": "Für euch gibt es bereits einen gemeinsamen Bereich",
-    "existingContextText": "Ihr habt bereits einen gemeinsamen Bereich – aus einer früheren Einladung zum Co-Founder-Matching. Dort liegen euer Alignment, euer Workbook und alles, was ihr schon miteinander erarbeitet habt. CoFoundery legt denselben gemeinsamen Kontext nicht doppelt an.",
+    "existingContextText": "Ihr habt bereits einen gemeinsamen Kontext aus einer früheren Einladung. Diesen verwenden wir weiter; frühere Auswertungen bleiben erreichbar.",
     "profilesEyebrow": "Beteiligte Profile",
     "profilesTitle": "Eure Discovery-Profile",
     "profilesText": "Hier seht ihr die Angaben, die ihr bewusst über Discovery veröffentlicht habt. Private Suchprioritäten und Assessment-Antworten bleiben verborgen.",

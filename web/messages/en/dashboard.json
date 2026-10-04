@@ -615,7 +615,7 @@
     "eyebrow": "Currently free during the test phase.",
     "title": "Start your matching",
     "stepInvite": "Invite your co-founder.",
-    "stepReport": "After that, you receive your matching report and work together in the workbook.",
+    "stepReport": "Then “How you work together” leads to conversation points and Founder Setup.",
     "inviteCta": "Invite co-founder",
     "supportCta": "Support the test phase (€39)",
     "paymentWindowHint": "Payment opens in a new window. After that, you can simply continue here.",
@@ -625,7 +625,7 @@
   "coFounderInviteForm": {
     "title": "Invite a co-founder",
     "targetTeam": "Invitation to “{name}”. The person joins this existing team. Workstyle and sharing remain individual decisions.",
-      "intro": "Choose your context and send the invitation directly by email. If needed, you can still share the link manually afterwards.",
+    "intro": "Choose your context and send the invitation directly by email. If needed, you can still share the link manually afterwards.",
     "label": {
       "projectName": "Team or project name",
       "email": "Email address"
@@ -659,7 +659,7 @@
     },
     "modules": {
       "label": "Modules",
-      "help": "For the productive founder flow, you start with the foundation module and optional values. Report and workbook then build on these modules.",
+      "help": "These modules belong to the earlier assessment. Find your current workstyle and shared agreements through “How you work together” and Founder Setup in your team.",
       "baseActive": "Foundation (active)",
       "valuesOptional": "Values (optional)",
       "selectedBasis": "Foundation",

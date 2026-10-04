@@ -32,7 +32,8 @@ insert into public.founder_team_members (team_id, user_id) values
   ('da222222-2222-4222-8222-222222222222', 'd3333333-3333-4333-8333-333333333333');
 
 select set_config('request.jwt.claims', '{"sub":"d1111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
-set local role authenticated;
+-- Historical maintenance contract: the public RPC is retired in Phase 9.3.
+-- Execute as the migration owner with the original subject; no public grant is restored.
 select pg_temp.assert_handoff(
   public.handoff_workbook_deep_dive_note_if_empty(
     'da111111-1111-4111-8111-111111111111', 'decision_rights', 'Gemeinsame Reflexion'
@@ -66,7 +67,8 @@ end $$;
 reset role;
 
 select set_config('request.jwt.claims', '{"sub":"d4444444-4444-4444-8444-444444444444","role":"authenticated"}', true);
-set local role authenticated;
+-- Historical maintenance contract: the public RPC is retired in Phase 9.3.
+-- Execute as the migration owner with the original subject; no public grant is restored.
 do $$ begin
   begin
     perform public.handoff_workbook_deep_dive_note_if_empty(
