@@ -16,8 +16,8 @@ from (values
 insert into public.profiles(user_id,roles) values
  ('e8510000-0000-4000-8000-000000000001',array['founder']),('e8510000-0000-4000-8000-000000000002',array['founder'])
 on conflict(user_id) do update set roles=excluded.roles;
-select pg_temp.check_workstyle((select count(*)=37 from public.workstyle_item_versions),'37 frozen items');
-select pg_temp.check_workstyle((select count(*)=20 from public.workstyle_item_versions where definition->>'usage'='core'),'20 identical core items');
+select pg_temp.check_workstyle((select count(*)=37 from public.workstyle_item_versions where assessment_version='8.5a-v1'),'37 frozen items');
+select pg_temp.check_workstyle((select count(*)=20 from public.workstyle_item_versions where assessment_version='8.5a-v1' and definition->>'usage'='core'),'20 identical core items');
 select pg_temp.check_workstyle(not has_function_privilege('anon','public.start_workstyle_pretest(text,jsonb,boolean)','EXECUTE'),'anonymous cannot participate');
 
 select set_config('request.jwt.claims','{"sub":"e8510000-0000-4000-8000-000000000001","role":"authenticated"}',true);
@@ -68,7 +68,7 @@ do $$ declare person_id uuid; row record; id uuid; form_id text; begin
  for person_id in select person from workstyle_ids where person<>'e8510000-0000-4000-8000-000000000003' loop
    perform set_config('request.jwt.claims',jsonb_build_object('sub',person_id,'role','authenticated')::text,true);
    select assessment,form into id,form_id from workstyle_ids where person=person_id;
-   for row in select * from public.workstyle_item_versions where definition->>'usage'='core' order by position loop
+   for row in select * from public.workstyle_item_versions where assessment_version='8.5a-v1' and definition->>'usage'='core' order by position loop
      perform public.save_workstyle_pretest_answer(id,row.item_key,row.item_version,3,null,1200);
    end loop;
    for row in select * from public.workstyle_item_versions where definition->>'form'=form_id order by position loop
@@ -108,7 +108,7 @@ do $$ declare result jsonb; begin
  perform pg_temp.check_workstyle(result->>'status'='ready','explicitly shared two-founder context ready');
  perform pg_temp.check_workstyle(jsonb_array_length(result->'people')=2 and jsonb_array_length(result->'people'->0->'core')=20,'two equal core sets');
  perform pg_temp.check_workstyle(not exists(select 1 from jsonb_array_elements(result->'people') p,jsonb_array_elements(p->'core') a
-   join public.workstyle_item_versions i on i.item_key=a->>'item_key' where i.definition->>'usage'='research_only'),'no research item in team inputs');
+   join public.workstyle_item_versions i on i.item_key=a->>'item_key' and i.assessment_version='8.5a-v1' where i.definition->>'usage'='research_only'),'no research item in team inputs');
 end $$;
 reset role;
 insert into public.alignment_share_hidden_blocks(share_id,block_id)

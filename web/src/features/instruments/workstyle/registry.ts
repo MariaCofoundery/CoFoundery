@@ -1,7 +1,9 @@
 import manifest from "../../../../docs/founder-workstyle-pretest-8.5a-v1.json";
 
+import manifestV2 from "../../../../docs/founder-workstyle-pretest-8.5a-v2.json";
+
 export type WorkstyleForm = "A" | "B" | "C";
-export type WorkstyleResponseFormat = "frequency" | "experience_weight" | "ambiguity_comfort";
+export type WorkstyleResponseFormat = "frequency" | "experience_weight" | "ambiguity_comfort" | "ambiguity_discomfort" | "likelihood";
 export type WorkstyleSourceType = "live_reference" | "adapted" | "new";
 
 export type WorkstyleItem = Readonly<{
@@ -35,10 +37,12 @@ export type WorkstyleRegistry = Readonly<{
   source: string;
   status: "candidate_for_pretest" | "archived";
   declared_counts: Readonly<{ pool: number; core: number }>;
-  actual_counts: Readonly<{ pool: number; core: number; A: number; B: number; C: number }>;
+  actual_counts: Readonly<{ pool: number; core: number; A?: number; B?: number; C?: number; research_only?: number }>;
   core_item_keys: readonly string[];
-  forms: Readonly<Record<WorkstyleForm, readonly string[]>>;
-  response_formats: Readonly<Record<WorkstyleResponseFormat, readonly Readonly<{ value: number; label: string }>[]>>;
+  design?: "fixed";
+  item_order?: readonly string[];
+  forms: Readonly<Record<string, readonly string[]>>;
+  response_formats: Readonly<Record<string, readonly Readonly<{ value: number; label: string }>[]>>;
   missing_options: Readonly<{ cannot_assess: string }>;
   scoring: Readonly<{ overall_score: false; construct_scores: false; compatibility_score: false; validated_short_scale: false }>;
   comparison_requirements: readonly string[];
@@ -53,30 +57,33 @@ export function validateWorkstyleRegistry(registry: WorkstyleRegistry): void {
   if (registry.assessment_key !== "founder-workstyle-pretest" || !registry.assessment_version || !registry.pool_version) fail("version");
   if (Object.values(registry.scoring).some(value => value !== false)) fail("unsupported_scoring");
   if (!["candidate_for_pretest", "archived"].includes(registry.status)) fail("status");
-  const assigned = [...registry.core_item_keys, ...FORMS.flatMap(form => registry.forms[form])];
+  const fixed = registry.assessment_version === "8.5a-v2";
+  const assigned = fixed ? [...(registry.item_order ?? [])] : [...registry.core_item_keys, ...FORMS.flatMap(form => registry.forms[form])];
+  if (fixed && (registry.design !== "fixed" || Object.keys(registry.forms).length || assigned.length !== 36 || registry.core_item_keys.length !== 30 || registry.actual_counts.research_only !== 6)) fail("fixed_design");
   if (new Set(assigned).size !== assigned.length) fail("duplicate_assignment");
   const keys = registry.items.map(item => item.item_key);
   if (new Set(keys).size !== keys.length || keys.length !== assigned.length || assigned.some(key => !keys.includes(key))) fail("item_coverage");
   if (registry.declared_counts.pool !== keys.length || registry.declared_counts.core !== registry.core_item_keys.length) fail("declared_count");
   if (registry.actual_counts.pool !== keys.length || registry.actual_counts.core !== registry.core_item_keys.length) fail("count");
-  for (const form of FORMS) {
+  for (const form of fixed ? [] : FORMS) {
     if (registry.forms[form].length !== registry.actual_counts[form]) fail("form_count");
   }
   for (const options of Object.values(registry.response_formats)) {
     if (options.length !== 5 || options.some((option, index) => option.value !== index + 1 || !option.label.trim())) fail("five_ordinal_options");
   }
   for (const item of registry.items) {
-    if (!/^(EVI|EXP|EL|VOICE|AMB|ORG)-\d{2}$/.test(item.item_key) || !item.item_version || item.assessment_version !== registry.assessment_version) fail("item_identity");
+    if (!/^(EVI|EXP|EL|VOICE|AMB|ORG)-(?:\d{2}|R1)$/.test(item.item_key) || !item.item_version || item.assessment_version !== registry.assessment_version) fail("item_identity");
     if (!item.prompt.trim() || !item.construct || !registry.response_formats[item.response_format]) fail("item_content");
     if (!["live_reference", "adapted", "new"].includes(item.source_type) || item.source_status !== item.source_type) fail("source_type");
+    if (fixed && (item.item_version !== "8.4-v0.3" || item.missing_reasons.length !== 1 || item.stem !== null || item.form !== null)) fail("v2_item_contract");
     if (item.missing_reasons.some(reason => reason !== "cannot_assess")) fail("missing_reason");
     const isCore = registry.core_item_keys.includes(item.item_key);
     if (isCore) {
       if (item.usage !== "core" || item.research_only || item.form !== null || item.product_status !== "pretest_comparison_candidate") fail("core_usage");
-    } else if (item.usage !== "research_only" || !item.research_only || !item.form || !registry.forms[item.form].includes(item.item_key) || item.product_status !== "excluded") {
+    } else if (item.usage !== "research_only" || !item.research_only || (!fixed && (!item.form || !registry.forms[item.form].includes(item.item_key))) || item.product_status !== "excluded") {
       fail("research_usage");
     }
-    if (item.item_key.startsWith("AMB-") && !item.stem) fail("ambiguity_stem");
+    if (!fixed && item.item_key.startsWith("AMB-") && !item.stem) fail("ambiguity_stem");
   }
 }
 
@@ -91,9 +98,12 @@ function freezeDeep<T>(value: T): T {
 const registry = manifest as WorkstyleRegistry;
 validateWorkstyleRegistry(registry);
 export const WORKSTYLE_PRETEST_V1 = freezeDeep(registry);
+validateWorkstyleRegistry(manifestV2 as WorkstyleRegistry);
+export const WORKSTYLE_PRETEST_V2 = freezeDeep(manifestV2 as WorkstyleRegistry);
 
 /** Exact resolution; never reinterpret an unknown historical version as the newest. */
 export function workstyleRegistryFor(assessmentVersion: string): WorkstyleRegistry {
+  if (assessmentVersion === WORKSTYLE_PRETEST_V2.assessment_version) return WORKSTYLE_PRETEST_V2;
   if (assessmentVersion !== WORKSTYLE_PRETEST_V1.assessment_version) throw new Error("unknown_workstyle_assessment_version");
   return WORKSTYLE_PRETEST_V1;
 }
@@ -112,6 +122,22 @@ export function previewWorkstyleForm(form: WorkstyleForm): readonly WorkstyleIte
 }
 
 /** Archived manifests remain readable but cannot start a new pretest. */
-export function assertWorkstylePretestReady(): void {
-  if (WORKSTYLE_PRETEST_V1.status !== "candidate_for_pretest") throw new Error("workstyle_pretest_not_ready");
+export function assertWorkstylePretestReady(version = "8.5a-v1"): void {
+  if (workstyleRegistryFor(version).status !== "candidate_for_pretest") throw new Error("workstyle_pretest_not_ready");
+}
+
+/** The persisted version selects the exact display order; no client randomization. */
+export function workstyleSessionItems(version: string, form: WorkstyleForm | null): readonly WorkstyleItem[] {
+  const manifest = workstyleRegistryFor(version);
+  if (version === "8.5a-v1") {
+    if (!form) throw new Error("unknown_workstyle_form");
+    return previewWorkstyleForm(form);
+  }
+  if (form !== null) throw new Error("unexpected_workstyle_form");
+  return manifest.item_order!.map(key => manifest.items.find(item => item.item_key === key)!);
+}
+
+export function workstyleInstrumentId(version: string): string {
+  workstyleRegistryFor(version);
+  return `founder-workstyle-pretest-${version.replaceAll(".", "-")}`;
 }

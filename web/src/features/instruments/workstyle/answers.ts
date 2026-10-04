@@ -14,10 +14,10 @@ export type VersionedWorkstyleAnswer = WorkstyleAnswerValue & Readonly<{
 /** Pure validation for a future write service; this function does not persist answers. */
 export function parseWorkstyleAnswer(
   identity: { assessment_version: string; item_key: string; item_version: string },
-  assignedForm: WorkstyleForm,
+  assignedForm: WorkstyleForm | null,
   input: unknown,
 ): VersionedWorkstyleAnswer {
-  if (!["A", "B", "C"].includes(assignedForm)) throw new Error("unknown_workstyle_form");
+  if (identity.assessment_version === "8.5a-v1" ? !assignedForm || !["A", "B", "C"].includes(assignedForm) : assignedForm !== null) throw new Error("unknown_workstyle_form");
   const item = workstyleItemFor(identity.item_key, identity.item_version, identity.assessment_version);
   if (item.research_only && item.form !== assignedForm) throw new Error("workstyle_item_not_assigned");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("invalid_workstyle_answer");

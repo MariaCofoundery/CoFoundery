@@ -30,7 +30,7 @@ function Question({ item, initial, pending, onSave }: { item: WorkstyleItem; ini
   </form>;
 }
 
-function Feedback({ items, pending, onSave, onSkip }: { items: readonly WorkstyleItem[]; pending: boolean; onSave: (feedback: ResearchFeedback) => void; onSkip: () => void }) {
+export function WorkstyleFeedback({ items, pending, onSave, onSkip, v2 = false }: { v2?: boolean; items: readonly WorkstyleItem[]; pending: boolean; onSave: (feedback: ResearchFeedback) => void; onSkip: () => void }) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -39,6 +39,7 @@ function Feedback({ items, pending, onSave, onSkip }: { items: readonly Workstyl
     if (form.get("desirable")) feedback.desirable = form.get("desirable") === "yes";
     for (const key of ["unclear_text", "unsuitable_text", "other"] as const) if (form.get(key)) feedback[key] = String(form.get(key));
     for (const key of ["unclear_items", "unsuitable_items", "desirable_items"] as const) feedback[key] = form.getAll(key).map(String);
+    if (v2) feedback.clear_realistic_items = form.getAll("clear_realistic_items").map(String);
     onSave(feedback);
   }
   return <form onSubmit={submit} className="mt-6 space-y-6">
@@ -48,9 +49,13 @@ function Feedback({ items, pending, onSave, onSkip }: { items: readonly Workstyl
     {([['unclear', 'Gab es Fragen, bei denen unklar war, was gemeint ist?'], ['unsuitable', 'Gab es Fragen, bei denen keine Antwort richtig gepasst hat?'], ['desirable', 'Gab es Fragen, bei denen offensichtlich war, welche Antwort „gut“ wirken soll?']] as const).map(([key, label]) => <fieldset key={key} className="rounded-xl border border-slate-200 p-4">
       <legend className="px-1 font-medium">{label}</legend>
       {key === "desirable" && <label className="block">Deine Einschätzung<select name="desirable" className={field} defaultValue=""><option value="">Keine Angabe</option><option value="yes">Ja</option><option value="no">Nein</option></select></label>}
-      <details className="mt-3"><summary className="cursor-pointer py-2 underline">Fragen auswählen (optional)</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name={`${key}_items`} value={item.item_key} className="mt-1" /><span>{item.item_key}: {item.prompt}</span></label>)}</div></details>
+      <details className="mt-3"><summary className="cursor-pointer py-2 underline">Fragen auswählen (optional)</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name={`${key}_items`} value={item.item_key} className="mt-1" /><span>{!v2 && `${item.item_key}: `}{item.prompt}</span></label>)}</div></details>
       {key !== "desirable" && <label className="mt-3 block text-sm">Dein Hinweis (optional)<textarea name={`${key}_text`} maxLength={2000} className={field} /></label>}
     </fieldset>)}
+    {v2 && <fieldset className="rounded-xl border border-slate-200 p-4">
+      <legend className="px-1 font-medium">Gab es Fragen, die sich für dich besonders klar oder realistisch angefühlt haben?</legend>
+      <details className="mt-3"><summary className="cursor-pointer py-2 underline">Fragen auswählen (optional)</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name="clear_realistic_items" value={item.item_key} className="mt-1" /><span>{item.prompt}</span></label>)}</div></details>
+    </fieldset>}
     <label className="block">Sonstige Hinweise (optional)<textarea name="other" maxLength={2000} className={field} /></label>
     <div className="flex flex-wrap gap-4"><button disabled={pending} className={button}>Feedback speichern</button><button type="button" disabled={pending} className="min-h-11 underline" onClick={onSkip}>Ohne Feedback abschließen</button></div>
   </form>;
@@ -66,11 +71,11 @@ export function WorkstylePretest({ initialSession }: { initialSession: PretestSe
   const [pending, startTransition] = useTransition();
   const [position, setPosition] = useState(() => {
     if (!initialSession) return 0;
-    const items = previewWorkstyleForm(initialSession.form);
+    const items = previewWorkstyleForm(initialSession.form!);
     const missing = items.findIndex(item => !initialSession.answers.some(answer => answer.item_key === item.item_key));
     return missing === -1 ? items.length : missing;
   });
-  const items = session ? previewWorkstyleForm(session.form) : [];
+  const items = session ? previewWorkstyleForm(session.form!) : [];
   function run(action: () => Promise<void>) { setError(""); startTransition(async () => { try { await action(); } catch { setError("Der Stand konnte nicht geladen werden. Bitte versuche es erneut."); } }); }
   const active = session && !session.withdrawn_at;
   return <section className="mt-8">
@@ -88,7 +93,7 @@ export function WorkstylePretest({ initialSession }: { initialSession: PretestSe
       {stage === "context" && <form className="space-y-5" onSubmit={event => { event.preventDefault(); const data = new FormData(event.currentTarget); run(async () => {
         const result = await startWorkstylePretest(consent, { founder_experience: String(data.get("experience")) as ResearchContext["founder_experience"], team_size: String(data.get("team")) as ResearchContext["team_size"], venture_phase: String(data.get("phase")) }, retake);
         if (!result.ok) return setError(result.error); setSession(result.session);
-        const nextItems = previewWorkstyleForm(result.session.form);
+        const nextItems = previewWorkstyleForm(result.session.form!);
         const nextMissing = nextItems.findIndex(item => !result.session.answers.some(answer => answer.item_key === item.item_key));
         setPosition(nextMissing === -1 ? nextItems.length : nextMissing); setFeedbackDone(false);
       }); }}><h2 className="text-xl font-semibold">Kurz zu deinem Kontext</h2>
@@ -112,7 +117,7 @@ export function WorkstylePretest({ initialSession }: { initialSession: PretestSe
     </>}
     {active && session.completed_at && <>
       <h2 className="text-2xl font-semibold">Danke, dein Pretest ist abgeschlossen.</h2><p className="mt-3">Dein gemeinsames Arbeitsprofil bleibt privat. Es wurde kein Teamreport erzeugt und nichts automatisch freigegeben.</p>
-      {!feedbackDone ? <Feedback items={items} pending={pending} onSkip={() => setFeedbackDone(true)} onSave={feedback => run(async () => { const result = await saveWorkstyleFeedback(session.assessment_id, feedback); if (!result.ok) return setError(result.error); setFeedbackDone(true); })} /> : <p role="status" className="mt-4">Alles erledigt. Danke für deine Teilnahme.</p>}
+      {!feedbackDone ? <WorkstyleFeedback items={items} pending={pending} onSkip={() => setFeedbackDone(true)} onSave={feedback => run(async () => { const result = await saveWorkstyleFeedback(session.assessment_id, feedback); if (!result.ok) return setError(result.error); setFeedbackDone(true); })} /> : <p role="status" className="mt-4">Alles erledigt. Danke für deine Teilnahme.</p>}
       <button className="mt-6 min-h-11 underline" disabled={pending} onClick={() => { setSession(null); setStage("consent"); setConsent(false); setRetake(true); }}>Späteren Stand neu erheben</button>
     </>}
     {active && <div className="mt-10 border-t border-slate-200 pt-5"><p className="text-sm text-slate-600">Die Forschungsteilnahme ist freiwillig. Ein Widerruf löscht die noch zuordenbaren Forschungszusätze.</p><button disabled={pending} className="mt-2 min-h-11 text-sm underline" onClick={() => run(async () => { const result = await withdrawWorkstyleResearch(); if (!result.ok) return setError(result.error); setSession(session.completed_at ? { ...session, withdrawn_at: new Date().toISOString() } : null); setStage("intro"); setConsent(false); })}>Forschungseinwilligung widerrufen</button></div>}

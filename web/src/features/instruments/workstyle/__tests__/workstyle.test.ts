@@ -41,7 +41,7 @@ test("versions resolve exactly and the loaded historical manifest cannot be muta
   // A wording/meaning change needs a new manifest, not regeneration under the old ID.
   assert.equal(createHash("sha256").update(readFileSync("docs/founder-workstyle-pretest-8.5a-v1.json")).digest("hex"), "ec66379fc20a9c6986f77de200499f2b3a56bafa8616f43ac616b065226a2531");
   assert.equal(workstyleRegistryFor("8.5a-v1"), registry);
-  assert.throws(() => workstyleRegistryFor("8.5a-v2"), /unknown_workstyle_assessment_version/);
+  assert.throws(() => workstyleRegistryFor("unknown"), /unknown_workstyle_assessment_version/);
   assert.throws(() => workstyleItemFor("EVI-01", "8.4-v0.3", "8.5a-v1"), /unknown_workstyle_item_version/);
   assert.throws(() => Object.assign(registry.items[0], { prompt: "changed" }), TypeError);
   assert.throws(() => Object.assign(registry.forms.A, { 0: "EL-02" }), TypeError);
@@ -104,7 +104,7 @@ test("long export preserves versions and missing, omits direct identities and fr
 test("team adapter requires two equally versioned cores and complete shared venture answers", () => {
   const input: Extract<WorkstyleTeamInputs, { status: "ready" }> = {
     status: "ready", team_id: "team", team_context: "existing_team",
-    people: ["a", "b"].map(person => ({ person_id: person, workstyle_assessment_id: `core-${person}`, assessment_version: "8.5a-v1",
+    people: ["a", "b"].map(person => ({ person_id: person, workstyle_assessment_id: `core-${person}`, assessment_version: "8.5a-v1", instrument_id: "founder-workstyle-pretest-8-5a-v1", manifest_version: "1.0.0",
       core: registry.core_item_keys.map(key => ({ item_key: key, item_version: "8.4-v0.2", value: { scale: 3 }, missing_reason: null })),
       venture_assessment_id: `venture-${person}`, venture_instrument: "venture-alignment-v1",
       venture_alignment: getItemsV22("venture_alignment").filter(item => !item.retired).map(item => ({ item_key: item.itemId, value: null, missing_reason: "prefer_not_to_say" })),
