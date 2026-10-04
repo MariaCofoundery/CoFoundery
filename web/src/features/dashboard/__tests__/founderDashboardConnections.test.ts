@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as nodeModule from "node:module";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
@@ -258,4 +259,147 @@ test("DE and EN card copy are parallel, factual, and contain no completion frami
   assert.match(copy, /Alignment Report vorhanden/);
   assert.match(copy, /Commitment Lab begonnen/);
   assert.doesNotMatch(copy, /Team Readiness|Compatibility %|von 18|of 18|Team abgeschlossen/);
+});
+
+/**
+ * REGRESSION (nach Phase 9.4A gefunden): Der Loader filterte `report_runs`
+ * nach `status = 'completed'`. Diese Spalte gibt es seit der Neuanlage der
+ * Tabelle in 20260220183046_reset_to_invitation_assessment_model nicht mehr -
+ * PostgREST antwortet mit einem Fehler, der Loader warf
+ * `dashboard_connection_statuses_unavailable`, und jeder Founder mit einer
+ * Relationship sah seine Karten ohne Status.
+ *
+ * Der nachgebaute Client kennt deshalb die ECHTEN Spalten der abgefragten
+ * Tabellen (Stand lokale DB) und antwortet bei einer unbekannten Spalte wie
+ * PostgREST mit einem Fehler. Ein Client, der jede Spalte akzeptiert, haette
+ * den Fehler nie gezeigt.
+ */
+const LIVE_COLUMNS: Record<string, string[]> = {
+  relationships: ["id", "user_a_id", "user_b_id", "founder_team_id", "created_at"],
+  report_runs: ["id", "relationship_id", "invitation_id", "modules", "input_assessment_ids", "payload", "created_at"],
+  commitment_labs: ["relationship_id", "shared_reflection", "created_at", "updated_at"],
+  relationship_advisors: ["id", "relationship_id", "status", "created_at", "updated_at"],
+  founder_team_setup_items: ["id", "team_id", "work_status", "current_confirmed_revision_id", "created_at", "updated_at"],
+  founder_discovery_profiles: ["id", "user_id", "display_name", "status", "created_at", "updated_at"],
+};
+
+function schemaBoundClient(rows: Record<string, Array<Record<string, unknown>>>) {
+  const queries: Array<{ table: string; select: string[]; filters: string[] }> = [];
+  const client = {
+    from(table: string) {
+      const known = LIVE_COLUMNS[table];
+      assert.ok(known, `unerwartete Tabelle ${table}`);
+      const query = { table, select: [] as string[], filters: [] as string[] };
+      queries.push(query);
+      let unknown: string | null = null;
+      const check = (column: string) => {
+        if (!known.includes(column) && !unknown) unknown = column;
+      };
+      let data = [...(rows[table] ?? [])];
+      const builder = {
+        select(columns: string) {
+          query.select = columns.split(",").map((c) => c.trim());
+          query.select.forEach(check);
+          return builder;
+        },
+        eq(column: string, value: unknown) {
+          query.filters.push(`eq:${column}`);
+          check(column);
+          data = data.filter((row) => row[column] === value);
+          return builder;
+        },
+        in(column: string, values: unknown[]) {
+          query.filters.push(`in:${column}`);
+          check(column);
+          data = data.filter((row) => values.includes(row[column]));
+          return builder;
+        },
+        or(expression: string) {
+          query.filters.push(`or:${expression}`);
+          for (const part of expression.split(",")) check(part.split(".")[0]);
+          return builder;
+        },
+        order(column: string) {
+          check(column);
+          return builder;
+        },
+        then(resolve: (value: unknown) => unknown) {
+          return Promise.resolve(
+            unknown
+              ? { data: null, error: { code: "42703", message: `column ${table}.${unknown} does not exist` } }
+              : { data, error: null }
+          ).then(resolve);
+        },
+      };
+      return builder;
+    },
+  };
+  return { client, queries };
+}
+
+test("ein Founder mit Relationship bekommt seinen Report-Status - ohne report_runs.status", async () => {
+  // Der Loader importiert den Server-Client (next/headers), benutzt ihn aber
+  // nur ohne uebergebenen Client. Im Test wird er durch einen Platzhalter
+  // ersetzt, der bei Benutzung laut scheitert.
+  type Resolved = { url: string; shortCircuit?: boolean };
+  const { registerHooks } = nodeModule as unknown as {
+    registerHooks(hooks: {
+      resolve(specifier: string, context: unknown, next: (s: string, c: unknown) => Resolved): Resolved;
+    }): { deregister(): void };
+  };
+  const stub = 'export const createClient = async () => { throw new Error("server client must not be used in this test"); };';
+  const hooks = registerHooks({
+    resolve(specifier, context, next) {
+      return specifier === "@/lib/supabase/server"
+        ? { url: `data:text/javascript,${encodeURIComponent(stub)}`, shortCircuit: true }
+        : next(specifier, context);
+    },
+  });
+  const { getFounderDashboardConnectionsV2 } = await import(
+    "@/features/dashboard/founderDashboardConnectionData"
+  ).finally(() => hooks.deregister());
+  const { client, queries } = schemaBoundClient({
+    relationships: [
+      { id: "rel-ab", user_a_id: alice, user_b_id: bob, founder_team_id: null, created_at: "2026-08-03" },
+    ],
+    report_runs: [{ relationship_id: "rel-ab", invitation_id: "invite-ab", created_at: "2026-08-05" }],
+    founder_discovery_profiles: [{ user_id: bob, display_name: "Bob", status: "active" }],
+  });
+
+  // Vorher: wirft dashboard_connection_statuses_unavailable.
+  const overview = await getFounderDashboardConnectionsV2({
+    currentUserId: alice,
+    teams: [],
+    invitations: [],
+    client: client as never,
+  });
+
+  // Die Verbindung bleibt lesbar und traegt ihren Report-Status.
+  assert.equal(overview.connections.length, 1);
+  assert.equal(overview.connections[0]?.relationshipId, "rel-ab");
+  assert.deepEqual(overview.connections[0]?.statuses.map((status) => status.type), ["alignment_report"]);
+
+  // Die Abfrage nennt keine Spalte, die es nicht gibt - und keinen Statusfilter.
+  const reportQuery = queries.find((query) => query.table === "report_runs");
+  assert.ok(reportQuery, "report_runs wurde nicht abgefragt");
+  assert.deepEqual(reportQuery.select, ["relationship_id", "invitation_id", "created_at"]);
+  assert.deepEqual(reportQuery.filters, ["in:relationship_id"]);
+
+  // Keine neue Semantik: weiterhin keine Payloads, keine Setup-Notizen, kein
+  // Research, und die uebrigen Quellen sind dieselben wie vorher.
+  assert.deepEqual(
+    [...new Set(queries.map((query) => query.table))].sort(),
+    ["commitment_labs", "founder_discovery_profiles", "relationship_advisors", "relationships", "report_runs"]
+  );
+  for (const query of queries) {
+    assert.ok(!query.select.includes("payload"), `${query.table} liest payload`);
+    assert.ok(!query.select.some((column) => /research|working_note|shared_reflection/.test(column)), query.table);
+  }
+});
+
+test("der Statusfilter auf report_runs kommt nicht zurueck", () => {
+  const source = readFileSync("src/features/dashboard/founderDashboardConnectionData.ts", "utf8");
+  const reportQuery = source.slice(source.indexOf('.from("report_runs")'), source.indexOf('.from("commitment_labs")'));
+  assert.ok(reportQuery.length > 0);
+  assert.doesNotMatch(reportQuery, /\.eq\(\s*"status"/);
 });

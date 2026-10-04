@@ -215,8 +215,13 @@ test("Team-Intake bleibt fuer Founder erreichbar, aber leise im Teams-Bereich", 
   );
   assert.match(teams, /href="\/team-intake"/);
   assert.match(teams, /t\("team\.teamIntakeLink"\)/);
-  // Im Advisor-Kontext steht Intake als regulaerer Menuepunkt.
+  // Im Advisor-Kontext steht Intake als regulaerer Menuepunkt - und nur dort:
+  // Der alte hartkodierte "Team Context"-Link im Advisor-Dashboard zeigte auf
+  // dasselbe Ziel und ist entfernt.
   assert.match(shellSource, /href: "\/team-intake"[\s\S]{0,40}label: t\("advisorIntake"\)/);
+  const advisorDashboard = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.doesNotMatch(advisorDashboard, /Team Context/);
+  assert.doesNotMatch(advisorDashboard, /href="\/team-intake"/);
 });
 
 test("fruehere Auswertungen stehen nur eingeklappt und nur, wenn es sie gibt", () => {

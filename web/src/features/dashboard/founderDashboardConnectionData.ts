@@ -56,9 +56,15 @@ export async function getFounderDashboardConnectionsV2(params: {
     relationshipIds.length
       ? supabase
           .from("report_runs")
+          // KEIN Statusfilter: `report_runs` hat seit der Neuanlage in
+          // 20260220183046_reset_to_invitation_assessment_model keine Spalte
+          // `status` mehr. Eine Zeile ist ein unveraenderlicher, fertiger
+          // Report-Snapshot - "vorhanden" heisst "abgeschlossen", wie in den
+          // uebrigen Readern (Homebase, Rollen, Advisor-Zugriff). Der alte
+          // Filter liess die ganze Abfrage scheitern und die Teamkarten ohne
+          // Status zurueckfallen.
           .select("relationship_id, invitation_id, created_at")
           .in("relationship_id", relationshipIds)
-          .eq("status", "completed")
       : Promise.resolve({ data: [], error: null }),
     relationshipIds.length
       ? supabase

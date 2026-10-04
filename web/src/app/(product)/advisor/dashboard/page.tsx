@@ -732,7 +732,6 @@ export default async function AdvisorDashboardPage() {
               <h1 className="mt-2 text-3xl font-semibold text-slate-950 md:text-4xl">
                 {displayName}
               </h1>
-                  <Link href="/team-intake" className="inline-block min-h-11 py-3 text-sm underline">Team Context</Link>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                 {t("dashboard.heroText")}
               </p>
