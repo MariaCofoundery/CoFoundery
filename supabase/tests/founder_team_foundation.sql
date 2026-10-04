@@ -34,7 +34,8 @@ insert into public.relationships (id, user_a_id, user_b_id)
 values
   ('8a111111-1111-4111-8111-111111111111', '81111111-1111-4111-8111-111111111111', '82222222-2222-4222-8222-222222222222'),
   ('8a222222-2222-4222-8222-222222222222', '81111111-1111-4111-8111-111111111111', '83333333-3333-4333-8333-333333333333'),
-  ('8a333333-3333-4333-8333-333333333333', '81111111-1111-4111-8111-111111111111', '84444444-4444-4444-8444-444444444444');
+  ('8a333333-3333-4333-8333-333333333333', '81111111-1111-4111-8111-111111111111', '84444444-4444-4444-8444-444444444444'),
+  ('8a444444-4444-4444-8444-444444444444', '81111111-1111-4111-8111-111111111111', '85555555-5555-4555-8555-555555555555');
 
 set local role service_role;
 do $$
@@ -63,13 +64,14 @@ begin
     v_team_id
   );
 
+  perform public.ensure_founder_team_for_relationship('8a333333-3333-4333-8333-333333333333','existing_team',v_team_id);
   begin
     perform public.ensure_founder_team_for_relationship(
-      '8a333333-3333-4333-8333-333333333333',
+      '8a444444-4444-4444-8444-444444444444',
       'existing_team',
       v_team_id
     );
-    raise exception 'fourth founder unexpectedly joined team';
+    raise exception 'fifth founder unexpectedly joined team';
   exception when check_violation then
     if sqlerrm <> 'founder_team_member_limit_reached' then raise; end if;
   end;
@@ -79,14 +81,14 @@ reset role;
 
 select pg_temp.assert_true(
   (
-    select count(*) = 3
+    select count(*) = 4
     from public.founder_team_members member
     where member.team_id = (
       select founder_team_id from public.relationships
       where id = '8a111111-1111-4111-8111-111111111111'
     )
   ),
-  'two-to-three-founder team membership was not persisted exactly once'
+  'two-to-four-founder team membership was not persisted exactly once'
 );
 
 select pg_temp.assert_true(
@@ -101,7 +103,7 @@ select pg_temp.assert_true(
   ) and (
     select founder_team_id is null
     from public.relationships
-    where id = '8a333333-3333-4333-8333-333333333333'
+    where id = '8a444444-4444-4444-8444-444444444444'
   ),
   'relationship team assignment or member-limit rollback is inconsistent'
 );
@@ -114,12 +116,12 @@ select set_config(
 );
 set local role authenticated;
 select pg_temp.assert_true((select count(*) = 1 from public.founder_teams), 'team member cannot read team');
-select pg_temp.assert_true((select count(*) = 3 from public.founder_team_members), 'team member cannot read memberships');
+select pg_temp.assert_true((select count(*) = 4 from public.founder_team_members), 'team member cannot read memberships');
 reset role;
 
 select set_config(
   'request.jwt.claims',
-  '{"sub":"84444444-4444-4444-8444-444444444444","email":"team-d@example.com","role":"authenticated"}',
+  '{"sub":"85555555-5555-4555-8555-555555555555","email":"invite-a@example.com","role":"authenticated"}',
   true
 );
 set local role authenticated;
@@ -177,7 +179,7 @@ begin
   begin
     update public.relationships
     set founder_team_id = '8a444444-4444-4444-8444-444444444444'
-    where id = '8a333333-3333-4333-8333-333333333333';
+    where id = '8a444444-4444-4444-8444-444444444444';
     raise exception 'relationship with a nonmember unexpectedly joined team';
   exception when check_violation then
     if sqlerrm <> 'relationship_founders_must_be_team_members' then raise; end if;
@@ -188,7 +190,7 @@ reset role;
 
 select set_config(
   'request.jwt.claims',
-  '{"sub":"84444444-4444-4444-8444-444444444444","email":"team-d@example.com","role":"authenticated"}',
+  '{"sub":"85555555-5555-4555-8555-555555555555","email":"invite-a@example.com","role":"authenticated"}',
   true
 );
 set local role authenticated;

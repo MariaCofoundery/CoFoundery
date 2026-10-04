@@ -77,11 +77,11 @@ test("die Antworten aus dem Bogen stehen nur in der Langfassung", () => {
   assert.ok(karte > 0, "die WorkMap fehlt");
   assert.ok(antworten > 0, "die Antworten fehlen");
 
-  // Die WorkMap steht in BEIDEN Fassungen - sie IST die Zusammenfassung.
+  // Die historische WorkMap bleibt in der Langfassung. Die neue Signature ist in beiden Fassungen.
   // Also kommt sie im Abschnitt „Wie du arbeitest", bevor der sich nach dem
   // Modus verzweigt. (Weiter oben gibt es eine Verzweigung fuer das
   // Kennzeichen „Kurzprofil" / „Ausfuehrliches Profil"; die zaehlt nicht.)
-  const abschnitt = druck.slice(druck.indexOf("{workProfile ?"));
+  const abschnitt = druck.slice(druck.indexOf("{voll && workProfile ?"));
   assert.ok(
     abschnitt.indexOf("<WorkMap") < abschnitt.indexOf("{voll ? ("),
     "die WorkMap haengt am Modus",
@@ -199,7 +199,7 @@ test("leere Abschnitte entfallen ohne Hinweis", () => {
   assert.ok(!/<MissingSection|missingCapability|missingWorkProfile|\.empty\b/.test(druck));
 
   for (const bedingung of [
-    /\{workProfile \?/,
+    /\{voll && workProfile \?/,
     /\{strengths\.length > 0 \?/,
     /\{orderedEntries\.length > 0 \?/,
     /\{growingInto\.length > 0 \?/,

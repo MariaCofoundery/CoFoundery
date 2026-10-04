@@ -25,7 +25,7 @@ export type ShareState = {
 
 export async function getShareState(
   userId: string,
-  scope: AssessmentScope,
+  scope: AssessmentScope | "workstyle",
   ventureId: string | null,
 ): Promise<ShareState> {
   const supabase = await createClient();
@@ -63,13 +63,18 @@ export async function getShareState(
     if (id && id !== userId && !partners.has(id)) partners.set(id, "Begleitung (Advisor)");
   }
 
+  // Shared teams make recipients selectable; they do not grant any answer access.
+  if (scope === "workstyle") {
+    const { data: people } = await supabase.rpc("get_workstyle_share_recipients");
+    for (const person of people ?? []) partners.set(person.user_id, person.display_name);
+  }
   if (partners.size === 0) return { recipients: [], hiddenByRecipient: {} };
 
   const suche = supabase
     .from("assessments")
     .select("id")
     .eq("user_id", userId)
-    .eq("instrument_id", INSTRUMENT_OF[scope])
+    .eq("instrument_id", scope === "workstyle" ? "founder-workstyle-pretest-8-5a-v3" : INSTRUMENT_OF[scope])
     .not("submitted_at", "is", null)
     .order("created_at", { ascending: false })
     .limit(1);

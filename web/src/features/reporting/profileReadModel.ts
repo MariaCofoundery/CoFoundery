@@ -1,4 +1,5 @@
 import "server-only";
+import { getProductWorkstyle } from "@/features/reporting/workstyle/data";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -60,6 +61,7 @@ export async function getProfileReadModel(
   const [
     core,
     report,
+    workstyleV04,
     workProfile,
     vocabulary,
     entries,
@@ -76,6 +78,7 @@ export async function getProfileReadModel(
     getLatestSelfAlignmentReport({ locale }),
     // Das aktuelle Arbeitsprofil. Dieselbe Funktion, die auch die
     // Advisor-Ansicht liest - keine zweite Auswertung daneben.
+    getProductWorkstyle(supabase, userId),
     getScopeReport(userId, "founder_profile").catch(() => null),
     getCapabilityVocabulary(supabase),
     getOwnCapabilityEntries(supabase, userId),
@@ -136,6 +139,7 @@ export async function getProfileReadModel(
   return {
     core,
     report,
+    workstyleV04,
     workProfile,
     vocabulary,
     entries,

@@ -1,3 +1,4 @@
+import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -131,6 +132,7 @@ export default async function FounderProfilePage() {
   const {
     core,
     report,
+    workstyleV04,
     workProfile,
     vocabulary,
     entries,
@@ -406,6 +408,8 @@ export default async function FounderProfilePage() {
           "arbeitsweise",
           "indigo",
           <>
+            {workstyleV04 ? <><IndividualWorkstyle profile={workstyleV04} /><Link className="mt-4 inline-block underline" href="/me/profile/workstyle">Antworten freigeben und Bericht festhalten</Link></> : <p className="py-4">Dein aktuelles Arbeitsprofil ist noch nicht abgeschlossen. <Link className="underline" href="/research/workstyle-pretest">Arbeitsprofil kennenlernen</Link></p>}
+            {workProfile && <ProfileDetails summary="Früheres Arbeitsprofil – historischer Stand" hint={null}>
             {workProfile ? (
               <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
                 <p className="max-w-3xl text-sm leading-7 text-slate-700">
@@ -434,16 +438,13 @@ export default async function FounderProfilePage() {
                 </div>
 
                 <div className="mt-4">
-                  <ProfileDetails
-                    summary={t("workProfile.detailsSummary")}
-                    hint={detailsHint(workProfile.sections.length)}
-                  >
+                  <div>
                     <ReportViewV21
                       sections={workProfile.sections}
                       orphans={workProfile.orphans}
                       marked={workProfile.marked}
                     />
-                  </ProfileDetails>
+                  </div>
                 </div>
 
                 <EditLink href="/founder-alignment/profil" label={t("edit")} />
@@ -456,6 +457,8 @@ export default async function FounderProfilePage() {
                 cta={t("missingWorkProfile.cta")}
               />
             )}
+
+            </ProfileDetails>}
 
             {/* DER ALTBESTAND - DARUNTER, ZUGEKLAPPT, DATIERT.
 

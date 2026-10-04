@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getItemV22, type AssessmentScope } from "@/features/instruments/align/registries";
+import { shareProductWorkstyle } from "@/features/reporting/workstyle/actions";
 import { INSTRUMENT_OF } from "@/features/instruments/align/reportData";
 
 /**
@@ -51,11 +52,12 @@ async function ownSubmitted(scope: AssessmentScope, ventureId: string | null) {
 }
 
 export async function shareScope(
-  scope: AssessmentScope,
+  scope: AssessmentScope | "workstyle",
   recipientUserId: string,
   hiddenItemIds: readonly string[] = [],
   ventureId: string | null = null,
 ): Promise<Result> {
+  if (scope === "workstyle") { const result = await shareProductWorkstyle(recipientUserId, [...hiddenItemIds]); return result.ok ? {ok:true} : {ok:false,reason:"share_failed"}; }
   const unknown = hiddenItemIds.filter((itemId) => !getItemV22(itemId));
   if (unknown.length) return { ok: false, reason: "unknown_block", detail: unknown.join(", ") };
 
@@ -111,10 +113,11 @@ export async function shareScope(
  * Änderungen erst recht nicht.
  */
 export async function revokeScopeShare(
-  scope: AssessmentScope,
+  scope: AssessmentScope | "workstyle",
   recipientUserId: string,
   ventureId: string | null = null,
 ): Promise<Result> {
+  if (scope === "workstyle") { const result = await shareProductWorkstyle(recipientUserId, [], true); return result.ok ? {ok:true} : {ok:false,reason:"revoke_failed"}; }
   const { supabase, assessmentId, userId } = await ownSubmitted(scope, ventureId);
   if (!userId) return { ok: false, reason: "not_authenticated" };
   if (!assessmentId) return { ok: false, reason: "not_submitted" };

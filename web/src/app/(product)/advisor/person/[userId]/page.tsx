@@ -1,10 +1,21 @@
+import { getProductWorkstyle } from "@/features/reporting/workstyle/data";
+import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
-import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/notebookData";
-import { getAdvisorPersonAlignment, getAdvisorPersonView } from "@/features/advisor/personViewData";
-import { buildAdvisorSelfReport, hasUsableAlignment } from "@/features/advisor/advisorSelfReport";
+import {
+  getAdvisorFollowUpFor,
+  getAdvisorNoteFor,
+} from "@/features/advisor/notebookData";
+import {
+  getAdvisorPersonAlignment,
+  getAdvisorPersonView,
+} from "@/features/advisor/personViewData";
+import {
+  buildAdvisorSelfReport,
+  hasUsableAlignment,
+} from "@/features/advisor/advisorSelfReport";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { getAdvisorAlignmentV21 } from "@/features/instruments/v21/advisorAlignmentV21";
@@ -43,7 +54,8 @@ export default async function AdvisorPersonPage({
   const {
     data: { user },
   } = await getRequestUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/advisor/person/${userId}`)}`);
+  if (!user)
+    redirect(`/login?next=${encodeURIComponent(`/advisor/person/${userId}`)}`);
 
   // Sich selbst begleitet niemand. Ohne diese Zeile kaeme die eigene Person
   // hier durch - die Freigabe-Abfrage unten sieht auch die EIGENEN Zeilen, die
@@ -84,6 +96,7 @@ export default async function AdvisorPersonPage({
   const alignmentV21 = await getAdvisorAlignmentV21(userId);
   const hasLegacy = hasUsableAlignment(alignment);
   const alignViews = await getAdvisorAlignViews(userId);
+  const workstyleV04 = await getProductWorkstyle(client, userId);
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-10">
@@ -98,15 +111,23 @@ export default async function AdvisorPersonPage({
         {view.base?.displayName ?? t("unnamed")}
       </h1>
       {view.base?.headline ? (
-        <p className="mt-2 text-sm font-medium text-slate-700">{view.base.headline}</p>
+        <p className="mt-2 text-sm font-medium text-slate-700">
+          {view.base.headline}
+        </p>
       ) : null}
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+        {t("intro")}
+      </p>
 
       {view.base ? (
         <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("base")}</h2>
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("base")}
+          </h2>
           {view.base.bio ? (
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{view.base.bio}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">
+              {view.base.bio}
+            </p>
           ) : null}
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">
             {view.base.locationRegion ? (
@@ -114,7 +135,9 @@ export default async function AdvisorPersonPage({
                 <dt className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
                   {t("region")}
                 </dt>
-                <dd className="mt-1 text-sm text-slate-800">{view.base.locationRegion}</dd>
+                <dd className="mt-1 text-sm text-slate-800">
+                  {view.base.locationRegion}
+                </dd>
               </div>
             ) : null}
             {view.base.expertise.length > 0 ? (
@@ -122,7 +145,9 @@ export default async function AdvisorPersonPage({
                 <dt className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
                   {t("expertise")}
                 </dt>
-                <dd className="mt-1 text-sm text-slate-800">{view.base.expertise.join(" · ")}</dd>
+                <dd className="mt-1 text-sm text-slate-800">
+                  {view.base.expertise.join(" · ")}
+                </dd>
               </div>
             ) : null}
           </dl>
@@ -140,31 +165,46 @@ export default async function AdvisorPersonPage({
           Jetzt: die freigegebenen ALIGN-Ansichten hier oben, der v1-Bericht
           zugeklappt und datiert ganz unten.
           ---------------------------------------------------------------- */}
-      {alignViews.map((view) => (
-        <section key={view.scope} className="mt-8">
-          <h2 className="text-xl font-semibold text-slate-950">
-            {view.label}
-            {view.ventureName && (
-              <span className="ml-2 text-base font-normal text-slate-500">
-                · {view.ventureName}
-              </span>
-            )}
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
-          {/* Die Gueltigkeitsangabe kommt aus der Registratur und ist dort
+      {workstyleV04 && (
+        <section className="mt-8">
+          <h2 className="mb-5 text-xl font-semibold">Wie du arbeitest</h2>
+          <IndividualWorkstyle
+            profile={workstyleV04}
+            name={view.base?.displayName ?? "Founder"}
+          />
+        </section>
+      )}
+      {alignViews.map((view) => {
+        const content = (
+          <section key={view.scope} className="mt-8">
+            <h2 className="text-xl font-semibold text-slate-950">
+              {view.label}
+              {view.ventureName && (
+                <span className="ml-2 text-base font-normal text-slate-500">
+                  · {view.ventureName}
+                </span>
+              )}
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {tAlign("selfReportNote")}
+            </p>
+            {/* Die Gueltigkeitsangabe kommt aus der Registratur und ist dort
               nur auf Deutsch hinterlegt. Sie ist Inhalt des Instruments, kein
               Oberflaechentext - sie hier zu uebersetzen hiesse, sie zu
               verdoppeln. */}
-          <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
-          <p className="mt-1 text-sm text-slate-500">
-            {tAlign("visible", { count: view.visible.count, of: view.visible.of })}
-          </p>
+            <p className="mt-1 text-sm text-slate-500">{view.validity}</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {tAlign("visible", {
+                count: view.visible.count,
+                of: view.visible.of,
+              })}
+            </p>
 
-          <div className="mt-6">
-            <WorkMap sections={view.sections} />
-          </div>
+            <div className="mt-6">
+              <WorkMap sections={view.sections} />
+            </div>
 
-          {/* DIESELBE BESCHREIBUNG - UND NUR UEBER DAS FREIGEGEBENE.
+            {/* DIESELBE BESCHREIBUNG - UND NUR UEBER DAS FREIGEGEBENE.
 
               `view.sections` enthaelt genau die Antworten, die diese Person
               freigegeben hat; nicht freigegebene kommen gar nicht erst mit
@@ -172,16 +212,24 @@ export default async function AdvisorPersonPage({
               Beschreibung entsteht aus derselben Liste - es gibt also keinen
               Weg, ueber eine Zusammenfassung mehr zu erfahren als ueber die
               Antworten selbst. */}
-          <div className="mt-6">
-            <WorkProfileSynthesisView sections={view.sections} heading="h3" />
-          </div>
+            <div className="mt-6">
+              <WorkProfileSynthesisView sections={view.sections} heading="h3" />
+            </div>
 
-          <div className="mt-6">
-            <ReportViewV21 sections={view.sections} />
-          </div>
-        </section>
-      ))}
-
+            <div className="mt-6">
+              <ReportViewV21 sections={view.sections} />
+            </div>
+          </section>
+        );
+        return view.scope === "founder_profile" ? (
+          <details key={view.scope} className="mt-6">
+            <summary>Früheres Arbeitsprofil – historischer Stand</summary>
+            {content}
+          </details>
+        ) : (
+          content
+        );
+      })}
       {/* KEINE FREIGABE - NEUTRAL GESAGT, UND NUR NEBEN DEM ALTBESTAND.
 
           Die Regel dieser Seite gilt weiter: Was nicht freigegeben ist,
@@ -191,16 +239,24 @@ export default async function AdvisorPersonPage({
           arbeitet" aussieht - und genau das hat ihn zum aktuellen Stand
           gemacht. Der Satz sagt nichts ueber den Menschen: nicht, ob das
           Profil ausgefuellt ist, und keine Aufforderung, danach zu fragen. */}
-      {hasLegacy && !alignViews.some((entry) => entry.scope === "founder_profile") ? (
+      {hasLegacy &&
+      !workstyleV04 &&
+      !alignViews.some((entry) => entry.scope === "founder_profile") ? (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-slate-900">{t("workProfileTitle")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600">{t("workProfileNotShared")}</p>
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("workProfileTitle")}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            {t("workProfileNotShared")}
+          </p>
         </section>
       ) : null}
 
       {view.capability && view.capability.length > 0 ? (
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("capability")}</h2>
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("capability")}
+          </h2>
           <ul className="mt-4 divide-y divide-slate-200 border-y border-slate-200">
             {view.capability.map((entry) => (
               <li
@@ -215,7 +271,9 @@ export default async function AdvisorPersonPage({
                     heraus, und hier steht dann eben nichts. */}
                 <span className="flex flex-wrap gap-x-3 text-slate-600">
                   {entry.applicationLevel !== null ? (
-                    <span>{tCapability(`levels.${entry.applicationLevel}`)}</span>
+                    <span>
+                      {tCapability(`levels.${entry.applicationLevel}`)}
+                    </span>
                   ) : null}
                   {entry.ownershipWish ? (
                     <span className="text-slate-800">
@@ -231,17 +289,24 @@ export default async function AdvisorPersonPage({
 
       {view.strengths && view.strengths.length > 0 ? (
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("strengths")}</h2>
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("strengths")}
+          </h2>
           <ul className="mt-4 space-y-3">
             {view.strengths.map((strength) => (
               <li key={strength.statement} className="text-sm leading-6">
-                <span className="font-medium text-slate-900">{strength.statement}</span>
+                <span className="font-medium text-slate-900">
+                  {strength.statement}
+                </span>
                 {strength.selfFrequency ? (
                   <span className="ml-2 text-xs text-slate-500">
-                    {t("self")}: {tCapability(`strengths.frequencies.${strength.selfFrequency}`)}
+                    {t("self")}:{" "}
+                    {tCapability(
+                      `strengths.frequencies.${strength.selfFrequency}`,
+                    )}
                     {strength.reflectedFrequency && strength.reflectedWho
                       ? ` · ${tCapability(`strengths.groups.${strength.reflectedWho}`)}: ${tCapability(
-                          `strengths.frequencies.${strength.reflectedFrequency}`
+                          `strengths.frequencies.${strength.reflectedFrequency}`,
                         )}`
                       : ""}
                   </span>
@@ -254,10 +319,15 @@ export default async function AdvisorPersonPage({
 
       {view.direction && view.direction.length > 0 ? (
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("direction")}</h2>
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("direction")}
+          </h2>
           <ul className="mt-4 space-y-2">
             {view.direction.map((entry) => (
-              <li key={entry.statement} className="text-sm leading-6 text-slate-900">
+              <li
+                key={entry.statement}
+                className="text-sm leading-6 text-slate-900"
+              >
                 <span className="text-xs uppercase tracking-[.12em] text-slate-500">
                   {tDirection(entry.facet)}
                 </span>
@@ -272,7 +342,9 @@ export default async function AdvisorPersonPage({
           derselbe Satz; hier ist er wichtiger, weil ihn jemand liest, der
           ueber Menschen entscheidet. */}
       <section className="mt-8 rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">
-        <h2 className="text-sm font-semibold text-slate-900">{tNote("title")}</h2>
+        <h2 className="text-sm font-semibold text-slate-900">
+          {tNote("title")}
+        </h2>
         <ul className="mt-3 space-y-2">
           <li>{tNote("selfReport")}</li>
           <li>{tNote("notATest")}</li>
@@ -286,7 +358,9 @@ export default async function AdvisorPersonPage({
           <h2 className="text-xl font-semibold text-slate-950">
             {tAlign("newVersionTitle")}
           </h2>
-          <p className="mt-1 text-sm text-slate-600">{tAlign("selfReportNote")}</p>
+          <p className="mt-1 text-sm text-slate-600">
+            {tAlign("selfReportNote")}
+          </p>
           <p className="mt-1 text-sm text-slate-500">
             {tAlign("visible", {
               count: alignmentV21.visible.count,
@@ -316,7 +390,12 @@ export default async function AdvisorPersonPage({
       {hasLegacy && alignment ? (
         <details className="group mt-10 rounded-2xl border border-slate-200 bg-white/70">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 [&::-webkit-details-marker]:hidden">
-            <span aria-hidden className="text-slate-400 transition-transform group-open:rotate-90 motion-reduce:transition-none">▸</span>
+            <span
+              aria-hidden
+              className="text-slate-400 transition-transform group-open:rotate-90 motion-reduce:transition-none"
+            >
+              ▸
+            </span>
             <span>
               {alignment.updatedAt
                 ? t("legacyTitle", {
@@ -330,7 +409,9 @@ export default async function AdvisorPersonPage({
             </span>
           </summary>
           <div className="px-4 pb-5">
-            <p className="max-w-3xl text-sm leading-6 text-slate-600">{t("legacyText")}</p>
+            <p className="max-w-3xl text-sm leading-6 text-slate-600">
+              {t("legacyText")}
+            </p>
             <div className="mt-4">
               <SelfReportView
                 report={buildAdvisorSelfReport({

@@ -384,13 +384,10 @@ test("dieselbe Ableitung auf allen drei Oberflaechen", () => {
   const advisor = codeOnly(join("src", "app", "(product)", "advisor", "person", "[userId]", "page.tsx"));
   assert.match(advisor, /<WorkProfileSynthesisView sections=\{view\.sections\}/);
 
-  // Und sie steht offen, nicht im Aufklapper: Auf dem eigenen Profil kommt
-  // sie vor dem `ProfileDetails` mit den Rohantworten.
+  // v0.4 is now primary; the old synthesis remains deliberately historical.
   const eigen = codeOnly(join("src", "app", "me", "profile", "page.tsx"));
-  assert.ok(
-    eigen.indexOf("<WorkProfileSynthesisView") < eigen.indexOf("<ProfileDetails\n                    summary={t(\"workProfile.detailsSummary\")"),
-    "die Beschreibung steckt im Aufklapper",
-  );
+  assert.ok(eigen.indexOf("<IndividualWorkstyle") < eigen.indexOf("<WorkProfileSynthesisView"));
+  assert.match(eigen, /Früheres Arbeitsprofil – historischer Stand/);
 });
 
 test("der alte Satz „noch keine Auswertung\" ist weg", () => {

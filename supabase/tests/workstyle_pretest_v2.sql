@@ -99,6 +99,12 @@ insert into public.alignment_answers(assessment_id,block_id,answer_format,value)
 update public.assessments set submitted_at=now() where venture_id='e8521000-0000-4000-8000-000000000001';
 insert into public.alignment_shares(assessment_id,recipient_user_id) select id,'e8520000-0000-4000-8000-000000000003' from public.assessments where user_id in (select person from v2_ids);
 select set_config('request.jwt.claims','{"sub":"e8520000-0000-4000-8000-000000000003","role":"authenticated"}',true);
+reset role;
+-- Reporting now requires explicit consent for the exact advisor group, also for historical inputs.
+insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,status,activated_at) values('e8523000-0000-4000-8000-000000000001','e8520000-0000-4000-8000-000000000003','e8520000-0000-4000-8000-000000000003','active',now());
+insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) values
+ ('e8523000-0000-4000-8000-000000000001','e8520000-0000-4000-8000-000000000001','approved',now()),
+ ('e8523000-0000-4000-8000-000000000001','e8520000-0000-4000-8000-000000000002','approved',now());
 set local role authenticated;
 select pg_temp.check_v2(public.get_workstyle_team_inputs('e8521000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'mixed v1/v2 denied despite all shares; no fallback to old v1');
 reset role;

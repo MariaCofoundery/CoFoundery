@@ -161,7 +161,8 @@ select is(public.get_problem_workspace_development((select id from ids where key
 select is((select count(*)::int from public.founder_teams where id=(select id from ids where key='newventure')),0,'Workspace grant does not extend founder-team RLS');
 reset role;
 insert into public.founder_team_members(team_id,user_id) values((select id from ids where key='oldsolo'),'77000000-0000-4000-8000-000000000002'),((select id from ids where key='oldsolo'),'77000000-0000-4000-8000-000000000003');
-select throws_ok($q$insert into public.founder_team_members(team_id,user_id) values((select id from ids where key='oldsolo'),'77000000-0000-4000-8000-000000000004')$q$,'23514',null,'Existing three-founder limit unchanged');
+insert into public.founder_team_members(team_id,user_id) values((select id from ids where key='oldsolo'),'77000000-0000-4000-8000-000000000004');
+select throws_ok($q$insert into public.founder_team_members(team_id,user_id) values((select id from ids where key='oldsolo'),'77000000-0000-4000-8000-000000000005')$q$,'23514',null,'Four-founder limit is enforced for existing workspace ventures');
 reset role;
 select set_config('request.jwt.claim.sub','77000000-0000-4000-8000-000000000003',true);
 set local role authenticated;

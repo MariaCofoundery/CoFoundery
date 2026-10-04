@@ -1,0 +1,130 @@
+.ws-report {
+  color: #182235;
+  overflow-wrap: anywhere;
+}
+.ws-report section {
+  scroll-margin-top: 2rem;
+}
+.ws-token {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 12px/1 sans-serif;
+  border: 2px solid #27344c;
+  background: #fff;
+  color: #182235;
+  flex: none;
+}
+.ws-token-0 {
+  border-radius: 50%;
+  background: #e6ddfc;
+}
+.ws-token-1 {
+  border-radius: 5px;
+  background: #d7efed;
+}
+.ws-token-2 {
+  border-radius: 50%;
+  border-style: dashed;
+  background: #f8ebd7;
+}
+.ws-token-3 {
+  border-radius: 5px;
+  border-style: double;
+  border-width: 4px;
+  background: #eee;
+}
+.ws-matrix {
+  display: grid;
+  gap: 1rem;
+}
+.ws-component {
+  border: 1px solid #d5dce5;
+  border-radius: 16px;
+  padding: 1rem;
+  background: #fff;
+}
+.ws-component-members {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.ws-component-cell {
+  border: 1px solid #e1e5ec;
+  border-radius: 10px;
+  padding: 0.7rem;
+  min-width: 0;
+}
+@media (min-width: 800px) {
+  .ws-component-members {
+    grid-template-columns: repeat(var(--members, 2), minmax(0, 1fr));
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  .ws-report {
+    font-size: 10pt;
+    max-width: none !important;
+    padding: 0 !important;
+    color: #111;
+  }
+  .ws-report .ws-no-print {
+    display: none !important;
+  }
+  .ws-report details > summary {
+    display: none;
+  }
+  .ws-report details > *:not(summary) {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+  .ws-lane,
+  .ws-component,
+  .ws-text-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .ws-area {
+    break-inside: auto;
+  }
+  /* Normal block flow lets long report sections paginate; browser grid fragmentation
+     otherwise leaves almost empty pages before a row of two long interpretation cards. */
+  .ws-report .grid {
+    display: block;
+  }
+  .ws-report .grid > * + * {
+    margin-top: 4mm;
+  }
+  .ws-report li {
+    break-inside: avoid;
+  }
+  .ws-report p {
+    orphans: 3;
+    widows: 3;
+  }
+  .ws-report h2,
+  .ws-report h3,
+  .ws-report h4 {
+    break-after: avoid;
+  }
+  .ws-report .ws-component-members {
+    grid-template-columns: repeat(var(--members, 2), minmax(0, 1fr));
+  }
+  .ws-report .ws-token {
+    background: white !important;
+    color: black !important;
+    border-color: black !important;
+  }
+  .ws-report a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .ws-report * {
+    box-shadow: none !important;
+  }
+}

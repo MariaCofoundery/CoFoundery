@@ -18,7 +18,7 @@ import type { AssessmentScope } from "@/features/instruments/align/registries";
 export type ShareRecipient = { userId: string; label: string; sharedAt: string | null };
 
 type Props = {
-  scope: AssessmentScope;
+  scope: AssessmentScope | "workstyle";
   ventureId: string | null;
   recipients: ShareRecipient[];
   items: { itemId: string; prompt: string }[];

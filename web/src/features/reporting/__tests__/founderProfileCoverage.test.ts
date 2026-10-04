@@ -215,3 +215,11 @@ test("die Zählung je Herkunftsart geht auf", () => {
   assert.equal(coverage.roles.bySourcing.component, 1);
   assert.equal(coverage.roles.bySourcing.unclassified, 0);
 });
+
+test("beitragen ist auch bei viel Erfahrung kein Übernahmewunsch", () => {
+  const coverage = buildFounderProfileCoverage(
+    [entry("customer_discovery", 5, "contribute")], withSourcing, families
+  );
+  assert.deepEqual(coverage.roles.covered, []);
+  assert.deepEqual(coverage.roles.spokenNotOwned, ["customer_discovery"]);
+});

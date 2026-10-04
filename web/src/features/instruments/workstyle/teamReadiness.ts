@@ -12,7 +12,7 @@ export type WorkstyleTeamInputs = { status: "ready"; team_id: string; team_conte
  * An unavailable/hidden required answer cannot turn a partial read into a complete report.
  */
 export function checkWorkstyleTeamReadiness(input: WorkstyleTeamInputs): WorkstyleTeamInputs {
-  if (input.status !== "ready" || input.people.length !== 2 || new Set(input.people.map(person => person.person_id)).size !== 2) return { status: "not_ready" };
+  if (input.status !== "ready" || input.people.length < 2 || new Set(input.people.map(person => person.person_id)).size !== input.people.length) return { status: "not_ready" };
   const first = input.people[0];
   for (const person of input.people) {
     let registry;

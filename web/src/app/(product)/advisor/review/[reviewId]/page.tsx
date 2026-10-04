@@ -64,6 +64,7 @@ export default async function AdvisorTeamReviewPage({
 
   if (!detail) notFound();
 
+  const {data: workstyleTeams} = await client.rpc("get_workstyle_report_teams");
   const names = detail.group?.included.map((person) => person.name) ?? [];
 
   return (
@@ -79,6 +80,8 @@ export default async function AdvisorTeamReviewPage({
         {names.length > 0 ? names.join(", ") : t("untitled")}
       </h1>
       <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+
+      {workstyleTeams?.length > 0 && <section className="mt-6 rounded-xl border border-slate-200 p-4"><h2 className="font-semibold">Freigegebene Founder-Teams</h2>{workstyleTeams.map((team: {team_id:string;team_name:string|null})=><Link key={team.team_id} className="mt-2 block underline" href={`/teams/${team.team_id}/workstyle`}>{team.team_name ?? "Vorhaben"} · Euer Zusammenspiel</Link>)}</section>}
 
       {/* ------------------------------------------------------------------
           Die Rollenlage.

@@ -41,6 +41,7 @@ const PILOT = join("src", "app", "(product)", "founder-alignment", "pilot");
  * ist der Zweck.
  */
 const ERLAUBT = [
+  join("src", "features", "reporting", "workstyle"),
   join("src", "app", "(product)", "founder-alignment", "versionen") + sep,
   // Das Dashboard: Hinweis auf die neue Fassung und der Archivkasten. Es
   // FUEHRT dorthin, es enthaelt den Fragebogen nicht - ein eigener Test unten

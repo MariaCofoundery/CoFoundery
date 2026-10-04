@@ -50,7 +50,7 @@ export type CoverageFamily = {
 };
 
 /**
- * Welche Rollen jemand abdeckt - nach Faltin.
+ * Welche interne Verantwortung jemand übernehmen möchte.
  *
  * GEWUENSCHT AM 27.09.2026: "Ich haette das gerne auch im Gesamtbild, dass
  * drinsteht, welche Rollen ich im Prinzip schon abdecke [...] und vor allem
@@ -62,7 +62,7 @@ export type CoverageFamily = {
  *   Der Bereich GEHOERT INS TEAM (`internal_only`). Was einkaufbar ist,
  *   braucht niemanden im Team - dort ist eine Luecke eine Bestellung.
  *
- *   Die Person WILL IHN VERANTWORTEN (`own` oder `contribute`). Etwas zu
+ *   Die Person WILL IHN VERANTWORTEN (`own`). Etwas zu
  *   koennen ist nicht dasselbe wie es zu uebernehmen: Eine hohe Stufe mit
  *   `prefer_other` ist ein ausdruecklich gueltiger Zustand.
  *
@@ -128,10 +128,10 @@ export function buildFounderProfileCoverage(
       };
     });
 
-  // Verantwortung heisst hier `own` oder `contribute`. `grow_into` zaehlt
+  // Verantwortung heisst hier `own`. `grow_into` zaehlt
   // bewusst nicht mit: "da will ich hineinwachsen" ist eine Absicht und noch
   // keine abgedeckte Rolle.
-  const wantsIt = (wish: string | null) => wish === "own" || wish === "contribute";
+  const wantsIt = (wish: string | null) => wish === "own";
   const sourcingOf = new Map(areas.map((area) => [area.area_id, area.sourcing ?? "unclassified"]));
 
   const covered: string[] = [];

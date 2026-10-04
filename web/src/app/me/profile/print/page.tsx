@@ -1,3 +1,4 @@
+import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
@@ -143,6 +144,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
   const {
     core,
     report,
+    workstyleV04,
     workProfile,
     vocabulary,
     orderedEntries,
@@ -275,8 +277,9 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
       ) : null}
 
       {/* 2 — Wie du arbeitest. */}
-      {workProfile ? (
-        <Abschnitt title={t("sections.work")}>
+      {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle profile={workstyleV04} full={voll} /></Abschnitt> : null}
+      {voll && workProfile ? (
+        <Abschnitt title="Früheres Arbeitsprofil – historischer Stand">
           <p className="max-w-3xl text-sm leading-6 text-slate-600">{t("workProfile.note")}</p>
           <p className="mt-1 text-sm text-slate-500">
             {t("workProfile.answered", { answered: workProfile.answered, of: workProfile.of })}

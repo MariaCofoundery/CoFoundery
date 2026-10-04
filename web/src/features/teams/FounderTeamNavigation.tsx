@@ -33,6 +33,7 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
         {labels.context}
       </p>
       <nav aria-label={labels.ariaLabel} className="mt-2 flex flex-wrap gap-1">
+        <Link className="rounded-full px-3 py-2 text-sm font-medium text-slate-700" href={`/teams/${encodeURIComponent(teamId)}/workstyle`}>Euer Zusammenspiel</Link>
         {items.map((item) => (
           <Link
             key={item.key}
