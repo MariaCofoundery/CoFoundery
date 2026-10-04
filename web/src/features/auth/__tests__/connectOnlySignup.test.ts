@@ -98,7 +98,10 @@ test("existing Founder and Advisor product entry remains unchanged", () => {
 test("Connect-only navigation exposes Connect and Account without Founder or Advisor links", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
   assert.match(shell, /isConnectOnly = hasConnect && !hasFounder && !hasAdvisor/);
-  assert.match(shell, /const alignItem: NavigationItem\[\] = isConnectOnly \? \[\]/);
+  // Seit Phase 9.4A gibt es zwei Baeume statt ALIGN - beide sind fuer
+  // Connect-only leer.
+  assert.match(shell, /const founderItems: NavigationItem\[\] = isConnectOnly \|\| !isFounderView \? \[\]/);
+  assert.match(shell, /const advisorItems: NavigationItem\[\] = isConnectOnly \|\| isFounderView \|\| !hasAdvisor \? \[\]/);
   // Die Form hat sich geaendert, die Zusage nicht: Find haengt an hasFounder.
   // Seit dem aufklappbaren Menue auf dem Telefon steht die Bedingung an der
   // Liste und nicht mehr im JSX - es gibt zwei Ansichten und eine Liste.

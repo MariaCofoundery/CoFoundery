@@ -28,8 +28,10 @@ const versionen = lies(
   "src", "app", "(product)", "founder-alignment", "versionen", "page.tsx");
 
 test("das aktuelle Arbeitsprofil steht unabhängig von Legacy genau einmal oben", () => {
-  assert.equal(dashboard.split("<AlignCard").length - 1, 1);
-  assert.ok(dashboard.indexOf("<AlignCard") < dashboard.indexOf('id="dashboard-legacy-title"'));
+  // Seit Phase 9.4A steht die Arbeitsweise unter "Über dich" - genau einmal,
+  // und vor den frueheren Auswertungen.
+  assert.equal(dashboard.split("<AlignWorkstyleStatus").length - 1, 1);
+  assert.ok(dashboard.indexOf("<AlignWorkstyleStatus") < dashboard.indexOf('id="dashboard-legacy-title"'));
   assert.ok(!dashboard.includes("<AlignAnnounce"));
   assert.ok(!dashboard.includes("<TransitionAnnounce"));
   assert.match(dashboard, /hasSubmittedBase && <Link href="\/me\/report"/);
@@ -47,8 +49,11 @@ test("der Kasten zählt Schritte und nicht Fragen", () => {
   // Fehler in einer Zeile: Die 43 zählte die zurückgezogene S01 mit, und das
   // UX-Review Teil 2, Abschnitt 14, will die Einzelfragenzahl gar nicht mehr
   // sehen.
-  assert.match(karte, /Noch nicht begonnen/);
-  assert.match(karte, /t\("ventureSteps", \{ count: schritte\("venture_alignment"\)/);
+  // Seit Phase 9.4A zeigt die Karte gar keine Zahl mehr - nur Status und eine
+  // Aktion. "Noch nicht begonnen" kommt aus den Messages statt von Hand.
+  assert.match(karte, /t\("notStarted"\)/);
+  const de = JSON.parse(lies("messages", "de", "dashboard.json")) as { workProfile: { notStarted: string } };
+  assert.equal(de.workProfile.notStarted, "Noch nicht begonnen");
   assert.ok(!/\$\{state\.profile\.of\}/.test(karte), "die Fragenzahl steht wieder da");
   assert.ok(!/\$\{venture\.of\}/.test(karte), "die Fragenzahl steht wieder da");
 

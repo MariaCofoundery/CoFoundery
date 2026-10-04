@@ -47,7 +47,7 @@ const hooks = registerHooks({
   resolve(s,c,next) { return mocks[s] ? {url: `data:text/javascript,${encodeURIComponent(mocks[s])}`, shortCircuit:true} : next(s,c); },
   load(s,c,next) { return s.endsWith("/AlignCard.tsx") ? { format: "module", shortCircuit:true, source: ts.transpileModule(readFileSync(fileURLToPath(s),"utf8"), {compilerOptions: {module:ts.ModuleKind.ESNext, jsx:ts.JsxEmit.ReactJSX, target:ts.ScriptTarget.ES2022}}).outputText } : next(s,c); },
 });
-const { AlignCard } = await import("@/features/instruments/align/AlignCard");
+const { AlignWorkstyleStatus } = await import("@/features/instruments/align/AlignCard");
 const { getAlignDashboardState } = await import("@/features/instruments/align/dashboardData");
 hooks.deregister();
 function assessment(id: string, instrument = "founder-workstyle-pretest-8-5a-v3", submitted: string | null = null, created = "2026-10-01"): Row {
@@ -62,7 +62,7 @@ for (const locale of ["de", "en"]) for (const state of ["new", "legacy", "starte
       fixture.answers.push({assessment_id:"current", block_id:"P01"});
     }
     const data = await getAlignDashboardState("own"); assert.equal(data.show,true);
-    const html = renderToStaticMarkup(await AlignCard({state:data}));
+    const html = renderToStaticMarkup(await AlignWorkstyleStatus({state:data}));
     assert.ok(html.includes(dictionaries[locale].workProfile.actions[state]));
     assert.ok(html.includes(`href="${founderWorkProfileHref(state)}"`));
     assert.equal(html.includes(dictionaries[locale].workProfile.migrationTitle), state === "legacy");
@@ -90,7 +90,7 @@ test("values-only legacy submission and another user's base do not trigger migra
 for (const table of ["assessments", "alignment_answers"]) test(`failed ${table} read does not invent new-user state`, async () => {
   fixture.fail=table; fixture.assessments=[assessment("current")]; fixture.answers=[];
   const data = await getAlignDashboardState("own"); assert.equal(data.show,false);
-  const html=renderToStaticMarkup(await AlignCard({state:data}));
+  const html=renderToStaticMarkup(await AlignWorkstyleStatus({state:data}));
   assert.ok(html.includes(dictionaries[fixture.locale].workProfile.unavailable)); assert.doesNotMatch(html, /href=/); fixture.fail="";
 });
 test("completion has precedence over answer count", () => {

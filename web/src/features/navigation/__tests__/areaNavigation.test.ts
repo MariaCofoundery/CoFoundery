@@ -22,9 +22,22 @@ test("the bar carries areas, and only areas", () => {
   // ab 1024 Pixeln und das aufklappbare Menue darunter. Beide lesen
   // `navigationItems` - deshalb prueft dieser Test die Liste und nicht mehr
   // das JSX einer der beiden Ansichten.
-  for (const area of ["areaAlign", "areaFind", "areaConnect"]) {
+  // Seit Phase 9.4A: Founder-Baum (Start, Profil, Teams & Verbindungen, Find,
+  // Connect) und Advisor-Baum (Start, Personen & Gruppen, Teams, Intake).
+  for (const area of [
+    "areaStart",
+    "areaProfile",
+    "areaTeams",
+    "areaFind",
+    "areaConnect",
+    "advisorPeople",
+    "advisorTeams",
+    "advisorIntake",
+  ]) {
     assert.match(shell, new RegExp(`label: t\\("${area}"\\)`), `${area} fehlt als Bereich`);
   }
+  // Kein globales Align mehr.
+  assert.doesNotMatch(shell, /t\("areaAlign"\)/);
 
   // In der zusammengesetzten Liste stehen nur benannte Eintraege. Stuende dort
   // eine Adresse, waere sie in genau einer der beiden Ansichten sichtbar.
@@ -44,15 +57,17 @@ test("the bar carries areas, and only areas", () => {
   const bar = shell.slice(barStart, barEnd);
   assert.match(bar, /navigationItems\.map/);
   assert.doesNotMatch(bar, /href="\/profile"/, "das Profil ist kein Bereich");
-  assert.doesNotMatch(bar, /href="\/connections"/, "Verbindungen ist eine Seite in Align");
+  assert.doesNotMatch(bar, /href="\/connections"/, "Verbindungen ist ein Bereichseintrag, kein Extra-Link");
 });
 
-test("the three areas are named as one system", () => {
+test("the areas are named as one system", () => {
   for (const locale of ["de", "en"]) {
     const navigation = readJson(`messages/${locale}/navigation.json`);
-    assert.equal(navigation.areaAlign, "Align");
     assert.equal(navigation.areaFind, "Find");
     assert.equal(navigation.areaConnect, "Connect");
+    assert.equal(navigation.areaStart, "Start");
+    // Align ist als Sammelbereich entfallen (Phase 9.4A).
+    assert.equal(navigation.areaAlign, undefined);
   }
 });
 
@@ -95,18 +110,20 @@ test("being somewhere is announced, not only coloured", () => {
 });
 
 test("nothing was stranded by taking it out of the bar", () => {
-  // Verbindungen: vom Dashboard verlinkt, und Align markiert sich dort.
+  // Verbindungen: vom Dashboard verlinkt, und "Teams & Verbindungen" markiert
+  // sich dort.
   assert.match(source("src/app/(product)/dashboard/page.tsx"), /href="\/connections"/);
   assert.match(source(SHELL), /currentPathname === "\/connections"/);
 
-  // Founder-Verbindungen des Advisors: bleibt in der Leiste, weil das
-  // Advisor-Dashboard nicht dorthin verlinkt.
+  // Die begleiteten Teams des Advisors: stehen in der Leiste, weil das
+  // Advisor-Dashboard nicht dorthin verlinkt. Seit Phase 9.4A als Eintrag
+  // "Teams" im Advisor-Baum statt als Extra-Link.
   assert.doesNotMatch(
     source("src/app/(product)/advisor/dashboard/page.tsx"),
     /href="\/advisor\/report/,
     "sobald das Dashboard verlinkt, darf der Eintrag aus der Leiste"
   );
-  assert.match(source(SHELL), /t\("advisorConnections"\)/);
+  assert.match(source(SHELL), /href: resolvedMatchingHref,\s*label: t\("advisorTeams"\)/);
 });
 
 test("the routes did not move with the labels", () => {
@@ -145,14 +162,18 @@ test("the language switch is a footnote, not a button pair", () => {
   }
 });
 
-test("the connections are reachable from the top of Align", () => {
+test("the connections are reachable near the top of the dashboard", () => {
+  // GEAENDERT IN PHASE 9.4A: Der Kopfbereich traegt keine drei Wege mehr. Die
+  // Teams und Verbindungen sind der erste Inhaltsbereich nach dem, was
+  // ansteht - und ein eigener Bereich in der Leiste.
   const dashboard = source("src/app/(product)/dashboard/page.tsx");
-  const heroAt = dashboard.indexOf("data-dashboard-hero");
-  const linkAt = dashboard.indexOf('href="/connections"');
-  const quoteAt = dashboard.indexOf("hero.quoteEyebrow");
-  assert.ok(heroAt > -1 && linkAt > heroAt, "der Weg steht im Kopfbereich");
-  assert.ok(linkAt < quoteAt, "und noch vor dem Zitat, nicht darunter");
-  assert.match(dashboard, /hero\.heroConnectionsCount/, "mit der Zahl, nicht nur als Wort");
+  const tasksAt = dashboard.indexOf('id="dashboard-block-tasks"');
+  const teamsAt = dashboard.indexOf('id="dashboard-block-connections"');
+  const linkAt = dashboard.indexOf('href="/connections"', teamsAt);
+  const profileAt = dashboard.indexOf('id="dashboard-block-profile"');
+  assert.ok(tasksAt > -1 && teamsAt > tasksAt, "Teams folgen direkt auf das, was ansteht");
+  assert.ok(linkAt > teamsAt && linkAt < profileAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
+  assert.match(source(SHELL), /href: "\/connections",\s*label: t\("areaTeams"\)/);
 });
 
 test("auch Profil leuchtet auf, wenn man dort ist", () => {

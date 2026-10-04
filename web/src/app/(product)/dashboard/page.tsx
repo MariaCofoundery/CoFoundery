@@ -4,10 +4,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
-import { DashboardHeroConstellation } from "@/features/dashboard/DashboardHeroConstellation";
-import { DashboardJourneyLine } from "@/features/dashboard/DashboardJourneyLine";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
-import { DashboardSpotlight } from "@/features/dashboard/DashboardSpotlight";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
@@ -17,8 +14,10 @@ import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDa
 import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
 import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
+  resolveDashboardPrimaryAction,
   resolveDiscoveryFoundationState,
 } from "@/features/dashboard/founderDashboardV2";
+import { founderWorkProfileHref } from "@/features/dashboard/founderWorkProfileState";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { signOutAllSessionsAction } from "@/app/(product)/dashboard/actions";
@@ -41,10 +40,13 @@ import {
 } from "@/features/onboarding/invitationFlow";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
-import { getActiveOwnConnectCounts } from "@/features/connect/connectData";
 import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
 import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
-import { AlignCard } from "@/features/instruments/align/AlignCard";
+import {
+  AlignVentureActions,
+  AlignWorkstyleStatus,
+  alignWorkProfileState,
+} from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 
@@ -91,10 +93,6 @@ const REPORT_CTA_CLASS =
   "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 const UTILITY_CTA_CLASS =
   "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
-const PRIMARY_SURFACE_CLASS =
-  "dashboard-card rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_12px_30px_rgba(15,23,42,0.04)]";
-const SECONDARY_SURFACE_CLASS =
-  "dashboard-card rounded-2xl border border-slate-200/80 bg-slate-50/70 shadow-[0_10px_24px_rgba(15,23,42,0.035)]";
 function staggerStyle(delayMs: number) {
   return {
     animationDelay: `${delayMs}ms`,
@@ -134,7 +132,6 @@ export default async function DashboardPage({
     founderTeams,
     discoveryProfile,
     assessmentProgressResult,
-    connectCounts,
   ] =
     await Promise.all([
       getLatestSelfAlignmentReport(),
@@ -163,9 +160,6 @@ export default async function DashboardPage({
         .in("module", ["base", "values"])
         .eq("instrument_id", CURRENT_INSTRUMENT_ID)
         .order("created_at", { ascending: false }),
-      // Haengt von nichts hier ab und lief trotzdem hinterher - eine
-      // Netzwerkrunde extra auf der meistbesuchten Seite.
-      getActiveOwnConnectCounts(supabase, user.id).catch(() => ({ seeking: 0, offering: 0 })),
     ]);
 
   if (!roleViews.hasFounder) {
@@ -308,15 +302,19 @@ export default async function DashboardPage({
   ).map((task) =>
     presentDashboardTask(task, t, setupT)
   );
-  const collaborationSpotlightHref = founderTeams[0]?.id
-    ? `/teams/${encodeURIComponent(founderTeams[0].id)}#collaboration-lab`
-    : "/connections";
   const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
     ? null
     : profileData?.avatar_url?.trim() || null;
-  const quoteOfTheDay = getQuoteOfTheDay(t);
+  // Hoechstens eine Hauptaktion; alles, was andere betrifft, steht unter
+  // "Was gerade ansteht". Ist das Arbeitsprofil nicht lesbar, keine Aktion.
+  const workProfileState = alignState.show ? alignWorkProfileState(alignState) : "completed";
+  const primaryAction = resolveDashboardPrimaryAction({ needsOnboarding, workProfileState });
+  const primaryActionHref =
+    primaryAction === "complete_profile" ? "#dashboard-block-profile-data" : founderWorkProfileHref(workProfileState);
+  const hasHistory =
+    readyReports.length > 0 || hasSubmittedBase || alignState.knowsPrevious || versionState.next.started;
 
   const selfReportDebug = selfReport
     ? {
@@ -338,7 +336,7 @@ export default async function DashboardPage({
     createdAt: run.created_at,
   }));
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 md:px-10 xl:px-12">
+    <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-10 md:px-10 xl:px-12">
       {contextualInvitation ? (
         <ProductNavigationOverride
           matchingHref={contextualMatchingHref}
@@ -346,17 +344,6 @@ export default async function DashboardPage({
           contextLabel={t("hero.contextLabel")}
         />
       ) : null}
-      <DashboardJourneyLine
-        label={t("sectionNavigation.label")}
-        sections={[
-          { id: "dashboard-block-tasks", label: t("sectionNavigation.tasks") },
-          { id: "dashboard-block-align", label: t("workProfile.title") },
-          { id: "dashboard-block-foundation", label: t("foundation.discovery.title") },
-          { id: "dashboard-block-connections", label: t("sectionNavigation.connections") },
-          { id: "dashboard-block-explore", label: t("sectionNavigation.explore") },
-          { id: "dashboard-block-outlook", label: t("sectionNavigation.outlook") },
-        ]}
-      />
 
       {params.error ? (
         <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -364,70 +351,44 @@ export default async function DashboardPage({
         </p>
       ) : null}
 
-      <section data-dashboard-hero className="relative isolate mb-10 lg:mb-12">
-        <div className="relative rounded-[32px]">
-          <DashboardHeroConstellation />
-          <div className="relative z-10">
-            <section className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:p-6" style={staggerStyle(40)}>
-              <div className="flex items-center gap-3.5">
-                <DashboardProfileAvatar displayName={displayName} avatarId={profileAvatarId} imageUrl={profileImageUrl} />
-                <div className="min-w-0 max-w-3xl">
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("hero.eyebrow")}</p>
-                  <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.15rem]">
-                    {t("hero.greeting", { name: displayName })}
-                  </h1>
-                  <Link href="/team-intake" className="inline-block min-h-11 py-3 text-sm underline">Team Context</Link>
-                </div>
-              </div>
+      {/* -----------------------------------------------------------------
+          PHASE 9.4A: VIER FRAGEN, VIER BEREICHE
+          -----------------------------------------------------------------
 
-              {/* Der schnelle Weg zu den Menschen. Die Verbindungen standen
-                  bisher weit unten in einem Abschnitt, den man erst
-                  hinunterscrollen musste - obwohl sie das sind, wofuer man
-                  hier ist. */}
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/connections"
-                  className="brand-here inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold transition"
-                >
-                  {t("hero.heroConnections")}
-                  <span className="rounded-full bg-white/70 px-2 py-0.5 text-xs font-medium">
-                    {t("hero.heroConnectionsCount", { count: founderTeams.length })}
-                  </span>
-                </Link>
-                <Link
-                  href="/discovery"
-                  className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-                >
-                  {t("hero.heroFind")}
-                </Link>
-                {/* Das Gesamtprofil ist auch ohne historischen Assessment-Report erreichbar. */}
-                <Link
-                  href="/me/profile"
-                  className="inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-violet-50 px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-100"
-                >
-                  {t("hero.heroOwnProfile")}
-                </Link>
-              </div>
+          1. Begruessung (hoechstens eine Hauptaktion)
+          2. Was wartet auf mich?          -> Was gerade ansteht
+          3. Woran arbeite ich mit wem?    -> Deine Teams & Verbindungen
+          4. Wo pflege ich mein Profil?    -> Über dich
+          Danach nur noch Eingeklapptes: fruehere Auswertungen und Konto.
 
-              <div className="mt-5">
-                <article className="rounded-2xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.07),rgba(255,255,255,0.94)_52%,rgba(124,58,237,0.04))] px-4 py-4">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/80 bg-white/85 text-slate-600"><QuoteIcon className="h-4 w-4" /></span>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{t("hero.quoteEyebrow")}</p>
-                      <p className="mt-1.5 text-sm leading-6 text-slate-700">„{quoteOfTheDay.text}“</p>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            </section>
+          Zitat, Ausblick, Karussell, Netzwerk-Box und die Abschnittsleiste
+          sind weg - sie standen gleichrangig neben dem, was ansteht, und
+          machten die Seite laenger, nicht klarer. Menschen suchen geht ueber
+          FIND in der Leiste, Connect hat dort seinen Zaehler. */}
+      <section data-dashboard-hero className="mb-8">
+        <div className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:p-6" style={staggerStyle(40)}>
+          <div className="flex items-center gap-3.5">
+            <DashboardProfileAvatar displayName={displayName} avatarId={profileAvatarId} imageUrl={profileImageUrl} />
+            <div className="min-w-0 max-w-3xl">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("hero.eyebrow")}</p>
+              <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.15rem]">
+                {t("hero.greeting", { name: displayName })}
+              </h1>
+            </div>
           </div>
+          {primaryAction ? (
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Link
+                href={primaryActionHref}
+                className="brand-here inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold transition"
+              >
+                {t(`hero.primary.${primaryAction}`)}
+              </Link>
+              <p className="text-sm leading-6 text-slate-600">{t(`hero.primaryText.${primaryAction}`)}</p>
+            </div>
+          ) : null}
         </div>
       </section>
-
-      {connectCounts.seeking + connectCounts.offering > 0 ? <section className="dashboard-fade-up mb-8 rounded-2xl border border-cyan-200/80 bg-cyan-50/55 p-5" aria-labelledby="dashboard-network-title">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[11px] uppercase tracking-[.2em] text-slate-500">{t("connect.eyebrow")}</p><h2 id="dashboard-network-title" className="mt-2 text-xl font-semibold">{t("connect.title")}</h2><p className="mt-1 text-sm text-slate-600">{t("connect.summary", { seeking: connectCounts.seeking, offering: connectCounts.offering })}</p></div><div className="flex flex-wrap gap-2"><Link href="/connect" className={UTILITY_CTA_CLASS}>{t("connect.open")}</Link><Link href="/connect/listings/new" className={UTILITY_CTA_CLASS}>{t("connect.create")}</Link></div></div>
-      </section> : null}
 
       <section
         id="dashboard-block-tasks"
@@ -448,306 +409,204 @@ export default async function DashboardPage({
         />
       </section>
 
-      <AlignCard state={alignState} />
-
-      <section id="dashboard-block-foundation" className="mb-8">
-        <FoundationCard
-          title={t("foundation.discovery.title")}
-          eyebrow={t("foundation.discovery.eyebrow")}
-          description={t("foundation.discovery.description")}
-          status={t(`foundation.discovery.states.${discoveryFoundationState}`)}
-          href="/discovery/profile"
-          action={t("foundation.discovery.action")}
-        />
-      </section>
-
       <section
         id="dashboard-block-connections"
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-6"
         style={staggerStyle(120)}
+        aria-labelledby="dashboard-connections-title"
       >
-        <div>
-          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-            <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-              <ConnectionsIcon className="h-4 w-4" />
-            </span>
-            {t("team.eyebrow")}
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-slate-950">
-            {t("team.title")}
-          </h2>
-        </div>
-
-        <article className={`${PRIMARY_SURFACE_CLASS} mt-5 p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">
-                {teamsT("eyebrow")}
-              </p>
-              <h3 className="mt-2 text-base font-semibold text-slate-900">
-                {teamsT("title")}
-              </h3>
-            </div>
-            <Link href="/connections" className={UTILITY_CTA_CLASS}>
-              {teamsT("allConnections")}
-            </Link>
-          </div>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            {teamsT("description")}
-          </p>
-
-          <DashboardConnectionCards overview={connectionOverview} />
-        </article>
-
-        <div className={`${SECONDARY_SURFACE_CLASS} mt-4 flex flex-wrap items-center justify-between gap-4 p-4`}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">{t("team.inviteTitle")}</h3>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("team.inviteText")}
+            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
+                <ConnectionsIcon className="h-4 w-4" />
+              </span>
+              {t("team.eyebrow")}
             </p>
+            <h2 id="dashboard-connections-title" className="mt-2 text-xl font-semibold text-slate-950">
+              {t("team.title")}
+            </h2>
           </div>
-          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-            {t("actions.inviteCofounder")}
+          <Link href="/connections" className={UTILITY_CTA_CLASS}>
+            {teamsT("allConnections")}
           </Link>
         </div>
 
-        <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">{t("team.detailsTitle")}</p>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
-                {t("team.detailsText")}
-              </p>
-            </div>
-            <span className="text-sm text-slate-500">{t("team.expand")}</span>
-          </summary>
+        <DashboardConnectionCards overview={connectionOverview} />
 
-          <div className="mt-5 grid gap-4">
-            <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">{t("team.invitations")}</h3>
-                <span className="text-xs tracking-[0.08em] text-slate-500">
-                  {actionableIncomingInvites.length + sentInvitesSorted.length}
-                </span>
+        <div className="mt-5">
+          <AlignVentureActions state={alignState} />
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-4">
+          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
+            {t("actions.inviteCofounder")}
+          </Link>
+          {/* Team-Intake bleibt erreichbar - Founder koennen Teilnehmende
+              sein. Aber leise und nicht als eigener Bereich: angelegt werden
+              Intakes im Advisor-Kontext, dort steht es in der Leiste. */}
+          <p className="text-xs leading-5 text-slate-500">
+            {t("team.teamIntakeText")}{" "}
+            <Link href="/team-intake" className="underline hover:text-slate-900">
+              {t("team.teamIntakeLink")}
+            </Link>
+          </p>
+        </div>
+
+        {actionableIncomingInvites.length + sentInvitesSorted.length > 0 ? (
+          <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{t("team.invitationsSummary")}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">{t("team.invitationsSummaryText")}</p>
               </div>
-              <div className="mt-3 space-y-2">
-                {actionableIncomingInvites.length > 0 ? (
-                  actionableIncomingInvites.map((invite) => (
+              <span className="text-xs tracking-[0.08em] text-slate-500">
+                {actionableIncomingInvites.length + sentInvitesSorted.length}
+              </span>
+            </summary>
+            <div className="mt-4 space-y-2">
+              {actionableIncomingInvites.length > 0
+                ? actionableIncomingInvites.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
                       {renderCompactIncomingInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
                     </div>
                   ))
-                ) : sentInvitesSorted.length > 0 ? (
-                  sentInvitesSorted.map((invite) => (
+                : sentInvitesSorted.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
                       {renderCompactSentInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
                     </div>
-                  ))
-                ) : (
-                  <p className="text-sm leading-7 text-slate-500">{t("team.noInvitations")}</p>
-                )}
-              </div>
-            </article>
-
-            <article className={`${SECONDARY_SURFACE_CLASS} p-5`}>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-slate-900">{t("team.reports")}</h3>
-                <span className="text-xs tracking-[0.08em] text-slate-500">{readyReports.length}</span>
-              </div>
-              <div className="mt-3 space-y-2">
-                {readyReports.length > 0 ? (
-                  readyReports.map((run) => (
-                    <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactReportRow(run, t)}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm leading-7 text-slate-500">
-                    {t("team.noReports")}
-                  </p>
-                )}
-              </div>
-            </article>
-          </div>
-        </details>
+                  ))}
+            </div>
+          </details>
+        ) : null}
       </section>
 
-      {(hasSubmittedBase || alignState.knowsPrevious || versionState.next.started) && (
-        <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="dashboard-legacy-title">
-          <h2 id="dashboard-legacy-title" className="font-semibold">{t("legacy.title")}</h2>
-          <p className="mt-2 text-sm text-slate-600">{t("legacy.description")}</p>
-          {hasSubmittedBase && <Link href="/me/report" className="mt-3 inline-block text-sm underline">{t("legacy.report")}</Link>}
-          {hasSubmittedBase && hasSubmittedValues && <p className="mt-2 text-sm text-slate-600">{t("legacy.values")}</p>}
-          <details className="mt-3 text-sm">
-            <summary className="cursor-pointer">{t("legacy.versions")}</summary>
-            <Link href="/founder-alignment/versionen" className="my-3 inline-block underline">{t("legacy.answers")}</Link>
-            {versionState.next.started && (
-              <VersionArchiveCard
-                decision={versionState.decision}
-                previous={versionState.previous}
-                next={versionState.next}
-                connectionsNext={versionState.connectionsNext}
-                archived={versionState.archived}
-              />
-            )}
-          </details>
-        </section>
-      )}
-
       <section
-        id="dashboard-block-explore"
+        id="dashboard-block-profile"
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
         style={staggerStyle(130)}
-        aria-labelledby="dashboard-explore-title"
+        aria-labelledby="dashboard-about-title"
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">{t("explore.eyebrow")}</p>
-            <h2 id="dashboard-explore-title" className="mt-2 text-2xl font-semibold text-slate-950">{t("explore.title")}</h2>
-          </div>
-          <Link
-            href="/founder-library"
-            className="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 sm:max-w-sm"
-          >
-            <span className="block text-sm font-semibold text-slate-900">{t("explore.libraryLink.title")}</span>
-            <span className="mt-1 block text-xs leading-5 text-slate-600">{t("explore.libraryLink.text")}</span>
-          </Link>
-        </div>
+        <h2 id="dashboard-about-title" className="text-xl font-semibold text-slate-950">{t("aboutYou.title")}</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-600">{t("aboutYou.text")}</p>
 
-        <DashboardSpotlight
-          items={[
-            {
-              id: "founder-library",
-              title: t("explore.items.library.title"),
-              text: t("explore.items.library.text"),
-              action: t("explore.items.library.action"),
-              href: "/founder-library",
-            },
-            {
-              id: "discovery",
-              title: t("explore.items.discovery.title"),
-              text: t("explore.items.discovery.text"),
-              action: t("explore.items.discovery.action"),
-              href: "/discovery",
-            },
-            {
-              id: "collaboration",
-              title: t("explore.items.collaboration.title"),
-              text: t("explore.items.collaboration.text"),
-              action: t("explore.items.collaboration.action"),
-              href: collaborationSpotlightHref,
-            },
-          ]}
-          previousLabel={t("explore.controls.previous")}
-          nextLabel={t("explore.controls.next")}
-          indicatorsLabel={t("explore.controls.indicators")}
-          positionLabel={t.raw("explore.controls.position")}
-        />
-      </section>
+        {needsOnboarding ? (
+          <details id="dashboard-block-profile-data" className="mt-4 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
+            <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+              {t("utilities.profileCreate")}
+            </summary>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
+            <div className="mt-4 border-t border-slate-200 pt-4">
+              {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als
+                  ein Editor. Wer das Basisprofil ausgefuellt hat, geht auf
+                  /profile. */}
+              {needsOnboarding ? (
+                <ProfileBasicsForm
+                  mode="onboarding"
+                  initialValues={{
+                    display_name: profileData?.display_name ?? null,
+                    focus_skill: profileData?.focus_skill ?? null,
+                    intention: profileData?.intention ?? null,
+                    roles: profileData?.roles ?? null,
+                    avatar_id: profileData?.avatar_id ?? null,
+                    avatar_url: profileData?.avatar_url ?? null,
+                  }}
+                  submitLabel={t("actions.saveProfile")}
+                  onSuccessRedirectTo={contextualDashboardHref}
+                  variant="accent"
+                  fallbackAvatarUrl={profileImageUrl}
+                />
+              ) : null}
+            </div>
+          </details>
+        ) : null}
 
-      <section id="dashboard-block-profile" className="dashboard-fade-up mb-8 grid gap-3 md:grid-cols-2" style={staggerStyle(130)} aria-label={t("utilities.title")}>
-        <details id="dashboard-block-profile-data" className="scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]" open={needsOnboarding}>
-          <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-            {needsOnboarding ? t("utilities.profileCreate") : t("utilities.profileEdit")}
-          </summary>
-          <p className="mt-2 text-xs leading-5 text-slate-500">
-            {needsOnboarding ? t("utilities.profileHelp") : t("utilities.profileEntryHelp")}
-          </p>
-          <div className="mt-4 border-t border-slate-200 pt-4">
-            {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als ein
-                Editor. Wer das Basisprofil ausgefuellt hat, geht auf /profile -
-                den einen Ort fuer Identitaet, Expertise und Capability. */}
-            {needsOnboarding ? (
-              <ProfileBasicsForm
-                mode="onboarding"
-                initialValues={{
-                  display_name: profileData?.display_name ?? null,
-                  focus_skill: profileData?.focus_skill ?? null,
-                  intention: profileData?.intention ?? null,
-                  roles: profileData?.roles ?? null,
-                  avatar_id: profileData?.avatar_id ?? null,
-                  avatar_url: profileData?.avatar_url ?? null,
-                }}
-                submitLabel={t("actions.saveProfile")}
-                onSuccessRedirectTo={contextualDashboardHref}
-                variant="accent"
-                fallbackAvatarUrl={profileImageUrl}
-              />
-            ) : null}
-            <Link
-              href="/profile"
-              className={`inline-flex min-h-11 items-center rounded-full border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50${needsOnboarding ? " mt-4" : ""}`}
-            >
-              {t("utilities.profileOpen")}
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.ownProfile.title")}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">{t("aboutYou.ownProfile.text")}</p>
+            <Link href="/me/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
+              {t("aboutYou.ownProfile.action")}
             </Link>
           </div>
-        </details>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            <AlignWorkstyleStatus state={alignState} />
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.find.title")}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              {t(`foundation.discovery.states.${discoveryFoundationState}`)}
+            </p>
+            <Link href="/discovery/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
+              {t("foundation.discovery.action")}
+            </Link>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.edit.title")}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">{t("utilities.profileEntryHelp")}</p>
+            <Link href="/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
+              {t("aboutYou.edit.action")}
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <details id="dashboard-block-account" className="scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.03)]">
+      {/* Fruehere Auswertungen: erhalten und erreichbar, aber eingeklappt und
+          nur, wenn es etwas gibt. Sie sind Rueckblick, nicht der aktuelle Weg. */}
+      {hasHistory ? (
+        <details className="mb-4 rounded-2xl border border-slate-200 bg-white/80 p-4" aria-labelledby="dashboard-legacy-title">
           <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-            {t("utilities.account")}
+            <h2 id="dashboard-legacy-title" className="inline text-sm font-semibold text-slate-900">{t("legacy.title")}</h2>
+            <span className="mt-1 block pl-4 text-xs font-normal leading-5 text-slate-600">{t("legacy.description")}</span>
           </summary>
-          <div className="mt-4 border-t border-slate-200 pt-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("account.emailLabel")}</p>
-            <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? t("account.emailUnavailable")}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">{t("account.magicLinkText")}</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <a href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`} className={UTILITY_CTA_CLASS}>{t("actions.contactSupport")}</a>
-              <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
-            </div>
-            {/* Der Schalter steht im Account und nur dort. Am 28.09.2026 gemeldet:
-                "Ich habe die mehrmals gestellt bekommen, das war ein bisschen viel."
-                Er stand hier UND im Account - zwei Zeilen ueber dem Link dorthin. */}
+          <div className="mt-4 space-y-3 text-sm">
+            {readyReports.length > 0 ? (
+              <div className="space-y-2">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("team.reports")}</h3>
+                {readyReports.map((run) => (
+                  <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                    {renderCompactReportRow(run, t)}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {hasSubmittedBase && <Link href="/me/report" className="inline-block underline">{t("legacy.report")}</Link>}
+            {hasSubmittedBase && hasSubmittedValues && <p className="text-slate-600">{t("legacy.values")}</p>}
+            {(alignState.knowsPrevious || versionState.next.started) && (
+              <div>
+                <Link href="/founder-alignment/versionen" className="inline-block underline">{t("legacy.answers")}</Link>
+                {versionState.next.started && (
+                  <VersionArchiveCard
+                    decision={versionState.decision}
+                    previous={versionState.previous}
+                    next={versionState.next}
+                    connectionsNext={versionState.connectionsNext}
+                    archived={versionState.archived}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </details>
+      ) : null}
+
+      {/* Konto: /account bietet Support und "alle Sitzungen abmelden" nicht an,
+          deshalb bleibt beides hier - eingeklappt am Ende. */}
+      <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
+        <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+          {t("utilities.account")}
+        </summary>
+        <div className="mt-4 border-t border-slate-200 pt-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("account.emailLabel")}</p>
+          <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? t("account.emailUnavailable")}</p>
+          <p className="mt-2 text-xs leading-5 text-slate-500">{t("account.magicLinkText")}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`} className={UTILITY_CTA_CLASS}>{t("actions.contactSupport")}</a>
+            <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
             <Link href="/account" className={UTILITY_CTA_CLASS}>{t("account.manage")}</Link>
           </div>
-        </details>
-      </section>
-
-      <section
-        id="dashboard-block-outlook"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-2xl border border-slate-200/70 bg-slate-50/76 p-6 shadow-[0_10px_24px_rgba(15,23,42,0.03)]"
-        style={staggerStyle(140)}
-      >
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <ReportIcon className="h-4 w-4" />
-              </span>
-              {t("outlook.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-900">{t("outlook.title")}</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              {t("outlook.text")}
-            </p>
-          </div>
         </div>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.collaborationTitle")}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.inDevelopment")}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.collaborationText")}
-            </p>
-          </article>
-          <article className="rounded-2xl border border-slate-200/80 bg-white/88 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold text-slate-900">{t("outlook.items.checkInsTitle")}</h3>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-500">
-                {t("outlook.inDevelopment")}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              {t("outlook.items.checkInsText")}
-            </p>
-          </article>
-        </div>
-      </section>
+      </details>
 
       <DashboardDevSection
         enabled={isDev}
@@ -948,38 +807,6 @@ function presentDashboardTask(
   }
 }
 
-function FoundationCard({
-  title,
-  eyebrow,
-  description,
-  status,
-  badge,
-  href,
-  action,
-}: {
-  title: string;
-  eyebrow?: string;
-  description: string;
-  status: string;
-  badge?: string;
-  href: string;
-  action: string;
-}) {
-  return (
-    <article className="flex min-h-64 flex-col rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
-      {eyebrow ? <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">{eyebrow}</p> : null}
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <h3 className="text-lg font-semibold text-slate-950">{title}</h3>
-        {badge ? <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-600">{badge}</span> : null}
-      </div>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{description}</p>
-      <p className="mt-4 text-xs font-medium text-slate-700">{status}</p>
-      <div className="mt-auto pt-5">
-        <Link href={href} className={UTILITY_CTA_CLASS}>{action}</Link>
-      </div>
-    </article>
-  );
-}
 
 function formatDate(value: string | null | undefined, t: DashboardT) {
   if (!value) return t("date.unknown");
@@ -1099,7 +926,7 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: Dashb
 }
 
 function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: DashboardT, currentTeam?: string | null) {
-  const action = currentTeam ? { href: `/teams/${currentTeam}/workstyle`, label: "Euer Zusammenspiel", className: REPORT_CTA_CLASS, canOpenCompletionStatus: false } : buildIncomingInvitationAction(invite, t);
+  const action = currentTeam ? { href: `/teams/${currentTeam}/workstyle`, label: t("team.incomingActions.openTeamReport"), className: REPORT_CTA_CLASS, canOpenCompletionStatus: false } : buildIncomingInvitationAction(invite, t);
   const helperText = null;
 
   return (
@@ -1186,17 +1013,6 @@ function renderCompactReportRow(run: ReportRunRow, t: DashboardT) {
   );
 }
 
-function getQuoteOfTheDay(t: DashboardT) {
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - startOfYear.getTime();
-  const dayOfYear = Math.floor(diff / 86_400_000);
-  const quoteKey = `quotes.q${dayOfYear % 6}`;
-  return {
-    text: t(quoteKey),
-  };
-}
-
 function DashboardProfileAvatar({
   displayName,
   avatarId,
@@ -1217,15 +1033,6 @@ function DashboardProfileAvatar({
   );
 }
 
-function ReportIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 4.5h6l3 3v12h-9A2.25 2.25 0 015.25 17.25V6.75A2.25 2.25 0 017.5 4.5z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5v3h3" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.75 12h6.5M8.75 15.5h4.5" />
-    </svg>
-  );
-}
 
 function ConnectionsIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -1233,23 +1040,6 @@ function ConnectionsIcon({ className = "h-4 w-4" }: { className?: string }) {
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 16.5L4.5 12.75 8.25 9" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 11.25H8.25m7.5 1.5H4.5" />
-    </svg>
-  );
-}
-
-function QuoteIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" className={className} aria-hidden="true">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9.25 8.75c-1.56.72-2.34 1.95-2.34 3.7v1.08c0 .97.79 1.76 1.76 1.76h.83c.97 0 1.75-.78 1.75-1.75v-.9c0-.96-.78-1.75-1.75-1.75H7.66c.05-.93.57-1.71 1.59-2.34"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M17.25 8.75c-1.56.72-2.34 1.95-2.34 3.7v1.08c0 .97.79 1.76 1.76 1.76h.83c.97 0 1.75-.78 1.75-1.75v-.9c0-.96-.78-1.75-1.75-1.75h-1.84c.05-.93.57-1.71 1.59-2.34"
-      />
     </svg>
   );
 }

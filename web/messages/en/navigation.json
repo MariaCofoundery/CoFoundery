@@ -5,7 +5,6 @@
   "discovery": "Find a Co-Founder",
   "connections": "Connections",
   "connect": "Connect",
-  "advisorConnections": "Founder connections",
   "incomingRequestBadgeSingular": "1 open co-founder request",
   "incomingRequestBadgePlural": "{count} open co-founder requests",
   "incomingConnectContactBadge": "{count} open Connect contact requests",
@@ -37,7 +36,6 @@
     "locale": "en-US"
   },
   "profile": "About you",
-  "areaAlign": "Align",
   "areaFind": "Find",
   "areaConnect": "Connect",
   "subNavLabel": "Pages in this area",
@@ -58,5 +56,15 @@
   "connectProfile": "Your profile",
   "connectListings": "Your listings",
   "connectVentures": "Your ventures",
-  "connectSuggestions": "Suggestions for you"
+  "connectSuggestions": "Suggestions for you",
+  "areaStart": "Start",
+  "areaProfile": "Profile",
+  "areaTeams": "Teams & connections",
+  "profileEdit": "Edit details",
+  "advisorPeople": "People & groups",
+  "advisorTeams": "Teams",
+  "advisorIntake": "Intake",
+  "viewSwitchLabel": "Switch work context",
+  "viewFounder": "Founder",
+  "viewAdvisor": "Advisor"
 }

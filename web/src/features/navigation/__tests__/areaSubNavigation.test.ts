@@ -75,10 +75,12 @@ test("Align leuchtet auch in der Library, weil sie dort hingehört", () => {
   assert.equal(isProductChromePath("/founder-library/cliff"), true);
 });
 
-test("die Advisor-Ansicht bekommt die Align-Unterseiten nicht", () => {
+test("die Advisor-Ansicht bekommt die Founder-Unterseiten nicht", () => {
   // Verbindungen und Library sind Founder-Seiten. In der Advisor-Ansicht
-  // führte der Link ins Leere beziehungsweise auf eine Weiterleitung.
-  assert.match(source(SHELL), /resolvedActiveView === "advisor"\s*\?\s*undefined/);
+  // führte der Link ins Leere beziehungsweise auf eine Weiterleitung. Seit
+  // Phase 9.4A ist der ganze Founder-Baum in der Advisor-Ansicht leer.
+  assert.match(source(SHELL), /const founderItems: NavigationItem\[\] = isConnectOnly \|\| !isFounderView \? \[\]/);
+  assert.match(source(SHELL), /\.\.\.\(isFounderView && hasFounder \? \[findItem\] : \[\]\)/);
 });
 
 // ---------------------------------------------------------------------------

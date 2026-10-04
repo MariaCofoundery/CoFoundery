@@ -2,14 +2,19 @@
   "hero": {
     "eyebrow": "Founder Dashboard",
     "greeting": "Schön, dass du da bist, {name}.",
-    "quoteEyebrow": "Zitat des Tages",
     "contextLabel": "Founder-Kontext",
     "error": "Die Aktion konnte gerade nicht abgeschlossen werden. Bitte versuche es erneut.",
     "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut.",
-    "heroConnections": "Deine Verbindungen",
-    "heroConnectionsCount": "{count, plural, =0 {Noch keine Verbindung} one {1 Verbindung} other {# Verbindungen}}",
-    "heroFind": "Menschen finden",
-    "heroOwnProfile": "Das bist du"
+    "primary": {
+      "complete_profile": "Profil vervollständigen",
+      "workstyle_start": "Wie du arbeitest – jetzt starten",
+      "workstyle_continue": "Wie du arbeitest – fortsetzen"
+    },
+    "primaryText": {
+      "complete_profile": "Ein paar Basisangaben fehlen noch – sie dauern nur einen Moment.",
+      "workstyle_start": "Deine Arbeitsweise ist die Grundlage für Gespräche im Team.",
+      "workstyle_continue": "Du hast schon begonnen – mach dort weiter, wo du aufgehört hast."
+    }
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",
@@ -36,14 +41,6 @@
     "continueValuesTitle": "Führe dein Werteprofil zu Ende.",
     "inviteTitle": "Lade einen Co-Founder ein.",
     "inviteText": "Starte eine Founder-Verbindung und lernt eure Perspektiven gemeinsam kennen."
-  },
-  "sectionNavigation": {
-    "label": "Dashboard-Abschnitte",
-    "tasks": "Was gerade ansteht",
-    "foundation": "Deine Grundlage",
-    "connections": "Deine Verbindungen und Teams",
-    "explore": "Entdecke CoFoundery",
-    "outlook": "Ausblick"
   },
   "tasks": {
     "eyebrow": "Aktuelle Arbeit",
@@ -169,44 +166,6 @@
       }
     }
   },
-  "connect": {
-    "eyebrow": "Deine Aktivitäten",
-    "title": "Dein Netzwerk",
-    "summary": "{seeking} Gesuche · {offering} Angebote aktiv",
-    "open": "Connect öffnen",
-    "create": "+ Gesuch oder Angebot"
-  },
-  "explore": {
-    "eyebrow": "Entdecke CoFoundery",
-    "title": "Was du mit CoFoundery machen kannst",
-    "libraryLink": {
-      "title": "Founder Library",
-      "text": "Begriffe, Updates und Quellen für Founder."
-    },
-    "items": {
-      "library": {
-        "title": "Founder Library",
-        "text": "Begriffe verstehen und wichtige Entwicklungen im Blick behalten.",
-        "action": "Library öffnen"
-      },
-      "discovery": {
-        "title": "Co-Founder finden",
-        "text": "Entdecke Founder und prüfe, wer zu dem passt, was du für eine gemeinsame Gründung suchst.",
-        "action": "Founder entdecken"
-      },
-      "collaboration": {
-        "title": "Zusammenarbeit verstehen",
-        "text": "Nutzt eure Zusammenarbeit bewusst – zum Beispiel mit Read My Mind und strukturierten Gesprächen.",
-        "action": "Zusammenarbeit entdecken"
-      }
-    },
-    "controls": {
-      "previous": "Vorheriges Element",
-      "next": "Nächstes Element",
-      "indicators": "Spotlight-Positionen",
-      "position": "Element {position} von {total} anzeigen"
-    }
-  },
   "foundation": {
     "eyebrow": "Persönliche Grundlage",
     "title": "Deine Grundlage",
@@ -302,9 +261,7 @@
   },
   "team": {
     "eyebrow": "Founder-Arbeitsbereich",
-    "title": "Deine Verbindungen & Teams",
-    "inviteTitle": "Co-Founder einladen",
-    "inviteText": "Starte eine neue Founder-Verbindung.",
+    "title": "Deine Teams & Verbindungen",
     "cards": {
       "empty": "Noch keine Founder-Verbindung vorhanden.",
       "founderFallback": "Founder {index}",
@@ -332,13 +289,7 @@
         "alignmentInProgress": "Alignment in Arbeit"
       }
     },
-    "detailsTitle": "Einladungen und Reports",
-    "detailsText": "Offene Einladungen, Alignment Reports und weitere Details.",
-    "expand": "Ausklappen",
-    "invitations": "Einladungen",
-    "noInvitations": "Noch keine offenen Einladungen.",
     "reports": "Alignment Reports",
-    "noReports": "Sobald Alignment Reports bereit sind, erscheinen sie hier.",
     "partner": "Partner: {email}",
     "status": "Status: {status}",
     "modulesAndExpiry": "Module: {modules} · Ablauf: {date}",
@@ -362,7 +313,8 @@
       "continueNow": "Jetzt fortsetzen",
       "startNow": "Jetzt starten",
       "openValues": "Werte-Modul öffnen",
-      "startMatching": "Matching starten"
+      "startMatching": "Matching starten",
+      "openTeamReport": "Euer Zusammenspiel"
     },
     "incomingHero": {
       "reportReadyLabel": "Matching-Report ansehen",
@@ -376,7 +328,11 @@
       "priorityTitle": "Dein laufendes Matching hat Priorität.",
       "statusText": "Steige direkt in den aktuellen Status mit {name} ein und gehe von dort weiter.",
       "flowText": "Führe den eingeladenen Founder-Flow mit {name} genau dort weiter, wo du aufgehört hast."
-    }
+    },
+    "invitationsSummary": "Offene Einladungen",
+    "invitationsSummaryText": "Eingegangene und von dir verschickte Einladungen.",
+    "teamIntakeText": "Nimmst du an einem Team-Intake teil?",
+    "teamIntakeLink": "Zum Team-Intake"
   },
   "profile": {
     "eyebrow": "Profil & Einstellungen",
@@ -596,18 +552,6 @@
       "failed": "Der Probelauf ist nicht durchgelaufen. Bitte noch einmal versuchen."
     }
   },
-  "outlook": {
-    "eyebrow": "Ausblick",
-    "title": "Was als Nächstes entstehen kann",
-    "text": "Zwei Themen, an denen CoFoundery für die langfristige Zusammenarbeit weiterarbeitet – ohne feste Terminversprechen.",
-    "inDevelopment": "In Entwicklung",
-    "items": {
-      "collaborationTitle": "Zusammenarbeit stärken",
-      "collaborationText": "Lernt eure Arbeitsweisen noch besser kennen – mit gemeinsamen Fragen, kleinen Szenarien und Experimenten für eure Zusammenarbeit.",
-      "checkInsTitle": "Regelmäßige Team-Check-ins",
-      "checkInsText": "Prüft gemeinsam, was in eurer Zusammenarbeit funktioniert und was ihr neu vereinbaren möchtet."
-    }
-  },
   "coFounderInvitePage": {
     "backToDashboard": "Zurück zum Dashboard"
   },
@@ -754,14 +698,6 @@
     "unknown": "unbekannt",
     "locale": "de-DE"
   },
-  "quotes": {
-    "q0": "Klarheit spart Gründerteams später deutlich mehr Kraft als Tempo am falschen Punkt.",
-    "q1": "Nicht jede Spannung ist ein Problem. Aber jede ungeklärte Spannung kostet Fokus.",
-    "q2": "Gute Founder-Teams wirken nicht reibungslos. Sie klären Reibung früh.",
-    "q3": "Ein stabiles Team entsteht selten aus Gleichheit, sondern aus gut geklärten Unterschieden.",
-    "q4": "Wenn zwei Founder dieselbe Richtung sehen, werden Entscheidungen leichter und Konflikte kleiner.",
-    "q5": "Manchmal ist der produktivste Fortschritt nicht mehr Tempo, sondern eine bessere Absprache."
-  },
   "workProfile": {
     "eyebrow": "Deine Arbeitsweise und deine Vorhaben",
     "title": "Founder-Arbeitsprofil",
@@ -792,7 +728,8 @@
     "comparisonEmpty": "Vergleichen könnt ihr euch, sobald ihr verbunden seid, beide abgegeben und einander freigegeben habt.",
     "compare": "Mit {name} vergleichen",
     "notShared": "{name} – hat noch nichts freigegeben",
-    "unavailable": "Dein Arbeitsprofil konnte gerade nicht geladen werden. Bitte lade die Seite erneut."
+    "unavailable": "Dein Arbeitsprofil konnte gerade nicht geladen werden. Bitte lade die Seite erneut.",
+    "notStarted": "Noch nicht begonnen"
   },
   "legacy": {
     "title": "Frühere Auswertungen",
@@ -801,5 +738,21 @@
     "values": "Enthält dein früheres Werteprofil.",
     "versions": "Ältere Fassungen und Antworten",
     "answers": "Zum Archiv der früheren Fassungen"
+  },
+  "aboutYou": {
+    "title": "Über dich",
+    "text": "Was zu dir gehört – unabhängig von einem Team.",
+    "ownProfile": {
+      "title": "Das bist du",
+      "text": "Dein zusammengeführtes Profil: Arbeitsweise, Fähigkeiten, Stärken und Antrieb.",
+      "action": "Ansehen"
+    },
+    "find": {
+      "title": "Dein FIND-Profil"
+    },
+    "edit": {
+      "title": "Angaben bearbeiten",
+      "action": "Bearbeiten"
+    }
   }
 }

@@ -15,6 +15,12 @@ import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/co
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
 import { PRODUCT_FULL_NAME } from "@/features/brand";
+import {
+  resolveActiveView,
+  workContextToStore,
+  writeWorkContextCookie,
+  type WorkContext,
+} from "@/features/navigation/workContext";
 
 type Props = {
   children: React.ReactNode;
@@ -33,6 +39,8 @@ type Props = {
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
   researchConsentState: ResearchConsentState;
+  /** Zuletzt genutzter Arbeitskontext aus dem Cookie - nur Darstellung, siehe workContext.ts. */
+  storedWorkContext?: WorkContext | null;
 };
 
 /**
@@ -93,7 +101,7 @@ const ProductNavigationOverrideContext = createContext<
  */
 function areaLinkClassName(active: boolean) {
   // .brand-here traegt den weichen Verlauf von Lila nach Tuerkis - dieselbe
-  // Klasse wie der Hauptweg im Align-Kopfbereich, damit beide nicht
+  // Klasse wie die Hauptaktion im Dashboard-Kopfbereich, damit beide nicht
   // auseinanderlaufen. Siehe globals.css.
   // px-3 auf dem Telefon und shrink-0/whitespace-nowrap: Vier Pillen mit je
   // 16 Pixel Innenabstand sind allein 128 Pixel Luft - genau das, was am Rand
@@ -215,6 +223,7 @@ export function ProductShell({
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
+  storedWorkContext: initialStoredWorkContext = null,
 }: Props) {
   const pathname = usePathname();
   const t = useTranslations("navigation");
@@ -222,6 +231,26 @@ export function ProductShell({
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
+  // Als Zustand und nicht nur als Prop: Das Root-Layout rendert bei einem
+  // Seitenwechsel im Browser nicht neu, die Prop waere danach veraltet.
+  const [storedWorkContext, setStoredWorkContext] = useState<WorkContext | null>(initialStoredWorkContext);
+
+  // "Zuletzt in diesem Kontext gearbeitet": Eindeutige Founder- oder
+  // Advisor-Seiten merken sich den Kontext, gemeinsame Seiten lesen ihn nur.
+  // Nur bei Doppelrolle - workContextToStore liefert sonst nichts.
+  useEffect(() => {
+    const next = workContextToStore({ pathname, hasFounder, hasAdvisor });
+    if (next && next !== storedWorkContext) {
+      writeWorkContextCookie(next);
+      setStoredWorkContext(next);
+    }
+  }, [pathname, hasFounder, hasAdvisor, storedWorkContext]);
+
+  function chooseWorkContext(next: WorkContext) {
+    if (!(hasFounder && hasAdvisor)) return;
+    writeWorkContextCookie(next);
+    setStoredWorkContext(next);
+  }
 
   // Nach jedem Wechsel des Ortes zu. Ohne das bleibt das Menue nach einem
   // Antippen offen stehen und verdeckt die Seite, auf der man gerade
@@ -244,8 +273,15 @@ export function ProductShell({
   const closeMenu = () => setIsMenuOpen(false);
   configureResearchConsentState(researchConsentState);
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
-  const resolvedActiveView =
-    navigationOverride?.activeView ?? (pathname.startsWith("/advisor/") ? "advisor" : "founder");
+  // Reine Darstellung: welcher Baum steht und wohin "Start" fuehrt. Zugang
+  // entscheidet jede Seite selbst.
+  const resolvedActiveView = resolveActiveView({
+    pathname,
+    override: navigationOverride?.activeView ?? null,
+    hasFounder,
+    hasAdvisor,
+    stored: storedWorkContext,
+  });
   const advisorFallbackHref = "/advisor/dashboard#advisor-teams";
   const resolvedMatchingHref =
     resolvedActiveView === "advisor"
@@ -266,94 +302,143 @@ export function ProductShell({
   // denselben Ort.
   const messagesAttentionCount = getMessagesAttentionCount(unreadConnectMessageCount, waitingNoticeCount);
   // Die Leiste traegt Bereiche - Orte, in denen man eine Weile arbeitet.
-  // Vorher standen dort fuenf Eintraege nebeneinander, die drei verschiedene
-  // Sorten waren: Bereiche, ein Querschnitt (Profil) und eine Unterseite
-  // (Verbindungen). Genau deshalb las es sich nicht als "ich bin hier".
-  //
-  // Profil steht jetzt rechts bei Konto und Sprache. Verbindungen ist eine
-  // Seite innerhalb von Align und vom Dashboard aus verlinkt - sie verwaist
-  // dadurch nicht.
-  //
   // Seit dem 20.09.2026 ist diese Liste die EINZIGE Quelle fuer die Bereiche:
   // Die Pillen ab 1024 Pixel und das aufklappbare Menue darunter lesen
-  // dieselben Eintraege. Vorher stand Find und Connect direkt im JSX - mit
-  // zwei Ansichten waeren daraus zwei Listen geworden, die auseinanderlaufen.
-  const alignItem: NavigationItem[] = isConnectOnly ? [] : [
+  // dieselben Eintraege.
+  //
+  // ---------------------------------------------------------------------
+  // KEIN GLOBALES ALIGN MEHR (Phase 9.4A)
+  // ---------------------------------------------------------------------
+  //
+  // "Align" markierte Dashboard, eigenes Profil und Teams zugleich - ein
+  // Sammelbegriff statt eines Ortes. Die Funktionen bleiben, sie stehen jetzt
+  // dort, wo sie hingehoeren: das eigene Bild unter Profil, Team Alignment im
+  // Team, Advisor-Reviews im Advisor-Kontext. Keine Route hat sich bewegt.
+  const isFounderView = resolvedActiveView === "founder";
+  const isProfileArea = (currentPathname: string) =>
+    currentPathname.startsWith("/me/") ||
+    currentPathname === "/profile" ||
+    currentPathname.startsWith("/profile/") ||
+    currentPathname.startsWith("/research/workstyle-pretest") ||
+    currentPathname.startsWith("/founder-alignment/profil") ||
+    currentPathname.startsWith("/founder-alignment/pilot") ||
+    currentPathname.startsWith("/founder-alignment/versionen");
+  const isTeamsArea = (currentPathname: string) =>
+    currentPathname === "/connections" ||
+    currentPathname.startsWith("/teams/") ||
+    currentPathname === "/invite/new" ||
+    currentPathname.startsWith("/report/") ||
+    currentPathname.startsWith("/founder-library") ||
+    // Vorhaben, Vergleich und fruehere Workbookstaende sind Teamkontext.
+    (currentPathname.startsWith("/founder-alignment") && !isProfileArea(currentPathname));
+
+  const founderItems: NavigationItem[] = isConnectOnly || !isFounderView ? [] : [
     {
-      href: dashboardHref,
-      label: t("areaAlign"),
-      isActive: (currentPathname) =>
-        resolvedActiveView === "advisor"
-          ? currentPathname === "/advisor/dashboard"
-          : currentPathname === "/dashboard" ||
-            currentPathname === "/connections" ||
-            currentPathname.startsWith("/teams/") ||
-            currentPathname.startsWith("/founder-library") ||
-            // Fragebogen und eigener Report gehoeren zu Align. Ohne das waere
-            // die zweite Reihe genau dort verschwunden, wo der neue Eintrag
-            // hinfuehrt - ein Reiter, der sich beim Anklicken aufloest.
-            currentPathname.startsWith("/me/") ||
-            currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest") || currentPathname.startsWith("/founder-alignment"),
-      // Align hatte als einziger Bereich keine eigene Navigation. Beide Seiten
-      // waren nur vom Dashboard aus erreichbar - wer woanders stand, musste
-      // erst dorthin zurueck.
-      // ---------------------------------------------------------------------
-      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE
-      // ---------------------------------------------------------------------
-      //
-      // Vorher stand "Verbindungen" vorn. Man faengt aber bei sich selbst an:
-      // erst das eigene Bild, dann der Test, dann die anderen, dann das
-      // Nachlesen. Wer die Reihe von links nach rechts liest, liest damit die
-      // Reihenfolge, in der die Sachen im Leben vorkommen.
-      subItems:
-        resolvedActiveView === "advisor"
-          ? undefined
-          : [
-              ...(hasFounder
-                ? [
-                    // GEAENDERT AM 22.09.2026: Hier stand `/me/report`.
-                    // Marias Beobachtung nach dem ersten Blick auf das
-                    // Founderprofil: "Das gehoert oben in die Leiste statt
-                    // mein Report, da ist ja auch der Report im Prinzip
-                    // drin." Stimmt - das Gesamtbild zeigt denselben
-                    // Selbstbericht und daneben, was sonst noch da ist. Zwei
-                    // Eintraege fuer dasselbe Ergebnis waeren zwei Orte, an
-                    // denen man nachsieht.
-                    {
-                      href: "/me/profile",
-                      label: t("alignOwnProfile"),
-                      isActive: (currentPathname: string) =>
-                        currentPathname === "/me/profile",
-                    },
-                    {
-                      // DIE NEUE FASSUNG GEHOERT INS MENUE. Sie war nur ueber
-                      // eine Karte auf dem Dashboard erreichbar - wer woanders
-                      // stand, musste erst dorthin zurueck. Genau das war bei
-                      // Fragebogen und Report schon einmal das Problem.
-                      href: "/me/profile/workstyle",
-                      label: t("alignNewVersion"),
-                      isActive: (currentPathname: string) =>
-                        currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest"),
-                    },
-                  ]
-                : []),
+      href: "/dashboard",
+      label: t("areaStart"),
+      isActive: (currentPathname) => currentPathname === "/dashboard",
+    },
+    ...(hasFounder
+      ? [
+          {
+            href: "/me/profile",
+            label: t("areaProfile"),
+            isActive: isProfileArea,
+            // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst das eigene Bild,
+            // dann die Arbeitsweise, dann das Pflegen der Angaben.
+            subItems: [
               {
-                href: "/connections",
-                label: t("alignConnections"),
+                href: "/me/profile",
+                label: t("alignOwnProfile"),
                 isActive: (currentPathname: string) =>
-                  currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
+                  currentPathname === "/me/profile" || currentPathname.startsWith("/me/profile/print"),
               },
-              ...(hasFounder
-                ? [
-                    {
-                      href: "/founder-library",
-                      label: t("alignLibrary"),
-                      isActive: (currentPathname: string) =>
-                        currentPathname.startsWith("/founder-library"),
-                    },
-                  ]
-                : []),
+              {
+                // Die aktuelle Fassung bleibt aktiv, auch waehrend man sie
+                // ausfuellt - ein Reiter, der sich beim Anklicken aufloest,
+                // war hier schon einmal das Problem.
+                href: "/me/profile/workstyle",
+                label: t("alignNewVersion"),
+                isActive: (currentPathname: string) =>
+                  currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest"),
+              },
+              {
+                // Der bestehende Editor. Er stand bisher als eigener Textlink
+                // rechts in der Leiste ("Über dich") - in der Founder-Ansicht
+                // waere das jetzt derselbe Weg zweimal.
+                href: "/profile",
+                label: t("profileEdit"),
+                isActive: (currentPathname: string) =>
+                  currentPathname === "/profile" || currentPathname.startsWith("/profile/"),
+              },
             ],
+          },
+        ]
+      : []),
+    {
+      href: "/connections",
+      label: t("areaTeams"),
+      isActive: isTeamsArea,
+      subItems: [
+        // Verbindungen gilt auch ohne Founder-Rolle - sonst waere die zweite
+        // Reihe fuer diese Menschen leer.
+        {
+          href: "/connections",
+          label: t("alignConnections"),
+          isActive: (currentPathname: string) =>
+            currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
+        },
+        ...(hasFounder
+          ? [
+              {
+                // Sekundaer: Wissen fuer Setup und Zusammenarbeit. Im Team
+                // steht die Library zusaetzlich in der Teamnavigation.
+                href: "/founder-library",
+                label: t("alignLibrary"),
+                isActive: (currentPathname: string) =>
+                  currentPathname.startsWith("/founder-library"),
+              },
+            ]
+          : []),
+      ],
+    },
+  ];
+
+  // Der Advisor-Baum: nur bestehende Ziele. Vorher stand hier nur ein Eintrag
+  // zum Advisor-Dashboard; Personen, Reviews und Intake erreichte man nur ueber
+  // Anker dort, und auf den Unterseiten zeigte die Leiste keinen Ort.
+  const advisorItems: NavigationItem[] = isConnectOnly || isFounderView || !hasAdvisor ? [] : [
+    {
+      href: "/advisor/dashboard",
+      label: t("areaStart"),
+      isActive: (currentPathname) => currentPathname === "/advisor/dashboard",
+    },
+    {
+      href: "/advisor/group",
+      label: t("advisorPeople"),
+      // Teamreviews stehen auf /advisor/group und gehoeren deshalb hierher.
+      isActive: (currentPathname) =>
+        currentPathname === "/advisor/group" ||
+        currentPathname.startsWith("/advisor/person/") ||
+        currentPathname.startsWith("/advisor/review/"),
+    },
+    {
+      // Das Advisor-Dashboard verlinkt die begleiteten Teams nur als Anker;
+      // eine Seite kann das Ziel weiterhin ueberschreiben.
+      href: resolvedMatchingHref,
+      label: t("advisorTeams"),
+      isActive: (currentPathname) =>
+        ["/advisor/report", "/advisor/snapshot", "/advisor/session"].some(
+          (base) => currentPathname === base || currentPathname.startsWith(`${base}/`),
+        ),
+    },
+    {
+      href: "/team-intake",
+      label: t("advisorIntake"),
+      isActive: (currentPathname) =>
+        currentPathname === "/team-intake" ||
+        currentPathname.startsWith("/team-intake/") ||
+        currentPathname.startsWith("/advisor/intake"),
     },
   ];
 
@@ -419,13 +504,15 @@ export function ProductShell({
   };
 
   const navigationItems: NavigationItem[] = [
-    ...alignItem,
-    ...(resolvedActiveView === "advisor"
-      ? hasConnect
-        ? [connectItem]
-        : []
-      : [...(hasFounder ? [findItem] : []), ...(hasConnect ? [connectItem] : [])]),
+    ...founderItems,
+    ...advisorItems,
+    ...(isFounderView && hasFounder ? [findItem] : []),
+    ...(hasConnect ? [connectItem] : []),
   ];
+  // Wer den Founder-Baum mit Profil sieht, hat den Editor dort. Fuer alle
+  // anderen (Advisor-Ansicht, nur Connect) bleibt der sichtbare Weg rechts -
+  // ihn hinter dem Bild zu verstecken war schon einmal die Beschwerde.
+  const showProfileShortcut = !isSuspendedConnectOnly && !(isFounderView && hasFounder && !isConnectOnly);
 
   // Die zweite Reihe gehoert zu dem Bereich, in dem man gerade ist. Steht man
   // nirgends drin, gibt es sie nicht - eine leere Leiste waere ein Balken ohne
@@ -520,16 +607,6 @@ export function ProductShell({
                     {areaBadge(item.badge)}
                   </Link>
                 ))}
-                {/* Bleibt in der Leiste: Das Advisor-Dashboard verlinkt diese
-                    Seite nicht, sie waere sonst nicht erreichbar. */}
-                {resolvedActiveView === "advisor" ? (
-                  <Link
-                    href={resolvedMatchingHref}
-                    className={navLinkClassName(pathname.startsWith("/advisor/report"))}
-                  >
-                    {t("advisorConnections")}
-                  </Link>
-                ) : null}
               </nav>
             </div>
 
@@ -585,7 +662,7 @@ export function ProductShell({
                     />
                   </Link>
                 ) : null}
-                {!isSuspendedConnectOnly ? (
+                {showProfileShortcut ? (
                   <Link
                     href="/profile"
                     aria-current={pathname.startsWith("/profile") ? "page" : undefined}
@@ -604,6 +681,7 @@ export function ProductShell({
                   activeView={resolvedActiveView}
                   hasFounder={hasFounder}
                   hasAdvisor={hasAdvisor}
+                  onSelect={chooseWorkContext}
                 />
 
                 <LanguageSwitcher />
@@ -695,15 +773,6 @@ export function ProductShell({
                       : null}
                   </div>
                 ))}
-                {resolvedActiveView === "advisor" ? (
-                  <MobileMenuLink
-                    href={resolvedMatchingHref}
-                    active={pathname.startsWith("/advisor/report")}
-                    onNavigate={closeMenu}
-                  >
-                    {t("advisorConnections")}
-                  </MobileMenuLink>
-                ) : null}
               </nav>
 
               <div className="mt-2 flex flex-col gap-1 border-t border-slate-200/80 pt-2">
@@ -722,12 +791,12 @@ export function ProductShell({
                     {t("messages")}
                   </MobileMenuLink>
                 ) : null}
-                {/* DIE BEIDEN PERSOENLICHEN SEITEN STEHEN NEBENEINANDER.
-                    "Das bist du" haengt sonst allein unter Align - und liest
-                    laengst mehr als Align: Faehigkeiten, Staerken, Richtung.
-                    Wer nur Connect oder nur Find nutzt, kaeme dort nie hin,
-                    obwohl die Seite fuer ihn genauso funktioniert. */}
-                {!isSuspendedConnectOnly ? (
+                {/* DIE BEIDEN PERSOENLICHEN SEITEN STEHEN NEBENEINANDER - fuer
+                    alle, die den Founder-Bereich "Profil" nicht sehen
+                    (Advisor-Ansicht, nur Connect). "Das bist du" liest mehr als
+                    Founder-Daten: Faehigkeiten, Staerken, Richtung. In der
+                    Founder-Ansicht stehen beide unter "Profil". */}
+                {showProfileShortcut ? (
                   <>
                     <MobileMenuLink
                       href="/profile"
@@ -767,6 +836,7 @@ export function ProductShell({
                   activeView={resolvedActiveView}
                   hasFounder={hasFounder}
                   hasAdvisor={hasAdvisor}
+                  onSelect={chooseWorkContext}
                 />
               </div>
             </div>
@@ -809,7 +879,7 @@ export function ProductShell({
             AUF JEDER EBENE UND AUF JEDEM GERAET
             ---------------------------------------------------------------
 
-            Die zweite Reihe gibt es erst ab 1024 Pixeln und nur bei Align.
+            Die zweite Reihe gibt es erst ab 1024 Pixeln und nur in Bereichen mit Unterseiten.
             Diese Zeile gibt es immer - gerade auf dem Telefon, wo die
             Bereiche hinter einem Knopf liegen und man sonst gar nicht sieht,
             worin man steht.

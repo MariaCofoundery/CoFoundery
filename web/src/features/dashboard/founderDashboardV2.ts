@@ -46,3 +46,24 @@ export function resolveDiscoveryFoundationState(
   if (status === "active" || status === "paused" || status === "draft") return status;
   return "not_created" as const;
 }
+
+/**
+ * Die eine Hauptaktion im Begruessungsbereich - oder keine.
+ *
+ * Seit Phase 9.4A hoechstens eine: Ist das Basisprofil unvollstaendig, geht es
+ * darum; sonst um die eigene Arbeitsweise, solange sie nicht abgegeben ist.
+ * Alles, was andere betrifft (Einladungen, Freigaben, Bestaetigungen), steht
+ * unter "Was gerade ansteht" - es hier zu wiederholen, waere dieselbe Aufgabe
+ * zweimal. Ist nichts offen, bleibt der Bereich ruhig.
+ */
+export type DashboardPrimaryAction = "complete_profile" | "workstyle_start" | "workstyle_continue";
+
+export function resolveDashboardPrimaryAction(params: {
+  needsOnboarding: boolean;
+  workProfileState: "new" | "legacy" | "started" | "completed";
+}): DashboardPrimaryAction | null {
+  if (params.needsOnboarding) return "complete_profile";
+  if (params.workProfileState === "started") return "workstyle_continue";
+  if (params.workProfileState === "new" || params.workProfileState === "legacy") return "workstyle_start";
+  return null;
+}

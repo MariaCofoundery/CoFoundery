@@ -627,7 +627,9 @@ test("task UI and DE/EN messages preserve the three-item limit and empty state",
   assert.match(component, /tasks\.slice\(0, 3\)/);
   assert.doesNotMatch(component, /aria-expanded|showAll|useState/);
   assert.match(dashboard, /dashboard-block-tasks/);
-  assert.match(dashboard, /sectionNavigation\.tasks/);
+  // Die Abschnittsleiste gibt es seit Phase 9.4A nicht mehr; der Bereich
+  // traegt seinen Titel selbst.
+  assert.match(dashboard, /t\("tasks\.title"\)/);
   assert.doesNotMatch(dashboard, /prioritizedTask|resolvedHeroPanel/);
   assert.equal(de.tasks.empty.title, "Aktuell wartet nichts auf dich.");
   assert.equal(en.tasks.empty.title, "Nothing is waiting for you right now.");

@@ -3,31 +3,21 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   resolveDashboardHeroAction,
+  resolveDashboardPrimaryAction,
   resolveDiscoveryFoundationState,
   resolveFounderAlignmentFoundationState,
   resolveValuesFoundationState,
 } from "@/features/dashboard/founderDashboardV2";
 
 const dashboardSource = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
-const journeySource = readFileSync(
-  "src/features/dashboard/DashboardJourneyLine.tsx",
-  "utf8"
-);
+const shellSource = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
 type DashboardMessages = {
-  hero: { eyebrow: string; quoteEyebrow: string };
-  explore: {
-    libraryLink: { title: string; text: string };
-    items: Record<string, { title: string; text: string; action: string }>;
-    controls: Record<string, string>;
-  };
+  hero: { eyebrow: string; primary: Record<string, string>; primaryText: Record<string, string> };
+  aboutYou: { title: string; ownProfile: { title: string }; find: { title: string }; edit: { title: string } };
   foundation: {
     alignment: { title: string };
     values: { optionalBadge: string };
     discovery: { eyebrow: string };
-  };
-  outlook: {
-    inDevelopment: string;
-    items: Record<string, string>;
   };
 };
 
@@ -160,33 +150,87 @@ test("dashboard no longer renders a global roadmap, profile percentage, or workb
   assert.doesNotMatch(dashboardSource, /startWorkbook|continueWorkbook|workbookFocus/);
 });
 
-test("personal hero, quote, foundation and connections remain visible", () => {
+test("die eine Hauptaktion: Profil zuerst, dann die eigene Arbeitsweise, sonst nichts", () => {
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: true, workProfileState: "completed" }), "complete_profile");
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: true, workProfileState: "new" }), "complete_profile");
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "new" }), "workstyle_start");
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "legacy" }), "workstyle_start");
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "started" }), "workstyle_continue");
+  // Ist nichts offen, bleibt der Kopfbereich ruhig - keine erzwungene Aktion.
+  assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "completed" }), null);
+  // Und hoechstens eine: der Bereich rendert genau einen bedingten Link.
+  const hero = dashboardSource.slice(
+    dashboardSource.indexOf("data-dashboard-hero"),
+    dashboardSource.indexOf('id="dashboard-block-tasks"'),
+  );
+  assert.equal(hero.match(/<Link/g)?.length, 1);
+  assert.match(hero, /primaryAction \? \(/);
+});
+
+test("vier Bereiche in fester Reihenfolge: Begruessung, Ansteht, Teams, Über dich", () => {
   assert.match(dashboardSource, /t\("hero\.eyebrow"\)/);
   assert.match(dashboardSource, /t\("hero\.greeting"/);
-  assert.match(dashboardSource, /t\("hero\.quoteEyebrow"\)/);
-  assert.match(dashboardSource, /dashboard-block-foundation/);
-  assert.match(dashboardSource, /dashboard-block-connections/);
-  assert.doesNotMatch(dashboardSource, /foundation\.values\.optionalBadge/);
-  assert.match(dashboardSource, /<AlignCard state=\{alignState\}/);
+  const order = [
+    "data-dashboard-hero",
+    'id="dashboard-block-tasks"',
+    'id="dashboard-block-connections"',
+    'id="dashboard-block-profile"',
+    'id="dashboard-legacy-title"',
+    'id="dashboard-block-account"',
+  ].map((marker) => dashboardSource.indexOf(marker));
+  for (const at of order) assert.ok(at > -1, "ein Bereich fehlt");
+  assert.deepEqual([...order].sort((a, b) => a - b), order, "die Reihenfolge stimmt nicht");
+
+  assert.match(dashboardSource, /<AlignWorkstyleStatus state=\{alignState\}/);
+  assert.match(dashboardSource, /<AlignVentureActions state=\{alignState\}/);
   assert.match(dashboardSource, /getOwnDiscoveryProfile/);
+  assert.doesNotMatch(dashboardSource, /foundation\.values\.optionalBadge/);
   assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|prioritizedTask|buildDashboardV2HeroPanel/);
 });
 
-test("right-side section navigation points only to existing V2 sections", () => {
-  for (const id of [
-    "dashboard-block-tasks",
-    "dashboard-block-foundation",
-    "dashboard-block-connections",
-    "dashboard-block-explore",
-    "dashboard-block-outlook",
+test("Zitat, Ausblick, Karussell, Netzwerk-Box und Abschnittsleiste sind weg", () => {
+  for (const removed of [
+    /hero\.quoteEyebrow|getQuoteOfTheDay/,
+    /DashboardJourneyLine|sectionNavigation\./,
+    /DashboardSpotlight|explore\./,
+    /dashboard-block-outlook|outlook\./,
+    /DashboardHeroConstellation/,
+    /connectCounts|dashboard-network-title/,
+    /dashboard-block-roadmap/,
   ]) {
-    assert.match(dashboardSource, new RegExp(`id=\\"${id}\\"`));
-    assert.match(dashboardSource, new RegExp(`id: \\"${id}\\"`));
+    assert.doesNotMatch(dashboardSource, removed);
   }
-  assert.match(journeySource, /<nav/);
-  assert.match(journeySource, /aria-current/);
-  assert.match(journeySource, /href=\{`#\$\{section\.id\}`\}/);
-  assert.doesNotMatch(dashboardSource, /dashboard-block-roadmap/);
+  // Der Kopfbereich traegt keine Sammlung von Wegen mehr.
+  assert.doesNotMatch(dashboardSource, /hero\.heroConnections|hero\.heroFind|hero\.heroOwnProfile/);
+  // "Team Context" steht nicht mehr im Kopfbereich und nirgends hartkodiert.
+  assert.doesNotMatch(dashboardSource, /Team Context/);
+  // Die Library bleibt erreichbar - jetzt ueber die Leiste.
+  assert.match(shellSource, /href: "\/founder-library"/);
+});
+
+test("Team-Intake bleibt fuer Founder erreichbar, aber leise im Teams-Bereich", () => {
+  const teams = dashboardSource.slice(
+    dashboardSource.indexOf('id="dashboard-block-connections"'),
+    dashboardSource.indexOf('id="dashboard-block-profile"'),
+  );
+  assert.match(teams, /href="\/team-intake"/);
+  assert.match(teams, /t\("team\.teamIntakeLink"\)/);
+  // Im Advisor-Kontext steht Intake als regulaerer Menuepunkt.
+  assert.match(shellSource, /href: "\/team-intake"[\s\S]{0,40}label: t\("advisorIntake"\)/);
+});
+
+test("fruehere Auswertungen stehen nur eingeklappt und nur, wenn es sie gibt", () => {
+  const at = dashboardSource.indexOf('id="dashboard-legacy-title"');
+  const details = dashboardSource.lastIndexOf("{hasHistory ? (", at);
+  assert.ok(details > -1 && details < at);
+  assert.match(dashboardSource.slice(details, at), /<details/);
+  // Die alten Paarreports stehen hier und nicht mehr im Teams-Bereich.
+  const teams = dashboardSource.slice(
+    dashboardSource.indexOf('id="dashboard-block-connections"'),
+    dashboardSource.indexOf('id="dashboard-block-profile"'),
+  );
+  assert.doesNotMatch(teams, /renderCompactReportRow/);
+  assert.ok(dashboardSource.indexOf("renderCompactReportRow(run, t)") > details);
 });
 
 test("Current work is the only task presentation and remains capped at three items", () => {
@@ -197,44 +241,14 @@ test("Current work is the only task presentation and remains capped at three ite
   assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|tasks\[0\]/);
 });
 
-test("Explore CoFoundery has three manual spotlight items and a permanent Library link", () => {
-  const spotlight = readFileSync("src/features/dashboard/DashboardSpotlight.tsx", "utf8");
-  assert.deepEqual(Object.keys(deDashboard.explore.items), ["library", "discovery", "collaboration"]);
-  assert.deepEqual(Object.keys(deDashboard.explore.items), Object.keys(enDashboard.explore.items));
-  assert.equal(deDashboard.explore.libraryLink.text, "Begriffe, Updates und Quellen für Founder.");
-  assert.equal(enDashboard.explore.libraryLink.text, "Terms, updates and sources for founders.");
-  assert.match(dashboardSource, /href="\/founder-library"/);
-  assert.match(dashboardSource, /id: "founder-library"/);
-  assert.match(dashboardSource, /id: "discovery"/);
-  assert.match(dashboardSource, /id: "collaboration"/);
-  assert.match(spotlight, /aria-label=\{previousLabel\}/);
-  assert.match(spotlight, /aria-label=\{nextLabel\}/);
-  assert.match(spotlight, /aria-pressed=\{index === activeIndex\}/);
-  assert.doesNotMatch(spotlight, /setInterval|setTimeout|autoplay|useEffect/i);
-});
-
-test("outlook contains exactly the two V2 future themes in DE and EN", () => {
-  const expectedKeys = [
-    "checkInsText",
-    "checkInsTitle",
-    "collaborationText",
-    "collaborationTitle",
-  ];
-  assert.deepEqual(Object.keys(deDashboard.outlook.items).sort(), expectedKeys);
-  assert.deepEqual(Object.keys(enDashboard.outlook.items).sort(), expectedKeys);
-  assert.equal(deDashboard.outlook.inDevelopment, "In Entwicklung");
-  assert.equal(enDashboard.outlook.inDevelopment, "In development");
-
-  const outlookCopy = JSON.stringify({ de: deDashboard.outlook, en: enDashboard.outlook });
-  assert.doesNotMatch(outlookCopy, /Investor Readiness|Wissensbibliothek|Knowledge library/);
-  assert.doesNotMatch(outlookCopy, /Collaboration Profile|Founder Trial Sprint/);
-});
-
 test("DE and EN preserve personal dashboard semantics and optional values", () => {
   assert.equal(deDashboard.hero.eyebrow, "Founder Dashboard");
   assert.equal(enDashboard.hero.eyebrow, "Founder dashboard");
-  assert.equal(deDashboard.hero.quoteEyebrow, "Zitat des Tages");
-  assert.equal(enDashboard.hero.quoteEyebrow, "Quote of the day");
+  assert.deepEqual(Object.keys(deDashboard.hero.primary), ["complete_profile", "workstyle_start", "workstyle_continue"]);
+  assert.deepEqual(Object.keys(enDashboard.hero.primary), Object.keys(deDashboard.hero.primary));
+  assert.deepEqual(Object.keys(enDashboard.hero.primaryText), Object.keys(deDashboard.hero.primaryText));
+  assert.equal(deDashboard.aboutYou.title, "Über dich");
+  assert.equal(enDashboard.aboutYou.title, "About you");
   assert.equal(deDashboard.foundation.values.optionalBadge, "Optional");
   assert.equal(enDashboard.foundation.values.optionalBadge, "Optional");
   assert.equal(deDashboard.foundation.alignment.title, "Founder Alignment");

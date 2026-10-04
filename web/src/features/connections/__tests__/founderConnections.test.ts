@@ -165,18 +165,20 @@ test("global and contextual navigation use the new DE/EN information architectur
 
   assert.equal(deNavigation.connections, "Verbindungen");
   assert.equal(enNavigation.connections, "Connections");
-  // GEAENDERT am 18.09.2026: Die Leiste traegt nur noch Bereiche - Align,
-  // Find, Connect. "Verbindungen" ist eine Seite INNERHALB von Align.
+  // GEAENDERT am 18.09.2026: Die Leiste traegt nur noch Bereiche.
+  // GEAENDERT in Phase 9.4A: Statt "Align" gibt es den Bereich
+  // "Teams & Verbindungen"; "Verbindungen" ist seine erste Seite.
   assert.equal(deNavigation.areaFind, "Find");
-  assert.equal(deNavigation.areaAlign, "Align");
-  // Die Zusage bleibt: erreichbar. Nur woanders - das Dashboard verlinkt sie,
-  // und der Align-Eintrag markiert sich auf dieser Adresse als aktiv.
+  assert.equal(deNavigation.areaTeams, "Teams & Verbindungen");
+  assert.equal(enNavigation.areaTeams, "Teams & connections");
+  // Die Zusage bleibt: erreichbar. Das Dashboard verlinkt sie, und der
+  // Bereich markiert sich auf dieser Adresse als aktiv.
   assert.match(
     readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
     /href="\/connections"/,
     "vom Dashboard aus erreichbar"
   );
-  assert.match(shell, /currentPathname === "\/connections"/, "Align markiert sich dort");
+  assert.match(shell, /currentPathname === "\/connections"/, "der Bereich markiert sich dort");
   assert.doesNotMatch(shell, /<NavigationContextMenu/);
   assert.equal(isProductChromePath("/connections"), true);
 

@@ -1,9 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import type { WorkContext } from "@/features/navigation/workContext";
 
 type DashboardViewSwitchProps = {
-  activeView: "founder" | "advisor";
+  activeView: WorkContext;
   hasFounder: boolean;
   hasAdvisor: boolean;
+  /**
+   * Merkt sich den gewaehlten Arbeitskontext (siehe workContext.ts). Reine
+   * Darstellung: Die Links fuehren auf dieselben Seiten wie vorher, und jede
+   * dieser Seiten prueft ihren Zugang selbst.
+   */
+  onSelect?: (view: WorkContext) => void;
 };
 
 function linkClassName(active: boolean) {
@@ -18,21 +28,34 @@ export function DashboardViewSwitch({
   activeView,
   hasFounder,
   hasAdvisor,
+  onSelect,
 }: DashboardViewSwitchProps) {
+  const t = useTranslations("navigation");
+
   if (!(hasFounder && hasAdvisor)) {
     return null;
   }
 
   return (
     <nav
-      aria-label="Ansicht wechseln"
+      aria-label={t("viewSwitchLabel")}
       className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200/80 bg-slate-100/85 p-1"
     >
-      <Link href="/dashboard" className={linkClassName(activeView === "founder")}>
-        Founder
+      <Link
+        href="/dashboard"
+        aria-current={activeView === "founder" ? "true" : undefined}
+        onClick={() => onSelect?.("founder")}
+        className={linkClassName(activeView === "founder")}
+      >
+        {t("viewFounder")}
       </Link>
-      <Link href="/advisor/dashboard" className={linkClassName(activeView === "advisor")}>
-        Advisor
+      <Link
+        href="/advisor/dashboard"
+        aria-current={activeView === "advisor" ? "true" : undefined}
+        onClick={() => onSelect?.("advisor")}
+        className={linkClassName(activeView === "advisor")}
+      >
+        {t("viewAdvisor")}
       </Link>
     </nav>
   );

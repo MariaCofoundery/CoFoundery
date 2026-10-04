@@ -11,6 +11,8 @@ import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNotice
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import { parseWorkContext, WORK_CONTEXT_COOKIE } from "@/features/navigation/workContext";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getMessages } from "@/i18n/messages";
@@ -72,6 +74,8 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getRequestLocale();
   const messages = getMessages(locale);
+  // Nur die Leiste liest diesen Wert - zuletzt genutzter Arbeitskontext, keine Berechtigung.
+  const storedWorkContext = parseWorkContext((await cookies()).get(WORK_CONTEXT_COOKIE)?.value);
   const supabase = await createClient();
   const {
     data: { user },
@@ -147,6 +151,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             unreadConnectMessageCount={unreadConnectMessageCount}
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}
+            storedWorkContext={storedWorkContext}
           >
             {children}
           </ProductShell>

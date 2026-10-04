@@ -2,14 +2,19 @@
   "hero": {
     "eyebrow": "Founder dashboard",
     "greeting": "Good to see you, {name}.",
-    "quoteEyebrow": "Quote of the day",
     "contextLabel": "Founder context",
     "error": "The action could not be completed right now. Please try again.",
     "loadError": "The dashboard could not be loaded completely right now. Please try again.",
-    "heroConnections": "Your connections",
-    "heroConnectionsCount": "{count, plural, =0 {No connection yet} one {1 connection} other {# connections}}",
-    "heroFind": "Find people",
-    "heroOwnProfile": "This is you"
+    "primary": {
+      "complete_profile": "Complete your profile",
+      "workstyle_start": "How you work – start now",
+      "workstyle_continue": "How you work – continue"
+    },
+    "primaryText": {
+      "complete_profile": "A few basic details are still missing – it only takes a moment.",
+      "workstyle_start": "How you work is the basis for conversations within your team.",
+      "workstyle_continue": "You have already started – pick up where you left off."
+    }
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
@@ -36,14 +41,6 @@
     "continueValuesTitle": "Finish your values profile.",
     "inviteTitle": "Invite a co-founder.",
     "inviteText": "Start a founder connection and explore your perspectives together."
-  },
-  "sectionNavigation": {
-    "label": "Dashboard sections",
-    "tasks": "What needs your attention",
-    "foundation": "Your foundation",
-    "connections": "Your connections and teams",
-    "explore": "Explore CoFoundery",
-    "outlook": "Outlook"
   },
   "tasks": {
     "eyebrow": "Current work",
@@ -169,44 +166,6 @@
       }
     }
   },
-  "connect": {
-    "eyebrow": "Your activity",
-    "title": "Your connect",
-    "summary": "{seeking} needs · {offering} offers active",
-    "open": "Open Connect",
-    "create": "+ Need or offer"
-  },
-  "explore": {
-    "eyebrow": "Explore CoFoundery",
-    "title": "What you can do with CoFoundery",
-    "libraryLink": {
-      "title": "Founder Library",
-      "text": "Terms, updates and sources for founders."
-    },
-    "items": {
-      "library": {
-        "title": "Founder Library",
-        "text": "Understand key terms and keep an eye on important developments.",
-        "action": "Open Library"
-      },
-      "discovery": {
-        "title": "Find a co-founder",
-        "text": "Discover founders and explore who may fit what you are looking for in a shared venture.",
-        "action": "Discover founders"
-      },
-      "collaboration": {
-        "title": "Understand collaboration",
-        "text": "Work with your collaboration intentionally—for example with Read My Mind and structured conversations.",
-        "action": "Explore collaboration"
-      }
-    },
-    "controls": {
-      "previous": "Previous item",
-      "next": "Next item",
-      "indicators": "Spotlight positions",
-      "position": "Show item {position} of {total}"
-    }
-  },
   "foundation": {
     "eyebrow": "Personal foundation",
     "title": "Your foundation",
@@ -302,9 +261,7 @@
   },
   "team": {
     "eyebrow": "Founder workspace",
-    "title": "Your connections & teams",
-    "inviteTitle": "Invite co-founder",
-    "inviteText": "Start a new founder connection.",
+    "title": "Your teams & connections",
     "cards": {
       "empty": "No founder connection yet.",
       "founderFallback": "Founder {index}",
@@ -332,13 +289,7 @@
         "alignmentInProgress": "Alignment in progress"
       }
     },
-    "detailsTitle": "Invitations and reports",
-    "detailsText": "Open invitations, alignment reports, and more details.",
-    "expand": "Expand",
-    "invitations": "Invitations",
-    "noInvitations": "No open invitations yet.",
     "reports": "Alignment reports",
-    "noReports": "Once alignment reports are ready, they appear here.",
     "partner": "Partner: {email}",
     "status": "Status: {status}",
     "modulesAndExpiry": "Modules: {modules} · Expires: {date}",
@@ -362,7 +313,8 @@
       "continueNow": "Continue now",
       "startNow": "Start now",
       "openValues": "Open values module",
-      "startMatching": "Start matching"
+      "startMatching": "Start matching",
+      "openTeamReport": "How you work together"
     },
     "incomingHero": {
       "reportReadyLabel": "View matching report",
@@ -376,7 +328,11 @@
       "priorityTitle": "Your active matching has priority.",
       "statusText": "Jump straight into the current status with {name} and continue from there.",
       "flowText": "Continue the invited founder flow with {name} exactly where you left off."
-    }
+    },
+    "invitationsSummary": "Open invitations",
+    "invitationsSummaryText": "Invitations you received or sent.",
+    "teamIntakeText": "Taking part in a team intake?",
+    "teamIntakeLink": "Go to team intake"
   },
   "profile": {
     "eyebrow": "Profile & settings",
@@ -596,18 +552,6 @@
       "failed": "The test run did not complete. Please try again."
     }
   },
-  "outlook": {
-    "eyebrow": "Outlook",
-    "title": "What could come next",
-    "text": "Two areas CoFoundery is exploring for long-term collaboration, without promising fixed release dates.",
-    "inDevelopment": "In development",
-    "items": {
-      "collaborationTitle": "Strengthen your collaboration",
-      "collaborationText": "Get to know your ways of working even better through shared questions, short scenarios, and experiments for your collaboration.",
-      "checkInsTitle": "Regular team check-ins",
-      "checkInsText": "Review together what works in your collaboration and what you want to agree differently."
-    }
-  },
   "coFounderInvitePage": {
     "backToDashboard": "Back to dashboard"
   },
@@ -754,14 +698,6 @@
     "unknown": "unknown",
     "locale": "en-US"
   },
-  "quotes": {
-    "q0": "Clarity saves founder teams far more energy later than speed in the wrong place.",
-    "q1": "Not every tension is a problem. But every unspoken tension costs focus.",
-    "q2": "Good founder teams are not frictionless. They clarify friction early.",
-    "q3": "A stable team rarely comes from sameness, but from well-clarified differences.",
-    "q4": "When two founders see the same direction, decisions get easier and conflicts get smaller.",
-    "q5": "Sometimes the most productive progress is not more speed, but a better agreement."
-  },
   "workProfile": {
     "eyebrow": "How you work and what you want to build",
     "title": "Founder working profile",
@@ -792,7 +728,8 @@
     "comparisonEmpty": "You can compare once you are connected, have both submitted and shared your answers with each other.",
     "compare": "Compare with {name}",
     "notShared": "{name} – has not shared anything yet",
-    "unavailable": "Your working profile could not be loaded. Please reload the page."
+    "unavailable": "Your working profile could not be loaded. Please reload the page.",
+    "notStarted": "Not started"
   },
   "legacy": {
     "title": "Earlier assessments",
@@ -801,5 +738,21 @@
     "values": "Includes your earlier values profile.",
     "versions": "Earlier versions and answers",
     "answers": "Open the archive of earlier versions"
+  },
+  "aboutYou": {
+    "title": "About you",
+    "text": "What belongs to you – independent of any team.",
+    "ownProfile": {
+      "title": "This is you",
+      "text": "Your combined profile: how you work, capabilities, strengths and drive.",
+      "action": "View"
+    },
+    "find": {
+      "title": "Your FIND profile"
+    },
+    "edit": {
+      "title": "Edit details",
+      "action": "Edit"
+    }
   }
 }

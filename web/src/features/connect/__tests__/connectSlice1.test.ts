@@ -155,10 +155,14 @@ test("missing technical roles never normalize to Founder", () => {
 test("owner lifecycle and dashboard integration are present", () => {
   const my = readFileSync("src/app/(product)/connect/my/page.tsx", "utf8");
   const lifecycle = readFileSync("src/features/connect/ConnectLifecycleForm.tsx", "utf8");
-  const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   assert.match(my, /ConnectLifecycleForm/);
   for (const action of ["publish", "pause", "complete", "renew"]) assert.match(lifecycle, new RegExp(action));
-  assert.match(dashboard, /connectCounts\.seeking \+ connectCounts\.offering > 0/);
+  // GEAENDERT IN PHASE 9.4A: Die eigene Netzwerk-Box auf dem Founder-Dashboard
+  // ist weg - sie stand gleichrangig neben dem, was ansteht. Connect bleibt
+  // ueber die Leiste erreichbar, mit Zaehler und dem eigenen Bereich "Meins".
+  assert.match(shell, /badge: \{ kind: "attention", count: connectAttentionCount \}/);
+  assert.match(shell, /href: "\/connect\/my"/);
 });
 
 test("German and English Connect messages have exact key parity", () => {
