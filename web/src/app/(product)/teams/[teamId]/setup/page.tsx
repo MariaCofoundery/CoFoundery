@@ -58,6 +58,8 @@ export default async function FounderSetupPage({ params }: Props) {
         ) : null}
       </header>
 
+      {setup.items.some(item => item.rosterConfirmationMissing) ? <p className="mt-5 rounded-xl border border-slate-200 p-4 text-sm leading-6">{t("rosterChanged")}</p> : null}
+
       <FounderTeamNavigation
         teamId={teamId}
         active="setup"

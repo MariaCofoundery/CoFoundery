@@ -76,7 +76,7 @@ test("homebase presents localized real avatars with initials fallback in the int
   const setup = page.indexOf('aria-labelledby="team-setup-title"');
   const agreements = page.indexOf('aria-labelledby="team-agreements-title"');
   const advisor = page.indexOf("<FounderRelationshipAdvisorPanel");
-  assert.ok(founder < alignment && alignment < setup && setup < agreements && agreements < advisor);
+  assert.ok(founder < setup && setup < alignment && alignment < agreements && agreements < advisor);
 });
 
 test("detail makes a founder's pending confirmation and CTA hierarchy explicit in DE and EN", () => {

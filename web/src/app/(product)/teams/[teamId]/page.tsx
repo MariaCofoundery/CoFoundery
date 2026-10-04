@@ -93,6 +93,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
    * und ein falscher Rat ist schlechter als keiner.
    */
   const isNewPair =
+    team.members.length === 2 &&
     team.alignment.every((entry) => !entry.matchingReport && !entry.classicReport) &&
     !setupState?.started &&
     startedLabRelationships.size === 0;
@@ -173,6 +174,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
               </li>
             ))}
           </ul>
+          {team.members.length < 4 ? <Link className={`${LINK_CLASS} mt-4`} href={`/invite/new?team=${team.id}`}>{t("membersInvite")}</Link> : <p className="mt-4 text-sm text-slate-600">{t("membersFull")}</p>}
         </section>
 
         {/* ---------------------------------------------------------------
@@ -196,6 +198,38 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           <p className="mt-2 text-sm leading-6">Startet mit euren freigegebenen Arbeitsweisen und Erwartungen an dieses Vorhaben. Gesprächspunkte könnt ihr anschließend direkt im Founder Setup klären.</p>
           <Link className="mt-3 inline-block underline" href={`/teams/${team.id}/workstyle`}>Zum aktuellen Teamreport</Link>
           <p className="mt-3 text-sm">Vertiefungen dienen dem Gespräch. Founder Setup hält eure gemeinsam bestätigten Vereinbarungen fest.</p>
+        </section>
+        <section
+          className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
+          aria-labelledby="team-setup-title"
+        >
+          <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
+            {t("setup.title")}
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
+          {pendingSetupAdvisorTask ? (
+            <div className="mt-4 rounded-xl border border-violet-200 bg-white/80 p-4">
+              <p className="text-sm font-semibold text-slate-900">{t("setup.advisorTask.title")}</p>
+              <p className="mt-1 text-sm leading-6 text-slate-600">{t("setup.advisorTask.description")}</p>
+              <Link href={`/teams/${teamId}/setup#advisor-setup-access`} className={`${LINK_CLASS} mt-3`}>{t("setup.advisorTask.cta")}</Link>
+            </div>
+          ) : null}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-slate-700">
+              {setupState?.started ? t("setup.started") : t("setup.notStarted")}
+            </p>
+            <Link
+              href={`/teams/${teamId}/setup`}
+              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+            >
+              {t("setup.open")}
+            </Link>
+          </div>
+        </section>
+
+        <section id="team-deep-dives" className="rounded-2xl border border-slate-200 p-5">
+          <h2 className="text-xl font-semibold">{t("pairScope.title")}</h2>
+          <p className="mt-2 text-sm leading-6">{t("pairScope.description")}</p>
         </section>
 {isNewPair ? (
           <p className="rounded-2xl border border-cyan-200/70 bg-[linear-gradient(120deg,rgba(103,232,249,.10),rgba(124,58,237,.06))] px-5 py-4 text-sm leading-7 text-slate-700">
@@ -342,34 +376,6 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </div>
           </section>
         ) : null}
-
-        <section
-          className="rounded-2xl border border-violet-200/80 bg-violet-50/45 p-5 shadow-[0_12px_30px_rgba(76,29,149,0.05)] sm:p-6"
-          aria-labelledby="team-setup-title"
-        >
-          <h2 id="team-setup-title" className="text-xl font-semibold text-slate-950">
-            {t("setup.title")}
-          </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">{t("setup.description")}</p>
-          {pendingSetupAdvisorTask ? (
-            <div className="mt-4 rounded-xl border border-violet-200 bg-white/80 p-4">
-              <p className="text-sm font-semibold text-slate-900">{t("setup.advisorTask.title")}</p>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{t("setup.advisorTask.description")}</p>
-              <Link href={`/teams/${teamId}/setup#advisor-setup-access`} className={`${LINK_CLASS} mt-3`}>{t("setup.advisorTask.cta")}</Link>
-            </div>
-          ) : null}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-medium text-slate-700">
-              {setupState?.started ? t("setup.started") : t("setup.notStarted")}
-            </p>
-            <Link
-              href={`/teams/${teamId}/setup`}
-              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-            >
-              {t("setup.open")}
-            </Link>
-          </div>
-        </section>
 
         <section className={SECTION_CLASS} aria-labelledby="team-agreements-title">
           <h2 id="team-agreements-title" className="text-xl font-semibold text-slate-950">

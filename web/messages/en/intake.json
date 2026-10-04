@@ -10,7 +10,7 @@
   "team": "Team / venture",
   "newTeam": "Create a new team after confirmation",
   "existingHelp": "Existing teams are offered only with effective team access. Enter all members’ email addresses as well. A new round does not change an earlier one.",
-  "emails": "Email addresses of 2 or 3 founders (one per line)",
+  "emails": "Email addresses of 2 to 4 founders (one per line)",
   "holder": "Advisor / recipient",
   "personal": "Me personally",
   "reviewers": "Named reviewers",

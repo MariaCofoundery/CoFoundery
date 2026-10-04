@@ -1,3 +1,4 @@
+import { getFounderSetup } from "@/features/teams/founderSetupData";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
@@ -8,10 +9,10 @@ export async function TeamJourneyStatus({ teamId, userId }: { teamId: string; us
     client.from("assessments").select("submitted_at").eq("user_id", userId).eq("instrument_id", CURRENT_WORKSTYLE_INSTRUMENT).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     client.from("assessments").select("submitted_at").eq("user_id", userId).eq("instrument_id", "venture-alignment-v1").eq("venture_id", teamId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     client.rpc("get_workstyle_product_team_status", { p_team_id: teamId }),
-    client.from("founder_team_setup_items").select("current_confirmed_revision_id,pending_revision_id,work_status").eq("team_id", teamId),
+    getFounderSetup(teamId, userId, client),
   ]);
   const status = (result: typeof work) => result.error ? "Status nicht verfügbar" : result.data?.submitted_at ? "Vorhanden" : result.data ? "In Arbeit" : "Noch offen";
-  const setupStatus = setup.error ? "Status nicht verfügbar" : setup.data?.some(x => x.current_confirmed_revision_id) ? "Bestätigte Themen vorhanden" : setup.data?.some(x => x.pending_revision_id || x.work_status === "discussing") ? "In Klärung" : "Offen";
+  const setupStatus = !setup ? "Status nicht verfügbar" : setup.items.some(x => x.currentConfirmedRevision) ? "Bestätigte Themen vorhanden" : setup.items.some(x => x.rosterConfirmationMissing || x.pendingRevision || x.workStatus === "discussing") ? "In Klärung" : "Offen";
   const entries = [
     { name: "Deine Arbeitsweise", status: status(work), href: "/me/profile/workstyle" },
     { name: "Dein Venture Alignment", status: status(venture), href: `/founder-alignment/vorhaben?venture=${teamId}` },

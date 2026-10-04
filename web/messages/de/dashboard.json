@@ -624,7 +624,8 @@
   },
   "coFounderInviteForm": {
     "title": "Co-Founder einladen",
-    "intro": "Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.",
+    "targetTeam": "Einladung zu „{name}“. Die Person tritt diesem bestehenden Team bei. Arbeitsweise und Freigaben bleiben persönliche Entscheidungen.",
+      "intro": "Wähle jetzt euren Kontext und sende die Einladung direkt per E-Mail. Falls nötig, kannst du den Link danach weiterhin manuell teilen.",
     "label": {
       "projectName": "Name eures Teams oder Projekts",
       "email": "E-Mail-Adresse"

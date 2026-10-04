@@ -89,7 +89,7 @@ test("beide Seiten bekommen einen Hinweis", () => {
   // aus, bevor du jemanden einlädst."
   const einladen = lies("src", "app", "(product)", "invite", "new", "page.tsx");
   assert.match(einladen, /worksWithPrevious\(user\.id\)/);
-  assert.match(einladen, /\{bisherigeFassung && <InviteVersionNote \/>\}/);
+  assert.match(einladen, /\{!targetTeam && bisherigeFassung && <InviteVersionNote \/>\}/);
 
   // Und wer im alten Bogen sitzt, erfährt es dort - nicht danach.
   const base = lies("src", "app", "me", "base", "page.tsx");

@@ -1,19 +1,29 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
 import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
 import { InviteVersionNote } from "@/features/instruments/align/InviteVersionNote";
 import { worksWithPrevious } from "@/features/instruments/align/invitationVersion";
-import { getRequestUser } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
-export default async function NewInvitePage() {
+export default async function NewInvitePage({ searchParams }: { searchParams: Promise<{ team?: string }> }) {
+  const { team: teamId } = await searchParams;
   const t = await getTranslations("dashboard.coFounderInvitePage");
   const {
     data: { user },
   } = await getRequestUser();
 
   if (!user) {
-    redirect("/login?next=/invite/new");
+    redirect(`/login?next=${encodeURIComponent(teamId ? `/invite/new?team=${teamId}` : "/invite/new")}`);
+  }
+
+  let targetTeam: { id: string; name: string; context: "pre_founder" | "existing_team" } | undefined;
+  if (teamId) {
+    const { getFounderTeamHomebase } = await import("@/features/teams/founderTeamHomebaseData");
+    const team = await getFounderTeamHomebase(teamId, user.id, await createClient());
+    if (!team) notFound();
+    if (team.members.length >= 4) redirect(`/teams/${teamId}`);
+    targetTeam = { id: team.id, name: team.name ?? team.members.map(m => m.displayName ?? "Founder").join(" + "), context: team.teamContext };
   }
 
   // WER EINLAEDT, ENTSCHEIDET UEBER BEIDE. Die Einladung fuehrt dorthin, wo
@@ -32,9 +42,9 @@ export default async function NewInvitePage() {
         </a>
       </div>
       <div className="space-y-6">
-        {bisherigeFassung && <InviteVersionNote />}
-        <MatchingStartBlock />
-        <CoFounderInviteForm />
+        {!targetTeam && bisherigeFassung && <InviteVersionNote />}
+        {!targetTeam && <MatchingStartBlock />}
+        <CoFounderInviteForm targetTeam={targetTeam} />
       </div>
     </main>
   );

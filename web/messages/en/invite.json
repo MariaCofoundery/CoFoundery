@@ -1,5 +1,8 @@
 {
   "join": {
+      "teamFull": "The team already has four members. Another person cannot join.",
+      "teamChanged": "The team context has changed. Please clarify the invitation with the person who invited you.",
+
     "loadingTitle": "Checking invitation",
     "loadingDescription": "We are processing your invitation link.",
     "sessionCheckFailedTitle": "Sign-in could not be checked",
@@ -24,6 +27,9 @@
   },
   "welcome": {
     "errors": {
+      "teamFull": "The team already has four members. Another person cannot join.",
+      "teamChanged": "The team context has changed. Please clarify the invitation with the person who invited you.",
+
       "invalidToken": "Invalid link",
       "expired": "Link expired",
       "revoked": "Invitation revoked",

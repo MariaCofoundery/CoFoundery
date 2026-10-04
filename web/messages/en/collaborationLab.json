@@ -6,7 +6,7 @@
     "betaLabel": "Beta · In development",
     "experienceDescription": "Estimate how each other would respond to five short work situations. Your answers stay hidden until you have both finished.",
     "revealWaitingText": "The round will complete once you have both viewed all five reveals.",
-    "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
+    "unsupported": "Read My Mind involves two people. Pair selection for larger teams is not available yet.",
     "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders.",
     "partnerFallback": "Co-founder",
     "status": {
@@ -83,7 +83,7 @@
       "declinePurge": "If {name} does not join this time, the round ends and the answers from this attempt are deleted."
     },
     "start": "Start round",
-    "unsupported": "Read My Mind for teams with three founders will follow in a later step.",
+    "unsupported": "Read My Mind involves two people. Pair selection for larger teams is not available yet.",
     "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders."
   },
   "round": {

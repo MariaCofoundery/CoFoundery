@@ -1,5 +1,9 @@
 {
   "homebase": {
+    "membersInvite": "Weitere Person in dieses Team einladen",
+    "membersFull": "Dieses Team hat vier Mitglieder. Weitere Einladungen sind nicht möglich.",
+    "pairScope": {"title": "Optionale Vertiefungen", "description": "Diese Vertiefungen finden zwischen zwei Teammitgliedern statt. Beim Commitment Lab steht das jeweilige Paar dabei. Ergebnisse gelten für dieses Paar, nicht automatisch für das gesamte Team. RMM und Founder in the Wild sind derzeit nur für Zweierteams startbar; eine Paarauswahl für größere Teams ist noch nicht verfügbar."},
+
     "eyebrow": "Founder-Team",
     "title": "Unsere Zusammenarbeit",
     "back": "Zurück zu Verbindungen",
@@ -300,6 +304,7 @@
     }
   },
   "setup": {
+    "rosterChanged": "Für frühere Vereinbarungen fehlen Bestätigungen aus eurem aktuellen Team. Die früheren Fassungen bleiben in der Historie lesbar. Besprecht die Themen erneut und schlagt bei Bedarf eine neue Fassung zur Bestätigung durch alle aktuellen Mitglieder vor.",
     "title": "Founder Setup",
     "subtitle": "Klärt Schritt für Schritt die Themen, die für eure Zusammenarbeit wichtig sind.",
     "backToCollaboration": "Zur Zusammenarbeit",

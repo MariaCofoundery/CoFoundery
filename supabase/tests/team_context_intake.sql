@@ -22,7 +22,7 @@ select lives_ok($q$insert into intake_test_ids select 'abc',public.create_team_i
 select lives_ok($q$insert into intake_test_ids select 'mixed',public.create_team_intake('selection','mixed',array['intake-a@example.invalid','intake-future@example.invalid'],array[md5('mixed-a')||md5('mixed-a'),md5('mixed-future')||md5('mixed-future')],null,null,null)$q$, 'mixed: create 2 invites');
 select lives_ok($q$insert into intake_test_ids select 'none',public.create_team_intake('selection','none',array['intake-future1@example.invalid','intake-future2@example.invalid'],array[md5('none-future1')||md5('none-future1'),md5('none-future2')||md5('none-future2')],null,null,null)$q$, 'none: create 2 invites');
 select is(public.get_team_intake((select id from intake_test_ids where key='none'))->>'team_id',null::text,'Invites need no team or accounts');
-select throws_ok($q$select public.create_team_intake('selection','four',array['a@x','b@x','c@x','d@x'],array[repeat('a',64),repeat('b',64),repeat('c',64),repeat('d',64)])$q$, '22023', 'intake_invalid', 'Fourth person rejected');
+select throws_ok($q$select public.create_team_intake('selection','four',array['a@x','b@x','c@x','d@x','e@x'],array[repeat('a',64),repeat('b',64),repeat('c',64),repeat('d',64),repeat('e',64)])$q$, '22023', 'intake_invalid', 'Fifth person rejected');
 reset role;
 select set_config('request.jwt.claim.sub','75000000-0000-4000-8000-000000000005',true);
 set local role authenticated;

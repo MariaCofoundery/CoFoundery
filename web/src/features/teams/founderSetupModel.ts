@@ -68,6 +68,7 @@ export type FounderSetupItem = {
    */
   displayStatus: FounderSetupDisplayStatus;
   currentConfirmedRevision: FounderSetupRevision | null;
+  rosterConfirmationMissing?: boolean;
   pendingRevision: FounderSetupRevision | null;
 };
 
@@ -143,9 +144,13 @@ export function buildFounderSetupReadModel(params: {
 
   const items = FOUNDER_SETUP_CATALOG.map((catalogItem): FounderSetupItem => {
     const row = rows.get(catalogItem.key);
-    const current = row?.current_confirmed_revision_id
+    const historical = row?.current_confirmed_revision_id
       ? revisions.get(row.current_confirmed_revision_id) ?? null
       : null;
+    // A pointer records history; only the current roster can make it a shared agreement.
+    const current = historical?.confirmedAt && params.members.length >= 2 && params.members.every(member =>
+      historical.confirmations.some(c => c.userId === member.userId)
+    ) ? historical : null;
     const pending = row?.pending_revision_id
       ? revisions.get(row.pending_revision_id) ?? null
       : null;
@@ -156,6 +161,7 @@ export function buildFounderSetupReadModel(params: {
       workStatus,
       workingNote: row?.working_note ?? "",
       currentConfirmedRevision: current,
+      rosterConfirmationMissing: Boolean(historical && !current),
       pendingRevision: pending,
       stage: pending ? "awaiting_confirmation" : current ? "settled" : workStatus,
       outcome: current?.resolutionStatus ?? null,

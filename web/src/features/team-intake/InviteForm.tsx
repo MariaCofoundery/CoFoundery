@@ -122,7 +122,7 @@ export function IntakeInviteForm({ options }: { options: IntakeOptions }) {
           name="emails"
           rows={3}
           required
-          maxLength={770}
+          maxLength={1030}
           className={input}
         />
       </label>

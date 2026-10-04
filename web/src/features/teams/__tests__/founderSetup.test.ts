@@ -49,6 +49,7 @@ test("read model keeps confirmed and pending snapshots separate for three founde
       { id: "pending", setup_item_id: "item", resolution_status: "documented", note: "Neue Fassung", documentation_reference: "Dokument vom 14.08.", proposed_by_user_id: "alice", created_at: "2026-02-01", confirmed_at: null },
     ],
     confirmationRows: [
+      ...members.map(m => ({ revision_id: "confirmed", user_id: m.userId, confirmed_at: "2026-01-02" })),
       { revision_id: "pending", user_id: "alice", confirmed_at: "2026-02-01" },
       { revision_id: "pending", user_id: "bob", confirmed_at: "2026-02-02" },
     ],
@@ -87,6 +88,7 @@ function settledWith(resolution: string) {
     confirmationRows: [
       { revision_id: "confirmed", user_id: "alice", confirmed_at: "2026-01-02" },
       { revision_id: "confirmed", user_id: "bob", confirmed_at: "2026-01-02" },
+      { revision_id: "confirmed", user_id: "cara", confirmed_at: "2026-01-02" },
     ],
   });
   const item = model.items.find((entry) => entry.key === "equity");
@@ -209,4 +211,18 @@ test("routes authorize server-side and homebase links into setup without exposin
   assert.match(detailPage, /if \(!setup\) notFound\(\)/);
   assert.match(homebase, /href=\{`\/teams\/\$\{teamId\}\/setup`\}/);
   assert.doesNotMatch(`${listPage}${detailPage}`, /\.email\b|user_id/);
+});
+
+test("roster growth never turns a pair agreement into a 3/4-person agreement", () => {
+  const all = [...members, { userId: "dan", displayName: "Dan" }];
+  const itemRows = [{ id: "item", team_id: "team", item_key: "equity", work_status: "open", working_note: "", current_confirmed_revision_id: "r", pending_revision_id: null }];
+  const revisionRows = [{ id: "r", setup_item_id: "item", resolution_status: "clarified", note: "Pair agreement", documentation_reference: null, proposed_by_user_id: "alice", created_at: "2026-01-01", confirmed_at: "2026-01-02" }];
+  for (const size of [2, 3, 4]) {
+    const input = { teamId: "team", currentUserId: "alice", members: all.slice(0, size), itemRows, revisionRows, confirmationRows: all.slice(0, 2).map(m => ({ revision_id: "r", user_id: m.userId, confirmed_at: "2026-01-02" })) };
+    const item = buildFounderSetupReadModel(input).items.find(i => i.key === "equity")!;
+    assert.equal(Boolean(item.currentConfirmedRevision), size === 2);
+    assert.equal(revisionRows[0].note, "Pair agreement");
+    const confirmed = buildFounderSetupReadModel({ ...input, confirmationRows: all.slice(0, size).map(m => ({ revision_id: "r", user_id: m.userId, confirmed_at: "2026-01-02" })) }).items.find(i => i.key === "equity")!;
+    assert.equal(confirmed.stage, "settled");
+  }
 });

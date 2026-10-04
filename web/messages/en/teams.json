@@ -1,5 +1,9 @@
 {
   "homebase": {
+    "membersInvite": "Invite another person to this team",
+    "membersFull": "This team has four members. No further invitations are available.",
+    "pairScope": {"title": "Optional deep dives", "description": "These deep dives involve two team members. Commitment Lab identifies the pair explicitly. Results apply to that pair, not automatically to the whole team. RMM and Founder in the Wild currently start only in two-person teams; pair selection for larger teams is not available."},
+
     "eyebrow": "Founder team",
     "title": "Our collaboration",
     "back": "Back to connections",
@@ -300,6 +304,7 @@
     }
   },
   "setup": {
+    "rosterChanged": "Earlier agreements lack confirmations from your current team. Previous versions remain readable in the history. Discuss these topics again and, where appropriate, propose a new version for all current members to confirm.",
     "title": "Founder Setup",
     "subtitle": "Work through the topics that matter for your collaboration, one step at a time.",
     "backToCollaboration": "Back to collaboration",

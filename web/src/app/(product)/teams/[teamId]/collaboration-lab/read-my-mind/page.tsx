@@ -55,7 +55,7 @@ export default async function ReadMyMindEntryPage({ params, searchParams }: { pa
       </aside>
       {query.result === "email-sent" || query.result === "email-failed" ? <p role="status" className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700">{t(`notification.${query.result === "email-sent" ? "sent" : "failed"}`, { name: partnerName })}</p> : null}
       {team.members.length !== 2 ? (
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t(team.members.length === 3 ? "unsupported" : "unsupportedTeamSize")}</p></section>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><p className="text-sm leading-7 text-slate-700">{t(team.members.length > 2 ? "unsupported" : "unsupportedTeamSize")}</p></section>
       ) : (
         <>
           <section className="mt-6 rounded-2xl border border-amber-200/80 bg-amber-50/70 p-5 sm:p-6" aria-labelledby="rmm-handoff">

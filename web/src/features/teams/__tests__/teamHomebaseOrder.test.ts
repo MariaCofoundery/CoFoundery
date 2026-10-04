@@ -27,7 +27,7 @@ const groups = (locale: string) =>
  *
  * Jetzt drei Gruppen in der Reihenfolge, in der ein Paar sich bewegt.
  */
-test("die Seite fuehrt von kennenlernen ueber verstehen zu verbindlich werden", () => {
+test("Phase 9.2: Setup ist vor den optionalen Vertiefungen erreichbar", () => {
   const page = source(PAGE);
   const at = (needle: string) => {
     const index = page.indexOf(needle);
@@ -49,7 +49,7 @@ test("die Seite fuehrt von kennenlernen ueber verstehen zu verbindlich werden", 
   assert.ok(at('id="team-alignment"') > understand);
   assert.ok(at('id="team-alignment"') < commit);
   assert.ok(at('aria-labelledby="commitment-lab-title"') > commit);
-  assert.ok(at('aria-labelledby="team-setup-title"') > commit);
+  assert.ok(at('aria-labelledby="team-setup-title"') < discover);
 });
 
 test("die vier Alignment-Links sagen, was dahinter liegt", () => {

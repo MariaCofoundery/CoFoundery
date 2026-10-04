@@ -184,12 +184,12 @@ test("handoff offers only explicit Setup targets and never confirms an agreement
   assert.doesNotMatch(action, /founder_team_setup_confirmations/);
 });
 
-test("homebase places Commitment Lab between Alignment and Founder Setup", () => {
+test("homebase keeps pair Commitment Lab optional after current Founder Setup", () => {
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
   const alignment = page.indexOf('id="team-alignment"');
   const lab = page.indexOf('id="commitment-lab-title"');
   const setup = page.indexOf('id="team-setup-title"');
-  assert.ok(alignment >= 0 && lab > alignment && setup > lab);
+  assert.ok(setup >= 0 && alignment > setup && lab > alignment);
   assert.match(page, /startedLabRelationships\.has\(entry\.relationshipId\)/);
   assert.match(page, /is_commitment_lab_complete/);
   assert.match(page, /completedLabRelationships\.has\(entry\.relationshipId\)/);

@@ -28,7 +28,7 @@ export async function createIntakeAction(
     .filter(Boolean);
   if (
     emails.length < 2 ||
-    emails.length > 3 ||
+    emails.length > 4 ||
     new Set(emails).size !== emails.length
   )
     return { error: true };

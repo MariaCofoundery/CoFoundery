@@ -101,6 +101,7 @@ async function createInvitation(params: {
   label?: string | null;
   reportScope: "basis" | "basis_plus_values";
   teamContext: TeamContext;
+  targetTeamId?: string;
   sendEmail?: boolean;
 }): Promise<InviteActionResult> {
   const supabase = await createClient();
@@ -139,8 +140,9 @@ async function createInvitation(params: {
   const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data: invitationRows, error: inviteError } = await supabase.rpc(
-    "create_founder_invitation_reliable",
+    params.targetTeamId ? "create_founder_team_invitation" : "create_founder_invitation_reliable",
     {
+      ...(params.targetTeamId ? { p_team_id: params.targetTeamId } : {}),
       p_invitee_email: invitedEmail,
       p_label: params.label ?? invitedEmail,
       p_inviter_display_name: inviterDisplayName,
@@ -422,6 +424,7 @@ export async function createCoFounderInvitationAction(formData: FormData): Promi
     label: labelRaw.length > 0 ? labelRaw : null,
     reportScope: includeValues ? "basis_plus_values" : "basis",
     teamContext,
+    targetTeamId: String(formData.get("targetTeamId") ?? "") || undefined,
     sendEmail: true,
   });
 }

@@ -111,7 +111,7 @@ async function resolveNode(node: ReactNode): Promise<ReactNode> {
   );
 }
 for (const locale of ["de", "en"])
-  for (const count of [2, 3])
+  for (const count of [2, 3, 4])
     for (const mode of ["selection", "development"] as const) {
       test(`${locale}: ${count} founders ${mode}, originals in every directed perspective without private data`, async () => {
         fixture.locale = locale;

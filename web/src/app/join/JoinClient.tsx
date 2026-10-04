@@ -18,6 +18,9 @@ type JoinUiState =
 
 function resolveInviteError(message: string, t: ReturnType<typeof useTranslations>) {
   const normalized = message.trim().toLowerCase();
+  if (normalized.includes("founder_team_member_limit_reached") || normalized.includes("invitation_target_conflict")) {
+    return { title: t("acceptFailedTitle"), description: t(normalized.includes("founder_team_member_limit_reached") ? "teamFull" : "teamChanged") };
+  }
 
   if (normalized.includes("invalid_token")) {
     return {

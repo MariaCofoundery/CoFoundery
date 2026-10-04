@@ -6,7 +6,7 @@
     "betaLabel": "Beta · In Entwicklung",
     "experienceDescription": "Schätzt euch gegenseitig in fünf kurzen Arbeitssituationen ein. Eure Antworten bleiben verborgen, bis ihr beide fertig seid.",
     "revealWaitingText": "Die Runde wird abgeschlossen, sobald ihr beide alle fünf Reveals angesehen habt.",
-    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
+    "unsupported": "Read My Mind findet zwischen zwei Personen statt. Für größere Teams ist noch keine Paarauswahl verfügbar.",
     "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder.",
     "partnerFallback": "Co-Founder",
     "status": {
@@ -83,7 +83,7 @@
       "declinePurge": "Wenn {name} diesmal nicht mitmacht, wird diese Runde beendet und die Antworten aus diesem Versuch werden gelöscht."
     },
     "start": "Runde starten",
-    "unsupported": "Read My Mind für Teams mit drei Foundern folgt in einem nächsten Schritt.",
+    "unsupported": "Read My Mind findet zwischen zwei Personen statt. Für größere Teams ist noch keine Paarauswahl verfügbar.",
     "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder."
   },
   "round": {

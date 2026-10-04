@@ -30,16 +30,30 @@ reset role;
 insert into public.alignment_shares(assessment_id,recipient_user_id) select p.assessment,v.person from report_people p cross join report_people v where p.n<=4 and p.person<>v.person;
 set local role authenticated;
 select pg_temp.check_report(jsonb_array_length(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'people')=2,'2 founders ready');
+select * from public.propose_founder_team_setup_revision('e8541000-0000-4000-8000-000000000001','time_commitment','clarified','Our pair agreement',null);
+reset role;
+select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+set local role authenticated;
+select * from public.confirm_founder_team_setup_revision((select pending_revision_id from public.founder_team_setup_items where team_id='e8541000-0000-4000-8000-000000000001' and item_key='time_commitment'));
+reset role;
+select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.check_report(jsonb_array_length(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'setup')=1,'Pair agreement initially current');
+select set_config('report.pair_snapshot',public.create_workstyle_product_snapshot('e8541000-0000-4000-8000-000000000001')::text,true);
 reset role;
 insert into public.founder_team_members(team_id,user_id) select 'e8541000-0000-4000-8000-000000000001',person from report_people where n=3;
 set local role authenticated;
 select pg_temp.check_report(jsonb_array_length(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'people')=3,'3 founders ready');
+select pg_temp.check_report(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'setup'='[]'::jsonb,'C does not inherit pair agreement');
+select pg_temp.check_report(public.get_workstyle_product_snapshot(current_setting('report.pair_snapshot')::uuid) is null,'Adding C invalidates pair snapshot');
+select set_config('report.three_snapshot',public.create_workstyle_product_snapshot('e8541000-0000-4000-8000-000000000001')::text,true);
 reset role;
 insert into public.founder_team_members(team_id,user_id) select 'e8541000-0000-4000-8000-000000000001',person from report_people where n=4;
 do $$begin
  begin insert into public.founder_team_members values('e8541000-0000-4000-8000-000000000001','e8540000-0000-4000-8000-000000000006',now());raise exception 'fifth member accepted';exception when check_violation then null;end;
 end $$;
 set local role authenticated;
+select pg_temp.check_report(public.get_workstyle_product_snapshot(current_setting('report.three_snapshot')::uuid) is null,'Adding D invalidates three-person snapshot');
 do $$declare result jsonb;s uuid;begin
  result:=public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001');
  perform pg_temp.check_report(jsonb_array_length(result->'people')=4,'4 founders ready');
@@ -50,6 +64,12 @@ do $$declare result jsonb;s uuid;begin
  perform set_config('report.snapshot',s::text,true);
 end $$;
 reset role;
+-- Removal must also invalidate the exact current input snapshot.
+delete from public.founder_team_members where team_id='e8541000-0000-4000-8000-000000000001' and user_id='e8540000-0000-4000-8000-000000000004';
+set local role authenticated;
+select pg_temp.check_report(public.get_workstyle_product_snapshot(current_setting('report.snapshot')::uuid) is null,'Removing D blocks old four-person snapshot');
+reset role;
+insert into public.founder_team_members(team_id,user_id) values('e8541000-0000-4000-8000-000000000001','e8540000-0000-4000-8000-000000000004');
 -- Product components reuse disclosure and never infer ownership from a visible area.
 insert into public.person_capability_entries(user_id,area_id,application_level,ownership_wish) values('e8540000-0000-4000-8000-000000000002','customer_discovery',5,'prefer_other');
 update public.person_core set capability_disclosure='private' where user_id='e8540000-0000-4000-8000-000000000002';

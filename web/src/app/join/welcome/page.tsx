@@ -61,6 +61,8 @@ type InviteT = Awaited<ReturnType<typeof getTranslations>>;
 
 function resolveInviteError(message: string, t: InviteT) {
   const normalized = message.trim().toLowerCase();
+  if (normalized.includes("founder_team_member_limit_reached")) return t("errors.teamFull");
+  if (normalized.includes("invitation_target_conflict")) return t("errors.teamChanged");
   if (normalized.includes("invalid_token")) return t("errors.invalidToken");
   if (normalized.includes("expired")) return t("errors.expired");
   if (normalized.includes("revoked")) return t("errors.revoked");
@@ -221,7 +223,7 @@ export default async function JoinWelcomePage({
     return renderErrorState(t("errors.revoked"), t);
   }
 
-  if (isInvitationExpired(invitation.expires_at)) {
+  if (invitation.status !== "accepted" && isInvitationExpired(invitation.expires_at)) {
     return renderErrorState(t("errors.expired"), t);
   }
 

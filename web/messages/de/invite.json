@@ -1,5 +1,8 @@
 {
   "join": {
+      "teamFull": "Das Team hat bereits vier Mitglieder. Ein weiterer Beitritt ist nicht möglich.",
+      "teamChanged": "Die Teamzuordnung hat sich geändert. Bitte kläre die Einladung mit der einladenden Person.",
+
     "loadingTitle": "Einladung wird geprüft",
     "loadingDescription": "Wir verarbeiten deinen Einladungslink.",
     "sessionCheckFailedTitle": "Anmeldung konnte nicht geprüft werden",
@@ -24,6 +27,9 @@
   },
   "welcome": {
     "errors": {
+      "teamFull": "Das Team hat bereits vier Mitglieder. Ein weiterer Beitritt ist nicht möglich.",
+      "teamChanged": "Die Teamzuordnung hat sich geändert. Bitte kläre die Einladung mit der einladenden Person.",
+
       "invalidToken": "Link ungültig",
       "expired": "Link abgelaufen",
       "revoked": "Einladung widerrufen",

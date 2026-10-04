@@ -10,7 +10,7 @@
   "team": "Team / Vorhaben",
   "newTeam": "Neues Team nach Bestätigung anlegen",
   "existingHelp": "Ein vorhandenes Team wird nur bei bereits wirksamem Teamzugang angeboten. Gib auch dann die E-Mail-Adressen aller Mitglieder ein. Eine neue Runde verändert keine frühere Runde.",
-  "emails": "E-Mail-Adressen der 2 oder 3 Founder (eine pro Zeile)",
+  "emails": "E-Mail-Adressen der 2 bis 4 Founder (eine pro Zeile)",
   "holder": "Begleitung / Empfänger",
   "personal": "Ich persönlich",
   "reviewers": "Benannte Reviewer",

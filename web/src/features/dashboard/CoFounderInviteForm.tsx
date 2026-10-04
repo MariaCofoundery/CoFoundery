@@ -11,13 +11,13 @@ function toAbsoluteUrl(path: string) {
   return typeof window === "undefined" ? path : toPublicAppUrl(path, window.location.origin);
 }
 
-export function CoFounderInviteForm() {
+export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string; name: string; context: TeamContext } }) {
   const router = useRouter();
   const t = useTranslations("dashboard.coFounderInviteForm");
-  const [label, setLabel] = useState("");
+  const [label, setLabel] = useState(targetTeam?.name ?? "");
   const [email, setEmail] = useState("");
   const [includeValues, setIncludeValues] = useState(false);
-  const [teamContext, setTeamContext] = useState<TeamContext | null>(null);
+  const [teamContext, setTeamContext] = useState<TeamContext | null>(targetTeam?.context ?? null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
@@ -59,6 +59,7 @@ export function CoFounderInviteForm() {
       formData.set("invitedEmail", invitedEmail);
       formData.set("includeValues", includeValues ? "true" : "false");
       formData.set("teamContext", teamContext);
+      if (targetTeam) formData.set("targetTeamId", targetTeam.id);
 
       const result = await createCoFounderInvitationAction(formData);
       if (!result.ok) {
@@ -105,7 +106,7 @@ export function CoFounderInviteForm() {
     >
       <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
       <p className="mt-2 text-sm text-slate-600">
-        {t("intro")}
+        {targetTeam ? t("targetTeam", { name: targetTeam.name }) : t("intro")}
       </p>
 
       <form onSubmit={onSubmit} className="mt-5 space-y-4">
@@ -141,7 +142,7 @@ export function CoFounderInviteForm() {
           />
         </div>
 
-        <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
+        {!targetTeam && <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
             {t("teamContext.label")}
           </p>
@@ -186,9 +187,9 @@ export function CoFounderInviteForm() {
           <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
             {t("teamContext.dataHint")}
           </p>
-        </div>
+        </div>}
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+        {!targetTeam && <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">{t("modules.label")}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             {t("modules.help")}
@@ -208,7 +209,7 @@ export function CoFounderInviteForm() {
               <span>{t("modules.valuesOptional")}</span>
             </label>
           </div>
-        </div>
+        </div>}
 
         <button
           type="submit"
@@ -251,7 +252,7 @@ export function CoFounderInviteForm() {
               resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
             }`}
           >
-            {t("result.activeModules", { modules: selectedModulesLabel })}
+            {targetTeam ? t("targetTeam", { name: targetTeam.name }) : t("result.activeModules", { modules: selectedModulesLabel })}
           </p>
           {teamContext ? (
             <p

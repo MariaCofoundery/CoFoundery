@@ -79,13 +79,7 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   const en = JSON.parse(readFileSync(new URL("../../../../messages/en/collaborationLab.json", import.meta.url), "utf8"));
   const dashboardDe = JSON.parse(readFileSync(new URL("../../../../messages/de/dashboard.json", import.meta.url), "utf8"));
   const dashboardEn = JSON.parse(readFileSync(new URL("../../../../messages/en/dashboard.json", import.meta.url), "utf8"));
-  // GEAENDERT am 18.09.2026: Die Karte stand zwischen Commitment Lab und
-  // Founder Setup - zwischen den beiden schwersten Blocks der Seite, obwohl
-  // sie der leichte Einstieg ist. Die Teamseite ist jetzt in drei Gruppen
-  // geordnet (kennenlernen, verstehen, verbindlich werden); Read My Mind
-  // steht in der ersten.
-  //
-  // Die Zusage ist damit umgekehrt: Sie steht VOR dem, was Arbeit ist.
+  // Phase 9.2: optional pair experiences follow the current report and Setup.
   const cardPosition = homebase.lastIndexOf("<ReadMyMindHomebaseCard");
   assert.ok(cardPosition > 0, "die Karte steht nicht mehr auf der Teamseite");
   assert.ok(
@@ -93,8 +87,8 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
     "Read My Mind steht wieder hinter dem Commitment Lab"
   );
   assert.ok(
-    cardPosition < homebase.indexOf("team-setup-title"),
-    "Read My Mind steht wieder hinter dem Founder Setup"
+    cardPosition > homebase.indexOf("team-setup-title"),
+    "Phase 9.2: optionale Vertiefung darf Setup nicht vorangestellt sein"
   );
   // Und in der ersten Gruppe, nicht irgendwo davor.
   assert.ok(
@@ -105,8 +99,8 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
   assert.match(form, /disabled=\{!complete \|\| allLocked\}/);
   assert.match(form, /focus-visible:ring/);
   assert.deepEqual(Object.keys(de), Object.keys(en));
-  assert.match(de.homebase.unsupported, /drei Foundern/);
-  assert.match(en.homebase.unsupported, /three founders/);
+  assert.match(de.homebase.unsupported, /zwischen zwei Personen/);
+  assert.match(en.homebase.unsupported, /two people/);
   assert.match(card, /t\("betaLabel"\)/);
   assert.match(card, /t\("action\.handoff"\)/);
   assert.match(entry, /t\("betaNotice"\)/);

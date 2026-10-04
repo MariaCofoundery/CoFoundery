@@ -624,7 +624,8 @@
   },
   "coFounderInviteForm": {
     "title": "Invite a co-founder",
-    "intro": "Choose your context and send the invitation directly by email. If needed, you can still share the link manually afterwards.",
+    "targetTeam": "Invitation to “{name}”. The person joins this existing team. Workstyle and sharing remain individual decisions.",
+      "intro": "Choose your context and send the invitation directly by email. If needed, you can still share the link manually afterwards.",
     "label": {
       "projectName": "Team or project name",
       "email": "Email address"
