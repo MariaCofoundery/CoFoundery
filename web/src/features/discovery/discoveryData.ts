@@ -17,7 +17,6 @@ import {
   buildDiscoveryV2Candidate,
 } from "@/features/discovery/discoveryV2Search";
 import {
-  getDiscoveryV2AlignmentSignalsForCandidates,
 } from "@/features/discovery/discoveryAssessmentSignals";
 import { resolveDiscoveryAssessmentConsentState } from "@/features/discovery/discoveryConsent";
 import type {
@@ -588,15 +587,10 @@ export async function getDiscoveryV2AlignmentContextForCandidate(
     return { preferences: preferences?.discoveryV2AlignmentPreferences ?? {}, signals: [] };
   }
 
-  const signals = await getDiscoveryV2AlignmentSignalsForCandidates({
-    ownerUserId: normalizedOwnerUserId,
-    candidateUserIds: [normalizedCandidateUserId],
-    prioritizedDimensions: preferences.discoveryV2AlignmentDimensions,
-  });
-  return {
-    preferences: preferences.discoveryV2AlignmentPreferences,
-    signals: signals.get(normalizedCandidateUserId) ?? [],
-  };
+  // Historical preferences remain readable; the legacy scoring projection is retired.
+  void normalizedCandidateUserId;
+  return { preferences: preferences.discoveryV2AlignmentPreferences, signals: [] };
+
 }
 
 export async function getDiscoveryCandidatesForCurrentUser(
@@ -674,15 +668,7 @@ export async function getDiscoveryCandidatesForCurrentUser(
     createdAt: row.published_at ?? "",
     updatedAt: row.published_at ?? "",
   }));
-  const alignmentSignals =
-    preferences?.discoveryV2AlignmentEnabled &&
-    preferences.discoveryV2AlignmentDimensions.length > 0
-      ? await getDiscoveryV2AlignmentSignalsForCandidates({
-          ownerUserId: normalizedUserId,
-          candidateUserIds: candidateProfiles.map((profile) => profile.userId),
-          prioritizedDimensions: preferences.discoveryV2AlignmentDimensions,
-        })
-      : new Map();
+  const alignmentSignals = new Map();
   const candidates = attachDiscoveryV2AlignmentSignals(
     candidateProfiles.map((profile) => buildDiscoveryV2Candidate(profile, mustHaves)),
     alignmentSignals,

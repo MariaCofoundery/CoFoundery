@@ -1,5 +1,5 @@
+import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
-import { versionOfInvitation } from "@/features/instruments/align/invitationVersion";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -66,7 +66,7 @@ export function buildInvitationQuestionnaireHref(
  * einem Fragebogen, den er nicht gesucht hat.
  */
 export function buildInvitationAlignHref(invitationId: string) {
-  return `/founder-alignment/profil?invitationId=${encodeURIComponent(invitationId)}`;
+  return `/research/workstyle-pretest?version=8.5a-v3&invitationId=${encodeURIComponent(invitationId)}`;
 }
 
 export function buildInvitationStartHref(invitationId: string) {
@@ -120,6 +120,10 @@ export async function resolveInvitationContinueTarget(
     };
   }
 
+  const client = await createClient();
+  const { data: { user } } = await getRequestUser();
+  const teamId = user ? await currentTeamForInvitation(client, user.id, normalizedInvitationId) : null;
+  if (teamId) return { ok: true, invitationId: normalizedInvitationId, mode: "needs_questionnaires", labelKey: "align", label: "Euer Zusammenspiel", resolvedHref: `/teams/${teamId}/workstyle`, entryHref: buildInvitationStartHref(normalizedInvitationId) };
   const decision = await getInvitationJoinDecision(normalizedInvitationId);
   logInviteFlowDebug("invitationFlow:join_decision", {
     invitationId: normalizedInvitationId,
@@ -135,55 +139,5 @@ export async function resolveInvitationContinueTarget(
     };
   }
 
-  if (decision.mode === "report_ready" || decision.mode === "choice_existing_or_update") {
-    const result = {
-      ok: true,
-      invitationId: normalizedInvitationId,
-      mode: decision.mode,
-      labelKey: decision.mode === "report_ready" ? "report" : "completion",
-      label: decision.mode === "report_ready" ? "Zum Report" : "Zum Abschluss",
-      resolvedHref: buildInvitationDoneHref(normalizedInvitationId),
-      entryHref: buildInvitationStartHref(normalizedInvitationId),
-    } satisfies Extract<InvitationContinueResolution, { ok: true }>;
-    logInviteFlowDebug("invitationFlow:resolve_result", result);
-    return result;
-  }
-
-  // ---------------------------------------------------------------------------
-  // WOHIN DIE EINLADUNG FUEHRT, ENTSCHEIDET DIE EINLADENDE PERSON
-  // ---------------------------------------------------------------------------
-  //
-  // Bis zum 30.09.2026 fuehrte jede Einladung in die bisherige Fassung - auch
-  // zwischen zwei Menschen, die beide gerade erst angekommen waren. Beide
-  // fuellten einen Fragebogen aus, den es in dieser Form nicht mehr gibt.
-  //
-  // Umgekehrt gilt es genauso: Wer mit der bisherigen Fassung einlaedt, fuehrt
-  // die andere Person ebenfalls dorthin. Sonst haetten die beiden am Ende zwei
-  // Boegen und nichts Gemeinsames.
-  if ((await versionOfInvitation(normalizedInvitationId)) === "align") {
-    const neu = {
-      ok: true,
-      invitationId: normalizedInvitationId,
-      mode: decision.mode,
-      labelKey: "align",
-      label: "Zu deinem Arbeitsprofil",
-      resolvedHref: buildInvitationAlignHref(normalizedInvitationId),
-      entryHref: buildInvitationStartHref(normalizedInvitationId),
-    } satisfies Extract<InvitationContinueResolution, { ok: true }>;
-    logInviteFlowDebug("invitationFlow:resolve_result", neu);
-    return neu;
-  }
-
-  const nextModule = decision.missing_modules.includes("base") ? "base" : "values";
-  const result = {
-    ok: true,
-    invitationId: normalizedInvitationId,
-    mode: decision.mode,
-    labelKey: nextModule === "base" ? "base" : "values",
-    label: nextModule === "base" ? "Zum Basis-Fragebogen" : "Zum Werte-Modul",
-    resolvedHref: buildInvitationQuestionnaireHref(normalizedInvitationId, nextModule),
-    entryHref: buildInvitationStartHref(normalizedInvitationId),
-  } satisfies Extract<InvitationContinueResolution, { ok: true }>;
-  logInviteFlowDebug("invitationFlow:resolve_result", result);
-  return result;
+  return { ok: true, invitationId: normalizedInvitationId, mode: decision.mode, labelKey: "align", label: "Wie du arbeitest", resolvedHref: buildInvitationAlignHref(normalizedInvitationId), entryHref: buildInvitationStartHref(normalizedInvitationId) };
 }

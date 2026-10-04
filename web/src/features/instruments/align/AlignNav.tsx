@@ -47,11 +47,11 @@ export function AlignNav({
   const eintraege = [
     {
       href: state.profileSubmitted
-        ? "/founder-alignment/profil/antworten"
-        : "/founder-alignment/profil",
+        ? "/me/profile/workstyle"
+        : "/research/workstyle-pretest?version=8.5a-v3",
       label: "Wie du arbeitest",
       // Beide Seiten desselben Bogens gelten als derselbe Ort.
-      matches: (path: string) => path.startsWith("/founder-alignment/profil"),
+      matches: (path: string) => path.startsWith("/research/workstyle-pretest") || path === "/me/profile/workstyle",
     },
     {
       href: state.ventureSubmitted
@@ -71,7 +71,7 @@ export function AlignNav({
   ];
 
   return (
-    <nav aria-label="Neue Fassung" className="mb-6">
+    <nav aria-label="Arbeitsweise und Vorhaben" className="mb-6">
       {/* ZURÜCK STEHT ÜBER DEN REITERN, NICHT DAZWISCHEN. Es ist kein
           weiterer Bereich, sondern der Weg hinaus - und wer ihn sucht, sucht
           ihn oben links. */}

@@ -1,3 +1,4 @@
+import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -180,8 +181,10 @@ export default async function DashboardPage({
   let invitationRows = initialInvitationRows;
   let runsResult = initialRunsResult;
 
+  const currentTeamEntries = await Promise.all(invitationRows.filter(i => i.status === "accepted").map(async i => [i.id, await currentTeamForInvitation(supabase, user.id, i.id)] as const));
+  const currentTeamByInvitation = new Map(currentTeamEntries);
   const pendingFinalizeIds = invitationRows
-    .filter((invitation) => invitation.isReadyForMatching && !invitation.isReportReady)
+    .filter((invitation) => !currentTeamByInvitation.get(invitation.id) && invitation.isReadyForMatching && !invitation.isReportReady)
     .map((invitation) => invitation.id);
   if (pendingFinalizeIds.length > 0) {
     const finalizeResults = await Promise.all(
@@ -257,7 +260,8 @@ export default async function DashboardPage({
   const contextualDashboardHref = contextualInvitationId
     ? buildInvitationDashboardHref(contextualInvitationId)
     : "/dashboard";
-  const contextualMatchingHref = contextualInvitation
+  const contextualTeam = contextualInvitation ? currentTeamByInvitation.get(contextualInvitation.id) : null;
+  const contextualMatchingHref = contextualTeam ? `/teams/${contextualTeam}/workstyle` : contextualInvitation
     ? contextualInvitation.isReportReady
       ? `/report/${encodeURIComponent(contextualInvitation.id)}`
       : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
@@ -287,8 +291,8 @@ export default async function DashboardPage({
   const dashboardTasks = await getFounderDashboardTasks({
     currentUserId: user.id,
     invitations: invitationRows,
-    founderAlignmentStarted: hasStartedBase,
-    founderAlignmentSubmitted: hasSubmittedBase,
+    founderAlignmentStarted: alignState.profile.started,
+    founderAlignmentSubmitted: alignState.profile.submitted,
     valuesStarted: hasStartedValues,
     valuesSubmitted: hasSubmittedValues,
     teams: founderTeams,
@@ -530,13 +534,13 @@ export default async function DashboardPage({
                 {actionableIncomingInvites.length > 0 ? (
                   actionableIncomingInvites.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactIncomingInvitationRow(invite, t)}
+                      {renderCompactIncomingInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
                     </div>
                   ))
                 ) : sentInvitesSorted.length > 0 ? (
                   sentInvitesSorted.map((invite) => (
                     <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactSentInvitationRow(invite, t)}
+                      {renderCompactSentInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
                     </div>
                   ))
                 ) : (
@@ -1057,7 +1061,7 @@ function resolveInvitationTeamName(label: string | null | undefined, inviteeEmai
   return normalizedLabel;
 }
 
-function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: DashboardT) {
+function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: DashboardT, currentTeam?: string | null) {
   const teamName = resolveInvitationTeamName(invite.label, invite.inviteeEmail);
   const title = teamName || invite.inviteeEmail;
 
@@ -1082,8 +1086,8 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: Dashb
       </div>
 
       <div className="shrink-0">
-        {invite.isReportReady ? (
-          <Link href={`/report/${invite.id}`} className={REPORT_CTA_CLASS}>
+        {currentTeam || invite.isReportReady ? (
+          <Link href={currentTeam ? `/teams/${currentTeam}/workstyle` : `/report/${invite.id}`} className={REPORT_CTA_CLASS}>
             {t("actions.open")}
           </Link>
         ) : (
@@ -1094,8 +1098,8 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: Dashb
   );
 }
 
-function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: DashboardT) {
-  const action = buildIncomingInvitationAction(invite, t);
+function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: DashboardT, currentTeam?: string | null) {
+  const action = currentTeam ? { href: `/teams/${currentTeam}/workstyle`, label: "Euer Zusammenspiel", className: REPORT_CTA_CLASS, canOpenCompletionStatus: false } : buildIncomingInvitationAction(invite, t);
   const helperText = null;
 
   return (

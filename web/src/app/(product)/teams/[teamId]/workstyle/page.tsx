@@ -30,7 +30,9 @@ export default async function Page({
     redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/workstyle`)}`);
   const client = await createClient();
   const current = await getProductTeam(client, teamId);
+  const { data: membership } = await client.from("founder_team_members").select("team_id").eq("team_id", teamId).eq("user_id", user.id).maybeSingle();
   if (!current) notFound();
+  const { data: readiness } = current === "not_ready" ? await client.rpc("get_workstyle_product_team_status", { p_team_id: teamId }) : { data: "available" };
   const snapshot = query.snapshot
     ? await getProductSnapshot<ProductTeam>(client, query.snapshot)
     : null;
@@ -40,8 +42,8 @@ export default async function Page({
   return (
     <main className="ws-report mx-auto max-w-6xl px-5 py-10">
       <div className="ws-no-print mb-5">
-        <Link href={`/teams/${teamId}`} className="underline">
-          Zum Team
+        <Link href={membership ? `/teams/${teamId}` : "/advisor"} className="underline">
+          {membership ? "Zum Team" : "Zum Advisor-Bereich"}
         </Link>
       </div>
       <header className="mb-10">
@@ -78,7 +80,7 @@ export default async function Page({
       {team === "not_ready" ? (
         <section>
           <h2 className="text-xl font-semibold">
-            Eure Arbeitsprofile sind noch nicht gemeinsam sichtbar
+            {readiness === "share_missing" ? "Freigabe fehlt" : "Der Teamreport ist noch nicht verfügbar"}
           </h2>
           <p className="mt-3 leading-7">
             Alle Mitglieder benötigen ein abgeschlossenes Arbeitsprofil
@@ -94,7 +96,7 @@ export default async function Page({
           </Link>
         </section>
       ) : (
-        <TeamWorkstyleReport team={team} />
+        <TeamWorkstyleReport team={team} canDiscuss={Boolean(membership)} />
       )}
     </main>
   );

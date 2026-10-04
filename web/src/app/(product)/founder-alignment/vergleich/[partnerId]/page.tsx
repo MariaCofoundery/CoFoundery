@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
 import { getAlignNavState } from "@/features/instruments/align/navState";
@@ -80,7 +81,8 @@ export default async function AlignComparePage({
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>
-      <h1 className="text-2xl font-semibold text-slate-900">Nebeneinander</h1>
+      {zusammenImVorhaben && venture && <p className="mb-5"><Link href={`/teams/${venture.id}/workstyle`} className="underline">Euer aktuelles Zusammenspiel öffnen</Link></p>}
+      <h1 className="text-2xl font-semibold text-slate-900">Frühere Auswertung: Nebeneinander</h1>
       <p className="mt-4 text-slate-700">
         Eure Antworten nebeneinander — keine Passungszahl, keine Bewertung. Wo ihr
         unterschiedlich geantwortet habt, heißt das nicht, dass etwas nicht passt. Es

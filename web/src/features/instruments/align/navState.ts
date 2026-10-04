@@ -1,3 +1,4 @@
+import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import "server-only";
 
 import { INSTRUMENT_OF } from "@/features/instruments/align/reportData";
@@ -26,7 +27,7 @@ export async function getAlignNavState(userId: string): Promise<AlignNavState> {
       .select("instrument_id, venture_id, submitted_at")
       .eq("user_id", userId)
       .in("instrument_id", [
-        INSTRUMENT_OF.founder_profile,
+        CURRENT_WORKSTYLE_INSTRUMENT,
         INSTRUMENT_OF.venture_alignment,
       ]);
 
@@ -37,7 +38,7 @@ export async function getAlignNavState(userId: string): Promise<AlignNavState> {
 
     return {
       profileSubmitted: (rows ?? []).some(
-        (row) => row.instrument_id === INSTRUMENT_OF.founder_profile && row.submitted_at,
+        (row) => row.instrument_id === CURRENT_WORKSTYLE_INSTRUMENT && row.submitted_at,
       ),
       ventureSubmitted: (rows ?? []).some(
         (row) =>

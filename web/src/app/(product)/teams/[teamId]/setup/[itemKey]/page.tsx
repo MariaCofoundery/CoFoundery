@@ -1,3 +1,4 @@
+import { workstyleSetupHandoff } from "@/features/reporting/workstyle/setupHandoff";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -25,7 +26,7 @@ import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 type Props = {
   params: Promise<{ teamId: string; itemKey: string }>;
-  searchParams: Promise<{ result?: string }>;
+  searchParams: Promise<{ result?: string; workstyle?: string }>;
 };
 
 const CARD = "rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.035)] sm:p-6";
@@ -33,7 +34,9 @@ const INPUT = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2
 
 export default async function FounderSetupItemPage({ params, searchParams }: Props) {
   const { teamId, itemKey } = await params;
-  const { result } = await searchParams;
+  const { result, workstyle } = await searchParams;
+  const proposedHandoff = workstyleSetupHandoff(workstyle ?? "");
+  const handoff = proposedHandoff?.topic === itemKey ? proposedHandoff : null;
   if (!isFounderSetupItemKey(itemKey)) notFound();
   const catalogItem = getFounderSetupCatalogItem(itemKey);
   if (!catalogItem) notFound();
@@ -198,7 +201,8 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("discussion.help")}</p>
           <p className="mt-2 text-xs leading-5 text-slate-500">{t("discussion.visibility")}</p>
-          <FounderSetupDiscussionComposer action={discussionAction} />
+          {handoff && <p className="mt-3 text-sm">Gesprächsimpuls aus „Euer Zusammenspiel“. Bearbeitet und speichert ihn bewusst als Diskussionsbeitrag. Eine Vereinbarung entsteht erst durch eine separate Revision und eure Bestätigung.</p>}
+          <div id="discussion"><FounderSetupDiscussionComposer key={workstyle ?? "empty"} action={discussionAction} initialBody={handoff?.question ?? ""} /></div>
           {discussionThreads.length > 0 ? (
             <ol className="mt-6 space-y-4">
               {discussionThreads.map((thread) => (

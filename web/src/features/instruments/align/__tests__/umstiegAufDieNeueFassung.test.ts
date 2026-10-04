@@ -67,6 +67,6 @@ test("der Hinweis sagt die drei Dinge, die sonst fehlen", () => {
 test("die neue Fassung steht im Menü, nicht nur auf einer Karte", () => {
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"), "utf8");
-  assert.match(shell, /href: "\/founder-alignment\/profil"/);
+  assert.match(shell, /href: "\/me\/profile\/workstyle"/);
   assert.match(shell, /alignNewVersion/);
 });

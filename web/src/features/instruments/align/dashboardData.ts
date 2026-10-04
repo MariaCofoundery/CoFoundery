@@ -1,3 +1,4 @@
+import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import "server-only";
 
 import { offeredItemsV22 } from "@/features/instruments/align/registries";
@@ -6,7 +7,6 @@ import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { connectedPartners } from "@/features/instruments/connectedPartners";
 import {
   CURRENT_INSTRUMENT_ID,
-  FOUNDER_PROFILE_INSTRUMENT_ID,
   VENTURE_ALIGNMENT_INSTRUMENT_ID,
 } from "@/features/instruments/instruments";
 import {
@@ -94,7 +94,7 @@ export async function getAlignDashboardState(
       .from("assessments")
       .select("id, instrument_id, venture_id, submitted_at, answers_confirmed_at")
       .eq("user_id", userId)
-      .in("instrument_id", [FOUNDER_PROFILE_INSTRUMENT_ID, VENTURE_ALIGNMENT_INSTRUMENT_ID])
+      .in("instrument_id", [CURRENT_WORKSTYLE_INSTRUMENT, VENTURE_ALIGNMENT_INSTRUMENT_ID])
       .order("created_at", { ascending: false });
     if (assessmentsError) throw assessmentsError;
 
@@ -139,7 +139,7 @@ export async function getAlignDashboardState(
     const decision = (transition?.decision ?? "pending") as TransitionDecision;
 
     const profileRow = rows.find(
-      (row) => row.instrument_id === FOUNDER_PROFILE_INSTRUMENT_ID,
+      (row) => row.instrument_id === CURRENT_WORKSTYLE_INSTRUMENT,
     );
     const profileAnswered = profileRow ? (answeredBy.get(profileRow.id) ?? 0) : 0;
 
@@ -184,10 +184,10 @@ export async function getAlignDashboardState(
 
     return {
       profile: {
-        started: profileAnswered > 0,
+        started: Boolean(profileRow),
         submitted: Boolean(profileRow?.submitted_at),
         answered: profileAnswered,
-        of: offeredItemsV22("founder_profile").length,
+        of: 29,
       },
       ventures: ventureStates,
       partners: await partnersFor(userId),
@@ -236,7 +236,7 @@ async function partnersFor(
         .from("assessments")
         .select("user_id")
         .in("id", (shares ?? []).map((row) => row.assessment_id))
-        .in("instrument_id", [FOUNDER_PROFILE_INSTRUMENT_ID, VENTURE_ALIGNMENT_INSTRUMENT_ID])
+        .in("instrument_id", [CURRENT_WORKSTYLE_INSTRUMENT, VENTURE_ALIGNMENT_INSTRUMENT_ID])
         .not("submitted_at", "is", null)
     : { data: [] };
 

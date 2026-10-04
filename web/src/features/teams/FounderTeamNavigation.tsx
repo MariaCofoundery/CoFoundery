@@ -45,7 +45,7 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
                 : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             }`}
           >
-            {labels[item.key]}
+            {item.key === "alignment" ? "Frühere Auswertungen" : labels[item.key]}
           </Link>
         ))}
       </nav>

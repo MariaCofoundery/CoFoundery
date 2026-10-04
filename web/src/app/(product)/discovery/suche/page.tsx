@@ -1,3 +1,4 @@
+import { DiscoveryWorkstyleConsent } from "@/features/find/DiscoveryWorkstyleConsent";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -10,13 +11,6 @@ import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { DISCOVERY_SELECTION_LIMITS } from "@/features/discovery/discoveryConfig";
 import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
 
-import { THEME_IDS } from "@/features/find/discoveryThemes";
-import { getOwnPreferences } from "@/features/find/preferenceData";
-import {
-  SearchPreferencesForm,
-  type SearchPreferencesCopy,
-} from "@/features/find/SearchPreferencesForm";
-import { FOUNDER_PROFILE_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -59,9 +53,9 @@ const LEERE_KRITERIEN: DiscoveryMustHaves = {
 export default async function SearchPreferencesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ gespeichert?: string }>;
+  searchParams: Promise<{ gespeichert?: string; workstyle?: string }>;
 }) {
-  const { gespeichert } = await searchParams;
+  const { gespeichert, workstyle } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/suche")}`);
@@ -86,48 +80,11 @@ export default async function SearchPreferencesPage({
     redirect(`/discovery/suche?gespeichert=${result.ok ? "1" : "0"}`);
   }
 
-  const [{ preferences, stale }, { data: assessment }, searchPreferences] = await Promise.all([
-    getOwnPreferences(auth.user.id),
-    supabase
-      .from("assessments")
-      .select("id, submitted_at")
-      .eq("user_id", auth.user.id)
-      .eq("instrument_id", FOUNDER_PROFILE_INSTRUMENT_ID)
-      .not("submitted_at", "is", null)
-      .limit(1)
-      .maybeSingle(),
-    getOwnSearchPreferences(auth.user.id),
-  ]);
+  const searchPreferences = await getOwnSearchPreferences(auth.user.id);
 
   const tCapability = await getTranslations("capability");
   const vocabulary = await getCapabilityVocabulary(supabase);
   const kriterien = searchPreferences?.mustHaves ?? LEERE_KRITERIEN;
-
-  const copy: SearchPreferencesCopy = {
-    directionLabel: t("directionLabel"),
-    importanceLabel: t("importanceLabel"),
-    directions: {
-      similar: t("directions.similar"),
-      complementary: t("directions.complementary"),
-      neutral: t("directions.neutral"),
-    },
-    importances: {
-      "1": t("importances.1"),
-      "2": t("importances.2"),
-      "3": t("importances.3"),
-    },
-    themes: Object.fromEntries(
-      THEME_IDS.map((themeId) => [
-        themeId,
-        { title: t(`themes.${themeId}.title`), text: t(`themes.${themeId}.text`) },
-      ]),
-    ),
-    save: t("save"),
-    saving: t("saving"),
-    saved: t("saved"),
-    saveFailed: t("saveFailed"),
-    changeLater: t("changeLater"),
-  };
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
@@ -144,28 +101,6 @@ export default async function SearchPreferencesPage({
       <p className="mt-4 max-w-2xl rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm leading-7 text-slate-600">
         {t("private")}
       </p>
-
-      {!assessment && (
-        <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-5">
-          <h2 className="text-base font-semibold text-slate-900">{t("needsProfileTitle")}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("needsProfileText")}</p>
-          <Link
-            href="/founder-alignment/profil"
-            className="mt-3 inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-          >
-            {t("needsProfileCta")}
-          </Link>
-        </section>
-      )}
-
-      {/* Die Auswahl gehört zu einer Fassung des Bogens. Stimmt sie nicht mehr,
-          wird nicht still weitergerechnet (Spec, Abschnitt 28). */}
-      {stale && (
-        <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-5">
-          <h2 className="text-base font-semibold text-slate-900">{t("staleTitle")}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("staleText")}</p>
-        </section>
-      )}
 
       {gespeichert && (
         <p
@@ -278,18 +213,7 @@ export default async function SearchPreferencesPage({
         </div>
       </section>
 
-      {/* ------------------------------------------------------------------
-          3 — Wie soll die Person zu dir passen?
-          ------------------------------------------------------------------ */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold text-slate-900">{t("themesTitle")}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("themesIntro")}</p>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("themesNote")}</p>
-
-        <div className="mt-6">
-          <SearchPreferencesForm themeIds={THEME_IDS} initial={preferences} copy={copy} />
-        </div>
-      </section>
+      <DiscoveryWorkstyleConsent userId={auth.user.id} result={workstyle} />
 
       <p className="mt-10 border-t border-slate-200 pt-6 text-sm">
         <Link href="/discovery?mode=search" className="font-medium text-slate-900 underline">

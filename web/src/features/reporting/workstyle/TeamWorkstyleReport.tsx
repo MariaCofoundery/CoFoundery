@@ -1,3 +1,4 @@
+import { workstyleSetupHref } from "./setupHandoff";
 import { SignatureOverview } from "@/features/reporting/workstyle/SignatureOverview";
 import Link from "next/link";
 import {
@@ -15,7 +16,7 @@ import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import setupCopy from "../../../../messages/de/teams.json";
 import "@/features/reporting/workstyle/report.css";
 
-export function TeamWorkstyleReport({ team }: { team: ProductTeam }) {
+export function TeamWorkstyleReport({ team, canDiscuss = false }: { team: ProductTeam; canDiscuss?: boolean }) {
   if (!validProductTeam(team))
     return (
       <p>
@@ -119,6 +120,7 @@ export function TeamWorkstyleReport({ team }: { team: ProductTeam }) {
                 <p className="mt-3 text-sm leading-6">{p.complement.text}</p>
               )}
               <p className="mt-4 text-sm font-medium">{p.question}</p>
+              {canDiscuss && <Link className="ws-no-print mt-3 inline-block text-sm underline" href={workstyleSetupHref(team.team_id, p.key)}>Im Founder Setup besprechen</Link>}
             </article>
           ))}
         </div>

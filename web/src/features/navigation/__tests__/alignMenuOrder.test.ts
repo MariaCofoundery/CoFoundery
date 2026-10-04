@@ -39,5 +39,5 @@ test("Verbindungen steht auch ohne Founder-Rolle da", () => {
 test("die neue Fassung bleibt im Menü aktiv, egal auf welcher ihrer Seiten man steht", () => {
   // Ein Reiter, der sich beim Anklicken aufloest, war hier schon einmal das
   // Problem.
-  assert.match(shell, /href: "\/founder-alignment\/profil"[\s\S]{0,260}startsWith\("\/founder-alignment"\)/);
+  assert.match(shell, /href: "\/me\/profile\/workstyle"[\s\S]{0,420}startsWith\("\/founder-alignment"\)/);
 });

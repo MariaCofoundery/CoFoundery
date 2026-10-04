@@ -50,8 +50,8 @@ const hooks = registerHooks({
 const { AlignCard } = await import("@/features/instruments/align/AlignCard");
 const { getAlignDashboardState } = await import("@/features/instruments/align/dashboardData");
 hooks.deregister();
-function assessment(id: string, instrument = "founder-profile-v1", submitted: string | null = null, created = "2026-10-01"): Row {
-  return { id, user_id: "own", instrument_id: instrument, module: instrument === "founder-profile-v1" ? "founder_profile" : "base", submitted_at: submitted, created_at: created };
+function assessment(id: string, instrument = "founder-workstyle-pretest-8-5a-v3", submitted: string | null = null, created = "2026-10-01"): Row {
+  return { id, user_id: "own", instrument_id: instrument, module: instrument === "founder-workstyle-pretest-8-5a-v3" ? "founder_profile" : "base", submitted_at: submitted, created_at: created };
 }
 for (const locale of ["de", "en"]) for (const state of ["new", "legacy", "started", "completed"] as const) {
   test(`${locale}: actual dashboard reader and card render ${state}`, async () => {
@@ -72,10 +72,10 @@ for (const locale of ["de", "en"]) for (const state of ["new", "legacy", "starte
     assert.ok(calls.some(call => call.table === "assessments" && call.order === "created_at"));
   });
 }
-test("empty current draft and unfinished legacy draft do not count as begun or completed legacy", async () => {
+test("empty current draft counts as begun; unfinished legacy is not completed", async () => {
   Object.assign(fixture, {fail:"", assessments:[assessment("empty"), assessment("old", "founder-compatibility-v1")], answers:[]});
   const data = await getAlignDashboardState("own");
-  assert.equal(resolveFounderWorkProfileState({...data.profile, legacyBaseSubmitted:data.hasPrevious}),"new"); assert.equal(data.announce,false);
+  assert.equal(resolveFounderWorkProfileState({...data.profile, legacyBaseSubmitted:data.hasPrevious}),"started"); assert.equal(data.announce,false);
 });
 test("latest current assessment wins; completed legacy base is found beyond first row", async () => {
   fixture.assessments = [assessment("earlier", undefined,"2026-09-01","2026-09-01"), assessment("current"), assessment("draft", "founder-compatibility-v1"), assessment("old", "founder-compatibility-v1","2026-08-01")];

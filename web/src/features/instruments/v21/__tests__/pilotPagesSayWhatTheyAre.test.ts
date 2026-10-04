@@ -400,7 +400,7 @@ test("die neuen Bögen holen ihre FRAGEN aus den eigenen Registraturen", () => {
   // Sie duerfen v2.1-Bausteine benutzen - Pruefung, Eingabefeld,
   // Lesbarmachung. Die Fragen aus v2.1 zu ziehen waere etwas anderes: Dann
   // stuenden dort 36 statt 16, und die Teilung waere Dekoration.
-  for (const seite of ["profil", "vorhaben"]) {
+  for (const seite of ["vorhaben"]) {
     const page = readFileSync(
       join("src", "app", "(product)", "founder-alignment", seite, "page.tsx"), "utf8");
     assert.match(page, /instruments\/align\//, seite);

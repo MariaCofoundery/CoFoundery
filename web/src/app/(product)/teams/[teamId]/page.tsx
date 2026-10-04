@@ -1,3 +1,4 @@
+import { TeamJourneyStatus } from "@/features/teams/TeamJourneyStatus";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -189,6 +190,13 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             werden.
             --------------------------------------------------------------- */}
 
+<TeamJourneyStatus teamId={team.id} userId={user.id} />
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="text-xl font-semibold">Euer Zusammenspiel</h2>
+          <p className="mt-2 text-sm leading-6">Startet mit euren freigegebenen Arbeitsweisen und Erwartungen an dieses Vorhaben. Gesprächspunkte könnt ihr anschließend direkt im Founder Setup klären.</p>
+          <Link className="mt-3 inline-block underline" href={`/teams/${team.id}/workstyle`}>Zum aktuellen Teamreport</Link>
+          <p className="mt-3 text-sm">Vertiefungen dienen dem Gespräch. Founder Setup hält eure gemeinsam bestätigten Vereinbarungen fest.</p>
+        </section>
 {isNewPair ? (
           <p className="rounded-2xl border border-cyan-200/70 bg-[linear-gradient(120deg,rgba(103,232,249,.10),rgba(124,58,237,.06))] px-5 py-4 text-sm leading-7 text-slate-700">
             {t("groups.whereToStart")}
@@ -231,8 +239,9 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
           </h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("groups.understand.text")}</p>
         </div>
+        <details id="team-alignment" className="rounded-2xl border border-slate-200 p-4">
+          <summary className="cursor-pointer font-medium">Frühere Paarreports und Workbooks</summary>
         <section
-          id="team-alignment"
           className={`${SECTION_CLASS} scroll-mt-32`}
           aria-labelledby="team-alignment-title"
         >
@@ -311,7 +320,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </div>
           )}
         </section>
-
+        </details>
 
         <div className="mt-2">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -401,7 +410,6 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
             </ul>
           )}
         </section>
-
 
         <div className="mt-2">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">

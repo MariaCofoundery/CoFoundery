@@ -182,7 +182,7 @@ test("profile editor and cards only render explicitly stored intent and horizon"
   // Commitment, Risikoorientierung ...) mit "dieselbe grobe Tendenz" daneben.
   // Die FIND-Spec streicht diese Kategorien in Abschnitt 20; an ihrer Stelle
   // stehen die Matchpunkte der neuen Themen.
-  assert.match(search, /<MatchPointsView/);
+  assert.match(search, /<DiscoveryWorkstyle/);
   assert.doesNotMatch(search, /v2\.alignment\.dimensions/);
   assert.doesNotMatch(search, /high_intent|serious_founder|startHorizon.*ventureStage/);
 });

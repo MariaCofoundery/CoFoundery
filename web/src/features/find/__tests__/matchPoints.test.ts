@@ -117,7 +117,7 @@ test("die alten Alignment-Dimensionen stehen nicht mehr in FIND", () => {
   ]) {
     const text = readFileSync(datei, "utf8");
     assert.ok(!/v2\.alignment\.dimensions/.test(text), datei);
-    assert.match(text, /MatchPointsView/, datei);
+    assert.match(text, /DiscoveryWorkstyle/, datei);
   }
 });
 

@@ -1,3 +1,4 @@
+import { DiscoveryWorkstyle } from "@/features/find/DiscoveryWorkstyle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -12,10 +13,6 @@ import {
   requestDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
 import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
-import { getCandidateMatch } from "@/features/find/matchData";
-import { matchPoints, type MatchPointKind } from "@/features/find/matchPoints";
-import { getOwnPreferences } from "@/features/find/preferenceData";
-import { MatchPointsView, type MatchPointsCopy } from "@/features/find/MatchPointsView";
 import {
   resolveDiscoveryIntroFeedback,
   type DiscoveryIntroActionState,
@@ -337,30 +334,6 @@ export default async function DiscoveryProfileDetailPage({
   //
   // Auf dem Profil ALLE Punkte - wer hier ist, hat sich fuer diese Person
   // entschieden und will lesen. Auf der Ergebniskarte sind es hoechstens zwei.
-  const tFind = await getTranslations("find.points");
-  const tFindSearch = await getTranslations("find.search");
-  const ownPreferences = isOwner
-    ? { preferences: [] }
-    : await getOwnPreferences(user.id);
-  const hasSearchPreferences = ownPreferences.preferences.some(
-    (entry) => entry.importance > 0,
-  );
-  const findMatch = isOwner
-    ? { match: { themes: [], rankingScore: null, weightedThemes: 0 }, mutualStrongPoints: [] }
-    : await getCandidateMatch(user.id, profile.userId);
-  const findMatchPoints = matchPoints(
-    findMatch.match.themes,
-    findMatch.mutualStrongPoints,
-  );
-  const matchCopy: MatchPointsCopy = {
-    title: tFind("title"),
-    themeTitle: (themeId: string) => tFindSearch(`themes.${themeId}.title`),
-    kindTitle: (kind: MatchPointKind) => tFind(`kinds.${kind}.title`),
-    kindText: (kind: MatchPointKind, name: string) => tFind(`kinds.${kind}.text`, { name }),
-    noPreferences: tFind("noPreferences"),
-    noPreferencesCta: tFind("noPreferencesCta"),
-  };
-
   // Die Bedingungen prueft get_disclosed_capability; hier wird nur nicht
   // gefragt, wenn es das eigene Profil ist.
   const disclosedCapability = isOwner
@@ -546,12 +519,7 @@ export default async function DiscoveryProfileDetailPage({
             sich fuer diese Person entschieden und will lesen. */}
         {!isOwner ? (
           <section className={CARD_CLASS}>
-            <MatchPointsView
-              points={findMatchPoints}
-              candidateName={profile.displayName}
-              copy={matchCopy}
-              hasPreferences={hasSearchPreferences}
-            />
+            <DiscoveryWorkstyle candidateId={profile.userId} />
           </section>
         ) : null}
 

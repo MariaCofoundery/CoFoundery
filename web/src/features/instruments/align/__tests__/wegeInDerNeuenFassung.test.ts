@@ -48,7 +48,7 @@ test("die Leiste zeigt zurück und auf die zwei Bereiche", () => {
 
   assert.match(nav, /href="\/dashboard"/);
   assert.match(nav, /← Übersicht/);
-  for (const ziel of ["/founder-alignment/profil", "/founder-alignment/vorhaben"]) {
+  for (const ziel of ["/me/profile/workstyle", "/founder-alignment/vorhaben"]) {
     assert.ok(nav.includes(ziel), ziel);
   }
 
@@ -88,7 +88,7 @@ test("nach dem Absenden passiert etwas", () => {
   // dem die meiste Arbeit hinter einem liegt.
   const seite = readFileSync(
     join("src", "app", "(product)", "founder-alignment", "profil", "page.tsx"), "utf8");
-  assert.match(seite, /afterSubmit="\/founder-alignment\/profil\/antworten\?erstellt=1"/);
+  assert.match(seite, /redirect\(data \? "\/founder-alignment\/profil\/antworten" : CURRENT_WORKSTYLE_HREF\)/);
 
   const fragebogen = readFileSync(
     join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");

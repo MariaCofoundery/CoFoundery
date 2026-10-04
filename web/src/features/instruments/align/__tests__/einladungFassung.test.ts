@@ -31,15 +31,15 @@ const version = lies("src", "features", "instruments", "align", "invitationVersi
 const migration = lies(
   "..", "supabase", "migrations", "20261084120000_invitation_version.sql");
 
-test("die Einladung führt dorthin, wo die einladende Person arbeitet", () => {
-  assert.match(flow, /versionOfInvitation\(normalizedInvitationId\)\) === "align"/);
+test("die aktuelle Einladung führt zum bestehenden Team oder v0.4", () => {
+  assert.match(flow, /currentTeamForInvitation\(client, user.id, normalizedInvitationId\)/);
   assert.match(flow, /labelKey: "align"/);
 
   // Und die Kennung kommt mit: Ohne sie landet jemand in einem Fragebogen,
   // den er nicht gesucht hat.
   assert.match(
     flow,
-    /return `\/founder-alignment\/profil\?invitationId=\$\{encodeURIComponent\(invitationId\)\}`;/,
+    /return `\/research\/workstyle-pretest\?version=8.5a-v3&invitationId=\$\{encodeURIComponent\(invitationId\)\}`;/,
   );
 });
 
@@ -101,8 +101,8 @@ test("beide Seiten bekommen einen Hinweis", () => {
   assert.ok(!/bg-slate-900/.test(hinweis), "der Hinweis zieht aus dem Bogen heraus");
 });
 
-test("wer über eine Einladung im neuen Bogen landet, erfährt warum", () => {
-  const profil = lies("src", "app", "(product)", "founder-alignment", "profil", "page.tsx");
-  assert.match(profil, /inviter_display_name/);
-  assert.match(profil, /Du bist über die Einladung von/);
+test("historical profile URLs never create new legacy assessments", () => {
+ const page = lies("src", "app", "(product)", "founder-alignment", "profil", "page.tsx");
+ assert.match(page, /CURRENT_WORKSTYLE_HREF/);
+ assert.doesNotMatch(page, /<Questionnaire/);
 });

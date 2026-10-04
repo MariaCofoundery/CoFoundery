@@ -47,7 +47,7 @@ test("der Kasten zählt Schritte und nicht Fragen", () => {
   // Fehler in einer Zeile: Die 43 zählte die zurückgezogene S01 mit, und das
   // UX-Review Teil 2, Abschnitt 14, will die Einzelfragenzahl gar nicht mehr
   // sehen.
-  assert.match(karte, /t\("steps", \{ count: schritte\("founder_profile"\)/);
+  assert.match(karte, /Noch nicht begonnen/);
   assert.match(karte, /t\("ventureSteps", \{ count: schritte\("venture_alignment"\)/);
   assert.ok(!/\$\{state\.profile\.of\}/.test(karte), "die Fragenzahl steht wieder da");
   assert.ok(!/\$\{venture\.of\}/.test(karte), "die Fragenzahl steht wieder da");

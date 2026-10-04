@@ -313,7 +313,7 @@ test("die Seite baut keine Erfassungsoberflaeche nach", () => {
   // Seite verteilt.
   const modell = codeOnly(MODELL);
   for (const ziel of [
-    "/founder-alignment/profil",
+    "/me/profile/workstyle",
     "/profile/interview",
     "/profile/direction",
     "/profile?step=areas",

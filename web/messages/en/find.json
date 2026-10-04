@@ -110,5 +110,31 @@
       "open": "{count, plural, =1 {1 topic still open} other {# topics still open}}"
     },
     "insufficient": "We do not have enough information yet for a meaningful match point on this."
+  },
+  "workstyle": {
+    "title": "Working styles in conversation",
+    "areas": {
+      "EVI": "Examining decisions",
+      "EXP": "Using experience",
+      "EL": "Learning by trying",
+      "VOICE": "Bringing in other perspectives",
+      "AMB": "Handling open questions",
+      "ORG": "Managing work"
+    },
+    "SIMILAR_PATTERN": "In comparable situations, you describe similar approaches. What experiences are behind them?",
+    "DISCUSSION_POINT": "In comparable situations, you place different emphasis. Discuss when each approach helps.",
+    "unavailable": "No shared, sufficiently comparable working-style information is available here. This is not an assessment of this person.",
+    "settings": "Manage FIND permission",
+    "consentTitle": "Use my working style for FIND",
+    "consentText": "With your permission, FIND uses your current product-approved Workstyle responses for descriptive conversation prompts. Other founders see only these derived hints, never raw answers. There is no compatibility score or working-style ranking. Both people must allow this use.",
+    "separate": "This voluntary permission applies only to FIND. It is separate from team sharing, advisor access and research consent. Research and candidate responses are excluded. You can withdraw at any time; no new hints will then be delivered.",
+    "enabled": "FIND use allowed",
+    "disabled": "FIND use not allowed",
+    "loadError": "Permission status could not be loaded.",
+    "saved": "FIND permission saved.",
+    "error": "Could not save the change. Please try again.",
+    "revoke": "Withdraw FIND permission",
+    "enable": "Allow FIND use",
+    "profile": "View my working style"
   }
 }

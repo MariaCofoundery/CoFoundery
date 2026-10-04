@@ -293,7 +293,7 @@ export function ProductShell({
             // die zweite Reihe genau dort verschwunden, wo der neue Eintrag
             // hinfuehrt - ein Reiter, der sich beim Anklicken aufloest.
             currentPathname.startsWith("/me/") ||
-            currentPathname.startsWith("/founder-alignment"),
+            currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest") || currentPathname.startsWith("/founder-alignment"),
       // Align hatte als einziger Bereich keine eigene Navigation. Beide Seiten
       // waren nur vom Dashboard aus erreichbar - wer woanders stand, musste
       // erst dorthin zurueck.
@@ -323,17 +323,17 @@ export function ProductShell({
                       href: "/me/profile",
                       label: t("alignOwnProfile"),
                       isActive: (currentPathname: string) =>
-                        currentPathname.startsWith("/me/profile"),
+                        currentPathname === "/me/profile",
                     },
                     {
                       // DIE NEUE FASSUNG GEHOERT INS MENUE. Sie war nur ueber
                       // eine Karte auf dem Dashboard erreichbar - wer woanders
                       // stand, musste erst dorthin zurueck. Genau das war bei
                       // Fragebogen und Report schon einmal das Problem.
-                      href: "/founder-alignment/profil",
+                      href: "/me/profile/workstyle",
                       label: t("alignNewVersion"),
                       isActive: (currentPathname: string) =>
-                        currentPathname.startsWith("/founder-alignment"),
+                        currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest") || currentPathname.startsWith("/founder-alignment"),
                     },
                   ]
                 : []),

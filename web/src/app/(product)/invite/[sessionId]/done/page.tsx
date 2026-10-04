@@ -1,3 +1,4 @@
+import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { type ReactNode } from "react";
@@ -13,7 +14,7 @@ import {
   buildInvitationDashboardHref,
   resolveInvitationContinueTarget,
 } from "@/features/onboarding/invitationFlow";
-import { getRequestUser } from "@/lib/supabase/server";
+import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 type PageProps = {
   params: Promise<{ sessionId: string }>;
@@ -80,6 +81,8 @@ export default async function InvitationDonePage({ params, searchParams }: PageP
     redirect(`/login?next=${encodeURIComponent(`/invite/${invitationId}/done`)}`);
   }
 
+  const currentTeam = await currentTeamForInvitation(await createClient(), user.id, invitationId);
+  if (currentTeam) redirect(`/teams/${currentTeam}/workstyle`);
   const dashboardHref = buildInvitationDashboardHref(invitationId);
   const matchingReportHref = `/report/${encodeURIComponent(invitationId)}`;
   const individualReportHref = "/me/report";

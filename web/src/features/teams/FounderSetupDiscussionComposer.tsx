@@ -22,14 +22,16 @@ export function FounderSetupDiscussionComposer({
   action,
   parentEntryId,
   compact = false,
+  initialBody = "",
 }: {
   action: (formData: FormData) => void | Promise<void>;
   parentEntryId?: string;
   compact?: boolean;
+  initialBody?: string;
 }) {
   const t = useTranslations("teams.setup.discussion");
   const locale = useLocale();
-  const [body, setBody] = useState("");
+  const [body, setBody] = useState(initialBody);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);

@@ -1,3 +1,4 @@
+import { DiscoveryWorkstyle } from "@/features/find/DiscoveryWorkstyle";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
@@ -7,8 +8,6 @@ import {
   compactDiscoveryValues,
   discoveryRoleLabels,
 } from "@/features/discovery/discoveryPresentation";
-import { MatchPointsView, type MatchPointsCopy } from "@/features/find/MatchPointsView";
-import type { MatchPoint } from "@/features/find/matchPoints";
 import type {
   DiscoveryCandidate,
   DiscoveryFounderRole,
@@ -87,7 +86,6 @@ export function FounderDiscoveryCard({
   saved,
   photo,
   showMatchReasons = true,
-  match,
 }: {
   candidate: DiscoveryCandidate;
   preferences: FounderSearchPreferences["mustHaves"];
@@ -96,21 +94,6 @@ export function FounderDiscoveryCard({
   /** Nur gesetzt, wenn diese Person ihr Bild fuer Mitglieder freigegeben hat. */
   photo?: MemberPhoto;
   showMatchReasons?: boolean;
-  /**
-   * Die Matchpunkte dieser Person — je Thema einer, hoechstens zwei.
-   *
-   * ERSETZT DIE ALTEN ALIGNMENT-SIGNALE. Hier standen bis zum 30.09.2026
-   * "Commitment · dieselbe grobe Tendenz" und ebenso Unternehmenslogik,
-   * Risikoorientierung, Konfliktstil. Diese Kategorien stammen aus einer
-   * aelteren Architektur und vermischen venturebezogene Themen mit
-   * portablen Arbeitspraeferenzen - die FIND-Spec streicht sie in
-   * Abschnitt 20 ausdruecklich.
-   */
-  match?: {
-    points: readonly MatchPoint[];
-    copy: MatchPointsCopy;
-    hasPreferences: boolean;
-  };
 }) {
   const { profile } = candidate;
   const roles = compactDiscoveryValues(
@@ -177,14 +160,7 @@ export function FounderDiscoveryCard({
         </section>
       ) : null}
 
-      {showMatchReasons && match ? (
-        <MatchPointsView
-          points={match.points}
-          candidateName={profile.displayName}
-          copy={match.copy}
-          hasPreferences={match.hasPreferences}
-        />
-      ) : null}
+      {showMatchReasons && <DiscoveryWorkstyle candidateId={candidate.profile.userId} compact />}
 
       <div className="mt-auto flex flex-wrap items-center gap-3 pt-6">
         <Link href={`/discovery/${profile.id}`} className={PRIMARY_CTA_CLASS}>{t("common.viewProfile")}</Link>

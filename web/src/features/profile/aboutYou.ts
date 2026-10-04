@@ -113,6 +113,7 @@ export type AboutYouFacts = {
   /** Irgendeine Kernangabe gesetzt. */
   identityTouched: boolean;
   workAnswers: number;
+  workStarted?: boolean;
   workSubmitted: boolean;
   interviewStarted: boolean;
   interviewCompleted: boolean;
@@ -159,7 +160,7 @@ function stepStatus(id: StepId, facts: AboutYouFacts): StepStatus {
 
     case "arbeitsweise":
       if (facts.workSubmitted) return "doneForNow";
-      return facts.workAnswers > 0 ? "started" : "open";
+      return (facts.workStarted || facts.workAnswers > 0) ? "started" : "open";
 
     case "gespraech":
       // Unsortierte Antworten sind KEIN Ende, auch nicht bei abgeschlossenem
@@ -212,7 +213,7 @@ function stepHref(id: StepId, facts: AboutYouFacts): string {
     case "basis":
       return "/profile?step=identity";
     case "arbeitsweise":
-      return "/founder-alignment/profil";
+      return "/me/profile/workstyle";
     case "gespraech":
       // Wartende Antworten gehen vor einem neuen Gespräch - dieselbe
       // Reihenfolge wie bisher auf der Seite.

@@ -16,6 +16,7 @@ export async function AlignCard({ state }: { state: AlignDashboardState }) {
   if (!state.show) return <p className="mb-8 text-sm text-slate-600">{t("unavailable")}</p>;
   const profileState = resolveFounderWorkProfileState({
     answered: state.profile.answered,
+    started: state.profile.started,
     submitted: state.profile.submitted,
     legacyBaseSubmitted: state.hasPrevious,
   });
@@ -46,7 +47,7 @@ export async function AlignCard({ state }: { state: AlignDashboardState }) {
           <p className="text-sm font-medium text-slate-900">{t("profileTitle")}</p>
           <p className="mt-1 text-xs text-slate-500">
             {profileState === "completed" ? t("completed") : profileState === "started"
-              ? t("started") : t("steps", { count: schritte("founder_profile") })}
+              ? t("started") : "Noch nicht begonnen"}
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             <Link href={founderWorkProfileHref(profileState)} className="text-slate-900 underline">
@@ -55,7 +56,7 @@ export async function AlignCard({ state }: { state: AlignDashboardState }) {
             {state.profile.submitted && (
               <>
                 <Link
-                  href="/founder-alignment/profil/antworten"
+                  href="/me/profile/workstyle"
                   className="text-slate-900 underline"
                 >
                   {t("answers")}
@@ -130,35 +131,11 @@ export async function AlignCard({ state }: { state: AlignDashboardState }) {
         </div>
       </div>
 
-      {(state.profile.submitted || state.ventures.some((venture) => venture.submitted)) && (
-        <div className="mt-5 rounded-2xl border border-slate-200 p-4">
-          <p className="text-sm font-medium text-slate-900">{t("comparisonTitle")}</p>
-          {state.partners.length === 0 ? (
-            <p className="mt-1 text-sm text-slate-600">
-              {t("comparisonEmpty")}
-            </p>
-          ) : (
-            <ul className="mt-2 space-y-1">
-              {state.partners.map((partner) => (
-                <li key={partner.userId} className="text-sm">
-                  {partner.ready ? (
-                    <Link
-                      href={`/founder-alignment/vergleich/${partner.userId}`}
-                      className="text-slate-900 underline"
-                    >
-                      {t("compare", { name: partner.label })}
-                    </Link>
-                  ) : (
-                    <span className="text-slate-500">
-                      {t("notShared", { name: partner.label })}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      {state.ventures.length > 0 && <div className="mt-5 rounded-2xl border border-slate-200 p-4">
+        <h3 className="font-medium">Euer Zusammenspiel</h3>
+        <p className="mt-1 text-sm text-slate-600">Der Teamreport verbindet eure freigegebenen Arbeitsweisen. Angaben zum Vorhaben und Vereinbarungen bleiben eigene Bereiche.</p>
+        <ul className="mt-3 space-y-2">{state.ventures.filter(v => !v.alone).map(v => <li key={v.id}><Link className="underline" href={`/teams/${v.id}/workstyle`}>{v.name ?? "Teamreport öffnen"}</Link></li>)}</ul>
+      </div>}
     </section>
   );
 }

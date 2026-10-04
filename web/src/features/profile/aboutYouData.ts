@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { CapabilityEntry } from "@/features/capability/capabilityTypes";
 import { CAPABILITY_INTERVIEW, DIRECTION_INTERVIEW } from "@/features/interviews/interviewKinds";
-import { FOUNDER_PROFILE_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import type { AboutYouFacts } from "@/features/profile/aboutYou";
 import { getIdentityGaps, type IdentityCoreValues } from "@/features/profile/identityReadiness";
 
@@ -81,7 +81,7 @@ export async function getAboutYouFacts(
           .from("assessments")
           .select("id, submitted_at")
           .eq("user_id", userId)
-          .eq("instrument_id", FOUNDER_PROFILE_INSTRUMENT_ID)
+          .eq("instrument_id", CURRENT_WORKSTYLE_INSTRUMENT)
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -168,6 +168,7 @@ export async function getAboutYouFacts(
     identityGaps: getIdentityGaps(core).length,
     identityTouched,
     workAnswers: antworten,
+    workStarted: Boolean(workAssessment),
     workSubmitted: Boolean(workAssessment?.submitted_at),
     interviewStarted: interviewSessions.some((session) => session.status === "active"),
     interviewCompleted: interviewSessions.some((session) => session.status === "completed"),

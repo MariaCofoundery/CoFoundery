@@ -110,5 +110,31 @@
       "open": "{count, plural, =1 {1 Thema noch offen} other {# Themen noch offen}}"
     },
     "insufficient": "Dazu haben wir noch nicht genug Angaben für einen belastbaren Matchpunkt."
+  },
+  "workstyle": {
+    "title": "Arbeitsweisen im Gespräch",
+    "areas": {
+      "EVI": "Entscheidungen prüfen",
+      "EXP": "Erfahrung nutzen",
+      "EL": "Durch Ausprobieren lernen",
+      "VOICE": "Andere Sichtweisen einbringen",
+      "AMB": "Mit offenen Fragen umgehen",
+      "ORG": "Die Arbeit steuern"
+    },
+    "SIMILAR_PATTERN": "In den vergleichbaren Situationen beschreibt ihr ähnliche Vorgehensweisen. Welche Erfahrungen stehen dahinter?",
+    "DISCUSSION_POINT": "In den vergleichbaren Situationen setzt ihr unterschiedliche Schwerpunkte. Sprecht darüber, wann welches Vorgehen hilfreich ist.",
+    "unavailable": "Hier gibt es noch keine freigegebenen, ausreichend vergleichbaren Angaben zur Arbeitsweise. Das ist keine Bewertung dieser Person.",
+    "settings": "FIND-Freigabe verwalten",
+    "consentTitle": "Meine Arbeitsweise für FIND verwenden",
+    "consentText": "Wenn du zustimmst, verwendet FIND deine aktuellen produktfähigen Workstyle-Antworten für beschreibende Gesprächsimpulse. Andere Founder sehen nur diese abgeleiteten Hinweise, keine Rohantworten. Es gibt keine Kompatibilitätszahl und kein Ranking nach Arbeitsweise. Beide Personen müssen diese Nutzung erlauben.",
+    "separate": "Diese freiwillige Freigabe gilt nur für FIND. Sie ist unabhängig von Teamfreigaben, Advisor-Zugriff und Forschungseinwilligung. Forschungs- und Candidate-Antworten bleiben ausgeschlossen. Du kannst jederzeit widerrufen; danach werden keine neuen Hinweise ausgeliefert.",
+    "enabled": "FIND-Nutzung erlaubt",
+    "disabled": "FIND-Nutzung nicht erlaubt",
+    "loadError": "Freigabestatus konnte nicht geladen werden.",
+    "saved": "FIND-Freigabe gespeichert.",
+    "error": "Die Änderung konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    "revoke": "FIND-Freigabe widerrufen",
+    "enable": "FIND-Nutzung erlauben",
+    "profile": "Meine Arbeitsweise ansehen"
   }
 }

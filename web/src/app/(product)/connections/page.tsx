@@ -89,7 +89,7 @@ export default async function ConnectionsPage() {
                         </p>
                       </div>
                     </div>
-                    <Link href={`/teams/${encodeURIComponent(team.id)}`} className={`${LINK} mt-4`}>
+                    <Link href={`/teams/${encodeURIComponent(team.id)}/workstyle`} className={`${LINK} mt-4`}>
                       {t("openTeam")}
                     </Link>
                   </li>

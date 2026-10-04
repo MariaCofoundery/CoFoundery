@@ -77,7 +77,7 @@ export default async function ProfileAnswersPage({
         </section>
       )}
 
-      <h1 className="text-2xl font-semibold text-slate-900">Wie du arbeitest</h1>
+      <h1 className="text-2xl font-semibold text-slate-900">Frühere Auswertung</h1>
       <p className="mt-4 text-slate-700">
         Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein
         Vergleich mit anderen.
@@ -87,7 +87,7 @@ export default async function ProfileAnswersPage({
       {!report ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
           Hier steht noch nichts.{" "}
-          <Link href="/founder-alignment/profil" className="underline">
+          <Link href="/me/profile/workstyle" className="underline">
             Zum Fragebogen
           </Link>
           .

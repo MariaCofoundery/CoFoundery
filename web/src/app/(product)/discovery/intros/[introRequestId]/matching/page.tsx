@@ -1,3 +1,4 @@
+import { currentTeamForPeople } from "@/features/teams/currentJourneyData";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -48,6 +49,7 @@ type MatchingPreparationPageParams = {
 type MatchingPreparationSearchParams = {
   matchingStartResult?: string | string[];
   matchingStartError?: string | string[];
+  currentTeamError?: string | string[];
   matchingSessionResult?: string | string[];
   matchingSessionError?: string | string[];
   matchingReportResult?: string | string[];
@@ -615,6 +617,25 @@ export default async function DiscoveryIntroMatchingPreparationPage({
     preparation.currentUserRole === "requester"
       ? preparation.recipientProfile
       : preparation.requesterProfile;
+  const currentTeam = await currentTeamForPeople(await createClient(), user.id, otherProfile.userId);
+  if (currentTeam) redirect(`/teams/${currentTeam}/workstyle`);
+  if (preparation.matchingStart?.status === "ready_for_matching") {
+    const startId = preparation.matchingStart.id;
+    async function openCurrentTeam() {
+      "use server";
+      const { data, error } = await (await createClient()).rpc("open_discovery_workstyle_team", { p_start_id: startId });
+      if (error || !data) redirect(`/discovery/intros/${introRequestId}/matching?currentTeamError=1`);
+      redirect(`/teams/${data}/workstyle`);
+    }
+    return <main className="mx-auto max-w-3xl px-5 py-10">
+      <Link className="underline" href="/discovery/intros">Zu euren Anfragen</Link>
+      <h1 className="mt-6 text-3xl font-semibold">Euer Zusammenspiel</h1>
+      <p className="mt-4 leading-7">Ihr habt beide zugestimmt, gemeinsam weiterzuschauen. Öffnet euren Teambereich. Für den Report benötigt ihr eure aktuellen Arbeitsprofile und separate Freigaben.</p>
+      <p className="mt-3 text-sm">Dieser Schritt gibt weder Antworten noch Forschungsdaten frei und erzeugt keine Vereinbarung.</p>
+      {searchParamValue(resolvedSearchParams.currentTeamError) && <p role="alert">Der Teambereich konnte nicht geöffnet werden. Bitte erneut versuchen.</p>}
+      <form action={openCurrentTeam}><button className="mt-5 min-h-11 rounded-xl border px-5 py-3">Euer Zusammenspiel öffnen</button></form>
+    </main>;
+  }
   const matchingStart = preparation.matchingStart;
   // Gibt es zwischen diesen beiden schon einen gemeinsamen Bereich? Dann ist
   // "Gemeinsam pruefen" nicht der naechste Schritt, sondern bereits passiert -
