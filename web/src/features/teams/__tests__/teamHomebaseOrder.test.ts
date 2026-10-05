@@ -65,7 +65,12 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
   // Teamnavigation, beide oberhalb von "Vertiefen".
   assert.match(source("src/features/teams/TeamJourneyStatus.tsx"), /href: `\/teams\/\$\{team\}\/setup`/);
   assert.match(source("src/features/teams/FounderTeamNavigation.tsx"), /key: "setup" as const/);
-  assert.ok(at("<FounderTeamNavigation") < deepen);
+  // Phase 11.7B: Die Teamnavigation steht im kompakten Teamkopf ganz oben.
+  assert.match(source("src/features/teams/TeamPageHeader.tsx"), /<FounderTeamNavigation/);
+  assert.ok(at("<TeamPageHeader") < header, "der Teamkopf steht nicht ganz oben");
+  // Teamfreigabe direkt unter dem Kopf, Team verlassen ganz am Ende.
+  assert.ok(at("<TeamShareCard") > status && at("<TeamShareCard") < understand, "die Teamfreigabe steht nicht oben");
+  assert.ok(at("<LeaveTeamSection") > advisor, "Team verlassen steht nicht am Ende");
 });
 
 test("die Statuszeile behaelt vier getrennte Zustaende ohne Gesamtwert", () => {

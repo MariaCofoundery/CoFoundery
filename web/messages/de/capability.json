@@ -641,9 +641,9 @@
     "canDo": "hat Tiefe: {names}",
     "unnamedMember": "ein Teammitglied",
     "emptyTitle": "Noch keine Grundlage",
-    "emptyText": "Für diese Auswertung braucht es von mindestens zwei Menschen im Team Angaben zu Erfahrungsstufe und Verantwortungswunsch – und die Freigabe, sie im Team zu zeigen. Beides entscheidet jede Person selbst; „privat“ bleibt privat, auch hier.",
+    "emptyText": "Hier erscheinen Erfahrungsstufe und Verantwortungswunsch der Mitglieder, die für dieses Team geteilt haben. Dafür braucht es Angaben zu Fähigkeiten – und die Teamfreigabe für genau dieses Team. Beides entscheidet jede Person selbst; „privat“ bleibt privat, solange du nicht teilst.",
     "emptyInterview": "Gespräch führen",
-    "emptyDisclosure": "Freigabe einstellen",
+    "emptyDisclosure": "Mit diesem Team teilen",
     "states": {
       "contested": {
         "label": "Mehrere wollen verantworten",
@@ -673,7 +673,8 @@
         "label": "Zu wenige Angaben",
         "text": "Hier haben sich weniger als zwei Menschen entschieden – oder „noch unklar“ angegeben. Daraus eine Rollenaussage zu machen wäre geraten, deshalb steht hier keine."
       }
-    }
+    },
+    "teamBasis": "{contributing} von {members} im Team haben Angaben gemacht, davon {withDepth} mit Erfahrungsstufe und Verantwortungswunsch. Die Tiefe ist sichtbar, wenn jemand für dieses Team geteilt hat – eine Freigabe in einem anderen Team zählt hier nicht."
   },
   "viewFounderProfile": "„Das bist du“ ansehen",
   "strengths": {

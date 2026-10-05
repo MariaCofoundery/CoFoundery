@@ -187,7 +187,9 @@ test("global and contextual navigation use the new DE/EN information architectur
     assert.equal(typeof enTeams.teamNavigation[key], "string");
   }
   assert.doesNotMatch(teamNavigation, /Gespräche|Check-ins|Conversations/);
-  assert.match(teamNavigation, /#team-alignment/);
+  // Phase 11.7B: Fruehere Auswertungen sind kein Reiter mehr - sie stehen
+  // eingeklappt auf der Uebersicht.
+  assert.doesNotMatch(teamNavigation, /#team-alignment/);
   assert.match(homebase, /id="team-alignment"/);
 });
 

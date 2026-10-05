@@ -22,7 +22,20 @@
     "expiredHint": "Falls der Link wirklich abgelaufen ist, bitte die einladende Person um eine neue Einladung.",
     "technicalHint": "Technischer Hinweis: {detail}",
     "toDashboard": "Zum Dashboard",
-    "fallback": "Lade Einladung…"
+    "fallback": "Lade Einladung…",
+    "choice": {
+      "title": "Team beitreten",
+      "body": "Du wurdest in ein Founder-Team eingeladen. Entscheide selbst, ob du gleich mit diesem Team teilst – beitreten kannst du in beiden Fällen.",
+      "share": {
+        "title": "Team beitreten und teilen",
+        "body": "Die Mitglieder dieses Teams sehen deine Arbeitsweise und deine Angaben zu Fähigkeiten und Verantwortung. Das gilt für die aktuellen und später hinzukommenden Mitglieder dieses Teams, bis du die Freigabe zurücknimmst."
+      },
+      "later": {
+        "title": "Erst beitreten, später entscheiden",
+        "body": "Du trittst bei, ohne etwas zu teilen. Teilen kannst du jederzeit auf der Teamseite."
+      },
+      "note": "Forschungsantworten, FIND und Advisor-Zugänge sind von dieser Entscheidung nicht betroffen. Deine Antworten zum Vorhaben sehen die Mitglieder erst, wenn du sie abgibst."
+    }
   },
   "welcome": {
     "errors": {

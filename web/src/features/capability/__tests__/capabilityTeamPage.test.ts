@@ -38,9 +38,11 @@ test("die Freigabeleiter wird nicht umgangen", () => {
   // `person_capability_entries` fuer eine fremde Kennung waere der Weg daneben -
   // und Zeilensicherheit hin oder her, sie waere die Stelle, an der jemand sie
   // eines Tages weitet.
+  // Phase 11.7B.1: teamgenau - der Teamkontext steht explizit im Aufruf.
   const data = codeOnly(DATA);
-  assert.match(data, /rpc\("get_disclosed_capability"/);
-  assert.match(data, /p_context: "team"/);
+  assert.match(data, /rpc\("get_team_capability"/);
+  assert.match(data, /p_team_id: teamId/);
+  assert.doesNotMatch(data, /get_disclosed_capability/);
   assert.doesNotMatch(
     data,
     /from\("person_capability_entries"\)/,
@@ -182,7 +184,10 @@ test("der leere Zustand nennt beide Ursachen und beide Wege", () => {
   const page = source(PAGE);
   assert.match(page, /data\.contributing === 0/);
   assert.match(page, /href="\/profile\/interview"/);
-  assert.match(page, /href="\/profile#freigabe"/);
+  // Phase 11.7B.1: zweiter Weg ist die Teamfreigabe fuer genau dieses Team.
+  assert.match(page, /href=\{`\/teams\/\$\{encodeURIComponent\(teamId\)\}#teamfreigabe`\}/);
+  assert.match(page, /<ComponentMatrix people=\{data\.people\} areas=\{data\.areas\} heading=\{false\} \/>/);
+  assert.doesNotMatch(page, /CapabilityTeamReadoutView/);
   for (const locale of ["de", "en"]) {
     const copy = teamCopy(locale);
     assert.ok(copy.emptyTitle && copy.emptyText, `${locale}: der leere Zustand fehlt`);

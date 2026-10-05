@@ -161,11 +161,11 @@ test("Cutover: fruehere Fragebogen-Einstiege fuehren in den aktuellen Weg", () =
 const src = (p: string) => readFileSync(p, "utf8");
 const code = (p: string) => src(p).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("Teamreport: eine Agenda, Einzelantworten im Anhang, keine Bewertungsgrafik", () => {
+test("Teamreport: ein Gesprächsteil, Einzelantworten im Anhang, keine Bewertungsgrafik", () => {
   const report = code("src/features/reporting/workstyle/TeamWorkstyleReport.tsx");
-  // Die Agenda steht einmal - nicht zusaetzlich am Ende wiederholt.
-  assert.equal((report.match(/id="agenda"/g) ?? []).length, 1);
-  assert.ok(report.indexOf('id="agenda"') < report.indexOf('id="arbeitsweisen"'), "die Agenda steht nicht vorn");
+  // Phase 11.7B: "Hier lohnt sich ein Gespraech" steht einmal - vor den Bereichen.
+  assert.equal((report.match(/id="gespraech"/g) ?? []).length, 1);
+  assert.ok(report.indexOf('id="gespraech"') < report.indexOf('id="arbeitsweisen"'), "die Gespraechskarten stehen nicht vorn");
   // Alle 29 Einzelantworten nur im Anhang.
   assert.match(report, /<details className="ws-appendix[^"]*" open=\{full\}>[\s\S]*?<WorkstyleSignature/);
   assert.doesNotMatch(report, /ReportViewV21/);

@@ -22,7 +22,20 @@
     "expiredHint": "If the link has expired, please ask the inviting person for a new invitation.",
     "technicalHint": "Technical note: {detail}",
     "toDashboard": "Go to dashboard",
-    "fallback": "Loading invitation…"
+    "fallback": "Loading invitation…",
+    "choice": {
+      "title": "Join team",
+      "body": "You were invited to a founder team. Decide for yourself whether to share with this team right away – you can join either way.",
+      "share": {
+        "title": "Join team and share",
+        "body": "The members of this team see how you work and what you said about capabilities and responsibility. This applies to current and future members of this team until you withdraw the share."
+      },
+      "later": {
+        "title": "Join now, decide later",
+        "body": "You join without sharing anything. You can share at any time on the team page."
+      },
+      "note": "Research answers, FIND and advisor access are not affected by this decision. Members only see your venture answers once you submit them."
+    }
   },
   "welcome": {
     "errors": {

@@ -31,8 +31,10 @@ export const COMPONENT_LABELS: Record<ComponentState, string> = {
 /** Application level, ownership wish and sourcing are three independent axes.
  * Only `own` claims ownership. Contribute/grow_into never silently become coverage.
  * No entry or undisclosed wish is unknown, never evidence of an internal gap. */
+/** Nur das, was die Faehigkeiten-Darstellung braucht - Teambericht und Teamseite teilen sie. */
+export type CapabilityPerson = Pick<ProductMember, "person_id" | "name" | "capabilities">;
 export function componentRows(
-  people: ProductMember[],
+  people: CapabilityPerson[],
   areas: CapabilityArea[],
 ) {
   return [...areas]

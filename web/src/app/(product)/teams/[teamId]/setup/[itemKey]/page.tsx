@@ -1,5 +1,4 @@
 import { workstyleSetupHandoff } from "@/features/reporting/workstyle/setupHandoff";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -9,7 +8,7 @@ import { GlossaryText } from "@/features/founderLibrary/GlossaryText";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
 import { FounderSetupDiscussionComposer } from "@/features/teams/FounderSetupDiscussionComposer";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderSetupCatalogItem, isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup, getFounderSetupDiscussion } from "@/features/teams/founderSetupData";
 import { groupFounderSetupDiscussionEntries } from "@/features/teams/founderSetupDiscussion";
@@ -47,9 +46,9 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   if (!setup) notFound();
   const item = setup.items.find((entry) => entry.key === itemKey);
   if (!item) notFound();
-  const [t, navigationT, locale, discussionEntries] = await Promise.all([
+  const [t, teamLabel, locale, discussionEntries] = await Promise.all([
     getTranslations("teams.setup"),
-    getTranslations("teams.teamNavigation"),
+    getTeamLabel(supabase, teamId),
     getLocale(),
     getFounderSetupDiscussion(teamId, itemKey, supabase),
   ]);
@@ -146,12 +145,12 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   };
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${teamId}/setup`} className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("backToSetup")}</Link>
-      <header className="mt-6 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
+    <main className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-6">
+      {/* Phase 11.7B.1: gemeinsamer Teamkopf; der Reiter "Founder Setup" ist der Weg zur Themenliste. */}
+      <TeamPageHeader teamId={teamId} active="setup" title={t(`items.${itemKey}.title`)} teamLabel={teamLabel} />
+      <section className="mt-5 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
         <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">{t(`categories.${catalogItem.category}`)}</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">{t(`items.${itemKey}.title`)}</h1>
-        <p className="mt-4 text-sm leading-7 text-slate-600">{t(`items.${itemKey}.question`)}</p>
+        <p className="mt-3 text-sm leading-7 text-slate-600">{t(`items.${itemKey}.question`)}</p>
         {/* Vor dem leeren Feld ein Anhaltspunkt.
             Bis 18.09.2026 bestand ein Thema aus Titel, Frage und Textfeld.
             Bei "Kommunikation" geht das. Bei Vesting und Beteiligung - also
@@ -173,20 +172,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           <p className="mt-3 text-xs leading-6 text-slate-500">{t("orientationHelp")}</p>
         </section>
         {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-white px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
-      </header>
-      <FounderTeamNavigation
-        teamId={teamId}
-        active="setup"
-        labels={{
-          ariaLabel: navigationT("ariaLabel"),
-          overview: navigationT("overview"),
-          workstyle: navigationT("workstyle"),
-          setup: navigationT("setup"),
-          library: navigationT("library"),
-          alignment: navigationT("alignment"),
-          roles: navigationT("roles"),
-        }}
-      />
+      </section>
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}
       <div className="mt-6 grid gap-6">
         {/* VOR DER BESPRECHUNG, NICHT DANACH: Was im Lab markiert wurde, ist

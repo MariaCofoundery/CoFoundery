@@ -48,16 +48,18 @@ test("jede Reihe in der Leiste darf umbrechen", () => {
 
   // Und die linke Gruppe mit dem Logo hatte es von Anfang an - falls jemand es
   // herausnimmt, faellt es hier auf.
-  assert.match(codeOnly(SHELL), /flex min-w-0 flex-wrap items-center gap-4 md:gap-6/);
+  // Phase 11.7B: ab 1024 Pixeln bewusst einzeilig (lg:flex-nowrap), darunter umbrechend.
+  assert.match(codeOnly(SHELL), /flex min-w-0 flex-wrap items-center gap-4 md:gap-5 lg:flex-nowrap/);
 });
 
 test("der Innenabstand ist auf dem Telefon kleiner", () => {
   // px-6 links und rechts nimmt von 360 Pixeln schon 48 weg. Das war genau
   // die Luft, die am Rand fehlte.
   const shell = codeOnly(SHELL);
-  assert.match(shell, /px-4 py-3 sm:px-6 md:px-10/);
+  // Phase 11.7B: kompakter (py-2 / pb-1), damit der Inhalt frueher beginnt.
+  assert.match(shell, /px-4 py-2 sm:px-6 md:px-10/);
   // Und die zweite Reihe folgt demselben Abstand - sonst stehen sie versetzt.
-  assert.match(shell, /px-4 pb-2 sm:px-6 md:px-10/);
+  assert.match(shell, /px-4 pb-1 sm:px-6 md:px-10/);
 });
 
 test("ein Eintrag rutscht ganz in die nächste Zeile, statt zu zerfallen", () => {
@@ -98,6 +100,8 @@ test("unter 1024 Pixeln steht statt der Reihen ein Knopf", () => {
   assert.match(shell, /className="hidden flex-wrap items-center gap-1 rounded-full[^"]*lg:flex"/);
   // Die rechte Reihe: erst ab lg.
   assert.match(shell, /className="hidden min-w-0 flex-wrap items-center justify-end[^"]*lg:flex"/);
+  // Phase 11.7B: der geschlossene Knopf traegt den aktuellen Bereich als Ortsangabe.
+  assert.match(shell, /activeArea\?\.label \?\? t\("menuOpen"\)/);
   // Die zweite Reihe mit den Unterseiten: erst ab lg.
   assert.match(shell, /mx-auto hidden w-full max-w-7xl[^"]*lg:block/);
   // Und der Knopf nur darunter.

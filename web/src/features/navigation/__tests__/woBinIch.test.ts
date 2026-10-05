@@ -25,22 +25,23 @@ test("die Krumen kommen aus dem Navigationsbaum, nicht aus dem Pfad", () => {
   assert.ok(!/pathname\.split/.test(block), "die Zeile zerlegt den Pfad");
 });
 
-test("die Zeile gilt auf jedem Gerät", () => {
-  // Die zweite Reihe gibt es erst ab 1024 Pixeln und nur bei Align. Gerade
-  // auf dem Telefon liegen die Bereiche hinter einem Knopf - dort ist die
-  // Ortsangabe am noetigsten.
+test("die Zeile erscheint nur, wenn sie etwas sagt (Phase 11.7B)", () => {
+  // Ab 1024 Pixeln zeigen Pille und zweite Reihe schon Bereich und
+  // Unterbereich - die Krume war dort die dritte Angabe desselben Ortes. Auf
+  // dem Telefon traegt der Menueknopf den Bereich; die Krume bleibt fuer Seiten
+  // UNTERHALB eines Unterbereichs, nie auf Teamseiten mit eigenem Rueckweg.
   const zeile = shell.slice(
     shell.indexOf('aria-label={t("breadcrumbLabel")}'),
     shell.indexOf("{children}", shell.indexOf('aria-label={t("breadcrumbLabel")}')),
   );
   assert.ok(zeile.length > 0, "die Zeile fehlt");
-  // Nur die KLASSEN zaehlen - `aria-hidden` am Trennzeichen ist etwas
-  // anderes und hat meinen ersten Anlauf faelschlich rot gemacht.
   const klassen = [...zeile.matchAll(/className="([^"]*)"/g)].map((treffer) => treffer[1]).join(" ");
-  assert.ok(
-    !/\bhidden\b|\blg:block\b/.test(klassen),
-    `die Zeile ist auf kleinen Schirmen versteckt: ${klassen}`,
-  );
+  assert.match(klassen, /\blg:hidden\b/, "am Rechner wiederholt die Zeile Pille und zweite Reihe");
+  const regel = shell.slice(shell.indexOf("const breadcrumbAddsOrientation"), shell.indexOf("const breadcrumb ="));
+  assert.match(regel, /pathname !== activeSubItem\?\.href/);
+  assert.match(regel, /!pathname\.startsWith\("\/teams\/"\)/);
+  // Die Ortsangabe auf dem Telefon: der Bereich auf dem Menueknopf.
+  assert.match(shell, /activeArea\?\.label \?\? t\("menuOpen"\)/);
 });
 
 test("„hier“ steht nur da, wo man wirklich ist", () => {

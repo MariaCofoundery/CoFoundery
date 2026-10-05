@@ -129,29 +129,28 @@
     "emptyIndividualCta": "Wie du arbeitest ausfüllen",
     "notReadyTitle": "Der Teamreport ist noch nicht verfügbar",
     "shareMissingTitle": "Freigabe fehlt",
-    "notReadyBody": "Alle Mitglieder brauchen ein abgeschlossenes Arbeitsprofil in der aktuellen Fassung und müssen ihre Antworten für die lesende Person freigeben. Eine Einladung allein erteilt keine Freigabe.",
-    "notReadyCta": "Eigenes Arbeitsprofil und Freigaben öffnen",
+    "notReadyBody": "Alle Mitglieder brauchen ein abgeschlossenes Arbeitsprofil in der aktuellen Fassung und müssen mit diesem Team teilen. Ein Beitritt allein teilt nichts.",
+    "notReadyCta": "Eigenes Arbeitsprofil öffnen",
     "readiness": {
       "title": "Für euren gemeinsamen Bericht fehlt noch etwas",
-      "listLabel": "Stand der Freigaben im Team",
+      "listLabel": "Wer schon mit diesem Team teilt",
       "you": "du",
       "state": {
-        "MISSING_MINE": "Deine Freigabe fehlt noch. Sobald du deine Arbeitsweise für alle im Team freigibst, erscheint euer Bericht für alle gleichzeitig.",
-        "MISSING_OTHERS": "Deine Freigabe ist da. Warte noch auf die Freigabe von {names}.",
-        "MISSING_MULTIPLE": "Es fehlen noch mehrere Freigaben – auch deine. Außerdem wartet ihr auf {names}.",
-        "INSUFFICIENT_WORKSTYLE": "Für den gemeinsamen Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Freigabe für alle anderen. Offen ist das noch bei: {names}.",
-        "READY": "Alle Freigaben sind da.",
+        "MISSING_MINE": "Du teilst noch nicht mit diesem Team. Sobald alle geteilt haben, erscheint euer Bericht für alle gleichzeitig.",
+        "MISSING_OTHERS": "Du teilst schon mit diesem Team. Es fehlt noch: {names}.",
+        "MISSING_MULTIPLE": "Du teilst noch nicht mit diesem Team, und es fehlt noch: {names}.",
+        "INSUFFICIENT_WORKSTYLE": "Für euren Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Teamfreigabe. Offen ist das noch bei: {names}.",
+        "READY": "Alle teilen mit diesem Team.",
         "UNAVAILABLE": "Der Teambericht ist für dieses Team nicht verfügbar.",
-        "INSUFFICIENT_WORKSTYLE_SELF": "Für den gemeinsamen Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Freigabe für alle anderen. Dein Arbeitsprofil fehlt noch."
+        "INSUFFICIENT_WORKSTYLE_SELF": "Für euren Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Teamfreigabe. Dein Arbeitsprofil fehlt noch."
       },
       "member": {
-        "shared": "Arbeitsweise für alle im Team freigegeben",
-        "notShared": "Arbeitsweise noch nicht für alle im Team freigegeben",
-        "noWorkstyle": "Noch kein aktuelles Arbeitsprofil"
+        "shared": "geteilt",
+        "notShared": "noch nicht geteilt",
+        "noWorkstyle": "geteilt, Arbeitsprofil fehlt noch"
       },
-      "reviewShares": "Freigaben prüfen",
       "completeWorkstyle": "Wie du arbeitest ausfüllen",
-      "rule": "Der gemeinsame Bericht erscheint für alle im Team gleichzeitig – sobald jede Person ihre Arbeitsweise für alle anderen freigegeben hat. Eine Freigabe gilt immer nur in eine Richtung; niemand gibt etwas für andere frei, und mit einer Einladung wird nichts automatisch geteilt."
+      "rule": "Euer Bericht erscheint für alle gleichzeitig, sobald jede Person ein aktuelles Arbeitsprofil hat und mit diesem Team teilt. Niemand teilt für andere, und ein Beitritt allein teilt nichts."
     },
     "researchOffer": {
       "title": "Made2Found bei der Weiterentwicklung unterstützen",
@@ -161,7 +160,18 @@
     },
     "advisorNotReady": {
       "title": "Der gemeinsame Bericht ist noch nicht verfügbar.",
-      "body": "Es fehlen noch Freigaben im Team. Der Bericht erscheint hier, sobald alle im Team ihre Arbeitsweise füreinander freigegeben haben – und für dich."
-    }
+      "body": "Im Team teilen noch nicht alle. Der Bericht erscheint hier, sobald alle im Team geteilt haben – und dir ihre Arbeitsweise freigegeben haben."
+    },
+    "sharing": {
+      "title": "Mit wem du teilst",
+      "intro": "Mit einem Team teilst du einmal – für alle aktuellen und später hinzukommenden Mitglieder. Das verwaltest du auf der jeweiligen Teamseite.",
+      "shared": "Für dieses Team freigegeben",
+      "notShared": "Noch nicht geteilt",
+      "manage": "Auf der Teamseite verwalten",
+      "noTeams": "Du bist noch in keinem Team.",
+      "individualTitle": "Einzelne Personen und Advisors",
+      "individualIntro": "Für einzelne Kontakte und Advisors kannst du deine Arbeitsweise weiterhin einzeln freigeben und dabei einzelne Fragen ausblenden. Im Team gilt immer die Teamfreigabe – dort lässt sich nichts einzeln ausblenden."
+    },
+    "moreActions": "Mehr"
   }
 }

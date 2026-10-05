@@ -130,7 +130,8 @@ test("mixed erzeugt keine Richtung, insufficient keine Deutung", () => {
     const mixed = withArea(area, [1, 5, 1, 5, 1]);
     const m = areaNarrative(mixed, area);
     assert.equal(m.pattern.kind, "mixed", area);
-    assert.match(m.core, /unterschiedlich/, area);
+    // Phase 11.7B: Alltagssprache ("haengt von der Situation ab") statt "beantwortest du unterschiedlich".
+    assert.match(m.core, /von der (Situation|Aufgabe) ab|unterschiedlich/, area);
     assert.equal(m.exception, null, area);
     assert.equal(m.claim, `${area}.MIXED`);
 
@@ -224,7 +225,7 @@ test("Überblick wirkt nicht stärker als der Text", () => {
       }
     }
   }
-  const src = readFileSync("src/features/reporting/workstyle/SignatureOverview.tsx", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const src = readFileSync("src/features/reporting/workstyle/WorkstyleGlance.tsx", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.match(src, /overviewMark/);
   assert.doesNotMatch(src, /displayPosition|radar|spider|score/i);
 });

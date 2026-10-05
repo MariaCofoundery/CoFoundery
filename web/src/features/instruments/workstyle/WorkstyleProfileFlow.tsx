@@ -140,8 +140,8 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
 
   const actions = <div className="mt-7 flex flex-wrap gap-3">
     <Link href="/me/profile/workstyle" className={button}>Arbeitsprofil ansehen</Link>
-    {context && <Link href="/me/profile/workstyle#freigaben" className={secondary}>{names ? `Freigaben für ${names} prüfen` : "Freigaben prüfen"}</Link>}
-    {context?.teamId && <Link href={`/teams/${context.teamId}`} className={secondary}>Zu eurem Team</Link>}
+    {/* Phase 11.7B: geteilt wird einmal mit dem Team, nicht je Person. */}
+    {context?.teamId && <Link href={`/teams/${context.teamId}/workstyle`} className={secondary}>{names ? `Zum Zusammenspiel mit ${names}` : "Zu eurem Zusammenspiel"}</Link>}
     <Link href="/dashboard" className={secondary}>Zum Dashboard</Link>
   </div>;
 
@@ -273,11 +273,11 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
         {mixed && session.completed_at ? <>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Fertig</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">Geschafft – danke.</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil ist fertig, und du hast uns zusätzlich bei der Weiterentwicklung unterstützt. Dein Arbeitsprofil bleibt privat, bis du etwas freigibst – auch die Person, die dich eingeladen hat, sieht nichts automatisch.</p>
+          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil ist fertig, und du hast uns zusätzlich bei der Weiterentwicklung unterstützt. Dein Arbeitsprofil sehen nur die, mit denen du es teilst, etwa dein Team – niemand sieht deine Antworten automatisch, auch nicht die Person, die dich eingeladen hat.</p>
         </> : <>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Geschafft</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">Dein Arbeitsprofil ist bereit.</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil bleibt privat, bis du etwas freigibst. Niemand sieht deine Antworten automatisch – auch nicht die Person, die dich eingeladen hat.</p>
+          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil sehen nur die, mit denen du es teilst, etwa dein Team. Niemand sieht deine Antworten automatisch – auch nicht die Person, die dich eingeladen hat.</p>
         </>}
         {actions}
         {mixed && session.completed_at && <p className="mt-6 text-sm text-slate-600">Deine {DEVELOPMENT_COUNT} Entwicklungsantworten verändern deinen aktuellen Report nicht. <Link href={RESEARCH_HREF} className="underline">Forschungsteilnahme verwalten</Link></p>}

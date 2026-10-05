@@ -23,10 +23,16 @@ export type FounderLibraryViewKey = "glossary" | "updates";
 type Props = {
   view: FounderLibraryViewKey;
   pathname: string;
-  backHref: string;
-  backLabel: string;
+  backHref?: string;
+  backLabel?: string;
   teamId?: string;
   contextNavigation?: ReactNode;
+  /**
+   * Phase 11.7B.1: Im Team traegt der gemeinsame Teamkopf (TeamPageHeader)
+   * Rueckweg, Titel und Teamreiter - dann kein eigener Rueckweg und kein
+   * zweiter Titel.
+   */
+  teamHeader?: ReactNode;
 };
 
 export async function FounderLibraryView({
@@ -36,6 +42,7 @@ export async function FounderLibraryView({
   backLabel,
   teamId,
   contextNavigation,
+  teamHeader,
 }: Props) {
   const [t, setupT, locale] = await Promise.all([
     getTranslations("founderLibrary"),
@@ -44,10 +51,21 @@ export async function FounderLibraryView({
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={backHref} className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
-        {backLabel}
-      </Link>
+    <main className={`mx-auto w-full max-w-5xl px-4 sm:px-6 ${teamHeader ? "py-5 sm:py-6" : "py-8 sm:py-10"}`}>
+      {teamHeader ? (
+        <>
+          {teamHeader}
+          <p className="mt-4 max-w-3xl text-lg font-medium leading-7 text-slate-900">{view === "glossary" ? t("title") : t("updates.title")}</p>
+          <p className="mt-1 max-w-3xl text-base leading-7 text-slate-700">{view === "glossary" ? t("intro") : t("updates.intro")}</p>
+          {view === "glossary" ? <p className="mt-2 max-w-3xl text-xs leading-6 text-slate-500">{t("professionalNote")}</p> : null}
+        </>
+      ) : (
+      <>
+      {backHref && backLabel ? (
+        <Link href={backHref} className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+          {backLabel}
+        </Link>
+      ) : null}
       <header className="mt-6 border-b border-slate-200 pb-7 sm:pb-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{view === "glossary" ? t("eyebrow") : t("updates.eyebrow")}</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-slate-950">{view === "glossary" ? t("title") : t("updates.title")}</h1>
@@ -56,6 +74,8 @@ export async function FounderLibraryView({
       </header>
 
       {contextNavigation}
+      </>
+      )}
 
       <nav aria-label={t("views.label")} className="mt-7 border-b border-slate-200">
         <div className="flex gap-6">

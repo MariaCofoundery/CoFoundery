@@ -12,18 +12,21 @@ type Props = {
     roles: string;
     setup: string;
     library: string;
-    alignment: string;
+    /** Nicht mehr in der Leiste (Phase 11.7B) - fruehere Auswertungen stehen auf der Uebersicht. */
+    alignment?: string;
   };
 };
 
 /**
- * Die Arbeitsstruktur eines Teams - seit Phase 9.4B in der Reihenfolge, in
- * der ein Team sie benutzt: Ueberblick, sich verstehen (Zusammenspiel,
- * Faehigkeiten), festhalten (Setup), nachschlagen (Library). Fruehere
- * Auswertungen stehen leise am Ende - sie sind Rueckblick, kein Bereich.
+ * Die Arbeitsstruktur eines Teams - in der Reihenfolge, in der ein Team sie
+ * benutzt: Ueberblick, sich verstehen (Zusammenspiel, Faehigkeiten),
+ * festhalten (Setup), nachschlagen (Library).
  *
- * Vorher stand "Euer Zusammenspiel" als hartkodierter Extra-Link vor der
- * Liste, ohne aktiven Zustand, und "Rollen" ganz hinten.
+ * Phase 11.7B: Die Leiste gehoert zum Teaminhalt, nicht zur globalen
+ * Navigation. Deshalb ruhige Reiter mit Unterstrich statt eines dunklen
+ * Pills - global gibt es die farbige Pille, in der zweiten Ebene den
+ * Unterstrich, hier denselben Unterstrich. Auf dem Telefon horizontal
+ * scrollbar statt umbrechend; jedes Ziel bleibt mindestens 44 Pixel hoch.
  */
 export function FounderTeamNavigation({ teamId, active, labels }: Props) {
   const team = encodeURIComponent(teamId);
@@ -36,30 +39,24 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
   ];
 
   return (
-    <nav
-      aria-label={labels.ariaLabel}
-      className="mt-5 flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-slate-200 pb-3"
-    >
-      {items.map((item) => (
-        <Link
-          key={item.key}
-          href={item.href}
-          aria-current={active === item.key ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 ${
-            active === item.key
-              ? "bg-slate-900 text-white"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
-          }`}
-        >
-          {labels[item.key]}
-        </Link>
-      ))}
-      <Link
-        href={`/teams/${team}#team-alignment`}
-        className="ml-auto inline-flex min-h-11 items-center rounded-full px-3 text-xs font-medium text-slate-500 underline decoration-slate-300 underline-offset-4 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-      >
-        {labels.alignment}
-      </Link>
+    <nav aria-label={labels.ariaLabel} className="ws-no-print team-tabs -mx-4 mt-4 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:px-0">
+      <ul className="flex min-w-max items-end gap-1 sm:gap-2">
+        {items.map((item) => (
+          <li key={item.key}>
+            <Link
+              href={item.href}
+              aria-current={active === item.key ? "page" : undefined}
+              className={`-mb-px inline-flex min-h-11 items-center whitespace-nowrap border-b-2 px-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 sm:px-3 ${
+                active === item.key
+                  ? "border-violet-500 font-semibold text-slate-950"
+                  : "border-transparent font-medium text-slate-500 hover:border-slate-300 hover:text-slate-900"
+              }`}
+            >
+              {labels[item.key]}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

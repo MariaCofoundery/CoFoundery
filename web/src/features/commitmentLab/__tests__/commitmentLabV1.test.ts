@@ -151,7 +151,8 @@ test("the route is standalone, pairwise, and does not expose advisor access", ()
   );
   const data = readFileSync("src/features/commitmentLab/commitmentLabData.ts", "utf8");
   assert.match(page, /commitment-lab/);
-  assert.match(page, /FounderTeamNavigation/);
+  // Phase 11.7B.1: gemeinsamer Teamkopf (enthaelt die Teamnavigation).
+  assert.match(page, /<TeamPageHeader/);
   assert.doesNotMatch(page, /FounderAlignmentWorkbookClient|workbookPayload/);
   assert.match(data, /alignment\.find\(\(entry\) => entry\.relationshipId === relationshipId\)/);
   assert.doesNotMatch(data, /relationship_advisors|advisor_user_id|service_role/);

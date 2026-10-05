@@ -1,14 +1,14 @@
 import {
   AREAS,
-  memberInitials,
   PRODUCT_ITEMS,
   rawChoice,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
 import { workstyleResponseOptions } from "@/features/instruments/workstyle/registry";
 
-/** One lane per original item. Marker rows are separated by member, not jittered randomly.
- * Position denotes the chosen response category only. No aggregation, norm or match distance. */
+/** One lane per original item. Seit Phase 11.7B je Person eine eigene Zeile mit
+ * Namen (keine Kuerzel als alleinige Kennzeichnung). Position denotes the chosen
+ * response category only. No aggregation, norm or match distance. */
 export function WorkstyleSignature({
   people,
   compact = false,
@@ -36,16 +36,6 @@ export function WorkstyleSignature({
           gewählten Antworten. Ihre Position ist keine Bewertung.
         </p>
       </figcaption>
-      <ul className="mb-6 flex flex-wrap gap-4" aria-label="Personenlegende">
-        {people.map((p, n) => (
-          <li key={p.id} className="flex items-center gap-2">
-            <span className={`ws-token ws-token-${n % 4}`} aria-hidden="true">
-              {memberInitials(p.name)}
-            </span>
-            <span>{p.name}</span>
-          </li>
-        ))}
-      </ul>
       <div className="grid gap-7">
         {AREAS.map((area) => (
           <section key={area.key} className="ws-area">
@@ -74,35 +64,28 @@ export function WorkstyleSignature({
                         ))}
                       </div>
                     ) : null}
-                    <div
-                      className="relative mt-3"
-                      style={{ height: Math.max(38, people.length * 30) }}
-                      aria-hidden="true"
-                    >
-                      <div className="absolute inset-x-3 top-1/2 border-t border-slate-300" />
-                      {options.map((o, n) => (
-                        <span
-                          key={o.value}
-                          className="absolute top-1/2 h-2 w-2 -translate-y-1/2 rounded-full border border-slate-500 bg-white"
-                          style={{
-                            left: `calc(${(n / (options.length - 1)) * 100}% + ${12 - (n / (options.length - 1)) * 32}px)`,
-                          }}
-                        />
+                    <div className="mt-3 grid gap-1.5" aria-hidden="true">
+                      {present.map((p) => (
+                        <div key={p.id} className={people.length > 1 ? "grid grid-cols-[minmax(0,6rem)_minmax(0,1fr)] items-center gap-3" : ""}>
+                          {people.length > 1 ? <span className="truncate text-xs font-medium text-slate-700">{p.name}</span> : null}
+                          <div className="relative mx-2 h-5">
+                            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-300" />
+                            {options.map((o, n) => (
+                              <span
+                                key={o.value}
+                                className="absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-300"
+                                style={{ left: `${(n / (options.length - 1)) * 100}%` }}
+                              />
+                            ))}
+                            {p.choice ? (
+                              <span
+                                className="ws-glance-point absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600 ring-4 ring-violet-100"
+                                style={{ left: `${(p.choice.position / (options.length - 1)) * 100}%` }}
+                              />
+                            ) : null}
+                          </div>
+                        </div>
                       ))}
-                      {present.map((p, n) =>
-                        p.choice ? (
-                          <span
-                            key={p.id}
-                            className={`ws-token ws-token-${n % 4} absolute`}
-                            style={{
-                              left: `calc(${(p.choice.position / (options.length - 1)) * 100}% + ${2 - (p.choice.position / (options.length - 1)) * 32}px)`,
-                              top: n * 30,
-                            }}
-                          >
-                            {memberInitials(p.name)}
-                          </span>
-                        ) : null,
-                      )}
                     </div>
                     <div
                       className="flex justify-between gap-5 text-xs text-slate-600"

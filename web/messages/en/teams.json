@@ -153,7 +153,8 @@
     "deepen": {
       "pair": "The two of you: {names}",
       "twoOnly": "Read My Mind and Founder in the Wild can currently only be started in teams of exactly two founders. You use the Commitment Lab with the people you are directly connected with."
-    }
+    },
+    "backShort": "Connections"
   },
   "teamNavigation": {
     "ariaLabel": "Founder team areas",
@@ -354,7 +355,8 @@
         "incoming": "You are exploring together",
         "sent": "You are exploring together"
       }
-    }
+    },
+    "leftTeam": "You left the team. Your personal details are unchanged in your profile."
   },
   "setup": {
     "rosterChanged": "Earlier agreements lack confirmations from your current team. Previous versions remain readable in the history. Discuss these topics again and, where appropriate, propose a new version for all current members to confirm.",
@@ -651,5 +653,35 @@
       "preFounder": "You are exploring founding a company together",
       "existingTeam": "Existing founder team"
     }
+  },
+  "teamShare": {
+    "title": "Share with this team",
+    "body": "So you can use your joint report, the members of this team see how you work and what you said about capabilities and responsibility. This also applies to people who join this team later. Research answers, FIND and advisor access are not affected.",
+    "action": "Share with this team",
+    "activeTitle": "Shared with this team",
+    "activeBody": "The members of this team – including people who join later – see how you work and what you said about capabilities and responsibility until you withdraw the share. Research answers, FIND and advisor access are not affected.",
+    "ventureNote": "Members see your venture answers as soon as you submit them – no separate share needed.",
+    "legacy": "So far you shared how you work with each member individually. The team share also covers capabilities and responsibility and people who join later.",
+    "revoke": "Withdraw share",
+    "revokeExplain": "If you withdraw the share, your current team report is unavailable for everyone until you share again. What others have already seen cannot be taken back.",
+    "revokeConfirm": "Yes, withdraw share",
+    "savedOn": "Saved: you now share with this team.",
+    "savedOff": "Saved: the share for this team has been withdrawn.",
+    "error": "That didn't work. Please try again."
+  },
+  "leave": {
+    "title": "Leave team",
+    "intro": "You can leave this team at any time. This is what happens:",
+    "consequences": {
+      "access": "Your access to this team ends.",
+      "share": "Your team share for this team ends.",
+      "report": "Your current team report may no longer be available to the others.",
+      "setup": "Agreements already confirmed in Founder Setup are not rewritten; they only count if all current members have confirmed them.",
+      "personal": "Your personal details stay in your own profile.",
+      "pair": "In a team of two, the other person remains alone in the team and can invite new members."
+    },
+    "confirm": "Leave team for good",
+    "error": "Leaving didn't work. Please try again.",
+    "done": "You left the team. Your personal details are unchanged in your profile."
   }
 }

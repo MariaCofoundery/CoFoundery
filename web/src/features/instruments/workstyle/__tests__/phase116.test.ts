@@ -60,7 +60,8 @@ test("Arbeitsprofil-Ablauf: nur Core, eigener Fortschritt, kein Pretest-Wording,
 test("Abschluss: Arbeitsprofil zuerst, Forschung nur als freiwilliges, nachgeordnetes Angebot", () => {
   const flow = code(FLOW);
   const actions = flow.slice(flow.indexOf("const actions ="), flow.indexOf("const withdrawal ="));
-  const order = ["Arbeitsprofil ansehen", "Freigaben für", "Zu eurem Team", "Zum Dashboard"].map(m => actions.indexOf(m));
+  // Phase 11.7B: statt "Freigaben fuer ..." einmal zum Zusammenspiel des Teams (dort die Teamfreigabe).
+  const order = ["Arbeitsprofil ansehen", "Zum Zusammenspiel mit", "Zum Dashboard"].map(m => actions.indexOf(m));
   order.forEach((at, n) => assert.ok(at > (n ? order[n - 1] : -1), `Reihenfolge ${n}`));
   const done = flow.slice(flow.indexOf("Dein Arbeitsprofil ist bereit."));
   assert.ok(done.indexOf("{actions}") < done.indexOf("Forschung später unterstützen"), "Forschung nur nachgeordnet");
@@ -110,7 +111,8 @@ test("Teamseite: Advisors sehen vor der Bereitschaft einen neutralen Hinweis ohn
   const page = code("src/app/(product)/teams/[teamId]/workstyle/page.tsx");
   assert.match(page, /team === "not_ready" && !membership \? \(/);
   assert.match(page, /t\("advisorNotReady\.title"\)/);
-  assert.match(page, /current === "not_ready" && membership \? await client\.rpc\("get_workstyle_product_team_status"/);
+  // Phase 11.7B: Mitglieder sehen die Bereitschaft je Person, Advisors nur den neutralen Hinweis.
+  assert.match(page, /current === "not_ready" && membership\s*\?\s*parseTeamReadiness/);
   const advisor = page.slice(page.indexOf('team === "not_ready" && !membership'), page.indexOf('t("advisorNotReady.body")'));
   assert.doesNotMatch(advisor, /TeamReadinessPanel|share|Link/);
 });

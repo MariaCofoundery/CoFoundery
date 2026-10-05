@@ -12,7 +12,8 @@ const CARD =
 const LINK =
   "inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
 
-export default async function ConnectionsPage() {
+export default async function ConnectionsPage({ searchParams }: { searchParams?: Promise<{ team?: string }> }) {
+  const query = (await searchParams) ?? {};
   const supabase = await createClient();
   const {
     data: { user },
@@ -47,6 +48,12 @@ export default async function ConnectionsPage() {
       </header>
 
       <div className="mt-7 grid gap-6">
+        {/* Phase 11.7B: Rueckmeldung nach "Team verlassen". */}
+        {query.team === "verlassen" ? (
+          <p role="status" className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm leading-6 text-slate-700">
+            {t("leftTeam")}
+          </p>
+        ) : null}
         <AccountDeletionNoticeList notices={deletionNotices} />
         <section className={CARD} aria-labelledby="established-connections-title">
           <h2 id="established-connections-title" className="text-xl font-semibold text-slate-950">

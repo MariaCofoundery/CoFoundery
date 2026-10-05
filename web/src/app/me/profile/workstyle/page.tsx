@@ -16,6 +16,7 @@ import { ShareForm } from "@/features/instruments/align/ShareForm";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
+import { getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getLocale, getTranslations } from "next-intl/server";
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -33,11 +34,23 @@ export default async function Page({
   if (!user) redirect("/login?next=%2Fme%2Fprofile%2Fworkstyle");
   const client = await createClient();
   const query = await searchParams;
-  const [current, shares, participation] = await Promise.all([
+  const t0 = await getTranslations("report.workstyle");
+  const [current, shares, participation, memberships, teamShares] = await Promise.all([
     getProductWorkstyle(client, user.id),
     getShareState(user.id, "workstyle", null),
     getMyWorkstylePretest(CURRENT_WORKSTYLE_VERSION).catch(() => null),
+    client.from("founder_team_members").select("team_id").eq("user_id", user.id),
+    client.from("team_shares").select("team_id").eq("owner_user_id", user.id).is("revoked_at", null),
   ]);
+  // Phase 11.7B: Mit Teams wird einmal je Team geteilt - auf der Teamseite.
+  const sharedTeams = new Set((teamShares.data ?? []).map((row) => row.team_id as string));
+  const teams = await Promise.all(
+    (memberships.data ?? []).map(async (row) => ({
+      id: row.team_id as string,
+      label: (await getTeamLabel(client, row.team_id as string)) ?? t0("teamFallbackName"),
+      shared: sharedTeams.has(row.team_id as string),
+    })),
+  );
   const snapshot = query.snapshot
     ? await getProductSnapshot<ProductProfile>(client, query.snapshot)
     : null;
@@ -62,12 +75,12 @@ export default async function Page({
     return `/me/profile/workstyle${qs ? `?${qs}` : ""}`;
   };
   return (
-    <main className="ws-report mx-auto max-w-4xl px-5 py-10">
-      <Link className="ws-no-print underline" href="/me/profile">
-        {t("backToProfile")}
+    <main className="ws-report mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
+      <Link className="ws-no-print inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline" href="/me/profile">
+        ← {t("backToProfile")}
       </Link>
-      <header className="my-7">
-        <h1 className="text-4xl font-semibold">{t("individualTitle")}</h1>
+      <header className="mb-6 mt-1">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("individualTitle")}</h1>
         {locale !== "de" && (
           <p className="mt-3 text-sm text-slate-600" lang={locale}>
             {t("germanOnly")}
@@ -99,19 +112,48 @@ export default async function Page({
             </p>
           )}
           <IndividualWorkstyle profile={profile} full={full} />
-          <div id="freigaben" className="ws-no-print mt-10 scroll-mt-28">
-            <ShareForm
-              scope="workstyle"
-              ventureId={null}
-              recipients={shares.recipients}
-              hiddenByRecipient={shares.hiddenByRecipient}
-              items={PRODUCT_ITEMS.map((i) => ({
-                itemId: i.item_key,
-                prompt: i.prompt,
-              }))}
-              label="Dein Arbeitsprofil"
-            />
-          </div>
+          <section id="freigaben" aria-labelledby="ws-sharing-title" className="ws-no-print mt-10 scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            <h2 id="ws-sharing-title" className="text-xl font-semibold text-slate-950">{t("sharing.title")}</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("sharing.intro")}</p>
+            {teams.length > 0 ? (
+              <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
+                {teams.map((team) => (
+                  <li key={team.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-slate-900">{team.label}</span>
+                      <span className={`text-sm ${team.shared ? "text-emerald-800" : "text-slate-500"}`}>
+                        {team.shared ? `✓ ${t("sharing.shared")}` : `○ ${t("sharing.notShared")}`}
+                      </span>
+                    </span>
+                    <Link href={`/teams/${encodeURIComponent(team.id)}#teamfreigabe`} className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950">
+                      {t("sharing.manage")}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-slate-600">{t("sharing.noTeams")}</p>
+            )}
+            <details className="mt-5">
+              <summary className="cursor-pointer text-sm font-medium text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+                {t("sharing.individualTitle")}
+              </summary>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{t("sharing.individualIntro")}</p>
+              <div className="mt-4">
+                <ShareForm
+                  scope="workstyle"
+                  ventureId={null}
+                  recipients={shares.recipients}
+                  hiddenByRecipient={shares.hiddenByRecipient}
+                  items={PRODUCT_ITEMS.map((i) => ({
+                    itemId: i.item_key,
+                    prompt: i.prompt,
+                  }))}
+                  label="Dein Arbeitsprofil"
+                />
+              </div>
+            </details>
+          </section>
           {researchOffer && (
             <section aria-labelledby="ws-research-offer" className="ws-no-print mt-10 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6">
               <h2 id="ws-research-offer" className="text-lg font-semibold">{t("researchOffer.title")}</h2>

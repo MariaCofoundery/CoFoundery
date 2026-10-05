@@ -129,29 +129,28 @@
     "emptyIndividualCta": "Fill in how you work",
     "notReadyTitle": "The team report is not available yet",
     "shareMissingTitle": "Sharing missing",
-    "notReadyBody": "Every member needs a completed work profile in the current version and has to share their answers with the reader. An invitation alone does not grant access.",
-    "notReadyCta": "Open your work profile and sharing",
+    "notReadyBody": "All members need a completed work profile in the current version and must share with this team. Joining alone shares nothing.",
+    "notReadyCta": "Open your work profile",
     "readiness": {
-      "title": "Something is still missing for your shared report",
-      "listLabel": "Sharing status in the team",
+      "title": "Something is still missing for your joint report",
+      "listLabel": "Who already shares with this team",
       "you": "you",
       "state": {
-        "MISSING_MINE": "Your sharing is still missing. As soon as you share your work style with everyone in the team, your report appears for all of you at the same time.",
-        "MISSING_OTHERS": "Your sharing is in place. Still waiting for {names} to share.",
-        "MISSING_MULTIPLE": "Several shares are still missing – including yours. You are also waiting for {names}.",
-        "INSUFFICIENT_WORKSTYLE": "For the shared report, everyone needs a current work profile and sharing with everyone else. Still open for: {names}.",
-        "READY": "All shares are in place.",
+        "MISSING_MINE": "You don't share with this team yet. As soon as everyone has shared, your report appears for everyone at the same time.",
+        "MISSING_OTHERS": "You already share with this team. Still missing: {names}.",
+        "MISSING_MULTIPLE": "You don't share with this team yet, and still missing: {names}.",
+        "INSUFFICIENT_WORKSTYLE": "For your report, everyone needs a current work profile and a team share. Still open for: {names}.",
+        "READY": "Everyone shares with this team.",
         "UNAVAILABLE": "The team report is not available for this team.",
-        "INSUFFICIENT_WORKSTYLE_SELF": "For the shared report, everyone needs a current work profile and sharing with everyone else. Your work profile is still missing."
+        "INSUFFICIENT_WORKSTYLE_SELF": "For your report, everyone needs a current work profile and a team share. Your work profile is still missing."
       },
       "member": {
-        "shared": "Work style shared with everyone in the team",
-        "notShared": "Work style not yet shared with everyone in the team",
-        "noWorkstyle": "No current work profile yet"
+        "shared": "shared",
+        "notShared": "not shared yet",
+        "noWorkstyle": "shared, work profile still missing"
       },
-      "reviewShares": "Review sharing",
-      "completeWorkstyle": "Fill in how you work",
-      "rule": "The shared report appears for everyone in the team at the same time – once each person has shared their work style with everyone else. Sharing always works in one direction only; nobody shares anything on behalf of others, and an invitation shares nothing automatically."
+      "completeWorkstyle": "Complete how you work",
+      "rule": "Your report appears for everyone at the same time once each person has a current work profile and shares with this team. Nobody shares for others, and joining alone shares nothing."
     },
     "researchOffer": {
       "title": "Help develop Made2Found",
@@ -160,8 +159,19 @@
       "continue": "Continue the research part"
     },
     "advisorNotReady": {
-      "title": "The shared report is not available yet.",
-      "body": "Some shares within the team are still missing. The report appears here once everyone in the team has shared their way of working with each other – and with you."
-    }
+      "title": "The joint report is not available yet.",
+      "body": "Not everyone in the team is sharing yet. The report appears here once everyone in the team has shared – and has shared how they work with you."
+    },
+    "sharing": {
+      "title": "Who you share with",
+      "intro": "You share with a team once – for all current and future members. You manage this on each team page.",
+      "shared": "Shared with this team",
+      "notShared": "Not shared yet",
+      "manage": "Manage on the team page",
+      "noTeams": "You are not in a team yet.",
+      "individualTitle": "Individual people and advisors",
+      "individualIntro": "For individual contacts and advisors you can still share how you work individually and hide single questions. Within a team the team share always applies – nothing can be hidden individually there."
+    },
+    "moreActions": "More"
   }
 }

@@ -8,7 +8,7 @@ import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
 import { FounderSetupAdvisorAccessPanel } from "@/features/teams/FounderSetupAdvisorAccessPanel";
 import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvisorAccessData";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getCollaborationConversationPointCounts } from "@/features/collaborationLab/collaborationConversationPoints";
 
 type Props = { params: Promise<{ teamId: string }> };
@@ -29,22 +29,19 @@ export default async function FounderSetupPage({ params }: Props) {
     user.id,
     supabase
   );
-  const [t, navigationT] = await Promise.all([
+  const [t, teamLabel] = await Promise.all([
     getTranslations("teams.setup"),
-    getTranslations("teams.teamNavigation"),
+    getTeamLabel(supabase, teamId),
   ]);
   const counts = countFounderSetupStatuses(setup);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${teamId}`} className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-        {t("backToCollaboration")}
-      </Link>
-      <header className="mt-6 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{t("subtitle")}</p>
+    <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
+      <TeamPageHeader teamId={teamId} active="setup" title={t("title")} teamLabel={teamLabel} />
+      <section className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
+        <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("subtitle")}</p>
         {setup.started ? (
-          <p className="mt-4 text-sm font-medium text-slate-700">
+          <p className="mt-2 text-sm font-medium text-slate-700">
             {t("summary", {
               clarified: counts.clarified + counts.documented + counts.not_relevant,
               discussing: counts.discussing,
@@ -53,23 +50,9 @@ export default async function FounderSetupPage({ params }: Props) {
             })}
           </p>
         ) : null}
-      </header>
+      </section>
 
       {setup.items.some(item => item.rosterConfirmationMissing) ? <p className="mt-5 rounded-xl border border-slate-200 p-4 text-sm leading-6">{t("rosterChanged")}</p> : null}
-
-      <FounderTeamNavigation
-        teamId={teamId}
-        active="setup"
-        labels={{
-          ariaLabel: navigationT("ariaLabel"),
-          overview: navigationT("overview"),
-          workstyle: navigationT("workstyle"),
-          setup: navigationT("setup"),
-          library: navigationT("library"),
-          alignment: navigationT("alignment"),
-          roles: navigationT("roles"),
-        }}
-      />
 
       {/* ---------------------------------------------------------------
           Phasen statt einer Liste von zwanzig.

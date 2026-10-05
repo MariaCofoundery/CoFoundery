@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
-import { getTeamCapabilityReadout } from "@/features/capability/capabilityTeamData";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { ComponentMatrix } from "@/features/reporting/workstyle/ComponentMatrix";
+import "@/features/reporting/workstyle/report.css";
+import { getTeamCapabilityForTeam } from "@/features/capability/capabilityTeamData";
+import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -40,45 +41,22 @@ export default async function TeamRolesPage({
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
 
-  const [t, navigationT, data] = await Promise.all([
-    getTranslations("capability"),
-    getTranslations("teams.teamNavigation"),
-    getTeamCapabilityReadout(supabase, teamId, user.id),
+  const t = await getTranslations("capability");
+  const [data, teamLabel] = await Promise.all([
+    getTeamCapabilityForTeam(supabase, teamId, user.id, t("team.unnamedMember")),
+    getTeamLabel(supabase, teamId),
   ]);
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10">
-      <Link
-        href={`/teams/${encodeURIComponent(teamId)}`}
-        className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950"
-      >
-        ← {t("team.backToTeam")}
-      </Link>
-
-      <FounderTeamNavigation
-        teamId={teamId}
-        active="roles"
-        labels={{
-          ariaLabel: navigationT("ariaLabel"),
-          overview: navigationT("overview"),
-          workstyle: navigationT("workstyle"),
-          setup: navigationT("setup"),
-          library: navigationT("library"),
-          alignment: navigationT("alignment"),
-          roles: navigationT("roles"),
-        }}
-      />
-
-      <p className="mt-6 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-        {t("team.title")}
-      </h1>
+    <main className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
+      <TeamPageHeader teamId={teamId} active="roles" title={t("team.title")} teamLabel={teamLabel} />
       <p className="mt-3 max-w-2xl leading-7 text-slate-600">{t("team.text")}</p>
 
       {!data || data.contributing === 0 ? (
-        /* NICHTS FREIGEGEBEN IST KEIN FEHLER UND KEINE LEERE SEITE. Es ist der
+        /* NICHTS GETEILT IST KEIN FEHLER UND KEINE LEERE SEITE. Es ist der
            Normalfall am Anfang, und es hat genau zwei Ursachen - noch keine
-           Angaben, oder die Freigabestufe. Beide Wege stehen deshalb dabei. */
+           Angaben, oder noch keine Teamfreigabe fuer dieses Team. Beide Wege
+           stehen deshalb dabei. */
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
           <h2 className="text-lg font-semibold text-slate-900">{t("team.emptyTitle")}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{t("team.emptyText")}</p>
@@ -90,7 +68,7 @@ export default async function TeamRolesPage({
               {t("team.emptyInterview")}
             </Link>
             <Link
-              href="/profile#freigabe"
+              href={`/teams/${encodeURIComponent(teamId)}#teamfreigabe`}
               className="inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800"
             >
               {t("team.emptyDisclosure")}
@@ -98,8 +76,12 @@ export default async function TeamRolesPage({
           </div>
         </section>
       ) : (
-        <div className="mt-6">
-          <CapabilityTeamReadoutView data={data} />
+        <div className="ws-report mt-6">
+          {/* Phase 11.7B.1: dieselbe Darstellung wie im Teambericht. */}
+          <p className="max-w-3xl text-sm leading-6 text-slate-600">
+            {t("team.teamBasis", { contributing: data.contributing, members: data.memberCount, withDepth: data.withDepth })}
+          </p>
+          <ComponentMatrix people={data.people} areas={data.areas} heading={false} />
         </div>
       )}
     </main>

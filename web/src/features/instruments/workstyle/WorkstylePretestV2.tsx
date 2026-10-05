@@ -183,8 +183,7 @@ export function WorkstylePretestV2({ initialSession, version = "8.5a-v2", contex
         <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil bleibt privat, bis du etwas freigibst. Niemand sieht deine Antworten automatisch – auch nicht die Person, die dich eingeladen hat.</p>
         <div className="mt-7 flex flex-wrap gap-3">
           {version === "8.5a-v3" && <Link href="/me/profile/workstyle" className={button}>Arbeitsprofil ansehen</Link>}
-          {version === "8.5a-v3" && context && <Link href="/me/profile/workstyle#freigaben" className={secondary}>{names ? `Freigaben für ${names} prüfen` : "Freigaben prüfen"}</Link>}
-          {context?.teamId && <Link href={`/teams/${context.teamId}`} className={secondary}>Zu eurem Team</Link>}
+          {context?.teamId && <Link href={`/teams/${context.teamId}/workstyle`} className={secondary}>{names ? `Zum Zusammenspiel mit ${names}` : "Zu eurem Zusammenspiel"}</Link>}
           <Link href="/dashboard" className={secondary}>Zum Dashboard</Link>
         </div>
       </div>

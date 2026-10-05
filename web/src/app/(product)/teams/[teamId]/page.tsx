@@ -7,7 +7,10 @@ import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHomebaseCard";
 import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/FounderInTheWildHomebaseCard";
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { TeamPageHeader } from "@/features/teams/TeamPageHeader";
+import { TeamShareCard } from "@/features/teams/TeamShareCard";
+import { LeaveTeamSection } from "@/features/teams/LeaveTeamSection";
+import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
 import {
   getFounderTeamHomebase,
@@ -19,6 +22,7 @@ import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvis
 
 type TeamHomebasePageProps = {
   params: Promise<{ teamId: string }>;
+  searchParams?: Promise<{ teamfreigabe?: string; verlassen?: string }>;
 };
 
 const SECTION_CLASS =
@@ -53,8 +57,9 @@ function pairName(
     .join(" & ");
 }
 
-export default async function TeamHomebasePage({ params }: TeamHomebasePageProps) {
+export default async function TeamHomebasePage({ params, searchParams }: TeamHomebasePageProps) {
   const { teamId } = await params;
+  const query = (await searchParams) ?? {};
   const supabase = await createClient();
   const {
     data: { user },
@@ -66,7 +71,7 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
-  const [setup, setupAdvisorAccess, labStateResult] = await Promise.all([
+  const [setup, setupAdvisorAccess, labStateResult, shareReadinessResult] = await Promise.all([
     // Das bestehende Setup-Readmodel - dieselbe Quelle wie die Setup-Seite.
     // Nicht lesbar heisst "Status nicht verfuegbar", nicht "offen".
     getFounderSetup(teamId, user.id, supabase).catch(() => null),
@@ -74,7 +79,12 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
     team.alignment.length
       ? supabase.from("commitment_labs").select("relationship_id").in("relationship_id", team.alignment.map((entry) => entry.relationshipId))
       : Promise.resolve({ data: [], error: null }),
+    // Phase 11.7B: eigene Teamfreigabe (und Bestand) - nur Wahrheitswerte.
+    supabase.rpc("get_workstyle_team_share_readiness", { p_team_id: teamId }),
   ]);
+  const shareReadiness = parseTeamReadiness(shareReadinessResult.data);
+  const viewerShare = shareReadiness?.members.find((member) => member.is_viewer);
+  const teamShareActive = Boolean(shareReadiness?.viewer_team_share);
   const labRows = labStateResult.error
     ? []
     : ((labStateResult.data ?? []) as Array<{ relationship_id: string }>);
@@ -106,9 +116,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
     !setup?.started &&
     startedLabRelationships.size === 0;
 
-  const [t, navigationT, commitmentT, setupT, journey] = await Promise.all([
+  const [t, commitmentT, setupT, journey] = await Promise.all([
     getTranslations("teams.homebase"),
-    getTranslations("teams.teamNavigation"),
     getTranslations("teams.commitmentLab"),
     getTranslations("teams.setup"),
     loadTeamJourneyStatus({ teamId: team.id, userId: user.id, client: supabase, setup }),
@@ -142,27 +151,21 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
   ];
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Link
-        href="/connections"
-        className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-      >
-        {t("back")}
-      </Link>
-
+    <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
       {/* -----------------------------------------------------------------
-          PHASE 9.4B: EIN GEMEINSAMER ARBEITSRAUM STATT EINER FEATURE-WAND
+          PHASE 9.4B / 11.7B: EIN GEMEINSAMER ARBEITSRAUM
 
-          Oben das Team selbst (Name, Menschen, Einladung) und eine ruhige
-          Statuszeile mit vier getrennten Zustaenden. Darunter drei Ebenen:
-          Verstehen, Vertiefen (zu zweit), Vereinbaren. Nachschlagen und
-          Rueckblick folgen leise. Daten, Rechte und Vertraege sind dieselben
-          wie vorher - nur die Ordnung ist neu.
+          Oben der kompakte Teamkopf mit "← Verbindungen" und der lokalen
+          Teamnavigation (Phase 11.7B, statt Brotkrume und eigener Leiste
+          unter der Karte). Darunter das Team selbst (Menschen, Einladung,
+          Status), die Teamfreigabe und drei Ebenen: Verstehen, Vertiefen
+          (zu zweit), Vereinbaren. Ganz unten leise: Rueckblick und Team
+          verlassen.
           ----------------------------------------------------------------- */}
-      <header className="mt-6 rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-8">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">{t("eyebrow")}</p>
-        <h1 className="mt-2 break-words text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{context}</p>
+      <TeamPageHeader teamId={teamId} active="overview" title={title} eyebrow={t("eyebrow")} />
+
+      <header className="mt-5 rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-6">
+        <p className="max-w-3xl text-sm leading-7 text-slate-600">{context}</p>
         {linkedAdvisors.length > 0 ? (
           <p className="mt-1 text-sm leading-6 text-slate-600">
             {t("header.advisors", { names: linkedAdvisors.join(", ") })}
@@ -207,19 +210,15 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
         </div>
       </header>
 
-      <FounderTeamNavigation
-        teamId={teamId}
-        active="overview"
-        labels={{
-          ariaLabel: navigationT("ariaLabel"),
-          overview: navigationT("overview"),
-          workstyle: navigationT("workstyle"),
-          roles: navigationT("roles"),
-          setup: navigationT("setup"),
-          library: navigationT("library"),
-          alignment: navigationT("alignment"),
-        }}
-      />
+      <div className="mt-5">
+        <TeamShareCard
+          teamId={team.id}
+          active={teamShareActive}
+          legacyShared={Boolean(viewerShare?.shared_with_team && !viewerShare.team_share_active)}
+          returnTo={`/teams/${encodeURIComponent(team.id)}#teamfreigabe`}
+          status={query.teamfreigabe ?? null}
+        />
+      </div>
 
       <div className="mt-8 grid gap-10">
         {/* VERSTEHEN: drei Einstiege, jeder mit genau einer Aktion. */}
@@ -517,6 +516,8 @@ export default async function TeamHomebasePage({ params }: TeamHomebasePageProps
         </details>
 
         <FounderRelationshipAdvisorPanel team={team} currentUserId={user.id} names={names} />
+
+        <LeaveTeamSection teamId={team.id} memberCount={team.members.length} failed={query.verlassen === "fehler"} />
       </div>
     </main>
   );

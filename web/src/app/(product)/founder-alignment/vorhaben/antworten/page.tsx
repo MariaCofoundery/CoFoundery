@@ -6,9 +6,6 @@ import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { VentureDirection, WorkMap } from "@/features/instruments/align/AlignMaps";
 import { getScopeReport } from "@/features/instruments/align/reportData";
 import { VENTURE_ALIGNMENT, getItemsV22 } from "@/features/instruments/align/registries";
-import { withPartner } from "@/features/instruments/align/questionnaireData";
-import { getShareState } from "@/features/instruments/align/shareData";
-import { ShareForm } from "@/features/instruments/align/ShareForm";
 import { resolveVenture } from "@/features/instruments/align/ventureResolution";
 import { getRequestUser } from "@/lib/supabase/server";
 
@@ -58,7 +55,6 @@ export default async function VentureAnswersPage({
   }
 
   const report = await getScopeReport(auth.user.id, "venture_alignment", venture.id);
-  const teilen = await getShareState(auth.user.id, "venture_alignment", venture.id);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -81,7 +77,8 @@ export default async function VentureAnswersPage({
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-700">
             Unten siehst du deine Angaben — und oben auf einen Blick, wohin es gehen
-            soll. Wenn jemand dazukommt, lässt sich daraus ein Vergleich machen.
+            soll. Die Mitglieder dieses Teams sehen deine Antworten jetzt im gemeinsamen
+            Bericht; wer später dazukommt, ebenfalls.
           </p>
           {/* EIN WEG UND NICHT ZWEI. Beim Arbeitsprofil steht hier "Weiter:
               Was du aufbauen willst" - dort kommt noch ein Teil. Hier kommt
@@ -151,19 +148,16 @@ export default async function VentureAnswersPage({
             markVentureId={venture.id}
           />
 
-          <div className="mt-10">
-            <ShareForm
-              scope="venture_alignment"
-              ventureId={venture.id}
-              label="Deine Angaben zu diesem Vorhaben"
-              recipients={teilen.recipients}
-              hiddenByRecipient={teilen.hiddenByRecipient}
-              items={getItemsV22("venture_alignment").map((item) => ({
-                itemId: item.itemId,
-                prompt: withPartner(item.prompt),
-              }))}
-            />
-          </div>
+          {/* Phase 11.7B: keine eigene Freigabe mehr. Abgeben heisst: mit diesem
+              Team teilen. Advisors sehen nichts davon ohne ihre eigene Freigabe. */}
+          <section aria-labelledby="venture-visibility" className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h2 id="venture-visibility" className="text-base font-semibold text-slate-900">Wer das sieht</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {report.submittedAt
+                ? "Deine abgegebenen Antworten sehen die aktuellen Mitglieder dieses Teams – auch Personen, die später dazukommen. Advisors, FIND und Personen außerhalb des Teams sehen sie nicht automatisch. Wenn du das Team verlässt, sieht das Team sie nicht mehr."
+                : "Noch niemand. Deine Antworten werden nach dem Absenden für die Mitglieder dieses Teams sichtbar."}
+            </p>
+          </section>
         </div>
       )}
     </main>

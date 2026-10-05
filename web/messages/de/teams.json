@@ -153,7 +153,8 @@
     "deepen": {
       "pair": "Ihr zwei: {names}",
       "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
-    }
+    },
+    "backShort": "Verbindungen"
   },
   "teamNavigation": {
     "ariaLabel": "Bereiche des Founder-Teams",
@@ -354,7 +355,8 @@
         "incoming": "Ihr prüft gemeinsam",
         "sent": "Ihr prüft gemeinsam"
       }
-    }
+    },
+    "leftTeam": "Du hast das Team verlassen. Deine persönlichen Angaben sind unverändert in deinem Profil."
   },
   "setup": {
     "rosterChanged": "Für frühere Vereinbarungen fehlen Bestätigungen aus eurem aktuellen Team. Die früheren Fassungen bleiben in der Historie lesbar. Besprecht die Themen erneut und schlagt bei Bedarf eine neue Fassung zur Bestätigung durch alle aktuellen Mitglieder vor.",
@@ -651,5 +653,35 @@
       "preFounder": "Ihr prüft eine gemeinsame Gründung",
       "existingTeam": "Bestehendes Founder-Team"
     }
+  },
+  "teamShare": {
+    "title": "Mit diesem Team teilen",
+    "body": "Damit ihr euren gemeinsamen Bericht nutzen könnt, sehen die Mitglieder dieses Teams deine Arbeitsweise und deine Angaben zu Fähigkeiten und Verantwortung. Das gilt auch für Personen, die später zu diesem Team dazukommen. Forschungsantworten, FIND und Advisor-Zugänge sind davon nicht betroffen.",
+    "action": "Für dieses Team freigeben",
+    "activeTitle": "Für dieses Team freigegeben",
+    "activeBody": "Die Mitglieder dieses Teams – auch Personen, die später dazukommen – sehen deine Arbeitsweise und deine Angaben zu Fähigkeiten und Verantwortung, bis du die Freigabe zurücknimmst. Forschungsantworten, FIND und Advisor-Zugänge sind davon nicht betroffen.",
+    "ventureNote": "Deine Antworten zum Vorhaben sehen die Mitglieder, sobald du sie abgibst – dafür braucht es keine eigene Freigabe.",
+    "legacy": "Du hast deine Arbeitsweise bisher einzeln mit allen Mitgliedern geteilt. Mit der Teamfreigabe gilt das auch für deine Angaben zu Fähigkeiten und Verantwortung und für Personen, die später dazukommen.",
+    "revoke": "Freigabe zurücknehmen",
+    "revokeExplain": "Wenn du die Freigabe zurücknimmst, ist euer aktueller Teambericht für alle nicht mehr verfügbar, bis du wieder teilst. Was die anderen schon gesehen haben, lässt sich nicht zurückholen.",
+    "revokeConfirm": "Ja, Freigabe zurücknehmen",
+    "savedOn": "Gespeichert: Du teilst jetzt mit diesem Team.",
+    "savedOff": "Gespeichert: Die Freigabe für dieses Team ist zurückgenommen.",
+    "error": "Das hat nicht geklappt. Bitte versuch es noch einmal."
+  },
+  "leave": {
+    "title": "Team verlassen",
+    "intro": "Du kannst dieses Team jederzeit verlassen. Das passiert dabei:",
+    "consequences": {
+      "access": "Dein Zugang zu diesem Team endet.",
+      "share": "Deine Teamfreigabe für dieses Team endet.",
+      "report": "Euer aktueller Teambericht ist für die anderen danach möglicherweise nicht mehr verfügbar.",
+      "setup": "Bereits bestätigte Vereinbarungen im Founder Setup werden nicht umgeschrieben; sie gelten aber nur, wenn alle aktuellen Mitglieder sie bestätigt haben.",
+      "personal": "Deine persönlichen Angaben bleiben in deinem eigenen Profil.",
+      "pair": "In einem Zweierteam bleibt die andere Person allein im Team und kann neue Mitglieder einladen."
+    },
+    "confirm": "Team endgültig verlassen",
+    "error": "Das Verlassen hat nicht geklappt. Bitte versuch es noch einmal.",
+    "done": "Du hast das Team verlassen. Deine persönlichen Angaben sind unverändert in deinem Profil."
   }
 }

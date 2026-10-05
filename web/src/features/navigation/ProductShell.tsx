@@ -117,10 +117,14 @@ function navLinkClassName(active: boolean) {
   // Dieselbe Hervorhebung wie bei den Bereichen: "Ich bin hier" ist dieselbe
   // Aussage, egal ob der Ort ein Bereich oder ein Querschnitt ist. Vorher trug
   // Profil ein blasses Grau und war auf /profile praktisch nicht zu erkennen.
-  return `shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm transition ${
+  //
+  // Phase 11.7B: Werkzeuge sind leiser als Bereiche - kleinere Schrift,
+  // weniger Innenabstand -, damit die Leiste auch bei 1280 Pixeln in EINER
+  // Zeile bleibt und nicht als eigene dritte Reihe umbricht.
+  return `shrink-0 whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition ${
     active
       ? "brand-here font-semibold"
-      : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      : "font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 
@@ -539,7 +543,18 @@ export function ProductShell({
   // der Baum nichts, und zu raten waere schlimmer als zu schweigen - die
   // Ueberschrift der Seite steht ohnehin direkt darunter.
   const activeSubItem = activeAreaSubItems.find((subItem) => subItem.isActive(pathname));
-  const breadcrumb = activeArea
+  // Phase 11.7B: NUR WENN SIE ETWAS SAGT. Ab 1024 Pixeln zeigen die Pille und
+  // die zweite Reihe schon Bereich und Unterbereich - dieselbe Angabe ein
+  // drittes Mal war nur Hoehe. Auf dem Telefon traegt der Menueknopf den
+  // Bereich; die Krume erscheint dort nur auf Seiten UNTERHALB eines
+  // Unterbereichs (z. B. ein einzelnes Inserat) und nie auf Teamseiten, die
+  // ihren eigenen Weg zurueck ("← Verbindungen") haben.
+  const breadcrumbAddsOrientation =
+    Boolean(activeArea && activeSubItem) &&
+    pathname !== activeSubItem?.href &&
+    pathname !== activeArea?.href &&
+    !pathname.startsWith("/teams/");
+  const breadcrumb = activeArea && breadcrumbAddsOrientation
     ? [
         { href: activeArea.href, label: activeArea.label },
         ...(activeSubItem ? [{ href: activeSubItem.href, label: activeSubItem.label }] : []),
@@ -571,8 +586,8 @@ export function ProductShell({
     <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
       <div className="min-h-screen">
         <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 md:px-10 xl:px-12">
-            <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-6">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:px-6 md:px-10 lg:flex-nowrap xl:px-12">
+            <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-5 lg:flex-nowrap">
               <Link
                 href={dashboardHref}
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
@@ -639,8 +654,8 @@ export function ProductShell({
                 trotzdem stehen - auch bei 1024 Pixeln kann ein langer Name die
                 Reihe noch verlaengern.
                 ----------------------------------------------------------- */}
-            <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2">
-              <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 lg:flex">
+            <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 lg:flex-nowrap">
+              <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 lg:flex">
                 {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
                     gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
                     es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
@@ -702,7 +717,11 @@ export function ProductShell({
                 className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 lg:hidden"
               >
                 <MenuGlyph isOpen={isMenuOpen} />
-                <span>{isMenuOpen ? t("menuClose") : t("menuOpen")}</span>
+                {/* Phase 11.7B: Geschlossen traegt der Knopf den aktuellen
+                    Bereich - das ist auf dem Telefon die Ortsangabe, statt
+                    einer eigenen Brotkrumen-Reihe. */}
+                <span className="max-w-[11rem] truncate">{isMenuOpen ? t("menuClose") : activeArea?.label ?? t("menuOpen")}</span>
+                {!isMenuOpen && activeArea ? <span className="sr-only">{` – ${t("menuOpen")}`}</span> : null}
                 {/* Der Zaehler steht AUF dem Knopf, nicht nur dahinter: Ein
                     geschlossenes Menue darf nicht verbergen, dass etwas
                     wartet. */}
@@ -846,14 +865,14 @@ export function ProductShell({
               dieselben Unterseiten im Menue unter ihrem Bereich - eine zweite
               Leiste waere dort nur weitere Hoehe. */}
           {activeAreaSubItems.length > 0 ? (
-            <div className="mx-auto hidden w-full max-w-7xl px-4 pb-2 sm:px-6 md:px-10 lg:block xl:px-12">
+            <div className="mx-auto hidden w-full max-w-7xl px-4 pb-1 sm:px-6 md:px-10 lg:block xl:px-12">
               <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
                 {activeAreaSubItems.map((subItem) => (
                   <Link
                     key={subItem.href}
                     href={subItem.href}
                     aria-current={subItem.isActive(pathname) ? "page" : undefined}
-                    className={`inline-flex min-h-11 items-center rounded-full px-3 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40 ${
+                    className={`inline-flex min-h-9 items-center rounded-full px-3 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40 ${
                       subItem.isActive(pathname)
                         ? "font-semibold text-slate-900 underline decoration-2 underline-offset-[6px]"
                         : "font-medium text-slate-500 hover:text-slate-900"
@@ -892,7 +911,7 @@ export function ProductShell({
         {breadcrumb.length > 0 ? (
           <nav
             aria-label={t("breadcrumbLabel")}
-            className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 md:px-10 xl:px-12"
+            className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 md:px-10 lg:hidden xl:px-12"
           >
             <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
               {breadcrumb.map((krume, index) => (
@@ -1002,7 +1021,7 @@ function ProfileMenu({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="flex cursor-pointer items-center gap-3 rounded-full border border-slate-200 bg-white px-2.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-1.5 py-1 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
@@ -1013,7 +1032,7 @@ function ProfileMenu({
           className="h-8 w-8 shrink-0 rounded-full object-cover"
           fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
         />
-        <span className="hidden max-w-28 truncate md:inline">{normalizedName}</span>
+        <span className="hidden max-w-28 truncate xl:inline">{normalizedName}</span>
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"
@@ -1101,7 +1120,7 @@ function LanguageSwitcher() {
           type="button"
           onClick={() => selectLocale(item)}
           className={`inline-flex items-center gap-1 rounded-full px-2 py-1 transition ${
-            locale === item ? "bg-slate-900 text-white" : "hover:bg-slate-50 hover:text-slate-900"
+            locale === item ? "bg-slate-100 font-semibold text-slate-900" : "hover:bg-slate-50 hover:text-slate-900"
           }`}
           aria-pressed={locale === item}
           // Die Fahne ist Schmuck - der volle Name steht im Titel, damit eine

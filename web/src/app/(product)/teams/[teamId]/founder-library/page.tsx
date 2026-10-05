@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -21,33 +21,18 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
   if (!team) notFound();
 
-  const [t, navigationT] = await Promise.all([
+  const [t, teamLabel] = await Promise.all([
     getTranslations("founderLibrary"),
-    getTranslations("teams.teamNavigation"),
+    getTeamLabel(supabase, teamId),
   ]);
 
+  // Phase 11.7B.1: gemeinsamer Teamkopf statt eigenem Rueckweg und Leiste.
   return (
     <FounderLibraryView
       view={view}
       pathname={pathname}
-      backHref={`/teams/${encodeURIComponent(teamId)}`}
-      backLabel={t("back")}
       teamId={teamId}
-      contextNavigation={(
-        <FounderTeamNavigation
-          teamId={teamId}
-          active="library"
-          labels={{
-            ariaLabel: navigationT("ariaLabel"),
-            overview: navigationT("overview"),
-            workstyle: navigationT("workstyle"),
-            setup: navigationT("setup"),
-            library: navigationT("library"),
-            alignment: navigationT("alignment"),
-            roles: navigationT("roles"),
-          }}
-        />
-      )}
+      teamHeader={<TeamPageHeader teamId={teamId} active="library" title={view === "glossary" ? t("eyebrow") : t("updates.eyebrow")} teamLabel={teamLabel} />}
     />
   );
 }

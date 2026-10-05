@@ -5,77 +5,14 @@
 .ws-report section {
   scroll-margin-top: 2rem;
 }
-.ws-token {
-  width: 26px;
-  height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font: 600 12px/1 sans-serif;
-  border: 2px solid #27344c;
-  background: #fff;
-  color: #182235;
-  flex: none;
-}
-/* Spannweite gemischter Antworten: bewusst ohne Fuellung und gestrichelt,
-   damit sie nicht wie ein Punktwert wirkt. */
-.ws-range {
-  height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed #64748b;
-  border-radius: 13px;
-  /* Deckt die Skalenpunkte darunter ab, damit das Kuerzel lesbar bleibt;
-     bewusst weiss statt farbig - eine Spannweite ist kein Wert. */
-  background: rgba(255, 255, 255, 0.92);
-  font: 600 11px/1 sans-serif;
-  color: #334155;
-}
-.ws-token-0 {
-  border-radius: 50%;
-  background: #e6ddfc;
-}
-.ws-token-1 {
-  border-radius: 5px;
-  background: #d7efed;
-}
-.ws-token-2 {
-  border-radius: 50%;
-  border-style: dashed;
-  background: #f8ebd7;
-}
-.ws-token-3 {
-  border-radius: 5px;
-  border-style: double;
-  border-width: 4px;
-  background: #eee;
-}
-.ws-matrix {
-  display: grid;
-  gap: 1rem;
-}
-.ws-component {
-  border: 1px solid #d5dce5;
-  border-radius: 16px;
-  padding: 1rem;
-  background: #fff;
-}
-.ws-component-members {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-.ws-component-cell {
-  border: 1px solid #e1e5ec;
-  border-radius: 10px;
-  padding: 0.7rem;
+/* Phase 11.7B: Bereichskarten "auf einen Blick" - Punkt, weicher Balken,
+   leere Linie. Keine Kuerzel-Token mehr, keine Wertungsfarbe. */
+.ws-glance-card,
+.ws-talk-card {
   min-width: 0;
 }
-@media (min-width: 800px) {
-  .ws-component-members {
-    grid-template-columns: repeat(var(--members, 2), minmax(0, 1fr));
-  }
+.ws-details > summary::-webkit-details-marker {
+  color: #94a3b8;
 }
 @media print {
   @page {
@@ -94,6 +31,15 @@
   .ws-report details > summary {
     display: none;
   }
+  /* Ausnahme: Zusammenfassungen, die zugleich Ueberschrift sind (Bereich fuer
+     Bereich) - im Druck als Ueberschrift ohne Bedienelement. */
+  .ws-report details > summary.ws-summary-keep {
+    display: block;
+    list-style: none;
+  }
+  .ws-report details > summary.ws-summary-keep::-webkit-details-marker {
+    display: none;
+  }
   .ws-report details > *:not(summary) {
     display: block !important;
     content-visibility: visible !important;
@@ -108,23 +54,42 @@
     border: 0;
     padding: 0;
   }
-  /* Phase 11.5: Faehigkeiten-Karte bleibt im Druck ein Raster aus kleinen,
-     ungeteilten Bausteinen; die Signature-Spuren reissen nicht. */
-  .ws-report .ws-mosaic.grid {
+  /* Bereichskarten zwei je Zeile, Karten und Gespraechskarten nie geteilt. */
+  .ws-report .ws-glance-grid.grid {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2mm;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3mm;
   }
-  .ws-report .ws-mosaic.grid > * + * {
+  .ws-report .ws-glance-grid.grid > * + * {
     margin-top: 0;
   }
-  .ws-tile,
-  .ws-overview figcaption {
+  .ws-glance-card,
+  .ws-talk-card,
+  .ws-glance-track {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+  .ws-report .ws-glance-point {
+    background: #111 !important;
+    box-shadow: none !important;
+    --tw-ring-color: transparent !important;
+  }
+  .ws-report .ws-glance-range {
+    background: repeating-linear-gradient(45deg, #fff, #fff 2px, #cbd5e1 2px, #cbd5e1 4px) !important;
+    border: 1px dashed #334155 !important;
+  }
+  .ws-report .ws-chip {
+    border: 0 !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+  .ws-report .ws-chip::before {
+    content: "[";
+  }
+  .ws-report .ws-chip::after {
+    content: "]";
+  }
   .ws-lane,
-  .ws-component,
   .ws-text-card {
     break-inside: avoid;
     page-break-inside: avoid;
@@ -151,14 +116,6 @@
   .ws-report h3,
   .ws-report h4 {
     break-after: avoid;
-  }
-  .ws-report .ws-component-members {
-    grid-template-columns: repeat(var(--members, 2), minmax(0, 1fr));
-  }
-  .ws-report .ws-token {
-    background: white !important;
-    color: black !important;
-    border-color: black !important;
   }
   .ws-report a {
     color: inherit;

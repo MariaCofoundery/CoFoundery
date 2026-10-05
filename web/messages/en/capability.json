@@ -641,9 +641,9 @@
     "canDo": "has depth: {names}",
     "unnamedMember": "a team member",
     "emptyTitle": "No basis yet",
-    "emptyText": "This readout needs entries on application level and ownership wish from at least two people in the team – and their release to show them within the team. Each person decides both for themselves; “private” stays private, here too.",
+    "emptyText": "This shows the application level and ownership wish of members who share with this team. That needs capability entries – and the team share for exactly this team. Each person decides both for themselves; “private” stays private as long as you don't share.",
     "emptyInterview": "Have the conversation",
-    "emptyDisclosure": "Set your release",
+    "emptyDisclosure": "Share with this team",
     "states": {
       "contested": {
         "label": "Several want to own it",
@@ -673,7 +673,8 @@
         "label": "Too few entries",
         "text": "Fewer than two people have decided here – or they entered “not clear yet”. Turning that into a statement about a role would be guesswork, so there is none."
       }
-    }
+    },
+    "teamBasis": "{contributing} of {members} in the team have made entries, {withDepth} of them with an application level and an ownership wish. Depth is visible when someone shares with this team – a share in another team does not count here."
   },
   "viewFounderProfile": "See “This is you”",
   "strengths": {

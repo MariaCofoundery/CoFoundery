@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 
 type JoinUiState =
   | { type: "loading"; title: string; description: string }
+  // Phase 11.7B: Beitritt mit ausdruecklicher Wahl - keine Vorauswahl.
+  | { type: "choice"; token: string; invitationId: string; busy: boolean }
   | { type: "redirecting"; title: string; description: string }
   | {
       type: "error";
@@ -107,6 +109,36 @@ export default function JoinClient() {
     description: t("loadingDescription"),
   });
 
+  async function acceptWithChoice(token: string, invitationIdFromUrl: string, share: boolean) {
+    setUiState({ type: "choice", token, invitationId: invitationIdFromUrl, busy: true });
+    logInviteFlowDebug("JoinClient:accept_invitation_attempt", { invitationIdFromUrl, tokenPresent: true, share });
+    const { data, error } = await supabase.rpc("accept_invitation_with_team_share", {
+      p_token: token,
+      p_share: share,
+    });
+
+    if (error) {
+      logInviteFlowDebug("JoinClient:accept_invitation_error", { invitationIdFromUrl, error: error.message });
+      const normalizedError = error.message.trim().toLowerCase();
+      if (normalizedError.includes("auth session missing") || normalizedError.includes("not_authenticated")) {
+        if (typeof window !== "undefined") window.location.replace(`/join/prepare?token=${encodeURIComponent(token)}`);
+        return;
+      }
+      const mapped = resolveInviteError(error.message, t);
+      setUiState({ type: "error", title: mapped.title, description: mapped.description, technicalError: error.message });
+      return;
+    }
+
+    const resolvedInvitationId = extractInvitationIdFromAcceptPayload(data) ?? invitationIdFromUrl;
+    logInviteFlowDebug("JoinClient:accept_invitation_success", { invitationIdFromUrl, resolvedInvitationId, share });
+    if (!resolvedInvitationId) {
+      setUiState({ type: "error", title: t("invalidTitle"), description: t("missingInvitationDescription"), technicalError: "missing_invitation_context" });
+      return;
+    }
+    setUiState({ type: "redirecting", title: t("loadingTitle"), description: t("loadingDescription") });
+    router.replace(buildJoinStartHref(resolvedInvitationId));
+  }
+
   useEffect(() => {
     if (hasRunRef.current) return;
     hasRunRef.current = true;
@@ -162,54 +194,14 @@ export default function JoinClient() {
         return;
       }
 
-      let resolvedInvitationId = invitationIdFromUrl;
+      const resolvedInvitationId = invitationIdFromUrl;
       const token = tokenFromUrl;
 
       if (token) {
-        logInviteFlowDebug("JoinClient:accept_invitation_attempt", {
-          sessionUserId: session.user.id,
-          invitationIdFromUrl,
-          tokenPresent: true,
-        });
-        const { data, error } = await supabase.rpc("accept_invitation", {
-          p_token: token,
-        });
-
-        if (error) {
-          logInviteFlowDebug("JoinClient:accept_invitation_error", {
-            sessionUserId: session.user.id,
-            invitationIdFromUrl,
-            error: error.message,
-          });
-          const normalizedError = error.message.trim().toLowerCase();
-          if (
-            normalizedError.includes("auth session missing") ||
-            normalizedError.includes("not_authenticated")
-          ) {
-            if (typeof window !== "undefined") {
-              window.location.replace(`/join/prepare?token=${encodeURIComponent(token)}`);
-              return;
-            }
-            return;
-          }
-
-          const mapped = resolveInviteError(error.message, t);
-          setUiState({
-            type: "error",
-            title: mapped.title,
-            description: mapped.description,
-            technicalError: error.message,
-          });
-          return;
-        }
-
-        resolvedInvitationId = extractInvitationIdFromAcceptPayload(data) ?? resolvedInvitationId;
-        logInviteFlowDebug("JoinClient:accept_invitation_success", {
-          sessionUserId: session.user.id,
-          invitationIdFromUrl,
-          resolvedInvitationId,
-          payload: data,
-        });
+        // Beitritt erst nach einer ausdruecklichen Entscheidung: "Team beitreten
+        // und teilen" oder "Erst beitreten, spaeter entscheiden".
+        setUiState({ type: "choice", token, invitationId: invitationIdFromUrl, busy: false });
+        return;
       }
 
       if (!resolvedInvitationId) {
@@ -246,6 +238,31 @@ export default function JoinClient() {
    * 4) Weiterleitung auf /join/start?invitationId=... prüfen.
    * 5) Von dort entweder direkt in den nächsten Einladungsschritt oder bei fehlenden Profil-Basics nach /join/welcome.
    */
+
+  if (uiState.type === "choice") {
+    const option =
+      "flex w-full flex-col items-start rounded-2xl border border-slate-300 bg-white p-5 text-left transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60";
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
+        <section aria-labelledby="join-choice-title" className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h1 id="join-choice-title" className="text-xl font-semibold text-slate-900">{t("choice.title")}</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("choice.body")}</p>
+          {/* Zwei gleichwertige Optionen, keine Vorauswahl, kein verstecktes Teilen. */}
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <button type="button" className={option} disabled={uiState.busy} onClick={() => void acceptWithChoice(uiState.token, uiState.invitationId, true)}>
+              <span className="text-base font-semibold text-slate-950">{t("choice.share.title")}</span>
+              <span className="mt-2 text-sm leading-6 text-slate-600">{t("choice.share.body")}</span>
+            </button>
+            <button type="button" className={option} disabled={uiState.busy} onClick={() => void acceptWithChoice(uiState.token, uiState.invitationId, false)}>
+              <span className="text-base font-semibold text-slate-950">{t("choice.later.title")}</span>
+              <span className="mt-2 text-sm leading-6 text-slate-600">{t("choice.later.body")}</span>
+            </button>
+          </div>
+          <p className="mt-4 text-xs leading-5 text-slate-500">{t("choice.note")}</p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">

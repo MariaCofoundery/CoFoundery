@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
-import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import {
   CommitmentLabDiscussionComposer,
   CommitmentLabMarkerProvider,
@@ -45,9 +45,9 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/commitment-lab/${relationshipId}`)}`);
   const lab = await getCommitmentLab(teamId, relationshipId, user.id, supabase);
   if (!lab) notFound();
-  const [t, navigationT, locale] = await Promise.all([
+  const [t, teamLabel, locale] = await Promise.all([
     getTranslations("teams.commitmentLab"),
-    getTranslations("teams.teamNavigation"),
+    getTeamLabel(supabase, teamId),
     getLocale(),
   ]);
   const ownEntry = lab.founderEntries.find((entry) => entry.userId === user.id) ?? null;
@@ -87,15 +87,13 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   };
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/teams/${teamId}#team-alignment`} className="rounded-sm text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("back")}</Link>
-      <header className="mt-6 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">{t("eyebrow")}</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1>
-        <p className="mt-3 text-sm font-medium text-slate-700">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
-      </header>
-      <FounderTeamNavigation teamId={teamId} active="overview" labels={{ ariaLabel: navigationT("ariaLabel"), overview: navigationT("overview"), workstyle: navigationT("workstyle"), setup: navigationT("setup"), library: navigationT("library"), alignment: navigationT("alignment"), roles: navigationT("roles") }} />
+    <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
+      {/* Phase 11.7B.1: gemeinsamer Teamkopf; das Lab gehoert zur Uebersicht. */}
+      <TeamPageHeader teamId={teamId} active="overview" title={t("title")} teamLabel={teamLabel} />
+      <section className="mt-5 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
+        <p className="text-sm font-medium text-slate-700">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+      </section>
       {feedback ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedback}`)}</p> : null}
 
       <CommitmentLabMarkerProvider initialMarkers={ownEntry?.discussionMarkers ?? []}>

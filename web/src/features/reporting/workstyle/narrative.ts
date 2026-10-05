@@ -75,21 +75,20 @@ export const SITUATIONS: Record<string, string> = {
   "ORG-02": "dir bei langen Aufgaben selbst Zwischenpunkte setzen",
 };
 
-/** Worte fuer die beiden Pole je Antwortformat - aus den Antwortoptionen, nicht neu erfunden. */
-const POLES: Record<string, { upper: string; lower: string }> = {
-  likelihood: { upper: "eher wahrscheinlich", lower: "eher unwahrscheinlich" },
-  influence: { upper: "eher stark", lower: "eher wenig" },
-  ambiguity_discomfort: { upper: "eher unangenehm", lower: "eher nicht unangenehm" },
-};
-
 /**
- * Bereichstexte. Jede Richtungsaussage paraphrasiert nur die Items des
- * Bereichs (Iteminhalt im Kommentar) und bleibt "in den beschriebenen
- * Situationen". Fragen sind Reflexionsangebote ohne unterstellte Schwierigkeit.
+ * Bereichstexte. Seit Phase 11.7B in Alltagssprache ("Wenn ... dann ...",
+ * "Bei dir haengt es davon ab ..."), aber weiterhin nur aus den Items des
+ * Bereichs abgeleitet (Iteminhalt im Kommentar): keine Charakterdiagnose,
+ * keine Wirkung auf andere, kein beobachtetes Verhalten. Fragen sind
+ * Reflexionsangebote ohne unterstellte Schwierigkeit.
  */
 type AreaCopy = {
   direction: Record<Band, string>;
   mixed: string;
+  /** Ein kurzer Satz fuer die Bereichskarte "auf einen Blick". */
+  short: Record<Band | "mixed", string>;
+  /** Beschriftung der Situationen je Antwortbereich (gemischtes Muster). */
+  bands: Record<Band, string>;
   question: Record<"upper" | "lower" | "open", string>;
   note?: string;
 };
@@ -98,67 +97,77 @@ const COPY: Record<AreaKey, AreaCopy> = {
   EVI: {
     direction: {
       // EVI-01 Gegenargumente, -02 unsichere Annahme, -03/-05 Gegeninformation/Gegenpunkt, -06 widersprüchliche Quellen
-      upper: "In den beschriebenen Situationen prüfst du eine Einschätzung eher noch einmal: Du suchst nach Gegenargumenten, prüfst unsichere Annahmen und gehst Gegeninformationen oder Widersprüchen nach.",
-      lower: "In den beschriebenen Situationen prüfst du eine Einschätzung eher nicht noch einmal gezielt – etwa durch die Suche nach Gegenargumenten oder das Nachgehen von Gegeninformationen.",
-      middle: "Ob du eine Einschätzung noch einmal gezielt prüfst, beantwortest du in den beschriebenen Situationen mit „teils/teils“.",
+      upper: "Wenn eine Entscheidung ansteht, schaust du lieber noch einmal genauer hin: Du suchst nach Gegenargumenten, prüfst unsichere Annahmen und gehst Informationen nach, die dagegen sprechen.",
+      lower: "Eine Einschätzung, die steht, lässt du eher stehen: Gezielt nach Gegenargumenten zu suchen oder Gegeninformationen nachzugehen, ist in diesen Situationen für dich eher nicht der nächste Schritt.",
+      middle: "Ob du eine Einschätzung noch einmal prüfst, lässt du in den meisten Situationen offen – mal eher ja, mal eher nein.",
     },
-    mixed: "Ob du eine Einschätzung noch einmal gezielt prüfst, beantwortest du je nach Situation unterschiedlich.",
+    mixed: "Bei dir hängt es von der Situation ab: Manches lässt du stehen, anderes prüfst du noch einmal genauer.",
+    short: { upper: "Du schaust lieber noch einmal genauer hin.", lower: "Du lässt eine erste Einschätzung eher stehen.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    bands: { upper: "Hier prüfst du eher noch einmal", middle: "Hier kommt es darauf an", lower: "Hier lässt du es eher stehen" },
     question: {
-      upper: "Woran erkennst du, dass genug geprüft ist und du entscheiden kannst?",
+      upper: "Woran merkst du, dass genug geprüft ist und du entscheiden kannst?",
       lower: "Welche neue Information wäre für dich ein guter Grund, eine Entscheidung noch einmal zu öffnen?",
-      open: "In welchen Situationen prüfst du eine Einschätzung noch einmal – und wann reicht dir deine erste?",
+      open: "Woran merkst du, dass es sich lohnt, eine Entscheidung noch einmal zu öffnen – und wann lässt du sie bewusst stehen?",
     },
   },
   EXP: {
     direction: {
       // EXP-02 Papierlösung, -03 Gleichstand, -04 wiederholtes Problem, -06 fehlende Informationen (alle "influence")
-      upper: "In den beschriebenen Situationen beeinflussen frühere Erfahrungen deine Einschätzung eher stark – etwa wenn eine Lösung auf dem Papier überzeugt oder Informationen fehlen.",
-      lower: "In den beschriebenen Situationen beeinflussen frühere Erfahrungen deine Einschätzung eher wenig – etwa wenn eine Lösung auf dem Papier überzeugt oder Informationen fehlen.",
-      middle: "Wie stark frühere Erfahrungen deine Einschätzung beeinflussen, beantwortest du in den beschriebenen Situationen mit „teilweise“.",
+      upper: "Wenn dir eine Situation bekannt vorkommt, lässt du dich von früheren Erfahrungen deutlich leiten – auch dann, wenn eine Lösung auf dem Papier überzeugt oder Informationen fehlen.",
+      lower: "Frühere Erfahrungen spielen bei deiner Einschätzung eher eine kleine Rolle – du schätzt eine Situation lieber frisch ein, auch wenn sie dir vertraut ist.",
+      middle: "Frühere Erfahrungen fließen bei dir teilweise ein – sie sind ein Hinweis unter mehreren.",
     },
-    mixed: "Wie stark frühere Erfahrungen deine Einschätzung beeinflussen, beantwortest du je nach Situation unterschiedlich.",
+    mixed: "Erfahrung ist für dich ein Hinweis unter mehreren: In manchen Situationen stützt du dich stark darauf, in anderen weniger – das hängt von der Situation ab.",
+    short: { upper: "Du baust auf Erfahrung.", lower: "Du schätzt eher frisch ein.", middle: "Erfahrung zählt teilweise.", mixed: "Je nach Situation." },
+    bands: { upper: "Hier zählt Erfahrung für dich stark", middle: "Hier zählt sie teilweise", lower: "Hier zählt sie für dich wenig" },
     question: {
-      upper: "Woran erkennst du, ob eine frühere Erfahrung auf die aktuelle Situation übertragbar ist?",
+      upper: "Woran erkennst du, ob eine frühere Erfahrung auf die aktuelle Situation passt?",
       lower: "In welchen Situationen wäre es dir wichtig, gezielt nach früheren Erfahrungen zu fragen?",
-      open: "In welchen Situationen stützt du dich auf Erfahrung – und wann schaust du lieber neu hin?",
+      open: "Wann stützt du dich auf Erfahrung – und wann schaust du lieber neu hin?",
     },
   },
   EL: {
     direction: {
       // EL-01 vor Festlegung testen, -02 Test vorschlagen, -04 einfache Version zeigen, -05 verändern und erneut testen
-      upper: "Wenn sich etwas mit wenig Aufwand ausprobieren lässt, ist ein kleiner Versuch in den beschriebenen Situationen für dich eher ein naheliegender Schritt.",
-      lower: "Auch wenn sich etwas mit wenig Aufwand ausprobieren ließe, ist ein kleiner Versuch in den beschriebenen Situationen für dich eher nicht der naheliegende Schritt.",
-      middle: "Ob du etwas zuerst im Kleinen ausprobierst, beantwortest du in den beschriebenen Situationen mit „teils/teils“.",
+      upper: "Wenn sich etwas mit wenig Aufwand testen lässt, probierst du es lieber im Kleinen aus, als lange darüber zu reden.",
+      lower: "Auch wenn sich etwas im Kleinen testen ließe, klärst du lieber erst, bevor du etwas ausprobierst.",
+      middle: "Ob du erst ausprobierst oder erst klärst, lässt du in den meisten Situationen offen.",
     },
-    mixed: "Ob du etwas zuerst im Kleinen ausprobierst, beantwortest du je nach Situation unterschiedlich.",
+    mixed: "Ob du erst testest oder erst klärst, hängt bei dir von der Situation ab.",
+    short: { upper: "Du probierst lieber erst aus.", lower: "Du klärst lieber erst.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    bands: { upper: "Hier probierst du eher aus", middle: "Hier kommt es darauf an", lower: "Hier klärst du eher erst" },
     question: {
       upper: "Woran merkst du, dass ein Versuch mehr bringt als ein weiteres Gespräch – und was machst du mit dem Ergebnis?",
       lower: "Bei welchen Fragen würdest du einen kleinen Versuch in Betracht ziehen – und bei welchen nicht?",
-      open: "Bei welchen Fragen probierst du lieber aus – und wann willst du vorher mehr wissen?",
+      open: "Wann probierst du lieber aus – und wann willst du vorher mehr wissen?",
     },
   },
   VOICE: {
     direction: {
       // VOICE-01 Gegenpunkt trotz Einigkeit, -02 Unangenehmes, -03 vertagtes Thema, -04 abweichende Einschätzung, -05 noch nicht so weit
-      upper: "In den beschriebenen Situationen sprichst du Einwände, Unangenehmes und noch offene Punkte eher an – auch wenn die Runde schon einig ist oder abschließen möchte.",
-      lower: "In den beschriebenen Situationen sprichst du Einwände, Unangenehmes und noch offene Punkte eher nicht von dir aus an, wenn die Runde schon einig ist oder abschließen möchte.",
-      middle: "Ob du einen Einwand oder offenen Punkt ansprichst, beantwortest du in den beschriebenen Situationen mit „teils/teils“.",
+      upper: "Wenn dir etwas Wichtiges auffällt, sprichst du es an – auch wenn die anderen schon einig sind oder fast fertig.",
+      lower: "Einwände und offene Punkte sprichst du eher nicht gleich von dir aus an, wenn die Runde schon einig ist oder abschließen möchte.",
+      middle: "Ob du einen Einwand gleich ansprichst, lässt du in den meisten Situationen offen.",
     },
-    mixed: "Ob du einen Einwand oder offenen Punkt ansprichst, beantwortest du je nach Situation unterschiedlich.",
+    mixed: "Manche Einwände bringst du gleich ein, bei anderen wartest du eher ab – das hängt von der Situation ab.",
+    short: { upper: "Du sprichst Dinge gleich an.", lower: "Du wartest eher ab.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    bands: { upper: "Hier sprichst du es eher an", middle: "Hier kommt es darauf an", lower: "Hier wartest du eher ab" },
     question: {
       upper: "Wie möchtest du mit einem späten Einwand umgehen, wenn eine Entscheidung eigentlich schon steht?",
-      lower: "In welchen Situationen wäre es dir wichtig, einen Einwand trotzdem anzusprechen?",
-      open: "In welchen Situationen sprichst du einen Einwand an – und wann eher nicht?",
+      lower: "In welchen Situationen wäre es dir wichtig, einen Einwand trotzdem gleich anzusprechen?",
+      open: "Wann sprichst du einen Einwand gleich an – und wann wartest du lieber ab?",
     },
   },
   AMB: {
     direction: {
       // AMB-01 widersprüchliche Rückmeldungen, -02 mehrere Erklärungen, -04 Lage wird offener, -05 Weiterarbeiten mit offener Frage
-      upper: "Widersprüchliche Rückmeldungen, mehrere mögliche Erklärungen oder eine offene wichtige Frage empfindest du in den beschriebenen Situationen eher als unangenehm.",
-      lower: "Widersprüchliche Rückmeldungen, mehrere mögliche Erklärungen oder eine offene wichtige Frage empfindest du in den beschriebenen Situationen eher nicht als unangenehm.",
-      middle: "Wie unangenehm offene Situationen für dich sind, beantwortest du in den beschriebenen Fällen mit „teils/teils“.",
+      upper: "Offene Fragen, die sich gerade nicht klären lassen, empfindest du eher als unangenehm – etwa widersprüchliche Rückmeldungen oder mehrere mögliche Erklärungen.",
+      lower: "Offene Fragen, die sich gerade nicht klären lassen, empfindest du eher nicht als unangenehm – auch bei widersprüchlichen Rückmeldungen oder mehreren möglichen Erklärungen.",
+      middle: "Offene Situationen empfindest du teils als unangenehm, teils nicht.",
     },
-    mixed: "Wie unangenehm offene Situationen für dich sind, beantwortest du je nach Situation unterschiedlich.",
+    mixed: "Manche offenen Situationen empfindest du als unangenehm, andere nicht – das hängt von der Situation ab.",
+    short: { upper: "Offenes ist dir eher unbequem.", lower: "Offenes ist für dich okay.", middle: "Teils unbequem, teils okay.", mixed: "Je nach Situation." },
+    bands: { upper: "Das empfindest du eher als unangenehm", middle: "Das empfindest du teils so, teils so", lower: "Das empfindest du eher nicht als unangenehm" },
     question: {
       upper: "Was brauchst du, um gut weiterzuarbeiten, solange eine wichtige Frage offen ist?",
       lower: "Wie gehst du damit um, wenn offene Fragen für andere unangenehmer sind als für dich?",
@@ -169,17 +178,33 @@ const COPY: Record<AreaKey, AreaCopy> = {
   ORG: {
     direction: {
       // Nur ORG-01 (nächste Schritte klären) und ORG-02 (eigene Zwischenpunkte) - keine allgemeine Arbeitsorganisation
-      upper: "Bei größeren oder längeren Aufgaben klärst du in den beschriebenen Situationen eher zuerst nächste Schritte und setzt dir selbst Zwischenpunkte.",
-      lower: "Bei größeren oder längeren Aufgaben klärst du in den beschriebenen Situationen eher nicht zuerst nächste Schritte und setzt dir eher keine eigenen Zwischenpunkte.",
-      middle: "Ob du bei größeren Aufgaben zuerst nächste Schritte klärst und dir Zwischenpunkte setzt, beantwortest du mit „teils/teils“.",
+      upper: "Bei größeren Aufgaben machst du dir zuerst die nächsten Schritte klar und setzt dir eigene Zwischenpunkte.",
+      lower: "Bei größeren Aufgaben fängst du eher einfach an, statt zuerst die nächsten Schritte festzulegen und dir Zwischenpunkte zu setzen.",
+      middle: "Ob du bei größeren Aufgaben erst die Schritte klärst, lässt du meistens offen.",
     },
-    mixed: "Ob du bei größeren Aufgaben zuerst nächste Schritte klärst und dir Zwischenpunkte setzt, beantwortest du unterschiedlich.",
+    mixed: "Bei größeren Aufgaben legst du manchmal erst die Schritte fest, manchmal fängst du einfach an und sortierst unterwegs – das hängt von der Aufgabe ab.",
+    short: { upper: "Du klärst erst die Schritte.", lower: "Du fängst lieber einfach an.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Aufgabe." },
+    bands: { upper: "Hier klärst du eher erst die Schritte", middle: "Hier kommt es darauf an", lower: "Hier fängst du eher einfach an" },
     question: {
       upper: "Wie viel Vorstruktur brauchst du – und wann wird sie dir zu viel?",
       lower: "Wie viel gemeinsamer Plan hilft dir, bevor du mit anderen an etwas Größerem startest?",
       open: "Wann hilft dir ein Plan – und wann arbeitest du lieber ohne?",
     },
   },
+};
+
+/**
+ * Kurze, gleichwertige Pole fuer die Bereichskarten (Phase 11.7B). Rechts
+ * steht immer das obere Ende der Antwortskala - dieselbe Richtung wie
+ * `overviewMark`.
+ */
+export const AREA_POLES: Record<AreaKey, { left: string; right: string }> = {
+  EVI: { left: "erste Einschätzung stehen lassen", right: "noch einmal genauer hinschauen" },
+  EXP: { left: "eher frisch einschätzen", right: "auf Erfahrung bauen" },
+  EL: { left: "erst klären", right: "erst ausprobieren" },
+  VOICE: { left: "eher abwarten", right: "gleich ansprechen" },
+  AMB: { left: "offen ist okay", right: "offen ist unbequem" },
+  ORG: { left: "einfach anfangen", right: "erst Schritte klären" },
 };
 
 /** ORG-Zweierwahlen: je eine ausgeschriebene Wahl aus dem Optionstext, "eher" oder "deutlich eher" nach Antwort. */
@@ -204,8 +229,6 @@ export function patternItems(area: AreaKey) {
 export function minAnswered(area: AreaKey) {
   return Math.min(3, patternItems(area).length);
 }
-
-const capitalize = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 /** Muster eines Bereichs aus den gleichformatigen Ordinalantworten - ohne Zahl nach aussen. */
 export function areaPattern(profile: ProductProfile, area: AreaKey): AreaPattern {
@@ -232,10 +255,6 @@ export function areaPattern(profile: ProductProfile, area: AreaKey): AreaPattern
     middle: bands.filter((x) => x.band === "middle").map((x) => x.key),
     lower: bands.filter((x) => x.band === "lower").map((x) => x.key),
   };
-}
-
-function poleWords(area: AreaKey) {
-  return POLES[patternItems(area)[0]?.response_format ?? "likelihood"] ?? POLES.likelihood;
 }
 
 /** Einzelantworten, die nicht in die Bereichsrichtung eingehen - woertlich wiedergegeben. */
@@ -279,7 +298,6 @@ export type AreaNarrative = {
 export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarrative {
   const copy = COPY[area];
   const pattern = areaPattern(profile, area);
-  const poles = poleWords(area);
   const notes = itemNotes(profile, area);
   const missing = PRODUCT_ITEMS.filter((i) => i.area_key === area && !rawChoice(profile, i.item_key)).length;
   const base = { key: area, pattern, itemNotes: notes, missing, exception: null, situations: [] };
@@ -289,18 +307,16 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarra
       claim: `${area}.INSUFFICIENT`,
       core:
         area === "ORG" && notes.length
-          ? "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten für eine Aussage vor."
-          : "Für diesen Bereich liegen zu wenige Antworten vor, um eine Aussage zu machen.",
+          ? "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
+          : "Für diesen Bereich liegen zu wenige Antworten vor, um etwas daraus abzuleiten.",
       note: null,
       question: null,
     };
   }
   if (pattern.kind === "mixed") {
-    const situations = [
-      { label: capitalize(poles.upper), items: pattern.upper.map((k) => SITUATIONS[k]) },
-      { label: area === "EXP" ? "Teilweise" : "Teils/teils", items: pattern.middle.map((k) => SITUATIONS[k]) },
-      { label: capitalize(poles.lower), items: pattern.lower.map((k) => SITUATIONS[k]) },
-    ].filter((s) => s.items.length);
+    const situations = (["upper", "middle", "lower"] as Band[])
+      .map((band) => ({ label: copy.bands[band], items: pattern[band].map((k) => SITUATIONS[k]) }))
+      .filter((s) => s.items.length);
     return { ...base, claim: `${area}.MIXED`, core: copy.mixed, situations, note: copy.note ?? null, question: copy.question.open };
   }
   const side = pattern.band === "middle" ? null : pattern.band;
@@ -309,11 +325,32 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarra
     claim: `${area}.DIRECTION.${pattern.band.toUpperCase()}.${pattern.strength.toUpperCase()}`,
     core: copy.direction[pattern.band],
     exception: pattern.exception
-      ? `Ausnahme mit „${area === "EXP" ? "teilweise" : "teils/teils"}“: ${SITUATIONS[pattern.exception]}.`
+      ? `Nur in einer Situation legst du dich weniger fest: ${SITUATIONS[pattern.exception]}.`
       : null,
     note: copy.note ?? null,
     question: side ? copy.question[side] : copy.question.open,
   };
+}
+
+/** Ein kurzer Satz fuer die Bereichskarte - nie staerker als die Kernaussage. */
+export function glanceSentence(profile: ProductProfile, area: AreaKey): string {
+  const pattern = areaPattern(profile, area);
+  if (pattern.kind === "insufficient") return "Noch zu wenige Antworten.";
+  return pattern.kind === "mixed" ? COPY[area].short.mixed : COPY[area].short[pattern.band];
+}
+
+/**
+ * Genau eine Reflexionsfrage fuer den Einzelbericht: aus dem ersten Bereich
+ * mit durchgehender Richtung, sonst mit ueberwiegender Richtung, sonst aus
+ * dem ersten gemischten Bereich. Feste Bereichsreihenfolge - keine Gewichtung.
+ */
+export function questionForYou(profile: ProductProfile): { area: AreaKey; question: string; claim: string } | null {
+  const all = AREAS.map((a) => ({ area: a.key, n: areaNarrative(profile, a.key) }));
+  const pick =
+    all.find((x) => x.n.pattern.kind === "direction" && x.n.pattern.band !== "middle" && x.n.pattern.strength === "all") ??
+    all.find((x) => x.n.pattern.kind === "direction" && x.n.pattern.band !== "middle") ??
+    all.find((x) => x.n.pattern.kind === "mixed");
+  return pick && pick.n.question ? { area: pick.area, question: pick.n.question, claim: pick.n.claim } : null;
 }
 
 export function individualNarratives(profile: ProductProfile) {
@@ -376,60 +413,98 @@ export function overviewMark(profile: ProductProfile, area: AreaKey): OverviewMa
 
 type TeamCopy = {
   similar: Record<"upper" | "lower", { text: string; question: string }>;
-  differs: { text: string; question: string };
+  /** text = Arbeitshypothese (Moeglichkeit), summary = lebensnaher Satz fuer die Karte. */
+  differs: { text: string; question: string; summary: string };
+  /** Gespraechskarte (Phase 11.7B): Etikett und Frage aus Teamsicht. */
+  card: { label: string; question: string };
 };
 
 const TEAM_COPY: Record<AreaKey, TeamCopy> = {
   EVI: {
     similar: {
-      upper: { text: "In den beschriebenen Situationen prüft ihr {alle} eine Einschätzung eher noch einmal.", question: "Wie entscheidet ihr, wenn Informationen unvollständig bleiben – und wer stößt dann die Umsetzung an?" },
-      lower: { text: "In den beschriebenen Situationen prüft ihr {alle} eine Einschätzung eher nicht noch einmal gezielt.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
+      upper: { text: "Ihr schaut {alle} lieber noch einmal genauer hin, bevor eine Entscheidung steht.", question: "Wie entscheidet ihr, wenn Informationen unvollständig bleiben – und wer stößt dann die Umsetzung an?" },
+      lower: { text: "Ihr {alle} lasst eine erste Einschätzung eher stehen, statt gezielt nach Gegenargumenten zu suchen.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
     },
-    differs: { text: "Beim gemeinsamen Entscheiden: Wenn eine Person eine Einschätzung noch einmal prüfen möchte und eine andere damit weiterarbeiten will, könntet ihr unterschiedlich sehen, wann eine Entscheidung steht. Das könnte sich ergänzen, wenn ihr vorab klärt, wann eine Entscheidung noch einmal geöffnet wird.", question: "Welche neue Information ist für euch Anlass, eine Entscheidung noch einmal zu öffnen – und wer darf das anstoßen?" },
+    differs: {
+      summary: "Bei manchen Situationen liegt ihr nah beieinander, bei anderen würdet ihr eher unterschiedlich reagieren. Besonders sichtbar wird das bei der Frage, wann eine Entscheidung noch einmal geöffnet werden sollte.",
+      text: "Beim gemeinsamen Entscheiden: Wenn jemand von euch eine Einschätzung noch einmal prüfen möchte und jemand anderes damit weiterarbeiten will, könntet ihr unterschiedlich sehen, wann eine Entscheidung steht. Das könnte sich ergänzen, wenn ihr vorab klärt, wann eine Entscheidung noch einmal geöffnet wird.",
+      question: "Welche neue Information ist für euch Anlass, eine Entscheidung noch einmal zu öffnen – und wer darf das anstoßen?",
+    },
+    card: { label: "Entscheidungen", question: "Wann öffnen wir eine Entscheidung noch einmal – und wann lassen wir sie bewusst stehen?" },
   },
   EXP: {
     similar: {
-      upper: { text: "In den beschriebenen Situationen beeinflusst frühere Erfahrung eure Einschätzung {allen} eher stark.", question: "Was ist an einer neuen Situation anders als bei euren früheren Erfahrungen?" },
-      lower: { text: "In den beschriebenen Situationen beeinflusst frühere Erfahrung eure Einschätzung {allen} eher wenig.", question: "Was wisst ihr aus ähnlichen Situationen schon, das hier helfen könnte?" },
+      upper: { text: "Ihr lasst euch {alle} deutlich von früherer Erfahrung leiten. Spannend wird es, wenn eure Erfahrungen in verschiedene Richtungen zeigen.", question: "Was ist an einer neuen Situation anders als bei euren früheren Erfahrungen?" },
+      lower: { text: "Frühere Erfahrung spielt für euch {alle} eher eine kleine Rolle – ihr schätzt Situationen lieber frisch ein.", question: "Was wisst ihr aus ähnlichen Situationen schon, das hier helfen könnte?" },
     },
-    differs: { text: "Beim Einschätzen einer Lage: Wenn eine Person sich stärker auf frühere Erfahrung stützt als eine andere, könntet ihr dieselbe Situation unterschiedlich einordnen. Das könnte sich ergänzen, wenn die Erfahrung ausgesprochen und gemeinsam auf den aktuellen Fall geprüft wird.", question: "Woran erkennt ihr, ob eine frühere Erfahrung auf die aktuelle Situation übertragbar ist?" },
+    differs: {
+      summary: "Bei manchen Situationen stützt ihr euch ähnlich stark auf Erfahrung, bei anderen deutlich unterschiedlich – etwa wenn Informationen fehlen oder eine Lösung auf dem Papier überzeugt.",
+      text: "Beim Einschätzen einer Lage: Wenn sich jemand von euch stärker auf frühere Erfahrung stützt als jemand anderes, könntet ihr dieselbe Situation unterschiedlich einordnen. Das könnte sich ergänzen, wenn die Erfahrung ausgesprochen und gemeinsam auf den aktuellen Fall geprüft wird.",
+      question: "Woran erkennt ihr, ob eine frühere Erfahrung auf die aktuelle Situation übertragbar ist?",
+    },
+    card: { label: "Erfahrung", question: "Wessen Erfahrung zählt, wenn unsere Erfahrungen in verschiedene Richtungen zeigen?" },
   },
   EL: {
     similar: {
-      upper: { text: "In den beschriebenen Situationen ist ein kleiner Versuch für euch {alle} eher ein naheliegender Schritt.", question: "Wann hat ein Versuch für euch genug Aussagekraft – und wer wertet ihn aus?" },
-      lower: { text: "In den beschriebenen Situationen ist ein kleiner Versuch für euch {alle} eher nicht der naheliegende Schritt.", question: "Bei welcher offenen Frage käme für euch ein kleiner Versuch in Betracht?" },
+      upper: { text: "Wenn sich etwas im Kleinen testen lässt, probiert ihr es {alle} lieber aus, als lange darüber zu reden.", question: "Wann hat ein Versuch für euch genug Aussagekraft – und wer wertet ihn aus?" },
+      lower: { text: "Ihr klärt {alle} lieber erst, bevor ihr etwas im Kleinen ausprobiert.", question: "Bei welcher offenen Frage käme für euch ein kleiner Versuch in Betracht?" },
     },
-    differs: { text: "Bei offenen Fragen: Wenn eine Person früh etwas ausprobieren möchte und eine andere eher nicht, könntet ihr unterschiedlich einschätzen, wann ein Versuch der nächste Schritt ist. Es kann helfen, vorab zu vereinbaren, wann ihr vom Besprechen ins Ausprobieren wechselt.", question: "Wie geht ihr vor, wenn eine Person testen will und eine andere noch offene Fragen klären möchte?" },
+    differs: {
+      summary: "Wenn sich etwas im Kleinen testen ließe, würdet ihr teils unterschiedlich vorgehen: Mal möchte jemand von euch lieber ausprobieren, jemand anderes lieber erst klären.",
+      text: "Bei offenen Fragen: Wenn jemand von euch früh etwas ausprobieren möchte und jemand anderes lieber erst klärt, könntet ihr unterschiedlich einschätzen, wann ein Versuch der nächste Schritt ist. Es kann helfen, vorab zu vereinbaren, wann ihr vom Besprechen ins Ausprobieren wechselt.",
+      question: "Wie geht ihr vor, wenn jemand testen will und jemand anderes noch offene Fragen klären möchte?",
+    },
+    card: { label: "Ausprobieren", question: "Wann testen wir im Kleinen, und wann klären wir erst weiter?" },
   },
   VOICE: {
     similar: {
-      upper: { text: "In den beschriebenen Situationen sprecht ihr {alle} Einwände und offene Punkte eher an.", question: "Wann gilt eine Entscheidung bei euch als abgeschlossen – und was passiert mit einem späten Einwand?" },
-      lower: { text: "In den beschriebenen Situationen sprecht ihr {alle} Einwände und offene Punkte eher nicht von euch aus an.", question: "Wann fragt ihr ausdrücklich nach Einwänden, bevor ihr etwas abschließt?" },
+      upper: { text: "Ihr sprecht {alle} an, was euch auffällt – auch kurz vor dem Abschluss.", question: "Wann gilt eine Entscheidung bei euch als abgeschlossen – und was passiert mit einem späten Einwand?" },
+      lower: { text: "Ihr wartet {alle} eher ab, statt Einwände gleich anzusprechen, wenn die Runde schon einig ist.", question: "Wann fragt ihr ausdrücklich nach Einwänden, bevor ihr etwas abschließt?" },
     },
-    differs: { text: "In Besprechungen: Wenn eine Person Einwände eher anspricht als eine andere, könnten Einwände unterschiedlich früh sichtbar werden. Feste Gelegenheiten für Rückfragen vor einem Abschluss könnten helfen.", question: "Wie schafft ihr Raum für einen Einwand, wenn die Runde schon abschließen möchte?" },
+    differs: {
+      summary: "Bei manchen Situationen würdet ihr Einwände ähnlich früh ansprechen, bei anderen unterschiedlich – etwa wenn die Runde schon abschließen möchte.",
+      text: "In Besprechungen: Wenn jemand von euch Einwände eher gleich anspricht als jemand anderes, könnten Einwände unterschiedlich früh sichtbar werden. Feste Gelegenheiten für Rückfragen vor einem Abschluss könnten helfen.",
+      question: "Wie schafft ihr Raum für einen Einwand, wenn die Runde schon abschließen möchte?",
+    },
+    card: { label: "Einwände", question: "Wie sorgen wir dafür, dass Zweifel noch Platz haben, auch wenn wir fast fertig sind?" },
   },
   AMB: {
     similar: {
-      upper: { text: "Offene Situationen empfindet ihr {alle} in den beschriebenen Fällen eher als unangenehm. Das beschreibt das Empfinden, nicht das Handeln.", question: "Wie haltet ihr offene Fragen fest, damit ihr trotzdem weiterarbeiten könnt?" },
-      lower: { text: "Offene Situationen empfindet ihr {alle} in den beschriebenen Fällen eher nicht als unangenehm. Das beschreibt das Empfinden, nicht das Handeln.", question: "Wie haltet ihr offene Fragen fest, auch wenn sie euch wenig stören?" },
+      upper: { text: "Offene Fragen empfindet ihr {alle} eher als unangenehm. Das beschreibt euer Empfinden, nicht euer Handeln.", question: "Wie haltet ihr offene Fragen fest, damit ihr trotzdem weiterarbeiten könnt?" },
+      lower: { text: "Offene Fragen empfindet ihr {alle} eher nicht als unangenehm. Das beschreibt euer Empfinden, nicht euer Handeln.", question: "Wie haltet ihr offene Fragen fest, auch wenn sie euch wenig stören?" },
     },
-    differs: { text: "Wenn vieles offen ist: Wenn offene Situationen für eine Person unangenehmer sind als für eine andere, könntet ihr unterschiedlich viel Klärung brauchen, bevor ihr weiterarbeitet. Das beschreibt das Empfinden, nicht das Handeln. Es kann helfen, offene Fragen und den nächsten Schritt getrennt festzuhalten.", question: "Was braucht ihr, um weiterzuarbeiten, solange eine wichtige Frage offen ist?" },
+    differs: {
+      summary: "Offene Fragen fühlen sich für euch unterschiedlich an: Was jemand von euch eher als unangenehm empfindet, ist für jemand anderen eher in Ordnung. Das beschreibt euer Empfinden, nicht euer Handeln.",
+      text: "Wenn vieles offen ist: Wenn offene Situationen für jemanden von euch unangenehmer sind als für jemand anderen, könntet ihr unterschiedlich viel Klärung brauchen, bevor ihr weiterarbeitet. Das beschreibt das Empfinden, nicht das Handeln. Es kann helfen, offene Fragen und den nächsten Schritt getrennt festzuhalten.",
+      question: "Was braucht ihr, um weiterzuarbeiten, solange eine wichtige Frage offen ist?",
+    },
+    card: { label: "Offene Fragen", question: "Wie lange halten wir eine wichtige Frage offen, bevor wir trotzdem weitermachen?" },
   },
   ORG: {
     similar: {
-      upper: { text: "Bei größeren Aufgaben klärt ihr {alle} in den beschriebenen Situationen eher zuerst nächste Schritte und setzt euch Zwischenpunkte.", question: "Wer passt euren gemeinsamen Plan an, wenn sich die Lage ändert?" },
-      lower: { text: "Bei größeren Aufgaben klärt ihr {alle} in den beschriebenen Situationen eher nicht zuerst nächste Schritte.", question: "Wie viel gemeinsamer Plan ist nötig, bevor ihr startet?" },
+      upper: { text: "Bei größeren Aufgaben klärt ihr {alle} gern zuerst die nächsten Schritte und setzt euch Zwischenpunkte.", question: "Wer passt euren gemeinsamen Plan an, wenn sich die Lage ändert?" },
+      lower: { text: "Bei größeren Aufgaben fangt ihr {alle} eher einfach an, statt zuerst die nächsten Schritte festzulegen.", question: "Wie viel gemeinsamer Plan ist nötig, bevor ihr startet?" },
     },
-    differs: { text: "Bei größeren Vorhaben: Wenn eine Person zuerst nächste Schritte klärt und eine andere eher nicht, könntet ihr unterschiedlich viel gemeinsamen Plan erwarten, bevor ihr startet.", question: "Wie viel gemeinsamer Plan ist nötig, bevor ihr startet?" },
+    differs: {
+      summary: "Bei größeren Aufgaben würdet ihr teils unterschiedlich vorgehen: Mal will jemand von euch erst die Schritte klären, jemand anderes lieber einfach anfangen.",
+      text: "Bei größeren Vorhaben: Wenn jemand von euch zuerst die nächsten Schritte klärt und jemand anderes lieber einfach anfängt, könntet ihr unterschiedlich viel gemeinsamen Plan erwarten, bevor ihr startet.",
+      question: "Wie viel gemeinsamer Plan ist nötig, bevor ihr startet?",
+    },
+    card: { label: "Arbeit steuern", question: "Wie viel Plan brauchen wir, bevor wir loslegen – und wann passen wir ihn an?" },
   },
 };
 
+/** Die Gespraechskarte eines Bereichs (Etikett + Frage), fuer TeamWorkstyleReport. */
+export function teamCard(area: AreaKey) {
+  return TEAM_COPY[area].card;
+}
+
 /** ORG-Zweierwahlen haben eigene Hypothesen - Fokus, Unterbrechung und Planaenderung sind verschiedene Unteraspekte. */
-const ORG_ITEM_DIFFERS: Record<string, { text: string; question: string }> = {
-  "ORG-03": { text: "Bei konkurrierenden Aufgaben: Wenn eine Person mehrere Dinge parallel bewegt und eine andere sich lieber auf wenige konzentriert, könntet ihr unterschiedliche Erwartungen an Prioritäten und Reaktionszeiten haben.", question: "Woran erkennt ihr, was gerade Vorrang hat – und wann darf jemand unterbrochen werden?" },
-  "ORG-07": { text: "Bei neuen Anfragen während konzentrierter Arbeit: Wenn eine Person eher unterbricht und eine andere eher bei der laufenden Arbeit bleibt, könntet ihr unterschiedlich einschätzen, was sofort Aufmerksamkeit braucht.", question: "Was gilt bei euch als dringend genug, um laufende Arbeit zu unterbrechen?" },
-  "ORG-04": { text: "Wenn eine Aufgabe länger dauert als gedacht: Wenn eine Person sie zunächst wie geplant zu Ende bringt und eine andere den weiteren Plan früh anpasst, könntet ihr unterschiedlich einschätzen, wann der gemeinsame Plan neu sortiert wird.", question: "Wann sortiert ihr einen gemeinsamen Plan neu, wenn eine Aufgabe länger dauert – und wer bringt das ein?" },
-  "ORG-08": { text: "Bei kleineren Abweichungen vom Plan: Wenn eine Person den Plan schon früh anpasst und eine andere erst bei relevanten Abweichungen, könntet ihr unterschiedlich einschätzen, ab wann eine Änderung den gemeinsamen Plan betrifft.", question: "Ab welchem Punkt betrifft eine Abweichung euren gemeinsamen Plan – und wer bringt das ein?" },
+const ORG_ITEM_DIFFERS: Record<string, { text: string; question: string; summary: string }> = {
+  "ORG-03": { summary: "Wenn mehrere wichtige Aufgaben konkurrieren, würdet ihr unterschiedlich vorgehen: mehrere Dinge parallel bewegen oder sich auf wenige konzentrieren.", text: "Bei konkurrierenden Aufgaben: Wenn jemand von euch mehrere Dinge parallel bewegt und jemand anderes sich lieber auf wenige konzentriert, könntet ihr unterschiedliche Erwartungen an Prioritäten und Reaktionszeiten haben.", question: "Woran erkennt ihr, was gerade Vorrang hat – und wann darf jemand unterbrochen werden?" },
+  "ORG-07": { summary: "Wenn während konzentrierter Arbeit etwas Neues hereinkommt, würdet ihr unterschiedlich reagieren: gleich unterbrechen oder erst bei der laufenden Arbeit bleiben.", text: "Bei neuen Anfragen während konzentrierter Arbeit: Wenn jemand von euch eher unterbricht und jemand anderes eher bei der laufenden Arbeit bleibt, könntet ihr unterschiedlich einschätzen, was sofort Aufmerksamkeit braucht.", question: "Was gilt bei euch als dringend genug, um laufende Arbeit zu unterbrechen?" },
+  "ORG-04": { summary: "Wenn eine Aufgabe länger dauert als gedacht, würdet ihr unterschiedlich vorgehen: erst wie geplant zu Ende bringen oder den Plan früh anpassen.", text: "Wenn eine Aufgabe länger dauert als gedacht: Wenn jemand von euch sie zunächst wie geplant zu Ende bringt und jemand anderes den weiteren Plan früh anpasst, könntet ihr unterschiedlich einschätzen, wann der gemeinsame Plan neu sortiert wird.", question: "Wann sortiert ihr einen gemeinsamen Plan neu, wenn eine Aufgabe länger dauert – und wer bringt das ein?" },
+  "ORG-08": { summary: "Wenn kleinere Dinge anders laufen als geplant, würdet ihr den Plan unterschiedlich früh anpassen.", text: "Bei kleineren Abweichungen vom Plan: Wenn jemand von euch den Plan schon früh anpasst und jemand anderes erst bei relevanten Abweichungen, könntet ihr unterschiedlich einschätzen, ab wann eine Änderung den gemeinsamen Plan betrifft.", question: "Ab welchem Punkt betrifft eine Abweichung euren gemeinsamen Plan – und wer bringt das ein?" },
 };
 
 const BAND_ORDER = ["lower", "middle", "upper", "A", "B"];
@@ -476,7 +551,7 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
   }));
 
   if (shared.length < Math.min(3, items.length)) {
-    return { key: area, kind: "insufficient", claim: `${area}.TEAM.INSUFFICIENT`, summary: "Für diesen Bereich fehlen gemeinsame Antworten. Daraus wird nichts abgeleitet.", situations: [], hypothesis: null, question: null };
+    return { key: area, kind: "insufficient", claim: `${area}.TEAM.INSUFFICIENT`, summary: "Für diesen Bereich fehlen gemeinsame Antworten – daraus leiten wir nichts ab.", situations: [], hypothesis: null, question: null };
   }
   if (!different.length) {
     const directions = people.map((p) => personDirection(p.profile, area));
@@ -486,24 +561,23 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
       key: area,
       kind: "similar",
       claim: `${area}.TEAM.SIMILAR.${common ? common.toUpperCase() : "NO_DIRECTION"}`,
-      summary: "In den gemeinsam beantworteten Situationen antwortet ihr ähnlich. Das legt noch nicht fest, wie ihr im Alltag zusammen handelt.",
+      // Mit gemeinsamer Richtung sagt der Satz, welche; sonst nur "nah beieinander".
+      summary: note ? fill(note.text) : "In diesem Bereich liegt ihr nah beieinander. Das legt noch nicht fest, wie ihr im Alltag zusammen handelt.",
       situations: [],
-      hypothesis: note ? fill(note.text) : null,
+      hypothesis: null,
       question: note ? note.question : null,
     };
   }
-  const share =
-    different.length === 1
-      ? "In einer Situation antwortet ihr unterschiedlich, sonst ähnlich."
-      : different.length / shared.length >= 0.6
-        ? "In den meisten gemeinsam beantworteten Situationen antwortet ihr unterschiedlich."
-        : "Teils antwortet ihr ähnlich, teils unterschiedlich.";
   if (!opposite.length) {
+    // Nuancen nicht kuenstlich prominent: kein Gegensatz, nur kleine Unterschiede.
     return {
       key: area,
       kind: "nuance",
       claim: `${area}.TEAM.NUANCE`,
-      summary: `${share} Die Unterschiede liegen zwischen einer mittleren und einer klaren Antwort – eher Nuancen als Gegensätze.`,
+      summary:
+        different.length === 1
+          ? "Ihr liegt hier nah beieinander; nur in einer Situation antwortet ihr etwas unterschiedlich."
+          : "Ihr liegt hier überwiegend nah beieinander; kleine Unterschiede gibt es bei einzelnen Situationen.",
       situations,
       hypothesis: null,
       question: null,
@@ -518,7 +592,7 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
     key: area,
     kind: "opposite",
     claim: `${area}.TEAM.OPPOSITE${specificKey ? `.${specificKey}` : ""}`,
-    summary: `${share} In mindestens einer Situation liegen eure Antworten auf entgegengesetzten Seiten.`,
+    summary: differs.summary,
     situations,
     hypothesis: differs.text,
     question: differs.question,
