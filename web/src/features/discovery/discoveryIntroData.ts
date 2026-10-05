@@ -306,6 +306,34 @@ export async function getDiscoveryIntroRequestForProfile(
   return data ? mapIntroRow(data as unknown as DiscoveryIntroRequestRow) : null;
 }
 
+/**
+ * Phase 11: Die umgekehrte Richtung. Hat die Person, deren Profil ich ansehe,
+ * MIR schon eine Anfrage geschickt, biete ich keine zweite Anfrage an, sondern
+ * zeige ihre - beantwortet wird sie unter "Kennenlernen".
+ */
+export async function getIncomingDiscoveryIntroRequestFromUser(
+  userId: string,
+  requesterUserId: string
+): Promise<DiscoveryIntroRequest | null> {
+  const normalizedUserId = assertUserId(userId);
+  const normalizedRequester = assertUserId(requesterUserId);
+  if (normalizedRequester === normalizedUserId) return null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("discovery_intro_requests")
+    .select(DISCOVERY_INTRO_COLUMNS)
+    .eq("requester_user_id", normalizedRequester)
+    .eq("recipient_user_id", normalizedUserId)
+    .in("status", ["pending", "accepted"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    throw new Error(getErrorMessage(error, "discovery_intro_status_load_failed"));
+  }
+  return data ? mapIntroRow(data as unknown as DiscoveryIntroRequestRow) : null;
+}
+
 export async function requestDiscoveryIntro(params: {
   requesterUserId: string;
   recipientProfileId: string;

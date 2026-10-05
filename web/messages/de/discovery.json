@@ -1,9 +1,9 @@
 {
   "common": {
-    "brandEyebrow": "Founder Discovery",
+    "brandEyebrow": "FIND",
     "notProvided": "Noch nicht angegeben",
     "open": "Noch offen",
-    "backToDiscovery": "Zurück zu Co-Founder finden",
+    "backToDiscovery": "Zurück zu Menschen finden",
     "backToDashboard": "← Zurück zum Dashboard",
     "viewProfile": "Profil ansehen",
     "saveProfile": "Merken",
@@ -11,7 +11,7 @@
     "savedProfiles": "Gemerkt",
     "moreCount": "+{count}",
     "myIntros": "Kennenlernen",
-    "prepareSharedMatching": "Gemeinsam prüfen",
+    "prepareSharedMatching": "Gemeinsam weitergehen",
     "fillBaseQuestions": "Basis-Fragen ausfüllen"
   },
   "saved": {
@@ -232,8 +232,8 @@
     }
   },
   "v2": {
-    "title": "Co-Founder finden",
-    "subtitle": "Finde Founder, die zu dem passen, was du gerade suchst.",
+    "title": "Menschen finden",
+    "subtitle": "Nicht der perfekte Match – sondern Menschen, mit denen sich ein Gespräch lohnen könnte.",
     "editProfile": "Suchprofil bearbeiten",
     "modes": {
       "label": "Ansicht",
@@ -242,9 +242,9 @@
     },
     "explore": {
       "eyebrow": "Für dich",
-      "title": "Profile, die zu dir passen könnten",
+      "title": "Veröffentlichte Profile",
       "count": "{count, plural, =0 {Noch keine Profile} =1 {Ein veröffentlichtes Profil} other {# veröffentlichte Profile}}",
-      "emptyTitle": "Noch keine Profile für dich",
+      "emptyTitle": "Noch keine veröffentlichten Profile",
       "emptyText": "Sobald weitere Founder ihr Discovery-Profil veröffentlichen, erscheinen sie hier."
     },
     "search": {
@@ -386,7 +386,7 @@
       "brings": "Bringt mit",
       "seeks": "Sucht",
       "foundingFrame": "Gründungsrahmen",
-      "practicalMatches": "Passt zu deiner Suche",
+      "practicalMatches": "Entspricht deinen Kriterien",
       "alignmentMatches": "Freiwillig ähnliche Präferenzen in ausgewählten Bereichen",
       "alignmentSignals": "Alignment-Hinweise"
     },
@@ -440,8 +440,9 @@
       },
       "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
       "back": "Zurück zur Suche",
-      "themesHint": "Diese Angaben halten fest, wonach du gesucht hast. Ob eine Arbeitsweise passt, lässt sich erst sagen, wenn beide den Bogen ausgefüllt haben — benachrichtigt wird deshalb nach den Kriterien darüber."
-    }
+      "themesHint": "Frühere Arbeitsweise-Angaben aus einer älteren Fassung. Sie werden nicht mehr ausgewertet; benachrichtigt wird nur nach den Kriterien darüber."
+    },
+    "sortNote": "Zuletzt veröffentlichte Profile zuerst. Es gibt keine Rangfolge nach Passung und keinen Score."
   },
   "profile": {
     "title": "Dein FIND-Profil",
@@ -454,7 +455,8 @@
       "completionTitle": "Vollständigkeit",
       "completionCount": "{done} von {total} Angaben stehen",
       "completionDone": "Alles beisammen.",
-      "completionRemaining": "Es fehlt noch {count, plural, one {eine Angabe} other {# Angaben}}."
+      "completionRemaining": "Es fehlt noch {count, plural, one {eine Angabe} other {# Angaben}}.",
+      "openItemsTitle": "Was noch fehlt"
     },
     "intent": {
       "searchIntent": "Wie aktiv suchst du gerade?",
@@ -643,6 +645,20 @@
       "commitment": "Commitment-Level",
       "stages": "Venture Stages",
       "goals": "Venture Goals"
+    },
+    "visibility": {
+      "title": "Was andere in FIND zusätzlich sehen",
+      "photoOn": "Foto: für eingeloggte Mitglieder sichtbar.",
+      "photoOff": "Foto: nicht sichtbar – andere sehen deine Initialen.",
+      "capability": {
+        "private": "Fähigkeiten: privat – niemand sieht sie.",
+        "areas": "Fähigkeiten: die Bereiche sind sichtbar, nicht deine Erfahrung und nicht, was du übernehmen möchtest.",
+        "areas_depth_on_contact": "Fähigkeiten: die Bereiche sind sichtbar; Erfahrung und Verantwortungswunsch erst nach einem angenommenen Kennenlernen."
+      },
+      "workstyleOn": "Arbeitsweise: wenige beschreibende Hinweise – nur für Personen, die das ebenfalls erlaubt haben. Keine Antworten, kein Score.",
+      "workstyleOff": "Arbeitsweise: nicht freigegeben – niemand sieht Hinweise dazu.",
+      "never": "Nie sichtbar in FIND: deine private Suche, deine einzelnen Antworten, Team-, Advisor- und Forschungsdaten.",
+      "change": "Ändern"
     }
   },
   "intros": {
@@ -693,12 +709,12 @@
     "conversationError": "Das Gespräch konnte gerade nicht geöffnet werden. Versuch es bitte noch einmal."
   },
   "detail": {
-    "eyebrow": "Discovery-Profil",
+    "eyebrow": "FIND-Profil",
     "editOwn": "Mein Suchprofil bearbeiten",
     "shortBio": "Kurzbeschreibung",
     "searchProfile": "Suchprofil",
     "publishedTitle": "Was diese Person veröffentlicht hat",
-    "privacy": "Dieses Profil zeigt nur Angaben, die die Person bewusst für Discovery veröffentlicht hat. Private Suchprioritäten und Assessment-Antworten werden nicht angezeigt.",
+    "privacy": "Dieses Profil zeigt nur, was die Person für FIND veröffentlicht hat, sowie Fähigkeiten, Foto und Arbeitsweise-Hinweise nur, soweit sie das freigegeben hat. Private Suche, Antworten, Team- und Forschungsdaten werden nicht angezeigt.",
     "emptyTitle": "Profil nicht sichtbar",
     "emptyText": "Dieses Discovery-Profil ist aktuell nicht öffentlich sichtbar oder existiert nicht.",
     "alignment": {
@@ -709,16 +725,18 @@
       "preferenceDiffers": "Du hattest hier eine ähnliche Tendenz priorisiert. Eure Antworten liegen aktuell nicht in derselben groben Tendenz."
     },
     "details": {
-      "brings": "Bringt mit",
-      "seeks": "Sucht",
+      "brings": "Eigene Rollen",
+      "seeks": "Sucht jemanden für",
       "expertise": "Expertise",
       "industries": "Branchen / Interessen",
       "location": "Standort",
       "remoteMode": "Remote-Modus",
-      "availability": "Verfügbarkeit",
-      "commitment": "Commitment-Level",
-      "stage": "Venture Stage",
-      "goal": "Venture Goal"
+      "availability": "Zeit pro Woche",
+      "commitment": "Geplanter Einsatz",
+      "stage": "Stand des Vorhabens",
+      "goal": "Ziel des Vorhabens",
+      "searchIntent": "Wie konkret die Suche ist",
+      "startHorizon": "Möglicher Start"
     },
     "sections": {
       "interests": {
@@ -736,6 +754,14 @@
       "founding": {
         "eyebrow": "Arbeitsrahmen",
         "title": "Zeit, Tempo und Ziel"
+      },
+      "search": {
+        "eyebrow": "Suche & Vorhaben",
+        "title": "Sucht und möchte aufbauen"
+      },
+      "capability": {
+        "eyebrow": "Fähigkeiten & Verantwortung",
+        "title": "Was diese Person mitbringt und übernehmen möchte"
       }
     },
     "intro": {
@@ -746,8 +772,8 @@
       "messagePlaceholder": "Was macht das Profil für dich spannend?",
       "messageHelp": "Optional, maximal 600 Zeichen. Teile nur, was du bewusst senden möchtest.",
       "request": "Kennenlernen anfragen",
-      "acceptedTitle": "Ihr möchtet euch kennenlernen",
-      "acceptedText": "Wenn ihr beide möchtet, könnt ihr als Nächstes gemeinsam eure Erwartungen und Vorstellungen vergleichen.",
+      "acceptedTitle": "Ihr seid verbunden",
+      "acceptedText": "Ihr habt beide Interesse an einem Kennenlernen. Ihr könnt jetzt ein Gespräch beginnen. Wenn ihr gemeinsam weitergehen möchtet, öffnet ihr – nach Zustimmung von euch beiden – einen gemeinsamen Teambereich.",
       "declinedTitle": "Intro aktuell nicht angenommen",
       "declinedText": "Diese Person möchte das Intro aktuell nicht weiterverfolgen.",
       "canceledTitle": "Anfrage zurückgezogen",
@@ -756,18 +782,34 @@
       "pendingText": "Deine Anfrage wartet auf Antwort.",
       "responsePrefix": "Antwort:",
       "yourMessagePrefix": "Deine Nachricht:",
-      "cancel": "Anfrage zurückziehen"
+      "cancel": "Anfrage zurückziehen",
+      "incomingTitle": "{name} möchte dich kennenlernen",
+      "incomingText": "{name} hat dir bereits eine Anfrage geschickt. Du kannst sie unter „Kennenlernen“ annehmen oder ablehnen – eine eigene, zweite Anfrage ist nicht nötig.",
+      "incomingCta": "Anfrage beantworten",
+      "theirMessagePrefix": "Nachricht von {name}:"
+    },
+    "capability": {
+      "title": "Bereiche mit eigenen Angaben",
+      "note": "Eigene Angaben, keine geprüfte Kompetenz und keine vereinbarte Rolle. Wie viel Erfahrung jemand hat und was jemand übernehmen möchte, sieht man nur nach einem angenommenen Kennenlernen – und nur, wenn die Person das so eingestellt hat.",
+      "ownership": {
+        "own": "Möchte verantworten",
+        "contribute": "Möchte beitragen",
+        "grow_into": "Möchte hineinwachsen",
+        "prefer_other": "Lieber eine andere Person",
+        "prefer_external": "Extern denkbar",
+        "unclear": "Noch unklar"
+      }
     }
   },
   "matchingPreparation": {
     "feedback": {
-      "matchingStartRequested": "Gemeinsam prüfen angefragt.",
+      "matchingStartRequested": "Anfrage gesendet. Die andere Person muss noch zustimmen.",
       "notAuthenticated": "Bitte melde dich an, um gemeinsam weiterzumachen.",
       "preparationNotAllowed": "Ihr könnt diesen gemeinsamen Schritt aktuell nicht starten.",
       "preparationFailed": "Der gemeinsame Schritt konnte gerade nicht gestartet werden.",
-      "otherParticipantRequested": "Die andere Person hat ‚Gemeinsam prüfen‘ bereits angefragt. Du kannst jetzt zustimmen.",
-      "requestNotAllowed": "Du kannst ‚Gemeinsam prüfen‘ aktuell nicht anfragen.",
-      "requestFailed": "‚Gemeinsam prüfen‘ konnte gerade nicht angefragt werden.",
+      "otherParticipantRequested": "Die andere Person hat bereits angefragt. Du kannst jetzt zustimmen.",
+      "requestNotAllowed": "Du kannst „Gemeinsam weitergehen“ aktuell nicht anfragen.",
+      "requestFailed": "„Gemeinsam weitergehen“ konnte gerade nicht angefragt werden.",
       "selfConfirmationForbidden": "Die andere Person muss noch zustimmen.",
       "confirmationNotAllowed": "Du kannst diesem gemeinsamen Schritt aktuell nicht zustimmen.",
       "confirmationFailed": "Deine Zustimmung konnte gerade nicht gespeichert werden.",
@@ -787,15 +829,15 @@
     },
     "backToIntros": "Zurück zum Kennenlernen",
     "backToOpenRequests": "Zurück zu offenen Anfragen",
-    "eyebrow": "Gemeinsam prüfen",
-    "title": "Ihr möchtet euch kennenlernen",
-    "subtitle": "Wenn ihr beide möchtet, könnt ihr als Nächstes eure Erwartungen an Rollen, Commitment und Zusammenarbeit gemeinsam prüfen.",
-    "safetyNote": "Euer gemeinsamer Alignment-Blick wird erst vorbereitet, wenn ihr beide diesem Schritt zugestimmt habt.",
+    "eyebrow": "Gemeinsam weitergehen",
+    "title": "Ihr seid verbunden",
+    "subtitle": "Wenn ihr beide möchtet, öffnet ihr einen gemeinsamen Teambereich. Dort könnt ihr euer Zusammenspiel ansehen, eure Erwartungen an das Vorhaben klären und Absprachen festhalten.",
+    "safetyNote": "Der gemeinsame Teambereich entsteht erst, wenn ihr beide zugestimmt habt. Dabei werden keine Antworten freigegeben und keine Vereinbarungen getroffen.",
     "existingContextTitle": "Für euch gibt es bereits einen gemeinsamen Bereich",
     "existingContextText": "Ihr habt bereits einen gemeinsamen Kontext aus einer früheren Einladung. Diesen verwenden wir weiter; frühere Auswertungen bleiben erreichbar.",
     "profilesEyebrow": "Beteiligte Profile",
-    "profilesTitle": "Eure Discovery-Profile",
-    "profilesText": "Hier seht ihr die Angaben, die ihr bewusst über Discovery veröffentlicht habt. Private Suchprioritäten und Assessment-Antworten bleiben verborgen.",
+    "profilesTitle": "Eure FIND-Profile",
+    "profilesText": "Hier seht ihr die Angaben, die ihr bewusst in FIND veröffentlicht habt. Eure private Suche und eure Antworten bleiben verborgen.",
     "you": "Du",
     "counterpart": "Gegenüber",
     "profile": {
@@ -830,44 +872,52 @@
     },
     "states": {
       "canceledEyebrow": "Vorbereitung beendet",
-      "canceledTitle": "Gemeinsamen Vergleich beendet",
+      "canceledTitle": "Gemeinsamer Schritt beendet",
       "canceledText": "Dieser gemeinsame Schritt wurde beendet.",
       "readyEyebrow": "Bereit",
       "readyTitle": "Ihr habt beide zugestimmt",
-      "readyText": "Euer gemeinsamer Alignment-Blick kann jetzt vorbereitet werden.",
-      "readyFollowup": "CoFoundery prüft dabei, ob eure erforderlichen eigenen Angaben bereits vorhanden sind.",
-      "confirmationEyebrow": "Gemeinsam prüfen",
+      "readyText": "Ihr könnt jetzt euren gemeinsamen Teambereich öffnen.",
+      "readyFollowup": "Für „Euer Zusammenspiel“ braucht ihr beide ein aktuelles Arbeitsprofil und eine eigene Freigabe füreinander.",
+      "confirmationEyebrow": "Gemeinsam weitergehen",
       "confirmationRequestedTitle": "Warte auf {name}",
-      "confirmTitle": "{name} möchte gemeinsam prüfen",
-      "confirmationRequestedText": "{name} muss diesem gemeinsamen Schritt noch zustimmen.",
-      "confirmText": "Damit CoFoundery euren gemeinsamen Alignment-Blick vorbereitet, müsst ihr beide zustimmen.",
-      "startedEyebrow": "Gemeinsam prüfen",
-      "startedTitle": "Gemeinsam prüfen",
-      "startedText": "Mit deiner Anfrage stimmst du zu, euren gemeinsamen Alignment-Blick vorzubereiten. Die andere Person muss anschließend ebenfalls zustimmen.",
+      "confirmTitle": "{name} möchte gemeinsam weitergehen",
+      "confirmationRequestedText": "{name} muss noch zustimmen.",
+      "confirmText": "Wenn du zustimmst, könnt ihr euren gemeinsamen Teambereich öffnen.",
+      "startedEyebrow": "Gemeinsam weitergehen",
+      "startedTitle": "Gemeinsam weitergehen",
+      "startedText": "Mit deiner Anfrage stimmst du zu, gemeinsam weiterzugehen. Die andere Person muss ebenfalls zustimmen.",
       "nextStepEyebrow": "Nächster Schritt",
-      "startTitle": "Gemeinsam prüfen",
-      "startText": "Wenn ihr beide möchtet, könnt ihr als Nächstes gemeinsam eure Erwartungen und Vorstellungen vergleichen. Dafür müsst ihr beide zustimmen.",
+      "startTitle": "Gemeinsam weitergehen",
+      "startText": "Wenn ihr beide möchtet, öffnet ihr einen gemeinsamen Teambereich. Dafür müsst ihr beide zustimmen.",
       "alreadyConnectedTitle": "Das habt ihr schon",
-      "alreadyConnectedSubtext": "„Gemeinsam prüfen“ ist hier nicht der nächste Schritt – ihr seid diesen Weg schon gegangen.",
+      "alreadyConnectedSubtext": "„Gemeinsam weitergehen“ ist hier nicht der nächste Schritt – ihr habt schon einen gemeinsamen Bereich.",
       "alreadyConnectedText": "Macht in eurem gemeinsamen Bereich weiter. Wenn du dort etwas Neues vergleichen möchtest, findest du unter Verbindungen den Weg dorthin."
     },
     "steps": {
       "introAccepted": "Intro angenommen",
-      "preparationCreated": "Gemeinsam prüfen angefragt",
+      "preparationCreated": "Gemeinsam weitergehen angefragt",
       "bothConfirmed": "Ihr habt beide zugestimmt",
       "awaitingSecondConfirmation": "Die Zustimmung der anderen Person fehlt noch",
       "needsBothConfirmations": "Ihr müsst beide zustimmen",
-      "startFullMatching": "1. Ihr stimmt beide dem gemeinsamen Blick zu.",
-      "answerQuestions": "2. Falls nötig, vervollständigt ihr eure eigenen Angaben.",
-      "reportAndWorkbook": "3. Danach könnt ihr euer Alignment ansehen und bewusst entscheiden, ob ihr weiter zusammenarbeiten möchtet."
+      "startFullMatching": "1. Ihr stimmt beide zu, gemeinsam weiterzugehen.",
+      "answerQuestions": "2. Ihr öffnet euren gemeinsamen Teambereich.",
+      "reportAndWorkbook": "3. „Euer Zusammenspiel“ erscheint, sobald ihr beide euer aktuelles Arbeitsprofil füreinander freigegeben habt."
     },
     "actions": {
       "prepareSession": "Weiter zu euren Angaben",
       "waitingForConfirmation": "Warte auf Zustimmung",
-      "confirmMatching": "Zustimmen und gemeinsam prüfen",
-      "requestFullMatching": "Gemeinsam prüfen",
-      "startPreparation": "Gemeinsam prüfen",
+      "confirmMatching": "Zustimmen",
+      "requestFullMatching": "Gemeinsam weitergehen",
+      "startPreparation": "Gemeinsam weitergehen",
       "openExistingConnection": "Zu eurer Verbindung"
+    },
+    "team": {
+      "eyebrow": "Ihr habt beide zugestimmt",
+      "title": "Gemeinsam weiter mit {name}",
+      "text": "Öffnet euren gemeinsamen Teambereich. Dort findet ihr „Euer Zusammenspiel“, „Was ihr aufbauen wollt“ und Founder Setup. Für „Euer Zusammenspiel“ braucht ihr beide ein aktuelles Arbeitsprofil und eine eigene Freigabe füreinander.",
+      "boundary": "Dieser Schritt gibt weder Antworten noch Forschungsdaten frei und erzeugt keine Vereinbarung.",
+      "error": "Der Teambereich konnte nicht geöffnet werden. Bitte versuche es noch einmal.",
+      "open": "Teambereich öffnen"
     }
   },
   "commitmentLevelHints": {

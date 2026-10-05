@@ -73,11 +73,18 @@ test("Search empty state offers an explicit user-controlled reset", () => {
 test("profile detail uses editorial sections and moves the existing intro state above them", () => {
   const page = readFileSync("src/app/(product)/discovery/[profileId]/page.tsx", "utf8");
   const introIndex = page.indexOf("<IntroRequestCard");
-  const interestsIndex = page.indexOf('t("detail.sections.interests.title")');
-  assert.ok(introIndex > 0 && interestsIndex > introIndex);
-  assert.match(page, /detail\.sections\.brings\.title/);
-  assert.match(page, /detail\.sections\.seeks\.title/);
-  assert.match(page, /detail\.sections\.founding\.title/);
+  // Phase 11: Person -> Sucht -> Faehigkeiten & Verantwortung -> Arbeitsweise
+  // -> Warum ein Gespraech -> Frueh besprechen -> Intro.
+  const order = [
+    'detail.sections.search.title',
+    'detail.sections.capability.title',
+    '<DiscoveryWorkstyle',
+    'kind="why"',
+    'kind="discuss"',
+  ].map((marker) => page.indexOf(marker));
+  assert.ok(introIndex > 0 && order[0] > introIndex);
+  order.forEach((at, n) => assert.ok(at > (n ? order[n - 1] : 0), `Reihenfolge ${n}`));
+  assert.ok(page.lastIndexOf("<IntroRequestCard") > order.at(-1)!, "die Frage steht am Ende");
 });
 
 test("all Discovery routes use the founder access guard", () => {
@@ -91,6 +98,9 @@ test("all Discovery routes use the founder access guard", () => {
     "src/app/(product)/discovery/saved/page.tsx",
     "src/app/(product)/discovery/intros/page.tsx",
     "src/app/(product)/discovery/intros/[introRequestId]/matching/page.tsx",
+    // Phase 11: auch die private Suche und die gemerkten Suchen.
+    "src/app/(product)/discovery/suche/page.tsx",
+    "src/app/(product)/discovery/searches/page.tsx",
   ]) {
     const source = readFileSync(route, "utf8");
     assert.match(source, /hasFounderDiscoveryAccess/);
@@ -115,8 +125,9 @@ test("Discovery Slice 1 copy is parallel and removes the hardcoded Intros eyebro
   const en = JSON.parse(readFileSync("messages/en/discovery.json", "utf8"));
   assert.equal(de.v2.search.edit, "Suche bearbeiten");
   assert.equal(en.v2.search.edit, "Edit search");
-  assert.equal(de.v2.cards.practicalMatches, "Passt zu deiner Suche");
-  assert.equal(en.v2.cards.practicalMatches, "Matches your search");
+  // Phase 11: keine Passungssprache - es sind erfuellte Kriterien.
+  assert.equal(de.v2.cards.practicalMatches, "Entspricht deinen Kriterien");
+  assert.equal(en.v2.cards.practicalMatches, "Meets your criteria");
   const intros = readFileSync("src/app/(product)/discovery/intros/page.tsx", "utf8");
   assert.doesNotMatch(intros, />\s*Discovery Intros\s*</);
   assert.match(intros, /t\("intros\.eyebrow"\)/);

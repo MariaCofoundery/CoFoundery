@@ -37,7 +37,9 @@ test("Gemeinsam prüfen stürzt bei einem Datenbankfehler nicht ab", () => {
   // Jeder werfende Aufruf muss INNERHALB des try stehen.
   const tryStart = page.indexOf("try {");
   const catchEnd = page.indexOf("}", page.indexOf("} catch (error) {"));
-  for (const loader of ["getDiscoveryMatchingPreparation", "getMatchingSessionForDiscoveryStart"]) {
+  // Phase 11: Matching-Session und -Report werden hier nicht mehr geladen.
+  assert.doesNotMatch(page, /getMatchingSessionForDiscoveryStart|getMatchingReportRunForSession/);
+  for (const loader of ["getDiscoveryMatchingPreparation"]) {
     const at = page.indexOf(`await ${loader}(`);
     assert.ok(at > tryStart && at < catchEnd, `${loader} steht ausserhalb der Absicherung`);
   }

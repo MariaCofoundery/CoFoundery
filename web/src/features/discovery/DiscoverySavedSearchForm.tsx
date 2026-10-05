@@ -56,9 +56,6 @@ export async function DiscoverySavedSearchForm({
       : null,
   ].filter((line): line is string => line !== null);
 
-  const alignmentActive =
-    preferences.discoveryV2AlignmentEnabled && preferences.discoveryV2AlignmentDimensions.length > 0;
-
 
   return (
     <section className={className}>
@@ -90,12 +87,9 @@ export async function DiscoverySavedSearchForm({
           text={t("v2.watch.capabilitiesText")}
         />
 
-        {alignmentActive ? (
-          <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-            {t("v2.watch.alignmentNote")}
-          </p>
-        ) : null}
-
+        {/* Phase 11: Kein Hinweis mehr, dass fruehere Alignment-Dimensionen "in
+            der Liste wirken" - sie wirken nirgends mehr (Discovery-Auslieferung
+            seit Phase 9.1 stillgelegt). */}
         <div className="flex flex-wrap items-center gap-3">
           <input
             name="label"

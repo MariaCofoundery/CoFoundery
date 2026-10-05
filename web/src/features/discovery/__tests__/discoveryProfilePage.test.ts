@@ -172,7 +172,6 @@ test("locationLabel exists nowhere any more", () => {
     "src/features/discovery/discoveryConfig.ts",
     "src/features/discovery/discoveryIntroData.ts",
     "src/features/discovery/discoveryV2Search.ts",
-    "src/features/discovery/discoveryRecommendation.ts",
     "src/features/discovery/discoverySavedSearchMatching.ts",
     "src/features/matchingCore/matchingCoreData.ts",
   ];
@@ -210,14 +209,13 @@ test("the migration rescues the old values before dropping the column", () => {
 // ---------------------------------------------------------------------------
 // Bewegung mit Aufgabe, und abbestellbar
 // ---------------------------------------------------------------------------
-test("the completion meter counts the same eight things publishing requires", () => {
+test("no completeness percentage - only what concretely is still missing", () => {
+  // Phase 11: Kein Vollstaendigkeits-Balken, kein "x von y", keine Prozent.
+  // Die Person sieht nur, was konkret fehlt - und nur sie selbst.
   const page = codeOnly(PAGE);
-  // Kein zweites Mass: Der Balken zaehlt die Punkte, die auch die Liste
-  // darunter aufzaehlt - sonst stuenden zwei Wahrheiten auf einer Seite.
-  assert.match(page, /const total = DISCOVERY_PROFILE_PUBLISH_ISSUES\.length/);
-  assert.match(page, /const done = total - issues\.length/);
-  assert.match(page, /role="progressbar"/);
-  assert.match(page, /aria-valuenow=\{done\}/);
+  assert.doesNotMatch(page, /role="progressbar"|CompletionMeter|completionCount|percent/);
+  assert.match(page, /<OpenItems issues=\{issues\} t=\{t\} \/>/);
+  assert.match(page, /translatePublishIssue\(issue, t\)/);
 });
 
 /**
@@ -789,8 +787,8 @@ test("the question comes after the profile, the status before it", () => {
 
   // Die FRAGE "moechtest du diese Person kennenlernen" stand direkt unter dem
   // Kopf und verlangte eine Entscheidung, bevor irgendetwas gelesen war.
-  const question = page.indexOf("isOwner || introRequest ? null : (");
-  const content = page.indexOf("detail.sections.interests.eyebrow");
+  const question = page.indexOf("isOwner || introRequest || incomingRequest ? null : (");
+  const content = page.indexOf("detail.sections.search.eyebrow");
   assert.ok(question > -1 && content > -1);
   assert.ok(question > content, "die Frage steht hinter dem Inhalt");
 

@@ -245,8 +245,9 @@ test("matching preparation page no longer exposes the legacy free-text query cha
   const legacyStatusParameter = ["matching", "Ok"].join("");
   assert.equal(pageSource.includes(legacyMessageParameter), false);
   assert.equal(pageSource.includes(legacyStatusParameter), false);
-  assert.match(pageSource, /matchingSessionResult/);
-  assert.match(pageSource, /matchingSessionError/);
-  assert.match(pageSource, /matchingReportResult/);
-  assert.match(pageSource, /matchingReportError/);
+  // Phase 11: Die Session-/Report-Rueckmeldungen gehoeren nicht mehr zu dieser
+  // Seite (keine fruehere Matching-Session auf dem aktuellen FIND-Weg).
+  assert.doesNotMatch(pageSource, /matchingSessionResult|matchingSessionError|matchingReportResult|matchingReportError/);
+  assert.match(pageSource, /matchingStartResult/);
+  assert.match(pageSource, /matchingStartError/);
 });

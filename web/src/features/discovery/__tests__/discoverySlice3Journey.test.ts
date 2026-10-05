@@ -25,8 +25,9 @@ test("the founder journey uses one plain-language state map in German and Englis
   assert.equal(enDiscovery.intros.title, "Meet founders");
   assert.equal(deDiscovery.detail.intro.request, "Kennenlernen anfragen");
   assert.equal(enDiscovery.detail.intro.request, "Ask to connect");
-  assert.equal(deDiscovery.matchingPreparation.states.startTitle, "Gemeinsam prüfen");
-  assert.equal(enDiscovery.matchingPreparation.states.startTitle, "Explore together");
+  // Phase 11: Der zweite Schritt fuehrt in den Teambereich, nicht in einen Vergleich.
+  assert.equal(deDiscovery.matchingPreparation.states.startTitle, "Gemeinsam weitergehen");
+  assert.equal(enDiscovery.matchingPreparation.states.startTitle, "Continue together");
   assert.equal(
     deDiscovery.matchingPreparation.readiness.completeInputs,
     "Angaben vervollständigen"
@@ -65,16 +66,25 @@ test("the second consent creates no legacy matching session and leads into the c
   assert.match(matchingPage, /redirect\(`\/teams\/\$\{data\}\/workstyle`\)/);
 });
 
-test("missing inputs expose status only and the report boundary remains a user action", () => {
-  assert.match(matchingPage, /currentUserBaseMissing/);
-  assert.match(matchingPage, /counterpartBaseMissing/);
-  assert.match(matchingPage, /partnerInputsMissingTitle/);
-  assert.doesNotMatch(matchingPage, /answeredCount|answer_count|36 questions/);
-  assert.match(matchingPage, /action=\{createMatchingReport\}/);
-  assert.equal(
-    deDiscovery.matchingPreparation.readiness.partnerInputsMissingTitle,
-    "{name} vervollständigt noch den eigenen Teil"
+test("no legacy matching session or matching report on the current FIND path", () => {
+  // Phase 11: Die unerreichbare Readiness-/Report-Ansicht ist entfernt. Nach
+  // beidseitiger Zustimmung fuehrt die Seite nur noch in den aktuellen
+  // Teambereich; fruehere Reports bleiben ueber ihre eigenen Seiten lesbar.
+  const code = matchingPage.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  assert.doesNotMatch(
+    code,
+    /currentUserBaseMissing|createMatchingReport|createMatchingSession|getMatchingSessionForDiscoveryStart|getMatchingReportRunForSession|matchingCore/
   );
+  assert.doesNotMatch(matchingPage, /answeredCount|answer_count|36 questions/);
+  assert.match(matchingPage, /open_discovery_workstyle_team/);
+  assert.match(matchingPage, /t\("matchingPreparation\.team\.open"\)/);
+  assert.doesNotMatch(matchingPage, />\s*Euer Zusammenspiel öffnen\s*</, "keine hartkodierten Texte mehr");
+  for (const copy of [deDiscovery.matchingPreparation, enDiscovery.matchingPreparation]) {
+    const values = (o: unknown): string[] =>
+      typeof o === "string" ? [o] : o && typeof o === "object" ? Object.values(o).flatMap(values) : [];
+    const visible = values({ ...copy, readiness: undefined, feedback: undefined }).join(" ");
+    assert.doesNotMatch(visible, /Alignment|Workbook|Report/i);
+  }
 });
 
 test("starting collaboration remains a conscious non-evaluative boundary", () => {
@@ -110,12 +120,6 @@ test("introductions and connections have distinct visible roles", () => {
 
 test("the relevant actions retain mobile-safe wrapping and one primary action per state", () => {
   assert.match(matchingPage, /flex flex-wrap gap-3/);
-  assert.equal(
-    deDiscovery.matchingPreparation.actions.confirmMatching,
-    "Zustimmen und gemeinsam prüfen"
-  );
-  assert.equal(
-    enDiscovery.matchingPreparation.actions.confirmMatching,
-    "Consent and explore together"
-  );
+  assert.equal(deDiscovery.matchingPreparation.actions.confirmMatching, "Zustimmen");
+  assert.equal(enDiscovery.matchingPreparation.actions.confirmMatching, "Agree");
 });

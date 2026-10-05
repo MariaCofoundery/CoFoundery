@@ -12,6 +12,7 @@ import { DISCOVERY_SELECTION_LIMITS } from "@/features/discovery/discoveryConfig
 import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
 
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 
 /**
  * Deine Suche — der private Teil von FIND.
@@ -64,6 +65,8 @@ export default async function SearchPreferencesPage({
   const t = await getTranslations("find.search");
   const tDiscovery = await getTranslations("discovery");
   const supabase = await createClient();
+  // Phase 11: Dieselbe Founder-Pruefung wie auf allen anderen FIND-Seiten.
+  if (!(await hasFounderDiscoveryAccess(auth.user.id, supabase))) redirect("/advisor/dashboard");
 
   // Dieselbe Aktion wie vorher auf der Ergebnisseite - nur landet man danach
   // wieder hier und nicht bei den Treffern: Diese Seite legt fest, sie sucht

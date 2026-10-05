@@ -1,7 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 
 import { judgeAll, type ThemeDistance, type ThemePreference } from "@/features/find/discoveryMatch";
 import { DISCOVERY_THEMES } from "@/features/find/discoveryThemes";
@@ -72,55 +70,6 @@ test("Weg 3: beide haben etwas festgelegt — dieselbe Rechnung, zweimal", () =>
   assert.equal(ihrs.verdict, "worth_a_look", "gleiche Antworten sind keine Ergänzung");
 });
 
-test("nichts sagt, ob die andere Person etwas festgelegt hat", () => {
-  // „X hat für die eigene Suche noch keine Matching-Präferenzen festgelegt"
-  // stünde in Abschnitt 13 der Spec. Maria am 30.09.2026: „das sollte nicht
-  // erkennbar sein."
-  //
-  // Der Grund ist nicht Zurückhaltung, sondern Genauigkeit: Was für die eine
-  // Person gut ist, ist es für die andere nicht - und ob jemand seine Suche
-  // festgelegt hat, ist eine Auskunft über ihn, die er nicht gegeben hat.
-  const daten = readFileSync(join("src", "features", "find", "matchData.ts"), "utf8");
-  assert.ok(!/otherHasPreferences/.test(daten));
-  assert.ok(!/hasPreferences/.test(daten));
-
-  // Herausgegeben werden Urteile, nie Richtungen oder Gewichte der anderen
-  // Person: Aus `mutualStrongPoints` kommen nur Themenkennungen.
-  assert.match(daten, /mutualStrongPoints: string\[\]/);
-  assert.match(daten, /\.map\(\(theme\) => theme\.themeId\)/);
-});
-
-test("die fremde Suche erreicht nur den Server", () => {
-  const daten = readFileSync(join("src", "features", "find", "matchData.ts"), "utf8");
-  const migration = readFileSync(
-    join("..", "supabase", "migrations", "20261086120000_discovery_theme_distances.sql"),
-    "utf8",
-  );
-
-  // Eine Funktion, die die angemeldete Person aufrufen darf, darf ihr Browser
-  // aufrufen - dort liegt dieselbe Sitzung und derselbe öffentliche Schlüssel.
-  assert.match(
-    migration,
-    /revoke all on function public\.discovery_preferences_for_match\(uuid, uuid\)\s*\n\s*from public, anon, authenticated;/,
-  );
-  assert.match(
-    migration,
-    /grant execute on function public\.discovery_preferences_for_match\(uuid, uuid\) to service_role;/,
-  );
-
-  // Und sie wird auch nur so aufgerufen.
-  assert.match(daten, /SUPABASE_SERVICE_ROLE_KEY/);
-  assert.match(daten, /discovery_preferences_for_match/);
-
-  // Ohne Dienstschlüssel gibt es keine gegenseitigen Punkte - und keinen
-  // Umweg über die Sitzung der Person.
-  assert.match(daten, /if \(!url \|\| !serviceRoleKey\) return \[\];/);
-});
-
-test("dasselbe Urteil für beide Richtungen", () => {
-  // Der Wunsch der anderen Person wird mit `judgeAll` beurteilt und nicht mit
-  // einer zweiten Regel - sonst wäre das die Stelle, an der beide Seiten
-  // auseinanderlaufen.
-  const daten = readFileSync(join("src", "features", "find", "matchData.ts"), "utf8");
-  assert.match(daten, /const incoming = judgeAll\(fremde, distances\);/);
-});
+// Phase 11: Die Tests zu matchData.ts sind mit dem Modul entfallen. Es war ohne
+// Importe und las fremde Suchpraeferenzen ueber den Service-Role-Schluessel
+// (discovery_preferences_for_match) - ein Weg, den FIND nicht mehr hat.

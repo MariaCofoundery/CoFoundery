@@ -24,7 +24,6 @@ import {
 import { DiscoveryAvailabilityField } from "@/features/discovery/DiscoveryAvailabilityField";
 import { DiscoveryChoiceField } from "@/features/discovery/DiscoveryChoiceField";
 import { DiscoveryRoleField } from "@/features/discovery/DiscoveryRoleField";
-import { DISCOVERY_PROFILE_PUBLISH_ISSUES } from "@/features/discovery/discoveryProfileFeedback";
 import {
   resolveDiscoveryProfileDraftFeedback,
   resolveDiscoveryProfilePauseFeedback,
@@ -218,47 +217,32 @@ function PageMessage({
   );
 }
 
-function CompletionMeter({
+/**
+ * Phase 11: Kein Vollstaendigkeits-Balken und keine "x von y" mehr - FIND soll
+ * keine Profilqualitaet in Prozent ausdruecken. Stattdessen nur, was konkret
+ * noch fehlt, und nur fuer die Person selbst.
+ */
+function OpenItems({
   issues,
   t,
 }: {
   issues: DiscoveryProfilePublishIssue[];
   t: DiscoveryT;
 }) {
-  const total = DISCOVERY_PROFILE_PUBLISH_ISSUES.length;
-  const done = total - issues.length;
-  const percent = Math.round((done / total) * 100);
-
   return (
     <div className="mt-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-          {t("profile.status.completionTitle")}
-        </p>
-        <p className="text-sm font-semibold text-slate-900">
-          {t("profile.status.completionCount", { done, total })}
-        </p>
-      </div>
-      <div
-        className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200/80"
-        role="progressbar"
-        aria-valuenow={done}
-        aria-valuemin={0}
-        aria-valuemax={total}
-        aria-label={t("profile.status.completionTitle")}
-      >
-        <div
-          className={`discovery-meter-fill h-full rounded-full ${
-            issues.length === 0 ? "bg-emerald-500" : "bg-[color:var(--brand-primary)]"
-          }`}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-      <p className="mt-2 text-xs leading-5 text-slate-500">
-        {issues.length === 0
-          ? t("profile.status.completionDone")
-          : t("profile.status.completionRemaining", { count: issues.length })}
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        {t("profile.status.openItemsTitle")}
       </p>
+      {issues.length === 0 ? (
+        <p className="mt-2 text-sm leading-6 text-slate-700">{t("profile.status.completionDone")}</p>
+      ) : (
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700">
+          {issues.map((issue) => (
+            <li key={issue}>{translatePublishIssue(issue, t)}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -320,7 +304,7 @@ function StatusCard({
           {t(`status.${status}`)}
         </span>
       </div>
-      {status !== "active" || issues.length > 0 ? <CompletionMeter issues={issues} t={t} /> : null}
+      {status !== "active" || issues.length > 0 ? <OpenItems issues={issues} t={t} /> : null}
     </section>
   );
 }
@@ -373,10 +357,22 @@ export default async function DiscoveryProfilePage({
   // eigenen Tendenzen zu den sechs alten Kategorien. Das Formular gibt es
   // nicht mehr (FIND-Spec, Abschnitt 20), und Abfragen fuer etwas, das
   // niemand mehr anzeigt, sind Abfragen zu viel.
-  const [loadedProfile, core] = await Promise.all([
+  // Phase 11: Dazu die drei Freigaben, die bestimmen, was andere in FIND
+  // ZUSAETZLICH sehen (Foto, Faehigkeiten, Arbeitsweise-Hinweise). Nur gelesen.
+  const [loadedProfile, core, disclosureRow, workstyleRow] = await Promise.all([
     getOwnDiscoveryProfile(user.id),
     getPersonCore(supabase, user.id),
+    supabase.from("person_core").select("capability_disclosure").eq("user_id", user.id).maybeSingle(),
+    supabase
+      .from("founder_search_preferences")
+      .select("workstyle_discovery_enabled,workstyle_discovery_consent_version")
+      .eq("user_id", user.id)
+      .maybeSingle(),
   ]);
+  const capabilityDisclosure = (disclosureRow.data?.capability_disclosure as string | undefined) ?? "private";
+  const workstyleShared =
+    workstyleRow.data?.workstyle_discovery_enabled === true &&
+    workstyleRow.data?.workstyle_discovery_consent_version === "workstyle_discovery_v1";
   const params = await searchParams;
   const publishFeedback = resolveDiscoveryProfilePublishFeedback({
     result: searchParamValue(params.publishResult),
@@ -1009,6 +1005,28 @@ export default async function DiscoveryProfilePage({
               <p className="mt-3 text-xs leading-5 text-slate-500">
                 {t("profile.preview.privacy")}
               </p>
+            </section>
+
+            {/* Das sehen andere in FIND ausserdem - je nach eigener Freigabe. */}
+            <section className={CARD_CLASS} aria-labelledby="find-visibility-title">
+              <h2 id="find-visibility-title" className="text-lg font-semibold text-slate-950">
+                {t("profile.visibility.title")}
+              </h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                <li>
+                  {t(core?.photo_visible_to_members ? "profile.visibility.photoOn" : "profile.visibility.photoOff")}{" "}
+                  <Link href="/profile" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
+                </li>
+                <li>
+                  {t(`profile.visibility.capability.${["areas", "areas_depth_on_contact"].includes(capabilityDisclosure) ? capabilityDisclosure : "private"}`)}{" "}
+                  <Link href="/profile" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
+                </li>
+                <li>
+                  {t(workstyleShared ? "profile.visibility.workstyleOn" : "profile.visibility.workstyleOff")}{" "}
+                  <Link href="/discovery/suche#workstyle" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
+                </li>
+              </ul>
+              <p className="mt-4 text-xs leading-5 text-slate-500">{t("profile.visibility.never")}</p>
             </section>
 
           </aside>

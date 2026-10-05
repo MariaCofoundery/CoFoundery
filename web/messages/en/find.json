@@ -136,5 +136,30 @@
     "revoke": "Withdraw FIND permission",
     "enable": "Allow FIND use",
     "profile": "View my working style"
+  },
+  "conversation": {
+    "whyTitle": "Why a conversation could be interesting",
+    "whyIntro": "Based on what you both published or shared with you. This is not a rating of how well you fit together.",
+    "whyEmpty": "The published information does not show a concrete starting point yet. That says nothing about the person.",
+    "cardWhyLead": "A conversation could be interesting because …",
+    "discussTitle": "Worth discussing early",
+    "discussIntro": "Points worth clarifying early – not a prediction and not an exclusion criterion.",
+    "discussEmpty": "The published information shows no particular point to clarify. Basics such as roles, time and expectations are still worth discussing early.",
+    "why": {
+      "roleSoughtByThem": "{name} is looking for someone in {roles} – you listed that as your role.",
+      "roleSoughtByYou": "You are looking for {roles} – {name} lists that as their own role.",
+      "capabilityInYourSearch": "{name} has entries in areas you are searching for: {areas}.",
+      "ownershipYouHandOver": "{name} would like to own {areas} – you would rather hand that over or source it externally.",
+      "sharedIndustry": "You are both interested in {industries}."
+    },
+    "discuss": {
+      "sameOwnRole": "You both list {roles} as your own role. Talk early about who wants to own which part.",
+      "bothWantToOwn": "You both want to own {areas}. Talk about who really wants to take on this area.",
+      "searchIntentDiffers": "You are searching with different urgency – you: “{you}”, {name}: “{them}”. Clarify early how committed you both are right now.",
+      "startHorizonDiffers": "You plan different starting points – you: “{you}”, {name}: “{them}”. Clarify early when you want to begin.",
+      "availabilityDiffers": "You plan different amounts of time – you: {you} h/week, {name}: {them} h/week. Worth clarifying early.",
+      "remoteModeDiffers": "You prefer different ways of working on site – you: “{you}”, {name}: “{them}”. Clarify early how you want to work together.",
+      "workstyleDiscussionPoint": "In “{area}” you set different priorities in comparable situations. Talk about when which approach helps."
+    }
   }
 }

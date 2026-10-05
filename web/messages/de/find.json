@@ -136,5 +136,30 @@
     "revoke": "FIND-Freigabe widerrufen",
     "enable": "FIND-Nutzung erlauben",
     "profile": "Meine Arbeitsweise ansehen"
+  },
+  "conversation": {
+    "whyTitle": "Warum ein Gespräch interessant sein könnte",
+    "whyIntro": "Aus den Angaben, die ihr beide veröffentlicht oder für dich freigegeben habt. Das ist keine Bewertung, wie gut ihr zusammenpasst.",
+    "whyEmpty": "Aus den veröffentlichten Angaben ergibt sich hier noch kein konkreter Anknüpfungspunkt. Das sagt nichts über die Person.",
+    "cardWhyLead": "Ein Gespräch könnte interessant sein, weil …",
+    "discussTitle": "Das solltet ihr früh besprechen",
+    "discussIntro": "Punkte, die sich früh zu klären lohnen – keine Prognose, kein Ausschlusskriterium.",
+    "discussEmpty": "Aus den veröffentlichten Angaben ergibt sich hier kein besonderer Klärungspunkt. Grundlagen wie Rollen, Zeit und Erwartungen lohnen sich trotzdem früh zu besprechen.",
+    "why": {
+      "roleSoughtByThem": "{name} sucht jemanden für {roles} – das hast du als deine Rolle angegeben.",
+      "roleSoughtByYou": "Du suchst {roles} – {name} gibt das als eigene Rolle an.",
+      "capabilityInYourSearch": "{name} hat Angaben zu Bereichen gemacht, nach denen du suchst: {areas}.",
+      "ownershipYouHandOver": "{name} möchte {areas} verantworten – du möchtest das lieber abgeben oder extern lösen.",
+      "sharedIndustry": "Ihr interessiert euch beide für {industries}."
+    },
+    "discuss": {
+      "sameOwnRole": "Ihr gebt beide {roles} als eigene Rolle an. Sprecht früh darüber, wer welchen Teil verantworten möchte.",
+      "bothWantToOwn": "Ihr möchtet beide {areas} verantworten. Sprecht darüber, wer diesen Bereich wirklich übernehmen möchte.",
+      "searchIntentDiffers": "Ihr sucht unterschiedlich konkret – du: „{you}“, {name}: „{them}“. Klärt früh, wie verbindlich ihr gerade sucht.",
+      "startHorizonDiffers": "Ihr plant unterschiedliche Starts – du: „{you}“, {name}: „{them}“. Klärt früh, wann ihr anfangen wollt.",
+      "availabilityDiffers": "Ihr plant unterschiedlich viel Zeit ein – du: {you} Std./Woche, {name}: {them} Std./Woche. Das lohnt sich früh zu klären.",
+      "remoteModeDiffers": "Ihr arbeitet unterschiedlich gern vor Ort – du: „{you}“, {name}: „{them}“. Klärt früh, wie ihr zusammenarbeiten wollt.",
+      "workstyleDiscussionPoint": "Bei „{area}“ setzt ihr in vergleichbaren Situationen unterschiedliche Schwerpunkte. Sprecht darüber, wann welches Vorgehen hilfreich ist."
+    }
   }
 }

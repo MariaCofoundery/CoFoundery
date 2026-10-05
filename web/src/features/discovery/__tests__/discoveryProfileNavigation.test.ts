@@ -23,6 +23,7 @@ test("own Discovery profile returns to the canonical Discovery entry", () => {
 });
 
 test("Discovery back navigation uses clear parallel DE and EN copy", () => {
-  assert.equal(deMessages.common.backToDiscovery, "Zurück zu Co-Founder finden");
-  assert.equal(enMessages.common.backToDiscovery, "Back to Find a Co-Founder");
+  // Phase 11: FIND heisst auf der Seite "Menschen finden".
+  assert.equal(deMessages.common.backToDiscovery, "Zurück zu Menschen finden");
+  assert.equal(enMessages.common.backToDiscovery, "Back to Find people");
 });

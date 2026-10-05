@@ -4,7 +4,16 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { DisclosedCapability } from "@/features/capability/DisclosedCapability";
 import { getDisclosedCapability } from "@/features/capability/capabilityData";
-import { getActiveDiscoveryProfileById } from "@/features/discovery/discoveryData";
+import {
+  getActiveDiscoveryProfileById,
+  getOwnDiscoveryProfile,
+  getOwnSearchPreferences,
+} from "@/features/discovery/discoveryData";
+import { discoveryRoleLabels } from "@/features/discovery/discoveryPresentation";
+import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
+import { getDiscoveryWorkstyleSignals } from "@/features/find/workstyleSignalData";
+import { conversationPoints } from "@/features/find/conversationPrompts";
+import { ConversationPoints } from "@/features/find/ConversationPoints";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
 import { getOwnSavedDiscoveryProfileIds } from "@/features/discovery/discoverySavesData";
@@ -12,7 +21,10 @@ import {
   cancelDiscoveryIntroAction,
   requestDiscoveryIntroAction,
 } from "@/features/discovery/discoveryIntroActions";
-import { getDiscoveryIntroRequestForProfile } from "@/features/discovery/discoveryIntroData";
+import {
+  getDiscoveryIntroRequestForProfile,
+  getIncomingDiscoveryIntroRequestFromUser,
+} from "@/features/discovery/discoveryIntroData";
 import {
   resolveDiscoveryIntroFeedback,
   type DiscoveryIntroActionState,
@@ -21,7 +33,7 @@ import {
   canCancelDiscoveryIntro,
   type DiscoveryIntroRequest,
 } from "@/features/discovery/discoveryIntroTypes";
-import type { DiscoveryFounderRole, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
+import type { FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -45,12 +57,6 @@ type DiscoveryProfileDetailSearchParams = {
   introMessage?: string | string[];
   introOk?: string | string[];
 };
-
-function formatRoleList(values: DiscoveryFounderRole[], t: DiscoveryT) {
-  return values.length > 0
-    ? values.map((value) => t(`roles.${value}`)).join(", ")
-    : t("common.notProvided");
-}
 
 function formatText(value: string | null | undefined, t: DiscoveryT) {
   const normalized = value?.trim();
@@ -287,6 +293,39 @@ function IntroRequestCard({
   );
 }
 
+function IncomingIntroCard({ request, name, t }: { request: DiscoveryIntroRequest; name: string; t: DiscoveryT }) {
+  const accepted = request.status === "accepted";
+  return (
+    <section className={CARD_CLASS}>
+      <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${accepted ? "text-emerald-700" : "text-amber-700"}`}>
+        {t(accepted ? "introStatus.accepted" : "introStatus.pending")}
+      </p>
+      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+        {accepted ? t("detail.intro.acceptedTitle") : t("detail.intro.incomingTitle", { name })}
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        {accepted ? t("detail.intro.acceptedText") : t("detail.intro.incomingText", { name })}
+      </p>
+      {request.message ? (
+        <p className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+          {t("detail.intro.theirMessagePrefix", { name })} {request.message}
+        </p>
+      ) : null}
+      <div className="mt-5 flex flex-wrap gap-3">
+        {accepted ? (
+          <Link href={`/discovery/intros/${request.id}/matching`} className={PRIMARY_CTA_CLASS}>
+            {t("common.prepareSharedMatching")}
+          </Link>
+        ) : (
+          <Link href="/discovery/intros" className={PRIMARY_CTA_CLASS}>
+            {t("detail.intro.incomingCta")}
+          </Link>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default async function DiscoveryProfileDetailPage({
   params,
   searchParams,
@@ -319,40 +358,57 @@ export default async function DiscoveryProfileDetailPage({
   const memberPhoto = (await getMemberPhotos(supabase, [profile.userId])).get(profile.userId);
 
   const isOwner = profile.userId === user.id;
-  // `getDiscoveryV2AlignmentContextForCandidate` faellt hier weg: Die alten
-  // Alignment-Dimensionen stehen nicht mehr auf dieser Seite, und eine
-  // Abfrage fuer etwas, das niemand mehr anzeigt, ist eine Abfrage zu viel.
-  const [introRequest, savedProfileIds] = isOwner
-    ? [null, new Set<string>()]
+  // Beide Richtungen: meine Anfrage an diese Person - oder ihre an mich. Gibt
+  // es ihre schon, biete ich keine zweite an (Phase 11).
+  const [introRequest, incomingRequest, savedProfileIds] = isOwner
+    ? [null, null, new Set<string>()]
     : await Promise.all([
         getDiscoveryIntroRequestForProfile(user.id, profile.id),
+        getIncomingDiscoveryIntroRequestFromUser(user.id, profile.userId),
         getOwnSavedDiscoveryProfileIds(user.id),
       ]);
-  // ---------------------------------------------------------------------------
-  // WARUM KOENNTE DAS INTERESSANT SEIN?
-  // ---------------------------------------------------------------------------
-  //
-  // Auf dem Profil ALLE Punkte - wer hier ist, hat sich fuer diese Person
-  // entschieden und will lesen. Auf der Ergebniskarte sind es hoechstens zwei.
   // Die Bedingungen prueft get_disclosed_capability; hier wird nur nicht
   // gefragt, wenn es das eigene Profil ist.
   const disclosedCapability = isOwner
     ? []
     : await getDisclosedCapability(supabase, profile.userId, "discovery");
+  // Fuer "Warum ein Gespraech" / "Frueh besprechen": nur eigene Angaben der
+  // betrachtenden Person (privat, nur ihr selbst gezeigt) und das, was die
+  // andere Person veroeffentlicht bzw. freigegeben hat. Kein Score.
+  const [ownProfile, ownSearch, ownCapability, workstyleSignals] = isOwner
+    ? [null, null, [], []]
+    : await Promise.all([
+        getOwnDiscoveryProfile(user.id).catch(() => null),
+        getOwnSearchPreferences(user.id).catch(() => null),
+        getOwnCapabilityEntries(supabase, user.id),
+        getDiscoveryWorkstyleSignals(supabase, profile.userId),
+      ]);
+  const points = conversationPoints({
+    viewer: ownProfile,
+    candidate: profile,
+    viewerSearchAreas: ownSearch?.mustHaves.requiredCapabilityAreasAny ?? [],
+    viewerCapability: ownCapability,
+    candidateCapability: disclosedCapability,
+    workstyleSignals,
+  });
   const capabilityT = await getTranslations("capability");
   const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
   const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
+  const name = formatText(profile.displayName, t);
+  const seekingRoles = discoveryRoleLabels(profile.seekingRoles, profile.seekingRoleOther, (role) => t(`roles.${role}`));
+  const ownRoles = discoveryRoleLabels(profile.ownRoles, profile.ownRoleOther, (role) => t(`roles.${role}`));
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+        {/* 1. PERSON - wer ist das? */}
         <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
           <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
             {t("common.backToDiscovery")}
           </Link>
           <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 {t("detail.eyebrow")}
               </p>
@@ -365,23 +421,16 @@ export default async function DiscoveryProfileDetailPage({
                 className="mt-4 h-20 w-20 rounded-full object-cover"
                 fallbackClassName="mt-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-950 text-lg font-semibold text-white"
               />
-              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-                {formatText(profile.displayName, t)}
+              <h1 className="mt-3 break-words text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
+                {name}
               </h1>
               <p className="mt-3 max-w-3xl text-xl font-semibold leading-8 text-slate-900">
                 {formatText(profile.headline, t)}
               </p>
+              {profile.bio.trim() ? (
+                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-7 text-slate-700">{profile.bio}</p>
+              ) : null}
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
-                {profile.searchIntent ? (
-                  <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">
-                    {t(`searchIntents.${profile.searchIntent}.short`)}
-                  </span>
-                ) : null}
-                {profile.startHorizon ? (
-                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                    {t(`startHorizons.${profile.startHorizon}.short`)}
-                  </span>
-                ) : null}
                 {profile.locationRegion ? (
                   <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
                     {profile.locationRegion}
@@ -390,36 +439,7 @@ export default async function DiscoveryProfileDetailPage({
                 <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
                   {t(`remoteModes.${profile.remoteMode}`)}
                 </span>
-                {profile.availabilityHoursPerWeek ? (
-                  <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                    {t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek })}
-                  </span>
-                ) : null}
-                {profile.availabilityFlexibility ? (
-                  <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-violet-900">
-                    {t(
-                      `profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`
-                    )}
-                  </span>
-                ) : null}
               </div>
-              {/* Die Bedingung steht nur hier, nicht auf der Karte: Sie ist
-                  ein Satz, ueber den man redet - kein Merkmal zum Ueberfliegen. */}
-              {profile.availabilityCondition ? (
-                <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {profile.availabilityCondition}
-                </p>
-              ) : null}
-              {/* Der letzte Schritt steht nur hier, nicht auf der Karte: Er
-                  ist ein Satz zum Lesen, kein Merkmal zum Ueberfliegen. */}
-              {profile.recentStep ? (
-                <div className="mt-4 rounded-2xl border-l-[3px] border-violet-400 bg-white px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    {t("profile.venture.recentStepTitle")}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-700">{profile.recentStep}</p>
-                </div>
-              ) : null}
             </div>
             {isOwner ? (
               <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
@@ -448,95 +468,109 @@ export default async function DiscoveryProfileDetailPage({
             t={t}
           />
         )}
+        {!isOwner && !introRequest && incomingRequest ? (
+          <IncomingIntroCard request={incomingRequest} name={name} t={t} />
+        ) : null}
 
-        <section className={CARD_CLASS}>
+        {/* 2. SUCHT / MOECHTE AUFBAUEN */}
+        <section className={CARD_CLASS} aria-labelledby="find-detail-search">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("detail.sections.interests.eyebrow")}
+            {t("detail.sections.search.eyebrow")}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            {t("detail.sections.interests.title")}
+          <h2 id="find-detail-search" className="mt-2 text-2xl font-semibold text-slate-950">
+            {t("detail.sections.search.title")}
           </h2>
-          {profile.bio.trim() ? (
-            <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{profile.bio}</p>
-          ) : null}
           <dl className="mt-5 grid gap-3 md:grid-cols-2">
+            {profile.searchIntent ? (
+              <DetailItem label={t("detail.details.searchIntent")} value={t(`searchIntents.${profile.searchIntent}.short`)} />
+            ) : null}
+            {profile.startHorizon ? (
+              <DetailItem label={t("detail.details.startHorizon")} value={t(`startHorizons.${profile.startHorizon}.long`)} />
+            ) : null}
+            <DetailItem label={t("detail.details.seeks")} value={seekingRoles.length > 0 ? seekingRoles.join(", ") : t("common.notProvided")} />
+            <DetailItem label={t("detail.details.stage")} value={t(`ventureStages.${profile.ventureStage}`)} />
+            <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
+            <DetailItem label={t("detail.details.commitment")} value={t(`commitmentLevels.${profile.commitmentLevel}`)} />
+            {profile.availabilityHoursPerWeek ? (
+              <DetailItem
+                label={t("detail.details.availability")}
+                value={[
+                  t("profile.preview.hoursPerWeek", { hours: profile.availabilityHoursPerWeek }),
+                  profile.availabilityFlexibility
+                    ? t(`profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`)
+                    : null,
+                ].filter(Boolean).join(" · ")}
+              />
+            ) : null}
             {profile.industries.length > 0 ? (
               <DetailItem label={t("detail.details.industries")} value={formatIndustries(profile.industries, t)} />
             ) : null}
-            <DetailItem label={t("detail.details.stage")} value={t(`ventureStages.${profile.ventureStage}`)} />
           </dl>
+          {/* Die Bedingung steht nur hier, nicht auf der Karte: Sie ist ein
+              Satz, ueber den man redet - kein Merkmal zum Ueberfliegen. */}
+          {profile.availabilityCondition ? (
+            <p className="mt-3 text-sm leading-6 text-slate-600">{profile.availabilityCondition}</p>
+          ) : null}
+          {profile.recentStep ? (
+            <div className="mt-4 rounded-2xl border-l-[3px] border-violet-400 bg-white px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                {t("profile.venture.recentStepTitle")}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-700">{profile.recentStep}</p>
+            </div>
+          ) : null}
         </section>
 
-        <div className="grid gap-5 lg:grid-cols-2">
-          <section className={CARD_CLASS}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              {t("detail.sections.brings.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.brings.title")}</h2>
-            <dl className="mt-5 grid gap-3">
-              <DetailItem label={t("detail.details.brings")} value={formatRoleList(profile.ownRoles, t)} />
-              {profile.expertise.length > 0 ? (
-                <DetailItem label={t("detail.details.expertise")} value={formatIndustries(profile.expertise, t)} />
-              ) : null}
-            </dl>
-          </section>
-
-          <section className={CARD_CLASS}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              {t("detail.sections.seeks.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.seeks.title")}</h2>
-            <dl className="mt-5 grid gap-3">
-              <DetailItem label={t("detail.details.seeks")} value={formatRoleList(profile.seekingRoles, t)} />
-            </dl>
-          </section>
-        </div>
-
-        <section className={CARD_CLASS}>
+        {/* 3. FAEHIGKEITEN & VERANTWORTUNG - Rolle, Erfahrung und
+            Verantwortungswunsch bleiben getrennt; eine Angabe ist keine
+            vereinbarte Rolle. */}
+        <section className={CARD_CLASS} aria-labelledby="find-detail-capability">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("detail.sections.founding.eyebrow")}
+            {t("detail.sections.capability.eyebrow")}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("detail.sections.founding.title")}</h2>
+          <h2 id="find-detail-capability" className="mt-2 text-2xl font-semibold text-slate-950">
+            {t("detail.sections.capability.title")}
+          </h2>
           <dl className="mt-5 grid gap-3 md:grid-cols-2">
-            <DetailItem label={t("detail.details.commitment")} value={t(`commitmentLevels.${profile.commitmentLevel}`)} />
-            <DetailItem label={t("detail.details.goal")} value={t(`ventureGoals.${profile.ventureGoal}`)} />
+            <DetailItem label={t("detail.details.brings")} value={ownRoles.length > 0 ? ownRoles.join(", ") : t("common.notProvided")} />
+            {profile.expertise.length > 0 ? (
+              <DetailItem label={t("detail.details.expertise")} value={formatIndustries(profile.expertise, t)} />
+            ) : null}
           </dl>
+          <DisclosedCapability
+            rows={disclosedCapability}
+            copy={{
+              title: t("detail.capability.title"),
+              familyLabel: (familyId) => capabilityT(`families.${familyId}`),
+              areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
+              levelLabel: (level) => capabilityT(`levels.${level}`),
+              ownershipLabel: (wish) => t(`detail.capability.ownership.${wish}`),
+            }}
+          />
+          {disclosedCapability.length > 0 ? (
+            <p className="mt-3 text-xs leading-5 text-slate-500">{t("detail.capability.note")}</p>
+          ) : null}
         </section>
 
-        {/* ---------------------------------------------------------------
-            WARUM KOENNTE DAS INTERESSANT SEIN?
-            ---------------------------------------------------------------
-
-            Hier standen bis zum 30.09.2026 die sechs alten
-            Alignment-Dimensionen: Unternehmenslogik, Entscheidungslogik,
-            Arbeitsstruktur, Commitment, Risikoorientierung, Konfliktstil -
-            mit "dieselbe grobe Tendenz" daneben. Diese Kategorien stammen aus
-            einer aelteren Architektur und vermischen venturebezogene Themen
-            mit portablen Arbeitspraeferenzen; die FIND-Spec streicht sie in
-            Abschnitt 20 ausdruecklich.
-
-            AUF DEM PROFIL ALLE PUNKTE, AUF DER KARTE ZWEI. Wer hier ist, hat
-            sich fuer diese Person entschieden und will lesen. */}
+        {/* 4. WIE SIE ARBEITET - nur das Discovery-Signal, nur bei
+            beidseitigem Opt-in (get_discovery_workstyle_signals). */}
         {!isOwner ? (
           <section className={CARD_CLASS}>
-            <DiscoveryWorkstyle candidateId={profile.userId} />
+            <DiscoveryWorkstyle candidateId={profile.userId} signals={workstyleSignals} />
           </section>
         ) : null}
 
-        <DisclosedCapability
-          rows={disclosedCapability}
-          copy={{
-            title: capabilityT("foreign.title"),
-            familyLabel: (familyId) => capabilityT(`families.${familyId}`),
-            areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
-            levelLabel: (level) => capabilityT(`levels.${level}`),
-            ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
-          }}
-        />
+        {/* 5./6. WARUM EIN GESPRAECH - UND WAS FRUEH ZU KLAEREN IST.
+            Einzelne Angaben nebeneinander, keine Gesamtwertung, keine Zahl. */}
+        {!isOwner ? (
+          <>
+            <ConversationPoints points={points.why} kind="why" candidateName={name} />
+            <ConversationPoints points={points.discuss} kind="discuss" candidateName={name} />
+          </>
+        ) : null}
 
-        {/* Die Frage am Ende: Vorher stand sie direkt unter dem Kopf und
-            fragte nach einer Entscheidung, bevor irgendetwas gelesen war. */}
-        {isOwner || introRequest ? null : (
+        {/* 7. INTRO - die Frage am Ende: erst lesen, dann entscheiden. */}
+        {isOwner || introRequest || incomingRequest ? null : (
           <IntroRequestCard
             profile={profile}
             introRequest={introRequest}

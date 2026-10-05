@@ -282,12 +282,14 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t(mode === "explore" ? "v2.explore.eyebrow" : "v2.results.eyebrow")}</p>
             <h2 className="mt-2 text-2xl font-semibold">{t(mode === "explore" ? "v2.explore.title" : "v2.results.title")}</h2>
             <p className="mt-2 text-sm text-slate-600">{t(mode === "explore" ? "v2.explore.count" : "v2.results.count", { count: result.totalCount })}</p>
+            {/* Phase 11: Die Reihenfolge offen sagen - es gibt keine Passung als Sortierung. */}
+            <p className="mt-1 text-xs leading-5 text-slate-500">{t("v2.sortNote")}</p>
           </div>
         </section>
 
         {(mode === "explore" || isActive) && result.candidates.length > 0 ? (
           <div className="grid gap-5 lg:grid-cols-2">
-            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} />)}
+            {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} viewer={profile} />)}
           </div>
         ) : (
           <section className={CARD_CLASS}>

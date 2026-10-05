@@ -3,9 +3,18 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getDiscoveryWorkstyleSignals } from "./workstyleSignalData";
 
-export async function DiscoveryWorkstyle({ candidateId, compact = false }: { candidateId: string; compact?: boolean }) {
+export async function DiscoveryWorkstyle({
+  candidateId,
+  compact = false,
+  signals: preloaded,
+}: {
+  candidateId: string;
+  compact?: boolean;
+  /** Bereits geladene Signale (Detailseite), sonst wird hier geladen. */
+  signals?: Awaited<ReturnType<typeof getDiscoveryWorkstyleSignals>>;
+}) {
   const t = await getTranslations("find.workstyle");
-  const signals = await getDiscoveryWorkstyleSignals(await createClient(), candidateId);
+  const signals = preloaded ?? (await getDiscoveryWorkstyleSignals(await createClient(), candidateId));
   const visible = signals.filter(s => s.pattern !== "INSUFFICIENT_DATA");
   if (!visible.length && compact) return null;
   return <section className="mt-4 rounded-2xl border border-slate-200 p-4">

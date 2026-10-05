@@ -1,9 +1,9 @@
 {
   "common": {
-    "brandEyebrow": "Founder Discovery",
+    "brandEyebrow": "FIND",
     "notProvided": "Not provided yet",
     "open": "Still open",
-    "backToDiscovery": "Back to Find a Co-Founder",
+    "backToDiscovery": "Back to Find people",
     "backToDashboard": "← Back to dashboard",
     "viewProfile": "View profile",
     "saveProfile": "Save",
@@ -11,7 +11,7 @@
     "savedProfiles": "Saved",
     "moreCount": "+{count}",
     "myIntros": "Meet founders",
-    "prepareSharedMatching": "Explore together",
+    "prepareSharedMatching": "Continue together",
     "fillBaseQuestions": "Answer the foundation questions"
   },
   "saved": {
@@ -232,8 +232,8 @@
     }
   },
   "v2": {
-    "title": "Find a co-founder",
-    "subtitle": "Find founders who fit what you are looking for right now.",
+    "title": "Find people",
+    "subtitle": "Not the perfect match – people with whom a conversation could be worthwhile.",
     "editProfile": "Edit search profile",
     "modes": {
       "label": "View",
@@ -242,9 +242,9 @@
     },
     "explore": {
       "eyebrow": "For you",
-      "title": "Profiles that could fit you",
+      "title": "Published profiles",
       "count": "{count, plural, =0 {No profiles yet} =1 {One published profile} other {# published profiles}}",
-      "emptyTitle": "No profiles for you yet",
+      "emptyTitle": "No published profiles yet",
       "emptyText": "Founders will appear here once they publish their Discovery profiles."
     },
     "search": {
@@ -386,7 +386,7 @@
       "brings": "Brings",
       "seeks": "Looking for",
       "foundingFrame": "Founding setup",
-      "practicalMatches": "Matches your search",
+      "practicalMatches": "Meets your criteria",
       "alignmentMatches": "Voluntarily shared similar preferences in selected areas",
       "alignmentSignals": "Alignment cues"
     },
@@ -440,8 +440,9 @@
       },
       "error": "That did not work. Please try again.",
       "back": "Back to search",
-      "themesHint": "These record what you were looking for. Whether a way of working fits can only be said once both have filled in the questionnaire — notifications therefore follow the criteria above."
-    }
+      "themesHint": "Earlier work-style entries from an older version. They are no longer evaluated; notifications only use the criteria above."
+    },
+    "sortNote": "Most recently published profiles first. There is no ranking by fit and no score."
   },
   "profile": {
     "title": "Your FIND profile",
@@ -454,7 +455,8 @@
       "completionTitle": "Completeness",
       "completionCount": "{done} of {total} entries are in",
       "completionDone": "Everything is there.",
-      "completionRemaining": "{count, plural, one {One entry is} other {# entries are}} still missing."
+      "completionRemaining": "{count, plural, one {One entry is} other {# entries are}} still missing.",
+      "openItemsTitle": "Still missing"
     },
     "intent": {
       "searchIntent": "How actively are you searching right now?",
@@ -643,6 +645,20 @@
       "commitment": "Commitment level",
       "stages": "Venture stages",
       "goals": "Venture goals"
+    },
+    "visibility": {
+      "title": "What others additionally see in FIND",
+      "photoOn": "Photo: visible to signed-in members.",
+      "photoOff": "Photo: not visible – others see your initials.",
+      "capability": {
+        "private": "Skills: private – nobody sees them.",
+        "areas": "Skills: the areas are visible, not your experience and not what you would like to take on.",
+        "areas_depth_on_contact": "Skills: the areas are visible; experience and ownership wishes only after an accepted introduction."
+      },
+      "workstyleOn": "Work style: a few descriptive hints – only for people who allowed this too. No answers, no score.",
+      "workstyleOff": "Work style: not shared – nobody sees hints about it.",
+      "never": "Never visible in FIND: your private search, your individual answers, team, advisor and research data.",
+      "change": "Change"
     }
   },
   "intros": {
@@ -693,12 +709,12 @@
     "conversationError": "The conversation couldn't be opened just now. Please try again."
   },
   "detail": {
-    "eyebrow": "Discovery profile",
+    "eyebrow": "FIND profile",
     "editOwn": "Edit my search profile",
     "shortBio": "Short description",
     "searchProfile": "Search profile",
     "publishedTitle": "What this person published",
-    "privacy": "This profile only shows details the person intentionally published for Discovery. Private search priorities and assessment answers are not shown.",
+    "privacy": "This profile only shows what the person published for FIND, plus skills, photo and work-style hints only as far as they shared them. Private search, answers, team and research data are not shown.",
     "emptyTitle": "Profile not visible",
     "emptyText": "This Discovery profile is currently not publicly visible or does not exist.",
     "alignment": {
@@ -709,16 +725,18 @@
       "preferenceDiffers": "You prioritized a similar tendency here. Your responses currently do not fall within the same broad tendency."
     },
     "details": {
-      "brings": "Brings",
-      "seeks": "Looking for",
+      "brings": "Own roles",
+      "seeks": "Looking for someone in",
       "expertise": "Expertise",
       "industries": "Industries / interests",
       "location": "Location",
       "remoteMode": "Remote mode",
-      "availability": "Availability",
-      "commitment": "Commitment level",
-      "stage": "Venture stage",
-      "goal": "Venture goal"
+      "availability": "Time per week",
+      "commitment": "Planned commitment",
+      "stage": "Venture status",
+      "goal": "Venture goal",
+      "searchIntent": "How concrete the search is",
+      "startHorizon": "Possible start"
     },
     "sections": {
       "interests": {
@@ -736,6 +754,14 @@
       "founding": {
         "eyebrow": "Working setup",
         "title": "Time, pace and goal"
+      },
+      "search": {
+        "eyebrow": "Search & venture",
+        "title": "Looking for and wants to build"
+      },
+      "capability": {
+        "eyebrow": "Skills & responsibility",
+        "title": "What this person brings and would like to take on"
       }
     },
     "intro": {
@@ -746,8 +772,8 @@
       "messagePlaceholder": "What makes this profile interesting to you?",
       "messageHelp": "Optional, maximum 600 characters. Share only what you intentionally want to send.",
       "request": "Ask to connect",
-      "acceptedTitle": "You would like to get to know each other",
-      "acceptedText": "If you both want to, you can next compare your expectations and perspectives together.",
+      "acceptedTitle": "You are connected",
+      "acceptedText": "You are both interested in meeting. You can now start a conversation. If you want to continue together, you open a shared team space – once you have both agreed.",
       "declinedTitle": "Intro not accepted right now",
       "declinedText": "This person does not want to continue with the intro right now.",
       "canceledTitle": "Request withdrawn",
@@ -756,18 +782,34 @@
       "pendingText": "Your request is waiting for a response.",
       "responsePrefix": "Response:",
       "yourMessagePrefix": "Your message:",
-      "cancel": "Withdraw request"
+      "cancel": "Withdraw request",
+      "incomingTitle": "{name} would like to meet you",
+      "incomingText": "{name} has already sent you a request. You can accept or decline it under “Introductions” – no second request of your own is needed.",
+      "incomingCta": "Respond to request",
+      "theirMessagePrefix": "Message from {name}:"
+    },
+    "capability": {
+      "title": "Areas with own entries",
+      "note": "Self-reported entries, not verified competence and not an agreed role. How much experience someone has and what they would like to take on is only visible after an accepted introduction – and only if the person chose that setting.",
+      "ownership": {
+        "own": "Wants to own",
+        "contribute": "Wants to contribute",
+        "grow_into": "Wants to grow into",
+        "prefer_other": "Prefers someone else",
+        "prefer_external": "External is an option",
+        "unclear": "Not clear yet"
+      }
     }
   },
   "matchingPreparation": {
     "feedback": {
-      "matchingStartRequested": "Explore together requested.",
+      "matchingStartRequested": "Request sent. The other person still needs to agree.",
       "notAuthenticated": "Please sign in to continue together.",
       "preparationNotAllowed": "You cannot start this shared step right now.",
       "preparationFailed": "The shared step could not be started right now.",
-      "otherParticipantRequested": "The other person has already asked to explore together. You can consent now.",
-      "requestNotAllowed": "You cannot ask to explore together right now.",
-      "requestFailed": "The request to explore together could not be sent right now.",
+      "otherParticipantRequested": "The other person has already asked. You can agree now.",
+      "requestNotAllowed": "You cannot request “Continue together” right now.",
+      "requestFailed": "“Continue together” could not be requested just now.",
       "selfConfirmationForbidden": "The other person still needs to consent.",
       "confirmationNotAllowed": "You cannot consent to this shared step right now.",
       "confirmationFailed": "Your consent could not be saved right now.",
@@ -787,15 +829,15 @@
     },
     "backToIntros": "Back to introductions",
     "backToOpenRequests": "Back to open requests",
-    "eyebrow": "Explore together",
-    "title": "You would like to get to know each other",
-    "subtitle": "If you both want to, you can next explore your expectations around roles, commitment and collaboration together.",
-    "safetyNote": "Your shared Alignment view is prepared only after both of you consent to this step.",
+    "eyebrow": "Continue together",
+    "title": "You are connected",
+    "subtitle": "If you both want to, you open a shared team space. There you can look at how you work together, clarify your expectations for the venture and record agreements.",
+    "safetyNote": "The shared team space is only created once you have both agreed. No answers are shared and no agreements are made in this step.",
     "existingContextTitle": "You already have a shared area",
-    "existingContextText": "You already share a context from an earlier invitation. We reuse it; earlier reports remain accessible.",
+    "existingContextText": "You already share a context from an earlier invitation. We reuse it; earlier evaluations remain accessible.",
     "profilesEyebrow": "Involved profiles",
-    "profilesTitle": "Your Discovery profiles",
-    "profilesText": "These are the details you intentionally published through Discovery. Private search priorities and assessment answers stay hidden.",
+    "profilesTitle": "Your FIND profiles",
+    "profilesText": "These are the details you deliberately published in FIND. Your private search and your answers stay hidden.",
     "you": "You",
     "counterpart": "Counterpart",
     "profile": {
@@ -830,44 +872,52 @@
     },
     "states": {
       "canceledEyebrow": "Preparation ended",
-      "canceledTitle": "Shared comparison ended",
+      "canceledTitle": "Shared step ended",
       "canceledText": "This shared step was ended.",
       "readyEyebrow": "Ready",
-      "readyTitle": "You both consented",
-      "readyText": "Your shared Alignment view can now be prepared.",
-      "readyFollowup": "Cofoundery checks whether your required personal details are already available.",
-      "confirmationEyebrow": "Explore together",
+      "readyTitle": "You have both agreed",
+      "readyText": "You can now open your shared team space.",
+      "readyFollowup": "For “How you work together” you both need a current work profile and your own sharing with each other.",
+      "confirmationEyebrow": "Continue together",
       "confirmationRequestedTitle": "Waiting for {name}",
-      "confirmTitle": "{name} would like to explore together",
-      "confirmationRequestedText": "{name} still needs to consent to this shared step.",
-      "confirmText": "Both of you need to consent before Cofoundery prepares your shared Alignment view.",
-      "startedEyebrow": "Explore together",
-      "startedTitle": "Explore together",
-      "startedText": "By making this request, you consent to preparing your shared Alignment view. The other person then needs to consent as well.",
+      "confirmTitle": "{name} would like to continue together",
+      "confirmationRequestedText": "{name} still needs to agree.",
+      "confirmText": "If you agree, you can open your shared team space.",
+      "startedEyebrow": "Continue together",
+      "startedTitle": "Continue together",
+      "startedText": "With your request you agree to continue together. The other person needs to agree as well.",
       "nextStepEyebrow": "Next step",
-      "startTitle": "Explore together",
-      "startText": "If you both want to, you can next compare your expectations and perspectives together. Both of you need to consent.",
+      "startTitle": "Continue together",
+      "startText": "If you both want to, you open a shared team space. You both need to agree.",
       "alreadyConnectedTitle": "You already did this",
-      "alreadyConnectedSubtext": "“Check together” is not the next step here – you have already been down this road.",
+      "alreadyConnectedSubtext": "“Continue together” is not the next step here – you already have a shared space.",
       "alreadyConnectedText": "Carry on in your shared area. If you want to compare something new there, you'll find the way in under Connections."
     },
     "steps": {
       "introAccepted": "Intro accepted",
-      "preparationCreated": "Explore together requested",
+      "preparationCreated": "Continue together requested",
       "bothConfirmed": "You both consented",
       "awaitingSecondConfirmation": "The other person's consent is still missing",
       "needsBothConfirmations": "Both of you need to consent",
-      "startFullMatching": "1. You both consent to the shared view.",
-      "answerQuestions": "2. If needed, you complete your own details.",
-      "reportAndWorkbook": "3. You can then view your Alignment and consciously decide whether to continue working together."
+      "startFullMatching": "1. You both agree to continue together.",
+      "answerQuestions": "2. You open your shared team space.",
+      "reportAndWorkbook": "3. “How you work together” appears once you have both shared your current work profile with each other."
     },
     "actions": {
       "prepareSession": "Continue to your details",
       "waitingForConfirmation": "Waiting for consent",
-      "confirmMatching": "Consent and explore together",
-      "requestFullMatching": "Explore together",
-      "startPreparation": "Explore together",
+      "confirmMatching": "Agree",
+      "requestFullMatching": "Continue together",
+      "startPreparation": "Continue together",
       "openExistingConnection": "Go to your connection"
+    },
+    "team": {
+      "eyebrow": "You have both agreed",
+      "title": "Continue together with {name}",
+      "text": "Open your shared team space. There you find “How you work together”, “What you want to build” and Founder Setup. For “How you work together” you both need a current work profile and your own sharing with each other.",
+      "boundary": "This step shares neither answers nor research data and creates no agreement.",
+      "error": "The team space could not be opened. Please try again.",
+      "open": "Open team space"
     }
   },
   "commitmentLevelHints": {

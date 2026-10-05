@@ -1,5 +1,4 @@
 import { currentTeamForPeople } from "@/features/teams/currentJourneyData";
-import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -19,19 +18,6 @@ import type {
   DiscoveryFounderRole,
   DiscoveryProfilePreview,
 } from "@/features/discovery/discoveryTypes";
-import { createMatchingSessionFromDiscoveryStartAction } from "@/features/matchingCore/matchingCoreActions";
-import { getMatchingSessionForDiscoveryStart } from "@/features/matchingCore/matchingCoreData";
-import { createMatchingReportRunFromSessionAction } from "@/features/matchingCore/matchingCoreReportActions";
-import { getMatchingReportRunForSession } from "@/features/matchingCore/matchingCoreReportData";
-import type { MatchingReportRunSummary } from "@/features/matchingCore/matchingCoreReportTypes";
-import {
-  resolveMatchingReportFeedback,
-  resolveMatchingSessionFeedback,
-  selectMatchingPreparationFeedback,
-  type MatchingReportCreationResult,
-  type MatchingSessionPreparationResult,
-} from "@/features/matchingCore/matchingSessionReportFeedback";
-import type { MatchingSessionSummary } from "@/features/matchingCore/matchingCoreTypes";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD_CLASS =
@@ -51,46 +37,12 @@ type MatchingPreparationSearchParams = {
   matchingStartResult?: string | string[];
   matchingStartError?: string | string[];
   currentTeamError?: string | string[];
-  matchingSessionResult?: string | string[];
-  matchingSessionError?: string | string[];
-  matchingReportResult?: string | string[];
-  matchingReportError?: string | string[];
 };
 
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
 function searchParamValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function matchingSessionResultUrl(
-  introRequestId: string,
-  result: MatchingSessionPreparationResult
-) {
-  const params = new URLSearchParams();
-
-  if (result.ok) {
-    params.set("matchingSessionResult", result.reason);
-  } else {
-    params.set("matchingSessionError", result.reason);
-  }
-
-  return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
-}
-
-function matchingReportResultUrl(
-  introRequestId: string,
-  result: MatchingReportCreationResult
-) {
-  const params = new URLSearchParams();
-
-  if (result.ok) {
-    params.set("matchingReportResult", result.reason);
-  } else {
-    params.set("matchingReportError", result.reason);
-  }
-
-  return `/discovery/intros/${introRequestId}/matching?${params.toString()}`;
 }
 
 function matchingStartResultUrl(
@@ -167,106 +119,6 @@ function ProfileCard({
   );
 }
 
-function MatchingSessionReadinessCard({
-  summary,
-  currentUserId,
-  reportRun,
-  counterpartName,
-  t,
-}: {
-  summary: MatchingSessionSummary;
-  currentUserId: string;
-  reportRun: MatchingReportRunSummary | null;
-  counterpartName: string;
-  t: DiscoveryT;
-}) {
-  const currentUserReadiness = summary.participants.find(
-    (participant) => participant.userId === currentUserId
-  );
-  const currentUserBaseMissing = currentUserReadiness?.baseInputStatus === "missing";
-  const counterpartReadiness = summary.participants.find(
-    (participant) => participant.userId !== currentUserId
-  );
-  const counterpartBaseMissing = counterpartReadiness?.baseInputStatus === "missing";
-  const isReadyForReport = summary.session.status === "ready_for_report";
-  const isReportReady = summary.session.status === "report_ready" || Boolean(reportRun);
-
-  return (
-    <>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-        {t("matchingPreparation.readiness.eyebrow")}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-        {isReportReady || isReadyForReport
-          ? t("matchingPreparation.readiness.alignmentReadyTitle")
-          : currentUserBaseMissing
-            ? t("matchingPreparation.readiness.ownInputsMissingTitle")
-            : counterpartBaseMissing
-              ? t("matchingPreparation.readiness.partnerInputsMissingTitle", {
-                  name: counterpartName,
-                })
-              : t("matchingPreparation.readiness.title")}
-      </h2>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-        {t("matchingPreparation.readiness.text")}
-      </p>
-      <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
-        {t("matchingPreparation.readiness.statusPrefix")}{" "}
-        {isReportReady
-          ? t("matchingPreparation.readiness.reportReady")
-          : isReadyForReport
-            ? t("matchingPreparation.readiness.readyForReport")
-            : t("matchingPreparation.readiness.waitingForAnswers")}
-      </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-2">
-        {summary.participants.map((participant) => (
-          <article key={participant.userId} className="rounded-3xl border border-slate-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              {participant.userId === currentUserId
-                ? t("matchingPreparation.you")
-                : t("matchingPreparation.counterpart")}
-            </p>
-            <h3 className="mt-2 text-lg font-semibold text-slate-950">
-              {participant.profile?.displayName ?? t("matchingPreparation.readiness.profileHidden")}
-            </h3>
-            {participant.profile?.headline ? (
-              <p className="mt-1 text-sm leading-6 text-slate-600">{participant.profile.headline}</p>
-            ) : null}
-            <p
-              className={`mt-4 rounded-full px-3 py-2 text-sm font-semibold ${
-                participant.baseInputStatus === "present"
-                  ? "bg-emerald-50 text-emerald-800"
-                  : "bg-amber-50 text-amber-800"
-              }`}
-            >
-              {participant.baseInputStatus === "present"
-                ? t("matchingPreparation.readiness.basePresent")
-                : t("matchingPreparation.readiness.baseMissing")}
-            </p>
-          </article>
-        ))}
-      </div>
-      <div className="mt-6 flex flex-wrap gap-3">
-        {currentUserBaseMissing ? (
-          <Link href={CURRENT_WORKSTYLE_HREF} className={PRIMARY_CTA_CLASS}>
-            {t("matchingPreparation.readiness.completeInputs")}
-          </Link>
-        ) : null}
-        {isReportReady ? (
-          <Link href={`/matching/${summary.session.id}/report`} className={PRIMARY_CTA_CLASS}>
-            {t("matchingPreparation.readiness.viewAlignment")}
-          </Link>
-        ) : null}
-        {isReadyForReport && !isReportReady ? (
-          <p className="w-full max-w-3xl text-sm leading-6 text-slate-600">
-            {t("matchingPreparation.readiness.createReportHint")}
-          </p>
-        ) : null}
-      </div>
-    </>
-  );
-}
-
 function UnavailableState({ t }: { t: DiscoveryT }) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
@@ -315,16 +167,12 @@ function MatchingStartStatusContent({
   introRequestId,
   matchingStart,
   currentUserId,
-  matchingSession,
-  reportRun,
   counterpartName,
   t,
 }: {
   introRequestId: string;
   matchingStart: DiscoveryMatchingStart;
   currentUserId: string;
-  matchingSession: MatchingSessionSummary | null;
-  reportRun: MatchingReportRunSummary | null;
   counterpartName: string;
   t: DiscoveryT;
 }) {
@@ -343,33 +191,6 @@ function MatchingStartStatusContent({
     redirect(matchingStartResultUrl(introRequestId, result));
   }
 
-  async function createMatchingSession() {
-    "use server";
-    const result = await createMatchingSessionFromDiscoveryStartAction(introRequestId, matchingStart.id);
-    redirect(matchingSessionResultUrl(introRequestId, result));
-  }
-
-  async function createMatchingReport() {
-    "use server";
-    if (!matchingSession) {
-      redirect(
-        matchingReportResultUrl(
-          introRequestId,
-          {
-            ok: false,
-            reason: "report_unavailable",
-          }
-        )
-      );
-    }
-
-    const result = await createMatchingReportRunFromSessionAction(matchingSession.session.id);
-    if (result.ok && result.reportHref) {
-      redirect(result.reportHref);
-    }
-    redirect(matchingReportResultUrl(introRequestId, result));
-  }
-
   if (matchingStart.status === "canceled") {
     return (
       <>
@@ -382,66 +203,6 @@ function MatchingStartStatusContent({
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
           {t("matchingPreparation.states.canceledText")}
         </p>
-      </>
-    );
-  }
-
-  if (matchingStart.status === "ready_for_matching") {
-    if (matchingSession) {
-      return (
-        <>
-          <MatchingSessionReadinessCard
-            summary={matchingSession}
-            currentUserId={currentUserId}
-            reportRun={reportRun}
-            counterpartName={counterpartName}
-            t={t}
-          />
-          {matchingSession.session.status === "ready_for_report" && !reportRun ? (
-            <div className="mt-6">
-              <form action={createMatchingReport}>
-                <button type="submit" className={PRIMARY_CTA_CLASS}>
-                  {t("matchingPreparation.readiness.viewAlignment")}
-                </button>
-              </form>
-            </div>
-          ) : null}
-        </>
-      );
-    }
-
-    return (
-      <>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-          {t("matchingPreparation.states.readyEyebrow")}
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          {t("matchingPreparation.states.readyTitle")}
-        </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-          {t("matchingPreparation.states.readyText")}
-        </p>
-        <ul className="mt-5 grid gap-3 text-sm leading-6 text-slate-700">
-          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            {t("matchingPreparation.steps.introAccepted")}
-          </li>
-          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            {t("matchingPreparation.steps.preparationCreated")}
-          </li>
-          <li className="rounded-2xl bg-emerald-50 px-4 py-3 font-medium text-emerald-900">
-            {t("matchingPreparation.steps.bothConfirmed")}
-          </li>
-        </ul>
-        <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-600">
-          {t("matchingPreparation.states.readyFollowup")}
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <form action={createMatchingSession}>
-            <button type="submit" className={PRIMARY_CTA_CLASS}>
-              {t("matchingPreparation.actions.prepareSession")}
-            </button>
-          </form>
-        </div>
       </>
     );
   }
@@ -572,23 +333,13 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   // Mal steht im Serverprotokoll, WELCHE der Abfragen es war. Ohne Kennungen -
   // nur der Vorgang und die Meldung.
   // ---------------------------------------------------------------------
+  // Phase 11: Keine Matching-Session und kein Matching-Report der frueheren
+  // Fassung mehr laden - der Weg fuehrt nach beidseitiger Zustimmung in den
+  // aktuellen Teambereich (open_discovery_workstyle_team). Fruehere Reports
+  // bleiben ueber ihre eigenen Seiten lesbar.
   let preparation: Awaited<ReturnType<typeof getDiscoveryMatchingPreparation>> = null;
-  let matchingSessionForStart: MatchingSessionSummary | null = null;
-  let reportRunForSession: MatchingReportRunSummary | null = null;
   try {
     preparation = await getDiscoveryMatchingPreparation(introRequestId, user.id);
-    if (preparation?.matchingStart) {
-      matchingSessionForStart = await getMatchingSessionForDiscoveryStart(
-        preparation.matchingStart.id,
-        user.id
-      );
-    }
-    if (matchingSessionForStart) {
-      reportRunForSession = await getMatchingReportRunForSession(
-        matchingSessionForStart.session.id,
-        user.id
-      );
-    }
   } catch (error) {
     console.error("[discovery-matching] preparation_load_failed", {
       operation: "load_matching_preparation",
@@ -624,48 +375,46 @@ export default async function DiscoveryIntroMatchingPreparationPage({
       if (error || !data) redirect(`/discovery/intros/${introRequestId}/matching?currentTeamError=1`);
       redirect(`/teams/${data}/workstyle`);
     }
-    return <main className="mx-auto max-w-3xl px-5 py-10">
-      <Link className="underline" href="/discovery/intros">Zu euren Anfragen</Link>
-      <h1 className="mt-6 text-3xl font-semibold">Euer Zusammenspiel</h1>
-      <p className="mt-4 leading-7">Ihr habt beide zugestimmt, gemeinsam weiterzuschauen. Öffnet euren Teambereich. Für den Report benötigt ihr eure aktuellen Arbeitsprofile und separate Freigaben.</p>
-      <p className="mt-3 text-sm">Dieser Schritt gibt weder Antworten noch Forschungsdaten frei und erzeugt keine Vereinbarung.</p>
-      {searchParamValue(resolvedSearchParams.currentTeamError) && <p role="alert">Der Teambereich konnte nicht geöffnet werden. Bitte erneut versuchen.</p>}
-      <form action={openCurrentTeam}><button className="mt-5 min-h-11 rounded-xl border px-5 py-3">Euer Zusammenspiel öffnen</button></form>
-    </main>;
+    return (
+      <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
+          <section className={CARD_CLASS}>
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-900" href="/discovery/intros">
+              {t("matchingPreparation.backToIntros")}
+            </Link>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              {t("matchingPreparation.team.eyebrow")}
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em]">
+              {t("matchingPreparation.team.title", { name: otherProfile.displayName })}
+            </h1>
+            <p className="mt-4 leading-7 text-slate-700">{t("matchingPreparation.team.text")}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{t("matchingPreparation.team.boundary")}</p>
+            {searchParamValue(resolvedSearchParams.currentTeamError) ? (
+              <p role="alert" className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                {t("matchingPreparation.team.error")}
+              </p>
+            ) : null}
+            <form action={openCurrentTeam} className="mt-6">
+              <button className={`${PRIMARY_CTA_CLASS} min-h-11`}>{t("matchingPreparation.team.open")}</button>
+            </form>
+          </section>
+        </div>
+      </main>
+    );
   }
   const matchingStart = preparation.matchingStart;
   // Gibt es zwischen diesen beiden schon einen gemeinsamen Bereich? Dann ist
   // "Gemeinsam pruefen" nicht der naechste Schritt, sondern bereits passiert -
   // und `canCreateDiscoveryMatchingStart` laesst es ohnehin nicht zu.
   const existingSharedContext = preparation.relationshipExists || preparation.invitationExists;
-  const matchingSession = matchingSessionForStart;
-  const reportRun = reportRunForSession;
   const matchingStartError = searchParamValue(resolvedSearchParams.matchingStartError);
-  const matchingSessionError = searchParamValue(resolvedSearchParams.matchingSessionError);
-  const matchingReportError = searchParamValue(resolvedSearchParams.matchingReportError);
   const matchingStartResult = searchParamValue(resolvedSearchParams.matchingStartResult);
-  const matchingSessionResult = searchParamValue(resolvedSearchParams.matchingSessionResult);
-  const matchingReportResult = searchParamValue(resolvedSearchParams.matchingReportResult);
-  const matchingFeedback = selectMatchingPreparationFeedback({
-    matchingStartError: matchingStartError
-      ? resolveDiscoveryMatchingStartFeedback({ error: matchingStartError })
-      : null,
-    matchingSessionError: matchingSessionError
-      ? resolveMatchingSessionFeedback({ error: matchingSessionError })
-      : null,
-    matchingReportError: matchingReportError
-      ? resolveMatchingReportFeedback({ error: matchingReportError })
-      : null,
-    matchingStartResult: matchingStartResult
+  const matchingFeedback = matchingStartError
+    ? resolveDiscoveryMatchingStartFeedback({ error: matchingStartError })
+    : matchingStartResult
       ? resolveDiscoveryMatchingStartFeedback({ result: matchingStartResult })
-      : null,
-    matchingSessionResult: matchingSessionResult
-      ? resolveMatchingSessionFeedback({ result: matchingSessionResult })
-      : null,
-    matchingReportResult: matchingReportResult
-      ? resolveMatchingReportFeedback({ result: matchingReportResult })
-      : null,
-  });
+      : null;
   const feedbackMessage = matchingFeedback ? t(matchingFeedback.messageKey) : null;
   const feedbackOk = matchingFeedback?.ok ?? false;
 
@@ -755,8 +504,6 @@ export default async function DiscoveryIntroMatchingPreparationPage({
               introRequestId={introRequestId}
               matchingStart={matchingStart}
               currentUserId={user.id}
-              matchingSession={matchingSession}
-              reportRun={reportRun}
               counterpartName={otherProfile.displayName}
               t={t}
             />

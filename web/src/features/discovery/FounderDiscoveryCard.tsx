@@ -1,4 +1,6 @@
 import { DiscoveryWorkstyle } from "@/features/find/DiscoveryWorkstyle";
+import { ConversationPoints } from "@/features/find/ConversationPoints";
+import { conversationPoints, type ConversationProfile } from "@/features/find/conversationPrompts";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
@@ -86,6 +88,7 @@ export function FounderDiscoveryCard({
   saved,
   photo,
   showMatchReasons = true,
+  viewer = null,
 }: {
   candidate: DiscoveryCandidate;
   preferences: FounderSearchPreferences["mustHaves"];
@@ -94,8 +97,12 @@ export function FounderDiscoveryCard({
   /** Nur gesetzt, wenn diese Person ihr Bild fuer Mitglieder freigegeben hat. */
   photo?: MemberPhoto;
   showMatchReasons?: boolean;
+  /** Eigenes FIND-Profil der betrachtenden Person - fuer hoechstens zwei Gespraechsanlaesse. */
+  viewer?: ConversationProfile | null;
 }) {
   const { profile } = candidate;
+  // Kein Score und keine Reihenfolge: einzelne Angaben nebeneinander, siehe conversationPrompts.ts.
+  const why = viewer ? conversationPoints({ viewer, candidate: profile }).why : [];
   const roles = compactDiscoveryValues(
     discoveryRoleLabels(profile.ownRoles, profile.ownRoleOther, (role) =>
       roleLabel(t, role as DiscoveryFounderRole)
@@ -159,6 +166,8 @@ export function FounderDiscoveryCard({
           </div>
         </section>
       ) : null}
+
+      <ConversationPoints points={why} kind="why" candidateName={profile.displayName} variant="card" />
 
       {showMatchReasons && <DiscoveryWorkstyle candidateId={candidate.profile.userId} compact />}
 
