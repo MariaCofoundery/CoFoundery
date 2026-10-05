@@ -96,11 +96,11 @@ test("Abschluss 37 und Zwischenstand bei offenen Entwicklungsfragen", () => {
   assert.match(flow, /openInFlow > 0 && \(!profileDone \|\| continuing\)/);
 });
 
-test("Workbook-Migration nach allen DB-first-Migrationen", () => {
-  const files = readdirSync("../supabase/migrations");
-  assert.ok(!existsSync("../supabase/migrations/20261117120000_retire_active_workbook_writes.sql"));
-  assert.ok(files.includes("20261118150000_retire_active_workbook_writes.sql"));
-  const dbFirst = ["20261118120000_workstyle_team_mutual_readiness.sql", "20261118130000_workstyle_product_core_completion.sql", "20261118140000_workstyle_research_wave1.sql"];
-  for (const file of dbFirst) assert.ok(file < "20261118150000_retire_active_workbook_writes.sql", file);
-  assert.equal(files.sort().at(-1), "20261118150000_retire_active_workbook_writes.sql");
+test("Migrationsreihenfolge: Workbook-Migration bereits remote, drei DB-first-Migrationen danach", () => {
+  // 20261117120000 ist remote angewendet (Release-Preflight); die Umbenennung aus 11.6C ist rueckgaengig gemacht.
+  const files = readdirSync("../supabase/migrations").sort();
+  assert.ok(existsSync("../supabase/migrations/20261117120000_retire_active_workbook_writes.sql"));
+  assert.equal(files.filter(file => file.includes("retire_active_workbook_writes")).length, 1);
+  const pending = ["20261118120000_workstyle_team_mutual_readiness.sql", "20261118130000_workstyle_product_core_completion.sql", "20261118140000_workstyle_research_wave1.sql"];
+  assert.deepEqual(files.slice(files.indexOf("20261117120000_retire_active_workbook_writes.sql") + 1), pending);
 });

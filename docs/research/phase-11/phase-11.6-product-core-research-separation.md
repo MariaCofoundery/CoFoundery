@@ -1,6 +1,6 @@
 # Phase 11.6 – Arbeitsprofil und Forschung getrennt, Advisor-Teambericht nur bei gegenseitiger Bereitschaft
 
-Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, HEAD `aee3abdd`. Phase 11.5 und 11.6 liegen gemeinsam **uncommitted** im Working Tree. Kein Push, kein Deployment, kein Remote-Supabase-Push.
+Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, Ausgangscommit `aee3abdd`. Phase 11.5–11.6C sind mit `39c2c4a1` (`feat: finalize workstyle assessment and research wave 1`) committed. Uncommitted sind nur noch die Korrektur der Workbook-Migrationshistorie (Datei wieder `20261117120000_retire_active_workbook_writes.sql`) und die zugehörigen Dokumentationskorrekturen. Kein Push, kein Deployment, kein Remote-Supabase-Push.
 
 **Neue Migration:** `supabase/migrations/20261118130000_workstyle_product_core_completion.sql`. Sie ist nur lokal angewendet und setzt auf `20261118120000_workstyle_team_mutual_readiness.sql` (Phase 11.5) auf.
 
@@ -235,7 +235,7 @@ Scroll und Fokus (gemessen nach „ganz nach unten, Weiter“): Bei 1280 px lieg
 
 ## 17. Auswirkung auf den Release-Plan
 
-Remote ausstehend sind jetzt **9** Migrationen: `20261113120000` … `20261117120000` (7, wie im Release-Audit), dazu `20261118120000` (11.5) und **neu `20261118130000`** (11.6).
+*(Stand 11.6, durch die Korrektur unten überholt.)* Remote ausstehend sind jetzt **9** Migrationen: `20261113120000` … `20261117120000` (7, wie im Release-Audit), dazu `20261118120000` (11.5) und **neu `20261118130000`** (11.6).
 
 **`20261118130000` ist DB_FIRST_SAFE, nicht CODE_FIRST_SAFE.** Der neue Code ruft `start_workstyle_product` und `start_workstyle_research` auf, die es erst mit der Migration gibt. Sie braucht `20261118120000` (`workstyle_core_visible_to`) und muss **vor** dem Code-Deploy laufen. Wirkung auf den heute laufenden Code, wenn die Migration vorher läuft:
 - Bisheriger Fragebogen (Start mit Einwilligung, 52 gemischte Schritte, `p_finalize` an Position 52, Abschluss über `completed_at`): funktioniert weiter. Das Arbeitsprofil wird schon mit der 29. Core-Antwort fertig und ist damit früher im Profil, im Teilen und im Teambericht sichtbar. Die Forschung läuft wie gewohnt bis 52.
@@ -244,17 +244,13 @@ Remote ausstehend sind jetzt **9** Migrationen: `20261113120000` … `2026111712
 - Advisors ohne gegenseitige Bereitschaft sehen im alten Code den bisherigen „nicht verfügbar“-Block statt eines Berichts.
 - Teamberichte, die bisher nur einseitig sichtbar waren, verschwinden bis zur vollen Gegenseitigkeit (11.5).
 
-> **Nachtrag 11.6C:** Das Reihenfolgeproblem ist gelöst. Die Workbook-Migration heißt jetzt `20261118150000_retire_active_workbook_writes.sql` (remote nie angewendet, lokal per Verlaufseintrag nachgezogen). Details in `phase-11.6c-wave1-research-sets.md`.
-
-**Reihenfolgeproblem:** `20261117120000_retire_active_workbook_writes` muss weiterhin **nach** dem Code-Deploy laufen. `20261118120000` und `20261118130000` müssen **vor** dem Deploy laufen, haben aber höhere Versionsnummern. Ein einfaches `supabase db push` würde 1117 zuerst anwenden. Vorschlag (Entscheidung bei dir):
-- (a) Den Stage-Worktree so aufbauen, dass er 1113–1116 und 1118120000/1118130000 enthält, aber nicht 1117. Das spätere Nachziehen von 1117 braucht dann `supabase db push --include-all`.
-- oder (b) 1117 vor dem ersten Remote-Push auf einen Zeitstempel nach `20261118130000` umbenennen (remote nie angewendet, lokal per Repair nachziehen).
+> **Korrektur (Release-Preflight):** Remote sind `20261113120000` … `20261117120000` bereits angewendet, auch `20261117120000_retire_active_workbook_writes`. Das in Phase 11.6 vermutete Reihenfolgeproblem (1117 erst nach dem Code-Deploy) besteht damit nicht; die in Phase 11.6C vorgenommene Umbenennung auf `20261118150000` beruhte auf einer falschen Annahme und ist rückgängig gemacht (Datei wieder `20261117120000_retire_active_workbook_writes.sql`, SQL unverändert). Ausstehend sind nur `20261118120000`, `20261118130000` und `20261118140000`, alle DB-first vor dem Code-Deploy.
 
 Nicht remote gepusht.
 
 ## 18. Offene Punkte
 
-- **Release-Reihenfolge** 1117 gegen 1118xx (Abschnitt 17), vor dem Remote-Push entscheiden.
+- ~~Release-Reihenfolge 1117 gegen 1118xx~~ – entfällt: `20261117120000` ist remote bereits angewendet (Korrektur in Abschnitt 17).
 - `start_workstyle_pretest`, `set_workstyle_pretest_position` und `resume_position` bleiben als bisherige Einstiege. Nach dem Deploy prüfen, ob sie stillgelegt werden können (Skripte unter `web/scripts/` nutzen sie noch).
 - Forschung nach einem Widerruf erneut beginnen geht nur über eine neue Teilnahme („Arbeitsprofil später neu beantworten“). Eine Wieder-Einwilligung in derselben Sitzung ist bewusst nicht vorgesehen.
 - Auswertung (`analytics.ts`): Dauer wird weiter ab `started_at` gemessen, also ab Beginn des Arbeitsprofils. Für Forschungsdauern `research_consent_given_at` aus dem Export nutzen. Die Anpassung steht noch aus.

@@ -1,6 +1,6 @@
 # Phase 11.6C – Finaler Workstyle-Ablauf: 29 Core + optional 8 gemischte Entwicklungsfragen
 
-Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, HEAD `aee3abdd`. Die Phasen 11.5, 11.6, 11.6B und 11.6C liegen gemeinsam **uncommitted** im Working Tree. Die Umbenennung der Workbook-Migration ist per `git mv` gestaged. Kein Push, kein Deployment, kein Remote-Supabase-Push.
+Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, Ausgangscommit `aee3abdd`. Phase 11.5–11.6C sind mit `39c2c4a1` (`feat: finalize workstyle assessment and research wave 1`) committed. Uncommitted sind nur noch die Korrektur der Workbook-Migrationshistorie (Datei wieder `20261117120000_retire_active_workbook_writes.sql`) und die zugehörigen Dokumentationskorrekturen. Siehe Abschnitt 18. Kein Push, kein Deployment, kein Remote-Supabase-Push.
 
 ---
 
@@ -223,13 +223,14 @@ Set und Reihenfolge sind Teil der Forschungsteilnahme. Es gibt keine neue stille
 
 Gleiche Signaturen, keine neuen Grants für `authenticated`. Bestehende Sitzungen, full-23-Daten, Core-Antworten, Freigaben und Berichte bleiben unverändert; es gibt keine Datenübernahme.
 
-## 18. Umbenannte Workbook-Migration
+## 18. Workbook-Migration (Korrektur)
 
-`20261117120000_retire_active_workbook_writes.sql` → **`20261118150000_retire_active_workbook_writes.sql`**:
-- Sie war remote **nie** angewendet (Release-Audit).
-- Lokal wurde der Eintrag in `supabase_migrations.schema_migrations` auf die neue Version umgeschrieben. Die Migration lief nicht erneut, ein Reset war nicht nötig.
+In 11.6C wurde `20261117120000_retire_active_workbook_writes.sql` auf `20261118150000` umbenannt, unter der Annahme, sie sei remote noch nicht angewendet. **Das war falsch:** Beim finalen Release-Preflight ist `20261117120000` remote bereits als angewendet registriert. Inhalt beider Fassungen per SHA-256 identisch.
+
+- Die Datei heißt wieder **`20261117120000_retire_active_workbook_writes.sql`** (per `git mv`), der SQL-Inhalt ist unverändert.
+- Sie ist **keine ausstehende Post-Deploy-Migration**.
 - Kein Remote-Repair, kein Remote-Push.
-- Verweise in `phase-9.3-…`, `phase-11.5-…` und `phase-11.6-…` sind ergänzt; ein Test prüft, dass sie die letzte Migration ist.
+- Lokal: Der Verlaufseintrag in `supabase_migrations.schema_migrations` wurde in 11.6C auf `20261118150000` umgeschrieben und steht dort noch. Er betrifft nur die lokale Historie, `db:test` nicht. Für einen sauberen Abgleich lokal zurücksetzen (nicht ausgeführt): `update supabase_migrations.schema_migrations set version='20261117120000' where version='20261118150000';`
 
 ## 19. Tests
 
@@ -266,7 +267,7 @@ Gleiche Signaturen, keine neuen Grants für `authenticated`. Bestehende Sitzunge
   - Einstieg mit fairer Wahl;
   - gemeinsamer Fragebogen ohne Forschungsmarkierung und ohne Client-Zufall;
   - 37er-Abschluss und Zwischenstand;
-  - Migrationsreihenfolge.
+  - Migrationsreihenfolge: die drei DB-first-Migrationen kommen nach `20261117120000`, `20261118140000` ist die letzte.
 
   `phase115.test.ts` und `phase116.test.ts` sind an den neuen Ablauf angepasst; die negativen Garantien bleiben.
 - **Parallel-HTTP-Test** (lokal, Testnutzer gelöscht): siehe Abschnitt 8. Repo-Skript `test-workstyle-v3-concurrency.mjs` (bisheriger 52er-Weg) grün.
@@ -289,17 +290,14 @@ Lokale Daten über die echten RPCs: Vera (fertiges Profil), Nora (eingeladen), O
 
 ## 21. Release-Reihenfolge
 
-Remote ausstehend, in Versionsreihenfolge:
-1. `20261113120000` … `20261116130000` (6, DB-first wie im Release-Audit)
-2. `20261118120000_workstyle_team_mutual_readiness` (DB-first)
-3. `20261118130000_workstyle_product_core_completion` (DB-first)
-4. **`20261118140000_workstyle_research_wave1`** (DB-first; der neue Code braucht `start_workstyle_research` mit Set und Reihenfolge und die neuen Spalten)
-5. → **Code-Deploy**
-6. **`20261118150000_retire_active_workbook_writes`** (nach dem Code-Deploy)
+Remote bereits angewendet: alles bis einschließlich `20261117120000_retire_active_workbook_writes` (Release-Preflight).
 
-Damit funktioniert ein normales `supabase db push` in zwei Schritten:
-- Schritt 1 (alles bis `20261118140000`) **vor** dem Deploy. Praktisch geht das über `supabase db push` aus einem Stand, in dem `20261118150000` noch nicht liegt, oder indem man die Datei bis nach dem Deploy zurückhält. Der Unterschied zu vorher: Die Reihenfolge der Versionen stimmt jetzt; es gibt keine übersprungene Migration und kein `--include-all`.
-- Schritt 2 (`20261118150000`) danach.
+Remote ausstehend, in Versionsreihenfolge, **alle DB-first vor dem Code-Deploy**:
+1. `20261118120000_workstyle_team_mutual_readiness`
+2. `20261118130000_workstyle_product_core_completion`
+3. `20261118140000_workstyle_research_wave1` (der neue Code braucht `start_workstyle_research` mit Set und Reihenfolge und die neuen Spalten)
+
+Danach der Code-Deploy. Es gibt keine Post-Deploy-Migration; ein normales `supabase db push` vor dem Deploy genügt.
 
 **Wirkung von `20261118140000` auf heute laufenden Code** (vor dem Deploy):
 - Der alte Fragebogen (Start mit Einwilligung, 52 Schritte) läuft weiter, ohne Set (full-23).

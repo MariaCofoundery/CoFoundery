@@ -118,7 +118,7 @@ Aktuelle Report-Prints und Setup-Dokumente bleiben unverändert. Browserprüfung
 
 ## 12. Migration und Servergrenzen
 
-Neue additive Migration: `supabase/migrations/20261117120000_retire_active_workbook_writes.sql` (seit Phase 11.6C umbenannt in `20261118150000_retire_active_workbook_writes.sql`, damit sie nach allen DB-first-Migrationen läuft).
+Neue additive Migration: `supabase/migrations/20261117120000_retire_active_workbook_writes.sql` (remote bereits angewendet; eine zwischenzeitliche Umbenennung in Phase 11.6C beruhte auf einer falschen Annahme und wurde rückgängig gemacht).
 
 - Entzieht `INSERT/UPDATE` für PUBLIC/anon/authenticated auf den drei alten Content-/Workspace-Tabellen.
 - Entzieht öffentliches/authentifiziertes EXECUTE für `start_workspace_from_matching_session(uuid)`, `create_or_get_matching_workspace_agreement(uuid)` und `handoff_workbook_deep_dive_note_if_empty(uuid,text,text)`.
@@ -267,7 +267,7 @@ Browserfixtures ausschließlich lokal, temporäre Browserzustände/Screenshots/P
 ### Geänderte Dateien
 
 - `docs/research/phase-9/phase-9.3-workbook-consolidation-implementation.md`
-- `supabase/migrations/20261117120000_retire_active_workbook_writes.sql` (seit Phase 11.6C umbenannt in `20261118150000_retire_active_workbook_writes.sql`, damit sie nach allen DB-first-Migrationen läuft)
+- `supabase/migrations/20261117120000_retire_active_workbook_writes.sql` (remote bereits angewendet; eine zwischenzeitliche Umbenennung in Phase 11.6C beruhte auf einer falschen Annahme und wurde rückgängig gemacht)
 - `supabase/tests/founder_team_foundation.sql`
 - `supabase/tests/workbook_deep_dive_handoff.sql`
 - `supabase/tests/workbook_historical_read_only.sql`

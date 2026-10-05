@@ -1,6 +1,6 @@
 # Phase 11.5 – Assessment-UX, Sharing-Konsistenz & Report-Visuals
 
-Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, Ausgangscommit `aee3abdd` (`feat: refine founder discovery and intro flow`). Alle Änderungen sind lokal und **nicht committed**. Kein Push, kein Deployment, kein Remote-Supabase-Push.
+Stand: 05.10.2026. Branch: `feat/workstyle-reporting-v04`, Ausgangscommit `aee3abdd` (`feat: refine founder discovery and intro flow`). Phase 11.5–11.6C sind mit `39c2c4a1` (`feat: finalize workstyle assessment and research wave 1`) committed. Uncommitted sind nur noch die Korrektur der Workbook-Migrationshistorie (Datei wieder `20261117120000_retire_active_workbook_writes.sql`) und die zugehörigen Dokumentationskorrekturen. Kein Push, kein Deployment, kein Remote-Supabase-Push.
 
 **Eine neue Migration:** `supabase/migrations/20261118120000_workstyle_team_mutual_readiness.sql`, nach ausdrücklicher Freigabe angelegt und nur lokal angewendet. Sie ändert nur Lesefunktionen: keine Tabelle, keine Spalte, keine Policy, kein Schreibpfad, keine Freigabe.
 
@@ -184,7 +184,7 @@ Browserreview bei 390 px: Assessment (Intro, Fragen, Abschluss), Readiness-Panel
 
 ## 20. Offene Punkte
 
-- **Release-Plan erweitern:** Die neue Migration `20261118120000` ist die achte remote ausstehende Migration. Sie ist **DB_FIRST_SAFE** und gehört nach `20261114120000`/`20261115120000`. Der heute live laufende Code ruft die neue Readiness-Funktion nicht auf, und für ihn ändert sich nur, dass einseitig sichtbare Teamberichte verschwinden, bis alle freigegeben haben. `20261117120000_retire_active_workbook_writes` bleibt wie geplant nach dem Code-Deploy. **Nachtrag 11.6C:** Die Workbook-Migration heißt jetzt `20261118150000_retire_active_workbook_writes.sql` und läuft nach allen DB-first-Migrationen (siehe `phase-11.6c-wave1-research-sets.md`).
+- **Release-Plan erweitern:** Die neue Migration `20261118120000` ist die achte remote ausstehende Migration. Sie ist **DB_FIRST_SAFE** und gehört nach `20261114120000`/`20261115120000`. Der heute live laufende Code ruft die neue Readiness-Funktion nicht auf, und für ihn ändert sich nur, dass einseitig sichtbare Teamberichte verschwinden, bis alle freigegeben haben. **Korrektur (Release-Preflight):** `20261117120000_retire_active_workbook_writes` ist remote bereits angewendet und keine ausstehende Post-Deploy-Migration mehr. Ausstehend sind nur `20261118120000`, `20261118130000` und `20261118140000` (siehe `phase-11.6c-wave1-research-sets.md`, Abschnitt 21).
 - **Trennung Produkt/Research:** eigene Phase mit Migration und Consent-Änderung (Konzept in Abschnitt 6).
 - **Freigabe beim Einladen vormerken:** nur mit neuer Persistenz und neuem Consent-Vertrag, bewusst nicht umgesetzt.
 - **DELETE_CODE_LATER:** `features/dashboard/DailyQuote.tsx` und `dailyQuotes.ts` sind ungenutzt (ersetzt durch `QuoteOfTheDay`). Die Matrix-Darstellung im Anhang ist ersetzt; die ungenutzten Label-Importe sind entfernt, ältere `.ws-*`-Regeln in `report.css` sollten bei Gelegenheit gesichtet werden.
