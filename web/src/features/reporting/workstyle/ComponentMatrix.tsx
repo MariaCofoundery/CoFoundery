@@ -1,18 +1,12 @@
-import type { CSSProperties } from "react";
 import copy from "../../../../messages/de/capability.json";
-import {
-  componentRows,
-  COMPONENT_LABELS,
-  OWNERSHIP_LABELS,
-} from "@/features/reporting/workstyle/componentsModel";
+import { componentRows } from "@/features/reporting/workstyle/componentsModel";
+import { memberInitials } from "@/features/reporting/workstyle/model";
 import type { ProductTeam } from "@/features/reporting/workstyle/model";
 
 const areaName = (key: string) =>
   (copy.areaLabels as Record<string, string>)[key] ?? key;
 const familyName = (key: string) =>
   (copy.families as Record<string, string>)[key] ?? key;
-const levelName = (level: number | null) =>
-  level ? (copy.levels as Record<string, string>)[String(level)] : null;
 
 /** Ab "Wiederholt angewandt" (Stufe 4) - dieselbe Tiefe wie im Profil (DEPTH_LEVEL). Selbstauskunft, keine Pruefung. */
 const EXPERIENCED = 4;
@@ -115,57 +109,7 @@ export function ComponentMatrix({ team }: { team: ProductTeam }) {
             </div>
           )}
 
-          <details className="ws-appendix rounded-2xl border border-slate-200 bg-white/70 p-4">
-            <summary className="cursor-pointer text-sm font-medium text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-              Alle Bereiche mit Angaben im Detail ({rows.length})
-            </summary>
-            <p className="mt-4 text-sm leading-6 text-slate-600">
-              Nicht alles muss im Founder-Team liegen: „Extern lösbar“ folgt dem Komponentenprinzip und heißt noch nicht,
-              dass etwas beauftragt ist. Zu {allRows.length - rows.length} weiteren Bereichen liegen keine Angaben vor;
-              daraus wird keine fehlende Fähigkeit abgeleitet.
-            </p>
-            <div className="ws-matrix mt-4" aria-label="Fähigkeiten und Verantwortung je Bereich">
-              {rows.map((row) => (
-                <article key={row.area.area_id} className="ws-component">
-                  <p className="text-xs text-slate-500">{familyName(row.area.family_id)}</p>
-                  <h4 className="mt-1 font-semibold">{areaName(row.area.area_id)}</h4>
-                  <p className="my-3 text-sm">
-                    {row.states
-                      // "Angaben fehlen" nur dort, wo es die Deutung aendert: wenn niemand verantworten moechte.
-                      .filter((s) => s !== "INSUFFICIENT_DATA" || row.owners.length === 0)
-                      .map((s) => COMPONENT_LABELS[s])
-                      .join(" · ") || "Sourcing noch nicht eingeordnet"}
-                  </p>
-                  <div className="ws-component-members" style={{ "--members": team.people.length } as CSSProperties}>
-                    {row.cells.map((c) => (
-                      <div key={c.personId} className="ws-component-cell">
-                        <h5 className="text-sm font-semibold">{c.name}</h5>
-                        {c.entry ? (
-                          <>
-                            <p className="mt-2 text-xs leading-5">Erfahrung: {levelName(c.entry.application_level) ?? "nicht eingestuft"}</p>
-                            <p className="mt-1 text-xs leading-5">
-                              {c.entry.ownership_wish ? OWNERSHIP_LABELS[c.entry.ownership_wish] : "Verantwortung: keine Angabe"}
-                            </p>
-                          </>
-                        ) : (
-                          <p className="mt-2 text-xs leading-5 text-slate-500">Keine Angabe</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-3 border-t border-dashed border-slate-300 pt-3 text-sm">
-                    {row.sourcing === "internal_only"
-                      ? "Sollte intern verankert bleiben."
-                      : row.sourcing === "component"
-                        ? "Kann extern bezogen werden; Beauftragung und interne Schnittstelle klären."
-                        : row.sourcing === "depends"
-                          ? "Ob intern oder extern, hängt von eurem Vorhaben ab."
-                          : "Noch nicht fachlich eingeordnet."}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </details>
+          <CapabilityMosaic rows={rows} hiddenCount={allRows.length - rows.length} />
         </>
       )}
     </section>
@@ -192,6 +136,110 @@ export function ComponentSummary({ team }: { team: ProductTeam }) {
           <p className="mt-2 text-sm leading-6">{g.rows.map((r) => areaName(r.area.area_id)).join(" · ")}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** Kurze, gleichwertige Zustandslabels mit Symbol - lesbar auch in Graustufen. */
+const WISH: Record<string, { symbol: string; label: string }> = {
+  own: { symbol: "◆", label: "möchte verantworten" },
+  contribute: { symbol: "＋", label: "möchte beitragen" },
+  grow_into: { symbol: "↗", label: "möchte hineinwachsen" },
+  prefer_other: { symbol: "↪", label: "lieber eine andere Person" },
+  prefer_external: { symbol: "◇", label: "lieber extern" },
+  unclear: { symbol: "?", label: "noch unklar" },
+};
+
+/**
+ * Faehigkeiten-Karte (Phase 11.5): ein Baustein je Bereich mit Angaben,
+ * gruppiert nach Familie. Je Person: Erfahrung (nur ab "Wiederholt angewandt",
+ * eigene Angabe) und Verantwortungswunsch - getrennt. Bereichsweite Hinweise
+ * nur aus dem bestehenden Modell: Verantwortung ungeklaert, mehrere moechten
+ * verantworten, extern denkbar (Sourcing des Bereichs), noch nicht alle
+ * Angaben. Kein Fuellstand, kein "fehlt euch", keine Wertungsfarbe.
+ */
+function CapabilityMosaic({
+  rows,
+  hiddenCount,
+}: {
+  rows: ReturnType<typeof componentRows>;
+  hiddenCount: number;
+}) {
+  const families = [...new Set(rows.map((r) => r.area.family_id))];
+  return (
+    <div>
+      <h3 className="text-lg font-semibold">Fähigkeiten-Karte</h3>
+      <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+        Ein Baustein je Bereich, zu dem jemand Angaben gemacht hat. Erfahrung und Verantwortungswunsch stehen getrennt;
+        beides sind eigene Angaben.
+      </p>
+      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600" aria-label="Legende">
+        <span>★ wiederholt angewandt</span>
+        {Object.values(WISH).map((w) => (
+          <span key={w.label}>
+            {w.symbol} {w.label}
+          </span>
+        ))}
+      </p>
+      <div className="ws-mosaic mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {families
+                .flatMap((family) => rows.filter((r) => r.area.family_id === family))
+                .map((row) => {
+                  const notes = [
+                    row.states.includes("OPEN_INTERNAL") ? "Verantwortung ungeklärt" : null,
+                    row.states.includes("MULTI_COVERED") ? "Mehrere möchten verantworten" : null,
+                    row.sourcing === "component" ? "Extern denkbar" : null,
+                    row.states.includes("INSUFFICIENT_DATA") && row.owners.length === 0 ? "Noch nicht alle Angaben" : null,
+                  ].filter((n): n is string => Boolean(n));
+                  return (
+                    <article
+                      key={row.area.area_id}
+                      className={`ws-tile rounded-2xl border bg-white p-3 ${row.owners.length ? "border-slate-300" : "border-dashed border-slate-300"}`}
+                    >
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{familyName(row.area.family_id)}</p>
+                      <h4 className="mt-0.5 text-sm font-semibold text-slate-900">{areaName(row.area.area_id)}</h4>
+                      {notes.length ? (
+                        <p className="mt-1 flex flex-wrap gap-1">
+                          {notes.map((n) => (
+                            <span key={n} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-700">
+                              {n}
+                            </span>
+                          ))}
+                        </p>
+                      ) : null}
+                      <ul className="mt-2 space-y-1">
+                        {row.cells.map((c, n) => {
+                          const wish = c.entry?.ownership_wish ? WISH[c.entry.ownership_wish] : null;
+                          const experienced = (c.entry?.application_level ?? 0) >= EXPERIENCED;
+                          return (
+                            <li key={c.personId} className="flex items-center gap-2 text-xs leading-5">
+                              <span aria-hidden="true" className={`ws-token ws-token-${n % 4} scale-75`}>
+                                {memberInitials(c.name)}
+                              </span>
+                              <span className="sr-only">{c.name}: </span>
+                              {c.entry ? (
+                                <span className="text-slate-700">
+                                  {[experienced ? "★ wiederholt angewandt" : null, wish ? `${wish.symbol} ${wish.label}` : null]
+                                    .filter(Boolean)
+                                    .join(" · ") || "Angabe ohne Erfahrungsstufe und Wunsch"}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">keine Angabe</span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </article>
+                  );
+                })}
+      </div>
+      <p className="mt-4 text-sm leading-6 text-slate-600">
+        {hiddenCount > 0
+          ? `Zu ${hiddenCount} weiteren Bereichen hat niemand Angaben gemacht oder freigegeben. Daraus wird keine fehlende Fähigkeit abgeleitet.`
+          : null}{" "}
+        „Extern denkbar“ ist eine Eigenschaft des Bereichs und heißt noch nicht, dass etwas beauftragt ist.
+      </p>
     </div>
   );
 }

@@ -631,7 +631,9 @@
       "success": "Link kopiert.",
       "error": "Kopieren nicht möglich. Bitte Link manuell kopieren."
     },
-    "dashboardCta": "Zum Dashboard"
+    "dashboardCta": "Zum Dashboard",
+    "sharingTitle": "Was mit der Einladung geteilt wird",
+    "sharingNote": "Mit der Einladung wird nichts automatisch geteilt – keine Antworten, kein Arbeitsprofil, keine Angaben zum Vorhaben. Nach der Annahme entscheidet jede Person selbst, was sie für die andere freigibt. Euer gemeinsamer Bericht erscheint erst, wenn alle ihre Arbeitsweise füreinander freigegeben haben – dann für alle gleichzeitig."
   },
   "participantInvite": {
     "projectLabel": "Team- oder Projektname",

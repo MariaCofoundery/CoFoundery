@@ -130,6 +130,38 @@
     "notReadyTitle": "The team report is not available yet",
     "shareMissingTitle": "Sharing missing",
     "notReadyBody": "Every member needs a completed work profile in the current version and has to share their answers with the reader. An invitation alone does not grant access.",
-    "notReadyCta": "Open your work profile and sharing"
+    "notReadyCta": "Open your work profile and sharing",
+    "readiness": {
+      "title": "Something is still missing for your shared report",
+      "listLabel": "Sharing status in the team",
+      "you": "you",
+      "state": {
+        "MISSING_MINE": "Your sharing is still missing. As soon as you share your work style with everyone in the team, your report appears for all of you at the same time.",
+        "MISSING_OTHERS": "Your sharing is in place. Still waiting for {names} to share.",
+        "MISSING_MULTIPLE": "Several shares are still missing – including yours. You are also waiting for {names}.",
+        "INSUFFICIENT_WORKSTYLE": "For the shared report, everyone needs a current work profile and sharing with everyone else. Still open for: {names}.",
+        "READY": "All shares are in place.",
+        "UNAVAILABLE": "The team report is not available for this team.",
+        "INSUFFICIENT_WORKSTYLE_SELF": "For the shared report, everyone needs a current work profile and sharing with everyone else. Your work profile is still missing."
+      },
+      "member": {
+        "shared": "Work style shared with everyone in the team",
+        "notShared": "Work style not yet shared with everyone in the team",
+        "noWorkstyle": "No current work profile yet"
+      },
+      "reviewShares": "Review sharing",
+      "completeWorkstyle": "Fill in how you work",
+      "rule": "The shared report appears for everyone in the team at the same time – once each person has shared their work style with everyone else. Sharing always works in one direction only; nobody shares anything on behalf of others, and an invitation shares nothing automatically."
+    },
+    "researchOffer": {
+      "title": "Help develop Made2Found",
+      "body": "Optional: further situations that help us develop the work profile. They do not change your work profile, and taking part has no effect on sharing, team reports or FIND.",
+      "offer": "Learn more",
+      "continue": "Continue the research part"
+    },
+    "advisorNotReady": {
+      "title": "The shared report is not available yet.",
+      "body": "Some shares within the team are still missing. The report appears here once everyone in the team has shared their way of working with each other – and with you."
+    }
   }
 }

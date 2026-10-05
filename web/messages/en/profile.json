@@ -337,7 +337,8 @@
       "legacyApply": "Apply",
       "workAnswers": "Your answers",
       "more": "{count, plural, =1 {One further entry is in the full profile} other {# further entries are in the full profile}}.",
-      "footer": "Created with {brand} · {date}"
+      "footer": "Created with {brand} · {date}",
+      "archiveNote": "Earlier evaluation from an older version – for reference only and not part of this profile. To print it in full, choose “Include the earlier evaluation”."
     },
     "currentWorkstyle": {
       "openReport": "Open report, share answers and save a version",

@@ -278,7 +278,19 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
 
       {/* 2 — Wie du arbeitest. */}
       {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle profile={workstyleV04} full={voll} /></Abschnitt> : null}
-      {voll && workProfile ? (
+      {/* Phase 11.5: Das fruehere Arbeitsprofil steht in der Langfassung nur noch
+          als kompakte Archivkarte. Vollstaendig nur, wenn "Fruehere Auswertung
+          mit aufnehmen" gewaehlt ist. Keine Daten werden geloescht. */}
+      {voll && workProfile && !includeLegacy ? (
+        <ArchiveCard
+          title={t("historicalWorkProfile.title")}
+          dated={t("historicalWorkProfile.dated", {
+            date: workProfile.submittedAt ? datum(workProfile.submittedAt) : "—",
+          })}
+          note={t("print.archiveNote")}
+        />
+      ) : null}
+      {voll && workProfile && includeLegacy ? (
         <Abschnitt
           title={`${t("historicalWorkProfile.title")} — ${t("historicalWorkProfile.dated", {
             date: workProfile.submittedAt
@@ -516,6 +528,13 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
           `density="full"` statt "summary": In der Zusammenfassung stecken die
           Kapitel in Aufklappern, und ein zugeklapptes `details` im PDF wäre
           eine leere Seite. */}
+      {voll && !includeLegacy && report ? (
+        <ArchiveCard
+          title={t("legacyReport.title")}
+          dated={t("legacyReport.dated", { date: report.createdAt ? datum(report.createdAt) : "—" })}
+          note={t("print.archiveNote")}
+        />
+      ) : null}
       {includeLegacy && report ? (
         <Abschnitt title={t("legacyReport.title")}>
           <p className="text-sm text-slate-600">
@@ -646,5 +665,17 @@ function PrintToolbar({
         </form>
       ) : null}
     </div>
+  );
+}
+
+/** Kompakte Archivkarte fuer historische Auswertungen in der Langfassung. */
+function ArchiveCard({ title, dated, note }: { title: string; dated: string; note: string }) {
+  return (
+    <section className="mt-8 rounded-2xl border border-dashed border-slate-300 px-5 py-4" style={{ breakInside: "avoid" }}>
+      <p className="text-sm font-semibold text-slate-900">
+        {title} – {dated}
+      </p>
+      <p className="mt-1 text-sm leading-6 text-slate-600">{note}</p>
+    </section>
   );
 }

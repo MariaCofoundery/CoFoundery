@@ -1,5 +1,6 @@
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import Link from "next/link";
+import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
@@ -387,6 +388,8 @@ export default async function DashboardPage({
               <p className="text-sm leading-6 text-slate-600">{t(`hero.primaryText.${primaryAction}`)}</p>
             </div>
           ) : null}
+          {/* Phase 11.5: klein unter der Begruessung, kein eigener Hero. */}
+          <QuoteOfTheDay className="mt-5 max-w-2xl" />
         </div>
       </section>
 

@@ -11,6 +11,8 @@ import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import type { ProductTeam } from "@/features/reporting/workstyle/model";
 import { getLocale, getTranslations } from "next-intl/server";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
+import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
+import { TeamReadinessPanel } from "@/features/reporting/workstyle/TeamReadinessPanel";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Euer Zusammenspiel",
@@ -34,7 +36,13 @@ export default async function Page({
   const current = await getProductTeam(client, teamId);
   const { data: membership } = await client.from("founder_team_members").select("team_id").eq("team_id", teamId).eq("user_id", user.id).maybeSingle();
   if (!current) notFound();
-  const { data: readiness } = current === "not_ready" ? await client.rpc("get_workstyle_product_team_status", { p_team_id: teamId }) : { data: "available" };
+  const { data: readiness } = current === "not_ready" && membership ? await client.rpc("get_workstyle_product_team_status", { p_team_id: teamId }) : { data: "available" };
+  // Phase 11.5: Fuer Mitglieder konkret, was fuer den gemeinsamen Bericht fehlt -
+  // nur zwei Wahrheitswerte je Person, keine Antworten.
+  const shareReadiness =
+    current === "not_ready" && membership
+      ? parseTeamReadiness((await client.rpc("get_workstyle_team_share_readiness", { p_team_id: teamId })).data)
+      : null;
   const snapshot = query.snapshot
     ? await getProductSnapshot<ProductTeam>(client, query.snapshot)
     : null;
@@ -122,7 +130,16 @@ export default async function Page({
           </p>
         )}
       </header>
-      {team === "not_ready" ? (
+      {team === "not_ready" && shareReadiness && shareReadiness.status !== "unavailable" ? (
+        <TeamReadinessPanel readiness={shareReadiness} />
+      ) : team === "not_ready" && !membership ? (
+        // Phase 11.6: Advisors sehen den gemeinsamen Bericht nicht frueher als das
+        // Team - und hier keine Details darueber, wer was freigegeben hat.
+        <section aria-labelledby="advisor-not-ready-title" className="rounded-3xl border border-slate-200 bg-white p-5 md:p-6">
+          <h2 id="advisor-not-ready-title" className="text-xl font-semibold">{t("advisorNotReady.title")}</h2>
+          <p className="mt-3 max-w-2xl leading-7 text-slate-700">{t("advisorNotReady.body")}</p>
+        </section>
+      ) : team === "not_ready" ? (
         <section>
           <h2 className="text-xl font-semibold">
             {readiness === "share_missing" ? t("shareMissingTitle") : t("notReadyTitle")}

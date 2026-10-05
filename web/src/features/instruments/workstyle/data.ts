@@ -11,7 +11,16 @@ export type ResearchRow = {
   started_at: string; completed_at: string | null; context: ResearchContext;
   feedback: ResearchFeedback | null; timings: Record<string, number>; answers: ResearchAnswer[];
 };
-export type PretestSession = ResearchRow & { assessment_id: string; consent_given_at: string; withdrawn_at: string | null };
+/**
+ * Phase 11.6 (nur 8.5a-v3): `submitted_at` = Arbeitsprofil fertig (29 Core),
+ * `completed_at` = Forschungsteil fertig. `consent_version`/`consent_given_at`
+ * sind leer, solange jemand nicht in die Forschung eingewilligt hat.
+ */
+export type PretestSession = Omit<ResearchRow, "consent_version"> & {
+  assessment_id: string; consent_version: string | null; consent_given_at: string | null; withdrawn_at: string | null; submitted_at?: string | null;
+  /** Phase 11.6C: Welle 1 - zugeteiltes Set, Set-Version, gespeicherte Reihenfolge (Item-Schluessel). */
+  research_set?: "A" | "B" | null; research_set_version?: string | null; item_order?: string[] | null;
+};
 
 export async function getMyWorkstylePretest(version = "8.5a-v1"): Promise<PretestSession | null> {
   const client = await createClient();

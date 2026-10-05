@@ -31,20 +31,42 @@ export function IndividualWorkstyle({
 }) {
   if (!validProductProfile(profile)) return null;
   const narratives = individualNarratives(profile);
+  // Getragene Richtungen (nicht "teils/teils") in fester Bereichsreihenfolge -
+  // keine Gewichtung, keine Auswahl nach "Wichtigkeit".
+  const findings = narratives.filter(({ narrative: n }) => n.pattern.kind === "direction" && n.pattern.band !== "middle");
   return (
-    <div className={`ws-report space-y-8${full ? " ws-print-full" : ""}`} lang="de">
-      <p className="max-w-3xl text-sm leading-6 text-slate-600">
+    <div className={`ws-report space-y-8 ${full ? "ws-print-full" : ""}`} lang="de">
+      {/* Phase 11.5: erst ein freundlicher Einstieg und das Bild, die
+          methodischen Grenzen folgen unter "So liest du das". */}
+      <p className="max-w-3xl leading-7 text-slate-700">
         {perspective === "other"
-          ? `Selbstauskunft von ${name} zu konkreten Arbeitssituationen. Die Beschreibungen sind an ${name} gerichtet formuliert.`
-          : "Deine Selbstauskunft zu konkreten Arbeitssituationen."}{" "}
-        Sie beschreibt typische Arbeitsweisen in diesen Situationen – keine Persönlichkeit, keine Eignung und keine
-        Rangfolge. Das Instrument ist noch in Entwicklung und nicht validiert.{" "}
-        {perspective === "other"
-          ? "Wie dieses Vorgehen bei anderen ankommt, misst der Bericht nicht."
-          : "Wie dein Vorgehen bei anderen ankommt, misst der Bericht nicht – das lässt sich nur im Gespräch herausfinden."}
+          ? `Hier siehst du, wie ${name} in konkreten Arbeitssituationen vorgeht – nach eigenen Antworten. Die Beschreibungen sind an ${name} gerichtet formuliert.`
+          : "Hier siehst du, wie du in konkreten Arbeitssituationen vorgehst – Bereich für Bereich, aus deinen eigenen Antworten."}
       </p>
 
       <SignatureOverview people={[{ id: profile.person_id, name, profile }]} />
+
+      <section aria-labelledby="ws-findings-title" className="rounded-3xl border border-violet-100 bg-violet-50/40 p-5 sm:p-6">
+        <h2 id="ws-findings-title" className="text-xl font-semibold">
+          {perspective === "other" ? "Wo die Antworten in eine Richtung gehen" : "Wo deine Antworten in eine Richtung gehen"}
+        </h2>
+        {findings.length ? (
+          <ul className="mt-4 space-y-3">
+            {findings.map(({ area, narrative: n }) => (
+              <li key={area.key} data-claim={n.claim} className="text-sm leading-6">
+                <span className="font-semibold text-slate-900">{area.title}: </span>
+                <span className="text-slate-700">{n.core}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            {perspective === "other"
+              ? "In keinem Bereich gehen die Antworten eindeutig in eine Richtung – sie unterscheiden sich je nach Situation. Die Einzelheiten stehen unten."
+              : "In keinem Bereich gehen deine Antworten eindeutig in eine Richtung – sie unterscheiden sich je nach Situation. Die Einzelheiten stehen unten."}
+          </p>
+        )}
+      </section>
 
       <section aria-labelledby="ws-areas-title">
         <h2 id="ws-areas-title" className="text-xl font-semibold">
@@ -98,6 +120,20 @@ export function IndividualWorkstyle({
             </section>
           ))}
         </div>
+      </section>
+
+      <section aria-labelledby="ws-method-title" className="ws-text-card rounded-2xl border border-slate-200 bg-white/70 p-5">
+        <h2 id="ws-method-title" className="text-base font-semibold">So liest du das</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+          {perspective === "other"
+            ? `Selbstauskunft von ${name} zu konkreten Arbeitssituationen.`
+            : "Deine Selbstauskunft zu konkreten Arbeitssituationen."}{" "}
+          Sie beschreibt typische Arbeitsweisen in diesen Situationen – keine Persönlichkeit, keine Eignung und keine
+          Rangfolge. Das Instrument ist noch in Entwicklung und nicht validiert.{" "}
+          {perspective === "other"
+            ? "Wie dieses Vorgehen bei anderen ankommt, misst der Bericht nicht."
+            : "Wie dein Vorgehen bei anderen ankommt, misst der Bericht nicht – das lässt sich nur im Gespräch herausfinden."}
+        </p>
       </section>
 
       <details className="ws-appendix rounded-2xl border border-slate-200 bg-white/70 p-4" open={full}>

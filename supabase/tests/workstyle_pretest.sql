@@ -108,6 +108,15 @@ select assessment,'e8510000-0000-4000-8000-000000000003' from workstyle_ids wher
 insert into public.alignment_shares(assessment_id,recipient_user_id) values
  ('e8512000-0000-4000-8000-000000000001','e8510000-0000-4000-8000-000000000003'),
  ('e8512000-0000-4000-8000-000000000002','e8510000-0000-4000-8000-000000000003');
+-- Phase 11.6: Advisor-Freigaben allein ergeben keine Team-Eingaben; erst wenn
+-- die Mitglieder ihre Arbeitsprofile auch gegenseitig freigegeben haben.
+set local role authenticated;
+select pg_temp.check_workstyle(public.get_workstyle_team_inputs('e8511000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'advisor shares without mutual member shares stay not_ready');
+reset role;
+insert into public.alignment_shares(assessment_id,recipient_user_id)
+select a.assessment,b.person from workstyle_ids a join workstyle_ids b on b.person<>a.person
+where a.person in ('e8510000-0000-4000-8000-000000000001','e8510000-0000-4000-8000-000000000002')
+ and b.person in ('e8510000-0000-4000-8000-000000000001','e8510000-0000-4000-8000-000000000002');
 set local role authenticated;
 do $$ declare result jsonb; begin
  result:=public.get_workstyle_team_inputs('e8511000-0000-4000-8000-000000000001');

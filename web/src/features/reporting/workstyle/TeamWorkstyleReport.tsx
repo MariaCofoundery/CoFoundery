@@ -99,7 +99,7 @@ export function TeamWorkstyleReport({
   const shownAgenda = agenda.slice(0, 8);
 
   return (
-    <div className={`ws-report space-y-12${full ? " ws-print-full" : ""}`} lang="de">
+    <div className={`ws-report space-y-12 ${full ? "ws-print-full" : ""}`} lang="de">
       <section aria-labelledby="ws-glance-title">
         <h2 id="ws-glance-title" className="text-2xl font-semibold">Auf einen Blick</h2>
         <p className="mt-3 leading-7">{team.people.map((p) => p.name).join(" · ")}</p>

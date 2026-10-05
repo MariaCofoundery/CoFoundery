@@ -130,6 +130,38 @@
     "notReadyTitle": "Der Teamreport ist noch nicht verfügbar",
     "shareMissingTitle": "Freigabe fehlt",
     "notReadyBody": "Alle Mitglieder brauchen ein abgeschlossenes Arbeitsprofil in der aktuellen Fassung und müssen ihre Antworten für die lesende Person freigeben. Eine Einladung allein erteilt keine Freigabe.",
-    "notReadyCta": "Eigenes Arbeitsprofil und Freigaben öffnen"
+    "notReadyCta": "Eigenes Arbeitsprofil und Freigaben öffnen",
+    "readiness": {
+      "title": "Für euren gemeinsamen Bericht fehlt noch etwas",
+      "listLabel": "Stand der Freigaben im Team",
+      "you": "du",
+      "state": {
+        "MISSING_MINE": "Deine Freigabe fehlt noch. Sobald du deine Arbeitsweise für alle im Team freigibst, erscheint euer Bericht für alle gleichzeitig.",
+        "MISSING_OTHERS": "Deine Freigabe ist da. Warte noch auf die Freigabe von {names}.",
+        "MISSING_MULTIPLE": "Es fehlen noch mehrere Freigaben – auch deine. Außerdem wartet ihr auf {names}.",
+        "INSUFFICIENT_WORKSTYLE": "Für den gemeinsamen Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Freigabe für alle anderen. Offen ist das noch bei: {names}.",
+        "READY": "Alle Freigaben sind da.",
+        "UNAVAILABLE": "Der Teambericht ist für dieses Team nicht verfügbar.",
+        "INSUFFICIENT_WORKSTYLE_SELF": "Für den gemeinsamen Bericht braucht jede Person ein aktuelles Arbeitsprofil und eine Freigabe für alle anderen. Dein Arbeitsprofil fehlt noch."
+      },
+      "member": {
+        "shared": "Arbeitsweise für alle im Team freigegeben",
+        "notShared": "Arbeitsweise noch nicht für alle im Team freigegeben",
+        "noWorkstyle": "Noch kein aktuelles Arbeitsprofil"
+      },
+      "reviewShares": "Freigaben prüfen",
+      "completeWorkstyle": "Wie du arbeitest ausfüllen",
+      "rule": "Der gemeinsame Bericht erscheint für alle im Team gleichzeitig – sobald jede Person ihre Arbeitsweise für alle anderen freigegeben hat. Eine Freigabe gilt immer nur in eine Richtung; niemand gibt etwas für andere frei, und mit einer Einladung wird nichts automatisch geteilt."
+    },
+    "researchOffer": {
+      "title": "Made2Found bei der Weiterentwicklung unterstützen",
+      "body": "Freiwillig: weitere Situationen, mit denen wir das Arbeitsprofil weiterentwickeln. Sie verändern dein Arbeitsprofil nicht, und ob du mitmachst, hat keinen Einfluss auf Freigaben, Teamberichte oder FIND.",
+      "offer": "Mehr erfahren",
+      "continue": "Forschungsteil fortsetzen"
+    },
+    "advisorNotReady": {
+      "title": "Der gemeinsame Bericht ist noch nicht verfügbar.",
+      "body": "Es fehlen noch Freigaben im Team. Der Bericht erscheint hier, sobald alle im Team ihre Arbeitsweise füreinander freigegeben haben – und für dich."
+    }
   }
 }

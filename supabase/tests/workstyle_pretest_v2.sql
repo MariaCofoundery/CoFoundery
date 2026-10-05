@@ -121,6 +121,11 @@ set local role authenticated;
 select pg_temp.check_v2(public.get_workstyle_team_inputs('e8521000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'new v2 not automatically shared');
 reset role;
 insert into public.alignment_shares(assessment_id,recipient_user_id) select v2,'e8520000-0000-4000-8000-000000000003' from v2_ids where person='e8520000-0000-4000-8000-000000000002';
+-- Phase 11.6: erst die gegenseitige Freigabe der Mitglieder macht Team-Eingaben.
+set local role authenticated;
+select pg_temp.check_v2(public.get_workstyle_team_inputs('e8521000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'advisor shares without mutual member shares stay not_ready');
+reset role;
+insert into public.alignment_shares(assessment_id,recipient_user_id) select a.v2,b.person from v2_ids a join v2_ids b on b.person<>a.person;
 set local role authenticated;
 do $$ declare r jsonb; begin
  r:=public.get_workstyle_team_inputs('e8521000-0000-4000-8000-000000000001');

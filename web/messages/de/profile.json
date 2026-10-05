@@ -337,7 +337,8 @@
       "legacyApply": "Übernehmen",
       "workAnswers": "Deine Antworten",
       "more": "{count, plural, =1 {Ein weiterer Eintrag steht im ausführlichen Profil} other {# weitere Einträge stehen im ausführlichen Profil}}.",
-      "footer": "Erstellt mit {brand} · {date}"
+      "footer": "Erstellt mit {brand} · {date}",
+      "archiveNote": "Frühere Auswertung aus einer älteren Fassung – nur zum Nachlesen und nicht Teil dieses Profils. Vollständig druckst du sie mit „Frühere Auswertung mit aufnehmen“."
     },
     "currentWorkstyle": {
       "openReport": "Bericht öffnen, Antworten freigeben und Stand festhalten",

@@ -26,7 +26,9 @@
   justify-content: center;
   border: 2px dashed #64748b;
   border-radius: 13px;
-  background: transparent;
+  /* Deckt die Skalenpunkte darunter ab, damit das Kuerzel lesbar bleibt;
+     bewusst weiss statt farbig - eine Spannweite ist kein Wert. */
+  background: rgba(255, 255, 255, 0.92);
   font: 600 11px/1 sans-serif;
   color: #334155;
 }
@@ -105,6 +107,21 @@
     display: block !important;
     border: 0;
     padding: 0;
+  }
+  /* Phase 11.5: Faehigkeiten-Karte bleibt im Druck ein Raster aus kleinen,
+     ungeteilten Bausteinen; die Signature-Spuren reissen nicht. */
+  .ws-report .ws-mosaic.grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2mm;
+  }
+  .ws-report .ws-mosaic.grid > * + * {
+    margin-top: 0;
+  }
+  .ws-tile,
+  .ws-overview figcaption {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .ws-lane,
   .ws-component,

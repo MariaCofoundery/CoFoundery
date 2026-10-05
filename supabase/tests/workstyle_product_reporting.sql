@@ -17,7 +17,7 @@ do $$ declare p record;i record;id uuid;begin
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
   id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
   update report_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' order by position loop
+  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
    perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
   end loop;
  end loop;

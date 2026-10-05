@@ -29,6 +29,26 @@ export async function startWorkstylePretest(consent: boolean, context: ResearchC
   return { ok: true as const, session: data as NonNullable<Awaited<ReturnType<typeof getMyWorkstylePretest>>> };
 }
 
+/** Phase 11.6: Arbeitsprofil starten oder fortsetzen - ohne Forschungseinwilligung. */
+export async function startWorkstyleProduct(newAssessment = false) {
+  const client = await createClient();
+  const { data, error } = await client.rpc("start_workstyle_product", { p_new: newAssessment });
+  if (error) return failure;
+  revalidatePath(root);
+  return { ok: true as const, session: data as NonNullable<Awaited<ReturnType<typeof getMyWorkstylePretest>>> };
+}
+
+/** Phase 11.6: freiwillige Forschung - nur mit ausdruecklicher Einwilligung, nach dem Arbeitsprofil. */
+export async function startWorkstyleResearch(consent: boolean, context: ResearchContext) {
+  if (consent !== true) return { ok: false as const, error: "Bitte willige zuerst ausdrücklich in die Forschung ein." };
+  const client = await createClient();
+  const { data, error } = await client.rpc("start_workstyle_research", { p_consent_version: consentV3.consent_version, p_context: context });
+  if (error) return failure;
+  revalidatePath(root);
+  revalidatePath("/me/profile/workstyle");
+  return { ok: true as const, session: data as NonNullable<Awaited<ReturnType<typeof getMyWorkstylePretest>>> };
+}
+
 export async function saveWorkstyleAnswer(assessmentId: string, itemKey: string, input: unknown, responseTimeMs: number, version = "8.5a-v1") {
   const session = await getMyWorkstylePretest(version);
   if (!session || session.assessment_id !== assessmentId || session.withdrawn_at || session.completed_at) return failure;
@@ -74,6 +94,7 @@ export async function withdrawWorkstyleResearch() {
   if (error) return failure;
   revalidatePath(root);
   revalidatePath("/account");
+  revalidatePath("/me/profile/workstyle");
   return { ok: true as const };
 }
 
@@ -118,7 +139,10 @@ export async function saveWorkstyleV3(assessmentId: string, itemKey: string, inp
     p_response_time_ms: Number.isFinite(responseTimeMs) ? Math.min(86400000, Math.max(0, Math.round(responseTimeMs))) : null,
   });
   if (error) return failure;
-  const saved = data as { completed_at: string | null; answer: typeof session.answers[number] };
-  if (finalize) revalidatePath(root);
-  return { ok: true as const, answer: saved.answer, completed_at: saved.completed_at };
+  const saved = data as { submitted_at: string | null; completed_at: string | null; answer: typeof session.answers[number] };
+  if (finalize || saved.submitted_at !== session.submitted_at || saved.completed_at !== session.completed_at) {
+    revalidatePath(root);
+    revalidatePath("/me/profile/workstyle");
+  }
+  return { ok: true as const, answer: saved.answer, submitted_at: saved.submitted_at, completed_at: saved.completed_at };
 }

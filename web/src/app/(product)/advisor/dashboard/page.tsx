@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { PersonInviteSection, type PersonInvite } from "@/features/advisor/PersonInviteSection";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import {
@@ -735,6 +736,8 @@ export default async function AdvisorDashboardPage() {
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                 {t("dashboard.heroText")}
               </p>
+              {/* Phase 11.5: dasselbe Zitat des Tages wie im Founder-Dashboard. */}
+              <QuoteOfTheDay className="mt-4 max-w-2xl" />
             </div>
           </div>
 

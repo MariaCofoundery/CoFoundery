@@ -1,4 +1,5 @@
 import { workstyleItemFor, type WorkstyleForm } from "@/features/instruments/workstyle/registry";
+import { workstyleV3Item } from "@/features/instruments/workstyle/researchSets";
 
 export type WorkstyleAnswerValue =
   | Readonly<{ response_value: 1 | 2 | 3 | 4 | 5; missing_reason: null }>
@@ -49,7 +50,9 @@ export type WorkstyleV3Answer = Readonly<{
 
 /** Preserve category identity and presentation independently from ordinal values. */
 export function parseWorkstyleV3Answer(itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
-  const item = workstyleItemFor(itemKey, itemVersion, "8.5a-v3");
+  // Phase 11.6C: auch die Welle-1-Ueberarbeitungen (EVI-04r, EL-03r, EL-06r).
+  const item = workstyleV3Item(itemKey);
+  if (!item || item.item_version !== itemVersion) throw new Error("unknown_workstyle_item");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("invalid_workstyle_answer");
   const data = input as Record<string, unknown>;
   const keys = ["response_value", "response_option", "missing_reason", "rendered_order"];

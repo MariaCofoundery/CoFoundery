@@ -186,6 +186,12 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
           </p>
         </div>}
 
+        {/* Phase 11.5: Vor dem Absenden klar sagen, dass nichts automatisch
+            geteilt wird. Freigaben sind erst nach der Annahme moeglich. */}
+        <div className="rounded-xl border border-violet-200 bg-violet-50/60 p-4">
+          <p className="text-sm font-semibold text-violet-950">{t("sharingTitle")}</p>
+          <p className="mt-1 text-sm leading-6 text-violet-950/80">{t("sharingNote")}</p>
+        </div>
 
         <button
           type="submit"

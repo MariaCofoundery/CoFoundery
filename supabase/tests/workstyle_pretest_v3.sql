@@ -9,7 +9,7 @@ grant all on v3_ids to authenticated;
 create function pg_temp.fill_v3(id uuid,all_missing boolean) returns jsonb language plpgsql as $$
 declare i record; result jsonb; v integer; o text;
 begin
- for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' order by position loop
+ for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
    v:=null; o:=null;
    if not all_missing then
      if i.definition->>'response_format' in ('comparative','behavioral') then o:=i.definition->'options'->0->>'option_id'; else v:=3; end if;
@@ -24,7 +24,10 @@ insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_co
 select '00000000-0000-0000-0000-000000000000',id,'authenticated','authenticated',email,'',now(),'{}','{}',now(),now()
 from (values ('e8530000-0000-4000-8000-000000000001'::uuid,'v3-a@example.test'),('e8530000-0000-4000-8000-000000000002'::uuid,'v3-b@example.test'),('e8530000-0000-4000-8000-000000000003'::uuid,'v3-advisor@example.test'),('e8530000-0000-4000-8000-000000000004'::uuid,'v3-admin@example.test')) x(id,email);
 insert into public.profiles(user_id,roles) values ('e8530000-0000-4000-8000-000000000001',array['founder']),('e8530000-0000-4000-8000-000000000002',array['founder']) on conflict(user_id) do update set roles=excluded.roles;
-select pg_temp.check_v3((select count(*)=52 and count(*) filter(where definition->>'usage'='core')=29 and count(*) filter(where definition->>'usage'='research_only')=23 from public.workstyle_item_versions where assessment_version='8.5a-v3'),'52 items / 29 product / 23 private');
+select pg_temp.check_v3((select count(*)=52 and count(*) filter(where definition->>'usage'='core')=29 and count(*) filter(where definition->>'usage'='research_only')=23 from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null),'52 items / 29 product / 23 private');
+-- Phase 11.6C: drei sprachliche Ueberarbeitungen fuer research-sets/1.0.0 kommen als eigene, rein private Items hinzu.
+select pg_temp.check_v3((select count(*)=3 and bool_and(definition->>'usage'='research_only' and definition->>'research_set_version'='research-sets/1.0.0' and position>52)
+ and array_agg(item_key order by item_key)=array['EL-03r','EL-06r','EVI-04r'] from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is not null),'three private wave-1 revisions, never core');
 select pg_temp.check_v3((select bool_and(item_version='8.4-v0.4' and definition->'missing_reasons'='["cannot_assess"]' and definition->>'form' is null) from public.workstyle_item_versions where assessment_version='8.5a-v3'),'exact item version, missing everywhere, no form');
 select pg_temp.check_v3((select count(*)=4 from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'scientific_status'='candidate_core' and definition->>'usage'='research_only'),'candidate DEC stays private');
 select pg_temp.check_v3(not has_function_privilege('authenticated','public.workstyle_answer_rows(uuid)','EXECUTE') and not has_function_privilege('anon','public.save_workstyle_pretest_v3(uuid,text,text,integer,text,text,jsonb,integer,boolean)','EXECUTE'),'helper and anonymous entry denied');
@@ -70,7 +73,9 @@ select pg_temp.check_v3((select count(*)=29 from public.alignment_answers where 
 select pg_temp.check_v3((select value='{"optionId":"strong_a"}'::jsonb and answer_format='single_choice' and workstyle_rendered_order='["A","B"]' from public.alignment_answers where assessment_id=(select assessment from v3_ids limit 1) and block_id='ORG-03'),'FC product raw option, no numeric score');
 select pg_temp.check_v3((select response_option='A' and response_value is null from public.workstyle_research_responses where assessment_id=(select assessment from v3_ids limit 1) and item_key='EL-03'),'behavioral raw pattern, not ordinal');
 select pg_temp.check_v3((select count(*)=23 from public.workstyle_research_responses where assessment_id=(select assessment from v3_ids limit 1)),'all research/candidate data private');
-select pg_temp.check_v3((select a.submitted_at=s.completed_at from public.assessments a join public.workstyle_pretest_sessions s on s.assessment_id=a.id where a.id=(select assessment from v3_ids limit 1)),'atomic completion');
+-- Phase 11.6: Arbeitsprofil (submitted_at) ist mit der 29. Core-Antwort fertig,
+-- die Forschung (completed_at) erst mit der letzten Forschungsantwort.
+select pg_temp.check_v3((select a.submitted_at<s.completed_at from public.assessments a join public.workstyle_pretest_sessions s on s.assessment_id=a.id where a.id=(select assessment from v3_ids limit 1)),'product completes at 29th core, research completes separately later');
 do $$ begin
  begin update public.workstyle_item_versions set definition=jsonb_set(definition,'{prompt}','"changed"') where assessment_version='8.5a-v2'; raise exception 'old v2 overwritten'; exception when check_violation then null; end;
  begin update public.workstyle_item_versions set definition=jsonb_set(definition,'{prompt}','"changed"') where assessment_version='8.5a-v3'; raise exception 'v3 overwritten'; exception when check_violation then null; end;
@@ -124,6 +129,11 @@ set local role authenticated;
 select pg_temp.check_v3(public.get_workstyle_team_inputs('e8531000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'new instrument not auto-shared');
 reset role;
 insert into public.alignment_shares(assessment_id,recipient_user_id) select assessment,'e8530000-0000-4000-8000-000000000003' from v3_ids where person='e8530000-0000-4000-8000-000000000002';
+-- Phase 11.6: erst die gegenseitige Freigabe der Mitglieder macht Team-Eingaben.
+set local role authenticated;
+select pg_temp.check_v3(public.get_workstyle_team_inputs('e8531000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'advisor shares without mutual member shares stay not_ready');
+reset role;
+insert into public.alignment_shares(assessment_id,recipient_user_id) select a.assessment,b.person from v3_ids a join v3_ids b on b.person<>a.person;
 set local role authenticated;
 do $$ declare r jsonb; begin
  r:=public.get_workstyle_team_inputs('e8531000-0000-4000-8000-000000000001');

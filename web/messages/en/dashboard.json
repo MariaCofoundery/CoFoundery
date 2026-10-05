@@ -631,7 +631,9 @@
       "success": "Link copied.",
       "error": "Copying is not possible. Please copy the link manually."
     },
-    "dashboardCta": "Go to dashboard"
+    "dashboardCta": "Go to dashboard",
+    "sharingTitle": "What the invitation shares",
+    "sharingNote": "The invitation shares nothing automatically – no answers, no work profile, no venture details. After accepting, each person decides for themselves what to share with the other. Your shared report only appears once everyone has shared their work style with each other – then for all of you at the same time."
   },
   "participantInvite": {
     "projectLabel": "Team or project name",

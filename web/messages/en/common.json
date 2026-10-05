@@ -31,5 +31,20 @@
       "noSpeech": "No speech was detected.",
       "generic": "The recording could not be processed right now."
     }
+  },
+  "quoteOfTheDay": {
+    "eyebrow": "Quote of the day",
+    "quotes": {
+      "q0": "Clarity saves founding teams more energy later than speed at the wrong point.",
+      "q1": "Not every tension is a problem. But every unresolved tension costs focus.",
+      "q2": "Good founder teams don't look frictionless. They address friction early.",
+      "q3": "Similar or different – what matters is what you agree on.",
+      "q4": "Sometimes the most productive progress is not another task, but a better agreement.",
+      "q5": "A good question at the right time often saves a long discussion.",
+      "q6": "Saying early what matters to you makes it easier for others to listen.",
+      "q7": "Agreements are not contracts against each other, but orientation for each other.",
+      "q8": "An open point that is spoken out weighs less than one that quietly runs along.",
+      "q9": "Founding together also means deciding together how you decide."
+    }
   }
 }

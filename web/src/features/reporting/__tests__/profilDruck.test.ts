@@ -81,7 +81,10 @@ test("die Antworten aus dem Bogen stehen nur in der Langfassung", () => {
   // Also kommt sie im Abschnitt „Wie du arbeitest", bevor der sich nach dem
   // Modus verzweigt. (Weiter oben gibt es eine Verzweigung fuer das
   // Kennzeichen „Kurzprofil" / „Ausfuehrliches Profil"; die zaehlt nicht.)
-  const abschnitt = druck.slice(druck.indexOf("{voll && workProfile ?"));
+  // Phase 11.5: vollstaendig nur mit "Fruehere Auswertung mit aufnehmen";
+  // sonst nur eine kompakte Archivkarte.
+  assert.match(druck, /\{voll && workProfile && !includeLegacy \? \(\s*<ArchiveCard/);
+  const abschnitt = druck.slice(druck.indexOf("{voll && workProfile && includeLegacy ?"));
   assert.ok(
     abschnitt.indexOf("<WorkMap") < abschnitt.indexOf("{voll ? ("),
     "die WorkMap haengt am Modus",
@@ -199,7 +202,7 @@ test("leere Abschnitte entfallen ohne Hinweis", () => {
   assert.ok(!/<MissingSection|missingCapability|missingWorkProfile|\.empty\b/.test(druck));
 
   for (const bedingung of [
-    /\{voll && workProfile \?/,
+    /\{voll && workProfile && includeLegacy \?/,
     /\{strengths\.length > 0 \?/,
     /\{orderedEntries\.length > 0 \?/,
     /\{growingInto\.length > 0 \?/,

@@ -1,0 +1,171 @@
+{
+  "research_set_version": "research-sets/1.0.0",
+  "assessment_version": "8.5a-v3",
+  "instrument_id": "founder-workstyle-pretest-8-5a-v3",
+  "core_manifest_version": "3.0.0",
+  "status": "wave_1",
+  "note": "Eigene Achse neben dem Core-Manifest. Keine Wirkung auf Arbeitsprofil, Berichte, Teilen, FIND. Die Originale EVI-04, EL-03, EL-06 bleiben für die full-23-Kohorte unverändert.",
+  "sets": {
+    "A": [
+      "ORG-06",
+      "EXP-05",
+      "EVI-R1",
+      "AMB-06",
+      "EL-03r",
+      "VOICE-R1",
+      "ORG-05",
+      "DEC-02"
+    ],
+    "B": [
+      "ORG-06",
+      "EXP-R1",
+      "VOICE-06",
+      "AMB-03",
+      "EVI-04r",
+      "EL-06r",
+      "AMB-R1",
+      "FS-R2"
+    ]
+  },
+  "anchor_items": [
+    "ORG-06"
+  ],
+  "assignment": "Serverseitig bei der Forschungseinwilligung: weniger belegtes Set, bei Gleichstand zufällig; unter Sperre; danach unveränderlich.",
+  "ordering": "Mit Einwilligung zu Beginn: 29 Core in fester relativer Reihenfolge, 8 Set-Items in zufälliger Reihenfolge, je eines in einer zufälligen Lücke aus 8 gleich großen Lückengruppen nach den Core-Items 1–29. Nach fertigem Arbeitsprofil: nur die 8 Set-Items in zufälliger Reihenfolge. Einmal erzeugt und je Sitzung gespeichert.",
+  "revised_items": [
+    {
+      "item_key": "EVI-04r",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Evidenzorientierung",
+      "area_key": "EVI",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein für euer Vorhaben wichtiges Ergebnis fällt deutlich anders aus als erwartet. Was tust du am ehesten zuerst?",
+      "stem": null,
+      "response_format": "behavioral",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "label": "Ich warte ab, ob sich das Ergebnis wiederholt – ein einzelner Ausreißer kann täuschen."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich gehe vom naheliegendsten Grund aus und arbeite damit weiter, damit wir nicht ins Stocken geraten."
+        },
+        {
+          "option_id": "C",
+          "label": "Ich schaue mir an, wie das Ergebnis zustande gekommen ist, bevor ich es deute."
+        },
+        {
+          "option_id": "D",
+          "label": "Ich überlege mir mehrere mögliche Erklärungen und wäge sie gegeneinander ab."
+        },
+        {
+          "option_id": "E",
+          "label": "Ich frage mich zuerst, ob meine ursprüngliche Erwartung überhaupt stimmte."
+        }
+      ],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Sprachliche Überarbeitung von EVI-04 für research-sets/1.0.0; Konstrukt und Forschungsfrage unverändert; keine Gleichsetzung mit EVI-04",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Gleichwertige Vorgehensweisen statt Methodenleiter; jede Option mit eigenem nachvollziehbarem Grund.",
+      "revision_of": "EVI-04",
+      "research_set_version": "research-sets/1.0.0"
+    },
+    {
+      "item_key": "EL-03r",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "core_research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Du hast etwas ausprobiert, und das Ergebnis überrascht dich. Was machst du als Nächstes am ehesten?",
+      "stem": null,
+      "response_format": "behavioral",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "label": "Ich probiere es noch einmal genauso, um zu sehen, ob es sich bestätigt."
+        },
+        {
+          "option_id": "B",
+          "label": "Ich ändere gezielt eine Sache und probiere es erneut."
+        },
+        {
+          "option_id": "C",
+          "label": "Ich probiere einen deutlich anderen Ansatz aus."
+        },
+        {
+          "option_id": "D",
+          "label": "Mir reicht das Ergebnis – ich entscheide damit, ohne noch einmal zu testen."
+        }
+      ],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Sprachliche Überarbeitung von EL-03 für research-sets/1.0.0; Konstrukt und Forschungsfrage unverändert; keine Gleichsetzung mit EL-03",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "Vier klar unterschiedliche nächste Schritte; die EVI-nahe Option (Ursachen verstehen) entfällt.",
+      "revision_of": "EL-03",
+      "research_set_version": "research-sets/1.0.0"
+    },
+    {
+      "item_key": "EL-06r",
+      "item_version": "8.4-v0.4",
+      "assessment_version": "8.5a-v3",
+      "construct": "Experimentelles Lernen",
+      "area_key": "EL",
+      "area_status": "development_area",
+      "scientific_status": "research",
+      "facet": null,
+      "facet_status": "not_specified",
+      "prompt": "Ein erster Versuch spricht gegen deine ursprüngliche Idee. Wie wahrscheinlich ist es, dass du dir überlegst, was du beim nächsten Versuch gezielt anders prüfst?",
+      "stem": null,
+      "response_format": "likelihood",
+      "missing_reasons": [
+        "cannot_assess"
+      ],
+      "options": [],
+      "alternatives": [],
+      "rendered_order": null,
+      "source_type": "adapted",
+      "source_status": "adapted",
+      "source_status_explicit": false,
+      "source_note": "Sprachliche Überarbeitung von EL-06 für research-sets/1.0.0; Konstrukt und Forschungsfrage unverändert; keine Gleichsetzung mit EL-06",
+      "development_status": "candidate_for_pretest",
+      "usage": "research_only",
+      "research_only": true,
+      "product_status": "excluded",
+      "form": null,
+      "note": "experimentelles Lernen vs. Beharrlichkeit/Persistenz; alltagsnähere Formulierung.",
+      "revision_of": "EL-06",
+      "research_set_version": "research-sets/1.0.0"
+    }
+  ]
+}

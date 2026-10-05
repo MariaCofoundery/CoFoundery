@@ -31,5 +31,20 @@
       "noSpeech": "Es wurde gerade keine Sprache erkannt.",
       "generic": "Die Sprachaufnahme konnte gerade nicht verarbeitet werden."
     }
+  },
+  "quoteOfTheDay": {
+    "eyebrow": "Zitat des Tages",
+    "quotes": {
+      "q0": "Klarheit spart Gründerteams später mehr Kraft als Tempo am falschen Punkt.",
+      "q1": "Nicht jede Spannung ist ein Problem. Aber jede ungeklärte Spannung kostet Fokus.",
+      "q2": "Gute Founder-Teams wirken nicht reibungslos. Sie klären Reibung früh.",
+      "q3": "Ähnlich oder verschieden – entscheidend ist, was ihr daraus vereinbart.",
+      "q4": "Manchmal ist der produktivste Fortschritt keine weitere Aufgabe, sondern eine bessere Absprache.",
+      "q5": "Eine gute Frage zur rechten Zeit erspart oft eine lange Diskussion.",
+      "q6": "Wer früh sagt, was ihm wichtig ist, macht es anderen leichter zuzuhören.",
+      "q7": "Vereinbarungen sind keine Verträge gegeneinander, sondern Orientierung füreinander.",
+      "q8": "Ein ausgesprochener offener Punkt wiegt weniger als einer, der still mitläuft.",
+      "q9": "Gemeinsam gründen heißt auch: gemeinsam entscheiden, wie ihr entscheidet."
+    }
   }
 }
