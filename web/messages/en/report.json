@@ -109,5 +109,27 @@
     "snapshot": "It is a snapshot. People answer differently in a different situation, and that is not a fault of the answer.",
     "purpose": "What it is for: as a basis for a conversation — between people who want to found together, or with somebody accompanying them. Not as a basis for selection.",
     "dated": "State of the answers: {date}"
+  },
+  "workstyle": {
+    "backToProfile": "Your profile",
+    "backToTeam": "Back to team",
+    "backToAdvisor": "Back to advisor area",
+    "individualTitle": "How you work",
+    "teamTitle": "How you work together",
+    "teamFallbackName": "Your venture",
+    "print": "Print / save as PDF",
+    "fullVersion": "Full version with all answers",
+    "compactVersion": "Compact version",
+    "fullVersionNote": "Full version: all individual answers are expanded and included in print.",
+    "snapshot": "Save this version",
+    "snapshotSaved": "Saved on {date}",
+    "snapshotError": "This version could not be saved. Please reload the report.",
+    "germanOnly": "This report is currently available in German only, because the workstyle instrument exists in German only.",
+    "emptyIndividual": "You have not yet described how you work. Your report is built from your answers about concrete work situations.",
+    "emptyIndividualCta": "Fill in how you work",
+    "notReadyTitle": "The team report is not available yet",
+    "shareMissingTitle": "Sharing missing",
+    "notReadyBody": "Every member needs a completed work profile in the current version and has to share their answers with the reader. An invitation alone does not grant access.",
+    "notReadyCta": "Open your work profile and sharing"
   }
 }

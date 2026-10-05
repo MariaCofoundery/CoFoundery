@@ -338,6 +338,16 @@
       "workAnswers": "Your answers",
       "more": "{count, plural, =1 {One further entry is in the full profile} other {# further entries are in the full profile}}.",
       "footer": "Created with {brand} · {date}"
+    },
+    "currentWorkstyle": {
+      "openReport": "Open report, share answers and save a version",
+      "empty": "You have not yet described how you work. Your report is built from your answers about concrete work situations.",
+      "cta": "Fill in how you work"
+    },
+    "historicalWorkProfile": {
+      "title": "Earlier work profile – historical version",
+      "dated": "As of: {date}",
+      "text": "From an earlier version of the work profile. For reference only: it is no longer edited and is not combined with the current report."
     }
   }
 }

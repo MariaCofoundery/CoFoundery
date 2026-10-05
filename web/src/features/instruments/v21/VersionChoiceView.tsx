@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import {
   versionFacts,
   CHOICE_CONSEQUENCES,
@@ -97,9 +98,13 @@ export function VersionChoiceView({ hasPrevious, hasNext, archived = false }: Pr
             hasPrevious ? (
               <p className="text-sm text-slate-500">Das ist der Stand — du musst nichts tun.</p>
             ) : (
-              <Link href="/me/base" className="text-sm text-slate-900 underline">
-                Zur bisherigen Fassung
-              </Link>
+              // Phase 10: Die bisherige Fassung wird nicht mehr ausgefuellt.
+              <p className="text-sm text-slate-500">
+                Die bisherige Fassung wird nicht mehr ausgefüllt.{" "}
+                <Link href={CURRENT_WORKSTYLE_HREF} className="text-slate-900 underline">
+                  Wie du arbeitest ausfüllen
+                </Link>
+              </p>
             )
           }
         />

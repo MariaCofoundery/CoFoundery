@@ -625,7 +625,7 @@
     }
   },
   "team": {
-    "title": "Rollen und Zuständigkeiten",
+    "title": "Fähigkeiten & Verantwortung",
     "text": "Wer verantwortet was, wo wollen mehrere dasselbe, und wo will es niemand. Das hier ist eine Lagebeschreibung aus euren eigenen Angaben – keine Bewertung, keine Punkte und keine Rangfolge.",
     "backToTeam": "Zum Team",
     "basis": "{contributing} von {members} im Team haben Angaben gemacht, davon {withDepth} mit Erfahrungsstufe und Verantwortungswunsch. Nur diese beiden lassen eine Aussage über eine Rolle zu – wer weniger freigegeben hat, erscheint hier ohne Tiefe.",

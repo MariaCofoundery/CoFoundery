@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { buildInvitationQuestionnaireHref } from "@/features/onboarding/invitationFlow";
+import { buildInvitationStartHref } from "@/features/onboarding/invitationFlow";
 import {
   claimAdvisorTeamInviteFounderAction,
 } from "@/features/dashboard/advisorTeamInviteActions";
@@ -105,8 +105,10 @@ export default async function AdvisorTeamInvitePage({
     !slotAlreadyClaimed &&
     (founderSlot === "founderA" ? !row.founder_a_user_id : !row.founder_b_user_id);
   const invitationReadyForCurrentSlot = Boolean(row.invitation_id) && slotAlreadyClaimed;
+  // Phase 10: Weiter ueber /join/start in den aktuellen Weg (Workstyle v0.4
+  // bzw. Teamreport) - nicht mehr in den frueheren Basis-Fragebogen.
   const questionnaireHref = row.invitation_id
-    ? buildInvitationQuestionnaireHref(row.invitation_id, "base")
+    ? buildInvitationStartHref(row.invitation_id)
     : null;
   const errorMessage = statusCopy(resolvedSearchParams.error, t);
 
@@ -122,7 +124,7 @@ export default async function AdvisorTeamInvitePage({
       redirect(`/team-invite/${encodeURIComponent(token)}?error=${encodeURIComponent(result.reason)}`);
     }
 
-    redirect(buildInvitationQuestionnaireHref(result.invitationId, "base"));
+    redirect(buildInvitationStartHref(result.invitationId));
   }
 
   return (

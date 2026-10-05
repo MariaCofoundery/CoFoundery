@@ -2,8 +2,6 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
 import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
-import { InviteVersionNote } from "@/features/instruments/align/InviteVersionNote";
-import { worksWithPrevious } from "@/features/instruments/align/invitationVersion";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function NewInvitePage({ searchParams }: { searchParams: Promise<{ team?: string }> }) {
@@ -26,10 +24,10 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
     targetTeam = { id: team.id, name: team.name ?? team.members.map(m => m.displayName ?? "Founder").join(" + "), context: team.teamContext };
   }
 
-  // WER EINLAEDT, ENTSCHEIDET UEBER BEIDE. Die Einladung fuehrt dorthin, wo
-  // die einladende Person arbeitet - bisher fiel diese Entscheidung, ohne
-  // dass jemand sie bemerkt haette.
-  const bisherigeFassung = await worksWithPrevious(user.id);
+  // Phase 10: Kein Hinweis "du laedst in die bisherige Fassung ein" mehr -
+  // jede Einladung fuehrt ueber /join/start in den aktuellen Weg
+  // (resolveInvitationContinueTarget), unabhaengig von der Fassung der
+  // einladenden Person.
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
@@ -42,7 +40,6 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
         </a>
       </div>
       <div className="space-y-6">
-        {!targetTeam && bisherigeFassung && <InviteVersionNote />}
         {!targetTeam && <MatchingStartBlock />}
         <CoFounderInviteForm targetTeam={targetTeam} />
       </div>

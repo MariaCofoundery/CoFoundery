@@ -110,14 +110,18 @@ test("der Waechter findet die Pilotseiten", () => {
   }
 });
 
-test("der Fragebogen sagt VOR der ersten Frage, dass er eine Testfassung ist", () => {
+test("Phase 10: der archivierte Fragebogen laedt niemanden mehr ein", () => {
+  // Frueher stand hier, dass der Fragebogen VOR der ersten Frage sagt, dass er
+  // eine Testfassung ist. Seit dem Cutover gibt es keine erste Frage mehr:
+  // Wer v2.1 hat, liest seine Antworten; alle anderen kommen in den aktuellen Weg.
   const page = readFileSync(join(PILOT, "page.tsx"), "utf8");
-  assert.match(page, /Testfassung/);
-  // Und die beiden Folgen, die man nicht hinterher erfahren darf.
-  assert.match(page, /noch keine\s*\n?\s*Auswertung|keine\s*\n?\s*Auswertung/,
-    "der Hinweis, dass es noch keine Auswertung gibt, fehlt");
-  assert.match(page, /dieselbe Fassung|zwei verschiedene Fragebögen/,
-    "der Hinweis auf den Vergleich nur innerhalb einer Fassung fehlt");
+  assert.doesNotMatch(page, /QuestionnaireV21|saveAnswerV21/);
+  assert.match(page, /redirect\(assessment \? "\/founder-alignment\/pilot\/report" : CURRENT_WORKSTYLE_HREF\)/);
+  const discovery = readFileSync(join(PILOT, "discovery", "page.tsx"), "utf8");
+  assert.doesNotMatch(discovery, /DiscoveryTopicsFormV21/);
+  assert.match(discovery, /redirect\("\/founder-alignment\/suche"\)/);
+  const nav = readFileSync(join("src", "features", "instruments", "v21", "NavV21.tsx"), "utf8");
+  assert.doesNotMatch(nav, /href: "\/founder-alignment\/pilot"|pilot\/discovery/);
 });
 
 test("v1 bleibt die Fassung, die gilt", () => {
@@ -141,6 +145,8 @@ test("keine Pilotseite verwechselt v2 mit v2.1", () => {
   // jemand sieht einen leeren Fragebogen, obwohl er ihn ausgefuellt hat.
   for (const path of pagesOfPilot()) {
     const page = readFileSync(path, "utf8");
+    // Reine Weiterleitungen (Phase 10) lesen keine Antworten.
+    if (!/\.from\(/.test(page)) continue;
     assert.match(page, /ALIGNMENT_V21_INSTRUMENT_ID/, path);
     assert.ok(!/ALIGNMENT_V2_INSTRUMENT_ID/.test(page), path);
   }

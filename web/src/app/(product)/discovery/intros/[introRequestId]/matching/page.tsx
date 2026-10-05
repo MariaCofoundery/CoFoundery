@@ -1,4 +1,5 @@
 import { currentTeamForPeople } from "@/features/teams/currentJourneyData";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -247,7 +248,7 @@ function MatchingSessionReadinessCard({
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         {currentUserBaseMissing ? (
-          <Link href="/me/base" className={PRIMARY_CTA_CLASS}>
+          <Link href={CURRENT_WORKSTYLE_HREF} className={PRIMARY_CTA_CLASS}>
             {t("matchingPreparation.readiness.completeInputs")}
           </Link>
         ) : null}
@@ -336,14 +337,10 @@ function MatchingStartStatusContent({
   async function confirmFullMatching() {
     "use server";
     const result = await confirmFullDiscoveryMatchingAction(introRequestId, matchingStart.id);
-    if (!result.ok) {
-      redirect(matchingStartResultUrl(introRequestId, result));
-    }
-    const sessionResult = await createMatchingSessionFromDiscoveryStartAction(
-      introRequestId,
-      matchingStart.id
-    );
-    redirect(matchingSessionResultUrl(introRequestId, sessionResult));
+    // Phase 10: Nach der zweiten Zustimmung KEINE fruehere Matching-Session
+    // mehr anlegen. Die Seite fuehrt danach in den aktuellen Teamweg
+    // ("Euer Zusammenspiel oeffnen", open_discovery_workstyle_team).
+    redirect(matchingStartResultUrl(introRequestId, result));
   }
 
   async function createMatchingSession() {

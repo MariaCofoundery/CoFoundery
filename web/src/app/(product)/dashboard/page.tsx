@@ -905,10 +905,9 @@ function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: Dashb
           {t("team.status", { status: getSentInviteStatusLabel(invite, t) })}
         </p>
         <p className="text-xs text-slate-500">
-          {t("team.modulesAndExpiry", {
-            modules: formatInvitationModules(invite.requiredModules, t),
-            date: formatDate(invite.expiresAt, t),
-          })}
+          {/* Phase 10: keine "Module: Basis, Werte" mehr - neue Einladungen
+              fuehren in den aktuellen Weg, der keine Module kennt. */}
+          {t("team.expires", { date: formatDate(invite.expiresAt, t) })}
         </p>
       </div>
 
@@ -937,10 +936,7 @@ function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: D
           {t("team.status", { status: getIncomingInviteStatusLabel(invite, t) })}
         </p>
         <p className="text-xs text-slate-500">
-          {t("team.modulesAndCreated", {
-            modules: formatInvitationModules(invite.requiredModules, t),
-            date: formatDate(invite.createdAt, t),
-          })}
+          {t("team.created", { date: formatDate(invite.createdAt, t) })}
         </p>
         {helperText ? <p className="mt-1 text-xs text-amber-700">{helperText}</p> : null}
       </div>
@@ -962,25 +958,17 @@ function buildIncomingInvitationAction(invite: InvitationDashboardRow, t: Dashbo
   const isAccepted = invite.status === "accepted";
   const resumeHref = buildInvitationResumeHref(invite.id);
   const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
-  const needsBaseQuestionnaire = !invite.inviteeBaseSubmitted;
-  const needsValuesQuestionnaire =
-    invite.inviteeBaseSubmitted && requiresValues && !invite.inviteeValuesSubmitted;
 
   return {
     href: resumeHref,
+    // Phase 10: Die Beschriftung leitet sich nicht mehr aus dem Fortschritt im
+    // frueheren Basis-/Werte-Fragebogen ab. /invite/:id/resume fuehrt ueber
+    // /join/start in den aktuellen Weg; ein frueherer Bericht bleibt lesbar.
     label: invite.isReportReady
       ? t("actions.open")
       : canOpenCompletionStatus
         ? t("team.incomingActions.openStatus")
-        : isAccepted
-          ? needsBaseQuestionnaire
-            ? invite.inviteeBaseStarted
-              ? t("team.incomingActions.continueNow")
-              : t("team.incomingActions.startNow")
-            : needsValuesQuestionnaire
-              ? t("team.incomingActions.openValues")
-              : t("team.incomingActions.openStatus")
-          : t("team.incomingActions.startMatching"),
+        : t("team.incomingActions.openInvitation"),
     className: invite.isReportReady
       ? REPORT_CTA_CLASS
       : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",

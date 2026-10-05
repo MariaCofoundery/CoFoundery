@@ -52,8 +52,10 @@ export const AREAS = [
   },
   {
     key: "VOICE",
-    title: "Wie du andere Sichtweisen einbringst",
-    team: "Andere Sichtweisen einbringen",
+    // Phase 10B: VOICE misst das Ansprechen eigener Einwaende - nicht das
+    // Einholen anderer Perspektiven (das ist das Research-Facet FS).
+    title: "Wie du Einwände ansprichst",
+    team: "Einwände ansprechen",
     question:
       "Wie schafft ihr Raum für einen Einwand, wenn die Runde eine Entscheidung schon abschließen möchte?",
     benefit:
@@ -63,8 +65,9 @@ export const AREAS = [
   },
   {
     key: "AMB",
-    title: "Wie du mit offenen Fragen umgehst",
-    team: "Mit offenen Fragen umgehen",
+    // Phase 10B: AMB misst erlebtes Unbehagen, nicht den Umgang (das Handeln).
+    title: "Wie du offene Situationen empfindest",
+    team: "Offene Situationen empfinden",
     question:
       "Was braucht ihr, um weiterzuarbeiten, solange mehrere Erklärungen oder Antworten offenbleiben?",
     benefit:
@@ -360,6 +363,12 @@ export function teamPatterns(people: ProductMember[]) {
           .size === 1,
     );
     const different = shared.filter((i) => !similar.includes(i));
+    // Eine moegliche Ergaenzung nur bei echten Gegenpolen (unten vs. oben,
+    // A vs. B) - nicht, wenn nur "teils/teils" neben einer klaren Antwort steht.
+    const opposite = different.filter((i) => {
+      const bands = new Set(people.map((p) => responseBand(p.workstyle, i.item_key)));
+      return (bands.has("lower") && bands.has("upper")) || (bands.has("A") && bands.has("B"));
+    });
     const category: PatternCategory = !shared.length
       ? "INSUFFICIENT_DATA"
       : different.length
@@ -396,18 +405,19 @@ export function teamPatterns(people: ProductMember[]) {
           : different.length
             ? "Ihr setzt in diesen Situationen unterschiedliche Schwerpunkte. Die Antworten beschreiben eure Selbsteinschätzung, keine Bewertung des Teams."
             : "In den gemeinsam beantworteten Situationen wählt ihr ähnliche Antwortbereiche. Das legt noch nicht fest, wie ihr im Alltag zusammen handelt.",
-      complement: different.length
+      opposite: opposite.length,
+      complement: opposite.length
         ? {
             category: "POTENTIAL_COMPLEMENT" as const,
             text: (
               {
                 EVI: "Eine zusätzliche Prüfung und das Weiterarbeiten mit einer bestehenden Einschätzung können sich ergänzen, wenn ihr vorab vereinbart, wann ihr Entscheidungen wieder öffnet.",
-                EXP: "Erfahrungswissen kann neben einer Prüfung des aktuellen Falls stehen. Macht ausdrücklich, welche früheren Bedingungen sich übertragen lassen.",
+                EXP: "Erfahrungswissen und eine Prüfung des aktuellen Falls könnten sich ergänzen, wenn ihr ausdrücklich macht, welche früheren Bedingungen sich übertragen lassen.",
                 EL: "Ein kleiner Versuch und eine weitere Klärung vor dem Versuch können verschiedene offene Fragen bearbeiten. Vereinbart, wann ihr vom Gespräch ins Ausprobieren wechselt.",
                 VOICE:
-                  "Unterschiedlich wahrscheinliche Einwände machen verlässliche Gesprächsgelegenheiten hilfreich. Fragt vor dem Abschluss gezielt nach noch offenen Punkten.",
-                AMB: "Unterschiedlich erlebtes Unbehagen kann ein Anlass sein, den nächsten Schritt und die noch offenen Fragen getrennt festzuhalten.",
-                ORG: "Planstabilität und frühes Umplanen können je nach Lage hilfreich sein. Legt fest, wann eine Änderung den gemeinsamen Plan betrifft.",
+                  "Wenn Einwände unterschiedlich wahrscheinlich angesprochen werden, könnten verlässliche Gesprächsgelegenheiten helfen. Fragt vor dem Abschluss gezielt nach noch offenen Punkten.",
+                AMB: "Unterschiedlich erlebtes Unbehagen könnte ein Anlass sein, den nächsten Schritt und die noch offenen Fragen getrennt festzuhalten.",
+                ORG: "Unterschiedliche Vorgehensweisen bei Planung und Prioritäten könnten sich ergänzen, wenn ihr festlegt, wann eine Änderung den gemeinsamen Plan betrifft.",
               } as Record<AreaKey, string>
             )[area.key],
           }
@@ -444,4 +454,18 @@ export function memberInitials(name: string): string {
       ? parts[0][0] + parts.at(-1)![0]
       : (parts[0] ?? "?").slice(0, 2)
   ).toLocaleUpperCase("de-DE");
+}
+
+/** Darstellung: gleiche oder fehlende Namen unterscheidbar machen ("Founder 1", "Founder 2").
+ * Aendert keine Daten, nur die Beschriftung im Bericht. */
+export function distinctNames<T extends { name: string }>(people: T[]): T[] {
+  const counts = new Map<string, number>();
+  for (const p of people) counts.set(p.name, (counts.get(p.name) ?? 0) + 1);
+  const seen = new Map<string, number>();
+  return people.map((p) => {
+    if ((counts.get(p.name) ?? 0) < 2) return p;
+    const n = (seen.get(p.name) ?? 0) + 1;
+    seen.set(p.name, n);
+    return { ...p, name: `${p.name} ${n}` };
+  });
 }

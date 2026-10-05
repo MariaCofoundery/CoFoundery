@@ -279,7 +279,13 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
       {/* 2 — Wie du arbeitest. */}
       {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle profile={workstyleV04} full={voll} /></Abschnitt> : null}
       {voll && workProfile ? (
-        <Abschnitt title="Früheres Arbeitsprofil – historischer Stand">
+        <Abschnitt
+          title={`${t("historicalWorkProfile.title")} — ${t("historicalWorkProfile.dated", {
+            date: workProfile.submittedAt
+              ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(workProfile.submittedAt))
+              : "—",
+          })}`}
+        >
           <p className="max-w-3xl text-sm leading-6 text-slate-600">{t("workProfile.note")}</p>
           <p className="mt-1 text-sm text-slate-500">
             {t("workProfile.answered", { answered: workProfile.answered, of: workProfile.of })}

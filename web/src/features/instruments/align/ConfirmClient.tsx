@@ -29,6 +29,7 @@ export function ConfirmClient(props: {
         answeredAt={props.answeredAt}
         ages={props.ages}
         keeps={props.keeps}
+        editHref={`/founder-alignment/vorhaben?venture=${encodeURIComponent(props.ventureId)}`}
         confirming={pending}
         onConfirm={() =>
           start(async () => {

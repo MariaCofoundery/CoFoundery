@@ -170,6 +170,11 @@ async function draftFor(
 
   if (existing) return { ok: true, supabase, assessment: existing, ventureId };
 
+  // Phase 10 - Cutover: Das fruehere Arbeitsprofil (founder-profile-v1) wird
+  // nicht neu begonnen; der aktuelle Weg ist Workstyle v0.4. Abgegebenes
+  // bleibt als historischer Stand lesbar.
+  if (scope === "founder_profile") return { ok: false, reason: "archived_instrument" };
+
   const { data: created, error } = await supabase
     .from("assessments")
     .insert({

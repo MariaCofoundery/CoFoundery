@@ -126,6 +126,7 @@
       "setup": {
         "unavailable": "Status unavailable",
         "confirmed": "Confirmed topics",
+        "reconfirm": "To be confirmed again",
         "clarifying": "Being clarified",
         "open": "Open"
       }
@@ -144,7 +145,7 @@
         "view": "View your answers"
       },
       "roles": {
-        "title": "What you bring",
+        "title": "Skills & responsibility",
         "text": "Experience, the responsibility you want and what you would rather hand over or source externally – side by side, without rating.",
         "action": "View"
       }
@@ -160,7 +161,7 @@
     "setup": "Founder Setup",
     "library": "Library",
     "alignment": "Earlier results",
-    "roles": "Skills & roles",
+    "roles": "Skills & responsibility",
     "workstyle": "How you work together"
   },
   "commitmentLab": {

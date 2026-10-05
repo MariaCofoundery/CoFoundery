@@ -83,22 +83,21 @@ test("nach dem Einstieg wird nicht anders entschieden als beim Einstieg", () => 
   assert.match(done, /resolveInvitationContinueTarget\(invitationId\)/);
 });
 
-test("beide Seiten bekommen einen Hinweis", () => {
-  // Maria am 30.09.2026: „sowohl die einladende Person sollte nochmal einen
-  // Hinweis bekommen, hey, das ist das alte, bitte füllt auch noch das neue
-  // aus, bevor du jemanden einlädst."
+test("Phase 10: keine Einladung fuehrt mehr in die bisherige Fassung", () => {
+  // Frueher bekamen beide Seiten einen Hinweis auf die bisherige Fassung
+  // (Maria am 30.09.2026). Seit dem Cutover fuehrt jede Einladung in den
+  // aktuellen Weg - der Hinweis waere falsch.
   const einladen = lies("src", "app", "(product)", "invite", "new", "page.tsx");
-  assert.match(einladen, /worksWithPrevious\(user\.id\)/);
-  assert.match(einladen, /\{!targetTeam && bisherigeFassung && <InviteVersionNote \/>\}/);
+  assert.doesNotMatch(einladen, /InviteVersionNote|worksWithPrevious/);
 
-  // Und wer im alten Bogen sitzt, erfährt es dort - nicht danach.
-  const base = lies("src", "app", "me", "base", "page.tsx");
-  assert.match(base, /<PreviousVersionNote inviterName=\{einladender\} \/>/);
-
-  const hinweis = lies("src", "features", "instruments", "align", "PreviousVersionNote.tsx");
-  assert.match(hinweis, /Das ist die bisherige Fassung\./);
-  // KEIN GROSSER KNOPF: Wer angefangen hat, soll fertig werden können.
-  assert.ok(!/bg-slate-900/.test(hinweis), "der Hinweis zieht aus dem Bogen heraus");
+  // Der fruehere Bogen legt beim Oeffnen nichts mehr an, sondern leitet weiter.
+  for (const seite of [["me", "base", "page.tsx"], ["me", "values", "page.tsx"]]) {
+    const quelle = lies("src", "app", ...seite);
+    assert.match(quelle, /redirect\(currentPathForLegacyQuestionnaire\(params\.invitationId\)\)/);
+    assert.doesNotMatch(quelle, /createDraftAssessment|getOrCreateDraftAssessment|ensureInvitationMatchingBinding|QuestionnaireClient/);
+  }
+  const current = lies("src", "features", "instruments", "workstyle", "current.ts");
+  assert.match(current, /\/join\/start\?invitationId=/);
 });
 
 test("historical profile URLs never create new legacy assessments", () => {

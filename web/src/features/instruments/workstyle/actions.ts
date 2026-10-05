@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { parseWorkstyleAnswer, parseWorkstyleV3Answer } from "@/features/instruments/workstyle/answers";
 import { assertWorkstylePretestReady, workstyleRegistryFor } from "@/features/instruments/workstyle/registry";
 import { getMyWorkstylePretest, type ResearchContext, type ResearchFeedback } from "@/features/instruments/workstyle/data";
+import { CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import consentText from "../../../../docs/founder-workstyle-research-consent-v1.json";
 import consentV2 from "../../../../docs/founder-workstyle-research-consent-v2.json";
 import consentV3 from "../../../../docs/founder-workstyle-research-consent-v3.json";
@@ -15,6 +16,10 @@ const failure = { ok: false as const, error: "Das konnte nicht gespeichert werde
 export async function startWorkstylePretest(consent: boolean, context: ResearchContext, newAssessment = false, version = "8.5a-v1") {
   if (consent !== true) return { ok: false as const, error: "Bitte willige zuerst ausdrücklich in den Research-Pretest ein." };
   assertWorkstylePretestReady(version);
+  // Phase 10 - Cutover: Fruehere Fassungen (8.5a-v1/-v2) werden nicht neu
+  // begonnen. Wer dort schon eine Teilnahme hat, behaelt sie.
+  if (version !== CURRENT_WORKSTYLE_VERSION && (newAssessment || !(await getMyWorkstylePretest(version))))
+    return { ok: false as const, error: "Diese Fassung wird nicht mehr neu begonnen. Bitte nutze die aktuelle Fassung." };
   const client = await createClient();
   const { data, error } = await client.rpc("start_workstyle_pretest", {
     p_consent_version: (version === "8.5a-v3" ? consentV3 : version === "8.5a-v2" ? consentV2 : consentText).consent_version, p_context: context, p_new: newAssessment,

@@ -387,7 +387,10 @@ test("dieselbe Ableitung auf allen drei Oberflaechen", () => {
   // v0.4 is now primary; the old synthesis remains deliberately historical.
   const eigen = codeOnly(join("src", "app", "me", "profile", "page.tsx"));
   assert.ok(eigen.indexOf("<IndividualWorkstyle") < eigen.indexOf("<WorkProfileSynthesisView"));
-  assert.match(eigen, /Früheres Arbeitsprofil – historischer Stand/);
+  // Seit Phase 10 ueber die Messages und datiert (historicalWorkProfile.dated).
+  assert.match(eigen, /historicalWorkProfile\.title/);
+  assert.match(eigen, /historicalWorkProfile\.dated/);
+  assert.match(source(join("messages", "de", "profile.json")), /Früheres Arbeitsprofil – historischer Stand/);
 });
 
 test("der alte Satz „noch keine Auswertung\" ist weg", () => {

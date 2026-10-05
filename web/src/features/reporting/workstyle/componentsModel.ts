@@ -18,14 +18,15 @@ export const OWNERSHIP_LABELS = {
   unclear: "? Noch unklar",
 };
 export const COMPONENT_LABELS: Record<ComponentState, string> = {
-  INTERNALLY_COVERED: "Im Team getragen",
-  MULTI_COVERED: "Mehrfach getragen",
-  OPEN_INTERNAL: "Interne Verantwortung offen",
+  // Wunschsprache: Ein Verantwortungswunsch ist noch keine Vereinbarung.
+  INTERNALLY_COVERED: "Eine Person möchte verantworten",
+  MULTI_COVERED: "Mehrere möchten verantworten",
+  OPEN_INTERNAL: "Intern wichtig, aber niemand möchte verantworten",
   EXTERNAL_COMPONENT: "Extern lösbar",
-  DEPENDS: "Vom Vorhaben abhängig",
-  GROWTH_AREA: "Hineinwachsen vorgesehen",
-  SINGLE_POINT_OF_FAILURE: "Eine Person möchte intern tragen",
-  INSUFFICIENT_DATA: "Angaben fehlen oder sind nicht freigegeben",
+  DEPENDS: "Intern oder extern – hängt vom Vorhaben ab",
+  GROWTH_AREA: "Jemand möchte hineinwachsen",
+  SINGLE_POINT_OF_FAILURE: "Nur eine Person möchte intern verantworten",
+  INSUFFICIENT_DATA: "Nicht alle haben Angaben gemacht oder freigegeben",
 };
 /** Application level, ownership wish and sourcing are three independent axes.
  * Only `own` claims ownership. Contribute/grow_into never silently become coverage.

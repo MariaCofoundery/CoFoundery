@@ -46,3 +46,38 @@ export function alignmentPatterns(people: ProductMember[]) {
       };
     });
 }
+
+/** Eine Venture-Antwort als kurzer Text - die Frage steht im Bericht nur einmal, nicht je Person erneut. */
+export function readoutText(entry: ReturnType<typeof readAnswer> | null): string | null {
+  const value = entry?.value;
+  if (!value) return entry?.missing?.label ?? null;
+  switch (value.kind) {
+    case "ordinal":
+      return value.label;
+    case "choice": {
+      // Die Ausfuellhilfe ("– bitte angeben") gehoert zur Frage, nicht zur Antwort.
+      const label = value.label.replace(/\s*[–-]\s*bitte angeben$/, "");
+      return value.text ? `${label} (${value.text})` : label;
+    }
+    case "choices":
+      return [value.labels.join(" · "), value.priority ? `Vorrang: ${value.priority}` : null, ...value.texts].filter(Boolean).join(" – ");
+    case "text":
+      return value.text;
+    case "entries":
+      return value.entries.map((e) => e.text).join(" · ");
+    case "perEntry":
+      return value.entries.map((e) => `${e.about}: ${e.text}`).join(" · ");
+    case "number":
+      return `${value.number} ${value.unit}${value.condition ? ` (${value.condition})` : ""}`;
+    case "money":
+      return `${value.amount.toLocaleString("de-DE")} ${value.currency}`;
+    case "perPerson":
+      return value.per.map((p) => `${p.person}: ${p.number ?? "–"} ${p.unit}`).join(" · ");
+    case "windows":
+      return value.windows.map((w) => `${w.day} ${w.from}–${w.to}`).join(" · ");
+    case "date":
+      return value.date;
+    case "case":
+      return value.path;
+  }
+}

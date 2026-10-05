@@ -171,6 +171,7 @@ export default async function AdvisorPersonPage({
           <IndividualWorkstyle
             profile={workstyleV04}
             name={view.base?.displayName ?? "Founder"}
+            perspective="other"
           />
         </section>
       )}

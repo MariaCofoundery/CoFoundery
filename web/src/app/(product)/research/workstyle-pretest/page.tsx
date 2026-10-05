@@ -1,7 +1,8 @@
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import { WorkstylePretestV2 } from "@/features/instruments/workstyle/WorkstylePretestV2";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
@@ -15,6 +16,12 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
   const version = query.version ?? "8.5a-v3";
   if (!["8.5a-v1", "8.5a-v2", "8.5a-v3"].includes(version)) notFound();
   const { data: { user } } = await getRequestUser();
+  // Phase 10 - Cutover: Fruehere Fassungen nur noch fuer Menschen, die dort
+  // schon eine Teilnahme haben (HISTORICAL). Alle anderen - auch ohne
+  // Anmeldung - landen in der aktuellen Fassung.
+  if (version !== CURRENT_WORKSTYLE_VERSION && (!user || !(await getMyWorkstylePretest(version)))) {
+    redirect(query.invitationId ? `${CURRENT_WORKSTYLE_HREF}&invitationId=${encodeURIComponent(query.invitationId)}` : CURRENT_WORKSTYLE_HREF);
+  }
   const teamId = user && query.invitationId ? await currentTeamForInvitation(await createClient(), user.id, query.invitationId) : null;
   if (version === "8.5a-v2" || version === "8.5a-v3") {
     const [session, historical, historicalV2] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v1"), version === "8.5a-v3" ? getMyWorkstylePretest("8.5a-v2") : Promise.resolve(null)]) : [null, null, null];

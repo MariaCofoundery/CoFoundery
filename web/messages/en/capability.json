@@ -625,7 +625,7 @@
     }
   },
   "team": {
-    "title": "Roles and responsibilities",
+    "title": "Skills & responsibility",
     "text": "Who owns what, where several want the same thing, and where nobody wants it. This is a description of the situation from your own entries – no rating, no points, no ranking.",
     "backToTeam": "Back to the team",
     "basis": "{contributing} of {members} in the team have made entries, {withDepth} of them with an application level and an ownership wish. Only those two allow a statement about a role – whoever released less appears here without depth.",

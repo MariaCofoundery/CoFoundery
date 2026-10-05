@@ -134,8 +134,11 @@ test("ein fehlender Abschnitt wird benannt, aber nicht mitgedruckt", () => {
   // Neue Konten bekommen ihn nicht mehr angeboten; der Hinweis schickte sie
   // also an eine Stelle, die es fuer sie nicht gibt. Der Weg fuehrt jetzt zum
   // aktuellen Arbeitsprofil, und `/me/base` darf hier nicht mehr stehen.
-  assert.match(page, /href="\/founder-alignment\/profil"/);
-  assert.doesNotMatch(page, /href="\/me\/base"/);
+  // NACHGEZOGEN IN PHASE 10: Der Hinweis fuehrt direkt in den aktuellen Bogen
+  // (CURRENT_WORKSTYLE_HREF, "Wie du arbeitest ausfüllen") - nicht mehr ueber
+  // /founder-alignment/profil und nie in den frueheren Fragebogen.
+  assert.match(page, /href=\{CURRENT_WORKSTYLE_HREF\}/);
+  assert.doesNotMatch(page, /href="\/me\/base"|href="\/founder-alignment\/profil"/);
   assert.match(page, /href="\/profile\/interview"/);
 });
 
@@ -517,7 +520,8 @@ test("der alte Bericht steht darunter, datiert und zugeklappt - und wird nicht v
   assert.match(page, /legacyReport\.dated/);
   // Und er steht NACH dem neuen Bogen. Wer zuerst die alte Auswertung sieht,
   // haelt sie fuer die Hauptsache.
-  const neu = page.indexOf("workProfile.intro");
+  // Seit Phase 10 ist der aktuelle Bogen der Workstyle-Bericht v0.4.
+  const neu = page.indexOf("<IndividualWorkstyle");
   const alt = page.indexOf("legacyReport.title");
   assert.ok(neu > 0 && alt > neu, "der Altbestand steht vor dem aktuellen Bogen");
 

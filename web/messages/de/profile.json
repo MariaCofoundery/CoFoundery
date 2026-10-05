@@ -338,6 +338,16 @@
       "workAnswers": "Deine Antworten",
       "more": "{count, plural, =1 {Ein weiterer Eintrag steht im ausführlichen Profil} other {# weitere Einträge stehen im ausführlichen Profil}}.",
       "footer": "Erstellt mit {brand} · {date}"
+    },
+    "currentWorkstyle": {
+      "openReport": "Bericht öffnen, Antworten freigeben und Stand festhalten",
+      "empty": "Du hast noch nicht beschrieben, wie du arbeitest. Dein Bericht entsteht aus deinen Antworten zu konkreten Arbeitssituationen.",
+      "cta": "Wie du arbeitest ausfüllen"
+    },
+    "historicalWorkProfile": {
+      "title": "Früheres Arbeitsprofil – historischer Stand",
+      "dated": "Stand: {date}",
+      "text": "Aus einer früheren Fassung des Arbeitsprofils. Nur noch zum Nachlesen: Es wird nicht mehr bearbeitet und nicht mit dem aktuellen Bericht verrechnet."
     }
   }
 }

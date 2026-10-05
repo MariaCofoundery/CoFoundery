@@ -109,5 +109,27 @@
     "snapshot": "Es ist eine Momentaufnahme. Menschen antworten in einer anderen Lage anders, und das ist kein Fehler der Antwort.",
     "purpose": "Wofür es gedacht ist: als Grundlage für ein Gespräch — zwischen Menschen, die zusammen gründen wollen, oder mit jemandem, der sie begleitet. Nicht als Grundlage für eine Auswahl.",
     "dated": "Stand der Angaben: {date}"
+  },
+  "workstyle": {
+    "backToProfile": "Dein Gesamtprofil",
+    "backToTeam": "Zum Team",
+    "backToAdvisor": "Zum Advisor-Bereich",
+    "individualTitle": "Wie du arbeitest",
+    "teamTitle": "Euer Zusammenspiel",
+    "teamFallbackName": "Euer Vorhaben",
+    "print": "Drucken / als PDF speichern",
+    "fullVersion": "Ausführliche Fassung mit allen Antworten",
+    "compactVersion": "Kompakte Fassung",
+    "fullVersionNote": "Ausführliche Fassung: Alle Einzelantworten sind aufgeklappt und werden mitgedruckt.",
+    "snapshot": "Diesen Stand festhalten",
+    "snapshotSaved": "Festgehalten am {date}",
+    "snapshotError": "Der Stand konnte nicht gespeichert werden. Bitte lade den Bericht neu.",
+    "germanOnly": "Dieser Bericht ist derzeit nur auf Deutsch verfügbar, weil das Workstyle-Instrument nur auf Deutsch vorliegt.",
+    "emptyIndividual": "Du hast noch nicht beschrieben, wie du arbeitest. Dein Bericht entsteht aus deinen Antworten zu konkreten Arbeitssituationen.",
+    "emptyIndividualCta": "Wie du arbeitest ausfüllen",
+    "notReadyTitle": "Der Teamreport ist noch nicht verfügbar",
+    "shareMissingTitle": "Freigabe fehlt",
+    "notReadyBody": "Alle Mitglieder brauchen ein abgeschlossenes Arbeitsprofil in der aktuellen Fassung und müssen ihre Antworten für die lesende Person freigeben. Eine Einladung allein erteilt keine Freigabe.",
+    "notReadyCta": "Eigenes Arbeitsprofil und Freigaben öffnen"
   }
 }

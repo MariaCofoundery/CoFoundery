@@ -26,6 +26,7 @@ import { ProfilePart } from "@/features/reporting/ProfilePart";
 import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePillar";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -408,12 +409,38 @@ export default async function FounderProfilePage() {
           "arbeitsweise",
           "indigo",
           <>
-            {workstyleV04 ? <><IndividualWorkstyle profile={workstyleV04} /><Link className="mt-4 inline-block underline" href="/me/profile/workstyle">Antworten freigeben und Bericht festhalten</Link></> : <p className="py-4">Dein aktuelles Arbeitsprofil ist noch nicht abgeschlossen. <Link className="underline" href="/research/workstyle-pretest">Arbeitsprofil kennenlernen</Link></p>}
-            {workProfile && <ProfileDetails summary="Früheres Arbeitsprofil – historischer Stand" hint={null}>
-            {workProfile ? (
+            {workstyleV04 ? (
+              <>
+                <IndividualWorkstyle profile={workstyleV04} />
+                <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
+                  {t("currentWorkstyle.openReport")}
+                </Link>
+              </>
+            ) : (
+              <MissingSection
+                title={t("currentWorkstyle.empty")}
+                href={CURRENT_WORKSTYLE_HREF}
+                cta={t("currentWorkstyle.cta")}
+              />
+            )}
+
+            {/* Phase 10: Das fruehere Arbeitsprofil (founder-profile-v1) nur
+                noch datiert zum Nachlesen - kein Bearbeiten-Link mehr in den
+                alten Fragebogen und nie ein Ersatz fuer den aktuellen Bericht. */}
+            {workProfile && (
+              <ProfileDetails
+                summary={`${t("historicalWorkProfile.title")} — ${t("historicalWorkProfile.dated", {
+                  date: workProfile.submittedAt
+                    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                        new Date(workProfile.submittedAt)
+                      )
+                    : "—",
+                })}`}
+                hint={null}
+              >
               <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
                 <p className="max-w-3xl text-sm leading-7 text-slate-700">
-                  {t("workProfile.intro")}
+                  {t("historicalWorkProfile.text")}
                 </p>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
                   {t("workProfile.note")}
@@ -446,19 +473,9 @@ export default async function FounderProfilePage() {
                     />
                   </div>
                 </div>
-
-                <EditLink href="/founder-alignment/profil" label={t("edit")} />
               </section>
-            ) : (
-              <MissingSection
-                title={t("missingWorkProfile.title")}
-                text={t("missingWorkProfile.text")}
-                href="/founder-alignment/profil"
-                cta={t("missingWorkProfile.cta")}
-              />
+              </ProfileDetails>
             )}
-
-            </ProfileDetails>}
 
             {/* DER ALTBESTAND - DARUNTER, ZUGEKLAPPT, DATIERT.
 
@@ -1005,14 +1022,14 @@ function MissingSection({
   cta,
 }: {
   title: string;
-  text: string;
+  text?: string;
   href: string;
   cta: string;
 }) {
   return (
     <section className="no-print rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
       <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{text}</p>
+      {text ? <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{text}</p> : null}
       <a
         href={href}
         className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"

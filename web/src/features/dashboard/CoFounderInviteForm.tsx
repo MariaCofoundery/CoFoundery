@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
@@ -16,7 +16,6 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
   const t = useTranslations("dashboard.coFounderInviteForm");
   const [label, setLabel] = useState(targetTeam?.name ?? "");
   const [email, setEmail] = useState("");
-  const [includeValues, setIncludeValues] = useState(false);
   const [teamContext, setTeamContext] = useState<TeamContext | null>(targetTeam?.context ?? null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -27,10 +26,6 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
     message: string;
   } | null>(null);
   const [isPending, startTransition] = useTransition();
-
-  const selectedModulesLabel = useMemo(() => {
-    return includeValues ? t("modules.selectedBasisValues") : t("modules.selectedBasis");
-  }, [includeValues, t]);
 
   const teamContextLabel =
     teamContext === "existing_team"
@@ -57,7 +52,9 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
       const formData = new FormData();
       formData.set("label", label.trim());
       formData.set("invitedEmail", invitedEmail);
-      formData.set("includeValues", includeValues ? "true" : "false");
+      // Phase 10: Keine Auswahl "Basis / Werte" mehr - die Einladung fuehrt in
+      // den aktuellen Weg, der diese Module nicht kennt.
+      formData.set("includeValues", "false");
       formData.set("teamContext", teamContext);
       if (targetTeam) formData.set("targetTeamId", targetTeam.id);
 
@@ -189,27 +186,6 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
           </p>
         </div>}
 
-        {!targetTeam && <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">{t("modules.label")}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {t("modules.help")}
-          </p>
-          <div className="mt-3 space-y-2 text-sm text-slate-700">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked disabled className="h-4 w-4" />
-              <span>{t("modules.baseActive")}</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={includeValues}
-                onChange={(event) => setIncludeValues(event.target.checked)}
-                className="h-4 w-4"
-              />
-              <span>{t("modules.valuesOptional")}</span>
-            </label>
-          </div>
-        </div>}
 
         <button
           type="submit"
@@ -247,13 +223,15 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
           >
             {resultState.message}
           </p>
-          <p
-            className={`mt-2 text-sm ${
-              resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
-            }`}
-          >
-            {targetTeam ? t("targetTeam", { name: targetTeam.name }) : t("result.activeModules", { modules: selectedModulesLabel })}
-          </p>
+          {targetTeam ? (
+            <p
+              className={`mt-2 text-sm ${
+                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
+              }`}
+            >
+              {t("targetTeam", { name: targetTeam.name })}
+            </p>
+          ) : null}
           {teamContext ? (
             <p
               className={`mt-1 text-sm ${

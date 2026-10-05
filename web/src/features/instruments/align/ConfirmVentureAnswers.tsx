@@ -52,10 +52,12 @@ type Props = {
   keeps: ConfirmEntry[];
   onConfirm: () => void;
   confirming?: boolean;
+  /** Wohin "Etwas ändern" fuehrt: der aktuelle Vorhaben-Fragebogen dieses Vorhabens. */
+  editHref: string;
 };
 
 export function ConfirmVentureAnswers({
-  ventureName, partnerLabel, answeredAt, ages, keeps, onConfirm, confirming,
+  ventureName, partnerLabel, answeredAt, ages, keeps, onConfirm, confirming, editHref,
 }: Props) {
   const [showAll, setShowAll] = useState(false);
   const gezeigt = showAll ? [...ages, ...keeps] : ages;
@@ -107,7 +109,7 @@ export function ConfirmVentureAnswers({
         </button>
 
         <Link
-          href="/founder-alignment/pilot"
+          href={editHref}
           className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800"
         >
           Etwas ändern

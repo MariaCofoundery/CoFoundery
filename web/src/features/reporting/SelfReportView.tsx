@@ -550,14 +550,9 @@ function renderCompactValuesSection(report: SelfAlignmentReport, chrome: SelfRep
         <p className="text-sm leading-7 text-slate-700">
           {report.locale === "en" ? normalizeSentence(fallbackText) : normalizeSentence(t(fallbackText))}
         </p>
-        <div className="mt-4">
-          <a
-            href="/me/values"
-            className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
-          >
-            {chrome.labels.startValues}
-          </a>
-        </div>
+        {/* Phase 10: Kein "Werte starten" mehr - dieser Bericht ist ein
+            historischer Stand, und der fruehere Werte-Fragebogen ist kein
+            aktiver Weg. */}
       </div>
     );
   }

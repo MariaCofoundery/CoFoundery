@@ -126,6 +126,7 @@
       "setup": {
         "unavailable": "Status nicht verfügbar",
         "confirmed": "Bestätigte Themen vorhanden",
+        "reconfirm": "Erneut zu bestätigen",
         "clarifying": "In Klärung",
         "open": "Offen"
       }
@@ -144,7 +145,7 @@
         "view": "Deine Angaben ansehen"
       },
       "roles": {
-        "title": "Was ihr einbringt",
+        "title": "Fähigkeiten & Verantwortung",
         "text": "Erfahrung, gewünschte Verantwortung und was ihr lieber abgebt oder extern löst – nebeneinander, ohne Bewertung.",
         "action": "Ansehen"
       }
@@ -160,7 +161,7 @@
     "setup": "Founder Setup",
     "library": "Library",
     "alignment": "Frühere Auswertungen",
-    "roles": "Fähigkeiten & Rollen",
+    "roles": "Fähigkeiten & Verantwortung",
     "workstyle": "Euer Zusammenspiel"
   },
   "commitmentLab": {

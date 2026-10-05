@@ -296,6 +296,7 @@
     "modulesAndCreated": "Modules: {modules} · Created: {date}",
     "modules": "Modules: {modules}",
     "created": "Created: {date}",
+    "expires": "Expires: {date}",
     "invitedBy": "{name} invited you",
     "statuses": {
       "reportReady": "Report ready",
@@ -314,7 +315,8 @@
       "startNow": "Start now",
       "openValues": "Open values module",
       "startMatching": "Start matching",
-      "openTeamReport": "How you work together"
+      "openTeamReport": "How you work together",
+      "openInvitation": "Open invitation"
     },
     "incomingHero": {
       "reportReadyLabel": "View matching report",

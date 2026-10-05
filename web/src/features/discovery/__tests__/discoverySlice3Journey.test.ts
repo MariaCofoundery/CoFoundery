@@ -52,19 +52,17 @@ test("the explicit joint-check action folds in technical preparation without rem
   assert.match(matchingPage, /actions\.confirmMatching/);
 });
 
-test("the second consent prepares only the idempotent matching session", () => {
+test("the second consent creates no legacy matching session and leads into the current team path", () => {
+  // Phase 10: Frueher legte die Bestaetigung still eine Matching-Session des
+  // frueheren Fragebogens an. Jetzt nur noch die Zustimmung selbst; danach
+  // fuehrt die Seite (ready_for_matching) in den aktuellen Teamweg.
   const confirmationAt = matchingPage.indexOf("await confirmFullDiscoveryMatchingAction(");
-  const sessionAt = matchingPage.indexOf(
-    "await createMatchingSessionFromDiscoveryStartAction(",
-    confirmationAt
-  );
   assert.ok(confirmationAt >= 0);
-  assert.ok(sessionAt > confirmationAt);
-  assert.equal(
-    matchingPage.slice(confirmationAt, sessionAt).includes("startWorkspaceFromMatchingSession"),
-    false
-  );
-  assert.match(matchingPage, /if \(!result\.ok\)/);
+  const actionBody = matchingPage.slice(confirmationAt, matchingPage.indexOf("async function createMatchingSession()", confirmationAt));
+  assert.doesNotMatch(actionBody, /createMatchingSessionFromDiscoveryStartAction|startWorkspaceFromMatchingSession/);
+  assert.match(actionBody, /redirect\(matchingStartResultUrl\(introRequestId, result\)\)/);
+  assert.match(matchingPage, /open_discovery_workstyle_team/);
+  assert.match(matchingPage, /redirect\(`\/teams\/\$\{data\}\/workstyle`\)/);
 });
 
 test("missing inputs expose status only and the report boundary remains a user action", () => {

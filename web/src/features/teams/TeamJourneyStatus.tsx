@@ -17,7 +17,7 @@ export type TeamJourneyState = {
   work: AssessmentState;
   venture: AssessmentState;
   report: "unavailable" | "available" | "shareMissing" | "notAvailable";
-  setup: "unavailable" | "confirmed" | "clarifying" | "open";
+  setup: "unavailable" | "confirmed" | "reconfirm" | "clarifying" | "open";
 };
 
 export async function loadTeamJourneyStatus(params: {
@@ -52,9 +52,14 @@ export async function loadTeamJourneyStatus(params: {
       ? "unavailable"
       : setup.items.some((x) => x.currentConfirmedRevision)
         ? "confirmed"
-        : setup.items.some((x) => x.rosterConfirmationMissing || x.pendingRevision || x.workStatus === "discussing")
-          ? "clarifying"
-          : "open",
+        : // Phase 10: Nach einer Teamaenderung ist eine fruehere Absprache nicht
+          // "in Klaerung" (niemand diskutiert sie), sondern muss von den
+          // aktuellen Mitgliedern erneut bestaetigt werden.
+          setup.items.some((x) => x.rosterConfirmationMissing)
+          ? "reconfirm"
+          : setup.items.some((x) => x.pendingRevision || x.workStatus === "discussing")
+            ? "clarifying"
+            : "open",
   };
 }
 

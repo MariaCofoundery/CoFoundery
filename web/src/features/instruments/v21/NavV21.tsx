@@ -1,10 +1,11 @@
 import Link from "next/link";
 
-/** Die zwei Seiten, die es zu v2.1 gibt. Mehr wird es erst, wenn es mehr gibt. */
+/**
+ * Die Seiten zur archivierten Fassung v2.1 - seit Phase 10 nur noch lesend:
+ * kein "Fragebogen" und kein "Wonach du suchst" der Testfassung mehr.
+ */
 const PAGES = [
-  { href: "/founder-alignment/pilot", label: "Fragebogen" },
   { href: "/founder-alignment/pilot/report", label: "Deine Antworten" },
-  { href: "/founder-alignment/pilot/discovery", label: "Wonach du suchst" },
   { href: "/founder-alignment/versionen", label: "Beide Fassungen" },
 ];
 

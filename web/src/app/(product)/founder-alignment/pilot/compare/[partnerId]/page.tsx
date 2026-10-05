@@ -79,7 +79,7 @@ export default async function CompareV21Page({
   if (mine.rows.length === 0 || theirs.rows.length === 0) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
-        <NavV21 current="/founder-alignment/pilot" />
+        <NavV21 current="/founder-alignment/pilot/report" />
         <h1 className="text-2xl font-semibold text-slate-900">Nebeneinander</h1>
         <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
           {mine.rows.length === 0
@@ -122,7 +122,7 @@ export default async function CompareV21Page({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <NavV21 current="/founder-alignment/pilot" />
+      <NavV21 current="/founder-alignment/pilot/report" />
 
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Entwurf — wird niemandem vorgelegt

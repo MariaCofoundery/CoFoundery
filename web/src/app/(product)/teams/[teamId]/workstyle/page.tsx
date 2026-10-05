@@ -9,7 +9,7 @@ import { saveProductSnapshot } from "@/features/reporting/workstyle/actions";
 import { TeamWorkstyleReport } from "@/features/reporting/workstyle/TeamWorkstyleReport";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import type { ProductTeam } from "@/features/reporting/workstyle/model";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -21,7 +21,7 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ teamId: string }>;
-  searchParams: Promise<{ snapshot?: string; error?: string }>;
+  searchParams: Promise<{ snapshot?: string; error?: string; ansicht?: string }>;
 }) {
   const { teamId } = await params;
   const query = await searchParams;
@@ -41,12 +41,25 @@ export default async function Page({
   if (query.snapshot && (!snapshot || snapshot.input.team_id !== teamId))
     notFound();
   const team = snapshot?.input ?? current;
-  const navigationT = await getTranslations("teams.teamNavigation");
+  const [navigationT, t, locale] = await Promise.all([
+    getTranslations("teams.teamNavigation"),
+    getTranslations("report.workstyle"),
+    getLocale(),
+  ]);
+  // Ausfuehrliche Fassung: alle Einzelantworten aufgeklappt und im Druck enthalten.
+  const full = query.ansicht === "ausfuehrlich";
+  const viewHref = (nextFull: boolean) => {
+    const params = new URLSearchParams();
+    if (query.snapshot) params.set("snapshot", query.snapshot);
+    if (nextFull) params.set("ansicht", "ausfuehrlich");
+    const qs = params.toString();
+    return `/teams/${teamId}/workstyle${qs ? `?${qs}` : ""}`;
+  };
   return (
     <main className="ws-report mx-auto max-w-6xl px-5 py-10">
       <div className="ws-no-print mb-5">
         <Link href={membership ? `/teams/${teamId}` : "/advisor"} className="underline">
-          {membership ? "Zum Team" : "Zum Advisor-Bereich"}
+          {membership ? t("backToTeam") : t("backToAdvisor")}
         </Link>
         {/* Phase 9.4B: Die Teamnavigation auch hier - nur fuer Mitglieder
             (Advisor erreichen den Report ueber ihre eigene Freigabe) und nie
@@ -70,54 +83,60 @@ export default async function Page({
       <header className="mb-10">
         <p className="text-sm text-slate-500">
           {team !== "not_ready"
-            ? (team.team_name ?? "Euer Vorhaben")
-            : "Euer Vorhaben"}
+            ? (team.team_name ?? t("teamFallbackName"))
+            : t("teamFallbackName")}
         </p>
-        <h1 className="mt-2 text-4xl font-semibold">Euer Zusammenspiel</h1>
-        <div className="ws-no-print mt-5 flex flex-wrap gap-4">
-          <PrintReportButton label="Drucken / als PDF speichern" />
-          {team !== "not_ready" && (
-            <form action={saveProductSnapshot.bind(null, teamId)}>
-              <button className="min-h-11 rounded-lg border px-4">
-                Diesen Stand festhalten
-              </button>
-            </form>
-          )}
-        </div>
-        {query.error && (
-          <p role="alert">
-            Der Stand konnte nicht gespeichert werden. Bitte lade den Report
-            neu.
+        <h1 className="mt-2 text-4xl font-semibold">{t("teamTitle")}</h1>
+        {locale !== "de" && (
+          <p className="mt-3 text-sm text-slate-600" lang={locale}>
+            {t("germanOnly")}
           </p>
         )}
+        <div className="ws-no-print mt-5 flex flex-wrap items-center gap-4">
+          <PrintReportButton label={t("print")} />
+          {team !== "not_ready" && (
+            <>
+              <Link className="text-sm underline" href={viewHref(!full)}>
+                {full ? t("compactVersion") : t("fullVersion")}
+              </Link>
+              {!snapshot && (
+                <form action={saveProductSnapshot.bind(null, teamId)}>
+                  <button className="min-h-11 rounded-lg border px-4">
+                    {t("snapshot")}
+                  </button>
+                </form>
+              )}
+            </>
+          )}
+        </div>
+        {full && team !== "not_ready" && (
+          <p className="mt-3 text-sm text-slate-500">{t("fullVersionNote")}</p>
+        )}
+        {query.error && <p role="alert">{t("snapshotError")}</p>}
         {snapshot && (
           <p className="mt-3 text-sm text-slate-500">
-            Festgehalten am{" "}
-            {new Date(snapshot.generated_at).toLocaleString("de-DE")} ·{" "}
-            {snapshot.schema_version}
+            {t("snapshotSaved", {
+              date: new Date(snapshot.generated_at).toLocaleString("de-DE"),
+            })}{" "}
+            · {snapshot.schema_version}
           </p>
         )}
       </header>
       {team === "not_ready" ? (
         <section>
           <h2 className="text-xl font-semibold">
-            {readiness === "share_missing" ? "Freigabe fehlt" : "Der Teamreport ist noch nicht verfügbar"}
+            {readiness === "share_missing" ? t("shareMissingTitle") : t("notReadyTitle")}
           </h2>
-          <p className="mt-3 leading-7">
-            Alle Mitglieder benötigen ein abgeschlossenes Arbeitsprofil
-            derselben aktuellen Fassung und müssen dessen Core-Antworten für die
-            lesende Person freigeben. Eine Einladung allein erteilt keine
-            Freigabe.
-          </p>
+          <p className="mt-3 leading-7">{t("notReadyBody")}</p>
           <Link
             href="/me/profile/workstyle"
             className="mt-4 inline-block underline"
           >
-            Eigenes Arbeitsprofil und Freigaben öffnen
+            {t("notReadyCta")}
           </Link>
         </section>
       ) : (
-        <TeamWorkstyleReport team={team} canDiscuss={Boolean(membership)} />
+        <TeamWorkstyleReport team={team} canDiscuss={Boolean(membership)} full={full} />
       )}
     </main>
   );

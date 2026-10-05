@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { archiveHint, type TransitionDecision } from "@/features/instruments/v21/transitionV21";
 
 /**
@@ -69,8 +70,9 @@ export function VersionArchiveCard({
               Zum bisherigen Report
             </Link>
           ) : (
-            <Link href="/me/base" className="mt-3 inline-block text-sm text-slate-900 underline">
-              Zum bisherigen Fragebogen
+            // Phase 10: Der bisherige Fragebogen wird nicht mehr ausgefuellt.
+            <Link href={CURRENT_WORKSTYLE_HREF} className="mt-3 inline-block text-sm text-slate-900 underline">
+              Wie du arbeitest ausfüllen
             </Link>
           )}
         </div>
@@ -103,7 +105,7 @@ export function VersionArchiveCard({
                 <Link href="/founder-alignment/pilot/report" className="text-slate-900 underline">
                   Deine Antworten
                 </Link>
-                <Link href="/founder-alignment/pilot/discovery" className="text-slate-900 underline">
+                <Link href="/founder-alignment/suche" className="text-slate-900 underline">
                   Wonach du suchst
                 </Link>
               </>

@@ -8,6 +8,7 @@ import { getItemsV21 } from "@/features/instruments/v21/registryV21";
 import { ALIGNMENT_V21_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -186,9 +187,9 @@ export default async function ReportV21Page() {
 
       {sections.length === 0 ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-          Hier steht noch nichts.{" "}
-          <Link href="/founder-alignment/pilot" className="underline">
-            Zum Fragebogen
+          Zu dieser archivierten Fassung liegen von dir keine Antworten vor.{" "}
+          <Link href={CURRENT_WORKSTYLE_HREF} className="underline">
+            Wie du arbeitest ausfüllen
           </Link>
           .
         </p>

@@ -17,6 +17,19 @@
   color: #182235;
   flex: none;
 }
+/* Spannweite gemischter Antworten: bewusst ohne Fuellung und gestrichelt,
+   damit sie nicht wie ein Punktwert wirkt. */
+.ws-range {
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #64748b;
+  border-radius: 13px;
+  background: transparent;
+  font: 600 11px/1 sans-serif;
+  color: #334155;
+}
 .ws-token-0 {
   border-radius: 50%;
   background: #e6ddfc;
@@ -82,6 +95,16 @@
   .ws-report details > *:not(summary) {
     display: block !important;
     content-visibility: visible !important;
+  }
+  /* Anhang mit allen Einzelantworten: nur in der ausfuehrlichen Fassung
+     drucken. Die kompakte Fassung bleibt bei Aussagen, Agenda und Ueberblick. */
+  .ws-report .ws-appendix {
+    display: none !important;
+  }
+  .ws-report.ws-print-full .ws-appendix {
+    display: block !important;
+    border: 0;
+    padding: 0;
   }
   .ws-lane,
   .ws-component,

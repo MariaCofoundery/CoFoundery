@@ -54,14 +54,9 @@ async function draft() {
 
   if (existing) return { supabase, assessment: existing };
 
-  const { data: created, error } = await supabase
-    .from("assessments")
-    .insert({ user_id: auth.user.id, module: MODULE, instrument_id: ALIGNMENT_V21_INSTRUMENT_ID })
-    .select("id, submitted_at")
-    .single();
-
-  if (error || !created) throw new Error(error?.message ?? "draft_create_failed");
-  return { supabase, assessment: created };
+  // Phase 10 - Cutover: v2.1 ist archiviert. Kein neuer Entwurf mehr - auch
+  // nicht ueber einen direkten Aufruf dieser Server-Action.
+  throw new Error("archived_instrument");
 }
 
 /**
