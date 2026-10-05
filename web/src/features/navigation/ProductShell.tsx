@@ -307,7 +307,7 @@ export function ProductShell({
   const messagesAttentionCount = getMessagesAttentionCount(unreadConnectMessageCount, waitingNoticeCount);
   // Die Leiste traegt Bereiche - Orte, in denen man eine Weile arbeitet.
   // Seit dem 20.09.2026 ist diese Liste die EINZIGE Quelle fuer die Bereiche:
-  // Die Pillen ab 1024 Pixel und das aufklappbare Menue darunter lesen
+  // Die Pillen ab 1280 Pixel und das aufklappbare Menue darunter lesen
   // dieselben Eintraege.
   //
   // ---------------------------------------------------------------------
@@ -543,7 +543,7 @@ export function ProductShell({
   // der Baum nichts, und zu raten waere schlimmer als zu schweigen - die
   // Ueberschrift der Seite steht ohnehin direkt darunter.
   const activeSubItem = activeAreaSubItems.find((subItem) => subItem.isActive(pathname));
-  // Phase 11.7B: NUR WENN SIE ETWAS SAGT. Ab 1024 Pixeln zeigen die Pille und
+  // Phase 11.7B: NUR WENN SIE ETWAS SAGT. Ab 1280 Pixeln zeigen die Pille und
   // die zweite Reihe schon Bereich und Unterbereich - dieselbe Angabe ein
   // drittes Mal war nur Hoehe. Auf dem Telefon traegt der Menueknopf den
   // Bereich; die Krume erscheint dort nur auf Seiten UNTERHALB eines
@@ -586,8 +586,24 @@ export function ProductShell({
     <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
       <div className="min-h-screen">
         <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:px-6 md:px-10 lg:flex-nowrap xl:px-12">
-            <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-5 lg:flex-nowrap">
+          {/* -----------------------------------------------------------
+              GEMELDET AM 05.10.2026: "Connect steht selbst bei 2048 Pixeln
+              allein in einer zweiten Zeile."
+
+              Nicht zu wenig Platz, sondern falsch verteilt: Die linke Gruppe
+              (Logo + Bereiche) trug min-w-0 und die Bereichs-Pille flex-wrap.
+              Wurde es rechts eng - mit dem Founder/Advisor-Wechsel immer, der
+              Rahmen ist wegen max-w-7xl ab 1280 Pixeln stets gleich breit -,
+              hat Flex die LINKE Gruppe geschrumpft, und die Pille brach um.
+
+              Jetzt umgekehrt: Bereiche schrumpfen nie (shrink-0, flex-nowrap),
+              die Werkzeuge rechts nehmen nur den Rest und werden kompakter.
+              Und erst ab 1280 Pixeln (xl) gibt es die Reihe - darunter den
+              Menue-Knopf. Einen Zwischenzustand mit zweizeiliger Reihe gibt es
+              nicht mehr.
+              ----------------------------------------------------------- */}
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:px-6 md:px-10 xl:flex-nowrap xl:px-12">
+            <div className="flex min-w-0 flex-wrap items-center gap-4 md:gap-5 xl:shrink-0 xl:flex-nowrap xl:gap-4">
               <Link
                 href={dashboardHref}
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
@@ -604,12 +620,12 @@ export function ProductShell({
                 />
               </Link>
 
-              {/* Ab 1024 Pixeln stehen die Bereiche als Pillen in der Leiste.
+              {/* Ab 1280 Pixeln stehen die Bereiche als Pillen in der Leiste.
                   Darunter liegen sie im aufklappbaren Menue - die Reihe hier
                   war auf einem Telefon der groessere Teil der Hoehe. */}
               <nav
                 aria-label={t("navLabel")}
-                className="hidden flex-wrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1 lg:flex"
+                className="hidden shrink-0 flex-nowrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1 xl:flex"
               >
                 {navigationItems.map((item) => (
                   <Link
@@ -649,13 +665,14 @@ export function ProductShell({
                 Ueberlauf gegen HOEHE getauscht - aus einer Reihe wurden drei,
                 und die Leiste nahm ein Viertel des Bildschirms.
 
-                Deshalb jetzt zwei Fassungen: ab 1024 Pixeln diese Reihe wie
-                bisher, darunter ein Knopf mit dem Menue. Der Umbruch bleibt
-                trotzdem stehen - auch bei 1024 Pixeln kann ein langer Name die
-                Reihe noch verlaengern.
+                Deshalb jetzt zwei Fassungen: ab 1280 Pixeln (seit 05.10.2026,
+                vorher 1024) diese Reihe, darunter ein Knopf mit dem Menue. Am
+                Rechner bricht die Reihe nicht um: Sie nimmt den Platz rechts
+                der Bereiche (flex-1), und was nicht passt, kuerzt zuerst den
+                Kontonamen.
                 ----------------------------------------------------------- */}
-            <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 lg:flex-nowrap">
-              <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 lg:flex">
+            <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 xl:flex-1 xl:flex-nowrap">
+              <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 xl:flex xl:flex-nowrap">
                 {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
                     gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
                     es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
@@ -697,24 +714,28 @@ export function ProductShell({
                   hasFounder={hasFounder}
                   hasAdvisor={hasAdvisor}
                   onSelect={chooseWorkContext}
+                  compact
                 />
 
-                <LanguageSwitcher />
+                <LanguageSwitcher compact />
+                {/* Mit dem Founder/Advisor-Wechsel ist die Reihe am vollsten -
+                    dann nur das Bild, der Name steht im aufgeklappten Menue. */}
                 <ProfileMenu
                   displayName={displayName}
                   avatarId={avatarId}
                   avatarImageUrl={avatarImageUrl}
                   accountOnly={isSuspendedConnectOnly}
+                  showName={!(hasFounder && hasAdvisor)}
                 />
               </div>
 
-              {/* Bis 1024 Pixel genau ein Element auf der rechten Seite. */}
+              {/* Bis 1280 Pixel genau ein Element auf der rechten Seite. */}
               <button
                 type="button"
                 onClick={() => setIsMenuOpen((current) => !current)}
                 aria-expanded={isMenuOpen}
                 aria-controls={MOBILE_MENU_ID}
-                className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 lg:hidden"
+                className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 xl:hidden"
               >
                 <MenuGlyph isOpen={isMenuOpen} />
                 {/* Phase 11.7B: Geschlossen traegt der Knopf den aktuellen
@@ -745,7 +766,7 @@ export function ProductShell({
           {isMenuOpen ? (
             <div
               id={MOBILE_MENU_ID}
-              className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-200/80 bg-white/95 px-4 pb-4 pt-2 sm:px-6 lg:hidden"
+              className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-slate-200/80 bg-white/95 px-4 pb-4 pt-2 sm:px-6 xl:hidden"
             >
               {/* Wer hier angemeldet ist. Am Rechner steht der Name neben dem
                   Bild in der Leiste; auf dem Telefon war er nirgends zu sehen,
@@ -861,11 +882,11 @@ export function ProductShell({
             </div>
           ) : null}
 
-          {/* Die zweite Reihe gilt ab 1024 Pixeln. Auf dem Telefon stehen
+          {/* Die zweite Reihe gilt ab 1280 Pixeln. Auf dem Telefon stehen
               dieselben Unterseiten im Menue unter ihrem Bereich - eine zweite
               Leiste waere dort nur weitere Hoehe. */}
           {activeAreaSubItems.length > 0 ? (
-            <div className="mx-auto hidden w-full max-w-7xl px-4 pb-1 sm:px-6 md:px-10 lg:block xl:px-12">
+            <div className="mx-auto hidden w-full max-w-7xl px-4 pb-1 sm:px-6 md:px-10 xl:block xl:px-12">
               <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
                 {activeAreaSubItems.map((subItem) => (
                   <Link
@@ -898,7 +919,7 @@ export function ProductShell({
             AUF JEDER EBENE UND AUF JEDEM GERAET
             ---------------------------------------------------------------
 
-            Die zweite Reihe gibt es erst ab 1024 Pixeln und nur in Bereichen mit Unterseiten.
+            Die zweite Reihe gibt es erst ab 1280 Pixeln und nur in Bereichen mit Unterseiten.
             Diese Zeile gibt es immer - gerade auf dem Telefon, wo die
             Bereiche hinter einem Knopf liegen und man sonst gar nicht sieht,
             worin man steht.
@@ -911,7 +932,7 @@ export function ProductShell({
         {breadcrumb.length > 0 ? (
           <nav
             aria-label={t("breadcrumbLabel")}
-            className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 md:px-10 lg:hidden xl:px-12"
+            className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6 md:px-10 xl:hidden xl:px-12"
           >
             <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
               {breadcrumb.map((krume, index) => (
@@ -977,11 +998,13 @@ function ProfileMenu({
   avatarId,
   avatarImageUrl,
   accountOnly,
+  showName = true,
 }: {
   displayName: string | null;
   avatarId: string | null;
   avatarImageUrl: string | null;
   accountOnly: boolean;
+  showName?: boolean;
 }) {
   const t = useTranslations("navigation");
   const normalizedName = normalizeDisplayName(displayName) || t("profileFallback");
@@ -1017,11 +1040,11 @@ function ProfileMenu({
   }, [isOpen]);
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative min-w-0">
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-1.5 py-1 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50"
+        className="flex min-w-0 max-w-full cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-1.5 py-1 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
@@ -1032,11 +1055,13 @@ function ProfileMenu({
           className="h-8 w-8 shrink-0 rounded-full object-cover"
           fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
         />
-        <span className="hidden max-w-28 truncate xl:inline">{normalizedName}</span>
+        {/* Der Name ist das Erste, was weicht: kuerzer (truncate), und bei
+            vollem Kopf gar nicht - nie die Bereiche links. */}
+        <span className={showName ? "hidden min-w-0 max-w-28 truncate xl:inline" : "sr-only"}>{normalizedName}</span>
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"
-          className="h-4 w-4 text-slate-500"
+          className="h-4 w-4 shrink-0 text-slate-500"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.7"
@@ -1097,7 +1122,8 @@ function ProfileMenu({
   );
 }
 
-function LanguageSwitcher() {
+/** compact: am Rechner im Kopf ohne Fahnen - die Leiste ist sonst zu voll. */
+function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const locale = useLocale() as AppLocale;
   const router = useRouter();
   const t = useTranslations("common");
@@ -1128,7 +1154,7 @@ function LanguageSwitcher() {
           title={t(`language.${item}`)}
         >
           <span>{t(`language.short.${item}`)}</span>
-          <span aria-hidden>{t(`language.flag.${item}`)}</span>
+          <span aria-hidden className={compact ? "hidden 2xl:inline" : undefined}>{t(`language.flag.${item}`)}</span>
         </button>
       ))}
     </div>

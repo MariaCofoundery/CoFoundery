@@ -14,10 +14,13 @@ type DashboardViewSwitchProps = {
    * dieser Seiten prueft ihren Zugang selbst.
    */
   onSelect?: (view: WorkContext) => void;
+  compact?: boolean;
 };
 
-function linkClassName(active: boolean) {
-  return `rounded-full px-3 py-1.5 text-sm font-medium transition ${
+function linkClassName(active: boolean, compact: boolean) {
+  // compact: im Kopf am Rechner - dort ist der Wechsel ein Werkzeug neben
+  // anderen, nicht die Hauptnavigation, und darf diese nicht verdraengen.
+  return `whitespace-nowrap rounded-full font-medium transition ${compact ? "px-2.5 py-1 text-[13px]" : "px-3 py-1.5 text-sm"} ${
     active
       ? "bg-[color:var(--brand-primary)] text-slate-900 shadow-[0_8px_18px_rgba(103,232,249,0.22)]"
       : "text-slate-600 hover:bg-white/80 hover:text-slate-900"
@@ -29,6 +32,7 @@ export function DashboardViewSwitch({
   hasFounder,
   hasAdvisor,
   onSelect,
+  compact = false,
 }: DashboardViewSwitchProps) {
   const t = useTranslations("navigation");
 
@@ -39,13 +43,13 @@ export function DashboardViewSwitch({
   return (
     <nav
       aria-label={t("viewSwitchLabel")}
-      className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200/80 bg-slate-100/85 p-1"
+      className={`inline-flex shrink-0 items-center rounded-full border border-slate-200/80 bg-slate-100/85 ${compact ? "gap-0.5 p-0.5" : "gap-1 p-1"}`}
     >
       <Link
         href="/dashboard"
         aria-current={activeView === "founder" ? "true" : undefined}
         onClick={() => onSelect?.("founder")}
-        className={linkClassName(activeView === "founder")}
+        className={linkClassName(activeView === "founder", compact)}
       >
         {t("viewFounder")}
       </Link>
@@ -53,7 +57,7 @@ export function DashboardViewSwitch({
         href="/advisor/dashboard"
         aria-current={activeView === "advisor" ? "true" : undefined}
         onClick={() => onSelect?.("advisor")}
-        className={linkClassName(activeView === "advisor")}
+        className={linkClassName(activeView === "advisor", compact)}
       >
         {t("viewAdvisor")}
       </Link>

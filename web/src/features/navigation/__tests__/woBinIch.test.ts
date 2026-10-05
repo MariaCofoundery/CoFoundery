@@ -26,7 +26,7 @@ test("die Krumen kommen aus dem Navigationsbaum, nicht aus dem Pfad", () => {
 });
 
 test("die Zeile erscheint nur, wenn sie etwas sagt (Phase 11.7B)", () => {
-  // Ab 1024 Pixeln zeigen Pille und zweite Reihe schon Bereich und
+  // Ab 1280 Pixeln (vorher 1024) zeigen Pille und zweite Reihe schon Bereich und
   // Unterbereich - die Krume war dort die dritte Angabe desselben Ortes. Auf
   // dem Telefon traegt der Menueknopf den Bereich; die Krume bleibt fuer Seiten
   // UNTERHALB eines Unterbereichs, nie auf Teamseiten mit eigenem Rueckweg.
@@ -36,7 +36,7 @@ test("die Zeile erscheint nur, wenn sie etwas sagt (Phase 11.7B)", () => {
   );
   assert.ok(zeile.length > 0, "die Zeile fehlt");
   const klassen = [...zeile.matchAll(/className="([^"]*)"/g)].map((treffer) => treffer[1]).join(" ");
-  assert.match(klassen, /\blg:hidden\b/, "am Rechner wiederholt die Zeile Pille und zweite Reihe");
+  assert.match(klassen, /\bxl:hidden\b/, "am Rechner wiederholt die Zeile Pille und zweite Reihe");
   const regel = shell.slice(shell.indexOf("const breadcrumbAddsOrientation"), shell.indexOf("const breadcrumb ="));
   assert.match(regel, /pathname !== activeSubItem\?\.href/);
   assert.match(regel, /!pathname\.startsWith\("\/teams\/"\)/);

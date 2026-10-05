@@ -147,7 +147,8 @@ test("the language switch is a footnote, not a button pair", () => {
   // Die Fahne ist Schmuck und aria-hidden. Der volle Name steht im title -
   // eine Vorlesesoftware soll nicht "DE Flagge Deutschland" sagen, und eine
   // Sprache ist ohnehin kein Land.
-  assert.match(shell, /<span aria-hidden>\{t\(`language\.flag\./);
+  // Seit 05.10.2026 im Kopf am Rechner erst ab 2xl (compact), im Menue immer.
+  assert.match(shell, /<span aria-hidden className=\{compact \? "hidden 2xl:inline" : undefined\}>\{t\(`language\.flag\./);
   assert.match(shell, /title=\{t\(`language\.\$\{item\}`\)\}/);
 
   for (const locale of ["de", "en"]) {

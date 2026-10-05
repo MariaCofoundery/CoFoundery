@@ -48,8 +48,9 @@ test("jede Reihe in der Leiste darf umbrechen", () => {
 
   // Und die linke Gruppe mit dem Logo hatte es von Anfang an - falls jemand es
   // herausnimmt, faellt es hier auf.
-  // Phase 11.7B: ab 1024 Pixeln bewusst einzeilig (lg:flex-nowrap), darunter umbrechend.
-  assert.match(codeOnly(SHELL), /flex min-w-0 flex-wrap items-center gap-4 md:gap-5 lg:flex-nowrap/);
+  // Phase 11.7B: am Rechner bewusst einzeilig, darunter umbrechend. Seit dem
+  // 05.10.2026 ab 1280 Pixeln (xl) und ohne Schrumpfen, siehe unten.
+  assert.match(codeOnly(SHELL), /flex min-w-0 flex-wrap items-center gap-4 md:gap-5 xl:shrink-0 xl:flex-nowrap/);
 });
 
 test("der Innenabstand ist auf dem Telefon kleiner", () => {
@@ -94,18 +95,19 @@ test("ein Eintrag rutscht ganz in die nächste Zeile, statt zu zerfallen", () =>
  * Reihe wurden drei, dazu die zweite Reihe mit den Unterseiten. Unter 1024
  * Pixeln steht deshalb jetzt ein Knopf, und alles andere liegt dahinter.
  */
-test("unter 1024 Pixeln steht statt der Reihen ein Knopf", () => {
+test("unter 1280 Pixeln steht statt der Reihen ein Knopf", () => {
   const shell = codeOnly(SHELL);
-  // Die Pillenreihe: erst ab lg.
-  assert.match(shell, /className="hidden flex-wrap items-center gap-1 rounded-full[^"]*lg:flex"/);
-  // Die rechte Reihe: erst ab lg.
-  assert.match(shell, /className="hidden min-w-0 flex-wrap items-center justify-end[^"]*lg:flex"/);
+  // Die Pillenreihe: erst ab xl (05.10.2026, vorher lg).
+  assert.match(shell, /className="hidden shrink-0 flex-nowrap items-center gap-1 rounded-full[^"]*xl:flex"/);
+  // Die rechte Reihe: erst ab xl.
+  assert.match(shell, /className="hidden min-w-0 flex-wrap items-center justify-end[^"]*xl:flex xl:flex-nowrap"/);
   // Phase 11.7B: der geschlossene Knopf traegt den aktuellen Bereich als Ortsangabe.
   assert.match(shell, /activeArea\?\.label \?\? t\("menuOpen"\)/);
-  // Die zweite Reihe mit den Unterseiten: erst ab lg.
-  assert.match(shell, /mx-auto hidden w-full max-w-7xl[^"]*lg:block/);
-  // Und der Knopf nur darunter.
-  assert.match(shell, /lg:hidden"\s*>\s*<MenuGlyph/);
+  // Die zweite Reihe mit den Unterseiten: erst ab xl.
+  assert.match(shell, /mx-auto hidden w-full max-w-7xl[^"]*xl:block/);
+  // Und der Knopf nur darunter - samt dem aufgeklappten Menue.
+  assert.match(shell, /xl:hidden"\s*>\s*<MenuGlyph/);
+  assert.match(shell, /overflow-y-auto[^"]*xl:hidden"/);
 });
 
 test("das geschlossene Menü verbirgt nicht, dass etwas wartet", () => {
@@ -174,4 +176,62 @@ test("das Postfach hat die Reihe verlängert – und bleibt trotzdem sichtbar", 
   const shell = codeOnly(SHELL);
   assert.match(shell, /href="\/messages"/);
   assert.match(shell, /href="\/profile"/);
+});
+
+// ---------------------------------------------------------------------------
+// Am Rechner: genau eine Reihe
+// ---------------------------------------------------------------------------
+/**
+ * GEMELDET AM 05.10.2026: "Sowohl Founder als auch Advisor zeigen selbst bei
+ * sehr breiten Fenstern Connect allein in einer zweiten Zeile."
+ *
+ * Gemessen (lokal, Chrome): Mit Founder/Advisor-Wechsel brach Connect bei
+ * 1024-2048 Pixeln IMMER um (Kopf 104 statt 62 Pixel). Der Rahmen ist wegen
+ * max-w-7xl ab 1280 Pixeln gleich breit; die linke Gruppe trug min-w-0, die
+ * Pille flex-wrap - also schrumpfte Flex die BEREICHE, um den Werkzeugen
+ * rechts Platz zu machen. Umgekehrt ist es richtig.
+ */
+const PRIMARY_NAV = /<nav\s+aria-label=\{t\("navLabel"\)\}\s+className="([^"]*)"/;
+
+test("Founder- und Advisor-Bereiche brechen am Rechner nicht um", () => {
+  const shell = codeOnly(SHELL);
+  // Beide Rollen laufen durch dieselbe Pille (navigationItems = Founder- ODER
+  // Advisor-Eintraege) - eine Regel deckt beide ab.
+  assert.match(shell, /\.\.\.advisorItems,/);
+  const nav = shell.match(PRIMARY_NAV)?.[1];
+  assert.ok(nav, "die Bereichs-Pille ist nicht mehr auffindbar");
+  assert.match(nav, /\bflex-nowrap\b/, "die Pille darf umbrechen - dann rutscht Connect in Zeile zwei");
+  assert.ok(!/(^|\s)flex-wrap\b/.test(nav), `die Pille bricht wieder um: ${nav}`);
+  assert.match(nav, /\bshrink-0\b/, "die Pille darf gequetscht werden");
+  // Keine feste oder maximale Breite an der Pille: Sie richtet sich nach ihrem Inhalt.
+  assert.ok(!/\b(max-)?w-/.test(nav), `die Pille hat eine feste Breite: ${nav}`);
+  // Und die Gruppe aus Logo und Pille schrumpft am Rechner nicht.
+  assert.match(shell, /md:gap-5 xl:shrink-0 xl:flex-nowrap/);
+});
+
+test("Connect bleibt in der ersten Reihe: Was rechts nicht passt, weicht", () => {
+  const shell = codeOnly(SHELL);
+  // Die Werkzeuge nehmen nur den Rest (flex-1) und brechen am Rechner nicht um.
+  assert.match(shell, /justify-end gap-x-3 gap-y-2 xl:flex-1 xl:flex-nowrap/);
+  // Zuerst weicht der Kontoname: kuerzbar, und bei vollem Kopf ganz weg.
+  assert.match(shell, /showName=\{!\(hasFounder && hasAdvisor\)\}/);
+  assert.match(shell, /showName \? "hidden min-w-0 max-w-28 truncate xl:inline" : "sr-only"/);
+  // Sprache und Rollenwechsel im Kopf kompakt; im Menue unveraendert.
+  assert.match(shell, /<LanguageSwitcher compact \/>/);
+  assert.match(shell, /compact \? "hidden 2xl:inline" : undefined/);
+  const menu = shell.slice(shell.indexOf("id={MOBILE_MENU_ID}"));
+  assert.match(menu, /<LanguageSwitcher \/>/);
+  assert.ok(!/<DashboardViewSwitch[^>]*\bcompact\b/.test(menu), "im Menue bleibt der Wechsel gross genug zum Tippen");
+  assert.match(codeOnly("src/features/dashboard/DashboardViewSwitch.tsx"), /compact \? "px-2\.5 py-1 text-\[13px\]" : "px-3 py-1\.5 text-sm"/);
+});
+
+test("kein Zwischenzustand: Reihe und Menue wechseln an derselben Grenze", () => {
+  const shell = codeOnly(SHELL);
+  // Alles, was am Rechner sichtbar wird, und alles, was dann verschwindet,
+  // haengt an xl. Ein uebrig gebliebenes lg: wuerde zwischen 1024 und 1279
+  // Pixeln wieder Reihe UND Knopf - oder keins von beiden - zeigen.
+  assert.ok(!/\blg:/.test(shell), "ein lg:-Wechsel ist uebrig - zwischen 1024 und 1280 Pixeln entsteht ein Mischzustand");
+  // Kein horizontaler Ueberlauf: Rahmen bleibt w-full max-w-7xl, nie eine feste Mindestbreite.
+  assert.match(shell, /mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between/);
+  assert.ok(!/min-w-\[\d/.test(shell), "eine feste Mindestbreite im Kopf schiebt die Seite ueber den Rand");
 });
