@@ -9,7 +9,9 @@ import { createClient } from "@/lib/supabase/client";
 type JoinUiState =
   | { type: "loading"; title: string; description: string }
   // Phase 11.7B: Beitritt mit ausdruecklicher Wahl - keine Vorauswahl.
-  | { type: "choice"; token: string; invitationId: string; busy: boolean }
+  // Phase 12C.0: token=null, wenn die Einladung aus dem Konto heraus geoeffnet
+  // wird (Dashboard, Verbindungen) - dann identifiziert sie die invitationId.
+  | { type: "choice"; token: string | null; invitationId: string; busy: boolean }
   | { type: "redirecting"; title: string; description: string }
   | {
       type: "error";
@@ -22,6 +24,11 @@ function resolveInviteError(message: string, t: ReturnType<typeof useTranslation
   const normalized = message.trim().toLowerCase();
   if (normalized.includes("founder_team_member_limit_reached") || normalized.includes("invitation_target_conflict")) {
     return { title: t("acceptFailedTitle"), description: t(normalized.includes("founder_team_member_limit_reached") ? "teamFull" : "teamChanged") };
+  }
+
+  // Phase 12C.0b: Annahme nur mit bestaetigter E-Mail-Adresse.
+  if (normalized.includes("email_not_verified") || normalized === "unverified") {
+    return { title: t("unverifiedTitle"), description: t("unverifiedDescription") };
   }
 
   if (normalized.includes("invalid_token")) {
@@ -109,19 +116,29 @@ export default function JoinClient() {
     description: t("loadingDescription"),
   });
 
-  async function acceptWithChoice(token: string, invitationIdFromUrl: string, share: boolean) {
+  // Die EINZIGE Stelle, an der eine Einladung angenommen wird - und nur nach
+  // einem Klick auf eine der beiden Optionen.
+  async function acceptWithChoice(token: string | null, invitationIdFromUrl: string, share: boolean) {
     setUiState({ type: "choice", token, invitationId: invitationIdFromUrl, busy: true });
-    logInviteFlowDebug("JoinClient:accept_invitation_attempt", { invitationIdFromUrl, tokenPresent: true, share });
-    const { data, error } = await supabase.rpc("accept_invitation_with_team_share", {
-      p_token: token,
-      p_share: share,
-    });
+    logInviteFlowDebug("JoinClient:accept_invitation_attempt", { invitationIdFromUrl, tokenPresent: Boolean(token), share });
+    const { data, error } = token
+      ? await supabase.rpc("accept_invitation_with_team_share", { p_token: token, p_share: share })
+      : await supabase.rpc("accept_invitation_by_id_with_team_share", {
+          p_invitation_id: invitationIdFromUrl,
+          p_share: share,
+        });
 
     if (error) {
       logInviteFlowDebug("JoinClient:accept_invitation_error", { invitationIdFromUrl, error: error.message });
       const normalizedError = error.message.trim().toLowerCase();
       if (normalizedError.includes("auth session missing") || normalizedError.includes("not_authenticated")) {
-        if (typeof window !== "undefined") window.location.replace(`/join/prepare?token=${encodeURIComponent(token)}`);
+        if (typeof window !== "undefined") {
+          window.location.replace(
+            token
+              ? `/join/prepare?token=${encodeURIComponent(token)}`
+              : `/login?next=${encodeURIComponent(buildJoinStartHref(invitationIdFromUrl))}`
+          );
+        }
         return;
       }
       const mapped = resolveInviteError(error.message, t);
@@ -202,6 +219,23 @@ export default function JoinClient() {
         // und teilen" oder "Erst beitreten, spaeter entscheiden".
         setUiState({ type: "choice", token, invitationId: invitationIdFromUrl, busy: false });
         return;
+      }
+
+      if (resolvedInvitationId) {
+        // Phase 12C.0: Aus dem Konto heraus geoeffnet (ohne Token). Offene
+        // Einladung -> derselbe Beitrittsdialog. Nur lesen, nichts annehmen.
+        const { data: state } = await supabase.rpc("get_invitation_decision_state", {
+          p_invitation_id: resolvedInvitationId,
+        });
+        if (state === "pending") {
+          setUiState({ type: "choice", token: null, invitationId: resolvedInvitationId, busy: false });
+          return;
+        }
+        if (state === "expired" || state === "revoked" || state === "unavailable" || state === "unverified") {
+          const mapped = resolveInviteError(state === "unavailable" ? "invalid_token" : state, t);
+          setUiState({ type: "error", title: mapped.title, description: mapped.description, technicalError: String(state) });
+          return;
+        }
       }
 
       if (!resolvedInvitationId) {

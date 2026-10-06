@@ -48,33 +48,7 @@ function readInvitationId(params: WelcomeSearchParams) {
   return (params.invitationId ?? "").trim();
 }
 
-function extractInvitationIdFromAcceptPayload(payload: unknown): string | null {
-  if (Array.isArray(payload)) {
-    const first = payload[0] as { invitation_id?: unknown } | undefined;
-    return typeof first?.invitation_id === "string" ? first.invitation_id : null;
-  }
-  const direct = payload as { invitation_id?: unknown } | null;
-  return typeof direct?.invitation_id === "string" ? direct.invitation_id : null;
-}
-
 type InviteT = Awaited<ReturnType<typeof getTranslations>>;
-
-function resolveInviteError(message: string, t: InviteT) {
-  const normalized = message.trim().toLowerCase();
-  if (normalized.includes("founder_team_member_limit_reached")) return t("errors.teamFull");
-  if (normalized.includes("invitation_target_conflict")) return t("errors.teamChanged");
-  if (normalized.includes("invalid_token")) return t("errors.invalidToken");
-  if (normalized.includes("expired")) return t("errors.expired");
-  if (normalized.includes("revoked")) return t("errors.revoked");
-  if (
-    normalized.includes("invitation_email_mismatch") ||
-    normalized.includes("invitation_already_accepted")
-  ) {
-    return t("errors.emailMismatch");
-  }
-  if (normalized.includes("not_authenticated")) return t("errors.notAuthenticated");
-  return t("errors.processingFailed");
-}
 
 function isInvitationExpired(expiresAt: string | null | undefined) {
   if (!expiresAt) return false;
@@ -131,7 +105,7 @@ export default async function JoinWelcomePage({
   const t = await getTranslations("invite.welcome");
   const params = await searchParams;
   const token = readToken(params);
-  let invitationId = readInvitationId(params);
+  const invitationId = readInvitationId(params);
   const showDebug = inviteFlowDebugQueryEnabled(params.debug);
 
   const supabase = await createClient();
@@ -163,29 +137,11 @@ export default async function JoinWelcomePage({
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 
+  // Phase 12C.0: Diese Seite nimmt nichts mehr an. Ein Token in der Adresse
+  // fuehrt in den Beitrittsdialog (/join), wo die ausdrueckliche Wahl faellt -
+  // ein Seitenaufruf allein darf keine Mitgliedschaft erzeugen.
   if (token) {
-    logInviteFlowDebug("join/welcome:accept_invitation_attempt", {
-      invitationId,
-      tokenPresent: true,
-      userId: user.id,
-    });
-    const { data, error } = await supabase.rpc("accept_invitation", { p_token: token });
-    if (error) {
-      logInviteFlowDebug("join/welcome:accept_invitation_error", {
-        invitationId,
-        userId: user.id,
-        error: error.message,
-      });
-      return renderErrorState(resolveInviteError(error.message, t), t);
-    }
-    const acceptedInvitationId = extractInvitationIdFromAcceptPayload(data);
-    invitationId = acceptedInvitationId ?? invitationId;
-    logInviteFlowDebug("join/welcome:accept_invitation_success", {
-      invitationId,
-      acceptedInvitationId,
-      userId: user.id,
-      payload: data,
-    });
+    redirect(`/join?token=${encodeURIComponent(token)}`);
   }
 
   if (!invitationId) {

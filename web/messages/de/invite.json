@@ -35,7 +35,9 @@
         "body": "Du trittst bei, ohne etwas zu teilen. Teilen kannst du jederzeit auf der Teamseite."
       },
       "note": "Forschungsantworten, FIND und Advisor-Zugänge sind von dieser Entscheidung nicht betroffen. Deine Antworten zum Vorhaben sehen die Mitglieder erst, wenn du sie abgibst."
-    }
+    },
+    "unverifiedTitle": "Bitte zuerst die E-Mail-Adresse bestätigen",
+    "unverifiedDescription": "Eine Einladung lässt sich erst annehmen, wenn deine E-Mail-Adresse bestätigt ist. Melde dich einmal über den Link in deiner Mail an und öffne die Einladung danach erneut."
   },
   "welcome": {
     "errors": {

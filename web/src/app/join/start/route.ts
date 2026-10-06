@@ -13,6 +13,10 @@ function buildStartHref(invitationId: string) {
   return `/join/start?invitationId=${encodeURIComponent(invitationId)}`;
 }
 
+function buildDecisionHref(invitationId: string) {
+  return `/join?invitationId=${encodeURIComponent(invitationId)}`;
+}
+
 function buildLoginHref(request: NextRequest, invitationId: string) {
   const loginUrl = new URL("/login", request.url);
   loginUrl.searchParams.set("next", buildStartHref(invitationId));
@@ -63,6 +67,17 @@ export async function GET(request: NextRequest) {
     invitation: invitationSnapshot,
     invitationError: invitationSnapshotError?.message ?? null,
   });
+
+  // Phase 12C.0: Eine offene Einladung wird hier nie angenommen, sondern in den
+  // Beitrittsdialog gefuehrt - vor allem anderen, auch vor der Profilabfrage.
+  // Erst die ausdrueckliche Wahl dort erzeugt die Mitgliedschaft.
+  const { data: decisionState } = await supabase.rpc("get_invitation_decision_state", {
+    p_invitation_id: invitationId,
+  });
+  if (decisionState === "pending") {
+    logInviteFlowDebug("join/start:redirect_decision", { invitationId, userId: user.id });
+    return NextResponse.redirect(new URL(buildDecisionHref(invitationId), request.url));
+  }
 
   const profile = await getProfileBasicsRow(supabase, user.id).catch(() => null);
   if (!isCoreProfileComplete(profile)) {

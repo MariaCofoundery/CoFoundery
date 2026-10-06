@@ -35,6 +35,22 @@
     "holder": {
       "org": "The organisation holds this access — it stays if the person who asked leaves.",
       "person": "This person holds the access — nobody else."
+    },
+    "invitePage": {
+      "title": "A request for access",
+      "intro": "{name} is asking for access to parts of your details.",
+      "introOrg": "{name} is asking for access to parts of your details on behalf of “{org}”.",
+      "requesterFallback": "Someone",
+      "scopesTitle": "What is being requested",
+      "noteLabel": "Message",
+      "whatHappens": "If you accept, a request per area appears in your account. Nothing becomes visible until you agree there, area by area – and you can withdraw any access at any time.",
+      "accept": "Accept request",
+      "notNow": "Not now",
+      "error": "That did not work. Please try again.",
+      "expired": "This invitation has expired. Ask the person who invited you for a new one.",
+      "revoked": "This invitation was withdrawn.",
+      "unverified": "Please confirm your email address first. Then you can accept the invitation.",
+      "self": "This invitation comes from you and cannot be accepted."
     }
   },
   "teamReview": {

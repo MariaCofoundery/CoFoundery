@@ -35,7 +35,9 @@
         "body": "You join without sharing anything. You can share at any time on the team page."
       },
       "note": "Research answers, FIND and advisor access are not affected by this decision. Members only see your venture answers once you submit them."
-    }
+    },
+    "unverifiedTitle": "Please confirm your email address first",
+    "unverifiedDescription": "You can accept an invitation once your email address is confirmed. Sign in once via the link in your email, then open the invitation again."
   },
   "welcome": {
     "errors": {

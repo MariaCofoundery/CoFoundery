@@ -35,6 +35,22 @@
     "holder": {
       "org": "Den Zugang hält die Organisation — er bleibt bestehen, wenn die anfragende Person sie verlässt.",
       "person": "Den Zugang hält diese Person — niemand sonst."
+    },
+    "invitePage": {
+      "title": "Eine Anfrage nach Zugang",
+      "intro": "{name} bittet um Zugang zu Teilen deiner Angaben.",
+      "introOrg": "{name} bittet im Namen von „{org}“ um Zugang zu Teilen deiner Angaben.",
+      "requesterFallback": "Eine Person",
+      "scopesTitle": "Worum gebeten wird",
+      "noteLabel": "Nachricht",
+      "whatHappens": "Wenn du annimmst, entsteht in deinem Konto eine Anfrage je Bereich. Sichtbar wird erst etwas, wenn du dort einzeln zustimmst – und du kannst jeden Zugang jederzeit zurücknehmen.",
+      "accept": "Anfrage annehmen",
+      "notNow": "Nicht jetzt",
+      "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
+      "expired": "Diese Einladung ist abgelaufen. Frag die Person, die dich eingeladen hat, nach einer neuen.",
+      "revoked": "Diese Einladung wurde zurückgenommen.",
+      "unverified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du die Einladung annehmen.",
+      "self": "Diese Einladung stammt von dir selbst und lässt sich nicht annehmen."
     }
   },
   "teamReview": {
