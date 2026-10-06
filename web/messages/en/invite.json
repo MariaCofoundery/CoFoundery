@@ -92,7 +92,8 @@
       "emailMismatch": "This invitation does not match the email address of your current profile.",
       "alreadyClaimed": "This founder slot has already been connected to another profile.",
       "activationFailed": "The team connection could not be completed right now. Please try again in a moment.",
-      "invalidToken": "This founder link is no longer valid or could not be found."
+      "invalidToken": "This founder link is no longer valid or could not be found.",
+      "emailNotVerified": "Please confirm your email address first. Then you can take your place."
     },
     "eyebrow": "Founder invitation",
     "notFoundTitle": "Invitation not found",

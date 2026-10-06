@@ -62,7 +62,6 @@ type InvitationBootstrapRow = {
   invitee_email: string;
   status: string;
   accepted_at: string | null;
-  relationship_id: string | null;
 };
 
 export type AdvisorPendingTeamInvite = {
@@ -113,6 +112,7 @@ export type ClaimAdvisorTeamInviteResult =
         | "email_mismatch"
         | "already_claimed"
         | "claim_failed"
+        | "email_not_verified"
         | "activation_failed";
     };
 
@@ -369,6 +369,9 @@ export async function getAdvisorTeamInviteByToken(
   return loadAdvisorTeamInviteByTokenHash(hashOpaqueToken(normalizedToken), privileged);
 }
 
+// Phase 12C.1B: `relationships` hat keine Spalten `status`/`revoked_at` (mehr).
+// Sie hier zu lesen und zu schreiben liess jede neue Advisor-Team-Verbindung an
+// "relationship_create_failed" scheitern - der Advisor wurde nie verknuepft.
 async function resolveRelationshipIdForFounders(
   founderAUserId: string,
   founderBUserId: string,
@@ -376,7 +379,7 @@ async function resolveRelationshipIdForFounders(
 ) {
   const { data: existingRelationship, error: existingRelationshipError } = await client
     .from("relationships")
-    .select("id, status, revoked_at")
+    .select("id")
     .or(
       `and(user_a_id.eq.${founderAUserId},user_b_id.eq.${founderBUserId}),and(user_a_id.eq.${founderBUserId},user_b_id.eq.${founderAUserId})`
     )
@@ -391,9 +394,8 @@ async function resolveRelationshipIdForFounders(
     .insert({
       user_a_id: founderAUserId,
       user_b_id: founderBUserId,
-      status: "active",
     })
-    .select("id, status, revoked_at")
+    .select("id")
     .maybeSingle();
 
   if (!insertedRelationshipError && insertedRelationship) {
@@ -421,7 +423,7 @@ async function loadInvitationBootstrapRow(
 ): Promise<InvitationBootstrapRow | null> {
   const { data, error } = await client
     .from("invitations")
-    .select("id, inviter_user_id, invitee_user_id, invitee_email, status, accepted_at, relationship_id")
+    .select("id, inviter_user_id, invitee_user_id, invitee_email, status, accepted_at")
     .eq("id", invitationId)
     .maybeSingle();
 
@@ -672,24 +674,31 @@ function resolveBootstrapStarter(row: AdvisorTeamInviteRow) {
   return null;
 }
 
-function resolveExpectedInviteeUserId(
-  invitation: InvitationBootstrapRow,
-  row: AdvisorTeamInviteRow
-) {
-  const invitationInviteeEmail = normalizeEmail(invitation.invitee_email);
-  if (invitationInviteeEmail === normalizeEmail(row.founder_a_email)) {
-    return row.founder_a_user_id;
+/**
+ * Phase 12C.1B: Finalisieren bis zum Ende - nur aus ausdruecklichen
+ * Schreibwegen (zweiter Slot-Klick, Knopf "Verbindung abschliessen").
+ *
+ * Ein Durchlauf legt fehlende Teile an (Einladung, Beziehung) und verknuepft
+ * den Advisor erst im naechsten, wenn diese Teile gespeichert sind. Bisher hat
+ * der naechste Seitenaufruf (GET) diesen zweiten Durchlauf erledigt; jetzt
+ * laeuft er hier, solange ein Durchlauf etwas repariert hat (hoechstens drei).
+ * Jeder Schritt ist idempotent - parallele Klicks fuehren zum selben Ergebnis.
+ */
+export async function finalizeAdvisorTeamInviteCompletely(
+  pendingInvite: AdvisorTeamInviteRow,
+  client?: SupabaseLikeClient
+): Promise<FinalizeAdvisorTeamInviteResult> {
+  const resolvedClient = client ?? createPrivilegedClient();
+  let row = pendingInvite;
+  let result = await finalizeAdvisorTeamInviteIfPossible(row, resolvedClient ?? undefined);
+  for (let pass = 1; pass < 3 && !result.activated && result.repaired; pass += 1) {
+    if (!resolvedClient) break;
+    const reloaded = await loadAdvisorTeamInviteById(row.id, resolvedClient);
+    if (!reloaded) break;
+    row = reloaded;
+    result = await finalizeAdvisorTeamInviteIfPossible(row, resolvedClient ?? undefined);
   }
-  if (invitationInviteeEmail === normalizeEmail(row.founder_b_email)) {
-    return row.founder_b_user_id;
-  }
-  if (invitation.inviter_user_id === row.founder_a_user_id) {
-    return row.founder_b_user_id;
-  }
-  if (invitation.inviter_user_id === row.founder_b_user_id) {
-    return row.founder_a_user_id;
-  }
-  return null;
+  return result;
 }
 
 export async function finalizeAdvisorTeamInviteIfPossible(
@@ -711,10 +720,7 @@ export async function finalizeAdvisorTeamInviteIfPossible(
     relationshipId,
     activated: row.status === "activated",
     invitationReady: Boolean(
-      invitation &&
-        invitation.status === "accepted" &&
-        invitation.invitee_user_id &&
-        invitation.relationship_id
+      invitation && ["sent", "opened", "accepted"].includes(String(invitation.status))
     ),
     advisorLinkReady,
     repaired,
@@ -886,73 +892,17 @@ export async function finalizeAdvisorTeamInviteIfPossible(
     }
   }
 
-  if (invitation && bothFoundersClaimed && relationshipId) {
-    const currentInvitation = invitation;
-    const expectedInviteeUserId = resolveExpectedInviteeUserId(invitation, row);
-    const invitationNeedsUpdate =
-      currentInvitation.status !== "accepted" ||
-      currentInvitation.invitee_user_id !== expectedInviteeUserId ||
-      currentInvitation.relationship_id !== relationshipId ||
-      !currentInvitation.accepted_at;
+  // Phase 12C.1B: KEINE erzwungene Annahme mehr. Hier setzte der
+  // Service-Role-Client die Founder-Einladung auf "angenommen" (und schrieb
+  // dabei die laengst entfernte Spalte invitations.relationship_id - der Schritt
+  // konnte im aktuellen Schema nie gelingen). Seit 12C.0 entsteht eine
+  // Teammitgliedschaft nur ueber die ausdrueckliche Wahl im Beitrittsdialog:
+  // Nach dem Slot-Klick fuehrt /join/start die eingeladene Founderin dorthin.
 
-    if (expectedInviteeUserId && invitationNeedsUpdate) {
-      const updatedInvitation = await safeStep("ensure_invitation_accepted", async () => {
-        const nextAcceptedAt = currentInvitation.accepted_at ?? new Date().toISOString();
-        const { error } = await resolvedClient
-          .from("invitations")
-          .update({
-            invitee_user_id: expectedInviteeUserId,
-            accepted_at: nextAcceptedAt,
-            status: "accepted",
-            relationship_id: relationshipId,
-          })
-          .eq("id", currentInvitation.id);
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        const refreshedInvitation = await loadInvitationBootstrapRow(currentInvitation.id, resolvedClient);
-        if (!refreshedInvitation) {
-          throw new Error("invitation_reload_failed");
-        }
-        return refreshedInvitation;
-      });
-      if (updatedInvitation) {
-        invitation = updatedInvitation;
-        repaired = true;
-      }
-    } else if (expectedInviteeUserId) {
-      logAdvisorTeamInviteActivation({
-        stage: "ensure_invitation_accepted_skip_existing",
-        pendingInviteId: row.id,
-        invitationId,
-        status: row.status,
-        founderAUserId: row.founder_a_user_id,
-        founderBUserId: row.founder_b_user_id,
-        relationshipId,
-      });
-    } else {
-      failures.push("ensure_invitation_accepted:missing_expected_invitee");
-      logAdvisorTeamInviteActivation({
-        stage: "ensure_invitation_accepted",
-        level: "error",
-        pendingInviteId: row.id,
-        invitationId,
-        status: row.status,
-        founderAUserId: row.founder_a_user_id,
-        founderBUserId: row.founder_b_user_id,
-        relationshipId,
-        detail: "missing_expected_invitee",
-      });
-    }
-  }
-
+  // Bereit heisst: Die Founder-Einladung existiert und ist offen oder
+  // angenommen - die Annahme selbst bleibt der Founderin vorbehalten.
   const invitationReady = Boolean(
-    invitation &&
-      invitation.status === "accepted" &&
-      invitation.invitee_user_id &&
-      invitation.relationship_id
+    invitation && ["sent", "opened", "accepted"].includes(String(invitation.status))
   );
 
   if (invitationId && relationshipId) {
@@ -1092,6 +1042,10 @@ export async function claimAdvisorTeamInviteFounder(params: {
     if (/already_claimed/i.test(claimError.message)) {
       return { ok: false, reason: "already_claimed" };
     }
+    // Phase 12C.1A/B: Slot nur mit bestaetigter E-Mail-Adresse.
+    if (/email_not_verified/i.test(claimError.message)) {
+      return { ok: false, reason: "email_not_verified" };
+    }
     return { ok: false, reason: "claim_failed" };
   }
 
@@ -1119,7 +1073,7 @@ export async function claimAdvisorTeamInviteFounder(params: {
     founderBUserId: refreshedRow.founder_b_user_id,
     relationshipId: refreshedRow.relationship_id,
   });
-  const finalizeResult = await finalizeAdvisorTeamInviteIfPossible(refreshedRow, privileged);
+  const finalizeResult = await finalizeAdvisorTeamInviteCompletely(refreshedRow, privileged);
   const invitationId = finalizeResult.invitationId;
   if (!invitationId) {
     return { ok: false, reason: "activation_failed" };

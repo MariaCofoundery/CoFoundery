@@ -82,6 +82,15 @@ where id = 'ae222222-2222-4222-8222-222222222222';
 update public.founder_team_setup_items set current_confirmed_revision_id = 'af333333-3333-4333-8333-333333333333'
 where id = 'ae333333-3333-4333-8333-333333333333';
 
+-- Phase 12C.1B: Eine bestaetigte Revision traegt im echten Ablauf die
+-- Bestaetigungen aller damaligen Mitglieder (der Setup-Leser prueft das jetzt).
+insert into public.founder_team_setup_confirmations (revision_id, user_id)
+select revision.id, member.user_id
+from public.founder_team_setup_revisions revision
+join public.founder_team_setup_items item on item.id = revision.setup_item_id
+join public.founder_team_members member on member.team_id = item.team_id
+where revision.id in ('af111111-1111-4111-8111-111111111111', 'af222222-2222-4222-8222-222222222222', 'af333333-3333-4333-8333-333333333333');
+
 -- A relationship advisor receives nothing before a separate team-level grant exists.
 select set_config('request.jwt.claims', '{"sub":"aa111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
 set local role authenticated;

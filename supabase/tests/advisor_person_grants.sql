@@ -68,6 +68,9 @@ select extensions.ok(
   'the person can agree'
 );
 
+-- Phase 12C.1B: Die Person kann nicht erfragen, ob ein Advisor Zugang hat - das
+-- beantwortet die Hilfsfunktion nur dem Advisor selbst (kein Orakel).
+select set_config('request.jwt.claims', '{"sub":"b1000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select extensions.ok(
   public.has_advisor_person_access(
     'b1000000-0000-4000-8000-000000000001', 'capability',
@@ -75,6 +78,7 @@ select extensions.ok(
   ),
   'and then the advisor sees that scope'
 );
+select set_config('request.jwt.claims', '{"sub":"b1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 -- NUR DIESEN UMFANG. Eine Zustimmung zu den Faehigkeiten ist keine zu allem
 -- anderen - deshalb je Umfang eine eigene Zeile.

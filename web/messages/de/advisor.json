@@ -437,7 +437,9 @@
       "expired": "Diese Einladung ist abgelaufen. Frag nach einer neuen.",
       "revoked": "Diese Einladung wurde zurückgenommen.",
       "unverified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du der Organisation beitreten."
-    }
+    },
+    "leave": "Organisation verlassen",
+    "leaveLastOwner": "Du führst die Organisation als Einzige. Übertrage zuerst die Führung oder schließe die Organisation, bevor du gehst."
   },
   "personView": {
     "back": "Zurück zur Übersicht",

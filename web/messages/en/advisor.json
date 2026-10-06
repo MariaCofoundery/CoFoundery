@@ -437,7 +437,9 @@
       "expired": "This invitation has expired. Ask for a new one.",
       "revoked": "This invitation was withdrawn.",
       "unverified": "Please confirm your email address first. Then you can join the organisation."
-    }
+    },
+    "leave": "Leave organisation",
+    "leaveLastOwner": "You are the only person leading this organisation. Hand over the lead or close the organisation before you leave."
   },
   "personView": {
     "back": "Back to the overview",

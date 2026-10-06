@@ -7,7 +7,6 @@ import {
 } from "@/features/dashboard/advisorTeamInviteActions";
 import {
   fallbackLabelFromEmail,
-  finalizeAdvisorTeamInviteIfPossible,
   getAdvisorTeamInviteByToken,
   normalizeEmail,
   normalizeTeamName,
@@ -35,6 +34,9 @@ function statusCopy(error: string | undefined, t: TeamInviteT) {
   if (error === "invalid_token") {
     return t("statusErrors.invalidToken");
   }
+  if (error === "email_not_verified") {
+    return t("statusErrors.emailNotVerified");
+  }
   return null;
 }
 
@@ -48,16 +50,12 @@ export default async function AdvisorTeamInvitePage({
   const t = await getTranslations("invite.teamInvite");
   const { token } = await params;
   const resolvedSearchParams = await searchParams;
-  let invite = await getAdvisorTeamInviteByToken(token);
-
-  if (
-    invite.status === "ready" &&
-    invite.row.invitation_id &&
-    invite.row.status !== "activated"
-  ) {
-    await finalizeAdvisorTeamInviteIfPossible(invite.row);
-    invite = await getAdvisorTeamInviteByToken(token);
-  }
+  // Phase 12C.1B: Der Seitenaufruf liest nur. Hier stand eine Finalisierung mit
+  // dem Service-Role-Client - ein GET (auch Prefetch, Link-Vorschau, Crawler)
+  // nahm die Einladung an und verknuepfte den Advisor. Finalisiert wird jetzt
+  // ausschliesslich im zweiten ausdruecklichen Slot-Klick
+  // (claimAdvisorTeamInviteFounder -> finalizeAdvisorTeamInviteCompletely).
+  const invite = await getAdvisorTeamInviteByToken(token);
 
   if (invite.status !== "ready") {
     return (
@@ -115,6 +113,8 @@ export default async function AdvisorTeamInvitePage({
   if (invitationReadyForCurrentSlot && questionnaireHref) {
     redirect(questionnaireHref);
   }
+
+
 
   async function claimAction() {
     "use server";

@@ -150,8 +150,10 @@ reset role;
 select lives_ok($q$delete from public.founder_team_members where team_id='e8921000-0000-4000-8000-000000000001'$q$,'Removing final members is not blocked by invitation history');
 select is((select count(*)::int from public.founder_team_members where team_id='e8921000-0000-4000-8000-000000000001'),0,'No current roster remains');
 select is((select count(*)::int from public.invitations where target_founder_team_id='e8921000-0000-4000-8000-000000000001'),3,'Historical and pending invitations retained');
+-- Phase 12C.1B: Das leere Team ist archiviert, offene Einladungen sind dabei widerrufen.
+select is((select archived_at is not null from public.founder_teams where id='e8921000-0000-4000-8000-000000000001'),true,'Empty team is archived, not deleted');
 set local role authenticated;
-select throws_ok($q$select public.accept_invitation('phase92-5')$q$,'42501','invitation_target_conflict','Orphaned pending invitation cannot recreate membership');
+select throws_ok($q$select public.accept_invitation('phase92-5')$q$,'P0001','revoked','Orphaned pending invitation cannot recreate membership');
 reset role;
 select * from finish();
 rollback;

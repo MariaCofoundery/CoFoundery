@@ -109,6 +109,8 @@ insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,
 insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) values
  ('e8533000-0000-4000-8000-000000000001','e8530000-0000-4000-8000-000000000001','approved',now()),
  ('e8533000-0000-4000-8000-000000000001','e8530000-0000-4000-8000-000000000002','approved',now());
+-- Phase 12C.1B: wie bei der Aktivierung an das Team mit exakt dieser Gruppe binden.
+update public.advisor_team_reviews set team_id=public.advisor_team_review_matching_team(id),team_bound_at=now() where team_id is null and status='active';
 set local role authenticated;
 select pg_temp.check_v3(public.get_workstyle_team_inputs('e8531000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'advisor without shares denied');
 reset role;

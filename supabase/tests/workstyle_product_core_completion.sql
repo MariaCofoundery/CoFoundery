@@ -254,6 +254,8 @@ insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,
 insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) values
  ('e8563000-0000-4000-8000-000000000001',pg_temp.person(1),'approved',now()),('e8563000-0000-4000-8000-000000000001',pg_temp.person(2),'approved',now()),
  ('e8563000-0000-4000-8000-000000000002',pg_temp.person(1),'approved',now()),('e8563000-0000-4000-8000-000000000002',pg_temp.person(2),'approved',now()),('e8563000-0000-4000-8000-000000000002',pg_temp.person(6),'approved',now());
+-- Phase 12C.1B: wie bei der Aktivierung an das Team mit exakt dieser Gruppe binden.
+update public.advisor_team_reviews set team_id=public.advisor_team_review_matching_team(id),team_bound_at=now() where team_id is null and status='active';
 
 -- Advisor C) Nur Personenfreigabe von 1: Einzelansicht ja, Teambericht nein.
 select pg_temp.share_with_advisor(1);

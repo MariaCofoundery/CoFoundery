@@ -41,6 +41,8 @@ select pg_temp.p(n),pg_temp.p(5),s,'active',pg_temp.p(5),now() from generate_ser
 -- Teamreview fuer genau 1 und 2, beide zugestimmt, aktiv.
 insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,status,activated_at) values ('e87a2000-0000-4000-8000-000000000001',pg_temp.p(5),pg_temp.p(5),'active',now());
 insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) select 'e87a2000-0000-4000-8000-000000000001',pg_temp.p(n),'approved',now() from generate_series(1,2)n;
+-- Phase 12C.1B: wie bei der Aktivierung an das Team mit exakt dieser Gruppe gebunden.
+update public.advisor_team_reviews set team_id=public.advisor_team_review_matching_team(id),team_bound_at=now() where id='e87a2000-0000-4000-8000-000000000001';
 
 create function pg_temp.as_user(n integer) returns void language plpgsql as $$
 begin perform set_config('request.jwt.claims',jsonb_build_object('sub',pg_temp.p(n),'email','access-'||n||'@example.test','role','authenticated')::text,true); end $$;
@@ -127,12 +129,12 @@ delete from public.founder_team_members where team_id=pg_temp.t() and user_id=pg
 -- Team besteht nicht mehr aus der zustimmenden Gruppe.
 delete from public.founder_team_members where team_id=pg_temp.t() and user_id=pg_temp.p(2);
 select pg_temp.check(pg_temp.team_status(5)='none','F: team {1,3} not readable through review {1,2}');
--- Wieder genau die zustimmende Gruppe {1,2}: der Bericht ist wieder lesbar.
--- (Bestehendes Verhalten: Der Review ist an die Personengruppe gebunden, nicht
--- an einen Teamstand - offene Entscheidung, siehe Doku 5.)
+-- Wieder genau die zustimmende Gruppe {1,2}: seit 12C.1B KEIN Wiederaufleben -
+-- der Teamberichts-Zugriff endete beim ersten Rosterwechsel endgueltig.
 delete from public.founder_team_members where team_id=pg_temp.t() and user_id=pg_temp.p(3);
 insert into public.founder_team_members(team_id,user_id) values (pg_temp.t(),pg_temp.p(2));
-select pg_temp.check(pg_temp.team_status(5)='ready','F: group-bound review applies again when the roster equals the consenting group');
+select pg_temp.check(pg_temp.team_status(5)='none','F: returning to the old roster does not revive the team report');
+select pg_temp.check(pg_temp.review_access(5),'F: the group review itself stays');
 
 -- I/J/K) Organisation: Grants der Organisation enden mit der Mitgliedschaft.
 insert into public.advisor_orgs(id,name) values ('e87a3000-0000-4000-8000-000000000001','Access Org');

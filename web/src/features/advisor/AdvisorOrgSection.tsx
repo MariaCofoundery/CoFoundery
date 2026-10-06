@@ -5,6 +5,7 @@ import {
   updateAdvisorOrgProfileAction,
   inviteOrgAdvisorAction,
   setOrgMembershipAction,
+  leaveOrgAction,
 } from "@/features/advisor/orgActions";
 import type { AccompaniedPersonNamed, AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -206,6 +207,22 @@ export async function AdvisorOrgSection({
               </li>
             ))}
           </ul>
+
+          {/* Phase 12C.1B: selbst gehen. Die letzte Inhaberin bekommt statt des
+              Knopfs den Hinweis - die Datenbank wuerde es ohnehin ablehnen. */}
+          {org.role === null ? null : org.role === "owner" &&
+          members.filter((member) => member.role === "owner" && member.status === "active").length <= 1 ? (
+            <p className="mt-4 text-xs leading-6 text-slate-500">{t("leaveLastOwner")}</p>
+          ) : (
+            <form action={leaveOrgAction} className="mt-4">
+              <input type="hidden" name="orgId" value={org.id} />
+              <SubmitButton
+                label={t("leave")}
+                pendingLabel={t("pending")}
+                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
+              />
+            </form>
+          )}
 
           {/* WAS EINE MITGLIEDSCHAFT BEDEUTET - dort, wo sie vergeben wird. */}
           <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">

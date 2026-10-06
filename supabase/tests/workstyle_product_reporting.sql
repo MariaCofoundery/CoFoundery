@@ -103,6 +103,8 @@ select pg_temp.check_report(public.get_workstyle_product_snapshot(current_settin
 reset role;
 insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,status,activated_at) values('e8542000-0000-4000-8000-000000000001','e8540000-0000-4000-8000-000000000005','e8540000-0000-4000-8000-000000000005','active',now());
 insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) select 'e8542000-0000-4000-8000-000000000001',person,'approved',now() from report_people where n<=4;
+-- Phase 12C.1B: wie bei der Aktivierung an das Team mit exakt dieser Gruppe binden.
+update public.advisor_team_reviews set team_id=public.advisor_team_review_matching_team(id),team_bound_at=now() where team_id is null and status='active';
 set local role authenticated;
 select pg_temp.check_report(jsonb_array_length(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'people')=4,'exact approved advisor group plus response shares permits report');
 select pg_temp.check_report(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->'setup'='[]'::jsonb,'team review does not grant setup');

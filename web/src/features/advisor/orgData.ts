@@ -41,9 +41,18 @@ export type AccompaniedPerson = {
 };
 
 export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorOrg[]> {
+  // Phase 12C.1B: NUR DIE EIGENE MITGLIEDSCHAFT. Die Zeilensicherheit zeigt
+  // Mitgliedern auch die Zeilen der anderen Mitglieder - ohne diesen Filter kam
+  // die Rolle der ersten Zeile zurueck, und eine Advisorin sah die Knoepfe der
+  // Inhaberin (die Datenbank lehnte sie ab, die Oberflaeche zeigte sie trotzdem).
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) return [];
   const { data: memberships } = await client
     .from("advisor_org_members")
     .select("org_id, role, status")
+    .eq("user_id", user.id)
     .eq("status", "active");
 
   const rows = (memberships ?? []) as { org_id: string; role: AdvisorOrg["role"]; status: string }[];

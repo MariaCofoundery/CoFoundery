@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(10);
+select extensions.plan(11);
 
 -- ---------------------------------------------------------------------------
 -- Eine Organisation, mehrere Advisor
@@ -54,6 +54,8 @@ set local role authenticated;
 -- ---------------------------------------------------------------------------
 -- Jedes aktive Mitglied sieht, was die Organisation bekommen hat
 -- ---------------------------------------------------------------------------
+-- Phase 12C.1B: Jede Person fragt nur fuer sich selbst (kein Orakel).
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select extensions.ok(
   public.has_advisor_person_access(
     'd1000000-0000-4000-8000-000000000003', 'capability',
@@ -61,8 +63,20 @@ select extensions.ok(
   ),
   'an active member sees what the organisation was granted'
 );
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+
+-- Phase 12C.1B: Eine andere angemeldete Person kann das nicht erfragen.
+select extensions.ok(
+  not public.has_advisor_person_access(
+    'd1000000-0000-4000-8000-000000000003', 'capability',
+    'd1000000-0000-4000-8000-000000000002'
+  ),
+  'nobody else can ask whether a member has access'
+);
 
 -- Und ein Fremder nicht.
+-- Phase 12C.1B: Jede Person fragt nur fuer sich selbst (kein Orakel).
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000004","role":"authenticated"}', true);
 select extensions.ok(
   not public.has_advisor_person_access(
     'd1000000-0000-4000-8000-000000000003', 'capability',
@@ -70,6 +84,7 @@ select extensions.ok(
   ),
   'somebody outside sees nothing'
 );
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 -- ---------------------------------------------------------------------------
 -- DAS IST DER GRUND FUER DIE ORGANISATION
@@ -84,6 +99,8 @@ select extensions.ok(
   'a membership can be ended'
 );
 
+-- Phase 12C.1B: Jede Person fragt nur fuer sich selbst (kein Orakel).
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
 select extensions.ok(
   not public.has_advisor_person_access(
     'd1000000-0000-4000-8000-000000000003', 'capability',
@@ -91,6 +108,7 @@ select extensions.ok(
   ),
   'and that access is gone at once'
 );
+select set_config('request.jwt.claims', '{"sub":"d1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 
 select extensions.is(
   (select status from public.advisor_person_grants

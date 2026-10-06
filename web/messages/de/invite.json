@@ -92,7 +92,8 @@
       "emailMismatch": "Diese Einladung passt nicht zur E-Mail-Adresse deines aktuellen Profils.",
       "alreadyClaimed": "Dieser Founder-Platz wurde bereits mit einem anderen Profil verknüpft.",
       "activationFailed": "Die Team-Verknüpfung konnte gerade nicht abgeschlossen werden. Bitte versuche es gleich noch einmal.",
-      "invalidToken": "Dieser Founder-Link ist nicht mehr gültig oder konnte nicht gefunden werden."
+      "invalidToken": "Dieser Founder-Link ist nicht mehr gültig oder konnte nicht gefunden werden.",
+      "emailNotVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du deinen Platz übernehmen."
     },
     "eyebrow": "Founder-Einladung",
     "notFoundTitle": "Einladung nicht gefunden",

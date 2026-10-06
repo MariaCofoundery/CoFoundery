@@ -88,6 +88,20 @@ export async function setOrgMembershipAction(formData: FormData) {
 }
 
 /**
+ * Selbst-Austritt (Phase 12C.1B). Die Datenbank prueft alles: nur die eigene
+ * aktive Mitgliedschaft, und eine Inhaberin nur, wenn eine andere bleibt.
+ * Danach endet jeder Zugriff ueber die Organisation sofort.
+ */
+export async function leaveOrgAction(formData: FormData) {
+  const { client } = await requireUser();
+  const { error } = await client.rpc("leave_advisor_org", {
+    p_org_id: String(formData.get("orgId") ?? ""),
+  });
+  if (error) back("org_leave");
+  done();
+}
+
+/**
  * Was die Organisation über sich sagt.
  *
  * GEMELDET AM 25.09.2026: "Ich habe als Advisor quasi den Accelerator angelegt,
