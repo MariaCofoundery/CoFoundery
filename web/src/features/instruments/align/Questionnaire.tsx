@@ -7,6 +7,7 @@ import type { SectionView } from "@/features/instruments/v21/questionnaireDataV2
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import type { AnswerableItem } from "@/features/instruments/v21/answersV21";
 import { clearAnswer, saveAnswer, submitScope } from "@/features/instruments/align/answerActions";
+import { basisAnswered } from "@/features/instruments/align/followUps";
 import { setVentureName } from "@/features/instruments/align/ventureActions";
 import {
   noteItemAnswered,
@@ -494,8 +495,10 @@ export function Questionnaire({
     </div>
   );
 
+  // Beta-Gate: dieselbe Regel wie bei der Abgabe (followUps.ts) - eine
+  // Anschlussfrage haengt an IHRER Ausgangsfrage, nicht pauschal an L01.
   const sichtbar = (item: SectionView["items"][number]) =>
-    !item.basisItemId || basisEntries.length > 0;
+    !item.basisItemId || basisAnswered(answers[item.basisItemId]);
 
   /**
    * Wie viele Anschlussfragen an dieser Frage hängen — und noch nicht da sind.

@@ -32,6 +32,17 @@ type Props = {
   variant?: "default" | "accent";
   fallbackAvatarUrl?: string | null;
   welcomeVisual?: ReactNode;
+  /**
+   * Welche Antworten auf "Was hast du vor?" angeboten werden.
+   *
+   * Beta-Gate 06.10.2026: Der Einladungs-Einstieg (/join/welcome) bot einer
+   * eingeladenen Co-Founderin auch "Erstmal nur Leute kennenlernen" und
+   * "Ich begleite" an. Wer das waehlte, war Teammitglied ohne Founder-Rolle:
+   * Das Dashboard schickte nach CONNECT, und aus der Navigation fuehrte kein
+   * Weg mehr ins eigene Team. Dort werden deshalb nur Plaene mit Founder-Rolle
+   * angeboten. Ohne Angabe bleibt es bei allen vier.
+   */
+  plans?: readonly OnboardingPlan[];
 };
 
 const SKILLS = ["Tech", "Sales", "Marketing", "Product", "Operations", "Finance", "Allrounder", "Sonstiges"] as const;
@@ -84,7 +95,7 @@ const ONBOARDING_STEPS_FULL = ["welcome", "name", "plan", "focus", "intention", 
 const ONBOARDING_STEPS_CONNECT = ["welcome", "name", "plan", "next"] as const;
 
 type OnboardingStepId = (typeof ONBOARDING_STEPS_FULL)[number];
-type OnboardingPlan = ProfileRole | "both" | "connect";
+export type OnboardingPlan = ProfileRole | "both" | "connect";
 const ONBOARDING_PLANS: OnboardingPlan[] = ["founder", "advisor", "both", "connect"];
 
 type ProductArea = "align" | "find" | "connect";
@@ -147,6 +158,7 @@ export function ProfileBasicsForm({
   variant = "default",
   fallbackAvatarUrl = null,
   welcomeVisual,
+  plans = ONBOARDING_PLANS,
 }: Props) {
   const t = useTranslations("profile.basicsForm");
   const successRedirect = normalizePath(onSuccessRedirectTo, "/dashboard");
@@ -509,7 +521,7 @@ export function ProfileBasicsForm({
   function renderPlanStep() {
     return (
       <div className="grid gap-3">
-        {ONBOARDING_PLANS.map((planOption) => {
+        {plans.map((planOption) => {
           const selected = plan === planOption;
           return (
             <button

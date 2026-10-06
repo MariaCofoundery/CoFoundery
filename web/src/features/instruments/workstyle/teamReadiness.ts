@@ -1,4 +1,5 @@
 import { getItemsV22 } from "@/features/instruments/align/registries";
+import { followUpApplies } from "@/features/instruments/align/followUps";
 import { workstyleRegistryFor, workstyleInstrumentId } from "@/features/instruments/workstyle/registry";
 
 type CoreResponse = { item_key: string; item_version: string; value: unknown; missing_reason: string | null };
@@ -26,7 +27,9 @@ export function checkWorkstyleTeamReadiness(input: WorkstyleTeamInputs): Worksty
     const core = new Map(person.core.map(answer => [answer.item_key, answer]));
     if (core.size !== registry.core_item_keys.length || person.core.length !== registry.core_item_keys.length || registry.core_item_keys.some(key => core.get(key)?.item_version !== registry.items.find(item => item.item_key === key)?.item_version)) return { status: "not_ready" };
     const ventureKeys = new Set(person.venture_alignment.map(answer => answer.item_key));
-    if (getItemsV22("venture_alignment").some(item => !item.retired && (!item.showAfter || ventureKeys.has(item.showAfter)) && !ventureKeys.has(item.itemId))) return { status: "not_ready" };
+    const ventureAnswer = new Map(person.venture_alignment.map(answer => [answer.item_key, { value: answer.value, missingCode: answer.missing_reason }]));
+    // Dieselbe Anschlussfragen-Regel wie Oberflaeche und Abgabe (followUps.ts).
+    if (getItemsV22("venture_alignment").some(item => !item.retired && followUpApplies(item, key => ventureAnswer.get(key)) && !ventureKeys.has(item.itemId))) return { status: "not_ready" };
   }
   return input;
 }

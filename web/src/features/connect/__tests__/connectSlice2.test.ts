@@ -78,8 +78,10 @@ test("contacts keep pending lifecycle actions separate from accepted conversatio
   assert.match(contacts, /request\.status === "pending"/);
   assert.match(controls, /respondConnectContactAction/);
   assert.match(controls, /cancelConnectContactAction/);
-  assert.match(controls, /fieldName="response" intent="accepted"/);
-  assert.match(controls, /fieldName="response" intent="declined"/);
+  // Beta-Gate: die Antwort steht als verstecktes Feld im jeweiligen Formular -
+  // als Knopfwert kam sie in der Serveraktion leer an.
+  assert.match(controls, /<input type="hidden" name="response" value="accepted" \/>/);
+  assert.match(controls, /<input type="hidden" name="response" value="declined" \/>/);
   assert.match(contacts, /request\.status !== "accepted"/);
   assert.match(contacts, /messages\.acceptedContacts/);
   // GEAENDERT am 19.09.2026: Das Gespraech liegt im gemeinsamen Postfach unter

@@ -11,7 +11,9 @@ import {
   logInviteFlowDebug,
 } from "@/features/onboarding/inviteFlowDebug";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
-import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
+import { ProfileBasicsForm, type OnboardingPlan } from "@/features/profile/ProfileBasicsForm";
+
+const INVITEE_PLANS: readonly OnboardingPlan[] = ["founder", "both"];
 import { getPrimaryProfileRoleLabel, isCoreProfileComplete } from "@/features/profile/profileCompletion";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -301,6 +303,9 @@ export default async function JoinWelcomePage({
               submitLabel={primaryLabel}
               onSuccessRedirectTo={primaryHref}
               variant="accent"
+              // Eingeladen in ein Founder-Team: nur Plaene mit Founder-Rolle,
+              // sonst fuehrt kein Weg mehr ins eigene Team (Beta-Gate).
+              plans={INVITEE_PLANS}
             />
           )}
         </div>

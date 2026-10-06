@@ -1,5 +1,7 @@
 "use server";
 
+import { followUpApplies } from "@/features/instruments/align/followUps";
+
 import { createClient } from "@/lib/supabase/server";
 import {
   FOUNDER_PROFILE_INSTRUMENT_ID,
@@ -290,22 +292,29 @@ export async function submitScope(
 
   const { data: rows, error: readError } = await supabase
     .from("alignment_answers")
-    .select("block_id")
+    .select("block_id, value, missing_code")
     .eq("assessment_id", assessment.id);
 
   if (readError) return { ok: false, reason: "read_failed", detail: readError.message };
 
   const beantwortet = new Set((rows ?? []).map((row) => row.block_id));
+  const antwort = new Map(
+    ((rows ?? []) as { block_id: string; value: unknown; missing_code: string | null }[]).map((row) => [
+      row.block_id,
+      { value: row.value, missingCode: row.missing_code },
+    ])
+  );
   const missing = getItemsV22(scope)
     .filter((item) => {
       // Zurueckgezogene Fragen werden nicht mehr vorgelegt - sie zu verlangen
       // hiesse, eine Abgabe an einer Frage scheitern zu lassen, die niemand
       // zu sehen bekommt.
       if (item.retired) return false;
-      // Anschlussfragen zaehlen nur, wenn ihre Voraussetzung beantwortet ist.
+      // Anschlussfragen zaehlen nur, wenn ihre Voraussetzung INHALTLICH
+      // beantwortet ist - dieselbe Regel wie in der Oberflaeche (followUps.ts).
       // Sie zu verlangen hiesse, jemanden fuer eine zulaessige Antwort zu
-      // bestrafen.
-      if (item.showAfter && !beantwortet.has(item.showAfter)) return false;
+      // bestrafen - und nach einer Frage zu fragen, die niemand sieht.
+      if (!followUpApplies(item, (itemId) => antwort.get(itemId))) return false;
       return !beantwortet.has(item.itemId);
     })
     .map((item) => item.itemId);
