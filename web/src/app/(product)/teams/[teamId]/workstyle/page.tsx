@@ -127,7 +127,7 @@ export default async function Page({
       ) : (
         <header>
           {/* Advisors erreichen den Bericht ueber ihre eigene Freigabe; keine Teamnavigation. */}
-          <Link href="/advisor" className="ws-no-print inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline">
+          <Link href="/advisor/dashboard" className="ws-no-print inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline">
             ← {t("backToAdvisor")}
           </Link>
           <p className="mt-1 text-sm font-medium text-slate-500">
