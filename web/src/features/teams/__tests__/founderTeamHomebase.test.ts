@@ -385,7 +385,7 @@ test("homebase and dashboard system copy stay structurally parallel in DE and EN
     "utf8"
   );
   assert.match(page, /getFounderTeamHomebase\(teamId, user\.id, supabase\)/);
-  assert.match(page, /if \(!team\) notFound\(\)/);
+  assert.match(page, /if \(!team\) return <TeamUnavailable teamId=\{teamId\} \/>;/);
   assert.match(page, /aria-labelledby="team-founders-title"/);
   assert.doesNotMatch(page, /alignmentPercent|compatibilityScore|teamHealth/);
   assert.match(dashboard, /getFounderTeamDashboardSummaries\(user\.id, supabase\)/);

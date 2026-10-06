@@ -295,7 +295,8 @@
       "emailMismatch": "Please sign in with the email address this advisor invitation was sent to.",
       "invalidToken": "The advisor link could not be confirmed.",
       "updateFailed": "The link could not be saved right now."
-    }
+    },
+    "toStart": "Go to start"
   },
   "session": {
     "context": "Session sheet",
@@ -439,10 +440,22 @@
       "unverified": "Please confirm your email address first. Then you can join the organisation."
     },
     "leave": "Leave organisation",
-    "leaveLastOwner": "You are the only person leading this organisation. Hand over the lead or close the organisation before you leave."
+    "leaveLastOwner": "You are the only person leading this organisation. Hand over the lead or close the organisation before you leave.",
+    "you": "You",
+    "unnamed": "No name",
+    "suspended": "This organisation is suspended. Access through it is currently not active.",
+    "errors": {
+      "org_last_owner": "You are the only owner of this organisation. Hand over ownership first before you leave.",
+      "org_not_member": "This membership has already ended.",
+      "org_forbidden": "Only an owner of the organisation can do this.",
+      "org_suspended": "The organisation is suspended. This action is not possible right now.",
+      "org_name": "The name needs between 2 and 120 characters.",
+      "email": "Please enter a valid email address.",
+      "org_failed": "That did not work just now. Please try again."
+    }
   },
   "personView": {
-    "back": "Back to the overview",
+    "back": "Back to people & groups",
     "unnamed": "This person",
     "intro": "Only what this person released to you. They can take back any release at any time — then the section here is gone.",
     "base": "Who they are",
@@ -488,7 +501,8 @@
     "reviewsTitle": "Requested evaluations",
     "reviewActive": "running",
     "reviewWaiting": "{count, plural, =1 {waiting for 1 answer} other {waiting for # answers}}",
-    "reviewOpen": "Open evaluation"
+    "reviewOpen": "Open evaluation",
+    "nobodyCta": "Invite a person"
   },
   "review": {
     "back": "Back to the selection",
@@ -502,7 +516,18 @@
     "alignmentNoValue": "No entry: {names}",
     "alignmentBasis": "Self-report, not a test. The dots show how these people described themselves — not how they are, and not how well they fit together.",
     "alignmentMissing": "Not in the comparison: {names}. They agreed to the joint evaluation, but their questionnaire is not released.",
-    "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and released themselves. Anyone involved can withdraw at any time — then this page is gone."
+    "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and released themselves. Anyone involved can withdraw at any time — then this page is gone.",
+    "teamContext": {
+      "title": "Team report",
+      "withTeam": "This review is linked to a current team report.",
+      "openTeam": "{team} · Open team report",
+      "teamFallback": "Team",
+      "withoutTeam": "The joint review is active. No team report is currently linked to it: a team report is only linked if, at the time of consent, the group matches exactly one current team. A current team report needs a new, team-related release.",
+      "teamChanged": "The joint review stays active. The team's composition has changed since consent was given, so the team report is no longer linked. A new release is needed for the current team report.",
+      "teamInactive": "The joint review stays active. The linked team is no longer active, so there is no team report for it any more.",
+      "teamUnavailable": "The linked team report is currently not available.",
+      "requestNew": "Request a new review"
+    }
   },
   "notebook": {
     "title": "Your working file",
@@ -523,6 +548,39 @@
       "forbidden": "There is no mandate for that — neither now nor earlier.",
       "due": "Please give a date.",
       "save": "That did not work."
+    }
+  },
+  "access": {
+    "eyebrow": "Accompaniment",
+    "toPeople": "Go to people & groups",
+    "toAdvisor": "Go to advisor overview",
+    "person": {
+      "ended": {
+        "title": "This access is no longer active.",
+        "body": "The release for this profile has ended. What you saw before can no longer be opened here."
+      },
+      "pending": {
+        "title": "The request is still open.",
+        "body": "As soon as the person agrees, you will see here what they have released to you."
+      }
+    },
+    "review": {
+      "ended": {
+        "title": "This joint review is no longer active.",
+        "body": "It has ended. A new review needs new consent from everyone involved."
+      },
+      "requested": {
+        "title": "The review is still waiting for answers.",
+        "body": "As soon as everyone involved has agreed, it will appear here."
+      }
+    },
+    "orgMembershipEnded": {
+      "title": "Your membership in the organisation has ended.",
+      "body": "This access was through the organisation. It ends with the membership."
+    },
+    "orgSuspended": {
+      "title": "The organisation is suspended.",
+      "body": "Access through this organisation is currently not active."
     }
   }
 }

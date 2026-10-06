@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { redirect } from "next/navigation";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
 import { getAlignNavState } from "@/features/instruments/align/navState";
@@ -25,7 +26,7 @@ export default async function VentureAnswersPage({
   const { erstellt } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
-    redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/antworten")}`);
+    redirect(buildLoginRedirectPath("/founder-alignment/vorhaben/antworten", { venture: (await searchParams).venture }));
   }
 
   const navState = await getAlignNavState(auth.user.id);
@@ -58,7 +59,7 @@ export default async function VentureAnswersPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} />
+      <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} teamId={venture.id} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

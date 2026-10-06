@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
 import { getAlignNavState } from "@/features/instruments/align/navState";
 import { ConfirmClient } from "@/features/instruments/align/ConfirmClient";
@@ -25,7 +26,7 @@ export default async function ConfirmPage({
 }) {
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
-    redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben/bestaetigen")}`);
+    redirect(buildLoginRedirectPath("/founder-alignment/vorhaben/bestaetigen", { venture: (await searchParams).venture }));
   }
 
   const navState = await getAlignNavState(auth.user.id);
@@ -108,7 +109,7 @@ export default async function ConfirmPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <AlignNav current="/founder-alignment/vorhaben/bestaetigen" state={navState} />
+      <AlignNav current="/founder-alignment/vorhaben/bestaetigen" state={navState} teamId={venture.id} />
       <ConfirmClient
         ventureId={venture.id}
         ventureName={venture.name}

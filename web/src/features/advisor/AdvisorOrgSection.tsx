@@ -8,6 +8,7 @@ import {
   leaveOrgAction,
 } from "@/features/advisor/orgActions";
 import type { AccompaniedPersonNamed, AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
+import type { OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 /**
@@ -27,10 +28,13 @@ export async function AdvisorOrgSection({
   orgs,
   members,
   accompanied,
+  error = null,
 }: {
   orgs: AdvisorOrg[];
   members: OrgMember[];
   accompanied: AccompaniedPersonNamed[];
+  /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
+  error?: OrgActionErrorCode | null;
 }) {
   const t = await getTranslations("advisor.org");
   const org = orgs[0] ?? null;
@@ -39,6 +43,12 @@ export async function AdvisorOrgSection({
     <section id="advisor-org" className="mt-8 scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
       <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("text")}</p>
+
+      {error ? (
+        <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
+          {t(`errors.${error}`)}
+        </p>
+      ) : null}
 
       {org === null ? (
         <form action={createAdvisorOrgAction} className="mt-5">
@@ -63,7 +73,12 @@ export async function AdvisorOrgSection({
         </form>
       ) : (
         <>
-          <p className="mt-4 text-sm font-medium text-slate-900">{org.name}</p>
+          <p className="mt-4 break-words text-sm font-medium text-slate-900">{org.name}</p>
+          {org.status === "suspended" ? (
+            <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+              {t("suspended")}
+            </p>
+          ) : null}
 
           {/* --------------------------------------------------------------
               Das Profil der Organisation.
@@ -77,7 +92,7 @@ export async function AdvisorOrgSection({
               er bestimmt aber nicht, was sie über sich sagt. Die Regel steht
               in der Datenbank; hier wird das Formular nur nicht gezeigt.
               -------------------------------------------------------------- */}
-          {org.role === "owner" ? (
+          {org.role === "owner" && org.status === "active" ? (
             <details className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60">
               <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-slate-800">
                 {t("profileTitle")}
@@ -160,7 +175,7 @@ export async function AdvisorOrgSection({
             </details>
           ) : null}
 
-          {org.role === "owner" ? (
+          {org.role === "owner" && org.status === "active" ? (
             <form action={inviteOrgAdvisorAction} className="mt-4 flex flex-wrap items-end gap-3">
               <input type="hidden" name="orgId" value={org.id} />
               <label className="min-w-0 flex-1">
@@ -188,11 +203,19 @@ export async function AdvisorOrgSection({
                 key={member.userId}
                 className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm"
               >
-                <span className="text-slate-800">
-                  {t(`roles.${member.role}`)}
-                  {member.status === "revoked" ? ` · ${t("revoked")}` : ""}
+                {/* Phase 12C.1C: Name vor der Rolle - wer verwaltet, muss sehen, wen. */}
+                <span className="min-w-0 break-words text-slate-800">
+                  <span className="font-medium text-slate-900">
+                    {member.displayName ?? t("unnamed")}
+                    {member.isSelf ? ` (${t("you")})` : ""}
+                  </span>
+                  <span className="text-slate-500">
+                    {" · "}
+                    {t(`roles.${member.role}`)}
+                    {member.status === "revoked" ? ` · ${t("revoked")}` : ""}
+                  </span>
                 </span>
-                {org.role === "owner" && member.status === "active" ? (
+                {org.role === "owner" && org.status === "active" && member.status === "active" && !member.isSelf ? (
                   <form action={setOrgMembershipAction}>
                     <input type="hidden" name="orgId" value={org.id} />
                     <input type="hidden" name="userId" value={member.userId} />

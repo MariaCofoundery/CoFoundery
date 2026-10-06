@@ -1,6 +1,7 @@
 import { TeamJourneyStatus, loadTeamJourneyStatus, ventureHref } from "@/features/teams/TeamJourneyStatus";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
@@ -70,7 +71,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
   }
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
   const [setup, setupAdvisorAccess, labStateResult, shareReadinessResult] = await Promise.all([
     // Das bestehende Setup-Readmodel - dieselbe Quelle wie die Setup-Seite.
     // Nicht lesbar heisst "Status nicht verfuegbar", nicht "offen".

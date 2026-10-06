@@ -177,8 +177,13 @@ test("der doppelte Weg auf der Find-Übersicht ist weg", () => {
   // Vorher stand "Profil bearbeiten" als Knopf unter dem Titel. Zusätzlich zur
   // Gruppe wären es zwei Wege zum selben Ziel, direkt übereinander.
   const page = source(DISCOVERY_PAGES[0]);
+  // Phase 12C.1C: Einzige Ausnahme ist der Weg aus dem leeren Zustand eines
+  // inaktiven Profils - dort steht er beim Hinweis, nicht unter dem Titel.
+  const inactiveCta = page.indexOf('mode !== "explore" && !isActive ?');
+  const withoutInactiveCta =
+    inactiveCta >= 0 ? page.slice(0, inactiveCta) + page.slice(page.indexOf(") : null}", inactiveCta)) : page;
   assert.equal(
-    (page.match(/href="\/discovery\/profile"/g) ?? []).length,
+    (withoutInactiveCta.match(/href="\/discovery\/profile"/g) ?? []).length,
     0,
     "die alte Knopfreihe steht noch da"
   );

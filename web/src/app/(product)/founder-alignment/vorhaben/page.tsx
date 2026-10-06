@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import { TeamUnavailable, loadTeamAccessView } from "@/features/access/TeamUnavailable";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
 import { getAlignNavState } from "@/features/instruments/align/navState";
 import { Questionnaire } from "@/features/instruments/align/Questionnaire";
@@ -26,7 +28,7 @@ export default async function VentureAlignmentPage({
 }) {
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
-    redirect(`/login?next=${encodeURIComponent("/founder-alignment/vorhaben")}`);
+    redirect(buildLoginRedirectPath("/founder-alignment/vorhaben", { venture: (await searchParams).venture }));
   }
 
   const navState = await getAlignNavState(auth.user.id);
@@ -38,13 +40,19 @@ export default async function VentureAlignmentPage({
   // weiss selbst, welches gemeint ist - und eine falsch geratene Zuordnung
   // legt Zusagen an ein Vorhaben, das niemand gemeint hat.
   if (!venture) {
+    // Phase 12C.1C: Ein Link auf ein Vorhaben, dessen Team man verlassen hat,
+    // erklaert das - statt "Du bist in mehreren" zu behaupten.
+    if (gewaehlt && (await loadTeamAccessView(gewaehlt))) {
+      return <TeamUnavailable teamId={gewaehlt} />;
+    }
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vorhaben" state={navState} />
         <h1 className="text-2xl font-semibold text-slate-900">Für welches Vorhaben?</h1>
         <p className="mt-3 text-slate-700">
-          Du bist in mehreren. Deine Angaben zu Zeit, Geld und Zielen gelten jeweils
-          für eins — deshalb fragen wir, statt zu raten.
+          {gewaehlt
+            ? "Dieses Vorhaben ist für dich nicht verfügbar. Wähle eines von deinen:"
+            : "Du bist in mehreren. Deine Angaben zu Zeit, Geld und Zielen gelten jeweils für eins — deshalb fragen wir, statt zu raten."}
         </p>
         <ul className="mt-6 space-y-2">
           {choices.map((entry) => (
@@ -112,7 +120,7 @@ export default async function VentureAlignmentPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <AlignNav current="/founder-alignment/vorhaben" state={navState} />
+      <AlignNav current="/founder-alignment/vorhaben" state={navState} teamId={venture.id} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
         Testfassung
       </p>

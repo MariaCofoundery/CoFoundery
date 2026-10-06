@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
+import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import {
   FOUNDER_SETUP_PHASE_KEYS,
@@ -43,7 +44,7 @@ export default async function FounderSetupDocument({
     getLocale(),
     getFounderSetup(teamId, user.id, supabase),
   ]);
-  if (!setup) notFound();
+  if (!setup) return <TeamUnavailable teamId={teamId} />;
 
   const locale = normalizeLocale(rawLocale);
   const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" });

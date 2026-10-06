@@ -187,9 +187,17 @@ test("der gesammelte Bereich trennt Zusage und Anfrage", () => {
   assert.match(data, /row\.status === "active"/);
   const view = codeOnly("src/features/advisor/AdvisorOrgSection.tsx");
   assert.match(view, /personPending/);
-  // Und die Liste zeigt keine Namen: Sie würde sie für Menschen laden, die
-  // vielleicht nur "Wer du bist" freigegeben haben.
-  assert.doesNotMatch(view, /displayName|person_core/);
+  // Und die Liste der begleiteten Menschen laedt keine Namen aus dem Profil:
+  // Sie wuerde sie fuer Menschen laden, die vielleicht nur "Wer du bist"
+  // freigegeben haben. Ihr Name kommt nur aus der Freigabe (person.name).
+  assert.doesNotMatch(view, /person_core/);
+  const peopleList = view.slice(view.indexOf("accompanied.map("));
+  assert.doesNotMatch(peopleList, /displayName/);
+  assert.match(peopleList, /person\.name \?\? t\("personUnnamed"\)/);
+  // Phase 12C.1C: Namen gibt es nur in der Mitgliederliste der Organisation -
+  // aus einer eigenen Funktion, die nur Mitgliedern antwortet.
+  assert.match(data, /get_advisor_org_member_list/);
+  assert.match(view, /member\.displayName \?\? t\("unnamed"\)/);
 });
 
 // ---------------------------------------------------------------------------
@@ -268,7 +276,13 @@ test("die Seite zeigt nur, was die Datenbank herausgegeben hat", () => {
   }
 
   // Gar nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
-  assert.match(page, /grantedScopes\.length === 0\)\s*notFound\(\)/);
+  // Phase 12C.1C: Wer einmal Zugang hatte, bekommt den Zustand erklaert - ohne
+  // jeden Inhalt; alle anderen weiter 404.
+  const noAccess = page.slice(page.indexOf("grantedScopes.length === 0 || accessState !== \"active\")"), page.indexOf("const [t, tCapability"));
+  // Massgeblich ist der wirksame Zugang, nicht nur die Freigabezeilen.
+  assert.ok(page.indexOf("get_advisor_person_access_state") < page.indexOf("grantedScopes.length === 0 || accessState"));
+  assert.match(noAccess, /if \(!stateView\) notFound\(\);/);
+  assert.doesNotMatch(noAccess, /view\.(base|capability|strengths|direction)|alignment|workstyle/i);
 
   // Sich selbst begleitet niemand - die Freigabe-Abfrage sieht auch die
   // EIGENEN Zeilen, die Lesefunktionen geben ihnen aber nichts heraus.

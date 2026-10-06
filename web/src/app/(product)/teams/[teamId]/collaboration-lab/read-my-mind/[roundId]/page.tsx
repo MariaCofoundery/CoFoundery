@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { abandonReadMyMindRoundAction, declineReadMyMindRoundAction, joinReadMyMindRoundAction, lockReadMyMindPromptAction, notifyReadMyMindHandoffsAction } from "@/features/collaborationLab/readMyMindActions";
@@ -18,7 +19,7 @@ export default async function ReadMyMindRoundPage({ params, searchParams }: { pa
   const href = `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind/${encodeURIComponent(roundId)}`;
   if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
   const round = await getReadMyMindRound(team, roundId, user.id, supabase);
   if (!round) notFound();
   const [t, rawLocale] = await Promise.all([getTranslations("collaborationLab.round"), getLocale()]);

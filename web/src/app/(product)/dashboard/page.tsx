@@ -1,4 +1,5 @@
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import Link from "next/link";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { redirect } from "next/navigation";
@@ -50,6 +51,8 @@ import {
 } from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
+
+const INVITATION_ERROR_KEYS = new Set(["expired", "revoked", "invitation_not_found"]);
 
 type DashboardSearchParams = {
   error?: string;
@@ -115,11 +118,11 @@ export default async function DashboardPage({
     data: { user },
   } = await getRequestUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   const params = await searchParams;
+  if (!user) {
+    // Phase 12C.1C: mit Kontext (z. B. invitationId) zurueck zum Dashboard.
+    redirect(buildLoginRedirectPath("/dashboard", params as Record<string, string | undefined>));
+  }
   if (params.invitationId) {
     await finalizeInvitationIfReady(params.invitationId);
   }
@@ -347,8 +350,12 @@ export default async function DashboardPage({
       ) : null}
 
       {params.error ? (
-        <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          {t("hero.error")}
+        <p role="alert" className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {/* Phase 12C.1C: Einladungsgruende aus /join/start benennen statt
+              "bitte erneut versuchen" - ein neuer Versuch hilft dort nicht. */}
+          {INVITATION_ERROR_KEYS.has(params.error)
+            ? t(`hero.invitationErrors.${params.error}`)
+            : t("hero.error")}
         </p>
       ) : null}
 

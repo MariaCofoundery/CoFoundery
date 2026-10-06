@@ -14,6 +14,11 @@
       "complete_profile": "A few basic details are still missing – it only takes a moment.",
       "workstyle_start": "How you work is the basis for conversations within your team.",
       "workstyle_continue": "You have already started – pick up where you left off."
+    },
+    "invitationErrors": {
+      "expired": "This invitation has expired. Ask the person who invited you to send a new one.",
+      "revoked": "This invitation was withdrawn and is no longer valid.",
+      "invitation_not_found": "This invitation is no longer available – it may already have been used or withdrawn."
     }
   },
   "actions": {
@@ -555,7 +560,8 @@
     }
   },
   "coFounderInvitePage": {
-    "backToDashboard": "Back to dashboard"
+    "backToDashboard": "Back to dashboard",
+    "backToTeam": "Back to the team"
   },
   "inviteStart": {
     "eyebrow": "Currently free during the test phase.",

@@ -335,12 +335,14 @@
     "established": {
       "title": "Gemeinsame Bereiche",
       "description": "Dauerhafte Arbeitsbereiche für eure bestehenden Founder-Verbindungen.",
-      "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden."
+      "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden.",
+      "emptyCta": "Co-Founder einladen"
     },
     "potential": {
       "title": "Kennenlernen & gemeinsam prüfen",
       "description": "Offene Kennenlern-Anfragen und Verbindungen, bei denen ihr eure Zusammenarbeit noch gemeinsam prüft.",
-      "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen."
+      "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen.",
+      "emptyCta": "Co-Founder finden"
     },
     "states": {
       "request_pending": {

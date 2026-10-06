@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { completeReadMyMindRoundAction, markReadMyMindConversationAction, openReadMyMindRevealAction, unmarkReadMyMindConversationAction } from "@/features/collaborationLab/readMyMindActions";
@@ -34,7 +35,7 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
   const revealHref = `${roundHref}/reveal`;
   if (!user) redirect(`/login?next=${encodeURIComponent(`${revealHref}/${position}`)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
   const round = await getReadMyMindRound(team, roundId, user.id, supabase);
   const prompt = round?.prompts.find((entry) => entry.position === position);
   if (!round || !prompt) notFound();

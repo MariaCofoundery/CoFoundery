@@ -61,9 +61,13 @@ export default async function ConnectionsPage({ searchParams }: { searchParams?:
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">{t("established.description")}</p>
           {connections.teams.length === 0 ? (
-            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              {t("established.empty")}
-            </p>
+            <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <p>{t("established.empty")}</p>
+              {/* Phase 12C.1C: ein ruhiger naechster Schritt statt Sackgasse. */}
+              <Link href="/invite/new" className={`${LINK} mt-3`}>
+                {t("established.emptyCta")}
+              </Link>
+            </div>
           ) : (
             <ul className="mt-5 grid gap-3 md:grid-cols-2">
               {connections.teams.map((team) => {
@@ -96,7 +100,8 @@ export default async function ConnectionsPage({ searchParams }: { searchParams?:
                         </p>
                       </div>
                     </div>
-                    <Link href={`/teams/${encodeURIComponent(team.id)}/workstyle`} className={`${LINK} mt-4`}>
+                    {/* Phase 12C.1C: wie auf dem Dashboard das Team selbst, nicht direkt den Bericht. */}
+                    <Link href={`/teams/${encodeURIComponent(team.id)}`} className={`${LINK} mt-4`}>
                       {t("openTeam")}
                     </Link>
                   </li>
@@ -112,9 +117,12 @@ export default async function ConnectionsPage({ searchParams }: { searchParams?:
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-600">{t("potential.description")}</p>
           {connections.potentialConnections.length === 0 ? (
-            <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              {t("potential.empty")}
-            </p>
+            <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <p>{t("potential.empty")}</p>
+              <Link href="/discovery" className={`${LINK} mt-3`}>
+                {t("potential.emptyCta")}
+              </Link>
+            </div>
           ) : (
             <ul className="mt-5 grid gap-3 md:grid-cols-2">
               {connections.potentialConnections.map((connection) => (

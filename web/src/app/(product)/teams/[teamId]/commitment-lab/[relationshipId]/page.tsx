@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
+import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
@@ -44,7 +45,7 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/commitment-lab/${relationshipId}`)}`);
   const lab = await getCommitmentLab(teamId, relationshipId, user.id, supabase);
-  if (!lab) notFound();
+  if (!lab) return <TeamUnavailable teamId={teamId} />;
   const [t, teamLabel, locale] = await Promise.all([
     getTranslations("teams.commitmentLab"),
     getTeamLabel(supabase, teamId),

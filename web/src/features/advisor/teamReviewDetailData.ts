@@ -30,6 +30,8 @@ import { getAdvisorTeamReviews } from "@/features/advisor/teamReviewData";
 
 export type TeamReviewDetail = {
   reviewId: string;
+  /** Die angefragte Gruppe - der Advisor hat sie selbst zusammengestellt. */
+  subjectUserIds: string[];
   group: AdvisorGroupReadout | null;
   alignment: AlignmentPerson[];
   /** Wer zugestimmt hat, aber seinen Fragebogen nicht freigegeben hat. */
@@ -76,6 +78,7 @@ export async function getTeamReviewDetail(
 
   return {
     reviewId,
+    subjectUserIds: review.subjectUserIds,
     group,
     // Ein einzelner Punkt je Achse ist kein Nebeneinander, sondern ein
     // Einzelreport an der falschen Stelle.

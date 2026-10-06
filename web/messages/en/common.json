@@ -46,5 +46,55 @@
       "q8": "An open point that is spoken out weighs less than one that quietly runs along.",
       "q9": "Founding together also means deciding together how you decide."
     }
+  },
+  "access": {
+    "notFound": {
+      "eyebrow": "Not available",
+      "title": "This page is no longer available.",
+      "body": "The link may be out of date, or this page does not exist for your account.",
+      "home": "Go to start",
+      "connections": "Go to teams & connections"
+    },
+    "error": {
+      "eyebrow": "Briefly interrupted",
+      "title": "This page could not be loaded right now.",
+      "body": "This is not your fault. Please try again in a moment.",
+      "retry": "Try again",
+      "home": "Go to start"
+    },
+    "team": {
+      "eyebrow": "Team",
+      "left": {
+        "title": "You are no longer part of this team.",
+        "body": "You left this team. Its shared content is no longer visible to you. Your own profile is not affected."
+      },
+      "archived": {
+        "title": "This team is no longer active.",
+        "body": "All members have left the team. It is archived, and its shared content can no longer be opened."
+      },
+      "rosterChanged": {
+        "title": "The team's composition has changed.",
+        "body": "A new release is needed for this team report. You can request a new joint review under People & groups."
+      },
+      "reviewEnded": {
+        "title": "The joint report is currently not available.",
+        "body": "The release for this team report is no longer active."
+      },
+      "orgMembershipEnded": {
+        "title": "Your membership in the organisation has ended.",
+        "body": "Access to this team was through the organisation. It ends with the membership."
+      },
+      "orgSuspended": {
+        "title": "The organisation is suspended.",
+        "body": "Access through this organisation is currently not active."
+      },
+      "accessEnded": {
+        "title": "This access is no longer active.",
+        "body": "The release for this team has ended."
+      },
+      "toConnections": "Go to teams & connections",
+      "toAdvisor": "Go to advisor overview",
+      "toPeople": "Go to people & groups"
+    }
   }
 }

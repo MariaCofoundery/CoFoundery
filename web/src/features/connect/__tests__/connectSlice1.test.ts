@@ -79,7 +79,7 @@ test("Connect actions have pending and success feedback without duplicate submit
 
 test("every Connect editing context has deterministic back navigation", () => {
   const paths = ["profile/page.tsx", "my/page.tsx", "listings/new/page.tsx", "listings/[listingId]/edit/page.tsx", "listings/[listingId]/page.tsx"];
-  for (const path of paths) assert.match(readFileSync(`src/app/(product)/connect/${path}`, "utf8"), /navigation\.(overview|connect|myListings)/);
+  for (const path of paths) assert.match(readFileSync(`src/app/(product)/connect/${path}`, "utf8"), /navigation\.(overview|connect|myListings)|mine\.back/);
 });
 
 test("a Connect profile stays a draft unless publishing is asked for, and publication requires concrete fields", () => {

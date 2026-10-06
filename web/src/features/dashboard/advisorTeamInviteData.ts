@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHash, randomBytes } from "crypto";
+import { needsAdvisorTeamInviteRecovery } from "@/features/dashboard/advisorTeamInviteRecovery";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
 import { createClient } from "@/lib/supabase/server";
@@ -1118,4 +1119,61 @@ export async function claimAdvisorTeamInviteFounder(params: {
     state: isInviteeForInvitation ? "invitee_continue" : "inviter_continue",
     invitationId,
   };
+}
+
+export type RecoverAdvisorTeamInviteResult =
+  | { ok: true; invitationId: string; activated: boolean }
+  | { ok: false; reason: "not_authenticated" | "service_unavailable" | "invalid_token" | "not_slot_owner" | "recovery_failed" };
+
+/**
+ * Phase 12C.1C: Den Abschluss nach einem gescheiterten Slot-Klick erneut anstossen.
+ *
+ * Nur per ausdruecklichem POST (Server Action), nie beim Seitenaufruf. Der
+ * Token oeffnet den Weg nur fuer die Person, die den Slot schon beansprucht
+ * hat (Kennung UND Adresse, siehe needsAdvisorTeamInviteRecovery) - keine neue
+ * Zustimmung, aber auch keine Token-Wiederverwendung durch Dritte. Der
+ * Abschluss selbst ist derselbe idempotente Weg wie im Slot-Klick; er nimmt
+ * keine Founder-Einladung an und legt keine Mitgliedschaft an.
+ */
+export async function recoverAdvisorTeamInviteFounder(params: {
+  token: string;
+  userId: string;
+  userEmail: string | null | undefined;
+}): Promise<RecoverAdvisorTeamInviteResult> {
+  const normalizedToken = params.token.trim();
+  if (!normalizedToken || !params.userId) return { ok: false, reason: "not_authenticated" };
+
+  const privileged = createPrivilegedClient();
+  if (!privileged) return { ok: false, reason: "service_unavailable" };
+
+  const lookup = await loadAdvisorTeamInviteByTokenHash(hashOpaqueToken(normalizedToken), privileged);
+  if (lookup.status !== "ready") return { ok: false, reason: "invalid_token" };
+  if (
+    !needsAdvisorTeamInviteRecovery(lookup.row, lookup.founderSlot, {
+      userId: params.userId,
+      email: params.userEmail,
+    })
+  ) {
+    return { ok: false, reason: "not_slot_owner" };
+  }
+
+  const result = await finalizeAdvisorTeamInviteCompletely(lookup.row, privileged);
+  logAdvisorTeamInviteActivation({
+    stage: "recovery_finalize",
+    level: result.invitationId ? "info" : "error",
+    pendingInviteId: lookup.row.id,
+    invitationId: result.invitationId,
+    founderSlot: lookup.founderSlot,
+    currentUserId: params.userId,
+    status: lookup.row.status,
+    founderAUserId: lookup.row.founder_a_user_id,
+    founderBUserId: lookup.row.founder_b_user_id,
+    relationshipId: result.relationshipId,
+    detail: result.failures.join(" | ") || null,
+  });
+  const bothClaimed = Boolean(lookup.row.founder_a_user_id && lookup.row.founder_b_user_id);
+  if (!result.invitationId || (bothClaimed && !result.activated)) {
+    return { ok: false, reason: "recovery_failed" };
+  }
+  return { ok: true, invitationId: result.invitationId, activated: result.activated };
 }

@@ -46,8 +46,10 @@ test("die Leiste zeigt zurück und auf die zwei Bereiche", () => {
   const nav = readFileSync(
     join("src", "features", "instruments", "align", "AlignNav.tsx"), "utf8");
 
-  assert.match(nav, /href="\/dashboard"/);
+  assert.match(nav, /: "\/dashboard"/);
   assert.match(nav, /← Übersicht/);
+  // Phase 12C.1C: Mit bekanntem Vorhaben (= Team) fuehrt der Weg ins Team.
+  assert.match(nav, /teamId \? `\/teams\/\$\{encodeURIComponent\(teamId\)\}` : "\/dashboard"/);
   for (const ziel of ["/me/profile/workstyle", "/founder-alignment/vorhaben"]) {
     assert.ok(nav.includes(ziel), ziel);
   }

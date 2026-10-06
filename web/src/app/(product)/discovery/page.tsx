@@ -300,6 +300,12 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
                 <button className={SECONDARY_CTA_CLASS}>{t("v2.results.reset")}</button>
               </form>
             ) : null}
+            {/* Phase 12C.1C: Der Weg zum Profil steht beim Hinweis, nicht nur im Menue. */}
+            {mode !== "explore" && !isActive ? (
+              <Link href="/discovery/profile" className={`${SECONDARY_CTA_CLASS} mt-5`}>
+                {t("v2.results.inactiveCta")}
+              </Link>
+            ) : null}
           </section>
         )}
 

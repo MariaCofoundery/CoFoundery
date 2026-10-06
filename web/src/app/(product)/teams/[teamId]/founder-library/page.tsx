@@ -1,4 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { getTranslations } from "next-intl/server";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
@@ -19,7 +20,7 @@ export default async function FounderLibraryPage({ params, searchParams }: Props
   if (!user) redirect(`/login?next=${encodeURIComponent(pathname)}`);
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
 
   const [t, teamLabel] = await Promise.all([
     getTranslations("founderLibrary"),

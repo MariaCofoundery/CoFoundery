@@ -207,8 +207,10 @@ test("routes authorize server-side and homebase links into setup without exposin
   const homebase = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
   assert.match(listPage, /getFounderSetup\(teamId, user\.id, supabase\)/);
   assert.match(detailPage, /getFounderSetup\(teamId, user\.id, supabase\)/);
-  assert.match(listPage, /if \(!setup\) notFound\(\)/);
-  assert.match(detailPage, /if \(!setup\) notFound\(\)/);
+  // Phase 12C.1C: Nicht lesbar -> erklaerender Zustand fuer ehemalige
+  // Mitglieder, sonst 404 (TeamUnavailable). Nie Setup-Inhalte.
+  assert.match(listPage, /if \(!setup\) return <TeamUnavailable teamId=\{teamId\} \/>;/);
+  assert.match(detailPage, /if \(!setup\) return <TeamUnavailable teamId=\{teamId\} \/>;/);
   assert.match(homebase, /href=\{`\/teams\/\$\{teamId\}\/setup`\}/);
   assert.doesNotMatch(`${listPage}${detailPage}`, /\.email\b|user_id/);
 });

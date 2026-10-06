@@ -46,5 +46,55 @@
       "q8": "Ein ausgesprochener offener Punkt wiegt weniger als einer, der still mitläuft.",
       "q9": "Gemeinsam gründen heißt auch: gemeinsam entscheiden, wie ihr entscheidet."
     }
+  },
+  "access": {
+    "notFound": {
+      "eyebrow": "Nicht verfügbar",
+      "title": "Diese Seite ist nicht mehr verfügbar.",
+      "body": "Vielleicht ist der Link veraltet, oder diese Seite gibt es für dein Konto nicht.",
+      "home": "Zur Startseite",
+      "connections": "Zu Teams & Verbindungen"
+    },
+    "error": {
+      "eyebrow": "Kurz unterbrochen",
+      "title": "Diese Seite konnte gerade nicht geladen werden.",
+      "body": "Das liegt nicht an dir. Versuche es gleich noch einmal.",
+      "retry": "Erneut versuchen",
+      "home": "Zur Startseite"
+    },
+    "team": {
+      "eyebrow": "Team",
+      "left": {
+        "title": "Du gehörst diesem Team nicht mehr an.",
+        "body": "Du hast dieses Team verlassen. Seine gemeinsamen Inhalte sind für dich nicht mehr sichtbar. Dein eigenes Profil ist davon nicht betroffen."
+      },
+      "archived": {
+        "title": "Dieses Team ist nicht mehr aktiv.",
+        "body": "Alle Mitglieder haben das Team verlassen. Es ist archiviert, und seine gemeinsamen Inhalte sind nicht mehr abrufbar."
+      },
+      "rosterChanged": {
+        "title": "Die Teamzusammensetzung hat sich verändert.",
+        "body": "Für diesen Teambericht ist eine neue Freigabe nötig. Eine neue gemeinsame Auswertung kannst du unter Personen & Gruppen anfragen."
+      },
+      "reviewEnded": {
+        "title": "Der gemeinsame Bericht ist aktuell nicht verfügbar.",
+        "body": "Die Freigabe für diesen Teambericht ist nicht mehr aktiv."
+      },
+      "orgMembershipEnded": {
+        "title": "Deine Mitgliedschaft in der Organisation ist beendet.",
+        "body": "Der Zugang zu diesem Team lief über die Organisation. Mit der Mitgliedschaft endet auch er."
+      },
+      "orgSuspended": {
+        "title": "Die Organisation ist ausgesetzt.",
+        "body": "Zugänge über diese Organisation sind derzeit nicht aktiv."
+      },
+      "accessEnded": {
+        "title": "Dieser Zugang ist nicht mehr aktiv.",
+        "body": "Die Freigabe für dieses Team wurde beendet."
+      },
+      "toConnections": "Zu Teams & Verbindungen",
+      "toAdvisor": "Zur Advisor-Übersicht",
+      "toPeople": "Zu Personen & Gruppen"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { workstyleSetupHandoff } from "@/features/reporting/workstyle/setupHandoff";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -43,7 +44,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup/${itemKey}`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
-  if (!setup) notFound();
+  if (!setup) return <TeamUnavailable teamId={teamId} />;
   const item = setup.items.find((entry) => entry.key === itemKey);
   if (!item) notFound();
   const [t, teamLabel, locale, discussionEntries] = await Promise.all([

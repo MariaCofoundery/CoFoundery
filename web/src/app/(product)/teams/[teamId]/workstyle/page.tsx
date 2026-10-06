@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import {
@@ -31,11 +33,11 @@ export default async function Page({
     data: { user },
   } = await getRequestUser();
   if (!user)
-    redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/workstyle`)}`);
+    redirect(buildLoginRedirectPath(`/teams/${teamId}/workstyle`, { snapshot: query.snapshot, ansicht: query.ansicht }));
   const client = await createClient();
   const current = await getProductTeam(client, teamId);
   const { data: membership } = await client.from("founder_team_members").select("team_id").eq("team_id", teamId).eq("user_id", user.id).maybeSingle();
-  if (!current) notFound();
+  if (!current) return <TeamUnavailable teamId={teamId} />;
   // Fuer Mitglieder konkret, was fuer den gemeinsamen Bericht fehlt - je Person
   // nur "geteilt" / "noch nicht geteilt", keine Antworten.
   const shareReadiness =

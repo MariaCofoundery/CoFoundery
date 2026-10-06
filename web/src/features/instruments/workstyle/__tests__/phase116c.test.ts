@@ -102,6 +102,6 @@ test("Migrationsreihenfolge: Workbook-Migration bereits remote, drei DB-first-Mi
   assert.ok(existsSync("../supabase/migrations/20261117120000_retire_active_workbook_writes.sql"));
   assert.equal(files.filter(file => file.includes("retire_active_workbook_writes")).length, 1);
   // Phase 11.7B: danach die Teamfreigabe-Migration. Phase 12C.0/0b: Einladungsannahme nur nach Entscheidung.
-  const pending = ["20261118120000_workstyle_team_mutual_readiness.sql", "20261118130000_workstyle_product_core_completion.sql", "20261118140000_workstyle_research_wave1.sql", "20261119120000_team_shares_and_leave.sql", "20261119130000_team_share_scope_corrections.sql", "20261120120000_invitation_acceptance_by_decision.sql", "20261120130000_advisor_invite_consent.sql", "20261121120000_advisor_access_integrity.sql", "20261122120000_team_org_lifecycle.sql"];
+  const pending = ["20261118120000_workstyle_team_mutual_readiness.sql", "20261118130000_workstyle_product_core_completion.sql", "20261118140000_workstyle_research_wave1.sql", "20261119120000_team_shares_and_leave.sql", "20261119130000_team_share_scope_corrections.sql", "20261120120000_invitation_acceptance_by_decision.sql", "20261120130000_advisor_invite_consent.sql", "20261121120000_advisor_access_integrity.sql", "20261122120000_team_org_lifecycle.sql", "20261123120000_access_state_recovery.sql"];
   assert.deepEqual(files.slice(files.indexOf("20261117120000_retire_active_workbook_writes.sql") + 1), pending);
 });

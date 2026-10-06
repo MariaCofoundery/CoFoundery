@@ -93,7 +93,8 @@
       "alreadyClaimed": "This founder slot has already been connected to another profile.",
       "activationFailed": "The team connection could not be completed right now. Please try again in a moment.",
       "invalidToken": "This founder link is no longer valid or could not be found.",
-      "emailNotVerified": "Please confirm your email address first. Then you can take your place."
+      "emailNotVerified": "Please confirm your email address first. Then you can take your place.",
+      "recoveryFailed": "The final step did not work yet. Please try again later."
     },
     "eyebrow": "Founder invitation",
     "notFoundTitle": "Invitation not found",
@@ -119,7 +120,11 @@
     "activateText": "This link belongs to {email}. By accepting, you confirm your part of this founder connection. Founder Setup is not shared automatically.",
     "activateCta": "Accept invitation",
     "waitingTitle": "Waiting for the second founder",
-    "waitingText": "Your slot is already connected. Once {counterpart} has started as well, your shared matching context will activate automatically."
+    "waitingText": "Your slot is already connected. Once {counterpart} has started as well, your shared matching context will activate automatically.",
+    "toDashboard": "Go to dashboard",
+    "recoveryTitle": "The setup has not finished yet.",
+    "recoveryText": "Your consent is saved, but the connection with your advisor has not been fully set up yet. You can restart the final step here – no new consent is needed.",
+    "recoveryCta": "Restart final step"
   },
   "basisComplete": {
     "eyebrow": "Intermediate step",

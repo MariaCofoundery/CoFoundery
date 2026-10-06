@@ -221,10 +221,16 @@ export function TeamWorkstyleReport({
         </p>
         {!answered.length ? (
           <p className="mt-4 text-sm">
-            Für dieses Vorhaben hat noch niemand Antworten abgegeben. Abgegebene Antworten sehen alle im Team.{" "}
-            <Link className="underline" href={`/founder-alignment/vorhaben?venture=${team.team_id}`}>
-              Zum Fragebogen
-            </Link>
+            Für dieses Vorhaben hat noch niemand Antworten abgegeben. Abgegebene Antworten sehen alle im Team.
+            {/* Phase 12C.1C: Der Fragebogen ist ein Founder-Weg - Advisors (canDiscuss=false) sehen keinen CTA. */}
+            {canDiscuss ? (
+              <>
+                {" "}
+                <Link className="underline" href={`/founder-alignment/vorhaben?venture=${team.team_id}`}>
+                  Zum Fragebogen
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : (
           <>

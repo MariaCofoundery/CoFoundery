@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { ComponentMatrix } from "@/features/reporting/workstyle/ComponentMatrix";
@@ -39,7 +40,7 @@ export default async function TeamRolesPage({
   if (!user) redirect(`/login?next=${encodeURIComponent(pathname)}`);
 
   const team = await getFounderTeamHomebase(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
 
   const t = await getTranslations("capability");
   const [data, teamLabel] = await Promise.all([

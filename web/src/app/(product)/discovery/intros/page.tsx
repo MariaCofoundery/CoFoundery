@@ -384,9 +384,12 @@ export default async function DiscoveryIntrosPage({
               ))}
             </div>
           ) : (
-            <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              {t("intros.receivedEmpty")}
-            </p>
+            <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
+              <p>{t("intros.receivedEmpty")}</p>
+              <Link href="/discovery/profile" className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">
+                {t("intros.receivedEmptyCta")}
+              </Link>
+            </div>
           )}
         </section>
 
@@ -408,9 +411,12 @@ export default async function DiscoveryIntrosPage({
               ))}
             </div>
           ) : (
-            <p className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
-              {t("intros.sentEmpty")}
-            </p>
+            <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
+              <p>{t("intros.sentEmpty")}</p>
+              <Link href="/discovery" className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">
+                {t("intros.sentEmptyCta")}
+              </Link>
+            </div>
           )}
         </section>
       </div>

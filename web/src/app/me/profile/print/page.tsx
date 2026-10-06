@@ -1,4 +1,5 @@
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
@@ -125,7 +126,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
   const {
     data: { user },
   } = await getRequestUser();
-  if (!user) redirect("/login?next=/me/profile");
+  if (!user) redirect(buildLoginRedirectPath("/me/profile/print", await searchParams));
 
   const params = await searchParams;
   const mode = parsePrintMode(params.mode);

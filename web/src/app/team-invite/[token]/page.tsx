@@ -4,7 +4,9 @@ import { getTranslations } from "next-intl/server";
 import { buildInvitationStartHref } from "@/features/onboarding/invitationFlow";
 import {
   claimAdvisorTeamInviteFounderAction,
+  recoverAdvisorTeamInviteFounderAction,
 } from "@/features/dashboard/advisorTeamInviteActions";
+import { needsAdvisorTeamInviteRecovery } from "@/features/dashboard/advisorTeamInviteRecovery";
 import {
   fallbackLabelFromEmail,
   getAdvisorTeamInviteByToken,
@@ -37,6 +39,9 @@ function statusCopy(error: string | undefined, t: TeamInviteT) {
   if (error === "email_not_verified") {
     return t("statusErrors.emailNotVerified");
   }
+  if (error === "recovery_failed") {
+    return t("statusErrors.recoveryFailed");
+  }
   return null;
 }
 
@@ -58,6 +63,11 @@ export default async function AdvisorTeamInvitePage({
   const invite = await getAdvisorTeamInviteByToken(token);
 
   if (invite.status !== "ready") {
+    // Phase 12C.1C: "Zur Anmeldung" nur fuer Abgemeldete - Angemeldete
+    // bekamen denselben Knopf und landeten im Kreis.
+    const {
+      data: { user: viewer },
+    } = await getRequestUser();
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
         <div className="mb-5 flex justify-end">
@@ -70,9 +80,15 @@ export default async function AdvisorTeamInvitePage({
             {t("notFoundText")}
           </p>
           <div className="mt-8">
-            <Link href="/login" className={SECONDARY_CTA_CLASS}>
-              {t("toLogin")}
-            </Link>
+            {viewer ? (
+              <Link href="/dashboard" className={SECONDARY_CTA_CLASS}>
+                {t("toDashboard")}
+              </Link>
+            ) : (
+              <Link href="/login" className={SECONDARY_CTA_CLASS}>
+                {t("toLogin")}
+              </Link>
+            )}
           </div>
         </section>
       </main>
@@ -110,7 +126,16 @@ export default async function AdvisorTeamInvitePage({
     : null;
   const errorMessage = statusCopy(resolvedSearchParams.error, t);
 
-  if (invitationReadyForCurrentSlot && questionnaireHref) {
+  // Phase 12C.1C: Ist ein Abschluss nach dem eigenen Slot-Klick gescheitert,
+  // bietet die Seite den Wiederholungsweg an - statt sofort weiterzuleiten und
+  // den Abschluss nie wieder anzustossen. Nur lesen; geschrieben wird erst im
+  // ausdruecklichen Klick (recoverAction).
+  const needsRecovery = needsAdvisorTeamInviteRecovery(row, founderSlot, {
+    userId: user?.id,
+    email: user?.email,
+  });
+
+  if (!needsRecovery && invitationReadyForCurrentSlot && questionnaireHref) {
     redirect(questionnaireHref);
   }
 
@@ -122,6 +147,17 @@ export default async function AdvisorTeamInvitePage({
     const result = await claimAdvisorTeamInviteFounderAction({ token });
     if (!result.ok) {
       redirect(`/team-invite/${encodeURIComponent(token)}?error=${encodeURIComponent(result.reason)}`);
+    }
+
+    redirect(buildInvitationStartHref(result.invitationId));
+  }
+
+  async function recoverAction() {
+    "use server";
+
+    const result = await recoverAdvisorTeamInviteFounderAction({ token });
+    if (!result.ok) {
+      redirect(`/team-invite/${encodeURIComponent(token)}?error=recovery_failed`);
     }
 
     redirect(buildInvitationStartHref(result.invitationId));
@@ -198,6 +234,16 @@ export default async function AdvisorTeamInvitePage({
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 {t("wrongEmailText", { slotEmail, currentEmail: user.email ?? "" })}
               </p>
+            </>
+          ) : needsRecovery ? (
+            <>
+              <h2 className="text-xl font-semibold text-slate-950">{t("recoveryTitle")}</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-700">{t("recoveryText")}</p>
+              <form action={recoverAction} className="mt-6">
+                <button type="submit" className={PRIMARY_CTA_CLASS}>
+                  {t("recoveryCta")}
+                </button>
+              </form>
             </>
           ) : slotNeedsActivation ? (
             <>

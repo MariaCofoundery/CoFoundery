@@ -287,7 +287,9 @@
       "connect_problem": "From something unsolved",
       "discovery_intro": "From an intro in Find",
       "history": "Earlier conversation"
-    }
+    },
+    "inboxEmptyFind": "Find people",
+    "inboxEmptyConnect": "Open CONNECT"
   },
   "my": {
     "title": "My contributions",
@@ -748,7 +750,8 @@
     "listings": "My listings",
     "ventures": "My ventures",
     "suggestions": "For you",
-    "suggestionCount": "{count, plural, one {One suggestion for you} other {# suggestions for you}}"
+    "suggestionCount": "{count, plural, one {One suggestion for you} other {# suggestions for you}}",
+    "back": "Back to My CONNECT"
   },
   "resources": {
     "title": "Access and networks",

@@ -35,10 +35,17 @@ export type AlignNavState = {
 export function AlignNav({
   current,
   state,
+  teamId = null,
 }: {
   /** Die eigene Adresse — der aktive Eintrag wird nicht verlinkt. */
   current: string;
   state: AlignNavState;
+  /**
+   * Phase 12C.1C: Das Vorhaben, um das es auf dieser Seite geht (= Team-ID).
+   * Vorhaben werden vom Team aus geöffnet - der Weg zurück führt dorthin,
+   * nicht aufs Dashboard.
+   */
+  teamId?: string | null;
 }) {
   const venture = state.ventureId
     ? `?venture=${encodeURIComponent(state.ventureId)}`
@@ -76,10 +83,10 @@ export function AlignNav({
           weiterer Bereich, sondern der Weg hinaus - und wer ihn sucht, sucht
           ihn oben links. */}
       <Link
-        href="/dashboard"
+        href={teamId ? `/teams/${encodeURIComponent(teamId)}` : "/dashboard"}
         className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 hover:text-slate-900"
       >
-        ← Übersicht
+        {teamId ? "← Zum Team" : "← Übersicht"}
       </Link>
 
       <div className="mt-2 flex flex-wrap gap-2">

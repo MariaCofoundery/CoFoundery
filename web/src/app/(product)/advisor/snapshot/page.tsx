@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
@@ -71,7 +72,7 @@ export default async function AdvisorSnapshotPage({
   } = await getRequestUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(buildLoginRedirectPath("/advisor/snapshot", { invitationId, teamContext: params.teamContext }));
   }
 
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {

@@ -927,7 +927,7 @@ export default async function FounderProfilePage() {
             {ventures.map((venture) => (
               <li key={venture.id}>
                 <Link
-                  href="/founder-alignment/vorhaben"
+                  href={`/founder-alignment/vorhaben?venture=${encodeURIComponent(venture.id)}`}
                   className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-800 hover:border-slate-300"
                 >
                   {venture.name?.trim() || t("ventures.cta")}

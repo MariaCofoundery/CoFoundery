@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { FOUNDER_SETUP_PHASE_KEYS, getFounderSetupCatalogItem } from "@/features/teams/founderSetupCatalog";
@@ -19,7 +20,7 @@ export default async function FounderSetupPage({ params }: Props) {
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup`)}`);
   const setup = await getFounderSetup(teamId, user.id, supabase);
-  if (!setup) notFound();
+  if (!setup) return <TeamUnavailable teamId={teamId} />;
   const advisorAccess = await getFounderSetupAdvisorAccess(teamId, supabase);
   // Der Hinweis MUSS in der Liste stehen, nicht nur auf der Themenseite:
   // Sonst findet man ihn nur, wenn man das richtige Thema ohnehin schon

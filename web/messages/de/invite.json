@@ -93,7 +93,8 @@
       "alreadyClaimed": "Dieser Founder-Platz wurde bereits mit einem anderen Profil verknüpft.",
       "activationFailed": "Die Team-Verknüpfung konnte gerade nicht abgeschlossen werden. Bitte versuche es gleich noch einmal.",
       "invalidToken": "Dieser Founder-Link ist nicht mehr gültig oder konnte nicht gefunden werden.",
-      "emailNotVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du deinen Platz übernehmen."
+      "emailNotVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du deinen Platz übernehmen.",
+      "recoveryFailed": "Der Abschluss hat noch nicht geklappt. Bitte versuche es später noch einmal."
     },
     "eyebrow": "Founder-Einladung",
     "notFoundTitle": "Einladung nicht gefunden",
@@ -119,7 +120,11 @@
     "activateText": "Dieser Link gehört zu {email}. Mit der Annahme bestätigst du deinen Teil dieser Founder-Verbindung. Founder Setup wird dadurch nicht automatisch geteilt.",
     "activateCta": "Einladung annehmen",
     "waitingTitle": "Wartet auf den zweiten Founder",
-    "waitingText": "Dein Platz ist bereits verknüpft. Sobald auch {counterpart} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert."
+    "waitingText": "Dein Platz ist bereits verknüpft. Sobald auch {counterpart} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert.",
+    "toDashboard": "Zum Dashboard",
+    "recoveryTitle": "Der Abschluss ist noch nicht durchgelaufen.",
+    "recoveryText": "Deine Zustimmung ist gespeichert, aber die Verbindung mit eurem Advisor ist noch nicht fertig eingerichtet. Du kannst den Abschluss hier erneut anstoßen – eine neue Zustimmung braucht es dafür nicht.",
+    "recoveryCta": "Abschluss erneut anstoßen"
   },
   "basisComplete": {
     "eyebrow": "Zwischenschritt",

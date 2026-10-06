@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlignmentSideBySide } from "@/features/advisor/AlignmentSideBySide";
 import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
@@ -7,6 +7,8 @@ import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/not
 import { getTeamReviewDetail } from "@/features/advisor/teamReviewDetailData";
 import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { isActiveReviewState, parseTeamReviewState } from "@/features/access/accessStateModel";
+import { AdvisorReviewUnavailable, ReviewTeamContext } from "@/features/advisor/AdvisorReviewState";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -17,6 +19,10 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * mit 404 - nicht mit einem Hinweis "noch nicht freigegeben". Ein Hinweis
  * waere eine Auskunft darueber, dass es diese Anfrage gibt und wie sie
  * ausgegangen ist; das geht nur die Beteiligten etwas an.
+ *
+ * Phase 12C.1C: Zu den Beteiligten gehoert der anfragende Advisor selbst. Er
+ * bekommt einen erklaerenden Zustand (beendet, wartet, Organisation) - ohne
+ * Angabe, WER abgelehnt oder zurueckgezogen hat. Alle anderen weiter 404.
  *
  * ---------------------------------------------------------------------------
  * ZWEI TEILE, UND BEIDE STELLEN NEBENEINANDER
@@ -62,9 +68,25 @@ export default async function AdvisorTeamReviewPage({
     getAdvisorFollowUpFor(client, anchor),
   ]);
 
-  if (!detail) notFound();
+  // Phase 12C.1C: Der Zustand des Reviews fuer diesen Advisor. Wer nie Advisor
+  // dieses Reviews war, bekommt 'none' - dann bleibt es eine echte 404.
+  const reviewState = parseTeamReviewState(
+    (await client.rpc("get_advisor_team_review_state", { p_review_id: reviewId })).data
+  );
+  if (!detail || !isActiveReviewState(reviewState)) {
+    return <AdvisorReviewUnavailable state={reviewState} />;
+  }
 
-  const {data: workstyleTeams} = await client.rpc("get_workstyle_report_teams");
+  // Phase 12C.1C: Nur das Team, an das genau DIESER Review gebunden ist - nicht
+  // alle Teams, die der Advisor irgendwie lesen darf.
+  let boundTeamName: string | null = null;
+  if (reviewState.state === "active_with_team") {
+    const { data: readableTeams } = await client.rpc("get_workstyle_report_teams");
+    boundTeamName =
+      ((readableTeams ?? []) as { team_id: string; team_name: string | null }[]).find(
+        (team) => team.team_id === reviewState.teamId
+      )?.team_name ?? null;
+  }
   const names = detail.group?.included.map((person) => person.name) ?? [];
 
   return (
@@ -81,7 +103,7 @@ export default async function AdvisorTeamReviewPage({
       </h1>
       <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
 
-      {workstyleTeams?.length > 0 && <section className="mt-6 rounded-xl border border-slate-200 p-4"><h2 className="font-semibold">Freigegebene Founder-Teams</h2>{workstyleTeams.map((team: {team_id:string;team_name:string|null})=><Link key={team.team_id} className="mt-2 block underline" href={`/teams/${team.team_id}/workstyle`}>{team.team_name ?? "Vorhaben"} · Euer Zusammenspiel</Link>)}</section>}
+      <ReviewTeamContext state={reviewState} teamName={boundTeamName} subjectUserIds={detail.subjectUserIds} />
 
       {/* ------------------------------------------------------------------
           Die Rollenlage.

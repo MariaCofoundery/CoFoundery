@@ -206,7 +206,9 @@ test("die Seite ist nur fuer Mitglieder des Teams", () => {
   const page = source(PAGE);
   assert.match(page, /redirect\(`\/login\?next=\$\{encodeURIComponent\(pathname\)\}`\)/);
   // `getFounderTeamHomebase` gibt null zurueck, wenn man nicht dabei ist.
-  assert.match(page, /if \(!team\) notFound\(\)/);
+  // Phase 12C.1C: Dann erklaert TeamUnavailable einen verlorenen Zugang - oder
+  // antwortet selbst mit 404 (nie Mitglied). Keine Teamdaten in diesem Zweig.
+  assert.match(page, /if \(!team\) return <TeamUnavailable teamId=\{teamId\} \/>;/);
 });
 
 test("der Reiter steht in der Team-Navigation", () => {

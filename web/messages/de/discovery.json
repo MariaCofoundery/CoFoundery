@@ -380,7 +380,8 @@
       "emptyText": "Aktuell gibt es keine Profile, die alle gewählten Kriterien erfüllen. Du kannst deine Suche anpassen oder alle Filter zurücksetzen.",
       "reset": "Alle Filter zurücksetzen",
       "inactiveTitle": "Aktiviere zuerst dein Discovery-Profil",
-      "inactiveText": "Veröffentliche dein Profil, bevor du andere Founder in Discovery findest."
+      "inactiveText": "Veröffentliche dein Profil, bevor du andere Founder in Discovery findest.",
+      "inactiveCta": "FIND-Profil bearbeiten"
     },
     "cards": {
       "brings": "Bringt mit",
@@ -706,7 +707,9 @@
     "decline": "Ablehnen",
     "cancel": "Zurückziehen",
     "openConversation": "Nachricht schreiben",
-    "conversationError": "Das Gespräch konnte gerade nicht geöffnet werden. Versuch es bitte noch einmal."
+    "conversationError": "Das Gespräch konnte gerade nicht geöffnet werden. Versuch es bitte noch einmal.",
+    "receivedEmptyCta": "FIND-Profil bearbeiten",
+    "sentEmptyCta": "Menschen finden"
   },
   "detail": {
     "eyebrow": "FIND-Profil",

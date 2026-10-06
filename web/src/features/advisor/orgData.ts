@@ -17,6 +17,8 @@ export type AdvisorOrg = {
   name: string;
   personSeatLimit: number | null;
   role: "owner" | "advisor" | null;
+  /** Phase 12C.1C: Eine ausgesetzte Organisation sagt das im Org-Abschnitt. */
+  status: "active" | "suspended";
   /**
    * Das Profil - seit 26.09.2026. Es ist nicht Zierde: Genau diese Angaben
    * liest eine Person, die um Freigabe ihres Profils gebeten wird.
@@ -31,6 +33,9 @@ export type OrgMember = {
   userId: string;
   role: "owner" | "advisor";
   status: "active" | "revoked";
+  /** Phase 12C.1C: Anzeigename - wer verwaltet, muss sehen, wen. */
+  displayName: string | null;
+  isSelf: boolean;
 };
 
 export type AccompaniedPerson = {
@@ -60,7 +65,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 
   const { data: orgs } = await client
     .from("advisor_orgs")
-    .select("id, name, person_seat_limit, description, website_url, focus, location_region")
+    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region")
     .in(
       "id",
       rows.map((row) => row.org_id)
@@ -70,6 +75,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     (orgs ?? []) as {
       id: string;
       name: string;
+      status: string;
       person_seat_limit: number | null;
       description: string | null;
       website_url: string | null;
@@ -79,6 +85,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
   ).map((org) => ({
     id: org.id,
     name: org.name,
+    status: org.status === "suspended" ? "suspended" : "active",
     personSeatLimit: org.person_seat_limit,
     role: rows.find((row) => row.org_id === org.id)?.role ?? null,
     description: org.description,
@@ -88,19 +95,35 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
   }));
 }
 
+/**
+ * Die Mitglieder der Organisation - mit Namen (Phase 12C.1C).
+ *
+ * `person_core` ist nur fuer die eigene Person lesbar; der Name kommt deshalb
+ * aus `get_advisor_org_member_list`. Die Funktion antwortet nur aktiven
+ * Mitgliedern, gibt nur den Anzeigenamen heraus und zeigt beendete
+ * Mitgliedschaften nur Inhaberinnen.
+ */
 export async function getOrgMembers(
   client: SupabaseClient,
   orgId: string
 ): Promise<OrgMember[]> {
-  const { data } = await client
-    .from("advisor_org_members")
-    .select("user_id, role, status")
-    .eq("org_id", orgId)
-    .order("created_at", { ascending: true });
+  const { data } = await client.rpc("get_advisor_org_member_list", { p_org_id: orgId });
 
-  return ((data ?? []) as { user_id: string; role: OrgMember["role"]; status: OrgMember["status"] }[]).map(
-    (row) => ({ userId: row.user_id, role: row.role, status: row.status })
-  );
+  return (
+    (data ?? []) as {
+      user_id: string;
+      role: OrgMember["role"];
+      status: OrgMember["status"];
+      display_name: string | null;
+      is_self: boolean;
+    }[]
+  ).map((row) => ({
+    userId: row.user_id,
+    role: row.role,
+    status: row.status,
+    displayName: row.display_name,
+    isSelf: row.is_self,
+  }));
 }
 
 /**

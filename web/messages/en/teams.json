@@ -335,12 +335,14 @@
     "established": {
       "title": "Shared areas",
       "description": "Long-term workspaces for your established founder connections.",
-      "empty": "You do not have a long-term founder connection yet."
+      "empty": "You do not have a long-term founder connection yet.",
+      "emptyCta": "Invite a co-founder"
     },
     "potential": {
       "title": "Meet & explore together",
       "description": "Open introduction requests and connections where you are still exploring collaboration together.",
-      "empty": "There are no open or ongoing connections right now."
+      "empty": "There are no open or ongoing connections right now.",
+      "emptyCta": "Find a co-founder"
     },
     "states": {
       "request_pending": {

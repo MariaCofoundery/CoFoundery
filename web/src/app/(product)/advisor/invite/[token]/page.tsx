@@ -49,6 +49,10 @@ export default async function AdvisorInvitePage({
           : null;
 
   if (invite.status !== "ready") {
+    // Phase 12C.1C: "Zur Anmeldung" nur fuer Abgemeldete.
+    const {
+      data: { user: viewer },
+    } = await getRequestUser();
     return (
       <main className="mx-auto min-h-screen w-full max-w-4xl px-6 py-16 md:px-10">
         <section className="rounded-[32px] border border-slate-200/80 bg-white/95 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)]">
@@ -60,9 +64,15 @@ export default async function AdvisorInvitePage({
             {t("invite.notFoundText")}
           </p>
           <div className="mt-8">
-            <Link href="/login" className={SECONDARY_CTA_CLASS}>
-              {t("invite.toLogin")}
-            </Link>
+            {viewer ? (
+              <Link href="/dashboard" className={SECONDARY_CTA_CLASS}>
+                {t("invite.toStart")}
+              </Link>
+            ) : (
+              <Link href="/login" className={SECONDARY_CTA_CLASS}>
+                {t("invite.toLogin")}
+              </Link>
+            )}
           </div>
         </section>
       </main>

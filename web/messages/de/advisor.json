@@ -295,7 +295,8 @@
       "emailMismatch": "Bitte melde dich mit der E-Mail-Adresse an, an die diese Advisor-Einladung gesendet wurde.",
       "invalidToken": "Der Advisor-Link konnte nicht bestätigt werden.",
       "updateFailed": "Die Verknüpfung konnte gerade nicht gespeichert werden."
-    }
+    },
+    "toStart": "Zur Startseite"
   },
   "session": {
     "context": "Sitzungsblatt",
@@ -439,10 +440,22 @@
       "unverified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du der Organisation beitreten."
     },
     "leave": "Organisation verlassen",
-    "leaveLastOwner": "Du führst die Organisation als Einzige. Übertrage zuerst die Führung oder schließe die Organisation, bevor du gehst."
+    "leaveLastOwner": "Du führst die Organisation als Einzige. Übertrage zuerst die Führung oder schließe die Organisation, bevor du gehst.",
+    "you": "Du",
+    "unnamed": "Ohne Namen",
+    "suspended": "Diese Organisation ist ausgesetzt. Zugänge über sie sind derzeit nicht aktiv.",
+    "errors": {
+      "org_last_owner": "Du führst die Organisation als Einzige. Übertrage zuerst die Führung, bevor du gehst.",
+      "org_not_member": "Diese Mitgliedschaft ist bereits beendet.",
+      "org_forbidden": "Das kann nur eine Inhaberin der Organisation.",
+      "org_suspended": "Die Organisation ist ausgesetzt. Diese Aktion ist gerade nicht möglich.",
+      "org_name": "Der Name braucht zwischen 2 und 120 Zeichen.",
+      "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
+    }
   },
   "personView": {
-    "back": "Zurück zur Übersicht",
+    "back": "Zurück zu Personen & Gruppen",
     "unnamed": "Diese Person",
     "intro": "Nur das, was diese Person dir freigegeben hat. Sie kann jede Freigabe jederzeit zurücknehmen — dann ist der Abschnitt hier weg.",
     "base": "Wer sie ist",
@@ -488,7 +501,8 @@
     "reviewsTitle": "Angefragte Auswertungen",
     "reviewActive": "läuft",
     "reviewWaiting": "{count, plural, =1 {wartet auf 1 Antwort} other {wartet auf # Antworten}}",
-    "reviewOpen": "Auswertung öffnen"
+    "reviewOpen": "Auswertung öffnen",
+    "nobodyCta": "Person einladen"
   },
   "review": {
     "back": "Zurück zur Auswahl",
@@ -502,7 +516,18 @@
     "alignmentNoValue": "Ohne Angabe: {names}",
     "alignmentBasis": "Selbstauskunft, kein Test. Die Punkte zeigen, wie sich diese Menschen selbst beschrieben haben — nicht, wie sie sind, und nicht, wie gut sie zueinander passen.",
     "alignmentMissing": "Nicht im Nebeneinander: {names}. Zugestimmt wurde der gemeinsamen Auswertung, der Fragebogen ist aber nicht freigegeben.",
-    "notAVerdict": "Diese Seite fällt kein Urteil und berechnet keine Passung. Sie stellt nebeneinander, was jede Person selbst angegeben und freigegeben hat. Jede und jeder Beteiligte kann jederzeit aussteigen — dann gibt es diese Seite nicht mehr."
+    "notAVerdict": "Diese Seite fällt kein Urteil und berechnet keine Passung. Sie stellt nebeneinander, was jede Person selbst angegeben und freigegeben hat. Jede und jeder Beteiligte kann jederzeit aussteigen — dann gibt es diese Seite nicht mehr.",
+    "teamContext": {
+      "title": "Teambericht",
+      "withTeam": "Diese Auswertung ist mit einem aktuellen Teambericht verbunden.",
+      "openTeam": "{team} · Teambericht öffnen",
+      "teamFallback": "Team",
+      "withoutTeam": "Die gemeinsame Auswertung ist aktiv. Mit ihr ist aktuell kein Teambericht verbunden: Ein Teambericht wird nur verknüpft, wenn die Gruppe bei der Zustimmung genau einem aktuellen Team entspricht. Für einen aktuellen Teambericht ist eine neue, teambezogene Freigabe nötig.",
+      "teamChanged": "Die gemeinsame Auswertung bleibt aktiv. Die Teamzusammensetzung hat sich seit der Zustimmung aber verändert, deshalb ist der Teambericht nicht mehr verbunden. Für den aktuellen Teambericht ist eine neue Freigabe nötig.",
+      "teamInactive": "Die gemeinsame Auswertung bleibt aktiv. Das verbundene Team ist nicht mehr aktiv, deshalb gibt es keinen Teambericht mehr dazu.",
+      "teamUnavailable": "Der verbundene Teambericht ist aktuell nicht verfügbar.",
+      "requestNew": "Neue Auswertung anfragen"
+    }
   },
   "notebook": {
     "title": "Deine Handakte",
@@ -523,6 +548,39 @@
       "forbidden": "Dafür gibt es kein Mandat — weder jetzt noch früher.",
       "due": "Bitte ein Datum angeben.",
       "save": "Das hat nicht geklappt."
+    }
+  },
+  "access": {
+    "eyebrow": "Begleitung",
+    "toPeople": "Zu Personen & Gruppen",
+    "toAdvisor": "Zur Advisor-Übersicht",
+    "person": {
+      "ended": {
+        "title": "Dieser Zugang ist nicht mehr aktiv.",
+        "body": "Die Freigabe für dieses Profil wurde beendet. Was du vorher gesehen hast, ist hier nicht mehr abrufbar."
+      },
+      "pending": {
+        "title": "Die Anfrage ist noch offen.",
+        "body": "Sobald die Person zustimmt, siehst du hier, was sie dir freigegeben hat."
+      }
+    },
+    "review": {
+      "ended": {
+        "title": "Diese gemeinsame Auswertung ist nicht mehr aktiv.",
+        "body": "Sie wurde beendet. Für eine neue Auswertung braucht es eine neue Zustimmung aller Beteiligten."
+      },
+      "requested": {
+        "title": "Die Auswertung wartet noch auf Antworten.",
+        "body": "Sobald alle Beteiligten zugestimmt haben, erscheint sie hier."
+      }
+    },
+    "orgMembershipEnded": {
+      "title": "Deine Mitgliedschaft in der Organisation ist beendet.",
+      "body": "Dieser Zugang lief über die Organisation. Mit der Mitgliedschaft endet auch er."
+    },
+    "orgSuspended": {
+      "title": "Die Organisation ist ausgesetzt.",
+      "body": "Zugänge über diese Organisation sind derzeit nicht aktiv."
     }
   }
 }

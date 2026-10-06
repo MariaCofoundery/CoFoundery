@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
+import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { startFounderInTheWildRoundAction } from "@/features/founderInTheWild/founderInTheWildActions";
 import { findCompletedFounderInTheWildRounds, findOpenFounderInTheWildRoundsByPack, getFounderInTheWildTeam } from "@/features/founderInTheWild/founderInTheWildData";
@@ -15,14 +16,14 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
   const href = founderInTheWildEntryHref(teamId);
   const supabase = await createClient(); const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(href)}`);
-  const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) notFound();
+  const team = await getFounderInTheWildTeam(teamId, user.id, supabase); if (!team) return <TeamUnavailable teamId={teamId} />;
   const [t, openRounds, completedRounds, rawLocale] = await Promise.all([getTranslations("founderInTheWild.entry"), findOpenFounderInTheWildRoundsByPack(team, user.id, supabase), findCompletedFounderInTheWildRounds(team, supabase), getLocale()]);
   const locale = normalizeLocale(rawLocale);
   const tally = await getCollaborationGuessTally(supabase, teamId);
   const partnerName = team.members.find((member) => member.userId !== user.id)?.displayName
     ?? (locale === "de" ? "dein Co-Founder" : "your co-founder");
   return <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-    <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">{t("back")}</Link>
+    <Link href={`/teams/${encodeURIComponent(teamId)}#founder-in-the-wild`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">{t("back")}</Link>
     <header className="mt-6 rounded-[30px] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-violet-50 p-6 shadow-[0_20px_50px_rgba(76,29,149,0.08)] sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">{t("intro")}</p></header>
     {query.result ? <p role="status" className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">{t(query.result === "unavailable" ? "twoFounders" : query.result === "discarded" ? "discarded" : query.result === "declined" ? "declined" : "changed")}</p> : null}
     {/* Zwei Packs statt eines: "Unter Druck" allein war einmal gespielt und

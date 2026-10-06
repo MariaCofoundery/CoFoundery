@@ -1,4 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
 import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
@@ -19,7 +20,7 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
   if (teamId) {
     const { getFounderTeamHomebase } = await import("@/features/teams/founderTeamHomebaseData");
     const team = await getFounderTeamHomebase(teamId, user.id, await createClient());
-    if (!team) notFound();
+    if (!team) return <TeamUnavailable teamId={teamId} />;
     if (team.members.length >= 4) redirect(`/teams/${teamId}`);
     targetTeam = { id: team.id, name: team.name ?? team.members.map(m => m.displayName ?? "Founder").join(" + "), context: team.teamContext };
   }
@@ -32,11 +33,12 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
       <div className="mb-6">
+        {/* Phase 12C.1C: Aus dem Team heraus geoeffnet fuehrt der Weg zurueck ins Team. */}
         <a
-          href="/dashboard"
+          href={targetTeam ? `/teams/${encodeURIComponent(targetTeam.id)}` : "/dashboard"}
           className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
         >
-          {t("backToDashboard")}
+          {targetTeam ? t("backToTeam") : t("backToDashboard")}
         </a>
       </div>
       <div className="space-y-6">

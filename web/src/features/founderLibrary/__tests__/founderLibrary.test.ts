@@ -193,7 +193,8 @@ test("team-scoped route remains server-authorized for founders and fails closed 
   // Netzwerkgang wie jede andere noch einmal.
   assert.match(page, /await (getRequestUser\(\)|supabase\.auth\.getUser\(\))/);
   assert.match(page, /getFounderTeamHomebase\(teamId, user\.id, supabase\)/);
-  assert.match(page, /if \(!team\) notFound\(\)/);
+  // Phase 12C.1C: Verlorener Zugang wird erklaert, sonst 404 (TeamUnavailable).
+  assert.match(page, /if \(!team\) return <TeamUnavailable teamId=\{teamId\} \/>;/);
   assert.doesNotMatch(page, /Advisor|advisor|serviceRole|service_role/);
   assert.match(page, /active="library"/);
   assert.match(page, /<FounderLibraryView/);

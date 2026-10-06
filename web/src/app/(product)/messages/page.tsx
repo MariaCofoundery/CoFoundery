@@ -8,6 +8,8 @@ import {
 } from "@/features/connect/connectData";
 import { WaitingNotices } from "@/features/notifications/WaitingNotices";
 import { getWaitingInAppNotices } from "@/features/notifications/inAppNoticeData";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
+import { hasProfileRole } from "@/features/profile/profileRoles";
 
 /**
  * Ein Postfach fuer alles.
@@ -29,14 +31,33 @@ import { getWaitingInAppNotices } from "@/features/notifications/inAppNoticeData
  * warten, ohne es zu wissen. Es steht hier und nicht in einem eigenen
  * Bereich: Zwei Orte zum Nachsehen heissen, dass man an einem nicht nachsieht.
  */
+async function getEmptyInboxLinks(
+  client: Awaited<ReturnType<typeof requireSignedInForMessages>>["client"],
+  userId: string
+) {
+  const [profile, connect] = await Promise.all([
+    getProfileBasicsRow(client, userId).catch(() => null),
+    client.rpc("is_network_member"),
+  ]);
+  return {
+    find: hasProfileRole(profile?.roles, "founder"),
+    connect: connect.data === true,
+  };
+}
+
 export default async function MessagesPage() {
   const [t, locale] = await Promise.all([getTranslations("connect"), getLocale()]);
-  const { client } = await requireSignedInForMessages();
+  const { client, user } = await requireSignedInForMessages();
 
   const [conversations, notices] = await Promise.all([
     getConnectConversations(client),
     getWaitingInAppNotices(client),
   ]);
+  // Phase 12C.1C: Ein leeres Postfach zeigt einen Weg dorthin, wo Gespraeche
+  // entstehen - nur in Bereiche, die die Person auch betreten kann.
+  const emptyLinks =
+    conversations.length === 0 ? await getEmptyInboxLinks(client, user.id) : { find: false, connect: false };
+
   const counterpartIds = conversations
     .map((conversation) => conversation.counterpart_user_id)
     .filter((id): id is string => Boolean(id));
@@ -59,6 +80,20 @@ export default async function MessagesPage() {
           <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
             {t("messages.inboxEmptyText")}
           </p>
+          {emptyLinks.find || emptyLinks.connect ? (
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              {emptyLinks.find ? (
+                <Link href="/discovery" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">
+                  {t("messages.inboxEmptyFind")}
+                </Link>
+              ) : null}
+              {emptyLinks.connect ? (
+                <Link href="/connect" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">
+                  {t("messages.inboxEmptyConnect")}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : (
         <ul className="mt-8 space-y-3">

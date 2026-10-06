@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getAccompaniedPeople, withAccompaniedNames } from "@/features/advisor/orgData";
@@ -48,7 +49,7 @@ export default async function AdvisorGroupPage({
   const {
     data: { user },
   } = await getRequestUser();
-  if (!user) redirect("/login?next=/advisor/group");
+  if (!user) redirect(buildLoginRedirectPath("/advisor/group", { p: (await searchParams).p }));
 
   const client = await createClient();
   const params = await searchParams;
@@ -92,7 +93,16 @@ export default async function AdvisorGroupPage({
           <p className="mt-1 text-xs leading-5 text-slate-600">{t("chooseHint")}</p>
 
           {people.length === 0 ? (
-            <p className="mt-3 text-sm leading-6 text-slate-600">{t("nobody")}</p>
+            <div className="mt-3 text-sm leading-6 text-slate-600">
+              <p>{t("nobody")}</p>
+              {/* Phase 12C.1C: der Weg zur Personen-Einladung statt Sackgasse. */}
+              <Link
+                href="/advisor/dashboard#person-invites"
+                className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+              >
+                {t("nobodyCta")}
+              </Link>
+            </div>
           ) : (
             <ul className="mt-3 grid gap-1 sm:grid-cols-2">
               {people.map((person) => {

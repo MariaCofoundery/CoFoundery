@@ -14,6 +14,11 @@
       "complete_profile": "Ein paar Basisangaben fehlen noch – sie dauern nur einen Moment.",
       "workstyle_start": "Deine Arbeitsweise ist die Grundlage für Gespräche im Team.",
       "workstyle_continue": "Du hast schon begonnen – mach dort weiter, wo du aufgehört hast."
+    },
+    "invitationErrors": {
+      "expired": "Diese Einladung ist abgelaufen. Bitte die einladende Person, dir eine neue zu schicken.",
+      "revoked": "Diese Einladung wurde zurückgezogen und gilt nicht mehr.",
+      "invitation_not_found": "Diese Einladung ist nicht mehr verfügbar – vielleicht wurde sie schon genutzt oder zurückgezogen."
     }
   },
   "actions": {
@@ -555,7 +560,8 @@
     }
   },
   "coFounderInvitePage": {
-    "backToDashboard": "Zurück zum Dashboard"
+    "backToDashboard": "Zurück zum Dashboard",
+    "backToTeam": "Zurück zum Team"
   },
   "inviteStart": {
     "eyebrow": "Aktuell in der Testphase kostenlos.",

@@ -35,8 +35,8 @@ export default async function ConnectSearchesPage({
 
   return (
     <main className="mx-auto max-w-3xl break-words px-5 py-10">
-      <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
-        ← {t("navigation.overview")}
+      <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
+        ← {t("mine.back")}
       </Link>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight">{t("searches.title")}</h1>
       <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("searches.text")}</p>

@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import {
   claimAdvisorTeamInviteFounder,
+  recoverAdvisorTeamInviteFounder,
   createOpaqueToken,
   getAdvisorPendingTeamInvites,
   hashOpaqueToken,
   normalizeEmail,
   normalizeTeamName,
   type ClaimAdvisorTeamInviteResult,
+  type RecoverAdvisorTeamInviteResult,
 } from "@/features/dashboard/advisorTeamInviteData";
 import {
   deriveAdvisorInviteEmailStatus,
@@ -317,4 +319,34 @@ export async function revokeAdvisorPendingTeamInviteAction(
   });
 
   revalidatePath("/advisor/dashboard");
+}
+
+/**
+ * Phase 12C.1C: Wiederholungsweg nach einem gescheiterten Abschluss. Nur als
+ * ausdrueckliche Aktion (POST); die Seite selbst schreibt weiterhin nichts.
+ */
+export async function recoverAdvisorTeamInviteFounderAction(params: {
+  token: string;
+}): Promise<RecoverAdvisorTeamInviteResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return { ok: false, reason: "not_authenticated" };
+  }
+
+  const result = await recoverAdvisorTeamInviteFounder({
+    token: params.token,
+    userId: user.id,
+    userEmail: user.email,
+  });
+
+  if (result.ok) {
+    revalidatePath("/advisor/dashboard");
+    revalidatePath("/dashboard");
+  }
+
+  return result;
 }

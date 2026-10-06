@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { completeReadMyMindRoundAction } from "@/features/collaborationLab/readMyMindActions";
@@ -19,7 +20,7 @@ export default async function ReadMyMindRevealEntryPage({ params, searchParams }
   const revealHref = `${roundHref}/reveal`;
   if (!user) redirect(`/login?next=${encodeURIComponent(revealHref)}`);
   const team = await getReadMyMindTeamContext(teamId, user.id, supabase);
-  if (!team) notFound();
+  if (!team) return <TeamUnavailable teamId={teamId} />;
   const round = await getReadMyMindRound(team, roundId, user.id, supabase);
   if (!round) notFound();
   if (round.status === "abandoned" || !round.wholeRoundAnswerComplete) redirect(roundHref);

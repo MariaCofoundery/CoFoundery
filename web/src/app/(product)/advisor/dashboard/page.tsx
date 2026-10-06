@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { readOrgErrorCode } from "@/features/advisor/orgErrors";
+import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { PersonInviteSection, type PersonInvite } from "@/features/advisor/PersonInviteSection";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
@@ -599,7 +601,12 @@ function PendingInviteSection({
   );
 }
 
-export default async function AdvisorDashboardPage() {
+export default async function AdvisorDashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ orgError?: string }>;
+}) {
+  const orgError = readOrgErrorCode(((await searchParams) ?? {}).orgError);
   // Internal relationship and invitation metadata is never rendered in the product UI.
   const t = await getTranslations("advisor");
   const locale = await getRequestLocale();
@@ -608,7 +615,7 @@ export default async function AdvisorDashboardPage() {
   } = await getRequestUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(buildLoginRedirectPath("/advisor/dashboard"));
   }
 
   // Der angemeldete Zugang, nicht der privilegierte: Die Wiedervorlagen liegen
@@ -776,7 +783,7 @@ export default async function AdvisorDashboardPage() {
           Organisationszugang, und darunter kann man dann auch Advisor
           aufnehmen." Sie steht vor der Einladung an einzelne Personen, weil
           sie entscheidet, in wessen Namen gefragt wird. */}
-      <AdvisorOrgSection orgs={advisorOrgs} members={orgMembers} accompanied={accompanied} />
+      <AdvisorOrgSection orgs={advisorOrgs} members={orgMembers} accompanied={accompanied} error={orgError} />
 
       <PersonInviteSection invites={personInvites} orgs={advisorOrgs} />
 

@@ -37,7 +37,7 @@ export async function FounderInTheWildHomebaseCard({ team, currentUserId }: { te
   // Seit Phase 9.4B dieselbe ruhige Karte wie Read My Mind im Bereich
   // "Vertiefen" (h3 unter der Bereichsueberschrift). Zustand und Aktion sind
   // unveraendert; ohne genau zwei Founder bleibt der ehrliche Hinweis.
-  return <section className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="founder-wild-title">
+  return <section id="founder-in-the-wild" className="scroll-mt-24 flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="founder-wild-title">
     <h3 id="founder-wild-title" className="text-base font-semibold text-slate-950">{t("title")}</h3>
     <p className="mt-2 text-sm leading-6 text-slate-600">{t("description")}</p>
     {status ? <p className="mt-3 text-sm font-medium text-slate-800">{status}</p> : null}

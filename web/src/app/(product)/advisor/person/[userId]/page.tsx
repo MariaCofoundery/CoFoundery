@@ -23,6 +23,8 @@ import { getAdvisorAlignViews } from "@/features/instruments/align/advisorView";
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { getRequestLocale } from "@/i18n/getLocale";
+import { AccessStatePanel } from "@/features/access/AccessStatePanel";
+import { personAccessView } from "@/features/access/accessStateModel";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -74,7 +76,34 @@ export default async function AdvisorPersonPage({
   ]);
 
   // Nichts freigegeben heisst: Diese Seite gibt es für diese Person nicht.
-  if (view.grantedScopes.length === 0) notFound();
+  // Phase 12C.1C: Ausser fuer den, der einmal Zugang hatte oder gerade anfragt -
+  // er bekommt den Zustand erklaert (beendet, offen, Organisation), ohne Inhalte.
+  // Massgeblich ist der WIRKSAME Zugang: Die Freigabezeilen allein sagen nichts
+  // ueber eine ausgesetzte Organisation oder eine beendete Mitgliedschaft -
+  // dort stand sonst eine leere Seite.
+  const { data: accessState } = await client.rpc("get_advisor_person_access_state", {
+    p_subject_user_id: userId,
+  });
+  if (view.grantedScopes.length === 0 || accessState !== "active") {
+    const stateView = personAccessView(accessState);
+    if (!stateView) notFound();
+    const tAccess = await getTranslations("advisor.access");
+    const key =
+      stateView.messageKey === "ended" || stateView.messageKey === "pending"
+        ? `person.${stateView.messageKey}`
+        : stateView.messageKey;
+    return (
+      <AccessStatePanel
+        eyebrow={tAccess("eyebrow")}
+        title={tAccess(`${key}.title`)}
+        body={tAccess(`${key}.body`)}
+        actions={[
+          { href: "/advisor/group", label: tAccess("toPeople") },
+          { href: "/advisor/dashboard", label: tAccess("toAdvisor") },
+        ]}
+      />
+    );
+  }
 
   const [t, tCapability, tDirection, tNote, tAlign] = await Promise.all([
     getTranslations("advisor.personView"),
@@ -101,7 +130,7 @@ export default async function AdvisorPersonPage({
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-10">
       <Link
-        href="/advisor/dashboard#advisor-org"
+        href="/advisor/group"
         className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
       >
         {t("back")}
