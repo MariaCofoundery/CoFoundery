@@ -369,12 +369,12 @@
     "securityText": "Dein E-Mail-Konto ist dein Zugang – schütze es idealerweise mit Zwei-Faktor-Authentifizierung.",
     "supportText": "Aktuell läuft die Änderung deiner E-Mail-Adresse über den Support.",
     "supportSubject": "E-Mail-Adresse ändern",
-    "sharedText": "Hier verwaltest du dein persönliches CoFoundery-Konto unabhängig davon, welche Produktbereiche du nutzt.",
+    "sharedText": "Hier verwaltest du dein persönliches Made2Found-Konto unabhängig davon, welche Produktbereiche du nutzt.",
     "manage": "Account verwalten",
     "delete": {
       "summary": "Danger Zone",
       "title": "Account löschen",
-      "confirmText": "Dein Account und die dazugehörigen personenbezogenen CoFoundery-Daten werden dauerhaft gelöscht. Gemeinsame Inhalte werden entsprechend dem bestehenden Löschvertrag bereinigt oder entfernt. Dieser Schritt kann nicht rückgängig gemacht werden.\n\nMöchtest du deinen Account wirklich löschen?",
+      "confirmText": "Dein Account und die dazugehörigen personenbezogenen Made2Found-Daten werden dauerhaft gelöscht. Gemeinsame Inhalte werden entsprechend dem bestehenden Löschvertrag bereinigt oder entfernt. Dieser Schritt kann nicht rückgängig gemacht werden.\n\nMöchtest du deinen Account wirklich löschen?",
       "inputHelp": "Tippe",
       "inputHelpSuffix": "um fortzufahren",
       "confirmToken": "LÖSCHEN",
@@ -508,18 +508,18 @@
       "disable": "Auf diesem Gerät ausschalten",
       "pending": "Einen Moment …",
       "perDevice": "Die Erlaubnis gehört zum Browser, nicht zum Konto: Dein Telefon einzurichten richtet den Rechner nicht mit ein. Im Text einer Mitteilung steht nie, was jemand geschrieben hat – ein Sperrbildschirm ist ein öffentlicher Ort.",
-      "homeScreen": "Auf dem iPhone und iPad gibt es Mitteilungen nur, wenn die Seite auf dem Startbildschirm liegt: In Safari auf Teilen tippen, „Zum Home-Bildschirm“ wählen, CoFoundery von dort öffnen und hier wiederkommen.",
+      "homeScreen": "Auf dem iPhone und iPad gibt es Mitteilungen nur, wenn die Seite auf dem Startbildschirm liegt: In Safari auf Teilen tippen, „Zum Home-Bildschirm“ wählen, Made2Found von dort öffnen und hier wiederkommen.",
       "unsupported": "Dieser Browser kann keine Mitteilungen anzeigen. Die Mail kommt weiterhin.",
       "notConfigured": "Mitteilungen richten wir gerade ein – dieser Schalter kommt in Kürze. Die Mail kommt weiterhin.",
       "errors": {
-        "denied": "Der Browser hat Mitteilungen für diese Seite abgelehnt. Erlauben lässt sich das nur in seinen eigenen Einstellungen – such dort nach CoFoundery.",
+        "denied": "Der Browser hat Mitteilungen für diese Seite abgelehnt. Erlauben lässt sich das nur in seinen eigenen Einstellungen – such dort nach Made2Found.",
         "unsupported_service": "Dieser Browser meldet sich bei einem Dienst an, den wir noch nicht kennen. Schreib uns kurz, dann ergänzen wir ihn.",
         "failed": "Das hat gerade nicht geklappt. Versuch es später noch einmal – an deinen Mails ändert sich nichts."
       },
       "test": "Zur Probe eine schicken",
-      "testSent": "Unterwegs – sie sollte in ein paar Sekunden erscheinen. Kommt nichts, prüf in den Geräteeinstellungen, ob Mitteilungen für CoFoundery erlaubt sind.",
+      "testSent": "Unterwegs – sie sollte in ein paar Sekunden erscheinen. Kommt nichts, prüf in den Geräteeinstellungen, ob Mitteilungen für Made2Found erlaubt sind.",
       "testNothing": "Es konnte nichts zugestellt werden. Schalte die Mitteilungen auf diesem Gerät einmal aus und wieder ein.",
-      "testTitle": "Hallo von CoFoundery",
+      "testTitle": "Hallo von Made2Found",
       "testBody": "Wenn du das liest, kommen Mitteilungen auf diesem Gerät an."
     },
     "deletionNotices": {
@@ -583,7 +583,7 @@
       "email": "E-Mail-Adresse"
     },
     "placeholder": {
-      "projectName": "optional, z. B. Cofoundery oder Projekt Atlas"
+      "projectName": "optional, z. B. Made2Found oder Projekt Atlas"
     },
     "help": {
       "projectName": "Optional. Wenn ihr euer Matching benennen möchtet, nutzen wir den Namen später dort, wo euer Team sichtbar wird."

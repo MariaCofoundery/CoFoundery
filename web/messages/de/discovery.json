@@ -171,7 +171,7 @@
       "cta": "Suchprofil erstellen"
     },
     "activeProfile": {
-      "hint": "Dein Profil ist für eingeloggte Cofoundery-Nutzer:innen sichtbar.",
+      "hint": "Dein Profil ist für eingeloggte Made2Found-Nutzer:innen sichtbar.",
       "cta": "Profil bearbeiten"
     },
     "pausedProfile": {
@@ -202,7 +202,7 @@
         "description": "Wenn beide Interesse haben, könnt ihr ein erstes Gespräch starten."
       },
       "matching": {
-        "title": "Gemeinsames Cofoundery-Matching starten",
+        "title": "Gemeinsames Made2Found-Matching starten",
         "description": "Danach könnt ihr im Team „Euer Zusammenspiel“ ansehen und gemeinsame Vereinbarungen in Founder Setup klären."
       }
     },
@@ -415,7 +415,7 @@
       "title": "Gemerkte Suchen",
       "text": "Jede Suche zeigt ihre Kriterien im Klartext – damit du nach Wochen noch weißt, warum eine Meldung kam.",
       "emptyTitle": "Noch nichts gemerkt",
-      "emptyText": "Grenze deine Suche ein und merke sie dir. Danach meldet sich CoFoundery, wenn jemand Neues dazu passt.",
+      "emptyText": "Grenze deine Suche ein und merke sie dir. Danach meldet sich Made2Found, wenn jemand Neues dazu passt.",
       "emptyCta": "Zur Suche",
       "criteria": {
         "roles": "Rollen und Expertise",
@@ -626,15 +626,15 @@
     },
     "assessment": {
       "eyebrow": "Private Einstellung",
-      "title": "Cofoundery Check einbeziehen",
-      "description": "Wenn du möchtest, nutzen wir deine Cofoundery-Assessment-Ergebnisse später, um bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne Auswertungen werden nicht auf deinem Profil angezeigt.",
+      "title": "Made2Found Check einbeziehen",
+      "description": "Wenn du möchtest, nutzen wir deine Made2Found-Assessment-Ergebnisse später, um bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne Auswertungen werden nicht auf deinem Profil angezeigt.",
       "checkbox": "Für bessere Vorschläge einbeziehen",
       "checkboxHelp": "Diese Einstellung ist privat und erscheint nicht auf deinem öffentlichen Discovery-Profil.",
       "fillBase": "Basis-Fragen ausfüllen",
       "defaulted": "Für die Testphase ist diese private Einstellung vorausgewählt. Speichere deine Suchprioritäten, um sie zu übernehmen, oder entferne den Haken.",
-      "missingBase": "Fülle zuerst die Basis-Fragen aus, um den Cofoundery Check einzubeziehen.",
+      "missingBase": "Fülle zuerst die Basis-Fragen aus, um den Made2Found Check einzubeziehen.",
       "inactive": "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt.",
-      "active": "Aktiv: Cofoundery nutzt deine Check-Signale privat für bessere Discovery-Vorschläge und Gesprächsimpulse."
+      "active": "Aktiv: Made2Found nutzt deine Check-Signale privat für bessere Discovery-Vorschläge und Gesprächsimpulse."
     },
     "filters": {
       "title": "Erweiterte Filter",
@@ -855,7 +855,7 @@
       "ownInputsMissingTitle": "Dir fehlen noch ein paar Angaben",
       "partnerInputsMissingTitle": "{name} vervollständigt noch den eigenen Teil",
       "alignmentReadyTitle": "Euer Alignment ist bereit",
-      "text": "Für euren gemeinsamen Alignment-Blick prüft CoFoundery nur, ob die erforderlichen eigenen Angaben von euch beiden vorliegen.",
+      "text": "Für euren gemeinsamen Alignment-Blick prüft Made2Found nur, ob die erforderlichen eigenen Angaben von euch beiden vorliegen.",
       "statusPrefix": "Status:",
       "reportReady": "Alignment bereit",
       "readyForReport": "Gemeinsamer Blick bereit",

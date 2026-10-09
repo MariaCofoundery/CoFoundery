@@ -1,4 +1,4 @@
-export const DEFAULT_PUBLIC_APP_ORIGIN = "https://cofoundery.de";
+export const DEFAULT_PUBLIC_APP_ORIGIN = "https://made2found.de";
 
 function normalizeOrigin(value: string) {
   const trimmed = value.trim();

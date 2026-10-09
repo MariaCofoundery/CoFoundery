@@ -333,7 +333,7 @@
     },
     "note": {
       "title": "Deine Notizen",
-      "privacy": "Diese Notizen gehören dir. Die Founder sehen sie nicht, und niemand sonst bei CoFoundery kann sie lesen. Sie bleiben dir auch dann erhalten, wenn die Freigabe für dieses Team endet – und sie verschwinden, wenn das Team sein Konto löscht.",
+      "privacy": "Diese Notizen gehören dir. Die Founder sehen sie nicht, und niemand sonst bei Made2Found kann sie lesen. Sie bleiben dir auch dann erhalten, wenn die Freigabe für dieses Team endet – und sie verschwinden, wenn das Team sein Konto löscht.",
       "label": "Notiz",
       "placeholder": "Was ist dir aufgefallen, was willst du beim nächsten Mal ansprechen, was kannst du noch nicht sagen?",
       "save": "Notiz speichern",

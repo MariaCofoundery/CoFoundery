@@ -41,7 +41,7 @@ self.addEventListener("push", (event) => {
     payload = {};
   }
 
-  const title = typeof payload.title === "string" && payload.title ? payload.title : "CoFoundery";
+  const title = typeof payload.title === "string" && payload.title ? payload.title : "Made2Found";
   const body = typeof payload.body === "string" ? payload.body : "";
   // Nur Pfade auf der eigenen Seite. Eine fremde Adresse in der Nutzlast wuerde
   // sonst einen Antippen-Weg nach draussen bauen.

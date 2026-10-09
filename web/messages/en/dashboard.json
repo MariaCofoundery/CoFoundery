@@ -369,12 +369,12 @@
     "securityText": "Your email account is your access point, so ideally protect it with two-factor authentication.",
     "supportText": "Changing your email address currently runs through support.",
     "supportSubject": "Change email address",
-    "sharedText": "Manage your personal CoFoundery account here, regardless of which product areas you use.",
+    "sharedText": "Manage your personal Made2Found account here, regardless of which product areas you use.",
     "manage": "Manage account",
     "delete": {
       "summary": "Danger zone",
       "title": "Delete account",
-      "confirmText": "Your account and its associated personal CoFoundery data will be permanently deleted. Shared content will be cleaned up or removed according to the existing deletion contract. This step cannot be undone.\n\nDo you really want to delete your account?",
+      "confirmText": "Your account and its associated personal Made2Found data will be permanently deleted. Shared content will be cleaned up or removed according to the existing deletion contract. This step cannot be undone.\n\nDo you really want to delete your account?",
       "inputHelp": "Type",
       "inputHelpSuffix": "to continue",
       "confirmToken": "DELETE",
@@ -508,18 +508,18 @@
       "disable": "Turn off on this device",
       "pending": "One moment …",
       "perDevice": "The permission belongs to the browser, not to the account: setting up your phone does not set up your computer. A notification never carries what someone wrote – a lock screen is a public place.",
-      "homeScreen": "On iPhone and iPad, notifications only work once the page sits on the home screen: in Safari tap Share, choose “Add to Home Screen”, open CoFoundery from there and come back here.",
+      "homeScreen": "On iPhone and iPad, notifications only work once the page sits on the home screen: in Safari tap Share, choose “Add to Home Screen”, open Made2Found from there and come back here.",
       "unsupported": "This browser cannot show notifications. The email still arrives.",
       "notConfigured": "We are still setting notifications up – this switch is coming shortly. The email still arrives.",
       "errors": {
-        "denied": "The browser has blocked notifications for this site. It can only be allowed again in the browser's own settings – look for CoFoundery there.",
+        "denied": "The browser has blocked notifications for this site. It can only be allowed again in the browser's own settings – look for Made2Found there.",
         "unsupported_service": "This browser registers with a service we don't know yet. Drop us a line and we'll add it.",
         "failed": "That didn't work just now. Try again later – nothing changes about your emails."
       },
       "test": "Send a test one",
-      "testSent": "On its way – it should show up within a few seconds. If nothing arrives, check in your device settings whether notifications are allowed for CoFoundery.",
+      "testSent": "On its way – it should show up within a few seconds. If nothing arrives, check in your device settings whether notifications are allowed for Made2Found.",
       "testNothing": "Nothing could be delivered. Turn notifications off on this device and on again.",
-      "testTitle": "Hello from CoFoundery",
+      "testTitle": "Hello from Made2Found",
       "testBody": "If you are reading this, notifications arrive on this device."
     },
     "deletionNotices": {
@@ -583,7 +583,7 @@
       "email": "Email address"
     },
     "placeholder": {
-      "projectName": "optional, e.g. Cofoundery or Project Atlas"
+      "projectName": "optional, e.g. Made2Found or Project Atlas"
     },
     "help": {
       "projectName": "Optional. If you want to name your matching, we will use this name later wherever your team becomes visible."

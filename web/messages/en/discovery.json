@@ -171,7 +171,7 @@
       "cta": "Create search profile"
     },
     "activeProfile": {
-      "hint": "Your profile is visible to logged-in Cofoundery users.",
+      "hint": "Your profile is visible to logged-in Made2Found users.",
       "cta": "Edit profile"
     },
     "pausedProfile": {
@@ -202,7 +202,7 @@
         "description": "If both sides are interested, you can start a first conversation."
       },
       "matching": {
-        "title": "Start shared Cofoundery Matching",
+        "title": "Start shared Made2Found Matching",
         "description": "Then view “How you work together” in your team and discuss shared agreements in Founder Setup."
       }
     },
@@ -415,7 +415,7 @@
       "title": "Remembered searches",
       "text": "Every search shows its criteria in plain words – so that weeks later you still know why a notification arrived.",
       "emptyTitle": "Nothing remembered yet",
-      "emptyText": "Narrow your search and remember it. CoFoundery will then get in touch when someone new fits.",
+      "emptyText": "Narrow your search and remember it. Made2Found will then get in touch when someone new fits.",
       "emptyCta": "Go to search",
       "criteria": {
         "roles": "Roles and expertise",
@@ -626,15 +626,15 @@
     },
     "assessment": {
       "eyebrow": "Private setting",
-      "title": "Include Cofoundery Check",
-      "description": "If you want, we later use your Cofoundery assessment results to generate better suggestions and conversation cues. Raw answers or internal evaluations are not shown on your profile.",
+      "title": "Include Made2Found Check",
+      "description": "If you want, we later use your Made2Found assessment results to generate better suggestions and conversation cues. Raw answers or internal evaluations are not shown on your profile.",
       "checkbox": "Include for better suggestions",
       "checkboxHelp": "This setting is private and does not appear on your public Discovery profile.",
       "fillBase": "Answer the foundation questions",
       "defaulted": "For the beta phase, this private setting is preselected. Save your search priorities to keep it, or remove the checkmark.",
-      "missingBase": "Answer the foundation questions first to include the Cofoundery Check.",
+      "missingBase": "Answer the foundation questions first to include the Made2Found Check.",
       "inactive": "Inactive: Your assessment results stay unused for Discovery.",
-      "active": "Active: Cofoundery privately uses your Check signals for better Discovery suggestions and conversation cues."
+      "active": "Active: Made2Found privately uses your Check signals for better Discovery suggestions and conversation cues."
     },
     "filters": {
       "title": "Advanced filters",
@@ -855,7 +855,7 @@
       "ownInputsMissingTitle": "You still need to add a few details",
       "partnerInputsMissingTitle": "{name} is still completing their part",
       "alignmentReadyTitle": "Your Alignment is ready",
-      "text": "For your shared Alignment view, Cofoundery only checks whether both of you have provided the required personal details.",
+      "text": "For your shared Alignment view, Made2Found only checks whether both of you have provided the required personal details.",
       "statusPrefix": "Status:",
       "reportReady": "Alignment ready",
       "readyForReport": "Shared view ready",

@@ -9,12 +9,12 @@ type EventLandingFormProps = {
 export function EventLandingForm({ event, errorMessage, action }: EventLandingFormProps) {
   return (
     <section className="rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)] sm:p-8">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Cofoundery Event</p>
+      <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Made2Found Event</p>
       <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
         {event.name}
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700 sm:text-[15px]">
-        Mach den kurzen Cofoundery Event-Check und vergleiche dich danach per QR-Code mit anderen Teilnehmenden.
+        Mach den kurzen Made2Found Event-Check und vergleiche dich danach per QR-Code mit anderen Teilnehmenden.
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">

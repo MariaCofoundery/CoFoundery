@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from "@/features/brand";
 /**
  * Die Einladung an eine Person, von einem angemeldeten Advisor.
  *
@@ -34,7 +35,7 @@ function escapeHtml(value: string) {
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
-  const fromName = process.env.RESEND_FROM_NAME?.trim() || "Cofoundery";
+  const fromName = process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME;
   return `${fromName} <${fromEmail}>`;
 }
 
@@ -50,11 +51,11 @@ export async function sendAdvisorPersonInviteEmail(
   if (!apiKey) return { ok: false, error: "missing_resend_api_key" };
   if (!from) return { ok: false, error: "missing_resend_from_email" };
 
-  const subject = "Jemand möchte dich bei CoFoundery begleiten";
+  const subject = "Jemand möchte dich bei Made2Found begleiten";
   const note = params.note ? `<p>„${escapeHtml(params.note)}“</p>` : "";
   const html = [
     "<p>Hallo,</p>",
-    "<p>jemand bittet dich über CoFoundery um Zugang zu Teilen deines Founderprofils,",
+    "<p>jemand bittet dich über Made2Found um Zugang zu Teilen deines Founderprofils,",
     "um dich zu begleiten.</p>",
     note,
     `<p><a href="${escapeHtml(params.url)}">Anfrage ansehen</a></p>`,
@@ -75,7 +76,7 @@ export async function sendAdvisorPersonInviteEmail(
         subject,
         html,
         text:
-          "Jemand bittet dich über CoFoundery um Zugang zu Teilen deines Founderprofils.\n" +
+          "Jemand bittet dich über Made2Found um Zugang zu Teilen deines Founderprofils.\n" +
           (params.note ? `\n"${params.note}"\n` : "") +
           `\n${params.url}\n\n` +
           "Der Link öffnet nur die Anfrage. Du entscheidest danach selbst, welche Teile " +

@@ -6,7 +6,7 @@
       "steps": {
         "welcome": {
           "title": "Schön, dass du da bist.",
-          "hint": "Wir stellen dir gleich ein paar kurze Fragen. Danach weißt du, wo du bei CoFoundery zu Hause bist."
+          "hint": "Wir stellen dir gleich ein paar kurze Fragen. Danach weißt du, wo du bei Made2Found zu Hause bist."
         },
         "name": {
           "title": "Wie sollen wir dich nennen?",
@@ -43,7 +43,7 @@
       "startButton": "Profil starten",
       "skipImageButton": "Ohne Bild weitermachen",
       "backButton": "Zurück",
-      "nonDiagnosticHint": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft dir, Zusammenarbeit früh klarer und belastbarer zu machen.",
+      "nonDiagnosticHint": "Made2Found ist kein Persönlichkeitstest. Es hilft dir, Zusammenarbeit früh klarer und belastbarer zu machen.",
       "stepsLeft": "{count, plural, =0 {Letzter Schritt} =1 {Noch ein Schritt} other {Noch # Schritte}}",
       "plans": {
         "founder": {
@@ -84,7 +84,7 @@
       "startConnectButton": "Weiter zu Connect",
       "planChangeableConnect": "Und wenn du später doch gründen willst, schalten wir dir Align und Find frei – schreib uns einfach.",
       "areasLaterConnect": "Align und Find stehen dir offen, sobald du willst – melde dich kurz bei uns, dann schalten wir sie frei.",
-      "nonDiagnosticHintAdvisor": "CoFoundery Align ist kein Persönlichkeitstest. Es hilft den Teams, die du begleitest, ihre Zusammenarbeit früh klarer und belastbarer zu machen."
+      "nonDiagnosticHintAdvisor": "Made2Found ist kein Persönlichkeitstest. Es hilft den Teams, die du begleitest, ihre Zusammenarbeit früh klarer und belastbarer zu machen."
     },
     "avatar": {
       "title": "Avatar",
@@ -104,8 +104,8 @@
       "focusOtherPlaceholder": "Optional genauer beschreiben",
       "rolesLegend": "Deine Rollen",
       "rolesHelp": "Die Kernrolle für dein Onboarding ist bereits gesetzt. Hier kannst du zusätzlich weitere Modi aktivieren.",
-      "advisorRoleHelp": "Nutze CoFoundery auch, um Founder-Teams als Advisor zu begleiten.",
-      "founderRoleHelp": "Nutze CoFoundery für dein eigenes Founder-Profil, Matching und Alignment."
+      "advisorRoleHelp": "Nutze Made2Found auch, um Founder-Teams als Advisor zu begleiten.",
+      "founderRoleHelp": "Nutze Made2Found für dein eigenes Founder-Profil, Matching und Alignment."
     },
     "roles": {
       "founder": "Founder",

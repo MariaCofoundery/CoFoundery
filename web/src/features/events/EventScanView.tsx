@@ -12,7 +12,7 @@ export function EventScanView({ event, participantName, backToCardHref }: EventS
   return (
     <section className="rounded-[28px] border border-slate-200/80 bg-white/96 p-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)] sm:p-8">
       <div className="max-w-3xl">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Cofoundery Event Scanner</p>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Made2Found Event Scanner</p>
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
           QR-Code scannen
         </h1>

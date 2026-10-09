@@ -77,7 +77,7 @@
       "compare": "You can then compare your perspectives together.",
       "noRightAnswers": "There are no right answers.",
       "sharedReveal": "Your answers in this round are intended for the shared reveal with your co-founder.",
-      "isolated": "Private answers from Founder Alignment, Commitment Lab, or other CoFoundery areas are not used.",
+      "isolated": "Private answers from Founder Alignment, Commitment Lab, or other Made2Found areas are not used.",
       "declinePurge": "If {name} does not join this time, the round ends and the answers from this attempt are deleted."
     },
     "start": "Start round",

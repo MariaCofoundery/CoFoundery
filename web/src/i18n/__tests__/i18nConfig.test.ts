@@ -37,7 +37,7 @@ test("loads English discovery messages", () => {
     profile?: { assessment?: { title?: string } };
   };
   assert.equal(discovery.index?.title, "Find a co-founder");
-  assert.equal(discovery.profile?.assessment?.title, "Include Cofoundery Check");
+  assert.equal(discovery.profile?.assessment?.title, "Include Made2Found Check");
 });
 
 test("loads English auth, dashboard, workspace, workbook and report messages", () => {

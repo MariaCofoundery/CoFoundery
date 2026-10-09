@@ -3,7 +3,7 @@
   "title": "Über dich",
   "identity": {
     "title": "Du & dein Hintergrund",
-    "text": "Diese Angaben gelten überall in CoFoundery – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
+    "text": "Diese Angaben gelten überall in Made2Found – im Founder-Profil, in der Co-Founder-Suche und in Connect. Du pflegst sie nur noch hier.",
     "name": "Name",
     "headline": "Headline",
     "headlineHint": "Ein Satz, der sagt, was du tust.",
@@ -37,7 +37,7 @@
       "discovery": "Zurück zum Suchprofil"
     },
     "photoVisibleLabel": "Mein Bild für eingeloggte Mitglieder sichtbar machen",
-    "photoVisibleHint": "Dann erscheint dein CoFoundery-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort entscheidest du getrennt, ob dein Foto erscheint – Connect bekommt dann eine eigene Kopie.",
+    "photoVisibleHint": "Dann erscheint dein Made2Found-Profilbild überall dort, wo Mitglieder dich sehen – in der Co-Founder-Suche, bei Verbindungen und in Teams. Ohne Häkchen siehst nur du es. Für Connect gilt das nicht: Dort entscheidest du getrennt, ob dein Foto erscheint – Connect bekommt dann eine eigene Kopie.",
     "linkedin": {
       "title": "LinkedIn",
       "urlLabel": "Dein LinkedIn-Profil",
@@ -55,11 +55,11 @@
           "hint": "Nur wer eine Kontaktanfrage mit dir angenommen hat – also jemand, mit dem du ohnehin schon im Gespräch bist."
         },
         "members": {
-          "label": "Alle bei CoFoundery Angemeldeten",
+          "label": "Alle bei Made2Found Angemeldeten",
           "hint": "Jede Person, die hier ein Konto hat und eingeloggt ist. Nicht im offenen Netz, aber auch nicht nur dein engster Kreis."
         },
         "public": {
-          "label": "Auch außerhalb von CoFoundery",
+          "label": "Auch außerhalb von Made2Found",
           "hint": "Auf deiner öffentlichen Netzwerkseite, die man ohne Konto aufrufen kann."
         }
       },

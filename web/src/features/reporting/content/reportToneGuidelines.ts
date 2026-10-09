@@ -2,7 +2,7 @@ export const REPORT_TONE_GUIDELINES = [
   {
     key: "no_diagnostic_language",
     rule: "Avoid diagnostic or clinical language.",
-    rationale: "Cofoundery reports describe collaboration patterns, not psychological conditions.",
+    rationale: "Made2Found reports describe collaboration patterns, not psychological conditions.",
   },
   {
     key: "no_hard_fit_claims",

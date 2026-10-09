@@ -3,7 +3,7 @@
   "title": "About you",
   "identity": {
     "title": "You & your background",
-    "text": "These details apply everywhere in CoFoundery – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
+    "text": "These details apply everywhere in Made2Found – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
     "name": "Name",
     "headline": "Headline",
     "headlineHint": "One sentence saying what you do.",
@@ -37,7 +37,7 @@
       "discovery": "Back to the search profile"
     },
     "photoVisibleLabel": "Make my photo visible to signed-in members",
-    "photoVisibleHint": "Your CoFoundery profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: there you decide separately whether your photo appears – Connect then gets its own copy.",
+    "photoVisibleHint": "Your Made2Found profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: there you decide separately whether your photo appears – Connect then gets its own copy.",
     "linkedin": {
       "title": "LinkedIn",
       "urlLabel": "Your LinkedIn profile",
@@ -55,11 +55,11 @@
           "hint": "Only those who accepted a contact request with you – people you are already talking to anyway."
         },
         "members": {
-          "label": "Everyone signed in to CoFoundery",
+          "label": "Everyone signed in to Made2Found",
           "hint": "Anyone with an account here who is logged in. Not out on the open web, but not just your closest circle either."
         },
         "public": {
-          "label": "Outside CoFoundery too",
+          "label": "Outside Made2Found too",
           "hint": "On your public network page, which anyone can open without an account."
         }
       },

@@ -1,4 +1,5 @@
 import type { AppLocale } from "@/i18n/config";
+import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 type TeamContext = "pre_founder" | "existing_team";
 type ReportScope = "basis" | "basis_plus_values";
@@ -27,8 +28,13 @@ type FounderInTheWildHandoffCopyInput = {
   founderName: string | null;
 };
 
-export function getEmailPrivacyUrl(locale: AppLocale) {
-  return locale === "en" ? "https://cofoundery.de/datenschutz" : "https://cofoundery.de/datenschutz";
+export function getEmailPrivacyUrl(_locale: AppLocale) {
+  return toPublicAppUrl("/datenschutz");
+}
+
+/** Existing public asset; replace after an approved Made2Found logo is supplied. */
+export function getEmailLogoUrl() {
+  return toPublicAppUrl("/cofoundery-align-logo.svg");
 }
 
 export function getReadMyMindStartedEmailCopy(
@@ -122,17 +128,17 @@ export function getCoFounderInviteEmailCopy(
     return {
       htmlLang: "en",
       subject: inviterName
-        ? `${inviterName} invited you to Cofoundery Align`
-        : "You’ve been invited to Cofoundery Align",
+        ? `${inviterName} invited you to Made2Found`
+        : "You’ve been invited to Made2Found",
       preheader:
-        "Personal invitation to Cofoundery Align: shared report and Founder Setup for your collaboration.",
+        "Personal invitation to Made2Found: shared report and Founder Setup for your collaboration.",
       eyebrow: "Personal invitation",
       greeting: "Hi,",
       inviterLine: inviterName
-        ? `${inviterName} would like to explore your co-founder dynamics with you in Cofoundery Align.`
-        : "You’ve been invited to explore your co-founder dynamics together in Cofoundery Align.",
+        ? `${inviterName} would like to explore your co-founder dynamics with you in Made2Found.`
+        : "You’ve been invited to explore your co-founder dynamics together in Made2Found.",
       productIntro:
-        "Cofoundery Align helps founder teams see collaboration more clearly early on, understand differences better, and discuss important topics with more structure.",
+        "Made2Found helps founder teams see collaboration more clearly early on, understand differences better, and discuss important topics with more structure.",
       listTitle: "What to expect",
       bullets: [
         "a structured matching report about collaboration, roles, and decision logic",
@@ -147,7 +153,7 @@ export function getCoFounderInviteEmailCopy(
       fallback:
         "If the button does not work, you can also open this link directly:",
       footerReason:
-        "You are receiving this email because you were personally invited to a shared Cofoundery Align process.",
+        "You are receiving this email because you were personally invited to a shared Made2Found process.",
       footerIgnore:
         "If you do not want to participate or the invitation is not relevant to you, you can simply ignore this email.",
       privacy: "Privacy policy",
@@ -157,17 +163,17 @@ export function getCoFounderInviteEmailCopy(
   return {
     htmlLang: "de",
     subject: inviterName
-      ? `${inviterName} lädt dich zu eurem Cofoundery Align ein`
-      : "Einladung zu eurem Cofoundery Align",
+      ? `${inviterName} lädt dich zu Made2Found ein`
+      : "Einladung zu Made2Found",
     preheader:
-      "Persönliche Einladung zu Cofoundery Align: gemeinsamer Report und Founder Setup für eure Zusammenarbeit.",
+      "Persönliche Einladung zu Made2Found: gemeinsamer Report und Founder Setup für eure Zusammenarbeit.",
     eyebrow: "Persönliche Einladung",
     greeting: "Hi,",
     inviterLine: inviterName
-      ? `${inviterName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Cofoundery Align anschauen.`
-      : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Cofoundery Align anzuschauen.",
+      ? `${inviterName} möchte gemeinsam mit dir eure Co-Founder-Dynamik in Made2Found anschauen.`
+      : "Du wurdest eingeladen, gemeinsam eure Co-Founder-Dynamik in Made2Found anzuschauen.",
     productIntro:
-      "Cofoundery Align hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.",
+      "Made2Found hilft Founder-Teams dabei, Zusammenarbeit früh klarer zu sehen, Unterschiede besser einzuordnen und wichtige Themen bewusst zu besprechen.",
     listTitle: "Was euch erwartet",
     bullets: [
       "ein strukturierter Matching-Report zu Zusammenarbeit, Rollen und Entscheidungslogik",
@@ -183,7 +189,7 @@ export function getCoFounderInviteEmailCopy(
     fallback:
       "Falls der Button nicht funktioniert, kannst du auch direkt diesen Link öffnen:",
     footerReason:
-      "Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Cofoundery-Align-Prozess eingeladen wurdest.",
+      "Du erhältst diese E-Mail, weil du persönlich zu einem gemeinsamen Made2Found-Prozess eingeladen wurdest.",
     footerIgnore:
       "Wenn du nicht teilnehmen möchtest oder die Einladung für dich nicht relevant ist, kannst du diese E-Mail einfach ignorieren.",
     privacy: "Datenschutzerklärung",
@@ -223,9 +229,9 @@ export function getAdvisorInviteEmailCopy(
       preheader: `Advisor invitation for the founder connection between ${input.founderAName} and ${input.founderBName}.`,
       eyebrow: "Personal advisor invitation",
       greeting: advisorGreeting,
-      founderLine: `${input.founderAName} and ${input.founderBName} invited you as an advisor for their founder connection in Cofoundery.`,
+      founderLine: `${input.founderAName} and ${input.founderBName} invited you as an advisor for their founder connection in Made2Found.`,
       productIntro:
-        "Cofoundery Align helps founder teams make differences visible early, understand tension better, and structure important conversations.",
+        "Made2Found helps founder teams make differences visible early, understand tension better, and structure important conversations.",
       accessIntro:
         "Once you accept, you can access the advisor and alignment areas intended for this connection. Founder Setup requires a separate approval from every current founder.",
       listTitle: "What you can see",
@@ -250,9 +256,9 @@ export function getAdvisorInviteEmailCopy(
     preheader: `Advisor-Einladung für die Founder-Verbindung von ${input.founderAName} und ${input.founderBName}.`,
     eyebrow: "Persönliche Advisor-Einladung",
     greeting: advisorGreeting,
-    founderLine: `${input.founderAName} und ${input.founderBName} haben Sie als Advisor für ihre Founder-Verbindung in Cofoundery eingeladen.`,
+    founderLine: `${input.founderAName} und ${input.founderBName} haben Sie als Advisor für ihre Founder-Verbindung in Made2Found eingeladen.`,
     productIntro:
-      "Cofoundery Align hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.",
+      "Made2Found hilft Founder-Teams dabei, Unterschiede früh sichtbar zu machen, Spannungen besser einzuordnen und wichtige Gespräche strukturierter zu führen.",
     accessIntro:
       "Nach der Annahme erhalten Sie Zugriff auf die dafür vorgesehenen Advisor- und Alignment-Bereiche dieser Verbindung. Founder Setup wird nur separat und mit Zustimmung aller aktuellen Founder freigegeben.",
     listTitle: "Was Sie sehen können",
@@ -293,15 +299,15 @@ export function getAdvisorTeamFounderInviteEmailCopy(
     return {
       htmlLang: "en",
       subject: advisorName
-        ? `${advisorName} invited you to Cofoundery`
-        : "Your invitation to Cofoundery",
+        ? `${advisorName} invited you to Made2Found`
+        : "Your invitation to Made2Found",
       preheader:
-        "Invitation to a shared founder connection in Cofoundery.",
+        "Invitation to a shared founder connection in Made2Found.",
       eyebrow: "Founder invitation",
       greeting: "Hi,",
       advisorLine: advisorName
-        ? `${advisorName} would like to support both of you as founders in Cofoundery.`
-        : "An advisor invited both of you to a shared founder connection in Cofoundery.",
+        ? `${advisorName} would like to support both of you as founders in Made2Found.`
+        : "An advisor invited both of you to a shared founder connection in Made2Found.",
       counterpartLine: counterpartLabel
         ? `Once ${counterpartLabel} has also accepted, the founder connection and advisor access for its designated areas will be activated.`
         : "Once the second founder has also accepted, the founder connection and advisor access for its designated areas will be activated.",
@@ -329,15 +335,15 @@ export function getAdvisorTeamFounderInviteEmailCopy(
   return {
     htmlLang: "de",
       subject: advisorName
-      ? `${advisorName} lädt dich zu CoFoundery ein`
-      : "Deine Einladung zu CoFoundery",
+      ? `${advisorName} lädt dich zu Made2Found ein`
+      : "Deine Einladung zu Made2Found",
     preheader:
-      "Einladung zu einer gemeinsamen Founder-Verbindung in CoFoundery.",
+      "Einladung zu einer gemeinsamen Founder-Verbindung in Made2Found.",
     eyebrow: "Founder-Einladung",
     greeting: "Hi,",
     advisorLine: advisorName
-      ? `${advisorName} möchte euch als Founder in CoFoundery begleiten.`
-      : "Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung in CoFoundery eingeladen.",
+      ? `${advisorName} möchte euch als Founder in Made2Found begleiten.`
+      : "Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung in Made2Found eingeladen.",
     counterpartLine: counterpartLabel
       ? `Sobald auch ${counterpartLabel} angenommen hat, werden eure Founder-Verbindung und der Advisor-Zugang für die vorgesehenen Bereiche aktiviert.`
       : "Sobald auch die zweite Founder-Person angenommen hat, werden eure Founder-Verbindung und der Advisor-Zugang für die vorgesehenen Bereiche aktiviert.",
@@ -388,7 +394,7 @@ export type NetworkNotificationCopyKind =
  * sonst im falschen Bereich.
  */
 function notificationArea(kind: NetworkNotificationCopyKind) {
-  return kind.startsWith("discovery_intro") ? "CoFoundery Find" : "CoFoundery Connect";
+  return kind.startsWith("discovery_intro") ? "Made2Found Find" : "Made2Found Connect";
 }
 
 /**
@@ -430,7 +436,7 @@ export function getNetworkNotificationEmailCopy(
       message: {
         subject: `New message from ${name}`,
         headline: "A new message",
-        intro: `${name} has written to you on CoFoundery.`,
+        intro: `${name} has written to you on Made2Found.`,
         cta: "Open the conversation",
       },
       discovery_intro_request: {
@@ -449,7 +455,7 @@ export function getNetworkNotificationEmailCopy(
         subject: count === 1 ? "One suggestion for you" : `${count} suggestions for you`,
         headline: count === 1 ? "One suggestion for you" : "New suggestions for you",
         // KEIN NAME, KEIN TITEL. Wer oder was vorgeschlagen wurde, steht in
-        // CoFoundery - nicht in einem Postfach, dessen Weg wir nicht kennen.
+        // Made2Found - nicht in einem Postfach, dessen Weg wir nicht kennen.
         intro:
           count === 1
             ? "Something in Connect overlaps with what you wrote about yourself. Every suggestion shows you the word that triggered it."
@@ -501,7 +507,7 @@ export function getNetworkNotificationEmailCopy(
     message: {
       subject: `Neue Nachricht von ${name}`,
       headline: "Eine neue Nachricht",
-      intro: `${name} hat dir auf CoFoundery geschrieben.`,
+      intro: `${name} hat dir auf Made2Found geschrieben.`,
       cta: "Gespräch öffnen",
     },
     discovery_intro_request: {
@@ -520,7 +526,7 @@ export function getNetworkNotificationEmailCopy(
       subject: count === 1 ? "Ein Vorschlag für dich" : `${count} Vorschläge für dich`,
       headline: count === 1 ? "Ein Vorschlag für dich" : "Neue Vorschläge für dich",
       // KEIN NAME, KEIN TITEL. Wer oder was vorgeschlagen wurde, steht in
-      // CoFoundery - nicht in einem Postfach, dessen Weg wir nicht kennen.
+      // Made2Found - nicht in einem Postfach, dessen Weg wir nicht kennen.
       intro:
         count === 1
           ? "In Connect gibt es etwas, das sich mit deinen eigenen Angaben überschneidet. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat."
@@ -561,7 +567,7 @@ export function getSavedSearchEmailCopy(
   if (locale === "en") {
     return {
       htmlLang: "en",
-      eyebrow: "CoFoundery Connect",
+      eyebrow: "Made2Found Connect",
       subject:
         input.subjectKind === "problem"
           ? "A new problem matches your search"
@@ -584,7 +590,7 @@ export function getSavedSearchEmailCopy(
 
   return {
     htmlLang: "de",
-    eyebrow: "CoFoundery Connect",
+    eyebrow: "Made2Found Connect",
     subject:
       input.subjectKind === "problem"
         ? "Ein neues Problem passt zu deiner Suche"
@@ -618,7 +624,7 @@ export function getDiscoverySavedSearchEmailCopy(
   if (locale === "en") {
     return {
       htmlLang: "en",
-      eyebrow: "CoFoundery Discovery",
+      eyebrow: "Made2Found Discovery",
       subject: "A new profile matches your search",
       headline: "A new profile matches your search",
       intro: `${input.displayName} – ${input.headline}`,
@@ -636,7 +642,7 @@ export function getDiscoverySavedSearchEmailCopy(
 
   return {
     htmlLang: "de",
-    eyebrow: "CoFoundery Discovery",
+    eyebrow: "Made2Found Discovery",
     subject: "Ein neues Profil passt zu deiner Suche",
     headline: "Ein neues Profil passt zu deiner Suche",
     intro: `${input.displayName} – ${input.headline}`,

@@ -147,7 +147,7 @@
   "visibility": {
     "profileTitle": "Sichtbarkeit des Connect-Profils",
     "listingTitle": "Sichtbarkeit dieses Eintrags",
-    "membersOnly": "Nur für CoFoundery-Mitglieder",
+    "membersOnly": "Nur für Made2Found-Mitglieder",
     "public": "Öffentlich (derzeit nicht verfügbar)",
     "profilePublicHint": "Dein veröffentlichtes Connect-Profil kann ohne Login aufgerufen und von Suchmaschinen gefunden werden.",
     "listingPublicHint": "Dieser Eintrag kann ohne Login aufgerufen und über Suchmaschinen gefunden werden.",
@@ -173,7 +173,7 @@
     "title": "Eintrag bearbeiten"
   },
   "cofounder": {
-    "eyebrow": "Spezialisierter CoFoundery-Flow",
+    "eyebrow": "Spezialisierter Made2Found-Flow",
     "title": "Co-Founder-Suche",
     "text": "Für die Co-Founder-Suche gibt es einen eigenen Bereich. Dort kannst du neben Erfahrung und Rahmenbedingungen auch Erwartungen an die Zusammenarbeit berücksichtigen.",
     "cta": "Co-Founder-Suche einrichten oder ansehen",
@@ -192,10 +192,10 @@
     "region": "Region",
     "publicListings": "Öffentliche Einträge",
     "viewProfile": "Öffentliches Profil ansehen",
-    "aboutTitle": "CoFoundery Connect",
-    "aboutText": "Im CoFoundery Connect werden konkrete Gesuche und Angebote rund um Startups und Unternehmertum sichtbar. Kontaktanfragen bleiben an einen Eintrag und einen geschützten CoFoundery-Zugang gebunden.",
+    "aboutTitle": "Made2Found Connect",
+    "aboutText": "Im Made2Found Connect werden konkrete Gesuche und Angebote rund um Startups und Unternehmertum sichtbar. Kontaktanfragen bleiben an einen Eintrag und einen geschützten Made2Found-Zugang gebunden.",
     "joinConnect": "Connect-Zugang anfragen",
-    "contactRequiresAccess": "Um Kontakt aufzunehmen, brauchst du einen CoFoundery-Zugang. Neue Zugänge folgen weiterhin dem kontrollierten Beta-Vertrag.",
+    "contactRequiresAccess": "Um Kontakt aufzunehmen, brauchst du einen Made2Found-Zugang. Neue Zugänge folgen weiterhin dem kontrollierten Beta-Vertrag.",
     "login": "Einloggen",
     "requestAccess": "Zugang anfragen",
     "ownListing": "Das ist dein eigener Eintrag."
@@ -317,7 +317,7 @@
     "publish": "Connect-Profil veröffentlichen",
     "photo": {
       "title": "Profilbild",
-      "helper": "Dein Profilbild erscheint innerhalb von CoFoundery bei deinem Connect-Profil und deinen Connect-Einträgen.",
+      "helper": "Dein Profilbild erscheint innerhalb von Made2Found bei deinem Connect-Profil und deinen Connect-Einträgen.",
       "fallbackName": "Connect-Mitglied",
       "keep": "Aktuelles Connect-Bild beibehalten",
       "existing": "Mein vorhandenes Profilfoto verwenden",
@@ -415,7 +415,7 @@
     "venture_audience": "Sag mit mindestens 20 Zeichen, für wen das ist.",
     "venture_logo": "Das Logo konnte nicht gespeichert werden. JPG, PNG oder WebP, maximal 2 MB.",
     "venture_limit": "Fünf Einträge sind das Maximum.",
-    "venture_website": "Diese Adresse können wir nicht öffnen. Sie muss eine Webadresse sein, zum Beispiel cofoundery.de – und sie muss über https erreichbar sein. Gespeichert haben wir sie deshalb nicht.",
+    "venture_website": "Diese Adresse können wir nicht öffnen. Sie muss eine Webadresse sein, zum Beispiel made2found.de – und sie muss über https erreichbar sein. Gespeichert haben wir sie deshalb nicht.",
     "publish_title": "Für die Veröffentlichung fehlt ein Titel mit mindestens 5 Zeichen.",
     "publish_summary": "Für die Veröffentlichung fehlt eine Beschreibung mit mindestens 20 Zeichen.",
     "publish_profile": "Veröffentliche zuerst dein vollständiges CONNECT-Profil. Dein Beitrag bleibt als Entwurf erhalten.",
@@ -646,7 +646,7 @@
     "motivationPlaceholder": "z. B. Ich habe selbst erlebt, wie viel gute Arbeit unsichtbar bleibt, nur weil niemand Zeit hat, sie zu zeigen.",
     "motivationHint": "Freiwillig – und oft der Teil, der hängen bleibt. Über Werte redet man sonst erst im dritten Gespräch.",
     "website": "Webseite",
-    "websitePlaceholder": "cofoundery.de",
+    "websitePlaceholder": "made2found.de",
     "websiteHint": "Die Adresse eurer Webseite. Du kannst sie aus der Adresszeile kopieren – „https://“ ergänzen wir. Links öffnen immer ein neues Fenster.",
     "logo": "Logo",
     "logoHint": "Freiwillig, maximal 2 MB. JPG, PNG oder WebP.",

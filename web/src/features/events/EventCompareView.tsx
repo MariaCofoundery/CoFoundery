@@ -377,7 +377,7 @@ export function EventCompareView({ event, result, backToCardHref, scanHref }: Ev
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Naechster Schritt</p>
           <h2 className="mt-2 text-lg font-semibold text-slate-950">Wollt ihr tiefer einsteigen?</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Der Event-Check zeigt euch erste Dynamiken. Im vollstaendigen Cofoundery-Matching geht ihr genauer rein:
+            Der Event-Check zeigt euch erste Dynamiken. Im vollstaendigen Made2Found-Matching geht ihr genauer rein:
             Persoenlichkeit, Werte, Zusammenarbeit und gemeinsamer Report.
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">

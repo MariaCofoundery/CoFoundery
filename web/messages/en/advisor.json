@@ -333,7 +333,7 @@
     },
     "note": {
       "title": "Your notes",
-      "privacy": "These notes are yours. The founders don't see them, and nobody else at CoFoundery can read them. They stay with you even if access to this team ends – and they disappear if the team deletes their account.",
+      "privacy": "These notes are yours. The founders don't see them, and nobody else at Made2Found can read them. They stay with you even if access to this team ends – and they disappear if the team deletes their account.",
       "label": "Note",
       "placeholder": "What struck you, what do you want to raise next time, what can't you say yet?",
       "save": "Save note",

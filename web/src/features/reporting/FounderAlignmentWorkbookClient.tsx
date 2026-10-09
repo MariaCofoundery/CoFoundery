@@ -3312,7 +3312,7 @@ export function FounderAlignmentWorkbookClient({
                   aria-label={wt("client.logoLabel")}
                 />
                 <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                  CoFoundery Align
+                  Made2Found
                 </p>
                 <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.035em] text-slate-950">
                   {wt("client.summaryTitle")}

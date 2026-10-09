@@ -25,11 +25,11 @@ export default async function InformierteEntscheidungenPage() {
             <object
               data="/cofoundery-align-logo.svg"
               type="image/svg+xml"
-              aria-label="CoFoundery Align Logo"
+              aria-label="Made2Found Logo"
               className="h-10 w-auto max-w-[190px]"
             >
               <span className="font-[var(--font-display)] text-sm tracking-[0.08em] md:text-base">
-                CoFoundery Align
+                Made2Found
               </span>
             </object>
           </Link>

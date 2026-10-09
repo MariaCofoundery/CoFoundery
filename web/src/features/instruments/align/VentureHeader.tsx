@@ -67,7 +67,7 @@ export function VentureHeader({
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="z. B. CoFoundery oder Projekt X"
+              placeholder="z. B. Made2Found oder Projekt X"
               className="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-slate-500"
             />
           </label>

@@ -4,8 +4,43 @@ import { buildAdvisorInviteEmailPayload } from "@/lib/email/sendAdvisorInviteEma
 import { buildAdvisorTeamFounderInviteEmailPayload } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { buildCoFounderInviteEmailPayload } from "@/lib/email/sendCoFounderInviteEmail";
 import { buildReadMyMindStartedEmailPayload } from "@/lib/email/sendReadMyMindStartedEmail";
+import { getEmailLogoUrl, getEmailPrivacyUrl } from "@/features/email/emailMessages";
+import { getPublicAppOrigin, toPublicAppUrl } from "@/lib/publicAppOrigin";
 
 const INVITE_URL = "https://app.cofoundery.de/join?token=opaque-token-123";
+
+test("public mail links use Made2Found by default and respect configured and local origins", () => {
+  const keys = ["NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_APP_URL", "SITE_URL", "APP_URL"] as const;
+  const previous = keys.map((key) => process.env[key]);
+  try {
+    for (const key of keys) delete process.env[key];
+    assert.equal(getPublicAppOrigin("https://preview.example.invalid"), "https://made2found.de");
+    assert.equal(getPublicAppOrigin("http://localhost:3000"), "http://localhost:3000");
+    assert.equal(getEmailPrivacyUrl("de"), "https://made2found.de/datenschutz");
+    assert.equal(getEmailPrivacyUrl("en"), "https://made2found.de/datenschutz");
+    assert.equal(getEmailLogoUrl(), "https://made2found.de/cofoundery-align-logo.svg");
+    const payload = buildCoFounderInviteEmailPayload({
+      inviteeEmail: "founder@example.com",
+      inviteUrl: toPublicAppUrl("/join?token=test"),
+      inviterDisplayName: null,
+      reportScope: "basis",
+      teamContext: "pre_founder",
+    });
+    assert.match(payload.html, /href="https:\/\/made2found\.de\/join\?token=test"/);
+    assert.match(payload.html, /href="https:\/\/made2found\.de\/datenschutz"/);
+    assert.match(payload.html, /src="https:\/\/made2found\.de\/cofoundery-align-logo\.svg"/);
+
+    process.env.NEXT_PUBLIC_SITE_URL = "https://configured.example.invalid/some/path/";
+    assert.equal(getPublicAppOrigin(), "https://configured.example.invalid");
+    assert.equal(getEmailPrivacyUrl("de"), "https://configured.example.invalid/datenschutz");
+    assert.equal(getEmailLogoUrl(), "https://configured.example.invalid/cofoundery-align-logo.svg");
+  } finally {
+    keys.forEach((key, index) => {
+      if (previous[index] === undefined) delete process.env[key];
+      else process.env[key] = previous[index];
+    });
+  }
+});
 
 test("co-founder invite email defaults to German and keeps the invite URL", () => {
   const payload = buildCoFounderInviteEmailPayload({
@@ -16,10 +51,10 @@ test("co-founder invite email defaults to German and keeps the invite URL", () =
     teamContext: "pre_founder",
   });
 
-  assert.equal(payload.subject, "Mara lädt dich zu eurem Cofoundery Align ein");
+  assert.equal(payload.subject, "Mara lädt dich zu Made2Found ein");
   assert.match(payload.html, /<html lang="de">/);
   assert.match(payload.html, /Einladung öffnen/);
-  assert.match(payload.text, /Cofoundery Align hilft Founder-Teams/);
+  assert.match(payload.text, /Made2Found hilft Founder-Teams/);
   assert.match(payload.html, new RegExp(escapeRegExp(INVITE_URL)));
   assert.match(payload.text, new RegExp(escapeRegExp(INVITE_URL)));
 });
@@ -34,7 +69,7 @@ test("co-founder invite email renders English with locale en", () => {
     locale: "en",
   });
 
-  assert.equal(payload.subject, "Mara invited you to Cofoundery Align");
+  assert.equal(payload.subject, "Mara invited you to Made2Found");
   assert.match(payload.html, /<html lang="en">/);
   assert.match(payload.html, /Open invitation/);
   assert.match(payload.text, /co-founder dynamics/);
@@ -71,7 +106,7 @@ test("advisor team founder invite email renders English and preserves token URL"
     locale: "en",
   });
 
-  assert.equal(payload.subject, "Alex invited you to Cofoundery");
+  assert.equal(payload.subject, "Alex invited you to Made2Found");
   assert.match(payload.html, /<html lang="en">/);
   assert.match(payload.html, /View invitation/);
   assert.match(payload.text, /Once Noah has also accepted/);
@@ -89,7 +124,7 @@ test("invalid email locale falls back to German", () => {
     locale: "fr",
   });
 
-  assert.equal(payload.subject, "Deine Einladung zu CoFoundery");
+  assert.equal(payload.subject, "Deine Einladung zu Made2Found");
   assert.match(payload.html, /<html lang="de">/);
   assert.match(payload.text, /Ein Advisor hat euch zu einer gemeinsamen Founder-Verbindung/);
 });

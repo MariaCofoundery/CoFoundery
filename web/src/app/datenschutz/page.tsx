@@ -73,7 +73,7 @@ export default function DatenschutzPage() {
 
           <BulletSection number="2" title="Überblick über die Datenverarbeitung">
             <p>
-              Wir verarbeiten personenbezogene Daten, damit du CoFoundery Align nutzen kannst:
+              Wir verarbeiten personenbezogene Daten, damit du Made2Found nutzen kannst:
               für Login, Profil, Fragebögen, Auswertungen, Matching, gemeinsames Workbook und
               technische Produktanalyse.
             </p>

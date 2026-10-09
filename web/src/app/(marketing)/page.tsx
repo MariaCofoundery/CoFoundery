@@ -237,7 +237,7 @@ export default async function Page() {
 
         <footer className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--line)] py-8 text-sm text-[color:var(--muted)]">
           <div>
-            <p className="text-[color:var(--ink)]">© 2026 CoFoundery Align</p>
+            <p className="text-[color:var(--ink)]">© 2026 Made2Found</p>
             <p className="mt-1">{content.home.footerText}</p>
           </div>
           <p className="flex flex-wrap items-center gap-2">

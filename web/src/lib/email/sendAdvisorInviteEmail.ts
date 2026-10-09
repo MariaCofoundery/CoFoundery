@@ -1,3 +1,5 @@
+import { getEmailLogoUrl } from "@/features/email/emailMessages";
+import { PRODUCT_NAME } from "@/features/brand";
 import type { AppLocale } from "@/i18n/config";
 import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
 import {
@@ -34,7 +36,7 @@ function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
 
-  const fromName = process.env.RESEND_FROM_NAME?.trim() || "Cofoundery";
+  const fromName = process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME;
   return `${fromName} <${fromEmail}>`;
 }
 
@@ -67,8 +69,8 @@ function buildHtmlBody(params: SendAdvisorInviteEmailParams, locale: AppLocale) 
               <td style="padding:28px 32px 0;background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);">
                 <p style="margin:0;">
                   <img
-                    src="https://cofoundery.de/cofoundery-align-logo.svg"
-                    alt="Cofoundery Align"
+                    src="${escapeHtml(getEmailLogoUrl())}"
+                    alt="Made2Found"
                     width="176"
                     style="display:block;border:0;max-width:176px;height:auto;"
                   />

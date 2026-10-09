@@ -61,8 +61,8 @@ export const REPORT_GLOSSARY = [
   },
   {
     key: "cofoundery_check",
-    de: "Cofoundery Check",
-    en: "Cofoundery Check",
+    de: "Made2Found Check",
+    en: "Made2Found Check",
     notes: "Product term; do not describe as a psychometric diagnosis.",
   },
   {

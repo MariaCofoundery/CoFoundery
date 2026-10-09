@@ -147,7 +147,7 @@
   "visibility": {
     "profileTitle": "Connect profile visibility",
     "listingTitle": "Visibility of this listing",
-    "membersOnly": "CoFoundery members only",
+    "membersOnly": "Made2Found members only",
     "public": "Public (currently unavailable)",
     "profilePublicHint": "Your published Connect profile can be opened without signing in and found by search engines.",
     "listingPublicHint": "This listing can be opened without signing in and found through search engines.",
@@ -173,7 +173,7 @@
     "title": "Edit listing"
   },
   "cofounder": {
-    "eyebrow": "Dedicated CoFoundery workflow",
+    "eyebrow": "Dedicated Made2Found workflow",
     "title": "Co-Founder search",
     "text": "Co-Founder search has its own area. It lets you consider experience and practical constraints alongside expectations about working together.",
     "cta": "Set up or view Co-Founder search",
@@ -192,10 +192,10 @@
     "region": "Region",
     "publicListings": "Public listings",
     "viewProfile": "View public profile",
-    "aboutTitle": "CoFoundery Connect",
-    "aboutText": "CoFoundery Connect makes concrete needs and offers around startups and entrepreneurship visible. Contact requests remain tied to a listing and protected CoFoundery access.",
+    "aboutTitle": "Made2Found Connect",
+    "aboutText": "Made2Found Connect makes concrete needs and offers around startups and entrepreneurship visible. Contact requests remain tied to a listing and protected Made2Found access.",
     "joinConnect": "Request Connect access",
-    "contactRequiresAccess": "You need CoFoundery access to get in touch. New access continues to follow the controlled beta contract.",
+    "contactRequiresAccess": "You need Made2Found access to get in touch. New access continues to follow the controlled beta contract.",
     "login": "Log in",
     "requestAccess": "Request access",
     "ownListing": "This is your own listing."
@@ -317,7 +317,7 @@
     "publish": "Publish Connect profile",
     "photo": {
       "title": "Profile photo",
-      "helper": "Your profile photo appears inside CoFoundery on your Connect profile and Connect listings.",
+      "helper": "Your profile photo appears inside Made2Found on your Connect profile and Connect listings.",
       "fallbackName": "Connect member",
       "keep": "Keep current Connect photo",
       "existing": "Use my existing profile photo",
@@ -415,7 +415,7 @@
     "venture_audience": "Say in at least 20 characters who it is for.",
     "venture_logo": "The logo could not be saved. JPG, PNG or WebP, 2 MB maximum.",
     "venture_limit": "Five entries is the maximum.",
-    "venture_website": "We can't open that address. It needs to be a web address, for example cofoundery.com – and it has to be reachable over https. So we haven't saved it.",
+    "venture_website": "We can't open that address. It needs to be a web address, for example made2found.de – and it has to be reachable over https. So we haven't saved it.",
     "publish_title": "Publication needs a title with at least 5 characters.",
     "publish_summary": "Publication needs a description with at least 20 characters.",
     "publish_profile": "Publish your complete CONNECT profile first. Your contribution remains a draft.",
@@ -646,7 +646,7 @@
     "motivationPlaceholder": "e.g. I have seen how much good work stays invisible simply because nobody has time to show it.",
     "motivationHint": "Optional – and often the part that sticks. Values usually only come up in the third conversation.",
     "website": "Website",
-    "websitePlaceholder": "cofoundery.de",
+    "websitePlaceholder": "made2found.de",
     "websiteHint": "The address of your website. You can paste it from the address bar – we'll add the “https://”. Links always open a new window.",
     "logo": "Logo",
     "logoHint": "Optional, 2 MB maximum. JPG, PNG or WebP.",

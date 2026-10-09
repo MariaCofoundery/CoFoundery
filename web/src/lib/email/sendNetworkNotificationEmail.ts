@@ -1,3 +1,5 @@
+import { getEmailLogoUrl } from "@/features/email/emailMessages";
+import { PRODUCT_NAME } from "@/features/brand";
 import type { AppLocale } from "@/i18n/config";
 import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
 import {
@@ -12,7 +14,7 @@ import {
  * Bewusst knapp: Was passiert ist, wer es war, ein Knopf. Kein Inhalt der
  * Nachricht, kein Auszug aus der Anfrage - eine Mail landet in Postfaechern,
  * die wir nicht kennen, und in Vorschauen auf Sperrbildschirmen. Was jemand
- * geschrieben hat, steht in CoFoundery.
+ * geschrieben hat, steht in Made2Found.
  *
  * Hiess bis zum 20.09.2026 `sendConnectNotificationEmail`. Mit den
  * Vorstellungsanfragen aus Find bediente sie zwei Bereiche; die Datenbank
@@ -47,7 +49,7 @@ function escapeHtml(value: string) {
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
-  const fromName = process.env.RESEND_FROM_NAME?.trim() || "Cofoundery";
+  const fromName = process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME;
   return `${fromName} <${fromEmail}>`;
 }
 
@@ -67,7 +69,7 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:24px;overflow:hidden;">
-          <tr><td style="padding:28px 32px 0;"><img src="https://cofoundery.de/cofoundery-align-logo.svg" alt="Cofoundery Align" width="176" height="34" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
+          <tr><td style="padding:28px 32px 0;"><img src="${escapeHtml(getEmailLogoUrl())}" alt="Made2Found" width="176" height="34" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
           <tr><td style="padding:24px 32px 32px;">
             <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">${escapeHtml(copy.eyebrow)}</p>
             <h1 style="margin:0 0 18px;font-size:26px;line-height:32px;color:#0f172a;">${escapeHtml(copy.headline)}</h1>

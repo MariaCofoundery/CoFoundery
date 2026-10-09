@@ -1,6 +1,6 @@
+import { PRODUCT_NAME } from "@/features/brand";
 import "server-only";
 
-import { PRODUCT_NAME } from "@/features/brand";
 import { PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS, type SanitizedProductFeedbackSubmission } from "@/features/feedback/productFeedback";
 import feedbackCopy from "../../../messages/de/feedback.json";
 
@@ -53,7 +53,7 @@ export async function sendFeedbackNotification(params: Params): Promise<Result> 
       // Bound the best-effort attempt so an unavailable provider cannot stall the form.
       signal: AbortSignal.timeout(5000),
       body: JSON.stringify({
-        from: `${process.env.RESEND_FROM_NAME?.trim() || "Cofoundery"} <${fromEmail}>`,
+        from: `${process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME} <${fromEmail}>`,
         to: [recipient],
         reply_to: process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined,
         ...buildFeedbackNotificationPayload(params),

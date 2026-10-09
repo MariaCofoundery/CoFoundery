@@ -77,7 +77,7 @@
       "compare": "Danach könnt ihr eure Einschätzungen miteinander vergleichen.",
       "noRightAnswers": "Es gibt keine richtigen Antworten.",
       "sharedReveal": "Deine Antworten dieser Runde sind für den gemeinsamen Reveal mit deinem Co-Founder bestimmt.",
-      "isolated": "Private Antworten aus Founder Alignment, Commitment Lab oder anderen CoFoundery-Bereichen werden dafür nicht verwendet.",
+      "isolated": "Private Antworten aus Founder Alignment, Commitment Lab oder anderen Made2Found-Bereichen werden dafür nicht verwendet.",
       "declinePurge": "Wenn {name} diesmal nicht mitmacht, wird diese Runde beendet und die Antworten aus diesem Versuch werden gelöscht."
     },
     "start": "Runde starten",

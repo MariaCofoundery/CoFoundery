@@ -369,7 +369,7 @@
     "openItem": "Thema öffnen",
     "founderFallback": "Founder {index}",
     "summary": "{clarified} festgehalten · {discussing} in Klärung · {open} offen · {pending} Bestätigungen offen",
-    "legalGeneral": "CoFoundery hilft euch, Gesprächs- und Klärungspunkte zu strukturieren. Die konkrete rechtliche oder steuerliche Ausgestaltung kann professionelle Beratung erfordern.",
+    "legalGeneral": "Made2Found hilft euch, Gesprächs- und Klärungspunkte zu strukturieren. Die konkrete rechtliche oder steuerliche Ausgestaltung kann professionelle Beratung erfordern.",
     "legalSpecific": "Die konkrete rechtliche oder steuerliche Ausgestaltung dieses Themas kann professionelle Beratung erfordern.",
     "advisorAccess": {
       "title": "Founder Setup für Advisor freigeben",
@@ -619,7 +619,7 @@
     },
     "outcomeHelp": {
       "clarified": "Ihr wisst beide, was gilt – festgehalten ist es hier.",
-      "documented": "Es steht zusätzlich in einem Dokument außerhalb von CoFoundery, etwa im Vertrag.",
+      "documented": "Es steht zusätzlich in einem Dokument außerhalb von Made2Found, etwa im Vertrag.",
       "not_relevant": "Das Thema betrifft euch nicht. Ihr habt es bewusst zur Seite gelegt."
     },
     "legendTitle": "Was die Zeichen bedeuten",

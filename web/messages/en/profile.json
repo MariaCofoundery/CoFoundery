@@ -6,7 +6,7 @@
       "steps": {
         "welcome": {
           "title": "Good to have you here.",
-          "hint": "We'll ask you a few short questions. After that you'll know where you're at home in CoFoundery."
+          "hint": "We'll ask you a few short questions. After that you'll know where you're at home in Made2Found."
         },
         "name": {
           "title": "What should we call you?",
@@ -43,7 +43,7 @@
       "startButton": "Start profile",
       "skipImageButton": "Continue without image",
       "backButton": "Back",
-      "nonDiagnosticHint": "CoFoundery Align is not a personality test. It helps you make collaboration clearer and more resilient early.",
+      "nonDiagnosticHint": "Made2Found is not a personality test. It helps you make collaboration clearer and more resilient early.",
       "stepsLeft": "{count, plural, =0 {Last step} =1 {One more step} other {# more steps}}",
       "plans": {
         "founder": {
@@ -84,7 +84,7 @@
       "startConnectButton": "Continue to Connect",
       "planChangeableConnect": "And if you decide to found something later, we'll open up Align and Find – just drop us a line.",
       "areasLaterConnect": "Align and Find are open to you whenever you want – just get in touch and we'll unlock them.",
-      "nonDiagnosticHintAdvisor": "CoFoundery Align is not a personality test. It helps the teams you support make their collaboration clearer and more robust, early on."
+      "nonDiagnosticHintAdvisor": "Made2Found is not a personality test. It helps the teams you support make their collaboration clearer and more robust, early on."
     },
     "avatar": {
       "title": "Avatar",
@@ -104,8 +104,8 @@
       "focusOtherPlaceholder": "Optionally describe more specifically",
       "rolesLegend": "Your roles",
       "rolesHelp": "The core role for your onboarding is already set. Here you can activate additional modes.",
-      "advisorRoleHelp": "Use CoFoundery to support founder teams as an advisor as well.",
-      "founderRoleHelp": "Use CoFoundery for your own founder profile, matching, and alignment."
+      "advisorRoleHelp": "Use Made2Found to support founder teams as an advisor as well.",
+      "founderRoleHelp": "Use Made2Found for your own founder profile, matching, and alignment."
     },
     "roles": {
       "founder": "Founder",

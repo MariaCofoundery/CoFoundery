@@ -42,7 +42,7 @@ export function DebugConversationGuidePreview({
                 <object
                   data="/cofoundery-align-logo.svg"
                   type="image/svg+xml"
-                  aria-label="CoFoundery Align Logo"
+                  aria-label="Made2Found Logo"
                   className="h-10 w-auto max-w-[190px]"
                 />
                 <h1 className="mt-6 text-3xl font-semibold text-slate-950 md:text-4xl">

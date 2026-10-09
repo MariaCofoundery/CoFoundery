@@ -1,3 +1,5 @@
+import { getEmailLogoUrl } from "@/features/email/emailMessages";
+import { PRODUCT_NAME } from "@/features/brand";
 import type { AppLocale } from "@/i18n/config";
 import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
 import { getDiscoverySavedSearchEmailCopy, getEmailPrivacyUrl } from "@/features/email/emailMessages";
@@ -23,7 +25,7 @@ function escapeHtml(value: string) {
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
-  return `${process.env.RESEND_FROM_NAME?.trim() || "Cofoundery"} <${fromEmail}>`;
+  return `${process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME} <${fromEmail}>`;
 }
 
 function describeReasons(reasons: DiscoverySavedSearchReason[], locale: AppLocale) {
@@ -52,7 +54,7 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:24px;overflow:hidden;">
-          <tr><td style="padding:28px 32px 0;"><img src="https://cofoundery.de/cofoundery-align-logo.svg" alt="Cofoundery Align" width="176" height="34" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
+          <tr><td style="padding:28px 32px 0;"><img src="${escapeHtml(getEmailLogoUrl())}" alt="Made2Found" width="176" height="34" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
           <tr><td style="padding:24px 32px 32px;">
             <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">${escapeHtml(copy.eyebrow)}</p>
             <h1 style="margin:0 0 16px;font-size:24px;line-height:31px;color:#0f172a;">${escapeHtml(copy.headline)}</h1>

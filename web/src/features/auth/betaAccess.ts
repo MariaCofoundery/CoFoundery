@@ -13,9 +13,9 @@ function normalizeCode(value: string) {
 
 export function getBetaAccessRequestHref() {
   const subject = encodeURIComponent("Beta-Zugang anfragen");
-  const body = encodeURIComponent(`Hallo Cofoundery-Team,
+  const body = encodeURIComponent(`Hallo Made2Found-Team,
 
-ich würde gerne Zugang zur Cofoundery-Beta anfragen.
+ich würde gerne Zugang zur Made2Found-Beta anfragen.
 
 Kurz zu mir / uns:
 [bitte ergänzen]

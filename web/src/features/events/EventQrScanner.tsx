@@ -74,7 +74,7 @@ function validateEventCompareQr(rawValue: string, eventSlug: string): ScanValida
 function rejectionMessage(reason: ScanRejectionReason) {
   switch (reason) {
     case "external":
-      return "Dieser QR-Code gehoert nicht zu Cofoundery Event Compare.";
+      return "Dieser QR-Code gehoert nicht zu Made2Found Event Compare.";
     case "wrong_event":
       return "Dieser QR-Code gehoert zu einem anderen Event.";
     default:

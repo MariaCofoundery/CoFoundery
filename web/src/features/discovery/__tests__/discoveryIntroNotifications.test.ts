@@ -95,14 +95,14 @@ test("die Mail nennt Find und nicht Connect", () => {
       kind: "discovery_intro_request",
       senderName: "Mara",
     });
-    assert.equal(intro.eyebrow, "CoFoundery Find");
+    assert.equal(intro.eyebrow, "Made2Found Find");
     assert.match(intro.subject, /Mara/);
 
     const contact = getNetworkNotificationEmailCopy(locale, {
       kind: "contact_request",
       senderName: "Mara",
     });
-    assert.equal(contact.eyebrow, "CoFoundery Connect", "Connect hat sich mitverschoben");
+    assert.equal(contact.eyebrow, "Made2Found Connect", "Connect hat sich mitverschoben");
   }
 });
 
