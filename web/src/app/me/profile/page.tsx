@@ -1,3 +1,4 @@
+import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -411,7 +412,7 @@ export default async function FounderProfilePage() {
           <>
             {workstyleV04 ? (
               <>
-                <IndividualWorkstyle profile={workstyleV04} />
+                <IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} />
                 <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
                   {t("currentWorkstyle.openReport")}
                 </Link>

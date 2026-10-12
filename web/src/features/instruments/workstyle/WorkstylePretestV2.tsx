@@ -1,10 +1,14 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
+
 import Link from "next/link";
+import { workstyleDisplayItem, workstyleDisplayOptions } from "./display";
+import type { AppLocale } from "@/i18n/config";
 import { useEffect, useRef, useState, useTransition } from "react";
 import consentV2 from "../../../../docs/founder-workstyle-research-consent-v2.json";
 import consentV3 from "../../../../docs/founder-workstyle-research-consent-v3.json";
-import { workstyleResponseOptions, workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
+import { workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { startWorkstylePretest, saveWorkstyleAnswer, saveWorkstyleFeedback, withdrawWorkstyleResearch, finishWorkstyleV2, setWorkstylePosition, saveWorkstyleV3 } from "@/features/instruments/workstyle/actions";
 import { WorkstyleFeedback } from "@/features/instruments/workstyle/WorkstylePretest";
 import type { PretestSession, ResearchAnswer, ResearchContext } from "@/features/instruments/workstyle/data";
@@ -20,24 +24,30 @@ const versionItems = { "8.5a-v2": workstyleSessionItems("8.5a-v2", null), "8.5a-
 export type WorkstyleCompletionContext = { teamId: string | null; partnerNames: string[] };
 
 export function WorkstyleProgress({ position, total, noun = "Frage", ariaLabel = "Fortschritt" }: { position: number; total: number; noun?: string; ariaLabel?: string }) {
-  const label = `${noun} ${position + 1} von ${total}`;
+  const t = useTranslations("workstyleFlow");
+
+  const label = t("value_value_of_value", { p0: noun === "Frage" ? t("question") : noun, p1: position + 1, p2: total });
   return (
     <div className="mb-6">
       <div className="mb-2 flex items-center justify-between text-sm text-slate-600">
         <span>{label}</span>
       </div>
       {/* Fortschritt ist Fortschritt, keine Bewertung: Markenfarben statt Ampel-Gruen. */}
-      <div role="progressbar" aria-label={ariaLabel} aria-valuemin={1} aria-valuemax={total} aria-valuenow={position + 1} aria-valuetext={label} className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+      <div role="progressbar" aria-label={ariaLabel === "Fortschritt" ? t("progress") : ariaLabel} aria-valuemin={1} aria-valuemax={total} aria-valuenow={position + 1} aria-valuetext={label} className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
         <div className="h-full rounded-full bg-gradient-to-r from-violet-600 to-cyan-400 transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${((position + 1) / total) * 100}%` }} />
       </div>
     </div>
   );
 }
 
-export function WorkstyleQuestion({ item, initial, pending, last, canGoBack, onSave, onBack }: {
+export function WorkstyleQuestion({ item: sourceItem, initial, pending, last, canGoBack, onSave, onBack }: {
   item: WorkstyleItem; initial?: ResearchAnswer; pending: boolean; last: boolean; canGoBack: boolean;
   onSave: (value: number | string, elapsed: number) => void; onBack: () => void;
 }) {
+  const t = useTranslations("workstyleFlow");
+
+  const locale = useLocale() as AppLocale;
+  const item = workstyleDisplayItem(sourceItem, locale);
   const [value, setValue] = useState<number | string | null>(initial?.missing_reason ?? initial?.response_option ?? initial?.response_value ?? null);
   const [started] = useState(() => Date.now());
   const card = useRef<HTMLDivElement>(null);
@@ -57,7 +67,7 @@ export function WorkstyleQuestion({ item, initial, pending, last, canGoBack, onS
     question.current?.focus({ preventScroll: true });
   }, []);
   // Visual separation only: concatenate these two substrings to recover the exact supplied prompt.
-  const split = Math.max(0, item.prompt.lastIndexOf("Wie "), item.prompt.lastIndexOf("Was "));
+  const split = Math.max(0, ...["Wie ", "Was ", "How ", "Which ", "What "].map(word => item.prompt.lastIndexOf(word)));
   return <div ref={card} className="scroll-mt-36 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.05)] sm:p-9">
     <form onSubmit={event => { event.preventDefault(); if (value !== null) onSave(value, Date.now() - started); }}>
       <fieldset disabled={pending}>
@@ -65,24 +75,23 @@ export function WorkstyleQuestion({ item, initial, pending, last, canGoBack, onS
           <span className="block text-lg leading-8 text-slate-600">{item.prompt.slice(0, split)}</span>
           <span className="mt-3 block text-2xl font-semibold leading-9 tracking-[-0.01em] text-slate-950">{item.prompt.slice(split)}</span>
         </legend>
-        {item.response_format === "comparative" && <div className="mb-6 grid gap-3" aria-label="Zwei Vorgehensweisen">
+        {item.response_format === "comparative" && <div className="mb-6 grid gap-3" aria-label={t("comparative_label")}>
           {item.alternatives?.map(alternative => <p key={alternative.option_id} className="flex gap-3 rounded-2xl bg-slate-50 p-4 leading-7 text-slate-800">
             <span aria-hidden="true" className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-violet-800 ring-1 ring-violet-200">{alternative.option_id}</span>
             <span><span className="sr-only">{alternative.option_id}: </span>{alternative.label}</span>
           </p>)}
         </div>}
         <div className="grid gap-2.5">
-          {workstyleResponseOptions(item).map(option => <label key={option.value} className={`flex min-h-14 cursor-pointer items-center gap-4 rounded-2xl border px-5 py-3.5 leading-6 transition ${value === option.value ? "border-violet-500 bg-violet-50/70 ring-1 ring-violet-200" : "border-slate-200 hover:border-slate-300"}`}>
+          {workstyleDisplayOptions(item, locale).map(option => <label key={option.value} className={`flex min-h-14 cursor-pointer items-center gap-4 rounded-2xl border px-5 py-3.5 leading-6 transition ${value === option.value ? "border-violet-500 bg-violet-50/70 ring-1 ring-violet-200" : "border-slate-200 hover:border-slate-300"}`}>
             <input type="radio" className="h-5 w-5 shrink-0 accent-violet-700" name={item.item_key} value={option.value} checked={value === option.value} onChange={() => setValue(option.value)} />{option.label}
           </label>)}
           <label className={`mt-2 flex min-h-14 cursor-pointer items-center gap-4 rounded-2xl border border-dashed px-5 py-3.5 leading-6 text-slate-700 transition ${value === "cannot_assess" ? "border-violet-400 bg-violet-50/50" : "border-slate-300 hover:border-slate-400"}`}>
-            <input type="radio" className="h-5 w-5 shrink-0 accent-violet-700" name={item.item_key} value="cannot_assess" checked={value === "cannot_assess"} onChange={() => setValue("cannot_assess")} />Kann ich noch nicht einschätzen
-          </label>
+            <input type="radio" className="h-5 w-5 shrink-0 accent-violet-700" name={item.item_key} value="cannot_assess" checked={value === "cannot_assess"} onChange={() => setValue("cannot_assess")} />{t("i_cannot_assess_this_yet")} </label>
         </div>
       </fieldset>
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {canGoBack ? <button type="button" className={secondary} disabled={pending} onClick={onBack}>Zurück</button> : <span />}
-        <button className={button} disabled={pending || value === null}>{pending ? "Wird gespeichert …" : last ? "Abschließen" : "Weiter"}</button>
+        {canGoBack ? <button type="button" className={secondary} disabled={pending} onClick={onBack}>{t("back")}</button> : <span />}
+        <button className={button} disabled={pending || value === null}>{pending ? t("saving") : last ? t("finish") : t("next")}</button>
       </div>
     </form>
   </div>;

@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayEntry, alignmentDisplayText } from "@/features/instruments/align/display";
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { MarkV21 } from "@/features/instruments/v21/MarkV21";
@@ -52,13 +54,15 @@ type Props = {
 };
 
 export async function ReportViewV21({
-  sections, orphans = [], marked = [], canMark = false, markScope, markVentureId,
+  sections: sourceSections, orphans = [], marked = [], canMark = false, markScope, markVentureId,
 }: Props) {
   // SERVERKOMPONENTE, und das bleibt sie. Alle sechs Stellen, die sie
   // benutzen, sind Seiten - das eigene Profil, die Advisor-Ansicht, der
   // Vergleich, die beiden Antwortenseiten und der Pilot. Damit kommen die
   // Texte aus derselben Quelle wie ueberall, und es gibt keine zweite
   // Uebersetzung fuer die Advisor-Ansicht.
+  const locale = await getRequestLocale();
+  const sections = sourceSections.map(group => ({...group, section: alignmentDisplayText(group.section, locale), entries: group.entries.map(entry => alignmentDisplayEntry(entry, locale))}));
   const t = await getTranslations("alignment.report");
   // Betraege und Daten tragen das Format der gelesenen Sprache, nicht
   // "de-DE". Ein Datum im deutschen Format in einer englischen Seite ist

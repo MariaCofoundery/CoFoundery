@@ -11,15 +11,16 @@ import { saveProductSnapshot } from "@/features/reporting/workstyle/actions";
 import { TeamWorkstyleReport } from "@/features/reporting/workstyle/TeamWorkstyleReport";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import type { ProductTeam } from "@/features/reporting/workstyle/model";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getRequestLocale as getLocale } from "@/i18n/getLocale";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 import { TeamReadinessPanel } from "@/features/reporting/workstyle/TeamReadinessPanel";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Euer Zusammenspiel",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  const t = await getTranslations("report.workstyle");
+  return { title: t("teamTitle"), robots: { index: false, follow: false } };
+}
 export default async function Page({
   params,
   searchParams,
@@ -103,17 +104,12 @@ export default async function Page({
     ) : null;
   const notes = (
     <>
-      {locale !== "de" && (
-        <p className="mt-3 text-sm text-slate-600" lang={locale}>
-          {t("germanOnly")}
-        </p>
-      )}
       {full && team !== "not_ready" && <p className="mt-3 text-sm text-slate-500">{t("fullVersionNote")}</p>}
       {query.error && <p role="alert">{t("snapshotError")}</p>}
       {snapshot && (
         <p className="mt-3 text-sm text-slate-500">
           {t("snapshotSaved", {
-            date: new Date(snapshot.generated_at).toLocaleString("de-DE"),
+            date: new Date(snapshot.generated_at).toLocaleString(locale === "en" ? "en-US" : "de-DE"),
           })}{" "}
           · {snapshot.schema_version}
         </p>
@@ -159,7 +155,7 @@ export default async function Page({
             </Link>
           </section>
         ) : (
-          <TeamWorkstyleReport team={team} canDiscuss={Boolean(membership)} full={full} />
+          <TeamWorkstyleReport locale={locale} team={team} canDiscuss={Boolean(membership)} full={full} />
         )}
       </div>
     </main>

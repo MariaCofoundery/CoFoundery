@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { redirect } from "next/navigation";
 import { NavV21 } from "@/features/instruments/v21/NavV21";
 import { ComparisonViewV21 } from "@/features/instruments/v21/ComparisonViewV21";
@@ -25,6 +27,9 @@ export default async function CompareV21Page({
 }: {
   params: Promise<{ partnerId: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
 
   const { partnerId } = await params;
   const { data: auth } = await getRequestUser();
@@ -80,11 +85,11 @@ export default async function CompareV21Page({
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
         <NavV21 current="/founder-alignment/pilot/report" />
-        <h1 className="text-2xl font-semibold text-slate-900">Nebeneinander</h1>
+        <h1 className="text-2xl font-semibold text-slate-900"> {copy("Nebeneinander")} </h1>
         <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
           {mine.rows.length === 0
-            ? "Du hast den Fragebogen noch nicht abgegeben."
-            : "Diese Person hat ihre Antworten noch nicht abgegeben oder nicht mit dir geteilt."}
+            ? copy("Du hast den Fragebogen noch nicht abgegeben.")
+            : copy("Diese Person hat ihre Antworten noch nicht abgegeben oder nicht mit dir geteilt.")}
         </p>
       </main>
     );
@@ -92,13 +97,13 @@ export default async function CompareV21Page({
 
   const comparison = buildComparisonV21(
     {
-      name: "Du",
+      name: copy("Du"),
       instrumentId: ALIGNMENT_V21_INSTRUMENT_ID,
       rows: mine.rows,
       notSharedItemIds: mine.notShared,
     },
     {
-      name: "Die andere Person",
+      name: copy("Die andere Person"),
       instrumentId: ALIGNMENT_V21_INSTRUMENT_ID,
       rows: theirs.rows,
       notSharedItemIds: theirs.notShared,
@@ -108,16 +113,17 @@ export default async function CompareV21Page({
   // NICHT „Du“. Die Kartenvorlagen stehen in der dritten Person („{a} sagt
   // {aAnswer}“); „Du“ ergaebe „Du sagt manchmal“. Die Tabelle darunter behaelt
   // ihre Spaltenkoepfe - dort ist „Du“ eine Beschriftung und kein Satz.
-  const eigenerName = await displayNameOf(auth.user.id, "Du");
+  const eigenerName = await displayNameOf(auth.user.id, copy("Du"));
 
   const cards = buildCardsV21({
+    locale,
     comparison: comparison.sections,
     markedItemIds: [
       ...mine.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
       ...theirs.rows.filter((row) => row.marked_for_discussion).map((row) => row.block_id),
     ],
     nameA: eigenerName,
-    nameB: "Die andere Person",
+    nameB: copy("Die andere Person"),
   });
 
   return (
@@ -125,14 +131,10 @@ export default async function CompareV21Page({
       <NavV21 current="/founder-alignment/pilot/report" />
 
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Entwurf — wird niemandem vorgelegt
-      </p>
-      <h1 className="text-2xl font-semibold text-slate-900">Nebeneinander</h1>
+         {copy("Entwurf — wird niemandem vorgelegt")} </p>
+      <h1 className="text-2xl font-semibold text-slate-900"> {copy("Nebeneinander")} </h1>
       <p className="mt-4 text-slate-700">
-        Eure Antworten nebeneinander — keine Passungszahl, keine Bewertung. Wo ihr
-        unterschiedlich geantwortet habt, heißt das nicht, dass etwas nicht passt. Es
-        heißt, dass ihr darüber noch nicht gesprochen habt.
-      </p>
+         {copy("Eure Antworten nebeneinander — keine Passungszahl, keine Bewertung. Wo ihr unterschiedlich geantwortet habt, heißt das nicht, dass etwas nicht passt. Es heißt, dass ihr darüber noch nicht gesprochen habt.")} </p>
 
       {/* GANZ OBEN: die konkreteste Aussage, die dieser Vergleich hergibt.
           Zwei Zahlen, ueber die sich am Dienstag reden laesst - waehrend
@@ -141,8 +143,8 @@ export default async function CompareV21Page({
       <div className="mt-10">
         <ExpectationGapsView
           result={comparison.expectations}
-          nameA="Du"
-          nameB="Die andere Person"
+          nameA={copy("Du")}
+          nameB={copy("Die andere Person")}
         />
       </div>
 
@@ -150,21 +152,18 @@ export default async function CompareV21Page({
           schon gedeutet, bevor die Frage danebensteht - und die Karten sind
           genau dafuer da, das zu verhindern. */}
       <section className="mt-12">
-        <h2 className="text-lg font-semibold text-slate-900">Gesprächskarten</h2>
+        <h2 className="text-lg font-semibold text-slate-900"> {copy("Gesprächskarten")} </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Aus einer geprüften Sammlung, nicht erzeugt. Zu jeder Karte steht, was
-          tatsächlich geantwortet wurde, was es bedeuten <em>kann</em>, was ihr fragen
-          könnt und woraus eine Vereinbarung bestehen sollte.
-        </p>
+          {locale === "en" ? <>Selected from a reviewed collection. Each card shows the actual responses, what they <em>may</em> mean, what you can ask, and what to include in an agreement.</> : <>Aus einer geprüften Sammlung, nicht erzeugt. Zu jeder Karte steht, was tatsächlich geantwortet wurde, was es bedeuten <em>kann</em>, was ihr fragen könnt und woraus eine Vereinbarung bestehen sollte.</>} </p>
         <div className="mt-4">
           <ConversationCardsView cards={cards} />
         </div>
       </section>
 
       <div className="mt-12">
-        <h2 className="text-lg font-semibold text-slate-900">Alle Antworten nebeneinander</h2>
+        <h2 className="text-lg font-semibold text-slate-900"> {copy("Alle Antworten nebeneinander")} </h2>
         <div className="mt-4">
-          <ComparisonViewV21 comparison={comparison} nameA="Du" nameB="Die andere Person" />
+          <ComparisonViewV21 comparison={comparison} nameA={copy("Du")} nameB={copy("Die andere Person")} />
         </div>
       </div>
     </main>

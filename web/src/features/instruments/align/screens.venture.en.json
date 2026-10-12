@@ -1,0 +1,82 @@
+{
+  "intro": {
+    "title": "What you want to build",
+    "paragraphs": [
+      "Now let’s look at your specific venture.",
+      "What do you want to achieve? What can you realistically contribute? And which expectations, rules, or boundaries matter to you?",
+      "Some things may already be clear, while others are not. Both are fine. Open questions can help identify important conversations later."
+    ],
+    "cta": "Next",
+    "duration": null
+  },
+  "nameQuestion": {
+    "title": "What is your venture called?",
+    "subline": "A working title is enough.",
+    "placeholder": "e.g., Made2Found or Project X",
+    "cta": "Next",
+    "skip": "Later"
+  },
+  "screens": [
+    {
+      "title": "How would you like to work together?",
+      "transition": "When responsibilities are clearly defined, how much freedom would you like within your area?",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "How much visibility would you like into each other’s work?",
+      "transition": "Good collaboration means different things to different people. Some want to be involved early; others prefer to wait until things are more concrete.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "What do you want this venture to become?",
+      "transition": "People build businesses for many reasons. What matters most to you in this venture?",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "What can you realistically contribute?",
+      "transition": "Let’s get more specific.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "When things do not go to plan",
+      "transition": "Not every venture develops as expected. What would matter to you then?",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "How do you want to make decisions?",
+      "transition": "Differences are part of working together. The question is how you reach a decision despite them.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "Money, risk, and safeguards",
+      "transition": "People have very different limits around money and personal risk. This is about what realistically works for you, rather than what seems brave or right.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "When two things matter at once",
+      "transition": "Sometimes two things both make sense, but pull in different directions.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "Your personal boundaries",
+      "transition": "Finally, your personal boundaries. Not everything has to be negotiable.",
+      "subline": null,
+      "groupPrompt": null
+    }
+  ],
+  "closing": {
+    "title": "All done.",
+    "text": "Take another look at your responses. When everything reflects your situation, you can finish this part.",
+    "cta": "Create summary",
+    "ctaBusy": "Creating summary …",
+    "subline": "Submitting completes this round. Your responses will become visible to the members of this team after you submit."
+  }
+}

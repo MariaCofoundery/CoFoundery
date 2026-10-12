@@ -1,5 +1,7 @@
-import { AREAS, type AreaKey, type ProductProfile } from "@/features/reporting/workstyle/model";
-import { AREA_POLES, glanceSentence, overviewMark, type OverviewMark } from "@/features/reporting/workstyle/narrative";
+import type { AppLocale } from "@/i18n/config";
+import { workstyleAreas, workstylePoles, reportText } from "./display";
+import { type AreaKey, type ProductProfile } from "@/features/reporting/workstyle/model";
+import { glanceSentence, overviewMark, type OverviewMark } from "@/features/reporting/workstyle/narrative";
 
 /**
  * "Deine Arbeitsweise auf einen Blick" / "Euer Zusammenspiel auf einen Blick"
@@ -17,17 +19,17 @@ type Person = { id: string; name: string; profile: ProductProfile };
 
 const at = (position: number) => `${position * 25}%`;
 
-function poleFor(area: AreaKey, position: number) {
-  return position <= 1 ? AREA_POLES[area].left : position >= 3 ? AREA_POLES[area].right : "in der Mitte";
+function poleFor(area: AreaKey, position: number, locale: AppLocale) {
+  return position <= 1 ? workstylePoles(locale)[area].left : position >= 3 ? workstylePoles(locale)[area].right : reportText(locale, "in der Mitte", "in the middle");
 }
 
-function describe(area: AreaKey, mark: OverviewMark) {
-  if (mark.kind === "point") return `klare Richtung: ${poleFor(area, mark.position)}`;
-  if (mark.kind === "range") return `je nach Situation, zwischen „${poleFor(area, mark.from)}“ und „${poleFor(area, mark.to)}“`;
-  return "noch zu wenige Antworten";
+function describe(area: AreaKey, mark: OverviewMark, locale: AppLocale) {
+  if (mark.kind === "point") return locale === "en" ? `Consistent direction: ${poleFor(area, mark.position, locale)}` : `klare Richtung: ${poleFor(area, mark.position, locale)}`;
+  if (mark.kind === "range") return locale === "en" ? `Depends on the situation, between “${poleFor(area, mark.from, locale)}” and “${poleFor(area, mark.to, locale)}”` : `je nach Situation, zwischen „${poleFor(area, mark.from, locale)}“ und „${poleFor(area, mark.to, locale)}“`;
+  return reportText(locale, "noch zu wenige Antworten", "Not enough responses yet");
 }
 
-function Track({ area, mark, name }: { area: AreaKey; mark: OverviewMark; name: string | null }) {
+function Track({ area, mark, name, locale }: { area: AreaKey; mark: OverviewMark; name: string | null; locale: AppLocale }) {
   return (
     <div className="ws-glance-track">
       {name ? <p className="truncate text-xs font-medium text-slate-700">{name}</p> : null}
@@ -45,22 +47,24 @@ function Track({ area, mark, name }: { area: AreaKey; mark: OverviewMark; name: 
           />
         ) : null}
       </div>
-      <span className="sr-only">{`${name ? `${name}: ` : ""}${describe(area, mark)}`}</span>
+      <span className="sr-only">{`${name ? `${name}: ` : ""}${describe(area, mark, locale)}`}</span>
       {/* Bei einer Person sagt der Satz darunter dasselbe - dann keine Doppelung. */}
-      {name && mark.kind === "none" ? <p className="text-xs text-slate-400">Noch zu wenige Antworten</p> : null}
-      {name && mark.kind === "range" ? <p className="text-xs text-slate-500">je nach Situation</p> : null}
+      {name && mark.kind === "none" ? <p className="text-xs text-slate-400">{reportText(locale, "Noch zu wenige Antworten", "Not enough responses yet")}</p> : null}
+      {name && mark.kind === "range" ? <p className="text-xs text-slate-500">{reportText(locale, "je nach Situation", "Depends on the situation")}</p> : null}
     </div>
   );
 }
 
 export function WorkstyleGlance({
   people,
+  locale = "de",
   title,
   intro,
   sentences,
   headingId = "ws-glance-title",
 }: {
   people: Person[];
+  locale?: AppLocale;
   title: string;
   intro?: string;
   /** Ein Satz je Bereich; ohne Angabe der Kurzsatz aus der Einzelperspektive. */
@@ -73,27 +77,26 @@ export function WorkstyleGlance({
       <h2 id={headingId} className="text-2xl font-semibold tracking-tight text-slate-950">{title}</h2>
       {intro ? <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{intro}</p> : null}
       <div className="ws-glance-grid mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {AREAS.map((area) => (
+        {workstyleAreas(locale).map((area) => (
           <article key={area.key} className="ws-glance-card rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
             <h3 className="text-sm font-semibold text-slate-950">{area.team}</h3>
             <div className="mt-2 flex justify-between gap-4 text-xs leading-4 text-slate-500">
-              <span className="max-w-[48%]">{AREA_POLES[area.key].left}</span>
-              <span className="max-w-[48%] text-right">{AREA_POLES[area.key].right}</span>
+              <span className="max-w-[48%]">{workstylePoles(locale)[area.key].left}</span>
+              <span className="max-w-[48%] text-right">{workstylePoles(locale)[area.key].right}</span>
             </div>
             <div className={`mt-2 grid ${many ? "gap-2" : "gap-1"}`}>
               {people.map((p) => (
-                <Track key={p.id} area={area.key} mark={overviewMark(p.profile, area.key)} name={many ? p.name : null} />
+                <Track locale={locale} key={p.id} area={area.key} mark={overviewMark(p.profile, area.key, locale)} name={many ? p.name : null} />
               ))}
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">
-              {sentences?.[area.key] ?? (people[0] ? glanceSentence(people[0].profile, area.key) : null)}
+              {sentences?.[area.key] ?? (people[0] ? glanceSentence(people[0].profile, area.key, locale) : null)}
             </p>
           </article>
         ))}
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-500">
-        Punkt: Die Antworten gehen in eine Richtung. Weicher Balken: je nach Situation. Leere Linie: noch zu wenige
-        Antworten. Links und rechts sind gleichwertig – es gibt keinen Gesamtwert und keine Rangfolge.
+        {reportText(locale, "Punkt: Die Antworten gehen in eine Richtung. Weicher Balken: je nach Situation. Leere Linie: noch zu wenige Antworten. Links und rechts sind gleichwertig – es gibt keinen Gesamtwert und keine Rangfolge.", "Dot: responses point in one direction. Soft bar: responses depend on the situation. Empty line: not enough responses yet. Neither end is better. There is no overall score or ranking.")}
       </p>
     </section>
   );

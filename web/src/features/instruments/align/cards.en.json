@@ -1,0 +1,176 @@
+{
+  "einwand_zeitpunkt": {
+    "observed": "When raising a concern, {a} would like to: {aAnswer}. {b} would like to: {bAnswer}.",
+    "meaning": "These are two preferences about timing, not personal traits. Both approaches may have reasons that were not asked about here.",
+    "question": "How will you flag a concern early, and when will you discuss it in depth?",
+    "agreement": [
+      "A signal for “I see this differently”",
+      "An agreed time to discuss it"
+    ],
+    "source": "Expert review, section 5, first example"
+  },
+  "einwand_formulierung": {
+    "observed": "{a} takes this approach: {aAnswer}. {b} takes this approach: {bAnswer}.",
+    "meaning": "This describes how someone puts a concern into words. It does not say how strongly they feel about it.",
+    "question": "How will you recognize when a concern matters to the other person?",
+    "agreement": [
+      "A signal for “this matters to me”",
+      "What happens next"
+    ],
+    "source": "Based on section 5: approaches, not traits"
+  },
+  "abwaegen_und_gefuehl": {
+    "observed": "{a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "Weighing things up and drawing on experience are not opposites. Both can matter to the same person. These responses describe a preferred approach.",
+    "question": "Which approach would you like to use for each kind of decision?",
+    "agreement": [
+      "A kind of decision",
+      "How you will approach it",
+      "When you will review it"
+    ],
+    "source": "Master draft, section 8.1: never combine A and I into one measure"
+  },
+  "erproben": {
+    "observed": "For a small, reversible step, {a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "This describes how likely someone is to start a trial, rather than how thoroughly they work.",
+    "question": "What counts as a small trial for you, and what is already a decision about direction?",
+    "agreement": [
+      "What counts as a trial",
+      "Its maximum cost"
+    ],
+    "source": "Based on section 5"
+  },
+  "offene_lage": {
+    "observed": "When something stays unresolved, {a} reports feeling: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "These are reported feelings, not a measure of resilience. Feeling uncomfortable does not mean someone handles the situation less well.",
+    "question": "What helps each of you when something has to remain unresolved for a while?",
+    "agreement": [
+      "A schedule for progress updates",
+      "When you will decide, even without complete clarity"
+    ],
+    "source": "Based on section 5 and master draft X: reported feelings, not coping ability"
+  },
+  "informationsregel": {
+    "observed": "{a} would like to: {aAnswer}. {b} prefers to: {bAnswer}.",
+    "meaning": "Two rules for the same purpose. Which works depends on your workstyle, rather than who is right.",
+    "question": "What default rule would work for how you collaborate?",
+    "agreement": [
+      "A default rule",
+      "When you can depart from it",
+      "When you will review it"
+    ],
+    "source": "Expert review, section 5, second example"
+  },
+  "wertefall_regel": {
+    "observed": "In the scenario, {a} chooses: {aAnswer}. {b} chooses: {bAnswer}.",
+    "meaning": "This is a decision in a hypothetical situation, not a statement about someone’s underlying values.",
+    "question": "What rule would you like to agree on before a similar situation comes up?",
+    "agreement": [
+      "A rule for this situation",
+      "Who decides if the rule does not apply"
+    ],
+    "source": "Expert review, section 5, third example"
+  },
+  "gleicher_weg_andere_gruende": {
+    "observed": "You chose the same approach here: {aAnswer}.",
+    "meaning": "The same approach can come from different reasons. Your responses do not tell us what those reasons are.",
+    "question": "Which conditions mattered to each of you?",
+    "agreement": [
+      "What this approach depends on",
+      "How you will recognize when it no longer works"
+    ],
+    "source": "Expert review, section 5, fourth example"
+  },
+  "zeit_und_erwartung": {
+    "observed": "For the next twelve weeks, {a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "These are your stated plans, not a measure of dedication. An agreement may change the expectations.",
+    "question": "Should the role, goal, or expectation be adjusted?",
+    "agreement": [
+      "The role",
+      "A specific commitment",
+      "A shared review date"
+    ],
+    "source": "Expert review, section 5, fifth example"
+  },
+  "geld_und_absicherung": {
+    "observed": "{a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "These responses describe what someone can contribute or needs. They depend on personal circumstances that were not asked about here.",
+    "question": "Which expenses will you decide on together, and above what amount?",
+    "agreement": [
+      "An amount threshold",
+      "Who decides it",
+      "When you will review it"
+    ],
+    "source": "Based on section 5: responses, not traits"
+  },
+  "absicherungen_teils_gleich": {
+    "observed": "Some of your choices overlap: {shared}. {a} also selected {aOnly}, and {b} selected {bOnly}.",
+    "meaning": "Overlap does not mean the other choices are unimportant. An additional choice may be the one that matters most to someone.",
+    "question": "Which of these will you agree on together, and which will remain an individual matter?",
+    "agreement": [
+      "A shared list",
+      "What each person keeps as an individual matter"
+    ],
+    "source": "Based on section 5"
+  },
+  "eigenstaendigkeit": {
+    "observed": "{a} would like to: {aAnswer}. {b} would like to: {bAnswer}.",
+    "meaning": "These responses describe the freedom someone wants within an agreed area. Without agreed areas, the question cannot be answered.",
+    "question": "Who is responsible for which areas, and what must explicitly be decided together?",
+    "agreement": [
+      "The areas",
+      "What will always be decided together"
+    ],
+    "source": "Based on section 5"
+  },
+  "ziele_teils_gleich": {
+    "observed": "You both selected {shared}. {a} also selected {aOnly}, and {b} selected {bOnly}.",
+    "meaning": "Having several goals is not a contradiction. They may compete when the same week has to accommodate them all.",
+    "question": "Which goal takes priority when you have to choose?",
+    "agreement": [
+      "A priority order when goals compete",
+      "When you will review it"
+    ],
+    "source": "Based on section 5"
+  },
+  "exit_und_kapital": {
+    "observed": "{a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "meaning": "These are current plans for a period of time, rather than fixed decisions. They may change as the venture develops.",
+    "question": "What would prompt you to decide on this again together?",
+    "agreement": [
+      "A reason to revisit the decision",
+      "Who will decide then"
+    ],
+    "source": "Based on section 5"
+  },
+  "grenze_genannt": {
+    "observed": "{a} has named a personal boundary.",
+    "meaning": "A boundary describes what someone cannot accept. It is not negotiable in the same way as a preference.",
+    "question": "How will you recognize early enough that you are approaching this boundary?",
+    "agreement": [
+      "An early sign",
+      "How you will respond"
+    ],
+    "source": "Master draft, section 6: L describes boundaries, not integrity scores"
+  },
+  "zurueckgehalten": {
+    "observed": "One person has not shared a response to this question.",
+    "meaning": "Not shared does not mean nonexistent. It may be a deliberate choice, which should be respected.",
+    "question": "Do you need this information for an upcoming decision, or can it remain open?",
+    "agreement": [
+      "Whether it is needed",
+      "By when"
+    ],
+    "source": "Master draft, section 8.4: not sharing does not mean a lack of commitment"
+  },
+  "markiert": {
+    "observed": "One of you marked this question for discussion.",
+    "meaning": "The reason is not captured in the responses. It may relate to the question itself or to something behind it.",
+    "question": "What led you to mark this?",
+    "agreement": [
+      "What follows from it",
+      "Whether there is anything to agree on"
+    ],
+    "source": "Discussion mark: a request to talk"
+  }
+}

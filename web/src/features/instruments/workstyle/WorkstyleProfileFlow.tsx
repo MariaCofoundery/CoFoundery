@@ -1,14 +1,18 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
+
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import consentV3 from "../../../../docs/founder-workstyle-research-consent-v3.json";
+
 import { workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { workstyleV3Item } from "@/features/instruments/workstyle/researchSets";
 import { saveWorkstyleFeedback, saveWorkstyleV3, startWorkstyleProduct, startWorkstyleResearch, withdrawWorkstyleResearch } from "@/features/instruments/workstyle/actions";
 import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstylePretestV2";
 import { WorkstyleFeedback } from "@/features/instruments/workstyle/WorkstylePretest";
 import type { PretestSession, ResearchContext } from "@/features/instruments/workstyle/data";
+import { researchConsentDocument } from "@/features/instruments/workstyle/researchConsent";
+import type { AppLocale } from "@/i18n/config";
 
 /**
  * Aktueller Ablauf (8.5a-v3).
@@ -60,29 +64,39 @@ function firstOpen(list: readonly WorkstyleItem[], session: PretestSession | nul
 }
 
 function ContextFields() {
+  const t = useTranslations("workstyleFlow");
+
   return <div className="grid gap-4">
-    <label className="block text-sm">An wie vielen Gründungsvorhaben bist oder warst du bisher als Founder oder Co-Founder aktiv beteiligt?<span className="mt-1 block text-slate-600">Zähle dein aktuelles Vorhaben mit.</span><select name="experience" className={field} required defaultValue=""><option value="" disabled>Bitte auswählen</option><option value="0">0</option><option value="1">1</option><option value="2-3">2–3</option><option value="4-5">4–5</option><option value="6_plus">6 oder mehr</option><option value="prefer_not_to_say">möchte ich nicht angeben</option></select></label>
-    <label className="block text-sm">Aktuelle Teamsituation<select name="team" className={field} required defaultValue=""><option value="" disabled>Bitte auswählen</option><option value="solo">Solo</option><option value="two">2-Founder-Team</option><option value="larger">Größeres Team</option><option value="no_venture">Noch kein Venture</option></select></label>
-    <label className="block text-sm">Venture-Phase (optional)<select name="phase" className={field} defaultValue=""><option value="">Keine Angabe</option><option value="idea">Idee / Orientierung</option><option value="building">Aufbau / Erprobung</option><option value="operating">Laufender Betrieb</option></select></label>
+    <label className="block text-sm">{t("how_many_ventures_have_you_actively_worked")}<span className="mt-1 block text-slate-600">{t("include_your_current_venture")}</span><select name="experience" className={field} required defaultValue=""><option value="" disabled>{t("please_select")}</option><option value="0">0</option><option value="1">1</option><option value="2-3">2–3</option><option value="4-5">4–5</option><option value="6_plus">{t("6_or_more")}</option><option value="prefer_not_to_say">{t("prefer_not_to_say")}</option></select></label>
+    <label className="block text-sm">{t("current_team_situation")}<select name="team" className={field} required defaultValue=""><option value="" disabled>{t("please_select_m011")}</option><option value="solo">Solo</option><option value="two">{t("twofounder_team")}</option><option value="larger">{t("larger_team")}</option><option value="no_venture">{t("no_venture_yet")}</option></select></label>
+    <label className="block text-sm">{t("venture_stage_optional")}<select name="phase" className={field} defaultValue=""><option value="">{t("no_entry")}</option><option value="idea">{t("idea_exploration")}</option><option value="building">{t("building_testing")}</option><option value="operating">{t("operating")}</option></select></label>
   </div>;
 }
 const contextFrom = (data: FormData): ResearchContext => ({ founder_experience: String(data.get("experience")) as ResearchContext["founder_experience"], team_size: String(data.get("team")) as ResearchContext["team_size"], venture_phase: String(data.get("phase")) });
 
-function ConsentDetails({ consent, onConsent }: { consent: boolean; onConsent: (value: boolean) => void }) {
+export function ConsentDetails({ consent, onConsent }: { consent: boolean; onConsent: (value: boolean) => void }) {
+  const t = useTranslations("workstyleFlow");
+  const consentDocument = researchConsentDocument(useLocale() as AppLocale);
+
   return <div className="space-y-4">
-    <p className="text-sm leading-6 text-slate-700">Damit wir die Entwicklungsfragen auswerten dürfen, brauchen wir deine Einwilligung. Ausgewertet werden pseudonymisiert deine Antworten – auch die zu deinem Arbeitsprofil –, zwei kurze Angaben zu deinem Kontext und die Bearbeitungszeiten. Niemand im Team und kein Advisor sieht die Entwicklungsantworten. Du kannst die Einwilligung jederzeit widerrufen; ein fertiges Arbeitsprofil bleibt erhalten.</p>
+    <p className="text-sm leading-6 text-slate-700">{t("we_need_your_consent_to_analyze_the")}</p>
     <details className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-      <summary className="cursor-pointer font-medium text-slate-900">Einwilligungstext lesen</summary>
-      <div className="mt-3 space-y-3">{consentV3.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
+      <summary className="cursor-pointer font-medium text-slate-900">{t("read_the_consent_text")}</summary>
+      <div className="mt-3 space-y-3">{consentDocument.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>
     </details>
     <ContextFields />
-    <label className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" checked={consent} onChange={event => onConsent(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-violet-700" /><span>{consentV3.confirmation}</span></label>
+    <label className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" checked={consent} onChange={event => onConsent(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-violet-700" /><span>{consentDocument.confirmation}</span></label>
   </div>;
 }
 
 export function WorkstyleProfileFlow({ initialSession, part = "profile", context = null }: {
   initialSession: PretestSession | null; part?: "profile" | "research"; context?: WorkstyleCompletionContext | null;
 }) {
+  const t = useTranslations("workstyleFlow");
+  const locale = useLocale();
+  // Server actions answer in German; keep their specific guidance in DE, use the generic EN line otherwise.
+  const serverError = (message: string) => locale === "en" ? t("something_went_wrong_your_saved_responses_are") : message;
+
   const [session, setSession] = useState(initialSession);
   const [position, setPosition] = useState(() => firstOpen(part === "research" ? researchItemsOf(initialSession) : flowItems(initialSession), initialSession));
   // Wer mitten im Ablauf ist, wird nicht auf einen Zwischenstand umgeleitet.
@@ -98,7 +112,7 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
   const [pending, startTransition] = useTransition();
   function run(action: () => Promise<void>) {
     setError("");
-    startTransition(async () => { try { await action(); } catch { setError("Das hat nicht geklappt. Deine gespeicherten Antworten bleiben erhalten. Bitte versuche es erneut."); } });
+    startTransition(async () => { try { await action(); } catch { setError(t("something_went_wrong_your_saved_responses_are")); } });
   }
   const profileDone = Boolean(session?.submitted_at);
   const consented = Boolean(session?.consent_version) && !session?.withdrawn_at;
@@ -107,7 +121,7 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
   const openInFlow = flow.filter(item => !answered(session, item)).length;
   const research = researchItemsOf(session);
   const openResearch = consented ? research.filter(item => !answered(session, item)).length : 0;
-  const names = context?.partnerNames.length ? new Intl.ListFormat("de", { style: "long", type: "conjunction" }).format(context.partnerNames) : null;
+  const names = context?.partnerNames.length ? new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(context.partnerNames) : null;
   const fresh = !session || (!started && !profileDone && !session.consent_version && session.answers.length === 0);
 
   function questions(list: readonly WorkstyleItem[], noun: string, ariaLabel: string) {
@@ -126,7 +140,7 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
             missing_reason: value === "cannot_assess" ? "cannot_assess" : null,
             rendered_order: item.rendered_order ?? null,
           }, elapsed);
-          if (!result.ok) return setError(result.error);
+          if (!result.ok) return setError(serverError(result.error));
           const saved = { ...s, submitted_at: result.submitted_at, completed_at: result.completed_at,
             answers: [...s.answers.filter(answer => answer.item_key !== result.answer.item_key), result.answer] };
           setSession(saved);
@@ -139,76 +153,76 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
   }
 
   const actions = <div className="mt-7 flex flex-wrap gap-3">
-    <Link href="/me/profile/workstyle" className={button}>Arbeitsprofil ansehen</Link>
+    <Link href="/me/profile/workstyle" className={button}>{t("view_workstyle_profile")}</Link>
     {/* Phase 11.7B: geteilt wird einmal mit dem Team, nicht je Person. */}
-    {context?.teamId && <Link href={`/teams/${context.teamId}/workstyle`} className={secondary}>{names ? `Zum Zusammenspiel mit ${names}` : "Zu eurem Zusammenspiel"}</Link>}
-    <Link href="/dashboard" className={secondary}>Zum Dashboard</Link>
+    {context?.teamId && <Link href={`/teams/${context.teamId}/workstyle`} className={secondary}>{names ? t("view_team_workstyle_with_value", { p0: names }) : t("view_team_workstyle")}</Link>}
+    <Link href="/dashboard" className={secondary}>{t("go_to_dashboard")}</Link>
   </div>;
 
   const withdrawal = (note: string) => <div className="mt-10 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-600">
-    {!confirmWithdraw ? <button className="min-h-11 underline" onClick={() => setConfirmWithdraw(true)}>Teilnahme an den Entwicklungsfragen beenden</button>
+    {!confirmWithdraw ? <button className="min-h-11 underline" onClick={() => setConfirmWithdraw(true)}>{t("stop_taking_part_in_the_development_questions")}</button>
       : <div className="rounded-2xl border border-slate-200 bg-white p-4">
         <p>{note}</p>
         <div className="mt-3 flex flex-wrap gap-3">
           <button className={secondary} disabled={pending} onClick={() => run(async () => {
-            const result = await withdrawWorkstyleResearch(); if (!result.ok) return setError(result.error);
+            const result = await withdrawWorkstyleResearch(); if (!result.ok) return setError(serverError(result.error));
             setSession(session?.submitted_at ? { ...session, withdrawn_at: new Date().toISOString(), item_order: null, research_set: null, research_set_version: null } : null);
             setConfirmWithdraw(false); setPosition(0); setChoice(null); setConsent(false);
-          })}>Forschungseinwilligung widerrufen</button>
-          <button className={secondary} onClick={() => setConfirmWithdraw(false)}>Abbrechen</button>
+          })}>{t("withdraw_research_consent")}</button>
+          <button className={secondary} onClick={() => setConfirmWithdraw(false)}>{t("cancel")}</button>
         </div>
       </div>}
   </div>;
   const withdrawNote = profileDone
-    ? "Deine Entwicklungsantworten, Kontextangaben, Zeiten und dein Feedback werden gelöscht. Dein Arbeitsprofil bleibt."
-    : "Deine noch nicht abgeschlossene Teilnahme wird dabei gelöscht – so steht es in der Einwilligung. Danach kannst du dein Arbeitsprofil mit 29 Situationen neu beginnen.";
+    ? t("your_development_responses_context_entries_completion_times")
+    : t("your_unfinished_participation_will_be_deleted_as");
 
   if (part === "research") return <section className="mt-8">
     {error && <p role="alert" className="mb-5 rounded-xl bg-red-50 p-4 text-red-900">{error}</p>}
     {!profileDone && (mixed && consented
-      ? <div className={`space-y-4 ${card}`}><h2 className="text-xl font-semibold">Dein Fragebogen läuft noch</h2><p className="leading-7 text-slate-700">Die Entwicklungsfragen sind in deinen Fragebogen eingemischt. Mach einfach dort weiter.</p><Link href="/research/workstyle-pretest?version=8.5a-v3" className={button}>Zum Fragebogen</Link></div>
-      : <div className={`space-y-4 ${card}`}><h2 className="text-xl font-semibold">Zuerst dein Arbeitsprofil</h2><p className="leading-7 text-slate-700">Die Entwicklungsfragen stehen dir offen, sobald dein Arbeitsprofil fertig ist – oder du wählst sie gleich zu Beginn mit aus.</p><Link href="/research/workstyle-pretest?version=8.5a-v3" className={button}>Zum Arbeitsprofil</Link></div>)}
+      ? <div className={`space-y-4 ${card}`}><h2 className="text-xl font-semibold">{t("your_questionnaire_is_still_in_progress")}</h2><p className="leading-7 text-slate-700">{t("the_development_questions_are_mixed_into_your")}</p><Link href="/research/workstyle-pretest?version=8.5a-v3" className={button}>{t("go_to_questionnaire")}</Link></div>
+      : <div className={`space-y-4 ${card}`}><h2 className="text-xl font-semibold">{t("your_workstyle_profile_comes_first")}</h2><p className="leading-7 text-slate-700">{t("development_questions_are_available_once_your_workstyle")}</p><Link href="/research/workstyle-pretest?version=8.5a-v3" className={button}>{t("go_to_workstyle_profile")}</Link></div>)}
     {profileDone && session?.withdrawn_at && <div className={`space-y-4 ${card}`}>
-      <h2 className="text-xl font-semibold">Forschungseinwilligung widerrufen</h2>
-      <p className="leading-7 text-slate-700">Deine Entwicklungsantworten, Kontextangaben, Zeiten und dein Feedback sind gelöscht. Dein Arbeitsprofil bleibt erhalten.</p>
-      <Link href="/me/profile/workstyle" className={secondary}>Zum Arbeitsprofil</Link>
+      <h2 className="text-xl font-semibold">{t("research_consent_withdrawn")}</h2>
+      <p className="leading-7 text-slate-700">{t("your_development_responses_context_entries_completion_times_m040")}</p>
+      <Link href="/me/profile/workstyle" className={secondary}>{t("go_to_workstyle_profile_m041")}</Link>
     </div>}
     {profileDone && !session?.withdrawn_at && !session?.consent_version && <form className={`space-y-6 ${card}`} onSubmit={event => {
       event.preventDefault(); const data = new FormData(event.currentTarget);
       run(async () => {
         const result = await startWorkstyleResearch(consent, contextFrom(data));
-        if (!result.ok) return setError(result.error);
+        if (!result.ok) return setError(serverError(result.error));
         setSession(result.session); setPosition(firstOpen(researchItemsOf(result.session), result.session));
       });
     }}>
       <div className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Freiwillig</p>
-        <h2 className="text-2xl font-semibold tracking-[-0.01em]">Made2Found bei der Weiterentwicklung unterstützen</h2>
-        <p className="leading-7 text-slate-700">Mit {DEVELOPMENT_COUNT} zusätzlichen Situationen hilfst du uns, das Arbeitsprofil weiterzuentwickeln. Sie verändern dein Arbeitsprofil und deinen Report nicht.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("optional")}</p>
+        <h2 className="text-2xl font-semibold tracking-[-0.01em]">{t("help_develop_made2found")}</h2>
+        <p className="leading-7 text-slate-700">{t("with")} {DEVELOPMENT_COUNT} {t("additional_situations_you_can_help_us_develop")}</p>
       </div>
       <ConsentDetails consent={consent} onConsent={setConsent} />
       <div className="flex flex-wrap gap-3">
-        <button disabled={pending || !consent} className={button}>Entwicklungsfragen starten</button>
-        <Link href="/me/profile/workstyle" className={secondary}>Nein, danke</Link>
+        <button disabled={pending || !consent} className={button}>{t("start_development_questions")}</button>
+        <Link href="/me/profile/workstyle" className={secondary}>{t("no_thanks")}</Link>
       </div>
     </form>}
     {profileDone && consented && !session?.completed_at && <>
-      {questions(research, "Entwicklungsfrage", "Fortschritt Entwicklungsfragen")}
-      <p className="mt-6 text-center text-sm text-slate-600">Jede Antwort ist gespeichert. <Link href="/me/profile/workstyle" className="font-medium text-slate-900 underline">Später weitermachen</Link></p>
+      {questions(research, t("development_question"), t("development_questions_progress"))}
+      <p className="mt-6 text-center text-sm text-slate-600">{t("each_response_is_saved")} <Link href="/me/profile/workstyle" className="font-medium text-slate-900 underline">{t("continue_later")}</Link></p>
       {withdrawal(withdrawNote)}
     </>}
     {profileDone && consented && session?.completed_at && <>
       <div className={card}>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Danke</p>
-        <h2 className="mt-2 text-2xl font-semibold">Du hast die Entwicklungsfragen abgeschlossen.</h2>
-        <p className="mt-3 max-w-2xl leading-7 text-slate-700">Deine Antworten helfen uns, das Arbeitsprofil weiterzuentwickeln. An deinem Arbeitsprofil ändert sich dadurch nichts.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("thank_you")}</p>
+        <h2 className="mt-2 text-2xl font-semibold">{t("you_have_completed_the_development_questions")}</h2>
+        <p className="mt-3 max-w-2xl leading-7 text-slate-700">{t("your_responses_help_us_develop_the_workstyle")}</p>
         <div className="mt-5">
           {!feedbackDone ? <WorkstyleFeedback v2 items={[...flowItems(session), ...(mixed ? [] : research)]} pending={pending} onSkip={() => setFeedbackDone(true)} onSave={feedback => run(async () => {
             const result = await saveWorkstyleFeedback(session.assessment_id, feedback, "8.5a-v3");
-            if (!result.ok) return setError(result.error); setFeedbackDone(true);
-          })} /> : <p role="status" className="text-sm">Danke für deine Rückmeldung.</p>}
+            if (!result.ok) return setError(serverError(result.error)); setFeedbackDone(true);
+          })} /> : <p role="status" className="text-sm">{t("thank_you_for_your_feedback")}</p>}
         </div>
-        <Link href="/me/profile/workstyle" className={`mt-6 ${secondary}`}>Zum Arbeitsprofil</Link>
+        <Link href="/me/profile/workstyle" className={`mt-6 ${secondary}`}>{t("go_to_workstyle_profile_m055")}</Link>
       </div>
       {withdrawal(withdrawNote)}
     </>}
@@ -221,79 +235,79 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
       event.preventDefault(); const data = new FormData(event.currentTarget);
       run(async () => {
         const result = choice === "research" ? await startWorkstyleResearch(consent, contextFrom(data)) : await startWorkstyleProduct();
-        if (!result.ok) return setError(result.error);
+        if (!result.ok) return setError(serverError(result.error));
         setSession(result.session); setStarted(true); setContinuing(true); setPosition(firstOpen(flowItems(result.session), result.session));
       });
     }}>
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-[-0.01em]">Mach’s dir kurz bequem.</h2>
-        <p className="leading-7 text-slate-700">Nimm dir gern einen Kaffee, einen Tee oder etwas zum Snacken dazu. In den nächsten Situationen geht es um Entscheidungen, Zusammenarbeit, offene Fragen und die Art, wie du Dinge angehst.</p>
-        <p className="leading-7 text-slate-700">Es gibt kein Richtig oder Falsch. Antworte so, wie du im echten Arbeitsalltag wahrscheinlich reagieren würdest – nicht so, wie es ideal klingen würde.</p>
-        <p className="leading-7 text-slate-700">Jede Antwort wird sofort gespeichert. Du kannst jederzeit aufhören und später weitermachen. Dein Arbeitsprofil bleibt privat, bis du selbst etwas freigibst.</p>
+        <h2 className="text-2xl font-semibold tracking-[-0.01em]">{t("take_a_moment_to_settle_in")}</h2>
+        <p className="leading-7 text-slate-700">{t("feel_free_to_grab_a_coffee_tea")}</p>
+        <p className="leading-7 text-slate-700">{t("there_are_no_right_or_wrong_answers")}</p>
+        <p className="leading-7 text-slate-700">{t("each_response_is_saved_straight_away_you")}</p>
       </div>
       <div className="space-y-3 rounded-2xl bg-violet-50/60 p-5">
-        <p className="font-semibold text-slate-900">Dein Arbeitsprofil basiert auf {coreItems.length} Situationen.</p>
-        <p className="leading-7 text-slate-700">Wenn du möchtest, kannst du uns zusätzlich mit {DEVELOPMENT_COUNT} Entwicklungsfragen helfen, Made2Found weiterzuentwickeln. Dann sind es insgesamt {coreItems.length + DEVELOPMENT_COUNT} Situationen – die zusätzlichen Fragen werden ganz normal zwischen die anderen gemischt. Sie verändern dein Arbeitsprofil und deinen Report nicht. Ob du mitmachst, entscheidest du frei.</p>
+        <p className="font-semibold text-slate-900">{t("your_workstyle_profile_is_based_on")} {coreItems.length} {t("situations")}</p>
+        <p className="leading-7 text-slate-700">{t("if_you_like_you_can_also_answer")} {DEVELOPMENT_COUNT} {t("development_questions_to_help_us_improve_made2found")} {coreItems.length + DEVELOPMENT_COUNT} {t("situations_with_the_additional_questions_mixed_in")}</p>
       </div>
       <fieldset className="space-y-3">
-        <legend className="mb-3 font-semibold text-slate-900">Wie möchtest du starten?</legend>
+        <legend className="mb-3 font-semibold text-slate-900">{t("how_would_you_like_to_start")}</legend>
         {([
-          ["profile", "Nur mein Arbeitsprofil", `${coreItems.length} Situationen`],
-          ["research", "Ja, ich unterstütze die Weiterentwicklung", `${coreItems.length + DEVELOPMENT_COUNT} Situationen – ${DEVELOPMENT_COUNT} davon helfen bei der Weiterentwicklung`],
+          ["profile", t("just_my_workstyle_profile"), t("value_situations", { p0: coreItems.length })],
+          ["research", t("yes_i_would_like_to_help_develop"), t("value_situations_including_value_development_questions", { p0: coreItems.length + DEVELOPMENT_COUNT, p1: DEVELOPMENT_COUNT })],
         ] as const).map(([value, title, detail]) => <label key={value} className={`flex min-h-16 cursor-pointer items-start gap-4 rounded-2xl border px-5 py-4 transition ${choice === value ? "border-violet-500 bg-violet-50/70 ring-1 ring-violet-200" : "border-slate-200 hover:border-slate-300"}`}>
           <input type="radio" name="start" value={value} checked={choice === value} onChange={() => setChoice(value)} className="mt-1 h-5 w-5 shrink-0 accent-violet-700" />
           <span><span className="block font-semibold text-slate-900">{title}</span><span className="block text-sm text-slate-600">{detail}</span></span>
         </label>)}
       </fieldset>
       {choice === "research" && <ConsentDetails consent={consent} onConsent={setConsent} />}
-      <button className={button} disabled={pending || !choice || (choice === "research" && !consent)}>Los geht’s</button>
+      <button className={button} disabled={pending || !choice || (choice === "research" && !consent)}>{t("lets_begin")}</button>
     </form>}
 
     {!fresh && session && openInFlow > 0 && (!profileDone || continuing) && <>
-      {questions(flow, "Frage", mixed ? "Fortschritt Fragebogen" : "Fortschritt Arbeitsprofil")}
+      {questions(flow, t("question"), mixed ? t("questionnaire_progress") : t("workstyle_profile_progress"))}
       <p className="mt-6 text-center text-sm text-slate-600">
-        Jede Antwort ist gespeichert. <Link href="/dashboard" className="font-medium text-slate-900 underline">Später weitermachen</Link>
+        {t("each_response_is_saved_m074")} <Link href="/dashboard" className="font-medium text-slate-900 underline">{t("continue_later_m075")}</Link>
       </p>
       {consented && withdrawal(withdrawNote)}
     </>}
 
     {!fresh && session && profileDone && openInFlow > 0 && !continuing && <div className={card}>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Zwischenstand</p>
-      <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">Dein Arbeitsprofil ist fertig.</h2>
-      <p className="mt-4 max-w-2xl leading-7 text-slate-700">{openInFlow === 1 ? "Du hast noch 1 freiwillige Entwicklungsfrage offen." : `Du hast noch ${openInFlow} freiwillige Entwicklungsfragen offen.`} Sie verändern deinen Report nicht – du kannst sie jetzt beantworten oder einfach später.</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("progress_update")}</p>
+      <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">{t("your_workstyle_profile_is_complete")}</h2>
+      <p className="mt-4 max-w-2xl leading-7 text-slate-700">{openInFlow === 1 ? t("one_development_question_open") : t("you_still_have_value_optional_development_questions", { p0: openInFlow })} {t("they_do_not_change_your_report_you")}</p>
       <div className="mt-7 flex flex-wrap gap-3">
-        <Link href="/me/profile/workstyle" className={button}>Arbeitsprofil ansehen</Link>
-        <button className={secondary} onClick={() => { setContinuing(true); setPosition(firstOpen(flow, session)); }}>Entwicklungsfragen fortsetzen</button>
-        <Link href="/dashboard" className={secondary}>Zum Dashboard</Link>
+        <Link href="/me/profile/workstyle" className={button}>{t("view_workstyle_profile_m080")}</Link>
+        <button className={secondary} onClick={() => { setContinuing(true); setPosition(firstOpen(flow, session)); }}>{t("continue_development_questions")}</button>
+        <Link href="/dashboard" className={secondary}>{t("go_to_dashboard_m082")}</Link>
       </div>
     </div>}
 
     {!fresh && session && profileDone && openInFlow === 0 && <>
       <div className={card}>
         {mixed && session.completed_at ? <>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Fertig</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">Geschafft – danke.</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil ist fertig, und du hast uns zusätzlich bei der Weiterentwicklung unterstützt. Dein Arbeitsprofil sehen nur die, mit denen du es teilst, etwa dein Team – niemand sieht deine Antworten automatisch, auch nicht die Person, die dich eingeladen hat.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("complete")}</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">{t("all_done_thank_you")}</h2>
+          <p className="mt-4 max-w-2xl leading-7 text-slate-700">{t("your_workstyle_profile_is_complete_and_you")}</p>
         </> : <>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Geschafft</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">Dein Arbeitsprofil ist bereit.</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-700">Dein Arbeitsprofil sehen nur die, mit denen du es teilst, etwa dein Team. Niemand sieht deine Antworten automatisch – auch nicht die Person, die dich eingeladen hat.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("all_done")}</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.02em]">{t("your_workstyle_profile_is_ready")}</h2>
+          <p className="mt-4 max-w-2xl leading-7 text-slate-700">{t("only_people_you_share_it_with_such")}</p>
         </>}
         {actions}
-        {mixed && session.completed_at && <p className="mt-6 text-sm text-slate-600">Deine {DEVELOPMENT_COUNT} Entwicklungsantworten verändern deinen aktuellen Report nicht. <Link href={RESEARCH_HREF} className="underline">Forschungsteilnahme verwalten</Link></p>}
+        {mixed && session.completed_at && <p className="mt-6 text-sm text-slate-600">{t("your")} {DEVELOPMENT_COUNT} {t("development_responses_do_not_change_your_current")} <Link href={RESEARCH_HREF} className="underline">{t("manage_research_participation")}</Link></p>}
       </div>
       <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
-        {!session.consent_version && !session.withdrawn_at && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">Forschung später unterstützen</Link>}
-        {consented && !mixed && openResearch > 0 && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">Entwicklungsfragen fortsetzen</Link>}
-        {!confirmRetake ? <button className="min-h-11 underline" onClick={() => setConfirmRetake(true)}>Arbeitsprofil später neu beantworten</button>
+        {!session.consent_version && !session.withdrawn_at && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("support_research_later")}</Link>}
+        {consented && !mixed && openResearch > 0 && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("continue_development_questions_m093")}</Link>}
+        {!confirmRetake ? <button className="min-h-11 underline" onClick={() => setConfirmRetake(true)}>{t("answer_the_workstyle_questions_again_later")}</button>
           : <div className="w-full rounded-2xl border border-slate-200 bg-white p-4 leading-6">
-            <p>Du beantwortest die Situationen dann noch einmal. Dein bisheriges Arbeitsprofil bleibt aktuell, bis die neue Fassung fertig ist; Freigaben gelten für die neue Fassung erst, wenn du sie erneut erteilst.</p>
+            <p>{t("you_will_answer_the_situations_again_your")}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <button className={secondary} disabled={pending} onClick={() => run(async () => {
-                const result = await startWorkstyleProduct(true); if (!result.ok) return setError(result.error);
+                const result = await startWorkstyleProduct(true); if (!result.ok) return setError(serverError(result.error));
                 setSession(result.session); setPosition(0); setConfirmRetake(false); setChoice(null); setConsent(false); setStarted(false);
-              })}>Neu beginnen</button>
-              <button className={secondary} onClick={() => setConfirmRetake(false)}>Abbrechen</button>
+              })}>{t("start_again")}</button>
+              <button className={secondary} onClick={() => setConfirmRetake(false)}>{t("cancel_m097")}</button>
             </div>
           </div>}
       </div>

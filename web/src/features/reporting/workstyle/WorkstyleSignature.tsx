@@ -1,50 +1,53 @@
+import type { AppLocale } from "@/i18n/config";
+import { workstyleAreas, reportText } from "./display";
+import { workstyleDisplayItem, workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
 import {
-  AREAS,
   PRODUCT_ITEMS,
   rawChoice,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
-import { workstyleResponseOptions } from "@/features/instruments/workstyle/registry";
 
 /** One lane per original item. Seit Phase 11.7B je Person eine eigene Zeile mit
  * Namen (keine Kuerzel als alleinige Kennzeichnung). Position denotes the chosen
  * response category only. No aggregation, norm or match distance. */
 export function WorkstyleSignature({
   people,
+  locale = "de",
   compact = false,
 }: {
   people: { id: string; name: string; profile: ProductProfile }[];
   compact?: boolean;
+  locale?: AppLocale;
 }) {
   return (
     <figure
       className="ws-signature"
       aria-label={
         people.length === 1
-          ? "Deine Antworten im Detail"
-          : "Eure Antworten im Detail"
+          ? reportText(locale, "Deine Antworten im Detail", "Your responses in detail")
+          : reportText(locale, "Eure Antworten im Detail", "Your team\u2019s responses in detail")
       }
     >
       <figcaption className="mb-5">
         <h3 className="text-xl font-semibold">
           {people.length === 1
-            ? "Deine Antworten im Detail"
-            : "Eure Antworten im Detail"}
+            ? reportText(locale, "Deine Antworten im Detail", "Your responses in detail")
+            : reportText(locale, "Eure Antworten im Detail", "Your team\u2019s responses in detail")}
         </h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Jede Linie steht für eine konkrete Situation. Die Marker zeigen die
-          gewählten Antworten. Ihre Position ist keine Bewertung.
+          {reportText(locale, "Jede Linie steht für eine konkrete Situation. Die Marker zeigen die gewählten Antworten. Ihre Position ist keine Bewertung.", "Each line represents a specific situation. The markers show the selected responses. Their position is not a rating.")}
         </p>
       </figcaption>
       <div className="grid gap-7">
-        {AREAS.map((area) => (
+        {workstyleAreas(locale).map((area) => (
           <section key={area.key} className="ws-area">
             <h4 className="mb-3 text-base font-semibold">
               {people.length === 1 ? area.title : area.team}
             </h4>
             {PRODUCT_ITEMS.filter((i) => i.area_key === area.key).map(
               (item) => {
-                const options = workstyleResponseOptions(item);
+                const displayItem = workstyleDisplayItem(item, locale);
+                const options = workstyleDisplayOptions(item, locale);
                 const present = people.map((p) => ({
                   ...p,
                   choice: rawChoice(p.profile, item.item_key),
@@ -54,10 +57,10 @@ export function WorkstyleSignature({
                     key={item.item_key}
                     className="ws-lane border-t border-slate-200 py-4"
                   >
-                    <p className="text-sm leading-6">{item.prompt}</p>
-                    {item.alternatives?.length ? (
+                    <p className="text-sm leading-6">{displayItem.prompt}</p>
+                    {displayItem.alternatives?.length ? (
                       <div className="my-3 grid gap-2 text-sm">
-                        {item.alternatives.map((a) => (
+                        {displayItem.alternatives.map((a) => (
                           <p key={a.option_id}>
                             <b>{a.option_id}</b> · {a.label}
                           </p>
@@ -102,7 +105,7 @@ export function WorkstyleSignature({
                       {present.map((p) => (
                         <li key={p.id}>
                           <span className="font-medium">{p.name}:</span>{" "}
-                          {p.choice?.label ?? "Keine Einschätzung sichtbar"}
+                          {p.choice ? options[p.choice.position].label : reportText(locale, "Keine Einschätzung sichtbar", "No response visible")}
                         </li>
                       ))}
                     </ul>

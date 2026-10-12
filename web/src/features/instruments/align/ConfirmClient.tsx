@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -17,6 +18,7 @@ export function ConfirmClient(props: {
   ages: ConfirmEntry[];
   keeps: ConfirmEntry[];
 }) {
+  const locale = useLocale();
   const [pending, start] = useTransition();
   const [failed, setFailed] = useState(false);
   const router = useRouter();
@@ -41,8 +43,7 @@ export function ConfirmClient(props: {
       />
       {failed && (
         <p role="alert" className="mt-3 text-sm text-rose-700">
-          Das konnte nicht festgehalten werden. Deine Antworten sind davon nicht
-          betroffen — sie gelten weiter.
+          {locale === "en" ? "We could not record your confirmation. Your responses are unaffected and remain current." : "Das konnte nicht festgehalten werden. Deine Antworten sind davon nicht betroffen — sie gelten weiter."}
         </p>
       )}
     </>

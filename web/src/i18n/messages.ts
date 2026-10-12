@@ -1,3 +1,5 @@
+import deWorkstyleFlow from "../../messages/de/workstyleFlow.json";
+import enWorkstyleFlow from "../../messages/en/workstyleFlow.json";
 import deRadar from "../../messages/de/radar.json";
 import enRadar from "../../messages/en/radar.json";
 import deProblemWorkspace from "../../messages/de/problemWorkspace.json";
@@ -61,6 +63,7 @@ import enWorkbook from "../../messages/en/workbook.json";
 
 const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
   de: {
+    workstyleFlow: deWorkstyleFlow,
     radar: deRadar,
     intake: deIntake,
     problemWorkspace: deProblemWorkspace,
@@ -92,6 +95,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workbook: deWorkbook as unknown as AbstractIntlMessages,
   },
   en: {
+    workstyleFlow: enWorkstyleFlow,
     radar: enRadar,
     intake: enIntake,
     problemWorkspace: enProblemWorkspace,

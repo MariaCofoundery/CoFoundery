@@ -1,0 +1,67 @@
+{
+  "intro": {
+    "title": "How do you work as a founder?",
+    "paragraphs": [
+      "Good to have you here.",
+      "Take your time with the next questions. Answer as you usually would in everyday work, rather than how you think you ideally should.",
+      "ALIGN has several parts.",
+      "The first is about you: how you approach decisions, deal with uncertainty, and raise different views.",
+      "Then we will look at your specific venture and how you work together.",
+      "There are no right or wrong answers. If you cannot assess something yet, you can simply say so."
+    ],
+    "cta": "Start",
+    "duration": null
+  },
+  "nameQuestion": null,
+  "screens": [
+    {
+      "title": "Decisions",
+      "transition": "Let’s start with decisions.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "Experience and intuition",
+      "transition": "Not every decision can be worked out completely.",
+      "subline": "How much room do you give your experience and intuition?",
+      "groupPrompt": null
+    },
+    {
+      "title": "Trying things out and learning",
+      "transition": "What do you do when you do not have all the information yet?",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "Making concerns visible",
+      "transition": "Not every disagreement needs a full discussion straight away. We are interested in when you make it visible.",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "Expressing disagreement",
+      "transition": "When you disagree, how do you put it into words?",
+      "subline": null,
+      "groupPrompt": null
+    },
+    {
+      "title": "When things are still unclear I",
+      "transition": "Finally, a few situations where things are still unclear.",
+      "subline": null,
+      "groupPrompt": "How comfortable do you feel with each situation?"
+    },
+    {
+      "title": "When things are still unclear II",
+      "transition": "Two more situations.",
+      "subline": null,
+      "groupPrompt": "How comfortable do you feel with each situation?"
+    }
+  ],
+  "closing": {
+    "title": "All done.",
+    "text": "Take another look at your responses. When everything reflects your situation, you can finish this part.",
+    "cta": "Create founder profile",
+    "ctaBusy": "Creating profile …",
+    "subline": "Submitting completes this round."
+  }
+}

@@ -96,7 +96,7 @@ test("die Startseite verspricht keine Dauer", () => {
 test("der Fortschritt zählt Schritte, nicht Fragen", () => {
   const fragebogen = readFileSync(
     join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");
-  assert.match(fragebogen, /Schritt \{schirm\.step\} von \{screens\.screens\.length\}/);
+  assert.match(fragebogen, /t\("Schritt"\).*\{schirm\.step\}.*t\("von"\).*\{screens\.screens\.length\}/);
 
   // KEIN ZWEITER ZAEHLER. Das UX-Review Teil 2 nennt es wörtlich: „42 Fragen"
   // und „0 von 39 beantwortet" standen gleichzeitig da. Beide Zahlen waren

@@ -1,3 +1,4 @@
+import { getRequestLocale } from "@/i18n/getLocale";
 import "server-only";
 
 import { registryOf, type AssessmentScope } from "@/features/instruments/align/registries";
@@ -109,6 +110,7 @@ export async function buildScopeComparison(
   theirs: string,
   ventureId: string | null,
 ): Promise<ScopeComparison> {
+  const locale = await getRequestLocale();
   const a = await readSide(mine, scope, ventureId);
   const b = await readSide(theirs, scope, ventureId);
 
@@ -118,8 +120,8 @@ export async function buildScopeComparison(
   const marked = [...a.marked, ...b.marked];
 
   const names = {
-    a: await displayNameOf(mine, "Du"),
-    b: await displayNameOf(theirs, "Die andere Person"),
+    a: await displayNameOf(mine, locale === "en" ? "You" : "Du"),
+    b: await displayNameOf(theirs, locale === "en" ? "The other person" : "Die andere Person"),
   };
 
   return {
@@ -127,6 +129,7 @@ export async function buildScopeComparison(
     sections,
     names,
     cards: buildCards({
+      locale,
       comparison: sections,
       markedItemIds: marked,
       nameA: names.a,

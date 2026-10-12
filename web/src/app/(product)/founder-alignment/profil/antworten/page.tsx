@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
@@ -23,6 +25,9 @@ export default async function ProfileAnswersPage({
 }: {
   searchParams: Promise<{ erstellt?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const { erstellt } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
@@ -38,8 +43,7 @@ export default async function ProfileAnswersPage({
     <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/profil/antworten" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Testfassung
-      </p>
+         {copy("Testfassung")} </p>
       {/* ---------------------------------------------------------------
           DER MOMENT NACH DEM ABSENDEN
           ---------------------------------------------------------------
@@ -54,50 +58,41 @@ export default async function ProfileAnswersPage({
               ueber dem Abgabeknopf. Zweimal dasselbe Wort klingt wie eine
               Aufnahme, die haengt. */}
           <h2 className="text-xl font-semibold text-slate-950">
-            Dein Arbeitsprofil steht.
-          </h2>
+             {copy("Dein Arbeitsprofil steht.")} </h2>
           <p className="mt-2 text-sm leading-7 text-slate-700">
-            Unten siehst du, was du geantwortet hast — und oben auf einen Blick, wie
-            sich das verteilt.
-          </p>
+             {copy("Unten siehst du, was du geantwortet hast — und oben auf einen Blick, wie sich das verteilt.")} </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/founder-alignment/vorhaben"
               className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
             >
-              Weiter: Was du aufbauen willst
-            </Link>
+               {copy("Weiter: Was du aufbauen willst")} </Link>
             <Link
               href="/dashboard"
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
             >
-              Später
-            </Link>
+               {copy("Später")} </Link>
           </div>
         </section>
       )}
 
-      <h1 className="text-2xl font-semibold text-slate-900">Frühere Auswertung</h1>
+      <h1 className="text-2xl font-semibold text-slate-900"> {copy("Frühere Auswertung")} </h1>
       <p className="mt-4 text-slate-700">
-        Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein
-        Vergleich mit anderen.
-      </p>
+         {copy("Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein Vergleich mit anderen.")} </p>
       <p className="mt-2 text-sm text-slate-500">{FOUNDER_PROFILE.validity}</p>
 
       {!report ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-          Hier steht noch nichts.{" "}
+           {copy("Hier steht noch nichts.")} {" "}
           <Link href="/me/profile/workstyle" className="underline">
-            Zum Fragebogen
-          </Link>
+             {copy("Zum Fragebogen")} </Link>
           .
         </p>
       ) : (
         <div className="mt-10">
           <p className="mb-4 text-sm text-slate-500">
-            {report.answered} von {report.of} Fragen beantwortet
-            {report.submittedAt && (
-              <> · abgegeben am {new Date(report.submittedAt).toLocaleDateString("de-DE")}</>
+            {report.answered}  {copy("von")} {report.of}  {copy("Fragen beantwortet")} {report.submittedAt && (
+              <>  {copy("· abgegeben am")} {new Date(report.submittedAt).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}</>
             )}
           </p>
           {/* DAS BILD VOR DER LISTE. Es zeigt dieselben Antworten kompakt -
@@ -121,7 +116,7 @@ export default async function ProfileAnswersPage({
             <ShareForm
               scope="founder_profile"
               ventureId={null}
-              label="Dein Arbeitsprofil"
+              label={copy("Dein Arbeitsprofil")}
               recipients={teilen.recipients}
               hiddenByRecipient={teilen.hiddenByRecipient}
               items={getItemsV22("founder_profile").map((item) => ({

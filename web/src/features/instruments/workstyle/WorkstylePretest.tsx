@@ -1,6 +1,10 @@
 "use client";
 
+import { useTranslations, useLocale } from "next-intl";
+
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
+import { workstyleDisplayItem } from "./display";
+import type { AppLocale } from "@/i18n/config";
 import consentText from "../../../../docs/founder-workstyle-research-consent-v1.json";
 import { WORKSTYLE_PRETEST_V1, previewWorkstyleForm, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { startWorkstylePretest, saveWorkstyleAnswer, completeWorkstylePretest, saveWorkstyleFeedback, withdrawWorkstyleResearch } from "@/features/instruments/workstyle/actions";
@@ -30,7 +34,11 @@ function Question({ item, initial, pending, onSave }: { item: WorkstyleItem; ini
   </form>;
 }
 
-export function WorkstyleFeedback({ items, pending, onSave, onSkip, v2 = false }: { v2?: boolean; items: readonly WorkstyleItem[]; pending: boolean; onSave: (feedback: ResearchFeedback) => void; onSkip: () => void }) {
+export function WorkstyleFeedback({ items: sourceItems, pending, onSave, onSkip, v2 = false }: { v2?: boolean; items: readonly WorkstyleItem[]; pending: boolean; onSave: (feedback: ResearchFeedback) => void; onSkip: () => void }) {
+  const t = useTranslations("workstyleFlow");
+  const locale = useLocale() as AppLocale;
+  const items = sourceItems.map(item => workstyleDisplayItem(item, locale));
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -43,21 +51,21 @@ export function WorkstyleFeedback({ items, pending, onSave, onSkip, v2 = false }
     onSave(feedback);
   }
   return <form onSubmit={submit} className="mt-6 space-y-6">
-    <h2 className="text-xl font-semibold">Freiwilliges Feedback</h2>
-    <p>Deine Antworten sind bereits abgeschlossen. Du kannst alle Feedbackfragen überspringen. Bitte nenne keine Namen oder andere persönliche Angaben im Freitext.</p>
-    <label className="block">Verständlichkeit insgesamt<select name="clarity" className={field} defaultValue=""><option value="">Keine Angabe</option>{[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}{n === 1 ? " – sehr unverständlich" : n === 5 ? " – sehr verständlich" : ""}</option>)}</select></label>
-    {([['unclear', 'Gab es Fragen, bei denen unklar war, was gemeint ist?'], ['unsuitable', 'Gab es Fragen, bei denen keine Antwort richtig gepasst hat?'], ['desirable', 'Gab es Fragen, bei denen offensichtlich war, welche Antwort „gut“ wirken soll?']] as const).map(([key, label]) => <fieldset key={key} className="rounded-xl border border-slate-200 p-4">
+    <h2 className="text-xl font-semibold">{t("optional_feedback")}</h2>
+    <p>{t("your_responses_are_already_complete_you_can")}</p>
+    <label className="block">{t("overall_clarity")}<select name="clarity" className={field} defaultValue=""><option value="">{t("no_entry_m110")}</option>{[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}{n === 1 ? t("very_unclear") : n === 5 ? t("very_clear") : ""}</option>)}</select></label>
+    {([['unclear', t("unclear_question")], ['unsuitable', t("were_there_questions_where_none_of_the")], ['desirable', t("were_there_questions_where_it_was_obvious")]] as const).map(([key, label]) => <fieldset key={key} className="rounded-xl border border-slate-200 p-4">
       <legend className="px-1 font-medium">{label}</legend>
-      {key === "desirable" && <label className="block">Deine Einschätzung<select name="desirable" className={field} defaultValue=""><option value="">Keine Angabe</option><option value="yes">Ja</option><option value="no">Nein</option></select></label>}
-      <details className="mt-3"><summary className="cursor-pointer py-2 underline">Fragen auswählen (optional)</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name={`${key}_items`} value={item.item_key} className="mt-1" /><span>{!v2 && `${item.item_key}: `}{item.prompt}</span></label>)}</div></details>
-      {key !== "desirable" && <label className="mt-3 block text-sm">Dein Hinweis (optional)<textarea name={`${key}_text`} maxLength={2000} className={field} /></label>}
+      {key === "desirable" && <label className="block">{t("your_view")}<select name="desirable" className={field} defaultValue=""><option value="">{t("no_entry_m116")}</option><option value="yes">{t("yes")}</option><option value="no">{t("no")}</option></select></label>}
+      <details className="mt-3"><summary className="cursor-pointer py-2 underline">{t("select_questions_optional")}</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name={`${key}_items`} value={item.item_key} className="mt-1" /><span>{!v2 && `${item.item_key}: `}{item.prompt}</span></label>)}</div></details>
+      {key !== "desirable" && <label className="mt-3 block text-sm">{t("your_comment_optional")}<textarea name={`${key}_text`} maxLength={2000} className={field} /></label>}
     </fieldset>)}
     {v2 && <fieldset className="rounded-xl border border-slate-200 p-4">
-      <legend className="px-1 font-medium">Gab es Fragen, die sich für dich besonders klar oder realistisch angefühlt haben?</legend>
-      <details className="mt-3"><summary className="cursor-pointer py-2 underline">Fragen auswählen (optional)</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name="clear_realistic_items" value={item.item_key} className="mt-1" /><span>{item.prompt}</span></label>)}</div></details>
+      <legend className="px-1 font-medium">{t("were_there_questions_that_felt_particularly_clear")}</legend>
+      <details className="mt-3"><summary className="cursor-pointer py-2 underline">{t("select_questions_optional_m122")}</summary><div className="max-h-64 overflow-y-auto">{items.map(item => <label key={item.item_key} className="flex items-start gap-3 py-3 text-sm"><input type="checkbox" name="clear_realistic_items" value={item.item_key} className="mt-1" /><span>{item.prompt}</span></label>)}</div></details>
     </fieldset>}
-    <label className="block">Sonstige Hinweise (optional)<textarea name="other" maxLength={2000} className={field} /></label>
-    <div className="flex flex-wrap gap-4"><button disabled={pending} className={button}>Feedback speichern</button><button type="button" disabled={pending} className="min-h-11 underline" onClick={onSkip}>Ohne Feedback abschließen</button></div>
+    <label className="block">{t("other_comments_optional")}<textarea name="other" maxLength={2000} className={field} /></label>
+    <div className="flex flex-wrap gap-4"><button disabled={pending} className={button}>{t("save_feedback")}</button><button type="button" disabled={pending} className="min-h-11 underline" onClick={onSkip}>{t("finish_without_feedback")}</button></div>
   </form>;
 }
 

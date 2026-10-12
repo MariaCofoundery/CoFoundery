@@ -1,3 +1,4 @@
+import { withWorkstyleCopy } from "@/features/instruments/workstyle/__tests__/localizedSource";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,7 +12,7 @@ import { QUOTE_COUNT, quoteIndexFor } from "@/features/dashboard/quoteDayIndex";
  */
 
 const src = (p: string) => readFileSync(p, "utf8");
-const code = (p: string) => src(p).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = (p: string) => withWorkstyleCopy(src(p)).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 const json = (p: string) => JSON.parse(src(p));
 
 // Phase 11.7B: je Person "fuer dieses Team geteilt" statt Paarmatrix.
@@ -86,15 +87,15 @@ test("Fragebogen: Fortschritt in Markenfarben mit echter Zahl, Scroll unter der 
   assert.doesNotMatch(ui, /<progress/);
   assert.match(ui, /role="progressbar"/);
   assert.match(ui, /from-violet-600 to-cyan-400/);
-  assert.match(ui, /`\$\{noun\} \$\{position \+ 1\} von \$\{total\}`/);
+  assert.match(ui, /position \+ 1[\s\S]*?total/);
   assert.doesNotMatch(ui, /%<\/|Prozent/);
   assert.match(ui, /scroll-mt-36/);
   assert.match(ui, /focus\(\{ preventScroll: true \}\)/);
-  assert.match(ui, />Zurück</);
+  assert.match(ui, />\s*Zurück\s*</);
   // Aktueller Ablauf: warm, mit echter Anzahl, ohne erfundene Minuten.
   const flow = code("src/features/instruments/workstyle/WorkstyleProfileFlow.tsx");
   assert.match(flow, /Mach’s dir kurz bequem\./);
-  assert.match(flow, /Dein Arbeitsprofil basiert auf \{coreItems\.length\} Situationen\./);
+  assert.match(flow, /Dein Arbeitsprofil basiert auf\s+\{coreItems\.length\}\s+Situationen\./);
   assert.match(flow, /Später weitermachen/);
   assert.doesNotMatch(flow, /Minuten|minutes/);
 });
@@ -143,10 +144,10 @@ test("Auf einen Blick (11.7B): kurze Pole innerhalb der Konstrukte, eine Spur je
   assert.match(poles, /EVI: \{ left: "erste Einschätzung stehen lassen", right: "noch einmal genauer hinschauen" \}/);
   assert.doesNotMatch(poles, /intelligen|rational|Risiko|risikobereit|extravert|Toleranz|gewissenhaft|Intuition|Bauchgefühl|Vision|Typ\b/i);
   const glance = code("src/features/reporting/workstyle/WorkstyleGlance.tsx");
-  assert.match(glance, /overviewMark\(p\.profile, area\.key\)/);
+  assert.match(glance, /overviewMark\(p\.profile, area\.key, locale\)/);
   assert.match(glance, /people\.map\(\(p\) => \(\s*<Track/);
-  assert.doesNotMatch(glance, /memberInitials|ws-token|lanes|people\.length >= 3/);
-  assert.doesNotMatch(glance, /Workstyle Signature|radar|score|Prozent/i);
+  assert.doesNotMatch(glance.replace("no overall score or ranking", ""), /memberInitials|ws-token|lanes|people\.length >= 3/);
+  assert.doesNotMatch(glance.replace("no overall score or ranking", ""), /Workstyle Signature|radar|score|Prozent/i);
 });
 
 test("Einzelbericht (11.7B): Einstieg → auf einen Blick → Auffälliges → Bereiche → eine Frage → So liest du das → Anhang", () => {
@@ -165,7 +166,7 @@ test("Fähigkeiten (11.7B): Textchips statt Symbol-Mosaik, offene Verantwortung 
   assert.ok(matrix.indexOf("Wo Verantwortung noch offen ist") < matrix.indexOf("Wer was mitbringt"));
   assert.match(matrix, /"viel Erfahrung"/);
   assert.match(matrix, /"möchte verantworten"/);
-  assert.match(matrix, /Keine Angabe: \{without\.join/);
+  assert.match(matrix, /"Keine Angabe:"[\s\S]*?\{without\.join/);
   assert.match(matrix, /Weitere Bereiche mit Angaben/);
   assert.doesNotMatch(matrix, /fehlt euch|Lücke|Score|Prozent|vollständig abgedeckt/i);
   assert.match(matrix, /das heißt nicht, dass etwas fehlt/);

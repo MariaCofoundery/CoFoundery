@@ -1,5 +1,9 @@
 "use client";
 
+import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/config";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setVentureName } from "@/features/instruments/align/ventureActions";
@@ -35,6 +39,9 @@ export function VentureHeader({
    */
   introAsks?: boolean;
 }) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   const [name, setName] = useState(venture.name ?? "");
   /**
    * Zu ist der Normalfall.
@@ -52,10 +59,9 @@ export function VentureHeader({
     <div className="space-y-3">
       {needsConfirmation && (
         <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Es ist jemand dazugekommen. Schau kurz, ob deine Angaben noch stimmen —{" "}
+           {t("Es ist jemand dazugekommen. Schau kurz, ob deine Angaben noch stimmen —")} {" "}
           <a href="/founder-alignment/vorhaben/bestaetigen" className="underline">
-            das hattest du angegeben
-          </a>
+             {t("das hattest du angegeben")} </a>
           .
         </p>
       )}
@@ -63,11 +69,10 @@ export function VentureHeader({
       {open ? (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <label className="block text-sm text-slate-700">
-            Wie heißt das Vorhaben?
-            <input
+             {t("Wie heißt das Vorhaben?")} <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="z. B. Made2Found oder Projekt X"
+              placeholder={t("z. B. Made2Found oder Projekt X")}
               className="mt-2 h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-slate-500"
             />
           </label>
@@ -86,8 +91,7 @@ export function VentureHeader({
               }
               className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
             >
-              Speichern
-            </button>
+               {t("Speichern")} </button>
             {/* OHNE NAMEN GEHT ES WEITER. Er ist eine Beschriftung, keine
                 Bedingung - wer jetzt keinen hat, soll trotzdem ausfuellen
                 koennen. */}
@@ -96,21 +100,20 @@ export function VentureHeader({
               className="text-sm text-slate-600 underline"
               onClick={() => setOpen(false)}
             >
-              Später
-            </button>
+               {t("Später")} </button>
           </div>
         </div>
       ) : (
         !introAsks && (
           <p className="text-sm text-slate-600">
-            <span className="font-medium text-slate-900">{venture.name ?? "Ohne Namen"}</span>
-            {venture.alone && <span className="text-slate-500"> — bisher nur du</span>}
+            <span className="font-medium text-slate-900">{venture.name ?? t("Ohne Namen")}</span>
+            {venture.alone && <span className="text-slate-500">  {t("— bisher nur du")} </span>}
             <button
               type="button"
               className="ml-3 text-slate-500 underline"
               onClick={() => setOpen(true)}
             >
-              {venture.name ? "umbenennen" : "benennen"}
+              {venture.name ? t("umbenennen") : t("benennen")}
             </button>
           </p>
         )

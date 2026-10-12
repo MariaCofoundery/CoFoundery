@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
@@ -18,6 +20,9 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  */
 
 export default async function ReportV21Page() {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
 
   const { data: auth } = await getRequestUser();
   // Zum Login statt 404: Wer den Link bekommt und gerade ausgeloggt ist, soll
@@ -127,7 +132,7 @@ export default async function ReportV21Page() {
   for (const grant of grants ?? []) {
     const id = grant.advisor_user_id as string;
     if (id && id !== auth.user.id && !partnerIds.has(id)) {
-      partnerIds.set(id, "Begleitung (Advisor)");
+      partnerIds.set(id, copy("Begleitung (Advisor)"));
     }
   }
 
@@ -162,7 +167,7 @@ export default async function ReportV21Page() {
   const canCompareWith = (theirAssessments ?? [])
     .map((row) => ({
       userId: row.user_id as string,
-      label: partnerIds.get(row.user_id as string) ?? "Mitgründer:in",
+      label: partnerIds.get(row.user_id as string) ?? (locale === "en" ? "Co-founder" : "Mitgründer:in"),
     }))
     .filter((entry) => entry.userId !== auth.user.id);
 
@@ -171,26 +176,18 @@ export default async function ReportV21Page() {
       <NavV21 current="/founder-alignment/pilot/report" />
 
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Entwurf — wird niemandem vorgelegt
-      </p>
-      <h1 className="text-2xl font-semibold text-slate-900">Deine Antworten</h1>
+         {copy("Entwurf — wird niemandem vorgelegt")} </p>
+      <h1 className="text-2xl font-semibold text-slate-900"> {copy("Deine Antworten")} </h1>
       <p className="mt-4 text-slate-700">
-        Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein
-        Vergleich mit anderen. Es ist die Grundlage für ein Gespräch, nicht sein
-        Ergebnis.
-      </p>
+         {copy("Das ist, was du geantwortet hast — keine Auswertung, keine Punktzahl, kein Vergleich mit anderen. Es ist die Grundlage für ein Gespräch, nicht sein Ergebnis.")} </p>
       <p className="mt-2 text-sm text-slate-500">
-        Setz einen Haken bei allem, worüber du sprechen möchtest. Das geht auch nach
-        dem Abgeben und sagt nichts über deine Antwort aus — es kommt in eurem
-        gemeinsamen Teil ganz oben auf die Liste.
-      </p>
+         {copy("Setz einen Haken bei allem, worüber du sprechen möchtest. Das geht auch nach dem Abgeben und sagt nichts über deine Antwort aus — es kommt in eurem gemeinsamen Teil ganz oben auf die Liste.")} </p>
 
       {sections.length === 0 ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-          Zu dieser archivierten Fassung liegen von dir keine Antworten vor.{" "}
+           {copy("Zu dieser archivierten Fassung liegen von dir keine Antworten vor.")} {" "}
           <Link href={CURRENT_WORKSTYLE_HREF} className="underline">
-            Wie du arbeitest ausfüllen
-          </Link>
+             {copy("Wie du arbeitest ausfüllen")} </Link>
           .
         </p>
       ) : (
@@ -204,10 +201,9 @@ export default async function ReportV21Page() {
 
           {canCompareWith.length > 0 && (
             <div className="mt-10 rounded-xl border border-slate-200 bg-white p-5">
-              <h2 className="text-base font-semibold text-slate-900">Nebeneinander ansehen</h2>
+              <h2 className="text-base font-semibold text-slate-900"> {copy("Nebeneinander ansehen")} </h2>
               <p className="mt-1 text-sm text-slate-600">
-                Diese Menschen haben dir ihre Antworten freigegeben.
-              </p>
+                 {copy("Diese Menschen haben dir ihre Antworten freigegeben.")} </p>
               <ul className="mt-3 space-y-1">
                 {canCompareWith.map((entry) => (
                   <li key={entry.userId}>
@@ -215,7 +211,7 @@ export default async function ReportV21Page() {
                       href={`/founder-alignment/pilot/compare/${entry.userId}`}
                       className="text-sm text-slate-900 underline"
                     >
-                      mit {entry.label} vergleichen
+                       {locale === "en" ? `Compare with ${entry.label}` : `mit ${entry.label} vergleichen`}
                     </Link>
                   </li>
                 ))}

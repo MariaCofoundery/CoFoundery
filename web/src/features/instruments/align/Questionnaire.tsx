@@ -1,5 +1,9 @@
 "use client";
 
+import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/config";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/AnswerFieldV21";
@@ -14,6 +18,7 @@ import {
   noteItemSeen,
 } from "@/features/instruments/v21/itemViewActions";
 import type { AssessmentScope } from "@/features/instruments/align/registries";
+import { alignmentScreens } from "@/features/instruments/align/screenDisplay";
 import type { ScreenSet } from "@/features/instruments/align/screens";
 import { questionBlocks } from "@/features/instruments/align/questionBlocks";
 
@@ -84,9 +89,13 @@ type Props = {
  * sonst nichts. Keine Auswertung beim Ausfüllen, am Ende keine Zahl.
  */
 export function Questionnaire({
-  scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens,
+  scope, ventureId = null, sections, answerable, initialAnswers, submitted, screens: sourceScreens,
   ventureName = null, afterSubmit = null,
 }: Props) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
+  const screens = alignmentScreens(sourceScreens, locale);
   const [answers, setAnswers] = useState<Record<string, DraftV21>>(initialAnswers);
   const [states, setStates] = useState<Record<string, SaveState>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -356,7 +365,7 @@ export function Questionnaire({
   
             {submitError && (
               <p role="alert" className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
-                {submitErrorText(submitError)}
+                {submitErrorText(submitError, locale)}
               </p>
             )}
       </div>
@@ -377,9 +386,9 @@ export function Questionnaire({
     return (
       <>
         <p className={klein ? "text-sm text-slate-900" : "text-base text-slate-900"}>
-          {item.prompt}
+          {t(item.prompt)}
         </p>
-        {item.hint && <p className="mt-1 text-sm text-slate-500">{item.hint}</p>}
+        {item.hint && <p className="mt-1 text-sm text-slate-500">{t(item.hint)}</p>}
 
         <div className={klein ? "mt-2" : "mt-4"}>
           <AnswerFieldV21
@@ -396,23 +405,22 @@ export function Questionnaire({
 
         {wartendeAnschlussfragen(item.itemId) > 0 && (
           <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            Wenn du hier etwas einträgst, kommen{" "}
+             {t("Wenn du hier etwas einträgst, kommen")} {" "}
             {wartendeAnschlussfragen(item.itemId) === 1
-              ? "eine Anschlussfrage"
-              : `${wartendeAnschlussfragen(item.itemId)} Anschlussfragen`}{" "}
-            dazu. Ohne Eintrag gibt es dazu nichts zu fragen.
-          </p>
+              ? t("eine Anschlussfrage")
+              : `${wartendeAnschlussfragen(item.itemId)} ${locale === "en" ? "follow-up questions" : "Anschlussfragen"}`}{" "}
+             {t("dazu. Ohne Eintrag gibt es dazu nichts zu fragen.")} </p>
         )}
 
         <div className="mt-3 flex items-center gap-3 text-xs">
-          {state === "saving" && <span className="text-slate-500">Speichern …</span>}
-          {state === "saved" && <span className="text-slate-500">Gespeichert</span>}
+          {state === "saving" && <span className="text-slate-500"> {t("Speichern …")} </span>}
+          {state === "saved" && <span className="text-slate-500"> {t("Gespeichert")} </span>}
           {state === "incomplete" && (
-            <span className="text-slate-400">noch nicht vollständig</span>
+            <span className="text-slate-400"> {t("noch nicht vollständig")} </span>
           )}
           {state === "error" && (
             <span className="text-rose-700">
-              {errorText(errors[item.itemId])}{" "}
+              {errorText(errors[item.itemId], locale)}{" "}
               {/* WIEDERHOLEN NUR, WO WIEDERHOLEN HELFEN KANN. Ein Knopf, der
                   nie Erfolg haben kann, laesst jemanden zehnmal klicken und
                   dann glauben, er habe etwas falsch gemacht. */}
@@ -422,8 +430,7 @@ export function Questionnaire({
                   className="underline"
                   onClick={() => persist(item.itemId, answers[item.itemId] ?? {})}
                 >
-                  Erneut versuchen
-                </button>
+                   {t("Erneut versuchen")} </button>
               )}
             </span>
           )}
@@ -475,7 +482,7 @@ export function Questionnaire({
       className="rounded-xl border border-slate-200 bg-white p-5"
     >
       <p className="border-b border-slate-200 pb-3 text-base font-medium text-slate-900">
-        {gruppenfrage}
+        {t(gruppenfrage)}
       </p>
       <div className="divide-y divide-slate-100">
         {reihe.map((item) => (
@@ -624,7 +631,7 @@ export function Questionnaire({
             Zaehler - eine zweite Ueberschrift ueber dem Uebergang waere ein
             zweiter Anfang. */}
         <p className="text-sm text-slate-500">
-          Schritt {schirm.step} von {screens.screens.length}
+           {t("Schritt")} {schirm.step}  {t("von")} {screens.screens.length}
           <span className="text-slate-400"> · </span>
           <span className="text-slate-600">{schirm.title}</span>
         </p>
@@ -655,10 +662,7 @@ export function Questionnaire({
 
       {missingAfterSubmit.length > 0 && (
         <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Es fehlen noch {missingAfterSubmit.length} Antworten. Für jede Frage gibt es
-          auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts
-          hinschreiben, was du nicht meinst.
-        </p>
+           {t("Es fehlen noch")} {missingAfterSubmit.length}  {t("Antworten. Für jede Frage gibt es auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts hinschreiben, was du nicht meinst.")} </p>
       )}
 
       {/* DER MOMENT VOR DEM ABSENDEN. Vorher stand hier nur ein Knopf;
@@ -678,8 +682,7 @@ export function Questionnaire({
             onClick={() => zuSchritt(schirm.step - 1)}
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700"
           >
-            Zurück
-          </button>
+             {t("Zurück")} </button>
         )}
         {!letzter && (
           <button
@@ -687,16 +690,15 @@ export function Questionnaire({
             onClick={() => zuSchritt(schirm.step + 1)}
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
           >
-            Weiter
-          </button>
+             {t("Weiter")} </button>
         )}
         {letzter && !isSubmitted && abgabeKnopf()}
       </div>
 
       {letzter && isSubmitted && (
         <p className="text-sm font-medium text-slate-900">
-          Abgegeben. Deine Antworten stehen{" "}
-          {scope === "founder_profile" ? "in deinem Founder-Profil" : "bei diesem Vorhaben"}.
+           {t("Abgegeben. Deine Antworten stehen")} {" "}
+          {scope === "founder_profile" ? t("in deinem Founder-Profil") : t("bei diesem Vorhaben")}.
         </p>
       )}
     </div>
@@ -732,55 +734,61 @@ function kannWiederholen(reason?: string): boolean {
   return reason === "unreachable";
 }
 
-function submitErrorText(reason: string): string {
+function submitErrorText(reason: string, locale: AppLocale): string {
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   switch (reason) {
     case "unsaved":
-      return "Eine Antwort ist noch nicht gespeichert. Bitte warte kurz oder versuche sie erneut zu speichern.";
+      return t("Eine Antwort ist noch nicht gespeichert. Bitte warte kurz oder versuche sie erneut zu speichern.");
     case "unreachable":
-      return "Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.";
+      return t("Das hat gerade nicht geklappt. Deine Antworten sind noch da. Bitte versuche es erneut.");
     case "no_permission":
-      return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet. Deine Antworten sind noch da.";
+      return t("Dieser Fragebogen ist für dein Konto nicht freigeschaltet. Deine Antworten sind noch da.");
     case "setup_missing":
-      return "Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Deine Antworten sind noch da; bitte sag uns Bescheid.";
+      return t("Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Deine Antworten sind noch da; bitte sag uns Bescheid.");
     case "venture_ambiguous":
-      return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
+      return t("Du bist in mehreren Vorhaben — bitte wähle oben eins aus.");
     default:
-      return `Das hat gerade nicht geklappt (${reason}). Deine Antworten sind noch da — sag uns bitte Bescheid.`;
+      return locale === "en" ? `That did not work (${reason}). Your responses are still there. Please let us know.` : `Das hat gerade nicht geklappt (${reason}). Deine Antworten sind noch da — sag uns bitte Bescheid.`;
   }
 }
 
-function errorText(reason = "unbekannt"): string {
+function errorText(reason: string = "", locale: AppLocale = "de"): string {
+  // The code is shown verbatim; only the placeholder for a missing one follows the locale.
+  if (!reason) reason = locale === "en" ? "unknown" : "unbekannt";
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   switch (reason) {
     case "option_needs_text":
-      return "Bitte beschreibe kurz, was du meinst.";
+      return t("Bitte beschreibe kurz, was du meinst.");
     case "exclusive_option_with_others":
-      return "Diese Antwort schließt die anderen aus.";
+      return t("Diese Antwort schließt die anderen aus.");
     case "too_many_options":
-      return "Bitte höchstens zwei auswählen.";
+      return t("Bitte höchstens zwei auswählen.");
     case "missing_currency":
-      return "Bitte wähle eine Währung.";
+      return t("Bitte wähle eine Währung.");
     case "missing_unit":
-      return "Bitte gib eine Einheit an.";
+      return t("Bitte gib eine Einheit an.");
     case "incomplete_window":
-      return "Bitte Tag, Uhrzeit und Zeitzone angeben.";
+      return t("Bitte Tag, Uhrzeit und Zeitzone angeben.");
     case "person_without_name":
-      return "Bitte benenne die Person oder die geplante Rolle.";
+      return t("Bitte benenne die Person oder die geplante Rolle.");
     case "empty_text":
-      return "Da steht noch nichts.";
+      return t("Da steht noch nichts.");
     case "incomplete_value_case":
-      return "Bitte beide Anliegen bewerten und einen Weg wählen.";
+      return t("Bitte beide Anliegen bewerten und einen Weg wählen.");
     case "venture_ambiguous":
-      return "Du bist in mehreren Vorhaben — bitte wähle oben eins aus.";
+      return t("Du bist in mehreren Vorhaben — bitte wähle oben eins aus.");
     case "unreachable":
-      return "Verbindung unterbrochen — diese Änderung ist noch nicht gespeichert.";
+      return t("Verbindung unterbrochen — diese Änderung ist noch nicht gespeichert.");
     case "no_permission":
-      return "Dieser Fragebogen ist für dein Konto nicht freigeschaltet.";
+      return t("Dieser Fragebogen ist für dein Konto nicht freigeschaltet.");
     case "setup_missing":
-      return "Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Ein zweiter Versuch hilft hier nicht.";
+      return t("Diese Umgebung kennt den Fragebogen noch nicht — die Datenbank ist nicht auf dem Stand der Anwendung. Ein zweiter Versuch hilft hier nicht.");
     case "value_rejected":
-      return "Diese Antwort hat die Datenbank abgelehnt. Das ist ein Fehler bei uns — bitte sag uns, bei welcher Frage es passiert ist.";
+      return t("Diese Antwort hat die Datenbank abgelehnt. Das ist ein Fehler bei uns — bitte sag uns, bei welcher Frage es passiert ist.");
     case "draft_create_failed":
-      return "Der Fragebogen konnte nicht angelegt werden. Das liegt an uns, nicht an dir — bitte sag uns Bescheid.";
+      return t("Der Fragebogen konnte nicht angelegt werden. Das liegt an uns, nicht an dir — bitte sag uns Bescheid.");
 
     // ---------------------------------------------------------------------------
     // JEDER FEHLSCHLAG OHNE NAMEN SAH GLEICH AUS
@@ -797,6 +805,6 @@ function errorText(reason = "unbekannt"): string {
     // ein glatter Satz, der nichts sagt. Und der Satz sagt dazu, dass es an
     // uns liegt und nicht an der Person.
     default:
-      return `Das konnte nicht gespeichert werden (${reason}). Das liegt an uns, nicht an dir — sag uns bitte, bei welcher Frage es passiert ist.`;
+      return locale === "en" ? `This could not be saved (${reason}) because of a problem on our side. Please tell us which question it happened on.` : `Das konnte nicht gespeichert werden (${reason}). Das liegt an uns, nicht an dir — sag uns bitte, bei welcher Frage es passiert ist.`;
   }
 }

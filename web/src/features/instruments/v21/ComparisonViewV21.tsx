@@ -1,3 +1,6 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import type { AppLocale } from "@/i18n/config";
+import { alignmentDisplayText, alignmentDisplayEntry } from "@/features/instruments/align/display";
 import type { ComparisonV21 } from "@/features/instruments/v21/comparisonDataV21";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -56,20 +59,19 @@ const AGENDA_GROUPS: { kind: string; label: string }[] = [
 
 type Props = { comparison: ComparisonV21; nameA: string; nameB: string };
 
-export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
+export async function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
+  const locale = await getRequestLocale();
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   return (
     <div className="space-y-10">
       <section className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-        <h2 className="text-base font-semibold text-slate-900">Worüber ihr sprechen könnt</h2>
+        <h2 className="text-base font-semibold text-slate-900"> {t("Worüber ihr sprechen könnt")} </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Gruppiert nach Art, nicht nach Wichtigkeit: Zusagen und Regeln sind konkreter
-          als Arbeitspräferenzen — schwerer sind sie deshalb nicht.
-        </p>
+           {t("Gruppiert nach Art, nicht nach Wichtigkeit: Zusagen und Regeln sind konkreter als Arbeitspräferenzen — schwerer sind sie deshalb nicht.")} </p>
         {comparison.agenda.length === 0 ? (
           <p className="mt-3 text-sm text-slate-700">
-            Noch nichts. Das heißt nicht, dass ihr euch einig seid — es heißt, dass
-            noch zu wenig beantwortet ist.
-          </p>
+             {t("Noch nichts. Das heißt nicht, dass ihr euch einig seid — es heißt, dass noch zu wenig beantwortet ist.")} </p>
         ) : (
           <div className="mt-4 space-y-4">
             {AGENDA_GROUPS.map((group) => {
@@ -78,13 +80,13 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
               return (
                 <div key={group.kind}>
                   <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {group.label}
+                    {t(group.label)}
                   </p>
                   <ul className="mt-1 space-y-1.5">
                     {entries.map((entry) => (
                       <li key={entry.itemId} className="text-sm text-slate-800">
-                        <span className="text-slate-500">{entry.section} — </span>
-                        {entry.prompt}
+                        <span className="text-slate-500">{t(entry.section)} — </span>
+                        {t(entry.prompt)}
                       </li>
                     ))}
                   </ul>
@@ -96,15 +98,15 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
       </section>
 
       {comparison.sections.map((group) => (
-        <section key={group.section} className="space-y-3">
-          <h2 className="text-lg font-semibold text-slate-900">{group.section}</h2>
+        <section key={t(group.section)} className="space-y-3">
+          <h2 className="text-lg font-semibold text-slate-900">{t(group.section)}</h2>
 
           {group.items.map((item) => (
             <div key={item.itemId} className="rounded-xl border border-slate-200 bg-white p-5">
               <div className="flex items-start justify-between gap-4">
-                <p className="text-sm text-slate-600">{item.prompt}</p>
+                <p className="text-sm text-slate-600">{t(item.prompt)}</p>
                 <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                  {STATE_LABEL[item.state]}
+                  {t(STATE_LABEL[item.state])}
                 </span>
               </div>
 
@@ -112,12 +114,12 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
                 // „Fehlt“ sieht nicht aus wie „passt nicht“: Es steht dabei,
                 // WARUM es keinen Vergleich gibt.
                 <p className="mt-3 text-sm text-slate-500">
-                  {item.why ? WHY_LABEL[item.why] : "kein Vergleich möglich"}
+                  {item.why ? t(WHY_LABEL[item.why]) : t("kein Vergleich möglich")}
                 </p>
               ) : (
                 <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                  <Column name={nameA} entry={item.a} />
-                  <Column name={nameB} entry={item.b} />
+                  <Column locale={locale} name={nameA} entry={item.a} />
+                  <Column locale={locale} name={nameB} entry={item.b} />
                 </div>
               )}
 
@@ -129,7 +131,9 @@ export function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
   );
 }
 
-function Column({ name, entry }: { name: string; entry: ReadoutEntry | null }) {
+function Column({ name, entry: raw, locale }: { name: string; entry: ReadoutEntry | null; locale: AppLocale }) {
+  const entry = raw ? alignmentDisplayEntry(raw, locale) : null;
+
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{name}</p>
@@ -139,7 +143,7 @@ function Column({ name, entry }: { name: string; entry: ReadoutEntry | null }) {
         ) : entry.missing ? (
           <p className="text-sm text-slate-600">{entry.missing.label}</p>
         ) : (
-          <Short value={entry} />
+          <Short value={entry} locale={locale} />
         )}
       </div>
     </div>
@@ -147,9 +151,11 @@ function Column({ name, entry }: { name: string; entry: ReadoutEntry | null }) {
 }
 
 /** Kurzfassung fürs Nebeneinander. Der ganze Text steht im eigenen Bericht. */
-function Short({ value: entry }: { value: ReadoutEntry }) {
+function Short({ value: entry, locale }: { value: ReadoutEntry; locale: AppLocale }) {
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   const value = entry.value;
-  if (!value) return <p className="text-sm text-rose-700">nicht lesbar</p>;
+  if (!value) return <p className="text-sm text-rose-700"> {t("nicht lesbar")} </p>;
 
   switch (value.kind) {
     case "ordinal":
@@ -171,7 +177,7 @@ function Short({ value: entry }: { value: ReadoutEntry }) {
               {concern.label}: {concern.importance.label}
             </p>
           ))}
-          <p className="mt-1">Weg: {value.path}</p>
+          <p className="mt-1"> {t("Weg:")} {value.path}</p>
         </div>
       );
     case "number":
@@ -183,7 +189,7 @@ function Short({ value: entry }: { value: ReadoutEntry }) {
     case "money":
       return (
         <p className="text-sm text-slate-900">
-          {value.amount.toLocaleString("de-DE")} {value.currency}
+          {value.amount.toLocaleString(locale === "en" ? "en-US" : "de-DE")} {value.currency}
         </p>
       );
     case "date":
@@ -214,7 +220,7 @@ function Short({ value: entry }: { value: ReadoutEntry }) {
         <ul className="text-sm text-slate-900">
           {value.per.map((row, index) => (
             <li key={index}>
-              {row.person}: {row.number === null ? "keine feste Erwartung" : `${row.number} ${row.unit}`}
+              {row.person}: {row.number === null ? t("keine feste Erwartung") : `${row.number} ${row.unit}`}
             </li>
           ))}
         </ul>

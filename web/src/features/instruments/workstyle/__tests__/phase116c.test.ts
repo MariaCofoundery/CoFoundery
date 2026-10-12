@@ -1,3 +1,4 @@
+import { withWorkstyleCopy } from "@/features/instruments/workstyle/__tests__/localizedSource";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -12,7 +13,7 @@ import { WORKSTYLE_PRETEST_V3 } from "@/features/instruments/workstyle/registry"
  */
 
 const src = (p: string) => readFileSync(p, "utf8");
-const code = (p: string) => src(p).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = (p: string) => withWorkstyleCopy(src(p)).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 const MIGRATION = "../supabase/migrations/20261118140000_workstyle_research_wave1.sql";
 const FLOW = "src/features/instruments/workstyle/WorkstyleProfileFlow.tsx";
 const SPEC = JSON.parse(src("docs/founder-workstyle-research-sets-1.0.0.json"));
@@ -66,7 +67,7 @@ test("Einstieg: warm, faire Wahl zwischen 29 und 37, nichts vorausgewaehlt", () 
   const flow = code(FLOW);
   assert.match(flow, /Mach’s dir kurz bequem\./);
   assert.match(flow, /nicht so, wie es ideal klingen würde/);
-  assert.match(flow, /Dein Arbeitsprofil basiert auf \{coreItems\.length\} Situationen\./);
+  assert.match(flow, /Dein Arbeitsprofil basiert auf\s+\{coreItems\.length\}\s+Situationen\./);
   assert.match(flow, /die zusätzlichen Fragen werden ganz normal zwischen die anderen gemischt/);
   assert.match(flow, /\["profile", "Nur mein Arbeitsprofil"/);
   assert.match(flow, /\["research", "Ja, ich unterstütze die Weiterentwicklung"/);
@@ -88,7 +89,7 @@ test("Abschluss 37 und Zwischenstand bei offenen Entwicklungsfragen", () => {
   const flow = code(FLOW);
   assert.match(flow, /Geschafft – danke\./);
   assert.match(flow, /Dein Arbeitsprofil ist fertig, und du hast uns zusätzlich bei der Weiterentwicklung unterstützt\./);
-  assert.match(flow, /Deine \{DEVELOPMENT_COUNT\} Entwicklungsantworten verändern deinen aktuellen Report nicht\./);
+  assert.match(flow, /Deine\s+\{DEVELOPMENT_COUNT\}\s+Entwicklungsantworten verändern deinen aktuellen Report nicht\./);
   assert.match(flow, /Dein Arbeitsprofil ist fertig\./);
   assert.match(flow, /freiwillige Entwicklungsfragen offen/);
   // Der Abschluss erscheint erst, wenn der gewaehlte Ablauf zu Ende ist.

@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
@@ -34,6 +36,9 @@ export default async function AlignComparePage({
   params: Promise<{ partnerId: string }>;
   searchParams: Promise<{ venture?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const { partnerId } = await params;
   const { venture: gewaehlt } = await searchParams;
 
@@ -79,41 +84,34 @@ export default async function AlignComparePage({
     <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vergleich" state={navState} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Testfassung
-      </p>
-      {zusammenImVorhaben && venture && <p className="mb-5"><Link href={`/teams/${venture.id}/workstyle`} className="underline">Euer aktuelles Zusammenspiel öffnen</Link></p>}
-      <h1 className="text-2xl font-semibold text-slate-900">Frühere Auswertung: Nebeneinander</h1>
+         {copy("Testfassung")} </p>
+      {zusammenImVorhaben && venture && <p className="mb-5"><Link href={`/teams/${venture.id}/workstyle`} className="underline"> {copy("Euer aktuelles Zusammenspiel öffnen")} </Link></p>}
+      <h1 className="text-2xl font-semibold text-slate-900"> {copy("Frühere Auswertung: Nebeneinander")} </h1>
       <p className="mt-4 text-slate-700">
-        Eure Antworten nebeneinander — keine Passungszahl, keine Bewertung. Wo ihr
-        unterschiedlich geantwortet habt, heißt das nicht, dass etwas nicht passt. Es
-        heißt, dass ihr darüber noch nicht gesprochen habt.
-      </p>
+         {copy("Eure Antworten nebeneinander — keine Passungszahl, keine Bewertung. Wo ihr unterschiedlich geantwortet habt, heißt das nicht, dass etwas nicht passt. Es heißt, dass ihr darüber noch nicht gesprochen habt.")} </p>
 
       {/* DAS VORHABEN ZUERST. Zusagen und Ziele sind konkreter als
           Arbeitspraeferenzen - ueber eine Zahl laesst sich am Dienstag reden. */}
       {vorhaben && (
         <section className="mt-12">
           <h2 className="text-lg font-semibold text-slate-900">
-            {venture?.name ?? "Euer Vorhaben"}
+            {venture?.name ?? copy("Euer Vorhaben")}
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            {registryOf("venture_alignment").validity}
+            {copy(registryOf("venture_alignment").validity)}
           </p>
 
           {!vorhaben.hasAnything ? (
             <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-              Zu diesem Vorhaben hat noch niemand von euch abgegeben. Das heißt nicht,
-              dass ihr euch einig seid — es heißt, dass es noch nichts zu vergleichen
-              gibt.
-            </p>
+               {copy("Zu diesem Vorhaben hat noch niemand von euch abgegeben. Das heißt nicht, dass ihr euch einig seid — es heißt, dass es noch nichts zu vergleichen gibt.")} </p>
           ) : (
             <>
               {vorhaben.expectations && (
                 <div className="mt-4">
                   <ExpectationGapsView
                     result={vorhaben.expectations}
-                    nameA="Du"
-                    nameB="Die andere Person"
+                    nameA={copy("Du")}
+                    nameB={copy("Die andere Person")}
                   />
                 </div>
               )}
@@ -130,7 +128,7 @@ export default async function AlignComparePage({
               </div>
 
               <div className="mt-6">
-                <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
+                <h3 className="text-base font-medium text-slate-900"> {copy("Gesprächskarten")} </h3>
                 <div className="mt-3">
                   <ConversationCardsView cards={vorhaben.cards} />
                 </div>
@@ -144,8 +142,8 @@ export default async function AlignComparePage({
                     notShared: [],
                     expectations: vorhaben.expectations ?? { gaps: [], unmatched: [] },
                   }}
-                  nameA="Du"
-                  nameB="Die andere Person"
+                  nameA={copy("Du")}
+                  nameB={copy("Die andere Person")}
                 />
               </div>
 
@@ -167,15 +165,14 @@ export default async function AlignComparePage({
       )}
 
       <section className="mt-16">
-        <h2 className="text-lg font-semibold text-slate-900">Wie ihr arbeitet</h2>
+        <h2 className="text-lg font-semibold text-slate-900"> {copy("Wie ihr arbeitet")} </h2>
         <p className="mt-1 text-sm text-slate-500">
-          {registryOf("founder_profile").validity}
+          {copy(registryOf("founder_profile").validity)}
         </p>
 
         {!profil.hasAnything ? (
           <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-            Zum Arbeitsprofil hat noch niemand von euch abgegeben.
-          </p>
+             {copy("Zum Arbeitsprofil hat noch niemand von euch abgegeben.")} </p>
         ) : (
           <>
           <div className="mt-6">
@@ -187,7 +184,7 @@ export default async function AlignComparePage({
           </div>
 
           <div className="mt-6">
-            <h3 className="text-base font-medium text-slate-900">Gesprächskarten</h3>
+            <h3 className="text-base font-medium text-slate-900"> {copy("Gesprächskarten")} </h3>
             <div className="mt-3">
               <ConversationCardsView cards={profil.cards} />
             </div>
@@ -201,8 +198,8 @@ export default async function AlignComparePage({
                 notShared: [],
                 expectations: { gaps: [], unmatched: [] },
               }}
-              nameA="Du"
-              nameB="Die andere Person"
+              nameA={copy("Du")}
+              nameB={copy("Die andere Person")}
             />
           </div>
 

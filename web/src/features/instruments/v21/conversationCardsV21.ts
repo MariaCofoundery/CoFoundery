@@ -1,3 +1,6 @@
+import englishCards from "../align/cardsLegacy.en.json";
+import type { AppLocale } from "@/i18n/config";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import libraryJson from "../../../../docs/founder-alignment-conversation-v2-1.json";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 import type { ReadoutValue } from "@/features/instruments/v21/readoutV21";
@@ -95,7 +98,9 @@ export function buildCardsV21(input: {
   markedItemIds?: readonly string[];
   nameA: string;
   nameB: string;
+  locale?: AppLocale;
 }): ConversationCardV21[] {
+  const locale = input.locale ?? "de";
   const marked = new Set(input.markedItemIds ?? []);
   const cards: ConversationCardV21[] = [];
   const used = new Set<string>();
@@ -104,15 +109,16 @@ export function buildCardsV21(input: {
     for (const item of group.items) {
       if (used.has(item.itemId)) continue;
 
-      const card = pick(item, marked.has(item.itemId));
+      const selected = pick(item, marked.has(item.itemId));
+      const card = selected && locale === "en" ? { ...selected, ...(englishCards as Record<string, Omit<LibraryCard, "id" | "trigger">>)[selected.id] } : selected;
       if (!card) continue;
 
       used.add(item.itemId);
       cards.push({
         id: `${card.id}:${item.itemId}`,
         itemId: item.itemId,
-        section: item.section,
-        observed: fill(card.observed, item, input.nameA, input.nameB),
+        section: alignmentDisplayText(item.section, locale),
+        observed: fill(card.observed, item, input.nameA, input.nameB, locale),
         meaning: card.meaning,
         question: card.question,
         agreement: card.agreement,
@@ -171,26 +177,26 @@ function pick(item: ItemComparison, isMarked: boolean): LibraryCard | null {
  * Bleibt ein Platzhalter ohne Wert, verschwindet er samt Satzteil. Ein „{b}
  * nennt undefined“ wäre schlimmer als ein kürzerer Satz.
  */
-function fill(text: string, item: ItemComparison, nameA: string, nameB: string): string {
+function fill(text: string, item: ItemComparison, nameA: string, nameB: string, locale: AppLocale): string {
   const short = (value: ReadoutValue | null | undefined): string | null => {
     if (!value) return null;
     switch (value.kind) {
       case "ordinal":
       case "choice":
-        return value.label;
+        return alignmentDisplayText(value.label, locale);
       case "choices":
-        return value.labels.join(", ");
+        return value.labels.map(v => alignmentDisplayText(v, locale)).join(", ");
       case "case":
-        return value.path;
+        return alignmentDisplayText(value.path, locale);
       case "number":
-        return `${value.number} ${value.unit}`.trim();
+        return `${value.number} ${alignmentDisplayText(value.unit, locale)}`.trim();
       case "money":
-        return `${value.amount.toLocaleString("de-DE")} ${value.currency}`.trim();
+        return `${value.amount.toLocaleString(locale === "en" ? "en-US" : "de-DE")} ${value.currency}`.trim();
       case "date":
         return value.date;
       case "perPerson":
         return value.per
-          .map((row) => `${row.person}: ${row.number ?? "keine feste Erwartung"}`)
+          .map((row) => `${row.person}: ${row.number ?? alignmentDisplayText("keine feste Erwartung", locale)}`)
           .join("; ");
       default:
         return null;
@@ -207,9 +213,9 @@ function fill(text: string, item: ItemComparison, nameA: string, nameB: string):
     b: nameB,
     aAnswer: short(item.a?.value),
     bAnswer: short(item.b?.value),
-    shared: mine.filter((label) => theirs.includes(label)).join(", ") || null,
-    aOnly: mine.filter((label) => !theirs.includes(label)).join(", ") || null,
-    bOnly: theirs.filter((label) => !mine.includes(label)).join(", ") || null,
+    shared: mine.filter((label) => theirs.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
+    aOnly: mine.filter((label) => !theirs.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
+    bOnly: theirs.filter((label) => !mine.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
   };
 
   return text

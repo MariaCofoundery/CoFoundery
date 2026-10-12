@@ -1,3 +1,4 @@
+import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import Link from "next/link";
@@ -278,7 +279,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
       ) : null}
 
       {/* 2 — Wie du arbeitest. */}
-      {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle profile={workstyleV04} full={voll} /></Abschnitt> : null}
+      {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} full={voll} /></Abschnitt> : null}
       {/* Phase 11.5: Das fruehere Arbeitsprofil steht in der Langfassung nur noch
           als kompakte Archivkarte. Vollstaendig nur, wenn "Fruehere Auswertung
           mit aufnehmen" gewaehlt ist. Keine Daten werden geloescht. */}

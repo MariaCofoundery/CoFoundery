@@ -1,3 +1,6 @@
+import type { AppLocale } from "@/i18n/config";
+import { COPY_EN, SITUATIONS_EN, PREFERENCES_EN, TEAM_EN, ORG_DIFFERS_EN } from "@/features/reporting/workstyle/displayCopyEn";
+import { workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
 /**
  * Report-Aussagen fuer workstyle-report/1.0.0 - deterministisch, ohne LLM.
  *
@@ -28,8 +31,7 @@
  * - keine Alltagsableitungen ueber die beschriebenen Situationen hinaus;
  * - AMB beschreibt Empfinden, nicht Handeln.
  *
- * Inhalt ist deutsch, weil das Instrument nur deutsch existiert. Die
- * Seitenumgebung ist uebersetzt.
+ * Locale changes display copy only; the evidence and claim selection stay unchanged.
  */
 import {
   AREAS,
@@ -258,11 +260,11 @@ export function areaPattern(profile: ProductProfile, area: AreaKey): AreaPattern
 }
 
 /** Einzelantworten, die nicht in die Bereichsrichtung eingehen - woertlich wiedergegeben. */
-function itemNotes(profile: ProductProfile, area: AreaKey): { claim: string; text: string }[] {
+function itemNotes(profile: ProductProfile, area: AreaKey, locale: AppLocale): { claim: string; text: string }[] {
   if (area === "EXP") {
     const choice = rawChoice(profile, "EXP-01");
     return choice
-      ? [{ claim: "EXP.ITEM.EXP-01", text: `Wie ernst du einen vertrauten Eindruck nimmst, den du noch nicht begründen kannst: „${choice.label}“.` }]
+      ? [{ claim: "EXP.ITEM.EXP-01", text: locale === "en" ? `How seriously you take a familiar impression before you can explain it: “${displayChoiceLabel(profile, "EXP-01", locale)}”.` : `Wie ernst du einen vertrauten Eindruck nimmst, den du noch nicht begründen kannst: „${choice.label}“.` }]
       : [];
   }
   if (area !== "ORG") return [];
@@ -272,7 +274,7 @@ function itemNotes(profile: ProductProfile, area: AreaKey): { claim: string; tex
     const side = choice.value.endsWith("_a") ? "A" : choice.value.endsWith("_b") ? "B" : null;
     if (!side) return [];
     const strong = choice.value.startsWith("strong_");
-    return [{ claim: `ORG.ITEM.${key}`, text: `${copy.context}, ${copy[side].replace("{eher}", strong ? "deutlich eher" : "eher")}.` }];
+    return [{ claim: `ORG.ITEM.${key}`, text: locale === "en" ? `${PREFERENCES_EN[key].context}, ${PREFERENCES_EN[key][side].replace("{preference}", strong ? "strongly prefer to" : "tend to")}.` : `${copy.context}, ${copy[side].replace("{eher}", strong ? "deutlich eher" : "eher")}.` }];
   });
 }
 
@@ -295,10 +297,10 @@ export type AreaNarrative = {
   question: string | null;
 };
 
-export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarrative {
-  const copy = COPY[area];
+export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): AreaNarrative {
+  const copy: AreaCopy = locale === "en" ? COPY_EN[area] : COPY[area];
   const pattern = areaPattern(profile, area);
-  const notes = itemNotes(profile, area);
+  const notes = itemNotes(profile, area, locale);
   const missing = PRODUCT_ITEMS.filter((i) => i.area_key === area && !rawChoice(profile, i.item_key)).length;
   const base = { key: area, pattern, itemNotes: notes, missing, exception: null, situations: [] };
   if (pattern.kind === "insufficient") {
@@ -307,15 +309,15 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarra
       claim: `${area}.INSUFFICIENT`,
       core:
         area === "ORG" && notes.length
-          ? "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
-          : "Für diesen Bereich liegen zu wenige Antworten vor, um etwas daraus abzuleiten.",
+          ? locale === "en" ? "There are not enough responses about next steps and checkpoints to describe a pattern yet." : "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
+          : locale === "en" ? "There are not enough responses to describe a pattern in this area yet." : "Für diesen Bereich liegen zu wenige Antworten vor, um etwas daraus abzuleiten.",
       note: null,
       question: null,
     };
   }
   if (pattern.kind === "mixed") {
     const situations = (["upper", "middle", "lower"] as Band[])
-      .map((band) => ({ label: copy.bands[band], items: pattern[band].map((k) => SITUATIONS[k]) }))
+      .map((band) => ({ label: copy.bands[band], items: pattern[band].map((k) => (locale === "en" ? SITUATIONS_EN : SITUATIONS)[k]) }))
       .filter((s) => s.items.length);
     return { ...base, claim: `${area}.MIXED`, core: copy.mixed, situations, note: copy.note ?? null, question: copy.question.open };
   }
@@ -325,7 +327,7 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarra
     claim: `${area}.DIRECTION.${pattern.band.toUpperCase()}.${pattern.strength.toUpperCase()}`,
     core: copy.direction[pattern.band],
     exception: pattern.exception
-      ? `Nur in einer Situation legst du dich weniger fest: ${SITUATIONS[pattern.exception]}.`
+      ? locale === "en" ? `In one situation you are less definite: ${SITUATIONS_EN[pattern.exception]}.` : `Nur in einer Situation legst du dich weniger fest: ${SITUATIONS[pattern.exception]}.`
       : null,
     note: copy.note ?? null,
     question: side ? copy.question[side] : copy.question.open,
@@ -333,10 +335,11 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey): AreaNarra
 }
 
 /** Ein kurzer Satz fuer die Bereichskarte - nie staerker als die Kernaussage. */
-export function glanceSentence(profile: ProductProfile, area: AreaKey): string {
+export function glanceSentence(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): string {
   const pattern = areaPattern(profile, area);
-  if (pattern.kind === "insufficient") return "Noch zu wenige Antworten.";
-  return pattern.kind === "mixed" ? COPY[area].short.mixed : COPY[area].short[pattern.band];
+  if (pattern.kind === "insufficient") return locale === "en" ? "Not enough responses yet." : "Noch zu wenige Antworten.";
+  const copy = locale === "en" ? COPY_EN[area] : COPY[area];
+  return pattern.kind === "mixed" ? copy.short.mixed : copy.short[pattern.band];
 }
 
 /**
@@ -344,8 +347,8 @@ export function glanceSentence(profile: ProductProfile, area: AreaKey): string {
  * mit durchgehender Richtung, sonst mit ueberwiegender Richtung, sonst aus
  * dem ersten gemischten Bereich. Feste Bereichsreihenfolge - keine Gewichtung.
  */
-export function questionForYou(profile: ProductProfile): { area: AreaKey; question: string; claim: string } | null {
-  const all = AREAS.map((a) => ({ area: a.key, n: areaNarrative(profile, a.key) }));
+export function questionForYou(profile: ProductProfile, locale: AppLocale = "de"): { area: AreaKey; question: string; claim: string } | null {
+  const all = AREAS.map((a) => ({ area: a.key, n: areaNarrative(profile, a.key, locale) }));
   const pick =
     all.find((x) => x.n.pattern.kind === "direction" && x.n.pattern.band !== "middle" && x.n.pattern.strength === "all") ??
     all.find((x) => x.n.pattern.kind === "direction" && x.n.pattern.band !== "middle") ??
@@ -353,8 +356,8 @@ export function questionForYou(profile: ProductProfile): { area: AreaKey; questi
   return pick && pick.n.question ? { area: pick.area, question: pick.n.question, claim: pick.n.claim } : null;
 }
 
-export function individualNarratives(profile: ProductProfile) {
-  return AREAS.map((area) => ({ area, narrative: areaNarrative(profile, area.key) }));
+export function individualNarratives(profile: ProductProfile, locale: AppLocale = "de") {
+  return AREAS.map((area) => ({ area, narrative: areaNarrative(profile, area.key, locale) }));
 }
 
 /** Die Richtung einer Person in einem Bereich - nur, wenn sie getragen ist. */
@@ -376,7 +379,7 @@ export type OverviewMark =
   | { kind: "range"; from: number; to: number; fromLabel: string; toLabel: string; options: readonly { label: string }[] }
   | { kind: "none" };
 
-export function overviewMark(profile: ProductProfile, area: AreaKey): OverviewMark {
+export function overviewMark(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): OverviewMark {
   const pattern = areaPattern(profile, area);
   if (pattern.kind === "insufficient") return { kind: "none" };
   const choices = patternItems(area)
@@ -385,13 +388,14 @@ export function overviewMark(profile: ProductProfile, area: AreaKey): OverviewMa
       return c && typeof c.value === "number" ? [c] : [];
     })
     .sort((a, b) => a.position - b.position);
-  const options = choices[0].options;
+  const firstItem = patternItems(area)[0];
+  const options = workstyleDisplayOptions(firstItem, locale);
   if (pattern.kind === "direction") {
     const median = choices[Math.floor((choices.length - 1) / 2)];
-    return { kind: "point", position: median.position, label: median.label, options };
+    return { kind: "point", position: median.position, label: options[median.position].label, options };
   }
   const from = choices[0], to = choices.at(-1)!;
-  return { kind: "range", from: from.position, to: to.position, fromLabel: from.label, toLabel: to.label, options };
+  return { kind: "range", from: from.position, to: to.position, fromLabel: options[from.position].label, toLabel: options[to.position].label, options };
 }
 
 // ---------------------------------------------------------------------------
@@ -495,8 +499,8 @@ const TEAM_COPY: Record<AreaKey, TeamCopy> = {
 };
 
 /** Die Gespraechskarte eines Bereichs (Etikett + Frage), fuer TeamWorkstyleReport. */
-export function teamCard(area: AreaKey) {
-  return TEAM_COPY[area].card;
+export function teamCard(area: AreaKey, locale: AppLocale = "de") {
+  return (locale === "en" ? TEAM_EN : TEAM_COPY)[area].card;
 }
 
 /** ORG-Zweierwahlen haben eigene Hypothesen - Fokus, Unterbrechung und Planaenderung sind verschiedene Unteraspekte. */
@@ -529,7 +533,7 @@ function isOpposite(bands: string[]) {
   return (set.has("lower") && set.has("upper")) || (set.has("A") && set.has("B"));
 }
 
-export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamAreaFinding {
+export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale: AppLocale = "de"): TeamAreaFinding {
   const items = PRODUCT_ITEMS.filter((i) => i.area_key === area);
   // Nur Situationen, die ALLE beantwortet haben. Fehlende Antworten sind keine Mitte.
   const shared = items.filter((i) => people.every((p) => responseBand(p.profile, i.item_key) !== null));
@@ -537,32 +541,32 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
   const different = shared.filter((i) => new Set(bandsOf(i.item_key)).size > 1);
   const opposite = different.filter((i) => isOpposite(bandsOf(i.item_key)));
   const allWord = people.length === 2 ? "beide" : "alle";
-  const fill = (text: string) => text.replace("{alle}", allWord).replace("{allen}", people.length === 2 ? "beiden" : "allen");
+  const fill = (text: string) => text.replace("{all}", people.length === 2 ? "both" : "all").replace("{alle}", allWord).replace("{allen}", people.length === 2 ? "beiden" : "allen");
 
   const situations = [...opposite, ...different.filter((i) => !opposite.includes(i))].slice(0, 2).map((i) => ({
     item: i.item_key,
-    label: SITUATIONS[i.item_key] ?? PREFERENCES[i.item_key]?.context ?? i.prompt,
+    label: locale === "en" ? SITUATIONS_EN[i.item_key] ?? PREFERENCES_EN[i.item_key]?.context ?? i.prompt : SITUATIONS[i.item_key] ?? PREFERENCES[i.item_key]?.context ?? i.prompt,
     groups: [...new Set(bandsOf(i.item_key))]
       .sort((a, b) => BAND_ORDER.indexOf(a) - BAND_ORDER.indexOf(b))
       .map((band) => ({
         names: people.filter((p) => responseBand(p.profile, i.item_key) === band).map((p) => p.name),
-        answers: [...new Set(people.filter((p) => responseBand(p.profile, i.item_key) === band).map((p) => rawChoice(p.profile, i.item_key)!.label))],
+        answers: [...new Set(people.filter((p) => responseBand(p.profile, i.item_key) === band).map((p) => displayChoiceLabel(p.profile, i.item_key, locale)!))],
       })),
   }));
 
   if (shared.length < Math.min(3, items.length)) {
-    return { key: area, kind: "insufficient", claim: `${area}.TEAM.INSUFFICIENT`, summary: "Für diesen Bereich fehlen gemeinsame Antworten – daraus leiten wir nichts ab.", situations: [], hypothesis: null, question: null };
+    return { key: area, kind: "insufficient", claim: `${area}.TEAM.INSUFFICIENT`, summary: locale === "en" ? "There are not enough shared responses in this area to describe a pattern." : "Für diesen Bereich fehlen gemeinsame Antworten – daraus leiten wir nichts ab.", situations: [], hypothesis: null, question: null };
   }
   if (!different.length) {
     const directions = people.map((p) => personDirection(p.profile, area));
     const common = directions.every((d) => d && d === directions[0]) ? directions[0] : null;
-    const note = common ? TEAM_COPY[area].similar[common] : null;
+    const note = common ? (locale === "en" ? TEAM_EN : TEAM_COPY)[area].similar[common] : null;
     return {
       key: area,
       kind: "similar",
       claim: `${area}.TEAM.SIMILAR.${common ? common.toUpperCase() : "NO_DIRECTION"}`,
       // Mit gemeinsamer Richtung sagt der Satz, welche; sonst nur "nah beieinander".
-      summary: note ? fill(note.text) : "In diesem Bereich liegt ihr nah beieinander. Das legt noch nicht fest, wie ihr im Alltag zusammen handelt.",
+      summary: note ? fill(note.text) : locale === "en" ? "Your responses are close in this area. This does not determine how you work together day to day." : "In diesem Bereich liegt ihr nah beieinander. Das legt noch nicht fest, wie ihr im Alltag zusammen handelt.",
       situations: [],
       hypothesis: null,
       question: note ? note.question : null,
@@ -576,8 +580,8 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
       claim: `${area}.TEAM.NUANCE`,
       summary:
         different.length === 1
-          ? "Ihr liegt hier nah beieinander; nur in einer Situation antwortet ihr etwas unterschiedlich."
-          : "Ihr liegt hier überwiegend nah beieinander; kleine Unterschiede gibt es bei einzelnen Situationen.",
+          ? locale === "en" ? "Your responses are close here; they differ slightly in just one situation." : "Ihr liegt hier nah beieinander; nur in einer Situation antwortet ihr etwas unterschiedlich."
+          : locale === "en" ? "Your responses are mostly close here, with small differences in individual situations." : "Ihr liegt hier überwiegend nah beieinander; kleine Unterschiede gibt es bei einzelnen Situationen.",
       situations,
       hypothesis: null,
       question: null,
@@ -587,7 +591,7 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
   // einer ORG-Zweierwahl deren eigener Unteraspekt, sonst der Bereich.
   const first = opposite[0].item_key;
   const specificKey = area === "ORG" && ORG_ITEM_DIFFERS[first] ? first : undefined;
-  const differs = specificKey ? ORG_ITEM_DIFFERS[specificKey] : TEAM_COPY[area].differs;
+  const differs = specificKey ? (locale === "en" ? ORG_DIFFERS_EN : ORG_ITEM_DIFFERS)[specificKey] : (locale === "en" ? TEAM_EN : TEAM_COPY)[area].differs;
   return {
     key: area,
     kind: "opposite",
@@ -597,4 +601,11 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey): TeamA
     hypothesis: differs.text,
     question: differs.question,
   };
+}
+
+/** Localize the selected label without changing its value or position. */
+export function displayChoiceLabel(profile: ProductProfile, key: string, locale: AppLocale) {
+  const choice = rawChoice(profile, key);
+  const item = PRODUCT_ITEMS.find(i => i.item_key === key);
+  return choice && item ? workstyleDisplayOptions(item, locale)[choice.position].label : null;
 }

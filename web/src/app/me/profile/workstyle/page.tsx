@@ -17,12 +17,13 @@ import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
 import { getTeamLabel } from "@/features/teams/TeamPageHeader";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getRequestLocale as getLocale } from "@/i18n/getLocale";
 export const dynamic = "force-dynamic";
-export const metadata = {
-  title: "Wie du arbeitest",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata() {
+  const t = await getTranslations("report.workstyle");
+  return { title: t("individualTitle"), robots: { index: false, follow: false } };
+}
 export default async function Page({
   searchParams,
 }: {
@@ -81,11 +82,6 @@ export default async function Page({
       </Link>
       <header className="mb-6 mt-1">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("individualTitle")}</h1>
-        {locale !== "de" && (
-          <p className="mt-3 text-sm text-slate-600" lang={locale}>
-            {t("germanOnly")}
-          </p>
-        )}
       </header>
       {profile ? (
         <>
@@ -107,11 +103,11 @@ export default async function Page({
           {snapshot && (
             <p className="mb-5 text-sm">
               {t("snapshotSaved", {
-                date: new Date(snapshot.generated_at).toLocaleString("de-DE"),
+                date: new Date(snapshot.generated_at).toLocaleString(locale === "en" ? "en-US" : "de-DE"),
               })}
             </p>
           )}
-          <IndividualWorkstyle profile={profile} full={full} />
+          <IndividualWorkstyle locale={locale} profile={profile} full={full} />
           <section id="freigaben" aria-labelledby="ws-sharing-title" className="ws-no-print mt-10 scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
             <h2 id="ws-sharing-title" className="text-xl font-semibold text-slate-950">{t("sharing.title")}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("sharing.intro")}</p>

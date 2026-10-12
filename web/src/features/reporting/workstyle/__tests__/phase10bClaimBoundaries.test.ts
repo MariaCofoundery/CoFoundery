@@ -227,7 +227,7 @@ test("Überblick wirkt nicht stärker als der Text", () => {
   }
   const src = readFileSync("src/features/reporting/workstyle/WorkstyleGlance.tsx", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.match(src, /overviewMark/);
-  assert.doesNotMatch(src, /displayPosition|radar|spider|score/i);
+  assert.doesNotMatch(src.replace("no overall score or ranking", ""), /displayPosition|radar|spider|score/i);
 });
 
 test("jede Aussage hat eine interne Claim-ID", () => {

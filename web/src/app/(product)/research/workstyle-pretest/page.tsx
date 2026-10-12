@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,9 +13,13 @@ import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
 import { WorkstylePretest } from "@/features/instruments/workstyle/WorkstylePretest";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Wie du arbeitest", robots: { index: false, follow: false }, referrer: "no-referrer" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("report.workstyle");
+  return { title: t("individualTitle"), robots: { index: false, follow: false }, referrer: "no-referrer" };
+}
 
 export default async function WorkstylePretestPage({ searchParams }: { searchParams: Promise<{ version?: string; invitationId?: string; teil?: string }> }) {
+  const [locale, t] = await Promise.all([getRequestLocale(), getTranslations("workstyleFlow")]);
   const query = await searchParams;
   const version = query.version ?? "8.5a-v3";
   if (!["8.5a-v1", "8.5a-v2", "8.5a-v3"].includes(version)) notFound();
@@ -35,17 +41,17 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
   const research = version === "8.5a-v3" && query.teil === "forschung";
   if (version === "8.5a-v2" || version === "8.5a-v3") {
     const [session, historical, historicalV2] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v1"), version === "8.5a-v3" ? getMyWorkstylePretest("8.5a-v2") : Promise.resolve(null)]) : [null, null, null];
-    return <main lang="de" className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">
-      <h1 className="text-3xl font-semibold">{research ? "Forschung zum Arbeitsprofil" : "Wie arbeitest du eigentlich?"}</h1>
-      {teamId && <p className="mt-4"><Link className="underline" href={`/teams/${teamId}/workstyle`}>Zurück zu eurem Zusammenspiel</Link> · Die Teilnahme erteilt keine Teamfreigabe.</p>}
+    return <main lang={locale} className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">
+      <h1 className="text-3xl font-semibold">{research ? t("research_title") : t("entry_title")}</h1>
+      {teamId && <p className="mt-4"><Link className="underline" href={`/teams/${teamId}/workstyle`}>{t("entry_back")}</Link> · {t("entry_sharing")}</p>}
       {/* Phase 11.6: Aktuelle Fassung - Arbeitsprofil (29 Core) und freiwillige
           Forschung getrennt; fruehere Fassung 8.5a-v2 unveraendert. */}
       {user ? (version === "8.5a-v3"
         ? <WorkstyleProfileFlow key={research ? "research" : "profile"} part={research ? "research" : "profile"} initialSession={session} context={completionContext} />
         : <WorkstylePretestV2 key={version} version={version} initialSession={session} context={completionContext} />)
-        : <div className="mt-6 space-y-4"><p>In den nächsten Fragen geht es um ganz unterschiedliche Situationen aus dem Arbeitsalltag – um Entscheidungen, Zusammenarbeit, offene Fragen und die Art, wie du Dinge angehst.</p><p>Antworte so, wie es bei dir meistens wirklich läuft. Nicht so, wie es im Idealfall sein sollte.</p><p>Es gibt keine richtigen oder falschen Antworten.</p><Link className="underline" href={`/login?next=${encodeURIComponent(`/research/workstyle-pretest?version=${version}${research ? "&teil=forschung" : ""}`)}`}>Anmelden und loslegen</Link></div>}
-      {historicalV2 && !historicalV2.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v2">Vorherige Teilnahme öffnen</Link></p>}
-      {historical && !historical.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v1">Frühere Teilnahme öffnen</Link></p>}
+        : <div className="mt-6 space-y-4"><p>{t("entry_intro")}</p><p>{t("entry_answer")}</p><p>{t("entry_no_right")}</p><Link className="underline" href={`/login?next=${encodeURIComponent(`/research/workstyle-pretest?version=${version}${research ? "&teil=forschung" : ""}`)}`}>{t("entry_login")}</Link></div>}
+      {historicalV2 && !historicalV2.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v2">{t("entry_previous")}</Link></p>}
+      {historical && !historical.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v1">{t("entry_earlier")}</Link></p>}
     </main>;
   }
   return <main lang="de" className="mx-auto max-w-3xl px-4 py-10 text-slate-900">

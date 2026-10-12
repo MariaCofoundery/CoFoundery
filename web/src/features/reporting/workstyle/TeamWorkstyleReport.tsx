@@ -1,7 +1,11 @@
+import { alignmentDisplayEntry, alignmentDisplayItem, alignmentDisplayText } from "@/features/instruments/align/display";
+import type { AppLocale } from "@/i18n/config";
+import { workstyleAreas, reportText } from "./display";
+import capabilityEn from "../../../../messages/en/capability.json";
+import setupEn from "../../../../messages/en/teams.json";
 import { workstyleSetupHref } from "./setupHandoff";
 import Link from "next/link";
 import {
-  AREAS,
   distinctNames,
   validProductTeam,
   type AreaKey,
@@ -12,13 +16,15 @@ import { WorkstyleGlance } from "@/features/reporting/workstyle/WorkstyleGlance"
 import { WorkstyleSignature } from "@/features/reporting/workstyle/WorkstyleSignature";
 import { ComponentMatrix, openResponsibilityRows } from "@/features/reporting/workstyle/ComponentMatrix";
 import { alignmentPatterns, readoutText } from "@/features/reporting/workstyle/alignmentModel";
-import capabilityCopy from "../../../../messages/de/capability.json";
-import setupCopy from "../../../../messages/de/teams.json";
+import capabilityDe from "../../../../messages/de/capability.json";
+import setupDe from "../../../../messages/de/teams.json";
 import "@/features/reporting/workstyle/report.css";
+
+const GLANCE_EN = { similar: "Your responses are close here.", nuance: "Your responses are mostly close here.", opposite: "You take different approaches in some situations.", insufficient: "Not enough shared responses yet." };
 
 type ConversationCard = { label: string; question: string; context: string | null; href: string | null; claim: string };
 
-const areaName = (key: string) => (capabilityCopy.areaLabels as Record<string, string>)[key] ?? key;
+const areaName = (key: string, locale: AppLocale) => ((locale === "en" ? capabilityEn : capabilityDe).areaLabels as Record<string, string>)[key] ?? key;
 
 /** Ein kurzer Satz je Bereichskarte - nie staerker als der Text darunter. */
 const GLANCE_LINE: Record<TeamAreaFinding["kind"], string> = {
@@ -38,31 +44,34 @@ const DETAILS_SUMMARY_CLASS =
  * Zusammenarbeit aussehen - und worueber lohnt sich ein Gespraech?".
  *
  * Phase 11.7B - neue Gliederung, gleiche Befundlogik:
- * 1. "Euer Zusammenspiel auf einen Blick" (eine Spur je Person, auch zu zweit)
+ * 1. reportText(locale, "Euer Zusammenspiel auf einen Blick", "Your team\u2019s workstyle at a glance") (eine Spur je Person, auch zu zweit)
  * 2. "Was bei euch aehnlich ist" (nur gemeinsame klare Richtungen)
- * 3. "Wo ihr unterschiedlich an Dinge herangeht" (nur Gegenpole; Nuancen nicht prominent)
+ * 3. reportText(locale, "Wo ihr unterschiedlich an Dinge herangeht", "Where you take different approaches") (nur Gegenpole; Nuancen nicht prominent)
  * 4. "Hier lohnt sich ein Gespraech" (3-6 Karten, nicht nummeriert, keine Rangliste)
  * 5. Bereich fuer Bereich (eingeklappt)
  * 6. Faehigkeiten & Verantwortung
  * 7. Was ihr aufbauen wollt
  * 8. Was ihr bereits vereinbart habt
- * 9. "So lest ihr das"
+ * 9. reportText(locale, "So lest ihr das", "How to read this report")
  */
 export function TeamWorkstyleReport({
   team: input,
+  locale = "de",
   canDiscuss = false,
   full = false,
 }: {
   team: ProductTeam;
+  locale?: AppLocale;
   canDiscuss?: boolean;
   full?: boolean;
 }) {
+  const setupCopy = locale === "en" ? setupEn : setupDe;
   if (!validProductTeam(input))
-    return <p>Die geteilten Arbeitsprofile sind noch nicht gemeinsam auswertbar.</p>;
+    return <p>{reportText(locale, "Die geteilten Arbeitsprofile sind noch nicht gemeinsam auswertbar.", "The shared workstyle profiles cannot be summarized together yet.")}</p>;
   const team = { ...input, people: distinctNames(input.people) };
   const members = team.people.map((p) => ({ person_id: p.person_id, name: p.name, profile: p.workstyle }));
   const people = members.map((m) => ({ id: m.person_id, name: m.name, profile: m.profile }));
-  const findings = AREAS.map((area) => ({ area, finding: teamAreaFinding(members, area.key) }));
+  const findings = workstyleAreas(locale).map((area) => ({ area, finding: teamAreaFinding(members, area.key, locale) }));
   const similar = findings.filter(({ finding }) => finding.kind === "similar" && /SIMILAR\.(UPPER|LOWER)/.test(finding.claim));
   const close = findings.filter(({ finding }) => finding.kind === "similar" && finding.claim.endsWith("NO_DIRECTION"));
   const opposite = findings.filter(({ finding }) => finding.kind === "opposite");
@@ -76,24 +85,24 @@ export function TeamWorkstyleReport({
 
   // --- Gespraechskarten: jede aus einem Befund, feste Reihenfolge, keine Rangliste ---
   const workstyleCards: ConversationCard[] = opposite.map(({ area, finding }) => ({
-    ...teamCard(area.key),
-    context: finding.situations[0] ? `Etwa: ${finding.situations[0].label}.` : null,
+    ...teamCard(area.key, locale),
+    context: finding.situations[0] ? `${reportText(locale, "Etwa:", "For example:")} ${finding.situations[0].label}.` : null,
     href: setupHref(area.key),
     claim: finding.claim,
   }));
   const otherCards: ConversationCard[] = [
     ...openResponsibilityRows(team.people, team.taxonomy.areas).slice(0, 2).map((row) => ({
-      label: "Verantwortung",
+      label: reportText(locale, "Verantwortung", "Responsibilities"),
       question: row.states.includes("OPEN_INTERNAL")
-        ? `Für ${areaName(row.area.area_id)} möchte bisher niemand Verantwortung übernehmen. Wer kümmert sich – oder lösen wir es extern?`
-        : `Für ${areaName(row.area.area_id)} möchten mehrere Verantwortung übernehmen. Wer verantwortet es, und wer unterstützt?`,
+        ? locale === "en" ? `No one has indicated that they want responsibility for ${areaName(row.area.area_id, locale)} yet. Who will take it on, or will we use external support?` : `Für ${areaName(row.area.area_id, locale)} möchte bisher niemand Verantwortung übernehmen. Wer kümmert sich – oder lösen wir es extern?`
+        : locale === "en" ? `Several people would like responsibility for ${areaName(row.area.area_id, locale)}. Who will take responsibility, and who will support them?` : `Für ${areaName(row.area.area_id, locale)} möchten mehrere Verantwortung übernehmen. Wer verantwortet es, und wer unterstützt?`,
       context: null,
       href: rolesHref,
       claim: row.states.includes("OPEN_INTERNAL") ? "CAPABILITY.OPEN_INTERNAL" : "CAPABILITY.MULTI_COVERED",
     })),
     ...[...new Set(differing.filter((a) => a.different).map((a) => a.item.section))].slice(0, 2).map((section) => ({
-      label: "Vorhaben",
-      question: `Ihr erwartet bei „${section.replace(/^[A-Z/]+ – /, "")}“ Unterschiedliches. Was soll für euer Vorhaben gelten?`,
+      label: reportText(locale, "Vorhaben", "Venture"),
+      question: locale === "en" ? `Your expectations for “${alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}” differ. What should apply to your venture?` : `Ihr erwartet bei „${alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}“ Unterschiedliches. Was soll für euer Vorhaben gelten?`,
       context: null,
       href: null,
       claim: `VENTURE.DIFFERENT.${section}`,
@@ -110,8 +119,8 @@ export function TeamWorkstyleReport({
   for (const { area, finding } of [...similar, ...findings.filter((f) => !similar.includes(f) && !opposite.includes(f))]) {
     if (cards.length >= 3) break;
     cards.push({
-      label: teamCard(area.key).label,
-      question: finding.kind === "similar" && finding.question ? finding.question : teamCard(area.key).question,
+      label: teamCard(area.key, locale).label,
+      question: finding.kind === "similar" && finding.question ? finding.question : teamCard(area.key, locale).question,
       context: null,
       href: setupHref(area.key),
       claim: `AGENDA.${finding.claim}`,
@@ -120,17 +129,18 @@ export function TeamWorkstyleReport({
   const shownCards = cards.slice(0, 6);
 
   return (
-    <div className={`ws-report space-y-12 ${full ? "ws-print-full" : ""}`} lang="de">
+    <div className={`ws-report space-y-12 ${full ? "ws-print-full" : ""}`} lang={locale}>
       <WorkstyleGlance
+        locale={locale}
         people={people}
-        title="Euer Zusammenspiel auf einen Blick"
-        intro={`Eine Spur je Person: so liegen ${new Intl.ListFormat("de", { type: "conjunction" }).format(team.people.map((p) => p.name))} in den sechs Bereichen nebeneinander – nach euren eigenen Antworten.`}
-        sentences={Object.fromEntries(findings.map(({ area, finding }) => [area.key, GLANCE_LINE[finding.kind]]))}
+        title={reportText(locale, "Euer Zusammenspiel auf einen Blick", "Your team\u2019s workstyle at a glance")}
+        intro={locale === "en" ? `One track per person: ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map(p => p.name))} across the six areas, based on your own responses.` : `Eine Spur je Person: so liegen ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map((p) => p.name))} in den sechs Bereichen nebeneinander – nach euren eigenen Antworten.`}
+        sentences={Object.fromEntries(findings.map(({ area, finding }) => [area.key, (locale === "en" ? GLANCE_EN : GLANCE_LINE)[finding.kind]]))}
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section aria-labelledby="ws-similar-title" className="ws-text-card rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 id="ws-similar-title" className="text-xl font-semibold text-slate-950">Was bei euch ähnlich ist</h2>
+          <h2 id="ws-similar-title" className="text-xl font-semibold text-slate-950">{reportText(locale, "Was bei euch ähnlich ist", "Where your responses are similar")}</h2>
           {similar.length ? (
             <ul className="mt-3 space-y-3">
               {similar.map(({ area, finding }) => (
@@ -141,14 +151,14 @@ export function TeamWorkstyleReport({
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm leading-6 text-slate-600">In keinem Bereich zeigen eure Antworten gemeinsam klar in eine Richtung.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{reportText(locale, "In keinem Bereich zeigen eure Antworten gemeinsam klar in eine Richtung.", "There is no area where your responses all clearly point in one direction.")}</p>
           )}
           {close.length > 0 && (
-            <p className="mt-3 text-sm leading-6 text-slate-600">Nah beieinander liegt ihr außerdem bei: {close.map(({ area }) => area.team).join(", ")}.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{reportText(locale, "Nah beieinander liegt ihr außerdem bei:", "Your responses are also close in:")} {close.map(({ area }) => area.team).join(", ")}.</p>
           )}
         </section>
         <section aria-labelledby="ws-differ-title" className="ws-text-card rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 id="ws-differ-title" className="text-xl font-semibold text-slate-950">Wo ihr unterschiedlich an Dinge herangeht</h2>
+          <h2 id="ws-differ-title" className="text-xl font-semibold text-slate-950">{reportText(locale, "Wo ihr unterschiedlich an Dinge herangeht", "Where you take different approaches")}</h2>
           {opposite.length ? (
             <ul className="mt-3 space-y-3">
               {opposite.map(({ area, finding }) => (
@@ -160,17 +170,16 @@ export function TeamWorkstyleReport({
             </ul>
           ) : (
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              Deutliche Unterschiede gibt es in euren Antworten nicht. Kleinere Unterschiede stehen unten Bereich für Bereich.
+              {reportText(locale, "Deutliche Unterschiede gibt es in euren Antworten nicht. Kleinere Unterschiede stehen unten Bereich für Bereich.", "Your responses show no marked differences. Smaller differences are shown below for each area.")}
             </p>
           )}
         </section>
       </div>
 
       <section id="gespraech" aria-labelledby="ws-talk-title">
-        <h2 id="ws-talk-title" className="text-2xl font-semibold tracking-tight text-slate-950">Hier lohnt sich ein Gespräch</h2>
+        <h2 id="ws-talk-title" className="text-2xl font-semibold tracking-tight text-slate-950">{reportText(locale, "Hier lohnt sich ein Gespräch", "Discussion prompts")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Jede Frage ergibt sich aus euren Antworten, euren Angaben zu Verantwortung oder euren Erwartungen an das Vorhaben.
-          Die Reihenfolge ist keine Rangfolge.
+          {reportText(locale, "Jede Frage ergibt sich aus euren Antworten, euren Angaben zu Verantwortung oder euren Erwartungen an das Vorhaben. Die Reihenfolge ist keine Rangfolge.", "Each question comes from your responses, responsibility preferences, or expectations for the venture. The order is not a ranking.")}
         </p>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {shownCards.map((card) => (
@@ -180,54 +189,51 @@ export function TeamWorkstyleReport({
               {card.context && <p className="mt-2 text-xs leading-5 text-slate-500">{card.context}</p>}
               {card.href && (
                 <Link className="ws-no-print mt-auto pt-3 text-sm font-medium text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950" href={card.href}>
-                  Im Founder Setup festhalten
+                  {reportText(locale, "Im Founder Setup festhalten", "Record in Founder Setup")}
                 </Link>
               )}
             </li>
           ))}
         </ul>
         <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
-          Haltet fest, welche Absprache ihr ausprobiert und wann ihr sie gemeinsam überprüft. Eine Absprache gilt erst, wenn
-          alle sie im Founder Setup bestätigt haben.
+          {reportText(locale, "Haltet fest, welche Absprache ihr ausprobiert und wann ihr sie gemeinsam überprüft. Eine Absprache gilt erst, wenn alle sie im Founder Setup bestätigt haben.", "Record which arrangement you will try and when you will review it together. An arrangement only becomes an agreement when everyone has confirmed it in Founder Setup.")}
         </p>
       </section>
 
       <section id="arbeitsweisen" aria-labelledby="ws-work-title">
-        <h2 id="ws-work-title" className="text-2xl font-semibold tracking-tight text-slate-950">Bereich für Bereich</h2>
+        <h2 id="ws-work-title" className="text-2xl font-semibold tracking-tight text-slate-950">{reportText(locale, "Bereich für Bereich", "Each area in detail")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Die Einzelheiten je Bereich – aufklappen, wenn ihr tiefer einsteigen wollt. Gruppen erscheinen in der Reihenfolge
-          der Antwortskala, nicht nach Größe.
+          {reportText(locale, "Die Einzelheiten je Bereich – aufklappen, wenn ihr tiefer einsteigen wollt. Gruppen erscheinen in der Reihenfolge der Antwortskala, nicht nach Größe.", "Open each area to explore the details. Groups appear in response-scale order, not by size.")}
         </p>
         <div className="mt-4 grid gap-3">
           {findings.map(({ area, finding }) => (
-            <AreaDetails key={area.key} title={area.team} finding={finding} href={setupHref(area.key)} open={full} />
+            <AreaDetails locale={locale} key={area.key} title={area.team} finding={finding} href={setupHref(area.key)} open={full} />
           ))}
         </div>
         <details className="ws-appendix mt-4 rounded-2xl border border-slate-200 bg-white/70 p-4" open={full}>
-          <summary className={DETAILS_SUMMARY_CLASS}>Alle Antworten im Detail</summary>
+          <summary className={DETAILS_SUMMARY_CLASS}>{reportText(locale, "Alle Antworten im Detail", "All responses in detail")}</summary>
           <div className="mt-5">
-            <WorkstyleSignature people={people} />
+            <WorkstyleSignature locale={locale} people={people} />
           </div>
         </details>
       </section>
 
-      <ComponentMatrix people={team.people} areas={team.taxonomy.areas} />
+      <ComponentMatrix locale={locale} people={team.people} areas={team.taxonomy.areas} />
 
       <section id="venture" aria-labelledby="ws-venture-title">
-        <h2 id="ws-venture-title" className="text-2xl font-semibold tracking-tight text-slate-950">Was ihr aufbauen wollt</h2>
+        <h2 id="ws-venture-title" className="text-2xl font-semibold tracking-tight text-slate-950">{reportText(locale, "Was ihr aufbauen wollt", "What you want to build")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Getrennt von euren Arbeitsweisen: eure Wünsche und Erwartungen an dieses konkrete Vorhaben – kein beobachtetes
-          Verhalten und noch keine Vereinbarung. Fehlende Antworten sind keine Aussage über eine Person.
+          {reportText(locale, "Getrennt von euren Arbeitsweisen: eure Wünsche und Erwartungen an dieses konkrete Vorhaben – kein beobachtetes Verhalten und noch keine Vereinbarung. Fehlende Antworten sind keine Aussage über eine Person.", "Separate from workstyle: your wishes and expectations for this specific venture, not observed behavior or an agreement. Missing responses say nothing about a person.")}
         </p>
         {!answered.length ? (
           <p className="mt-4 text-sm">
-            Für dieses Vorhaben hat noch niemand Antworten abgegeben. Abgegebene Antworten sehen alle im Team.
+            {reportText(locale, "Für dieses Vorhaben hat noch niemand Antworten abgegeben. Abgegebene Antworten sehen alle im Team.", "No one has submitted responses for this venture yet. Everyone on the team can see submitted responses.")}
             {/* Phase 12C.1C: Der Fragebogen ist ein Founder-Weg - Advisors (canDiscuss=false) sehen keinen CTA. */}
             {canDiscuss ? (
               <>
                 {" "}
                 <Link className="underline" href={`/founder-alignment/vorhaben?venture=${team.team_id}`}>
-                  Zum Fragebogen
+                  {reportText(locale, "Zum Fragebogen", "Go to questionnaire")}
                 </Link>
               </>
             ) : null}
@@ -237,21 +243,20 @@ export function TeamWorkstyleReport({
             {differing.length > 0 ? (
               [...new Set(differing.map((a) => a.item.section))].map((section) => (
                 <section key={section} className="mt-6">
-                  <h3 className="text-lg font-semibold">{section.replace(/^[A-Z/]+ – /, "")}</h3>
+                  <h3 className="text-lg font-semibold">{alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}</h3>
                   {differing
                     .filter((a) => a.item.section === section)
                     .map((a) => (
                       <article key={a.item.itemId} className="ws-text-card mt-3 rounded-xl border border-slate-200 bg-white p-4">
-                        <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{a.status}</p>
-                        <p className="mt-1 text-sm font-medium leading-6">{a.item.prompt}</p>
+                        <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{alignmentDisplayText(a.status, locale)}</p>
+                        <p className="mt-1 text-sm font-medium leading-6">{alignmentDisplayItem(a.item, locale).prompt}</p>
                         {a.ambiguous && (
                           <p className="mt-2 text-sm leading-6">
-                            Diese Frage bezieht sich auf eine einzelne andere Person. Bei mehr als zwei Foundern ist
-                            nicht eindeutig, wer gemeint war; deshalb wird daraus kein Teamvergleich abgeleitet.
+                            {reportText(locale, "Diese Frage bezieht sich auf eine einzelne andere Person. Bei mehr als zwei Foundern ist nicht eindeutig, wer gemeint war; deshalb wird daraus kein Teamvergleich abgeleitet.", "This question refers to one other person. With more than two founders, it is unclear who was meant, so no team comparison is drawn from it.")}
                           </p>
                         )}
                         <ul className="mt-2 space-y-1 text-sm leading-6">
-                          {groupedAnswers(a.entries).map((g) => (
+                          {groupedAnswers(a.entries, locale).map((g) => (
                             <li key={g.names.join()}>
                               <span className="font-medium">{g.names.join(", ")}:</span> {g.text}
                             </li>
@@ -262,21 +267,20 @@ export function TeamWorkstyleReport({
                 </section>
               ))
             ) : (
-              <p className="mt-4 text-sm">In den gemeinsam beantworteten Fragen habt ihr ähnliche Erwartungen.</p>
+              <p className="mt-4 text-sm">{reportText(locale, "In den gemeinsam beantworteten Fragen habt ihr ähnliche Erwartungen.", "You have similar expectations in the questions you have all answered.")}</p>
             )}
             {incomplete.length > 0 && (
               <p className="mt-4 text-sm text-slate-600">
-                Zu {incomplete.length === 1 ? "einer Frage" : `${incomplete.length} Fragen`} liegen noch nicht von allen
-                Antworten vor.
+                {locale === "en" ? `${incomplete.length} ${incomplete.length === 1 ? "question is" : "questions are"} still awaiting responses from some team members.` : <>Zu {incomplete.length === 1 ? "einer Frage" : `${incomplete.length} Fragen`} liegen noch nicht von allen Antworten vor.</>}
               </p>
             )}
             {similarVenture.length > 0 && (
               <details className="ws-appendix mt-4 rounded-2xl border border-slate-200 bg-white/70 p-4" open={full}>
-                <summary className={DETAILS_SUMMARY_CLASS}>Ähnlich beantwortete Fragen ({similarVenture.length})</summary>
+                <summary className={DETAILS_SUMMARY_CLASS}>{reportText(locale, "Ähnlich beantwortete Fragen", "Questions answered similarly")} ({similarVenture.length})</summary>
                 <ul className="mt-4 space-y-2 text-sm leading-6">
                   {similarVenture.map((a) => (
                     <li key={a.item.itemId}>
-                      {a.item.prompt} <span className="text-slate-600">– {readoutText(a.entries[0].entry)}</span>
+                      {alignmentDisplayItem(a.item, locale).prompt} <span className="text-slate-600">– {readoutText(a.entries[0].entry ? alignmentDisplayEntry(a.entries[0].entry, locale) : null, locale)}</span>
                     </li>
                   ))}
                 </ul>
@@ -287,10 +291,9 @@ export function TeamWorkstyleReport({
       </section>
 
       <section id="vereinbarungen" aria-labelledby="ws-setup-title">
-        <h2 id="ws-setup-title" className="text-2xl font-semibold tracking-tight text-slate-950">Was ihr bereits vereinbart habt</h2>
+        <h2 id="ws-setup-title" className="text-2xl font-semibold tracking-tight text-slate-950">{reportText(locale, "Was ihr bereits vereinbart habt", "What you have already agreed")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Nur Vereinbarungen aus Founder Setup, die alle aktuellen Mitglieder bestätigt haben. Alles andere ist noch nicht
-          vereinbart – auch dort, wo ihr ähnlich antwortet.
+          {reportText(locale, "Nur Vereinbarungen aus Founder Setup, die alle aktuellen Mitglieder bestätigt haben. Alles andere ist noch nicht vereinbart – auch dort, wo ihr ähnlich antwortet.", "Only agreements from Founder Setup that all current members have confirmed. Everything else is still unagreed, even where your responses are similar.")}
         </p>
         {team.setup.length ? (
           <div className="mt-5 grid gap-4">
@@ -303,27 +306,24 @@ export function TeamWorkstyleReport({
                   {(setupCopy.setup.outcomes as Record<string, string>)[s.resolution_status] ?? s.resolution_status}
                 </p>
                 {s.note && <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{s.note}</p>}
-                <p className="mt-2 text-xs text-slate-500">Bestätigt am {new Date(s.confirmed_at).toLocaleDateString("de-DE")}</p>
+                <p className="mt-2 text-xs text-slate-500">{reportText(locale, "Bestätigt am", "Confirmed on")} {new Date(s.confirmed_at).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}</p>
               </article>
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm">Es gibt noch keine Vereinbarungen, die alle aktuellen Mitglieder bestätigt haben.</p>
+          <p className="mt-4 text-sm">{reportText(locale, "Es gibt noch keine Vereinbarungen, die alle aktuellen Mitglieder bestätigt haben.", "There are no agreements that all current members have confirmed yet.")}</p>
         )}
         {team.setup_available && (
           <Link className="ws-no-print mt-4 inline-block underline" href={`/teams/${team.team_id}/setup`}>
-            Founder Setup öffnen
+            {reportText(locale, "Founder Setup öffnen", "Open Founder Setup")}
           </Link>
         )}
       </section>
 
       <section aria-labelledby="ws-team-method-title" className="ws-text-card rounded-2xl border border-slate-200 bg-white/70 p-5">
-        <h2 id="ws-team-method-title" className="text-base font-semibold">So lest ihr das</h2>
+        <h2 id="ws-team-method-title" className="text-base font-semibold">{reportText(locale, "So lest ihr das", "How to read this report")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          Dieser Bericht stellt eure Selbstauskünfte nebeneinander. Er sagt nicht, wie gut ihr zusammenpasst, sondern zeigt,
-          wie eure Zusammenarbeit aussehen könnte und worüber sich ein Gespräch lohnt. Ähnlichkeit ist kein Ziel, ein
-          Unterschied kein Makel – beides sind Gesprächsanlässe, keine Bewertung. Wie euer Vorgehen beim jeweils anderen
-          ankommt, misst der Bericht nicht. Das Workstyle-Instrument ist noch in Entwicklung.
+          {reportText(locale, "Dieser Bericht stellt eure Selbstauskünfte nebeneinander. Er sagt nicht, wie gut ihr zusammenpasst, sondern zeigt, wie eure Zusammenarbeit aussehen könnte und worüber sich ein Gespräch lohnt. Ähnlichkeit ist kein Ziel, ein Unterschied kein Makel – beides sind Gesprächsanlässe, keine Bewertung. Wie euer Vorgehen beim jeweils anderen ankommt, misst der Bericht nicht. Das Workstyle-Instrument ist noch in Entwicklung.", "This report shows your self-reported responses side by side. It does not rate compatibility. It shows what working together might look like and what you could discuss. Similarity is not a goal, and difference is not a flaw. Both are discussion points, not ratings. The report does not measure how others experience your approach. The workstyle instrument is still in development.")}
         </p>
       </section>
     </div>
@@ -335,10 +335,10 @@ export function TeamWorkstyleReport({
  * nach Gruppengroesse. Eine einzelne Antwort steht gleichwertig neben einer
  * Gruppe; es gibt keine Mehrheit.
  */
-function groupedAnswers(entries: { personId: string; name: string; entry: Parameters<typeof readoutText>[0] }[]) {
+function groupedAnswers(entries: { personId: string; name: string; entry: Parameters<typeof readoutText>[0] }[], locale: AppLocale) {
   const groups: { names: string[]; text: string }[] = [];
   for (const e of entries) {
-    const text = readoutText(e.entry) ?? "Keine Antwort sichtbar";
+    const text = readoutText(e.entry ? alignmentDisplayEntry(e.entry, locale) : null, locale) ?? reportText(locale, "Keine Antwort sichtbar", "No response visible");
     const group = groups.find((g) => g.text === text);
     if (group) group.names.push(e.name);
     else groups.push({ names: [e.name], text });
@@ -346,12 +346,12 @@ function groupedAnswers(entries: { personId: string; name: string; entry: Parame
   return groups;
 }
 
-function AreaDetails({ title, finding, href, open }: { title: string; finding: TeamAreaFinding; href: string | null; open: boolean }) {
+function AreaDetails({ title, finding, href, open, locale }: { locale: AppLocale; title: string; finding: TeamAreaFinding; href: string | null; open: boolean }) {
   return (
     <details className="ws-details ws-text-card rounded-2xl border border-slate-200 bg-white p-4" data-claim={finding.claim} open={open}>
       <summary className={`${DETAILS_SUMMARY_CLASS} ws-summary-keep`}>
         <span className="text-base font-semibold text-slate-950">{title}</span>
-        <span className="ml-2 text-sm font-normal text-slate-500">{GLANCE_LINE[finding.kind]}</span>
+        <span className="ml-2 text-sm font-normal text-slate-500">{(locale === "en" ? GLANCE_EN : GLANCE_LINE)[finding.kind]}</span>
       </summary>
       <p className="mt-3 text-sm leading-6 text-slate-800">{finding.summary}</p>
       {finding.situations.map((s) => (

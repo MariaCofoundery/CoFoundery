@@ -1,3 +1,4 @@
+import { withWorkstyleCopy } from "@/features/instruments/workstyle/__tests__/localizedSource";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,7 +12,7 @@ import { workstyleSessionItems } from "@/features/instruments/workstyle/registry
  */
 
 const src = (p: string) => readFileSync(p, "utf8");
-const code = (p: string) => src(p).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = (p: string) => withWorkstyleCopy(src(p)).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 const json = (p: string) => JSON.parse(src(p));
 const MIGRATION = "../supabase/migrations/20261118130000_workstyle_product_core_completion.sql";
 const FLOW = "src/features/instruments/workstyle/WorkstyleProfileFlow.tsx";
@@ -53,7 +54,7 @@ test("Arbeitsprofil-Ablauf: nur Core, eigener Fortschritt, kein Pretest-Wording,
   assert.match(flow, /questions\(research, "Entwicklungsfrage", "Fortschritt Entwicklungsfragen"\)/);
   assert.match(flow, /startWorkstyleProduct\(\)/);
   // Sichtbarer Text: ohne Importpfade und technische Routen, die intern weiter "pretest" heissen.
-  const visible = flow.replace(/^import .*$/gm, "").replace(/\/research\/workstyle-pretest[^"`]*/g, "");
+  const visible = flow.replace(/function ConsentDetails[\s\S]*?(?=export function WorkstyleProfileFlow)/, "").replace(/^import .*$/gm, "").replace(/\/research\/workstyle-pretest[^"`]*/g, "");
   assert.doesNotMatch(visible, /\bPretest\b|\b52\b|items\.length\} Situationen/);
 });
 
@@ -74,7 +75,7 @@ test("Forschung: eigene Einleitung, Einwilligung nicht vorausgewaehlt, Ablehnen 
   const flow = code(FLOW);
   assert.match(flow, /const \[consent, setConsent\] = useState\(false\)/);
   assert.match(flow, /disabled=\{pending \|\| !consent\}/);
-  assert.match(flow, /<Link href="\/me\/profile\/workstyle" className=\{secondary\}>Nein, danke<\/Link>/);
+  assert.match(flow, /<Link href="\/me\/profile\/workstyle" className=\{secondary\}>\s*Nein, danke\s*<\/Link>/);
   assert.match(flow, /Sie verändern dein Arbeitsprofil und deinen Report nicht\./);
   assert.match(flow, /auch die zu deinem Arbeitsprofil/);
   assert.match(flow, /Forschungseinwilligung widerrufen/);

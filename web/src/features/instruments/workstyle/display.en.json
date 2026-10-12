@@ -1,0 +1,277 @@
+{
+  "items": {
+    "ORG-01": {
+      "prompt": "When starting a larger venture, how likely are you to clarify specific next steps before getting properly underway?"
+    },
+    "EXP-01": {
+      "prompt": "A situation immediately feels familiar. You cannot yet say exactly why, but you recognize a pattern from the past. How seriously do you take this impression?"
+    },
+    "VOICE-01": {
+      "prompt": "Your group has already agreed on a decision. You notice another point against it. How likely are you to raise it anyway?"
+    },
+    "AMB-01": {
+      "prompt": "You receive very different feedback on the same idea and cannot yet tell which feedback matters more. How uncomfortable does this feel?"
+    },
+    "DEC-01": {
+      "prompt": "You have the key information for a decision, but there is still some uncertainty. Which describes you better?",
+      "alternatives": {
+        "A": "I prefer to leave the decision open a little longer in case something relevant comes up.",
+        "B": "I commit based on what I know now and change the decision later if there is a good reason."
+      }
+    },
+    "EL-01": {
+      "prompt": "You are choosing between two approaches, both of which you could try on a small scale. How likely are you to test something before deciding?"
+    },
+    "EVI-01": {
+      "prompt": "You have three options, and one immediately appeals to you most. How likely are you to deliberately look for reasons against your favorite?"
+    },
+    "EXP-02": {
+      "prompt": "A solution looks convincing on paper. But you remember things from similar situations that make you skeptical. How much does this experience influence your assessment?"
+    },
+    "ORG-03": {
+      "prompt": "Several important tasks compete for your attention at the same time. Which describes you better?",
+      "alternatives": {
+        "A": "I keep several tasks moving in parallel so that nothing comes to a complete stop.",
+        "B": "I focus on fewer things and accept that others must wait."
+      }
+    },
+    "AMB-02": {
+      "prompt": "There are several plausible explanations, but you cannot currently establish which one is right. How uncomfortable does this feel?"
+    },
+    "EL-03": {
+      "prompt": "You try something and get an unexpected result. What are you more likely to do next?",
+      "options": {
+        "A": "I first check whether the result happens again.",
+        "B": "I first try to understand what might have caused it.",
+        "C": "I change something and try another version.",
+        "D": "I use the result alongside what I already know to make the next decision.",
+        "E": "I turn it into a new question to investigate next."
+      }
+    },
+    "VOICE-02": {
+      "prompt": "You learn something uncomfortable that matters to your work together. How likely are you to raise it soon?"
+    },
+    "EVI-02": {
+      "prompt": "An important decision depends on an assumption you are unsure about. How likely are you to test that specific assumption before deciding?"
+    },
+    "DEC-02": {
+      "prompt": "Two options remain plausible. You could do more research but do not expect it to change the overall picture. Which approach do you prefer?",
+      "alternatives": {
+        "A": "I still look a little more closely before committing.",
+        "B": "I decide based on what I know by now."
+      }
+    },
+    "EXP-03": {
+      "prompt": "Based on the available information, two options look about equally good. One strongly reminds you of a similar situation you have experienced. How much does this experience influence your decision?"
+    },
+    "FS-R1": {
+      "prompt": "You already have a view on an important question. How likely are you to deliberately ask someone you expect to see things differently?"
+    },
+    "AMB-04": {
+      "prompt": "New information does not make things clearer; it opens up even more possible explanations. How uncomfortable does this feel?"
+    },
+    "ORG-04": {
+      "prompt": "A task takes much longer than expected. Which describes you better?",
+      "alternatives": {
+        "A": "I first try to finish the task as planned before rearranging the rest.",
+        "B": "I adjust my remaining plan to the new situation early."
+      }
+    },
+    "EL-02": {
+      "prompt": "You have two plausible approaches and the discussion is not moving forward. Both could be tried with little effort. How likely are you to suggest a test?"
+    },
+    "EXP-04": {
+      "prompt": "You face a problem you have encountered several times in a similar form. How much do you draw on those experiences to assess what might matter this time?"
+    },
+    "VOICE-03": {
+      "prompt": "A difficult topic was postponed and never revisited. Something important remains unresolved for you. How likely are you to bring it up again yourself?"
+    },
+    "EL-05": {
+      "prompt": "An initial attempt gives no clear answer. How likely are you to deliberately change something and try again?"
+    },
+    "DEC-03": {
+      "prompt": "You have discussed the main arguments for two directions. Some smaller questions remain open. Which describes you better?",
+      "alternatives": {
+        "A": "I want to resolve the open points if possible before the decision is final.",
+        "B": "For me, the decision can already stand despite those open points."
+      }
+    },
+    "AMB-05": {
+      "prompt": "You need to keep working on something even though an important question remains open. How uncomfortable does this feel?"
+    },
+    "ORG-02": {
+      "prompt": "A task runs over several weeks, and nobody sets interim deadlines for you. How likely are you to set your own points for reviewing progress?"
+    },
+    "EVI-03": {
+      "prompt": "You have made a decision. The next day, new information clearly points against it. How likely are you to seriously reconsider your decision?"
+    },
+    "EL-04": {
+      "prompt": "You are unsure how others would respond to an idea, offer, or approach. With manageable effort, you could show or let them try a simple version. How likely are you to do this early?"
+    },
+    "ORG-05": {
+      "prompt": "Over an extended period, more work comes in than you can realistically handle. Which describes you better?",
+      "alternatives": {
+        "A": "I try to keep as much as possible moving and make smaller scheduling changes.",
+        "B": "At some point, I draw a clear line and decide again what must wait or be dropped."
+      }
+    },
+    "EXP-05": {
+      "prompt": "A situation resembles something you know, but not in every respect. How much do you still use your experience as a guide?"
+    },
+    "VOICE-04": {
+      "prompt": "A decision is made that you consider wrong from a professional perspective. How likely are you to say that you see it differently?"
+    },
+    "AMB-06": {
+      "prompt": "Two people whose judgment you take seriously assess the same situation very differently. At present, you cannot establish who is more likely to be right. How uncomfortable does this feel?"
+    },
+    "DEC-04": {
+      "prompt": "You need a direction for the next few weeks, but you know you can decide again later. Which approach do you prefer?",
+      "alternatives": {
+        "A": "I keep the options open as long as possible.",
+        "B": "I choose a provisional direction and work with it for now."
+      }
+    },
+    "EVI-05": {
+      "prompt": "Someone on the team sees something differently and raises a point you can understand. How likely are you to reconsider your own assessment?"
+    },
+    "ORG-06": {
+      "prompt": "Nobody tells you when or in what order things must be done. How much do you structure the work yourself?"
+    },
+    "EVI-04": {
+      "prompt": "A result that matters to your venture turns out very differently from what you expected. Which best describes how you respond?",
+      "options": {
+        "A": "I first acknowledge that things turned out differently and watch whether it happens again.",
+        "B": "I look for an obvious reason that explains the difference.",
+        "C": "I compare a few possible explanations and then decide whether to investigate further.",
+        "D": "I try to find out which explanation best fits the result.",
+        "E": "I deliberately check explanations that contradict my initial assumption."
+      }
+    },
+    "FS-R2": {
+      "prompt": "You are stuck on a difficult question. Which approach do you prefer?",
+      "alternatives": {
+        "A": "I first keep trying to develop a clearer view on my own.",
+        "B": "I bring in another perspective relatively early."
+      }
+    },
+    "EXP-06": {
+      "prompt": "You need to decide before all the information is available, but you know the subject very well. How much do you also draw on your experience?"
+    },
+    "VOICE-05": {
+      "prompt": "The group wants to close a topic, but an important point remains open for you. How likely are you to say that you are not ready yet?"
+    },
+    "AMB-03": {
+      "prompt": "An important development could have several outcomes, but none can currently be predicted reliably. How uncomfortable does this feel?"
+    },
+    "ORG-07": {
+      "prompt": "You are concentrating on something important when another important request comes in. Which describes you better?",
+      "alternatives": {
+        "A": "I interrupt my work fairly quickly and take care of the new request.",
+        "B": "I first stay with what I am currently working on."
+      }
+    },
+    "EVI-06": {
+      "prompt": "Two sources you generally consider reliable contradict each other on an important question. How likely are you to look more closely at why they differ?"
+    },
+    "EL-06": {
+      "prompt": "An initial attempt points against your original idea. How likely are you to use it to frame a new question for the next attempt?"
+    },
+    "VOICE-06": {
+      "prompt": "You initially agreed to a plan but later realize that your view has changed. How likely are you to bring this up again yourself?"
+    },
+    "DEC-R1": {
+      "prompt": "There is no time pressure on an important decision, but the key information is available. Which describes you better?",
+      "alternatives": {
+        "A": "Without time pressure, I prefer to leave the decision open a little longer.",
+        "B": "Once I know enough, I commit even without external time pressure."
+      }
+    },
+    "AMB-R1": {
+      "prompt": "You are planning the coming weeks, although two important circumstances could still change significantly. How uncomfortable does this feel?"
+    },
+    "VOICE-R1": {
+      "prompt": "Everyone on the team agrees quickly, but you still see a risk. How likely are you to raise it anyway?"
+    },
+    "EVI-R1": {
+      "prompt": "The team quickly agrees on a solution. You notice unresolved points. How likely are you to deliberately check what might count against the solution?"
+    },
+    "ORG-08": {
+      "prompt": "Your plan still basically works, but several smaller things turn out differently than expected. Which describes you better?",
+      "alternatives": {
+        "A": "I only change my plan when the deviations really matter.",
+        "B": "I prefer to adjust my plan even for smaller changes."
+      }
+    },
+    "EL-R1": {
+      "prompt": "You want to try something new. How likely are you to clarify in advance how you would recognize whether the attempt helps you?"
+    },
+    "EXP-R1": {
+      "prompt": "You know a subject well and quickly get a sense of what could work. How much does this first impression influence your further assessment?"
+    },
+    "ORG-R1": {
+      "prompt": "You have promised to finish something by a specific time. How likely are you to check along the way whether you are still on track?"
+    },
+    "DEC-R2": {
+      "prompt": "Two approaches remain about equally plausible. How likely are you to commit to one anyway, even without new information?"
+    },
+    "EVI-04r": {
+      "prompt": "An important result for your venture is very different from what you expected. What would you most likely do first?",
+      "options": {
+        "A": "I wait to see whether the result repeats. A single outlier can be misleading.",
+        "B": "I work with the most likely explanation so that we can keep moving.",
+        "C": "I look at how the result came about before interpreting it.",
+        "D": "I consider several possible explanations and weigh them against each other.",
+        "E": "I first ask whether my original expectation was sound."
+      }
+    },
+    "EL-03r": {
+      "prompt": "You try something out, and the result surprises you. What would you most likely do next?",
+      "options": {
+        "A": "I try it again in the same way to see whether the result holds.",
+        "B": "I change one specific thing and try again.",
+        "C": "I try a substantially different approach.",
+        "D": "The result is enough for me to make a decision without another test."
+      }
+    },
+    "EL-06r": {
+      "prompt": "An initial trial goes against your original idea. How likely are you to consider what you would specifically test differently next time?"
+    }
+  },
+  "comparative": {
+    "strong_a": "Much more like A",
+    "lean_a": "More like A",
+    "lean_b": "More like B",
+    "strong_b": "Much more like B"
+  },
+  "response_formats": {
+    "likelihood": [
+      "Very unlikely",
+      "Rather unlikely",
+      "Sometimes yes, sometimes no",
+      "Rather likely",
+      "Very likely"
+    ],
+    "influence": [
+      "Not at all",
+      "A little",
+      "Somewhat",
+      "Quite strongly",
+      "Very strongly"
+    ],
+    "seriousness": [
+      "Not at all seriously",
+      "Not very seriously",
+      "Somewhat",
+      "Quite seriously",
+      "Very seriously"
+    ],
+    "ambiguity_discomfort": [
+      "Not at all uncomfortable",
+      "Not very uncomfortable",
+      "Sometimes uncomfortable, sometimes not",
+      "Quite uncomfortable",
+      "Very uncomfortable"
+    ]
+  },
+  "cannot_assess": "I cannot assess this yet"
+}

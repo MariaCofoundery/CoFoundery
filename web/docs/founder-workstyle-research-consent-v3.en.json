@@ -1,0 +1,13 @@
+{
+  "consent_version": "workstyle_research_v3",
+  "assessment_key": "founder-workstyle-pretest",
+  "assessment_version": "8.5a-v3",
+  "language": "en",
+  "translation_of": "founder-workstyle-research-consent-v3.json",
+  "paragraphs": [
+    "I voluntarily consent to my responses, short context entries, completion times, and optional feedback being analyzed to develop the founder workstyle instrument. Authorized research administrators may analyze and export these data in pseudonymized form. The export includes neither my name nor my direct user ID.",
+    "This consent applies to this pretest. It does not share information with other founders, advisors, or organizations. Some of my responses are also stored as my private, portable workstyle profile. Responses collected solely for research remain separate.",
+    "I can withdraw research consent here or through research settings in my account. Research responses, context entries, completion times, and feedback that can still be linked to me will then be deleted, and my workstyle profile will no longer be provided for research. A completed private workstyle profile is retained; an unfinished pretest is deleted. Data already exported cannot be recalled technically; the research administration is responsible for deleting those data."
+  ],
+  "confirmation": "I have read the information and expressly consent to this research pretest."
+}

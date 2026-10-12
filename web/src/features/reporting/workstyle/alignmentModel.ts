@@ -1,3 +1,4 @@
+import type { AppLocale } from "@/i18n/config";
 import { getItemsV22 } from "@/features/instruments/align/registries";
 import { readAnswer } from "@/features/instruments/v21/readoutV21";
 import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
@@ -48,7 +49,7 @@ export function alignmentPatterns(people: ProductMember[]) {
 }
 
 /** Eine Venture-Antwort als kurzer Text - die Frage steht im Bericht nur einmal, nicht je Person erneut. */
-export function readoutText(entry: ReturnType<typeof readAnswer> | null): string | null {
+export function readoutText(entry: ReturnType<typeof readAnswer> | null, locale: AppLocale = "de"): string | null {
   const value = entry?.value;
   if (!value) return entry?.missing?.label ?? null;
   switch (value.kind) {
@@ -56,11 +57,11 @@ export function readoutText(entry: ReturnType<typeof readAnswer> | null): string
       return value.label;
     case "choice": {
       // Die Ausfuellhilfe ("– bitte angeben") gehoert zur Frage, nicht zur Antwort.
-      const label = value.label.replace(/\s*[–-]\s*bitte angeben$/, "");
+      const label = value.label.replace(/\s*[–—-]\s*(?:bitte angeben|please specify)$/, "");
       return value.text ? `${label} (${value.text})` : label;
     }
     case "choices":
-      return [value.labels.join(" · "), value.priority ? `Vorrang: ${value.priority}` : null, ...value.texts].filter(Boolean).join(" – ");
+      return [value.labels.join(" · "), value.priority ? `${locale === "en" ? "Priority" : "Vorrang"}: ${value.priority}` : null, ...value.texts].filter(Boolean).join(" – ");
     case "text":
       return value.text;
     case "entries":
@@ -70,7 +71,7 @@ export function readoutText(entry: ReturnType<typeof readAnswer> | null): string
     case "number":
       return `${value.number} ${value.unit}${value.condition ? ` (${value.condition})` : ""}`;
     case "money":
-      return `${value.amount.toLocaleString("de-DE")} ${value.currency}`;
+      return `${value.amount.toLocaleString(locale === "en" ? "en-US" : "de-DE")} ${value.currency}`;
     case "perPerson":
       return value.per.map((p) => `${p.person}: ${p.number ?? "–"} ${p.unit}`).join(" · ");
     case "windows":

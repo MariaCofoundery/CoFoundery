@@ -1,0 +1,313 @@
+{
+  "Du hast mehrere realistische Möglichkeiten vor dir. Wie oft vergleichst du ihre Vor- und Nachteile, bevor du dich festlegst?": {
+    "nie": "Never",
+    "selten": "Rarely",
+    "manchmal": "Sometimes",
+    "häufig": "Often",
+    "fast immer": "Almost always"
+  },
+  "Eine wichtige Entscheidung hängt davon ab, ob eine Annahme stimmt. Wie oft prüfst du gezielt, was dafür oder dagegen spricht?": {
+    "nie": "Never",
+    "selten": "Rarely",
+    "manchmal": "Sometimes",
+    "häufig": "Often",
+    "fast immer": "Almost always"
+  },
+  "Du kennst dich mit einem Thema gut aus. Wie viel Gewicht hat dein erster Eindruck bei deiner Entscheidung?": {
+    "gar nicht": "Not at all",
+    "eher wenig": "A little",
+    "mittel": "Moderately",
+    "stark": "Strongly",
+    "sehr stark": "Very strongly"
+  },
+  "Mehrere Möglichkeiten sehen nach den verfügbaren Infos ähnlich gut aus. Wie viel Gewicht gibst du dann deiner Erfahrung oder deinem Gefühl?": {
+    "gar nicht": "Not at all",
+    "eher wenig": "A little",
+    "mittel": "Moderately",
+    "stark": "Strongly",
+    "sehr stark": "Very strongly"
+  },
+  "Die Zahlen sprechen für eine Option, dein Gefühl dagegen. Wie stark nimmst du dieses Gefühl als zusätzliches Signal ernst?": {
+    "gar nicht": "Not at all",
+    "eher wenig": "A little",
+    "mittel": "Moderately",
+    "stark": "Strongly",
+    "sehr stark": "Very strongly"
+  },
+  "Du könntest noch weiter recherchieren – oder mit einem kleinen Test neue Informationen gewinnen. Wie wahrscheinlich ist es, dass du zuerst testest?": {
+    "sehr unwahrscheinlich": "Very unlikely",
+    "eher unwahrscheinlich": "Rather unlikely",
+    "teils/teils": "Sometimes yes, sometimes no",
+    "eher wahrscheinlich": "Rather likely",
+    "sehr wahrscheinlich": "Very likely"
+  },
+  "Zwei Wege erscheinen beide sinnvoll. Statt dich direkt festzulegen, könntest du beide zunächst in kleinem Rahmen ausprobieren. Wie wahrscheinlich ist es, dass du sie so vergleichst?": {
+    "sehr unwahrscheinlich": "Very unlikely",
+    "eher unwahrscheinlich": "Rather unlikely",
+    "teils/teils": "Sometimes yes, sometimes no",
+    "eher wahrscheinlich": "Rather likely",
+    "sehr wahrscheinlich": "Very likely"
+  },
+  "Eine Entscheidung lässt sich leicht korrigieren. Wie wahrscheinlich ist es, dass du trotzdem schon eine vorläufige Richtung festlegst?": {
+    "sehr unwahrscheinlich": "Very unlikely",
+    "eher unwahrscheinlich": "Rather unlikely",
+    "teils/teils": "Sometimes yes, sometimes no",
+    "eher wahrscheinlich": "Rather likely",
+    "sehr wahrscheinlich": "Very likely"
+  },
+  "Ein Vorschlag erscheint dir nicht sinnvoll. Wie wahrscheinlich ist es, dass du ausdrücklich sagst, dass du nicht zustimmst?": {
+    "sehr unwahrscheinlich": "Very unlikely",
+    "eher unwahrscheinlich": "Rather unlikely",
+    "teils/teils": "Sometimes yes, sometimes no",
+    "eher wahrscheinlich": "Rather likely",
+    "sehr wahrscheinlich": "Very likely"
+  },
+  "Im Gespräch merkst du: Du siehst eine geplante, wichtige Entscheidung anders. Sie ist nicht dringend. Wann sprichst du deinen Einwand zum ersten Mal an?": {
+    "noch im laufenden Gespräch": "During the discussion",
+    "nach dem Gespräch, aber am selben Arbeitstag": "After the discussion, on the same working day",
+    "am nächsten Arbeitstag": "On the next working day",
+    "nach mehr als einem Arbeitstag": "After more than one working day",
+    "situationsabhängig": "Depends on the situation"
+  },
+  "Du hast Bedenken, kannst aber noch nicht genau sagen, warum. Was passt dann eher zu dir?": {
+    "direkt ansprechen und Unklarheit benennen": "Raise it straight away and acknowledge the uncertainty",
+    "kurz erwähnen und später genauer darauf zurückkommen": "Mention it briefly and come back to it in more detail later",
+    "erst für mich sortieren und dann ansprechen": "Sort it out for myself first, then raise it",
+    "erst ansprechen, wenn ich es ziemlich genau benennen kann": "Only raise it when I can describe it fairly precisely",
+    "situationsabhängig": "Depends on the situation"
+  },
+  "Du bist inhaltlich anderer Meinung. Welche Formulierung würdest du am ehesten wählen?": {
+    "„Ich sehe das anders, weil …“": "“I see it differently because…”",
+    "„Ich habe bei dem Punkt noch Bedenken …“": "“I still have concerns about this…”",
+    "„Wie würde unser Vorschlag mit … umgehen?“": "“How would our proposal handle…?”",
+    "„Ich würde gern noch eine andere Möglichkeit anschauen …“": "“I would like to consider another option…”",
+    "anders": "Something else"
+  },
+  "Für ein Ergebnis gibt es mehrere plausible Erklärungen – und noch ist unklar, welche davon zutrifft.": {
+    "sehr unwohl": "Very uncomfortable",
+    "eher unwohl": "Rather uncomfortable",
+    "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
+    "eher wohl": "Rather comfortable",
+    "sehr wohl": "Very comfortable"
+  },
+  "Über mehrere Wochen bleibt offen, welche von zwei Richtungen euer Vorhaben nehmen wird.": {
+    "sehr unwohl": "Very uncomfortable",
+    "eher unwohl": "Rather uncomfortable",
+    "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
+    "eher wohl": "Rather comfortable",
+    "sehr wohl": "Very comfortable"
+  },
+  "Ihr bekommt zu derselben Idee widersprüchliche Rückmeldungen – und noch ist unklar, welche davon relevanter sind.": {
+    "sehr unwohl": "Very uncomfortable",
+    "eher unwohl": "Rather uncomfortable",
+    "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
+    "eher wohl": "Rather comfortable",
+    "sehr wohl": "Very comfortable"
+  },
+  "Eine wichtige Frage bleibt eine Zeit lang ohne eindeutige Antwort.": {
+    "sehr unwohl": "Very uncomfortable",
+    "eher unwohl": "Rather uncomfortable",
+    "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
+    "eher wohl": "Rather comfortable",
+    "sehr wohl": "Very comfortable"
+  },
+  "Wenn dein Verantwortungsbereich klar ist: Wie möchtest du im Alltag entscheiden, wie du ein Ziel erreichst?": {
+    "ich möchte das Vorgehen grundsätzlich gemeinsam abstimmen": "I want to agree on the approach together as a rule",
+    "ich möchte die meisten Schritte vorher abstimmen": "I want to agree on most steps in advance",
+    "teils selbst entscheiden, teils abstimmen": "Decide some things myself and agree on others together",
+    "meist selbst entscheiden und bei wichtigen Punkten Rücksprache halten": "Usually decide myself and consult on important points",
+    "in meinem Bereich selbst entscheiden und nur bei größeren Auswirkungen abstimmen": "Decide within my area and consult only when there are wider consequences"
+  },
+  "Für deinen Bereich gibt es ein vereinbartes Budget. Wie möchtest du innerhalb dieses Rahmens über Ausgaben entscheiden?": {
+    "Ausgaben grundsätzlich vorher gemeinsam abstimmen": "Agree on spending together in advance as a rule",
+    "die meisten Ausgaben vorher abstimmen": "Agree on most spending in advance",
+    "kleinere Ausgaben selbst entscheiden, größere gemeinsam": "Decide on smaller expenses myself and larger ones together",
+    "meist selbst entscheiden und nur größere oder ungewöhnliche Ausgaben abstimmen": "Usually decide myself and consult only on larger or unusual expenses",
+    "innerhalb des vereinbarten Budgets selbst entscheiden": "Decide myself within the agreed budget"
+  },
+  "Wenn mehrere sinnvolle Wege möglich sind: Wie möchtest du entscheiden, welchen du gehst?": {
+    "gemeinsam entscheiden, welchen Weg wir nehmen": "Decide together which approach to take",
+    "vorher Rücksprache halten und den Weg meist gemeinsam festlegen": "Consult in advance and usually choose together",
+    "je nach Situation gemeinsam oder selbst entscheiden": "Decide together or myself depending on the situation",
+    "Input einholen und dann meist selbst entscheiden": "Seek input and then usually decide myself",
+    "im eigenen Verantwortungsbereich selbst entscheiden": "Decide within my own responsibilities"
+  },
+  "Wenn sich während der Arbeit etwas verändert: Wie möchtest du mit Anpassungen an einem vereinbarten Plan umgehen?": {
+    "Änderungen am vereinbarten Plan gemeinsam entscheiden": "Decide changes to the agreed plan together",
+    "die meisten Änderungen vorher abstimmen": "Agree on most changes in advance",
+    "kleinere Änderungen selbst, größere gemeinsam entscheiden": "Decide smaller changes myself and larger ones together",
+    "meist selbst anpassen und bei größeren Änderungen Rücksprache halten": "Usually adjust it myself and consult on larger changes",
+    "im eigenen Bereich selbst anpassen und andere informieren, wenn es für sie relevant ist": "Adjust within my area and inform others when it is relevant to them"
+  },
+  "Wann zeigst du anderen Foundern normalerweise einen Zwischenstand aus deinem Bereich?": {
+    "schon bei ersten Ideen/Skizzen": "At the first ideas or sketches",
+    "wenn die Richtung klarer wird, aber noch vieles offen ist": "When the direction becomes clearer but much remains open",
+    "bei einem ersten brauchbaren Stand": "At the first usable version",
+    "eher wenn das Ergebnis weitgehend fertig ist": "When the result is largely finished",
+    "stark situationsabhängig": "Strongly depends on the situation"
+  },
+  "In einem anderen Bereich zeichnet sich eine wichtige Änderung ab. Wann möchtest du davon erfahren?": {
+    "schon während sie geprüft wird": "While it is being considered",
+    "sobald eine Richtung wahrscheinlich wird": "As soon as a direction becomes likely",
+    "wenn die Entscheidung getroffen ist": "When the decision has been made",
+    "wenn sie für meinen Bereich relevant wird": "When it becomes relevant to my area",
+    "situationsabhängig": "Depends on the situation"
+  },
+  "Welche Art von Überblick über andere Bereiche wäre für dich im Alltag am hilfreichsten?": {
+    "regelmäßiger kurzer Überblick": "A regular brief overview",
+    "aktive Information bei größeren Änderungen": "Proactive updates on larger changes",
+    "zugänglicher Arbeitsstand bei Bedarf": "Access to work in progress when needed",
+    "ich frage gezielt nach": "I ask specific questions",
+    "andere Regel": "Another arrangement"
+  },
+  "Welche Ergebnisse möchtest Du mit dem Unternehmen in den nächsten drei Jahren erreichen?": {
+    "regelmäßiges Einkommen für den Lebensunterhalt": "Regular income to cover living costs",
+    "deutliches Wachstum": "Significant growth",
+    "gesellschaftlicher/ökologischer Beitrag": "A contribution to society or the environment",
+    "perspektivisch verkaufsfähiges Unternehmen": "A company that could eventually be sold",
+    "fachlich/technologisch anspruchsvolle Idee": "An ambitious professional or technological idea",
+    "mehr unternehmerische Unabhängigkeit": "Greater independence in business",
+    "anderes Ziel": "Another goal"
+  },
+  "Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Deutlich wachsen und einen größeren Markt erreichen.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Ein Unternehmen aufbauen, das später teilweise oder vollständig verkauft werden könnte.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Mehr unternehmerische und persönliche Unabhängigkeit erreichen.": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig wichtig": "Not very important",
+    "mittel": "Moderately important",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Und welche ein oder zwei davon stehen für dich gerade besonders weit oben?": {
+    "Ein wirtschaftlich tragfähiges Unternehmen aufbauen, das verlässlich Einkommen erwirtschaften kann.": "Build an economically viable company that can generate a reliable income.",
+    "Deutlich wachsen und einen größeren Markt erreichen.": "Grow significantly and reach a larger market.",
+    "Einen konkreten gesellschaftlichen oder ökologischen Beitrag leisten.": "Make a concrete contribution to society or the environment.",
+    "Ein Unternehmen aufbauen, das später teilweise oder vollständig verkauft werden könnte.": "Build a company that could later be sold in part or in full.",
+    "Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen.": "Put an ambitious professional or technological idea into practice.",
+    "Mehr unternehmerische und persönliche Unabhängigkeit erreichen.": "Achieve greater independence in business and in your personal life."
+  },
+  "Wie denkst du heute über deine Beteiligung am Unternehmen?": {
+    "Ich möchte langfristig beteiligt bleiben und plane aktuell keinen Verkauf.": "I want to keep my stake for the long term and do not currently plan to sell.",
+    "Ein teilweiser Verkauf wäre für mich grundsätzlich möglich.": "I would be open to selling part of my stake.",
+    "Ich möchte gezielt auf einen späteren vollständigen Verkauf hinarbeiten.": "I want to work toward a full sale later.",
+    "Das hängt für mich von bestimmten Bedingungen ab.": "It depends on specific conditions.",
+    "Ich möchte mir alle Möglichkeiten offenhalten.": "I want to keep all options open."
+  },
+  "Wie offen bist du dafür, externe Investor:innen aufzunehmen und dafür Unternehmensanteile abzugeben?": {
+    "zunächst ohne externes Eigenkapital": "Start without outside equity",
+    "Möglichkeit offenhalten": "Keep the option open",
+    "gezielt suchen": "Actively seek investment",
+    "abhängig von Bedingungen": "Depends on the conditions"
+  },
+  "Wenn du ungefähr drei Jahre vorausblickst: Welche Rolle möchtest du dann am liebsten im Unternehmen haben?": {
+    "stark operativ": "Work hands-on in operations",
+    "vor allem führen/organisieren": "Primarily lead and organize",
+    "vor allem fachlich/strategisch gestalten": "Primarily shape the professional or strategic direction",
+    "schrittweise aus Tagesgeschäft zurückziehen": "Gradually step back from day-to-day operations",
+    "hauptsächlich als Anteilseigner:in": "Primarily as an equity holder",
+    "andere Vorstellung": "Another idea"
+  },
+  "Ab wann müsstest du voraussichtlich regelmäßig Geld aus dem Vorhaben bekommen, damit du deinen Lebensunterhalt damit abdecken kannst?": {
+    "ab sofort": "Immediately",
+    "ab Datum": "From a specific date",
+    "innerhalb 12 Monate voraussichtlich nicht": "Probably not within twelve months"
+  },
+  "Was müsste passieren, damit du dir vorstellen könntest, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?": {
+    "bereits Haupttätigkeit": "It is already my main activity",
+    "bestimmte Auszahlung gesichert": "A specific payment is secured",
+    "Finanzierung erreicht": "Funding is secured",
+    "Meilenstein erreicht": "A milestone is reached",
+    "ab Datum": "From a specific date",
+    "andere Bedingung": "Another condition",
+    "aktuell nicht geplant": "Not currently planned"
+  },
+  "Angenommen, ein wichtiger vereinbarter Meilenstein wird nicht erreicht. Wie möchtest du dann über deine weitere Mitarbeit entscheiden?": {
+    "bis Datum weiterarbeiten und neu entscheiden": "Keep working until a date, then decide again",
+    "neues konkretes Ziel vereinbaren und bis dahin weiter": "Agree on a new specific goal and continue until then",
+    "gemeinsam neu entscheiden": "Decide again together",
+    "unter bestimmten Bedingungen nicht weiterführen": "Stop under specific conditions",
+    "andere Vorgehensweise": "Another approach"
+  },
+  "Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?": {
+    "gar nicht wichtig": "Not at all important",
+    "eher wenig": "A little",
+    "mittel": "Moderately",
+    "ziemlich wichtig": "Quite important",
+    "sehr wichtig": "Very important"
+  },
+  "Wann wäre ein guter Zeitpunkt, diese Zusagen und Erwartungen gemeinsam wieder anzuschauen?": {
+    "an einem bestimmten Datum – bitte angeben": "On a specific date — please specify",
+    "nach dem nächsten Meilenstein": "After the next milestone"
+  },
+  "Ihr seid euch bei einer wichtigen Entscheidung uneinig. Sie liegt klar im Verantwortungsbereich einer Person und betrifft die anderen Bereiche nicht wesentlich. Welche Regel sollte dann gelten?": {
+    "verantwortliche Person entscheidet nach Anhörung": "The responsible person decides after hearing others",
+    "vorher benannte andere Person entscheidet nach Rücksprache": "Another person named in advance decides after consultation",
+    "Mehrheit entscheidet": "The majority decides",
+    "nur bei Zustimmung aller": "Only with everyone’s agreement",
+    "abhängig von Entscheidungsart": "Depends on the type of decision"
+  },
+  "Ihr kommt bis zum vereinbarten Zeitpunkt bei einer wichtigen Entscheidung zu keiner Einigung. Welche Wege sollten dann grundsätzlich möglich sein?": {
+    "vorher benannte Person entscheidet": "A person named in advance decides",
+    "begrenzter Test": "A limited test",
+    "externe Beratung/Moderation": "External advice or facilitation",
+    "neue Frist": "A new deadline",
+    "anderer Weg": "Another approach"
+  },
+  "Bei welchen Entscheidungen sollten aus deiner Sicht immer alle Founder zustimmen?": {
+    "neue Founder/Beteiligungen": "New founders or equity stakes",
+    "größere finanzielle Verpflichtungen": "Larger financial commitments",
+    "grundlegende Richtungsänderung": "A fundamental change of direction",
+    "Unternehmensverkauf": "Sale of the company",
+    "wesentliche Änderung persönlicher Zusagen": "A significant change in personal commitments",
+    "weitere": "Other decisions"
+  },
+  "Ein Schritt würde einen spürbaren Teil eurer Zeit oder eures Budgets beanspruchen. Was wäre dir wichtig, bevor ihr loslegt?": {
+    "kleiner Vorversuch": "A small preliminary test",
+    "feste Ausgabenobergrenze": "A fixed spending limit",
+    "vorher vereinbarte Stop-/Neubewertungsbedingung": "An agreed condition for stopping or reassessing",
+    "externe fachkundige Einschätzung": "An external expert view",
+    "andere Absicherung": "Another safeguard",
+    "keine zusätzliche Absicherung": "No additional safeguard"
+  },
+  "Was sollte passieren, wenn ihr euch nicht einig seid, ob eine für dich wichtige Grenze in einer konkreten Situation betroffen ist?": {
+    "zunächst aussetzen und gemeinsam klären": "Pause first and clarify together",
+    "externe fachliche/rechtliche Einschätzung": "External professional or legal advice",
+    "neutrale Person hinzuziehen": "Bring in a neutral person",
+    "persönliches Veto": "A personal veto",
+    "abhängig von Art der Grenze": "Depends on the kind of boundary",
+    "andere Regel": "Another rule"
+  }
+}

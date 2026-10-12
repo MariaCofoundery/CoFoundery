@@ -186,7 +186,7 @@ test("der leere Zustand nennt beide Ursachen und beide Wege", () => {
   assert.match(page, /href="\/profile\/interview"/);
   // Phase 11.7B.1: zweiter Weg ist die Teamfreigabe fuer genau dieses Team.
   assert.match(page, /href=\{`\/teams\/\$\{encodeURIComponent\(teamId\)\}#teamfreigabe`\}/);
-  assert.match(page, /<ComponentMatrix people=\{data\.people\} areas=\{data\.areas\} heading=\{false\} \/>/);
+  assert.match(page, /<ComponentMatrix locale=\{await getDisplayLocale\(\)\} people=\{data\.people\} areas=\{data\.areas\} heading=\{false\} \/>/);
   assert.doesNotMatch(page, /CapabilityTeamReadoutView/);
   for (const locale of ["de", "en"]) {
     const copy = teamCopy(locale);

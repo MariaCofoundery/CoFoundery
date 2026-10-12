@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { getTranslations } from "next-intl/server";
 
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -115,6 +117,8 @@ export async function WorkMap({
 }) {
   // Welche Antwort eine Stelle bekommt, entscheidet mapRows.ts - dort ist es
   // geprueft. Hier wird nur gezeichnet.
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
   const gruppen = workMapGroups(sections);
 
   // Ohne geordnete Antworten gibt es kein Bild. Ein leerer Rahmen mit
@@ -139,21 +143,21 @@ export async function WorkMap({
 
       <div className={dicht ? "mt-3 gap-x-6 sm:columns-2" : "mt-5 space-y-5"}>
         {gruppen.map((group) => (
-          <div key={group.section} className={dicht ? "mb-3 break-inside-avoid" : undefined}>
+          <div key={copy(group.section)} className={dicht ? "mb-3 break-inside-avoid" : undefined}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {themenname(group.rows[0]?.itemId ?? "") ?? group.section}
+              {themenname(group.rows[0]?.itemId ?? "") ?? copy(group.section)}
             </p>
             <ul className={dicht ? "mt-1 space-y-1" : "mt-2 space-y-2.5"}>
               {group.rows.map((row) => {
                 const beschriftung = kurz(row.itemId);
                 return (
-                  <li key={row.itemId} title={row.prompt}>
+                  <li key={row.itemId} title={copy(row.prompt)}>
                     {beschriftung ? (
                       <p className={`text-xs text-slate-600 ${dicht ? "leading-4" : "leading-5"}`}>{beschriftung}</p>
                     ) : null}
                     <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${beschriftung && !dicht ? "mt-0.5" : ""}`}>
                       <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                      <span className={dicht ? "text-xs leading-4 text-slate-900" : "text-sm text-slate-900"}>{row.ordinal.label}</span>
+                      <span className={dicht ? "text-xs leading-4 text-slate-900" : "text-sm text-slate-900"}>{copy(row.ordinal.label)}</span>
                     </div>
                   </li>
                 );
@@ -196,6 +200,8 @@ export async function DifferenceMap({
   nameA: string;
   nameB: string;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
   const gruppen = differenceGroups(sections);
 
   if (gruppen.length === 0) return null;
@@ -223,14 +229,14 @@ export async function DifferenceMap({
 
       <div className="mt-5 space-y-6">
         {gruppen.map((group) => (
-          <div key={group.section}>
+          <div key={copy(group.section)}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {group.section}
+              {copy(group.section)}
             </p>
             <ul className="mt-3 space-y-4">
               {group.rows.map((row) => (
                 <li key={row.itemId}>
-                  <p className="text-sm text-slate-700">{row.prompt}</p>
+                  <p className="text-sm text-slate-700">{copy(row.prompt)}</p>
                   <div className="mt-2">
                     <Hantel a={row.a.position} b={row.b.position} of={row.a.of} />
                   </div>
@@ -238,7 +244,7 @@ export async function DifferenceMap({
                       Ein Bild ohne Worte laedt dazu ein, den Abstand zu
                       deuten statt die Antworten zu lesen. */}
                   <p className="mt-1.5 text-sm text-slate-900">
-                    {nameA}: {row.a.label} · {nameB}: {row.b.label}
+                    {nameA}: {copy(row.a.label)} · {nameB}: {copy(row.b.label)}
                   </p>
                 </li>
               ))}
@@ -304,6 +310,8 @@ export async function VentureDirection({
   entries: Entry[];
   items: { itemId: string; shortLabel?: string; prompt: string }[];
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
   const rows = directionRows(entries, items);
   const beantwortet = rows.filter((row) => row.ordinal || row.missing);
 
@@ -320,7 +328,7 @@ export async function VentureDirection({
         {rows.map((row) => (
           <li key={row.itemId} className="sm:flex sm:items-center sm:gap-4">
             <span className="block text-sm text-slate-700 sm:w-64 sm:shrink-0">
-              {row.label}
+              {copy(row.label)}
               {/* Die Markierung sagt: dieses hier zuerst. Sie ist keine
                   hoehere Stufe - man kann ein "mittel" wichtiges Ziel
                   voranstellen, weil es gerade dran ist. */}
@@ -334,11 +342,11 @@ export async function VentureDirection({
               {row.ordinal ? (
                 <>
                   <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                  <span className="text-sm text-slate-900">{row.ordinal.label}</span>
+                  <span className="text-sm text-slate-900">{copy(row.ordinal.label)}</span>
                 </>
               ) : (
                 <span className="text-sm text-slate-500">
-                  {row.missing?.label ?? t("directionNoAnswer")}
+                  {row.missing?.label ? copy(row.missing.label) : t("directionNoAnswer")}
                 </span>
               )}
             </span>

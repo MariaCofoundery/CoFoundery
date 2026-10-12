@@ -1,3 +1,4 @@
+import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import { getProductWorkstyle } from "@/features/reporting/workstyle/data";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import Link from "next/link";
@@ -51,6 +52,7 @@ export default async function AdvisorPersonPage({
   params: Promise<{ userId: string }>;
   searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
+  const displayLocale = await getDisplayLocale();
   const { userId } = await params;
   const query = await searchParams;
   const {
@@ -196,8 +198,8 @@ export default async function AdvisorPersonPage({
           ---------------------------------------------------------------- */}
       {workstyleV04 && (
         <section className="mt-8">
-          <h2 className="mb-5 text-xl font-semibold">Wie du arbeitest</h2>
-          <IndividualWorkstyle
+          <h2 className="mb-5 text-xl font-semibold">{(await getTranslations("report.workstyle"))("individualTitle")}</h2>
+          <IndividualWorkstyle locale={await getDisplayLocale()}
             profile={workstyleV04}
             name={view.base?.displayName ?? "Founder"}
             perspective="other"
@@ -253,7 +255,7 @@ export default async function AdvisorPersonPage({
         );
         return view.scope === "founder_profile" ? (
           <details key={view.scope} className="mt-6">
-            <summary>Früheres Arbeitsprofil – historischer Stand</summary>
+            <summary>{displayLocale === "en" ? "Earlier workstyle profile — historical version" : "Früheres Arbeitsprofil – historischer Stand"}</summary>
             {content}
           </details>
         ) : (

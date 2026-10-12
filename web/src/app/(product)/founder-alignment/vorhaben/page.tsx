@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { redirect } from "next/navigation";
 import { TeamUnavailable, loadTeamAccessView } from "@/features/access/TeamUnavailable";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -26,6 +28,9 @@ export default async function VentureAlignmentPage({
 }: {
   searchParams: Promise<{ venture?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(buildLoginRedirectPath("/founder-alignment/vorhaben", { venture: (await searchParams).venture }));
@@ -48,11 +53,11 @@ export default async function VentureAlignmentPage({
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vorhaben" state={navState} />
-        <h1 className="text-2xl font-semibold text-slate-900">Für welches Vorhaben?</h1>
+        <h1 className="text-2xl font-semibold text-slate-900"> {copy("Für welches Vorhaben?")} </h1>
         <p className="mt-3 text-slate-700">
           {gewaehlt
-            ? "Dieses Vorhaben ist für dich nicht verfügbar. Wähle eines von deinen:"
-            : "Du bist in mehreren. Deine Angaben zu Zeit, Geld und Zielen gelten jeweils für eins — deshalb fragen wir, statt zu raten."}
+            ? copy("Dieses Vorhaben ist für dich nicht verfügbar. Wähle eines von deinen:")
+            : copy("Du bist in mehreren. Deine Angaben zu Zeit, Geld und Zielen gelten jeweils für eins — deshalb fragen wir, statt zu raten.")}
         </p>
         <ul className="mt-6 space-y-2">
           {choices.map((entry) => (
@@ -61,8 +66,8 @@ export default async function VentureAlignmentPage({
                 href={`/founder-alignment/vorhaben?venture=${encodeURIComponent(entry.id)}`}
                 className="text-slate-900 underline"
               >
-                {entry.name ?? "Ohne Namen"}
-                {entry.alone && <span className="text-slate-500"> — nur du</span>}
+                {entry.name ?? copy("Ohne Namen")}
+                {entry.alone && <span className="text-slate-500">  {copy("— nur du")} </span>}
               </a>
             </li>
           ))}
@@ -122,8 +127,7 @@ export default async function VentureAlignmentPage({
     <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vorhaben" state={navState} teamId={venture.id} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Testfassung
-      </p>
+         {copy("Testfassung")} </p>
 
       {/* Der Fragebogen beginnt mit der Einleitung, solange nichts beantwortet
           ist - und fragt dort nach dem Namen. Dann fragt der Kopf nicht auch

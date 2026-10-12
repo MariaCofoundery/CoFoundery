@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { redirect } from "next/navigation";
@@ -23,6 +25,9 @@ export default async function VentureAnswersPage({
 }: {
   searchParams: Promise<{ venture?: string; erstellt?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const { erstellt } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
@@ -38,7 +43,7 @@ export default async function VentureAnswersPage({
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} />
-        <h1 className="text-2xl font-semibold text-slate-900">Welches Vorhaben?</h1>
+        <h1 className="text-2xl font-semibold text-slate-900"> {copy("Welches Vorhaben?")} </h1>
         <ul className="mt-6 space-y-2">
           {choices.map((entry) => (
             <li key={entry.id}>
@@ -46,7 +51,7 @@ export default async function VentureAnswersPage({
                 href={`/founder-alignment/vorhaben/antworten?venture=${encodeURIComponent(entry.id)}`}
                 className="text-slate-900 underline"
               >
-                {entry.name ?? "Ohne Namen"}
+                {entry.name ?? copy("Ohne Namen")}
               </Link>
             </li>
           ))}
@@ -61,8 +66,7 @@ export default async function VentureAnswersPage({
     <main className="mx-auto max-w-3xl px-4 py-10">
       <AlignNav current="/founder-alignment/vorhaben/antworten" state={navState} teamId={venture.id} />
       <p className="mb-2 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900">
-        Testfassung
-      </p>
+         {copy("Testfassung")} </p>
       {/* ---------------------------------------------------------------
           DER MOMENT NACH DEM ABSENDEN
           ---------------------------------------------------------------
@@ -74,13 +78,10 @@ export default async function VentureAnswersPage({
       {erstellt === "1" && (
         <section className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
           <h2 className="text-xl font-semibold text-slate-950">
-            Das steht jetzt für {venture.name ?? "dein Vorhaben"}.
+             {copy("Das steht jetzt für")} {venture.name ?? copy("dein Vorhaben")}.
           </h2>
           <p className="mt-2 text-sm leading-7 text-slate-700">
-            Unten siehst du deine Angaben — und oben auf einen Blick, wohin es gehen
-            soll. Die Mitglieder dieses Teams sehen deine Antworten jetzt im gemeinsamen
-            Bericht; wer später dazukommt, ebenfalls.
-          </p>
+             {copy("Unten siehst du deine Angaben — und oben auf einen Blick, wohin es gehen soll. Die Mitglieder dieses Teams sehen deine Antworten jetzt im gemeinsamen Bericht; wer später dazukommt, ebenfalls.")} </p>
           {/* EIN WEG UND NICHT ZWEI. Beim Arbeitsprofil steht hier "Weiter:
               Was du aufbauen willst" - dort kommt noch ein Teil. Hier kommt
               keiner mehr, und "Später" neben "Zur Übersicht" waere zweimal
@@ -90,37 +91,32 @@ export default async function VentureAnswersPage({
               href="/dashboard"
               className="inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
             >
-              Zur Übersicht
-            </Link>
+               {copy("Zur Übersicht")} </Link>
           </div>
         </section>
       )}
 
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-        {venture.name ?? "Ohne Namen"}
+        {venture.name ?? copy("Ohne Namen")}
       </p>
       <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-        Was dir bei diesem Vorhaben wichtig ist
-      </h1>
+         {copy("Was dir bei diesem Vorhaben wichtig ist")} </h1>
       <p className="mt-4 text-slate-700">
-        Das ist, was du geantwortet hast — keine Auswertung und keine Punktzahl.
-      </p>
+         {copy("Das ist, was du geantwortet hast — keine Auswertung und keine Punktzahl.")} </p>
       <p className="mt-2 text-sm text-slate-500">{VENTURE_ALIGNMENT.validity}</p>
 
       {!report ? (
         <p className="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-          Hier steht noch nichts.{" "}
+           {copy("Hier steht noch nichts.")} {" "}
           <Link href="/founder-alignment/vorhaben" className="underline">
-            Zum Fragebogen
-          </Link>
+             {copy("Zum Fragebogen")} </Link>
           .
         </p>
       ) : (
         <div className="mt-10">
           <p className="mb-4 text-sm text-slate-500">
-            {report.answered} von {report.of} Fragen beantwortet
-            {report.submittedAt && (
-              <> · abgegeben am {new Date(report.submittedAt).toLocaleDateString("de-DE")}</>
+            {report.answered}  {copy("von")} {report.of}  {copy("Fragen beantwortet")} {report.submittedAt && (
+              <>  {copy("· abgegeben am")} {new Date(report.submittedAt).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}</>
             )}
           </p>
           {/* DAS BILD VOR DER LISTE. Es zeigt dieselben Antworten kompakt -
@@ -152,11 +148,11 @@ export default async function VentureAnswersPage({
           {/* Phase 11.7B: keine eigene Freigabe mehr. Abgeben heisst: mit diesem
               Team teilen. Advisors sehen nichts davon ohne ihre eigene Freigabe. */}
           <section aria-labelledby="venture-visibility" className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <h2 id="venture-visibility" className="text-base font-semibold text-slate-900">Wer das sieht</h2>
+            <h2 id="venture-visibility" className="text-base font-semibold text-slate-900"> {copy("Wer das sieht")} </h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
               {report.submittedAt
-                ? "Deine abgegebenen Antworten sehen die aktuellen Mitglieder dieses Teams – auch Personen, die später dazukommen. Advisors, FIND und Personen außerhalb des Teams sehen sie nicht automatisch. Wenn du das Team verlässt, sieht das Team sie nicht mehr."
-                : "Noch niemand. Deine Antworten werden nach dem Absenden für die Mitglieder dieses Teams sichtbar."}
+                ? copy("Deine abgegebenen Antworten sehen die aktuellen Mitglieder dieses Teams – auch Personen, die später dazukommen. Advisors, FIND und Personen außerhalb des Teams sehen sie nicht automatisch. Wenn du das Team verlässt, sieht das Team sie nicht mehr.")
+                : copy("Noch niemand. Deine Antworten werden nach dem Absenden für die Mitglieder dieses Teams sichtbar.")}
             </p>
           </section>
         </div>

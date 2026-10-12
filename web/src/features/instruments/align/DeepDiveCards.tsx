@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { deepDiveLinks } from "@/features/instruments/align/deepDive";
@@ -35,6 +37,9 @@ export async function DeepDiveCards({
   teamId: string;
   teamContext: "pre_founder" | "existing_team";
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const t = await getTranslations("teams.setup");
   const links = deepDiveLinks(scope, teamContext);
 
@@ -42,12 +47,9 @@ export async function DeepDiveCards({
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
-      <h2 className="text-base font-semibold text-slate-900">Und dann?</h2>
+      <h2 className="text-base font-semibold text-slate-900"> {copy("Und dann?")} </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Dieser Vergleich ist keine Vereinbarung — er sagt nur, worüber ihr sprechen
-        könnt. Festhalten könnt ihr das im Founder-Setup: Dort bekommt jedes Thema
-        einen Stand und eine Bestätigung von euch beiden.
-      </p>
+         {copy("Dieser Vergleich ist keine Vereinbarung — er sagt nur, worüber ihr sprechen könnt. Festhalten könnt ihr das im Founder-Setup: Dort bekommt jedes Thema einen Stand und eine Bestätigung von euch beiden.")} </p>
 
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {links.map((link) => (
@@ -65,7 +67,7 @@ export async function DeepDiveCards({
               {/* Woher die Karte kommt - sonst steht sie da, als haetten wir
                   sie geraten. */}
               <span className="mt-2 block text-[11px] text-slate-500">
-                aus {link.sections.join(", ")}
+                 {copy("aus")} {link.sections.map(copy).join(", ")}
               </span>
             </Link>
           </li>

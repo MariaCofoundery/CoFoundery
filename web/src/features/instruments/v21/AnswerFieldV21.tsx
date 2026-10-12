@@ -1,5 +1,9 @@
 "use client";
 
+import { alignmentDisplayText, alignmentQuestionView } from "@/features/instruments/align/display";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/config";
+
 import type { ItemView } from "@/features/instruments/v21/questionnaireDataV21";
 import type { MissingCode } from "@/features/instruments/v21/registryV21";
 
@@ -47,7 +51,11 @@ const optionRow =
   "flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2 text-sm " +
   "transition-colors hover:bg-slate-50";
 
-export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disabled }: Props) {
+export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries = [], disabled }: Props) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
+  const item = alignmentQuestionView(sourceItem, locale);
   const value = draft.value ?? {};
   const patch = (next: Record<string, unknown>) =>
     onChange({ value: { ...value, ...next } });
@@ -123,7 +131,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               {option.requiresText && chosen === option.optionId && (
                 <input
                   className={`${box} mt-2`}
-                  placeholder="bitte beschreiben"
+                  placeholder={t("bitte beschreiben")}
                   value={(value.text as string) ?? ""}
                   disabled={disabled}
                   onChange={(event) => patch({ text: event.target.value })}
@@ -152,12 +160,10 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
         {item.conditionalFields && chosen && (
           <div className="mt-4 rounded-lg bg-slate-50 p-3">
             <p className="text-xs text-slate-500">
-              Freiwillig: ungefährer Monatsbetrag, mit Währung und ob vor oder nach
-              persönlichen Steuern.
-            </p>
+               {t("Freiwillig: ungefährer Monatsbetrag, mit Währung und ob vor oder nach persönlichen Steuern.")} </p>
             <input
               className={`${box} mt-2`}
-              placeholder="z. B. 2.400 EUR netto"
+              placeholder={t("z. B. 2.400 EUR netto")}
               value={(value.optionalAmount as string) ?? ""}
               disabled={disabled}
               onChange={(event) => patch({ optionalAmount: event.target.value })}
@@ -288,7 +294,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               {option.requiresText && chosen.includes(option.optionId) && (
                 <input
                   className={`${box} mt-2`}
-                  placeholder="bitte beschreiben"
+                  placeholder={t("bitte beschreiben")}
                   value={texts[option.optionId] ?? ""}
                   disabled={disabled}
                   onChange={(event) =>
@@ -304,7 +310,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           <div className="mt-4 rounded-lg bg-slate-50 p-3">
             <p className="text-sm font-medium text-slate-800">{item.followup.question}</p>
             <p className="mt-0.5 text-xs text-slate-500">
-              {item.followup.optional ? "freiwillig" : ""}
+              {item.followup.optional ? t("freiwillig") : ""}
             </p>
             <div className="mt-2 space-y-1">
               {item.options
@@ -378,10 +384,10 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
       // Ohne die Wege bleiben die Anliegen die letzte Notloesung - besser als
       // ein leerer Knopf, aber der Wachtest in `registries.ts` laesst einen
       // Bogen ohne Wege ohnehin nicht durch.
-      { key: "A", label: item.paths?.[0] ?? item.concerns?.[0] ?? "der erste Weg" },
-      { key: "B", label: item.paths?.[1] ?? item.concerns?.[1] ?? "der zweite Weg" },
-      { key: "other", label: muster?.otherLabel ?? "etwas anderes" },
-      { key: "unknown", label: muster?.unknownLabel ?? "ich kann das noch nicht entscheiden" },
+      { key: "A", label: item.paths?.[0] ?? item.concerns?.[0] ?? t("der erste Weg") },
+      { key: "B", label: item.paths?.[1] ?? item.concerns?.[1] ?? t("der zweite Weg") },
+      { key: "other", label: muster?.otherLabel ?? t("etwas anderes") },
+      { key: "unknown", label: muster?.unknownLabel ?? t("ich kann das noch nicht entscheiden") },
     ];
     return (
       <div className="space-y-5">
@@ -417,7 +423,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
 
         <div className="border-t border-slate-200 pt-5">
           <p className="text-sm font-medium text-slate-900">
-            {muster?.pathPrompt ?? "Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?"}
+            {muster?.pathPrompt ?? t("Welchen Weg würdest du unter diesen Bedingungen zuerst wählen?")}
           </p>
           <div className="mt-2 space-y-2">
             {wege.map((path) => (
@@ -451,7 +457,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           type="number"
           inputMode="decimal"
           className={box}
-          placeholder="Betrag"
+          placeholder={t("Betrag")}
           value={(value.amount as number | undefined) ?? ""}
           disabled={disabled}
           onChange={(event) =>
@@ -499,7 +505,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               })
             }
           />
-          {unit && <span className="text-sm text-slate-600">{unit}</span>}
+          {unit && <span className="text-sm text-slate-600">{t(unit)}</span>}
         </div>
         {/* Auch der Zusatz gehoert ans Item: "Falls der Umfang schwankt" war
             fuer die Stundenfrage geschrieben und stand bei der Geldfrage mit. */}
@@ -529,7 +535,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           <div key={index} className="flex flex-wrap items-center gap-2">
             <input
               className={`${box} flex-1 min-w-40`}
-              placeholder="Person oder geplante Rolle"
+              placeholder={t("Person oder geplante Rolle")}
               value={row.person}
               disabled={disabled}
               onChange={(event) =>
@@ -541,7 +547,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               type="number"
               min={0}
               className={`${box} w-24`}
-              placeholder="Std."
+              placeholder={t("Std.")}
               value={row.number ?? ""}
               disabled={disabled || row.number === null}
               onChange={(event) =>
@@ -567,7 +573,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
                       : entry))
                 }
               />
-              {item.options[0]?.label ?? "keine feste Erwartung"}
+              {item.options[0]?.label ?? t("keine feste Erwartung")}
             </label>
             {rows.length > 1 && (
               <button
@@ -576,8 +582,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
                 disabled={disabled}
                 onClick={() => write(rows.filter((_, at) => at !== index))}
               >
-                entfernen
-              </button>
+                 {t("entfernen")} </button>
             )}
           </div>
         ))}
@@ -587,8 +592,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           disabled={disabled}
           onClick={() => write([...rows, { person: "", number: null, unit: "Stunden pro Woche" }])}
         >
-          weitere Person
-        </button>
+           {t("weitere Person")} </button>
       </div>
     );
   }
@@ -623,7 +627,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               }
             >
               {days.map((day) => (
-                <option key={day}>{day}</option>
+                <option key={day} value={day}>{t(day)}</option>
               ))}
             </select>
             {(["from", "to"] as const).map((which) => (
@@ -655,8 +659,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
                 disabled={disabled}
                 onClick={() => write(windows.filter((_, at) => at !== index))}
               >
-                entfernen
-              </button>
+                 {t("entfernen")} </button>
             )}
           </div>
         ))}
@@ -666,8 +669,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
           disabled={disabled}
           onClick={() => write([...windows, { day: "Montag", from: "", to: "", timezone: here }])}
         >
-          weiteres Zeitfenster
-        </button>
+           {t("weiteres Zeitfenster")} </button>
       </div>
     );
   }
@@ -728,8 +730,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
               disabled={disabled}
               onClick={() => write(entries.filter((_, at) => at !== index))}
             >
-              entfernen
-            </button>
+               {t("entfernen")} </button>
           </div>
         ))}
         <button
@@ -740,7 +741,7 @@ export function AnswerFieldV21({ item, draft, onChange, basisEntries = [], disab
             write([...entries, { entryId: `e${Date.now().toString(36)}`, text: "" }])
           }
         >
-          {entries.length === 0 ? "eine Grenze nennen" : "weitere Grenze"}
+          {entries.length === 0 ? t("eine Grenze nennen") : t("weitere Grenze")}
         </button>
       </div>
     );
@@ -800,12 +801,13 @@ function MissingChoices({
   onChoose: (code: MissingCode) => void;
   disabled?: boolean;
 }) {
+  const locale = useLocale();
   if (offered.length === 0) return null;
   return (
     <>
     <div className="border-t border-dashed border-slate-300 pt-3">
       <p className="mb-2 text-[11px] uppercase tracking-wide text-slate-400">
-        {offered.length === 1 ? "oder" : "oder eines davon"}
+        {locale === "en" ? (offered.length === 1 ? "or" : "or one of these") : (offered.length === 1 ? "oder" : "oder eines davon")}
       </p>
     <div className="flex flex-wrap gap-2">
       {offered.map((entry) => (

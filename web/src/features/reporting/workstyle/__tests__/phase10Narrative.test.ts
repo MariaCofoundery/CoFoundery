@@ -169,7 +169,7 @@ test("Teamreport: ein Gesprächsteil, Einzelantworten im Anhang, keine Bewertung
   // Alle 29 Einzelantworten nur im Anhang.
   assert.match(report, /<details className="ws-appendix[^"]*" open=\{full\}>[\s\S]*?<WorkstyleSignature/);
   assert.doesNotMatch(report, /ReportViewV21/);
-  assert.doesNotMatch(report, /score|percent|Prozent|ranking|Ampel|radar|spider|teamHealth/i);
+  assert.doesNotMatch(report.replace("not a ranking", ""), /score|percent|Prozent|ranking|Ampel|radar|spider|teamHealth/i);
   // Vereinbart ist nur, was alle aktuellen Mitglieder bestaetigt haben.
   assert.match(report, /team\.setup\.map/);
   assert.match(report, /alle aktuellen Mitglieder/);
@@ -186,9 +186,9 @@ test("Druck: Anhang nur in der ausfuehrlichen Fassung", () => {
     const p = src(page);
     assert.match(p, /query\.ansicht === "ausfuehrlich"/, page);
     assert.match(p, /full=\{full\}/, page);
-    // EN: Hinweis, dass der Bericht nur auf Deutsch vorliegt - kein Sprachmix.
-    assert.match(p, /locale !== "de" && \(/, page);
-    assert.match(p, /t\("germanOnly"\)/, page);
+    // EN now uses the same locale-aware renderer, including the appendix.
+    assert.match(p, /locale=\{locale\}/, page);
+    assert.doesNotMatch(p, /t\("germanOnly"\)/, page);
   }
 });
 

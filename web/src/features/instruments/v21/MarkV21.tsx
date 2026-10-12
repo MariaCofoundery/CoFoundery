@@ -1,5 +1,9 @@
 "use client";
 
+import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/config";
+
 import { useState, useTransition } from "react";
 import {
   setDiscussionMarkV21,
@@ -25,6 +29,9 @@ export function MarkV21({
   scope?: MarkScope;
   ventureId?: string;
 }) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   const [marked, setMarked] = useState(initial);
   const [failed, setFailed] = useState(false);
   const [pending, start] = useTransition();
@@ -51,8 +58,7 @@ export function MarkV21({
           });
         }}
       />
-      darüber möchte ich sprechen
-      {failed && <span className="text-rose-700">— nicht gespeichert</span>}
+       {t("darüber möchte ich sprechen")} {failed && <span className="text-rose-700"> {t("— nicht gespeichert")} </span>}
     </label>
   );
 }

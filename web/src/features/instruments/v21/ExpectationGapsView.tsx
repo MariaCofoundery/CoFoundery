@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import type { ExpectationResult } from "@/features/instruments/v21/expectationsV21";
 
 /**
@@ -22,7 +24,10 @@ import type { ExpectationResult } from "@/features/instruments/v21/expectationsV
 
 type Props = { result: ExpectationResult; nameA: string; nameB: string };
 
-export function ExpectationGapsView({ result, nameA, nameB }: Props) {
+export async function ExpectationGapsView({ result, nameA, nameB }: Props) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const nameOf = (side: "a" | "b") => (side === "a" ? nameA : nameB);
   const otherOf = (side: "a" | "b") => (side === "a" ? nameB : nameA);
 
@@ -30,24 +35,19 @@ export function ExpectationGapsView({ result, nameA, nameB }: Props) {
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 className="text-base font-semibold text-slate-900">Zeit: Zusage und Erwartung</h2>
+      <h2 className="text-base font-semibold text-slate-900"> {copy("Zeit: Zusage und Erwartung")} </h2>
 
       {result.gaps.length > 0 && (
         <ul className="mt-3 space-y-4">
           {result.gaps.map((gap, index) => (
             <li key={index}>
               <p className="text-base text-slate-900">
-                {otherOf(gap.from)} kann {gap.offered} {gap.unit} einplanen.{" "}
-                {nameOf(gap.from)} erwartet von {gap.recipientLabel} {gap.expected} {gap.unit}.
+                {locale === "en" ? <>{otherOf(gap.from)} can set aside {gap.offered} {copy(gap.unit)}. {nameOf(gap.from)} expects {gap.expected} {copy(gap.unit)} from {gap.recipientLabel}.</> : <>{otherOf(gap.from)} kann {gap.offered} {gap.unit} einplanen. {nameOf(gap.from)} erwartet von {gap.recipientLabel} {gap.expected} {gap.unit}.</>}
               </p>
               <p className="mt-1 text-sm text-slate-600">
-                Das sind {gap.shortfall} {gap.unit} Unterschied zwischen dem, was zugesagt
-                ist, und dem, was erwartet wird. Das beschreibt zwei Angaben, nicht die
-                Einsatzbereitschaft — eine Vereinbarung kann beides ändern.
-              </p>
+                 {copy("Das sind")} {gap.shortfall} {copy(gap.unit)}  {copy("Unterschied zwischen dem, was zugesagt ist, und dem, was erwartet wird. Das beschreibt zwei Angaben, nicht die Einsatzbereitschaft — eine Vereinbarung kann beides ändern.")} </p>
               <p className="mt-1 text-sm text-slate-700">
-                Klärt, ob Rolle, Ziel oder Erwartung angepasst werden sollen.
-              </p>
+                 {copy("Klärt, ob Rolle, Ziel oder Erwartung angepasst werden sollen.")} </p>
             </li>
           ))}
         </ul>
@@ -59,19 +59,17 @@ export function ExpectationGapsView({ result, nameA, nameB }: Props) {
             {/* HIER WIRD NICHT GERATEN, und das steht dabei. Eine falsch
                 zugeordnete Erwartung stellt jemandem eine Forderung vor, die
                 einem Dritten galt. */}
-            Diese Erwartungen lassen sich nicht sicher zuordnen:
-          </p>
+             {copy("Diese Erwartungen lassen sich nicht sicher zuordnen:")} </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-700">
             {result.unmatched.map((entry, index) => (
               <li key={index}>
-                {nameOf(entry.from)} erwartet von {entry.recipientLabel}
-                {entry.expected !== null ? ` ${entry.expected} ${entry.unit}` : ""} —{" "}
+                {locale === "en" ? <>{nameOf(entry.from)} expects {entry.expected !== null ? `${entry.expected} ${copy(entry.unit)} ` : ""}from {entry.recipientLabel} — </> : <>{nameOf(entry.from)} erwartet von {entry.recipientLabel}{entry.expected !== null ? ` ${entry.expected} ${entry.unit}` : ""} — </>}
                 <span className="text-slate-500">
                   {entry.why === "several_entries"
-                    ? "es sind mehrere Personen genannt, und die Namen sind frei geschrieben"
+                    ? copy("es sind mehrere Personen genannt, und die Namen sind frei geschrieben")
                     : entry.why === "no_offer"
-                      ? "dazu liegt keine Zusage vor"
-                      : "die Einheiten passen nicht zusammen"}
+                      ? copy("dazu liegt keine Zusage vor")
+                      : copy("die Einheiten passen nicht zusammen")}
                 </span>
               </li>
             ))}

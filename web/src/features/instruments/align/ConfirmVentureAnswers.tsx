@@ -1,5 +1,9 @@
 "use client";
 
+import { alignmentDisplayText, alignmentDisplayEntry } from "@/features/instruments/align/display";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/config";
+
 import { useState } from "react";
 import Link from "next/link";
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -59,28 +63,28 @@ type Props = {
 export function ConfirmVentureAnswers({
   ventureName, partnerLabel, answeredAt, ages, keeps, onConfirm, confirming, editHref,
 }: Props) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   const [showAll, setShowAll] = useState(false);
-  const gezeigt = showAll ? [...ages, ...keeps] : ages;
+  const gezeigt = (showAll ? [...ages, ...keeps] : ages).map(row => ({ ...row, prompt: t(row.prompt), entry: row.entry ? alignmentDisplayEntry(row.entry, locale) : null }));
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-        {ventureName ?? "Dein Vorhaben"}
+        {ventureName ?? (locale === "en" ? "Your venture" : "Dein Vorhaben")}
       </p>
       <h2 className="mt-2 text-xl font-semibold text-slate-950">
-        Das hast du zu diesem Vorhaben angegeben
-      </h2>
+         {t("Das hast du zu diesem Vorhaben angegeben")} </h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        {partnerLabel} ist jetzt dabei. Bevor eure Antworten nebeneinanderstehen:
-        Schau kurz drüber, ob das noch stimmt.
-        {answeredAt && (
-          <> Du hast das am {new Date(answeredAt).toLocaleDateString("de-DE")} ausgefüllt.</>
+        {partnerLabel}  {t("ist jetzt dabei. Bevor eure Antworten nebeneinanderstehen: Schau kurz drüber, ob das noch stimmt.")} {answeredAt && (
+          <>  {t("Du hast das am")} {new Date(answeredAt).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}  {t("ausgefüllt.")} </>
         )}
       </p>
       <p className="mt-2 text-sm text-slate-500">
         {showAll
-          ? "Alle Angaben zu diesem Vorhaben."
-          : "Zuerst die Angaben, die sich mit der Zeit ändern — Stunden, Beträge, Termine."}
+          ? t("Alle Angaben zu diesem Vorhaben.")
+          : t("Zuerst die Angaben, die sich mit der Zeit ändern — Stunden, Beträge, Termine.")}
       </p>
 
       <ul className="mt-5 space-y-3">
@@ -105,15 +109,14 @@ export function ConfirmVentureAnswers({
           onClick={onConfirm}
           className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {confirming ? "einen Moment…" : "So übernehmen"}
+          {confirming ? t("einen Moment…") : t("So übernehmen")}
         </button>
 
         <Link
           href={editHref}
           className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800"
         >
-          Etwas ändern
-        </Link>
+           {t("Etwas ändern")} </Link>
 
         {!showAll && keeps.length > 0 && (
           <button
@@ -121,8 +124,7 @@ export function ConfirmVentureAnswers({
             className="text-sm text-slate-600 underline"
             onClick={() => setShowAll(true)}
           >
-            Alle {ages.length + keeps.length} Angaben ansehen
-          </button>
+             {t("Alle")} {ages.length + keeps.length}  {t("Angaben ansehen")} </button>
         )}
       </div>
 
@@ -130,17 +132,18 @@ export function ConfirmVentureAnswers({
           Huerde und keine Gelegenheit - und jemand, der ihn wegklickt, muesste
           befuerchten, dass seine Antworten nicht gelten. */}
       <p className="mt-4 text-xs text-slate-500">
-        Deine Antworten gelten auch ohne diesen Schritt weiter. Ändern kannst du sie
-        jederzeit.
-      </p>
+         {t("Deine Antworten gelten auch ohne diesen Schritt weiter. Ändern kannst du sie jederzeit.")} </p>
     </section>
   );
 }
 
 /** Kurzfassung - der ganze Text steht im eigenen Bericht. */
 function Short({ entry }: { entry: ReadoutEntry | null }) {
+  const locale = useLocale() as AppLocale;
+  const t = (text: string) => alignmentDisplayText(text, locale);
+
   const value = entry?.value;
-  if (!value) return <span className="text-slate-400">noch nicht beantwortet</span>;
+  if (!value) return <span className="text-slate-400"> {t("noch nicht beantwortet")} </span>;
 
   switch (value.kind) {
     case "ordinal":
@@ -151,9 +154,9 @@ function Short({ entry }: { entry: ReadoutEntry | null }) {
     case "number":
       return <>{`${value.number} ${value.unit}`}</>;
     case "money":
-      return <>{`${value.amount.toLocaleString("de-DE")} ${value.currency}`}</>;
+      return <>{`${value.amount.toLocaleString(locale === "en" ? "en-US" : "de-DE")} ${value.currency}`}</>;
     case "date":
-      return <>{new Date(value.date).toLocaleDateString("de-DE")}</>;
+      return <>{new Date(value.date).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}</>;
     case "text":
       return <>{value.text}</>;
     case "perPerson":
@@ -161,7 +164,7 @@ function Short({ entry }: { entry: ReadoutEntry | null }) {
         <>
           {value.per
             .map((row) =>
-              `${row.person}: ${row.number === null ? "keine feste Erwartung" : `${row.number} ${row.unit}`}`)
+              `${row.person}: ${row.number === null ? t("keine feste Erwartung") : `${row.number} ${row.unit}`}`)
             .join(" · ")}
         </>
       );
@@ -176,6 +179,6 @@ function Short({ entry }: { entry: ReadoutEntry | null }) {
     case "entries":
       return <>{value.entries.map((e) => e.text).join(" · ")}</>;
     default:
-      return <span className="text-slate-500">siehe Bericht</span>;
+      return <span className="text-slate-500"> {t("siehe Bericht")} </span>;
   }
 }

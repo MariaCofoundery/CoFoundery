@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
 
 /**
@@ -32,7 +34,7 @@ export type AlignNavState = {
   ventureId: string | null;
 };
 
-export function AlignNav({
+export async function AlignNav({
   current,
   state,
   teamId = null,
@@ -47,6 +49,9 @@ export function AlignNav({
    */
   teamId?: string | null;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const venture = state.ventureId
     ? `?venture=${encodeURIComponent(state.ventureId)}`
     : "";
@@ -56,7 +61,7 @@ export function AlignNav({
       href: state.profileSubmitted
         ? "/me/profile/workstyle"
         : "/research/workstyle-pretest?version=8.5a-v3",
-      label: "Wie du arbeitest",
+      label: copy("Wie du arbeitest"),
       // Beide Seiten desselben Bogens gelten als derselbe Ort.
       matches: (path: string) => path.startsWith("/research/workstyle-pretest") || path === "/me/profile/workstyle",
     },
@@ -67,7 +72,7 @@ export function AlignNav({
       // "Euer Vorhaben" setzt ein Wir voraus, das es oft noch nicht gibt -
       // Solo-Foundernde und Leute vor der Co-Founder-Suche fielen damit
       // durch. UX-Review Teil 2 vom 30.09.2026.
-      label: "Was du aufbauen willst",
+      label: copy("Was du aufbauen willst"),
       matches: (path: string) => path.startsWith("/founder-alignment/vorhaben"),
     },
     // "Wonach du suchst" stand hier bis zum 30.09.2026. Es ist nach FIND
@@ -78,7 +83,7 @@ export function AlignNav({
   ];
 
   return (
-    <nav aria-label="Arbeitsweise und Vorhaben" className="mb-6">
+    <nav aria-label={copy("Arbeitsweise und Vorhaben")} className="mb-6">
       {/* ZURÜCK STEHT ÜBER DEN REITERN, NICHT DAZWISCHEN. Es ist kein
           weiterer Bereich, sondern der Weg hinaus - und wer ihn sucht, sucht
           ihn oben links. */}
@@ -86,7 +91,7 @@ export function AlignNav({
         href={teamId ? `/teams/${encodeURIComponent(teamId)}` : "/dashboard"}
         className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 hover:text-slate-900"
       >
-        {teamId ? "← Zum Team" : "← Übersicht"}
+        {teamId ? copy("← Zum Team") : copy("← Übersicht")}
       </Link>
 
       <div className="mt-2 flex flex-wrap gap-2">

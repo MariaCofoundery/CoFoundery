@@ -1,3 +1,5 @@
+import { getRequestLocale } from "@/i18n/getLocale";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { redirect } from "next/navigation";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AlignNav } from "@/features/instruments/align/AlignNav";
@@ -24,6 +26,9 @@ export default async function ConfirmPage({
 }: {
   searchParams: Promise<{ venture?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const copy = (text: string) => alignmentDisplayText(text, locale);
+
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(buildLoginRedirectPath("/founder-alignment/vorhaben/bestaetigen", { venture: (await searchParams).venture }));
@@ -99,7 +104,7 @@ export default async function ConfirmPage({
 
   const andere = (members ?? []).length;
   const partnerLabel =
-    andere === 0 ? "Jemand" : andere === 1 ? "Eine weitere Person" : `${andere} weitere Personen`;
+    andere === 0 ? copy("Jemand") : andere === 1 ? copy("Eine weitere Person") : `${andere} ${locale === "en" ? "other people" : "weitere Personen"}`;
 
   const zuletzt = rows
     .map((row) => row.answered_at as string | null)

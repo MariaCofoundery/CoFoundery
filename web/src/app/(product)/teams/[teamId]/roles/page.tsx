@@ -1,3 +1,4 @@
+import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import Link from "next/link";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { redirect } from "next/navigation";
@@ -82,7 +83,7 @@ export default async function TeamRolesPage({
           <p className="max-w-3xl text-sm leading-6 text-slate-600">
             {t("team.teamBasis", { contributing: data.contributing, members: data.memberCount, withDepth: data.withDepth })}
           </p>
-          <ComponentMatrix people={data.people} areas={data.areas} heading={false} />
+          <ComponentMatrix locale={await getDisplayLocale()} people={data.people} areas={data.areas} heading={false} />
         </div>
       )}
     </main>
