@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { getMarketingContent } from "@/data/marketing";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -22,16 +23,7 @@ export default async function InformierteEntscheidungenPage() {
       <header className="relative z-10 mx-auto mt-4 w-full max-w-6xl px-5 md:px-8">
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[color:var(--line)] bg-white/70 px-4 py-3 backdrop-blur md:flex-nowrap md:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <object
-              data="/cofoundery-align-logo.svg"
-              type="image/svg+xml"
-              aria-label="Made2Found Logo"
-              className="h-10 w-auto max-w-[190px]"
-            >
-              <span className="font-[var(--font-display)] text-sm tracking-[0.08em] md:text-base">
-                Made2Found
-              </span>
-            </object>
+            <BrandLogo className="h-10" priority sizes="160px" />
           </Link>
           <nav className="hidden items-center gap-7 text-sm text-[color:var(--muted)] md:flex">
             {content.nav.map((item) => (

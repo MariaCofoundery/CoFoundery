@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
-import { BRAND_NAME } from "@/features/brand";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { getHomepageContent } from "@/data/homepage";
 import styles from "./homepage.module.css";
 
@@ -36,8 +36,8 @@ export function HomepageNav() {
   return (
     <header className={styles.header}>
       <div className={styles.headerRow}>
-        {/* Plain brand text until the approved standalone logo is supplied. */}
-        <Link href="/" className={styles.wordmark}>{BRAND_NAME}</Link>
+        {/* Header: logo only. The claim lives in brand and footer areas. */}
+        <Link href="/" className={styles.wordmark}><BrandLogo className={styles.headerLogo} priority sizes="(min-width: 640px) 176px, 144px" /></Link>
         <nav className={styles.desktopNav} aria-label={content.navigation}>
           {content.areas.map((area) => <Link key={area.id} href={`/#${area.id}`}>{area.label}</Link>)}
           <Link href="/#ablauf">{content.how}</Link>

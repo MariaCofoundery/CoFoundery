@@ -32,9 +32,13 @@ export function getEmailPrivacyUrl(_locale: AppLocale) {
   return toPublicAppUrl("/datenschutz");
 }
 
-/** Existing public asset; replace after an approved Made2Found logo is supplied. */
+/**
+ * The approved Made2Found wordmark for light backgrounds (2000 x 500, 4:1).
+ * PNG rather than SVG: many mail clients do not show SVG. The old
+ * /cofoundery-align-logo.svg stays published for mails already sent.
+ */
 export function getEmailLogoUrl() {
-  return toPublicAppUrl("/cofoundery-align-logo.svg");
+  return toPublicAppUrl("/brand/made2found-logo-on-light.png");
 }
 
 export function getReadMyMindStartedEmailCopy(

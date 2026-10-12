@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HomepageNav } from "@/components/marketing/HomepageNav";
 import styles from "@/components/marketing/homepage.module.css";
 import { getHomepageContent } from "@/data/homepage";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { BRAND_NAME } from "@/features/brand";
 import { InstalledAppEntry } from "@/features/navigation/InstalledAppEntry";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -87,9 +88,8 @@ export default async function Page() {
         </div></section>
       </main>
       <footer className={`${styles.container} ${styles.footer}`}>
-        <div><Link href="/" className={styles.wordmark}>{BRAND_NAME}</Link><p>{content.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
+        <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{content.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
         <nav aria-label={content.legal}><Link href="/impressum">{content.legal}</Link><Link href="/datenschutz">{content.privacy}</Link><Link href="/informierte-entscheidungen">{content.stance}</Link></nav>
-        <p className={styles.footerClaim}>From People to Impact</p>
       </footer>
     </div>
   );

@@ -54,7 +54,7 @@ function buildHtmlBody(params: Params, locale: AppLocale) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #e2e8f0;border-radius:24px;overflow:hidden;">
-          <tr><td style="padding:28px 32px 0;"><img src="${escapeHtml(getEmailLogoUrl())}" alt="Made2Found" width="176" height="34" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
+          <tr><td style="padding:28px 32px 0;"><img src="${escapeHtml(getEmailLogoUrl())}" alt="Made2Found" width="176" height="44" style="display:block;height:auto;width:176px;max-width:100%;" /></td></tr>
           <tr><td style="padding:24px 32px 32px;">
             <p style="margin:0 0 10px;font-size:12px;line-height:18px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">${escapeHtml(copy.eyebrow)}</p>
             <h1 style="margin:0 0 16px;font-size:24px;line-height:31px;color:#0f172a;">${escapeHtml(copy.headline)}</h1>

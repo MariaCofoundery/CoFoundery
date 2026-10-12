@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { type CSSProperties } from "react";
 import {
   FOUNDER_CONVERSATION_GUIDE_CHAPTERS,
@@ -39,12 +40,7 @@ export function DebugConversationGuidePreview({
           <div className="flex flex-col gap-8 border-b border-slate-200 pb-8">
             <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
               <div className="max-w-3xl">
-                <object
-                  data="/cofoundery-align-logo.svg"
-                  type="image/svg+xml"
-                  aria-label="Made2Found Logo"
-                  className="h-10 w-auto max-w-[190px]"
-                />
+                <BrandLogo className="h-10" sizes="160px" />
                 <h1 className="mt-6 text-3xl font-semibold text-slate-950 md:text-4xl">
                   {t("Gespraech vorbereiten")}
                 </h1>

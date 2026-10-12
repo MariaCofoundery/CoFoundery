@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import {
   type ReactNode,
   useCallback,
@@ -3305,12 +3306,7 @@ export function FounderAlignmentWorkbookClient({
           <section className="rounded-[32px] border border-slate-200/80 bg-white/98 p-10 shadow-[0_16px_50px_rgba(15,23,42,0.05)] print:rounded-none print:border-none print:bg-white print:p-0 print:shadow-none">
             <div className="grid gap-8 border-b border-slate-200/80 pb-10 print:gap-6 print:pb-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
               <div className="min-w-0">
-                <object
-                  type="image/svg+xml"
-                  data="/cofoundery-align-logo.svg"
-                  className="h-9 w-auto max-w-[190px] print:h-7"
-                  aria-label={wt("client.logoLabel")}
-                />
+                <BrandLogo className="h-9 print:h-7" sizes="144px" />
                 <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-slate-500">
                   Made2Found
                 </p>

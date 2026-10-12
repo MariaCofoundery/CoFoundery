@@ -66,7 +66,7 @@ function buildHtmlBody(params: SendAdvisorTeamFounderInviteEmailParams, locale: 
                   src="${escapeHtml(getEmailLogoUrl())}"
                   alt="Made2Found"
                   width="176"
-                  height="34"
+                  height="44"
                   style="display:block;height:auto;width:176px;max-width:100%;margin:0;"
                 />
               </td>

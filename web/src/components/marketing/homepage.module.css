@@ -17,7 +17,11 @@
 .container { width: min(100% - 48px, 1152px); margin-inline: auto; }
 .header { position: sticky; top: 0; z-index: 30; background: var(--paper); border-bottom: 1px solid var(--line); }
 .headerRow { width: min(100% - 48px, 1152px); margin-inline: auto; min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.wordmark { font-family: var(--font-unbounded), sans-serif; font-size: 21px; font-weight: 500; letter-spacing: -1px; white-space: nowrap; }
+.wordmark { display: inline-flex; align-items: center; padding-block: 8px; }
+.headerLogo { height: 36px; }
+.footerBrand { display: inline-block; }
+.footerLogo { height: 52px; }
+.footerClaimText { color: var(--soft); white-space: nowrap; }
 .desktopNav, .desktopActions { display: none; }
 .menuButton { min-height: 44px; display: flex; align-items: center; gap: 18px; background: none; border: 1px solid var(--line); border-radius: 9px; padding: 8px 14px; cursor: pointer; font: inherit; font-size: 14px; }
 .menuButton span { font-size: 22px; line-height: 1; }
@@ -117,7 +121,6 @@
 .footer span { font-size: 11px; color: var(--soft); }
 .footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .footer nav a { min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; }
-.footer .footerClaim { font-family: var(--font-spectral), Georgia, serif; font-size: 20px; color: var(--ink); margin: 0; }
 @media (max-width: 639px) {
   .board { aspect-ratio: 480 / 620; }
   .note { padding: 14px; }
@@ -129,6 +132,7 @@
 }
 @media (min-width: 640px) {
   .container, .headerRow { width: min(100% - 80px, 1152px); }
+  .headerLogo { height: 44px; }
   .hero { padding-block: 72px; }
   .heroCopy h1 { font-size: 56px; }
   .board { max-width: 480px; width: 100%; margin-inline: auto; }
@@ -167,7 +171,6 @@
   .team { margin-top: 48px; }
   .betaSection { padding-block: 84px; }
   .footer { grid-template-columns: 1.3fr 1fr; padding-block: 50px; }
-  .footerClaim { grid-column: 2; text-align: right; margin-top: -32px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   :global(html):has(.page) { scroll-behavior: auto; }

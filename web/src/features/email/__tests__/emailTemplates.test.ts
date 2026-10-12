@@ -18,7 +18,7 @@ test("public mail links use Made2Found by default and respect configured and loc
     assert.equal(getPublicAppOrigin("http://localhost:3000"), "http://localhost:3000");
     assert.equal(getEmailPrivacyUrl("de"), "https://made2found.de/datenschutz");
     assert.equal(getEmailPrivacyUrl("en"), "https://made2found.de/datenschutz");
-    assert.equal(getEmailLogoUrl(), "https://made2found.de/cofoundery-align-logo.svg");
+    assert.equal(getEmailLogoUrl(), "https://made2found.de/brand/made2found-logo-on-light.png");
     const payload = buildCoFounderInviteEmailPayload({
       inviteeEmail: "founder@example.com",
       inviteUrl: toPublicAppUrl("/join?token=test"),
@@ -28,12 +28,12 @@ test("public mail links use Made2Found by default and respect configured and loc
     });
     assert.match(payload.html, /href="https:\/\/made2found\.de\/join\?token=test"/);
     assert.match(payload.html, /href="https:\/\/made2found\.de\/datenschutz"/);
-    assert.match(payload.html, /src="https:\/\/made2found\.de\/cofoundery-align-logo\.svg"/);
+    assert.match(payload.html, /src="https:\/\/made2found\.de\/brand\/made2found-logo-on-light\.png"/);
 
     process.env.NEXT_PUBLIC_SITE_URL = "https://configured.example.invalid/some/path/";
     assert.equal(getPublicAppOrigin(), "https://configured.example.invalid");
     assert.equal(getEmailPrivacyUrl("de"), "https://configured.example.invalid/datenschutz");
-    assert.equal(getEmailLogoUrl(), "https://configured.example.invalid/cofoundery-align-logo.svg");
+    assert.equal(getEmailLogoUrl(), "https://configured.example.invalid/brand/made2found-logo-on-light.png");
   } finally {
     keys.forEach((key, index) => {
       if (previous[index] === undefined) delete process.env[key];

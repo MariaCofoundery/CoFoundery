@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -14,7 +15,6 @@ import { getConnectAttentionCount, getMessagesAttentionCount } from "@/features/
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
-import { PRODUCT_FULL_NAME } from "@/features/brand";
 import {
   resolveActiveView,
   workContextToStore,
@@ -609,15 +609,7 @@ export function ProductShell({
                 className="flex min-w-0 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40"
                 aria-label={t("logoLabel")}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/cofoundery-align-logo.svg"
-                  alt={PRODUCT_FULL_NAME}
-                  width={200}
-                  height={70}
-                  className="block h-8 w-auto shrink-0 md:h-9"
-                  draggable={false}
-                />
+                <BrandLogo className="h-8 md:h-9" priority sizes="(min-width: 768px) 144px, 128px" />
               </Link>
 
               {/* Ab 1280 Pixeln stehen die Bereiche als Pillen in der Leiste.

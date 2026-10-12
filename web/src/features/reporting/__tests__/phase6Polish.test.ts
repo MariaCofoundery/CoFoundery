@@ -104,9 +104,11 @@ test("Seitentitel, Manifest und Logos haengen am zentralen Namen", () => {
     join("src", "features", "navigation", "ProductShell.tsx"),
     join("src", "components", "marketing", "LandingTopNav.tsx"),
     join("src", "features", "connect", "PublicConnectShell.tsx"),
+    join("src", "components", "brand", "BrandLogo.tsx"),
   ]) {
     const code = codeOnly(datei);
-    assert.match(code, /from "@\/features\/brand"/, datei);
+    // Die Wortmarke kommt aus BrandLogo, das selbst am zentralen Namen haengt.
+    assert.match(code, /from "@\/(features\/brand|components\/brand\/BrandLogo)"/, datei);
     assert.doesNotMatch(code, /"CoFoundery( Align)?"/, datei);
   }
 });
