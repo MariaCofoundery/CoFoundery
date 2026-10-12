@@ -2,9 +2,11 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { syncAuthLanguage } from "@/features/auth/authLanguage";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { PENDING_EMAIL_COOKIE } from "@/features/auth/pendingEmailCookie";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -78,6 +80,7 @@ export async function verifyEmailCodeAction(input: {
 
   const store = await cookies();
   store.delete(PENDING_EMAIL_COOKIE);
+  await syncAuthLanguage(supabase, await getRequestLocale());
 
   redirect(await resolvePostAuthRedirectPath(supabase, nextPath));
 }

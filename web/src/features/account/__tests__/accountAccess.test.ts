@@ -44,7 +44,9 @@ test("der Wechsel wird an beide Adressen bestaetigt", () => {
   // hier sofort umgestellt, reichte ein kurz unbeaufsichtigter Bildschirm fuer
   // eine Kontouebernahme. updateUser schickt bei aktivierter Einstellung
   // "Secure email change" an beide Adressen.
-  assert.match(actions, /auth\.updateUser\(\s*\{ email: nextEmail \}/);
+  // `data` traegt nur die Mailsprache (siehe authLanguage.ts), die Adresse
+  // wechselt weiterhin ueber den bestaetigungspflichtigen Weg.
+  assert.match(actions, /auth\.updateUser\(\s*\{ email: nextEmail, data: authLanguageMetadata\(await getRequestLocale\(\)\) \}/);
   assert.doesNotMatch(actions, /admin\.updateUserById/, "das waere ein Wechsel ohne Bestaetigung");
 
   // Und der Text sagt es, statt es nur zu tun.

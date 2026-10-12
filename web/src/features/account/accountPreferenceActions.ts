@@ -9,6 +9,7 @@ import {
   isNotificationEmailOptIn,
   isNotificationKind,
 } from "@/features/account/notificationKinds";
+import { syncAuthLanguage } from "@/features/auth/authLanguage";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, normalizeLocale } from "@/i18n/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -108,6 +109,8 @@ export async function saveAccountLocaleAction(formData: FormData) {
 
   const { error } = await client.from("person_core").update({ locale }).eq("user_id", user.id);
   if (error) redirect("/account?status=locale_failed#sprache");
+  // Dieselbe Wahl gilt fuer die Auth-Mails (Anmeldung, E-Mail-Wechsel).
+  await syncAuthLanguage(client, locale);
 
   (await cookies()).set(LOCALE_COOKIE_NAME, locale, {
     path: "/",

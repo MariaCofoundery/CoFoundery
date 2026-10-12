@@ -1,0 +1,57 @@
+<!--
+  Bestaetigungscode fuer eine sensible Aenderung.
+
+  WO SIE WIRKLICH LIEGT: im Supabase-Dashboard unter
+  Authentication -> Email Templates -> "Reauthentication". Diese Datei ist die
+  Fassung, die dort hineingehoert - sie wird von hier aus NICHT ausgeliefert.
+
+  WANN SIE KOMMT: nur bei supabase.auth.reauthenticate() - die App ruft das
+  derzeit nirgends auf. Sprache: die gespeicherte (sonst Deutsch); der Vorgang
+  veraendert keine Metadaten.
+
+  {{ .Token }} setzt Supabase ein.
+
+  Betreff (Dashboard-Feld "Subject", genau eine Zeile):
+  {{ if eq (printf "%v" .Data.language) "en" }}Your Made2Found confirmation code{{ else }}Dein Bestätigungscode für Made2Found{{ end }}
+-->
+{{ if eq (printf "%v" .Data.language) "en" }}
+<div lang="en" style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
+  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">
+    Made2Found
+  </p>
+  <h2 style="margin:0 0 16px;font-size:24px;">Confirm it’s you</h2>
+
+  <p style="margin:0 0 8px;">
+    Enter this code to confirm the change to your account:
+  </p>
+  <p style="margin:0 0 20px;font-size:28px;letter-spacing:6px;font-weight:700;">{{ .Token }}</p>
+
+  <p style="margin:0;color:#64748b;font-size:13px;">
+    If you didn’t request this, you can ignore this email – nothing changes without the code.
+  </p>
+  <p style="margin:24px 0 0;color:#334155;">
+    Founderly yours,<br />
+    your Made2Found Team
+  </p>
+</div>
+{{ else }}
+<div lang="de" style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
+  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">
+    Made2Found
+  </p>
+  <h2 style="margin:0 0 16px;font-size:24px;">Bestätige, dass du es bist</h2>
+
+  <p style="margin:0 0 8px;">
+    Gib diesen Code ein, um die Änderung an deinem Konto zu bestätigen:
+  </p>
+  <p style="margin:0 0 20px;font-size:28px;letter-spacing:6px;font-weight:700;">{{ .Token }}</p>
+
+  <p style="margin:0;color:#64748b;font-size:13px;">
+    Wenn du das nicht warst, ignorier diese Mail einfach – ohne den Code ändert sich nichts.
+  </p>
+  <p style="margin:24px 0 0;color:#334155;">
+    Gründerige Grüße<br />
+    dein Made2Found Team
+  </p>
+</div>
+{{ end }}

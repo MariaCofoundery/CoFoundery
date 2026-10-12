@@ -18,9 +18,48 @@
   Der direkte /auth/confirm-Link entspricht dem produktiven Workaround.
   Nicht durch .ConfirmationURL ersetzen.
 
-  Betreff: Dein Anmeldelink für Made2Found
+  SPRACHE: .Data ist user_metadata. Englisch nur bei language = "en", sonst
+  Deutsch (auch fuer Konten ohne language). `printf "%v"` macht aus einem
+  fehlenden Wert einen String - ein blankes `eq .Data.language "en"` waere
+  auf den Vergleich mit einem fehlenden Schluessel angewiesen.
+
+  Betreff (Dashboard-Feld "Subject", genau eine Zeile):
+  {{ if eq (printf "%v" .Data.language) "en" }}Your sign-in link for Made2Found{{ else }}Dein Anmeldelink für Made2Found{{ end }}
 -->
-<div style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
+{{ if eq (printf "%v" .Data.language) "en" }}
+<div lang="en" style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
+  <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">
+    Made2Found
+  </p>
+  <h2 style="margin:0 0 16px;font-size:24px;">Sign in</h2>
+
+  <p style="margin:0 0 20px;">
+    One click and you’re in:
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="https://made2found.de/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+       style="display:inline-block;padding:14px 22px;border-radius:999px;background:#6d28d9;color:#ffffff;text-decoration:none;font-weight:700;">
+      Sign in
+    </a>
+  </p>
+
+  <p style="margin:0 0 8px;color:#334155;">
+    Using Made2Found as an app on your home screen? Enter this code there instead –
+    the link opens your browser and would only sign you in there:
+  </p>
+  <p style="margin:0 0 20px;font-size:28px;letter-spacing:6px;font-weight:700;">{{ .Token }}</p>
+
+  <p style="margin:0;color:#64748b;font-size:13px;">
+    The link and code are valid for one hour. If you didn’t try to sign in, you can safely ignore this email.
+  </p>
+  <p style="margin:24px 0 0;color:#334155;">
+    Founderly yours,<br />
+    your Made2Found Team
+  </p>
+</div>
+{{ else }}
+<div lang="de" style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;line-height:1.6;">
   <p style="margin:0 0 6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6d28d9;">
     Made2Found
   </p>
@@ -46,4 +85,9 @@
   <p style="margin:0;color:#64748b;font-size:13px;">
     Beides gilt eine Stunde. Wenn du dich nicht anmelden wolltest, ignorier diese Mail einfach.
   </p>
+  <p style="margin:24px 0 0;color:#334155;">
+    Gründerige Grüße<br />
+    dein Made2Found Team
+  </p>
 </div>
+{{ end }}

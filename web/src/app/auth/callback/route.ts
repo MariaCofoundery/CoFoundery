@@ -5,8 +5,10 @@ import {
   readConnectSignupToken,
   readProfileSignupIntent,
 } from "@/features/auth/authRedirects";
+import { syncAuthLanguage } from "@/features/auth/authLanguage";
 import { claimConnectSignupIntent } from "@/features/auth/connectSignup";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
@@ -19,6 +21,7 @@ export async function GET(request: NextRequest) {
       if (connectSignupToken && !(await claimConnectSignupIntent(supabase, connectSignupToken))) {
         return NextResponse.redirect(new URL("/start?status=connect_failed", request.url));
       }
+      await syncAuthLanguage(supabase, await getRequestLocale());
       const destination = await resolvePostAuthRedirectPath(
         supabase,
         normalizeNextPath(nextPath),

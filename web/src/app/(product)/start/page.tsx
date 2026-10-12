@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { authLanguageMetadata } from "@/features/auth/authLanguage";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import {
   BETA_ACCESS_REQUEST_EMAIL,
@@ -16,6 +17,7 @@ import {
   PENDING_EMAIL_MAX_AGE,
 } from "@/features/auth/pendingEmailCookie";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -150,6 +152,9 @@ export default async function StartPage({
       options: {
         emailRedirectTo: redirectTo.toString(),
         shouldCreateUser: true,
+        // Gilt nur fuer ein neu angelegtes Konto - dann kommt schon die erste
+        // Mail in der Sprache, in der jemand die Seite gerade sieht.
+        data: authLanguageMetadata(await getRequestLocale()),
       },
     });
 

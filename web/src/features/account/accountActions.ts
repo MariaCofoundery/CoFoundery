@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { authLanguageMetadata } from "@/features/auth/authLanguage";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -53,8 +55,11 @@ export async function requestEmailChangeAction(formData: FormData) {
     redirect(back("email_unchanged"));
   }
 
+  // `data` mergt nur `language` in die Metadaten. Supabase setzt sie in
+  // derselben Transaktion VOR dem Versand, die Bestaetigungsmails sprechen
+  // also die Sprache, in der die Person die Aenderung gerade anstoesst.
   const { error } = await client.auth.updateUser(
-    { email: nextEmail },
+    { email: nextEmail, data: authLanguageMetadata(await getRequestLocale()) },
     { emailRedirectTo: `${getPublicAppOrigin()}/auth/confirm?next=%2Faccount` }
   );
 

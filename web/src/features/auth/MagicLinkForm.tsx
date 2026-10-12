@@ -1,8 +1,9 @@
 "use client";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
+import { authLanguageMetadata } from "@/features/auth/authLanguage";
 import { EmailCodeForm } from "@/features/auth/EmailCodeForm";
 import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
@@ -13,6 +14,7 @@ type MagicLinkFormProps = {
 
 export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = false }: MagicLinkFormProps) {
   const t = useTranslations("auth.magicLinkForm");
+  const locale = useLocale();
   const supabase = useMemo(
     () =>
       createSupabaseClient(
@@ -58,6 +60,9 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
       options: {
         emailRedirectTo: redirectTo.toString(),
         shouldCreateUser,
+        // Nur fuer ein neu angelegtes Konto wirksam; bestehende Konten behalten
+        // ihre gespeicherte Mailsprache (siehe authLanguage.ts).
+        data: authLanguageMetadata(locale),
       },
     });
 

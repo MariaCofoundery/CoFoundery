@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalizeNextPath, readConnectSignupToken, readProfileSignupIntent, redirectToLoginError } from "@/features/auth/authRedirects";
 import { cleanupOversizedAvatarMetadata } from "@/features/auth/authSessionHygiene";
+import { syncAuthLanguage } from "@/features/auth/authLanguage";
 import { claimConnectSignupIntent } from "@/features/auth/connectSignup";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
@@ -23,6 +25,7 @@ export async function GET(request: NextRequest) {
   }
 
   await cleanupOversizedAvatarMetadata(supabase, user);
+  await syncAuthLanguage(supabase, await getRequestLocale());
   const destination = await resolvePostAuthRedirectPath(
     supabase,
     nextPath,
