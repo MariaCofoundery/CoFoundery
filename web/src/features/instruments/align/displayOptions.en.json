@@ -36,37 +36,37 @@
   },
   "Du könntest noch weiter recherchieren – oder mit einem kleinen Test neue Informationen gewinnen. Wie wahrscheinlich ist es, dass du zuerst testest?": {
     "sehr unwahrscheinlich": "Very unlikely",
-    "eher unwahrscheinlich": "Rather unlikely",
+    "eher unwahrscheinlich": "Somewhat unlikely",
     "teils/teils": "Sometimes yes, sometimes no",
-    "eher wahrscheinlich": "Rather likely",
+    "eher wahrscheinlich": "Somewhat likely",
     "sehr wahrscheinlich": "Very likely"
   },
   "Zwei Wege erscheinen beide sinnvoll. Statt dich direkt festzulegen, könntest du beide zunächst in kleinem Rahmen ausprobieren. Wie wahrscheinlich ist es, dass du sie so vergleichst?": {
     "sehr unwahrscheinlich": "Very unlikely",
-    "eher unwahrscheinlich": "Rather unlikely",
+    "eher unwahrscheinlich": "Somewhat unlikely",
     "teils/teils": "Sometimes yes, sometimes no",
-    "eher wahrscheinlich": "Rather likely",
+    "eher wahrscheinlich": "Somewhat likely",
     "sehr wahrscheinlich": "Very likely"
   },
   "Eine Entscheidung lässt sich leicht korrigieren. Wie wahrscheinlich ist es, dass du trotzdem schon eine vorläufige Richtung festlegst?": {
     "sehr unwahrscheinlich": "Very unlikely",
-    "eher unwahrscheinlich": "Rather unlikely",
+    "eher unwahrscheinlich": "Somewhat unlikely",
     "teils/teils": "Sometimes yes, sometimes no",
-    "eher wahrscheinlich": "Rather likely",
+    "eher wahrscheinlich": "Somewhat likely",
     "sehr wahrscheinlich": "Very likely"
   },
   "Ein Vorschlag erscheint dir nicht sinnvoll. Wie wahrscheinlich ist es, dass du ausdrücklich sagst, dass du nicht zustimmst?": {
     "sehr unwahrscheinlich": "Very unlikely",
-    "eher unwahrscheinlich": "Rather unlikely",
+    "eher unwahrscheinlich": "Somewhat unlikely",
     "teils/teils": "Sometimes yes, sometimes no",
-    "eher wahrscheinlich": "Rather likely",
+    "eher wahrscheinlich": "Somewhat likely",
     "sehr wahrscheinlich": "Very likely"
   },
   "Im Gespräch merkst du: Du siehst eine geplante, wichtige Entscheidung anders. Sie ist nicht dringend. Wann sprichst du deinen Einwand zum ersten Mal an?": {
     "noch im laufenden Gespräch": "During the discussion",
-    "nach dem Gespräch, aber am selben Arbeitstag": "After the discussion, on the same working day",
-    "am nächsten Arbeitstag": "On the next working day",
-    "nach mehr als einem Arbeitstag": "After more than one working day",
+    "nach dem Gespräch, aber am selben Arbeitstag": "After the discussion, but on the same workday",
+    "am nächsten Arbeitstag": "On the next workday",
+    "nach mehr als einem Arbeitstag": "After more than one workday",
     "situationsabhängig": "Depends on the situation"
   },
   "Du hast Bedenken, kannst aber noch nicht genau sagen, warum. Was passt dann eher zu dir?": {
@@ -85,30 +85,30 @@
   },
   "Für ein Ergebnis gibt es mehrere plausible Erklärungen – und noch ist unklar, welche davon zutrifft.": {
     "sehr unwohl": "Very uncomfortable",
-    "eher unwohl": "Rather uncomfortable",
+    "eher unwohl": "Somewhat uncomfortable",
     "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
-    "eher wohl": "Rather comfortable",
+    "eher wohl": "Somewhat comfortable",
     "sehr wohl": "Very comfortable"
   },
   "Über mehrere Wochen bleibt offen, welche von zwei Richtungen euer Vorhaben nehmen wird.": {
     "sehr unwohl": "Very uncomfortable",
-    "eher unwohl": "Rather uncomfortable",
+    "eher unwohl": "Somewhat uncomfortable",
     "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
-    "eher wohl": "Rather comfortable",
+    "eher wohl": "Somewhat comfortable",
     "sehr wohl": "Very comfortable"
   },
   "Ihr bekommt zu derselben Idee widersprüchliche Rückmeldungen – und noch ist unklar, welche davon relevanter sind.": {
     "sehr unwohl": "Very uncomfortable",
-    "eher unwohl": "Rather uncomfortable",
+    "eher unwohl": "Somewhat uncomfortable",
     "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
-    "eher wohl": "Rather comfortable",
+    "eher wohl": "Somewhat comfortable",
     "sehr wohl": "Very comfortable"
   },
   "Eine wichtige Frage bleibt eine Zeit lang ohne eindeutige Antwort.": {
     "sehr unwohl": "Very uncomfortable",
-    "eher unwohl": "Rather uncomfortable",
+    "eher unwohl": "Somewhat uncomfortable",
     "weder wohl noch unwohl": "Neither comfortable nor uncomfortable",
-    "eher wohl": "Rather comfortable",
+    "eher wohl": "Somewhat comfortable",
     "sehr wohl": "Very comfortable"
   },
   "Wenn dein Verantwortungsbereich klar ist: Wie möchtest du im Alltag entscheiden, wie du ein Ziel erreichst?": {
@@ -263,8 +263,8 @@
   },
   "Wie wichtig ist es dir persönlich, dieses konkrete Vorhaben weiterzuführen?": {
     "gar nicht wichtig": "Not at all important",
-    "eher wenig": "A little",
-    "mittel": "Moderately",
+    "eher wenig": "Not very important",
+    "mittel": "Moderately important",
     "ziemlich wichtig": "Quite important",
     "sehr wichtig": "Very important"
   },

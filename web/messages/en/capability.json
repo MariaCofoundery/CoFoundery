@@ -3,15 +3,15 @@
   "title": "About you",
   "identity": {
     "title": "You & your background",
-    "text": "These details apply everywhere in Made2Found – in your founder profile, in co-founder search and in Connect. You only maintain them here.",
+    "text": "These details are used everywhere in Made2Found – your founder profile, co-founder search and Connect. You only need to keep them up to date here.",
     "name": "Name",
     "headline": "Headline",
-    "headlineHint": "One sentence saying what you do.",
+    "headlineHint": "One sentence about what you do.",
     "bio": "Short introduction",
     "bioHint": "What should people know about your work?",
     "region": "Region",
-    "regionHint": "Roughly is enough: Berlin, Rhine-Main, North Rhine-Westphalia.",
-    "remote": "Collaboration mode",
+    "regionHint": "A rough area is enough: Berlin, Rhine-Main, North Rhine-Westphalia.",
+    "remote": "Work setup",
     "remoteUnset": "Not specified",
     "expertise": "Expertise",
     "expertiseHint": "Separate with commas, up to {max}.",
@@ -20,12 +20,12 @@
     "submit": "Save",
     "publishedNote": "Your Connect profile is published. Changes here are visible there immediately.",
     "rolesLegend": "What are you here for?",
-    "rolesHint": "This controls which areas are offered to you – not what you have access to. Advisor insight stays tied to the teams that invited you.",
+    "rolesHint": "This controls which areas are offered to you – not what you have access to. What you can see as an advisor stays tied to the teams that invited you.",
     "roles": {
-      "founder": "Founder – I am founding or looking to",
+      "founder": "Founder – I'm founding or looking for co-founders",
       "advisor": "Advisor – I support founding teams"
     },
-    "publishTitle": "Still needed for publishing:",
+    "publishTitle": "Still needed before you can publish:",
     "publishNote": "You can save at any time – this only applies if you want your profile visible to others in Connect or in co-founder search.",
     "gaps": {
       "displayName": "A name with at least {min} characters",
@@ -33,17 +33,17 @@
       "bio": "A short introduction with at least {min} characters"
     },
     "backTo": {
-      "connect": "Back to the Connect profile",
-      "discovery": "Back to the search profile"
+      "connect": "Back to your Connect profile",
+      "discovery": "Back to your search profile"
     },
     "photoVisibleLabel": "Make my photo visible to signed-in members",
-    "photoVisibleHint": "Your Made2Found profile photo then appears wherever members see you – in the co-founder search, in connections and in teams. Without this, only you see it. It does not apply to Connect: there you decide separately whether your photo appears – Connect then gets its own copy.",
+    "photoVisibleHint": "Your Made2Found profile photo then appears wherever members see you – in co-founder search, in connections and in teams. If unchecked, only you see it. This doesn't apply to Connect: there you decide separately whether your photo appears, and Connect gets its own copy.",
     "linkedin": {
       "title": "LinkedIn",
       "urlLabel": "Your LinkedIn profile",
       "urlPlaceholder": "linkedin.com/in/your-name",
-      "urlHint": "The address of your profile. You can paste it straight from the address bar – we'll add the “https://”. LinkedIn only, no other addresses.",
-      "urlInvalid": "We don't recognise that as a LinkedIn profile. It needs to be an address at linkedin.com, for example linkedin.com/in/your-name.",
+      "urlHint": "Your profile's web address. You can copy it straight from the address bar – we'll add the “https://”. LinkedIn addresses only.",
+      "urlInvalid": "We don't recognize that as a LinkedIn profile. It needs to be an address at linkedin.com, for example linkedin.com/in/your-name.",
       "visibilityTitle": "Who should see your LinkedIn profile?",
       "options": {
         "private": {
@@ -52,92 +52,92 @@
         },
         "contacts": {
           "label": "People you are connected to",
-          "hint": "Only those who accepted a contact request with you – people you are already talking to anyway."
+          "hint": "Only people who have accepted a contact request with you – people you're already in touch with."
         },
         "members": {
           "label": "Everyone signed in to Made2Found",
-          "hint": "Anyone with an account here who is logged in. Not out on the open web, but not just your closest circle either."
+          "hint": "Anyone with an account here who is signed in. Not the open web, but not just your inner circle either."
         },
         "public": {
           "label": "Outside Made2Found too",
           "hint": "On your public network page, which anyone can open without an account."
         }
       },
-      "publicWarning": "Anyone on the internet can open that page, and search engines read it. Your LinkedIn profile would become findable under your name.",
+      "publicWarning": "Anyone on the internet can open that page, and search engines index it. People could then find your LinkedIn profile by searching for your name.",
       "publicConfirm": "Yes, my LinkedIn profile may appear on my public page.",
       "openHint": "Opens LinkedIn in a new window",
       "linkLabel": "View LinkedIn profile"
     },
     "cv": {
-      "title": "Read in your CV (optional)",
+      "title": "Import from your CV (optional)",
       "betaBadge": "Beta",
-      "betaNote": "Still beta: for now it only works by copy and paste – welcome back to the 2000s 😉 Reading files directly is coming soon.",
-      "text": "Paste your CV as text. The tool marks which skills and industries it recognises in it – you decide what makes it into your profile.",
+      "betaNote": "Still in beta: for now this only works with copy and paste – welcome back to the 2000s 😉 Reading files directly is coming soon.",
+      "text": "Paste your CV as text. The tool marks which skills and industries it recognizes – you decide what goes into your profile.",
       "privacyNote": "Your CV stays in your browser. It is not uploaded, not sent to an AI, and not stored anywhere. Once you leave the page it's gone.",
       "textareaLabel": "Text of your CV",
       "placeholder": "Paste it here – Ctrl+A, Ctrl+C in your PDF, then Ctrl+V here.",
       "fileLabel": "Choose a text file",
-      "analyze": "Analyse text",
-      "tooShort": "That's still too little text to find anything meaningful. Go ahead and paste the whole CV.",
-      "nothingFound": "We couldn't recognise anything here.",
-      "nothingFoundHint": "That says nothing about your career – the method only knows a fixed list of words. Just enter your skills and industries yourself above.",
+      "analyze": "Analyze text",
+      "tooShort": "That's not enough text to find anything useful yet. Go ahead and paste your whole CV.",
+      "nothingFound": "We couldn't recognize anything here.",
+      "nothingFoundHint": "That says nothing about your background – the tool only knows a fixed list of words. Just add your skills and industries above yourself.",
       "expertiseTitle": "Skills found",
       "industriesTitle": "Industries found",
-      "because": "Found because of:",
-      "apply": "Apply what's ticked",
-      "applied": "Applied – check the fields above, then save.",
+      "because": "Matched on:",
+      "apply": "Add selected items",
+      "applied": "Added – check the fields above, then save.",
       "clear": "Clear text",
       "chosenCount": "selected",
-      "fileUnsupported": "We can't read that file. Plain text only (.txt or .md) – for a PDF or Word document, copy the contents straight into the field."
+      "fileUnsupported": "We can't read that file. Only plain text works (.txt or .md) – for a PDF or Word document, it's best to copy the contents straight into the field."
     },
     "photo": {
       "title": "Your photo",
-      "help": "A picture or an illustration. Who gets to see it you decide below, and separately in Connect.",
+      "help": "A picture or an illustration. You decide below who can see it – and separately in Connect.",
       "add": "Add a photo",
       "change": "Change photo",
       "chooseIllustration": "Choose an illustration",
-      "closeIllustrations": "Close the selection",
+      "closeIllustrations": "Hide illustrations",
       "remove": "Remove photo",
       "save": "Save photo",
-      "preview": "This is how it looks"
+      "preview": "Here's how it looks"
     }
   },
   "steps": {
     "evidence": "One example",
     "areas": "Areas",
-    "ownership": "Ownership",
+    "ownership": "Responsibility",
     "later": "Continue later"
   },
   "evidence": {
-    "title": "What was the last piece of work you owned and saw through?",
-    "text": "A concrete example says more about your experience than a list of keywords. It does not have to come from a job – your own project, volunteering or freelance work counts just as much.",
-    "narrativeLabel": "What was it, and what was yours to carry?",
-    "narrativePlaceholder": "For example: I took our first enterprise customer from the first approach to a signed contract – the proposal, the follow-up questions and the negotiation were mine.",
+    "title": "What's the last task you were responsible for and saw through to the end?",
+    "text": "A concrete example says more about your experience than a list of keywords. It doesn't have to come from a job – your own project, volunteering or a side job count just as much.",
+    "narrativeLabel": "What was it about, and which part was yours?",
+    "narrativePlaceholder": "For example: I took our first enterprise customer from first contact to a signed contract – the proposal, follow-up questions and negotiation were my responsibility.",
     "narrativeHint": "Two or three sentences are enough. At least {min} characters.",
     "levelLabel": "And how much experience do you have in that area overall?",
     "submit": "Continue",
     "skip": "Continue without an example",
-    "assignmentNote": "I will suggest which area that is in the next step – confirming it is up to you."
+    "assignmentNote": "I'll suggest an area for it in the next step – you decide whether to confirm it."
   },
   "confirm": {
-    "title": "Here is what I read into it",
-    "text": "I only go by terms in your text – that can fit well and it can be off. So I would rather ask: which of these was genuinely your strength?",
+    "title": "Here's what I took from it",
+    "text": "I only go by the words in your text – that can be right, or just as easily wrong. So I'd rather ask: which of these was really your strength?",
     "pickLabel": "Pick up to {max}",
-    "matchedTerms": "Recognised from: {terms}",
-    "noneIsFine": "If none of these fit, simply pick nothing. You can set the area yourself in the next step.",
+    "matchedTerms": "Matched on: {terms}",
+    "noneIsFine": "If none of these fit, just don't select any. You can choose the area yourself in the next step.",
     "showNarrative": "Show your description",
-    "submit": "That fits, continue",
+    "submit": "Looks right, continue",
     "back": "Edit the text again",
-    "emptyTitle": "This is where I get stuck",
-    "emptyText": "I could not derive an area from your text. That says nothing about your description – my list of terms is limited and does not catch paraphrases. You will pick the area yourself in the next step.",
+    "emptyTitle": "I couldn't find a match",
+    "emptyText": "I couldn't match your text to an area. That says nothing about your description – my list of terms is limited and misses paraphrases. You'll choose the area yourself in the next step.",
     "engine": {
-      "rules": "Assigned from a fixed list of terms inside your browser, without an AI model. Your text is not transmitted for this.",
-      "model": "Assigned by an AI model. The result can be wrong – your selection is what counts."
+      "rules": "Matched using a fixed list of terms in your browser, without an AI model. Your text isn't sent anywhere for this.",
+      "model": "Matched by an AI model. The result may be wrong – your selection is what counts."
     }
   },
   "areas": {
     "title": "Which other areas have you worked in?",
-    "text": "Start with the fields you have actually worked in. The specific areas appear afterwards. Focus on what matters rather than everything you have touched once.",
+    "text": "Start with the fields you've actually worked in. The specific areas appear after that. Focus on what matters, not everything you've ever touched.",
     "familyLabel": "Areas in {family}",
     "empty": "Nothing selected yet.",
     "submit": "Continue",
@@ -145,7 +145,7 @@
   },
   "ownership": {
     "title": "Which of these do you not want to own long term?",
-    "text": "Being able to do something does not mean wanting to be responsible for it. It is worth discussing that distinction early.",
+    "text": "Being able to do something doesn't mean wanting to be responsible for it long term. It's worth discussing that difference early.",
     "noEntries": "You have not selected any areas yet.",
     "submit": "Finish snapshot",
     "back": "Back"
@@ -156,130 +156,130 @@
     "2": "Tried with support",
     "3": "Applied independently",
     "4": "Applied repeatedly",
-    "5": "Applied in demanding situations too, can support others",
-    "unset": "Not rated yet"
+    "5": "Applied even in difficult situations; can support others",
+    "unset": "No level yet"
   },
   "ownershipWishes": {
-    "label": "Ownership",
+    "label": "Responsibility",
     "own": "I want to own this",
-    "contribute": "I want to contribute actively",
+    "contribute": "I want to actively contribute",
     "grow_into": "I want to grow into it",
     "prefer_other": "I would prefer someone else",
-    "prefer_external": "I would rather cover it externally",
+    "prefer_external": "I'd rather have it covered externally",
     "unclear": "Still unclear",
     "unset": "Still open"
   },
   "summary": {
     "title": "What you bring",
-    "empty": "Your picture appears here once you have filled in the snapshot.",
+    "empty": "Your overview appears here once you've completed the snapshot.",
     "start": "Start snapshot",
     "continue": "Continue snapshot",
-    "edit": "Add or change",
-    "evidenceTitle": "What you told us about",
+    "edit": "Add or edit",
+    "evidenceTitle": "What you've described",
     "removeEvidence": "Remove",
     "wantsToOwn": "You want to own",
     "notOwning": "Explicitly not long term",
-    "incompleteNote": "Anything not listed here only means you have not entered it yet.",
+    "incompleteNote": "Anything not listed here just means you have not entered it yet.",
     "sectionTitle": "What you bring",
-    "removeEvidenceQuestion": "Really remove this evidence? The text will be gone.",
-    "removeEvidenceConfirm": "Yes, remove",
+    "removeEvidenceQuestion": "Remove this evidence? The text will be deleted for good.",
+    "removeEvidenceConfirm": "Yes, remove it",
     "removeEvidenceCancel": "Keep it"
   },
   "readout": {
-    "title": "What can be read from this",
-    "coverage": "{areas} areas recorded, {levelled} of them with an experience level and {wished} with an ownership preference.",
-    "focus": "Your entries centre on {family}.",
-    "basis": "This readout only places your own entries side by side – experience level and ownership preference. It reads nothing into them, and an empty field only means nothing is written there.",
+    "title": "What this shows",
+    "coverage": "{areas} areas recorded, {levelled} of them with an experience level and {wished} with a responsibility preference.",
+    "focus": "Most of your entries are in {family}.",
+    "basis": "This summary only puts your own entries side by side – experience level and responsibility preference. It doesn't interpret them, and an empty field only means nothing has been entered there.",
     "findings": {
       "anchor": {
         "title": "Responsibility you want to take on",
-        "text": "In these areas you want to be in charge for the long term. In a founding conversation, this is where the division of roles starts."
+        "text": "In these areas, you want to be in charge for the long term. When you talk about founding together, this is the starting point for dividing up roles."
       },
       "canButHandsOver": {
-        "title": "Experience in place – responsibility better handed over",
-        "text": "In these areas you bring practical experience but do not want to own them for the long term. That is not a contradiction but important input for dividing roles: you can support here, while the responsibility should sit with someone else."
+        "title": "You have experience – but would rather hand over responsibility",
+        "text": "In these areas, you have hands-on experience but don't want to be responsible for them long term. That isn't a contradiction – it's important input for dividing up roles: you can support here, but responsibility should sit with someone else."
       },
       "growingInto": {
         "title": "Responsibility you want to grow into",
-        "text": "You want to take on responsibility here but do not yet have much experience. That can be planned for – once it is discussed openly."
+        "text": "You want to take on responsibility here but don't have much experience yet. That can be planned for – if it's discussed openly."
       },
       "contributes": {
         "title": "Contributing without being in charge",
-        "text": "You get involved here but do not want to be in charge. That tends to make dividing roles easier rather than harder."
+        "text": "You're involved here but don't want to be in charge. That tends to make dividing up roles easier, not harder."
       },
       "undecided": {
         "title": "Still open",
-        "text": "You have not stated an ownership preference here, or have explicitly left it open. A good place to start a conversation."
+        "text": "You haven't stated a responsibility preference here, or you've explicitly left it open. A good place to start a conversation."
       }
     }
   },
   "comparison": {
-    "title": "If the two of you were to found together",
-    "intro": "This is not an assessment and not a compatibility score. It places your entries side by side and sorts them by what should be settled before founding.",
-    "basis": "The basis is two self-reports – experience level and ownership preference. This is a conversation starter, not a test instrument, and it does not predict success.",
+    "title": "If you were to start a company together",
+    "intro": "This isn't an assessment or a compatibility score. It puts your entries side by side and sorts them by what should be settled before starting a company.",
+    "basis": "It's based on two self-reports – experience level and responsibility preference. It's a starting point for conversation, not a test, and it doesn't predict success.",
     "coverage": "{together} areas in total, {shared} of them entered by both of you, {onlyA} only by you, {onlyB} only by {name}.",
-    "gapNote": "Where entries are missing, nothing is shown. That can mean: not entered – or not shared. We deliberately do not tell those apart, because otherwise holding back would itself be a statement.",
+    "gapNote": "Where entries are missing, nothing is shown. That can mean not entered – or not shared. We deliberately don't distinguish between the two; otherwise holding back would itself say something.",
     "yours": "You",
-    "ownerLabel": "Would sit with {who}",
+    "ownerLabel": "Would rest with {who}",
     "levelUnset": "no level given",
     "wishUnset": "no preference given",
     "overlap": {
-      "high": "You have both entered something almost everywhere – a lot of overlap in what you bring. Whether there are areas neither of you covers is worth looking at together.",
-      "balanced": "Your entries overlap in part and complement each other in part.",
-      "low": "You have barely entered the same areas – you complement each other strongly. What the other one's work looks like in their areas is worth talking about."
+      "high": "You've both entered something almost everywhere – a lot of overlap in what you bring. It's worth looking together at whether there are areas neither of you covers.",
+      "balanced": "Your entries partly overlap and partly complement each other.",
+      "low": "You've entered hardly any of the same areas – you complement each other strongly. It's worth talking about what each of you actually does in your own areas."
     },
     "states": {
       "contested": {
         "title": "Both of you want to own it",
-        "text": "You both claim the same responsibility here. It is not yet settled who takes it on – this is a point to discuss between you."
+        "text": "You both claim the same responsibility here. Who takes it on isn't settled yet – this is something to discuss with each other."
       },
       "openPosition": {
         "title": "Nobody wants to own it",
-        "text": "Neither of you wants to be permanently in charge here. Whether that is a problem depends on what your venture needs – which we do not know. All that can be said is: nobody is in charge here yet."
+        "text": "Neither of you wants to be in charge of this long term. Whether that's a problem depends on what your venture needs – and we don't know that. All we can say is that nobody is in charge here yet."
       },
       "bothShallow": {
-        "title": "Wanted, but without depth yet",
-        "text": "At least one of you wants to take this on, and neither has stated deep experience here. As a team you have little experience at this point."
+        "title": "Wanted, but no deep experience yet",
+        "text": "At least one of you wants to take this on, and neither of you has stated deep experience here. As a team, you have little experience in this area."
       },
       "handoverPath": {
         "title": "A path that can be planned",
-        "text": "One of you has depth here and does not want to keep it; the other wants to take it on but is not there yet. That can be planned for – once it is said out loud."
+        "text": "One of you has deep experience here and doesn't want to keep it; the other wants to take it on but isn't there yet. That can be planned for – once it's said out loud."
       },
       "settled": {
-        "title": "This one already sits",
-        "text": "One of you wants the responsibility and has the experience for it, the other does not want it. Nothing to negotiate here, only to name."
+        "title": "Already settled",
+        "text": "One of you wants the responsibility and has the experience for it; the other doesn't want it. Nothing to negotiate here – just to name."
       },
       "noBasis": {
         "title": "Not enough to go on",
-        "text": "For these areas there is not enough information to say anything. That is a finding about the data, not about you."
+        "text": "There isn't enough information on these areas to say anything. That's a statement about the data, not about you."
       }
     },
     "back": "Back to profile",
-    "empty": "There is not enough information yet for a comparison with {name}. That may be down to either of your snapshots, or to how far they are shared.",
+    "empty": "There isn't enough information yet for a comparison with {name}. That may be because of either of your snapshots, or because of how much of them is shared.",
     "fillOwn": "Add to your snapshot",
     "openFor": "Compare with {name}",
     "sectionTitle": "Comparison",
-    "sectionText": "With people you are connected to, you can place your snapshots side by side – ordered by what should be settled before founding.",
-    "noneYet": "As soon as a contact request is accepted, that person appears here."
+    "sectionText": "You can put your snapshot side by side with those of people you're connected to – ordered by what should be settled before starting a company.",
+    "noneYet": "Once a contact request has been accepted, the person appears here."
   },
   "families": {
     "customer_market": "Customer & Market",
     "product_value": "Product & Value Proposition",
     "strategy_business_model": "Strategy & Business Model",
     "technology_delivery": "Technology & Delivery",
-    "commercial_growth": "Commercial & Growth",
+    "commercial_growth": "Sales & Growth",
     "finance_funding": "Finance & Funding",
-    "operations_people": "Operations, People & Organisation",
+    "operations_people": "Operations, People & Organization",
     "legal_governance": "Legal, Governance & Compliance",
     "other": "Other focus",
-    "communication_representation": "Representation & facilitation",
+    "communication_representation": "Public presence & facilitation",
     "working_style": "Collaboration & responsibility"
   },
   "areaLabels": {
-    "customer_discovery": "Customer Discovery",
+    "customer_discovery": "Customer Discovery & Interviews",
     "user_research": "User Research",
     "market_analysis": "Market & Competitive Analysis",
-    "target_segments": "Segmentation",
+    "target_segments": "Target Audiences & Segmentation",
     "industry_domain": "Industry & Domain Knowledge",
     "product_discovery": "Product Discovery",
     "product_management": "Product Management",
@@ -287,7 +287,7 @@
     "ux_design": "UX & Interface Design",
     "prototyping": "Prototyping",
     "business_model": "Business Model",
-    "pricing": "Pricing & Monetisation",
+    "pricing": "Pricing & Monetization",
     "positioning": "Positioning",
     "strategic_planning": "Strategic Planning",
     "software_engineering": "Software Engineering",
@@ -312,7 +312,7 @@
     "process_design": "Process Design & Tooling",
     "recruiting": "Recruiting & Hiring",
     "people_management": "Leadership & People Management",
-    "org_design": "Organisational Design",
+    "org_design": "Organizational Design",
     "corporate_legal": "Corporate Law & Contracts",
     "ip": "IP & Trademarks",
     "data_protection": "Data Protection",
@@ -321,26 +321,26 @@
     "other": "Something else",
     "public_speaking": "Speaking to groups & pitching",
     "facilitation": "Facilitation & leading conversations",
-    "networking": "Building & keeping a network",
-    "difficult_conversations": "Raising difficult matters",
-    "teaching_mentoring": "Teaching & enabling others",
-    "owning_outcomes": "Carrying something through to a result",
+    "networking": "Building & maintaining a network",
+    "difficult_conversations": "Raising difficult issues",
+    "teaching_mentoring": "Teaching & coaching others",
+    "owning_outcomes": "Seeing something through to a result",
     "deciding_under_uncertainty": "Deciding when information is missing",
-    "prioritising": "Deciding what happens first",
-    "structuring_work": "Ordering work so others can join in",
+    "prioritising": "Deciding what comes first",
+    "structuring_work": "Organizing work so others can plug in",
     "handing_over": "Handing over and delegating",
     "reviewing_setbacks": "Reviewing after a setback"
   },
   "errors": {
     "narrative": "Please write at least two short sentences.",
     "area": "Please choose an area.",
-    "save": "That could not be saved just now. Please try again.",
-    "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please complete the field or set the Connect profile back to draft first.",
-    "roles": "At least one role has to stay set. Without one, the platform would have no area to take you to.",
-    "linkedin": "We can't read that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it.",
+    "save": "That couldn't be saved just now. Please try again.",
+    "published_incomplete": "Your published Connect profile needs a name, a headline and a slightly longer text about you. Please fill in what's missing, or switch your Connect profile back to draft first.",
+    "roles": "At least one role has to stay selected. Without a role, there's no area the platform can take you to.",
+    "linkedin": "We can't recognize that as a LinkedIn profile. It has to point to linkedin.com – so we haven't saved it.",
     "strength_length": "One sentence, at most two hundred characters.",
-    "resource_empty": "Please choose a type and write a short sentence for it.",
-    "resource_duplicate": "You already have exactly that one.",
+    "resource_empty": "Please choose a type and add a short sentence.",
+    "resource_duplicate": "You've already added exactly this.",
     "photo_empty": "Please choose a picture or an illustration.",
     "photo_too_large": "That picture is too large. Please choose a smaller one.",
     "photo_save": "The photo could not be saved."
@@ -352,7 +352,7 @@
     "disclosure": "Your sharing setting is saved.",
     "interview_done": "The conversation is finished. Your answers are ready to be sorted into areas.",
     "resource_added": "Resource added.",
-    "resource_updated": "Resource changed.",
+    "resource_updated": "Resource updated.",
     "resource_removed": "Resource removed.",
     "photo": "Photo saved.",
     "photo_removed": "Photo removed."
@@ -368,31 +368,31 @@
   },
   "contexts": {
     "title": "Where you decide what is shown",
-    "text": "Your details live here. Whether and how they appear in an area is decided there.",
+    "text": "Your details are stored here. Whether and how they appear in each area, you decide there.",
     "discovery": "Discovery profile",
     "connect": "Connect profile"
   },
   "disclosure": {
     "title": "Who gets to see what you can do?",
-    "text": "Above you noted what you have experience in. Here you decide who sees any of it. Until you change something: nobody.",
+    "text": "Above, you noted what you have experience in. Here you decide who gets to see any of it. Unless you change this, nobody does.",
     "private": "Nobody but me",
     "privateHint": "Your entries stay with you. Others can't even tell that you've filled anything in.",
     "areas": "Members see the topics",
     "areasHint": "Your profiles will then show what you have experience in – in your case {examples}, for instance. Nothing more: how much experience you have, and what you'd like to take on, stays with you.",
     "areas_depth_on_contact": "People you're connected with see more",
-    "areas_depth_on_contactHint": "For everyone else it stays at the topics. Anyone whose connection you've accepted also sees how much experience you have – and what you'd like to take on, and what you'd rather not.",
-    "note": "Two things always hold: nobody ever gets to see your evidence. And on public pages – the ones anyone on the web can open – none of this ever appears.",
+    "areas_depth_on_contactHint": "Everyone else still sees only the topics. Anyone whose connection request you've accepted also sees how much experience you have – and what you'd like to take on and what you'd rather not.",
+    "note": "Two things always apply: nobody ever sees your evidence. And public pages – the ones anyone on the web can open – never show any of this.",
     "submit": "Save choice",
-    "privateNotFound": "As long as your areas are private, a search by skills will not find you. That is not a drawback but your choice — everything else in your profile still makes you findable."
+    "privateNotFound": "As long as your areas are private, you won't show up in searches by skill. That's not a drawback, it's your choice — people can still find you through everything else in your profile."
   },
   "foreign": {
     "title": "What this person brings"
   },
   "notices": {
-    "recognised": "We filed your description under one or more areas – already ticked below. Check whether that fits and add what is missing.",
-    "unmatched": "We could not derive an area from your description yet. It is stored under “Other focus” – pick the area below that actually fits.",
-    "confirmed": "Your selection is saved. Here you can add whatever is still missing.",
-    "interview_paused": "Saved. You can continue the conversation at any time where you left off."
+    "recognised": "We've matched your description to one or more areas – already checked below. See if that fits, and add anything that's missing.",
+    "unmatched": "We couldn't match your description to an area yet. It's saved under “Other focus” – choose the area below that actually fits.",
+    "confirmed": "Your selection is saved. You can add anything that's still missing here.",
+    "interview_paused": "Saved. You can pick up the conversation where you left off at any time."
   },
   "industryLabels": {
     "software_saas": "Software & SaaS",
@@ -403,7 +403,7 @@
     "biotech_pharma": "Biotech & pharma",
     "medtech": "Medical technology",
     "education": "Education",
-    "hr_work": "HR & labour market",
+    "hr_work": "HR & labor market",
     "real_estate": "Real estate",
     "construction": "Construction & trades",
     "mobility": "Mobility & transport",
@@ -416,7 +416,7 @@
     "agriculture": "Agriculture",
     "energy": "Energy",
     "sustainability": "Sustainability & climate",
-    "manufacturing": "Industry & machinery",
+    "manufacturing": "Manufacturing & machinery",
     "robotics": "Robotics & automation",
     "electronics": "Electronics & semiconductors",
     "telecommunications": "Telecommunications",
@@ -430,56 +430,56 @@
     "tourism_hospitality": "Tourism & hospitality",
     "sports": "Sports & fitness",
     "fashion": "Fashion & textiles",
-    "security_defense": "Security & defence",
+    "security_defense": "Security & defense",
     "research_academia": "Research & academia",
     "chemicals": "Chemicals & materials"
   },
   "interview": {
     "title": "The conversation",
-    "text": "Eight questions about situations that actually happened – at work and outside it. No test and no points: your stories turn into proposals for which areas you cover, and you confirm every single one yourself.",
+    "text": "Eight questions about situations that actually happened – at work and outside it. No test, no points: your stories become suggestions for which areas you cover, and you confirm each one yourself.",
     "guidanceTitle": "Take your time with this",
-    "guidanceTime": "Expect 30 to 45 minutes if you do it in one go. But it is explicitly not meant to be clicked through quickly – two questions in an evening is perfectly fine.",
+    "guidanceTime": "Plan on 30 to 45 minutes if you do it in one go. But it's deliberately not meant to be clicked through quickly – two questions in one evening is perfectly fine.",
     "guidanceSaving": "Everything is saved automatically while you write. If your browser crashes or you close the window, your text will be there next time. You can also save at any point and continue later.",
     "guidanceDictate": "You can type or dictate – the microphone on your keyboard is enough, you do not need to switch anything on.",
     "guidanceLength": "Two to five sentences are enough. Tell it the way you would tell somebody at the kitchen table, with names, numbers and the parts that went wrong.",
-    "guidanceNoRight": "There are no right answers. “I don't know” is one too – then you simply skip the question.",
-    "privacy": "Nobody but you sees what you tell here. A team readout later shows only which area you confirmed and how you stand towards it – never the story behind it.",
+    "guidanceNoRight": "There are no right answers. “I don't know” is an answer too – in that case, just skip the question.",
+    "privacy": "Nobody but you sees what you share here. Later, a team summary includes only which area you confirmed and where you stand on it – never the story behind it.",
     "contextProfessional": "At work",
     "contextPersonal": "Outside of work",
-    "contextEither": "At work or privately – both count equally here",
+    "contextEither": "At work or in your personal life – both count equally here",
     "backToProfile": "Back to profile",
     "start": "Start the conversation",
     "resume": "Continue the conversation",
-    "resumeEmpty": "Your conversation is open, but it does not hold a question yet. One click fetches it.",
+    "resumeEmpty": "Your conversation is open, but there's no question in it yet. One click loads it.",
     "progress": "{answered} of {total} questions answered",
     "answerLabel": "Your answer",
     "answerPlaceholder": "Tell it the way you would tell somebody at the kitchen table – with names, numbers and the parts that went wrong.",
     "answerHint": "At least {min} characters.",
     "saveStateIdle": "Saved automatically while you write.",
-    "saveStateLocal": "Kept in this browser.",
+    "saveStateLocal": "Saved in this browser.",
     "saveStateSaving": "Saving …",
     "saveStateSaved": "Saved.",
-    "saveStateFailed": "Could not be saved just now – your text is kept in this browser. Leave the window open, it keeps trying.",
-    "restored": "A version from this browser was longer than the saved one – we restored it. Please check that it is right.",
+    "saveStateFailed": "Couldn't save just now – your text is kept in this browser. Leave the window open; we'll keep trying.",
+    "restored": "A version in this browser was longer than the saved one – we've restored it. Please check that it's right.",
     "followUpTitle": "Follow-up",
-    "followUpHint": "If you like, go into this as well – just add it above.",
-    "tooShort": "At least {min} characters, otherwise nothing can be drawn from it. If nothing comes to mind, skip the question.",
+    "followUpHint": "If you like, you can go into this too – just add it to your answer above.",
+    "tooShort": "At least {min} characters – otherwise there's nothing to work with. If nothing comes to mind, skip the question.",
     "submit": "Continue",
     "submitLast": "Save answer and finish",
     "pause": "Save and continue later",
     "skip": "Skip this question",
-    "previousTitle": "What you have told so far",
+    "previousTitle": "What you've shared so far",
     "completeTitle": "Finish the conversation",
-    "completeTextAll": "You have been through all the questions. Finishing closes the conversation; your answers stay and will be sorted into areas in the next step.",
-    "completeTextEnough": "You have answered enough ({min} or more) to make a readout from it. You can also carry on – the more situations, the more precise.",
+    "completeTextAll": "You've gone through all the questions. Finishing closes the conversation; your answers are kept and will be sorted into areas in the next step.",
+    "completeTextEnough": "You've answered enough ({min} or more) for a summary. You can also keep going – the more situations, the more precise it gets.",
     "complete": "Finish the conversation",
     "errors": {
       "start": "The conversation could not be opened. Please try again.",
       "save": "The answer could not be saved. Your text is still in the field.",
       "short": "The answer was too short.",
       "long": "The answer was too long.",
-      "stale": "This question is no longer the current one – perhaps a second window was open. Here is the current state.",
-      "complete": "Finishing did not work. Please try again."
+      "stale": "This question is out of date – maybe a second window was open. Here's where things stand now.",
+      "complete": "Couldn't finish the conversation. Please try again."
     },
     "sortCta": "Sort your answers",
     "sortPending": "{count, plural, one {One answer is waiting to be sorted} other {# answers are waiting to be sorted}}",
@@ -498,139 +498,139 @@
       "remaining": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}}",
       "yourAnswer": "Your answer",
       "whichAreas": "Which areas were these?",
-      "whichAreasText": "Up to three. If none of the proposals fits, choose nothing – your story is kept either way and lands in “Other”.",
+      "whichAreasText": "Up to three. If none of the suggestions fits, don't pick any – your story is kept either way and goes under “Other”.",
       "fromQuestion": "Follows from the question",
-      "fromQuestionHint": "This is not a finding in your text: whoever tells anything at all in answer to this question has done it. You still have to confirm it.",
-      "fromText": "Recognised in your text",
+      "fromQuestionHint": "This is not a finding in your text: if you have any story at all for this question, you've done it. You still need to confirm it.",
+      "fromText": "Found in your text",
       "analysing": "Reading …",
-      "nothingFound": "Nothing was recognised here. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself later in your profile.",
-      "because": "Recognised by: {terms}",
-      "limit": "At most {max} areas. Ticking everything says nothing at all.",
+      "nothingFound": "Nothing was recognized here. That says nothing about your story – only that it didn't match our list of terms. You can add areas yourself later in your profile.",
+      "because": "Matched on: {terms}",
+      "limit": "Up to {max} areas. If you check everything, it no longer says anything.",
       "submit": "Sort and continue",
-      "emptyAllowed": "Moving on without a selection is fine.",
+      "emptyAllowed": "It's fine to continue without a selection.",
       "doneTitle": "Everything sorted",
       "doneText": "No answer is left open. What you confirmed is now in your profile – with your story attached as evidence.",
       "toProfile": "Back to profile",
-      "toInterview": "Have another conversation",
+      "toInterview": "Start another conversation",
       "alreadySorted": "This answer was already sorted – perhaps a second window was open. Here is the next one.",
       "againTitle": "{count, plural, one {One answer is already sorted} other {# answers are already sorted}}",
-      "againText": "You can sort an answer again. That makes sense when the proposals were thin back then – the recognition keeps improving, your story stays the same. The old piece of evidence is replaced so the same story does not appear twice in your profile. Areas you already confirmed stay.",
+      "againText": "You can sort an answer again. That's useful if the suggestions were thin at the time – recognition keeps improving, while your story stays the same. The old evidence is replaced so the same story doesn't appear twice in your profile. Areas you've already confirmed stay.",
       "again": "Sort again",
       "againPending": "Opening …",
       "fromModel": "What the AI saw",
-      "fromModelHint": "Every proposal comes with the verbatim sentence it relies on – checked against your answer when it was saved. What a model cannot prove never arrives here. Whether it is right is your call.",
-      "levelFor": "How deep are you in “{area}”?",
-      "askTitle": "Let the AI read along?",
-      "askText": "A language model on our own hardware reads this one answer and proposes areas – each with the sentence it relies on. It decides nothing, it sets no level, and it sees no answer but this one. You can do the sorting entirely without it.",
-      "ask": "Have this answer read",
+      "fromModelHint": "Every suggestion comes with the exact sentence it's based on – checked against your answer when it was saved. Anything a model can't back up never shows up here. Whether it's right is your call.",
+      "levelFor": "How much experience do you have in “{area}”?",
+      "askTitle": "Let the AI take a look?",
+      "askText": "A language model on our own hardware reads only this answer and suggests areas – each with the sentence it's based on. It doesn't decide anything, doesn't set a level, and sees no other answer. You can also do the sorting entirely without it.",
+      "ask": "Let the AI read this answer",
       "askPending": "Asking …",
-      "askRunning": "The AI is reading. That usually takes under twenty seconds – this page refreshes itself.",
-      "askUnavailable": "No model is reachable right now. That is not an error: it runs on a machine that is sometimes off. Just sort without it – or come back later.",
-      "askFailed": "The last attempt did not complete.",
-      "ownChoice": "Choose yourself",
-      "ownChoiceHint": "All areas, grouped by field. Take what is true – even if none of it was proposed above. Our recognition depends on words, your story does not.",
+      "askRunning": "The AI is reading. That usually takes less than twenty seconds – this page refreshes on its own.",
+      "askUnavailable": "No model is available right now. That's not an error: it runs on a machine that's sometimes switched off. Just sort without it – or come back later.",
+      "askFailed": "The last attempt didn't finish.",
+      "ownChoice": "Choose areas yourself",
+      "ownChoiceHint": "All areas, grouped by field. Pick what's true – even if none of it was suggested above. Our recognition depends on words; your story doesn't.",
       "familyHint": "fits the question",
       "errors": {
         "area": "One of the areas is unknown. Please reload the page and try again.",
-        "save": "Sorting could not be saved. Your answer is unchanged.",
+        "save": "Sorting couldn't be saved. Your answer hasn't changed.",
         "link": "Saved, but the answer could not be marked as sorted. It will appear once more – please do not sort it twice.",
-        "resort": "Opening did not work. Your answer and its sorting are unchanged.",
-        "ask": "The request could not be made. Perhaps the AI is already reading this answer."
+        "resort": "Couldn't open it. Your answer and its sorting haven't changed.",
+        "ask": "The request couldn't be sent. The AI may already be reading this answer."
       }
     },
     "summary": {
       "title": "Looking back",
       "text": "{answered, plural, one {One answer} other {# answers}} from this conversation, {personal, plural, =0 {none} one {one} other {#}} of them outside paid work. Here is what came up more than once – nothing you did not confirm yourself.",
-      "provisional": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}} – so this look back is provisional.",
+      "provisional": "{count, plural, one {One answer is not sorted yet} other {# answers are not sorted yet}} – so this is still provisional.",
       "recurringTitle": "What came up more than once",
-      "recurringText": "You confirmed these areas in different stories. That is the most reliable information this method yields – not because it is better, but because it recurs.",
+      "recurringText": "You confirmed these areas in different stories. That's the most reliable information this method provides – not because it's better, but because it keeps coming up.",
       "inStories": "{count, plural, one {in one story} other {in # stories}}",
       "observedTitle": "What others come to you for",
-      "observedText": "From the question about what others repeatedly ask you for help with. That is not a self-assessment but something others observe about you – and often the part you miss in yourself.",
+      "observedText": "From the question about what others repeatedly ask you for help with. That isn't a self-assessment but something others notice in you – and often what you miss in yourself.",
       "wantingTitle": "What you want and what you don't",
-      "wantingText": "Being able is not wanting. For a team that distinction matters as much as the ability itself, and it is almost never asked.",
+      "wantingText": "Being able to do something isn't the same as wanting to. For a team, that difference matters as much as the ability itself – and it's almost never asked about.",
       "handOver": "You would rather hand over",
       "growInto": "You would like to take on",
       "singleTitle": "Mentioned once",
-      "singleText": "Confirmed in one story. That means told once – not worth less.",
+      "singleText": "Confirmed in one story. That means it came up once – it's not worth less.",
       "openTitle": "What stayed open",
-      "skipped": "{count, plural, one {You skipped one question} other {You skipped # questions}}. That is an answer, and it stays one.",
-      "withoutArea": "{count, plural, one {For one answer} other {For # answers}} no area was found. That says nothing about your story – only that our list of terms did not match it. You can add areas yourself in your profile."
+      "skipped": "{count, plural, one {You skipped one question} other {You skipped # questions}}. That counts as an answer, and it stays that way.",
+      "withoutArea": "{count, plural, one {For one answer} other {For # answers}} no area was found. That says nothing about your story – only that it didn't match our list of terms. You can add areas yourself in your profile."
     },
     "questions": {
       "owned_last": {
-        "title": "Tell me about the last thing you really took responsibility for – up to a clear result, or a deliberate decision to stop it.",
-        "hint": "One concrete thing with a beginning and an end. It does not have to be big, and having deliberately stopped something counts as much here as having finished it.",
+        "title": "Tell me about the last thing you were truly responsible for – through to a clear result, or a deliberate decision to stop.",
+        "hint": "One concrete thing with a beginning and an end. It doesn't have to be big, and deliberately stopping something counts just as much as finishing it.",
         "followUps": {
           "whatWasYours": "Which part of it was yours specifically – and which part was other people's?",
           "howYouDecidedDone": "How did you decide it was finished, good enough, or no longer worth it?"
         }
       },
       "went_wrong": {
-        "title": "Tell me about something that recently went clearly differently from what you had planned or hoped for.",
+        "title": "Tell me about something that recently turned out quite differently from what you had planned or hoped.",
         "hint": "This is not about blame but about what came after. What you changed afterwards says more about your ability than a success story.",
         "followUps": {
           "yourOwnPart": "Looking back, what was your own part in it?",
-          "whatChanged": "What did you concretely change afterwards?"
+          "whatChanged": "What specifically did you change afterwards?"
         }
       },
       "outside_work": {
-        "title": "What have you built, organised or made possible outside of classic paid work, where your own contribution really mattered?",
-        "hint": "A club, your neighbourhood, family, friends, volunteering, a move, caring for someone, a festival, a demonstration. It counts as much here as a project at work – and it appears in no reference letter.",
+        "title": "Outside of traditional paid work, what have you built, organized or made possible where your own contribution really mattered?",
+        "hint": "A club, your neighborhood, family, friends, volunteering, a move, caring for someone, a festival, a protest. It counts just as much here as a project at work – and it won't show up in any job reference.",
         "followUps": {
           "whatYouDidYourself": "What exactly did you do yourself?",
           "howYouNoticedImpact": "How did you notice that your contribution made a difference?"
         }
       },
       "in_front_of_group": {
-        "title": "Tell me about a situation in which you had to make something understandable to people who did not know you or your topic well – or win them over for it.",
-        "hint": "That can be a stage, a pitch, a conversation with an authority, a first customer, a parents' evening, or a single person you had to convince. Even if it went badly.",
+        "title": "Tell me about a time you had to explain something to people who didn't know you or your topic well – or win them over to it.",
+        "hint": "That could be a stage, a pitch, a conversation with a government office, a first customer, a parent-teacher meeting, or one person you had to convince. Even if it went badly.",
         "followUps": {
           "whatYouNeededToUnderstand": "What did you have to understand about these people for it to work?",
-          "didYouAdapt": "Did you change the way you explained or persuaded along the way – and why?"
+          "didYouAdapt": "Did you change how you explained or persuaded along the way – and why?"
         }
       },
       "uncomfortable_topic": {
         "title": "When did you last raise an important, uncomfortable matter even though you expected resistance or tension?",
-        "hint": "An unpaid invoice, an expectation, a behaviour, a decision nobody wanted to make. At work or privately.",
+        "hint": "An unpaid invoice, an expectation, a behavior, a decision nobody wanted to make. At work or in your personal life.",
         "followUps": {
           "whyItMattered": "Why was it important to you to raise it anyway?",
           "howYouWentAboutIt": "How exactly did you go about it – and what happened afterwards?"
         }
       },
       "people_come_to_you": {
-        "title": "What do others repeatedly ask you for help, advice or support with, even though it is not necessarily officially your job?",
-        "hint": "The view from outside. If several people ask you about the same thing, that is a signal which is easy to miss in yourself.",
+        "title": "What do others keep asking you for help, advice or support with, even if it isn't officially your job?",
+        "hint": "The outside view. If several people ask you about the same thing, that's a signal that's easy to miss in yourself.",
         "followUps": {
           "lastExample": "What was the last concrete example?",
-          "whatYouActuallyDo": "What do you concretely do there that others find helpful?"
+          "whatYouActuallyDo": "What specifically do you do there that others find helpful?"
         }
       },
       "would_hand_over": {
-        "title": "Which task or responsibility are you carrying right now that you would rather hand over in the long run?",
-        "hint": "Something that gets done because otherwise nobody does it. This is not about ability but about wanting – and for a team that matters just as much.",
+        "title": "What task or responsibility are you carrying right now that you'd rather hand over in the long run?",
+        "hint": "Something that gets done because otherwise nobody would do it. This isn't about ability but about what you want – and for a team, that matters just as much.",
         "followUps": {
           "whyStillYou": "Why are you still doing it yourself at the moment?",
           "whatSomeoneElseNeeds": "What would somebody else have to be able to do or deliver for you to hand it over with a clear conscience?"
         }
       },
       "want_to_own": {
-        "title": "Which responsibility would you like to take on next year, even though today you would not be sure you could fill it well on your own?",
-        "hint": "Something you want to grow into. Saying it openly is worth more in a team than claiming it and staying quiet.",
+        "title": "Which responsibility would you like to take on next year, even though today you're not sure you could handle it well on your own?",
+        "hint": "Something you want to grow into. Saying that openly is worth more in a team than quietly assuming you can handle it.",
         "followUps": {
           "whatDrawsYou": "What draws you to it?",
-          "whatYouWouldNeed": "What would you still need to learn, or to have experienced once in practice?"
+          "whatYouWouldNeed": "What would you still need to learn, or experience in practice at least once?"
         }
       }
     }
   },
   "team": {
     "title": "Skills & responsibility",
-    "text": "Who owns what, where several want the same thing, and where nobody wants it. This is a description of the situation from your own entries – no rating, no points, no ranking.",
+    "text": "Who owns what, where several people want the same thing, and where nobody wants it. This describes the current situation based on your own entries – no rating, no points, no ranking.",
     "backToTeam": "Back to the team",
-    "basis": "{contributing} of {members} in the team have made entries, {withDepth} of them with an application level and an ownership wish. Only those two allow a statement about a role – whoever released less appears here without depth.",
+    "basis": "{contributing} of {members} team members have made entries, {withDepth} of them with an experience level and a responsibility preference. Only those two allow any statement about a role – anyone who has shared less appears here without depth.",
     "mapTitle": "The situation at a glance",
-    "mapText": "One bar per family, one field per area that has entries. The colours stand for the state, and the same information is given as a number next to it.",
+    "mapText": "One bar per field, one segment per area with entries. Colors show the state, and the same information appears as a number next to it.",
     "familyUnspoken": "Nobody has said anything about this. That does not mean it is missing.",
     "countEntry": "{count}× {state}",
     "claimedBy": "Wants to own: {names}",
@@ -638,32 +638,32 @@
     "findingsTitle": "What follows from it",
     "areaCount": "{count, plural, one {one area} other {# areas}}",
     "wants": "wants to own: {names}",
-    "canDo": "has depth: {names}",
+    "canDo": "has deep experience: {names}",
     "unnamedMember": "a team member",
     "emptyTitle": "No basis yet",
-    "emptyText": "This shows the application level and ownership wish of members who share with this team. That needs capability entries – and the team share for exactly this team. Each person decides both for themselves; “private” stays private as long as you don't share.",
-    "emptyInterview": "Have the conversation",
+    "emptyText": "This shows the experience level and responsibility preference of members who share with this team. That needs entries on skills – and sharing turned on for this specific team. Each person decides both for themselves; “private” stays private as long as you don't share.",
+    "emptyInterview": "Start the conversation",
     "emptyDisclosure": "Share with this team",
     "states": {
       "contested": {
         "label": "Several want to own it",
-        "text": "Two or more claim the same responsibility. It is not yet settled who decides here – that is worth a conversation, not who is better at it."
+        "text": "Two or more people claim the same responsibility. Who decides here isn't settled yet – that's worth a conversation, not who's better at it."
       },
       "gap": {
-        "label": "Nobody wants it, nobody can",
-        "text": "Nobody wished for the responsibility here and nobody stated depth. This is the only situation that forces a decision: hire, commission – or deliberately leave it open and record that."
+        "label": "Nobody wants it, nobody can do it",
+        "text": "Nobody wants responsibility for this and nobody has stated deep experience. This is the only situation that forces a decision: hire, contract it out – or deliberately leave it open and record that."
       },
       "openPosition": {
         "label": "Somebody can, nobody wants to",
-        "text": "The ability is there, the responsibility is wanted by nobody. That is an arrangement, not a shortcoming – often it is enough to agree on it for a limited time."
+        "text": "The skills are there, but nobody wants the responsibility. That's an arrangement to make, not a shortcoming – often it's enough to agree on it for a limited time."
       },
       "claimedShallow": {
-        "label": "Wanted, not yet deep",
+        "label": "Wanted, not much experience yet",
         "text": "Somebody wants to own this and, by their own account, has not applied it repeatedly yet. That is fine – what matters is that it is said out loud in the team and not treated as settled."
       },
       "handoverPath": {
         "label": "Handover possible",
-        "text": "One wants to grow into it, another has depth and does not want to keep the responsibility. That is a transition you can plan."
+        "text": "One person wants to grow into it; another has deep experience and doesn't want to keep the responsibility. That's a transition you can plan."
       },
       "settled": {
         "label": "Owned",
@@ -671,27 +671,27 @@
       },
       "noBasis": {
         "label": "Too few entries",
-        "text": "Fewer than two people have decided here – or they entered “not clear yet”. Turning that into a statement about a role would be guesswork, so there is none."
+        "text": "Fewer than two people have made a choice here – or they chose “Still unclear”. Turning that into a statement about roles would be guesswork, so there isn't one."
       }
     },
-    "teamBasis": "{contributing} of {members} in the team have made entries, {withDepth} of them with an application level and an ownership wish. Depth is visible when someone shares with this team – a share in another team does not count here."
+    "teamBasis": "{contributing} of {members} team members have made entries, {withDepth} of them with an experience level and a responsibility preference. Depth is visible when someone shares with this team – sharing in another team doesn't count here."
   },
   "viewFounderProfile": "See “This is you”",
   "strengths": {
     "title": "How you work",
-    "text": "Sentences about how you work — from situations you told. For each you can say two things: how often it shows up, and what people who have worked with you would say.",
+    "text": "Sentences about how you work — based on situations you described. For each one, you can say two things: how often it shows up, and what people who've worked with you would say.",
     "proposalsTitle": "From your stories",
-    "proposalsText": "With the passage they rely on. None of it counts until you take it — and you can rewrite it.",
-    "empty": "Nothing kept yet. Tell a situation in the interview, or write something down yourself.",
+    "proposalsText": "Each with the passage it's based on. None of it counts until you accept it — and you can rewrite it.",
+    "empty": "Nothing saved yet. Describe a situation in the interview, or write something yourself.",
     "addTitle": "Write one yourself",
     "addLabel": "In one sentence",
     "addPlaceholder": "For example: keeps at it when an agreement does not hold",
-    "addHint": "A sentence about the WAY you work, not about you as a person. Not “I am persistent” but what you did in a situation.",
-    "add": "Keep it",
-    "confirm": "Take it",
-    "reject": "Does not fit",
+    "addHint": "A sentence about the WAY you work, not about you as a person. Not “I'm persistent”, but what you did in a situation.",
+    "add": "Add",
+    "confirm": "Accept",
+    "reject": "Doesn't fit",
     "remove": "Remove",
-    "save": "Save assessment",
+    "save": "Save answers",
     "pending": "Saving …",
     "unanswered": "Not answered yet",
     "selfLabel": "How often does this show up for you?",
@@ -711,21 +711,21 @@
       "family": "Family"
     },
     "gap": {
-      "others_see_more": "Here you assume more from others than from yourself. That is not a mistake — it is the place where you might claim something others have long seen.",
-      "others_see_less": "Here you see more in yourself than in others. Also not a mistake — perhaps you show it where nobody notices."
+      "others_see_more": "Here you think others notice it more than you do. That isn't a mistake — it may be where you could give yourself credit for something others have long seen.",
+      "others_see_less": "Here you notice it more than you think others do. That isn't a mistake either — maybe you show it where nobody notices."
     }
   },
   "sourcing": {
     "internal_only": "belongs in the team",
-    "component": "can be bought in",
+    "component": "can be sourced externally",
     "depends": "depends on the venture",
     "internal_onlyHint": "Handing this over means handing over the company.",
-    "componentHint": "This exists as a finished service — often better than doing it on the side.",
+    "componentHint": "Available as a ready-made service — often better than doing it yourself on the side.",
     "dependsHint": "Whether this belongs in the team depends on what you build."
   },
   "aboutYou": {
-    "intro": "This is where your founder profile takes shape, step by step. You do not have to do it all at once — add whatever fits right now.",
-    "backToOverview": "← Back to „About you“",
+    "intro": "This is where your founder profile comes together, step by step. You don't have to do it all at once — just add whatever fits right now.",
+    "backToOverview": "← Back to “About you”",
     "besides": "Alongside this",
     "disclosureCta": "Set visibility",
     "status": {
@@ -741,19 +741,19 @@
     "stations": {
       "basis": {
         "title": "You & your background",
-        "text": "Name, short introduction, region, areas of expertise — what others read about you first. You enter it once and it applies everywhere."
+        "text": "Name, short introduction, region, areas of expertise — what others read about you first. Enter it once and it applies everywhere."
       },
       "arbeitsweise": {
         "title": "How you work",
-        "text": "The founder questionnaire: how you decide, test, disagree and deal with open questions. Self-report, not a test result."
+        "text": "The founder questionnaire: how you make decisions, try things out, disagree and handle open questions. Self-reported, not a test result."
       },
       "mitbringen": {
         "title": "What you bring",
-        "text": "From situations you describe to your capabilities and your experience, through to the question of what you want to own — and what someone else should."
+        "text": "From situations you describe to your skills and experience, through to what you want to own — and what you'd rather leave to someone else."
       },
       "antrieb": {
         "title": "What drives you",
-        "text": "Six questions about the themes, problems and changes you keep coming back to. This is the part a CV does not give you."
+        "text": "Six questions about the themes, problems and changes you keep coming back to. This is the part a CV doesn't show."
       },
       "ressourcen": {
         "title": "Network & resources",
@@ -764,9 +764,9 @@
       "basis": "Your details",
       "arbeitsweise": "The founder questionnaire",
       "gespraech": "Learning from situations",
-      "faehigkeiten": "Your capabilities",
-      "erfahrung": "Placing your experience",
-      "verantwortung": "Choosing responsibility",
+      "faehigkeiten": "Your skills",
+      "erfahrung": "Your experience level",
+      "verantwortung": "Choosing responsibilities",
       "staerken": "Your strengths",
       "antrieb": "The conversation",
       "ressourcen": "Your entries"
@@ -779,31 +779,31 @@
         "arbeitsweise": "Next, you could fill in the founder questionnaire.",
         "gespraech": "Next, you could describe a few situations in the conversation.",
         "faehigkeiten": "Next, you could choose the areas you bring something to.",
-        "erfahrung": "Next, you could place how far you have come in your areas.",
+        "erfahrung": "Next, you could record how far you've come in your areas.",
         "verantwortung": "Next, you could say what you want to own — and what someone else should.",
-        "staerken": "Next, you could record which ways of working show up in you.",
+        "staerken": "Next, you could note which ways of working show up in what you do.",
         "antrieb": "Next, you could have the conversation about what drives you.",
-        "ressourcen": "Next, you could look at the access and contacts that have been recognised."
+        "ressourcen": "Next, you could review the access and contacts already identified."
       }
     },
     "payoff": {
-      "workDone": "Your working profile is in.",
+      "workDone": "Your workstyle profile is ready.",
       "workStarted": "{count, plural, =1 {One answer saved} other {# answers saved}}.",
       "bring": "{areas, plural, =0 {No areas entered yet} =1 {One area entered} other {# areas entered}}, {levelled} of them with an experience level · {strengths, plural, =0 {no strengths yet} =1 {one strength} other {# strengths}}.",
       "direction": "{count, plural, =1 {One confirmed statement} other {# confirmed statements}} about what drives you.",
       "resources": "{confirmed, plural, =0 {Nothing recorded yet} =1 {One resource recorded} other {# resources recorded}}{pending, plural, =0 {} =1 {, one suggestion is waiting for you} other {, # suggestions are waiting for you}}."
     },
     "payoffTitles": {
-      "identity": "This is how it looks"
+      "identity": "Here's how it looks"
     },
     "mark": {
-      "markedNote": "You have marked this area as „done for now“. That does not mean finished — you can add to it any time, and the mark stays.",
-      "mark": "I am done with this for now",
+      "markedNote": "You've marked this area as “done for now”. That doesn't mean finished — you can add to it any time, and the mark stays.",
+      "mark": "I'm done with this for now",
       "unmark": "Undo the mark"
     },
     "resources": {
       "ownTitle": "Your resources",
-      "ownText": "The network, access and offers you bring. So far this is visible to you only.",
+      "ownText": "The network, access and offers you bring. For now, only you can see this.",
       "empty": "This is where you can record the network, the access or the resources you bring.",
       "add": "Add a resource",
       "kindField": "Type",

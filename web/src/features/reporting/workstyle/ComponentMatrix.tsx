@@ -152,7 +152,7 @@ export function ComponentMatrix({
                         ? text(locale, "bisher möchte es niemand verantworten", "No one has indicated that they want to take responsibility yet")
                         : row.states.includes("MULTI_COVERED")
                           ? `${text(locale, "mehrere möchten es verantworten:", "Several people would like to take responsibility:")} ${row.owners.map((o) => o.name).join(", ")}`
-                          : locale === "en" ? `${row.externalPreference.join(", ")} would prefer external support; this area is classified as internal` : `${row.externalPreference.join(", ")} ${row.externalPreference.length === 1 ? "möchte" : "möchten"} es lieber extern lösen; der Bereich ist als intern einzuordnen`}
+                          : locale === "en" ? `${row.externalPreference.join(", ")} would prefer external support; this area is marked as internal` : `${row.externalPreference.join(", ")} ${row.externalPreference.length === 1 ? "möchte" : "möchten"} es lieber extern lösen; der Bereich ist als intern einzuordnen`}
                       {row.sourcing === "component" || row.sourcing === "depends" ? text(locale, " · extern denkbar", " · external support is an option") : ""}
                     </span>
                   </li>
@@ -189,7 +189,7 @@ export function ComponentMatrix({
 
           <p className="text-sm leading-6 text-slate-600">
             {empty > 0 ? locale === "en" ? `There are no entries for ${empty} other areas. This does not mean anything is missing. ` : `Zu ${empty} weiteren Bereichen hat niemand etwas angegeben – das heißt nicht, dass etwas fehlt. ` : ""}
-            {text(locale, "Alle Angaben sind Selbstauskünfte. „Extern denkbar“ ist eine Eigenschaft des Bereichs und heißt noch nicht, dass etwas beauftragt ist.", "All entries are self-reported. External support being an option is a property of the area; it does not mean anyone has been commissioned.")}
+            {text(locale, "Alle Angaben sind Selbstauskünfte. „Extern denkbar“ ist eine Eigenschaft des Bereichs und heißt noch nicht, dass etwas beauftragt ist.", "All entries are self-reported. External support being an option is a property of the area; it does not mean anything has been contracted out yet.")}
           </p>
         </>
       )}

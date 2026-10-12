@@ -6,7 +6,7 @@
       "steps": {
         "welcome": {
           "title": "Good to have you here.",
-          "hint": "We'll ask you a few short questions. After that you'll know where you're at home in Made2Found."
+          "hint": "We'll ask you a few short questions. After that, you'll know which parts of Made2Found are for you."
         },
         "name": {
           "title": "What should we call you?",
@@ -43,7 +43,7 @@
       "startButton": "Start profile",
       "skipImageButton": "Continue without image",
       "backButton": "Back",
-      "nonDiagnosticHint": "Made2Found is not a personality test. It helps you make collaboration clearer and more resilient early.",
+      "nonDiagnosticHint": "Made2Found is not a personality test. It helps you make collaboration clearer and more resilient, early on.",
       "stepsLeft": "{count, plural, =0 {Last step} =1 {One more step} other {# more steps}}",
       "plans": {
         "founder": {
@@ -73,7 +73,7 @@
         },
         "find": {
           "name": "Find",
-          "text": "Here you look for people you could found with. You say what you're looking for and what you bring – and see who fits."
+          "text": "Here you look for people you could found with. You say what you're looking for and what you bring – and see who matches that."
         },
         "connect": {
           "name": "Connect",
@@ -124,15 +124,15 @@
     "intentions": {
       "Suche": {
         "label": "Searching",
-        "description": "You want to see early who collaboration could really work with."
+        "description": "You want to find out early who you could really work well with."
       },
       "Partner-Match": {
         "label": "Partner match",
-        "description": "You want to clarify fit and differences in a specific co-founder constellation."
+        "description": "You want to clarify where you align and where you differ with a specific co-founder."
       },
       "Selbsttest": {
         "label": "Self-check",
-        "description": "You first want to understand your own profile and way of working more clearly."
+        "description": "You first want to understand your own profile and workstyle more clearly."
       },
       "Begleiten": {
         "label": "Supporting teams",
@@ -158,12 +158,12 @@
       "expertise": "Areas of expertise",
       "industries": "Industries",
       "linkedin": "LinkedIn",
-      "empty": "Nothing about you yet. One sentence about yourself and your focus areas make the difference between a profile and a readout.",
+      "empty": "Nothing about you yet. One sentence about yourself and your focus areas make the difference between a profile and a mere report.",
       "completeCta": "Add details"
     },
     "capability": {
       "title": "What you bring",
-      "intro": "Per area: how often you have applied it and how you would see responsibility for it. The situations you told in the interview are deliberately not shown here — they stay on your profile page.",
+      "intro": "For each area: how often you've applied it and how you see responsibility for it. The situations you described in the interview are deliberately not shown here — they stay on your profile page.",
       "evidenceCount": "{count, plural, =1 {1 piece of evidence} other {# pieces of evidence}}",
       "noLevel": "Level still open",
       "detailsSummary": "Your areas in detail",
@@ -184,20 +184,20 @@
     },
     "workProfile": {
       "title": "How you work",
-      "intro": "Your answers from the founder working profile — how you decide, test, disagree and deal with open questions.",
+      "intro": "Your answers from the founder workstyle profile — how you decide, test, disagree and deal with open questions.",
       "note": "Self-report, not a test result.",
       "answered": "{answered} of {of} questions answered",
       "detailsSummary": "Your answers"
     },
     "missingWorkProfile": {
-      "title": "You have not filled in your founder working profile yet.",
+      "title": "You haven't filled in your founder workstyle profile yet.",
       "text": "Sixteen questions about how you decide, test and raise differences. No score — what you get are your answers, and you can change them at any time.",
       "cta": "Start How you work"
     },
     "legacyReport": {
       "title": "Your earlier evaluation",
       "dated": "As of: {date}",
-      "text": "From the earlier questionnaire. It measures something different from the working profile above and is not combined with it — two versions, two separate statements."
+      "text": "From the earlier questionnaire. It measures something different from the workstyle profile above and is not combined with it — two versions, two separate statements."
     },
     "missingReport": {
       "title": "Your self-report is still missing",
@@ -205,8 +205,8 @@
       "cta": "Fill in the questionnaire"
     },
     "missingCapability": {
-      "title": "Your capabilities are still missing",
-      "text": "In the interview you tell real situations, and the areas with evidence come out of them. That is the part that makes this profile more than a list of keywords.",
+      "title": "Your skills are still missing",
+      "text": "In the interview you describe real situations, and the areas with evidence come out of them. That is the part that makes this profile more than a list of keywords.",
       "cta": "Start the interview"
     },
     "direction": {
@@ -220,7 +220,7 @@
     },
     "strengths": {
       "title": "How you work",
-      "intro": "Ways of working from situations you told — with your own assessment and what you assume others would say.",
+      "intro": "Ways of working from situations you described — with your own assessment and what you assume others would say.",
       "self": "You",
       "reflected": "{who}",
       "unanswered": "open",
@@ -240,7 +240,7 @@
       "familyUnspoken": "not discussed yet",
       "basis": "This map counts your own entries. It says what the interview covered — not what you are capable of.",
       "rolesTitle": "Components & responsibility",
-      "rolesIntro": "Areas that should remain anchored internally and that you would like to own. The classification draws on Günter Faltin’s component principle: suitable functions can be sourced externally. It is not a fixed founder role model.",
+      "rolesIntro": "Areas that should remain anchored internally and that you would like to own. This view draws on Günter Faltin’s component principle: suitable functions can be sourced externally. It is not a fixed founder role model.",
       "rolesNone": "None so far. Either the areas you discussed are buyable, or you have not yet said whether you want to own them.",
       "rolesOpen": "{count, plural, =1 {One other internal area is not marked for you to own} other {# other internal areas are not marked for you to own}}. Contributing, growing into an area and handing it over remain separate wishes.",
       "rolesCaveat": "Experience and ownership wishes remain separate. A wish is not yet a jointly agreed responsibility."
@@ -258,7 +258,7 @@
       "about": "About you",
       "work": "How you work",
       "strengths": "Your strengths",
-      "capability": "Your capabilities",
+      "capability": "Your skills",
       "depth": "Experience & depth",
       "ownership": "What you want to own",
       "growing": "Where you want to grow",
@@ -290,7 +290,7 @@
       "empty": "You have not said yet what you want to own."
     },
     "strengthsSection": {
-      "intro": "Ways of working from situations you told — with your own assessment and what you assume others would say.",
+      "intro": "Ways of working from situations you described — with your own assessment and what you assume others would say.",
       "detailsSummary": "All strengths, with where they came from",
       "more": "{count, plural, =1 {One more in the panel} other {# more in the panel}}",
       "empty": "No confirmed strengths recorded here yet.",
@@ -328,11 +328,11 @@
       "badgeFull": "Full profile",
       "shortText": "A compact overview for a first conversation or to pass on.",
       "fullText": "Your fuller founder dossier for an accelerator, an advisor or deeper conversations.",
-      "back": "← Back to „This is you“",
+      "back": "← Back to “This is you”",
       "cta": "Print or save as PDF",
       "switchToShort": "The short profile instead",
       "switchToFull": "The full profile instead",
-      "privacy": "The full profile contains more personal detail about how you work, what you can do and what you are after. Before you pass it on, check whether you want to share these contents with that person or organisation.",
+      "privacy": "The full profile contains more personal detail about how you work, what you can do and what you are after. Before you pass it on, check whether you want to share these contents with that person or organization.",
       "legacyLabel": "Include the earlier evaluation",
       "legacyApply": "Apply",
       "workAnswers": "Your answers",
@@ -346,9 +346,9 @@
       "cta": "Fill in how you work"
     },
     "historicalWorkProfile": {
-      "title": "Earlier work profile – historical version",
+      "title": "Earlier workstyle profile – historical version",
       "dated": "As of: {date}",
-      "text": "From an earlier version of the work profile. For reference only: it is no longer edited and is not combined with the current report."
+      "text": "From an earlier version of the workstyle profile. For reference only: it is no longer edited and is not combined with the current report."
     }
   }
 }

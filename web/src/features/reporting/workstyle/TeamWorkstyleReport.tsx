@@ -95,7 +95,7 @@ export function TeamWorkstyleReport({
       label: reportText(locale, "Verantwortung", "Responsibilities"),
       question: row.states.includes("OPEN_INTERNAL")
         ? locale === "en" ? `No one has indicated that they want responsibility for ${areaName(row.area.area_id, locale)} yet. Who will take it on, or will we use external support?` : `Für ${areaName(row.area.area_id, locale)} möchte bisher niemand Verantwortung übernehmen. Wer kümmert sich – oder lösen wir es extern?`
-        : locale === "en" ? `Several people would like responsibility for ${areaName(row.area.area_id, locale)}. Who will take responsibility, and who will support them?` : `Für ${areaName(row.area.area_id, locale)} möchten mehrere Verantwortung übernehmen. Wer verantwortet es, und wer unterstützt?`,
+        : locale === "en" ? `Several people would like to take responsibility for ${areaName(row.area.area_id, locale)}. Who will take responsibility, and who will support them?` : `Für ${areaName(row.area.area_id, locale)} möchten mehrere Verantwortung übernehmen. Wer verantwortet es, und wer unterstützt?`,
       context: null,
       href: rolesHref,
       claim: row.states.includes("OPEN_INTERNAL") ? "CAPABILITY.OPEN_INTERNAL" : "CAPABILITY.MULTI_COVERED",
@@ -134,7 +134,7 @@ export function TeamWorkstyleReport({
         locale={locale}
         people={people}
         title={reportText(locale, "Euer Zusammenspiel auf einen Blick", "Your team\u2019s workstyle at a glance")}
-        intro={locale === "en" ? `One track per person: ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map(p => p.name))} across the six areas, based on your own responses.` : `Eine Spur je Person: so liegen ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map((p) => p.name))} in den sechs Bereichen nebeneinander – nach euren eigenen Antworten.`}
+        intro={locale === "en" ? `One track per person, showing ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map(p => p.name))} side by side across the six areas, based on your own responses.` : `Eine Spur je Person: so liegen ${new Intl.ListFormat(locale, { type: "conjunction" }).format(team.people.map((p) => p.name))} in den sechs Bereichen nebeneinander – nach euren eigenen Antworten.`}
         sentences={Object.fromEntries(findings.map(({ area, finding }) => [area.key, (locale === "en" ? GLANCE_EN : GLANCE_LINE)[finding.kind]]))}
       />
 
@@ -293,7 +293,7 @@ export function TeamWorkstyleReport({
       <section id="vereinbarungen" aria-labelledby="ws-setup-title">
         <h2 id="ws-setup-title" className="text-2xl font-semibold tracking-tight text-slate-950">{reportText(locale, "Was ihr bereits vereinbart habt", "What you have already agreed")}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-          {reportText(locale, "Nur Vereinbarungen aus Founder Setup, die alle aktuellen Mitglieder bestätigt haben. Alles andere ist noch nicht vereinbart – auch dort, wo ihr ähnlich antwortet.", "Only agreements from Founder Setup that all current members have confirmed. Everything else is still unagreed, even where your responses are similar.")}
+          {reportText(locale, "Nur Vereinbarungen aus Founder Setup, die alle aktuellen Mitglieder bestätigt haben. Alles andere ist noch nicht vereinbart – auch dort, wo ihr ähnlich antwortet.", "Only agreements from Founder Setup that all current members have confirmed. Everything else hasn't been agreed yet, even where your responses are similar.")}
         </p>
         {team.setup.length ? (
           <div className="mt-5 grid gap-4">

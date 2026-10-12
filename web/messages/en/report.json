@@ -105,10 +105,10 @@
   "instrumentNote": {
     "title": "What this is — and what it is not",
     "selfReport": "Everything here comes from you. None of it has been measured, tested or checked from the outside.",
-    "notATest": "It is not a validated test. There is no comparison to a norm, no score and no statement about whether somebody is suited to founding — such statements could not be supported by this data.",
-    "snapshot": "It is a snapshot. People answer differently in a different situation, and that is not a fault of the answer.",
-    "purpose": "What it is for: as a basis for a conversation — between people who want to found together, or with somebody accompanying them. Not as a basis for selection.",
-    "dated": "State of the answers: {date}"
+    "notATest": "It is not a validated test. There is no comparison to a norm, no score and no statement about whether someone is suited to be a founder — such statements could not be supported by this data.",
+    "snapshot": "It is a snapshot. People answer differently in different situations, and that does not make an answer wrong.",
+    "purpose": "What it is for: as a basis for a conversation — between people who want to found together, or with someone who supports them. Not as a basis for selection.",
+    "dated": "Responses as of {date}"
   },
   "workstyle": {
     "backToProfile": "Your profile",
@@ -126,31 +126,31 @@
     "snapshotError": "This version could not be saved. Please reload the report.",
     "germanOnly": "This report is currently available in German only, because the workstyle instrument exists in German only.",
     "emptyIndividual": "You have not yet described how you work. Your report is built from your answers about concrete work situations.",
-    "emptyIndividualCta": "Fill in how you work",
+    "emptyIndividualCta": "Describe how you work",
     "notReadyTitle": "The team report is not available yet",
-    "shareMissingTitle": "Sharing missing",
-    "notReadyBody": "All members need a completed work profile in the current version and must share with this team. Joining alone shares nothing.",
-    "notReadyCta": "Open your work profile",
+    "shareMissingTitle": "Not shared yet",
+    "notReadyBody": "Every member needs a completed workstyle profile in the current version and has to share it with this team. Joining the team does not share anything.",
+    "notReadyCta": "Open your workstyle profile",
     "readiness": {
-      "title": "Something is still missing for your joint report",
+      "title": "Something is still missing for your team report",
       "listLabel": "Who already shares with this team",
       "you": "you",
       "state": {
         "MISSING_MINE": "You don't share with this team yet. As soon as everyone has shared, your report appears for everyone at the same time.",
         "MISSING_OTHERS": "You already share with this team. Still missing: {names}.",
-        "MISSING_MULTIPLE": "You don't share with this team yet, and still missing: {names}.",
-        "INSUFFICIENT_WORKSTYLE": "For your report, everyone needs a current work profile and a team share. Still open for: {names}.",
+        "MISSING_MULTIPLE": "You don't share with this team yet. Also still missing: {names}.",
+        "INSUFFICIENT_WORKSTYLE": "For your report, everyone needs a current workstyle profile and has to share it with this team. Still missing for: {names}.",
         "READY": "Everyone shares with this team.",
         "UNAVAILABLE": "The team report is not available for this team.",
-        "INSUFFICIENT_WORKSTYLE_SELF": "For your report, everyone needs a current work profile and a team share. Your work profile is still missing."
+        "INSUFFICIENT_WORKSTYLE_SELF": "For your report, everyone needs a current workstyle profile and has to share it with this team. Your workstyle profile is still missing."
       },
       "member": {
         "shared": "shared",
         "notShared": "not shared yet",
-        "noWorkstyle": "shared, work profile still missing"
+        "noWorkstyle": "shared, workstyle profile still missing"
       },
-      "completeWorkstyle": "Complete how you work",
-      "rule": "Your report appears for everyone at the same time once each person has a current work profile and shares with this team. Nobody shares for others, and joining alone shares nothing."
+      "completeWorkstyle": "Describe how you work",
+      "rule": "Your report appears for everyone at the same time once each person has a current workstyle profile and shares with this team. Nobody can share for anyone else, and joining the team does not share anything."
     },
     "researchOffer": {
       "title": "Help develop Made2Found",
@@ -159,7 +159,7 @@
       "continue": "Continue the research part"
     },
     "advisorNotReady": {
-      "title": "The joint report is not available yet.",
+      "title": "The team report is not available yet.",
       "body": "Not everyone in the team is sharing yet. The report appears here once everyone in the team has shared – and has shared how they work with you."
     },
     "sharing": {
@@ -170,7 +170,7 @@
       "manage": "Manage on the team page",
       "noTeams": "You are not in a team yet.",
       "individualTitle": "Individual people and advisors",
-      "individualIntro": "For individual contacts and advisors you can still share how you work individually and hide single questions. Within a team the team share always applies – nothing can be hidden individually there."
+      "individualIntro": "With individual contacts and advisors, you can still share how you work one by one and hide specific questions. Within a team, the team share always applies, so nothing can be hidden individually there."
     },
     "moreActions": "More"
   }

@@ -1,6 +1,6 @@
 {
   "einwand_zeitpunkt": {
-    "observed": "When raising a concern, {a} would like to: {aAnswer}. {b} would like to: {bAnswer}.",
+    "observed": "When to raise a concern — {a}: {aAnswer}. {b}: {bAnswer}.",
     "meaning": "These are two preferences about timing, not personal traits. Both approaches may have reasons that were not asked about here.",
     "question": "How will you flag a concern early, and when will you discuss it in depth?",
     "agreement": [
@@ -10,7 +10,7 @@
     "source": "Expert review, section 5, first example"
   },
   "informationsregel": {
-    "observed": "{a} would like to: {aAnswer}. {b} prefers to: {bAnswer}.",
+    "observed": "{a} prefers: {aAnswer}. {b} prefers: {bAnswer}.",
     "meaning": "Two rules for the same purpose. Which works depends on your workstyle, rather than who is right.",
     "question": "What default rule would work for how you collaborate?",
     "agreement": [
@@ -41,7 +41,7 @@
     "source": "Expert review, section 5, fourth example"
   },
   "zeit_und_erwartung": {
-    "observed": "For the next twelve weeks, {a} reports: {aAnswer}. {b} reports: {bAnswer}.",
+    "observed": "For the next twelve weeks, {a} answered: {aAnswer}. {b} answered: {bAnswer}.",
     "meaning": "These are your stated plans, not a measure of dedication. An agreement may change the expectations.",
     "question": "Should the role, goal, or expectation be adjusted?",
     "agreement": [
@@ -73,7 +73,7 @@
     "source": "Based on section 5"
   },
   "eigenstaendigkeit": {
-    "observed": "{a} would like to: {aAnswer}. {b} would like to: {bAnswer}.",
+    "observed": "{a} prefers: {aAnswer}. {b} prefers: {bAnswer}.",
     "meaning": "These responses describe the freedom someone wants within an agreed area. Without agreed areas, the question cannot be answered.",
     "question": "Who is responsible for which areas, and what must explicitly be decided together?",
     "agreement": [

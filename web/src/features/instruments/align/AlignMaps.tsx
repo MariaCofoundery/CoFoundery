@@ -1,5 +1,5 @@
 import { getRequestLocale } from "@/i18n/getLocale";
-import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { alignmentDisplayText, alignmentOptionText } from "@/features/instruments/align/display";
 import { getTranslations } from "next-intl/server";
 
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -157,7 +157,7 @@ export async function WorkMap({
                     ) : null}
                     <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${beschriftung && !dicht ? "mt-0.5" : ""}`}>
                       <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                      <span className={dicht ? "text-xs leading-4 text-slate-900" : "text-sm text-slate-900"}>{copy(row.ordinal.label)}</span>
+                      <span className={dicht ? "text-xs leading-4 text-slate-900" : "text-sm text-slate-900"}>{alignmentOptionText(row.prompt, row.ordinal.label, locale)}</span>
                     </div>
                   </li>
                 );
@@ -244,7 +244,7 @@ export async function DifferenceMap({
                       Ein Bild ohne Worte laedt dazu ein, den Abstand zu
                       deuten statt die Antworten zu lesen. */}
                   <p className="mt-1.5 text-sm text-slate-900">
-                    {nameA}: {copy(row.a.label)} · {nameB}: {copy(row.b.label)}
+                    {nameA}: {alignmentOptionText(row.prompt, row.a.label, locale)} · {nameB}: {alignmentOptionText(row.prompt, row.b.label, locale)}
                   </p>
                 </li>
               ))}
@@ -313,6 +313,7 @@ export async function VentureDirection({
   const locale = await getRequestLocale();
   const copy = (text: string) => alignmentDisplayText(text, locale);
   const rows = directionRows(entries, items);
+  const promptOf = new Map(items.map((item) => [item.itemId, item.prompt]));
   const beantwortet = rows.filter((row) => row.ordinal || row.missing);
 
   if (beantwortet.length === 0) return null;
@@ -342,7 +343,7 @@ export async function VentureDirection({
               {row.ordinal ? (
                 <>
                   <Punktreihe position={row.ordinal.position} of={row.ordinal.of} />
-                  <span className="text-sm text-slate-900">{copy(row.ordinal.label)}</span>
+                  <span className="text-sm text-slate-900">{alignmentOptionText(promptOf.get(row.itemId) ?? "", row.ordinal.label, locale)}</span>
                 </>
               ) : (
                 <span className="text-sm text-slate-500">

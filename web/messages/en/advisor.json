@@ -23,7 +23,7 @@
     "teamsDescription": "See each connection's relationship access, current reports, and separate Founder Setup sharing status.",
     "emptyTitle": "No teams linked yet",
     "emptyText": "Once both founders have started and are linked through your invite, the team will appear here with its approval status.",
-    "emptyHint": "Until then, new invitations already appear above as open team starts.",
+    "emptyHint": "Until then, your new invitations appear above as open invites.",
     "readyTeamsTitle": "Supported teams",
     "readyTeamsDescription": "Teams with active advisor access and usable working drafts.",
     "waitingTeamsTitle": "Waiting for approval",
@@ -137,8 +137,8 @@
     },
     "accessDescription": {
       "revoked": "Access to this team has ended. The report, snapshot and workbook are no longer available – the team stays in this list so you know where you stand.",
-      "ready": "Relationship approval is complete. Report and snapshot become available with their respective state. Historical workbook content remains separately accessible.",
-      "paused": "At least one founder approval is not active right now. While that is the case the content is closed. Once both have approved again, you continue where you left off.",
+      "ready": "Relationship approval is complete. The report and snapshot become available as soon as each is ready. Historical workbook content remains accessible separately.",
+      "paused": "At least one founder approval is not active right now. Until that changes, the content is closed. Once both have approved again, you can pick up where you left off.",
       "waiting": "One founder approval is still missing. Once both founders approve, the team is open for advisor support."
     },
     "approvals": "{count} of 2 approvals",
@@ -165,13 +165,13 @@
     "context": "Advisor context",
     "eyebrow": "Advisor report",
     "missingTitle": "Report not available yet",
-    "missingText": "There is no renderable advisor report for this team yet. Once the founder report has been fully generated, you can continue working with the advisor report here.",
+    "missingText": "There is no advisor report to display for this team yet. Once the founder report has been fully generated, you can work with the advisor report here.",
     "backToDashboard": "Back to advisor dashboard",
     "openWorkbook": "Open historical working state",
     "exportSnapshot": "Export snapshot",
     "impulsesEyebrow": "Advisor prompts",
     "impulsesTitle": "Short prompts per section",
-    "impulsesText": "Capture brief observations or facilitation notes here. Each section has exactly one editable advisor prompt. Empty fields remove the entry again.",
+    "impulsesText": "Capture brief observations or facilitation notes here. Each section has exactly one editable advisor prompt. Clearing a field removes the entry.",
     "saved": "Saved",
     "lastSaved": "Last saved: {date}",
     "noImpulse": "No prompt added yet",
@@ -199,7 +199,7 @@
       "conversationQuestion": "Conversation question",
       "responseContext": "Conversation context",
       "reviewTogether": "Review together",
-      "classificationContext": "This classification is a conversation prompt and does not evaluate the quality of the team.",
+      "classificationContext": "This view is meant to start a conversation and does not evaluate the quality of the team.",
       "keepInMind": "Keep in mind",
       "internalPreview": "Internal preview · Advisor report"
     }
@@ -274,10 +274,10 @@
     "alreadyLinkedText": "The advisor link is already connected to another profile. If this was not intended, you need a new advisor invitation.",
     "toDashboard": "Go to advisor dashboard",
     "linkProfileTitle": "Link with your profile",
-    "linkProfileText": "Sign in so your advisor profile can be linked cleanly to this team. After that, you will land directly in the advisor area.",
+    "linkProfileText": "Sign in so we can link your advisor profile to this team. You'll then go straight to the advisor area.",
     "loginAndLink": "Log in / link profile",
     "activateTitle": "Activate advisor access",
-    "activateText": "Your profile is signed in. With one click, you can link yourself as advisor to this founder connection and receive the approved relationship access.",
+    "activateText": "Your profile is signed in. With one click, you link yourself as advisor to this founder connection and get the relationship access the founders approved.",
     "linkProfile": "Link profile",
     "activeTitle": "Advisor access is active",
     "activeText": "Your profile is already linked to this founder connection. The advisor dashboard shows the areas currently shared with you.",
@@ -289,7 +289,7 @@
       "workbook": "historical workbook content where it already exists and has been shared",
       "followUp": "founder responses and follow-up status"
     },
-    "notVisible": "Raw assessment answers, new alignment deep dives, open points, and the Commitment Lab are not part of this access. Founder Setup requires a separate confirmed-only team grant.",
+    "notVisible": "Raw assessment answers, new alignment deep dives, open points, and the Commitment Lab are not part of this access. Founder Setup requires a separate team grant that covers confirmed content only.",
     "errors": {
       "alreadyClaimed": "This advisor link is already connected to another profile.",
       "emailMismatch": "Please sign in with the email address this advisor invitation was sent to.",
@@ -303,7 +303,7 @@
     "eyebrow": "Before the session",
     "title": "Session sheet",
     "text": "Everything you need for a conversation with this team on one page – and the place for your own notes.",
-    "back": "← Back to the teams you accompany",
+    "back": "← Back to the teams you support",
     "saved": {
       "note": "Note saved.",
       "follow_up": "Follow-up set.",
@@ -315,9 +315,9 @@
       "save": "That couldn't be saved just now. Please try again.",
       "forbidden": "We can't save notes for this team.",
       "follow_up_date": "That's not a valid date.",
-      "follow_up_past": "A date in the past reminds you of nothing. Please pick a day still to come.",
+      "follow_up_past": "A date in the past won't remind you of anything. Please pick a future date.",
       "setup_request": "The request couldn't be sent just now. Please try again – if it fails again, your access to this team may no longer be active.",
-      "setup_request_no_team": "There is no Founder Setup for this team yet that could be shared. The founders create it themselves."
+      "setup_request_no_team": "This team doesn't have a Founder Setup that could be shared yet. The founders set it up themselves."
     },
     "followUp": {
       "title": "Your follow-up",
@@ -340,8 +340,8 @@
       "updatedAt": "Last changed on {date}"
     },
     "settled": {
-      "title": "What the team has put down",
-      "help": "Only the jointly confirmed positions – that's what the founders released to you. What is still open does not appear here.",
+      "title": "What the team has recorded",
+      "help": "Only the positions the founders confirmed together – that's what they shared with you. Anything still open doesn't appear here.",
       "empty": "The team hasn't confirmed a shared position yet.",
       "requestAccess": "Ask for access",
       "requestAccessHint": "Both founders get the request in their Founder Setup and each decide there themselves. This gives you no access until both have agreed.",
@@ -349,53 +349,53 @@
     },
     "impulses": {
       "title": "What you wrote to the founders",
-      "help": "Your impulses are visible to the founders – unlike your notes above.",
-      "empty": "You haven't left any impulses yet.",
-      "edit": "Edit impulses in the report →"
+      "help": "Your prompts are visible to the founders – unlike your notes above.",
+      "empty": "You haven't added any prompts yet.",
+      "edit": "Edit prompts in the report →"
     },
     "links": {
       "label": "Other views",
       "report": "Advisor report",
       "snapshot": "Snapshot",
-      "document": "State to take away"
+      "document": "Take-away summary"
     }
   },
   "document": {
     "back": "← Back to the session sheet",
-    "title": "Accompaniment – the current state, to take away",
+    "title": "Advisor support – current summary to take with you",
     "asOf": "As of {date}",
-    "intro": "This sheet sums up what was put down while accompanying this team: the founders' jointly confirmed positions and the impulses written about them. Everything here is known to both sides.",
+    "intro": "This sheet summarizes what was recorded while supporting this team: the founders' jointly confirmed positions and the advisor prompts written about them. Both sides know everything on it.",
     "settledTitle": "What the team has jointly confirmed",
-    "settledEmpty": "At the time of this state the team had not confirmed a shared position yet – or access to it is not active right now.",
-    "impulsesTitle": "Impulses from the accompaniment",
-    "impulsesEmpty": "No impulses have been recorded for this team yet.",
+    "settledEmpty": "As of this summary, the team had not confirmed a shared position yet – or access to it isn't active right now.",
+    "impulsesTitle": "Advisor prompts",
+    "impulsesEmpty": "No advisor prompts have been recorded for this team yet.",
     "nextTitle": "Next step",
-    "notesExcluded": "Not included: the accompanying person's private working notes. They are deliberately not part of this sheet – a document that prints them on request would be a promise with an exception, and that is not a promise.",
-    "disclaimer": "This sheet records a state and is no substitute for legal or tax advice.",
+    "notesExcluded": "Not included: the advisor's private working notes. They are deliberately left out of this sheet – a document that printed them on request would be a promise with an exception, and that is no promise.",
+    "disclaimer": "This sheet records a point in time and is no substitute for legal or tax advice.",
     "print": "Print or save as PDF"
   },
   "personInvites": {
     "title": "Invite a person",
-    "text": "You invite by email address. There is no people search — it would reveal whether an address has an account.",
+    "text": "You invite people by email address. There is no people search — it would reveal whether an address has an account.",
     "emailLabel": "Email address",
     "scopesLabel": "What are you asking for?",
-    "scopesHint": "Tick them individually. A blanket request gets a blanket answer — usually none.",
+    "scopesHint": "Select each one individually. A blanket request gets a blanket answer — usually none.",
     "noteLabel": "One sentence about it",
-    "notePlaceholder": "For example: we accompany you in the programme and would like to prepare.",
+    "notePlaceholder": "For example: we're supporting you in the program and would like to prepare.",
     "invite": "Send invitation",
-    "revoke": "Take back",
+    "revoke": "Withdraw",
     "pending": "Sending …",
     "scopeCount": "{count, plural, =1 {1 area} other {# areas}}",
-    "notAnAccess": "An invitation is not an access. Whoever accepts sees your request in their account and decides area by area — and can take it back at any time.",
+    "notAnAccess": "An invitation doesn't grant access. Whoever accepts sees your request in their account, decides area by area — and can withdraw at any time.",
     "holderLabel": "On whose behalf?",
     "holderOrg": "{name}",
     "holderSelf": "In your own name",
-    "holderHint": "In the organisation's name the access stays there when you leave — in your own name it ends with you."
+    "holderHint": "On behalf of the organization, the access stays there when you leave — in your own name, it ends with you."
   },
   "org": {
-    "title": "Your organisation",
-    "text": "A programme or a consultancy with several advisors. It holds the access — so it does not disappear with one person when they leave.",
-    "nameLabel": "Name of the organisation",
+    "title": "Your organization",
+    "text": "A program or consultancy with several advisors. The organization holds the access, so it doesn't disappear when one person leaves.",
+    "nameLabel": "Organization name",
     "create": "Create",
     "inviteLabel": "Invite an advisor",
     "invite": "Invite",
@@ -403,53 +403,53 @@
     "revoked": "ended",
     "pending": "Saving …",
     "roles": {
-      "owner": "Leads the organisation",
+      "owner": "Leads the organization",
       "advisor": "Advisor"
     },
-    "membershipMeaning": "Whoever is a member here sees everything released to the organisation. When the membership ends, that access ends at once — but the accompanied person's consent stays, so your successor does not have to ask again. The accompanied people can see at any time who is a member here.",
-    "peopleTitle": "Who you accompany",
-    "peopleEmpty": "Nobody yet. Invite someone, and they appear here once they have agreed.",
-    "personScopes": "{count, plural, =0 {nothing released yet} =1 {1 area released} other {# areas released}}",
+    "membershipMeaning": "Members here see everything shared with the organization. When a membership ends, that access ends at once — but the consent of the person you support stays in place, so your successor doesn't have to ask again. The people you support can see at any time who is a member here.",
+    "peopleTitle": "Who you support",
+    "peopleEmpty": "Nobody yet. Invite someone, and they'll appear here once they've agreed.",
+    "personScopes": "{count, plural, =0 {nothing shared yet} =1 {1 area shared} other {# areas shared}}",
     "personPending": "{count, plural, =1 {1 request open} other {# requests open}}",
-    "claimFailedTitle": "This invitation does not open",
+    "claimFailedTitle": "This invitation can't be used",
     "claimFailedText": "It may have expired, been claimed already, or been addressed to a different email than the one you are signed in with.",
-    "claimFailedCta": "To the overview",
-    "profileTitle": "How your organisation appears",
+    "claimFailedCta": "Go to overview",
+    "profileTitle": "How your organization appears",
     "profileText": "Everyone you ask for access sees this — right where they decide. Without it, all they see is a name.",
     "profileDescriptionLabel": "What you are there for",
-    "profileDescriptionPlaceholder": "Two or three sentences: who do you accompany, for how long, and what happens in that time?",
+    "profileDescriptionPlaceholder": "Two or three sentences: who do you support, for how long, and what happens during that time?",
     "profileWebsiteLabel": "Website",
     "profileRegionLabel": "Location",
     "profileFocusLabel": "Focus areas",
     "profileFocusPlaceholder": "Comma separated, at most eight",
     "profileSave": "Save profile",
-    "personUnnamed": "No name released",
+    "personUnnamed": "Name not shared",
     "groupLink": "View a line-up",
     "invitePage": {
-      "title": "Join an organisation",
+      "title": "Join an organization",
       "intro": "{name} is inviting you to “{org}”.",
       "introNoInviter": "You have been invited to “{org}”.",
       "roleLabel": "Your role",
       "meaningTitle": "What membership means",
-      "alreadyMember": "You are already a member here. If you lead the organisation, that stays the same.",
-      "accept": "Join organisation",
+      "alreadyMember": "You are already a member here. If you lead the organization, that stays the same.",
+      "accept": "Join organization",
       "notNow": "Do not join",
       "error": "That did not work. Please try again.",
       "expired": "This invitation has expired. Ask for a new one.",
       "revoked": "This invitation was withdrawn.",
-      "unverified": "Please confirm your email address first. Then you can join the organisation."
+      "unverified": "Please confirm your email address first. Then you can join the organization."
     },
-    "leave": "Leave organisation",
-    "leaveLastOwner": "You are the only person leading this organisation. Hand over the lead or close the organisation before you leave.",
+    "leave": "Leave organization",
+    "leaveLastOwner": "You are the only person leading this organization. Hand over the lead or close the organization before you leave.",
     "you": "You",
     "unnamed": "No name",
-    "suspended": "This organisation is suspended. Access through it is currently not active.",
+    "suspended": "This organization is suspended. Access through it is currently not active.",
     "errors": {
-      "org_last_owner": "You are the only owner of this organisation. Hand over ownership first before you leave.",
+      "org_last_owner": "You are the only owner of this organization. Hand over ownership first before you leave.",
       "org_not_member": "This membership has already ended.",
-      "org_forbidden": "Only an owner of the organisation can do this.",
-      "org_suspended": "The organisation is suspended. This action is not possible right now.",
-      "org_name": "The name needs between 2 and 120 characters.",
+      "org_forbidden": "Only an owner of the organization can do this.",
+      "org_suspended": "The organization is suspended. This action is not possible right now.",
+      "org_name": "The name must be between 2 and 120 characters.",
       "email": "Please enter a valid email address.",
       "org_failed": "That did not work just now. Please try again."
     }
@@ -457,7 +457,7 @@
   "personView": {
     "back": "Back to people & groups",
     "unnamed": "This person",
-    "intro": "Only what this person released to you. They can take back any release at any time — then the section here is gone.",
+    "intro": "Only what this person has shared with you. They can withdraw any share at any time — the section then disappears from here.",
     "base": "Who they are",
     "region": "Location and way of working",
     "expertise": "Focus areas",
@@ -465,39 +465,39 @@
     "strengths": "How they work",
     "direction": "What matters to them",
     "self": "Self",
-    "scopeNote": "The stories from the conversations are never included here — they are not released, in any scope.",
-    "workProfileTitle": "Founder working profile",
-    "workProfileNotShared": "You have not been given access to the current founder working profile.",
+    "scopeNote": "The stories from the conversations are never included here — they are never shared, whatever the scope.",
+    "workProfileTitle": "Founder workstyle profile",
+    "workProfileNotShared": "The current founder workstyle profile hasn't been shared with you.",
     "legacyTitle": "Earlier evaluation – as of {date}",
     "legacyTitleNoDate": "Earlier evaluation – date unknown",
-    "legacyText": "From the earlier questionnaire, as this person calculated it at the time — not necessarily where they stand today. It measures something different from the working profile and is not combined with it. The texts are addressed to the person themselves."
+    "legacyText": "From the earlier questionnaire, as it was calculated for this person at the time — not necessarily where they stand today. It measures something different from the workstyle profile and is not combined with it. The texts are addressed to the person themselves."
   },
   "group": {
-    "back": "Back to the organisation",
-    "title": "How do these people stand together?",
-    "intro": "Pick two or more people from your programme. You will see exactly the picture a team sees of itself — no more, no less.",
+    "back": "Back to the organization",
+    "title": "What does this group look like together?",
+    "intro": "Pick two or more people from your program. You'll see exactly the picture a team sees of itself — no more, no less.",
     "chooseTitle": "Choose a line-up",
-    "chooseHint": "Selectable is anyone who released their name and capabilities to you. Twelve at most.",
-    "nobody": "You are not accompanying anyone yet.",
-    "unnamed": "No name released",
-    "notReleased": "not released yet",
+    "chooseHint": "You can select anyone who has shared their name and skills with you. Up to twelve.",
+    "nobody": "You aren't supporting anyone yet.",
+    "unnamed": "Name not shared",
+    "notReleased": "not shared yet",
     "show": "Show line-up",
     "resultTitle": "{names}",
-    "tooFewReleased": "Fewer than two of the people you picked released both their name and their capabilities. A line-up needs at least two.",
+    "tooFewReleased": "Fewer than two of the people you picked have shared both their name and their skills. A line-up needs at least two.",
     "omitted": {
-      "no_base": "{name} is not included: the name is not released, and findings nobody can attribute are useless.",
-      "no_capability": "{name} is not included: capabilities are not released."
+      "no_base": "{name} isn't included: their name hasn't been shared, and results without a name couldn't be attributed to anyone.",
+      "no_capability": "{name} isn't included: their skills haven't been shared."
     },
-    "notARanking": "This page does not rate a line-up or compute a best combination. It counts areas and shows who has talked about what — a single number per group is not something this model supports, and it would decide who gets into a programme.",
+    "notARanking": "This page does not rate a line-up or compute a best combination. It counts areas and shows who has talked about what — this model can't support a single number per group, and such a number would decide who gets into a program.",
     "requestTitle": "Request a joint evaluation",
-    "requestText": "The overview above shows what each person released to you individually. A joint evaluation goes further — it is a statement about how these people stand in relation to each other. That needs everyone's agreement.",
+    "requestText": "The overview above shows what each person has shared with you individually. A joint evaluation goes further — it is a statement about how these people relate to each other. That needs everyone's agreement.",
     "requestDisclosure": "The request itself discloses the group: everyone asked learns who else is involved. There is no other way for anyone to agree to a comparison.",
     "requestNoteLabel": "What it is about (optional)",
     "requestNotePlaceholder": "One sentence on why you are suggesting this.",
     "requestSubmit": "Ask everyone involved",
     "requestPending": "Requesting…",
     "requestDone": "Requested. Once everyone has agreed, the joint evaluation appears here.",
-    "requestFailed": "That did not work. You can only ask people who already let you accompany them individually.",
+    "requestFailed": "That did not work. You can only ask people who already let you support them individually.",
     "reviewsTitle": "Requested evaluations",
     "reviewActive": "running",
     "reviewWaiting": "{count, plural, =1 {waiting for 1 answer} other {waiting for # answers}}",
@@ -508,22 +508,22 @@
     "back": "Back to the selection",
     "untitled": "Joint evaluation",
     "intro": "Everyone involved has agreed. What you see here is their own entries side by side — not a rating and not a recommendation.",
-    "rolesTitle": "Role situation",
-    "rolesOmitted": "{count, plural, =1 {One person involved} other {# people involved}} does not appear here: their capabilities are not released individually. Joint agreement permits placing things side by side, not access to more data.",
-    "noRoles": "The role situation needs individually released capabilities from at least two of the people involved. Those are not available yet.",
+    "rolesTitle": "Roles at a glance",
+    "rolesOmitted": "{count, plural, =1 {One person involved doesn't} other {# people involved don't}} appear here: their skills haven't been shared individually. Joint consent allows a side-by-side view, not access to more data.",
+    "noRoles": "Roles at a glance needs individually shared skills from at least two of the people involved. These aren't available yet.",
     "alignmentTitle": "Self-reports side by side",
     "alignmentIntro": "Each axis is one dimension from the questionnaire, each dot one person. Far apart is not worse than close together — it is a place worth talking about.",
     "alignmentNoValue": "No entry: {names}",
     "alignmentBasis": "Self-report, not a test. The dots show how these people described themselves — not how they are, and not how well they fit together.",
-    "alignmentMissing": "Not in the comparison: {names}. They agreed to the joint evaluation, but their questionnaire is not released.",
-    "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and released themselves. Anyone involved can withdraw at any time — then this page is gone.",
+    "alignmentMissing": "Not in the comparison: {names}. They agreed to the joint evaluation, but their questionnaire hasn't been shared.",
+    "notAVerdict": "This page passes no verdict and computes no fit. It places side by side what each person entered and shared themselves. Anyone involved can withdraw at any time — then this page is gone.",
     "teamContext": {
       "title": "Team report",
       "withTeam": "This review is linked to a current team report.",
       "openTeam": "{team} · Open team report",
       "teamFallback": "Team",
-      "withoutTeam": "The joint review is active. No team report is currently linked to it: a team report is only linked if, at the time of consent, the group matches exactly one current team. A current team report needs a new, team-related release.",
-      "teamChanged": "The joint review stays active. The team's composition has changed since consent was given, so the team report is no longer linked. A new release is needed for the current team report.",
+      "withoutTeam": "The joint review is active. No team report is currently linked to it: a team report is only linked if, at the time of consent, the group matches exactly one current team. A current team report needs a new team-specific share.",
+      "teamChanged": "The joint review stays active. The team's composition has changed since consent was given, so the team report is no longer linked. A new share is needed for the current team report.",
       "teamInactive": "The joint review stays active. The linked team is no longer active, so there is no team report for it any more.",
       "teamUnavailable": "The linked team report is currently not available.",
       "requestNew": "Request a new review"
@@ -531,7 +531,7 @@
   },
   "notebook": {
     "title": "Your working file",
-    "private": "For you alone. Neither the person you accompany nor other advisors in your organisation can read this — not even the owner.",
+    "private": "Only for you. Neither the person you support nor other advisors in your organization can read this — not even the owner.",
     "noteLabel": "Note",
     "notePlaceholder": "What stood out last time, what you want to raise next time, what you cannot say yet.",
     "saveNote": "Save note",
@@ -539,29 +539,29 @@
     "dueOn": "When",
     "followUpNote": "About",
     "followUpPlaceholder": "What you want to be reminded of.",
-    "saveFollowUp": "Remember",
+    "saveFollowUp": "Set reminder",
     "markDone": "Done",
     "pending": "One moment…",
     "saved": "Saved.",
-    "survives": "Your notes stay when a release ends — the accompaniment did happen. They disappear when that person deletes their account.",
+    "survives": "Your notes stay when a share ends — the support did happen, after all. They disappear when that person deletes their account.",
     "errors": {
-      "forbidden": "There is no mandate for that — neither now nor earlier.",
-      "due": "Please give a date.",
+      "forbidden": "You don't have a mandate for that — not now, and not before.",
+      "due": "Please enter a date.",
       "save": "That did not work."
     }
   },
   "access": {
-    "eyebrow": "Accompaniment",
+    "eyebrow": "Advisor support",
     "toPeople": "Go to people & groups",
     "toAdvisor": "Go to advisor overview",
     "person": {
       "ended": {
         "title": "This access is no longer active.",
-        "body": "The release for this profile has ended. What you saw before can no longer be opened here."
+        "body": "Sharing for this profile has ended. What you saw before can no longer be opened here."
       },
       "pending": {
         "title": "The request is still open.",
-        "body": "As soon as the person agrees, you will see here what they have released to you."
+        "body": "As soon as the person agrees, you'll see here what they have shared with you."
       }
     },
     "review": {
@@ -575,12 +575,12 @@
       }
     },
     "orgMembershipEnded": {
-      "title": "Your membership in the organisation has ended.",
-      "body": "This access was through the organisation. It ends with the membership."
+      "title": "Your membership in the organization has ended.",
+      "body": "This access came through the organization. It ends with the membership."
     },
     "orgSuspended": {
-      "title": "The organisation is suspended.",
-      "body": "Access through this organisation is currently not active."
+      "title": "The organization is suspended.",
+      "body": "Access through this organization is currently not active."
     }
   }
 }

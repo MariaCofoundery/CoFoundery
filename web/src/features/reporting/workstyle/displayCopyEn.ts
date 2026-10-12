@@ -4,7 +4,7 @@ export const AREAS_EN = {
   EXP: { title: "How you draw on experience", team: "Drawing on experience" },
   EL: { title: "How you learn by trying things out", team: "Learning by trying things out" },
   VOICE: { title: "How you raise concerns", team: "Raising concerns" },
-  AMB: { title: "How you feel when things are unclear", team: "Feeling uncertain" },
+  AMB: { title: "How you feel when things are unclear", team: "Experiencing unclear situations" },
   ORG: { title: "How you organize your work", team: "Organizing work" },
 };
 export const SITUATIONS_EN: Record<string, string> = {
@@ -20,7 +20,7 @@ export const SITUATIONS_EN: Record<string, string> = {
   "EXP-06": "drawing on experience when information is missing but you know the subject well",
   "EL-01": "testing something before choosing between two approaches",
   "EL-02": "suggesting a test when a discussion is not moving forward",
-  "EL-04": "showing or letting others try a simple version early",
+  "EL-04": "showing others a simple version early or letting them try it",
   "EL-05": "deliberately changing something and trying again after an inconclusive attempt",
   "VOICE-01": "raising a counterpoint after the group has agreed",
   "VOICE-02": "raising something uncomfortable soon",
@@ -31,7 +31,7 @@ export const SITUATIONS_EN: Record<string, string> = {
   "AMB-02": "having several plausible explanations that cannot currently be resolved",
   "AMB-04": "receiving new information that leaves even more possibilities open",
   "AMB-05": "continuing work with an important question still open",
-  "ORG-01": "clarifying next steps before starting a larger venture",
+  "ORG-01": "clarifying next steps before starting a larger project",
   "ORG-02": "setting your own checkpoints for longer tasks",
 };
 export const PREFERENCES_EN: Record<string, { context: string; A: string; B: string }> = {
@@ -44,13 +44,13 @@ export const POLES_EN = {
   EVI: { left: "keep the first assessment", right: "take another close look" },
   EXP: { left: "assess with fresh eyes", right: "draw on experience" },
   EL: { left: "clarify first", right: "try it first" },
-  VOICE: { left: "wait first", right: "raise it right away" },
+  VOICE: { left: "wait and see", right: "raise it right away" },
   AMB: { left: "uncertainty feels okay", right: "uncertainty feels uncomfortable" },
   ORG: { left: "get started", right: "clarify the steps first" },
 };
 export const COPY_EN = {
   EVI: {
-    direction: { upper: "When a decision is coming up, you prefer to take another close look: you look for counterarguments, check uncertain assumptions, and investigate information that points against it.", lower: "You tend to let an established assessment stand. In these situations, deliberately looking for counterarguments or investigating contrary information is less likely to be your next step.", middle: "In most situations, you leave it open whether you would review an assessment again: sometimes yes, sometimes no." },
+    direction: { upper: "When a decision is coming up, you prefer to take another close look: you look for counterarguments, check uncertain assumptions, and follow up on information that points the other way.", lower: "Once you've made an assessment, you tend to let it stand. In these situations, deliberately looking for counterarguments or investigating contrary information is less likely to be your next step.", middle: "In most situations, you leave it open whether you would review an assessment again: sometimes yes, sometimes no." },
     mixed: "It depends on the situation: you let some assessments stand and take another close look at others.",
     short: { upper: "You prefer another close look.", lower: "You tend to keep the first assessment.", middle: "Usually somewhere in between.", mixed: "It depends on the situation." },
     bands: { upper: "Here you tend to check again", middle: "Here it depends", lower: "Here you tend to let it stand" },
@@ -71,9 +71,9 @@ export const COPY_EN = {
     question: { upper: "When would a test tell you more than another discussion, and what would you do with the result?", lower: "Which questions would you consider testing on a small scale, and which would you not?", open: "When do you prefer to try something, and when do you want to know more first?" },
   },
   VOICE: {
-    direction: { upper: "When you notice something important, you raise it, even when others have already agreed or are almost finished.", lower: "You tend not to raise concerns or unresolved points straight away yourself when the group has already agreed or wants to close a topic.", middle: "In most situations, you leave it open whether you would raise a concern straight away." },
-    mixed: "You raise some concerns straight away and wait with others. It depends on the situation.",
-    short: { upper: "You raise things straight away.", lower: "You tend to wait first.", middle: "Usually somewhere in between.", mixed: "It depends on the situation." },
+    direction: { upper: "When you notice something important, you raise it, even when others have already agreed or are almost finished.", lower: "You tend not to bring up concerns or open points yourself right away when the group has already agreed or wants to close a topic.", middle: "In most situations, you leave it open whether you would raise a concern straight away." },
+    mixed: "You raise some concerns straight away and hold off on others. It depends on the situation.",
+    short: { upper: "You raise things straight away.", lower: "You tend to wait and see.", middle: "Usually somewhere in between.", mixed: "It depends on the situation." },
     bands: { upper: "Here you tend to raise it", middle: "Here it depends", lower: "Here you tend to wait" },
     question: { upper: "How would you like to handle a late concern when a decision has already been made?", lower: "In which situations would you want to raise a concern straight away anyway?", open: "When do you raise a concern straight away, and when do you prefer to wait?" },
   },
@@ -96,12 +96,12 @@ export const COPY_EN = {
 export const TEAM_EN = {
   EVI: {
     similar: { upper: { text: "You {all} prefer another close look before a decision is final.", question: "How do you decide when information remains incomplete, and who starts putting the decision into practice?" }, lower: { text: "You {all} tend to let the first assessment stand rather than deliberately look for counterarguments.", question: "How do you recognize when a decision should be revisited?" } },
-    differs: { summary: "In some situations your responses are close, and in others you would respond differently. This is particularly visible in when you would revisit a decision.", text: "When deciding together, one person may want to check an assessment again while another wants to move forward. You may see the point at which a decision is final differently. These approaches could complement each other if you agree in advance when to revisit a decision.", question: "What new information would lead you to revisit a decision, and who can initiate that?" },
+    differs: { summary: "In some situations your responses are close, and in others you would respond differently. This is most visible when it comes to revisiting a decision.", text: "When deciding together, one person may want to check an assessment again while another wants to move forward. You may see differently when a decision is final. These approaches could complement each other if you agree in advance when to revisit a decision.", question: "What new information would lead you to revisit a decision, and who can initiate that?" },
     card: { label: "Decisions", question: "When do we revisit a decision, and when do we deliberately let it stand?" },
   },
   EXP: {
     similar: { upper: { text: "You {all} draw strongly on past experience. It becomes interesting when your experiences point in different directions.", question: "What is different about a new situation compared with your past experiences?" }, lower: { text: "Past experience plays a smaller part for {all} of you. You prefer a fresh assessment.", question: "What do you already know from similar situations that could help here?" } },
-    differs: { summary: "You draw on experience to a similar extent in some situations and to different extents in others, such as when information is missing or a solution looks convincing on paper.", text: "When assessing a situation, one person may rely more strongly on experience than another. You may assess the same situation differently. These approaches could complement each other if you explain the experience and check together whether it applies to the current case.", question: "How do you recognize whether a past experience applies to the current situation?" },
+    differs: { summary: "You draw on experience to a similar extent in some situations and to different extents in others, such as when information is missing or a solution looks convincing on paper.", text: "When assessing a situation, one person may rely more strongly on experience than another. You may assess the same situation differently. These approaches could complement each other if you spell out the experience and check together whether it applies to the current case.", question: "How do you recognize whether a past experience applies to the current situation?" },
     card: { label: "Experience", question: "Whose experience guides us when our experiences point in different directions?" },
   },
   EL: {
@@ -110,8 +110,8 @@ export const TEAM_EN = {
     card: { label: "Trying things out", question: "When do we test on a small scale, and when do we keep clarifying things first?" },
   },
   VOICE: {
-    similar: { upper: { text: "You {all} raise what you notice, even shortly before a discussion closes.", question: "When is a decision final for you, and what happens with a late concern?" }, lower: { text: "You {all} tend to wait rather than raise concerns straight away when the group has already agreed.", question: "When do you explicitly ask about concerns before closing a topic?" } },
-    differs: { summary: "In some situations you would raise concerns at similar points, and in others at different points, such as when the group wants to close a topic.", text: "In discussions, one person may raise concerns sooner than another, so concerns may become visible at different times. Regular opportunities for questions before closing a topic may help.", question: "How can someone raise a concern when the group is ready to decide?" },
+    similar: { upper: { text: "You {all} raise what you notice, even shortly before a discussion closes.", question: "When is a decision final for you, and what happens to a late concern?" }, lower: { text: "You {all} tend to wait rather than raise concerns straight away when the group has already agreed.", question: "When do you explicitly ask about concerns before closing a topic?" } },
+    differs: { summary: "In some situations you would raise concerns at similar points, and in others at different points, such as when the group wants to close a topic.", text: "In discussions, one person may raise concerns sooner than another, so concerns may become visible at different times. Regular opportunities for questions before closing a topic may help.", question: "How do you make room for a concern when the group already wants to wrap up?" },
     card: { label: "Concerns", question: "How do we leave room for doubts even when we are almost finished?" },
   },
   AMB: {
@@ -121,13 +121,13 @@ export const TEAM_EN = {
   },
   ORG: {
     similar: { upper: { text: "For larger tasks, you {all} like to clarify next steps and set checkpoints first.", question: "Who adjusts your shared plan when circumstances change?" }, lower: { text: "For larger tasks, you {all} tend to get started rather than first setting out the next steps.", question: "How much shared planning do you need before starting?" } },
-    differs: { summary: "For larger tasks, you would sometimes take different approaches: one person wants to clarify the steps first, another would prefer getting started.", text: "For larger ventures, one person may clarify next steps first while another prefers getting started. You may expect different amounts of shared planning before starting.", question: "How much shared planning do you need before starting?" },
+    differs: { summary: "For larger tasks, you would sometimes take different approaches: one person wants to clarify the steps first, another would prefer getting started.", text: "For larger projects, one person may clarify next steps first while another prefers getting started. You may expect different amounts of shared planning before starting.", question: "How much shared planning do you need before starting?" },
     card: { label: "Organizing work", question: "How much planning do we need before starting, and when do we adjust it?" },
   },
 };
 export const ORG_DIFFERS_EN: Record<string, { summary: string; text: string; question: string }> = {
   "ORG-03": { summary: "When several important tasks compete, you would take different approaches: keep several moving in parallel or focus on fewer tasks.", text: "When tasks compete, one person may keep several moving while another prefers to focus on fewer. You may have different expectations about priorities and response times.", question: "How do you recognize what takes priority, and when can someone be interrupted?" },
-  "ORG-07": { summary: "When something new comes in during focused work, you would respond differently: interrupt straight away or first stay with the current task.", text: "When new requests arrive during focused work, one person may interrupt while another stays with the current task. You may differ on what needs immediate attention.", question: "What counts as urgent enough to interrupt ongoing work?" },
+  "ORG-07": { summary: "When something new comes in during focused work, you would respond differently: interrupt right away or stay with the current task first.", text: "When new requests arrive during focused work, one person may interrupt while another stays with the current task. You may differ on what needs immediate attention.", question: "What counts as urgent enough to interrupt ongoing work?" },
   "ORG-04": { summary: "When a task takes longer than expected, you would take different approaches: finish it as planned first or adjust the plan early.", text: "When a task takes longer than expected, one person may finish it as planned first while another adjusts the remaining plan early. You may differ on when to rearrange the shared plan.", question: "When do you rearrange a shared plan if a task takes longer, and who raises this?" },
   "ORG-08": { summary: "When smaller things turn out differently than planned, you would adjust the plan at different points.", text: "With smaller deviations, one person may adjust the plan early while another waits until the deviations matter. You may differ on when a change affects the shared plan.", question: "At what point does a deviation affect your shared plan, and who raises it?" },
 };

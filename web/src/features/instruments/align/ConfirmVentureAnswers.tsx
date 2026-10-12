@@ -78,7 +78,7 @@ export function ConfirmVentureAnswers({
          {t("Das hast du zu diesem Vorhaben angegeben")} </h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
         {partnerLabel}  {t("ist jetzt dabei. Bevor eure Antworten nebeneinanderstehen: Schau kurz drüber, ob das noch stimmt.")} {answeredAt && (
-          <>  {t("Du hast das am")} {new Date(answeredAt).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}  {t("ausgefüllt.")} </>
+          <>  {t("Du hast das am")} {new Date(answeredAt).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}{locale === "en" ? "" : "  "}{t("ausgefüllt.")} </>
         )}
       </p>
       <p className="mt-2 text-sm text-slate-500">

@@ -408,7 +408,7 @@ export function Questionnaire({
              {t("Wenn du hier etwas einträgst, kommen")} {" "}
             {wartendeAnschlussfragen(item.itemId) === 1
               ? t("eine Anschlussfrage")
-              : `${wartendeAnschlussfragen(item.itemId)} ${locale === "en" ? "follow-up questions" : "Anschlussfragen"}`}{" "}
+              : `${wartendeAnschlussfragen(item.itemId)} ${locale === "en" ? "follow-up questions" : "Anschlussfragen"}`}{locale === "en" ? "" : " "}
              {t("dazu. Ohne Eintrag gibt es dazu nichts zu fragen.")} </p>
         )}
 

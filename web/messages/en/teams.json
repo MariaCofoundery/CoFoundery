@@ -59,7 +59,7 @@
       "resend": "Resend",
       "revoke": "Revoke advisor access",
       "confirmRevoke": "Revoke access now",
-      "revokeDescription": "The advisor loses access to the shared areas of this connection. Separate team grants such as Founder Setup also become ineffective while this advisor access is revoked.",
+      "revokeDescription": "The advisor loses access to the shared areas of this connection. Separate team grants such as Founder Setup also stop applying while this advisor access is revoked.",
       "ownApprovalSaved": "Your approval is saved.",
       "otherFounder": "the other founder",
       "founderA": "Founder A",
@@ -83,7 +83,7 @@
       }
     },
     "groups": {
-      "whereToStart": "You have only just come together. An easy start is Read My Mind here under “Go deeper”: a few minutes, and you see where you read each other right – and where you did not.",
+      "whereToStart": "You've only just come together. An easy way to start is Read My Mind under “Go deeper”: in a few minutes, you'll see where you read each other right – and where you didn't.",
       "understand": {
         "title": "Understand",
         "text": "How you work, what you want from this venture and what each of you brings – as a basis for your conversations."
@@ -101,7 +101,7 @@
       }
     },
     "header": {
-      "advisors": "Accompanied by {names}"
+      "advisors": "Supported by {names}"
     },
     "journey": {
       "label": "Where your areas stand",
@@ -204,7 +204,7 @@
     "meaning": {
       "title": "What does commitment mean to you?",
       "core": "What does “I am in” mean to you when motivation, time, or external circumstances change?",
-      "aspectsHelp": "The following aspects structure your reflection. They are not a psychometric scale and are not scored.",
+      "aspectsHelp": "These aspects give your reflection some structure. They are not a psychometric scale and are not scored.",
       "priority": "What place does the startup have alongside your other commitments when several things matter at the same time?",
       "reliability": "What does your commitment mean during periods when motivation or progress is much lower than you hoped?",
       "transparency": "When should your co-founder learn that you will probably no longer be able to keep your previous commitment?",
@@ -295,14 +295,14 @@
     },
     "handoff": {
       "title": "Continue in Founder Setup",
-      "help": "Would you like to record something for your collaboration? Deliberately choose the appropriate Founder Setup item.",
+      "help": "Want to record something from this for how you work together? Choose the matching Founder Setup topic yourself.",
       "choose": "Choose a Founder Setup topic",
       "time": "Time & commitment",
       "changing": "When commitment changes",
       "copy": "Copy as working note",
       "open": "Open Founder Setup",
       "existing": "This topic already has a shared working note. It will not be overwritten.",
-      "three": "This reflection comes from a pairwise founder relationship. Continue it with the whole team in Founder Setup; it will not be copied automatically."
+      "three": "This reflection comes from a two-person founder connection. Continue it with the whole team in Founder Setup; it won't be copied automatically."
     },
     "feedback": {
       "personal-saved": "Your personal perspective was saved.",
@@ -321,7 +321,7 @@
     "eyebrow": "Connections",
     "title": "Connections & teams",
     "subtitle": "Find the founders you are exploring a collaboration with or already working with.",
-    "find": "Find a Co-Founder",
+    "find": "Find a co-founder",
     "avatarAlt": "Profile for {name}",
     "founderFallback": "Founder {index}",
     "founderUnknown": "Founder",
@@ -346,7 +346,7 @@
     },
     "states": {
       "request_pending": {
-        "incoming": "Your response is open",
+        "incoming": "Waiting for your response",
         "sent": "Request sent"
       },
       "intro_accepted": {
@@ -384,7 +384,7 @@
       "share": "Propose access",
       "approve": "Approve",
       "revoke": "End access",
-      "requestedByAdvisor": "{name} asked for this access. Everyone in the team decides for themselves – access only starts once all have agreed."
+      "requestedByAdvisor": "{name} asked for this access. Each person on the team decides for themselves – access starts only once everyone has agreed."
     },
     "advisorView": {
       "title": "Founder Setup",
@@ -399,7 +399,7 @@
       },
       "accessDescriptions": {
         "not_granted": "There is no separate Founder Setup sharing grant for this founder connection.",
-        "pending": "Not all current founders have approved confirmed-only sharing. Content remains hidden.",
+        "pending": "Not all current founders have approved sharing of confirmed content. Content remains hidden.",
         "active": "Only jointly confirmed Founder Setup content is visible.",
         "paused": "Sharing is not fully effective right now, for example after a team membership change. Content remains hidden.",
         "revoked": "The separate Founder Setup grant has ended. Content remains hidden."
@@ -458,7 +458,7 @@
       "yourConfirmationPending": "Your confirmation is still open.",
       "noNote": "No additional wording was provided.",
       "noteTitle": "What you are working on",
-      "noteHelp": "Collect here what you want to put down. As long as it's a note it doesn't count as your shared position – you can change it any time.",
+      "noteHelp": "Collect what you want to record here. As long as it's a note, it doesn't count as your shared position – you can change it any time.",
       "note": "Note",
       "proposeToggle": "Turn this into a shared position"
     },
@@ -489,12 +489,12 @@
       "communication": {
         "title": "Communication & collaboration",
         "question": "How do you want to share information, coordinate, give feedback and be reachable day to day?",
-        "orientation": "Most teams need exactly two things: a fixed weekly slot that doesn't get cancelled, and an agreement about availability – when you have to answer and when you don't. The rest sorts itself out. Without the first, topics get dragged along; without the second, it starts to feel like you're never off."
+        "orientation": "Most teams need exactly two things: a fixed weekly slot that doesn't get cancelled, and an agreement about availability – when you have to answer and when you don't. The rest sorts itself out. Without the first, topics drag on; without the second, it starts to feel like you're never off."
       },
       "conflict_deadlock": {
         "title": "Conflict & deadlock",
         "question": "What do you do when you can't agree – and when do you bring someone in?",
-        "orientation": "Settle this while you still get on well. A common escalation: first a conversation with a deadline, then a third person who moderates (not decides). Whoever gets named should have been asked beforehand. Agreeing on something in the middle of a crisis doesn't work."
+        "orientation": "Settle this while you still get along well. A common escalation: first a conversation with a deadline, then a third person who moderates (not decides). Ask whoever you name beforehand. Agreeing on something in the middle of a crisis doesn't work."
       },
       "equity": {
         "title": "Equity",
@@ -504,7 +504,7 @@
       "vesting": {
         "title": "Vesting",
         "question": "What happens to the shares if someone leaves early?",
-        "orientation": "Most common: four years, one-year cliff. Whoever leaves before the first year is out keeps nothing; after that the share grows monthly. What matters isn't the exact number but that something applies at all before anyone leaves. Without vesting, a person who leaves after four months keeps their full stake – and sits at the table at every later financing round."
+        "orientation": "Most common: four years, one-year cliff. Whoever leaves before the first year is up keeps nothing; after that the share grows monthly. What matters isn't the exact number but that something applies at all before anyone leaves. Without vesting, a person who leaves after four months keeps their full stake – and sits at the table at every later financing round."
       },
       "compensation": {
         "title": "Salary & compensation",
@@ -524,7 +524,7 @@
       "legal_entity": {
         "title": "Legal form",
         "question": "In what form are you incorporating – and when?",
-        "orientation": "In Germany the GmbH and UG are the norm, the UG mainly for its lower share capital. A GbR, by contrast, comes into being by itself as soon as you start working together – with personal liability for both of you. That's the most common unnoticed state: many teams have long been a GbR without knowing it. The choice belongs in a conversation with a tax adviser, and the timing is often earlier than expected."
+        "orientation": "In Germany the GmbH and UG are the norm, the UG mainly for its lower share capital. A GbR, by contrast, comes into being by itself as soon as you start working together – with personal liability for both of you. That's the most common unnoticed state: many teams have long been a GbR without knowing it. The choice belongs in a conversation with a tax advisor, and the timing is often earlier than expected."
       },
       "founder_agreements": {
         "title": "Founder agreements",
@@ -569,7 +569,7 @@
       "post_exit_competition": {
         "title": "Competition after leaving",
         "question": "What may someone do who is no longer part of it?",
-        "orientation": "This is what disputes live on. The usual instrument is a non-compete limited in time and scope – often one to two years, tied to the specific field. Clauses drawn too widely are frequently unenforceable in Germany and trigger compensation; this belongs in a lawyer's wording. Talk about what you want to grant each other beforehand all the same."
+        "orientation": "This is where disputes tend to arise. The usual instrument is a non-compete limited in time and scope – often one to two years, tied to the specific field. Clauses drawn too widely are frequently unenforceable in Germany and trigger compensation; this belongs in a lawyer's wording. Even so, talk beforehand about what you want to allow each other."
       }
     },
     "formerMember": "Former member",
@@ -601,7 +601,7 @@
       "reference": "Filed under: {reference}",
       "openTitle": "Still open",
       "nothingYet": "You haven't confirmed a shared state yet. Once you close the first topic, your document starts here.",
-      "disclaimer": "This document records what you have agreed on. It is no substitute for legal or tax advice and is not articles of association.",
+      "disclaimer": "This document records what you have agreed on. It is no substitute for legal or tax advice and is not a set of articles of association.",
       "print": "Print or save as PDF",
       "open": "View the document",
       "openHelp": "Everything the two of you confirmed – to print or take with you."
@@ -627,7 +627,7 @@
     "legendOutcomes": "How a topic ends is shown by the last marker – clarified, additionally documented, or not relevant for you.",
     "conversationPoints": {
       "title": "You wanted to talk about this",
-      "text": "Marked in Founder in the Wild or Read My Mind. Expand it here instead of going over – the half-typed sentence stays put.",
+      "text": "Marked in Founder in the Wild or Read My Mind. Expand it here instead of switching over – your half-typed sentence stays put.",
       "partnerFallback": "your co-founder",
       "markedByMe": "Marked by you",
       "markedByPartner": "{name} would like to talk about this",
@@ -658,12 +658,12 @@
   },
   "teamShare": {
     "title": "Share with this team",
-    "body": "So you can use your joint report, the members of this team see how you work and what you said about capabilities and responsibility. This also applies to people who join this team later. Research answers, FIND and advisor access are not affected.",
+    "body": "So your team can use your joint report, the members of this team see how you work and what you said about skills and responsibility. This also applies to people who join this team later. Research answers, FIND and advisor access are not affected.",
     "action": "Share with this team",
     "activeTitle": "Shared with this team",
-    "activeBody": "The members of this team – including people who join later – see how you work and what you said about capabilities and responsibility until you withdraw the share. Research answers, FIND and advisor access are not affected.",
+    "activeBody": "The members of this team – including people who join later – see how you work and what you said about skills and responsibility until you withdraw the share. Research answers, FIND and advisor access are not affected.",
     "ventureNote": "Members see your venture answers as soon as you submit them – no separate share needed.",
-    "legacy": "So far you shared how you work with each member individually. The team share also covers capabilities and responsibility and people who join later.",
+    "legacy": "So far you shared how you work with each member individually. The team share also covers skills and responsibility and people who join later.",
     "revoke": "Withdraw share",
     "revokeExplain": "If you withdraw the share, your current team report is unavailable for everyone until you share again. What others have already seen cannot be taken back.",
     "revokeConfirm": "Yes, withdraw share",

@@ -3,12 +3,12 @@
     "backToDashboard": "Back to dashboard",
     "draftNotice": "Test version. This questionnaire is not evaluated yet.",
     "progress": "{answered} of {total} answered",
-    "saving": "Saving …",
+    "saving": "Saving…",
     "saved": "Saved",
     "submit": "Submit questionnaire",
-    "submitting": "Submitting …",
-    "incomplete": "You do not have to commit to anything: for every question you can also state that it is still open or that you would rather not answer it. {count} answers are still missing.",
-    "submitted": "Submitted. Nothing here can be changed from now on.",
+    "submitting": "Submitting…",
+    "incomplete": "You don’t have to commit to anything: for every question, you can also say that it’s still open or that you’d rather not answer. {count} answers are still missing.",
+    "submitted": "Submitted. These answers can no longer be changed.",
     "navBase": "Questionnaire",
     "navCommitments": "Commitments",
     "navValues": "Priorities",
@@ -20,25 +20,25 @@
     "title": "How you want to work",
     "step1": {
       "title": "Part one",
-      "intro": "This is about how you want to work, what you want to achieve and which rules you would like — not about who you are.",
+      "intro": "This is about how you want to work, what you want to achieve, and which rules you’d like — not about who you are.",
       "note": "There are no better or worse answers and no score at the end. The questionnaire saves as you go; you can stop anytime and continue later."
     },
     "step2": {
       "title": "Part two: the commitments",
-      "intro": "Now it is about hours, money and dates. These are commitments, not self-description — which is why they come later.",
+      "intro": "Now it’s about hours, money, and dates. These are commitments, not a self-description, which is why they come later.",
       "note": "Everything here describes where you stand today. It is not an obligation, and you can change it later."
     }
   },
   "values": {
     "title": "Priorities and limits",
-    "intro": "Short situations in which two reasonable concerns collide. You say separately how important each one is to you — both may be very important.",
-    "note": "There is no right choice and no evaluation of your values. The point is to know what you should talk about.",
+    "intro": "Short situations in which two reasonable concerns conflict. You rate how important each one is to you separately — both can be very important.",
+    "note": "There is no right choice and no evaluation of your values. The point is to see what’s worth talking about.",
     "concerns": "How important is each of these two concerns to you?",
-    "pathQuestion": "Which way would you choose first under these conditions?"
+    "pathQuestion": "Which approach would you choose first under these conditions?"
   },
   "missing": {
     "heading": "Or:",
-    "hint": "This counts as an answer. It is not a skip."
+    "hint": "This counts as an answer, not a skip."
   },
   "fields": {
     "otherText": "Please describe",
@@ -60,32 +60,32 @@
   "sourceLanguage": "The questions themselves are shown in German. Translating a measurement instrument is not a translation task but a re-validation: an item that reads differently measures something else, and none of the equivalence work has been done. An English version comes after the cognitive interviews, not before.",
   "discussion": {
     "mark": "I want to talk about this",
-    "markHint": "It then goes to the top of your conversation agenda — even if you both answered the same.",
+    "markHint": "It then moves to the top of your shared discussion list, even if you both gave the same answer.",
     "changeCondition": "What would change your answer? (optional)"
   },
   "report": {
     "title": "Your answers",
-    "intro": "This is not an assessment of you. It prepares the conversation that still lies ahead.",
+    "intro": "This is not an assessment of you. It helps you prepare for the conversation ahead.",
     "openTitle": "What is still open",
-    "openIntro": "This is the most useful part: exactly here is where you would talk.",
+    "openIntro": "This is the most useful part: this is where your conversation starts.",
     "limitsTitle": "What these answers cannot do",
     "marked": "You marked this for discussion.",
     "instrument": "Version: {instrument}",
     "emptyTitle": "Nothing here yet.",
     "emptyIntro": "Once you have filled in the questionnaire, your answers appear here — sorted and without any rating.",
     "emptyAction": "Go to the questionnaire",
-    "orphans": "For {count, plural, =1 {one question} other {# questions}} there is an answer below that refers to a limit you have since removed. It is not deleted — you can leave it as it is or overwrite it in the questionnaire.",
+    "orphans": "For {count, plural, =1 {one question} other {# questions}} there is an answer below that refers to a boundary you have since removed. It is not deleted — you can leave it as it is or overwrite it in the questionnaire.",
     "openBadge": "open",
-    "unreadable": "This answer cannot be read. That is a fault on our side — it is saved and not lost.",
+    "unreadable": "This answer can’t be displayed. That’s a problem on our side — it’s saved and not lost.",
     "priority": "Priority: {value}",
-    "path": "Path: {value}",
+    "path": "Approach: {value}",
     "noExpectation": "no fixed expectation"
   },
   "maps": {
     "workTitle": "At a glance",
-    "workIntro": "Your answers side by side — one dot per answer, at the position you chose, with no section value. This is the same as below, only more compact. Questions without an order appear below only.",
+    "workIntro": "Your answers at a glance — one dot per answer, at the position you chose, with no combined value per section. It’s the same as below, just more compact. Questions without an ordered scale appear only below.",
     "differenceTitle": "Where you differ",
-    "differenceIntro": "Only the questions you both answered and that have an order. A wide gap does not mean something is wrong — it means you have not talked about it yet.",
+    "differenceIntro": "Only questions you both answered that use an ordered scale. A wide gap doesn’t mean something is wrong — it means you haven’t talked about it yet.",
     "directionTitle": "Where this should go",
     "directionIntro": "Six goals side by side, each with the weight you gave it. They are not added up — none comes at the cost of another, and there is no total.",
     "directionFirst": "first",
@@ -94,15 +94,15 @@
   "advisor": {
     "newVersionTitle": "Answers from an earlier version of the questionnaire",
     "selfReportNote": "Self-report, not a test result.",
-    "visible": "You see {count} of {of} questions. What is missing may be withheld or unanswered — from here the two cannot be told apart."
+    "visible": "You can see {count} of {of} questions. Missing ones may be withheld or unanswered — from here, you can’t tell which."
   },
   "compare": {
     "title": "The two of you",
     "intro": "Side by side, not calculated against each other. There is no fit score and no rating here.",
-    "cardsTitle": "What you should talk about",
+    "cardsTitle": "What to talk about",
     "cardsIntro": "At most four topics per conversation. Everything else is below for reference.",
     "nothingYet": "Nothing to discuss yet — or answers are still missing.",
-    "agreementTitle": "An agreement consists of",
+    "agreementTitle": "An agreement covers",
     "agreementHint": "You set the amounts and deadlines, not the questionnaire.",
     "allTitle": "All answers",
     "question": "Question",
@@ -116,23 +116,23 @@
     "intro": "The questionnaire has been reworked: better questions, separate reasons for leaving something out, and no score at the end. You decide what happens to your existing answers.",
     "reversible": "You can change this later. Your old answers are kept either way.",
     "keep_previous": {
-      "title": "I keep my report",
+      "title": "I’ll keep my report",
       "action": "Keep the old report"
     },
     "retake": {
-      "title": "I will answer again",
+      "title": "I’ll answer again",
       "action": "Start the new questionnaire"
     },
     "confirmed": {
       "keep_previous": "Your existing report stays valid. You can answer again at any time.",
-      "retake": "Done — your old answers are kept, and the new questionnaire is waiting."
+      "retake": "Done — your old answers are kept, and the new questionnaire is ready."
     }
   },
   "discovery": {
     "title": "What matters to you in the search",
-    "intro": "You state a wish per topic. This does not produce a fit score — it produces an order that you set yourself.",
+    "intro": "For each topic, you say what you’re looking for. This doesn’t produce a fit score — just an order you set yourself.",
     "orderTitle": "Your order",
-    "orderIntro": "Your first topic is looked at first. The second only breaks a tie. Someone who does not fit your most important topic is not lifted by matches further down.",
+    "orderIntro": "Your first topic is considered first. The second only breaks ties. Matches further down don’t move someone up if they don’t fit your most important topic.",
     "nothingChosen": "No topic chosen yet. Pick what matters to you below.",
     "topicsTitle": "All topics",
     "ruleLabel": "Counts as similar",
@@ -154,10 +154,10 @@
     }
   },
   "synthesis": {
-    "title": "What shows in your answers",
-    "intro": "Put together from the answers you gave — question by question. Where your answers within a theme pull apart, that is what it says.",
-    "tooFew": "There are not enough answers here yet for a connected description.",
-    "note": "The descriptions summarise your answers; they are not a diagnosis, not a comparison against a norm and not a score.",
+    "title": "What your answers show",
+    "intro": "Built from the answers you gave, question by question. Where your answers within a theme point in different directions, the description says so.",
+    "tooFew": "There aren’t enough answers here yet for a coherent description.",
+    "note": "The descriptions summarize your answers. They are not a diagnosis, not a comparison against a norm, and not a score.",
     "shortLabels": {
       "A01": "comparing the options",
       "A02": "testing an assumption",
@@ -166,13 +166,13 @@
       "I03": "gut feeling against the numbers",
       "E01": "testing instead of researching further",
       "E02": "trying two paths in parallel",
-      "E03": "settling provisionally when reversible",
-      "T01": "when an objection comes",
+      "E03": "provisional direction when reversible",
+      "T01": "when you raise a concern",
       "T02": "concerns without a clear reason",
-      "D01": "how disagreement sounds",
-      "D02": "saying you do not agree",
-      "X01": "several explanations open",
-      "X02": "direction open for longer",
+      "D01": "how you phrase disagreement",
+      "D02": "saying you disagree",
+      "X01": "several possible explanations",
+      "X02": "direction open for weeks",
       "X03": "conflicting feedback",
       "X04": "an important question unanswered"
     },
@@ -181,18 +181,18 @@
         "title": "Weighing decisions",
         "low": "Before you commit, you rarely compare systematically and rarely check an assumption on purpose.",
         "middle": "Comparing and checking are part of how you decide — but not with every decision.",
-        "high": "Before you commit, you compare the options and check what speaks for your assumptions."
+        "high": "Before you commit, you compare the options and check what supports your assumptions."
       },
       "experience": {
-        "title": "Experience & gut feeling",
+        "title": "Experience and intuition",
         "low": "You do not automatically treat your first impression or your gut feeling as a basis for deciding.",
-        "middle": "Experience and gut feeling count for you without being decisive.",
+        "middle": "Experience and gut feeling matter to you, but they don’t decide things on their own.",
         "high": "You give your experience and your gut feeling clear weight when you decide."
       },
       "trying": {
-        "title": "Trying things & learning",
-        "low": "Trying something out before thinking it through further is not really your way.",
-        "middle": "Trying things out happens with you, but it is not the first move.",
+        "title": "Trying things out and learning",
+        "low": "You don’t usually try something out before thinking it through further.",
+        "middle": "You do try things out, but it’s usually not your first move.",
         "high": "Where something can be tried out, you tend to do that rather than think further."
       },
       "differences": {
@@ -202,7 +202,7 @@
         "title": "Living with open questions",
         "low": "When something stays open, you tend to find that uncomfortable.",
         "middle": "You can live with open situations without being comfortable in them.",
-        "high": "You get on well with situations that stay open."
+        "high": "You’re comfortable with situations that stay open."
       }
     },
     "items": {
@@ -227,39 +227,39 @@
         "high": "When several options look about equally good, experience tends to decide it for you."
       },
       "I03": {
-        "low": "When the numbers favour one option and your gut says otherwise, you tend to follow the numbers.",
-        "middle": "When the numbers favour one option and your gut says otherwise, you take the feeling partly as a signal.",
-        "high": "When numbers and gut feeling pull against each other, you clearly take the feeling as an extra signal."
+        "low": "When the numbers favor one option and your gut says otherwise, you tend to follow the numbers.",
+        "middle": "When the numbers favor one option and your gut says otherwise, you partly treat the feeling as a signal.",
+        "high": "When the numbers and your gut feeling pull in different directions, you clearly treat the feeling as an additional signal."
       },
       "E01": {
         "low": "Before testing, you tend to research further.",
-        "middle": "Whether you test first or research further depends on the situation for you.",
+        "middle": "Whether you test first or keep researching depends on the situation.",
         "high": "You like small tests when they bring new information faster than more research would."
       },
       "E02": {
-        "low": "Trying two paths in parallel on a small scale is not really your way.",
-        "middle": "Trying two paths in parallel does happen with you.",
+        "low": "You don’t usually try two paths in parallel on a small scale.",
+        "middle": "You sometimes try two paths in parallel.",
         "high": "When two paths both look sensible, you tend to try both on a small scale rather than commit at once."
       },
       "E03": {
         "low": "Even with easily reversible decisions, you tend not to settle on a provisional direction.",
         "middle": "With easily reversible decisions, you sometimes settle on a provisional direction.",
-        "high": "When a decision is easy to reverse, you tend to set a provisional direction already."
+        "high": "When a decision is easy to reverse, you tend to set a provisional direction early."
       },
       "D02": {
         "low": "You tend not to say outright that you do not agree with a proposal.",
-        "middle": "Whether you say outright that you do not agree depends on the situation for you.",
+        "middle": "Whether you say outright that you disagree depends on the situation.",
         "high": "When a proposal does not seem sound to you, you tend to say outright that you do not agree."
       },
       "X01": {
         "low": "Several plausible explanations for one result tend to make you uncomfortable.",
         "middle": "You can live with several plausible explanations side by side.",
-        "high": "Several plausible explanations for one result are something you are comfortable with."
+        "high": "You’re comfortable with several plausible explanations for one result."
       },
       "X02": {
         "low": "Weeks of uncertainty about which direction the venture takes tend to make you uncomfortable.",
         "middle": "You can live with a direction that stays open for weeks.",
-        "high": "Weeks of uncertainty about which direction the venture takes are something you get on with."
+        "high": "You’re comfortable with weeks of uncertainty about which direction the venture takes."
       },
       "X03": {
         "low": "Conflicting feedback on the same idea tends to make you uncomfortable.",
@@ -269,27 +269,27 @@
       "X04": {
         "low": "An important question staying unanswered for a while tends to make you uncomfortable.",
         "middle": "You can live with an important question staying unanswered for a while.",
-        "high": "An important question staying unanswered for a while is something you are comfortable with."
+        "high": "You’re comfortable with an important question staying unanswered for a while."
       }
     },
     "choices": {
       "T01": {
-        "0": "You raise an objection to an important decision while the conversation is still going.",
-        "1": "You raise an objection after the conversation, but on the same working day.",
-        "2": "You raise an objection the next working day.",
-        "3": "You raise an objection once more than a working day has passed.",
-        "4": "When you raise an objection depends on the situation for you."
+        "0": "You raise a concern about an important decision while the conversation is still going on.",
+        "1": "You raise a concern after the conversation, but on the same workday.",
+        "2": "You raise a concern on the next workday.",
+        "3": "You raise a concern after more than one workday has passed.",
+        "4": "When you raise a concern depends on the situation."
       },
       "T02": {
-        "0": "Concerns you cannot name precisely yet, you raise directly and say that they are still unclear.",
-        "1": "Concerns you cannot name precisely yet, you mention briefly and come back to in more detail later.",
-        "2": "Concerns you cannot name precisely yet, you sort out for yourself first and then raise.",
+        "0": "You raise concerns you can’t pin down yet right away, and say that they’re still unclear.",
+        "1": "You briefly mention concerns you can’t pin down yet and come back to them in more detail later.",
+        "2": "You first sort out concerns you can’t pin down yet for yourself, then raise them.",
         "3": "You raise concerns once you can name them fairly precisely.",
-        "4": "How you handle concerns that are still unclear depends on the situation for you."
+        "4": "How you handle concerns that are still unclear depends on the situation."
       },
       "D01": {
-        "0": "When you disagree, you are most likely to say so directly: „I see that differently, because …“",
-        "1": "When you disagree, you are most likely to name your concerns: „I still have reservations on that point …“",
+        "0": "When you disagree, you’re most likely to say so directly: “I see it differently because…”",
+        "1": "When you disagree, you’re most likely to name your concerns: “I still have concerns about this…”",
         "2": "When you disagree, you are most likely to ask how the proposal would deal with your objection.",
         "3": "When you disagree, you are most likely to bring another option into play.",
         "4": "None of the offered wordings fits how you disagree."

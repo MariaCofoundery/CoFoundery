@@ -1,7 +1,7 @@
 {
   "items": {
     "ORG-01": {
-      "prompt": "When starting a larger venture, how likely are you to clarify specific next steps before getting properly underway?"
+      "prompt": "When starting a larger project, how likely are you to clarify specific next steps before you really get going?"
     },
     "EXP-01": {
       "prompt": "A situation immediately feels familiar. You cannot yet say exactly why, but you recognize a pattern from the past. How seriously do you take this impression?"
@@ -100,13 +100,13 @@
       "prompt": "You need to keep working on something even though an important question remains open. How uncomfortable does this feel?"
     },
     "ORG-02": {
-      "prompt": "A task runs over several weeks, and nobody sets interim deadlines for you. How likely are you to set your own points for reviewing progress?"
+      "prompt": "A task runs over several weeks, and nobody sets interim deadlines for you. How likely are you to set your own checkpoints to see where you stand?"
     },
     "EVI-03": {
       "prompt": "You have made a decision. The next day, new information clearly points against it. How likely are you to seriously reconsider your decision?"
     },
     "EL-04": {
-      "prompt": "You are unsure how others would respond to an idea, offer, or approach. With manageable effort, you could show or let them try a simple version. How likely are you to do this early?"
+      "prompt": "You are unsure how others would respond to an idea, offer, or approach. With manageable effort, you could show them a simple version or let them try it. How likely are you to do this early?"
     },
     "ORG-05": {
       "prompt": "Over an extended period, more work comes in than you can realistically handle. Which describes you better?",
@@ -246,9 +246,9 @@
   "response_formats": {
     "likelihood": [
       "Very unlikely",
-      "Rather unlikely",
+      "Somewhat unlikely",
       "Sometimes yes, sometimes no",
-      "Rather likely",
+      "Somewhat likely",
       "Very likely"
     ],
     "influence": [

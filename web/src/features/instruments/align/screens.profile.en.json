@@ -33,8 +33,8 @@
       "groupPrompt": null
     },
     {
-      "title": "Making concerns visible",
-      "transition": "Not every disagreement needs a full discussion straight away. We are interested in when you make it visible.",
+      "title": "Raising concerns",
+      "transition": "Not every disagreement needs a full discussion straight away. What matters here is when you first raise it.",
       "subline": null,
       "groupPrompt": null
     },
@@ -61,7 +61,7 @@
     "title": "All done.",
     "text": "Take another look at your responses. When everything reflects your situation, you can finish this part.",
     "cta": "Create founder profile",
-    "ctaBusy": "Creating profile …",
+    "ctaBusy": "Creating profile…",
     "subline": "Submitting completes this round."
   }
 }

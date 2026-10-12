@@ -24,7 +24,12 @@ export function alignmentDisplayText(value: string, locale: AppLocale) {
   }
   return value;
 }
-function optionText(prompt: string, label: string, locale: AppLocale) {
+/**
+ * Prompt-aware option label. Every place that shows an answer option (readouts,
+ * maps, discussion prompts) goes through this, so the same answer reads the
+ * same everywhere. Display only: stored values and comparisons stay German.
+ */
+export function alignmentOptionText(prompt: string, label: string, locale: AppLocale) {
   return locale === "en"
     ? (contextualOptions as Record<string, Record<string, string>>)[prompt]?.[label] ?? alignmentDisplayText(label, locale)
     : label;
@@ -34,7 +39,7 @@ export function alignmentDisplayItem<T extends DisplayItem>(item: T, locale: App
   const text = (value: string) => alignmentDisplayText(value, locale);
   return { ...item, prompt: text(item.prompt), section: text(item.section),
     ...(item.hint ? { hint: text(item.hint) } : {}), ...(item.unit ? { unit: text(item.unit) } : {}),
-    options: item.options.map(o => ({ ...o, label: optionText(item.prompt, o.label, locale) })),
+    options: item.options.map(o => ({ ...o, label: alignmentOptionText(item.prompt, o.label, locale) })),
     ...(item.missing ? { missing: item.missing.map(m => ({ ...m, label: text(m.label) })) } : {}),
     ...(item.concerns ? { concerns: item.concerns.map(text) } : {}),
     ...(item.paths ? { paths: item.paths.map(text) } : {}),
@@ -43,7 +48,7 @@ export function alignmentDisplayItem<T extends DisplayItem>(item: T, locale: App
 }
 export function alignmentDisplayEntry(entry: ReadoutEntry, locale: AppLocale): ReadoutEntry {
   if (locale !== "en") return entry;
-  const label = (s: string) => optionText(entry.prompt, s, locale);
+  const label = (s: string) => alignmentOptionText(entry.prompt, s, locale);
   const text = (s: string) => alignmentDisplayText(s, locale);
   const v = entry.value;
   let value: ReadoutValue | null = v;
@@ -67,7 +72,7 @@ export function alignmentQuestionView(item: import("@/features/instruments/v21/q
   const optional = (s: string | null | undefined) => s == null ? s : text(s);
   return { ...item, prompt: text(item.prompt), hint: optional(item.hint) ?? null,
     groupPrompt: optional(item.groupPrompt), conditionHint: optional(item.conditionHint),
-    options: item.options.map(o => ({ ...o, label: optionText(item.prompt, o.label, locale) })),
+    options: item.options.map(o => ({ ...o, label: alignmentOptionText(item.prompt, o.label, locale) })),
     offeredMissing: item.offeredMissing.map(m => ({ ...m, label: text(m.label) })),
     concerns: item.concerns?.map(text) ?? null, paths: item.paths?.map(text) ?? null,
     ratingOptions: item.ratingOptions?.map(text) ?? null, ratingMissing: optional(item.ratingMissing) ?? null,

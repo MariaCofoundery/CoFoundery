@@ -1,9 +1,24 @@
 "use client";
 
 import { type EmailOtpType } from "@supabase/supabase-js";
+import { useLocale } from "next-intl";
 import { useEffect, useMemo } from "react";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { createClient } from "@/lib/supabase/client";
+
+// Nur die Anzeige folgt der Sprache; Token-Verarbeitung und Weiterleitung bleiben unberuehrt.
+const CALLBACK_COPY = {
+  de: {
+    eyebrow: "Authentifizierung",
+    title: "Anmeldung wird abgeschlossen",
+    text: "Einen Moment bitte. Deine Session wird aufgebaut und du wirst direkt weitergeleitet.",
+  },
+  en: {
+    eyebrow: "Signing in",
+    title: "Finishing sign-in",
+    text: "One moment. We’re setting up your session and will take you there right away.",
+  },
+} as const;
 
 const AUTH_CALLBACK_SESSION_STORAGE_KEY = "cofoundery.auth.callback.tokens";
 
@@ -164,17 +179,19 @@ export default function AuthCallbackClientPage() {
     };
   }, [supabase]);
 
+  const copy = CALLBACK_COPY[useLocale() === "en" ? "en" : "de"];
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-xl px-5 py-14 md:px-8">
       <section className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-[0_20px_40px_rgba(16,26,42,0.1)] md:p-8">
         <p className="text-xs tracking-[0.14em] text-[color:var(--ink-soft)]">
-          Authentifizierung
+          {copy.eyebrow}
         </p>
         <h1 className="mt-2 text-3xl font-semibold text-[color:var(--ink)]">
-          Anmeldung wird abgeschlossen
+          {copy.title}
         </h1>
         <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-          Einen Moment bitte. Deine Session wird aufgebaut und du wirst direkt weitergeleitet.
+          {copy.text}
         </p>
       </section>
     </main>

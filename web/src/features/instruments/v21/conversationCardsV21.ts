@@ -1,6 +1,6 @@
 import englishCards from "../align/cardsLegacy.en.json";
 import type { AppLocale } from "@/i18n/config";
-import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { alignmentDisplayText, alignmentOptionText } from "@/features/instruments/align/display";
 import libraryJson from "../../../../docs/founder-alignment-conversation-v2-1.json";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 import type { ReadoutValue } from "@/features/instruments/v21/readoutV21";
@@ -183,9 +183,9 @@ function fill(text: string, item: ItemComparison, nameA: string, nameB: string, 
     switch (value.kind) {
       case "ordinal":
       case "choice":
-        return alignmentDisplayText(value.label, locale);
+        return alignmentOptionText(item.prompt, value.label, locale);
       case "choices":
-        return value.labels.map(v => alignmentDisplayText(v, locale)).join(", ");
+        return value.labels.map(v => alignmentOptionText(item.prompt, v, locale)).join(", ");
       case "case":
         return alignmentDisplayText(value.path, locale);
       case "number":
@@ -213,9 +213,9 @@ function fill(text: string, item: ItemComparison, nameA: string, nameB: string, 
     b: nameB,
     aAnswer: short(item.a?.value),
     bAnswer: short(item.b?.value),
-    shared: mine.filter((label) => theirs.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
-    aOnly: mine.filter((label) => !theirs.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
-    bOnly: theirs.filter((label) => !mine.includes(label)).map(label => alignmentDisplayText(label, locale)).join(", ") || null,
+    shared: mine.filter((label) => theirs.includes(label)).map(label => alignmentOptionText(item.prompt, label, locale)).join(", ") || null,
+    aOnly: mine.filter((label) => !theirs.includes(label)).map(label => alignmentOptionText(item.prompt, label, locale)).join(", ") || null,
+    bOnly: theirs.filter((label) => !mine.includes(label)).map(label => alignmentOptionText(item.prompt, label, locale)).join(", ") || null,
   };
 
   return text
