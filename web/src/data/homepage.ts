@@ -1,0 +1,88 @@
+// Kept separate from the independently reviewed domain/rebrand pass.
+const de = {
+  skip: "Zum Inhalt", menu: "Menü", close: "Menü schließen", navigation: "Hauptnavigation",
+  login: "Einloggen", try: "Made2Found ausprobieren", start: "Zur Beta", how: "So funktioniert’s",
+  beta: "Im Aufbau. Für Menschen, die etwas bewegen wollen.",
+  headline: ["Die richtigen Menschen.", "Das richtige Know‑how."],
+  possibility: "Und vielleicht genau das Problem, das ihr gemeinsam lösen wollt.",
+  intro: "Made2Found bringt Menschen, Fähigkeiten und Vorhaben zusammen. Finde mögliche Co-Founder, entdecke relevante Kontakte und schafft eine bessere Grundlage für Zusammenarbeit.",
+  access: "Geschlossene Beta · Zugang mit Einladung oder Beta-Code",
+  board: ["Was du mitbringst", "Was euch verbindet", "Was daraus werden kann"],
+  tags: ["Neue Perspektiven", "Produkt & Design", "Eine gute Frage", "Zeit & Erfahrung", "Gemeinsam weiterdenken"],
+  connection: "Hier könnte etwas anfangen.",
+  areasEyebrow: "Drei Wege. Viele Möglichkeiten.", areasTitle: "Es beginnt mit Menschen.\nUnd geht gemeinsam weiter.",
+  areas: [
+    { id: "find", label: "FIND", lens: "WHO", question: "Wer könnte mit dir etwas aufbauen?", text: "Entdecke Menschen, die auch etwas aufbauen wollen. Finde mögliche Co-Founder, lerne ihre Interessen und Erfahrungen kennen und komm ins Gespräch.", note: "Für die Suche nach Menschen, mit denen du gründen möchtest.", words: ["Menschen", "Interessen", "Ein erster Austausch"] },
+    { id: "connect", label: "CONNECT", lens: "WHAT / WHY", question: "Wer braucht genau das, was du kannst?", text: "Verbinde Fähigkeiten, Ressourcen und Interessen mit Angeboten, Bedarfen und Vorhaben. Vielleicht bringst du Know-how mit. Vielleicht suchst du Unterstützung. Beides kann der Anfang sein.", note: "Auch für dich, wenn du nicht selbst gründen willst.", words: ["Ich bringe mit", "Du suchst", "Wir kommen weiter"] },
+    { id: "align", label: "ALIGN", lens: "HOW", question: "Wie wollt ihr miteinander arbeiten?", text: "Macht Arbeitsweisen, Erwartungen und Fähigkeiten sichtbar. Sprecht darüber, wie ihr Entscheidungen trefft, Verantwortung teilt und Zusammenarbeit gestalten wollt.", note: "Eine Grundlage für Gespräche. Keine Typologie und kein Kompatibilitätsscore.", words: ["Erwartungen", "Arbeitsweisen", "Gemeinsame Klarheit"] },
+  ],
+  stanceEyebrow: "Mehr als ein Profil", stanceTitle: "Nicht noch ein Persönlichkeitstest. Nicht noch ein Netzwerk voller Profile.",
+  stanceText: "Du bist mehr als ein Typ, ein Titel oder eine Liste von Skills. Made2Found bringt zusammen, was für gemeinsames Arbeiten zählt – und lässt Raum für das, was erst im Gespräch entsteht.",
+  lenses: ["Menschen", "Fähigkeiten", "Zusammenarbeit", "Möglichkeiten"],
+  stanceNote: "Keine Erfolgsprognose. Keine Bewertung, wer zu wem passen muss. Die Entscheidung bleibt bei euch.",
+  stepsTitle: "Vom ersten Hallo\nzum gemeinsamen Machen.",
+  steps: [
+    { title: "Zeig, was du mitbringst.", text: "Deine Erfahrungen, Fähigkeiten und Interessen. Und das, wonach du gerade suchst." },
+    { title: "Entdecke relevante Verbindungen.", text: "Lerne Menschen kennen, tausche dich aus und entdecke, wo ihr einander weiterhelfen könnt." },
+    { title: "Schafft eine gute Grundlage.", text: "Macht Erwartungen und Arbeitsweisen zum Gespräch. Findet heraus, wie ihr gemeinsam weitergehen wollt." },
+  ],
+  audienceEyebrow: "Für unterschiedliche Anfänge", audienceTitle: "Du musst noch nicht wissen,\nwohin es genau geht.",
+  audiences: [
+    { title: "Du willst etwas gründen.", text: "Mit einer Idee oder noch auf der Suche nach einer Richtung: Entdecke Menschen, mit denen du etwas aufbauen könntest." },
+    { title: "Du möchtest etwas beitragen.", text: "Mit Erfahrung, Fähigkeiten, Kontakten oder Ressourcen. Du brauchst dafür keine eigene Gründungsabsicht." },
+    { title: "Ihr seid schon ein Team.", text: "Nehmt eure Zusammenarbeit genauer in den Blick – und sprecht über das, was euch im Alltag wichtig ist." },
+  ],
+  teamTitle: "Schon gemeinsam unterwegs?", teamText: "Team Workstyle Report, Capability, Venture / Vorhaben und Founder Setup helfen euch, Arbeitsweisen, Fähigkeiten, euer Vorhaben und wichtige Vereinbarungen sichtbar zu machen.",
+  future: "Wir denken weiter: Problem- und Opportunity-Matching sowie automatische Problem-Analyse sind geplant. Diese Funktionen sind noch nicht vollständig umgesetzt und noch nicht als Beta-Angebot verfügbar.",
+  betaEyebrow: "Die nächste Verbindung könnte deine sein.", betaTitle: "Was bringst du mit?\nUnd was könnte daraus werden?", betaText: "Made2Found wächst mit den Menschen, die es nutzen. In der geschlossenen Beta kannst du die Plattform kennenlernen und mit deinem Feedback mitgestalten.",
+  code: "Du hast schon eine Einladung oder einen Beta-Code?", noCode: "Noch keinen Zugang? Auf der Anmeldeseite findest du die Möglichkeit, Beta-Zugang anzufragen.",
+  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung",
+  seoTitle: "Made2Found – Menschen, Fähigkeiten und Vorhaben verbinden",
+  seoDescription: "Entdecke mögliche Co-Founder, verbinde Know-how mit Angeboten und Bedarfen und sprecht über Zusammenarbeit. Lerne Made2Found in der geschlossenen Beta kennen.",
+};
+
+const en: typeof de = {
+  skip: "Skip to content", menu: "Menu", close: "Close menu", navigation: "Main navigation",
+  login: "Log in", try: "Try Made2Found", start: "Join the beta", how: "How it works",
+  beta: "Taking shape. For people who want to make things happen.",
+  headline: ["The right people.", "The right know‑how."],
+  possibility: "And perhaps the very problem you want to solve together.",
+  intro: "Made2Found brings people, skills and ventures together. Discover potential co-founders, make relevant connections and build a better foundation for working together.",
+  access: "Closed beta · Access with an invitation or beta code",
+  board: ["What you bring", "What connects you", "What could grow"],
+  tags: ["Fresh perspectives", "Product & design", "A good question", "Time & experience", "Thinking together"],
+  connection: "Something could start here.",
+  areasEyebrow: "Three paths. Many possibilities.", areasTitle: "It starts with people.\nAnd grows through collaboration.",
+  areas: [
+    { id: "find", label: "FIND", lens: "WHO", question: "Who could build something with you?", text: "Discover people who want to build something too. Find potential co-founders, explore their interests and experience, and start a conversation.", note: "For finding people you might start a venture with.", words: ["People", "Interests", "A first conversation"] },
+    { id: "connect", label: "CONNECT", lens: "WHAT / WHY", question: "Who needs exactly what you can offer?", text: "Connect skills, resources and interests with offers, needs and ventures. You might bring know-how. You might be looking for support. Either can be a beginning.", note: "For you, too, if you don’t want to start a company.", words: ["What I bring", "What you need", "Moving forward together"] },
+    { id: "align", label: "ALIGN", lens: "HOW", question: "How do you want to work together?", text: "Make working styles, expectations and skills visible. Talk about how you make decisions, share responsibility and shape your collaboration.", note: "A foundation for conversations. No typology or compatibility score.", words: ["Expectations", "Working styles", "Shared clarity"] },
+  ],
+  stanceEyebrow: "More than a profile", stanceTitle: "More than another personality test. More than a network full of profiles.",
+  stanceText: "You are more than a type, a title or a list of skills. Made2Found brings together what matters for collaboration – with room for what only emerges in conversation.",
+  lenses: ["People", "Skills", "Collaboration", "Possibilities"],
+  stanceNote: "No predictions of success. No verdict on who must fit together. The decision stays with you.",
+  stepsTitle: "From the first hello\nto making things happen.",
+  steps: [
+    { title: "Show what you bring.", text: "Your experience, skills and interests. And what you are looking for right now." },
+    { title: "Discover relevant connections.", text: "Get to know people, exchange ideas and explore where you can help each other." },
+    { title: "Build a good foundation.", text: "Talk about expectations and working styles. Work out how you want to move forward together." },
+  ],
+  audienceEyebrow: "For different beginnings", audienceTitle: "You don’t need to know\nexactly where you’re headed.",
+  audiences: [
+    { title: "You want to start a venture.", text: "With an idea or still looking for a direction: discover people you could build something with." },
+    { title: "You want to contribute.", text: "Through experience, skills, contacts or resources. You don’t need plans to start your own company." },
+    { title: "You are already a team.", text: "Take a closer look at how you work together – and talk about what matters in your day-to-day collaboration." },
+  ],
+  teamTitle: "Already working together?", teamText: "Team Workstyle Report, Capability, Venture and Founder Setup help you make working styles, skills, your venture and key agreements visible.",
+  future: "Looking ahead: problem and opportunity matching and automated problem analysis are planned. These features are not fully implemented yet and are not available as part of the beta offering.",
+  betaEyebrow: "The next connection could be yours.", betaTitle: "What do you bring?\nAnd what could grow from it?", betaText: "Made2Found grows with the people who use it. Explore the platform in the closed beta and help shape it with your feedback.",
+  code: "Already have an invitation or a beta code?", noCode: "No access yet? You can request beta access on the sign-up page.",
+  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach",
+  seoTitle: "Made2Found – Connecting people, skills and ventures",
+  seoDescription: "Discover potential co-founders, connect know-how with offers and needs, and talk about collaboration. Explore Made2Found in the closed beta.",
+};
+
+export function getHomepageContent(locale: string) {
+  return locale === "en" ? en : de;
+}

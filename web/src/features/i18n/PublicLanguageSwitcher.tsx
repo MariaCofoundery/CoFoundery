@@ -31,6 +31,7 @@ export function PublicLanguageSwitcher({ className = "" }: Props) {
 
   return (
     <div
+      role="group"
       className={`inline-flex items-center rounded-full border border-slate-200 bg-white/88 p-1 text-xs font-medium text-slate-600 shadow-sm backdrop-blur ${className}`}
       aria-label={t("language.switchLabel")}
     >
