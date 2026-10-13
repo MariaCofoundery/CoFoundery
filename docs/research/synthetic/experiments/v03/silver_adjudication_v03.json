@@ -1,0 +1,24 @@
+{
+ "meta": {
+  "version": "v03",
+  "scope": "SILVER DEVELOPMENT REFERENCE",
+  "note": "Einzige Adjudication. Grundlage: der einzige starke Development-Konflikt zwischen SILVER_R1 und SILVER_R2 aus Experiment 2. Weitere Fälle werden nicht nachträglich adjudiziert – insbesondere nicht, weil ein Modell dort schlecht abschneidet.",
+  "decided_before_model_evaluation": true
+ },
+ "adjudications": [
+  {
+   "pair_code": "RP-081",
+   "context": "FIND",
+   "values": {
+    "find_q1_gespraech": 2,
+    "find_q2_a_to_b": 5,
+    "find_q3_b_to_a": 1,
+    "find_q4_ausschluss": "yes",
+    "find_q4_grund": "location_remote",
+    "find_q4_begruendung": "Person B sucht ausdrücklich im Raum Mitteldeutschland/Leipzig und arbeitet onsite; Person A ist in Stuttgart.",
+    "find_q5_sicherheit": 3
+   },
+   "rationale": "Stark einseitige Relevanz (A profitiert, B kaum) plus expliziter Orts-/Onsite-Konflikt: B verlangt ausdrücklich Leipzig/Mitteldeutschland und arbeitet vor Ort, A ist in Stuttgart."
+  }
+ ]
+}

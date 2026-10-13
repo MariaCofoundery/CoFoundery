@@ -1,0 +1,79 @@
+{
+ "scope": "development only",
+ "holdout_rows_ignored": 80,
+ "reviewers": [
+  "SILVER_R1",
+  "SILVER_R2"
+ ],
+ "rows": 160,
+ "problems": [],
+ "pairs": {
+  "SILVER_R1~SILVER_R2": {
+   "find_q1_gespraech": {
+    "n": 50,
+    "agreement": 0.62,
+    "weighted_kappa_quadratic": 0.8699,
+    "weighted_kappa_linear": 0.7238,
+    "mean_difference": -0.04,
+    "mean_abs_difference": 0.4
+   },
+   "find_q2_a_to_b": {
+    "n": 50,
+    "agreement": 0.68,
+    "weighted_kappa_quadratic": 0.9014,
+    "weighted_kappa_linear": 0.7509,
+    "mean_difference": -0.16,
+    "mean_abs_difference": 0.32
+   },
+   "find_q3_b_to_a": {
+    "n": 50,
+    "agreement": 0.56,
+    "weighted_kappa_quadratic": 0.884,
+    "weighted_kappa_linear": 0.6958,
+    "mean_difference": -0.08,
+    "mean_abs_difference": 0.44
+   },
+   "find_q4_ausschluss": {
+    "n": 50,
+    "agreement": 0.98,
+    "cohen_kappa": 0.9292
+   },
+   "find_q5_sicherheit": {
+    "n": 50,
+    "agreement": 0.26,
+    "weighted_kappa_quadratic": 0.3982,
+    "weighted_kappa_linear": 0.206,
+    "mean_difference": -0.74,
+    "mean_abs_difference": 0.74
+   },
+   "connect_q1_deckung": {
+    "n": 30,
+    "agreement": 0.7,
+    "weighted_kappa_quadratic": 0.9343,
+    "weighted_kappa_linear": 0.8161,
+    "mean_difference": 0.0333,
+    "mean_abs_difference": 0.3
+   },
+   "connect_q2_anzeigen": {
+    "n": 30,
+    "agreement": 0.9667,
+    "cohen_kappa": 0.9454
+   },
+   "connect_q3_ausschluss": {
+    "n": 30,
+    "agreement": 1.0,
+    "cohen_kappa": 1.0
+   },
+   "connect_q4_sicherheit": {
+    "n": 30,
+    "agreement": 0.8667,
+    "weighted_kappa_quadratic": 0.9542,
+    "weighted_kappa_linear": 0.8465,
+    "mean_difference": -0.1333,
+    "mean_abs_difference": 0.1333
+   }
+  }
+ },
+ "strong_disagreements": 2,
+ "pairs_needing_adjudication": 1
+}

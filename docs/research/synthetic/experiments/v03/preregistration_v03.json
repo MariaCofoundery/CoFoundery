@@ -1,0 +1,199 @@
+{
+ "connect_models": {
+  "C0_M7core": {
+   "kind": "m7core"
+  },
+  "C1_topic_required_DICT": {
+   "kind": "c1",
+   "norm": "N-DICTIONARY"
+  },
+  "C1_topic_required_GENERIC": {
+   "kind": "c1",
+   "norm": "N-GENERIC"
+  },
+  "C2_coverage_DICT": {
+   "kind": "c2",
+   "norm": "N-DICTIONARY"
+  },
+  "C2_coverage_GENERIC": {
+   "kind": "c2",
+   "norm": "N-GENERIC"
+  }
+ },
+ "consensus": {
+  "adjudication": "nur RP-081 (silver_adjudication_v03.json)",
+  "categorical": "gleich→Wert; mit maybe/unclear→maybe/unclear; yes/no→nur adjudiziert",
+  "ordinal": "Mittelwert R1/R2; adjudiziert ersetzt"
+ },
+ "decision_rules": {
+  "connect": {
+   "all_required": true,
+   "primary": "Spearman(Modellscore, SILVER Consensus Q1) über alle Development-CONNECT-Paare; nicht zugelassene Paare = −1",
+   "rule": [
+    "Δ Spearman Q1 (Consensus) ≥ +0,03 gegenüber C0",
+    "Q2-Gruppen: Mittelwert yes > maybe > no (soweit Gruppen vorhanden) UND AUC(yes vs. no) ≥ C0 − 0,02",
+    "Gate-F1 gegen Q3 ≥ C0 − 0,02",
+    "Anteil Anfragen mit Gleichstand an Rang 10 ≤ 0,5 × C0",
+    "SYNTHETIC: strenge Stressfälle bestanden ≥ C0 UND pessimistischer Recall@10 ≥ C0 − 0,05"
+   ]
+  },
+  "find": {
+   "all_required": true,
+   "primary": "Spearman(Modellscore, SILVER Consensus Q1) über alle Development-FIND-Paare; nicht zugelassene Paare = −1",
+   "rule": [
+    "Δ Spearman Q1 (Consensus) ≥ +0,03 gegenüber F0",
+    "Spearman Q2 (A→B) und Q3 (B→A) je ≥ F0 − 0,03",
+    "Gate-F1 gegen Q4 (yes = Ausschluss) ≥ F0 − 0,02",
+    "SYNTHETIC: Anteil konstruierter asymmetrischer Paare, die bei der Seite ohne Bedarf in den Top 10 stehen, ≤ F0 − 0,10",
+    "SYNTHETIC: Kontrast-NDCG@10 ≥ F0 − 0,05"
+   ]
+  }
+ },
+ "experiment": "matching v0.3",
+ "find_models": {
+  "F0_M7": {
+   "kind": "m7"
+  },
+  "F1_PH1_exact": {
+   "kind": "ph1_exact"
+  },
+  "F2_PH1_min75_DICT": {
+   "kind": "ph1",
+   "mutual": "min75",
+   "norm": "N-DICTIONARY"
+  },
+  "F2_PH1_min75_GENERIC": {
+   "kind": "ph1",
+   "mutual": "min75",
+   "norm": "N-GENERIC"
+  },
+  "F3_PH1_min60_DICT": {
+   "kind": "ph1",
+   "mutual": "min60",
+   "norm": "N-DICTIONARY"
+  },
+  "F3_PH1_min60_GENERIC": {
+   "kind": "ph1",
+   "mutual": "min60",
+   "norm": "N-GENERIC"
+  }
+ },
+ "formulas": {
+  "c1": {
+   "expertise_only": 0.7,
+   "no_topic_cap": 0.1,
+   "text": "IDF-gewichteter Anteil der Gesuch-Token (Titel+Beschreibung+Themen), die im Angebot vorkommen",
+   "text_min": 0.1,
+   "weights": {
+    "category": 0.1,
+    "industry": 0.15,
+    "text": 0.2,
+    "topic": 0.55
+   }
+  },
+  "c2": {
+   "aspect_values": {
+    "expertise": 0.7,
+    "text_all_tokens": 0.8,
+    "text_partial_factor": 0.6,
+    "topic": 1.0
+   },
+   "coverage_min": 0.1,
+   "fallback_needs": 3,
+   "no_coverage_cap": 0.1,
+   "specificity": "Bedarfsgewicht = mittlere IDF seiner Token (min 0,05)",
+   "weights": {
+    "category": 0.1,
+    "coverage": 0.75,
+    "industry": 0.15
+   }
+  },
+  "f1": "posthoc_v02.score_ph1 unverändert: need_mutual(0,6·min+0,4·mittel) × (0,5+0,5·mod), M7-Gate",
+  "missing": "Relevanz nur aus vorhandener Evidenz; fehlende Branche zählt in C1/C2 als 0 (kein Beitrag, nicht herausgerechnet); PH1 bewusst unverändert (mod unbekannt = 0,5); Confidence getrennt",
+  "mutual": {
+   "min60": "0,60·min + 0,40·mittel (= M7-Form)",
+   "min75": "0,75·min + 0,25·mittel"
+  },
+  "need": "v01: Mittel(Rollen-Abdeckung, Mittel der besten Abdeckung je abzugebendem Bereich); own≥3:1, contribute≥3:0,6, own<3:0,4, unklar≥3:0,3, grow_into/prefer_*:0, Familie ×0,5",
+  "ph1_directional": "rel(X→Y) = need(X→Y) × (0,5 + 0,5 × mod); mod = Mittel bekannter {context, intent}, sonst 0,5"
+ },
+ "frozen_upstream": {
+  "../matching_models_v01.py": "239941b74411ff629c5e4401c162ee7d1edd02ca9d8e8f59ebae1b72c1ff43b1",
+  "../normalization_v01.py": "44f55979f5008f0f75ec7a28222976ccea5fe7f941614af0ed6882ef1d0be7d7",
+  "../v02/connect_stress_v02.json": "7ebbe24b8f8ef6d0a1fefe5702cef954b6ac60403304903ef9ce4552cee5e136",
+  "../v02/human_labels_split_key_v02.json": "9ae1768f8364a6cbf70b3fb7a713af86d63459de26c3c0528ca71c41d1d70ca2",
+  "../v02/matching_models_v02.py": "586b65a0a872eeff5c71c43f1a3372204abda06721d8819b3a623f634e9eedce",
+  "../v02/normalization_v02.py": "3e505b0dfd8d0e2a5474cea09fbd8ec184ca3e48fe6eefea1c8ea4a42b9d8c4c",
+  "../v02/posthoc_v02.py": "5ee0a45951f06e13aaac2d5b5795f743f3e0b0aa4bcf7920313216baf2b69c4a"
+ },
+ "gates": {
+  "c0": "M7core-Gate unverändert",
+  "connect_v03": "Angebot aktiv, nicht abgelaufen, Profil aktiv; regional+onsite mit konkretem Ort verlangt denselben Ort beim Gegenüber (Platzhalter erfüllt nicht); unbekannt = uncertain",
+  "f0_f1": "M7-Gate unverändert",
+  "find_v03": "Must-haves beider Seiten (Rolle, Stunden, Arbeitsweise, Suchstand, Start, Bereich, Expertise); Ort nur bei konkretem Orts-Must-have + Gegenüber eindeutig anderswo (Platzhalter erfüllt keinen Ort) + Must-Seite nicht remote/flexibel und lässt remote nicht zu; beide onsite an verschiedenen Orten. Unbekannt = uncertain, nie Konflikt. Kein Bonus."
+ },
+ "hashes": {
+  "matching_models_v03.py": "125e937568d7cd74d6e37005e38f4befce5ab4b1a554613937e517d9a1b67036",
+  "normalization_v03.py": "df12a15e923d6f426e1fb1f886514431383bc94de5547396c38ec28dd88c02db",
+  "run_experiment_v03.py": "6cec070f5175b0238dc92bb8432b3baacb1ee6b89b68264bd8d0d7ce3d2adb52",
+  "silver_adjudication_v03.json": "e7b3f05d20e1b1cbfa2cbdbd882b9305d889ab1c75627d2c5e1ff41401bf01d0",
+  "silver_reference_v03.py": "9c7b4f467aac15aaa57aa7ddde3e699688c669cd00d828420e5bd5cbcbc3af27"
+ },
+ "holdout": "UNOPENED – Holdout-Zeilen werden vor dem Lesen verworfen; Referenzpaare der Holdout-Stichprobe auch aus SYNTHETIC ausgeschlossen",
+ "metrics": {
+  "silver_connect": {
+   "primary": "Spearman Q1 (Consensus)",
+   "secondary": [
+    "Kendall τ-b",
+    "NDCG",
+    "paarweise Ordnung",
+    "Scoreverteilung je Q2 yes/maybe/no, AUC yes vs no",
+    "Gate vs Q3",
+    "Q4 nur deskriptiv",
+    "gegen R1 und R2 einzeln"
+   ]
+  },
+  "silver_find": {
+   "primary": "Spearman Q1 (Consensus)",
+   "secondary": [
+    "Kendall τ-b Q1",
+    "NDCG Q1 (Gewinn = Q1 − 1, Gleichstand pessimistisch)",
+    "paarweise Ordnung Q1 (Gleichstand = falsch; Gleichstandsanteil berichtet)",
+    "Spearman A→B vs Q2, B→A vs Q3",
+    "Gate vs Q4: Precision/Recall/Spezifität/F1 (positiv = Ausschluss; 'unclear' ausgenommen)",
+    "Q5 Sicherheit: nur deskriptiv (Spearman mit Modell-Confidence)",
+    "alles zusätzlich gegen R1 und R2 einzeln"
+   ]
+  },
+  "synthetic_connect": [
+   "Recall@10 und NDCG@10 (v01-Gleichstand und pessimistisch)",
+   "strenge Stressfälle",
+   "Gleichstände an Rang 1/5/10, mittlere Größe identischer Scores in den Top 10"
+  ],
+  "synthetic_find": [
+   "Recall@10",
+   "NDCG@10 (wie gerankt und pessimistisch)",
+   "excellent/promising@10",
+   "asymmetrisch: Seite mit/ohne Bedarf in Top 10",
+   "exclude in Top 10 / zugelassen",
+   "konstruiert vs. Kontrast",
+   "Generalisten/Sparse-Exposition"
+  ]
+ },
+ "normalization": {
+  "modes": {
+   "N-DICTIONARY": "dict+generic2",
+   "N-GENERIC": "generic2"
+  },
+  "note": "keine neuen Synonyme, kein LLM, keine Embeddings",
+  "text": "IDF über alle Einträge, Token wie generic2, Mindestlänge 3"
+ },
+ "references": {
+  "SILVER": "qualitative Gegenprüfung durch zwei getrennte Modell-Review-Pässe (SILVER_R1, SILVER_R2); keine menschliche Ground Truth",
+  "SYNTHETIC": "konstruktiv erzeugte Ground Truth des synthetischen Datensatzes"
+ },
+ "silver_files": {
+  "R1": "../v02/silver_labels_R1_v02.csv",
+  "R2": "../v02/silver_labels_R2_v02.csv"
+ }
+}

@@ -1,0 +1,3 @@
+pair_code,kontext,frage,reviewer_1,wert_1,reviewer_2,wert_2,grund
+RP-081,FIND,find_q1_gespraech,SILVER_R1,3,SILVER_R2,1,Differenz >= 2
+RP-081,FIND,find_q4_ausschluss,SILVER_R1,no,SILVER_R2,yes,yes vs. no

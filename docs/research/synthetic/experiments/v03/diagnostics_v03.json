@@ -1,0 +1,474 @@
+{
+ "note": "Beschreibend, nicht vorab festgelegt. Nur Development. HOLDOUT STATUS: UNOPENED.",
+ "find_silver_q1_by_synthetic_class": {
+  "asymmetric": {
+   "n": 6,
+   "mean": 3.25,
+   "min": 2.5,
+   "max": 4.0
+  },
+  "excellent_candidate": {
+   "n": 8,
+   "mean": 4.81,
+   "min": 4.5,
+   "max": 5.0
+  },
+  "exclude": {
+   "n": 8,
+   "mean": 1.81,
+   "min": 1.0,
+   "max": 2.0
+  },
+  "insufficient_data": {
+   "n": 4,
+   "mean": 2.0,
+   "min": 1.5,
+   "max": 2.5
+  },
+  "low_relevance": {
+   "n": 7,
+   "mean": 2.0,
+   "min": 1.5,
+   "max": 2.5
+  },
+  "promising": {
+   "n": 9,
+   "mean": 4.28,
+   "min": 4.0,
+   "max": 5.0
+  },
+  "worth_exploring": {
+   "n": 8,
+   "mean": 4.38,
+   "min": 4.0,
+   "max": 5.0
+  }
+ },
+ "find_clear_disagreements": [],
+ "connect_silver_q1_by_synthetic_class": {
+  "excellent_candidate": {
+   "n": 7,
+   "mean": 4.86,
+   "min": 4.5,
+   "max": 5.0,
+   "show": {
+    "yes": 7
+   }
+  },
+  "exclude": {
+   "n": 4,
+   "mean": 4.38,
+   "min": 4.0,
+   "max": 5.0,
+   "show": {
+    "no": 4
+   }
+  },
+  "insufficient_data": {
+   "n": 3,
+   "mean": 3.0,
+   "min": 3.0,
+   "max": 3.0,
+   "show": {
+    "maybe": 3
+   }
+  },
+  "low_relevance": {
+   "n": 6,
+   "mean": 1.0,
+   "min": 1.0,
+   "max": 1.0,
+   "show": {
+    "no": 6
+   }
+  },
+  "promising": {
+   "n": 6,
+   "mean": 4.17,
+   "min": 3.5,
+   "max": 4.5,
+   "show": {
+    "yes": 5,
+    "maybe": 1
+   }
+  },
+  "stress:C10": {
+   "n": 1,
+   "mean": 4.5,
+   "min": 4.5,
+   "max": 4.5,
+   "show": {
+    "yes": 1
+   }
+  },
+  "stress:C11": {
+   "n": 1,
+   "mean": 3.0,
+   "min": 3.0,
+   "max": 3.0,
+   "show": {
+    "maybe": 1
+   }
+  },
+  "stress:C2": {
+   "n": 1,
+   "mean": 1.5,
+   "min": 1.5,
+   "max": 1.5,
+   "show": {
+    "no": 1
+   }
+  },
+  "stress:C5": {
+   "n": 1,
+   "mean": 5.0,
+   "min": 5.0,
+   "max": 5.0,
+   "show": {
+    "yes": 1
+   }
+  }
+ },
+ "connect_clear_disagreements": [
+  {
+   "pair_code": "RP-004",
+   "synthetic": "exclude",
+   "silver_q1": 4.0,
+   "silver_show": "no"
+  },
+  {
+   "pair_code": "RP-046",
+   "synthetic": "exclude",
+   "silver_q1": 4.5,
+   "silver_show": "no"
+  },
+  {
+   "pair_code": "RP-059",
+   "synthetic": "exclude",
+   "silver_q1": 4.0,
+   "silver_show": "no"
+  },
+  {
+   "pair_code": "RP-078",
+   "synthetic": "exclude",
+   "silver_q1": 5.0,
+   "silver_show": "no"
+  }
+ ],
+ "connect_silver_exclusions": [
+  {
+   "pair_code": "RP-004",
+   "synthetic": "exclude",
+   "grund_r1": "location_remote",
+   "grund_r2": "location_remote"
+  },
+  {
+   "pair_code": "RP-018",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-037",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-042",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-044",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-046",
+   "synthetic": "exclude",
+   "grund_r1": "timing",
+   "grund_r2": "timing"
+  },
+  {
+   "pair_code": "RP-059",
+   "synthetic": "exclude",
+   "grund_r1": "location_remote",
+   "grund_r2": "location_remote"
+  },
+  {
+   "pair_code": "RP-070",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-078",
+   "synthetic": "exclude",
+   "grund_r1": "location_remote",
+   "grund_r2": "location_remote"
+  },
+  {
+   "pair_code": "RP-084",
+   "synthetic": "stress:C2",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "topic_mismatch"
+  },
+  {
+   "pair_code": "RP-086",
+   "synthetic": "low_relevance",
+   "grund_r1": "topic_mismatch",
+   "grund_r2": "category_mismatch"
+  }
+ ],
+ "connect_exclusion_reasons": {
+  "location_remote": 3,
+  "topic_mismatch": 6,
+  "timing": 1,
+  "topic_mismatch/category_mismatch": 1
+ },
+ "silver_asymmetric_cases": {
+  "F0_M7": [
+   {
+    "pair_code": "RP-003",
+    "q1": 2.5,
+    "q2": 5.0,
+    "q3": 1.5,
+    "score": 0.6533,
+    "eligible": true,
+    "directed": [
+     0.8667,
+     0.6
+    ],
+    "position_in_silver_set": 18
+   },
+   {
+    "pair_code": "RP-068",
+    "q1": 3.0,
+    "q2": 5.0,
+    "q3": 2.0,
+    "score": 0.6433,
+    "eligible": true,
+    "directed": [
+     0.8567,
+     0.59
+    ],
+    "position_in_silver_set": 21
+   },
+   {
+    "pair_code": "RP-081",
+    "q1": 2.0,
+    "q2": 5.0,
+    "q3": 1.0,
+    "score": -1.0,
+    "eligible": false,
+    "directed": [
+     0.44,
+     0.34
+    ],
+    "position_in_silver_set": 42
+   },
+   {
+    "pair_code": "RP-090",
+    "q1": 3.5,
+    "q2": 2.5,
+    "q3": 4.5,
+    "score": 0.4933,
+    "eligible": true,
+    "directed": [
+     0.4667,
+     0.6
+    ],
+    "position_in_silver_set": 28
+   },
+   {
+    "pair_code": "RP-095",
+    "q1": 3.0,
+    "q2": 2.0,
+    "q3": 4.5,
+    "score": 0.368,
+    "eligible": true,
+    "directed": [
+     0.3333,
+     0.5067
+    ],
+    "position_in_silver_set": 33
+   },
+   {
+    "pair_code": "RP-115",
+    "q1": 3.5,
+    "q2": 5.0,
+    "q3": 2.5,
+    "score": 0.6533,
+    "eligible": true,
+    "directed": [
+     0.8667,
+     0.6
+    ],
+    "position_in_silver_set": 18
+   }
+  ],
+  "F1_PH1_exact": [
+   {
+    "pair_code": "RP-003",
+    "q1": 2.5,
+    "q2": 5.0,
+    "q3": 1.5,
+    "score": 0.2,
+    "eligible": true,
+    "directed": [
+     1.0,
+     0.0
+    ],
+    "position_in_silver_set": 27
+   },
+   {
+    "pair_code": "RP-068",
+    "q1": 3.0,
+    "q2": 5.0,
+    "q3": 2.0,
+    "score": 0.1975,
+    "eligible": true,
+    "directed": [
+     0.9875,
+     0.0
+    ],
+    "position_in_silver_set": 29
+   },
+   {
+    "pair_code": "RP-081",
+    "q1": 2.0,
+    "q2": 5.0,
+    "q3": 1.0,
+    "score": -1.0,
+    "eligible": false,
+    "directed": [
+     0.425,
+     0.0
+    ],
+    "position_in_silver_set": 42
+   },
+   {
+    "pair_code": "RP-090",
+    "q1": 3.5,
+    "q2": 2.5,
+    "q3": 4.5,
+    "score": 0.2625,
+    "eligible": true,
+    "directed": [
+     0.1875,
+     0.5625
+    ],
+    "position_in_silver_set": 24
+   },
+   {
+    "pair_code": "RP-095",
+    "q1": 3.0,
+    "q2": 2.0,
+    "q3": 4.5,
+    "score": 0.0943,
+    "eligible": true,
+    "directed": [
+     0.0,
+     0.4713
+    ],
+    "position_in_silver_set": 31
+   },
+   {
+    "pair_code": "RP-115",
+    "q1": 3.5,
+    "q2": 5.0,
+    "q3": 2.5,
+    "score": 0.2,
+    "eligible": true,
+    "directed": [
+     1.0,
+     0.0
+    ],
+    "position_in_silver_set": 27
+   }
+  ],
+  "F2_PH1_min75_DICT": [
+   {
+    "pair_code": "RP-003",
+    "q1": 2.5,
+    "q2": 5.0,
+    "q3": 1.5,
+    "score": 0.125,
+    "eligible": true,
+    "directed": [
+     1.0,
+     0.0
+    ],
+    "position_in_silver_set": 27
+   },
+   {
+    "pair_code": "RP-068",
+    "q1": 3.0,
+    "q2": 5.0,
+    "q3": 2.0,
+    "score": 0.1234,
+    "eligible": true,
+    "directed": [
+     0.9875,
+     0.0
+    ],
+    "position_in_silver_set": 29
+   },
+   {
+    "pair_code": "RP-081",
+    "q1": 2.0,
+    "q2": 5.0,
+    "q3": 1.0,
+    "score": -1.0,
+    "eligible": false,
+    "directed": [
+     0.425,
+     0.0
+    ],
+    "position_in_silver_set": 42
+   },
+   {
+    "pair_code": "RP-090",
+    "q1": 3.5,
+    "q2": 2.5,
+    "q3": 4.5,
+    "score": 0.2344,
+    "eligible": true,
+    "directed": [
+     0.1875,
+     0.5625
+    ],
+    "position_in_silver_set": 24
+   },
+   {
+    "pair_code": "RP-095",
+    "q1": 3.0,
+    "q2": 2.0,
+    "q3": 4.5,
+    "score": 0.0589,
+    "eligible": true,
+    "directed": [
+     0.0,
+     0.4713
+    ],
+    "position_in_silver_set": 31
+   },
+   {
+    "pair_code": "RP-115",
+    "q1": 3.5,
+    "q2": 5.0,
+    "q3": 2.5,
+    "score": 0.125,
+    "eligible": true,
+    "directed": [
+     1.0,
+     0.0
+    ],
+    "position_in_silver_set": 27
+   }
+  ]
+ }
+}

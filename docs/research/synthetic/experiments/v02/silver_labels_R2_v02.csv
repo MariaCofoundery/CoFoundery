@@ -1,0 +1,121 @@
+reviewer_id,pair_code,kontext,find_q1_gespraech,find_q2_a_to_b,find_q3_b_to_a,find_q4_ausschluss,find_q4_grund,find_q4_begruendung,find_q5_sicherheit,connect_q1_deckung,connect_q2_anzeigen,connect_q3_ausschluss,connect_q3_grund,connect_q3_begruendung,connect_q4_sicherheit,kommentar
+SILVER_R2,RP-001,FIND,3,5,2,no,,,5,,,,,,,
+SILVER_R2,RP-002,FIND,4,4,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-003,FIND,2,5,1,no,,,5,,,,,,,
+SILVER_R2,RP-004,CONNECT,,,,,,,,4,no,yes,location_remote,"Beide Einträge sind vor Ort, aber an verschiedenen Orten (Zurich vs. Leipzig).",5,
+SILVER_R2,RP-005,FIND,4,5,4,no,,,4,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-006,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-007,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-008,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-009,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-010,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-011,CONNECT,,,,,,,,3,maybe,unclear,,,1,
+SILVER_R2,RP-012,FIND,2,2,2,yes,role_mismatch,"Person B verlangt Rolle(n) design, tech; Person A bringt sie nicht mit.",3,,,,,,,
+SILVER_R2,RP-013,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-014,FIND,1,4,1,yes,role_mismatch,Person B verlangt Rolle(n) research; Person A bringt sie nicht mit.,5,,,,,,,
+SILVER_R2,RP-015,FIND,3,3,4,no,,,5,,,,,,,
+SILVER_R2,RP-016,FIND,2,2,2,no,,,3,,,,,,,
+SILVER_R2,RP-017,FIND,2,5,5,yes,start_timing,Person A akzeptiert den Startzeitpunkt von Person B nicht.,5,,,,,,,
+SILVER_R2,RP-018,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-019,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-020,FIND,2,5,5,yes,founder_intent,Person A akzeptiert den Suchstand von Person B nicht.,5,,,,,,,
+SILVER_R2,RP-021,FIND,2,5,5,yes,time_commitment,Person A verlangt mindestens 28 h; Person B hat 7 h.,5,,,,,,,
+SILVER_R2,RP-022,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-023,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-024,FIND,4,4,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-025,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-026,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-027,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-028,FIND,4,4,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-029,FIND,3,4,2,no,,,3,,,,,,,
+SILVER_R2,RP-030,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-031,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-032,FIND,2,2,2,no,,,5,,,,,,,
+SILVER_R2,RP-033,FIND,2,5,1,no,,,4,,,,,,,
+SILVER_R2,RP-034,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-035,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-036,FIND,1,1,1,yes,role_mismatch,Person A verlangt Rolle(n) tech; Person B bringt sie nicht mit.,5,,,,,,,
+SILVER_R2,RP-037,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-038,CONNECT,,,,,,,,4,no,yes,timing,Das Angebot ist seit 2026-09-28 abgelaufen.,5,
+SILVER_R2,RP-039,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-040,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-041,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-042,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-043,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-044,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-045,FIND,4,4,5,no,,,4,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-046,CONNECT,,,,,,,,5,no,yes,timing,Das Angebot ist seit 2026-09-28 abgelaufen.,5,
+SILVER_R2,RP-047,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-048,FIND,3,5,2,no,,,5,,,,,,,
+SILVER_R2,RP-049,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-050,FIND,3,4,2,no,,,5,,,,,,,
+SILVER_R2,RP-051,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-052,CONNECT,,,,,,,,3,maybe,no,,,4,"Breites Generalisten-Angebot: Zulassung passt, MDR-spezifische Tiefe ist nicht klar erkennbar."
+SILVER_R2,RP-053,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-054,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-055,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-056,CONNECT,,,,,,,,1,no,yes,location_remote,"Das Gesuch ist vor Ort, das Angebot remote.",5,
+SILVER_R2,RP-057,FIND,1,1,1,no,,,3,,,,,,,
+SILVER_R2,RP-058,FIND,4,4,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-059,CONNECT,,,,,,,,4,no,yes,location_remote,"Beide Einträge sind vor Ort, aber an verschiedenen Orten (HH vs. Leipzig).",5,
+SILVER_R2,RP-060,CONNECT,,,,,,,,3,maybe,unclear,,,1,
+SILVER_R2,RP-061,FIND,2,5,5,yes,location_remote,Person A akzeptiert die Arbeitsweise von Person B nicht.,5,,,,,,,
+SILVER_R2,RP-062,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-063,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-064,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-065,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-066,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-067,FIND,4,4,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-068,FIND,3,5,2,no,,,5,,,,,,,
+SILVER_R2,RP-069,FIND,1,1,2,no,,,5,,,,,,,
+SILVER_R2,RP-070,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-071,FIND,3,3,3,no,,,5,,,,,,,
+SILVER_R2,RP-072,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-073,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-074,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-075,FIND,2,2,3,no,,,5,,,,,,,
+SILVER_R2,RP-076,FIND,4,5,4,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-077,FIND,2,2,2,no,,,5,,,,,,,
+SILVER_R2,RP-078,CONNECT,,,,,,,,5,no,yes,location_remote,"Beide Einträge sind vor Ort, aber an verschiedenen Orten (Zurich vs. Wien).",5,
+SILVER_R2,RP-079,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-080,FIND,4,4,5,no,,,4,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-081,FIND,1,5,1,yes,location_remote,Person B sucht Ort Mitteldeutschland (Leipzig); Person A ist in Stuttgart.,3,,,,,,,
+SILVER_R2,RP-082,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-083,FIND,2,5,5,yes,location_remote,"Beide arbeiten nur vor Ort (Wien vs. Stuttgart, BW).",5,,,,,,,
+SILVER_R2,RP-084,CONNECT,,,,,,,,2,no,yes,topic_mismatch,,5,
+SILVER_R2,RP-085,CONNECT,,,,,,,,3,maybe,unclear,,,1,
+SILVER_R2,RP-086,CONNECT,,,,,,,,1,no,yes,category_mismatch,Gesucht wird Investment; das Angebot ist kein Investment-Angebot.,5,
+SILVER_R2,RP-087,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-088,FIND,3,2,5,no,,,5,,,,,,,
+SILVER_R2,RP-089,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-090,FIND,4,3,5,no,,,5,,,,,,,
+SILVER_R2,RP-091,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-092,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-093,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-094,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-095,FIND,3,2,4,no,,,5,,,,,,,
+SILVER_R2,RP-096,FIND,4,5,4,no,,,4,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-097,FIND,3,3,3,no,,,4,,,,,,,
+SILVER_R2,RP-098,CONNECT,,,,,,,,5,no,yes,location_remote,"Beide Einträge sind vor Ort, aber an verschiedenen Orten (Ruhr Area vs. Zürich).",5,
+SILVER_R2,RP-099,FIND,2,2,2,no,,,5,,,,,,,
+SILVER_R2,RP-100,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-101,FIND,2,5,5,yes,founder_intent,Person A akzeptiert den Suchstand von Person B nicht.,5,,,,,,,
+SILVER_R2,RP-102,FIND,2,5,5,yes,time_commitment,Person A verlangt mindestens 57 h; Person B hat 43 h.,5,,,,,,,
+SILVER_R2,RP-103,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-104,CONNECT,,,,,,,,3,maybe,unclear,,,1,
+SILVER_R2,RP-105,FIND,1,1,1,no,,,5,,,,,,,
+SILVER_R2,RP-106,FIND,2,3,2,no,,,5,,,,,,,
+SILVER_R2,RP-107,CONNECT,,,,,,,,1,no,yes,topic_mismatch,Das Angebot deckt das konkrete Thema des Gesuchs nicht erkennbar ab.,5,
+SILVER_R2,RP-108,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-109,CONNECT,,,,,,,,3,maybe,unclear,,,1,
+SILVER_R2,RP-110,FIND,2,4,4,yes,role_mismatch,Person B verlangt Rolle(n) tech; Person A bringt sie nicht mit.,5,,,,,,,
+SILVER_R2,RP-111,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-112,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-113,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-114,CONNECT,,,,,,,,5,yes,no,,,5,
+SILVER_R2,RP-115,FIND,3,5,2,no,,,5,,,,,,,
+SILVER_R2,RP-116,FIND,5,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-117,CONNECT,,,,,,,,4,yes,no,,,5,
+SILVER_R2,RP-118,FIND,2,2,2,no,,,3,,,,,,,
+SILVER_R2,RP-119,FIND,4,5,5,no,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
+SILVER_R2,RP-120,FIND,5,5,5,unclear,,,5,,,,,,,R2: gegenseitige konkrete Bedarf→Angebot-Relevanz wurde stärker gewichtet.
