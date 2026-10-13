@@ -1,0 +1,383 @@
+{
+ "note": "Scores vor dem Laden der Holdout-Labels festgeschrieben",
+ "scores": {
+  "RP-007": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.9875,
+    0.9875
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.9875
+  },
+  "RP-009": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.8252
+  },
+  "RP-014": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.1781,
+    0.0
+   ],
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 0.0356
+  },
+  "RP-015": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-020": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.9625,
+    0.9625
+   ],
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 0.9625
+  },
+  "RP-026": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.5344,
+    0.4987
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.5059
+  },
+  "RP-030": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.75,
+    0.75
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.75
+  },
+  "RP-033": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    1.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.2
+  },
+  "RP-034": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.576,
+    0.2469
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.3127
+  },
+  "RP-035": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.5437,
+    0.3625
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.3988
+  },
+  "RP-038": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 0.8
+  },
+  "RP-040": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.7125,
+    0.4453
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.4987
+  },
+  "RP-041": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.8371
+  },
+  "RP-043": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.6041
+  },
+  "RP-045": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    0.9875,
+    0.9875
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.9875
+  },
+  "RP-048": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    1.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.2
+  },
+  "RP-049": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.575,
+    0.75
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.61
+  },
+  "RP-055": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.1
+  },
+  "RP-056": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.1292
+  },
+  "RP-057": {
+   "confidence": 0.2222,
+   "context": "find",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-064": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.5806
+  },
+  "RP-067": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.1703,
+    0.6813
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.2725
+  },
+  "RP-071": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-073": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.9227
+  },
+  "RP-076": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.7375,
+    0.2458
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.3442
+  },
+  "RP-077": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-082": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-088": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.2695,
+    0.7188
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.3594
+  },
+  "RP-091": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.5919
+  },
+  "RP-094": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    0.6417,
+    0.3208
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.385
+  },
+  "RP-098": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 0.8
+  },
+  "RP-102": {
+   "confidence": 0.8889,
+   "context": "find",
+   "directed": [
+    1.0,
+    1.0
+   ],
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 1.0
+  },
+  "RP-104": {
+   "confidence": 0.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.1
+  },
+  "RP-107": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.1
+  },
+  "RP-109": {
+   "confidence": 0.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "uncertain",
+   "score": 0.1
+  },
+  "RP-114": {
+   "confidence": 1.0,
+   "context": "connect",
+   "directed": null,
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.8687
+  },
+  "RP-118": {
+   "confidence": 0.3333,
+   "context": "find",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "eligible": true,
+   "gate_state": "eligible",
+   "score": 0.0
+  },
+  "RP-120": {
+   "confidence": 1.0,
+   "context": "find",
+   "directed": [
+    1.0,
+    1.0
+   ],
+   "eligible": false,
+   "gate_state": "not_eligible",
+   "score": 1.0
+  }
+ },
+ "versions": {
+  "idf_corpus_version": "synthetic-v03-all-listings",
+  "matching_version": "matching-v0.1",
+  "normalization_version": "matching-normalization-v0.1"
+ }
+}

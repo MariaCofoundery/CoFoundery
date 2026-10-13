@@ -1,0 +1,145 @@
+{
+ "criteria": {
+  "connect_gate_false_exclusions": {
+   "CONDITIONAL": "1",
+   "FAIL": ">= 2",
+   "PASS": "0",
+   "definition": "Gate ineligible, Consensus Q3 = no"
+  },
+  "connect_q1_spearman_consensus": {
+   "CONDITIONAL": "> 0 – < 0.40",
+   "FAIL": "<= 0",
+   "PASS": ">= 0.40",
+   "development": 0.5529
+  },
+  "connect_q2_auc_yes_vs_no_consensus": {
+   "CONDITIONAL": "0.60 – < 0.80",
+   "FAIL": "< 0.60",
+   "NOT_ASSESSABLE": "keine yes- oder keine no-Gruppe",
+   "PASS": ">= 0.80",
+   "definition": "AUC Score yes vs. no (Gleichstand = 0.5); v03-strikte Fassung (Gleichstand = 0) zusätzlich berichtet",
+   "development": 1.0
+  },
+  "connect_q2_yes_no_ties": {
+   "CONDITIONAL": "> 0.10",
+   "FAIL": "–",
+   "PASS": "<= 0.10",
+   "definition": "Anteil yes/no-Paarvergleiche mit gleichem Score"
+  },
+  "connect_rater_robustness": {
+   "CONDITIONAL": "sonst",
+   "FAIL": "–",
+   "NOT_ASSESSABLE": "AUC nicht berechenbar",
+   "PASS": "Q2-AUC R1 und R2 je >= 0.60"
+  },
+  "find_asymmetry": {
+   "CONDITIONAL": "sonst",
+   "FAIL": "n >= 3 und Anteil < 1/3",
+   "NOT_ASSESSABLE": "n = 0",
+   "PASS": "Anteil >= 2/3",
+   "definition": "Consensus |Q2 − Q3| >= 2: Vorzeichen (directed A→B − B→A) = Vorzeichen (Q2 − Q3)"
+  },
+  "find_direction_q2_q3_spearman_consensus": {
+   "CONDITIONAL": "beide > 0, mindestens eine < 0.50",
+   "FAIL": "eine <= 0",
+   "PASS": "beide >= 0.50",
+   "development": [
+    0.7861,
+    0.8869
+   ]
+  },
+  "find_gate_false_exclusions": {
+   "CONDITIONAL": "1",
+   "FAIL": ">= 2",
+   "PASS": "0",
+   "definition": "Gate ineligible, Consensus Q4 = no"
+  },
+  "find_gate_missed_exclusions": {
+   "CONDITIONAL": ">= 2",
+   "FAIL": "–",
+   "PASS": "<= 1",
+   "definition": "Gate eligible/uncertain, Consensus Q4 = yes"
+  },
+  "find_q1_spearman_consensus": {
+   "CONDITIONAL": "0.40 – < 0.70",
+   "FAIL": "< 0.40",
+   "PASS": ">= 0.70",
+   "development": 0.8588
+  },
+  "find_rater_robustness": {
+   "CONDITIONAL": "sonst",
+   "FAIL": "–",
+   "PASS": "Q1 Spearman R1 und R2 je >= 0.40"
+  }
+ },
+ "experiment": "FINAL HOLDOUT EVALUATION – Matching Engine v0.1",
+ "frozen_code_sha256": {
+  "../matching_models_v01.py": "239941b74411ff629c5e4401c162ee7d1edd02ca9d8e8f59ebae1b72c1ff43b1",
+  "../normalization_v01.py": "44f55979f5008f0f75ec7a28222976ccea5fe7f941614af0ed6882ef1d0be7d7",
+  "../v02/connect_stress_v02.json": "7ebbe24b8f8ef6d0a1fefe5702cef954b6ac60403304903ef9ce4552cee5e136",
+  "../v02/human_labels_split_key_v02.json": "9ae1768f8364a6cbf70b3fb7a713af86d63459de26c3c0528ca71c41d1d70ca2",
+  "../v02/matching_models_v02.py": "586b65a0a872eeff5c71c43f1a3372204abda06721d8819b3a623f634e9eedce",
+  "../v02/normalization_v02.py": "3e505b0dfd8d0e2a5474cea09fbd8ec184ca3e48fe6eefea1c8ea4a42b9d8c4c",
+  "../v02/posthoc_v02.py": "5ee0a45951f06e13aaac2d5b5795f743f3e0b0aa4bcf7920313216baf2b69c4a",
+  "../v03b/models_v03b.py": "31b352e04e7060682a36e83c8215c48c1a0924ed9190c69d08ab23ccec802623",
+  "../v03b/run_experiment_v03b.py": "adf8b026a9f0a75751d2adcaa922b19afa3e4f3dc31c5f599a9fca55eb75dc61",
+  "matching_models_v03.py": "125e937568d7cd74d6e37005e38f4befce5ab4b1a554613937e517d9a1b67036",
+  "normalization_v03.py": "df12a15e923d6f426e1fb1f886514431383bc94de5547396c38ec28dd88c02db",
+  "run_experiment_v03.py": "6cec070f5175b0238dc92bb8432b3baacb1ee6b89b68264bd8d0d7ce3d2adb52",
+  "silver_adjudication_v03.json": "e7b3f05d20e1b1cbfa2cbdbd882b9305d889ab1c75627d2c5e1ff41401bf01d0",
+  "silver_reference_v03.py": "9c7b4f467aac15aaa57aa7ddde3e699688c669cd00d828420e5bd5cbcbc3af27"
+ },
+ "holdout": {
+  "clean": 38,
+  "composition": "23 FIND, 14 CONNECT, 1 CONNECT-Stressfall (C4)",
+  "consensus": "Regeln v03 unverändert (Mittel ordinal; yes/no ohne Adjudication -> ausgeschlossen und gezählt); keine neue Adjudication; Adjudication-Datei v03 enthält keinen Holdout-Code",
+  "excluded": [
+   "RP-001",
+   "RP-002"
+  ],
+  "exclusion": "RP-001/RP-002 werden vor dem Lesen jeder Antwortspalte verworfen; nur ihre Anzahl wird gezählt",
+  "opening": "einmalig; Scores aller 38 Ziele werden vor dem Laden als holdout_scores_prelabel_v01.json festgeschrieben"
+ },
+ "metrics": {
+  "connect": [
+   "Q1 Spearman/Kendall/NDCG/paarweise",
+   "Scoreverteilung je Q2 yes/maybe/no, AUC yes vs no, Tie-Anteil, Monotonie",
+   "Gate vs Q3 mit Fehlerliste",
+   "Tie-Anteil der Scores im Holdout-Set",
+   "Stressfall C4 (strenge Kriterien) und seine Labels",
+   "Confidence vs Q4 nur deskriptiv",
+   "Bootstrap-95%-Intervall für Q1 Spearman, nur deskriptiv"
+  ],
+  "development_comparison": "Werte aus results_v03.json, nur zum Vergleich",
+  "find": [
+   "Q1 Spearman/Kendall/NDCG/paarweise (Consensus, R1, R2)",
+   "directional A→B vs Q2, B→A vs Q3 (Spearman)",
+   "Gate vs Q4 (TP/FP/FN/TN, Precision, Recall, F1) mit Fehlerliste",
+   "Asymmetrie-Fälle |Q2−Q3| >= 2 einzeln",
+   "Confidence vs Q5 nur deskriptiv",
+   "Bootstrap-95%-Intervall für Q1 Spearman (2000 Ziehungen, Seed 1), nur deskriptiv"
+  ],
+  "synthetic_holdout": "getrennt: Referenzklassen der Holdout-Paare (Anteil zugelassen / Top 10, falsche Sperren, Asymmetrie)"
+ },
+ "models": {
+  "connect": "C1_topic_required_DICT: Gate -> 0.55 topic + 0.20 text (IDF) + 0.15 industry + 0.10 category, Themenpflicht-Deckel 0.10; generic2 + Wörterbuch; Confidence getrennt",
+  "find": "F3_PH1_min60_DICT: Gate v03 -> PH1 A→B, B→A (Familien-Halbwert wie eingefroren) -> 0.6·min + 0.4·mean; Confidence getrennt"
+ },
+ "runner_sha256": "648b4ff4ebe1f139bb6080ad220b00efa4834b2cbac70ae9b6264cfd85131b6f",
+ "spec_sha256": {
+  "matching-engine-v0.1-spec.json": "d6d70cd6d27f9f9c20a67aa42b7c60e83c54516ccd615dad09a5f9cd1b63e646",
+  "matching-engine-v0.1-spec.md": "9d3c44b7927d96055354666eeba6fe4325eb2e1d6fd6c2e7d7928e455d0e2e6e"
+ },
+ "spec_status": "FROZEN",
+ "verdict_meaning": {
+  "CONDITIONAL_PASS": "Grundstruktur tragfähig, benannte Schwächen vor Produktbetrieb adressieren",
+  "FAIL": "struktureller Fehler, erneute Research-Runde",
+  "PASS": "stabil genug für einen nicht-produktiven Produkt-Prototyp"
+ },
+ "verdict_rule": "FAIL, wenn ein Kriterium FAIL ist; sonst CONDITIONAL PASS, wenn ein Kriterium CONDITIONAL ist; sonst PASS. NOT_ASSESSABLE zählt nicht und wird berichtet. Verpasste CONNECT-Ausschlüsse (Q3 = yes, Gate offen) sind deskriptiv, weil Themen-Fehlpassung laut Spec nicht im Gate liegt (Relevanz-Deckel). Bekannte Schwächen aus Spec §19 allein ändern das Urteil nicht, werden aber benannt.",
+ "versions": {
+  "idf_corpus_version": "synthetic-v03-all-listings",
+  "matching_version": "matching-v0.1",
+  "normalization_version": "matching-normalization-v0.1"
+ }
+}

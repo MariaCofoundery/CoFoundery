@@ -1,0 +1,662 @@
+{
+ "find_pairs": [
+  {
+   "pair_code": "RP-007",
+   "pair_id": "syn-pair0297",
+   "score": 0.9875,
+   "gate_state": "eligible",
+   "directed": [
+    0.9875,
+    0.9875
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.5,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-014",
+   "pair_id": "syn-pair0356",
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "directed": [
+    0.1781,
+    0.0
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": [
+    "A: Remote-Modus passt nicht",
+    "B: Pflichtrolle fehlt"
+   ],
+   "consensus": {
+    "find_q1_gespraech": 1.5,
+    "find_q2_a_to_b": 4.0,
+    "find_q3_b_to_a": 1.5,
+    "find_q4_ausschluss": "yes",
+    "find_q5_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-015",
+   "pair_id": "syn-pair0032",
+   "score": 0.0,
+   "gate_state": "eligible",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 2.5,
+    "find_q2_a_to_b": 2.5,
+    "find_q3_b_to_a": 3.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-020",
+   "pair_id": "syn-pair0111",
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "directed": [
+    0.9625,
+    0.9625
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": [
+    "A: Suchstand ausdrücklich ausgeschlossen"
+   ],
+   "consensus": {
+    "find_q1_gespraech": 2.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "yes",
+    "find_q5_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-026",
+   "pair_id": "syn-pair0044",
+   "score": 0.5059,
+   "gate_state": "eligible",
+   "directed": [
+    0.5344,
+    0.4987
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.5,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-030",
+   "pair_id": "syn-pair0082",
+   "score": 0.75,
+   "gate_state": "eligible",
+   "directed": [
+    0.75,
+    0.75
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 5.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-033",
+   "pair_id": "syn-pair0037",
+   "score": 0.2,
+   "gate_state": "eligible",
+   "directed": [
+    1.0,
+    0.0
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 2.5,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 1.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.0
+   }
+  },
+  {
+   "pair_code": "RP-034",
+   "pair_id": "syn-pair0083",
+   "score": 0.3127,
+   "gate_state": "eligible",
+   "directed": [
+    0.576,
+    0.2469
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 5.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-035",
+   "pair_id": "syn-pair0290",
+   "score": 0.3988,
+   "gate_state": "eligible",
+   "directed": [
+    0.5437,
+    0.3625
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-040",
+   "pair_id": "syn-pair0019",
+   "score": 0.4987,
+   "gate_state": "eligible",
+   "directed": [
+    0.7125,
+    0.4453
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.5,
+    "find_q2_a_to_b": 4.5,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-045",
+   "pair_id": "syn-pair0039",
+   "score": 0.9875,
+   "gate_state": "eligible",
+   "directed": [
+    0.9875,
+    0.9875
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.5,
+    "find_q2_a_to_b": 4.5,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.0
+   }
+  },
+  {
+   "pair_code": "RP-048",
+   "pair_id": "syn-pair0096",
+   "score": 0.2,
+   "gate_state": "eligible",
+   "directed": [
+    1.0,
+    0.0
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 3.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 2.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-049",
+   "pair_id": "syn-pair0061",
+   "score": 0.61,
+   "gate_state": "eligible",
+   "directed": [
+    0.575,
+    0.75
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.5,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-057",
+   "pair_id": "syn-pair0250",
+   "score": 0.0,
+   "gate_state": "eligible",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "confidence": 0.2222,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 1.5,
+    "find_q2_a_to_b": 1.5,
+    "find_q3_b_to_a": 1.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 2.5
+   }
+  },
+  {
+   "pair_code": "RP-067",
+   "pair_id": "syn-pair0411",
+   "score": 0.2725,
+   "gate_state": "eligible",
+   "directed": [
+    0.1703,
+    0.6813
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.0,
+    "find_q2_a_to_b": 4.0,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-071",
+   "pair_id": "syn-pair0338",
+   "score": 0.0,
+   "gate_state": "eligible",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 2.5,
+    "find_q2_a_to_b": 2.5,
+    "find_q3_b_to_a": 2.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-076",
+   "pair_id": "syn-pair0294",
+   "score": 0.3442,
+   "gate_state": "eligible",
+   "directed": [
+    0.7375,
+    0.2458
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.0,
+    "find_q2_a_to_b": 4.5,
+    "find_q3_b_to_a": 4.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-077",
+   "pair_id": "syn-pair0280",
+   "score": 0.0,
+   "gate_state": "eligible",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 2.0,
+    "find_q2_a_to_b": 2.0,
+    "find_q3_b_to_a": 2.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-088",
+   "pair_id": "syn-pair0405",
+   "score": 0.3594,
+   "gate_state": "eligible",
+   "directed": [
+    0.2695,
+    0.7188
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 3.5,
+    "find_q2_a_to_b": 2.5,
+    "find_q3_b_to_a": 4.5,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-094",
+   "pair_id": "syn-pair0384",
+   "score": 0.385,
+   "gate_state": "eligible",
+   "directed": [
+    0.6417,
+    0.3208
+   ],
+   "confidence": 1.0,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 4.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-102",
+   "pair_id": "syn-pair0114",
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "directed": [
+    1.0,
+    1.0
+   ],
+   "confidence": 0.8889,
+   "gate_reasons": [
+    "A: zu wenig Stunden"
+   ],
+   "consensus": {
+    "find_q1_gespraech": 2.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "yes",
+    "find_q5_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-118",
+   "pair_id": "syn-pair0246",
+   "score": 0.0,
+   "gate_state": "eligible",
+   "directed": [
+    0.0,
+    0.0
+   ],
+   "confidence": 0.3333,
+   "gate_reasons": null,
+   "consensus": {
+    "find_q1_gespraech": 2.0,
+    "find_q2_a_to_b": 2.0,
+    "find_q3_b_to_a": 2.0,
+    "find_q4_ausschluss": "no",
+    "find_q5_sicherheit": 3.0
+   }
+  },
+  {
+   "pair_code": "RP-120",
+   "pair_id": "syn-pair0021",
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "directed": [
+    1.0,
+    1.0
+   ],
+   "confidence": 1.0,
+   "gate_reasons": [
+    "A: verlangter Ort nicht erfüllt"
+   ],
+   "consensus": {
+    "find_q1_gespraech": 4.0,
+    "find_q2_a_to_b": 5.0,
+    "find_q3_b_to_a": 5.0,
+    "find_q4_ausschluss": "unclear",
+    "find_q5_sicherheit": 4.0
+   }
+  }
+ ],
+ "connect_pairs": [
+  {
+   "pair_code": "RP-009",
+   "pair_id": "syn-pair0130",
+   "stress_case": null,
+   "score": 0.8252,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 4.5,
+    "connect_q2_anzeigen": "yes",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-038",
+   "pair_id": "syn-pair0204",
+   "stress_case": null,
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 4.5,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-041",
+   "pair_id": "syn-pair0144",
+   "stress_case": null,
+   "score": 0.8371,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 3.5,
+    "connect_q2_anzeigen": "maybe",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-043",
+   "pair_id": "syn-pair0160",
+   "stress_case": null,
+   "score": 0.6041,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 4.0,
+    "connect_q2_anzeigen": "yes",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-055",
+   "pair_id": "syn-pair0187",
+   "stress_case": null,
+   "score": 0.1,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 1.0,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-056",
+   "pair_id": "syn-pair0188",
+   "stress_case": null,
+   "score": 0.1292,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 1.0,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-064",
+   "pair_id": "syn-pair0165",
+   "stress_case": null,
+   "score": 0.5806,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 3.5,
+    "connect_q2_anzeigen": "maybe",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-073",
+   "pair_id": null,
+   "stress_case": "C4",
+   "score": 0.9227,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 5.0,
+    "connect_q2_anzeigen": "yes",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-082",
+   "pair_id": "syn-pair0208",
+   "stress_case": null,
+   "score": 0.0,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 1.0,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-091",
+   "pair_id": "syn-pair0148",
+   "stress_case": null,
+   "score": 0.5919,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 4.0,
+    "connect_q2_anzeigen": "yes",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 4.5
+   }
+  },
+  {
+   "pair_code": "RP-098",
+   "pair_id": "syn-pair0199",
+   "stress_case": null,
+   "score": -1.0,
+   "gate_state": "not_eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 4.5,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-104",
+   "pair_id": "syn-pair0259",
+   "stress_case": null,
+   "score": 0.1,
+   "gate_state": "eligible",
+   "confidence": 0.0,
+   "consensus": {
+    "connect_q1_deckung": 3.0,
+    "connect_q2_anzeigen": "maybe",
+    "connect_q3_ausschluss": "unclear",
+    "connect_q4_sicherheit": 1.0
+   }
+  },
+  {
+   "pair_code": "RP-107",
+   "pair_id": "syn-pair0189",
+   "stress_case": null,
+   "score": 0.1,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 1.0,
+    "connect_q2_anzeigen": "no",
+    "connect_q3_ausschluss": "yes",
+    "connect_q4_sicherheit": 5.0
+   }
+  },
+  {
+   "pair_code": "RP-109",
+   "pair_id": "syn-pair0258",
+   "stress_case": null,
+   "score": 0.1,
+   "gate_state": "uncertain",
+   "confidence": 0.0,
+   "consensus": {
+    "connect_q1_deckung": 3.0,
+    "connect_q2_anzeigen": "maybe",
+    "connect_q3_ausschluss": "unclear",
+    "connect_q4_sicherheit": 1.0
+   }
+  },
+  {
+   "pair_code": "RP-114",
+   "pair_id": "syn-pair0131",
+   "stress_case": null,
+   "score": 0.8687,
+   "gate_state": "eligible",
+   "confidence": 1.0,
+   "consensus": {
+    "connect_q1_deckung": 5.0,
+    "connect_q2_anzeigen": "yes",
+    "connect_q3_ausschluss": "no",
+    "connect_q4_sicherheit": 5.0
+   }
+  }
+ ]
+}
