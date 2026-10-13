@@ -1,0 +1,55 @@
+{
+ "assumption": "Alle synthetischen Personen haben der Matching-Nutzung von Capability-Bereich, Erfahrung und Verantwortungswunsch zugestimmt (volle Sicht wie v03).",
+ "decision_rule": {
+  "adopt_F3_NO_FAMILY_if_all": [
+   "Silver Spearman Q1 (Consensus) ≥ F3_BASELINE − 0.02",
+   "Silver Spearman Q2 und Q3 (Consensus) je ≥ F3_BASELINE − 0.02",
+   "Gate unverändert: identischer Gate-Zustand für alle Paare (Pool) und identische Silver-Gate-Kennzahlen",
+   "Synthetic Kontrast-NDCG@10 ≥ F3_BASELINE − 0.02",
+   "Asymmetrie erhalten: konstruierte asym. Paare, Seite ohne Bedarf in Top 10 ≤ F3_BASELINE + 0.05 UND ≤ M7 (0.9231) − 0.1"
+  ],
+  "no_threshold_changes_after_results": true
+ },
+ "experiment": "matching v03b – capability family ablation",
+ "frozen_upstream": {
+  "matching_models_v03.py": "125e937568d7cd74d6e37005e38f4befce5ab4b1a554613937e517d9a1b67036",
+  "normalization_v03.py": "df12a15e923d6f426e1fb1f886514431383bc94de5547396c38ec28dd88c02db",
+  "preregistration_v03.json": "cbe29894e01cffb27d1d81aef7ab0bba9a425bda8db07b6eda858cfc09fad9df",
+  "silver_adjudication_v03.json": "e7b3f05d20e1b1cbfa2cbdbd882b9305d889ab1c75627d2c5e1ff41401bf01d0",
+  "silver_reference_v03.py": "9c7b4f467aac15aaa57aa7ddde3e699688c669cd00d828420e5bd5cbcbc3af27"
+ },
+ "hashes": {
+  "models_v03b.py": "31b352e04e7060682a36e83c8215c48c1a0924ed9190c69d08ab23ccec802623",
+  "run_experiment_v03b.py": "adf8b026a9f0a75751d2adcaa922b19afa3e4f3dc31c5f599a9fca55eb75dc61"
+ },
+ "holdout": "UNOPENED – 38 clean; RP-001/RP-002 contaminated and excluded",
+ "metrics": {
+  "primary": "Silver Spearman Q1 (Consensus)",
+  "silver": [
+   "Spearman/Kendall/NDCG/paarweise Q1 gegen Consensus, R1, R2",
+   "Spearman A→B vs Q2, B→A vs Q3",
+   "Gate vs Q4 (P/R/Spez/F1)"
+  ],
+  "synthetic": [
+   "Recall@10, NDCG@10 (wie gerankt, pessimistisch)",
+   "konstruiert/Kontrast NDCG@10",
+   "excellent/promising@10",
+   "asymmetrisch konstruiert/Kontrast: Seite mit/ohne Bedarf in Top 10",
+   "exclude zugelassen/Top 10, falsch gesperrt",
+   "Exposition Generalisten/Sparse/Spezialisten",
+   "Anzahl Paare mit geändertem Score"
+  ]
+ },
+ "models": {
+  "F3_BASELINE": "matching_models_v03 F3_PH1_min60_DICT unverändert",
+  "F3_NO_FAMILY": "identisch; einzige Änderung: Teil-Gutschrift für Bereiche derselben Capability-Familie = 0 (family_credit=False)"
+ },
+ "tolerances": {
+  "M7_constructed_asym_other_side_top10_from_v03": 0.9231,
+  "asym_other_side_max_increase_vs_baseline": 0.05,
+  "asym_other_side_must_stay_below_M7_minus": 0.1,
+  "silver_q1_max_drop": 0.02,
+  "silver_q2_q3_max_drop": 0.02,
+  "synthetic_contrast_ndcg10_max_drop": 0.02
+ }
+}

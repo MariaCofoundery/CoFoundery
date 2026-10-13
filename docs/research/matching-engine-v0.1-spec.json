@@ -1,0 +1,327 @@
+{
+ "status": "draft-for-freeze; all open decisions resolved (v03b); not yet hash-frozen; no product implementation",
+ "binding_document": "docs/research/matching-engine-v0.1-spec.md",
+ "matching_version": "matching-v0.1",
+ "normalization_version": "matching-normalization-v0.1",
+ "research_basis": {
+  "preregistration_v03_sha256": "cbe29894e01cffb27d1d81aef7ab0bba9a425bda8db07b6eda858cfc09fad9df",
+  "find_model": "F3_PH1_min60_DICT",
+  "connect_model": "C1_topic_required_DICT",
+  "frozen_files_sha256": {
+   "matching_models_v03.py": "125e937568d7cd74d6e37005e38f4befce5ab4b1a554613937e517d9a1b67036",
+   "normalization_v03.py": "df12a15e923d6f426e1fb1f886514431383bc94de5547396c38ec28dd88c02db",
+   "run_experiment_v03.py": "6cec070f5175b0238dc92bb8432b3baacb1ee6b89b68264bd8d0d7ce3d2adb52",
+   "silver_adjudication_v03.json": "e7b3f05d20e1b1cbfa2cbdbd882b9305d889ab1c75627d2c5e1ff41401bf01d0",
+   "silver_reference_v03.py": "9c7b4f467aac15aaa57aa7ddde3e699688c669cd00d828420e5bd5cbcbc3af27",
+   "../matching_models_v01.py": "239941b74411ff629c5e4401c162ee7d1edd02ca9d8e8f59ebae1b72c1ff43b1",
+   "../normalization_v01.py": "44f55979f5008f0f75ec7a28222976ccea5fe7f941614af0ed6882ef1d0be7d7",
+   "../v02/connect_stress_v02.json": "7ebbe24b8f8ef6d0a1fefe5702cef954b6ac60403304903ef9ce4552cee5e136",
+   "../v02/human_labels_split_key_v02.json": "9ae1768f8364a6cbf70b3fb7a713af86d63459de26c3c0528ca71c41d1d70ca2",
+   "../v02/matching_models_v02.py": "586b65a0a872eeff5c71c43f1a3372204abda06721d8819b3a623f634e9eedce",
+   "../v02/normalization_v02.py": "3e505b0dfd8d0e2a5474cea09fbd8ec184ca3e48fe6eefea1c8ea4a42b9d8c4c",
+   "../v02/posthoc_v02.py": "5ee0a45951f06e13aaac2d5b5795f743f3e0b0aa4bcf7920313216baf2b69c4a",
+   "../v03b/models_v03b.py": "31b352e04e7060682a36e83c8215c48c1a0924ed9190c69d08ab23ccec802623",
+   "../v03b/run_experiment_v03b.py": "adf8b026a9f0a75751d2adcaa922b19afa3e4f3dc31c5f599a9fca55eb75dc61"
+  },
+  "preregistration_v03b_sha256": "95197de95f0c85022e6089e5ad075fdf7af48fd66229805c700581292e0a51a1",
+  "family_ablation_v03b": {
+   "result": "F3_NO_FAMILY not adopted",
+   "failed_criterion": "asymmetry_preserved",
+   "constructed_asym_other_side_top10": {
+    "F3_BASELINE": 0.6154,
+    "F3_NO_FAMILY": 0.7692,
+    "allowed_increase": 0.05
+   },
+   "silver_q1_spearman_consensus": {
+    "F3_BASELINE": 0.8588,
+    "F3_NO_FAMILY": 0.8643
+   },
+   "gate_identical": true
+  }
+ },
+ "find": {
+  "gate": {
+   "states": [
+    "eligible",
+    "uncertain",
+    "ineligible"
+   ],
+   "both_directions": true,
+   "checks": [
+    "requiredRolesAny",
+    "minimumAvailabilityHoursPerWeek",
+    "acceptedRemoteModes",
+    "desiredLocationRegion",
+    "acceptedSearchIntents",
+    "acceptedStartHorizons",
+    "requiredCapabilityAreasAny",
+    "requiredExpertiseAny",
+    "both_onsite_different_place"
+   ],
+   "location_conflict_requires": [
+    "concrete_required_place",
+    "counterpart_clearly_elsewhere_wildcard_does_not_satisfy",
+    "requirer_not_remote_or_flexible_and_not_accepting_remote"
+   ],
+   "unknown": "uncertain_never_conflict",
+   "bonus": null
+  },
+  "role_cover": "|seeking_roles(X) ∩ own_roles(Y)| / |seeking_roles(X)|",
+  "coverage_values": {
+   "own_level_ge3": 1.0,
+   "contribute_level_ge3": 0.6,
+   "own_level_lt3_or_unknown": 0.4,
+   "contribute_unclear_or_empty_level_ge3": 0.3,
+   "grow_into": 0.0,
+   "prefer_other": 0.0,
+   "prefer_external": 0.0,
+   "same_family_factor": 0.5,
+   "family_excluded": [
+    "working_style",
+    "other"
+   ],
+   "aggregation": "best_single_entry_per_need",
+   "same_family_note": "kept after v03b ablation; ranking partial credit only, never ownership, no reason code"
+  },
+  "need": "mean_of_known(role_cover, cap_cover); both_unknown -> 0",
+  "intent_parts": {
+   "search_intent_distance": {
+    "0": 1.0,
+    "1": 0.6,
+    "2": 0.1
+   },
+   "start_horizon_distance": {
+    "0": 1.0,
+    "1": 1.0,
+    "2": 0.6,
+    "3": 0.2
+   },
+   "goal_group_distance": {
+    "0": 1.0,
+    "1": 0.6,
+    "2": 0.1
+   },
+   "goal_groups": {
+    "explore": 0,
+    "side_project": 0,
+    "profitable_business": 1,
+    "venture_scale": 2,
+    "exit_oriented": 2
+   },
+   "stage": {
+    "both_already_building_or_both_no_idea": 0.5,
+    "one_with_idea_one_without": 1.0,
+    "otherwise": 0.8
+   }
+  },
+  "modulator": "mean_of_known(context, intent); both_unknown -> 0.5",
+  "directional": "need × (0.5 + 0.5 × mod)",
+  "mutuality": {
+   "w_min": 0.6,
+   "w_mean": 0.4
+  },
+  "confidence_fields": [
+   "own_roles",
+   "seeking_roles",
+   "capabilities",
+   "industries",
+   "expertise",
+   "search_intent",
+   "start_horizon",
+   "location_region",
+   "remote_mode"
+  ],
+  "confidence": "min(c(A), c(B))",
+  "ownership_rule": "only ownership_wish == 'own' counts as ownership; grow_into never",
+  "confidence_user_levels": null
+ },
+ "connect": {
+  "gate": {
+   "states": [
+    "eligible",
+    "uncertain",
+    "ineligible"
+   ],
+   "checks": [
+    "offer_active",
+    "offer_not_expired",
+    "offer_profile_active",
+    "visibility_permission",
+    "not_blocked",
+    "not_own",
+    "suggestable_for_person_suggestions",
+    "regional_onsite_concrete_place"
+   ],
+   "not_in_gate": [
+    "topic_mismatch"
+   ]
+  },
+  "weights": {
+   "category": 0.1,
+   "industry": 0.15,
+   "text": 0.2,
+   "topic": 0.55
+  },
+  "expertise_only_topic_value": 0.7,
+  "no_topic_cap": 0.1,
+  "no_topic_text_min": 0.1,
+  "text_relevance": "IDF-weighted share of seek tokens (title+summary+topics) found in offer tokens (title+summary+topics); match = equal or common stem >= 6; min token length 3",
+  "industry_missing": 0.0,
+  "confidence_fields": [
+   "topics",
+   "industries",
+   "locations",
+   "geographic_scope"
+  ],
+  "confidence": "min(c(seek), c(offer))",
+  "ties": {
+   "tie_group": "identical relevance score",
+   "secondary_order": "display only (e.g. published_at, then id); never relevance"
+  }
+ },
+ "normalization": {
+  "pipeline": [
+   "raw_value_kept",
+   "generic2",
+   "frozen_dictionary",
+   "match_representation{key,tokens}"
+  ],
+  "dictionary_precedence": "if both terms have a dictionary key, the dictionary decides",
+  "wildcard_places": "never satisfy a concrete place; never a conflict on their own",
+  "known_false_match": [
+   "Marketing ~ Marketplace (stem 'market')"
+  ]
+ },
+ "never_inputs": [
+  "workstyle (ranking)",
+  "founder-compatibility-v1 scores",
+  "values",
+  "venture_alignment",
+  "founder_setup",
+  "commitment_lab",
+  "read_my_mind",
+  "founder_in_the_wild",
+  "research_items",
+  "direction_statements",
+  "person_resources",
+  "evidence_narratives",
+  "interview_answers",
+  "strengths",
+  "advisor_data",
+  "team_only_data",
+  "capabilities_with_disclosure_private"
+ ],
+ "workstyle_context": {
+  "after_matching_only": true,
+  "requires_mutual_consent": "workstyle_discovery_enabled",
+  "outputs": [
+   "SIMILAR_PATTERN",
+   "DISCUSSION_POINT",
+   "INSUFFICIENT_DATA"
+  ],
+  "affects": null
+ },
+ "reason_codes": {
+  "find": [
+   "FIND_ROLE_NEED_COVERED",
+   "FIND_ROLE_NEED_COVERED_REVERSE",
+   "FIND_AREA_OWN_COVERED",
+   "FIND_AREA_CONTRIBUTE",
+   "FIND_SAME_INDUSTRY",
+   "FIND_START_ALIGNED",
+   "FIND_STAGE_COMPLEMENT",
+   "FIND_DIFF_START",
+   "FIND_DIFF_COMMITMENT",
+   "FIND_DIFF_GOAL",
+   "FIND_UNKNOWN_LOCATION",
+   "FIND_LIMITED_EVIDENCE"
+  ],
+  "connect": [
+   "CONNECT_TOPIC_MATCH",
+   "CONNECT_TOPIC_VIA_EXPERTISE",
+   "CONNECT_TEXT_OVERLAP",
+   "CONNECT_SAME_INDUSTRY",
+   "CONNECT_SAME_CATEGORY",
+   "CONNECT_REMOTE_POSSIBLE",
+   "CONNECT_UNKNOWN_LOCATION",
+   "CONNECT_LIMITED_EVIDENCE"
+  ]
+ },
+ "open_decisions": [],
+ "pre_implementation_bugfix_required": [
+  "web/src/features/capability/capabilityComparison.ts:88 CLAIMS includes grow_into – PRE-IMPLEMENTATION BUGFIX REQUIRED",
+  "web/src/features/capability/capabilityTeamReadout.ts:117 CLAIMS includes grow_into – PRE-IMPLEMENTATION BUGFIX REQUIRED"
+ ],
+ "holdout": {
+  "pipeline": "UNOPENED",
+  "contaminated_exclude": [
+   "RP-001",
+   "RP-002"
+  ],
+  "clean_unopened": 38,
+  "regression_tests_must_not_use": [
+   "syn-pair0297",
+   "stress case C4"
+  ],
+  "status_text": "38 CLEAN / UNOPENED"
+ },
+ "final_research_gate": "Matching Engine v0.1 Spec must be frozen before clean holdout evaluation.",
+ "idf_corpus_version": {
+  "formula_unchanged": "idf(tok) = ln((N+1)/(df(tok)+1)); unknown token -> ln(N+1)",
+  "corpus": "title+summary+topics of CONNECT listings permitted for matching at snapshot time (active, not expired, profile active, visibility allowed); never drafts/private/deleted/blocked/research",
+  "stored": "N, df table and its hash only; no texts, no listing ids",
+  "format": "connect-idf-<matching_version>-<YYYYMMDD>-<hash8>",
+  "frozen_per_matching_version": true,
+  "synthetic_value": "synthetic-v03-all-listings"
+ },
+ "result_versions_required_in_every_result": [
+  "matching_version",
+  "normalization_version",
+  "idf_corpus_version"
+ ],
+ "capability_matching_permission": {
+  "requires_explicit_consent": true,
+  "fields": [
+   "area_id",
+   "application_level",
+   "ownership_wish"
+  ],
+  "consent_is_not_visibility": true,
+  "explanations_never_reveal_private_values": true,
+  "without_consent": "capabilities treated as absent: cap_cover UNKNOWN, need = role_cover, counterpart requiredCapabilityAreasAny -> uncertain; person not excluded",
+  "v0_1_scope": "functional requirement only; no consent UI, no DB column",
+  "synthetic_assumption": "all synthetic persons consented"
+ },
+ "confidence_display": {
+  "internal_score_and_evidence_allowed": true,
+  "binding_user_levels": false,
+  "threshold_model": null,
+  "neutral_hint_allowed": "Dieser Vorschlag basiert auf wenigen Angaben.",
+  "hint_affects_ranking": false
+ },
+ "ranking_display": {
+  "find_default_sort": "relevance",
+  "ranking_hidden": false,
+  "ui_must_explain": "ordered by explicit search criteria plus released matching data",
+  "forbidden": [
+   "percentages",
+   "founder fit",
+   "compatibility language",
+   "score categories"
+  ],
+  "published_at": "replaced as default later; 'Neueste' may become optional sort",
+  "ui_specified": false
+ },
+ "resolved_decisions": {
+  "capability_depth_matching_consent_or_disclosed_view": "RESOLVED – explicit consent required; consent != visibility",
+  "family_half_credit_keep_or_remove_retest": "RESOLVED – kept (v03b: F3_NO_FAMILY fails asymmetry criterion)",
+  "idf_corpus_and_version": "RESOLVED – versioned frozen snapshot of matching-permitted listings; formula unchanged",
+  "confidence_level_thresholds": "RESOLVED – no binding user levels; internal only; neutral hint allowed",
+  "relevance_order_vs_product_rules_confirmation": "RESOLVED – relevance default, transparent, no %/fit/compatibility language",
+  "find_sort_switch_from_publication_to_relevance": "RESOLVED – published_at replaced later; optional 'Neueste'; no UI yet",
+  "ownership_bugs": "RESOLVED as pre-implementation requirement; code unchanged"
+ },
+ "pre_implementation_checked_no_ownership_bug": [
+  "web/src/features/capability/capabilityReadout.ts:93-106 grow_into never anchor; but own with explicit level<4 -> growingInto mixes axes – engine must not reuse buckets"
+ ]
+}
