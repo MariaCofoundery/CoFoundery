@@ -1,0 +1,201 @@
+id,primary_scenario,locale,display_name,location_region,remote_mode,industries,expertise,capability_count,find_status,own_roles,seeking_roles,hours,commitment,venture_stage,venture_goal,search_intent,start_horizon,must_have_keys,connect_active,listings,problems
+syn-p001,normal,de,Mateo Synth-001,Berlin,flexible,Industry 4.0,Künstliche Intelligenz | Data Science | Softwareentwicklung,7,active,tech,sales,40,full_time,already_building,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p002,normal,de,Lina Synth-002,bundesweit,remote,Mobilität | Plattform,Künstliche Intelligenz | Datenanalyse | KI / ML,5,active,research tech,product sales,36,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p003,normal,en,Finn Synth-003,Region Stuttgart,onsite,Fintech | PropTech,,8,active,tech,finance,5,side_project,idea_validating,explore,actively_exploring,next_6_months,acceptedStartHorizons desiredLocationRegion requiredRolesAny,False,0,0
+syn-p004,normal,de,Clara Synth-004,Großraum Berlin,remote,Mobilität,Nutzerforschung | Produktdesign | UX-Design,7,active,product,tech growth,39,full_time,idea_validating,profitable_business,ready_now,now,acceptedRemoteModes requiredRolesAny,True,2,0
+syn-p005,normal,en,Luca Synth-005,DACH,remote,Arbeitswelt | Software,Gestaltung | UX-Design,7,active,design,tech,38,full_time,exploring_ideas,venture_scale,ready_now,now,,False,0,0
+syn-p006,normal,de,Alma Synth-006,Berlin,onsite,Hardware,Partnerships,9,active,sales,tech product,22,part_time,idea_validating,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p007,normal,de,Dario Synth-007,Berlin (DE),hybrid,,,5,active,growth marketing,product,17,part_time,idea_validating,venture_scale,actively_exploring,next_3_months,desiredLocationRegion requiredRolesAny,True,3,0
+syn-p008,normal,de,Ida Synth-008,Leipzig,flexible,Bauwirtschaft | Industry 4.0,Community-Aufbau,4,active,marketing,product,12,side_project,idea_validating,explore,actively_exploring,next_6_months,requiredRolesAny,True,3,0
+syn-p009,normal,en,Noah Synth-009,Berlin,remote,Energy | Sozialunternehmen,Scaling | Personalgewinnung | Operations,6,active,operations,tech,39,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p010,normal,en,Selin Synth-010,Hamburg,,Industry 4.0 | FinTech,Seed Funding | Monetization,7,active,finance,tech,52,all_in,idea_validating,venture_scale,ready_now,now,requiredRolesAny,True,3,0
+syn-p011,normal,en,Bao Synth-011,Wien,hybrid,Real Estate,B2B Sales,7,active,strategy,tech product,25,part_time,no_idea_open_to_join,explore,open_later,later_or_flexible,requiredRolesAny,False,0,0
+syn-p012,normal,de,Frieda Synth-012,Berlin,onsite,Energiewende | Consumer,,6,active,research,tech,23,part_time,exploring_ideas,explore,open_later,,,True,3,0
+syn-p013,normal,de,Kenji Synth-013,München,flexible,Arbeitswelt,Wirkungsmessung,6,active,community,tech finance,6,side_project,exploring_ideas,side_project,actively_exploring,next_6_months,,False,0,0
+syn-p014,normal,en,Ronja Synth-014,,flexible,ClimateTech,Operations | Recruiting,6,active,operations,sales tech,23,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,acceptedRemoteModes acceptedSearchIntents minimumAvailabilityHoursPerWeek requiredRolesAny,True,3,1
+syn-p015,normal,de,Kofi Synth-015,,hybrid,saas,Ops | Elektronik,6,active,tech,sales finance,28,part_time,exploring_ideas,explore,open_later,later_or_flexible,,False,0,0
+syn-p016,normal,en,Defne Synth-016,Zürich,hybrid,,SROI | Community,6,active,community,finance,40,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,acceptedStartHorizons minimumAvailabilityHoursPerWeek,True,3,0
+syn-p017,normal,en,Paul Synth-017,remote (DE),hybrid,SaaS,Early Adopters | Kooperationen | Vertriebsaufbau,6,active,sales,tech,4,side_project,exploring_ideas,explore,actively_exploring,next_6_months,,False,0,0
+syn-p018,normal,de,Lotte Synth-018,München,hybrid,,Markteintritt | BizDev,5,active,sales,tech product,5,side_project,exploring_ideas,side_project,actively_exploring,next_6_months,,False,0,0
+syn-p019,normal,de,Can Synth-019,DACH,hybrid,E-Health,Netzwerk | Wirkungsmessung,8,,,,,,,,,,,True,3,1
+syn-p020,normal,de,Nora Synth-020,DACH,remote,Immobilien | Personalwesen,Preismodelle | Finanzplanung,7,draft,finance,tech,40,full_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p021,normal,de,Matti Synth-021,Wien,,Banking,Prozesse,7,,,,,,,,,,,True,3,0
+syn-p022,normal,de,Nele Synth-022,Großraum Berlin,hybrid,Finanzdienstleistungen,,4,,,,,,,,,,,False,0,0
+syn-p023,normal,de,Emil Synth-023,DACH,remote,Personalwesen,Impact,8,,,,,,,,,,,False,0,0
+syn-p024,normal,en,Juna Synth-024,Cologne,hybrid,,Sales | Monetization,8,,,,,,,,,,,True,3,0
+syn-p025,normal,en,Ravi Synth-025,Frankfurt am Main,onsite,Energy,Scaling | Elektronik,5,,,,,,,,,,,True,3,0
+syn-p026,normal,de,Zoe Synth-026,München,onsite,Energie,Vertrieb | Pricing,8,,,,,,,,,,,False,0,0
+syn-p027,normal,de,Jan Synth-027,Hamburg,flexible,Maschinenbau,,7,,,,,,,,,,,True,3,0
+syn-p028,normal,de,Leyla Synth-028,,remote,Bauwirtschaft,,6,,,,,,,,,,,True,3,0
+syn-p029,normal,de,Theo Synth-029,Zürich,hybrid,Impact,,7,,,,,,,,,,,False,0,0
+syn-p030,normal,de,Yara Synth-030,Köln,flexible,Handel,Preismodelle | Fundraising,6,paused,finance,tech product,4,side_project,idea_validating,side_project,actively_exploring,next_6_months,,True,3,1
+syn-p031,normal,de,Malik Synth-031,Hamburg,remote,Immobilien | Produktion,Produktentwicklung | UX,6,active,product,marketing,29,part_time,exploring_ideas,explore,actively_exploring,next_3_months,,True,3,0
+syn-p032,normal,de,Hanna Synth-032,Zürich,onsite,DTC,Gestaltung | Produktmanagement,7,,,,,,,,,,,True,3,0
+syn-p033,normal,en,Elias Synth-033,München,remote,Deep Tech | Immobilien,UX | UX-Design,7,,,,,,,,,,,True,3,0
+syn-p034,normal,en,Mina Synth-034,München,flexible,HR Tech | Software,Data Analytics | Software Engineering,6,active,tech,design,16,part_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p035,normal,en,Vincent Synth-035,Stuttgart,onsite,Financial Services | Digital Health,,7,active,finance,tech,6,side_project,idea_validating,explore,actively_exploring,next_6_months,acceptedRemoteModes requiredRolesAny,True,3,0
+syn-p036,normal,de,Aylin Synth-036,Germany,hybrid,Logistik | Klimaschutz,Data | KI / ML,7,active,tech growth,product,42,full_time,idea_validating,profitable_business,ready_now,now,,True,3,0
+syn-p037,normal,de,Leon Synth-037,Berlin,flexible,Klimaschutz | Materialforschung,Gestaltung,6,active,design,operations,35,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p038,normal,de,Greta Synth-038,Frankfurt am Main,remote,Mobilität | Klimaschutz,Impact Measurement | Community,6,,,,,,,,,,,True,3,0
+syn-p039,normal,de,Oskar Synth-039,"Stuttgart, BW",onsite,Banking | Supply Chain,Data | KI,9,active,tech,finance research,16,part_time,already_building,side_project,actively_exploring,next_3_months,,True,3,0
+syn-p040,normal,en,Merle Synth-040,Berlin,hybrid,Energy | Manufacturing,Prozesse | Hiring | Operations,8,active,operations,design,35,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p041,normal,de,Henrik Synth-041,Stuttgart,remote,Konsumgüter,KI | Data | KI / ML,4,active,tech,product,11,side_project,idea_validating,side_project,,next_6_months,,True,3,0
+syn-p042,normal,en,Pia Synth-042,Frankfurt am Main,hybrid,Mobilität | Social Entrepreneurship,,6,active,product,tech,38,full_time,no_idea_open_to_join,profitable_business,ready_now,now,acceptedRemoteModes minimumAvailabilityHoursPerWeek requiredRolesAny,True,3,0
+syn-p043,normal,de,Jonas Synth-043,,hybrid,Sozialunternehmen | Arbeitswelt,Prozesse,5,,,,,,,,,,,True,3,0
+syn-p044,normal,en,Sanna Synth-044,,flexible,Mobility | Creative Industries,UX,5,active,product,tech design,42,full_time,exploring_ideas,venture_scale,ready_now,now,acceptedRemoteModes minimumAvailabilityHoursPerWeek requiredRolesAny,True,3,1
+syn-p045,normal,de,Arjun Synth-045,"Stuttgart, BW",onsite,Konsumgüter | Robotics,Produktdesign | Produktmanagement,7,active,product,tech,12,side_project,exploring_ideas,side_project,actively_exploring,next_6_months,requiredRolesAny,True,3,1
+syn-p046,normal,de,Amira Synth-046,München / Bayern,onsite,Energie | Industrie,Personalgewinnung,7,active,operations,design,41,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p047,normal,de,Tariq Synth-047,Hamburg,onsite,Maschinenbau | Bildung,Community-Aufbau | Impact,9,,,,,,,,,,,True,3,0
+syn-p048,normal,de,Imani Synth-048,FFM,flexible,,Gestaltung | Produktentwicklung | Produktmanagement,8,,,,,,,,,,,True,3,0
+syn-p049,normal,de,Samir Synth-049,Berlin,hybrid,Weiterbildung | Immobilien,Finanzierung | Fundraising,6,active,finance,community,41,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,acceptedStartHorizons requiredRolesAny,True,3,1
+syn-p050,normal,en,Mara Synth-050,München,hybrid,Digital Health,Brand Marketing,6,active,design,operations,44,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p051,normal,de,Mateo Synth-051,Region Stuttgart,flexible,Plattform,Scaling,4,active,operations,design,22,part_time,exploring_ideas,profitable_business,open_later,later_or_flexible,,True,3,0
+syn-p052,normal,de,Lina Synth-052,München,flexible,Mobilität | Digitale Gesundheit,,6,active,operations,research,35,full_time,already_building,venture_scale,actively_exploring,next_3_months,,True,2,0
+syn-p053,normal,en,Finn Synth-053,bundesweit,hybrid,Energy | Education,Community,7,,,,,,,,,,,True,3,0
+syn-p054,normal,de,Clara Synth-054,München,flexible,,Hardware-Entwicklung | Prozesse,6,active,tech,operations,35,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p055,normal,en,Luca Synth-055,München,flexible,,,7,active,strategy,design,41,full_time,already_building,venture_scale,actively_exploring,next_3_months,acceptedSearchIntents requiredCapabilityAreasAny requiredRolesAny,False,0,0
+syn-p056,normal,en,Alma Synth-056,Wien,hybrid,AgriTech,Software Engineering | Machine Learning | Data Analytics,5,active,tech,product,43,full_time,exploring_ideas,venture_scale,ready_now,now,acceptedRemoteModes requiredRolesAny,True,2,1
+syn-p057,normal,de,Dario Synth-057,"Hamburg, Deutschland",hybrid,Bauwirtschaft | Gemeinwohl,Softwareentwicklung | Datenanalyse | Machine Learning | Software Engineering,5,active,tech,finance growth,51,all_in,already_building,venture_scale,ready_now,now,,True,3,0
+syn-p058,normal,en,Ida Synth-058,Leipzig,onsite,HR Tech | marketplace,ML | Engineering | Software Engineering | KI / ML,7,active,tech,design,38,full_time,already_building,venture_scale,ready_now,now,desiredLocationRegion,False,0,0
+syn-p059,normal,de,Noah Synth-059,,onsite,Klimaschutz | ConTech,B2B Sales,6,active,strategy,design,35,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p060,normal,de,Selin Synth-060,Frankfurt am Main,onsite,Mobilität | Digitale Gesundheit,Monetization | Fundraising,6,active,finance,operations,35,full_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p061,normal,de,Bao Synth-061,,flexible,SaaS,Netzwerk | Wirkungsmessung,7,,,,,,,,,,,True,3,1
+syn-p062,normal,de,Frieda Synth-062,Muenchen,onsite,Digitale Gesundheit | Social Entrepreneurship,,7,active,design,strategy,38,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p063,normal,de,Kenji Synth-063,München,onsite,Health Tech | Arbeitswelt,,5,active,design,strategy,41,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p064,normal,de,Ronja Synth-064,Berlin-Brandenburg,hybrid,Erneuerbare Energien | Medien,Produktdesign | Content Marketing | UX-Design,8,active,design,operations,39,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,desiredLocationRegion requiredRolesAny,True,3,0
+syn-p065,normal,en,Kofi Synth-065,HH,flexible,Erneuerbare Energien,Wirkungsmessung,6,,,,,,,,,,,True,3,0
+syn-p066,normal,de,Defne Synth-066,Munich,hybrid,Arbeitswelt | Medien,Vertrieb | Markenaufbau | Performance Marketing,6,active,marketing,tech,15,part_time,idea_validating,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p067,normal,de,Paul Synth-067,Berlin,flexible,Maschinenbau,,6,,,,,,,,,,,True,3,1
+syn-p068,normal,de,Lotte Synth-068,Berlin-Brandenburg,,Lebensmittel,Markteintritt | Markenaufbau,4,,,,,,,,,,,True,3,0
+syn-p069,normal,de,Can Synth-069,Stuttgart,flexible,Marketplace | Bauwirtschaft,Markenaufbau,8,active,design,operations,25,part_time,no_idea_open_to_join,profitable_business,open_later,later_or_flexible,acceptedSearchIntents,True,2,0
+syn-p070,normal,de,Nora Synth-070,Köln,hybrid,Logistik,Discovery,8,,,,,,,,,,,True,3,0
+syn-p071,normal,de,Matti Synth-071,Frankfurt am Main,flexible,Arbeitswelt,Netzwerk | Impact,8,,,,,,,,,,,True,3,0
+syn-p072,normal,de,Nele Synth-072,Ruhr Area,flexible,Bauwirtschaft,Kooperationen | Pilotkunden | B2B-Vertrieb,9,,,,,,,,,,,True,3,0
+syn-p073,normal,de,Emil Synth-073,Stuttgart,remote,Marktplatz,,8,active,strategy,design,22,part_time,already_building,profitable_business,ready_now,later_or_flexible,,True,3,0
+syn-p074,normal,de,Juna Synth-074,Wien,hybrid,,Produktdesign | Nutzerforschung | Produktmanagement,7,active,product,strategy,21,part_time,already_building,explore,open_later,later_or_flexible,acceptedRemoteModes minimumAvailabilityHoursPerWeek,False,0,0
+syn-p075,normal,de,Ravi Synth-075,München,flexible,Bildung,Monetarisierung | Fundraise | Finanzplanung | Fundraising,8,,,,,,,,,,,True,3,0
+syn-p076,normal,de,Zoe Synth-076,Zürich,remote,Future of Work | Software as a Service,,9,active,tech,marketing,15,part_time,already_building,venture_scale,actively_exploring,next_3_months,minimumAvailabilityHoursPerWeek,True,3,0
+syn-p077,normal,en,Jan Synth-077,Wien,,Platform | Financial Services,Communities | Community,6,,,,,,,,,,,True,3,0
+syn-p078,normal,en,Leyla Synth-078,Ruhrgebiet,hybrid,Software,User Research | Produktmanagement,4,active,product,strategy,30,part_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,1
+syn-p079,normal,en,Theo Synth-079,DACH,remote,Mobility | Unternehmenssoftware,UX,7,active,product sales,research,42,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,requiredRolesAny,False,0,0
+syn-p080,normal,en,Yara Synth-080,Berlin,remote,Consumer Goods,,4,active,tech,product,43,full_time,no_idea_open_to_join,venture_scale,ready_now,now,acceptedSearchIntents,False,0,0
+syn-p081,normal,en,Malik Synth-081,,remote,Creative Industries,,6,,,,,,,,,,,True,3,0
+syn-p082,normal,de,Hanna Synth-082,,remote,Weiterbildung,Prozesse | Talent,4,active,operations,design,62,all_in,no_idea_open_to_join,venture_scale,ready_now,now,,False,0,0
+syn-p083,normal,de,Elias Synth-083,"Berlin, Germany",remote,Digitale Gesundheit,Markenaufbau | UX-Design,6,active,design,strategy,40,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p084,normal,de,Mina Synth-084,München,flexible,Erneuerbare Energien | Landwirtschaft,,4,active,growth,sales,4,side_project,already_building,explore,actively_exploring,next_6_months,requiredRolesAny,False,0,0
+syn-p085,normal,de,Vincent Synth-085,München,hybrid,Consumer,,6,active,strategy,design,36,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p086,normal,de,Aylin Synth-086,Muenchen,remote,Handel | Plattform,,5,active,design,strategy,35,full_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,1
+syn-p087,normal,de,Leon Synth-087,Hamburg,remote,Immobilien | Robotik,Netzwerk | Community,5,active,marketing,product,28,part_time,idea_validating,explore,actively_exploring,next_3_months,requiredRolesAny,False,0,0
+syn-p088,normal,de,Greta Synth-088,Köln,onsite,Bauwirtschaft,Datenanalyse | Software Engineering,6,,,,,,,,,,,True,3,1
+syn-p089,normal,en,Oskar Synth-089,Mitteldeutschland (Leipzig),flexible,Digital Health,Content Marketing | UX | UX-Design,6,active,design,tech,43,full_time,exploring_ideas,venture_scale,ready_now,now,,True,3,0
+syn-p090,normal,de,Merle Synth-090,DACH,remote,,Markenaufbau | Events,7,,,,,,,,,,,True,3,0
+syn-p091,normal,de,Henrik Synth-091,HH,hybrid,Personalwesen | Immobilien,Datenanalyse | KI,7,active,tech,marketing,15,part_time,already_building,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p092,normal,en,Pia Synth-092,Leipzig,flexible,Real Estate | Mobilität,,6,,,,,,,,,,,True,3,0
+syn-p093,normal,de,Jonas Synth-093,,hybrid,Personalwesen | Materialforschung,Markenaufbau | UX,7,active,design,marketing,19,part_time,already_building,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p094,normal,de,Sanna Synth-094,Berlin,flexible,Robotik | Personalwesen,Elektronik,5,active,tech product,sales community,48,full_time,idea_validating,venture_scale,ready_now,now,,False,0,0
+syn-p095,normal,de,Arjun Synth-095,Berlin,hybrid,Personalwesen,Personalgewinnung | Operations,5,active,operations,design,35,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,minimumAvailabilityHoursPerWeek,False,0,0
+syn-p096,normal,de,Amira Synth-096,,hybrid,Materialforschung,Kooperationen | Erste Kunden | B2B-Vertrieb,7,active,sales community,tech design,16,part_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,requiredRolesAny,True,3,0
+syn-p097,normal,de,Tariq Synth-097,Berlin,flexible,Industrie,Datenanalyse | Künstliche Intelligenz | KI / ML,7,active,tech,product,38,full_time,idea_validating,profitable_business,ready_now,now,minimumAvailabilityHoursPerWeek requiredCapabilityAreasAny requiredRolesAny,True,2,0
+syn-p098,normal,en,Imani Synth-098,,flexible,Marketplace | Social Impact,BizDev | Vertrieb | Pilot Customers | B2B-Vertrieb,9,,,,,,,,,,,True,3,0
+syn-p099,normal,de,Samir Synth-099,Ruhr Area,flexible,Klima | Medien,,10,active,sales,operations,27,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,acceptedSearchIntents,True,3,0
+syn-p100,normal,en,Mara Synth-100,Wien,hybrid,Social Impact | Financial Services,Recruiting | Scaling,7,,,,,,,,,,,True,3,0
+syn-p101,normal,de,Mateo Synth-101,München,onsite,Gesundheitswesen,Monetarisierung | Fundraising,6,active,finance,design,37,full_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p102,normal,de,Lina Synth-102,Großraum Berlin,hybrid,Logistik,GTM | B2B-Vertrieb | Software Engineering,7,active,sales tech,operations research,49,full_time,already_building,profitable_business,ready_now,now,requiredRolesAny,False,0,0
+syn-p103,normal,de,Finn Synth-103,,flexible,Plattform,Operations,6,active,tech,finance,7,side_project,exploring_ideas,explore,actively_exploring,next_6_months,acceptedStartHorizons minimumAvailabilityHoursPerWeek requiredRolesAny,False,0,0
+syn-p104,normal,de,Clara Synth-104,Hamburg,onsite,Unternehmenssoftware,Marketing | Performance Marketing,6,active,growth,tech,54,all_in,no_idea_open_to_join,venture_scale,ready_now,now,acceptedSearchIntents minimumAvailabilityHoursPerWeek requiredRolesAny,False,0,0
+syn-p105,normal,en,Luca Synth-105,Berlin,hybrid,DeepTech | Marketplace,AI | KI / ML,4,active,research,sales,20,part_time,idea_validating,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p106,normal,de,Alma Synth-106,Leipzig,hybrid,Personalwesen | Materialforschung,Marketing,5,active,growth,tech,41,full_time,exploring_ideas,venture_scale,ready_now,now,,True,3,0
+syn-p107,normal,en,Dario Synth-107,Berlin,hybrid,Industry 4.0 | FinTech,Fundraising | Pricing,7,,,,,,,,,,,True,3,0
+syn-p108,normal,de,Ida Synth-108,München,flexible,Mobilität | Kreativwirtschaft,Gestaltung | Marketing | UX-Design,5,active,design,tech,48,full_time,exploring_ideas,profitable_business,ready_now,now,acceptedSearchIntents acceptedStartHorizons,False,0,0
+syn-p109,normal,de,Noah Synth-109,bundesweit,remote,Gesundheitswesen | HRTech,Monetarisierung | Fundraising,7,,,,,,,,,,,True,3,1
+syn-p110,normal,de,Selin Synth-110,München,,Energie,Markenaufbau | Gestaltung | UX-Design,6,active,design,finance,35,full_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p111,complementary_cluster,en,Bao Synth-111,Berlin,hybrid,Digital Health,Data Analytics | Full-Stack,5,active,tech,sales finance,27,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p112,complementary_cluster,de,Frieda Synth-112,berlin,hybrid,Digitale Gesundheit,Markteintritt,6,active,sales,tech finance,19,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p113,complementary_cluster,de,Kenji Synth-113,Berlin,hybrid,Gesundheitswesen,Preisgestaltung | Finanzplanung,6,active,finance,tech sales,17,part_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,2,0
+syn-p114,complementary_cluster,de,Ronja Synth-114,Berlin,remote,Klimaschutz,Nutzerforschung | Produktmanagement,6,active,product,tech growth,26,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,,True,2,1
+syn-p115,complementary_cluster,de,Kofi Synth-115,berlin,remote,Klimaschutz,Datenanalyse | Backend | KI | Software Engineering,8,active,tech,product growth,21,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p116,complementary_cluster,de,Defne Synth-116,Berlin,remote,Energie,B2B Sales | Markenaufbau,6,active,growth,product tech,7,side_project,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,1
+syn-p117,complementary_cluster,de,Paul Synth-117,Hamburg,remote,Bildung,Zulassung,7,active,research,sales operations,63,all_in,idea_validating,venture_scale,ready_now,now,,True,3,0
+syn-p118,complementary_cluster,de,Lotte Synth-118,"Hamburg, Deutschland",remote,Bildung,Partnerschaften | Vertrieb | Pilotkunden | B2B-Vertrieb,7,active,sales,research operations,54,all_in,no_idea_open_to_join,venture_scale,ready_now,now,,False,0,0
+syn-p119,complementary_cluster,en,Can Synth-119,Hamburg,remote,Lernen,Scaling | Recruiting | Operations,5,active,operations,research sales,60,all_in,exploring_ideas,venture_scale,ready_now,now,,False,0,0
+syn-p120,complementary_cluster,de,Nora Synth-120,Hamburg & Umgebung,flexible,Robotik,Machine Learning | Backend | Datenanalyse | Software Engineering,7,active,tech,finance sales,26,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,,True,3,1
+syn-p121,complementary_cluster,de,Matti Synth-121,Hamburg,flexible,Materialforschung,Monetization | Finanzplanung,6,active,finance,tech sales,16,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p122,complementary_cluster,de,Nele Synth-122,HH,flexible,Deep Tech,Erste Kunden | Markteintritt,8,active,sales,tech finance,25,part_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p123,complementary_cluster,de,Emil Synth-123,Köln,hybrid,Handel,Branding,4,active,design,tech marketing,37,full_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p124,complementary_cluster,de,Juna Synth-124,Köln/Bonn,hybrid,Handel,Softwareentwicklung | Software Engineering,6,active,tech,design marketing,41,full_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p125,complementary_cluster,en,Ravi Synth-125,Cologne,hybrid,E-Commerce,Brand Marketing | Events,4,active,marketing,design tech,12,part_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p126,complementary_cluster,en,Zoe Synth-126,Stuttgart,remote,Sozialunternehmen,Go-to-Market,8,active,strategy,tech community,56,all_in,idea_validating,venture_scale,ready_now,now,,False,0,0
+syn-p127,complementary_cluster,de,Jan Synth-127,"Stuttgart, BW",remote,Gemeinwohl,GenAI | KI / ML,7,active,tech,strategy community,50,all_in,no_idea_open_to_join,venture_scale,ready_now,now,,False,0,0
+syn-p128,complementary_cluster,de,Leyla Synth-128,"Stuttgart, BW",remote,Gemeinwohl,Wirkungsmessung,8,active,community,strategy tech,57,all_in,exploring_ideas,venture_scale,ready_now,now,,True,3,0
+syn-p129,complementary_cluster,de,Theo Synth-129,Berlin,remote,B2B-Software,Softwareentwicklung | Datenanalyse | KI,6,active,tech,product sales,41,full_time,idea_validating,venture_scale,ready_now,now,,True,3,1
+syn-p130,complementary_cluster,de,Yara Synth-130,Berlin,remote,Unternehmenssoftware,UX/UI | Produktentwicklung,6,active,product,tech sales,40,full_time,no_idea_open_to_join,venture_scale,ready_now,now,,True,3,0
+syn-p131,complementary_cluster,de,Malik Synth-131,Großraum Berlin,remote,B2B-Software,Erste Kunden | Markteintritt,7,active,sales,tech product,43,full_time,exploring_ideas,venture_scale,ready_now,now,,False,0,0
+syn-p132,complementary_cluster,de,Hanna Synth-132,Köln,hybrid,Agrar,Prozessoptimierung | Operations,6,active,operations,tech marketing,26,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p133,complementary_cluster,de,Elias Synth-133,Köln,hybrid,Lebensmittel,Softwareentwicklung | Machine Learning | Software Engineering,7,active,tech,operations marketing,23,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p134,complementary_cluster,de,Mina Synth-134,Köln,hybrid,Landwirtschaft,Community-Aufbau | Community,4,active,marketing,operations tech,6,side_project,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p135,complementary_cluster,de,Vincent Synth-135,Stuttgart,flexible,Kreativwirtschaft,Wirkungsmessung | Netzwerk,8,active,community,tech finance,50,full_time,idea_validating,venture_scale,ready_now,now,,True,3,0
+syn-p136,complementary_cluster,de,Aylin Synth-136,Region Stuttgart,flexible,Creative Industries,Künstliche Intelligenz | Datenanalyse,7,active,tech,community finance,38,full_time,no_idea_open_to_join,venture_scale,ready_now,now,,False,0,0
+syn-p137,complementary_cluster,de,Leon Synth-137,Stuttgart,flexible,Kreativwirtschaft,Investorensuche,6,active,finance,community tech,39,full_time,exploring_ideas,venture_scale,ready_now,now,,False,0,0
+syn-p138,complementary_cluster,en,Greta Synth-138,Ruhrgebiet,flexible,Insurtech,Preisgestaltung | Seed Funding | Finanzplanung,9,active,finance,product tech,41,full_time,idea_validating,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p139,complementary_cluster,en,Oskar Synth-139,Ruhrgebiet,flexible,Financial Services,UX/UI | Produktmanagement,6,active,product,finance tech,43,full_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p140,complementary_cluster,de,Merle Synth-140,Ruhr Area,flexible,Finanzdienstleistungen,Datenanalyse | Dev | KI | Software Engineering,8,active,tech,finance product,40,full_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p141,asymmetric,en,Henrik Synth-141,Koeln,hybrid,Mobility | AgriTech,Recruiting | Operations,5,active,operations,research,38,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p142,asymmetric,en,Pia Synth-142,Berlin,hybrid,Personalwesen,Pricing | Fundraising,8,active,finance,operations,39,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p143,asymmetric,de,Jonas Synth-143,Berlin,remote,E-Health | Social Entrepreneurship,Brand Marketing | Performance Marketing,7,active,growth,design,39,full_time,already_building,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p144,asymmetric,en,Sanna Synth-144,Ruhrgebiet,onsite,PropTech | New Work,Revenue Model,5,active,strategy,product,29,part_time,already_building,explore,actively_exploring,next_3_months,,True,3,1
+syn-p145,asymmetric,de,Arjun Synth-145,München / Bayern,remote,Gesundheitswesen | Mobilität,Wirkungsmessung | Community,7,active,community,design,38,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p146,asymmetric,en,Amira Synth-146,Stuttgart,hybrid,Robotics | Handel,Product Discovery,7,active,research,tech,43,full_time,exploring_ideas,venture_scale,ready_now,now,,True,3,0
+syn-p147,asymmetric,de,Tariq Synth-147,Ruhrgebiet,remote,Klimaschutz | Media,Produktentwicklung | Gestaltung,7,active,product,sales,28,part_time,already_building,profitable_business,ready_now,next_3_months,,True,1,0
+syn-p148,asymmetric,de,Imani Synth-148,"Stuttgart, BW",flexible,Fintec | Creative Industries,Produktdesign | Markenaufbau,5,active,design,tech,22,part_time,exploring_ideas,side_project,actively_exploring,next_3_months,,True,3,0
+syn-p149,asymmetric,de,Samir Synth-149,Leipzig,hybrid,HR | Kreativwirtschaft,Zulassungen,5,active,research,growth,39,full_time,idea_validating,venture_scale,ready_now,now,,True,3,0
+syn-p150,asymmetric,de,Mara Synth-150,DACH,flexible,B2B-Software | Mobilitaet,Personalgewinnung | Prozesse | Operations,5,active,operations,sales,4,side_project,idea_validating,explore,actively_exploring,next_6_months,,False,0,0
+syn-p151,asymmetric,de,Mateo Synth-151,Berlin-Brandenburg,hybrid,Energy | Financial Services,Monetarisierung | Fundraising,5,active,finance,research,28,part_time,exploring_ideas,explore,open_later,later_or_flexible,,True,3,0
+syn-p152,asymmetric,en,Lina Synth-152,"Hamburg, Deutschland",onsite,E-Commerce | EdTech,Machine Learning | Data Analytics,6,active,tech,strategy,36,full_time,idea_validating,venture_scale,actively_exploring,next_3_months,,True,3,1
+syn-p153,asymmetric,de,Finn Synth-153,Muenchen,remote,Digitale Gesundheit | B2B SaaS,Community-Aufbau | Marketing,5,active,marketing,design,35,full_time,already_building,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p154,asymmetric,de,Clara Synth-154,Zürich,hybrid,Arbeitswelt | Gemeinwohlökonomie,Monetarisierung | Vertrieb,8,active,strategy,tech,36,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p155,asymmetric,de,Luca Synth-155,Wien,flexible,Landwirtschaft | saas,Künstliche Intelligenz,7,active,research,product,22,part_time,exploring_ideas,profitable_business,open_later,later_or_flexible,,True,3,1
+syn-p156,constraint_conflict,de,Alma Synth-156,Berlin,remote,Erneuerbare Energien | Weiterbildung,Produktdesign | Produktentwicklung | Produktmanagement,7,active,product,growth,6,side_project,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,minimumAvailabilityHoursPerWeek,False,0,0
+syn-p157,constraint_conflict,de,Dario Synth-157,Berlin,remote,Robotik | Climate Tech,Künstliche Intelligenz | Analytics,5,active,tech,sales,16,part_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,acceptedRemoteModes,False,0,0
+syn-p158,constraint_conflict,en,Ida Synth-158,Wien,onsite,Consumer Goods | HR Tech,AI | KI / ML,8,active,tech,product,12,side_project,already_building,side_project,actively_exploring,next_6_months,,True,3,0
+syn-p159,constraint_conflict,de,Noah Synth-159,München,hybrid,Arbeitswelt | Banking,Analytics | Künstliche Intelligenz | KI / ML | Fundraising,7,active,tech,community,4,side_project,idea_validating,side_project,actively_exploring,next_6_months,acceptedSearchIntents,True,3,0
+syn-p160,constraint_conflict,de,Selin Synth-160,München,hybrid,Landwirtschaft | Kreativwirtschaft,Skalierung | Operations,6,active,operations,marketing,5,side_project,already_building,profitable_business,actively_exploring,next_3_months,acceptedStartHorizons,True,1,1
+syn-p161,constraint_conflict,de,Bao Synth-161,Stuttgart,hybrid,D2C | Robotik,Produktdesign | UX-Design,7,active,product,strategy tech,10,side_project,exploring_ideas,side_project,actively_exploring,next_6_months,requiredRolesAny,True,3,0
+syn-p162,constraint_conflict,de,Frieda Synth-162,Hamburg,flexible,Materialforschung | Maschinenbau,Finanzierung,8,active,finance,tech,27,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,minimumAvailabilityHoursPerWeek,False,0,0
+syn-p163,constraint_conflict,de,Kenji Synth-163,Cologne,remote,Handel | Arbeitswelt,Produktdesign | Markenaufbau,6,active,design,marketing,12,part_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,acceptedRemoteModes,True,3,0
+syn-p164,constraint_conflict,de,Ronja Synth-164,Stuttgart,onsite,Energie | HRTech,Gestaltung | Brand Marketing,7,active,design,operations,43,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p165,constraint_conflict,de,Kofi Synth-165,Ruhrgebiet,hybrid,Energie | Unternehmenssoftware,Personalgewinnung | Prozesse,7,active,operations,sales,22,part_time,exploring_ideas,profitable_business,ready_now,next_3_months,acceptedSearchIntents,True,3,0
+syn-p166,constraint_conflict,de,Defne Synth-166,"Munich, Bavaria",hybrid,Weiterbildung | D2C,UX | Markenaufbau | UX-Design,6,active,design,operations,65,all_in,idea_validating,venture_scale,ready_now,now,acceptedStartHorizons,True,3,0
+syn-p167,constraint_conflict,de,Paul Synth-167,Hamburg,onsite,Bildung | Immobilien,Datenanalyse,7,active,research,strategy operations,54,all_in,exploring_ideas,exit_oriented,ready_now,now,requiredRolesAny,True,3,0
+syn-p168,constraint_conflict,de,Lotte Synth-168,Berlin,remote,Consumer Goods | Maschinenbau,Discovery | UX Design | Produktmanagement,6,active,product,tech,45,full_time,idea_validating,venture_scale,ready_now,now,minimumAvailabilityHoursPerWeek,False,0,0
+syn-p169,constraint_conflict,de,Can Synth-169,Berlin,onsite,Bauwirtschaft | Social Impact,BI | Backend | KI | Software Engineering | KI / ML,8,active,tech,strategy,20,part_time,idea_validating,explore,open_later,later_or_flexible,acceptedRemoteModes,True,3,0
+syn-p170,constraint_conflict,de,Nora Synth-170,München,onsite,Materialforschung | Medien & Kultur,AI | Datenanalyse | Backend | Software Engineering | Produktmanagement,7,active,tech,sales,17,part_time,idea_validating,profitable_business,actively_exploring,next_3_months,,False,0,0
+syn-p171,sparse,de,Matti Synth-171,Stuttgart,,,,0,active,community,tech finance,45,full_time,idea_validating,profitable_business,,,,True,1,0
+syn-p172,sparse,de,Nele Synth-172,,flexible,,,0,active,operations,sales,40,full_time,no_idea_open_to_join,venture_scale,,,,False,0,0
+syn-p173,sparse,de,Emil Synth-173,,,,,0,active,operations,tech,36,full_time,idea_validating,venture_scale,,,,False,0,0
+syn-p174,sparse,de,Juna Synth-174,,hybrid,,,0,active,finance,tech product,38,full_time,already_building,venture_scale,,,,False,0,0
+syn-p175,sparse,de,Ravi Synth-175,,,,,0,active,growth marketing,product,42,full_time,no_idea_open_to_join,venture_scale,,,,False,0,0
+syn-p176,sparse,en,Zoe Synth-176,,,,,0,active,design,tech sales,27,part_time,idea_validating,profitable_business,,,,False,0,0
+syn-p177,sparse,de,Jan Synth-177,München,,,,0,draft,marketing,product,53,all_in,exploring_ideas,venture_scale,,,,True,1,0
+syn-p178,sparse,de,Leyla Synth-178,,,,,0,draft,product,tech design,26,part_time,idea_validating,profitable_business,,,,True,1,0
+syn-p179,sparse,de,Theo Synth-179,,remote,,,0,paused,community,finance,45,full_time,exploring_ideas,profitable_business,,,,True,1,0
+syn-p180,sparse,en,Yara Synth-180,,,,,0,paused,tech,finance,21,part_time,exploring_ideas,profitable_business,,,,True,1,0
+syn-p181,generalist,en,Malik Synth-181,Köln,onsite,Creative Industries | Plattform,AI | Softwareentwicklung | Compliance | Data Analytics | Pilot Customers | B2B-Vertrieb,15,active,sales product marketing,tech,43,full_time,already_building,profitable_business,actively_exploring,next_3_months,,True,2,0
+syn-p182,generalist,de,Hanna Synth-182,Köln,flexible,Future of Work | Materialforschung,Netzwerk | Prototyping | Machine Learning | Vertrieb | Marketing,13,active,community strategy marketing,tech,24,part_time,idea_validating,explore,open_later,later_or_flexible,,False,0,0
+syn-p183,generalist,de,Elias Synth-183,Stuttgart,hybrid,saas | Mobilitaet,Netzwerk | Teamaufbau | Zulassung | GenAI | Nachhaltigkeit | UX-Design,15,active,product strategy sales,tech,51,all_in,exploring_ideas,exit_oriented,ready_now,now,,False,0,0
+syn-p184,generalist,de,Mina Synth-184,Munich,hybrid,Industrie 4.0 | Erneuerbare Energien,Produktentwicklung | Prozesse | Elektronik | Datenanalyse | Gesellschaftsrecht | KI / ML,15,active,sales community product,tech,36,full_time,already_building,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p185,generalist,de,Vincent Synth-185,Berlin,flexible,Supply Chain | Handel,Produktdesign | Hardware-Entwicklung | Recruiting | Pilotkunden | Data Analytics,15,active,sales operations strategy,tech,58,all_in,already_building,exit_oriented,ready_now,now,,False,0,0
+syn-p186,specialist,en,Aylin Synth-186,Hamburg,remote,Health Tech,MDR,3,active,other,tech,25,part_time,exploring_ideas,explore,open_later,later_or_flexible,,True,1,0
+syn-p187,specialist,de,Leon Synth-187,Berlin,flexible,Erneuerbare Energien,Zellchemie,3,draft,research,sales,28,part_time,no_idea_open_to_join,profitable_business,open_later,later_or_flexible,,True,1,0
+syn-p188,specialist,de,Greta Synth-188,Frankfurt am Main,flexible,Materialforschung,Quantentechnologie,3,paused,research,tech,41,full_time,exploring_ideas,profitable_business,actively_exploring,next_3_months,,True,1,0
+syn-p189,specialist,en,Oskar Synth-189,Essen / Ruhrgebiet,onsite,Landwirtschaft,Soil Health,3,draft,research,sales,20,part_time,exploring_ideas,explore,open_later,later_or_flexible,,True,1,0
+syn-p190,specialist,de,Merle Synth-190,"Hamburg, Deutschland",remote,Unternehmenssoftware,Vergabe | B2B-Vertrieb,3,paused,other,tech,27,part_time,no_idea_open_to_join,profitable_business,actively_exploring,next_3_months,,True,1,0
+syn-p191,noise_edge,de,Henrik Synth-191,Köln/Bonn,hybrid,Enterprise Software | Klima,User Research | Go-to-Market,7,active,strategy,product,30,part_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p192,noise_edge,en,Pia Synth-192,München / Bayern,hybrid,Erneuerbare Energien | Immobilien,Teamaufbau | UX/UI | Brand | UX-Design,5,active,design,operations,45,full_time,already_building,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p193,noise_edge,en,Jonas Synth-193,Munich,hybrid,Digitale Gesundheit | Non-Profit,Design | Preisgestaltung | GTM,8,active,strategy,design,35,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,False,0,0
+syn-p194,noise_edge,de,Sanna Synth-194,München / Bayern,remote,Klima | Proptech,Operations | Talent | Brand,7,active,design,operations,41,full_time,exploring_ideas,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p195,noise_edge,en,Arjun Synth-195,"Stuttgart, BW",remote,Fintech,Data Science | ML | Investorensuche | Fundraising,8,active,finance,tech,15,part_time,exploring_ideas,side_project,actively_exploring,next_3_months,,True,3,0
+syn-p196,noise_edge,en,Amira Synth-196,Vienna,onsite,HRTech | Transport,Markenaufbau | Gestaltung | Events | Community | Performance Marketing,7,active,marketing,design,20,part_time,no_idea_open_to_join,venture_scale,actively_exploring,next_3_months,,True,3,0
+syn-p197,noise_edge,en,Tariq Synth-197,"Berlin, Germany",hybrid,Transport | Energiewende,Datenanalyse | Design | Produktentwicklung,6,active,product,tech,6,all_in,idea_validating,venture_scale,ready_now,now,,True,3,0
+syn-p198,noise_edge,de,Imani Synth-198,Remote / überall,onsite,MedTech | Social Impact,Markenaufbau | UX/UI | Hardware,4,active,tech,design,43,full_time,idea_validating,venture_scale,ready_now,now,,False,0,0
+syn-p199,noise_edge,en,Samir Synth-199,Berlin-Brandenburg,remote,Logistik | Plattform,Hardware-Entwicklung | Skalierung,7,active,marketing,tech,37,full_time,idea_validating,profitable_business,actively_exploring,next_3_months,,True,3,0
+syn-p200,noise_edge,en,Mara Synth-200,Munich,flexible,HRTech | eCommerce,Performance Marketing | BI | KI | KI / ML,8,active,tech,growth,38,full_time,no_idea_open_to_join,venture_scale,ready_now,now,,True,0,0
