@@ -1,0 +1,2714 @@
+{
+ "meta": {
+  "marker": "v02_connect_stress",
+  "note": "Vor dem Lauf entworfen. Erwartung je Fall: Noten 3/2/1/0 oder 'gate'. Kriterien: order a b (a vor b), top x k (x in den Top k), not_top x k, gated x, eligible x. Nicht aus Modellresultaten abgeleitet; der Datensatz bleibt unverändert."
+ },
+ "owners": [
+  {
+   "id": "v02s-p001",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 001",
+    "headline": "Gründerin Digital Health",
+    "bio": "Gründerin Digital Health – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "Gesundheitswesen"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l001",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Unterstützung beim Fundraising",
+     "summary": "Suche Unterstützung beim Fundraising (Stressfall v02).",
+     "topics": [
+      "Fundraising"
+     ],
+     "industries": [
+      "Gesundheitswesen"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p002",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 002",
+    "headline": "Fundraising-Beraterin Health",
+    "bio": "Fundraising-Beraterin Health – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Fundraising"
+    ],
+    "industries": [
+     "Digital Health"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l002",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Fundraising für Health-Startups",
+     "summary": "Biete Fundraising für Health-Startups (Stressfall v02).",
+     "topics": [
+      "Fundraising"
+     ],
+     "industries": [
+      "Digital Health"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p003",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 003",
+    "headline": "Fundraising-Berater Mobilität",
+    "bio": "Fundraising-Berater Mobilität – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Fundraising"
+    ],
+    "industries": [
+     "Mobility"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l003",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Fundraising für Mobilität",
+     "summary": "Biete Fundraising für Mobilität (Stressfall v02).",
+     "topics": [
+      "Fundraising"
+     ],
+     "industries": [
+      "Mobility"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p004",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 004",
+    "headline": "Recruiterin Healthcare",
+    "bio": "Recruiterin Healthcare – synthetischer Stressfall.",
+    "location_region": "Köln",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Recruiting"
+    ],
+    "industries": [
+     "Healthcare"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l004",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Recruiting im Gesundheitswesen",
+     "summary": "Biete Recruiting im Gesundheitswesen (Stressfall v02).",
+     "topics": [
+      "Recruiting"
+     ],
+     "industries": [
+      "Healthcare"
+     ],
+     "locations": [
+      "Köln"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p005",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 005",
+    "headline": "Gründer FinTech",
+    "bio": "Gründer FinTech – synthetischer Stressfall.",
+    "location_region": "Frankfurt",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "FinTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l005",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Hilfe beim Pricing",
+     "summary": "Suche Hilfe beim Pricing (Stressfall v02).",
+     "topics": [
+      "Pricing"
+     ],
+     "industries": [
+      "FinTech"
+     ],
+     "locations": [
+      "Frankfurt"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p006",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 006",
+    "headline": "Pricing-Expertin Banking",
+    "bio": "Pricing-Expertin Banking – synthetischer Stressfall.",
+    "location_region": "Frankfurt",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Pricing"
+    ],
+    "industries": [
+     "Banking"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l006",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Pricing-Workshops",
+     "summary": "Biete Pricing-Workshops (Stressfall v02).",
+     "topics": [
+      "Pricing"
+     ],
+     "industries": [
+      "Banking"
+     ],
+     "locations": [
+      "Frankfurt"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p007",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 007",
+    "headline": "Community-Manager FinTech",
+    "bio": "Community-Manager FinTech – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Community Building"
+    ],
+    "industries": [
+     "FinTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l007",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Community-Aufbau",
+     "summary": "Biete Community-Aufbau (Stressfall v02).",
+     "topics": [
+      "Community Building"
+     ],
+     "industries": [
+      "FinTech"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p008",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 008",
+    "headline": "Gründerin EdTech",
+    "bio": "Gründerin EdTech – synthetischer Stressfall.",
+    "location_region": "Leipzig",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "Education"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l008",
+     "direction": "seeking",
+     "category": "sparring",
+     "title": "Suche Sparring zu UX Research",
+     "summary": "Suche Sparring zu UX Research (Stressfall v02).",
+     "topics": [
+      "UX Research"
+     ],
+     "industries": [
+      "Education"
+     ],
+     "locations": [
+      "Leipzig"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p009",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 009",
+    "headline": "UX-Researcherin Bildung",
+    "bio": "UX-Researcherin Bildung – synthetischer Stressfall.",
+    "location_region": "Leipzig",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Nutzerforschung"
+    ],
+    "industries": [
+     "Bildung"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l009",
+     "direction": "offering",
+     "category": "sparring",
+     "title": "Sparring zu Nutzerforschung",
+     "summary": "Sparring zu Nutzerforschung (Stressfall v02).",
+     "topics": [
+      "Nutzerforschung"
+     ],
+     "industries": [
+      "Bildung"
+     ],
+     "locations": [
+      "Leipzig"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p010",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 010",
+    "headline": "Steuerberater Immobilien",
+    "bio": "Steuerberater Immobilien – synthetischer Stressfall.",
+    "location_region": "Dresden",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Steuerrecht"
+    ],
+    "industries": [
+     "Immobilien"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l010",
+     "direction": "offering",
+     "category": "sparring",
+     "title": "Sparring zu Steuerfragen",
+     "summary": "Sparring zu Steuerfragen (Stressfall v02).",
+     "topics": [
+      "Steuerrecht"
+     ],
+     "industries": [
+      "Immobilien"
+     ],
+     "locations": [
+      "Dresden"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p011",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 011",
+    "headline": "Gründer FinTech",
+    "bio": "Gründer FinTech – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Fundraising"
+    ],
+    "industries": [
+     "FinTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l011",
+     "direction": "seeking",
+     "category": "sparring",
+     "title": "Suche Hilfe beim Investoren-Pitch",
+     "summary": "Suche Hilfe beim Investoren-Pitch (Stressfall v02).",
+     "topics": [
+      "Pitch"
+     ],
+     "industries": [
+      "FinTech"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p012",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 012",
+    "headline": "Sportplatz-Vermietung",
+    "bio": "Sportplatz-Vermietung – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Pitch"
+    ],
+    "industries": [
+     "Sport"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l012",
+     "direction": "offering",
+     "category": "cooperation",
+     "title": "Vermiete Fußball-Pitch für Firmenevents",
+     "summary": "Vermiete Fußball-Pitch für Firmenevents (Stressfall v02).",
+     "topics": [
+      "Pitch"
+     ],
+     "industries": [
+      "Sport"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p013",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 013",
+    "headline": "Pitch-Coach für Gründungsteams",
+    "bio": "Pitch-Coach für Gründungsteams – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Investor Pitch",
+     "Fundraising"
+    ],
+    "industries": [
+     "FinTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l013",
+     "direction": "offering",
+     "category": "sparring",
+     "title": "Coaching für Investor Pitches",
+     "summary": "Coaching für Investor Pitches (Stressfall v02).",
+     "topics": [
+      "Investor Pitch",
+      "Fundraising"
+     ],
+     "industries": [
+      "FinTech"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p014",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 014",
+    "headline": "Gründerin SaaS",
+    "bio": "Gründerin SaaS – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "SaaS"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l014",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Unterstützung bei der Kundenakquise",
+     "summary": "Suche Unterstützung bei der Kundenakquise (Stressfall v02).",
+     "topics": [
+      "Kundenakquise"
+     ],
+     "industries": [
+      "SaaS"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p015",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 015",
+    "headline": "Vertriebsprofi Software",
+    "bio": "Vertriebsprofi Software – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Neukundengewinnung",
+     "Lead-Generierung"
+    ],
+    "industries": [
+     "Software"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l015",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Neukundengewinnung für B2B-Software",
+     "summary": "Biete Neukundengewinnung für B2B-Software (Stressfall v02).",
+     "topics": [
+      "Neukundengewinnung",
+      "Lead-Generierung"
+     ],
+     "industries": [
+      "Software"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p016",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 016",
+    "headline": "Buchhalter Software",
+    "bio": "Buchhalter Software – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Buchhaltung"
+    ],
+    "industries": [
+     "Software"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l016",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Buchhaltung für Software-Startups",
+     "summary": "Biete Buchhaltung für Software-Startups (Stressfall v02).",
+     "topics": [
+      "Buchhaltung"
+     ],
+     "industries": [
+      "Software"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p017",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 017",
+    "headline": "Gründer Chemie",
+    "bio": "Gründer Chemie – synthetischer Stressfall.",
+    "location_region": "Köln",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "Chemie"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l017",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Unterstützung bei der Biozid-Zulassung",
+     "summary": "Suche Unterstützung bei der Biozid-Zulassung (Stressfall v02).",
+     "topics": [
+      "Biozid-Zulassung"
+     ],
+     "industries": [
+      "Chemie"
+     ],
+     "locations": [
+      "Köln"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p018",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 018",
+    "headline": "Biozid-Expertin",
+    "bio": "Biozid-Expertin – synthetischer Stressfall.",
+    "location_region": "Köln",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Biozidrecht"
+    ],
+    "industries": [
+     "Chemie"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l018",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Biozidrecht und BPR-Dossiers",
+     "summary": "Biete Biozidrecht und BPR-Dossiers (Stressfall v02).",
+     "topics": [
+      "Biozidrecht",
+      "BPR-Dossiers"
+     ],
+     "industries": [
+      "Chemie"
+     ],
+     "locations": [
+      "Köln"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p019",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 019",
+    "headline": "Regulatory-Berater",
+    "bio": "Regulatory-Berater – synthetischer Stressfall.",
+    "location_region": "Köln",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Regulatory"
+    ],
+    "industries": [
+     "Chemie"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l019",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete allgemeine Regulatory-Beratung",
+     "summary": "Biete allgemeine Regulatory-Beratung (Stressfall v02).",
+     "topics": [
+      "Regulatory"
+     ],
+     "industries": [
+      "Chemie"
+     ],
+     "locations": [
+      "Köln"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p020",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 020",
+    "headline": "CFO-Sparring für SaaS",
+    "bio": "CFO-Sparring für SaaS – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Finanzplanung",
+     "Fundraising",
+     "Pricing"
+    ],
+    "industries": [
+     "SaaS"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l020",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Finanzplanung, Fundraising und Pricing",
+     "summary": "Biete Finanzplanung, Fundraising und Pricing (Stressfall v02).",
+     "topics": [
+      "Finanzplanung",
+      "Fundraising",
+      "Pricing"
+     ],
+     "industries": [
+      "SaaS"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p021",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 021",
+    "headline": "Gründerin SaaS 1",
+    "bio": "Gründerin SaaS 1 – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "SaaS"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l021",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Hilfe beim Fundraising",
+     "summary": "Suche Hilfe beim Fundraising (Stressfall v02).",
+     "topics": [
+      "Fundraising"
+     ],
+     "industries": [
+      "SaaS"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p022",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 022",
+    "headline": "Gründerin SaaS 2",
+    "bio": "Gründerin SaaS 2 – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "SaaS"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l022",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Hilfe beim Pricing",
+     "summary": "Suche Hilfe beim Pricing (Stressfall v02).",
+     "topics": [
+      "Pricing"
+     ],
+     "industries": [
+      "SaaS"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p023",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 023",
+    "headline": "Gründerin SaaS 3",
+    "bio": "Gründerin SaaS 3 – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "SaaS"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l023",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Hilfe bei der Finanzplanung",
+     "summary": "Suche Hilfe bei der Finanzplanung (Stressfall v02).",
+     "topics": [
+      "Finanzplanung"
+     ],
+     "industries": [
+      "SaaS"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p024",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 024",
+    "headline": "Gründer HR Tech",
+    "bio": "Gründer HR Tech – synthetischer Stressfall.",
+    "location_region": "Stuttgart",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "HR Tech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l024",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche UX Research",
+     "summary": "Suche UX Research (Stressfall v02).",
+     "topics": [
+      "UX Research"
+     ],
+     "industries": [
+      "HR Tech"
+     ],
+     "locations": [
+      "Stuttgart"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p025",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 025",
+    "headline": "UX-Researcher 1",
+    "bio": "UX-Researcher 1 – synthetischer Stressfall.",
+    "location_region": "Stuttgart",
+    "remote_mode": "flexible",
+    "expertise": [
+     "User Research"
+    ],
+    "industries": [
+     "HR"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l025",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete User Research",
+     "summary": "Biete User Research (Stressfall v02).",
+     "topics": [
+      "User Research"
+     ],
+     "industries": [
+      "HR"
+     ],
+     "locations": [
+      "Stuttgart"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p026",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 026",
+    "headline": "UX-Researcher 2",
+    "bio": "UX-Researcher 2 – synthetischer Stressfall.",
+    "location_region": "Stuttgart",
+    "remote_mode": "flexible",
+    "expertise": [
+     "UX Research",
+     "Interviews"
+    ],
+    "industries": [
+     "Personalwesen"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l026",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete UX Research",
+     "summary": "Biete UX Research (Stressfall v02).",
+     "topics": [
+      "UX Research",
+      "Interviews"
+     ],
+     "industries": [
+      "Personalwesen"
+     ],
+     "locations": [
+      "Stuttgart"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p027",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 027",
+    "headline": "UX-Researcher 3",
+    "bio": "UX-Researcher 3 – synthetischer Stressfall.",
+    "location_region": "Stuttgart",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Nutzerforschung"
+    ],
+    "industries": [
+     "Future of Work"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l027",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Nutzerforschung",
+     "summary": "Biete Nutzerforschung (Stressfall v02).",
+     "topics": [
+      "Nutzerforschung"
+     ],
+     "industries": [
+      "Future of Work"
+     ],
+     "locations": [
+      "Stuttgart"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p028",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 028",
+    "headline": "Gründerin Hardware",
+    "bio": "Gründerin Hardware – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "onsite",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "Manufacturing"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l028",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Prototypenbau vor Ort",
+     "summary": "Suche Prototypenbau vor Ort (Stressfall v02).",
+     "topics": [
+      "Prototyping"
+     ],
+     "industries": [
+      "Manufacturing"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "regional",
+     "remote_mode": "onsite",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p029",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 029",
+    "headline": "Prototypenbau München",
+    "bio": "Prototypenbau München – synthetischer Stressfall.",
+    "location_region": "München",
+    "remote_mode": "onsite",
+    "expertise": [
+     "Prototyping"
+    ],
+    "industries": [
+     "Industrie"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l029",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Prototypenbau vor Ort",
+     "summary": "Biete Prototypenbau vor Ort (Stressfall v02).",
+     "topics": [
+      "Prototyping"
+     ],
+     "industries": [
+      "Industrie"
+     ],
+     "locations": [
+      "München"
+     ],
+     "geographic_scope": "regional",
+     "remote_mode": "onsite",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p030",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 030",
+    "headline": "Prototypenbau Hamburg",
+    "bio": "Prototypenbau Hamburg – synthetischer Stressfall.",
+    "location_region": "Hamburg",
+    "remote_mode": "onsite",
+    "expertise": [
+     "Prototyping"
+    ],
+    "industries": [
+     "Industrie"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l030",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Prototypenbau vor Ort",
+     "summary": "Biete Prototypenbau vor Ort (Stressfall v02).",
+     "topics": [
+      "Prototyping"
+     ],
+     "industries": [
+      "Industrie"
+     ],
+     "locations": [
+      "Hamburg"
+     ],
+     "geographic_scope": "regional",
+     "remote_mode": "onsite",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p031",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 031",
+    "headline": "Gründer E-Commerce",
+    "bio": "Gründer E-Commerce – synthetischer Stressfall.",
+    "location_region": "Köln",
+    "remote_mode": "remote",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "E-Commerce"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l031",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Data Analytics (remote)",
+     "summary": "Suche Data Analytics (remote) (Stressfall v02).",
+     "topics": [
+      "Data Analytics"
+     ],
+     "industries": [
+      "E-Commerce"
+     ],
+     "locations": [
+      "Köln"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "remote",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p032",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 032",
+    "headline": "Data-Analystin Consumer",
+    "bio": "Data-Analystin Consumer – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "remote",
+    "expertise": [
+     "Datenanalyse"
+    ],
+    "industries": [
+     "Consumer"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l032",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Datenanalyse remote",
+     "summary": "Biete Datenanalyse remote (Stressfall v02).",
+     "topics": [
+      "Datenanalyse"
+     ],
+     "industries": [
+      "Consumer"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "remote",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p033",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 033",
+    "headline": "Gründerin MedTech",
+    "bio": "Gründerin MedTech – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Produkt"
+    ],
+    "industries": [
+     "MedTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l033",
+     "direction": "seeking",
+     "category": "expertise",
+     "title": "Suche Unterstützung bei MDR Klasse IIb",
+     "summary": "Suche Unterstützung bei MDR Klasse IIb (Stressfall v02).",
+     "topics": [
+      "MDR Klasse IIb"
+     ],
+     "industries": [
+      "MedTech"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p034",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 034",
+    "headline": "MDR-Spezialistin",
+    "bio": "MDR-Spezialistin – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "MDR",
+     "Klasse IIb"
+    ],
+    "industries": [
+     "Medizintechnik"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l034",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete MDR-Zulassung Klasse IIb",
+     "summary": "Biete MDR-Zulassung Klasse IIb (Stressfall v02).",
+     "topics": [
+      "MDR",
+      "Klasse IIb",
+      "Technische Dokumentation"
+     ],
+     "industries": [
+      "Medizintechnik"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  },
+  {
+   "id": "v02s-p035",
+   "v02_connect_stress": true,
+   "person_core": {
+    "display_name": "Stress 035",
+    "headline": "Allround-Beratung",
+    "bio": "Allround-Beratung – synthetischer Stressfall.",
+    "location_region": "Berlin",
+    "remote_mode": "flexible",
+    "expertise": [
+     "Strategie",
+     "Marketing",
+     "Vertrieb",
+     "Recht",
+     "Zulassung",
+     "Finanzierung",
+     "Recruiting",
+     "Operations"
+    ],
+    "industries": [
+     "Healthcare",
+     "SaaS",
+     "FinTech"
+    ],
+    "capability_disclosure": "areas",
+    "photo_visible_to_members": false,
+    "locale": "de"
+   },
+   "profiles": {
+    "roles": [
+     "founder"
+    ]
+   },
+   "capability_entries": [],
+   "find_profile": null,
+   "connect_profile": {
+    "status": "active",
+    "network_roles": [
+     "expert"
+    ],
+    "open_to_formats": [
+     "call"
+    ],
+    "network_reach": null,
+    "contact_note": null,
+    "suggestable": true,
+    "visibility": "members_only"
+   },
+   "connect_listings": [
+    {
+     "id": "v02s-l035",
+     "direction": "offering",
+     "category": "expertise",
+     "title": "Biete Beratung für alles",
+     "summary": "Biete Beratung für alles (Stressfall v02).",
+     "topics": [
+      "Strategie",
+      "Marketing",
+      "Vertrieb",
+      "Recht",
+      "Zulassung",
+      "Finanzierung",
+      "Recruiting",
+      "Operations"
+     ],
+     "industries": [
+      "Healthcare",
+      "SaaS",
+      "FinTech"
+     ],
+     "locations": [
+      "Berlin"
+     ],
+     "geographic_scope": "germany",
+     "remote_mode": "flexible",
+     "venture_stage": null,
+     "starts_on": null,
+     "ends_on": null,
+     "status": "active",
+     "visibility": "members_only",
+     "published_at": "2026-10-01",
+     "expires_at": "2026-11-30"
+    }
+   ],
+   "connect_problems": [],
+   "person_resources": []
+  }
+ ],
+ "cases": [
+  {
+   "case": "C1",
+   "kind": "topic_match_industry_mismatch",
+   "seek": "v02s-l001",
+   "expect": {
+    "v02s-l002": 3,
+    "v02s-l003": 2,
+    "v02s-l004": 0
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l002",
+     "v02s-l003"
+    ],
+    [
+     "order",
+     "v02s-l003",
+     "v02s-l004"
+    ]
+   ],
+   "note": "Gleiches Thema, falsche Branche ist weniger gut als gleiches Thema in passender Branche – aber besser als passende Branche ohne Thema."
+  },
+  {
+   "case": "C2",
+   "kind": "industry_match_topic_mismatch",
+   "seek": "v02s-l005",
+   "expect": {
+    "v02s-l006": 3,
+    "v02s-l007": 0
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l006",
+     "v02s-l007"
+    ],
+    [
+     "not_top",
+     "v02s-l007",
+     10
+    ]
+   ],
+   "note": "Gleiche Branche ersetzt kein passendes Thema."
+  },
+  {
+   "case": "C3",
+   "kind": "category_match_content_mismatch",
+   "seek": "v02s-l008",
+   "expect": {
+    "v02s-l009": 3,
+    "v02s-l010": 0
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l009",
+     "v02s-l010"
+    ],
+    [
+     "not_top",
+     "v02s-l010",
+     10
+    ]
+   ],
+   "note": "Gleiche Kategorie ohne inhaltlichen Bezug ist kein Treffer."
+  },
+  {
+   "case": "C4",
+   "kind": "same_words_wrong_context",
+   "seek": "v02s-l011",
+   "expect": {
+    "v02s-l013": 3,
+    "v02s-l012": 0
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l013",
+     "v02s-l012"
+    ]
+   ],
+   "note": "Das Wort „Pitch“ ist gleich, die Bedeutung nicht."
+  },
+  {
+   "case": "C5",
+   "kind": "synonyms_without_word_overlap",
+   "seek": "v02s-l014",
+   "expect": {
+    "v02s-l015": 3,
+    "v02s-l016": 0
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l015",
+     "v02s-l016"
+    ]
+   ],
+   "note": "Kundenakquise = Neukundengewinnung, ohne gemeinsames Wort und ohne Woerterbucheintrag."
+  },
+  {
+   "case": "C6",
+   "kind": "rare_special_term",
+   "seek": "v02s-l017",
+   "expect": {
+    "v02s-l018": 3,
+    "v02s-l019": 2
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l018",
+     "v02s-l019"
+    ],
+    [
+     "top",
+     "v02s-l018",
+     10
+    ]
+   ],
+   "note": "Ein seltener Fachbegriff soll die spezialisierte Person vor die allgemeine bringen."
+  },
+  {
+   "case": "C7a",
+   "kind": "one_offer_many_needs",
+   "seek": "v02s-l021",
+   "expect": {
+    "v02s-l020": 3
+   },
+   "criteria": [
+    [
+     "top",
+     "v02s-l020",
+     10
+    ]
+   ],
+   "note": "Ein breites, aber echtes Angebot passt zu jeder der drei Suchen."
+  },
+  {
+   "case": "C7b",
+   "kind": "one_offer_many_needs",
+   "seek": "v02s-l022",
+   "expect": {
+    "v02s-l020": 3
+   },
+   "criteria": [
+    [
+     "top",
+     "v02s-l020",
+     10
+    ]
+   ],
+   "note": "Ein breites, aber echtes Angebot passt zu jeder der drei Suchen."
+  },
+  {
+   "case": "C7c",
+   "kind": "one_offer_many_needs",
+   "seek": "v02s-l023",
+   "expect": {
+    "v02s-l020": 3
+   },
+   "criteria": [
+    [
+     "top",
+     "v02s-l020",
+     10
+    ]
+   ],
+   "note": "Ein breites, aber echtes Angebot passt zu jeder der drei Suchen."
+  },
+  {
+   "case": "C8",
+   "kind": "many_offers_one_need",
+   "seek": "v02s-l024",
+   "expect": {
+    "v02s-l025": 3,
+    "v02s-l026": 3,
+    "v02s-l027": 3
+   },
+   "criteria": [
+    [
+     "top",
+     "v02s-l025",
+     10
+    ],
+    [
+     "top",
+     "v02s-l026",
+     10
+    ],
+    [
+     "top",
+     "v02s-l027",
+     10
+    ]
+   ],
+   "note": "Drei gleichwertige Angebote sollen alle oben stehen."
+  },
+  {
+   "case": "C9",
+   "kind": "geographic_conflict",
+   "seek": "v02s-l028",
+   "expect": {
+    "v02s-l030": 3,
+    "v02s-l029": "gate"
+   },
+   "criteria": [
+    [
+     "gated",
+     "v02s-l029"
+    ],
+    [
+     "top",
+     "v02s-l030",
+     10
+    ]
+   ],
+   "note": "Regional vor Ort in Hamburg vs. München ist nicht erfüllbar."
+  },
+  {
+   "case": "C10",
+   "kind": "remote_compatible_different_places",
+   "seek": "v02s-l031",
+   "expect": {
+    "v02s-l032": 3
+   },
+   "criteria": [
+    [
+     "eligible",
+     "v02s-l032"
+    ],
+    [
+     "top",
+     "v02s-l032",
+     10
+    ]
+   ],
+   "note": "Beide remote: verschiedene Orte sind kein Konflikt."
+  },
+  {
+   "case": "C11",
+   "kind": "specific_need_vs_generalist",
+   "seek": "v02s-l033",
+   "expect": {
+    "v02s-l034": 3,
+    "v02s-l035": 1
+   },
+   "criteria": [
+    [
+     "order",
+     "v02s-l034",
+     "v02s-l035"
+    ]
+   ],
+   "note": "Der präzise Bedarf soll die Spezialistin vor das breite Angebot bringen."
+  }
+ ]
+}

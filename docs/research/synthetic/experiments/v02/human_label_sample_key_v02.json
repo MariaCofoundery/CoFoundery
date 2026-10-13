@@ -1,0 +1,977 @@
+{
+ "meta": {
+  "note": "INTERN – nicht an Reviewer geben. Ordnet Stichprobe zu Referenzpaar/Stressfall zu."
+ },
+ "key": [
+  {
+   "sample_id": "hv02-001",
+   "context": "connect",
+   "pair_id": "syn-pair0195",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-002",
+   "context": "find",
+   "pair_id": "syn-pair0090",
+   "reference_class": "asymmetric",
+   "source": "designed_asymmetric",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-003",
+   "context": "find",
+   "pair_id": "syn-pair0039",
+   "reference_class": "excellent_candidate",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-004",
+   "context": "connect",
+   "pair_id": "syn-pair0221",
+   "reference_class": "excellent_candidate",
+   "source": "designed_specialist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-005",
+   "context": "find",
+   "pair_id": "syn-pair0404",
+   "reference_class": "worth_exploring",
+   "source": "contrast_selection",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-006",
+   "context": "find",
+   "pair_id": "syn-pair0042",
+   "reference_class": "promising",
+   "source": "designed_normal_relation",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-007",
+   "context": "connect",
+   "pair_id": "syn-pair0206",
+   "reference_class": "excellent_candidate",
+   "source": "designed_specialist",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-008",
+   "context": "find",
+   "pair_id": "syn-pair0384",
+   "reference_class": "promising",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-009",
+   "context": "connect",
+   "pair_id": null,
+   "stress_case": "C10",
+   "stress_kind": "remote_compatible_different_places",
+   "expected": 3,
+   "source": "v02_connect_stress",
+   "selection": "edge_v02_connect_stress"
+  },
+  {
+   "sample_id": "hv02-010",
+   "context": "connect",
+   "pair_id": "syn-pair0217",
+   "reference_class": "excellent_candidate",
+   "source": "designed_specialist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-011",
+   "context": "find",
+   "pair_id": "syn-pair0297",
+   "reference_class": "excellent_candidate",
+   "source": "designed_noise",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-012",
+   "context": "find",
+   "pair_id": "syn-pair0387",
+   "reference_class": "promising",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-013",
+   "context": "find",
+   "pair_id": "syn-pair0276",
+   "reference_class": "worth_exploring",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-014",
+   "context": "find",
+   "pair_id": "syn-pair0083",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-015",
+   "context": "find",
+   "pair_id": "syn-pair0287",
+   "reference_class": "low_relevance",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-016",
+   "context": "connect",
+   "pair_id": null,
+   "stress_case": "C11",
+   "stress_kind": "specific_need_vs_generalist",
+   "expected": 1,
+   "source": "v02_connect_stress",
+   "selection": "edge_v02_connect_stress"
+  },
+  {
+   "sample_id": "hv02-017",
+   "context": "find",
+   "pair_id": "syn-pair0302",
+   "reference_class": "excellent_candidate",
+   "source": "designed_noise",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-018",
+   "context": "connect",
+   "pair_id": "syn-pair0188",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-019",
+   "context": "find",
+   "pair_id": "syn-pair0290",
+   "reference_class": "worth_exploring",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-020",
+   "context": "connect",
+   "pair_id": "syn-pair0198",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-021",
+   "context": "find",
+   "pair_id": "syn-pair0369",
+   "reference_class": "promising",
+   "source": "contrast_selection",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-022",
+   "context": "connect",
+   "pair_id": "syn-pair0150",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-023",
+   "context": "find",
+   "pair_id": "syn-pair0236",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-024",
+   "context": "connect",
+   "pair_id": "syn-pair0148",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-025",
+   "context": "connect",
+   "pair_id": "syn-pair0258",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-026",
+   "context": "find",
+   "pair_id": "syn-pair0246",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-027",
+   "context": "connect",
+   "pair_id": "syn-pair0165",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-028",
+   "context": "find",
+   "pair_id": "syn-pair0006",
+   "reference_class": "promising",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-029",
+   "context": "connect",
+   "pair_id": "syn-pair0130",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-030",
+   "context": "find",
+   "pair_id": "syn-pair0008",
+   "reference_class": "low_relevance",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-031",
+   "context": "connect",
+   "pair_id": "syn-pair0264",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-032",
+   "context": "find",
+   "pair_id": "syn-pair0038",
+   "reference_class": "worth_exploring",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-033",
+   "context": "connect",
+   "pair_id": "syn-pair0184",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-034",
+   "context": "find",
+   "pair_id": "syn-pair0010",
+   "reference_class": "promising",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-035",
+   "context": "find",
+   "pair_id": "syn-pair0405",
+   "reference_class": "worth_exploring",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-036",
+   "context": "connect",
+   "pair_id": "syn-pair0203",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-037",
+   "context": "find",
+   "pair_id": "syn-pair0058",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-038",
+   "context": "find",
+   "pair_id": "syn-pair0250",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-039",
+   "context": "connect",
+   "pair_id": "syn-pair0260",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-040",
+   "context": "find",
+   "pair_id": "syn-pair0243",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-041",
+   "context": "connect",
+   "pair_id": "syn-pair0152",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-042",
+   "context": "find",
+   "pair_id": "syn-pair0045",
+   "reference_class": "worth_exploring",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-043",
+   "context": "find",
+   "pair_id": "syn-pair0054",
+   "reference_class": "asymmetric",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-044",
+   "context": "find",
+   "pair_id": "syn-pair0037",
+   "reference_class": "asymmetric",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-045",
+   "context": "connect",
+   "pair_id": "syn-pair0207",
+   "reference_class": "low_relevance",
+   "source": "designed_specialist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-046",
+   "context": "connect",
+   "pair_id": "syn-pair0187",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-047",
+   "context": "find",
+   "pair_id": "syn-pair0356",
+   "reference_class": "exclude",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-048",
+   "context": "find",
+   "pair_id": "syn-pair0286",
+   "reference_class": "promising",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-049",
+   "context": "find",
+   "pair_id": "syn-pair0346",
+   "reference_class": "exclude",
+   "source": "contrast_selection",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-050",
+   "context": "find",
+   "pair_id": "syn-pair0096",
+   "reference_class": "asymmetric",
+   "source": "designed_asymmetric",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-051",
+   "context": "find",
+   "pair_id": "syn-pair0323",
+   "reference_class": "low_relevance",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-052",
+   "context": "find",
+   "pair_id": "syn-pair0019",
+   "reference_class": "worth_exploring",
+   "source": "designed_normal_relation",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-053",
+   "context": "connect",
+   "pair_id": "syn-pair0128",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-054",
+   "context": "connect",
+   "pair_id": null,
+   "stress_case": "C5",
+   "stress_kind": "synonyms_without_word_overlap",
+   "expected": 3,
+   "source": "v02_connect_stress",
+   "selection": "edge_v02_connect_stress"
+  },
+  {
+   "sample_id": "hv02-055",
+   "context": "find",
+   "pair_id": "syn-pair0035",
+   "reference_class": "low_relevance",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-056",
+   "context": "connect",
+   "pair_id": "syn-pair0202",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-057",
+   "context": "connect",
+   "pair_id": "syn-pair0161",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-058",
+   "context": "find",
+   "pair_id": "syn-pair0370",
+   "reference_class": "promising",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-059",
+   "context": "connect",
+   "pair_id": "syn-pair0265",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-060",
+   "context": "connect",
+   "pair_id": "syn-pair0180",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-061",
+   "context": "connect",
+   "pair_id": "syn-pair0204",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-062",
+   "context": "find",
+   "pair_id": "syn-pair0009",
+   "reference_class": "excellent_candidate",
+   "source": "designed_normal_relation",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-063",
+   "context": "find",
+   "pair_id": "syn-pair0433",
+   "reference_class": "asymmetric",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-064",
+   "context": "find",
+   "pair_id": "syn-pair0097",
+   "reference_class": "asymmetric",
+   "source": "designed_asymmetric",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-065",
+   "context": "connect",
+   "pair_id": "syn-pair0211",
+   "reference_class": "low_relevance",
+   "source": "designed_specialist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-066",
+   "context": "find",
+   "pair_id": "syn-pair0079",
+   "reference_class": "promising",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-067",
+   "context": "connect",
+   "pair_id": "syn-pair0140",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-068",
+   "context": "connect",
+   "pair_id": "syn-pair0168",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-069",
+   "context": "find",
+   "pair_id": "syn-pair0280",
+   "reference_class": "low_relevance",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-070",
+   "context": "find",
+   "pair_id": "syn-pair0082",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-071",
+   "context": "find",
+   "pair_id": "syn-pair0068",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-072",
+   "context": "find",
+   "pair_id": "syn-pair0055",
+   "reference_class": "asymmetric",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-073",
+   "context": "find",
+   "pair_id": "syn-pair0041",
+   "reference_class": "worth_exploring",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-074",
+   "context": "connect",
+   "pair_id": "syn-pair0259",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-075",
+   "context": "find",
+   "pair_id": "syn-pair0061",
+   "reference_class": "promising",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-076",
+   "context": "connect",
+   "pair_id": "syn-pair0124",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-077",
+   "context": "find",
+   "pair_id": "syn-pair0044",
+   "reference_class": "promising",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-078",
+   "context": "find",
+   "pair_id": "syn-pair0350",
+   "reference_class": "exclude",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-079",
+   "context": "find",
+   "pair_id": "syn-pair0353",
+   "reference_class": "exclude",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-080",
+   "context": "find",
+   "pair_id": "syn-pair0104",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-081",
+   "context": "find",
+   "pair_id": "syn-pair0028",
+   "reference_class": "exclude",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-082",
+   "context": "connect",
+   "pair_id": "syn-pair0160",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-083",
+   "context": "find",
+   "pair_id": "syn-pair0239",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-084",
+   "context": "find",
+   "pair_id": "syn-pair0065",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-085",
+   "context": "find",
+   "pair_id": "syn-pair0420",
+   "reference_class": "worth_exploring",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-086",
+   "context": "connect",
+   "pair_id": "syn-pair0175",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-087",
+   "context": "find",
+   "pair_id": "syn-pair0043",
+   "reference_class": "asymmetric",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-088",
+   "context": "find",
+   "pair_id": "syn-pair0431",
+   "reference_class": "asymmetric",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-089",
+   "context": "find",
+   "pair_id": "syn-pair0114",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-090",
+   "context": "connect",
+   "pair_id": "syn-pair0174",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-091",
+   "context": "connect",
+   "pair_id": "syn-pair0156",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-092",
+   "context": "connect",
+   "pair_id": "syn-pair0135",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-093",
+   "context": "find",
+   "pair_id": "syn-pair0115",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-094",
+   "context": "find",
+   "pair_id": "syn-pair0439",
+   "reference_class": "asymmetric",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-095",
+   "context": "connect",
+   "pair_id": null,
+   "stress_case": "C2",
+   "stress_kind": "industry_match_topic_mismatch",
+   "expected": 0,
+   "source": "v02_connect_stress",
+   "selection": "edge_v02_connect_stress"
+  },
+  {
+   "sample_id": "hv02-096",
+   "context": "find",
+   "pair_id": "syn-pair0338",
+   "reference_class": "low_relevance",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-097",
+   "context": "find",
+   "pair_id": "syn-pair0395",
+   "reference_class": "worth_exploring",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-098",
+   "context": "connect",
+   "pair_id": "syn-pair0208",
+   "reference_class": "low_relevance",
+   "source": "designed_specialist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-099",
+   "context": "find",
+   "pair_id": "syn-pair0102",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-100",
+   "context": "find",
+   "pair_id": "syn-pair0292",
+   "reference_class": "low_relevance",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-101",
+   "context": "connect",
+   "pair_id": "syn-pair0144",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-102",
+   "context": "find",
+   "pair_id": "syn-pair0002",
+   "reference_class": "promising",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-103",
+   "context": "connect",
+   "pair_id": "syn-pair0149",
+   "reference_class": "promising",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-104",
+   "context": "find",
+   "pair_id": "syn-pair0244",
+   "reference_class": "insufficient_data",
+   "source": "designed_sparse",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-105",
+   "context": "connect",
+   "pair_id": "syn-pair0131",
+   "reference_class": "excellent_candidate",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-106",
+   "context": "find",
+   "pair_id": "syn-pair0301",
+   "reference_class": "excellent_candidate",
+   "source": "designed_noise",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-107",
+   "context": "find",
+   "pair_id": "syn-pair0315",
+   "reference_class": "low_relevance",
+   "source": "contrast_selection",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-108",
+   "context": "find",
+   "pair_id": "syn-pair0275",
+   "reference_class": "low_relevance",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-109",
+   "context": "find",
+   "pair_id": "syn-pair0411",
+   "reference_class": "worth_exploring",
+   "source": "contrast_selection",
+   "selection": "edge_location_semantics"
+  },
+  {
+   "sample_id": "hv02-110",
+   "context": "find",
+   "pair_id": "syn-pair0111",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-111",
+   "context": "find",
+   "pair_id": "syn-pair0003",
+   "reference_class": "excellent_candidate",
+   "source": "designed_normal_relation",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-112",
+   "context": "find",
+   "pair_id": "syn-pair0059",
+   "reference_class": "excellent_candidate",
+   "source": "designed_cluster",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-113",
+   "context": "connect",
+   "pair_id": "syn-pair0189",
+   "reference_class": "low_relevance",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-114",
+   "context": "connect",
+   "pair_id": "syn-pair0199",
+   "reference_class": "exclude",
+   "source": "designed_connect_listing",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-115",
+   "context": "connect",
+   "pair_id": null,
+   "stress_case": "C4",
+   "stress_kind": "same_words_wrong_context",
+   "expected": 3,
+   "source": "v02_connect_stress",
+   "selection": "edge_v02_connect_stress"
+  },
+  {
+   "sample_id": "hv02-116",
+   "context": "find",
+   "pair_id": "syn-pair0278",
+   "reference_class": "worth_exploring",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-117",
+   "context": "find",
+   "pair_id": "syn-pair0294",
+   "reference_class": "worth_exploring",
+   "source": "designed_generalist",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-118",
+   "context": "find",
+   "pair_id": "syn-pair0021",
+   "reference_class": "exclude",
+   "source": "designed_normal_relation",
+   "selection": "edge_known_stress"
+  },
+  {
+   "sample_id": "hv02-119",
+   "context": "find",
+   "pair_id": "syn-pair0112",
+   "reference_class": "exclude",
+   "source": "designed_constraint_conflict",
+   "selection": "stratified"
+  },
+  {
+   "sample_id": "hv02-120",
+   "context": "find",
+   "pair_id": "syn-pair0032",
+   "reference_class": "low_relevance",
+   "source": "designed_normal_relation",
+   "selection": "stratified"
+  }
+ ]
+}

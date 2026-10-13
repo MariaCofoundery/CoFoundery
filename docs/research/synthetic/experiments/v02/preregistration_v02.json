@@ -1,0 +1,10 @@
+{
+ "created": "2026-10-13T16:49:18",
+ "note": "Vorab-Festlegung vor dem Volllauf. Rauchtest (Baseline-Gleichheit, Lauff\u00e4higkeit) lief vorher, ohne Ground Truth.",
+ "sha256": {
+  "matching_models_v02.py": "586b65a0a872eeff5c71c43f1a3372204abda06721d8819b3a623f634e9eedce",
+  "normalization_v02.py": "3e505b0dfd8d0e2a5474cea09fbd8ec184ca3e48fe6eefea1c8ea4a42b9d8c4c",
+  "connect_stress_v02.json": "7ebbe24b8f8ef6d0a1fefe5702cef954b6ac60403304903ef9ce4552cee5e136",
+  "README.md": "7c896f3bca8eb6c85f0f7d108e90c7afb74dbe2837a39f103374ff2062ca975b"
+ }
+}

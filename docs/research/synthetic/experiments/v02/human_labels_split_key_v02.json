@@ -1,0 +1,732 @@
+{
+ "meta": {
+  "note": "INTERN – nicht an Reviewer geben. Holdout erst mit --include-holdout auswerten.",
+  "seed": 20261015,
+  "development": 80,
+  "holdout": 40,
+  "sample_sha256": "8e40719c09b438621f0560f74c2d168752f04334097005aca546ed9402c0c98e",
+  "sample_key_sha256": "1f1477c634c20b41723225bb9fb419e986bafddfebace2c129eea8e0229e781c"
+ },
+ "split": [
+  {
+   "pair_code": "RP-001",
+   "sample_id": "hv02-072",
+   "split": "holdout",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-002",
+   "sample_id": "hv02-063",
+   "split": "holdout",
+   "stratum": "find|stratified|asymmetric|contrast"
+  },
+  {
+   "pair_code": "RP-003",
+   "sample_id": "hv02-043",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-004",
+   "sample_id": "hv02-056",
+   "split": "development",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-005",
+   "sample_id": "hv02-032",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-006",
+   "sample_id": "hv02-042",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-007",
+   "sample_id": "hv02-011",
+   "split": "holdout",
+   "stratum": "find|edge_known_stress|edge_known_stress|designed"
+  },
+  {
+   "pair_code": "RP-008",
+   "sample_id": "hv02-010",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-009",
+   "sample_id": "hv02-029",
+   "split": "holdout",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-010",
+   "sample_id": "hv02-116",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-011",
+   "sample_id": "hv02-039",
+   "split": "development",
+   "stratum": "connect|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-012",
+   "sample_id": "hv02-104",
+   "split": "development",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-013",
+   "sample_id": "hv02-091",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-014",
+   "sample_id": "hv02-047",
+   "split": "holdout",
+   "stratum": "find|stratified|exclude|contrast"
+  },
+  {
+   "pair_code": "RP-015",
+   "sample_id": "hv02-120",
+   "split": "holdout",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-016",
+   "sample_id": "hv02-083",
+   "split": "development",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-017",
+   "sample_id": "hv02-119",
+   "split": "development",
+   "stratum": "find|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-018",
+   "sample_id": "hv02-060",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-019",
+   "sample_id": "hv02-034",
+   "split": "development",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-020",
+   "sample_id": "hv02-110",
+   "split": "holdout",
+   "stratum": "find|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-021",
+   "sample_id": "hv02-099",
+   "split": "development",
+   "stratum": "find|edge_known_stress|edge_known_stress|designed"
+  },
+  {
+   "pair_code": "RP-022",
+   "sample_id": "hv02-037",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-023",
+   "sample_id": "hv02-048",
+   "split": "development",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-024",
+   "sample_id": "hv02-013",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-025",
+   "sample_id": "hv02-017",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-026",
+   "sample_id": "hv02-077",
+   "split": "holdout",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-027",
+   "sample_id": "hv02-041",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-028",
+   "sample_id": "hv02-021",
+   "split": "development",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|contrast"
+  },
+  {
+   "pair_code": "RP-029",
+   "sample_id": "hv02-040",
+   "split": "development",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-030",
+   "sample_id": "hv02-070",
+   "split": "holdout",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-031",
+   "sample_id": "hv02-066",
+   "split": "development",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-032",
+   "sample_id": "hv02-049",
+   "split": "development",
+   "stratum": "find|edge_known_stress|edge_known_stress|contrast"
+  },
+  {
+   "pair_code": "RP-033",
+   "sample_id": "hv02-044",
+   "split": "holdout",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-034",
+   "sample_id": "hv02-014",
+   "split": "holdout",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-035",
+   "sample_id": "hv02-019",
+   "split": "holdout",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-036",
+   "sample_id": "hv02-078",
+   "split": "development",
+   "stratum": "find|stratified|exclude|contrast"
+  },
+  {
+   "pair_code": "RP-037",
+   "sample_id": "hv02-065",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-038",
+   "sample_id": "hv02-061",
+   "split": "holdout",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-039",
+   "sample_id": "hv02-092",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-040",
+   "sample_id": "hv02-052",
+   "split": "holdout",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|designed"
+  },
+  {
+   "pair_code": "RP-041",
+   "sample_id": "hv02-101",
+   "split": "holdout",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-042",
+   "sample_id": "hv02-033",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-043",
+   "sample_id": "hv02-082",
+   "split": "holdout",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-044",
+   "sample_id": "hv02-086",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-045",
+   "sample_id": "hv02-003",
+   "split": "holdout",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-046",
+   "sample_id": "hv02-020",
+   "split": "development",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-047",
+   "sample_id": "hv02-007",
+   "split": "development",
+   "stratum": "connect|edge_known_stress|edge_known_stress|designed"
+  },
+  {
+   "pair_code": "RP-048",
+   "sample_id": "hv02-050",
+   "split": "holdout",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-049",
+   "sample_id": "hv02-075",
+   "split": "holdout",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-050",
+   "sample_id": "hv02-108",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-051",
+   "sample_id": "hv02-067",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-052",
+   "sample_id": "hv02-016",
+   "split": "development",
+   "stratum": "connect|edge_v02_connect_stress|stress_expected_1|designed"
+  },
+  {
+   "pair_code": "RP-053",
+   "sample_id": "hv02-054",
+   "split": "development",
+   "stratum": "connect|edge_v02_connect_stress|stress_expected_3|designed"
+  },
+  {
+   "pair_code": "RP-054",
+   "sample_id": "hv02-053",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-055",
+   "sample_id": "hv02-046",
+   "split": "holdout",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-056",
+   "sample_id": "hv02-018",
+   "split": "holdout",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-057",
+   "sample_id": "hv02-038",
+   "split": "holdout",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-058",
+   "sample_id": "hv02-012",
+   "split": "development",
+   "stratum": "find|stratified|promising|contrast"
+  },
+  {
+   "pair_code": "RP-059",
+   "sample_id": "hv02-036",
+   "split": "development",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-060",
+   "sample_id": "hv02-059",
+   "split": "development",
+   "stratum": "connect|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-061",
+   "sample_id": "hv02-093",
+   "split": "development",
+   "stratum": "find|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-062",
+   "sample_id": "hv02-073",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-063",
+   "sample_id": "hv02-102",
+   "split": "development",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-064",
+   "sample_id": "hv02-027",
+   "split": "holdout",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-065",
+   "sample_id": "hv02-076",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-066",
+   "sample_id": "hv02-005",
+   "split": "development",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|contrast"
+  },
+  {
+   "pair_code": "RP-067",
+   "sample_id": "hv02-109",
+   "split": "holdout",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|contrast"
+  },
+  {
+   "pair_code": "RP-068",
+   "sample_id": "hv02-087",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-069",
+   "sample_id": "hv02-015",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-070",
+   "sample_id": "hv02-090",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-071",
+   "sample_id": "hv02-096",
+   "split": "holdout",
+   "stratum": "find|stratified|low_relevance|contrast"
+  },
+  {
+   "pair_code": "RP-072",
+   "sample_id": "hv02-058",
+   "split": "development",
+   "stratum": "find|stratified|promising|contrast"
+  },
+  {
+   "pair_code": "RP-073",
+   "sample_id": "hv02-115",
+   "split": "holdout",
+   "stratum": "connect|edge_v02_connect_stress|stress_expected_3|designed"
+  },
+  {
+   "pair_code": "RP-074",
+   "sample_id": "hv02-022",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-075",
+   "sample_id": "hv02-107",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|contrast"
+  },
+  {
+   "pair_code": "RP-076",
+   "sample_id": "hv02-117",
+   "split": "holdout",
+   "stratum": "find|stratified|worth_exploring|designed"
+  },
+  {
+   "pair_code": "RP-077",
+   "sample_id": "hv02-069",
+   "split": "holdout",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-078",
+   "sample_id": "hv02-001",
+   "split": "development",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-079",
+   "sample_id": "hv02-112",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-080",
+   "sample_id": "hv02-111",
+   "split": "development",
+   "stratum": "find|edge_known_stress|edge_known_stress|designed"
+  },
+  {
+   "pair_code": "RP-081",
+   "sample_id": "hv02-023",
+   "split": "development",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-082",
+   "sample_id": "hv02-098",
+   "split": "holdout",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-083",
+   "sample_id": "hv02-080",
+   "split": "development",
+   "stratum": "find|edge_known_stress|edge_known_stress|designed"
+  },
+  {
+   "pair_code": "RP-084",
+   "sample_id": "hv02-095",
+   "split": "development",
+   "stratum": "connect|edge_v02_connect_stress|stress_expected_0|designed"
+  },
+  {
+   "pair_code": "RP-085",
+   "sample_id": "hv02-031",
+   "split": "development",
+   "stratum": "connect|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-086",
+   "sample_id": "hv02-045",
+   "split": "development",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-087",
+   "sample_id": "hv02-009",
+   "split": "development",
+   "stratum": "connect|edge_v02_connect_stress|stress_expected_3|designed"
+  },
+  {
+   "pair_code": "RP-088",
+   "sample_id": "hv02-035",
+   "split": "holdout",
+   "stratum": "find|stratified|worth_exploring|contrast"
+  },
+  {
+   "pair_code": "RP-089",
+   "sample_id": "hv02-085",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|contrast"
+  },
+  {
+   "pair_code": "RP-090",
+   "sample_id": "hv02-094",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|contrast"
+  },
+  {
+   "pair_code": "RP-091",
+   "sample_id": "hv02-024",
+   "split": "holdout",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-092",
+   "sample_id": "hv02-071",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-093",
+   "sample_id": "hv02-097",
+   "split": "development",
+   "stratum": "find|stratified|worth_exploring|contrast"
+  },
+  {
+   "pair_code": "RP-094",
+   "sample_id": "hv02-008",
+   "split": "holdout",
+   "stratum": "find|stratified|promising|contrast"
+  },
+  {
+   "pair_code": "RP-095",
+   "sample_id": "hv02-088",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|contrast"
+  },
+  {
+   "pair_code": "RP-096",
+   "sample_id": "hv02-064",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-097",
+   "sample_id": "hv02-030",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-098",
+   "sample_id": "hv02-114",
+   "split": "holdout",
+   "stratum": "connect|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-099",
+   "sample_id": "hv02-100",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-100",
+   "sample_id": "hv02-103",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-101",
+   "sample_id": "hv02-081",
+   "split": "development",
+   "stratum": "find|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-102",
+   "sample_id": "hv02-089",
+   "split": "holdout",
+   "stratum": "find|stratified|exclude|designed"
+  },
+  {
+   "pair_code": "RP-103",
+   "sample_id": "hv02-084",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-104",
+   "sample_id": "hv02-074",
+   "split": "holdout",
+   "stratum": "connect|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-105",
+   "sample_id": "hv02-051",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|contrast"
+  },
+  {
+   "pair_code": "RP-106",
+   "sample_id": "hv02-055",
+   "split": "development",
+   "stratum": "find|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-107",
+   "sample_id": "hv02-113",
+   "split": "holdout",
+   "stratum": "connect|stratified|low_relevance|designed"
+  },
+  {
+   "pair_code": "RP-108",
+   "sample_id": "hv02-068",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-109",
+   "sample_id": "hv02-025",
+   "split": "holdout",
+   "stratum": "connect|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-110",
+   "sample_id": "hv02-079",
+   "split": "development",
+   "stratum": "find|stratified|exclude|contrast"
+  },
+  {
+   "pair_code": "RP-111",
+   "sample_id": "hv02-004",
+   "split": "development",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-112",
+   "sample_id": "hv02-006",
+   "split": "development",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|designed"
+  },
+  {
+   "pair_code": "RP-113",
+   "sample_id": "hv02-106",
+   "split": "development",
+   "stratum": "find|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-114",
+   "sample_id": "hv02-105",
+   "split": "holdout",
+   "stratum": "connect|stratified|excellent_candidate|designed"
+  },
+  {
+   "pair_code": "RP-115",
+   "sample_id": "hv02-002",
+   "split": "development",
+   "stratum": "find|stratified|asymmetric|designed"
+  },
+  {
+   "pair_code": "RP-116",
+   "sample_id": "hv02-062",
+   "split": "development",
+   "stratum": "find|edge_location_semantics|edge_location_semantics|designed"
+  },
+  {
+   "pair_code": "RP-117",
+   "sample_id": "hv02-057",
+   "split": "development",
+   "stratum": "connect|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-118",
+   "sample_id": "hv02-026",
+   "split": "holdout",
+   "stratum": "find|stratified|insufficient_data|designed"
+  },
+  {
+   "pair_code": "RP-119",
+   "sample_id": "hv02-028",
+   "split": "development",
+   "stratum": "find|stratified|promising|designed"
+  },
+  {
+   "pair_code": "RP-120",
+   "sample_id": "hv02-118",
+   "split": "holdout",
+   "stratum": "find|edge_known_stress|edge_known_stress|designed"
+  }
+ ]
+}
