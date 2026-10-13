@@ -91,7 +91,12 @@ test("zwei Ebenen speichern, und sie sagen Verschiedenes", () => {
   // und `localStorage` ist in einem privaten Fenster leer und auf einem
   // anderen Geraet nie da.
   const form = codeOnly(FORM);
-  assert.match(form, /localStorage\.setItem/);
+  // Der Browser-Puffer liegt seit dem 13.10.2026 in einem eigenen Modul
+  // (interviewDrafts.ts) - als reiner Crash-Puffer, der nach bestaetigtem
+  // Server-Speichern wieder verschwindet.
+  const drafts = codeOnly("src/features/interviews/interviewDrafts.ts");
+  assert.match(form, /writeDraft\(key, next\)/);
+  assert.match(drafts, /store\.setItem\(key, value\)/);
   // ANGEPASST AM 22.09.2026: Hier stand `autosaveInterviewAnswerAction`. Das
   // Feld ist seit dem Teilen der Gespraechsmechanik allgemein und bekommt
   // seine drei Aktionen als Eigenschaft - die Zusage ist dieselbe: Es gibt
@@ -104,11 +109,15 @@ test("zwei Ebenen speichern, und sie sagen Verschiedenes", () => {
 
   // Jeder Zugriff auf den Browserspeicher ist abgesichert: In einem privaten
   // Fenster oder bei abgeschalteten Websitedaten wirft er.
+  // Das Formular selbst fasst den Speicher nicht mehr an; im Modul steckt jeder
+  // Zugriff in einem try (storage, lesen, schreiben, loeschen, alle loeschen).
+  assert.doesNotMatch(form, /localStorage/);
   assert.equal(
-    (form.match(/try \{/g) ?? []).length,
-    3,
+    (drafts.match(/try \{/g) ?? []).length,
+    5,
     "ein Zugriff auf localStorage ist nicht abgesichert"
   );
+  assert.equal((drafts.match(/window\.localStorage/g) ?? []).length, 1, "nur storage() greift auf localStorage zu");
 
   // "In diesem Browser gesichert" und "Gespeichert" sind ZWEI Zusagen, und ein
   // Haken koennte beide bedeuten. Deshalb Worte, und deshalb verschiedene.

@@ -1,5 +1,6 @@
 "use client";
 
+import { clearAllInterviewDrafts } from "@/features/interviews/interviewDrafts";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { deleteCurrentUserAccountAction } from "@/features/account/actions";
@@ -40,6 +41,8 @@ export function DeleteAccountSection({
   const onDelete = () => {
     if (isPending || confirmationText.trim() !== confirmToken) return;
     setError(null);
+    // Mit dem Konto gehen auch die Interview-Puffer in diesem Browser.
+    clearAllInterviewDrafts();
     startTransition(async () => {
       const result = await deleteCurrentUserAccountAction({
         problems: outlivable.problems > 0 && keepProblems,

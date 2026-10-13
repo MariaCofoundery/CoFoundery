@@ -83,12 +83,15 @@ export function workContextToStore(params: {
   return kind === "shared" ? null : kind;
 }
 
-/** Clientseitig geschrieben, wie die Sprachwahl. Kein httpOnly noetig: reine UI-Praeferenz. */
+/**
+ * Clientseitig geschrieben, nur beim ausdruecklichen Umschalten. Kein httpOnly
+ * noetig: reine UI-Praeferenz. Ein Sitzungs-Cookie ohne max-age - es endet mit
+ * der Browsersitzung; mehr braucht "zuletzt gewaehlter Kontext" nicht.
+ */
 export function writeWorkContextCookie(value: WorkContext) {
   document.cookie = [
     `${WORK_CONTEXT_COOKIE}=${value}`,
     "path=/",
-    "max-age=31536000",
     "samesite=lax",
   ].join("; ");
 }

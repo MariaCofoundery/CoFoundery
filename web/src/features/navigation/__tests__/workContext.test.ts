@@ -75,13 +75,25 @@ test("bei nur einer Rolle zaehlt das Cookie nicht", () => {
   assert.equal(resolveActiveView({ pathname: "/connect", hasFounder: false, hasAdvisor: false, stored: "advisor" }), "founder");
 });
 
-test("geschrieben wird nur bei Doppelrolle und nur auf eindeutigen Seiten", () => {
+test("gemerkt wird nur bei Doppelrolle und nur auf eindeutigen Seiten", () => {
   assert.equal(workContextToStore({ pathname: "/advisor/group", ...both }), "advisor");
   assert.equal(workContextToStore({ pathname: "/teams/t1", ...both }), "founder");
   assert.equal(workContextToStore({ pathname: "/messages", ...both }), null);
   assert.equal(workContextToStore({ pathname: "/team-intake", ...both }), null);
   assert.equal(workContextToStore({ pathname: "/advisor/group", hasFounder: false, hasAdvisor: true }), null);
   assert.equal(workContextToStore({ pathname: "/dashboard", hasFounder: true, hasAdvisor: false }), null);
+});
+
+test("das Cookie entsteht nur beim ausdruecklichen Umschalten und endet mit der Sitzung", () => {
+  const shell = readFileSync(join("src", "features", "navigation", "ProductShell.tsx"), "utf8");
+  // Genau ein Aufruf - im Umschalter, nicht im Effekt beim Seitenwechsel.
+  assert.equal(shell.split("writeWorkContextCookie(").length - 1, 1);
+  assert.match(shell, /function chooseWorkContext\(next: WorkContext\) \{\s*if \(!\(hasFounder && hasAdvisor\)\) return;\s*writeWorkContextCookie\(next\);/);
+  assert.match(shell, /if \(next && next !== storedWorkContext\) setStoredWorkContext\(next\);/);
+  // Sitzungs-Cookie: kein max-age, kein expires.
+  const cookie = readFileSync(join("src", "features", "navigation", "workContext.ts"), "utf8");
+  const writer = cookie.slice(cookie.indexOf("export function writeWorkContextCookie"));
+  assert.doesNotMatch(writer.slice(0, writer.indexOf("}")), /max-age|expires/i);
 });
 
 /**

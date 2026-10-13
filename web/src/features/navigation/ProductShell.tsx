@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
+import { clearAllInterviewDrafts } from "@/features/interviews/interviewDrafts";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
@@ -242,12 +243,12 @@ export function ProductShell({
   // "Zuletzt in diesem Kontext gearbeitet": Eindeutige Founder- oder
   // Advisor-Seiten merken sich den Kontext, gemeinsame Seiten lesen ihn nur.
   // Nur bei Doppelrolle - workContextToStore liefert sonst nichts.
+  // NUR IM SPEICHER DIESES TABS. Ein Cookie entsteht erst, wenn jemand den
+  // Kontext ausdruecklich umschaltet (chooseWorkContext) - nicht beim blossen
+  // Oeffnen einer Seite.
   useEffect(() => {
     const next = workContextToStore({ pathname, hasFounder, hasAdvisor });
-    if (next && next !== storedWorkContext) {
-      writeWorkContextCookie(next);
-      setStoredWorkContext(next);
-    }
+    if (next && next !== storedWorkContext) setStoredWorkContext(next);
   }, [pathname, hasFounder, hasAdvisor, storedWorkContext]);
 
   function chooseWorkContext(next: WorkContext) {
@@ -855,7 +856,7 @@ export function ProductShell({
                   variant="nav"
                   triggerClassName={MOBILE_MENU_ROW_CLASS}
                 />
-                <form action={signOutAction}>
+                <form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>
                   <button type="submit" className={`${MOBILE_MENU_ROW_CLASS} w-full text-left`}>
                     {t("logout")}
                   </button>
@@ -1099,7 +1100,7 @@ function ProfileMenu({
           >
             {t("account")}
           </Link>
-          <form action={signOutAction}>
+          <form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>
             <button
               type="submit"
               className="block w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"

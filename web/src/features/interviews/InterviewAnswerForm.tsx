@@ -1,5 +1,6 @@
 "use client";
 
+import { clearDraft, clearDraftIfSaved, draftKey, readDraft, writeDraft } from "@/features/interviews/interviewDrafts";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -39,38 +40,6 @@ const AUTOSAVE_DELAY_MS = 2_500;
 
 type SaveState = "idle" | "local" | "saving" | "saved" | "failed";
 
-function draftKey(sessionId: string, turnId: string) {
-  return `cofoundery.interview.${sessionId}.${turnId}`;
-}
-
-function readDraft(key: string) {
-  // Ein privates Fenster, geloeschte Websitedaten, ein Browser mit
-  // abgeschaltetem Speicher: Jeder Zugriff kann werfen, und dann gibt es eben
-  // keinen Zwischenstand.
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function writeDraft(key: string, value: string) {
-  try {
-    window.localStorage.setItem(key, value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function clearDraft(key: string) {
-  try {
-    window.localStorage.removeItem(key);
-  } catch {
-    // Nichts zu tun: Ein liegengebliebener Zwischenstand wird beim naechsten
-    // Mal ueberschrieben.
-  }
-}
 
 export function InterviewAnswerForm({
   namespace,
@@ -138,7 +107,10 @@ export function InterviewAnswerForm({
       setValue(draft);
       setRestored(true);
       setSaveState("local");
+      return;
     }
+    // Ein Rest, der dem Serverstand entspricht, wird nicht mehr gebraucht.
+    clearDraftIfSaved(key, savedAnswer);
   }, [key, savedAnswer]);
 
   // Der verzoegerte Gang zum Server. Aufgeraeumt bei jeder Aenderung, damit
@@ -161,6 +133,9 @@ export function InterviewAnswerForm({
             return;
           }
           lastSaved.current = trimmed;
+          // Der Server hat den Text - der Puffer auf dem Geraet wird nicht mehr
+          // gebraucht. Weitergetippter Text bleibt liegen (anderer Inhalt).
+          clearDraftIfSaved(key, trimmed);
           setSaveState("saved");
           setRestored(false);
         })
@@ -176,7 +151,7 @@ export function InterviewAnswerForm({
     // Konstanten - aber das gehoert nicht in einen Kommentar, sondern in die
     // Abhaengigkeiten: Wer das Feld spaeter mit wechselnden Aktionen benutzt,
     // soll keinen Effekt bekommen, der die alte noch ruft.
-  }, [value, turnId, actions, minLength, maxLength]);
+  }, [value, turnId, key, actions, minLength, maxLength]);
 
   const onChange = (next: string) => {
     setValue(next);

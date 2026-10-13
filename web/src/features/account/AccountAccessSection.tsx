@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { requestEmailChangeAction, signOutEverywhereAction } from "@/features/account/accountActions";
+import { ClearDraftsForm } from "@/features/interviews/ClearDraftsForm";
 import {
   accountStatusSection,
   isAccountStatusFailure,
@@ -111,13 +112,13 @@ export async function AccountAccessSection({
       <div className="mt-6 border-t border-slate-200 pt-5">
         <h3 className="text-base font-semibold text-slate-950">{t("account.access.signOutTitle")}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.access.signOutText")}</p>
-        <form action={signOutEverywhereAction} className="mt-3">
+        <ClearDraftsForm action={signOutEverywhereAction} className="mt-3">
           <SubmitButton
             label={t("account.access.signOutCta")}
             pendingLabel={t("account.access.signOutPending")}
             className={SECONDARY}
           />
-        </form>
+        </ClearDraftsForm>
       </div>
     </section>
   );
