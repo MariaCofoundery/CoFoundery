@@ -5,6 +5,10 @@
     {
       "path": "/api/cron/connect-suggestions",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/privacy-retention",
+      "schedule": "0 3 * * *"
     }
   ]
 }
