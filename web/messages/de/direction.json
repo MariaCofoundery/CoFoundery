@@ -164,7 +164,7 @@
     "reject": "Passt nicht",
     "rejectPending": "Wird verworfen …",
     "askTitle": "Lesen lassen",
-    "askText": "Du kannst eine deiner Antworten lesen lassen. Sie geht dabei an ein Modell auf Marias Rechner — nicht an einen fremden Dienst.",
+    "askText": "Freiwillig: Du kannst eine deiner Antworten von einem KI-Modell lesen lassen. Es läuft auf einem Rechner von Made2Found — nicht bei einem fremden Dienst. Die Vorschläge können falsch oder unvollständig sein und gelten erst, wenn du sie bestätigst.",
     "ask": "Diese Antwort lesen lassen",
     "askPending": "Wird angefragt …",
     "jobOpen": "Wird gerade gelesen …",
@@ -180,7 +180,7 @@
   "done": {
     "title": "Deine Antworten stehen",
     "text": "{count} von {total} Fragen beantwortet. Was jetzt kommt, entscheidest du.",
-    "withAi": "Du kannst deine Antworten lesen lassen. Sie gehen an ein Modell auf Marias Rechner — nicht an einen fremden Dienst. Heraus kommen Vorschläge mit der Stelle, auf die sie sich berufen; nichts davon gilt, bis du es bestätigst.",
+    "withAi": "Freiwillig: Du kannst deine Antworten von einem KI-Modell lesen lassen. Mit einem Klick werden alle beantworteten Antworten gelesen. Das Modell läuft auf einem Rechner von Made2Found — nicht bei einem fremden Dienst. Heraus kommen Vorschläge mit der Stelle, auf die sie sich berufen; sie können falsch oder unvollständig sein. Das Modell bewertet und entscheidet nichts, und nichts davon gilt, bis du es bestätigst. Ohne KI geht es genauso: Du schreibst selbst auf, was dir auffällt.",
     "askAll": "Antworten lesen lassen",
     "withoutAi": "Gerade liest kein Modell mit — das macht nichts. Unter „Meine Richtung“ schreibst du selbst auf, was dir beim Lesen deiner Antworten auffällt. Genau das ist das Ergebnis; das Modell macht daraus nur Vorschläge.",
     "readWithoutAi": "Antworten durchsehen",

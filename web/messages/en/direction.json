@@ -164,7 +164,7 @@
     "reject": "Does not fit",
     "rejectPending": "Discarding …",
     "askTitle": "Have it read",
-    "askText": "You can have one of your answers read. It goes to a model on Maria's machine — not to an outside service.",
+    "askText": "Optional: you can have one of your answers read by an AI model. It runs on a Made2Found machine — not an outside service. The proposals may be wrong or incomplete and only count once you confirm them.",
     "ask": "Have this answer read",
     "askPending": "Requesting …",
     "jobOpen": "Being read …",
@@ -180,7 +180,7 @@
   "done": {
     "title": "Your answers are in",
     "text": "{count} of {total} questions answered. What happens next is your call.",
-    "withAi": "You can have your answers read. They go to a model on Maria's machine — not to an outside service. Out come proposals with the passage they rely on; none of it counts until you confirm it.",
+    "withAi": "Optional: you can have your answers read by an AI model. One click reads all the answers you've given. The model runs on a Made2Found machine — not an outside service. Out come proposals with the passage they rely on; they may be wrong or incomplete. The model doesn't rate or decide anything, and none of it counts until you confirm it. It works just as well without AI: you write down yourself what stands out to you.",
     "askAll": "Have the answers read",
     "withoutAi": "No model is reading along right now — that is fine. Under “My direction” you write down yourself what strikes you when reading your answers. That is the result; the model only turns it into proposals.",
     "readWithoutAi": "Look through the answers",

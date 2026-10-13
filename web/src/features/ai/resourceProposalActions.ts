@@ -11,7 +11,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * dieser beiden Handlungen entschieden.
  *
  * VERWORFEN HEISST NICHT GELOESCHT: Die Zeile bleibt mit `status = 'rejected'`
- * stehen, damit derselbe Vorschlag bei der naechsten Veroeffentlichung nicht
+ * stehen, damit derselbe Vorschlag beim naechsten Lesenlassen nicht
  * wiederkommt (die Eindeutigkeit in `insert_ai_resource_proposal` haengt
  * daran). Wer ihn endgueltig los sein will, loescht ihn - dafuer gibt es die
  * delete-Policy.

@@ -169,15 +169,10 @@ export async function saveConnectListingAction(formData: FormData) {
       category: values.category,
     });
 
-    // Und die Auswertung auf Zugaenge - erst jetzt, weil ein Entwurf fuer
-    // niemanden sichtbar ist, auch nicht fuer ein Modell. Sie wandert in eine
-    // Warteschlange und wird gerechnet, wenn ein Modell laeuft; hier wartet
-    // niemand darauf.
-    await client.rpc("enqueue_ai_job", {
-      p_job_type: "connect_resource_extraction",
-      p_source_table: "network_listings",
-      p_source_id: result.data.id,
-    });
+    // KEINE KI BEIM VEROEFFENTLICHEN. Bis 13.10.2026 ging hier jeder Eintrag
+    // automatisch in die KI-Warteschlange. Gelesen wird jetzt nur noch, wenn
+    // die Person das auf der Eintragsseite ausdruecklich anfordert
+    // (`requestListingResourceProposalsAction`).
   }
 
   refresh();

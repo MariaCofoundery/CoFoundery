@@ -211,7 +211,7 @@ test("kein Modell erreichbar ist kein Fehler", () => {
     // Und der Satz vor dem Knopf sagt, was passiert.
     assert.match(
       copy.askText,
-      locale === "de" ? /eigenen Hardware/ : /own hardware/,
+      locale === "de" ? /Rechner von Made2Found/ : /Made2Found machine/,
       `${locale}: es steht nicht da, wohin der Text geht`
     );
     assert.match(

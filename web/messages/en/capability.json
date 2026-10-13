@@ -521,7 +521,7 @@
       "fromModelHint": "Every suggestion comes with the exact sentence it's based on – checked against your answer when it was saved. Anything a model can't back up never shows up here. Whether it's right is your call.",
       "levelFor": "How much experience do you have in “{area}”?",
       "askTitle": "Let the AI take a look?",
-      "askText": "A language model on our own hardware reads only this answer and suggests areas – each with the sentence it's based on. It doesn't decide anything, doesn't set a level, and sees no other answer. You can also do the sorting entirely without it.",
+      "askText": "Optional: an AI model on a Made2Found machine – not an outside service – reads only this answer and suggests areas, sometimes also a sentence about how you work, each with the passage it rests on. The suggestions may be wrong or incomplete. The model doesn't rate or decide anything, doesn't set a level and sees no other answer; nothing counts before you confirm it. You can also do the sorting entirely without AI.",
       "ask": "Let the AI read this answer",
       "askPending": "Asking …",
       "askRunning": "The AI is reading. That usually takes less than twenty seconds – this page refreshes on its own.",

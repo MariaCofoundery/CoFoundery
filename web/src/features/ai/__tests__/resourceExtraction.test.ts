@@ -149,10 +149,11 @@ test("nur veroeffentlichte Texte werden ausgewertet", () => {
   const migration = sqlCodeOnly(MIGRATION);
   assert.equal((migration.match(/status = 'active'/g) ?? []).length, 2, "Anzeige und Problem");
 
-  const actions = codeOnly("src/features/connect/connectActions.ts");
-  const enqueueAt = actions.indexOf('p_job_type: "connect_resource_extraction"');
-  const publishAt = actions.indexOf('if (nextStatus === "active" && currentListing.data?.status !== "active") {');
-  assert.ok(publishAt > 0 && enqueueAt > publishAt, "die Aufgabe entsteht ausserhalb des publish-Zweigs");
+  // Seit 13.10.2026 entsteht die Aufgabe nicht mehr beim Veroeffentlichen,
+  // sondern nur auf Anforderung - und auch die liest nur aktive Eintraege.
+  const request = codeOnly("src/features/connect/connectAiActions.ts");
+  assert.match(request, /listing\.status === "active"/);
+  assert.match(request, /if \(!active\) redirect\(/);
 });
 
 test("der Arbeiter liest den Text ueber die enge Funktion, nicht aus der Tabelle", () => {
@@ -174,7 +175,7 @@ test("nichts gilt, bevor ein Mensch zugestimmt hat", () => {
   assert.match(actions, /\.eq\("user_id", user\.id\)/);
 
   // Verworfen heisst nicht geloescht: Sonst kaeme derselbe Vorschlag bei der
-  // naechsten Veroeffentlichung wieder.
+  // naechsten Anforderung wieder.
   assert.match(actions, /status, decided_at/);
   const data = codeOnly("src/features/ai/personResources.ts");
   assert.match(data, /\.in\("status", \["pending", "confirmed"\]\)/);

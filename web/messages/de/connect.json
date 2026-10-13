@@ -755,7 +755,20 @@
   },
   "resources": {
     "title": "Zugänge und Netzwerke",
-    "text": "Aus deinen veröffentlichten Anzeigen liest ein Sprachmodell heraus, welche Zugänge du mitbringst – Menschen, die du kennst, Orte, an die du herankommst, Dinge, die du anbieten kannst. Jeder Vorschlag zeigt die Stelle, auf die er sich stützt. Nichts davon gilt, bevor du zustimmst.",
+    "text": "Aus Einträgen, die du ausdrücklich hast lesen lassen, schlägt ein KI-Modell vor, welche Zugänge du mitbringst – Menschen, die du kennst, Orte, an die du herankommst, Dinge, die du anbieten kannst. Jeder Vorschlag zeigt die Stelle, auf die er sich stützt, und kann falsch oder unvollständig sein. Nichts davon gilt, bevor du zustimmst.",
+    "askTitle": "Zugänge vorschlagen lassen?",
+    "askText": "Freiwillig: Ein KI-Modell auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest Titel und Beschreibung dieses Eintrags und schlägt mögliche Zugänge vor, jeweils mit der Textstelle, auf die sich der Vorschlag stützt. Die Vorschläge können falsch oder unvollständig sein. Das Modell bewertet und entscheidet nichts; es gilt nichts, bevor du es bestätigst. Dein Eintrag bleibt davon unberührt, und du kannst Zugänge auch selbst eintragen.",
+    "ask": "Diesen Eintrag lesen lassen",
+    "askPending": "Wird angefragt …",
+    "askRunning": "Die KI liest gerade. Das dauert meist unter einer Minute – diese Seite aktualisiert sich von selbst.",
+    "askDone": "Gelesen. Vorschläge, die sich belegen ließen, warten in deinem CONNECT-Profil auf deine Entscheidung.",
+    "askDoneLink": "Zu den Vorschlägen",
+    "askFailed": "Der letzte Versuch ist nicht durchgelaufen. Du kannst es noch einmal versuchen.",
+    "notice": {
+      "requested": "Angefragt. Die KI liest diesen Eintrag, sobald sie dazu kommt.",
+      "unavailable": "Gerade lässt sich nichts lesen lassen: Der Eintrag ist nicht veröffentlicht, oder es ist kein Modell erreichbar. Es wurde nichts verarbeitet.",
+      "failed": "Die Anfrage ließ sich nicht stellen. Vielleicht liest die KI diesen Eintrag schon."
+    },
     "pendingTitle": "Vorgeschlagen",
     "confirmedTitle": "Bestätigt",
     "quote": "„{quote}“",

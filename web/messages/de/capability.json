@@ -521,7 +521,7 @@
       "fromModelHint": "Jeder Vorschlag steht mit dem wörtlichen Satz da, auf den er sich beruft – geprüft wurde er beim Speichern gegen deine Antwort. Was ein Modell nicht belegen kann, kommt hier gar nicht an. Ob es stimmt, entscheidest du.",
       "levelFor": "Wie tief steckst du in „{area}“?",
       "askTitle": "Die KI mitlesen lassen?",
-      "askText": "Ein Sprachmodell auf unserer eigenen Hardware liest diese eine Antwort und schlägt Bereiche vor – jeden mit dem Satz, auf den er sich beruft. Es entscheidet nichts, es setzt keine Stufe, und es sieht keine andere Antwort als diese. Du kannst das Einordnen auch ganz ohne machen.",
+      "askText": "Freiwillig: Ein KI-Modell auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest diese eine Antwort und schlägt Bereiche vor, manchmal auch einen Satz zu deiner Arbeitsweise, jeweils mit der Textstelle, auf die er sich stützt. Die Vorschläge können falsch oder unvollständig sein. Das Modell bewertet und entscheidet nichts, setzt keine Stufe und sieht keine andere Antwort als diese; es gilt nichts, bevor du es bestätigst. Du kannst das Einordnen auch ganz ohne KI machen.",
       "ask": "Diese Antwort lesen lassen",
       "askPending": "Wird angefragt …",
       "askRunning": "Die KI liest gerade. Das dauert meist unter zwanzig Sekunden – diese Seite aktualisiert sich von selbst.",

@@ -755,7 +755,20 @@
   },
   "resources": {
     "title": "Access and networks",
-    "text": "From your published listings, a language model reads out which doors you can open – people you know, places you can reach, things you can offer. Every suggestion shows the passage it rests on. None of it counts before you agree.",
+    "text": "From listings you explicitly asked to have read, an AI model suggests which doors you can open – people you know, places you can reach, things you can offer. Every suggestion shows the passage it rests on and may be wrong or incomplete. None of it counts before you agree.",
+    "askTitle": "Get suggestions for your access?",
+    "askText": "Optional: an AI model on a Made2Found machine – not an outside service – reads the title and description of this listing and suggests possible access you bring, each with the passage the suggestion rests on. The suggestions may be wrong or incomplete. The model doesn't rate or decide anything; nothing counts before you confirm it. Your listing stays as it is, and you can also add access yourself.",
+    "ask": "Have this listing read",
+    "askPending": "Requesting …",
+    "askRunning": "The AI is reading. This usually takes less than a minute – this page refreshes on its own.",
+    "askDone": "Read. Suggestions that could be backed up are waiting in your CONNECT profile for your decision.",
+    "askDoneLink": "Go to the suggestions",
+    "askFailed": "The last attempt didn't go through. You can try again.",
+    "notice": {
+      "requested": "Requested. The AI will read this listing as soon as it gets to it.",
+      "unavailable": "Nothing can be read right now: the listing isn't published, or no model is reachable. Nothing was processed.",
+      "failed": "The request couldn't be made. Maybe the AI is already reading this listing."
+    },
     "pendingTitle": "Suggested",
     "confirmedTitle": "Confirmed",
     "quote": "“{quote}”",
