@@ -140,10 +140,12 @@ test("eine Stufe unter der Tiefe ist noch keine Tiefe", () => {
   assert.equal(stateOf(readout, "fundraising")?.state, "claimedShallow");
 });
 
-test("einer will hineinwachsen, ein anderer gibt ab - ein planbarer Weg", () => {
+test("einer will verantworten, ist noch nicht tief, ein anderer gibt ab - ein planbarer Weg", () => {
+  // Der Anspruch ist `own` ohne Tiefe. "Möchte hineinwachsen" ist kein Anspruch
+  // und ergibt diesen Weg nicht (siehe die Fälle zu grow_into unten).
   const readout = buildCapabilityTeamReadout(
     [
-      member("a", "Ada", [entry("fundraising", 1, "grow_into")]),
+      member("a", "Ada", [entry("fundraising", 1, "own")]),
       member("b", "Bo", [entry("fundraising", 5, "prefer_other")]),
     ],
     areas,
@@ -154,6 +156,90 @@ test("einer will hineinwachsen, ein anderer gibt ab - ein planbarer Weg", () => 
   assert.equal(area?.state, "handoverPath");
   assert.deepEqual(area?.claimants, ["a"]);
   assert.deepEqual(area?.deep, ["b"]);
+});
+
+// ---------------------------------------------------------------------------
+// Nur `own` ist ein Anspruch. "Möchte hineinwachsen" ist weder Anspruch noch
+// Absage; bis zum 13.10.2026 zählte es als Anspruch.
+// ---------------------------------------------------------------------------
+const single = (wishes: [string, number | null, string | null][], areaId = "fundraising") =>
+  stateOf(
+    buildCapabilityTeamReadout(
+      wishes.map(([id, level, wish]) => member(id, id.toUpperCase(), [entry(areaId, level, wish)])),
+      areas,
+      families
+    ),
+    areaId
+  );
+
+test("A: own + own bleibt ein doppelter Anspruch", () => {
+  const area = single([["a", 5, "own"], ["b", 1, "own"]]);
+  assert.equal(area?.state, "contested");
+  assert.deepEqual(area?.claimants.sort(), ["a", "b"]);
+});
+
+test("B: own + grow_into ist kein zweiter Anspruch", () => {
+  const two = single([["a", 5, "own"], ["b", 1, "grow_into"]]);
+  assert.notEqual(two?.state, "contested");
+  assert.deepEqual(two?.claimants, ["a"]);
+  assert.equal(two?.undecided, 1, "die hineinwachsende Person hat über die Zuständigkeit nicht entschieden");
+  assert.equal(two?.state, "noBasis", "nur eine Entscheidung - keine Teamaussage");
+
+  // Mit einer weiteren Entscheidung sitzt die Rolle bei der Person mit `own`.
+  const three = single([["a", 5, "own"], ["b", 1, "grow_into"], ["c", 2, "prefer_other"]]);
+  assert.equal(three?.state, "settled");
+  assert.deepEqual(three?.claimants, ["a"]);
+});
+
+test("C: grow_into + grow_into ist kein Anspruch", () => {
+  const area = single([["a", 1, "grow_into"], ["b", 5, "grow_into"]]);
+  assert.equal(area?.state, "noBasis");
+  assert.deepEqual(area?.claimants, []);
+  assert.equal(area?.undecided, 2);
+});
+
+test("D: grow_into + prefer_other macht niemanden zur Anspruchsseite", () => {
+  // Früher: handoverPath mit der hineinwachsenden Person als Anspruch.
+  const two = single([["a", 1, "grow_into"], ["b", 5, "prefer_other"]]);
+  assert.equal(two?.state, "noBasis");
+  assert.deepEqual(two?.claimants, []);
+  assert.deepEqual(two?.declining, ["b"]);
+
+  // Auch mit mehr Menschen entsteht weder Anspruch noch Rolle für grow_into.
+  const three = single([["a", 5, "grow_into"], ["b", 5, "prefer_other"], ["c", 2, "prefer_external"]]);
+  assert.deepEqual(three?.claimants, []);
+  assert.ok(!["contested", "settled", "handoverPath", "claimedShallow"].includes(three?.state ?? ""), three?.state);
+});
+
+test("E: contribute + own - nur own beansprucht", () => {
+  const settled = single([["a", 3, "contribute"], ["b", 5, "own"]]);
+  assert.equal(settled?.state, "settled");
+  assert.deepEqual(settled?.claimants, ["b"]);
+
+  const path = single([["a", 5, "contribute"], ["b", 2, "own"]]);
+  assert.equal(path?.state, "handoverPath");
+  assert.deepEqual(path?.claimants, ["b"]);
+  assert.deepEqual(path?.declining, ["a"]);
+});
+
+test("F: unclear + grow_into ist kein Anspruch", () => {
+  const area = single([["a", 5, "unclear"], ["b", 1, "grow_into"]]);
+  assert.equal(area?.state, "noBasis");
+  assert.deepEqual(area?.claimants, []);
+  assert.equal(area?.undecided, 2);
+});
+
+test("grow_into taucht in keiner Familie als Anspruch auf", () => {
+  const readout = buildCapabilityTeamReadout(
+    [
+      member("a", "Ada", [entry("fundraising", 5, "grow_into"), entry("accounting_controlling", 5, "grow_into")]),
+      member("b", "Bo", [entry("fundraising", 4, "prefer_other"), entry("accounting_controlling", 2, "own")]),
+    ],
+    areas,
+    families
+  );
+  const finance = readout.families.find((family) => family.familyId === "finance_funding");
+  assert.deepEqual(finance?.claimants, ["b"]);
 });
 
 test("'noch unklar' ist eine Angabe, aber keine Entscheidung", () => {
@@ -295,7 +381,7 @@ test("jeder Bereich hat genau einen Zustand", () => {
       member("b", "Bo", [
         entry("fundraising", 4, "own"),
         entry("accounting_controlling", 2, "prefer_external"),
-        entry("public_speaking", 1, "grow_into"),
+        entry("public_speaking", 1, "own"),
         entry("facilitation", 2, "unclear"),
       ]),
     ],

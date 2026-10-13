@@ -663,7 +663,7 @@
       },
       "handoverPath": {
         "label": "Handover possible",
-        "text": "One person wants to grow into it; another has deep experience and doesn't want to keep the responsibility. That's a transition you can plan."
+        "text": "One person wants to take on the responsibility but doesn't have deep experience yet; another has deep experience and doesn't want to keep it. That's a transition you can plan."
       },
       "settled": {
         "label": "Owned",
@@ -671,7 +671,7 @@
       },
       "noBasis": {
         "label": "Too few entries",
-        "text": "Fewer than two people have made a choice here – or they chose “Still unclear”. Turning that into a statement about roles would be guesswork, so there isn't one."
+        "text": "Fewer than two people have made a choice here – or they chose “Still unclear” or “I want to grow into it”. Turning that into a statement about roles would be guesswork, so there isn't one."
       }
     },
     "teamBasis": "{contributing} of {members} team members have made entries, {withDepth} of them with an experience level and a responsibility preference. Depth is visible when someone shares with this team – sharing in another team doesn't count here."

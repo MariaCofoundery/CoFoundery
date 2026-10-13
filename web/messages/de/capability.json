@@ -663,7 +663,7 @@
       },
       "handoverPath": {
         "label": "Übergabe möglich",
-        "text": "Einer will hineinwachsen, ein anderer hat Tiefe und will die Zuständigkeit nicht behalten. Das ist ein Übergang, den man planen kann."
+        "text": "Einer will die Zuständigkeit übernehmen, hat aber noch keine Tiefe; ein anderer hat Tiefe und will sie nicht behalten. Das ist ein Übergang, den man planen kann."
       },
       "settled": {
         "label": "Verantwortet",
@@ -671,7 +671,7 @@
       },
       "noBasis": {
         "label": "Zu wenige Angaben",
-        "text": "Hier haben sich weniger als zwei Menschen entschieden – oder „noch unklar“ angegeben. Daraus eine Rollenaussage zu machen wäre geraten, deshalb steht hier keine."
+        "text": "Hier haben sich weniger als zwei Menschen entschieden – oder „noch unklar“ bzw. „möchte ich mich hineinentwickeln“ angegeben. Daraus eine Rollenaussage zu machen wäre geraten, deshalb steht hier keine."
       }
     },
     "teamBasis": "{contributing} von {members} im Team haben Angaben gemacht, davon {withDepth} mit Erfahrungsstufe und Verantwortungswunsch. Die Tiefe ist sichtbar, wenn jemand für dieses Team geteilt hat – eine Freigabe in einem anderen Team zählt hier nicht."

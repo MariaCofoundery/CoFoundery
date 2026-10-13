@@ -66,11 +66,14 @@ test("nobody wanting it is an open position", () => {
 
 test("a claim without depth on either side marks the team as thin there", () => {
   assert.equal(stateOf(2, "own", 1, "contribute").state, "bothShallow");
-  assert.equal(stateOf(null, "grow_into", 3, "prefer_other").state, "bothShallow");
+  // Ohne angegebene Stufe ist der Anspruch auch ohne Tiefe.
+  assert.equal(stateOf(null, "own", 3, "prefer_other").state, "bothShallow");
 });
 
-test("depth on one side plus a claim on the other is a handover path", () => {
-  const fromA = stateOf(5, "prefer_other", 1, "grow_into");
+test("depth on one side plus a shallow claim on the other is a handover path", () => {
+  // Der Anspruch ist `own` ohne Tiefe; "moechte hineinwachsen" ist kein
+  // Anspruch und ergibt diesen Weg nicht (siehe unten).
+  const fromA = stateOf(5, "prefer_other", 1, "own");
   assert.equal(fromA.state, "handoverPath");
   assert.equal(fromA.owner, "a", "die Tiefe liegt bei A");
 
@@ -87,6 +90,64 @@ test("one wants it and can, the other does not want it - the role already sits",
   const b = stateOf(3, "contribute", 4, "own");
   assert.equal(b.state, "settled");
   assert.equal(b.owner, "b");
+});
+
+// ---------------------------------------------------------------------------
+// Nur `own` ist ein Anspruch
+// ---------------------------------------------------------------------------
+// "Moechte hineinwachsen" ist ein Entwicklungswunsch - weder Anspruch noch
+// Absage. Bis zum 13.10.2026 zaehlte es als Anspruch; diese Faelle halten fest,
+// dass daraus kein doppelter Anspruch und keine Rolle mehr entsteht.
+test("A: own + own bleibt ein doppelter Anspruch", () => {
+  assert.equal(stateOf(5, "own", 5, "own").state, "contested");
+  assert.equal(stateOf(1, "own", 2, "own").state, "contested");
+});
+
+test("B: own + grow_into ist kein doppelter Anspruch", () => {
+  for (const [levelA, levelB] of [[5, 1], [2, 5], [5, 5], [null, null]] as const) {
+    const result = stateOf(levelA, "own", levelB, "grow_into");
+    assert.notEqual(result.state, "contested", `${levelA}/own vs ${levelB}/grow_into`);
+    assert.equal(result.state, "noBasis", "die hineinwachsende Seite hat ueber die Zustaendigkeit nicht entschieden");
+    assert.equal(result.owner, null);
+  }
+});
+
+test("C: grow_into + grow_into ist kein Anspruch", () => {
+  assert.deepEqual(stateOf(1, "grow_into", 2, "grow_into"), { state: "noBasis", owner: null });
+  assert.deepEqual(stateOf(5, "grow_into", 5, "grow_into"), { state: "noBasis", owner: null });
+});
+
+test("D: grow_into + prefer_other macht die hineinwachsende Seite nicht zur Anspruchsseite", () => {
+  // Frueher: handoverPath bzw. bothShallow bzw. settled mit der grow_into-Seite als Anspruch.
+  assert.deepEqual(stateOf(1, "grow_into", 5, "prefer_other"), { state: "noBasis", owner: null });
+  assert.deepEqual(stateOf(null, "grow_into", 3, "prefer_other"), { state: "noBasis", owner: null });
+  assert.deepEqual(stateOf(5, "grow_into", 2, "prefer_other"), { state: "noBasis", owner: null });
+  // Und auch keine offene Stelle: Wer hineinwachsen will, hat nicht abgesagt.
+  assert.notEqual(stateOf(2, "grow_into", 2, "prefer_external").state, "openPosition");
+});
+
+test("E: contribute + own - nur own beansprucht", () => {
+  assert.deepEqual(stateOf(3, "contribute", 4, "own"), { state: "settled", owner: "b" });
+  assert.deepEqual(stateOf(5, "contribute", 2, "own"), { state: "handoverPath", owner: "a" });
+  assert.equal(stateOf(2, "contribute", 2, "own").state, "bothShallow");
+});
+
+test("F: unclear + grow_into ist kein Anspruch", () => {
+  assert.deepEqual(stateOf(5, "unclear", 5, "grow_into"), { state: "noBasis", owner: null });
+});
+
+test("grow_into erzeugt mit keiner Gegenseite einen Anspruchs-Zustand", () => {
+  const levels: (number | null)[] = [null, ...APPLICATION_LEVELS];
+  const wishes: (string | null)[] = [null, ...OWNERSHIP_WISHES];
+  for (const levelA of levels) {
+    for (const levelB of levels) {
+      for (const wishB of wishes) {
+        const { state, owner } = stateOf(levelA, "grow_into", levelB, wishB);
+        assert.equal(state, "noBasis", `${levelA}/grow_into vs ${levelB}/${wishB}`);
+        assert.equal(owner, null);
+      }
+    }
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -132,7 +193,7 @@ test("no state ever carries an owner it cannot justify", () => {
     [
       side("b2b_sales", 5, "own"),
       side("ux_design", 3, "contribute"),
-      side("marketing_brand", 1, "grow_into"),
+      side("marketing_brand", 1, "contribute"),
       side("fundraising", 5, "own"),
     ]
   );
@@ -233,7 +294,7 @@ test("too few areas means no overlap claim", () => {
 test("groups follow urgency, not the vocabulary order", () => {
   const result = compare(
     [side("b2b_sales", 5, "prefer_other"), side("product_management", 5, "own")],
-    [side("b2b_sales", 1, "grow_into"), side("product_management", 5, "own")]
+    [side("b2b_sales", 1, "own"), side("product_management", 5, "own")]
   );
   assert.deepEqual(
     result.groups.map((group) => group.state),

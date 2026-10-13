@@ -83,9 +83,16 @@ export type CapabilityComparison = {
  * "Noch unklar" ist eine Angabe, aber keine Entscheidung - daraus "niemand
  * will es verantworten" zu machen waere genau die Deutung, die dieses Modell
  * nicht vornimmt.
+ *
+ * `grow_into` gehoert ebenfalls zu keinem der beiden Lager. "Moechte
+ * hineinwachsen" ist ein Entwicklungswunsch, kein Anspruch auf die
+ * Zustaendigkeit - und auch keine Absage. Bis zum 13.10.2026 stand es unter
+ * den Anspruechen; dadurch wurden aus "A will verantworten, B will
+ * hineinwachsen" zwei Ansprueche (`contested`), und wer hineinwachsen wollte,
+ * erschien als Anspruchsseite. Nur `own` ist Ownership.
  */
-/** Beansprucht die Zustaendigkeit - jetzt oder auf Sicht. */
-const CLAIMS = ["own", "grow_into"];
+/** Beansprucht die Zustaendigkeit. Nur `own`. */
+const CLAIMS = ["own"];
 /** Hat entschieden, sie nicht zu wollen. */
 const DECLINES = ["contribute", "prefer_other", "prefer_external"];
 
@@ -204,6 +211,8 @@ function deriveState(
   // Solange eine Seite sich nicht entschieden hat, gibt es keinen Zustand.
   // Das trifft drei Faelle, die absichtlich nicht auseinanderzuhalten sind:
   // nichts eingetragen, "noch unklar", oder die Tiefe nicht freigegeben.
+  // Dazu kommt "moechte hineinwachsen": ein Wunsch, aber keine Entscheidung
+  // ueber die Zustaendigkeit - also weder Anspruch noch Absage.
   if ((!claimsA && !declinesA) || (!claimsB && !declinesB)) {
     return { state: "noBasis", owner: null };
   }

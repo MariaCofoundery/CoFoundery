@@ -84,7 +84,10 @@ export type TeamAreaState = {
   deep: string[];
   /** Wer sich ausdrücklich gegen die Zuständigkeit entschieden hat. */
   declining: string[];
-  /** Wie viele sich zu diesem Bereich noch nicht entschieden haben. */
+  /**
+   * Wie viele sich zu diesem Bereich noch nicht entschieden haben: nichts
+   * eingetragen, "noch unklar" oder "möchte hineinwachsen".
+   */
   undecided: number;
 };
 
@@ -113,8 +116,15 @@ export type TeamReadout = {
   unspokenFamilies: string[];
 };
 
-/** Beansprucht die Zuständigkeit - jetzt oder auf Sicht. Wie paarweise. */
-const CLAIMS = ["own", "grow_into"];
+/**
+ * Beansprucht die Zuständigkeit. Nur `own` - wie paarweise.
+ *
+ * `grow_into` ist ein Entwicklungswunsch, weder Anspruch noch Absage, und
+ * zählt deshalb wie "noch unklar" zu den Unentschiedenen. Bis zum 13.10.2026
+ * stand es hier mit; dadurch erzeugte "will hineinwachsen" einen zweiten
+ * Anspruch (`contested`) und erschien in der Ansicht als "will verantworten".
+ */
+const CLAIMS = ["own"];
 /** Hat entschieden, sie nicht zu wollen. Wie paarweise. */
 const DECLINES = ["contribute", "prefer_other", "prefer_external"];
 
@@ -250,9 +260,10 @@ function deriveAreaState(
     const wish = entry.ownershipWish;
     if (wish !== null && CLAIMS.includes(wish)) claimants.push(member.userId);
     else if (wish !== null && DECLINES.includes(wish)) declining.push(member.userId);
-    // `unclear` und null gehören zu keinem Lager: "Noch unklar" ist eine
-    // Angabe, aber keine Entscheidung. Daraus "will es niemand" zu machen wäre
-    // genau die Deutung, die dieses Modell nicht vornimmt.
+    // `unclear`, `grow_into` und null gehören zu keinem Lager: "Noch unklar"
+    // und "möchte hineinwachsen" sind Angaben, aber keine Entscheidung über die
+    // Zuständigkeit. Daraus "will es niemand" oder "will es verantworten" zu
+    // machen wäre genau die Deutung, die dieses Modell nicht vornimmt.
     else undecided += 1;
   }
 
