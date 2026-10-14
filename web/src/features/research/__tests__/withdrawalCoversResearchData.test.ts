@@ -123,12 +123,25 @@ test("der Einwilligungstext beschreibt nur, wozu eingewilligt wird", () => {
   // in dem jemand gerade eine Entscheidung trifft.
   //
   // WAS DER TEXT DAFUER NENNEN MUSS, ist das, was man sich am wenigsten
-  // denkt: dass Freitexte dazugehoeren und dass es das Produkt verlassen kann.
+  // denkt: dass es das Produkt verlassen kann - und genau, was dazugehoert.
+  //
+  // KORRIGIERT AM 14.10.2026 (Privacy-Audit): Der Text versprach bis dahin
+  // „einschliesslich Freitexten“. Diese Einwilligung deckt aber nur
+  // `research_events`, und dort erlaubt die Datenbank keinen Freitext
+  // (properties nur `choiceValue` aus einer festen Liste, Migration
+  // 20260830160000). Freitext gibt es nur in der Workstyle-Forschung mit
+  // eigener Einwilligung (workstyle_research_v3, nennt das Feedback selbst).
+  // Eine Einwilligung darf nicht mehr beschreiben, als erhoben wird.
   for (const locale of ["de", "en"] as const) {
     const texts = JSON.parse(readFileSync(`messages/${locale}/researchConsent.json`, "utf8"));
     const body: string = texts.notice.body;
+    const description: string = texts.settings.description;
 
-    assert.match(body, locale === "de" ? /Freitexten/ : /free text/);
+    for (const text of [body, description]) {
+      assert.doesNotMatch(text, locale === "de" ? /einschließlich Freitexten/ : /including free text/);
+      assert.match(text, locale === "de" ? /Freitexte[^.]*nicht dazu/ : /[Ff]ree text[^.]*not included/);
+      assert.match(text, locale === "de" ? /Antworten/ : /answers/);
+    }
     assert.match(body, locale === "de" ? /Veröffentlichung/ : /publication/);
     assert.match(body, locale === "de" ? /freiwillig/ : /voluntary/);
     // Und nichts ueber Dinge, fuer die gar nicht gefragt wird.

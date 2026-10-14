@@ -152,7 +152,7 @@ reset role;
 -- General withdrawal erases research for both versions, retains completed product cores.
 select set_config('request.jwt.claims','{"sub":"e8520000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 set local role authenticated;
-select * from public.set_my_research_consent('declined');
+select * from public.set_my_research_consent('declined', 'research_consent_copy_2026-10-14', 'de', 'settings');
 reset role;
 select pg_temp.check_v2((select count(*)=2 and bool_and(withdrawn_at is not null and context='{}' and timings='{}' and feedback is null) from public.workstyle_pretest_sessions where assessment_id in (select v1 from v2_ids where person='e8520000-0000-4000-8000-000000000001' union all select v2 from v2_ids where person='e8520000-0000-4000-8000-000000000001')),'both consent versions withdrawn, research metadata erased');
 select pg_temp.check_v2((select count(*)=30 from public.alignment_answers where assessment_id=(select v2 from v2_ids where person='e8520000-0000-4000-8000-000000000001')),'v2 completed core survives');

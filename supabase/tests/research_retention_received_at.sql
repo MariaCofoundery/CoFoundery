@@ -16,7 +16,7 @@ insert into auth.users (
 
 select set_config('request.jwt.claims', '{"sub":"eb111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
 set local role authenticated;
-select * from public.set_my_research_consent('accepted');
+select * from public.set_my_research_consent('accepted', 'research_consent_copy_2026-10-14', 'de', 'settings');
 reset role;
 
 -- Grenze wie in der Funktion

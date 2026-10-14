@@ -13,7 +13,7 @@ export function ResearchConsentNotice({ onDecision }: { onDecision: (state: Rese
   const decide = (state: "accepted" | "declined") => {
     setError(false);
     startTransition(async () => {
-      const result = await setResearchConsentAction(state);
+      const result = await setResearchConsentAction(state, "notice");
       if (!result.ok) return setError(true);
       onDecision(state);
     });

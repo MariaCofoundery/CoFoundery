@@ -2,14 +2,14 @@
   "notice": {
     "eyebrow": "Forschung & Produktentwicklung",
     "title": "Hilf uns, Zusammenarbeit in Founder-Teams besser zu verstehen.",
-    "body": "Wenn du möchtest, dürfen wir deine Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams verwenden — einschließlich Freitexten und auch außerhalb von Made2Found, etwa in einer Veröffentlichung.\n\nDeine Teilnahme ist freiwillig. Du kannst Made2Found genauso nutzen, wenn du nicht teilnimmst, und du kannst sie jederzeit im Account beenden.",
+    "body": "Wenn du möchtest, dürfen wir ausgewählte Antworten aus deinen Fragebögen und Angaben dazu, wie du sie ausfüllst (etwa Bearbeitungszeiten), pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams verwenden — auch außerhalb von Made2Found, etwa in einer Veröffentlichung. Freitexte, Namen und E-Mail-Adressen gehören nicht dazu.\n\nDeine Teilnahme ist freiwillig. Du kannst Made2Found genauso nutzen, wenn du nicht teilnimmst, und du kannst sie jederzeit im Account beenden.",
     "decline": "Nein, danke",
     "accept": "An Forschung teilnehmen",
     "error": "Deine Auswahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
   },
   "settings": {
     "title": "Forschungsteilnahme",
-    "description": "Du entscheidest freiwillig, ob deine Antworten und Nutzungsdaten pseudonymisiert für wissenschaftliche Forschung verwendet werden dürfen — einschließlich Freitexten und auch in Veröffentlichungen.",
+    "description": "Du entscheidest freiwillig, ob ausgewählte Antworten aus deinen Fragebögen und Angaben dazu, wie du sie ausfüllst, pseudonymisiert für wissenschaftliche Forschung verwendet werden dürfen — auch in Veröffentlichungen. Freitexte gehören nicht dazu.",
     "statusLabel": "Status:",
     "active": "Aktiv",
     "inactive": "Nicht aktiv",

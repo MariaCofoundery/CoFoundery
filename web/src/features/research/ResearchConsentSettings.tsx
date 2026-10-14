@@ -22,7 +22,7 @@ export function ResearchConsentSettings({ initialState }: { initialState: Resear
   const update = (next: "accepted" | "declined") => {
     setError(false);
     startTransition(async () => {
-      const result = await setResearchConsentAction(next);
+      const result = await setResearchConsentAction(next, "settings");
       if (!result.ok) return setError(true);
       configureResearchConsentState(next);
       setState(next);

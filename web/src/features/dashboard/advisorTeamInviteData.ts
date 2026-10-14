@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "crypto";
 import { needsAdvisorTeamInviteRecovery } from "@/features/dashboard/advisorTeamInviteRecovery";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { bindLatestSubmittedInvitationMatchingInputs } from "@/features/assessments/matchingBindings";
+import { safeErrorLog } from "@/lib/logging/safeErrorLog";
 import { createClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -636,7 +637,8 @@ async function upsertRelationshipAdvisorLink(params: {
     founderAUserId: params.row.founder_a_user_id,
     founderBUserId: params.row.founder_b_user_id,
     relationshipId: params.relationshipId,
-    detail: extendedResult.error.message,
+    // Nur der Code - die Meldung kann Zeilenwerte enthalten.
+    detail: safeErrorLog(extendedResult.error).code ?? "persist_failed",
   });
 
   const baseResult = await persist(basePayload);

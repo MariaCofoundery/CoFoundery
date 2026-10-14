@@ -22,6 +22,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendAdvisorTeamFounderInviteEmail } from "@/lib/email/sendAdvisorTeamFounderInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { safeErrorLog } from "@/lib/logging/safeErrorLog";
 import { createClient } from "@/lib/supabase/server";
 
 export type CreateAdvisorTeamInviteError =
@@ -166,9 +167,10 @@ export async function createAdvisorTeamInviteAction(
     if (insertError?.code === "23505") {
       return { ok: false, error: "duplicate_invite" };
     }
+    // Nur der Code: Die Postgres-Meldung kann die eingefuegte Zeile mit den
+    // E-Mail-Adressen enthalten („Failing row contains …“).
     console.error("Failed to create advisor team invite", {
-      code: insertError?.code ?? null,
-      message: insertError?.message ?? "unknown_error",
+      error: safeErrorLog(insertError),
     });
     return { ok: false, error: "create_failed" };
   }

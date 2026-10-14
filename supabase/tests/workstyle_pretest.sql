@@ -160,7 +160,7 @@ set local role authenticated;
 select public.save_workstyle_feedback((select assessment from workstyle_ids where person=auth.uid()),'{"clarity":4,"unclear_items":["EVI-01"]}');
 select pg_temp.check_workstyle((public.start_workstyle_pretest('workstyle_research_v1','{"founder_experience":"none","team_size":"solo"}',true)->>'assessment_id')::uuid<>(select assessment from workstyle_ids where person=auth.uid()),'reassessment creates a new historical record');
 select pg_temp.check_workstyle((select count(*)=20 from public.alignment_answers where assessment_id=(select assessment from workstyle_ids where person=auth.uid())),'reassessment preserves prior responses');
-select * from public.set_my_research_consent('declined');
+select * from public.set_my_research_consent('declined', 'research_consent_copy_2026-10-14', 'de', 'settings');
 reset role;
 select pg_temp.check_workstyle((select withdrawn_at is not null and context='{}' and timings='{}' and feedback is null from public.workstyle_pretest_sessions where assessment_id=(select assessment from workstyle_ids where person='e8510000-0000-4000-8000-000000000001')),'withdrawal clears metadata');
 select pg_temp.check_workstyle((select count(*)=0 from public.workstyle_research_responses where assessment_id=(select assessment from workstyle_ids where person='e8510000-0000-4000-8000-000000000001')),'withdrawal deletes extension');

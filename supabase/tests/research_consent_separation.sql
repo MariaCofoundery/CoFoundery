@@ -27,7 +27,7 @@ select pg_temp.assert_research(
 select set_config('request.jwt.claims', '{"sub":"ea111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
 set local role authenticated;
 select pg_temp.assert_research((select count(*) = 0 from public.research_consent_preferences), 'undecided should be represented by no preference row');
-select * from public.set_my_research_consent('accepted');
+select * from public.set_my_research_consent('accepted', 'research_consent_copy_2026-10-14', 'de', 'settings');
 select pg_temp.assert_research((select state = 'accepted' from public.research_consent_preferences), 'owner cannot accept research');
 reset role;
 
@@ -58,7 +58,7 @@ reset role;
 
 select set_config('request.jwt.claims', '{"sub":"ea111111-1111-4111-8111-111111111111","role":"authenticated"}', true);
 set local role authenticated;
-select * from public.set_my_research_consent('declined');
+select * from public.set_my_research_consent('declined', 'research_consent_copy_2026-10-14', 'de', 'settings');
 select pg_temp.assert_research((select state = 'declined' and withdrawn_at is not null from public.research_consent_preferences), 'withdrawal state was not persisted');
 reset role;
 

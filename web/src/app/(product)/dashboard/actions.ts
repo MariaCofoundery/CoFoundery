@@ -8,6 +8,7 @@ import { writeDisplayNameToCore } from "@/features/profile/displayNameWrite";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { buildLocaleContinuationPath } from "@/i18n/localeContinuation";
 import { sendCoFounderInviteEmail } from "@/lib/email/sendCoFounderInviteEmail";
+import { safeErrorLog } from "@/lib/logging/safeErrorLog";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -183,10 +184,10 @@ async function createInvitation(params: {
       .in("status", ["sent", "opened"])
       .select("id")
       .maybeSingle();
+    // Kein Meldungstext und keine Personendaten im Protokoll (safeErrorLog).
     console.error("createInvitation matching binding bootstrap failed", {
       invitationId,
-      userId: user.id,
-      error: error instanceof Error ? error.message : String(error),
+      error: safeErrorLog(error),
       compensated: !revokeError && Boolean(revokedInvitation),
     });
     return { ok: false, error: "invite_create_failed" };
@@ -211,11 +212,11 @@ async function createInvitation(params: {
       emailStatus = "sent";
     } else {
       emailError = "email_delivery_failed";
+      // Weder die Adresse der eingeladenen Person noch der Antworttext von
+      // Resend: Beide koennen Personendaten enthalten (Privacy-Audit 14.10.2026).
       console.error("createInvitation email send failed", {
         invitationId,
-        userId: user.id,
-        invitedEmail,
-        error: sendResult.error,
+        error: safeErrorLog(sendResult.error),
       });
     }
   }

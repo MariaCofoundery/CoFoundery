@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
+import { RESEARCH_CONSENT_VERSION } from "@/features/research/consentVersion";
 import {
   getFounderCompatibilityBaseItem,
   isValidFounderCompatibilityBaseChoiceValue,
@@ -284,7 +285,7 @@ export async function trackServerResearchEvent(payload: ServerResearchTrackPaylo
     device_class: productPayload.device_class,
     app_version: productPayload.app_version,
     properties: choiceValue != null ? { choiceValue } : {},
-    research_consent_version: "research_consent_v1",
+    research_consent_version: RESEARCH_CONSENT_VERSION,
   });
 
   return researchError
