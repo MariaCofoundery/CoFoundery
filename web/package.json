@@ -20,6 +20,7 @@
     "item-analysis": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types --env-file-if-exists=.env.local scripts/item-analysis.ts",
     "db:test": "node scripts/db-test.mjs",
     "matching:harness": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/matching-v01-harness.ts",
+    "matching:idf-snapshot": "node --env-file-if-exists=.env.local --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/matching-idf-snapshot.ts",
     "export:rework": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/export-rework-template.ts",
     "export:questionnaire": "node --import ./scripts/register-ts-alias.mjs --experimental-strip-types scripts/export-questionnaire-v21.ts",
     "build:screens": "cd .. && python3 web/scripts/build-screens.py"
