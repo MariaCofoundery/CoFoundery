@@ -346,7 +346,6 @@
     "title": "Profile and settings in one place",
     "text": "Keep your foundation details up to date and manage your account settings.",
     "profileEyebrow": "Profile",
-    "createTitle": "Create your core profile first",
     "currentTitle": "Your current profile details",
     "baseComplete": "Foundation profile completed ({answered}/{total})",
     "baseOpen": "Foundation profile still open",

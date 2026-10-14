@@ -290,7 +290,6 @@
       "enable": "Use Alignment for my search",
       "choose": "What matters most to you in a co-founder?",
       "chooseHelp": "Choose up to three areas. These cues are not hard filters and do not affect profile order or visibility.",
-      "unavailable": "Complete Founder Alignment first. Your search works fully without Alignment signals.",
       "transparency": "Your selection stays private. A cue is only produced with bilateral sharing and sufficient responses.",
       "disclaimer": "These cues describe similarities and differences in your stated preferences. They do not predict whether you will work well together or build a successful company.",
       "importance": {
@@ -630,9 +629,7 @@
       "description": "If you want, we later use your Made2Found assessment results to generate better suggestions and conversation cues. Raw answers or internal evaluations are not shown on your profile.",
       "checkbox": "Include for better suggestions",
       "checkboxHelp": "This setting is private and does not appear on your public Discovery profile.",
-      "fillBase": "Answer the foundation questions",
       "defaulted": "For the beta phase, this private setting is preselected. Save your search priorities to keep it, or remove the checkmark.",
-      "missingBase": "Answer the foundation questions first to include the Made2Found Check.",
       "inactive": "Inactive: Your assessment results stay unused for Discovery.",
       "active": "Active: Made2Found privately uses your Check signals for better Discovery suggestions and conversation cues."
     },

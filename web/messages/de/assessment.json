@@ -16,11 +16,6 @@
     },
     "title": "Werte-Fragebogen",
     "subtitle": "Werte-Vertiefung",
-    "requiresBase": {
-      "title": "Basis zuerst abschließen",
-      "description": "Das Werte Add-on ist verfügbar, sobald dein Basis-Fragebogen eingereicht ist.",
-      "cta": "Basis-Fragebogen starten"
-    },
     "createError": "Fehler beim Erstellen des Werte-Fragebogens.",
     "questionsLoadError": "Das Werte-Add-on konnte gerade nicht geladen werden. Bitte versuche es erneut.",
     "loadErrorTitle": "Werte-Fragebogen",

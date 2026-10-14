@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { parseIdentityReturnPath, type IdentityReturnPath } from "@/features/profile/identityReadiness";
 import { createClient } from "@/lib/supabase/server";
 import {
   MAX_CONFIRMED_AREAS,
@@ -27,9 +28,14 @@ async function context() {
 // Kontrollfluss ab, aber TypeScript leitet fuer Funktionsdeklarationen kein
 // `never` ab. Ohne die Annotation haelt der Compiler den Code nach jedem
 // back()-Aufruf fuer erreichbar.
-function back(step: string, error?: string, notice?: string): never {
+function back(step: string, error?: string, notice?: string, returnPath?: IdentityReturnPath | null): never {
   revalidatePath("/profile");
-  const query = [error ? `error=${error}` : null, notice ? `notice=${notice}` : null]
+  const query = [
+    error ? `error=${error}` : null,
+    notice ? `notice=${notice}` : null,
+    // Der Rueckweg reist durch die Schritte mit (nur Allowlist-Pfade).
+    returnPath ? `next=${encodeURIComponent(returnPath)}` : null,
+  ]
     .filter(Boolean)
     .join("&");
   redirect(`/profile?step=${step}${query ? `&${query}` : ""}`);
@@ -116,6 +122,7 @@ export async function saveCapabilityEvidenceAction(formData: FormData) {
  */
 export async function saveCapabilityAreasAction(formData: FormData) {
   const { client, user } = await context();
+  const returnPath = parseIdentityReturnPath(formData.get("next"));
   const selected = new Set(
     formData
       .getAll("area_id")
@@ -127,7 +134,7 @@ export async function saveCapabilityAreasAction(formData: FormData) {
     .from("person_capability_entries")
     .select("id,area_id,person_capability_evidence(id)")
     .eq("user_id", user.id);
-  if (existing.error) back("areas", "save");
+  if (existing.error) back("areas", "save", undefined, returnPath);
 
   const rows = (existing.data ?? []) as {
     id: string;
@@ -146,14 +153,14 @@ export async function saveCapabilityAreasAction(formData: FormData) {
 
   if (toInsert.length) {
     const { error } = await client.from("person_capability_entries").insert(toInsert);
-    if (error) back("areas", error.message.includes("area_id") ? "area" : "save");
+    if (error) back("areas", error.message.includes("area_id") ? "area" : "save", undefined, returnPath);
   }
   if (toDelete.length) {
     const { error } = await client.from("person_capability_entries").delete().in("id", toDelete);
-    if (error) back("areas", "save");
+    if (error) back("areas", "save", undefined, returnPath);
   }
 
-  back("ownership");
+  back("ownership", undefined, undefined, returnPath);
 }
 
 /**
@@ -165,12 +172,13 @@ export async function saveCapabilityAreasAction(formData: FormData) {
  */
 export async function saveCapabilityOwnershipAction(formData: FormData) {
   const { client, user } = await context();
+  const returnPath = parseIdentityReturnPath(formData.get("next"));
 
   const existing = await client
     .from("person_capability_entries")
     .select("id,area_id,ownership_wish")
     .eq("user_id", user.id);
-  if (existing.error) back("ownership", "save");
+  if (existing.error) back("ownership", "save", undefined, returnPath);
 
   const rows = (existing.data ?? []) as { id: string; area_id: string; ownership_wish: string | null }[];
 
@@ -181,10 +189,12 @@ export async function saveCapabilityOwnershipAction(formData: FormData) {
       .from("person_capability_entries")
       .update({ ownership_wish: wish })
       .eq("id", row.id);
-    if (error) back("ownership", "save");
+    if (error) back("ownership", "save", undefined, returnPath);
   }
 
   revalidatePath("/profile");
+  // Kam die Person aus FIND oder CONNECT, geht es dorthin zurueck.
+  if (returnPath) redirect(returnPath);
   // Zurueck zur Station, nicht an den Seitenanfang: Wer die drei Schritte
   // durchlaufen hat, soll dort stehen, wo das Ergebnis steht.
   redirect("/profile?saved=snapshot#mitbringen");
@@ -212,16 +222,17 @@ export async function deleteCapabilityEvidenceAction(formData: FormData) {
 export async function saveCapabilityDisclosureAction(formData: FormData) {
   const { client, user } = await context();
   const level = parseCapabilityDisclosure(formData.get("capability_disclosure"));
+  const returnPath = parseIdentityReturnPath(formData.get("next"));
 
   const { error } = await client
     .from("person_core")
     .update({ capability_disclosure: level })
     .eq("user_id", user.id);
   if (error) {
-    revalidatePath("/profile");
-    redirect("/profile?step=sichtbarkeit&error=save");
+    back("sichtbarkeit", "save", undefined, returnPath);
   }
 
   revalidatePath("/profile");
+  if (returnPath) redirect(returnPath);
   redirect("/profile?saved=disclosure#besides");
 }

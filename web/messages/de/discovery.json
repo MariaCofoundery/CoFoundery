@@ -290,7 +290,6 @@
       "enable": "Alignment für meine Suche nutzen",
       "choose": "Was ist dir bei einem Co-Founder besonders wichtig?",
       "chooseHelp": "Wähle bis zu drei Bereiche. Die Hinweise sind keine harten Filter und verändern weder Reihenfolge noch Sichtbarkeit der Profile.",
-      "unavailable": "Fülle zuerst das Founder Alignment aus. Deine Suche funktioniert auch ohne Alignment-Signale vollständig.",
       "transparency": "Deine Auswahl bleibt privat. Ein Hinweis entsteht nur bei beidseitiger Freigabe und ausreichenden Angaben.",
       "disclaimer": "Diese Hinweise beschreiben Ähnlichkeiten und Unterschiede in euren angegebenen Präferenzen. Sie sagen nicht voraus, ob ihr gut zusammenarbeitet oder erfolgreich gründet.",
       "importance": {
@@ -630,9 +629,7 @@
       "description": "Wenn du möchtest, nutzen wir deine Made2Found-Assessment-Ergebnisse später, um bessere Vorschläge und Gesprächsimpulse zu erzeugen. Rohantworten oder interne Auswertungen werden nicht auf deinem Profil angezeigt.",
       "checkbox": "Für bessere Vorschläge einbeziehen",
       "checkboxHelp": "Diese Einstellung ist privat und erscheint nicht auf deinem öffentlichen Discovery-Profil.",
-      "fillBase": "Basis-Fragen ausfüllen",
       "defaulted": "Für die Testphase ist diese private Einstellung vorausgewählt. Speichere deine Suchprioritäten, um sie zu übernehmen, oder entferne den Haken.",
-      "missingBase": "Fülle zuerst die Basis-Fragen aus, um den Made2Found Check einzubeziehen.",
       "inactive": "Inaktiv: Deine Assessment-Ergebnisse bleiben für Discovery ungenutzt.",
       "active": "Aktiv: Made2Found nutzt deine Check-Signale privat für bessere Discovery-Vorschläge und Gesprächsimpulse."
     },

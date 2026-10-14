@@ -480,6 +480,8 @@ export default async function ProfilePage({
           details/summary - das progressive Aufklappen braucht kein JavaScript. */}
       {step === "areas" ? (
         <form action={saveCapabilityAreasAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+          {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
+          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
             <h2 className="text-xl font-semibold">{t("areas.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("areas.text")}</p>
@@ -559,6 +561,8 @@ export default async function ProfilePage({
           Frage, die sonst niemand stellt, und sie klaert spaeter viel. */}
       {step === "ownership" ? (
         <form action={saveCapabilityOwnershipAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+          {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
+          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
             <h2 className="text-xl font-semibold">{t("ownership.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("ownership.text")}</p>
@@ -597,7 +601,7 @@ export default async function ProfilePage({
           )}
           <div className="flex flex-wrap items-center gap-3">
             <SubmitButton label={t("ownership.submit")} pendingLabel={t("pending.save")} className={primary} />
-            <Link href="/profile?step=areas" className={secondary}>
+            <Link href={returnPath ? `/profile?step=areas&next=${encodeURIComponent(returnPath)}` : "/profile?step=areas"} className={secondary}>
               {t("ownership.back")}
             </Link>
           </div>
@@ -1160,6 +1164,8 @@ export default async function ProfilePage({
           Fragen. Erscheint nur, wenn es ueberhaupt etwas freizugeben gibt. */}
       {step === "sichtbarkeit" ? (
         <form action={saveCapabilityDisclosureAction} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
+          {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
+          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
             <h2 className="text-xl font-semibold">{t("disclosure.title")}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("disclosure.text")}</p>

@@ -16,11 +16,6 @@
     },
     "title": "Values questions",
     "subtitle": "Values deep dive",
-    "requiresBase": {
-      "title": "Complete the foundation questions first",
-      "description": "The values add-on becomes available once your foundation questionnaire has been submitted.",
-      "cta": "Start foundation questions"
-    },
     "createError": "Something went wrong while creating the values questionnaire.",
     "questionsLoadError": "The values add-on could not be loaded right now. Please try again.",
     "loadErrorTitle": "Values questions",

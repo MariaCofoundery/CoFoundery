@@ -4,8 +4,9 @@
  * Jede Eingabe wird FELDWEISE aufgebaut. Alles, was eine DB-Zeile darüber hinaus trägt
  * (Bio, Headline, Evidence-Narrative, Research, Workstyle …), fällt dadurch weg.
  *
- * CAPABILITY-FREIGABE: Es gibt im Produkt noch keine Matching-Freigabe (Spec §5). Deshalb ist
- * `capabilityMatchingAllowed` hier standardmäßig false. `capability_disclosure` (Sichtbarkeit) wird
+ * CAPABILITY-FREIGABE (Spec §5): Die Freigabe kommt als `CapabilityMatchingPermission` aus
+ * `getCapabilityMatchingPermission` (person_core.capability_matching_allowed, fail closed) - nicht
+ * als frei übergebener Boolean. Fehlt sie, gilt false. `capability_disclosure` (Sichtbarkeit) wird
  * NICHT als Matching-Freigabe gelesen – sie bestimmt nur, was Reasons zeigen dürfen.
  *
  * MUST-HAVES: Das eingefrorene Gate prüft genau acht Kriterien. `requiredIndustriesAny`,
@@ -14,6 +15,7 @@
  *
  * Nicht angeschlossen: kein Produktpfad ruft diese Funktionen auf.
  */
+import type { CapabilityMatchingPermission } from "@/features/capability/capabilityMatchingPermission";
 import type { CapabilityDisclosure, OwnershipWish as ProductOwnershipWish } from "@/features/capability/capabilityTypes";
 import type { ConnectListing, ConnectProfile } from "@/features/connect/connectTypes";
 import type { DiscoveryMustHaves, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
@@ -76,8 +78,8 @@ export function findPersonFromDiscovery(input: {
   capabilityRows: readonly CapabilityRowLike[];
   capabilityDisclosure: CapabilityDisclosure | null;
   hasContact?: boolean;
-  /** Ausdrückliche Matching-Freigabe. Im Produkt nicht vorhanden -> false. */
-  capabilityMatchingAllowed?: boolean;
+  /** Ausdrückliche Matching-Freigabe aus getCapabilityMatchingPermission. Fehlt sie -> false. */
+  capabilityMatchingPermission?: CapabilityMatchingPermission;
 }): FindPersonInput {
   const p = input.profile;
   return {
@@ -101,7 +103,7 @@ export function findPersonFromDiscovery(input: {
     remoteMode: p.remoteMode,
     mustHaves: mustHavesFromDiscovery(input.mustHaves),
     capabilities: {
-      matchingAllowed: input.capabilityMatchingAllowed === true,
+      matchingAllowed: input.capabilityMatchingPermission?.allowed === true,
       entries: capabilityEntriesFromRows(input.capabilityRows),
       visibleToCounterpart: capabilityVisibility(input.capabilityDisclosure, input.hasContact === true),
     },

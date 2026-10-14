@@ -827,5 +827,16 @@
       "where": "Wo und wie du arbeitest",
       "what": "Woran du arbeitest"
     }
+  },
+  "matchingPermission": {
+    "title": "Fähigkeiten für Vorschläge verwenden",
+    "body": "Made2Found darf deine Angaben zu Fähigkeiten, Erfahrung und gewünschter Verantwortung nutzen, um relevantere Founder vorzuschlagen. Das ändert nicht, wer deine Fähigkeiten sehen kann.",
+    "revocable": "Du kannst diese Freigabe jederzeit wieder ausschalten.",
+    "toggleLabel": "Fähigkeiten für Vorschläge verwenden",
+    "statusOn": "Eingeschaltet",
+    "statusOff": "Ausgeschaltet",
+    "emptyNotice": "Vorschläge nutzen bisher deine FIND-Angaben. Du kannst Fähigkeiten ergänzen – freiwillig.",
+    "emptyLink": "Fähigkeiten ergänzen",
+    "error": "Die Einstellung konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
   }
 }

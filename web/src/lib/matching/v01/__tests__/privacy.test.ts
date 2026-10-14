@@ -5,6 +5,7 @@ import test from "node:test";
 
 import type { CapabilityEntry } from "@/features/capability/capabilityTypes";
 import type { DiscoveryMustHaves, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
+import { capabilityMatchingPermissionFromRow } from "@/features/capability/capabilityMatchingPermission";
 import { findPersonFromDiscovery } from "@/lib/matching/v01/adapters";
 import { matchFindPair } from "@/lib/matching/v01/findMatcher";
 import { attachWorkstyleContext } from "@/lib/matching/v01/workstyle";
@@ -93,7 +94,7 @@ test("private Evidence-Narrative und Research-Daten erreichen weder Eingabe noch
     capabilityRows: [entry("b2b_sales", 5, "own")],
     capabilityDisclosure: "areas_depth_on_contact",
     hasContact: true,
-    capabilityMatchingAllowed: true,
+    capabilityMatchingPermission: capabilityMatchingPermissionFromRow({ capability_matching_allowed: true }),
   });
   const b = findPersonFromDiscovery({
     profile: discoveryProfile("u2", { ownRoles: ["sales"], seekingRoles: ["tech"] }),
@@ -102,7 +103,7 @@ test("private Evidence-Narrative und Research-Daten erreichen weder Eingabe noch
     capabilityRows: [entry("b2b_sales", 2, "prefer_other")],
     capabilityDisclosure: "areas_depth_on_contact",
     hasContact: true,
-    capabilityMatchingAllowed: true,
+    capabilityMatchingPermission: capabilityMatchingPermissionFromRow({ capability_matching_allowed: true }),
   });
   const inputs = JSON.stringify([a, b]);
   for (const secret of [SECRET_EVIDENCE, SECRET_RESEARCH, "privat", "Geheimbranche", "Bio", "Headline"]) {

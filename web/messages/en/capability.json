@@ -827,5 +827,16 @@
       "where": "Where and how you work",
       "what": "What you work on"
     }
+  },
+  "matchingPermission": {
+    "title": "Use your capabilities for suggestions",
+    "body": "Made2Found may use what you have shared about your capabilities, experience and the responsibility you want to take on to suggest more relevant founders. This does not change who can see your capabilities.",
+    "revocable": "You can turn this off again at any time.",
+    "toggleLabel": "Use my capabilities for suggestions",
+    "statusOn": "On",
+    "statusOff": "Off",
+    "emptyNotice": "Suggestions currently use your FIND details. You can add capabilities if you like – it's voluntary.",
+    "emptyLink": "Add capabilities",
+    "error": "We couldn't save this setting right now. Please try again."
   }
 }
