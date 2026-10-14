@@ -46,7 +46,12 @@ export const EMPTY_MUST_HAVES: FindMustHavesInput = Object.freeze({
   requiredExpertiseAny: [],
 });
 
-export function mustHavesFromDiscovery(m: Partial<DiscoveryMustHaves> | null | undefined): FindMustHavesInput {
+/**
+ * Genau die acht Gate-Kriterien aus Spec §7. Die Produktfelder requiredIndustriesAny,
+ * acceptedCommitmentLevels, acceptedVentureStages und acceptedVentureGoals fallen weg
+ * (PRODUCT CONSTRAINT NOT IN MATCHING v0.1, implementation-decisions §4).
+ */
+export function mustHavesFromDiscovery(m: Partial<DiscoveryMustHaves> | FindMustHavesInput | null | undefined): FindMustHavesInput {
   if (!m) return EMPTY_MUST_HAVES;
   return {
     requiredRolesAny: [...(m.requiredRolesAny ?? [])],
@@ -73,7 +78,8 @@ export function capabilityVisibility(disclosure: CapabilityDisclosure | null, ha
 
 export function findPersonFromDiscovery(input: {
   profile: FounderDiscoveryProfile;
-  mustHaves: Partial<DiscoveryMustHaves> | null;
+  /** Private Kriterien DIESER Person (getFounderPrivateSearchPreferences / getCandidateMatchingV01Constraints). */
+  mustHaves: Partial<DiscoveryMustHaves> | FindMustHavesInput | null;
   isFounder: boolean;
   capabilityRows: readonly CapabilityRowLike[];
   capabilityDisclosure: CapabilityDisclosure | null;

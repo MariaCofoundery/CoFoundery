@@ -295,13 +295,17 @@ test("FIND braucht kein IDF; außerhalb von lib/matching nutzt nichts die Engine
   for (const file of ["findMatcher.ts", "findRelevance.ts", "findEligibility.ts"]) {
     assert.doesNotMatch(read(`src/lib/matching/v01/${file}`), /idf"/);
   }
+  // Vorbereitete, selbst nirgends eingebundene Server-Module (eigener Test prüft, dass niemand sie importiert).
+  const PREPARED_UNWIRED = [join("src", "features", "discovery", "privateSearchConstraints.ts")];
   const productUsers: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
       const path = join(dir, entry);
       if (statSync(path).isDirectory()) {
         if (entry !== "__tests__" && path !== join("src", "lib", "matching")) walk(path);
-      } else if (/\.(ts|tsx)$/.test(entry) && /from "@\/lib\/matching/.test(read(path))) productUsers.push(path);
+      } else if (/\.(ts|tsx)$/.test(entry) && /from "@\/lib\/matching/.test(read(path)) && !PREPARED_UNWIRED.includes(path)) {
+        productUsers.push(path);
+      }
     }
   };
   walk("src");
