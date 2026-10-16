@@ -311,7 +311,7 @@ test("Sichtbarkeitsvertrag: Gate, Confidence, LIMITED_EVIDENCE intern; kein cand
   assert.doesNotMatch(source.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ""), /eligibility\.reasons|confidence|relevance|idfCorpusVersion|workstyleContext|tieGroup/);
 });
 
-test("nur vom FIND-Shadow genutzt, von keiner Oberfläche", () => {
+test("nur von den FIND-Shadows genutzt, von keiner Oberfläche", () => {
   const users: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
@@ -322,6 +322,9 @@ test("nur vom FIND-Shadow genutzt, von keiner Oberfläche", () => {
     }
   };
   walk("src");
-  // Seit E1 nur der FIND-Shadow (serverseitig, Ergebnis wird verworfen) - keine Oberfläche.
-  assert.deepEqual(users, [join("src", "features", "discovery", "findMatchingShadow.ts")]);
+  // Seit E1/E2 nur die FIND-Shadows (serverseitig, Ergebnis wird verworfen) - keine Oberfläche.
+  assert.deepEqual(users, [
+    join("src", "features", "discovery", "findMatchingGlobalShadow.ts"),
+    join("src", "features", "discovery", "findMatchingShadow.ts"),
+  ]);
 });
