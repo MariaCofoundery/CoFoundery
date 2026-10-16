@@ -69,7 +69,7 @@ Fehlt der Service-Client, schlägt eine Abfrage fehl, werfen Kriterien-Loader, E
    - Harness auf den synthetischen Fixtures (`npm run matching:harness -- find-shadow syn-p001`): Keiner der 12 global besten v0.1-Kandidaten steht auf der ersten sichtbaren Seite.
    - Bei `syn-p010` sind es 10 von 12.
 2. **Die RPC filtert anders als das Gate v03.** Einseitig statt beidseitig, Ja/Nein statt drei Zustände, und fehlende Werte schließen aus statt `uncertain`. Dazu kommen Expertise und Ort als exakter Textvergleich statt Normalisierung, `flexible` ohne Sonderregel, und Capability-Bereiche nach Sichtbarkeit (`capability_disclosure`) statt nach Matching-Freigabe. Kandidaten, die v0.1 als `uncertain` behalten würde, kommen gar nicht erst in den Pool.
-3. **Die RPC prüft weder die Founder-Rolle der Kandidaten noch Blockierungen.** Der Shadow schließt diese Personen aus, die sichtbare Suche zeigt sie heute. Das ist ein eigenes Produktthema außerhalb von v0.1.
+3. ~~Die RPC prüft weder die Founder-Rolle der Kandidaten noch Blockierungen.~~ **Behoben seit Commit 80f39156** (Migration `20261130120000_find_access_integrity.sql`): Die Suche und die FIND-Profile prüfen jetzt Founder-Rolle und Blockierung (beide Richtungen). Dieser Punkt ist kein Unterschied zwischen sichtbarer Suche und Shadow mehr.
 
 Echtes Ranking braucht deshalb einen eigenen serverseitigen Kandidatenpool (alle aktiven Founder-Profile ohne die Filter der RPC, das Gate macht die Engine) und Seiten erst nach dem Ranking. Für E1 ist nichts davon umgebaut.
 
@@ -108,9 +108,9 @@ aktive FIND-Profile (alle, ohne published_at-Seiten)
 | Regel | Klasse | Quelle |
 |---|---|---|
 | FIND-Profil `status = active` | A | Spec §7 Pool; wie heute |
-| Rolle `founder` (`profiles.roles`) | A | Spec §7 Pool; heute in der Suche nicht geprüft |
+| Rolle `founder` (`profiles.roles`) | A | Spec §7 Pool; seit 80f39156 auch in der Suche geprüft |
 | nicht die betrachtende Person | A | Spec §7 |
-| keine Blockierung (`network_blocks`, symmetrisch) | A | Spec §7; heute in der Suche nicht geprüft |
+| keine Blockierung (`network_blocks`, symmetrisch) | A | Spec §7; seit 80f39156 auch in der Suche geprüft |
 | Betrachter selbst aktiv und Founder | A | wie heute die Suche (nur aktiv sucht) |
 | Kontolöschung | A | Löschen entfernt Profile per Kaskade; eine FIND-eigene Deaktivierung gibt es nicht |
 | Intro-/Kontaktstatus | – | kein Pool-Kriterium; nur Reason-Tiefe (Capability) |
@@ -120,7 +120,11 @@ aktive FIND-Profile (alle, ohne published_at-Seiten)
 
 Die Engine prüft Pool-Regeln noch einmal (`POOL_*`). Der Basispool spart nur Rechenzeit.
 
-## Audit: Founder-Rolle und Blockierung in der heutigen Suche
+## Audit: Founder-Rolle und Blockierung in der Suche (historisch, behoben)
+
+**Aktueller Stand:** Beide Befunde sind seit Commit 80f39156 behoben (Migration `20261130120000_find_access_integrity.sql`). Die Suche zeigt nur Founder und niemanden, mit dem eine Blockierung besteht; die FIND-Profile sind auch per direktem API-Zugriff entsprechend geschützt. Wer die Founder-Rolle verliert, wird automatisch pausiert. Bestehende Beziehungen behalten ihren Anzeigenamen über `get_relationship_display_names`. Seit `20261201120000` bzw. `20261202120000` liefert auch `get_disclosed_capability` in den Kontexten `discovery` und `connect` bei Blockierung keine Capability-Daten.
+
+Der folgende Befund beschreibt den Stand vor diesem Fix:
 
 Lokal nachgestellt (Transaktion mit Rollback, 16.10.2026).
 
@@ -142,7 +146,7 @@ Lokal nachgestellt (Transaktion mit Rollback, 16.10.2026).
 
 **Vorschlag (separater kleiner Fix):** `and not public.is_network_interaction_blocked(profile.user_id, auth.uid())` in `search_founder_discovery_profiles_v2` und in der Select-Policy bzw. der Profil-Detailabfrage.
 
-Beides ist nicht repariert. Der Shadow wendet beide Regeln als Produkt-Gates an. Das ist der Unterschied in der Zeile „visibleExcludedByV01“.
+Beides war zum Zeitpunkt des Audits nicht repariert und ist seit 80f39156 behoben (siehe oben). Der Shadow wendet beide Regeln weiter als Produkt-Gates an. In den unten dokumentierten E2-Auswertungen floss der damalige Unterschied in „visibleExcludedByV01“ ein; die Zahlen selbst sind unverändert.
 
 ## Heutige RPC vs. globaler Basispool vs. v0.1-Gate
 
@@ -157,8 +161,8 @@ Beides ist nicht repariert. Der Shadow wendet beide Regeln als Produkt-Gates an.
 | Capability-Bereiche | nach **Sichtbarkeit** (`capability_disclosure`) | – | nach **Matching-Freigabe**; ohne → uncertain | grundverschieden; nicht vermischen |
 | Expertise | exakter Textvergleich | – | normalisierte Begriffe (Wörterbuch, Wortstamm) | v0.1 findet mehr |
 | Fehlende Daten | schließen aus | – | uncertain, ohne Abzug | Kern-Unterschied |
-| Founder-Rolle | nicht geprüft | ja | ja (`POOL_NOT_FOUNDER`) | heutiger Bug A |
-| Blockierung | nicht geprüft | ja | ja (`POOL_BLOCKED`) | heutiger Bug B |
+| Founder-Rolle | seit 80f39156 geprüft (vorher nicht) | ja | ja (`POOL_NOT_FOUNDER`) | kein Unterschied mehr |
+| Blockierung | seit 80f39156 geprüft, beide Richtungen (vorher nicht) | ja | ja (`POOL_BLOCKED`) | kein Unterschied mehr |
 | Kriterien der Gegenseite | nicht geprüft | – | ja (bilateral) | v0.1 verbirgt, wen die Gegenseite ausschließt |
 | Reihenfolge | `published_at desc`, ID; LIMIT/OFFSET | – | Gegenseitigkeit; Gleichstand → `published_at`, ID | Seiten erst nach dem Ranking |
 | vier Produktfelder | nicht verwendet | nicht verwendet | nicht verwendet | unverändert |
@@ -181,6 +185,8 @@ Aggregiert über alle Personen: Summen, Anteile, Mittelwerte. Keine IDs, Namen, 
 **Suchen mit Capability-Filter** sind „nicht vergleichbar“: Die heutige RPC liest dafür sichtbare Bereiche ohne Matching-Freigabe, und die Auswertung lädt solche Daten nicht.
 
 **Prüfung der Nachbildung:** Lokal mit 101 synthetischen Personen gegen die echte RPC gerechnet. Bei allen 99 vergleichbaren Betrachtern war die Reihenfolge identisch.
+
+**Hinweis seit 80f39156:** `currentFindRpcOrder` bildet die Suche in der Fassung `search_by_frame` (vor 80f39156) nach, also ohne Founder-Rolle und ohne Blockierung. Die oben genannte Prüfung und die E2-Zahlen beziehen sich auf diese Fassung. Für eine künftige Auswertung muss die Nachbildung um beide Bedingungen ergänzt werden (in den synthetischen Daten gibt es weder Blockierungen noch Personen ohne Founder-Rolle, die Fixture-Zahlen ändern sich dadurch nicht).
 
 **Ergebnisse auf synthetischen Daten** (99 von 101 vergleichbar):
 
