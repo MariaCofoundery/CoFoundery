@@ -161,5 +161,19 @@
       "remoteModeDiffers": "You prefer different ways of working on site – you: “{you}”, {name}: “{them}”. Clarify early how you want to work together.",
       "workstyleDiscussionPoint": "In “{area}” you set different priorities in comparable situations. Talk about when which approach helps."
     }
+  },
+  "matchingReasons": {
+    "FIND_ROLE_NEED_COVERED": "You're looking for {role}; that's one of {name}'s roles.",
+    "FIND_ROLE_NEED_COVERED_REVERSE": "{name} is looking for {role}; that's one of your roles.",
+    "FIND_AREA_OWN_COVERED": "You'd like to hand over {area}; {name} wants to own it.",
+    "FIND_AREA_CONTRIBUTE": "{name} can contribute to {area}.",
+    "FIND_SAME_INDUSTRY": "You both list {industry}.",
+    "FIND_START_ALIGNED": "You're both aiming to start {horizon}.",
+    "FIND_STAGE_COMPLEMENT": "{name} {stage_b}; you {stage_a}.",
+    "FIND_DIFF_START": "Your planned start differs ({a} / {b}).",
+    "FIND_DIFF_COMMITMENT": "You plan different amounts of time ({a} / {b}) – worth discussing.",
+    "FIND_DIFF_GOAL": "Your goals for the venture differ ({a} / {b}).",
+    "FIND_UNKNOWN_LOCATION": "Location or way of working is still missing.",
+    "FIND_LIMITED_EVIDENCE": "This suggestion is based on limited information."
   }
 }

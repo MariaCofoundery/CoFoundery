@@ -897,5 +897,15 @@
     "workspaceHint": "To explore a problem together, you can use a private workspace. Only people explicitly invited can see the space and its contents.",
     "workspaces": "Go to your private workspaces",
     "filterTitle": "Filter problems"
+  },
+  "matchingReasons": {
+    "CONNECT_TOPIC_MATCH": "The offer mentions {offer_topic}; your request asks for {seek_topic}.",
+    "CONNECT_TOPIC_VIA_EXPERTISE": "{name} lists {topic} as expertise.",
+    "CONNECT_TEXT_OVERLAP": "Both titles and descriptions refer to {terms}.",
+    "CONNECT_SAME_INDUSTRY": "Both entries relate to {industry}.",
+    "CONNECT_SAME_CATEGORY": "Both entries are in {category}.",
+    "CONNECT_REMOTE_POSSIBLE": "The offer is available remotely.",
+    "CONNECT_UNKNOWN_LOCATION": "The location is not specified.",
+    "CONNECT_LIMITED_EVIDENCE": "This suggestion is based on limited information."
   }
 }

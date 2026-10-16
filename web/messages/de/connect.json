@@ -897,5 +897,15 @@
     "workspaceHint": "Wenn ihr gemeinsam weiterdenken möchtet, könnt ihr einen privaten Arbeitsraum nutzen. Nur ausdrücklich eingeladene Personen sehen den Raum und seine Inhalte.",
     "workspaces": "Zu deinen privaten Arbeitsräumen",
     "filterTitle": "Probleme eingrenzen"
+  },
+  "matchingReasons": {
+    "CONNECT_TOPIC_MATCH": "Das Angebot nennt {offer_topic}; dein Gesuch sucht {seek_topic}.",
+    "CONNECT_TOPIC_VIA_EXPERTISE": "{name} nennt {topic} in der eigenen Expertise.",
+    "CONNECT_TEXT_OVERLAP": "Titel und Beschreibung beider Einträge beziehen sich auf {terms}.",
+    "CONNECT_SAME_INDUSTRY": "Beide Einträge beziehen sich auf {industry}.",
+    "CONNECT_SAME_CATEGORY": "Beide Einträge gehören zu {category}.",
+    "CONNECT_REMOTE_POSSIBLE": "Das Angebot ist remote möglich.",
+    "CONNECT_UNKNOWN_LOCATION": "Zum Ort fehlen Angaben.",
+    "CONNECT_LIMITED_EVIDENCE": "Dieser Vorschlag basiert auf wenigen Angaben."
   }
 }

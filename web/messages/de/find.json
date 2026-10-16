@@ -161,5 +161,19 @@
       "remoteModeDiffers": "Ihr arbeitet unterschiedlich gern vor Ort – du: „{you}“, {name}: „{them}“. Klärt früh, wie ihr zusammenarbeiten wollt.",
       "workstyleDiscussionPoint": "Bei „{area}“ setzt ihr in vergleichbaren Situationen unterschiedliche Schwerpunkte. Sprecht darüber, wann welches Vorgehen hilfreich ist."
     }
+  },
+  "matchingReasons": {
+    "FIND_ROLE_NEED_COVERED": "Du suchst {role}; das gehört zu den Rollen von {name}.",
+    "FIND_ROLE_NEED_COVERED_REVERSE": "{name} sucht {role}; das gehört zu deinen angegebenen Rollen.",
+    "FIND_AREA_OWN_COVERED": "Du möchtest {area} abgeben; {name} möchte das verantworten.",
+    "FIND_AREA_CONTRIBUTE": "{name} kann bei {area} mitarbeiten.",
+    "FIND_SAME_INDUSTRY": "Ihr nennt beide {industry}.",
+    "FIND_START_ALIGNED": "Ihr sucht beide einen Start {horizon}.",
+    "FIND_STAGE_COMPLEMENT": "{name} {stage_b}; du {stage_a}.",
+    "FIND_DIFF_START": "Euer geplanter Start unterscheidet sich ({a} / {b}).",
+    "FIND_DIFF_COMMITMENT": "Ihr plant unterschiedlich viel Zeit ein ({a} / {b}) – ein Gesprächsanlass.",
+    "FIND_DIFF_GOAL": "Eure Ziele für das Vorhaben unterscheiden sich ({a} / {b}).",
+    "FIND_UNKNOWN_LOCATION": "Zu Standort oder Arbeitsweise fehlen noch Angaben.",
+    "FIND_LIMITED_EVIDENCE": "Dieser Vorschlag basiert auf wenigen Angaben."
   }
 }
