@@ -1,13 +1,18 @@
 import "server-only";
 
-import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
-
-import { capabilityMatchingPermissionFromRow } from "@/features/capability/capabilityMatchingPermission";
-import type { CapabilityDisclosure } from "@/features/capability/capabilityTypes";
 import type { DiscoveryMustHaves, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
+import {
+  buildFindPersonInput,
+  createShadowServiceClient,
+  FIND_SHADOW_IDF_CORPUS_VERSION,
+  hasMatchingPermission,
+  PERSON_CORE_MATCHING_COLUMNS,
+  type CapabilityEntryRow,
+  type MatchingCoreRow,
+  type ShadowClient,
+} from "@/features/discovery/findMatchingInputs";
 import { getCandidateMatchingV01Constraints } from "@/features/discovery/privateSearchConstraints";
 import { presentFindReasons } from "@/lib/matching/reasonPresentation";
-import { findPersonFromDiscovery, type CapabilityRowLike } from "@/lib/matching/v01/adapters";
 import { matchFindPair, rankFindCandidates } from "@/lib/matching/v01/findMatcher";
 import type { FindMatchResult, FindMustHavesInput, FindPersonInput, GateStatus } from "@/lib/matching/v01/types";
 import { MATCHING_VERSION, NORMALIZATION_VERSION } from "@/lib/matching/v01/version";
@@ -30,8 +35,7 @@ import { MATCHING_VERSION, NORMALIZATION_VERSION } from "@/lib/matching/v01/vers
  */
 
 export const FIND_SHADOW_FLAG = "MATCHING_FIND_V01_SHADOW_ENABLED";
-/** FIND nutzt kein IDF (Spec §11.2); das Ergebnis trägt die Version trotzdem mit. */
-export const FIND_SHADOW_IDF_CORPUS_VERSION = "none-find-does-not-use-idf";
+export { FIND_SHADOW_IDF_CORPUS_VERSION };
 
 export function isFindMatchingShadowEnabled(env: Readonly<Record<string, string | undefined>> = process.env): boolean {
   const raw = env[FIND_SHADOW_FLAG];
@@ -72,18 +76,6 @@ export type FindMatchingShadowInput = Readonly<{
   rpcTotalCount: number;
 }>;
 
-type ShadowClient = Pick<SupabaseClient, "from">;
-
-type CoreRow = {
-  user_id: string;
-  industries: string[] | null;
-  expertise: string[] | null;
-  location_region: string | null;
-  remote_mode: string | null;
-  capability_disclosure: string | null;
-  capability_matching_allowed: boolean | null;
-};
-
 class StageError extends Error {
   readonly failure: FindMatchingShadowFailure;
   constructor(failure: FindMatchingShadowFailure) {
@@ -104,12 +96,7 @@ async function loadShadowData(client: ShadowClient, viewerUserId: string, candid
   const either = (a: string, b: string) => `${a}.eq.${viewerUserId},${b}.eq.${viewerUserId}`;
   const [roleRows, coreRows, blockRows, introRows, contactRows, candidateMustHaves] = await Promise.all([
     rows<{ user_id: string; roles: string[] | null }>(client.from("profiles").select("user_id, roles").in("user_id", ids)),
-    rows<CoreRow>(
-      client
-        .from("person_core")
-        .select("user_id, industries, expertise, location_region, remote_mode, capability_disclosure, capability_matching_allowed")
-        .in("user_id", ids),
-    ),
+    rows<MatchingCoreRow>(client.from("person_core").select(PERSON_CORE_MATCHING_COLUMNS).in("user_id", ids)),
     rows<{ blocker_user_id: string; blocked_user_id: string }>(
       client.from("network_blocks").select("blocker_user_id, blocked_user_id").or(either("blocker_user_id", "blocked_user_id")),
     ),
@@ -135,12 +122,12 @@ async function loadShadowData(client: ShadowClient, viewerUserId: string, candid
 
   const core = new Map(coreRows.map((r) => [r.user_id, r]));
   // Capability nur für Personen mit ausdrücklicher Matching-Freigabe - die übrigen werden gar nicht gelesen.
-  const allowedIds = ids.filter((id) => capabilityMatchingPermissionFromRow(core.get(id) ?? null).allowed);
+  const allowedIds = ids.filter((id) => hasMatchingPermission(core.get(id)));
   const [entryRows, areaRows] =
     allowedIds.length === 0
       ? [[], []]
       : await Promise.all([
-          rows<CapabilityRowLike & { user_id: string }>(
+          rows<CapabilityEntryRow>(
             client.from("person_capability_entries").select("user_id, area_id, application_level, ownership_wish").in("user_id", allowedIds),
           ),
           rows<{ area_id: string; family_id: string }>(client.from("capability_areas").select("area_id, family_id")),
@@ -169,24 +156,11 @@ function personInput(
   data: Awaited<ReturnType<typeof loadShadowData>>,
   hasContact: boolean,
 ): FindPersonInput {
-  const core = data.core.get(profile.userId);
-  return findPersonFromDiscovery({
-    // Branchen, Expertise, Ort, Remote aus person_core (Spec §4); fehlt die Zeile, bleiben die Profilwerte.
-    profile: core
-      ? {
-          ...profile,
-          industries: core.industries ?? [],
-          expertise: core.expertise ?? [],
-          locationRegion: core.location_region,
-          remoteMode: (core.remote_mode ?? profile.remoteMode) as FounderDiscoveryProfile["remoteMode"],
-        }
-      : profile,
-    mustHaves,
+  return buildFindPersonInput(profile, mustHaves, {
+    core: data.core.get(profile.userId),
     isFounder: data.founders.has(profile.userId),
-    capabilityRows: data.entries.filter((e) => e.user_id === profile.userId),
-    capabilityDisclosure: (core?.capability_disclosure ?? null) as CapabilityDisclosure | null,
+    entries: data.entries,
     hasContact,
-    capabilityMatchingPermission: capabilityMatchingPermissionFromRow(core ?? null),
   });
 }
 
@@ -273,13 +247,6 @@ export async function computeFindMatchingShadow(
   }
 }
 
-function defaultServiceClient(): ShadowClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (!url || !key) return null;
-  return createSupabaseClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-}
-
 export type ScheduleFindShadowOptions = Readonly<{
   env?: Readonly<Record<string, string | undefined>>;
   /** Next: `after` - läuft nach der Antwort. */
@@ -301,7 +268,7 @@ export function scheduleFindMatchingShadow(
   try {
     options.schedule(async () => {
       try {
-        const client = (options.createServiceClient ?? defaultServiceClient)();
+        const client = (options.createServiceClient ?? createShadowServiceClient)();
         const result = await computeFindMatchingShadow(input, client);
         options.onResult?.(result);
       } catch {

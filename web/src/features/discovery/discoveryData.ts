@@ -3,6 +3,7 @@ import "server-only";
 import { after } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { scheduleGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
 import { scheduleFindMatchingShadow } from "@/features/discovery/findMatchingShadow";
 import {
   getPrioritizedDiscoveryAlignmentDimensions,
@@ -694,6 +695,9 @@ export async function getDiscoveryCandidatesForCurrentUser(
     },
     { schedule: after }
   );
+  // GLOBALER SHADOW (E2): nur mit MATCHING_FIND_V01_GLOBAL_SHADOW_ENABLED=true, ebenfalls
+  // nach der Antwort und verworfen. Lädt den ganzen FIND-Bestand - nur für kleine Bestände.
+  scheduleGlobalFindMatchingShadow(normalizedUserId, { schedule: after });
 
   return {
     candidates,

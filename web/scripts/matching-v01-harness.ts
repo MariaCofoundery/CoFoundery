@@ -5,11 +5,14 @@
  *   npm run matching:harness -- rank-find <person> [n]       FIND-Rangliste für eine Person
  *   npm run matching:harness -- connect <seekListing> [n]    ein CONNECT-Gesuch gegen alle Angebote ranken
  *   npm run matching:harness -- find-shadow <person> [page]  FIND-Shadow (E1): heutige Reihenfolge vs. v0.1, Seite vs. global
+ *   npm run matching:harness -- find-shadow-eval [page]      FIND-Shadow (E2): Kennzahlen über alle Fixture-Personen (nur Zahlen)
  *   npm run matching:harness -- list                         verfügbare Fixture-IDs
  *
  * Läuft ausschließlich gegen die synthetischen Test-Fixtures (ohne Holdout-Personen).
  * Keine DB, kein Netz, keine Route, keine Schreibzugriffe. Ausgabe: Resultatobjekte als JSON.
  */
+import { rankGlobalFindShadow } from "@/features/discovery/findMatchingGlobalShadow";
+import { aggregateFindShadowEvaluations, currentFindRpcOrder, evaluateFindShadow } from "@/features/discovery/findShadowEvaluation";
 import { createIdfIndex, matchFindPair, rankConnectOffers, rankFindCandidates } from "@/lib/matching/v01";
 import {
   NOW,
@@ -85,6 +88,31 @@ if (command === "list") {
     shadowRankOnPage: onPage.get(p.personId) ?? null,
     shadowRankGlobal: global.get(p.personId) ?? null,
   })).filter((row) => row.onFirstPage || (row.shadowRankGlobal !== null && row.shadowRankGlobal <= pageSize)));
+} else if (command === "find-shadow-eval") {
+  // Alle Fixture-Personen mit aktivem FIND-Profil als Betrachter. Die Fixtures haben kein
+  // published_at - die "heutige" Reihenfolge fällt deshalb wie in der RPC (nulls last) auf die ID zurück.
+  const pageSize = Number(x ?? 12);
+  const people = synthetic.profiles.filter((p) => pool.has(p.id) && p.find_profile?.status === "active").map((p) => findPerson(p));
+  const evaluations = [];
+  let notComparable = 0;
+  for (const viewer of people) {
+    const others = people.filter((p) => p.personId !== viewer.personId);
+    const candidates = others.filter((p) => p.isFounder);
+    const { results, ranked } = rankGlobalFindShadow(viewer, candidates, { familyOfArea: synthetic.family_of, computedAt: NOW });
+    const visible = currentFindRpcOrder(viewer.mustHaves, others.map((p) => ({ ...p, userId: p.personId })));
+    if (visible === "not_comparable") {
+      notComparable += 1;
+      continue;
+    }
+    const tally = (s: string) => results.filter((r) => r.eligibility.status === s).length;
+    evaluations.push(evaluateFindShadow(visible, {
+      pool: { baseCandidates: candidates.length, excludedNoFounderRole: others.length - candidates.length, excludedBlocked: 0 },
+      counts: { eligible: tally("eligible"), uncertain: tally("uncertain"), ineligible: tally("ineligible") },
+      ranked,
+      statusById: new Map(results.map((r) => [r.subject.b, r.eligibility.status])),
+    }, pageSize));
+  }
+  print(aggregateFindShadowEvaluations(evaluations, { notComparable, notInPool: 0 }));
 } else if (command === "connect") {
   const seek = seekInput(x ?? "");
   const offers = [...listingsById.values()]
