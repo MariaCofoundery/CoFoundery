@@ -71,6 +71,9 @@ async function run(w: World, page = 1, o: { session?: string | null; fail?: Fail
   return { result, session, service, loader, serviceCreated: () => serviceCreated };
 }
 
+/** Ergebnis ohne die serverinternen Diagnosedaten (E3d) - die prüft findRankingObservability.test.ts. */
+const outcome = (r: Awaited<ReturnType<typeof getFindCandidatesV01ForCurrentUser>>) => (r.ok ? { ok: true } : { ok: false, failure: r.failure });
+
 const engineOrder = async (w: World) => {
   const pop = (await loadFindMatchingPool(rpcClient(w).client, { kind: "service", viewerUserId: V })).population!;
   const r = runGlobalFindMatchingShadow(pop, V, { now: NOW });
@@ -178,11 +181,11 @@ test("Ausschlüsse aus dem Pool tauchen nie auf (self, blockiert, keine Founder-
 test("Viewer-Spoofing: andere ID als die Sitzung -> kein v0.1, nichts geladen", async () => {
   const w = world(20);
   const spoof = await run(w, 1, { session: uid(2) });
-  assert.deepEqual(spoof.result, { ok: false, failure: "viewer_mismatch" });
+  assert.deepEqual(outcome(spoof.result), { ok: false, failure: "viewer_mismatch" });
   assert.equal(spoof.serviceCreated(), 0, "Service-Client gar nicht erst erzeugt");
   assert.equal(spoof.session.calls.length, 0);
   const none = await run(w, 1, { session: null });
-  assert.deepEqual(none.result, { ok: false, failure: "session_invalid" });
+  assert.deepEqual(outcome(none.result), { ok: false, failure: "session_invalid" });
   assert.equal(none.serviceCreated(), 0);
 });
 
@@ -198,17 +201,17 @@ test("Service-Client lädt nur die privaten Inputs; Pool und Vokabular über die
 // ---------------------------------------------------------------------------
 test("jede Fehlerart wird benannt - nie ein halbes Ergebnis", async () => {
   const w = world(30);
-  assert.deepEqual((await run(w, 1, { fail: "pool" })).result, { ok: false, failure: "pool_failed" });
-  assert.deepEqual((await run(w, 1, { fail: "areas" })).result, { ok: false, failure: "pool_failed" });
-  assert.deepEqual((await run(w, 1, { serviceFail: "inputs" })).result, { ok: false, failure: "inputs_failed" });
-  assert.deepEqual((await run(w, 1, { noService: true })).result, { ok: false, failure: "service_unavailable" });
-  assert.deepEqual((await run(w, 1, { detailFail: true })).result, { ok: false, failure: "detail_failed" });
+  assert.deepEqual(outcome((await run(w, 1, { fail: "pool" })).result), { ok: false, failure: "pool_failed" });
+  assert.deepEqual(outcome((await run(w, 1, { fail: "areas" })).result), { ok: false, failure: "pool_failed" });
+  assert.deepEqual(outcome((await run(w, 1, { serviceFail: "inputs" })).result), { ok: false, failure: "inputs_failed" });
+  assert.deepEqual(outcome((await run(w, 1, { noService: true })).result), { ok: false, failure: "service_unavailable" });
+  assert.deepEqual(outcome((await run(w, 1, { detailFail: true })).result), { ok: false, failure: "detail_failed" });
   const paused = world(10);
   (paused.profiles[0] as Row).status = "paused";
-  assert.deepEqual((await run(paused, 1)).result, { ok: false, failure: "viewer_not_searching" });
+  assert.deepEqual(outcome((await run(paused, 1)).result), { ok: false, failure: "viewer_not_searching" });
   const broken = world(10);
   (broken.core[1] as Row).industries = 42;
-  assert.deepEqual((await run(broken, 1)).result, { ok: false, failure: "engine_failed" });
+  assert.deepEqual(outcome((await run(broken, 1)).result), { ok: false, failure: "engine_failed" });
 });
 
 // ---------------------------------------------------------------------------

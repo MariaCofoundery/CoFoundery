@@ -101,7 +101,9 @@ test("Presenter scheitert -> ganzer v0.1-Pfad scheitert (heutige Suche), nie hal
   const result = await v01(world(60), 1, () => {
     throw new Error("presenter");
   });
-  assert.deepEqual(result, { ok: false, failure: "presenter_failed" });
+  assert.equal(result.ok, false);
+  assert.equal(!result.ok && result.failure, "presenter_failed");
+  assert.ok(!("page" in result), "keine halbe Seite");
 });
 
 test("Kürzung für die Karte: Presenter-Reihenfolge, je Code einmal, „anderer Schwerpunkt“ entfällt, ausgeblendet -> nichts", () => {
@@ -274,7 +276,12 @@ test("rankingMode: \"v01\" nur aus dem erfolgreichen v0.1-Zweig, sonst \"legacy\
   assert.equal((search.match(/rankingMode: "legacy"/g) ?? []).length, 2, "inaktives Profil und heutige Suche");
   assert.match(explore, /rankingMode: "legacy"/);
   assert.doesNotMatch(explore, /rankingMode: "v01"|matchingReasons|isFindV01RankingEnabled/, "Stöbern unverändert");
-  assert.doesNotMatch(search, /v01\.failure|failure:/, "kein Fehlergrund in der Produktantwort");
+  // Fehlergrund nur an die Zähler (E3d), nie in eine Rückgabe an die Seite.
+  const returns = [...(search.match(/return \{\n[\s\S]*?\n\s*\};/g) ?? []), ...(search.match(/return \{[^\n]*\};/g) ?? [])];
+  assert.equal(returns.length, 3, "inaktives Profil, v0.1, heutige Suche");
+  for (const r of returns) assert.doesNotMatch(r, /failure|diagnostics/, "kein Fehlergrund und keine Diagnose in der Produktantwort");
+  assert.equal((search.match(/v01\.failure/g) ?? []).length, 1);
+  assert.match(search, /recordFindRankingObservation\(\s*\{ rankingMode: v01\.ok \? "v01" : "legacy", fallback: v01\.ok \? null : v01\.failure, diagnostics: v01\.diagnostics \}/);
   assert.equal((search.match(/matchingReasons/g) ?? []).length, 1, "Reasons nur im v0.1-Zweig");
   const types = read("src/features/discovery/discoveryTypes.ts");
   assert.match(types, /export type FindRankingMode = "legacy" \| "v01";/);
@@ -335,7 +342,9 @@ test("Karte: legacy -> Kriterien-Chips wie bisher; v01 -> nur „Aus euren Angab
   assert.match(card, /\{showMatchReasons && rankingMode === "v01" && \(candidate\.matchingReasons\?\.length \?\? 0\) > 0 \? \(\s*<FindMatchingReasons/);
   assert.match(card, /title=\{t\("v2\.cards\.matchingReasons"\)\}/);
   assert.equal((card.match(/practicalMatches/g) ?? []).length, 3, "nur der eine Chip-Block (Bedingung, Titel, Liste)");
-  assert.equal((card.match(/rankingMode/g) ?? []).length, 5, "Prop, Typ, Doku, zwei Bedingungen - sonst nichts");
+  // Prop, Typ, Doku, zwei Bedingungen, Rollenpunkte (E3d) - sonst nichts
+  assert.equal((card.match(/rankingMode === "v01"/g) ?? []).length, 2, "Reasons und Rollenpunkt-Abgleich");
+  assert.equal((card.match(/rankingMode === "legacy"/g) ?? []).length, 1, "nur die Kriterien-Chips");
   // Workstyle und Gesprächsimpulse unabhängig vom Rankingmodus
   assert.match(card, /<ConversationPoints points=\{why\} kind="why" candidateName=\{profile\.displayName\} variant="card" \/>/);
   assert.match(card, /\{showMatchReasons && <DiscoveryWorkstyle candidateId=\{candidate\.profile\.userId\} compact \/>\}/);
@@ -351,4 +360,114 @@ test("Suchseite reicht den echten rankingMode an die Karte - Stöbern immer lega
   assert.match(page, /<FounderDiscoveryCard [^>]*showMatchReasons=\{mode === "search"\} viewer=\{profile\} rankingMode=\{mode === "search" \? result\.rankingMode : "legacy"\} \/>/);
   const saved = read("src/app/(product)/discovery/saved/page.tsx");
   assert.doesNotMatch(saved, /rankingMode/, "gemerkte Profile: Karte wie bisher");
+});
+
+// ---------------------------------------------------------------------------
+// Preview-QA E3d: Gesamtzahl im v0.1-Modus, Status der Freigabe in schmaler Spalte
+// ---------------------------------------------------------------------------
+test("Gesamtzahl: v0.1 sagt „nach den Angaben beider Seiten“, Legacy-Satz unverändert", () => {
+  const page = read("src/app/(product)/discovery/page.tsx");
+  assert.match(page, /\{mode === "search" && result\.rankingMode === "v01" \? \(\s*<p className="mt-2 text-sm text-slate-600">\{t\("v2\.results\.countV01", \{ count: result\.totalCount \}\)\}<\/p>\s*\) : \(\s*<p className="mt-2 text-sm text-slate-600">\{t\(mode === "explore" \? "v2\.explore\.count" : "v2\.results\.count", \{ count: result\.totalCount \}\)\}<\/p>\s*\)\}/);
+  const de = json("messages/de/discovery.json").v2.results;
+  const en = json("messages/en/discovery.json").v2.results;
+  // Legacy-Satz bis auf den Singular unverändert (E3d: „Ein Profil entspricht“ statt „entsprechen“).
+  assert.equal(de.count, "{count, plural, =0 {Keine Profile entsprechen} =1 {Ein Profil entspricht} other {# Profile entsprechen}} deinen praktischen Filtern.");
+  assert.equal(en.count, "{count, plural, =0 {No profiles match} =1 {One profile matches} other {# profiles match}} your practical filters.");
+  assert.match(de.countV01, /beider Seiten infrage/);
+  assert.match(en.countV01, /both sides' details/);
+  for (const text of [de.countV01, en.countV01]) assert.doesNotMatch(text, /%|score|match|kompatib|compatib|fit\b|passung|beste|best\b/i);
+});
+
+test("Freigabe: Titel benennt den Schalter, sichtbar nur der Zustand; Farbe wie die übrigen Capability-Eingaben", () => {
+  const ui = read("src/features/capability/CapabilityMatchingPermissionSection.tsx");
+  assert.match(ui, /aria-labelledby="capability-matching-title"\s*className="h-5 w-5 rounded border-slate-300 accent-violet-600"/);
+  assert.match(ui, /<span>\{allowed \? t\("statusOn"\) : t\("statusOff"\)\}<\/span>/);
+  assert.doesNotMatch(ui, /toggleLabel/, "keine doppelte Beschriftung");
+  for (const locale of ["de", "en"]) assert.equal(json(`messages/${locale}/capability.json`).matchingPermission.toggleLabel, undefined);
+  // Benachbarte Radios im Editor tragen dieselbe Farbe.
+  assert.match(read("src/app/(product)/profile/page.tsx"), /name="capability_disclosure"[\s\S]{0,200}accent-violet-600/);
+});
+
+// ---------------------------------------------------------------------------
+// Preview-QA-Bereinigung E3d (zweiter Teil)
+// ---------------------------------------------------------------------------
+const pr = (code: string, data: Record<string, string> = {}) => ({ code, visibility: "both" as const, messageKey: `find.matchingReasons.${code}`, data, labels: {} });
+const codes = (reasons: readonly FindCardReason[]) => reasons.map((r) => r.messageKey.split(".").pop());
+
+test("Reason-Auswahl: drei Unterschiede -> höchstens einer sichtbar", () => {
+  const out = cardReasonsFromPresented({
+    visible: true,
+    reasons: [pr("FIND_DIFF_START", { a: "now", b: "later_or_flexible" }), pr("FIND_DIFF_COMMITMENT", { a: "side_project", b: "full_time" }), pr("FIND_DIFF_GOAL", { a: "explore", b: "venture_scale" })],
+  });
+  assert.deepEqual(codes(out), ["FIND_DIFF_START"], "der erste in Presenter-Reihenfolge");
+});
+
+test("Reason-Auswahl: übrige Reasons zuerst, danach höchstens ein Unterschied - nie von Unterschieden verdrängt", () => {
+  // Presenter-Reihenfolge der Engine: Rolle, Start-Unterschied, Phase, Zeit-Unterschied, Ziel-Unterschied
+  const reasons = [pr("FIND_ROLE_NEED_COVERED", { role: "product" }), pr("FIND_DIFF_START", { a: "now", b: "next_6_months" }), pr("FIND_STAGE_COMPLEMENT", { stage_a: "idea_validating", stage_b: "exploring_ideas" }), pr("FIND_DIFF_COMMITMENT", { a: "side_project", b: "full_time" }), pr("FIND_DIFF_GOAL", { a: "explore", b: "venture_scale" })];
+  assert.deepEqual(codes(cardReasonsFromPresented({ visible: true, reasons })), ["FIND_ROLE_NEED_COVERED", "FIND_STAGE_COMPLEMENT", "FIND_DIFF_START"]);
+  const full = [pr("FIND_ROLE_NEED_COVERED", { role: "tech" }), pr("FIND_DIFF_GOAL", { a: "explore", b: "venture_scale" }), pr("FIND_ROLE_NEED_COVERED_REVERSE", { role: "sales" }), pr("FIND_SAME_INDUSTRY", { industry: "Fintech" }), pr("FIND_START_ALIGNED", { horizon: "now" })];
+  assert.deepEqual(codes(cardReasonsFromPresented({ visible: true, reasons: full })), ["FIND_ROLE_NEED_COVERED", "FIND_ROLE_NEED_COVERED_REVERSE", "FIND_SAME_INDUSTRY"], "drei übrige -> kein Unterschied");
+  assert.deepEqual(codes(cardReasonsFromPresented({ visible: true, reasons: [pr("FIND_UNKNOWN_LOCATION"), pr("FIND_DIFF_GOAL", { a: "explore", b: "venture_scale" })] })), ["FIND_UNKNOWN_LOCATION", "FIND_DIFF_GOAL"]);
+});
+
+test("Reason-Auswahl ändert weder Reihenfolge noch Auswahl der Kandidaten", async () => {
+  const w = world(120);
+  const pop = (await loadFindMatchingPool(rpcClient(w).client, { kind: "service", viewerUserId: V })).population!;
+  const order = runGlobalFindMatchingShadow(pop, V, { now: NOW }).ranked.map((x) => pop.profiles.get(x.result.subject.b)!.id);
+  const ids: string[] = [];
+  for (let page = 1; page <= Math.ceil(order.length / 12); page++) {
+    const r = await v01(w, page);
+    assert.ok(r.ok);
+    ids.push(...r.page.profiles.map((p) => p.id));
+    for (const reasons of r.page.reasonsByProfileId.values()) {
+      assert.ok(reasons.length <= 3);
+      assert.ok(codes(reasons).filter((c) => /^FIND_DIFF_/.test(c ?? "")).length <= 1, "höchstens ein Unterschied");
+    }
+  }
+  assert.deepEqual(ids, order, "Engine-Reihenfolge unverändert");
+  const sel = read("src/features/discovery/findMatchingRanking.ts");
+  assert.match(sel, /FIND_DIFFERENCE_REASON_CODES: ReadonlySet<string> = new Set\(\["FIND_DIFF_START", "FIND_DIFF_COMMITMENT", "FIND_DIFF_GOAL"\]\)/);
+});
+
+test("Karte: Rollenpunkt im Gesprächsblock entfällt nur in v0.1 und nur, wenn alle seine Rollen schon als Reason stehen", () => {
+  const card = read("src/features/discovery/FounderDiscoveryCard.tsx");
+  assert.match(card, /showMatchReasons && rankingMode === "v01"\s*\? \(candidate\.matchingReasons \?\? \[\]\)\.filter\(\(r\) => r\.messageKey === `find\.matchingReasons\.\$\{code\}`\)\.map\(\(r\) => r\.data\.role\)\s*: \[\]/);
+  assert.match(card, /\(roles \?\? \[\]\)\.length > 0 && \(roles \?\? \[\]\)\.every\(\(role\) => shown\.has\(role\)\)/);
+  assert.match(card, /point\.claim === "FIND\.WHY\.ROLE_SOUGHT_BY_YOU" && coveredBy\("FIND_ROLE_NEED_COVERED", point\.values\.roles\)/);
+  assert.match(card, /point\.claim === "FIND\.WHY\.ROLE_SOUGHT_BY_THEM" && coveredBy\("FIND_ROLE_NEED_COVERED_REVERSE", point\.values\.roles\)/);
+  assert.equal((card.match(/allWhy\.filter/g) ?? []).length, 1, "nur die zwei Rollen-Claims werden gefiltert");
+  assert.match(card, /<ConversationPoints points=\{why\} kind="why"/);
+  // Die beiden Claims meinen dieselbe Aussage wie die Reasons:
+  const prompts = read("src/features/find/conversationPrompts.ts");
+  assert.match(prompts, /soughtByThem = .*\n?[\s\S]*?ROLE_SOUGHT_BY_THEM/);
+});
+
+test("Seite außerhalb des Bereichs: neutraler Zustand mit Weg zur ersten Seite; echter Empty State nur bei 0", () => {
+  const page = read("src/app/(product)/discovery/page.tsx");
+  const i = page.indexOf('(mode === "explore" || isActive) && result.totalCount > 0 ? (');
+  assert.ok(i > 0 && i < page.indexOf('t("v2.results.emptyTitle")'), "vor dem echten Empty State");
+  const block = page.slice(i, page.indexOf('t("v2.results.emptyTitle")'));
+  assert.match(block, /t\("v2\.pagination\.outOfRangeTitle"\)/);
+  assert.match(block, /href=\{`\/discovery\?mode=\$\{mode\}`\}/);
+  assert.match(block, /t\("v2\.pagination\.firstPage"\)/);
+  assert.doesNotMatch(block, /emptyText|reset/);
+  const de = json("messages/de/discovery.json").v2.pagination;
+  const en = json("messages/en/discovery.json").v2.pagination;
+  assert.equal(de.outOfRangeTitle, "Auf dieser Seite gibt es keine Profile mehr.");
+  assert.equal(de.firstPage, "Zur ersten Seite");
+  assert.equal(en.outOfRangeTitle, "There are no more profiles on this page.");
+  assert.equal(en.firstPage, "Go to the first page");
+});
+
+test("Ohne eigene Kriterien: v0.1 behauptet nicht „alle Profile“; Legacy-Text unverändert", () => {
+  const page = read("src/app/(product)/discovery/page.tsx");
+  assert.match(page, /\) : rankingMode === "v01" \? \(\s*<p[^>]*>\{t\("v2\.search\.briefEmptyTextV01"\)\}<\/p>\s*\) : \(\s*<p[^>]*>\{t\("v2\.search\.briefEmptyText"\)\}<\/p>\s*\)\}/);
+  assert.match(page, /rankingMode=\{result\.rankingMode\}/);
+  const de = json("messages/de/discovery.json").v2.search;
+  const en = json("messages/en/discovery.json").v2.search;
+  assert.equal(de.briefEmptyTextV01, "Auch ohne eigene Suchkriterien siehst du Profile, die nach den Angaben beider Seiten grundsätzlich infrage kommen.");
+  assert.equal(en.briefEmptyTextV01, "Even without search criteria of your own, you'll see profiles that are possible based on both sides' details.");
+  assert.match(de.briefEmptyText, /siehst alle aktuell veröffentlichten Profile/, "Legacy unverändert");
+  for (const text of [de.briefEmptyTextV01, en.briefEmptyTextV01]) assert.doesNotMatch(text, /alle|all\b|%|score|match|fit\b/i);
 });

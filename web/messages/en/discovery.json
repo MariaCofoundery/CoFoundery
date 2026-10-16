@@ -256,6 +256,7 @@
       "briefTitle": "What you are looking for",
       "briefEmptyTitle": "Explore openly",
       "briefEmptyText": "You have not set any search criteria yet and are seeing all currently published profiles.",
+      "briefEmptyTextV01": "Even without search criteria of your own, you'll see profiles that are possible based on both sides' details.",
       "edit": "Edit search",
       "practicalTitle": "Practical search",
       "role": "Role",
@@ -374,7 +375,8 @@
     "results": {
       "eyebrow": "Search & filter",
       "title": "Profiles matching your criteria",
-      "count": "{count, plural, =0 {No profiles} =1 {One profile} other {# profiles}} match your practical filters.",
+      "count": "{count, plural, =0 {No profiles match} =1 {One profile matches} other {# profiles match}} your practical filters.",
+      "countV01": "{count, plural, =0 {No profiles are} =1 {One profile is} other {# profiles are}} possible based on both sides' details.",
       "emptyTitle": "No profiles with these filters",
       "emptyText": "There are currently no profiles that meet every selected criterion. You can adjust your search or reset all filters.",
       "reset": "Reset all filters",
@@ -395,7 +397,9 @@
       "label": "Discovery results",
       "previous": "Previous",
       "next": "Next",
-      "page": "Page {page}"
+      "page": "Page {page}",
+      "outOfRangeTitle": "There are no more profiles on this page.",
+      "firstPage": "Go to the first page"
     },
     "watch": {
       "title": "Notify me about new matches",

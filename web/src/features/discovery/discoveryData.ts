@@ -4,7 +4,12 @@ import { after } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 import { scheduleGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
-import { getFindCandidatesV01ForCurrentUser, isFindV01RankingEnabled } from "@/features/discovery/findMatchingRanking";
+import {
+  getFindCandidatesV01ForCurrentUser,
+  isFindV01RankingEnabled,
+  type FindV01Result,
+} from "@/features/discovery/findMatchingRanking";
+import { recordFindRankingObservation } from "@/features/discovery/findRankingObservability";
 import { scheduleFindMatchingShadow } from "@/features/discovery/findMatchingShadow";
 import {
   getPrioritizedDiscoveryAlignmentDimensions,
@@ -621,12 +626,24 @@ export async function getDiscoveryCandidatesForCurrentUser(
   // E3c: rankingMode sagt der Oberfläche, welche Reihenfolge die Seite WIRKLICH hat;
   // Reasons (nur Presenter-Ausgabe) gibt es nur mit "v01".
   if (isFindV01RankingEnabled()) {
-    const v01 = await getFindCandidatesV01ForCurrentUser({
-      sessionClient: supabase as never,
-      expectedUserId: normalizedUserId,
-      page,
-      loadPageProfiles: (profileIds) => getActiveDiscoveryProfilesByIds(profileIds, supabase),
-    });
+    let v01: FindV01Result;
+    try {
+      v01 = await getFindCandidatesV01ForCurrentUser({
+        sessionClient: supabase as never,
+        expectedUserId: normalizedUserId,
+        page,
+        loadPageProfiles: (profileIds) => getActiveDiscoveryProfilesByIds(profileIds, supabase),
+      });
+    } catch {
+      // Unerwartet: dieselbe Regel wie jeder bekannte Fehler - heutige Suche für diese Anfrage.
+      v01 = { ok: false, failure: "unexpected", diagnostics: {} };
+    }
+    // BEOBACHTBARKEIT (E3d): nur aggregierte Zähler, geschrieben nach der Antwort. Der
+    // Fehlergrund bleibt serverintern; die Oberfläche bekommt nur rankingMode.
+    recordFindRankingObservation(
+      { rankingMode: v01.ok ? "v01" : "legacy", fallback: v01.ok ? null : v01.failure, diagnostics: v01.diagnostics },
+      { schedule: after }
+    );
     if (v01.ok) {
       const rankedProfiles = [...v01.page.profiles];
       const reasons = v01.page.reasonsByProfileId;

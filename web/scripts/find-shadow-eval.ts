@@ -4,6 +4,7 @@
  *   npm run matching:find-shadow-eval                          lokal, alle aktiven Founder als Betrachter
  *   npm run matching:find-shadow-eval -- --viewers=50          höchstens 50 Betrachter (deterministisch nach ID)
  *   npm run matching:find-shadow-eval -- --page-size=12
+ *   npm run matching:find-shadow-eval -- --runtime-sample=20       Laufzeit des Produktionspfads (Pool je Betrachter) für 20 Betrachter; 0 = aus
  *   npm run matching:find-shadow-eval -- --confirm-remote=<host>   nötig für jede nicht-lokale Datenbank
  *
  * Liest mit dem Dienstschlüssel (web/.env.local) die Matching-Population einmal und
@@ -11,13 +12,18 @@
  * (Nachbildung von search_by_frame). Ausgegeben werden NUR aggregierte Kennzahlen:
  * keine IDs, Namen, Kriterien, Orte, Texte oder Capability-Werte. Nichts wird gespeichert.
  *
+ * E3d: Dazu die Laufzeit des produktiven Pfads (get_find_matching_pool_for_viewer +
+ * get_find_matching_inputs + Engine) für eine deterministische Stichprobe von Betrachtern -
+ * je Stufe nur Median, p95 und Maximum. Gegen echte Daten NUR mit ausdrücklicher Freigabe.
+ *
  * Doku: docs/research/matching-v0.1-find-shadow.md
  */
 import { createClient } from "@supabase/supabase-js";
 
 import { isLocalSupabaseUrl } from "@/features/auth/devLogin";
-import { loadFindMatchingPopulation } from "@/features/discovery/findMatchingGlobalShadow";
-import { evaluateFindShadowPopulation } from "@/features/discovery/findShadowEvaluation";
+import { loadFindMatchingPopulation, runGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
+import { loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
+import { aggregateFindRuntimes, evaluateFindShadowPopulation, type FindRuntimeSample } from "@/features/discovery/findShadowEvaluation";
 
 const args = new Map(
   process.argv.slice(2).map((arg) => {
@@ -25,7 +31,7 @@ const args = new Map(
     return [key, rest.length > 0 ? rest.join("=") : "true"] as const;
   }),
 );
-const known = new Set(["viewers", "page-size", "confirm-remote"]);
+const known = new Set(["viewers", "page-size", "confirm-remote", "runtime-sample"]);
 for (const key of args.keys()) if (!known.has(key)) throw new Error(`Unbekannte Option --${key}`);
 
 const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
@@ -50,6 +56,8 @@ const pageSize = Number(args.get("page-size") ?? 12);
 const maxViewers = args.has("viewers") ? Number(args.get("viewers")) : null;
 if (!Number.isInteger(pageSize) || pageSize < 1) throw new Error("--page-size muss eine positive ganze Zahl sein");
 if (maxViewers !== null && (!Number.isInteger(maxViewers) || maxViewers < 1)) throw new Error("--viewers muss eine positive ganze Zahl sein");
+const runtimeSample = Number(args.get("runtime-sample") ?? 20);
+if (!Number.isInteger(runtimeSample) || runtimeSample < 0) throw new Error("--runtime-sample muss eine ganze Zahl >= 0 sein");
 
 const client = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -60,6 +68,26 @@ const founders = [...population.profiles.keys()].filter((id) => population.found
 const viewerIds = maxViewers === null ? founders : founders.slice(0, maxViewers);
 const aggregate = evaluateFindShadowPopulation(population, { viewerIds, pageSize });
 
+// Laufzeit des produktiven Pfads: je Betrachter Pool + Inputs (eigene Abfragen) + Engine.
+// Nur die Dauern werden behalten, nichts aus den geladenen Daten.
+const samples: FindRuntimeSample[] = [];
+for (const viewerUserId of viewerIds.slice(0, runtimeSample)) {
+  const t0 = performance.now();
+  const load = await loadFindMatchingPool(client, { kind: "service", viewerUserId });
+  if (!load.population) continue;
+  const e0 = performance.now();
+  const run = runGlobalFindMatchingShadow(load.population, viewerUserId);
+  const e1 = performance.now();
+  if (run.status !== "ok") continue;
+  samples.push({
+    poolMs: load.timings.poolMs,
+    inputsMs: load.timings.inputsMs + load.timings.areasMs + load.timings.assemblyMs,
+    engineMs: e1 - e0,
+    totalMs: e1 - t0,
+  });
+}
+const runtime = aggregateFindRuntimes(samples);
+
 console.log(
   JSON.stringify(
     {
@@ -68,6 +96,7 @@ console.log(
       evaluationMs: Date.now() - started - loadedMs,
       pageSize,
       ...aggregate,
+      productionPathRuntime: runtime,
     },
     null,
     2,

@@ -256,6 +256,7 @@
       "briefTitle": "Das suchst du gerade",
       "briefEmptyTitle": "Offen entdecken",
       "briefEmptyText": "Du hast noch keine Suchkriterien gesetzt und siehst alle aktuell veröffentlichten Profile.",
+      "briefEmptyTextV01": "Auch ohne eigene Suchkriterien siehst du Profile, die nach den Angaben beider Seiten grundsätzlich infrage kommen.",
       "edit": "Suche bearbeiten",
       "practicalTitle": "Praktische Suche",
       "role": "Rolle",
@@ -374,7 +375,8 @@
     "results": {
       "eyebrow": "Suchen & filtern",
       "title": "Profile zu deinen Kriterien",
-      "count": "{count, plural, =0 {Keine Profile} =1 {Ein Profil} other {# Profile}} entsprechen deinen praktischen Filtern.",
+      "count": "{count, plural, =0 {Keine Profile entsprechen} =1 {Ein Profil entspricht} other {# Profile entsprechen}} deinen praktischen Filtern.",
+      "countV01": "{count, plural, =0 {Kein Profil kommt} =1 {Ein Profil kommt} other {# Profile kommen}} nach den Angaben beider Seiten infrage.",
       "emptyTitle": "Keine Profile mit diesen Filtern",
       "emptyText": "Aktuell gibt es keine Profile, die alle gewählten Kriterien erfüllen. Du kannst deine Suche anpassen oder alle Filter zurücksetzen.",
       "reset": "Alle Filter zurücksetzen",
@@ -395,7 +397,9 @@
       "label": "Discovery-Ergebnisse",
       "previous": "Zurück",
       "next": "Weiter",
-      "page": "Seite {page}"
+      "page": "Seite {page}",
+      "outOfRangeTitle": "Auf dieser Seite gibt es keine Profile mehr.",
+      "firstPage": "Zur ersten Seite"
     },
     "watch": {
       "title": "Bei neuen Treffern benachrichtigen",

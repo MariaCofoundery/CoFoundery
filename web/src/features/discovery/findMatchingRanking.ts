@@ -4,6 +4,7 @@ import type { FindCardReason, FounderDiscoveryProfile } from "@/features/discove
 import { paginateFindShadow, runGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
 import { createShadowServiceClient, type ShadowClient } from "@/features/discovery/findMatchingInputs";
 import { FindMatchingPoolError, loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
+import type { FindPageVisibility, FindRankingDiagnostics, FindRankingStage } from "@/features/discovery/findRankingObservability";
 import { presentFindReasons, type PresentedMatch } from "@/lib/matching/reasonPresentation";
 import type { FindMatchResult } from "@/lib/matching/v01/types";
 
@@ -41,7 +42,9 @@ export type FindV01Failure =
   | "inputs_failed"
   | "engine_failed"
   | "detail_failed"
-  | "presenter_failed";
+  | "presenter_failed"
+  /** Nur vom Aufrufer gesetzt, wenn der Pfad unerwartet wirft. */
+  | "unexpected";
 
 export type FindV01Page = Readonly<{
   /** Karten in Engine-Reihenfolge, als Suchprojektion (wie search_founder_discovery_profiles_v2). */
@@ -63,28 +66,37 @@ type ServiceClient = Parameters<typeof loadFindMatchingPool>[0];
 export const FIND_V01_PAGE_SIZE = 12;
 
 /**
- * Höchstens so viele Reasons je Karte. Reihenfolge = Presenter-Reihenfolge (die der
- * Engine-Erklärungen: Rollen, Capability, Branche, Start, Phase, Unterschiede, offene
- * Standortangaben); je Code nur der erste, damit z. B. drei gesuchte Rollen nicht alle
- * Plätze belegen. Keine eigene Gewichtung - das ist reine Kürzung für die Karte.
+ * Höchstens so viele Reasons je Karte. Auswahl (reine Präsentation, keine Gewichtung):
+ *   1. alle übrigen Reasons in Presenter-Reihenfolge (die der Engine-Erklärungen: Rollen,
+ *      Capability, Branche, gleicher Start, Phase, offene Standortangaben), je Code nur der
+ *      erste - damit z. B. drei gesuchte Rollen nicht alle Plätze belegen;
+ *   2. danach höchstens EIN Unterschied (FIND_DIFF_*), der erste in Presenter-Reihenfolge,
+ *      und nur, wenn noch ein Platz frei ist (Preview-QA E3d: sonst belegten Unterschiede
+ *      oft zwei von drei Plätzen).
  */
 export const FIND_CARD_REASON_LIMIT = 3;
+
+/** Unterschieds-Reasons - pro Karte höchstens einer, nach den übrigen. */
+export const FIND_DIFFERENCE_REASON_CODES: ReadonlySet<string> = new Set(["FIND_DIFF_START", "FIND_DIFF_COMMITMENT", "FIND_DIFF_GOAL"]);
 
 /** Presenter-Ausgabe -> Karten-Reasons. Nur messageKey, erlaubte Daten, Label-Namespaces. */
 export function cardReasonsFromPresented(presented: PresentedMatch): FindCardReason[] {
   if (!presented.visible) return [];
   const seen = new Set<string>();
-  const out: FindCardReason[] = [];
+  const others: PresentedMatch["reasons"][number][] = [];
+  let difference: PresentedMatch["reasons"][number] | null = null;
   for (const reason of presented.reasons) {
-    if (out.length >= FIND_CARD_REASON_LIMIT) break;
     if (seen.has(reason.code)) continue;
     // „Anderer Schwerpunkt“ sagt nicht, welcher - als Satz („Du suchst Anderer Schwerpunkt“)
     // wäre das ein künstlicher Grund. Er entfällt; der nächste Reason rückt nach.
     if (reason.data.role === "other") continue;
     seen.add(reason.code);
-    out.push({ messageKey: reason.messageKey, data: { ...reason.data }, labels: { ...reason.labels } });
+    if (FIND_DIFFERENCE_REASON_CODES.has(reason.code)) difference ??= reason;
+    else others.push(reason);
   }
-  return out;
+  const chosen = others.slice(0, FIND_CARD_REASON_LIMIT);
+  if (difference && chosen.length < FIND_CARD_REASON_LIMIT) chosen.push(difference);
+  return chosen.map((reason) => ({ messageKey: reason.messageKey, data: { ...reason.data }, labels: { ...reason.labels } }));
 }
 
 /** Dieselbe Projektion wie die heutige Suche: Bio, Branchen und letzter Schritt stehen nur auf der Profilseite. */
@@ -119,7 +131,23 @@ export function toSearchCardProfile(profile: FounderDiscoveryProfile): FounderDi
   };
 }
 
-export type FindV01Result = { ok: true; page: FindV01Page } | { ok: false; failure: FindV01Failure };
+/**
+ * Server-intern (E3d): technische Aggregate für die Beobachtbarkeit - Laufzeiten, Pool-Größe,
+ * Gate-Zählungen, Presenter-Ergebnis, Seitenfüllung. Nie Personen, IDs oder Inhalte; geht
+ * nicht in die Produktantwort.
+ */
+export type FindV01Result =
+  | { ok: true; page: FindV01Page; diagnostics: FindRankingDiagnostics }
+  | { ok: false; failure: FindV01Failure; diagnostics: FindRankingDiagnostics };
+
+/** Wie voll die gezeigte Seite ist - nur als Kategorie. */
+export function pageVisibility(visible: number, totalCount: number, page: number, pageSize = FIND_V01_PAGE_SIZE): FindPageVisibility {
+  const expected = Math.max(0, Math.min(pageSize, totalCount - (page - 1) * pageSize));
+  if (visible === 0) return "empty";
+  if (visible < expected) return "short_detail_dropped";
+  if (visible < pageSize) return "short_last_page";
+  return "full";
+}
 
 export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   sessionClient: SessionClient;
@@ -132,7 +160,23 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   now?: () => Date;
   /** Nur für Tests (Zählung); Standard presentFindReasons. */
   presentReasons?: (result: FindMatchResult) => PresentedMatch;
+  /** Nur für Tests; Standard performance.now. */
+  clock?: () => number;
 }>): Promise<FindV01Result> {
+  const clock = input.clock ?? (() => performance.now());
+  const started = clock();
+  // Technische Aggregate, während der Pfad läuft (E3d). Keine Personendaten.
+  const timingsMs: Partial<Record<FindRankingStage, number>> = {};
+  const seen: { poolSize?: number; gate?: FindRankingDiagnostics["gate"]; presenter?: FindRankingDiagnostics["presenter"] } = {};
+  const diagnostics = (pageVisible?: FindPageVisibility): FindRankingDiagnostics => ({
+    timingsMs: { ...timingsMs, total: clock() - started },
+    poolSize: seen.poolSize,
+    gate: seen.gate,
+    presenter: seen.presenter,
+    pageVisible,
+  });
+  const fail = (failure: FindV01Failure): FindV01Result => ({ ok: false, failure, diagnostics: diagnostics() });
+
   // A/B/D: gültige Sitzung, und die gesuchte ID IST die Sitzung.
   let sessionUserId: string | null = null;
   try {
@@ -141,8 +185,8 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   } catch {
     sessionUserId = null;
   }
-  if (!sessionUserId) return { ok: false, failure: "session_invalid" };
-  if (sessionUserId !== input.expectedUserId) return { ok: false, failure: "viewer_mismatch" };
+  if (!sessionUserId) return fail("session_invalid");
+  if (sessionUserId !== input.expectedUserId) return fail("viewer_mismatch");
 
   // C: Service-Client nur für die privaten Inputs.
   let serviceClient: ServiceClient | null;
@@ -151,21 +195,28 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   } catch {
     serviceClient = null;
   }
-  if (!serviceClient) return { ok: false, failure: "service_unavailable" };
+  if (!serviceClient) return fail("service_unavailable");
 
   let population;
   try {
-    ({ population } = await loadFindMatchingPool(serviceClient, { kind: "session", client: input.sessionClient }));
+    const load = await loadFindMatchingPool(serviceClient, { kind: "session", client: input.sessionClient }, clock);
+    population = load.population;
+    timingsMs.pool = load.timings.poolMs;
+    timingsMs.inputs = load.timings.inputsMs + load.timings.areasMs + load.timings.assemblyMs;
   } catch (error) {
-    return { ok: false, failure: error instanceof FindMatchingPoolError && error.stage === "inputs" ? "inputs_failed" : "pool_failed" };
+    return fail(error instanceof FindMatchingPoolError && error.stage === "inputs" ? "inputs_failed" : "pool_failed");
   }
-  if (!population) return { ok: false, failure: "viewer_not_searching" };
+  if (!population) return fail("viewer_not_searching");
   // E: Pool (Sitzung) und Inputs gehören zur selben Person.
-  if (!population.profiles.has(sessionUserId) || !population.core.has(sessionUserId)) return { ok: false, failure: "viewer_mismatch" };
+  if (!population.profiles.has(sessionUserId) || !population.core.has(sessionUserId)) return fail("viewer_mismatch");
+  seen.poolSize = population.profiles.size - 1;
 
+  const engineStarted = clock();
   const run = runGlobalFindMatchingShadow(population, sessionUserId, { now: input.now });
-  if (run.status === "viewer_not_in_pool") return { ok: false, failure: "viewer_not_searching" };
-  if (run.status !== "ok") return { ok: false, failure: "engine_failed" };
+  timingsMs.engine = clock() - engineStarted;
+  if (run.status === "viewer_not_in_pool") return fail("viewer_not_searching");
+  if (run.status !== "ok") return fail("engine_failed");
+  seen.gate = { eligible: run.counts.eligible, uncertain: run.counts.uncertain, excluded: run.counts.ineligible };
 
   // Seiten erst nach dem globalen Rang. Außerhalb des Bereichs: leere Seite, Gesamtzahl bleibt.
   const page = Number.isFinite(input.page) ? Math.max(1, Math.floor(input.page)) : 1;
@@ -179,11 +230,14 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   const orderedProfileIds = pageItems.map((item) => item.profileId);
 
   let loaded: FounderDiscoveryProfile[];
+  const detailStarted = clock();
   try {
     loaded = orderedProfileIds.length === 0 ? [] : await input.loadPageProfiles(orderedProfileIds);
   } catch {
-    return { ok: false, failure: "detail_failed" };
+    timingsMs.detail = clock() - detailStarted;
+    return fail("detail_failed");
   }
+  timingsMs.detail = clock() - detailStarted;
   // Reihenfolge der Engine wiederherstellen. Was der RLS-Lader nicht (mehr) liefert -
   // inzwischen pausiert, blockiert, keine Founder-Rolle -, entfällt; nichts kommt hinzu.
   const byId = new Map(loaded.map((p) => [p.id, p]));
@@ -201,8 +255,14 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
       if (byId.has(item.profileId)) reasonsByProfileId.set(item.profileId, cardReasonsFromPresented(present(item.result)));
     }
   } catch {
-    return { ok: false, failure: "presenter_failed" };
+    seen.presenter = "failed";
+    return fail("presenter_failed");
   }
+  seen.presenter = "ok";
 
-  return { ok: true, page: { profiles, reasonsByProfileId, page, pageSize: FIND_V01_PAGE_SIZE, totalCount } };
+  return {
+    ok: true,
+    page: { profiles, reasonsByProfileId, page, pageSize: FIND_V01_PAGE_SIZE, totalCount },
+    diagnostics: diagnostics(pageVisibility(profiles.length, totalCount, page)),
+  };
 }

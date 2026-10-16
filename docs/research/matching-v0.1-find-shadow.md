@@ -426,3 +426,86 @@ Die Freigabe-UI steht im FIND-Profil (`/discovery/profile`, Abschnitt Sichtbarke
 Lädt der RLS-Lader nach dem Ranking einzelne Karten nicht mehr (pausiert, blockiert, ohne Founder-Rolle), hat die Seite weniger als 12 Einträge. Es werden keine Treffer aus der heutigen Suche ergänzt und keine Rankingmodi gemischt.
 
 Später ließe sich mit den nächsten v0.1-gerankten Kandidaten auffüllen: für die Seite `ranked.slice(start, start + 12 + k)` laden und die ersten 12 lesbaren nehmen. Dafür müssten die folgenden Seiten verschoben werden (ein Seiten-Cursor statt eines festen Offsets). Das ist nicht trivial und deshalb nicht gebaut.
+
+# E3d: Preview-QA und aggregierte Beobachtbarkeit
+
+## Beobachtbarkeit: Vertrag
+
+Der v0.1-Pfad schreibt nur Tageszähler nach `public.find_ranking_metrics_daily` (Migration `20261204120000_find_ranking_metrics.sql`). Eine Zeile ist ein Tripel (UTC-Tag, Kennzahl, Bucket) mit einem Zählerwert; es gibt keine Zeile pro Anfrage.
+
+- **Wann:** nur bei `MATCHING_FIND_V01_RANKING_ENABLED=true`, nur im Suchmodus mit aktivem eigenen Profil. Stöbern, Profilseiten und CONNECT schreiben nichts.
+- **Wie:** `recordFindRankingObservation` bildet synchron nur die Liste der Erhöhungen (Mikrosekunden). Das Schreiben (`record_find_ranking_metrics`, Service-Client) läuft über `after()` erst nach der Antwort. Jeder Fehler wird verworfen. Es gibt keine Logs und keinen Drittanbieter.
+- **Doppelte Allowlist:** `FIND_RANKING_METRICS` im Code und `find_ranking_metric_allowed` in der Datenbank. Ein Test hält beide gleich. Die Funktion lehnt jedes unbekannte Paar, jeden weiteren Schlüssel und jeden Nicht-Zahl- oder negativen Wert ab, und zwar den ganzen Aufruf. Ein Check-Constraint schützt zusätzlich die Tabelle.
+- **Zugriff:** anon und authenticated haben keinen Zugriff. `service_role` darf lesen, aber nur über die Funktion schreiben.
+- **Oberfläche:** Für die UI gibt es weiterhin nur `rankingMode`. Fehlergrund und Diagnose bleiben serverintern.
+
+| Kennzahl | Buckets |
+|---|---|
+| `requests`, `v01_attempts`, `v01_success` | `all` |
+| `ranking_mode` | `legacy`, `v01` |
+| `fallback` | `session_invalid`, `viewer_mismatch`, `viewer_not_searching`, `service_unavailable`, `pool_failed`, `inputs_failed`, `engine_failed`, `detail_failed`, `presenter_failed`, `unexpected` (alles Unbekannte) |
+| `presenter` | `ok`, `failed` |
+| `pool_size` | `lt_10` … `ge_10000`, `sum`, `n` |
+| `gate` | `eligible`, `uncertain`, `excluded` (Tagessummen) |
+| `page_visible` | `full`, `short_last_page`, `short_detail_dropped`, `empty` |
+| `runtime_pool`, `runtime_inputs`, `runtime_engine`, `runtime_detail`, `runtime_total` | `lt_50` … `ge_2500`, `sum_ms`, `n` |
+
+**Nie gespeichert:** user_id, candidate_id, Hashes oder Pseudonyme davon, Namen, E-Mail, Orte, private Must-haves, Capability-Werte oder -Freigaben einzelner Personen, Reasons und ihre Parameter, Scores, Rang, `tieGroup`, Rohprofile, Suchtexte, Zeitstempel einzelner Anfragen.
+
+Bei sehr wenigen Anfragen pro Tag kann ein Zähler 1 sein. Er sagt dann, dass jemand gesucht hat, aber nicht wer. Das ist der Grund für Tages- statt Stundenbuckets.
+
+## Fehlerbehandlung
+
+Wirft der v0.1-Pfad unerwartet (also außerhalb der benannten Klassen), fängt `discoveryData` das ab: Für diese Anfrage gilt die heutige Suche, Bucket `unexpected`. Vorher hätte ein solcher Fehler die Suche abgebrochen.
+
+## Vorbereitete reale Auswertung (nicht ausgeführt)
+
+`npm run matching:find-shadow-eval` gibt nur Aggregate aus. Dazu gehören:
+
+- Populationsgröße und eligible/uncertain/excluded
+- Top-12-Überlappung und v0.1-Top-12 nicht auf Legacy-Seite 1
+- Legacy sichtbar, aber von v0.1 ausgeschlossen, und umgekehrt
+- Gleichstands-Aggregate
+
+Neu ist `productionPathRuntime` mit Median, p95 und Maximum je Stufe über den produktiven Pool-Pfad (Stichprobe `--runtime-sample`, Standard 20, `0` = aus). Gegen eine nicht-lokale Datenbank bricht das Skript ohne `--confirm-remote=<host>` ab, bevor es eine Verbindung aufbaut.
+
+**Gegen echte Daten nur mit ausdrücklicher Freigabe.**
+
+## Preview-Konfiguration (nichts gesetzt)
+
+| Variable | Environment | Wert |
+|---|---|---|
+| `MATCHING_FIND_V01_RANKING_ENABLED` | Vercel **Preview** (optional auf einen Branch beschränkt) | `true` |
+| `MATCHING_FIND_V01_RANKING_ENABLED` | Vercel **Production** | nicht gesetzt |
+
+Vercel trennt Variablen je Environment; die VAPID-Schlüssel sind schon so eingerichtet. Server-Variablen gelten ab dem nächsten Deploy des jeweiligen Environments.
+
+**Zurück auf Legacy:** Variable entfernen oder auf etwas anderes als `true` setzen und neu deployen. Es gibt keinen Datenzustand, der zurückgesetzt werden müsste. Die Freigabe-Einstellungen bleiben gespeichert und werden ohne Flag weder gezeigt noch verwendet.
+
+**Vorbedingungen:**
+
+1. Die Migrationen E3a (`20261203120000`) und E3d (`20261204120000`) müssen in der Datenbank sein, die die Preview nutzt. Ohne E3a fällt jede Suche auf Legacy zurück (`pool_failed`); ohne E3d werden die Zähler stillschweigend verworfen.
+2. **Offen:** Wenn Preview dieselbe Supabase-Instanz wie Production nutzt, rankt eine Preview mit Flag die echten FIND-Profile für die angemeldete Person und schreibt Zähler in die Production-Datenbank. Das ist dann faktisch ein Production-Test und braucht deine Freigabe.
+
+## Preview-QA (lokal, synthetisch, 300 Profile)
+
+Geprüft mit eigenem Dev-Server, headless Chrome (1280 px und 390 px), DE und EN, angemeldet als synthetische Personen. Die Daten wurden danach per Reset entfernt.
+
+- **Legacy (Flag aus):** 18 von 18 Seiten in Text und Pixeln identisch mit dem Stand vor E3a (`39e0dd11`): Suche Seite 1 und 2, Stöbern, Gemerkte, FIND-Profil, Sichtbarkeit.
+- **v0.1:**
+  - höchstens 3 Reasons je Karte, keine leeren Container, keine alten Kriterien-Chips
+  - Transparenzhinweis statt Sortiersatz
+  - Seite 2, letzte Seite und Seite außerhalb des Bereichs geprüft
+  - Freigabe an und aus in beiden Orten; Sichtbarkeit und Einträge unverändert
+  - ohne Fähigkeiten der Hinweis statt Umschalter
+  - kein horizontales Scrollen bei 390 px
+- **Rückfall (lokal erzwungen, Inputs-RPC entzogen):** heutige Suche mit Sortiersatz und Chips, keine Reasons, kein Fehler auf der Seite, Zähler `fallback:inputs_failed`.
+- **Behoben:**
+  1. Die Gesamtzahl sagte im v0.1-Modus „entsprechen deinen praktischen Filtern“. Jetzt heißt es „kommen nach den Angaben beider Seiten infrage“.
+  2. Der Status des Umschalters stand in der schmalen Spalte allein am rechten Rand.
+- **Danach bereinigt (Entscheidung Maria):**
+  1. Im v0.1-Modus entfällt der Rollenpunkt in „Ein Gespräch könnte interessant sein, weil …“, wenn alle seine Rollen schon als Reason auf der Karte stehen.
+  2. Pro Karte erst die übrigen Reasons, danach höchstens ein Unterschied (`FIND_DIFF_*`).
+  3. Eine Seite außerhalb des Bereichs bei vorhandenen Treffern zeigt „Auf dieser Seite gibt es keine Profile mehr.“ mit „Zur ersten Seite“.
+  4. Ohne eigene Kriterien heißt es im v0.1-Modus „… Profile, die nach den Angaben beider Seiten grundsätzlich infrage kommen“.
+  5. Freigabe ohne doppelte Beschriftung, violette Steuerelemente; Singular „Ein Profil entspricht“ / „One profile matches“.

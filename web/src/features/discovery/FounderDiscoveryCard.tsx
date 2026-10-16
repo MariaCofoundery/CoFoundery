@@ -111,7 +111,25 @@ export function FounderDiscoveryCard({
 }) {
   const { profile } = candidate;
   // Kein Score und keine Reihenfolge: einzelne Angaben nebeneinander, siehe conversationPrompts.ts.
-  const why = viewer ? conversationPoints({ viewer, candidate: profile }).why : [];
+  const allWhy = viewer ? conversationPoints({ viewer, candidate: profile }).why : [];
+  // v0.1: Steht dieselbe Rollenaussage schon unter „Aus euren Angaben“, entfällt der Rollenpunkt
+  // im Gesprächsblock (Preview-QA E3d) - nur wenn ALLE seine Rollen dort schon stehen, sonst
+  // ginge eine Angabe verloren. Alle anderen Punkte bleiben; Legacy unverändert.
+  const shownRoles = (code: string) =>
+    new Set(
+      showMatchReasons && rankingMode === "v01"
+        ? (candidate.matchingReasons ?? []).filter((r) => r.messageKey === `find.matchingReasons.${code}`).map((r) => r.data.role)
+        : []
+    );
+  const coveredBy = (code: string, roles: string[] | undefined) => {
+    const shown = shownRoles(code);
+    return (roles ?? []).length > 0 && (roles ?? []).every((role) => shown.has(role));
+  };
+  const why = allWhy.filter(
+    (point) =>
+      !(point.claim === "FIND.WHY.ROLE_SOUGHT_BY_YOU" && coveredBy("FIND_ROLE_NEED_COVERED", point.values.roles)) &&
+      !(point.claim === "FIND.WHY.ROLE_SOUGHT_BY_THEM" && coveredBy("FIND_ROLE_NEED_COVERED_REVERSE", point.values.roles))
+  );
   const roles = compactDiscoveryValues(
     discoveryRoleLabels(profile.ownRoles, profile.ownRoleOther, (role) =>
       roleLabel(t, role as DiscoveryFounderRole)

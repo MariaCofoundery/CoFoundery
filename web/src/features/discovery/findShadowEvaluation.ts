@@ -256,3 +256,32 @@ export function evaluateFindShadowPopulation(
   }
   return aggregateFindShadowEvaluations(evaluations, { notComparable, notInPool, failed });
 }
+
+// ---------------------------------------------------------------------------
+// Laufzeit (E3d): je Stufe nur Median, p95, Maximum über alle gemessenen Betrachter.
+// ---------------------------------------------------------------------------
+export type FindRuntimeSample = Readonly<{ poolMs: number; inputsMs: number; engineMs: number; totalMs: number }>;
+export type FindRuntimeStats = Readonly<{ median: number; p95: number; max: number }>;
+export type FindRuntimeAggregate = Readonly<{
+  viewersMeasured: number;
+  stages: Readonly<Record<keyof FindRuntimeSample, FindRuntimeStats>> | null;
+}>;
+
+const ms = (x: number) => Math.round(x * 10) / 10;
+
+/** Nächstgelegener Rang (keine Interpolation) - bei wenigen Werten ehrlicher als ein geschätztes Perzentil. */
+function percentile(sorted: readonly number[], p: number): number {
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(p * sorted.length) - 1))];
+}
+
+export function aggregateFindRuntimes(samples: readonly FindRuntimeSample[]): FindRuntimeAggregate {
+  if (samples.length === 0) return { viewersMeasured: 0, stages: null };
+  const stage = (key: keyof FindRuntimeSample): FindRuntimeStats => {
+    const sorted = samples.map((x) => x[key]).filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
+    return { median: ms(median(sorted)), p95: ms(percentile(sorted, 0.95)), max: ms(sorted[sorted.length - 1]) };
+  };
+  return {
+    viewersMeasured: samples.length,
+    stages: { poolMs: stage("poolMs"), inputsMs: stage("inputsMs"), engineMs: stage("engineMs"), totalMs: stage("totalMs") },
+  };
+}

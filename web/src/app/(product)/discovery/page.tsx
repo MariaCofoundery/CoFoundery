@@ -18,6 +18,7 @@ import {
 } from "@/features/discovery/discoveryPresentation";
 import {
   type DiscoveryFounderRole,
+  type FindRankingMode,
   type FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
@@ -81,9 +82,12 @@ function SearchBrief({
   preferences,
   t,
   capabilityLabel,
+  rankingMode,
 }: {
   preferences: FounderSearchPreferences;
   t: DiscoveryT;
+  /** v0.1: Ohne eigene Kriterien sieht man nicht „alle“ - die Bedingungen der anderen Seite gelten. */
+  rankingMode: FindRankingMode;
   /**
    * Die Beschriftungen der Faehigkeitsbereiche stehen in einem eigenen
    * Sprachpaket - deshalb kommt die Aufloesung von aussen herein.
@@ -127,6 +131,8 @@ function SearchBrief({
             <div className="mt-3 flex flex-wrap gap-2">
               {labels.map((label) => <span key={label} className={CHIP_CLASS}>{label}</span>)}
             </div>
+          ) : rankingMode === "v01" ? (
+            <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.search.briefEmptyTextV01")}</p>
           ) : (
             <p className="mt-2 text-sm leading-6 text-slate-600">{t("v2.search.briefEmptyText")}</p>
           )}
@@ -225,6 +231,7 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
             preferences={preferences}
             t={t}
             capabilityLabel={(areaId: string) => tCapability(`areaLabels.${areaId}`)}
+            rankingMode={result.rankingMode}
           />
         ) : null}
 
@@ -281,7 +288,13 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t(mode === "explore" ? "v2.explore.eyebrow" : "v2.results.eyebrow")}</p>
             <h2 className="mt-2 text-2xl font-semibold">{t(mode === "explore" ? "v2.explore.title" : "v2.results.title")}</h2>
-            <p className="mt-2 text-sm text-slate-600">{t(mode === "explore" ? "v2.explore.count" : "v2.results.count", { count: result.totalCount })}</p>
+            {/* E3d (Preview-QA): Im v0.1-Modus zählt die Gesamtzahl, wer nach den Bedingungen
+                BEIDER Seiten infrage kommt - nicht „deine praktischen Filter“. */}
+            {mode === "search" && result.rankingMode === "v01" ? (
+              <p className="mt-2 text-sm text-slate-600">{t("v2.results.countV01", { count: result.totalCount })}</p>
+            ) : (
+              <p className="mt-2 text-sm text-slate-600">{t(mode === "explore" ? "v2.explore.count" : "v2.results.count", { count: result.totalCount })}</p>
+            )}
             {/* Phase 11: Die Reihenfolge offen sagen - es gibt keine Passung als Sortierung.
                 E3c: Hat der v0.1-Pfad diese Suchseite geliefert (rankingMode, nicht das Flag -
                 nach einem Rückfall gilt wieder die heutige Reihenfolge), steht hier, was sie
@@ -298,6 +311,15 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
           <div className="grid gap-5 lg:grid-cols-2">
             {result.candidates.map((candidate) => <FounderDiscoveryCard key={candidate.profile.id} candidate={candidate} preferences={preferences.mustHaves} t={t} saved={savedProfileIds.has(candidate.profile.id)} photo={memberPhotos.get(candidate.profile.userId)} showMatchReasons={mode === "search"} viewer={profile} rankingMode={mode === "search" ? result.rankingMode : "legacy"} />)}
           </div>
+        ) : (mode === "explore" || isActive) && result.totalCount > 0 ? (
+          // Seite außerhalb des Bereichs (z. B. per URL): Es GIBT Profile, nur nicht auf dieser
+          // Seite - kein „Keine Profile mit diesen Filtern“ (Preview-QA E3d).
+          <section className={CARD_CLASS}>
+            <h2 className="text-lg font-semibold">{t("v2.pagination.outOfRangeTitle")}</h2>
+            <Link href={`/discovery?mode=${mode}`} className={`${SECONDARY_CTA_CLASS} mt-5`}>
+              {t("v2.pagination.firstPage")}
+            </Link>
+          </section>
         ) : (
           <section className={CARD_CLASS}>
             <h2 className="text-lg font-semibold">{mode === "explore" ? t("v2.explore.emptyTitle") : isActive ? t("v2.results.emptyTitle") : t("v2.results.inactiveTitle")}</h2>

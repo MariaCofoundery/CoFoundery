@@ -63,15 +63,18 @@ export function CapabilityMatchingPermissionSection({
       <h3 id="capability-matching-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600">{t("body")}</p>
       <label className="mt-3 inline-flex min-h-11 items-center gap-3 text-sm text-slate-800">
+        {/* Der Titel benennt den Schalter (aria-labelledby) - sichtbar steht daneben nur der
+            Zustand, statt den Titel ein zweites Mal zu wiederholen (Preview-QA E3d). Farbe wie
+            die übrigen Capability-Eingaben (accent-violet-600). */}
         <input
           type="checkbox"
           checked={allowed}
           disabled={pending}
           onChange={(event) => toggle(event.target.checked)}
-          className="h-5 w-5 rounded border-slate-300"
+          aria-labelledby="capability-matching-title"
+          className="h-5 w-5 rounded border-slate-300 accent-violet-600"
         />
-        <span>{t("toggleLabel")}</span>
-        <span className="text-slate-500">({allowed ? t("statusOn") : t("statusOff")})</span>
+        <span>{allowed ? t("statusOn") : t("statusOff")}</span>
       </label>
       <p className="mt-2 text-xs leading-5 text-slate-500">{t("revocable")}</p>
       {error ? <p role="alert" className="mt-3 text-sm text-red-700">{t("error")}</p> : null}
