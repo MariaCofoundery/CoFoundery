@@ -4,6 +4,7 @@
  *   npm run matching:harness -- find <personA> <personB>     zwei FIND-Fixtures vergleichen
  *   npm run matching:harness -- rank-find <person> [n]       FIND-Rangliste für eine Person
  *   npm run matching:harness -- connect <seekListing> [n]    ein CONNECT-Gesuch gegen alle Angebote ranken
+ *   npm run matching:harness -- find-shadow <person> [page]  FIND-Shadow (E1): heutige Reihenfolge vs. v0.1, Seite vs. global
  *   npm run matching:harness -- list                         verfügbare Fixture-IDs
  *
  * Läuft ausschließlich gegen die synthetischen Test-Fixtures (ohne Holdout-Personen).
@@ -64,6 +65,26 @@ if (command === "list") {
     explanations: r.result.explanations.filter((e) => e.audience === "a"),
     internal: { mutuality: r.result.relevance.mutuality, aToB: r.result.relevance.aToB, bToA: r.result.relevance.bToA },
   })));
+} else if (command === "find-shadow") {
+  // Wie FIND heute: published_at absteigend, dann ID, Seiten zu 12 - ohne die Suchfilter der RPC.
+  // Der Shadow rankt nur die geladene Seite; "global" zeigt, was dabei verloren geht (Pool-Bias).
+  const viewer = requireProfile(x);
+  const pageSize = Number(y ?? 12);
+  const visible = synthetic.profiles
+    .filter((p) => pool.has(p.id) && p.id !== viewer.personId && p.find_profile?.status === "active")
+    .map((p) => findPerson(p))
+    .sort((m, n) => (m.publishedAt === n.publishedAt ? (m.personId < n.personId ? -1 : 1) : (n.publishedAt ?? "") < (m.publishedAt ?? "") ? -1 : 1));
+  const ctx = { familyOfArea: synthetic.family_of, idfCorpusVersion: "none-find-does-not-use-idf", computedAt: null, blockedPersonIds: new Set<string>() };
+  const rankOn = (people: typeof visible) => new Map(rankFindCandidates(viewer, people, ctx).map((r) => [r.result.subject.b, r.rank]));
+  const onPage = rankOn(visible.slice(0, pageSize));
+  const global = rankOn(visible);
+  print(visible.map((p, i) => ({
+    candidate: p.personId,
+    visiblePosition: i + 1,
+    onFirstPage: i < pageSize,
+    shadowRankOnPage: onPage.get(p.personId) ?? null,
+    shadowRankGlobal: global.get(p.personId) ?? null,
+  })).filter((row) => row.onFirstPage || (row.shadowRankGlobal !== null && row.shadowRankGlobal <= pageSize)));
 } else if (command === "connect") {
   const seek = seekInput(x ?? "");
   const offers = [...listingsById.values()]

@@ -291,12 +291,16 @@ test("Snapshot- und Service-Role-Code ist serverseitig und in keinem Produktpfad
 // ---------------------------------------------------------------------------
 // Abgrenzung: FIND und CONNECT produktiv unverändert
 // ---------------------------------------------------------------------------
-test("FIND braucht kein IDF; außerhalb von lib/matching nutzt nichts die Engine", () => {
+test("FIND braucht kein IDF; außerhalb von lib/matching nutzt nur der FIND-Shadow die Engine", () => {
   for (const file of ["findMatcher.ts", "findRelevance.ts", "findEligibility.ts"]) {
     assert.doesNotMatch(read(`src/lib/matching/v01/${file}`), /idf"/);
   }
   // Vorbereitete, selbst nirgends eingebundene Server-Module (eigener Test prüft, dass niemand sie importiert).
-  const PREPARED_UNWIRED = [join("src", "features", "discovery", "privateSearchConstraints.ts")];
+  // Seit E1 zusätzlich der FIND-Shadow: rechnet nach der Antwort und verwirft das Ergebnis.
+  const PREPARED_UNWIRED = [
+    join("src", "features", "discovery", "privateSearchConstraints.ts"),
+    join("src", "features", "discovery", "findMatchingShadow.ts"),
+  ];
   const productUsers: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {

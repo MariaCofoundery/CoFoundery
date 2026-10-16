@@ -219,7 +219,7 @@ test("öffentliche Kandidatendaten kennen keine privaten Kriterien", () => {
   assert.doesNotMatch(mapping, /mustHaves|must_haves/, "Suchtreffer werden nur aus RPC-Spalten des Kandidaten gebaut");
 });
 
-test("der private Loader ist serverseitig und noch von keinem Produktpfad eingebunden", () => {
+test("der private Loader ist serverseitig und nur vom FIND-Shadow eingebunden", () => {
   assert.match(read("src/features/discovery/privateSearchConstraints.ts"), /^import "server-only";/);
   const users: string[] = [];
   const walk = (dir: string) => {
@@ -235,7 +235,8 @@ test("der private Loader ist serverseitig und noch von keinem Produktpfad eingeb
     }
   };
   walk("src");
-  assert.deepEqual(users, []);
+  // Seit E1 nur der FIND-Shadow (serverseitig, Ergebnis wird verworfen).
+  assert.deepEqual(users, [join("src", "features", "discovery", "findMatchingShadow.ts")]);
 });
 
 // ---------------------------------------------------------------------------

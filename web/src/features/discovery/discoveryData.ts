@@ -1,6 +1,9 @@
 import "server-only";
 
+import { after } from "next/server";
+
 import { createClient } from "@/lib/supabase/server";
+import { scheduleFindMatchingShadow } from "@/features/discovery/findMatchingShadow";
 import {
   getPrioritizedDiscoveryAlignmentDimensions,
   normalizeDiscoveryAlignmentPreferences,
@@ -674,12 +677,29 @@ export async function getDiscoveryCandidatesForCurrentUser(
     alignmentSignals,
     new Map(candidateProfiles.map((profile) => [profile.id, profile.userId]))
   );
+  const totalCount = rows[0] ? Number(rows[0].total_count) : 0;
+
+  // MATCHING v0.1 IM SCHATTEN (E1): nur mit MATCHING_FIND_V01_SHADOW_ENABLED=true,
+  // erst nach der Antwort, Ergebnis wird verworfen. Ändert nichts an Auswahl,
+  // Reihenfolge oder Seiten - siehe features/discovery/findMatchingShadow.ts.
+  scheduleFindMatchingShadow(
+    {
+      viewerUserId: normalizedUserId,
+      viewerProfile: ownProfile,
+      viewerMustHaves: preferences ? mustHaves : null,
+      candidates: candidateProfiles,
+      page,
+      pageSize,
+      rpcTotalCount: totalCount,
+    },
+    { schedule: after }
+  );
 
   return {
     candidates,
     page,
     pageSize,
-    totalCount: rows[0] ? Number(rows[0].total_count) : 0,
+    totalCount,
   };
 }
 
