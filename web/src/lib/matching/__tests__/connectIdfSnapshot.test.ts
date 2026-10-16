@@ -304,6 +304,8 @@ test("FIND braucht kein IDF; außerhalb von lib/matching nutzen nur die FIND-Sha
     join("src", "features", "discovery", "findMatchingGlobalShadow.ts"),
     join("src", "features", "discovery", "findMatchingInputs.ts"),
     join("src", "features", "discovery", "findShadowEvaluation.ts"),
+    // E3a: set-basierter Pool - ebenfalls ohne sichtbare Wirkung.
+    join("src", "features", "discovery", "findMatchingPool.ts"),
   ];
   const productUsers: string[] = [];
   const walk = (dir: string) => {

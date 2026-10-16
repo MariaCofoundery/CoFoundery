@@ -186,7 +186,7 @@ Aggregiert über alle Personen: Summen, Anteile, Mittelwerte. Keine IDs, Namen, 
 
 **Prüfung der Nachbildung:** Lokal mit 101 synthetischen Personen gegen die echte RPC gerechnet. Bei allen 99 vergleichbaren Betrachtern war die Reihenfolge identisch.
 
-**Hinweis seit 80f39156:** `currentFindRpcOrder` bildet die Suche in der Fassung `search_by_frame` (vor 80f39156) nach, also ohne Founder-Rolle und ohne Blockierung. Die oben genannte Prüfung und die E2-Zahlen beziehen sich auf diese Fassung. Für eine künftige Auswertung muss die Nachbildung um beide Bedingungen ergänzt werden (in den synthetischen Daten gibt es weder Blockierungen noch Personen ohne Founder-Rolle, die Fixture-Zahlen ändern sich dadurch nicht).
+**Hinweis seit 80f39156:** Die oben genannte Prüfung und die E2-Zahlen beziehen sich auf die Fassung `search_by_frame` (ohne Founder-Rolle und Blockierung). **Seit E3a** bildet `currentFindRpcOrder` die aktuelle Suche nach (mit Founder-Rolle und Blockierung) und wurde erneut lokal gegen die echte RPC geprüft (siehe E3a).
 
 **Ergebnisse auf synthetischen Daten** (99 von 101 vergleichbar):
 
@@ -227,3 +227,89 @@ npm run matching:find-shadow-eval -- --confirm-remote=<host>   # NICHT ohne ausd
 ```
 
 Gegen Production ist nichts gelaufen.
+
+---
+
+# E3a – Produktionsfähiger globaler Kandidatenpool
+
+Umsetzung:
+
+- Migration `20261203120000_find_matching_pool.sql`
+- `web/src/features/discovery/findMatchingPool.ts`
+- `scripts/find-pool-bench.ts` (`npm run matching:find-pool-bench`, nur lokal)
+
+**Weiterhin nichts sichtbar:** Die FIND-Suche nutzt unverändert `search_founder_discovery_profiles_v2`, und die Flags sind standardmäßig aus.
+
+## Pool-Vertrag (nur Produkt-/Access-Gates)
+
+| Regel | wo |
+|---|---|
+| FIND-Profil `active` | `find_matching_pool_core` |
+| Inhaber aktuell Founder | `discovery_profile_owner_is_founder` |
+| nicht die betrachtende Person | Pool |
+| keine Blockierung, beide Richtungen | `is_network_interaction_blocked` |
+| betrachtende Person selbst aktiv und Founder | sonst `null` (wie die Suche: nur wer aktiv ist, sucht) |
+| gelöschtes Konto | Kaskade, keine eigene Regel nötig |
+
+**Nicht im Pool:**
+
+- die acht v0.1-Kriterien (Rollen, Stunden, Remote, Ort, Suchstand, Start, Capability, Expertise),
+- fehlende Daten,
+- die Kriterien der Gegenseite,
+- die vier Produktfelder,
+- Workstyle.
+
+Das alles bleibt Sache der Engine. Eine FIND-eigene Kontosperre gibt es nicht. CONNECT-Mitgliedschaftssperren gelten für FIND nicht, wie bei der heutigen Suche.
+
+## Funktionen
+
+| Funktion | Zugriff | liefert |
+|---|---|---|
+| `get_find_matching_pool()` | angemeldete Person (`auth.uid()`), ohne Service-Role-Pool | Betrachter + Pool als ein JSON-Dokument |
+| `get_find_matching_pool_for_viewer(uuid)` | nur `service_role` | dasselbe für Server-Shadow und Auswertung |
+| `get_find_matching_inputs(uuid[])` | nur `service_role` | je Person: `person_core`-Matchingfelder, **nur die acht v0.1-Kriterien** (nie die vier Produktfelder, nichts Unbekanntes), Capability-Einträge **nur mit Matching-Freigabe** |
+
+**Felder im Pool:** `user_id`, `profile_id`, Rollen, Stunden, Flexibilität, Commitment, Phase, Ziel, Suchstand, Start, `published_at`, `updated_at` und `has_contact`. `has_contact` ist eine angenommene Verbindung (Intro, CONNECT-Kontakt oder gemeinsames Team) und wirkt nur auf die Tiefen-Sichtbarkeit von Reasons. Nicht enthalten sind Namen, Headline, Bio, Kriterien, Capability und Workstyle.
+
+**Service-Role:** Die Inputs brauchen sie, weil fremde `person_core`-Zeilen und Suchkriterien nur für ihre Inhaber lesbar sind. Der Pool selbst geht auch über die Sitzung (`get_find_matching_pool`). Beide Ergebnisse sind je ein JSON-Dokument, deshalb greift die PostgREST-Grenze von 1000 Zeilen nicht.
+
+## Abfragen
+
+| Profile | E2 (Tabellen-Blöcke) | E3a |
+|---|---|---|
+| 100 | 7 | 3 |
+| 1.000 | 22 | 3 |
+| 10.000 | 196 | 7 (Inputs in Blöcken zu 2000) |
+
+## Messung (lokal, synthetisch, Median über 5 Betrachter)
+
+| Profile | Pool | Inputs | Aufbau | Engine | Gesamt | Payload Pool + Inputs | Heap |
+|---|---|---|---|---|---|---|---|
+| 100 | 6 ms | 4 ms | <1 ms | 3 ms | 15 ms | ~0,1 MB | ~11 MB |
+| 1.000 | 22 ms | 22 ms | 1 ms | 34 ms | 84 ms | ~1 MB | ~30 MB |
+| 10.000 | 260 ms | 218 ms | 14 ms | 1.130 ms | 1,6 s | ~9,7 MB | ~200 MB |
+
+Zum Vergleich, der E2-Lader (ganze Population): 48 ms, 103 ms und 577 ms lokal. In Production kommt die Netzlatenz je Roundtrip hinzu, und davon hat E2 bei 10.000 Profilen 196.
+
+## Braucht es Cache?
+
+- **Bis etwa 1.000 Profile: nein.** Unter 100 ms lokal.
+- **Bei 10.000 Profilen dominiert die Engine (~70 %), nicht das Laden.** Ein Population-Cache spart höchstens ~0,5 s und löst das Problem nicht.
+
+Empfehlung für E3b in dieser Reihenfolge, ohne Formeländerung:
+
+1. Im Shadow-Lauf wird jedes Paar zweimal gerechnet (`matchFindPair` für den Status und noch einmal in `rankFindCandidates`). Den Rang aus den vorhandenen Ergebnissen zu bilden, halbiert die Engine-Zeit.
+2. Erst ab einigen tausend aktiven Profilen: ein Ergebnis-Cache je Betrachter mit kurzer Lebensdauer (z. B. 5–15 min). Er speichert nur geordnete IDs, Tie-Gruppen und Reason-Codes, keine Inputs. Er bindet sich an eine Bestandsversion (z. B. max `updated_at` des Pools) und hilft vor allem beim Blättern.
+3. Cache-Invalidierung erst danach. Noch nicht gebaut.
+
+## Seiten
+
+`paginateFindShadow` (12 je Seite) läuft auf dem globalen Rang. Getestet: deterministisch über Läufe, keine Doppelten, keine Lücken, Gleichstandsgruppen zusammenhängend auch über eine Seitengrenze, ohne eigene Tie-Oberfläche.
+
+## Nachbildung der aktuellen Suche
+
+`currentFindRpcOrder` berücksichtigt jetzt Founder-Rolle und Blockierung. Lokal geprüft mit 300 synthetischen Personen, darunter 13 Blockierungen und 6 aktive Profile ohne Founder-Rolle: Bei allen 288 vergleichbaren Betrachtern ist die Reihenfolge identisch mit der echten aktuellen RPC. 6 Betrachter sind wegen eines Capability-Filters nicht vergleichbar.
+
+## Parität
+
+Auf denselben 300 Personen liefert der DB-Pool für alle 294 suchenden Betrachter genau den E2-Basispool. Gate-Status, Rang, Gleichstände und Reason-Codes sind identisch. Ein Unit-Test prüft dasselbe auf Fixture-Daten.

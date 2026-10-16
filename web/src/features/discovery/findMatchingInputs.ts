@@ -83,3 +83,6 @@ export function createShadowServiceClient(): ShadowClient | null {
   if (!url || !key) return null;
   return createSupabaseClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
+
+/** Schlüssel eines ungeordneten Personenpaars (Blockierung, Verbindung). */
+export const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);

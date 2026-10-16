@@ -335,9 +335,12 @@ test("globaler Lauf nach der Antwort: Ergebnis nur beim Beobachter, Fehler nie n
   const env = { [GLOBAL_FIND_SHADOW_FLAG]: "true" };
   const tasks: (() => Promise<void>)[] = [];
   const results: unknown[] = [];
-  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => fakeClient(world(5)).client, onResult: (r) => results.push(r) });
-  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => fakeClient(world(5), { person_core: true }).client, onResult: (r) => results.push(r) });
-  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => null, onResult: (r) => results.push(r) });
+  // Seit E3a lädt der Shadow standardmäßig den set-basierten Pool (eigene Suite findMatchingPool.test.ts);
+  // hier geht es nur ums Einplanen und Fehlerverhalten, daher der Tabellen-Lader aus E2.
+  const loadPopulation = (client: Parameters<typeof loadFindMatchingPopulation>[0]) => loadFindMatchingPopulation(client);
+  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => fakeClient(world(5)).client, onResult: (r) => results.push(r), loadPopulation });
+  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => fakeClient(world(5), { person_core: true }).client, onResult: (r) => results.push(r), loadPopulation });
+  scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: (t) => void tasks.push(t), createServiceClient: () => null, onResult: (r) => results.push(r), loadPopulation });
   for (const t of tasks) await assert.doesNotReject(t());
   assert.deepEqual(results.map((r) => (r as { status: string; failure?: string | null }).failure ?? null), [null, "load_failed", "service_unavailable"]);
   assert.equal(scheduleGlobalFindMatchingShadow(VIEWER, { env, schedule: () => { throw new Error("no scope"); } }), "not_scheduled");

@@ -238,6 +238,8 @@ test("der private Loader ist serverseitig und nur von den FIND-Shadows eingebund
   // Seit E1/E2 nur die FIND-Shadows (serverseitig, Ergebnis wird verworfen).
   assert.deepEqual(users, [
     join("src", "features", "discovery", "findMatchingGlobalShadow.ts"),
+    // E3a: Pool-Lader normalisiert die Kriterien aus get_find_matching_inputs
+    join("src", "features", "discovery", "findMatchingPool.ts"),
     join("src", "features", "discovery", "findMatchingShadow.ts"),
   ]);
 });

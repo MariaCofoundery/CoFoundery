@@ -6,11 +6,13 @@ import {
   createShadowServiceClient,
   FIND_SHADOW_IDF_CORPUS_VERSION,
   hasMatchingPermission,
+  pairKey,
   PERSON_CORE_MATCHING_COLUMNS,
   type CapabilityEntryRow,
   type MatchingCoreRow,
   type ShadowClient,
 } from "@/features/discovery/findMatchingInputs";
+import { loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
 import { getCandidateMatchingV01Constraints } from "@/features/discovery/privateSearchConstraints";
 import { presentFindReasons } from "@/lib/matching/reasonPresentation";
 import { EMPTY_MUST_HAVES } from "@/lib/matching/v01/adapters";
@@ -106,7 +108,6 @@ function chunks<T>(items: readonly T[], size: number): T[][] {
   return out;
 }
 
-const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
 export type FindMatchingPopulation = Readonly<{
   /** Aktive FIND-Profile (nur Matching-Spalten). */
@@ -274,6 +275,18 @@ export async function loadFindMatchingPopulation(
   };
 }
 
+const EMPTY_POPULATION: FindMatchingPopulation = {
+  profiles: new Map(),
+  founders: new Set(),
+  core: new Map(),
+  constraints: new Map(),
+  blockedPairs: new Set(),
+  entries: [],
+  familyOfArea: {},
+  connectedPairs: null,
+  queryCount: 0,
+};
+
 export type FindBasePool = Readonly<{
   viewer: FounderDiscoveryProfile;
   candidates: readonly FounderDiscoveryProfile[];
@@ -424,11 +437,21 @@ export type ScheduleGlobalFindShadowOptions = Readonly<{
   createServiceClient?: () => ShadowClient | null;
   /** Nur Tests und lokale Hilfen. Ohne Beobachter wird das Ergebnis verworfen. */
   onResult?: (result: GlobalFindShadowRun | { status: "failed"; failure: "service_unavailable" | "load_failed" }) => void;
+  /**
+   * Standard seit E3a: set-basierter Pool (get_find_matching_pool_for_viewer) + Inputs.
+   * null = die Person sucht selbst nicht.
+   */
+  loadPopulation?: (client: ShadowClient, viewerUserId: string) => Promise<FindMatchingPopulation | null>;
 }>;
 
+async function loadPoolPopulation(client: ShadowClient, viewerUserId: string): Promise<FindMatchingPopulation | null> {
+  const load = await loadFindMatchingPool(client as Parameters<typeof loadFindMatchingPool>[0], { kind: "service", viewerUserId });
+  return load.population;
+}
+
 /**
- * Plant den globalen Shadow nach der Antwort ein. Lädt dafür die ganze Population -
- * nur für kleine Bestände gedacht (siehe Doku, Skalierung). Wirft nie.
+ * Plant den globalen Shadow nach der Antwort ein. Lädt seit E3a nur den Pool der Person
+ * (set-basiert, zwei bis drei Abfragen) statt der ganzen Population. Wirft nie.
  */
 export function scheduleGlobalFindMatchingShadow(
   viewerUserId: string,
@@ -440,12 +463,13 @@ export function scheduleGlobalFindMatchingShadow(
       try {
         const client = (options.createServiceClient ?? createShadowServiceClient)();
         if (!client) return options.onResult?.({ status: "failed", failure: "service_unavailable" });
-        let population: FindMatchingPopulation;
+        let population: FindMatchingPopulation | null;
         try {
-          population = await loadFindMatchingPopulation(client);
+          population = await (options.loadPopulation ?? loadPoolPopulation)(client, viewerUserId);
         } catch {
           return options.onResult?.({ status: "failed", failure: "load_failed" });
         }
+        if (!population) return options.onResult?.(runGlobalFindMatchingShadow(EMPTY_POPULATION, viewerUserId));
         options.onResult?.(runGlobalFindMatchingShadow(population, viewerUserId));
       } catch {
         // Shadow darf nie etwas Sichtbares beeinflussen; kein Log, keine Werte.

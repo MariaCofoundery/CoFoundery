@@ -1,6 +1,7 @@
 import "server-only";
 
 import { runGlobalFindMatchingShadow, type FindMatchingPopulation } from "@/features/discovery/findMatchingGlobalShadow";
+import { pairKey } from "@/features/discovery/findMatchingInputs";
 import { EMPTY_MUST_HAVES } from "@/lib/matching/v01/adapters";
 import type { FindMatchResult, FindMustHavesInput, GateStatus, Ranked } from "@/lib/matching/v01/types";
 
@@ -9,10 +10,11 @@ import type { FindMatchResult, FindMustHavesInput, GateStatus, Ranked } from "@/
  * Namen, Kriterien, Orte, Texte oder Capability-Werte im Ergebnis.
  *
  * `currentFindRpcOrder` bildet den WHERE-Teil und die Sortierung von
- * search_founder_discovery_profiles_v2 (20261091120000_search_by_frame.sql) für die
- * Auswertung nach - einseitig, Ja/Nein, fehlende Werte schließen aus, ohne Rolle und
- * Blockierung. Den Capability-Filter kann sie nicht nachbilden (er liest Einträge
- * ohne Matching-Freigabe); solche Suchen gelten als „nicht vergleichbar“.
+ * search_founder_discovery_profiles_v2 in der aktuellen Fassung
+ * (20261130120000_find_access_integrity.sql) für die Auswertung nach - einseitig,
+ * Ja/Nein, fehlende Werte schließen aus; seit 80f39156 nur Founder und ohne
+ * Blockierung (beide Richtungen). Den Capability-Filter kann sie nicht nachbilden (er
+ * liest Einträge ohne Matching-Freigabe); solche Suchen gelten als „nicht vergleichbar“.
  *
  * Aus den Zahlen folgt keine Qualitätsaussage und keine automatische Produktentscheidung.
  */
@@ -27,6 +29,10 @@ export type RpcComparableCandidate = Readonly<{
   availabilityHoursPerWeek: number | null;
   searchIntent: string | null;
   startHorizon: string | null;
+  /** Inhaber aktuell Founder (seit 80f39156 Bedingung der Suche). Fehlt die Angabe, gilt true. */
+  isFounder?: boolean;
+  /** Blockierung mit der betrachtenden Person, beliebige Richtung (seit 80f39156). */
+  blockedWithViewer?: boolean;
 }>;
 
 const norm = (s: string | null | undefined) => (s ?? "").trim().toLowerCase();
@@ -40,6 +46,7 @@ export function currentFindRpcOrder(
   const location = norm(mustHaves.desiredLocationRegion);
   const expertise = new Set(mustHaves.requiredExpertiseAny.map(norm));
   const hits = candidates.filter((c) => {
+    if (c.isFounder === false || c.blockedWithViewer === true) return false;
     if (mustHaves.requiredRolesAny.length > 0 && !c.ownRoles.some((r) => mustHaves.requiredRolesAny.includes(r))) return false;
     if (expertise.size > 0 && !c.expertise.some((e) => expertise.has(norm(e)))) return false;
     if (location && (c.locationRegion === null || norm(c.locationRegion) !== location)) return false;
@@ -233,7 +240,13 @@ export function evaluateFindShadowPopulation(
     }
     const visible = currentFindRpcOrder(
       population.constraints.get(viewerId) ?? EMPTY_MUST_HAVES,
-      comparable.filter((c) => c.userId !== viewerId),
+      comparable
+        .filter((c) => c.userId !== viewerId)
+        .map((c) => ({
+          ...c,
+          isFounder: population.founders.has(c.userId),
+          blockedWithViewer: population.blockedPairs.has(pairKey(c.userId, viewerId)),
+        })),
     );
     if (visible === "not_comparable") {
       notComparable += 1;

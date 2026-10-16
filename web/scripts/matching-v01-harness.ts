@@ -99,7 +99,7 @@ if (command === "list") {
     const others = people.filter((p) => p.personId !== viewer.personId);
     const candidates = others.filter((p) => p.isFounder);
     const { results, ranked } = rankGlobalFindShadow(viewer, candidates, { familyOfArea: synthetic.family_of, computedAt: NOW });
-    const visible = currentFindRpcOrder(viewer.mustHaves, others.map((p) => ({ ...p, userId: p.personId })));
+    const visible = currentFindRpcOrder(viewer.mustHaves, others.map((p) => ({ ...p, userId: p.personId, isFounder: p.isFounder, blockedWithViewer: false })));
     if (visible === "not_comparable") {
       notComparable += 1;
       continue;

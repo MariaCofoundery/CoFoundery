@@ -5,7 +5,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(22);
+select extensions.plan(23);
 
 -- A = Eigentümerin, F = anderer Founder, V = Advisor, M = reines Connect-Mitglied, N = ohne Kontext
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
@@ -96,12 +96,18 @@ reset role;
 select extensions.is(
   (select array_agg(p.proname::text order by p.proname) from pg_proc p join pg_namespace ns on ns.oid = p.pronamespace
    where ns.nspname = 'public' and p.prosrc ilike '%must_haves%'),
-  null, 'keine Funktion liest must_haves');
+  array['get_find_matching_inputs'],
+  'nur get_find_matching_inputs liest must_haves (E3a: nur acht v0.1-Felder, nur service_role)');
+select extensions.ok(
+  not has_function_privilege('authenticated', 'public.get_find_matching_inputs(uuid[])', 'execute')
+  and not has_function_privilege('anon', 'public.get_find_matching_inputs(uuid[])', 'execute')
+  and has_function_privilege('service_role', 'public.get_find_matching_inputs(uuid[])', 'execute'),
+  'get_find_matching_inputs: nur service_role');
 select extensions.is(
   (select array_agg(p.proname::text order by p.proname) from pg_proc p join pg_namespace ns on ns.oid = p.pronamespace
    where ns.nspname = 'public' and p.prosrc ilike '%founder_search_preferences%'),
-  array['delete_founder_account_data','get_discovery_workstyle_signals','set_discovery_workstyle_consent'],
-  'nur bekannte Funktionen berühren die Tabelle (Löschung, Workstyle-Zustimmung)');
+  array['delete_founder_account_data','get_discovery_workstyle_signals','get_find_matching_inputs','set_discovery_workstyle_consent'],
+  'nur bekannte Funktionen berühren die Tabelle (Löschung, Workstyle-Zustimmung, Matching-Inputs)');
 select extensions.is(
   (select count(*)::integer from pg_views where schemaname = 'public' and definition ilike '%founder_search_preferences%'),
   0, 'keine View auf die Tabelle');
