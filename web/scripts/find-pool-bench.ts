@@ -5,7 +5,9 @@
  *   npm run matching:find-pool-bench -- --viewers=20
  *
  * Misst je Betrachter getrennt: Basispool, Inputs, Bereichsfamilien, Aufbau der
- * Population, Engine (Gate + Ranking), Pagination und Gesamtzeit; dazu einmal den
+ * Population, Engine (Gate + Ranking, ein Durchlauf je Paar), Pagination, Laden der
+ * Karten für die 12 IDs der ersten Seite (lokal über den Service-Client mit denselben
+ * Spalten wie der RLS-Lader - eine Annäherung) und Gesamtzeit; dazu einmal den
  * E2-Lader (ganze Population) zum Vergleich. Ausgabe nur Kennzahlen (Mediane, Bytes,
  * Abfragen) - keine IDs, keine Inhalte. Für synthetische lokale Daten gedacht; gegen
  * eine nicht-lokale Datenbank bricht das Skript ab.
@@ -43,7 +45,11 @@ const e2 = await loadFindMatchingPopulation(client);
 const e2Ms = performance.now() - e2Start;
 const viewers = [...e2.profiles.keys()].filter((id) => e2.founders.has(id)).sort().slice(0, viewersWanted);
 
-const stages: Record<string, number[]> = { poolMs: [], inputsMs: [], areasMs: [], assemblyMs: [], engineMs: [], paginationMs: [], totalMs: [] };
+const stages: Record<string, number[]> = { poolMs: [], inputsMs: [], areasMs: [], assemblyMs: [], engineMs: [], paginationMs: [], pageDetailMs: [], totalMs: [] };
+const CARD_COLUMNS =
+  "id, user_id, display_name, headline, bio, own_roles, seeking_roles, own_role_other, seeking_role_other, expertise, industries, " +
+  "location_region, remote_mode, availability_hours_per_week, availability_flexibility, availability_condition, recent_step, " +
+  "commitment_level, venture_stage, venture_goal, search_intent, start_horizon, status, published_at, created_at, updated_at";
 const sizes = { poolBytes: [] as number[], inputBytes: [] as number[], poolCandidates: [] as number[], ranked: [] as number[], queries: [] as number[] };
 for (const viewerUserId of viewers) {
   const start = performance.now();
@@ -54,13 +60,18 @@ for (const viewerUserId of viewers) {
   const e1 = performance.now();
   const page = paginateFindShadow(run.ranked, 1);
   const e2End = performance.now();
+  const pageIds = page.items.map((r) => load.population!.profiles.get(r.result.subject.b)!.id);
+  const { error: detailError } = await client.from("founder_discovery_profiles").select(CARD_COLUMNS).in("id", pageIds).eq("status", "active");
+  if (detailError) throw new Error("Kartenabfrage fehlgeschlagen");
+  const e3End = performance.now();
   stages.poolMs.push(load.timings.poolMs);
   stages.inputsMs.push(load.timings.inputsMs);
   stages.areasMs.push(load.timings.areasMs);
   stages.assemblyMs.push(load.timings.assemblyMs);
   stages.engineMs.push(e1 - e0);
   stages.paginationMs.push(e2End - e1);
-  stages.totalMs.push(e2End - start);
+  stages.pageDetailMs.push(e3End - e2End);
+  stages.totalMs.push(e3End - start);
   sizes.poolBytes.push(load.payloadBytes.pool);
   sizes.inputBytes.push(load.payloadBytes.inputs);
   sizes.poolCandidates.push(load.population.profiles.size - 1);

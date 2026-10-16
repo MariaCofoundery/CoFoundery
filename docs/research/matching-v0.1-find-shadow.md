@@ -313,3 +313,55 @@ Empfehlung für E3b in dieser Reihenfolge, ohne Formeländerung:
 ## Parität
 
 Auf denselben 300 Personen liefert der DB-Pool für alle 294 suchenden Betrachter genau den E2-Basispool. Gate-Status, Rang, Gleichstände und Reason-Codes sind identisch. Ein Unit-Test prüft dasselbe auf Fixture-Daten.
+
+---
+
+# E3b – v0.1 als Rankingpfad hinter einem Server-Flag (standardmäßig aus)
+
+Umsetzung:
+
+- `web/src/features/discovery/findMatchingRanking.ts` (`getFindCandidatesV01ForCurrentUser`)
+- Weiche in `getDiscoveryCandidatesForCurrentUser`
+
+**Mit Standard-Konfiguration ändert sich nichts.**
+
+## Flag und Weiche
+
+- `MATCHING_FIND_V01_RANKING_ENABLED` ist nur eine Server-Variable. Nur `true` schaltet ein; fehlt die Variable oder hat sie einen anderen Wert, gilt die heutige Suche. Sie ist getrennt von den beiden Shadow-Flags.
+- **Flag an:** v0.1 für die Suche. Stöbern („Für dich“) bleibt bei der heutigen Funktion.
+- **Ein Fehler im v0.1-Pfad:** Für diese Anfrage gilt die heutige Suche, unverändert. Es gibt kein gemischtes oder halbes Ergebnis, keinen Fehler an den Client und keine Logs.
+- Fehlerarten (intern): `session_invalid`, `viewer_mismatch`, `viewer_not_searching`, `service_unavailable`, `pool_failed`, `inputs_failed`, `engine_failed`, `detail_failed`.
+
+## Ablauf
+
+1. Sitzung prüfen. Die gesuchte ID muss die angemeldete Person sein, sonst wird nichts geladen und der Service-Client gar nicht erst erzeugt.
+2. Pool und Bereichsfamilien über die Sitzung (`get_find_matching_pool`, `auth.uid()`).
+3. Private Inputs über den Service-Client (`get_find_matching_inputs`). Das ist seine einzige Aufgabe.
+4. Pool und Inputs müssen dieselbe Person enthalten.
+5. Gate v03, Relevanz, Gegenseitigkeit und globaler Rang (`rankGlobalFindShadow`, derselbe Baustein wie in den Shadows).
+6. Seite zu 12 Einträgen. Außerhalb des Bereichs: leere Seite, die Gesamtzahl bleibt.
+7. Nur für die IDs der Seite die Karten über den bestehenden RLS-Lader (`getActiveDiscoveryProfilesByIds`). Die Reihenfolge der Engine wird wiederhergestellt; wer inzwischen nicht mehr lesbar ist, entfällt, und nichts kommt hinzu.
+8. Die Ausgabe ist dieselbe Suchprojektion wie heute: keine Bio, keine Branchen, kein letzter Schritt, Zeitstempel aus `published_at`. Gesamtzahl = alle global zulässigen Kandidaten.
+
+Nicht nach außen gehen Scores, Komponenten, Gegenseitigkeit, Confidence, Gate-Gründe, Kriterien, `tieGroup`, `secondaryOrder`, die Capability-Freigabe und Capability-Details.
+
+## Kosten je Anfrage
+
+Zwei Ursachen waren behoben worden:
+
+1. **Doppelte Rechnung:** Jedes Paar wurde zweimal gerechnet (`matchFindPair` für den Status und noch einmal in `rankFindCandidates`). Jetzt einmal; der Rang entsteht aus denselben Ergebnissen über `rankWithTies`. Ein Paritätstest zeigt, dass das Ergebnis strukturell identisch zu `rankFindCandidates` ist.
+2. **Quadratischer Input-Aufbau:** Jede Person filterte die gesamte Liste der Capability-Einträge. Jetzt einmal je Person gruppiert.
+
+Messung (lokal, synthetisch, Median über 5 Betrachter):
+
+| Profile | Pool | Inputs | Engine | Karten der Seite | Gesamt | Abfragen |
+|---|---|---|---|---|---|---|
+| 100 | 6 ms | 4 ms | 1 ms | 5 ms | 20 ms | 3 + Karten |
+| 1.000 | 24 ms | 24 ms | 14 ms | 4 ms | 70 ms | 3 + Karten |
+| 10.000 | 234 ms | 225 ms | 81 ms | 6 ms | 0,57 s | 7 + Karten |
+
+Vor E3b lag die Engine bei 10.000 Profilen bei 1.136 ms und die Gesamtzeit bei 1,66 s. Die Karten-Zeit ist lokal über den Service-Client gemessen, mit denselben Spalten wie der RLS-Lader; das ist eine Annäherung.
+
+## Cache?
+
+**Vor der Closed Beta nicht nötig.** Bis 1.000 Profile bleibt es lokal unter 100 ms. Bei 10.000 Profilen dominiert jetzt die Übertragung von Pool und Inputs (zusammen ~9,7 MB). Ein Ergebnis-Cache je Person wird erst bei einigen tausend aktiven Profilen relevant. Davor wäre es günstiger, die Payload zu verkleinern (z. B. nur Kandidaten mit Matching-relevanten Feldern, kompaktere Kodierung).

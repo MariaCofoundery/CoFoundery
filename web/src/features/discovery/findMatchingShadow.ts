@@ -13,7 +13,7 @@ import {
 } from "@/features/discovery/findMatchingInputs";
 import { getCandidateMatchingV01Constraints } from "@/features/discovery/privateSearchConstraints";
 import { presentFindReasons } from "@/lib/matching/reasonPresentation";
-import { matchFindPair, rankFindCandidates } from "@/lib/matching/v01/findMatcher";
+import { rankGlobalFindShadow } from "@/features/discovery/findMatchingGlobalShadow";
 import type { FindMatchResult, FindMustHavesInput, FindPersonInput, GateStatus } from "@/lib/matching/v01/types";
 import { MATCHING_VERSION, NORMALIZATION_VERSION } from "@/lib/matching/v01/version";
 
@@ -204,15 +204,14 @@ export async function computeFindMatchingShadow(
     let viewer: FindPersonInput;
     let people: FindPersonInput[];
     let results: FindMatchResult[];
-    let ranked: ReturnType<typeof rankFindCandidates>;
+    let ranked: ReturnType<typeof rankGlobalFindShadow>["ranked"];
     try {
       viewer = personInput(input.viewerProfile, input.viewerMustHaves, data, false);
       people = input.candidates.map((c) =>
         personInput(c, data.candidateMustHaves.get(c.userId) ?? null, data, data.connected.has(c.userId)),
       );
       const ctx = { familyOfArea: data.familyOfArea, idfCorpusVersion: FIND_SHADOW_IDF_CORPUS_VERSION, computedAt };
-      results = people.map((p) => matchFindPair(viewer, p, { ...ctx, blocked: data.blocked.has(p.personId) }));
-      ranked = rankFindCandidates(viewer, people, { ...ctx, blockedPersonIds: data.blocked });
+      ({ results, ranked } = rankGlobalFindShadow(viewer, people, { familyOfArea: ctx.familyOfArea, computedAt: ctx.computedAt, blockedPersonIds: data.blocked }));
     } catch {
       throw new StageError("engine_failed");
     }

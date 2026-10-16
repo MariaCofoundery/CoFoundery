@@ -16,7 +16,8 @@ import { loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
 import { getCandidateMatchingV01Constraints } from "@/features/discovery/privateSearchConstraints";
 import { presentFindReasons } from "@/lib/matching/reasonPresentation";
 import { EMPTY_MUST_HAVES } from "@/lib/matching/v01/adapters";
-import { matchFindPair, rankFindCandidates } from "@/lib/matching/v01/findMatcher";
+import { matchFindPair } from "@/lib/matching/v01/findMatcher";
+import { rankWithTies } from "@/lib/matching/v01/ranking";
 import type { FindMatchResult, FindMustHavesInput, FindPersonInput, GateStatus, Ranked } from "@/lib/matching/v01/types";
 import { MATCHING_VERSION, NORMALIZATION_VERSION } from "@/lib/matching/v01/version";
 
@@ -343,8 +344,9 @@ const tally = (statuses: readonly GateStatus[]) => ({
 });
 
 /**
- * Reiner Kern: Gate und globales Ranking über vorbereitete Eingaben. Gerankt wird nach
- * Gegenseitigkeit unter eligible/uncertain (Engine), Gleichstände wie die Engine sie ausweist.
+ * Reiner Kern: Gate und globales Ranking über vorbereitete Eingaben - der eine kanonische
+ * Baustein für Seiten-Shadow (E1), globalen Shadow (E2/E3a) und den v0.1-Rankingpfad (E3b).
+ * Gerankt wird nach Gegenseitigkeit unter eligible/uncertain, Gleichstände wie die Engine.
  */
 export function rankGlobalFindShadow(
   viewer: FindPersonInput,
@@ -353,8 +355,17 @@ export function rankGlobalFindShadow(
 ): { results: FindMatchResult[]; ranked: Ranked<FindMatchResult>[] } {
   const base = { familyOfArea: ctx.familyOfArea, idfCorpusVersion: FIND_SHADOW_IDF_CORPUS_VERSION, computedAt: ctx.computedAt };
   const blocked = ctx.blockedPersonIds ?? new Set<string>();
+  // Jedes Paar genau einmal (E3b). Der Rang entsteht aus denselben Ergebnissen genau wie in
+  // rankFindCandidates: ohne `ineligible`, Wert = Gegenseitigkeit, Anzeige-Reihenfolge
+  // published_at, dann ID (rankWithTies). Paritätstest: findMatchingRanking.test.ts.
   const results = candidates.map((c) => matchFindPair(viewer, c, { ...base, blocked: blocked.has(c.personId) }));
-  const ranked = rankFindCandidates(viewer, candidates, { ...base, blockedPersonIds: blocked });
+  const ranked = rankWithTies(
+    candidates.flatMap((c, i) =>
+      results[i].eligibility.status === "ineligible"
+        ? []
+        : [{ result: results[i], score: results[i].relevance.mutuality, publishedAt: c.publishedAt, id: c.personId }],
+    ),
+  );
   return { results, ranked };
 }
 
@@ -377,10 +388,18 @@ export function runGlobalFindMatchingShadow(
   const pool = findBasePool(population, viewerUserId);
   if (!pool) return { ...empty, status: "viewer_not_in_pool", failure: null, pool: null };
 
+  // Einträge einmal je Person gruppieren (E3b): vorher filterte jede Person die ganze Liste -
+  // bei 10.000 Personen quadratisch. Gleicher Inhalt, gleiche Reihenfolge je Person.
+  const entriesByUser = new Map<string, CapabilityEntryRow[]>();
+  for (const entry of population.entries) {
+    const list = entriesByUser.get(entry.user_id);
+    if (list) list.push(entry);
+    else entriesByUser.set(entry.user_id, [entry]);
+  }
   const parts = (userId: string) => ({
     core: population.core.get(userId),
     isFounder: population.founders.has(userId),
-    entries: population.entries,
+    entries: entriesByUser.get(userId) ?? [],
     hasContact: userId !== viewerUserId && (population.connectedPairs?.has(pairKey(userId, viewerUserId)) ?? false),
   });
   let results: FindMatchResult[];

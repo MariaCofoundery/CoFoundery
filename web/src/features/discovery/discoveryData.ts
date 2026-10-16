@@ -4,6 +4,7 @@ import { after } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 import { scheduleGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
+import { getFindCandidatesV01ForCurrentUser, isFindV01RankingEnabled } from "@/features/discovery/findMatchingRanking";
 import { scheduleFindMatchingShadow } from "@/features/discovery/findMatchingShadow";
 import {
   getPrioritizedDiscoveryAlignmentDimensions,
@@ -613,6 +614,32 @@ export async function getDiscoveryCandidatesForCurrentUser(
   const mustHaves = preferences?.mustHaves ?? normalizeMustHaves(null);
   const pageSize = 12;
   const page = Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1;
+
+  // MATCHING v0.1 ALS RANKING (E3b): nur mit MATCHING_FIND_V01_RANKING_ENABLED=true.
+  // Globaler Pool -> Gate/Relevanz/Rang (Engine) -> Seite -> Karten für genau diese IDs.
+  // Schlägt etwas fehl, gilt für diese Anfrage die heutige Suche darunter - unverändert.
+  if (isFindV01RankingEnabled()) {
+    const v01 = await getFindCandidatesV01ForCurrentUser({
+      sessionClient: supabase as never,
+      expectedUserId: normalizedUserId,
+      page,
+      loadPageProfiles: (profileIds) => getActiveDiscoveryProfilesByIds(profileIds, supabase),
+    });
+    if (v01.ok) {
+      const rankedProfiles = [...v01.page.profiles];
+      return {
+        candidates: attachDiscoveryV2AlignmentSignals(
+          rankedProfiles.map((profile) => buildDiscoveryV2Candidate(profile, mustHaves)),
+          new Map(),
+          new Map(rankedProfiles.map((profile) => [profile.id, profile.userId]))
+        ),
+        page: v01.page.page,
+        pageSize: v01.page.pageSize,
+        totalCount: v01.page.totalCount,
+      };
+    }
+  }
+
   const rpcClient = supabase as unknown as {
     rpc: (
       name: string,

@@ -116,14 +116,15 @@ const sizeOf = (value: unknown) => (value == null ? 0 : JSON.stringify(value).le
 
 /**
  * Lädt Pool und Eingaben. `viewer`:
- *   { kind: "session", client }        Pool über die Sitzung (auth.uid(), ohne Service-Role-Pool)
+ *   { kind: "session", client }        Pool und Bereichsfamilien über die Sitzung (auth.uid());
+ *                                      der Service-Client lädt dann NUR die privaten Inputs
  *   { kind: "service", viewerUserId }  Pool über get_find_matching_pool_for_viewer (Server-Shadow)
  * Eingaben immer über den Service-Client (fremde person_core-Zeilen und Kriterien sind nur dort lesbar).
  * Jeder Fehler wirft FindMatchingPoolError - nie still leere Daten.
  */
 export async function loadFindMatchingPool(
   serviceClient: ServiceClient,
-  viewer: Readonly<{ kind: "session"; client: RpcClient } | { kind: "service"; viewerUserId: string }>,
+  viewer: Readonly<{ kind: "session"; client: RpcClient & ShadowClient } | { kind: "service"; viewerUserId: string }>,
   now: () => number = () => performance.now(),
 ): Promise<FindMatchingPoolLoad> {
   const t0 = now();
@@ -150,9 +151,12 @@ export async function loadFindMatchingPool(
   const t2 = now();
 
   // Bereichsfamilien nur, wenn überhaupt jemand Capability fürs Matching freigegeben hat.
+  // Öffentliches Vokabular: im Sitzungsweg über die Sitzung - der Service-Client lädt dort
+  // ausschließlich die privaten Inputs.
   let familyOfArea: Record<string, string> = {};
   if (inputs.some((row) => row.capability_entries.length > 0)) {
-    const { data, error } = await serviceClient.from("capability_areas").select("area_id, family_id");
+    const areasClient: ShadowClient = viewer.kind === "session" ? viewer.client : serviceClient;
+    const { data, error } = await areasClient.from("capability_areas").select("area_id, family_id");
     if (error || !Array.isArray(data)) throw new FindMatchingPoolError("areas");
     familyOfArea = Object.fromEntries((data as Array<{ area_id: string; family_id: string }>).map((a) => [a.area_id, a.family_id]));
   }
