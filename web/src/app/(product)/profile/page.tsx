@@ -22,6 +22,9 @@ import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapsho
 import { getUnsortedInterviewAnswers } from "@/features/capability/capabilityInterviewData";
 import { getComparablePeople, type ComparablePerson } from "@/features/capability/capabilityComparisonData";
 import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
+import { CapabilityMatchingPermissionSection } from "@/features/capability/CapabilityMatchingPermissionSection";
+import { getCapabilityMatchingPermission } from "@/features/capability/capabilityMatchingPermission";
+import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
 import {
   CAPABILITY_DISCLOSURE_LEVELS,
   OWNERSHIP_WISHES,
@@ -213,6 +216,12 @@ export default async function ProfilePage({
 
   const currentRoles = basisProfil.roles;
   const step = isPageStep(params.step) ? params.step : null;
+  // CAPABILITY-MATCHING-FREIGABE (E3c): nur im Schritt Sichtbarkeit, nur mit FIND-Zugang
+  // und nur, wenn FIND hier tatsächlich mit Matching v0.1 rankt (Server-Flag).
+  const matchingAllowed =
+    step === "sichtbarkeit" && hasDiscovery && isFindV01RankingEnabled()
+      ? (await getCapabilityMatchingPermission(supabase, user.id)).allowed
+      : null;
   // Nur bekannte Schluessel an t() geben. Ein manipulierter Query-Parameter
   // wuerde sonst als roher Schluesselpfad auf der Seite landen: next-intl
   // wirft bei einem fehlenden Schluessel nicht, es loggt einen IntlError und
@@ -1216,6 +1225,17 @@ export default async function ProfilePage({
           <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("disclosure.note")}</p>
           <SubmitButton label={t("disclosure.submit")} pendingLabel={t("pending.save")} className={primary} />
         </form>
+      ) : null}
+
+      {/* Eine zweite, eigene Entscheidung neben der Sichtbarkeit: ob Made2Found die
+          Fähigkeiten für FIND-Vorschläge VERWENDEN darf. Ändert die Sichtbarkeit nicht. */}
+      {step === "sichtbarkeit" && matchingAllowed !== null ? (
+        <CapabilityMatchingPermissionSection
+          hasCapabilities={entries.length > 0}
+          initialAllowed={matchingAllowed}
+          editHref="/profile?step=areas"
+          className="mt-4 rounded-3xl border border-slate-200 bg-white p-6"
+        />
       ) : null}
 
       {/* Rueckverweise in die Kontexte. Hier stehen Inhalte, dort wird

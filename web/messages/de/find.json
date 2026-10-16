@@ -168,12 +168,32 @@
     "FIND_AREA_OWN_COVERED": "Du möchtest {area} abgeben; {name} möchte das verantworten.",
     "FIND_AREA_CONTRIBUTE": "{name} kann bei {area} mitarbeiten.",
     "FIND_SAME_INDUSTRY": "Ihr nennt beide {industry}.",
-    "FIND_START_ALIGNED": "Ihr sucht beide einen Start {horizon}.",
+    "FIND_START_ALIGNED": "Ihr wollt beide {horizon} starten.",
     "FIND_STAGE_COMPLEMENT": "{name} {stage_b}; du {stage_a}.",
     "FIND_DIFF_START": "Euer geplanter Start unterscheidet sich ({a} / {b}).",
     "FIND_DIFF_COMMITMENT": "Ihr plant unterschiedlich viel Zeit ein ({a} / {b}) – ein Gesprächsanlass.",
     "FIND_DIFF_GOAL": "Eure Ziele für das Vorhaben unterscheiden sich ({a} / {b}).",
     "FIND_UNKNOWN_LOCATION": "Zu Standort oder Arbeitsweise fehlen noch Angaben.",
     "FIND_LIMITED_EVIDENCE": "Dieser Vorschlag basiert auf wenigen Angaben."
+  },
+  "reasonStartHorizons": {
+    "now": "jetzt oder sehr bald",
+    "next_3_months": "in den nächsten 3 Monaten",
+    "next_6_months": "in den nächsten 6 Monaten",
+    "later_or_flexible": "später oder zeitlich flexibel"
+  },
+  "reasonStagesSelf": {
+    "undecided": "bist noch offen",
+    "no_idea_open_to_join": "hast keine eigene Idee und bist offen einzusteigen",
+    "exploring_ideas": "prüfst Ideen",
+    "idea_validating": "validierst eine Idee",
+    "already_building": "baust bereits"
+  },
+  "reasonStagesOther": {
+    "undecided": "ist noch offen",
+    "no_idea_open_to_join": "hat keine eigene Idee und ist offen einzusteigen",
+    "exploring_ideas": "prüft Ideen",
+    "idea_validating": "validiert eine Idee",
+    "already_building": "baut bereits"
   }
 }

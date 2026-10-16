@@ -7,7 +7,8 @@
  * Misst je Betrachter getrennt: Basispool, Inputs, Bereichsfamilien, Aufbau der
  * Population, Engine (Gate + Ranking, ein Durchlauf je Paar), Pagination, Laden der
  * Karten für die 12 IDs der ersten Seite (lokal über den Service-Client mit denselben
- * Spalten wie der RLS-Lader - eine Annäherung) und Gesamtzeit; dazu einmal den
+ * Spalten wie der RLS-Lader - eine Annäherung), Presenter-Reasons nur für diese Seite (E3c)
+ * und Gesamtzeit; dazu einmal den
  * E2-Lader (ganze Population) zum Vergleich. Ausgabe nur Kennzahlen (Mediane, Bytes,
  * Abfragen) - keine IDs, keine Inhalte. Für synthetische lokale Daten gedacht; gegen
  * eine nicht-lokale Datenbank bricht das Skript ab.
@@ -17,6 +18,8 @@ import { createClient } from "@supabase/supabase-js";
 import { isLocalSupabaseUrl } from "@/features/auth/devLogin";
 import { loadFindMatchingPopulation, paginateFindShadow, runGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
 import { loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
+import { cardReasonsFromPresented } from "@/features/discovery/findMatchingRanking";
+import { presentFindReasons } from "@/lib/matching/reasonPresentation";
 
 const args = new Map(
   process.argv.slice(2).map((arg) => {
@@ -45,7 +48,7 @@ const e2 = await loadFindMatchingPopulation(client);
 const e2Ms = performance.now() - e2Start;
 const viewers = [...e2.profiles.keys()].filter((id) => e2.founders.has(id)).sort().slice(0, viewersWanted);
 
-const stages: Record<string, number[]> = { poolMs: [], inputsMs: [], areasMs: [], assemblyMs: [], engineMs: [], paginationMs: [], pageDetailMs: [], totalMs: [] };
+const stages: Record<string, number[]> = { poolMs: [], inputsMs: [], areasMs: [], assemblyMs: [], engineMs: [], paginationMs: [], pageDetailMs: [], pageReasonsMs: [], totalMs: [] };
 const CARD_COLUMNS =
   "id, user_id, display_name, headline, bio, own_roles, seeking_roles, own_role_other, seeking_role_other, expertise, industries, " +
   "location_region, remote_mode, availability_hours_per_week, availability_flexibility, availability_condition, recent_step, " +
@@ -64,6 +67,8 @@ for (const viewerUserId of viewers) {
   const { error: detailError } = await client.from("founder_discovery_profiles").select(CARD_COLUMNS).in("id", pageIds).eq("status", "active");
   if (detailError) throw new Error("Kartenabfrage fehlgeschlagen");
   const e3End = performance.now();
+  for (const item of page.items) cardReasonsFromPresented(presentFindReasons(item.result, { side: "a" }));
+  const e4End = performance.now();
   stages.poolMs.push(load.timings.poolMs);
   stages.inputsMs.push(load.timings.inputsMs);
   stages.areasMs.push(load.timings.areasMs);
@@ -71,7 +76,8 @@ for (const viewerUserId of viewers) {
   stages.engineMs.push(e1 - e0);
   stages.paginationMs.push(e2End - e1);
   stages.pageDetailMs.push(e3End - e2End);
-  stages.totalMs.push(e3End - start);
+  stages.pageReasonsMs.push(e4End - e3End);
+  stages.totalMs.push(e4End - start);
   sizes.poolBytes.push(load.payloadBytes.pool);
   sizes.inputBytes.push(load.payloadBytes.inputs);
   sizes.poolCandidates.push(load.population.profiles.size - 1);

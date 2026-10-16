@@ -388,7 +388,8 @@
       "foundingFrame": "Founding setup",
       "practicalMatches": "Meets your criteria",
       "alignmentMatches": "Voluntarily shared similar preferences in selected areas",
-      "alignmentSignals": "Alignment cues"
+      "alignmentSignals": "Alignment cues",
+      "matchingReasons": "From what you've both shared"
     },
     "pagination": {
       "label": "Discovery results",
@@ -442,7 +443,8 @@
       "back": "Back to search",
       "themesHint": "Earlier work-style entries from an older version. They are no longer evaluated; notifications only use the criteria above."
     },
-    "sortNote": "Most recently published profiles first. There is no ranking by fit and no score."
+    "sortNote": "Most recently published profiles first. There is no ranking by fit and no score.",
+    "rankingNote": "The order takes into account which roles you are each looking for and bring, your circumstances such as timing, time commitment and stage, and – where allowed – your capabilities. Both sides' details count. Missing details don't automatically count against anyone."
   },
   "profile": {
     "title": "Your FIND profile",

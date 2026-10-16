@@ -1,9 +1,11 @@
 import "server-only";
 
-import type { FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
+import type { FindCardReason, FounderDiscoveryProfile } from "@/features/discovery/discoveryTypes";
 import { paginateFindShadow, runGlobalFindMatchingShadow } from "@/features/discovery/findMatchingGlobalShadow";
 import { createShadowServiceClient, type ShadowClient } from "@/features/discovery/findMatchingInputs";
 import { FindMatchingPoolError, loadFindMatchingPool } from "@/features/discovery/findMatchingPool";
+import { presentFindReasons, type PresentedMatch } from "@/lib/matching/reasonPresentation";
+import type { FindMatchResult } from "@/lib/matching/v01/types";
 
 /**
  * FIND Matching v0.1 als produktiver Rankingpfad (E3b) - hinter einem Server-Flag,
@@ -19,17 +21,16 @@ import { FindMatchingPoolError, loadFindMatchingPool } from "@/features/discover
  * Komponenten, Gegenseitigkeit, Confidence, Gate-Gründe, Kriterien, tieGroup,
  * secondaryOrder, Capability-Freigabe oder Capability-Details.
  *
+ * E3c: Dazu je Karte höchstens FIND_CARD_REASON_LIMIT Reasons - NUR Presenter-Ausgabe
+ * (presentFindReasons, Sicht der betrachtenden Person) und NUR für die Kandidaten der
+ * gezeigten Seite, nie für die ganze Population.
+ *
  * Schlägt etwas fehl, kommt `{ ok: false, failure }` - der Aufrufer nimmt dann für
  * diese Anfrage die heutige Suche. Nie ein halbes Ergebnis, kein Fehler an den Client,
  * keine Logs.
  */
 
-export const FIND_V01_RANKING_FLAG = "MATCHING_FIND_V01_RANKING_ENABLED";
-
-export function isFindV01RankingEnabled(env: Readonly<Record<string, string | undefined>> = process.env): boolean {
-  const raw = env[FIND_V01_RANKING_FLAG];
-  return typeof raw === "string" && raw.trim().toLowerCase() === "true";
-}
+export { FIND_V01_RANKING_FLAG, isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
 
 export type FindV01Failure =
   | "session_invalid"
@@ -39,11 +40,14 @@ export type FindV01Failure =
   | "pool_failed"
   | "inputs_failed"
   | "engine_failed"
-  | "detail_failed";
+  | "detail_failed"
+  | "presenter_failed";
 
 export type FindV01Page = Readonly<{
   /** Karten in Engine-Reihenfolge, als Suchprojektion (wie search_founder_discovery_profiles_v2). */
   profiles: readonly FounderDiscoveryProfile[];
+  /** Presenter-Reasons je Profil-ID der Seite (höchstens FIND_CARD_REASON_LIMIT, ohne Rohdaten). */
+  reasonsByProfileId: ReadonlyMap<string, readonly FindCardReason[]>;
   page: number;
   pageSize: number;
   /** Alle für die Person zulässigen Kandidaten (eligible + uncertain), global. */
@@ -57,6 +61,31 @@ type SessionClient = ShadowClient & {
 type ServiceClient = Parameters<typeof loadFindMatchingPool>[0];
 
 export const FIND_V01_PAGE_SIZE = 12;
+
+/**
+ * Höchstens so viele Reasons je Karte. Reihenfolge = Presenter-Reihenfolge (die der
+ * Engine-Erklärungen: Rollen, Capability, Branche, Start, Phase, Unterschiede, offene
+ * Standortangaben); je Code nur der erste, damit z. B. drei gesuchte Rollen nicht alle
+ * Plätze belegen. Keine eigene Gewichtung - das ist reine Kürzung für die Karte.
+ */
+export const FIND_CARD_REASON_LIMIT = 3;
+
+/** Presenter-Ausgabe -> Karten-Reasons. Nur messageKey, erlaubte Daten, Label-Namespaces. */
+export function cardReasonsFromPresented(presented: PresentedMatch): FindCardReason[] {
+  if (!presented.visible) return [];
+  const seen = new Set<string>();
+  const out: FindCardReason[] = [];
+  for (const reason of presented.reasons) {
+    if (out.length >= FIND_CARD_REASON_LIMIT) break;
+    if (seen.has(reason.code)) continue;
+    // „Anderer Schwerpunkt“ sagt nicht, welcher - als Satz („Du suchst Anderer Schwerpunkt“)
+    // wäre das ein künstlicher Grund. Er entfällt; der nächste Reason rückt nach.
+    if (reason.data.role === "other") continue;
+    seen.add(reason.code);
+    out.push({ messageKey: reason.messageKey, data: { ...reason.data }, labels: { ...reason.labels } });
+  }
+  return out;
+}
 
 /** Dieselbe Projektion wie die heutige Suche: Bio, Branchen und letzter Schritt stehen nur auf der Profilseite. */
 export function toSearchCardProfile(profile: FounderDiscoveryProfile): FounderDiscoveryProfile {
@@ -101,6 +130,8 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   loadPageProfiles: (profileIds: string[]) => Promise<FounderDiscoveryProfile[]>;
   createServiceClient?: () => ServiceClient | null;
   now?: () => Date;
+  /** Nur für Tests (Zählung); Standard presentFindReasons. */
+  presentReasons?: (result: FindMatchResult) => PresentedMatch;
 }>): Promise<FindV01Result> {
   // A/B/D: gültige Sitzung, und die gesuchte ID IST die Sitzung.
   let sessionUserId: string | null = null;
@@ -141,10 +172,11 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
   const totalCount = run.ranked.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / FIND_V01_PAGE_SIZE));
   const items = page > totalPages ? [] : paginateFindShadow(run.ranked, page, FIND_V01_PAGE_SIZE).items;
-  const orderedProfileIds = items.flatMap((r) => {
+  const pageItems = items.flatMap((r) => {
     const profileId = population.profiles.get(r.result.subject.b)?.id;
-    return profileId ? [profileId] : [];
+    return profileId ? [{ profileId, result: r.result }] : [];
   });
+  const orderedProfileIds = pageItems.map((item) => item.profileId);
 
   let loaded: FounderDiscoveryProfile[];
   try {
@@ -160,5 +192,17 @@ export async function getFindCandidatesV01ForCurrentUser(input: Readonly<{
     return profile ? [toSearchCardProfile(profile)] : [];
   });
 
-  return { ok: true, page: { profiles, page, pageSize: FIND_V01_PAGE_SIZE, totalCount } };
+  // E3c: Reasons erst jetzt und nur für die Karten, die tatsächlich gezeigt werden.
+  // Betrachter ist in der Engine Seite "a". Scheitert der Presenter, gilt die heutige Suche.
+  const present = input.presentReasons ?? ((result: FindMatchResult) => presentFindReasons(result, { side: "a" }));
+  const reasonsByProfileId = new Map<string, readonly FindCardReason[]>();
+  try {
+    for (const item of pageItems) {
+      if (byId.has(item.profileId)) reasonsByProfileId.set(item.profileId, cardReasonsFromPresented(present(item.result)));
+    }
+  } catch {
+    return { ok: false, failure: "presenter_failed" };
+  }
+
+  return { ok: true, page: { profiles, reasonsByProfileId, page, pageSize: FIND_V01_PAGE_SIZE, totalCount } };
 }

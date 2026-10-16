@@ -9,9 +9,10 @@ import { setCapabilityMatchingPermissionAction } from "@/features/capability/cap
 /**
  * Die Capability-Matching-Freigabe als Abschnitt.
  *
- * VORBEREITET, ABER NIRGENDS EINGEBUNDEN: Die Freigabe wird erst eingeholt, wenn
- * FIND die Matching-Engine v0.1 tatsächlich nutzt. Ein Test hält fest, dass keine
- * Seite diese Komponente rendert.
+ * Eingebunden seit E3c, NUR wenn FIND in dieser Umgebung mit Matching v0.1 rankt
+ * (Server-Flag MATCHING_FIND_V01_RANKING_ENABLED): im FIND-Profil (/discovery/profile)
+ * und im Schritt Sichtbarkeit des Profil-Editors (/profile?step=sichtbarkeit). Ein Test
+ * hält beide Stellen und die Flag-Prüfung fest.
  *
  * Zwei Zustände:
  *   - Fähigkeiten vorhanden: Umschalter, Standard aus (der Ausgangswert kommt
@@ -23,10 +24,13 @@ export function CapabilityMatchingPermissionSection({
   hasCapabilities,
   initialAllowed,
   editHref,
+  className = "mt-5 border-t border-slate-200 pt-5",
 }: {
   hasCapabilities: boolean;
   initialAllowed: boolean;
   editHref: string;
+  /** Rahmen des Abschnitts: Standard als Teil einer Karte, im Editor als eigene Karte. */
+  className?: string;
 }) {
   const t = useTranslations("capability.matchingPermission");
   const [allowed, setAllowed] = useState(initialAllowed === true);
@@ -35,7 +39,7 @@ export function CapabilityMatchingPermissionSection({
 
   if (!hasCapabilities) {
     return (
-      <section className="mt-5 border-t border-slate-200 pt-5" aria-labelledby="capability-matching-title">
+      <section className={className} aria-labelledby="capability-matching-title">
         <h3 id="capability-matching-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">{t("emptyNotice")}</p>
         <Link href={editHref} className="mt-3 inline-flex min-h-11 items-center text-sm underline">
@@ -55,7 +59,7 @@ export function CapabilityMatchingPermissionSection({
   };
 
   return (
-    <section className="mt-5 border-t border-slate-200 pt-5" aria-labelledby="capability-matching-title">
+    <section className={className} aria-labelledby="capability-matching-title">
       <h3 id="capability-matching-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600">{t("body")}</p>
       <label className="mt-3 inline-flex min-h-11 items-center gap-3 text-sm text-slate-800">

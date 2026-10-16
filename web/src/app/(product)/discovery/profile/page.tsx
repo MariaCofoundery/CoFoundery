@@ -47,6 +47,10 @@ import {
   DISCOVERY_START_HORIZONS,
 } from "@/features/discovery/discoveryTypes";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { CapabilityMatchingPermissionSection } from "@/features/capability/CapabilityMatchingPermissionSection";
+import { getCapabilityMatchingPermission } from "@/features/capability/capabilityMatchingPermission";
+import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
+import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -370,6 +374,13 @@ export default async function DiscoveryProfilePage({
       .maybeSingle(),
   ]);
   const capabilityDisclosure = (disclosureRow.data?.capability_disclosure as string | undefined) ?? "private";
+  // CAPABILITY-MATCHING-FREIGABE (E3c): nur, wenn FIND hier tatsächlich mit Matching v0.1
+  // rankt (Server-Flag). Sonst keine Abfrage und kein Abschnitt.
+  const matchingPermission = isFindV01RankingEnabled()
+    ? await Promise.all([getOwnCapabilityEntries(supabase, user.id), getCapabilityMatchingPermission(supabase, user.id)]).then(
+        ([entries, permission]) => ({ hasCapabilities: entries.length > 0, allowed: permission.allowed })
+      )
+    : null;
   const workstyleShared =
     workstyleRow.data?.workstyle_discovery_enabled === true &&
     workstyleRow.data?.workstyle_discovery_consent_version === "workstyle_discovery_v1";
@@ -1027,6 +1038,14 @@ export default async function DiscoveryProfilePage({
                 </li>
               </ul>
               <p className="mt-4 text-xs leading-5 text-slate-500">{t("profile.visibility.never")}</p>
+              {/* Getrennt von der Sichtbarkeit darüber: wer Fähigkeiten SIEHT, ändert sich hier nicht. */}
+              {matchingPermission ? (
+                <CapabilityMatchingPermissionSection
+                  hasCapabilities={matchingPermission.hasCapabilities}
+                  initialAllowed={matchingPermission.allowed}
+                  editHref="/profile?step=areas"
+                />
+              ) : null}
             </section>
 
           </aside>

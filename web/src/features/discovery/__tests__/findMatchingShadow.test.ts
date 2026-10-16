@@ -347,7 +347,7 @@ test("Hook: nach dem Aufbau der Treffer, nicht abgewartet, Rückgabe unveränder
   assert.match(fn, /\n  scheduleFindMatchingShadow\(/, "Aufruf als Anweisung - Rückgabewert ungenutzt, nicht abgewartet");
   assert.doesNotMatch(fn, /await scheduleFindMatchingShadow|= scheduleFindMatchingShadow/);
   assert.match(fn, /\{ schedule: after \}/);
-  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n  \};/, "dieselben Treffer, Seiten, Gesamtzahl");
+  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n    rankingMode: "legacy",\n  \};/, "dieselben Treffer, Seiten, Gesamtzahl");
   assert.match(fn, /rpc\("search_founder_discovery_profiles_v2"/);
   assert.equal((data.match(/scheduleFindMatchingShadow\(/g) ?? []).length, 1, "nur in der Suche, nicht beim Stöbern");
 });

@@ -388,7 +388,8 @@
       "foundingFrame": "Gründungsrahmen",
       "practicalMatches": "Entspricht deinen Kriterien",
       "alignmentMatches": "Freiwillig ähnliche Präferenzen in ausgewählten Bereichen",
-      "alignmentSignals": "Alignment-Hinweise"
+      "alignmentSignals": "Alignment-Hinweise",
+      "matchingReasons": "Aus euren Angaben"
     },
     "pagination": {
       "label": "Discovery-Ergebnisse",
@@ -442,7 +443,8 @@
       "back": "Zurück zur Suche",
       "themesHint": "Frühere Arbeitsweise-Angaben aus einer älteren Fassung. Sie werden nicht mehr ausgewertet; benachrichtigt wird nur nach den Kriterien darüber."
     },
-    "sortNote": "Zuletzt veröffentlichte Profile zuerst. Es gibt keine Rangfolge nach Passung und keinen Score."
+    "sortNote": "Zuletzt veröffentlichte Profile zuerst. Es gibt keine Rangfolge nach Passung und keinen Score.",
+    "rankingNote": "Die Reihenfolge berücksichtigt, welche Rollen ihr sucht und mitbringt, eure Rahmenbedingungen wie Start, Zeit und Phase und – wenn freigegeben – eure Fähigkeiten. Dabei zählen die Angaben beider Seiten. Fehlende Angaben werden nicht automatisch als unpassend gewertet."
   },
   "profile": {
     "title": "Dein FIND-Profil",

@@ -154,7 +154,7 @@ test("der Adapter nimmt keinen frei übergebenen Boolean mehr an", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Vorbereitete Oberfläche: Copy, Zustände, nirgends eingebunden
+// Oberfläche: Copy, Zustände, eingebunden nur hinter dem FIND-v0.1-Flag (E3c)
 // ---------------------------------------------------------------------------
 test("Copy DE/EN wie vorgesehen", () => {
   const de = JSON.parse(read("messages/de/capability.json")).matchingPermission;
@@ -183,7 +183,7 @@ test("Komponente: ohne Fähigkeiten Hinweis ohne Umschalter, mit Fähigkeiten Um
   assert.match(ui, /useState\(initialAllowed === true\)/, "Ausgangswert nur bei ausdrücklichem true an");
 });
 
-test("die Komponente ist in keiner Seite eingebunden", () => {
+test("die Komponente steht nur im FIND-Profil und im Schritt Sichtbarkeit, jeweils hinter dem Flag", () => {
   const users: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
@@ -200,7 +200,24 @@ test("die Komponente ist in keiner Seite eingebunden", () => {
     }
   };
   walk("src");
-  assert.deepEqual(users, [], "die Freigabe wird erst mit der nutzenden FIND-Funktion eingebunden");
+  const findProfile = join("src", "app", "(product)", "discovery", "profile", "page.tsx");
+  const editor = join("src", "app", "(product)", "profile", "page.tsx");
+  assert.deepEqual(users.sort(), [findProfile, editor].sort());
+  // Ohne Flag: keine Abfrage, kein Abschnitt.
+  const find = read(findProfile);
+  assert.match(find, /const matchingPermission = isFindV01RankingEnabled\(\)\s*\? await/);
+  assert.match(find, /\{matchingPermission \? \(\s*<CapabilityMatchingPermissionSection/);
+  const profile = read(editor);
+  assert.match(profile, /step === "sichtbarkeit" && hasDiscovery && isFindV01RankingEnabled\(\)/);
+  assert.match(profile, /\{step === "sichtbarkeit" && matchingAllowed !== null \? \(\s*<CapabilityMatchingPermissionSection/);
+  // Ohne Fähigkeiten der Hinweis (Komponente), mit Fähigkeiten der Umschalter - aus echten Einträgen.
+  assert.match(find, /hasCapabilities: entries\.length > 0, allowed: permission\.allowed/);
+  assert.match(profile, /hasCapabilities=\{entries\.length > 0\}/);
+  // Das Flag kommt aus dem Server-Modul, nie aus einer öffentlichen Variable.
+  for (const source of [find, profile]) {
+    assert.match(source, /from "@\/features\/discovery\/findV01RankingFlag"/);
+    assert.doesNotMatch(source, /NEXT_PUBLIC_[A-Z_]*MATCHING/);
+  }
 });
 
 // ---------------------------------------------------------------------------

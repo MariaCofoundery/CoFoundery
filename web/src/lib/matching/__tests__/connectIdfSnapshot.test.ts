@@ -306,6 +306,9 @@ test("FIND braucht kein IDF; außerhalb von lib/matching nutzen nur die FIND-Sha
     join("src", "features", "discovery", "findShadowEvaluation.ts"),
     // E3a: set-basierter Pool - ebenfalls ohne sichtbare Wirkung.
     join("src", "features", "discovery", "findMatchingPool.ts"),
+    // E3b/E3c: v0.1-Rankingpfad hinter MATCHING_FIND_V01_RANKING_ENABLED (Standard aus); gibt nur
+    // Karten und Presenter-Reasons der gezeigten Seite weiter.
+    join("src", "features", "discovery", "findMatchingRanking.ts"),
   ];
   const productUsers: string[] = [];
   const walk = (dir: string) => {

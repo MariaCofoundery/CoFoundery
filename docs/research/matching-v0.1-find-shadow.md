@@ -365,3 +365,64 @@ Vor E3b lag die Engine bei 10.000 Profilen bei 1.136 ms und die Gesamtzeit bei 1
 ## Cache?
 
 **Vor der Closed Beta nicht nötig.** Bis 1.000 Profile bleibt es lokal unter 100 ms. Bei 10.000 Profilen dominiert jetzt die Übertragung von Pool und Inputs (zusammen ~9,7 MB). Ein Ergebnis-Cache je Person wird erst bei einigen tausend aktiven Profilen relevant. Davor wäre es günstiger, die Payload zu verkleinern (z. B. nur Kandidaten mit Matching-relevanten Feldern, kompaktere Kodierung).
+
+# E3c: sichtbare Produktschicht (hinter demselben Flag)
+
+Alles in diesem Abschnitt erscheint nur mit `MATCHING_FIND_V01_RANKING_ENABLED=true`. Ohne das Flag sehen Suche, Karten, Profilseiten und Editor genauso aus wie vorher.
+
+## `rankingMode`
+
+`DiscoverySearchPage` trägt `rankingMode: "legacy" | "v01"`.
+
+- `"v01"` nur, wenn der v0.1-Pfad diese Seite tatsächlich geliefert hat.
+- `"legacy"` in allen anderen Fällen: Flag aus, Rückfall nach einem Fehler, inaktives eigenes Profil, Stöbern.
+- Kein Fehlergrund in der Antwort, keine Logs.
+
+Die Oberfläche richtet sich nach `rankingMode`, nicht nach dem Flag. Nach einem Rückfall gibt es deshalb weder den Transparenzhinweis noch Reasons.
+
+## Reasons auf Trefferkarten
+
+1. Global ranken, Seite bilden.
+2. Nur für die Kandidaten dieser Seite `presentFindReasons(result, { side: "a" })` aufrufen.
+3. Für die Karte kürzen (`cardReasonsFromPresented`): Presenter-Reihenfolge, je Code nur der erste, höchstens 3. Eine Rolle „other“ entfällt, weil der Satz nicht sagen kann, welcher Schwerpunkt gemeint ist.
+
+An die Karte gehen nur Message Key, erlaubte Parameter und Label-Namespaces. Die Karte rendert sie serverseitig (`FindMatchingReasons`). Fehlt eine Übersetzung, entfällt der Reason; es gibt keinen Ersatztext.
+
+- Scheitert der Presenter, scheitert der ganze v0.1-Pfad (`presenter_failed`). Diese Anfrage nutzt dann die heutige Suche.
+- Kosten: 0,1 ms für eine Seite bei 10.000 Profilen (lokal, synthetisch). Gesamt 0,64 s, Pool 303 ms, Inputs 223 ms, Engine 90 ms, Karten 5 ms.
+
+Präsentationslabels als Satzteile:
+
+| Namespace | Für | Beispiel |
+|---|---|---|
+| `find.reasonStartHorizons` | Start gleich und Start unterschiedlich | „Ihr wollt beide in den nächsten 3 Monaten starten.“ |
+| `find.reasonStagesSelf`, `find.reasonStagesOther` | Phase („Anna baut bereits; du prüfst Ideen.“) | — |
+
+Die Engine-Werte bleiben dieselben Schlüssel.
+
+## Capability
+
+Die Freigabe (Wirkung im Ranking) und die Sichtbarkeit (ob ein Reason erscheint) bleiben getrennt.
+
+| Freigabe | Sichtbarkeit | Wirkung im Ranking | Capability-Reason |
+|---|---|---|---|
+| an | privat | ja | nein |
+| an | nur Bereiche | ja | nein |
+| an | Tiefe bei Kontakt, ohne Kontakt | ja | nein |
+| an | Tiefe bei Kontakt, mit Kontakt | ja | ja, nur Bereich, ohne Stufe oder Ownership-Rohwert |
+| aus | beliebig | nein | nein |
+
+Die Freigabe-UI steht im FIND-Profil (`/discovery/profile`, Abschnitt Sichtbarkeit) und unter `/profile?step=sichtbarkeit`, dort nur mit FIND-Zugang. Ohne Fähigkeiten erscheint ein Hinweis mit Link zum Editor statt eines Umschalters. Die Aktion ändert nur `capability_matching_allowed`.
+
+## Bewusst nicht
+
+- **Kein `FIND_LIMITED_EVIDENCE`.** Es gibt noch keinen eingefrorenen Auslöser.
+- **Keine Gleichstands-UI.** Keine gleiche Platznummer, keine Gruppe, kein Badge.
+- **Keine Workstyle-Reasons.** Die Gesprächsimpulse auf der Karte bleiben unverändert.
+- **Keine Reasons auf der Detailseite.** Das würde für eine einzelne Ansicht den ganzen Pool rechnen.
+
+## Unvollständige Seiten
+
+Lädt der RLS-Lader nach dem Ranking einzelne Karten nicht mehr (pausiert, blockiert, ohne Founder-Rolle), hat die Seite weniger als 12 Einträge. Es werden keine Treffer aus der heutigen Suche ergänzt und keine Rankingmodi gemischt.
+
+Später ließe sich mit den nächsten v0.1-gerankten Kandidaten auffüllen: für die Seite `ranked.slice(start, start + 12 + k)` laden und die ersten 12 lesbaren nehmen. Dafür müssten die folgenden Seiten verschoben werden (ein Seiten-Cursor statt eines festen Offsets). Das ist nicht trivial und deshalb nicht gebaut.

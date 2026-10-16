@@ -3,6 +3,7 @@ import { ConversationPoints } from "@/features/find/ConversationPoints";
 import { conversationPoints, type ConversationProfile } from "@/features/find/conversationPrompts";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { FindMatchingReasons } from "@/features/discovery/FindMatchingReasons";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import type { MemberPhoto } from "@/features/profile/memberPhotoData";
@@ -14,6 +15,7 @@ import type {
   DiscoveryCandidate,
   DiscoveryFounderRole,
   DiscoveryPracticalMatch,
+  FindRankingMode,
   FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 
@@ -89,6 +91,7 @@ export function FounderDiscoveryCard({
   photo,
   showMatchReasons = true,
   viewer = null,
+  rankingMode = "legacy",
 }: {
   candidate: DiscoveryCandidate;
   preferences: FounderSearchPreferences["mustHaves"];
@@ -99,6 +102,12 @@ export function FounderDiscoveryCard({
   showMatchReasons?: boolean;
   /** Eigenes FIND-Profil der betrachtenden Person - fuer hoechstens zwei Gespraechsanlaesse. */
   viewer?: ConversationProfile | null;
+  /**
+   * Welche Reihenfolge die Suchseite tatsächlich hat (DiscoverySearchPage.rankingMode).
+   * "v01": bilaterale v0.1-Reasons statt der einseitigen Kriterien-Chips - beides wird nicht
+   * gemischt. Standard "legacy": Karte wie bisher.
+   */
+  rankingMode?: FindRankingMode;
 }) {
   const { profile } = candidate;
   // Kein Score und keine Reihenfolge: einzelne Angaben nebeneinander, siehe conversationPrompts.ts.
@@ -158,7 +167,18 @@ export function FounderDiscoveryCard({
         ].join(" · ")}</p>
       </div>
 
-      {showMatchReasons && (candidate.practicalMatches?.length ?? 0) > 0 ? (
+      {/* MATCHING v0.1 (E3c): nur, wenn der v0.1-Pfad diese Seite geliefert hat - die
+          heutige Suche setzt keine matchingReasons, ihre Karten bleiben unverändert. */}
+      {showMatchReasons && rankingMode === "v01" && (candidate.matchingReasons?.length ?? 0) > 0 ? (
+        <FindMatchingReasons
+          reasons={candidate.matchingReasons ?? []}
+          candidateName={profile.displayName}
+          title={t("v2.cards.matchingReasons")}
+        />
+      ) : null}
+
+      {/* Kriterien-Chips aus der heutigen, einseitigen Suche - nur dort. */}
+      {showMatchReasons && rankingMode === "legacy" && (candidate.practicalMatches?.length ?? 0) > 0 ? (
         <section className="mt-5 border-t border-emerald-100 pt-4">
           <p className="text-xs font-semibold text-emerald-800">{t("v2.cards.practicalMatches")}</p>
           <div className="mt-2 flex flex-wrap gap-2">

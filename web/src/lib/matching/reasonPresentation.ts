@@ -18,7 +18,8 @@ import type { ConnectMatchResult, ConnectReasonCode, FindMatchResult, FindReason
  *     unbekannte Codes oder unerwartete Werte lassen den Reason ganz entfallen.
  *
  * Texte kommen über Message Keys (find.matchingReasons.*, connect.matchingReasons.*),
- * nie aus der Engine. Noch von keinem Produktpfad eingebunden.
+ * nie aus der Engine. Eingebunden nur im FIND-v0.1-Rankingpfad (E3c, hinter dem Server-Flag),
+ * und dort nur für die Kandidaten der gezeigten Seite.
  *
  * Matrix: docs/research/matching-v0.1-explainability-privacy.md
  */
@@ -50,12 +51,15 @@ export const FIND_REASON_POLICY: Readonly<Record<FindReasonCode, ReasonPolicy>> 
   FIND_AREA_OWN_COVERED: { visibility: "both", params: { area: label("capability.areaLabels") } },
   FIND_AREA_CONTRIBUTE: { visibility: "both", params: { area: label("capability.areaLabels") } },
   FIND_SAME_INDUSTRY: { visibility: "both", params: { industry: text } },
-  FIND_START_ALIGNED: { visibility: "both", params: { horizon: label("discovery.startHorizons") } },
+  // Präsentationslabels als Satzteile (E3c): discovery.startHorizons trägt nur Kurz-/Langformen
+  // („Start: jetzt“), discovery.ventureStages Ich-Sätze - beides passt nicht in die Reason-Sätze.
+  // Die Engine-Werte bleiben dieselben Schlüssel.
+  FIND_START_ALIGNED: { visibility: "both", params: { horizon: label("find.reasonStartHorizons") } },
   FIND_STAGE_COMPLEMENT: {
     visibility: "both",
-    params: { stage_a: label("discovery.ventureStages"), stage_b: label("discovery.ventureStages") },
+    params: { stage_a: label("find.reasonStagesSelf"), stage_b: label("find.reasonStagesOther") },
   },
-  FIND_DIFF_START: { visibility: "both", params: { a: label("discovery.startHorizons"), b: label("discovery.startHorizons") } },
+  FIND_DIFF_START: { visibility: "both", params: { a: label("find.reasonStartHorizons"), b: label("find.reasonStartHorizons") } },
   FIND_DIFF_COMMITMENT: { visibility: "both", params: { a: label("discovery.commitmentLevels"), b: label("discovery.commitmentLevels") } },
   FIND_DIFF_GOAL: { visibility: "both", params: { a: label("discovery.ventureGoals"), b: label("discovery.ventureGoals") } },
   // Nur, wessen eigene Bedingung offen ist (oder die Paarregel „beide vor Ort“) - die Engine setzt `audience` so.

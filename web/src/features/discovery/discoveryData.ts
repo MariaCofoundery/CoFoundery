@@ -608,7 +608,7 @@ export async function getDiscoveryCandidatesForCurrentUser(
   const supabase = await resolveClient(client);
   const ownProfile = await getOwnDiscoveryProfile(normalizedUserId, supabase);
   if (!ownProfile || ownProfile.status !== "active") {
-    return { candidates: [], page: 1, pageSize: 12, totalCount: 0 };
+    return { candidates: [], page: 1, pageSize: 12, totalCount: 0, rankingMode: "legacy" };
   }
   const preferences = await getOwnSearchPreferences(normalizedUserId, supabase);
   const mustHaves = preferences?.mustHaves ?? normalizeMustHaves(null);
@@ -618,6 +618,8 @@ export async function getDiscoveryCandidatesForCurrentUser(
   // MATCHING v0.1 ALS RANKING (E3b): nur mit MATCHING_FIND_V01_RANKING_ENABLED=true.
   // Globaler Pool -> Gate/Relevanz/Rang (Engine) -> Seite -> Karten für genau diese IDs.
   // Schlägt etwas fehl, gilt für diese Anfrage die heutige Suche darunter - unverändert.
+  // E3c: rankingMode sagt der Oberfläche, welche Reihenfolge die Seite WIRKLICH hat;
+  // Reasons (nur Presenter-Ausgabe) gibt es nur mit "v01".
   if (isFindV01RankingEnabled()) {
     const v01 = await getFindCandidatesV01ForCurrentUser({
       sessionClient: supabase as never,
@@ -627,15 +629,20 @@ export async function getDiscoveryCandidatesForCurrentUser(
     });
     if (v01.ok) {
       const rankedProfiles = [...v01.page.profiles];
+      const reasons = v01.page.reasonsByProfileId;
       return {
         candidates: attachDiscoveryV2AlignmentSignals(
-          rankedProfiles.map((profile) => buildDiscoveryV2Candidate(profile, mustHaves)),
+          rankedProfiles.map((profile) => ({
+            ...buildDiscoveryV2Candidate(profile, mustHaves),
+            matchingReasons: reasons.get(profile.id) ?? [],
+          })),
           new Map(),
           new Map(rankedProfiles.map((profile) => [profile.id, profile.userId]))
         ),
         page: v01.page.page,
         pageSize: v01.page.pageSize,
         totalCount: v01.page.totalCount,
+        rankingMode: "v01",
       };
     }
   }
@@ -731,6 +738,7 @@ export async function getDiscoveryCandidatesForCurrentUser(
     page,
     pageSize,
     totalCount,
+    rankingMode: "legacy",
   };
 }
 
@@ -802,5 +810,6 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
     page,
     pageSize,
     totalCount: rows[0] ? Number(rows[0].total_count) : 0,
+    rankingMode: "legacy",
   };
 }

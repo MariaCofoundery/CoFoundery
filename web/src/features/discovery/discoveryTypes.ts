@@ -283,9 +283,29 @@ export type DiscoveryProfilePreview = Pick<
   | "publishedAt"
 >;
 
+/**
+ * Ein Matching-Reason für eine Trefferkarte (FIND v0.1, E3c) - NUR Presenter-Ausgabe
+ * (presentFindReasons): Message Key, erlaubte Parameter, Label-Namespaces. Keine Scores,
+ * Komponenten, Gate-Gründe, Kriterien, Rang- oder Gleichstandsdaten.
+ */
+export type FindCardReason = Readonly<{
+  messageKey: string;
+  data: Readonly<Record<string, string>>;
+  labels: Readonly<Record<string, string>>;
+}>;
+
+/**
+ * Welche Reihenfolge eine Suchseite tatsächlich hat. Nur zur Steuerung der Oberfläche
+ * (Transparenzhinweis, Reasons) - "v01" nur, wenn der v0.1-Pfad diese Seite geliefert hat;
+ * nach einem Rückfall "legacy". Trägt bewusst keinen Fehlergrund.
+ */
+export type FindRankingMode = "legacy" | "v01";
+
 export type DiscoveryCandidate = {
   profile: DiscoveryProfilePreview;
   reasons: string[];
+  /** Nur im v0.1-Rankingpfad gesetzt, höchstens FIND_CARD_REASON_LIMIT. */
+  matchingReasons?: readonly FindCardReason[];
   conversationTopics: string[];
   practicalMatches?: DiscoveryPracticalMatch[];
   alignmentSimilarDimensions?: DiscoveryAlignmentDimension[];
@@ -305,4 +325,5 @@ export type DiscoverySearchPage = {
   page: number;
   pageSize: number;
   totalCount: number;
+  rankingMode: FindRankingMode;
 };

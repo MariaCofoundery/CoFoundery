@@ -129,9 +129,11 @@ test("v0.1: globaler Rang, dann Seite, Karten nur für die 12 IDs, in Engine-Rei
 test("Produktantwort ohne Matching-Metadaten", async () => {
   const { result } = await run(world(60), 1);
   assert.ok(result.ok);
-  assert.deepEqual(Object.keys(result.page).sort(), ["page", "pageSize", "profiles", "totalCount"]);
-  const s = JSON.stringify(result);
-  assert.doesNotMatch(s, /score|relevance|mutuality|confidence|eligib|tieGroup|secondaryOrder|mustHaves|must_haves|requiredRolesAny|capability|matchingAllowed|Geheimbranche|GATE_|POOL_/);
+  assert.deepEqual(Object.keys(result.page).sort(), ["page", "pageSize", "profiles", "reasonsByProfileId", "totalCount"]);
+  const s = JSON.stringify({ ...result.page, reasonsByProfileId: [...result.page.reasonsByProfileId] });
+  assert.doesNotMatch(s, /score|relevance|mutuality|confidence|eligib|tieGroup|secondaryOrder|mustHaves|must_haves|requiredRolesAny|matchingAllowed|applicationLevel|application_level|ownershipWish|ownership_wish|Geheimbranche|GATE_|POOL_|LIMITED_EVIDENCE/);
+  // Capability nur als Label-Namespace eines Presenter-Reasons, nie in den Karten.
+  assert.doesNotMatch(JSON.stringify(result.page.profiles), /capability/);
 });
 
 test("Seiten 1/2/3: stabil, keine Doppelten, keine Lücken; außerhalb des Bereichs leer mit Gesamtzahl", async () => {
@@ -224,7 +226,7 @@ test("Routing: Flag aus -> heutige Suche unverändert; v0.1-Fehler -> heutige Su
   assert.match(branch, /if \(v01\.ok\) \{/);
   assert.doesNotMatch(branch, /throw|console\./, "kein Fehler an den Client, keine Logs");
   assert.match(branch, /page: v01\.page\.page,\s*pageSize: v01\.page\.pageSize,\s*totalCount: v01\.page\.totalCount,/);
-  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n  \};/, "heutige Rückgabe unverändert");
+  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n    rankingMode: "legacy",\n  \};/, "heutige Rückgabe unverändert");
   assert.equal((data.match(/isFindV01RankingEnabled\(\)/g) ?? []).length, 1, "nur die Suche, nicht das Stöbern");
 });
 

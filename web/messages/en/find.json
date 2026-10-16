@@ -168,12 +168,32 @@
     "FIND_AREA_OWN_COVERED": "You'd like to hand over {area}; {name} wants to own it.",
     "FIND_AREA_CONTRIBUTE": "{name} can contribute to {area}.",
     "FIND_SAME_INDUSTRY": "You both list {industry}.",
-    "FIND_START_ALIGNED": "You're both aiming to start {horizon}.",
+    "FIND_START_ALIGNED": "You both want to start {horizon}.",
     "FIND_STAGE_COMPLEMENT": "{name} {stage_b}; you {stage_a}.",
     "FIND_DIFF_START": "Your planned start differs ({a} / {b}).",
     "FIND_DIFF_COMMITMENT": "You plan different amounts of time ({a} / {b}) – worth discussing.",
     "FIND_DIFF_GOAL": "Your goals for the venture differ ({a} / {b}).",
     "FIND_UNKNOWN_LOCATION": "Location or way of working is still missing.",
     "FIND_LIMITED_EVIDENCE": "This suggestion is based on limited information."
+  },
+  "reasonStartHorizons": {
+    "now": "now or very soon",
+    "next_3_months": "within the next 3 months",
+    "next_6_months": "within the next 6 months",
+    "later_or_flexible": "later or on a flexible timeline"
+  },
+  "reasonStagesSelf": {
+    "undecided": "are still undecided",
+    "no_idea_open_to_join": "have no idea of your own and are open to joining",
+    "exploring_ideas": "are exploring ideas",
+    "idea_validating": "are validating an idea",
+    "already_building": "are already building"
+  },
+  "reasonStagesOther": {
+    "undecided": "is still undecided",
+    "no_idea_open_to_join": "has no idea of their own and is open to joining",
+    "exploring_ideas": "is exploring ideas",
+    "idea_validating": "is validating an idea",
+    "already_building": "is already building"
   }
 }

@@ -352,7 +352,7 @@ test("Hook: beide Shadows nach der sichtbaren Suche, nicht abgewartet, Rückgabe
   assert.match(fn, /\n  scheduleGlobalFindMatchingShadow\(normalizedUserId, \{ schedule: after \}\);/);
   assert.doesNotMatch(fn, /await scheduleGlobalFindMatchingShadow|= scheduleGlobalFindMatchingShadow/);
   assert.ok(fn.indexOf("scheduleGlobalFindMatchingShadow(") > fn.indexOf("const candidates = attachDiscoveryV2AlignmentSignals("));
-  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n  \};/);
+  assert.match(fn, /return \{\n    candidates,\n    page,\n    pageSize,\n    totalCount,\n    rankingMode: "legacy",\n  \};/);
   assert.equal((data.match(/scheduleGlobalFindMatchingShadow\(/g) ?? []).length, 1);
 });
 
