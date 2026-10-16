@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getDisclosedCapability, getOwnCapabilityEntries } from "./capabilityData";
 import type { ComparisonSide } from "./capabilityComparison";
+import { loadRelationshipDisplayNames } from "@/features/discovery/relationshipDisplayNames";
 
 /**
  * Wer verglichen werden darf, und woher die zwei Seiten kommen.
@@ -74,11 +75,7 @@ export async function getComparablePeople(
           .eq("status", "active")
       : Promise.resolve({ data: [] }),
     discoveryIds.size
-      ? client
-          .from("founder_discovery_profiles")
-          .select("user_id,display_name")
-          .in("user_id", [...discoveryIds])
-          .eq("status", "active")
+      ? loadRelationshipDisplayNames(client, [...discoveryIds], { discoveryActiveOnly: true })
       : Promise.resolve({ data: [] }),
   ]);
 

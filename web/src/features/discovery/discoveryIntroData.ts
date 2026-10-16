@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { loadRelationshipDisplayNames } from "@/features/discovery/relationshipDisplayNames";
 import {
   getActiveDiscoveryProfileById,
   getOwnDiscoveryProfile,
@@ -172,6 +173,18 @@ function mapIntroProfileRow(row: DiscoveryIntroProfileRow): DiscoveryProfilePrev
 
 function getErrorMessage(error: SupabaseError | null | undefined, fallback: string) {
   return error?.message ?? fallback;
+}
+
+/**
+ * Name der Gegenseite aus der Intro-Beziehung, unabhängig davon, ob ihr
+ * FIND-Profil gerade sichtbar ist (Migration 20261130120000). Ohne Namen bleibt
+ * die bisherige neutrale Anzeige - ein Fehler hier blockiert die Liste nicht.
+ */
+async function loadIntroCounterpartNames(client: unknown, userIds: string[]) {
+  const { data } = await loadRelationshipDisplayNames(client, userIds, { discoveryActiveOnly: false });
+  return new Map(
+    (data ?? []).flatMap((row) => (row.display_name ? [[row.user_id, row.display_name] as const] : []))
+  );
 }
 
 async function loadPublicProfilesByUserId(userIds: string[]) {
@@ -471,13 +484,16 @@ export async function getReceivedDiscoveryIntroRequests(
   }
 
   const requests = ((data ?? []) as unknown as DiscoveryIntroRequestRow[]).map(mapIntroRow);
-  const profilesByUserId = await loadPublicProfilesByUserId(
-    requests.map((request) => request.requesterUserId)
-  );
+  const counterpartIds = requests.map((request) => request.requesterUserId);
+  const [profilesByUserId, namesByUserId] = await Promise.all([
+    loadPublicProfilesByUserId(counterpartIds),
+    loadIntroCounterpartNames(supabase, counterpartIds),
+  ]);
 
   return requests.map((request) => ({
     ...request,
     profile: profilesByUserId.get(request.requesterUserId) ?? null,
+    counterpartDisplayName: namesByUserId.get(request.requesterUserId) ?? null,
   }));
 }
 
@@ -514,13 +530,16 @@ export async function getSentDiscoveryIntroRequests(
   }
 
   const requests = ((data ?? []) as unknown as DiscoveryIntroRequestRow[]).map(mapIntroRow);
-  const profilesByUserId = await loadPublicProfilesByUserId(
-    requests.map((request) => request.recipientUserId)
-  );
+  const counterpartIds = requests.map((request) => request.recipientUserId);
+  const [profilesByUserId, namesByUserId] = await Promise.all([
+    loadPublicProfilesByUserId(counterpartIds),
+    loadIntroCounterpartNames(supabase, counterpartIds),
+  ]);
 
   return requests.map((request) => ({
     ...request,
     profile: profilesByUserId.get(request.recipientUserId) ?? null,
+    counterpartDisplayName: namesByUserId.get(request.recipientUserId) ?? null,
   }));
 }
 

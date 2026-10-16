@@ -76,11 +76,21 @@ function formatRoleList(values: DiscoveryFounderRole[], t: DiscoveryT) {
     : t("common.notProvided");
 }
 
-function ProfileSummary({ profile, t }: { profile: DiscoveryProfilePreview | null; t: DiscoveryT }) {
+function ProfileSummary({
+  profile,
+  counterpartName,
+  t,
+}: {
+  profile: DiscoveryProfilePreview | null;
+  counterpartName?: string | null;
+  t: DiscoveryT;
+}) {
   if (!profile) {
+    // Der Name aus der bestehenden Intro-Beziehung bleibt; ob das Profil
+    // pausiert, entfernt oder blockiert ist, sieht man hier nicht.
     return (
       <div>
-        <h3 className="text-xl font-semibold text-slate-950">{t("intros.profileHiddenTitle")}</h3>
+        <h3 className="text-xl font-semibold text-slate-950">{counterpartName || t("intros.profileHiddenTitle")}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           {t("intros.profileHiddenText")}
         </p>
@@ -169,7 +179,7 @@ function ReceivedIntroCard({
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <ProfileSummary profile={request.profile} t={t} />
+        <ProfileSummary profile={request.profile} counterpartName={request.counterpartDisplayName} t={t} />
         <StatusPill request={request} t={t} />
       </div>
       <div className="mt-4 grid gap-3">
@@ -257,7 +267,7 @@ function SentIntroCard({
   return (
     <article className="rounded-3xl border border-slate-200 bg-white p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <ProfileSummary profile={request.profile} t={t} />
+        <ProfileSummary profile={request.profile} counterpartName={request.counterpartDisplayName} t={t} />
         <StatusPill request={request} t={t} />
       </div>
       <div className="mt-4 grid gap-3">

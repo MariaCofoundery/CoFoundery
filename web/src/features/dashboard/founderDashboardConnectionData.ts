@@ -7,6 +7,7 @@ import {
 import type { InvitationDashboardRow } from "@/features/reporting/actions";
 import type { FounderTeamDashboardSummary } from "@/features/teams/founderTeamHomebaseModel";
 import { createClient } from "@/lib/supabase/server";
+import { loadRelationshipDisplayNames } from "@/features/discovery/relationshipDisplayNames";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -85,11 +86,7 @@ export async function getFounderDashboardConnectionsV2(params: {
           .in("team_id", teamIds)
       : Promise.resolve({ data: [], error: null }),
     counterpartIds.length
-      ? supabase
-          .from("founder_discovery_profiles")
-          .select("user_id, display_name")
-          .in("user_id", counterpartIds)
-          .eq("status", "active")
+      ? loadRelationshipDisplayNames(supabase, counterpartIds, { discoveryActiveOnly: true })
       : Promise.resolve({ data: [], error: null }),
   ]);
 

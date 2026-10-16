@@ -7,6 +7,7 @@ import { isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import type { FounderTeamDashboardSummary } from "@/features/teams/founderTeamHomebaseModel";
 import { createClient } from "@/lib/supabase/server";
 import { getReadMyMindPack } from "@/features/collaborationLab/readMyMindContent";
+import { loadRelationshipDisplayNames } from "@/features/discovery/relationshipDisplayNames";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -142,11 +143,7 @@ export async function getFounderDashboardTasks(params: {
           .in("source_id", discoveryMatchingStartIds)
       : Promise.resolve({ data: [], error: null }),
     discoveryCounterpartUserIds.length > 0
-      ? supabase
-          .from("founder_discovery_profiles")
-          .select("user_id, display_name")
-          .in("user_id", discoveryCounterpartUserIds)
-          .eq("status", "active")
+      ? loadRelationshipDisplayNames(supabase, discoveryCounterpartUserIds, { discoveryActiveOnly: true })
       : Promise.resolve({ data: [], error: null }),
   ]);
   const matchingSessions = matchingSessionResult.error

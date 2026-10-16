@@ -24,6 +24,12 @@ export type DiscoveryIntroRequest = {
 
 export type DiscoveryIntroRequestWithProfile = DiscoveryIntroRequest & {
   profile: DiscoveryProfilePreview | null;
+  /**
+   * Anzeigename der Gegenseite aus der bestehenden Intro-Beziehung - auch wenn
+   * ihr FIND-Profil nicht sichtbar ist (pausiert, entfernt oder blockiert; die
+   * Oberfläche unterscheidet das nicht). Keine weiteren Profildaten.
+   */
+  counterpartDisplayName?: string | null;
 };
 
 export type DiscoveryIntroMatchingPreparation = {

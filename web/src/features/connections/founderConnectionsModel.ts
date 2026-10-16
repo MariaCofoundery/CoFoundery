@@ -139,7 +139,7 @@ export function buildFounderConnectionsReadModel(params: {
       source: "intro" as const,
       direction: counterpart!.direction,
       counterpartUserId: counterpart!.userId,
-      counterpartName: request.profile?.displayName ?? null,
+      counterpartName: request.profile?.displayName ?? request.counterpartDisplayName ?? null,
       teamContext: "pre_founder" as const,
       state: request.status === "accepted" ? ("intro_accepted" as const) : ("request_pending" as const),
       href:

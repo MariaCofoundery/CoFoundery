@@ -286,6 +286,14 @@ const LIVE_COLUMNS: Record<string, string[]> = {
 function schemaBoundClient(rows: Record<string, Array<Record<string, unknown>>>) {
   const queries: Array<{ table: string; select: string[]; filters: string[] }> = [];
   const client = {
+    // Seit 20261130120000 kommen Namen in Beziehungen aus get_relationship_display_names.
+    rpc(name: string, args: Record<string, unknown>) {
+      queries.push({ table: `rpc:${name}`, select: [], filters: [] });
+      assert.equal(name, "get_relationship_display_names", `unerwarteter RPC ${name}`);
+      const ids = args.p_user_ids as string[];
+      const data = (rows.relationship_display_names ?? []).filter((row) => ids.includes(row.user_id as string));
+      return Promise.resolve({ data, error: null });
+    },
     from(table: string) {
       const known = LIVE_COLUMNS[table];
       assert.ok(known, `unerwartete Tabelle ${table}`);
@@ -363,7 +371,7 @@ test("ein Founder mit Relationship bekommt seinen Report-Status - ohne report_ru
       { id: "rel-ab", user_a_id: alice, user_b_id: bob, founder_team_id: null, created_at: "2026-08-03" },
     ],
     report_runs: [{ relationship_id: "rel-ab", invitation_id: "invite-ab", created_at: "2026-08-05" }],
-    founder_discovery_profiles: [{ user_id: bob, display_name: "Bob", status: "active" }],
+    relationship_display_names: [{ user_id: bob, display_name: "Bob", discovery_active: true }],
   });
 
   // Vorher: wirft dashboard_connection_statuses_unavailable.
@@ -389,7 +397,7 @@ test("ein Founder mit Relationship bekommt seinen Report-Status - ohne report_ru
   // Research, und die uebrigen Quellen sind dieselben wie vorher.
   assert.deepEqual(
     [...new Set(queries.map((query) => query.table))].sort(),
-    ["commitment_labs", "founder_discovery_profiles", "relationship_advisors", "relationships", "report_runs"]
+    ["commitment_labs", "relationship_advisors", "relationships", "report_runs", "rpc:get_relationship_display_names"]
   );
   for (const query of queries) {
     assert.ok(!query.select.includes("payload"), `${query.table} liest payload`);

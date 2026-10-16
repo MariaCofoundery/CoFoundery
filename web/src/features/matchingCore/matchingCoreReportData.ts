@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { loadRelationshipDisplayNames } from "@/features/discovery/relationshipDisplayNames";
 import type { MatchingSessionModule } from "@/features/matchingCore/matchingCoreTypes";
 import { assertFounderBaseQuestionVersionContract } from "@/features/scoring/founderBaseQuestionMeta";
 import {
@@ -291,14 +292,12 @@ async function loadDiscoveryDisplayNames(client: SupabaseLikeClient, userIds: st
     return new Map<string, string>();
   }
 
-  const { data, error } = await client
-    .from("founder_discovery_profiles")
-    .select("user_id, display_name")
-    .in("user_id", uniqueUserIds)
-    .eq("status", "active");
+  // Seit 20261130120000 ueber die Beziehungsfunktion: Name bleibt auch bei einer
+  // Blockierung erhalten, weiter nur bei aktivem FIND-Profil.
+  const { data, error } = await loadRelationshipDisplayNames(client, uniqueUserIds, { discoveryActiveOnly: true });
 
   if (error) {
-    throw new Error(getErrorMessage(error, "matching_report_profiles_load_failed"));
+    throw new Error(getErrorMessage(error as SupabaseError, "matching_report_profiles_load_failed"));
   }
 
   return new Map(
