@@ -1,5 +1,6 @@
 import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
+import { WorkstyleProfileSummary } from "@/features/reporting/workstyle/WorkstyleProfileSummary";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -15,7 +16,7 @@ import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
-import { FounderProfileCapability } from "@/features/reporting/FounderProfileCapability";
+import { CapabilityMap } from "@/features/reporting/CapabilityMap";
 import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
@@ -42,27 +43,25 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * vorhandene Quellen und schreibt nichts. Keine Kopie, keine zweite Wahrheit.
  *
  * ---------------------------------------------------------------------------
- * DREI TEILE, NEUN ABSCHNITTE - SEIT DEM 01.10.2026
+ * SIEBEN ABSCHNITTE - SEIT PHASE 1 (PROFIL), 17.10.2026
  * ---------------------------------------------------------------------------
  *
- * Vorher waren es vier Saeulen, und sie trugen sehr verschieden grosse
- * Inhalte: "Wie du arbeitest" war die laengste Seite des Produkts, "Wer du
- * bist" sechs Zeilen. Unter "Was du mitbringst" lagen vier verschiedene
- * Fragen in einem Block - welche Bereiche, wie tief, was davon verantworten,
- * wohin wachsen.
- *
- * Jetzt: drei Teile, neun Abschnitte, und jeder Abschnitt beantwortet genau
- * eine Frage.
+ * Vorher neun Abschnitte, und unter „Was du mitbringst" lagen vier davon fuer
+ * EINE Frage (welche Bereiche, wie tief, was verantworten, wohin wachsen) -
+ * dazu eine Deckungskarte, die nur zaehlte, wie viel ausgefuellt ist.
+ * Gemeldet: zu textlastig, zu viele Wiederholungen, Nummern mit Spruengen.
  *
  *   TEIL I  - Wer du bist          1 Ueber dich
- *                                  2 Wie du arbeitest
+ *                                  2 Wie du arbeitest      (Kurzfassung)
  *                                  3 Deine Staerken
- *   TEIL II - Was du mitbringst    4 Deine Faehigkeiten
- *                                  5 Erfahrung & Tiefe
- *                                  6 Was du verantworten willst
- *                                  7 Wohin du wachsen willst
- *                                  8 Netzwerk, Zugaenge & Ressourcen
- *   TEIL III- Was dich antreibt    9 Was dich antreibt
+ *   TEIL II - Was du mitbringst    4 Was du mitbringst     (Capability Map + Ressourcen)
+ *   TEIL III- Was dich antreibt    5 Was dich antreibt
+ *                                  6 Deine Vorhaben        (nur Namen und Weg dorthin)
+ *                                  7 Details & Methodik    (vollstaendiger Bericht,
+ *                                                           Abdeckung, Archiv, Hinweis)
+ *
+ * DIE NUMMER ZAEHLT NUR, WAS ZU SEHEN IST. Vorher behielt ein ausgeblendeter
+ * Abschnitt seinen Platz, und die Zaehlung sprang von 7 auf 9.
  *
  * ---------------------------------------------------------------------------
  * EINE ZUSAMMENFASSUNG, EIN AUFKLAPPER - NICHT MEHR
@@ -104,12 +103,10 @@ type SectionId =
   | "ueber-dich"
   | "arbeitsweise"
   | "staerken"
-  | "faehigkeiten"
-  | "erfahrung"
-  | "verantwortung"
-  | "entwicklung"
-  | "ressourcen"
-  | "antrieb";
+  | "mitbringst"
+  | "antrieb"
+  | "vorhaben"
+  | "details";
 
 export default async function FounderProfilePage() {
   const locale = await getRequestLocale();
@@ -136,20 +133,15 @@ export default async function FounderProfilePage() {
     report,
     workstyleV04,
     workProfile,
-    vocabulary,
     entries,
-    orderedEntries,
     directionStatements,
     strengths,
     confirmedResources,
     freshness,
-    ventures,
+    visibleVentures,
     photo,
-    readout,
     coverage,
-    ownershipGroups,
-    growingInto,
-    deepAreas,
+    capabilityMap,
     handsOver,
   } = modell;
 
@@ -193,37 +185,39 @@ export default async function FounderProfilePage() {
     { id: "ueber-dich", title: t("sections.about") },
     { id: "arbeitsweise", title: t("sections.work") },
     { id: "staerken", title: t("sections.strengths") },
-    { id: "faehigkeiten", title: t("sections.capability") },
-    { id: "erfahrung", title: t("sections.depth") },
-    { id: "verantwortung", title: t("sections.ownership") },
-    { id: "entwicklung", title: t("sections.growing") },
-    { id: "ressourcen", title: t("sections.resources") },
+    { id: "mitbringst", title: t("sections.bring") },
     { id: "antrieb", title: t("sections.direction") },
+    { id: "vorhaben", title: t("sections.ventures") },
+    { id: "details", title: t("sections.details") },
   ];
-  // "Abschnitt 4" - OHNE GESAMTZAHL. Siehe `ProfilePillar`: "4 von 9" war
-  // als Position gemeint und wurde als Fortschritt gelesen.
-  const nummer = (id: SectionId) =>
-    t("sections.step", {
-      index: sections.findIndex((section) => section.id === id) + 1,
-    });
-  const detailsHint = (count: number) => t("detailsHint", { count });
-  const originLabel = (origin: string) => t(`origins.${origin}`);
 
-  // Welche Abschnitte ueberhaupt erscheinen. Zwei duerfen ganz entfallen:
-  // "wohin du wachsen willst" und die Ressourcen. Bei beiden ist NICHTS eine
-  // gueltige Antwort, und ein Leerzustand waere die Aufforderung, sich ein
-  // Defizit zu suchen.
+  // Welche Abschnitte ueberhaupt erscheinen. Nur die Vorhaben duerfen ganz
+  // entfallen - ohne Vorhaben gibt es nichts zu verlinken, und ein Leerzustand
+  // waere eine Aufforderung, eines anzulegen. Alle anderen stehen immer und
+  // tragen bei leerer Datenlage einen Hinweis mit einem Weg.
   const zeigt: Record<SectionId, boolean> = {
     "ueber-dich": true,
     arbeitsweise: true,
     staerken: true,
-    faehigkeiten: true,
-    erfahrung: entries.length > 0,
-    verantwortung: true,
-    entwicklung: growingInto.length > 0,
-    ressourcen: confirmedResources.length > 0,
+    mitbringst: true,
     antrieb: true,
+    vorhaben: visibleVentures.length > 0,
+    details: true,
   };
+  const sichtbar = sections.filter((section) => zeigt[section.id]);
+
+  // "Abschnitt 4" - OHNE GESAMTZAHL. Siehe `ProfilePillar`: "4 von 9" war
+  // als Position gemeint und wurde als Fortschritt gelesen.
+  // GEZAEHLT WIRD NUR, WAS ZU SEHEN IST (Phase 1): Vorher behielt ein
+  // ausgeblendeter Abschnitt seinen Platz, und die Nummern sprangen.
+  const nummer = (id: SectionId) =>
+    t("sections.step", {
+      index: sichtbar.findIndex((section) => section.id === id) + 1,
+    });
+  const detailsHint = (count: number) => t("detailsHint", { count });
+  const originLabel = (origin: string) => t(`origins.${origin}`);
+  const dateLabel = (value: string) =>
+    new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(value));
 
   /**
    * Ein Abschnitt - oder nichts, wenn es dazu nichts zu zeigen gibt.
@@ -353,8 +347,7 @@ export default async function FounderProfilePage() {
             damit man sieht, dass dort noch etwas kommt. Der Rollbereich ist
             der der Liste; die Seite selbst wird dadurch nicht breiter. */}
         <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 lg:mx-0 lg:flex-wrap lg:overflow-x-visible lg:px-0 lg:pb-0">
-          {sections
-            .filter((section) => zeigt[section.id])
+          {sichtbar
             .map((section) => (
               <li key={section.id} className="shrink-0">
                 <a
@@ -400,112 +393,34 @@ export default async function FounderProfilePage() {
           </>
         )}
 
-        {/* 2 - Wie du arbeitest.
+        {/* 2 - Wie du arbeitest. DIE KURZFASSUNG (Phase 1).
 
-            Gelesen wird mit derselben Funktion wie in der Advisor-Ansicht.
-            KEINE PUNKTZAHL UND KEINE DEUTUNG: Die Registratur sagt
-            `overallScore: false` und `dimensionScores: false`; die WorkMap
-            setzt einen Punkt je Antwort und rechnet nichts zusammen. */}
+            Je Bereich EIN Satz auf der Karte, dazu was die Karten nicht sagen:
+            wo die Antworten durchgehend in eine Richtung zeigen und - bei
+            „je nach Situation" - je Pol eine konkrete Situation. Der
+            vollstaendige Bericht (Bereich fuer Bereich, Legende, „So liest du
+            das", Anhang) steht unveraendert unter „Details & Methodik" und
+            auf der eigenen Berichtsseite.
+
+            KEINE PUNKTZAHL UND KEINE DEUTUNG: dieselbe Auswertung wie dort
+            (`narrative.ts`), nichts neu gerechnet. */}
         {teil(
           "arbeitsweise",
           "indigo",
-          <>
-            {workstyleV04 ? (
-              <>
-                <IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} />
-                <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
-                  {t("currentWorkstyle.openReport")}
-                </Link>
-              </>
-            ) : (
-              <MissingSection
-                title={t("currentWorkstyle.empty")}
-                href={CURRENT_WORKSTYLE_HREF}
-                cta={t("currentWorkstyle.cta")}
-              />
-            )}
-
-            {/* Phase 10: Das fruehere Arbeitsprofil (founder-profile-v1) nur
-                noch datiert zum Nachlesen - kein Bearbeiten-Link mehr in den
-                alten Fragebogen und nie ein Ersatz fuer den aktuellen Bericht. */}
-            {workProfile && (
-              <ProfileDetails
-                summary={`${t("historicalWorkProfile.title")} — ${t("historicalWorkProfile.dated", {
-                  date: workProfile.submittedAt
-                    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-                        new Date(workProfile.submittedAt)
-                      )
-                    : "—",
-                })}`}
-                hint={null}
-              >
-              <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-                <p className="max-w-3xl text-sm leading-7 text-slate-700">
-                  {t("historicalWorkProfile.text")}
-                </p>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-                  {t("workProfile.note")}
-                </p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t("workProfile.answered", {
-                    answered: workProfile.answered,
-                    of: workProfile.of,
-                  })}
-                </p>
-
-                <div className="mt-5">
-                  <WorkMap sections={workProfile.sections} />
-                </div>
-
-                {/* WAS SICH IN DEN ANTWORTEN ZEIGT - die Ebene zwischen Bild
-                    und Liste, neu am 01.10.2026. Sie steht OFFEN: Die
-                    Rohantworten sind das Nachschlagewerk und bleiben
-                    eingeklappt; dies hier ist das Ergebnis. */}
-                <div className="mt-5">
-                  <WorkProfileSynthesisView sections={workProfile.sections} heading="h3" />
-                </div>
-
-                <div className="mt-4">
-                  <div>
-                    <ReportViewV21
-                      sections={workProfile.sections}
-                      orphans={workProfile.orphans}
-                      marked={workProfile.marked}
-                    />
-                  </div>
-                </div>
-              </section>
-              </ProfileDetails>
-            )}
-
-            {/* DER ALTBESTAND - DARUNTER, ZUGEKLAPPT, DATIERT.
-
-                Nur fuer Menschen, die den frueheren Bogen tatsaechlich
-                abgegeben haben. Er wird NICHT mit dem neuen verrechnet: keine
-                gemeinsame Skala, keine gemeinsame Karte, keine Zuordnung
-                alter Dimensionen auf neue Abschnitte. Zwei Fassungen messen
-                nicht dasselbe, und eine gemeinsame Darstellung waere eine
-                Behauptung ueber Vergleichbarkeit. */}
-            {report ? (
-              <ProfileDetails
-                summary={`${t("legacyReport.title")} — ${t("legacyReport.dated", {
-                  date: report.createdAt
-                    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-                        new Date(report.createdAt)
-                      )
-                    : "—",
-                })}`}
-                hint={null}
-              >
-                <p className="max-w-3xl text-sm leading-6 text-slate-500">
-                  {t("legacyReport.text")}
-                </p>
-                <div className="mt-4">
-                  <SelfReportView report={report} density="summary" detailsHint={detailsHint} legacy />
-                </div>
-              </ProfileDetails>
-            ) : null}
-          </>
+          workstyleV04 ? (
+            <>
+              <WorkstyleProfileSummary locale={await getDisplayLocale()} profile={workstyleV04} />
+              <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
+                {t("currentWorkstyle.openReport")}
+              </Link>
+            </>
+          ) : (
+            <MissingSection
+              title={t("currentWorkstyle.empty")}
+              href={CURRENT_WORKSTYLE_HREF}
+              cta={t("currentWorkstyle.cta")}
+            />
+          )
         )}
 
         {/* 3 - Deine Staerken. Zusammenfassung: die ersten fuenf.
@@ -553,9 +468,14 @@ export default async function FounderProfilePage() {
               <EditLink href="/profile?step=strengths" label={t("edit")} />
             </>
           ) : (
+            // EIN WEG, DIREKT: `/profile?step=strengths` ist ein eigener Schritt
+            // im Editor (PAGE_STEPS) mit Formular zum Festhalten. Keine zweite
+            // Aktion fuer KI-Vorschlaege - die entstehen nur, wenn der
+            // Worker laeuft, und ein Knopf, der dann nichts tut, waere eine
+            // Attrappe.
             <MissingSection
               title={t("strengthsSection.empty")}
-              text={t("strengthsSection.intro")}
+              text={t("strengthsSection.emptyText")}
               href="/profile?step=strengths"
               cta={t("strengthsSection.emptyCta")}
             />
@@ -572,273 +492,154 @@ export default async function FounderProfilePage() {
         eyebrow={t("parts.two")}
         title={t("parts.twoTitle")}
       >
-        {/* 4 - Deine Faehigkeiten. Die Landkarte, nicht die Bewertung.
-            `unspoken` ist bei 54 Bereichen der Normalfall und wird blass
-            gezeichnet, nie wie eine Luecke. */}
+        {/* 4 - Was du mitbringst. EIN Abschnitt statt vier (Phase 1).
+
+            Je Bereich stehen Erfahrung und Rolle nebeneinander - getrennt,
+            nicht verrechnet: Koennen ist nicht Wollen. „Will verantworten,
+            bisher weniger Erfahrung" bleibt genau das; „hineinwachsen" steht
+            nur da, wo es jemand so angegeben hat (`grow_into`).
+
+            Die Deckungskarte („x von y Bereichen") war eine Zaehlung, keine
+            Aussage ueber die Person. Sie steht jetzt unter „Details &
+            Methodik"; hier bleibt eine dezente Zeile, wie viel beschrieben ist. */}
         {teil(
-          "faehigkeiten",
+          "mitbringst",
           "emerald",
-          entries.length > 0 ? (
-            <>
-              <CoverageMap
-                coverage={coverage}
-                copy={{
-                  title: t("coverage.title"),
-                  intro: t("coverage.intro"),
-                  familyLabel: (familyId) => tCapability(`families.${familyId}`),
-                  stateLabel: (state) => t(`coverage.states.${state}`),
-                  familyCount: (entered, total) => t("coverage.familyCount", { entered, total }),
-                  familyUnspoken: t("coverage.familyUnspoken"),
-                  basis: t("coverage.basis"),
-                }}
-              />
-              <EditLink href="/profile?step=areas" label={t("edit")} />
-            </>
-          ) : (
-            <MissingSection
-              title={t("missingCapability.title")}
-              text={t("missingCapability.text")}
-              href="/profile/interview"
-              cta={t("missingCapability.cta")}
-            />
-          )
-        )}
-
-        {/* 5 - Erfahrung & Tiefe.
-
-            KEINE "BESTEN SKILLS". `DEPTH_LEVEL` ist die Grenze, ab der eine
-            Angabe als Tiefe gilt - das ist eine Selbstauskunft ueber
-            Haeufigkeit und keine Rangliste. Und es gibt keine 0: "noch nichts
-            eingetragen" ist `null`, nicht die unterste Stufe. */}
-        {teil(
-          "erfahrung",
-          "emerald",
-          <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-            <p className="max-w-3xl text-sm leading-7 text-slate-700">{t("depth.intro")}</p>
-            <p className="mt-2 text-sm text-slate-600">
-              {t("depth.counts", { levelled: readout.levelledCount, areas: readout.areaCount })}
-            </p>
-
-            {readout.levelledCount === 0 ? (
-              <p className="mt-3 text-sm leading-6 text-slate-500">{t("depth.noLevels")}</p>
-            ) : deepAreas.length > 0 ? (
-              <div className="mt-5">
-                <h3 className="text-sm font-semibold text-slate-900">{t("depth.depthTitle")}</h3>
-                <ul className="mt-2 flex flex-wrap gap-2">
-                  {deepAreas.map((areaId) => (
-                    <li
-                      key={areaId}
-                      className="rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-900"
-                    >
-                      {areaLabel(areaId)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p className="mt-3 text-sm leading-6 text-slate-500">{t("depth.depthNone")}</p>
-            )}
-
-            <div className="mt-5">
-              <ProfileDetails
-                summary={t("depth.detailsSummary")}
-                hint={detailsHint(orderedEntries.length)}
-              >
-                <FounderProfileCapability
-                  entries={orderedEntries}
-                  copy={{
-                    title: null,
-                    intro: t("capability.intro"),
-                    areaLabel,
-                    levelLabel: (level) => tCapability(`levels.${level}`),
-                    wishLabel: (wish) => tCapability(`ownershipWishes.${wish}`),
-                    evidenceCount: (count) => t("capability.evidenceCount", { count }),
-                    noLevel: t("capability.noLevel"),
-                  }}
-                />
-              </ProfileDetails>
-            </div>
-
-            <EditLink href="/profile?step=evidence" label={t("edit")} />
-          </section>
-        )}
-
-        {/* 6 - Was du verantworten willst.
-
-            KOENNEN UND WOLLEN SIND ZWEI VERSCHIEDENE DINGE - das ist der
-            tragende Satz des Modells und steht deshalb als erster da.
-
-            Die Rollenliste nach Faltin bleibt die Zusammenfassung: Ein
-            Bereich zaehlt, wenn er ins Team gehoert UND verantwortet werden
-            soll. Die Erfahrungsstufe wird dabei NICHT verrechnet. */}
-        {teil(
-          "verantwortung",
-          "emerald",
-          entries.length > 0 ? (
-            <>
-              <p className="max-w-3xl text-sm leading-7 text-slate-700">{t("ownership.intro")}</p>
-              <CoverageRoles
-                coverage={coverage}
-                copy={{
-                  rolesTitle: t("coverage.rolesTitle"),
-                  rolesIntro: t("coverage.rolesIntro"),
-                  rolesNone: t("coverage.rolesNone"),
-                  rolesOpen: (count) => t("coverage.rolesOpen", { count }),
-                  rolesCaveat: t("coverage.rolesCaveat"),
-                  areaLabel,
-                }}
-              />
-              {/* DER EINE BEFUND, DER MEHR SAGT ALS DIE GRUPPEN.
-
-                  "Tiefe angegeben, und trotzdem soll es jemand anders
-                  uebernehmen" - das steht in keiner der vier Gruppen, weil
-                  die die Erfahrungsstufe gar nicht kennen. Es ist die
-                  deutlichste Stelle, an der man sieht, dass Koennen und
-                  Wollen zwei verschiedene Dinge sind.
-
-                  Die uebrigen vier Befunde aus `capabilityReadout` stehen
-                  hier NICHT: `anchor`, `contributes` und `undecided` sagen
-                  dasselbe wie die Gruppen darunter, nur gedeutet, und
-                  `growingInto` hat seinen eigenen Abschnitt. */}
-              {handsOver.length > 0 ? (
-                <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    {tCapability("readout.findings.canButHandsOver.title")}
-                  </h3>
-                  <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                    {tCapability("readout.findings.canButHandsOver.text")}
-                  </p>
-                  <ul className="mt-3 flex flex-wrap gap-2">
-                    {handsOver.map((areaId) => (
-                      <li
-                        key={areaId}
-                        className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
-                      >
-                        {areaLabel(areaId)}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              <ProfileDetails
-                summary={t("ownership.detailsSummary")}
-                hint={detailsHint(ownershipGroups.length)}
-              >
-                <div className="grid gap-5 sm:grid-cols-2">
-                  {ownershipGroups.map((group) => (
-                    <div key={group.key}>
-                      <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                        {t(`ownership.groups.${group.key}`)}
-                      </h3>
-                      <ul className="mt-2 flex flex-wrap gap-2">
-                        {group.areaIds.map((areaId) => (
-                          <li
-                            key={areaId}
-                            className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
-                          >
-                            {areaLabel(areaId)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+          <>
+            {entries.length > 0 ? (
+              <>
+                <p className="max-w-3xl text-sm leading-7 text-slate-700">{t("bring.intro")}</p>
+                <div className="mt-5">
+                  <CapabilityMap
+                    map={capabilityMap}
+                    copy={{
+                      familyLabel: (familyId) => tCapability(`families.${familyId}`),
+                      areaLabel,
+                      experience: t("bring.experience"),
+                      role: t("bring.role"),
+                      levelLabel: (level) => tCapability(`levels.${level}`),
+                      levelUnset: tCapability("levels.unset"),
+                      roleLabel: (role) => t(`bring.roles.${role}`),
+                      sourcingLabel: (sourcing) => tCapability(`sourcing.${sourcing}`),
+                      lessExperience: t("bring.lessExperience"),
+                    }}
+                  />
                 </div>
-              </ProfileDetails>
-              <EditLink href="/profile?step=ownership" label={t("edit")} />
-            </>
-          ) : (
-            <MissingSection
-              title={t("ownership.empty")}
-              text={t("ownership.intro")}
-              href="/profile?step=ownership"
-              cta={t("missingCapability.cta")}
-            />
-          )
-        )}
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  {t("bring.counts", {
+                    areas: capabilityMap.counts.areas,
+                    levelled: capabilityMap.counts.levelled,
+                    withRole: capabilityMap.counts.withRole,
+                  })}
+                </p>
 
-        {/* 7 - Wohin du wachsen willst.
-
-            Abgeleitet, nicht gespeichert: Wunsch `grow_into`, oder `own` bei
-            einer Stufe unter vier. Beides heisst "da will ich hin" und nicht
-            "da fehlt mir etwas".
-
-            KEIN LEERZUSTAND. Der Abschnitt entfaellt ganz - "hier koennte
-            stehen, woran du arbeitest" waere die Aufforderung, sich etwas
-            vorzuwerfen. */}
-        {teil(
-          "entwicklung",
-          "emerald",
-          <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-            <p className="max-w-3xl text-sm leading-7 text-slate-700">{t("growingInto.intro")}</p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {growingInto.map((areaId) => (
-                <li
-                  key={areaId}
-                  className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
-                >
-                  {areaLabel(areaId)}
-                </li>
-              ))}
-            </ul>
-            <EditLink href="/profile?step=ownership" label={t("edit")} />
-          </section>
-        )}
-
-        {/* 8 - Netzwerk, Zugaenge & Ressourcen.
-
-            NUR BESTAETIGTES. Ein offener Vorschlag ist eine
-            Modellbehauptung; hier stuende er wie eine Aussage der Person.
-            Entschieden wird weiterhin dort, wo der Vorschlag entstanden ist. */}
-        {teil(
-          "ressourcen",
-          "emerald",
-          <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-            <p className="max-w-3xl text-sm leading-7 text-slate-700">{t("resources.intro")}</p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-3">
-              {RESOURCE_KINDS.map((kind) => {
-                const darin = confirmedResources.filter((resource) => resource.kind === kind);
-                if (darin.length === 0) return null;
-                return (
-                  <div key={kind}>
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                      {t(`resources.kinds.${kind}`)}
+                {/* DER EINE BEFUND, DER MEHR SAGT ALS DIE ZEILEN: Tiefe
+                    angegeben, und trotzdem soll es jemand anders
+                    uebernehmen. Die deutlichste Stelle, an der man sieht,
+                    dass Koennen und Wollen zwei verschiedene Dinge sind. */}
+                {handsOver.length > 0 ? (
+                  <section className="page-section mt-5 rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      {tCapability("readout.findings.canButHandsOver.title")}
                     </h3>
-                    <ul className="mt-2 flex flex-wrap gap-2">
-                      {darin.map((resource) => (
+                    <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+                      {tCapability("readout.findings.canButHandsOver.text")}
+                    </p>
+                    <ul className="mt-3 flex flex-wrap gap-2">
+                      {handsOver.map((areaId) => (
                         <li
-                          key={resource.id}
+                          key={areaId}
                           className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
                         >
-                          {resource.label}
+                          {areaLabel(areaId)}
                         </li>
                       ))}
                     </ul>
-                  </div>
-                );
-              })}
-            </div>
+                  </section>
+                ) : null}
 
-            <div className="mt-5">
-              <ProfileDetails
-                summary={t("resourcesSection.detailsSummary")}
-                hint={detailsHint(confirmedResources.length)}
-              >
-                <ul className="space-y-2">
-                  {confirmedResources.map((resource: PersonResource) => (
-                    <li key={resource.id} className="text-sm leading-6 text-slate-900">
-                      {resource.label}
-                      <span className="mt-0.5 block text-xs leading-5 text-slate-500">
-                        {t(`resources.kinds.${resource.kind}`)} · {originLabel(resource.origin)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </ProfileDetails>
-            </div>
+                {/* Die Rollen nach Faltin: was ins Team gehoert UND verantwortet
+                    werden soll. Eine Teamfrage - deshalb eingeklappt. */}
+                <div className="mt-5">
+                  <ProfileDetails summary={t("bring.rolesSummary")} hint={null}>
+                    <CoverageRoles
+                      coverage={coverage}
+                      copy={{
+                        rolesTitle: t("coverage.rolesTitle"),
+                        rolesIntro: t("coverage.rolesIntro"),
+                        rolesNone: t("coverage.rolesNone"),
+                        rolesOpen: (count) => t("coverage.rolesOpen", { count }),
+                        rolesCaveat: t("coverage.rolesCaveat"),
+                        areaLabel,
+                      }}
+                    />
+                  </ProfileDetails>
+                </div>
+                <EditLink href="/profile?step=areas" label={t("edit")} />
+              </>
+            ) : (
+              <MissingSection
+                title={t("missingCapability.title")}
+                text={t("missingCapability.text")}
+                href="/profile/interview"
+                cta={t("missingCapability.cta")}
+              />
+            )}
 
-            <EditLink href="/profile?step=resources" label={t("edit")} />
-          </section>
+            {/* Netzwerk, Zugaenge & Ressourcen - Teil dessen, was jemand
+                mitbringt. NUR BESTAETIGTES: Ein offener Vorschlag ist eine
+                Modellbehauptung. Ohne Bestaetigtes entfaellt der Block ganz. */}
+            {confirmedResources.length > 0 ? (
+              <section className="page-section mt-8 rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+                <h3 className="text-base font-semibold text-slate-900">{t("sections.resources")}</h3>
+                <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{t("resources.intro")}</p>
+                <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                  {RESOURCE_KINDS.map((kind) => {
+                    const darin = confirmedResources.filter((resource) => resource.kind === kind);
+                    if (darin.length === 0) return null;
+                    return (
+                      <div key={kind}>
+                        <h4 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          {t(`resources.kinds.${kind}`)}
+                        </h4>
+                        <ul className="mt-2 flex flex-wrap gap-2">
+                          {darin.map((resource) => (
+                            <li
+                              key={resource.id}
+                              className="rounded-full bg-slate-50 px-3 py-1 text-sm text-slate-800"
+                            >
+                              {resource.label}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-5">
+                  <ProfileDetails
+                    summary={t("resourcesSection.detailsSummary")}
+                    hint={detailsHint(confirmedResources.length)}
+                  >
+                    <ul className="space-y-2">
+                      {confirmedResources.map((resource: PersonResource) => (
+                        <li key={resource.id} className="text-sm leading-6 text-slate-900">
+                          {resource.label}
+                          <span className="mt-0.5 block text-xs leading-5 text-slate-500">
+                            {t(`resources.kinds.${resource.kind}`)} · {originLabel(resource.origin)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </ProfileDetails>
+                </div>
+
+                <EditLink href="/profile?step=resources" label={t("edit")} />
+              </section>
+            ) : null}
+          </>,
+          false
         )}
       </ProfilePart>
 
@@ -851,17 +652,14 @@ export default async function FounderProfilePage() {
         eyebrow={t("parts.three")}
         title={t("parts.threeTitle")}
       >
-        {/* 9 - Was dich antreibt.
+        {/* 5 - Was dich antreibt.
 
             NUR BESTAETIGTE AUSSAGEN. Ein Vorschlag eines Modells ist keine
             Aussage ueber einen Menschen, solange der Mensch ihn nicht
             bestaetigt hat.
 
-            DIE RUBRIKEN SIND DIE FACETTEN. Sie tragen laengst Beschriftungen
-            in normaler Sprache ("Probleme, die mir wichtig sind"), und sie
-            zu sechs groesseren Gruppen zusammenzufassen haette zwei Facetten
-            in einen Topf geworfen, die die Person getrennt eingetragen hat.
-            Es gibt keine Zusammenfassung darueber und keine Typologie. */}
+            DIE RUBRIKEN SIND DIE FACETTEN. Es gibt keine Zusammenfassung
+            darueber und keine Typologie. */}
         {teil(
           "antrieb",
           "violet",
@@ -909,75 +707,188 @@ export default async function FounderProfilePage() {
       </ProfilePart>
 
       {/* ------------------------------------------------------------------
-          DEINE VORHABEN - ALS VERWEIS, NICHT ALS ABSCHNITT
+          6 - DEINE VORHABEN - ALS VERWEIS
 
           Was zu einem Vorhaben festgehalten ist, gilt fuer DIESES Vorhaben
           und einen Zeitraum; das Profil gilt fuer die Person. Hier stehen
           deshalb nur Namen und der Weg dorthin - keine Zusagen, keine
           Risikogrenzen, keine Teamregeln, keine Alignment-Ergebnisse.
 
-          Der Satz daneben ist wichtiger als die Liste: Ohne ihn liest sich
-          der Verweis wie ein fehlender Abschnitt statt wie eine
-          Entscheidung.
+          Phase 1: ohne archivierte Vorhaben, zuletzt geaenderte zuerst, und
+          jede Zeile eindeutig - ein Vorhaben ohne Namen heisst „Unbenanntes
+          Vorhaben" mit Anlagedatum, nicht „Vorhaben ansehen" (siehe
+          `profileVentures.ts`).
           ------------------------------------------------------------------ */}
-      {ventures.length > 0 ? (
-        <section className="mt-12 rounded-2xl border border-slate-200/80 bg-white/70 p-6">
-          <h2 className="text-base font-semibold text-slate-900">{t("ventures.title")}</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{t("ventures.text")}</p>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {ventures.map((venture) => (
-              <li key={venture.id}>
-                <Link
-                  href={`/founder-alignment/vorhaben?venture=${encodeURIComponent(venture.id)}`}
-                  className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-800 hover:border-slate-300"
-                >
-                  {venture.name?.trim() || t("ventures.cta")}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <div className="mt-12">
+        {teil(
+          "vorhaben",
+          "slate",
+          <>
+            <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("ventures.text")}</p>
+            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+              {visibleVentures.map((venture) => {
+                const label =
+                  venture.name ??
+                  (venture.createdAt
+                    ? t("ventures.unnamedDated", { date: dateLabel(venture.createdAt) })
+                    : t("ventures.unnamed"));
+                return (
+                  <li key={venture.id}>
+                    <Link
+                      href={`/founder-alignment/vorhaben?venture=${encodeURIComponent(venture.id)}`}
+                      className="flex min-h-11 flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 hover:border-slate-300"
+                    >
+                      <span className="text-sm font-medium text-slate-900">
+                        {venture.duplicateIndex ? `${label} (${venture.duplicateIndex})` : label}
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        {venture.alone ? t("ventures.alone") : t("ventures.withTeam")}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </div>
 
-      {/* WAS DIESE SEITE ZEIGT - UND WAS NICHT. Unten, weil ein Hinweis ueber
-          dem Ergebnis ueberlesen wird oder es wertlos macht, bevor man es
-          gelesen hat. Und mitgedruckt, anders als die Hinweise auf fehlende
-          Teile: In der Fassung, die weitergegeben wird, ist dieser Satz am
-          wichtigsten. */}
-      <section className="mt-10 border-t border-slate-200 pt-6">
-        <h2 className="text-sm font-semibold text-slate-900">{t("whatThisIs.title")}</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{t("whatThisIs.text")}</p>
-        <p className="no-print mt-2 text-xs leading-5 text-slate-500">{t("whatThisIs.private")}</p>
+      {/* ------------------------------------------------------------------
+          7 - DETAILS & METHODIK
 
-        {/* DIE VIER EINSCHRAENKUNGEN BLEIBEN. Der Satz darueber sagt, was die
-            Seite zusammenfuehrt; dieser Kasten sagt, was sie als Verfahren
-            NICHT ist: kein validiertes Testverfahren, kein Normvergleich,
-            eine Momentaufnahme, nicht fuer Auswahlentscheidungen.
+          Was nicht weg soll, aber nicht ins aktuelle Bild gehoert: der
+          vollstaendige Workstyle-Bericht, die Abdeckung nach Familien, das
+          Archiv frueherer Auswertungen - und EIN Hinweis, was diese Seite ist.
+          Vorher stand dieser Hinweis viermal auf der Seite.
 
-            Die Dokumentation war darin immer ehrlich - das Produkt lange
-            nicht. Beim Umbau am 01.10.2026 waere der Kasten fast
-            herausgefallen, weil die Vorgabe "kein langer Disclaimerblock"
-            lautete. Er ist kein langer Block: vier kurze Saetze, und in der
-            Fassung, die man weitergibt, sind sie das Wichtigste.
+          ARCHIV, NICHT VERRECHNET. Fruehere Fassungen messen nicht dasselbe;
+          keine gemeinsame Skala, keine gemeinsame Karte. Alte Punktwerte oder
+          Ampeln werden hier nicht neu eingebunden.
+          ------------------------------------------------------------------ */}
+      {teil(
+        "details",
+        "slate",
+        <>
+          <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("details.intro")}</p>
+          <div className="mt-4 space-y-3">
+            {workstyleV04 ? (
+              <ProfileDetails summary={t("details.workstyle")} hint={null}>
+                <IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} />
+              </ProfileDetails>
+            ) : null}
 
-            DATIERT JETZT DIE SEITE, nicht mehr nur den v1-Bericht. */}
-        <InstrumentNote
-          copy={{
-            title: tNote("title"),
-            selfReport: tNote("selfReport"),
-            notATest: tNote("notATest"),
-            snapshot: tNote("snapshot"),
-            purpose: tNote("purpose"),
-            dated: freshness
-              ? tNote("dated", {
-                  date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-                    new Date(freshness)
-                  ),
-                })
-              : null,
-          }}
-        />
-      </section>
+            {entries.length > 0 ? (
+              <ProfileDetails summary={t("details.coverage")} hint={null}>
+                <CoverageMap
+                  coverage={coverage}
+                  copy={{
+                    title: t("coverage.title"),
+                    intro: t("coverage.intro"),
+                    familyLabel: (familyId) => tCapability(`families.${familyId}`),
+                    stateLabel: (state) => t(`coverage.states.${state}`),
+                    familyCount: (entered, total) => t("coverage.familyCount", { entered, total }),
+                    familyUnspoken: t("coverage.familyUnspoken"),
+                    basis: t("coverage.basis"),
+                  }}
+                />
+              </ProfileDetails>
+            ) : null}
+
+            {/* Phase 10: Das fruehere Arbeitsprofil (founder-profile-v1) nur
+                noch datiert zum Nachlesen - im Archiv, nie ein Ersatz fuer
+                den aktuellen Bericht. */}
+            {workProfile && (
+              <ProfileDetails
+                summary={`${t("historicalWorkProfile.title")} — ${t("historicalWorkProfile.dated", {
+                  date: workProfile.submittedAt
+                    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                        new Date(workProfile.submittedAt)
+                      )
+                    : "—",
+                })}`}
+                hint={null}
+              >
+              <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
+                <p className="max-w-3xl text-sm leading-7 text-slate-700">
+                  {t("historicalWorkProfile.text")}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("workProfile.answered", {
+                    answered: workProfile.answered,
+                    of: workProfile.of,
+                  })}
+                </p>
+
+                <div className="mt-5">
+                  <WorkMap sections={workProfile.sections} />
+                </div>
+
+                <div className="mt-5">
+                  <WorkProfileSynthesisView sections={workProfile.sections} heading="h3" />
+                </div>
+
+                <div className="mt-4">
+                  <div>
+                    <ReportViewV21
+                      sections={workProfile.sections}
+                      orphans={workProfile.orphans}
+                      marked={workProfile.marked}
+                    />
+                  </div>
+                </div>
+              </section>
+              </ProfileDetails>
+            )}
+
+            {/* DER ALTBESTAND - IM ARCHIV, ZUGEKLAPPT, DATIERT. Nur fuer
+                Menschen, die den frueheren Bogen tatsaechlich abgegeben haben;
+                er wird NICHT mit dem neuen verrechnet. */}
+            {report ? (
+              <ProfileDetails
+                summary={`${t("legacyReport.title")} — ${t("legacyReport.dated", {
+                  date: report.createdAt
+                    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                        new Date(report.createdAt)
+                      )
+                    : "—",
+                })}`}
+                hint={null}
+              >
+                <p className="max-w-3xl text-sm leading-6 text-slate-500">
+                  {t("legacyReport.text")}
+                </p>
+                <div className="mt-4">
+                  <SelfReportView report={report} density="summary" detailsHint={detailsHint} legacy />
+                </div>
+              </ProfileDetails>
+            ) : null}
+          </div>
+
+          {/* UEBER DIESE AUSWERTUNG - EINMAL. Die vier Einschraenkungen bleiben
+              (kein validiertes Testverfahren, kein Normvergleich,
+              Momentaufnahme, nicht fuer Auswahlentscheidungen), dazu „keine
+              Erfolgsprognose". Mitgedruckt: In der weitergegebenen Fassung
+              sind diese Saetze am wichtigsten. DATIERT DIE SEITE. */}
+          <InstrumentNote
+            copy={{
+              title: tNote("title"),
+              selfReport: tNote("selfReport"),
+              notATest: tNote("notATest"),
+              snapshot: tNote("snapshot"),
+              purpose: tNote("purpose"),
+              extra: t("whatThisIs.noPrediction"),
+              dated: freshness
+                ? tNote("dated", {
+                    date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                      new Date(freshness)
+                    ),
+                  })
+                : null,
+            }}
+          />
+          <p className="no-print mt-3 text-xs leading-5 text-slate-500">{t("whatThisIs.private")}</p>
+        </>
+      )}
     </main>
   );
 }
@@ -1031,9 +942,12 @@ function MissingSection({
     <section className="no-print rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
       <h3 className="text-base font-semibold text-slate-900">{title}</h3>
       {text ? <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{text}</p> : null}
+      {/* EINE KLARE AKTION (Phase 1): vorher ein grauer Rahmenknopf, der wie
+          ein Nebenlink aussah. Kein Warnton - was hier fehlt, fehlt nicht am
+          Menschen. */}
       <a
         href={href}
-        className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
+        className="mt-4 inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-medium text-white hover:bg-slate-800"
       >
         {cta}
       </a>

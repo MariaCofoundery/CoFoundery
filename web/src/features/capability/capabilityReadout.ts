@@ -30,14 +30,23 @@ import type { CapabilityArea, CapabilityEntry, CapabilityFamily } from "./capabi
 const HANDS_OVER = ["prefer_other", "prefer_external"] as const;
 
 export type ReadoutFindingKey =
-  /** Tiefe angegeben und will es auch verantworten. */
+  /** Will es verantworten - ohne ausdruecklich niedrige Stufe. */
   | "anchor"
+  /**
+   * Will es verantworten, hat aber eine ausdruecklich niedrige Stufe angegeben.
+   * Seit Phase 1 (Profil) ein eigener Befund: Das ist ein Verantwortungswunsch
+   * mit bisher weniger Erfahrung - KEIN Wunsch, hineinzuwachsen. Vorher landete
+   * es unter `growingInto` und vermischte damit zwei Angaben.
+   */
+  | "ownsWithLessExperience"
   /** Kann es, will es aber abgeben. Der interessanteste Fall. */
   | "canButHandsOver"
-  /** Will hineinwachsen - Wunsch vorhanden, Tiefe noch nicht. */
+  /** Will hineinwachsen - nur aus dem ausdruecklichen Wunsch `grow_into`. */
   | "growingInto"
-  /** Beruehrung, ohne Anspruch darauf. */
+  /** Will aktiv beitragen (`contribute`). Kein Abgeben und keine Absage. */
   | "contributes"
+  /** Soll lieber jemand anders uebernehmen - ohne angegebene Tiefe. */
+  | "handsOver"
   /** Wunsch noch offen. Kein Urteil, nur eine offene Stelle. */
   | "undecided";
 
@@ -74,9 +83,11 @@ export function buildCapabilityReadout(
 
   const bucket: Record<ReadoutFindingKey, string[]> = {
     anchor: [],
+    ownsWithLessExperience: [],
     canButHandsOver: [],
     growingInto: [],
     contributes: [],
+    handsOver: [],
     undecided: [],
   };
 
@@ -88,8 +99,12 @@ export function buildCapabilityReadout(
     // Der Wunsch steht dabei vor der Stufe, weil er ausdruecklich angegeben
     // ist. Eine fehlende Stufe darf nicht zu einer Aussage werden: Wer
     // "verantworten" angibt und die Stufe leer laesst, will verantworten -
-    // ob mit oder ohne Tiefe, steht dann eben nicht da. Nur eine
-    // ausdruecklich niedrige Stufe macht daraus Hineinwachsen.
+    // ob mit oder ohne Tiefe, steht dann eben nicht da.
+    //
+    // HINEINWACHSEN NUR AUS `grow_into` (Phase 1, Profil). Eine ausdruecklich
+    // niedrige Stufe bei `own` bleibt ein Verantwortungswunsch - mit bisher
+    // weniger Erfahrung - und wird nicht zu einem Wunsch umgedeutet, den die
+    // Person nicht angegeben hat.
     if (hasDepth(entry) && handsOver(entry)) {
       bucket.canButHandsOver.push(entry.area_id);
     } else if (
@@ -97,13 +112,15 @@ export function buildCapabilityReadout(
       entry.application_level !== null &&
       entry.application_level < DEPTH_LEVEL
     ) {
-      bucket.growingInto.push(entry.area_id);
+      bucket.ownsWithLessExperience.push(entry.area_id);
     } else if (entry.ownership_wish === "own") {
       bucket.anchor.push(entry.area_id);
     } else if (entry.ownership_wish === "grow_into") {
       bucket.growingInto.push(entry.area_id);
-    } else if (entry.ownership_wish === "contribute" || handsOver(entry)) {
+    } else if (entry.ownership_wish === "contribute") {
       bucket.contributes.push(entry.area_id);
+    } else if (handsOver(entry)) {
+      bucket.handsOver.push(entry.area_id);
     } else {
       // Bleibt: kein Wunsch angegeben oder ausdruecklich "noch unklar".
       bucket.undecided.push(entry.area_id);

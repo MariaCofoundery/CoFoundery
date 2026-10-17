@@ -40,6 +40,15 @@ export type Venture = {
   teamContext: "pre_founder" | "existing_team";
   /** Ist diese Person hier noch allein? Dann fehlt der Vergleich, nicht die Antwort. */
   alone: boolean;
+  /**
+   * Fuer Anzeige und Reihenfolge („Das bist du"): wann angelegt, zuletzt
+   * geaendert, archiviert (`founder_teams.archived_at`, gesetzt, wenn die
+   * letzte Person gegangen ist). Gefiltert wird hier NICHT - die Vorhaben-
+   * Seiten, das Dashboard und die Navigation behalten ihre bisherige Liste.
+   */
+  createdAt: string | null;
+  updatedAt: string | null;
+  archivedAt: string | null;
 };
 
 /**
@@ -62,7 +71,7 @@ export async function findVentures(userId: string): Promise<Venture[]> {
 
   const { data: teams } = await supabase
     .from("founder_teams")
-    .select("id, name, team_context")
+    .select("id, name, team_context, created_at, updated_at, archived_at")
     .in("id", ids);
 
   const { data: others } = await supabase
@@ -77,6 +86,9 @@ export async function findVentures(userId: string): Promise<Venture[]> {
     alone: !(others ?? []).some(
       (row) => row.team_id === team.id && row.user_id !== userId,
     ),
+    createdAt: (team.created_at as string | null) ?? null,
+    updatedAt: (team.updated_at as string | null) ?? null,
+    archivedAt: (team.archived_at as string | null) ?? null,
   }));
 }
 
@@ -107,7 +119,7 @@ export async function createVentureFor(): Promise<Venture | null> {
 
   const { data: team } = await supabase
     .from("founder_teams")
-    .select("id, name, team_context")
+    .select("id, name, team_context, created_at, updated_at, archived_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -120,6 +132,9 @@ export async function createVentureFor(): Promise<Venture | null> {
     // Die Funktion gibt nur ein Vorhaben zurueck, in dem diese Person allein
     // steht - sonst legt sie ein neues an.
     alone: true,
+    createdAt: (team.created_at as string | null) ?? null,
+    updatedAt: (team.updated_at as string | null) ?? null,
+    archivedAt: (team.archived_at as string | null) ?? null,
   };
 }
 

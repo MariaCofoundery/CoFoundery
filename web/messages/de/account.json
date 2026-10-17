@@ -14,7 +14,7 @@
       "alignment_report": "Dein Selbstbericht",
       "capability": "Deine Fähigkeitsbereiche",
       "capability_depth": "Erfahrung und Verantwortungswünsche",
-      "strengths": "Deine Arbeitsweise",
+      "strengths": "Deine Stärken",
       "direction": "Was dir wichtig ist"
     },
     "scopeHints": {
@@ -22,7 +22,7 @@
       "alignment_report": "Die sechs Dimensionen aus dem Fragebogen",
       "capability": "Welche Bereiche du eingetragen hast — ohne Tiefe",
       "capability_depth": "Zusätzlich, wie oft du es angewandt hast und was du übernehmen möchtest",
-      "strengths": "Die Sätze über deine Arbeitsweise samt deiner Einschätzung",
+      "strengths": "Die festgehaltenen Aussagen zu deinen Stärken samt deiner Einschätzung",
       "direction": "Die Aussagen, die du bestätigt hast"
     },
     "claimFailedTitle": "Diese Einladung geht nicht auf",

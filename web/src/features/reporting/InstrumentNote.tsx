@@ -31,6 +31,8 @@ export function InstrumentNote({
     notATest: string;
     snapshot: string;
     purpose: string;
+    /** Optional ein weiterer Satz in derselben Liste (z. B. „keine Erfolgsprognose" auf „Das bist du"). */
+    extra?: string | null;
     /** Wann die Angaben entstanden sind, wenn bekannt. */
     dated: string | null;
   };
@@ -48,6 +50,7 @@ export function InstrumentNote({
         <li>{copy.notATest}</li>
         <li>{copy.snapshot}</li>
         <li>{copy.purpose}</li>
+        {copy.extra ? <li>{copy.extra}</li> : null}
       </ul>
       {copy.dated ? <p className="mt-3 text-xs text-slate-500">{copy.dated}</p> : null}
     </section>

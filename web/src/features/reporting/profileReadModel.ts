@@ -13,9 +13,11 @@ import { getScopeReport } from "@/features/instruments/align/reportData";
 import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getLatestSelfAlignmentReport } from "@/features/reporting/actions";
+import { buildCapabilityMap } from "@/features/reporting/capabilityMapModel";
 import { buildFounderProfileCoverage } from "@/features/reporting/founderProfileCoverage";
 import { buildOwnershipGroups } from "@/features/reporting/ownershipGroups";
 import { getProfileFreshness } from "@/features/reporting/profileFreshness";
+import { profileVentures } from "@/features/reporting/profileVentures";
 
 /**
  * „Das bist du" — die Daten, einmal.
@@ -113,6 +115,8 @@ export async function getProfileReadModel(
   const readout = buildCapabilityReadout(entries, vocabulary.areas, vocabulary.families);
   const coverage = buildFounderProfileCoverage(entries, vocabulary.areas, vocabulary.families);
   const ownershipGroups = buildOwnershipGroups(entries, vocabulary.areas);
+  // „Was du mitbringst" (Phase 1): Erfahrung und Rolle je Bereich, getrennt.
+  const capabilityMap = buildCapabilityMap(entries, vocabulary.areas, vocabulary.families);
 
   // Die Reihenfolge des Vokabulars, nicht die der Datenbank: Sonst stehen die
   // Bereiche in der Folge, in der jemand sie eingetragen hat.
@@ -121,8 +125,9 @@ export async function getProfileReadModel(
     .slice()
     .sort((a, b) => (areaOrder.get(a.area_id) ?? 0) - (areaOrder.get(b.area_id) ?? 0));
 
-  // Zwei Ableitungen ohne eigenen Speicher: wohin jemand wachsen will, und
-  // die Bereiche, in denen Tiefe eingetragen ist.
+  // Zwei Ableitungen ohne eigenen Speicher: wohin jemand wachsen will - seit
+  // Phase 1 NUR aus dem ausdruecklichen Wunsch `grow_into` (siehe
+  // `capabilityReadout.ts`) -, und die Bereiche, in denen Tiefe eingetragen ist.
   const growingInto =
     readout.findings.find((finding) => finding.key === "growingInto")?.areaIds ?? [];
   const deepAreas = orderedEntries
@@ -150,8 +155,11 @@ export async function getProfileReadModel(
     confirmedResources,
     freshness,
     ventures,
+    // Fuer „Das bist du": ohne archivierte, geordnet, eindeutig beschriftbar.
+    visibleVentures: profileVentures(ventures),
     photo,
     readout,
+    capabilityMap,
     coverage,
     ownershipGroups,
     growingInto,

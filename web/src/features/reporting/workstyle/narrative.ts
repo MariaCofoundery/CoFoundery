@@ -43,6 +43,7 @@ import {
 } from "@/features/reporting/workstyle/model";
 
 export type Band = "lower" | "middle" | "upper";
+export type MixedVariant = "both" | "upper" | "lower";
 export type AreaPattern =
   | { kind: "insufficient"; answered: number; required: number }
   | { kind: "direction"; band: Band; strength: "all" | "most"; exception: string | null }
@@ -86,9 +87,18 @@ export const SITUATIONS: Record<string, string> = {
  */
 type AreaCopy = {
   direction: Record<Band, string>;
-  mixed: string;
-  /** Ein kurzer Satz fuer die Bereichskarte "auf einen Blick". */
-  short: Record<Band | "mixed", string>;
+  /**
+   * Gemischtes Muster (Phase 1, Profil). Vorher EIN Satz, der immer beide Pole
+   * behauptete ("Manches laesst du stehen, anderes pruefst du ..."), auch wenn
+   * die Antworten nur oben und in der Mitte lagen - und auf der Karte nur
+   * "Je nach Situation.". Jetzt je nachdem, welche Pole tatsaechlich vorkommen:
+   *   both   oben UND unten beantwortet
+   *   upper  oben und Mitte, nichts unten
+   *   lower  unten und Mitte, nichts oben
+   */
+  mixedBy: Record<MixedVariant, string>;
+  /** Ein kurzer Satz fuer die Bereichskarte "auf einen Blick" (getragene Richtung). */
+  short: Record<Band, string>;
   /** Beschriftung der Situationen je Antwortbereich (gemischtes Muster). */
   bands: Record<Band, string>;
   question: Record<"upper" | "lower" | "open", string>;
@@ -103,8 +113,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Eine Einschätzung, die steht, lässt du eher stehen: Gezielt nach Gegenargumenten zu suchen oder Gegeninformationen nachzugehen, ist in diesen Situationen für dich eher nicht der nächste Schritt.",
       middle: "Ob du eine Einschätzung noch einmal prüfst, lässt du in den meisten Situationen offen – mal eher ja, mal eher nein.",
     },
-    mixed: "Bei dir hängt es von der Situation ab: Manches lässt du stehen, anderes prüfst du noch einmal genauer.",
-    short: { upper: "Du schaust lieber noch einmal genauer hin.", lower: "Du lässt eine erste Einschätzung eher stehen.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "Manches lässt du stehen, anderes prüfst du noch einmal genauer.", upper: "Manches prüfst du noch einmal genauer, bei anderem legst du dich nicht fest.", lower: "Manches lässt du eher stehen, bei anderem legst du dich nicht fest." },
+    short: { upper: "Du schaust lieber noch einmal genauer hin.", lower: "Du lässt eine erste Einschätzung eher stehen.", middle: "Meist irgendwo dazwischen." },
     bands: { upper: "Hier prüfst du eher noch einmal", middle: "Hier kommt es darauf an", lower: "Hier lässt du es eher stehen" },
     question: {
       upper: "Woran merkst du, dass genug geprüft ist und du entscheiden kannst?",
@@ -119,8 +130,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Frühere Erfahrungen spielen bei deiner Einschätzung eher eine kleine Rolle – du schätzt eine Situation lieber frisch ein, auch wenn sie dir vertraut ist.",
       middle: "Frühere Erfahrungen fließen bei dir teilweise ein – sie sind ein Hinweis unter mehreren.",
     },
-    mixed: "Erfahrung ist für dich ein Hinweis unter mehreren: In manchen Situationen stützt du dich stark darauf, in anderen weniger – das hängt von der Situation ab.",
-    short: { upper: "Du baust auf Erfahrung.", lower: "Du schätzt eher frisch ein.", middle: "Erfahrung zählt teilweise.", mixed: "Je nach Situation." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "In manchen Situationen stützt du dich stark auf Erfahrung, in anderen kaum.", upper: "In manchen Situationen stützt du dich stark auf Erfahrung, in anderen nur teilweise.", lower: "In manchen Situationen spielt Erfahrung für dich kaum eine Rolle, in anderen teilweise." },
+    short: { upper: "Du baust auf Erfahrung.", lower: "Du schätzt eher frisch ein.", middle: "Erfahrung zählt teilweise." },
     bands: { upper: "Hier zählt Erfahrung für dich stark", middle: "Hier zählt sie teilweise", lower: "Hier zählt sie für dich wenig" },
     question: {
       upper: "Woran erkennst du, ob eine frühere Erfahrung auf die aktuelle Situation passt?",
@@ -135,8 +147,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Auch wenn sich etwas im Kleinen testen ließe, klärst du lieber erst, bevor du etwas ausprobierst.",
       middle: "Ob du erst ausprobierst oder erst klärst, lässt du in den meisten Situationen offen.",
     },
-    mixed: "Ob du erst testest oder erst klärst, hängt bei dir von der Situation ab.",
-    short: { upper: "Du probierst lieber erst aus.", lower: "Du klärst lieber erst.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "Manchmal testest du lieber zuerst, manchmal klärst du lieber zuerst.", upper: "Manchmal testest du lieber zuerst, in anderen Situationen legst du dich nicht fest.", lower: "Manchmal klärst du lieber zuerst, in anderen Situationen legst du dich nicht fest." },
+    short: { upper: "Du probierst lieber erst aus.", lower: "Du klärst lieber erst.", middle: "Meist irgendwo dazwischen." },
     bands: { upper: "Hier probierst du eher aus", middle: "Hier kommt es darauf an", lower: "Hier klärst du eher erst" },
     question: {
       upper: "Woran merkst du, dass ein Versuch mehr bringt als ein weiteres Gespräch – und was machst du mit dem Ergebnis?",
@@ -151,8 +164,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Einwände und offene Punkte sprichst du eher nicht gleich von dir aus an, wenn die Runde schon einig ist oder abschließen möchte.",
       middle: "Ob du einen Einwand gleich ansprichst, lässt du in den meisten Situationen offen.",
     },
-    mixed: "Manche Einwände bringst du gleich ein, bei anderen wartest du eher ab – das hängt von der Situation ab.",
-    short: { upper: "Du sprichst Dinge gleich an.", lower: "Du wartest eher ab.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Situation." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "Manches sprichst du gleich an, bei anderem wartest du eher ab.", upper: "Manches sprichst du gleich an, bei anderem legst du dich nicht fest.", lower: "Bei manchem wartest du eher ab, bei anderem legst du dich nicht fest." },
+    short: { upper: "Du sprichst Dinge gleich an.", lower: "Du wartest eher ab.", middle: "Meist irgendwo dazwischen." },
     bands: { upper: "Hier sprichst du es eher an", middle: "Hier kommt es darauf an", lower: "Hier wartest du eher ab" },
     question: {
       upper: "Wie möchtest du mit einem späten Einwand umgehen, wenn eine Entscheidung eigentlich schon steht?",
@@ -167,8 +181,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Offene Fragen, die sich gerade nicht klären lassen, empfindest du eher nicht als unangenehm – auch bei widersprüchlichen Rückmeldungen oder mehreren möglichen Erklärungen.",
       middle: "Offene Situationen empfindest du teils als unangenehm, teils nicht.",
     },
-    mixed: "Manche offenen Situationen empfindest du als unangenehm, andere nicht – das hängt von der Situation ab.",
-    short: { upper: "Offenes ist dir eher unbequem.", lower: "Offenes ist für dich okay.", middle: "Teils unbequem, teils okay.", mixed: "Je nach Situation." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "Manche offenen Situationen sind dir unangenehm, andere kaum.", upper: "Manche offenen Situationen sind dir unangenehm, bei anderen liegst du in der Mitte.", lower: "Manche offenen Situationen sind für dich in Ordnung, bei anderen liegst du in der Mitte." },
+    short: { upper: "Offenes ist dir eher unbequem.", lower: "Offenes ist für dich okay.", middle: "Teils unbequem, teils okay." },
     bands: { upper: "Das empfindest du eher als unangenehm", middle: "Das empfindest du teils so, teils so", lower: "Das empfindest du eher nicht als unangenehm" },
     question: {
       upper: "Was brauchst du, um gut weiterzuarbeiten, solange eine wichtige Frage offen ist?",
@@ -184,8 +199,9 @@ const COPY: Record<AreaKey, AreaCopy> = {
       lower: "Bei größeren Aufgaben fängst du eher einfach an, statt zuerst die nächsten Schritte festzulegen und dir Zwischenpunkte zu setzen.",
       middle: "Ob du bei größeren Aufgaben erst die Schritte klärst, lässt du meistens offen.",
     },
-    mixed: "Bei größeren Aufgaben legst du manchmal erst die Schritte fest, manchmal fängst du einfach an und sortierst unterwegs – das hängt von der Aufgabe ab.",
-    short: { upper: "Du klärst erst die Schritte.", lower: "Du fängst lieber einfach an.", middle: "Meist irgendwo dazwischen.", mixed: "Je nach Aufgabe." },
+    // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
+    mixedBy: { both: "Bei manchen Aufgaben klärst du zuerst die Schritte, bei anderen fängst du einfach an.", upper: "Bei manchen Aufgaben klärst du zuerst die Schritte, bei anderen legst du dich nicht fest.", lower: "Bei manchen Aufgaben fängst du einfach an, bei anderen legst du dich nicht fest." },
+    short: { upper: "Du klärst erst die Schritte.", lower: "Du fängst lieber einfach an.", middle: "Meist irgendwo dazwischen." },
     bands: { upper: "Hier klärst du eher erst die Schritte", middle: "Hier kommt es darauf an", lower: "Hier fängst du eher einfach an" },
     question: {
       upper: "Wie viel Vorstruktur brauchst du – und wann wird sie dir zu viel?",
@@ -288,7 +304,7 @@ export type AreaNarrative = {
   /** Bei MOST: die eine Situation mit "teils/teils". */
   exception: string | null;
   /** Bei gemischtem Muster: Situationen je Antwortbereich. */
-  situations: { label: string; items: string[] }[];
+  situations: { band: Band; label: string; items: string[] }[];
   /** Einzelantworten ausserhalb der Bereichsrichtung (EXP-01, ORG-Zweierwahlen). */
   itemNotes: { claim: string; text: string }[];
   /** Wie viele Situationen des Bereichs ohne Einschaetzung sind - sie fliessen nicht ein. */
@@ -317,9 +333,9 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
   }
   if (pattern.kind === "mixed") {
     const situations = (["upper", "middle", "lower"] as Band[])
-      .map((band) => ({ label: copy.bands[band], items: pattern[band].map((k) => (locale === "en" ? SITUATIONS_EN : SITUATIONS)[k]) }))
+      .map((band) => ({ band, label: copy.bands[band], items: pattern[band].map((k) => (locale === "en" ? SITUATIONS_EN : SITUATIONS)[k]) }))
       .filter((s) => s.items.length);
-    return { ...base, claim: `${area}.MIXED`, core: copy.mixed, situations, note: copy.note ?? null, question: copy.question.open };
+    return { ...base, claim: `${area}.MIXED`, core: copy.mixedBy[mixedVariant(pattern)], situations, note: copy.note ?? null, question: copy.question.open };
   }
   const side = pattern.band === "middle" ? null : pattern.band;
   return {
@@ -338,8 +354,14 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
 export function glanceSentence(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): string {
   const pattern = areaPattern(profile, area);
   if (pattern.kind === "insufficient") return locale === "en" ? "Not enough responses yet." : "Noch zu wenige Antworten.";
-  const copy = locale === "en" ? COPY_EN[area] : COPY[area];
-  return pattern.kind === "mixed" ? copy.short.mixed : copy.short[pattern.band];
+  const copy: AreaCopy = locale === "en" ? COPY_EN[area] : COPY[area];
+  return pattern.kind === "mixed" ? copy.mixedBy[mixedVariant(pattern)] : copy.short[pattern.band];
+}
+
+/** Welche Pole ein gemischtes Muster tatsaechlich enthaelt - nur aus den Antworten, ohne Gewichtung. */
+export function mixedVariant(pattern: Extract<AreaPattern, { kind: "mixed" }>): MixedVariant {
+  if (pattern.upper.length > 0 && pattern.lower.length > 0) return "both";
+  return pattern.upper.length > 0 ? "upper" : "lower";
 }
 
 /**

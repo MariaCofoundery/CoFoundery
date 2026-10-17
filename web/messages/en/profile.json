@@ -169,6 +169,23 @@
       "detailsSummary": "Your areas in detail",
       "detailsHint": "{count, plural, =1 {1 area} other {# areas}}"
     },
+    "bring": {
+      "intro": "Two separate things for each area: how much experience you bring, and what role you want to take on there. Being able to do something and wanting to do it are two different things.",
+      "experience": "Experience",
+      "role": "Role",
+      "roles": {
+        "own": "Take on responsibility",
+        "contribute": "Contribute",
+        "grow_into": "Grow into it",
+        "prefer_other": "Rather someone else",
+        "prefer_external": "Rather external",
+        "unclear": "Still open",
+        "unset": "Role not stated yet"
+      },
+      "lessExperience": "less experience so far",
+      "counts": "{areas, plural, =1 {1 area described} other {# areas described}} · {levelled} with an experience level · {withRole} with a role",
+      "rolesSummary": "What belongs in the team and who wants to own it"
+    },
     "growingInto": {
       "title": "Where you want to grow",
       "intro": "Areas you want to grow into — from your own entries. That is an intention, not a gap."
@@ -263,7 +280,10 @@
       "ownership": "What you want to own",
       "growing": "Where you want to grow",
       "resources": "Network, access & resources",
-      "direction": "What drives you"
+      "direction": "What drives you",
+      "bring": "What you bring",
+      "ventures": "Your ventures",
+      "details": "Details & method"
     },
     "head": {
       "intro": "This brings together what you have recorded and worked out about yourself as a founder — how you work, what you bring and what drives you.",
@@ -293,8 +313,9 @@
       "intro": "Ways of working from situations you described — with your own assessment and what you assume others would say.",
       "detailsSummary": "All strengths, with where they came from",
       "more": "{count, plural, =1 {One more in the panel} other {# more in the panel}}",
-      "empty": "No confirmed strengths recorded here yet.",
-      "emptyCta": "Record strengths"
+      "empty": "You haven't recorded your strengths yet.",
+      "emptyCta": "Record strengths",
+      "emptyText": "Note in your own words what comes easily to you at work – and how often it shows."
     },
     "directionSection": {
       "detailsSummary": "All statements with their origin",
@@ -307,12 +328,22 @@
     "ventures": {
       "title": "Your ventures",
       "text": "What you recorded about a venture holds for that venture and a period of time — not for you as a person. That is why it is not here.",
-      "cta": "See ventures"
+      "cta": "See ventures",
+      "unnamed": "Unnamed venture",
+      "unnamedDated": "Unnamed venture · created {date}",
+      "alone": "Just you so far",
+      "withTeam": "With other people"
+    },
+    "details": {
+      "intro": "Everything the profile above doesn't need to repeat: the detailed report, coverage by area, and earlier versions to look back on.",
+      "workstyle": "How you work – detailed report",
+      "coverage": "Coverage by area family"
     },
     "whatThisIs": {
       "title": "What this page shows",
       "text": "“This is you” brings together what you stated or confirmed yourself. It is not an assessment of your personality and not a prediction of success.",
-      "private": "This page is visible only to you."
+      "private": "This page is visible only to you.",
+      "noPrediction": "It is not a prediction of success and not an assessment of your personality."
     },
     "origins": {
       "own_words": "written by you",

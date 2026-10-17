@@ -130,8 +130,11 @@ test("mixed erzeugt keine Richtung, insufficient keine Deutung", () => {
     const mixed = withArea(area, [1, 5, 1, 5, 1]);
     const m = areaNarrative(mixed, area);
     assert.equal(m.pattern.kind, "mixed", area);
-    // Phase 11.7B: Alltagssprache ("haengt von der Situation ab") statt "beantwortest du unterschiedlich".
-    assert.match(m.core, /von der (Situation|Aufgabe) ab|unterschiedlich/, area);
+    // Phase 11.7B: Alltagssprache statt "beantwortest du unterschiedlich".
+    // Phase 1 (Profil): konkret je Pol ("Manches ..., anderes ...") statt nur
+    // "haengt von der Situation ab" - weiterhin ausdruecklich KEINE Richtung.
+    assert.match(m.core, /^(Manch|In manchen|Bei manch|Manchmal)/, area);
+    assert.doesNotMatch(m.core, /^Je nach Situation\.?$/, area);
     assert.equal(m.exception, null, area);
     assert.equal(m.claim, `${area}.MIXED`);
 

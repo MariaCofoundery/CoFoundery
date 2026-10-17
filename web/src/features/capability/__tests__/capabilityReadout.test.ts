@@ -57,12 +57,31 @@ test("can-but-hands-over is recognised as its own finding, not as a contradictio
 });
 
 test("handing over without depth is not the same finding", () => {
-  // Ohne Tiefe ist "lieber jemand anders" keine Verhandlungsinformation,
-  // sondern schlicht Mitarbeit. Beides zu vermischen wuerde den einen
-  // aussagekraeftigen Befund verwaessern.
+  // Ohne Tiefe ist "lieber jemand anders" keine Verhandlungsinformation.
+  // Beides zu vermischen wuerde den einen aussagekraeftigen Befund
+  // verwaessern.
+  // SEIT PHASE 1 (PROFIL): auch nicht mehr unter `contributes` - "lieber
+  // jemand anders" ist kein Beitragen, und Beitragen ist kein Abgeben.
   const entries = [entry("b2b_sales", 2, "prefer_other")];
   assert.equal(finding(entries, "canButHandsOver"), undefined);
-  assert.deepEqual(finding(entries, "contributes")?.areaIds, ["b2b_sales"]);
+  assert.equal(finding(entries, "contributes"), undefined);
+  assert.deepEqual(finding(entries, "handsOver")?.areaIds, ["b2b_sales"]);
+  assert.deepEqual(finding([entry("b2b_sales", null, "prefer_external")], "handsOver")?.areaIds, ["b2b_sales"]);
+});
+
+test("contribute is its own finding - never read as handing over", () => {
+  const entries = [entry("marketing_brand", 5, "contribute"), entry("b2b_sales", 1, "contribute")];
+  assert.deepEqual(finding(entries, "contributes")?.areaIds, ["b2b_sales", "marketing_brand"]);
+  assert.equal(finding(entries, "handsOver"), undefined);
+  assert.equal(finding(entries, "canButHandsOver"), undefined);
+  // Die Copy sagt Beitragen - nicht "nicht uebernehmen".
+  for (const locale of ["de", "en"]) {
+    const text = JSON.stringify(
+      ((readJson(`messages/${locale}/capability.json`).readout as Record<string, unknown>).findings as Record<string, unknown>).contributes,
+    );
+    assert.doesNotMatch(text, /nicht übernehmen|nicht verantworten|don't want to be in charge|without being in charge/i, locale);
+    assert.match(text, /beitragen|contribute/i, locale);
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -77,10 +96,27 @@ test("wanting to own without a stated level is not turned into growth", () => {
   assert.equal(finding(entries, "growingInto"), undefined);
 });
 
-test("only an explicitly low level makes it growth", () => {
+test("own with an explicitly low level stays a wish to take responsibility - not growth", () => {
+  // SEIT PHASE 1 (PROFIL). Vorher: `own` + Stufe unter DEPTH_LEVEL -> growingInto.
+  // Das deutete einen Verantwortungswunsch in einen Wunsch zum Hineinwachsen
+  // um, den die Person nicht angegeben hat.
   const entries = [entry("product_management", 2, "own")];
-  assert.deepEqual(finding(entries, "growingInto")?.areaIds, ["product_management"]);
+  assert.deepEqual(finding(entries, "ownsWithLessExperience")?.areaIds, ["product_management"]);
+  assert.equal(finding(entries, "growingInto"), undefined);
   assert.equal(finding(entries, "anchor"), undefined);
+});
+
+test("growth comes only from an explicit grow_into", () => {
+  for (const level of [null, 1, 3, 5] as const) {
+    const entries = [entry("ux_design", level, "grow_into")];
+    assert.deepEqual(finding(entries, "growingInto")?.areaIds, ["ux_design"], `Stufe ${level}`);
+  }
+  const others = (["own", "contribute", "prefer_other", "prefer_external", "unclear", null] as const).flatMap((wish) =>
+    [null, 1, 2, 3, 4, 5].map((level) => entry("ux_design", level as ApplicationLevel | null, wish)),
+  );
+  for (const one of others) {
+    assert.equal(finding([one], "growingInto"), undefined, `${one.ownership_wish}/${one.application_level}`);
+  }
 });
 
 test("depth without a stated wish stays open instead of being read as a claim", () => {
@@ -181,7 +217,7 @@ test("both locales carry every finding with title and text", () => {
   const en = (readJson("messages/en/capability.json").readout as Record<string, unknown>).findings as Record<string, Record<string, string>>;
 
   assert.deepEqual(Object.keys(de), Object.keys(en));
-  for (const key of ["anchor", "canButHandsOver", "growingInto", "contributes", "undecided"]) {
+  for (const key of ["anchor", "ownsWithLessExperience", "canButHandsOver", "growingInto", "contributes", "handsOver", "undecided"]) {
     assert.ok(de[key]?.title, `de fehlt readout.findings.${key}.title`);
     assert.ok(de[key]?.text, `de fehlt readout.findings.${key}.text`);
     assert.ok(en[key]?.title, `en fehlt readout.findings.${key}.title`);

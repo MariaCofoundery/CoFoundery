@@ -27,16 +27,17 @@ const bundle = (locale: string) =>
 test("welche Abschnitte bei welcher Datenlage erscheinen", () => {
   const page = codeOnly(PAGE);
 
-  // Nur zwei Abschnitte dürfen ganz verschwinden - und bei beiden ist NICHTS
-  // eine gültige Antwort. Bei allen anderen steht ein Hinweis mit einem Weg.
+  // SEIT PHASE 1 (PROFIL): Nur die Vorhaben duerfen als Abschnitt ganz
+  // verschwinden - ohne Vorhaben gibt es nichts zu verlinken. Bei allen
+  // anderen steht ein Hinweis mit einem Weg. Die Ressourcen sind Teil von
+  // „Was du mitbringst" und entfallen dort ohne Bestaetigtes als Block.
   const bedingungen = /const zeigt: Record<SectionId, boolean> = \{([\s\S]*?)\};/.exec(page)?.[1];
   assert.ok(bedingungen, "die Bedingungen stehen nicht als Daten");
-  assert.match(bedingungen, /entwicklung: growingInto\.length > 0/);
-  assert.match(bedingungen, /ressourcen: confirmedResources\.length > 0/);
-  assert.match(bedingungen, /erfahrung: entries\.length > 0/);
+  assert.match(bedingungen, /vorhaben: visibleVentures\.length > 0/);
+  assert.match(page, /\{confirmedResources\.length > 0 \? \(/);
 
-  // Diese vier stehen immer - sie tragen bei leerer Datenlage einen Hinweis.
-  for (const immer of ["ueber-dich", "arbeitsweise", "staerken", "antrieb"]) {
+  // Diese stehen immer - sie tragen bei leerer Datenlage einen Hinweis.
+  for (const immer of ["ueber-dich", "arbeitsweise", "staerken", "mitbringst", "antrieb", "details"]) {
     assert.match(
       bedingungen,
       new RegExp(`"?${immer}"?: true`),
@@ -130,9 +131,12 @@ test("beide Sprachen haben dieselben Saetze fuer die neue Seite", () => {
     assert.ok(en[block], `en: ${block} fehlt`);
   }
 
-  // Neun Abschnittsnamen, und `step` ist die Zählweise.
+  // Die sieben Abschnitte der Seite (Phase 1) - dazu die bisherigen Namen,
+  // die die Druckfassung weiter benutzt - und `step` ist die Zählweise.
   const sections = de.sections as Record<string, string>;
-  assert.equal(Object.keys(sections).length, 10);
+  for (const key of ["about", "work", "strengths", "bring", "direction", "ventures", "details"]) {
+    assert.ok(sections[key], `sections.${key} fehlt`);
+  }
   assert.match(sections.step, /\{index\}/);
 });
 
@@ -173,7 +177,7 @@ test("der Sprungbalken schiebt sich, statt die halbe Seite zu fuellen", () => {
   // in sieben Zeilen und 356 px hoch - fast ein ganzer Bildschirm
   // Inhaltsverzeichnis vor dem ersten Inhalt.
   const page = codeOnly(PAGE);
-  const liste = /<ul className="([^"]*)">\s*\{sections/.exec(page)?.[1];
+  const liste = /<ul className="([^"]*)">\s*\{sichtbar/.exec(page)?.[1];
   assert.ok(liste, "der Sprungbalken ist keine Liste mehr");
 
   // Unter `lg` eine Zeile zum Schieben - seit Phase 6 auch auf dem Tablet:
@@ -247,7 +251,71 @@ test("der Hinweis unten bleibt und sagt alle vier Einschraenkungen", () => {
   // Umbau wäre der Kasten fast herausgefallen.
   const page = codeOnly(PAGE);
   assert.match(page, /<InstrumentNote/);
-  assert.match(page, /whatThisIs\.title/);
+  // SEIT PHASE 1 (PROFIL): EIN Hinweis statt vier. „Was diese Seite zeigt"
+  // ist in den Kasten aufgegangen - mit „keine Erfolgsprognose" als eigenem
+  // Satz und dem Hinweis, dass die Seite privat ist.
+  assert.equal([...page.matchAll(/<InstrumentNote/g)].length, 1);
+  assert.match(page, /extra: t\("whatThisIs\.noPrediction"\)/);
+  assert.match(page, /whatThisIs\.private/);
+  assert.doesNotMatch(page, /whatThisIs\.title|whatThisIs\.text/);
+  // Er steht in „Details & Methodik", ganz unten.
+  assert.ok(page.indexOf("<InstrumentNote") > page.search(/\{teil\(\s*"details",/), "der Hinweis steht nicht unten");
   // Er datiert jetzt die Seite, nicht mehr nur den v1-Bericht.
   assert.match(page, /dated: freshness/);
+  for (const locale of ["de", "en"]) {
+    const note = bundle(locale).whatThisIs as Record<string, string>;
+    assert.match(note.noPrediction, /Erfolgsprognose|prediction of success/, locale);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Phase 1 (Profil), 17.10.2026
+// ---------------------------------------------------------------------------
+test("die Nummern zaehlen nur sichtbare Abschnitte - keine Spruenge", () => {
+  const page = codeOnly(PAGE);
+  assert.match(page, /const sichtbar = sections\.filter\(\(section\) => zeigt\[section\.id\]\);/);
+  assert.match(page, /index: sichtbar\.findIndex\(\(section\) => section\.id === id\) \+ 1/);
+  assert.doesNotMatch(page, /index: sections\.findIndex/, "die Nummer zaehlt wieder ausgeblendete Abschnitte mit");
+  // Dieselbe Rechnung als Daten nachgespielt: Ohne Vorhaben ist „Details &
+  // Methodik" Abschnitt 6, nicht 7.
+  const ids = ["ueber-dich", "arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"];
+  const nummern = (zeigt: Record<string, boolean>) => {
+    const sichtbar = ids.filter((id) => zeigt[id]);
+    return sichtbar.map((id) => sichtbar.indexOf(id) + 1);
+  };
+  const alle = Object.fromEntries(ids.map((id) => [id, true]));
+  assert.deepEqual(nummern(alle), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(nummern({ ...alle, vorhaben: false }), [1, 2, 3, 4, 5, 6]);
+});
+
+test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existiert", () => {
+  const page = codeOnly(PAGE);
+  const leer = page.slice(page.indexOf('title={t("strengthsSection.empty")}'));
+  assert.match(leer, /^title=\{t\("strengthsSection\.empty"\)\}\s*text=\{t\("strengthsSection\.emptyText"\)\}\s*href="\/profile\?step=strengths"\s*cta=\{t\("strengthsSection\.emptyCta"\)\}/);
+  const de = bundle("de").strengthsSection as Record<string, string>;
+  const en = bundle("en").strengthsSection as Record<string, string>;
+  assert.equal(de.empty, "Du hast deine Stärken noch nicht festgehalten.");
+  assert.equal(de.emptyCta, "Stärken festhalten");
+  assert.equal(en.empty, "You haven't recorded your strengths yet.");
+  assert.ok(de.emptyText && en.emptyText && en.emptyCta);
+  // Das Ziel ist ein echter Schritt des Editors - mit Formular, nicht nur ein Anker.
+  const editor = source(join("src", "app", "(product)", "profile", "page.tsx"));
+  assert.match(editor, /const PAGE_STEPS = \[[\s\S]*?"strengths"[\s\S]*?\]/);
+  assert.match(editor, /\{step === "strengths" \? \(/);
+  assert.match(editor, /<StrengthsSection/);
+  // Keine zweite Aktion fuer KI-Vorschlaege: Sie haengen am manuell gestarteten Worker.
+  assert.doesNotMatch(leer.slice(0, 400), /interview|proposal/i);
+});
+
+test("Vorhaben: ohne Archiv, eindeutig beschriftet, nie der Knopftext als Name", () => {
+  const page = codeOnly(PAGE);
+  assert.doesNotMatch(page, /venture\.name\?\.trim\(\) \|\| t\("ventures\.cta"\)/, "namenlose Vorhaben heissen wieder wie der Knopf");
+  assert.match(page, /t\("ventures\.unnamedDated", \{ date: dateLabel\(venture\.createdAt\) \}\)/);
+  assert.match(page, /venture\.duplicateIndex \? `\$\{label\} \(\$\{venture\.duplicateIndex\}\)` : label/);
+  assert.match(codeOnly(join("src", "features", "reporting", "profileReadModel.ts")), /visibleVentures: profileVentures\(ventures\)/);
+  for (const locale of ["de", "en"]) {
+    const v = bundle(locale).ventures as Record<string, string>;
+    for (const key of ["unnamed", "unnamedDated", "alone", "withTeam"]) assert.ok(v[key], `${locale}: ventures.${key}`);
+    assert.match(v.unnamedDated, /\{date\}/);
+  }
 });

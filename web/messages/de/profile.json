@@ -169,6 +169,23 @@
       "detailsSummary": "Deine Bereiche im Einzelnen",
       "detailsHint": "{count, plural, =1 {1 Bereich} other {# Bereiche}}"
     },
+    "bring": {
+      "intro": "Je Bereich zwei getrennte Angaben: wie viel Erfahrung du mitbringst und welche Rolle du dort übernehmen möchtest. Können und Wollen sind zwei verschiedene Dinge.",
+      "experience": "Erfahrung",
+      "role": "Rolle",
+      "roles": {
+        "own": "Verantwortung übernehmen",
+        "contribute": "Beitragen",
+        "grow_into": "Hineinwachsen",
+        "prefer_other": "Lieber eine andere Person",
+        "prefer_external": "Eher extern",
+        "unclear": "Noch offen",
+        "unset": "Rolle noch nicht angegeben"
+      },
+      "lessExperience": "bisher weniger Erfahrung",
+      "counts": "{areas, plural, =1 {1 Bereich beschrieben} other {# Bereiche beschrieben}} · {levelled} mit Erfahrungsstufe · {withRole} mit Rolle",
+      "rolesSummary": "Was ins Team gehört und wer es übernehmen will"
+    },
     "growingInto": {
       "title": "Wohin du wachsen willst",
       "intro": "Bereiche, in die du dich hineinentwickeln möchtest — aus deinen eigenen Angaben. Das ist eine Absicht und keine Lücke."
@@ -263,7 +280,10 @@
       "ownership": "Was du verantworten willst",
       "growing": "Wohin du wachsen willst",
       "resources": "Netzwerk, Zugänge & Ressourcen",
-      "direction": "Was dich antreibt"
+      "direction": "Was dich antreibt",
+      "bring": "Was du mitbringst",
+      "ventures": "Deine Vorhaben",
+      "details": "Details & Methodik"
     },
     "head": {
       "intro": "Hier kommt zusammen, was du über dich als Founder festgehalten und erarbeitet hast — wie du arbeitest, was du mitbringst und was dich antreibt.",
@@ -293,8 +313,9 @@
       "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
       "detailsSummary": "Alle Stärken mit ihrer Herkunft",
       "more": "{count, plural, =1 {Eine weitere im Aufklapper} other {# weitere im Aufklapper}}",
-      "empty": "Hier sind noch keine bestätigten Stärken festgehalten.",
-      "emptyCta": "Stärken festhalten"
+      "empty": "Du hast deine Stärken noch nicht festgehalten.",
+      "emptyCta": "Stärken festhalten",
+      "emptyText": "Halte in deinen eigenen Worten fest, was dir in der Arbeit leichtfällt – und wie oft es sich zeigt."
     },
     "directionSection": {
       "detailsSummary": "Alle Aussagen mit ihrer Herkunft",
@@ -307,12 +328,22 @@
     "ventures": {
       "title": "Deine Vorhaben",
       "text": "Was du zu einem Vorhaben festgehalten hast, gilt für dieses Vorhaben und einen Zeitraum — nicht für dich als Person. Deshalb steht es nicht hier.",
-      "cta": "Vorhaben ansehen"
+      "cta": "Vorhaben ansehen",
+      "unnamed": "Unbenanntes Vorhaben",
+      "unnamedDated": "Unbenanntes Vorhaben · angelegt am {date}",
+      "alone": "Bisher nur du",
+      "withTeam": "Mit weiteren Personen"
+    },
+    "details": {
+      "intro": "Hier liegt, was das Profil oben nicht wiederholen soll: die ausführliche Auswertung, die Abdeckung nach Bereichen und frühere Stände zum Nachlesen.",
+      "workstyle": "Wie du arbeitest – Auswertung im Detail",
+      "coverage": "Abdeckung nach Bereichsfamilien"
     },
     "whatThisIs": {
       "title": "Was diese Seite zeigt",
       "text": "„Das bist du“ führt Angaben zusammen, die du selbst gemacht oder bestätigt hast. Es ist keine Bewertung deiner Persönlichkeit und keine Erfolgsprognose.",
-      "private": "Die Seite ist nur für dich sichtbar."
+      "private": "Die Seite ist nur für dich sichtbar.",
+      "noPrediction": "Es ist keine Erfolgsprognose und keine Bewertung deiner Persönlichkeit."
     },
     "origins": {
       "own_words": "von dir geschrieben",

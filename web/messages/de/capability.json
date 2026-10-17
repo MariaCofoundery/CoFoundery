@@ -195,17 +195,25 @@
         "title": "Verantwortung, die du übernehmen willst",
         "text": "In diesen Bereichen möchtest du dauerhaft zuständig sein. Für ein Gründungsgespräch ist das der Ausgangspunkt der Rollenverteilung."
       },
+      "ownsWithLessExperience": {
+        "title": "Verantwortung übernehmen – bisher weniger Erfahrung",
+        "text": "Hier möchtest du Verantwortung übernehmen und hast bisher weniger praktische Erfahrung angegeben. Das lässt sich planen – wenn es offen besprochen wird."
+      },
       "canButHandsOver": {
         "title": "Erfahrung vorhanden – Verantwortung lieber abgeben",
         "text": "In diesen Bereichen bringst du praktische Erfahrung mit, möchtest sie aber nicht dauerhaft verantworten. Das ist kein Widerspruch, sondern eine wichtige Angabe für die Rollenverteilung: Du kannst hier unterstützen, die Zuständigkeit sollte aber bei jemand anderem liegen."
       },
       "growingInto": {
-        "title": "Verantwortung, in die du hineinwachsen willst",
-        "text": "Hier möchtest du Verantwortung übernehmen, hast aber noch wenig Erfahrung. Das lässt sich planen – wenn es offen besprochen wird."
+        "title": "Worin du hineinwachsen willst",
+        "text": "In diese Bereiche möchtest du dich hineinentwickeln – so hast du es selbst angegeben. Das ist eine Absicht und keine Lücke."
       },
       "contributes": {
-        "title": "Mitarbeit ohne Zuständigkeit",
-        "text": "Du bringst dich hier ein, möchtest die Zuständigkeit aber nicht übernehmen. Das erleichtert eine Rollenverteilung eher, als dass es sie einschränkt."
+        "title": "Wo du aktiv beitragen willst",
+        "text": "Hier möchtest du mitarbeiten und dich einbringen. Wer die Hauptverantwortung trägt, ist damit noch offen – ein guter Punkt für die Rollenverteilung."
+      },
+      "handsOver": {
+        "title": "Lieber bei jemand anderem",
+        "text": "Diese Bereiche sollen nach deiner Angabe eher andere übernehmen – im Team oder extern."
       },
       "undecided": {
         "title": "Noch offen",
@@ -678,7 +686,7 @@
   },
   "viewFounderProfile": "„Das bist du“ ansehen",
   "strengths": {
-    "title": "Deine Arbeitsweise",
+    "title": "Deine Stärken",
     "text": "Sätze darüber, wie du arbeitest — aus Situationen, die du erzählt hast. Zu jedem kannst du zwei Dinge sagen: wie oft es sich bei dir zeigt, und was Menschen sagen würden, die dich erlebt haben.",
     "proposalsTitle": "Aus deinen Erzählungen",
     "proposalsText": "Mit der Stelle, auf die sie sich berufen. Nichts davon gilt, bis du es übernimmst — und du kannst es umschreiben.",

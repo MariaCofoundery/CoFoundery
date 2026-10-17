@@ -260,12 +260,11 @@ const COVERAGE_VIEW = "src/features/reporting/CoverageMap.tsx";
 const COVERAGE_DATA = "src/features/reporting/founderProfileCoverage.ts";
 const REPORT_PAGE = "src/features/reporting/IndividualReportPageContent.tsx";
 
-test("die Seite steht in drei Teilen mit neun Abschnitten", () => {
+test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
   const page = codeOnly(PAGE);
 
-  // UMGEBAUT AM 01.10.2026. Vorher vier Saeulen - sie trugen sehr verschieden
-  // grosse Inhalte, und unter "Was du mitbringst" lagen vier verschiedene
-  // Fragen in einem Block.
+  // UMGEBAUT IN PHASE 1 (PROFIL), 17.10.2026. Vorher neun Abschnitte; unter
+  // "Was du mitbringst" lagen vier fuer EINE Frage, dazu eine Zaehlkarte.
   assert.equal([...page.matchAll(/<ProfilePart/g)].length, 3);
 
   // Die Abschnitte stehen einmal als Daten. Der Sprungbalken oben und die
@@ -277,18 +276,19 @@ test("die Seite steht in drei Teilen mit neun Abschnitten", () => {
     "ueber-dich",
     "arbeitsweise",
     "staerken",
-    "faehigkeiten",
-    "erfahrung",
-    "verantwortung",
-    "entwicklung",
-    "ressourcen",
+    "mitbringst",
     "antrieb",
+    "vorhaben",
+    "details",
   ]);
-  assert.match(page, /\.filter\(\(section\) => zeigt\[section\.id\]\)/);
+  assert.match(page, /sections\.filter\(\(section\) => zeigt\[section\.id\]\)/);
 
-  // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe.
+  // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe. Vorhaben
+  // und Details stehen ausserhalb der Teile, neutral.
   const tones = [...page.matchAll(/tone="(\w+)"/g)].map((treffer) => treffer[1]);
   assert.deepEqual([...new Set(tones)].sort(), ["emerald", "indigo", "violet"]);
+  assert.match(page, /"vorhaben",\s*"slate"/);
+  assert.match(page, /"details",\s*"slate"/);
 });
 
 test("kein Abschnitt hat zwei Aufklapper ineinander", () => {
@@ -394,22 +394,27 @@ test("die Ausfuehrungen sind eingeklappt, die Zusammenfassung nicht", () => {
   assert.ok(!report.includes("summaryText"), "keine eigene Kurzfassung der Texte");
 });
 
-test("die Landkarte steht offen, die eigene Liste im Aufklapper", () => {
+test("die Capability Map steht offen, die Zaehlkarte nur noch unter Details", () => {
   const page = codeOnly(PAGE);
 
-  // Abschnitt 4 zeigt die Deckungskarte, Abschnitt 5 die Liste mit den
-  // Stufen - in dieser Reihenfolge, und die Liste eingeklappt.
-  const map = page.indexOf("<CoverageMap");
-  const liste = page.indexOf("<FounderProfileCapability");
-  const details = page.lastIndexOf("<ProfileDetails", liste);
-  assert.ok(map > 0 && liste > map, "die Liste steht vor der Karte");
-  assert.ok(details > map, "die eigene Liste steht nicht in einem Aufklapper");
+  // PHASE 1 (PROFIL): „Was du mitbringst" zeigt je Bereich Erfahrung und
+  // Rolle - offen. Die Deckungskarte („x von y Bereichen") war eine Zaehlung
+  // und steht jetzt eingeklappt unter „Details & Methodik".
+  const map = page.indexOf("<CapabilityMap");
+  const coverage = page.indexOf("<CoverageMap");
+  assert.ok(map > 0, "die Capability Map fehlt");
+  assert.ok(coverage > map, "die Zaehlkarte steht vor der Capability Map");
+  assert.ok(page.lastIndexOf("<ProfileDetails", coverage) > map, "die Zaehlkarte steht nicht eingeklappt");
+  assert.ok(coverage > page.search(/\{teil\(\s*"details",/), "die Zaehlkarte steht nicht unter Details & Methodik");
+  // Ein Zaehlsatz bleibt - dezent, unter der Karte.
+  assert.match(page, /t\("bring\.counts", \{/);
 
-  // Die Rollen nach Faltin sind ein eigener Abschnitt, nicht mehr ein
-  // Anhaengsel unter der Karte: Worueber gesprochen wurde und was jemand
-  // uebernehmen will, sind zwei Fragen.
+  // Die Rollen nach Faltin bleiben - eingeklappt, als Teamfrage.
+  assert.match(page, /<ProfileDetails summary=\{t\("bring\.rolesSummary"\)\}/);
   assert.match(page, /<CoverageRoles/);
-  assert.ok(page.indexOf("<CoverageRoles") > map, "die Rollen stehen vor der Karte");
+  // Die alte Liste ersetzt die Karte; die Druckfassung behaelt sie.
+  assert.doesNotMatch(page, /<FounderProfileCapability/);
+  assert.match(codeOnly(DRUCK), /<FounderProfileCapability/);
 });
 
 test("die Voreinstellung bleibt ausfuehrlich - die Berichtsseite aendert sich nicht", () => {
@@ -534,19 +539,15 @@ test("der alte Bericht steht darunter, datiert und zugeklappt - und wird nicht v
 test("die kleinen Ableitungen zeigen nur Bestaetigtes und behaupten keine Luecke", () => {
   const page = codeOnly(PAGE);
 
-  // "Wohin du wachsen willst" ist ein eigener Abschnitt - und entfaellt
-  // ganz, wenn nichts da ist. Kein Leerzustand: Nichts ist eine gueltige
-  // Antwort, und "hier koennte stehen, woran du arbeitest" waere die
-  // Aufforderung, sich etwas vorzuwerfen.
-  assert.match(page, /growingInto\.intro/);
-  assert.match(page, /entwicklung: growingInto\.length > 0/);
-  // Und in der Druckfassung entfaellt er genauso - ohne Hinweis, denn der
-  // richtete sich dort an jemanden, der nichts daran aendern kann.
+  // „Wohin du wachsen willst" ist seit Phase 1 kein eigener Abschnitt mehr
+  // auf der Seite: Die Capability Map zeigt je Bereich „Hineinwachsen" - und
+  // zwar nur, wo es jemand so angegeben hat. In der Druckfassung entfaellt der
+  // Block weiterhin ganz, wenn nichts da ist.
+  assert.doesNotMatch(page, /growingInto\.intro|entwicklung:/);
   assert.match(codeOnly(DRUCK), /growingInto\.length > 0 \?/);
 
-  // Von den fuenf Befunden der Auswertung steht genau einer auf der Seite:
-  // "kann es, will es abgeben". Die anderen sagen dasselbe wie die Gruppen,
-  // nur gedeutet.
+  // Von den Befunden der Auswertung steht genau einer eigens auf der Seite:
+  // "kann es, will es abgeben". Die anderen zeigt die Karte je Bereich.
   assert.match(codeOnly(MODELL), /finding\.key === "canButHandsOver"/);
   assert.ok(!/<CapabilityReadoutSection/.test(page), "die gedeutete Auswertung steht wieder da");
 

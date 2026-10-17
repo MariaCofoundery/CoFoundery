@@ -195,17 +195,25 @@
         "title": "Responsibility you want to take on",
         "text": "In these areas, you want to be in charge for the long term. When you talk about founding together, this is the starting point for dividing up roles."
       },
+      "ownsWithLessExperience": {
+        "title": "Taking on responsibility – with less experience so far",
+        "text": "You want to take on responsibility here and have stated less hands-on experience so far. That can be planned for – if it's discussed openly."
+      },
       "canButHandsOver": {
         "title": "You have experience – but would rather hand over responsibility",
         "text": "In these areas, you have hands-on experience but don't want to be responsible for them long term. That isn't a contradiction – it's important input for dividing up roles: you can support here, but responsibility should sit with someone else."
       },
       "growingInto": {
-        "title": "Responsibility you want to grow into",
-        "text": "You want to take on responsibility here but don't have much experience yet. That can be planned for – if it's discussed openly."
+        "title": "Where you want to grow",
+        "text": "You want to grow into these areas – that's what you stated yourself. It's an intention, not a gap."
       },
       "contributes": {
-        "title": "Contributing without being in charge",
-        "text": "You're involved here but don't want to be in charge. That tends to make dividing up roles easier, not harder."
+        "title": "Where you want to contribute",
+        "text": "You want to be actively involved here. Who carries the main responsibility is still open – a good point for dividing up roles."
+      },
+      "handsOver": {
+        "title": "Rather with someone else",
+        "text": "According to what you've stated, others should rather take these areas on – within the team or externally."
       },
       "undecided": {
         "title": "Still open",
@@ -678,7 +686,7 @@
   },
   "viewFounderProfile": "See “This is you”",
   "strengths": {
-    "title": "How you work",
+    "title": "Your strengths",
     "text": "Sentences about how you work — based on situations you described. For each one, you can say two things: how often it shows up, and what people who've worked with you would say.",
     "proposalsTitle": "From your stories",
     "proposalsText": "Each with the passage it's based on. None of it counts until you accept it — and you can rewrite it.",
