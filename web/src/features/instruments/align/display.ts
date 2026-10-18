@@ -25,6 +25,19 @@ export function alignmentDisplayText(value: string, locale: AppLocale) {
   return value;
 }
 /**
+ * Ein Abschnittstitel fuer die Anzeige - ohne internen Blockcode (Phase 1.1).
+ *
+ * „U/K – Zusammenarbeit: Spielraum und Information" ist in der Registratur der
+ * Schluessel des Abschnitts; „U/K", „S", „R" ... sind Arbeitskuerzel aus der
+ * Entwicklung und sagen niemandem etwas. Angezeigt wird nur der Name. Die
+ * Schluessel selbst (Registratur, Vergleich, Uebersetzungskatalog) bleiben
+ * unveraendert.
+ */
+export function alignmentSectionTitle(section: string, locale: AppLocale): string {
+  return alignmentDisplayText(section, locale).replace(/^[A-Z](?:\/[A-Z])*\s+[–-]\s+/, "");
+}
+
+/**
  * Prompt-aware option label. Every place that shows an answer option (readouts,
  * maps, discussion prompts) goes through this, so the same answer reads the
  * same everywhere. Display only: stored values and comparisons stay German.

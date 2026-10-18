@@ -42,7 +42,7 @@ export async function ExpectationGapsView({ result, nameA, nameB }: Props) {
           {result.gaps.map((gap, index) => (
             <li key={index}>
               <p className="text-base text-slate-900">
-                {locale === "en" ? <>{otherOf(gap.from)} can set aside {gap.offered} {copy(gap.unit)}. {nameOf(gap.from)} expects {gap.expected} {copy(gap.unit)} from {gap.recipientLabel}.</> : <>{otherOf(gap.from)} kann {gap.offered} {gap.unit} einplanen. {nameOf(gap.from)} erwartet von {gap.recipientLabel} {gap.expected} {gap.unit}.</>}
+                {locale === "en" ? <>{otherOf(gap.from)} can set aside {gap.offered} {copy(gap.unit)}. {nameOf(gap.from)} expects {gap.expected} {copy(gap.unit)} from {gap.recipientLabel || otherOf(gap.from)}.</> : <>{otherOf(gap.from)} kann {gap.offered} {gap.unit} einplanen. {nameOf(gap.from)} erwartet von {gap.recipientLabel || otherOf(gap.from)} {gap.expected} {gap.unit}.</>}
               </p>
               <p className="mt-1 text-sm text-slate-600">
                  {copy("Das sind")} {gap.shortfall} {copy(gap.unit)}  {copy("Unterschied zwischen dem, was zugesagt ist, und dem, was erwartet wird. Das beschreibt zwei Angaben, nicht die Einsatzbereitschaft — eine Vereinbarung kann beides ändern.")} </p>
@@ -63,7 +63,7 @@ export async function ExpectationGapsView({ result, nameA, nameB }: Props) {
           <ul className="mt-2 space-y-1 text-sm text-slate-700">
             {result.unmatched.map((entry, index) => (
               <li key={index}>
-                {locale === "en" ? <>{nameOf(entry.from)} expects {entry.expected !== null ? `${entry.expected} ${copy(entry.unit)} ` : ""}from {entry.recipientLabel} — </> : <>{nameOf(entry.from)} erwartet von {entry.recipientLabel}{entry.expected !== null ? ` ${entry.expected} ${entry.unit}` : ""} — </>}
+                {locale === "en" ? <>{nameOf(entry.from)} expects {entry.expected !== null ? `${entry.expected} ${copy(entry.unit)} ` : ""}from {entry.recipientLabel || otherOf(entry.from)} — </> : <>{nameOf(entry.from)} erwartet von {entry.recipientLabel || otherOf(entry.from)}{entry.expected !== null ? ` ${entry.expected} ${entry.unit}` : ""} — </>}
                 <span className="text-slate-500">
                   {entry.why === "several_entries"
                     ? copy("es sind mehrere Personen genannt, und die Namen sind frei geschrieben")

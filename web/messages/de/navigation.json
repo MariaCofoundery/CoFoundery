@@ -49,6 +49,7 @@
   "menuAttentionBadge": "{count, plural, =0 {Nichts Offenes} one {1 offener Punkt im Menü} other {# offene Punkte im Menü}}",
   "alignOwnProfile": "Das bist du",
   "alignNewVersion": "Wie du arbeitest",
+  "profileVenture": "So willst du gründen",
   "breadcrumbLabel": "Wo du bist",
   "findYourSearch": "Deine Suche",
   "findProfile": "Dein FIND-Profil",

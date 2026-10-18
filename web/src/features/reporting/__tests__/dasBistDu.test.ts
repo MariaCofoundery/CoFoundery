@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -33,11 +33,12 @@ test("welche Abschnitte bei welcher Datenlage erscheinen", () => {
   // „Was du mitbringst" und entfallen dort ohne Bestaetigtes als Block.
   const bedingungen = /const zeigt: Record<SectionId, boolean> = \{([\s\S]*?)\};/.exec(page)?.[1];
   assert.ok(bedingungen, "die Bedingungen stehen nicht als Daten");
-  assert.match(bedingungen, /vorhaben: visibleVentures\.length > 0/);
+  // Phase 1.1: „So willst du gründen" steht immer - ohne Antworten mit Einstieg.
+  assert.match(bedingungen, /vorhaben: true/);
   assert.match(page, /\{confirmedResources\.length > 0 \? \(/);
 
   // Diese stehen immer - sie tragen bei leerer Datenlage einen Hinweis.
-  for (const immer of ["ueber-dich", "arbeitsweise", "staerken", "mitbringst", "antrieb", "details"]) {
+  for (const immer of ["ueber-dich", "arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"]) {
     assert.match(
       bedingungen,
       new RegExp(`"?${immer}"?: true`),
@@ -303,8 +304,20 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
   assert.match(editor, /const PAGE_STEPS = \[[\s\S]*?"strengths"[\s\S]*?\]/);
   assert.match(editor, /\{step === "strengths" \? \(/);
   assert.match(editor, /<StrengthsSection/);
-  // Keine zweite Aktion fuer KI-Vorschlaege: Sie haengen am manuell gestarteten Worker.
-  assert.doesNotMatch(leer.slice(0, 400), /interview|proposal/i);
+  // PHASE 1.1: Der Interview-Weg ist zurueck - als zweite Aktion, weil es ihn
+  // wirklich gibt (/profile/interview mit Fragen und gespeicherten Antworten).
+  // Er verspricht keine fertigen Vorschlaege: Die Copy sagt „koennen".
+  assert.match(leer, /secondary=\{\{ href: "\/profile\/interview", cta: t\("strengthsSection\.interviewCta"\) \}\}/);
+  assert.ok(existsSync(join("src", "app", "(product)", "profile", "interview", "page.tsx")), "das Interview gibt es nicht mehr");
+  for (const locale of ["de", "en"]) {
+    assert.ok((bundle(locale).strengthsSection as Record<string, string>).interviewCta, `${locale}: interviewCta`);
+    const strengths = JSON.parse(source(join("messages", locale, "capability.json"))).strengths;
+    assert.ok(strengths.interviewTitle && strengths.interviewText && strengths.interviewCta, `${locale}: Interview-Copy im Editor`);
+    assert.doesNotMatch(strengths.interviewText, /werden automatisch|will automatically|garantiert|guaranteed/i);
+  }
+  const editorSection = source(join("src", "features", "capability", "StrengthsSection.tsx"));
+  assert.match(editorSection, /href="\/profile\/interview"/);
+  assert.match(editorSection, /t\("interviewCta"\)/);
 });
 
 test("Vorhaben: ohne Archiv, eindeutig beschriftet, nie der Knopftext als Name", () => {

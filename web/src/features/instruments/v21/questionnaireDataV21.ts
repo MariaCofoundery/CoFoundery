@@ -23,6 +23,8 @@ export type OptionView = {
   label: string;
   requiresText: boolean;
   exclusive: boolean;
+  /** Ein Datumsfeld, sobald die Option angekreuzt ist (Phase 1.1). */
+  requiresDate?: boolean;
 };
 
 export type ItemView = {
@@ -85,6 +87,8 @@ export type ItemView = {
   conditionalFields: string[] | null;
   /** Die Frage, aus der sich die Wiederholungen ergeben - oder null. */
   basisItemId: string | null;
+  /** Nur bei diesen Antworten der Ausgangsfrage (Phase 1.1); fehlt es, bei jeder. */
+  basisOptionIds?: string[] | null;
   followup: {
     question: string;
     /** Mit Kennungen, wie jede andere Antwort auch. */

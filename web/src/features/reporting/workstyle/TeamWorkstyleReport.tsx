@@ -1,4 +1,4 @@
-import { alignmentDisplayEntry, alignmentDisplayItem, alignmentDisplayText } from "@/features/instruments/align/display";
+import { alignmentDisplayEntry, alignmentDisplayItem, alignmentDisplayText, alignmentSectionTitle } from "@/features/instruments/align/display";
 import type { AppLocale } from "@/i18n/config";
 import { workstyleAreas, reportText } from "./display";
 import capabilityEn from "../../../../messages/en/capability.json";
@@ -102,7 +102,7 @@ export function TeamWorkstyleReport({
     })),
     ...[...new Set(differing.filter((a) => a.different).map((a) => a.item.section))].slice(0, 2).map((section) => ({
       label: reportText(locale, "Vorhaben", "Venture"),
-      question: locale === "en" ? `Your expectations for “${alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}” differ. What should apply to your venture?` : `Ihr erwartet bei „${alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}“ Unterschiedliches. Was soll für euer Vorhaben gelten?`,
+      question: locale === "en" ? `Your expectations for “${alignmentSectionTitle(section, locale)}” differ. What should apply to your venture?` : `Ihr erwartet bei „${alignmentSectionTitle(section, locale)}“ Unterschiedliches. Was soll für euer Vorhaben gelten?`,
       context: null,
       href: null,
       claim: `VENTURE.DIFFERENT.${section}`,
@@ -243,7 +243,7 @@ export function TeamWorkstyleReport({
             {differing.length > 0 ? (
               [...new Set(differing.map((a) => a.item.section))].map((section) => (
                 <section key={section} className="mt-6">
-                  <h3 className="text-lg font-semibold">{alignmentDisplayText(section, locale).replace(/^[A-Z/]+ – /, "")}</h3>
+                  <h3 className="text-lg font-semibold">{alignmentSectionTitle(section, locale)}</h3>
                   {differing
                     .filter((a) => a.item.section === section)
                     .map((a) => (

@@ -5,7 +5,8 @@ import type { AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import type { ProductMember } from "@/features/reporting/workstyle/model";
 
 /** Compare selected content, never numeric distances. Same venture enforced by the DB reader.
- * R02 addresses one partner: with 3+ members its old wording cannot identify a recipient. */
+ * R02 (Phase 1.1) no longer names a recipient: it is each person's expectation per
+ * other founder, so it compares like any other answer - also with 3+ members. */
 export function alignmentPatterns(people: ProductMember[]) {
   return getItemsV22("venture_alignment")
     .filter((i) => !i.retired)
@@ -27,23 +28,20 @@ export function alignmentPatterns(people: ProductMember[]) {
         };
       });
       const usable = entries.filter((e) => e.entry?.value);
-      const ambiguous = people.length > 2 && item.itemId === "R02";
       const distinct = new Set(
         usable.map((e) => JSON.stringify(e.entry?.value)),
       );
       return {
         item,
         entries,
-        status: ambiguous
-          ? "Empfängerbezug gemeinsam klären"
-          : usable.length !== people.length
+        status: usable.length !== people.length
             ? "Noch offen"
             : distinct.size === 1
               ? "Ähnliche Erwartungen"
               : "Unterschiedliche Erwartungen",
-        different:
-          !ambiguous && usable.length === people.length && distinct.size > 1,
-        ambiguous,
+        different: usable.length === people.length && distinct.size > 1,
+        // Kein Empfaengerbezug mehr seit Phase 1.1 (R02 ohne Namen).
+        ambiguous: false,
       };
     });
 }

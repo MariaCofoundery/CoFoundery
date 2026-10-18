@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   addStrengthAction,
@@ -190,6 +191,22 @@ export async function StrengthsSection({
           })}
         </ul>
       )}
+
+      {/* DER ZWEITE WEG (Phase 1.1): das gefuehrte Interview. Der Link fiel
+          beim Umbau der Startansicht weg (027ce2f1); das Interview selbst
+          laeuft - es legt Fragen vor und speichert die Antworten. Vorschlaege
+          fuer Staerken entstehen daraus nur, wenn die Auswertung laeuft -
+          deshalb „koennen", nicht „werden". */}
+      <div className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/40 p-5">
+        <h3 className="text-sm font-semibold text-slate-900">{t("interviewTitle")}</h3>
+        <p className="mt-1 text-sm leading-6 text-slate-600">{t("interviewText")}</p>
+        <Link
+          href="/profile/interview"
+          className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-violet-300 bg-white px-4 text-sm font-medium text-slate-900"
+        >
+          {t("interviewCta")}
+        </Link>
+      </div>
 
       <form action={addStrengthAction} className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
         <h3 className="text-sm font-semibold text-slate-900">{t("addTitle")}</h3>

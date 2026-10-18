@@ -43,6 +43,17 @@ test("die neue Fassung bleibt im Menü aktiv, egal auf welcher ihrer Seiten man 
 });
 
 test("historical workbook is not labeled as the current workstyle", () => {
-  const item = shell.slice(shell.indexOf('href: "/me/profile/workstyle"'),shell.indexOf('href: "/connections"'));
+  // Nur der Workstyle-Eintrag selbst - seit Phase 1.1 steht danach im Profil
+  // der Einstieg „So willst du gründen" (/founder-alignment/vorhaben).
+  const start = shell.indexOf('href: "/me/profile/workstyle"');
+  const item = shell.slice(start, shell.indexOf("href:", start + 10));
   assert.doesNotMatch(item,/founder-alignment/);
+});
+
+test("„So willst du gründen“ steht im Profil, nicht unter Teams & Verbindungen", () => {
+  const profil = shell.slice(shell.indexOf('href: "/me/profile",'), shell.indexOf('href: "/connections"'));
+  assert.match(profil, /href: "\/founder-alignment\/vorhaben",\s*label: t\("profileVenture"\)/);
+  assert.match(shell, /currentPathname\.startsWith\("\/founder-alignment\/vorhaben"\);/);
+  // Der Vergleich bleibt Teamkontext.
+  assert.match(shell, /\(currentPathname\.startsWith\("\/founder-alignment"\) && !isProfileArea\(currentPathname\)\)/);
 });

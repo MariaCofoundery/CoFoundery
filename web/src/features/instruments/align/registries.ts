@@ -90,6 +90,12 @@ export type ItemOptionV22 = {
   label: string;
   requiresText: boolean;
   exclusive: boolean;
+  /**
+   * Die Option verlangt ein Datum (R04 „ab Datum", Phase 1.1). Das Feld
+   * erscheint sofort beim Ankreuzen; gespeichert als `value.date` (YYYY-MM-DD)
+   * neben `optionId` - kein neues Format, keine Migration.
+   */
+  requiresDate?: boolean;
 };
 
 export type RegistryItemV22 = {
@@ -123,6 +129,13 @@ export type RegistryItemV22 = {
   followUpQuestion?: string;
   /** Erscheint erst, wenn diese Frage beantwortet ist. */
   showAfter?: string;
+  /**
+   * Nur bei DIESEN Antworten der Ausgangsfrage (Phase 1.1). R05 („ab diesem
+   * Zeitpunkt") passt nur, wenn es einen Zeitpunkt gibt - nicht bei
+   * „innerhalb 12 Monate voraussichtlich nicht". Ohne Angabe: jede inhaltliche
+   * Antwort.
+   */
+  showAfterOptions?: string[];
   /**
    * Eine Frage, die über mehreren Items steht.
    *
@@ -272,6 +285,15 @@ export function assertRegistryV22(registry: RegistryV22): RegistryV22 {
 
     if (item.showAfter && !known.has(item.showAfter)) {
       fail(`${item.itemId}: hängt an ${item.showAfter}, das es nicht gibt`);
+    }
+    if (item.showAfterOptions) {
+      const basis = registry.items.find((entry) => entry.itemId === item.showAfter);
+      if (!basis) fail(`${item.itemId}: showAfterOptions ohne showAfter`);
+      for (const optionId of item.showAfterOptions) {
+        if (!basis?.options.some((option) => option.optionId === optionId)) {
+          fail(`${item.itemId}: ${optionId} gibt es bei ${item.showAfter} nicht`);
+        }
+      }
     }
   }
 

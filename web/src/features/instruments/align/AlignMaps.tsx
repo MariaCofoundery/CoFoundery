@@ -1,5 +1,5 @@
 import { getRequestLocale } from "@/i18n/getLocale";
-import { alignmentDisplayText, alignmentOptionText } from "@/features/instruments/align/display";
+import { alignmentDisplayText, alignmentOptionText, alignmentSectionTitle } from "@/features/instruments/align/display";
 import { getTranslations } from "next-intl/server";
 
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -145,7 +145,7 @@ export async function WorkMap({
         {gruppen.map((group) => (
           <div key={copy(group.section)} className={dicht ? "mb-3 break-inside-avoid" : undefined}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {themenname(group.rows[0]?.itemId ?? "") ?? copy(group.section)}
+              {themenname(group.rows[0]?.itemId ?? "") ?? alignmentSectionTitle(group.section, locale)}
             </p>
             <ul className={dicht ? "mt-1 space-y-1" : "mt-2 space-y-2.5"}>
               {group.rows.map((row) => {
@@ -231,7 +231,7 @@ export async function DifferenceMap({
         {gruppen.map((group) => (
           <div key={copy(group.section)}>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {copy(group.section)}
+              {alignmentSectionTitle(group.section, locale)}
             </p>
             <ul className="mt-3 space-y-4">
               {group.rows.map((row) => (

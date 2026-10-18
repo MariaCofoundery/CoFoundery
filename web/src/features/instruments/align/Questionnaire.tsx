@@ -4,14 +4,14 @@ import { alignmentDisplayText } from "@/features/instruments/align/display";
 import { useLocale } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/AnswerFieldV21";
 import type { SectionView } from "@/features/instruments/v21/questionnaireDataV21";
 import { completenessV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
 import type { AnswerableItem } from "@/features/instruments/v21/answersV21";
 import { clearAnswer, saveAnswer, submitScope } from "@/features/instruments/align/answerActions";
-import { basisAnswered } from "@/features/instruments/align/followUps";
+import { followUpApplies } from "@/features/instruments/align/followUps";
 import { setVentureName } from "@/features/instruments/align/ventureActions";
 import {
   noteItemAnswered,
@@ -21,6 +21,12 @@ import type { AssessmentScope } from "@/features/instruments/align/registries";
 import { alignmentScreens } from "@/features/instruments/align/screenDisplay";
 import type { ScreenSet } from "@/features/instruments/align/screens";
 import { questionBlocks } from "@/features/instruments/align/questionBlocks";
+import { stepOf } from "@/features/instruments/align/screens";
+import {
+  missingAnswersText,
+  revealQuestion,
+  scrollViewportToTop,
+} from "@/features/instruments/align/wizardNavigation";
 
 type SaveState = "idle" | "saving" | "saved" | "incomplete" | "error";
 
@@ -136,12 +142,39 @@ export function Questionnaire({
    * beginnt der nächste Schritt mitten in seinen Fragen, und die Überleitung,
    * die erklärt, worum es jetzt geht, hat man nie gesehen.
    *
-   * `auto` und nicht `smooth`: Wer zügig durchklickt, wartet sonst bei jedem
-   * Schritt auf eine Animation.
+   * PHASE 1.1: Der Sprung passiert NACH dem Rendern des neuen Schritts und
+   * ausdruecklich ohne Animation - siehe `wizardNavigation.ts`, warum er
+   * vorher nur bei manchen Schritten ankam. Danach bekommt die Kopfzeile den
+   * Fokus (ohne eigenen Sprung), damit Tastatur und Screenreader im neuen
+   * Schritt oben anfangen statt am Weiter-Knopf des alten.
    */
-  const zuSchritt = (naechster: number) => {
-    setStep(naechster);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+  const zuSchritt = (naechster: number) => setStep(naechster);
+
+  /** Welche Frage nach dem naechsten Rendern angesprungen werden soll („Zur Frage"). */
+  const ziel = useRef<string | null>(null);
+  /** Zaehlt Spruenge innerhalb desselben Schritts - dann aendert sich `step` nicht. */
+  const [sprung, setSprung] = useState(0);
+  const kopf = useRef<HTMLElement | null>(null);
+  const ersterRender = useRef(true);
+
+  useLayoutEffect(() => {
+    if (ersterRender.current) {
+      ersterRender.current = false;
+      return;
+    }
+    const itemId = ziel.current;
+    ziel.current = null;
+    if (itemId && revealQuestion(itemId)) return;
+    scrollViewportToTop();
+    kopf.current?.focus({ preventScroll: true });
+  }, [step, sprung]);
+
+  /** Aus der Liste fehlender Antworten: auf den richtigen Schritt, zur Frage, Fokus ins Feld. */
+  const zurFrage = (itemId: string) => {
+    ziel.current = itemId;
+    const naechster = stepOf(sourceScreens, itemId);
+    if (naechster !== null && naechster !== step) setStep(naechster);
+    else setSprung((zaehler) => zaehler + 1);
   };
 
   /**
@@ -230,8 +263,14 @@ export function Questionnaire({
     "time_windows",
     "date",
   ]);
+  // PHASE 1.1: knapp eine Sekunde Pause, und beim Verlassen des Feldes sofort.
+  // Die zwei Sekunden vorher waren eine Antwort auf „speichert nach jedem
+  // Buchstaben" - das eigentliche Problem war aber, dass das Feld bei jedem
+  // Zeichen neu angelegt wurde (siehe AnswerFieldV21). Gespeichert wird
+  // weiterhin nur der Entwurf aus dem lokalen Zustand; das Feld bleibt dabei
+  // dasselbe Element, Cursor und Fokus bleiben stehen.
   const wartezeit = (itemId: string) =>
-    TIPPEN.has(answerable[itemId]?.answerFormat ?? "") ? 2000 : 600;
+    TIPPEN.has(answerable[itemId]?.answerFormat ?? "") ? 900 : 600;
 
   const persist = useCallback(
     (itemId: string, draft: DraftV21, sofort = false) => {
@@ -444,6 +483,7 @@ export function Questionnaire({
     <div
       key={item.itemId}
       data-item-id={item.itemId}
+      tabIndex={-1}
       // WER DAS FELD VERLAESST, IST FERTIG. React laesst `blur` steigen,
       // deshalb steht es an der Karte und nicht an jedem Feld darin.
       onBlur={() => jetztSpeichern(item.itemId)}
@@ -489,6 +529,7 @@ export function Questionnaire({
           <div
             key={item.itemId}
             data-item-id={item.itemId}
+            tabIndex={-1}
             onBlur={() => jetztSpeichern(item.itemId)}
             className={[
               "-mx-2 px-2 py-4",
@@ -504,8 +545,15 @@ export function Questionnaire({
 
   // Beta-Gate: dieselbe Regel wie bei der Abgabe (followUps.ts) - eine
   // Anschlussfrage haengt an IHRER Ausgangsfrage, nicht pauschal an L01.
+  // PHASE 1.1: auch nur bei bestimmten Antworten (R05 nur mit Zeitpunkt).
+  // Aus dem LOKALEN Zustand - die Anschlussfrage erscheint beim Ankreuzen,
+  // nicht erst nach dem Speichern.
   const sichtbar = (item: SectionView["items"][number]) =>
-    !item.basisItemId || basisAnswered(answers[item.basisItemId]);
+    !item.basisItemId ||
+    followUpApplies(
+      { showAfter: item.basisItemId, showAfterOptions: item.basisOptionIds ?? null },
+      (itemId) => answers[itemId],
+    );
 
   /**
    * Wie viele Anschlussfragen an dieser Frage hängen — und noch nicht da sind.
@@ -556,7 +604,7 @@ export function Questionnaire({
 
     return (
       <div className="max-w-2xl space-y-5">
-        <h1 className="text-2xl font-semibold text-slate-900">{screens.intro.title}</h1>
+        <h1 ref={(node) => { kopf.current = node; }} tabIndex={-1} className="text-2xl font-semibold text-slate-900 outline-none">{screens.intro.title}</h1>
         {screens.intro.paragraphs.map((absatz) => (
           <p key={absatz} className="text-base leading-7 text-slate-700">
             {absatz}
@@ -630,7 +678,7 @@ export function Questionnaire({
             ist, aber nicht, woran man sitzt. Klein und in einer Zeile mit dem
             Zaehler - eine zweite Ueberschrift ueber dem Uebergang waere ein
             zweiter Anfang. */}
-        <p className="text-sm text-slate-500">
+        <p ref={(node) => { kopf.current = node; }} tabIndex={-1} className="text-sm text-slate-500 outline-none">
            {t("Schritt")} {schirm.step}  {t("von")} {screens.screens.length}
           <span className="text-slate-400"> · </span>
           <span className="text-slate-600">{schirm.title}</span>
@@ -660,9 +708,32 @@ export function Questionnaire({
         )}
       </div>
 
+      {/* WELCHE FEHLEN - UND DER WEG DORTHIN (Phase 1.1). Vorher nur „Es
+          fehlen noch 1 Antworten"; wo, musste man suchen. Jetzt je Frage ein
+          Knopf, der auf den richtigen Schritt geht, zur Frage scrollt und den
+          Fokus ins Feld setzt. Die Markierung an der Frage bleibt. */}
       {missingAfterSubmit.length > 0 && (
-        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-           {t("Es fehlen noch")} {missingAfterSubmit.length}  {t("Antworten. Für jede Frage gibt es auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts hinschreiben, was du nicht meinst.")} </p>
+        <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">{missingAnswersText(missingAfterSubmit.length, locale)}</p>
+          <ul className="mt-2 space-y-2">
+            {missingAfterSubmit.map((itemId) => {
+              const offen = allItems.find((entry) => entry.itemId === itemId);
+              return (
+                <li key={itemId} className="flex flex-wrap items-start justify-between gap-2">
+                  <span className="min-w-0 flex-1 line-clamp-2">{offen ? t(offen.prompt) : itemId}</span>
+                  <button
+                    type="button"
+                    onClick={() => zurFrage(itemId)}
+                    className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-amber-300 bg-white px-3 text-sm font-medium text-amber-900"
+                  >
+                    {t("Zur Frage")}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3">{t("Für jede Frage gibt es auch eine Antwort, die das Nichtbeantworten benennt — du musst nichts hinschreiben, was du nicht meinst.")}</p>
+        </div>
       )}
 
       {/* DER MOMENT VOR DEM ABSENDEN. Vorher stand hier nur ein Knopf;

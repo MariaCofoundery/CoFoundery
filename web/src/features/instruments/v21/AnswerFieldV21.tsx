@@ -76,32 +76,42 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
     </div>
   );
 
+  // DIE FELDER WERDEN AUFGERUFEN, NICHT ALS <Komponente /> GERENDERT (Phase 1.1).
+  //
+  // GEMELDET: Beim Tippen in „12-Monats-Ziel" und den Stundenfeldern sprang
+  // der Fokus nach jedem Zeichen heraus. Ursache: `NumberRange`, `SingleText`
+  // usw. sind Funktionen INNERHALB dieser Komponente und entstehen bei jedem
+  // Render neu. Als `<NumberRange />` gerendert sieht React darin bei jedem
+  // Tastendruck einen neuen Komponententyp, wirft das alte <input> weg und
+  // legt ein neues an - Fokus und Cursor sind weg. Als Funktionsaufruf liefern
+  // sie nur JSX in den bestehenden Baum; das <input> bleibt dasselbe Element.
+  // Sie benutzen keine Hooks, deshalb ist der Aufruf zulaessig.
   function renderInput() {
     switch (item.answerFormat) {
       case "ordinal_choice":
       case "single_choice":
-        return <SingleChoice />;
+        return SingleChoice();
       case "multi_choice":
       case "multi_choice_priority":
-        return <MultiChoice />;
+        return MultiChoice();
       case "value_case":
-        return <ValueCase />;
+        return ValueCase();
       case "money_range":
-        return <MoneyRange />;
+        return MoneyRange();
       case "number_range":
-        return <NumberRange />;
+        return NumberRange();
       case "person_number_range":
-        return <PerPerson />;
+        return PerPerson();
       case "time_windows":
-        return <TimeWindows />;
+        return TimeWindows();
       case "date":
-        return <DateField />;
+        return DateField();
       case "structured_text":
-        return <SingleText />;
+        return SingleText();
       case "free_text_repeatable":
-        return <RepeatableText />;
+        return RepeatableText();
       case "free_text_per_entry":
-        return <PerEntryText />;
+        return PerEntryText();
     }
   }
 
@@ -137,6 +147,18 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
                   onChange={(event) => patch({ text: event.target.value })}
                 />
               )}
+              {/* „AB DATUM" BRAUCHT EIN DATUM (Phase 1.1). Erscheint sofort beim
+                  Ankreuzen - aus dem lokalen Zustand, nicht nach dem Speichern. */}
+              {option.requiresDate && chosen === option.optionId && (
+                <input
+                  type="date"
+                  className={`${box} mt-2 w-auto`}
+                  aria-label={t("Ab welchem Datum ungefähr?")}
+                  value={(value.date as string) ?? ""}
+                  disabled={disabled}
+                  onChange={(event) => patch({ date: event.target.value || undefined })}
+                />
+              )}
             </span>
           </label>
         ))}
@@ -148,9 +170,7 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
           ihre Eingabefelder". Eine Frage, die in der Registratur steht und
           auf dem Bildschirm nicht auftaucht, ist unsichtbar falsch.
         */}
-        {item.followup && chosen === item.followup.triggerOptionId && (
-          <FollowUpChoices />
-        )}
+        {item.followup && chosen === item.followup.triggerOptionId && FollowUpChoices()}
 
         {/*
           R04: der monatliche Betrag ist ausdruecklich OPTIONAL - der Hinweis

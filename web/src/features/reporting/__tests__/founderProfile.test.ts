@@ -150,7 +150,13 @@ test("die Seite ist die eigene und gibt nichts frei", () => {
   assert.match(page, /redirect\("\/login\?next=\/me\/profile"\)/);
   assert.match(codeOnly(MODELL), /getOwnCapabilityEntries\(supabase, userId\)/);
   // Kein Fremdzugriff: keine userId aus Parametern, keine Freigabe-RPC.
-  assert.doesNotMatch(page, /params|searchParams|get_disclosed_capability|advisor/);
+  // SEIT PHASE 1.1 gibt es GENAU EINEN Parameter: welches EIGENE Vorhaben
+  // gezeigt wird. Er waehlt nur unter den eigenen Vorhaben aus, und gelesen
+  // wird immer mit der angemeldeten Person.
+  assert.doesNotMatch(page, /params\.|searchParams\)\?\.(?!vorhaben)|get_disclosed_capability|advisor/);
+  assert.match(page, /const gewaehlt = \(await searchParams\)\?\.vorhaben;/);
+  assert.match(page, /visibleVentures\.find\(\(venture\) => venture\.id === wahl\)/);
+  assert.match(page, /getVentureSnapshot\(supabase, user\.id, aktuellesVorhaben\.id,/);
   // Der Weg zum Weitergeben fuehrt auf eine eigene Seite - seit dem
   // 01.10.2026 mit einer Wahl davor statt eines einzelnen Knopfes.
   assert.match(page, /<ProfilePdfChoice/);
@@ -269,7 +275,7 @@ test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
 
   // Die Abschnitte stehen einmal als Daten. Der Sprungbalken oben und die
   // Ueberschriften darunter duerfen nicht auseinanderlaufen.
-  const ids = [...page.matchAll(/id: "([a-z-]+)", title: t\("sections\.\w+"\)/g)].map(
+  const ids = [...page.matchAll(/id: "([a-z-]+)", title: t\("(?:sections|venture)\.\w+"\)/g)].map(
     (treffer) => treffer[1],
   );
   assert.deepEqual(ids, [
@@ -281,6 +287,8 @@ test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
     "vorhaben",
     "details",
   ]);
+  // Phase 1.1: „So willst du gründen" statt der Teamkarten-Liste.
+  assert.match(page, /\{ id: "vorhaben", title: t\("venture\.title"\) \}/);
   assert.match(page, /sections\.filter\(\(section\) => zeigt\[section\.id\]\)/);
 
   // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe. Vorhaben
@@ -343,20 +351,26 @@ test("der Stand kommt aus allen Quellen - oder gar nicht", () => {
   assert.match(quelle, /if \(gueltig\.length === 0\) return null/);
 });
 
-test("Venture-Angaben bleiben draussen - bis auf Namen und Weg dorthin", () => {
+test("Vorhabensangaben: nur die eigenen, nur im Abschnitt „So willst du gründen“, nie im Druck", () => {
   const page = codeOnly(PAGE);
-  // Was zu einem Vorhaben festgehalten ist, gilt fuer DIESES Vorhaben und
-  // einen Zeitraum. Ein Profil mit Venture-Zusagen darin vermischt beides.
-  assert.match(codeOnly(MODELL), /findVentures/);
-  assert.match(page, /ventures\.text/);
-  // Weder die Seite noch die Druckfassung noch das Modell lesen Antworten zu
-  // einem Vorhaben: Die gelten fuer EIN Vorhaben und einen Zeitraum.
-  for (const datei of [MODELL, PAGE, DRUCK]) {
+  // SEIT PHASE 1.1 zeigt die Seite die EIGENE Sicht auf EIN Vorhaben - als
+  // kompakte Karten. Gelesen wird nur ueber `ventureSnapshotData`, mit der
+  // angemeldeten Person und dem gewaehlten eigenen Vorhaben.
+  assert.match(page, /<VentureSnapshot/);
+  const loader = codeOnly("src/features/reporting/ventureSnapshotData.ts");
+  assert.match(loader, /^import "server-only";/m);
+  assert.match(loader, /\.eq\("user_id", userId\)/);
+  assert.match(loader, /\.eq\("venture_id", ventureId\)/);
+  // Das Lesemodell (auch fuer den Druck) und die Druckfassung lesen KEINE
+  // Vorhabensantworten: Sie gelten fuer ein Vorhaben und einen Zeitraum.
+  for (const datei of [MODELL, DRUCK]) {
     assert.ok(
-      !/venture_alignment|getScopeReport\((user\.id|userId), "venture/.test(codeOnly(datei)),
+      !/venture_alignment|getScopeReport\((user\.id|userId), "venture|getVentureSnapshot/.test(codeOnly(datei)),
       `${datei} liest Venture-Antworten`,
     );
   }
+  // Und die Seite liest sie nicht an der Snapshot-Schicht vorbei.
+  assert.ok(!/venture_alignment|getScopeReport\(user\.id, "venture/.test(page));
 });
 
 test("die Farbe sagt, welche Saeule - nicht, wie gut", () => {

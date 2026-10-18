@@ -315,7 +315,8 @@
       "more": "{count, plural, =1 {One more in the panel} other {# more in the panel}}",
       "empty": "You haven't recorded your strengths yet.",
       "emptyCta": "Record strengths",
-      "emptyText": "Note in your own words what comes easily to you at work – and how often it shows."
+      "emptyText": "Note in your own words what comes easily to you at work – and how often it shows.",
+      "interviewCta": "Discover strengths in the interview"
     },
     "directionSection": {
       "detailsSummary": "All statements with their origin",
@@ -333,6 +334,48 @@
       "unnamedDated": "Unnamed venture · created {date}",
       "alone": "Just you so far",
       "withTeam": "With other people"
+    },
+    "venture": {
+      "title": "How you want to build",
+      "intro": "Your own view of one specific venture – time, money, decisions, goals and limits. Each person involved answers this for themselves; only the team comparison puts the views side by side.",
+      "select": "Venture",
+      "show": "Show",
+      "current": "Venture: {name}",
+      "empty": "You haven't described your expectations for this venture yet.",
+      "emptyText": "How much time you can put in, what you need financially, how you'd like to make decisions and what's off the table for you – from your point of view, for this one venture.",
+      "emptyCta": "Describe your view",
+      "draft": "Not submitted yet – these are your answers so far.",
+      "allAnswers": "See all answers",
+      "continue": "Continue",
+      "cards": {
+        "time": "Time & commitment",
+        "money": "Money & horizon",
+        "decisions": "Decisions",
+        "collaboration": "Keeping each other informed",
+        "goals": "Goals",
+        "limits": "Limits"
+      },
+      "facts": {
+        "R01": "What you can set aside",
+        "R02": "What you expect from each other founder",
+        "R10": "How important this venture is to you",
+        "R04": "Making a living from the venture",
+        "R05": "Minimum needed per month",
+        "B01": "Own money, at most in addition",
+        "B04": "Costs covered before you invest more",
+        "U01": "Decisions in your own area",
+        "U04": "When several paths are possible",
+        "U03": "Spending within your budget",
+        "U05": "Adjusting the plan",
+        "G01": "Disagreement in someone's area",
+        "K01": "Sharing work in progress",
+        "K03": "Hearing about important changes",
+        "K04": "Overview of other areas",
+        "S01_top": "Most important right now",
+        "S04": "To achieve in twelve months",
+        "S03": "External investors",
+        "L01": "Off the table for you"
+      }
     },
     "details": {
       "intro": "Everything the profile above doesn't need to repeat: the detailed report, coverage by area, and earlier versions to look back on.",

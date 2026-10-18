@@ -41,12 +41,19 @@ test("die realen Anschlussfragen haengen an ihrer eigenen Ausgangsfrage", () => 
   assert.equal(byId.get("L03")?.showAfter, "L01");
 
   const answers = new Map<string, { value?: unknown; missingCode?: string }>([
-    ["R04", { value: { optionId: "x" } }],
+    ["R04", { value: { optionId: "R04_o1" } }],
     ["L01", { missingCode: "prefer_not_to_say" }],
   ]);
   const get = (id: string) => answers.get(id);
-  // R05 gilt, weil R04 beantwortet ist - unabhaengig von L01.
+  // R05 gilt, weil R04 einen Zeitpunkt nennt - unabhaengig von L01.
   assert.equal(followUpApplies(byId.get("R05")!, get), true);
+  // PHASE 1.1: nur bei „ab sofort" / „ab Datum" - nicht bei „innerhalb 12
+  // Monate voraussichtlich nicht" (dann gibt es keinen Zeitpunkt).
+  assert.deepEqual(byId.get("R05")?.showAfterOptions, ["R04_o1", "R04_o2"]);
+  const mit = (optionId: string) => (id: string) => (id === "R04" ? { value: { optionId } } : undefined);
+  assert.equal(followUpApplies(byId.get("R05")!, mit("R04_o2")), true);
+  assert.equal(followUpApplies(byId.get("R05")!, mit("R04_o3")), false);
+  assert.equal(followUpApplies(byId.get("R05")!, () => ({ missingCode: "cannot_assess" })), false);
   // L02/L03 gelten nicht nach einer Nicht-Antwort in L01.
   assert.equal(followUpApplies(byId.get("L02")!, get), false);
   assert.equal(followUpApplies(byId.get("L03")!, get), false);
@@ -56,7 +63,10 @@ test("die realen Anschlussfragen haengen an ihrer eigenen Ausgangsfrage", () => 
 
 test("Oberflaeche, Abgabe und Teambereitschaft benutzen dieselbe Regel", () => {
   const ui = read("src/features/instruments/align/Questionnaire.tsx");
-  assert.match(ui, /!item\.basisItemId \|\| basisAnswered\(answers\[item\.basisItemId\]\)/);
+  // Phase 1.1: dieselbe Funktion wie bei der Abgabe - inklusive der
+  // Antworten, bei denen die Anschlussfrage ueberhaupt passt - und aus dem
+  // lokalen Zustand (`answers`), also sofort beim Ankreuzen.
+  assert.match(ui, /!item\.basisItemId \|\|\s*followUpApplies\(\s*\{ showAfter: item\.basisItemId, showAfterOptions: item\.basisOptionIds \?\? null \},\s*\(itemId\) => answers\[itemId\],\s*\)/);
   // Nicht mehr pauschal an den L01-Eintraegen.
   assert.doesNotMatch(ui, /!item\.basisItemId \|\| basisEntries\.length > 0/);
 

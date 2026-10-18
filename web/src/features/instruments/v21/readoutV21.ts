@@ -143,7 +143,9 @@ function valueOf(
       if (!label) return null;
       // Keine Position. Eine Handlungswahl hat keine Reihenfolge, und eine
       // auszugeben wäre eine Behauptung über Nähe, die es nicht gibt.
-      return { kind: "choice", label, text: (value.text as string) ?? null };
+      // Das Datum bei „ab Datum" (Phase 1.1) steht dort, wo sonst der
+      // Begleittext steht - roh (YYYY-MM-DD), formatiert wird in der Anzeige.
+      return { kind: "choice", label, text: (value.text as string) ?? (value.date as string) ?? null };
     }
 
     case "multi_choice":

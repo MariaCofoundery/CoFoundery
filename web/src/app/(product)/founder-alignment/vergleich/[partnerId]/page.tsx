@@ -74,7 +74,12 @@ export default async function AlignComparePage({
   const profil = await buildScopeComparison(
     "founder_profile", auth.user.id, partnerId, null,
   );
-  const vorhaben = venture
+  // NUR IM GEMEINSAMEN VORHABEN (Phase 1.1). Die Antworten der anderen Person
+  // werden ohnehin nur zu DIESEM Vorhaben gelesen - wer nicht darin ist (z. B.
+  // ein Kontakt aus FIND mit einem eigenen, anderen Vorhaben), hat dazu
+  // nichts. Statt einer halben Gegenueberstellung steht dann keine: Der
+  // Vergleich der Vorhaben-Sichten beginnt erst im gemeinsamen Vorhaben.
+  const vorhaben = venture && zusammenImVorhaben
     ? await buildScopeComparison(
         "venture_alignment", auth.user.id, partnerId, venture.id,
       )

@@ -82,10 +82,18 @@ test("beim Schrittwechsel geht es nach oben", () => {
   // Schritt mitten in seinen Fragen.
   const fragebogen = readFileSync(
     join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");
-  assert.match(fragebogen, /const zuSchritt = \(naechster: number\) => \{/);
-  assert.match(fragebogen, /window\.scrollTo\(\{ top: 0, behavior: "auto" \}\)/);
-  // Und kein Weg daran vorbei: `setStep` wird nur noch dort aufgerufen.
-  assert.equal((fragebogen.match(/setStep\(/g) ?? []).length, 1);
+  // PHASE 1.1: NACH dem Rendern und ohne Animation. Vorher sprang
+  // `scrollTo({ behavior: "auto" })` VOR dem Rendern - und „auto" heisst
+  // wegen `scroll-behavior: smooth` in globals.css eine Animation, die der
+  // Inhaltstausch abbrach. Daher kam man nur bei manchen Schritten oben an.
+  assert.match(fragebogen, /const zuSchritt = \(naechster: number\) => setStep\(naechster\);/);
+  assert.match(fragebogen, /useLayoutEffect\(\(\) => \{[\s\S]*?scrollViewportToTop\(\);[\s\S]*?\}, \[step, sprung\]\);/);
+  assert.doesNotMatch(fragebogen, /behavior: "auto"/);
+  const navigation = readFileSync(join("src", "features", "instruments", "align", "wizardNavigation.ts"), "utf8");
+  assert.match(navigation, /behavior: "instant"/);
+  // `setStep` nur dort - und beim Sprung zu einer fehlenden Antwort.
+  assert.equal((fragebogen.match(/setStep\(/g) ?? []).length, 2);
+  assert.match(fragebogen, /if \(naechster !== null && naechster !== step\) setStep\(naechster\);/);
 });
 
 test("beim Tippen wird später gespeichert - und beim Verlassen sofort", () => {
@@ -93,7 +101,9 @@ test("beim Tippen wird später gespeichert - und beim Verlassen sofort", () => {
   // nach einem Buchstaben, das ist etwas lästig."
   const fragebogen = readFileSync(
     join("src", "features", "instruments", "align", "Questionnaire.tsx"), "utf8");
-  assert.match(fragebogen, /TIPPEN\.has\(answerable\[itemId\]\?\.answerFormat \?\? ""\) \? 2000 : 600/);
+  // Phase 1.1: knapp eine Sekunde (vorher zwei - das eigentliche Problem war der
+  // Neuaufbau des Feldes bei jedem Zeichen, siehe AnswerFieldV21).
+  assert.match(fragebogen, /TIPPEN\.has\(answerable\[itemId\]\?\.answerFormat \?\? ""\) \? 900 : 600/);
   assert.match(fragebogen, /onBlur=\{\(\) => jetztSpeichern\(item\.itemId\)\}/);
 
   // Beides gilt für beide Darstellungen - einzelne Karte und Block.

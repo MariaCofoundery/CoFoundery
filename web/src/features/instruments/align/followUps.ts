@@ -48,8 +48,17 @@ export function basisAnswered(answer: BasisAnswer): boolean {
 
 /** Gilt diese Frage fuer die gegebenen Antworten (je Frage-ID)? */
 export function followUpApplies(
-  item: { showAfter?: string | null },
+  item: { showAfter?: string | null; showAfterOptions?: readonly string[] | null },
   answerFor: (itemId: string) => BasisAnswer
 ): boolean {
-  return !item.showAfter || basisAnswered(answerFor(item.showAfter));
+  if (!item.showAfter) return true;
+  const answer = answerFor(item.showAfter);
+  if (!basisAnswered(answer)) return false;
+  // Nur bei bestimmten Antworten (Phase 1.1) - dieselbe Regel in Oberflaeche
+  // und Abgabe, sonst verlangt die Abgabe eine Frage, die niemand sieht.
+  if (item.showAfterOptions?.length) {
+    const optionId = (answer?.value as { optionId?: unknown } | null | undefined)?.optionId;
+    return typeof optionId === "string" && item.showAfterOptions.includes(optionId);
+  }
+  return true;
 }

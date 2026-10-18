@@ -42,11 +42,15 @@ test("P0-04/06: user text and raw answer values remain unchanged in EN", () => {
 });
 
 test("P0-04: partner interpolation localizes the owned template and preserves the name", () => {
-  const item = getItemsV22("venture_alignment").find(i=>i.prompt.includes("[Name]"))!;
-  assert.ok(item);
-  const translated = alignmentDisplayText(item.prompt.replace("[Name]","Jörg Müller"),"en");
+  // Phase 1.1: keine aktuelle Frage traegt mehr [Name] (R02 ohne Namen). Die
+  // Ersetzung im Katalog bleibt fuer die fruehere Fassung lesbar.
+  assert.equal(getItemsV22("venture_alignment").filter(i=>i.prompt.includes("[Name]")).length, 0);
+  const template = "Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen ungefähr von [Name]?";
+  const translated = alignmentDisplayText(template.replace("[Name]","Jörg Müller"),"en");
   assert.ok(translated.includes("Jörg Müller"));
-  assert.equal(translated,alignmentDisplayText(item.prompt,"en").replace("[Name]","Jörg Müller"));
+  assert.equal(translated,alignmentDisplayText(template,"en").replace("[Name]","Jörg Müller"));
+  const r02 = getItemsV22("venture_alignment").find(i=>i.itemId==="R02")!;
+  assert.notEqual(alignmentDisplayText(r02.prompt,"en"), r02.prompt, "R02 hat keine EN-Fassung");
 });
 
 for (const [name, library, build] of [["current", CARD_LIBRARY, buildCards],["historical", CARD_LIBRARY_V21, buildCardsV21]] as const) {

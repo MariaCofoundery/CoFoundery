@@ -64,6 +64,11 @@ const ERLAUBT = [
   // anfaengt, bekommt den v1-Bogen nicht mehr; ohne diesen Eintrag waere die
   // Saeule fuer ihn dauerhaft leer geblieben.
   join("src", "app", "me", "profile") + sep,
+  // „So willst du gründen" auf „Das bist du" (Phase 1.1): dieselbe
+  // Lesbarmachung (`readAnswer`) fuer die eigenen Vorhaben-Antworten - keine
+  // v2.1-Fragen, kein Fragebogen.
+  join("src", "features", "reporting", "ventureSnapshotData.ts"),
+  join("src", "features", "reporting", "ventureSnapshotModel.ts"),
 ];
 const ROOT = "src";
 const V21 = join("src", "features", "instruments", "v21") + sep;

@@ -17,6 +17,12 @@ import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfi
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { CapabilityMap } from "@/features/reporting/CapabilityMap";
+import { VentureSnapshot } from "@/features/reporting/VentureSnapshot";
+import { getVentureSnapshot, type VentureSnapshot as VentureSnapshotData } from "@/features/reporting/ventureSnapshotData";
+import type { ProfileVenture } from "@/features/reporting/profileVentures";
+import { alignmentDisplayText } from "@/features/instruments/align/display";
+import { isIsoDate } from "@/features/instruments/v21/answersV21";
+import type { AppLocale } from "@/i18n/config";
 import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileDirection } from "@/features/reporting/FounderProfileDirection";
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
@@ -108,8 +114,13 @@ type SectionId =
   | "vorhaben"
   | "details";
 
-export default async function FounderProfilePage() {
+export default async function FounderProfilePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ vorhaben?: string | string[] }>;
+}) {
   const locale = await getRequestLocale();
+  const gewaehlt = (await searchParams)?.vorhaben;
   const {
     data: { user },
   } = await getRequestUser();
@@ -187,7 +198,7 @@ export default async function FounderProfilePage() {
     { id: "staerken", title: t("sections.strengths") },
     { id: "mitbringst", title: t("sections.bring") },
     { id: "antrieb", title: t("sections.direction") },
-    { id: "vorhaben", title: t("sections.ventures") },
+    { id: "vorhaben", title: t("venture.title") },
     { id: "details", title: t("sections.details") },
   ];
 
@@ -201,7 +212,8 @@ export default async function FounderProfilePage() {
     staerken: true,
     mitbringst: true,
     antrieb: true,
-    vorhaben: visibleVentures.length > 0,
+    // Phase 1.1: immer - ohne Antworten mit einem direkten Einstieg.
+    vorhaben: true,
     details: true,
   };
   const sichtbar = sections.filter((section) => zeigt[section.id]);
@@ -218,6 +230,24 @@ export default async function FounderProfilePage() {
   const originLabel = (origin: string) => t(`origins.${origin}`);
   const dateLabel = (value: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(value));
+  const ventureLabel = (venture: ProfileVenture) => {
+    const label =
+      venture.name ??
+      (venture.createdAt ? t("ventures.unnamedDated", { date: dateLabel(venture.createdAt) }) : t("ventures.unnamed"));
+    return venture.duplicateIndex ? `${label} (${venture.duplicateIndex})` : label;
+  };
+
+  // „SO WILLST DU GRÜNDEN" (Phase 1.1): EIN aktuelles Vorhaben - das gewaehlte,
+  // sonst das zuletzt geaenderte. Archivierte kommen gar nicht vor
+  // (`profileVentures`). Gelesen werden nur die EIGENEN Antworten dazu.
+  const wahl = Array.isArray(gewaehlt) ? gewaehlt[0] : gewaehlt;
+  const aktuellesVorhaben = visibleVentures.find((venture) => venture.id === wahl) ?? visibleVentures[0] ?? null;
+  const snapshot: VentureSnapshotData = aktuellesVorhaben
+    ? await getVentureSnapshot(supabase, user.id, aktuellesVorhaben.id, locale as AppLocale)
+    : { status: "none" };
+  const fragebogenHref = aktuellesVorhaben
+    ? `/founder-alignment/vorhaben?venture=${encodeURIComponent(aktuellesVorhaben.id)}`
+    : "/founder-alignment/vorhaben";
 
   /**
    * Ein Abschnitt - oder nichts, wenn es dazu nichts zu zeigen gibt.
@@ -478,6 +508,8 @@ export default async function FounderProfilePage() {
               text={t("strengthsSection.emptyText")}
               href="/profile?step=strengths"
               cta={t("strengthsSection.emptyCta")}
+              // Phase 1.1: der Interview-Weg, den es gibt (/profile/interview).
+              secondary={{ href: "/profile/interview", cta: t("strengthsSection.interviewCta") }}
             />
           )
         )}
@@ -707,48 +739,95 @@ export default async function FounderProfilePage() {
       </ProfilePart>
 
       {/* ------------------------------------------------------------------
-          6 - DEINE VORHABEN - ALS VERWEIS
+          6 - SO WILLST DU GRÜNDEN (Phase 1.1)
 
-          Was zu einem Vorhaben festgehalten ist, gilt fuer DIESES Vorhaben
-          und einen Zeitraum; das Profil gilt fuer die Person. Hier stehen
-          deshalb nur Namen und der Weg dorthin - keine Zusagen, keine
-          Risikogrenzen, keine Teamregeln, keine Alignment-Ergebnisse.
+          Die EIGENE Sicht auf EIN konkretes Vorhaben - jede beteiligte Person
+          beantwortet das fuer sich; erst der Teamvergleich (im Team) stellt
+          die Sichten nebeneinander. Deshalb hier: ein aktuelles Vorhaben (bei
+          mehreren eine schlichte Auswahl statt Teamkarten), die eigenen
+          Antworten als kurze Karten, und der Weg zur ausfuehrlichen
+          Auswertung. Keine Teammitglieder, keine Antworten anderer.
 
-          Phase 1: ohne archivierte Vorhaben, zuletzt geaenderte zuerst, und
-          jede Zeile eindeutig - ein Vorhaben ohne Namen heisst „Unbenanntes
-          Vorhaben" mit Anlagedatum, nicht „Vorhaben ansehen" (siehe
-          `profileVentures.ts`).
+          Kein Gesamtwert, kein Prozent, keine Rangfolge (`ventureSnapshotModel`).
+          Und NICHT in der Druckfassung: Vorhabensangaben gelten fuer ein
+          Vorhaben und einen Zeitraum, nicht fuer die Person.
           ------------------------------------------------------------------ */}
       <div className="mt-12">
         {teil(
           "vorhaben",
           "slate",
           <>
-            <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("ventures.text")}</p>
-            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {visibleVentures.map((venture) => {
-                const label =
-                  venture.name ??
-                  (venture.createdAt
-                    ? t("ventures.unnamedDated", { date: dateLabel(venture.createdAt) })
-                    : t("ventures.unnamed"));
-                return (
-                  <li key={venture.id}>
+            <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("venture.intro")}</p>
+            {aktuellesVorhaben && visibleVentures.length > 1 ? (
+              <form method="get" action="/me/profile#vorhaben" className="no-print mt-4 flex flex-wrap items-end gap-2">
+                <label className="text-sm text-slate-700">
+                  {t("venture.select")}
+                  <select
+                    name="vorhaben"
+                    defaultValue={aktuellesVorhaben.id}
+                    className="mt-1 block min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
+                  >
+                    {visibleVentures.map((venture) => (
+                      <option key={venture.id} value={venture.id}>
+                        {ventureLabel(venture)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-700"
+                >
+                  {t("venture.show")}
+                </button>
+              </form>
+            ) : aktuellesVorhaben ? (
+              <p className="mt-3 text-sm text-slate-500">{t("venture.current", { name: ventureLabel(aktuellesVorhaben) })}</p>
+            ) : null}
+
+            {snapshot.status !== "none" && snapshot.cards.length > 0 ? (
+              <>
+                <div className="mt-5">
+                  <VentureSnapshot
+                    cards={snapshot.cards}
+                    copy={{
+                      cardTitle: (key) => t(`venture.cards.${key}`),
+                      factLabel: (itemId) => t(`venture.facts.${itemId}`),
+                      number: (value) => new Intl.NumberFormat(locale).format(value),
+                      money: (amount, currency) => `${new Intl.NumberFormat(locale).format(amount)} ${currency}`,
+                      unit: (unit) => alignmentDisplayText(unit, locale as AppLocale),
+                      detail: (detail) => (isIsoDate(detail) ? dateLabel(detail) : detail),
+                    }}
+                  />
+                </div>
+                {snapshot.status === "draft" ? (
+                  <p className="mt-3 text-xs leading-5 text-slate-500">{t("venture.draft")}</p>
+                ) : null}
+                <p className="no-print mt-4 flex flex-wrap gap-x-5">
+                  <Link
+                    href={`/founder-alignment/vorhaben/antworten?venture=${encodeURIComponent(aktuellesVorhaben!.id)}`}
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 underline underline-offset-2"
+                  >
+                    {t("venture.allAnswers")}
+                  </Link>
+                  {snapshot.status === "draft" ? (
                     <Link
-                      href={`/founder-alignment/vorhaben?venture=${encodeURIComponent(venture.id)}`}
-                      className="flex min-h-11 flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 hover:border-slate-300"
+                      href={fragebogenHref}
+                      className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 underline underline-offset-2"
                     >
-                      <span className="text-sm font-medium text-slate-900">
-                        {venture.duplicateIndex ? `${label} (${venture.duplicateIndex})` : label}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        {venture.alone ? t("ventures.alone") : t("ventures.withTeam")}
-                      </span>
+                      {t("venture.continue")}
                     </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                  ) : null}
+                </p>
+              </>
+            ) : (
+              <MissingSection
+                title={t("venture.empty")}
+                text={t("venture.emptyText")}
+                href={fragebogenHref}
+                cta={t("venture.emptyCta")}
+              />
+            )}
           </>
         )}
       </div>
@@ -932,11 +1011,14 @@ function MissingSection({
   text,
   href,
   cta,
+  secondary,
 }: {
   title: string;
   text?: string;
   href: string;
   cta: string;
+  /** Ein zweiter, gleichwertig echter Weg - nur wo es ihn wirklich gibt (Phase 1.1: Staerken-Interview). */
+  secondary?: { href: string; cta: string };
 }) {
   return (
     <section className="no-print rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-6">
@@ -951,6 +1033,14 @@ function MissingSection({
       >
         {cta}
       </a>
+      {secondary ? (
+        <a
+          href={secondary.href}
+          className="ml-3 mt-4 inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-medium text-slate-800 hover:border-slate-400"
+        >
+          {secondary.cta}
+        </a>
+      ) : null}
     </section>
   );
 }

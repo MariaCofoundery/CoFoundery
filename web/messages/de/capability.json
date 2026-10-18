@@ -721,7 +721,10 @@
     "gap": {
       "others_see_more": "Hier vermutest du mehr bei anderen als bei dir selbst. Das ist kein Fehler — es ist die Stelle, an der du dir vielleicht etwas zutrauen könntest, das andere längst sehen.",
       "others_see_less": "Hier siehst du mehr bei dir als bei anderen. Auch das ist kein Fehler — vielleicht zeigst du es nur an Stellen, die niemand mitbekommt."
-    }
+    },
+    "interviewTitle": "Im Interview entdecken",
+    "interviewText": "Erzähl von konkreten Situationen aus deiner Arbeit. Aus deinen Antworten können Vorschläge für Stärken entstehen – du entscheidest, ob du sie übernimmst, umschreibst oder verwirfst.",
+    "interviewCta": "Stärken im Interview entdecken"
   },
   "sourcing": {
     "internal_only": "gehört ins Team",

@@ -327,7 +327,11 @@ export function ProductShell({
     currentPathname.startsWith("/research/workstyle-pretest") ||
     currentPathname.startsWith("/founder-alignment/profil") ||
     currentPathname.startsWith("/founder-alignment/pilot") ||
-    currentPathname.startsWith("/founder-alignment/versionen");
+    currentPathname.startsWith("/founder-alignment/versionen") ||
+    // PHASE 1.1: „Was du aufbauen willst" ist die eigene Sicht EINER Person auf
+    // ein Vorhaben - jede beantwortet es fuer sich. Es gehoert zum eigenen
+    // Bild, nicht zu „Teams & Verbindungen". Der Vergleich bleibt im Team.
+    currentPathname.startsWith("/founder-alignment/vorhaben");
   const isTeamsArea = (currentPathname: string) =>
     currentPathname === "/connections" ||
     currentPathname.startsWith("/teams/") ||
@@ -366,6 +370,14 @@ export function ProductShell({
                 label: t("alignNewVersion"),
                 isActive: (currentPathname: string) =>
                   currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest"),
+              },
+              {
+                // Phase 1.1: die eigene Sicht auf ein Vorhaben. Die Antworten
+                // bleiben je Vorhaben gespeichert; der Einstieg steht hier, weil
+                // jede Person sie fuer sich gibt.
+                href: "/founder-alignment/vorhaben",
+                label: t("profileVenture"),
+                isActive: (currentPathname: string) => currentPathname.startsWith("/founder-alignment/vorhaben"),
               },
               {
                 // Der bestehende Editor. Er stand bisher als eigener Textlink

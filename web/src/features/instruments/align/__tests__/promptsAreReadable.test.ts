@@ -44,15 +44,16 @@ test("keine Redaktionsmarke steht in einer Frage", () => {
 });
 
 test("ein Platzhalter erreicht den Bildschirm nie als Platzhalter", () => {
+  // SEIT PHASE 1.1 hat keine Frage mehr einen Platzhalter: R02 fragt ohne Namen
+  // nach der Erwartung an jede andere Founder:in. Die Ersetzung bleibt fuer
+  // Texte, die noch einen tragen koennten - und sie bleibt nicht leer.
   const roh = getItemsV22("venture_alignment").find((item) => item.itemId === "R02");
-  assert.ok(roh?.prompt.includes("[Name]"), "R02 hat den Platzhalter verloren");
-
-  // Mit Namen.
-  assert.match(withPartner(roh!.prompt, "Ben"), /von Ben\?$/);
-
-  // Ohne Namen - und NICHT leer. Eine eckige Klammer sieht aus wie ein Fehler.
-  assert.match(withPartner(roh!.prompt), new RegExp(`von ${OHNE_NAMEN}\\?$`));
-  assert.match(withPartner(roh!.prompt, "   "), new RegExp(`von ${OHNE_NAMEN}\\?$`));
+  assert.ok(!roh?.prompt.includes("[Name]"), "R02 setzt wieder Namen ein");
+  assert.match(roh!.prompt, /pro Person/);
+  const vorlage = "Wie viele Stunden erwartest du von [Name]?";
+  assert.match(withPartner(vorlage, "Ben"), /von Ben\?$/);
+  assert.match(withPartner(vorlage), new RegExp(`von ${OHNE_NAMEN}\\?$`));
+  assert.match(withPartner(vorlage, "   "), new RegExp(`von ${OHNE_NAMEN}\\?$`));
 
   // Auch der Weg ueber die Lesbarmachung ersetzt ihn.
   for (const items of [readableItems("venture_alignment"), readableItems("venture_alignment", "Ben")]) {

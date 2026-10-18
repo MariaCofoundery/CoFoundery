@@ -10,7 +10,7 @@ import { VentureHeader } from "@/features/instruments/align/VentureHeader";
 import { buildSections, answerableOf } from "@/features/instruments/align/questionnaireData";
 import { getItemsV22, getItemV22 } from "@/features/instruments/align/registries";
 import { screenSet } from "@/features/instruments/align/screens";
-import { resolveVenture, solePartnerName } from "@/features/instruments/align/ventureResolution";
+import { resolveVenture } from "@/features/instruments/align/ventureResolution";
 import { needsConfirmation } from "@/features/instruments/align/needsConfirmation";
 import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -78,9 +78,9 @@ export default async function VentureAlignmentPage({
 
   const supabase = await createClient();
 
-  // R02 fragt nach einer Erwartung an eine bestimmte Person. Steht genau eine
-  // im Vorhaben, steht ihr Name in der Frage - sonst "der anderen Person".
-  const partnerName = await solePartnerName(venture.id, auth.user.id);
+  // R02 NENNT KEINE NAMEN MEHR (Phase 1.1). Die Frage fragt nach der eigenen
+  // Erwartung an jede andere Founder:in, je Person - die anderen geben ihre
+  // Verfuegbarkeit selbst an. Vorher stand hier z. B. „von Tim & Maria Test".
 
   const { data: assessment } = await supabase
     .from("assessments")
@@ -152,7 +152,7 @@ export default async function VentureAlignmentPage({
           ventureName={venture.name}
           screens={screenSet("venture_alignment", (itemId: string) => Boolean(getItemV22(itemId)))}
           afterSubmit={`/founder-alignment/vorhaben/antworten?venture=${encodeURIComponent(venture.id)}&erstellt=1`}
-          sections={buildSections("venture_alignment", partnerName)}
+          sections={buildSections("venture_alignment")}
           answerable={answerable}
           initialAnswers={initialAnswers}
           submitted={Boolean(assessment?.submitted_at)}

@@ -79,6 +79,7 @@ function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
       label: option.label,
       requiresText: option.requiresText,
       exclusive: option.exclusive,
+      requiresDate: option.requiresDate ?? false,
     })),
     offeredMissing: item.missing.map((entry) => ({ code: entry.code, label: entry.label })),
     concerns: item.concerns ?? null,
@@ -91,6 +92,7 @@ function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
     conditionalFields: null,
     // `showAfter` heisst in v2.1 `basisItemId` - dieselbe Sache, anderer Name.
     basisItemId: item.showAfter ?? null,
+    basisOptionIds: item.showAfterOptions ?? null,
     followup: item.followUpQuestion
       ? {
           question: item.followUpQuestion,

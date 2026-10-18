@@ -101,6 +101,12 @@
       "source": "Master-Arbeitsfassung v0.2, R12",
       "reason": "'Datum' ist keine Antwort, sondern die Form einer Antwort. Als Beschriftung auf einem Knopf waere es sinnlos: Niemand waehlt 'Datum', man waehlt EIN Datum.",
       "decidedBy": "Claude, 29.09.2026"
+    },
+    {
+      "what": "R02 fragt nach der eigenen Erwartung an jede andere Founder:in, je Person, ohne Namen: 'Wie viele Stunden pro Woche sollten andere Founder:innen aus deiner Sicht in den naechsten zwoelf Wochen pro Person verlaesslich einbringen koennen?' - als Zahl mit der Einheit Stunden pro Woche (number_range) statt einer Liste je Person (person_number_range).",
+      "source": "Wortlaut von Maria, Phase 1.1 (18.10.2026) - steht in keinem der Dokumente",
+      "reason": "Die bisherige Frage setzte Namen ein ('... von Tim & Maria Test?') und erwartete je Person eine eigene Zeile. Das passte nicht zu Teams mit mehreren Personen und vermischte die Erwartung der antwortenden Person mit der tatsaechlichen Verfuegbarkeit der anderen, die diese selbst in R01 angeben. Ausserdem lehnte die Datenbank jede Zahl ab, weil das Personenformat ohne Einheit gespeichert wurde. Jetzt: eine Erwartung je andere Person, als Zahl mit Einheit - im Vergleich zweier Menschen trifft sie genau das Angebot der anderen Person.",
+      "decidedBy": "Maria, 18.10.2026"
     }
   ],
   "notes": [
@@ -1048,9 +1054,9 @@
       "itemId": "R02",
       "order": 21,
       "section": "R – Ressourcen & tatsächliche Zusagen",
-      "prompt": "Wie viele Stunden pro Woche erwartest du in den nächsten zwölf Wochen ungefähr von [Name]?",
+      "prompt": "Wie viele Stunden pro Woche sollten andere Founder:innen aus deiner Sicht in den nächsten zwölf Wochen pro Person verlässlich einbringen können?",
       "hint": null,
-      "answerFormat": "person_number_range",
+      "answerFormat": "number_range",
       "options": [],
       "missing": [
         {
@@ -1058,7 +1064,8 @@
           "label": "haben wir noch nicht geklärt"
         }
       ],
-      "note": "Gerichtete Erwartung; nicht über Personen mitteln."
+      "note": "Erwartung dieser Person an jede andere Founder:in, je Person. Die anderen geben ihre eigene Verfügbarkeit separat an (R01). Keine Namen in der Frage.",
+      "unit": "Stunden pro Woche"
     },
     {
       "itemId": "R03",
@@ -1094,7 +1101,8 @@
           "optionId": "R04_o2",
           "label": "ab Datum",
           "requiresText": false,
-          "exclusive": false
+          "exclusive": false,
+          "requiresDate": true
         },
         {
           "optionId": "R04_o3",
@@ -1130,7 +1138,11 @@
         }
       ],
       "note": "Mindestbedarf, keine Gehaltsforderung oder Unternehmensprognose.",
-      "showAfter": "R04"
+      "showAfter": "R04",
+      "showAfterOptions": [
+        "R04_o1",
+        "R04_o2"
+      ]
     },
     {
       "itemId": "R06",
@@ -1792,7 +1804,7 @@
       "order": 41,
       "section": "L – persönliche Grenzen",
       "prompt": "Gibt es Entscheidungen oder Vorgehensweisen, die für dich grundsätzlich nicht infrage kommen?",
-      "hint": null,
+      "hint": "Zum Beispiel bestimmte Finanzierungsformen, persönliche Bürgschaften, wichtige Entscheidungen ohne Rücksprache oder Vorgehensweisen, die deinen Werten widersprechen.",
       "answerFormat": "free_text_repeatable",
       "options": [],
       "missing": [

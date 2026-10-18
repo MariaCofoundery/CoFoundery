@@ -315,7 +315,8 @@
       "more": "{count, plural, =1 {Eine weitere im Aufklapper} other {# weitere im Aufklapper}}",
       "empty": "Du hast deine Stärken noch nicht festgehalten.",
       "emptyCta": "Stärken festhalten",
-      "emptyText": "Halte in deinen eigenen Worten fest, was dir in der Arbeit leichtfällt – und wie oft es sich zeigt."
+      "emptyText": "Halte in deinen eigenen Worten fest, was dir in der Arbeit leichtfällt – und wie oft es sich zeigt.",
+      "interviewCta": "Stärken im Interview entdecken"
     },
     "directionSection": {
       "detailsSummary": "Alle Aussagen mit ihrer Herkunft",
@@ -333,6 +334,48 @@
       "unnamedDated": "Unbenanntes Vorhaben · angelegt am {date}",
       "alone": "Bisher nur du",
       "withTeam": "Mit weiteren Personen"
+    },
+    "venture": {
+      "title": "So willst du gründen",
+      "intro": "Deine eigene Sicht auf ein konkretes Vorhaben – Zeit, Geld, Entscheidungen, Ziele und Grenzen. Jede beteiligte Person beantwortet das für sich; erst der Teamvergleich stellt die Sichten nebeneinander.",
+      "select": "Vorhaben",
+      "show": "Anzeigen",
+      "current": "Vorhaben: {name}",
+      "empty": "Du hast deine Vorstellungen für dieses Vorhaben noch nicht beschrieben.",
+      "emptyText": "Wie viel Zeit du einbringen kannst, was du finanziell brauchst, wie du entscheiden möchtest und was für dich nicht infrage kommt – aus deiner Sicht, für dieses eine Vorhaben.",
+      "emptyCta": "Deine Sicht beschreiben",
+      "draft": "Noch nicht abgegeben – das sind deine bisherigen Angaben.",
+      "allAnswers": "Alle Antworten ansehen",
+      "continue": "Weiter ausfüllen",
+      "cards": {
+        "time": "Zeit & Einsatz",
+        "money": "Geld & Horizont",
+        "decisions": "Entscheiden",
+        "collaboration": "Abstimmung",
+        "goals": "Ziele",
+        "limits": "Grenzen"
+      },
+      "facts": {
+        "R01": "Das kannst du einplanen",
+        "R02": "Das erwartest du je andere Founder:in",
+        "R10": "Wie wichtig dir dieses Vorhaben ist",
+        "R04": "Lebensunterhalt aus dem Vorhaben",
+        "R05": "Mindestens nötig pro Monat",
+        "B01": "Eigenes Geld, höchstens zusätzlich",
+        "B04": "Kosten gedeckt, bevor ihr mehr investiert",
+        "U01": "Entscheidungen im eigenen Bereich",
+        "U04": "Wenn mehrere Wege möglich sind",
+        "U03": "Ausgaben im eigenen Budget",
+        "U05": "Anpassungen am Plan",
+        "G01": "Uneinigkeit im Verantwortungsbereich",
+        "K01": "Zwischenstände zeigen",
+        "K03": "Von wichtigen Änderungen erfahren",
+        "K04": "Überblick über andere Bereiche",
+        "S01_top": "Besonders wichtig",
+        "S04": "In zwölf Monaten erreichen",
+        "S03": "Externe Investor:innen",
+        "L01": "Kommt für dich nicht infrage"
+      }
     },
     "details": {
       "intro": "Hier liegt, was das Profil oben nicht wiederholen soll: die ausführliche Auswertung, die Abdeckung nach Bereichen und frühere Stände zum Nachlesen.",

@@ -83,6 +83,10 @@ type PerPerson = { person: string; number: number | null; unit: string };
 
 function expectationsOf(entry: ReadoutEntry | null | undefined): PerPerson[] {
   const value = entry?.value as ReadoutValue | null | undefined;
+  // SEIT PHASE 1.1 eine Zahl ohne Namen: „je andere Founder:in". Im Vergleich
+  // zweier Menschen meint sie genau die andere Person - die Anzeige nennt
+  // dann deren Namen statt eines frei getippten.
+  if (value?.kind === "number") return [{ person: "", number: value.number, unit: value.unit }];
   if (!value || value.kind !== "perPerson") return [];
   return value.per;
 }

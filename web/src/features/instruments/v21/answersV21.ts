@@ -95,7 +95,7 @@ const has = <K extends string>(value: object, key: K): value is Record<K, unknow
 export type AnswerableItem = {
   itemId: string;
   answerFormat: string;
-  options: { optionId: string; label: string; requiresText: boolean; exclusive: boolean }[];
+  options: { optionId: string; label: string; requiresText: boolean; exclusive: boolean; requiresDate?: boolean }[];
   missing: { code: MissingCode; label: string }[];
   concerns?: string[];
   ratingOptions?: string[];
@@ -151,6 +151,12 @@ export function validateAnswerV21(
       }
       const followup = followUpVerdict(item, value.optionId, value);
       if (!followup.ok) return followup;
+      // Ein Datum, wenn eines dasteht, muss eines sein. Verlangt wird es hier
+      // NICHT: Fruehere Entwuerfe mit „ab Datum" ohne Datum bleiben gueltig.
+      const date = (value as Record<string, unknown>).date;
+      if (date !== undefined && date !== null && !isIsoDate(date)) {
+        return no("invalid_date", answer.blockId);
+      }
       return requiredTextPresent(item, [value.optionId], value);
     }
 
@@ -493,6 +499,8 @@ export function completenessV21(
       const option = item.options.find((entry) => entry.optionId === optionId);
       // Angekreuzt, aber der verlangte Text fehlt noch: mittendrin.
       if (option?.requiresText && !String(value.text ?? "").trim()) return "incomplete";
+      // Dasselbe fuer das Datum bei „ab Datum" (Phase 1.1).
+      if (option?.requiresDate && !isIsoDate(value.date)) return "incomplete";
       // Erscheint eine Folgefrage, gehoert sie zur Antwort. "Keine besondere
       // Bedingung" ist eine davon - niemand muss sich etwas ausdenken.
       const followup = item.followup;
@@ -580,4 +588,11 @@ export function completenessV21(
       // geprueft werden koennte es danach auch nicht.
       return nothing ? "empty" : "incomplete";
   }
+}
+
+/** YYYY-MM-DD und ein echtes Kalenderdatum. */
+export function isIsoDate(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }

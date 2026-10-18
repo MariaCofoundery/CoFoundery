@@ -123,7 +123,9 @@ const NOCH_NICHT_UEBERARBEITET = new Set<string>([]);
  * Fragen. Maria hat sich am 30.09.2026 für die Monate entschieden und die
  * Frage dafür neu geschrieben.
  */
-const NACHTRAEGE = new Set(["B04"]);
+// R02 (Phase 1.1, 18.10.2026): Erwartung je andere Founder:in, ohne Namen -
+// Wortlaut von Maria, begruendet in `deviationsFromSource`.
+const NACHTRAEGE = new Set(["B04", "R02"]);
 
 test("jeder Nachtrag ist begründet und nicht bloß anders", () => {
   const deviations = VENTURE_ALIGNMENT.deviationsFromSource ?? [];

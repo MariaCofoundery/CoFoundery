@@ -1,5 +1,5 @@
 import { getRequestLocale } from "@/i18n/getLocale";
-import { alignmentDisplayEntry, alignmentDisplayText } from "@/features/instruments/align/display";
+import { alignmentDisplayEntry, alignmentSectionTitle } from "@/features/instruments/align/display";
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { MarkV21 } from "@/features/instruments/v21/MarkV21";
@@ -62,7 +62,7 @@ export async function ReportViewV21({
   // Texte aus derselben Quelle wie ueberall, und es gibt keine zweite
   // Uebersetzung fuer die Advisor-Ansicht.
   const locale = await getRequestLocale();
-  const sections = sourceSections.map(group => ({...group, section: alignmentDisplayText(group.section, locale), entries: group.entries.map(entry => alignmentDisplayEntry(entry, locale))}));
+  const sections = sourceSections.map(group => ({...group, section: alignmentSectionTitle(group.section, locale), entries: group.entries.map(entry => alignmentDisplayEntry(entry, locale))}));
   const t = await getTranslations("alignment.report");
   // Betraege und Daten tragen das Format der gelesenen Sprache, nicht
   // "de-DE". Ein Datum im deutschen Format in einer englischen Seite ist

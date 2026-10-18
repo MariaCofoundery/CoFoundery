@@ -157,7 +157,7 @@ for (const n of [2, 3, 4])
     assert.ok(rows[0].states.includes("INSUFFICIENT_DATA"));
     assert.ok(!rows[0].states.includes("SINGLE_POINT_OF_FAILURE"));
   });
-test("alignment missing is open, literal options reused, R02 not pair-assumed with 3+", () => {
+test("alignment missing is open, literal options reused, R02 compares like any answer (no recipient since Phase 1.1)", () => {
   const people = team(3).people;
   people.forEach(
     (p) =>
@@ -178,9 +178,13 @@ test("alignment missing is open, literal options reused, R02 not pair-assumed wi
     alignmentPatterns(people).find((a) => a.item.itemId === "U01")!.different,
     true,
   );
-  assert.ok(
-    alignmentPatterns(people).find((a) => a.item.itemId === "R02")!.ambiguous,
-  );
+  // R02 nennt seit Phase 1.1 keine Person mehr - kein Empfaengerbezug, also
+  // auch bei 3+ Personen kein Sonderstatus.
+  assert.equal(alignmentPatterns(people).find((a) => a.item.itemId === "R02")!.ambiguous, false);
+  people.forEach((p, n) => (p.alignment = [{ item_key: "R02", value: { number: n === 0 ? 20 : 15, unit: "Stunden pro Woche" }, missing_reason: null }]));
+  const r02 = alignmentPatterns(people).find((a) => a.item.itemId === "R02")!;
+  assert.equal(r02.status, "Unterschiedliche Erwartungen");
+  assert.equal(r02.different, true);
 });
 test("product views share a raw-item signature; no research read path or external LLM", () => {
   const signature = readFileSync(

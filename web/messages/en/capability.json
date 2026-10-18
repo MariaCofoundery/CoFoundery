@@ -721,7 +721,10 @@
     "gap": {
       "others_see_more": "Here you think others notice it more than you do. That isn't a mistake — it may be where you could give yourself credit for something others have long seen.",
       "others_see_less": "Here you notice it more than you think others do. That isn't a mistake either — maybe you show it where nobody notices."
-    }
+    },
+    "interviewTitle": "Discover them in the interview",
+    "interviewText": "Talk about specific situations from your work. Your answers can lead to suggested strengths – you decide whether to keep, reword or discard them.",
+    "interviewCta": "Discover strengths in the interview"
   },
   "sourcing": {
     "internal_only": "belongs in the team",

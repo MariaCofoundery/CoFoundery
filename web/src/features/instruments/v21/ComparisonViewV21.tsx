@@ -1,6 +1,6 @@
 import { getRequestLocale } from "@/i18n/getLocale";
 import type { AppLocale } from "@/i18n/config";
-import { alignmentDisplayText, alignmentDisplayEntry } from "@/features/instruments/align/display";
+import { alignmentDisplayText, alignmentDisplayEntry, alignmentSectionTitle } from "@/features/instruments/align/display";
 import type { ComparisonV21 } from "@/features/instruments/v21/comparisonDataV21";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 import type { ReadoutEntry } from "@/features/instruments/v21/readoutV21";
@@ -85,7 +85,7 @@ export async function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
                   <ul className="mt-1 space-y-1.5">
                     {entries.map((entry) => (
                       <li key={entry.itemId} className="text-sm text-slate-800">
-                        <span className="text-slate-500">{t(entry.section)} — </span>
+                        <span className="text-slate-500">{alignmentSectionTitle(entry.section, locale)} — </span>
                         {t(entry.prompt)}
                       </li>
                     ))}
@@ -99,7 +99,7 @@ export async function ComparisonViewV21({ comparison, nameA, nameB }: Props) {
 
       {comparison.sections.map((group) => (
         <section key={t(group.section)} className="space-y-3">
-          <h2 className="text-lg font-semibold text-slate-900">{t(group.section)}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{alignmentSectionTitle(group.section, locale)}</h2>
 
           {group.items.map((item) => (
             <div key={item.itemId} className="rounded-xl border border-slate-200 bg-white p-5">
