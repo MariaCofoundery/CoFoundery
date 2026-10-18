@@ -1,0 +1,150 @@
+{
+  "eyebrow": "Your strengths",
+  "title": "Strengths interview",
+  "text": "You describe concrete situations – what you did, not how you rate yourself. From these, suggestions for personal strengths can emerge, each with the passage from your answer it is based on. You decide what fits you.",
+  "backToStrengths": "Back to your strengths",
+  "guidance": {
+    "title": "Before you start",
+    "time": "Seven questions, about 20 minutes. You can finish after three answers.",
+    "stories": "Describe one situation that actually happened each time – at work or in private life. What you did matters more than the outcome.",
+    "notCapability": "This is not about fields of expertise or experience. What you bring professionally is covered by the capability interview.",
+    "save": "Your answers are saved as you write. You can pause at any time.",
+    "private": "Nobody but you sees your answers. They are only analyzed if you explicitly ask for it at the end.",
+    "noTest": "This is not a test and not a typology. There are no points and no right answers."
+  },
+  "start": "Start the strengths interview",
+  "startPending": "Preparing …",
+  "progress": {
+    "atQuestion": "Question {index} of {total}",
+    "answered": "{count, plural, =0 {no answer yet} one {one answer} other {# answers}}",
+    "enough": "You have shared enough to finish. More answers make the suggestions more reliable."
+  },
+  "notice": {
+    "paused": "Saved. You can continue here later.",
+    "completed": "Finished. If you like, you can now ask for suggestions for your strengths.",
+    "reading": "Your answers are being read. The suggestions will appear here as soon as they are ready."
+  },
+  "errors": {
+    "start": "The interview could not be started. Please try again.",
+    "save": "The answer could not be saved. Your text is still in this browser.",
+    "short": "The answer is still too short.",
+    "long": "The answer is too long – 2000 characters at most.",
+    "stale": "This question is no longer the current one. Here is where you continue.",
+    "complete": "The interview could not be finished. Please try again.",
+    "too_few": "You need at least three answers to finish.",
+    "ask": "The analysis could not be requested. Please try again.",
+    "proposal": "The suggestion could not be saved. Please try again."
+  },
+  "done": {
+    "title": "Your strengths interview is finished",
+    "text": "{count, plural, one {One answer} other {# answers}} from this conversation.",
+    "askText": "An AI model on a Made2Found computer – not an external service – reads your answers and suggests three to five personal strengths. Each suggestion names the passage from your answer it is based on. Anything that cannot be backed up is not suggested.",
+    "ask": "Get suggestions",
+    "askPending": "Requesting …",
+    "unavailable": "The analysis is not available right now. Your answers stay saved – you can ask for suggestions later. You can always record your own sentences under your strengths.",
+    "reading": "Your answers are being read …",
+    "failed": "Reading did not work. You can try again.",
+    "retry": "Try again",
+    "noneFound": "No strength could be backed up well enough from this conversation. That says nothing about you – only that the answers do not describe enough behavior for it. You can do another interview or record something yourself.",
+    "allDecided": "You have decided on all suggestions from this conversation.",
+    "toStrengths": "Go to your strengths"
+  },
+  "proposals": {
+    "title": "Suggestions from your answers",
+    "text": "None of this counts until you accept it. You can rewrite the label and the statement first.",
+    "labelField": "Label",
+    "statementField": "Statement",
+    "rationale": "Where it shows",
+    "evidence": "From your answer",
+    "confirm": "Fits me",
+    "reject": "Doesn't fit",
+    "pending": "Saving …"
+  },
+  "review": {
+    "title": "Your answers",
+    "text": "What you shared in this conversation."
+  },
+  "again": {
+    "text": "You can do another strengths interview – for example with other situations.",
+    "cta": "Start another strengths interview"
+  },
+  "interview": {
+    "answerLabel": "Your answer",
+    "answerHint": "At least {min} characters. Describe a situation – what happened, what did you do?",
+    "answerPlaceholder": "Describe what happened and what you did …",
+    "tooShort": "Still too short – at least {min} characters.",
+    "submit": "Save and continue",
+    "submitLast": "Save and finish",
+    "submitPending": "Saving …",
+    "pause": "Pause",
+    "pausePending": "Saving …",
+    "skip": "Skip this question",
+    "skipPending": "Skipping …",
+    "restored": "There was a longer text in this browser than the saved one. It is shown now.",
+    "saveStateIdle": "Not saved yet",
+    "saveStateLocal": "Kept in this browser",
+    "saveStateSaving": "Saving …",
+    "saveStateSaved": "Saved",
+    "saveStateFailed": "Not saved – the text is still in this browser",
+    "followUpTitle": "If you like",
+    "followUpHint": "These follow-up questions belong to the same answer – just keep writing.",
+    "questions": {
+      "took_charge": {
+        "title": "Tell me about a situation in which you took on responsibility even though it was not clear at first who was in charge.",
+        "hint": "At work or in private life. It does not have to be big – what matters is what you did.",
+        "followUps": {
+          "whatYouDidFirst": "What exactly did you do first?",
+          "whyYou": "Why did you take it on instead of waiting?"
+        }
+      },
+      "hard_won": {
+        "title": "Tell me about something difficult that you managed in the end.",
+        "hint": "At work or in private life. Even if it only partly worked out.",
+        "followUps": {
+          "whatMadeItHard": "What exactly made it difficult?",
+          "whenItStalled": "What did you do when it got stuck?"
+        }
+      },
+      "solved_problem": {
+        "title": "Tell me about a problem you solved.",
+        "hint": "A concrete problem with a before and an after – at work or in private life.",
+        "followUps": {
+          "howYouApproached": "How did you go about understanding the problem?",
+          "whatWasYours": "Which part of it was yours – and which part was others'?"
+        }
+      },
+      "initiated": {
+        "title": "Tell me about something you got started without anyone asking you to.",
+        "hint": "A project, a change, an initiative, a meeting – at work or in private life.",
+        "followUps": {
+          "whatMadeYouStart": "What made you start it?",
+          "whoYouBroughtIn": "Who did you win over for it – and how?"
+        }
+      },
+      "new_ground": {
+        "title": "Tell me about a situation in which you had to get into something new quickly.",
+        "hint": "A new topic, a new role, a new environment – at work or in private life.",
+        "followUps": {
+          "howYouLearned": "How exactly did you go about learning it?",
+          "whatYouDidDifferently": "What did you do differently from others?"
+        }
+      },
+      "resistance": {
+        "title": "Tell me about a situation in which you stood up for something or raised it even though you expected resistance or conflict.",
+        "hint": "An opinion, a decision, an uncomfortable topic – at work or in private life.",
+        "followUps": {
+          "howYouWentAboutIt": "How exactly did you go about it?",
+          "whatHappenedAfter": "What happened afterwards?"
+        }
+      },
+      "others_come": {
+        "title": "What do others repeatedly come to you for help with? Tell me about the most recent concrete case.",
+        "hint": "The outside view. When several people ask you for the same thing, it shows something that is easy to overlook in yourself.",
+        "followUps": {
+          "lastExample": "What exactly was it about last time?",
+          "whatYouActuallyDo": "What do you actually do that helps others?"
+        }
+      }
+    }
+  }
+}

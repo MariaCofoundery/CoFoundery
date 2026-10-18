@@ -19,9 +19,14 @@
  *            Nutzertext das System verlaesst.
  *
  * Deshalb traegt das Ergebnis `engine` mit: Wer eine Zuordnung sieht, soll
- * wissen, woher sie kommt. Und `strength` ist vorbereitet, bleibt bei den
- * Regeln aber null - eine Auswahlliste waere soziale Erwuenschtheit ohne
- * Gegengewicht und muesste spaeter wieder weichen.
+ * wissen, woher sie kommt.
+ *
+ * KEINE STAERKEN MEHR (18.10.2026). Bis dahin trug das Ergebnis ein Feld
+ * `strength`, und das Modell sollte neben den Bereichen "nebenbei" einen Satz
+ * ueber eine Arbeitsweise schreiben. Persoenliche Staerken haben jetzt ein
+ * eigenes Interview und eine eigene Auswertung
+ * (`features/strengths/strengthAnalysisModel.ts`); diese Zuordnung kennt nur
+ * noch Funktionsbereiche.
  */
 
 export type AreaSuggestion = {
@@ -32,17 +37,6 @@ export type AreaSuggestion = {
 
 export type NarrativeAnalysis = {
   areas: AreaSuggestion[];
-  /** Abgeleitete Staerke. Null, solange die Regel-Engine laeuft. */
-  /**
-   * Eine Arbeitsweise, die in der Erzaehlung sichtbar wurde - MIT Beleg.
-   *
-   * SEIT DEM 22.09.2026 EIN OBJEKT statt eines blossen Satzes: Das Feld wurde
-   * bis dahin ausgelesen und weggeworfen, es gab also keinen Ort dafuer und
-   * niemandem fiel auf, dass nichts es stuetzte. Jetzt wird es zu einem
-   * Vorschlag, den ein Mensch bestaetigt - und dann braucht es dieselbe
-   * Zitatpflicht wie jeder andere Vorschlag.
-   */
-  strength: { statement: string; quote: string } | null;
   engine: "rules" | "model";
 };
 
@@ -215,8 +209,5 @@ export function scoreAreasByTerms(text: string, limit: number): AreaSuggestion[]
  */
 export const analyzeNarrativeWithRules: NarrativeAnalyzer = async ({ narrative }) => ({
   areas: scoreAreasByTerms(narrative, MAX_SUGGESTIONS),
-  // Regeln koennen keine Staerke formulieren. Der Platz bleibt leer, bis ein
-  // Sprachmodell dahinter tritt.
-  strength: null,
   engine: "rules",
 });

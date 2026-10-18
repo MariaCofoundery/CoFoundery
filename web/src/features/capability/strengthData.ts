@@ -29,6 +29,12 @@ export type ReflectedGroup = (typeof REFLECTED_GROUPS)[number];
 
 export type PersonStrength = {
   id: string;
+  /**
+   * Kurze Bezeichnung ("Verantwortung übernehmen"). Seit dem 18.10.2026 und
+   * optional: eigene Sätze und ältere Stärken haben keine - sie stehen dann
+   * wie bisher als Satz da.
+   */
+  label: string | null;
   statement: string;
   origin: "own_words" | "confirmed_proposal" | "edited_proposal";
   selfFrequency: StrengthFrequency | null;
@@ -36,16 +42,27 @@ export type PersonStrength = {
   reflectedWho: ReflectedGroup | null;
 };
 
+/**
+ * Ein Vorschlag, wie er zur Bestätigung vorliegt.
+ *
+ * ZWEI GENERATIONEN: Ältere Vorschläge (aus der Capability-Auswertung, bis
+ * zum 18.10.2026) haben nur Satz und Zitat. Neue aus dem Stärken-Interview
+ * haben dazu Bezeichnung, Begründung und das Gespräch, aus dem sie stammen.
+ * Beide lassen sich gleich bestätigen.
+ */
 export type StrengthProposal = {
   id: string;
+  label: string | null;
   statement: string;
+  rationale: string | null;
   quote: string;
+  sessionId: string | null;
 };
 
 export async function getPersonStrengths(client: SupabaseClient): Promise<PersonStrength[]> {
   const { data, error } = await client
     .from("person_strengths")
-    .select("id, statement, origin, self_frequency, reflected_frequency, reflected_who")
+    .select("id, label, statement, origin, self_frequency, reflected_frequency, reflected_who")
     .order("created_at", { ascending: true })
     .limit(100);
   if (error || !data) return [];
@@ -53,6 +70,7 @@ export async function getPersonStrengths(client: SupabaseClient): Promise<Person
   return (
     data as {
       id: string;
+      label: string | null;
       statement: string;
       origin: PersonStrength["origin"];
       self_frequency: StrengthFrequency | null;
@@ -61,6 +79,7 @@ export async function getPersonStrengths(client: SupabaseClient): Promise<Person
     }[]
   ).map((row) => ({
     id: row.id,
+    label: row.label,
     statement: row.statement,
     origin: row.origin,
     selfFrequency: row.self_frequency,
@@ -70,18 +89,33 @@ export async function getPersonStrengths(client: SupabaseClient): Promise<Person
 }
 
 export async function getPendingStrengthProposals(
-  client: SupabaseClient
+  client: SupabaseClient,
+  options?: { sessionId?: string }
 ): Promise<StrengthProposal[]> {
-  const { data } = await client
+  let query = client
     .from("person_strength_proposals")
-    .select("id, statement, evidence_quote")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true })
-    .limit(20);
+    .select("id, label, statement, rationale, evidence_quote, session_id")
+    .eq("status", "pending");
+  if (options?.sessionId) query = query.eq("session_id", options.sessionId);
+  const { data } = await query.order("created_at", { ascending: true }).limit(20);
 
-  return ((data ?? []) as { id: string; statement: string; evidence_quote: string }[]).map(
-    (row) => ({ id: row.id, statement: row.statement, quote: row.evidence_quote })
-  );
+  return (
+    (data ?? []) as {
+      id: string;
+      label: string | null;
+      statement: string;
+      rationale: string | null;
+      evidence_quote: string;
+      session_id: string | null;
+    }[]
+  ).map((row) => ({
+    id: row.id,
+    label: row.label,
+    statement: row.statement,
+    rationale: row.rationale,
+    quote: row.evidence_quote,
+    sessionId: row.session_id,
+  }));
 }
 
 /**

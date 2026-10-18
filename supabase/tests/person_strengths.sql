@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(9);
+select extensions.plan(10);
 
 -- ---------------------------------------------------------------------------
 -- Staerken und zwei Blickrichtungen
@@ -86,54 +86,56 @@ select extensions.set_eq(
     where table_schema = 'public' and table_name = 'person_strengths'$$,
   $$values ('id'), ('user_id'), ('statement'), ('origin'), ('source_turn_id'),
            ('self_frequency'), ('reflected_frequency'), ('reflected_who'),
-           ('created_at'), ('updated_at')$$,
+           ('label'), ('created_at'), ('updated_at')$$,
   'the strength holds no number and no ranking'
 );
 set local role authenticated;
 
 -- ---------------------------------------------------------------------------
--- Der Vorschlag braucht einen Beleg
+-- Der alte Weg funktioniert waehrend des Rollouts weiter
 -- ---------------------------------------------------------------------------
+--
+-- Bis 20261205120000 schrieb die Capability-Auswertung nebenbei einen Satz je
+-- Antwort (ohne Bezeichnung, ohne Begruendung). Ein alter Arbeiter kann das
+-- waehrend eines Deployments noch tun; die Funktion bleibt deshalb bis zur
+-- Aufraeum-Migration (`supabase/pending/`) bestehen - unveraendert im
+-- Verhalten. Neuer Code ruft sie nicht mehr auf.
 set local role postgres;
 insert into public.ai_jobs(id, job_type, subject_user_id, source_table, source_id, status, claimed_at)
 values ('a5000000-0000-4000-8000-000000000001','capability_area_proposal',
   'a1000000-0000-4000-8000-000000000001','capability_interview_turns',
   'a3000000-0000-4000-8000-000000000001','running', now());
-create temp table job_ref as select 'a5000000-0000-4000-8000-000000000001'::uuid as id;
-grant select on job_ref to authenticated;
 set local role authenticated;
-
 set local request.jwt.claims = '{"sub":"a1000000-0000-4000-8000-000000000003","role":"authenticated"}';
 
 select extensions.ok(
-  not public.insert_ai_strength_proposal(
-    (select id from job_ref),
-    'Bleibt ueber lange Zeitraeume an einer Sache dran',
-    'das steht so nicht in der Antwort drin',
-    'qwen3.5:4b','v1'
-  ),
-  'an invented quote never becomes a strength'
-);
-
-select extensions.ok(
   public.insert_ai_strength_proposal(
-    (select id from job_ref),
+    'a5000000-0000-4000-8000-000000000001',
     'Bleibt ueber lange Zeitraeume an einer Sache dran',
     'drei Jahre lang jede Woche mit Kliniken telefoniert',
     'qwen3.5:4b','v1'
   ),
-  'a quoted strength becomes a proposal'
+  'the old worker call still writes during the rollout'
 );
 
--- Zweimal lesen lassen gibt nicht denselben Satz doppelt.
+-- Ein erfundenes Zitat traegt dort weiterhin nicht ...
 select extensions.ok(
   not public.insert_ai_strength_proposal(
-    (select id from job_ref),
+    'a5000000-0000-4000-8000-000000000001',
+    'Ein anderer Satz', 'das steht so nicht in der Antwort drin', 'qwen3.5:4b','v1'
+  ),
+  'an invented quote never becomes a strength, old path included'
+);
+
+-- ... und es bleibt bei einem Satz je Antwort.
+select extensions.ok(
+  not public.insert_ai_strength_proposal(
+    'a5000000-0000-4000-8000-000000000001',
     'Ein anderer Satz zur selben Antwort',
     'drei Jahre lang jede Woche mit Kliniken telefoniert',
     'qwen3.5:4b','v1'
   ),
-  'one strength per answer, not one per run'
+  'old-style proposals stay one per answer'
 );
 
 -- ---------------------------------------------------------------------------
@@ -146,6 +148,12 @@ select public.confirm_strength_proposal(
   (select id from public.person_strength_proposals where status = 'pending' limit 1),
   'Meine eigenen Worte dafuer'
 ) as id;
+
+-- Ohne Bezeichnung bestaetigt, bleibt sie ohne.
+select extensions.ok(
+  (select label is null from public.person_strengths where id = (select id from confirmed)),
+  'confirming an old proposal keeps it without a label'
+);
 
 select extensions.is(
   (select origin from public.person_strengths where id = (select id from confirmed)),

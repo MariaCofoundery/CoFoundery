@@ -687,10 +687,10 @@
   "viewFounderProfile": "See “This is you”",
   "strengths": {
     "title": "Your strengths",
-    "text": "Sentences about how you work — based on situations you described. For each one, you can say two things: how often it shows up, and what people who've worked with you would say.",
-    "proposalsTitle": "From your stories",
+    "text": "Personal strengths that show in your behavior – based on situations you described. For each one, you can say two things: how often it shows up, and what people who've worked with you would say.",
+    "proposalsTitle": "Suggestions from your answers",
     "proposalsText": "Each with the passage it's based on. None of it counts until you accept it — and you can rewrite it.",
-    "empty": "Nothing saved yet. Describe a situation in the interview, or write something yourself.",
+    "empty": "Nothing saved yet. Describe situations in the strengths interview, or write something yourself.",
     "addTitle": "Write one yourself",
     "addLabel": "In one sentence",
     "addPlaceholder": "For example: keeps at it when an agreement does not hold",
@@ -722,9 +722,9 @@
       "others_see_more": "Here you think others notice it more than you do. That isn't a mistake — it may be where you could give yourself credit for something others have long seen.",
       "others_see_less": "Here you notice it more than you think others do. That isn't a mistake either — maybe you show it where nobody notices."
     },
-    "interviewTitle": "Discover them in the interview",
-    "interviewText": "Talk about specific situations from your work. Your answers can lead to suggested strengths – you decide whether to keep, reword or discard them.",
-    "interviewCta": "Discover strengths in the interview"
+    "interviewTitle": "Strengths interview",
+    "interviewText": "You describe concrete situations – something you took on, solved or got started. Your answers can lead to suggested personal strengths, each with the passage from your answer. You decide whether to keep, reword or discard them.",
+    "interviewCta": "Start the strengths interview"
   },
   "sourcing": {
     "internal_only": "belongs in the team",

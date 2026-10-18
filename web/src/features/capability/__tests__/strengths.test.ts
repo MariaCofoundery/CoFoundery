@@ -15,13 +15,15 @@ const codeOnly = (path: string) =>
 
 const VIEW = "src/features/capability/StrengthsSection.tsx";
 const ACTIONS = "src/features/capability/strengthActions.ts";
-const MODEL = "src/features/capability/narrativeAnalysisModel.ts";
+const MODEL = "src/features/strengths/strengthAnalysisModel.ts";
 const WORKER = "scripts/ai-worker.ts";
 const MIGRATION = "../supabase/migrations/20261039120000_person_strengths.sql";
+const STRENGTH_MIGRATION = "../supabase/migrations/20261205120000_strength_interview.sql";
 const sqlCodeOnly = (path: string) => source(path).replace(/^\s*--.*$/gm, "");
 
 const strength = (self: string | null, reflected: string | null) => ({
   id: "x",
+  label: null,
   statement: "Bleibt dran",
   origin: "own_words" as const,
   selfFrequency: self as never,
@@ -104,24 +106,24 @@ test("keine Zahl, kein Mittelwert", () => {
   assert.doesNotMatch(sqlCodeOnly(MIGRATION), /numeric|integer|smallint|real\b/);
 });
 
-test("die Stärke des Modells braucht jetzt einen Beleg", () => {
-  // SIE WURDE BIS ZUM 22.09.2026 WEGGEWORFEN: Das Modell wurde danach gefragt
-  // ("ein kurzer Satz über eine Arbeitsweise, die im Text sichtbar wird"), der
-  // Code las das Feld aus - und es endete dort, weil es keinen Ort dafür gab.
-  // Deshalb fiel auch nicht auf, dass nichts den Satz stützte.
+test("die Stärke des Modells braucht einen Beleg - und kommt aus ihrer eigenen Auswertung", () => {
+  // SEIT DEM 18.10.2026 nicht mehr aus der Bereichszuordnung, sondern aus dem
+  // Stärken-Interview (`features/strengths/strengthAnalysisModel.ts`). Die
+  // Zitatpflicht ist geblieben - im Code UND in der Datenbank.
   const model = codeOnly(MODEL);
-  assert.match(model, /isQuoteFromText\(strengthQuote, input\.narrative\)/);
-  assert.match(model, /ABOUT_THE_PERSON\.some\(\(pattern\) => pattern\.test\(statement\)\)/);
-  // Und der Arbeiter legt sie als Vorschlag ab, nicht als Tatsache.
+  assert.match(model, /if \(!source \|\| !isQuoteFromAnswer\(quote, source\.answer\)\) continue;/);
+  assert.match(model, /if \(evidence\.length === 0\) continue;/);
+  assert.match(model, /ABOUT_THE_PERSON\.some\(\(pattern\) => pattern\.test\(all\)\)/);
+  // Der Arbeiter legt sie als Vorschlag ab, nicht als Tatsache.
   assert.match(codeOnly(WORKER), /insert_ai_strength_proposal/);
-  assert.match(sqlCodeOnly(MIGRATION), /position\(v_normalized_quote in v_normalized_source\) = 0/);
+  assert.match(sqlCodeOnly(STRENGTH_MIGRATION), /position\(v_normalized_quote in v_normalized_source\) = 0/);
 });
 
-test("ein Satz über die Arbeitsweise, nicht über die Person", () => {
+test("ein Satz über das Verhalten, nicht über die Person", () => {
   // Das ist die Grenze, die diesen Bereich von einem Persönlichkeitstest
   // trennt - und sie steht in der Anweisung an das Modell UND im Hinweis an
   // den Menschen, der selbst etwas aufschreibt.
-  assert.match(source(MODEL), /Schreibe dort NICHT über die Person selbst/);
+  assert.match(source(MODEL), /Falsch: 'Du bist eine sehr durchsetzungsfähige Person\.'/);
   for (const locale of ["de", "en"]) {
     const copy = (
       JSON.parse(source(`messages/${locale}/capability.json`)) as {
@@ -141,4 +143,10 @@ test("bestätigt wird von Hand, und die Herkunft bleibt sichtbar", () => {
   // Und die Herkunft entsteht in der Datenbank aus dem Vergleich, nicht aus
   // einer Behauptung des Aufrufers.
   assert.match(migration, /then 'confirmed_proposal' else 'edited_proposal' end/);
+  // Seit 20261205120000 mit Bezeichnung: Auch eine geänderte Bezeichnung
+  // macht aus dem Vorschlag einen umgeschriebenen.
+  assert.match(
+    sqlCodeOnly(STRENGTH_MIGRATION),
+    /when v_statement = v_proposal\.statement and v_label is not distinct from v_proposal\.label\s+then 'confirmed_proposal'\s+else 'edited_proposal'/
+  );
 });

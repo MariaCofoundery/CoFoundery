@@ -579,17 +579,11 @@ test("the first step no longer asks the person to classify", () => {
 
 test("the analysis interface is swappable and says which engine ran", () => {
   const analyzer = source("src/features/capability/narrativeAnalysis.ts");
-  // Der Platz fuer eine abgeleitete Staerke bleibt bei den Regeln leer - eine
-  // Auswahlliste waere soziale Erwuenschtheit ohne Gegengewicht.
-  //
-  // GEAENDERT AM 22.09.2026: Die Staerke ist jetzt ein Objekt mit Zitat. Bis
-  // dahin war sie ein blosser Satz, der ausgelesen und weggeworfen wurde -
-  // also fiel nicht auf, dass nichts ihn stuetzte. Seit sie zu einem
-  // Vorschlag wird, den ein Mensch bestaetigt, gilt dieselbe Zitatpflicht wie
-  // fuer jeden anderen Vorschlag.
-  assert.match(analyzer, /strength: \{ statement: string; quote: string \} \| null/);
+  // SEIT DEM 18.10.2026 KEINE STAERKE MEHR IN DIESER SCHNITTSTELLE: Sie war
+  // ein Nebenfeld der Bereichszuordnung und hat jetzt ein eigenes Interview
+  // mit eigener Auswertung (`features/strengths/strengthAnalysisModel.ts`).
+  assert.doesNotMatch(analyzer, /^\s*strength:/m);
   assert.match(analyzer, /engine: "rules" \| "model"/);
-  assert.match(analyzer, /strength: null/);
   // Jeder Vorschlag traegt seine Begruendung mit.
   assert.match(analyzer, /matchedTerms: string\[\]/);
 });

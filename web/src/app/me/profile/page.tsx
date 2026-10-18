@@ -508,8 +508,9 @@ export default async function FounderProfilePage({
               text={t("strengthsSection.emptyText")}
               href="/profile?step=strengths"
               cta={t("strengthsSection.emptyCta")}
-              // Phase 1.1: der Interview-Weg, den es gibt (/profile/interview).
-              secondary={{ href: "/profile/interview", cta: t("strengthsSection.interviewCta") }}
+              // Das Stärken-Interview - ein eigenes Gespräch, nicht das
+              // Capability-Interview (bis 18.10.2026 führte dieser Link dorthin).
+              secondary={{ href: "/profile/strengths-interview", cta: t("strengthsSection.interviewCta") }}
             />
           )
         )}

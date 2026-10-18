@@ -16,8 +16,15 @@
  * Direction-Interview startet. Das ist der eine Weg, auf dem dieses Teilen
  * Schaden anrichten kann; deshalb filtert jeder Leser und jede Aktion.
  */
-export const INTERVIEW_KINDS = ["capability", "direction"] as const;
+export const INTERVIEW_KINDS = ["capability", "direction", "strengths"] as const;
 export type InterviewKind = (typeof INTERVIEW_KINDS)[number];
 
 export const CAPABILITY_INTERVIEW: InterviewKind = "capability";
 export const DIRECTION_INTERVIEW: InterviewKind = "direction";
+/**
+ * Das Stärken-Interview (Migration 20261205120000): eigene Fragen nach
+ * erlebten Situationen, eigene Auswertung (`strength_proposal`). Es teilt mit
+ * dem Capability-Interview nur die Tabellen und das Antwortfeld - nicht die
+ * Fragen, nicht die Einordnung in Bereiche.
+ */
+export const STRENGTHS_INTERVIEW: InterviewKind = "strengths";

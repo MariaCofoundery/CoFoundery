@@ -1,0 +1,150 @@
+{
+  "eyebrow": "Deine Stärken",
+  "title": "Stärken-Interview",
+  "text": "Du erzählst von konkreten Situationen – was du getan hast, nicht wie du dich einschätzt. Daraus können Vorschläge für persönliche Stärken entstehen, jeweils mit der Stelle aus deiner Antwort, auf die sie sich stützen. Du entscheidest, was davon zu dir passt.",
+  "backToStrengths": "Zurück zu deinen Stärken",
+  "guidance": {
+    "title": "Bevor du anfängst",
+    "time": "Sieben Fragen, etwa 20 Minuten. Ab drei Antworten kannst du abschließen.",
+    "stories": "Erzähl jeweils eine Situation, die wirklich passiert ist – beruflich oder privat. Was du getan hast, ist wichtiger als das Ergebnis.",
+    "notCapability": "Hier geht es nicht um Fachgebiete oder Erfahrung. Was du fachlich mitbringst, erfasst das Capability-Interview.",
+    "save": "Deine Antworten werden beim Schreiben gespeichert. Du kannst jederzeit pausieren.",
+    "private": "Deine Antworten sieht niemand außer dir. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
+    "noTest": "Das ist kein Test und keine Typologie. Es gibt keine Punkte und keine richtigen Antworten."
+  },
+  "start": "Stärken-Interview beginnen",
+  "startPending": "Wird vorbereitet …",
+  "progress": {
+    "atQuestion": "Frage {index} von {total}",
+    "answered": "{count, plural, =0 {noch keine Antwort} one {eine Antwort} other {# Antworten}}",
+    "enough": "Du hast genug erzählt, um abzuschließen. Weitere Antworten machen die Vorschläge belastbarer."
+  },
+  "notice": {
+    "paused": "Gespeichert. Du kannst später hier weitermachen.",
+    "completed": "Abgeschlossen. Wenn du möchtest, lass dir jetzt Vorschläge für deine Stärken erstellen.",
+    "reading": "Deine Antworten werden gelesen. Die Vorschläge erscheinen hier, sobald sie da sind."
+  },
+  "errors": {
+    "start": "Das Interview konnte nicht gestartet werden. Bitte versuch es noch einmal.",
+    "save": "Die Antwort konnte nicht gespeichert werden. Dein Text steht noch in diesem Browser.",
+    "short": "Die Antwort ist noch zu kurz.",
+    "long": "Die Antwort ist zu lang – höchstens 2000 Zeichen.",
+    "stale": "Diese Frage ist nicht mehr die aktuelle. Hier geht es weiter.",
+    "complete": "Das Interview konnte nicht abgeschlossen werden. Bitte versuch es noch einmal.",
+    "too_few": "Zum Abschließen braucht es mindestens drei Antworten.",
+    "ask": "Die Auswertung konnte nicht angefordert werden. Bitte versuch es noch einmal.",
+    "proposal": "Der Vorschlag konnte nicht gespeichert werden. Bitte versuch es noch einmal."
+  },
+  "done": {
+    "title": "Dein Stärken-Interview ist abgeschlossen",
+    "text": "{count, plural, one {Eine Antwort} other {# Antworten}} aus diesem Gespräch.",
+    "askText": "Eine KI auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest deine Antworten und schlägt drei bis fünf persönliche Stärken vor. Jeder Vorschlag nennt die Stelle aus deiner Antwort, auf die er sich stützt. Was sich nicht belegen lässt, wird nicht vorgeschlagen.",
+    "ask": "Vorschläge erstellen lassen",
+    "askPending": "Wird angefordert …",
+    "unavailable": "Die Auswertung ist gerade nicht erreichbar. Deine Antworten bleiben gespeichert – du kannst die Vorschläge später anfordern. Eigene Sätze kannst du jederzeit bei deinen Stärken festhalten.",
+    "reading": "Deine Antworten werden gelesen …",
+    "failed": "Das Lesen hat nicht geklappt. Du kannst es noch einmal versuchen.",
+    "retry": "Noch einmal versuchen",
+    "noneFound": "Aus diesem Gespräch ließ sich keine Stärke ausreichend belegen. Das sagt nichts über dich – nur, dass die Antworten dafür nicht genug Verhalten beschreiben. Du kannst ein weiteres Interview führen oder selbst etwas festhalten.",
+    "allDecided": "Du hast über alle Vorschläge aus diesem Gespräch entschieden.",
+    "toStrengths": "Zu deinen Stärken"
+  },
+  "proposals": {
+    "title": "Vorschläge aus deinen Antworten",
+    "text": "Nichts davon gilt, bis du es übernimmst. Du kannst Bezeichnung und Aussage vorher umschreiben.",
+    "labelField": "Bezeichnung",
+    "statementField": "Aussage",
+    "rationale": "Woran es sich zeigt",
+    "evidence": "Aus deiner Antwort",
+    "confirm": "Passt zu mir",
+    "reject": "Passt nicht",
+    "pending": "Wird gespeichert …"
+  },
+  "review": {
+    "title": "Deine Antworten",
+    "text": "Was du in diesem Gespräch erzählt hast."
+  },
+  "again": {
+    "text": "Du kannst ein weiteres Stärken-Interview führen – etwa mit anderen Situationen.",
+    "cta": "Weiteres Stärken-Interview beginnen"
+  },
+  "interview": {
+    "answerLabel": "Deine Antwort",
+    "answerHint": "Mindestens {min} Zeichen. Erzähl eine Situation – was ist passiert, was hast du getan?",
+    "answerPlaceholder": "Erzähl, was passiert ist und was du getan hast …",
+    "tooShort": "Noch zu kurz – mindestens {min} Zeichen.",
+    "submit": "Speichern und weiter",
+    "submitLast": "Speichern und abschließen",
+    "submitPending": "Wird gespeichert …",
+    "pause": "Pausieren",
+    "pausePending": "Wird gespeichert …",
+    "skip": "Diese Frage überspringen",
+    "skipPending": "Wird übersprungen …",
+    "restored": "Es war noch ein Text in diesem Browser, der länger war als der gespeicherte. Er steht jetzt da.",
+    "saveStateIdle": "Noch nicht gespeichert",
+    "saveStateLocal": "In diesem Browser gesichert",
+    "saveStateSaving": "Wird gespeichert …",
+    "saveStateSaved": "Gespeichert",
+    "saveStateFailed": "Nicht gespeichert – der Text steht noch in diesem Browser",
+    "followUpTitle": "Falls du magst",
+    "followUpHint": "Diese Nachfragen gehören zur selben Antwort – schreib einfach weiter.",
+    "questions": {
+      "took_charge": {
+        "title": "Erzähl von einer Situation, in der du Verantwortung übernommen hast, obwohl zunächst nicht klar war, wer zuständig ist.",
+        "hint": "Beruflich oder privat. Es muss nichts Großes sein – entscheidend ist, was du getan hast.",
+        "followUps": {
+          "whatYouDidFirst": "Was hast du als Erstes konkret getan?",
+          "whyYou": "Warum hast du es übernommen, statt abzuwarten?"
+        }
+      },
+      "hard_won": {
+        "title": "Erzähl von etwas Schwierigem, das du am Ende geschafft hast.",
+        "hint": "Beruflich oder privat. Auch wenn es nur teilweise gelungen ist.",
+        "followUps": {
+          "whatMadeItHard": "Was genau hat es schwierig gemacht?",
+          "whenItStalled": "Was hast du getan, als es nicht weiterging?"
+        }
+      },
+      "solved_problem": {
+        "title": "Erzähl von einem Problem, das du gelöst hast.",
+        "hint": "Ein konkretes Problem mit einem Davor und einem Danach – beruflich oder privat.",
+        "followUps": {
+          "howYouApproached": "Wie bist du vorgegangen, um das Problem zu verstehen?",
+          "whatWasYours": "Was davon lag bei dir – und was bei anderen?"
+        }
+      },
+      "initiated": {
+        "title": "Erzähl von etwas, das du angestoßen hast, ohne dass dich jemand darum gebeten hat.",
+        "hint": "Ein Projekt, eine Veränderung, eine Initiative, ein Treffen – beruflich oder privat.",
+        "followUps": {
+          "whatMadeYouStart": "Was hat dich dazu gebracht, damit anzufangen?",
+          "whoYouBroughtIn": "Wen hast du dafür gewonnen – und wie?"
+        }
+      },
+      "new_ground": {
+        "title": "Erzähl von einer Situation, in der du dich schnell in etwas Neues einarbeiten musstest.",
+        "hint": "Ein neues Thema, eine neue Rolle, ein neues Umfeld – beruflich oder privat.",
+        "followUps": {
+          "howYouLearned": "Wie bist du konkret vorgegangen, um es zu lernen?",
+          "whatYouDidDifferently": "Was hast du dabei anders gemacht als andere?"
+        }
+      },
+      "resistance": {
+        "title": "Erzähl von einer Situation, in der du etwas vertreten oder angesprochen hast, obwohl du mit Widerstand oder Konflikt rechnen musstest.",
+        "hint": "Eine Meinung, eine Entscheidung, ein unangenehmes Thema – beruflich oder privat.",
+        "followUps": {
+          "howYouWentAboutIt": "Wie genau bist du dabei vorgegangen?",
+          "whatHappenedAfter": "Was ist danach passiert?"
+        }
+      },
+      "others_come": {
+        "title": "Wobei kommen andere wiederholt zu dir und bitten um Hilfe? Erzähl vom letzten konkreten Fall.",
+        "hint": "Der Blick von außen. Wenn mehrere Menschen dich für dasselbe fragen, zeigt das etwas, das man bei sich selbst leicht übersieht.",
+        "followUps": {
+          "lastExample": "Worum ging es beim letzten Mal genau?",
+          "whatYouActuallyDo": "Was tust du dabei konkret, das anderen hilft?"
+        }
+      }
+    }
+  }
+}

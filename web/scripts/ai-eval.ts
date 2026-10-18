@@ -128,7 +128,6 @@ async function main() {
     console.log(
       `    Modell:   ${noAnswer ? "KEINE ANTWORT (Zeitablauf oder nicht erreichbar)" : describe(model)}`
     );
-    if (model.strength) console.log(`    Stärke:   ${model.strength}`);
     for (const area of model.areas) {
       console.log(`      ${area.areaId} ← „${area.matchedTerms[0]}“`);
     }

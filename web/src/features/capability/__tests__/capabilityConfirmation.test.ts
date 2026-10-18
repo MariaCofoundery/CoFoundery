@@ -201,8 +201,8 @@ test("what the confirmation shows is what the rule engine produced", async () =>
   for (const area of analysis.areas) {
     assert.ok(area.matchedTerms.length > 0, `${area.areaId} ohne Begruendung angezeigt`);
   }
-  // Unter Regeln gibt es keine abgeleitete Staerke; die Rueckfrage bietet
-  // Bereiche an, nicht Formulierungen.
-  assert.equal(analysis.strength, null);
+  // Keine abgeleitete Staerke; die Rueckfrage bietet Bereiche an, nicht
+  // Formulierungen.
+  assert.equal("strength" in analysis, false);
   assert.equal(analysis.engine, "rules");
 });

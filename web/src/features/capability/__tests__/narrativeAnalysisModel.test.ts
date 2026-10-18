@@ -156,45 +156,20 @@ test("derselbe Bereich zweimal wird einmal gezaehlt, und es bleiben hoechstens d
   assert.equal(analysis.areas[0].areaId, "b2b_sales");
 });
 
-test("eine Staerke braucht einen Beleg, und zu lang wird verworfen statt gekuerzt", () => {
-  // Ein abgeschnittener Satz mitten im Wort sieht aus wie ein Fehler der
-  // Person, nicht wie einer des Modells.
-  //
-  // ERWEITERT AM 22.09.2026: Die Staerke traegt jetzt ein Zitat. Bis dahin
-  // war sie ein Satz ins Blaue - das Feld wurde ausgelesen und weggeworfen,
-  // also fiel nicht auf, dass nichts es stuetzte. Seit sie gespeichert wird
-  // und jemandem angezeigt wird, gilt dieselbe Zitatpflicht wie fuer jeden
-  // anderen Vorschlag.
-  const quote = "drei Jahre lang jede Woche mit Kliniken telefoniert";
-
-  const long = validateModelAnalysis(
-    { areas: [], strength: { statement: "x".repeat(400), quote } },
+test("die Bereichszuordnung liefert keine Staerke mehr - auch wenn das Modell eine mitschickt", () => {
+  // BIS ZUM 18.10.2026 war die Staerke ein Nebenfeld dieser Zuordnung. Jetzt
+  // hat sie ein eigenes Interview und eine eigene Auswertung
+  // (`features/strengths/strengthAnalysisModel.ts`); was ein Modell hier
+  // trotzdem schreibt, wird nicht weitergereicht.
+  const analysis = validateModelAnalysis(
+    {
+      areas: [{ areaId: "b2b_sales", quotes: ["jede Woche mit Kliniken telefoniert"] }],
+      strength: { statement: "Bleibt über lange Zeiträume an einer Sache dran.", quote: "drei Jahre lang jede Woche mit Kliniken telefoniert" },
+    },
     { narrative: NARRATIVE, areaIds: AREAS }
   );
-  assert.equal(long.strength, null);
-
-  // Ohne Beleg gibt es keine Staerke - auch wenn der Satz gut klingt.
-  const unquoted = validateModelAnalysis(
-    { areas: [], strength: { statement: "Bleibt lange an einer Sache dran.", quote: "steht so nicht im Text" } },
-    { narrative: NARRATIVE, areaIds: AREAS }
-  );
-  assert.equal(unquoted.strength, null);
-
-  // Und kein Satz UEBER die Person: "Du bist hartnaeckig" waere ein Typ.
-  const aboutPerson = validateModelAnalysis(
-    { areas: [], strength: { statement: "Du bist ein hartnaeckiger Mensch.", quote } },
-    { narrative: NARRATIVE, areaIds: AREAS }
-  );
-  assert.equal(aboutPerson.strength, null);
-
-  const fine = validateModelAnalysis(
-    { areas: [], strength: { statement: "Bleibt über lange Zeiträume an einer Sache dran.", quote } },
-    { narrative: NARRATIVE, areaIds: AREAS }
-  );
-  assert.deepEqual(fine.strength, {
-    statement: "Bleibt über lange Zeiträume an einer Sache dran.",
-    quote,
-  });
+  assert.deepEqual(Object.keys(analysis).sort(), ["areas", "engine"]);
+  assert.equal(analysis.areas[0]?.areaId, "b2b_sales");
 });
 
 test("ist das Modell nicht erreichbar, antwortet die Begriffsliste", async () => {

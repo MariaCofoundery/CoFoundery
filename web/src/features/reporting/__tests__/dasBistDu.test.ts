@@ -304,11 +304,12 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
   assert.match(editor, /const PAGE_STEPS = \[[\s\S]*?"strengths"[\s\S]*?\]/);
   assert.match(editor, /\{step === "strengths" \? \(/);
   assert.match(editor, /<StrengthsSection/);
-  // PHASE 1.1: Der Interview-Weg ist zurueck - als zweite Aktion, weil es ihn
-  // wirklich gibt (/profile/interview mit Fragen und gespeicherten Antworten).
-  // Er verspricht keine fertigen Vorschlaege: Die Copy sagt „koennen".
-  assert.match(leer, /secondary=\{\{ href: "\/profile\/interview", cta: t\("strengthsSection\.interviewCta"\) \}\}/);
-  assert.ok(existsSync(join("src", "app", "(product)", "profile", "interview", "page.tsx")), "das Interview gibt es nicht mehr");
+  // Der Interview-Weg als zweite Aktion - SEIT DEM 18.10.2026 das eigene
+  // Staerken-Interview, nicht mehr das Capability-Interview (/profile/interview),
+  // das am Ende in Funktionsbereiche einordnet.
+  assert.match(leer, /secondary=\{\{ href: "\/profile\/strengths-interview", cta: t\("strengthsSection\.interviewCta"\) \}\}/);
+  assert.doesNotMatch(leer, /href: "\/profile\/interview"/);
+  assert.ok(existsSync(join("src", "app", "(product)", "profile", "strengths-interview", "page.tsx")), "das Staerken-Interview gibt es nicht");
   for (const locale of ["de", "en"]) {
     assert.ok((bundle(locale).strengthsSection as Record<string, string>).interviewCta, `${locale}: interviewCta`);
     const strengths = JSON.parse(source(join("messages", locale, "capability.json"))).strengths;
@@ -316,7 +317,8 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
     assert.doesNotMatch(strengths.interviewText, /werden automatisch|will automatically|garantiert|guaranteed/i);
   }
   const editorSection = source(join("src", "features", "capability", "StrengthsSection.tsx"));
-  assert.match(editorSection, /href="\/profile\/interview"/);
+  assert.match(editorSection, /href="\/profile\/strengths-interview"/);
+  assert.doesNotMatch(editorSection, /href="\/profile\/interview"/);
   assert.match(editorSection, /t\("interviewCta"\)/);
 });
 

@@ -310,13 +310,13 @@
       "empty": "Du hast noch nicht gesagt, was du davon verantworten willst."
     },
     "strengthsSection": {
-      "intro": "Arbeitsweisen aus Situationen, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
+      "intro": "Persönliche Stärken, die sich in Situationen gezeigt haben, die du erzählt hast — mit deiner eigenen Einschätzung und dem, was du bei anderen vermutest.",
       "detailsSummary": "Alle Stärken mit ihrer Herkunft",
       "more": "{count, plural, =1 {Eine weitere im Aufklapper} other {# weitere im Aufklapper}}",
       "empty": "Du hast deine Stärken noch nicht festgehalten.",
       "emptyCta": "Stärken festhalten",
       "emptyText": "Halte in deinen eigenen Worten fest, was dir in der Arbeit leichtfällt – und wie oft es sich zeigt.",
-      "interviewCta": "Stärken im Interview entdecken"
+      "interviewCta": "Stärken-Interview starten"
     },
     "directionSection": {
       "detailsSummary": "Alle Aussagen mit ihrer Herkunft",

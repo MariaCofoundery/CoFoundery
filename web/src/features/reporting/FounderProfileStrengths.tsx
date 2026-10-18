@@ -67,7 +67,17 @@ export function FounderProfileStrengths({
       <ul className="mt-5 divide-y divide-slate-200 border-y border-slate-200">
         {gezeigt.map((strength) => (
           <li key={strength.id} className="py-3">
-            <p className="text-sm font-medium text-slate-950">{strength.statement}</p>
+            {/* Bezeichnung als Überschrift, wenn es eine gibt (seit dem
+                18.10.2026, aus dem Stärken-Interview). Ältere und eigene
+                Sätze stehen ohne - wie bisher. */}
+            {strength.label ? (
+              <>
+                <p className="text-sm font-semibold text-slate-950">{strength.label}</p>
+                <p className="mt-0.5 text-sm leading-6 text-slate-700">{strength.statement}</p>
+              </>
+            ) : (
+              <p className="text-sm font-medium text-slate-950">{strength.statement}</p>
+            )}
             <p className="mt-1 text-xs leading-5 text-slate-500">
               {copy.self}:{" "}
               {strength.selfFrequency ? copy.frequency(strength.selfFrequency) : copy.unanswered}

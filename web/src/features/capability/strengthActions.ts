@@ -43,6 +43,34 @@ function done(): never {
   redirect(`${PATH}${ANCHOR}`);
 }
 
+/**
+ * Vorschläge werden an zwei Stellen bestätigt: bei den Stärken und am Ende
+ * des Stärken-Interviews. Zurück geht es dorthin, wo man war - aber nur an
+ * eine dieser beiden bekannten Adressen, nie an eine beliebige aus dem
+ * Formular.
+ */
+const INTERVIEW_PATH = "/profile/strengths-interview";
+
+function backTo(formData: FormData) {
+  return String(formData.get("returnTo") ?? "") === INTERVIEW_PATH ? INTERVIEW_PATH : null;
+}
+
+function proposalDone(formData: FormData): never {
+  const target = backTo(formData);
+  if (!target) done();
+  revalidatePath("/profile");
+  revalidatePath("/me/profile");
+  revalidatePath(target);
+  redirect(target);
+}
+
+function proposalFailed(formData: FormData): never {
+  const target = backTo(formData);
+  if (!target) back("save");
+  revalidatePath(target);
+  redirect(`${target}?error=proposal`);
+}
+
 async function requireUser() {
   const client = await createClient();
   const {
@@ -112,17 +140,26 @@ export async function assessStrengthAction(formData: FormData) {
   done();
 }
 
+/**
+ * Übernehmen - unverändert oder umgeschrieben.
+ *
+ * Bezeichnung und Aussage kommen aus dem Formular; ein leeres Feld heißt
+ * "wie vorgeschlagen". Ob es dieselben Worte sind, entscheidet die Datenbank
+ * (`confirmed_proposal` oder `edited_proposal`), nicht der Aufrufer.
+ */
 export async function confirmStrengthProposalAction(formData: FormData) {
   const { client } = await requireUser();
   const proposalId = String(formData.get("proposalId") ?? "");
   const statement = String(formData.get("statement") ?? "").trim();
+  const label = String(formData.get("label") ?? "").trim();
 
   const { error } = await client.rpc("confirm_strength_proposal", {
     p_proposal_id: proposalId,
     p_statement: statement.length > 0 ? statement : null,
+    p_label: label.length > 0 ? label : null,
   });
-  if (error) back("save");
-  done();
+  if (error) proposalFailed(formData);
+  proposalDone(formData);
 }
 
 export async function rejectStrengthProposalAction(formData: FormData) {
@@ -133,6 +170,6 @@ export async function rejectStrengthProposalAction(formData: FormData) {
     .update({ status: "rejected", decided_at: new Date().toISOString() })
     .eq("id", proposalId)
     .eq("status", "pending");
-  if (error) back("save");
-  done();
+  if (error) proposalFailed(formData);
+  proposalDone(formData);
 }

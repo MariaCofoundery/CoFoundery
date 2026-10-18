@@ -41,7 +41,7 @@ test("nothing recognised returns an empty list rather than a guess", async () =>
 
 test("the rule engine never claims a derived strength", async () => {
   const result = await analyze("Ich habe den Vertrieb aufgebaut und Verträge verhandelt.");
-  assert.equal(result.strength, null, "Regeln koennen keine Staerke formulieren");
+  assert.equal("strength" in result, false, "die Bereichszuordnung formuliert keine Staerken");
   assert.equal(result.engine, "rules", "wer eine Zuordnung sieht, soll wissen, woher sie kommt");
 });
 
@@ -125,8 +125,8 @@ test("und Unangenehmes ansprechen wird als Zustaendigkeit erkannt", () => {
       found.includes("difficult_conversations"),
       `nicht erkannt: ${found.join(", ") || "nichts"}`
     );
-    // Die Regel-Engine leitet weiterhin keine Staerke ab - das darf nur ein
-    // Mensch, und beim Bestaetigen.
-    assert.equal(analysis.strength, null);
+    // Die Bereichszuordnung leitet keine Staerke ab - dafuer gibt es seit dem
+    // 18.10.2026 das Staerken-Interview.
+    assert.equal("strength" in analysis, false);
   });
 });
