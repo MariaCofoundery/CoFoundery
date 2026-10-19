@@ -1,0 +1,69 @@
+{
+  "title": "Questionnaires and conversations",
+  "intro": "Each questionnaire answers one question. Beforehand you see what it is for, how long it takes and who sees the result.",
+  "groups": {
+    "person": {
+      "title": "About me",
+      "lead": "The basis of your profile."
+    },
+    "venture": {
+      "title": "For this venture",
+      "lead": "Applies to one venture and one period."
+    },
+    "deepening": {
+      "title": "To go deeper",
+      "lead": "Optional. Nothing here is missing from your profile."
+    },
+    "team": {
+      "title": "With the team",
+      "lead": "In pairs or together – in the team area."
+    }
+  },
+  "state": {
+    "not_started": "Not started",
+    "in_progress": "In progress",
+    "done_for_now": "Completed"
+  },
+  "cta": {
+    "start": "Start",
+    "continue": "Continue",
+    "view": "View result"
+  },
+  "beta": "Beta",
+  "minutes": "approx. {minutes} min.",
+  "noVenture": "Questionnaires about a venture need a venture. It is created as soon as you invite someone or start a comparison.",
+  "team": {
+    "cta": "Open in the team",
+    "setup": {
+      "title": "Founder Setup",
+      "text": "20 topics you agree in writing. Every comparison ends here."
+    },
+    "commitment": {
+      "title": "Commitment Lab",
+      "text": "What do you expect from each other when it gets serious? In pairs."
+    },
+    "exercises": {
+      "title": "Practise collaboration",
+      "text": "Read My Mind and Founder in the Wild: small exercises for pairs."
+    }
+  },
+  "how": {
+    "title": "How a questionnaire is built",
+    "purpose": {
+      "label": "Purpose",
+      "text": "Make expectations and ways of working visible – not judge right or wrong."
+    },
+    "not": {
+      "label": "What it is not",
+      "text": "Not a personality test, no score, no match percentage, no types."
+    },
+    "method": {
+      "label": "Method",
+      "text": "Fixed questions and answer formats; only identical versions are compared."
+    },
+    "privacy": {
+      "label": "Who sees what",
+      "text": "Only you – until you share. In the team comparison only when everyone has shared."
+    }
+  }
+}

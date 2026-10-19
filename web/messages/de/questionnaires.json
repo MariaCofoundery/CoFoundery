@@ -1,0 +1,69 @@
+{
+  "title": "Fragebögen und Gespräche",
+  "intro": "Jeder Fragebogen beantwortet eine Frage. Du siehst vorher, wozu er dient, wie lange er dauert und wer das Ergebnis sieht.",
+  "groups": {
+    "person": {
+      "title": "Über mich",
+      "lead": "Die Basis deines Profils."
+    },
+    "venture": {
+      "title": "Für dieses Vorhaben",
+      "lead": "Gilt für ein Vorhaben und einen Zeitraum."
+    },
+    "deepening": {
+      "title": "Zum Vertiefen",
+      "lead": "Freiwillig. Nichts davon fehlt deinem Profil."
+    },
+    "team": {
+      "title": "Mit dem Team",
+      "lead": "Zu zweit oder gemeinsam – im Team-Bereich."
+    }
+  },
+  "state": {
+    "not_started": "Noch nicht begonnen",
+    "in_progress": "Begonnen",
+    "done_for_now": "Abgeschlossen"
+  },
+  "cta": {
+    "start": "Starten",
+    "continue": "Weitermachen",
+    "view": "Ergebnis ansehen"
+  },
+  "beta": "Beta",
+  "minutes": "ca. {minutes} Min.",
+  "noVenture": "Für Fragebögen zu einem Vorhaben brauchst du ein Vorhaben. Es entsteht, sobald du jemanden einlädst oder einen Vergleich startest.",
+  "team": {
+    "cta": "Im Team öffnen",
+    "setup": {
+      "title": "Founder Setup",
+      "text": "20 Themen, die ihr schriftlich vereinbart. Hier endet jeder Vergleich."
+    },
+    "commitment": {
+      "title": "Commitment Lab",
+      "text": "Was erwartet ihr voneinander, wenn es ernst wird? Zu zweit."
+    },
+    "exercises": {
+      "title": "Zusammenarbeit üben",
+      "text": "Read My Mind und Founder in the Wild: kleine Übungen für Paare."
+    }
+  },
+  "how": {
+    "title": "So ist ein Fragebogen aufgebaut",
+    "purpose": {
+      "label": "Wozu",
+      "text": "Erwartungen und Arbeitsweisen sichtbar machen – nicht richtig oder falsch bewerten."
+    },
+    "not": {
+      "label": "Was es nicht ist",
+      "text": "Kein Persönlichkeitstest, kein Score, kein Match-Prozent, keine Typen."
+    },
+    "method": {
+      "label": "Methodik",
+      "text": "Feste Fragen und Antwortformate; verglichen wird nur zwischen identischen Fassungen."
+    },
+    "privacy": {
+      "label": "Wer sieht was",
+      "text": "Nur du – bis du freigibst. Im Teamvergleich nur, wenn alle freigegeben haben."
+    }
+  }
+}

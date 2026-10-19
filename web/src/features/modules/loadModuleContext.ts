@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { getPersonStrengths } from "@/features/capability/strengthData";
 import {
+  VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID,
   VENTURE_ALIGNMENT_INSTRUMENT_ID,
   VENTURE_TRADEOFFS_INSTRUMENT_ID,
 } from "@/features/instruments/instruments";
@@ -50,6 +51,8 @@ export async function loadModuleContext(
     /** Fuer die Teaser-Zeilen abgeschlossener Vertiefungen - ohne sie gibt es keine. */
     translate?: ModuleContext["translate"];
     locale?: ModuleContext["locale"];
+    /** Venture Alignment (Beta) mitladen - nur fuer freigeschaltete Konten, sonst entfaellt die Abfrage. */
+    includeBeta?: boolean;
   } = {}
 ): Promise<ModuleContext> {
   const [entries, strengths, disclosure] = await Promise.all([
@@ -132,6 +135,7 @@ export async function loadModuleContext(
     context.tradeoffsAssessments = tradeoffs;
     // Die eigene Freigabe-Lage kommt von der Datenbank (nur lesen; ueber andere Personen gibt sie nichts her).
     context.tradeoffsReadiness = await loadTradeoffsReadiness(client, ventureId);
+    if (options.includeBeta) context.betaAssessments = await rowsOf(VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID);
 
     // Die Antworten der neuesten abgegebenen Fassung - fuer die kurzen Zeilen im Profil.
     const abgegeben = tradeoffs

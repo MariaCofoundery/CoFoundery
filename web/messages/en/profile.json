@@ -438,6 +438,29 @@
         "in_progress": "Continue",
         "completed": "View"
       }
+    },
+    "glance": {
+      "title": "At a glance",
+      "note": "derived from your answers, without AI",
+      "open": "View",
+      "work": {
+        "title": "How you work",
+        "consistent": "Consistently in one direction: {areas}",
+        "mixed": "{count, plural, one {For one area it depends on the situation.} other {For # areas it depends on the situation.}}",
+        "ready": "Your work profile is complete.",
+        "empty": "The questions take about 12 minutes. After that your work profile appears here.",
+        "cta": "Start questionnaire"
+      },
+      "strengths": {
+        "title": "What carries you",
+        "empty": "In the strengths conversation, situations where you were at your best come together.",
+        "cta": "Start conversation"
+      },
+      "direction": {
+        "title": "Where you want to go",
+        "empty": "Here are the themes and impact that matter to you – in your words.",
+        "cta": "Add"
+      }
     }
   }
 }

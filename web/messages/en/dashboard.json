@@ -19,7 +19,9 @@
       "expired": "This invitation has expired. Ask the person who invited you to send a new one.",
       "revoked": "This invitation was withdrawn and is no longer valid.",
       "invitation_not_found": "This invitation is no longer available – it may already have been used or withdrawn."
-    }
+    },
+    "nextStep": "Your next step",
+    "go": "Let’s go"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
@@ -763,5 +765,34 @@
       "title": "Edit details",
       "action": "Edit"
     }
+  },
+  "path": {
+    "title": "Your path",
+    "lead": "First understand how each person works. Then compare. Then agree in writing.",
+    "understand": {
+      "title": "Understand me",
+      "text": "Ways of working, strengths, skills, direction – your profile."
+    },
+    "compare": {
+      "title": "Compare us",
+      "text": "Where you agree, where you differ – as a conversation, not a grade."
+    },
+    "agree": {
+      "title": "Agree",
+      "text": "Founder Setup: roles, time, money, decisions – in writing, together."
+    },
+    "state": {
+      "done": "Done",
+      "started": "In progress",
+      "open": "Not yet",
+      "here": "Continue here",
+      "inTeam": "In the team"
+    }
+  },
+  "areas": {
+    "title": "Not the whole team yet?",
+    "text": "With Find you find suitable co-founders, with Connect you share problems and make contacts. Both stay optional and separate from your team.",
+    "find": "Open Find",
+    "connect": "Open Connect"
   }
 }

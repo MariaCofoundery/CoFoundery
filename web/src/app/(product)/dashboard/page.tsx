@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
+import { DashboardAreas, DashboardPath } from "@/features/dashboard/DashboardOrientation";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
@@ -173,6 +174,10 @@ export default async function DashboardPage({
   }
   // Erst hier, nicht oben im grossen Promise.all: Wer kein Founder ist, wird
   // vorher weitergeleitet und soll diese Abfragen nicht bezahlen.
+  // Connect gibt es nur fuer Netzwerk-Mitglieder - dieselbe Frage wie die Leiste.
+  const isNetworkMember = await supabase
+    .rpc("is_network_member")
+    .then(({ data }) => data === true, () => false);
   const versionState = await getDashboardVersionState(user.id);
   const alignState = await getAlignDashboardState(user.id);
 
@@ -385,20 +390,29 @@ export default async function DashboardPage({
             </div>
           </div>
           {primaryAction ? (
-            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+            // DER NAECHSTE SCHRITT ALS EINE FLAECHE: die Marken-Flaeche ist der einzige Block dieser Art
+            // auf der Seite und sagt, wo es weitergeht.
+            <div className="brand-panel mt-5 rounded-2xl p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("hero.nextStep")}</p>
+              <p className="mt-1.5 text-xl font-semibold">{t(`hero.primary.${primaryAction}`)}</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-white">{t(`hero.primaryText.${primaryAction}`)}</p>
               <Link
                 href={primaryActionHref}
-                className="brand-here inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold transition"
+                className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-white px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-50"
               >
-                {t(`hero.primary.${primaryAction}`)}
+                {t("hero.go")}
               </Link>
-              <p className="text-sm leading-6 text-slate-600">{t(`hero.primaryText.${primaryAction}`)}</p>
             </div>
           ) : null}
           {/* Phase 11.5: klein unter der Begruessung, kein eigener Hero. */}
           <QuoteOfTheDay className="mt-5 max-w-2xl" />
         </div>
       </section>
+
+      <DashboardPath
+        profile={alignState.profile.submitted ? "done" : alignState.profile.started ? "started" : "open"}
+        hasTeam={founderTeams.length > 0}
+      />
 
       <section
         id="dashboard-block-tasks"
@@ -602,6 +616,8 @@ export default async function DashboardPage({
 
       {/* Konto: /account bietet Support und "alle Sitzungen abmelden" nicht an,
           deshalb bleibt beides hier - eingeklappt am Ende. */}
+      <DashboardAreas hasConnect={isNetworkMember} />
+
       <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
         <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
           {t("utilities.account")}

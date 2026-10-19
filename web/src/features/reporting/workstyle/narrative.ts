@@ -420,6 +420,32 @@ export function overviewMark(profile: ProductProfile, area: AreaKey, locale: App
   return { kind: "range", from: from.position, to: to.position, fromLabel: options[from.position].label, toLabel: options[to.position].label, options };
 }
 
+/**
+ * Jede beantwortete Situation eines Bereichs als Punkt auf der Skala - fuer „Auf einen Blick" (Einzelperson).
+ *
+ * Dieselben Items und dieselben Antworten wie `overviewMark` und die Bereichsrichtung: Nichts wird neu
+ * gerechnet. Die Punkte machen sichtbar, WORAUS Richtung oder Spannweite entstehen (Haeufung = durchgehend,
+ * Streuung = je nach Situation). Es gibt keine Gewichtung, keine Summe, keinen Wert - und nichts, wenn der Bereich
+ * zu wenige Antworten hat.
+ */
+export type SituationDot = { itemKey: string; position: number; situation: string; answer: string };
+
+export function situationDots(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): SituationDot[] {
+  if (areaPattern(profile, area).kind === "insufficient") return [];
+  const items = patternItems(area);
+  const firstItem = items[0];
+  if (!firstItem) return [];
+  const options = workstyleDisplayOptions(firstItem, locale);
+  const situations = locale === "en" ? SITUATIONS_EN : SITUATIONS;
+  return items
+    .flatMap((item) => {
+      const choice = rawChoice(profile, item.item_key);
+      if (!choice || typeof choice.value !== "number") return [];
+      return [{ itemKey: item.item_key, position: choice.position, situation: situations[item.item_key] ?? item.item_key, answer: options[choice.position]?.label ?? "" }];
+    })
+    .sort((a, b) => a.position - b.position);
+}
+
 // ---------------------------------------------------------------------------
 // TEAM-EBENE
 // ---------------------------------------------------------------------------

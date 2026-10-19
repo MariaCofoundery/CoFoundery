@@ -67,5 +67,10 @@
   "advisorIntake": "Intake",
   "viewSwitchLabel": "Switch work context",
   "viewFounder": "Founder",
-  "viewAdvisor": "Advisor"
+  "viewAdvisor": "Advisor",
+  "areaAlign": "Align",
+  "alignQuestionnaires": "Questionnaires",
+  "alignProfile": "Profile",
+  "alignTeam": "Team",
+  "betaBadge": "Beta"
 }

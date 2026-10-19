@@ -78,10 +78,15 @@ export function ProfilePillar({
   intro?: string | null;
   children: ReactNode;
 }) {
+  // Jeder Abschnitt ist eine Karte (UX-Neuordnung, Oktober 2026): ein ruhiger, gleich aufgebauter Rahmen statt
+  // loser Bloecke. Im Ausdruck faellt der Rahmen weg.
   const toneClasses = TONE[tone];
 
   return (
-    <section id={id} className="mt-10 scroll-mt-6 first:mt-8">
+    <section
+      id={id}
+      className="mt-6 scroll-mt-6 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] first:mt-8 sm:p-6 print:mt-8 print:rounded-none print:border-0 print:bg-transparent print:p-0 print:shadow-none"
+    >
       <header className="flex items-start gap-4">
         {/* Die Randlinie traegt die Farbe. Sie ist Schmuck: Alles, was sie
             sagt, steht daneben auch in Worten. */}

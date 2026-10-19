@@ -57,7 +57,7 @@ test("und von jeder Align-Seite aus, nicht nur vom Dashboard", () => {
   const shell = codeOnly(SHELL);
   const subItems = shell.slice(shell.indexOf("const founderItems"), shell.indexOf("const advisorItems"));
   assert.match(subItems, /href: "\/me\/profile"/);
-  assert.match(subItems, /label: t\("alignOwnProfile"\)/);
+  assert.match(subItems, /label: t\("alignProfile"\)/);
   // Und nicht zweimal dasselbe: Der alte Eintrag ist ersetzt, nicht ergaenzt.
   assert.doesNotMatch(subItems, /href: "\/me\/report"/);
 
@@ -71,9 +71,10 @@ test("der Reiter loest sich nicht auf, wenn man ihn anklickt", () => {
   // waere genau auf der Seite verschwunden, zu der er fuehrt.
   const shell = codeOnly(SHELL);
   // Seit Phase 9.4A ist das der Bereich "Profil".
-  const profileActive = shell.slice(shell.indexOf("const isProfileArea"), shell.indexOf("const isTeamsArea"));
+  // Seit 19.10.2026 unter Align: der Reiter „Profil" in der zweiten Reihe.
+  const profileActive = shell.slice(shell.indexOf("const isProfileArea"), shell.indexOf("const isQuestionnairesArea"));
   assert.match(profileActive, /currentPathname\.startsWith\("\/me\/"\)/);
-  assert.match(shell, /label: t\("areaProfile"\),\s*isActive: isProfileArea/);
+  assert.match(shell, /label: t\("alignProfile"\),\s*isActive: isProfileArea/);
 
   // Und die Seite traegt die Produktleiste ueberhaupt.
   assert.match(codeOnly(CHROME), /pathname\.startsWith\("\/me\/"\)/);

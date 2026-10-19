@@ -921,3 +921,28 @@ body {
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Die Marken-Flaeche (UX-Neuordnung, Oktober 2026)
+   ---------------------------------------------------------------------------
+   Der Verlauf des Logos - Violett nach Blau-Tuerkis - als GROSSE Flaeche mit
+   weisser Schrift: fuer den einen Block, der sagt „hier geht es weiter". Die
+   Endfarbe ist dunkel genug fuer weisse Schrift (Kontrast >= 4,5:1); das
+   hellste Tuerkis des Logos bleibt Dekoration. Nicht fuer kleine Flaechen und
+   nicht fuer mehr als einen Block je Seite.
+   --------------------------------------------------------------------------- */
+.brand-panel {
+  background-image: linear-gradient(120deg, #6d49e0, #0a80b8);
+  color: #ffffff;
+}
+
+@media print {
+  /* Im Ausdruck steht die Marken-Flaeche ohne Verlauf: schwarz auf weiss, wie jede andere Seite. */
+  .brand-panel {
+    background-image: none !important;
+    color: #0f172a !important;
+  }
+  .brand-panel * {
+    color: inherit !important;
+  }
+}

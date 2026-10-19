@@ -617,6 +617,8 @@ test("das Produkt benutzt die Modulschicht nur an wenigen, bewussten Stellen: de
     // Venture Alignment (Beta, nur fuer freigeschaltete Konten): Flow-Seite und Teamreport.
     join("src", "app", "(product)", "founder-alignment", "vorhaben", "beta", "page.tsx"),
     join("src", "app", "(product)", "teams", "[teamId]", "vorhaben-beta", "page.tsx"),
+    // Die Fragebogen-Bibliothek (Align) listet die Module aus der Registry.
+    join("src", "app", "(product)", "fragebogen", "page.tsx"),
     join("src", "app", "me", "profile", "page.tsx"),
   ].sort());
 });

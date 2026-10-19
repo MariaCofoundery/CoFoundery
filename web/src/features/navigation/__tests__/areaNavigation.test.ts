@@ -26,8 +26,7 @@ test("the bar carries areas, and only areas", () => {
   // Connect) und Advisor-Baum (Start, Personen & Gruppen, Teams, Intake).
   for (const area of [
     "areaStart",
-    "areaProfile",
-    "areaTeams",
+    "areaAlign",
     "areaFind",
     "areaConnect",
     "advisorPeople",
@@ -36,8 +35,9 @@ test("the bar carries areas, and only areas", () => {
   ]) {
     assert.match(shell, new RegExp(`label: t\\("${area}"\\)`), `${area} fehlt als Bereich`);
   }
-  // Kein globales Align mehr.
-  assert.doesNotMatch(shell, /t\("areaAlign"\)/);
+  // Align ist seit der UX-Neuordnung (19.10.2026) wieder ein Bereich - mit Profil und Team in der zweiten Reihe.
+  // (Produktentscheidung: drei Produktbereiche Align, Find, Connect; Start davor.)
+  assert.match(shell, /label: t\("areaAlign"\)/);
 
   // In der zusammengesetzten Liste stehen nur benannte Eintraege. Stuende dort
   // eine Adresse, waere sie in genau einer der beiden Ansichten sichtbar.
@@ -66,8 +66,8 @@ test("the areas are named as one system", () => {
     assert.equal(navigation.areaFind, "Find");
     assert.equal(navigation.areaConnect, "Connect");
     assert.equal(navigation.areaStart, "Start");
-    // Align ist als Sammelbereich entfallen (Phase 9.4A).
-    assert.equal(navigation.areaAlign, undefined);
+    // Align ist wieder ein Bereich (19.10.2026): Fragebögen, Profil, Team und Library liegen darunter.
+    assert.equal(navigation.areaAlign, "Align");
   }
 });
 
@@ -91,8 +91,10 @@ test("exactly one point is filled: the one you are standing on", () => {
   // Und eine Stelle fuer beide Orte, sonst laufen sie auseinander.
   assert.match(
     readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
-    /brand-here/,
-    "der Hauptweg im Kopfbereich nutzt dieselbe Klasse"
+    /brand-panel/,
+    // Seit der UX-Neuordnung (19.10.2026) ist der Hauptweg eine Marken-Flaeche (derselbe Verlauf, gross, weisse
+    // Schrift) - eine Klasse in globals.css, nicht kopiert.
+    "der Hauptweg im Kopfbereich nutzt die Marken-Flaeche"
   );
   assert.doesNotMatch(
     shell,
@@ -174,7 +176,7 @@ test("the connections are reachable near the top of the dashboard", () => {
   const profileAt = dashboard.indexOf('id="dashboard-block-profile"');
   assert.ok(tasksAt > -1 && teamsAt > tasksAt, "Teams folgen direkt auf das, was ansteht");
   assert.ok(linkAt > teamsAt && linkAt < profileAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
-  assert.match(source(SHELL), /href: "\/connections",\s*label: t\("areaTeams"\)/);
+  assert.match(source(SHELL), /href: "\/connections",\s*label: t\("alignTeam"\)/);
 });
 
 test("auch Profil leuchtet auf, wenn man dort ist", () => {

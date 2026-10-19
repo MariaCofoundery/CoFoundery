@@ -14,6 +14,7 @@ import {
   areaPattern,
   overviewMark,
   patternItems,
+  situationDots,
   teamAreaFinding,
   type TeamMemberInput,
 } from "@/features/reporting/workstyle/narrative";
@@ -272,4 +273,36 @@ test("Venture und Setup: Erwartung ist kein Verhalten, nur Bestätigtes ist vere
   assert.match(report, /kein beobachtetes\s+Verhalten und noch keine Vereinbarung/);
   assert.match(report, /Nur Vereinbarungen aus Founder Setup, die alle aktuellen Mitglieder bestätigt haben/);
   assert.match(report, /auch dort, wo ihr ähnlich antwortet/);
+});
+
+test("Situations-Punkte: dieselben Antworten wie Richtung und Spannweite - nichts Neues, nichts bei zu wenigen Antworten", () => {
+  for (const area of AREAS.map((a) => a.key)) {
+    for (const shape of SHAPES) {
+      const p = withArea(area, shape);
+      const pattern = areaPattern(p, area);
+      const dots = situationDots(p, area);
+      const mark = overviewMark(p, area);
+      if (pattern.kind === "insufficient") {
+        assert.equal(dots.length, 0, `${area} ${shape}: Punkte trotz zu weniger Antworten`);
+        continue;
+      }
+      // Jede Position liegt auf der Skala, und es gibt nie mehr Punkte als Situationen des Bereichs.
+      assert.ok(dots.length > 0 && dots.length <= patternItems(area).length, `${area} ${shape}`);
+      for (const dot of dots) assert.ok(dot.position >= 0 && dot.position <= 4, `${area} ${shape}: ${dot.position}`);
+      // Die Spannweite des Balkens ist genau die Spannweite der Punkte.
+      if (mark.kind === "range") {
+        assert.equal(Math.min(...dots.map((d) => d.position)), mark.from);
+        assert.equal(Math.max(...dots.map((d) => d.position)), mark.to);
+      }
+      // Der Punkt der Richtung liegt unter den Antworten (unterer Median, keine Interpolation).
+      if (mark.kind === "point") assert.ok(dots.some((d) => d.position === mark.position), `${area} ${shape}: Richtungspunkt ohne Antwort`);
+      // Beschriftet mit der Situation und der Antwort der Person - kein Wert.
+      for (const dot of dots) assert.ok(dot.situation && dot.answer, `${area}: ${dot.itemKey}`);
+    }
+  }
+  const src = readFileSync("src/features/reporting/workstyle/WorkstyleGlance.tsx", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  // Nur bei einer Person (bei Teams bleibt die Spur je Person unveraendert), und fuer Screenreader als Liste.
+  assert.match(src, /dots=\{many \? \[\] : situationDots\(p\.profile, area\.key, locale\)\}/);
+  assert.match(src, /<ul className="sr-only">/);
+  assert.doesNotMatch(src.replace("no overall score or ranking", ""), /radar|spider|score|Prozent/i);
 });

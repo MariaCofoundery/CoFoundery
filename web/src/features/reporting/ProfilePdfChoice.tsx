@@ -38,15 +38,19 @@ export function ProfilePdfChoice({
     fullText: string;
   };
 }) {
+  // KLEIN, IM KOPF (UX-Neuordnung, Oktober 2026): Die Wahl bleibt vor dem Klick, nimmt aber keine eigene Zeile
+  // mehr ein - ein Menue im Kopf der Seite. Ohne Skript: <details> klappt von selbst auf.
   return (
-    <section className="no-print mt-6 rounded-2xl border border-slate-200 bg-white/80 p-5">
-      <h2 className="text-sm font-semibold text-slate-900">{copy.title}</h2>
-
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+    <details className="no-print group relative">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-white/60 bg-white/15 px-4 text-sm font-semibold text-white transition hover:bg-white/25 [&::-webkit-details-marker]:hidden">
+        {copy.title}
+        <span aria-hidden="true" className="text-xs transition group-open:rotate-180">▾</span>
+      </summary>
+      <div className="absolute left-0 z-20 mt-2 grid w-[min(20rem,calc(100vw-3rem))] gap-2 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-xl sm:left-auto sm:right-0">
         <Wahl href="/me/profile/print?mode=short" title={copy.shortTitle} text={copy.shortText} />
         <Wahl href="/me/profile/print?mode=full" title={copy.fullTitle} text={copy.fullText} />
       </div>
-    </section>
+    </details>
   );
 }
 

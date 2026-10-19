@@ -29,6 +29,8 @@ import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStre
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
+import { ProfileGlance, type GlanceCard } from "@/features/reporting/ProfileGlance";
+import { workGlanceLines } from "@/features/reporting/profileGlanceLines";
 import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
 import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePillar";
@@ -282,8 +284,37 @@ export default async function FounderProfilePage({
       </ProfilePillar>
     ) : null;
 
+  // „Auf einen Blick": je Karte ein kurzer, aus den vorhandenen Antworten abgeleiteter Satz - nichts Neues gerechnet.
+  const workLines = workGlanceLines(workstyleV04, await getDisplayLocale(), (key, values) => t(key as never, values as never));
+  const glanceCards: GlanceCard[] = [
+    {
+      key: "work",
+      title: t("glance.work.title"),
+      lines: workLines,
+      empty: t("glance.work.empty"),
+      href: workstyleV04 ? "/me/profile/workstyle" : CURRENT_WORKSTYLE_HREF,
+      cta: workstyleV04 ? t("glance.open") : t("glance.work.cta"),
+    },
+    {
+      key: "strengths",
+      title: t("glance.strengths.title"),
+      lines: strengths.slice(0, 3).map((strength) => strength.label ?? strength.statement),
+      empty: t("glance.strengths.empty"),
+      href: strengths.length > 0 ? "#staerken" : "/profile?step=strengths",
+      cta: strengths.length > 0 ? t("glance.open") : t("glance.strengths.cta"),
+    },
+    {
+      key: "direction",
+      title: t("glance.direction.title"),
+      lines: directionStatements.slice(0, 2).map((statement) => statement.statement),
+      empty: t("glance.direction.empty"),
+      href: directionStatements.length > 0 ? "#antrieb" : "/profile/direction",
+      cta: directionStatements.length > 0 ? t("glance.open") : t("glance.direction.cta"),
+    },
+  ];
+
   return (
-    <main className="report-print-root mx-auto min-h-screen w-full max-w-4xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
+    <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-10 print:max-w-none print:px-0 print:py-0">
       <div className="no-print mb-8 flex items-center justify-between">
         {/* `min-h-11`: 44 px, gemessen statt angenommen. Vorher 38. */}
         <a
@@ -303,8 +334,8 @@ export default async function FounderProfilePage({
           Ein Datum, das nur die Haelfte der Quellen kennt, ist schlechter als
           keines - man sieht ihm nicht an, dass es die Haelfte ist.
           ------------------------------------------------------------------ */}
-      <section className="page-section rounded-2xl border border-slate-200/80 bg-white/95 p-6 print:rounded-none print:border-none print:px-0">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("eyebrow")}</p>
+      <section className="page-section brand-panel rounded-[28px] p-6 sm:p-8 print:rounded-none print:px-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white">{t("eyebrow")}</p>
 
         {/* DAS FOTO - gelesen, nicht gespeichert. Geaendert wird es unter
             „Ueber dich"; hier gibt es keinen Upload.
@@ -312,43 +343,41 @@ export default async function FounderProfilePage({
             `alt=""`: Der Name steht direkt daneben. Ein Alternativtext waere
             eine zweite Fassung desselben - und im Druck stuende er mitten in
             der Ueberschrift, wenn das Bild nicht laedt. */}
-        <div className="mt-3 flex flex-wrap items-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center gap-5">
           {photo.avatarId || photo.avatarUrl ? (
             <ProfileAvatar
               displayName={displayName}
               avatarId={photo.avatarId}
               imageUrl={photo.avatarUrl}
               alt=""
-              className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+              className="h-20 w-20 shrink-0 rounded-3xl object-cover ring-2 ring-white/60"
             />
           ) : null}
-          <h1 className="text-3xl font-semibold text-slate-900">{displayName}</h1>
+          <div className="min-w-0">
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{displayName}</h1>
+            {core?.headline?.trim() ? (
+              <p className="mt-1.5 text-base font-medium text-white">{core.headline}</p>
+            ) : null}
+            {core?.location_region?.trim() ? (
+              <p className="mt-0.5 text-sm text-white">{core.location_region}</p>
+            ) : null}
+          </div>
         </div>
-        {core?.headline?.trim() ? (
-          <p className="mt-2 text-sm font-medium text-slate-700">{core.headline}</p>
-        ) : null}
-        {core?.location_region?.trim() ? (
-          <p className="mt-1 text-sm text-slate-500">{core.location_region}</p>
-        ) : null}
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-700">{t("head.intro")}</p>
-        {asOf ? <p className="mt-3 text-xs text-slate-500">{asOf}</p> : null}
+        <p className="mt-5 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>
+        {asOf ? <p className="mt-3 text-xs text-white">{asOf}</p> : null}
+        {/* Zwei Fassungen zum Weitergeben - klein, im Kopf; die Wahl steht weiter vor dem Klick. */}
+        <div className="mt-5">
+          <ProfilePdfChoice
+                  copy={{
+                    title: t("print.chooseTitle"),
+                    shortTitle: t("print.badgeShort"),
+                    shortText: t("print.shortText"),
+                    fullTitle: t("print.badgeFull"),
+                    fullText: t("print.fullText"),
+                  }}
+                />
+        </div>
       </section>
-
-      {/* ZWEI FASSUNGEN ZUM WEITERGEBEN.
-
-          Hier stand bis zum 01.10.2026 ein einzelner Knopf „Als PDF
-          speichern" - und was darin landete, hing davon ab, welche Aufklapper
-          gerade offen waren. Jetzt fuehrt der Weg auf eine eigene Seite,
-          deren Inhalt in der Adresse steht. */}
-      <ProfilePdfChoice
-        copy={{
-          title: t("print.chooseTitle"),
-          shortTitle: t("print.badgeShort"),
-          shortText: t("print.shortText"),
-          fullTitle: t("print.badgeFull"),
-          fullText: t("print.fullText"),
-        }}
-      />
 
       {/* ------------------------------------------------------------------
           DER SPRUNGBALKEN
@@ -361,7 +390,7 @@ export default async function FounderProfilePage({
           NICHT MITGEDRUCKT. Im Ausdruck waere er ein Inhaltsverzeichnis fuer
           eine Seite, die man am Stueck liest.
           ------------------------------------------------------------------ */}
-      <nav aria-label={t("head.jumpTo")} className="no-print mt-6">
+      <nav aria-label={t("head.jumpTo")} className="no-print mt-6 lg:hidden">
         {/* UNTER `lg` EINE ZEILE ZUM SCHIEBEN, DARUEBER UMBRUCH.
 
             Bis Phase 6 lag die Grenze bei `sm` (640 px). Nachgemessen am
@@ -393,6 +422,26 @@ export default async function FounderProfilePage({
             ))}
         </ul>
       </nav>
+      <div className="mt-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+        {/* DIE SEITENLEISTE: am Rechner bleibt sie sichtbar und zeigt, wo man ist. Eine Liste von Ankern -
+            keine Statusanzeige, keine Zaehler. Nicht mitgedruckt. */}
+        <aside aria-label={t("head.jumpTo")} className="no-print hidden lg:block">
+          <ul className="sticky top-6 space-y-0.5 text-sm">
+            <li>
+              <a href="#auf-einen-blick" className="block rounded-lg px-3 py-2 font-semibold text-slate-900 hover:bg-slate-100">{t("glance.title")}</a>
+            </li>
+            {sichtbar.map((section) => (
+              <li key={section.id}>
+                <a href={`#${section.id}`} className="block rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">{section.title}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <div className="min-w-0">
+          <div className="mt-6 lg:mt-0">
+            <ProfileGlance title={t("glance.title")} note={t("glance.note")} cards={glanceCards} />
+          </div>
+
 
       {/* ==================================================================
           TEIL I - WER DU BIST
@@ -989,6 +1038,8 @@ export default async function FounderProfilePage({
           <p className="no-print mt-3 text-xs leading-5 text-slate-500">{t("whatThisIs.private")}</p>
         </>
       )}
+        </div>
+      </div>
     </main>
   );
 }

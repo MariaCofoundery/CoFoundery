@@ -20,6 +20,9 @@ export function isProductChromePath(pathname: string) {
     // Fenster - aber es ist ein zweites Fenster DIESER Anwendung, in dem man
     // weiterarbeiten kann. Eine Seite ohne Leiste waere dort eine Sackgasse.
     pathname.startsWith("/founder-library") ||
+    // Die Fragebogen-Bibliothek (Align).
+    pathname === "/fragebogen" ||
+    pathname.startsWith("/fragebogen/") ||
     pathname === "/connections" ||
     // Das Postfach ist ein Querschnitt, kein Bereich - es traegt Gespraeche
     // aus Connect UND aus Find.

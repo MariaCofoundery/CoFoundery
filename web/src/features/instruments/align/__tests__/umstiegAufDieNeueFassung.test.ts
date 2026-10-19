@@ -67,6 +67,10 @@ test("der Hinweis sagt die drei Dinge, die sonst fehlen", () => {
 test("die neue Fassung steht im Menü, nicht nur auf einer Karte", () => {
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"), "utf8");
-  assert.match(shell, /href: "\/me\/profile\/workstyle"/);
-  assert.match(shell, /alignNewVersion/);
+  // Seit 19.10.2026 liegt die Fassung unter „Fragebögen" (Align): Die Bibliothek listet sie aus der
+  // Modul-Registry, und der Reiter bleibt auf dem Fragebogen selbst aktiv.
+  assert.match(shell, /isQuestionnairesArea[\s\S]{0,600}workstyle-pretest/);
+  assert.match(shell, /label: t\("alignQuestionnaires"\)/);
+  const bibliothek = readFileSync(join("src", "app", "(product)", "fragebogen", "page.tsx"), "utf8");
+  assert.match(bibliothek, /MODULE_REGISTRY/);
 });

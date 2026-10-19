@@ -19,7 +19,9 @@
       "expired": "Diese Einladung ist abgelaufen. Bitte die einladende Person, dir eine neue zu schicken.",
       "revoked": "Diese Einladung wurde zurückgezogen und gilt nicht mehr.",
       "invitation_not_found": "Diese Einladung ist nicht mehr verfügbar – vielleicht wurde sie schon genutzt oder zurückgezogen."
-    }
+    },
+    "nextStep": "Dein nächster Schritt",
+    "go": "Los geht’s"
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",
@@ -763,5 +765,34 @@
       "title": "Angaben bearbeiten",
       "action": "Bearbeiten"
     }
+  },
+  "path": {
+    "title": "Euer Weg",
+    "lead": "Erst verstehen, wie jede Person arbeitet. Dann vergleichen. Dann verbindlich vereinbaren.",
+    "understand": {
+      "title": "Ich verstehen",
+      "text": "Arbeitsweise, Stärken, Fähigkeiten, Richtung – dein Profil."
+    },
+    "compare": {
+      "title": "Uns vergleichen",
+      "text": "Wo seid ihr einig, wo unterschiedlich – als Gespräch, nicht als Note."
+    },
+    "agree": {
+      "title": "Vereinbaren",
+      "text": "Founder Setup: Rollen, Zeit, Geld, Entscheidungen – schriftlich und gemeinsam."
+    },
+    "state": {
+      "done": "Steht",
+      "started": "Begonnen",
+      "open": "Noch offen",
+      "here": "Hier geht es weiter",
+      "inTeam": "Im Team"
+    }
+  },
+  "areas": {
+    "title": "Noch nicht das ganze Team?",
+    "text": "Mit Find findest du passende Mitgründer:innen, mit Connect teilst du Probleme und knüpfst Kontakte. Beides bleibt freiwillig und getrennt von deinem Team.",
+    "find": "Find öffnen",
+    "connect": "Connect öffnen"
   }
 }

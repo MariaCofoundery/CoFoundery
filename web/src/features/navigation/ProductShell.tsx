@@ -194,6 +194,15 @@ function MenuGlyph({ isOpen }: { isOpen: boolean }) {
   );
 }
 
+/** Eine Sprechblase - das Postfach als Symbol, der Zaehler haengt oben rechts daran. */
+function MessagesGlyph() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />
+    </svg>
+  );
+}
+
 function ConnectAttentionBadge({ count, label }: { count: number; label: string }) {
   if (count < 1) return null;
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
@@ -320,26 +329,43 @@ export function ProductShell({
   // dort, wo sie hingehoeren: das eigene Bild unter Profil, Team Alignment im
   // Team, Advisor-Reviews im Advisor-Kontext. Keine Route hat sich bewegt.
   const isFounderView = resolvedActiveView === "founder";
+  // ---------------------------------------------------------------------
+  // ALIGN IST WIEDER EIN BEREICH (UX-Neuordnung, Oktober 2026)
+  // ---------------------------------------------------------------------
+  //
+  // Phase 9.4A hatte „Align" als Sammelbegriff abgeschafft, weil es Dashboard,
+  // Profil und Teams zugleich markierte. Die Produktentscheidung vom
+  // 19.10.2026 ist eine andere Aufteilung: Es gibt DREI Produktbereiche -
+  // Align, Find, Connect - und davor „Start" als Uebersicht ueber alle drei.
+  // Align traegt in seiner zweiten Reihe den Weg des Alignments:
+  //
+  //   Fragebögen  ->  Profil  ->  Team  ->  Library
+  //
+  // Die Seiten selbst haben sich nicht bewegt; nur die Leiste fasst sie
+  // zusammen. Wer „Wie du arbeitest" oder „So willst du gründen" sucht, findet
+  // sie unter Fragebögen; die Ergebnisse stehen im Profil, der Vergleich im Team.
   const isProfileArea = (currentPathname: string) =>
     currentPathname.startsWith("/me/") ||
     currentPathname === "/profile" ||
-    currentPathname.startsWith("/profile/") ||
+    currentPathname.startsWith("/profile/");
+  const isQuestionnairesArea = (currentPathname: string) =>
+    currentPathname === "/fragebogen" ||
+    currentPathname.startsWith("/fragebogen/") ||
     currentPathname.startsWith("/research/workstyle-pretest") ||
     currentPathname.startsWith("/founder-alignment/profil") ||
     currentPathname.startsWith("/founder-alignment/pilot") ||
     currentPathname.startsWith("/founder-alignment/versionen") ||
-    // PHASE 1.1: „Was du aufbauen willst" ist die eigene Sicht EINER Person auf
-    // ein Vorhaben - jede beantwortet es fuer sich. Es gehoert zum eigenen
-    // Bild, nicht zu „Teams & Verbindungen". Der Vergleich bleibt im Team.
+    // „Was du aufbauen willst" ist die eigene Sicht EINER Person auf ein
+    // Vorhaben - jede beantwortet es fuer sich. Der Vergleich bleibt im Team.
     currentPathname.startsWith("/founder-alignment/vorhaben");
   const isTeamsArea = (currentPathname: string) =>
     currentPathname === "/connections" ||
     currentPathname.startsWith("/teams/") ||
     currentPathname === "/invite/new" ||
     currentPathname.startsWith("/report/") ||
-    currentPathname.startsWith("/founder-library") ||
     // Vorhaben, Vergleich und fruehere Workbookstaende sind Teamkontext.
-    (currentPathname.startsWith("/founder-alignment") && !isProfileArea(currentPathname));
+    (currentPathname.startsWith("/founder-alignment") && !isQuestionnairesArea(currentPathname));
+  const isLibraryArea = (currentPathname: string) => currentPathname.startsWith("/founder-library");
 
   const founderItems: NavigationItem[] = isConnectOnly || !isFounderView ? [] : [
     {
@@ -347,63 +373,37 @@ export function ProductShell({
       label: t("areaStart"),
       isActive: (currentPathname) => currentPathname === "/dashboard",
     },
-    ...(hasFounder
-      ? [
-          {
-            href: "/me/profile",
-            label: t("areaProfile"),
-            isActive: isProfileArea,
-            // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst das eigene Bild,
-            // dann die Arbeitsweise, dann das Pflegen der Angaben.
-            subItems: [
+    {
+      href: hasFounder ? "/fragebogen" : "/connections",
+      label: t("areaAlign"),
+      isActive: (currentPathname) =>
+        isQuestionnairesArea(currentPathname) ||
+        isProfileArea(currentPathname) ||
+        isTeamsArea(currentPathname) ||
+        isLibraryArea(currentPathname),
+      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst beantworten, dann das
+      // eigene Bild, dann das Team, dann das Nachlesen.
+      subItems: [
+        ...(hasFounder
+          ? [
+              {
+                href: "/fragebogen",
+                label: t("alignQuestionnaires"),
+                isActive: isQuestionnairesArea,
+              },
               {
                 href: "/me/profile",
-                label: t("alignOwnProfile"),
-                isActive: (currentPathname: string) =>
-                  currentPathname === "/me/profile" || currentPathname.startsWith("/me/profile/print"),
+                label: t("alignProfile"),
+                isActive: isProfileArea,
               },
-              {
-                // Die aktuelle Fassung bleibt aktiv, auch waehrend man sie
-                // ausfuellt - ein Reiter, der sich beim Anklicken aufloest,
-                // war hier schon einmal das Problem.
-                href: "/me/profile/workstyle",
-                label: t("alignNewVersion"),
-                isActive: (currentPathname: string) =>
-                  currentPathname === "/me/profile/workstyle" || currentPathname.startsWith("/research/workstyle-pretest"),
-              },
-              {
-                // Phase 1.1: die eigene Sicht auf ein Vorhaben. Die Antworten
-                // bleiben je Vorhaben gespeichert; der Einstieg steht hier, weil
-                // jede Person sie fuer sich gibt.
-                href: "/founder-alignment/vorhaben",
-                label: t("profileVenture"),
-                isActive: (currentPathname: string) => currentPathname.startsWith("/founder-alignment/vorhaben"),
-              },
-              {
-                // Der bestehende Editor. Er stand bisher als eigener Textlink
-                // rechts in der Leiste ("Über dich") - in der Founder-Ansicht
-                // waere das jetzt derselbe Weg zweimal.
-                href: "/profile",
-                label: t("profileEdit"),
-                isActive: (currentPathname: string) =>
-                  currentPathname === "/profile" || currentPathname.startsWith("/profile/"),
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      href: "/connections",
-      label: t("areaTeams"),
-      isActive: isTeamsArea,
-      subItems: [
-        // Verbindungen gilt auch ohne Founder-Rolle - sonst waere die zweite
-        // Reihe fuer diese Menschen leer.
+            ]
+          : []),
+        // Das Team gilt auch ohne Founder-Rolle - sonst waere die zweite Reihe
+        // fuer diese Menschen leer.
         {
           href: "/connections",
-          label: t("alignConnections"),
-          isActive: (currentPathname: string) =>
-            currentPathname === "/connections" || currentPathname.startsWith("/teams/"),
+          label: t("alignTeam"),
+          isActive: isTeamsArea,
         },
         ...(hasFounder
           ? [
@@ -412,8 +412,7 @@ export function ProductShell({
                 // steht die Library zusaetzlich in der Teamnavigation.
                 href: "/founder-library",
                 label: t("alignLibrary"),
-                isActive: (currentPathname: string) =>
-                  currentPathname.startsWith("/founder-library"),
+                isActive: isLibraryArea,
               },
             ]
           : []),
@@ -624,6 +623,10 @@ export function ProductShell({
               >
                 <BrandLogo className="h-8 md:h-9" priority sizes="(min-width: 768px) 144px, 128px" />
               </Link>
+              {/* Solange die Testphase laeuft: ein ruhiges Etikett, das sagt, wo man ist. */}
+              <span className="-ml-1 hidden rounded-full border border-violet-300 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-violet-700 sm:inline-flex">
+                {t("betaBadge")}
+              </span>
 
               {/* Ab 1280 Pixeln stehen die Bereiche als Pillen in der Leiste.
                   Darunter liegen sie im aufklappbaren Menue - die Reihe hier
@@ -632,16 +635,20 @@ export function ProductShell({
                 aria-label={t("navLabel")}
                 className="hidden shrink-0 flex-nowrap items-center gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1 xl:flex"
               >
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    aria-current={item.isActive(pathname) ? "page" : undefined}
-                    className={`${areaLinkClassName(item.isActive(pathname))} inline-flex items-center gap-2`}
-                  >
-                    <span>{item.label}</span>
-                    {areaBadge(item.badge)}
-                  </Link>
+                {navigationItems.map((item, index) => (
+                  <span key={item.href} className="inline-flex shrink-0 items-center gap-1">
+                    {/* Eine feine Linie trennt die Bereiche - Start | Align | Find | Connect
+                        lesen sich so als eigene Orte, nicht als eine Liste. */}
+                    {index > 0 ? <span aria-hidden="true" className="mr-0.5 h-5 w-px bg-slate-200" /> : null}
+                    <Link
+                      href={item.href}
+                      aria-current={item.isActive(pathname) ? "page" : undefined}
+                      className={`${areaLinkClassName(item.isActive(pathname))} inline-flex items-center gap-2`}
+                    >
+                      <span>{item.label}</span>
+                      {areaBadge(item.badge)}
+                    </Link>
+                  </span>
                 ))}
               </nav>
             </div>
@@ -690,13 +697,21 @@ export function ProductShell({
                   <Link
                     href="/messages"
                     aria-current={pathname.startsWith("/messages") ? "page" : undefined}
-                    className={`${navLinkClassName(pathname.startsWith("/messages"))} inline-flex items-center gap-2`}
+                    aria-label={t("messages")}
+                    title={t("messages")}
+                    className={`relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
+                      pathname.startsWith("/messages")
+                        ? "brand-here"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    }`}
                   >
-                    {t("messages")}
-                    <ConnectAttentionBadge
-                      count={messagesAttentionCount}
-                      label={t("messagesAttentionBadge", { count: messagesAttentionCount })}
-                    />
+                    <MessagesGlyph />
+                    <span className="absolute -right-0.5 -top-0.5">
+                      <ConnectAttentionBadge
+                        count={messagesAttentionCount}
+                        label={t("messagesAttentionBadge", { count: messagesAttentionCount })}
+                      />
+                    </span>
                   </Link>
                 ) : null}
                 {showProfileShortcut ? (
@@ -712,7 +727,8 @@ export function ProductShell({
                   source="nav"
                   invitationId={resolvedFeedbackInvitationId}
                   variant="nav"
-                  triggerClassName={navLinkClassName(false)}
+                  // In der Testphase auffaellig genug, ohne Inhalt zu verdecken: umrandet, immer sichtbar.
+                  triggerClassName="shrink-0 whitespace-nowrap rounded-full border border-violet-300 px-3 py-1.5 text-[13px] font-semibold text-violet-700 transition hover:bg-violet-50"
                 />
                 <DashboardViewSwitch
                   activeView={resolvedActiveView}

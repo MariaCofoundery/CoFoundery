@@ -1,7 +1,7 @@
 import type { AppLocale } from "@/i18n/config";
 import { workstyleAreas, workstylePoles, reportText } from "./display";
 import { type AreaKey, type ProductProfile } from "@/features/reporting/workstyle/model";
-import { glanceSentence, overviewMark, type OverviewMark } from "@/features/reporting/workstyle/narrative";
+import { glanceSentence, overviewMark, situationDots, type OverviewMark, type SituationDot } from "@/features/reporting/workstyle/narrative";
 
 /**
  * "Deine Arbeitsweise auf einen Blick" / "Euer Zusammenspiel auf einen Blick"
@@ -29,7 +29,7 @@ function describe(area: AreaKey, mark: OverviewMark, locale: AppLocale) {
   return reportText(locale, "noch zu wenige Antworten", "Not enough responses yet");
 }
 
-function Track({ area, mark, name, locale }: { area: AreaKey; mark: OverviewMark; name: string | null; locale: AppLocale }) {
+function Track({ area, mark, name, locale, dots = [] }: { area: AreaKey; mark: OverviewMark; name: string | null; locale: AppLocale; dots?: SituationDot[] }) {
   return (
     <div className="ws-glance-track">
       {name ? <p className="truncate text-xs font-medium text-slate-700">{name}</p> : null}
@@ -39,14 +39,39 @@ function Track({ area, mark, name, locale }: { area: AreaKey; mark: OverviewMark
           <span key={n} className="absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-300" style={{ left: at(n) }} />
         ))}
         {mark.kind === "point" ? (
-          <span className="ws-glance-point absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600 ring-4 ring-violet-100" style={{ left: at(mark.position) }} />
+          <span
+            className={`ws-glance-point absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ring-violet-100 ${dots.length > 0 ? "bg-violet-200" : "bg-violet-600"}`}
+            style={{ left: at(mark.position) }}
+          />
         ) : mark.kind === "range" ? (
           <span
             className="ws-glance-range absolute top-1/2 h-3 -translate-y-1/2 rounded-full border border-violet-300 bg-gradient-to-r from-violet-200/80 to-cyan-200/80"
             style={{ left: `calc(${at(mark.from)} - 6px)`, width: `calc(${(mark.to - mark.from) * 25}% + 12px)` }}
           />
         ) : null}
+        {/* Jede beantwortete Situation ein Punkt: Haeufung = durchgehend, Streuung = je nach Situation.
+            Mehrere Situationen auf derselben Stufe stehen leicht versetzt nebeneinander. */}
+        {dots.map((dot, index) => {
+          const same = dots.filter((other) => other.position === dot.position);
+          const offset = (same.indexOf(dot) - (same.length - 1) / 2) * 9;
+          return (
+            <span
+              key={dot.itemKey}
+              data-situation-dot={dot.itemKey}
+              title={`${dot.situation}: ${dot.answer}`}
+              className="ws-glance-dot absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border border-white bg-violet-700"
+              style={{ left: `calc(${at(dot.position)} + ${offset}px - 5px)`, zIndex: index + 1 }}
+            />
+          );
+        })}
       </div>
+      {dots.length > 0 ? (
+        <ul className="sr-only">
+          {dots.map((dot) => (
+            <li key={dot.itemKey}>{`${dot.situation}: ${dot.answer}`}</li>
+          ))}
+        </ul>
+      ) : null}
       <span className="sr-only">{`${name ? `${name}: ` : ""}${describe(area, mark, locale)}`}</span>
       {/* Bei einer Person sagt der Satz darunter dasselbe - dann keine Doppelung. */}
       {name && mark.kind === "none" ? <p className="text-xs text-slate-400">{reportText(locale, "Noch zu wenige Antworten", "Not enough responses yet")}</p> : null}
@@ -86,7 +111,7 @@ export function WorkstyleGlance({
             </div>
             <div className={`mt-2 grid ${many ? "gap-2" : "gap-1"}`}>
               {people.map((p) => (
-                <Track locale={locale} key={p.id} area={area.key} mark={overviewMark(p.profile, area.key, locale)} name={many ? p.name : null} />
+                <Track locale={locale} key={p.id} area={area.key} mark={overviewMark(p.profile, area.key, locale)} name={many ? p.name : null} dots={many ? [] : situationDots(p.profile, area.key, locale)} />
               ))}
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">
@@ -96,7 +121,7 @@ export function WorkstyleGlance({
         ))}
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-500">
-        {reportText(locale, "Punkt: Die Antworten gehen in eine Richtung. Weicher Balken: je nach Situation. Leere Linie: noch zu wenige Antworten. Links und rechts sind gleichwertig – es gibt keinen Gesamtwert und keine Rangfolge.", "Dot: responses point in one direction. Soft bar: responses depend on the situation. Empty line: not enough responses yet. Neither end is better. There is no overall score or ranking.")}
+        {reportText(locale, "Kleine Punkte: je eine beantwortete Situation. Großer Punkt: Die Antworten gehen in eine Richtung. Weicher Balken: je nach Situation. Leere Linie: noch zu wenige Antworten. Links und rechts sind gleichwertig – es gibt keinen Gesamtwert und keine Rangfolge.", "Small dots: one answered situation each. Large dot: responses point in one direction. Soft bar: responses depend on the situation. Empty line: not enough responses yet. Neither end is better. There is no overall score or ranking.")}
       </p>
     </section>
   );

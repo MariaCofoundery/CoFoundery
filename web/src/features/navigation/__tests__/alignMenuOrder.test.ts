@@ -11,10 +11,12 @@ test("die zweite Reihe unter Align liest sich als Weg", () => {
   // Nachlesen. Vorher stand "Verbindungen" vorn - man faengt aber bei sich
   // selbst an.
   const reihenfolge = [...shell.matchAll(/label: t\("(align[A-Za-z]+)"\)/g)].map((m) => m[1]);
+  // Seit 19.10.2026: Fragebögen (beantworten) -> Profil (das eigene Bild) -> Team (vergleichen und
+  // vereinbaren) -> Library (nachlesen).
   assert.deepEqual(reihenfolge, [
-    "alignOwnProfile",
-    "alignNewVersion",
-    "alignConnections",
+    "alignQuestionnaires",
+    "alignProfile",
+    "alignTeam",
     "alignLibrary",
   ]);
 });
@@ -27,7 +29,7 @@ test("Verbindungen steht auch ohne Founder-Rolle da", () => {
     shell.indexOf("DIE REIHENFOLGE IST EIN WEG"),
     shell.indexOf("const findItem"),
   );
-  const verbindungen = zweiteReihe.indexOf('label: t("alignConnections")');
+  const verbindungen = zweiteReihe.indexOf('label: t("alignTeam")');
   const blockEnde = zweiteReihe.indexOf("...(hasFounder", verbindungen);
 
   assert.ok(verbindungen > 0, "Verbindungen fehlt");
@@ -36,24 +38,22 @@ test("Verbindungen steht auch ohne Founder-Rolle da", () => {
   assert.ok(blockEnde > verbindungen, "Verbindungen haengt an der Founder-Rolle");
 });
 
-test("die neue Fassung bleibt im Menü aktiv, egal auf welcher ihrer Seiten man steht", () => {
-  // Ein Reiter, der sich beim Anklicken aufloest, war hier schon einmal das
-  // Problem.
-  assert.match(shell, /href: "\/me\/profile\/workstyle"[\s\S]{0,420}startsWith\("\/research\/workstyle-pretest"\)/);
+test("die neue Fassung bleibt unter Fragebögen aktiv, egal auf welcher ihrer Seiten man steht", () => {
+  // Ein Reiter, der sich beim Anklicken aufloest, war hier schon einmal das Problem. Seit 19.10.2026 liegen
+  // die Fragebogen-Seiten unter „Fragebögen“ (Align) - die Ergebnisse unter „Profil".
+  const bereich = shell.slice(shell.indexOf("const isQuestionnairesArea"), shell.indexOf("const isTeamsArea"));
+  assert.match(bereich, /startsWith\("\/research\/workstyle-pretest"\)/);
+  assert.match(bereich, /currentPathname === "\/fragebogen"/);
 });
 
 test("historical workbook is not labeled as the current workstyle", () => {
-  // Nur der Workstyle-Eintrag selbst - seit Phase 1.1 steht danach im Profil
-  // der Einstieg „So willst du gründen" (/founder-alignment/vorhaben).
-  const start = shell.indexOf('href: "/me/profile/workstyle"');
-  const item = shell.slice(start, shell.indexOf("href:", start + 10));
-  assert.doesNotMatch(item,/founder-alignment/);
+  const bereich = shell.slice(shell.indexOf("const isQuestionnairesArea"), shell.indexOf("const isTeamsArea"));
+  assert.doesNotMatch(bereich, /workbook/);
 });
 
-test("„So willst du gründen“ steht im Profil, nicht unter Teams & Verbindungen", () => {
-  const profil = shell.slice(shell.indexOf('href: "/me/profile",'), shell.indexOf('href: "/connections"'));
-  assert.match(profil, /href: "\/founder-alignment\/vorhaben",\s*label: t\("profileVenture"\)/);
-  assert.match(shell, /currentPathname\.startsWith\("\/founder-alignment\/vorhaben"\);/);
+test("„So willst du gründen“ steht unter Fragebögen, nicht unter Team", () => {
+  const bereich = shell.slice(shell.indexOf("const isQuestionnairesArea"), shell.indexOf("const isTeamsArea"));
+  assert.match(bereich, /currentPathname\.startsWith\("\/founder-alignment\/vorhaben"\)/);
   // Der Vergleich bleibt Teamkontext.
-  assert.match(shell, /\(currentPathname\.startsWith\("\/founder-alignment"\) && !isProfileArea\(currentPathname\)\)/);
+  assert.match(shell, /\(currentPathname\.startsWith\("\/founder-alignment"\) && !isQuestionnairesArea\(currentPathname\)\)/);
 });

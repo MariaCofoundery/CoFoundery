@@ -438,6 +438,29 @@
         "in_progress": "Weitermachen",
         "completed": "Ansehen"
       }
+    },
+    "glance": {
+      "title": "Auf einen Blick",
+      "note": "aus deinen Antworten abgeleitet, ohne KI",
+      "open": "Ansehen",
+      "work": {
+        "title": "Wie du arbeitest",
+        "consistent": "Durchgehend in eine Richtung: {areas}",
+        "mixed": "{count, plural, one {Bei einem Bereich hängt es von der Situation ab.} other {Bei # Bereichen hängt es von der Situation ab.}}",
+        "ready": "Dein Arbeitsprofil steht.",
+        "empty": "Die Fragen dazu dauern etwa 12 Minuten. Danach siehst du hier dein Arbeitsprofil.",
+        "cta": "Fragebogen starten"
+      },
+      "strengths": {
+        "title": "Was dich trägt",
+        "empty": "Im Stärken-Gespräch kommen Situationen zusammen, in denen du gut warst.",
+        "cta": "Gespräch starten"
+      },
+      "direction": {
+        "title": "Wohin du willst",
+        "empty": "Hier stehen die Themen und die Wirkung, die dir wichtig sind – in deinen Worten.",
+        "cta": "Ergänzen"
+      }
     }
   }
 }
