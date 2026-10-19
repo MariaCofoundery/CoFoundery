@@ -35,22 +35,58 @@ export default async function FounderSetupPage({ params }: Props) {
     getTeamLabel(supabase, teamId),
   ]);
   const counts = countFounderSetupStatuses(setup);
+  // Das naechste Thema: zuerst ein wichtiges, noch offenes; sonst eines, das gerade geklaert wird oder
+  // auf Bestaetigung wartet; sonst das erste offene. Keine Rangfolge der Personen, nur der Reihenfolge der Seite.
+  const unsettled = FOUNDER_SETUP_PHASE_KEYS.flatMap((phase) =>
+    setup.items.filter((item) => getFounderSetupCatalogItem(item.key)?.phase === phase && item.stage !== "settled")
+  );
+  const nextItem =
+    unsettled.find((item) => getFounderSetupCatalogItem(item.key)?.weight === "critical" && item.stage === "open") ??
+    unsettled.find((item) => item.stage === "discussing" || item.stage === "awaiting_confirmation") ??
+    unsettled[0] ??
+    null;
+  const settledCount = counts.clarified + counts.documented + counts.not_relevant;
+  const chips = [
+    { key: "settled", count: settledCount, dot: "bg-teal-600" },
+    { key: "discussing", count: counts.discussing, dot: "bg-violet-600" },
+    { key: "pending", count: counts.confirmation_pending, dot: "bg-sky-600" },
+    { key: "open", count: counts.open, dot: "border-2 border-white" },
+  ] as const;
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
       <TeamPageHeader teamId={teamId} active="setup" title={t("title")} teamLabel={teamLabel} />
-      <section className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-        <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("subtitle")}</p>
+      <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8" aria-labelledby="setup-title">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{teamLabel}</p>
+        <h1 id="setup-title" className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-white">{t("subtitle")}</p>
         {setup.started ? (
-          <p className="mt-2 text-sm font-medium text-slate-700">
-            {t("summary", {
-              clarified: counts.clarified + counts.documented + counts.not_relevant,
-              discussing: counts.discussing,
-              open: counts.open,
-              pending: counts.confirmation_pending,
-            })}
-          </p>
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label={t("hero.stateLabel")}>
+            {chips.map((chip) => (
+              <li key={chip.key} className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-sm font-semibold">
+                <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${chip.dot === "border-2 border-white" ? "border-2 border-white" : chip.dot}`} />
+                {t(`hero.chips.${chip.key}`, { count: chip.count })}
+              </li>
+            ))}
+          </ul>
         ) : null}
+        <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-white/15 p-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("hero.nextEyebrow")}</p>
+            <p className="mt-1 text-lg font-semibold">{nextItem ? t(`items.${nextItem.key}.title`) : t("hero.allDone")}</p>
+          </div>
+          {nextItem ? (
+            <Link
+              href={`/teams/${teamId}/setup/${nextItem.key}`}
+              className="inline-flex min-h-11 items-center rounded-xl bg-white px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-50"
+            >
+              {t("hero.openTopic")}
+            </Link>
+          ) : null}
+          <Link href={`/teams/${teamId}/setup/document`} className="text-sm text-white underline underline-offset-4">
+            {t("document.open")}
+          </Link>
+        </div>
       </section>
 
       {setup.items.some(item => item.rosterConfirmationMissing) ? <p className="mt-5 rounded-xl border border-slate-200 p-4 text-sm leading-6">{t("rosterChanged")}</p> : null}
@@ -93,15 +129,15 @@ export default async function FounderSetupPage({ params }: Props) {
               <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
                 {t(`phases.${phase}.text`)}
               </p>
-              <ul className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_25px_rgba(15,23,42,0.035)]">
+              <ul className="mt-4 grid gap-3 md:grid-cols-2">
                 {items.map((item) => {
                   const catalogItem = getFounderSetupCatalogItem(item.key);
                   const isCritical = catalogItem?.weight === "critical";
                   return (
-                    <li key={item.key} className="border-b border-slate-200 last:border-b-0">
+                    <li key={item.key}>
                       <Link
                         href={`/teams/${teamId}/setup/${item.key}`}
-                        className="group flex min-h-16 w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[color:var(--brand-accent)] sm:px-5"
+                        className="group flex h-full min-h-16 w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 transition hover:border-violet-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] sm:px-5"
                       >
                         <span className="min-w-0 flex-1">
                           <span className="block font-medium text-slate-950">

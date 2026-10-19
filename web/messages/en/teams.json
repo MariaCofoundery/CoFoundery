@@ -653,6 +653,18 @@
         "founder_in_the_wild": "Founder in the Wild",
         "read_my_mind": "Read My Mind"
       }
+    },
+    "hero": {
+      "stateLabel": "Status of the topics",
+      "nextEyebrow": "Next topic",
+      "openTopic": "Open topic",
+      "allDone": "All topics are settled",
+      "chips": {
+        "settled": "{count} settled",
+        "discussing": "{count} in discussion",
+        "pending": "{count} awaiting confirmation",
+        "open": "{count} open"
+      }
     }
   },
   "dashboard": {
