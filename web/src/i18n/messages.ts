@@ -19,6 +19,7 @@ import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDirection from "../../messages/de/direction.json";
 import deStrengths from "../../messages/de/strengths.json";
+import deModules from "../../messages/de/modules.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFind from "../../messages/de/find.json";
 import deFeedback from "../../messages/de/feedback.json";
@@ -46,6 +47,7 @@ import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDirection from "../../messages/en/direction.json";
 import enStrengths from "../../messages/en/strengths.json";
+import enModules from "../../messages/en/modules.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFind from "../../messages/en/find.json";
 import enFeedback from "../../messages/en/feedback.json";
@@ -80,6 +82,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: deDashboard,
     direction: deDirection,
     strengths: deStrengths,
+    modules: deModules,
     discovery: deDiscovery,
     find: deFind,
     feedback: deFeedback,
@@ -113,6 +116,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     dashboard: enDashboard,
     direction: enDirection,
     strengths: enStrengths,
+    modules: enModules,
     discovery: enDiscovery,
     find: enFind,
     feedback: enFeedback,

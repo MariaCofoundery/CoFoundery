@@ -1,0 +1,22 @@
+{
+  "workstyle": {
+    "title": "How you work",
+    "summary": "Your way of working in concrete situations – descriptive, without judgment."
+  },
+  "strengths": {
+    "title": "Your strengths",
+    "summary": "Personal strengths that show in your behavior – based on situations you described."
+  },
+  "capability": {
+    "title": "What you bring",
+    "summary": "Experience, areas of work and the responsibility you want to take on."
+  },
+  "direction": {
+    "title": "What drives you",
+    "summary": "Topics and impact that matter to you – in your own words."
+  },
+  "venture_core": {
+    "title": "How you want to build",
+    "summary": "Your view of a specific venture: goals, time, money and collaboration."
+  }
+}

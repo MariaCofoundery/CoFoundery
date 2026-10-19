@@ -1,0 +1,22 @@
+{
+  "workstyle": {
+    "title": "Wie du arbeitest",
+    "summary": "Deine Arbeitsweise in konkreten Situationen – beschreibend, ohne Wertung."
+  },
+  "strengths": {
+    "title": "Deine Stärken",
+    "summary": "Persönliche Stärken, die sich in deinem Verhalten zeigen – aus Situationen, die du erzählt hast."
+  },
+  "capability": {
+    "title": "Was du mitbringst",
+    "summary": "Erfahrung, Tätigkeitsbereiche und die Verantwortung, die du übernehmen möchtest."
+  },
+  "direction": {
+    "title": "Was dich antreibt",
+    "summary": "Themen und Wirkung, die dir wichtig sind – in deinen eigenen Worten."
+  },
+  "venture_core": {
+    "title": "So willst du gründen",
+    "summary": "Deine Sicht auf ein konkretes Vorhaben: Ziele, Zeit, Geld und Zusammenarbeit."
+  }
+}
