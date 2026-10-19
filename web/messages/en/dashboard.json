@@ -21,7 +21,9 @@
       "invitation_not_found": "This invitation is no longer available – it may already have been used or withdrawn."
     },
     "nextStep": "Your next step",
-    "go": "Let’s go"
+    "go": "Let’s go",
+    "headline": "How do you work together – and what do you want to agree on?",
+    "allQuestionnaires": "See all questionnaires"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
@@ -796,5 +798,32 @@
     "text": "With Find you find suitable co-founders, with Connect you share problems and make contacts. Both stay optional and separate from your team.",
     "find": "Open Find",
     "connect": "Open Connect"
+  },
+  "teamCard": {
+    "title": "Your team",
+    "someone": "Co-founder",
+    "people": "{count, plural, one {# person} other {# people}} in the team",
+    "open": "Open team →",
+    "others": "{count, plural, one {Other team} other {Other teams}} ({count})",
+    "none": "You are not in a team yet. Invite someone and you will work together here.",
+    "invite": "Invite a co-founder →"
+  },
+  "deepen": {
+    "title": "To go deeper",
+    "lead": "Optional. Nothing here is missing from your profile.",
+    "view": "View →",
+    "tradeoffs": {
+      "title": "Values & trade-offs",
+      "text": "Four situations where two things can both be right · 5 min."
+    },
+    "strengths": {
+      "title": "Strengths interview",
+      "text": "What you do well day to day, in conversation · 15 min."
+    },
+    "privacy": {
+      "title": "How Made2Found handles your data",
+      "text": "Submitting shares nothing. You decide per questionnaire whether and with whom to share – and can take it back any time.",
+      "link": "Who sees what →"
+    }
   }
 }

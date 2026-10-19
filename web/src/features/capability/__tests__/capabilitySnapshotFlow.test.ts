@@ -347,7 +347,8 @@ test("/profile is reachable from the dashboard and the account menu", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
 
   assert.match(shell, /href="\/profile"/, "das Kontomenue muss dorthin fuehren");
-  assert.match(dashboard, /href="\/profile"/, "das Dashboard ist der zentrale Anlaufpunkt");
+  // Die Profilangaben stehen im Menue, nicht mehr auf der Startseite.
+  assert.doesNotMatch(dashboard, /href="\/profile"/);
 
   // Der Erststart bleibt im Dashboard eingebettet - ein Einstieg ist etwas
   // anderes als ein Editor. Danach ist der Block nur noch ein Eingang.

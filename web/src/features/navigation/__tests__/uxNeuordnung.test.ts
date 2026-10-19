@@ -69,13 +69,16 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
 
 test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find und Connect - ohne Prozent", () => {
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
-  assert.match(dashboard, /className="brand-panel mt-5/);
+  assert.match(dashboard, /className="brand-panel flex flex-col/);
   assert.match(dashboard, /<DashboardPath/);
-  // Die Bereichsleiste ist weg: Align, Find und Connect stehen in der Navigation.
-  assert.doesNotMatch(dashboard, /<DashboardAreas/);
+  // Kopf mit Zitat und Team-Karte, Weg, Aufgaben nur wenn etwas wartet, Vertiefen, Find/Connect-Streifen.
+  assert.match(dashboard, /<DashboardTeamCard/);
+  assert.match(dashboard, /<DashboardDeepen/);
+  assert.match(dashboard, /<DashboardAreas/);
   assert.match(dashboard, /taskPresentations\.length > 0/);
-  // Reihenfolge: Hero, Weg, Aufgaben, Teams, Profil, Konto.
-  const order = ["data-dashboard-hero", "<DashboardPath", 'id="dashboard-block-tasks"', 'id="dashboard-block-connections"', 'id="dashboard-block-profile"', 'id="dashboard-block-account"'].map((m) => dashboard.indexOf(m));
+  // Die Profilangaben (4 Karten) sind von der Startseite ins Menue gewandert.
+  assert.doesNotMatch(dashboard, /aboutYou\./);
+  const order = ["data-dashboard-hero", "<DashboardTeamCard", "<DashboardPath", 'id="dashboard-block-tasks"', "<DashboardDeepen", "<DashboardAreas", 'id="dashboard-block-connections"', 'id="dashboard-block-account"'].map((m) => dashboard.indexOf(m));
   assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
   const orientation = code("src/features/dashboard/DashboardOrientation.tsx");
   assert.doesNotMatch(orientation, /%|percent|von\s+\d|\bscore\b/i);

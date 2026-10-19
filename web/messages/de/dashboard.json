@@ -21,7 +21,9 @@
       "invitation_not_found": "Diese Einladung ist nicht mehr verfügbar – vielleicht wurde sie schon genutzt oder zurückgezogen."
     },
     "nextStep": "Dein nächster Schritt",
-    "go": "Los geht’s"
+    "go": "Los geht’s",
+    "headline": "Wie arbeitet ihr zusammen – und worauf wollt ihr euch einigen?",
+    "allQuestionnaires": "Alle Fragebögen ansehen"
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",
@@ -796,5 +798,32 @@
     "text": "Mit Find findest du passende Mitgründer:innen, mit Connect teilst du Probleme und knüpfst Kontakte. Beides bleibt freiwillig und getrennt von deinem Team.",
     "find": "Find öffnen",
     "connect": "Connect öffnen"
+  },
+  "teamCard": {
+    "title": "Dein Team",
+    "someone": "Mitgründer:in",
+    "people": "{count, plural, one {# Person} other {# Personen}} im Team",
+    "open": "Zum Team →",
+    "others": "{count, plural, one {Anderes Team} other {Andere Teams}} ({count})",
+    "none": "Du bist noch in keinem Team. Lade eine Person ein, dann arbeitet ihr hier zusammen.",
+    "invite": "Mitgründer:in einladen →"
+  },
+  "deepen": {
+    "title": "Zum Vertiefen",
+    "lead": "Freiwillig. Nichts davon fehlt deinem Profil.",
+    "view": "Ansehen →",
+    "tradeoffs": {
+      "title": "Werte & Zielkonflikte",
+      "text": "Vier Situationen, in denen zwei Dinge richtig sein können · 5 Min."
+    },
+    "strengths": {
+      "title": "Stärken-Interview",
+      "text": "Was du im Alltag gut machst, im Gespräch · 15 Min."
+    },
+    "privacy": {
+      "title": "So geht Made2Found mit deinen Daten um",
+      "text": "Abgeben teilt nichts. Du entscheidest je Fragebogen, ob und mit wem du teilst – und kannst es jederzeit zurücknehmen.",
+      "link": "Wer sieht was →"
+    }
   }
 }

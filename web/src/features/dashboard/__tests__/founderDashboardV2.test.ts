@@ -158,30 +158,29 @@ test("die eine Hauptaktion: Profil zuerst, dann die eigene Arbeitsweise, sonst n
   assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "started" }), "workstyle_continue");
   // Ist nichts offen, bleibt der Kopfbereich ruhig - keine erzwungene Aktion.
   assert.equal(resolveDashboardPrimaryAction({ needsOnboarding: false, workProfileState: "completed" }), null);
-  // Und hoechstens eine: der Bereich rendert genau einen bedingten Link.
+  // Und hoechstens eine Hauptaktion: genau ein "Weiter", dazu ein ruhiger Link zur Bibliothek.
   const hero = dashboardSource.slice(
     dashboardSource.indexOf("data-dashboard-hero"),
     dashboardSource.indexOf('id="dashboard-block-tasks"'),
   );
-  assert.equal(hero.match(/<Link/g)?.length, 1);
+  assert.equal(hero.match(/t\("hero\.go"\)/g)?.length, 1);
   assert.match(hero, /primaryAction \? \(/);
 });
 
 test("vier Bereiche in fester Reihenfolge: Begruessung, Ansteht, Teams, Über dich", () => {
-  assert.match(dashboardSource, /t\("hero\.eyebrow"\)/);
+  assert.match(dashboardSource, /t\("hero\.headline"\)/);
   assert.match(dashboardSource, /t\("hero\.greeting"/);
   const order = [
     "data-dashboard-hero",
     'id="dashboard-block-tasks"',
-    'id="dashboard-block-connections"',
     'id="dashboard-block-profile"',
+    'id="dashboard-block-connections"',
     'id="dashboard-legacy-title"',
     'id="dashboard-block-account"',
   ].map((marker) => dashboardSource.indexOf(marker));
   for (const at of order) assert.ok(at > -1, "ein Bereich fehlt");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "die Reihenfolge stimmt nicht");
 
-  assert.match(dashboardSource, /<AlignWorkstyleStatus state=\{alignState\}/);
   assert.match(dashboardSource, /<AlignVentureActions state=\{alignState\}/);
   assert.match(dashboardSource, /getOwnDiscoveryProfile/);
   assert.doesNotMatch(dashboardSource, /foundation\.values\.optionalBadge/);
@@ -211,7 +210,7 @@ test("Zitat, Ausblick, Karussell, Netzwerk-Box und Abschnittsleiste sind weg", (
 test("Team-Intake bleibt fuer Founder erreichbar, aber leise im Teams-Bereich", () => {
   const teams = dashboardSource.slice(
     dashboardSource.indexOf('id="dashboard-block-connections"'),
-    dashboardSource.indexOf('id="dashboard-block-profile"'),
+    dashboardSource.indexOf('id="dashboard-legacy-title"'),
   );
   assert.match(teams, /href="\/team-intake"/);
   assert.match(teams, /t\("team\.teamIntakeLink"\)/);
@@ -232,7 +231,7 @@ test("fruehere Auswertungen stehen nur eingeklappt und nur, wenn es sie gibt", (
   // Die alten Paarreports stehen hier und nicht mehr im Teams-Bereich.
   const teams = dashboardSource.slice(
     dashboardSource.indexOf('id="dashboard-block-connections"'),
-    dashboardSource.indexOf('id="dashboard-block-profile"'),
+    dashboardSource.indexOf('id="dashboard-legacy-title"'),
   );
   assert.doesNotMatch(teams, /renderCompactReportRow/);
   assert.ok(dashboardSource.indexOf("renderCompactReportRow(run, t)") > details);

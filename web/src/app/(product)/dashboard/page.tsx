@@ -7,7 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
-import { DashboardPath } from "@/features/dashboard/DashboardOrientation";
+import { DashboardAreas, DashboardDeepen, DashboardPath, DashboardTeamCard } from "@/features/dashboard/DashboardOrientation";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
@@ -47,7 +47,6 @@ import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCar
 import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
 import {
   AlignVentureActions,
-  AlignWorkstyleStatus,
   alignWorkProfileState,
 } from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
@@ -60,6 +59,7 @@ type DashboardSearchParams = {
   valuesStatus?: string;
   invite?: string;
   invitationId?: string;
+  team?: string;
 };
 
 type ReportRunRow = {
@@ -311,6 +311,7 @@ export default async function DashboardPage({
   ).map((task) =>
     presentDashboardTask(task, t, setupT)
   );
+  const selectedTeamId = founderTeams.find((team) => team.id === params.team)?.id ?? founderTeams[0]?.id ?? null;
   const supportEmail = "hello@cofoundery.de";
   const profileAvatarId = profileData?.avatar_id?.trim() || null;
   const profileImageUrl = profileAvatarId
@@ -379,39 +380,38 @@ export default async function DashboardPage({
           machten die Seite laenger, nicht klarer. Menschen suchen geht ueber
           FIND in der Leiste, Connect hat dort seinen Zaehler. */}
       <section data-dashboard-hero className="mb-8">
-        <div className="dashboard-panel dashboard-fade-up rounded-[28px] border border-slate-200/80 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.04)] sm:p-6" style={staggerStyle(40)}>
-          <div className="flex items-center gap-3.5">
-            <DashboardProfileAvatar displayName={displayName} avatarId={profileAvatarId} imageUrl={profileImageUrl} />
-            <div className="min-w-0 max-w-3xl">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">{t("hero.eyebrow")}</p>
-              <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.15rem]">
-                {t("hero.greeting", { name: displayName })}
-              </h1>
-            </div>
+        <p className="text-[15px] text-slate-600">{t("hero.greeting", { name: displayName })}</p>
+        <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.35rem]">{t("hero.headline")}</h1>
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          {/* DER NAECHSTE SCHRITT ALS EINE FLAECHE: die Marken-Flaeche ist der einzige Block dieser Art
+              im Kopf und sagt, wo es weitergeht. Das Zitat steht klein darin - auch dann, wenn nichts ansteht. */}
+          <div className="brand-panel flex flex-col gap-3 rounded-3xl p-6 sm:p-8">
+            {primaryAction ? (
+              <>
+                <span className="self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{t("hero.nextStep")}</span>
+                <p className="text-2xl font-semibold leading-snug sm:text-[1.7rem]">{t(`hero.primary.${primaryAction}`)}</p>
+                <p className="max-w-xl text-sm leading-6 text-white">{t(`hero.primaryText.${primaryAction}`)}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-3">
+                  <Link
+                    href={primaryActionHref}
+                    className="inline-flex min-h-11 items-center rounded-xl bg-white px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-50"
+                  >
+                    {t("hero.go")}
+                  </Link>
+                  <Link href="/fragebogen" className="text-sm text-white underline underline-offset-4">{t("hero.allQuestionnaires")}</Link>
+                </div>
+              </>
+            ) : null}
+            <QuoteOfTheDay tone="brand" className="mt-auto" />
           </div>
-          {primaryAction ? (
-            // DER NAECHSTE SCHRITT ALS EINE FLAECHE: die Marken-Flaeche ist der einzige Block dieser Art
-            // auf der Seite und sagt, wo es weitergeht.
-            <div className="brand-panel mt-5 rounded-2xl p-5 sm:p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("hero.nextStep")}</p>
-              <p className="mt-1.5 text-xl font-semibold">{t(`hero.primary.${primaryAction}`)}</p>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-white">{t(`hero.primaryText.${primaryAction}`)}</p>
-              <Link
-                href={primaryActionHref}
-                className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-white px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-50"
-              >
-                {t("hero.go")}
-              </Link>
-            </div>
-          ) : null}
-          {/* Phase 11.5: klein unter der Begruessung, kein eigener Hero. */}
-          <QuoteOfTheDay className="mt-5 max-w-2xl" />
+          <DashboardTeamCard teams={founderTeams} selectedTeamId={params.team ?? null} />
         </div>
       </section>
 
       <DashboardPath
         profile={alignState.profile.submitted ? "done" : alignState.profile.started ? "started" : "open"}
         hasTeam={founderTeams.length > 0}
+        teamId={selectedTeamId}
       />
 
       {taskPresentations.length > 0 ? (
@@ -435,31 +435,50 @@ export default async function DashboardPage({
       </section>
       ) : null}
 
-      <section
-        id="dashboard-block-connections"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] lg:p-6"
-        style={staggerStyle(120)}
-        aria-labelledby="dashboard-connections-title"
-      >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-              <span className="dashboard-icon-chip text-[color:var(--brand-accent)]">
-                <ConnectionsIcon className="h-4 w-4" />
-              </span>
-              {t("team.eyebrow")}
-            </p>
-            <h2 id="dashboard-connections-title" className="mt-2 text-xl font-semibold text-slate-950">
-              {t("team.title")}
-            </h2>
+      {needsOnboarding ? (
+        <section id="dashboard-block-profile" className="mb-8 scroll-mt-28 rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
+          <details id="dashboard-block-profile-data" className="mt-4 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
+            <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+              {t("utilities.profileCreate")}
+            </summary>
+            <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
+            <div className="mt-4 border-t border-slate-200 pt-4">
+              {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als
+                  ein Editor. Wer das Basisprofil ausgefuellt hat, geht auf
+                  /profile. */}
+              {needsOnboarding ? (
+                <ProfileBasicsForm
+                  mode="onboarding"
+                  initialValues={{
+                    display_name: profileData?.display_name ?? null,
+                    focus_skill: profileData?.focus_skill ?? null,
+                    intention: profileData?.intention ?? null,
+                    roles: profileData?.roles ?? null,
+                    avatar_id: profileData?.avatar_id ?? null,
+                    avatar_url: profileData?.avatar_url ?? null,
+                  }}
+                  submitLabel={t("actions.saveProfile")}
+                  onSuccessRedirectTo={contextualDashboardHref}
+                  variant="accent"
+                  fallbackAvatarUrl={profileImageUrl}
+                />
+              ) : null}
+            </div>
+          </details>
+        </section>
+      ) : null}
+
+      <DashboardDeepen />
+
+      <DashboardAreas hasConnect={isNetworkMember} />
+
+      <details id="dashboard-block-connections" className="mb-4 scroll-mt-28 rounded-2xl border border-slate-200 bg-white/80 p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.title")}</summary>
+        <div className="mt-4">
+          <DashboardConnectionCards overview={connectionOverview} />
+          <div className="mt-4 flex justify-end">
+            <Link href="/connections" className={UTILITY_CTA_CLASS}>{teamsT("allConnections")}</Link>
           </div>
-          <Link href="/connections" className={UTILITY_CTA_CLASS}>
-            {teamsT("allConnections")}
-          </Link>
-        </div>
-
-        <DashboardConnectionCards overview={connectionOverview} />
-
         <details className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.moreSummary")}</summary>
           <div className="mt-4">
@@ -511,80 +530,8 @@ export default async function DashboardPage({
             </div>
           </details>
         ) : null}
-      </section>
-
-      <section
-        id="dashboard-block-profile"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
-        style={staggerStyle(130)}
-        aria-labelledby="dashboard-about-title"
-      >
-        <h2 id="dashboard-about-title" className="text-xl font-semibold text-slate-950">{t("aboutYou.title")}</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-600">{t("aboutYou.text")}</p>
-
-        {needsOnboarding ? (
-          <details id="dashboard-block-profile-data" className="mt-4 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
-            <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-              {t("utilities.profileCreate")}
-            </summary>
-            <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
-            <div className="mt-4 border-t border-slate-200 pt-4">
-              {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als
-                  ein Editor. Wer das Basisprofil ausgefuellt hat, geht auf
-                  /profile. */}
-              {needsOnboarding ? (
-                <ProfileBasicsForm
-                  mode="onboarding"
-                  initialValues={{
-                    display_name: profileData?.display_name ?? null,
-                    focus_skill: profileData?.focus_skill ?? null,
-                    intention: profileData?.intention ?? null,
-                    roles: profileData?.roles ?? null,
-                    avatar_id: profileData?.avatar_id ?? null,
-                    avatar_url: profileData?.avatar_url ?? null,
-                  }}
-                  submitLabel={t("actions.saveProfile")}
-                  onSuccessRedirectTo={contextualDashboardHref}
-                  variant="accent"
-                  fallbackAvatarUrl={profileImageUrl}
-                />
-              ) : null}
-            </div>
-          </details>
-        ) : null}
-
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("aboutYou.moreSummary")}</summary>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.ownProfile.title")}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">{t("aboutYou.ownProfile.text")}</p>
-            <Link href="/me/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
-              {t("aboutYou.ownProfile.action")}
-            </Link>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-            <AlignWorkstyleStatus state={alignState} />
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.find.title")}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">
-              {t(`foundation.discovery.states.${discoveryFoundationState}`)}
-            </p>
-            <Link href="/discovery/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
-              {t("foundation.discovery.action")}
-            </Link>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-sm font-semibold text-slate-900">{t("aboutYou.edit.title")}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">{t("utilities.profileEntryHelp")}</p>
-            <Link href="/profile" className="mt-3 inline-block text-sm text-slate-900 underline">
-              {t("aboutYou.edit.action")}
-            </Link>
-          </div>
         </div>
-        </details>
-      </section>
+      </details>
 
       {/* Fruehere Auswertungen: erhalten und erreichbar, aber eingeklappt und
           nur, wenn es etwas gibt. Sie sind Rueckblick, nicht der aktuelle Weg. */}

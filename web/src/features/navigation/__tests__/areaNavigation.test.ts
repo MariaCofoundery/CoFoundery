@@ -173,9 +173,10 @@ test("the connections are reachable near the top of the dashboard", () => {
   const tasksAt = dashboard.indexOf('id="dashboard-block-tasks"');
   const teamsAt = dashboard.indexOf('id="dashboard-block-connections"');
   const linkAt = dashboard.indexOf('href="/connections"', teamsAt);
-  const profileAt = dashboard.indexOf('id="dashboard-block-profile"');
-  assert.ok(tasksAt > -1 && teamsAt > tasksAt, "Teams folgen direkt auf das, was ansteht");
-  assert.ok(linkAt > teamsAt && linkAt < profileAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
+  const legacyAt = dashboard.indexOf('id="dashboard-legacy-title"');
+  assert.ok(tasksAt > -1 && teamsAt > tasksAt, "alle Verbindungen folgen auf das, was ansteht");
+  assert.ok(dashboard.indexOf("<DashboardTeamCard") > -1 && dashboard.indexOf("<DashboardTeamCard") < tasksAt, "das aktuelle Team steht im Kopf");
+  assert.ok(linkAt > teamsAt && linkAt < legacyAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
   assert.match(source(SHELL), /href: "\/connections",\s*label: t\("alignTeam"\)/);
 });
 
