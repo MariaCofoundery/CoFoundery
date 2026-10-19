@@ -155,7 +155,18 @@
       "summary": "Deepen collaboration as a pair",
       "twoOnly": "Read My Mind and Founder in the Wild can currently only be started in teams of exactly two founders. You use the Commitment Lab with the people you are directly connected with."
     },
-    "backShort": "Connections"
+    "backShort": "Connections",
+    "overview": {
+      "nextStep": "Your next step",
+      "go": "Continue",
+      "next": {
+        "work": "Answer your work style questions",
+        "venture": "Add your answers on the venture",
+        "share": "Share your work style with the team",
+        "report": "See how you work together",
+        "setup": "Agree in the Founder Setup"
+      }
+    }
   },
   "teamNavigation": {
     "ariaLabel": "Founder team areas",

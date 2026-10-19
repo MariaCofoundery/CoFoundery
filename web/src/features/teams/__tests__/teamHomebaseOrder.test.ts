@@ -35,9 +35,10 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
     return index;
   };
 
-  const header = at('aria-labelledby="team-founders-title"');
-  const status = at("<TeamJourneyStatus");
-  const understand = at('t("groups.understand.title")');
+  // Kopf, naechster Schritt und die vier Bereiche stehen in TeamOverview.
+  const header = at("<TeamOverview");
+  const status = header;
+  const understand = header;
   const deepen = at('t("groups.discover.title")');
   const agree = at('t("groups.commit.title")');
   const resources = at('t("groups.resources.title")');
@@ -45,14 +46,16 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
   const advisor = at("<FounderRelationshipAdvisorPanel");
 
   // Die Ebenen in der Reihenfolge, in der ein Team sie benutzt.
-  assert.ok(header < status && status < understand, "Kopf und Statuszeile stehen oben");
+  assert.ok(header < deepen, "Kopf und Statuszeile stehen oben");
   assert.ok(understand < deepen && deepen < agree, "die drei Ebenen stehen nicht in Reihenfolge");
   assert.ok(agree < resources && resources < history && history < advisor, "Nachschlagen und Rueckblick stehen nicht am Ende");
 
   // Jedes Angebot sitzt in seiner Ebene.
-  for (const entry of ["/workstyle`}", "ventureHref(team.id, journey.venture)", "/roles`}"]) {
-    assert.ok(at(entry) > understand && at(entry) < deepen, `${entry} steht nicht unter Verstehen`);
+  const overview = source("src/features/teams/TeamOverview.tsx");
+  for (const entry of ["/me/profile/workstyle", "ventureHref(teamId, journey.venture)", "/workstyle`", "/setup`"]) {
+    assert.ok(overview.includes(entry), `${entry} fehlt in den Bereichen des Teamkopfs`);
   }
+  assert.doesNotMatch(overview, /%|percent|von\s+\d|\bscore\b/i);
   for (const entry of ['aria-labelledby="commitment-lab-title"', "<ReadMyMindHomebaseCard", "<FounderInTheWildHomebaseCard"]) {
     assert.ok(at(entry) > deepen && at(entry) < agree, `${entry} steht nicht unter Vertiefen`);
   }
@@ -69,7 +72,7 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
   assert.match(source("src/features/teams/TeamPageHeader.tsx"), /<FounderTeamNavigation/);
   assert.ok(at("<TeamPageHeader") < header, "der Teamkopf steht nicht ganz oben");
   // Teamfreigabe direkt unter dem Kopf, Team verlassen ganz am Ende.
-  assert.ok(at("<TeamShareCard") > status && at("<TeamShareCard") < understand, "die Teamfreigabe steht nicht oben");
+  assert.ok(at("<TeamShareCard") > status && at("<TeamShareCard") < deepen, "die Teamfreigabe steht nicht oben");
   assert.ok(at("<LeaveTeamSection") > advisor, "Team verlassen steht nicht am Ende");
 });
 

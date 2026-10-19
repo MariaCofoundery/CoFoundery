@@ -1,4 +1,4 @@
-import { TeamJourneyStatus, loadTeamJourneyStatus, ventureHref } from "@/features/teams/TeamJourneyStatus";
+import { loadTeamJourneyStatus } from "@/features/teams/TeamJourneyStatus";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -9,6 +9,7 @@ import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHo
 import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/FounderInTheWildHomebaseCard";
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { TeamPageHeader } from "@/features/teams/TeamPageHeader";
+import { TeamOverview } from "@/features/teams/TeamOverview";
 import { TeamShareCard } from "@/features/teams/TeamShareCard";
 import { BetaTeamCard } from "@/features/modules/ui/BetaTeamCard";
 import { TradeoffsTeamCard } from "@/features/modules/ui/TradeoffsTeamCard";
@@ -168,51 +169,21 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           ----------------------------------------------------------------- */}
       <TeamPageHeader teamId={teamId} active="overview" title={title} eyebrow={t("eyebrow")} />
 
-      <header className="mt-5 rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-6">
-        <p className="max-w-3xl text-sm leading-7 text-slate-600">{context}</p>
-        {linkedAdvisors.length > 0 ? (
-          <p className="mt-1 text-sm leading-6 text-slate-600">
-            {t("header.advisors", { names: linkedAdvisors.join(", ") })}
-          </p>
-        ) : null}
-
-        <section className="mt-6" aria-labelledby="team-founders-title">
-          <h2 id="team-founders-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            {t("founders.count", { count: team.members.length })}
-          </h2>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-3">
-            <ul className="flex flex-wrap gap-2">
-              {founderNames.map((name, index) => (
-                <li
-                  key={team.members[index]?.userId ?? name}
-                  className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 py-1 pl-1 pr-4 text-sm font-medium text-slate-900"
-                >
-                  <ProfileAvatar
-                    displayName={name}
-                    avatarId={team.members[index]?.avatarId}
-                    imageUrl={team.members[index]?.avatarUrl}
-                    alt={t("founders.avatarAlt", { name })}
-                    className="h-9 w-9 shrink-0 rounded-full object-cover"
-                    fallbackClassName="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-700"
-                  />
-                  <span className="min-w-0 truncate">{name}</span>
-                </li>
-              ))}
-            </ul>
-            {team.members.length < 4 ? (
-              <Link className={CARD_LINK_CLASS} href={`/invite/new?team=${team.id}`}>
-                {t("membersInvite")}
-              </Link>
-            ) : (
-              <p className="text-xs leading-5 text-slate-500">{t("membersFull")}</p>
-            )}
-          </div>
-        </section>
-
-        <div className="mt-6 border-t border-slate-200 pt-5">
-          <TeamJourneyStatus teamId={team.id} state={journey} />
-        </div>
-      </header>
+      <TeamOverview
+        teamId={team.id}
+        title={title}
+        members={team.members.map((member, index) => ({
+          userId: member.userId,
+          displayName: founderNames[index],
+          avatarId: member.avatarId,
+          avatarUrl: member.avatarUrl,
+        }))}
+        journey={journey}
+        canInvite={team.members.length < 4}
+      />
+      {linkedAdvisors.length > 0 ? (
+        <p className="mt-3 text-sm leading-6 text-slate-600">{t("header.advisors", { names: linkedAdvisors.join(", ") })}</p>
+      ) : null}
 
       <div className="mt-5">
         <TeamShareCard
@@ -225,41 +196,6 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
       </div>
 
       <div className="mt-8 grid gap-10">
-        {/* VERSTEHEN: drei Einstiege, jeder mit genau einer Aktion. */}
-        <section aria-labelledby="team-understand-title">
-          <h2 id="team-understand-title" className={GROUP_TITLE_CLASS}>{t("groups.understand.title")}</h2>
-          <p className={GROUP_TEXT_CLASS}>{t("groups.understand.text")}</p>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <article className={CARD_CLASS} aria-labelledby="team-understand-workstyle">
-              <h3 id="team-understand-workstyle" className="text-base font-semibold text-slate-950">{t("understand.workstyle.title")}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{t("understand.workstyle.text")}</p>
-              <div className="mt-auto pt-4">
-                <Link className={CARD_LINK_CLASS} href={`/teams/${team.id}/workstyle`}>{t("understand.workstyle.action")}</Link>
-              </div>
-            </article>
-            <article className={CARD_CLASS} aria-labelledby="team-understand-venture">
-              <h3 id="team-understand-venture" className="text-base font-semibold text-slate-950">{t("understand.venture.title")}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{t("understand.venture.text")}</p>
-              <div className="mt-auto pt-4">
-                <Link className={CARD_LINK_CLASS} href={ventureHref(team.id, journey.venture)}>
-                  {journey.venture === "present"
-                    ? t("understand.venture.view")
-                    : journey.venture === "inProgress"
-                      ? t("understand.venture.continue")
-                      : t("understand.venture.begin")}
-                </Link>
-              </div>
-            </article>
-            <article className={CARD_CLASS} aria-labelledby="team-understand-roles">
-              <h3 id="team-understand-roles" className="text-base font-semibold text-slate-950">{t("understand.roles.title")}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{t("understand.roles.text")}</p>
-              <div className="mt-auto pt-4">
-                <Link className={CARD_LINK_CLASS} href={`/teams/${team.id}/roles`}>{t("understand.roles.action")}</Link>
-              </div>
-            </article>
-          </div>
-        </section>
-
         {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
             Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
             freigegeben haben. Hier steht nur die eigene Lage. */}
@@ -272,7 +208,6 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("deepen.summary")}</summary>
         <section className="mt-4" aria-labelledby="team-deepen-title">
           <h2 id="team-deepen-title" className={GROUP_TITLE_CLASS}>{t("groups.discover.title")}</h2>
-          <p className={GROUP_TEXT_CLASS}>{t("groups.discover.text")}</p>
           {isNewPair ? (
             <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 px-5 py-4 text-sm leading-7 text-slate-700">
               {t("groups.whereToStart")}
@@ -358,13 +293,11 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             Mitglieder bestaetigt haben. */}
         <section aria-labelledby="team-agree-title">
           <h2 id="team-agree-title" className={GROUP_TITLE_CLASS}>{t("groups.commit.title")}</h2>
-          <p className={GROUP_TEXT_CLASS}>{t("groups.commit.text")}</p>
           <article
             className="mt-4 rounded-2xl border border-violet-200/80 bg-violet-50/40 p-5 sm:p-6"
             aria-labelledby="team-setup-title"
           >
             <h3 id="team-setup-title" className="text-lg font-semibold text-slate-950">{t("setup.title")}</h3>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{t("setup.description")}</p>
             <p className="mt-4 text-sm font-medium text-slate-800">
               {setupCounts
                 ? setupT("summary", {

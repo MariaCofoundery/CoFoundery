@@ -155,7 +155,18 @@
       "summary": "Zusammenarbeit zu zweit vertiefen",
       "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
     },
-    "backShort": "Verbindungen"
+    "backShort": "Verbindungen",
+    "overview": {
+      "nextStep": "Euer nächster Schritt",
+      "go": "Weiter",
+      "next": {
+        "work": "Deine Arbeitsweise beantworten",
+        "venture": "Deine Angaben zum Vorhaben machen",
+        "share": "Deine Arbeitsweise mit dem Team teilen",
+        "report": "Euer Zusammenspiel ansehen",
+        "setup": "Im Founder Setup vereinbaren"
+      }
+    }
   },
   "teamNavigation": {
     "ariaLabel": "Bereiche des Founder-Teams",

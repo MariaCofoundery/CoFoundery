@@ -64,14 +64,17 @@ test("homebase presents localized real avatars with initials fallback in the int
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");
   const de = JSON.parse(readFileSync("messages/de/teams.json", "utf8"));
   const en = JSON.parse(readFileSync("messages/en/teams.json", "utf8"));
-  assert.match(page, /<ProfileAvatar/);
-  assert.match(page, /displayName=\{name\}/);
-  assert.match(page, /avatarId=\{team\.members\[index\]\?\.avatarId\}/);
-  assert.match(page, /imageUrl=\{team\.members\[index\]\?\.avatarUrl\}/);
+  // Seit dem Umbau der Teamseite zeigt TeamOverview die Menschen im Kopf.
+  const overview = readFileSync("src/features/teams/TeamOverview.tsx", "utf8");
+  assert.match(overview, /<ProfileAvatar/);
+  assert.match(overview, /displayName=\{member\.displayName\}/);
+  assert.match(overview, /avatarId=\{member\.avatarId\}/);
+  assert.match(overview, /imageUrl=\{member\.avatarUrl\}/);
+  assert.match(page, /avatarUrl: member\.avatarUrl/);
   assert.equal(de.homebase.founders.avatarAlt, "Profil von {name}");
   assert.equal(en.homebase.founders.avatarAlt, "Profile for {name}");
 
-  const founder = page.indexOf('aria-labelledby="team-founders-title"');
+  const founder = page.indexOf("<TeamOverview");
   const alignment = page.indexOf('aria-labelledby="team-alignment-title"');
   const setup = page.indexOf('aria-labelledby="team-setup-title"');
   const agreements = page.indexOf('aria-labelledby="team-agreements-title"');
