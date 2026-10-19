@@ -487,19 +487,28 @@ export function ProductShell({
     // Muster, und auf den Unterseiten fehlte die Reihe teilweise ganz.
     subItems: [
       {
-        href: "/discovery/suche",
-        label: t("findYourSearch"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/suche"),
+        href: "/discovery",
+        label: t("findDiscover"),
+        isActive: (currentPathname: string) =>
+          currentPathname === "/discovery" ||
+          currentPathname.startsWith("/discovery/saved") ||
+          /^\/discovery\/(?!intros|profile|suche|searches)[^/]+/.test(currentPathname),
+      },
+      {
+        href: "/discovery/intros",
+        label: t("findIntros"),
+        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/intros"),
+        ...(incomingOpenRequestCount > 0
+          ? { count: { value: incomingOpenRequestCount, label: t("findIntroCount", { count: incomingOpenRequestCount }) } }
+          : {}),
       },
       {
         href: "/discovery/profile",
-        label: t("findProfile"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/profile"),
-      },
-      {
-        href: "/discovery/searches",
-        label: t("findSearches"),
-        isActive: (currentPathname: string) => currentPathname.startsWith("/discovery/searches"),
+        label: t("findMyProfile"),
+        isActive: (currentPathname: string) =>
+          currentPathname.startsWith("/discovery/profile") ||
+          currentPathname.startsWith("/discovery/suche") ||
+          currentPathname.startsWith("/discovery/searches"),
       },
     ],
   };
@@ -512,10 +521,21 @@ export function ProductShell({
     // Der Problem-Hub hat einen eigenen Einstieg. Die Discovery-Reiter mit
     // Bestandszaehlern bleiben zusaetzlich auf den jeweiligen Uebersichtsseiten.
     subItems: [
-      { href: "/connect", label: tConnect("beta.discover"), isActive: (path: string) => path === "/connect" || /^\/connect\/(people|listings)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")) },
-      { href: "/connect/problems", label: tConnect("problemHub.nav"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
-      { href: "/connect/suggestions", label: tConnect("suggestions.title"), isActive: (path: string) => path.startsWith("/connect/suggestions"), ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}) },
-      { href: "/connect/my", label: tConnect("beta.mine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
+      {
+        href: "/connect",
+        label: t("connectDiscover"),
+        isActive: (path: string) => path === "/connect" || /^\/connect\/(people|listings|suggestions)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")),
+        // Die Vorschlaege stehen als Streifen oben auf Entdecken; die Zahl bleibt hier, nicht rot.
+        ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}),
+      },
+      { href: "/connect/problems", label: t("connectProblems"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
+      {
+        href: "/connect/contacts",
+        label: t("connectContacts"),
+        isActive: (path: string) => path.startsWith("/connect/contacts") || path.startsWith("/connect/messages"),
+        ...(connectAttentionCount > 0 ? { count: { value: connectAttentionCount, label: t("connectAttentionBadge", { count: connectAttentionCount }) } } : {}),
+      },
+      { href: "/connect/my", label: t("connectMine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
     ],
   };
 

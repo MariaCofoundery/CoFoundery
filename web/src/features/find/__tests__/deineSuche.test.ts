@@ -209,8 +209,11 @@ test("die eigene Suche steht auf jeder FIND-Seite", () => {
     join("src", "features", "navigation", "ProductShell.tsx"),
     "utf8",
   );
-  assert.match(shell, /href: "\/discovery\/suche"/);
-  assert.match(shell, /t\("findYourSearch"\)/);
+  // Seit der Neuaufteilung (Okt. 2026) steht die Suche unter „Mein Find-Profil“: Der Reiter
+  // deckt /discovery/suche und /discovery/searches mit ab, und die Profilseite verlinkt sie.
+  assert.match(shell, /href: "\/discovery\/profile"/);
+  assert.match(shell, /startsWith\("\/discovery\/suche"\)/);
+  assert.match(readFileSync(join("src", "app", "(product)", "discovery", "profile", "page.tsx"), "utf8"), /href="\/discovery\/suche"/);
 
   // Und nicht zweimal: Zwei Wege zu denselben Seiten heißt, dass man sich
   // angewöhnt, in beiden zu suchen.

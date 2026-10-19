@@ -17,7 +17,6 @@ const OWN_PAGES = [
   "/connect/profile",
   "/connect/my",
   "/connect/ventures/mine",
-  "/connect/suggestions",
 ];
 
 /**

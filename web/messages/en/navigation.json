@@ -72,5 +72,13 @@
   "alignQuestionnaires": "Questionnaires",
   "alignProfile": "Profile",
   "alignTeam": "Team",
-  "betaBadge": "Beta"
+  "betaBadge": "Beta",
+  "findDiscover": "Discover",
+  "findIntros": "Introductions",
+  "findIntroCount": "{count, plural, one {# open request} other {# open requests}}",
+  "findMyProfile": "My Find profile",
+  "connectDiscover": "Discover",
+  "connectProblems": "Problems",
+  "connectContacts": "Contacts",
+  "connectMine": "My Connect"
 }

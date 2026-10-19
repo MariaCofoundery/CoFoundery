@@ -105,14 +105,14 @@ test("alle drei Bereiche tragen ihre Ziele in der Leiste", () => {
     "/connections",
     "/founder-library",
     // Find
-    "/discovery/suche",
+    "/discovery",
+    "/discovery/intros",
     "/discovery/profile",
-    "/discovery/searches",
     // Connect
     "/connect",
     "/connect/problems",
+    "/connect/contacts",
     "/connect/my",
-    "/connect/suggestions",
   ]) {
     assert.ok(shell.includes(`href: "${href}"`), `${href} steht nicht in der Leiste`);
   }
