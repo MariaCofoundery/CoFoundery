@@ -60,14 +60,14 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
             {team.members.length !== 2 ? (
               <p className="text-sm text-slate-600">{t("twoFounders")}</p>
             ) : openRound ? (
-              <Link href={founderInTheWildRoundHref(teamId, openRound.id)} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white">
+              <Link href={founderInTheWildRoundHref(teamId, openRound.id)} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold">
                 {t(openRound.ownAnswerComplete ? "status" : "continue")}
               </Link>
             ) : anyOpen ? (
               <p className="shrink-0 text-sm text-slate-500">{t("otherRoundOpen")}</p>
             ) : (
               <form action={startFounderInTheWildRoundAction.bind(null, teamId, pack.key)}>
-                <button type="submit" className="min-h-11 shrink-0 rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-violet-500">
+                <button type="submit" className="min-h-11 shrink-0 rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-violet-500">
                   {t("start")}
                 </button>
               </form>

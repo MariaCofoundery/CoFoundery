@@ -20,7 +20,7 @@ export function ReadMyMindProgress({ current, total, label }: {
                 position < current
                   ? "bg-violet-400"
                   : position === current
-                    ? "scale-y-150 bg-violet-700"
+                    ? "scale-y-150 brand-cta"
                     : "bg-slate-200"
               }`}
             />

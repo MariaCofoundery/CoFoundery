@@ -59,7 +59,7 @@ function ChoiceGroup({ legend, slot, locale, labels, selected, setSelected, enab
 function SubmitButton({ labels, disabled }: { labels: Labels; disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={disabled || pending} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(109,40,217,0.2)] transition-[transform,background-color,box-shadow] duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-800 motion-safe:active:translate-y-0 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0">
+    <button type="submit" disabled={disabled || pending} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl brand-cta px-5 py-3 text-sm font-semibold transition-[transform,background-color,box-shadow] duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-800 motion-safe:active:translate-y-0 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0">
       <span aria-hidden="true" className={`transition-transform duration-200 motion-reduce:transition-none ${pending ? "scale-100" : "scale-90"}`}>✓</span>
       {pending ? labels.submitPending : labels.submit}
     </button>

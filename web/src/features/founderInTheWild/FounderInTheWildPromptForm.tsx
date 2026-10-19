@@ -6,7 +6,7 @@ import type { FounderInTheWildPromptState } from "./founderInTheWildModel";
 
 function Submit({ label, pendingLabel, disabled }: { label: string; pendingLabel: string; disabled: boolean }) {
   const { pending } = useFormStatus();
-  return <button type="submit" disabled={disabled || pending} className="min-h-12 rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 disabled:bg-slate-300">{pending ? pendingLabel : label}</button>;
+  return <button type="submit" disabled={disabled || pending} className="min-h-12 rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 disabled:bg-slate-300">{pending ? pendingLabel : label}</button>;
 }
 
 export function FounderInTheWildPromptForm({ prompt, locale, action, labels }: { prompt: FounderInTheWildPromptState; locale: "de" | "en"; action: (data: FormData) => void | Promise<void>; labels: { move: string; matters: string; mattersHint: string; need: string; guess: string; guessHint: string; lock: string; locking: string; warning: string } }) {
