@@ -7,6 +7,39 @@ type Member = { userId: string; displayName: string; avatarId?: string | null; a
 type StepKey = "work" | "venture" | "report" | "setup";
 type Tone = "done" | "doing" | "open";
 
+/** Kleine Bildzeichen, rein beschreibend: Person, Vorhaben, Ueberlappung, Absprache. */
+function StepGlyph({ name }: { name: StepKey }) {
+  const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+  if (name === "work")
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5" />
+      </svg>
+    );
+  if (name === "venture")
+    return (
+      <svg {...common}>
+        <path d="M6 21V4" />
+        <path d="M6 5h11l-2.5 3.5L17 12H6" />
+      </svg>
+    );
+  if (name === "report")
+    return (
+      <svg {...common}>
+        <circle cx="9" cy="12" r="5.5" />
+        <circle cx="15" cy="12" r="5.5" />
+      </svg>
+    );
+  return (
+    <svg {...common}>
+      <rect x="5" y="4" width="14" height="17" rx="2.5" />
+      <path d="M9 9.5l1.5 1.5L14 7.5" />
+      <path d="M9 15.5h6" />
+    </svg>
+  );
+}
+
 /**
  * Kopf der Teamseite: Menschen, ein naechster Schritt, vier Bereiche als Kacheln.
  * Zustaende stehen als Text UND Punkt (nie nur Farbe), es gibt keinen
@@ -100,14 +133,14 @@ export async function TeamOverview({
       </section>
 
       <ul aria-label={t("journey.label")} className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map((key, index) => (
+        {steps.map((key) => (
           <li key={key} className="min-w-0">
             <Link
               href={href[key]}
               className="flex h-full flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-violet-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-sky-600 text-sm font-semibold text-white">
-                {index + 1}
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-sky-600 text-white">
+                <StepGlyph name={key} />
               </span>
               <span className="text-base font-semibold text-slate-950">{t(`journey.items.${key}`)}</span>
               <span className="mt-auto inline-flex items-center gap-2 text-sm text-slate-600">
