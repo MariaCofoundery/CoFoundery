@@ -1,8 +1,7 @@
 import { VENTURE_CORE_MODULE } from "@/features/modules/definitions";
-import { findVersionOfInstrument } from "@/features/modules/registry";
+import { statusFromAssessmentRows } from "@/features/modules/adapters/shared";
 import {
   ModuleContextError,
-  type AssessmentRow,
   type ModuleAdapter,
   type ModuleContext,
   type ModuleStatus,
@@ -31,35 +30,17 @@ import {
  * „unavailable") und wird nicht still zu „offen".
  */
 
-function rowsOf(context: ModuleContext, ventureId: string): AssessmentRow[] {
-  if (context.ventureAssessments === undefined) {
-    throw new ModuleContextError("module_context_missing_venture_assessments");
-  }
-  if (context.ventureAssessments === null) throw new ModuleContextError("module_data_unavailable");
-
-  const rows = context.ventureAssessments.filter(
-    (row) =>
-      row.venture_id === ventureId &&
-      findVersionOfInstrument(VENTURE_CORE_MODULE.moduleId, row.instrument_id) !== null
-  );
-  // Neueste zuerst; ohne Zeitstempel gilt die gelieferte Reihenfolge.
-  return [...rows].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-}
-
 function requireVenture(context: ModuleContext): string {
   if (!context.ventureId) throw new ModuleContextError("module_context_missing_venture");
   return context.ventureId;
 }
 
 function statusOf(context: ModuleContext): ModuleStatus {
-  const rows = rowsOf(context, requireVenture(context));
-  const submitted = rows.find((row) => row.submitted_at);
-  if (submitted) {
-    const version = findVersionOfInstrument(VENTURE_CORE_MODULE.moduleId, submitted.instrument_id);
-    return { state: "done_for_now", completedVersion: version?.versionId ?? null };
+  const ventureId = requireVenture(context);
+  if (context.ventureAssessments === undefined) {
+    throw new ModuleContextError("module_context_missing_venture_assessments");
   }
-  if (rows.length > 0) return { state: "in_progress", completedVersion: null };
-  return { state: "not_started", completedVersion: null };
+  return statusFromAssessmentRows(context.ventureAssessments, ventureId, VENTURE_CORE_MODULE.moduleId);
 }
 
 export const ventureCoreAdapter: ModuleAdapter = {

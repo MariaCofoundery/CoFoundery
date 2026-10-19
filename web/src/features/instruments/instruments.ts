@@ -78,6 +78,18 @@ export const INSTRUMENT_IDS = [
   "founder-workstyle-pretest-8-5a-v1",
   "founder-workstyle-pretest-8-5a-v2",
   "founder-workstyle-pretest-8-5a-v3",
+  /**
+   * Seit 19.10.2026, Status `draft`: „Werte & Zielkonflikte", das erste echte
+   * Vertiefungsmodul (Module Architecture v1.0, Phase D). Vier Situationen
+   * (W03-W06), eigener Lebenszyklus, eigene Abgabe.
+   *
+   * Warum eine eigene Kennung und kein Teil von `venture-alignment-v1`: Eine
+   * abgegebene Fassung ist unveraenderlich - eine freiwillige Vertiefung
+   * koennte darin nie nachtraeglich beantwortet werden. Die vier Situationen
+   * stehen in `venture-alignment-v1` weiter als historische Antworten; sie
+   * werden nicht umgeschrieben und nicht stillschweigend uebernommen.
+   */
+  "venture-tradeoffs-v1",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
@@ -120,6 +132,8 @@ export const ALIGNMENT_V21_INSTRUMENT_ID: InstrumentId = "founder-alignment-v2-1
  */
 export const FOUNDER_PROFILE_INSTRUMENT_ID: InstrumentId = "founder-profile-v1";
 export const VENTURE_ALIGNMENT_INSTRUMENT_ID: InstrumentId = "venture-alignment-v1";
+/** Werte & Zielkonflikte - eine Vertiefung des Vorhabens, nicht Teil von `venture-alignment-v1`. */
+export const VENTURE_TRADEOFFS_INSTRUMENT_ID: InstrumentId = "venture-tradeoffs-v1";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);

@@ -1,0 +1,80 @@
+{
+  "backToProfile": "Zurück zu „So willst du gründen“",
+  "eyebrow": "Freiwillige Vertiefung",
+  "title": "Werte & Zielkonflikte",
+  "intro": "Manche Entscheidungen sind schwierig, weil zwei wichtige Dinge gleichzeitig richtig sein können. In vier Situationen kannst du anschauen, was dir bei diesem Vorhaben wichtiger wäre.",
+  "points": {
+    "noRight": "Es gibt keine richtigen oder falschen Antworten.",
+    "thisVenture": "Deine Antworten gelten für dieses Vorhaben.",
+    "optional": "Das ist freiwillig und unabhängig davon, ob du den Fragebogen zum Vorhaben abgeschlossen hast.",
+    "private": "Nur du siehst deine Antworten."
+  },
+  "start": "Situationen ansehen",
+  "startPending": "Wird vorbereitet …",
+  "legacy": {
+    "title": "Du hast ähnliche Situationen schon einmal beantwortet.",
+    "text": "Möchtest du deine bisherigen Antworten als Ausgangspunkt übernehmen? Du kannst sie prüfen und ändern. Abgegeben wird erst, wenn du es selbst tust.",
+    "take": "Bisherige Antworten als Ausgangspunkt übernehmen",
+    "fresh": "Neu beginnen"
+  },
+  "from": {
+    "legacy": "Deine früheren Antworten aus dem Fragebogen zum Vorhaben stehen hier als Ausgangspunkt. Prüfe sie und ändere, was heute anders ist.",
+    "previous": "Deine letzte Abgabe steht hier als Ausgangspunkt. Prüfe sie und ändere, was heute anders ist."
+  },
+  "same": {
+    "legacy": "Wie in deiner früheren Antwort",
+    "previous": "Wie in deiner letzten Abgabe"
+  },
+  "flow": {
+    "situation": "Situation {index}",
+    "saved": "Gespeichert",
+    "saving": "Wird gespeichert …",
+    "notSaved": "Nicht gespeichert – bitte noch einmal versuchen",
+    "submit": "Abgeben",
+    "submitPending": "Wird abgegeben …",
+    "submitHint": "Wenn alle vier Situationen beantwortet sind, kannst du abgeben. „Ich kann das noch nicht entscheiden“ ist eine gültige Antwort.",
+    "errors": {
+      "incomplete": "Eine Situation ist noch offen.",
+      "generic": "Das konnte nicht abgegeben werden. Deine Antworten sind gespeichert – versuch es gleich noch einmal."
+    }
+  },
+  "result": {
+    "title": "Deine Antworten",
+    "intro": "Das sind deine Gewichtungen und Wege in den vier Situationen, so wie du sie angegeben hast. Es sind Gesprächsanlässe, keine Bewertung.",
+    "private": "Nur du siehst diese Antworten.",
+    "submittedOn": "Abgegeben am {date}",
+    "noAnswer": "Zu dieser Situation liegt keine Antwort vor.",
+    "update": "Noch einmal ansehen",
+    "updateHint": "Dein letzter Stand bleibt gültig, bis du eine neue Fassung abgibst.",
+    "draftTitle": "Ein neuer Durchlauf läuft",
+    "draftText": "Deine letzte Abgabe bleibt gültig, bis du die neue abgibst.",
+    "draftContinue": "Weitermachen",
+    "statement": {
+      "weights_equal": "Beide Aspekte waren dir gleich wichtig ({level}).",
+      "weights_more": "Du hast „{more}“ stärker gewichtet als „{less}“.",
+      "weights_more_high": "Hier war dir „{more}“ wichtiger, obwohl „{less}“ ebenfalls {lessLevel} war.",
+      "path": "Als ersten Weg würdest du „{path}“ wählen.",
+      "path_other": "Als ersten Weg würdest du etwas anderes wählen.",
+      "path_unknown": "Welchen Weg du zuerst wählen würdest, ist für dich noch offen.",
+      "path_against_weight": "Den ersten Weg würdest du bei „{pathConcern}“ gehen, auch wenn dir „{more}“ wichtiger war.",
+      "not_decided": "{label}"
+    }
+  },
+  "situations": {
+    "W03": "Wirkung oder Überschuss",
+    "W04": "Abstimmen oder starten",
+    "W05": "Reserve oder Markttest",
+    "W06": "Gleich verteilen oder nach Beitrag"
+  },
+  "teaser": {
+    "path": "{situation}: zuerst „{path}“",
+    "open": "{situation}: noch offen"
+  },
+  "errors": {
+    "setup_missing": "Diese Vertiefung ist in dieser Umgebung noch nicht eingerichtet.",
+    "no_permission": "Dafür fehlt die Berechtigung.",
+    "draft_create_failed": "Das konnte nicht angelegt werden. Bitte versuch es noch einmal.",
+    "value_rejected": "Diese Angabe wurde nicht angenommen.",
+    "unreachable": "Gerade nicht erreichbar. Bitte versuch es gleich noch einmal."
+  }
+}

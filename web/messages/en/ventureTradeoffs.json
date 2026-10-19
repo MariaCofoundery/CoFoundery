@@ -1,0 +1,80 @@
+{
+  "backToProfile": "Back to “How you want to build”",
+  "eyebrow": "Optional deepening",
+  "title": "Values and trade-offs",
+  "intro": "Some decisions are hard because two important things can both be right at the same time. In four situations you can look at what would matter more to you in this venture.",
+  "points": {
+    "noRight": "There are no right or wrong answers.",
+    "thisVenture": "Your answers apply to this venture.",
+    "optional": "This is optional and independent of whether you have completed the venture questionnaire.",
+    "private": "Only you can see your answers."
+  },
+  "start": "Look at the situations",
+  "startPending": "Preparing …",
+  "legacy": {
+    "title": "You have answered similar situations before.",
+    "text": "Would you like to use your earlier answers as a starting point? You can review and change them. Nothing is submitted until you do it yourself.",
+    "take": "Use my earlier answers as a starting point",
+    "fresh": "Start fresh"
+  },
+  "from": {
+    "legacy": "Your earlier answers from the venture questionnaire are shown here as a starting point. Review them and change whatever is different today.",
+    "previous": "Your last submission is shown here as a starting point. Review it and change whatever is different today."
+  },
+  "same": {
+    "legacy": "Same as your earlier answer",
+    "previous": "Same as your last submission"
+  },
+  "flow": {
+    "situation": "Situation {index}",
+    "saved": "Saved",
+    "saving": "Saving …",
+    "notSaved": "Not saved – please try again",
+    "submit": "Submit",
+    "submitPending": "Submitting …",
+    "submitHint": "Once all four situations are answered, you can submit. “I can’t decide that yet” is a valid answer.",
+    "errors": {
+      "incomplete": "One situation is still open.",
+      "generic": "This could not be submitted. Your answers are saved – please try again in a moment."
+    }
+  },
+  "result": {
+    "title": "Your answers",
+    "intro": "These are your weightings and paths in the four situations, as you gave them. They are conversation starters, not an assessment.",
+    "private": "Only you can see these answers.",
+    "submittedOn": "Submitted on {date}",
+    "noAnswer": "There is no answer for this situation.",
+    "update": "Take another look",
+    "updateHint": "Your last submission stays valid until you submit a new version.",
+    "draftTitle": "A new run is in progress",
+    "draftText": "Your last submission stays valid until you submit the new one.",
+    "draftContinue": "Continue",
+    "statement": {
+      "weights_equal": "Both aspects were equally important to you ({level}).",
+      "weights_more": "You weighted “{more}” more strongly than “{less}”.",
+      "weights_more_high": "Here “{more}” mattered more to you, although “{less}” was also {lessLevel}.",
+      "path": "As a first path, you would choose “{path}”.",
+      "path_other": "As a first path, you would choose something else.",
+      "path_unknown": "Which path you would choose first is still open for you.",
+      "path_against_weight": "You would take the first path at “{pathConcern}”, even though “{more}” mattered more to you.",
+      "not_decided": "{label}"
+    }
+  },
+  "situations": {
+    "W03": "Impact or surplus",
+    "W04": "Align first or start",
+    "W05": "Reserve or market test",
+    "W06": "Split equally or by contribution"
+  },
+  "teaser": {
+    "path": "{situation}: first “{path}”",
+    "open": "{situation}: still open"
+  },
+  "errors": {
+    "setup_missing": "This deepening is not set up in this environment yet.",
+    "no_permission": "You do not have permission for this.",
+    "draft_create_failed": "This could not be created. Please try again.",
+    "value_rejected": "This entry was not accepted.",
+    "unreachable": "Not reachable right now. Please try again in a moment."
+  }
+}

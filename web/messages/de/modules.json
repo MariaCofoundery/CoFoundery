@@ -18,5 +18,9 @@
   "venture_core": {
     "title": "So willst du gründen",
     "summary": "Deine Sicht auf ein konkretes Vorhaben: Ziele, Zeit, Geld und Zusammenarbeit."
+  },
+  "venture_tradeoffs": {
+    "title": "Werte & Zielkonflikte",
+    "summary": "Vier Situationen, in denen zwei wichtige Dinge gleichzeitig richtig sein können – und was dir bei diesem Vorhaben wichtiger wäre."
   }
 }

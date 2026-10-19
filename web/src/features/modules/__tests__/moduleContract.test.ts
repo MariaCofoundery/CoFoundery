@@ -10,6 +10,7 @@ import {
   MODULE_DEFINITIONS,
   STRENGTHS_MODULE,
   VENTURE_CORE_MODULE,
+  VENTURE_TRADEOFFS_MODULE,
   WORKSTYLE_MODULE,
 } from "@/features/modules/definitions";
 import {
@@ -225,9 +226,13 @@ test("assertModuleRegistry nennt alle Verstoesse und wirft", () => {
 // Die Registry der fuenf Bestandsmodule
 // ---------------------------------------------------------------------------
 
-test("registriert sind genau Workstyle, Strengths, Capability, Direction und Venture-Core", () => {
-  assert.deepEqual(MODULE_REGISTRY.map((def) => def.moduleId), ["workstyle", "strengths", "capability", "direction", "venture_core"]);
+test("registriert sind die fuenf Bestandsmodule und das erste native Modul", () => {
+  assert.deepEqual(MODULE_REGISTRY.map((def) => def.moduleId), [
+    "workstyle", "strengths", "capability", "direction", "venture_core", "venture_tradeoffs",
+  ]);
   assert.deepEqual(MODULE_DEFINITIONS.map((def) => def.moduleId), MODULE_REGISTRY.map((def) => def.moduleId));
+  // Genau ein Modul ist nativ - alle anderen sind Bestandsadapter.
+  assert.deepEqual(MODULE_REGISTRY.filter((def) => !def.legacyAdapter).map((def) => def.moduleId), ["venture_tradeoffs"]);
 });
 
 test("die Registry erfuellt den Contract - mit echtem Setup-Katalog und echten Sprachtexten", () => {
@@ -253,11 +258,16 @@ test("storage ist der Antwortspeicher, bindsTo der Freigabevertrag - beides getr
   for (const def of [STRENGTHS_MODULE, CAPABILITY_MODULE, DIRECTION_MODULE]) {
     assert.equal(def.input.storage, "existing", def.moduleId);
   }
-  // Alle fuenf teilen nach ihrem bestehenden Vertrag und sind ausdruecklich als bestehende Adapter markiert.
-  for (const def of MODULE_REGISTRY) {
+  // Die Bestandsmodule teilen nach ihrem bestehenden Vertrag und sind ausdruecklich als bestehende Adapter markiert.
+  for (const def of MODULE_REGISTRY.filter((candidate) => candidate.moduleId !== "venture_tradeoffs")) {
     assert.equal(def.sharing.bindsTo, "existing_contract", def.moduleId);
     assert.equal(def.legacyAdapter, true, def.moduleId);
   }
+  // Das native Modul: eigenes Instrument in assessments, Freigabe (spaeter) an den Durchlauf, KEIN Bestandsmarker.
+  assert.equal(VENTURE_TRADEOFFS_MODULE.input.storage, "assessments");
+  assert.equal(VENTURE_TRADEOFFS_MODULE.sharing.bindsTo, "assessment");
+  assert.equal(VENTURE_TRADEOFFS_MODULE.legacyAdapter, undefined);
+  assert.equal(VENTURE_TRADEOFFS_MODULE.versions[0]?.instrumentId, "venture-tradeoffs-v1");
 });
 
 test("bindsTo = existing_contract bei assessments gilt nur mit dem Marker legacyAdapter - nie geraten", () => {
@@ -305,11 +315,14 @@ test("Workstyle und Venture tragen ihre echte Instrument-Version", () => {
 });
 
 test("die Bestandsmodule behaupten keinen Vergleichsvertrag und keine Team-Sicht", () => {
-  for (const def of MODULE_REGISTRY) {
+  for (const def of MODULE_REGISTRY.filter((candidate) => candidate.legacyAdapter)) {
     assert.equal(def.compare, undefined, `${def.moduleId}: Compare Contracts folgen in Phase E und F`);
     assert.equal(def.renderers.comparison, undefined, def.moduleId);
     assert.equal(def.renderers.teamView, undefined, def.moduleId);
   }
+  // Auch das native Modul hat noch keinen Vergleichs-Renderer: Der Vertrag ist beschrieben, der Vergleich folgt in Phase E.
+  assert.equal(VENTURE_TRADEOFFS_MODULE.renderers.comparison, undefined);
+  assert.equal(VENTURE_TRADEOFFS_MODULE.renderers.teamView, undefined);
 });
 
 test("Renderer-Verweise zeigen auf Routen und Profilabschnitte, die es gibt", () => {

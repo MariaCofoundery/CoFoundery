@@ -56,6 +56,11 @@ const ERLAUBT = [
   // FRAGEN kommen aus ihren eigenen Registraturen.
   join("src", "app", "(product)", "founder-alignment", "profil") + sep,
   join("src", "app", "(product)", "founder-alignment", "vorhaben") + sep,
+  // „Werte & Zielkonflikte" (Phase D): vier Situationen aus dem Vorhaben-Bogen mit eigenem Instrument. Wie
+  // die beiden neuen Boegen benutzt das Modul Pruefung und Eingabefeld von v2.1; die FRAGEN kommen aus
+  // seiner eigenen Registry (`docs/venture-tradeoffs-registry-v1.json`).
+  join("src", "features", "modules", "tradeoffs") + sep,
+  join("src", "features", "modules", "ui", "TradeoffsFlow.tsx"),
   join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
   join("src", "app", "(product)", "founder-alignment", "suche") + sep,
   // Das eigene Gesamtbild. Seit dem 30.09.2026 zeigt es das aktuelle

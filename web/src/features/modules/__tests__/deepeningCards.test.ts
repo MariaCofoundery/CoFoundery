@@ -60,10 +60,12 @@ const resolver =
 // Neutralitaet: ohne registrierte Vertiefungen aendert sich nichts
 // ---------------------------------------------------------------------------
 
-test("die echte Registry hat keine Vertiefung - die Karten sind im heutigen Produkt unsichtbar", () => {
-  assert.deepEqual(MODULE_REGISTRY.filter((def) => def.tier === "deepening"), []);
-  for (const def of MODULE_REGISTRY) {
-    assert.deepEqual(deepeningsOf(def.moduleId), [], def.moduleId);
+test("die echte Registry hat genau eine Vertiefung - die Karten der anderen Bereiche bleiben unsichtbar", () => {
+  assert.deepEqual(MODULE_REGISTRY.filter((def) => def.tier === "deepening").map((def) => def.moduleId), ["venture_tradeoffs"]);
+  // Nur das Vorhaben hat eine; alle Person-Bereiche und das Vorhaben-Modul selbst bleiben ohne Karte.
+  assert.deepEqual(deepeningsOf("venture_core").map((def) => def.moduleId), ["venture_tradeoffs"]);
+  for (const anchor of ["workstyle", "strengths", "capability", "direction", "venture_tradeoffs"]) {
+    assert.deepEqual(deepeningsOf(anchor), [], anchor);
   }
   assert.deepEqual(deepeningsOf("gibt_es_nicht"), []);
   assert.deepEqual(buildDeepeningCards([], () => null), { visible: [], more: [] });
@@ -150,7 +152,7 @@ test("Scope-Trennung im Kartenmodell: Person-Vertiefungen nur am Person-Bereich,
   assert.deepEqual(deepeningsOf("workstyle", DEMO_REGISTRY).map((d) => d.moduleId), ["demo_feedback"]);
   assert.deepEqual(
     deepeningsOf("venture_core", DEMO_REGISTRY).map((d) => d.moduleId),
-    ["demo_tradeoffs", "demo_limits", "demo_everyday", "demo_spare"]
+    ["venture_tradeoffs", "demo_tradeoffs", "demo_limits", "demo_everyday", "demo_spare"]
   );
   // Andere Person-Bereiche haben keine Vertiefung - es gibt keine globale Sammelsektion.
   for (const anchor of ["strengths", "capability", "direction"]) {
@@ -324,23 +326,26 @@ test("DE und EN: dieselben Schluessel, und beide Sprachen haben jeden Zustand", 
 
 test("die Oberflaeche bringt keine zweite Modulliste mit", () => {
   const verboten = [/Zusammenarbeit & Feedback/, /Werte & Zielkonflikte/, /Unter Druck/, /Grenzen/, /moduleId:\s*["']/];
-  for (const file of [...quellen(UI), "src/features/modules/deepeningCards.ts"]) {
+  // Die generischen Karten kennen kein Modul beim Namen. (Die modulspezifische Oberflaeche - Flow und
+  // Ergebnis von „Werte & Zielkonflikte" - gehoert zu ihrem Modul und darf es benennen.)
+  const generisch = ["DeepeningCard.tsx", "DeepeningCards.tsx", "ProfileDeepenings.tsx"].map((name) => `${UI}/${name}`);
+  for (const file of [...generisch, "src/features/modules/deepeningCards.ts"]) {
     const code = codeOnly(file);
     for (const muster of verboten) assert.doesNotMatch(code, muster, file);
   }
   const komponente = codeOnly(`${UI}/ProfileDeepenings.tsx`);
   assert.match(komponente, /getModuleAdapter\(def\.moduleId\)/, "der Zustand kommt vom Adapter");
   assert.match(komponente, /tModules\(`\$\{model\.moduleId\}\.title`\)/, "der Titel kommt aus der Registry-Sprachdatei");
-  assert.match(codeOnly("src/features/modules/deepeningCards.ts"), /href: def\.renderers\.detail/, "das Ziel kommt aus der Registry");
+  assert.match(codeOnly("src/features/modules/deepeningCards.ts"), /href: resolved\.teaser\?\.href \?\? def\.renderers\.detail/, "das Ziel kommt aus der Registry (ggf. mit Vorhaben ergaenzt)");
 });
 
-test("Phase C aendert weder Adapter noch Datenabfragen noch Sharing", () => {
-  for (const file of quellen("src/features/modules")) {
+test("die Karten lesen nur: kein Schreiben, keine Freigabe", () => {
+  for (const file of [...quellen(UI), "src/features/modules/deepeningCards.ts", "src/features/modules/grundprofil.ts"]) {
     const code = codeOnly(file);
+    // Der Flow des Piloten ruft die Server-Actions seines Moduls; sie selbst stehen unter `tradeoffs/` und
+    // werden in der Parity-Suite geprueft. Die Karten und der Flow schreiben nicht direkt.
     assert.doesNotMatch(code, /\.(insert|update|upsert|delete)\(/, file);
-    for (const name of [...code.matchAll(/\.rpc\(\s*"([a-z_0-9]+)"/g)].map((m) => m[1])) {
-      assert.equal(name, "get_workstyle_team_share_readiness", file);
-    }
+    assert.doesNotMatch(code, /\.rpc\(/, file);
   }
 });
 
@@ -374,9 +379,10 @@ test("ein Update-Entwurf macht das Grundprofil nicht wieder unvollstaendig", () 
   };
   const statuses = (context: Partial<ModuleContext>) =>
     Object.fromEntries(
-      Object.entries(MODULE_ADAPTERS)
-        .filter(([id]) => id !== "venture_core")
-        .map(([id, adapter]) => [id, adapter.status({ id: "u" }, { personFacts: facts, ...context })])
+      personCoreModules().map((def) => [
+        def.moduleId,
+        MODULE_ADAPTERS[def.moduleId]!.status({ id: "u" }, { personFacts: facts, ...context }),
+      ])
     );
   assert.equal(isGrundprofilComplete(statuses({ workstyleSubmitted: false })), false, "ohne je abzugeben: nicht fertig");
   assert.equal(isGrundprofilComplete(statuses({ workstyleSubmitted: true })), true, "abgegeben, dann ein Update-Entwurf: weiter fertig");

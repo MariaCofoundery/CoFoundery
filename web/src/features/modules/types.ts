@@ -206,8 +206,17 @@ export interface ModuleAdapter {
   shareState(user: ModuleUser, context: ModuleContext): ModuleShareState;
 }
 
+/** Eine Antwort aus `alignment_answers`, wie die Lesbarmachung sie braucht. */
+export type TradeoffAnswerRow = {
+  block_id: string;
+  value: Record<string, unknown> | null;
+  missing_code: string | null;
+};
+
 /** Eine Zeile aus `assessments`, wie die Produktlogik sie liest. */
 export type AssessmentRow = {
+  /** Nur wo die Antworten dazu gelesen werden (Teaser-Zeilen). */
+  id?: string;
   instrument_id: string;
   venture_id?: string | null;
   submitted_at: string | null;
@@ -239,6 +248,21 @@ export type ModuleContext = {
    * Zeile und die neueste ABGEGEBENE (oft dieselbe). `null` heisst: nicht lesbar.
    */
   ventureAssessments?: readonly AssessmentRow[] | null;
+  /**
+   * Zeilen aus `assessments` zu diesem Vorhaben und dem Instrument von „Werte &
+   * Zielkonflikte" (neueste und neueste abgegebene). `null`: nicht lesbar.
+   */
+  tradeoffsAssessments?: readonly AssessmentRow[] | null;
+  /** Die Antworten der neuesten ABGEGEBENEN Fassung von „Werte & Zielkonflikte". */
+  tradeoffsAnswers?: readonly TradeoffAnswerRow[] | null;
+  /**
+   * Uebersetzt einen Schluessel des Sprachbundles - fuer die kurzen Teaser-Zeilen
+   * abgeschlossener Vertiefungen. Ohne sie gibt es keine Zeilen (statt
+   * unuebersetzter Saetze).
+   */
+  translate?: (key: string, values?: Record<string, string | number>) => string;
+  /** Die Sprache der Ausgabe; die Registry-Texte sind deutsch, die englische Fassung kommt aus der Anzeigeschicht. */
+  locale?: "de" | "en";
   /** Das Team der Teamfreigabe und ob die Person dafuer geteilt hat. */
   teamShare?: { teamId: string; active: boolean } | null;
   /** `person_core.capability_disclosure`. */

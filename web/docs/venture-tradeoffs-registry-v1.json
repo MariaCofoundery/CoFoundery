@@ -1,0 +1,182 @@
+{
+  "instrumentId": "venture-tradeoffs-v1",
+  "scope": "venture_alignment",
+  "label": "Werte & Zielkonflikte",
+  "registryVersion": "1.0.0",
+  "status": "draft",
+  "createdAt": "2026-10-19",
+  "source": "docs/venture-alignment-registry-v1.json (W03-W06); docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md, Abschnitt 3 (W als eigenes Deep-Dive-Modul)",
+  "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Freiwillige Vertiefung, unabhaengig vom Abschluss des Venture-Core; kein Teil von venture-alignment-v1.",
+  "overallScore": false,
+  "dimensionScores": false,
+  "deviationsFromSource": [
+    {
+      "what": "W03-W06 aus venture-alignment-v1 als eigenes Instrument (venture-tradeoffs-v1); Wortlaut, Anliegen, Wege und Wichtigkeitsstufen unveraendert",
+      "source": "docs/CoFoundery_ALIGN_Master_Arbeitsfassung_v0.2.md, Abschnitt 3: W01-W06 OPTIONAL, eigenes Deep-Dive-Modul",
+      "reason": "Eine abgegebene Fassung ist unveraenderlich; eine freiwillige Vertiefung braucht einen eigenen Lebenszyklus. W01 und W02 werden nicht uebernommen (Kommunikationsnorm bzw. Mitarbeitenden-Fall in der Fruehphase).",
+      "decidedBy": "Maria, 19.10.2026 (Module Architecture v1.0, Phase D)"
+    }
+  ],
+  "notes": [
+    "KEIN GESAMTWERT, KEINE TYPEN, KEINE WERTUNG. Die vier Situationen sind Gespraechsanlaesse: Es gibt keine richtige oder falsche Antwort.",
+    "Die Antworten in venture-alignment-v1 (W03-W06) bleiben historische Daten. Eine Uebernahme gibt es nur auf ausdrueckliche Aktion der Person, nie still.",
+    "Vergleich (spaeter, Phase E): path_and_weights, conversation_only."
+  ],
+  "sections": [
+    "Werte & Zielkonflikte"
+  ],
+  "items": [
+    {
+      "itemId": "W03",
+      "order": 1,
+      "section": "Werte & Zielkonflikte",
+      "prompt": "Ihr könnt zwischen zwei wirtschaftlich tragfähigen Angeboten wählen. Eines erzielt mehr gesellschaftliche oder ökologische Wirkung. Das andere erwirtschaftet einen höheren Überschuss, der für die weitere Entwicklung des Unternehmens genutzt werden könnte. Beide decken ihre laufenden Kosten.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
+      "concerns": [
+        "direkte gesellschaftliche / ökologische Wirkung",
+        "zusätzlicher finanzieller Spielraum"
+      ],
+      "paths": [
+        "Angebot mit größerer Wirkung",
+        "Angebot mit größerem Überschuss"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht entscheiden"
+    },
+    {
+      "itemId": "W04",
+      "order": 2,
+      "section": "Werte & Zielkonflikte",
+      "prompt": "Ein interner Arbeitsablauf soll verändert werden. Die betroffenen Personen haben ihre Sicht bereits schriftlich eingebracht. Ein weiterer gemeinsamer Austausch würde den Start um ungefähr eine Woche verschieben.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
+      "concerns": [
+        "vor dem Start gemeinsames Verständnis herstellen",
+        "Änderung zeitnah umsetzen und anschließend überprüfen"
+      ],
+      "paths": [
+        "noch einen gemeinsamen Austausch durchführen",
+        "auf Grundlage der bisherigen Rückmeldungen entscheiden und nach Start überprüfen"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht entscheiden"
+    },
+    {
+      "itemId": "W05",
+      "order": 3,
+      "section": "Werte & Zielkonflikte",
+      "prompt": "Ihr habt zusätzliches Budget zur Verfügung. Eure laufenden Verpflichtungen sind abgesichert. Ihr könnt das Geld entweder als zusätzliche Reserve behalten oder einen klar begrenzten Markttest damit durchführen.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
+      "concerns": [
+        "zusätzlicher finanzieller Puffer",
+        "früher Erkenntnisgewinn über den Markt"
+      ],
+      "paths": [
+        "Budget als Reserve behalten",
+        "Budget für den begrenzten Markttest einsetzen"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht entscheiden"
+    },
+    {
+      "itemId": "W06",
+      "order": 4,
+      "section": "Werte & Zielkonflikte",
+      "prompt": "Für ein gemeinsam erreichtes Ergebnis steht ein zusätzlicher Bonus zur Verfügung. Die vereinbarten Grundregeln wurden von allen erfüllt, die dokumentierten Beiträge zum konkreten Ergebnis waren aber unterschiedlich.",
+      "hint": null,
+      "answerFormat": "value_case",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "",
+      "valueCase": {
+        "importancePrompt": "Wie wichtig sind dir dabei diese beiden Aspekte?",
+        "pathPrompt": "Wenn du dich in dieser Situation entscheiden müsstest: Welchen Weg würdest du zuerst wählen?",
+        "otherLabel": "etwas anderes",
+        "unknownLabel": "ich kann das noch nicht entscheiden"
+      },
+      "concerns": [
+        "alle erhalten einen gleichen Anteil am gemeinsamen Erfolg",
+        "unterschiedliche Beiträge werden bei der Verteilung berücksichtigt"
+      ],
+      "paths": [
+        "Bonus gleich verteilen",
+        "anhand vorher dokumentierter Beiträge verteilen"
+      ],
+      "ratingOptions": [
+        "gar nicht wichtig",
+        "wenig wichtig",
+        "mittel",
+        "ziemlich wichtig",
+        "sehr wichtig"
+      ],
+      "ratingMissing": "kann ich noch nicht entscheiden"
+    }
+  ]
+}

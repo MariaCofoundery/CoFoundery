@@ -35,7 +35,7 @@ export type DeepeningCardState = "available" | "in_progress" | "completed";
 export type DeepeningCardModel = {
   moduleId: string;
   state: DeepeningCardState;
-  /** Wohin der Klick fuehrt: das Detail des Moduls. */
+  /** Wohin der Klick fuehrt: das Detail des Moduls (Ziel aus der Registry, ggf. mit Vorhaben). */
   href: string;
   /** Nur bei `completed`. */
   teaser: readonly string[];
@@ -107,7 +107,9 @@ export function buildDeepeningCards(
     cards.push({
       moduleId: def.moduleId,
       state,
-      href: def.renderers.detail,
+      // Das Ziel kommt aus der Registry; ein Modul darf es um den Kontext ergaenzen
+      // (bei `person_in_venture` haengt das Vorhaben als Parameter dran).
+      href: resolved.teaser?.href ?? def.renderers.detail,
       teaser: state === "completed" ? (resolved.teaser?.lines ?? []).slice(0, MAX_TEASER_LINES) : [],
     });
   }

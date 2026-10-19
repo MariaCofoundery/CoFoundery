@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { buildDeepeningCards, deepeningsOf } from "@/features/modules/deepeningCards";
 import { getModuleAdapter } from "@/features/modules/adapters";
@@ -35,11 +35,19 @@ export async function ProfileDeepenings({
   if (defs.length === 0) return null;
 
   const client = await createClient();
-  const [t, tModules, context] = await Promise.all([
+  const [t, tModules, tRoot, locale] = await Promise.all([
     getTranslations("profile.founderProfile.deepening"),
     getTranslations("modules"),
-    loadModuleContext(client, userId, { ventureId: ventureId ?? null }),
+    getTranslations(),
+    getLocale(),
   ]);
+  // Die kurzen Zeilen abgeschlossener Vertiefungen kommen vom Modul selbst; der
+  // Uebersetzer gibt ihm die Sprachdatei, ohne dass die Karte den Inhalt kennt.
+  const context = await loadModuleContext(client, userId, {
+    ventureId: ventureId ?? null,
+    translate: (key, values) => tRoot(key as never, values as never),
+    locale: locale === "en" ? "en" : "de",
+  });
 
   const user = { id: userId };
   const cards = buildDeepeningCards(defs, (def) => {

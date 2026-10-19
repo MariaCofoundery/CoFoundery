@@ -439,16 +439,21 @@ test("der Lader reicht die Fakten des Produkts weiter - und die Adapter lesen da
 test("der Lader fragt das Vorhaben wie die Teamseite - plus die neueste abgegebene Zeile", async () => {
   const client = produktClient({ ventureRow: zeile({ submitted_at: "2026-10-02T10:00:00Z" }) });
   const context = await loadModuleContext(client, "u-1", { ventureId: "v-1" });
-  const abfragen = client.queries.filter((q) => q.table === "assessments" && eqOf(q, "venture_id") === "v-1");
+  const abfragen = client.queries.filter(
+    (q) => q.table === "assessments" && eqOf(q, "venture_id") === "v-1" && eqOf(q, "instrument_id") === "venture-alignment-v1"
+  );
   assert.equal(abfragen.length, 2, "neueste Zeile und neueste abgegebene");
   for (const abfrage of abfragen) {
-    assert.equal(eqOf(abfrage, "instrument_id"), "venture-alignment-v1");
     assert.equal(eqOf(abfrage, "user_id"), "u-1");
     assert.ok(abfrage.ops.includes("order") && abfrage.ops.includes("limit"), "neueste zuerst, eine Zeile");
   }
   assert.equal(abfragen.filter((q) => q.ops.includes("not")).length, 1);
   assert.equal(context.ventureAssessments?.length, 1, "dieselbe Zeile wird nicht doppelt gefuehrt");
   assert.equal(ventureCoreAdapter.status(user, context).state, "done_for_now");
+
+  // „Werte & Zielkonflikte" wird getrennt gefragt - nie in derselben Kette, immer mit eigenem Instrument.
+  const eigene = client.queries.filter((q) => q.table === "assessments" && eqOf(q, "instrument_id") === "venture-tradeoffs-v1");
+  assert.equal(eigene.length, 2);
 
   const leerClient = produktClient({ ventureRow: null });
   const leerContext = await loadModuleContext(leerClient, "u-1", { ventureId: "v-1" });
@@ -524,12 +529,31 @@ function* quellen(dir: string): Generator<string> {
 }
 const ohneKommentare = (path: string) => read(path).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("die Modulschicht schreibt nirgends: keine Schreib-Operation, keine schreibende RPC", () => {
+test("die Adapter- und Ladeschicht schreibt nirgends: keine Schreib-Operation, keine schreibende RPC", () => {
+  // EINE Datei darf schreiben: der eigene Lebenszyklus des nativen Moduls (`tradeoffs/actions.ts`,
+  // unten gesondert geprueft). Alles andere - Adapter, Lader, Karten - liest nur.
   for (const file of quellen("src/features/modules")) {
+    if (file === join("src", "features", "modules", "tradeoffs", "actions.ts")) continue;
     const code = ohneKommentare(file);
     assert.doesNotMatch(code, /\.(insert|update|upsert|delete)\(/, file);
     const rpcs = [...code.matchAll(/\.rpc\(\s*"([a-z_0-9]+)"/g)].map((m) => m[1]);
     for (const name of rpcs) assert.equal(name, "get_workstyle_team_share_readiness", `${file}: ${name}`);
+  }
+});
+
+test("das native Modul schreibt nur in sein eigenes Instrument - nie in Venture Alignment, nie in Freigaben", () => {
+  const code = ohneKommentare(join("src", "features", "modules", "tradeoffs", "actions.ts"));
+  // Geschrieben wird nur in zwei Tabellen: der Bogen und seine Antworten.
+  const tabellen = new Set([...code.matchAll(/\.from\("([a-z_]+)"\)/g)].map((m) => m[1]));
+  assert.deepEqual([...tabellen].sort(), ["alignment_answers", "assessments"]);
+  // Keine RPC: keine Freigabe, kein Widerruf, nichts ausser dem eigenen Lebenszyklus.
+  assert.doesNotMatch(code, /\.rpc\(/);
+  // Jeder Bogen, der angelegt wird, traegt das eigene Instrument.
+  assert.match(code, /instrument_id: VENTURE_TRADEOFFS_INSTRUMENT_ID/);
+  assert.doesNotMatch(code, /insert\(\{[^}]*VENTURE_ALIGNMENT_INSTRUMENT_ID/);
+  // Die Freigabe-Tabellen kommen nirgends im Modul vor.
+  for (const file of quellen("src/features/modules")) {
+    assert.doesNotMatch(ohneKommentare(file), /alignment_shares|team_shares|alignment_share_hidden_blocks/, file);
   }
 });
 
@@ -549,13 +573,16 @@ test("keine Migration, keine neue Completion-Tabelle, keine DB-Spiegelung", () =
   }
 });
 
-test("das Produkt benutzt die Modulschicht nur an einer Stelle: den Vertiefungskarten im Profil", () => {
-  // Phase C schliesst GENAU `ProfileDeepenings` an - keine Navigation, kein Flow, kein Sharing.
-  // Spaetere Phasen duerfen weitere Stellen aufnehmen; dann bewusst anpassen.
+test("das Produkt benutzt die Modulschicht nur an zwei Stellen: den Vertiefungskarten im Profil und der Seite des Piloten", () => {
+  // Phase C schliesst `ProfileDeepenings` an, Phase D die Seite von „Werte & Zielkonflikte" - keine
+  // Navigation, kein bestehender Flow, kein Sharing. Spaetere Phasen duerfen weitere Stellen aufnehmen; dann bewusst anpassen.
   const ausserhalb: string[] = [];
   for (const file of quellen("src")) {
     if (file.startsWith(join("src", "features", "modules"))) continue;
     if (/@\/features\/modules/.test(read(file))) ausserhalb.push(file);
   }
-  assert.deepEqual(ausserhalb, [join("src", "app", "me", "profile", "page.tsx")]);
+  assert.deepEqual(ausserhalb.sort(), [
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "zielkonflikte", "page.tsx"),
+    join("src", "app", "me", "profile", "page.tsx"),
+  ]);
 });

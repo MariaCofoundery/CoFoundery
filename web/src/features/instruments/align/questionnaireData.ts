@@ -63,7 +63,7 @@ export function buildSections(
     .filter((group) => group.items.length > 0);
 }
 
-function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
+export function toView(item: RegistryItemV22, partnerName?: string | null): ItemView {
   return {
     itemId: item.itemId,
     groupPrompt: item.groupPrompt ?? null,

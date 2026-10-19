@@ -386,7 +386,9 @@ Kein Gesamtwert. Reveal-Modell (Abschnitt 7.7). Das Team startet die Runde (kein
 
 **Legacy:** Die W03–W06-Antworten in `venture-alignment-v1` bleiben **historische Antworten**. Eine Übernahme ins neue Modul gibt es **nur als ausdrücklichen Opt-in**: ein vorbefüllter Entwurf, den die Person bestätigt und als neuen Durchlauf mit neuer Freigabe abgibt. Keine stille Übernahme.
 
-Ob der Pilot einen eigenen `assessments.module`-Wert bekommt oder unter einer bestehenden Storage-Familie läuft, wird in Phase D nach einer Repo-Prüfung entschieden.
+**Entschieden in Phase D (Variante B):** Der Pilot läuft unter der bestehenden Storage-Familie `assessments.module = 'venture_alignment'` mit eigener `instrument_id = 'venture-tradeoffs-v1'` (kein neuer Enum-Wert). Begründung, Audit und Folgen: [phase-d-storage-decision.md](phase-d-storage-decision.md).
+
+**Stand Phase D (lokal umgesetzt, nicht committet):** additive Migration `20261205130000_venture_tradeoffs_instrument.sql` (Instrument + zwei instrumentgebundene Wächter), eigene Registry W03–W06, natives Modul `venture_tradeoffs` (deepens `venture_core`, `bindsTo = assessment`, kein Vergleichs-Renderer), eigener Flow `/founder-alignment/vorhaben/zielkonflikte`, eigenes Ergebnis nur aus gewählten Wegen und Gewichten. Alte W-Antworten bleiben unverändert; Übernahme nur auf ausdrückliche Aktion (neuer Entwurf, selbst prüfen und abgeben). Der Compare Contract (`path_and_weights`, `conversation_only`) ist beschrieben, aber nicht gebaut; es gibt keine Freigabe – das Modul ist privat (Phase E).
 
 ## 15. Roadmap
 
@@ -396,7 +398,7 @@ Ob der Pilot einen eigenen `assessments.module`-Wert bekommt oder unter einer be
 | **A** | Code-Registry, Typen, Contract-Validatoren für Workstyle, Strengths, Capability, Direction, Venture Alignment | **nein** | umgesetzt |
 | **B** | Read-only Adapter für dieselben fünf Systeme, Parity-Tests | **nein** | umgesetzt |
 | **C** | Minimaler Profile-UX-Support für Vertiefungskarten; ohne registrierte Vertiefung entsteht keine sichtbare Änderung, kein Datenumbau | nein | umgesetzt |
-| **D** | Pilot „Werte & Zielkonflikte" | ggf. additiv | offen |
+| **D** | Pilot „Werte & Zielkonflikte" | additiv (Instrument + Wächter) | lokal umgesetzt, nicht committet |
 | **E** | Sharing + Teamvergleich optionaler Module; erst hier ggf. `module_versions` | ja, minimal | offen |
 | **F** | `venture-alignment-v2`, erst nachdem der Pilot die Architektur bewiesen hat | ja | offen |
 | **G** | Zusammenarbeit & Feedback als erster Person-Deepening-Pilot | ja, additiv | offen |
@@ -482,5 +484,5 @@ Bewusst vertagt, aber nicht offen: die genaue Item-Liste von `venture-alignment-
 | Interview | kein generisches Framework jetzt | erst ein zweiter echter Use Case | bestehende Interviews bleiben |
 | Capability-Provenance | `origin` für Evidenz vorgesehen | nachvollziehbare Herkunft | Migration später |
 | Pilot | Werte & Zielkonflikte (W03–W06), person_in_venture, deepening, `storage = assessments` | vorhandener Inhalt, Format und Vergleich; geringe Sensitivität | alte W-Antworten bleiben historisch, Übernahme nur per Opt-in |
-| Pilot-Storage | `assessments.module`-Wert offen bis Phase D | erst nach Repo-Prüfung entscheidbar | Entscheidung in Phase D |
+| Pilot-Storage | Bestehende Familie `venture_alignment` + eigene `instrument_id` (Variante B) | `module` ist Speicherfamilie; jeder Leser filtert strikt nach Instrument; kein Enum-Eingriff | entschieden in Phase D, siehe phase-d-storage-decision.md |
 | Roadmap | 0 → A–H | Architektur erst am Piloten beweisen | v2 erst nach dem Piloten; Unter Druck zuletzt |

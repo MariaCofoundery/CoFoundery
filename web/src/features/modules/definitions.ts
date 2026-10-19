@@ -2,11 +2,15 @@ import {
   CURRENT_WORKSTYLE_INSTRUMENT,
   CURRENT_WORKSTYLE_VERSION,
 } from "@/features/instruments/workstyle/current";
-import { VENTURE_ALIGNMENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import {
+  VENTURE_ALIGNMENT_INSTRUMENT_ID,
+  VENTURE_TRADEOFFS_INSTRUMENT_ID,
+} from "@/features/instruments/instruments";
 import type { ModuleDefinition } from "@/features/modules/types";
 
 /**
- * Die fuenf Bestandsmodule, wie sie heute sind (Phase A).
+ * Die fuenf Bestandsmodule, wie sie heute sind (Phase A), und - ab Phase D - das
+ * erste native Modul „Werte & Zielkonflikte".
  *
  * `storage` UND `sharing.bindsTo` SIND ZWEI FRAGEN:
  *
@@ -176,10 +180,70 @@ export const VENTURE_CORE_MODULE: ModuleDefinition = {
   i18n: { namespace: "modules" },
 };
 
+/**
+ * Werte & Zielkonflikte - das erste NATIVE Modul (Phase D).
+ *
+ * Kein Bestandsadapter (`legacyAdapter` fehlt): eigenes Instrument, eigener
+ * Assessment-Lebenszyklus, `storage = "assessments"` mit Freigabe an den
+ * Durchlauf. Siehe `docs/architecture/phase-d-storage-decision.md`.
+ *
+ * DER FREIGABEVERTRAG IST BESCHRIEBEN, NICHT IMPLEMENTIERT: `bindsTo =
+ * "assessment"` sagt, woran eine Freigabe spaeter haengen wird. In Phase D gibt
+ * es keine Freigabe, keinen Teamvergleich und keine Readiness - das Modul ist
+ * privat. Der Compare Contract (`path_and_weights`, `conversation_only`) ist
+ * deklariert, aber es gibt noch keinen Vergleichs-Renderer (Phase E).
+ *
+ * Basis sind die vier bestehenden Situationen W03-W06. Ihre Antworten in
+ * `venture-alignment-v1` bleiben historische Daten.
+ */
+export const VENTURE_TRADEOFFS_MODULE: ModuleDefinition = {
+  moduleId: "venture_tradeoffs",
+  scope: "person_in_venture",
+  tier: "deepening",
+  cadence: "revisable",
+  usage: "product",
+  deepens: "venture_core",
+  input: {
+    method: "questionnaire",
+    storage: "assessments",
+    writesTo:
+      "assessments + alignment_answers (module = venture_alignment, instrument = venture-tradeoffs-v1, je Vorhaben); Antwortformat value_case",
+  },
+  versions: [
+    {
+      versionId: VENTURE_TRADEOFFS_INSTRUMENT_ID,
+      instrumentId: VENTURE_TRADEOFFS_INSTRUMENT_ID,
+      compatGroup: "venture-tradeoffs-v1",
+    },
+  ],
+  completion: {
+    source:
+      "assessments.submitted_at des eigenen Instruments je Vorhaben; die DB (guard_venture_tradeoffs_assessment) laesst die Abgabe nur zu, wenn W03-W06 beantwortet sind",
+  },
+  sharing: { ceiling: "answers", sensitivity: "standard", bindsTo: "assessment" },
+  compare: [
+    { target: "W03", method: "path_and_weights", stance: "conversation_only" },
+    { target: "W04", method: "path_and_weights", stance: "conversation_only" },
+    { target: "W05", method: "path_and_weights", stance: "conversation_only" },
+    { target: "W06", method: "path_and_weights", stance: "conversation_only" },
+  ],
+  renderers: {
+    profileCard: "me-profile:vorhaben",
+    detail: "/founder-alignment/vorhaben/zielkonflikte",
+  },
+  setupHandoff: [
+    { target: "conflict_deadlock", when: "difference" },
+    { target: "equity", when: "difference" },
+    { target: "compensation", when: "difference" },
+  ],
+  i18n: { namespace: "modules" },
+};
+
 export const MODULE_DEFINITIONS: readonly ModuleDefinition[] = [
   WORKSTYLE_MODULE,
   STRENGTHS_MODULE,
   CAPABILITY_MODULE,
   DIRECTION_MODULE,
   VENTURE_CORE_MODULE,
+  VENTURE_TRADEOFFS_MODULE,
 ];
