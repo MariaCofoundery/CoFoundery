@@ -665,6 +665,11 @@
         "pending": "{count} awaiting confirmation",
         "open": "{count} open"
       }
+    },
+    "topicSteps": {
+      "talk": "Discuss",
+      "confirm": "Confirm",
+      "settled": "Settled"
     }
   },
   "dashboard": {

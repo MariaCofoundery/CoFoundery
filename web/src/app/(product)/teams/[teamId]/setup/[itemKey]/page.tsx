@@ -29,7 +29,7 @@ type Props = {
   searchParams: Promise<{ result?: string; workstyle?: string }>;
 };
 
-const CARD = "rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.035)] sm:p-6";
+const CARD = "rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.035)] sm:p-6";
 const INPUT = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200";
 
 export default async function FounderSetupItemPage({ params, searchParams }: Props) {
@@ -149,16 +149,42 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
     <main className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-6">
       {/* Phase 11.7B.1: gemeinsamer Teamkopf; der Reiter "Founder Setup" ist der Weg zur Themenliste. */}
       <TeamPageHeader teamId={teamId} active="setup" title={t(`items.${itemKey}.title`)} teamLabel={teamLabel} />
-      <section className="mt-5 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">{t(`categories.${catalogItem.category}`)}</p>
-        <p className="mt-3 text-sm leading-7 text-slate-600">{t(`items.${itemKey}.question`)}</p>
+
+      <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8" aria-labelledby="topic-title">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t(`categories.${catalogItem.category}`)}</p>
+        <h1 id="topic-title" className="mt-2 text-3xl font-semibold leading-tight">{t(`items.${itemKey}.title`)}</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t(`items.${itemKey}.question`)}</p>
+        {/* Wo das Thema steht - in Worten und mit Punkt, ohne Zahl. */}
+        <ol className="mt-5 flex flex-wrap gap-2" aria-label={t("hero.stateLabel")}>
+          {(["talk", "confirm", "settled"] as const).map((step) => {
+            const here =
+              step === "talk"
+                ? item.stage === "open" || item.stage === "discussing"
+                : step === "confirm"
+                  ? item.stage === "awaiting_confirmation"
+                  : item.stage === "settled";
+            return (
+              <li
+                key={step}
+                aria-current={here ? "step" : undefined}
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold ${here ? "bg-white text-violet-800" : "bg-white/20 text-white"}`}
+              >
+                <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${here ? "bg-violet-600" : "border-2 border-white"}`} />
+                {t(`topicSteps.${step}`)}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+
         {/* Vor dem leeren Feld ein Anhaltspunkt.
             Bis 18.09.2026 bestand ein Thema aus Titel, Frage und Textfeld.
             Bei "Kommunikation" geht das. Bei Vesting und Beteiligung - also
             genau dort, wo niemand weiss, was ueblich ist - sagte das Produkt
             nichts, und zwei Menschen sassen vor einem leeren Feld und sollten
             etwas festlegen, das ihnen in drei Jahren um die Ohren fliegt. */}
-        <section className="mt-5 rounded-2xl border border-cyan-200/70 bg-[linear-gradient(120deg,rgba(103,232,249,.10),rgba(124,58,237,.05))] p-5">
+        <section className="mt-5 rounded-3xl bg-violet-50 p-5 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-800">
             {t("orientationTitle")}
           </p>
@@ -172,8 +198,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           />
           <p className="mt-3 text-xs leading-6 text-slate-500">{t("orientationHelp")}</p>
         </section>
-        {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-white px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
-      </section>
+      {catalogItem.legalNote ? <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("legalSpecific")}</p> : null}
       {feedbackKey ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedbackKey}`)}</p> : null}
       <div className="mt-6 grid gap-6">
         {/* VOR DER BESPRECHUNG, NICHT DANACH: Was im Lab markiert wurde, ist
