@@ -402,7 +402,7 @@ Kein Gesamtwert. Reveal-Modell (Abschnitt 7.7). Das Team startet die Runde (kein
 | **C** | Minimaler Profile-UX-Support für Vertiefungskarten; ohne registrierte Vertiefung entsteht keine sichtbare Änderung, kein Datenumbau | nein | umgesetzt |
 | **D** | Pilot „Werte & Zielkonflikte" | additiv (Instrument + Wächter) | lokal umgesetzt, nicht committet |
 | **E** | Sharing + Teamvergleich optionaler Module; erst hier ggf. `module_versions` | ja, minimal (eine Tabelle, RPCs; keine `module_versions`) | lokal umgesetzt, nicht committet |
-| **F** | `venture-alignment-v2`, erst nachdem der Pilot die Architektur bewiesen hat | ja | offen |
+| **F** | `venture-alignment-v2` – als erprobbare **Beta 1** (`venture-alignment-v2-beta1`, Beta-Gate, assessment-gebundenes Teilen, Teamreport); finale ID erst nach der Erprobung | ja (kleine Allowlist-Tabelle, allgemeine Funktionen) | lokal umgesetzt, nicht committet; siehe [phase-f-beta-audit.md](phase-f-beta-audit.md) |
 | **G** | Zusammenarbeit & Feedback als erster Person-Deepening-Pilot | ja, additiv | offen |
 | **H** | Team-Check-ins, erst nach Pretest | ja | offen |
 

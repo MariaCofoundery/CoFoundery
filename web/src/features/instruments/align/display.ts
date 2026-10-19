@@ -1,8 +1,13 @@
 /** Locale overlays for platform-owned display fields, never for saved answers or user text. */
-import strings from "./display.en.json";
+import baseStrings from "./display.en.json";
+import betaStrings from "./display.beta.en.json";
 import contextualOptions from "./displayOptions.en.json";
 import type { AppLocale } from "@/i18n/config";
 import type { ReadoutEntry, ReadoutValue } from "@/features/instruments/v21/readoutV21";
+
+// Venture Alignment v2 (Beta 1) bringt seine eigenen Texte mit; sie ueberschreiben nie einen Bestandstext
+// (die Beta-Datei enthaelt nur Schluessel, die der Bestand nicht kennt).
+const strings: Record<string, string> = { ...(betaStrings as Record<string, string>), ...(baseStrings as Record<string, string>) };
 
 type DisplayItem = { prompt: string; section: string; hint?: string | null; unit?: string;
   options: readonly { label: string }[]; missing?: readonly { label: string }[];

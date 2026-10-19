@@ -1,0 +1,242 @@
+{
+  "badge": "Beta",
+  "backToProfile": "Zurück zu „So willst du gründen“",
+  "eyebrow": "Venture Alignment · Beta",
+  "title": "Wie möchtest du dieses Vorhaben aufbauen?",
+  "intro": "19 kurze Fragen dazu, wie du dieses konkrete Vorhaben aufbauen möchtest. Es geht darum, Erwartungen sichtbar zu machen – nicht darum, richtig oder falsch zu antworten.",
+  "points": {
+    "noRight": "Es gibt keine richtigen oder falschen Antworten.",
+    "thisVenture": "Deine Antworten gelten für dieses Vorhaben und diesen Zeitraum.",
+    "privateFirst": "Nach dem Abgeben sind deine Antworten zunächst nur für dich. Mit dem Team teilst du sie später ausdrücklich.",
+    "beta": "Das ist eine Beta-Fassung: Wortlaut und Auswertung können sich nach der Erprobung noch ändern."
+  },
+  "start": "Beginnen",
+  "startPending": "Wird vorbereitet …",
+  "takeover": {
+    "title": "Einige deiner bisherigen Antworten können als Ausgangspunkt übernommen werden.",
+    "text": "Das betrifft Fragen, die in der bisherigen Fassung genau so gestellt wurden. Du kannst sie prüfen und ändern. Die Beta bestätigst und gibst du ganz neu selbst ab.",
+    "take": "Bisherige Antworten als Ausgangspunkt übernehmen",
+    "fresh": "Neu beginnen"
+  },
+  "from": {
+    "takeover": "Einige Antworten stehen hier als Ausgangspunkt aus deiner bisherigen Fassung. Prüfe sie und ändere, was heute anders ist.",
+    "previous": "Deine letzte Abgabe steht hier als Ausgangspunkt. Prüfe sie und ändere, was heute anders ist."
+  },
+  "same": {
+    "takeover": "Wie in deiner früheren Antwort",
+    "previous": "Wie in deiner letzten Abgabe"
+  },
+  "blocks": {
+    "vision": {
+      "title": "Zielbild und Prioritäten",
+      "lead": "Wohin soll das Vorhaben, und was ist dir dabei wichtig?"
+    },
+    "ownership": {
+      "title": "Beteiligung und Finanzierung",
+      "lead": "Wie denkst du über Verkauf und externes Kapital?"
+    },
+    "role": {
+      "title": "Rolle",
+      "lead": "Welche Rolle stellst du dir für dich vor?"
+    },
+    "time": {
+      "title": "Zeit und Commitment",
+      "lead": "Wie viel Einsatz ist realistisch, und was erwartest du von anderen?"
+    },
+    "money": {
+      "title": "Geld und Risiko",
+      "lead": "Wann brauchst du Einkommen, und wie viel Risiko gehst du mit?"
+    },
+    "pace": {
+      "title": "Tempo und Qualität",
+      "lead": "Wie schnell soll es gehen, und wie fertig soll etwas sein?"
+    },
+    "deciding": {
+      "title": "Entscheiden",
+      "lead": "Wer entscheidet was – im Alltag und bei Uneinigkeit?"
+    },
+    "communication": {
+      "title": "Kommunikation",
+      "lead": "Wann möchtest du von Änderungen anderswo erfahren?"
+    }
+  },
+  "flow": {
+    "saving": "Wird gespeichert …",
+    "saved": "Gespeichert",
+    "notSaved": "Nicht gespeichert – bitte noch einmal versuchen",
+    "submit": "Abgeben",
+    "submitPending": "Wird abgegeben …",
+    "submitHint": "Wenn alle Fragen beantwortet sind, kannst du abgeben. „Habe ich noch nicht entschieden“ ist eine gültige Antwort.",
+    "submitDoesNotShare": "Abgeben teilt nichts: Danach sind deine Antworten zunächst nur für dich sichtbar.",
+    "privateBadge": "Nur für dich – erscheint nie im Teamvergleich",
+    "errors": {
+      "incomplete": "Eine Frage ist noch offen.",
+      "generic": "Das konnte nicht abgegeben werden. Deine Antworten sind gespeichert – versuch es gleich noch einmal."
+    }
+  },
+  "result": {
+    "title": "Deine Zusammenfassung",
+    "intro": "So hast du angegeben, wie du dieses Vorhaben aufbauen möchtest – kurz zusammengefasst. Es sind Gesprächsgrundlagen, keine Bewertung.",
+    "submittedOn": "Abgegeben am {date}",
+    "private": "Sichtbar für dich – im Teamvergleich nur, wenn du es freigibst.",
+    "update": "Noch einmal ansehen",
+    "updateHint": "Deine letzte Abgabe bleibt gültig, bis du eine neue Fassung abgibst und freigibst.",
+    "draftText": "Ein neuer Durchlauf läuft. Deine letzte Abgabe bleibt gültig, bis du die neue abgibst.",
+    "privateAmount": "Nur für dich",
+    "noAnswer": "Dazu liegt keine Antwort vor."
+  },
+  "summary": {
+    "Z01": "Dein Zukunftsbild für drei Jahre: {answer}",
+    "Z02": "Am wichtigsten ist dir: {answer}",
+    "Z03": "Du würdest nach zwölf Monaten merken, dass es sich gelohnt hat an: {answer}",
+    "F01": "Zu einem möglichen Verkauf: {answer}",
+    "F02": "Zu externem Kapital: {answer}",
+    "O01": "Deine Rolle in drei Jahren: {answer}",
+    "C01": "Du planst ein: {answer}",
+    "C02": "Von anderen erwartest du pro Person: {answer}",
+    "C03": "Haupttätigkeit: {answer}",
+    "C04": "Wird ein vereinbarter Meilenstein verfehlt: {answer}",
+    "M01": "Du brauchst Einkommen aus dem Vorhaben: {answer}",
+    "M01p": "Benötigter Betrag pro Monat: {answer}",
+    "M02": "Eigenes Geld, das du zusätzlich einsetzen würdest: {answer}",
+    "M02p": "Genauer Betrag: {answer}",
+    "M03": "Finanzierte Monate laufender Kosten vor einer größeren neuen Verpflichtung: {answer}",
+    "T01": "Einen überschaubaren, rückholbaren Schritt gehst du an: {answer}",
+    "T02": "Ein Ergebnis mit nicht kritischen Schwächen geht zu Kund:innen: {answer}",
+    "E01": "Im eigenen Bereich entscheidest du so: {answer}",
+    "E02": "Bei Uneinigkeit soll gelten: {answer}",
+    "E03": "Immer alle zustimmen sollten bei: {answer}",
+    "N01": "Von Änderungen anderswo möchtest du erfahren: {answer}"
+  },
+  "share": {
+    "title": "Teamvergleich",
+    "private": "Nur für dich",
+    "shared": "Für den Teamvergleich freigegeben",
+    "explainTitle": "Bevor du freigibst",
+    "explain": {
+      "p1": "Dein freigegebener Durchlauf kann erst im gemeinsamen Vergleich erscheinen, wenn alle aktuellen Teammitglieder ihren Durchlauf ebenfalls abgegeben und freigegeben haben.",
+      "p2": "Vorher sieht niemand deine Antworten im Teamvergleich.",
+      "p3": "Du kannst die Freigabe jederzeit zurücknehmen.",
+      "p4": "Die Freigabe gilt nur für diesen Durchlauf. Wenn du später neu antwortest, entscheidest du neu. Betragsfelder „nur für dich“ erscheinen nie im Teamvergleich."
+    },
+    "action": "Für den Teamvergleich freigeben",
+    "actionPending": "Wird freigegeben …",
+    "revokeSummary": "Freigabe zurücknehmen",
+    "revokeConfirm": "Wenn du die Freigabe zurücknimmst, kann der gemeinsame Vergleich für das Team vorübergehend nicht mehr angezeigt werden. Deine eigenen Antworten bleiben für dich sichtbar.",
+    "revokeAction": "Ja, Freigabe zurücknehmen",
+    "revokePending": "Wird zurückgenommen …",
+    "on": "Du hast diesen Durchlauf für den Teamvergleich freigegeben.",
+    "off": "Die Freigabe ist zurückgenommen. Dein Durchlauf ist wieder nur für dich.",
+    "missing": "Für den gemeinsamen Vergleich fehlen noch Voraussetzungen.",
+    "ready": "Der gemeinsame Vergleich ist bereit.",
+    "openCompare": "Gemeinsamen Vergleich ansehen",
+    "olderActive": "Eine frühere Fassung von dir ist weiterhin für den Teamvergleich freigegeben. Diese neuere Fassung ist nur für dich, bis du sie ausdrücklich freigibst."
+  },
+  "team": {
+    "title": "Venture Alignment (Beta)",
+    "text": "Euer gemeinsamer Vergleich erscheint erst, wenn alle aktuellen Mitglieder abgegeben und freigegeben haben – vorher sieht niemand etwas von den anderen.",
+    "not_started": "Du hast die Beta noch nicht begonnen.",
+    "in_progress": "Du hast begonnen.",
+    "completed": "Du hast abgegeben. Dein Durchlauf ist nur für dich sichtbar.",
+    "shared": "Du hast deinen Durchlauf freigegeben.",
+    "start": "Beta beginnen",
+    "continue": "Weitermachen",
+    "share": "Für Teamvergleich freigeben",
+    "manage": "Freigabe verwalten",
+    "view": "Gemeinsamen Vergleich ansehen"
+  },
+  "report": {
+    "back": "Zurück zum Team",
+    "eyebrow": "Venture Alignment · Beta",
+    "title": "Wie ihr dieses Vorhaben aufbauen wollt",
+    "intro": "So haben alle aktuellen Mitglieder angegeben, wie sie dieses Vorhaben aufbauen möchten. Unterschiede sind Gesprächsanlässe, Übereinstimmung ist keine Bewertung. Alle aktuellen Mitglieder sehen denselben Bericht.",
+    "notReadyTitle": "Der gemeinsame Vergleich ist gerade nicht verfügbar",
+    "notReady": "Für den gemeinsamen Vergleich fehlen noch Voraussetzungen.",
+    "yourPart": "Dein Teil: ",
+    "you": "Du",
+    "closing": "Der Vergleich beschreibt nur, was ihr angegeben habt. Er bewertet nicht, wie gut ihr zusammenpasst.",
+    "groups": {
+      "direction": {
+        "title": "Wohin wollt ihr?",
+        "lead": "Zielbild, Prioritäten, Verkauf und Kapital."
+      },
+      "role": {
+        "title": "Welche Rolle und welchen Einsatz stellt ihr euch vor?",
+        "lead": "Rollen, Zeit und was bei einem verfehlten Meilenstein gelten soll."
+      },
+      "money": {
+        "title": "Geld und Risiko",
+        "lead": "Wann Einkommen nötig ist und wie viel Risiko ihr tragt."
+      },
+      "pace": {
+        "title": "Tempo und Qualität",
+        "lead": "Wie schnell ihr loslegt und wie fertig etwas sein soll."
+      },
+      "deciding": {
+        "title": "Entscheiden und Informieren",
+        "lead": "Wer wie entscheidet und wann ihr einander informiert."
+      }
+    },
+    "clarify": {
+      "title": "Das solltet ihr konkret abstimmen",
+      "lead": "Hier liegen Antworten weit genug auseinander, dass eine ausdrückliche Verabredung hilft."
+    },
+    "impulse": {
+      "title": "Gesprächsimpulse",
+      "lead": "Hier lohnt ein Gespräch – ohne dass etwas geklärt werden müsste."
+    },
+    "differences": {
+      "title": "Unterschiede"
+    },
+    "common": {
+      "title": "Gemeinsame Antworten"
+    },
+    "setupCta": "Im Founder Setup vereinbaren",
+    "showQuestion": "Frage anzeigen",
+    "noAnswer": "keine Angabe",
+    "pairGap": "{expectedBy} erwartet {expected} Stunden pro Woche pro Person, {offeredBy} plant {offered} ein.",
+    "itemShort": {
+      "Z01": "Zukunftsbild",
+      "Z02": "Persönliche Prioritäten",
+      "Z03": "Zwölf-Monats-Marke",
+      "F01": "Verkauf",
+      "F02": "Externes Kapital",
+      "O01": "Rolle in drei Jahren",
+      "C01": "Eigene Stunden",
+      "C02": "Erwartete Stunden der anderen",
+      "C03": "Haupttätigkeit",
+      "C04": "Meilenstein verfehlt",
+      "M01": "Einkommensbedarf ab",
+      "M02": "Eigenes Geld",
+      "M03": "Finanzierte Monate (Runway)",
+      "T01": "Tempo",
+      "T02": "Qualitätsanspruch",
+      "E01": "Entscheidungsspielraum",
+      "E02": "Regel bei Uneinigkeit",
+      "E03": "Immer einstimmig",
+      "N01": "Information über Änderungen"
+    },
+    "pairGapYouExpect": "Du erwartest {expected} Stunden pro Woche pro Person, {offeredBy} plant {offered} ein.",
+    "pairGapYouOffer": "{expectedBy} erwartet {expected} Stunden pro Woche pro Person, du planst {offered} ein."
+  },
+  "profile": {
+    "title": "Venture Alignment (Beta)",
+    "summary": "Wie möchtest du dieses Vorhaben aufbauen? 19 kurze Fragen – die neue Fassung, die live erprobt wird.",
+    "not_started": "Zum Ausprobieren: Die Beta ersetzt deine bisherigen Antworten nicht.",
+    "in_progress": "Du hast begonnen.",
+    "completed": "Du hast abgegeben.",
+    "start": "Beta ansehen",
+    "continue": "Weitermachen",
+    "view": "Zusammenfassung ansehen"
+  },
+  "errors": {
+    "setup_missing": "Das Instrument ist hier noch nicht eingerichtet.",
+    "no_permission": "Dafür fehlt dir gerade die Berechtigung.",
+    "draft_create_failed": "Der Entwurf konnte nicht angelegt werden. Versuch es gleich noch einmal.",
+    "value_rejected": "Eine Antwort wurde abgelehnt.",
+    "unreachable": "Gerade nicht erreichbar. Versuch es gleich noch einmal.",
+    "not_submitted": "Freigeben geht erst nach der Abgabe.",
+    "share_rejected": "Diese Freigabe ist nicht möglich.",
+    "share_failed": "Das hat gerade nicht geklappt. Versuch es gleich noch einmal."
+  }
+}

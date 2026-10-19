@@ -1,0 +1,242 @@
+{
+  "badge": "Beta",
+  "backToProfile": "Back to “How you want to found”",
+  "eyebrow": "Venture Alignment · Beta",
+  "title": "How do you want to build this venture?",
+  "intro": "19 short questions about how you want to build this specific venture. The point is to make expectations visible – not to answer right or wrong.",
+  "points": {
+    "noRight": "There are no right or wrong answers.",
+    "thisVenture": "Your answers apply to this venture and this period.",
+    "privateFirst": "After you submit, your answers are only for you at first. You share them with the team later, explicitly.",
+    "beta": "This is a beta version: wording and evaluation may still change after testing."
+  },
+  "start": "Begin",
+  "startPending": "Preparing …",
+  "takeover": {
+    "title": "Some of your earlier answers can be taken over as a starting point.",
+    "text": "This applies to questions that were asked in exactly this way in the earlier version. You can review and change them. You confirm and submit the beta entirely anew yourself.",
+    "take": "Take earlier answers over as a starting point",
+    "fresh": "Start fresh"
+  },
+  "from": {
+    "takeover": "Some answers are here as a starting point from your earlier version. Review them and change what is different today.",
+    "previous": "Your last submission is here as a starting point. Review it and change what is different today."
+  },
+  "same": {
+    "takeover": "Same as your earlier answer",
+    "previous": "Same as your last submission"
+  },
+  "blocks": {
+    "vision": {
+      "title": "Vision and priorities",
+      "lead": "Where should the venture go, and what matters to you?"
+    },
+    "ownership": {
+      "title": "Ownership and financing",
+      "lead": "How do you think about a sale and external capital?"
+    },
+    "role": {
+      "title": "Role",
+      "lead": "Which role do you imagine for yourself?"
+    },
+    "time": {
+      "title": "Time and commitment",
+      "lead": "How much commitment is realistic, and what do you expect from others?"
+    },
+    "money": {
+      "title": "Money and risk",
+      "lead": "When do you need income, and how much risk do you take on?"
+    },
+    "pace": {
+      "title": "Pace and quality",
+      "lead": "How fast should things go, and how finished should something be?"
+    },
+    "deciding": {
+      "title": "Deciding",
+      "lead": "Who decides what – in everyday work and when you disagree?"
+    },
+    "communication": {
+      "title": "Communication",
+      "lead": "When do you want to hear about changes elsewhere?"
+    }
+  },
+  "flow": {
+    "saving": "Saving …",
+    "saved": "Saved",
+    "notSaved": "Not saved – please try again",
+    "submit": "Submit",
+    "submitPending": "Submitting …",
+    "submitHint": "When all questions are answered you can submit. “I haven't decided yet” is a valid answer.",
+    "submitDoesNotShare": "Submitting shares nothing: afterwards your answers are visible only to you at first.",
+    "privateBadge": "Only for you – never appears in the team comparison",
+    "errors": {
+      "incomplete": "A question is still open.",
+      "generic": "That could not be submitted. Your answers are saved – please try again shortly."
+    }
+  },
+  "result": {
+    "title": "Your summary",
+    "intro": "This is how you said you want to build this venture – briefly summarised. It is a basis for conversation, not an assessment.",
+    "submittedOn": "Submitted on {date}",
+    "private": "Visible to you – in the team comparison only if you share it.",
+    "update": "Look at it again",
+    "updateHint": "Your last submission stays valid until you submit and share a new version.",
+    "draftText": "A new run is in progress. Your last submission stays valid until you submit the new one.",
+    "privateAmount": "Only for you",
+    "noAnswer": "There is no answer for this."
+  },
+  "summary": {
+    "Z01": "Your picture of the future for three years: {answer}",
+    "Z02": "What matters most to you: {answer}",
+    "Z03": "After twelve months you would notice it was worth it by: {answer}",
+    "F01": "On a possible sale: {answer}",
+    "F02": "On external capital: {answer}",
+    "O01": "Your role in three years: {answer}",
+    "C01": "You plan to commit: {answer}",
+    "C02": "From others you expect per person: {answer}",
+    "C03": "Main occupation: {answer}",
+    "C04": "If an agreed milestone is missed: {answer}",
+    "M01": "You need income from the venture: {answer}",
+    "M01p": "Amount needed per month: {answer}",
+    "M02": "Own money you would put in additionally: {answer}",
+    "M02p": "Exact amount: {answer}",
+    "M03": "Months of running costs financed before a larger new commitment: {answer}",
+    "T01": "You would take on a manageable, reversible step: {answer}",
+    "T02": "A result with non-critical weaknesses goes to customers: {answer}",
+    "E01": "In your own area you decide like this: {answer}",
+    "E02": "When you disagree, this should apply: {answer}",
+    "E03": "Everyone should always agree on: {answer}",
+    "N01": "You want to hear about changes elsewhere: {answer}"
+  },
+  "share": {
+    "title": "Team comparison",
+    "private": "Only you",
+    "shared": "Shared for the team comparison",
+    "explainTitle": "Before you share",
+    "explain": {
+      "p1": "Your shared run can only appear in the joint comparison once all current team members have also submitted and shared their run.",
+      "p2": "Until then nobody sees your answers in the team comparison.",
+      "p3": "You can withdraw the sharing at any time.",
+      "p4": "Sharing applies to this run only. If you answer again later, you decide again. Amount fields “only for you” never appear in the team comparison."
+    },
+    "action": "Share for the team comparison",
+    "actionPending": "Sharing …",
+    "revokeSummary": "Withdraw sharing",
+    "revokeConfirm": "If you withdraw the sharing, the joint comparison may temporarily disappear for the team. Your own answers stay visible to you.",
+    "revokeAction": "Yes, withdraw sharing",
+    "revokePending": "Withdrawing …",
+    "on": "You have shared this run for the team comparison.",
+    "off": "Sharing is withdrawn. Your run is private again.",
+    "missing": "Some requirements for the joint comparison are still missing.",
+    "ready": "The joint comparison is ready.",
+    "openCompare": "View the joint comparison",
+    "olderActive": "An earlier version of yours is still shared for the team comparison. This newer version is only yours until you explicitly share it."
+  },
+  "team": {
+    "title": "Venture Alignment (Beta)",
+    "text": "Your joint comparison only appears once all current members have submitted and shared – until then nobody sees anything from the others.",
+    "not_started": "You have not started the beta yet.",
+    "in_progress": "You have started.",
+    "completed": "You have submitted. Your run is visible only to you.",
+    "shared": "You have shared your run.",
+    "start": "Begin the beta",
+    "continue": "Continue",
+    "share": "Share for team comparison",
+    "manage": "Manage sharing",
+    "view": "View the joint comparison"
+  },
+  "report": {
+    "back": "Back to the team",
+    "eyebrow": "Venture Alignment · Beta",
+    "title": "How you want to build this venture",
+    "intro": "This is how all current members said they want to build this venture. Differences are conversation starters; agreement is not an assessment. All current members see the same report.",
+    "notReadyTitle": "The joint comparison is not available right now",
+    "notReady": "Some requirements for the joint comparison are still missing.",
+    "yourPart": "Your part: ",
+    "you": "You",
+    "closing": "The comparison only describes what you stated. It does not assess how well you fit together.",
+    "groups": {
+      "direction": {
+        "title": "Where do you want to go?",
+        "lead": "Vision, priorities, sale and capital."
+      },
+      "role": {
+        "title": "Which role and commitment do you each imagine?",
+        "lead": "Roles, time, and what should apply if a milestone is missed."
+      },
+      "money": {
+        "title": "Money and risk",
+        "lead": "When income is needed and how much risk you carry."
+      },
+      "pace": {
+        "title": "Pace and quality",
+        "lead": "How quickly you start and how finished something should be."
+      },
+      "deciding": {
+        "title": "Deciding and informing",
+        "lead": "Who decides how, and when you inform each other."
+      }
+    },
+    "clarify": {
+      "title": "You should agree on this concretely",
+      "lead": "Answers here are far enough apart that an explicit agreement helps."
+    },
+    "impulse": {
+      "title": "Conversation starters",
+      "lead": "A conversation is worthwhile here – without anything having to be settled."
+    },
+    "differences": {
+      "title": "Differences"
+    },
+    "common": {
+      "title": "Shared answers"
+    },
+    "setupCta": "Agree on it in Founder Setup",
+    "showQuestion": "Show question",
+    "noAnswer": "no answer",
+    "pairGap": "{expectedBy} expects {expected} hours per week per person, {offeredBy} plans {offered}.",
+    "itemShort": {
+      "Z01": "Picture of the future",
+      "Z02": "Personal priorities",
+      "Z03": "Twelve-month marker",
+      "F01": "Sale",
+      "F02": "External capital",
+      "O01": "Role in three years",
+      "C01": "Own hours",
+      "C02": "Expected hours from others",
+      "C03": "Main occupation",
+      "C04": "Milestone missed",
+      "M01": "Income needed from",
+      "M02": "Own money",
+      "M03": "Months financed (runway)",
+      "T01": "Pace",
+      "T02": "Quality bar",
+      "E01": "Room to decide",
+      "E02": "Rule when you disagree",
+      "E03": "Always unanimous",
+      "N01": "Information about changes"
+    },
+    "pairGapYouExpect": "You expect {expected} hours per week per person, {offeredBy} plans {offered}.",
+    "pairGapYouOffer": "{expectedBy} expects {expected} hours per week per person, you plan {offered}."
+  },
+  "profile": {
+    "title": "Venture Alignment (Beta)",
+    "summary": "How do you want to build this venture? 19 short questions – the new version being tested live.",
+    "not_started": "To try out: the beta does not replace your earlier answers.",
+    "in_progress": "You have started.",
+    "completed": "You have submitted.",
+    "start": "Look at the beta",
+    "continue": "Continue",
+    "view": "View summary"
+  },
+  "errors": {
+    "setup_missing": "The instrument is not set up here yet.",
+    "no_permission": "You do not have permission for that right now.",
+    "draft_create_failed": "The draft could not be created. Please try again shortly.",
+    "value_rejected": "An answer was rejected.",
+    "unreachable": "Not reachable right now. Please try again shortly.",
+    "not_submitted": "Sharing is possible only after you have submitted.",
+    "share_rejected": "This sharing is not possible.",
+    "share_failed": "That did not work just now. Please try again shortly."
+  }
+}

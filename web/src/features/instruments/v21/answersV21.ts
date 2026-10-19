@@ -75,6 +75,11 @@ export function exclusiveOptionOf(item: AnswerableItem): string | null {
   return item.options.find((option) => option.exclusive)?.optionId ?? null;
 }
 
+/** Alle Optionen, die jede andere ausschliessen (meist null oder eine). */
+export function exclusiveOptionsOf(item: AnswerableItem): string[] {
+  return item.options.filter((option) => option.exclusive).map((option) => option.optionId);
+}
+
 const has = <K extends string>(value: object, key: K): value is Record<K, unknown> => key in value;
 
 /**
@@ -180,8 +185,10 @@ export function validateAnswerV21(
         return no("too_many_options", `${answer.blockId}: ${chosen.length} > ${item.maxChoices}`);
       }
 
-      const exclusive = exclusiveOptionOf(item);
-      if (exclusive && chosen.includes(exclusive) && chosen.length > 1) {
+      // Es kann mehrere ausschliessende Optionen geben (Venture Alignment v2: „Ist bereits meine
+      // Haupttätigkeit“ und „Aktuell nicht geplant“). Jede schliesst ALLE anderen aus - auch die andere.
+      const exclusive = exclusiveOptionsOf(item).find((id) => chosen.includes(id)) ?? null;
+      if (exclusive && chosen.length > 1) {
         // „Keine zusätzliche Absicherung“ neben drei angekreuzten Absicherungen
         // ist kein Sonderfall, sondern ein Widerspruch. Die Oberfläche soll das
         // verhindern; hier fällt es auf, falls sie es nicht tut.

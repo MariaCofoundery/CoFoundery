@@ -260,6 +260,10 @@ export type ModuleContext = {
   tradeoffsAnswers?: readonly TradeoffAnswerRow[] | null;
   /** Die EIGENE Lage zur Freigabe von „Werte & Zielkonflikte" - von der Datenbank, nicht zusammengesetzt. */
   tradeoffsReadiness?: TradeoffsReadiness | null;
+  /** Venture Alignment (Beta): die Zeilen, die Antworten des neuesten abgegebenen Durchlaufs und die eigene Freigabe-Lage. */
+  betaAssessments?: readonly AssessmentRow[] | null;
+  betaAnswers?: readonly TradeoffAnswerRow[] | null;
+  betaReadiness?: TradeoffsReadiness | null;
   /**
    * Uebersetzt einen Schluessel des Sprachbundles - fuer die kurzen Teaser-Zeilen
    * abgeschlossener Vertiefungen. Ohne sie gibt es keine Zeilen (statt

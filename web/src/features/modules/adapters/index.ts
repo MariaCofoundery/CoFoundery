@@ -5,6 +5,7 @@ import {
   workstyleAdapter,
 } from "@/features/modules/adapters/personModules";
 import { ventureCoreAdapter } from "@/features/modules/adapters/ventureCore";
+import { ventureCoreBetaAdapter } from "@/features/modules/adapters/ventureCoreBeta";
 import { ventureTradeoffsAdapter } from "@/features/modules/adapters/ventureTradeoffs";
 import type { ModuleAdapter } from "@/features/modules/types";
 
@@ -16,6 +17,7 @@ export const MODULE_ADAPTERS: Readonly<Record<string, ModuleAdapter>> = {
   direction: directionAdapter,
   venture_core: ventureCoreAdapter,
   venture_tradeoffs: ventureTradeoffsAdapter,
+  venture_core_beta: ventureCoreBetaAdapter,
 };
 
 export function getModuleAdapter(moduleId: string): ModuleAdapter | null {
@@ -29,4 +31,5 @@ export {
   workstyleAdapter,
   ventureCoreAdapter,
   ventureTradeoffsAdapter,
+  ventureCoreBetaAdapter,
 };

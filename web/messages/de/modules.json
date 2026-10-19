@@ -22,5 +22,9 @@
   "venture_tradeoffs": {
     "title": "Werte & Zielkonflikte",
     "summary": "Vier Situationen, in denen zwei wichtige Dinge gleichzeitig richtig sein können – und was dir bei diesem Vorhaben wichtiger wäre."
+  },
+  "venture_core_beta": {
+    "title": "Venture Alignment (Beta)",
+    "summary": "Wie möchtest du dieses Vorhaben aufbauen? 19 kurze Fragen – die neue Fassung, die live erprobt wird."
   }
 }

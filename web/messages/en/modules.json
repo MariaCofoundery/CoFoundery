@@ -22,5 +22,9 @@
   "venture_tradeoffs": {
     "title": "Values and trade-offs",
     "summary": "Four situations where two important things can both be right – and which would matter more to you in this venture."
+  },
+  "venture_core_beta": {
+    "title": "Venture Alignment (Beta)",
+    "summary": "How do you want to build this venture? 19 short questions – the new version being tested live."
   }
 }

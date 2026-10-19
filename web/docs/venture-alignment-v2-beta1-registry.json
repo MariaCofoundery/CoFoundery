@@ -1,0 +1,938 @@
+{
+  "instrumentId": "venture-alignment-v2-beta1",
+  "scope": "venture_alignment",
+  "label": "Venture Alignment v2 (Beta 1)",
+  "validity": "Gilt fuer EIN Vorhaben und einen Zeitraum. Beta-Fassung: Wortlaut und Auswertung koennen sich nach der Erprobung aendern.",
+  "registryVersion": "2.0.0-beta1",
+  "status": "draft",
+  "createdAt": "2026-10-19",
+  "source": "docs/architecture/venture-alignment-v2-beta1.md",
+  "overallScore": false,
+  "dimensionScores": false,
+  "deviationsFromSource": [],
+  "notes": [
+    "Beta-Fassung (Pretest Candidate) des Venture-Core. 19 Core-Items und zwei private Betragsfelder (M01p, M02p).",
+    "KEIN GESAMTWERT UND KEINE DIMENSIONSWERTE. Vergleich nur beschreibend (conversation_only/neutral_difference/needs_clarification).",
+    "Private Felder (M01p, M02p) verlassen nie den Eigentuemer: Der Team-Lesepfad arbeitet mit einer Allowlist (assessment_share_instruments)."
+  ],
+  "sections": [
+    "Zielbild und Prioritäten",
+    "Beteiligung und Finanzierung",
+    "Rolle",
+    "Zeit und Commitment",
+    "Geld und Risiko",
+    "Tempo und Qualität",
+    "Entscheiden",
+    "Kommunikation"
+  ],
+  "items": [
+    {
+      "itemId": "Z01",
+      "order": 1,
+      "section": "Zielbild und Prioritäten",
+      "prompt": "Stell dir vor, dieses Vorhaben läuft in drei Jahren gut. Welches Bild beschreibt am ehesten das Unternehmen, das du dir dann wünschst?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "Z01_o1",
+          "label": "Bewusst klein bleiben: wenige Personen, die davon wirtschaftlich verlässlich leben",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z01_o2",
+          "label": "Schrittweise wachsen: nach und nach ein eigenes Team aufbauen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z01_o3",
+          "label": "Schnell in einen größeren Markt wachsen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z01_o4",
+          "label": "Sich auf ein spezialisiertes Feld konzentrieren: die Größe des Unternehmens ist dabei zweitrangig",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z01_o5",
+          "label": "Ich habe dazu noch kein klares Bild",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec ZB01. Vier parallele Bilder, keine Reihenfolge, kein Bild aufgewertet.",
+      "shortLabel": "Zukunftsbild"
+    },
+    {
+      "itemId": "Z02",
+      "order": 2,
+      "section": "Zielbild und Prioritäten",
+      "prompt": "Was ist dir an diesem Vorhaben in den nächsten drei Jahren persönlich am wichtigsten? Wähle bis zu zwei.",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "Z02_o1",
+          "label": "Davon verlässlich Einkommen erzielen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z02_o2",
+          "label": "Etwas Konkretes für Gesellschaft oder Umwelt bewirken",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z02_o3",
+          "label": "Eine fachlich oder technologisch anspruchsvolle Idee verwirklichen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z02_o4",
+          "label": "Unternehmerisch und persönlich unabhängiger werden",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z02_o5",
+          "label": "Etwas aufbauen, das groß wird und viele erreicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z02_o6",
+          "label": "Etwas anderes",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec ZB02. Ersetzt S01, S01a-f, S01_top.",
+      "shortLabel": "Persönliche Prioritäten",
+      "maxChoices": 2
+    },
+    {
+      "itemId": "Z03",
+      "order": 3,
+      "section": "Zielbild und Prioritäten",
+      "prompt": "Woran würdest du in zwölf Monaten am ehesten merken, dass sich dieses Vorhaben bisher gelohnt hat?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "Z03_o1",
+          "label": "Erste zahlende Kund:innen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z03_o2",
+          "label": "Ein nutzbares Produkt oder Angebot steht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z03_o3",
+          "label": "Regelmäßige Einnahmen, die einen Teil unserer Kosten tragen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z03_o4",
+          "label": "Finanzierung oder Förderung ist gesichert",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z03_o5",
+          "label": "Wir haben eine belastbare Antwort, ob es trägt – auch wenn sie „nein“ lautet",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "Z03_o6",
+          "label": "Etwas anderes",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec ZB03 (Pretest-beobachtet). Ersetzt S04 (Freitext).",
+      "shortLabel": "Zwölf-Monats-Marke"
+    },
+    {
+      "itemId": "F01",
+      "order": 4,
+      "section": "Beteiligung und Finanzierung",
+      "prompt": "Wie denkst du heute über einen möglichen Verkauf des Unternehmens?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "F01_o1",
+          "label": "Ich möchte langfristig dabei bleiben und plane keinen Verkauf.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F01_o2",
+          "label": "Ein teilweiser Verkauf wäre für mich grundsätzlich denkbar.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F01_o3",
+          "label": "Ich möchte auf einen späteren vollständigen Verkauf hinarbeiten.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F01_o4",
+          "label": "Das hängt für mich von bestimmten Bedingungen ab.",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F01_o5",
+          "label": "Ich halte mir alles offen.",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec BT01 (aus S02, umformuliert).",
+      "shortLabel": "Verkauf"
+    },
+    {
+      "itemId": "F02",
+      "order": 5,
+      "section": "Beteiligung und Finanzierung",
+      "prompt": "Wie offen bist du dafür, externe Investor:innen aufzunehmen und dafür Unternehmensanteile abzugeben?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "F02_o1",
+          "label": "zunächst ohne externes Eigenkapital",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F02_o2",
+          "label": "Möglichkeit offenhalten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F02_o3",
+          "label": "gezielt suchen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "F02_o4",
+          "label": "abhängig von Bedingungen",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (S03); Beta-ID F02. Uebernahme-Kandidat.",
+      "shortLabel": "Externes Kapital"
+    },
+    {
+      "itemId": "O01",
+      "order": 6,
+      "section": "Rolle",
+      "prompt": "Wenn du ungefähr drei Jahre vorausblickst: Welche Rolle möchtest du dann am liebsten im Unternehmen haben? Wähle bis zu zwei.",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "O01_o1",
+          "label": "Stark operativ",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "O01_o2",
+          "label": "Vor allem führen und organisieren",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "O01_o3",
+          "label": "Vor allem fachlich und strategisch gestalten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "O01_o4",
+          "label": "Schrittweise aus dem Tagesgeschäft zurückziehen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "O01_o5",
+          "label": "Hauptsächlich als Anteilseigner:in",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "O01_o6",
+          "label": "Andere Vorstellung",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec RO01 (aus S06, Limit 2 -> nicht uebernahmefaehig).",
+      "shortLabel": "Rolle in drei Jahren",
+      "maxChoices": 2
+    },
+    {
+      "itemId": "C01",
+      "order": 7,
+      "section": "Zeit und Commitment",
+      "prompt": "Wie viele Stunden pro Woche kannst du in den nächsten zwölf Wochen realistisch und verlässlich für dieses Vorhaben einplanen?",
+      "hint": null,
+      "answerFormat": "number_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (R01); Beta-ID C01. Uebernahme-Kandidat.",
+      "unit": "Stunden pro Woche",
+      "conditionHint": "Falls der Umfang schwankt: unter welchen Bedingungen? (freiwillig)",
+      "shortLabel": "Eigene Stunden"
+    },
+    {
+      "itemId": "C02",
+      "order": 8,
+      "section": "Zeit und Commitment",
+      "prompt": "Wie viele Stunden pro Woche sollten andere Founder:innen aus deiner Sicht in den nächsten zwölf Wochen pro Person verlässlich einbringen können?",
+      "hint": null,
+      "answerFormat": "number_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_clarified",
+          "label": "haben wir noch nicht geklärt"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (R02); Beta-ID C02. Uebernahme-Kandidat.",
+      "unit": "Stunden pro Woche",
+      "shortLabel": "Erwartete Stunden der anderen"
+    },
+    {
+      "itemId": "C03",
+      "order": 9,
+      "section": "Zeit und Commitment",
+      "prompt": "Was müsste passieren, damit du dir vorstellen könntest, das Vorhaben zu deiner beruflichen Haupttätigkeit zu machen?",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "C03_o1",
+          "label": "Ist bereits meine Haupttätigkeit",
+          "requiresText": false,
+          "exclusive": true
+        },
+        {
+          "optionId": "C03_o2",
+          "label": "Eine bestimmte Auszahlung ist gesichert",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C03_o3",
+          "label": "Finanzierung ist erreicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C03_o4",
+          "label": "Ein Meilenstein ist erreicht",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C03_o5",
+          "label": "Ab einem bestimmten Datum",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C03_o6",
+          "label": "Andere Bedingung",
+          "requiresText": true,
+          "exclusive": false
+        },
+        {
+          "optionId": "C03_o7",
+          "label": "Aktuell nicht geplant",
+          "requiresText": false,
+          "exclusive": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec ZC03: zwei exklusive Optionen (1 und 7); 2-6 kombinierbar. Nicht uebernahmefaehig.",
+      "shortLabel": "Haupttätigkeit"
+    },
+    {
+      "itemId": "C04",
+      "order": 10,
+      "section": "Zeit und Commitment",
+      "prompt": "Angenommen, ein wichtiger vereinbarter Meilenstein wird nicht erreicht. Wie möchtest du dann über deine weitere Mitarbeit entscheiden?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "C04_o1",
+          "label": "bis Datum weiterarbeiten und neu entscheiden",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C04_o2",
+          "label": "neues konkretes Ziel vereinbaren und bis dahin weiter",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C04_o3",
+          "label": "gemeinsam neu entscheiden",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C04_o4",
+          "label": "unter bestimmten Bedingungen nicht weiterführen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "C04_o5",
+          "label": "andere Vorgehensweise",
+          "requiresText": true,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (R09); Beta-ID C04. Uebernahme-Kandidat.",
+      "shortLabel": "Meilenstein verfehlt"
+    },
+    {
+      "itemId": "M01",
+      "order": 11,
+      "section": "Geld und Risiko",
+      "prompt": "Ab wann würdest du aus dem Vorhaben regelmäßig Geld brauchen, um davon deinen Lebensunterhalt zu bestreiten?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "M01_o1",
+          "label": "Ab sofort",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "M01_o2",
+          "label": "Ab einem Datum",
+          "requiresText": false,
+          "exclusive": false,
+          "requiresDate": true
+        },
+        {
+          "optionId": "M01_o3",
+          "label": "Innerhalb der nächsten zwölf Monate voraussichtlich nicht",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec GR01: nur der Zeitpunkt ist team-sichtbar.",
+      "shortLabel": "Einkommensbedarf ab"
+    },
+    {
+      "itemId": "M01p",
+      "order": 12,
+      "section": "Geld und Risiko",
+      "prompt": "Optional und nur für dich: Welchen Betrag pro Monat brauchst du dafür ungefähr mindestens (netto, nach Steuern, in Euro)? Dieser Betrag erscheint nie im Teamvergleich.",
+      "hint": null,
+      "answerFormat": "money_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec GR01P: PRIVAT. Nie im Team-Lesepfad, nie im Vergleich.",
+      "shortLabel": "Benötigter Betrag (privat)",
+      "showAfter": "M01",
+      "showAfterOptions": [
+        "M01_o1",
+        "M01_o2"
+      ]
+    },
+    {
+      "itemId": "M02",
+      "order": 13,
+      "section": "Geld und Risiko",
+      "prompt": "Wie viel eigenes Geld wärst du bereit, zusätzlich in das Vorhaben zu stecken, wenn du einkalkulierst, den Betrag vollständig zu verlieren?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "M02_o1",
+          "label": "Kein zusätzliches eigenes Geld",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "M02_o2",
+          "label": "Bis 2.000 €",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "M02_o3",
+          "label": "Über 2.000 € bis 10.000 €",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "M02_o4",
+          "label": "Über 10.000 € bis 50.000 €",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "M02_o5",
+          "label": "Über 50.000 €",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec GR02 Variante B (Beta): neutrale Euro-Baender; Grenzen sind Hypothese.",
+      "shortLabel": "Eigenes Geld"
+    },
+    {
+      "itemId": "M02p",
+      "order": 14,
+      "section": "Geld und Risiko",
+      "prompt": "Optional und nur für dich: Welchen Betrag würdest du ungefähr höchstens zusätzlich einsetzen (in Euro)? Dieser Betrag erscheint nie im Teamvergleich.",
+      "hint": null,
+      "answerFormat": "money_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec GR02P: PRIVAT. Nie im Team-Lesepfad, nie im Vergleich.",
+      "shortLabel": "Genauer Betrag (privat)",
+      "showAfter": "M02",
+      "showAfterOptions": [
+        "M02_o2",
+        "M02_o3",
+        "M02_o4",
+        "M02_o5"
+      ]
+    },
+    {
+      "itemId": "M03",
+      "order": 15,
+      "section": "Geld und Risiko",
+      "prompt": "Wie viele Monate laufender Kosten sollten aus deiner Sicht finanziert sein, bevor ihr eine größere neue finanzielle Verpflichtung eingeht?",
+      "hint": "„Laufende Kosten“ sind alle regelmäßigen Ausgaben des Vorhabens, z. B. Gehälter, Miete, Software. Eine „größere neue Verpflichtung“ ist z. B. eine Einstellung, ein Mietvertrag oder eine größere Anschaffung.",
+      "answerFormat": "number_range",
+      "options": [],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        },
+        {
+          "code": "prefer_not_to_say",
+          "label": "möchte ich nicht angeben"
+        }
+      ],
+      "note": "Spec GR03 (Pretest-beobachtet): Runway/Risikopuffer.",
+      "shortLabel": "Finanzierte Monate (Runway)",
+      "unit": "Monate"
+    },
+    {
+      "itemId": "T01",
+      "order": 16,
+      "section": "Tempo und Qualität",
+      "prompt": "Ihr plant einen nächsten Schritt, der überschaubar und jederzeit rückgängig zu machen ist (z. B. ein neues Angebot testweise anbieten oder einen Preis für vier Wochen ändern). Er hat keine Sicherheits- oder Rechtsrisiken, und ihr habt die wichtigsten Informationen, die ihr bekommen könnt. Wie schnell möchtest du ihn angehen?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "T01_o1",
+          "label": "Innerhalb weniger Tage, mit nur der nötigsten Vorbereitung",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T01_o2",
+          "label": "Innerhalb von ein bis zwei Wochen, nach kurzer Vorbereitung",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T01_o3",
+          "label": "Innerhalb von drei bis vier Wochen, nach gründlicher Vorbereitung",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T01_o4",
+          "label": "Später als vier Wochen, nach sehr ausführlicher Prüfung und Vorbereitung",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec TQ01 (Pretest-beobachtet): nur Startgeschwindigkeit/Vorbereitungsdauer variieren.",
+      "shortLabel": "Tempo"
+    },
+    {
+      "itemId": "T02",
+      "order": 17,
+      "section": "Tempo und Qualität",
+      "prompt": "Ein Ergebnis für Kund:innen (z. B. ein Angebot, eine Software-Version, ein Prototyp) erfüllt seinen Kernnutzen. Es hat keine Sicherheits-, Rechts- oder wesentlichen Funktionsprobleme, aber sichtbare, nicht kritische Schwächen (z. B. Gestaltung, Komfort, fehlende Nebenfunktionen). Wann sollte es aus deiner Sicht zu Kund:innen gehen?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "T02_o1",
+          "label": "Jetzt – wir verbessern anhand der Rückmeldungen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T02_o2",
+          "label": "Nachdem die auffälligsten Schwächen behoben sind",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T02_o3",
+          "label": "Nachdem die meisten sichtbaren Schwächen behoben sind",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "T02_o4",
+          "label": "Erst wenn es auch in den Details so ist, wie wir es selbst gut finden",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec TQ02 (Pretest-beobachtet): Szenario fixiert den Kontext.",
+      "shortLabel": "Qualitätsanspruch"
+    },
+    {
+      "itemId": "E01",
+      "order": 18,
+      "section": "Entscheiden",
+      "prompt": "Wenn dein Verantwortungsbereich klar ist: Wie möchtest du im Alltag entscheiden, wie du ein Ziel erreichst?",
+      "hint": null,
+      "answerFormat": "ordinal_choice",
+      "options": [
+        {
+          "optionId": "E01_o1",
+          "label": "ich möchte das Vorgehen grundsätzlich gemeinsam abstimmen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o2",
+          "label": "ich möchte die meisten Schritte vorher abstimmen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o3",
+          "label": "teils selbst entscheiden, teils abstimmen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o4",
+          "label": "meist selbst entscheiden und bei wichtigen Punkten Rücksprache halten",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E01_o5",
+          "label": "in meinem Bereich selbst entscheiden und nur bei größeren Auswirkungen abstimmen",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (U01); Beta-ID E01. Uebernahme-Kandidat.",
+      "shortLabel": "Entscheidungsspielraum"
+    },
+    {
+      "itemId": "E02",
+      "order": 19,
+      "section": "Entscheiden",
+      "prompt": "Ihr seid euch bei einer wichtigen Entscheidung uneinig. Sie liegt klar im Verantwortungsbereich einer Person und betrifft die anderen Bereiche nicht wesentlich. Welche Regel sollte dann gelten?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "E02_o1",
+          "label": "verantwortliche Person entscheidet nach Anhörung",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E02_o2",
+          "label": "vorher benannte andere Person entscheidet nach Rücksprache",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E02_o3",
+          "label": "Mehrheit entscheidet",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E02_o4",
+          "label": "nur bei Zustimmung aller",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E02_o5",
+          "label": "abhängig von Entscheidungsart",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "cannot_assess",
+          "label": "kann ich noch nicht einschätzen"
+        }
+      ],
+      "note": "Unveraendert aus venture-alignment-v1 (G01); Beta-ID E02. Uebernahme-Kandidat.",
+      "shortLabel": "Regel bei Uneinigkeit"
+    },
+    {
+      "itemId": "E03",
+      "order": 20,
+      "section": "Entscheiden",
+      "prompt": "Bei welchen Entscheidungen sollten aus deiner Sicht immer alle Founder zustimmen?",
+      "hint": null,
+      "answerFormat": "multi_choice",
+      "options": [
+        {
+          "optionId": "E03_o1",
+          "label": "neue Founder/Beteiligungen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o2",
+          "label": "größere finanzielle Verpflichtungen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o3",
+          "label": "grundlegende Richtungsänderung",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o4",
+          "label": "Unternehmensverkauf",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o5",
+          "label": "wesentliche Änderung persönlicher Zusagen",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o6",
+          "label": "weitere",
+          "requiresText": true,
+          "exclusive": false
+        },
+        {
+          "optionId": "E03_o7",
+          "label": "Keine davon",
+          "requiresText": false,
+          "exclusive": true
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht festgelegt"
+        }
+      ],
+      "note": "Spec EN03: aus G05, plus exklusive Option „Keine davon“ (inhaltliche Position, nicht „noch nicht entschieden“). Nicht uebernahmefaehig.",
+      "shortLabel": "Immer einstimmig"
+    },
+    {
+      "itemId": "N01",
+      "order": 21,
+      "section": "Kommunikation",
+      "prompt": "Wann möchtest du von einer wichtigen Veränderung in einem anderen Verantwortungsbereich erfahren?",
+      "hint": null,
+      "answerFormat": "single_choice",
+      "options": [
+        {
+          "optionId": "N01_o1",
+          "label": "Schon während sie geprüft wird",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "N01_o2",
+          "label": "Sobald eine Richtung wahrscheinlich ist",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "N01_o3",
+          "label": "Wenn sie entschieden ist",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "N01_o4",
+          "label": "Erst wenn sie meinen Bereich betrifft",
+          "requiresText": false,
+          "exclusive": false
+        },
+        {
+          "optionId": "N01_o5",
+          "label": "Das hängt von der Art der Veränderung ab",
+          "requiresText": false,
+          "exclusive": false
+        }
+      ],
+      "missing": [
+        {
+          "code": "not_decided",
+          "label": "habe ich noch nicht entschieden"
+        }
+      ],
+      "note": "Spec KO01 (aus K03, Option 4 umformuliert -> nicht uebernahmefaehig).",
+      "shortLabel": "Information über Änderungen"
+    }
+  ]
+}

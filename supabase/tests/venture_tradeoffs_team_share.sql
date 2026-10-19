@@ -143,7 +143,7 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"e1000001-0001-4001-8001-00000000000a","role":"authenticated"}';
 select extensions.throws_ok($$insert into public.alignment_shares (assessment_id, recipient_user_id) values ('e3000001-0000-4000-8000-000000000000','e1000004-0004-4004-8004-00000000000d')$$, '42501', null, 'no directed share of this instrument (also not to an advisor)');
 reset role;
-select extensions.throws_ok($$insert into public.assessment_team_shares (assessment_id,team_id,owner_user_id,instrument_id) values ('e3000090-0000-4000-8000-000000000000','e2000001-0001-4001-8001-0000000000a1','e1000001-0001-4001-8001-00000000000a','venture-alignment-v1')$$, '23514', null, 'only the allowlisted instrument can be shared (no second version is compatible)');
+select extensions.throws_ok($$insert into public.assessment_team_shares (assessment_id,team_id,owner_user_id,instrument_id) values ('e3000090-0000-4000-8000-000000000000','e2000001-0001-4001-8001-0000000000a1','e1000001-0001-4001-8001-00000000000a','venture-alignment-v1')$$, '23503', null, 'only an instrument on the share allowlist can be shared (no other version is compatible)');
 reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"e1000001-0001-4001-8001-00000000000a","role":"authenticated"}';

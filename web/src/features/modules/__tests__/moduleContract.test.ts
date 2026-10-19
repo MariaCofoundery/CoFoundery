@@ -226,13 +226,13 @@ test("assertModuleRegistry nennt alle Verstoesse und wirft", () => {
 // Die Registry der fuenf Bestandsmodule
 // ---------------------------------------------------------------------------
 
-test("registriert sind die fuenf Bestandsmodule und das erste native Modul", () => {
+test("registriert sind die fuenf Bestandsmodule und die beiden nativen Module", () => {
   assert.deepEqual(MODULE_REGISTRY.map((def) => def.moduleId), [
-    "workstyle", "strengths", "capability", "direction", "venture_core", "venture_tradeoffs",
+    "workstyle", "strengths", "capability", "direction", "venture_core", "venture_tradeoffs", "venture_core_beta",
   ]);
   assert.deepEqual(MODULE_DEFINITIONS.map((def) => def.moduleId), MODULE_REGISTRY.map((def) => def.moduleId));
-  // Genau ein Modul ist nativ - alle anderen sind Bestandsadapter.
-  assert.deepEqual(MODULE_REGISTRY.filter((def) => !def.legacyAdapter).map((def) => def.moduleId), ["venture_tradeoffs"]);
+  // Genau zwei Module sind nativ (die Vertiefung und die Beta des Venture-Core) - alle anderen sind Bestandsadapter.
+  assert.deepEqual(MODULE_REGISTRY.filter((def) => !def.legacyAdapter).map((def) => def.moduleId), ["venture_tradeoffs", "venture_core_beta"]);
 });
 
 test("die Registry erfuellt den Contract - mit echtem Setup-Katalog und echten Sprachtexten", () => {
@@ -259,7 +259,7 @@ test("storage ist der Antwortspeicher, bindsTo der Freigabevertrag - beides getr
     assert.equal(def.input.storage, "existing", def.moduleId);
   }
   // Die Bestandsmodule teilen nach ihrem bestehenden Vertrag und sind ausdruecklich als bestehende Adapter markiert.
-  for (const def of MODULE_REGISTRY.filter((candidate) => candidate.moduleId !== "venture_tradeoffs")) {
+  for (const def of MODULE_REGISTRY.filter((candidate) => candidate.legacyAdapter)) {
     assert.equal(def.sharing.bindsTo, "existing_contract", def.moduleId);
     assert.equal(def.legacyAdapter, true, def.moduleId);
   }

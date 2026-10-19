@@ -21,6 +21,7 @@ import deDirection from "../../messages/de/direction.json";
 import deStrengths from "../../messages/de/strengths.json";
 import deModules from "../../messages/de/modules.json";
 import deVentureTradeoffs from "../../messages/de/ventureTradeoffs.json";
+import deVentureBeta from "../../messages/de/ventureBeta.json";
 import deDiscovery from "../../messages/de/discovery.json";
 import deFind from "../../messages/de/find.json";
 import deFeedback from "../../messages/de/feedback.json";
@@ -50,6 +51,7 @@ import enDirection from "../../messages/en/direction.json";
 import enStrengths from "../../messages/en/strengths.json";
 import enModules from "../../messages/en/modules.json";
 import enVentureTradeoffs from "../../messages/en/ventureTradeoffs.json";
+import enVentureBeta from "../../messages/en/ventureBeta.json";
 import enDiscovery from "../../messages/en/discovery.json";
 import enFind from "../../messages/en/find.json";
 import enFeedback from "../../messages/en/feedback.json";
@@ -86,6 +88,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     strengths: deStrengths,
     modules: deModules,
     ventureTradeoffs: deVentureTradeoffs,
+    ventureBeta: deVentureBeta,
     discovery: deDiscovery,
     find: deFind,
     feedback: deFeedback,
@@ -121,6 +124,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     strengths: enStrengths,
     modules: enModules,
     ventureTradeoffs: enVentureTradeoffs,
+    ventureBeta: enVentureBeta,
     discovery: enDiscovery,
     find: enFind,
     feedback: enFeedback,

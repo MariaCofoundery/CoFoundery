@@ -61,6 +61,10 @@ const ERLAUBT = [
   // seiner eigenen Registry (`docs/venture-tradeoffs-registry-v1.json`).
   join("src", "features", "modules", "tradeoffs") + sep,
   join("src", "features", "modules", "ui", "TradeoffsFlow.tsx"),
+  // Venture Alignment (Beta): wie „Werte & Zielkonflikte" - Pruefung und Eingabefeld von v2.1, die FRAGEN aus der
+  // eigenen Registry (`docs/venture-alignment-v2-beta1-registry.json`).
+  join("src", "features", "modules", "ventureBeta") + sep,
+  join("src", "features", "modules", "ui", "BetaFlow.tsx"),
   join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
   join("src", "app", "(product)", "founder-alignment", "suche") + sep,
   // Das eigene Gesamtbild. Seit dem 30.09.2026 zeigt es das aktuelle

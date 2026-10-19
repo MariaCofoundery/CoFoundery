@@ -1,8 +1,11 @@
+import { COMPARE_RULES, methodOf, stanceOf } from "@/features/modules/ventureBeta/compareConfig";
+import { betaHandoffTargets } from "@/features/modules/ventureBeta/handoff";
 import {
   CURRENT_WORKSTYLE_INSTRUMENT,
   CURRENT_WORKSTYLE_VERSION,
 } from "@/features/instruments/workstyle/current";
 import {
+  VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID,
   VENTURE_ALIGNMENT_INSTRUMENT_ID,
   VENTURE_TRADEOFFS_INSTRUMENT_ID,
 } from "@/features/instruments/instruments";
@@ -242,6 +245,51 @@ export const VENTURE_TRADEOFFS_MODULE: ModuleDefinition = {
   i18n: { namespace: "modules" },
 };
 
+/**
+ * Venture Alignment v2 (Beta 1) - die erprobbare Beta des Venture-Core.
+ *
+ * NATIV (kein `legacyAdapter`): eigenes Instrument `venture-alignment-v2-beta1`, eigener Lebenszyklus,
+ * assessment-gebundenes Teilen (Phase E/F), Submission != Sharing. Es ERSETZT `venture_core` (v1) nicht:
+ * v1 bleibt Legacy und unveraendert lesbar; die Beta ist nur fuer freigeschaltete Konten sichtbar
+ * (`ventureBeta/gate.ts`). Vergleichbar nur mit sich selbst (exakt gleiche Instrument-ID).
+ *
+ * Die Vergleichsregeln stehen in `ventureBeta/compareConfig.ts` (Beta-Hypothesen); hier werden sie nur
+ * als Vertrag deklariert - Methode und Bedeutung getrennt, kein Score, keine Ampel.
+ */
+export const VENTURE_CORE_BETA_MODULE: ModuleDefinition = {
+  moduleId: "venture_core_beta",
+  scope: "person_in_venture",
+  tier: "core",
+  cadence: "revisable",
+  usage: "product",
+  input: {
+    method: "questionnaire",
+    storage: "assessments",
+    writesTo: "assessments + alignment_answers (module = venture_alignment, instrument venture-alignment-v2-beta1)",
+  },
+  versions: [
+    {
+      versionId: VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID,
+      instrumentId: VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID,
+      compatGroup: "venture-alignment-v2-beta1",
+    },
+  ],
+  completion: { source: "assessments.submitted_at je Vorhaben und Instrument" },
+  sharing: { ceiling: "answers", sensitivity: "standard", bindsTo: "assessment" },
+  compare: Object.entries(COMPARE_RULES).map(([target, rule]) => ({
+    target,
+    method: methodOf(rule),
+    stance: stanceOf(rule),
+  })),
+  renderers: {
+    profileCard: "me-profile:vorhaben",
+    detail: "/founder-alignment/vorhaben/beta",
+    comparison: "/teams/[teamId]/vorhaben-beta",
+  },
+  setupHandoff: betaHandoffTargets(),
+  i18n: { namespace: "modules" },
+};
+
 export const MODULE_DEFINITIONS: readonly ModuleDefinition[] = [
   WORKSTYLE_MODULE,
   STRENGTHS_MODULE,
@@ -249,4 +297,5 @@ export const MODULE_DEFINITIONS: readonly ModuleDefinition[] = [
   DIRECTION_MODULE,
   VENTURE_CORE_MODULE,
   VENTURE_TRADEOFFS_MODULE,
+  VENTURE_CORE_BETA_MODULE,
 ];

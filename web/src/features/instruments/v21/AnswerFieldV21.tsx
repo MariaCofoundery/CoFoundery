@@ -249,7 +249,8 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
   function MultiChoice() {
     const chosen = (value.optionIds as string[] | undefined) ?? [];
     const texts = (value.texts as Record<string, string> | undefined) ?? {};
-    const exclusive = item.options.find((option) => option.exclusive)?.optionId;
+    // Alle ausschliessenden Optionen (meist null oder eine; v2: zwei).
+    const exclusives = item.options.filter((option) => option.exclusive).map((option) => option.optionId);
 
     /**
      * Voll — und dann sind die übrigen aus.
@@ -269,7 +270,7 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
       chosen.length >= item.maxChoices;
 
     const toggle = (optionId: string) => {
-      const isExclusive = optionId === exclusive;
+      const isExclusive = exclusives.includes(optionId);
       // „Keine zusätzliche Absicherung“ neben drei angekreuzten Absicherungen
       // ist ein Widerspruch. Die Oberfläche löst ihn auf, statt ihn beim
       // Speichern als Fehlermeldung zurückzuwerfen.
@@ -277,7 +278,7 @@ export function AnswerFieldV21({ item: sourceItem, draft, onChange, basisEntries
         ? chosen.filter((entry) => entry !== optionId)
         : isExclusive
           ? [optionId]
-          : [...chosen.filter((entry) => entry !== exclusive), optionId];
+          : [...chosen.filter((entry) => !exclusives.includes(entry)), optionId];
 
       const cleanedTexts = Object.fromEntries(
         Object.entries(texts).filter(([key]) => next.includes(key)),

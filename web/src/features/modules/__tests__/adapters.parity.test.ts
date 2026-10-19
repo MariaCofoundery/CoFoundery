@@ -537,8 +537,17 @@ test("die Adapter- und Ladeschicht schreibt nirgends: keine Schreib-Operation, k
   const schreibend = [
     join("src", "features", "modules", "tradeoffs", "actions.ts"),
     join("src", "features", "modules", "tradeoffs", "shareActions.ts"),
+    // Venture Alignment (Beta): derselbe Aufbau - eigener Lebenszyklus und eine Freigabe.
+    join("src", "features", "modules", "ventureBeta", "actions.ts"),
+    join("src", "features", "modules", "ventureBeta", "shareActions.ts"),
   ];
-  const leseRpcs = new Set(["get_workstyle_team_share_readiness", "get_tradeoffs_team_readiness", "get_tradeoffs_team_comparison"]);
+  const leseRpcs = new Set([
+    "get_workstyle_team_share_readiness",
+    "get_tradeoffs_team_readiness",
+    "get_tradeoffs_team_comparison",
+    "get_assessment_team_readiness",
+    "get_assessment_team_comparison",
+  ]);
   for (const file of quellen("src/features/modules")) {
     if (schreibend.includes(file)) continue;
     const code = ohneKommentare(file);
@@ -605,6 +614,9 @@ test("das Produkt benutzt die Modulschicht nur an wenigen, bewussten Stellen: de
     // Phase E: die Teamseite (Karte „Gemeinsam vertiefen") und der gemeinsame Vergleich.
     join("src", "app", "(product)", "teams", "[teamId]", "page.tsx"),
     join("src", "app", "(product)", "teams", "[teamId]", "zielkonflikte", "page.tsx"),
+    // Venture Alignment (Beta, nur fuer freigeschaltete Konten): Flow-Seite und Teamreport.
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "beta", "page.tsx"),
+    join("src", "app", "(product)", "teams", "[teamId]", "vorhaben-beta", "page.tsx"),
     join("src", "app", "me", "profile", "page.tsx"),
-  ]);
+  ].sort());
 });

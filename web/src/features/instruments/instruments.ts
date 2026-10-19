@@ -90,6 +90,13 @@ export const INSTRUMENT_IDS = [
    * werden nicht umgeschrieben und nicht stillschweigend uebernommen.
    */
   "venture-tradeoffs-v1",
+  /**
+   * Venture Alignment v2 - BETA 1. Ein echtes Assessment (Scope person_in_venture, Core), live erprobbar.
+   * Bewusst NICHT die endgueltige `venture-alignment-v2`: Die Beta darf echte Daten speichern, ohne
+   * die spaetere finale ID zu verbrauchen. Nur mit sich selbst vergleichbar. `venture-alignment-v1`
+   * bleibt unveraendert lesbar (Legacy).
+   */
+  "venture-alignment-v2-beta1",
 ] as const;
 export type InstrumentId = (typeof INSTRUMENT_IDS)[number];
 
@@ -134,6 +141,9 @@ export const FOUNDER_PROFILE_INSTRUMENT_ID: InstrumentId = "founder-profile-v1";
 export const VENTURE_ALIGNMENT_INSTRUMENT_ID: InstrumentId = "venture-alignment-v1";
 /** Werte & Zielkonflikte - eine Vertiefung des Vorhabens, nicht Teil von `venture-alignment-v1`. */
 export const VENTURE_TRADEOFFS_INSTRUMENT_ID: InstrumentId = "venture-tradeoffs-v1";
+
+/** Venture Alignment v2 (Beta 1) - die erprobbare Beta des Venture-Core. */
+export const VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID: InstrumentId = "venture-alignment-v2-beta1";
 
 export function isInstrumentId(value: unknown): value is InstrumentId {
   return typeof value === "string" && (INSTRUMENT_IDS as readonly string[]).includes(value);

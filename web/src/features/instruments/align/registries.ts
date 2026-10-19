@@ -258,9 +258,12 @@ export function assertRegistryV22(registry: RegistryV22): RegistryV22 {
         fail(`${item.itemId}: Options-Kennung passt nicht: ${option.optionId}`);
       }
     }
-    if (item.options.filter((option) => option.exclusive).length > 1) {
-      // Zwei Optionen, die alles andere ausschließen, schließen einander aus.
-      fail(`${item.itemId}: mehr als eine ausschließende Option`);
+    // Mehrere ausschliessende Optionen sind erlaubt: Jede schliesst ALLE anderen aus, auch die
+    // andere (Venture Alignment v2, C03: „Ist bereits meine Haupttätigkeit“ / „Aktuell nicht
+    // geplant“). Die Antwortpruefung (`exclusiveOptionsOf`) und das Eingabefeld behandeln das so.
+    // Eine ausschliessende Option nur ausserhalb einer Mehrfachauswahl waere dagegen ein Fehler.
+    if (item.options.some((option) => option.exclusive) && item.answerFormat !== "multi_choice" && item.answerFormat !== "multi_choice_priority") {
+      fail(`${item.itemId}: ausschliessende Option ohne Mehrfachauswahl`);
     }
 
     // ZWEI, NICHT DREI. R12 fragt "Datum oder nach dem naechsten Meilenstein"
