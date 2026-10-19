@@ -16,7 +16,7 @@ import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
-import { generateConnectSuggestions } from "@/features/connect/connectSuggestionData";
+import { generateConnectSuggestions, getOwnConnectSuggestions } from "@/features/connect/connectSuggestionData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -36,6 +36,9 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
     // aufgebraucht, kehrt der Aufruf nach einer Zaehlung zurueck.
     generateConnectSuggestions(client)]);
   const listings = listingsRows.slice(0, CONNECT_PAGE_SIZE);
+  // "Fuer dich": hoechstens die drei neuesten offenen Vorschlaege als Streifen oben. Lesen allein - erzeugt
+  // wird oben, weggeklickt wird auf der Vorschlagsseite.
+  const suggestionStrip = (await getOwnConnectSuggestions(client).catch(() => [])).slice(0, 3);
   // Wie viele Kriterien gesetzt sind - danach richtet sich, ob die
   // Eingrenzung offen oder eingeklappt erscheint.
   const activeFilterCount = ["direction", "category", "remote_mode", "geographic_scope", "topic", "industry"].filter((key) => (filters[key] ?? "").trim().length > 0).length;
@@ -44,20 +47,38 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
     <div className="mx-auto max-w-6xl space-y-6">
       {/* Orientierung, Discoveryarten, Highlights, Beitrag und Suche. */}
-      <header>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-semibold tracking-[-.04em]">{t("title")}</h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("subtitle")}</p>
+            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("subtitle")}</p>
           </div>
           {/* Rechts oben steht, was einem selbst gehoert. Aus Connect fuehrte
               vorher kein Weg dorthin - man sah ausschliesslich das, was andere
               gemacht haben. */}
           <div className="flex flex-col items-start gap-2 sm:items-end">
-            {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
+            {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white underline underline-offset-4">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
           </div>
         </div>
       </header>
+
+      {suggestionStrip.length > 0 ? (
+        <section aria-labelledby="connect-for-you">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="connect-for-you" className="text-xl font-semibold text-slate-950">{t("suggestions.title")}</h2>
+            <Link href="/connect/suggestions" className="text-sm font-semibold text-violet-800 underline underline-offset-4">{t("suggestions.all")}</Link>
+          </div>
+          <ul className="mt-3 grid gap-4 md:grid-cols-3">
+            {suggestionStrip.map((suggestion) => (
+              <li key={suggestion.id} className="flex flex-col gap-2 rounded-3xl border border-slate-200 bg-white p-5">
+                <span className="self-start rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">{t(`suggestions.kinds.${suggestion.kind}`)}</span>
+                <Link href={suggestion.href} className="text-base font-semibold leading-snug text-slate-950 hover:underline">{suggestion.title}</Link>
+                <p className="text-sm leading-6 text-slate-600">{t("suggestions.because", { terms: suggestion.matchedTerms.join(", ") })}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="border-t border-slate-200/80 pt-7">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("browse.title")}</p>

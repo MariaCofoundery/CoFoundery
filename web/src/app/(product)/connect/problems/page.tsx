@@ -47,17 +47,17 @@ export default async function ConnectProblemsPage({
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
-      <header className="rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50/70 via-white to-cyan-50/50 p-5 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-violet-700">{t("problemHub.nav")}</p>
-        <h1 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">{t("problemHub.title")}</h1>
-        <div className="mt-5 max-w-2xl space-y-3 leading-7 text-slate-700">
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("problemHub.nav")}</p>
+        <h1 className="mt-2 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">{t("problemHub.title")}</h1>
+        <div className="mt-5 max-w-2xl space-y-3 leading-7 text-white">
           {(["opening", "purpose", "possibilities", "closing"] as const).map((paragraph) => (
             <p key={paragraph}>{t(`problemHub.${paragraph}`)}</p>
           ))}
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="#probleme" className={`${action} bg-slate-900 text-white hover:bg-slate-800`}>{t("problemHub.discover")}</Link>
-          <Link href="/connect/problems/new" className={`${action} border border-slate-200 bg-white hover:bg-slate-50`}>{t("problemHub.create")}</Link>
+          <Link href="#probleme" className={`${action} bg-white text-violet-800 hover:bg-violet-50`}>{t("problemHub.discover")}</Link>
+          <Link href="/connect/problems/new" className={`${action} border border-white/60 bg-white/15 text-white hover:bg-white/25`}>{t("problemHub.create")}</Link>
         </div>
       </header>
 

@@ -817,7 +817,8 @@
     "emptyText": "Wir schlagen nur vor, was sich mit deinen eigenen Angaben überschneidet – lieber nichts als etwas Beliebiges. Je genauer dein Profil ist, und vor allem: je eher du aufschreibst, was du suchst, desto mehr findet sich.",
     "emptyCta": "Profil ergänzen",
     "note": "Höchstens drei neue Vorschläge innerhalb von sieben Tagen. Neue Hinweise können auch entstehen, wenn du gerade nicht hier bist. E-Mail und Push richten sich nach deinen Einstellungen. Benachrichtigungen nennen nur die Anzahl und einen Link, keine vorgeschlagenen Namen oder Inhaltstitel.",
-    "emptyCtaAsk": "Gesuch einstellen"
+    "emptyCtaAsk": "Gesuch einstellen",
+    "all": "Alle Vorschläge"
   },
   "lifecycle": {
     "participation": "Deine CONNECT-Teilnahme",

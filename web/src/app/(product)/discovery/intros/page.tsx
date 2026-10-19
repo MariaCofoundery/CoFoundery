@@ -351,23 +351,10 @@ export default async function DiscoveryIntrosPage({
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
-          <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
-            {t("common.backToDiscovery")}
-          </Link>
-          <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                {t("intros.eyebrow")}
-              </p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
-                {t("intros.title")}
-              </h1>
-            </div>
-          </div>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            {t("intros.subtitle")}
-          </p>
+        <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("intros.eyebrow")}</p>
+          <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("intros.title")}</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("intros.subtitle")}</p>
         </header>
 
         <IntroPageMessage message={introMessage} ok={introFeedback?.ok ?? false} />

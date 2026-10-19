@@ -817,7 +817,8 @@
     "emptyText": "We only suggest what overlaps with your own entries – rather nothing than something arbitrary. The more precise your profile is, and above all: the sooner you write down what you are looking for, the more turns up.",
     "emptyCta": "Complete your profile",
     "note": "At most three new suggestions within seven days. New suggestions can also appear while you are away. Email and push follow your settings. Notifications contain only a count and a link, not suggested names or content titles.",
-    "emptyCtaAsk": "Post a request"
+    "emptyCtaAsk": "Post a request",
+    "all": "All suggestions"
   },
   "lifecycle": {
     "participation": "Your CONNECT participation",

@@ -208,19 +208,15 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <header className={CARD_CLASS}>
-          {/* Rechts oben, was einem selbst gehoert - identisch zu Connect,
-              damit man es nicht zweimal lernen muss. "Anfragen" bleibt
-              daneben stehen: Das ist ein Eingang, kein eigener Besitz. */}
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t("common.brandEyebrow")}</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{t("v2.title")}</h1>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{t("v2.subtitle")}</p>
-            </div>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/discovery/intros" className={SECONDARY_CTA_CLASS}>{t("index.openRequests")}</Link>
+        <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("common.brandEyebrow")}</p>
+          <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("v2.title")}</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("v2.subtitle")}</p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className={`rounded-full px-3 py-1.5 text-sm font-semibold ${isActive ? "bg-white text-violet-800" : "bg-white/20 text-white"}`}>
+              {isActive ? t("status.active") : t("v2.search.profileInactive")}
+            </span>
+            <Link href="/discovery/intros" className="text-sm text-white underline underline-offset-4">{t("index.openRequests")}</Link>
           </div>
         </header>
 

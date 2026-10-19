@@ -88,8 +88,9 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
   const incoming = requests.filter((request) => request.recipient_user_id === user.id && request.status !== "accepted");
   const outgoing = requests.filter((request) => request.sender_user_id === user.id && request.status !== "accepted");
 
-  return <main className="mx-auto max-w-5xl px-5 py-10"><Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("navigation.overview")}</Link>
-    <h1 className="mt-3 text-3xl font-semibold">{t("contact.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("contact.text")}</p>
+  return <main className="mx-auto max-w-5xl px-5 py-10">
+    <Link href="/connect" className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("navigation.overview")}</Link>
+    <header className="brand-panel rounded-[28px] p-6 sm:p-8"><h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("contact.title")}</h1><p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("contact.text")}</p></header>
     {knownKey(query.changed, CONNECT_CONTACT_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`contact.success.${knownKey(query.changed, CONNECT_CONTACT_KEYS)}`)}</p> : null}
     {query.error ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(query.error === "report" ? "safety.reportError" : "contact.error")}</p> : null}
     {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
