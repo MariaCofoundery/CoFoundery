@@ -11,12 +11,19 @@ import {
 /**
  * Venture Alignment v1 - ein Adapter je Vorhaben.
  *
- * QUELLE DER WAHRHEIT: `assessments` je Vorhaben und Instrument. Der Adapter
- * folgt derselben Regel wie die Teamseite (`loadTeamJourneyStatus`): Es zaehlt
- * die NEUESTE Zeile - abgegeben heisst fertig, eine Zeile ohne Abgabe heisst
- * begonnen, keine Zeile heisst offen. Ein neuerer Entwurf nach einer Abgabe
- * macht den Stand also wieder „begonnen"; das ist die heutige Produktlogik und
- * wird hier nicht veraendert.
+ * QUELLE DER WAHRHEIT: `assessments` je Vorhaben und Instrument.
+ *
+ * EIN ABGESCHLOSSENER STAND BLEIBT GUELTIG. Wer fuer dieses Vorhaben je
+ * abgegeben hat, ist `done_for_now` - auch wenn danach ein neuer Entwurf
+ * begonnen wurde. Ein Update ist eine Aktualisierung, nicht wieder
+ * „unvollstaendig"; `completedVersion` ist die Version der neuesten
+ * ABGEGEBENEN Zeile. Gibt es nur Entwuerfe, ist der Stand `in_progress`, ohne
+ * Zeile `not_started`.
+ *
+ * DAS WEICHT IN EINEM FALL VON DER TEAMSEITE AB: `loadTeamJourneyStatus` liest
+ * nur die NEUESTE Zeile und zeigt nach einer Abgabe plus neuem Entwurf wieder
+ * „begonnen". Die Teamseite bleibt, wie sie ist; die Abweichung ist gewollt und
+ * im Parity-Test festgehalten.
  *
  * KEIN VORHABEN, KEIN STATUS. Ein `person_in_venture`-Modul hat ohne
  * Vorhaben keinen Zustand - das ist ein Fehler des Aufrufers, kein „offen".
@@ -24,7 +31,7 @@ import {
  * „unavailable") und wird nicht still zu „offen".
  */
 
-function latestRow(context: ModuleContext, ventureId: string): AssessmentRow | null {
+function rowsOf(context: ModuleContext, ventureId: string): AssessmentRow[] {
   if (context.ventureAssessments === undefined) {
     throw new ModuleContextError("module_context_missing_venture_assessments");
   }
@@ -35,10 +42,8 @@ function latestRow(context: ModuleContext, ventureId: string): AssessmentRow | n
       row.venture_id === ventureId &&
       findVersionOfInstrument(VENTURE_CORE_MODULE.moduleId, row.instrument_id) !== null
   );
-  // Neueste zuerst; ohne Zeitstempel gilt die gelieferte Reihenfolge (der
-  // Lader sortiert bereits absteigend).
-  const sorted = [...rows].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
-  return sorted[0] ?? null;
+  // Neueste zuerst; ohne Zeitstempel gilt die gelieferte Reihenfolge.
+  return [...rows].sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
 }
 
 function requireVenture(context: ModuleContext): string {
@@ -47,12 +52,14 @@ function requireVenture(context: ModuleContext): string {
 }
 
 function statusOf(context: ModuleContext): ModuleStatus {
-  const row = latestRow(context, requireVenture(context));
-  if (!row) return { state: "not_started", completedVersion: null };
-  if (!row.submitted_at) return { state: "in_progress", completedVersion: null };
-
-  const version = findVersionOfInstrument(VENTURE_CORE_MODULE.moduleId, row.instrument_id);
-  return { state: "done_for_now", completedVersion: version?.versionId ?? null };
+  const rows = rowsOf(context, requireVenture(context));
+  const submitted = rows.find((row) => row.submitted_at);
+  if (submitted) {
+    const version = findVersionOfInstrument(VENTURE_CORE_MODULE.moduleId, submitted.instrument_id);
+    return { state: "done_for_now", completedVersion: version?.versionId ?? null };
+  }
+  if (rows.length > 0) return { state: "in_progress", completedVersion: null };
+  return { state: "not_started", completedVersion: null };
 }
 
 export const ventureCoreAdapter: ModuleAdapter = {

@@ -110,6 +110,17 @@ export type ModuleDefinition = {
    * aus dem Storage zu raten. Native Module setzen ihn nie.
    */
   legacyAdapter?: true;
+  /**
+   * Die Vertiefung haengt an einem Core-Modul: dessen `moduleId`.
+   *
+   * Nur fuer `tier = deepening`, GENAU EIN primaerer Anker: Beruehrt eine
+   * Vertiefung mehrere Themen, bekommt sie im Profil trotzdem nur einen Platz.
+   * Pflicht bei jeder Vertiefung ausser im Team-Scope (ein Team-Check-in hat
+   * keinen Profil-Anhang). Das Ziel muss ein registriertes Core-Modul desselben
+   * Scopes sein - so vermischt keine Vertiefung Person und Vorhaben - und darf
+   * nicht die Vertiefung selbst sein. Die UI hat keine zweite Zuordnung.
+   */
+  deepens?: string;
   scope: ModuleScope;
   tier: ModuleTier;
   cadence: ModuleCadence;
@@ -168,6 +179,8 @@ export type ModuleUser = { id: string };
 export type ModuleTeaser = {
   href: string;
   hasContent: boolean;
+  /** Ein bis zwei kurze Saetze fuer eine abgeschlossene Vertiefung (spaeter vom Renderer des Moduls). */
+  lines?: readonly string[];
   /** Inhalte, die das Profil schon zeigt (z. B. Anzahl Staerken); kein Fortschritt. */
   counts?: Readonly<Record<string, number>>;
 };
@@ -210,9 +223,21 @@ export type AssessmentRow = {
 export type ModuleContext = {
   /** Wie `getAboutYouFacts` sie liefert; fuer die vier Person-Module. */
   personFacts?: import("@/features/profile/aboutYou").AboutYouFacts;
+  /**
+   * Hat die Person je einen Workstyle-Bogen des AKTUELLEN Instruments abgegeben?
+   *
+   * Ein abgeschlossener Stand bleibt gueltig: Ein spaeter begonnener Update-
+   * Entwurf macht daraus nicht wieder „unvollstaendig". `AboutYouFacts` kennt nur
+   * die NEUESTE Zeile (ein neuer Entwurf wuerde dort `workSubmitted = false`
+   * ergeben); diese Angabe schliesst die Luecke. `null` = nicht lesbar.
+   */
+  workstyleSubmitted?: boolean | null;
   /** Das Vorhaben (= `founder_teams.id`), fuer `person_in_venture`. */
   ventureId?: string | null;
-  /** Zeilen aus `assessments` zu diesem Vorhaben; `null` heisst: nicht lesbar. */
+  /**
+   * Zeilen aus `assessments` zu diesem Vorhaben und dem Instrument: die neueste
+   * Zeile und die neueste ABGEGEBENE (oft dieselbe). `null` heisst: nicht lesbar.
+   */
   ventureAssessments?: readonly AssessmentRow[] | null;
   /** Das Team der Teamfreigabe und ob die Person dafuer geteilt hat. */
   teamShare?: { teamId: string; active: boolean } | null;

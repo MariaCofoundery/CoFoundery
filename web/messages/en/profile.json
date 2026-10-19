@@ -423,6 +423,21 @@
       "title": "Earlier workstyle profile – historical version",
       "dated": "As of: {date}",
       "text": "From an earlier version of the workstyle profile. For reference only: it is no longer edited and is not combined with the current report."
+    },
+    "deepening": {
+      "heading": "Go deeper",
+      "intro": "Optional additions to this area.",
+      "more": "More deepenings",
+      "state": {
+        "available": "Optional",
+        "in_progress": "Started",
+        "completed": "Completed"
+      },
+      "cta": {
+        "available": "Take a look",
+        "in_progress": "Continue",
+        "completed": "View"
+      }
     }
   }
 }

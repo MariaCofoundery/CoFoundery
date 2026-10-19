@@ -54,6 +54,7 @@ const gut = (): ModuleDefinition => ({
   moduleId: "beispiel_vertiefung",
   scope: "person_in_venture",
   tier: "deepening",
+  deepens: "venture_core",
   cadence: "revisable",
   usage: "product",
   input: { method: "questionnaire", storage: "assessments", writesTo: "alignment_answers" },
@@ -101,7 +102,7 @@ test("Scope, Tier, Cadence und Usage muessen gueltig sein", () => {
 
 test("moduleId ist eindeutig und klein geschrieben", () => {
   assert.ok(regeln(mit(gut(), { moduleId: "Gross" })).includes("module_id"));
-  const doppelt = validateModuleRegistry([gut(), { ...gut(), versions: [{ versionId: "v1", instrumentId: "anders-v1", compatGroup: "x" }] }]);
+  const doppelt = validateModuleRegistry([VENTURE_CORE_MODULE, gut(), { ...gut(), versions: [{ versionId: "v1", instrumentId: "anders-v1", compatGroup: "x" }] }]);
   assert.ok(doppelt.some((issue) => issue.rule === "module_id_unique"));
 });
 
@@ -117,7 +118,7 @@ test("versionId ist je Modul eindeutig und immer Pflicht", () => {
   assert.ok(regeln(ohne).includes("version_id"));
   assert.ok(regeln(mit(gut(), { versions: [] })).includes("versions"));
   // dieselbe versionId in zwei VERSCHIEDENEN Modulen ist in Ordnung
-  const zwei = validateModuleRegistry([gut(), { ...gut(), moduleId: "zweites", versions: [{ versionId: "v1", instrumentId: "zweites-v1", compatGroup: "z" }] }]);
+  const zwei = validateModuleRegistry([VENTURE_CORE_MODULE, gut(), { ...gut(), moduleId: "zweites", versions: [{ versionId: "v1", instrumentId: "zweites-v1", compatGroup: "z" }] }]);
   assert.deepEqual(zwei, []);
 });
 
@@ -212,7 +213,7 @@ test("Sprachtexte: DE und EN muessen fuer jedes Modul vorhanden sein", () => {
 });
 
 test("eine Instrument-ID gehoert hoechstens einem Modul", () => {
-  const geteilt = validateModuleRegistry([gut(), { ...gut(), moduleId: "zweites" }]);
+  const geteilt = validateModuleRegistry([VENTURE_CORE_MODULE, gut(), { ...gut(), moduleId: "zweites" }]);
   assert.ok(geteilt.some((issue) => issue.rule === "instrument_id_unique"));
 });
 

@@ -136,6 +136,23 @@ export function validateModuleDefinition(
     add("sensitive_ceiling", "Ein sensibles Modul darf hoechstens bestaetigte Aussagen teilen (statements).");
   }
 
+  // --- Vertiefungen haengen an einem Core-Bereich --------------------------
+  if (def.tier === "deepening" && def.scope !== "team" && (def.deepens === undefined || blank(def.deepens))) {
+    add("deepens_required", "Eine Vertiefung haengt an einem Core-Modul (deepens).");
+  }
+  if (def.deepens !== undefined && typeof def.deepens !== "string") {
+    add("deepens_single", "Eine Vertiefung hat genau einen primären Core-Anker (deepens ist ein einzelner moduleId-Text).");
+  }
+  if (typeof def.deepens === "string" && def.deepens === def.moduleId) {
+    add("deepens_self", "Eine Vertiefung kann sich nicht selbst vertiefen.");
+  }
+  if (def.tier === "core" && def.deepens !== undefined) {
+    add("deepens_core", "Ein Core-Modul vertieft nichts (kein deepens).");
+  }
+  if (def.scope === "team" && def.deepens !== undefined) {
+    add("deepens_team", "Team-Module haben keinen Profil-Anhang (kein deepens).");
+  }
+
   // --- Renderer ------------------------------------------------------------
   const renderers = def.renderers;
   if (blank(renderers?.detail)) add("renderer_detail", "renderers.detail ist Pflicht.");
@@ -210,6 +227,23 @@ export function validateModuleRegistry(
       issues.push({ moduleId: def.moduleId, rule: "module_id_unique", message: `moduleId doppelt: ${def.moduleId}` });
     }
     ids.add(def.moduleId);
+  }
+
+  // Die Vertiefung zeigt auf ein Core-Modul desselben Scopes - Person und Vorhaben bleiben getrennt.
+  for (const def of defs) {
+    if (!def.deepens) continue;
+    const target = defs.find((candidate) => candidate.moduleId === def.deepens);
+    if (!target) {
+      issues.push({ moduleId: def.moduleId, rule: "deepens_target", message: `deepens zeigt auf ein unbekanntes Modul: ${def.deepens}` });
+    } else if (target.tier !== "core") {
+      issues.push({ moduleId: def.moduleId, rule: "deepens_target", message: `${def.deepens} ist kein Core-Modul.` });
+    } else if (target.scope !== def.scope) {
+      issues.push({
+        moduleId: def.moduleId,
+        rule: "deepens_scope",
+        message: `Scope ${def.scope} vertieft ein Modul mit Scope ${target.scope} (${def.deepens}).`,
+      });
+    }
   }
 
   // Eine Instrument-ID gehoert hoechstens einem Modul.

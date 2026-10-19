@@ -37,7 +37,12 @@ export const workstyleAdapter: ModuleAdapter = {
 
   status(_user, context) {
     const step = stepOf(requirePersonFacts(context), "arbeitsweise");
-    const state = moduleStateOf(step.status);
+    // EIN ABGESCHLOSSENER STAND BLEIBT GUELTIG. Das Profil liest die neueste
+    // Zeile: Ein spaeter begonnener Update-Entwurf ergaebe dort wieder
+    // „begonnen". Fuer die Modulschicht ist ein Update keine Unvollstaendigkeit -
+    // wer je abgegeben hat, bleibt `done_for_now`, bis eine neue Abgabe da ist.
+    const state =
+      context.workstyleSubmitted === true ? "done_for_now" : moduleStateOf(step.status);
     if (state !== "done_for_now") return { state, completedVersion: null };
 
     // Abgegeben ist immer das aktuelle Instrument: `getAboutYouFacts` fragt nur
@@ -49,7 +54,10 @@ export const workstyleAdapter: ModuleAdapter = {
 
   profileTeaser(_user, context) {
     const facts = requirePersonFacts(context);
-    return { href: stepOf(facts, "arbeitsweise").href, hasContent: facts.workSubmitted };
+    return {
+      href: stepOf(facts, "arbeitsweise").href,
+      hasContent: facts.workSubmitted || context.workstyleSubmitted === true,
+    };
   },
 
   shareState(_user, context) {

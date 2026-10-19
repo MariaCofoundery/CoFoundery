@@ -120,6 +120,20 @@ test("Workstyle: der Adapter sagt dasselbe wie der Schritt „arbeitsweise“ de
   assert.equal(workstyleAdapter.status(user, ctx(mit({ workSubmitted: true }))).state, "done_for_now");
 });
 
+test("Workstyle: ein abgeschlossener Stand bleibt gueltig, auch wenn ein Update-Entwurf laeuft", () => {
+  // Das Profil liest die neueste Zeile: Entwurf nach Abgabe -> workSubmitted = false.
+  const updateEntwurf = mit({ workSubmitted: false, workStarted: true, workAnswers: 5 });
+  assert.equal(workstyleAdapter.status(user, ctx(updateEntwurf)).state, "in_progress", "ohne die Angabe: wie das Profil");
+  const mitAbgabe = ctx(updateEntwurf, { workstyleSubmitted: true });
+  assert.deepEqual(workstyleAdapter.status(user, mitAbgabe), { state: "done_for_now", completedVersion: CURRENT_WORKSTYLE_VERSION });
+  assert.equal(workstyleAdapter.profileTeaser(user, mitAbgabe)?.hasContent, true);
+  // Nie abgegeben (oder nicht lesbar): es bleibt beim Stand des Profils.
+  for (const nie of [false, null, undefined]) {
+    assert.equal(workstyleAdapter.status(user, ctx(updateEntwurf, { workstyleSubmitted: nie })).state, "in_progress");
+  }
+  assert.equal(workstyleAdapter.status(user, ctx(leer, { workstyleSubmitted: false })).state, "not_started");
+});
+
 test("Strengths: der Adapter sagt dasselbe wie der Schritt „staerken“ - fertig ist, was die Person markiert", () => {
   for (const facts of personFakten()) {
     assert.equal(strengthsAdapter.status(user, ctx(facts)).state, zustand[produktSchritt(facts, "staerken")]);
@@ -247,12 +261,18 @@ test("Venture: Status je Vorhaben folgt der Teamseite", () => {
   );
 });
 
-test("Venture: die NEUESTE Zeile zaehlt - ein neuerer Entwurf macht den Stand wieder „begonnen“", () => {
+test("Venture: ein abgeschlossener Stand bleibt gueltig - ein neuer Update-Entwurf macht ihn nicht wieder „begonnen“", () => {
   const alt = zeile({ submitted_at: "2026-10-02T10:00:00Z", created_at: "2026-10-01T10:00:00Z" });
   const neuerEntwurf = zeile({ created_at: "2026-10-05T10:00:00Z" });
-  assert.equal(ventureCoreAdapter.status(user, venture([alt, neuerEntwurf])).state, "in_progress");
-  assert.equal(ventureCoreAdapter.status(user, venture([neuerEntwurf, alt])).state, "in_progress");
-  assert.equal(teamseite(neuerEntwurf), "inProgress", "so rechnet die Teamseite");
+  for (const rows of [[alt, neuerEntwurf], [neuerEntwurf, alt]]) {
+    assert.deepEqual(ventureCoreAdapter.status(user, venture(rows)), { state: "done_for_now", completedVersion: "venture-alignment-v1" });
+  }
+  // Nur Entwuerfe: begonnen.
+  assert.equal(ventureCoreAdapter.status(user, venture([neuerEntwurf])).state, "in_progress");
+  // Die Freigabesicht folgt: Die abgegebene Fassung bleibt sichtbar.
+  assert.deepEqual(ventureCoreAdapter.shareState(user, venture([alt, neuerEntwurf])), { contract: "visible_on_submit", ventureId: "v-1", visibleToTeam: true });
+  // GEWOLLTE ABWEICHUNG VON DER TEAMSEITE: Sie liest nur die neueste Zeile und zeigt hier „begonnen“.
+  assert.equal(teamseite(neuerEntwurf), "inProgress", "so rechnet die Teamseite weiter");
 });
 
 test("Venture: Zeilen anderer Vorhaben oder unbekannter Instrumente zaehlen nicht", () => {
@@ -355,15 +375,26 @@ test("jedes registrierte Modul hat genau einen Adapter, der seine eigene Definit
 // Der Lader: nur lesen, mit den Abfragen des Produkts
 // ---------------------------------------------------------------------------
 
-function produktClient(over: { ventureRow?: AssessmentRow | null; readiness?: unknown; fehler?: string[] } = {}) {
-  const fehler = new Set(over.fehler ?? []);
+function produktClient(
+  over: {
+    ventureRow?: AssessmentRow | null;
+    ventureSubmitted?: AssessmentRow | null;
+    workstyleLatest?: { id: string; submitted_at: string | null } | null;
+    workstyleEverSubmitted?: boolean;
+    readiness?: unknown;
+  } = {}
+) {
   return fakeClient(
     (query) => {
-      if (fehler.has(query.table)) return { error: { message: "kaputt" } };
       switch (query.table) {
         case "assessments":
           if (eqOf(query, "instrument_id") === CURRENT_WORKSTYLE_INSTRUMENT) {
-            return { data: { id: "w-1", submitted_at: "2026-10-01T00:00:00Z" } };
+            // Mit `not(submitted_at ...)`: ob je abgegeben wurde; sonst die neueste Zeile.
+            if (query.ops.includes("not")) return { data: (over.workstyleEverSubmitted ?? true) ? { submitted_at: "2026-10-01T00:00:00Z" } : null };
+            return { data: over.workstyleLatest === undefined ? { id: "w-1", submitted_at: "2026-10-01T00:00:00Z" } : over.workstyleLatest };
+          }
+          if (query.ops.includes("not")) {
+            return { data: over.ventureSubmitted ?? (over.ventureRow?.submitted_at ? over.ventureRow : null) };
           }
           return { data: over.ventureRow ?? null };
         case "alignment_answers": return { count: 29 };
@@ -405,19 +436,45 @@ test("der Lader reicht die Fakten des Produkts weiter - und die Adapter lesen da
   assert.deepEqual(directionAdapter.status(user, context), { state: "done_for_now", completedVersion: LEGACY_UNVERSIONED });
 });
 
-test("der Lader fragt das Vorhaben wie die Teamseite: neueste Zeile je Vorhaben und Instrument", async () => {
+test("der Lader fragt das Vorhaben wie die Teamseite - plus die neueste abgegebene Zeile", async () => {
   const client = produktClient({ ventureRow: zeile({ submitted_at: "2026-10-02T10:00:00Z" }) });
   const context = await loadModuleContext(client, "u-1", { ventureId: "v-1" });
-  const abfrage = client.queries.find((q) => q.table === "assessments" && eqOf(q, "venture_id") === "v-1")!;
-  assert.equal(eqOf(abfrage, "instrument_id"), "venture-alignment-v1");
-  assert.equal(eqOf(abfrage, "user_id"), "u-1");
-  assert.ok(abfrage.ops.includes("order") && abfrage.ops.includes("limit"), "neueste zuerst, eine Zeile");
+  const abfragen = client.queries.filter((q) => q.table === "assessments" && eqOf(q, "venture_id") === "v-1");
+  assert.equal(abfragen.length, 2, "neueste Zeile und neueste abgegebene");
+  for (const abfrage of abfragen) {
+    assert.equal(eqOf(abfrage, "instrument_id"), "venture-alignment-v1");
+    assert.equal(eqOf(abfrage, "user_id"), "u-1");
+    assert.ok(abfrage.ops.includes("order") && abfrage.ops.includes("limit"), "neueste zuerst, eine Zeile");
+  }
+  assert.equal(abfragen.filter((q) => q.ops.includes("not")).length, 1);
+  assert.equal(context.ventureAssessments?.length, 1, "dieselbe Zeile wird nicht doppelt gefuehrt");
   assert.equal(ventureCoreAdapter.status(user, context).state, "done_for_now");
 
   const leerClient = produktClient({ ventureRow: null });
   const leerContext = await loadModuleContext(leerClient, "u-1", { ventureId: "v-1" });
   assert.deepEqual(leerContext.ventureAssessments, []);
   assert.equal(ventureCoreAdapter.status(user, leerContext).state, "not_started");
+});
+
+test("der Lader sieht einen abgegebenen Stand neben einem neuen Entwurf - fuer Vorhaben und Workstyle", async () => {
+  const abgegeben = zeile({ submitted_at: "2026-10-02T10:00:00Z", created_at: "2026-10-01T10:00:00Z" });
+  const entwurf = zeile({ created_at: "2026-10-05T10:00:00Z" });
+  const client = produktClient({
+    ventureRow: entwurf,
+    ventureSubmitted: abgegeben,
+    workstyleLatest: { id: "w-2", submitted_at: null }, // neueste Zeile: Update-Entwurf
+    workstyleEverSubmitted: true,
+  });
+  const context = await loadModuleContext(client, "u-1", { ventureId: "v-1" });
+  assert.equal(context.personFacts?.workSubmitted, false, "das Profil sieht nur die neueste Zeile");
+  assert.equal(context.workstyleSubmitted, true);
+  assert.deepEqual(workstyleAdapter.status(user, context), { state: "done_for_now", completedVersion: CURRENT_WORKSTYLE_VERSION });
+  assert.deepEqual(ventureCoreAdapter.status(user, context), { state: "done_for_now", completedVersion: "venture-alignment-v1" });
+
+  // Nie abgegeben: wie das Profil.
+  const nie = await loadModuleContext(produktClient({ workstyleLatest: { id: "w-3", submitted_at: null }, workstyleEverSubmitted: false }), "u-1");
+  assert.equal(nie.workstyleSubmitted, false);
+  assert.equal(workstyleAdapter.status(user, nie).state, "in_progress");
 });
 
 test("ein Lesefehler beim Vorhaben wird als „nicht lesbar“ gemeldet, nicht als „leer“", async () => {
@@ -492,12 +549,13 @@ test("keine Migration, keine neue Completion-Tabelle, keine DB-Spiegelung", () =
   }
 });
 
-test("das Produkt benutzt die Modulschicht noch nicht: kein bestehender Flow, keine Navigation, kein Sharing wurde angeschlossen", () => {
-  // Phase C darf die Karten anschliessen - dieser Test dann bewusst anpassen.
+test("das Produkt benutzt die Modulschicht nur an einer Stelle: den Vertiefungskarten im Profil", () => {
+  // Phase C schliesst GENAU `ProfileDeepenings` an - keine Navigation, kein Flow, kein Sharing.
+  // Spaetere Phasen duerfen weitere Stellen aufnehmen; dann bewusst anpassen.
   const ausserhalb: string[] = [];
   for (const file of quellen("src")) {
     if (file.startsWith(join("src", "features", "modules"))) continue;
     if (/@\/features\/modules/.test(read(file))) ausserhalb.push(file);
   }
-  assert.deepEqual(ausserhalb, []);
+  assert.deepEqual(ausserhalb, [join("src", "app", "me", "profile", "page.tsx")]);
 });

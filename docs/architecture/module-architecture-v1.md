@@ -1,6 +1,6 @@
 # Made2Found Module Architecture v1.0
 
-Status: freigegeben am 19.10.2026. Umgesetzt sind Phase A (Registry, Typen, Validatoren) und Phase B (read-only Adapter); alle weiteren Phasen stehen in Abschnitt 15.
+Status: freigegeben am 19.10.2026. Umgesetzt sind Phase A (Registry, Typen, Validatoren), Phase B (read-only Adapter) und Phase C (UX-Unterbau für Vertiefungskarten); alle weiteren Phasen stehen in Abschnitt 15.
 
 Made2Found ist keine Persönlichkeitstest-Plattform. Das Produkt macht sichtbar, wie Founder arbeiten, was sie können, welche Stärken sie zeigen, wie sie gründen wollen, wo Erwartungen zusammenpassen, wo Unterschiede bestehen und was gemeinsam geklärt werden sollte.
 
@@ -85,6 +85,7 @@ Keine Founder-Typen, keine Scores, keine Match-Prozente, keine Ampeln, keine Ran
 type ModuleDefinition = {
   moduleId: string;                        // stabil, nie wiederverwendet
   legacyAdapter?: true;                    // bestehendes System hinter einem Adapter; nie bei nativen Modulen
+  deepens?: string;                        // genau ein primärer Core-Anker einer Vertiefung (Pflicht außer im Team-Scope)
   scope: "person" | "person_in_venture" | "team";
   tier: "core" | "deepening";
   cadence: "once" | "revisable" | "recurring";
@@ -114,7 +115,7 @@ type ModuleDefinition = {
 };
 ```
 
-`additionalMethods` und `legacyAdapter` sind die einzigen Ergänzungen gegenüber dem ursprünglichen Entwurf: Strengths, Capability und Direction entstehen aus Interview *und* manueller Eingabe, ein einzelner Wert hätte eines der beiden verschwiegen; der Marker `legacyAdapter` hält die Ausnahme für bestehende Adapter explizit (Abschnitt 2).
+`additionalMethods`, `legacyAdapter` und `deepens` sind die Ergänzungen gegenüber dem ursprünglichen Entwurf (alle bestätigt): Strengths, Capability und Direction entstehen aus Interview *und* manueller Eingabe, ein einzelner Wert hätte eines der beiden verschwiegen; der Marker `legacyAdapter` hält die Ausnahme für bestehende Adapter explizit (Abschnitt 2); `deepens` gibt der Profil-UI ihren Anker aus der Registry, ohne zweite Zuordnung. Die **Singularität ist beabsichtigt**: Auch wenn eine Vertiefung mehrere Themen berührt, bekommt sie im Profil genau einen primären Anker.
 
 **Modul ≠ Instrument.** Strengths, Capability und Direction sind keine Instrument-Module. Sie haben eine `versionId`, aber keine `instrumentId`.
 
@@ -127,6 +128,7 @@ type ModuleDefinition = {
 | Input | `method` und `storage` sind getrennte Pflichtfelder; keine Kopplung wird abgeleitet |
 | Instrument | `storage = assessments` → jede Version hat eine `instrumentId` (**nicht** abgeleitet aus `method = questionnaire`) |
 | Bindung ↔ Storage | `assessments` → `assessment`, **außer** bei `legacyAdapter` (dort `existing_contract`) · `rounds` → `round` · `existing` → `existing_contract` |
+| Vertiefungen | `deepens` nur bei `tier = deepening`; **genau ein** primärer Core-Anker (ein einzelner `moduleId`-Text); das Ziel ist ein **registriertes Core-Modul desselben Scopes** und nicht die Vertiefung selbst; Core-Module und Team-Module haben kein `deepens` |
 | Marker | `legacyAdapter` nur als `true`; verlangt `bindsTo = existing_contract`; die Instrument-Pflicht bei `assessments` bleibt |
 | Team-Module | `scope = team` → `storage = rounds`, `teamView` Pflicht, kein `profileCard` |
 | Renderer | `detail` Pflicht; `profileCard` nur bei `person` und `person_in_venture`; `teamView` nur bei `team`; `comparison` nur bei definiertem `compare` |
@@ -157,6 +159,8 @@ type ModuleDefinition = {
 - Das Editor-Modell (`aboutYou.ts`) bleibt eine UX-Gruppierung. Dass Stärken ein Schritt der Station „Was du mitbringst" sind, ändert nichts daran, dass Strengths und Capability fachlich getrennte Module sind.
 - **Vertiefungen beeinflussen nie die Core-Completion.**
 - „**Dein Grundprofil steht**" = alle vier Person-Core-Module sind `done_for_now`. Die Meldung erscheint **einmalig im Moment des Übergangs**, im Flow, der das letzte fehlende Core-Modul abschließt. Sie ist kein dauerhaftes Abzeichen, keine Prozentzahl, kein Balken, kein „x von y" und braucht keinen neuen persistierten Zustand. Für `person_in_venture` gibt es keine solche Meldung.
+
+> **Umsetzungsstand (Phase C):** Vorbereitet ist nur die **Ableitung** (`isGrundprofilComplete`: jedes Person-Core-Modul der Registry ist `done_for_now`, aus den Adapterzuständen, ohne Tabelle). Die Meldung selbst ist noch nicht gebaut und wird **ereignisbasiert** ausgelöst, ohne persistierten Zustand: *vorher* `isGrundprofilComplete = false` → ein Core-Modul wird erfolgreich abgeschlossen → *nachher* `true` ⇒ einmalige Meldung „Dein Grundprofil steht“. Es gibt keinen „schon gezeigt“-State; geht die Meldung durch Abbruch oder Neuladen verloren, ist das hinnehmbar, denn sie ist eine UX-Feier, kein fachlicher Zustand. Angebunden wird sie erst dort, wo ein Core-Modul erfolgreich abgeschlossen wird. Damit sie nicht bei jedem Update zurückkehrt, gilt die Statusregel aus Abschnitt 10 (ein abgeschlossener Stand bleibt gültig). *Bekannte Grenze:* Bei Capability kann der abgeleitete Zustand zurückgehen, wenn ein neuer Bereich ohne Stufe oder Wunsch hinzukommt; beim Anbinden ist zu entscheiden, ob dieser Fall die Meldung auslösen darf.
 
 ## 6. Versioning Contract
 
@@ -263,12 +267,14 @@ interface ModuleAdapter {
     state: "not_started" | "in_progress" | "done_for_now";
     completedVersion: string | "legacy_unversioned" | null;
   };
-  profileTeaser(user, context): { href: string; hasContent: boolean; counts?: Record<string, number> } | null;
+  profileTeaser(user, context): { href: string; hasContent: boolean; lines?: string[]; counts?: Record<string, number> } | null;
   shareState(user, context): ModuleShareState;
 }
 ```
 
+- `lines` ist ein optionaler **View Contract** für abgeschlossene Vertiefungen: Die Profil-UI zeigt höchstens zwei kurze Zeilen, alles Weitere gehört in die Detailansicht. Dafür gibt es keine zusätzliche Result- oder Summary-Abstraktion.
 - Adapter sind **read-only** und verändern keine bestehende Logik. Jede Source of Truth bleibt dort, wo sie heute ist; es gibt keine neue Completion-Tabelle und keine neue DB-Abstraktion.
+- **Ein abgeschlossener Stand bleibt gültig.** Ein gültig abgeschlossenes Core-Modul verliert `done_for_now` nicht dadurch, dass später ein Update- oder Re-Assessment-Entwurf beginnt (Workstyle: je abgegeben; Venture: je Vorhaben abgegeben). Ein neuer Entwurf ist eine Aktualisierung, nicht wieder „unvollständig“. `completedVersion` ist die Version der neuesten **abgegebenen** Zeile. *Abweichung vom Produkt:* Profil (`aboutYou`) und Teamseite (`loadTeamJourneyStatus`) lesen nur die neueste Zeile und zeigen nach Abgabe plus neuem Entwurf wieder „begonnen“. Beide bleiben unverändert; die Abweichung ist im Parity-Test festgehalten.
 - `completedVersion` ist nur bei `done_for_now` gesetzt (Version des *abgeschlossenen* Ergebnisses). Ergebnisse ohne gespeicherten Stempel ergeben `legacy_unversioned`; sie werden nie auf die aktuelle `versionId` gemappt.
 - **Parity-Tests** prüfen die Adapter gegen die heutige Produktlogik (`buildAboutYou`, `loadTeamJourneyStatus`, `workstyleSetupHandoff`, `deepDiveLinks`, `parseTeamReadiness`).
 - Bestehende Listen (Stationen, `/me/profile`-Sections, `PAGE_STEPS`) bleiben zunächst. Ein Ersatz kommt später und schrittweise.
@@ -297,6 +303,7 @@ Das bist du
 ```
 
 - **Vertiefungen hängen an dem Kernbereich, den sie vertiefen.** Es gibt keine gemeinsame Sammelsektion, die Person- und Vorhaben-Scope mischen würde.
+- **Umsetzung (Phase C):** `ProfileDeepenings` unter „Wie du arbeitest“ (Anker `workstyle`) und „So willst du gründen“ (Anker `venture_core`). Titel, Zusammenfassung und Ziel kommen aus der Registry, der Zustand aus dem Adapter. Solange keine Vertiefung registriert ist, entsteht weder Markup noch eine Abfrage; das ist der Schalter.
 - **Karte in drei Zuständen:** *Angebot* (gestrichelt, nie als Lücke), *begonnen*, *abgeschlossen* mit ein bis zwei Aussagen oder einer Mikrovisualisierung. Das Detail liegt hinter einem Klick.
 - Höchstens drei Karten gleichzeitig, der Rest unter „Weitere Vertiefungen"; dazu eine kleine Übersichtsseite.
 - **Kein neuer Menüpunkt**, die Profil-Navigation ist per Test festgelegt. Vertiefungen werden standardmäßig nicht gedruckt.
@@ -388,7 +395,7 @@ Ob der Pilot einen eigenen `assessments.module`-Wert bekommt oder unter einer be
 | **0** | Architecture v1.0 finalisieren | nein | erledigt |
 | **A** | Code-Registry, Typen, Contract-Validatoren für Workstyle, Strengths, Capability, Direction, Venture Alignment | **nein** | umgesetzt |
 | **B** | Read-only Adapter für dieselben fünf Systeme, Parity-Tests | **nein** | umgesetzt |
-| **C** | Minimaler Profile-UX-Support für Vertiefungskarten, Feature-Flag, kein Datenumbau | nein | offen |
+| **C** | Minimaler Profile-UX-Support für Vertiefungskarten; ohne registrierte Vertiefung entsteht keine sichtbare Änderung, kein Datenumbau | nein | umgesetzt |
 | **D** | Pilot „Werte & Zielkonflikte" | ggf. additiv | offen |
 | **E** | Sharing + Teamvergleich optionaler Module; erst hier ggf. `module_versions` | ja, minimal | offen |
 | **F** | `venture-alignment-v2`, erst nachdem der Pilot die Architektur bewiesen hat | ja | offen |
@@ -467,6 +474,11 @@ Bewusst vertagt, aber nicht offen: die genaue Item-Liste von `venture-alignment-
 | Team-Check-in-Inhalt | zwei getrennte Bereiche, Reveal, keine Anonymitätsbehauptung | kleine Teams sind nicht anonymisierbar | kein Gesamtwert |
 | Designbudget | Faustregel 6–10, situativ auch 4 | Qualität vor Umfang | kein starres Limit |
 | FIND | gemeinsames Glossar, keine gemeinsame Source of Truth | Suchkontext ≠ Vorhaben | nur Übernahme per Nutzeraktion |
+| Vertiefung hängt an einem Core-Modul | `ModuleDefinition.deepens`: genau ein primärer Anker, registriertes Core-Modul desselben Scopes, kein Self-Reference, nur bei `tier = deepening` | die UI braucht den Anker, ohne eine zweite Liste zu führen; Scopes werden nicht gemischt | Validator: `deepens_required`, `deepens_scope`, `deepens_target`; Karten erscheinen nur am passenden Core-Bereich |
+| Vertiefungskarten (Phase C) | Zustände `available` · `in_progress` · `completed`; höchstens drei sichtbar, Rest unter „Weitere Vertiefungen“; Angebot gestrichelt und neutral; keine Zahl, kein Fortschritt | Vertiefungen sind Angebote, keine Lücken | ohne registrierte Vertiefung unsichtbar; Karten nur im Bildschirm, nicht im Druck |
+| „Dein Grundprofil steht“ | ereignisbasiert über den Übergang `false → true` von `isGrundprofilComplete`; kein persistierter „schon gezeigt“-State; in Phase C nur die Ableitung | UX-Feier, kein fachlicher Zustand; ein verpasster Hinweis ist hinnehmbar | Meldung wird dort angebunden, wo ein Core-Modul erfolgreich abgeschlossen wird |
+| Abgeschlossener Stand bleibt gültig | ein gültig abgeschlossenes Core-Modul bleibt `done_for_now`, auch bei neuem Update-Entwurf (Workstyle, Venture) | ein Update ist keine Unvollständigkeit; die Feier kehrt nicht bei jeder Aktualisierung zurück | Adapter weichen in diesem einen Fall von `aboutYou` und Teamseite ab (dokumentiert, getestet) |
+| `ModuleTeaser.lines` | optionaler View Contract, höchstens zwei kurze Zeilen | Details gehören in die Detailansicht | keine zusätzliche Result- oder Summary-Abstraktion |
 | Interview | kein generisches Framework jetzt | erst ein zweiter echter Use Case | bestehende Interviews bleiben |
 | Capability-Provenance | `origin` für Evidenz vorgesehen | nachvollziehbare Herkunft | Migration später |
 | Pilot | Werte & Zielkonflikte (W03–W06), person_in_venture, deepening, `storage = assessments` | vorhandener Inhalt, Format und Vergleich; geringe Sensitivität | alte W-Antworten bleiben historisch, Übernahme nur per Opt-in |

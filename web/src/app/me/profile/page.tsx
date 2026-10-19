@@ -33,6 +33,7 @@ import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
 import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePillar";
 import { SelfReportView } from "@/features/reporting/SelfReportView";
+import { ProfileDeepenings } from "@/features/modules/ui/ProfileDeepenings";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -437,20 +438,25 @@ export default async function FounderProfilePage({
         {teil(
           "arbeitsweise",
           "indigo",
-          workstyleV04 ? (
-            <>
-              <WorkstyleProfileSummary locale={await getDisplayLocale()} profile={workstyleV04} />
-              <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
-                {t("currentWorkstyle.openReport")}
-              </Link>
-            </>
-          ) : (
-            <MissingSection
-              title={t("currentWorkstyle.empty")}
-              href={CURRENT_WORKSTYLE_HREF}
-              cta={t("currentWorkstyle.cta")}
-            />
-          )
+          <>
+            {workstyleV04 ? (
+              <>
+                <WorkstyleProfileSummary locale={await getDisplayLocale()} profile={workstyleV04} />
+                <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
+                  {t("currentWorkstyle.openReport")}
+                </Link>
+              </>
+            ) : (
+              <MissingSection
+                title={t("currentWorkstyle.empty")}
+                href={CURRENT_WORKSTYLE_HREF}
+                cta={t("currentWorkstyle.cta")}
+              />
+            )}
+            {/* Phase C: Vertiefungen haengen an dem Core-Bereich, den sie vertiefen.
+                Solange keine registriert ist, entsteht hier weder Markup noch eine Abfrage. */}
+            <ProfileDeepenings anchorModuleId="workstyle" userId={user.id} />
+          </>
         )}
 
         {/* 3 - Deine Staerken. Zusammenfassung: die ersten fuenf.
@@ -829,6 +835,12 @@ export default async function FounderProfilePage({
                 cta={t("venture.emptyCta")}
               />
             )}
+            {/* Phase C: Vorhaben-Vertiefungen nur hier, nie bei Person-Bereichen. */}
+            <ProfileDeepenings
+              anchorModuleId="venture_core"
+              userId={user.id}
+              ventureId={aktuellesVorhaben?.id ?? null}
+            />
           </>
         )}
       </div>

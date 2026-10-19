@@ -423,6 +423,21 @@
       "title": "Früheres Arbeitsprofil – historischer Stand",
       "dated": "Stand: {date}",
       "text": "Aus einer früheren Fassung des Arbeitsprofils. Nur noch zum Nachlesen: Es wird nicht mehr bearbeitet und nicht mit dem aktuellen Bericht verrechnet."
+    },
+    "deepening": {
+      "heading": "Vertiefen",
+      "intro": "Freiwillige Ergänzungen zu diesem Bereich.",
+      "more": "Weitere Vertiefungen",
+      "state": {
+        "available": "Freiwillig",
+        "in_progress": "Begonnen",
+        "completed": "Abgeschlossen"
+      },
+      "cta": {
+        "available": "Ansehen",
+        "in_progress": "Weitermachen",
+        "completed": "Ansehen"
+      }
     }
   }
 }
