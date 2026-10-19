@@ -341,7 +341,8 @@
     "invitationsSummary": "Offene Einladungen",
     "invitationsSummaryText": "Eingegangene und von dir verschickte Einladungen.",
     "teamIntakeText": "Nimmst du an einem Team-Intake teil?",
-    "teamIntakeLink": "Zum Team-Intake"
+    "teamIntakeLink": "Zum Team-Intake",
+    "moreSummary": "Mehr rund ums Team"
   },
   "profile": {
     "eyebrow": "Profil & Einstellungen",
@@ -764,7 +765,8 @@
     "edit": {
       "title": "Angaben bearbeiten",
       "action": "Bearbeiten"
-    }
+    },
+    "moreSummary": "Mehr zu deinem Profil"
   },
   "path": {
     "title": "Euer Weg",

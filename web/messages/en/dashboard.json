@@ -341,7 +341,8 @@
     "invitationsSummary": "Open invitations",
     "invitationsSummaryText": "Invitations you received or sent.",
     "teamIntakeText": "Taking part in a team intake?",
-    "teamIntakeLink": "Go to team intake"
+    "teamIntakeLink": "Go to team intake",
+    "moreSummary": "More about your team"
   },
   "profile": {
     "eyebrow": "Profile & settings",
@@ -764,7 +765,8 @@
     "edit": {
       "title": "Edit details",
       "action": "Edit"
-    }
+    },
+    "moreSummary": "More about your profile"
   },
   "path": {
     "title": "Your path",

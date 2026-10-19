@@ -71,9 +71,11 @@ test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find u
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
   assert.match(dashboard, /className="brand-panel mt-5/);
   assert.match(dashboard, /<DashboardPath/);
-  assert.match(dashboard, /<DashboardAreas hasConnect=\{isNetworkMember\}/);
-  // Reihenfolge: Hero, Weg, Aufgaben, Teams, Profil, Bereiche.
-  const order = ["data-dashboard-hero", "<DashboardPath", 'id="dashboard-block-tasks"', 'id="dashboard-block-connections"', 'id="dashboard-block-profile"', "<DashboardAreas"].map((m) => dashboard.indexOf(m));
+  // Die Bereichsleiste ist weg: Align, Find und Connect stehen in der Navigation.
+  assert.doesNotMatch(dashboard, /<DashboardAreas/);
+  assert.match(dashboard, /taskPresentations\.length > 0/);
+  // Reihenfolge: Hero, Weg, Aufgaben, Teams, Profil, Konto.
+  const order = ["data-dashboard-hero", "<DashboardPath", 'id="dashboard-block-tasks"', 'id="dashboard-block-connections"', 'id="dashboard-block-profile"', 'id="dashboard-block-account"'].map((m) => dashboard.indexOf(m));
   assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
   const orientation = code("src/features/dashboard/DashboardOrientation.tsx");
   assert.doesNotMatch(orientation, /%|percent|von\s+\d|\bscore\b/i);

@@ -7,7 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
-import { DashboardAreas, DashboardPath } from "@/features/dashboard/DashboardOrientation";
+import { DashboardPath } from "@/features/dashboard/DashboardOrientation";
 import {
   DashboardTaskList,
   type DashboardTaskPresentation,
@@ -414,6 +414,7 @@ export default async function DashboardPage({
         hasTeam={founderTeams.length > 0}
       />
 
+      {taskPresentations.length > 0 ? (
       <section
         id="dashboard-block-tasks"
         className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
@@ -432,6 +433,7 @@ export default async function DashboardPage({
           emptyText={t("tasks.empty.text")}
         />
       </section>
+      ) : null}
 
       <section
         id="dashboard-block-connections"
@@ -458,6 +460,9 @@ export default async function DashboardPage({
 
         <DashboardConnectionCards overview={connectionOverview} />
 
+        <details className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.moreSummary")}</summary>
+          <div className="mt-4">
         <div className="mt-5">
           <AlignVentureActions state={alignState} />
         </div>
@@ -476,6 +481,9 @@ export default async function DashboardPage({
             </Link>
           </p>
         </div>
+
+          </div>
+        </details>
 
         {actionableIncomingInvites.length + sentInvitesSorted.length > 0 ? (
           <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
@@ -545,7 +553,9 @@ export default async function DashboardPage({
           </details>
         ) : null}
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("aboutYou.moreSummary")}</summary>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
             <p className="text-sm font-semibold text-slate-900">{t("aboutYou.ownProfile.title")}</p>
             <p className="mt-1 text-xs leading-5 text-slate-500">{t("aboutYou.ownProfile.text")}</p>
@@ -573,6 +583,7 @@ export default async function DashboardPage({
             </Link>
           </div>
         </div>
+        </details>
       </section>
 
       {/* Fruehere Auswertungen: erhalten und erreichbar, aber eingeklappt und
@@ -616,8 +627,6 @@ export default async function DashboardPage({
 
       {/* Konto: /account bietet Support und "alle Sitzungen abmelden" nicht an,
           deshalb bleibt beides hier - eingeklappt am Ende. */}
-      <DashboardAreas hasConnect={isNetworkMember} />
-
       <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
         <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
           {t("utilities.account")}
