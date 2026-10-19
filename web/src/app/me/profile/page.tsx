@@ -278,6 +278,7 @@ export default async function FounderProfilePage({
         id={id}
         tone={tone}
         step={nummer(id)}
+        defaultOpen={id === "ueber-dich" || id === "arbeitsweise"}
         title={eigenerTitel ? sections.find((section) => section.id === id)?.title ?? "" : null}
       >
         {children}

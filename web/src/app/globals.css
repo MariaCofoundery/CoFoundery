@@ -946,3 +946,11 @@ body {
     color: inherit !important;
   }
 }
+
+@media print {
+  /* Im Ausdruck sind eingeklappte Profilabschnitte offen. */
+  details:not([open])::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+}

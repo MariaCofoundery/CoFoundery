@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PillarDetails } from "@/features/reporting/PillarDetails";
 
 /**
  * Ein Abschnitt von "Das bist du".
@@ -64,6 +65,7 @@ export function ProfilePillar({
   step,
   title,
   intro,
+  defaultOpen = true,
   children,
 }: {
   id: string;
@@ -76,6 +78,8 @@ export function ProfilePillar({
   /** Darf fehlen, wenn der Teil darueber denselben Namen traegt. */
   title?: string | null;
   intro?: string | null;
+  /** Auf dem Bildschirm zunaechst offen; Sprunglinks oeffnen den Abschnitt immer. */
+  defaultOpen?: boolean;
   children: ReactNode;
 }) {
   // Jeder Abschnitt ist eine Karte (UX-Neuordnung, Oktober 2026): ein ruhiger, gleich aufgebauter Rahmen statt
@@ -83,32 +87,34 @@ export function ProfilePillar({
   const toneClasses = TONE[tone];
 
   return (
-    <section
+    <PillarDetails
       id={id}
+      defaultOpen={defaultOpen}
       className="mt-6 scroll-mt-6 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] first:mt-8 sm:p-6 print:mt-8 print:rounded-none print:border-0 print:bg-transparent print:p-0 print:shadow-none"
+      summary={
+        <header className="flex items-start gap-4">
+          {/* Die Randlinie traegt die Farbe. Sie ist Schmuck: Alles, was sie
+              sagt, steht daneben auch in Worten. */}
+          <span aria-hidden className={`mt-1 h-10 w-1 shrink-0 rounded-full ${toneClasses.rule}`} />
+          <div className="min-w-0">
+            <p
+              className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${toneClasses.eyebrow}`}
+            >
+              {step}
+            </p>
+            {title ? (
+              <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
+            ) : null}
+            {intro ? (
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{intro}</p>
+            ) : null}
+          </div>
+        </header>
+      }
     >
-      <header className="flex items-start gap-4">
-        {/* Die Randlinie traegt die Farbe. Sie ist Schmuck: Alles, was sie
-            sagt, steht daneben auch in Worten. */}
-        <span aria-hidden className={`mt-1 h-10 w-1 shrink-0 rounded-full ${toneClasses.rule}`} />
-        <div className="min-w-0">
-          <p
-            className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${toneClasses.eyebrow}`}
-          >
-            {step}
-          </p>
-          {title ? (
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">{title}</h2>
-          ) : null}
-          {intro ? (
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{intro}</p>
-          ) : null}
-        </div>
-      </header>
-
       {/* Die Saeule ordnet die Abstaende, nicht ihre Teile - sonst haengt
           an jeder Naht eine doppelte Luecke. */}
       <div className="mt-5 space-y-4">{children}</div>
-    </section>
+    </PillarDetails>
   );
 }
