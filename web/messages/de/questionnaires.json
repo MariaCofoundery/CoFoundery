@@ -65,5 +65,33 @@
       "label": "Wer sieht was",
       "text": "Nur du – bis du freigibst. Im Teamvergleich nur, wenn alle freigegeben haben."
     }
+  },
+  "flow": {
+    "steps": "Schritte",
+    "back": "Zurück",
+    "next": "Weiter",
+    "answered": "beantwortet",
+    "open": "offen",
+    "noCounts": "Keine Prozent, keine Zähler. Du kannst jederzeit zurück und Antworten ändern."
+  },
+  "filters": {
+    "label": "Filter",
+    "all": "Alle",
+    "person": "Über mich",
+    "venture": "Für dieses Vorhaben",
+    "team": "Mit dem Team",
+    "deepening": "Zum Vertiefen"
+  },
+  "tags": {
+    "pair": "Zu zweit",
+    "together": "Gemeinsam"
+  },
+  "soon": {
+    "tag": "Bald",
+    "meta": "in Vorbereitung",
+    "limits": {
+      "title": "Grenzen",
+      "text": "Was für dich nicht infrage kommt. Sensibel – deshalb später und nur auf deinen Wunsch."
+    }
   }
 }

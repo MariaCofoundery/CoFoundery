@@ -72,7 +72,8 @@
     "errors": {
       "incomplete": "A question is still open.",
       "generic": "That could not be submitted. Your answers are saved – please try again shortly."
-    }
+    },
+    "privacyNote": "Only for you. Submitting shares nothing. Only afterwards you decide whether your team may see this run in the comparison. Amounts you optionally enter here never appear in the team comparison."
   },
   "result": {
     "title": "Your summary",

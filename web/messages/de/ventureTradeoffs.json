@@ -36,7 +36,8 @@
     "errors": {
       "incomplete": "Eine Situation ist noch offen.",
       "generic": "Das konnte nicht abgegeben werden. Deine Antworten sind gespeichert – versuch es gleich noch einmal."
-    }
+    },
+    "privacyNote": "Nur für dich. Beim Abgeben wird nichts geteilt. Erst danach entscheidest du, ob dein Team diesen Durchlauf im Vergleich sehen darf."
   },
   "result": {
     "title": "Deine Antworten",

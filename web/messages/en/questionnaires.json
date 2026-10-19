@@ -65,5 +65,33 @@
       "label": "Who sees what",
       "text": "Only you – until you share. In the team comparison only when everyone has shared."
     }
+  },
+  "flow": {
+    "steps": "Steps",
+    "back": "Back",
+    "next": "Next",
+    "answered": "answered",
+    "open": "open",
+    "noCounts": "No percentages, no counters. You can go back and change answers at any time."
+  },
+  "filters": {
+    "label": "Filter",
+    "all": "All",
+    "person": "About me",
+    "venture": "For this venture",
+    "team": "With the team",
+    "deepening": "To go deeper"
+  },
+  "tags": {
+    "pair": "As a pair",
+    "together": "Together"
+  },
+  "soon": {
+    "tag": "Soon",
+    "meta": "in preparation",
+    "limits": {
+      "title": "Limits",
+      "text": "What is out of the question for you. Sensitive – so later, and only if you want it."
+    }
   }
 }

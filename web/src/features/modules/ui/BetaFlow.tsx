@@ -9,6 +9,7 @@ import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/Answer
 import { completenessV21, type AlignmentAnswerV21, type AnswerableItem } from "@/features/instruments/v21/answersV21";
 import type { ItemView } from "@/features/instruments/v21/questionnaireDataV21";
 import { clearBetaAnswer, saveBetaAnswer, submitBeta } from "@/features/modules/ventureBeta/actions";
+import { StepShell } from "@/features/modules/ui/StepShell";
 import type { AppLocale } from "@/i18n/config";
 
 /**
@@ -163,11 +164,39 @@ export function BetaFlow({
     </p>
   );
 
-  return (
-    <div className="mt-6 space-y-9">
-      {blocks.map((block) => (
-        <section key={block.key} aria-labelledby={`beta-block-${block.key}`}>
-          <h2 id={`beta-block-${block.key}`} className="text-lg font-semibold text-slate-950">
+  const blockDone = (block: Block) => block.itemIds.every((itemId) => isComplete(itemId, drafts[itemId]));
+  const steps = [
+    ...blocks.map((block) => ({ key: block.key, label: t(`blocks.${block.key}.title`), done: blockDone(block) })),
+    { key: "submit", label: t("flow.submit"), done: false },
+  ];
+
+  const renderStep = (key: string) => {
+    if (key === "submit") {
+      return (
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+          <p className="text-sm leading-6 text-slate-600">{t("flow.submitHint")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("flow.submitDoesNotShare")}</p>
+          {error ? (
+            <p role="alert" className="mt-3 text-sm text-slate-800">
+              {error}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!allComplete || busy || submitting}
+            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {submitting ? t("flow.submitPending") : t("flow.submit")}
+          </button>
+        </div>
+      );
+    }
+    const block = blocks.find((entry) => entry.key === key);
+    if (!block) return null;
+    return (
+        <section aria-labelledby={`beta-block-${block.key}`}>
+          <h2 id={`beta-block-${block.key}`} className="text-sm font-semibold text-violet-700">
             {t(`blocks.${block.key}.title`)}
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t(`blocks.${block.key}.lead`)}</p>
@@ -179,7 +208,7 @@ export function BetaFlow({
               const attached = privateIds.filter((privateId) => viewById[privateId]?.basisItemId === itemId);
               return (
                 <article key={itemId} data-item-id={itemId} className="rounded-2xl border border-slate-200 bg-white p-5">
-                  <h3 className="text-base font-medium leading-7 text-slate-900">
+                  <h3 className="text-xl font-semibold leading-snug text-slate-950">
                     {alignmentDisplayText(item.prompt, locale)}
                   </h3>
                   {item.hint ? (
@@ -221,26 +250,8 @@ export function BetaFlow({
             })}
           </div>
         </section>
-      ))}
+    );
+  };
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
-        <p className="text-sm leading-6 text-slate-600">{t("flow.submitHint")}</p>
-        <p className="mt-2 text-sm leading-6 text-slate-600">{t("flow.submitDoesNotShare")}</p>
-        {error ? (
-          <p role="alert" className="mt-3 text-sm text-slate-800">
-            {error}
-          </p>
-        ) : null}
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!allComplete || busy || submitting}
-          className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {submitting ? t("flow.submitPending") : t("flow.submit")}
-        </button>
-      </div>
-    </div>
-  );
+  return <StepShell steps={steps} renderStep={renderStep} privacyNote={t("flow.privacyNote")} />;
 }
-

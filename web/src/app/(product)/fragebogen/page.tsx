@@ -39,7 +39,7 @@ const STATE_CLASS: Record<ModuleState, string> = {
   done_for_now: "bg-emerald-100 text-emerald-800",
 };
 
-export default async function QuestionnairesPage({ searchParams }: { searchParams?: Promise<{ vorhaben?: string }> }) {
+export default async function QuestionnairesPage({ searchParams }: { searchParams?: Promise<{ vorhaben?: string; gruppe?: string }> }) {
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) redirect("/login?next=/fragebogen");
   const user = auth.user;
@@ -88,6 +88,15 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
     { key: "deepening", cards: cards((def) => def.tier === "deepening") },
   ];
 
+  const filter = ["person", "venture", "team", "deepening"].includes(query.gruppe ?? "") ? (query.gruppe as string) : null;
+  const shown = (key: string) => !filter || filter === key;
+  const teamBase = venture ? `/teams/${encodeURIComponent(venture.id)}` : "/connections";
+  const teamCards = [
+    { key: "setup", tag: "together", href: venture ? `${teamBase}/setup` : "/connections" },
+    { key: "commitment", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/connections" },
+    { key: "exercises", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/connections" },
+  ] as const;
+
   const cta = (state: ModuleState) => (state === "done_for_now" ? t("cta.view") : state === "in_progress" ? t("cta.continue") : t("cta.start"));
 
   return (
@@ -95,8 +104,27 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
       <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
       <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">{t("intro")}</p>
 
+      <nav aria-label={t("filters.label")} className="mt-6 flex flex-wrap gap-2">
+        {([null, "person", "venture", "team", "deepening"] as const).map((key) => {
+          const active = (filter ?? null) === key;
+          const qs = new URLSearchParams();
+          if (query.vorhaben) qs.set("vorhaben", query.vorhaben);
+          if (key) qs.set("gruppe", key);
+          return (
+            <Link
+              key={key ?? "all"}
+              href={`/fragebogen${qs.toString() ? `?${qs}` : ""}`}
+              aria-current={active ? "true" : undefined}
+              className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm ${active ? "bg-slate-900 font-semibold text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+            >
+              {t(`filters.${key ?? "all"}`)}
+            </Link>
+          );
+        })}
+      </nav>
+
       {groups.map((group) =>
-        group.cards.length === 0 ? null : (
+        group.cards.length === 0 || !shown(group.key) ? null : (
           <section key={group.key} className="mt-10" aria-labelledby={`q-${group.key}`} data-group={group.key}>
             <h2 id={`q-${group.key}`} className="text-lg font-semibold text-slate-950">
               {t(`groups.${group.key}.title`)}
@@ -130,6 +158,14 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
                   </Link>
                 </li>
               ))}
+              {group.key === "venture" ? (
+                <li data-module="limits" data-state="planned" aria-disabled="true" className="flex flex-col gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-5 text-slate-500">
+                  <span className="self-start rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-600">{t("soon.tag")}</span>
+                  <h3 className="text-base font-semibold">{t("soon.limits.title")}</h3>
+                  <p className="text-sm leading-6">{t("soon.limits.text")}</p>
+                  <p className="text-xs">{t("soon.meta")}</p>
+                </li>
+              ) : null}
             </ul>
           </section>
         )
@@ -141,21 +177,24 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
         </section>
       ) : null}
 
+      {shown("team") ? (
       <section className="mt-10" aria-labelledby="q-team" data-group="team">
         <h2 id="q-team" className="text-lg font-semibold text-slate-950">{t("groups.team.title")}</h2>
         <p className="mt-1 text-sm text-slate-500">{t("groups.team.lead")}</p>
         <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {(["setup", "commitment", "exercises"] as const).map((key) => (
+          {teamCards.map(({ key, tag, href }) => (
             <li key={key} className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-5">
+              <span className={`self-start rounded-full px-2.5 py-0.5 text-xs font-semibold ${tag === "pair" ? "bg-amber-100 text-amber-900" : "bg-violet-100 text-violet-800"}`}>{t(`tags.${tag}`)}</span>
               <h3 className="text-base font-semibold text-slate-950">{t(`team.${key}.title`)}</h3>
               <p className="text-sm leading-6 text-slate-600">{t(`team.${key}.text`)}</p>
-              <Link href="/connections" className="mt-auto inline-flex min-h-11 items-center self-start rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-800">
+              <Link href={href} className="mt-auto inline-flex min-h-11 items-center self-start rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-800">
                 {t("team.cta")}
               </Link>
             </li>
           ))}
         </ul>
       </section>
+      ) : null}
 
       <section className="mt-10 rounded-2xl bg-slate-50 p-5">
         <h2 className="text-base font-semibold text-slate-950">{t("how.title")}</h2>

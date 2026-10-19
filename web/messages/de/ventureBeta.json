@@ -72,7 +72,8 @@
     "errors": {
       "incomplete": "Eine Frage ist noch offen.",
       "generic": "Das konnte nicht abgegeben werden. Deine Antworten sind gespeichert – versuch es gleich noch einmal."
-    }
+    },
+    "privacyNote": "Nur für dich. Beim Abgeben wird nichts geteilt. Erst danach entscheidest du, ob dein Team diesen Durchlauf im Vergleich sehen darf. Beträge, die du hier optional einträgst, erscheinen nie im Teamvergleich."
   },
   "result": {
     "title": "Deine Zusammenfassung",

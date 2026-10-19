@@ -9,6 +9,7 @@ import { AnswerFieldV21, type DraftV21 } from "@/features/instruments/v21/Answer
 import { completenessV21, type AlignmentAnswerV21, type AnswerableItem } from "@/features/instruments/v21/answersV21";
 import type { ItemView } from "@/features/instruments/v21/questionnaireDataV21";
 import { clearTradeoffAnswer, saveTradeoffAnswer, submitTradeoffs } from "@/features/modules/tradeoffs/actions";
+import { StepShell } from "@/features/modules/ui/StepShell";
 import type { AppLocale } from "@/i18n/config";
 
 /**
@@ -124,14 +125,44 @@ export function TradeoffsFlow({
     return canonical({ v: before.value ?? null, m: before.missingCode ?? null }) === canonical({ v: now.value ?? null, m: now.missingCode ?? null });
   };
 
-  return (
-    <div className="mt-6 space-y-5">
-      {items.map((item, index) => (
-        <section key={item.itemId} data-item-id={item.itemId} className="rounded-2xl border border-slate-200 bg-white p-5">
+  const steps = [
+    ...items.map((item, index) => ({
+      key: item.itemId,
+      label: t("flow.situation", { index: index + 1 }),
+      done: isComplete(item.itemId, drafts[item.itemId]),
+    })),
+    { key: "submit", label: t("flow.submit"), done: false },
+  ];
+
+  const renderStep = (key: string) => {
+    if (key === "submit") {
+      return (
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+          <p className="text-sm leading-6 text-slate-600">{t("flow.submitHint")}</p>
+          {error ? (
+            <p role="alert" className="mt-3 text-sm text-slate-800">
+              {error}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!allComplete || busy || submitting}
+            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {submitting ? t("flow.submitPending") : t("flow.submit")}
+          </button>
+        </div>
+      );
+    }
+    const item = items.find((entry) => entry.itemId === key);
+    if (!item) return null;
+    return (
+        <section data-item-id={item.itemId} className="rounded-2xl border border-slate-200 bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-            {t("flow.situation", { index: index + 1 })}
+            {t("flow.situation", { index: items.findIndex((entry) => entry.itemId === item.itemId) + 1 })}
           </p>
-          <h2 className="mt-2 text-base font-medium leading-7 text-slate-900">
+          <h2 className="mt-2 text-xl font-semibold leading-snug text-slate-950">
             {alignmentDisplayText(item.prompt, locale)}
           </h2>
           <div className="mt-4">
@@ -149,24 +180,8 @@ export function TradeoffsFlow({
             {earlierSource && same(item.itemId) ? <span>{t(`same.${earlierSource}`)}</span> : null}
           </p>
         </section>
-      ))}
+    );
+  };
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
-        <p className="text-sm leading-6 text-slate-600">{t("flow.submitHint")}</p>
-        {error ? (
-          <p role="alert" className="mt-3 text-sm text-slate-800">
-            {error}
-          </p>
-        ) : null}
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!allComplete || busy || submitting}
-          className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {submitting ? t("flow.submitPending") : t("flow.submit")}
-        </button>
-      </div>
-    </div>
-  );
+  return <StepShell steps={steps} renderStep={renderStep} privacyNote={t("flow.privacyNote")} />;
 }

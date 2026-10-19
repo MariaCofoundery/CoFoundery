@@ -102,7 +102,7 @@ export default async function BetaPage({
   const profileHref = `/me/profile?vorhaben=${encodeURIComponent(venture.id)}#vorhaben`;
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
+    <main className="mx-auto max-w-5xl px-5 py-10">
       <AlignNav current="/founder-alignment/vorhaben" state={navState} teamId={venture.id} />
       <Link
         href={profileHref}
