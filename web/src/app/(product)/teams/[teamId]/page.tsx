@@ -167,7 +167,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           (zu zweit), Vereinbaren. Ganz unten leise: Rueckblick und Team
           verlassen.
           ----------------------------------------------------------------- */}
-      <TeamPageHeader teamId={teamId} active="overview" title={title} eyebrow={t("eyebrow")} />
+      <TeamPageHeader teamId={teamId} active="overview" title={title} eyebrow={t("eyebrow")} hideTitle />
 
       <TeamOverview
         teamId={team.id}

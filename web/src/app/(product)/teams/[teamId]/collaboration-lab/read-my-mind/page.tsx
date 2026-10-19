@@ -43,12 +43,11 @@ export default async function ReadMyMindEntryPage({ params, searchParams }: { pa
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToCollaboration")}</Link>
-      <header className="rmm-enter relative mt-6 overflow-hidden rounded-[30px] bg-gradient-to-br from-violet-100 via-white to-amber-50 p-6 shadow-[0_24px_60px_rgba(76,29,149,0.1)] ring-1 ring-violet-200/70 sm:p-9">
-        <div aria-hidden="true" className="absolute -right-12 -top-16 h-56 w-56 rounded-full bg-violet-200/45 blur-3xl" />
+      <header className="rmm-enter brand-panel relative mt-6 overflow-hidden rounded-[30px] p-6 sm:p-9">
         <div className="relative">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white">{t("eyebrow")}</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{t("title")}</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("intro")}</p>
         </div>
       </header>
       <aside className="mt-5 rounded-2xl border border-violet-200 bg-violet-50/70 px-5 py-4 text-sm leading-6 text-violet-950" aria-label={t("betaLabel")}>

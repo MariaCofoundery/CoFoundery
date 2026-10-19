@@ -148,7 +148,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-6">
       {/* Phase 11.7B.1: gemeinsamer Teamkopf; der Reiter "Founder Setup" ist der Weg zur Themenliste. */}
-      <TeamPageHeader teamId={teamId} active="setup" title={t(`items.${itemKey}.title`)} teamLabel={teamLabel} />
+      <TeamPageHeader teamId={teamId} active="setup" title={t(`items.${itemKey}.title`)} teamLabel={teamLabel} hideTitle />
 
       <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8" aria-labelledby="topic-title">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t(`categories.${catalogItem.category}`)}</p>

@@ -55,7 +55,7 @@ export default async function FounderSetupPage({ params }: Props) {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
-      <TeamPageHeader teamId={teamId} active="setup" title={t("title")} teamLabel={teamLabel} />
+      <TeamPageHeader teamId={teamId} active="setup" title={t("title")} teamLabel={teamLabel} hideTitle />
       <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8" aria-labelledby="setup-title">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{teamLabel}</p>
         <h1 id="setup-title" className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>

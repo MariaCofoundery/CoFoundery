@@ -90,10 +90,11 @@ export default async function CommitmentLabPage({ params, searchParams }: Props)
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
       {/* Phase 11.7B.1: gemeinsamer Teamkopf; das Lab gehoert zur Uebersicht. */}
-      <TeamPageHeader teamId={teamId} active="overview" title={t("title")} teamLabel={teamLabel} />
-      <section className="mt-5 rounded-[28px] border border-slate-200 bg-slate-50/80 p-6 sm:p-8">
-        <p className="text-sm font-medium text-slate-700">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+      <TeamPageHeader teamId={teamId} active="overview" title={t("title")} teamLabel={teamLabel} hideTitle />
+      <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("pair", { names: lab.participantNames.join(" & ") })}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-white">{t("intro")}</p>
       </section>
       {feedback ? <p role="status" className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{t(`feedback.${feedback}`)}</p> : null}
 

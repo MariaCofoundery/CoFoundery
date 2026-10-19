@@ -24,7 +24,7 @@ export default async function FounderInTheWildEntryPage({ params, searchParams }
     ?? (locale === "de" ? "dein Co-Founder" : "your co-founder");
   return <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
     <Link href={`/teams/${encodeURIComponent(teamId)}#founder-in-the-wild`} className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-violet-500">{t("back")}</Link>
-    <header className="mt-6 rounded-[30px] border border-amber-200/80 bg-gradient-to-br from-amber-50 via-white to-violet-50 p-6 shadow-[0_20px_50px_rgba(76,29,149,0.08)] sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p><h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">{t("intro")}</p></header>
+    <header className="brand-panel mt-6 rounded-[30px] p-6 sm:p-9"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-white">{t("eyebrow")}</p><h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{t("title")}</h1><p className="mt-4 max-w-2xl text-base leading-7 text-white">{t("intro")}</p></header>
     {query.result ? <p role="status" className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">{t(query.result === "unavailable" ? "twoFounders" : query.result === "discarded" ? "discarded" : query.result === "declined" ? "declined" : "changed")}</p> : null}
     {/* Zwei Packs statt eines: "Unter Druck" allein war einmal gespielt und
         dann vorbei. Eine laufende Runde blockiert beide - man spielt nicht

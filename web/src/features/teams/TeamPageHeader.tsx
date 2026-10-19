@@ -33,6 +33,7 @@ export async function TeamPageHeader({
   title,
   teamLabel,
   eyebrow,
+  hideTitle = false,
   children,
 }: {
   teamId: string;
@@ -41,6 +42,8 @@ export async function TeamPageHeader({
   teamLabel?: string | null;
   /** Ueberschreibt die Zeile ueber dem Titel (sonst der Teamname). */
   eyebrow?: string | null;
+  /** Die Seite hat einen eigenen Kopf mit Ueberschrift (Marken-Flaeche): Zeile und Titel hier entfallen. */
+  hideTitle?: boolean;
   /** Aktionen direkt unter der Leiste (PDF, ausfuehrliche Fassung ...). */
   children?: React.ReactNode;
 }) {
@@ -54,8 +57,12 @@ export async function TeamPageHeader({
       >
         ← {t("backShort")}
       </Link>
-      <p className="mt-1 truncate text-sm font-medium text-slate-500">{line}</p>
-      <h1 className="mt-0.5 break-words text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{title}</h1>
+      {hideTitle ? null : (
+        <>
+          <p className="mt-1 truncate text-sm font-medium text-slate-500">{line}</p>
+          <h1 className="mt-0.5 break-words text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">{title}</h1>
+        </>
+      )}
       <FounderTeamNavigation
         teamId={teamId}
         active={active}

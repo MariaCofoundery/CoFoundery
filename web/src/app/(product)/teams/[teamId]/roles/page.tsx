@@ -51,8 +51,12 @@ export default async function TeamRolesPage({
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
-      <TeamPageHeader teamId={teamId} active="roles" title={t("team.title")} teamLabel={teamLabel} />
-      <p className="mt-3 max-w-2xl leading-7 text-slate-600">{t("team.text")}</p>
+      <TeamPageHeader teamId={teamId} active="roles" title={t("team.title")} teamLabel={teamLabel} hideTitle />
+      <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{teamLabel}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("team.title")}</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("team.text")}</p>
+      </section>
 
       {!data || data.contributing === 0 ? (
         /* NICHTS GETEILT IST KEIN FEHLER UND KEINE LEERE SEITE. Es ist der
