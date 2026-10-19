@@ -260,9 +260,17 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           </div>
         </section>
 
+        {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
+            Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
+            freigegeben haben. Hier steht nur die eigene Lage. */}
+        <BetaTeamCard enabled={isVentureBetaEnabled(user)} client={supabase} teamId={teamId} memberCount={team.members.length} />
+        <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+
         {/* VERTIEFEN: ausdruecklich zu zweit. Nur tatsaechlich vorhandene
             Paare - keine erfundenen Paarungen, keine neuen Relationships. */}
-        <section id="team-deep-dives" className="scroll-mt-24" aria-labelledby="team-deepen-title">
+        <details id="team-deep-dives" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white/70 p-4" open={!isPairTeam}>
+          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("deepen.summary")}</summary>
+        <section className="mt-4" aria-labelledby="team-deepen-title">
           <h2 id="team-deepen-title" className={GROUP_TITLE_CLASS}>{t("groups.discover.title")}</h2>
           <p className={GROUP_TEXT_CLASS}>{t("groups.discover.text")}</p>
           {isNewPair ? (
@@ -343,12 +351,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             </div>
           </div>
         </section>
-
-        {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
-            Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
-            freigegeben haben. Hier steht nur die eigene Lage. */}
-        <BetaTeamCard enabled={isVentureBetaEnabled(user)} client={supabase} teamId={teamId} memberCount={team.members.length} />
-        <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+        </details>
 
         {/* VEREINBAREN: Founder Setup ist der verbindliche Ort. Zahlen nur aus
             dem bestehenden Readmodel; bestaetigt ist, was alle AKTUELLEN

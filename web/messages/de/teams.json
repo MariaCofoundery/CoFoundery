@@ -152,6 +152,7 @@
     },
     "deepen": {
       "pair": "Ihr zwei: {names}",
+      "summary": "Zusammenarbeit zu zweit vertiefen",
       "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
     },
     "backShort": "Verbindungen"

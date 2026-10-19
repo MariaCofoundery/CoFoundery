@@ -152,6 +152,7 @@
     },
     "deepen": {
       "pair": "The two of you: {names}",
+      "summary": "Deepen collaboration as a pair",
       "twoOnly": "Read My Mind and Founder in the Wild can currently only be started in teams of exactly two founders. You use the Commitment Lab with the people you are directly connected with."
     },
     "backShort": "Connections"
