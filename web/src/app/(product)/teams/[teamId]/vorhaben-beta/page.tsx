@@ -7,6 +7,7 @@ import { BetaTeamReport } from "@/features/modules/ui/BetaTeamReport";
 import { compareBeta } from "@/features/modules/ventureBeta/compare";
 import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { loadBetaComparison, loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
+import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -38,6 +39,19 @@ export default async function BetaTeamPage({ params }: { params: Promise<{ teamI
   const comparison = readiness.status === "ready" ? await loadBetaComparison(client, teamId) : null;
   const results = comparison?.status === "ready" ? compareBeta(comparison.people) : null;
 
+  // Die Uebungen im Team: Commitment Lab gibt es je Paar. Gibt es fuer diese Person genau EIN Paar, geht der
+  // Link direkt dorthin; sonst auf die Teamseite, wo die Paare stehen. Nur gelesen, nichts angelegt.
+  const teamBase = results ? await getFounderTeamHomebase(teamId, auth.user.id, client).catch(() => null) : null;
+  const ownPairs = (teamBase?.alignment ?? []).filter((entry) => entry.participantUserIds.includes(auth.user.id));
+  const links = {
+    setup: `/teams/${encodeURIComponent(teamId)}/setup`,
+    commitment:
+      ownPairs.length === 1
+        ? `/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(ownPairs[0]!.relationshipId)}`
+        : `/teams/${encodeURIComponent(teamId)}#team-deep-dives`,
+    exercises: `/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind`,
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
       <Link
@@ -53,7 +67,7 @@ export default async function BetaTeamPage({ params }: { params: Promise<{ teamI
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{t("report.title")}</h1>
 
       {results ? (
-        <BetaTeamReport results={results} teamId={teamId} />
+        <BetaTeamReport results={results} teamId={teamId} links={links} />
       ) : (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
           <h2 className="text-base font-semibold text-slate-900">{t("report.notReadyTitle")}</h2>

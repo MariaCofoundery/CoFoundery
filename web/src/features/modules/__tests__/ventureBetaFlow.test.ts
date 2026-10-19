@@ -136,7 +136,8 @@ test("Teamreport: fuenf Gruppen, Gespraechsanlaesse zuerst, needs_clarification 
   // Reihenfolge: abstimmen, Impulse, Unterschiede, Gemeinsames.
   const order = ["clarify", "impulse", "differences", "common"].map((b) => report.indexOf(`data-bucket="${b}"`));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
-  assert.doesNotMatch(report, /warn|risiko|risk|alert|rot\b|red-|amber-/i);
+  // Orange (amber) heisst „abstimmen / Gespraech lohnt" - nie Rot, nie Warnung, nie Risiko.
+  assert.doesNotMatch(report, /warn|risiko|risk|alert|rot\b|red-/i);
   const de = JSON.parse(read("messages/de/ventureBeta.json")).report;
   assert.equal(de.clarify.title, "Das solltet ihr konkret abstimmen");
   // Die Gespraechsanlaesse sind keine Warnungen: weder Titel noch Leitsaetze sprechen von Risiko oder Warnung.
@@ -184,4 +185,47 @@ test("Profil und Team: Beta-Karte vor den Vertiefungen, keine Prozente; v1 unver
   for (const file of [join("src", "features", "instruments", "align", "answerActions.ts"), join("src", "features", "instruments", "align", "reportData.ts")]) {
     assert.doesNotMatch(read(file), /ventureBeta|venture-alignment-v2/i, file);
   }
+});
+
+test("Kurzfassung und Grafiken: nur Signale und Positionen - kein Wert, kein Ranking", async () => {
+  const { summarizeReport, classOf } = await import("@/features/modules/ventureBeta/reportSummary");
+  const cell = { personId: "a", name: "A", isViewer: true, answer: { kind: "none" as const } };
+  const result = (itemId: string, signal: Parameters<typeof classOf>[0]) => ({ itemId, signal, cells: [cell], pairGaps: [] });
+  const summary = summarizeReport([result("Z01", "needs_clarification"), result("Z02", "conversation_only"), result("Z03", "same"), result("F01", "neutral_difference"), result("F02", "none")]);
+  assert.deepEqual(summary.clarify, ["Z01"]);
+  assert.deepEqual(summary.talk, ["Z02"]);
+  assert.deepEqual(summary.agreed, ["Z03"]);
+  assert.deepEqual(summary.different, ["F01", "F02"]);
+  assert.equal(summary.tiles.length, 5);
+  // Nur Listen von Themen - keine Zahl, die ein Urteil waere.
+  assert.deepEqual(Object.keys(summary).sort(), ["agreed", "clarify", "different", "talk", "tiles"]);
+
+  const charts = code(join(UI, "BetaCharts.tsx"));
+  // Farbe UND Buchstabe, nie nur Farbe; keine Punktzahl, kein Radar, keine Ampel.
+  assert.match(charts, /aria-label=\{name\}/);
+  assert.doesNotMatch(charts, /radar|score|ampel|traffic|rank|percent/i);
+  for (const chart of ["option-rows", "choice-matrix", "hours", "number-bars"]) assert.match(charts, new RegExp(`data-chart="${chart}"`));
+  // Der Report waehlt die Grafik nach der Form der Frage.
+  const report = code(join(UI, "BetaTeamReport.tsx"));
+  assert.match(report, /<HoursChart/);
+  assert.match(report, /answerFormat === "multi_choice"[\s\S]{0,200}<ChoiceMatrix/);
+  assert.match(report, /<OptionRows/);
+  assert.match(report, /report\.next\.title|report\.next\./);
+  // Das Wichtigste, Wo ihr steht, fuenf Gruppen, Als Naechstes - in dieser Reihenfolge.
+  const order = ["data-report-summary", "data-report-map", "BETA_REPORT_GROUPS.map", "data-report-next"].map((m) => report.indexOf(m));
+  assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
+});
+
+test("Als Nächstes: echte Ziele - das einzige Paar fuer das Commitment Lab, sonst die Teamseite; der Report bekommt sie von aussen", () => {
+  const page = code(join("src", "app", "(product)", "teams", "[teamId]", "vorhaben-beta", "page.tsx"));
+  assert.match(page, /ownPairs\.length === 1/);
+  assert.match(page, /commitment-lab\/\$\{encodeURIComponent\(ownPairs\[0\]!\.relationshipId\)\}/);
+  assert.match(page, /collaboration-lab\/read-my-mind/);
+  // Nur gelesen: kein Schreiben auf der Seite.
+  assert.doesNotMatch(page, /\.(insert|update|upsert|delete)\(|\.rpc\(/);
+  const report = code(join(UI, "BetaTeamReport.tsx"));
+  assert.match(report, /links: BetaReportLinks/);
+  assert.match(report, /href: links\.setup/);
+  // Handy: Rasterkinder duerfen schrumpfen, sonst sprengt die Matrix die Seite.
+  assert.match(report, /min-w-0 rounded-2xl/);
 });

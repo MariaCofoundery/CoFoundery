@@ -217,7 +217,49 @@
       "N01": "Information über Änderungen"
     },
     "pairGapYouExpect": "Du erwartest {expected} Stunden pro Woche pro Person, {offeredBy} plant {offered} ein.",
-    "pairGapYouOffer": "{expectedBy} erwartet {expected} Stunden pro Woche pro Person, du planst {offered} ein."
+    "pairGapYouOffer": "{expectedBy} erwartet {expected} Stunden pro Woche pro Person, du planst {offered} ein.",
+    "summary": {
+      "title": "Das Wichtigste",
+      "none": "–",
+      "agreed": {
+        "label": "Einig"
+      },
+      "different": {
+        "label": "Unterschiedlich"
+      },
+      "talk": {
+        "label": "Gesprächsimpuls"
+      },
+      "clarify": {
+        "label": "Bitte abstimmen"
+      }
+    },
+    "map": {
+      "title": "Wo ihr steht",
+      "lead": "Jeder Punkt ist eine Frage – nur zur Orientierung, ohne Bewertung. Er zeigt, wo ein Gespräch lohnt.",
+      "agreed": "einig",
+      "different": "unterschiedlich, kein Handlungsbedarf",
+      "talk": "Gespräch oder Abstimmung lohnt"
+    },
+    "next": {
+      "title": "Als Nächstes",
+      "lead": "Aus dem Vergleich wird eine Verabredung. Starte dort, wo ihr „abstimmen“ gesehen habt.",
+      "setup": {
+        "title": "Founder Setup",
+        "text": "Zeit, Vergütung, Entscheidungsrechte, Kommunikation, Beteiligung – schriftlich und gemeinsam.",
+        "cta": "Setup öffnen"
+      },
+      "commitment": {
+        "title": "Commitment stärken",
+        "text": "Mit dem Commitment Lab klärt ihr zu zweit, was ihr voneinander erwartet, wenn es ernst wird.",
+        "cta": "Zum Team"
+      },
+      "exercises": {
+        "title": "Zusammenarbeit üben",
+        "text": "Read My Mind und Founder in the Wild: kleine Übungen, wie ihr einander besser versteht.",
+        "cta": "Übungen ansehen"
+      }
+    }
   },
   "profile": {
     "title": "Venture Alignment (Beta)",

@@ -217,7 +217,49 @@
       "N01": "Information about changes"
     },
     "pairGapYouExpect": "You expect {expected} hours per week per person, {offeredBy} plans {offered}.",
-    "pairGapYouOffer": "{expectedBy} expects {expected} hours per week per person, you plan {offered}."
+    "pairGapYouOffer": "{expectedBy} expects {expected} hours per week per person, you plan {offered}.",
+    "summary": {
+      "title": "The essentials",
+      "none": "–",
+      "agreed": {
+        "label": "Agreed"
+      },
+      "different": {
+        "label": "Different"
+      },
+      "talk": {
+        "label": "Conversation starter"
+      },
+      "clarify": {
+        "label": "Please agree"
+      }
+    },
+    "map": {
+      "title": "Where you stand",
+      "lead": "Each dot is a question – for orientation only, without assessment. It shows where a conversation is worthwhile.",
+      "agreed": "agreed",
+      "different": "different, nothing to do",
+      "talk": "conversation or agreement worthwhile"
+    },
+    "next": {
+      "title": "Next",
+      "lead": "The comparison becomes an agreement. Start where you saw “please agree”.",
+      "setup": {
+        "title": "Founder Setup",
+        "text": "Time, compensation, decision rights, communication, ownership – in writing, together.",
+        "cta": "Open setup"
+      },
+      "commitment": {
+        "title": "Strengthen commitment",
+        "text": "With the Commitment Lab you clarify in pairs what you expect from each other when it gets serious.",
+        "cta": "To the team"
+      },
+      "exercises": {
+        "title": "Practise collaboration",
+        "text": "Read My Mind and Founder in the Wild: small exercises to understand each other better.",
+        "cta": "See exercises"
+      }
+    }
   },
   "profile": {
     "title": "Venture Alignment (Beta)",
