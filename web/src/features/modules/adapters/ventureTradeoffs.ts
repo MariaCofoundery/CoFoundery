@@ -18,8 +18,9 @@ import {
  * (Update-Entwurf) begonnen wurde. Die Datenbank laesst die Abgabe nur zu, wenn
  * alle vier Situationen beantwortet sind.
  *
- * PRIVAT. Es gibt keinen Freigabevertrag: `shareState` ist `none`. Eine
- * Freigabe, Readiness und ein Teamvergleich folgen mit Phase E.
+ * PRIVAT, BIS DIE PERSON FREIGIBT. `shareState` meldet die Freigabe EINES
+ * Durchlaufs (`assessment_share`) - gelesen von der Datenbank, nie
+ * zusammengesetzt. Die Abgabe teilt nichts.
  *
  * Die Lesbarmachung ist dieselbe wie auf der Detailseite (`readTradeoffs`):
  * nur gewaehlte Wege - keine Charakterisierung.
@@ -78,5 +79,10 @@ export const ventureTradeoffsAdapter: ModuleAdapter = {
     };
   },
 
-  shareState: () => ({ contract: "none" }),
+  // Die Datenbank sagt, ob der neueste abgegebene Durchlauf freigegeben ist; ohne Auskunft gilt: nicht.
+  shareState: (_user, context) => ({
+    contract: "assessment_share",
+    assessmentId: context.tradeoffsReadiness?.own.assessmentId ?? null,
+    active: context.tradeoffsReadiness?.own.shared === true,
+  }),
 };

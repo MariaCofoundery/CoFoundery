@@ -11,6 +11,7 @@ import {
 import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import type { AssessmentRow, ModuleContext, TradeoffAnswerRow } from "@/features/modules/types";
 import { getAboutYouFacts } from "@/features/profile/aboutYouData";
+import { loadTradeoffsReadiness } from "@/features/modules/tradeoffs/teamData";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 
 /**
@@ -129,6 +130,8 @@ export async function loadModuleContext(
 
     const tradeoffs = await rowsOf(VENTURE_TRADEOFFS_INSTRUMENT_ID);
     context.tradeoffsAssessments = tradeoffs;
+    // Die eigene Freigabe-Lage kommt von der Datenbank (nur lesen; ueber andere Personen gibt sie nichts her).
+    context.tradeoffsReadiness = await loadTradeoffsReadiness(client, ventureId);
 
     // Die Antworten der neuesten abgegebenen Fassung - fuer die kurzen Zeilen im Profil.
     const abgegeben = tradeoffs

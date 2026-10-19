@@ -388,7 +388,9 @@ Kein Gesamtwert. Reveal-Modell (Abschnitt 7.7). Das Team startet die Runde (kein
 
 **Entschieden in Phase D (Variante B):** Der Pilot läuft unter der bestehenden Storage-Familie `assessments.module = 'venture_alignment'` mit eigener `instrument_id = 'venture-tradeoffs-v1'` (kein neuer Enum-Wert). Begründung, Audit und Folgen: [phase-d-storage-decision.md](phase-d-storage-decision.md).
 
-**Stand Phase D (lokal umgesetzt, nicht committet):** additive Migration `20261205130000_venture_tradeoffs_instrument.sql` (Instrument + zwei instrumentgebundene Wächter), eigene Registry W03–W06, natives Modul `venture_tradeoffs` (deepens `venture_core`, `bindsTo = assessment`, kein Vergleichs-Renderer), eigener Flow `/founder-alignment/vorhaben/zielkonflikte`, eigenes Ergebnis nur aus gewählten Wegen und Gewichten. Alte W-Antworten bleiben unverändert; Übernahme nur auf ausdrückliche Aktion (neuer Entwurf, selbst prüfen und abgeben). Der Compare Contract (`path_and_weights`, `conversation_only`) ist beschrieben, aber nicht gebaut; es gibt keine Freigabe – das Modul ist privat (Phase E).
+**Stand Phase D (lokal umgesetzt, nicht committet):** additive Migration `20261205130000_venture_tradeoffs_instrument.sql` (Instrument + zwei instrumentgebundene Wächter), eigene Registry W03–W06, natives Modul `venture_tradeoffs` (deepens `venture_core`, `bindsTo = assessment`, kein Vergleichs-Renderer), eigener Flow `/founder-alignment/vorhaben/zielkonflikte`, eigenes Ergebnis nur aus gewählten Wegen und Gewichten. Alte W-Antworten bleiben unverändert; Übernahme nur auf ausdrückliche Aktion (neuer Entwurf, selbst prüfen und abgeben). Der Compare Contract (`path_and_weights`, `conversation_only`) war in Phase D nur beschrieben; das Modul war privat.
+
+**Stand Phase E (lokal umgesetzt, nicht committet):** Freigabe an einen **Durchlauf** (`assessment_team_shares`, Migration `20261206120000_venture_tradeoffs_team_share.sql`), Bereitschaft und gemeinsamer Vergleich ausschließlich über Datenbank-RPCs (`get_tradeoffs_team_readiness`, `get_tradeoffs_team_comparison`), erster Vergleichs-Renderer `path_and_weights` unter `/teams/[teamId]/zielkonflikte`, Karte „Gemeinsam vertiefen" auf der Teamseite. Entscheidung `module_versions`: **A – keine Versionstabelle**, die exakte `instrument_id` genügt. Der freigegebene Team-Stand wird durch den aktiven Share bestimmt, nicht durch den neuesten privaten Durchlauf; ein privater Re-Assessment-Run verändert den Sharing-Zustand nicht. Audit und Semantik: [phase-e-sharing-audit.md](phase-e-sharing-audit.md).
 
 ## 15. Roadmap
 
@@ -399,7 +401,7 @@ Kein Gesamtwert. Reveal-Modell (Abschnitt 7.7). Das Team startet die Runde (kein
 | **B** | Read-only Adapter für dieselben fünf Systeme, Parity-Tests | **nein** | umgesetzt |
 | **C** | Minimaler Profile-UX-Support für Vertiefungskarten; ohne registrierte Vertiefung entsteht keine sichtbare Änderung, kein Datenumbau | nein | umgesetzt |
 | **D** | Pilot „Werte & Zielkonflikte" | additiv (Instrument + Wächter) | lokal umgesetzt, nicht committet |
-| **E** | Sharing + Teamvergleich optionaler Module; erst hier ggf. `module_versions` | ja, minimal | offen |
+| **E** | Sharing + Teamvergleich optionaler Module; erst hier ggf. `module_versions` | ja, minimal (eine Tabelle, RPCs; keine `module_versions`) | lokal umgesetzt, nicht committet |
 | **F** | `venture-alignment-v2`, erst nachdem der Pilot die Architektur bewiesen hat | ja | offen |
 | **G** | Zusammenarbeit & Feedback als erster Person-Deepening-Pilot | ja, additiv | offen |
 | **H** | Team-Check-ins, erst nach Pretest | ja | offen |

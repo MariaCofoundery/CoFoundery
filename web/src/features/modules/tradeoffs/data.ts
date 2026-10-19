@@ -63,7 +63,8 @@ export async function loadTradeoffsPageState(
       .eq("instrument_id", VENTURE_TRADEOFFS_INSTRUMENT_ID)
       .eq("venture_id", ventureId)
       .not("submitted_at", "is", null)
-      .order("created_at", { ascending: false })
+      // Wie die Datenbank: Der neueste ABGEGEBENE Durchlauf ist der, der freigegeben werden kann.
+      .order("submitted_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
     client

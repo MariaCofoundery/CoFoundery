@@ -7,7 +7,7 @@
     "noRight": "There are no right or wrong answers.",
     "thisVenture": "Your answers apply to this venture.",
     "optional": "This is optional and independent of whether you have completed the venture questionnaire.",
-    "private": "Only you can see your answers."
+    "private": "Only you see your answers – unless you later choose to share them for the team comparison."
   },
   "start": "Look at the situations",
   "startPending": "Preparing …",
@@ -41,7 +41,7 @@
   "result": {
     "title": "Your answers",
     "intro": "These are your weightings and paths in the four situations, as you gave them. They are conversation starters, not an assessment.",
-    "private": "Only you can see these answers.",
+    "private": "Visible to you – in the team comparison only if you share it.",
     "submittedOn": "Submitted on {date}",
     "noAnswer": "There is no answer for this situation.",
     "update": "Take another look",
@@ -75,6 +75,73 @@
     "no_permission": "You do not have permission for this.",
     "draft_create_failed": "This could not be created. Please try again.",
     "value_rejected": "This entry was not accepted.",
-    "unreachable": "Not reachable right now. Please try again in a moment."
+    "unreachable": "Not reachable right now. Please try again in a moment.",
+    "not_submitted": "Sharing is possible only after you have submitted.",
+    "share_rejected": "This sharing is not possible. There may be a newer run.",
+    "share_failed": "That did not work just now. Please try again shortly."
+  },
+  "share": {
+    "title": "Team comparison",
+    "private": "Only you",
+    "shared": "Shared for the team comparison",
+    "explainTitle": "Before you share",
+    "action": "Share for the team comparison",
+    "actionPending": "Sharing …",
+    "revokeSummary": "Withdraw sharing",
+    "revokeConfirm": "If you withdraw the sharing, the joint comparison may temporarily disappear for the team. Your own answers stay visible to you.",
+    "revokeAction": "Yes, withdraw sharing",
+    "revokePending": "Withdrawing …",
+    "on": "You have shared this run for the team comparison.",
+    "off": "Sharing is withdrawn. Your run is private again.",
+    "missing": "Some requirements for the joint comparison are still missing.",
+    "ready": "The joint comparison is ready.",
+    "openCompare": "View the joint comparison",
+    "explain": {
+      "p1": "Your shared run can only appear in the joint comparison once all current team members have also completed this deepening and shared theirs.",
+      "p2": "Until then nobody sees your answers in the team comparison.",
+      "p3": "You can withdraw the sharing at any time.",
+      "p4": "Sharing applies to this run only. If you answer again later, you decide again."
+    },
+    "olderActive": "An earlier version of yours is still shared for the team comparison. This newer version is only yours until you explicitly share it."
+  },
+  "team": {
+    "title": "Explore together",
+    "text": "Optional deepenings for the whole team. A joint comparison only appears once all current members have completed and shared – until then nobody sees anything from the others.",
+    "not_started": "You have not done this deepening yet.",
+    "in_progress": "You have started.",
+    "completed": "You have completed it. Your run is visible only to you.",
+    "shared": "You have shared your run.",
+    "start": "Start the deepening",
+    "continue": "Continue",
+    "share": "Share for team comparison",
+    "manage": "Manage sharing",
+    "view": "View the joint comparison"
+  },
+  "compare": {
+    "back": "Back to the team",
+    "eyebrow": "Explore together",
+    "title": "Values and trade-offs in the team",
+    "intro": "This is how you weighted four situations and which first path each of you would choose – as each person stated it. Differences are conversation starters; agreement is not an assessment. All current members see the same comparison.",
+    "notReadyTitle": "The joint comparison is not available right now",
+    "notReady": "Some requirements for the joint comparison are still missing.",
+    "yourPart": "Your part: ",
+    "you": "You",
+    "situation": "Situation {index}",
+    "weightsLabel": "Weighting",
+    "pathLabel": "First path",
+    "weights": {
+      "same": "You weighted this the same way.",
+      "different": "You weighted this differently."
+    },
+    "paths": {
+      "same": "You would choose the same first path.",
+      "different": "In this situation you set different priorities.",
+      "open": "Not everyone chose a path here – the comparison says nothing about that."
+    },
+    "talk": "This could be a good point to align your expectations.",
+    "pathOther": "something else",
+    "pathUnknown": "still open",
+    "pathNone": "no answer",
+    "closing": "The comparison only describes what you stated. It does not assess how well you fit together."
   }
 }

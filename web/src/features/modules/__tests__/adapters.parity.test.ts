@@ -503,14 +503,15 @@ test("die Teamfreigabe kommt aus derselben Auskunft wie auf der Teamseite", asyn
   assert.equal(ohne.teamShare, null);
 });
 
-test("der Lader liest nur: keine schreibende Operation, keine Markierung, nur die eine Lese-RPC", async () => {
+test("der Lader liest nur: keine schreibende Operation, keine Markierung, nur Lese-RPCs", async () => {
   const client = produktClient({ ventureRow: zeile() });
   await loadModuleContext(client, "u-1", { ventureId: "v-1", teamId: "t-1" });
   const schreibend = ["insert", "update", "upsert", "delete"];
   for (const query of client.queries) {
     assert.deepEqual(query.ops.filter((op) => schreibend.includes(op)), [], query.table);
   }
-  assert.deepEqual(client.rpcCalls.map((call) => call.name), ["get_workstyle_team_share_readiness"]);
+  // Zwei Lese-Auskuenfte: die Teamfreigabe des Arbeitsprofils (wie die Teamseite) und die eigene Lage zu „Werte & Zielkonflikte".
+  assert.deepEqual(client.rpcCalls.map((call) => call.name).sort(), ["get_tradeoffs_team_readiness", "get_workstyle_team_share_readiness"]);
   assert.ok(client.queries.length > 8, "die Gegenprobe: es wurde wirklich gefragt");
 });
 
@@ -530,15 +531,33 @@ function* quellen(dir: string): Generator<string> {
 const ohneKommentare = (path: string) => read(path).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("die Adapter- und Ladeschicht schreibt nirgends: keine Schreib-Operation, keine schreibende RPC", () => {
-  // EINE Datei darf schreiben: der eigene Lebenszyklus des nativen Moduls (`tradeoffs/actions.ts`,
-  // unten gesondert geprueft). Alles andere - Adapter, Lader, Karten - liest nur.
+  // ZWEI Dateien duerfen schreiben: der eigene Lebenszyklus des nativen Moduls (`tradeoffs/actions.ts`) und
+  // seine Freigabe (`tradeoffs/shareActions.ts`) - beide unten gesondert geprueft. Alles andere - Adapter,
+  // Lader, Karten, Vergleich - liest nur, und seine RPCs sind Lese-Auskuenfte.
+  const schreibend = [
+    join("src", "features", "modules", "tradeoffs", "actions.ts"),
+    join("src", "features", "modules", "tradeoffs", "shareActions.ts"),
+  ];
+  const leseRpcs = new Set(["get_workstyle_team_share_readiness", "get_tradeoffs_team_readiness", "get_tradeoffs_team_comparison"]);
   for (const file of quellen("src/features/modules")) {
-    if (file === join("src", "features", "modules", "tradeoffs", "actions.ts")) continue;
+    if (schreibend.includes(file)) continue;
     const code = ohneKommentare(file);
     assert.doesNotMatch(code, /\.(insert|update|upsert|delete)\(/, file);
     const rpcs = [...code.matchAll(/\.rpc\(\s*"([a-z_0-9]+)"/g)].map((m) => m[1]);
-    for (const name of rpcs) assert.equal(name, "get_workstyle_team_share_readiness", `${file}: ${name}`);
+    for (const name of rpcs) assert.ok(leseRpcs.has(name!), `${file}: ${name}`);
   }
+});
+
+test("die Freigabe ruft genau eine RPC - und die Abgabe ruft sie nicht", () => {
+  const share = ohneKommentare(join("src", "features", "modules", "tradeoffs", "shareActions.ts"));
+  assert.deepEqual([...share.matchAll(/\.rpc\(\s*"([a-z_0-9]+)"/g)].map((m) => m[1]), ["set_tradeoffs_team_share"]);
+  // Keine Tabellenschreibung, keine zweite Freigabe (weder Arbeitsprofil, Faehigkeiten noch Advisor).
+  assert.doesNotMatch(share, /\.from\(|team_shares|alignment_shares|advisor/);
+  // Nur eine ausdrueckliche Wahl zaehlt: kein Vorgabewert fuer `shared`.
+  assert.match(share, /choice !== "true" && choice !== "false"/);
+  // Die Abgabe und der Rest des Lebenszyklus kennen die Freigabe nicht.
+  const lifecycle = ohneKommentare(join("src", "features", "modules", "tradeoffs", "actions.ts"));
+  assert.doesNotMatch(lifecycle, /set_tradeoffs_team_share|assessment_team_shares|setTradeoffsShare/);
 });
 
 test("das native Modul schreibt nur in sein eigenes Instrument - nie in Venture Alignment, nie in Freigaben", () => {
@@ -573,7 +592,7 @@ test("keine Migration, keine neue Completion-Tabelle, keine DB-Spiegelung", () =
   }
 });
 
-test("das Produkt benutzt die Modulschicht nur an zwei Stellen: den Vertiefungskarten im Profil und der Seite des Piloten", () => {
+test("das Produkt benutzt die Modulschicht nur an wenigen, bewussten Stellen: den Vertiefungskarten im Profil, den Seiten des Piloten und dem Teambereich", () => {
   // Phase C schliesst `ProfileDeepenings` an, Phase D die Seite von „Werte & Zielkonflikte" - keine
   // Navigation, kein bestehender Flow, kein Sharing. Spaetere Phasen duerfen weitere Stellen aufnehmen; dann bewusst anpassen.
   const ausserhalb: string[] = [];
@@ -583,6 +602,9 @@ test("das Produkt benutzt die Modulschicht nur an zwei Stellen: den Vertiefungsk
   }
   assert.deepEqual(ausserhalb.sort(), [
     join("src", "app", "(product)", "founder-alignment", "vorhaben", "zielkonflikte", "page.tsx"),
+    // Phase E: die Teamseite (Karte „Gemeinsam vertiefen") und der gemeinsame Vergleich.
+    join("src", "app", "(product)", "teams", "[teamId]", "page.tsx"),
+    join("src", "app", "(product)", "teams", "[teamId]", "zielkonflikte", "page.tsx"),
     join("src", "app", "me", "profile", "page.tsx"),
   ]);
 });

@@ -133,9 +133,10 @@ test("Legacy-Uebernahme nur auf ausdrueckliche Handlung; keine Teamsicht, kein S
   assert.deepEqual(copies.sort(), ["clearTradeoffAnswer", "saveTradeoffAnswer", "startTradeoffs", "submitTradeoffs"]);
   const page = codeOnly("src/app/(product)/founder-alignment/vorhaben/zielkonflikte/page.tsx");
   assert.match(page, /legacy/);
-  assert.doesNotMatch(page, /share|teilen|Team-?Vergleich/i);
+  // Die Seite ruft selbst keine Freigabe: nur die ausdrueckliche Aktion des Panels teilt.
+  assert.doesNotMatch(page, /set_tradeoffs_team_share|setTradeoffsShare|\.rpc\(/);
   for (const f of walk("src/features/modules/ui").filter((n) => /Tradeoffs/.test(n))) {
-    assert.doesNotMatch(codeOnly(f), /alignment_shares|\.rpc\(/, f);
+    assert.doesNotMatch(codeOnly(f), /alignment_shares|team_shares|\.rpc\(/, f);
   }
 });
 

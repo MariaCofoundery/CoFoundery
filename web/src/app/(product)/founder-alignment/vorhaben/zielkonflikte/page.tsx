@@ -13,6 +13,8 @@ import { loadTradeoffsPageState } from "@/features/modules/tradeoffs/data";
 import { readTradeoffs } from "@/features/modules/tradeoffs/readout";
 import { tradeoffItems, tradeoffViews } from "@/features/modules/tradeoffs/registry";
 import { TradeoffsFlow } from "@/features/modules/ui/TradeoffsFlow";
+import { loadTradeoffsReadiness } from "@/features/modules/tradeoffs/teamData";
+import { TradeoffsSharePanel } from "@/features/modules/ui/TradeoffsSharePanel";
 import { TradeoffsResult } from "@/features/modules/ui/TradeoffsResult";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -41,7 +43,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 export default async function TradeoffsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ venture?: string; from?: string; error?: string }>;
+  searchParams: Promise<{ venture?: string; from?: string; error?: string; share?: string }>;
 }) {
   const query = await searchParams;
   const { data: auth } = await getRequestUser();
@@ -60,14 +62,28 @@ export default async function TradeoffsPage({
   if (!venture) redirect("/me/profile#vorhaben");
 
   const client = await createClient();
-  const [t, state, navState] = await Promise.all([
+  const [t, state, navState, readiness] = await Promise.all([
     getTranslations("ventureTradeoffs"),
     loadTradeoffsPageState(client, userId, venture.id),
     getAlignNavState(userId),
+    loadTradeoffsReadiness(client, venture.id),
   ]);
+  // Der aktive Share bestimmt den Team-Stand; der neueste Durchlauf kann neuer und noch privat sein.
+  const activeId = readiness?.own.sharedAssessmentId ?? null;
+  const shared = Boolean(state.submitted && activeId === state.submitted.id);
+  const sharePanel = state.submitted ? (
+    <TradeoffsSharePanel
+      ventureId={venture.id}
+      assessmentId={state.submitted.id}
+      shared={shared}
+      ready={shared && readiness?.status === "ready"}
+      olderSharedId={activeId && activeId !== state.submitted.id ? activeId : null}
+    />
+  ) : null;
+  const shareNote = query.share === "on" || query.share === "off" ? query.share : null;
 
   const items = tradeoffItems();
-  const known = ["setup_missing", "no_permission", "draft_create_failed", "value_rejected", "unreachable"];
+  const known = ["setup_missing", "no_permission", "draft_create_failed", "value_rejected", "unreachable", "not_submitted", "share_rejected", "share_failed"];
   const error = query.error && known.includes(query.error) ? query.error : null;
   const from = query.from === "legacy" || query.from === "previous" ? query.from : null;
 
@@ -100,6 +116,12 @@ export default async function TradeoffsPage({
         </p>
       ) : null}
 
+      {shareNote ? (
+        <p role="status" className="mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800">
+          {t(`share.${shareNote}`)}
+        </p>
+      ) : null}
+
       {state.draft ? (
         <>
           {from && state.draft.answers.length > 0 ? (
@@ -124,6 +146,7 @@ export default async function TradeoffsPage({
             }
             earlierSource={from}
           />
+          {sharePanel}
         </>
       ) : state.submitted ? (
         <>
@@ -138,6 +161,7 @@ export default async function TradeoffsPage({
               className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
             />
           </form>
+          {sharePanel}
         </>
       ) : (
         <>

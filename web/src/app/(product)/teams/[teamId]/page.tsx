@@ -10,6 +10,7 @@ import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/Founde
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { TeamPageHeader } from "@/features/teams/TeamPageHeader";
 import { TeamShareCard } from "@/features/teams/TeamShareCard";
+import { TradeoffsTeamCard } from "@/features/modules/ui/TradeoffsTeamCard";
 import { LeaveTeamSection } from "@/features/teams/LeaveTeamSection";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
@@ -340,6 +341,11 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             </div>
           </div>
         </section>
+
+        {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
+            Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
+            freigegeben haben. Hier steht nur die eigene Lage. */}
+        <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
 
         {/* VEREINBAREN: Founder Setup ist der verbindliche Ort. Zahlen nur aus
             dem bestehenden Readmodel; bestaetigt ist, was alle AKTUELLEN

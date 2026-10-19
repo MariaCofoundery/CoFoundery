@@ -320,9 +320,14 @@ test("die Bestandsmodule behaupten keinen Vergleichsvertrag und keine Team-Sicht
     assert.equal(def.renderers.comparison, undefined, def.moduleId);
     assert.equal(def.renderers.teamView, undefined, def.moduleId);
   }
-  // Auch das native Modul hat noch keinen Vergleichs-Renderer: Der Vertrag ist beschrieben, der Vergleich folgt in Phase E.
-  assert.equal(VENTURE_TRADEOFFS_MODULE.renderers.comparison, undefined);
+  // Das native Modul hat seit Phase E einen Vergleichs-Renderer - aber keine `teamView`: Das ist Team-Modulen
+  // vorbehalten, dies ist eine Person-Vertiefung (sonst wuerde sie auch nie als Profilkarte erscheinen).
+  assert.equal(VENTURE_TRADEOFFS_MODULE.renderers.comparison, "/teams/[teamId]/zielkonflikte");
   assert.equal(VENTURE_TRADEOFFS_MODULE.renderers.teamView, undefined);
+  assert.deepEqual(VENTURE_TRADEOFFS_MODULE.compare?.map((rule) => [rule.method, rule.stance]).flat(), [
+    "path_and_weights", "conversation_only", "path_and_weights", "conversation_only",
+    "path_and_weights", "conversation_only", "path_and_weights", "conversation_only",
+  ]);
 });
 
 test("Renderer-Verweise zeigen auf Routen und Profilabschnitte, die es gibt", () => {

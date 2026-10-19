@@ -7,7 +7,7 @@
     "noRight": "Es gibt keine richtigen oder falschen Antworten.",
     "thisVenture": "Deine Antworten gelten für dieses Vorhaben.",
     "optional": "Das ist freiwillig und unabhängig davon, ob du den Fragebogen zum Vorhaben abgeschlossen hast.",
-    "private": "Nur du siehst deine Antworten."
+    "private": "Nur du siehst deine Antworten – es sei denn, du gibst sie später ausdrücklich für den Teamvergleich frei."
   },
   "start": "Situationen ansehen",
   "startPending": "Wird vorbereitet …",
@@ -41,7 +41,7 @@
   "result": {
     "title": "Deine Antworten",
     "intro": "Das sind deine Gewichtungen und Wege in den vier Situationen, so wie du sie angegeben hast. Es sind Gesprächsanlässe, keine Bewertung.",
-    "private": "Nur du siehst diese Antworten.",
+    "private": "Sichtbar für dich – im Teamvergleich nur, wenn du es freigibst.",
     "submittedOn": "Abgegeben am {date}",
     "noAnswer": "Zu dieser Situation liegt keine Antwort vor.",
     "update": "Noch einmal ansehen",
@@ -75,6 +75,73 @@
     "no_permission": "Dafür fehlt die Berechtigung.",
     "draft_create_failed": "Das konnte nicht angelegt werden. Bitte versuch es noch einmal.",
     "value_rejected": "Diese Angabe wurde nicht angenommen.",
-    "unreachable": "Gerade nicht erreichbar. Bitte versuch es gleich noch einmal."
+    "unreachable": "Gerade nicht erreichbar. Bitte versuch es gleich noch einmal.",
+    "not_submitted": "Freigeben geht erst nach der Abgabe.",
+    "share_rejected": "Diese Freigabe ist nicht möglich. Möglicherweise gibt es einen neueren Durchlauf.",
+    "share_failed": "Das hat gerade nicht geklappt. Versuch es gleich noch einmal."
+  },
+  "share": {
+    "title": "Teamvergleich",
+    "private": "Nur für dich",
+    "shared": "Für den Teamvergleich freigegeben",
+    "explainTitle": "Bevor du freigibst",
+    "action": "Für den Teamvergleich freigeben",
+    "actionPending": "Wird freigegeben …",
+    "revokeSummary": "Freigabe zurücknehmen",
+    "revokeConfirm": "Wenn du die Freigabe zurücknimmst, kann der gemeinsame Vergleich für das Team vorübergehend nicht mehr angezeigt werden. Deine eigenen Antworten bleiben für dich sichtbar.",
+    "revokeAction": "Ja, Freigabe zurücknehmen",
+    "revokePending": "Wird zurückgenommen …",
+    "on": "Du hast diesen Durchlauf für den Teamvergleich freigegeben.",
+    "off": "Die Freigabe ist zurückgenommen. Dein Durchlauf ist wieder nur für dich.",
+    "missing": "Für den gemeinsamen Vergleich fehlen noch Voraussetzungen.",
+    "ready": "Der gemeinsame Vergleich ist bereit.",
+    "openCompare": "Gemeinsamen Vergleich ansehen",
+    "explain": {
+      "p1": "Dein freigegebener Durchlauf kann erst im gemeinsamen Vergleich erscheinen, wenn alle aktuellen Teammitglieder die Vertiefung ebenfalls abgeschlossen und freigegeben haben.",
+      "p2": "Vorher sieht niemand deine Antworten im Teamvergleich.",
+      "p3": "Du kannst die Freigabe jederzeit zurücknehmen.",
+      "p4": "Die Freigabe gilt nur für diesen Durchlauf. Wenn du später neu antwortest, entscheidest du neu."
+    },
+    "olderActive": "Eine frühere Fassung von dir ist weiterhin für den Teamvergleich freigegeben. Diese neuere Fassung ist nur für dich, bis du sie ausdrücklich freigibst."
+  },
+  "team": {
+    "title": "Gemeinsam vertiefen",
+    "text": "Freiwillige Vertiefungen für das ganze Team. Ein gemeinsamer Vergleich erscheint erst, wenn alle aktuellen Mitglieder abgeschlossen und freigegeben haben – vorher sieht niemand etwas von den anderen.",
+    "not_started": "Du hast diese Vertiefung noch nicht gemacht.",
+    "in_progress": "Du hast begonnen.",
+    "completed": "Du hast abgeschlossen. Dein Durchlauf ist nur für dich sichtbar.",
+    "shared": "Du hast deinen Durchlauf freigegeben.",
+    "start": "Vertiefung starten",
+    "continue": "Weitermachen",
+    "share": "Für Teamvergleich freigeben",
+    "manage": "Freigabe verwalten",
+    "view": "Gemeinsamen Vergleich ansehen"
+  },
+  "compare": {
+    "back": "Zurück zum Team",
+    "eyebrow": "Gemeinsam vertiefen",
+    "title": "Werte & Zielkonflikte im Team",
+    "intro": "So habt ihr in vier Situationen gewichtet und welchen ersten Weg ihr wählen würdet – wie es jede Person angegeben hat. Unterschiede sind Gesprächsanlässe, Übereinstimmung ist keine Bewertung. Alle aktuellen Mitglieder sehen denselben Vergleich.",
+    "notReadyTitle": "Der gemeinsame Vergleich ist gerade nicht verfügbar",
+    "notReady": "Für den gemeinsamen Vergleich fehlen noch Voraussetzungen.",
+    "yourPart": "Dein Teil: ",
+    "you": "Du",
+    "situation": "Situation {index}",
+    "weightsLabel": "Gewichtung",
+    "pathLabel": "Erster Weg",
+    "weights": {
+      "same": "Hier habt ihr gleich gewichtet.",
+      "different": "Hier habt ihr unterschiedlich gewichtet."
+    },
+    "paths": {
+      "same": "Ihr würdet denselben ersten Weg wählen.",
+      "different": "Ihr setzt in dieser Situation unterschiedliche Schwerpunkte.",
+      "open": "Nicht alle haben hier einen Weg gewählt – dazu sagt der Vergleich nichts."
+    },
+    "talk": "Das könnte ein guter Punkt sein, um eure Erwartungen abzugleichen.",
+    "pathOther": "etwas anderes",
+    "pathUnknown": "noch offen",
+    "pathNone": "keine Angabe",
+    "closing": "Der Vergleich beschreibt nur, was ihr angegeben habt. Er bewertet nicht, wie gut ihr zusammenpasst."
   }
 }

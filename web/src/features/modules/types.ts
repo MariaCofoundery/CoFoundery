@@ -1,3 +1,4 @@
+import type { TradeoffsReadiness } from "@/features/modules/tradeoffs/teamParse";
 import type { FounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 
 /**
@@ -197,7 +198,9 @@ export type ModuleShareState =
   | { contract: "none" }
   | { contract: "team_share"; teamId: string | null; active: boolean }
   | { contract: "capability_disclosure"; level: string }
-  | { contract: "visible_on_submit"; ventureId: string; visibleToTeam: boolean };
+  | { contract: "visible_on_submit"; ventureId: string; visibleToTeam: boolean }
+  /** Freigabe EINES Durchlaufs fuer den Teamvergleich (Phase E): nur der neueste abgegebene zaehlt. */
+  | { contract: "assessment_share"; assessmentId: string | null; active: boolean };
 
 export interface ModuleAdapter {
   describe(): ModuleDefinition;
@@ -255,6 +258,8 @@ export type ModuleContext = {
   tradeoffsAssessments?: readonly AssessmentRow[] | null;
   /** Die Antworten der neuesten ABGEGEBENEN Fassung von „Werte & Zielkonflikte". */
   tradeoffsAnswers?: readonly TradeoffAnswerRow[] | null;
+  /** Die EIGENE Lage zur Freigabe von „Werte & Zielkonflikte" - von der Datenbank, nicht zusammengesetzt. */
+  tradeoffsReadiness?: TradeoffsReadiness | null;
   /**
    * Uebersetzt einen Schluessel des Sprachbundles - fuer die kurzen Teaser-Zeilen
    * abgeschlossener Vertiefungen. Ohne sie gibt es keine Zeilen (statt

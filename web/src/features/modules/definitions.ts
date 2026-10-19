@@ -230,6 +230,9 @@ export const VENTURE_TRADEOFFS_MODULE: ModuleDefinition = {
   renderers: {
     profileCard: "me-profile:vorhaben",
     detail: "/founder-alignment/vorhaben/zielkonflikte",
+    // Der gemeinsame Teamvergleich (Phase E): erst bei Bereitschaft - die Datenbank entscheidet.
+    // Bewusst KEINE `teamView`: Das ist Team-Modulen vorbehalten, dies ist eine Person-Vertiefung.
+    comparison: "/teams/[teamId]/zielkonflikte",
   },
   setupHandoff: [
     { target: "conflict_deadlock", when: "difference" },
