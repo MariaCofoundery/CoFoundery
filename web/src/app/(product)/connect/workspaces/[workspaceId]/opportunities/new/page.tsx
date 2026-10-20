@@ -23,8 +23,10 @@ export default async function Page({
       >
         {t("backWorkspace")}
       </Link>
-      <h1 className="text-3xl font-semibold">{t("newOpportunity")}</h1>
-      <p>{t("opportunityHelp")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("newOpportunity")}</h1>
+        <p className="mt-3 text-white">{t("opportunityHelp")}</p>
+      </header>
       {(await searchParams).error && <p role="alert">{common("error")}</p>}
       <OpportunityForm workspaceId={w.id} entries={w.entries} />
     </>

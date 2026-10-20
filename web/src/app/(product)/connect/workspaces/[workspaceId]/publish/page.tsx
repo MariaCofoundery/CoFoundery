@@ -27,8 +27,10 @@ export default async function Page({
       >
         {t("backWorkspace")}
       </Link>
-      <h1 className="text-3xl font-semibold">{t("publication")}</h1>
-      <p>{t("publishHelp")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("publication")}</h1>
+        <p className="mt-3 text-white">{t("publishHelp")}</p>
+      </header>
       {error || !data ? (
         <p role="alert">{t("publicationUnavailable")}</p>
       ) : (

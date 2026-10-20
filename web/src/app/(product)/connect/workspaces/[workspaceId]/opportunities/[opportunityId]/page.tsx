@@ -51,10 +51,12 @@ export default async function Page({
       >
         {t("backWorkspace")}
       </Link>
-      <h1 className="break-words text-3xl font-semibold">{o.title}</h1>
-      <p>
-        {common(o.status)} · {common("private")}
-      </p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="break-words text-3xl font-semibold leading-tight sm:text-4xl">{o.title}</h1>
+        <p className="mt-3 text-white">
+          {common(o.status)} · {common("private")}
+        </p>
+      </header>
       {query.error && <p role="alert">{common("error")}</p>}
       {query.saved && <p role="status">{common("saved")}</p>}
       <section className={card}>
