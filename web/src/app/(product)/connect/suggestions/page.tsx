@@ -30,11 +30,13 @@ export default async function ConnectSuggestionsPage() {
         ← {t("navigation.overview")}
       </Link>
 
-      <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-        {t("suggestions.title")}
-      </h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("suggestions.text")}</p>
+      <header className="mt-3 brand-panel rounded-[28px] p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[.14em] text-white">{t("eyebrow")}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">
+          {t("suggestions.title")}
+        </h1>
+        <p className="mt-3 max-w-2xl leading-7 text-white">{t("suggestions.text")}</p>
+      </header>
 
 
       {suggestions.length === 0 ? (

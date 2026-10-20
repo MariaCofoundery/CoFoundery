@@ -51,11 +51,13 @@ export default async function ConnectVentureDirectoryPage({
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-10">
-      <p className="text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-        {t("ventures.directoryTitle")}
-      </h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("ventures.directoryText")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[.14em] text-white">{t("eyebrow")}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">
+          {t("ventures.directoryTitle")}
+        </h1>
+        <p className="mt-3 max-w-2xl leading-7 text-white">{t("ventures.directoryText")}</p>
+      </header>
 
       <div className="mt-5">
         <ConnectTabs active="ventures" counts={counts} />

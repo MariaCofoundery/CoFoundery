@@ -38,8 +38,10 @@ export default async function ConnectSearchesPage({
       <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
         ← {t("mine.back")}
       </Link>
-      <h1 className="mt-3 text-3xl font-semibold tracking-tight">{t("searches.title")}</h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("searches.text")}</p>
+      <header className="mt-3 brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("searches.title")}</h1>
+        <p className="mt-3 max-w-2xl leading-7 text-white">{t("searches.text")}</p>
+      </header>
 
       {saved ? (
         <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
