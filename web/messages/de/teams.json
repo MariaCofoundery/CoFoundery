@@ -727,5 +727,18 @@
     "confirm": "Team endgültig verlassen",
     "error": "Das Verlassen hat nicht geklappt. Bitte versuch es noch einmal.",
     "done": "Du hast das Team verlassen. Deine persönlichen Angaben sind unverändert in deinem Profil."
+  },
+  "comparison": {
+    "back": "Zum Team",
+    "eyebrow": "Teamvergleich",
+    "allShared": "Alle haben freigegeben",
+    "sameReport": "Alle sehen denselben Bericht.",
+    "tabsLabel": "Ansichten des Teamvergleichs",
+    "tabs": {
+      "venture": "Venture Alignment",
+      "workstyle": "Arbeitsweise",
+      "tradeoffs": "Werte & Zielkonflikte",
+      "setup": "Founder Setup"
+    }
   }
 }

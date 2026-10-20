@@ -727,5 +727,18 @@
     "confirm": "Leave team for good",
     "error": "Leaving didn't work. Please try again.",
     "done": "You left the team. Your personal details are unchanged in your profile."
+  },
+  "comparison": {
+    "back": "Back to team",
+    "eyebrow": "Team comparison",
+    "allShared": "Everyone has shared",
+    "sameReport": "Everyone sees the same report.",
+    "tabsLabel": "Views of the team comparison",
+    "tabs": {
+      "venture": "Venture Alignment",
+      "workstyle": "Working style",
+      "tradeoffs": "Values & trade-offs",
+      "setup": "Founder Setup"
+    }
   }
 }

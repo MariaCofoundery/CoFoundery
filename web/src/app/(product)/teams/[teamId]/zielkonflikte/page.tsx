@@ -7,6 +7,9 @@ import { compareTradeoffs } from "@/features/modules/tradeoffs/compare";
 import { tradeoffItems } from "@/features/modules/tradeoffs/registry";
 import { loadTradeoffsComparison, loadTradeoffsReadiness } from "@/features/modules/tradeoffs/teamData";
 import { TradeoffsComparison } from "@/features/modules/ui/TradeoffsComparison";
+import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
+import { TeamComparisonHeader } from "@/features/teams/TeamComparisonHeader";
+import { getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -40,16 +43,21 @@ export default async function TradeoffsTeamPage({ params }: { params: Promise<{ 
   const comparison = readiness.status === "ready" ? await loadTradeoffsComparison(client, teamId) : null;
   const rows = comparison?.status === "ready" ? compareTradeoffs(tradeoffItems(), comparison.people) : null;
 
+  const [teamBase, teamLabel] = await Promise.all([
+    getFounderTeamHomebase(teamId, auth.user.id, client).catch(() => null),
+    getTeamLabel(client, teamId).catch(() => null),
+  ]);
+
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10">
-      <Link
-        href={`/teams/${encodeURIComponent(teamId)}`}
-        className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
-      >
-        ← {t("compare.back")}
-      </Link>
-      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">{t("compare.eyebrow")}</p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{t("compare.title")}</h1>
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <TeamComparisonHeader
+        teamId={teamId}
+        teamLabel={teamLabel}
+        title={t("compare.title")}
+        active="tradeoffs"
+        members={teamBase?.members ?? []}
+        allShared={Boolean(rows)}
+      />
 
       {rows ? (
         <TradeoffsComparison rows={rows} />

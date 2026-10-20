@@ -7,6 +7,8 @@ import { BetaTeamReport } from "@/features/modules/ui/BetaTeamReport";
 import { compareBeta } from "@/features/modules/ventureBeta/compare";
 import { loadBetaComparison, loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
+import { TeamComparisonHeader } from "@/features/teams/TeamComparisonHeader";
+import { getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -39,7 +41,11 @@ export default async function BetaTeamPage({ params }: { params: Promise<{ teamI
 
   // Die Uebungen im Team: Commitment Lab gibt es je Paar. Gibt es fuer diese Person genau EIN Paar, geht der
   // Link direkt dorthin; sonst auf die Teamseite, wo die Paare stehen. Nur gelesen, nichts angelegt.
-  const teamBase = results ? await getFounderTeamHomebase(teamId, auth.user.id, client).catch(() => null) : null;
+  // Das Team wird fuer den Kopf (Menschen, Name) immer gelesen; nur gelesen, nichts angelegt.
+  const [teamBase, teamLabel] = await Promise.all([
+    getFounderTeamHomebase(teamId, auth.user.id, client).catch(() => null),
+    getTeamLabel(client, teamId).catch(() => null),
+  ]);
   const ownPairs = (teamBase?.alignment ?? []).filter((entry) => entry.participantUserIds.includes(auth.user.id));
   const links = {
     setup: `/teams/${encodeURIComponent(teamId)}/setup`,
@@ -51,18 +57,16 @@ export default async function BetaTeamPage({ params }: { params: Promise<{ teamI
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10">
-      <Link
-        href={`/teams/${encodeURIComponent(teamId)}`}
-        className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
-      >
-        ← {t("report.back")}
-      </Link>
-      <p className="mt-3 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
-        {t("report.eyebrow")}
-        <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px] tracking-normal text-slate-600">{t("badge")}</span>
-      </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{t("report.title")}</h1>
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <TeamComparisonHeader
+        teamId={teamId}
+        teamLabel={teamLabel}
+        title={t("report.title")}
+        active="venture"
+        members={teamBase?.members ?? []}
+        allShared={Boolean(results)}
+        badge={t("badge")}
+      />
 
       {results ? (
         <BetaTeamReport results={results} teamId={teamId} links={links} />
