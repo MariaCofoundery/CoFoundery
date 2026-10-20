@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { workspaceSession } from "@/features/connect/workspaces/data";
@@ -15,6 +16,9 @@ export default async function Page({
   const t = await getTranslations("problemWorkspace");
   return (
     <>
+      <Link href="/connect/workspaces" className="inline-block min-h-11 py-3 underline">
+        ← {t("title")}
+      </Link>
       <h1 className="text-3xl font-semibold">{t("claimTitle")}</h1>
       <p>{t("claimHelp")}</p>
       <form action={claimWorkspaceInviteAction.bind(null, token)}>
