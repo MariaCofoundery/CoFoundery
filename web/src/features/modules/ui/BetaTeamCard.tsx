@@ -13,17 +13,15 @@ import { loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
  * Nur fuer freigeschaltete Konten, nur bei 2-4 aktuellen Mitgliedern.
  */
 export async function BetaTeamCard({
-  enabled,
   client,
   teamId,
   memberCount,
 }: {
-  enabled: boolean;
   client: SupabaseClient;
   teamId: string;
   memberCount: number;
 }) {
-  if (!enabled || memberCount < 2 || memberCount > 4) return null;
+  if (memberCount < 2 || memberCount > 4) return null;
   const readiness = await loadBetaReadiness(client, teamId);
   if (!readiness) return null;
 

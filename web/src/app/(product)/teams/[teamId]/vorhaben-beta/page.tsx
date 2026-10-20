@@ -5,7 +5,6 @@ import { getTranslations } from "next-intl/server";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { BetaTeamReport } from "@/features/modules/ui/BetaTeamReport";
 import { compareBeta } from "@/features/modules/ventureBeta/compare";
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { loadBetaComparison, loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -28,7 +27,6 @@ export default async function BetaTeamPage({ params }: { params: Promise<{ teamI
   const { teamId } = await params;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/vorhaben-beta`)}`);
-  if (!isVentureBetaEnabled(auth.user)) notFound();
 
   const client = await createClient();
   const readiness = await loadBetaReadiness(client, teamId);

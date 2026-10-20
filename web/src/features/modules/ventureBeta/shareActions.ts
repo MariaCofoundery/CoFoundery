@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -40,7 +39,7 @@ export async function setBetaShare(formData: FormData) {
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
-  if (!isVentureBetaEnabled(auth?.user)) redirect("/me/profile");
+  if (!auth?.user) redirect("/me/profile");
 
   const { error } = await supabase.rpc("set_assessment_team_share", {
     p_assessment_id: assessmentId,

@@ -6,7 +6,6 @@ import { getModuleAdapter } from "@/features/modules/adapters";
 import { loadModuleContext } from "@/features/modules/loadModuleContext";
 import { MODULE_REGISTRY } from "@/features/modules/registry";
 import type { ModuleDefinition, ModuleState } from "@/features/modules/types";
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { findVentures } from "@/features/instruments/align/ventureResolution";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -55,10 +54,9 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
   ]);
 
   const venture = ventures.find((entry) => entry.id === query.vorhaben) ?? ventures[0] ?? null;
-  const betaOn = isVentureBetaEnabled(user);
   const context = await loadModuleContext(client, user.id, {
     ventureId: venture?.id ?? null,
-    includeBeta: betaOn,
+    includeBeta: true,
     translate: (key, values) => tRoot(key as never, values as never),
     locale: locale === "en" ? "en" : "de",
   });
@@ -77,7 +75,7 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
     }
   };
   const products = MODULE_REGISTRY.filter(
-    (def) => def.usage === "product" && def.scope !== "team" && (def.moduleId !== "venture_core_beta" || betaOn)
+    (def) => def.usage === "product" && def.scope !== "team"
   );
   const cards = (filter: (def: ModuleDefinition) => boolean) =>
     products.filter(filter).map(cardOf).filter((card): card is Card => card !== null);

@@ -19,15 +19,13 @@ import { createClient } from "@/lib/supabase/server";
  * „x von y", kein Balken.
  */
 export async function BetaProfileCard({
-  enabled,
   userId,
   ventureId,
 }: {
-  enabled: boolean;
   userId: string;
   ventureId: string | null;
 }) {
-  if (!enabled || !ventureId) return null;
+  if (!ventureId) return null;
 
   const client = await createClient();
   const [t, tModules, tRoot, localeRaw, state, readiness] = await Promise.all([

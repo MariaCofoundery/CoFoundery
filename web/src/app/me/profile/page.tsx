@@ -37,7 +37,6 @@ import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePill
 import { SelfReportView } from "@/features/reporting/SelfReportView";
 import { BetaProfileCard } from "@/features/modules/ui/BetaProfileCard";
 import { ProfileDeepenings } from "@/features/modules/ui/ProfileDeepenings";
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -887,9 +886,8 @@ export default async function FounderProfilePage({
                 cta={t("venture.emptyCta")}
               />
             )}
-            {/* Venture Alignment (Beta): nur fuer freigeschaltete Konten, ersetzt v1 nicht. */}
+            {/* Venture Alignment (Beta): ersetzt v1 nicht. */}
             <BetaProfileCard
-              enabled={isVentureBetaEnabled(user)}
               userId={user.id}
               ventureId={aktuellesVorhaben?.id ?? null}
             />

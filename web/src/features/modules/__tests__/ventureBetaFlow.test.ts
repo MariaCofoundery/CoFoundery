@@ -170,13 +170,13 @@ test("Profil und Team: Beta-Karte vor den Vertiefungen, keine Prozente; v1 unver
   const card = profile.indexOf("<BetaProfileCard");
   const deepenings = profile.indexOf('anchorModuleId="venture_core"');
   assert.ok(card > 0 && deepenings > card, "Beta-Karte steht vor den Vertiefungen");
-  assert.match(profile, /isVentureBetaEnabled\(user\)/);
+  assert.doesNotMatch(profile, /isVentureBetaEnabled/);
   const profileCard = code(join(UI, "BetaProfileCard.tsx"));
   assert.match(profileCard, /getModuleAdapter\("venture_core_beta"\)/);
   assert.doesNotMatch(profileCard, /%|percent|von\s+\d/i);
   // Die Team-Seite: eigene Karte, keine neue Hauptnavigation.
   const team = code(join("src", "app", "(product)", "teams", "[teamId]", "page.tsx"));
-  assert.match(team, /<BetaTeamCard enabled=\{isVentureBetaEnabled\(user\)\}/);
+  assert.match(team, /<BetaTeamCard client=\{supabase\}/);
   // Advisor: nirgends in der Beta.
   for (const file of [join(BETA, "actions.ts"), join(BETA, "shareActions.ts"), join(BETA, "teamData.ts"), join(UI, "BetaTeamReport.tsx"), join(UI, "BetaTeamCard.tsx"), PAGE]) {
     assert.doesNotMatch(code(file), /advisor|discovery|connect|network/i, file);

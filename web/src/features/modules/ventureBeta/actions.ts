@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 import { answerableOf } from "@/features/instruments/align/questionnaireData";
 import { VENTURE_ALIGNMENT_BETA_INSTRUMENT_ID } from "@/features/instruments/instruments";
 import { validateAnswerV21, type AlignmentAnswerV21 } from "@/features/instruments/v21/answersV21";
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import { BETA_CORE_ITEM_IDS, findBetaItem } from "@/features/modules/ventureBeta/registry";
 import { loadBetaPageState } from "@/features/modules/ventureBeta/data";
 import { createClient } from "@/lib/supabase/server";
@@ -59,8 +58,6 @@ async function authed() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user?.id) return null;
-  // Nicht freigeschaltet: so tun, als gaebe es die Beta nicht.
-  if (!isVentureBetaEnabled(data.user)) return null;
   return { supabase, userId: data.user.id };
 }
 

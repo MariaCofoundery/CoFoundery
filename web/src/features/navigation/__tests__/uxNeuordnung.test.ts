@@ -58,7 +58,7 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
   // Ebenen: Über mich, Vorhaben, Vertiefen, Team.
   for (const group of ["person", "venture", "deepening", "team"]) assert.match(page, new RegExp(`data-group="${group}"|key: "${group}"`));
   // Die Beta nur fuer freigeschaltete Konten.
-  assert.match(page, /def\.moduleId !== "venture_core_beta" \|\| betaOn/);
+  assert.doesNotMatch(page, /betaOn|isVentureBetaEnabled/);
   assert.doesNotMatch(page, /%|percent|von\s+\d|\bscore\b/i);
   for (const locale of ["de", "en"]) {
     const q = JSON.parse(read(`messages/${locale}/questionnaires.json`));

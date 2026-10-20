@@ -13,7 +13,6 @@ import { BetaSharePanel } from "@/features/modules/ui/BetaSharePanel";
 import { BetaSummary } from "@/features/modules/ui/BetaSummary";
 import { startBeta } from "@/features/modules/ventureBeta/actions";
 import { loadBetaPageState } from "@/features/modules/ventureBeta/data";
-import { isVentureBetaEnabled } from "@/features/modules/ventureBeta/gate";
 import {
   BETA_BLOCKS,
   BETA_CORE_ITEM_IDS,
@@ -54,7 +53,6 @@ export default async function BetaPage({
   if (!auth?.user?.id) {
     redirect(buildLoginRedirectPath("/founder-alignment/vorhaben/beta", { venture: query.venture }));
   }
-  if (!isVentureBetaEnabled(auth.user)) notFound();
   const userId = auth.user.id;
 
   // Das Vorhaben wird nie erraten und nie angelegt: gewaehlt oder das einzige.

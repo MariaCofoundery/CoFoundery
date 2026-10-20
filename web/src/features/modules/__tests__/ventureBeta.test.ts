@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -13,7 +13,6 @@ import { VENTURE_CORE_BETA_MODULE } from "@/features/modules/definitions";
 import { MODULE_REGISTRY } from "@/features/modules/registry";
 import { validateModuleRegistry } from "@/features/modules/validate";
 import { COMPARE_RULES } from "@/features/modules/ventureBeta/compareConfig";
-import { isVentureBetaEnabled, parseBetaGate } from "@/features/modules/ventureBeta/gate";
 import { BETA_ITEM_HANDOFFS } from "@/features/modules/ventureBeta/handoff";
 import {
   BETA_BLOCKS,
@@ -190,32 +189,19 @@ test("kein Score, keine Prozente, kein Match, keine Ampel, kein „x von y\" - i
   for (const i of betaItems()) assert.doesNotMatch([i.prompt, ...i.options.map((o) => o.label)].join(" "), /%/, i.itemId);
 });
 
-test("Gate: aus als Standard, `all`, oder nur bestimmte Konten - nie ein versteckter Wechsel", () => {
-  assert.equal(parseBetaGate(undefined).mode, "off");
-  assert.equal(parseBetaGate("").mode, "off");
-  assert.equal(parseBetaGate("off").mode, "off");
-  assert.equal(parseBetaGate(" ALL ").mode, "all");
-  const user = { id: "U-1", email: "Maria@Example.com" };
-  assert.equal(isVentureBetaEnabled(user, undefined), false);
-  assert.equal(isVentureBetaEnabled(user, "off"), false);
-  assert.equal(isVentureBetaEnabled(user, "all"), true);
-  assert.equal(isVentureBetaEnabled(null, "all"), false, "ohne Anmeldung nie");
-  assert.equal(isVentureBetaEnabled(user, "maria@example.com, other@x.de"), true, "E-Mail, unabhaengig von der Schreibweise");
-  assert.equal(isVentureBetaEnabled(user, "u-1"), true, "Nutzer-ID");
-  assert.equal(isVentureBetaEnabled(user, "someone@else.de"), false);
-  // Jede Beta-Oberflaeche hat das Gate: Seiten (404), Aktionen, Karten.
+test("Kein Feature-Schalter mehr: die Beta ist fuer alle Angemeldeten sichtbar, Zugang regelt BETA_ACCESS_CODES", () => {
+  assert.equal(existsSync(join(BETA_DIR, "gate.ts")), false);
+  const all = walk("src").filter((f) => /\.(ts|tsx)$/.test(f) && !/\.test\./.test(f));
+  for (const file of all) {
+    assert.doesNotMatch(read(file), /VENTURE_ALIGNMENT_V2_BETA|isVentureBetaEnabled/, file);
+  }
+  // Die Seiten bleiben angemeldet erreichbar.
   for (const page of [
     join("src", "app", "(product)", "founder-alignment", "vorhaben", "beta", "page.tsx"),
     join("src", "app", "(product)", "teams", "[teamId]", "vorhaben-beta", "page.tsx"),
   ]) {
-    assert.match(code(page), /isVentureBetaEnabled\(auth\.user\)\) notFound\(\)/, page);
+    assert.match(code(page), /redirect\(/, page);
   }
-  for (const file of ["actions.ts", "shareActions.ts"]) assert.match(code(join(BETA_DIR, file)), /isVentureBetaEnabled/, file);
-  assert.match(code(join("src", "features", "modules", "ui", "BetaProfileCard.tsx")), /if \(!enabled/);
-  assert.match(code(join("src", "features", "modules", "ui", "BetaTeamCard.tsx")), /if \(!enabled/);
-  // Die Umgebungsvariable ist an EINER Stelle benannt.
-  const hits = walk("src").filter((f) => /\.(ts|tsx)$/.test(f) && !/\.test\./.test(f) && /VENTURE_ALIGNMENT_V2_BETA/.test(read(f)));
-  assert.deepEqual(hits, [join(BETA_DIR, "gate.ts")]);
 });
 
 test("Setup-Handoffs: nur bestehende Themen, nur Verweise - keine Antwort wird zur Vereinbarung", () => {
