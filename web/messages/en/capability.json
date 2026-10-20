@@ -162,7 +162,35 @@
     "familyLabel": "Areas in {family}",
     "empty": "Nothing selected yet.",
     "submit": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "searchLabel": "Search areas",
+    "searchPlaceholder": "Search areas …",
+    "noResults": "I can't find an area for that. Try another search term or browse the fields.",
+    "levelTitle": "How much experience?",
+    "wishTitle": "Responsibility for it",
+    "overviewTitle": "Your overview",
+    "overviewEmpty": "Nothing chosen yet.",
+    "overviewNote": "Only you see this. Who else sees it is set under “Visibility”. Five to ten areas already give a meaningful picture.",
+    "hasExample": "You wrote an example for this area. To remove it, delete the example first.",
+    "familiesLabel": "Fields",
+    "levelsShort": {
+      "1": "Not applied yet",
+      "2": "Tried out",
+      "3": "Independently",
+      "4": "Repeatedly",
+      "5": "Can guide others"
+    },
+    "wishesShort": {
+      "own": "Take it on",
+      "contribute": "Contribute",
+      "grow_into": "Grow into it",
+      "prefer_other": "Rather someone else",
+      "prefer_external": "Rather external",
+      "unclear": "Unclear"
+    },
+    "textLead": "Choose the areas where you have worked hands-on – the important ones rather than everything you ever touched. For each you can add how much experience you have and whether you want to be responsible for it. Both are optional.",
+    "titleNew": "Where do you know your way around?",
+    "submitNew": "Save"
   },
   "ownership": {
     "title": "Which of these do you not want to own long term?",
@@ -424,7 +452,8 @@
     "recognised": "We've matched your description to one or more areas – already checked below. See if that fits, and add anything that's missing.",
     "unmatched": "We couldn't match your description to an area yet. It's saved under “Other focus” – choose the area below that actually fits.",
     "confirmed": "Your selection is saved. You can add anything that's still missing here.",
-    "interview_paused": "Saved. You can pick up the conversation where you left off at any time."
+    "interview_paused": "Saved. You can pick up the conversation where you left off at any time.",
+    "area_kept": "An area with an example stays – delete the example first if you want to remove it."
   },
   "industryLabels": {
     "software_saas": "Software & SaaS",

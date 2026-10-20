@@ -231,20 +231,20 @@ test("next: nur die erlaubten Rückwege", () => {
   assert.equal(parseIdentityReturnPath("/admin"), null);
 });
 
-test("next reist durch Bereiche, Verantwortung und Sichtbarkeit und führt zurück", () => {
+test("next reist durch Bereiche und Sichtbarkeit und führt zurück", () => {
   const page = read("src/app/(product)/profile/page.tsx");
-  for (const action of ["saveCapabilityAreasAction", "saveCapabilityOwnershipAction", "saveCapabilityDisclosureAction"]) {
+  for (const action of ["saveCapabilityAreasAction", "saveCapabilityDisclosureAction"]) {
     const form = page.slice(page.indexOf(`<form action={${action}}`), page.indexOf(`<form action={${action}}`) + 400);
     assert.match(form, /returnPath \? <input type="hidden" name="next" value=\{returnPath\} \/> : null/, `${action}: next fehlt im Formular`);
   }
-  assert.match(page, /href=\{returnPath \? `\/profile\?step=areas&next=\$\{encodeURIComponent\(returnPath\)\}` : "\/profile\?step=areas"\}/, "Zurück zu Bereichen behält next");
+  assert.match(page, /redirect\(back \? `\/profile\?step=areas&next=\$\{encodeURIComponent\(back\)\}` : "\/profile\?step=areas"\)/, "alte Verantwortungs-Links behalten next");
 
   const actions = read("src/features/capability/capabilityActions.ts");
-  assert.equal((actions.match(/const returnPath = parseIdentityReturnPath\(formData\.get\("next"\)\);/g) ?? []).length, 3);
+  assert.equal((actions.match(/const returnPath = parseIdentityReturnPath\(formData\.get\("next"\)\);/g) ?? []).length, 2);
   assert.match(actions, /returnPath \? `next=\$\{encodeURIComponent\(returnPath\)\}` : null/, "Zwischenschritte behalten next");
-  assert.match(actions, /back\("ownership", undefined, undefined, returnPath\);/, "Bereiche -> Verantwortung mit next");
-  const ownership = actions.slice(actions.indexOf("export async function saveCapabilityOwnershipAction"), actions.indexOf("export async function deleteCapabilityEvidenceAction"));
-  assert.match(ownership, /if \(returnPath\) redirect\(returnPath\);/, "Verantwortung führt zurück nach FIND");
+  // Verantwortung steht seit 21.10.2026 am Bereich: Speichern führt direkt zurück.
+  const areasAction = actions.slice(actions.indexOf("export async function saveCapabilityAreasAction"), actions.indexOf("export async function deleteCapabilityEvidenceAction"));
+  assert.match(areasAction, /if \(returnPath\) redirect\(returnPath\);/, "Bereiche führen zurück nach FIND");
   const disclosure = actions.slice(actions.indexOf("export async function saveCapabilityDisclosureAction"));
   assert.match(disclosure, /if \(returnPath\) redirect\(returnPath\);/, "Sichtbarkeit führt zurück nach FIND");
 });

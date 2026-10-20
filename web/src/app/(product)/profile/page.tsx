@@ -9,8 +9,8 @@ import {
   saveCapabilityAreasAction,
   saveCapabilityDisclosureAction,
   saveCapabilityEvidenceAction,
-  saveCapabilityOwnershipAction,
 } from "@/features/capability/capabilityActions";
+import { CapabilityAreasEditor } from "@/features/capability/CapabilityAreasEditor";
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
 import { StrengthsSection } from "@/features/capability/StrengthsSection";
 import {
@@ -146,7 +146,7 @@ const ERROR_KEYS = [
   "photo_reuse",
   "photo_upload",
 ];
-const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
+const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused", "area_kept"];
 
 export default async function ProfilePage({
   searchParams,
@@ -212,6 +212,12 @@ export default async function ProfilePage({
   ]);
 
   const currentRoles = basisProfil.roles;
+  // „Verantwortung" ist seit dem 21.10.2026 kein eigener Schritt mehr, sondern
+  // steht am Bereich. Alte Links und Lesezeichen landen dort.
+  if (params.step === "ownership") {
+    const back = parseIdentityReturnPath(params.next);
+    redirect(back ? `/profile?step=areas&next=${encodeURIComponent(back)}` : "/profile?step=areas");
+  }
   const step = isPageStep(params.step) ? params.step : null;
   // CAPABILITY-MATCHING-FREIGABE (E3c): nur im Schritt Sichtbarkeit, nur mit FIND-Zugang
   // und nur, wenn FIND hier tatsächlich mit Matching v0.1 rankt (Server-Flag).
@@ -232,7 +238,6 @@ export default async function ProfilePage({
     family,
     areas: areas.filter((area) => area.family_id === family.family_id),
   }));
-  const selectedAreaIds = new Set(entries.map((entry) => entry.area_id));
   const grouped = groupEntriesByFamily(entries, areas, families);
   const areaLabel = (areaId: string) => t(`areaLabels.${areaId}`);
   const readout = buildCapabilityReadout(entries, areas, families);
@@ -351,8 +356,8 @@ export default async function ProfilePage({
           {/* Erledigte Schritte sahen genauso aus wie kommende - die Anzeige
               zeigte, wo man ist, aber nicht, was schon sitzt. */}
           <ol className="flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
-            {(["evidence", "areas", "ownership"] as const).map((name, index) => {
-              const position = ["evidence", "areas", "ownership"].indexOf(step ?? "");
+            {(["evidence", "areas"] as const).map((name, index) => {
+              const position = ["evidence", "areas"].indexOf(step ?? "");
               const done = index < position;
               return (
                 <li
@@ -473,51 +478,49 @@ export default async function ProfilePage({
         />
       ) : null}
 
-      {/* Schritt 2: Familien aufklappen, darunter die Bereiche. Natives
-          details/summary - das progressive Aufklappen braucht kein JavaScript. */}
+      {/* Schritt 2: Bereiche, Erfahrung und Verantwortung an einem Ort. Die
+          Felder kommen aus der Client-Komponente; gespeichert wird hier. */}
       {step === "areas" ? (
-        <form action={saveCapabilityAreasAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+        <form action={saveCapabilityAreasAction} className="mt-8 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
           {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
           {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
-            <h2 className="text-xl font-semibold">{t("areas.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("areas.text")}</p>
+            <h2 className="text-xl font-semibold">{t("areas.titleNew")}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{t("areas.textLead")}</p>
           </div>
-          <div className="space-y-3">
-            {areasByFamily.map(({ family, areas: familyAreas }) => {
-              const selectedInFamily = familyAreas.filter((area) => selectedAreaIds.has(area.area_id)).length;
-              return (
-                <details
-                  key={family.family_id}
-                  open={selectedInFamily > 0}
-                  className="rounded-2xl border border-slate-200 px-4 py-3"
-                >
-                  <summary className="min-h-11 cursor-pointer text-sm font-semibold">
-                    {t(`families.${family.family_id}`)}
-                    {selectedInFamily > 0 ? <span className="ml-2 text-violet-700">({selectedInFamily})</span> : null}
-                  </summary>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    {familyAreas.map((area) => (
-                      <label
-                        key={area.area_id}
-                        className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"
-                      >
-                        <input
-                          type="checkbox"
-                          name="area_id"
-                          value={area.area_id}
-                          defaultChecked={selectedAreaIds.has(area.area_id)}
-                        />
-                        {areaLabel(area.area_id)}
-                      </label>
-                    ))}
-                  </div>
-                </details>
-              );
-            })}
-          </div>
+          <CapabilityAreasEditor
+            families={areasByFamily.map(({ family, areas: familyAreas }) => ({
+              id: family.family_id,
+              label: t(`families.${family.family_id}`),
+              areas: familyAreas.map((area) => ({
+                id: area.area_id,
+                label: areaLabel(area.area_id),
+                hasExample: (entries.find((entry) => entry.area_id === area.area_id)?.evidence.length ?? 0) > 0,
+              })),
+            }))}
+            initial={Object.fromEntries(
+              entries.map((entry) => [entry.area_id, { level: entry.application_level, wish: entry.ownership_wish }])
+            )}
+            copy={{
+              searchLabel: t("areas.searchLabel"),
+              searchPlaceholder: t("areas.searchPlaceholder"),
+              noResults: t("areas.noResults"),
+              levelTitle: t("areas.levelTitle"),
+              wishTitle: t("areas.wishTitle"),
+              overviewTitle: t("areas.overviewTitle"),
+              overviewEmpty: t("areas.overviewEmpty"),
+              overviewNote: t("areas.overviewNote"),
+              hasExample: t("areas.hasExample"),
+              familiesLabel: t("areas.familiesLabel"),
+              levels: Object.fromEntries(["1", "2", "3", "4", "5"].map((level) => [level, t(`areas.levelsShort.${level}`)])),
+              wishes: Object.fromEntries(OWNERSHIP_WISHES.map((wish) => [wish, t(`areas.wishesShort.${wish}`)])) as Record<
+                (typeof OWNERSHIP_WISHES)[number],
+                string
+              >,
+            }}
+          />
           <div className="flex flex-wrap items-center gap-3">
-            <SubmitButton label={t("areas.submit")} pendingLabel={t("pending.save")} className={primary} />
+            <SubmitButton label={t("areas.submitNew")} pendingLabel={t("pending.save")} className={primary} />
             <Link href="/profile?step=evidence" className={secondary}>
               {t("areas.back")}
             </Link>
@@ -554,61 +557,10 @@ export default async function ProfilePage({
         </div>
       ) : null}
 
-      {/* Schritt 3: Ownership. Bewusst als Verneinung gefragt - das ist die
-          Frage, die sonst niemand stellt, und sie klaert spaeter viel. */}
-      {step === "ownership" ? (
-        <form action={saveCapabilityOwnershipAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
-          {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
-          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
-          <div>
-            <h2 className="text-xl font-semibold">{t("ownership.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("ownership.text")}</p>
-          </div>
-          {entries.length ? (
-            <div className="space-y-3">
-              {grouped.map(({ familyId, entries: familyEntries }) => (
-                <section key={familyId}>
-                  <h3 className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">
-                    {t(`families.${familyId}`)}
-                  </h3>
-                  <div className="mt-2 space-y-2">
-                    {familyEntries.map((entry) => (
-                      <label key={entry.id} className="block rounded-xl border border-slate-200 p-3 text-sm">
-                        <span className="font-medium">{areaLabel(entry.area_id)}</span>
-                        <select
-                          name={`ownership_${entry.area_id}`}
-                          defaultValue={entry.ownership_wish ?? ""}
-                          className={field}
-                        >
-                          <option value="">{t("ownershipWishes.unset")}</option>
-                          {OWNERSHIP_WISHES.map((wish) => (
-                            <option key={wish} value={wish}>
-                              {t(`ownershipWishes.${wish}`)}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-600">{t("ownership.noEntries")}</p>
-          )}
-          <div className="flex flex-wrap items-center gap-3">
-            <SubmitButton label={t("ownership.submit")} pendingLabel={t("pending.save")} className={primary} />
-            <Link href={returnPath ? `/profile?step=areas&next=${encodeURIComponent(returnPath)}` : "/profile?step=areas"} className={secondary}>
-              {t("ownership.back")}
-            </Link>
-          </div>
-        </form>
-      ) : null}
-
       {/* KOENNEN IST NICHT WOLLEN. Die Rollenliste nach Faltin zaehlt die
           Bereiche, die ins Team gehoeren UND verantwortet werden sollen -
           die Erfahrungsstufe wird dabei nicht verrechnet. */}
-      {step === "ownership" && entries.length > 0 ? (
+      {step === "areas" && entries.length > 0 ? (
         <div className="mt-8">
           <CoverageRoles
             coverage={coverage}

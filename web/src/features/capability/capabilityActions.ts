@@ -132,21 +132,38 @@ export async function saveCapabilityAreasAction(formData: FormData) {
 
   const existing = await client
     .from("person_capability_entries")
-    .select("id,area_id,person_capability_evidence(id)")
+    .select("id,area_id,application_level,ownership_wish,person_capability_evidence(id)")
     .eq("user_id", user.id);
   if (existing.error) back("areas", "save", undefined, returnPath);
 
   const rows = (existing.data ?? []) as {
     id: string;
     area_id: string;
+    application_level: number | null;
+    ownership_wish: string | null;
     person_capability_evidence: { id: string }[] | null;
   }[];
   const known = new Map(rows.map((row) => [row.area_id, row]));
 
+  // Erfahrung und Verantwortungswunsch stehen seit dem 21.10.2026 am Bereich.
+  // Beides getrennt und freiwillig: ein fehlendes Feld heisst "keine Angabe".
+  const levelOf = (areaId: string) => parseApplicationLevel(formData.get(`level_${areaId}`));
+  const wishOf = (areaId: string) => parseOwnershipWish(formData.get(`wish_${areaId}`));
+
   const toInsert = [...selected]
     .filter((areaId) => !known.has(areaId))
-    .map((areaId) => ({ user_id: user.id, area_id: areaId }));
+    .map((areaId) => ({
+      user_id: user.id,
+      area_id: areaId,
+      application_level: levelOf(areaId),
+      ownership_wish: wishOf(areaId),
+    }));
 
+  // Ein Bereich mit Beispiel bleibt: Das Beispiel begruendet die Einstufung.
+  // Das Abwaehlen blieb frueher stumm wirkungslos - jetzt wird es gesagt.
+  const withEvidenceDropped = rows.filter(
+    (row) => !selected.has(row.area_id) && (row.person_capability_evidence ?? []).length > 0
+  );
   const toDelete = rows
     .filter((row) => !selected.has(row.area_id) && (row.person_capability_evidence ?? []).length === 0)
     .map((row) => row.id);
@@ -160,43 +177,26 @@ export async function saveCapabilityAreasAction(formData: FormData) {
     if (error) back("areas", "save", undefined, returnPath);
   }
 
-  back("ownership", undefined, undefined, returnPath);
-}
-
-/**
- * Schritt 3: der Ownership-Wunsch pro Bereich.
- *
- * Bewusst gefragt als "was moechtest du nicht dauerhaft verantworten" - das
- * ist die Frage, die Foundern sonst niemand stellt. Ein leeres Feld bleibt
- * leer; es gibt keinen Default-Wunsch.
- */
-export async function saveCapabilityOwnershipAction(formData: FormData) {
-  const { client, user } = await context();
-  const returnPath = parseIdentityReturnPath(formData.get("next"));
-
-  const existing = await client
-    .from("person_capability_entries")
-    .select("id,area_id,ownership_wish")
-    .eq("user_id", user.id);
-  if (existing.error) back("ownership", "save", undefined, returnPath);
-
-  const rows = (existing.data ?? []) as { id: string; area_id: string; ownership_wish: string | null }[];
-
   for (const row of rows) {
-    const wish = parseOwnershipWish(formData.get(`ownership_${row.area_id}`));
-    if (wish === row.ownership_wish) continue;
+    // Ein Bereich mit Beispiel gilt auch dann als gewaehlt, wenn das Feld fehlt.
+    if (!selected.has(row.area_id) && (row.person_capability_evidence ?? []).length === 0) continue;
+    const keptOnly = !selected.has(row.area_id);
+    const level = keptOnly ? row.application_level : levelOf(row.area_id);
+    const wish = keptOnly ? row.ownership_wish : wishOf(row.area_id);
+    if (level === row.application_level && wish === row.ownership_wish) continue;
     const { error } = await client
       .from("person_capability_entries")
-      .update({ ownership_wish: wish })
+      .update({ application_level: level, ownership_wish: wish })
       .eq("id", row.id);
-    if (error) back("ownership", "save", undefined, returnPath);
+    if (error) back("areas", "save", undefined, returnPath);
   }
+
+  if (withEvidenceDropped.length) back("areas", undefined, "area_kept", returnPath);
 
   revalidatePath("/profile");
   // Kam die Person aus FIND oder CONNECT, geht es dorthin zurueck.
   if (returnPath) redirect(returnPath);
-  // Zurueck zur Station, nicht an den Seitenanfang: Wer die drei Schritte
-  // durchlaufen hat, soll dort stehen, wo das Ergebnis steht.
+  // Zurueck zur Station, nicht an den Seitenanfang.
   redirect("/profile?saved=snapshot#mitbringen");
 }
 
