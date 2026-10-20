@@ -16,6 +16,7 @@ export type ReadinessMember = {
   person_id: string;
   name: string;
   is_viewer: boolean;
+  /** Fuer die eigene Person echt; fuer andere derselbe Wert wie `shared_with_team` (die Datenbank verraet nicht, wer nichts beantwortet hat). */
   has_current_workstyle: boolean;
   /** Fuer dieses Team geteilt (Teamfreigabe oder vollstaendiger Bestand). */
   shared_with_team: boolean;
@@ -83,7 +84,8 @@ export function readinessState(readiness: TeamReadiness): {
   // Eigene Teamfreigabe kann man auch ohne fertiges Arbeitsprofil schon geben.
   const viewerAction =
     viewer && !memberShared(viewer) ? "share_team" : viewer && !viewer.has_current_workstyle ? "complete_workstyle" : null;
-  if (readiness.members.some((m) => !m.has_current_workstyle)) return { state: "INSUFFICIENT_WORKSTYLE", waitingFor, viewerAction };
+  // Ob ANDERE ein Arbeitsprofil haben, verraet die Datenbank nicht (nur „geteilt" oder nicht); hier zaehlt, ob DU eines hast.
+  if (viewer && !viewer.has_current_workstyle) return { state: "INSUFFICIENT_WORKSTYLE", waitingFor, viewerAction };
   const mine = viewer ? !memberShared(viewer) : false;
   return {
     state: mine && waitingFor.length ? "MISSING_MULTIPLE" : mine ? "MISSING_MINE" : "MISSING_OTHERS",

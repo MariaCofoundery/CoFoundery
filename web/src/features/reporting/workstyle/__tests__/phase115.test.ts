@@ -44,7 +44,9 @@ test("Bereitschaft: alle Zustände aus echten Teamfreigaben", () => {
   assert.deepEqual([sharedNoProfile.state, sharedNoProfile.viewerAction], ["INSUFFICIENT_WORKSTYLE", "complete_workstyle"]);
 
   const otherNoProfile = readinessState(readiness("missing", [member({ is_viewer: true }), member({ name: "Mia", has_current_workstyle: false, shared_with_team: false })]));
-  assert.deepEqual([otherNoProfile.state, otherNoProfile.viewerAction, otherNoProfile.waitingFor], ["INSUFFICIENT_WORKSTYLE", null, ["Mia"]]);
+  // Seit 21.10.2026 verraet die Datenbank nicht, ob ANDERE das Arbeitsprofil beantwortet haben - nur, ob sie geteilt
+  // haben. Wer nicht geteilt hat, steht als „fehlt noch" da, ohne den Grund.
+  assert.deepEqual([otherNoProfile.state, otherNoProfile.viewerAction, otherNoProfile.waitingFor], ["MISSING_OTHERS", null, ["Mia"]]);
 });
 
 test("Bereitschaft: Parser nimmt nur Wahrheitswerte und Namen, keine Antworten", () => {

@@ -19,6 +19,10 @@ Oberflächen. Nichts wurde gegen echte Daten oder im Browser geprüft.
   gelöscht. Angewendet im Teambericht, in der Advisor-Sicht, beim Abschluss (erneutes Bestätigen erneuert den Zeitpunkt)
   und auf der Setup-Seite. Test: `supabase/tests/founder_team_setup_roster.sql`.
 
+- **Arbeitsweise-Bereitschaft verrät nicht mehr, wer nichts beantwortet hat** (Migration `20261215120000_workstyle_readiness_hides_who_answered.sql`):
+  Für andere steht nur „geteilt oder nicht“ (mit Namen, damit sich ein Team abstimmen kann); ob jemand das
+  Arbeitsprofil überhaupt beantwortet hat, sieht nur die Person selbst. „Nicht geteilt“ ist nicht „nicht beantwortet“.
+
 ## Entscheidung nötig (nicht gebaut)
 
 1. ~~Setup-Bestätigung nach Austritt und Wiedereintritt.~~ (siehe oben) Ursprünglicher Fund: Bestätigungen (`founder_team_setup_confirmations`)
@@ -29,9 +33,7 @@ Oberflächen. Nichts wurde gegen echte Daten oder im Browser geprüft.
    (`confirm_founder_team_setup_revision`). Vorschlag: eine Bestätigung zählt nur, wenn sie nach dem Beginn der
    aktuellen Mitgliedschaft erfolgte (`confirmed_at >= founder_team_members.created_at`). Ändert Einwilligungslogik,
    braucht Migration und Tests an allen vier Stellen.
-2. **`get_workstyle_team_share_readiness` nennt Namen, solange nicht alle geteilt haben.** Jedes Mitglied sieht,
-   wer noch nicht geteilt hat. Die Tests halten das als gewollt fest. Bei Venture Alignment und Werte &
-   Zielkonflikte gilt dagegen „vorher keine Namen“. Entscheiden, ob beides gleich sein soll.
+2. ~~`get_workstyle_team_share_readiness`~~ (siehe oben): Namen der noch nicht Teilenden bleiben sichtbar, der Grund nicht.
 3. **Fähigkeiten-Ansicht (Advisor): `contribute` zählt als Absage** (`capabilityTeamReadout.ts`). Die
    Rollenmatrix im Team behandelt es nie so. Eine Umstellung verschiebt die Zustände (`settled`, `noBasis`), weil
    die Mindestzahl Entschiedener (zwei) an der Absage hängt; vier Tests müssten neu gedacht werden.

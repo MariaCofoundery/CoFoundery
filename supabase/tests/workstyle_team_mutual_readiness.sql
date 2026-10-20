@@ -93,6 +93,8 @@ set local role authenticated;
 select pg_temp.check_mutual(public.get_workstyle_product_snapshot(current_setting('mutual.pair_snapshot')::uuid) is null,'F: pair snapshot not served as current three-person report');
 reset role;
 select pg_temp.check_mutual(pg_temp.member_flag(pg_temp.readiness_for(3),3,'has_current_workstyle') and not pg_temp.member_flag(pg_temp.readiness_for(3),3,'shared_with_all_members'),'D: third member listed as not yet shared');
+-- Nur die Person selbst sieht, ob sie ein aktuelles Arbeitsprofil hat; fuer andere steht dort der Wert von "geteilt".
+select pg_temp.check_mutual(not pg_temp.member_flag(pg_temp.readiness_for(1),3,'has_current_workstyle') and pg_temp.member_flag(pg_temp.readiness_for(3),3,'has_current_workstyle'),'only the person herself sees whether a workstyle exists');
 -- C teilt nur mit A -> immer noch fuer niemanden (B->C und C->B fehlen)
 select pg_temp.share(3,1); select pg_temp.share(1,3);
 select pg_temp.check_mutual(pg_temp.status_for(1)='not_ready' and pg_temp.status_for(3)='not_ready','D: partial three-way shares hide report even from A and C');
