@@ -3,7 +3,7 @@
     "membersInvite": "Invite another person to this team",
     "membersFull": "This team has four members. No further invitations are available.",
     "eyebrow": "Founder team",
-    "back": "Back to connections",
+    "back": "Back to teams",
     "context": {
       "preFounder": "You are exploring founding a company together",
       "existingTeam": "You already work together as a founder team"
@@ -155,7 +155,7 @@
       "summary": "Deepen collaboration as a pair",
       "twoOnly": "Read My Mind and Founder in the Wild can currently only be started in teams of exactly two founders. You use the Commitment Lab with the people you are directly connected with."
     },
-    "backShort": "Connections",
+    "backShort": "Teams",
     "overview": {
       "nextStep": "Your next step",
       "go": "Continue",
@@ -331,14 +331,12 @@
     }
   },
   "connections": {
-    "eyebrow": "Connections",
-    "title": "Connections & teams",
-    "subtitle": "Find the founders you are exploring a collaboration with or already working with.",
+    "eyebrow": "Align",
     "find": "Find a co-founder",
     "avatarAlt": "Profile for {name}",
     "founderFallback": "Founder {index}",
     "founderUnknown": "Founder",
-    "openTeam": "Open connection",
+    "openTeam": "Open team",
     "respond": "Open",
     "continue": "Continue",
     "contexts": {
@@ -347,12 +345,11 @@
     },
     "established": {
       "title": "Shared areas",
-      "description": "Long-term workspaces for your established founder connections.",
       "empty": "You do not have a long-term founder connection yet.",
       "emptyCta": "Invite a co-founder"
     },
     "potential": {
-      "title": "Meet & explore together",
+      "title": "Getting to know each other",
       "description": "Open introduction requests and connections where you are still exploring collaboration together.",
       "empty": "There are no open or ongoing connections right now.",
       "emptyCta": "Find a co-founder"
@@ -371,7 +368,22 @@
         "sent": "You are exploring together"
       }
     },
-    "leftTeam": "You left the team. Your personal details are unchanged in your profile."
+    "leftTeam": "You left the team. Your personal details are unchanged in your profile.",
+    "titleOne": "Your team",
+    "titleMany": "Your teams",
+    "subtitleOne": "This is where you work together: working style, roles and agreements in one place.",
+    "subtitleMany": "Each team has its own workspace. Choose what you want to work on.",
+    "subtitleNone": "Your shared workspace appears here as soon as there are two of you.",
+    "countTeams": "{count} teams",
+    "countWaiting": "{count, plural, one {# answer is waiting for you} other {# answers are waiting for you}}",
+    "invite": "Invite a co-founder",
+    "quickTitle": "Go straight to",
+    "noDescription": "No description yet.",
+    "answer": "Answer",
+    "start": {
+      "title": "Start with someone",
+      "text": "Invite someone you already know, or find someone to get to know. A team only forms once you both agree."
+    }
   },
   "setup": {
     "rosterChanged": "Earlier agreements lack confirmations from your current team. Previous versions remain readable in the history. Discuss these topics again and, where appropriate, propose a new version for all current members to confirm.",

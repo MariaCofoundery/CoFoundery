@@ -338,7 +338,7 @@ test("R: leere Zustaende bieten einen passenden naechsten Schritt", () => {
 // Weitere Navigation und S) Legacy bleibt
 // ---------------------------------------------------------------------------
 test("Navigation: konkrete Ziele statt allgemeiner Listen", () => {
-  assert.match(read("src/app/(product)/connections/page.tsx"), /href=\{`\/teams\/\$\{encodeURIComponent\(team\.id\)\}`\}/);
+  assert.match(read("src/app/(product)/connections/page.tsx"), /`\/teams\/\$\{encodeURIComponent\(team\.id\)\}\$\{sub\}`/);
   // Phase 1.1: „So willst du gründen" fuehrt in das aktuell gewaehlte Vorhaben.
   assert.match(read("src/app/me/profile/page.tsx"), /\/founder-alignment\/vorhaben\?venture=\$\{encodeURIComponent\(aktuellesVorhaben\.id\)\}/);
   assert.match(read("src/app/(product)/founder-alignment/vorhaben/page.tsx"), /state=\{navState\} teamId=\{venture\.id\}/);

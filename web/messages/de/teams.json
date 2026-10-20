@@ -3,7 +3,7 @@
     "membersInvite": "Weitere Person in dieses Team einladen",
     "membersFull": "Dieses Team hat vier Mitglieder. Weitere Einladungen sind nicht möglich.",
     "eyebrow": "Founder-Team",
-    "back": "Zurück zu Verbindungen",
+    "back": "Zurück zu Teams",
     "context": {
       "preFounder": "Ihr prüft eine gemeinsame Gründung",
       "existingTeam": "Ihr arbeitet bereits als Founder-Team zusammen"
@@ -155,7 +155,7 @@
       "summary": "Zusammenarbeit zu zweit vertiefen",
       "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
     },
-    "backShort": "Verbindungen",
+    "backShort": "Teams",
     "overview": {
       "nextStep": "Euer nächster Schritt",
       "go": "Weiter",
@@ -331,14 +331,12 @@
     }
   },
   "connections": {
-    "eyebrow": "Verbindungen",
-    "title": "Verbindungen & Teams",
-    "subtitle": "Hier findest du Founder, mit denen du eine Zusammenarbeit prüfst oder bereits zusammenarbeitest.",
+    "eyebrow": "Align",
     "find": "Co-Founder finden",
     "avatarAlt": "Profil von {name}",
     "founderFallback": "Founder {index}",
     "founderUnknown": "Founder",
-    "openTeam": "Verbindung öffnen",
+    "openTeam": "Zum Team",
     "respond": "Öffnen",
     "continue": "Fortsetzen",
     "contexts": {
@@ -347,12 +345,11 @@
     },
     "established": {
       "title": "Gemeinsame Bereiche",
-      "description": "Dauerhafte Arbeitsbereiche für eure bestehenden Founder-Verbindungen.",
       "empty": "Noch keine dauerhafte Founder-Verbindung vorhanden.",
       "emptyCta": "Co-Founder einladen"
     },
     "potential": {
-      "title": "Kennenlernen & gemeinsam prüfen",
+      "title": "Kennenlernen",
       "description": "Offene Kennenlern-Anfragen und Verbindungen, bei denen ihr eure Zusammenarbeit noch gemeinsam prüft.",
       "empty": "Aktuell gibt es keine offenen oder laufenden Verbindungen.",
       "emptyCta": "Co-Founder finden"
@@ -371,7 +368,22 @@
         "sent": "Ihr prüft gemeinsam"
       }
     },
-    "leftTeam": "Du hast das Team verlassen. Deine persönlichen Angaben sind unverändert in deinem Profil."
+    "leftTeam": "Du hast das Team verlassen. Deine persönlichen Angaben sind unverändert in deinem Profil.",
+    "titleOne": "Dein Team",
+    "titleMany": "Deine Teams",
+    "subtitleOne": "Hier arbeitet ihr zusammen: Arbeitsweise, Rollen und Absprachen an einem Ort.",
+    "subtitleMany": "Jedes Team hat seinen eigenen Arbeitsraum. Wähle, woran du gerade arbeiten willst.",
+    "subtitleNone": "Hier entsteht euer gemeinsamer Arbeitsraum, sobald ihr zu zweit seid.",
+    "countTeams": "{count} Teams",
+    "countWaiting": "{count, plural, one {# Antwort wartet auf dich} other {# Antworten warten auf dich}}",
+    "invite": "Mitgründer:in einladen",
+    "quickTitle": "Direkt weiter",
+    "noDescription": "Noch keine Beschreibung.",
+    "answer": "Antworten",
+    "start": {
+      "title": "Mit jemandem starten",
+      "text": "Lade eine Person ein, die du schon kennst, oder finde jemanden zum Kennenlernen. Ein Team entsteht erst, wenn ihr beide zustimmt."
+    }
   },
   "setup": {
     "rosterChanged": "Für frühere Vereinbarungen fehlen Bestätigungen aus eurem aktuellen Team. Die früheren Fassungen bleiben in der Historie lesbar. Besprecht die Themen erneut und schlagt bei Bedarf eine neue Fassung zur Bestätigung durch alle aktuellen Mitglieder vor.",

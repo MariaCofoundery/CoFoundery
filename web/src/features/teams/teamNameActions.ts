@@ -8,13 +8,14 @@ import { createClient } from "@/lib/supabase/server";
  * Teamname und Beschreibung setzen oder zurücknehmen - über die RPC `set_founder_team_details`.
  *
  * Der Client schreibt nie direkt in `founder_teams`. Die Rückkehradresse ist
- * auf die Startseite (mit Teamauswahl) und die Teamseite desselben Teams
- * begrenzt, damit das Formular kein offener Weiterleiter wird.
+ * auf die Startseite (mit Teamauswahl), die Teamuebersicht und die Teamseite
+ * desselben Teams begrenzt, damit das Formular kein offener Weiterleiter wird.
  */
 function safeReturn(teamId: string, returnTo: string) {
   const id = encodeURIComponent(teamId);
   if (returnTo === `/dashboard?team=${id}` || returnTo === `/dashboard`) return returnTo;
   if (returnTo === `/teams/${id}`) return returnTo;
+  if (returnTo === "/connections") return returnTo;
   return `/teams/${id}`;
 }
 

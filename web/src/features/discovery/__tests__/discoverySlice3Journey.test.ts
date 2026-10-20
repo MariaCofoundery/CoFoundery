@@ -110,12 +110,13 @@ test("starting collaboration remains a conscious non-evaluative boundary", () =>
 });
 
 test("introductions and connections have distinct visible roles", () => {
-  assert.equal(deTeams.connections.title, "Verbindungen & Teams");
-  assert.equal(enTeams.connections.title, "Connections & teams");
-  assert.equal(deTeams.connections.potential.title, "Kennenlernen & gemeinsam prüfen");
-  assert.equal(enTeams.connections.potential.title, "Meet & explore together");
+  // Seit 21.10.2026: „Dein Team" / „Deine Teams" und „Kennenlernen" getrennt.
+  assert.equal(deTeams.connections.titleOne, "Dein Team");
+  assert.equal(deTeams.connections.titleMany, "Deine Teams");
+  assert.equal(enTeams.connections.titleMany, "Your teams");
+  assert.equal(deTeams.connections.potential.title, "Kennenlernen");
+  assert.equal(enTeams.connections.potential.title, "Getting to know each other");
   assert.match(deDiscovery.intros.subtitle, /Anfragen/);
-  assert.match(deTeams.connections.established.description, /Arbeitsbereiche/);
 });
 
 test("the relevant actions retain mobile-safe wrapping and one primary action per state", () => {
