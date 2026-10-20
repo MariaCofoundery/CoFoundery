@@ -1,5 +1,6 @@
 "use client";
 
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { type ChangeEvent, type ReactNode, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { upsertProfileBasicsAction } from "@/features/profile/actions";
@@ -126,6 +127,21 @@ function areasForPlan(plan: OnboardingPlan): ProductArea[] {
   return ["align", "find", "connect"];
 }
 
+/**
+ * Womit anfangen - wohin der Abschluss des Einstiegs fuehrt.
+ *
+ * Nur, wenn der Einstieg ohne eigenes Ziel kam (Standard: /dashboard). Bei
+ * Einladungen und anderen Zielen bleibt deren Ziel. Jeder Eintrag ist der
+ * erste Schritt DES Bereichs, nicht eine Uebersicht: Align fuehrt in den
+ * Arbeitsweise-Fragebogen (fuer Advisors in die Begleitung), Find und Connect
+ * in das eigene Profil des Bereichs.
+ */
+function startHrefFor(area: ProductArea, plan: OnboardingPlan | ""): string {
+  if (area === "align") return plan === "advisor" ? "/advisor/dashboard" : CURRENT_WORKSTYLE_HREF;
+  if (area === "find") return "/discovery/profile";
+  return "/connect/profile";
+}
+
 function normalizePath(path: string | undefined, fallback: string) {
   const normalized = (path ?? "").trim();
   if (!normalized.startsWith("/")) {
@@ -208,6 +224,8 @@ export function ProfileBasicsForm({
   const [plan, setPlan] = useState<OnboardingPlan | "">(
     mode === "onboarding" && !initialValues.roles?.length ? "" : initialPlan
   );
+  // Womit anfangen: leer heisst „erst mal umsehen" (der Standard-Weg).
+  const [startArea, setStartArea] = useState<ProductArea | "">("");
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const avatarUploadRef = useRef<HTMLInputElement | null>(null);
   const previewName = displayName.trim() || "Founder";
@@ -239,6 +257,9 @@ export function ProfileBasicsForm({
       ? !getNextStepDisabled(activeStep, onboardingValues)
       : true;
   const openedAreas = areasForPlan(plan || "founder");
+  const canChooseStart = mode === "onboarding" && !isConnectPlan && openedAreas.length > 1 && successRedirect === "/dashboard";
+  const chosenStart = canChooseStart && startArea && openedAreas.includes(startArea) ? startArea : "";
+  const effectiveRedirect = chosenStart ? startHrefFor(chosenStart, plan) : successRedirect;
 
   /**
    * Titel und Hinweis je Schritt. Die Zaehlung steht nicht mehr drin.
@@ -609,6 +630,36 @@ export function ProfileBasicsForm({
           </p>
         ) : null}
 
+        {canChooseStart ? (
+          <fieldset className="grid gap-2">
+            <legend className="text-sm font-semibold text-slate-950">{t("onboarding.start.title")}</legend>
+            <p className="text-xs leading-5 text-slate-500">{t("onboarding.start.hint")}</p>
+            {[...openedAreas, "" as const].map((option) => (
+              <label
+                key={option || "around"}
+                className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 text-sm ${
+                  startArea === option
+                    ? "border-violet-300/70 bg-[linear-gradient(120deg,rgba(124,58,237,.07),rgba(34,211,238,.09))]"
+                    : "border-slate-200 bg-white hover:bg-slate-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="startArea"
+                  checked={startArea === option}
+                  onChange={() => setStartArea(option)}
+                  className="mt-1 h-4 w-4"
+                />
+                <span>
+                  <span className="block font-semibold text-slate-950">
+                    {option ? t(`onboarding.start.options.${option === "align" && plan === "advisor" ? "alignAdvisor" : option}`) : t("onboarding.start.lookAround")}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        ) : null}
+
         <div className="rounded-2xl border border-violet-200/70 bg-[linear-gradient(120deg,rgba(124,58,237,.06),rgba(34,211,238,.08))] px-5 py-4">
           {/* Der Schlusssatz - der eine, den man sich merkt. "Es hilft DIR"
               stimmt fuer einen Advisor nicht; ihm hilft es bei den Teams, die
@@ -665,9 +716,17 @@ export function ProfileBasicsForm({
             </p>
           ) : null}
           {isWelcomeStep ? (
-            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-              {t("onboarding.welcomeText")}
-            </p>
+            <>
+              <ul className="mt-4 grid max-w-xl gap-2 text-sm leading-6 text-slate-700">
+                {(["areas", "consent", "noScore"] as const).map((point) => (
+                  <li key={point} className="flex gap-2">
+                    <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+                    <span>{t(`onboarding.welcomePoints.${point}`)}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600">{t("onboarding.welcomeText")}</p>
+            </>
           ) : null}
           {/* Der Balken zaehlt die Schritte des GEWAEHLTEN Weges - der kurze
               hat vier, der lange sieben. Ein fester Balken haette beim
@@ -913,7 +972,7 @@ export function ProfileBasicsForm({
             : upsertProfileBasicsAction
         }
       >
-        <input type="hidden" name="onSuccessRedirectTo" value={successRedirect} />
+        <input type="hidden" name="onSuccessRedirectTo" value={effectiveRedirect} />
         <input type="hidden" name="onErrorRedirectTo" value={errorRedirect} />
         <input type="hidden" name="avatarId" value={selectedAvatarId} />
         <input type="hidden" name="avatarImageUrl" value={selectedAvatarId ? "" : uploadedAvatarUrl} />

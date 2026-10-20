@@ -13,7 +13,7 @@
           "hint": "This is how you'll appear to other people here."
         },
         "plan": {
-          "title": "What are you here to do?",
+          "title": "What would you like to do here?",
           "hint": "This decides which areas open up for you. There's no wrong answer – and none that locks you in."
         },
         "focus": {
@@ -48,15 +48,15 @@
       "plans": {
         "founder": {
           "title": "I want to found a company",
-          "description": "You're building something, or you firmly intend to – alone or with a team."
+          "description": "Understand my founding team, make agreements, find co-founders – alone or in a team."
         },
         "advisor": {
           "title": "I support founders",
-          "description": "You bring experience and work with teams in an advisory role."
+          "description": "Support teams and individuals – alone or in an organization such as an accelerator."
         },
         "both": {
           "title": "Both",
-          "description": "You're founding yourself and passing on what you've learned at the same time."
+          "description": "You found something yourself and support others. Both views are there for you."
         },
         "connect": {
           "title": "Just meet people for now",
@@ -84,7 +84,23 @@
       "startConnectButton": "Continue to Connect",
       "planChangeableConnect": "And if you decide to found something later, we'll open up Align and Find – just drop us a line.",
       "areasLaterConnect": "Align and Find are open to you whenever you want – just get in touch and we'll unlock them.",
-      "nonDiagnosticHintAdvisor": "Made2Found is not a personality test. It helps the teams you support make their collaboration clearer and more robust, early on."
+      "nonDiagnosticHintAdvisor": "Made2Found is not a personality test. It helps the teams you support make their collaboration clearer and more robust, early on.",
+      "welcomePoints": {
+        "areas": "Three areas you use on their own: Align, Find and Connect. You don't need one for another.",
+        "consent": "You decide who sees what. Every release is separate and can be withdrawn at any time.",
+        "noScore": "Nothing is scored: no score, no match percentage, no types."
+      },
+      "start": {
+        "title": "What would you like to start with?",
+        "hint": "You'll find the others in the bar at any time.",
+        "lookAround": "Just look around first",
+        "options": {
+          "align": "Clarify how I work (Align)",
+          "alignAdvisor": "Open my support area",
+          "find": "Create my Find profile",
+          "connect": "Create my Connect profile"
+        }
+      }
     },
     "avatar": {
       "title": "Avatar",

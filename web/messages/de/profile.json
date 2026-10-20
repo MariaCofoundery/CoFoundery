@@ -13,7 +13,7 @@
           "hint": "So erscheinst du später für andere Menschen hier."
         },
         "plan": {
-          "title": "Was hast du vor?",
+          "title": "Was möchtest du hier tun?",
           "hint": "Daran hängt, welche Bereiche sich für dich öffnen. Es gibt keine falsche Antwort – und keine, die dich festlegt."
         },
         "focus": {
@@ -48,15 +48,15 @@
       "plans": {
         "founder": {
           "title": "Ich will gründen",
-          "description": "Du baust etwas auf oder hast es fest vor – allein oder im Team."
+          "description": "Mein Gründungsteam verstehen, Absprachen treffen, Mitgründer:innen finden – allein oder im Team."
         },
         "advisor": {
-          "title": "Ich begleite Gründerinnen und Gründer",
-          "description": "Du bringst Erfahrung mit und arbeitest beratend mit Teams."
+          "title": "Ich begleite Gründende",
+          "description": "Teams und Einzelne begleiten – allein oder in einer Organisation wie einem Accelerator."
         },
         "both": {
           "title": "Beides",
-          "description": "Du gründest selbst und gibst gleichzeitig weiter, was du gelernt hast."
+          "description": "Du gründest selbst und begleitest andere. Beide Ansichten sind für dich da."
         },
         "connect": {
           "title": "Erstmal nur Leute kennenlernen",
@@ -84,7 +84,23 @@
       "startConnectButton": "Weiter zu Connect",
       "planChangeableConnect": "Und wenn du später doch gründen willst, schalten wir dir Align und Find frei – schreib uns einfach.",
       "areasLaterConnect": "Align und Find stehen dir offen, sobald du willst – melde dich kurz bei uns, dann schalten wir sie frei.",
-      "nonDiagnosticHintAdvisor": "Made2Found ist kein Persönlichkeitstest. Es hilft den Teams, die du begleitest, ihre Zusammenarbeit früh klarer und belastbarer zu machen."
+      "nonDiagnosticHintAdvisor": "Made2Found ist kein Persönlichkeitstest. Es hilft den Teams, die du begleitest, ihre Zusammenarbeit früh klarer und belastbarer zu machen.",
+      "welcomePoints": {
+        "areas": "Drei Bereiche, die du einzeln nutzt: Align, Find und Connect. Du brauchst keinen für den anderen.",
+        "consent": "Du entscheidest, wer was sieht. Jede Freigabe ist getrennt und jederzeit zurücknehmbar.",
+        "noScore": "Nichts wird bewertet: kein Score, kein Match-Prozent, keine Typen."
+      },
+      "start": {
+        "title": "Womit möchtest du anfangen?",
+        "hint": "Die anderen findest du jederzeit in der Leiste.",
+        "lookAround": "Erst mal umsehen",
+        "options": {
+          "align": "Meine Arbeitsweise klären (Align)",
+          "alignAdvisor": "Meine Begleitung öffnen",
+          "find": "Mein Find-Profil anlegen",
+          "connect": "Mein Connect-Profil anlegen"
+        }
+      }
     },
     "avatar": {
       "title": "Avatar",
