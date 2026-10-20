@@ -1,3 +1,4 @@
+import { getInterests } from "@/features/profile/interestsData";
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import Link from "next/link";
@@ -181,6 +182,7 @@ export default async function DashboardPage({
   const hasConnectProfile = await Promise.resolve(
     supabase.from("network_profiles").select("user_id").eq("user_id", user.id).maybeSingle()
   ).then(({ data }) => Boolean(data), () => false);
+  const interests = await getInterests(supabase, user.id);
   const versionState = await getDashboardVersionState(user.id);
   const alignState = await getAlignDashboardState(user.id);
 
@@ -466,7 +468,7 @@ export default async function DashboardPage({
 
       <DashboardDeepen />
 
-      <DashboardAreas showFind={!discoveryProfile} showConnect={isNetworkMember && !hasConnectProfile} showAdvisor={!roleViews.hasAdvisor} />
+      <DashboardAreas showFind={!discoveryProfile} showConnect={isNetworkMember && !hasConnectProfile} showAdvisor={!roleViews.hasAdvisor} interests={interests} />
 
       <details id="dashboard-block-connections" className="mb-4 scroll-mt-28 rounded-2xl border border-slate-200 bg-white/80 p-4">
         <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.title")}</summary>

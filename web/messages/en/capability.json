@@ -416,7 +416,8 @@
     "resource_removed": "Resource removed.",
     "photo": "Photo saved.",
     "photo_removed": "Photo removed.",
-    "photo_usage": "Where your photo is used has been saved."
+    "photo_usage": "Where your photo is used has been saved.",
+    "interests": "Saved."
   },
   "pending": {
     "save": "Saving …"
@@ -975,5 +976,31 @@
     "structuring_work": "Splitting and describing work so that others can take it over and connect to it.",
     "handing_over": "Passing tasks and knowledge to others so that they can really take them over.",
     "reviewing_setbacks": "Looking together at what happened after a failure and taking something from it."
+  },
+  "interests": {
+    "title": "What I'm here for",
+    "text": "What you want to do here. This only decides what the start page suggests – it doesn't open or close anything.",
+    "options": {
+      "align": {
+        "title": "Understand my founding team",
+        "text": "Working style, expectations, agreements (Align)"
+      },
+      "find": {
+        "title": "Find a co-founder",
+        "text": "Create a profile, meet people (Find)"
+      },
+      "connect": {
+        "title": "Network",
+        "text": "Share expertise, offers and problems (Connect)"
+      },
+      "advise": {
+        "title": "Support founders",
+        "text": "As an advisor, alone or in an organization"
+      }
+    },
+    "note": "Roles and releases stand apart from this: you change your role above, and who sees what under “Visibility”.",
+    "save": "Save",
+    "saving": "Saving …",
+    "saved": "Saved."
   }
 }

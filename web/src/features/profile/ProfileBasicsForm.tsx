@@ -1,5 +1,6 @@
 "use client";
 
+import { interestsForPlan } from "@/features/profile/interests";
 import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { type ChangeEvent, type ReactNode, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -982,6 +983,10 @@ export function ProfileBasicsForm({
           <>
             <input type="hidden" name="displayName" value={displayName} />
             <input type="hidden" name="completesOnboarding" value="1" />
+            {/* Wofuer die Person hier ist - eine Absicht, keine Berechtigung. */}
+            {interestsForPlan(plan, chosenStart).map((area) => (
+              <input key={area} type="hidden" name="interest" value={area} />
+            ))}
             {isConnectPlan ? null : (
               <>
                 <input type="hidden" name="intention" value={intention} />

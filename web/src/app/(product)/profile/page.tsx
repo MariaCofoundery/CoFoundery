@@ -38,6 +38,7 @@ import {
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
+import { InterestsCard } from "@/features/profile/InterestsCard";
 import { ProfileTabs } from "@/features/profile/ProfileTabs";
 import { getPhotoUsage } from "@/features/profile/photoUsageData";
 import { getPersonCore } from "@/features/profile/personCoreData";
@@ -129,6 +130,7 @@ const SAVED_KEYS = [
   "photo",
   "photo_removed",
   "photo_usage",
+  "interests",
 ];
 const ERROR_KEYS = [
   "narrative",
@@ -594,6 +596,10 @@ export default async function ProfilePage({
           photoUsage={await getPhotoUsage(supabase, user.id, core?.photo_visible_to_members ?? false)}
         />
       ) : null}
+
+      {/* WOFUER ICH HIER BIN - eine Absicht, die nur die Startseite steuert.
+          Eigenes Formular, nach dem Identitaetsformular. */}
+      {step === "identity" ? <InterestsCard client={supabase} userId={user.id} /> : null}
 
       {/* SO SIEHT ES AUS. Dieselbe Darstellung wie auf „Das bist du" - wer
           gerade Bio und Branchen eingetragen hat, sieht hier, was daraus

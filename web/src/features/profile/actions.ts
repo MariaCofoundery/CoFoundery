@@ -1,5 +1,7 @@
 "use server";
 
+import { parseInterests } from "@/features/profile/interests";
+import { writeInterests } from "@/features/profile/interestsData";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
@@ -195,6 +197,8 @@ export async function upsertProfileBasicsAction(formData: FormData) {
   // spaeter auch das Profil - ein Speichern dort ist kein Einstieg.
   if (formData.get("completesOnboarding") === "1") {
     await markOnboardingComplete(supabase, user.id);
+    // Wofuer die Person hier ist. Fehlschlag ist kein Abbruch: Es ist ein Vorschlag.
+    await writeInterests(supabase, user.id, parseInterests(formData.getAll("interest")));
   }
 
   const currentMetadataAvatarUrl =

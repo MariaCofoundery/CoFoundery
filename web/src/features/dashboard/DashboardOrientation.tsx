@@ -92,18 +92,24 @@ export async function DashboardAreas({
   showFind,
   showConnect,
   showAdvisor,
+  interests = [],
 }: {
   showFind: boolean;
   showConnect: boolean;
   showAdvisor: boolean;
+  /** Wofuer die Person hier ist (`person_core.interests`): nur Reihenfolge und Hinweis, nie Zugang. */
+  interests?: readonly string[];
 }) {
   const t = await getTranslations("dashboard.areas");
+  // Die Absicht des Einstiegs stellt Gewuenschtes nach vorn und markiert es -
+  // sie schaltet nichts frei und blendet nichts aus.
+  const wanted = (key: string) => interests.includes(key === "advisor" ? "advise" : key);
   const cards = [
     ...(showFind ? [{ key: "find", icon: "search" as const, tone: "violet" as const, href: "/discovery" }] : []),
     ...(showConnect ? [{ key: "connect", icon: "network" as const, tone: "blue" as const, href: "/connect" }] : []),
     // Die Rolle ergaenzt man selbst im Profil - eine Selbstfreischaltung gibt es hier nicht.
     ...(showAdvisor ? [{ key: "advisor", icon: "shield" as const, tone: "teal" as const, href: "/profile?step=identity#roles" }] : []),
-  ];
+  ].sort((a, b) => Number(wanted(b.key)) - Number(wanted(a.key)));
   if (cards.length === 0) return null;
   return (
     <section id="dashboard-block-areas" className="mb-8" aria-labelledby="dashboard-areas-title">
@@ -112,7 +118,12 @@ export async function DashboardAreas({
       <ul className="mt-4 grid gap-4 md:grid-cols-3">
         {cards.map((card) => (
           <li key={card.key} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
-            <IconTile name={card.icon} tone={card.tone} />
+            <span className="flex items-center justify-between gap-2">
+              <IconTile name={card.icon} tone={card.tone} />
+              {wanted(card.key) ? (
+                <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-800">{t("wanted")}</span>
+              ) : null}
+            </span>
             <h3 className="mt-4 text-base font-semibold text-slate-950">{t(`cards.${card.key}.title`)}</h3>
             <p className="mt-1.5 text-sm leading-6 text-slate-600">{t(`cards.${card.key}.text`)}</p>
             <Link href={card.href} className="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-3 text-sm font-semibold text-violet-700 hover:underline">

@@ -416,7 +416,8 @@
     "resource_removed": "Ressource entfernt.",
     "photo": "Foto gespeichert.",
     "photo_removed": "Foto entfernt.",
-    "photo_usage": "Verwendung deines Fotos gespeichert."
+    "photo_usage": "Verwendung deines Fotos gespeichert.",
+    "interests": "Gespeichert."
   },
   "pending": {
     "save": "Wird gespeichert …"
@@ -975,5 +976,31 @@
     "structuring_work": "Arbeit so aufteilen und beschreiben, dass andere sie übernehmen und anschließen können.",
     "handing_over": "Aufgaben und Wissen an andere weitergeben, sodass sie sie wirklich übernehmen können.",
     "reviewing_setbacks": "Nach einem Misserfolg gemeinsam ansehen, was passiert ist, und etwas daraus mitnehmen."
+  },
+  "interests": {
+    "title": "Wofür ich hier bin",
+    "text": "Was du hier tun möchtest. Das bestimmt nur, was dir die Startseite vorschlägt – es öffnet oder schließt nichts.",
+    "options": {
+      "align": {
+        "title": "Mein Gründungsteam verstehen",
+        "text": "Arbeitsweise, Vorstellungen, Absprachen (Align)"
+      },
+      "find": {
+        "title": "Mitgründer:in finden",
+        "text": "Profil anlegen, Menschen kennenlernen (Find)"
+      },
+      "connect": {
+        "title": "Mich vernetzen",
+        "text": "Expertise, Angebote und Probleme teilen (Connect)"
+      },
+      "advise": {
+        "title": "Gründende begleiten",
+        "text": "Als Advisor, allein oder in einer Organisation"
+      }
+    },
+    "note": "Rollen und Freigaben stehen davon getrennt: Die Rolle änderst du oben, wer was sieht unter „Sichtbarkeit“.",
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "saved": "Gespeichert."
   }
 }
