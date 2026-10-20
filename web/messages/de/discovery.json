@@ -712,6 +712,9 @@
     "openConversation": "Nachricht schreiben",
     "conversationError": "Das Gespräch konnte gerade nicht geöffnet werden. Versuch es bitte noch einmal.",
     "receivedEmptyCta": "FIND-Profil bearbeiten",
+    "acceptedEyebrow": "Angenommen",
+    "acceptedTitle": "Daraus kann ein Gespräch werden",
+    "acceptedEmpty": "Noch keine angenommene Anfrage.",
     "sentEmptyCta": "Menschen finden"
   },
   "detail": {

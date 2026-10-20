@@ -712,6 +712,9 @@
     "openConversation": "Send a message",
     "conversationError": "The conversation couldn't be opened just now. Please try again.",
     "receivedEmptyCta": "Edit FIND profile",
+    "acceptedEyebrow": "Accepted",
+    "acceptedTitle": "Where a conversation can start",
+    "acceptedEmpty": "No accepted requests yet.",
     "sentEmptyCta": "Find people"
   },
   "detail": {

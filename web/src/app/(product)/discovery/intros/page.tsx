@@ -342,8 +342,10 @@ export default async function DiscoveryIntrosPage({
     getSentDiscoveryIntroRequests(user.id),
   ]);
 
-  const sortedReceived = sortIntroRequests(received);
-  const sortedSent = sortIntroRequests(sent);
+  const sortedReceived = sortIntroRequests(received.filter((request) => request.status !== "accepted"));
+  const sortedSent = sortIntroRequests(sent.filter((request) => request.status !== "accepted"));
+  const acceptedReceived = sortIntroRequests(received.filter((request) => request.status === "accepted"));
+  const acceptedSent = sortIntroRequests(sent.filter((request) => request.status === "accepted"));
   const introReason = searchParamValue(resolvedSearchParams.introMessage) ?? null;
   const introFeedback = introReason ? resolveDiscoveryIntroFeedback(introReason) : null;
   const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
@@ -413,6 +415,28 @@ export default async function DiscoveryIntrosPage({
               <Link href="/discovery" className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">
                 {t("intros.sentEmptyCta")}
               </Link>
+            </div>
+          )}
+        </section>
+        <section className={CARD_CLASS}>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {t("intros.acceptedEyebrow")}
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+            {t("intros.acceptedTitle")}
+          </h2>
+          {acceptedReceived.length + acceptedSent.length > 0 ? (
+            <div className="mt-5 grid gap-4">
+              {acceptedReceived.map((request) => (
+                <ReceivedIntroCard key={request.id} request={request} t={t} />
+              ))}
+              {acceptedSent.map((request) => (
+                <SentIntroCard key={request.id} request={request} t={t} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-600">
+              <p>{t("intros.acceptedEmpty")}</p>
             </div>
           )}
         </section>
