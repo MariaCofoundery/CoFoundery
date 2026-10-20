@@ -1,11 +1,11 @@
 {
   "eyebrow": "Your strengths",
   "title": "Strengths interview",
-  "text": "You describe concrete situations – what you did, not how you rate yourself. From these, suggestions for personal strengths can emerge, each with the passage from your answer it is based on. You decide what fits you.",
+  "text": "You tell us about concrete situations – what you did, not how you rate yourself. From that, strength themes can arise, each with the passage from your answer it rests on. You decide what fits you.",
   "backToStrengths": "Back to your strengths",
   "guidance": {
     "title": "Before you start",
-    "time": "Seven questions, about 20 minutes. You can finish after three answers.",
+    "time": "Ten situations, three short counter-questions and one question about the outside view – about 30 to 40 minutes, feel free to do it in two sittings. You can finish after six answers.",
     "stories": "Describe one situation that actually happened each time – at work or in private life. What you did matters more than the outcome.",
     "notCapability": "This is not about fields of expertise or experience. What you bring professionally is covered by the capability interview.",
     "save": "Your answers are saved as you write. You can pause at any time.",
@@ -38,7 +38,7 @@
   "done": {
     "title": "Your strengths interview is finished",
     "text": "{count, plural, one {One answer} other {# answers}} from this conversation.",
-    "askText": "An AI model on a Made2Found computer – not an external service – reads your answers and suggests three to five personal strengths. Each suggestion names the passage from your answer it is based on. Anything that cannot be backed up is not suggested.",
+    "askText": "An AI on a Made2Found computer – not at an outside service – reads your answers and assigns strength themes to them. Each suggestion names the passage from your answer it rests on. The counter-questions are not analysed. Anything that cannot be backed up is not suggested.",
     "ask": "Get suggestions",
     "askPending": "Requesting …",
     "unavailable": "The analysis is not available right now. Your answers stay saved – you can ask for suggestions later. You can always record your own sentences under your strengths.",
@@ -51,14 +51,20 @@
   },
   "proposals": {
     "title": "Suggestions from your answers",
-    "text": "None of this counts until you accept it. You can rewrite the label and the statement first.",
+    "text": "None of this applies until you accept it. You can rewrite label and statement first.",
     "labelField": "Label",
     "statementField": "Statement",
     "rationale": "Where it shows",
     "evidence": "From your answer",
     "confirm": "Fits me",
     "reject": "Doesn't fit",
-    "pending": "Saving …"
+    "pending": "Saving …",
+    "level": {
+      "clear": "Clearly shows",
+      "shown": "Shows",
+      "hint": "Hint"
+    },
+    "levelNote": "How well supported – not how strong."
   },
   "review": {
     "title": "Your answers",
@@ -90,27 +96,30 @@
     "followUpHint": "These follow-up questions belong to the same answer – just keep writing.",
     "questions": {
       "took_charge": {
-        "title": "Tell me about a situation in which you took on responsibility even though it was not clear at first who was in charge.",
-        "hint": "At work or in private life. It does not have to be big – what matters is what you did.",
+        "title": "Tell me about a situation where you took responsibility although it was not clear at first who was in charge.",
+        "hint": "Work or private. It does not have to be big – what matters is what you did.",
         "followUps": {
-          "whatYouDidFirst": "What exactly did you do first?",
-          "whyYou": "Why did you take it on instead of waiting?"
+          "whatYouDidFirst": "What was the first concrete thing you did?",
+          "whatWouldHaveHappened": "What would have happened if you had not taken it on?",
+          "whatItCost": "Was that easy for you, or did it cost energy? How did you notice?"
         }
       },
       "hard_won": {
         "title": "Tell me about something difficult that you managed in the end.",
-        "hint": "At work or in private life. Even if it only partly worked out.",
+        "hint": "Work or private. Even if it only partly worked out.",
         "followUps": {
           "whatMadeItHard": "What exactly made it difficult?",
-          "whenItStalled": "What did you do when it got stuck?"
+          "whenItStalled": "What did you do when things stalled?",
+          "whatItCost": "What cost you the most energy, and what gave you energy?"
         }
       },
       "solved_problem": {
         "title": "Tell me about a problem you solved.",
-        "hint": "A concrete problem with a before and an after – at work or in private life.",
+        "hint": "A concrete problem with a before and an after – work or private.",
         "followUps": {
           "howYouApproached": "How did you go about understanding the problem?",
-          "whatWasYours": "Which part of it was yours – and which part was others'?"
+          "whatWasYours": "What of it was yours – and what was others'?",
+          "whatDidNotWork": "What did you try first that did not work?"
         }
       },
       "initiated": {
@@ -122,19 +131,21 @@
         }
       },
       "new_ground": {
-        "title": "Tell me about a situation in which you had to get into something new quickly.",
-        "hint": "A new topic, a new role, a new environment – at work or in private life.",
+        "title": "Tell me about a situation where you had to get up to speed quickly on something new.",
+        "hint": "A new topic, a new role, a new environment – work or private.",
         "followUps": {
-          "howYouLearned": "How exactly did you go about learning it?",
-          "whatYouDidDifferently": "What did you do differently from others?"
+          "howYouLearned": "How did you concretely go about learning it?",
+          "whatYouDidDifferently": "What did you do differently from others?",
+          "whatYouStillLacked": "What were you still missing in the end, and how did you deal with it?"
         }
       },
       "resistance": {
-        "title": "Tell me about a situation in which you stood up for something or raised it even though you expected resistance or conflict.",
-        "hint": "An opinion, a decision, an uncomfortable topic – at work or in private life.",
+        "title": "Tell me about a situation where you stood up for something or raised a topic although you expected resistance or conflict.",
+        "hint": "An opinion, a decision, an uncomfortable topic – work or private.",
         "followUps": {
           "howYouWentAboutIt": "How exactly did you go about it?",
-          "whatHappenedAfter": "What happened afterwards?"
+          "whatHappenedAfter": "What happened afterwards?",
+          "whatItCost": "What did it cost you – and would you do it again?"
         }
       },
       "others_come": {
@@ -144,7 +155,309 @@
           "lastExample": "What exactly was it about last time?",
           "whatYouActuallyDo": "What do you actually do that helps others?"
         }
+      },
+      "decide_unclear": {
+        "title": "Tell me about a decision you had to make without all the information and under time pressure.",
+        "hint": "Work or private. This is about the situation, not whether the decision was right.",
+        "followUps": {
+          "whatYouKnew": "What did you know, and what not? What did you rely on?",
+          "howYouDecided": "How did you get to the decision – whom did you talk to, what did you weigh?",
+          "whatYouWouldChange": "What would you do differently today?"
+        }
+      },
+      "built_new": {
+        "title": "Tell me about something you designed or built anew – something that did not exist in that form before.",
+        "hint": "A product, a process, an offer, an event – work or private.",
+        "followUps": {
+          "whereTheIdeaCame": "Where did the idea come from, and how did it grow?",
+          "howYouTestedIt": "How did you find out whether it worked?",
+          "whatYouLeftToOthers": "What did you leave to others, and why?"
+        }
+      },
+      "won_over": {
+        "title": "Tell me about a situation where you won someone over who initially did not want to.",
+        "hint": "A customer, a colleague, an investor, a friend – work or private.",
+        "followUps": {
+          "whatYouSaid": "What did you say or do to open the conversation?",
+          "whatChangedTheirMind": "What tipped it so the person went along?",
+          "whatYouWouldDoDifferently": "What would you do differently next time?"
+        }
+      },
+      "helped_grow": {
+        "title": "Tell me about a moment when you helped someone get better or move forward.",
+        "hint": "A colleague, a team member, a friend – work or private.",
+        "followUps": {
+          "whatYouDid": "What did you concretely do or say?",
+          "whatChangedForThem": "What changed for that person afterwards?",
+          "whatItGaveYou": "What did it give you – or cost you?"
+        }
+      },
+      "connected_people": {
+        "title": "Tell me about a situation where you connected people who did not know each other or did not work together before.",
+        "hint": "Two people or a whole group – work or private.",
+        "followUps": {
+          "whyThosePeople": "Why those people, and how did you notice they fit?",
+          "howYouDidIt": "How did you do it?",
+          "whatCameOfIt": "What came out of it?"
+        }
+      },
+      "avoid_task": {
+        "title": "What kind of task do you put off the longest?",
+        "hint": "It is about the kind of task, not a specific project. Honest, not polite."
+      },
+      "hand_off": {
+        "title": "What do you gladly hand off, even though you could do it?",
+        "hint": "Tasks where you are happy when somebody else takes them on."
+      },
+      "others_better": {
+        "title": "When did you notice that others do something better than you – and how did you notice?",
+        "hint": "A concrete occasion where you saw: someone else does this better."
       }
     }
-  }
+  },
+  "themes": {
+    "domains": {
+      "execute": {
+        "title": "Executing",
+        "text": "Getting things done"
+      },
+      "influence": {
+        "title": "Influencing",
+        "text": "Moving others"
+      },
+      "relate": {
+        "title": "Collaborating",
+        "text": "Connecting people"
+      },
+      "think": {
+        "title": "Thinking",
+        "text": "Understanding and designing"
+      }
+    },
+    "items": {
+      "keep_going": {
+        "domain": "execute",
+        "name": "Seeing it through",
+        "shows": "You keep going when it gets tough and nothing moves for a long time.",
+        "helps": "Helps in the long middle between idea and result.",
+        "prompt": "Where in our venture do we need someone who keeps going right now – and who of us already does?"
+      },
+      "reliable": {
+        "domain": "execute",
+        "name": "Being dependable",
+        "shows": "You keep your commitments; others do not have to chase you.",
+        "helps": "Helps build trust with customers, partners and team.",
+        "prompt": "What do we rely on each other for – and where is that not yet clear?"
+      },
+      "build_structure": {
+        "domain": "execute",
+        "name": "Creating structure",
+        "shows": "You bring order to chaos: processes, responsibilities, clear next steps.",
+        "helps": "Helps with scaling and delegating.",
+        "prompt": "Who of us brings structure when things get messy?"
+      },
+      "move_fast": {
+        "domain": "execute",
+        "name": "Moving fast",
+        "shows": "You act quickly and do not wait for perfection.",
+        "helps": "Helps in early phases and under time pressure.",
+        "prompt": "When do we want to be fast, and when careful?"
+      },
+      "thorough": {
+        "domain": "execute",
+        "name": "Working thoroughly",
+        "shows": "You pay attention to detail and quality before something goes out.",
+        "helps": "Helps with anything that is hard to fix later.",
+        "prompt": "Which things must be especially clean for us – and who checks them?"
+      },
+      "take_ownership": {
+        "domain": "execute",
+        "name": "Taking ownership",
+        "shows": "You step in when nobody is responsible.",
+        "helps": "Helps where roles are not yet settled.",
+        "prompt": "Where does someone among us take responsibility without it being agreed?"
+      },
+      "hold_focus": {
+        "domain": "execute",
+        "name": "Holding focus",
+        "shows": "You set priorities and say no when something distracts.",
+        "helps": "Helps against spreading too thin.",
+        "prompt": "Who of us reminds us of what matters most, and how do we say no?"
+      },
+      "convince": {
+        "domain": "influence",
+        "name": "Convincing",
+        "shows": "You win others over with arguments and examples.",
+        "helps": "Helps in sales, fundraising and recruiting.",
+        "prompt": "Who of us leads which conversations where we need to win others over?"
+      },
+      "speak_plainly": {
+        "domain": "influence",
+        "name": "Speaking plainly",
+        "shows": "You say uncomfortable things, even against resistance.",
+        "helps": "Helps when a team needs honest feedback.",
+        "prompt": "How do we want to tell each other uncomfortable things?"
+      },
+      "inspire": {
+        "domain": "influence",
+        "name": "Inspiring",
+        "shows": "You make a goal tangible and appealing to others.",
+        "helps": "Helps with vision and building a team.",
+        "prompt": "Who tells our story in a way that makes others want to join?"
+      },
+      "negotiate": {
+        "domain": "influence",
+        "name": "Negotiating",
+        "shows": "You find solutions between different interests.",
+        "helps": "Helps with contracts, partnerships and terms.",
+        "prompt": "Who of us negotiates, and what is our bottom line?"
+      },
+      "make_visible": {
+        "domain": "influence",
+        "name": "Making things visible",
+        "shows": "You bring ideas and results to the outside: presence, story, reach.",
+        "helps": "Helps with brand, visibility and sales.",
+        "prompt": "Who of us shows up externally, and who would rather not?"
+      },
+      "kick_off": {
+        "domain": "influence",
+        "name": "Kicking things off",
+        "shows": "You start without anyone asking you to.",
+        "helps": "Helps when momentum is missing.",
+        "prompt": "Who of us kicks things off – and who slows them down when it gets too much?"
+      },
+      "decide": {
+        "domain": "influence",
+        "name": "Deciding",
+        "shows": "You make decisions even with incomplete information.",
+        "helps": "Helps with uncertainty and deadlock.",
+        "prompt": "How do we decide when we disagree – and who gets the last word?"
+      },
+      "empathize": {
+        "domain": "relate",
+        "name": "Empathizing",
+        "shows": "You notice how others are doing and respond to it.",
+        "helps": "Helps in customer conversations and team climate.",
+        "prompt": "Who of us notices first when someone on the team is under pressure?"
+      },
+      "build_trust": {
+        "domain": "relate",
+        "name": "Building trust",
+        "shows": "You are experienced as open and predictable.",
+        "helps": "Helps with new partnerships.",
+        "prompt": "Whom do outsiders trust first among us – and why?"
+      },
+      "connect": {
+        "domain": "relate",
+        "name": "Connecting",
+        "shows": "You bring the right people together.",
+        "helps": "Helps with network, partners and introductions.",
+        "prompt": "Who of us knows people who could help us, and how do we use that?"
+      },
+      "develop_others": {
+        "domain": "relate",
+        "name": "Developing others",
+        "shows": "You help others get better.",
+        "helps": "Helps with building and keeping talent.",
+        "prompt": "Who develops others among us – and who needs support right now?"
+      },
+      "resolve_conflict": {
+        "domain": "relate",
+        "name": "Resolving conflict",
+        "shows": "You raise tensions and find a way through.",
+        "helps": "Helps when a team is under pressure.",
+        "prompt": "How do we handle tension – and who raises it first?"
+      },
+      "build_cohesion": {
+        "domain": "relate",
+        "name": "Building cohesion",
+        "shows": "You make a group feel like a team.",
+        "helps": "Helps in long, hard phases.",
+        "prompt": "What holds us together when things get difficult?"
+      },
+      "listen": {
+        "domain": "relate",
+        "name": "Listening",
+        "shows": "You take it in before you answer.",
+        "helps": "Helps with understanding customer problems.",
+        "prompt": "Who of us listens while others are still finding what they want to say?"
+      },
+      "spot_patterns": {
+        "domain": "think",
+        "name": "Spotting patterns",
+        "shows": "You see connections and repetition early.",
+        "helps": "Helps with markets, data and customer behaviour.",
+        "prompt": "Who of us sees patterns others do not see yet?"
+      },
+      "learn_fast": {
+        "domain": "think",
+        "name": "Learning fast",
+        "shows": "You get up to speed quickly on new things.",
+        "helps": "Helps when roles and topics change.",
+        "prompt": "Who of us takes on new things when nobody has experience?"
+      },
+      "generate_ideas": {
+        "domain": "think",
+        "name": "Generating ideas",
+        "shows": "You come up with new paths and combinations.",
+        "helps": "Helps with product and business model.",
+        "prompt": "Where do new ideas come from among us – and who checks them?"
+      },
+      "envision_future": {
+        "domain": "think",
+        "name": "Envisioning the future",
+        "shows": "You think in scenarios and longer lines.",
+        "helps": "Helps with strategy and roadmap.",
+        "prompt": "Who of us thinks in three years, who in three weeks – and how do we connect both?"
+      },
+      "break_down": {
+        "domain": "think",
+        "name": "Breaking problems down",
+        "shows": "You split complexity into clear parts.",
+        "helps": "Helps with planning and troubleshooting.",
+        "prompt": "Who of us breaks a big problem apart when we are stuck?"
+      },
+      "spot_opportunities": {
+        "domain": "think",
+        "name": "Spotting opportunities",
+        "shows": "You see possibilities where others do not.",
+        "helps": "Helps with market access and changes of direction.",
+        "prompt": "What opportunity do we see – and who of us would be most likely to seize it?"
+      },
+      "experiment": {
+        "domain": "think",
+        "name": "Experimenting",
+        "shows": "You test assumptions quickly and cheaply.",
+        "helps": "Helps before much money and time is spent.",
+        "prompt": "Which assumption could we test this week – and who tests it?"
+      }
+    }
+  },
+  "report": {
+    "eyebrow": "Your strengths picture",
+    "title": "Your strengths in the founding day-to-day",
+    "text": "These are themes that showed up in your own examples and that you accepted. They stand side by side as equals: no ranking, no number, no type.",
+    "levelNote": "“Clearly shows” means: in at least three of your situations. “Shows”: in two. “Hint”: in one. That says how well it is supported – not how strong it is.",
+    "domainEmpty": "Nothing has shown up here in your examples yet – that is fine, and a hint about who could complement you.",
+    "helps": "In a startup",
+    "prompt": "Conversation starter for the team",
+    "needs": {
+      "title": "Where you need support",
+      "text": "In your own words. This is not a weakness, but a hint about who could complement you.",
+      "avoid_task": "What you put off the longest",
+      "hand_off": "What you gladly hand off",
+      "others_better": "Where others do it better"
+    },
+    "other": {
+      "title": "Other statements from you",
+      "text": "Strengths you formulated yourself or accepted earlier."
+    },
+    "emptyTitle": "Your strengths picture comes from the strengths interview",
+    "emptyText": "You have not accepted any strength themes yet. In the interview you tell about ten situations; suggestions arise from that, and you confirm them.",
+    "start": "Start the strengths interview",
+    "again": "Run the strengths interview again",
+    "back": "Back to your profile",
+    "open": "View your strengths picture"
+  },
+  "levelNoteShort": "How well supported – not how strong."
 }

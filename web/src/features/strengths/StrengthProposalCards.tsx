@@ -4,6 +4,7 @@ import {
   rejectStrengthProposalAction,
 } from "@/features/capability/strengthActions";
 import type { StrengthProposal } from "@/features/capability/strengthData";
+import { domainOfTheme } from "@/features/strengths/strengthThemes";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
 /**
@@ -41,6 +42,18 @@ export async function StrengthProposalCards({
           <form action={confirmStrengthProposalAction}>
             <input type="hidden" name="proposalId" value={proposal.id} />
             {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
+            {proposal.theme ? (
+              <p className="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
+                <span className="rounded-full bg-violet-50 px-3 py-1 text-violet-900">
+                  {t(`themes.domains.${domainOfTheme(proposal.theme)}.title`)} · {t(`themes.items.${proposal.theme}.name`)}
+                </span>
+                {proposal.evidenceLevel ? (
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700" title={t("levelNoteShort")}>
+                    {t(`proposals.level.${proposal.evidenceLevel}`)}
+                  </span>
+                ) : null}
+              </p>
+            ) : null}
             <label className="block">
               <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
                 {t("proposals.labelField")}

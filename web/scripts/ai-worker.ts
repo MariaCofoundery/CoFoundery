@@ -42,6 +42,8 @@ import {
   createStrengthAnalyzer,
   STRENGTH_PROMPT_VERSION,
 } from "@/features/strengths/strengthAnalysisModel";
+import { isCounterQuestion } from "@/features/strengths/strengthsInterviewGuide";
+import { STRENGTH_THEME_IDS } from "@/features/strengths/strengthThemes";
 
 /**
  * Die Fragetexte des Staerken-Interviews - Kontext fuer das Modell, nie
@@ -57,6 +59,16 @@ const strengthsQuestionTitles = Object.fromEntries(
     ).interview.questions
   ).map(([id, question]) => [id, question.title])
 );
+
+/** Die 28 Themen mit Namen und "zeigt sich" - der Katalog in der Anweisung. */
+const strengthThemeHints = (() => {
+  const items = (
+    JSON.parse(readFileSync("messages/de/strengths.json", "utf8")) as {
+      themes: { items: Record<string, { name: string; shows: string }> };
+    }
+  ).themes.items;
+  return STRENGTH_THEME_IDS.map((id) => ({ id, name: items[id]?.name ?? id, shows: items[id]?.shows ?? "" }));
+})();
 
 /** Wie oft nachgefragt wird, wenn nichts daliegt. */
 const IDLE_POLL_MS = 5_000;
@@ -284,6 +296,8 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
       });
       if (error) return "source_missing";
       const answers = ((rows ?? []) as { turn_id: string; question_id: string; answer: string }[])
+        // Gegenfragen ("was schiebst du vor dir her") sagen, wo Unterstuetzung hilft - sie werden nie zur Staerke.
+        .filter((row) => !isCounterQuestion(row.question_id))
         .filter((row) => typeof row.answer === "string" && row.answer.trim().length >= 10)
         .map((row) => ({
           turnId: row.turn_id,
@@ -295,6 +309,7 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
       const analyze = createStrengthAnalyzer({
         capabilityTerms: readCapabilityTerms(),
         model: getAiModel(),
+        themes: strengthThemeHints,
       });
       const analysis = await analyze(answers);
       if (analysis.engine !== "model") return "model_unreachable";
@@ -305,13 +320,15 @@ async function runJob(client: SupabaseClient, job: AiJob): Promise<ErrorCode | n
       for (const proposal of analysis.proposals) {
         const primary = proposal.evidence[0];
         if (!primary) continue;
-        await client.rpc("insert_ai_strength_proposal", {
+        await client.rpc("insert_ai_strength_theme_proposal", {
           p_job_id: job.id,
           p_turn_id: primary.turnId,
           p_label: proposal.label,
           p_statement: proposal.statement,
           p_rationale: proposal.rationale,
           p_quote: primary.quote,
+          p_theme: proposal.theme,
+          p_evidence_level: proposal.level,
           p_model: getAiModel(),
           p_prompt_version: STRENGTH_PROMPT_VERSION,
         });

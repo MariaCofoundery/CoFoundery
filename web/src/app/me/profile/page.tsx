@@ -552,6 +552,13 @@ export default async function FounderProfilePage({
                   />
                 </ProfileDetails>
               ) : null}
+              {strengths.some((strength) => strength.theme) ? (
+                <p className="mt-3">
+                  <Link href="/me/profile/strengths" className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+                    {t("strengthsSection.report")} →
+                  </Link>
+                </p>
+              ) : null}
               <EditLink href="/profile?step=strengths" label={t("edit")} />
             </>
           ) : (

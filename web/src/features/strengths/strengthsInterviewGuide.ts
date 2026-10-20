@@ -24,38 +24,74 @@
  * `interview.questions.<id>`.
  */
 
+/**
+ * `situation` - erlebte Situation; Grundlage der Auswertung.
+ * `counter`   - Gegenfrage ("was schiebst du vor dir her"): sagt, wo jemand Unterstützung
+ *               braucht. Wird NIE zur Stärke und geht NICHT an die Auswertung; die Person
+ *               sieht ihre eigenen Worte im Bericht.
+ * `outside`   - der Blick von außen; Grundlage der Auswertung wie eine Situation.
+ */
+export type StrengthsQuestionKind = "situation" | "counter" | "outside";
+
 export type StrengthsQuestion = {
   id: string;
+  kind: StrengthsQuestionKind;
   /** Geschriebene Nachfragen, die erst nach dem Schreiben erscheinen. */
   followUpIds: readonly string[];
 };
 
 /**
- * Die Reihenfolge: zuerst das Naheliegende (Verantwortung, etwas geschafft),
- * dann das Unbequeme (Widerstand), zuletzt der Blick von außen.
+ * v2 (20.10.2026): zehn Situationen, drei Gegenfragen, der Blick von außen.
+ * Jede Situation hat dieselben drei Arten von Nachfragen, damit die Antworten
+ * vergleichbar bleiben: konkret (was genau getan), Wirkung und Energie (was
+ * anders gelaufen wäre, ob es leicht war) und Grenze (was nicht ging, was
+ * abgegeben wurde).
+ *
+ * Die Reihenfolge: zuerst das Naheliegende, dann das Unbequeme, dann die
+ * Gegenfragen, zuletzt der Blick von außen.
  */
 export const STRENGTHS_QUESTIONS: readonly StrengthsQuestion[] = [
-  { id: "took_charge", followUpIds: ["whatYouDidFirst", "whyYou"] },
-  { id: "hard_won", followUpIds: ["whatMadeItHard", "whenItStalled"] },
-  { id: "solved_problem", followUpIds: ["howYouApproached", "whatWasYours"] },
-  { id: "initiated", followUpIds: ["whatMadeYouStart", "whoYouBroughtIn"] },
-  { id: "new_ground", followUpIds: ["howYouLearned", "whatYouDidDifferently"] },
-  { id: "resistance", followUpIds: ["howYouWentAboutIt", "whatHappenedAfter"] },
-  { id: "others_come", followUpIds: ["lastExample", "whatYouActuallyDo"] },
+  { id: "took_charge", kind: "situation", followUpIds: ["whatYouDidFirst", "whatWouldHaveHappened", "whatItCost"] },
+  { id: "hard_won", kind: "situation", followUpIds: ["whatMadeItHard", "whenItStalled", "whatItCost"] },
+  { id: "decide_unclear", kind: "situation", followUpIds: ["whatYouKnew", "howYouDecided", "whatYouWouldChange"] },
+  { id: "solved_problem", kind: "situation", followUpIds: ["howYouApproached", "whatWasYours", "whatDidNotWork"] },
+  { id: "built_new", kind: "situation", followUpIds: ["whereTheIdeaCame", "howYouTestedIt", "whatYouLeftToOthers"] },
+  { id: "won_over", kind: "situation", followUpIds: ["whatYouSaid", "whatChangedTheirMind", "whatYouWouldDoDifferently"] },
+  { id: "resistance", kind: "situation", followUpIds: ["howYouWentAboutIt", "whatHappenedAfter", "whatItCost"] },
+  { id: "helped_grow", kind: "situation", followUpIds: ["whatYouDid", "whatChangedForThem", "whatItGaveYou"] },
+  { id: "connected_people", kind: "situation", followUpIds: ["whyThosePeople", "howYouDidIt", "whatCameOfIt"] },
+  { id: "new_ground", kind: "situation", followUpIds: ["howYouLearned", "whatYouDidDifferently", "whatYouStillLacked"] },
+  { id: "avoid_task", kind: "counter", followUpIds: [] },
+  { id: "hand_off", kind: "counter", followUpIds: [] },
+  { id: "others_better", kind: "counter", followUpIds: [] },
+  { id: "others_come", kind: "outside", followUpIds: ["lastExample", "whatYouActuallyDo"] },
 ];
 
 /**
- * Ab drei Antworten lässt sich abschließen. Eine Stärke, die sich über
- * mehrere Situationen zeigt, ist belastbarer als eine aus einer einzigen -
- * mit weniger als drei gäbe es diesen Vergleich nicht.
+ * Fragen der ersten Fassung, die nicht mehr gestellt werden. Gespräche, die sie
+ * schon enthalten, bleiben les- und auswertbar.
  */
-export const STRENGTHS_MIN_ANSWERS = 3;
+const LEGACY_STRENGTHS_QUESTIONS: readonly StrengthsQuestion[] = [
+  { id: "initiated", kind: "situation", followUpIds: ["whatMadeYouStart", "whoYouBroughtIn"] },
+];
+
+/** Ab sechs Antworten lässt sich abschließen - eine Stärke muss sich über Situationen zeigen. */
+export const STRENGTHS_MIN_ANSWERS = 6;
 /** Die Grenzen der Datenbank (`capability_interview_turns_answer_length`). */
 export const STRENGTHS_MIN_LENGTH = 10;
 export const STRENGTHS_MAX_LENGTH = 2000;
 
 export function findStrengthsQuestion(id: string) {
-  return STRENGTHS_QUESTIONS.find((question) => question.id === id) ?? null;
+  return (
+    STRENGTHS_QUESTIONS.find((question) => question.id === id) ??
+    LEGACY_STRENGTHS_QUESTIONS.find((question) => question.id === id) ??
+    null
+  );
+}
+
+/** Gegenfragen gehen nicht in die Auswertung. */
+export function isCounterQuestion(id: string) {
+  return findStrengthsQuestion(id)?.kind === "counter";
 }
 
 export function nextStrengthsQuestion(askedIds: readonly string[]) {

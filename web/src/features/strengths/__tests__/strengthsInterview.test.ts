@@ -14,7 +14,13 @@ import {
   validateStrengthAnalysis,
   type StrengthAnswer,
 } from "@/features/strengths/strengthAnalysisModel";
-import { STRENGTHS_QUESTIONS } from "@/features/strengths/strengthsInterviewGuide";
+import { isCounterQuestion, STRENGTHS_QUESTIONS } from "@/features/strengths/strengthsInterviewGuide";
+import {
+  evidenceLevelFor,
+  STRENGTH_DOMAINS,
+  STRENGTH_THEME_IDS,
+  STRENGTH_THEMES_BY_DOMAIN,
+} from "@/features/strengths/strengthThemes";
 
 /**
  * Das Stärken-Interview - getrennt vom Capability-Interview (18.10.2026).
@@ -49,11 +55,21 @@ const ANSWERS: StrengthAnswer[] = [
   },
 ];
 
+const THEME_FOR_LABEL: Record<string, string> = {
+  "Verantwortung übernehmen": "take_ownership",
+  "Übernimmt Verantwortung": "take_ownership",
+  Beharrlichkeit: "keep_going",
+  "Struktur schaffen": "build_structure",
+  "Klarheit schaffen": "break_down",
+  "Andere mitnehmen": "inspire",
+};
+
 const strength = (
   label: string,
   evidence: { answer: string; quote: string }[],
-  overrides: Partial<{ statement: string; rationale: string }> = {}
+  overrides: Partial<{ statement: string; rationale: string; theme: string }> = {}
 ) => ({
+  theme: overrides.theme ?? THEME_FOR_LABEL[label] ?? "take_ownership",
   label,
   statement: overrides.statement ?? "Du übernimmst Verantwortung, wenn etwas ungeklärt bleibt.",
   rationale:
@@ -72,8 +88,10 @@ const validate = (strengths: unknown[]) =>
 test("die Anweisung an das Modell enthält keine Funktionsbereiche und keine Gruppen", () => {
   const instruction = buildStrengthInstruction().toLocaleLowerCase("de-DE");
   const { areas } = readCapabilityAreas();
+  // Als ganzes Wort - kurze Kennungen wie "ip" stecken sonst in jedem längeren Text.
+  const asWord = (id: string) => new RegExp(`(^|[^\\p{L}_])${id}([^\\p{L}_]|$)`, "u").test(instruction);
   for (const area of areas) {
-    assert.ok(!instruction.includes(area.id), `Bereichs-ID im Prompt: ${area.id}`);
+    assert.ok(!asWord(area.id), `Bereichs-ID im Prompt: ${area.id}`);
   }
   for (const locale of ["de", "en"]) {
     const bundle = JSON.parse(read(`messages/${locale}/capability.json`)) as {
@@ -82,7 +100,7 @@ test("die Anweisung an das Modell enthält keine Funktionsbereiche und keine Gru
     };
     for (const [id, label] of [...Object.entries(bundle.areaLabels), ...Object.entries(bundle.families)]) {
       assert.ok(!instruction.includes(label.toLocaleLowerCase("de-DE")), `${locale}: ${label} im Prompt`);
-      assert.ok(!instruction.includes(id), `${locale}: ${id} im Prompt`);
+      assert.ok(!asWord(id), `${locale}: ${id} im Prompt`);
     }
   }
   // Und die Stärken-Auswertung baut nicht auf der Bereichszuordnung auf.
@@ -165,12 +183,12 @@ test("keine Diagnose, kein Typ, keine Zahl", () => {
   assert.deepEqual(result.proposals, []);
 });
 
-test("ähnliche Stärken werden zusammengeführt, verschiedene aus derselben Antwort bleiben", () => {
+test("dasselbe Thema wird zusammengeführt, verschiedene Themen aus derselben Antwort bleiben", () => {
   assert.equal(validate([
     strength("Klarheit schaffen", [{ answer: "A1", quote: "die nächsten Schritte aufgeschrieben" }]),
     strength("Struktur schaffen", [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }]),
     strength("Andere mitnehmen", [{ answer: "A2", quote: "habe ich vorher mit jedem einzeln gesprochen" }]),
-  ]).proposals.length, 3, "verschiedene Stärken werden nicht verschmolzen");
+  ]).proposals.length, 3, "verschiedene Themen werden nicht verschmolzen");
   const result = validate([
     strength("Verantwortung übernehmen", [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }]),
     strength("Übernimmt Verantwortung", [{ answer: "A2", quote: "habe ich vorher mit jedem einzeln gesprochen" }]),
@@ -179,16 +197,78 @@ test("ähnliche Stärken werden zusammengeführt, verschiedene aus derselben Ant
     }),
   ]);
   assert.deepEqual(result.proposals.map((p) => p.label), ["Verantwortung übernehmen", "Struktur schaffen"]);
-  // Die Dublette bringt ihren Beleg mit - eine Stärke, zwei Situationen.
+  // Die Dublette bringt ihren Beleg mit - ein Thema, zwei Situationen.
   assert.deepEqual(result.proposals[0]!.evidence.map((e) => e.turnId), ["t1", "t2"]);
-  // Zwei Stärken aus derselben Antwort sind möglich.
+  // Zwei Themen aus derselben Antwort sind möglich.
   assert.equal(result.proposals[1]!.evidence[0]!.turnId, "t1");
 });
 
-test("höchstens fünf Vorschläge, und nichts heißt eine leere Liste", () => {
-  const labels = ["Initiative", "Klarheit", "Empathie", "Kreativität", "Lernfähigkeit", "Selbstorganisation", "Priorisieren"];
-  const many = validate(labels.map((label) => strength(label, [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }])));
+test("ein Thema außerhalb der 28 wird verworfen", () => {
+  const quote = [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }];
+  assert.deepEqual(validate([strength("Erfundenes Thema", quote, { theme: "super_leadership" })]).proposals, []);
+  assert.deepEqual(validate([{ ...strength("Ohne Thema", quote), theme: undefined }]).proposals, []);
+});
+
+test("die Belegstärke kommt aus der Zahl verschiedener Situationen - nicht vom Modell", () => {
+  const one = validate([strength("Verantwortung übernehmen", [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }])]);
+  assert.equal(one.proposals[0]!.level, "hint");
+  const two = validate([
+    strength("Verantwortung übernehmen", [
+      { answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" },
+      { answer: "A2", quote: "habe ich vorher mit jedem einzeln gesprochen" },
+    ]),
+  ]);
+  assert.equal(two.proposals[0]!.level, "shown");
+  // Zwei Zitate aus DERSELBEN Antwort sind eine Situation.
+  const same = validate([
+    strength("Verantwortung übernehmen", [
+      { answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" },
+      { answer: "A1", quote: "die nächsten Schritte aufgeschrieben" },
+    ]),
+  ]);
+  assert.equal(same.proposals[0]!.level, "hint");
+  assert.equal(evidenceLevelFor(3), "clear");
+  assert.equal(evidenceLevelFor(5), "clear");
+  // Ein vom Modell mitgeschicktes "level" wird nicht gelesen.
+  const forged = validate([{ ...strength("Verantwortung übernehmen", [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }]), level: "clear" }]);
+  assert.equal(forged.proposals[0]!.level, "hint");
+});
+
+test("der Wortschatz hat 28 Themen in vier Bereichen, in der Anweisung und in beiden Sprachen", () => {
+  assert.equal(STRENGTH_THEME_IDS.length, 28);
+  assert.equal(new Set(STRENGTH_THEME_IDS).size, 28);
+  for (const domain of STRENGTH_DOMAINS) assert.equal(STRENGTH_THEMES_BY_DOMAIN[domain].length, 7, domain);
+  const instruction = buildStrengthInstruction();
+  for (const id of STRENGTH_THEME_IDS) assert.ok(instruction.includes(`- ${id}:`), `${id} fehlt in der Anweisung`);
+  for (const locale of ["de", "en"]) {
+    const bundle = JSON.parse(read(`messages/${locale}/strengths.json`));
+    for (const domain of STRENGTH_DOMAINS) assert.ok(bundle.themes.domains[domain]?.title, `${locale}: ${domain}`);
+    for (const id of STRENGTH_THEME_IDS) {
+      const item = bundle.themes.items[id];
+      for (const key of ["name", "shows", "helps", "prompt"]) assert.ok(item?.[key], `${locale}: ${id}.${key}`);
+      assert.doesNotMatch(item.name + item.shows + item.helps + item.prompt, /\bScore\b|Rang|Top[ -]?5|\d\s*%/i, `${locale}: ${id}`);
+    }
+  }
+  // Keine Namen von Gallup übernommen.
+  const text = read("messages/de/strengths.json") + read("messages/en/strengths.json");
+  assert.doesNotMatch(text, /Gallup|CliftonStrengths|Clifton/i);
+});
+
+test("Gegenfragen gehen nie in die Auswertung und werden nie zur Stärke", () => {
+  assert.deepEqual(STRENGTHS_QUESTIONS.filter((q) => q.kind === "counter").map((q) => q.id), ["avoid_task", "hand_off", "others_better"]);
+  for (const id of ["avoid_task", "hand_off", "others_better"]) assert.equal(isCounterQuestion(id), true, id);
+  for (const q of STRENGTHS_QUESTIONS.filter((q) => q.kind !== "counter")) assert.equal(isCounterQuestion(q.id), false, q.id);
+  assert.match(codeOnly("scripts/ai-worker.ts"), /\.filter\(\(row\) => !isCounterQuestion\(row\.question_id\)\)/);
+});
+
+test("höchstens sieben Vorschläge, und nichts heißt eine leere Liste", () => {
+  const many = validate(
+    STRENGTH_THEME_IDS.slice(0, 9).map((theme) =>
+      strength(`Thema ${theme}`, [{ answer: "A1", quote: "habe ich selbst einen Termin mit allen organisiert" }], { theme })
+    )
+  );
   assert.equal(many.proposals.length, MAX_STRENGTH_PROPOSALS);
+  assert.equal(MAX_STRENGTH_PROPOSALS, 7);
   assert.deepEqual(validate([]).proposals, []);
   assert.deepEqual(validateStrengthAnalysis(null, { answers: ANSWERS, capabilityTerms: terms }).proposals, []);
 });
@@ -213,13 +293,20 @@ test("das Modell darf nur auf die gegebenen Antworten verweisen - und sieht sie 
 
 test("gefragt wird nach Situationen, nie direkt nach Stärken - in DE und EN", () => {
   const ids = STRENGTHS_QUESTIONS.map((question) => question.id);
-  assert.ok(ids.includes("initiated") && ids.includes("new_ground"), "die beiden neuen Situationen fehlen");
+  assert.equal(STRENGTHS_QUESTIONS.filter((question) => question.kind === "situation").length, 10);
+  assert.equal(STRENGTHS_QUESTIONS.filter((question) => question.kind === "counter").length, 3);
+  assert.equal(STRENGTHS_QUESTIONS.filter((question) => question.kind === "outside").length, 1);
+  assert.ok(ids.includes("decide_unclear") && ids.includes("new_ground"), "die neuen Situationen fehlen");
+  // Jede Situation hat drei Nachfragen, die Gegenfragen keine.
+  for (const question of STRENGTHS_QUESTIONS.filter((q) => q.kind === "situation")) assert.equal(question.followUpIds.length, 3, question.id);
   for (const locale of ["de", "en"]) {
     const bundle = JSON.parse(read(`messages/${locale}/strengths.json`));
     for (const question of STRENGTHS_QUESTIONS) {
       const copy = bundle.interview.questions[question.id];
       assert.ok(copy?.title && copy?.hint, `${locale}: ${question.id}`);
-      assert.match(copy.title, /Erzähl|Wobei|Tell me|What do others/, `${locale}: ${question.id} fragt nicht nach einer Situation`);
+      if (question.kind !== "counter") {
+        assert.match(copy.title, /Erzähl|Wobei|Tell me|What do others/, `${locale}: ${question.id} fragt nicht nach einer Situation`);
+      }
       assert.doesNotMatch(copy.title, /deine Stärken|your strengths|Was kannst du|What are you good at/i, `${locale}: ${question.id}`);
       for (const followUp of question.followUpIds) {
         assert.ok(copy.followUps?.[followUp], `${locale}: ${question.id}.followUps.${followUp}`);

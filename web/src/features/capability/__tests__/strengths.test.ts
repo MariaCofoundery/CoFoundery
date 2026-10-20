@@ -115,7 +115,7 @@ test("die Stärke des Modells braucht einen Beleg - und kommt aus ihrer eigenen 
   assert.match(model, /if \(evidence\.length === 0\) continue;/);
   assert.match(model, /ABOUT_THE_PERSON\.some\(\(pattern\) => pattern\.test\(all\)\)/);
   // Der Arbeiter legt sie als Vorschlag ab, nicht als Tatsache.
-  assert.match(codeOnly(WORKER), /insert_ai_strength_proposal/);
+  assert.match(codeOnly(WORKER), /insert_ai_strength_theme_proposal/);
   assert.match(sqlCodeOnly(STRENGTH_MIGRATION), /position\(v_normalized_quote in v_normalized_source\) = 0/);
 });
 

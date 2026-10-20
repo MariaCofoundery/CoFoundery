@@ -86,8 +86,8 @@ select extensions.set_eq(
     where table_schema = 'public' and table_name = 'person_strengths'$$,
   $$values ('id'), ('user_id'), ('statement'), ('origin'), ('source_turn_id'),
            ('self_frequency'), ('reflected_frequency'), ('reflected_who'),
-           ('label'), ('created_at'), ('updated_at')$$,
-  'the strength holds no number and no ranking'
+           ('label'), ('theme'), ('evidence_level'), ('created_at'), ('updated_at')$$,
+  'the strength holds no number and no ranking (theme and evidence level are words, not scores)'
 );
 set local role authenticated;
 

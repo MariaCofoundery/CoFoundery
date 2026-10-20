@@ -1,4 +1,11 @@
 import { askModelForJson } from "@/lib/ai/ollama";
+import {
+  STRENGTH_THEME_IDS,
+  evidenceLevelFor,
+  isStrengthTheme,
+  type EvidenceLevel,
+  type StrengthThemeId,
+} from "@/features/strengths/strengthThemes";
 
 /**
  * Persönliche Stärken aus erzählten Situationen - die Auswertung des
@@ -29,11 +36,11 @@ import { askModelForJson } from "@/lib/ai/ollama";
  *   5. Nichts davon gilt, bevor die Person es übernimmt.
  */
 
-export const STRENGTH_PROMPT_VERSION = "strengths-v1";
+export const STRENGTH_PROMPT_VERSION = "strengths-v2";
 
-/** Ziel sind drei bis fünf; mehr wäre für die Person Arbeit ohne Ertrag. */
-export const MAX_STRENGTH_PROPOSALS = 5;
-const MAX_EVIDENCE = 3;
+/** Ziel sind vier bis sieben Themen; mehr wäre für die Person Arbeit ohne Ertrag. */
+export const MAX_STRENGTH_PROPOSALS = 7;
+const MAX_EVIDENCE = 4;
 
 export const STRENGTH_LABEL_MAX = 60;
 export const STRENGTH_STATEMENT_MAX = 200;
@@ -50,6 +57,10 @@ export type StrengthAnswer = {
 export type StrengthEvidence = { turnId: string; quote: string };
 
 export type StrengthCandidate = {
+  /** Eines der 28 Themen (`strengthThemes.ts`). */
+  theme: StrengthThemeId;
+  /** Wie gut belegt - aus der Zahl verschiedener Situationen, nie vom Modell. */
+  level: EvidenceLevel;
   label: string;
   statement: string;
   rationale: string;
@@ -107,6 +118,7 @@ export function buildStrengthSchema(answerRefs: string[]) {
         items: {
           type: "object",
           properties: {
+            theme: { type: "string", enum: [...STRENGTH_THEME_IDS] },
             label: { type: "string" },
             statement: { type: "string" },
             rationale: { type: "string" },
@@ -124,7 +136,7 @@ export function buildStrengthSchema(answerRefs: string[]) {
               },
             },
           },
-          required: ["label", "statement", "rationale", "evidence"],
+          required: ["theme", "label", "statement", "rationale", "evidence"],
         },
       },
     },
@@ -140,35 +152,38 @@ export function buildStrengthSchema(answerRefs: string[]) {
  * gemeint ist; ohne sie benennt ein Modell bei "Was zeigt sich hier?" fast
  * immer das Fachgebiet der Geschichte.
  */
-export function buildStrengthInstruction() {
+export type StrengthThemeHint = { id: string; name: string; shows: string };
+
+export function buildStrengthInstruction(themes: readonly StrengthThemeHint[] = []) {
+  const catalog = (themes.length > 0 ? themes : STRENGTH_THEME_IDS.map((id) => ({ id, name: id, shows: "" }))).map(
+    (theme) => `- ${theme.id}: ${theme.name}${theme.shows ? ` - ${theme.shows}` : ""}`
+  );
   return [
     "Du liest Antworten aus einem Interview. Eine Person hat darin von konkreten Situationen erzählt.",
-    "Leite daraus persönliche Stärken ab, die sich in ihrem VERHALTEN in diesen Situationen zeigen.",
+    "Ordne ihrem VERHALTEN in diesen Situationen Stärken-Themen aus der folgenden Liste zu.",
+    "Du darfst NUR Themen aus dieser Liste verwenden, mit der Kennung vor dem Doppelpunkt:",
+    ...catalog,
     "",
-    "Gemeint ist diese Art von Stärke, zum Beispiel: Verantwortung übernehmen, Initiative,",
-    "Durchsetzungsfähigkeit, Beharrlichkeit, Empathie, Klarheit, Strukturierungsfähigkeit, Priorisieren,",
-    "Entscheidungsstärke, Lernfähigkeit, Kreativität, Konfliktfähigkeit, Anpassungsfähigkeit, andere mitnehmen,",
-    "analytisches Denken, Selbstorganisation. Das ist KEINE feste Liste - benenne, was sich wirklich zeigt.",
+    "Die Themen beschreiben Verhalten, KEINE Fachgebiete, Funktionen, Branchen oder Werkzeuge",
+    "(etwa Marketing, Programmieren, Buchhaltung). Was jemand fachlich kann, gehört nicht hierher.",
     "",
-    "NICHT gemeint sind Fachgebiete, Funktionen, Branchen oder Werkzeuge (etwa Marketing, Programmieren,",
-    "Buchhaltung). Was jemand fachlich kann, gehört nicht hierher.",
-    "",
-    "Für jede Stärke:",
-    "- `label`: eine kurze Bezeichnung, zwei bis fünf Wörter.",
+    "Für jedes Thema, das sich zeigt:",
+    "- `theme`: die Kennung aus der Liste.",
+    "- `label`: eine kurze Bezeichnung, zwei bis fünf Wörter - gern der Name des Themas.",
     "- `statement`: EIN Satz in der Du-Form über ein Verhalten, nah an dem, was erzählt wurde.",
     "  Richtig: 'Du übernimmst Verantwortung, wenn etwas ungeklärt bleibt.'",
     "  Falsch: 'Du bist eine sehr durchsetzungsfähige Person.'",
     "- `rationale`: ein bis zwei Sätze, was in der geschilderten Situation passiert ist und woran sich",
-    "  die Stärke zeigt. Zum Beispiel: 'In deinem Beispiel hast du selbst den nächsten Schritt organisiert,",
-    "  obwohl zunächst niemand zuständig war.' Nur, was dasteht.",
-    "- `evidence`: ein bis drei WÖRTLICHE Zitate, jeweils mit der Kennung der Antwort (A1, A2, ...),",
-    "  aus der sie stammen. Zitiere exakt aus der Antwort, nicht aus der Frage.",
+    "  das Thema zeigt. Nur, was dasteht.",
+    "- `evidence`: ein bis vier WÖRTLICHE Zitate, jeweils mit der Kennung der Antwort (A1, A2, ...),",
+    "  aus der sie stammen. Zitiere exakt aus der Antwort, nicht aus der Frage. Je Situation ein Zitat,",
+    "  wenn sich das Thema in mehreren Situationen zeigt.",
     "",
     "Regeln:",
-    "- Ziel sind drei bis fünf gut belegte Stärken. Weniger ist besser als unsicher.",
+    "- Ziel sind vier bis sieben gut belegte Themen. Weniger ist besser als unsicher.",
     "  Ist nichts ausreichend belegt, gib eine leere Liste zurück.",
-    "- Fasse ähnliche Stärken zu einer zusammen. Eine Stärke darf sich auf mehrere Antworten stützen,",
-    "  und eine Antwort darf mehr als eine Stärke zeigen.",
+    "- Jedes Thema höchstens einmal. Ein Thema darf sich auf mehrere Antworten stützen,",
+    "  und eine Antwort darf mehr als ein Thema zeigen.",
     "- Keine Persönlichkeitstypen, keine Diagnose, keine Eigenschaften über die Person,",
     "  keine Zahlen, keine Punkte, keine Rangfolge.",
     "- Erfinde nichts, was nicht dasteht. Schließe nicht vom Beruf oder der Branche auf Verhalten.",
@@ -245,6 +260,7 @@ export function isSameStrength(a: string, b: string) {
 
 type ModelAnswer = {
   strengths?: {
+    theme?: unknown;
     label?: unknown;
     statement?: unknown;
     rationale?: unknown;
@@ -270,6 +286,8 @@ export function validateStrengthAnalysis(
   const proposals: StrengthCandidate[] = [];
 
   for (const entry of list) {
+    const theme = entry?.theme;
+    if (!isStrengthTheme(theme)) continue;
     const label = text(entry?.label);
     const statement = text(entry?.statement);
     const rationale = text(entry?.rationale);
@@ -296,9 +314,9 @@ export function validateStrengthAnalysis(
     }
     if (evidence.length === 0) continue;
 
-    // ZUSAMMENFÜHREN statt doppelt vorlegen: Die erste Formulierung bleibt,
-    // die Belege der zweiten kommen dazu.
-    const twin = proposals.find((known) => isSameStrength(known.label, label));
+    // ZUSAMMENFÜHREN statt doppelt vorlegen: Ein Thema steht höchstens einmal da;
+    // die erste Formulierung bleibt, die Belege der zweiten kommen dazu.
+    const twin = proposals.find((known) => known.theme === theme);
     if (twin) {
       for (const item of evidence) {
         if (twin.evidence.length >= MAX_EVIDENCE) break;
@@ -309,15 +327,31 @@ export function validateStrengthAnalysis(
       continue;
     }
 
-    proposals.push({ label, statement, rationale, evidence: evidence.slice(0, MAX_EVIDENCE) });
+    proposals.push({
+      theme,
+      level: "hint",
+      label,
+      statement,
+      rationale,
+      evidence: evidence.slice(0, MAX_EVIDENCE),
+    });
     if (proposals.length >= MAX_STRENGTH_PROPOSALS) break;
+  }
+
+  // BELEGSTÄRKE aus der Zahl verschiedener Situationen - nie vom Modell gesagt.
+  for (const proposal of proposals) {
+    proposal.level = evidenceLevelFor(new Set(proposal.evidence.map((item) => item.turnId)).size);
   }
 
   return { proposals, engine: "model" };
 }
 
-export function createStrengthAnalyzer(options: { capabilityTerms: CapabilityTerms; model?: string }) {
-  const instruction = buildStrengthInstruction();
+export function createStrengthAnalyzer(options: {
+  capabilityTerms: CapabilityTerms;
+  model?: string;
+  themes?: readonly StrengthThemeHint[];
+}) {
+  const instruction = buildStrengthInstruction(options.themes);
 
   return async (answers: readonly StrengthAnswer[]): Promise<StrengthAnalysis> => {
     if (answers.length === 0) return { proposals: [], engine: "model" };

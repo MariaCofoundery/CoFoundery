@@ -1,11 +1,11 @@
 {
   "eyebrow": "Deine Stärken",
   "title": "Stärken-Interview",
-  "text": "Du erzählst von konkreten Situationen – was du getan hast, nicht wie du dich einschätzt. Daraus können Vorschläge für persönliche Stärken entstehen, jeweils mit der Stelle aus deiner Antwort, auf die sie sich stützen. Du entscheidest, was davon zu dir passt.",
+  "text": "Du erzählst von konkreten Situationen – was du getan hast, nicht wie du dich einschätzt. Daraus können Stärken-Themen entstehen, jeweils mit der Stelle aus deiner Antwort, auf die sie sich stützen. Du entscheidest, was davon zu dir passt.",
   "backToStrengths": "Zurück zu deinen Stärken",
   "guidance": {
     "title": "Bevor du anfängst",
-    "time": "Sieben Fragen, etwa 20 Minuten. Ab drei Antworten kannst du abschließen.",
+    "time": "Zehn Situationen, drei kurze Gegenfragen und eine Frage zum Blick von außen – etwa 30 bis 40 Minuten, gern in zwei Anläufen. Ab sechs Antworten kannst du abschließen.",
     "stories": "Erzähl jeweils eine Situation, die wirklich passiert ist – beruflich oder privat. Was du getan hast, ist wichtiger als das Ergebnis.",
     "notCapability": "Hier geht es nicht um Fachgebiete oder Erfahrung. Was du fachlich mitbringst, erfasst das Capability-Interview.",
     "save": "Deine Antworten werden beim Schreiben gespeichert. Du kannst jederzeit pausieren.",
@@ -38,7 +38,7 @@
   "done": {
     "title": "Dein Stärken-Interview ist abgeschlossen",
     "text": "{count, plural, one {Eine Antwort} other {# Antworten}} aus diesem Gespräch.",
-    "askText": "Eine KI auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest deine Antworten und schlägt drei bis fünf persönliche Stärken vor. Jeder Vorschlag nennt die Stelle aus deiner Antwort, auf die er sich stützt. Was sich nicht belegen lässt, wird nicht vorgeschlagen.",
+    "askText": "Eine KI auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest deine Antworten und ordnet ihnen Stärken-Themen zu. Jeder Vorschlag nennt die Stelle aus deiner Antwort, auf die er sich stützt. Die Gegenfragen werden nicht ausgewertet. Was sich nicht belegen lässt, wird nicht vorgeschlagen.",
     "ask": "Vorschläge erstellen lassen",
     "askPending": "Wird angefordert …",
     "unavailable": "Die Auswertung ist gerade nicht erreichbar. Deine Antworten bleiben gespeichert – du kannst die Vorschläge später anfordern. Eigene Sätze kannst du jederzeit bei deinen Stärken festhalten.",
@@ -58,7 +58,13 @@
     "evidence": "Aus deiner Antwort",
     "confirm": "Passt zu mir",
     "reject": "Passt nicht",
-    "pending": "Wird gespeichert …"
+    "pending": "Wird gespeichert …",
+    "level": {
+      "clear": "Zeigt sich deutlich",
+      "shown": "Zeigt sich",
+      "hint": "Hinweis"
+    },
+    "levelNote": "Wie gut belegt – nicht, wie stark."
   },
   "review": {
     "title": "Deine Antworten",
@@ -94,7 +100,8 @@
         "hint": "Beruflich oder privat. Es muss nichts Großes sein – entscheidend ist, was du getan hast.",
         "followUps": {
           "whatYouDidFirst": "Was hast du als Erstes konkret getan?",
-          "whyYou": "Warum hast du es übernommen, statt abzuwarten?"
+          "whatWouldHaveHappened": "Was wäre passiert, wenn du es nicht übernommen hättest?",
+          "whatItCost": "War das leicht für dich, oder hat es Kraft gekostet? Woran hast du das gemerkt?"
         }
       },
       "hard_won": {
@@ -102,7 +109,8 @@
         "hint": "Beruflich oder privat. Auch wenn es nur teilweise gelungen ist.",
         "followUps": {
           "whatMadeItHard": "Was genau hat es schwierig gemacht?",
-          "whenItStalled": "Was hast du getan, als es nicht weiterging?"
+          "whenItStalled": "Was hast du getan, als es nicht weiterging?",
+          "whatItCost": "Was hat dich dabei am meisten Kraft gekostet, und was hat dir Kraft gegeben?"
         }
       },
       "solved_problem": {
@@ -110,7 +118,8 @@
         "hint": "Ein konkretes Problem mit einem Davor und einem Danach – beruflich oder privat.",
         "followUps": {
           "howYouApproached": "Wie bist du vorgegangen, um das Problem zu verstehen?",
-          "whatWasYours": "Was davon lag bei dir – und was bei anderen?"
+          "whatWasYours": "Was davon lag bei dir – und was bei anderen?",
+          "whatDidNotWork": "Was hast du zuerst versucht, das nicht funktioniert hat?"
         }
       },
       "initiated": {
@@ -126,7 +135,8 @@
         "hint": "Ein neues Thema, eine neue Rolle, ein neues Umfeld – beruflich oder privat.",
         "followUps": {
           "howYouLearned": "Wie bist du konkret vorgegangen, um es zu lernen?",
-          "whatYouDidDifferently": "Was hast du dabei anders gemacht als andere?"
+          "whatYouDidDifferently": "Was hast du dabei anders gemacht als andere?",
+          "whatYouStillLacked": "Was hat dir am Ende noch gefehlt, und wie bist du damit umgegangen?"
         }
       },
       "resistance": {
@@ -134,7 +144,8 @@
         "hint": "Eine Meinung, eine Entscheidung, ein unangenehmes Thema – beruflich oder privat.",
         "followUps": {
           "howYouWentAboutIt": "Wie genau bist du dabei vorgegangen?",
-          "whatHappenedAfter": "Was ist danach passiert?"
+          "whatHappenedAfter": "Was ist danach passiert?",
+          "whatItCost": "Was hat es dich gekostet – und würdest du es wieder tun?"
         }
       },
       "others_come": {
@@ -144,7 +155,309 @@
           "lastExample": "Worum ging es beim letzten Mal genau?",
           "whatYouActuallyDo": "Was tust du dabei konkret, das anderen hilft?"
         }
+      },
+      "decide_unclear": {
+        "title": "Erzähl von einer Entscheidung, die du treffen musstest, ohne alle Informationen zu haben, und mit Zeitdruck.",
+        "hint": "Beruflich oder privat. Es geht um die Situation, nicht darum, ob die Entscheidung richtig war.",
+        "followUps": {
+          "whatYouKnew": "Was wusstest du, und was nicht? Worauf hast du dich gestützt?",
+          "howYouDecided": "Wie bist du zur Entscheidung gekommen – mit wem hast du gesprochen, was hast du abgewogen?",
+          "whatYouWouldChange": "Was würdest du heute anders machen?"
+        }
+      },
+      "built_new": {
+        "title": "Erzähl von etwas, das du neu entworfen oder aufgebaut hast – etwas, das es vorher so nicht gab.",
+        "hint": "Ein Produkt, ein Ablauf, ein Angebot, eine Veranstaltung – beruflich oder privat.",
+        "followUps": {
+          "whereTheIdeaCame": "Woher kam die Idee, und wie ist sie gewachsen?",
+          "howYouTestedIt": "Wie hast du herausgefunden, ob es funktioniert?",
+          "whatYouLeftToOthers": "Was hast du anderen überlassen, und warum?"
+        }
+      },
+      "won_over": {
+        "title": "Erzähl von einer Situation, in der du jemanden gewonnen hast, der zuerst nicht wollte.",
+        "hint": "Eine Kundin, ein Kollege, eine Investorin, ein Freund – beruflich oder privat.",
+        "followUps": {
+          "whatYouSaid": "Was hast du gesagt oder getan, um das Gespräch zu öffnen?",
+          "whatChangedTheirMind": "Was hat den Ausschlag gegeben, dass die Person doch mitgemacht hat?",
+          "whatYouWouldDoDifferently": "Was würdest du beim nächsten Mal anders machen?"
+        }
+      },
+      "helped_grow": {
+        "title": "Erzähl von einem Moment, in dem du jemandem geholfen hast, besser zu werden oder weiterzukommen.",
+        "hint": "Eine Kollegin, ein Teammitglied, ein Freund – beruflich oder privat.",
+        "followUps": {
+          "whatYouDid": "Was hast du konkret getan oder gesagt?",
+          "whatChangedForThem": "Was hat sich für die Person danach verändert?",
+          "whatItGaveYou": "Was hat dir das gegeben – oder gekostet?"
+        }
+      },
+      "connected_people": {
+        "title": "Erzähl von einer Situation, in der du Menschen miteinander verbunden hast, die sich vorher nicht kannten oder nicht zusammenarbeiteten.",
+        "hint": "Zwei Personen oder eine ganze Gruppe – beruflich oder privat.",
+        "followUps": {
+          "whyThosePeople": "Warum gerade diese Menschen, und woran hast du gemerkt, dass es passt?",
+          "howYouDidIt": "Wie hast du es angestellt?",
+          "whatCameOfIt": "Was ist daraus entstanden?"
+        }
+      },
+      "avoid_task": {
+        "title": "Welche Art von Aufgabe schiebst du am längsten vor dir her?",
+        "hint": "Es geht um die Art der Aufgabe, nicht um ein bestimmtes Projekt. Ehrlich, nicht höflich."
+      },
+      "hand_off": {
+        "title": "Was gibst du gern ab, auch wenn du es könntest?",
+        "hint": "Aufgaben, bei denen du dich freust, wenn jemand anderes sie übernimmt."
+      },
+      "others_better": {
+        "title": "Woran hast du schon einmal gemerkt, dass andere etwas besser machen als du – und woran?",
+        "hint": "Eine konkrete Gelegenheit, bei der du gesehen hast: Das kann jemand anderes besser."
       }
     }
-  }
+  },
+  "themes": {
+    "domains": {
+      "execute": {
+        "title": "Umsetzen",
+        "text": "Dinge zu Ende bringen"
+      },
+      "influence": {
+        "title": "Beeinflussen",
+        "text": "Andere bewegen"
+      },
+      "relate": {
+        "title": "Zusammenarbeiten",
+        "text": "Menschen verbinden"
+      },
+      "think": {
+        "title": "Denken",
+        "text": "Verstehen und entwerfen"
+      }
+    },
+    "items": {
+      "keep_going": {
+        "domain": "execute",
+        "name": "Durchziehen",
+        "shows": "Du bleibst dran, auch wenn es zäh wird und lange nichts passiert.",
+        "helps": "Hilft in der langen Mitte zwischen Idee und Ergebnis.",
+        "prompt": "Wo in unserem Vorhaben brauchen wir gerade jemanden, der dranbleibt – und wer von uns tut das schon?"
+      },
+      "reliable": {
+        "domain": "execute",
+        "name": "Verlässlich sein",
+        "shows": "Du hältst Zusagen, andere müssen nicht nachfragen.",
+        "helps": "Hilft beim Vertrauen von Kund:innen, Partnern und Team.",
+        "prompt": "Worauf verlassen wir uns bei wem – und wo wäre das noch nicht klar?"
+      },
+      "build_structure": {
+        "domain": "execute",
+        "name": "Struktur schaffen",
+        "shows": "Du bringst Ordnung ins Chaos: Abläufe, Zuständigkeiten, klare nächste Schritte.",
+        "helps": "Hilft beim Skalieren und Delegieren.",
+        "prompt": "Wer von uns bringt Struktur hinein, wenn es unübersichtlich wird?"
+      },
+      "move_fast": {
+        "domain": "execute",
+        "name": "Tempo machen",
+        "shows": "Du gehst schnell ins Handeln und wartest nicht auf Perfektion.",
+        "helps": "Hilft in frühen Phasen und unter Zeitdruck.",
+        "prompt": "Wann wollen wir schnell sein, und wann lieber sorgfältig?"
+      },
+      "thorough": {
+        "domain": "execute",
+        "name": "Gründlich arbeiten",
+        "shows": "Du achtest auf Details und Qualität, bevor etwas rausgeht.",
+        "helps": "Hilft bei allem, was später schwer zu korrigieren ist.",
+        "prompt": "Welche Dinge müssen bei uns besonders sauber sein – und wer prüft sie?"
+      },
+      "take_ownership": {
+        "domain": "execute",
+        "name": "Verantwortung übernehmen",
+        "shows": "Du greifst zu, wenn niemand zuständig ist.",
+        "helps": "Hilft, wo Rollen noch nicht geklärt sind.",
+        "prompt": "Wo übernimmt bei uns jemand Verantwortung, ohne dass es abgesprochen ist?"
+      },
+      "hold_focus": {
+        "domain": "execute",
+        "name": "Fokus halten",
+        "shows": "Du setzt Prioritäten und sagst Nein, wenn etwas ablenkt.",
+        "helps": "Hilft gegen Verzettelung.",
+        "prompt": "Wer von uns erinnert uns an das Wichtigste, und wie sagen wir Nein?"
+      },
+      "convince": {
+        "domain": "influence",
+        "name": "Überzeugen",
+        "shows": "Du gewinnst andere mit Argumenten und Beispielen.",
+        "helps": "Hilft in Verkauf, Fundraising und Recruiting.",
+        "prompt": "Wer von uns führt welche Gespräche, in denen wir andere gewinnen müssen?"
+      },
+      "speak_plainly": {
+        "domain": "influence",
+        "name": "Klartext sprechen",
+        "shows": "Du sagst Unbequemes, auch gegen Widerstand.",
+        "helps": "Hilft, wenn ein Team ehrliche Rückmeldung braucht.",
+        "prompt": "Wie wollen wir uns gegenseitig Unbequemes sagen?"
+      },
+      "inspire": {
+        "domain": "influence",
+        "name": "Mitreißen",
+        "shows": "Du machst ein Ziel für andere greifbar und anziehend.",
+        "helps": "Hilft bei Vision und Teamaufbau.",
+        "prompt": "Wer erzählt unser Vorhaben so, dass andere mitmachen wollen?"
+      },
+      "negotiate": {
+        "domain": "influence",
+        "name": "Verhandeln",
+        "shows": "Du findest Lösungen zwischen unterschiedlichen Interessen.",
+        "helps": "Hilft bei Verträgen, Partnerschaften und Konditionen.",
+        "prompt": "Wer von uns verhandelt, und was ist unsere Untergrenze?"
+      },
+      "make_visible": {
+        "domain": "influence",
+        "name": "Sichtbar machen",
+        "shows": "Du bringst Ideen und Ergebnisse nach außen: Auftritt, Geschichte, Reichweite.",
+        "helps": "Hilft bei Marke, Sichtbarkeit und Vertrieb.",
+        "prompt": "Wer von uns zeigt sich nach außen, und wer möchte das lieber nicht?"
+      },
+      "kick_off": {
+        "domain": "influence",
+        "name": "Anstoßen",
+        "shows": "Du fängst an, ohne dass dich jemand darum bittet.",
+        "helps": "Hilft, wenn Bewegung fehlt.",
+        "prompt": "Wer von uns stößt Dinge an – und wer bremst sie, wenn es zu viel wird?"
+      },
+      "decide": {
+        "domain": "influence",
+        "name": "Entscheiden",
+        "shows": "Du triffst Entscheidungen auch bei unvollständiger Lage.",
+        "helps": "Hilft bei Unsicherheit und Blockaden.",
+        "prompt": "Wie entscheiden wir, wenn wir uns nicht einig sind – und wer darf das letzte Wort haben?"
+      },
+      "empathize": {
+        "domain": "relate",
+        "name": "Einfühlen",
+        "shows": "Du merkst, wie es anderen geht, und reagierst darauf.",
+        "helps": "Hilft in Kundengesprächen und beim Teamklima.",
+        "prompt": "Wer von uns merkt es zuerst, wenn jemand im Team Druck spürt?"
+      },
+      "build_trust": {
+        "domain": "relate",
+        "name": "Vertrauen aufbauen",
+        "shows": "Du wirst als offen und berechenbar erlebt.",
+        "helps": "Hilft bei neuen Partnerschaften.",
+        "prompt": "Wem vertrauen Außenstehende bei uns zuerst – und warum?"
+      },
+      "connect": {
+        "domain": "relate",
+        "name": "Verbinden",
+        "shows": "Du bringst die richtigen Menschen zusammen.",
+        "helps": "Hilft bei Netzwerk, Partnern und Einführungen.",
+        "prompt": "Wer von uns kennt Menschen, die uns weiterhelfen, und wie nutzen wir das?"
+      },
+      "develop_others": {
+        "domain": "relate",
+        "name": "Fördern",
+        "shows": "Du hilfst anderen, besser zu werden.",
+        "helps": "Hilft beim Aufbau und Halten von Talenten.",
+        "prompt": "Wer fördert bei uns andere – und wer braucht gerade Förderung?"
+      },
+      "resolve_conflict": {
+        "domain": "relate",
+        "name": "Konflikte klären",
+        "shows": "Du sprichst Spannungen an und findest einen Weg.",
+        "helps": "Hilft, wenn ein Team unter Druck steht.",
+        "prompt": "Wie gehen wir mit Spannungen um – und wer spricht sie zuerst an?"
+      },
+      "build_cohesion": {
+        "domain": "relate",
+        "name": "Zusammenhalt stiften",
+        "shows": "Du sorgst dafür, dass sich eine Gruppe als Team erlebt.",
+        "helps": "Hilft in langen, harten Phasen.",
+        "prompt": "Was hält uns zusammen, wenn es schwierig wird?"
+      },
+      "listen": {
+        "domain": "relate",
+        "name": "Zuhören",
+        "shows": "Du nimmst auf, bevor du antwortest.",
+        "helps": "Hilft beim Verstehen von Kundenproblemen.",
+        "prompt": "Wer von uns hört zu, wenn andere noch suchen, was sie sagen wollen?"
+      },
+      "spot_patterns": {
+        "domain": "think",
+        "name": "Muster erkennen",
+        "shows": "Du siehst Zusammenhänge und Wiederholungen früh.",
+        "helps": "Hilft bei Märkten, Daten und Kundenverhalten.",
+        "prompt": "Wer von uns sieht Muster, die andere noch nicht sehen?"
+      },
+      "learn_fast": {
+        "domain": "think",
+        "name": "Schnell lernen",
+        "shows": "Du arbeitest dich zügig in Neues ein.",
+        "helps": "Hilft, wenn sich Rollen und Themen ändern.",
+        "prompt": "Wer von uns übernimmt Neues, wenn niemand Erfahrung hat?"
+      },
+      "generate_ideas": {
+        "domain": "think",
+        "name": "Ideen entwickeln",
+        "shows": "Du kommst auf neue Wege und Kombinationen.",
+        "helps": "Hilft bei Produkt und Geschäftsmodell.",
+        "prompt": "Woher kommen bei uns neue Ideen – und wer prüft sie?"
+      },
+      "envision_future": {
+        "domain": "think",
+        "name": "Zukunft entwerfen",
+        "shows": "Du denkst in Szenarien und längeren Linien.",
+        "helps": "Hilft bei Strategie und Roadmap.",
+        "prompt": "Wer von uns denkt in drei Jahren, wer in drei Wochen – und wie verbinden wir beides?"
+      },
+      "break_down": {
+        "domain": "think",
+        "name": "Problem zerlegen",
+        "shows": "Du brichst Komplexes in klare Teile.",
+        "helps": "Hilft bei Planung und Fehlersuche.",
+        "prompt": "Wer von uns zerlegt ein großes Problem, wenn wir festhängen?"
+      },
+      "spot_opportunities": {
+        "domain": "think",
+        "name": "Chancen erkennen",
+        "shows": "Du siehst Möglichkeiten, wo andere keine sehen.",
+        "helps": "Hilft bei Marktzugang und Richtungswechseln.",
+        "prompt": "Welche Chance sehen wir – und wer von uns würde sie am ehesten ergreifen?"
+      },
+      "experiment": {
+        "domain": "think",
+        "name": "Ausprobieren",
+        "shows": "Du testest Annahmen schnell und billig.",
+        "helps": "Hilft, bevor viel Geld und Zeit fließt.",
+        "prompt": "Welche Annahme könnten wir diese Woche testen – und wer testet sie?"
+      }
+    }
+  },
+  "report": {
+    "eyebrow": "Dein Stärkenbild",
+    "title": "Deine Stärken im Gründungsalltag",
+    "text": "Das sind Themen, die sich in deinen eigenen Beispielen gezeigt haben und die du übernommen hast. Sie stehen gleichwertig nebeneinander: keine Rangfolge, keine Zahl, kein Typ.",
+    "levelNote": "„Zeigt sich deutlich“ heißt: in mindestens drei deiner Situationen. „Zeigt sich“: in zwei. „Hinweis“: in einer. Das sagt, wie gut es belegt ist – nicht, wie stark.",
+    "domainEmpty": "Hier hat sich in deinen Beispielen noch nichts gezeigt – das ist nicht schlimm, sondern ein Hinweis, wer dich ergänzen könnte.",
+    "helps": "Im Startup",
+    "prompt": "Gesprächsimpuls fürs Team",
+    "needs": {
+      "title": "Wo du Unterstützung brauchst",
+      "text": "In deinen eigenen Worten. Das ist keine Schwäche, sondern ein Hinweis darauf, wer dich ergänzen könnte.",
+      "avoid_task": "Was du am längsten vor dir herschiebst",
+      "hand_off": "Was du gern abgibst",
+      "others_better": "Wobei andere es besser machen"
+    },
+    "other": {
+      "title": "Weitere Sätze von dir",
+      "text": "Stärken, die du selbst formuliert oder früher übernommen hast."
+    },
+    "emptyTitle": "Dein Stärkenbild entsteht aus dem Stärken-Interview",
+    "emptyText": "Noch hast du keine Stärken-Themen übernommen. Im Interview erzählst du von zehn Situationen, daraus entstehen Vorschläge, die du bestätigst.",
+    "start": "Stärken-Interview beginnen",
+    "again": "Stärken-Interview erneut führen",
+    "back": "Zurück zu deinem Profil",
+    "open": "Dein Stärkenbild ansehen"
+  },
+  "levelNoteShort": "Wie gut belegt – nicht, wie stark."
 }

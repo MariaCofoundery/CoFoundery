@@ -1,6 +1,11 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isStrengthTheme, type EvidenceLevel, type StrengthThemeId } from "@/features/strengths/strengthThemes";
+
+const LEVELS = ["clear", "shown", "hint"] as const;
+const asLevel = (value: unknown): EvidenceLevel | null => (LEVELS as readonly unknown[]).includes(value) ? (value as EvidenceLevel) : null;
+const asTheme = (value: unknown): StrengthThemeId | null => (isStrengthTheme(value) ? value : null);
 
 /**
  * Stärken - und zwei Blickrichtungen darauf.
@@ -36,6 +41,10 @@ export type PersonStrength = {
    */
   label: string | null;
   statement: string;
+  /** Eines der 28 Themen, wenn die Stärke aus dem Interview v2 stammt. */
+  theme?: StrengthThemeId | null;
+  /** Wie gut belegt - kein Rang, keine Ausprägung. */
+  evidenceLevel?: EvidenceLevel | null;
   origin: "own_words" | "confirmed_proposal" | "edited_proposal";
   selfFrequency: StrengthFrequency | null;
   reflectedFrequency: StrengthFrequency | null;
@@ -57,12 +66,14 @@ export type StrengthProposal = {
   rationale: string | null;
   quote: string;
   sessionId: string | null;
+  theme: StrengthThemeId | null;
+  evidenceLevel: EvidenceLevel | null;
 };
 
 export async function getPersonStrengths(client: SupabaseClient): Promise<PersonStrength[]> {
   const { data, error } = await client
     .from("person_strengths")
-    .select("id, label, statement, origin, self_frequency, reflected_frequency, reflected_who")
+    .select("id, label, statement, origin, theme, evidence_level, self_frequency, reflected_frequency, reflected_who")
     .order("created_at", { ascending: true })
     .limit(100);
   if (error || !data) return [];
@@ -72,6 +83,8 @@ export async function getPersonStrengths(client: SupabaseClient): Promise<Person
       id: string;
       label: string | null;
       statement: string;
+      theme: string | null;
+      evidence_level: string | null;
       origin: PersonStrength["origin"];
       self_frequency: StrengthFrequency | null;
       reflected_frequency: StrengthFrequency | null;
@@ -81,6 +94,8 @@ export async function getPersonStrengths(client: SupabaseClient): Promise<Person
     id: row.id,
     label: row.label,
     statement: row.statement,
+    theme: asTheme(row.theme),
+    evidenceLevel: asLevel(row.evidence_level),
     origin: row.origin,
     selfFrequency: row.self_frequency,
     reflectedFrequency: row.reflected_frequency,
@@ -94,7 +109,7 @@ export async function getPendingStrengthProposals(
 ): Promise<StrengthProposal[]> {
   let query = client
     .from("person_strength_proposals")
-    .select("id, label, statement, rationale, evidence_quote, session_id")
+    .select("id, label, statement, rationale, evidence_quote, session_id, theme, evidence_level")
     .eq("status", "pending");
   if (options?.sessionId) query = query.eq("session_id", options.sessionId);
   const { data } = await query.order("created_at", { ascending: true }).limit(20);
@@ -107,6 +122,8 @@ export async function getPendingStrengthProposals(
       rationale: string | null;
       evidence_quote: string;
       session_id: string | null;
+      theme: string | null;
+      evidence_level: string | null;
     }[]
   ).map((row) => ({
     id: row.id,
@@ -115,6 +132,8 @@ export async function getPendingStrengthProposals(
     rationale: row.rationale,
     quote: row.evidence_quote,
     sessionId: row.session_id,
+    theme: asTheme(row.theme),
+    evidenceLevel: asLevel(row.evidence_level),
   }));
 }
 

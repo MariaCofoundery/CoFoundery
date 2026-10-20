@@ -316,7 +316,8 @@
       "empty": "You haven't recorded your strengths yet.",
       "emptyCta": "Record strengths",
       "emptyText": "Note in your own words what comes easily to you at work – and how often it shows.",
-      "interviewCta": "Start the strengths interview"
+      "interviewCta": "Start the strengths interview",
+      "report": "View your strengths picture"
     },
     "directionSection": {
       "detailsSummary": "All statements with their origin",
