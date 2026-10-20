@@ -57,7 +57,7 @@ import { getAboutYouFacts } from "@/features/profile/aboutYouData";
 import { AboutYouStation } from "@/features/profile/AboutYouStation";
 import { SectionMarkToggle } from "@/features/profile/SectionMarkToggle";
 import { buildFounderProfileCoverage } from "@/features/reporting/founderProfileCoverage";
-import { CoverageMap, CoverageRoles } from "@/features/reporting/CoverageMap";
+import { CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -528,23 +528,13 @@ export default async function ProfilePage({
         </form>
       ) : null}
 
-      {/* WAS DARAUS ENTSTANDEN IST - die Deckungskarte, dieselbe wie auf
-          „Das bist du". Keine neue Auswertung und keine zweite Fassung
-          derselben Grafik. */}
+      {/* Die Deckungskarte („Worüber du gesprochen hast", Balken mit „x von y
+          Bereichen") steht nicht mehr hier: Sie zaehlte, worueber im Interview
+          gesprochen wurde, und stand unter einer Seite, die etwas anderes
+          fragt - dazu kommt der Ueberblick direkt im Formular. Auf „Das bist
+          du" steht sie unveraendert. */}
       {step === "areas" && entries.length > 0 ? (
         <div className="mt-8">
-          <CoverageMap
-            coverage={coverage}
-            copy={{
-              title: tProfile("coverage.title"),
-              intro: tProfile("coverage.intro"),
-              familyLabel: (familyId) => t(`families.${familyId}`),
-              stateLabel: (state) => tProfile(`coverage.states.${state}`),
-              familyCount: (entered, total) => tProfile("coverage.familyCount", { entered, total }),
-              familyUnspoken: tProfile("coverage.familyUnspoken"),
-              basis: tProfile("coverage.basis"),
-            }}
-          />
           <SectionMarkToggle
             section="faehigkeiten"
             marked={facts.marks.has("faehigkeiten")}

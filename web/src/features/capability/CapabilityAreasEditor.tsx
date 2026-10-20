@@ -13,6 +13,11 @@ import { OWNERSHIP_WISHES, type ApplicationLevel, type OwnershipWish } from "./c
  * Jetzt steht beides direkt am gewaehlten Bereich - und bleibt zwei getrennte,
  * freiwillige Angaben: Koennen ist nicht Wollen.
  *
+ * LAYOUT: zwei Spalten (Felder, Bereiche), der Ueberblick darunter ueber die
+ * volle Breite. Drei Spalten passten nicht in die Karte der Seite (max-w-4xl):
+ * Die Mitte schrumpfte auf 240 Pixel, und jedes Wort stand in einer eigenen
+ * Zeile. Gefunden von Maria im Ausdruck, 21.10.2026.
+ *
  * Die Komponente steckt in einem Formular der Seite und liefert nur Felder:
  * `area_id` (mehrfach), `level_<id>` und `wish_<id>`. Gespeichert wird, wenn
  * die Person speichert - nicht bei jedem Tipp.
@@ -99,7 +104,7 @@ export function CapabilityAreasEditor({
     }`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)_17rem] lg:items-start">
+    <div className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-start">
       {/* Gewaehlte Bereiche reisen als Formularfelder mit. */}
       {Object.entries(chosen).map(([areaId, value]) => (
         <span key={areaId} hidden>
@@ -151,7 +156,7 @@ export function CapabilityAreasEditor({
         </nav>
       </div>
 
-      <div className="space-y-2.5 lg:col-start-2 lg:row-start-1">
+      <div className="min-w-0 space-y-2.5 lg:col-start-2 lg:row-start-1">
         {visible.length === 0 ? <p className="text-sm text-slate-600">{copy.noResults}</p> : null}
         {visible.map((area) => {
           const value = chosen[area.id];
@@ -202,12 +207,12 @@ export function CapabilityAreasEditor({
         })}
       </div>
 
-      <aside aria-label={copy.overviewTitle} className="rounded-2xl bg-slate-50 p-5 lg:col-start-3 lg:row-start-1 lg:sticky lg:top-6">
+      <aside aria-label={copy.overviewTitle} className="rounded-2xl bg-slate-50 p-5 lg:col-span-2">
         <h3 className="text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{copy.overviewTitle}</h3>
         {Object.keys(chosen).length === 0 ? (
           <p className="mt-3 text-sm text-slate-600">{copy.overviewEmpty}</p>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
             {families.map((family) => {
               const picked = family.areas.filter((area) => chosen[area.id]);
               if (picked.length === 0) return null;
