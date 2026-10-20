@@ -52,11 +52,13 @@ export default async function ConnectPersonContactPage({
           ← {person.display_name}
         </Link>
 
-        <section className="mt-3 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">
+        <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[.14em] text-white">
             {t("contact.eyebrow")}
           </p>
-          <h1 className="mt-3 text-3xl font-semibold">{t("contact.personTitle")}</h1>
+          <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("contact.personTitle")}</h1>
+        </header>
+        <section className="mt-4 rounded-3xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
 
           <div className="mt-5 flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
             <ConnectAvatar profile={person} displayName={person.display_name} />

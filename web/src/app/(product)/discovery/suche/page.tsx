@@ -96,8 +96,10 @@ export default async function SearchPreferencesPage({
       <Link href="/discovery/profile" className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">
         ← {tDiscovery("common.backToFindProfile")}
       </Link>
-      <h1 className="text-3xl font-semibold text-slate-900">{t("title")}</h1>
-      <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("subline")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white">{t("subline")}</p>
+      </header>
 
       {/* WER DAS LIEST, GIBT ANDERE ANTWORTEN. Ohne den Satz beantwortet man
           die Fragen so, wie man gesehen werden will. */}

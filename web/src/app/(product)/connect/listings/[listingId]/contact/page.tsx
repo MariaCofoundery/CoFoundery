@@ -22,9 +22,8 @@ export default async function ConnectContactCreatePage({ params, searchParams }:
   const profileValue = listing.network_profiles; const recipient = (Array.isArray(profileValue) ? profileValue[0] : profileValue) as ConnectProfile | null;
   return <main className="min-h-screen bg-slate-50 px-5 py-9"><div className="mx-auto max-w-2xl">
     <Link href={`/connect/listings/${listingId}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("contact.backToListing")}</Link>
-    <section className="mt-3 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-      <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t("contact.eyebrow")}</p>
-      <h1 className="mt-3 text-3xl font-semibold">{t("contact.createTitle")}</h1>
+    <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[.14em] text-white">{t("contact.eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("contact.createTitle")}</h1></header>
+    <section className="mt-4 rounded-3xl border border-violet-100 bg-white p-6 shadow-sm md:p-8">
       <div className="mt-5 rounded-2xl bg-slate-50 p-4"><p className="text-sm font-semibold text-slate-950">{listing.title}</p>{recipient ? <p className="mt-1 text-sm text-slate-600">{recipient.display_name} · {recipient.headline}</p> : null}</div>
       {knownKey(query.error, CONNECT_ERROR_KEYS) ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${knownKey(query.error, CONNECT_ERROR_KEYS)}`)}</p> : null}
       {!hasProfile ? (

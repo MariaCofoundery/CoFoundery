@@ -43,13 +43,15 @@ export default async function Page({
         {t("back")}
       </Link>
       <header className="space-y-3">
-        <p className="text-sm font-medium text-violet-800">
-          {t("private")} · {t(w.status)} · {t(w.role)}
-        </p>
-        <h1 className="break-words text-3xl font-semibold">{w.title}</h1>
-        <p className="whitespace-pre-wrap break-words leading-7">
-          {w.description}
-        </p>
+        <div className="brand-panel rounded-[28px] p-6 sm:p-8">
+          <p className="text-sm font-semibold text-white">
+            {t("private")} · {t(w.status)} · {t(w.role)}
+          </p>
+          <h1 className="mt-2 break-words text-3xl font-semibold leading-tight sm:text-4xl">{w.title}</h1>
+          <p className="mt-3 whitespace-pre-wrap break-words leading-7 text-white">
+            {w.description}
+          </p>
+        </div>
         <p className="text-sm text-slate-600">{t("privacy")}</p>
         {w.source_problem_id && (
           <Link

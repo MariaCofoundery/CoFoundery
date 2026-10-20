@@ -19,8 +19,10 @@ export default async function Page({
       <Link href="/connect" className="inline-block min-h-11 py-3 underline">
         {t("browse")}
       </Link>
-      <h1 className="text-3xl font-semibold">{t("title")}</h1>
-      <p>{t("intro")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
+        <p className="mt-3 text-white">{t("intro")}</p>
+      </header>
       {member.data === true && (
         <Link href="/connect/workspaces/new" className={button}>
           {t("new")}

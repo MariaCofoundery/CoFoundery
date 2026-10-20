@@ -19,8 +19,10 @@ export default async function Page({
       <Link href="/connect/workspaces" className="inline-block min-h-11 py-3 underline">
         ← {t("title")}
       </Link>
-      <h1 className="text-3xl font-semibold">{t("claimTitle")}</h1>
-      <p>{t("claimHelp")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("claimTitle")}</h1>
+        <p className="mt-3 text-white">{t("claimHelp")}</p>
+      </header>
       <form action={claimWorkspaceInviteAction.bind(null, token)}>
         <SubmitButton
           label={t("claim")}

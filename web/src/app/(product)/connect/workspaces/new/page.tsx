@@ -20,8 +20,10 @@ export default async function Page({
       <Link href="/connect/workspaces" className="underline">
         {t("back")}
       </Link>
-      <h1 className="text-3xl font-semibold">{t("new")}</h1>
-      <p>{t("privacy")}</p>
+      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("new")}</h1>
+        <p className="mt-3 text-white">{t("privacy")}</p>
+      </header>
       {query.error && <p role="alert">{t("error")}</p>}
       {problem && <p>{t("sourceNotice")}</p>}
       <form action={createWorkspaceAction} className={card}>
