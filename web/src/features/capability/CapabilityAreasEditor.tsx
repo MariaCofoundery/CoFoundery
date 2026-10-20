@@ -29,7 +29,7 @@ import { OWNERSHIP_WISHES, type ApplicationLevel, type OwnershipWish } from "./c
  * Alle Texte kommen fertig aufgeloest - eine Uebersetzungsfunktion laesst sich
  * nicht ueber die Client-Grenze reichen.
  */
-export type EditorArea = { id: string; label: string; hasExample: boolean };
+export type EditorArea = { id: string; label: string; hint: string; hasExample: boolean };
 export type EditorFamily = { id: string; label: string; areas: EditorArea[] };
 export type EditorInitial = Record<string, { level: ApplicationLevel | null; wish: OwnershipWish | null }>;
 
@@ -43,6 +43,7 @@ export type EditorCopy = {
   overviewEmpty: string;
   overviewNote: string;
   hasExample: string;
+  hintOpen: string;
   levels: Record<string, string>;
   wishes: Record<OwnershipWish, string>;
   familiesLabel: string;
@@ -66,6 +67,9 @@ export function CapabilityAreasEditor({
     families.find((family) => family.areas.some((area) => chosen[area.id]))?.id ?? families[0]?.id ?? ""
   );
   const [query, setQuery] = useState("");
+  // Welche Erklaerungen aufgeklappt sind. Am Rechner steht sie zusaetzlich als
+  // Tooltip (title); am Handy gibt es kein Hovern - dort der Knopf.
+  const [openHints, setOpenHints] = useState<Record<string, boolean>>({});
 
   const all = useMemo(
     () => families.flatMap((family) => family.areas.map((area) => ({ ...area, familyId: family.id, familyLabel: family.label }))),
@@ -114,7 +118,7 @@ export function CapabilityAreasEditor({
         </span>
       ))}
 
-      <div className="lg:col-start-1">
+      <div className="min-w-0 lg:col-start-1">
         <label className="block">
           <span className="sr-only">{copy.searchLabel}</span>
           <input
@@ -166,17 +170,31 @@ export function CapabilityAreasEditor({
               key={area.id}
               className={`rounded-2xl border px-4 ${value ? "border-violet-500 bg-violet-50/40" : "border-slate-200 bg-white"}`}
             >
-              <label className="flex min-h-12 cursor-pointer items-center gap-3 text-[15px]">
-                <input
-                  type="checkbox"
-                  checked={Boolean(value)}
-                  disabled={area.hasExample && Boolean(value)}
-                  onChange={() => toggle(area)}
-                  className="h-5 w-5 shrink-0"
-                />
-                <span className={value ? "font-semibold" : ""}>{area.label}</span>
-                {needle ? <span className="ml-auto text-xs text-slate-500">{area.familyLabel}</span> : null}
-              </label>
+              <div className="flex items-center gap-1">
+                <label title={area.hint} className="flex min-h-12 min-w-0 flex-1 cursor-pointer items-center gap-3 text-[15px]">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(value)}
+                    disabled={area.hasExample && Boolean(value)}
+                    onChange={() => toggle(area)}
+                    className="h-5 w-5 shrink-0"
+                  />
+                  <span className={value ? "font-semibold" : ""}>{area.label}</span>
+                  {needle ? <span className="ml-auto text-xs text-slate-500">{area.familyLabel}</span> : null}
+                </label>
+                <button
+                  type="button"
+                  aria-label={`${copy.hintOpen}: ${area.label}`}
+                  aria-expanded={Boolean(openHints[area.id])}
+                  onClick={() => setOpenHints((current) => ({ ...current, [area.id]: !current[area.id] }))}
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                >
+                  <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-xs">i</span>
+                </button>
+              </div>
+              {openHints[area.id] ? (
+                <p className="mb-3 rounded-xl bg-slate-50 px-3 py-2 text-sm leading-6 text-slate-700 sm:ml-8">{area.hint}</p>
+              ) : null}
               {value ? (
                 <div className="space-y-4 pb-4 sm:pl-8">
                   {area.hasExample ? <p className="text-xs text-slate-600">{copy.hasExample}</p> : null}

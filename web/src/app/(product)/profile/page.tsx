@@ -495,6 +495,7 @@ export default async function ProfilePage({
               areas: familyAreas.map((area) => ({
                 id: area.area_id,
                 label: areaLabel(area.area_id),
+                hint: t(`areaHints.${area.area_id}`),
                 hasExample: (entries.find((entry) => entry.area_id === area.area_id)?.evidence.length ?? 0) > 0,
               })),
             }))}
@@ -511,6 +512,7 @@ export default async function ProfilePage({
               overviewEmpty: t("areas.overviewEmpty"),
               overviewNote: t("areas.overviewNote"),
               hasExample: t("areas.hasExample"),
+              hintOpen: t("areas.hintOpen"),
               familiesLabel: t("areas.familiesLabel"),
               levels: Object.fromEntries(["1", "2", "3", "4", "5"].map((level) => [level, t(`areas.levelsShort.${level}`)])),
               wishes: Object.fromEntries(OWNERSHIP_WISHES.map((wish) => [wish, t(`areas.wishesShort.${wish}`)])) as Record<
