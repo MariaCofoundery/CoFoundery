@@ -53,6 +53,7 @@ import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 
 const CARD_CLASS =
   "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
@@ -81,6 +82,8 @@ type DiscoveryProfileSearchParams = {
   publishResult?: string | string[];
   publishError?: string | string[];
   publishIssue?: string | string[];
+  saved?: string | string[];
+  error?: string | string[];
 };
 
 function emptyProfile(): Partial<FounderDiscoveryProfile> {
@@ -473,6 +476,13 @@ export default async function DiscoveryProfilePage({
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)] lg:items-start">
           <div className="flex flex-col gap-5">
+          {/* Die Identitaet steht einmal im Profil und ist hier direkt bearbeitbar - ausserhalb des Formulars unten. */}
+          <IdentityInlineCard
+            client={supabase}
+            userId={user.id}
+            returnPath="/discovery/profile"
+            params={{ saved: searchParamValue(params.saved), error: searchParamValue(params.error) }}
+          />
           <section
             className={`${CARD_CLASS} discovery-rise`}
             style={{ "--rise-delay": "120ms" } as CSSProperties}
@@ -491,65 +501,6 @@ export default async function DiscoveryProfilePage({
                   </p>
                 </div>
 
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-5">
-                  <h3 className="text-sm font-semibold">{t("profile.publicProfile.identityTitle")}</h3>
-                  {core?.display_name ? (
-                    <>
-                      <div className="mt-3 space-y-1 text-sm text-slate-700">
-                        <p className="font-medium">{core.display_name}</p>
-                        {core.headline ? <p>{core.headline}</p> : null}
-                        {core.bio ? <p className="line-clamp-2 text-slate-600">{core.bio}</p> : null}
-                        {core.location_region ? <p className="text-slate-600">{core.location_region}</p> : null}
-                      </div>
-                      {/* Expertise, Branchen und Arbeitsweise stehen in der
-                          Vorschau rechts - kamen hier aber nicht vor. Wer sie
-                          dort leer sah, fand keinen Ort, sie zu ergaenzen. */}
-                      <dl className="mt-4 grid gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3">
-                        <div>
-                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            {t("profile.publicProfile.identityExpertise")}
-                          </dt>
-                          <dd className="mt-1 text-slate-700">
-                            {core.expertise?.length
-                              ? core.expertise.join(", ")
-                              : t("profile.publicProfile.identityEmpty")}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            {t("profile.publicProfile.identityIndustries")}
-                          </dt>
-                          <dd className="mt-1 text-slate-700">
-                            {core.industries?.length
-                              ? core.industries.join(", ")
-                              : t("profile.publicProfile.identityEmpty")}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            {t("profile.publicProfile.identityWorkFrame")}
-                          </dt>
-                          <dd className="mt-1 text-slate-700">
-                            {core.remote_mode
-                              ? t(`remoteModes.${core.remote_mode as DiscoveryRemoteMode}`)
-                              : t("profile.publicProfile.identityEmpty")}
-                          </dd>
-                        </div>
-                      </dl>
-                    </>
-                  ) : (
-                    <p className="mt-3 text-sm text-amber-900">{t("profile.publicProfile.identityMissing")}</p>
-                  )}
-                  <p className={`${HELP_CLASS} mt-4`}>{t("profile.publicProfile.identityText")}</p>
-                  <SubmitButton
-                    formAction={saveDraftAndLeave.bind(null, "/profile?next=/discovery/profile")}
-                    formNoValidate
-                    intent="identity"
-                    label={t("profile.publicProfile.identityLink")}
-                    pendingLabel={t("profile.publicProfile.identityLinkPending")}
-                    className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
-                  />
-                </div>
               </div>
 
               <div className={INNER_SECTION_CLASS}>

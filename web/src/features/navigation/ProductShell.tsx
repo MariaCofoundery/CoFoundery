@@ -114,6 +114,11 @@ function areaLinkClassName(active: boolean) {
 }
 
 /** Fuer alles, was kein Bereich ist - Profil, Feedback, Konto. */
+/** "Mein Profil": die Lese-Ansicht und alle Bearbeitungsschritte gehoeren zu einem Menuepunkt. */
+function isProfilePath(pathname: string) {
+  return pathname.startsWith("/me/profile") || pathname === "/profile" || pathname.startsWith("/profile/");
+}
+
 function navLinkClassName(active: boolean) {
   // Dieselbe Hervorhebung wie bei den Bereichen: "Ich bin hier" ist dieselbe
   // Aussage, egal ob der Ort ein Bereich oder ein Querschnitt ist. Vorher trug
@@ -736,11 +741,11 @@ export function ProductShell({
                 ) : null}
                 {showProfileShortcut ? (
                   <Link
-                    href="/profile"
-                    aria-current={pathname.startsWith("/profile") ? "page" : undefined}
-                    className={navLinkClassName(pathname.startsWith("/profile"))}
+                    href="/me/profile"
+                    aria-current={isProfilePath(pathname) ? "page" : undefined}
+                    className={navLinkClassName(isProfilePath(pathname))}
                   >
-                    {t("profile")}
+                    {t("myProfile")}
                   </Link>
                 ) : null}
                 <ProductFeedbackEntry
@@ -880,18 +885,11 @@ export function ProductShell({
                 {showProfileShortcut ? (
                   <>
                     <MobileMenuLink
-                      href="/profile"
-                      active={pathname.startsWith("/profile")}
-                      onNavigate={closeMenu}
-                    >
-                      {t("profile")}
-                    </MobileMenuLink>
-                    <MobileMenuLink
                       href="/me/profile"
-                      active={pathname.startsWith("/me/profile")}
+                      active={isProfilePath(pathname)}
                       onNavigate={closeMenu}
                     >
-                      {t("alignOwnProfile")}
+                      {t("myProfile")}
                     </MobileMenuLink>
                   </>
                 ) : null}
@@ -1123,20 +1121,12 @@ function ProfileMenu({
           {!accountOnly ? (
             <>
               <Link
-                href="/profile"
-                onClick={() => setIsOpen(false)}
-                className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
-                role="menuitem"
-              >
-                {t("editProfile")}
-              </Link>
-              <Link
                 href="/me/profile"
                 onClick={() => setIsOpen(false)}
                 className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
                 role="menuitem"
               >
-                {t("alignOwnProfile")}
+                {t("myProfile")}
               </Link>
             </>
           ) : null}

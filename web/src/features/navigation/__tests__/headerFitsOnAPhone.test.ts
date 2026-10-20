@@ -141,7 +141,7 @@ test("hinter dem Knopf liegt alles, was in der Reihe stand", () => {
 
   assert.match(menu, /navigationItems\.map/, "die Bereiche fehlen");
   assert.match(menu, /item\.subItems/, "die Unterseiten fehlen - sie sind sonst nirgends");
-  for (const href of ["/messages", "/profile", "/account"]) {
+  for (const href of ["/messages", "/me/profile", "/account"]) {
     assert.match(menu, new RegExp(`href="${href}"`), `${href} fehlt im Menü`);
   }
   assert.match(menu, /signOutAction/, "das Abmelden fehlt");
@@ -175,7 +175,7 @@ test("das Postfach hat die Reihe verlängert – und bleibt trotzdem sichtbar", 
   // nehmen war schon einmal die Beschwerde, die es dorthin gebracht hat.
   const shell = codeOnly(SHELL);
   assert.match(shell, /href="\/messages"/);
-  assert.match(shell, /href="\/profile"/);
+  assert.match(shell, /href="\/me\/profile"/);
 });
 
 // ---------------------------------------------------------------------------

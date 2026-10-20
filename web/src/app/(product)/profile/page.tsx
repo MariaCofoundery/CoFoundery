@@ -32,20 +32,13 @@ import {
   isSnapshotStep,
 } from "@/features/capability/capabilityTypes";
 import { hasFounderDiscoveryAccess } from "@/features/discovery/discoveryAccess";
-import { PROFILE_ROLE_OPTIONS, normalizeProfileRoles, type ProfileRole } from "@/features/profile/profileRoles";
+import { normalizeProfileRoles, type ProfileRole } from "@/features/profile/profileRoles";
 import {
-  IDENTITY_THRESHOLDS,
   getIdentityGaps,
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
-import { ANALYZED_AREA_IDS } from "@/features/capability/narrativeAnalysis";
-import { CvImportField } from "@/features/profile/CvImportField";
-import { CV_INDUSTRY_KEYS } from "@/features/profile/cvIndustries";
-import { LinkedInField } from "@/features/profile/LinkedInField";
-import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
+import { IdentityEditor } from "@/features/profile/IdentityEditor";
 import { getPersonCore } from "@/features/profile/personCoreData";
-import { saveIdentityAction } from "@/features/profile/personCoreActions";
-import { ProfilePhotoField } from "@/features/profile/ProfilePhotoField";
 import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
 import { RESOURCE_LABEL_MAX } from "@/features/ai/resourceExtraction";
@@ -149,7 +142,6 @@ const ERROR_KEYS = [
   "photo_save",
 ];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
-const REMOTE_MODES = ["onsite", "hybrid", "remote", "flexible"] as const;
 
 export default async function ProfilePage({
   searchParams,
@@ -650,274 +642,16 @@ export default async function ProfilePage({
           verschiedenen Tabellen, und ein Formular in einem Formular gibt es
           in HTML nicht. */}
       {step === "identity" ? (
-        <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
-          <ProfilePhotoField
-            displayName={core?.display_name?.trim() || ""}
-            avatarId={basisProfil.avatarId}
-            avatarUrl={basisProfil.avatarUrl}
-            copy={{
-              title: t("identity.photo.title"),
-              help: t("identity.photo.help"),
-              add: t("identity.photo.add"),
-              change: t("identity.photo.change"),
-              chooseIllustration: t("identity.photo.chooseIllustration"),
-              closeIllustrations: t("identity.photo.closeIllustrations"),
-              remove: t("identity.photo.remove"),
-              save: t("identity.photo.save"),
-              pending: t("pending.save"),
-              preview: t("identity.photo.preview"),
-            }}
-          />
-        </section>
-      ) : null}
-
-      {step === "identity" ? (
-        <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
-          {/* Reist mit, damit das Speichern zurueckfuehrt, wo es hergekommen
-              ist - siehe parseIdentityReturnPath fuer die Allowlist. */}
-          {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
-          <div>
-            <h2 className="text-xl font-semibold">{t("identity.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("identity.text")}</p>
-          </div>
-          {/* Was zum Veroeffentlichen noch fehlt, steht dort, wo man es
-              aendert. Vorher stand es nur dort, wo es abgewiesen wurde -
-              man speicherte erfolgreich und scheiterte eine Seite spaeter,
-              ohne zu erfahren, an welcher Angabe. */}
-          {identityGaps.length > 0 && (isConnectMember || hasDiscovery) ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-              <p className="text-sm font-semibold text-amber-900">{t("identity.publishTitle")}</p>
-              <ul className="mt-2 space-y-1 text-sm text-amber-900">
-                {identityGaps.map((gap) => (
-                  <li key={gap}>
-                    · {t(`identity.gaps.${gap}`, { min: IDENTITY_THRESHOLDS[gap] })}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 text-xs leading-5 text-amber-900/80">{t("identity.publishNote")}</p>
-            </div>
-          ) : null}
-          {connectProfile?.status === "active" ? (
-            <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("identity.publishedNote")}</p>
-          ) : null}
-          {/* Das Bild selbst wird im Schritt "Bild" gewaehlt; hier steht die
-              Frage, wer es sehen darf. Sie gehoert zur Identitaet, nicht in
-              einen eigenen Abschnitt - es ist dieselbe Entscheidung wie Name
-              und Headline, nur fuer das Gesicht. */}
-          {/* DREI KLEINE GRUPPEN STATT EINES LANGEN FORMULARS.
-
-              Elf Felder untereinander sind ein Antrag. Die Gruppen beantworten
-              je eine Frage - wer du bist, wo und wie du arbeitest, woran -,
-              und man kann eine davon ausfuellen und aufhoeren.
-
-              `fieldset`/`legend` und nicht `div`/`h3`: Dieselbe Gliederung,
-              die man sieht, hoert auch, wer das Formular vorgelesen bekommt. */}
-          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
-            <legend className="text-sm font-semibold text-slate-900">
-              {t("aboutYou.groups.who")}
-            </legend>
-
-          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
-            <input
-              type="checkbox"
-              name="photo_visible_to_members"
-              value="yes"
-              defaultChecked={core?.photo_visible_to_members ?? false}
-              className="mt-1 h-4 w-4 rounded border-slate-300"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">
-                {t("identity.photoVisibleLabel")}
-              </span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500">
-                {t("identity.photoVisibleHint")}
-              </span>
-            </span>
-          </label>
-
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="text-sm font-medium">
-              {t("identity.name")}
-              <input name="display_name" maxLength={80} defaultValue={core?.display_name ?? ""} className={field} />
-            </label>
-            <label className="text-sm font-medium">
-              {t("identity.headline")}
-              <input name="headline" maxLength={160} defaultValue={core?.headline ?? ""} className={field} />
-              <span className={hint}>{t("identity.headlineHint")}</span>
-            </label>
-          </div>
-          <label className="block text-sm font-medium">
-            {t("identity.bio")}
-            <textarea name="bio" rows={4} maxLength={1200} defaultValue={core?.bio ?? ""} className={field} />
-            <span className={hint}>{t("identity.bioHint")}</span>
-          </label>
-          </fieldset>
-
-          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
-            <legend className="text-sm font-semibold text-slate-900">
-              {t("aboutYou.groups.where")}
-            </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="text-sm font-medium">
-              {t("identity.region")}
-              <input name="location_region" maxLength={120} defaultValue={core?.location_region ?? ""} className={field} />
-              <span className={hint}>{t("identity.regionHint")}</span>
-            </label>
-            <label className="text-sm font-medium">
-              {t("identity.remote")}
-              <select name="remote_mode" defaultValue={core?.remote_mode ?? ""} className={field}>
-                <option value="">{t("identity.remoteUnset")}</option>
-                {REMOTE_MODES.map((mode) => (
-                  <option key={mode} value={mode}>
-                    {t(`remoteModes.${mode}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          </fieldset>
-
-          <fieldset className="space-y-5 border-t border-slate-200 pt-5">
-            <legend className="text-sm font-semibold text-slate-900">
-              {t("aboutYou.groups.what")}
-            </legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="text-sm font-medium">
-              {t("identity.expertise")}
-              <input name="expertise" defaultValue={(core?.expertise ?? []).join(", ")} className={field} />
-              <span className={hint}>{t("identity.expertiseHint", { max: 8 })}</span>
-            </label>
-            <label className="text-sm font-medium">
-              {t("identity.industries")}
-              <input name="industries" defaultValue={(core?.industries ?? []).join(", ")} className={field} />
-              <span className={hint}>{t("identity.industriesHint", { max: 5 })}</span>
-            </label>
-          </div>
-
-          {/* Direkt unter den beiden Feldern, die es fuellt - und eingeklappt,
-              weil es eine Abkuerzung ist und kein Schritt. Wer die Felder
-              lieber selbst ausfuellt, soll nicht daran vorbei muessen.
-
-              Die Beschriftungen werden hier aufgeloest, weil CvImportField
-              eine Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
-              nicht ueber die Grenze reichen. */}
-          <CvImportField
-            expertiseLabels={Object.fromEntries(
-              ANALYZED_AREA_IDS.map((areaId) => [areaId, t(`areaLabels.${areaId}`)])
-            )}
-            industryLabels={Object.fromEntries(
-              CV_INDUSTRY_KEYS.map((key) => [key, t(`industryLabels.${key}`)])
-            )}
-            copy={{
-              title: t("identity.cv.title"),
-              betaBadge: t("identity.cv.betaBadge"),
-              betaNote: t("identity.cv.betaNote"),
-              text: t("identity.cv.text"),
-              privacyNote: t("identity.cv.privacyNote"),
-              textareaLabel: t("identity.cv.textareaLabel"),
-              placeholder: t("identity.cv.placeholder"),
-              fileLabel: t("identity.cv.fileLabel"),
-              analyze: t("identity.cv.analyze"),
-              tooShort: t("identity.cv.tooShort"),
-              nothingFound: t("identity.cv.nothingFound"),
-              nothingFoundHint: t("identity.cv.nothingFoundHint"),
-              expertiseTitle: t("identity.cv.expertiseTitle"),
-              industriesTitle: t("identity.cv.industriesTitle"),
-              because: t("identity.cv.because"),
-              apply: t("identity.cv.apply"),
-              applied: t("identity.cv.applied"),
-              clear: t("identity.cv.clear"),
-              chosenCount: t("identity.cv.chosenCount"),
-              fileUnsupported: t("identity.cv.fileUnsupported"),
-            }}
-          />
-          </fieldset>
-
-          {/* Das LinkedIn-Profil steht hier und nicht in einem eigenen
-              Bereich: Es ist dieselbe Art Angabe wie Name und Headline - eine
-              Eigenschaft des Menschen, nicht eines Produktbereichs. Deshalb
-              wird sie einmal eingetragen und gilt ueberall.
-
-              Die Texte werden hier aufgeloest, weil LinkedInField eine
-              Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
-              nicht als Prop ueber die Grenze reichen - das hat in dieser
-              Codebasis schon zweimal die Produktion lahmgelegt. */}
-          <LinkedInField
-            initialUrl={core?.linkedin_url ?? ""}
-            initialVisibility={
-              isLinkedInVisibility(core?.linkedin_visibility) ? core.linkedin_visibility : "private"
-            }
-            copy={{
-              title: t("identity.linkedin.title"),
-              urlLabel: t("identity.linkedin.urlLabel"),
-              urlPlaceholder: t("identity.linkedin.urlPlaceholder"),
-              urlHint: t("identity.linkedin.urlHint"),
-              urlInvalid: t("identity.linkedin.urlInvalid"),
-              visibilityTitle: t("identity.linkedin.visibilityTitle"),
-              options: {
-                private: {
-                  label: t("identity.linkedin.options.private.label"),
-                  hint: t("identity.linkedin.options.private.hint"),
-                },
-                contacts: {
-                  label: t("identity.linkedin.options.contacts.label"),
-                  hint: t("identity.linkedin.options.contacts.hint"),
-                },
-                members: {
-                  label: t("identity.linkedin.options.members.label"),
-                  hint: t("identity.linkedin.options.members.hint"),
-                },
-                public: {
-                  label: t("identity.linkedin.options.public.label"),
-                  hint: t("identity.linkedin.options.public.hint"),
-                },
-              },
-              publicWarning: t("identity.linkedin.publicWarning"),
-              publicConfirm: t("identity.linkedin.publicConfirm"),
-            }}
-          />
-          {/* Rollen sind eine Navigationsangabe, keine Berechtigung: Wer
-              "Advisor" anhakt, sieht das Advisor-Dashboard - was darauf steht,
-              entscheidet weiterhin RLS ueber advisor_user_id. Deshalb darf das
-              hier aenderbar sein.
-
-              Nur sichtbar fuer Menschen, die schon eine dieser Rollen haben.
-              Einem Connect-Konto hier "Founder" anzubieten waere eine
-              Selbstfreischaltung ins Founder-Produkt und damit eine
-              Produktentscheidung, nicht ein Formularfeld. */}
-          {currentRoles.length > 0 ? (
-            <fieldset>
-              <legend className="text-sm font-medium">{t("identity.rolesLegend")}</legend>
-              <p className={hint}>{t("identity.rolesHint")}</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {PROFILE_ROLE_OPTIONS.map((role) => (
-                  <label
-                    key={role}
-                    className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      name="roles"
-                      value={role}
-                      defaultChecked={currentRoles.includes(role)}
-                    />
-                    {t(`identity.roles.${role}`)}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-3">
-            <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
-            {/* Der Weg zurueck, wenn Connect oder Discovery hierher geschickt
-                hat. Ohne ihn war die Identitaetsseite eine Sackgasse. */}
-            {returnPath ? (
-              <Link href={returnPath} className={secondary}>
-                {t(`identity.backTo.${returnPath === "/connect/profile" ? "connect" : "discovery"}`)}
-              </Link>
-            ) : null}
-          </div>
-        </form>
+        <IdentityEditor
+          core={core}
+          currentRoles={currentRoles}
+          returnPath={returnPath}
+          identityGaps={identityGaps}
+          showGaps={isConnectMember || hasDiscovery}
+          connectActive={connectProfile?.status === "active"}
+          avatarId={basisProfil.avatarId ?? null}
+          avatarUrl={basisProfil.avatarUrl ?? null}
+        />
       ) : null}
 
       {/* SO SIEHT ES AUS. Dieselbe Darstellung wie auf „Das bist du" - wer

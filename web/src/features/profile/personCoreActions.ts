@@ -79,8 +79,13 @@ export async function saveIdentityAction(formData: FormData) {
   // ist die Startansicht die Uebersicht - ohne den Schritt kaeme man nach dem
   // Speichern weder beim Formular noch bei dem Ergebnis an, und der Rueckweg
   // nach Connect oder FIND waere verschwunden.
+  // `inline`: Das Formular stand auf FIND oder Connect (eingebettet) - dann geht es
+  // dorthin zurueck, nicht ueber `/profile`. Nur mit einem erlaubten Rueckweg.
+  const inline = returnPath !== null && formData.get("inline") === "1";
   const back = (query: string) =>
-    `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+    inline
+      ? `${returnPath}?${query}`
+      : `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
 
   if (!linkedin.ok) {
     redirect(back("error=linkedin"));
@@ -140,9 +145,10 @@ export async function saveIdentityAction(formData: FormData) {
     redirect(back(`error=${published ? "published_incomplete" : "save"}`));
   }
 
-  await saveRoles(client, user.id, formData, returnPath);
+  await saveRoles(client, user.id, formData, returnPath, inline);
 
   revalidatePath("/profile");
+  if (returnPath) revalidatePath(returnPath);
   // Der Rueckweg wird nicht automatisch genommen. Wer von Connect kommt, hat
   // hier vielleicht noch mehr vor - der Weg zurueck steht als Knopf da, statt
   // die Person wegzuschicken.
@@ -167,10 +173,13 @@ async function saveRoles(
   client: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   formData: FormData,
-  returnPath: string | null
+  returnPath: string | null,
+  inline = false
 ) {
   const back = (query: string) =>
-    `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
+    inline && returnPath
+      ? `${returnPath}?${query}`
+      : `/profile?step=identity&${query}${returnPath ? `&next=${encodeURIComponent(returnPath)}` : ""}`;
 
   if (!formData.has("roles")) return;
 

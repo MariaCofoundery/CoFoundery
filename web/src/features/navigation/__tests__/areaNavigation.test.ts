@@ -196,5 +196,5 @@ test("auch Profil leuchtet auf, wenn man dort ist", () => {
   assert.doesNotMatch(navLink, /bg-slate-100 text-slate-950/);
 
   // Und der Ort wird weiterhin auch vorgelesen, nicht nur gefaerbt.
-  assert.match(shell, /href="\/profile"[\s\S]{0,120}aria-current=\{pathname\.startsWith\("\/profile"\) \? "page"/);
+  assert.match(shell, /href="\/me\/profile"[\s\S]{0,120}aria-current=\{isProfilePath\(pathname\) \? "page"/);
 });

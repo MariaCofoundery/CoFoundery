@@ -3,7 +3,13 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { PROFILE_ROLE_OPTIONS } from "@/features/profile/profileRoles";
 
-const source = (path: string) => readFileSync(path, "utf8");
+// Das Identitaetsformular steht seit dem 20.10.2026 in `IdentityEditor` (auch auf FIND und Connect
+// eingebettet); die Profilseite bindet es ein. Beide zusammen sind "die Profilseite".
+const source = (path: string) =>
+  readFileSync(path, "utf8") +
+  (path.replaceAll("\\", "/").endsWith("(product)/profile/page.tsx")
+    ? readFileSync("src/features/profile/IdentityEditor.tsx", "utf8")
+    : "");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
 
 const PAGE = "src/app/(product)/profile/page.tsx";

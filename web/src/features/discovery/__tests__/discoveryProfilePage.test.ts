@@ -95,14 +95,12 @@ test("the preview reads from person_core first", () => {
 
 test("the identity block names everything it actually covers", () => {
   const page = codeOnly(PAGE);
-  // Expertise, Branchen und Arbeitsweise stehen in der Vorschau. Wer sie dort
-  // leer sah, fand vorher keinen Ort, sie zu ergaenzen.
-  for (const key of [
-    "profile.publicProfile.identityExpertise",
-    "profile.publicProfile.identityIndustries",
-    "profile.publicProfile.identityWorkFrame",
-  ]) {
-    assert.ok(page.includes(key), `${key} fehlt im Identitaetsblock`);
+  // Seit dem 20.10.2026 ist der Identitaetsblock der eingebettete Editor: Expertise, Branchen und
+  // Arbeitsweise (Remote) sind dort direkt bearbeitbar - kein Umweg mehr ueber /profile.
+  assert.match(page, /<IdentityInlineCard/);
+  const editor = codeOnly("src/features/profile/IdentityEditor.tsx");
+  for (const name of ["expertise", "industries", "remote_mode", "location_region", "headline", "bio"]) {
+    assert.ok(editor.includes(`name="${name}"`), `${name} fehlt im Identitaetseditor`);
   }
 
   const de = readJson("messages/de/discovery.json");
@@ -449,22 +447,22 @@ test("no navigation link sits inside the unsaved form", () => {
   assert.doesNotMatch(form, /<Link\s/, "Wege aus dem Formular speichern erst");
 });
 
-test("the two remaining ways out save the draft first", () => {
+test("the remaining way out saves the draft first", () => {
   const page = codeOnly(PAGE);
   assert.match(page, /async function saveDraftAndLeave\(target: string, formData: FormData\)/);
-  assert.match(page, /saveDraftAndLeave\.bind\(null, "\/profile\?next=\/discovery\/profile"\)/);
+  // Der Weg zur Identitaet ist weg (sie ist eingebettet); es bleibt der zu den Problemen.
+  assert.doesNotMatch(page, /saveDraftAndLeave\.bind\(null, "\/profile\?next/);
   assert.match(page, /saveDraftAndLeave\.bind\(null, "\/connect\/problems"\)/);
 
   // Ohne Pflichtfeldpruefung: Ein Entwurf darf unvollstaendig sein, sonst
   // saesse jemand fest, der "Anderer Schwerpunkt" angekreuzt und den Text
   // noch nicht geschrieben hat.
-  assert.equal((page.match(/formNoValidate/g) ?? []).length, 2);
+  assert.equal((page.match(/formNoValidate/g) ?? []).length, 1);
 
   // Und die Beschriftung sagt, was passiert - statt es zu verschweigen.
   for (const locale of ["de", "en"]) {
     const messages = readJson(`messages/${locale}/discovery.json`);
     const profile = messages.profile as Record<string, Record<string, string>>;
-    assert.match(profile.publicProfile.identityLink, /Speichern und|Save and/);
     assert.match(profile.intent.connectBridgeCta, /Speichern und|Save and/);
   }
 });

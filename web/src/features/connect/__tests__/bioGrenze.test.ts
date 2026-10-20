@@ -7,7 +7,13 @@ import { CONNECT_BIO_MAX } from "@/features/connect/connectTypes";
 import { parseConnectProfile } from "@/features/connect/connectValidation";
 import { DISCOVERY_TEXT_LIMITS } from "@/features/discovery/discoveryConfig";
 
-const source = (path: string) => readFileSync(path, "utf8");
+// Das Identitaetsformular steht seit dem 20.10.2026 in `IdentityEditor` (auch auf FIND und Connect
+// eingebettet); die Profilseite bindet es ein. Beide zusammen sind "die Profilseite".
+const source = (path: string) =>
+  readFileSync(path, "utf8") +
+  (path.replaceAll("\\", "/").endsWith("(product)/profile/page.tsx")
+    ? readFileSync("src/features/profile/IdentityEditor.tsx", "utf8")
+    : "");
 
 /**
  * Die Bio wird nirgends mehr gekürzt.

@@ -100,6 +100,12 @@
       "remove": "Remove photo",
       "save": "Save photo",
       "preview": "Here's how it looks"
+    },
+    "inline": {
+      "title": "From your profile",
+      "text": "You maintain this once – it applies to Align, Find and Connect. You can change it right here.",
+      "edit": "Edit details",
+      "empty": "Nothing entered yet."
     }
   },
   "steps": {

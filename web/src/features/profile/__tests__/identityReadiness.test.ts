@@ -9,7 +9,13 @@ import {
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
 
-const source = (path: string) => readFileSync(path, "utf8");
+// Das Identitaetsformular steht seit dem 20.10.2026 in `IdentityEditor` (auch auf FIND und Connect
+// eingebettet); die Profilseite bindet es ein. Beide zusammen sind "die Profilseite".
+const source = (path: string) =>
+  readFileSync(path, "utf8") +
+  (path.replaceAll("\\", "/").endsWith("(product)/profile/page.tsx")
+    ? readFileSync("src/features/profile/IdentityEditor.tsx", "utf8")
+    : "");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
 
 const core = (over: Partial<{ display_name: string; headline: string; bio: string }> = {}) => ({
@@ -106,7 +112,8 @@ test("the profile page names the gaps where the fields are edited", () => {
   assert.match(page, /getIdentityGaps\(core\)/);
   assert.match(page, /identity\.gaps\.\$\{gap\}/);
   // Nur fuer Menschen, die ueberhaupt irgendwo veroeffentlichen.
-  assert.match(page, /identityGaps\.length > 0 && \(isConnectMember \|\| hasDiscovery\)/);
+  assert.match(page, /identityGaps\.length > 0 && showGaps/);
+  assert.match(page, /showGaps=\{isConnectMember \|\| hasDiscovery\}/);
 });
 
 test("saving from a context page offers the way back", () => {
@@ -124,16 +131,15 @@ test("saving from a context page offers the way back", () => {
 });
 
 test("both context pages hand over the return path", () => {
+  // Seit dem 20.10.2026 binden beide Seiten den Identitaets-Editor direkt ein (`inline`): Speichern fuehrt
+  // auf dieselbe Seite zurueck. Der Rueckweg bleibt auf die beiden erlaubten Pfade begrenzt.
   assert.match(
     source("src/app/(product)/connect/profile/page.tsx"),
-    /href="\/profile\?next=\/connect\/profile"/
+    /<IdentityInlineCard[^>]*returnPath="\/connect\/profile"/
   );
-  // In Discovery steht das Ziel in einer gebundenen Aktion statt in einem
-  // href: Der Weg dorthin speichert erst den Entwurf, weil ein Link mitten im
-  // Formular alles Ungespeicherte verworfen hat.
   assert.match(
     source("src/app/(product)/discovery/profile/page.tsx"),
-    /"\/profile\?next=\/discovery\/profile"/
+    /<IdentityInlineCard[^>]*returnPath="\/discovery\/profile"/
   );
 });
 
@@ -200,16 +206,16 @@ test("the profile is in the navigation bar, not only behind the avatar", () => {
   // Bereichen. Es ist ein Querschnitt, kein Ort.
   // Der Eintrag in der Kopfzeile traegt navLinkClassName; der zweite Treffer
   // auf /profile ist das Menue hinter dem Bild, das es immer gab.
-  const navLinks = shell.match(/href="\/profile"[\s\S]{0,200}?navLinkClassName/g) ?? [];
+  const navLinks = shell.match(/href="\/me\/profile"[\s\S]{0,200}?navLinkClassName/g) ?? [];
   assert.equal(navLinks.length, 1, "genau ein sichtbarer Eintrag in der Kopfzeile");
   assert.doesNotMatch(
     shell,
-    /href="\/profile"[\s\S]{0,120}areaLinkClassName/,
+    /href="\/me\/profile"[\s\S]{0,120}areaLinkClassName/,
     "aber nicht in der Bereichsleiste"
   );
 
   for (const locale of ["de", "en"]) {
     const navigation = readJson(`messages/${locale}/navigation.json`) as Record<string, string>;
-    assert.ok(navigation.profile, `${locale}: navigation.profile fehlt`);
+    assert.ok(navigation.myProfile, `${locale}: navigation.myProfile fehlt`);
   }
 });

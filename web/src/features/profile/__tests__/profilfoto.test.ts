@@ -3,7 +3,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
-const source = (path: string) => readFileSync(path, "utf8");
+// Das Identitaetsformular steht seit dem 20.10.2026 in `IdentityEditor` (auch auf FIND und Connect
+// eingebettet); die Profilseite bindet es ein. Beide zusammen sind "die Profilseite".
+const source = (path: string) =>
+  readFileSync(path, "utf8") +
+  (path.replaceAll("\\", "/").endsWith("(product)/profile/page.tsx")
+    ? readFileSync("src/features/profile/IdentityEditor.tsx", "utf8")
+    : "");
 const codeOnly = (path: string) =>
   source(path)
     .replace(/\/\*[\s\S]*?\*\//g, " ")
@@ -92,7 +98,9 @@ test("geaendert wird an einer Stelle - und dort steht auch das Bild", () => {
   const ueberDich = codeOnly(UEBER_DICH);
   assert.match(ueberDich, /<ProfilePhotoField/);
   // Beim Schritt, bei dem die anderen Basisangaben stehen.
-  assert.match(ueberDich, /\{step === "identity" \? \(\s*<section[\s\S]{0,200}<ProfilePhotoField/);
+  // Die Seite bindet den Identitaets-Editor ein, in dem Bild und Formular zusammen stehen.
+  assert.match(ueberDich, /\{step === "identity" \? \(\s*<IdentityEditor/);
+  assert.match(codeOnly(join("src", "features", "profile", "IdentityEditor.tsx")), /<section[\s\S]{0,200}<ProfilePhotoField/);
 
   // „Das bist du" und die Druckfassung LESEN nur.
   for (const datei of [DAS_BIST_DU, DRUCK]) {

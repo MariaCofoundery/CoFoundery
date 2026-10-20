@@ -7,6 +7,7 @@ import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_REACH_MAX, CONNECT_REACH_MIN, CONNECT_ROLES } from "@/features/connect/connectTypes";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectPhotoField } from "@/features/connect/ConnectPhotoField";
 import { connectPhotoUrl } from "@/features/connect/ConnectAvatar";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
@@ -45,27 +46,11 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
     {params.returned === "1" ? <p role="status" className="my-4 rounded-xl bg-slate-50 p-4">{t("lifecycle.returnHint")}</p> : null}
     {saved ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
     {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
+    {/* Die Identitaet (Name, Headline, Bio, Ort, ...) steht einmal im Profil und ist hier direkt bearbeitbar -
+        ausserhalb dieses Formulars, weil Formulare sich nicht verschachteln lassen. */}
+    <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} showPhoto={false} />
     <form action={saveConnectProfileAction} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
       {continuation ? <input type="hidden" name="next" value={continuation} /> : null}
-      {/* Identitaet wird zentral auf /profile gepflegt und von dort verteilt.
-          Diese Seite entscheidet nur noch das Kontextspezifische: Rollen, Foto
-          und Sichtbarkeit. */}
-      <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-        <h2 className="text-sm font-semibold">{t("beta.identity")}</h2>
-        {core?.display_name ? (
-          <div className="mt-3 space-y-1 text-sm text-slate-700">
-            <p className="font-medium">{core.display_name}</p>
-            {core.headline ? <p>{core.headline}</p> : null}
-            {core.bio ? <p className="line-clamp-2 text-slate-600">{core.bio}</p> : null}
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-amber-900">{t("profile.identityMissing")}</p>
-        )}
-        <p className={hint}>{t("profile.identityText")}</p>
-        <Link href="/profile?next=/connect/profile" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">
-          {t("profile.identityLink")}
-        </Link>
-      </section>
       <ConnectPhotoField
         displayName={profile?.display_name || baseProfile?.display_name || ""}
         currentAvatarId={profile?.photo_avatar_id}

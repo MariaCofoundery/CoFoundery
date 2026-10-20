@@ -47,7 +47,10 @@ test("profile menu keeps Connect identity separate and exposes Account for every
   // Der Eintrag verzweigt nicht mehr nach Rolle: /profile gilt fuer jeden
   // registrierten Menschen, weil jeder eine person_core-Zeile hat. Das ist
   // eine Vereinfachung gegenueber der frueheren Connect-Sonderbehandlung.
-  assert.match(shell, /href="\/profile"/);
+  // GEAENDERT am 20.10.2026: EIN Eintrag "Mein Profil" (Ansicht mit direkt bearbeitbaren Abschnitten)
+  // statt zwei ("Profil bearbeiten" und "Das bist du").
+  assert.match(shell, /href="\/me\/profile"/);
+  assert.doesNotMatch(shell, /href="\/profile"/);
   assert.doesNotMatch(shell, /connectOnly \? "\/connect\/profile"/);
   // Connect-only-Nutzer erreichen ihr Connect-Profil weiterhin - von /profile
   // aus, wo Sichtbarkeit und Rollen entschieden werden.

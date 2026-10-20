@@ -83,14 +83,15 @@ test("beide Seiten sind ohne Founder-Rolle erreichbar", () => {
   // an demselben Zugang, den `/profile` heute schon hat, und NICHT an
   // `hasFounder`.
   const kontomenue = shell.slice(shell.indexOf("{!accountOnly ? ("));
-  assert.match(kontomenue, /href="\/profile"/);
+  // GEAENDERT am 20.10.2026: ein Eintrag "Mein Profil" statt zwei.
+  assert.doesNotMatch(kontomenue, /href="\/profile"/);
   assert.match(kontomenue, /href="\/me\/profile"/);
 
   const mobil = shell.slice(
     shell.indexOf("{!isSuspendedConnectOnly ? ("),
     shell.indexOf('<MobileMenuLink href="/account"'),
   );
-  assert.match(mobil, /href="\/profile"/);
+  assert.doesNotMatch(mobil, /href="\/profile"/);
   assert.match(mobil, /href="\/me\/profile"/);
 });
 

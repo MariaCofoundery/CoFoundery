@@ -301,9 +301,9 @@ test("the Connect profile page no longer maintains identity itself", () => {
   assert.match(page, /name="network_roles"/);
   assert.match(page, /ConnectVisibilityField/);
   assert.match(page, /ConnectPhotoField/);
-  // Und ein Weg zum einen Ort - mit Rueckweg, sonst ist die Identitaetsseite
-  // von hier aus eine Sackgasse.
-  assert.match(page, /href="\/profile\?next=\/connect\/profile"/);
+  // Seit dem 20.10.2026 steht die Identitaet direkt bearbeitbar auf der Seite (eingebettet, ausserhalb
+  // des Connect-Formulars): derselbe Editor, Speichern bleibt hier - kein Umweg ueber /profile.
+  assert.match(page, /<IdentityInlineCard[^>]*returnPath="\/connect\/profile"/);
 
   // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
   assert.match(validation, /parseConnectProfile\(formData: FormData, identity: ConnectIdentitySource \| null\)/);
@@ -322,9 +322,9 @@ test("the Discovery profile page no longer maintains identity either", () => {
   for (const kept of ["ownRoles", "seekingRoles", "availabilityHoursPerWeek", "commitmentLevel", "ventureStage", "ventureGoal", "searchIntent", "startHorizon"]) {
     assert.match(page, new RegExp(`name="${kept}"`), `${kept} gehoert hierher und fehlt`);
   }
-  // Der Rueckweg wird uebergeben - seit die Wege aus dem Formular erst
-  // speichern, steht das Ziel in der gebundenen Aktion statt in einem href.
-  assert.match(page, /"\/profile\?next=\/discovery\/profile"/);
+  // Seit dem 20.10.2026 steht die Identitaet direkt bearbeitbar auf der Seite (eingebettet, ausserhalb
+  // des Formulars) - Speichern fuehrt hierher zurueck.
+  assert.match(page, /<IdentityInlineCard[\s\S]{0,160}returnPath="\/discovery\/profile"/);
 
   // Der Parser bekommt die Identitaet, statt sie aus dem Formular zu lesen.
   assert.match(actions, /parseDiscoveryProfileFormData\(\s*formData: FormData,\s*identity: PersonCore \| null/);
@@ -346,7 +346,9 @@ test("/profile is reachable from the dashboard and the account menu", () => {
   const dashboard = source("src/app/(product)/dashboard/page.tsx");
   const shell = source("src/features/navigation/ProductShell.tsx");
 
-  assert.match(shell, /href="\/profile"/, "das Kontomenue muss dorthin fuehren");
+  // GEAENDERT am 20.10.2026: das Kontomenue fuehrt mit EINEM Eintrag zu "Mein Profil"; die Bearbeitungsschritte
+  // von /profile sind von dort aus erreichbar.
+  assert.match(shell, /href="\/me\/profile"/, "das Kontomenue muss dorthin fuehren");
   // Die Profilangaben stehen im Menue, nicht mehr auf der Startseite.
   assert.doesNotMatch(dashboard, /href="\/profile"/);
 
