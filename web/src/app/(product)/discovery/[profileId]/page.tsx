@@ -403,13 +403,13 @@ export default async function DiscoveryProfileDetailPage({
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
         {/* 1. PERSON - wer ist das? */}
-        <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
-          <Link href="/discovery" className="text-sm font-medium text-slate-500 hover:text-slate-900">
+        <header className="brand-panel rounded-[28px] p-6 sm:p-8">
+          <Link href="/discovery" className="inline-flex min-h-11 items-center text-sm font-semibold text-white hover:underline">
             {t("common.backToDiscovery")}
           </Link>
           <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">
                 {t("detail.eyebrow")}
               </p>
               {/* Das Bild, wenn diese Person es fuer Mitglieder freigegeben
@@ -418,17 +418,17 @@ export default async function DiscoveryProfileDetailPage({
                 displayName={profile.displayName}
                 avatarId={memberPhoto?.avatarId}
                 imageUrl={memberPhoto?.avatarUrl}
-                className="mt-4 h-20 w-20 rounded-full object-cover"
-                fallbackClassName="mt-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-950 text-lg font-semibold text-white"
+                className="mt-4 h-20 w-20 rounded-full object-cover ring-2 ring-white"
+                fallbackClassName="mt-4 flex h-20 w-20 items-center justify-center rounded-full bg-violet-700 text-lg font-semibold text-white ring-2 ring-white"
               />
-              <h1 className="mt-3 break-words text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-5xl">
+              <h1 className="mt-3 break-words text-3xl font-semibold tracking-[-0.04em] md:text-5xl">
                 {name}
               </h1>
-              <p className="mt-3 max-w-3xl text-xl font-semibold leading-8 text-slate-900">
+              <p className="mt-3 max-w-3xl text-xl font-semibold leading-8 text-white">
                 {formatText(profile.headline, t)}
               </p>
               {profile.bio.trim() ? (
-                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-7 text-slate-700">{profile.bio}</p>
+                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-7 text-white">{profile.bio}</p>
               ) : null}
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
                 {profile.locationRegion ? (
@@ -442,7 +442,7 @@ export default async function DiscoveryProfileDetailPage({
               </div>
             </div>
             {isOwner ? (
-              <Link href="/discovery/profile" className={PRIMARY_CTA_CLASS}>
+              <Link href="/discovery/profile" className={SECONDARY_CTA_CLASS}>
                 {t("detail.editOwn")}
               </Link>
             ) : (
