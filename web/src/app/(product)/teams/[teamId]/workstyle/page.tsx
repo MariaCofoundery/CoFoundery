@@ -15,7 +15,9 @@ import { getTranslations } from "next-intl/server";
 import { getRequestLocale as getLocale } from "@/i18n/getLocale";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 import { TeamReadinessPanel } from "@/features/reporting/workstyle/TeamReadinessPanel";
-import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
+import { getTeamLabel } from "@/features/teams/TeamPageHeader";
+import { TeamComparisonHeader } from "@/features/teams/TeamComparisonHeader";
+import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const t = await getTranslations("report.workstyle");
@@ -51,10 +53,11 @@ export default async function Page({
   if (query.snapshot && (!snapshot || snapshot.input.team_id !== teamId))
     notFound();
   const team = snapshot?.input ?? current;
-  const [t, locale, teamLabel] = await Promise.all([
+  const [t, locale, teamLabel, teamBase] = await Promise.all([
     getTranslations("report.workstyle"),
     getLocale(),
     membership ? getTeamLabel(client, teamId) : Promise.resolve(null),
+    membership ? getFounderTeamHomebase(teamId, user.id, client).catch(() => null) : Promise.resolve(null),
   ]);
   // Ausfuehrliche Fassung: alle Einzelantworten aufgeklappt und im Druck enthalten.
   const full = query.ansicht === "ausfuehrlich";
@@ -119,9 +122,16 @@ export default async function Page({
   return (
     <main className="ws-report mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6">
       {membership ? (
-        <TeamPageHeader teamId={teamId} active="workstyle" title={t("teamTitle")} teamLabel={teamLabel}>
+        <TeamComparisonHeader
+          teamId={teamId}
+          teamLabel={teamLabel}
+          title={t("teamTitle")}
+          active="workstyle"
+          members={teamBase?.members ?? []}
+          allShared={team !== "not_ready"}
+        >
           {actions}
-        </TeamPageHeader>
+        </TeamComparisonHeader>
       ) : (
         <header>
           {/* Advisors erreichen den Bericht ueber ihre eigene Freigabe; keine Teamnavigation. */}

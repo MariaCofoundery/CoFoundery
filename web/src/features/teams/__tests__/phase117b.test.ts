@@ -130,11 +130,21 @@ test("Navigation: Teamseiten ohne Brotkrume und ohne „Zum Team“, ruhige Reit
   const header = code("src/features/teams/TeamPageHeader.tsx");
   assert.match(header, /href="\/connections"/);
   assert.match(header, /ws-no-print/);
-  for (const page of ["workstyle", "roles", "setup"]) {
+  for (const page of ["roles", "setup"]) {
     const p = code(`src/app/(product)/teams/[teamId]/${page}/page.tsx`);
     assert.match(p, /<TeamPageHeader/, page);
     assert.doesNotMatch(p, /backToTeam|backToCollaboration|Zum Team/, page);
   }
+  // Seit 21.10.2026 tragen die drei Vergleichsseiten (Arbeitsweise, Venture
+  // Alignment, Werte & Zielkonflikte) den Vergleichskopf: Zurueck zum Team,
+  // Status und die vier Ansichten als Reiter.
+  for (const page of ["workstyle", "vorhaben-beta", "zielkonflikte"]) {
+    const p = code(`src/app/(product)/teams/[teamId]/${page}/page.tsx`);
+    assert.match(p, /<TeamComparisonHeader/, page);
+  }
+  const comparison = code("src/features/teams/TeamComparisonHeader.tsx");
+  assert.match(comparison, /ws-no-print/);
+  assert.match(comparison, /vorhaben-beta[\s\S]*workstyle[\s\S]*zielkonflikte[\s\S]*setup/);
   assert.match(code("src/app/(product)/teams/[teamId]/page.tsx"), /<TeamPageHeader/);
 });
 
@@ -161,7 +171,6 @@ test("11.7B.1: Fähigkeiten teamgenau, Widerruf schlägt Bestand", () => {
 test("11.7B.1: alle Teamseiten nutzen den gemeinsamen Teamkopf ohne alte Rückwege", () => {
   for (const page of [
     "src/app/(product)/teams/[teamId]/page.tsx",
-    "src/app/(product)/teams/[teamId]/workstyle/page.tsx",
     "src/app/(product)/teams/[teamId]/roles/page.tsx",
     "src/app/(product)/teams/[teamId]/setup/page.tsx",
     "src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx",

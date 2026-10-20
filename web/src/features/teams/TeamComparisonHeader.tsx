@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import type { FounderTeamMemberSummary } from "@/features/teams/founderTeamHomebaseModel";
 
-type Active = "venture" | "tradeoffs";
+type Active = "venture" | "workstyle" | "tradeoffs";
 
 /**
  * Kopf der Vergleichsseiten im Team (Venture Alignment, Werte & Zielkonflikte).
@@ -15,7 +15,8 @@ type Active = "venture" | "tradeoffs";
  * Datenbank liefert ihn nur dann, und zwar erst, wenn alle aktuellen Mitglieder
  * abgegeben und geteilt haben.
  *
- * Nichts davon erscheint im Druck.
+ * Im Druck bleibt nur die Zeile mit dem Titel stehen - Zurueck-Link, Status
+ * und Reiter nicht.
  */
 export async function TeamComparisonHeader({
   teamId,
@@ -25,6 +26,7 @@ export async function TeamComparisonHeader({
   members,
   allShared,
   badge,
+  children,
 }: {
   teamId: string;
   teamLabel: string | null;
@@ -34,20 +36,22 @@ export async function TeamComparisonHeader({
   allShared: boolean;
   /** „Beta": steht neben der Zeile ueber dem Titel. */
   badge?: string;
+  /** Aktionen direkt unter den Reitern (PDF, ausfuehrliche Fassung ...). */
+  children?: React.ReactNode;
 }) {
   const t = await getTranslations("teams.comparison");
   const id = encodeURIComponent(teamId);
   const tabs: { key: string; href: string; active: boolean }[] = [
     { key: "venture", href: `/teams/${id}/vorhaben-beta`, active: active === "venture" },
-    { key: "workstyle", href: `/teams/${id}/workstyle`, active: false },
+    { key: "workstyle", href: `/teams/${id}/workstyle`, active: active === "workstyle" },
     { key: "tradeoffs", href: `/teams/${id}/zielkonflikte`, active: active === "tradeoffs" },
     { key: "setup", href: `/teams/${id}/setup`, active: false },
   ];
   return (
-    <header className="ws-no-print">
+    <header>
       <Link
         href={`/teams/${id}`}
-        className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+        className="ws-no-print inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
       >
         ← {t("back")}
       </Link>
@@ -63,7 +67,7 @@ export async function TeamComparisonHeader({
           <h1 className="mt-1 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
         </div>
         {allShared && members.length > 0 ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+          <div className="ws-no-print flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
             <ul className="flex -space-x-2">
               {members.map((member, index) => (
                 <li key={member.userId}>
@@ -85,7 +89,7 @@ export async function TeamComparisonHeader({
           </div>
         ) : null}
       </div>
-      <nav aria-label={t("tabsLabel")} className="-mx-4 mt-5 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:px-0">
+      <nav aria-label={t("tabsLabel")} className="ws-no-print -mx-4 mt-5 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:px-0">
         <ul className="flex min-w-max items-end gap-1">
           {tabs.map((tab) => (
             <li key={tab.key}>
@@ -104,6 +108,7 @@ export async function TeamComparisonHeader({
           ))}
         </ul>
       </nav>
+      {children ? <div className="ws-no-print mt-4 flex flex-wrap items-center gap-3">{children}</div> : null}
     </header>
   );
 }
