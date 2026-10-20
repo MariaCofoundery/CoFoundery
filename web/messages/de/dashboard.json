@@ -797,10 +797,25 @@
     }
   },
   "areas": {
-    "title": "Noch nicht das ganze Team?",
-    "text": "Mit Find findest du passende Mitgründer:innen, mit Connect teilst du Probleme und knüpfst Kontakte. Beides bleibt freiwillig und getrennt von deinem Team.",
-    "find": "Find öffnen",
-    "connect": "Connect öffnen"
+    "title": "Das kannst du auch",
+    "lead": "Bereiche, die du noch nicht nutzt. Alles bleibt freiwillig und getrennt von deinem Team.",
+    "cards": {
+      "find": {
+        "title": "Find",
+        "text": "Mitgründer:innen finden – du sagst, was du suchst und mitbringst.",
+        "cta": "Find öffnen"
+      },
+      "connect": {
+        "title": "Connect",
+        "text": "Netzwerk: Expertise, Angebote und Probleme teilen.",
+        "cta": "Connect öffnen"
+      },
+      "advisor": {
+        "title": "Gründende begleiten",
+        "text": "Als Advisor – allein oder in einer Organisation wie einem Accelerator.",
+        "cta": "Rolle ergänzen"
+      }
+    }
   },
   "teamCard": {
     "title": "Dein Team",

@@ -797,10 +797,25 @@
     }
   },
   "areas": {
-    "title": "Not the whole team yet?",
-    "text": "With Find you find suitable co-founders, with Connect you share problems and make contacts. Both stay optional and separate from your team.",
-    "find": "Open Find",
-    "connect": "Open Connect"
+    "title": "You can also",
+    "lead": "Areas you are not using yet. Everything stays voluntary and separate from your team.",
+    "cards": {
+      "find": {
+        "title": "Find",
+        "text": "Find co-founders – you say what you are looking for and what you bring.",
+        "cta": "Open Find"
+      },
+      "connect": {
+        "title": "Connect",
+        "text": "Network: share expertise, offers and problems.",
+        "cta": "Open Connect"
+      },
+      "advisor": {
+        "title": "Support founders",
+        "text": "As an advisor – alone or in an organization such as an accelerator.",
+        "cta": "Add the role"
+      }
+    }
   },
   "teamCard": {
     "title": "Your team",

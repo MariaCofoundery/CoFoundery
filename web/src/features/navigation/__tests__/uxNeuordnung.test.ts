@@ -69,7 +69,7 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
 
 test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find und Connect - ohne Prozent", () => {
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
-  assert.match(dashboard, /className="brand-panel flex /);
+  assert.match(dashboard, /className="brand-panel (relative )?flex /);
   // Das Zitat steht leise ueber der Ueberschrift, die Ueberschrift ist gross.
   assert.ok(dashboard.indexOf("<QuoteOfTheDay") < dashboard.indexOf("hero.headline"), "Zitat ueber der Ueberschrift");
   assert.match(dashboard, /sm:text-5xl/);

@@ -176,6 +176,11 @@ export default async function DashboardPage({
   const isNetworkMember = await supabase
     .rpc("is_network_member")
     .then(({ data }) => data === true, () => false);
+  // „Das kannst du auch": nur, was noch nicht in Gebrauch ist. Connect zaehlt als
+  // genutzt, sobald es ein eigenes Profil gibt (Mitglied ist jede Founderin automatisch).
+  const hasConnectProfile = await Promise.resolve(
+    supabase.from("network_profiles").select("user_id").eq("user_id", user.id).maybeSingle()
+  ).then(({ data }) => Boolean(data), () => false);
   const versionState = await getDashboardVersionState(user.id);
   const alignState = await getAlignDashboardState(user.id);
 
@@ -400,7 +405,16 @@ export default async function DashboardPage({
         <h1 className="mt-2 max-w-4xl text-[2rem] font-semibold leading-[1.12] tracking-tight text-slate-950 sm:text-5xl">{t("hero.headline")}</h1>
         <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           {/* EINE SACHE AUF EINMAL: der naechste Schritt, danach die Aufgaben - zum Weiterklicken. */}
-          <div id="dashboard-block-tasks" className="brand-panel flex scroll-mt-28 flex-col gap-3 rounded-3xl p-6 sm:p-8">
+          <div id="dashboard-block-tasks" className="brand-panel relative flex scroll-mt-28 flex-col gap-3 overflow-hidden rounded-3xl p-6 sm:p-8">
+            {/* Zarte Grafik: Kreise und eine gestrichelte Linie. Reiner Schmuck. */}
+            <svg aria-hidden="true" viewBox="0 0 400 300" className="pointer-events-none absolute -right-8 -top-5 hidden h-[300px] w-[400px] sm:block print:hidden">
+              <circle cx="300" cy="110" r="120" fill="none" stroke="rgba(255,255,255,.22)" strokeWidth="2" />
+              <circle cx="300" cy="110" r="80" fill="none" stroke="rgba(255,255,255,.28)" strokeWidth="2" />
+              <circle cx="300" cy="110" r="40" fill="rgba(255,255,255,.16)" />
+              <circle cx="215" cy="190" r="14" fill="rgba(255,255,255,.35)" />
+              <circle cx="352" cy="38" r="9" fill="rgba(255,255,255,.3)" />
+              <path d="M215 190 Q260 150 300 110" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2" strokeDasharray="3 6" />
+            </svg>
             <HeroCarousel
               items={heroItems}
               secondary={{ href: "/fragebogen", label: t("hero.allQuestionnaires") }}
@@ -452,7 +466,7 @@ export default async function DashboardPage({
 
       <DashboardDeepen />
 
-      <DashboardAreas hasConnect={isNetworkMember} />
+      <DashboardAreas showFind={!discoveryProfile} showConnect={isNetworkMember && !hasConnectProfile} showAdvisor={!roleViews.hasAdvisor} />
 
       <details id="dashboard-block-connections" className="mb-4 scroll-mt-28 rounded-2xl border border-slate-200 bg-white/80 p-4">
         <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.title")}</summary>

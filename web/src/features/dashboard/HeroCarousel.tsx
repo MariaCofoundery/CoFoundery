@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { IconTile } from "@/features/ui/Icons";
 
 export type HeroItem = {
   key: string;
@@ -35,9 +36,12 @@ export function HeroCarousel({
   const go = (next: number) => setIndex((next + count) % count);
 
   return (
-    <div className="flex flex-1 flex-col gap-3">
+    <div className="relative flex flex-1 flex-col gap-3">
       <div aria-live="polite" className="flex flex-1 flex-col gap-3">
-        <span className="self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{item.eyebrow}</span>
+        <span className="flex items-center gap-3">
+          <IconTile name="check" tone="white" />
+          <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{item.eyebrow}</span>
+        </span>
         <h2 className="text-2xl font-semibold leading-snug sm:text-[1.9rem]">{item.title}</h2>
         <p className="max-w-xl text-sm leading-6 text-white sm:text-base">{item.text}</p>
         <div className="mt-1 flex flex-wrap items-center gap-3">
