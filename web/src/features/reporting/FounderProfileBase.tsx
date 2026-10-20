@@ -24,6 +24,7 @@ export function FounderProfileBase({
   core,
   copy,
   tone = "card",
+  part = "all",
 }: {
   core: PersonCore | null;
   copy: {
@@ -46,13 +47,23 @@ export function FounderProfileBase({
     lessLabel?: string;
   };
   tone?: "card" | "onBrand" | "plain";
+  /**
+   * `bio`: nur der Ueber-mich-Text (Kopf von „Das bist du“). `facts`: nur Ort,
+   * Schwerpunkte und Branchen (Abschnitt „Dein Hintergrund“). Der Kopf blieb
+   * sonst zu voll. `all`: alles, wie auf der Editorseite.
+   */
+  part?: "all" | "bio" | "facts";
 }) {
   const region = [core?.location_region, core?.remote_mode ? copy.remoteMode(core.remote_mode) : null]
     .filter(Boolean)
     .join(" · ");
   const expertise = core?.expertise?.filter((entry) => entry.trim().length > 0) ?? [];
   const industries = core?.industries?.filter((entry) => entry.trim().length > 0) ?? [];
-  const hasAnything = Boolean(core?.bio?.trim()) || region.length > 0 || expertise.length > 0 || industries.length > 0;
+  const showBio = part !== "facts";
+  const showFacts = part !== "bio";
+  const hasAnything =
+    (showBio && Boolean(core?.bio?.trim())) ||
+    (showFacts && (region.length > 0 || expertise.length > 0 || industries.length > 0));
 
   // Im Kopf ohne Karte. Die Marken-Flaeche druckt von selbst schwarz auf weiss
   // (globals.css), der Druckkopf traegt eigene Farben.
@@ -64,6 +75,8 @@ export function FounderProfileBase({
   const bioClass = onBrand ? "text-white" : "text-slate-700";
   const labelClass = onBrand ? "text-white/85" : "text-slate-500";
   const valueClass = onBrand ? "text-white" : "text-slate-800";
+
+  if (part === "bio" && !hasAnything) return null;
 
   if (tone !== "card" && !hasAnything) {
     // Im Kopf kein Leertext - nur ein stiller Weg, und nicht im Ausdruck.
@@ -85,7 +98,7 @@ export function FounderProfileBase({
       ) : null}
       {hasAnything ? (
         <>
-          {core?.bio?.trim() ? (
+          {showBio && core?.bio?.trim() ? (
             onBrand && copy.moreLabel && copy.lessLabel ? (
               <div className="mt-3 max-w-3xl">
                 <ClampedBio text={core.bio} className={`text-sm leading-7 ${bioClass}`} moreLabel={copy.moreLabel} lessLabel={copy.lessLabel} />
@@ -95,7 +108,7 @@ export function FounderProfileBase({
             )
           ) : null}
 
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          {showFacts ? <dl className="mt-4 grid gap-4 sm:grid-cols-2">
             {region ? (
               <div>
                 <dt className={`text-xs font-semibold uppercase tracking-[0.12em] ${labelClass}`}>{copy.region}</dt>
@@ -104,7 +117,7 @@ export function FounderProfileBase({
             ) : null}
             {/* LinkedIn steht nicht im Kopf und nicht im Ausdruck: Kontakte sehen es
                 in Find und Connect, das Profil bleibt auf der Website. */}
-            {tone === "card" && core?.linkedin_url ? (
+            {tone === "card" && part === "all" && core?.linkedin_url ? (
               <div>
                 <dt className={`text-xs font-semibold uppercase tracking-[0.12em] ${labelClass}`}>{copy.linkedin}</dt>
                 {/* Ausgeschrieben und nicht als Link-Text: Ein gedrucktes
@@ -124,7 +137,7 @@ export function FounderProfileBase({
                 <dd className={`mt-1 text-sm leading-6 ${valueClass}`}>{industries.join(" · ")}</dd>
               </div>
             ) : null}
-          </dl>
+          </dl> : null}
         </>
       ) : (
         <div className="mt-3">

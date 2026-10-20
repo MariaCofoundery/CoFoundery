@@ -274,7 +274,7 @@
     },
     "sections": {
       "step": "Section {index}",
-      "about": "About you",
+      "background": "Your background",
       "work": "How you work",
       "strengths": "Your strengths",
       "capability": "Your skills",

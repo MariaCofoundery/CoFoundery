@@ -111,6 +111,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 
 type SectionId =
+  | "hintergrund"
   | "arbeitsweise"
   | "staerken"
   | "mitbringst"
@@ -197,6 +198,7 @@ export default async function FounderProfilePage({
   // Die Abschnitte einmal als Daten. Der Sprungbalken oben und die
   // Ueberschriften darunter duerfen nicht auseinanderlaufen.
   const sections: { id: SectionId; title: string }[] = [
+    { id: "hintergrund", title: t("sections.background") },
     { id: "arbeitsweise", title: t("sections.work") },
     { id: "staerken", title: t("sections.strengths") },
     { id: "mitbringst", title: t("sections.bring") },
@@ -210,6 +212,7 @@ export default async function FounderProfilePage({
   // waere eine Aufforderung, eines anzulegen. Alle anderen stehen immer und
   // tragen bei leerer Datenlage einen Hinweis mit einem Weg.
   const zeigt: Record<SectionId, boolean> = {
+    hintergrund: true,
     arbeitsweise: true,
     staerken: true,
     mitbringst: true,
@@ -364,6 +367,7 @@ export default async function FounderProfilePage({
         <FounderProfileBase
           core={core}
           tone="onBrand"
+          part="bio"
           copy={{
             title: null,
             region: t("base.region"),
@@ -393,11 +397,6 @@ export default async function FounderProfilePage({
                 />
         </div>
       </section>
-
-      {/* Die drei Rollen-Begriffe erklaert, mit Weg zur Aenderung - nur am Bildschirm. */}
-      <div className="no-print">
-        <RolesOverview client={supabase} userId={user.id} />
-      </div>
 
       {/* ------------------------------------------------------------------
           DER SPRUNGBALKEN
@@ -472,6 +471,33 @@ export default async function FounderProfilePage({
         eyebrow={t("parts.one")}
         title={t("parts.oneTitle")}
       >
+        {/* 1 - Dein Hintergrund: Ort, Schwerpunkte, Branchen - und die Rollen.
+            Der Ueber-mich-Text steht im Kopf; hier bliebe er doppelt, und mit
+            allem im Kopf war der zu voll. */}
+        {teil(
+          "hintergrund",
+          "indigo",
+          <>
+            <FounderProfileBase
+              core={core}
+              part="facts"
+              copy={{
+                title: null,
+                region: t("base.region"),
+                remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
+                expertise: t("base.expertise"),
+                industries: t("base.industries"),
+                linkedin: t("base.linkedin"),
+                empty: t("base.empty"),
+                completeHref: "/profile?step=identity",
+                completeCta: t("base.completeCta"),
+              }}
+            />
+            <RolesOverview client={supabase} userId={user.id} />
+            <EditLink href="/profile?step=identity" label={t("edit")} />
+          </>
+        )}
+
         {/* 2 - Wie du arbeitest. DIE KURZFASSUNG (Phase 1).
 
             Je Bereich EIN Satz auf der Karte, dazu was die Karten nicht sagen:

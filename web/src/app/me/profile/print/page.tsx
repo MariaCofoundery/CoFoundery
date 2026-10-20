@@ -250,6 +250,7 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
         <FounderProfileBase
           core={core}
           tone="plain"
+          part="bio"
           copy={{
             title: null,
             region: t("base.region"),
@@ -266,6 +267,30 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
           <p className="mt-3 text-xs text-slate-500">{t("head.asOf", { date: datum(freshness) })}</p>
         ) : null}
       </header>
+
+      {/* 1 — Dein Hintergrund. Nur, wenn etwas dasteht. Der Ueber-mich-Text steht im Kopf. */}
+      {core?.location_region?.trim() ||
+      (core?.expertise ?? []).length > 0 ||
+      (core?.industries ?? []).length > 0 ? (
+        <Abschnitt title={t("sections.background")}>
+          <FounderProfileBase
+            core={core}
+            part="facts"
+            copy={{
+              title: null,
+              region: t("base.region"),
+              remoteMode: (m) => tCapability(`remoteModes.${m}`),
+              expertise: t("base.expertise"),
+              industries: t("base.industries"),
+              linkedin: t("base.linkedin"),
+              // Steht nie da: Der Abschnitt erscheint nur, wenn etwas da ist.
+              empty: "",
+              completeHref: "/profile?step=identity",
+              completeCta: "",
+            }}
+          />
+        </Abschnitt>
+      ) : null}
 
       {/* 2 — Wie du arbeitest. */}
       {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} full={voll} /></Abschnitt> : null}

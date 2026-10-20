@@ -266,7 +266,7 @@ const COVERAGE_VIEW = "src/features/reporting/CoverageMap.tsx";
 const COVERAGE_DATA = "src/features/reporting/founderProfileCoverage.ts";
 const REPORT_PAGE = "src/features/reporting/IndividualReportPageContent.tsx";
 
-test("die Seite steht in drei Teilen und sechs Abschnitten", () => {
+test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
   const page = codeOnly(PAGE);
 
   // UMGEBAUT IN PHASE 1 (PROFIL), 17.10.2026. Vorher neun Abschnitte; unter
@@ -279,6 +279,7 @@ test("die Seite steht in drei Teilen und sechs Abschnitten", () => {
     (treffer) => treffer[1],
   );
   assert.deepEqual(ids, [
+    "hintergrund",
     "arbeitsweise",
     "staerken",
     "mitbringst",

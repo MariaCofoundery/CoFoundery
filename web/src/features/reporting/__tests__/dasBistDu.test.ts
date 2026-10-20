@@ -38,7 +38,7 @@ test("welche Abschnitte bei welcher Datenlage erscheinen", () => {
   assert.match(page, /\{confirmedResources\.length > 0 \? \(/);
 
   // Diese stehen immer - sie tragen bei leerer Datenlage einen Hinweis.
-  for (const immer of ["arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"]) {
+  for (const immer of ["hintergrund", "arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"]) {
     assert.match(
       bedingungen,
       new RegExp(`"?${immer}"?: true`),
@@ -135,7 +135,7 @@ test("beide Sprachen haben dieselben Saetze fuer die neue Seite", () => {
   // Die sieben Abschnitte der Seite (Phase 1) - dazu die bisherigen Namen,
   // die die Druckfassung weiter benutzt - und `step` ist die Zählweise.
   const sections = de.sections as Record<string, string>;
-  for (const key of ["about", "work", "strengths", "bring", "direction", "ventures", "details"]) {
+  for (const key of ["background", "work", "strengths", "bring", "direction", "ventures", "details"]) {
     assert.ok(sections[key], `sections.${key} fehlt`);
   }
   assert.match(sections.step, /\{index\}/);
@@ -279,14 +279,14 @@ test("die Nummern zaehlen nur sichtbare Abschnitte - keine Spruenge", () => {
   assert.doesNotMatch(page, /index: sections\.findIndex/, "die Nummer zaehlt wieder ausgeblendete Abschnitte mit");
   // Dieselbe Rechnung als Daten nachgespielt: Ohne Vorhaben ist „Details &
   // Methodik" Abschnitt 6, nicht 7.
-  const ids = ["arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"];
+  const ids = ["hintergrund", "arbeitsweise", "staerken", "mitbringst", "antrieb", "vorhaben", "details"];
   const nummern = (zeigt: Record<string, boolean>) => {
     const sichtbar = ids.filter((id) => zeigt[id]);
     return sichtbar.map((id) => sichtbar.indexOf(id) + 1);
   };
   const alle = Object.fromEntries(ids.map((id) => [id, true]));
-  assert.deepEqual(nummern(alle), [1, 2, 3, 4, 5, 6]);
-  assert.deepEqual(nummern({ ...alle, vorhaben: false }), [1, 2, 3, 4, 5]);
+  assert.deepEqual(nummern(alle), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(nummern({ ...alle, vorhaben: false }), [1, 2, 3, 4, 5, 6]);
 });
 
 test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existiert", () => {
