@@ -93,5 +93,11 @@
       "title": "Limits",
       "text": "What is out of the question for you. Sensitive – so later, and only if you want it."
     }
+  },
+  "start": {
+    "here": "Start here",
+    "next": "Next",
+    "after": "After that:",
+    "workstyleLead": "The start for everything else – your team comparison needs it too. Nothing is scored, and only you see your answers until you share them."
   }
 }

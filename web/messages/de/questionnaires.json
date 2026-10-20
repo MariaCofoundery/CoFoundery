@@ -93,5 +93,11 @@
       "title": "Grenzen",
       "text": "Was für dich nicht infrage kommt. Sensibel – deshalb später und nur auf deinen Wunsch."
     }
+  },
+  "start": {
+    "here": "Beginne hier",
+    "next": "Als Nächstes",
+    "after": "Danach:",
+    "workstyleLead": "Der Anfang für alles Weitere – auch dein Teamvergleich braucht ihn. Nichts wird bewertet, nur du siehst deine Antworten, bis du sie teilst."
   }
 }

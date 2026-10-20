@@ -7,6 +7,7 @@ import { loadModuleContext } from "@/features/modules/loadModuleContext";
 import { MODULE_REGISTRY } from "@/features/modules/registry";
 import type { ModuleDefinition, ModuleState } from "@/features/modules/types";
 import { findVentures } from "@/features/instruments/align/ventureResolution";
+import { AppIcon, IconTile } from "@/features/ui/Icons";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -95,12 +96,50 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
     { key: "exercises", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/connections" },
   ] as const;
 
+  // „Beginne hier": EIN naechster Schritt, in einer festen Reihenfolge. Der Rest steht leiser
+  // darunter ("Danach") und in den Gruppen unten - kein Fortschrittsbalken, keine Zaehler.
+  const ORDER = ["workstyle", "capability", "venture_core_beta", "venture_core"];
+  const open = ORDER.map((id) => groups.flatMap((group) => group.cards).find((card) => card.def.moduleId === id))
+    .filter((card): card is Card => card !== undefined && card.state !== "done_for_now");
+  const first = open[0] ?? null;
+  const later = open.slice(1, 3);
+
   const cta = (state: ModuleState) => (state === "done_for_now" ? t("cta.view") : state === "in_progress" ? t("cta.continue") : t("cta.start"));
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 md:px-10">
       <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
       <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">{t("intro")}</p>
+
+      {first && !filter ? (
+        <section aria-labelledby="q-start" className="brand-panel relative mt-8 overflow-hidden rounded-[28px] p-6 sm:p-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <IconTile name="check" tone="white" />
+              <div className="max-w-xl">
+                <p id="q-start" className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                  {first.def.moduleId === "workstyle" ? t("start.here") : t("start.next")}
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{tModules(`${first.def.moduleId}.title`)}</h2>
+                <p className="mt-2 text-sm leading-7 text-white">
+                  {first.def.moduleId === "workstyle" ? t("start.workstyleLead") : tModules(`${first.def.moduleId}.summary`)}
+                </p>
+                <p className="mt-1 text-xs text-white">{t("minutes", { minutes: MINUTES[first.def.moduleId] ?? 10 })}</p>
+              </div>
+            </div>
+            <Link href={first.href} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-violet-800">
+              {cta(first.state)}
+              <AppIcon name="arrow" className="h-4 w-4" />
+            </Link>
+          </div>
+          {later.length > 0 ? (
+            <p className="mt-5 border-t border-white/30 pt-4 text-sm text-white">
+              <span className="font-semibold">{t("start.after")}</span>{" "}
+              {later.map((card) => `${tModules(`${card.def.moduleId}.title`)} (${t("minutes", { minutes: MINUTES[card.def.moduleId] ?? 10 })})`).join(" · ")}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <nav aria-label={t("filters.label")} className="mt-6 flex flex-wrap gap-2">
         {([null, "person", "venture", "team", "deepening"] as const).map((key) => {
