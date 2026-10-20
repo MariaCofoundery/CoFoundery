@@ -38,8 +38,8 @@ export async function FindMatchingReasons({
   });
   if (sentences.length === 0) return null;
   return (
-    <section className="mt-5 border-t border-slate-100 pt-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{title}</p>
+    <section className="mt-5 rounded-2xl bg-violet-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-800">{title}</p>
       <ul className="mt-2 space-y-1 text-sm leading-6 text-slate-700">
         {sentences.map((sentence) => (
           <li key={sentence.key}>{sentence.text}</li>
