@@ -91,11 +91,11 @@ export default async function SearchPreferencesPage({
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
-      {/* KEIN EIGENER ZURUECK-LINK. Die Seite steht im Menue, also traegt die
-          Krume oben "Find › Deine Suche" - und die ist der Weg zurueck. Ein
-          "← FIND" darunter waere derselbe Link ein zweites Mal, zwei Zeilen
-          tiefer. Die anderen Discovery-Seiten haben einen, weil sie NICHT im
-          Menue stehen und deshalb keine Krume bekommen. */}
+      {/* Die Seite steht nicht mehr im Menue, sondern gehoert zu „Mein Find-Profil“
+          ("Wen du suchst"). Der Weg zurueck fuehrt dorthin. */}
+      <Link href="/discovery/profile" className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">
+        ← {tDiscovery("common.backToFindProfile")}
+      </Link>
       <h1 className="text-3xl font-semibold text-slate-900">{t("title")}</h1>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("subline")}</p>
 
