@@ -11,7 +11,7 @@ import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/c
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "min-w-0 break-words rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
+const card = "min-w-0 break-words rounded-3xl border border-violet-100 bg-white p-5 shadow-sm sm:p-6";
 const field =
   "min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const action = "inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold";
@@ -154,7 +154,7 @@ export default async function ConnectProblemsPage({
                   ) : null}
                   {problem.topics.length ? (
                     <ul aria-label={t("form.topics")} className="mt-3 flex flex-wrap gap-2">
-                      {problem.topics.map((topic) => <li key={topic} className="max-w-full rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">{topic}</li>)}
+                      {problem.topics.map((topic) => <li key={topic} className="max-w-full rounded-full bg-violet-50 px-3 py-1 text-xs text-violet-900">{topic}</li>)}
                     </ul>
                   ) : null}
                   <Link href={`/connect/problems/${problem.id}`} className={`${action} mt-4 border border-slate-200 hover:bg-slate-50`}>{t("problemHub.view")}</Link>
