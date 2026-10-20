@@ -16,21 +16,13 @@
           "title": "Was möchtest du hier tun?",
           "hint": "Daran hängt, welche Bereiche sich für dich öffnen. Es gibt keine falsche Antwort – und keine, die dich festlegt."
         },
-        "focus": {
-          "title": "Worauf liegt dein Schwerpunkt?",
-          "hint": "Eine grobe Richtung reicht. Genauer wird es später von selbst."
-        },
-        "intention": {
-          "title": "Was möchtest du hier als Erstes tun?",
-          "hint": "Das setzt den Kontext für alles, was dir hier begegnet – und lässt sich jederzeit ändern."
-        },
-        "avatar": {
-          "title": "Magst du ein Bild dazulegen?",
-          "hint": "Ganz freiwillig. Geht auch später jederzeit."
-        },
         "next": {
           "title": "Das sind deine Bereiche",
           "hint": "Oben in der Leiste findest du sie ab jetzt wieder."
+        },
+        "details": {
+          "title": "Zwei kurze Angaben",
+          "hint": "Damit wir dir passende Vorschläge machen. Genauer wird es später von selbst."
         }
       },
       "welcomeText": "Es dauert eine Minute, und du kannst alles später ändern.",
@@ -100,7 +92,10 @@
           "find": "Mein Find-Profil anlegen",
           "connect": "Mein Connect-Profil anlegen"
         }
-      }
+      },
+      "focusTitle": "Worauf liegt dein Schwerpunkt?",
+      "intentionTitle": "Was möchtest du hier als Erstes tun?",
+      "photoLater": "Ein Foto kannst du später im Profil ergänzen – es ist hier nicht nötig."
     },
     "avatar": {
       "title": "Avatar",

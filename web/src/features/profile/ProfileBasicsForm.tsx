@@ -93,7 +93,7 @@ function intentionsForPlan(plan: OnboardingPlan | ""): readonly string[] {
  * Beide Wege teilen sich die ersten drei Schritte, damit ein Wechsel der Wahl
  * den Fortschritt nicht zurueckwirft: Index 2 ist in beiden "plan".
  */
-const ONBOARDING_STEPS_FULL = ["welcome", "name", "plan", "focus", "intention", "avatar", "next"] as const;
+const ONBOARDING_STEPS_FULL = ["welcome", "name", "plan", "details", "next"] as const;
 const ONBOARDING_STEPS_CONNECT = ["welcome", "name", "plan", "next"] as const;
 
 type OnboardingStepId = (typeof ONBOARDING_STEPS_FULL)[number];
@@ -156,7 +156,7 @@ function normalizePath(path: string | undefined, fallback: string) {
 }
 
 function getNextStepDisabled(step: OnboardingStepId, values: Record<OnboardingStepId, string>) {
-  if (step === "welcome" || step === "avatar" || step === "next") {
+  if (step === "welcome" || step === "next") {
     return false;
   }
 
@@ -233,15 +233,13 @@ export function ProfileBasicsForm({
   const resolvedFocusSkill =
     focusChoice === "Sonstiges" ? focusOtherText.trim() || "Sonstiges" : focusChoice;
   const resolvedAvatarImageUrl = selectedAvatarId ? null : uploadedAvatarUrl || initialAvatarUrl || null;
-  const hasAvatarImage = Boolean(selectedAvatarId || resolvedAvatarImageUrl);
 
   const onboardingValues = {
     welcome: "ready",
     name: displayName,
     plan,
-    focus: resolvedFocusSkill,
-    intention,
-    avatar: selectedAvatarId,
+    // Schwerpunkt UND Absicht stehen auf einer Folie; beide muessen da sein.
+    details: resolvedFocusSkill && intention ? "ready" : "",
     next: "ready",
   } satisfies Record<OnboardingStepId, string>;
 
@@ -275,9 +273,7 @@ export function ProfileBasicsForm({
       welcome: { title: t("onboarding.steps.welcome.title"), hint: t("onboarding.steps.welcome.hint") },
       name: { title: t("onboarding.steps.name.title"), hint: t("onboarding.steps.name.hint") },
       plan: { title: t("onboarding.steps.plan.title"), hint: t("onboarding.steps.plan.hint") },
-      focus: { title: t("onboarding.steps.focus.title"), hint: t("onboarding.steps.focus.hint") },
-      intention: { title: t("onboarding.steps.intention.title"), hint: t("onboarding.steps.intention.hint") },
-      avatar: { title: t("onboarding.steps.avatar.title"), hint: t("onboarding.steps.avatar.hint") },
+      details: { title: t("onboarding.steps.details.title"), hint: t("onboarding.steps.details.hint") },
       next: { title: t("onboarding.steps.next.title"), hint: t("onboarding.steps.next.hint") },
     }),
     [t]
@@ -303,87 +299,6 @@ export function ProfileBasicsForm({
     if (activeStepIndex < lastStepIndex && canGoNext) {
       setActiveStepIndex((current) => Math.min(lastStepIndex, current + 1));
     }
-  }
-
-  function renderAvatarCard() {
-    return (
-      <div className="rounded-2xl border border-slate-200/80 bg-slate-50/85 p-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <ProfileAvatar
-              displayName={previewName}
-              avatarId={selectedAvatarId || null}
-              imageUrl={resolvedAvatarImageUrl}
-              className="h-16 w-16 rounded-[20px] border border-white/80 object-cover shadow-[0_10px_20px_rgba(15,23,42,0.08)]"
-              fallbackClassName="flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.92)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_10px_20px_rgba(15,23,42,0.06)]"
-            />
-            <div>
-              <p className="text-sm font-medium text-slate-900">{t("avatar.title")}</p>
-              <p className="mt-1 text-xs leading-6 text-slate-500">
-                {t("avatar.help")}
-              </p>
-              {uploadedAvatarLabel && !selectedAvatarId ? (
-                <p className="mt-2 text-xs font-medium text-slate-700">{uploadedAvatarLabel}</p>
-              ) : null}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setAvatarPickerOpen((current) => !current)}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-            >
-              {avatarPickerOpen ? t("avatar.closeSelection") : t("avatar.chooseAvatar")}
-            </button>
-            <button
-              type="button"
-              onClick={() => avatarUploadRef.current?.click()}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-            >
-              {t("avatar.uploadOwn")}
-            </button>
-          </div>
-        </div>
-        <input
-          ref={avatarUploadRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleAvatarUpload}
-        />
-
-        {avatarPickerOpen ? (
-          <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-            {AVATAR_LIBRARY.map((avatar) => {
-              const selected = selectedAvatarId === avatar.id;
-              return (
-                <button
-                  key={avatar.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedAvatarId(avatar.id);
-                    setUploadedAvatarLabel(null);
-                  }}
-                  className={`rounded-2xl border p-2 transition ${
-                    selected
-                      ? "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)]/10 shadow-[0_10px_24px_rgba(34,211,238,0.14)]"
-                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                  }`}
-                  aria-pressed={selected}
-                  aria-label={avatar.label}
-                >
-                  <ProfileAvatar
-                    displayName={avatar.label}
-                    avatarId={avatar.id}
-                    className="h-auto w-full rounded-[18px] border border-slate-100 object-cover"
-                  />
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-      </div>
-    );
   }
 
   function renderAvatarActionButton(params: {
@@ -770,8 +685,11 @@ export function ProfileBasicsForm({
 
           {activeStep === "plan" ? renderPlanStep() : null}
 
-          {activeStep === "focus" ? (
-            <div className="grid gap-3 sm:grid-cols-2">
+          {activeStep === "details" ? (
+            <div className="grid gap-6">
+              <fieldset className="grid gap-3">
+                <legend className="text-sm font-semibold text-slate-950">{t("onboarding.focusTitle")}</legend>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {SKILLS.map((skill) =>
                 renderChoiceCard({
                   id: skill,
@@ -792,9 +710,9 @@ export function ProfileBasicsForm({
                 </label>
               ) : null}
             </div>
-          ) : null}
-
-          {activeStep === "intention" ? (
+              </fieldset>
+              <fieldset className="grid gap-3">
+                <legend className="text-sm font-semibold text-slate-950">{t("onboarding.intentionTitle")}</legend>
             <div className="grid gap-3">
               {intentionsForPlan(plan).map((entry) =>
                 renderChoiceCard({
@@ -806,15 +724,9 @@ export function ProfileBasicsForm({
                 })
               )}
             </div>
-          ) : null}
-
-          {activeStep === "avatar" ? (
-            <>
-              {renderAvatarCard()}
-              <p className="text-xs leading-6 text-slate-500">
-                {t("onboarding.avatarSkipHint")}
-              </p>
-            </>
+              </fieldset>
+              <p className="text-xs leading-6 text-slate-500">{t("onboarding.photoLater")}</p>
+            </div>
           ) : null}
 
           {activeStep === "next" ? renderFinalStep() : null}
@@ -843,13 +755,7 @@ export function ProfileBasicsForm({
               disabled={!canGoNext}
               className="inline-flex min-h-11 items-center rounded-full bg-[linear-gradient(120deg,var(--brand-accent),var(--brand-primary))] px-6 text-sm font-semibold text-slate-900 shadow-[0_10px_28px_rgba(124,58,237,0.16)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
             >
-              {activeStep === "welcome"
-                ? t("onboarding.startButton")
-                : activeStep === "avatar"
-                  ? hasAvatarImage
-                    ? t("onboarding.nextButton")
-                    : t("onboarding.skipImageButton")
-                  : nextButtonLabel}
+              {activeStep === "welcome" ? t("onboarding.startButton") : nextButtonLabel}
             </button>
           )}
         </div>

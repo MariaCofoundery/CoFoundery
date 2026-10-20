@@ -30,7 +30,7 @@ const texts = (locale: string) =>
   JSON.parse(readFileSync(join("messages", locale, "profile.json"), "utf8")) as {
     basicsForm: {
       intentions: Record<string, { label: string; description: string }>;
-      onboarding: { steps: Record<string, { title: string; hint: string }> };
+      onboarding: { steps: Record<string, { title: string; hint: string }>; intentionTitle: string };
     };
   };
 
@@ -90,7 +90,7 @@ test("die Frage passt zu ihren Antworten", () => {
   // „Woran arbeitest du gerade?“ mit den Antworten „Suche / Partner-Match /
   // Selbsttest“ war die Stelle, an der es hakte.
   for (const locale of ["de", "en"]) {
-    const title = texts(locale).basicsForm.onboarding.steps.intention.title;
+    const title = texts(locale).basicsForm.onboarding.intentionTitle;
     assert.ok(
       !/Woran arbeitest du|What are you working on/i.test(title),
       `${locale}: die alte Frage steht noch da`,
@@ -114,7 +114,8 @@ test("jede Folie, die jemand bekommt, hat in beiden Sprachen Titel und Hinweis",
   // mitten im Einstieg.
   const alleSchritte = [...(form.match(/ONBOARDING_STEPS_FULL = \[([^\]]+)\]/)?.[1] ?? "")
     .matchAll(/"(\w+)"/g)].map((match) => match[1]);
-  assert.ok(alleSchritte.length >= 6, `nur ${alleSchritte.length} Schritte gefunden`);
+  // Seit 21.10.2026 fuenf Folien: Schwerpunkt und Absicht stehen auf einer, das Bild ist im Profil.
+  assert.ok(alleSchritte.length >= 5, `nur ${alleSchritte.length} Schritte gefunden`);
 
   for (const locale of ["de", "en"]) {
     const steps = texts(locale).basicsForm.onboarding.steps;

@@ -194,7 +194,7 @@ test("der kurze Weg laesst die Gruendungsfragen und das Bild aus", () => {
   assert.match(form, /ONBOARDING_STEPS_CONNECT = \["welcome", "name", "plan", "next"\]/);
   // Index 2 muss in beiden Wegen "plan" sein, sonst springt ein Wechsel der
   // Wahl den Fortschritt zurueck.
-  assert.match(form, /ONBOARDING_STEPS_FULL = \["welcome", "name", "plan", "focus"/);
+  assert.match(form, /ONBOARDING_STEPS_FULL = \["welcome", "name", "plan", "details", "next"\]/);
 });
 
 test("die Mitgliedschaft kommt vor der Markierung", () => {

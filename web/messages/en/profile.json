@@ -16,21 +16,13 @@
           "title": "What would you like to do here?",
           "hint": "This decides which areas open up for you. There's no wrong answer – and none that locks you in."
         },
-        "focus": {
-          "title": "Where's your focus?",
-          "hint": "A rough direction is enough. It gets more specific on its own."
-        },
-        "intention": {
-          "title": "What would you like to do here first?",
-          "hint": "This sets the context for what you see here — and you can change it any time."
-        },
-        "avatar": {
-          "title": "Want to add a picture?",
-          "hint": "Entirely optional. You can do it later any time."
-        },
         "next": {
           "title": "These are your areas",
           "hint": "You'll find them in the bar at the top from now on."
+        },
+        "details": {
+          "title": "Two quick details",
+          "hint": "So we can make fitting suggestions. It gets more precise on its own later."
         }
       },
       "welcomeText": "It takes a minute, and you can change everything later.",
@@ -100,7 +92,10 @@
           "find": "Create my Find profile",
           "connect": "Create my Connect profile"
         }
-      }
+      },
+      "focusTitle": "What is your focus?",
+      "intentionTitle": "What would you like to do here first?",
+      "photoLater": "You can add a photo later in your profile – you don't need one here."
     },
     "avatar": {
       "title": "Avatar",
