@@ -3,6 +3,7 @@ import { IdentityEditor } from "@/features/profile/IdentityEditor";
 import { getIdentityGaps, type IdentityReturnPath } from "@/features/profile/identityReadiness";
 import type { PersonCore } from "@/features/profile/personCoreData";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { getPhotoUsage } from "@/features/profile/photoUsageData";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { normalizeProfileRoles } from "@/features/profile/profileRoles";
 import type { createClient } from "@/lib/supabase/server";
@@ -10,7 +11,7 @@ import type { createClient } from "@/lib/supabase/server";
 type Client = Awaited<ReturnType<typeof createClient>>;
 
 // Nur bekannte Schluessel an t() geben (ein erfundener Parameter wuerde als Pfad auf der Seite landen).
-const ERROR_KEYS = ["save", "published_incomplete", "roles", "linkedin"];
+const ERROR_KEYS = ["save", "published_incomplete", "roles", "linkedin", "photo_reuse", "photo_upload"];
 
 /**
  * "Aus deinem Profil" auf FIND und Connect: dieselbe Identitaet wie in `/profile`,
@@ -39,7 +40,8 @@ export async function IdentityInlineCard({
     getPersonCore(client, userId),
     getProfileBasicsRow(client, userId).catch(() => null),
   ]);
-  const saved = params.saved === "identity";
+  const photoUsage = await getPhotoUsage(client, userId, core?.photo_visible_to_members ?? false);
+  const saved = params.saved === "identity" ? "identity" : params.saved === "photo_usage" ? "photo_usage" : null;
   const error = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   const summary = (c: PersonCore | null) => [c?.headline, c?.location_region].filter(Boolean).join(" · ");
 
@@ -47,7 +49,7 @@ export async function IdentityInlineCard({
     <section id="identity" className="mt-6 rounded-3xl border border-violet-100 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="identity-inline-title">
       <h2 id="identity-inline-title" className="text-lg font-semibold text-slate-950">{t("identity.inline.title")}</h2>
       <p className="mt-1 text-sm leading-6 text-slate-600">{t("identity.inline.text")}</p>
-      {saved ? <p role="status" className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-900">{t("success.identity")}</p> : null}
+      {saved ? <p role="status" className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-900">{t(`success.${saved}`)}</p> : null}
       {error ? <p role="alert" className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(`errors.${error}`)}</p> : null}
       <p className="mt-3 text-base font-semibold text-slate-950">{core?.display_name || t("identity.inline.empty")}</p>
       {summary(core) ? <p className="text-sm text-slate-600">{summary(core)}</p> : null}
@@ -67,6 +69,7 @@ export async function IdentityInlineCard({
             avatarId={basics?.avatar_id ?? null}
             avatarUrl={basics?.avatar_url ?? null}
             showPhoto={showPhoto}
+            photoUsage={photoUsage}
           />
         </div>
       </details>

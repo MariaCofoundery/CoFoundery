@@ -300,7 +300,9 @@ test("the Connect profile page no longer maintains identity itself", () => {
   // Was hier bleibt, gehoert hierher.
   assert.match(page, /name="network_roles"/);
   assert.match(page, /ConnectVisibilityField/);
-  assert.match(page, /ConnectPhotoField/);
+  // Das Foto (und wofuer es in Connect gilt) steht seit dem 20.10.2026 im Fotobereich des Profils.
+  assert.doesNotMatch(page, /ConnectPhotoField/);
+  assert.match(source("src/features/profile/PhotoUsagePanel.tsx"), /ConnectPhotoField/);
   // Seit dem 20.10.2026 steht die Identitaet direkt bearbeitbar auf der Seite (eingebettet, ausserhalb
   // des Connect-Formulars): derselbe Editor, Speichern bleibt hier - kein Umweg ueber /profile.
   assert.match(page, /<IdentityInlineCard[^>]*returnPath="\/connect\/profile"/);

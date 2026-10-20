@@ -106,6 +106,12 @@
       "text": "Das pflegst du einmal – es gilt für Align, Find und Connect. Hier kannst du es direkt ändern.",
       "edit": "Angaben bearbeiten",
       "empty": "Noch nichts eingetragen."
+    },
+    "photoUsage": {
+      "title": "Wo dein Foto zu sehen ist",
+      "text": "Du lädst es einmal hoch. Hier entscheidest du getrennt, wo es erscheint – das eine schließt das andere nicht ein.",
+      "find": "In FIND und für andere Mitglieder",
+      "save": "Verwendung speichern"
     }
   },
   "steps": {
@@ -357,7 +363,9 @@
     "resource_duplicate": "Das steht schon genau so bei dir.",
     "photo_empty": "Bitte wähle ein Bild oder eine Illustration.",
     "photo_too_large": "Das Bild ist zu groß. Bitte wähle ein kleineres.",
-    "photo_save": "Das Foto konnte nicht gespeichert werden."
+    "photo_save": "Das Foto konnte nicht gespeichert werden.",
+    "photo_reuse": "Dein Profilfoto konnte für Connect nicht übernommen werden. Lade es zuerst hoch oder wähle ein anderes.",
+    "photo_upload": "Das Bild für Connect konnte nicht gespeichert werden."
   },
   "success": {
     "snapshot": "Dein Snapshot ist gespeichert.",
@@ -369,7 +377,8 @@
     "resource_updated": "Ressource geändert.",
     "resource_removed": "Ressource entfernt.",
     "photo": "Foto gespeichert.",
-    "photo_removed": "Foto entfernt."
+    "photo_removed": "Foto entfernt.",
+    "photo_usage": "Verwendung deines Fotos gespeichert."
   },
   "pending": {
     "save": "Wird gespeichert …"

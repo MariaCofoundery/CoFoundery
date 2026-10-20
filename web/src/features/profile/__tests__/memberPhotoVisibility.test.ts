@@ -80,10 +80,14 @@ test("Find shows the photo where it shows the person", () => {
 });
 
 test("the switch sits with the photo, not in a settings corner", () => {
-  const page = source("src/app/(product)/profile/page.tsx");
-  assert.match(page, /name="photo_visible_to_members"/);
-  const actions = source("src/features/profile/personCoreActions.ts");
-  assert.match(actions, /photo_visible_to_members: formData\.get\("photo_visible_to_members"\) === "yes"/);
+  // GEAENDERT am 20.10.2026: Der Schalter steht im Fotobereich ("Wo dein Foto zu sehen ist"), mit eigener
+  // Aktion - und nicht mehr im Identitaetsformular, dessen Speichern ihn sonst zurueckgesetzt haette.
+  const panel = source("src/features/profile/PhotoUsagePanel.tsx");
+  assert.match(panel, /name="photo_visible_to_members"/);
+  const usage = source("src/features/profile/photoUsageActions.ts");
+  assert.match(usage, /photo_visible_to_members: formData\.get\("photo_visible_to_members"\) === "yes"/);
+  const identity = source("src/features/profile/personCoreActions.ts");
+  assert.doesNotMatch(identity, /photo_visible_to_members: formData/);
 
   for (const locale of ["de", "en"]) {
     const identity = (readJson(`messages/${locale}/capability.json`).identity as Record<string, string>);

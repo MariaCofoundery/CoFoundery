@@ -38,6 +38,7 @@ import {
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
+import { getPhotoUsage } from "@/features/profile/photoUsageData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
@@ -126,6 +127,7 @@ const SAVED_KEYS = [
   "resource_removed",
   "photo",
   "photo_removed",
+  "photo_usage",
 ];
 const ERROR_KEYS = [
   "narrative",
@@ -140,6 +142,8 @@ const ERROR_KEYS = [
   "photo_empty",
   "photo_too_large",
   "photo_save",
+  "photo_reuse",
+  "photo_upload",
 ];
 const NOTICE_KEYS = ["recognised", "confirmed", "unmatched", "interview_paused"];
 
@@ -651,6 +655,7 @@ export default async function ProfilePage({
           connectActive={connectProfile?.status === "active"}
           avatarId={basisProfil.avatarId ?? null}
           avatarUrl={basisProfil.avatarUrl ?? null}
+          photoUsage={await getPhotoUsage(supabase, user.id, core?.photo_visible_to_members ?? false)}
         />
       ) : null}
 

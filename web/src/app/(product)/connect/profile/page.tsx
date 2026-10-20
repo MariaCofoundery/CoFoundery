@@ -5,11 +5,7 @@ import { getOwnConnectProfile } from "@/features/connect/connectData";
 import { saveConnectProfileAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_REACH_MAX, CONNECT_REACH_MIN, CONNECT_ROLES } from "@/features/connect/connectTypes";
-import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { getPersonCore } from "@/features/profile/personCoreData";
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
-import { ConnectPhotoField } from "@/features/connect/ConnectPhotoField";
-import { connectPhotoUrl } from "@/features/connect/ConnectAvatar";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
 import { getOwnPersonResources } from "@/features/ai/personResources";
@@ -36,7 +32,7 @@ const ERROR_KEYS = [
 
 export default async function ConnectProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/profile");
-  const [profile, baseProfile, core, params, resources] = await Promise.all([getOwnConnectProfile(client, user.id), getProfileBasicsRow(client, user.id).catch(() => null), getPersonCore(client, user.id), searchParams, getOwnPersonResources(client)]);
+  const [profile, params, resources] = await Promise.all([getOwnConnectProfile(client, user.id), searchParams, getOwnPersonResources(client)]);
   const continuation = params.next?.startsWith("/connect") && !params.next.includes("\\") && !params.next.startsWith("//") ? params.next : "";
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
@@ -48,26 +44,9 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
     {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
     {/* Die Identitaet (Name, Headline, Bio, Ort, ...) steht einmal im Profil und ist hier direkt bearbeitbar -
         ausserhalb dieses Formulars, weil Formulare sich nicht verschachteln lassen. */}
-    <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} showPhoto={false} />
+    <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} />
     <form action={saveConnectProfileAction} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
       {continuation ? <input type="hidden" name="next" value={continuation} /> : null}
-      <ConnectPhotoField
-        displayName={profile?.display_name || baseProfile?.display_name || ""}
-        currentAvatarId={profile?.photo_avatar_id}
-        currentPhotoUrl={connectPhotoUrl(profile)}
-        existingAvatarId={baseProfile?.avatar_id}
-        existingImageUrl={baseProfile?.avatar_url}
-        copy={{
-          title: t("profile.photo.title"), helper: t("profile.photo.helper"), fallbackName: t("profile.photo.fallbackName"),
-          keep: t("profile.photo.keep"), existing: t("profile.photo.existing"), existingHint: t("profile.photo.existingHint"), none: t("profile.photo.none"), upload: t("profile.photo.upload"),
-          // Entfernt am 18.09.2026: vier weitere Schluessel wurden hier
-          // durchgereicht, die es in den Texten nie gab und die
-          // ConnectPhotoField auch nie gelesen hat. Sichtbar war davon nichts -
-          // aber next-intl wirft bei einem unbekannten Schluessel nicht, es
-          // loggt einen IntlError und gibt den Pfad zurueck. Das waren vier
-          // Fehler im Log bei jedem Aufbau dieser Seite.
-        }}
-      />
 
       <h2 className="border-t pt-6 text-lg font-semibold">{t("beta.contribution")}</h2>
       <fieldset><legend className="text-sm font-medium">{t("profile.roles")}</legend><p className={hint}>{t("profile.rolesHint")}</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{CONNECT_ROLES.map((role) => <label key={role} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 px-3 text-sm"><input type="checkbox" name="network_roles" value={role} defaultChecked={profile?.network_roles.includes(role)} />{t(`roles.${role}`)}</label>)}</div></fieldset>

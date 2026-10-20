@@ -181,13 +181,14 @@ test("Sichtbarkeit und Speicherung bleiben zwei verschiedene Dinge", () => {
     "die Fotoaktion entscheidet ueber Sichtbarkeit",
   );
 
-  // Der Haken fuer die Mitgliedersicht liegt weiterhin beim Kern, direkt
-  // unter dem Bild auf derselben Seite.
-  const ueberDich = codeOnly(UEBER_DICH);
-  assert.match(ueberDich, /name="photo_visible_to_members"/);
+  // Der Haken fuer die Mitgliedersicht steht seit dem 20.10.2026 im Bereich "Wo dein Foto zu sehen ist",
+  // direkt unter dem Bild im selben Editor - mit einer eigenen Aktion, nicht in der Fotoaktion.
+  const panel = codeOnly(join("src", "features", "profile", "PhotoUsagePanel.tsx"));
+  assert.match(panel, /name="photo_visible_to_members"/);
+  const editor = codeOnly(join("src", "features", "profile", "IdentityEditor.tsx"));
   assert.ok(
-    ueberDich.indexOf("<ProfilePhotoField") < ueberDich.indexOf('name="photo_visible_to_members"'),
-    "der Haken steht vor dem Bild, auf das er sich bezieht",
+    editor.indexOf("<ProfilePhotoField") < editor.indexOf("<PhotoUsagePanel"),
+    "die Verwendung steht nach dem Bild, auf das sie sich bezieht",
   );
 });
 

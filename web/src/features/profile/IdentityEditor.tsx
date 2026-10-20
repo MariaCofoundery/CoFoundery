@@ -9,6 +9,8 @@ import { LinkedInField } from "@/features/profile/LinkedInField";
 import { isLinkedInVisibility } from "@/features/profile/linkedInVisibility";
 import { saveIdentityAction } from "@/features/profile/personCoreActions";
 import type { PersonCore } from "@/features/profile/personCoreData";
+import { PhotoUsagePanel } from "@/features/profile/PhotoUsagePanel";
+import type { PhotoUsage } from "@/features/profile/photoUsageData";
 import { ProfilePhotoField } from "@/features/profile/ProfilePhotoField";
 import { PROFILE_ROLE_OPTIONS, type ProfileRole } from "@/features/profile/profileRoles";
 
@@ -38,6 +40,7 @@ export async function IdentityEditor({
   avatarId,
   avatarUrl,
   showPhoto = true,
+  photoUsage = null,
 }: {
   core: PersonCore | null;
   currentRoles: ProfileRole[];
@@ -49,6 +52,7 @@ export async function IdentityEditor({
   avatarId: string | null | undefined;
   avatarUrl: string | null | undefined;
   showPhoto?: boolean;
+  photoUsage?: PhotoUsage | null;
 }) {
   const t = await getTranslations("capability");
   return (
@@ -72,6 +76,15 @@ export async function IdentityEditor({
               preview: t("identity.photo.preview"),
             }}
           />
+        {photoUsage ? (
+            <PhotoUsagePanel
+              usage={photoUsage}
+              displayName={core?.display_name?.trim() || ""}
+              avatarId={avatarId ?? null}
+              avatarUrl={avatarUrl ?? null}
+              returnPath={inline ? returnPath : null}
+            />
+          ) : null}
         </section>
       ) : null}
         <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
@@ -120,23 +133,7 @@ export async function IdentityEditor({
               {t("aboutYou.groups.who")}
             </legend>
 
-          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4">
-            <input
-              type="checkbox"
-              name="photo_visible_to_members"
-              value="yes"
-              defaultChecked={core?.photo_visible_to_members ?? false}
-              className="mt-1 h-4 w-4 rounded border-slate-300"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">
-                {t("identity.photoVisibleLabel")}
-              </span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500">
-                {t("identity.photoVisibleHint")}
-              </span>
-            </span>
-          </label>
+          
 
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">

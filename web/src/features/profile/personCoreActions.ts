@@ -114,10 +114,9 @@ export async function saveIdentityAction(formData: FormData) {
         industries: parseList(formData.get("industries"), 5),
         linkedin_url: linkedin.url,
         linkedin_visibility: effectiveVisibility,
-        // Ein Bild, eine Entscheidung: Sie gilt ueberall, wo eingeloggte
-        // Mitglieder einander sehen. Connect hat seine eigene, weil dort
-        // oeffentliche Seiten haengen.
-        photo_visible_to_members: formData.get("photo_visible_to_members") === "yes",
+        // `photo_visible_to_members` steht seit dem 20.10.2026 NICHT mehr in diesem Formular, sondern
+        // beim Foto ("Wo dein Foto zu sehen ist", `photoUsageActions.ts`). Hier wird es nicht
+        // angefasst - sonst wuerde jedes Speichern der Angaben die Freigabe zuruecksetzen.
       },
       // Ohne count koennte diese Aktion "Gespeichert" melden, ohne etwas
       // geschrieben zu haben: Ein update ohne passende Zeile ist fuer

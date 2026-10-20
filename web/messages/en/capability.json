@@ -106,6 +106,12 @@
       "text": "You maintain this once – it applies to Align, Find and Connect. You can change it right here.",
       "edit": "Edit details",
       "empty": "Nothing entered yet."
+    },
+    "photoUsage": {
+      "title": "Where your photo is shown",
+      "text": "You upload it once. Here you decide separately where it appears – one does not include the other.",
+      "find": "In FIND and for other members",
+      "save": "Save where it is used"
     }
   },
   "steps": {
@@ -357,7 +363,9 @@
     "resource_duplicate": "You've already added exactly this.",
     "photo_empty": "Please choose a picture or an illustration.",
     "photo_too_large": "That picture is too large. Please choose a smaller one.",
-    "photo_save": "The photo could not be saved."
+    "photo_save": "The photo could not be saved.",
+    "photo_reuse": "Your profile photo could not be used for Connect. Upload it first or choose another one.",
+    "photo_upload": "The image for Connect could not be saved."
   },
   "success": {
     "snapshot": "Your snapshot is saved.",
@@ -369,7 +377,8 @@
     "resource_updated": "Resource updated.",
     "resource_removed": "Resource removed.",
     "photo": "Photo saved.",
-    "photo_removed": "Photo removed."
+    "photo_removed": "Photo removed.",
+    "photo_usage": "Where your photo is used has been saved."
   },
   "pending": {
     "save": "Saving …"
