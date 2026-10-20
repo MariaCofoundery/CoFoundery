@@ -31,7 +31,7 @@ export async function GET() {
     status: 200,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "content-disposition": `attachment; filename="cofoundery-export-${stamp}.json"`,
+      "content-disposition": `attachment; filename="made2found-export-${stamp}.json"`,
       // Ein Export gehoert in keinen Zwischenspeicher - weder im Browser noch
       // unterwegs.
       "cache-control": "no-store, private",

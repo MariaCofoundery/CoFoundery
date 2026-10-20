@@ -26,10 +26,25 @@ const EXPORTED_TABLES = [
 
   { table: "assessments", column: "user_id" },
   { table: "person_capability_entries", column: "user_id" },
+  { table: "capability_interview_sessions", column: "user_id" },
+  { table: "person_strengths", column: "user_id" },
+  { table: "direction_statements", column: "user_id" },
+  { table: "person_resources", column: "user_id" },
+  { table: "person_alignment_snapshots", column: "user_id" },
+  { table: "person_section_marks", column: "user_id" },
+  { table: "commitment_lab_founder_entries", column: "user_id" },
+  { table: "founder_team_setup_discussion_entries", column: "author_user_id" },
+  { table: "founder_team_members", column: "user_id" },
+  // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.
+  { table: "assessment_team_shares", column: "owner_user_id" },
+  { table: "team_shares", column: "owner_user_id" },
+  { table: "advisor_person_grants", column: "subject_user_id" },
 
   { table: "founder_discovery_profiles", column: "user_id" },
   { table: "founder_search_preferences", column: "user_id" },
   { table: "saved_searches", column: "user_id" },
+  { table: "founder_discovery_saves", column: "owner_user_id" },
+  { table: "discovery_intro_requests", column: "requester_user_id" },
 
   { table: "network_profiles", column: "user_id" },
   { table: "network_listings", column: "owner_user_id" },
@@ -37,6 +52,29 @@ const EXPORTED_TABLES = [
   { table: "network_problems", column: "author_user_id" },
   { table: "network_problem_approaches", column: "author_user_id" },
   { table: "network_messages", column: "sender_user_id" },
+  { table: "network_contact_requests", column: "sender_user_id" },
+  { table: "network_blocks", column: "blocker_user_id" },
+  { table: "network_problem_interests", column: "user_id" },
+  { table: "network_problem_confirmations", column: "user_id" },
+  { table: "connect_suggestions", column: "recipient_user_id" },
+  { table: "in_app_notices", column: "recipient_user_id" },
+  { table: "product_feedback", column: "user_id" },
+] as const;
+
+/**
+ * Tabellen, die keine Personenspalte tragen, sondern an einer Elterntabelle der
+ * Person haengen: die Antworten an `assessments`, die Belege an den
+ * Faehigkeitseintraegen, die Interview-Runden an den Interview-Sitzungen. Ohne
+ * sie waeren genau die Inhalte nicht im Export, die jemand am ehesten wiederhaben
+ * will. Gelesen wird wieder mit dem Client der Person; die Eltern-IDs stammen
+ * aus deren eigenen Zeilen.
+ */
+const CHILD_TABLES = [
+  { table: "alignment_answers", column: "assessment_id", parent: "assessments" },
+  { table: "workstyle_pretest_sessions", column: "assessment_id", parent: "assessments" },
+  { table: "workstyle_research_responses", column: "assessment_id", parent: "assessments" },
+  { table: "person_capability_evidence", column: "entry_id", parent: "person_capability_entries" },
+  { table: "capability_interview_turns", column: "session_id", parent: "capability_interview_sessions" },
 ] as const;
 
 export type AccountExport = {
@@ -74,6 +112,21 @@ export async function buildAccountExport(
     daten[table] = data ?? [];
   }
 
+  for (const { table, column, parent } of CHILD_TABLES) {
+    const parents = (daten[parent] ?? []) as { id?: string }[];
+    const ids = parents.map((row) => row.id).filter((id): id is string => typeof id === "string");
+    if (ids.length === 0) {
+      daten[table] = [];
+      continue;
+    }
+    const { data, error } = await client.from(table).select("*").in(column, ids);
+    if (error) {
+      nichtEnthalten.push({ tabelle: table, grund: error.message });
+      continue;
+    }
+    daten[table] = data ?? [];
+  }
+
   return {
     exportiertAm: new Date().toISOString(),
     hinweis: HINWEIS,
@@ -83,3 +136,4 @@ export async function buildAccountExport(
 }
 
 export const ACCOUNT_EXPORT_TABLES = EXPORTED_TABLES;
+export const ACCOUNT_EXPORT_CHILD_TABLES = CHILD_TABLES;

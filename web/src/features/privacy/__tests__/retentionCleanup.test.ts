@@ -41,6 +41,7 @@ const OK_RESPONSES = {
     data: { retentionDays: 30, cutoff: "2026-09-13T00:00:00Z", deletedResearchEvents: 4, deletedProductAnalyticsEvents: 2 },
   },
   cleanup_expired_event_data: { data: { closedEvents: 1, deletedAnswers: 12, deletedParticipants: 3 } },
+  purge_stale_operational_rows: { data: { jobDays: 90, noticeDays: 180, deletedAiJobs: 5, deletedNotices: 7 } },
 };
 
 async function run(authorization: string | null, secret: string | undefined, responses: Parameters<typeof fakeClient>[0] = OK_RESPONSES) {
@@ -93,7 +94,7 @@ test("korrektes Geheimnis: 200 und beide Schritte ok", async () => {
   const { outcome, calls } = await run(`Bearer ${SECRET}`, SECRET);
   assert.equal(outcome.status, 200);
   assert.equal(outcome.body.ok, true);
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 3);
 });
 
 test("ohne Service-Role-Schlüssel: 503, nichts wird aufgerufen", async () => {
@@ -110,6 +111,7 @@ test("jede Funktion genau einmal, Forschung mit 30 Tagen", async () => {
   assert.deepEqual(calls, [
     { fn: "purge_old_research_events", args: { p_retention_days: 30 } },
     { fn: "cleanup_expired_event_data", args: undefined },
+    { fn: "purge_stale_operational_rows", args: { p_job_days: 90, p_notice_days: 180 } },
   ]);
   assert.equal(RESEARCH_RETENTION_DAYS, 30);
 });
@@ -120,9 +122,11 @@ test("die Zählwerte der Funktionen gehen in die Antwort, sonst nichts", async (
     ok: true,
     researchCleanup: "ok",
     eventCleanup: "ok",
+    operationalCleanup: "ok",
     counts: {
       research: { retentionDays: 30, deletedResearchEvents: 4, deletedProductAnalyticsEvents: 2 },
       events: { closedEvents: 1, deletedAnswers: 12, deletedParticipants: 3 },
+      operational: { deletedAiJobs: 5, deletedNotices: 7 },
     },
   });
 });
@@ -141,7 +145,7 @@ test("Forschungs-Löschung scheitert: 500, Event-Löschung läuft trotzdem", asy
     assert.equal(outcome.body.ok, false);
     assert.equal("researchCleanup" in outcome.body && outcome.body.researchCleanup, "failed");
     assert.equal("eventCleanup" in outcome.body && outcome.body.eventCleanup, "ok");
-    assert.equal(calls.length, 2, "der zweite Schritt hängt nicht am ersten");
+    assert.equal(calls.length, 3, "die weiteren Schritte hängen nicht am ersten");
   } finally {
     log.restore();
   }
@@ -164,19 +168,21 @@ test("Event-Löschung scheitert: 500, Forschung bleibt ok", async () => {
   }
 });
 
-test("beide scheitern, auch per Ausnahme: 500, beide failed, keine Zählwerte", async () => {
+test("alle scheitern, auch per Ausnahme: 500, alle failed, keine Zählwerte", async () => {
   const log = silenceErrors();
   try {
     const { outcome } = await run(`Bearer ${SECRET}`, SECRET, {
       purge_old_research_events: { throws: true },
       cleanup_expired_event_data: { error: { code: "XX000" } },
+      purge_stale_operational_rows: { throws: true },
     });
     assert.equal(outcome.status, 500);
     assert.deepEqual(outcome.body, {
       ok: false,
       researchCleanup: "failed",
       eventCleanup: "failed",
-      counts: { research: null, events: null },
+      operationalCleanup: "failed",
+      counts: { research: null, events: null, operational: null },
     });
   } finally {
     log.restore();

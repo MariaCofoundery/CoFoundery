@@ -6,7 +6,7 @@ import {
   isNotificationKind,
   notificationKindsByArea,
 } from "@/features/account/notificationKinds";
-import { ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
+import { ACCOUNT_EXPORT_CHILD_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
@@ -218,7 +218,12 @@ test("der Export liest mit den Rechten der Person, nicht privilegiert", () => {
   for (const entry of ACCOUNT_EXPORT_TABLES) {
     assert.ok(entry.column.endsWith("user_id"), `${entry.table}: keine Personenspalte`);
   }
-  assert.ok(ACCOUNT_EXPORT_TABLES.length >= 12, "der Export deckt zu wenig ab");
+  assert.ok(ACCOUNT_EXPORT_TABLES.length >= 30, "der Export deckt zu wenig ab");
+  // Die Inhalte, die an einer Elterntabelle haengen (Antworten, Belege, Interview), sind dabei.
+  const tables: string[] = [...ACCOUNT_EXPORT_TABLES.map((entry) => entry.table), ...ACCOUNT_EXPORT_CHILD_TABLES.map((entry) => entry.table)];
+  for (const wanted of ["person_strengths", "person_resources", "direction_statements", "alignment_answers", "person_capability_evidence", "advisor_person_grants"]) {
+    assert.ok(tables.includes(wanted), `${wanted} fehlt im Export`);
+  }
 });
 
 test("eine fehlende Tabelle laesst den Export nicht platzen, sondern wird genannt", () => {

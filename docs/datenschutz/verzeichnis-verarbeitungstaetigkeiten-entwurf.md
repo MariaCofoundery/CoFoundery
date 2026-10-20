@@ -166,8 +166,11 @@ vorgeschlagene Rechtsgrundlage, wer die Daten sieht, die Frist und Besonderheite
 | Event-Daten | 24 Stunden nach Event-Ende | derselbe Löschlauf (`cleanup_expired_event_data`) |
 | Connect-Listings | laufen nach 60 Tagen ab (Sichtbarkeit) | Status, **keine Löschung** gefunden |
 | Konto | bis zur Löschung durch die Person | Löschfunktion mit Prüfung der Fremdschlüssel (pgTAP-Test) |
+| Abgeschlossene KI-Aufgaben (`ai_jobs`) | **90 Tage** nach Abschluss; laufende und wartende nie | täglicher Löschlauf, Funktion `purge_stale_operational_rows` (seit Oktober 2026) |
+| Hinweise in der Anwendung (`in_app_notices`) | **180 Tage** nach Entstehen, gelesen oder nicht | derselbe Lauf |
 | **Aggregate der Produktanalyse** | keine | laut Erklärung bewusst, **Begründung dokumentieren** |
-| **Nachrichten, Benachrichtigungen, Feedback, KI-Jobs, Einladungen, Hinweise** | **in dieser Prüfung nicht gefunden** | Löschkonzept ergänzen |
+| Einladungen | laufen nach 14 bzw. 30 Tagen ab; abgelaufene werden **nicht** automatisch gelöscht, spätestens mit dem Konto der einladenden Person | so in der Datenschutzerklärung (Abschnitt 24) beschrieben; Löschregel offen, weil Einladungen an Berichten hängen können |
+| **Nachrichten, Feedback, Aggregate** | keine automatische Frist; Nachrichten werden mit dem Konto nur vom Bezug gelöst | Entscheidung offen (Abschnitt 7) |
 
 Der Löschlauf in Production hängt von der Variable `CRON_SECRET` (sonst 503, nichts wird gelöscht) und dem Service-Role-Schlüssel ab. **Prüfen, ob beides in Production gesetzt ist.**
 
@@ -181,12 +184,15 @@ Backup und Restore (nicht dokumentiert), Protokollierung administrativer Zugriff
 
 ## 5. Betroffenenrechte (Stand Code)
 
-- **Auskunft/Export:** Die Exportfunktion liest, nach ihrer Tabellenliste im Code, `person_core`, `profiles`,
-  Find-Profil und -Präferenzen, Connect-Profil, Listings, Ventures, Probleme, Ansätze, gesendete Nachrichten,
-  gespeicherte Suchen, Fähigkeitseinträge, Assessments, Forschungseinwilligung und Opt-outs.
-  **In der Liste fehlen:** Stärken, Richtung, Ressourcen, Absicht, Antwortinhalte der Fragebögen (ob sie über
-  `assessments` mitkommen, ist nicht geprüft), Freigaben, Teamdaten, Advisor-Freigaben, Benachrichtigungen. Der
-  Dateiname trägt noch den alten Markennamen (`cofoundery-export-…`).
+- **Auskunft/Export:** Die Exportfunktion (`/api/account/export`) liest mit den Rechten der Person: Kern und
+  Profil, Antworten der Fragebögen (`alignment_answers`, Workstyle-Sitzungen und -Forschungsantworten),
+  Fähigkeiten samt Belegen und Interview, Stärken, Richtung, Ressourcen, Absicht (über `person_core`),
+  Freigaben (Team, Advisor), Teamzugehörigkeit und eigene Beiträge im Team, Find, Connect (Profil, Listings,
+  Probleme, gesendete Nachrichten, Kontaktanfragen, Blockierungen), Hinweise, Rückmeldungen. Der Dateiname
+  lautet jetzt `made2found-export-…`.
+  **Weiterhin nicht enthalten:** Nachrichten anderer Menschen, KI-Vorschläge zu Stärken und Richtung (hängen
+  zwei Stufen tief), Push-Zustelladressen, Meldungen an die Moderation. Ob jede Tabelle im Betrieb wirklich
+  lesbar ist, zeigt das Feld `nichtEnthalten` in der Exportdatei: **einmal mit einem echten Konto prüfen.**
 - **Löschung:** vorhanden (V17). **Berichtigung:** durch die Person. **Widerruf:** je Freigabe, Forschung getrennt.
 - **Einschränkung/Widerspruch:** kein eigener Weg erkennbar; Kontaktweg in der Erklärung nennen.
 
@@ -200,12 +206,14 @@ automatisierten Entscheidungen, strikte Zweck- und Freigabetrennung, keine Dritt
 
 ## 7. Offene Punkte (nach Dringlichkeit)
 
-1. **Datenschutzerklärung angleichen.** Die Fassung im Branch `feat/founder-profile-phase1` beschreibt noch Scores,
-   Matching-Reports und das Workbook und kennt weder Find noch Connect, Advisor-Notizen, Push, KI-Vorschläge oder
-   Stärken. Die Arbeit am Produktivstand liegt im Branch `docs/privacy-policy-production-state`; dort abgleichen.
+1. **Datenschutzerklärung veröffentlichen.** Die Fassung, die im Branch `feat/founder-profile-phase1` liegt,
+   ist veraltet (Scores, Workbook; kein Find, Connect, Advisor, Push, KI). Eine neue, 27 Abschnitte lange
+   Fassung liegt **uncommitted** im Hauptordner (Branch `docs/privacy-policy-production-state`). Sie sollte
+   committet und nach `main` gebracht werden; dabei die „LEGAL REVIEW REQUIRED“-Kommentare klären.
 2. **AV-Verträge, Standorte und Drittlandfragen** für Supabase, Vercel und Resend dokumentieren.
-3. **Löschkonzept vervollständigen** (Nachrichten, Benachrichtigungen, Feedback, Einladungen, KI-Jobs, Aggregate).
-4. **Export erweitern** (Abschnitt 5) und Dateinamen umbenennen.
+3. **Löschkonzept weiter vervollständigen:** KI-Jobs und Hinweise sind erledigt; offen sind Nachrichten,
+   Rückmeldungen, abgelaufene Einladungen und Aggregate (Entscheidung, ob und wann).
+4. **Export einmal mit einem echten Konto prüfen** (`nichtEnthalten` lesen).
 5. **KI-Worker:** Betriebsweise, Zugriff und Absicherung beschreiben; entscheiden, ob er außerhalb des
    Betreibergeräts laufen soll.
 6. **Notizen über Dritte** (Advisor): Rechtsgrundlage, Auskunftsweg, Löschung.

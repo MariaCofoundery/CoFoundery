@@ -26,6 +26,9 @@ import { createClient } from "@supabase/supabase-js";
 
 /** Die Aufbewahrung, mit der `purge_old_research_events` aufgerufen wird. */
 export const RESEARCH_RETENTION_DAYS = 30;
+/** Abgeschlossene KI-Aufgaben und alte Hinweise in der Anwendung (`purge_stale_operational_rows`). */
+export const AI_JOB_RETENTION_DAYS = 90;
+export const NOTICE_RETENTION_DAYS = 180;
 
 type RpcError = { code?: string | null } | null;
 type RpcResult = { data: unknown; error: RpcError };
@@ -41,10 +44,12 @@ export type PrivacyRetentionResult = {
   ok: boolean;
   researchCleanup: StepStatus;
   eventCleanup: StepStatus;
+  operationalCleanup: StepStatus;
   /** Nur Zählwerte, die die SQL-Funktionen selbst zurückgeben. */
   counts: {
     research: { retentionDays: number; deletedResearchEvents: number; deletedProductAnalyticsEvents: number } | null;
     events: { closedEvents: number; deletedAnswers: number; deletedParticipants: number } | null;
+    operational: { deletedAiJobs: number; deletedNotices: number } | null;
   };
 };
 
@@ -83,15 +88,21 @@ async function runStep(client: RetentionRpcClient, fn: string, args?: Record<str
 export async function runPrivacyRetention(client: RetentionRpcClient): Promise<PrivacyRetentionResult> {
   const research = await runStep(client, "purge_old_research_events", { p_retention_days: RESEARCH_RETENTION_DAYS });
   const events = await runStep(client, "cleanup_expired_event_data");
+  const operational = await runStep(client, "purge_stale_operational_rows", {
+    p_job_days: AI_JOB_RETENTION_DAYS,
+    p_notice_days: NOTICE_RETENTION_DAYS,
+  });
   return {
-    ok: research.ok && events.ok,
+    ok: research.ok && events.ok && operational.ok,
     researchCleanup: research.ok ? "ok" : "failed",
     eventCleanup: events.ok ? "ok" : "failed",
+    operationalCleanup: operational.ok ? "ok" : "failed",
     counts: {
       research: research.ok
         ? pickCounts(research.data, ["retentionDays", "deletedResearchEvents", "deletedProductAnalyticsEvents"] as const)
         : null,
       events: events.ok ? pickCounts(events.data, ["closedEvents", "deletedAnswers", "deletedParticipants"] as const) : null,
+      operational: operational.ok ? pickCounts(operational.data, ["deletedAiJobs", "deletedNotices"] as const) : null,
     },
   };
 }
