@@ -102,7 +102,9 @@ export function FounderProfileBase({
                 <dd className={`mt-1 text-sm leading-6 ${valueClass}`}>{region}</dd>
               </div>
             ) : null}
-            {core?.linkedin_url ? (
+            {/* LinkedIn steht nicht im Kopf und nicht im Ausdruck: Kontakte sehen es
+                in Find und Connect, das Profil bleibt auf der Website. */}
+            {tone === "card" && core?.linkedin_url ? (
               <div>
                 <dt className={`text-xs font-semibold uppercase tracking-[0.12em] ${labelClass}`}>{copy.linkedin}</dt>
                 {/* Ausgeschrieben und nicht als Link-Text: Ein gedrucktes
