@@ -150,15 +150,12 @@ test("jeder Schritt hat einen Weg zurueck, nicht nur die drei im Fluss", () => {
   // dreiteiligen Schrittanzeige. Seit „Ueber dich" gibt es sieben Schritte -
   // und wer ueber einen Bearbeiten-Link aus „Das bist du" hereinkommt, hatte
   // sonst nur den Browser-Zurueck.
+  // GEAENDERT am 20.10.2026: Der Weg zurueck ist der Reiter "Uebersicht" - er steht auf JEDER Seite der
+  // Profilbearbeitung (alle Schritte und Richtung) und ersetzt den einzelnen Link "Zurueck zur Uebersicht".
   const page = source("src/app/(product)/profile/page.tsx");
-  const kopf = page.slice(0, page.indexOf('{t("eyebrow")}'));
-  assert.match(kopf, /\{step \? \(/, "der Rueckweg haengt nicht am Schritt");
-  assert.match(kopf, /aboutYou\.backToOverview/);
-
-  for (const locale of ["de", "en"]) {
-    const about = readJson(`messages/${locale}/capability.json`).aboutYou as Record<string, string>;
-    assert.ok(about.backToOverview?.trim(), `${locale}: backToOverview fehlt`);
-  }
+  assert.match(page, /<ProfileTabs step=\{step\}/);
+  assert.match(source("src/features/profile/ProfileTabs.tsx"), /key: "overview", href: "\/profile"/);
+  assert.match(source("src/app/(product)/profile/direction/page.tsx"), /<ProfileTabsForUser/);
 });
 
 test("finished steps look different from upcoming ones", () => {

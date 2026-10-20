@@ -882,5 +882,22 @@
     "emptyNotice": "Vorschläge nutzen bisher deine FIND-Angaben. Du kannst Fähigkeiten ergänzen – freiwillig.",
     "emptyLink": "Fähigkeiten ergänzen",
     "error": "Die Einstellung konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
+  },
+  "profileTabs": {
+    "label": "Profil bearbeiten",
+    "subLabel": "Bereich",
+    "overview": "Übersicht",
+    "about": "Über mich",
+    "align": "Align",
+    "visibility": "Sichtbarkeit",
+    "find": "Find",
+    "connect": "Connect",
+    "sub": {
+      "identity": "Angaben & Foto",
+      "resources": "Ressourcen",
+      "capability": "Können",
+      "strengths": "Stärken",
+      "direction": "Richtung"
+    }
   }
 }

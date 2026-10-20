@@ -882,5 +882,22 @@
     "emptyNotice": "Suggestions currently use your FIND details. You can add capabilities if you like – it's voluntary.",
     "emptyLink": "Add capabilities",
     "error": "We couldn't save this setting right now. Please try again."
+  },
+  "profileTabs": {
+    "label": "Edit profile",
+    "subLabel": "Section",
+    "overview": "Overview",
+    "about": "About me",
+    "align": "Align",
+    "visibility": "Visibility",
+    "find": "Find",
+    "connect": "Connect",
+    "sub": {
+      "identity": "Details & photo",
+      "resources": "Resources",
+      "capability": "Capabilities",
+      "strengths": "Strengths",
+      "direction": "Direction"
+    }
   }
 }

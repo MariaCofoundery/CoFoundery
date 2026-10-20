@@ -31,6 +31,7 @@ import {
 import { ProposalWatcher } from "@/features/capability/ProposalWatcher";
 import { getDirectionStatements } from "@/features/direction/directionStatementData";
 import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
+import { ProfileTabsForUser } from "@/features/profile/ProfileTabs";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -100,6 +101,7 @@ export default async function DirectionInterviewPage({
       </Link>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight">{t("title")}</h1>
       <p className="mt-3 max-w-2xl leading-7 text-slate-600">{t("text")}</p>
+      <ProfileTabsForUser client={client} userId={user.id} current="direction" />
 
       {query.error ? (
         <p role="status" className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">

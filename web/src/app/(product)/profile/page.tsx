@@ -38,6 +38,7 @@ import {
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
+import { ProfileTabs } from "@/features/profile/ProfileTabs";
 import { getPhotoUsage } from "@/features/profile/photoUsageData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnPersonResources, type PersonResource } from "@/features/ai/personResources";
@@ -313,17 +314,6 @@ export default async function ProfilePage({
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 md:px-8">
-      {/* DER WEG ZURUECK, auf jeder Schrittseite. Vorher gab es ihn nur im
-          dreiteiligen Faehigkeitsablauf; wer ueber einen Bearbeiten-Link
-          hereinkam, hatte nur den Browser-Zurueck. */}
-      {step ? (
-        <Link
-          href="/profile"
-          className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 hover:text-slate-900"
-        >
-          {t("aboutYou.backToOverview")}
-        </Link>
-      ) : null}
 
       <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t("eyebrow")}</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">{t("title")}</h1>
@@ -343,6 +333,8 @@ export default async function ProfilePage({
       >
         {t("viewFounderProfile")}
       </Link>
+
+      <ProfileTabs step={step} hasFind={hasDiscovery} hasConnect={isConnectMember} />
 
       {saved ? (
         <p role="status" className="mt-6 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.${saved}`)}</p>
