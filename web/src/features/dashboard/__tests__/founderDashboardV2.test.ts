@@ -219,7 +219,9 @@ test("Team-Intake bleibt fuer Founder erreichbar, aber leise im Teams-Bereich", 
   // Im Advisor-Kontext steht Intake als regulaerer Menuepunkt - und nur dort:
   // Der alte hartkodierte "Team Context"-Link im Advisor-Dashboard zeigte auf
   // dasselbe Ziel und ist entfernt.
-  assert.match(shellSource, /href: "\/team-intake"[\s\S]{0,40}label: t\("advisorIntake"\)/);
+  // Seit 21.10.2026 unter „Einladen" (Team-Runde), nicht mehr als eigener Menuepunkt.
+  assert.match(shellSource, /href: "\/advisor\/einladen",\s*label: t\("advisorInvite"\)/);
+  assert.match(shellSource, /currentPathname\.startsWith\("\/team-intake\/"\)/);
   const advisorDashboard = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   assert.doesNotMatch(advisorDashboard, /Team Context/);
   assert.doesNotMatch(advisorDashboard, /href="\/team-intake"/);

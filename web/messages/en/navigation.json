@@ -79,5 +79,8 @@
   "findMyProfile": "My Find profile",
   "connectContacts": "Contacts",
   "connectMine": "My Connect",
-  "myProfile": "My profile"
+  "myProfile": "My profile",
+  "advisorFollow": "Support",
+  "advisorInvite": "Invite",
+  "advisorOrg": "Organization"
 }

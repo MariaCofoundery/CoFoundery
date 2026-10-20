@@ -253,7 +253,7 @@ test("O: Org-Fehler sind sichtbar, verstaendlich und nie Datenbanktext", () => {
   const section = read("src/features/advisor/AdvisorOrgSection.tsx");
   assert.match(section, /t\(`errors\.\$\{error\}`\)/);
   assert.match(section, /org\.status === "suspended"/);
-  assert.match(read("src/app/(product)/advisor/dashboard/page.tsx"), /readOrgErrorCode\(/);
+  assert.match(read("src/app/(product)/advisor/organisation/page.tsx"), /readOrgErrorCode\(/);
   for (const locale of ["de", "en"]) {
     for (const code of ["org_last_owner", "org_not_member", "org_forbidden", "org_suspended", "org_failed"]) {
       assert.ok(pick(messages(locale, "advisor"), `org.errors.${code}`), `${locale}: ${code}`);
@@ -330,7 +330,7 @@ test("R: leere Zustaende bieten einen passenden naechsten Schritt", () => {
   const intros = read("src/app/(product)/discovery/intros/page.tsx");
   assert.match(intros, /intros\.receivedEmptyCta/);
   assert.match(intros, /intros\.sentEmptyCta/);
-  assert.match(read("src/app/(product)/advisor/group/page.tsx"), /href="\/advisor\/dashboard#person-invites"[\s\S]*nobodyCta/);
+  assert.match(read("src/app/(product)/advisor/group/page.tsx"), /href="\/advisor\/einladen#person-invites"[\s\S]*nobodyCta/);
   assert.match(read("src/features/advisor/PersonInviteSection.tsx"), /id="person-invites"/);
 });
 

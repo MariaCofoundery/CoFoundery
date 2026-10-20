@@ -18,7 +18,7 @@ type Preview =
   | { state: "open"; org_name: string | null; role: "owner" | "advisor"; inviter_name: string | null; already_member: boolean }
   | { state: "claimed" | "expired" | "revoked" | "unverified" | "unavailable" };
 
-const SUCCESS = "/advisor/dashboard#advisor-org";
+const SUCCESS = "/advisor/organisation";
 
 export default async function ClaimAdvisorOrgInvitePage({
   params,

@@ -20,8 +20,8 @@ import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErr
  * ausläuft.
  */
 
-const PATH = "/advisor/dashboard";
-const ANCHOR = "#advisor-org";
+const PATH = "/advisor/organisation";
+const ANCHOR = "";
 
 function back(error: OrgActionErrorCode): never {
   revalidatePath(PATH);

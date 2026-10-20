@@ -211,7 +211,7 @@ export async function createAdvisorTeamInviteAction(
       status: founderBEmailStatus,
     }),
   ]);
-  revalidatePath("/advisor/dashboard");
+  revalidatePath("/advisor/dashboard"); revalidatePath("/advisor/begleitung"); revalidatePath("/advisor/einladen");
 
   return {
     ok: true,
@@ -268,7 +268,7 @@ export async function resendAdvisorTeamInviteFounderAction(formData: FormData): 
     founderSlot,
     status: delivery.ok ? "sent" : "failed",
   });
-  revalidatePath("/advisor/dashboard");
+  revalidatePath("/advisor/dashboard"); revalidatePath("/advisor/begleitung"); revalidatePath("/advisor/einladen");
 }
 
 export async function claimAdvisorTeamInviteFounderAction(params: {
@@ -290,7 +290,7 @@ export async function claimAdvisorTeamInviteFounderAction(params: {
   });
 
   if (result.ok) {
-    revalidatePath("/advisor/dashboard");
+    revalidatePath("/advisor/dashboard"); revalidatePath("/advisor/begleitung"); revalidatePath("/advisor/einladen");
     revalidatePath("/dashboard");
   }
 
@@ -318,7 +318,7 @@ export async function revokeAdvisorPendingTeamInviteAction(
     p_invite_id: pendingTeamId,
   });
 
-  revalidatePath("/advisor/dashboard");
+  revalidatePath("/advisor/dashboard"); revalidatePath("/advisor/begleitung"); revalidatePath("/advisor/einladen");
 }
 
 /**
@@ -344,7 +344,7 @@ export async function recoverAdvisorTeamInviteFounderAction(params: {
   });
 
   if (result.ok) {
-    revalidatePath("/advisor/dashboard");
+    revalidatePath("/advisor/dashboard"); revalidatePath("/advisor/begleitung"); revalidatePath("/advisor/einladen");
     revalidatePath("/dashboard");
   }
 

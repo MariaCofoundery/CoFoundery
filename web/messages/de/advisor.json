@@ -3,24 +3,24 @@
   "teamContext": {
     "existingTeam": "Bestehendes Team",
     "preFounder": "Pre-Founder",
-    "existingRelationship": "Founder-Verbindung · bestehendes Team",
-    "exploringRelationship": "Founder-Verbindung · Zusammenarbeit in Prüfung"
+    "existingRelationship": "Bestehendes Team",
+    "exploringRelationship": "Zusammenarbeit in Prüfung"
   },
   "dashboard": {
     "eyebrow": "Advisor Dashboard",
     "title": "Willkommen zurück, {name}",
     "description": "Behalte deine begleiteten Teams, offene Founder-Einladungen und die nächsten sinnvollen Schritte im Blick.",
     "workspaceEyebrow": "Advisor-Arbeitsplatz",
-    "heroText": "Du begleitest Founder-Verbindungen mit Außenblick. Zugriff entsteht erst, wenn beide Founder die Begleitung aktiv freigegeben haben.",
+    "heroText": "Du begleitest Teams mit Außenblick. Zugriff entsteht erst, wenn beide Founder die Begleitung aktiv freigegeben haben.",
     "summary": {
       "ready": "Bereit",
       "waiting": "Wartet",
       "paused": "Pausiert"
     },
     "createInviteTitle": "Neues Team einladen",
-    "teamsEyebrow": "Founder-Verbindungen",
-    "teamsTitle": "Deine Founder-Verbindungen",
-    "teamsDescription": "Du siehst pro Verbindung den Relationship-Zugang, aktuelle Reports und separate Founder-Setup-Freigaben.",
+    "teamsEyebrow": "Teams",
+    "teamsTitle": "Deine Teams",
+    "teamsDescription": "Du siehst pro Team den Zugang zum Team, aktuelle Reports und separate Founder-Setup-Freigaben.",
     "emptyTitle": "Noch keine Teams verknüpft",
     "emptyText": "Sobald beide Founder gestartet und mit deinem Invite verknüpft sind, erscheint das Team hier mit seinem Freigabestatus.",
     "emptyHint": "Bis dahin siehst du neue Einladungen oben bereits als offene Teamstarts.",
@@ -31,7 +31,7 @@
     "pausedTeamsTitle": "Pausierter Zugriff",
     "pausedTeamsDescription": "Teams, bei denen deine Advisor-Freigabe nicht aktiv ist.",
     "readySectionTitle": "Bereit zur Begleitung",
-    "readySectionDescription": "Die Relationship-Freigabe ist vollständig. Der Advisor Report ist dein aktueller Einstieg; frühere Workbook-Inhalte bleiben bei Bedarf erreichbar.",
+    "readySectionDescription": "Die Team-Freigabe ist vollständig. Der Advisor Report ist dein aktueller Einstieg; frühere Workbook-Inhalte bleiben bei Bedarf erreichbar.",
     "waitingSectionTitle": "Wartet auf Freigabe",
     "waitingSectionDescription": "Diese Teams sind sichtbar, aber noch nicht vollständig freigegeben. Behalte den Freigabestand im Blick.",
     "pausedSectionTitle": "Zugriff pausiert",
@@ -46,21 +46,21 @@
       "followUp": "Follow-up"
     },
     "inviteTeam": {
-      "eyebrow": "Neue Founder-Verbindung",
+      "eyebrow": "Neues Team",
       "title": "Zwei Founder einladen",
-      "description": "Starte eine paarweise Founder-Verbindung. Beide Founder erhalten einen eigenen Link und müssen jeweils selbst zustimmen, bevor dein Advisor-Zugang aktiviert wird.",
+      "description": "Starte ein Team mit zwei Founders. Beide Founder erhalten einen eigenen Link und müssen jeweils selbst zustimmen, bevor dein Advisor-Zugang aktiviert wird.",
       "founderAEmail": "E-Mail Founder A",
       "founderBEmail": "E-Mail Founder B",
       "teamName": "Name eures Teams oder Projekts",
       "teamNamePlaceholder": "optional, z. B. Projekt Atlas",
       "teamNameHint": "Optional. Wenn du einen Team- oder Projektnamen mitgibst, erscheint er später im Dashboard und in der Founder-Einladung.",
-      "submit": "Founder-Verbindung starten",
+      "submit": "Team starten",
       "submitting": "Einladungen werden erstellt...",
       "v1Hint": "Founder Setup bleibt separat; Commitment Lab, Deep Dives und offene Punkte werden nicht geteilt.",
       "sent": "Einladungen gesendet",
       "created": "Einladungen erstellt",
       "sentText": "Beide Founder wurden separat eingeladen. Dein Zugang beginnt erst nach beiden Annahmen.",
-      "createdText": "Die Founder-Verbindung ist vorbereitet. Prüfe unten, welche E-Mail zugestellt wurde, und sende fehlgeschlagene Einladungen gezielt erneut.",
+      "createdText": "Die Team ist vorbereitet. Prüfe unten, welche E-Mail zugestellt wurde, und sende fehlgeschlagene Einladungen gezielt erneut.",
       "emailDeliveryFailed": "Mindestens eine E-Mail konnte gerade nicht versendet werden. Die Einladungslinks bleiben verfügbar.",
       "copyLink": "Link kopieren",
       "copied": "Link kopiert.",
@@ -137,7 +137,7 @@
     },
     "accessDescription": {
       "revoked": "Die Freigabe für dieses Team ist beendet. Report, Snapshot und Workbook sind nicht mehr zugänglich – das Team bleibt hier in der Liste, damit du weißt, woran du bist.",
-      "ready": "Die Relationship-Freigabe ist vollständig. Report und Snapshot sind verfügbar, sobald der jeweilige Stand vorliegt. Historische Workbook-Inhalte bleiben separat erreichbar.",
+      "ready": "Die Team-Freigabe ist vollständig. Report und Snapshot sind verfügbar, sobald der jeweilige Stand vorliegt. Historische Workbook-Inhalte bleiben separat erreichbar.",
       "paused": "Mindestens eine Founder-Freigabe ist gerade nicht aktiv. Solange das so ist, sind die Inhalte geschlossen. Sobald wieder beide zugestimmt haben, kommst du an derselben Stelle weiter.",
       "waiting": "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team für die Begleitung offen."
     },
@@ -146,7 +146,7 @@
       "title": "Neu eingeladen",
       "description": "Diese Teams hast du bereits angestoßen. Sobald beide Founder gestartet haben, wechseln sie automatisch in deine begleiteten Teams.",
       "openCount": "{count} offen",
-      "type": "Founder-Verbindung",
+      "type": "Team",
       "remove": "Einladung beenden",
       "resend": "Erneut senden",
       "createNew": "Neue Einladung erstellen"
@@ -277,10 +277,10 @@
     "linkProfileText": "Melde dich an, damit dein Advisor-Profil sauber mit diesem Team verknüpft werden kann. Danach landest du direkt im Advisor-Bereich.",
     "loginAndLink": "Login / Profil verknüpfen",
     "activateTitle": "Advisor-Zugriff jetzt aktivieren",
-    "activateText": "Dein Profil ist angemeldet. Mit einem Klick verknüpfst du dich als Advisor mit dieser Founder-Verbindung und erhältst den freigegebenen Relationship-Zugang.",
+    "activateText": "Dein Profil ist angemeldet. Mit einem Klick verknüpfst du dich als Advisor mit diesem Team und erhältst den freigegebenen Zugang zum Team.",
     "linkProfile": "Profil verknüpfen",
     "activeTitle": "Advisor-Zugriff ist aktiv",
-    "activeText": "Dein Profil ist bereits mit dieser Founder-Verbindung verknüpft. Im Advisor Dashboard findest du die aktuell freigegebenen Bereiche.",
+    "activeText": "Dein Profil ist bereits mit diesem Team verknüpft. Im Advisor Dashboard findest du die aktuell freigegebenen Bereiche.",
     "continueDashboard": "Weiter zum Dashboard",
     "openWorkbook": "Früheren Workbookstand ansehen",
     "whatYouSee": "Was du als Advisor siehst",
@@ -452,7 +452,8 @@
       "org_name": "Der Name braucht zwischen 2 und 120 Zeichen.",
       "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
       "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
-    }
+    },
+    "personOpen": "Ansehen"
   },
   "personView": {
     "back": "Zurück zu Personen & Gruppen",
@@ -581,6 +582,62 @@
     "orgSuspended": {
       "title": "Die Organisation ist ausgesetzt.",
       "body": "Zugänge über diese Organisation sind derzeit nicht aktiv."
+    }
+  },
+  "area": {
+    "eyebrow": "Advisor",
+    "kinds": {
+      "team": "Team",
+      "person": "Person",
+      "group": "Gruppenauswertung",
+      "unnamed": "Ohne freigegebenen Namen"
+    },
+    "start": {
+      "title": "Willkommen zurück, {name}",
+      "summary": "Du begleitest {people, plural, one {# Person} other {# Personen}} und {teams, plural, one {# Team} other {# Teams}}.",
+      "summaryNone": "Du begleitest noch niemanden.",
+      "accessNote": "Zugriff entsteht erst, wenn die Begleiteten ihn freigegeben haben.",
+      "invite": "Jemanden einladen",
+      "waitingTitle": "Wartet auf dich · {count}",
+      "waitingTitleNone": "Wartet auf dich",
+      "waitingNone": "Gerade wartet nichts auf dich.",
+      "overdue": "Die Nachfrage bei {name} ist fällig.",
+      "waitingTeam": "{name}: Eine Freigabe fehlt noch.",
+      "teamInvites": "{count, plural, one {# Team-Einladung ist} other {# Team-Einladungen sind}} noch offen.",
+      "personInvites": "{count, plural, one {# Einladung an eine Person ist} other {# Einladungen an Personen sind}} noch offen.",
+      "open": "Öffnen",
+      "view": "Ansehen",
+      "recentTitle": "Zuletzt begleitet",
+      "recentAll": "Alle ansehen →",
+      "recentEmpty": "Noch niemand verknüpft."
+    },
+    "follow": {
+      "title": "Begleitung",
+      "text": "Alle, die du begleitest: Teams, Personen und Gruppenauswertungen. Jede Art hat ihre eigene Zustimmung – hier stehen sie nur nebeneinander.",
+      "filterLabel": "Art der Begleitung",
+      "filters": {
+        "all": "Alle",
+        "people": "Personen",
+        "teams": "Teams",
+        "groups": "Gruppenauswertungen"
+      },
+      "teamsTitle": "Teams",
+      "peopleTitle": "Personen",
+      "groupsTitle": "Gruppenauswertungen",
+      "groupsRequest": "Gruppenauswertung anfragen",
+      "groupsEmpty": "Noch keine Gruppenauswertung angefragt.",
+      "empty": "Sobald jemand deine Einladung annimmt und dir etwas freigibt, erscheint es hier."
+    },
+    "invite": {
+      "title": "Einladen",
+      "text": "Drei Wege: eine Person, ein Team oder eine Team-Runde. Eine Einladung ist kein Zugang – er entsteht erst, wenn die Eingeladenen ihn freigeben.",
+      "roundTitle": "Team-Runde",
+      "roundCta": "Team-Runde starten",
+      "roundList": "Bisherige Runden"
+    },
+    "org": {
+      "title": "Organisation",
+      "text": "Ein Programm oder eine Beratung mit mehreren Advisorinnen und Advisors. Die Organisation hält die Zugänge – damit sie nicht verschwinden, wenn eine Person aufhört."
     }
   }
 }

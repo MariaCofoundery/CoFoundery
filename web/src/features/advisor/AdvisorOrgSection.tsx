@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   createAdvisorOrgAction,
@@ -7,7 +6,7 @@ import {
   setOrgMembershipAction,
   leaveOrgAction,
 } from "@/features/advisor/orgActions";
-import type { AccompaniedPersonNamed, AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
+import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type { OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -27,12 +26,10 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 export async function AdvisorOrgSection({
   orgs,
   members,
-  accompanied,
   error = null,
 }: {
   orgs: AdvisorOrg[];
   members: OrgMember[];
-  accompanied: AccompaniedPersonNamed[];
   /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
   error?: OrgActionErrorCode | null;
 }) {
@@ -40,7 +37,7 @@ export async function AdvisorOrgSection({
   const org = orgs[0] ?? null;
 
   return (
-    <section id="advisor-org" className="mt-8 scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+    <section id="advisor-org" className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
       <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("text")}</p>
 
@@ -253,63 +250,6 @@ export async function AdvisorOrgSection({
           </p>
         </>
       )}
-
-      <div className="mt-8 border-t border-slate-200 pt-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-base font-semibold text-slate-900">{t("peopleTitle")}</h3>
-          {/* Zwei Menschen sind das Minimum fuer eine Aufstellung - darunter
-              waere der Link ein Weg auf eine Seite, die nichts zeigen kann. */}
-          {accompanied.filter((person) => person.scopes.includes("capability")).length >= 2 ? (
-            <Link
-              href="/advisor/group"
-              className="text-sm font-medium text-slate-700 underline-offset-4 hover:underline"
-            >
-              {t("groupLink")}
-            </Link>
-          ) : null}
-        </div>
-        {accompanied.length === 0 ? (
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t("peopleEmpty")}</p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {accompanied.map((person) => (
-              <li
-                key={person.subjectUserId}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-              >
-                {/* Der Weg zur Ansicht steht nur da, wenn ueberhaupt etwas
-                    freigegeben ist - ein Link auf eine Seite, die nichts
-                    zeigen darf, ist kein Weg. */}
-                {/* DER NAME STEHT VORN, seit 26.09.2026. Vorher stand hier
-                    "3 Bereiche freigegeben" - eine Liste namenloser Zeilen.
-                    Der Name ist selbst eine Freigabe: Wer nur seine
-                    Faehigkeiten freigegeben hat, bleibt namenlos, und das
-                    steht dann da statt einer Kennung. */}
-                {person.scopes.length > 0 ? (
-                  <Link
-                    href={`/advisor/person/${person.subjectUserId}`}
-                    className="font-medium text-slate-900 underline-offset-4 hover:underline"
-                  >
-                    {person.name ?? t("personUnnamed")}
-                  </Link>
-                ) : (
-                  <span className="font-medium text-slate-900">
-                    {person.name ?? t("personUnnamed")}
-                  </span>
-                )}
-                <span className="ml-2 text-slate-500">
-                  {t("personScopes", { count: person.scopes.length })}
-                </span>
-                {person.pendingScopes.length > 0 ? (
-                  <span className="ml-2 text-slate-500">
-                    {t("personPending", { count: person.pendingScopes.length })}
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </section>
   );
 }

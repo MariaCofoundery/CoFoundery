@@ -26,7 +26,7 @@ import { createClient } from "@/lib/supabase/server";
  * bei der Team-Einladung.
  */
 
-const PATH = "/advisor/dashboard";
+const PATH = "/advisor/einladen";
 
 function back(error: string): never {
   revalidatePath(PATH);

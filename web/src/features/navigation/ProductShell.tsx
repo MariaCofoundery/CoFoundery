@@ -301,7 +301,7 @@ export function ProductShell({
     hasAdvisor,
     stored: storedWorkContext,
   });
-  const advisorFallbackHref = "/advisor/dashboard#advisor-teams";
+  const advisorFallbackHref = "/advisor/begleitung";
   const resolvedMatchingHref =
     resolvedActiveView === "advisor"
       ? navigationOverride?.matchingHref ?? advisorFallbackHref
@@ -435,31 +435,29 @@ export function ProductShell({
       isActive: (currentPathname) => currentPathname === "/advisor/dashboard",
     },
     {
-      href: "/advisor/group",
-      label: t("advisorPeople"),
-      // Teamreviews stehen auf /advisor/group und gehoeren deshalb hierher.
+      // Alles, was man begleitet: Teams, Personen, Gruppenauswertungen - und
+      // die Seiten dazu (Person, Review, Report, Snapshot, Sitzung).
+      href: "/advisor/begleitung",
+      label: t("advisorFollow"),
       isActive: (currentPathname) =>
-        currentPathname === "/advisor/group" ||
-        currentPathname.startsWith("/advisor/person/") ||
-        currentPathname.startsWith("/advisor/review/"),
-    },
-    {
-      // Das Advisor-Dashboard verlinkt die begleiteten Teams nur als Anker;
-      // eine Seite kann das Ziel weiterhin ueberschreiben.
-      href: resolvedMatchingHref,
-      label: t("advisorTeams"),
-      isActive: (currentPathname) =>
-        ["/advisor/report", "/advisor/snapshot", "/advisor/session"].some(
+        ["/advisor/begleitung", "/advisor/group", "/advisor/person", "/advisor/review", "/advisor/report", "/advisor/snapshot", "/advisor/session"].some(
           (base) => currentPathname === base || currentPathname.startsWith(`${base}/`),
         ),
     },
     {
-      href: "/team-intake",
-      label: t("advisorIntake"),
+      // Person, Team und Team-Runde (frueher „Intake") an einem Ort.
+      href: "/advisor/einladen",
+      label: t("advisorInvite"),
       isActive: (currentPathname) =>
+        currentPathname === "/advisor/einladen" ||
         currentPathname === "/team-intake" ||
         currentPathname.startsWith("/team-intake/") ||
         currentPathname.startsWith("/advisor/intake"),
+    },
+    {
+      href: "/advisor/organisation",
+      label: t("advisorOrg"),
+      isActive: (currentPathname) => currentPathname === "/advisor/organisation",
     },
   ];
 

@@ -140,7 +140,7 @@ export default async function AdvisorSessionPage({
       />
       <main className="mx-auto w-full max-w-4xl px-6 py-10 md:px-10">
         <Link
-          href="/advisor/dashboard#advisor-teams"
+          href="/advisor/begleitung"
           className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
         >
           {t("session.back")}

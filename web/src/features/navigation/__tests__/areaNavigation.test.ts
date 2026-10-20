@@ -29,9 +29,9 @@ test("the bar carries areas, and only areas", () => {
     "areaAlign",
     "areaFind",
     "areaConnect",
-    "advisorPeople",
-    "advisorTeams",
-    "advisorIntake",
+    "advisorFollow",
+    "advisorInvite",
+    "advisorOrg",
   ]) {
     assert.match(shell, new RegExp(`label: t\\("${area}"\\)`), `${area} fehlt als Bereich`);
   }
@@ -125,7 +125,7 @@ test("nothing was stranded by taking it out of the bar", () => {
     /href="\/advisor\/report/,
     "sobald das Dashboard verlinkt, darf der Eintrag aus der Leiste"
   );
-  assert.match(source(SHELL), /href: resolvedMatchingHref,\s*label: t\("advisorTeams"\)/);
+  assert.match(source(SHELL), /href: "\/advisor\/begleitung",\s*label: t\("advisorFollow"\)/);
 });
 
 test("the routes did not move with the labels", () => {

@@ -185,19 +185,19 @@ test("der gesammelte Bereich trennt Zusage und Anfrage", () => {
   const data = codeOnly("src/features/advisor/orgData.ts");
   assert.match(data, /pendingScopes/);
   assert.match(data, /row\.status === "active"/);
-  const view = codeOnly("src/features/advisor/AdvisorOrgSection.tsx");
+  const view = codeOnly("src/features/advisor/AccompaniedPeopleList.tsx");
   assert.match(view, /personPending/);
   // Und die Liste der begleiteten Menschen laedt keine Namen aus dem Profil:
   // Sie wuerde sie fuer Menschen laden, die vielleicht nur "Wer du bist"
   // freigegeben haben. Ihr Name kommt nur aus der Freigabe (person.name).
   assert.doesNotMatch(view, /person_core/);
-  const peopleList = view.slice(view.indexOf("accompanied.map("));
+  const peopleList = view.slice(view.indexOf("people.map("));
   assert.doesNotMatch(peopleList, /displayName/);
   assert.match(peopleList, /person\.name \?\? t\("personUnnamed"\)/);
   // Phase 12C.1C: Namen gibt es nur in der Mitgliederliste der Organisation -
   // aus einer eigenen Funktion, die nur Mitgliedern antwortet.
   assert.match(data, /get_advisor_org_member_list/);
-  assert.match(view, /member\.displayName \?\? t\("unnamed"\)/);
+  assert.match(codeOnly("src/features/advisor/AdvisorOrgSection.tsx"), /member\.displayName \?\? t\("unnamed"\)/);
 });
 
 // ---------------------------------------------------------------------------

@@ -186,7 +186,7 @@ test("die Wiedervorlage ist seine eigene – die Founder erfahren nichts davon",
 // Erreichbarkeit
 // ---------------------------------------------------------------------------
 test("das Sitzungsblatt ist vom Dashboard aus erreichbar", () => {
-  const dashboard = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
+  const dashboard = codeOnly("src/features/advisor/AdvisorTeamsList.tsx");
   assert.match(dashboard, /team\.sessionHref/);
   assert.match(dashboard, /dashboard\.openSession/);
   assert.match(
@@ -253,7 +253,7 @@ test("eine fällige Wiedervorlage steht oben im Dashboard", () => {
   const dashboard = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
   assert.match(dashboard, /listDueAdvisorFollowUps\(client\)/);
   assert.match(dashboard, /overdueTeams/);
-  assert.match(dashboard, /dashboard\.followUpsDue\.title/);
+  assert.match(dashboard, /start\.overdue/);
   // Ueber den angemeldeten Zugang - die Policy gibt nur eigene Zeilen heraus.
   assert.doesNotMatch(dashboard, /createPrivilegedAccessClient/);
 

@@ -452,7 +452,8 @@
       "org_name": "The name must be between 2 and 120 characters.",
       "email": "Please enter a valid email address.",
       "org_failed": "That did not work just now. Please try again."
-    }
+    },
+    "personOpen": "View"
   },
   "personView": {
     "back": "Back to people & groups",
@@ -581,6 +582,62 @@
     "orgSuspended": {
       "title": "The organization is suspended.",
       "body": "Access through this organization is currently not active."
+    }
+  },
+  "area": {
+    "eyebrow": "Advisor",
+    "kinds": {
+      "team": "Team",
+      "person": "Person",
+      "group": "Group review",
+      "unnamed": "No name shared"
+    },
+    "start": {
+      "title": "Welcome back, {name}",
+      "summary": "You are supporting {people, plural, one {# person} other {# people}} and {teams, plural, one {# team} other {# teams}}.",
+      "summaryNone": "You are not supporting anyone yet.",
+      "accessNote": "Access only exists once the people you support have released it.",
+      "invite": "Invite someone",
+      "waitingTitle": "Waiting for you · {count}",
+      "waitingTitleNone": "Waiting for you",
+      "waitingNone": "Nothing is waiting for you right now.",
+      "overdue": "The follow-up with {name} is due.",
+      "waitingTeam": "{name}: one release is still missing.",
+      "teamInvites": "{count, plural, one {# team invitation is} other {# team invitations are}} still open.",
+      "personInvites": "{count, plural, one {# invitation to a person is} other {# invitations to people are}} still open.",
+      "open": "Open",
+      "view": "View",
+      "recentTitle": "Recently supported",
+      "recentAll": "View all →",
+      "recentEmpty": "Nobody linked yet."
+    },
+    "follow": {
+      "title": "Support",
+      "text": "Everyone you support: teams, people and group reviews. Each kind has its own consent – here they only stand side by side.",
+      "filterLabel": "Kind of support",
+      "filters": {
+        "all": "All",
+        "people": "People",
+        "teams": "Teams",
+        "groups": "Group reviews"
+      },
+      "teamsTitle": "Teams",
+      "peopleTitle": "People",
+      "groupsTitle": "Group reviews",
+      "groupsRequest": "Request a group review",
+      "groupsEmpty": "No group review requested yet.",
+      "empty": "As soon as someone accepts your invitation and releases something to you, it appears here."
+    },
+    "invite": {
+      "title": "Invite",
+      "text": "Three ways: a person, a team or a team round. An invitation is not access – it only exists once the invited people release it.",
+      "roundTitle": "Team round",
+      "roundCta": "Start a team round",
+      "roundList": "Previous rounds"
+    },
+    "org": {
+      "title": "Organization",
+      "text": "A program or consultancy with several advisors. The organization holds the access – so that it doesn't disappear when one person leaves."
     }
   }
 }

@@ -11,6 +11,7 @@ const codeOnly = (path: string) =>
 const WORKBOOK_PAGE = "src/features/reporting/history/HistoricalWorkbookPage.tsx";
 const ADVISOR_SURFACES = [
   "src/app/(product)/advisor/dashboard/page.tsx",
+  "src/features/advisor/AdvisorTeamsList.tsx",
   "src/app/(product)/advisor/report/page.tsx",
   "src/app/(product)/advisor/session/page.tsx",
   "src/app/(product)/advisor/snapshot/page.tsx",
@@ -95,7 +96,7 @@ test("die Report-Ampel hängt an dem, was sie anzeigt", () => {
   // team.workbookAvailable`. Ein fertiger Report sah gedämpft aus, solange
   // kein historisches Workbook existierte - und das gibt es hier gar nicht
   // mehr.
-  const dashboard = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
+  const dashboard = codeOnly("src/features/advisor/AdvisorTeamsList.tsx");
   assert.doesNotMatch(dashboard, /active: team\.reportReady && team\.workbookAvailable/);
   assert.match(dashboard, /active: team\.reportReady,/);
 });
@@ -104,7 +105,7 @@ test("die eigene Wiedervorlage steht nicht im Kasten mit dem Zustand des Teams",
   // Das war die unlogische Optik: Was das TEAM angeht und was man sich SELBST
   // vorgenommen hat, stand durcheinander - und vier gleich laute Knöpfe
   // darunter, von denen keiner der nächste Schritt war.
-  const dashboard = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
+  const dashboard = codeOnly("src/features/advisor/AdvisorTeamsList.tsx");
   const statusBox = dashboard.indexOf("dashboard.fields.report");
   const followUp = dashboard.indexOf("dashboard.fields.followUp");
   const ctaRow = dashboard.indexOf("team.sessionHref");

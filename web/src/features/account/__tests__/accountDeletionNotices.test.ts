@@ -98,7 +98,7 @@ test("jeder Zustand steht an der Stelle, an der etwas fehlt", () => {
   assert.match(connections, /getAccountDeletionNotices\(supabase, \["founder_connection", "founder_advisor"\]\)/);
   assert.match(connections, /<AccountDeletionNoticeList notices=/);
 
-  const advisor = codeOnly("src/app/(product)/advisor/dashboard/page.tsx");
+  const advisor = codeOnly("src/app/(product)/advisor/begleitung/page.tsx");
   assert.match(advisor, /getAccountDeletionNotices\(client, \["advisor_team"\]\)/);
   assert.match(advisor, /<AccountDeletionNoticeList notices=/);
   // Der Advisor-Bereich zeigt nicht, was die eigenen Verbindungen angeht.

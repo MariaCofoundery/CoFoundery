@@ -12,7 +12,8 @@ const codeOnly = (path: string) =>
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .replace(/(^|[^:])\/\/.*$/gm, "$1");
 const DATA = "src/features/dashboard/dashboardRoleData.ts";
-const PAGE = "src/app/(product)/advisor/dashboard/page.tsx";
+// Die Teamkarte steht seit 21.10.2026 in AdvisorTeamsList (unter „Begleitung").
+const PAGE = "src/features/advisor/AdvisorTeamsList.tsx";
 
 const advisorCopy = (locale: string) =>
   JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")) as {

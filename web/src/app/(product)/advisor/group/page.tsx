@@ -74,7 +74,7 @@ export default async function AdvisorGroupPage({
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-10">
       <Link
-        href="/advisor/dashboard#advisor-org"
+        href="/advisor/begleitung"
         className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
       >
         {t("back")}
@@ -97,7 +97,7 @@ export default async function AdvisorGroupPage({
               <p>{t("nobody")}</p>
               {/* Phase 12C.1C: der Weg zur Personen-Einladung statt Sackgasse. */}
               <Link
-                href="/advisor/dashboard#person-invites"
+                href="/advisor/einladen#person-invites"
                 className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
               >
                 {t("nobodyCta")}

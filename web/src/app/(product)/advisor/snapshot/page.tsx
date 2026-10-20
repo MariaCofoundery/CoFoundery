@@ -78,7 +78,7 @@ export default async function AdvisorSnapshotPage({
   const data = await getFounderAlignmentWorkbookPageData(invitationId, requestedTeamContext, {
     advisorContext: true,
   });
-  const dashboardFallbackHref = "/advisor/dashboard#advisor-teams";
+  const dashboardFallbackHref = "/advisor/begleitung";
   const reportHref =
     data.status === "ready"
       ? buildAdvisorReportHref(data.invitationId ?? invitationId, data.teamContext)
