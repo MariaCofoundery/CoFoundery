@@ -11,10 +11,18 @@ import { CONNECT_ERROR_KEYS, CONNECT_LIFECYCLE_KEYS } from "@/features/connect/c
 export default async function MyConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/my");
   const [listings, problems, params] = await Promise.all([getOwnConnectListings(client, user.id), getOwnConnectProblems(client, user.id), searchParams]);
+  const w = await getTranslations("problemWorkspace");
+  const tiles: [string, string][] = [
+    ["/connect/profile", t("actions.profile")],
+    ["/connect/ventures/mine", t("beta.ownVentures")],
+    ["/connect/workspaces", w("title")],
+    ["/connect/searches", t("searches.title")],
+  ];
   const groups = ["active", "paused", "draft", "completed"] as const;
   return <main className="mx-auto max-w-5xl px-5 py-10">
     <Link href="/connect" className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
     <header className="brand-panel flex flex-wrap items-end justify-between gap-4 rounded-[28px] p-6 sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("my.title")}</h1></div><Link href="/connect/listings/new" className="inline-flex min-h-11 items-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-violet-800">{t("my.create")}</Link></header>
+    <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{tiles.map(([href, label]) => <li key={href}><Link href={href} className="flex min-h-16 items-center justify-between gap-2 rounded-2xl border border-violet-100 bg-white p-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-violet-200">{label}<span aria-hidden className="text-violet-700">→</span></Link></li>)}</ul>
     {knownKey(params.changed, CONNECT_LIFECYCLE_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.lifecycle.${knownKey(params.changed, CONNECT_LIFECYCLE_KEYS)}`)}</p> : null}
     {knownKey(params.error, CONNECT_ERROR_KEYS) ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${knownKey(params.error, CONNECT_ERROR_KEYS)}`)}</p> : null}
     {params.error === "publish_profile" ? <Link href="/connect/profile" className="inline-flex min-h-11 items-center underline">{t("actions.profile")}</Link> : null}
