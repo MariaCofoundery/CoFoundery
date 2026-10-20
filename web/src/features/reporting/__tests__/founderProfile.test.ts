@@ -266,7 +266,7 @@ const COVERAGE_VIEW = "src/features/reporting/CoverageMap.tsx";
 const COVERAGE_DATA = "src/features/reporting/founderProfileCoverage.ts";
 const REPORT_PAGE = "src/features/reporting/IndividualReportPageContent.tsx";
 
-test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
+test("die Seite steht in drei Teilen und sechs Abschnitten", () => {
   const page = codeOnly(PAGE);
 
   // UMGEBAUT IN PHASE 1 (PROFIL), 17.10.2026. Vorher neun Abschnitte; unter
@@ -279,7 +279,6 @@ test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
     (treffer) => treffer[1],
   );
   assert.deepEqual(ids, [
-    "ueber-dich",
     "arbeitsweise",
     "staerken",
     "mitbringst",
@@ -293,7 +292,8 @@ test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
 
   // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe. Vorhaben
   // und Details stehen ausserhalb der Teile, neutral.
-  const tones = [...page.matchAll(/tone="(\w+)"/g)].map((treffer) => treffer[1]);
+  // `onBrand` ist keine Saeulenfarbe, sondern die Gestalt des Kopfes (Ueber dich).
+  const tones = [...page.matchAll(/tone="(\w+)"/g)].map((treffer) => treffer[1]).filter((ton) => ton !== "onBrand");
   assert.deepEqual([...new Set(tones)].sort(), ["emerald", "indigo", "violet"]);
   assert.match(page, /"vorhaben",\s*"slate"/);
   assert.match(page, /"details",\s*"slate"/);

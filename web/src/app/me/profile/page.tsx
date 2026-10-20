@@ -111,7 +111,6 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 
 type SectionId =
-  | "ueber-dich"
   | "arbeitsweise"
   | "staerken"
   | "mitbringst"
@@ -198,7 +197,6 @@ export default async function FounderProfilePage({
   // Die Abschnitte einmal als Daten. Der Sprungbalken oben und die
   // Ueberschriften darunter duerfen nicht auseinanderlaufen.
   const sections: { id: SectionId; title: string }[] = [
-    { id: "ueber-dich", title: t("sections.about") },
     { id: "arbeitsweise", title: t("sections.work") },
     { id: "staerken", title: t("sections.strengths") },
     { id: "mitbringst", title: t("sections.bring") },
@@ -212,7 +210,6 @@ export default async function FounderProfilePage({
   // waere eine Aufforderung, eines anzulegen. Alle anderen stehen immer und
   // tragen bei leerer Datenlage einen Hinweis mit einem Weg.
   const zeigt: Record<SectionId, boolean> = {
-    "ueber-dich": true,
     arbeitsweise: true,
     staerken: true,
     mitbringst: true,
@@ -278,7 +275,7 @@ export default async function FounderProfilePage({
         id={id}
         tone={tone}
         step={nummer(id)}
-        defaultOpen={id === "ueber-dich" || id === "arbeitsweise"}
+        defaultOpen={id === "arbeitsweise"}
         title={eigenerTitel ? sections.find((section) => section.id === id)?.title ?? "" : null}
       >
         {children}
@@ -359,11 +356,26 @@ export default async function FounderProfilePage({
             {core?.headline?.trim() ? (
               <p className="mt-1.5 text-base font-medium text-white">{core.headline}</p>
             ) : null}
-            {core?.location_region?.trim() ? (
-              <p className="mt-0.5 text-sm text-white">{core.location_region}</p>
-            ) : null}
           </div>
         </div>
+        {/* UEBER DICH steht im Kopf: Name, Headline und das Wichtigste ueber
+            die Person sind eine Aussage. Geaendert wird es unter
+            /profile?step=identity. Der Kopf wird mitgedruckt. */}
+        <FounderProfileBase
+          core={core}
+          tone="onBrand"
+          copy={{
+            title: null,
+            region: t("base.region"),
+            remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
+            expertise: t("base.expertise"),
+            industries: t("base.industries"),
+            linkedin: t("base.linkedin"),
+            empty: t("base.empty"),
+            completeHref: "/profile?step=identity",
+            completeCta: t("base.completeCta"),
+          }}
+        />
         <p className="mt-5 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>
         {asOf ? <p className="mt-3 text-xs text-white">{asOf}</p> : null}
         {/* Zwei Fassungen zum Weitergeben - klein, im Kopf; die Wahl steht weiter vor dem Klick. */}
@@ -379,6 +391,11 @@ export default async function FounderProfilePage({
                 />
         </div>
       </section>
+
+      {/* Die drei Rollen-Begriffe erklaert, mit Weg zur Aenderung - nur am Bildschirm. */}
+      <div className="no-print">
+        <RolesOverview client={supabase} userId={user.id} />
+      </div>
 
       {/* ------------------------------------------------------------------
           DER SPRUNGBALKEN
@@ -453,30 +470,6 @@ export default async function FounderProfilePage({
         eyebrow={t("parts.one")}
         title={t("parts.oneTitle")}
       >
-        {/* 1 - Ueber dich. Kein Aufklapper: Es sind sechs Zeilen. */}
-        {teil(
-          "ueber-dich",
-          "indigo",
-          <>
-            <FounderProfileBase
-              core={core}
-              copy={{
-                title: null,
-                region: t("base.region"),
-                remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
-                expertise: t("base.expertise"),
-                industries: t("base.industries"),
-                linkedin: t("base.linkedin"),
-                empty: t("base.empty"),
-                completeHref: "/profile?step=identity",
-                completeCta: t("base.completeCta"),
-              }}
-            />
-            <RolesOverview client={supabase} userId={user.id} />
-            <EditLink href="/profile?step=identity" label={t("edit")} />
-          </>
-        )}
-
         {/* 2 - Wie du arbeitest. DIE KURZFASSUNG (Phase 1).
 
             Je Bereich EIN Satz auf der Karte, dazu was die Karten nicht sagen:

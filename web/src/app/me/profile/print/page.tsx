@@ -246,37 +246,26 @@ export default async function ProfilePrintPage({ searchParams }: { searchParams:
         {core?.headline?.trim() ? (
           <p className="mt-1 text-sm font-medium text-slate-700">{core.headline}</p>
         ) : null}
-        {core?.location_region?.trim() ? (
-          <p className="mt-1 text-sm text-slate-600">{core.location_region}</p>
-        ) : null}
+        {/* Ueber dich steht im Kopf, nicht als eigener Abschnitt. */}
+        <FounderProfileBase
+          core={core}
+          tone="plain"
+          copy={{
+            title: null,
+            region: t("base.region"),
+            remoteMode: (m) => tCapability(`remoteModes.${m}`),
+            expertise: t("base.expertise"),
+            industries: t("base.industries"),
+            linkedin: t("base.linkedin"),
+            empty: "",
+            completeHref: "/profile?step=identity",
+            completeCta: "",
+          }}
+        />
         {freshness ? (
           <p className="mt-3 text-xs text-slate-500">{t("head.asOf", { date: datum(freshness) })}</p>
         ) : null}
       </header>
-
-      {/* 1 — Über dich. Nur, wenn etwas dasteht. */}
-      {core?.bio?.trim() ||
-      core?.location_region?.trim() ||
-      (core?.expertise ?? []).length > 0 ||
-      (core?.industries ?? []).length > 0 ? (
-        <Abschnitt title={t("sections.about")}>
-          <FounderProfileBase
-            core={core}
-            copy={{
-              title: null,
-              region: t("base.region"),
-              remoteMode: (m) => tCapability(`remoteModes.${m}`),
-              expertise: t("base.expertise"),
-              industries: t("base.industries"),
-              linkedin: t("base.linkedin"),
-              // Steht nie da: Der Abschnitt erscheint nur, wenn etwas da ist.
-              empty: "",
-              completeHref: "/profile?step=identity",
-              completeCta: "",
-            }}
-          />
-        </Abschnitt>
-      ) : null}
 
       {/* 2 — Wie du arbeitest. */}
       {workstyleV04 ? <Abschnitt title={t("sections.work")}><IndividualWorkstyle locale={await getDisplayLocale()} profile={workstyleV04} full={voll} /></Abschnitt> : null}
