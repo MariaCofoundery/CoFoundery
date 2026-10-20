@@ -25,8 +25,10 @@ export default async function NewConnectProblemPage({
       <Link href="/connect/problems" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
         ← {t("problems.backToBoard")}
       </Link>
-      <h1 className="mt-3 text-3xl font-semibold tracking-tight">{t("problems.createTitle")}</h1>
-      <p className="mt-2 max-w-2xl leading-7 text-slate-600">{t("problems.createText")}</p>
+      <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
+        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("problems.createTitle")}</h1>
+        <p className="mt-3 max-w-2xl leading-7 text-white">{t("problems.createText")}</p>
+      </header>
 
       {errorKey ? (
         <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">

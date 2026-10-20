@@ -41,7 +41,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   return <main className="mx-auto max-w-4xl px-5 py-10">
     <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("mine.back")}</Link>
-    <p className="mt-3 text-xs uppercase tracking-[.18em] text-slate-500">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold">{t("profile.title")}</h1><p className="mt-2 max-w-2xl text-slate-600">{t("profile.text")}</p>
+    <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[.14em] text-white">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("profile.title")}</h1><p className="mt-3 max-w-2xl text-white">{t("profile.text")}</p></header>
     {params.returned === "1" ? <p role="status" className="my-4 rounded-xl bg-slate-50 p-4">{t("lifecycle.returnHint")}</p> : null}
     {saved ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
     {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
