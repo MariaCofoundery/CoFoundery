@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamNameForm } from "@/features/teams/TeamNameForm";
 import { getTranslations } from "next-intl/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ventureHref, type TeamJourneyState } from "@/features/teams/TeamJourneyStatus";
@@ -48,12 +49,15 @@ function StepGlyph({ name }: { name: StepKey }) {
 export async function TeamOverview({
   teamId,
   title,
+  teamName = null,
   members,
   journey,
   canInvite,
 }: {
   teamId: string;
   title: string;
+  /** Der gesetzte Name (nicht der Ersatzname aus den Mitgliedern). */
+  teamName?: string | null;
   members: Member[];
   journey: TeamJourneyState;
   canInvite: boolean;
@@ -96,6 +100,7 @@ export async function TeamOverview({
       <section className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8" aria-labelledby="team-title">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("eyebrow")}</p>
         <h1 id="team-title" className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
+        <div className="mt-1"><TeamNameForm teamId={teamId} currentName={teamName} returnTo={`/teams/${encodeURIComponent(teamId)}`} tone="brand" /></div>
         <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3">
           <ul className="flex -space-x-2">
             {members.map((member) => (

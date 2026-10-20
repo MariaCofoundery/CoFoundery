@@ -18,12 +18,34 @@ export function DashboardTaskList({
   tasks,
   emptyTitle,
   emptyText,
+  variant = "card",
 }: {
   tasks: DashboardTaskPresentation[];
   emptyTitle: string;
   emptyText: string;
+  /** `brand`: kompakt auf der Marken-Flaeche der Startseite (weisse Schrift). */
+  variant?: "card" | "brand";
 }) {
   const visibleTasks = tasks.slice(0, 3);
+
+  if (variant === "brand" && tasks.length > 0) {
+    return (
+      <ul className="grid gap-2">
+        {visibleTasks.map((task) => (
+          <li key={task.id} className="flex flex-col gap-3 rounded-2xl bg-white/15 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white">{task.eyebrow}</p>
+              <p className="mt-1 text-base font-semibold text-white">{task.title}</p>
+              <p className="mt-0.5 text-sm leading-6 text-white">{task.text}</p>
+            </div>
+            <Link href={task.href} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-violet-800 transition hover:bg-violet-50">
+              {task.action}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   if (tasks.length === 0) {
     return (

@@ -175,7 +175,9 @@ test("the connections are reachable near the top of the dashboard", () => {
   const linkAt = dashboard.indexOf('href="/connections"', teamsAt);
   const legacyAt = dashboard.indexOf('id="dashboard-legacy-title"');
   assert.ok(tasksAt > -1 && teamsAt > tasksAt, "alle Verbindungen folgen auf das, was ansteht");
-  assert.ok(dashboard.indexOf("<DashboardTeamCard") > -1 && dashboard.indexOf("<DashboardTeamCard") < tasksAt, "das aktuelle Team steht im Kopf");
+  // GEAENDERT: Was ansteht steht in der Marken-Flaeche des Kopfes, das Team-Kaestchen daneben.
+  assert.ok(dashboard.indexOf("<DashboardTeamCard") > tasksAt && dashboard.indexOf("<DashboardTeamCard") < teamsAt, "Aufgaben im Kopf, das aktuelle Team daneben, dann die Verbindungen");
+  assert.ok(tasksAt < dashboard.indexOf("data-dashboard-hero") + 4000 && tasksAt > dashboard.indexOf("data-dashboard-hero"), "was ansteht steht im Kopfbereich");
   assert.ok(linkAt > teamsAt && linkAt < legacyAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
   assert.match(source(SHELL), /href: "\/connections",\s*label: t\("alignTeam"\)/);
 });

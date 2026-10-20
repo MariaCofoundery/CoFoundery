@@ -806,7 +806,13 @@
     "open": "Zum Team →",
     "others": "{count, plural, one {Anderes Team} other {Andere Teams}} ({count})",
     "none": "Du bist noch in keinem Team. Lade eine Person ein, dann arbeitet ihr hier zusammen.",
-    "invite": "Mitgründer:in einladen →"
+    "invite": "Mitgründer:in einladen →",
+    "rename": "Team umbenennen",
+    "nameIt": "Team einen Namen geben",
+    "nameLabel": "Teamname",
+    "namePlaceholder": "z. B. Nordlicht",
+    "nameHint": "Alle im Team sehen den Namen und können ihn ändern. Leer lassen setzt ihn zurück.",
+    "nameSave": "Name speichern"
   },
   "deepen": {
     "title": "Zum Vertiefen",

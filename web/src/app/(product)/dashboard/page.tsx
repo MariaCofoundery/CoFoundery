@@ -402,6 +402,17 @@ export default async function DashboardPage({
                 </div>
               </>
             ) : null}
+            {taskPresentations.length > 0 ? (
+              <div id="dashboard-block-tasks" className="scroll-mt-28">
+                <h2 className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-white">{t("tasks.title")}</h2>
+                <DashboardTaskList
+                  variant="brand"
+                  tasks={taskPresentations}
+                  emptyTitle={t("tasks.empty.title")}
+                  emptyText={t("tasks.empty.text")}
+                />
+              </div>
+            ) : null}
             <QuoteOfTheDay tone="brand" className="mt-auto" />
           </div>
           <DashboardTeamCard teams={founderTeams} selectedTeamId={params.team ?? null} />
@@ -413,27 +424,6 @@ export default async function DashboardPage({
         hasTeam={founderTeams.length > 0}
         teamId={selectedTeamId}
       />
-
-      {taskPresentations.length > 0 ? (
-      <section
-        id="dashboard-block-tasks"
-        className="dashboard-fade-up mb-8 scroll-mt-28 rounded-[28px] border border-slate-200/80 bg-white/96 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
-        style={staggerStyle(80)}
-      >
-        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
-          {t("tasks.eyebrow")}
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-950">{t("tasks.title")}</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-          {t("tasks.description")}
-        </p>
-        <DashboardTaskList
-          tasks={taskPresentations}
-          emptyTitle={t("tasks.empty.title")}
-          emptyText={t("tasks.empty.text")}
-        />
-      </section>
-      ) : null}
 
       {needsOnboarding ? (
         <section id="dashboard-block-profile" className="mb-8 scroll-mt-28 rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
