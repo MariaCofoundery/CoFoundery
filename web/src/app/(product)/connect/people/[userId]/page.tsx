@@ -66,20 +66,20 @@ export default async function ConnectPersonPage({
         ← {t("tabs.people")}
       </Link>
 
-      <header className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+      <header className="mt-4 brand-panel flex flex-col gap-4 rounded-[28px] p-6 sm:flex-row sm:items-start sm:p-8">
         <ConnectAvatar
           profile={person}
           displayName={person.display_name}
           className="h-20 w-20 shrink-0 rounded-2xl object-cover"
         />
         <div className="min-w-0">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
+          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
             {person.display_name}
           </h1>
           {person.headline ? (
-            <p className="mt-1 text-lg leading-7 text-slate-700">{person.headline}</p>
+            <p className="mt-2 text-lg leading-7 text-white">{person.headline}</p>
           ) : null}
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white">
             {person.location_region ? <span>{person.location_region}</span> : null}
             {person.remote_mode ? <span>{t(`remote.${person.remote_mode}`)}</span> : null}
             {person.network_roles.map((role) => (
@@ -90,7 +90,7 @@ export default async function ConnectPersonPage({
         {isOwn ? (
           <Link
             href="/connect/profile"
-            className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 sm:ml-auto"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-4 text-sm font-semibold text-violet-800 sm:ml-auto"
           >
             {t("actions.edit")}
           </Link>
@@ -100,7 +100,7 @@ export default async function ConnectPersonPage({
              ist. */
           <Link
             href={`/connect/people/${person.user_id}/contact`}
-            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-[color:var(--brand-primary)] px-5 text-sm font-semibold text-slate-900 sm:ml-auto"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-5 text-sm font-semibold text-violet-800 sm:ml-auto"
           >
             {t("contact.cta")}
           </Link>

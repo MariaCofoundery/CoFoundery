@@ -66,19 +66,19 @@ export default async function ConnectVenturePage({
         ← {t("tabs.ventures")}
       </Link>
 
-      <header className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+      <header className="mt-4 brand-panel flex flex-col gap-4 rounded-[28px] p-6 sm:flex-row sm:items-start sm:p-8">
         {logo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logo}
             alt=""
-            className="h-16 w-16 shrink-0 rounded-2xl border border-slate-200 object-contain"
+            className="h-16 w-16 shrink-0 rounded-2xl border border-white/40 bg-white object-contain"
           />
         ) : null}
         <div className="min-w-0">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{venture.name}</h1>
+          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{venture.name}</h1>
           {venture.role_label ? (
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-white">
               {t("ventures.roleLabel")}: {venture.role_label}
             </p>
           ) : null}
@@ -86,7 +86,7 @@ export default async function ConnectVenturePage({
         {isOwn ? (
           <Link
             href={`/connect/ventures/mine?edit=${venture.id}`}
-            className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 sm:ml-auto"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-4 text-sm font-semibold text-violet-800 sm:ml-auto"
           >
             {t("actions.edit")}
           </Link>
