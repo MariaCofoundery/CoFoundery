@@ -82,9 +82,10 @@ test("die Reiter über die Inhalte bleiben auf der Seite", () => {
   // Menschen, Unternehmen, Angebote und Ungelöstes sind Ausschnitte derselben
   // Fläche und keine Orte - und sie tragen Zähler, damit niemand einen Reiter
   // anklickt, hinter dem nichts steht. In der Leiste gäbe es die Zahlen nicht.
-  const tabs = source("src/features/connect/ConnectTabs.tsx");
-  assert.match(tabs, /counts/);
+  // Seit 21.10.2026 steht nur noch EINE Leiste im Kopf. Die Reiterreihe
+  // mit Zahlen ist weg: Sie fuehrte "Probleme" ein zweites Mal.
+  assert.ok(!existsSync("src/features/connect/ConnectTabs.tsx"));
   for (const page of BROWSE_PAGES) {
-    assert.match(source(page), /<ConnectTabs/, `${page} hat keine Reiterreihe`);
+    assert.ok(!/<ConnectTabs/.test(source(page)), `${page} hat noch die zweite Reiterreihe`);
   }
 });

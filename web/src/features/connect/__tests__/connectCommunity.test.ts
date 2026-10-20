@@ -89,13 +89,11 @@ test("Unternehmen sind durchsuchbar, und die eigenen bleiben verwaltbar", () => 
   }
 });
 
-test("die Leiste traegt vier Reiter, und jeder mit seiner Zahl", () => {
-  const tabs = codeOnly("src/features/connect/ConnectTabs.tsx");
+test("die Leiste traegt alle vier Arten zu entdecken", () => {
+  const shell = codeOnly("src/features/navigation/ProductShell.tsx");
   for (const key of ["people", "ventures", "listings", "problems"]) {
-    assert.match(tabs, new RegExp(`key: "${key}"`), `${key} fehlt in der Leiste`);
+    assert.ok(shell.includes(`tConnect("tabs.${key}")`), `${key} fehlt in der Leiste`);
   }
-  // Die Zahl steht dabei, damit niemand einen Reiter anklickt, hinter dem
-  // nichts steht.
   const counts = codeOnly("src/features/connect/connectPeopleData.ts");
   assert.match(counts, /ventures: ventures\.count \?\? 0/);
 });

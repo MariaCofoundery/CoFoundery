@@ -14,8 +14,6 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { hasProfileRole } from "@/features/profile/profileRoles";
 import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
-import { ConnectTabs } from "@/features/connect/ConnectTabs";
-import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { generateConnectSuggestions, getOwnConnectSuggestions } from "@/features/connect/connectSuggestionData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -28,7 +26,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "direction", "category", "remote_mode", "geographic_scope", "topic", "industry"]
     .some((key) => (filters[key] ?? "").trim().length > 0);
-  const { client, user } = await requireConnectMember(); const [listingsRows, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, tabCounts, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectTabCounts(client, user.id), getConnectHighlights(client, user.id),
+  const { client, user } = await requireConnectMember(); const [listingsRows, baseProfile, incomingContacts, unreadMessages, capabilityVocabulary, highlights] = await Promise.all([getActiveConnectListings(client, filters), getProfileBasicsRow(client, user.id).catch(() => null), getIncomingPendingConnectContactCount(client, user.id), getUnreadConnectMessageCount(client), getCapabilityVocabulary(client), getConnectHighlights(client, user.id),
     // ERZEUGT WIRD AUCH HIER, nicht nur auf der Vorschlagsseite. Sonst waere
     // die Zahl in "Meine Sachen" fuer jeden null, der die Unterseite noch nie
     // geoeffnet hat - und damit waere der Hinweis genau fuer die nutzlos, die
@@ -79,13 +77,6 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           </ul>
         </section>
       ) : null}
-
-      <div className="border-t border-slate-200/80 pt-7">
-        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("browse.title")}</p>
-        <div className="mt-4">
-          <ConnectTabs active="listings" counts={tabCounts} />
-        </div>
-      </div>
 
 
       <ConnectHighlight highlights={highlights} />

@@ -10,7 +10,6 @@ const readJson = (path: string) => JSON.parse(source(path)) as Record<string, un
 const PEOPLE_PAGE = "src/app/(product)/connect/people/page.tsx";
 const LISTINGS_PAGE = "src/app/(product)/connect/page.tsx";
 const PROBLEMS_PAGE = "src/app/(product)/connect/problems/page.tsx";
-const TABS = "src/features/connect/ConnectTabs.tsx";
 
 const ME = "11111111-1111-4111-8111-111111111111";
 
@@ -29,29 +28,17 @@ test("search load failure is not disguised as an empty network", async () => {
 });
 
 test("alle drei Connect-Seiten tragen dieselbe Leiste", () => {
-  const expected: [string, string][] = [
-    [PEOPLE_PAGE, "people"],
-    [LISTINGS_PAGE, "listings"],
-    [PROBLEMS_PAGE, "problems"],
-  ];
-
-  for (const [page, active] of expected) {
-    const code = source(page);
-    assert.match(code, /<ConnectTabs\s+active="([a-z]+)"/, `${page}: keine Leiste`);
-    assert.match(
-      code,
-      new RegExp(`<ConnectTabs\\s+active="${active}"`),
-      `${page}: die Leiste zeigt den falschen Reiter als aktiv`
-    );
+  // Die Leiste steht in der Shell, nicht auf den Seiten.
+  for (const page of [PEOPLE_PAGE, LISTINGS_PAGE, PROBLEMS_PAGE]) {
+    assert.ok(!/<ConnectTabs/.test(source(page)), `${page}: noch eine zweite Reiterreihe`);
   }
 });
 
 test("die Leiste fuehrt zu allen drei Bereichen", () => {
-  const code = source(TABS);
-  for (const href of ["/connect/people", "/connect", "/connect/problems"]) {
+  const code = source("src/features/navigation/ProductShell.tsx");
+  for (const href of ["/connect/people", "/connect", "/connect/problems", "/connect/ventures"]) {
     assert.ok(code.includes(`href: "${href}"`), `${href} fehlt in der Leiste`);
   }
-  assert.match(code, /aria-current=\{isActive \? "page"/, "wo man ist, muss auch vorgelesen werden");
 });
 
 // ---------------------------------------------------------------------------

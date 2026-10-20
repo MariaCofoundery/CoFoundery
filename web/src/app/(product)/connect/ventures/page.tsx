@@ -2,10 +2,8 @@ import { ConnectPagination } from "@/features/connect/ConnectPagination";
 import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ConnectTabs } from "@/features/connect/ConnectTabs";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
-import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { getActiveConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 
@@ -31,13 +29,10 @@ export default async function ConnectVentureDirectoryPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const [t, params] = await Promise.all([getTranslations("connect"), searchParams]);
-  const { client, user } = await requireConnectMember("/connect/ventures");
+  const { client } = await requireConnectMember("/connect/ventures");
 
   const term = (params.q ?? "").trim();
-  const [venturesRows, counts] = await Promise.all([
-    getActiveConnectVentures(client, term, params.page),
-    getConnectTabCounts(client, user.id),
-  ]);
+  const venturesRows = await getActiveConnectVentures(client, term, params.page);
   const ventures = venturesRows.slice(0, CONNECT_PAGE_SIZE);
 
   // Der Mensch zu jedem Unternehmen, in einer Abfrage statt einer je Karte.
@@ -58,10 +53,6 @@ export default async function ConnectVentureDirectoryPage({
         </h1>
         <p className="mt-3 max-w-2xl leading-7 text-white">{t("ventures.directoryText")}</p>
       </header>
-
-      <div className="mt-5">
-        <ConnectTabs active="ventures" counts={counts} />
-      </div>
 
       <form method="get" className="mt-5 flex flex-wrap gap-2">
         <input

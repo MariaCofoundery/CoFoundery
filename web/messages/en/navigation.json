@@ -77,8 +77,6 @@
   "findIntros": "Introductions",
   "findIntroCount": "{count, plural, one {# open request} other {# open requests}}",
   "findMyProfile": "My Find profile",
-  "connectDiscover": "Discover",
-  "connectProblems": "Problems",
   "connectContacts": "Contacts",
   "connectMine": "My Connect",
   "myProfile": "My profile"

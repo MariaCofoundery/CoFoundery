@@ -148,9 +148,9 @@ test("Ausschnitte bleiben auf der Seite - und auf jeder, zu der sie gehoeren", (
     assert.match(source(page), /<FindTabs/, `${page} hat keine Reiterreihe`);
   }
 
-  // Connect macht es genauso - und behaelt seine Zaehler, weil ein Reiter
-  // ohne Zahl einen ins Leere klicken laesst.
-  assert.match(source("src/features/connect/ConnectTabs.tsx"), /tabs\.map/);
+  // Connect hat keine Reiterreihe auf der Seite mehr: Seine Arten zu entdecken
+  // stehen in der Leiste.
+  assert.ok(!existsSync("src/features/connect/ConnectTabs.tsx"));
 });
 
 test("die Leiste benennt jedes Ziel in beiden Sprachen", () => {

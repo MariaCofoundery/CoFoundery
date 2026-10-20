@@ -298,7 +298,19 @@
     "untitled": "Untitled draft",
     "expiresIn": "Expires in {days} days – after that it is no longer visible to others.",
     "problemsTitle": "What you described",
-    "problemsEmpty": "You have not described anything yet."
+    "problemsEmpty": "You have not described anything yet.",
+    "home": "My Connect",
+    "overview": "Overview",
+    "profileTitle": "Your Connect profile",
+    "profileEmpty": "You don't have a Connect profile yet. It lets others find you and lets you post.",
+    "profileEdit": "Edit profile",
+    "profileCreate": "Create profile",
+    "listingsTitle": "My posts",
+    "profileStatus": {
+      "draft": "Draft – not visible to others yet",
+      "active": "Published",
+      "paused": "Paused – not visible to others"
+    }
   },
   "profile": {
     "title": "Your Connect profile",

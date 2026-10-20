@@ -159,9 +159,9 @@ test("the board is reachable from the Connect overview", () => {
   // allen drei Connect-Seiten steht - nicht mehr ueber einen eigenen Kasten
   // auf der Uebersicht. Die Zusage bleibt: von der Uebersicht aus erreichbar.
   const connect = source("src/app/(product)/connect/page.tsx");
-  assert.match(connect, /<ConnectTabs active="listings"/);
+  assert.ok(!/<ConnectTabs/.test(connect));
   assert.match(
-    source("src/features/connect/ConnectTabs.tsx"),
+    source("src/features/navigation/ProductShell.tsx"),
     /href: "\/connect\/problems"/,
     "und die Leiste fuehrt dorthin"
   );

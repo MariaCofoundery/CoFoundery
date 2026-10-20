@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { connectPublicationVisibility, CONNECT_PUBLIC_ROLLOUT_ENABLED } from "@/features/connect/connectRollout";
 import { connectPage, connectOffset, connectPageHref } from "@/features/connect/connectBrowsePage";
 import { connectPublishError } from "@/features/connect/connectPublishError";
@@ -32,8 +32,8 @@ test("highlight diversity counts owners, preserves own marker and accepts proble
 });
 test("closed beta has four areas, four discovery types and private management links", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  for (const key of ["connectDiscover", "connectProblems", "connectContacts", "connectMine"]) assert.ok(shell.includes(key));
-  const tabs = readFileSync("src/features/connect/ConnectTabs.tsx", "utf8"); assert.ok(!tabs.includes("/connect/workspaces"));
+  for (const key of ["connectContacts", "connectMine", "tabs.listings", "tabs.people", "tabs.problems", "tabs.ventures"]) assert.ok(shell.includes(key));
+  assert.ok(!existsSync("src/features/connect/ConnectTabs.tsx"), "die zweite Reiterreihe ist zurueck");
   const own = readFileSync("src/features/connect/ConnectMyNavigation.tsx", "utf8");
   for (const path of ["/connect/profile", "/connect/my", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"]) assert.ok(own.includes(path));
 });

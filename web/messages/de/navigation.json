@@ -77,8 +77,6 @@
   "findIntros": "Kennenlernen",
   "findIntroCount": "{count, plural, one {# offene Anfrage} other {# offene Anfragen}}",
   "findMyProfile": "Mein Find-Profil",
-  "connectDiscover": "Entdecken",
-  "connectProblems": "Probleme",
   "connectContacts": "Kontakte",
   "connectMine": "Mein Connect",
   "myProfile": "Mein Profil"

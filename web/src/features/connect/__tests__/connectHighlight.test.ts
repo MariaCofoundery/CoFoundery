@@ -159,8 +159,7 @@ test("das Feld steht vor dem Suchen, nicht danach", () => {
   // waere es eine Fussnote.
   const page = codeOnly(PAGE);
   const highlightAt = page.indexOf("<ConnectHighlight");
-  const tabsAt = page.indexOf("<ConnectTabs");
-  assert.ok(highlightAt > 0 && highlightAt > tabsAt, "das Feld steht unter der Liste");
+  assert.ok(highlightAt > 0, "das Feld fehlt");
 });
 
 test("die Auswahl mischt die Sorten, statt der Mehrheit zu folgen", () => {

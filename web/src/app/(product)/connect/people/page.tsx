@@ -4,8 +4,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
-import { ConnectTabs } from "@/features/connect/ConnectTabs";
-import { getConnectPeople, getConnectTabCounts } from "@/features/connect/connectPeopleData";
+import { getConnectPeople } from "@/features/connect/connectPeopleData";
 import {
   CONNECT_OPEN_TO_FORMATS,
   CONNECT_REMOTE_MODES,
@@ -35,10 +34,7 @@ export default async function ConnectPeoplePage({
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client, user } = await requireConnectMember("/connect/people");
 
-  const [peopleRows, counts] = await Promise.all([
-    getConnectPeople(client, user.id, filters),
-    getConnectTabCounts(client, user.id),
-  ]);
+  const peopleRows = await getConnectPeople(client, user.id, filters);
   const people = peopleRows.slice(0, CONNECT_PAGE_SIZE);
 
   const activeFilters = FILTER_KEYS.filter((key) => (filters[key] ?? "").trim().length > 0);
@@ -53,8 +49,6 @@ export default async function ConnectPeoplePage({
             <p className="mt-3 max-w-2xl leading-7 text-white">{t("people.text")}</p>
           </div>
         </header>
-
-        <ConnectTabs active="people" counts={counts} />
 
         <form className={card}>
           <input

@@ -523,17 +523,21 @@ export function ProductShell({
     label: t("areaConnect"),
     isActive: (currentPathname) => currentPathname.startsWith("/connect"),
     badge: { kind: "attention", count: connectAttentionCount },
-    // Der Problem-Hub hat einen eigenen Einstieg. Die Discovery-Reiter mit
-    // Bestandszaehlern bleiben zusaetzlich auf den jeweiligen Uebersichtsseiten.
+    // Eine einzige Leiste: die vier Arten zu entdecken, dann Kontakte und
+    // Mein Connect. Es gibt keine zweite Reiterreihe auf den Seiten mehr -
+    // vorher stand "Probleme" zweimal da, und "Entdecken" fuehrte auf dieselbe
+    // Seite wie "Connect" darueber.
     subItems: [
       {
         href: "/connect",
-        label: t("connectDiscover"),
-        isActive: (path: string) => path === "/connect" || /^\/connect\/(people|listings|suggestions)(\/|$)/.test(path) || (path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine")),
-        // Die Vorschlaege stehen als Streifen oben auf Entdecken; die Zahl bleibt hier, nicht rot.
+        label: tConnect("tabs.listings"),
+        isActive: (path: string) => path === "/connect" || /^\/connect\/(listings|suggestions)(\/|$)/.test(path),
+        // Die Vorschlaege stehen als Streifen oben auf der Startseite; die Zahl bleibt hier, nicht rot.
         ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}),
       },
-      { href: "/connect/problems", label: t("connectProblems"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
+      { href: "/connect/people", label: tConnect("tabs.people"), isActive: (path: string) => /^\/connect\/people(?:\/|$)/.test(path) },
+      { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
+      { href: "/connect/ventures", label: tConnect("tabs.ventures"), isActive: (path: string) => path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine") },
       {
         href: "/connect/contacts",
         label: t("connectContacts"),

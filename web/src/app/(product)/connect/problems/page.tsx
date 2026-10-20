@@ -3,8 +3,6 @@ import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
-import { ConnectTabs } from "@/features/connect/ConnectTabs";
-import { getConnectTabCounts } from "@/features/connect/connectPeopleData";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getActiveConnectProblems } from "@/features/connect/connectProblemData";
 import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/connect/connectTypes";
@@ -29,11 +27,8 @@ export default async function ConnectProblemsPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
-  const { client, user } = await requireConnectMember("/connect/problems");
-  const [problemsRows, tabCounts] = await Promise.all([
-    getActiveConnectProblems(client, filters),
-    getConnectTabCounts(client, user.id),
-  ]);
+  const { client } = await requireConnectMember("/connect/problems");
+  const problemsRows = await getActiveConnectProblems(client, filters);
   const problems = problemsRows.slice(0, CONNECT_PAGE_SIZE);
   const authors = await getConnectProfilesByUserIds(
     client,
@@ -77,7 +72,6 @@ export default async function ConnectProblemsPage({
 
       <section id="probleme" aria-labelledby="problem-list-title" className="mt-8 scroll-mt-24">
         <h2 id="problem-list-title" className="mb-4 text-2xl font-semibold">{t("problemHub.discover")}</h2>
-        <ConnectTabs active="problems" counts={tabCounts} />
         {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
 
         <section className={`${card} mt-6`}>

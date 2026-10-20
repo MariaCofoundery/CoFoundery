@@ -298,7 +298,19 @@
     "untitled": "Unbenannter Entwurf",
     "expiresIn": "Läuft in {days} Tagen aus – danach ist sie für andere nicht mehr sichtbar.",
     "problemsTitle": "Was du geschildert hast",
-    "problemsEmpty": "Du hast noch nichts geschildert."
+    "problemsEmpty": "Du hast noch nichts geschildert.",
+    "home": "Mein Connect",
+    "overview": "Übersicht",
+    "profileTitle": "Dein Connect-Profil",
+    "profileEmpty": "Du hast noch kein Connect-Profil. Erst damit können andere dich finden und du Beiträge einstellen.",
+    "profileEdit": "Profil bearbeiten",
+    "profileCreate": "Profil anlegen",
+    "listingsTitle": "Meine Beiträge",
+    "profileStatus": {
+      "draft": "Entwurf – noch nicht für andere sichtbar",
+      "active": "Veröffentlicht",
+      "paused": "Pausiert – für andere nicht sichtbar"
+    }
   },
   "profile": {
     "title": "Dein Connect-Profil",

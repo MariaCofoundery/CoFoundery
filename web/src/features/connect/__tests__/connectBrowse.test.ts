@@ -173,12 +173,10 @@ test("die Uebersicht trennt Beitragen sichtbar vom Suchen", () => {
 
   const postAt = page.indexOf('t("post.title")');
   const dividerAt = page.indexOf("border-t border-slate-200/80");
-  const browseAt = page.indexOf('t("browse.title")');
-  const tabsAt = page.indexOf("<ConnectTabs");
 
   assert.ok(postAt > 0, "der Bereich zum Einstellen hat keine Ueberschrift");
   assert.ok(dividerAt < postAt, "zwischen den beiden Haelften steht keine Trennung");
-  assert.ok(browseAt > dividerAt && tabsAt > browseAt, "die Reiter stehen nicht im Stoeber-Teil");
+  assert.ok(!page.includes("<ConnectTabs"), "die zweite Reiterreihe ist zurueck");
 
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {
@@ -186,7 +184,6 @@ test("die Uebersicht trennt Beitragen sichtbar vom Suchen", () => {
       browse?: { title?: string };
     };
     assert.ok(messages.post?.title && messages.post?.text, `${locale}: post fehlt`);
-    assert.ok(messages.browse?.title, `${locale}: browse fehlt`);
   }
 });
 
