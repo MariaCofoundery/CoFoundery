@@ -1,4 +1,5 @@
 import type { PersonCore } from "@/features/profile/personCoreData";
+import { ClampedBio } from "@/features/reporting/ClampedBio";
 
 /**
  * Wer die Person ist - der erste Abschnitt des Founderprofils.
@@ -40,6 +41,9 @@ export function FounderProfileBase({
     empty: string;
     completeHref: string;
     completeCta: string;
+    /** Nur im Kopf (`onBrand`): Knopf, der den am Telefon gekürzten Text öffnet. */
+    moreLabel?: string;
+    lessLabel?: string;
   };
   tone?: "card" | "onBrand" | "plain";
 }) {
@@ -82,7 +86,13 @@ export function FounderProfileBase({
       {hasAnything ? (
         <>
           {core?.bio?.trim() ? (
-            <p className={`mt-3 max-w-3xl text-sm leading-7 ${bioClass}`}>{core.bio}</p>
+            onBrand && copy.moreLabel && copy.lessLabel ? (
+              <div className="mt-3 max-w-3xl">
+                <ClampedBio text={core.bio} className={`text-sm leading-7 ${bioClass}`} moreLabel={copy.moreLabel} lessLabel={copy.lessLabel} />
+              </div>
+            ) : (
+              <p className={`mt-3 max-w-3xl text-sm leading-7 ${bioClass}`}>{core.bio}</p>
+            )
           ) : null}
 
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">

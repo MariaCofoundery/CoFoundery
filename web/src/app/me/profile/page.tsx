@@ -374,6 +374,8 @@ export default async function FounderProfilePage({
             empty: t("base.empty"),
             completeHref: "/profile?step=identity",
             completeCta: t("base.completeCta"),
+            moreLabel: t("base.more"),
+            lessLabel: t("base.less"),
           }}
         />
         <p className="mt-5 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>

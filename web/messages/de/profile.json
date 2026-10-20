@@ -159,7 +159,9 @@
       "industries": "Branchen",
       "linkedin": "LinkedIn",
       "empty": "Zu dir selbst steht hier noch nichts. Ein Satz zu dir und deine Schwerpunkte machen den Unterschied zwischen einem Profil und einer Auswertung.",
-      "completeCta": "Angaben ergänzen"
+      "completeCta": "Angaben ergänzen",
+      "more": "Mehr lesen",
+      "less": "Weniger"
     },
     "capability": {
       "title": "Was du mitbringst",

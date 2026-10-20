@@ -159,7 +159,9 @@
       "industries": "Industries",
       "linkedin": "LinkedIn",
       "empty": "Nothing about you yet. One sentence about yourself and your focus areas make the difference between a profile and a mere report.",
-      "completeCta": "Add details"
+      "completeCta": "Add details",
+      "more": "Read more",
+      "less": "Show less"
     },
     "capability": {
       "title": "What you bring",
