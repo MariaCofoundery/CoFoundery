@@ -161,10 +161,12 @@ test("die eine Hauptaktion: Profil zuerst, dann die eigene Arbeitsweise, sonst n
   // Und hoechstens eine Hauptaktion: genau ein "Weiter", dazu ein ruhiger Link zur Bibliothek.
   const hero = dashboardSource.slice(
     dashboardSource.indexOf("data-dashboard-hero"),
-    dashboardSource.indexOf('id="dashboard-block-tasks"'),
+    dashboardSource.indexOf("<DashboardTeamCard"),
   );
-  assert.equal(hero.match(/t\("hero\.go"\)/g)?.length, 1);
-  assert.match(hero, /primaryAction \? \(/);
+  // Der naechste Schritt ist der erste Eintrag des Karussells.
+  assert.equal(dashboardSource.match(/t\("hero\.go"\)/g)?.length, 1);
+  assert.match(dashboardSource, /\.\.\.\(primaryAction/);
+  assert.match(hero, /<HeroCarousel/);
 });
 
 test("vier Bereiche in fester Reihenfolge: Begruessung, Ansteht, Teams, Über dich", () => {
@@ -238,10 +240,10 @@ test("fruehere Auswertungen stehen nur eingeklappt und nur, wenn es sie gibt", (
 });
 
 test("Current work is the only task presentation and remains capped at three items", () => {
-  const taskList = readFileSync("src/features/dashboard/DashboardTaskList.tsx", "utf8");
-  assert.equal(dashboardSource.match(/<DashboardTaskList/g)?.length, 1);
-  assert.match(taskList, /tasks\.slice\(0, 3\)/);
-  assert.doesNotMatch(taskList, /showAll|aria-expanded|useState/);
+  const carousel = readFileSync("src/features/dashboard/HeroCarousel.tsx", "utf8");
+  assert.equal(dashboardSource.match(/<HeroCarousel/g)?.length, 1);
+  assert.match(dashboardSource, /taskPresentations\.slice\(0, 3\)/);
+  assert.doesNotMatch(carousel, /showAll|aria-expanded/);
   assert.doesNotMatch(dashboardSource, /resolvedHeroPanel|tasks\[0\]/);
 });
 

@@ -166,7 +166,8 @@
         "report": "Euer Zusammenspiel ansehen",
         "setup": "Im Founder Setup vereinbaren"
       }
-    }
+    },
+    "editDetails": "Name und Beschreibung ändern"
   },
   "teamNavigation": {
     "ariaLabel": "Bereiche des Founder-Teams",

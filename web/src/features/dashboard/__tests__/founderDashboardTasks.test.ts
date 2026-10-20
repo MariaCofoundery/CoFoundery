@@ -613,7 +613,7 @@ test("Discovery journey task copy is parallel, actionable and non-evaluative", (
 });
 
 test("task UI and DE/EN messages preserve the three-item limit and empty state", () => {
-  const component = readFileSync("src/features/dashboard/DashboardTaskList.tsx", "utf8");
+  const component = readFileSync("src/features/dashboard/HeroCarousel.tsx", "utf8");
   const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
   type TaskMessages = {
     tasks: { empty: { title: string }; kinds: Record<string, string> };
@@ -624,12 +624,14 @@ test("task UI and DE/EN messages preserve the three-item limit and empty state",
   const en = JSON.parse(
     readFileSync("messages/en/dashboard.json", "utf8")
   ) as TaskMessages;
-  assert.match(component, /tasks\.slice\(0, 3\)/);
-  assert.doesNotMatch(component, /aria-expanded|showAll|useState/);
+  // Seit dem 20.10.2026 zeigt das Karussell eine Sache auf einmal; hoechstens drei Aufgaben nach dem naechsten Schritt.
+  assert.match(dashboard, /taskPresentations\.slice\(0, 3\)/);
+  assert.match(component, /aria-live="polite"/);
+  assert.doesNotMatch(component, /aria-expanded|showAll/);
   assert.match(dashboard, /dashboard-block-tasks/);
   // Die Abschnittsleiste gibt es seit Phase 9.4A nicht mehr; der Bereich
   // traegt seinen Titel selbst.
-  assert.match(dashboard, /t\("tasks\.title"\)/);
+  assert.match(dashboard, /t\("tasks\.empty\.title"\)/);
   assert.doesNotMatch(dashboard, /prioritizedTask|resolvedHeroPanel/);
   assert.equal(de.tasks.empty.title, "Aktuell wartet nichts auf dich.");
   assert.equal(en.tasks.empty.title, "Nothing is waiting for you right now.");

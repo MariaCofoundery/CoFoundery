@@ -23,7 +23,10 @@
     "nextStep": "Your next step",
     "go": "Let’s go",
     "headline": "How do you work together – and what do you want to agree on?",
-    "allQuestionnaires": "See all questionnaires"
+    "allQuestionnaires": "See all questionnaires",
+    "previous": "Previous item",
+    "next": "Next item",
+    "goTo": "Item"
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
@@ -807,12 +810,15 @@
     "others": "{count, plural, one {Other team} other {Other teams}} ({count})",
     "none": "You are not in a team yet. Invite someone and you will work together here.",
     "invite": "Invite a co-founder →",
-    "rename": "Rename team",
-    "nameIt": "Give the team a name",
     "nameLabel": "Team name",
     "namePlaceholder": "e.g. Northern Lights",
-    "nameHint": "Everyone on the team sees the name and can change it. Leave empty to reset it.",
-    "nameSave": "Save name"
+    "nameHint": "Everyone on the team sees this and can change it. Leave empty to reset.",
+    "nameSave": "Save",
+    "descPrompt": "Your venture in one sentence – add it here.",
+    "descLabel": "Description (optional)",
+    "descPlaceholder": "e.g. We build digital tools for care teams.",
+    "editAria": "Edit name and description",
+    "editShort": "Name and description"
   },
   "deepen": {
     "title": "To go deeper",

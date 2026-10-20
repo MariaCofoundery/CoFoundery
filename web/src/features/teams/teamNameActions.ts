@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Teamname setzen oder zurücknehmen - über die RPC `rename_founder_team`.
+ * Teamname und Beschreibung setzen oder zurücknehmen - über die RPC `set_founder_team_details`.
  *
  * Der Client schreibt nie direkt in `founder_teams`. Die Rückkehradresse ist
  * auf die Startseite (mit Teamauswahl) und die Teamseite desselben Teams
@@ -18,9 +18,10 @@ function safeReturn(teamId: string, returnTo: string) {
   return `/teams/${id}`;
 }
 
-export async function renameTeamAction(formData: FormData) {
+export async function updateTeamDetailsAction(formData: FormData) {
   const teamId = String(formData.get("teamId") ?? "");
   const name = String(formData.get("name") ?? "");
+  const description = String(formData.get("description") ?? "");
   const returnTo = String(formData.get("returnTo") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(teamId)) redirect("/dashboard");
 
@@ -28,7 +29,7 @@ export async function renameTeamAction(formData: FormData) {
   const { data: auth } = await client.auth.getUser();
   if (!auth.user) redirect(`/login?next=${encodeURIComponent(safeReturn(teamId, returnTo))}`);
 
-  await client.rpc("rename_founder_team", { p_team_id: teamId, p_name: name });
+  await client.rpc("set_founder_team_details", { p_team_id: teamId, p_name: name, p_description: description });
   revalidatePath("/dashboard");
   revalidatePath(`/teams/${teamId}`);
   redirect(safeReturn(teamId, returnTo));

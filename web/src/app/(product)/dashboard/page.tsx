@@ -2,16 +2,14 @@ import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import Link from "next/link";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
+import { HeroCarousel, type HeroItem } from "@/features/dashboard/HeroCarousel";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
 import { DashboardAreas, DashboardDeepen, DashboardPath, DashboardTeamCard } from "@/features/dashboard/DashboardOrientation";
-import {
-  DashboardTaskList,
-  type DashboardTaskPresentation,
-} from "@/features/dashboard/DashboardTaskList";
+import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
 import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDashboardConnectionData";
 import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
@@ -345,6 +343,22 @@ export default async function DashboardPage({
     modules: run.modules ?? [],
     createdAt: run.created_at,
   }));
+  const heroItems: HeroItem[] = [
+    ...(primaryAction
+      ? [{
+          key: "primary",
+          eyebrow: t("hero.nextStep"),
+          title: t(`hero.primary.${primaryAction}`),
+          text: t(`hero.primaryText.${primaryAction}`),
+          href: primaryActionHref,
+          action: t("hero.go"),
+        }]
+      : []),
+    ...taskPresentations.slice(0, 3).map((task) => ({ key: task.id, eyebrow: task.eyebrow, title: task.title, text: task.text, href: task.href, action: task.action })),
+  ];
+  if (heroItems.length === 0) {
+    heroItems.push({ key: "empty", eyebrow: t("hero.nextStep"), title: t("tasks.empty.title"), text: t("tasks.empty.text"), href: "/fragebogen", action: t("hero.allQuestionnaires") });
+  }
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-10 md:px-10 xl:px-12">
       {contextualInvitation ? (
@@ -380,40 +394,18 @@ export default async function DashboardPage({
           machten die Seite laenger, nicht klarer. Menschen suchen geht ueber
           FIND in der Leiste, Connect hat dort seinen Zaehler. */}
       <section data-dashboard-hero className="mb-8">
+        {/* Das Zitat steht leise ueber der Ueberschrift. */}
+        <QuoteOfTheDay tone="light" className="mb-6 max-w-2xl border-transparent bg-transparent px-0 py-0" />
         <p className="text-[15px] text-slate-600">{t("hero.greeting", { name: displayName })}</p>
-        <h1 className="mt-1.5 text-[1.75rem] font-semibold leading-tight text-slate-950 sm:text-[2.35rem]">{t("hero.headline")}</h1>
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          {/* DER NAECHSTE SCHRITT ALS EINE FLAECHE: die Marken-Flaeche ist der einzige Block dieser Art
-              im Kopf und sagt, wo es weitergeht. Das Zitat steht klein darin - auch dann, wenn nichts ansteht. */}
-          <div className="brand-panel flex flex-col gap-3 rounded-3xl p-6 sm:p-8">
-            {primaryAction ? (
-              <>
-                <span className="self-start rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{t("hero.nextStep")}</span>
-                <p className="text-2xl font-semibold leading-snug sm:text-[1.7rem]">{t(`hero.primary.${primaryAction}`)}</p>
-                <p className="max-w-xl text-sm leading-6 text-white">{t(`hero.primaryText.${primaryAction}`)}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <Link
-                    href={primaryActionHref}
-                    className="inline-flex min-h-11 items-center rounded-xl bg-white px-5 text-sm font-semibold text-violet-800 transition hover:bg-violet-50"
-                  >
-                    {t("hero.go")}
-                  </Link>
-                  <Link href="/fragebogen" className="text-sm text-white underline underline-offset-4">{t("hero.allQuestionnaires")}</Link>
-                </div>
-              </>
-            ) : null}
-            {taskPresentations.length > 0 ? (
-              <div id="dashboard-block-tasks" className="scroll-mt-28">
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-white">{t("tasks.title")}</h2>
-                <DashboardTaskList
-                  variant="brand"
-                  tasks={taskPresentations}
-                  emptyTitle={t("tasks.empty.title")}
-                  emptyText={t("tasks.empty.text")}
-                />
-              </div>
-            ) : null}
-            <QuoteOfTheDay tone="brand" className="mt-auto" />
+        <h1 className="mt-2 max-w-4xl text-[2rem] font-semibold leading-[1.12] tracking-tight text-slate-950 sm:text-5xl">{t("hero.headline")}</h1>
+        <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          {/* EINE SACHE AUF EINMAL: der naechste Schritt, danach die Aufgaben - zum Weiterklicken. */}
+          <div id="dashboard-block-tasks" className="brand-panel flex scroll-mt-28 flex-col gap-3 rounded-3xl p-6 sm:p-8">
+            <HeroCarousel
+              items={heroItems}
+              secondary={{ href: "/fragebogen", label: t("hero.allQuestionnaires") }}
+              labels={{ previous: t("hero.previous"), next: t("hero.next"), goTo: t("hero.goTo") }}
+            />
           </div>
           <DashboardTeamCard teams={founderTeams} selectedTeamId={params.team ?? null} />
         </div>

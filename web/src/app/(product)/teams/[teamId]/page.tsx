@@ -172,6 +172,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
         teamId={team.id}
         title={title}
         teamName={team.name}
+        teamDescription={team.description ?? null}
         members={team.members.map((member, index) => ({
           userId: member.userId,
           displayName: founderNames[index],

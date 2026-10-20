@@ -79,7 +79,7 @@ export async function getFounderTeamHomebase(
   const [teamResult, memberResult] = await Promise.all([
     supabase
       .from("founder_teams")
-      .select("id, name, team_context, created_at")
+      .select("id, name, description, team_context, created_at")
       .eq("id", normalizedTeamId)
       .maybeSingle(),
     supabase
@@ -221,7 +221,7 @@ export async function getFounderTeamDashboardSummaries(
   const [teamResult, allMembersResult] = await Promise.all([
     supabase
       .from("founder_teams")
-      .select("id, name, team_context, created_at")
+      .select("id, name, description, team_context, created_at")
       .in("id", teamIds)
       .order("created_at", { ascending: false }),
     supabase

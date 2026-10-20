@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TeamNameForm } from "@/features/teams/TeamNameForm";
+import { TeamDetailsEditor } from "@/features/teams/TeamDetailsEditor";
 import { getTranslations } from "next-intl/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import type { FounderTeamDashboardSummary } from "@/features/teams/founderTeamHomebaseData";
@@ -116,9 +116,13 @@ export async function DashboardTeamCard({ teams, selectedTeamId }: { teams: Foun
               </li>
             ))}
           </ul>
-          <p className="text-lg font-semibold text-slate-950">{nameOf(current)}</p>
-          <TeamNameForm teamId={current.id} currentName={current.name?.trim() || null} returnTo={`/dashboard?team=${encodeURIComponent(current.id)}`} />
-          <p className="text-sm leading-6 text-slate-600">{t("people", { count: current.members.length })}</p>
+          <TeamDetailsEditor
+            teamId={current.id}
+            displayName={nameOf(current)}
+            name={current.name?.trim() || null}
+            description={current.description?.trim() || null}
+            returnTo={`/dashboard?team=${encodeURIComponent(current.id)}`}
+          />
           <Link href={`/teams/${encodeURIComponent(current.id)}`} className="mt-auto font-semibold text-violet-700 hover:underline">
             {t("open")}
           </Link>

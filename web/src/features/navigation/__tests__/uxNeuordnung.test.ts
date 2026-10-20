@@ -69,13 +69,17 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
 
 test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find und Connect - ohne Prozent", () => {
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
-  assert.match(dashboard, /className="brand-panel flex flex-col/);
+  assert.match(dashboard, /className="brand-panel flex /);
+  // Das Zitat steht leise ueber der Ueberschrift, die Ueberschrift ist gross.
+  assert.ok(dashboard.indexOf("<QuoteOfTheDay") < dashboard.indexOf("hero.headline"), "Zitat ueber der Ueberschrift");
+  assert.match(dashboard, /sm:text-5xl/);
   assert.match(dashboard, /<DashboardPath/);
   // Kopf: Marken-Flaeche mit naechstem Schritt, Aufgaben (nur wenn etwas wartet) und Zitat, daneben die Team-Karte; dann Weg, Vertiefen, Find/Connect-Streifen.
   assert.match(dashboard, /<DashboardTeamCard/);
   assert.match(dashboard, /<DashboardDeepen/);
   assert.match(dashboard, /<DashboardAreas/);
-  assert.match(dashboard, /taskPresentations\.length > 0/);
+  // Aufgaben stehen als Eintraege im Karussell; ohne Aufgabe und ohne Schritt bleibt ein ruhiger Leer-Eintrag.
+  assert.match(dashboard, /heroItems\.length === 0/);
   // Die Profilangaben (4 Karten) sind von der Startseite ins Menue gewandert.
   assert.doesNotMatch(dashboard, /aboutYou\./);
   const order = ["data-dashboard-hero", 'id="dashboard-block-tasks"', "<DashboardTeamCard", "<DashboardPath", "<DashboardDeepen", "<DashboardAreas", 'id="dashboard-block-connections"', 'id="dashboard-block-account"'].map((m) => dashboard.indexOf(m));

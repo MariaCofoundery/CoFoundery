@@ -1,6 +1,10 @@
-import Link from "next/link";
 import type { DashboardTaskKind } from "@/features/dashboard/founderDashboardTasks";
 
+/**
+ * Eine Aufgabe, wie sie die Startseite zeigt. Die Anzeige selbst ist seit dem
+ * 20.10.2026 das Karussell in der Marken-Flaeche (`HeroCarousel`): der naechste
+ * Schritt zuerst, danach hoechstens drei Aufgaben - eine Sache auf einmal.
+ */
 export type DashboardTaskPresentation = {
   id: string;
   kind: DashboardTaskKind;
@@ -10,77 +14,3 @@ export type DashboardTaskPresentation = {
   href: string;
   action: string;
 };
-
-const TASK_LINK_CLASS =
-  "inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
-
-export function DashboardTaskList({
-  tasks,
-  emptyTitle,
-  emptyText,
-  variant = "card",
-}: {
-  tasks: DashboardTaskPresentation[];
-  emptyTitle: string;
-  emptyText: string;
-  /** `brand`: kompakt auf der Marken-Flaeche der Startseite (weisse Schrift). */
-  variant?: "card" | "brand";
-}) {
-  const visibleTasks = tasks.slice(0, 3);
-
-  if (variant === "brand" && tasks.length > 0) {
-    return (
-      <ul className="grid gap-2">
-        {visibleTasks.map((task) => (
-          <li key={task.id} className="flex flex-col gap-3 rounded-2xl bg-white/15 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white">{task.eyebrow}</p>
-              <p className="mt-1 text-base font-semibold text-white">{task.title}</p>
-              <p className="mt-0.5 text-sm leading-6 text-white">{task.text}</p>
-            </div>
-            <Link href={task.href} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-violet-800 transition hover:bg-violet-50">
-              {task.action}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  if (tasks.length === 0) {
-    return (
-      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 px-5 py-4">
-        <p className="text-sm font-semibold text-slate-900">{emptyTitle}</p>
-        <p className="mt-1 text-sm leading-6 text-slate-600">{emptyText}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-5">
-      <ul className="grid gap-3">
-        {visibleTasks.map((task) => (
-          <li
-            key={task.id}
-            className={`flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
-              task.kind === "NEEDS_YOU"
-                ? "border-violet-200 bg-violet-50/45"
-                : "border-slate-200 bg-slate-50/70"
-            }`}
-          >
-            <div className="min-w-0">
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                {task.eyebrow}
-              </p>
-              <h3 className="mt-1.5 text-base font-semibold text-slate-950">{task.title}</h3>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{task.text}</p>
-            </div>
-            <Link href={task.href} className={TASK_LINK_CLASS}>
-              {task.action}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}

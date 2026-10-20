@@ -44,6 +44,7 @@ export type FounderTeamAdvisorEntry = {
 export type FounderTeamHomebase = {
   id: string;
   name: string | null;
+  description?: string | null;
   teamContext: FounderTeamContext;
   members: FounderTeamMemberSummary[];
   alignment: FounderTeamAlignmentEntry[];
@@ -54,11 +55,15 @@ export type FounderTeamHomebase = {
 export type FounderTeamDashboardSummary = Pick<
   FounderTeamHomebase,
   "id" | "name" | "teamContext" | "members"
->;
+> & {
+  /** Freier Satz der Mitglieder zum Vorhaben; nur auf der Start-Karte. */
+  description?: string | null;
+};
 
 export type FounderTeamRow = {
   id: string;
   name: string | null;
+  description?: string | null;
   team_context: string;
   created_at: string;
 };
@@ -170,6 +175,7 @@ export function buildFounderTeamDashboardSummaries(params: {
     .map((team) => ({
       id: team.id,
       name: normalizeDisplayName(team.name),
+      description: team.description?.trim() || null,
       teamContext: normalizeTeamContext(team.team_context),
       members: params.members
         .filter((member) => member.team_id === team.id)
@@ -413,6 +419,7 @@ export function buildFounderTeamHomebaseReadModel(params: {
   return {
     id: rows.team.id,
     name: normalizeDisplayName(rows.team.name),
+    description: rows.team.description?.trim() || null,
     teamContext: normalizeTeamContext(rows.team.team_context),
     members: teamMembers.map((member) => ({
       userId: member.user_id,

@@ -166,7 +166,8 @@
         "report": "See how you work together",
         "setup": "Agree in the Founder Setup"
       }
-    }
+    },
+    "editDetails": "Edit name and description"
   },
   "teamNavigation": {
     "ariaLabel": "Founder team areas",

@@ -23,7 +23,10 @@
     "nextStep": "Dein nächster Schritt",
     "go": "Los geht’s",
     "headline": "Wie arbeitet ihr zusammen – und worauf wollt ihr euch einigen?",
-    "allQuestionnaires": "Alle Fragebögen ansehen"
+    "allQuestionnaires": "Alle Fragebögen ansehen",
+    "previous": "Vorheriger Hinweis",
+    "next": "Nächster Hinweis",
+    "goTo": "Hinweis"
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",
@@ -807,12 +810,15 @@
     "others": "{count, plural, one {Anderes Team} other {Andere Teams}} ({count})",
     "none": "Du bist noch in keinem Team. Lade eine Person ein, dann arbeitet ihr hier zusammen.",
     "invite": "Mitgründer:in einladen →",
-    "rename": "Team umbenennen",
-    "nameIt": "Team einen Namen geben",
     "nameLabel": "Teamname",
     "namePlaceholder": "z. B. Nordlicht",
-    "nameHint": "Alle im Team sehen den Namen und können ihn ändern. Leer lassen setzt ihn zurück.",
-    "nameSave": "Name speichern"
+    "nameHint": "Alle im Team sehen das und können es ändern. Leer lassen setzt zurück.",
+    "nameSave": "Speichern",
+    "descPrompt": "Euer Vorhaben in einem Satz – hier eintragen.",
+    "descLabel": "Beschreibung (optional)",
+    "descPlaceholder": "z. B. Wir bauen digitale Tools für Pflegeteams.",
+    "editAria": "Name und Beschreibung ändern",
+    "editShort": "Name und Beschreibung"
   },
   "deepen": {
     "title": "Zum Vertiefen",
