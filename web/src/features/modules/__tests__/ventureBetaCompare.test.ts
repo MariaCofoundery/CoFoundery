@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { TradeoffsComparisonPerson } from "@/features/modules/tradeoffs/teamParse";
 import { compareBeta, monthsUntil, pairGapsOf, parseAnswer } from "@/features/modules/ventureBeta/compare";
+import { classOfResult } from "@/features/modules/ventureBeta/reportSummary";
 import { COMPARE_RULES, stanceOf } from "@/features/modules/ventureBeta/compareConfig";
 import { BETA_CORE_ITEM_IDS } from "@/features/modules/ventureBeta/registry";
 
@@ -144,6 +145,9 @@ test("ZC02: jede Erwartung gegen ZC01 JEDES anderen - kein Teamdurchschnitt (Mar
   // Vier Founder, alle gedeckt: keine Luecke, kein Signal.
   const four = ["a", "b", "c", "d"].map((id) => person(id, id.toUpperCase(), { C01: num(20), C02: num(15) }));
   assert.equal(compareBeta(four, { now: NOW }).find((r) => r.itemId === "C02")!.signal, "none");
+  // Gedeckte Erwartungen sind Einigkeit, kein Unterschied (Zusammenfassung und Gruppen).
+  assert.equal(classOfResult({ itemId: "C02", signal: "none" }), "agreed");
+  assert.equal(classOfResult({ itemId: "M01", signal: "none" }), "different", "unter der Schwelle: Unterschied ohne Handlungsbedarf");
   // Ein Bereich (von-bis) zaehlt mit seinem oberen Ende.
   assert.deepEqual(pairGapsOf("C02", "C01", [person("a", "A", { C02: num(20) }), person("b", "B", { C01: { number: 10, to: 25, unit: "Stunden pro Woche" } })]), []);
 });
@@ -167,4 +171,13 @@ test("parseAnswer: Antworten, Zahlen, Betraege und Auslassungen", () => {
   assert.deepEqual(parseAnswer({ value: { number: 8, unit: "Monate" }, missing_reason: null }), { kind: "number", number: 8, unit: "Monate" });
   assert.deepEqual(parseAnswer({ value: { amount: 500, currency: "EUR" }, missing_reason: null }), { kind: "amount", amount: 500, currency: "EUR" });
   assert.deepEqual(parseAnswer(undefined), { kind: "none" });
+});
+
+// 21.10.2026, Pruefung fuer drei und vier Gruendende: eine Person, die BEIDE Optionen haelt, ist keine
+// Spannung zwischen Menschen. Erst wenn zwei VERSCHIEDENE Personen sie halten, ist es eine.
+test("set_overlap C03: nur verschiedene Personen eskalieren (auch mit drei und vier Foundern)", () => {
+  // Eine Person haelt beide, die anderen weder noch: keine Eskalation.
+  assert.notEqual(signalOf("C03", set("C03_o1", "C03_o7"), set("C03_o2"), [{ C03: set("C03_o3") }]), "needs_clarification");
+  // Zwei verschiedene Personen halten je eine der beiden Optionen: Eskalation.
+  assert.equal(signalOf("C03", set("C03_o1"), set("C03_o7"), [{ C03: set("C03_o2") }, { C03: set("C03_o3") }]), "needs_clarification");
 });

@@ -146,8 +146,10 @@ function evaluate(rule: ItemRule, cells: CompareCell[], now: Date): Signal {
       const sets = answers.map((answer) => (answer.kind === "options" ? [...answer.optionIds].sort() : []));
       const identical = sets.every((set) => set.join("|") === sets[0]!.join("|"));
       if (identical) return "same";
+      // Zwei Optionen, die VERSCHIEDENE Personen halten. Haelt eine Person beide, ist das keine Spannung
+      // zwischen Menschen - mit drei oder vier Foundern kaeme es sonst haeufiger zu Fehlalarmen.
       for (const [a, b] of rule.escalatePairs ?? []) {
-        if (sets.some((set) => set.includes(a)) && sets.some((set) => set.includes(b))) return "needs_clarification";
+        if (sets.some((set, i) => set.includes(a) && sets.some((other, j) => j !== i && other.includes(b)))) return "needs_clarification";
       }
       return rule.difference;
     }

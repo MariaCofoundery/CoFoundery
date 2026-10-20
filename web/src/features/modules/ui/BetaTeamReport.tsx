@@ -7,7 +7,7 @@ import { answerText, type AnswerTextContext } from "@/features/modules/ventureBe
 import type { CompareCell, ItemResult } from "@/features/modules/ventureBeta/compare";
 import { setupTopicFor } from "@/features/modules/ventureBeta/handoff";
 import { BETA_REPORT_GROUPS, findBetaItem } from "@/features/modules/ventureBeta/registry";
-import { classOf, summarizeReport, type SignalClass } from "@/features/modules/ventureBeta/reportSummary";
+import { classOfResult, summarizeReport, type SignalClass } from "@/features/modules/ventureBeta/reportSummary";
 import { answerContextFor } from "@/features/modules/ui/betaFormat";
 import type { AppLocale } from "@/i18n/config";
 
@@ -29,8 +29,8 @@ import type { AppLocale } from "@/i18n/config";
  */
 type Bucket = "clarify" | "impulse" | "differences" | "common";
 
-const bucketOf = (signal: ItemResult["signal"]): Bucket => {
-  const cls = classOf(signal);
+const bucketOf = (result: Pick<ItemResult, "itemId" | "signal">): Bucket => {
+  const cls = classOfResult(result);
   return cls === "clarify" ? "clarify" : cls === "talk" ? "impulse" : cls === "different" ? "differences" : "common";
 };
 
@@ -223,7 +223,7 @@ export async function BetaTeamReport({
         {BETA_REPORT_GROUPS.map((group) => {
           const items = group.itemIds.map((id) => byId.get(id)).filter((r): r is ItemResult => Boolean(r));
           const buckets: Record<Bucket, ItemResult[]> = { clarify: [], impulse: [], differences: [], common: [] };
-          for (const result of items) buckets[bucketOf(result.signal)].push(result);
+          for (const result of items) buckets[bucketOf(result)].push(result);
           return (
             <section key={group.key} aria-labelledby={`report-${group.key}`} data-group={group.key}>
               <h2 id={`report-${group.key}`} className="text-2xl font-semibold tracking-tight text-slate-950">

@@ -118,6 +118,7 @@ export type TeamReadout = {
 
 /**
  * Beansprucht die Zuständigkeit. Nur `own` - wie paarweise.
+
  *
  * `grow_into` ist ein Entwicklungswunsch, weder Anspruch noch Absage, und
  * zählt deshalb wie "noch unklar" zu den Unentschiedenen. Bis zum 13.10.2026

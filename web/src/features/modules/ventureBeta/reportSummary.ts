@@ -1,5 +1,5 @@
 import type { ItemResult } from "@/features/modules/ventureBeta/compare";
-import type { Signal } from "@/features/modules/ventureBeta/compareConfig";
+import { COMPARE_RULES, type Signal } from "@/features/modules/ventureBeta/compareConfig";
 import { BETA_REPORT_GROUPS } from "@/features/modules/ventureBeta/registry";
 
 /**
@@ -24,6 +24,18 @@ export function classOf(signal: Signal): SignalClass {
   }
 }
 
+/**
+ * Die Klasse eines Ergebnisses.
+ *
+ * Ein Kreuzvergleich (ZC02 gegen ZC01) meldet `none`, wenn es KEINE Luecke gibt - also wenn die Erwartungen
+ * gedeckt sind. Das ist Einigkeit und kein Unterschied. Bei den uebrigen Regeln heisst `none`: die Antworten
+ * unterscheiden sich, aber unter der Schwelle - ein Unterschied ohne Handlungsbedarf.
+ */
+export function classOfResult(result: Pick<ItemResult, "itemId" | "signal">): SignalClass {
+  if (result.signal === "none" && COMPARE_RULES[result.itemId]?.method === "crosscheck") return "agreed";
+  return classOf(result.signal);
+}
+
 export type ReportSummary = {
   agreed: string[];
   different: string[];
@@ -41,7 +53,7 @@ export function summarizeReport(results: readonly ItemResult[]): ReportSummary {
     for (const id of group.itemIds) {
       const result = byId.get(id);
       if (!result) continue;
-      const cls = classOf(result.signal);
+      const cls = classOfResult(result);
       classes.push(cls);
       summary[cls].push(id);
     }
