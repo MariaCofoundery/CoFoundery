@@ -112,6 +112,25 @@
       "text": "Du lädst es einmal hoch. Hier entscheidest du getrennt, wo es erscheint – das eine schließt das andere nicht ein.",
       "find": "In FIND und für andere Mitglieder",
       "save": "Verwendung speichern"
+    },
+    "rolesOverview": {
+      "title": "Deine Rollen im Überblick",
+      "none": "Noch nichts festgelegt",
+      "change": "Ändern",
+      "access": {
+        "title": "Zugang",
+        "text": "Wofür du hier bist – bestimmt, welche Bereiche dir angeboten werden.",
+        "founder": "Founder",
+        "advisor": "Advisor"
+      },
+      "find": {
+        "title": "In FIND",
+        "text": "Was du in ein Gründungsteam einbringst."
+      },
+      "connect": {
+        "title": "In Connect",
+        "text": "Wer du im Netzwerk bist – beschreibend, ohne Berechtigung."
+      }
     }
   },
   "steps": {

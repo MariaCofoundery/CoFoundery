@@ -112,6 +112,25 @@
       "text": "You upload it once. Here you decide separately where it appears – one does not include the other.",
       "find": "In FIND and for other members",
       "save": "Save where it is used"
+    },
+    "rolesOverview": {
+      "title": "Your roles at a glance",
+      "none": "Nothing set yet",
+      "change": "Change",
+      "access": {
+        "title": "Access",
+        "text": "What you are here for – decides which areas are offered to you.",
+        "founder": "Founder",
+        "advisor": "Advisor"
+      },
+      "find": {
+        "title": "In FIND",
+        "text": "What you bring to a founding team."
+      },
+      "connect": {
+        "title": "In Connect",
+        "text": "Who you are in the network – descriptive, no permissions."
+      }
     }
   },
   "steps": {

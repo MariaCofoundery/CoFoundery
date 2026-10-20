@@ -15,6 +15,7 @@ import { DIRECTION_PER_FACET, STRENGTHS_IN_SUMMARY } from "@/features/reporting/
 import { WorkMap } from "@/features/instruments/align/AlignMaps";
 import { WorkProfileSynthesisView } from "@/features/instruments/align/WorkProfileSynthesisView";
 import { ReportViewV21 } from "@/features/instruments/v21/ReportViewV21";
+import { RolesOverview } from "@/features/profile/RolesOverview";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { CapabilityMap } from "@/features/reporting/CapabilityMap";
 import { VentureSnapshot } from "@/features/reporting/VentureSnapshot";
@@ -471,6 +472,7 @@ export default async function FounderProfilePage({
                 completeCta: t("base.completeCta"),
               }}
             />
+            <RolesOverview client={supabase} userId={user.id} />
             <EditLink href="/profile?step=identity" label={t("edit")} />
           </>
         )}

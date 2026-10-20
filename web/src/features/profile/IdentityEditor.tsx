@@ -286,7 +286,7 @@ export async function IdentityEditor({
               Selbstfreischaltung ins Founder-Produkt und damit eine
               Produktentscheidung, nicht ein Formularfeld. */}
           {currentRoles.length > 0 ? (
-            <fieldset>
+            <fieldset id="roles" className="scroll-mt-24">
               <legend className="text-sm font-medium">{t("identity.rolesLegend")}</legend>
               <p className={hint}>{t("identity.rolesHint")}</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
