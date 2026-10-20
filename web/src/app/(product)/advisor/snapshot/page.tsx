@@ -2,6 +2,7 @@ import Link from "next/link";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AdvisorTeamNav } from "@/features/advisor/AdvisorTeamNav";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
 import {
@@ -138,13 +139,10 @@ export default async function AdvisorSnapshotPage({
         matchingHref={reportHref}
       />
       <main className="print-document-root mx-auto min-h-screen w-full max-w-5xl px-6 py-16 md:px-10">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
-          <Link
-            href="/advisor/dashboard"
-            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            {t("snapshot.backToDashboard")}
-          </Link>
+        {data.invitationId ? (
+          <AdvisorTeamNav invitationId={data.invitationId} teamContext={data.teamContext} active="snapshot" />
+        ) : null}
+        <div className="mb-8 flex flex-wrap items-center justify-end gap-3 print:hidden">
           <PrintReportButton
             label={t("snapshot.export")}
             eventName="advisor_snapshot_print_clicked"

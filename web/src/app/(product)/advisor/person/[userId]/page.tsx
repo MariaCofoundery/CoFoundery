@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
+import { AdvisorDetailHeader } from "@/features/advisor/AdvisorDetailHeader";
 import {
   getAdvisorFollowUpFor,
   getAdvisorNoteFor,
@@ -50,7 +51,7 @@ export default async function AdvisorPersonPage({
   searchParams,
 }: {
   params: Promise<{ userId: string }>;
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; ansicht?: string }>;
 }) {
   const displayLocale = await getDisplayLocale();
   const { userId } = await params;
@@ -100,7 +101,7 @@ export default async function AdvisorPersonPage({
         title={tAccess(`${key}.title`)}
         body={tAccess(`${key}.body`)}
         actions={[
-          { href: "/advisor/group", label: tAccess("toPeople") },
+          { href: "/advisor/begleitung", label: tAccess("toPeople") },
           { href: "/advisor/dashboard", label: tAccess("toAdvisor") },
         ]}
       />
@@ -129,27 +130,36 @@ export default async function AdvisorPersonPage({
   const alignViews = await getAdvisorAlignViews(userId);
   const workstyleV04 = await getProductWorkstyle(client, userId);
 
-  return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-10">
-      <Link
-        href="/advisor/group"
-        className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
-      >
-        {t("back")}
-      </Link>
+  // Die Ansichten. Eine erscheint nur, wenn dahinter etwas freigegeben ist -
+  // sonst gaebe es einen leeren Reiter, und ein leerer Reiter waere eine Aussage
+  // ueber den Menschen. Die Notizen gehoeren dem Advisor und stehen immer da.
+  const showAbout = Boolean(view.base) || Boolean(view.strengths?.length) || Boolean(view.direction?.length);
+  const showCapability = Boolean(view.capability?.length);
+  const showWork =
+    Boolean(workstyleV04) || alignViews.length > 0 || Boolean(alignmentV21) || (hasLegacy && Boolean(alignment));
+  const available = [
+    ...(showAbout ? (["ueber"] as const) : []),
+    ...(showCapability ? (["faehigkeiten"] as const) : []),
+    ...(showWork ? (["arbeitsweise"] as const) : []),
+    "notizen" as const,
+  ];
+  // Nach dem Speichern einer Notiz (`saved`/`error`) landet man wieder bei den Notizen.
+  const wanted = query.saved || query.error ? "notizen" : query.ansicht;
+  const activeTab = (available as readonly string[]).includes(wanted ?? "") ? (wanted as (typeof available)[number]) : available[0];
+  const tabHref = (key: string) => `/advisor/person/${userId}${key === available[0] ? "" : `?ansicht=${key}`}`;
+  const tAdvisorArea = await getTranslations("advisor.area");
+  const SCOPE_CHIPS: Record<string, string> = {
+    base: "base",
+    alignment_report: "alignmentReport",
+    capability: "capability",
+    capability_depth: "capabilityDepth",
+    strengths: "strengths",
+    direction: "direction",
+  };
+  const chips = view.grantedScopes.map((scope) => tAdvisorArea(`person.scopes.${SCOPE_CHIPS[scope] ?? scope}`));
 
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
-        {view.base?.displayName ?? t("unnamed")}
-      </h1>
-      {view.base?.headline ? (
-        <p className="mt-2 text-sm font-medium text-slate-700">
-          {view.base.headline}
-        </p>
-      ) : null}
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-        {t("intro")}
-      </p>
-
+  const aboutSection = (
+    <>
       {view.base ? (
         <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
           <h2 className="text-base font-semibold text-slate-900">
@@ -185,6 +195,100 @@ export default async function AdvisorPersonPage({
         </section>
       ) : null}
 
+      {view.strengths && view.strengths.length > 0 ? (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("strengths")}
+          </h2>
+          <ul className="mt-4 space-y-3">
+            {view.strengths.map((strength) => (
+              <li key={strength.statement} className="text-sm leading-6">
+                <span className="font-medium text-slate-900">
+                  {strength.statement}
+                </span>
+                {strength.selfFrequency ? (
+                  <span className="ml-2 text-xs text-slate-500">
+                    {t("self")}:{" "}
+                    {tCapability(
+                      `strengths.frequencies.${strength.selfFrequency}`,
+                    )}
+                    {strength.reflectedFrequency && strength.reflectedWho
+                      ? ` · ${tCapability(`strengths.groups.${strength.reflectedWho}`)}: ${tCapability(
+                          `strengths.frequencies.${strength.reflectedFrequency}`,
+                        )}`
+                      : ""}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {view.direction && view.direction.length > 0 ? (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("direction")}
+          </h2>
+          <ul className="mt-4 space-y-2">
+            {view.direction.map((entry) => (
+              <li
+                key={entry.statement}
+                className="text-sm leading-6 text-slate-900"
+              >
+                <span className="text-xs uppercase tracking-[.12em] text-slate-500">
+                  {tDirection(entry.facet)}
+                </span>
+                <span className="mt-0.5 block">{entry.statement}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+    </>
+  );
+  const capabilitySection = (
+    <>
+      {view.capability && view.capability.length > 0 ? (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+          <h2 className="text-base font-semibold text-slate-900">
+            {t("capability")}
+          </h2>
+          <ul className="mt-4 divide-y divide-slate-200 border-y border-slate-200">
+            {view.capability.map((entry) => (
+              <li
+                key={entry.areaId}
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3 text-sm"
+              >
+                <span className="font-medium text-slate-900">
+                  {tCapability(`areaLabels.${entry.areaId}`)}
+                </span>
+                {/* Stufe und Verantwortungswunsch nur, wenn auch die Tiefe
+                    freigegeben ist - die Datenbank gibt sie sonst als null
+                    heraus, und hier steht dann eben nichts. */}
+                <span className="flex flex-wrap gap-x-3 text-slate-600">
+                  {entry.applicationLevel !== null ? (
+                    <span>
+                      {tCapability(`levels.${entry.applicationLevel}`)}
+                    </span>
+                  ) : null}
+                  {entry.ownershipWish ? (
+                    <span className="text-slate-800">
+                      {tCapability(`ownershipWishes.${entry.ownershipWish}`)}
+                    </span>
+                  ) : null}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+    </>
+  );
+  const workSection = (
+    <>
       {/* ----------------------------------------------------------------
           DER AKTUELLE STAND ZUERST - SEIT PHASE 6 (01.10.2026)
 
@@ -284,107 +388,6 @@ export default async function AdvisorPersonPage({
         </section>
       ) : null}
 
-      {view.capability && view.capability.length > 0 ? (
-        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">
-            {t("capability")}
-          </h2>
-          <ul className="mt-4 divide-y divide-slate-200 border-y border-slate-200">
-            {view.capability.map((entry) => (
-              <li
-                key={entry.areaId}
-                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3 text-sm"
-              >
-                <span className="font-medium text-slate-900">
-                  {tCapability(`areaLabels.${entry.areaId}`)}
-                </span>
-                {/* Stufe und Verantwortungswunsch nur, wenn auch die Tiefe
-                    freigegeben ist - die Datenbank gibt sie sonst als null
-                    heraus, und hier steht dann eben nichts. */}
-                <span className="flex flex-wrap gap-x-3 text-slate-600">
-                  {entry.applicationLevel !== null ? (
-                    <span>
-                      {tCapability(`levels.${entry.applicationLevel}`)}
-                    </span>
-                  ) : null}
-                  {entry.ownershipWish ? (
-                    <span className="text-slate-800">
-                      {tCapability(`ownershipWishes.${entry.ownershipWish}`)}
-                    </span>
-                  ) : null}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {view.strengths && view.strengths.length > 0 ? (
-        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">
-            {t("strengths")}
-          </h2>
-          <ul className="mt-4 space-y-3">
-            {view.strengths.map((strength) => (
-              <li key={strength.statement} className="text-sm leading-6">
-                <span className="font-medium text-slate-900">
-                  {strength.statement}
-                </span>
-                {strength.selfFrequency ? (
-                  <span className="ml-2 text-xs text-slate-500">
-                    {t("self")}:{" "}
-                    {tCapability(
-                      `strengths.frequencies.${strength.selfFrequency}`,
-                    )}
-                    {strength.reflectedFrequency && strength.reflectedWho
-                      ? ` · ${tCapability(`strengths.groups.${strength.reflectedWho}`)}: ${tCapability(
-                          `strengths.frequencies.${strength.reflectedFrequency}`,
-                        )}`
-                      : ""}
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {view.direction && view.direction.length > 0 ? (
-        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="text-base font-semibold text-slate-900">
-            {t("direction")}
-          </h2>
-          <ul className="mt-4 space-y-2">
-            {view.direction.map((entry) => (
-              <li
-                key={entry.statement}
-                className="text-sm leading-6 text-slate-900"
-              >
-                <span className="text-xs uppercase tracking-[.12em] text-slate-500">
-                  {tDirection(entry.facet)}
-                </span>
-                <span className="mt-0.5 block">{entry.statement}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {/* WAS DAS HIER IST - UND WAS NICHT. Auf dem eigenen Gesamtbild steht
-          derselbe Satz; hier ist er wichtiger, weil ihn jemand liest, der
-          ueber Menschen entscheidet. */}
-      <section className="mt-8 rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">
-        <h2 className="text-sm font-semibold text-slate-900">
-          {tNote("title")}
-        </h2>
-        <ul className="mt-3 space-y-2">
-          <li>{tNote("selfReport")}</li>
-          <li>{tNote("notATest")}</li>
-          <li>{tNote("purpose")}</li>
-        </ul>
-        <p className="mt-3 text-xs text-slate-500">{t("scopeNote")}</p>
-      </section>
-
       {alignmentV21 && (
         <section className="mt-10">
           <h2 className="text-xl font-semibold text-slate-950">
@@ -459,6 +462,46 @@ export default async function AdvisorPersonPage({
         </details>
       ) : null}
 
+    </>
+  );
+  const noteSection = (
+    <>
+      {/* WAS DAS HIER IST - UND WAS NICHT. Auf dem eigenen Gesamtbild steht
+          derselbe Satz; hier ist er wichtiger, weil ihn jemand liest, der
+          ueber Menschen entscheidet. */}
+      <section className="mt-8 rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">
+        <h2 className="text-sm font-semibold text-slate-900">
+          {tNote("title")}
+        </h2>
+        <ul className="mt-3 space-y-2">
+          <li>{tNote("selfReport")}</li>
+          <li>{tNote("notATest")}</li>
+          <li>{tNote("purpose")}</li>
+        </ul>
+        <p className="mt-3 text-xs text-slate-500">{t("scopeNote")}</p>
+      </section>
+
+    </>
+  );
+
+  return (
+    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <AdvisorDetailHeader
+        backLabel={tAdvisorArea("detail.back")}
+        eyebrow={tAdvisorArea("person.eyebrow")}
+        title={view.base?.displayName ?? t("unnamed")}
+        subtitle={view.base?.headline ?? null}
+        chips={chips}
+        tabsLabel={tAdvisorArea("person.tabsLabel")}
+        tabs={available.map((key) => ({ key, label: tAdvisorArea(`person.tabs.${key}`), href: tabHref(key), active: key === activeTab }))}
+      />
+      <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+
+      {activeTab === "ueber" ? aboutSection : null}
+      {activeTab === "faehigkeiten" ? capabilitySection : null}
+      {activeTab === "arbeitsweise" ? workSection : null}
+      {activeTab === "notizen" ? (
+        <>
       {/* DIE HANDAKTE GANZ UNTEN - nach allem, worueber sie handelt. Sie
           gehoert dem Advisor und war nie fuer die begleitete Person
           bestimmt. */}
@@ -469,6 +512,11 @@ export default async function AdvisorPersonPage({
         saved={query.saved}
         error={query.error}
       />
+        </>
+      ) : null}
+
+      {/* WAS DAS HIER IST - UND WAS NICHT: unter jeder Ansicht. */}
+      {noteSection}
     </main>
   );
 }

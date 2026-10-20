@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AdvisorTeamNav } from "@/features/advisor/AdvisorTeamNav";
 import type { ReactNode } from "react";
 import type { TeamContext } from "@/features/reporting/buildExecutiveSummary";
 import {
@@ -65,29 +65,7 @@ export function AdvisorReportProductView({
   copy,
 }: Props) {
   const impulseSectionMeta = getAdvisorImpulseSectionMeta(locale);
-  const topActions = (
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-      <Link
-        href="/advisor/dashboard"
-        className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-      >
-        {copy.backToDashboard}
-      </Link>
-      {/* Das historische Workbook ist am 20.09.2026 aus dem Advisor-Bereich
-          entfernt worden. Was es leisten sollte, leisten inzwischen der Report,
-          der Snapshot und das Sitzungsblatt - es stand nur noch als vierter
-          Knopf daneben und hat die Reihe unlesbar gemacht. Die Inhalte selbst
-          bleiben bei den Foundern, wo sie hingehoeren. */}
-      <div className="flex flex-wrap gap-3">
-        <Link
-          href={snapshotHref}
-          className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-        >
-          {copy.exportSnapshot}
-        </Link>
-      </div>
-    </div>
-  );
+  const topActions = <AdvisorTeamNav invitationId={invitationId} teamContext={teamContext} active="report" />;
 
   const appendix = (
     <div className="grid gap-6">

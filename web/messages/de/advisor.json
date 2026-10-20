@@ -151,7 +151,7 @@
       "resend": "Erneut senden",
       "createNew": "Neue Einladung erstellen"
     },
-    "openSession": "Sitzungsblatt",
+    "openSession": "Vorbereitung",
     "followUpsDue": {
       "title": "{count, plural, one {Eine Wiedervorlage ist fällig} other {# Wiedervorlagen sind fällig}}"
     },
@@ -299,9 +299,9 @@
     "toStart": "Zur Startseite"
   },
   "session": {
-    "context": "Sitzungsblatt",
+    "context": "Vorbereitung",
     "eyebrow": "Vor dem Termin",
-    "title": "Sitzungsblatt",
+    "title": "Vorbereitung",
     "text": "Alles, was du für ein Gespräch mit diesem Team brauchst, auf einer Seite – und der Ort für deine eigenen Notizen.",
     "back": "← Zurück zu den begleiteten Teams",
     "saved": {
@@ -361,7 +361,7 @@
     }
   },
   "document": {
-    "back": "← Zurück zum Sitzungsblatt",
+    "back": "← Zurück zur Vorbereitung",
     "title": "Begleitung – Stand zum Mitnehmen",
     "asOf": "Stand: {date}",
     "intro": "Dieses Blatt fasst zusammen, was in der Begleitung dieses Teams festgehalten wurde: die gemeinsam bestätigten Stände der Founder und die Impulse, die dazu geschrieben wurden. Beide Seiten kennen alles, was hier steht.",
@@ -553,7 +553,7 @@
   },
   "access": {
     "eyebrow": "Begleitung",
-    "toPeople": "Zu Personen & Gruppen",
+    "toPeople": "Zur Begleitung",
     "toAdvisor": "Zur Advisor-Übersicht",
     "person": {
       "ended": {
@@ -638,6 +638,38 @@
     "org": {
       "title": "Organisation",
       "text": "Ein Programm oder eine Beratung mit mehreren Advisorinnen und Advisors. Die Organisation hält die Zugänge – damit sie nicht verschwinden, wenn eine Person aufhört."
+    },
+    "person": {
+      "eyebrow": "Person · Advisor-Ansicht",
+      "tabsLabel": "Ansichten dieser Person",
+      "tabs": {
+        "ueber": "Über sie",
+        "faehigkeiten": "Fähigkeiten",
+        "arbeitsweise": "Arbeitsweise",
+        "notizen": "Notizen"
+      },
+      "scopes": {
+        "base": "Name und Basis freigegeben",
+        "alignmentReport": "Selbstbericht freigegeben",
+        "capability": "Fähigkeiten freigegeben",
+        "capabilityDepth": "Erfahrung und Verantwortung freigegeben",
+        "strengths": "Stärken freigegeben",
+        "direction": "Richtung freigegeben"
+      }
+    },
+    "detail": {
+      "back": "Begleitung"
+    },
+    "team": {
+      "tabsLabel": "Ansichten dieses Teams",
+      "tabs": {
+        "report": "Report",
+        "session": "Vorbereitung",
+        "snapshot": "Snapshot"
+      }
+    },
+    "group": {
+      "eyebrow": "Gruppenauswertung · Advisor-Ansicht"
     }
   }
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { AdvisorTeamNav } from "@/features/advisor/AdvisorTeamNav";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import {
@@ -139,14 +140,9 @@ export default async function AdvisorSessionPage({
         matchingHref={reportHref}
       />
       <main className="mx-auto w-full max-w-4xl px-6 py-10 md:px-10">
-        <Link
-          href="/advisor/begleitung"
-          className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
-        >
-          {t("session.back")}
-        </Link>
+        <AdvisorTeamNav invitationId={data.invitationId} teamContext={teamContext} active="session" />
 
-        <header className="mt-6">
+        <header>
           <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
             {t("session.eyebrow")}
           </p>

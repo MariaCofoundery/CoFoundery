@@ -31,7 +31,7 @@ export async function AdvisorReviewUnavailable({ state }: { state: TeamReviewSta
       title={t(`${key}.title`)}
       body={t(`${key}.body`)}
       actions={[
-        { href: "/advisor/group", label: t("toPeople") },
+        { href: "/advisor/begleitung", label: t("toPeople") },
         { href: "/advisor/dashboard", label: t("toAdvisor") },
       ]}
     />

@@ -553,7 +553,7 @@
   },
   "access": {
     "eyebrow": "Advisor support",
-    "toPeople": "Go to people & groups",
+    "toPeople": "Go to support",
     "toAdvisor": "Go to advisor overview",
     "person": {
       "ended": {
@@ -638,6 +638,38 @@
     "org": {
       "title": "Organization",
       "text": "A program or consultancy with several advisors. The organization holds the access – so that it doesn't disappear when one person leaves."
+    },
+    "person": {
+      "eyebrow": "Person · advisor view",
+      "tabsLabel": "Views of this person",
+      "tabs": {
+        "ueber": "About",
+        "faehigkeiten": "Skills",
+        "arbeitsweise": "Working style",
+        "notizen": "Notes"
+      },
+      "scopes": {
+        "base": "Name and basics released",
+        "alignmentReport": "Self-report released",
+        "capability": "Skills released",
+        "capabilityDepth": "Experience and responsibility released",
+        "strengths": "Strengths released",
+        "direction": "Direction released"
+      }
+    },
+    "detail": {
+      "back": "Support"
+    },
+    "team": {
+      "tabsLabel": "Views of this team",
+      "tabs": {
+        "report": "Report",
+        "session": "Preparation",
+        "snapshot": "Snapshot"
+      }
+    },
+    "group": {
+      "eyebrow": "Group review · advisor view"
     }
   }
 }

@@ -136,8 +136,8 @@ test("E/F: Personenseite erklaert beendete Zugaenge ohne Inhalte, sonst 404", ()
   assert.ok(page.indexOf("get_advisor_person_access_state") < page.indexOf("grantedScopes.length === 0 || accessState"));
   assert.match(branch, /if \(!stateView\) notFound\(\);/);
   assert.match(branch, /<AccessStatePanel/);
-  // Rueckweg zu Personen & Gruppen statt zum Org-Anker.
-  assert.match(page, /href="\/advisor\/group"/);
+  // Rueckweg zur Begleitung (seit 21.10.2026), nicht mehr zu Personen & Gruppen.
+  assert.match(page, /href: "\/advisor\/begleitung"/);
   assert.doesNotMatch(page, /href="\/advisor\/dashboard#advisor-org"/);
 });
 

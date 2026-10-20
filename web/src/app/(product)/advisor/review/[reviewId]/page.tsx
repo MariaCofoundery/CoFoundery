@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdvisorDetailHeader } from "@/features/advisor/AdvisorDetailHeader";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AlignmentSideBySide } from "@/features/advisor/AlignmentSideBySide";
@@ -60,9 +61,10 @@ export default async function AdvisorTeamReviewPage({
 
   const client = await createClient();
   const anchor = { kind: "review", id: reviewId } as const;
-  const [detail, t, locale, note, followUp] = await Promise.all([
+  const [detail, t, tArea, locale, note, followUp] = await Promise.all([
     getTeamReviewDetail(client, reviewId),
     getTranslations("advisor.review"),
+    getTranslations("advisor.area"),
     getRequestLocale(),
     getAdvisorNoteFor(client, anchor),
     getAdvisorFollowUpFor(client, anchor),
@@ -90,18 +92,14 @@ export default async function AdvisorTeamReviewPage({
   const names = detail.group?.included.map((person) => person.name) ?? [];
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-10">
-      <Link
-        href="/advisor/group"
-        className="text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
-      >
-        {t("back")}
-      </Link>
-
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
-        {names.length > 0 ? names.join(", ") : t("untitled")}
-      </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{t("intro")}</p>
+    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <AdvisorDetailHeader
+        backLabel={tArea("detail.back")}
+        eyebrow={tArea("group.eyebrow")}
+        title={names.length > 0 ? names.join(", ") : t("untitled")}
+        subtitle={null}
+      />
+      <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
 
       <ReviewTeamContext state={reviewState} teamName={boundTeamName} subjectUserIds={detail.subjectUserIds} />
 
