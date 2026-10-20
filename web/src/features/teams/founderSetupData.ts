@@ -1,3 +1,4 @@
+import { filterCurrentConfirmations } from "@/features/teams/founderSetupConfirmations";
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
@@ -69,6 +70,19 @@ export async function getFounderSetup(
       : { data: [], error: null };
   if (confirmationResult.error) throw new Error("founder_team_setup_unavailable");
 
+  // Eine Bestaetigung, die VOR dem letzten Austritt der Person entstand, zaehlt nicht mehr - sie betraf ein
+  // anderes Team. Dieselbe Regel steht in der Datenbank (`setup_confirmation_is_current`); die Austritte
+  // kommen ueber eine Funktion, die nur Mitgliedern antwortet. Faellt sie aus, bleibt die Seite lesbar
+  // und zeigt die Bestaetigungen wie bisher - die Datenbank entscheidet ohnehin beim Abschluss.
+  const exitResult = await supabase.rpc("get_setup_confirmation_exits", { p_team_id: teamId });
+  const exitedAt = new Map<string, string>(
+    ((exitResult.data ?? []) as { user_id: string; exited_at: string }[]).map((row) => [row.user_id, row.exited_at])
+  );
+  const currentConfirmations = filterCurrentConfirmations(
+    (confirmationResult.data ?? []) as FounderSetupConfirmationRow[],
+    exitedAt
+  );
+
   return buildFounderSetupReadModel({
     teamId,
     currentUserId,
@@ -78,7 +92,7 @@ export async function getFounderSetup(
     })),
     itemRows,
     revisionRows,
-    confirmationRows: (confirmationResult.data ?? []) as FounderSetupConfirmationRow[],
+    confirmationRows: currentConfirmations,
   });
 }
 

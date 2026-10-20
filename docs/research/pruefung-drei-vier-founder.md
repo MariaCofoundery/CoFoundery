@@ -12,9 +12,16 @@ Oberflächen. Nichts wurde gegen echte Daten oder im Browser geprüft.
   EINE Person beide Optionen hielt. Jetzt nur bei zwei verschiedenen Personen.
 - Tests für beides (auch mit drei und vier Personen).
 
+## Nachträglich gebaut
+
+- **Setup-Bestätigung nach Austritt und Wiedereintritt** (Migration `20261214120000_setup_confirmations_follow_roster.sql`):
+  Eine Bestätigung zählt nur, wenn die Person danach nicht ausgetreten ist (`founder_team_member_exits`). Nichts wird
+  gelöscht. Angewendet im Teambericht, in der Advisor-Sicht, beim Abschluss (erneutes Bestätigen erneuert den Zeitpunkt)
+  und auf der Setup-Seite. Test: `supabase/tests/founder_team_setup_roster.sql`.
+
 ## Entscheidung nötig (nicht gebaut)
 
-1. **Setup-Bestätigung nach Austritt und Wiedereintritt.** Bestätigungen (`founder_team_setup_confirmations`)
+1. ~~Setup-Bestätigung nach Austritt und Wiedereintritt.~~ (siehe oben) Ursprünglicher Fund: Bestätigungen (`founder_team_setup_confirmations`)
    werden beim Austritt nicht gelöscht, und die Prüfung „alle aktuellen Mitglieder haben bestätigt“ fragt nur,
    ob für jedes aktuelle Mitglied irgendeine Zeile existiert. Tritt C aus und später wieder ein, gilt seine alte
    Bestätigung für Vereinbarungen, die er nie erneut gesehen hat. Betroffen: `get_workstyle_product_team`,
