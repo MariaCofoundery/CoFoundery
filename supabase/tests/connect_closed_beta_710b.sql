@@ -25,7 +25,7 @@ select is((select count(*) from public.get_public_network_listing((select listin
 select is((select count(*) from public.get_public_network_problem((select problem from slugs))),0::bigint,'anon no problem, even public-marked');
 select is((select count(*) from public.list_public_network_profile_listings((select profile from slugs))),0::bigint,'anon no related public objects');
 select is((select count(*) from public.list_public_network_profile_ventures((select profile from slugs))),0::bigint,'anon no related public objects');
-select is(public.get_public_network_profile_linkedin((select profile from slugs)),null::text,'anon no LinkedIn'); select is((select count(*) from public.list_public_network_sitemap()),0::bigint,'no CONNECT sitemap');
+select is((select count(*) from public.list_public_network_sitemap()),0::bigint,'no CONNECT sitemap');
 select throws_ok($$select * from public.network_profiles$$,'42501',null,'anon no direct profile read');
 select throws_ok($$select * from public.network_listings$$,'42501',null,'anon no direct listing read');
 select throws_ok($$select * from public.network_problems$$,'42501',null,'anon no direct problem read');

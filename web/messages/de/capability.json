@@ -53,18 +53,8 @@
         "contacts": {
           "label": "Menschen, mit denen du verbunden bist",
           "hint": "Nur wer eine Kontaktanfrage mit dir angenommen hat – also jemand, mit dem du ohnehin schon im Gespräch bist."
-        },
-        "members": {
-          "label": "Alle bei Made2Found Angemeldeten",
-          "hint": "Jede Person, die hier ein Konto hat und eingeloggt ist. Nicht im offenen Netz, aber auch nicht nur dein engster Kreis."
-        },
-        "public": {
-          "label": "Auch außerhalb von Made2Found",
-          "hint": "Auf deiner öffentlichen Netzwerkseite, die man ohne Konto aufrufen kann."
         }
       },
-      "publicWarning": "Diese Seite kann jede Person im Internet aufrufen, und Suchmaschinen lesen sie mit. Dein LinkedIn-Profil wäre damit über deinen Namen auffindbar.",
-      "publicConfirm": "Ja, mein LinkedIn-Profil darf auf meiner öffentlichen Seite stehen.",
       "openHint": "Öffnet LinkedIn in einem neuen Fenster",
       "linkLabel": "LinkedIn-Profil ansehen"
     },

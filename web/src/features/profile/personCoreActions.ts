@@ -60,15 +60,6 @@ export async function saveIdentityAction(formData: FormData) {
   const linkedinVisibility: LinkedInVisibility = isLinkedInVisibility(rawVisibility)
     ? rawVisibility
     : "private";
-  // "Oeffentlich" ohne gesetztes Haekchen heisst: Die Bestaetigung, die die
-  // Folge erklaert, wurde nicht gegeben. Dann wird die Adresse gespeichert,
-  // aber eine Stufe darunter - sichtbar fuer Mitglieder, nicht fuer
-  // Suchmaschinen. Die Wahl zu unterstellen waere das Gegenteil von
-  // Einwilligung; die Eingabe wegzuwerfen waere unnoetig grob.
-  //
-  // Beim erneuten Speichern eines bereits oeffentlichen Profils fragt die
-  // Oberflaeche nicht noch einmal und schickt das Haekchen mit.
-  const confirmedPublic = formData.get("confirm_public_linkedin") === "yes";
   // Wohin es danach zurueckgeht, wenn jemand von Connect oder Discovery
   // hierher geschickt wurde. Ohne diesen Rueckweg endet der Weg zur
   // Identitaet in einer Sackgasse: Die Kontextseite schickt einen hierher,
@@ -95,11 +86,7 @@ export async function saveIdentityAction(formData: FormData) {
   // zurueck, damit ein spaeter nachgetragener Link nicht sofort unter einer
   // alten Entscheidung sichtbar wird.
   const effectiveVisibility: LinkedInVisibility =
-    linkedin.url === null
-      ? "private"
-      : linkedinVisibility === "public" && !confirmedPublic
-        ? "members"
-        : linkedinVisibility;
+    linkedin.url === null ? "private" : linkedinVisibility;
 
   const { error, count } = await client
     .from("person_core")

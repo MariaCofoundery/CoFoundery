@@ -15,8 +15,6 @@ type Copy = {
   urlInvalid: string;
   visibilityTitle: string;
   options: Record<LinkedInVisibility, { label: string; hint: string }>;
-  publicWarning: string;
-  publicConfirm: string;
 };
 
 /**
@@ -31,9 +29,8 @@ type Copy = {
  * Feld leer laesst, soll nicht ueber ein Publikum nachdenken muessen, das es
  * nicht gibt.
  *
- * Fuer "oeffentlich" gibt es eine zusaetzliche Bestaetigung, aber nur beim
- * Wechsel dorthin. Wer sie einmal gegeben hat, wird beim naechsten Speichern
- * nicht erneut gefragt - sonst wird aus einer Entscheidung eine Huerde.
+ * Es gibt nur zwei Stufen: niemand, oder angenommene Kontakte. Die Adresse
+ * bleibt auf der Website.
  */
 export function LinkedInField({
   initialUrl,
@@ -47,7 +44,6 @@ export function LinkedInField({
   const [url, setUrl] = useState(initialUrl);
   const [invalid, setInvalid] = useState(false);
   const [visibility, setVisibility] = useState<LinkedInVisibility>(initialVisibility);
-  const firstPublicTransition = initialVisibility !== "public" && visibility === "public";
 
   return (
     <fieldset className="rounded-2xl border border-slate-200 p-5">
@@ -135,24 +131,6 @@ export function LinkedInField({
               </label>
             ))}
           </div>
-
-          {visibility === "public" ? (
-            <div className="mt-3 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-              <p>{copy.publicWarning}</p>
-              {firstPublicTransition ? (
-                <label className="mt-3 flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    name="confirm_public_linkedin"
-                    value="yes"
-                    required
-                    className="mt-1 h-4 w-4"
-                  />
-                  <span>{copy.publicConfirm}</span>
-                </label>
-              ) : null}
-            </div>
-          ) : null}
         </div>
       ) : (
         <input type="hidden" name="linkedin_visibility" value={visibility} />

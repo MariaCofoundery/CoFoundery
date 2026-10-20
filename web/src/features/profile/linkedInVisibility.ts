@@ -7,7 +7,10 @@
  * als Constraint - was nicht durch das Formular kommt, wird trotzdem geprueft.
  */
 
-export const LINKEDIN_VISIBILITIES = ["private", "contacts", "members", "public"] as const;
+// Zwei Stufen, mehr gibt es nicht: Die Adresse bleibt auf der Website und ist
+// nur fuer angenommene Kontakte da (seit 21.10.2026; vorher auch "members" und
+// "public").
+export const LINKEDIN_VISIBILITIES = ["private", "contacts"] as const;
 
 export type LinkedInVisibility = (typeof LINKEDIN_VISIBILITIES)[number];
 
@@ -73,14 +76,5 @@ export function canSeeLinkedIn(params: {
   isAcceptedContact: boolean;
 }) {
   if (params.isSelf) return true;
-  switch (params.visibility) {
-    case "public":
-      return true;
-    case "members":
-      return params.isSignedIn;
-    case "contacts":
-      return params.isSignedIn && params.isAcceptedContact;
-    case "private":
-      return false;
-  }
+  return params.visibility === "contacts" && params.isSignedIn && params.isAcceptedContact;
 }

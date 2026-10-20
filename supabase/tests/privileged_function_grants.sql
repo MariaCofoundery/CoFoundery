@@ -19,7 +19,7 @@ select extensions.plan(7);
 -- 1. Die Regel
 -- ---------------------------------------------------------------------------
 -- Keine security-definer-Funktion ohne Aufruferpruefung darf fuer anon
--- ausfuehrbar sein - ausser den SIEBEN oeffentlichen Projektionen, die genau
+-- ausfuehrbar sein - ausser den SECHS oeffentlichen Projektionen, die genau
 -- dafuer gebaut wurden und ihre Bedingungen selbst pruefen.
 --
 -- DAZUGEKOMMEN AM 21.09.2026: `get_public_network_profile_linkedin`. Sie ist
@@ -54,8 +54,7 @@ select extensions.is(
        'get_public_network_problem',
        'list_public_network_profile_listings',
        'list_public_network_profile_ventures',
-       'list_public_network_sitemap',
-       'get_public_network_profile_linkedin'
+       'list_public_network_sitemap'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');
@@ -65,12 +64,12 @@ select extensions.is(
 -- ---------------------------------------------------------------------------
 --
 -- Eine Namensliste ist eine Behauptung ("die pruefen sich selbst"). Diese
--- Pruefung macht daraus eine Tatsache: Jede der sieben muss Sichtbarkeit UND
+-- Pruefung macht daraus eine Tatsache: Jede der sechs muss Sichtbarkeit UND
 -- Status im eigenen Koerper pruefen. Wer eine davon umschreibt und die
 -- Bedingung dabei verliert, faellt hier auf - und nicht erst, wenn eine
 -- zurueckgezogene Seite noch Daten herausgibt.
 --
--- Dazugekommen am 21.09.2026, zusammen mit der siebten Ausnahme: Eine Liste,
+-- Dazugekommen am 21.09.2026, zusammen mit der siebten Ausnahme (inzwischen wieder entfernt: LinkedIn gibt es nicht mehr oeffentlich, 21.10.2026): Eine Liste,
 -- die nur laenger wird, ist irgendwann keine Ausnahme mehr, sondern die Regel.
 select extensions.is(
   (select coalesce(string_agg(p.proname, ', ' order by p.proname), '')
@@ -83,8 +82,7 @@ select extensions.is(
        'get_public_network_problem',
        'list_public_network_profile_listings',
        'list_public_network_profile_ventures',
-       'list_public_network_sitemap',
-       'get_public_network_profile_linkedin'
+       'list_public_network_sitemap'
      )
      and not (p.prosrc like '%visibility = ''public''%' and p.prosrc like '%status = ''active''%')),
   '',

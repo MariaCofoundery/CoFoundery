@@ -263,17 +263,7 @@ export async function IdentityEditor({
                   label: t("identity.linkedin.options.contacts.label"),
                   hint: t("identity.linkedin.options.contacts.hint"),
                 },
-                members: {
-                  label: t("identity.linkedin.options.members.label"),
-                  hint: t("identity.linkedin.options.members.hint"),
-                },
-                public: {
-                  label: t("identity.linkedin.options.public.label"),
-                  hint: t("identity.linkedin.options.public.hint"),
-                },
               },
-              publicWarning: t("identity.linkedin.publicWarning"),
-              publicConfirm: t("identity.linkedin.publicConfirm"),
             }}
           />
           {/* Rollen sind eine Navigationsangabe, keine Berechtigung: Wer

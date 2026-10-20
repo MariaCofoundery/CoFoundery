@@ -78,21 +78,20 @@ test("Tracking-Anhängsel landen nicht im Profil", () => {
 // ---------------------------------------------------------------------------
 // Wer es sehen darf
 // ---------------------------------------------------------------------------
-test("die vier Stufen bedeuten vier verschiedene Publika", () => {
-  assert.deepEqual([...LINKEDIN_VISIBILITIES], ["private", "contacts", "members", "public"]);
-  assert.equal(isLinkedInVisibility("members"), true);
+test("es gibt nur zwei Stufen: niemand und angenommene Kontakte", () => {
+  // Seit 21.10.2026: Die Adresse bleibt auf der Website. "members" und "public"
+  // gibt es nicht mehr - weder im Code noch in der Datenbank.
+  assert.deepEqual([...LINKEDIN_VISIBILITIES], ["private", "contacts"]);
+  assert.equal(isLinkedInVisibility("members"), false);
+  assert.equal(isLinkedInVisibility("public"), false);
   assert.equal(isLinkedInVisibility("alle"), false);
 
   const viewer = { isSelf: false, isSignedIn: true, isAcceptedContact: false };
   const contact = { isSelf: false, isSignedIn: true, isAcceptedContact: true };
-  const stranger = { isSelf: false, isSignedIn: false, isAcceptedContact: false };
 
   assert.equal(canSeeLinkedIn({ visibility: "private", ...contact }), false, "private zeigt niemandem etwas");
   assert.equal(canSeeLinkedIn({ visibility: "contacts", ...viewer }), false);
   assert.equal(canSeeLinkedIn({ visibility: "contacts", ...contact }), true);
-  assert.equal(canSeeLinkedIn({ visibility: "members", ...viewer }), true);
-  assert.equal(canSeeLinkedIn({ visibility: "members", ...stranger }), false, "members ist nicht öffentlich");
-  assert.equal(canSeeLinkedIn({ visibility: "public", ...stranger }), true);
 });
 
 test("die eigene Angabe sieht man immer", () => {
@@ -235,31 +234,24 @@ test("das Eingabefeld lässt die Adresse durch, die man wirklich kopiert", () =>
   }
 });
 
-test("die öffentliche Stufe nennt die Folge und fragt einmal nach", () => {
+test("LinkedIn steht nirgends öffentlich - weder Seite noch Funktion noch Frage", () => {
+  const field = source("src/features/profile/LinkedInField.tsx");
+  assert.ok(!/firstPublicTransition|confirm_public_linkedin/.test(field));
+  const action = source("src/features/profile/personCoreActions.ts");
+  assert.ok(!/confirm_public_linkedin|confirmedPublic/.test(action));
+  const data = source("src/features/profile/linkedInData.ts");
+  assert.ok(!/get_public_network_profile_linkedin/.test(data));
+  const publicPage = source("src/app/(public-connect)/connect/p/[publicSlug]/page.tsx");
+  assert.ok(!/LinkedIn/i.test(publicPage), "die öffentliche Seite zeigt LinkedIn");
   for (const locale of ["de", "en"]) {
     const linkedin = (
       JSON.parse(readFileSync(`messages/${locale}/capability.json`, "utf8")) as {
-        identity: { linkedin: Record<string, string> };
+        identity: { linkedin: { options: Record<string, unknown> } & Record<string, unknown> };
       }
     ).identity.linkedin;
-    assert.match(
-      linkedin.publicWarning,
-      locale === "de" ? /Suchmaschinen/ : /search engines/,
-      `${locale}: die Warnung verschweigt, dass Suchmaschinen mitlesen`
-    );
-    assert.ok(linkedin.publicConfirm, `${locale}: die Bestätigung fehlt`);
+    assert.deepEqual(Object.keys(linkedin.options).sort(), ["contacts", "private"], locale);
+    assert.equal(linkedin.publicWarning, undefined, locale);
   }
-
-  // Nur beim WECHSEL nach oeffentlich wird gefragt. Wer bereits oeffentlich
-  // ist, soll nicht bei jedem Speichern erneut haken muessen.
-  const field = source("src/features/profile/LinkedInField.tsx");
-  assert.match(field, /firstPublicTransition/);
-  assert.match(field, /initialVisibility !== "public" && visibility === "public"/);
-
-  // Und ohne Haekchen wird nicht veroeffentlicht.
-  const action = source("src/features/profile/personCoreActions.ts");
-  assert.match(action, /confirm_public_linkedin/);
-  assert.match(action, /linkedinVisibility === "public" && !confirmedPublic/);
 });
 
 test("Links auf LinkedIn öffnen ein neues Fenster", () => {

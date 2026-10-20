@@ -33,20 +33,3 @@ export async function getMemberLinkedInUrls(
       .map((row) => [row.user_id, row.linkedin_url as string])
   );
 }
-
-/**
- * Fuer die oeffentlichen Netzwerkseiten - nur bei Stufe "public".
- *
- * Ueber den Slug und nicht ueber die user_id: Die oeffentliche Projektion
- * enthaelt bewusst keine user_id, und sie soll auch keine bekommen.
- */
-export async function getPublicProfileLinkedInUrl(
-  client: SupabaseClient,
-  publicSlug: string
-): Promise<string | null> {
-  const { data, error } = await client.rpc("get_public_network_profile_linkedin", {
-    p_public_slug: publicSlug,
-  });
-  if (error || typeof data !== "string" || data.length === 0) return null;
-  return data;
-}
