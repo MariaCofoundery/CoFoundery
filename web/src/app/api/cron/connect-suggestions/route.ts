@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
+import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
 /**
  * Der taegliche Lauf: Vorschlaege suchen und darueber Bescheid geben.
@@ -55,7 +56,9 @@ export async function GET(request: NextRequest) {
 
   const result = await runSuggestionNotifications(BATCH);
   if (!result.ok) {
-    return NextResponse.json(result, { status: result.reason === "missing_service_role" ? 503 : 500 });
+    const status = result.reason === "missing_service_role" ? 503 : 500;
+    await sendCronFailureAlert("connect-suggestions", status, result);
+    return NextResponse.json(result, { status });
   }
 
   return NextResponse.json(result, { status: 200 });

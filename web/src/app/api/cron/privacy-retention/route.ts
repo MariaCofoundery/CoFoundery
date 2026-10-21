@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { handlePrivacyRetentionCron, privilegedRetentionClient } from "@/features/privacy/retentionCleanup";
+import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
 /**
  * Der tägliche Löschlauf (siehe `features/privacy/retentionCleanup.ts`).
@@ -14,6 +15,8 @@ import { handlePrivacyRetentionCron, privilegedRetentionClient } from "@/feature
  * die SQL-Funktionen löschen nur, was die Zeitbedingung erfüllt.
  *
  * DIE ANTWORT NENNT NUR ZAHLEN, nie IDs oder Inhalte.
+ *
+ * BEI FEHLSCHLAG GEHT EINE MAIL RAUS (`sendCronFailureAlert`), nur bei echtem Aufruf.
  */
 export const dynamic = "force-dynamic";
 
@@ -23,5 +26,6 @@ export async function GET(request: NextRequest) {
     secret: process.env.CRON_SECRET,
     createClient: privilegedRetentionClient,
   });
+  await sendCronFailureAlert("privacy-retention", outcome.status, outcome.body);
   return NextResponse.json(outcome.body, { status: outcome.status });
 }

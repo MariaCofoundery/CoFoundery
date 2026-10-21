@@ -19,6 +19,7 @@ Ein „Schalter“ ist hier also: Variable ändern, Redeploy.
 | `CRON_SECRET` | Schutz der beiden Cron-Routen | Beide antworten 503 und **löschen nichts** |
 | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (+ `RESEND_FROM_NAME`, `RESEND_REPLY_TO_EMAIL`) | Einladungs- und Benachrichtigungsmails | Mail wird nicht gesendet, Aktion meldet `missing_resend_api_key` / `missing_resend_from_email` |
 | `FEEDBACK_NOTIFICATION_EMAIL` | Empfänger für Feedback-Hinweise | Keine Benachrichtigung |
+| `CRON_ALERT_EMAIL` | Empfänger der Fehler-Mail eines Zeitplanlaufs; ersatzweise `FEEDBACK_NOTIFICATION_EMAIL` | Kein Alarm, nur Protokoll |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (+ `VAPID_SUBJECT`) | Web-Push | Push still aus (nur Production konfiguriert, siehe Memory) |
 | `RESEARCH_HASH_SALT` | Pseudonymisierung bekannter Kennungen (Forschung, Konto-Löschung) | Kein Hash, `null` |
 | `MAINTENANCE_API_KEY` | Schutz von `POST /api/maintenance/report-runs/backfill` (Header `x-maintenance-key`) | Route antwortet 503 |
@@ -46,6 +47,7 @@ Supabase-URL (`isLocalSupabaseUrl`), nicht in Production.
 
 - Beide verlangen `Authorization: Bearer $CRON_SECRET` (Vercel schickt das selbst).
 - Antwort `503 cron_secret_not_configured` = Secret fehlt in **dieser** Umgebung; `401` = falsches Secret; `503 missing_service_role` = Service-Key fehlt. Antworten enthalten nur Zahlen, nie Inhalte.
+- **Alarm:** Scheitert ein echter Aufruf (Status 500, oder 503 `missing_service_role`), geht eine Mail an `CRON_ALERT_EMAIL`. Ein fehlendes oder falsches Secret löst bewusst keine Mail aus, das kann jeder von außen anstoßen. Die Mail nennt nur Lauf, Status und Schritte. Ein Lauf, der gar nicht startet, fällt so **nicht** auf.
 - Wiederholen ist harmlos (gelöscht wird nur, was die Frist erfüllt).
 - **Prüfen:** Vercel → Project → Logs, Filter auf den Pfad. Nach dem ersten Lauf sollte der Privacy-Lauf `200` mit Zählern liefern. Ein Dauer-`503` heißt: es wird **nicht gelöscht**, die Datenschutzerklärung verspricht es aber.
 - Manuell auslösen (Secret nicht in die Shell-History schreiben, besser aus einer Datei lesen):
@@ -124,4 +126,4 @@ Die Datei enthält Personendaten: nicht ins Repo, nicht in Cloud-Ordner ohne Ver
 
 - Supabase-Backup-Stand und Wiederherstellungsübung (Abschnitt 3) eintragen.
 - Aufbewahrung für Nachrichten, Feedback, Einladungen und Aggregate ist noch nicht entschieden (siehe Verzeichnis der Verarbeitungstätigkeiten).
-- Kein Alarm bei fehlgeschlagenem Cron: bisher nur manuelle Log-Sicht.
+- Alarm bei Fehlschlag ist gebaut; ein Lauf, der nie startet, fällt nur über einen externen Monitor oder den wöchentlichen Blick auf.
