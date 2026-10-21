@@ -21,8 +21,8 @@
           "hint": "You'll find them in the bar at the top from now on."
         },
         "details": {
-          "title": "Two quick details",
-          "hint": "So we can make fitting suggestions. It gets more precise on its own later."
+          "title": "What is your focus?",
+          "hint": "A rough direction is enough. It gets more precise on its own later."
         }
       },
       "welcomeText": "It takes a minute, and you can change everything later.",
@@ -93,8 +93,6 @@
           "connect": "Create my Connect profile"
         }
       },
-      "focusTitle": "What is your focus?",
-      "intentionTitle": "What would you like to do here first?",
       "photoLater": "You can add a photo later in your profile – you don't need one here."
     },
     "avatar": {

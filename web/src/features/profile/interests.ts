@@ -20,6 +20,19 @@ export function parseInterests(values: readonly unknown[]): InterestArea[] {
 }
 
 /**
+ * Die Absicht („Suche", „Selbsttest", „Begleiten" ...) aus dem, was die Person im Einstieg ohnehin gesagt hat.
+ *
+ * Bis 21.10.2026 wurde sie zusaetzlich einzeln gefragt („Was moechtest du hier als Erstes tun?"), obwohl der
+ * Einstieg am Ende schon fragt, womit man anfangen will. Gelesen wird `profiles.intention` nirgends
+ * ausser in der Vollstaendigkeitspruefung des Kernprofils - die Frage war eine Pflichtangabe ohne Folge. Die
+ * Werte bleiben die bisherigen, damit bestehende Profile gueltig sind.
+ */
+export function intentionForOnboarding(plan: string, startArea: string): "Suche" | "Selbsttest" | "Begleiten" {
+  if (plan === "advisor") return "Begleiten";
+  return startArea === "find" ? "Suche" : "Selbsttest";
+}
+
+/**
  * Was der Einstieg aus der Planwahl und der Startwahl ableitet.
  *
  * Wer „gruenden" waehlt, hat Align und Find gesagt - beides gehoert zu dem Satz

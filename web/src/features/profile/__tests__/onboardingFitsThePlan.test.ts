@@ -1,4 +1,5 @@
 import test from "node:test";
+import { intentionForOnboarding } from "@/features/profile/interests";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -86,23 +87,27 @@ test("jede neue Antwort ist auch serverseitig erlaubt", () => {
   }
 });
 
-test("die Frage passt zu ihren Antworten", () => {
-  // „Woran arbeitest du gerade?“ mit den Antworten „Suche / Partner-Match /
-  // Selbsttest“ war die Stelle, an der es hakte.
+test("die Absicht wird im Einstieg nicht mehr einzeln gefragt, sondern aus Plan und Startwahl abgeleitet", () => {
+  // Seit 21.10.2026: Die Frage „Was moechtest du hier als Erstes tun?" und die Startwahl am Ende fragten Verwandtes.
+  // `profiles.intention` wird nirgends gelesen ausser in der Vollstaendigkeitspruefung des Kernprofils.
+  assert.doesNotMatch(form, /intentionsForPlan/);
+  assert.match(form, /name="intention" value=\{intentionForOnboarding\(plan, chosenStart\)\}/);
   for (const locale of ["de", "en"]) {
-    const title = texts(locale).basicsForm.onboarding.intentionTitle;
-    assert.ok(
-      !/Woran arbeitest du|What are you working on/i.test(title),
-      `${locale}: die alte Frage steht noch da`,
-    );
-    assert.ok(title.trim().length > 10, locale);
+    assert.equal((texts(locale).basicsForm.onboarding as { intentionTitle?: string }).intentionTitle, undefined, locale);
+  }
+  // Jeder abgeleitete Wert ist serverseitig erlaubt.
+  for (const wert of [intentionForOnboarding("advisor", ""), intentionForOnboarding("founder", "find"), intentionForOnboarding("both", "align")]) {
+    assert.ok(actions.includes(`"${wert}"`), `${wert} ist nicht erlaubt`);
   }
 });
 
-test("die Liste hängt wirklich am Plan", () => {
-  // Gegenprobe: Ohne den Aufruf waere die Trennung Dekoration.
-  assert.match(form, /intentionsForPlan\(plan\)\.map/);
-  assert.match(form, /plan === "advisor"\) return ADVISOR_INTENTIONS/);
+test("die abgeleitete Absicht folgt dem Plan", () => {
+  assert.equal(intentionForOnboarding("advisor", ""), "Begleiten");
+  assert.equal(intentionForOnboarding("advisor", "align"), "Begleiten");
+  assert.equal(intentionForOnboarding("founder", "find"), "Suche");
+  assert.equal(intentionForOnboarding("both", "find"), "Suche");
+  assert.equal(intentionForOnboarding("founder", "align"), "Selbsttest");
+  assert.equal(intentionForOnboarding("founder", ""), "Selbsttest");
 });
 
 // ---------------------------------------------------------------------------

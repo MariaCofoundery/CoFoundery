@@ -1,6 +1,6 @@
 "use client";
 
-import { interestsForPlan } from "@/features/profile/interests";
+import { intentionForOnboarding, interestsForPlan } from "@/features/profile/interests";
 import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { type ChangeEvent, type ReactNode, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -70,15 +70,6 @@ const FOUNDER_INTENTIONS = ["Suche", "Partner-Match", "Selbsttest"] as const;
 const ADVISOR_INTENTIONS = ["Begleiten", "Teamklaerung", "Selbsttest"] as const;
 const INTENTIONS = [...FOUNDER_INTENTIONS, ...ADVISOR_INTENTIONS] as const;
 
-function intentionsForPlan(plan: OnboardingPlan | ""): readonly string[] {
-  if (plan === "advisor") return ADVISOR_INTENTIONS;
-  // Ohne gewaehlten Plan die Founder-Liste: Diese Folie kommt nach der
-  // Planwahl, der leere Fall ist also nur der Typ und kein Zustand.
-  // "Beides" bekommt beide Listen ohne Doppelung - wer gruendet UND begleitet,
-  // soll nicht raten muessen, welche Haelfte gemeint ist.
-  if (plan === "both") return [...new Set([...FOUNDER_INTENTIONS, ...ADVISOR_INTENTIONS])];
-  return FOUNDER_INTENTIONS;
-}
 
 /**
  * Zwei Wege, ein Formular.
@@ -238,8 +229,8 @@ export function ProfileBasicsForm({
     welcome: "ready",
     name: displayName,
     plan,
-    // Schwerpunkt UND Absicht stehen auf einer Folie; beide muessen da sein.
-    details: resolvedFocusSkill && intention ? "ready" : "",
+    // Nur der Schwerpunkt wird gefragt; die Absicht ergibt sich aus Plan und Startwahl.
+    details: resolvedFocusSkill ? "ready" : "",
     next: "ready",
   } satisfies Record<OnboardingStepId, string>;
 
@@ -291,9 +282,6 @@ export function ProfileBasicsForm({
     return t(`intentions.${intentionValue}.label`);
   }
 
-  function intentionDescription(intentionValue: string) {
-    return t(`intentions.${intentionValue}.description`);
-  }
 
   function handleOnboardingEnter() {
     if (activeStepIndex < lastStepIndex && canGoNext) {
@@ -688,7 +676,7 @@ export function ProfileBasicsForm({
           {activeStep === "details" ? (
             <div className="grid gap-6">
               <fieldset className="grid gap-3">
-                <legend className="text-sm font-semibold text-slate-950">{t("onboarding.focusTitle")}</legend>
+                <legend className="sr-only">{t("onboarding.steps.details.title")}</legend>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {SKILLS.map((skill) =>
                 renderChoiceCard({
@@ -709,20 +697,6 @@ export function ProfileBasicsForm({
                   />
                 </label>
               ) : null}
-            </div>
-              </fieldset>
-              <fieldset className="grid gap-3">
-                <legend className="text-sm font-semibold text-slate-950">{t("onboarding.intentionTitle")}</legend>
-            <div className="grid gap-3">
-              {intentionsForPlan(plan).map((entry) =>
-                renderChoiceCard({
-                  id: entry,
-                  title: intentionDisplayLabel(entry),
-                  description: intentionDescription(entry),
-                  selected: intention === entry,
-                  onSelect: () => setIntention(entry),
-                })
-              )}
             </div>
               </fieldset>
               <p className="text-xs leading-6 text-slate-500">{t("onboarding.photoLater")}</p>
@@ -895,7 +869,7 @@ export function ProfileBasicsForm({
             ))}
             {isConnectPlan ? null : (
               <>
-                <input type="hidden" name="intention" value={intention} />
+                <input type="hidden" name="intention" value={intentionForOnboarding(plan, chosenStart)} />
                 <input type="hidden" name="primaryRole" value={plan} />
                 {plan === "both" ? (
                   <>
