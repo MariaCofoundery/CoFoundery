@@ -83,8 +83,8 @@
   0%, 20% { transform: translate(0, 0) rotate(-3deg); opacity: 1; z-index: 4; }
   25% { transform: translate(380px, -30px) rotate(20deg); opacity: 0; z-index: 4; }
   25.1% { transform: translate(52px, -96px) rotate(9deg) scale(.9); opacity: 0; z-index: 1; }
-  30%, 45% { transform: translate(52px, -96px) rotate(9deg) scale(.9); opacity: .75; z-index: 1; }
-  50%, 70% { transform: translate(-30px, -64px) rotate(-7deg) scale(.94); opacity: .9; z-index: 2; }
+  30%, 45% { transform: translate(52px, -96px) rotate(9deg) scale(.9); opacity: 1; z-index: 1; }
+  50%, 70% { transform: translate(-30px, -64px) rotate(-7deg) scale(.94); opacity: 1; z-index: 2; }
   75%, 95% { transform: translate(32px, -30px) rotate(5deg) scale(.97); opacity: 1; z-index: 3; }
   100% { transform: translate(0, 0) rotate(-3deg); opacity: 1; z-index: 4; }
 }

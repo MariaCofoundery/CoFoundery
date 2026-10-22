@@ -25,9 +25,13 @@ export function HomepageNav() {
     const onResize = () => {
       if (window.innerWidth >= 960) setIsOpen(false);
     };
+    // Wer bei offenem Menue weiterscrollt, will die Seite lesen, nicht das Menue.
+    const onScroll = () => setIsOpen(false);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("resize", onResize);
     };
