@@ -36,7 +36,8 @@ test("headers show the logo without the claim, the homepage footer shows both", 
   }
   const home = source("src/app/(marketing)/page.tsx");
   assert.match(home, /<BrandLogo[^>]*\bclaim\b/);
-  assert.equal(home.split("From People to Impact").length, 2, "the footer claim is not repeated as a separate line");
+  // The claim comes from <BrandLogo claim>; a literal copy on the page would be a second, separate line.
+  assert.equal(home.split("From People to Impact").length, 1, "the footer claim is not repeated as a separate line");
 });
 
 test("mails use the light-background PNG at its own aspect ratio", () => {
