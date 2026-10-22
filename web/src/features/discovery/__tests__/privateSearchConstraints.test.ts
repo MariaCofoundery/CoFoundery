@@ -247,18 +247,18 @@ test("der private Loader ist serverseitig und nur von den FIND-Shadows eingebund
 // ---------------------------------------------------------------------------
 // Produktive FIND-Suche unverändert
 // ---------------------------------------------------------------------------
-test("heutige Suche: acht Kriterien als RPC-Filter, die vier Produktfelder nicht; Sortierung published_at", () => {
+test("heutige Suche: neun Kriterien als RPC-Filter, die drei Produktfelder nicht; Sortierung published_at", () => {
   const data = read("src/features/discovery/discoveryData.ts");
   const call = data.slice(data.indexOf('rpc("search_founder_discovery_profiles_v2"'), data.indexOf("if (error) {", data.indexOf('rpc("search_founder_discovery_profiles_v2"')));
   const params = [...call.matchAll(/(p_\w+): mustHaves\.(\w+)/g)].map((m) => m[2]).sort();
   assert.deepEqual(params, [
-    "acceptedRemoteModes", "acceptedSearchIntents", "acceptedStartHorizons", "desiredLocationRegion",
+    "acceptedCommitmentLevels", "acceptedRemoteModes", "acceptedSearchIntents", "acceptedStartHorizons", "desiredLocationRegion",
     "minimumAvailabilityHoursPerWeek", "requiredCapabilityAreasAny", "requiredExpertiseAny", "requiredRolesAny",
   ]);
-  assert.doesNotMatch(call, /requiredIndustriesAny|acceptedCommitmentLevels|acceptedVentureStages|acceptedVentureGoals/);
+  assert.doesNotMatch(call, /requiredIndustriesAny|acceptedVentureStages|acceptedVentureGoals/);
   const dir = "../supabase/migrations";
   const latest = readdirSync(dir).sort().filter((f) => /function public\.search_founder_discovery_profiles_v2/.test(read(join(dir, f)))).at(-1) as string;
-  // Seit 20261130120000 (FIND Access Integrity) mit Founder-Rolle und Blockierung, sonst wörtlich search_by_frame.
-  assert.equal(latest, "20261130120000_find_access_integrity.sql");
+  // Seit 20261130120000 (FIND Access Integrity) mit Founder-Rolle und Blockierung, seit 20261216120000 zusätzlich der Einsatz als Filter.
+  assert.equal(latest, "20261216120000_find_commitment_filter.sql");
   assert.match(read(join(dir, latest)), /order by profile\.published_at desc nulls last, profile\.id/);
 });

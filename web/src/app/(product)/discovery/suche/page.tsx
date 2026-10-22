@@ -165,6 +165,9 @@ export default async function SearchPreferencesPage({
               startHorizonHelp: t("startHorizonHelp"),
               startHorizonLabel: (horizon: string) =>
                 tDiscovery(`startHorizons.${horizon}.long`),
+              commitment: t("commitment"),
+              commitmentHelp: t("commitmentHelp"),
+              commitmentLabel: (level: string) => tDiscovery(`commitmentLevels.${level}`),
               apply: tDiscovery("v2.search.apply"),
               applying: tDiscovery("v2.search.applying"),
               reset: tDiscovery("v2.search.reset"),

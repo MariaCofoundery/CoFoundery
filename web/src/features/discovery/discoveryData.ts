@@ -509,6 +509,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
     requiredCapabilityAreasAny: unknown;
     acceptedSearchIntents: unknown;
     acceptedStartHorizons: unknown;
+    acceptedCommitmentLevels?: unknown;
     desiredLocationRegion: unknown;
     acceptedRemoteModes: unknown;
     minimumAvailabilityHoursPerWeek: unknown;
@@ -527,6 +528,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
     requiredCapabilityAreasAny: input.requiredCapabilityAreasAny,
     acceptedSearchIntents: input.acceptedSearchIntents,
     acceptedStartHorizons: input.acceptedStartHorizons,
+    acceptedCommitmentLevels: input.acceptedCommitmentLevels,
     desiredLocationRegion: input.desiredLocationRegion,
     acceptedRemoteModes: input.acceptedRemoteModes,
     minimumAvailabilityHoursPerWeek: input.minimumAvailabilityHoursPerWeek,
@@ -543,6 +545,7 @@ export async function upsertOwnDiscoveryV2SearchPreferences(
         requiredCapabilityAreasAny: practicalMustHaves.requiredCapabilityAreasAny,
         acceptedSearchIntents: practicalMustHaves.acceptedSearchIntents,
         acceptedStartHorizons: practicalMustHaves.acceptedStartHorizons,
+        acceptedCommitmentLevels: practicalMustHaves.acceptedCommitmentLevels,
         desiredLocationRegion: practicalMustHaves.desiredLocationRegion,
         acceptedRemoteModes: practicalMustHaves.acceptedRemoteModes,
         minimumAvailabilityHoursPerWeek:
@@ -687,6 +690,9 @@ export async function getDiscoveryCandidatesForCurrentUser(
     // waere geraten. Wer nichts waehlt, sieht weiterhin alle.
     p_search_intents: mustHaves.acceptedSearchIntents,
     p_start_horizons: mustHaves.acceptedStartHorizons,
+    // Der Einsatz ist bei jedem Profil gesetzt; gleiche Regel wie davor: leer
+    // heisst egal, mehrere Werte sind ein ODER.
+    p_commitment_levels: mustHaves.acceptedCommitmentLevels,
   });
 
   if (error) {

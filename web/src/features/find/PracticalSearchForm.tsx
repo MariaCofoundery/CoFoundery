@@ -3,8 +3,10 @@ import {
   DISCOVERY_ROLE_OPTIONS,
 } from "@/features/discovery/discoveryConfig";
 import {
+  DISCOVERY_COMMITMENT_LEVELS,
   DISCOVERY_SEARCH_INTENTS,
   DISCOVERY_START_HORIZONS,
+  type DiscoveryCommitmentLevel,
   type DiscoveryMustHaves,
   type DiscoveryRemoteMode,
   type DiscoverySearchIntent,
@@ -33,6 +35,9 @@ export type PracticalSearchCopy = {
   startHorizon: string;
   startHorizonHelp: string;
   startHorizonLabel: (horizon: string) => string;
+  commitment: string;
+  commitmentHelp: string;
+  commitmentLabel: (level: string) => string;
   apply: string;
   applying: string;
   reset: string;
@@ -156,6 +161,27 @@ export function PracticalSearchForm({
             />
           ))}
         </div>
+      </div>
+
+      {/* EINSATZ: Vollzeit ist kein eigenes Feld, sondern eine Stufe des
+          Einsatzes (full_time, all_in). Wer "Vollzeit" sucht, kreuzt die
+          Stufen an, die er meint - mehrere sind ein ODER. */}
+      <div>
+        <p className="text-sm font-semibold text-slate-900">{copy.commitment}</p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {DISCOVERY_COMMITMENT_LEVELS.map((level) => (
+            <Checkbox
+              key={level}
+              name="acceptedCommitmentLevels"
+              value={level}
+              label={copy.commitmentLabel(level)}
+              checked={mustHaves.acceptedCommitmentLevels.includes(
+                level as DiscoveryCommitmentLevel,
+              )}
+            />
+          ))}
+        </div>
+        <p className="mt-2 text-xs leading-5 text-slate-500">{copy.commitmentHelp}</p>
       </div>
 
       {/* ---------------------------------------------------------------

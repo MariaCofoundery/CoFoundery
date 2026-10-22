@@ -115,6 +115,9 @@ function SearchBrief({
     if (criterion.key === "startHorizon") {
       return criterion.values.map((horizon) => t(`startHorizons.${horizon}.short`));
     }
+    if (criterion.key === "commitment") {
+      return criterion.values.map((level) => t(`commitmentLevels.${level}`));
+    }
     return criterion.values;
   });
   return (

@@ -8,7 +8,8 @@ export type DiscoverySearchBriefCriterion =
   | { key: "remote"; values: string[] }
   | { key: "availability"; values: string[] }
   | { key: "searchIntent"; values: string[] }
-  | { key: "startHorizon"; values: string[] };
+  | { key: "startHorizon"; values: string[] }
+  | { key: "commitment"; values: string[] };
 
 /**
  * Wonach gerade gefiltert wird — vollstaendig.
@@ -48,6 +49,9 @@ export function getDiscoverySearchBriefCriteria(
   }
   if (filters.acceptedStartHorizons.length > 0) {
     criteria.push({ key: "startHorizon", values: filters.acceptedStartHorizons });
+  }
+  if (filters.acceptedCommitmentLevels.length > 0) {
+    criteria.push({ key: "commitment", values: filters.acceptedCommitmentLevels });
   }
   return criteria;
 }

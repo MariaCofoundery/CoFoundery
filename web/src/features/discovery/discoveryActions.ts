@@ -301,6 +301,7 @@ export async function saveDiscoveryV2SearchPreferencesAction(
       requiredCapabilityAreasAny: getStringList(formData, ["requiredCapabilityAreasAny"]),
       acceptedSearchIntents: getStringList(formData, ["acceptedSearchIntents"]),
       acceptedStartHorizons: getStringList(formData, ["acceptedStartHorizons"]),
+      acceptedCommitmentLevels: getStringList(formData, ["acceptedCommitmentLevels"]),
       desiredLocationRegion: getFirstString(formData, ["desiredLocationRegion"]),
       acceptedRemoteModes: getStringList(formData, ["acceptedRemoteModes"]),
       minimumAvailabilityHoursPerWeek: getFirstString(formData, [

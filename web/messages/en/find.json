@@ -58,6 +58,8 @@
     "needsProfileCta": "To the working profile",
     "practicalTitle": "What has to fit in practice?",
     "practicalIntro": "Some things simply have to fit in practice. Here you can define which conditions matter for your search.",
+    "commitment": "How much commitment should the person bring?",
+    "commitmentHelp": "Several are allowed — “Full-time” and “All-in” together means: at least full-time. Nothing ticked means: no preference.",
     "searchIntent": "How actively is the person searching?",
     "searchIntentHelp": "Nothing ticked means: no preference. If you tick something, you only see people who stated it.",
     "startHorizon": "When should it start?",
