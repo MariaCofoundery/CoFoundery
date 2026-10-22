@@ -15,6 +15,9 @@ import type { FindMatchResult, FindMustHavesInput, GateStatus, Ranked } from "@/
  * Ja/Nein, fehlende Werte schließen aus; seit 80f39156 nur Founder und ohne
  * Blockierung (beide Richtungen). Den Capability-Filter kann sie nicht nachbilden (er
  * liest Einträge ohne Matching-Freigabe); solche Suchen gelten als „nicht vergleichbar“.
+ * Auch den Einsatz-Filter (seit 20261216120000) kennt die Nachbildung nicht: v0.1 hat acht Gate-
+ * Kriterien und lädt ihn nicht. Wer danach sucht, erscheint in der Auswertung mit zu vielen
+ * Treffern der heutigen Suche. Aufnahme wäre eine neue matching_version.
  *
  * Aus den Zahlen folgt keine Qualitätsaussage und keine automatische Produktentscheidung.
  */
@@ -36,6 +39,8 @@ export type RpcComparableCandidate = Readonly<{
 }>;
 
 const norm = (s: string | null | undefined) => (s ?? "").trim().toLowerCase();
+/** Wie die Suche: verglichen wird der Ort vor dem ersten Komma ("Berlin, DE" = "Berlin"). */
+const city = (s: string | null | undefined) => norm((s ?? "").split(",")[0]);
 
 /** Reihenfolge aller Treffer der heutigen Suche (alle Seiten). "not_comparable" bei Capability-Filter. */
 export function currentFindRpcOrder(
@@ -49,7 +54,7 @@ export function currentFindRpcOrder(
     if (c.isFounder === false || c.blockedWithViewer === true) return false;
     if (mustHaves.requiredRolesAny.length > 0 && !c.ownRoles.some((r) => mustHaves.requiredRolesAny.includes(r))) return false;
     if (expertise.size > 0 && !c.expertise.some((e) => expertise.has(norm(e)))) return false;
-    if (location && (c.locationRegion === null || norm(c.locationRegion) !== location)) return false;
+    if (location && (norm(c.locationRegion) === "" || city(c.locationRegion) !== city(location))) return false;
     if (mustHaves.acceptedRemoteModes.length > 0 && (c.remoteMode === null || !mustHaves.acceptedRemoteModes.includes(c.remoteMode))) return false;
     if (mustHaves.minimumAvailabilityHoursPerWeek !== null) {
       if (c.availabilityHoursPerWeek === null || c.availabilityHoursPerWeek < mustHaves.minimumAvailabilityHoursPerWeek) return false;

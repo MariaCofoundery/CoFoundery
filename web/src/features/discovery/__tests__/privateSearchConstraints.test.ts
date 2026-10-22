@@ -258,7 +258,7 @@ test("heutige Suche: neun Kriterien als RPC-Filter, die drei Produktfelder nicht
   assert.doesNotMatch(call, /requiredIndustriesAny|acceptedVentureStages|acceptedVentureGoals/);
   const dir = "../supabase/migrations";
   const latest = readdirSync(dir).sort().filter((f) => /function public\.search_founder_discovery_profiles_v2/.test(read(join(dir, f)))).at(-1) as string;
-  // Seit 20261130120000 (FIND Access Integrity) mit Founder-Rolle und Blockierung, seit 20261216120000 zusätzlich der Einsatz als Filter.
-  assert.equal(latest, "20261216120000_find_commitment_filter.sql");
+  // Seit 20261130120000 (FIND Access Integrity) mit Founder-Rolle und Blockierung, seit 20261216120000 zusätzlich der Einsatz als Filter, seit 20261217120000 zählt beim Ort die Stadt vor dem Komma.
+  assert.equal(latest, "20261217120000_find_location_city_match.sql");
   assert.match(read(join(dir, latest)), /order by profile\.published_at desc nulls last, profile\.id/);
 });
