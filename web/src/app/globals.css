@@ -978,3 +978,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .profile-step-here, .profile-grow, .profile-rise { animation: none !important; }
 }
+
+/* Konzeptboards 31-34: schwebende Kreise im Kopf, Karten, die sich beim Darueberfahren leicht heben. */
+@keyframes orb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.orb { position: absolute; border-radius: 9999px; border: 1.5px solid rgba(255, 255, 255, 0.35); pointer-events: none; animation: orb-float 6s ease-in-out infinite; }
+.card-lift { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+.card-lift:hover { box-shadow: 0 12px 30px rgba(109, 73, 224, 0.12); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) {
+  .orb { animation: none; }
+  .card-lift:hover { transform: none; }
+}
+@media print { .orb { display: none; } }

@@ -401,22 +401,21 @@ export default async function DashboardPage({
           machten die Seite laenger, nicht klarer. Menschen suchen geht ueber
           FIND in der Leiste, Connect hat dort seinen Zaehler. */}
       <section data-dashboard-hero className="mb-8">
-        {/* Das Zitat steht leise ueber der Ueberschrift. */}
-        <QuoteOfTheDay tone="light" className="mb-6 max-w-2xl border-transparent bg-transparent px-0 py-0" />
-        <p className="text-[15px] text-slate-600">{t("hero.greeting", { name: displayName })}</p>
-        <h1 className="mt-2 max-w-4xl text-[2rem] font-semibold leading-[1.12] tracking-tight text-slate-950 sm:text-5xl">{t("hero.headline")}</h1>
+        {/* Begruessung und Ueberschrift links, das Zitat des Tages leise rechts daneben (Konzeptboard 32). */}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0 flex-[1_1_420px]">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]">{t("hero.greeting", { name: displayName })}</p>
+            <h1 className="mt-1.5 max-w-3xl text-[2rem] font-semibold leading-[1.15] tracking-tight text-[#0b1f3a] sm:text-[2.25rem]">{t("hero.headline")}</h1>
+          </div>
+          <QuoteOfTheDay tone="light" className="max-w-[300px] !rounded-[18px] !border-[#e4e2f0] !bg-white" />
+        </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           {/* EINE SACHE AUF EINMAL: der naechste Schritt, danach die Aufgaben - zum Weiterklicken. */}
-          <div id="dashboard-block-tasks" className="brand-panel relative flex scroll-mt-28 flex-col gap-3 overflow-hidden rounded-3xl p-6 sm:p-8">
-            {/* Zarte Grafik: Kreise und eine gestrichelte Linie. Reiner Schmuck. */}
-            <svg aria-hidden="true" viewBox="0 0 400 300" className="pointer-events-none absolute -right-8 -top-5 hidden h-[300px] w-[400px] sm:block print:hidden">
-              <circle cx="300" cy="110" r="120" fill="none" stroke="rgba(255,255,255,.22)" strokeWidth="2" />
-              <circle cx="300" cy="110" r="80" fill="none" stroke="rgba(255,255,255,.28)" strokeWidth="2" />
-              <circle cx="300" cy="110" r="40" fill="rgba(255,255,255,.16)" />
-              <circle cx="215" cy="190" r="14" fill="rgba(255,255,255,.35)" />
-              <circle cx="352" cy="38" r="9" fill="rgba(255,255,255,.3)" />
-              <path d="M215 190 Q260 150 300 110" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2" strokeDasharray="3 6" />
-            </svg>
+          <div id="dashboard-block-tasks" className="brand-panel relative flex scroll-mt-28 flex-col justify-center gap-3 overflow-hidden rounded-[28px] px-6 py-8 sm:px-9">
+            {/* Schwebende Kreise: reiner Schmuck, stehen still bei „Bewegung reduzieren". */}
+            <span aria-hidden="true" className="orb -right-8 -top-10 hidden h-44 w-44 sm:block" />
+            <span aria-hidden="true" className="orb bottom-[-20px] right-28 hidden h-24 w-24 sm:block" style={{ animationDelay: "0.8s" }} />
+            <span aria-hidden="true" className="orb right-16 top-24 hidden h-10 w-10 bg-white/20 sm:block" style={{ animationDelay: "0.3s" }} />
             <HeroCarousel
               items={heroItems}
               secondary={{ href: "/fragebogen", label: t("hero.allQuestionnaires") }}
@@ -434,7 +433,7 @@ export default async function DashboardPage({
       />
 
       {needsOnboarding ? (
-        <section id="dashboard-block-profile" className="mb-8 scroll-mt-28 rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
+        <section id="dashboard-block-profile" className="mb-8 scroll-mt-28 rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-6">
           <details id="dashboard-block-profile-data" className="mt-4 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
             <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
               {t("utilities.profileCreate")}
@@ -470,7 +469,7 @@ export default async function DashboardPage({
 
       <DashboardAreas showFind={!discoveryProfile} showConnect={isNetworkMember && !hasConnectProfile} showAdvisor={!roleViews.hasAdvisor} interests={interests} />
 
-      <details id="dashboard-block-connections" className="mb-4 scroll-mt-28 rounded-2xl border border-slate-200 bg-white/80 p-4">
+      <details id="dashboard-block-connections" className="mb-3 scroll-mt-28 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.title")}</summary>
         <div className="mt-4">
           <DashboardConnectionCards overview={connectionOverview} />
@@ -534,7 +533,7 @@ export default async function DashboardPage({
       {/* Fruehere Auswertungen: erhalten und erreichbar, aber eingeklappt und
           nur, wenn es etwas gibt. Sie sind Rueckblick, nicht der aktuelle Weg. */}
       {hasHistory ? (
-        <details className="mb-4 rounded-2xl border border-slate-200 bg-white/80 p-4" aria-labelledby="dashboard-legacy-title">
+        <details className="mb-3 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3" aria-labelledby="dashboard-legacy-title">
           <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
             <h2 id="dashboard-legacy-title" className="inline text-sm font-semibold text-slate-900">{t("legacy.title")}</h2>
             <span className="mt-1 block pl-4 text-xs font-normal leading-5 text-slate-600">{t("legacy.description")}</span>
@@ -572,7 +571,7 @@ export default async function DashboardPage({
 
       {/* Konto: /account bietet Support und "alle Sitzungen abmelden" nicht an,
           deshalb bleibt beides hier - eingeklappt am Ende. */}
-      <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4">
+      <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
         <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
           {t("utilities.account")}
         </summary>

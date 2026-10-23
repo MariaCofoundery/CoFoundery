@@ -70,9 +70,10 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
 test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find und Connect - ohne Prozent", () => {
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
   assert.match(dashboard, /className="brand-panel (relative )?flex /);
-  // Das Zitat steht leise ueber der Ueberschrift, die Ueberschrift ist gross.
-  assert.ok(dashboard.indexOf("<QuoteOfTheDay") < dashboard.indexOf("hero.headline"), "Zitat ueber der Ueberschrift");
-  assert.match(dashboard, /sm:text-5xl/);
+  // Konzeptboard 32: Ueberschrift links, das Zitat leise rechts daneben - beide vor der Marken-Flaeche.
+  assert.ok(dashboard.indexOf("hero.headline") < dashboard.indexOf("<QuoteOfTheDay"), "Zitat neben der Ueberschrift");
+  assert.ok(dashboard.indexOf("<QuoteOfTheDay") < dashboard.indexOf('id="dashboard-block-tasks"'), "Zitat vor der Marken-Flaeche");
+  assert.match(dashboard, /className="orb /);
   assert.match(dashboard, /<DashboardPath/);
   // Kopf: Marken-Flaeche mit naechstem Schritt, Aufgaben (nur wenn etwas wartet) und Zitat, daneben die Team-Karte; dann Weg, Vertiefen, Find/Connect-Streifen.
   assert.match(dashboard, /<DashboardTeamCard/);

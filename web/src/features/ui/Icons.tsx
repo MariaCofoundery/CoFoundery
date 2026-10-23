@@ -83,13 +83,16 @@ export function AppIcon({ name, className = "h-6 w-6" }: { name: IconName; class
   );
 }
 
-export type IconTone = "violet" | "teal" | "amber" | "blue" | "white";
+export type IconTone = "violet" | "teal" | "amber" | "blue" | "green" | "pink" | "brand" | "white";
 
 const TONES: Record<IconTone, string> = {
-  violet: "bg-violet-100 text-violet-700",
-  teal: "bg-teal-100 text-teal-800",
-  amber: "bg-amber-100 text-amber-800",
-  blue: "bg-sky-100 text-sky-800",
+  violet: "bg-[#efeafd] text-[#4a2fb8]",
+  teal: "bg-[#dff4f3] text-[#0b6b6e]",
+  amber: "bg-[#fdecc8] text-[#7a4300]",
+  blue: "bg-[#e1effa] text-[#0b5a8a]",
+  green: "bg-[#e3f6ec] text-[#17794a]",
+  pink: "bg-[#fde8f1] text-[#a3195b]",
+  brand: "bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white",
   white: "bg-white/20 text-white",
 };
 
@@ -106,7 +109,7 @@ export function IconTile({
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex shrink-0 items-center justify-center ${size === "sm" ? "h-9 w-9 rounded-xl" : "h-11 w-11 rounded-2xl"} ${TONES[tone]}`}
+      className={`inline-flex shrink-0 items-center justify-center ${size === "sm" ? "h-9 w-9 rounded-xl" : "h-11 w-11 rounded-[14px]"} ${TONES[tone]}`}
     >
       <AppIcon name={name} className={size === "sm" ? "h-[18px] w-[18px]" : "h-6 w-6"} />
     </span>

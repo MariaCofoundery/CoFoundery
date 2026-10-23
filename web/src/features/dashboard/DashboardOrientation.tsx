@@ -21,9 +21,9 @@ export type ProfileStage = "open" | "started" | "done";
 export async function DashboardPath({ profile, hasTeam, teamId = null }: { profile: ProfileStage; hasTeam: boolean; teamId?: string | null }) {
   const t = await getTranslations("dashboard.path");
   const chip = {
-    done: "bg-emerald-100 text-emerald-800",
-    here: "bg-violet-100 text-violet-800",
-    quiet: "bg-slate-100 text-slate-600",
+    done: "bg-[#e3f6ec] text-[#17794a]",
+    here: "bg-[#efeafd] text-[#4a2fb8]",
+    quiet: "bg-[#f1f0f7] text-[#33325e]",
   } as const;
   const stages = [
     {
@@ -50,9 +50,11 @@ export async function DashboardPath({ profile, hasTeam, teamId = null }: { profi
   };
 
   return (
-    <section id="dashboard-block-path" className="mb-8" aria-labelledby="dashboard-path-title">
-      <h2 id="dashboard-path-title" className="text-lg font-semibold text-slate-950">{t("title")}</h2>
-      <p className="mt-1 text-sm text-slate-600">{t("lead")}</p>
+    <section id="dashboard-block-path" className="mb-8 rounded-[24px] border border-[#e4e2f0] bg-white px-5 py-6 sm:px-7" aria-labelledby="dashboard-path-title">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="dashboard-path-title" className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("title")}</h2>
+        <p className="text-[13.5px] text-[#5f5e7a]">{t("lead")}</p>
+      </div>
       <div className="relative mt-4">
         {/* Die Linie verbindet die drei Stationen (ab md nebeneinander). */}
         <div aria-hidden="true" className="absolute inset-x-16 top-[42px] hidden border-t-2 border-dashed border-slate-300 md:block" />
@@ -61,12 +63,14 @@ export async function DashboardPath({ profile, hasTeam, teamId = null }: { profi
             <li key={stage.key}>
               <Link
                 href={stage.href}
-                className={`flex h-full flex-col gap-2 rounded-2xl border bg-white p-5 transition hover:border-slate-300 ${
-                  stage.active ? "border-violet-400 shadow-[0_10px_30px_rgba(109,73,224,0.14)]" : "border-slate-200"
+                className={`card-lift flex h-full flex-col gap-2.5 rounded-[22px] border bg-white p-5 ${
+                  stage.active ? "border-[#6d49e0] shadow-[0_0_0_4px_rgba(109,73,224,0.10)]" : "border-[#e4e2f0]"
                 }`}
               >
                 <span className="flex items-center gap-3">
-                  <IconTile name={icons[stage.key].icon} tone={icons[stage.key].tone} />
+                  <span className={stage.active ? "profile-step-here rounded-[14px]" : undefined}>
+                    <IconTile name={icons[stage.key].icon} tone={stage.active ? "brand" : icons[stage.key].tone} />
+                  </span>
                   <span className="text-base font-semibold text-slate-950">
                     <span className="sr-only">{index + 1}. </span>
                     {t(`${stage.key}.title`)}
@@ -113,11 +117,11 @@ export async function DashboardAreas({
   if (cards.length === 0) return null;
   return (
     <section id="dashboard-block-areas" className="mb-8" aria-labelledby="dashboard-areas-title">
-      <h2 id="dashboard-areas-title" className="text-lg font-semibold text-slate-950">{t("title")}</h2>
+      <h2 id="dashboard-areas-title" className="text-[22px] font-semibold tracking-tight text-[#0b1f3a]">{t("title")}</h2>
       <p className="mt-1 text-sm text-slate-600">{t("lead")}</p>
       <ul className="mt-4 grid gap-4 md:grid-cols-3">
         {cards.map((card) => (
-          <li key={card.key} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
+          <li key={card.key} className="card-lift flex flex-col rounded-[24px] border border-[#e4e2f0] bg-white p-6">
             <span className="flex items-center justify-between gap-2">
               <IconTile name={card.icon} tone={card.tone} />
               {wanted(card.key) ? (
@@ -148,7 +152,7 @@ export async function DashboardTeamCard({ teams, selectedTeamId }: { teams: Foun
   const nameOf = (team: FounderTeamDashboardSummary) =>
     team.name?.trim() || team.members.map((member) => member.displayName ?? t("someone")).join(" + ");
   return (
-    <div id="dashboard-block-team" className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-6">
+    <div id="dashboard-block-team" className="flex flex-col justify-center gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6">
       <div className="flex items-center gap-2.5">
         <IconTile name="team" tone="teal" size="sm" />
         <h2 className="text-[15px] font-semibold text-slate-600">{t("title")}</h2>
@@ -213,8 +217,8 @@ export async function DashboardDeepen() {
   };
   return (
     <section id="dashboard-block-deepen" className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]" aria-labelledby="dashboard-deepen-title">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6">
-        <h2 id="dashboard-deepen-title" className="text-lg font-semibold text-slate-950">{t("title")}</h2>
+      <div className="rounded-[24px] border border-[#e4e2f0] bg-white p-6">
+        <h2 id="dashboard-deepen-title" className="text-[22px] font-semibold tracking-tight text-[#0b1f3a]">{t("title")}</h2>
         <p className="mt-1 text-sm text-slate-600">{t("lead")}</p>
         <ul className="mt-3">
           {(["tradeoffs", "strengths"] as const).map((key) => (
@@ -231,7 +235,7 @@ export async function DashboardDeepen() {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col gap-2.5 rounded-3xl border border-violet-200 bg-violet-50 p-6">
+      <div className="flex flex-col gap-2.5 rounded-[24px] border border-[#d9cff8] bg-[#f5f2fe] p-6">
         <IconTile name="lock" tone="violet" />
         <h2 className="text-lg font-semibold text-slate-950">{t("privacy.title")}</h2>
         <p className="text-sm leading-6 text-slate-700">{t("privacy.text")}</p>
