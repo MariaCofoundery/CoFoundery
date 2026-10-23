@@ -967,3 +967,14 @@ body {
 
 .connect-highlight-track { scrollbar-width: none; }
 .connect-highlight-track::-webkit-scrollbar { display: none; }
+
+/* Profil auf einen Blick (Konzeptboard 31): ein Puls an der naechsten Station, Marken, die einwachsen, Saetze, die einblenden. */
+@keyframes profile-ring { 0% { box-shadow: 0 0 0 0 rgba(109, 73, 224, 0.45); } 70% { box-shadow: 0 0 0 12px rgba(109, 73, 224, 0); } 100% { box-shadow: 0 0 0 0 rgba(109, 73, 224, 0); } }
+@keyframes profile-grow { from { transform: translateY(-50%) scale(0); } to { transform: translateY(-50%) scale(1); } }
+@keyframes profile-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.profile-step-here { animation: profile-ring 2.2s infinite; }
+.profile-grow { animation: profile-grow 0.7s ease-out both; }
+.profile-rise { animation: profile-rise 0.6s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .profile-step-here, .profile-grow, .profile-rise { animation: none !important; }
+}

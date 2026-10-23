@@ -92,20 +92,21 @@ test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find u
 
 test("Profil: Hero, „Auf einen Blick\", Seitenleiste und Abschnitte als Karten - ohne Wert, ohne Prozent", () => {
   const page = code("src/app/me/profile/page.tsx");
-  assert.match(page, /page-section brand-panel/);
-  assert.match(page, /<ProfileGlance/);
+  const overview = code("src/features/reporting/ProfileOverview.tsx");
+  // Der Kopf ist die Uebersicht (Konzeptboard 31) und traegt die Marken-Flaeche.
+  assert.match(page, /<ProfileOverview/);
+  assert.match(overview, /page-section brand-panel/);
   assert.match(page, /lg:grid-cols-\[13rem_minmax\(0,1fr\)\]/);
   // Die Seitenleiste ersetzt die Sprungleiste nur am Rechner; darunter bleibt die Leiste zum Schieben.
   assert.match(page, /className="no-print mt-6 lg:hidden"/);
-  // Reihenfolge: Hero, Auf einen Blick, Teil I.
-  const order = ["page-section brand-panel", "<ProfileGlance", 'id="teil-wer"'].map((m) => page.indexOf(m));
+  // Reihenfolge: Uebersicht mit Hero, dann Teil I.
+  const order = ["<ProfileOverview", 'id="teil-wer"'].map((m) => page.indexOf(m));
   assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
-  const glance = code("src/features/reporting/ProfileGlance.tsx");
-  assert.match(glance, /data-glance=\{card\.key\}/);
-  assert.doesNotMatch(glance, /%|percent|von\s+\d|\bscore\b/i);
+  // Keine Prozente, kein „x von y", keine Wertung - die Uebersicht zeigt Stationen, keinen Fortschritt.
+  assert.doesNotMatch(overview, /%|percent|von\s+\d|\bscore\b/i);
   for (const locale of ["de", "en"]) {
-    const profile = JSON.parse(read(`messages/${locale}/profile.json`)).founderProfile.glance;
-    assert.ok(profile.title && profile.work.title && profile.strengths.title && profile.direction.title && profile.open);
+    const profile = JSON.parse(read(`messages/${locale}/profile.json`)).founderProfile.atAGlance;
+    assert.ok(profile.eyebrow && profile.next.label && profile.path.title && profile.can.title && profile.makes.title && profile.work.title && profile.share.title);
   }
   // Abschnitte sind Karten, im Druck ohne Rahmen.
   const pillar = read("src/features/reporting/ProfilePillar.tsx");

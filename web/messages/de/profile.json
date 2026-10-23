@@ -476,6 +476,132 @@
         "empty": "Hier stehen die Themen und die Wirkung, die dir wichtig sind – in deinen Worten.",
         "cta": "Ergänzen"
       }
+    },
+    "atAGlance": {
+      "eyebrow": "Dein Profil",
+      "next": {
+        "label": "Als Nächstes",
+        "later": "Später",
+        "basis": {
+          "title": "Dein Profil ausfüllen",
+          "text": "Name, Rolle und was du vorhast. Alles Weitere baut darauf auf.",
+          "cta": "Weitermachen"
+        },
+        "work": {
+          "title": "Wie du arbeitest",
+          "text": "Ein paar kurze Fragen dazu, wie du im Alltag entscheidest und zusammenarbeitest.",
+          "cta": "Weitermachen"
+        },
+        "can": {
+          "title": "Was du kannst",
+          "text": "Such die Bereiche aus, in denen du Erfahrung hast, und sag, wo du Verantwortung übernehmen willst.",
+          "cta": "Weitermachen"
+        },
+        "strengths": {
+          "title": "Was dich ausmacht",
+          "text": "Ein Gespräch über deine Stärken. Am Ende bestätigst du selbst, was stimmt.",
+          "cta": "Gespräch starten"
+        },
+        "direction": {
+          "title": "Was dich antreibt",
+          "text": "Ein paar Fragen dazu, wohin du willst. Du bestätigst am Ende selbst, was stimmt.",
+          "cta": "Weitermachen"
+        },
+        "venture": {
+          "title": "So willst du gründen",
+          "text": "Wie du dir ein Vorhaben vorstellst. Das siehst erst einmal nur du.",
+          "cta": "Weitermachen"
+        },
+        "done": {
+          "title": "Dein Profil steht",
+          "text": "Du kannst jederzeit etwas ergänzen oder ändern.",
+          "cta": "Im Detail ansehen"
+        }
+      },
+      "path": {
+        "title": "Dein Weg durchs Profil",
+        "note": "Keine Prozente. Jeder Schritt zählt für sich.",
+        "basis": "Basis",
+        "work": "Arbeitsweise",
+        "can": "Was ich kann",
+        "makes": "Was mich ausmacht",
+        "venture": "Vorhaben",
+        "state": {
+          "done": "erledigt",
+          "here": "als Nächstes",
+          "open": "noch offen"
+        }
+      },
+      "can": {
+        "title": "Was ich kann",
+        "sub": "Fachliches: was du konkret beherrschst",
+        "empty": "Du hast noch keine Bereiche ausgewählt.",
+        "level": "Erfahrung: Stufe {level} von 5",
+        "noLevel": "Noch nicht eingestuft",
+        "more": "Noch {count} weitere Bereiche stehen weiter unten im Detail.",
+        "edit": "Fähigkeiten ändern →",
+        "start": "Bereiche auswählen →",
+        "roles": {
+          "own": "selbst",
+          "contribute": "beitragen",
+          "grow_into": "hineinwachsen",
+          "prefer_other": "andere Person",
+          "prefer_external": "extern",
+          "unclear": "unklar"
+        },
+        "legend": {
+          "own": "selbst: du willst es verantworten",
+          "contribute": "beitragen: du packst aktiv mit an",
+          "grow_into": "hineinwachsen: du willst es lernen",
+          "prefer_other": "andere Person: lieber jemand anderes",
+          "prefer_external": "extern: lieber von außen geholt",
+          "unclear": "unklar: noch nicht entschieden"
+        }
+      },
+      "makes": {
+        "title": "Was mich ausmacht",
+        "sub": "Persönliches: wie du arbeitest und was dich trägt",
+        "strengths": "Stärken",
+        "direction": "Antrieb",
+        "strengthsEmpty": "Noch keine Stärken bestätigt.",
+        "directionEmpty": "Noch nichts zu deinem Antrieb bestätigt.",
+        "seeStrengths": "Stärken ansehen →",
+        "startStrengths": "Stärken-Gespräch starten →",
+        "seeDirection": "Antrieb ansehen →",
+        "startDirection": "Antrieb ergänzen →"
+      },
+      "work": {
+        "title": "Wie ich arbeite",
+        "sub": "Aus deiner Arbeitsweise, ohne Wertung",
+        "empty": "Noch keine Antworten zur Arbeitsweise.",
+        "noDirection": "In deinen Antworten zeigt noch nichts durchgehend in eine Richtung. Das ist in Ordnung.",
+        "open": "Ganze Auswertung →",
+        "start": "Fragen beantworten →"
+      },
+      "venture": {
+        "title": "So willst du gründen",
+        "text": "Ein Vorhaben, an dem du gerade arbeitest: Zeit, Geld, Rollen, Entscheidungen. Hier sagst du, wie du es dir vorstellst, ohne dass es jemand sieht.",
+        "have": "{name}: Du kannst dein Bild davon jederzeit ergänzen. Es sieht nur, wen du freigibst.",
+        "unnamed": "Dein Vorhaben",
+        "create": "Vorhaben anlegen",
+        "open": "Ansehen"
+      },
+      "share": {
+        "title": "Wer sieht was",
+        "text": "Alles ist zuerst nur für dich. Jede Freigabe schaltest du einzeln und kannst sie jederzeit zurücknehmen. Eine Freigabe ersetzt nie eine andere.",
+        "team": {
+          "title": "Mein Team",
+          "text": "Arbeitsweise, Fähigkeiten"
+        },
+        "find": {
+          "title": "Find",
+          "text": "Auffindbar für Mitgründer:innen"
+        },
+        "advisor": {
+          "title": "Advisor",
+          "text": "Nur wen du einlädst"
+        }
+      }
     }
   },
   "welcomeLetter": {

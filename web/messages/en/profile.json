@@ -476,6 +476,132 @@
         "empty": "Here are the themes and impact that matter to you – in your words.",
         "cta": "Add"
       }
+    },
+    "atAGlance": {
+      "eyebrow": "Your profile",
+      "next": {
+        "label": "Next up",
+        "later": "Later",
+        "basis": {
+          "title": "Fill in your profile",
+          "text": "Name, role and what you plan to do. Everything else builds on it.",
+          "cta": "Continue"
+        },
+        "work": {
+          "title": "How you work",
+          "text": "A few short questions about how you decide and work together day to day.",
+          "cta": "Continue"
+        },
+        "can": {
+          "title": "What you can do",
+          "text": "Pick the areas where you have experience and say where you want to take responsibility.",
+          "cta": "Continue"
+        },
+        "strengths": {
+          "title": "What makes you you",
+          "text": "A conversation about your strengths. At the end you confirm what is true.",
+          "cta": "Start the conversation"
+        },
+        "direction": {
+          "title": "What drives you",
+          "text": "A few questions about where you want to go. At the end you confirm what is true.",
+          "cta": "Continue"
+        },
+        "venture": {
+          "title": "How you want to found",
+          "text": "How you picture a venture. For now only you see it.",
+          "cta": "Continue"
+        },
+        "done": {
+          "title": "Your profile is set",
+          "text": "You can add or change things at any time.",
+          "cta": "View the details"
+        }
+      },
+      "path": {
+        "title": "Your way through the profile",
+        "note": "No percentages. Every step counts on its own.",
+        "basis": "Basics",
+        "work": "Way of working",
+        "can": "What I can do",
+        "makes": "What makes me me",
+        "venture": "Venture",
+        "state": {
+          "done": "done",
+          "here": "next up",
+          "open": "still open"
+        }
+      },
+      "can": {
+        "title": "What I can do",
+        "sub": "Practical: what you concretely master",
+        "empty": "You have not picked any areas yet.",
+        "level": "Experience: level {level} of 5",
+        "noLevel": "Not rated yet",
+        "more": "{count} more areas are listed below in the details.",
+        "edit": "Edit skills →",
+        "start": "Pick areas →",
+        "roles": {
+          "own": "own it",
+          "contribute": "contribute",
+          "grow_into": "grow into",
+          "prefer_other": "someone else",
+          "prefer_external": "external",
+          "unclear": "unclear"
+        },
+        "legend": {
+          "own": "own it: you want to take responsibility",
+          "contribute": "contribute: you pitch in actively",
+          "grow_into": "grow into: you want to learn it",
+          "prefer_other": "someone else: you would rather someone else does it",
+          "prefer_external": "external: you would rather bring it in",
+          "unclear": "unclear: not decided yet"
+        }
+      },
+      "makes": {
+        "title": "What makes me me",
+        "sub": "Personal: how you work and what carries you",
+        "strengths": "Strengths",
+        "direction": "Drive",
+        "strengthsEmpty": "No strengths confirmed yet.",
+        "directionEmpty": "Nothing about your drive confirmed yet.",
+        "seeStrengths": "View strengths →",
+        "startStrengths": "Start the strengths conversation →",
+        "seeDirection": "View drive →",
+        "startDirection": "Add your drive →"
+      },
+      "work": {
+        "title": "How I work",
+        "sub": "From your way of working, without judgement",
+        "empty": "No answers about your way of working yet.",
+        "noDirection": "Nothing in your answers points consistently in one direction yet. That is fine.",
+        "open": "Full results →",
+        "start": "Answer the questions →"
+      },
+      "venture": {
+        "title": "How you want to found",
+        "text": "A venture you are working on: time, money, roles, decisions. Here you say how you picture it, without anyone seeing it.",
+        "have": "{name}: You can add to your picture of it at any time. Only the people you share with see it.",
+        "unnamed": "Your venture",
+        "create": "Create a venture",
+        "open": "View"
+      },
+      "share": {
+        "title": "Who sees what",
+        "text": "Everything is only for you at first. You switch on each share separately and can take it back at any time. One share never replaces another.",
+        "team": {
+          "title": "My team",
+          "text": "Way of working, skills"
+        },
+        "find": {
+          "title": "Find",
+          "text": "Discoverable by co-founders"
+        },
+        "advisor": {
+          "title": "Advisor",
+          "text": "Only people you invite"
+        }
+      }
     }
   },
   "welcomeLetter": {

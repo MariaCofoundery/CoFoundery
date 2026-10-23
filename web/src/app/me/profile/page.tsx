@@ -30,8 +30,8 @@ import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStre
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
-import { ProfileGlance, type GlanceCard } from "@/features/reporting/ProfileGlance";
-import { workGlanceLines } from "@/features/reporting/profileGlanceLines";
+import { ProfileOverview, type OverviewWorkBar } from "@/features/reporting/ProfileOverview";
+import { workDirectionBars } from "@/features/reporting/profileGlanceLines";
 import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
 import { ProfilePillar, type PillarTone } from "@/features/reporting/ProfilePillar";
@@ -285,34 +285,12 @@ export default async function FounderProfilePage({
       </ProfilePillar>
     ) : null;
 
-  // „Auf einen Blick": je Karte ein kurzer, aus den vorhandenen Antworten abgeleiteter Satz - nichts Neues gerechnet.
-  const workLines = workGlanceLines(workstyleV04, await getDisplayLocale(), (key, values) => t(key as never, values as never));
-  const glanceCards: GlanceCard[] = [
-    {
-      key: "work",
-      title: t("glance.work.title"),
-      lines: workLines,
-      empty: t("glance.work.empty"),
-      href: workstyleV04 ? "/me/profile/workstyle" : CURRENT_WORKSTYLE_HREF,
-      cta: workstyleV04 ? t("glance.open") : t("glance.work.cta"),
-    },
-    {
-      key: "strengths",
-      title: t("glance.strengths.title"),
-      lines: strengths.slice(0, 3).map((strength) => strength.label ?? strength.statement),
-      empty: t("glance.strengths.empty"),
-      href: strengths.length > 0 ? "#staerken" : "/profile?step=strengths",
-      cta: strengths.length > 0 ? t("glance.open") : t("glance.strengths.cta"),
-    },
-    {
-      key: "direction",
-      title: t("glance.direction.title"),
-      lines: directionStatements.slice(0, 2).map((statement) => statement.statement),
-      empty: t("glance.direction.empty"),
-      href: directionStatements.length > 0 ? "#antrieb" : "/profile/direction",
-      cta: directionStatements.length > 0 ? t("glance.open") : t("glance.direction.cta"),
-    },
-  ];
+  // „Auf einen Blick" (Konzeptboard 31): nur, was die Person angegeben oder bestaetigt hat - nichts Neues gerechnet.
+  const workBars: OverviewWorkBar[] = workDirectionBars(workstyleV04, await getDisplayLocale());
+  const hasWorkProfile = Boolean(workstyleV04);
+  const hasStrengths = strengths.length > 0;
+  const hasDirection = directionStatements.length > 0;
+  const regionLine = [core?.location_region?.trim() || null].filter(Boolean).join(" · ") || null;
 
   return (
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-10 print:max-w-none print:px-0 print:py-0">
@@ -335,68 +313,90 @@ export default async function FounderProfilePage({
           Ein Datum, das nur die Haelfte der Quellen kennt, ist schlechter als
           keines - man sieht ihm nicht an, dass es die Haelfte ist.
           ------------------------------------------------------------------ */}
-      <section className="page-section brand-panel rounded-[28px] p-6 sm:p-8 print:rounded-none print:px-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white">{t("eyebrow")}</p>
-
-        {/* DAS FOTO - gelesen, nicht gespeichert. Geaendert wird es unter
-            „Ueber dich"; hier gibt es keinen Upload.
-
-            `alt=""`: Der Name steht direkt daneben. Ein Alternativtext waere
-            eine zweite Fassung desselben - und im Druck stuende er mitten in
-            der Ueberschrift, wenn das Bild nicht laedt. */}
-        <div className="mt-3 flex flex-wrap items-center gap-5">
-          {photo.avatarId || photo.avatarUrl ? (
+      <ProfileOverview
+        displayName={displayName}
+        headline={core?.headline?.trim() || null}
+        regionLine={regionLine}
+        asOf={asOf}
+        avatar={
+          photo.avatarId || photo.avatarUrl ? (
             <ProfileAvatar
               displayName={displayName}
               avatarId={photo.avatarId}
               imageUrl={photo.avatarUrl}
               alt=""
-              className="h-20 w-20 shrink-0 rounded-3xl object-cover ring-2 ring-white/60"
+              className="h-[88px] w-[88px] shrink-0 rounded-full object-cover ring-2 ring-white/60"
             />
-          ) : null}
-          <div className="min-w-0">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{displayName}</h1>
-            {core?.headline?.trim() ? (
-              <p className="mt-1.5 text-base font-medium text-white">{core.headline}</p>
-            ) : null}
-          </div>
-        </div>
-        {/* UEBER DICH steht im Kopf: Name, Headline und das Wichtigste ueber
-            die Person sind eine Aussage. Geaendert wird es unter
-            /profile?step=identity. Der Kopf wird mitgedruckt. */}
-        <FounderProfileBase
-          core={core}
-          tone="onBrand"
-          part="bio"
-          copy={{
-            title: null,
-            region: t("base.region"),
-            remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
-            expertise: t("base.expertise"),
-            industries: t("base.industries"),
-            linkedin: t("base.linkedin"),
-            empty: t("base.empty"),
-            completeHref: "/profile?step=identity",
-            completeCta: t("base.completeCta"),
-            moreLabel: t("base.more"),
-            lessLabel: t("base.less"),
-          }}
-        />
-        <p className="mt-5 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>
-        {asOf ? <p className="mt-3 text-xs text-white">{asOf}</p> : null}
-        {/* Zwei Fassungen zum Weitergeben - klein, im Kopf; die Wahl steht weiter vor dem Klick. */}
-        <div className="mt-5">
-          <ProfilePdfChoice
-                  copy={{
-                    title: t("print.chooseTitle"),
-                    shortTitle: t("print.badgeShort"),
-                    shortText: t("print.shortText"),
-                    fullTitle: t("print.badgeFull"),
-                    fullText: t("print.fullText"),
-                  }}
-                />
-        </div>
-      </section>
+          ) : (
+            <div aria-hidden="true" className="flex h-[88px] w-[88px] shrink-0 items-center justify-center rounded-full border-2 border-white/60 bg-white/20 text-[34px] font-semibold">
+              {displayName.slice(0, 1).toUpperCase()}
+            </div>
+          )
+        }
+        heroExtra={
+          <>
+            {/* UEBER DICH steht im Kopf: Name, Headline und das Wichtigste ueber die Person sind eine Aussage.
+                Geaendert wird es unter /profile?step=identity. Der Kopf wird mitgedruckt. */}
+            <FounderProfileBase
+              core={core}
+              tone="onBrand"
+              part="bio"
+              copy={{
+                title: null,
+                region: t("base.region"),
+                remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
+                expertise: t("base.expertise"),
+                industries: t("base.industries"),
+                linkedin: t("base.linkedin"),
+                empty: t("base.empty"),
+                completeHref: "/profile?step=identity",
+                completeCta: t("base.completeCta"),
+                moreLabel: t("base.more"),
+                lessLabel: t("base.less"),
+              }}
+            />
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>
+            {/* Zwei Fassungen zum Weitergeben - klein, im Kopf; die Wahl steht weiter vor dem Klick. */}
+            <div className="no-print mt-4">
+              <ProfilePdfChoice
+                copy={{
+                  title: t("print.chooseTitle"),
+                  shortTitle: t("print.badgeShort"),
+                  shortText: t("print.shortText"),
+                  fullTitle: t("print.badgeFull"),
+                  fullText: t("print.fullText"),
+                }}
+              />
+            </div>
+          </>
+        }
+        done={{
+          basis: Boolean(core?.display_name?.trim() && core?.headline?.trim()),
+          work: hasWorkProfile,
+          can: capabilityMap.counts.areas > 0,
+          makes: hasStrengths && hasDirection,
+          venture: visibleVentures.length > 0,
+        }}
+        hrefs={{
+          basis: "/profile?step=identity",
+          work: workstyleV04 ? "/me/profile/workstyle" : CURRENT_WORKSTYLE_HREF,
+          can: "/profile?step=areas",
+          strengths: "/profile?step=strengths",
+          direction: "/profile/direction",
+          venture: fragebogenHref,
+        }}
+        hasStrengths={hasStrengths}
+        hasDirection={hasDirection}
+        capabilityMap={capabilityMap}
+        areaLabel={areaLabel}
+        familyLabel={(familyId) => tCapability(`families.${familyId}`)}
+        strengths={strengths.slice(0, 3).map((strength) => strength.label ?? strength.statement)}
+        direction={directionStatements.slice(0, 2).map((statement) => statement.statement)}
+        workBars={workBars}
+        hasWorkProfile={hasWorkProfile}
+        ventureName={aktuellesVorhaben ? ventureLabel(aktuellesVorhaben) : null}
+        hasVenture={Boolean(aktuellesVorhaben)}
+      />
 
       {/* ------------------------------------------------------------------
           DER SPRUNGBALKEN
@@ -457,9 +457,6 @@ export default async function FounderProfilePage({
           </ul>
         </aside>
         <div className="min-w-0">
-          <div className="mt-6 lg:mt-0">
-            <ProfileGlance title={t("glance.title")} note={t("glance.note")} cards={glanceCards} />
-          </div>
 
 
       {/* ==================================================================
