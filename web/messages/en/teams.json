@@ -178,7 +178,8 @@
     "roles": "Skills & responsibility",
     "venture": "Venture",
     "tradeoffs": "Values & trade-offs",
-    "workstyle": "How you work together"
+    "workstyle": "How you work together",
+    "strengths": "Strengths & drive"
   },
   "commitmentLab": {
     "title": "Commitment Lab",
@@ -742,5 +743,26 @@
       "tradeoffs": "Values & trade-offs",
       "setup": "Founder Setup"
     }
+  },
+  "strengthsShare": {
+    "pageTitle": "Strengths and drive",
+    "pageText": "Personal things in the team: what each person has shared about themselves. Side by side, not against each other. No judgement and no numbers.",
+    "title": "My strengths and drive in the team",
+    "onText": "Your team sees your confirmed strengths and statements about your drive. This also applies to people who join the team later, until you switch it off.",
+    "offText": "Only you see your strengths and drive. Switch it on if you want your team to see them.",
+    "switchOn": "Shared",
+    "switchOff": "Not shared",
+    "separate": "This is a share of its own. Way of working, skills, Find, advisors and research are not affected. You can switch it off at any time, immediately.",
+    "savedOn": "Shared. Your team now sees your strengths and drive.",
+    "savedOff": "No longer shared. Your team sees nothing of it.",
+    "error": "That did not work just now. Please try again in a moment.",
+    "noContent": "You have not confirmed anything yet, so there would be nothing to see.",
+    "startInterview": "Start the strengths conversation →",
+    "emptyTitle": "Nobody has shared anything yet",
+    "emptyText": "That is fine. Sharing is voluntary and each person decides for themselves. Whoever shares appears here.",
+    "you": "You",
+    "strengths": "Strengths",
+    "direction": "Drive",
+    "noneYet": "Nothing confirmed yet."
   }
 }

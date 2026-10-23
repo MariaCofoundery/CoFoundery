@@ -178,7 +178,8 @@
     "roles": "Fähigkeiten & Verantwortung",
     "venture": "Vorhaben",
     "tradeoffs": "Werte & Zielkonflikte",
-    "workstyle": "Euer Zusammenspiel"
+    "workstyle": "Euer Zusammenspiel",
+    "strengths": "Stärken & Antrieb"
   },
   "commitmentLab": {
     "title": "Commitment Lab",
@@ -742,5 +743,26 @@
       "tradeoffs": "Werte & Zielkonflikte",
       "setup": "Founder Setup"
     }
+  },
+  "strengthsShare": {
+    "pageTitle": "Stärken und Antrieb",
+    "pageText": "Persönliches im Team: was jede Person von sich freigegeben hat. Nebeneinander, nicht gegeneinander. Keine Wertung und keine Zahl.",
+    "title": "Meine Stärken und mein Antrieb im Team",
+    "onText": "Dein Team sieht deine bestätigten Stärken und Aussagen zum Antrieb. Das gilt auch für Personen, die später ins Team kommen, bis du es ausschaltest.",
+    "offText": "Nur du siehst deine Stärken und deinen Antrieb. Schalte es ein, wenn dein Team sie sehen soll.",
+    "switchOn": "Geteilt",
+    "switchOff": "Nicht geteilt",
+    "separate": "Das ist eine eigene Freigabe. Arbeitsweise, Fähigkeiten, Find, Advisor und Forschung bleiben davon unberührt. Du kannst sie jederzeit ausschalten, sofort.",
+    "savedOn": "Geteilt. Dein Team sieht jetzt deine Stärken und deinen Antrieb.",
+    "savedOff": "Nicht mehr geteilt. Dein Team sieht nichts mehr davon.",
+    "error": "Das hat gerade nicht geklappt. Bitte versuche es gleich noch einmal.",
+    "noContent": "Du hast noch nichts bestätigt, deshalb gäbe es noch nichts zu sehen.",
+    "startInterview": "Stärken-Gespräch starten →",
+    "emptyTitle": "Noch hat niemand etwas geteilt",
+    "emptyText": "Das ist in Ordnung. Teilen ist freiwillig, und jede Person entscheidet selbst. Wer teilt, erscheint hier.",
+    "you": "Du",
+    "strengths": "Stärken",
+    "direction": "Antrieb",
+    "noneYet": "Noch nichts bestätigt."
   }
 }
