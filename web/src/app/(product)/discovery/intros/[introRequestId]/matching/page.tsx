@@ -19,15 +19,13 @@ import type {
   DiscoveryProfilePreview,
 } from "@/features/discovery/discoveryTypes";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { FIND_CARD, FIND_PRIMARY, FIND_SECONDARY } from "@/features/discovery/findUi";
 
-const CARD_CLASS =
-  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
+const CARD_CLASS = FIND_CARD;
 const PRIMARY_DISABLED_CTA_CLASS =
   "inline-flex cursor-not-allowed items-center justify-center rounded-full bg-slate-200 px-5 py-3 text-sm font-semibold text-slate-500";
-const PRIMARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const SECONDARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+const PRIMARY_CTA_CLASS = FIND_PRIMARY;
+const SECONDARY_CTA_CLASS = FIND_SECONDARY;
 
 type MatchingPreparationPageParams = {
   introRequestId: string;
@@ -376,7 +374,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
       redirect(`/teams/${data}/workstyle`);
     }
     return (
-      <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+      <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
           <section className={CARD_CLASS}>
             <Link className="text-sm font-medium text-slate-500 hover:text-slate-900" href="/discovery/intros">
@@ -419,7 +417,7 @@ export default async function DiscoveryIntroMatchingPreparationPage({
   const feedbackOk = matchingFeedback?.ok ?? false;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="rounded-[1.75rem] border border-white/70 bg-white/82 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.055)] backdrop-blur md:p-7">
           <Link

@@ -54,11 +54,10 @@ import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
+import { FIND_CARD, FIND_FIELD } from "@/features/discovery/findUi";
 
-const CARD_CLASS =
-  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
-const FIELD_CLASS =
-  "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
+const CARD_CLASS = FIND_CARD;
+const FIELD_CLASS = FIND_FIELD;
 const LABEL_CLASS = "text-sm font-medium text-slate-900";
 const HELP_CLASS = "mt-1 text-xs leading-5 text-slate-500";
 const PRIMARY_BUTTON_CLASS =
@@ -451,7 +450,7 @@ export default async function DiscoveryProfilePage({
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <Link
           href="/discovery"

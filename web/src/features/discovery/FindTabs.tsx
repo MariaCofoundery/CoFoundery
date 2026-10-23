@@ -32,17 +32,17 @@ export async function FindTabs({ active }: { active: Tab }) {
   return (
     <nav
       aria-label={t("v2.modes.label")}
-      className="flex flex-wrap gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1"
+      className="flex flex-wrap gap-2"
     >
       {tabs.map((tab) => (
         <Link
           key={tab.key}
           href={tab.href}
           aria-current={tab.key === active ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm transition ${
+          className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-semibold transition ${
             tab.key === active
-              ? "brand-here font-semibold"
-              : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              ? "border-[#0b1f3a] bg-[#0b1f3a] text-white"
+              : "border-[#d8d5ea] bg-white text-[#33325e] hover:bg-[#f5f2fe]"
           }`}
         >
           {tab.key === "saved" ? t("mine.saved") : t(`v2.modes.${tab.key}`)}

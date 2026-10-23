@@ -7,6 +7,7 @@ import { FindMatchingReasons } from "@/features/discovery/FindMatchingReasons";
 import { FounderDiscoverySaveButton } from "@/features/discovery/FounderDiscoverySaveButton";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import type { MemberPhoto } from "@/features/profile/memberPhotoData";
+import { FIND_CHIP, FIND_PRIMARY } from "@/features/discovery/findUi";
 import {
   compactDiscoveryValues,
   discoveryRoleLabels,
@@ -19,10 +20,8 @@ import type {
   FounderSearchPreferences,
 } from "@/features/discovery/discoveryTypes";
 
-const CHIP_CLASS =
-  "inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700";
-const PRIMARY_CTA_CLASS =
-  "brand-cta inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200";
+const CHIP_CLASS = FIND_CHIP;
+const PRIMARY_CTA_CLASS = FIND_PRIMARY;
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 
 function initials(name: string) {
@@ -143,7 +142,7 @@ export function FounderDiscoveryCard({
   );
 
   return (
-    <article className="flex h-full flex-col rounded-3xl border border-violet-100 bg-white p-5 shadow-sm transition hover:border-violet-200 md:p-6">
+    <article className="card-lift flex h-full flex-col rounded-[24px] border border-[#e4e2f0] bg-white p-6">
       <div className="flex items-start gap-4">
         {/* Das Bild, wenn diese Person es fuer Mitglieder freigegeben hat -
             sonst wie bisher die Initialen. */}
@@ -151,17 +150,17 @@ export function FounderDiscoveryCard({
           displayName={profile.displayName}
           avatarId={photo?.avatarId}
           imageUrl={photo?.avatarUrl}
-          className="h-12 w-12 shrink-0 rounded-full object-cover"
-          fallbackClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-700 text-sm font-semibold text-white"
+          className="h-14 w-14 shrink-0 rounded-full object-cover"
+          fallbackClassName="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-lg font-bold text-white"
         />
         <div className="min-w-0 flex-1">
-          <h3 className="text-xl font-semibold text-slate-950">{profile.displayName}</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-600">{profile.headline}</p>
+          <h3 className="text-[19px] font-semibold leading-tight text-[#0b1f3a]">{profile.displayName}</h3>
+          <p className="mt-1 text-sm leading-6 text-[#5f5e7a]">{profile.headline}</p>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-600">
-        {profile.searchIntent ? <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-1 font-semibold text-violet-900">{t(`searchIntents.${profile.searchIntent}.short`)}</span> : null}
+        {profile.searchIntent ? <span className="inline-flex items-center rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{t(`searchIntents.${profile.searchIntent}.short`)}</span> : null}
         {profile.startHorizon ? <span className={CHIP_CLASS}>{t(`startHorizons.${profile.startHorizon}.short`)}</span> : null}
         {profile.locationRegion ? <span className={CHIP_CLASS}>{profile.locationRegion}</span> : null}
         <span className={CHIP_CLASS}>{t(`remoteModes.${profile.remoteMode}`)}</span>
@@ -171,12 +170,12 @@ export function FounderDiscoveryCard({
         {profile.availabilityFlexibility ? <span className={`${CHIP_CLASS} border-violet-200 bg-violet-50 text-violet-900`}>{t(`profile.publicProfile.availabilityFlexShort.${profile.availabilityFlexibility}`)}</span> : null}
       </div>
 
-      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+      <div className="mt-5 grid gap-4 border-t border-[#e4e2f0] pt-5 sm:grid-cols-2">
         <CardValueGroup title={t("v2.cards.brings")} values={[...roles.visible, ...expertise.visible]} remaining={roles.remaining + expertise.remaining} t={t} />
         <CardValueGroup title={t("v2.cards.seeks")} values={seekingRoles.visible} remaining={seekingRoles.remaining} t={t} />
       </div>
 
-      <div className="mt-5 border-t border-slate-100 pt-5">
+      <div className="mt-5 border-t border-[#e4e2f0] pt-5">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{t("v2.cards.foundingFrame")}</p>
         <p className="mt-2 text-sm leading-6 text-slate-700">{[
           t(`commitmentLevels.${profile.commitmentLevel}`),

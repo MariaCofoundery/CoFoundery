@@ -24,17 +24,13 @@ import {
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { FIND_CARD, FIND_CHIP, FIND_FIELD, FIND_PRIMARY, FIND_SECONDARY } from "@/features/discovery/findUi";
 
-const CARD_CLASS =
-  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
-const PRIMARY_CTA_CLASS =
-  "inline-flex min-h-11 items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200";
-const SECONDARY_CTA_CLASS =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200";
-const FIELD_CLASS =
-  "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
-const CHIP_CLASS =
-  "inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700";
+const CARD_CLASS = FIND_CARD;
+const PRIMARY_CTA_CLASS = FIND_PRIMARY;
+const SECONDARY_CTA_CLASS = FIND_SECONDARY;
+const FIELD_CLASS = FIND_FIELD;
+const CHIP_CLASS = FIND_CHIP;
 
 type DiscoveryT = Awaited<ReturnType<typeof getTranslations>>;
 type DiscoverySearchParams = {
@@ -209,17 +205,20 @@ export default async function DiscoveryPage({ searchParams }: { searchParams?: P
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <header className="brand-panel rounded-[28px] p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("common.brandEyebrow")}</p>
-          <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("v2.title")}</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("v2.subtitle")}</p>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <span className={`rounded-full px-3 py-1.5 text-sm font-semibold ${isActive ? "bg-white text-violet-800" : "bg-white/20 text-white"}`}>
+        <header className="brand-panel relative overflow-hidden rounded-[28px] px-6 py-8 sm:px-9">
+          <span aria-hidden="true" className="orb -top-16 right-56 hidden h-44 w-44 md:block" />
+          <span aria-hidden="true" className="orb -bottom-6 right-20 hidden h-[70px] w-[70px] md:block" style={{ animationDelay: "0.6s" }} />
+          <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{t("common.brandEyebrow")}</p>
+          <h1 className="mt-1 text-[32px] font-semibold leading-[1.15] sm:text-4xl">{t("v2.title")}</h1>
+          <p className="mt-2 max-w-xl text-base leading-7 text-white opacity-95">{t("v2.subtitle")}</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[13px] font-semibold ${isActive ? "bg-white/25 text-white" : "bg-white/20 text-white"}`}>
+              <span aria-hidden="true" className={`h-2 w-2 rounded-full ${isActive ? "bg-[#7ee2a8]" : "bg-white/60"}`} />
               {isActive ? t("status.active") : t("v2.search.profileInactive")}
             </span>
-            <Link href="/discovery/intros" className="text-sm text-white underline underline-offset-4">{t("index.openRequests")}</Link>
+            <Link href="/discovery/intros" className="text-sm font-semibold text-white underline underline-offset-4">{t("index.openRequests")}</Link>
           </div>
         </header>
 

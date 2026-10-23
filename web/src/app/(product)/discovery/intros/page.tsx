@@ -22,13 +22,11 @@ import {
 } from "@/features/discovery/discoveryIntroTypes";
 import type { DiscoveryFounderRole, DiscoveryProfilePreview } from "@/features/discovery/discoveryTypes";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { FIND_CARD, FIND_PRIMARY, FIND_SECONDARY } from "@/features/discovery/findUi";
 
-const CARD_CLASS =
-  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
-const PRIMARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const SECONDARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+const CARD_CLASS = FIND_CARD;
+const PRIMARY_CTA_CLASS = FIND_PRIMARY;
+const SECONDARY_CTA_CLASS = FIND_SECONDARY;
 const DANGER_LIGHT_CTA_CLASS =
   "inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50";
 const TEXTAREA_CLASS =
@@ -351,7 +349,7 @@ export default async function DiscoveryIntrosPage({
   const introMessage = introFeedback ? t(introFeedback.messageKey) : null;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="brand-panel rounded-[28px] p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("intros.eyebrow")}</p>

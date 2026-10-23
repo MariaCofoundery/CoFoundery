@@ -37,13 +37,11 @@ import type { FounderDiscoveryProfile } from "@/features/discovery/discoveryType
 import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { FIND_CARD, FIND_PRIMARY, FIND_SECONDARY } from "@/features/discovery/findUi";
 
-const CARD_CLASS =
-  "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] md:p-6";
-const PRIMARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-[color:var(--brand-primary-hover)]";
-const SECONDARY_CTA_CLASS =
-  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50";
+const CARD_CLASS = FIND_CARD;
+const PRIMARY_CTA_CLASS = FIND_PRIMARY;
+const SECONDARY_CTA_CLASS = FIND_SECONDARY;
 const TEXTAREA_CLASS =
   "mt-2 min-h-28 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 
@@ -400,7 +398,7 @@ export default async function DiscoveryProfileDetailPage({
   const ownRoles = discoveryRoleLabels(profile.ownRoles, profile.ownRoleOther, (role) => t(`roles.${role}`));
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
         {/* 1. PERSON - wer ist das? */}
         <header className="brand-panel rounded-[28px] p-6 sm:p-8">

@@ -7,9 +7,9 @@ import { FounderDiscoveryCard } from "@/features/discovery/FounderDiscoveryCard"
 import { getOwnSavedDiscoveryCandidates } from "@/features/discovery/discoverySavesData";
 import type { FounderSearchPreferences } from "@/features/discovery/discoveryTypes";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { FIND_SECONDARY } from "@/features/discovery/findUi";
 
-const SECONDARY_CTA_CLASS =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200";
+const SECONDARY_CTA_CLASS = FIND_SECONDARY;
 
 const EMPTY_MUST_HAVES: FounderSearchPreferences["mustHaves"] = {
   minimumAvailabilityHoursPerWeek: null,
@@ -36,7 +36,7 @@ export default async function SavedFounderDiscoveryPage() {
   const savedCandidates = await getOwnSavedDiscoveryCandidates(user.id, supabase);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(250,204,21,0.14),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-7 text-slate-950 md:px-8 md:py-8">
+    <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <header className="brand-panel rounded-[28px] p-6 sm:p-8">
           {/* DIESELBE REITERREIHE WIE AUF DER UEBERSICHT. "Gemerkte" ist der
