@@ -135,10 +135,11 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         <p className="mt-3 text-xs leading-5 text-slate-500">{t("profile.suggestableOffHint")}</p>
       </fieldset>
 
-      {/* Highlights sind eine eigene Zustimmung und stehen bewusst NICHT auf
-          "an": Ein Highlight sieht jedes Mitglied ganz oben in Connect, auch
-          als Empfehlung von uns oder als Anzeige. Das ist mehr als ein
-          Vorschlag unter "Fuer dich" und wird deshalb getrennt gefragt. */}
+      {/* Highlights sind eine eigene Zustimmung: Ein Highlight sieht jedes
+          Mitglied ganz oben in Connect, auch als Empfehlung von uns oder als
+          Anzeige. Vorgewaehlt ist das Haekchen nur, solange noch nie
+          geantwortet wurde (Marias Entscheidung 23.10.2026); wer es
+          abgewaehlt hat, sieht es abgewaehlt. */}
       <fieldset className="rounded-2xl border border-slate-200 p-4">
         <legend className="px-1 text-sm font-medium">{t("profile.highlightableTitle")}</legend>
         <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm">
@@ -146,7 +147,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
             type="checkbox"
             name="highlightable"
             value="yes"
-            defaultChecked={profile?.highlightable ?? false}
+            defaultChecked={profile?.highlight_prompt_answered_at ? profile.highlightable : true}
             className="mt-1 h-4 w-4 rounded border-slate-300"
           />
           <span>

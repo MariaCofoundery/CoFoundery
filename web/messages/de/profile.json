@@ -505,7 +505,8 @@
     "goodToKnowTitle": "Gut zu wissen",
     "phone": {
       "title": "Hol dir Made2Found aufs Handy.",
-      "text": "Dann bekommst du Benachrichtigungen wie bei einer normalen App."
+      "text": "Dann bekommst du Benachrichtigungen wie bei einer normalen App.",
+      "link": "Kurzanleitung (PDF) →"
     },
     "feedback": {
       "title": "Feedback ist willkommen.",

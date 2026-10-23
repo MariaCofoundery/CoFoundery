@@ -10,6 +10,10 @@ export async function getResearchConsentState(
     .select("state")
     .eq("user_id", userId)
     .maybeSingle();
-  if (error || (data?.state !== "accepted" && data?.state !== "declined")) return "undecided";
+  // Ein Lesefehler ist keine offene Frage. supabase-js wirft ihn nicht, es
+  // liefert ihn zurueck - der .catch im Layout griff deshalb nie, und wer
+  // einmal geantwortet hatte, wurde bei jedem Lesefehler erneut gefragt.
+  if (error) return "unknown";
+  if (data?.state !== "accepted" && data?.state !== "declined") return "undecided";
   return data.state;
 }

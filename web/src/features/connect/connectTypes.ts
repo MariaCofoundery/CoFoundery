@@ -48,6 +48,8 @@ export type ConnectProfile = {
   suggestable: boolean;
   /** Ob diese Person als Highlight oben in Connect stehen darf (eigene Zustimmung). */
   highlightable: boolean;
+  /** Null = die Highlight-Frage wurde noch nicht beantwortet. */
+  highlight_prompt_answered_at: string | null;
   contact_note: string | null;
   published_at: string | null; updated_at: string;
 };

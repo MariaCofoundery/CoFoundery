@@ -34,10 +34,27 @@ test("Jede Highlight-Abfrage prueft highlightable und nicht suggestable", () => 
   }
 });
 
-test("Das Profilformular hat das Haekchen, standardmaessig nicht gesetzt", () => {
+test("Das Profilformular hat das Haekchen: vorgewaehlt bis geantwortet, danach die eigene Wahl", () => {
   const page = source("src/app/(product)/connect/profile/page.tsx");
   assert.match(page, /name="highlightable"/);
-  assert.match(page, /defaultChecked=\{profile\?\.highlightable \?\? false\}/);
+  assert.match(page, /defaultChecked=\{profile\?\.highlight_prompt_answered_at \? profile\.highlightable : true\}/);
+});
+
+test("Die einmalige Frage: nur mit Profil, nur wenn noch nicht beantwortet, Antwort wird festgehalten", () => {
+  const prompt = source("src/features/connect/HighlightConsentPrompt.tsx");
+  assert.match(prompt, /if \(!data \|\| data\.highlight_prompt_answered_at\) return null/);
+  assert.match(prompt, /name="highlightable"[\s\S]{0,80}defaultChecked/);
+  const action = source("src/features/connect/highlightConsentActions.ts");
+  assert.match(action, /highlightable: formData\.get\("highlightable"\) === "yes"/);
+  assert.match(action, /highlight_prompt_answered_at: new Date\(\)\.toISOString\(\)/);
+  assert.match(source("src/app/(product)/connect/page.tsx"), /<HighlightConsentPrompt client=\{client\} userId=\{user\.id\} \/>/);
+  // Die Migration schaltet niemanden ein: die Spalte bleibt standardmaessig aus.
+  assert.match(source(MIGRATION), /highlightable boolean not null default false/);
+});
+
+test("Ein Lesefehler beim Forschungs-Einverstaendnis ist keine offene Frage", () => {
+  const consent = source("src/features/research/consent.ts");
+  assert.match(consent, /if \(error\) return "unknown"/);
 });
 
 test("Ohne Haekchen im Formular wird die Zustimmung nicht erteilt", () => {

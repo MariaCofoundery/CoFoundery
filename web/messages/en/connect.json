@@ -369,7 +369,7 @@
     "highlightableTitle": "Being shown as a highlight",
     "highlightableLabel": "I am open to being shown as a highlight in Connect",
     "highlightableHint": "At the top of Connect there are three highlights that every member sees. They are drawn at random, recommended by us or paid for, and each card says why it is there. With this box ticked, your profile or one of your entries may appear there.",
-    "highlightableOffHint": "This is off by default. Without the tick you never appear there, not even if we wanted to recommend you. You can switch it off again at any time, and you disappear from running highlights as well."
+    "highlightableOffHint": "The box is pre-ticked, but it is your call. Without the tick you never appear there, not even if we wanted to recommend you. You can switch it off at any time, and you disappear from running highlights as well."
   },
   "safety": {
     "block": "Block",
@@ -982,5 +982,14 @@
       "error": "That did not work. Please try again."
     },
     "noConsentHint": "This person has not ticked the highlight box. The placement is only shown once they agree. Best to ask them first."
+  },
+  "highlightPrompt": {
+    "eyebrow": "New in Connect",
+    "title": "Highlights",
+    "body": "At the top of Connect we show three highlights. They are drawn at random, recommended by us or paid for, and each card says why it is there. May your profile or your project be one of them?",
+    "label": "Yes, I am open to being shown as a highlight.",
+    "hint": "If you would rather not, untick the box. You can change this at any time in your Connect profile.",
+    "save": "Save",
+    "saving": "Saving …"
   }
 }

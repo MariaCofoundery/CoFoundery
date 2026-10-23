@@ -64,7 +64,7 @@ export async function saveConnectProfileAction(formData: FormData) {
     });
     redirect(`/connect/profile?error=${identityGaps.length ? "identity_incomplete" : "roles_missing"}`);
   }
-  const currentProfile = await client.from("network_profiles").select("status,published_at,photo_path,photo_source,photo_avatar_id,visibility,public_slug").eq("user_id", user.id).maybeSingle();
+  const currentProfile = await client.from("network_profiles").select("status,published_at,photo_path,photo_source,photo_avatar_id,visibility,public_slug,highlight_prompt_answered_at").eq("user_id", user.id).maybeSingle();
   if (currentProfile.error) redirect("/connect/profile?error=save");
   const nextProfileStatus = currentProfile.data?.status === "active" ? "active" : publish ? "active" : currentProfile.data?.status ?? "draft";
   if (nextProfileStatus === "active" && !profilePublishable(values)) redirect("/connect/profile?error=identity_incomplete");
@@ -95,6 +95,8 @@ export async function saveConnectProfileAction(formData: FormData) {
   }
   const { error } = await client.from("network_profiles").upsert({
     user_id: user.id, ...values, status: nextProfileStatus,
+    // Wer das Formular mit dem Haekchen abschickt, hat die Frage beantwortet.
+    highlight_prompt_answered_at: currentProfile.data?.highlight_prompt_answered_at ?? new Date().toISOString(),
     published_at: nextProfileStatus === "active" ? currentProfile.data?.published_at ?? new Date().toISOString() : currentProfile.data?.published_at ?? null, visibility: profileVisibility, ...photoValues,
   }, { onConflict: "user_id" });
   if (error) {

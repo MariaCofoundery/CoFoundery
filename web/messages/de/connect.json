@@ -369,7 +369,7 @@
     "highlightableTitle": "Als Highlight gezeigt werden",
     "highlightableLabel": "Ich bin offen dafür, als Highlight in Connect gezeigt zu werden",
     "highlightableHint": "Ganz oben in Connect stehen drei Highlights, die alle Mitglieder sehen. Sie sind zufällig gezogen, von uns empfohlen oder bezahlt, und jede Karte sagt dazu, warum sie dort steht. Mit dem Häkchen darf dein Profil oder einer deiner Einträge dort erscheinen.",
-    "highlightableOffHint": "Standardmäßig ist das aus. Ohne Häkchen erscheinst du dort nie, auch nicht, wenn wir dich empfehlen wollten. Du kannst es jederzeit wieder abschalten, dann verschwindest du auch aus laufenden Highlights."
+    "highlightableOffHint": "Das Häkchen ist vorgewählt, du entscheidest. Ohne Häkchen erscheinst du dort nie, auch nicht, wenn wir dich empfehlen wollten. Du kannst es jederzeit abschalten, dann verschwindest du auch aus laufenden Highlights."
   },
   "safety": {
     "block": "Blockieren",
@@ -982,5 +982,14 @@
       "error": "Das hat nicht geklappt. Versuch es noch einmal."
     },
     "noConsentHint": "Die Person hat das Highlight-Häkchen nicht gesetzt. Der Platz wird erst gezeigt, wenn sie zustimmt. Frag sie am besten vorher."
+  },
+  "highlightPrompt": {
+    "eyebrow": "Neu in Connect",
+    "title": "Highlights",
+    "body": "Ganz oben in Connect zeigen wir drei Highlights. Sie werden zufällig gezogen, von uns empfohlen oder sind bezahlt, und jede Karte sagt dazu, warum sie dort steht. Darf dein Profil oder dein Projekt dabei sein?",
+    "label": "Ja, ich bin dafür offen, als Highlight gezeigt zu werden.",
+    "hint": "Wenn du das nicht möchtest, nimm das Häkchen raus. Du kannst es jederzeit in deinem Connect-Profil ändern.",
+    "save": "Speichern",
+    "saving": "Speichert …"
   }
 }

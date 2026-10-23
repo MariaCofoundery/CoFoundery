@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getActiveConnectListings, getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
+import { HighlightConsentPrompt } from "@/features/connect/HighlightConsentPrompt";
 import { ConnectHighlight } from "@/features/connect/ConnectHighlight";
 import { getConnectHighlights } from "@/features/connect/connectHighlightData";
 import { ConnectListingCard } from "@/features/connect/ConnectListingCard";
@@ -64,6 +65,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           gleich und sagen, warum sie dastehen; "Fuer dich" ist persoenlich und lebt auf
           der Vorschlagsseite. Beides in einem Kasten, und man hielte einen bezahlten
           Platz fuer eine persoenliche Empfehlung. */}
+      <HighlightConsentPrompt client={client} userId={user.id} />
       <ConnectHighlight highlights={highlights} />
       {suggestionStrip.length > 0 ? (
         <section aria-labelledby="connect-for-you" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3">

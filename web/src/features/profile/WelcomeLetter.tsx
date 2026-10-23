@@ -7,10 +7,10 @@ import { getTranslations } from "next-intl/server";
  * an dem Ort hier wichtig ist. Die vier Umgangsregeln stehen hier, damit sie
  * vor dem ersten Kontakt gelesen werden und nicht erst im Streitfall.
  *
- * Das Foto fehlt noch. Solange keine Datei eingetragen ist, steht eine Kreisflaeche
- * mit dem Anfangsbuchstaben da - kein kaputtes Bild.
+ * Das Foto liegt in /public/brand (quadratisch zugeschnitten, 720 px). Ist
+ * keins eingetragen, steht eine Kreisflaeche mit dem Anfangsbuchstaben da.
  */
-const MARIA_PHOTO_SRC: string | null = null;
+const MARIA_PHOTO_SRC: string | null = "/brand/maria.jpg";
 
 const VALUES = ["kind", "respect", "honest", "yours"] as const;
 
@@ -72,7 +72,10 @@ export async function WelcomeLetter() {
           <h3 className="text-lg font-semibold text-slate-950">{t("goodToKnowTitle")}</h3>
           <ul className="mt-3 grid gap-3 text-[15px] leading-6 text-slate-700">
             <li>
-              <strong className="font-semibold text-slate-950">{t("phone.title")}</strong> {t("phone.text")}
+              <strong className="font-semibold text-slate-950">{t("phone.title")}</strong> {t("phone.text")}{" "}
+              <a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener" className="font-semibold text-violet-700 underline underline-offset-2">
+                {t("phone.link")}
+              </a>
             </li>
             <li>
               <strong className="font-semibold text-slate-950">{t("feedback.title")}</strong> {t("feedback.text")}
