@@ -31,19 +31,23 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
   // einladenden Person.
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
-      <div className="mb-6">
-        {/* Phase 12C.1C: Aus dem Team heraus geoeffnet fuehrt der Weg zurueck ins Team. */}
-        <a
-          href={targetTeam ? `/teams/${encodeURIComponent(targetTeam.id)}` : "/dashboard"}
-          className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-        >
-          {targetTeam ? t("backToTeam") : t("backToDashboard")}
-        </a>
-      </div>
-      <div className="space-y-6">
-        {!targetTeam && <MatchingStartBlock />}
+    <main className="mx-auto min-h-screen w-full max-w-2xl px-5 py-10 sm:py-14">
+      {/* Phase 12C.1C: Aus dem Team heraus geoeffnet fuehrt der Weg zurueck ins Team. */}
+      <a
+        href={targetTeam ? `/teams/${encodeURIComponent(targetTeam.id)}` : "/dashboard"}
+        className="text-sm font-medium text-slate-600 underline-offset-2 hover:underline"
+      >
+        {"\u2190 "}{targetTeam ? t("backToTeam") : t("backToDashboard")}
+      </a>
+      <header className="mt-6">
+        <h1 className="text-3xl font-semibold tracking-[-0.02em] text-slate-950 sm:text-4xl">{t("title")}</h1>
+        <p className="mt-3 max-w-xl text-base leading-7 text-slate-600">
+          {targetTeam ? t("leadTeam", { name: targetTeam.name }) : t("lead")}
+        </p>
+      </header>
+      <div className="mt-8">
         <CoFounderInviteForm targetTeam={targetTeam} />
+        {!targetTeam && <MatchingStartBlock />}
       </div>
     </main>
   );

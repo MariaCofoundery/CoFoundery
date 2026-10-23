@@ -568,18 +568,18 @@
   },
   "coFounderInvitePage": {
     "backToDashboard": "Back to dashboard",
-    "backToTeam": "Back to the team"
+    "backToTeam": "Back to the team",
+    "title": "Invite a co-founder",
+    "lead": "Send your co-founder an invitation by email. After that, you each decide for yourselves what to share with each other.",
+    "leadTeam": "You are inviting someone to “{name}”. Work style and sharing remain personal decisions."
   },
   "inviteStart": {
     "eyebrow": "Currently free during the test phase.",
-    "title": "Start your matching",
-    "stepInvite": "Invite your co-founder.",
-    "stepReport": "Then “How you work together” leads to conversation points and Founder Setup.",
-    "inviteCta": "Invite co-founder",
     "supportCta": "Support the test phase (€39)",
     "paymentWindowHint": "Payment opens in a new window. After that, you can simply continue here.",
     "invoiceHint": "If you need an invoice, send us your billing details by email after payment.",
-    "regularPrice": "Regular price later: €99 per founder team"
+    "regularPrice": "Regular price later: €99 per founder team",
+    "moreInfo": "More about supporting us"
   },
   "coFounderInviteForm": {
     "title": "Invite a co-founder",
@@ -593,7 +593,7 @@
       "projectName": "optional, e.g. Made2Found or Project Atlas"
     },
     "help": {
-      "projectName": "Optional. If you want to name your matching, we will use this name later wherever your team becomes visible."
+      "projectName": "If you would like to name your team, we use the name later wherever your team becomes visible."
     },
     "validation": {
       "email": "Please enter a valid email address.",
@@ -609,7 +609,7 @@
       "generic": "The invitation could not be created right now. Please try again."
     },
     "teamContext": {
-      "label": "Team context",
+      "label": "Where do you stand with each other?",
       "help": "Choose deliberately whether you are exploring a potential collaboration or already working together.",
       "preFounder": "We are exploring working together",
       "existingTeam": "We already work together",
@@ -645,8 +645,9 @@
       "error": "Copying is not possible. Please copy the link manually."
     },
     "dashboardCta": "Go to dashboard",
-    "sharingTitle": "What the invitation shares",
-    "sharingNote": "The invitation shares nothing automatically – no answers, no work profile, no venture details. After accepting, each person decides for themselves what to share with the other. Your shared report only appears once everyone has shared their work style with each other – then for all of you at the same time."
+    "sharingTitle": "What is shared",
+    "sharingNote": "The invitation shares nothing automatically. After accepting, each person decides for themselves what to share with the other. Your shared report only appears once everyone has shared their work style with each other, then for all of you at the same time.",
+    "optionalName": "Name your team or project (optional)"
   },
   "participantInvite": {
     "projectLabel": "Team or project name",

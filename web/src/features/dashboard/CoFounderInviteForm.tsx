@@ -99,33 +99,11 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
   return (
     <section
       id="cofounder-invite-form"
-      className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white/95 p-6"
+      className="scroll-mt-24 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_16px_40px_rgba(15,23,42,.05)] sm:p-7"
     >
-      <h1 className="text-xl font-semibold text-slate-900">{t("title")}</h1>
-      <p className="mt-2 text-sm text-slate-600">
-        {targetTeam ? t("targetTeam", { name: targetTeam.name }) : t("intro")}
-      </p>
-
-      <form onSubmit={onSubmit} className="mt-5 space-y-4">
+      <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label htmlFor="invite-label" className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            {t("label.projectName")}
-          </label>
-          <input
-            id="invite-label"
-            type="text"
-            value={label}
-            onChange={(event) => setLabel(event.target.value)}
-            placeholder={t("placeholder.projectName")}
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-          />
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            {t("help.projectName")}
-          </p>
-        </div>
-
-        <div>
-          <label htmlFor="invite-email" className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
+          <label htmlFor="invite-email" className="text-sm font-semibold text-slate-900">
             {t("label.email")}
           </label>
           <input
@@ -135,60 +113,54 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
             onChange={(event) => setEmail(event.target.value)}
             required
             placeholder="cofounder@example.com"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+            className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900"
           />
         </div>
 
-        {!targetTeam && <div className="rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-600">
-            {t("teamContext.label")}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {t("teamContext.help")}
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => {
-                setTeamContext("pre_founder");
-                setError(null);
-              }}
-              className={`rounded-2xl border px-4 py-4 text-left transition ${
-                teamContext === "pre_founder"
-                  ? "border-cyan-400 bg-white shadow-[0_10px_25px_rgba(34,211,238,0.12)]"
-                  : "border-slate-200 bg-white/90 hover:border-cyan-200"
-              }`}
-              aria-pressed={teamContext === "pre_founder"}
-            >
-              <p className="text-sm font-semibold text-slate-900">{t("teamContext.preFounder")}</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setTeamContext("existing_team");
-                setError(null);
-              }}
-              className={`rounded-2xl border px-4 py-4 text-left transition ${
-                teamContext === "existing_team"
-                  ? "border-cyan-400 bg-white shadow-[0_10px_25px_rgba(34,211,238,0.12)]"
-                  : "border-slate-200 bg-white/90 hover:border-cyan-200"
-              }`}
-              aria-pressed={teamContext === "existing_team"}
-            >
-              <p className="text-sm font-semibold text-slate-900">{t("teamContext.existingTeam")}</p>
-            </button>
+        {!targetTeam && <fieldset>
+          <legend className="text-sm font-semibold text-slate-900">{t("teamContext.label")}</legend>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            {(["pre_founder", "existing_team"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  setTeamContext(value);
+                  setError(null);
+                }}
+                className={`min-h-12 rounded-xl border px-4 py-3 text-left text-sm font-medium transition ${
+                  teamContext === value
+                    ? "border-violet-500 bg-violet-50 text-violet-950 ring-2 ring-violet-200"
+                    : "border-slate-300 bg-white text-slate-800 hover:border-violet-300"
+                }`}
+                aria-pressed={teamContext === value}
+              >
+                {value === "pre_founder" ? t("teamContext.preFounder") : t("teamContext.existingTeam")}
+              </button>
+            ))}
           </div>
-          <p className="mt-3 text-xs leading-5 text-slate-500">
-            {t("teamContext.reportHint")}
-          </p>
-          <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
-            {t("teamContext.dataHint")}
-          </p>
-        </div>}
+          <p className="mt-2 text-xs leading-5 text-slate-500">{t("teamContext.dataHint")}</p>
+        </fieldset>}
+
+        {!targetTeam && <details className="rounded-xl border border-slate-200 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-medium text-slate-700">{t("optionalName")}</summary>
+          <div className="mt-3">
+            <label htmlFor="invite-label" className="sr-only">{t("label.projectName")}</label>
+            <input
+              id="invite-label"
+              type="text"
+              value={label}
+              onChange={(event) => setLabel(event.target.value)}
+              placeholder={t("placeholder.projectName")}
+              className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800"
+            />
+            <p className="mt-1 text-xs leading-5 text-slate-500">{t("help.projectName")}</p>
+          </div>
+        </details>}
 
         {/* Phase 11.5: Vor dem Absenden klar sagen, dass nichts automatisch
             geteilt wird. Freigaben sind erst nach der Annahme moeglich. */}
-        <div className="rounded-xl border border-violet-200 bg-violet-50/60 p-4">
+        <div className="rounded-xl bg-violet-50/70 px-4 py-3">
           <p className="text-sm font-semibold text-violet-950">{t("sharingTitle")}</p>
           <p className="mt-1 text-sm leading-6 text-violet-950/80">{t("sharingNote")}</p>
         </div>
@@ -196,13 +168,10 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-4 py-2 text-sm text-slate-900 shadow-[0_10px_30px_rgba(103,232,249,0.22)] transition hover:bg-[#4fd4e6] disabled:opacity-60"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[linear-gradient(120deg,var(--brand-accent),var(--brand-primary))] px-6 text-base font-semibold text-slate-900 shadow-[0_10px_28px_rgba(124,58,237,0.16)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {isPending ? t("submit.pending") : t("submit.idle")}
         </button>
-        <p className="text-xs text-slate-500">
-          {t("fallbackHint")}
-        </p>
       </form>
 
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}

@@ -568,18 +568,18 @@
   },
   "coFounderInvitePage": {
     "backToDashboard": "Zurück zum Dashboard",
-    "backToTeam": "Zurück zum Team"
+    "backToTeam": "Zurück zum Team",
+    "title": "Co-Founder einladen",
+    "lead": "Schick deiner Co-Founderin oder deinem Co-Founder eine Einladung per E-Mail. Ihr entscheidet danach beide selbst, was ihr miteinander teilt.",
+    "leadTeam": "Du lädst jemanden in „{name}“ ein. Arbeitsweise und Freigaben bleiben persönliche Entscheidungen."
   },
   "inviteStart": {
     "eyebrow": "Aktuell in der Testphase kostenlos.",
-    "title": "Starte euer Matching",
-    "stepInvite": "Du lädst deinen Co-Founder ein.",
-    "stepReport": "Danach führt euch „Euer Zusammenspiel“ zu Gesprächspunkten und Founder Setup.",
-    "inviteCta": "Co-Founder einladen",
     "supportCta": "Testphase unterstützen (39 €)",
     "paymentWindowHint": "Die Zahlung öffnet ein neues Fenster. Danach könnt ihr hier einfach weitermachen.",
     "invoiceHint": "Wenn ihr eine Rechnung braucht, schickt uns eure Rechnungsdaten nach der Zahlung per E-Mail.",
-    "regularPrice": "Regulärer Preis später: 99 € pro Founder-Team"
+    "regularPrice": "Regulärer Preis später: 99 € pro Founder-Team",
+    "moreInfo": "Mehr zur Unterstützung"
   },
   "coFounderInviteForm": {
     "title": "Co-Founder einladen",
@@ -593,7 +593,7 @@
       "projectName": "optional, z. B. Made2Found oder Projekt Atlas"
     },
     "help": {
-      "projectName": "Optional. Wenn ihr euer Matching benennen möchtet, nutzen wir den Namen später dort, wo euer Team sichtbar wird."
+      "projectName": "Wenn ihr euer Team benennen möchtet, nutzen wir den Namen später dort, wo euer Team sichtbar wird."
     },
     "validation": {
       "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
@@ -609,7 +609,7 @@
       "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."
     },
     "teamContext": {
-      "label": "Team-Kontext",
+      "label": "Wie steht ihr zueinander?",
       "help": "Wähle bewusst, ob ihr gerade eine mögliche Zusammenarbeit prüft oder bereits gemeinsam arbeitet.",
       "preFounder": "Wir überlegen zusammenzuarbeiten",
       "existingTeam": "Wir arbeiten bereits zusammen",
@@ -645,8 +645,9 @@
       "error": "Kopieren nicht möglich. Bitte Link manuell kopieren."
     },
     "dashboardCta": "Zum Dashboard",
-    "sharingTitle": "Was mit der Einladung geteilt wird",
-    "sharingNote": "Mit der Einladung wird nichts automatisch geteilt – keine Antworten, kein Arbeitsprofil, keine Angaben zum Vorhaben. Nach der Annahme entscheidet jede Person selbst, was sie für die andere freigibt. Euer gemeinsamer Bericht erscheint erst, wenn alle ihre Arbeitsweise füreinander freigegeben haben – dann für alle gleichzeitig."
+    "sharingTitle": "Was geteilt wird",
+    "sharingNote": "Mit der Einladung wird nichts automatisch geteilt. Nach der Annahme entscheidet jede Person selbst, was sie für die andere freigibt. Euer gemeinsamer Bericht erscheint erst, wenn alle ihre Arbeitsweise füreinander freigegeben haben, dann für alle gleichzeitig.",
+    "optionalName": "Team oder Projekt benennen (optional)"
   },
   "participantInvite": {
     "projectLabel": "Team- oder Projektname",
