@@ -23,15 +23,16 @@ type ReportActionButtonProps = {
 // `min-h-11`: 44 px. Gemessen am 01.10.2026 waren es 42 - knapp unter der
 // Groesse, die man am Telefon zuverlaessig trifft.
 const BASE_CLASS =
-  "inline-flex min-h-11 items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] cursor-pointer";
+  "inline-flex min-h-11 items-center justify-center rounded-xl border px-[18px] py-2.5 text-[15px] font-semibold transition duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] cursor-pointer";
 
 const VARIANT_CLASS: Record<NonNullable<ReportActionButtonProps["variant"]>, string> = {
+  // Seit den Konzeptboards: Hauptknopf mit Verlauf und weisser Schrift, ruhige Knoepfe in Grau-Violett.
   primary:
-    "border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] text-slate-900 hover:bg-[color:var(--brand-primary-hover)]",
+    "border-transparent bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white hover:opacity-90",
   secondary:
-    "border-[color:var(--brand-accent)] bg-[color:var(--brand-accent)] text-white hover:bg-[#6d28d9]",
+    "border-transparent bg-[#efeafd] text-[#4a2fb8] hover:bg-[#e4dcfb]",
   utility:
-    "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50",
+    "border-transparent bg-[#f1f0f7] text-[#0b1f3a] hover:bg-[#e9e7f4]",
 };
 
 export function ReportActionButton({

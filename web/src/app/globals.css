@@ -829,13 +829,13 @@ body {
    gleich aussehen soll. Eine kopierte Kette laeuft auseinander.
    --------------------------------------------------------------------------- */
 .brand-cta {
-  background-image: linear-gradient(135deg, #c4b5fd, #67e8f9);
-  color: #020617;
-  box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.24);
+  /* Seit den Konzeptboards 31-43: derselbe Verlauf und weisse Schrift wie der Hauptknopf ueberall. */
+  background-image: linear-gradient(120deg, #6d49e0, #0a80b8);
+  color: #ffffff;
 }
 
 .brand-cta:hover {
-  background-image: linear-gradient(135deg, #b9a5fc, #4ddcef);
+  opacity: 0.9;
 }
 
 .brand-cta:disabled {

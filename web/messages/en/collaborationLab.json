@@ -82,7 +82,8 @@
     },
     "start": "Start round",
     "unsupported": "Read My Mind involves two people. Pair selection for larger teams is not available yet.",
-    "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders."
+    "unsupportedTeamSize": "A new Read My Mind round requires exactly two current founders.",
+    "choosePerspective": "Choose a perspective"
   },
   "round": {
     "back": "Back to team overview",

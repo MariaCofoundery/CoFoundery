@@ -13,15 +13,15 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 function ChoiceList({ keys, contract, locale }: { keys: string[]; contract: ReadMyMindResponseContract; locale: "de" | "en" }) {
   const labels = keys.map((key) => contract.choices.find((choice) => choice.key === key)?.label[locale]).filter((label): label is string => Boolean(label));
-  return <ul className="mt-3 grid gap-2.5">{labels.map((label) => <li key={label} className="rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3.5 text-sm leading-6 text-slate-800 shadow-sm">{label}</li>)}</ul>;
+  return <ul className="mt-3 grid gap-2.5">{labels.map((label) => <li key={label} className="rounded-2xl border border-[#e4e2f0]/90 bg-white/90 px-4 py-3.5 text-sm leading-6 text-[#33325e] shadow-sm">{label}</li>)}</ul>;
 }
 
 function ComparisonLabel({ children, tone }: { children: React.ReactNode; tone: "violet" | "amber" | "neutral" }) {
   const colors = tone === "violet"
-    ? "border-violet-200 bg-violet-100/80 text-violet-900"
+    ? "border-[#d9cff8] bg-[#efeafd]/80 text-[#3a2394]"
     : tone === "amber"
-      ? "border-amber-200 bg-amber-100/80 text-amber-950"
-      : "border-slate-200 bg-slate-100 text-slate-700";
+      ? "border-[#c9e0f2] bg-[#e1effa]/80 text-[#0b5a8a]"
+      : "border-[#e4e2f0] bg-[#f1f0f7] text-[#33325e]";
   return <p className={`mt-5 inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold ${colors}`}>{children}</p>;
 }
 
@@ -66,73 +66,72 @@ export default async function ReadMyMindPromptRevealPage({ params }: { params: P
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <nav className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm" aria-label={t("navigationLabel")}>
-        <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-xs font-medium text-slate-500 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("collaborationBreadcrumb")}</Link>
-        <span aria-hidden="true" className="text-slate-300">›</span>
-        <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind`} className="font-semibold text-violet-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{t("backToReadMyMind")}</Link>
+        <Link href={`/teams/${encodeURIComponent(teamId)}#collaboration-lab`} className="text-xs font-medium text-[#5f5e7a] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9a82e8]">{t("collaborationBreadcrumb")}</Link>
+        <span aria-hidden="true" className="text-[#d8d5ea]">›</span>
+        <Link href={`/teams/${encodeURIComponent(teamId)}/collaboration-lab/read-my-mind`} className="font-semibold text-[#4a2fb8] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9a82e8]">{t("backToReadMyMind")}</Link>
       </nav>
       <div className="mt-6"><ReadMyMindProgress current={position + 1} total={round.prompts.length} label={t("progress", { current: position + 1, total: round.prompts.length })} /></div>
-      <header className="rmm-stage rmm-enter relative mt-5 overflow-hidden rounded-[30px] border border-violet-200/80 bg-violet-50 p-6 shadow-[0_22px_55px_rgba(76,29,149,0.1)] sm:p-9">
-        <div aria-hidden="true" className="absolute -right-10 -top-14 h-48 w-48 rounded-full bg-violet-200/45 blur-3xl" />
-        <div className="relative"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{prompt.content.title[locale]}</h1>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{prompt.content.selfQuestion[locale]}</p></div>
+      <header className="rmm-stage rmm-enter relative mt-5 overflow-hidden rounded-[24px] border border-[#e4e2f0] bg-white p-6 sm:p-9">
+        <div className="relative"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4a2fb8]">{t("eyebrow")}</p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#0b1f3a] sm:text-4xl">{prompt.content.title[locale]}</h1>
+        <p className="mt-4 max-w-3xl text-base leading-7 text-[#33325e] sm:text-lg sm:leading-8">{prompt.content.selfQuestion[locale]}</p></div>
       </header>
 
       {!opened ? (
-        <section className="rmm-sealed rmm-enter relative mt-6 overflow-hidden rounded-[30px] border border-violet-200 bg-white p-6 text-center shadow-[0_24px_60px_rgba(76,29,149,0.12)] sm:p-10" aria-labelledby="reveal-open-title">
-          <div aria-hidden="true" className="absolute inset-x-8 top-5 h-24 rotate-[-1.5deg] rounded-[24px] border border-amber-200/70 bg-amber-100/50" />
-          <div aria-hidden="true" className="absolute inset-x-5 top-3 h-24 rotate-[1deg] rounded-[24px] border border-violet-200/70 bg-violet-100/60" />
-          <div className="relative rounded-[24px] border border-white/90 bg-white/90 px-5 py-8 shadow-[0_18px_45px_rgba(76,29,149,0.1)] backdrop-blur-sm">
-          <span aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-sky-600 text-lg text-white shadow-[0_10px_24px_rgba(109,40,217,0.25)]">◇</span>
-          <h2 id="reveal-open-title" className="mt-4 text-2xl font-semibold text-slate-950">{prompt.content.title[locale]}</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">{t("openHint")}</p>
+        <section className="rmm-sealed rmm-enter relative mt-6 overflow-hidden rounded-[24px] border border-[#d9cff8] bg-white p-6 text-center  sm:p-10" aria-labelledby="reveal-open-title">
+          <div aria-hidden="true" className="absolute inset-x-8 top-5 h-24 rotate-[-1.5deg] rounded-[24px] border border-[#c9e0f2]/70 bg-[#e1effa]/50" />
+          <div aria-hidden="true" className="absolute inset-x-5 top-3 h-24 rotate-[1deg] rounded-[24px] border border-[#d9cff8]/70 bg-[#efeafd]/60" />
+          <div className="relative rounded-[24px] border border-white/90 bg-white/90 px-5 py-8  backdrop-blur-sm">
+          <span aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#6d49e0] to-sky-600 text-lg text-white shadow-[0_10px_24px_rgba(109,40,217,0.25)]">◇</span>
+          <h2 id="reveal-open-title" className="mt-4 text-2xl font-semibold text-[#0b1f3a]">{prompt.content.title[locale]}</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[#5f5e7a]">{t("openHint")}</p>
           <form action={openReadMyMindRevealAction.bind(null, teamId, roundId, position)} className="mt-7">
-            <button type="submit" className="min-h-12 w-full rounded-xl brand-cta px-6 py-3 text-sm font-semibold transition-[transform,box-shadow] duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl motion-safe:active:translate-y-0 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 sm:w-auto">{t("open")}</button>
+            <button type="submit" className="min-h-12 w-full rounded-xl brand-cta px-6 py-3 text-sm font-semibold transition-[transform,box-shadow] duration-200 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl motion-safe:active:translate-y-0 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2 sm:w-auto">{t("open")}</button>
           </form>
           </div>
         </section>
       ) : reveal ? (
         <div id="opened-reveal" className="rmm-reveal-content mt-6 grid gap-6" tabIndex={-1}>
-          <section className="rmm-reveal-panel rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50/90 to-white p-5 shadow-[0_16px_38px_rgba(76,29,149,0.07)] sm:p-7" aria-labelledby="own-perspective-title">
-            <h2 id="own-perspective-title" className="text-xl font-semibold text-slate-950">{t("ownSelf")}</h2>
+          <section className="rmm-reveal-panel rounded-[24px] border border-[#d9cff8] bg-gradient-to-br from-[#f5f2fe]/90 to-white p-5  sm:p-7" aria-labelledby="own-perspective-title">
+            <h2 id="own-perspective-title" className="text-xl font-semibold text-[#0b1f3a]">{t("ownSelf")}</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <article className="rounded-[22px] bg-white p-5 shadow-sm ring-1 ring-violet-200"><h3 className="text-sm font-semibold text-violet-900">{t("ownSelf")}</h3><ChoiceList keys={reveal.ownPerspective.self} contract={prompt.content.selfGuess} locale={locale} /></article>
-              <article className="rounded-[22px] bg-amber-50/80 p-5 shadow-sm ring-1 ring-amber-200"><h3 className="text-sm font-semibold text-amber-950">{t("partnerGuess", { name: partnerName })}</h3><ChoiceList keys={reveal.ownPerspective.partnerGuess} contract={prompt.content.selfGuess} locale={locale} /></article>
+              <article className="rounded-[22px] bg-white p-5 shadow-sm ring-1 ring-[#d9cff8]"><h3 className="text-sm font-semibold text-[#3a2394]">{t("ownSelf")}</h3><ChoiceList keys={reveal.ownPerspective.self} contract={prompt.content.selfGuess} locale={locale} /></article>
+              <article className="rounded-[22px] bg-[#eef6fc]/80 p-5 shadow-sm ring-1 ring-[#c9e0f2]"><h3 className="text-sm font-semibold text-[#0b5a8a]">{t("partnerGuess", { name: partnerName })}</h3><ChoiceList keys={reveal.ownPerspective.partnerGuess} contract={prompt.content.selfGuess} locale={locale} /></article>
             </div>
             <ComparisonLabel tone={comparisonTone(reveal.ownPerspective.exact)}>{comparison(reveal.ownPerspective.exact)}</ComparisonLabel>
           </section>
 
-          <section className="rmm-reveal-panel rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50/90 to-white p-5 shadow-[0_16px_38px_rgba(146,64,14,0.06)] sm:p-7" aria-labelledby="partner-perspective-title">
-            <h2 id="partner-perspective-title" className="text-xl font-semibold text-slate-950">{t("partnerSelf", { name: partnerName })}</h2>
+          <section className="rmm-reveal-panel rounded-[24px] border border-[#c9e0f2] bg-gradient-to-br from-[#eef6fc]/90 to-white p-5  sm:p-7" aria-labelledby="partner-perspective-title">
+            <h2 id="partner-perspective-title" className="text-xl font-semibold text-[#0b1f3a]">{t("partnerSelf", { name: partnerName })}</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <article className="rounded-[22px] bg-white p-5 shadow-sm ring-1 ring-amber-200"><h3 className="text-sm font-semibold text-amber-950">{t("partnerSelf", { name: partnerName })}</h3><ChoiceList keys={reveal.partnerPerspective.self} contract={prompt.content.selfGuess} locale={locale} /></article>
-              <article className="rounded-[22px] bg-violet-50/80 p-5 shadow-sm ring-1 ring-violet-200"><h3 className="text-sm font-semibold text-violet-900">{t("ownGuess", { name: partnerName })}</h3><ChoiceList keys={reveal.partnerPerspective.ownGuess} contract={prompt.content.selfGuess} locale={locale} /></article>
+              <article className="rounded-[22px] bg-white p-5 shadow-sm ring-1 ring-[#c9e0f2]"><h3 className="text-sm font-semibold text-[#0b5a8a]">{t("partnerSelf", { name: partnerName })}</h3><ChoiceList keys={reveal.partnerPerspective.self} contract={prompt.content.selfGuess} locale={locale} /></article>
+              <article className="rounded-[22px] bg-[#f5f2fe]/80 p-5 shadow-sm ring-1 ring-[#d9cff8]"><h3 className="text-sm font-semibold text-[#3a2394]">{t("ownGuess", { name: partnerName })}</h3><ChoiceList keys={reveal.partnerPerspective.ownGuess} contract={prompt.content.selfGuess} locale={locale} /></article>
             </div>
             <ComparisonLabel tone={comparisonTone(reveal.partnerPerspective.exact)}>{comparison(reveal.partnerPerspective.exact)}</ComparisonLabel>
           </section>
 
-          {reveal.needs && prompt.content.need ? <section className="rmm-reveal-panel rounded-[28px] border border-slate-200 bg-slate-50/65 p-5 sm:p-7" aria-labelledby="needs-reveal-title"><h2 id="needs-reveal-title" className="text-xl font-semibold text-slate-950">{t("needsTitle")}</h2><div className="mt-5 grid gap-4 md:grid-cols-2"><article className="rounded-[22px] bg-white p-5 ring-1 ring-slate-200"><h3 className="text-sm font-semibold text-violet-900">{t("ownNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.own} contract={prompt.content.need} locale={locale} /></article><article className="rounded-[22px] bg-white p-5 ring-1 ring-slate-200"><h3 className="text-sm font-semibold text-amber-950">{t("partnerNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.partner} contract={prompt.content.need} locale={locale} /></article></div></section> : null}
+          {reveal.needs && prompt.content.need ? <section className="rmm-reveal-panel rounded-[24px] border border-[#e4e2f0] bg-[#f7f6fb]/65 p-5 sm:p-7" aria-labelledby="needs-reveal-title"><h2 id="needs-reveal-title" className="text-xl font-semibold text-[#0b1f3a]">{t("needsTitle")}</h2><div className="mt-5 grid gap-4 md:grid-cols-2"><article className="rounded-[22px] bg-white p-5 ring-1 ring-[#e4e2f0]"><h3 className="text-sm font-semibold text-[#3a2394]">{t("ownNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.own} contract={prompt.content.need} locale={locale} /></article><article className="rounded-[22px] bg-white p-5 ring-1 ring-[#e4e2f0]"><h3 className="text-sm font-semibold text-[#0b5a8a]">{t("partnerNeed", { name: partnerName })}</h3><ChoiceList keys={reveal.needs.partner} contract={prompt.content.need} locale={locale} /></article></div></section> : null}
 
-          <p className="rounded-2xl bg-slate-50 px-5 py-4 text-center text-sm leading-6 text-slate-600">{t("reflection")}</p>
-          <section id="conversation-marker" className="rmm-reveal-panel scroll-mt-24 rounded-[22px] border border-violet-200 bg-violet-50/60 p-5" aria-labelledby="conversation-marker-title">
-            <div className="flex items-start gap-3"><span aria-hidden="true" className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${ownMarked ? "border-violet-600 bg-violet-600 text-white" : "border-violet-200 bg-white text-violet-700"}`}><svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 5.75h14v9.5H10l-4.5 3v-3H5z" strokeLinecap="round" strokeLinejoin="round" /></svg></span><div><h2 id="conversation-marker-title" className="text-lg font-semibold text-slate-950">{t("conversationMarkerTitle")}</h2>
-            {ownMarked ? <p className="mt-2 text-sm font-semibold text-violet-900">{t("markedConversation")}</p> : null}
-            {markerStatus ? <p className="mt-2 text-sm font-medium text-violet-900">{markerStatus}</p> : null}
-            <p className="mt-2 text-sm leading-6 text-slate-600">{t("sharedVisibility")}</p></div></div>
+          <p className="rounded-2xl bg-[#f7f6fb] px-5 py-4 text-center text-sm leading-6 text-[#5f5e7a]">{t("reflection")}</p>
+          <section id="conversation-marker" className="rmm-reveal-panel scroll-mt-24 rounded-[22px] border border-[#d9cff8] bg-[#f5f2fe]/60 p-5" aria-labelledby="conversation-marker-title">
+            <div className="flex items-start gap-3"><span aria-hidden="true" className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${ownMarked ? "border-[#6d49e0] bg-[#6d49e0] text-white" : "border-[#d9cff8] bg-white text-[#4a2fb8]"}`}><svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 5.75h14v9.5H10l-4.5 3v-3H5z" strokeLinecap="round" strokeLinejoin="round" /></svg></span><div><h2 id="conversation-marker-title" className="text-lg font-semibold text-[#0b1f3a]">{t("conversationMarkerTitle")}</h2>
+            {ownMarked ? <p className="mt-2 text-sm font-semibold text-[#3a2394]">{t("markedConversation")}</p> : null}
+            {markerStatus ? <p className="mt-2 text-sm font-medium text-[#3a2394]">{markerStatus}</p> : null}
+            <p className="mt-2 text-sm leading-6 text-[#5f5e7a]">{t("sharedVisibility")}</p></div></div>
             <form action={(ownMarked ? unmarkReadMyMindConversationAction : markReadMyMindConversationAction).bind(null, teamId, roundId, position, prompt.roundPromptId)} className="mt-4">
               {/* Schaltet sofort um - Begruendung in ConversationMarkerButton.tsx. */}
               <ConversationMarkerButton
                 marked={ownMarked}
                 markLabel={t("markConversation")}
                 unmarkLabel={t("unmarkConversation")}
-                className="min-h-11 rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900 shadow-sm transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-violet-100 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                className="min-h-11 rounded-xl border border-[#b9a8f0] bg-white px-4 py-2 text-sm font-semibold text-[#3a2394] shadow-sm transition-[transform,background-color] motion-safe:hover:-translate-y-0.5 motion-safe:hover:bg-[#efeafd] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2"
               />
             </form>
           </section>
-          {next === undefined ? <section className="rounded-[28px] border border-violet-200 bg-violet-50 p-6 text-center"><h2 className="text-2xl font-semibold text-slate-950">{t(round.status === "completed" ? "completedTitle" : "allSeenTitle")}</h2><p className="mt-3 text-sm leading-7 text-slate-700">{t(round.status === "completed" ? "completedText" : "allSeenText")}</p></section> : null}
+          {next === undefined ? <section className="rounded-[24px] border border-[#d9cff8] bg-[#f5f2fe] p-6 text-center"><h2 className="text-2xl font-semibold text-[#0b1f3a]">{t(round.status === "completed" ? "completedTitle" : "allSeenTitle")}</h2><p className="mt-3 text-sm leading-7 text-[#33325e]">{t(round.status === "completed" ? "completedText" : "allSeenText")}</p></section> : null}
           <nav className="flex flex-wrap items-center justify-between gap-3" aria-label={t("progress", { current: position + 1, total: round.prompts.length })}>
-            {previous !== undefined ? <Link prefetch={false} href={`${revealHref}/${previous}`} className="min-h-11 px-3 py-3 text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-slate-400">{t("previous")}</Link> : <span />}
-            {next !== undefined ? (round.openedPromptPositions.includes(next) ? <Link prefetch={false} href={`${revealHref}/${next}`} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("next")}</Link> : /* Deckt auf UND geht hin - siehe founder-in-the-wild/reveal/[position]. */ <form action={openReadMyMindRevealAction.bind(null, teamId, roundId, next)}><SubmitButton label={t("nextAndOpen")} pendingLabel={t("opening")} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2" /></form>) : round.status === "completed" ? <Link href={revealHref} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold">{t("roundOverview")}</Link> : <form action={completeReadMyMindRoundAction.bind(null, teamId, roundId)}><button type="submit" className="min-h-11 rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">{t("complete")}</button></form>}
+            {previous !== undefined ? <Link prefetch={false} href={`${revealHref}/${previous}`} className="min-h-11 px-3 py-3 text-sm font-medium text-[#5f5e7a] underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-[#8b89aa]">{t("previous")}</Link> : <span />}
+            {next !== undefined ? (round.openedPromptPositions.includes(next) ? <Link prefetch={false} href={`${revealHref}/${next}`} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{t("next")}</Link> : /* Deckt auf UND geht hin - siehe founder-in-the-wild/reveal/[position]. */ <form action={openReadMyMindRevealAction.bind(null, teamId, roundId, next)}><SubmitButton label={t("nextAndOpen")} pendingLabel={t("opening")} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2" /></form>) : round.status === "completed" ? <Link href={revealHref} className="inline-flex min-h-11 items-center rounded-xl brand-cta px-5 py-3 text-sm font-semibold">{t("roundOverview")}</Link> : <form action={completeReadMyMindRoundAction.bind(null, teamId, roundId)}><button type="submit" className="min-h-11 rounded-xl brand-cta px-5 py-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{t("complete")}</button></form>}
           </nav>
         </div>
       ) : notFound()}

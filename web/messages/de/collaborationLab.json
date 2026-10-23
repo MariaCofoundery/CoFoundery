@@ -82,7 +82,8 @@
     },
     "start": "Runde starten",
     "unsupported": "Read My Mind findet zwischen zwei Personen statt. Für größere Teams ist noch keine Paarauswahl verfügbar.",
-    "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder."
+    "unsupportedTeamSize": "Eine neue Read-My-Mind-Runde braucht genau zwei aktuelle Founder.",
+    "choosePerspective": "Wählt eine Perspektive"
   },
   "round": {
     "back": "Zur Teamübersicht",

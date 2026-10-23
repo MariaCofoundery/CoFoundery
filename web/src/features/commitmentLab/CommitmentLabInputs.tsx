@@ -47,7 +47,7 @@ export function CommitmentLabMarkerToggle({ marker }: { marker: CommitmentLabDis
   const checked = context.markers.has(marker);
   const disabled = !checked && context.markers.size >= 3;
   return (
-    <label className={`mt-2 inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${checked ? "border-violet-300 bg-violet-50 text-violet-900" : "border-slate-200 bg-white text-slate-600"} ${disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer"}`}>
+    <label className={`mt-2 inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${checked ? "border-[#b9a8f0] bg-[#f5f2fe] text-[#3a2394]" : "border-[#e4e2f0] bg-white text-[#5f5e7a]"} ${disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer"}`}>
       <input
         type="checkbox"
         name="discussionMarkers"
@@ -55,7 +55,7 @@ export function CommitmentLabMarkerToggle({ marker }: { marker: CommitmentLabDis
         checked={checked}
         disabled={disabled}
         onChange={() => context.toggle(marker)}
-        className="h-4 w-4 rounded border-slate-300 text-violet-700 focus:ring-violet-500"
+        className="h-4 w-4 rounded border-[#d8d5ea] text-[#4a2fb8] focus:ring-[#6d49e0]"
       />
       {t("toggle")}
     </label>
@@ -103,13 +103,13 @@ export function CommitmentLabSpeechTextarea({
   }
   return (
     <div className="mt-2">
-      <textarea id={id} name={name} value={text} onChange={(event) => setText(event.target.value)} maxLength={5000} rows={rows} placeholder={placeholder} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-950 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200" />
+      <textarea id={id} name={name} value={text} onChange={(event) => setText(event.target.value)} maxLength={5000} rows={rows} placeholder={placeholder} className="w-full rounded-xl border border-[#d8d5ea] bg-white px-3 py-3 text-sm text-[#0b1f3a] focus:border-[#5f5e7a] focus:outline-none focus:ring-2 focus:ring-[#e4e2f0]" />
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={toggle} aria-pressed={listening} className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+        <button type="button" onClick={toggle} aria-pressed={listening} className="min-h-10 rounded-lg border border-[#d8d5ea] bg-white px-3 py-2 text-sm font-medium text-[#33325e] hover:bg-[#f7f6fb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
           {listening ? t("stop") : t("start")}
         </button>
-        {listening ? <span role="status" className="text-xs text-slate-600">{t("listening")}</span> : null}
-        {unavailable ? <span role="status" className="text-xs text-slate-600">{t("unavailable")}</span> : null}
+        {listening ? <span role="status" className="text-xs text-[#5f5e7a]">{t("listening")}</span> : null}
+        {unavailable ? <span role="status" className="text-xs text-[#5f5e7a]">{t("unavailable")}</span> : null}
       </div>
     </div>
   );

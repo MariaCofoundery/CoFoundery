@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { getReadMyMindHomebaseState } from "@/features/collaborationLab/readMyMindData";
 import type { ReadMyMindTeamContext } from "@/features/collaborationLab/readMyMindModel";
+import { IconTile } from "@/features/ui/Icons";
 import { createClient } from "@/lib/supabase/server";
 
 export async function ReadMyMindHomebaseCard({ team, currentUserId }: { team: ReadMyMindTeamContext; currentUserId: string }) {
@@ -31,18 +32,19 @@ export async function ReadMyMindHomebaseCard({ team, currentUserId }: { team: Re
   // Sammeltitel mehr ("Zusammenarbeit staerken") ueber der einen Erfahrung,
   // keine Verlaufsflaeche. Zustand, Aktionen und Anker sind unveraendert.
   return (
-    <section id="collaboration-lab" className="scroll-mt-24 flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="collaboration-lab-title">
-      <div className="flex flex-wrap items-center gap-2">
-        <h3 id="collaboration-lab-title" className="text-base font-semibold text-slate-950">{t("experience")}</h3>
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-medium text-slate-600">{t("betaLabel")}</span>
+    <section id="collaboration-lab" className="card-lift scroll-mt-24 flex h-full flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="collaboration-lab-title">
+      <div className="flex items-center justify-between gap-2">
+        <IconTile name="chat" tone="violet" />
+        <span className="rounded-full bg-[#fdecc8] px-2.5 py-0.5 text-[13px] font-semibold text-[#7a4300]">{t("betaLabel")}</span>
       </div>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{t("experienceDescription")}</p>
-      <p className="mt-3 text-sm font-medium text-slate-800">{status}</p>
-      {state.kind === "reveal_waiting" ? <p className="mt-1 text-xs leading-5 text-slate-500">{t("revealWaitingText")}</p> : null}
+      <h3 id="collaboration-lab-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("experience")}</h3>
+      <p className="text-sm leading-[1.55] text-[#5f5e7a]">{t("experienceDescription")}</p>
+      <p className="self-start rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]">{status}</p>
+      {state.kind === "reveal_waiting" ? <p className="text-[13px] leading-5 text-[#5f5e7a]">{t("revealWaitingText")}</p> : null}
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
-        {state.kind !== "unsupported" ? <Link href={href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{action}</Link> : null}
-        {state.kind !== "start" && state.kind !== "unsupported" ? <Link href={entry} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("action.allPacks")}</Link> : null}
-        {historicalRound ? <Link prefetch={false} href={`${entry}/${encodeURIComponent(historicalRound.id)}/reveal`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("action.reviewCompleted")}</Link> : null}
+        {state.kind !== "unsupported" ? <Link href={href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{action}</Link> : null}
+        {state.kind !== "start" && state.kind !== "unsupported" ? <Link href={entry} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{t("action.allPacks")}</Link> : null}
+        {historicalRound ? <Link prefetch={false} href={`${entry}/${encodeURIComponent(historicalRound.id)}/reveal`} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{t("action.reviewCompleted")}</Link> : null}
       </div>
     </section>
   );
