@@ -37,6 +37,12 @@ export default async function RadarLayout({
         </Link>
         <Link
           className="inline-flex min-h-11 items-center"
+          href={`${radarRoot}/board`}
+        >
+          {t("board.title")}
+        </Link>
+        <Link
+          className="inline-flex min-h-11 items-center"
           href={`${radarRoot}/hypotheses`}
         >
           {t("hypotheses.title")}

@@ -56,5 +56,21 @@
     "closed": "Close"
   },
   "administration": "Administration",
-  "administrationIntro": "Everything only platform admins see: moderation, highlights, the problem radar and research analysis."
+  "administrationIntro": "Everything only platform admins see: moderation, highlights, the problem radar and research analysis.",
+  "reminder": {
+    "eyebrow": "Every week",
+    "title": "Asked Claude about problems this week yet?",
+    "doneTitle": "Done this week",
+    "text": "The internet does not scan itself: what is explicitly allowed is not productive enough. Ask Claude for the research in a session instead. You get about ten finds with a link and a summary in its own words, and take over what fits as a signal.",
+    "promptLabel": "Suggestion to copy",
+    "prompt": "Find me publicly discussed annoyances and problems around how co-founders and small teams work together this week. At most ten finds, each with a link, one sentence in your own words on what is annoying, and how sure you are that it is a real, recurring problem. No names, no quotes.",
+    "copy": "Copy text",
+    "copied": "Copied.",
+    "copyFailed": "Copying is not possible, select the text in the field.",
+    "markDone": "Done for this week",
+    "undo": "Not done after all",
+    "saving": "Saving …",
+    "doneText": "Done on {date}. From Monday the reminder returns.",
+    "lastTime": "Last done on {date}."
+  }
 }

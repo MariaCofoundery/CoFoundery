@@ -214,5 +214,13 @@
       "reviewed": "Geprüft",
       "archived": "Archiviert"
     }
+  },
+  "board": {
+    "title": "Problembrett",
+    "intro": "Die Probleme, die Mitglieder eingestellt haben, nach Themen gebündelt. Nur was ohnehin jedes Mitglied lesen darf, ohne Namen. Die Themen stehen alphabetisch, nicht nach Häufigkeit, damit es keine Rangliste wird.",
+    "empty": "Noch keine aktiven Probleme.",
+    "untagged": "Ohne Thema",
+    "more": "… und {count} weitere",
+    "loadError": "Das ließ sich gerade nicht laden."
   }
 }

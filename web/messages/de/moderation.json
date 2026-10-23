@@ -56,5 +56,21 @@
     "closed": "Schließen"
   },
   "administration": "Administration",
-  "administrationIntro": "Hier steht, was nur Plattform-Admins sehen: Moderation, Highlights, das Problem-Radar und die Auswertung."
+  "administrationIntro": "Hier steht, was nur Plattform-Admins sehen: Moderation, Highlights, das Problem-Radar und die Auswertung.",
+  "reminder": {
+    "eyebrow": "Jede Woche",
+    "title": "Schon diese Woche Claude nach Problemen gefragt?",
+    "doneTitle": "Diese Woche erledigt",
+    "text": "Das Internet scannt sich nicht von allein: Was ausdrücklich erlaubt ist, gibt es nicht ergiebig genug. Bitte stattdessen Claude in einer Sitzung um die Recherche. Du bekommst etwa zehn Funde mit Link und Zusammenfassung in eigenen Worten und übernimmst, was passt, als Signal.",
+    "promptLabel": "Vorschlag zum Kopieren",
+    "prompt": "Such mir diese Woche öffentlich diskutierte Ärgernisse und Probleme rund um die Zusammenarbeit von Mitgründer:innen und kleinen Teams. Höchstens zehn Funde, jeweils mit Link, einem Satz in deinen eigenen Worten, was nervt, und wie sicher du bist, dass es ein echtes, wiederkehrendes Problem ist. Keine Namen, keine Zitate.",
+    "copy": "Text kopieren",
+    "copied": "Kopiert.",
+    "copyFailed": "Kopieren nicht möglich, markiere den Text im Feld.",
+    "markDone": "Erledigt für diese Woche",
+    "undo": "Doch nicht erledigt",
+    "saving": "Speichert …",
+    "doneText": "Erledigt am {date}. Ab Montag erinnert dich das Feld wieder.",
+    "lastTime": "Zuletzt erledigt am {date}."
+  }
 }

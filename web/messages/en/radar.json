@@ -214,5 +214,13 @@
       "reviewed": "Reviewed",
       "archived": "Archived"
     }
+  },
+  "board": {
+    "title": "Problem board",
+    "intro": "The problems members posted, grouped by topic. Only what every member may read anyway, without names. Topics are alphabetical, not by frequency, so it does not become a ranking.",
+    "empty": "No active problems yet.",
+    "untagged": "No topic",
+    "more": "… and {count} more",
+    "loadError": "This could not be loaded just now."
   }
 }
