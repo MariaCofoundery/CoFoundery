@@ -82,6 +82,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await getRequestUser();
 
+  // Nur fuer die Darstellung des Menueeintrags "Admin". Wer es nicht ist oder wenn die
+  // Abfrage scheitert, sieht ihn nicht; der Zugang selbst liegt auf den Admin-Seiten.
+  const isPlatformAdmin = user?.id
+    ? await Promise.resolve(supabase.rpc("is_platform_admin")).then(({ data }) => data === true).catch(() => false)
+    : false;
+
   const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, connectSuggestionCount] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
@@ -152,6 +158,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             unreadConnectMessageCount={unreadConnectMessageCount}
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}
+            isPlatformAdmin={isPlatformAdmin}
             storedWorkContext={storedWorkContext}
           >
             {children}

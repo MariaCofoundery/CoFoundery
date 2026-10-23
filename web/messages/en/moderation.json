@@ -55,5 +55,6 @@
     "reviewed": "Mark as reviewed",
     "closed": "Close"
   },
-  "administration": "Administration"
+  "administration": "Administration",
+  "administrationIntro": "Everything only platform admins see: moderation, highlights, the problem radar and research analysis."
 }

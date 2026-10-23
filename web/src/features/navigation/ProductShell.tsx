@@ -40,6 +40,8 @@ type Props = {
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
   researchConsentState: ResearchConsentState;
+  /** Nur Darstellung: ob der Menueeintrag "Admin" erscheint. Der Zugang selbst wird auf /admin serverseitig geprueft. */
+  isPlatformAdmin?: boolean;
   /** Zuletzt genutzter Arbeitskontext aus dem Cookie - nur Darstellung, siehe workContext.ts. */
   storedWorkContext?: WorkContext | null;
 };
@@ -242,6 +244,7 @@ export function ProductShell({
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
+  isPlatformAdmin = false,
   storedWorkContext: initialStoredWorkContext = null,
 }: Props) {
   const pathname = usePathname();
@@ -773,6 +776,7 @@ export function ProductShell({
                   avatarId={avatarId}
                   avatarImageUrl={avatarImageUrl}
                   accountOnly={isSuspendedConnectOnly}
+                  isPlatformAdmin={isPlatformAdmin}
                   showName={!(hasFounder && hasAdvisor)}
                 />
               </div>
@@ -898,6 +902,11 @@ export function ProductShell({
                 <MobileMenuLink href="/account" active={pathname.startsWith("/account")} onNavigate={closeMenu}>
                   {t("account")}
                 </MobileMenuLink>
+                {isPlatformAdmin ? (
+                  <MobileMenuLink href="/admin" active={pathname === "/admin" || pathname.startsWith("/admin/")} onNavigate={closeMenu}>
+                    {t("admin")}
+                  </MobileMenuLink>
+                ) : null}
                 <ProductFeedbackEntry
                   source="nav"
                   invitationId={resolvedFeedbackInvitationId}
@@ -1039,12 +1048,14 @@ function ProfileMenu({
   avatarId,
   avatarImageUrl,
   accountOnly,
+  isPlatformAdmin = false,
   showName = true,
 }: {
   displayName: string | null;
   avatarId: string | null;
   avatarImageUrl: string | null;
   accountOnly: boolean;
+  isPlatformAdmin?: boolean;
   showName?: boolean;
 }) {
   const t = useTranslations("navigation");
@@ -1140,6 +1151,16 @@ function ProfileMenu({
           >
             {t("account")}
           </Link>
+          {isPlatformAdmin ? (
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+              role="menuitem"
+            >
+              {t("admin")}
+            </Link>
+          ) : null}
           <form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>
             <button
               type="submit"

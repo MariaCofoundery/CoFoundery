@@ -9,6 +9,7 @@ export function isProductChromePath(pathname: string) {
     pathname === "/dashboard" ||
     pathname === "/team-intake" || pathname.startsWith("/team-intake/") ||
     pathname === "/account" ||
+    pathname === "/admin" ||
     pathname === "/admin/moderation" ||
     pathname === "/admin/highlights" ||
     // Praefix, nicht exakt: /profile hat Unterseiten (der Vergleich), und die

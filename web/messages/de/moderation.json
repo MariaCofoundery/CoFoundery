@@ -55,5 +55,6 @@
     "reviewed": "Als geprüft markieren",
     "closed": "Schließen"
   },
-  "administration": "Administration"
+  "administration": "Administration",
+  "administrationIntro": "Hier steht, was nur Plattform-Admins sehen: Moderation, Highlights, das Problem-Radar und die Auswertung."
 }
