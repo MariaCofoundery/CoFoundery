@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
 import { getConnectFeed, getConnectFilterOptions } from "@/features/connect/connectFeedData";
+import { CONNECT_PLACES, CONNECT_TOPICS, mergeSuggestions } from "@/features/connect/connectFilterCatalog";
 import { DEFAULT_FEED_KINDS, FEED_KINDS, FEED_WORK, parseFeedKinds, parseFeedWork } from "@/features/connect/connectFeedModel";
 import { ConnectFeedRow } from "@/features/connect/ConnectFeedRow";
 import { HighlightConsentPrompt } from "@/features/connect/HighlightConsentPrompt";
@@ -32,6 +33,8 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
     Object.entries(rawFilters).map(([key, value]) => [key, Array.isArray(value) ? value.join(",") : value]),
   );
   const selectedKinds = parseFeedKinds(filters.art);
+  const topicSuggestions: string[] = [];
+  const placeSuggestions: string[] = [];
   const selectedWork = parseFeedWork(filters.work);
   // Ist ueberhaupt etwas eingegrenzt? Entscheidet, welcher Leerzustand gilt.
   const isFiltered = ["q", "topic", "location", "work"].some((key) => (filters[key] ?? "").trim().length > 0)
@@ -44,6 +47,8 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
     // er erreichen soll. Das Wochenbudget von drei gilt unveraendert; ist es
     // aufgebraucht, kehrt der Aufruf nach einer Zaehlung zurueck.
     generateConnectSuggestions(client)]);
+  topicSuggestions.push(...mergeSuggestions(CONNECT_TOPICS.map((entry) => entry.label), filterOptions.topics));
+  placeSuggestions.push(...mergeSuggestions(CONNECT_PLACES.map((entry) => entry.label), filterOptions.locations));
   const listings = feed.entries;
 
   // "Fuer dich": hoechstens die drei neuesten offenen Vorschlaege als Streifen oben. Lesen allein - erzeugt
@@ -129,10 +134,12 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
                   </label>)}
                 </fieldset>
                 <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("feed.topic")}
-                  <select name="topic" defaultValue={filters.topic || ""} className={selectField}><option value="">{t("feed.topicAll")}</option>{filterOptions.topics.map((topic) => <option key={topic} value={topic}>{topic}</option>)}</select>
+                  <input name="topic" list="connect-topics" defaultValue={filters.topic || ""} autoComplete="off" placeholder={t("feed.topicPlaceholder")} className={selectField} />
+                  <datalist id="connect-topics">{topicSuggestions.map((topic) => <option key={topic} value={topic} />)}</datalist>
                 </label>
                 <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("feed.place")}
-                  <select name="location" defaultValue={filters.location || ""} className={selectField}><option value="">{t("feed.placeAll")}</option>{filterOptions.locations.map((place) => <option key={place} value={place}>{place}</option>)}</select>
+                  <input name="location" list="connect-places" defaultValue={filters.location || ""} autoComplete="off" placeholder={t("feed.placePlaceholder")} className={selectField} />
+                  <datalist id="connect-places">{placeSuggestions.map((place) => <option key={place} value={place} />)}</datalist>
                 </label>
                 <fieldset className="grid gap-1">
                   <legend className="mb-1 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("feed.work")}</legend>

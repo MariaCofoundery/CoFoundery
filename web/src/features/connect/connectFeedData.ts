@@ -13,6 +13,7 @@ import {
   topValues,
   workToRemoteModes,
 } from "@/features/connect/connectFeedModel";
+import { topicTerms } from "@/features/connect/connectFilterCatalog";
 import type { ConnectListing, ConnectProblem, ConnectProfile, ConnectVenture } from "@/features/connect/connectTypes";
 
 type Client = SupabaseClient;
@@ -30,11 +31,13 @@ export type ConnectFeedEntry =
  * gesperrte Konten, Blockaden) bleibt damit dort, wo sie schon geprueft wird.
  * Hier wird nur zusammengefuehrt und nach Aktualitaet sortiert.
  *
- * WER EIN ATTRIBUT NICHT HAT, FAELLT BEI DEM FILTER RAUS: Thema und Ort gibt es
- * bei Gesuchen, Angeboten und Problemen (bei Menschen als Fachgebiet und
- * Region), Arbeitsort nur bei Gesuchen und Angeboten. Wer danach filtert, sieht
- * nur, was dazu eine Angabe hat - ein Unternehmen ohne Ort steht nicht
- * "irgendwo".
+ * THEMA UND ORT SIND TEXTSUCHEN, keine festen Kennungen: Eintraege in Connect sind
+ * Freitext, und die Auswahl im Filter (connectFilterCatalog.ts) faltet nur auf
+ * mehrere Suchbegriffe auf ("Bayern" findet auch "Muenchen"). Thema gilt fuer
+ * alle Arten, Ort fuer Gesuche, Angebote, Probleme und Menschen (deren Region).
+ * WER EIN ATTRIBUT NICHT HAT, FAELLT BEI DEM FILTER RAUS: Unternehmen haben
+ * keinen Ort, Arbeitsort gibt es nur bei Gesuchen und Angeboten - wer danach
+ * filtert, sieht nur, was dazu eine Angabe hat.
  */
 export async function getConnectFeed(client: Client, filters: Record<string, string | undefined>) {
   const kinds = parseFeedKinds(filters.art);
@@ -43,6 +46,7 @@ export async function getConnectFeed(client: Client, filters: Record<string, str
   const q = (filters.q ?? "").trim();
   const topic = (filters.topic ?? "").trim();
   const location = (filters.location ?? "").trim();
+  const topicTermList = topicTerms(topic);
   const page = Math.min(connectPage(filters.page), FEED_MAX_PAGES);
   const pages = Array.from({ length: page }, (_, index) => String(index + 1));
 
@@ -54,24 +58,27 @@ export async function getConnectFeed(client: Client, filters: Record<string, str
   const [listingPages, problemPages, peoplePages, venturePages] = await Promise.all([
     wantSeeking || wantOffering
       ? Promise.all(pages.map((p) => getActiveConnectListings(client, {
-          q, topic, location, direction, page: p, remote_modes: remoteModes?.join(",") ?? undefined,
+          q, topic_text: topic, place_text: location, direction, page: p, remote_modes: remoteModes?.join(",") ?? undefined,
         })))
       : [],
     kinds.includes("problem") && !workFiltered
-      ? Promise.all(pages.map((p) => getActiveConnectProblems(client, { q, topic, location, page: p })))
+      ? Promise.all(pages.map((p) => getActiveConnectProblems(client, { q, topic_text: topic, place_text: location, page: p })))
       : [],
     kinds.includes("person") && !workFiltered
-      ? Promise.all(pages.map((p) => getConnectPeople(client, "", { q, expertise: topic, region: location, page: p })))
+      ? Promise.all(pages.map((p) => getConnectPeople(client, "", { q: q || topic, region: location, page: p })))
       : [],
-    kinds.includes("venture") && !workFiltered && !topic && !location
-      ? Promise.all(pages.map((p) => getActiveConnectVentures(client, q, p)))
+    kinds.includes("venture") && !workFiltered && !location
+      ? Promise.all(pages.map((p) => getActiveConnectVentures(client, q || topic, p)))
       : [],
   ]);
 
   const listings = listingPages.flat();
   const problems = problemPages.flat();
-  const people = peoplePages.flat();
-  const ventures = venturePages.flat();
+  // Mit Suchwort UND Thema sucht die Abfrage nach dem Suchwort; das Thema trifft hier nachtraeglich.
+  const matchesTopic = (...texts: Array<string | string[] | null | undefined>) =>
+    !topic || !q || topicTermList.some((term) => texts.flat().join(" ").toLowerCase().includes(term));
+  const people = peoplePages.flat().filter((p) => matchesTopic(p.display_name, p.headline, p.bio, p.expertise, p.industries));
+  const ventures = venturePages.flat().filter((v) => matchesTopic(v.name, v.what_it_does, v.audience));
 
   const merged = pickFeedPage(
     [
@@ -98,7 +105,7 @@ export async function getConnectFeed(client: Client, filters: Record<string, str
   return { entries, hasMore: merged.hasMore, page };
 }
 
-/** Die haeufigsten Themen und Orte der laufenden Eintraege - fuer die beiden Auswahlfelder. */
+/** Die haeufigsten Themen und Orte der laufenden Eintraege - sie ergaenzen den Katalog in den Vorschlaegen. */
 export async function getConnectFilterOptions(client: Client) {
   const [listings, problems] = await Promise.all([
     client.from("connect_discovery_listings").select("topics, locations").eq("status", "active").gt("expires_at", new Date().toISOString()).limit(400),
@@ -106,7 +113,7 @@ export async function getConnectFilterOptions(client: Client) {
   ]);
   const rows = [...(listings.data ?? []), ...(problems.data ?? [])] as Array<{ topics: string[] | null; locations: string[] | null }>;
   return {
-    topics: topValues(rows.map((row) => row.topics), 40),
-    locations: topValues(rows.map((row) => row.locations), 40),
+    topics: topValues(rows.map((row) => row.topics), 60),
+    locations: topValues(rows.map((row) => row.locations), 60),
   };
 }

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { cronState, daysSince } from "@/features/admin/adminOverviewModel";
+import { isMissingDatabaseFunction } from "@/features/admin/rpcErrors";
 import { parseFeedbackTab } from "@/features/admin/feedbackTab";
 
 const source = (path: string) => readFileSync(path, "utf8");
@@ -49,4 +50,11 @@ test("Feedback wird pro Admin als gelesen gefuehrt und der Dialog nennt vorher, 
     assert.ok(JSON.parse(source(`messages/${locale}/feedback.json`)).nameNotice, `${locale}: Hinweis fehlt`);
   }
   assert.match(source("src/features/feedback/ProductFeedbackEntry.tsx"), /t\("nameNotice"\)/);
+});
+
+test("eine fehlende Datenbankfunktion ist ein eigener Fall und kein Lesefehler", () => {
+  assert.equal(isMissingDatabaseFunction({ code: "PGRST202", message: "Could not find the function public.admin_feedback_counts" }), true);
+  assert.equal(isMissingDatabaseFunction({ code: "42883" }), true);
+  assert.equal(isMissingDatabaseFunction({ code: "42501", message: "platform_admin_required" }), false);
+  assert.equal(isMissingDatabaseFunction(null), false);
 });

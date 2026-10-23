@@ -29,7 +29,8 @@
       "new": "Nichts Neues. Wenn Feedback hereinkommt, steht es hier.",
       "all": "Noch kein Feedback.",
       "read": "Noch nichts als gelesen markiert."
-    }
+    },
+    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie."
   },
   "overview": {
     "loadError": "Die Zahlen ließen sich gerade nicht laden.",
@@ -75,6 +76,7 @@
       "board": "Problembrett",
       "research": "Research",
       "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor."
-    }
+    },
+    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie."
   }
 }

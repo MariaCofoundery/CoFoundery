@@ -1022,6 +1022,8 @@
     },
     "workHint": "Applies to requests and offers only.",
     "resultMore": "The first {count} entries · newest first",
-    "result": "{count, plural, one {# entry} other {# entries}} · newest first"
+    "result": "{count, plural, one {# entry} other {# entries}} · newest first",
+    "topicPlaceholder": "Topic or keyword",
+    "placePlaceholder": "City or state"
   }
 }

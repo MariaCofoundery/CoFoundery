@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isMissingDatabaseFunction } from "@/features/admin/rpcErrors";
 import { markFeedbackReadAction } from "@/features/admin/adminFeedbackActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -53,7 +54,7 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page }: { cl
         </nav>
       </div>
 
-      {list.error ? <p role="alert" className="p-5 text-sm">{t("loadError")}</p> : rows.length === 0 ? (
+      {list.error ? <p role="alert" className="p-5 text-sm">{isMissingDatabaseFunction(list.error) || isMissingDatabaseFunction(counts.error) ? t("migrationMissing") : t("loadError")}</p> : rows.length === 0 ? (
         <p className="p-6 text-sm text-[#5f5e7a]">{t(`empty.${tab}`)}</p>
       ) : (
         <div className="grid md:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">

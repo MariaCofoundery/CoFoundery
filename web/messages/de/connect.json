@@ -1022,6 +1022,8 @@
     },
     "workHint": "Betrifft nur Gesuche und Angebote.",
     "resultMore": "Die ersten {count} Einträge · neueste zuerst",
-    "result": "{count, plural, one {# Eintrag} other {# Einträge}} · neueste zuerst"
+    "result": "{count, plural, one {# Eintrag} other {# Einträge}} · neueste zuerst",
+    "topicPlaceholder": "Thema oder Stichwort",
+    "placePlaceholder": "Stadt oder Bundesland"
   }
 }

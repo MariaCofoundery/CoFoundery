@@ -1,3 +1,4 @@
+import { orIlike, placeTerms, topicTerms } from "@/features/connect/connectFilterCatalog";
 import "server-only";
 import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 
@@ -39,6 +40,10 @@ export async function getActiveConnectProblems(
   if (filters.geographic_scope) query = query.eq("geographic_scope", filters.geographic_scope);
   if (filters.topic) query = query.contains("topics", [filters.topic]);
   if (filters.location) query = query.contains("locations", [filters.location]);
+  const topicOr = orIlike("search_text", topicTerms(filters.topic_text ?? ""));
+  if (topicOr) query = query.or(topicOr);
+  const placeOr = orIlike("search_text", placeTerms(filters.place_text ?? ""));
+  if (placeOr) query = query.or(placeOr);
 
   const term = (filters.q ?? "").trim();
   if (term) {

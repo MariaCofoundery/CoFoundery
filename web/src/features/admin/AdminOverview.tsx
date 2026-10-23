@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { markReminderDoneAction } from "@/features/moderation/adminReminderActions";
+import { isMissingDatabaseFunction } from "@/features/admin/rpcErrors";
 import { cronState, daysSince } from "@/features/admin/adminOverviewModel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -23,7 +24,7 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
     client.rpc("admin_dashboard_stats"),
     client.rpc("admin_reminder_status", { p_key: "db_dump" }),
   ]);
-  if (stats.error || !stats.data) return <p role="alert" className="text-sm">{t("loadError")}</p>;
+  if (stats.error || !stats.data) return <p role="alert" className="text-sm">{isMissingDatabaseFunction(stats.error) ? t("migrationMissing") : t("loadError")}</p>;
   const s = stats.data as Stats;
   const dumpDays = daysSince(typeof dump.data === "string" ? dump.data : null);
   const dumpState = dumpDays === null ? "never" : dumpDays >= 7 ? "late" : "ok";

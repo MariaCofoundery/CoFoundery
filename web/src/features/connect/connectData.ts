@@ -1,4 +1,5 @@
 import "server-only";
+import { orIlike, placeTerms, topicTerms } from "@/features/connect/connectFilterCatalog";
 import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ConnectBlockedMember, ConnectBlockState, ConnectContactRequest, ConnectConversation, ConnectListing, ConnectMessage, ConnectProfile } from "./connectTypes";
@@ -48,7 +49,11 @@ export async function getActiveConnectListings(client: Client, filters: Record<s
   if (isOneOf(CONNECT_REMOTE_MODES, filters.remote_mode)) query = query.eq("remote_mode", filters.remote_mode);
   if (isOneOf(CONNECT_GEOGRAPHIC_SCOPES, filters.geographic_scope)) query = query.eq("geographic_scope", filters.geographic_scope);
   if (filters.topic) query = query.contains("topics", [filters.topic]);
-  if (filters.location) query = query.contains("locations", [filters.location]);
+  // Thema und Ort der Uebersicht: Textsuche ueber mehrere Begriffe (siehe connectFilterCatalog.ts).
+  const topicOr = orIlike("search_text", topicTerms(filters.topic_text ?? ""));
+  if (topicOr) query = query.or(topicOr);
+  const placeOr = orIlike("search_text", placeTerms(filters.place_text ?? ""));
+  if (placeOr) query = query.or(placeOr);
   // Kommagetrennt: "Remote moeglich" schliesst hybrid und flexibel ein.
   if (filters.remote_modes) query = query.in("remote_mode", filters.remote_modes.split(",").filter((mode) => isOneOf(CONNECT_REMOTE_MODES, mode)));
   if (filters.industry) query = query.contains("industries", [filters.industry]);

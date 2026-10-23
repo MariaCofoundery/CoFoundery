@@ -25,17 +25,20 @@ test("browsing has a search box, not only structured filters", () => {
   }
 });
 
-test("the two inputs that looked like a search but demanded exactness are gone", () => {
+test("Thema and Ort are text fields with suggestions, and they match by contained text, not by exactness", () => {
   const page = source(PAGE);
-  // "Thema" und "Branche" waren Textfelder, prueften aber auf exakte
-  // Gleichheit mit einem Listeneintrag: Wer "sales" tippte, fand "B2B Sales"
-  // nicht. Neben einem echten Suchfeld ist das eine Falle.
-  assert.doesNotMatch(page, /<input name="topic"/);
+  // Bis 23.10.2026 waren "Thema" und "Branche" Textfelder, die exakte
+  // Gleichheit pruefen: Wer "sales" tippte, fand "B2B Sales" nicht. Die Falle
+  // war die Exaktheit, nicht das Textfeld. Jetzt nehmen beide Felder eigenen
+  // Text, schlagen einen Katalog vor und suchen per "enthaelt".
+  assert.match(page, /<input name="topic" list="connect-topics"/);
+  assert.match(page, /<input name="location" list="connect-places"/);
   assert.doesNotMatch(page, /<input name="industry"/);
 
-  // Als Parameter bleiben sie gueltig, damit bestehende Links weiter
-  // funktionieren.
   const data = source(DATA);
+  assert.match(data, /orIlike\("search_text", topicTerms\(/);
+  assert.match(data, /orIlike\("search_text", placeTerms\(/);
+  // Als Parameter bleiben die alten gueltig, damit bestehende Links weiter funktionieren.
   assert.match(data, /filters\.topic/);
   assert.match(data, /filters\.industry/);
 });
