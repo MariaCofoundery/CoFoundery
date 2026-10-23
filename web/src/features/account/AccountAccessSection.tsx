@@ -6,12 +6,12 @@ import {
   isAccountStatusFailure,
   type AccountStatus,
 } from "@/features/account/accountStatus";
+import { ACCOUNT_CARD as CARD, ACCOUNT_PRIMARY as PRIMARY, ACCOUNT_SECONDARY as SECONDARY, AccountHead } from "@/features/account/accountUi";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
-const CARD = "rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7";
-const PRIMARY = "inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white";
-const SECONDARY =
-  "inline-flex min-h-11 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50";
+
+
+
 
 /**
  * Der Zugang zum Konto.
@@ -47,11 +47,10 @@ export async function AccountAccessSection({
   const isError = own !== null && isAccountStatusFailure(own);
 
   return (
-    <section id="anmeldung" className={`${CARD} mt-8`}>
-      <h2 className="text-xl font-semibold text-slate-950">{t("account.access.title")}</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.access.text")}</p>
+    <section id="anmeldung" className={`${CARD} mt-5`}>
+      <AccountHead icon="person" tone="violet" title={t("account.access.title")} text={t("account.access.text")} />
 
-      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+      <div className="mt-5 rounded-xl border border-[#d8d5ea] bg-white p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
           {t("account.access.currentLabel")}
         </p>
@@ -74,7 +73,7 @@ export async function AccountAccessSection({
       {/* Eingeklappt: Die meisten Menschen kommen hierher, um nachzusehen,
           welche Adresse es ist - nicht um sie zu wechseln. */}
       <details className="mt-4">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-800">
+        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-[#6d49e0]">
           {t("account.access.changeCta")}
         </summary>
 
@@ -109,7 +108,7 @@ export async function AccountAccessSection({
         </form>
       </details>
 
-      <div className="mt-6 border-t border-slate-200 pt-5">
+      <div className="mt-6 border-t border-[#e4e2f0] pt-5">
         <h3 className="text-base font-semibold text-slate-950">{t("account.access.signOutTitle")}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.access.signOutText")}</p>
         <ClearDraftsForm action={signOutEverywhereAction} className="mt-3">

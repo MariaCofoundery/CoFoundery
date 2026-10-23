@@ -632,7 +632,8 @@
     "phone": {
       "title": "Put Made2Found on your phone.",
       "text": "Then you get notifications like with a normal app.",
-      "link": "Short guide (PDF, in German) →"
+      "link": "Short guide (PDF, in German) →",
+      "navLabel": "On your phone"
     },
     "feedback": {
       "title": "Feedback is welcome.",

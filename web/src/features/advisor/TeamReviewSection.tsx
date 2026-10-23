@@ -43,9 +43,9 @@ export async function TeamReviewSection({ requests }: { requests: TeamReviewRequ
   return (
     <section
       id="team-review"
-      className="mt-8 scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+      className="mt-5 scroll-mt-24 rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-[26px]"
     >
-      <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
+      <h2 className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("title")}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("text")}</p>
 
       {open.length > 0 ? (
@@ -77,7 +77,7 @@ export async function TeamReviewSection({ requests }: { requests: TeamReviewRequ
                   <SubmitButton
                     label={t("approve")}
                     pendingLabel={t("pending")}
-                    className="inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                    className="inline-flex min-h-11 items-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90"
                   />
                 </form>
                 <form action={decideTeamReviewAction}>

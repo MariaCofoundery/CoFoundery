@@ -30,7 +30,15 @@ export type IconName =
   | "clock"
   | "book"
   | "link"
-  | "game";
+  | "game"
+  | "globe"
+  | "bell"
+  | "download"
+  | "phone"
+  | "warn"
+  | "flask"
+  | "robot"
+  | "mail";
 
 const PATHS: Record<IconName, ReactNode> = {
   check: <path d="M5 12l5 5L20 7" />,
@@ -96,6 +104,39 @@ const PATHS: Record<IconName, ReactNode> = {
   ),
   book: <path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h10" />,
   link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.5 12h17M12 3.5c2.6 2.4 2.6 14.6 0 17M12 3.5c-2.6 2.4-2.6 14.6 0 17" />
+    </>
+  ),
+  bell: <path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4" />,
+  download: <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />,
+  phone: (
+    <>
+      <rect x="7" y="3" width="10" height="18" rx="2" />
+      <path d="M11 18h2" />
+    </>
+  ),
+  warn: (
+    <>
+      <path d="M12 4l9 16H3z" />
+      <path d="M12 10v4M12 17h.01" />
+    </>
+  ),
+  flask: <path d="M9 3h6M10 3v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4A1.5 1.5 0 0 0 19 19l-5-10V3" />,
+  robot: (
+    <>
+      <rect x="5" y="8" width="14" height="10" rx="3" />
+      <path d="M12 4v4M9 13h.01M15 13h.01" />
+    </>
+  ),
+  mail: (
+    <>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+      <path d="M4 7l8 6 8-6" />
+    </>
+  ),
   game: (
     <>
       <rect x="3" y="8" width="18" height="9" rx="4" />

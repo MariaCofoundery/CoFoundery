@@ -53,8 +53,8 @@ export function DeleteAccountSection({
   };
 
   return (
-    <details className="rounded-2xl border border-red-200/80 bg-red-50/40 p-4">
-      <summary className="cursor-pointer text-sm font-medium text-slate-900">
+    <details className="rounded-2xl border border-[#f3c9dd] bg-[#fffafc] p-4">
+      <summary className="cursor-pointer text-[15px] font-semibold text-[#a3195b]">
         {t("account.delete.summary")}
       </summary>
       <div className="mt-4 rounded-2xl border border-red-200/80 bg-white/70 p-4">

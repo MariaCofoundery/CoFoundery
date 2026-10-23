@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { IconTile } from "@/features/ui/Icons";
 import { setResearchConsentAction } from "@/features/research/actions";
 import { configureResearchConsentState, type ResearchConsentState } from "@/features/research/client";
 
@@ -29,15 +30,20 @@ export function ResearchConsentSettings({ initialState }: { initialState: Resear
   };
 
   return (
-    <section className="mt-5 border-t border-slate-200 pt-5" aria-labelledby="research-settings-title">
-      <h3 id="research-settings-title" className="text-sm font-semibold text-slate-950">{t("title")}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{t("description")}</p>
+    <section className="mt-5 border-t border-[#e4e2f0] pt-5" aria-labelledby="research-settings-title">
+      <div className="flex items-start gap-3">
+        <IconTile name="flask" tone="violet" size="sm" />
+        <div className="min-w-0 flex-1">
+          <h3 id="research-settings-title" className="font-semibold text-[#0b1f3a]">{t("title")}</h3>
+          <p className="mt-0.5 text-[13.5px] leading-[1.5] text-[#5f5e7a]">{t("description")}</p>
+        </div>
+        <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${active ? "bg-[#e3f6ec] text-[#17794a]" : "bg-[#f1f0f7] text-[#33325e]"}`}>{active ? t("active") : t("inactive")}</span>
+      </div>
       <Link href="/research/workstyle-pretest?version=8.5a-v3&teil=forschung" className="mt-3 inline-flex min-h-11 items-center underline">{t("workstylePretest")}</Link>
-      <p className="mt-3 text-sm text-slate-700">{t("statusLabel")} <strong>{active ? t("active") : t("inactive")}</strong></p>
-      {unreadable ? (
+            {unreadable ? (
         <p className="mt-2 text-sm text-amber-800">{t("unreadable")}</p>
       ) : null}
-      <button type="button" disabled={pending} onClick={() => update(active ? "declined" : "accepted")} className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60">{active ? t("withdraw") : t("activate")}</button>
+      <button type="button" disabled={pending} onClick={() => update(active ? "declined" : "accepted")} className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4] disabled:opacity-60">{active ? t("withdraw") : t("activate")}</button>
       {active ? <p className="mt-3 text-xs leading-5 text-slate-500">{t("withdrawal")}</p> : null}
       {error ? <p role="alert" className="mt-3 text-sm text-red-700">{t("error")}</p> : null}
     </section>

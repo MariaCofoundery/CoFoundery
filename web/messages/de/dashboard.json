@@ -564,6 +564,10 @@
       "mailOff": "Keine E-Mail – du hast ihr nicht zugestimmt. Das ist die Voreinstellung.",
       "mailFailed": "Keine E-Mail, obwohl du zugestimmt hast. Dann fehlt etwas am Mailversand.",
       "failed": "Der Probelauf ist nicht durchgelaufen. Bitte noch einmal versuchen."
+    },
+    "nav": {
+      "connect": "Connect",
+      "delete": "Konto löschen"
     }
   },
   "coFounderInvitePage": {

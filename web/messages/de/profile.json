@@ -632,7 +632,8 @@
     "phone": {
       "title": "Hol dir Made2Found aufs Handy.",
       "text": "Dann bekommst du Benachrichtigungen wie bei einer normalen App.",
-      "link": "Kurzanleitung (PDF) →"
+      "link": "Kurzanleitung (PDF) →",
+      "navLabel": "Aufs Handy"
     },
     "feedback": {
       "title": "Feedback ist willkommen.",

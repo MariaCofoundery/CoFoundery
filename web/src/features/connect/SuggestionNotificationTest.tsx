@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { sendTestSuggestionNotificationAction } from "@/features/connect/suggestionNotificationActions";
 
 const BUTTON =
-  "inline-flex min-h-11 items-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60";
+  "inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60";
 
 /**
  * Der Probelauf fuer die Vorschlags-Benachrichtigung.

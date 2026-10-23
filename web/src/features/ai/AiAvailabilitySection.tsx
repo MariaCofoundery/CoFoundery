@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
+import { IconTile } from "@/features/ui/Icons";
+
 /**
  * Der Zustand der KI-Auswertung, in Worten.
  *
@@ -27,24 +29,24 @@ export async function AiAvailabilitySection({
   const t = await getTranslations("dashboard.account.ai");
 
   return (
-    <section className="mt-5 border-t border-slate-200 pt-5" aria-labelledby="ai-status-title">
-      <h3 id="ai-status-title" className="text-sm font-semibold text-slate-950">
-        {t("title")}
-      </h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{t("text")}</p>
-
-      <p className="mt-3 flex items-center gap-2 text-sm text-slate-700">
-        <span aria-hidden className={available ? "text-emerald-600" : "text-slate-400"}>
-          ●
+    <section className="mt-5 border-t border-[#e4e2f0] pt-5" aria-labelledby="ai-status-title">
+      <div className="flex items-start gap-3">
+        <IconTile name="robot" tone="amber" size="sm" />
+        <div className="min-w-0 flex-1">
+          <h3 id="ai-status-title" className="font-semibold text-[#0b1f3a]">
+            {t("title")}
+          </h3>
+          <p className="mt-0.5 text-[13.5px] leading-[1.5] text-[#5f5e7a]">{t("text")}</p>
+          {pendingJobs > 0 ? (
+            <p className="mt-2 text-[13.5px] leading-[1.5] text-[#5f5e7a]">{t("pending", { count: pendingJobs })}</p>
+          ) : null}
+        </div>
+        {/* Der Punkt ist Schmuck; die Aussage steht im Text. Keine Farbe allein, kein Rot, kein Warndreieck. */}
+        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${available ? "bg-[#e3f6ec] text-[#17794a]" : "bg-[#fdecc8] text-[#7a4300]"}`}>
+          <span aria-hidden="true">●</span>
+          {available ? t("online") : t("offline")}
         </span>
-        {/* Der Punkt ist Schmuck; die Aussage steht im Text. Eine Farbe allein
-            waere fuer eine Vorlesesoftware keine Auskunft. */}
-        <strong className="font-semibold">{available ? t("online") : t("offline")}</strong>
-      </p>
-
-      {pendingJobs > 0 ? (
-        <p className="mt-2 text-sm leading-6 text-slate-600">{t("pending", { count: pendingJobs })}</p>
-      ) : null}
+      </div>
     </section>
   );
 }

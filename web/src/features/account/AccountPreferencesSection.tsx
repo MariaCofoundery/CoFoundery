@@ -18,15 +18,24 @@ import {
 } from "@/features/account/accountStatus";
 import { SuggestionNotificationTest } from "@/features/connect/SuggestionNotificationTest";
 import { PushNotificationSection } from "@/features/notifications/PushNotificationSection";
+import { IconTile, type IconName, type IconTone } from "@/features/ui/Icons";
 import { SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
+import { ACCOUNT_CARD as CARD0, ACCOUNT_PILL as PILL, ACCOUNT_PRIMARY as PRIMARY, ACCOUNT_SECONDARY as SECONDARY, AccountHead, SwitchTrack } from "@/features/account/accountUi";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
-const CARD = "mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7";
-const PRIMARY = "inline-flex min-h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white";
-const SECONDARY =
-  "inline-flex min-h-11 items-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50";
-const PILL =
-  "inline-flex min-h-11 cursor-pointer items-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-700 transition has-[:checked]:border-violet-300 has-[:checked]:bg-violet-50 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-violet-100";
+
+
+
+
+
+const CARD = `${CARD0} mt-5`;
+
+/** Symbol und Farbe je Bereich - die Farbe sagt, WORUM es geht, nie wie wichtig. */
+const AREA_ICON: Record<string, { icon: IconName; tone: IconTone }> = {
+  align: { icon: "spark", tone: "violet" },
+  find: { icon: "search", tone: "teal" },
+  connect: { icon: "link", tone: "blue" },
+};
 
 /**
  * Sprache und Post.
@@ -75,8 +84,7 @@ export async function AccountPreferencesSection({
   return (
     <>
       <section id="sprache" className={CARD}>
-        <h2 className="text-xl font-semibold text-slate-950">{t("account.locale.title")}</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.locale.text")}</p>
+        <AccountHead icon="globe" tone="blue" title={t("account.locale.title")} text={t("account.locale.text")} />
         {note("locale")}
 
         <form action={saveAccountLocaleAction} className="mt-4">
@@ -111,8 +119,7 @@ export async function AccountPreferencesSection({
       </section>
 
       <section id="post" className={CARD}>
-        <h2 className="text-xl font-semibold text-slate-950">{t("account.notifications.title")}</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.notifications.text")}</p>
+        <AccountHead icon="bell" tone="amber" title={t("account.notifications.title")} text={t("account.notifications.text")} />
         {note("notifications")}
 
         <form action={saveNotificationSettingsAction} className="mt-5">
@@ -123,7 +130,7 @@ export async function AccountPreferencesSection({
             if (kinds.length === 0) return null;
             return (
               <fieldset key={area} className="mt-5 first:mt-0">
-                <legend className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                <legend className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]">
                   {t(`account.notifications.areas.${area}`)}
                 </legend>
                 <div className="mt-2 grid gap-2">
@@ -139,24 +146,26 @@ export async function AccountPreferencesSection({
                       // trotzdem gemeinsam hervor.
                       <div
                         key={kind}
-                        className="rounded-2xl border border-slate-200 p-3 transition has-[:checked]:border-violet-200 has-[:checked]:bg-violet-50/40"
+                        className="rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3 transition has-[:checked]:border-[#d9cff8]"
                       >
-                        <label className="flex min-h-11 cursor-pointer items-start gap-3">
+                        <label className="flex min-h-11 cursor-pointer items-center gap-3.5">
                           <input
                             type="checkbox"
                             name="notification"
                             value={kind}
                             defaultChecked={!isOff.has(kind)}
-                            className="mt-1 h-4 w-4 rounded border-slate-300 accent-violet-600"
+                            className="peer sr-only"
                           />
-                          <span>
-                            <span className="block text-sm font-medium text-slate-900">
+                          <IconTile name={AREA_ICON[area].icon} tone={AREA_ICON[area].tone} size="sm" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[15.5px] font-semibold text-[#0b1f3a]">
                               {t(`account.notifications.kinds.${kind}.title`)}
                             </span>
-                            <span className="mt-1 block text-xs leading-5 text-slate-500">
+                            <span className="mt-0.5 block text-[13.5px] leading-5 text-[#5f5e7a]">
                               {t(`account.notifications.kinds.${kind}.text`)}
                             </span>
                           </span>
+                          <SwitchTrack />
                         </label>
 
                         {/* DER MAILWEG ALS ZWEITER, EINGERUECKTER HAKEN - und
@@ -174,15 +183,16 @@ export async function AccountPreferencesSection({
                             `wants_email_channel` in der Datenbank - nicht
                             diese Oberflaeche. */}
                         {optIn ? (
-                          <label className="mt-2 flex cursor-pointer items-start gap-2 pl-7">
+                          <label className="mt-2 flex cursor-pointer items-center gap-3 pl-[54px]">
                             <input
                               type="checkbox"
                               name="emailOptIn"
                               value={optIn.kind}
                               defaultChecked={hasConsented.has(optIn.kind)}
-                              className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-violet-600"
+                              className="peer sr-only"
                             />
-                            <span className="block text-xs leading-5 text-slate-600">
+                            <SwitchTrack />
+                            <span className="block text-[13px] leading-5 text-[#5f5e7a]">
                               {t(`account.notifications.emailOptIns.${optIn.kind}`)}
                             </span>
                           </label>
@@ -197,7 +207,7 @@ export async function AccountPreferencesSection({
 
           {/* Eine Einladung IST die Nachricht. Sie taucht deshalb nicht als
               Schalter auf - aber es steht da, statt dass jemand sie sucht. */}
-          <p className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+          <p className="mt-5 rounded-2xl bg-[#f7f6fb] px-4 py-3 text-sm leading-6 text-[#5f5e7a]">
             {t("account.notifications.alwaysSent")}
           </p>
 
@@ -242,13 +252,12 @@ export async function AccountDataSection({ children }: { children?: React.ReactN
 
   return (
     <section id="daten" className={CARD}>
-      <h2 className="text-xl font-semibold text-slate-950">{t("account.data.title")}</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{t("account.data.text")}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{t("account.data.scope")}</p>
+      <AccountHead icon="download" tone="teal" title={t("account.data.title")} text={t("account.data.text")} />
+      <p className="mt-2 text-sm leading-6 text-[#5f5e7a]">{t("account.data.scope")}</p>
       <Link href="/api/account/export" download className={`${SECONDARY} mt-4`}>
         {t("account.data.download")}
       </Link>
-      {children ? <div className="mt-6 border-t border-slate-200 pt-6">{children}</div> : null}
+      {children ? <div className="mt-6 border-t border-[#e4e2f0] pt-6">{children}</div> : null}
     </section>
   );
 }

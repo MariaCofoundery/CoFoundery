@@ -564,6 +564,10 @@
       "mailOff": "No email – you have not agreed to it. That is the default.",
       "mailFailed": "No email even though you agreed. Then something is missing in the mail setup.",
       "failed": "The test run did not complete. Please try again."
+    },
+    "nav": {
+      "connect": "Connect",
+      "delete": "Delete account"
     }
   },
   "coFounderInvitePage": {
