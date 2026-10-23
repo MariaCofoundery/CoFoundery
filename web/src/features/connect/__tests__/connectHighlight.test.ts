@@ -263,9 +263,9 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
 
   // Zwei eingeklappte Bereiche: die Auswahlen und das Merken.
   // Seit dem Umbau auf Filter links (Board 28, 23.10.2026) liegt der Filter als Seitenleiste
-  // neben der Liste: Auf dem Telefon bleibt er eingeklappt, am Bildschirm ist er offen
+  // neben der Liste: Auf dem Telefon ist er offen und lässt sich einklappen, am Bildschirm bleibt er offen
   // (globals.css, `.connect-filter-details`). Das Merken bleibt eingeklappt.
-  assert.match(page, /<details className="connect-filter-details" open=\{activeFilterCount > 0\}>/);
+  assert.match(page, /<details className="connect-filter-details" open>/);
   assert.match(page, /<details>\s*<summary[^>]*>\{t\("rememberSearch"\)\}/);
 
   // NACHGESCHAERFT AM 21.09.2026, und das ist die Umkehrung dessen, was hier

@@ -800,6 +800,7 @@
     }
   },
   "highlight": {
+    "dot": "Highlight {number} of {count}",
     "title": "Highlights",
     "randomNote": "A changing random selection of current eligible content — not a personal recommendation.",
     "kinds": {

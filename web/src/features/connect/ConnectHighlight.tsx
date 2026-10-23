@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import { HighlightCarousel } from "@/features/connect/HighlightCarousel";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import type { ConnectHighlight as Highlight } from "@/features/connect/connectHighlightData";
 
@@ -57,7 +58,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
         </details>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      <HighlightCarousel dotLabels={highlights.map((_, index) => t("dot", { number: index + 1, count: highlights.length }))}>
         {highlights.map((highlight) => (
           <Link
             key={`${highlight.kind}:${highlight.id}`}
@@ -125,7 +126,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
 
           </Link>
         ))}
-      </div>
+      </HighlightCarousel>
       {highlights.some((highlight) => highlight.disclosure === "sponsored") ? (
         <p className="mt-3 text-xs text-slate-500">{t("adNote")}</p>
       ) : null}

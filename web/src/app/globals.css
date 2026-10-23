@@ -964,3 +964,6 @@ body {
   .connect-filter-details > summary { pointer-events: none; list-style: none; }
   .connect-filter-details > summary::-webkit-details-marker { display: none; }
 }
+
+.connect-highlight-track { scrollbar-width: none; }
+.connect-highlight-track::-webkit-scrollbar { display: none; }

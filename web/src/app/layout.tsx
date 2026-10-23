@@ -43,7 +43,7 @@ const unbounded = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getPublicAppOrigin() || DEFAULT_PUBLIC_APP_ORIGIN),
-  title: `${PRODUCT_FULL_NAME} | Früh ehrlich über Zusammenarbeit sprechen`,
+  title: `${PRODUCT_FULL_NAME} | Menschen, Fähigkeiten und Vorhaben zusammenbringen`,
   description:
     `${PRODUCT_FULL_NAME} hilft Mitgründer:innen, früh offen über Arbeitsweise, Erwartungen und Absprachen zu sprechen, bevor aus Reibung ein Problem wird. Ohne Score, ohne Typen.`,
   applicationName: PRODUCT_FULL_NAME,

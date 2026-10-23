@@ -120,10 +120,10 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </details>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
         <div className="space-y-4">
           <form id="connect-filter" className="rounded-[22px] border border-[#e4e2f0] bg-white p-5">
-            <details className="connect-filter-details" open={activeFilterCount > 0}>
+            <details className="connect-filter-details" open>
               <summary className="flex min-h-9 cursor-pointer items-center text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
               <div className="mt-3 grid gap-5">
                 <fieldset className="grid gap-1">
