@@ -46,6 +46,8 @@ export type ConnectProfile = {
   open_to_formats: ConnectOpenToFormat[];
   /** Ob diese Person anderen vorgeschlagen werden darf. */
   suggestable: boolean;
+  /** Ob diese Person als Highlight oben in Connect stehen darf (eigene Zustimmung). */
+  highlightable: boolean;
   contact_note: string | null;
   published_at: string | null; updated_at: string;
 };

@@ -34,6 +34,8 @@ type Props = {
   variant?: "default" | "accent";
   fallbackAvatarUrl?: string | null;
   welcomeVisual?: ReactNode;
+  /** Ersetzt auf dem Begruessungsschritt Grafik und Stichpunkte durch einen Brief. */
+  welcomeLetter?: ReactNode;
   /**
    * Welche Antworten auf "Was hast du vor?" angeboten werden.
    *
@@ -166,6 +168,7 @@ export function ProfileBasicsForm({
   variant = "default",
   fallbackAvatarUrl = null,
   welcomeVisual,
+  welcomeLetter,
   plans = ONBOARDING_PLANS,
 }: Props) {
   const t = useTranslations("profile.basicsForm");
@@ -600,7 +603,7 @@ export function ProfileBasicsForm({
 
     return (
       <>
-        {isWelcomeStep && welcomeVisual ? <div className="pb-5">{welcomeVisual}</div> : null}
+        {isWelcomeStep && welcomeVisual && !welcomeLetter ? <div className="pb-5">{welcomeVisual}</div> : null}
 
         <div className="border-b border-cyan-200/70 pb-4">
           {/* Statt "Schritt 4 von 7": was noch kommt, nicht wie weit die
@@ -619,7 +622,12 @@ export function ProfileBasicsForm({
               {meta.hint}
             </p>
           ) : null}
-          {isWelcomeStep ? (
+          {isWelcomeStep && welcomeLetter ? (
+            <>
+              {welcomeLetter}
+              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600">{t("onboarding.welcomeText")}</p>
+            </>
+          ) : isWelcomeStep ? (
             <>
               <ul className="mt-4 grid max-w-xl gap-2 text-sm leading-6 text-slate-700">
                 {(["areas", "consent", "noScore"] as const).map((point) => (

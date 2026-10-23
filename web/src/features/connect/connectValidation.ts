@@ -77,6 +77,9 @@ export function parseConnectProfile(formData: FormData, identity: ConnectIdentit
     // nur mit, wenn es angehakt ist - deshalb ist die Abwesenheit hier die
     // Entscheidung und nicht ein fehlender Wert.
     suggestable: formData.get("suggestable") === "yes",
+    // Eigene Zustimmung, nicht aus "suggestable" abgeleitet: ein Highlight
+    // sehen alle Mitglieder, ein Vorschlag nur wenige.
+    highlightable: formData.get("highlightable") === "yes",
   };
 }
 

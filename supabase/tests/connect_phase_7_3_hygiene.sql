@@ -1,4 +1,6 @@
 \set ON_ERROR_STOP on
+-- Highlights haengen an der eigenen Zustimmung (highlightable, Standard aus); diese Pruefung gilt dem Auswahlfenster, nicht der Zustimmung.
+alter table public.network_profiles alter column highlightable set default true;
 begin;
 -- Historical public capability regression ONLY within this rolled-back test.
 -- Closed-beta defaults are asserted separately in connect_closed_beta_710b.sql.
@@ -24,10 +26,10 @@ insert into public.saved_searches(id,user_id,context,label,query) values ('93000
 insert into public.saved_searches(id,user_id,context,label,query) values ('93000000-0000-4000-8000-000000000002','91000000-0000-4000-8000-000000000001','connect','Second search','podcast');
 set local role authenticated; select set_config('request.jwt.claims','{"sub":"91000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select extensions.is((select count(*) from public.get_connect_highlight_owners(array['91000000-0000-4000-8000-000000000002']::uuid[])),1::bigint,'Eligible highlight owner returned');
-reset role;update public.network_profiles set suggestable=false where user_id='91000000-0000-4000-8000-000000000002';
+reset role;update public.network_profiles set suggestable=false,highlightable=false where user_id='91000000-0000-4000-8000-000000000002';
 set local role authenticated; select set_config('request.jwt.claims','{"sub":"91000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select extensions.is((select count(*) from public.get_connect_highlight_owners(array['91000000-0000-4000-8000-000000000002']::uuid[])),0::bigint,'Opted-out owner never highlighted');
-reset role;update public.network_profiles set suggestable=true where user_id='91000000-0000-4000-8000-000000000002';
+reset role;update public.network_profiles set suggestable=true,highlightable=true where user_id='91000000-0000-4000-8000-000000000002';
 set local role authenticated; select set_config('request.jwt.claims','{"sub":"91000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 select extensions.is((select count(*) from public.list_saved_searches_for_matching('connect','91000000-0000-4000-8000-000000000002') where id='93000000-0000-4000-8000-000000000001'),1::bigint,'Active unblocked search can be matched');
 select extensions.is((select count(*) from public.get_connect_saved_search_delivery('93000000-0000-4000-8000-000000000001','listing','92000000-0000-4000-8000-000000000001')),1::bigint,'Active member may receive listing');

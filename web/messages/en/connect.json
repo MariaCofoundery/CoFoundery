@@ -365,7 +365,11 @@
     "suggestableTitle": "Being suggested",
     "suggestableLabel": "I would like to be suggested to others",
     "suggestableHint": "People whose fields or industries overlap with yours will occasionally see your profile under “For you” – at most three suggestions a week, and only inside the platform.",
-    "suggestableOffHint": "Switched off you stay findable as usual: in the people list, through search and through your entries. You simply won't be suggested to anyone."
+    "suggestableOffHint": "Switched off you stay findable as usual: in the people list, through search and through your entries. You simply won't be suggested to anyone.",
+    "highlightableTitle": "Being shown as a highlight",
+    "highlightableLabel": "I am open to being shown as a highlight in Connect",
+    "highlightableHint": "At the top of Connect there are three highlights that every member sees. They are drawn at random, recommended by us or paid for, and each card says why it is there. With this box ticked, your profile or one of your entries may appear there.",
+    "highlightableOffHint": "This is off by default. Without the tick you never appear there, not even if we wanted to recommend you. You can switch it off again at any time, and you disappear from running highlights as well."
   },
   "safety": {
     "block": "Block",
@@ -816,7 +820,7 @@
     "yours": "Yours",
     "subtitle": "Three spots currently shown in the network. Each one says why it is here.",
     "howTitle": "How highlights are chosen",
-    "how": "Three spots. We can recommend an entry ourselves, one spot can be paid for and is then marked as an ad. All others are drawn at random. Only entries that are published and whose owner allows suggestions are shown.",
+    "how": "Three spots. We can recommend an entry ourselves, one spot can be paid for and is then marked as an ad. All others are drawn at random. Only entries that are published and whose owner has explicitly agreed to it are shown.",
     "disclosureMeta": {
       "none": "Random",
       "editorial": "From the platform",
@@ -969,13 +973,14 @@
     "removing": "Removing …",
     "gone": "Entry no longer exists",
     "goneHint": "The entry no longer exists. The spot is not shown.",
-    "visibilityHint": "A spot is not a consent: only entries that are published and whose owner allows suggestions are shown. A running spot can therefore be invisible.",
+    "visibilityHint": "A placement is not a permission: only what is published and whose owner ticked the highlight box in their Connect profile is shown. A running placement can therefore be invisible.",
     "results": {
       "saved": "The spot is saved.",
       "deleted": "The spot is removed.",
       "invalid": "That did not fit. Check the link, the end date (in the future) and the length of the sentence.",
       "notfound": "There is no entry for this link, or it has no owner.",
       "error": "That did not work. Please try again."
-    }
+    },
+    "noConsentHint": "This person has not ticked the highlight box. The placement is only shown once they agree. Best to ask them first."
   }
 }

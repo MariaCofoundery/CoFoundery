@@ -365,7 +365,11 @@
     "suggestableTitle": "Vorgeschlagen werden",
     "suggestableLabel": "Ich möchte anderen vorgeschlagen werden",
     "suggestableHint": "Wer Fachgebiete oder Branchen eingetragen hat, die sich mit deinen überschneiden, sieht dein Profil gelegentlich unter „Für dich“ – höchstens drei Vorschläge pro Woche, und nur in der Plattform.",
-    "suggestableOffHint": "Abgeschaltet bleibst du ganz normal auffindbar: in der Personenliste, über die Suche und über deine Einträge. Es wird dich dann nur niemand vorgeschlagen bekommen."
+    "suggestableOffHint": "Abgeschaltet bleibst du ganz normal auffindbar: in der Personenliste, über die Suche und über deine Einträge. Es wird dich dann nur niemand vorgeschlagen bekommen.",
+    "highlightableTitle": "Als Highlight gezeigt werden",
+    "highlightableLabel": "Ich bin offen dafür, als Highlight in Connect gezeigt zu werden",
+    "highlightableHint": "Ganz oben in Connect stehen drei Highlights, die alle Mitglieder sehen. Sie sind zufällig gezogen, von uns empfohlen oder bezahlt, und jede Karte sagt dazu, warum sie dort steht. Mit dem Häkchen darf dein Profil oder einer deiner Einträge dort erscheinen.",
+    "highlightableOffHint": "Standardmäßig ist das aus. Ohne Häkchen erscheinst du dort nie, auch nicht, wenn wir dich empfehlen wollten. Du kannst es jederzeit wieder abschalten, dann verschwindest du auch aus laufenden Highlights."
   },
   "safety": {
     "block": "Blockieren",
@@ -816,7 +820,7 @@
     "yours": "Von dir",
     "subtitle": "Drei Plätze, die gerade im Netzwerk gezeigt werden. Bei jedem steht, warum er hier ist.",
     "howTitle": "Wie Highlights entstehen",
-    "how": "Drei Plätze. Wir können einen Eintrag selbst empfehlen, ein Platz kann bezahlt sein und ist dann als Anzeige gekennzeichnet. Alle übrigen werden zufällig gezogen. Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in Vorschläge erlaubt hat.",
+    "how": "Drei Plätze. Wir können einen Eintrag selbst empfehlen, ein Platz kann bezahlt sein und ist dann als Anzeige gekennzeichnet. Alle übrigen werden zufällig gezogen. Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in dem ausdrücklich zugestimmt hat.",
     "disclosureMeta": {
       "none": "Per Zufall",
       "editorial": "Von der Plattform",
@@ -969,13 +973,14 @@
     "removing": "Entfernt …",
     "gone": "Eintrag nicht mehr vorhanden",
     "goneHint": "Der Eintrag existiert nicht mehr. Der Platz wird nicht angezeigt.",
-    "visibilityHint": "Ein Platz ist keine Freigabe: Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in Vorschläge erlaubt hat. Ein laufender Platz kann deshalb unsichtbar sein.",
+    "visibilityHint": "Ein Platz ist keine Freigabe: Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in das Highlight-Häkchen im Connect-Profil gesetzt hat. Ein laufender Platz kann deshalb unsichtbar sein.",
     "results": {
       "saved": "Der Platz ist gespeichert.",
       "deleted": "Der Platz ist entfernt.",
       "invalid": "Das hat nicht gepasst. Prüfe Link, Enddatum (in der Zukunft) und die Länge des Satzes.",
       "notfound": "Zu diesem Link gibt es keinen Eintrag, oder er hat keinen Besitzer.",
       "error": "Das hat nicht geklappt. Versuch es noch einmal."
-    }
+    },
+    "noConsentHint": "Die Person hat das Highlight-Häkchen nicht gesetzt. Der Platz wird erst gezeigt, wenn sie zustimmt. Frag sie am besten vorher."
   }
 }

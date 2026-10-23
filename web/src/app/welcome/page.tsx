@@ -4,6 +4,7 @@ import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
+import { WelcomeLetter } from "@/features/profile/WelcomeLetter";
 import { WelcomeAlignmentVisual } from "@/features/profile/WelcomeAlignmentVisual";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -94,6 +95,7 @@ export default async function WelcomePage({
           variant="accent"
           fallbackAvatarUrl={fallbackAvatarUrl}
           welcomeVisual={<WelcomeAlignmentVisual className="mx-auto w-full max-w-2xl" />}
+          welcomeLetter={<WelcomeLetter />}
         />
       </div>
     </main>

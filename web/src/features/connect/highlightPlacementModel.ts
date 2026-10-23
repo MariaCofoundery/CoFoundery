@@ -50,6 +50,8 @@ export type PlacementRow = {
   ends_at: string;
   title: string | null;
   owner_name: string | null;
+  /** Hat die Person das Highlight-Haekchen gesetzt? Ohne es bleibt der Platz unsichtbar. */
+  owner_consent: boolean;
 };
 
 export function placementState(row: Pick<PlacementRow, "starts_at" | "ends_at">, now = new Date()) {

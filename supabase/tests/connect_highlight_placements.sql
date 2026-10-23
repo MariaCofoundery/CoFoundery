@@ -1,4 +1,4 @@
-begin; select plan(14);
+begin; select plan(15);
 -- Highlight-Plaetze: nur die Verwaltung vergibt sie, und gezeigt wird nur,
 -- was auch als Zufalls-Highlight erscheinen duerfte.
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at) values
@@ -12,8 +12,8 @@ insert into public.network_memberships(user_id,status) values
  ('a1b00000-0000-4000-8000-000000000003','active')
 on conflict(user_id) do update set status='active';
 insert into public.platform_admins(user_id) values ('a1b00000-0000-4000-8000-000000000001');
-insert into public.network_profiles(user_id,display_name,headline,bio,network_roles,status,published_at,suggestable,expertise) values
- ('a1b00000-0000-4000-8000-000000000002','Owner','Synthetic headline','A complete synthetic biography for highlight verification.',array['founder'],'active',now(),true,array['software']);
+insert into public.network_profiles(user_id,display_name,headline,bio,network_roles,status,published_at,suggestable,highlightable,expertise) values
+ ('a1b00000-0000-4000-8000-000000000002','Owner','Synthetic headline','A complete synthetic biography for highlight verification.',array['founder'],'active',now(),true,true,array['software']);
 insert into public.network_listings(id,owner_user_id,direction,category,title,summary,status,published_at,expires_at)
  values('a1b00000-0000-4000-8000-000000000100','a1b00000-0000-4000-8000-000000000002','offering','expertise','Placed listing','A sufficiently long synthetic description.','active',now(),now()+interval '40 days');
 
@@ -34,9 +34,12 @@ select is((select count(*) from public.list_connect_highlight_placements() j whe
 
 reset role; update public.network_profiles set suggestable=false where user_id='a1b00000-0000-4000-8000-000000000002';
 reset role; select set_config('request.jwt.claim.sub','a1b00000-0000-4000-8000-000000000003',true); set local role authenticated;
-select is((select count(*) from public.list_connect_highlight_placements()),0::bigint,'opting out of suggestions also ends the placement');
+select is((select count(*) from public.list_connect_highlight_placements()),2::bigint,'switching off suggestions alone does not end a placement');
+reset role; update public.network_profiles set suggestable=true, highlightable=false where user_id='a1b00000-0000-4000-8000-000000000002';
+reset role; select set_config('request.jwt.claim.sub','a1b00000-0000-4000-8000-000000000003',true); set local role authenticated;
+select is((select count(*) from public.list_connect_highlight_placements()),0::bigint,'withdrawing the highlight consent also ends the placement');
 
-reset role; update public.network_profiles set suggestable=true where user_id='a1b00000-0000-4000-8000-000000000002';
+reset role; update public.network_profiles set highlightable=true where user_id='a1b00000-0000-4000-8000-000000000002';
 update public.connect_highlight_placements set ends_at=now()-interval '1 second', starts_at=now()-interval '2 days';
 reset role; select set_config('request.jwt.claim.sub','a1b00000-0000-4000-8000-000000000003',true); set local role authenticated;
 select is((select count(*) from public.list_connect_highlight_placements()),0::bigint,'an expired placement is not shown');

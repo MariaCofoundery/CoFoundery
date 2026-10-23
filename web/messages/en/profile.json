@@ -474,5 +474,42 @@
         "cta": "Add"
       }
     }
+  },
+  "welcomeLetter": {
+    "fromLabel": "From Maria, founder",
+    "photoAlt": "Maria, founder of Made2Found",
+    "greeting": "Hi, I'm Maria.",
+    "story1": "I became a mother at 17 and then followed a fairly classic career path. In 2025 I founded something myself and failed, badly. For many reasons. One of them: working together with my co-founder was difficult. After that I fell into a pretty nasty crisis.",
+    "story2": "Made2Found came out of that time. I believe that if you talk early about the right things and are honest and open with each other, working together can hold. Then problems don't only surface when it is already too late and people slide into a crisis. I want to prevent that.",
+    "story3": "It matters to me that we support each other. Take what you need. And if you like, write to me. I'm around here myself.",
+    "signoff": "Have fun, Maria",
+    "valuesTitle": "How we treat each other here",
+    "values": {
+      "kind": {
+        "title": "Friendly and appreciative.",
+        "text": "We assume that everyone here means well."
+      },
+      "respect": {
+        "title": "No room for racism, insults or discrimination.",
+        "text": "Not even as a joke."
+      },
+      "honest": {
+        "title": "Honest and open.",
+        "text": "Say what you need and what you don't. That goes for everyone."
+      },
+      "yours": {
+        "title": "You decide what others see.",
+        "text": "Every sharing choice is separate and can be taken back at any time."
+      }
+    },
+    "goodToKnowTitle": "Good to know",
+    "phone": {
+      "title": "Put Made2Found on your phone.",
+      "text": "Then you get notifications like with a normal app."
+    },
+    "feedback": {
+      "title": "Feedback is welcome.",
+      "text": "If something catches your eye, use the “Feedback” button at the top. I read everything."
+    }
   }
 }

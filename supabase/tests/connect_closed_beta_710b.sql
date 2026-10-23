@@ -1,4 +1,5 @@
 begin; select no_plan();
+-- Highlights haengen an der eigenen Zustimmung (highlightable). Diese Pruefung gilt dem Auswahlfenster: wer vorschlagbar ist, ist hier auch highlightbar.
 -- More than the former 60-person cap; the oldest matching person must be found.
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at)
 select ('710b0000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid,'00000000-0000-0000-0000-000000000000','authenticated','authenticated','beta710b-'||i||'@example.invalid',now(),now(),now() from generate_series(1,72) i;
@@ -6,6 +7,7 @@ insert into public.network_memberships(user_id,status)
 select id,'active' from auth.users where email like 'beta710b-%@example.invalid' on conflict(user_id) do update set status='active';
 insert into public.network_profiles(user_id,display_name,headline,bio,network_roles,status,published_at,suggestable,expertise)
 select ('710b0000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid,'Beta '||i,case when i=2 then 'needle_old_member' else 'Synthetic beta profile' end,'A complete synthetic biography for closed beta verification.',array['founder'],'active',now()-make_interval(days=>case when i=2 then 100 else i end),i<5,array['software'] from generate_series(1,72) i;
+update public.network_profiles set highlightable=suggestable;
 update public.network_profiles set location_region='Berlin',remote_mode='remote' where user_id='710b0000-0000-4000-8000-000000000002';
 update public.network_profiles set published_at=now() where user_id in('710b0000-0000-4000-8000-000000000003','710b0000-0000-4000-8000-000000000004');
 insert into public.network_listings(id,owner_user_id,direction,category,title,summary,status,published_at,expires_at) values('710b0000-0000-4000-8000-000000000100','710b0000-0000-4000-8000-000000000002','offering','expertise','Old eligible listing','A sufficiently long synthetic description.','active',now()-interval '10 days',now()+interval '40 days');
@@ -64,7 +66,7 @@ insert into public.connect_suggestions(id,recipient_user_id,subject_owner_user_i
 insert into public.connect_suggestions(id,recipient_user_id,subject_owner_user_id,venture_id,matched_terms) values('710b0000-0000-4000-8000-000000000123','710b0000-0000-4000-8000-000000000001','710b0000-0000-4000-8000-000000000004','710b0000-0000-4000-8000-000000000102',array['software']);
 reset role; select set_config('request.jwt.claim.sub','710b0000-0000-4000-8000-000000000001',true); set local role authenticated;
 select is((select count(*) from public.connect_suggestions),4::bigint,'four available suggestions');
-reset role; update public.network_profiles set suggestable=false where user_id='710b0000-0000-4000-8000-000000000002';
+reset role; update public.network_profiles set suggestable=false,highlightable=false where user_id='710b0000-0000-4000-8000-000000000002';
 reset role; select set_config('request.jwt.claim.sub','710b0000-0000-4000-8000-000000000001',true); set local role authenticated;
 select is((select count(*) from public.connect_suggestions where person_user_id='710b0000-0000-4000-8000-000000000002'),0::bigint,'old person suggestion disappears after opt-out'); select is((select count(*) from public.search_connect_people('needle_old_member')),1::bigint,'ordinary search unaffected by opt-out');
 reset role; insert into public.network_blocks(blocker_user_id,blocked_user_id) values('710b0000-0000-4000-8000-000000000002','710b0000-0000-4000-8000-000000000001');
@@ -96,7 +98,7 @@ update public.network_problems set moderation_blocked=false,status='withdrawn' w
 set local role authenticated;
 select is((select count(*) from public.connect_suggestions where problem_id='710b0000-0000-4000-8000-000000000101'),0::bigint,'withdrawn problem excludes suggestion');
 select is((select count(*) from public.connect_discovery_problems where id='710b0000-0000-4000-8000-000000000101'),0::bigint,'withdrawn problem excludes browse');
-reset role; update public.network_profiles set status='active',suggestable=true where user_id='710b0000-0000-4000-8000-000000000002'; update public.network_listings set expires_at=now()+interval '30 days' where id='710b0000-0000-4000-8000-000000000100'; update public.connect_suggestions set dismissed_at=null,notified_at=null where id in('710b0000-0000-4000-8000-000000000120','710b0000-0000-4000-8000-000000000121');
+reset role; update public.network_profiles set status='active',suggestable=true,highlightable=true where user_id='710b0000-0000-4000-8000-000000000002'; update public.network_listings set expires_at=now()+interval '30 days' where id='710b0000-0000-4000-8000-000000000100'; update public.connect_suggestions set dismissed_at=null,notified_at=null where id in('710b0000-0000-4000-8000-000000000120','710b0000-0000-4000-8000-000000000121');
 select set_config('request.jwt.claim.sub','',true); set local role service_role; select lives_ok($$select * from public.prepare_suggestion_notifications(200)$$,'notification preparation uses current eligibility');
 select is(public.count_connect_notification_delivery('710b0000-0000-4000-8000-000000000001',now()-interval '1 minute'),(select count(*)::int from public.connect_suggestions s where recipient_user_id='710b0000-0000-4000-8000-000000000001' and notified_at>=now()-interval '1 minute' and public.connect_suggestion_eligible(s)),'delivery rechecks eligibility');
 select is(public.count_connect_notification_delivery('710b0000-0000-4000-8000-000000000001',now()-interval '1 minute'),2,'only two currently available subjects can notify');

@@ -72,6 +72,7 @@ export default async function HighlightsAdminPage({ searchParams }: {
           </div>
           <p className="mt-1 text-xs text-slate-500">{t(`kinds.${row.kind}`)}{row.owner_name ? ` · ${row.owner_name}` : ""} · {day(row.starts_at)} – {day(row.ends_at)}</p>
           {row.note ? <p className="mt-2 text-sm text-slate-700">{row.note}</p> : null}
+          {state !== "ended" && row.title !== null && !row.owner_consent ? <p className="mt-2 text-xs text-amber-800">{t("noConsentHint")}</p> : null}
           {state === "running" && row.title === null ? <p className="mt-2 text-xs text-amber-800">{t("goneHint")}</p> : null}
           <form action={deleteHighlightPlacementAction} className="mt-3">
             <input type="hidden" name="id" value={row.id} />

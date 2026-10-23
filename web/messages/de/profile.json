@@ -474,5 +474,42 @@
         "cta": "Ergänzen"
       }
     }
+  },
+  "welcomeLetter": {
+    "fromLabel": "Von Maria, Gründerin",
+    "photoAlt": "Maria, Gründerin von Made2Found",
+    "greeting": "Hi, ich bin Maria.",
+    "story1": "Ich bin mit 17 Mama geworden und bin danach erst mal einen klassischen beruflichen Weg gegangen. 2025 habe ich dann selbst gegründet und bin krachend gescheitert. Aus vielen Gründen. Einer davon: Das Zusammenspiel mit meinem Mitgründer war schwierig. Danach bin ich in eine ziemlich fiese Krise geraten.",
+    "story2": "Aus dieser Zeit ist Made2Found entstanden. Ich glaube: Wenn man früh über die richtigen Dinge spricht und ehrlich und offen miteinander umgeht, wird die Zusammenarbeit tragfähig. Dann tauchen Probleme nicht erst auf, wenn es schon zu spät ist und Menschen in eine Krise rutschen. Das möchte ich verhindern.",
+    "story3": "Mir ist auch wichtig, dass wir uns gegenseitig unterstützen. Nimm mit, was du brauchst. Und wenn du magst, schreib mir. Ich bin hier auch selbst unterwegs.",
+    "signoff": "Viel Spaß, Maria",
+    "valuesTitle": "So gehen wir hier miteinander um",
+    "values": {
+      "kind": {
+        "title": "Freundlich und wertschätzend.",
+        "text": "Wir gehen davon aus, dass alle hier etwas Gutes wollen."
+      },
+      "respect": {
+        "title": "Kein Platz für Rassismus, Beleidigungen und Diskriminierung.",
+        "text": "Auch nicht als Scherz."
+      },
+      "honest": {
+        "title": "Ehrlich und offen.",
+        "text": "Sag, was du brauchst und was nicht. Das gilt für alle."
+      },
+      "yours": {
+        "title": "Du entscheidest, was andere sehen.",
+        "text": "Jede Freigabe ist getrennt und jederzeit zurücknehmbar."
+      }
+    },
+    "goodToKnowTitle": "Gut zu wissen",
+    "phone": {
+      "title": "Hol dir Made2Found aufs Handy.",
+      "text": "Dann bekommst du Benachrichtigungen wie bei einer normalen App."
+    },
+    "feedback": {
+      "title": "Feedback ist willkommen.",
+      "text": "Wenn dir etwas auffällt, nutz oben den Knopf „Feedback“. Ich lese alles."
+    }
   }
 }
