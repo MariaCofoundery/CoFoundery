@@ -24,8 +24,9 @@
     "toDashboard": "Zum Dashboard",
     "fallback": "Lade Einladung…",
     "choice": {
-      "title": "Team beitreten",
-      "body": "Du wurdest in ein Founder-Team eingeladen. Entscheide selbst, ob du gleich mit diesem Team teilst – beitreten kannst du in beiden Fällen.",
+      "eyebrow": "Einladung",
+      "title": "Schön, dass du dabei bist.",
+      "body": "Du wurdest in ein Founder-Team eingeladen. Beitreten kannst du in beiden Fällen. Du entscheidest nur, ob das Team gleich etwas von dir sieht.",
       "share": {
         "title": "Team beitreten und teilen",
         "body": "Die Mitglieder dieses Teams sehen deine Arbeitsweise und deine Angaben zu Fähigkeiten und Verantwortung. Das gilt für die aktuellen und später hinzukommenden Mitglieder dieses Teams, bis du die Freigabe zurücknimmst."
@@ -55,22 +56,22 @@
     },
     "technicalHint": "Technischer Hinweis: {detail}",
     "toDashboard": "Zum Dashboard",
-    "title": "Willkommen",
-    "invitedBy": "{name} hat dich eingeladen",
+    "title": "Du bist eingeladen.",
+    "invitedBy": "{name} hat dich eingeladen.",
     "context": {
       "existing": {
         "badge": "Bestehendes Gründerteam",
         "title": "Diese Einladung läuft im Modus für ein bestehendes Team.",
-        "text": "Der folgende Flow ist stärker auf Alignment, Rollen, Spannungen und konkrete Zusammenarbeit im bereits laufenden Alltag ausgerichtet."
+        "text": "Ihr arbeitet schon zusammen. Hier schaut ihr, wie das im Alltag läuft und worüber ihr euch noch absprechen wollt."
       },
       "preFounder": {
-        "badge": "Mögliche Gründungspartnerschaft",
+        "badge": "Mögliche Gründung zu zweit",
         "title": "Diese Einladung läuft im Modus für frühes Matching.",
-        "text": "Der folgende Flow hilft euch, Erwartungen, Unterschiede und Passung vor einer engeren Zusammenarbeit sichtbar zu machen."
+        "text": "Ihr lernt euch gerade kennen. Hier könnt ihr früh darüber sprechen, was ihr voneinander erwartet und wo ihr unterschiedlich arbeitet."
       }
     },
-    "profileIntro": "Richte kurz dein Kernprofil ein. Name, Rolle, Fokus und Intention verbinden dein Profil mit Reports und Teamkontext.",
-    "profileOptional": "Weitere Profildaten kannst du später optional ergänzen.",
+    "profileIntro": "Sag uns kurz, wer du bist: Name, Rolle und was du vorhast.",
+    "profileOptional": "Alles andere kannst du später ergänzen.",
     "profileBasicsTitle": "Deine Profil-Basics",
     "profile": {
       "name": "Name",

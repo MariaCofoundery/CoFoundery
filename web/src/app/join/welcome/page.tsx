@@ -81,12 +81,12 @@ function renderErrorState(title: string, t: InviteT) {
       <div className="mb-5 flex justify-end">
         <PublicLanguageSwitcher />
       </div>
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-3xl border border-[#e4e2f0] bg-white p-6 md:p-8">
         <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-        <p className="mt-3 text-sm text-slate-700">{t("errors.loadFailed")}</p>
+        <p className="mt-3 text-base leading-7 text-slate-700">{t("errors.loadFailed")}</p>
         <Link
           href="/dashboard"
-          className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+          className="mt-4 inline-flex min-h-12 items-center rounded-xl border border-[#d6d3ea] bg-white px-6 text-base font-semibold text-slate-900"
         >
           {t("toDashboard")}
         </Link>
@@ -206,27 +206,17 @@ export default async function JoinWelcomePage({
   const dashboardHref = buildInvitationDashboardHref(invitationId);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-12 md:px-8">
-      <div className="mb-5 flex justify-end">
+    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-5 px-5 py-10 md:px-8">
+      <div className="flex justify-end">
         <PublicLanguageSwitcher />
       </div>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-        <div className="border-b border-cyan-200 pb-3">
-          <h1 className="text-3xl font-semibold text-slate-900">{t("title")}</h1>
-          <p className="mt-2 text-base text-slate-700">{t("invitedBy", { name: inviterName })}</p>
-          <div className="mt-4 inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-700">
-            {contextMeta.badge}
-          </div>
-          <p className="mt-3 text-sm font-medium text-slate-900">{contextMeta.title}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{contextMeta.text}</p>
-        </div>
-
-        <p className="mt-4 text-sm leading-6 text-slate-700">
-          {t("profileIntro")}
-        </p>
-        <p className="mt-1 text-xs text-slate-500">
-          {t("profileOptional")}
-        </p>
+      <header className="rounded-[28px] bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] p-6 text-white md:p-9">
+        <p className="text-[13px] font-semibold uppercase tracking-[.1em] opacity-90">{contextMeta.badge}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight md:text-4xl">{t("title")}</h1>
+        <p className="mt-3 max-w-xl text-base leading-7 md:text-lg">{t("invitedBy", { name: inviterName })}</p>
+        <p className="mt-2 max-w-xl text-base leading-7 opacity-95">{contextMeta.text}</p>
+      </header>
+      <section className="rounded-3xl border border-[#e4e2f0] bg-white p-5 md:p-8">
 
         <div className="mt-6">
           {showDebug ? (
@@ -314,14 +304,14 @@ export default async function JoinWelcomePage({
           {hasProfileBasics ? (
             <Link
               href={primaryHref}
-              className="inline-flex items-center rounded-lg border border-cyan-300 bg-cyan-300 px-4 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+              className="inline-flex min-h-12 items-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-6 text-base font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >
               {primaryLabel}
             </Link>
           ) : null}
           <Link
             href={dashboardHref}
-            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+            className="inline-flex min-h-12 items-center rounded-xl border border-[#d6d3ea] bg-white px-6 text-base font-semibold text-slate-900 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
           >
             {t("later")}
           </Link>

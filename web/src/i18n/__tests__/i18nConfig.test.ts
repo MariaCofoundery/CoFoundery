@@ -137,7 +137,7 @@ test("loads English invite token-flow messages", () => {
 
   assert.equal(invite.join?.loadingTitle, "Checking invitation");
   assert.equal(invite.join?.toDashboard, "Go to dashboard");
-  assert.equal(invite.welcome?.title, "Welcome");
+  assert.equal(invite.welcome?.title, "You are invited.");
   assert.equal(invite.welcome?.nextLabels?.base, "Go to foundation questionnaire");
   assert.equal(invite.teamInvite?.title, "Confirm your founder connection together");
   assert.equal(invite.teamInvite?.activateCta, "Accept invitation");

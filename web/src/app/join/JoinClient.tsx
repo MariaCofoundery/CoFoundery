@@ -275,14 +275,17 @@ export default function JoinClient() {
 
   if (uiState.type === "choice") {
     const option =
-      "flex w-full flex-col items-start rounded-2xl border border-slate-300 bg-white p-5 text-left transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60";
+      "flex w-full flex-col items-start rounded-2xl border border-[#d6d3ea] bg-white p-5 text-left transition hover:border-[#6d49e0] hover:bg-[#f5f2fe] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60";
     return (
-      <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-        <section aria-labelledby="join-choice-title" className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h1 id="join-choice-title" className="text-xl font-semibold text-slate-900">{t("choice.title")}</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{t("choice.body")}</p>
+      <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-5 px-5 py-10 md:px-8">
+        <section aria-labelledby="join-choice-title" className="rounded-[28px] bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] p-6 text-white md:p-9">
+          <p className="text-[13px] font-semibold uppercase tracking-[.1em] opacity-90">{t("choice.eyebrow")}</p>
+          <h1 id="join-choice-title" className="mt-2 text-3xl font-semibold leading-tight md:text-4xl">{t("choice.title")}</h1>
+          <p className="mt-3 max-w-xl text-base leading-7 md:text-lg">{t("choice.body")}</p>
+        </section>
+        <section className="rounded-3xl border border-[#e4e2f0] bg-white p-5 md:p-7">
           {/* Zwei gleichwertige Optionen, keine Vorauswahl, kein verstecktes Teilen. */}
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             <button type="button" className={option} disabled={uiState.busy} onClick={() => void acceptWithChoice(uiState.token, uiState.invitationId, true)}>
               <span className="text-base font-semibold text-slate-950">{t("choice.share.title")}</span>
               <span className="mt-2 text-sm leading-6 text-slate-600">{t("choice.share.body")}</span>
@@ -300,18 +303,18 @@ export default function JoinClient() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10 md:px-8">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h1 className="text-xl font-semibold text-slate-900">{uiState.title}</h1>
-        <p className="mt-2 text-sm text-slate-600">{uiState.description}</p>
+      <div className="rounded-3xl border border-[#e4e2f0] bg-white p-6 md:p-8">
+        <h1 className="text-2xl font-semibold text-slate-900">{uiState.title}</h1>
+        <p className="mt-2 text-base leading-7 text-slate-600">{uiState.description}</p>
 
         {uiState.type === "error" ? (
           <>
-            <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               {t("expiredHint")}
             </p>
             <a
               href="/dashboard"
-              className="mt-4 inline-flex rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              className="mt-4 inline-flex min-h-12 items-center rounded-xl border border-[#d6d3ea] bg-white px-6 text-base font-semibold text-slate-900"
             >
               {t("toDashboard")}
             </a>
