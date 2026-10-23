@@ -14,7 +14,7 @@
  * IDs, keine Fehlertexte der Datenbank.
  */
 
-export type CronJobName = "privacy-retention" | "connect-suggestions" | "problem-radar";
+export type CronJobName = "privacy-retention" | "connect-suggestions";
 
 type AlertBody = { ok?: boolean; reason?: string } & Record<string, unknown>;
 
