@@ -511,6 +511,11 @@
     "feedback": {
       "title": "Feedback ist willkommen.",
       "text": "Wenn dir etwas auffällt, nutz oben den Knopf „Feedback“. Ich lese alles."
-    }
+    },
+    "returningEyebrow": "Einmalig",
+    "returningTitle": "Schön, dass du da bist.",
+    "returningIntro": "Bevor es weitergeht, ein paar Worte von mir und wie wir hier miteinander umgehen. Das siehst du nur dieses eine Mal.",
+    "returningConfirm": "Gelesen, weiter",
+    "returningSaving": "Einen Moment …"
   }
 }

@@ -8,6 +8,7 @@ import { countOpenConnectSuggestions } from "@/features/connect/connectSuggestio
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnProfileImage } from "@/features/profile/profileData";
 import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
+import { WelcomeLetterGate } from "@/features/profile/WelcomeLetterGate";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -155,6 +156,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           >
             {children}
           </ProductShell>
+          {user?.id ? <WelcomeLetterGate client={supabase as unknown as SupabaseClient} userId={user.id} /> : null}
         </I18nProvider>
       </body>
     </html>

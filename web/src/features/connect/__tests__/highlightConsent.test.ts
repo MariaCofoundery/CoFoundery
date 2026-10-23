@@ -75,3 +75,13 @@ test("Der Brief verspricht keine Bewertung und kein Match-Wort", () => {
   assert.doesNotMatch(text, /Score|Kompatibilit|Match-Prozent/);
   assert.ok(messages.values.respect.title.includes("Rassismus"));
 });
+
+test("Der Begruessungsbrief wird bestehenden Konten einmal gezeigt, ohne Backfill", () => {
+  const sql = source("../supabase/migrations/20261221120000_welcome_letter_seen.sql").replace(/--.*$/gm, "");
+  assert.match(sql, /add column if not exists welcome_letter_seen_at timestamptz;/);
+  assert.doesNotMatch(sql, /\bupdate\b/i, "ein Backfill wuerde den Brief fuer alle Bestandskonten ueberspringen");
+  const gate = source("src/features/profile/WelcomeLetterGate.tsx");
+  assert.match(gate, /if \(error \|\| !data\?\.onboarding_completed_at \|\| data\.welcome_letter_seen_at\) return null/);
+  assert.match(source("src/app/layout.tsx"), /<WelcomeLetterGate client=/);
+  assert.match(source("src/features/profile/onboardingCompletion.ts"), /welcome_letter_seen_at/);
+});

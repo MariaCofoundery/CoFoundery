@@ -16,7 +16,9 @@ type Client = Awaited<ReturnType<typeof createClient>>;
 export async function markOnboardingComplete(client: Client, userId: string) {
   await client
     .from("person_core")
-    .update({ onboarding_completed_at: new Date().toISOString() })
+    // Der Einstieg zeigt den Begruessungsbrief; wer ihn durchlaufen hat, bekommt
+    // ihn nicht noch einmal als Einmal-Hinweis (WelcomeLetterGate).
+    .update({ onboarding_completed_at: new Date().toISOString(), welcome_letter_seen_at: new Date().toISOString() })
     .eq("user_id", userId)
     .is("onboarding_completed_at", null);
 }

@@ -511,6 +511,11 @@
     "feedback": {
       "title": "Feedback is welcome.",
       "text": "If something catches your eye, use the “Feedback” button at the top. I read everything."
-    }
+    },
+    "returningEyebrow": "Just once",
+    "returningTitle": "Good to have you here.",
+    "returningIntro": "Before you carry on, a few words from me and how we treat each other here. You will only see this once.",
+    "returningConfirm": "Read, continue",
+    "returningSaving": "One moment …"
   }
 }
