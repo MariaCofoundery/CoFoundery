@@ -110,7 +110,8 @@
     "remote": "Zusammenarbeitsmodus",
     "allRemote": "Alle Arbeitsweisen",
     "apply": "Filter anwenden",
-    "search": "Suche in Titel, Beschreibung, Themen und Branchen"
+    "search": "Suche in Titel, Beschreibung, Themen und Branchen",
+    "searchButton": "Suchen"
   },
   "empty": {
     "title": "Gerade passt kein Eintrag zu allen Kriterien.",
@@ -751,7 +752,8 @@
   "rememberSearch": "Benachrichtigung zu neuen Beiträgen einrichten",
   "post": {
     "title": "Selbst etwas einstellen",
-    "text": "Sag, was du suchst oder anbietest – oder finde jemanden zum Gründen."
+    "text": "Sag, was du suchst oder anbietest – oder finde jemanden zum Gründen.",
+    "create": "Eintrag erstellen"
   },
   "browse": {
     "title": "Schauen, was da ist"

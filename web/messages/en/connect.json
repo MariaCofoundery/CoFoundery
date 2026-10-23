@@ -110,7 +110,8 @@
     "remote": "Collaboration mode",
     "allRemote": "All work modes",
     "apply": "Apply filters",
-    "search": "Search titles, descriptions, topics and industries"
+    "search": "Search titles, descriptions, topics and industries",
+    "searchButton": "Search"
   },
   "empty": {
     "title": "No listing currently meets every selected criterion.",
@@ -751,7 +752,8 @@
   "rememberSearch": "Set up notifications for new contributions",
   "post": {
     "title": "Post something yourself",
-    "text": "Say what you're looking for or offering – or find someone to found with."
+    "text": "Say what you're looking for or offering – or find someone to found with.",
+    "create": "Create entry"
   },
   "browse": {
     "title": "See what's there"

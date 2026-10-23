@@ -21,6 +21,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 
 const card = "rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,.05)]";
 const action = "inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold focus-visible:ring-4 focus-visible:ring-amber-200";
+const selectField = "min-h-11 w-full rounded-xl border border-[#d8d5ea] bg-white px-3 text-sm font-normal normal-case tracking-normal text-[#33325e]";
 const field = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm";
 export default async function ConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const [t, locale, filters] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]);
@@ -46,19 +47,15 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
     <div className="mx-auto max-w-6xl space-y-6">
       {/* Orientierung, Discoveryarten, Highlights, Beitrag und Suche. */}
-      <header className="brand-panel rounded-[28px] p-6 sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("subtitle")}</p>
-          </div>
-          {/* Rechts oben steht, was einem selbst gehoert. Aus Connect fuehrte
-              vorher kein Weg dorthin - man sah ausschliesslich das, was andere
-              gemacht haben. */}
-          <div className="flex flex-col items-start gap-2 sm:items-end">
-            {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white underline underline-offset-4">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
-          </div>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold leading-tight tracking-[-0.01em] text-slate-950 sm:text-[2rem]">{t("title")}</h1>
+          <p className="mt-2 max-w-2xl text-base leading-7 text-[#5f5e7a]">{t("subtitle")}</p>
         </div>
+        {/* Rechts oben steht, was einem selbst gehoert. Aus Connect fuehrte
+            vorher kein Weg dorthin - man sah ausschliesslich das, was andere
+            gemacht haben. */}
+        {connectAttentionCount > 0 ? <Link href="/connect/contacts" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-violet-800 underline underline-offset-4">{t("actions.contacts")}<span aria-label={t("messages.attentionCount", { count: connectAttentionCount })} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(connectAttentionCount, 99)}</span></Link> : null}
       </header>
 
       {/* Erst die Highlights, dann "Fuer dich" als schmale Zeile: Highlights sind fuer alle
@@ -68,56 +65,62 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
       <HighlightConsentPrompt client={client} userId={user.id} />
       <ConnectHighlight highlights={highlights} />
       {suggestionStrip.length > 0 ? (
-        <section aria-labelledby="connect-for-you" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3">
+        <section aria-labelledby="connect-for-you" className="flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#e4e2f0] bg-white px-5 py-3">
           <p className="text-sm text-slate-600"><span id="connect-for-you" className="font-semibold text-slate-950">{t("suggestions.title")}</span> · {t("suggestions.strip", { count: suggestionStrip.length })}</p>
-          <Link href="/connect/suggestions" className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-violet-800">{t("suggestions.all")}</Link>
+          <Link href="/connect/suggestions" className="inline-flex min-h-11 items-center rounded-xl bg-[#f1f0f7] px-4 text-sm font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t("suggestions.all")}</Link>
         </section>
       ) : null}
 
-      <section className="rounded-2xl bg-slate-50 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("post.title")}</p>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("post.text")}</p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Link href="/connect/listings/new?direction=seeking" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.seek")}</Link>
-          <Link href="/connect/listings/new?direction=offering" className={`${action} border border-slate-200 bg-white text-slate-800`}>{t("actions.offer")}</Link>
-          <Link href={cofounderHref} className={`${action} border border-violet-200 bg-violet-50 text-violet-800`}>{t("actions.cofounder")}</Link>
-        </div>
-      </section>
-
-      {/* Suche oben ueber die ganze Breite, die Eingrenzung links, die Eintraege als Liste.
-          Das Suchfeld liegt ausserhalb des Formulars und gehoert ueber `form` dazu. */}
+      {/* Suche und Einstellen in einer Zeile. Das Suchfeld liegt ausserhalb des
+          Formulars und gehoert ueber `form` dazu; "Eintrag erstellen" klappt
+          die drei Wege zum Einstellen auf. */}
       <section className="flex flex-wrap items-center gap-3">
-        <input
-          name="q"
-          type="search"
-          form="connect-filter"
-          defaultValue={filters.q}
-          className={`${field} min-w-0 flex-1`}
-          placeholder={t("filters.search")}
-          aria-label={t("filters.search")}
-        />
-        <button form="connect-filter" className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
+        <div className="relative min-w-0 flex-1 basis-72">
+          <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8a88a8]" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>
+          <input
+            name="q"
+            type="search"
+            form="connect-filter"
+            defaultValue={filters.q}
+            className="min-h-12 w-full rounded-xl border border-[#d8d5ea] bg-white pl-11 pr-4 text-sm text-slate-900 placeholder:text-[#8a88a8]"
+            placeholder={t("filters.search")}
+            aria-label={t("filters.search")}
+          />
+        </div>
+        <button form="connect-filter" className="min-h-12 shrink-0 rounded-xl bg-[#f1f0f7] px-5 text-sm font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t("filters.searchButton")}</button>
+        <details className="relative">
+          <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white [&::-webkit-details-marker]:hidden">{t("post.create")} <span aria-hidden="true">▾</span></summary>
+          <div className="absolute right-0 z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-2xl border border-[#e4e2f0] bg-white p-4 shadow-[0_16px_40px_rgba(15,23,42,.12)]">
+            <p className="text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("post.title")}</p>
+            <p className="mt-1 text-sm leading-6 text-[#5f5e7a]">{t("post.text")}</p>
+            <div className="mt-3 grid gap-2">
+              <Link href="/connect/listings/new?direction=seeking" className="inline-flex min-h-11 items-center rounded-xl bg-[#efeafd] px-4 text-sm font-semibold text-[#4a2fb8]">{t("actions.seek")}</Link>
+              <Link href="/connect/listings/new?direction=offering" className="inline-flex min-h-11 items-center rounded-xl bg-[#dcf3ef] px-4 text-sm font-semibold text-[#0b5d56]">{t("actions.offer")}</Link>
+              <Link href={cofounderHref} className="inline-flex min-h-11 items-center rounded-xl bg-[#f1f0f7] px-4 text-sm font-semibold text-slate-900">{t("actions.cofounder")}</Link>
+            </div>
+          </div>
+        </details>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
         <div className="space-y-4">
-          <form id="connect-filter" className="rounded-3xl border border-slate-200 bg-white p-5">
+          <form id="connect-filter" className="rounded-[22px] border border-[#e4e2f0] bg-white p-5">
             <details className="connect-filter-details" open={activeFilterCount > 0}>
-              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-800">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
+              <summary className="flex min-h-9 cursor-pointer items-center text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
               <div className="mt-3 grid gap-3">
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.direction")}<select name="direction" defaultValue={filters.direction || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select></label>
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.category")}<select name="category" defaultValue={filters.category || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allCategories")}</option>{CONNECT_CATEGORIES.map((v) => <option key={v} value={v}>{t(`categories.${v}`)}</option>)}</select></label>
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.scope")}<select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select></label>
-                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.remote")}<select name="remote_mode" defaultValue={filters.remote_mode || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filters.direction")}<select name="direction" defaultValue={filters.direction || ""} className={selectField}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filters.category")}<select name="category" defaultValue={filters.category || ""} className={selectField}><option value="">{t("filters.allCategories")}</option>{CONNECT_CATEGORIES.map((v) => <option key={v} value={v}>{t(`categories.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filters.scope")}<select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={selectField}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1.5 text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]">{t("filters.remote")}<select name="remote_mode" defaultValue={filters.remote_mode || ""} className={selectField}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select></label>
               </div>
             </details>
             {/* Zuruecksetzen nur, wenn es etwas zurueckzusetzen gibt. */}
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <button className="min-h-11 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
-              {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
+              <button className="min-h-11 rounded-xl bg-[#f1f0f7] px-5 text-sm font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t("filters.apply")}</button>
+              {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("empty.reset")}</Link> : null}
             </div>
           </form>
-        <div className="rounded-3xl border border-slate-200 bg-white/70 p-5">
+        <div className="rounded-[22px] border border-[#e4e2f0] bg-white/70 p-5">
         {/* AUCH EINGEKLAPPT, seit dem 21.09.2026: Dieser Block war der Rest der
             grossen Filterflaeche - mit der Faehigkeiten-Auswahl darin war er
             grosser als die eingeklappten Filter darueber. Speichern ist der
@@ -156,8 +159,8 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm text-slate-500">{t("resultCount", { count: listings.length })}</p>
-      {listings.length ? <section aria-label={t("browseTitle")} className="divide-y divide-slate-100 overflow-hidden rounded-3xl border border-slate-200 bg-white">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
+          <p className="text-sm text-[#5f5e7a]">{t("resultCount", { count: listings.length })}</p>
+      {listings.length ? <section aria-label={t("browseTitle")} className="divide-y divide-[#e4e2f0] overflow-hidden rounded-[22px] border border-[#e4e2f0] bg-white">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
         {/* Zwei verschiedene Leerzustaende, die vorher gleich aussahen.
             Wer ohne Filter auf eine leere Flaeche kommt, ist der erste
             Mensch hier - "kein Eintrag passt zu allen Kriterien" und ein
