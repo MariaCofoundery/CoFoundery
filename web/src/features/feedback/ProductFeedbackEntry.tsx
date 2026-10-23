@@ -278,7 +278,7 @@ function ProductFeedbackDialog({
 
                 <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs leading-6 text-slate-500">
-                    {t("requiredHint")}
+                    {t("requiredHint")} {t("nameNotice")}
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <ReportActionButton onClick={onClose} variant="utility">

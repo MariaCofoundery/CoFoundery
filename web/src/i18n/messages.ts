@@ -29,6 +29,7 @@ import deFeedback from "../../messages/de/feedback.json";
 import deFounderLibrary from "../../messages/de/founderLibrary.json";
 import deFounderInTheWild from "../../messages/de/founderInTheWild.json";
 import deInvite from "../../messages/de/invite.json";
+import deAdmin from "../../messages/de/admin.json";
 import deModeration from "../../messages/de/moderation.json";
 import deNavigation from "../../messages/de/navigation.json";
 import deNotices from "../../messages/de/notices.json";
@@ -60,6 +61,7 @@ import enFeedback from "../../messages/en/feedback.json";
 import enFounderLibrary from "../../messages/en/founderLibrary.json";
 import enFounderInTheWild from "../../messages/en/founderInTheWild.json";
 import enInvite from "../../messages/en/invite.json";
+import enAdmin from "../../messages/en/admin.json";
 import enModeration from "../../messages/en/moderation.json";
 import enNavigation from "../../messages/en/navigation.json";
 import enNotices from "../../messages/en/notices.json";
@@ -99,6 +101,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     founderInTheWild: deFounderInTheWild,
     invite: deInvite,
     navigation: deNavigation,
+    admin: deAdmin,
     moderation: deModeration,
     notices: deNotices,
     connect: deConnect,
@@ -136,6 +139,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     founderInTheWild: enFounderInTheWild,
     invite: enInvite,
     navigation: enNavigation,
+    admin: enAdmin,
     moderation: enModeration,
     notices: enNotices,
     connect: enConnect,

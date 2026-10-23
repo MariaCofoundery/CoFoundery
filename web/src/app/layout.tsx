@@ -87,6 +87,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const isPlatformAdmin = user?.id
     ? await Promise.resolve(supabase.rpc("is_platform_admin")).then(({ data }) => data === true).catch(() => false)
     : false;
+  // Die Zahl am Menuepunkt: neues Feedback plus offene Meldungen. Nur fuer Admins gefragt.
+  const adminAttentionCount = isPlatformAdmin
+    ? await Promise.resolve(supabase.rpc("admin_attention_count")).then(({ data }) => (typeof data === "number" ? data : 0)).catch(() => 0)
+    : 0;
 
   const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, connectSuggestionCount] = user
     ? await Promise.all([
@@ -159,6 +163,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}
             isPlatformAdmin={isPlatformAdmin}
+            adminAttentionCount={adminAttentionCount}
             storedWorkContext={storedWorkContext}
           >
             {children}

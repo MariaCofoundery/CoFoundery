@@ -42,6 +42,8 @@ type Props = {
   researchConsentState: ResearchConsentState;
   /** Nur Darstellung: ob der Menueeintrag "Admin" erscheint. Der Zugang selbst wird auf /admin serverseitig geprueft. */
   isPlatformAdmin?: boolean;
+  /** Neues Feedback plus offene Meldungen - die Zahl am Menuepunkt "Admin". */
+  adminAttentionCount?: number;
   /** Zuletzt genutzter Arbeitskontext aus dem Cookie - nur Darstellung, siehe workContext.ts. */
   storedWorkContext?: WorkContext | null;
 };
@@ -245,6 +247,7 @@ export function ProductShell({
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
   isPlatformAdmin = false,
+  adminAttentionCount = 0,
   storedWorkContext: initialStoredWorkContext = null,
 }: Props) {
   const pathname = usePathname();
@@ -777,6 +780,7 @@ export function ProductShell({
                   avatarImageUrl={avatarImageUrl}
                   accountOnly={isSuspendedConnectOnly}
                   isPlatformAdmin={isPlatformAdmin}
+                  adminAttentionCount={adminAttentionCount}
                   showName={!(hasFounder && hasAdvisor)}
                 />
               </div>
@@ -904,7 +908,7 @@ export function ProductShell({
                 </MobileMenuLink>
                 {isPlatformAdmin ? (
                   <MobileMenuLink href="/admin" active={pathname === "/admin" || pathname.startsWith("/admin/")} onNavigate={closeMenu}>
-                    {t("admin")}
+                    {t("admin")}{adminAttentionCount > 0 ? ` (${Math.min(adminAttentionCount, 99)})` : ""}
                   </MobileMenuLink>
                 ) : null}
                 <ProductFeedbackEntry
@@ -1049,6 +1053,7 @@ function ProfileMenu({
   avatarImageUrl,
   accountOnly,
   isPlatformAdmin = false,
+  adminAttentionCount = 0,
   showName = true,
 }: {
   displayName: string | null;
@@ -1056,6 +1061,7 @@ function ProfileMenu({
   avatarImageUrl: string | null;
   accountOnly: boolean;
   isPlatformAdmin?: boolean;
+  adminAttentionCount?: number;
   showName?: boolean;
 }) {
   const t = useTranslations("navigation");
@@ -1158,7 +1164,10 @@ function ProfileMenu({
               className="block rounded-xl px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
               role="menuitem"
             >
-              {t("admin")}
+              <span className="flex flex-wrap items-center gap-2">
+                {t("admin")}
+                {adminAttentionCount > 0 ? <span aria-label={t("adminAttention", { count: adminAttentionCount })} className="rounded-full bg-[#6d49e0] px-2 py-0.5 text-center text-[12px] font-bold text-white">{Math.min(adminAttentionCount, 99)}</span> : null}
+              </span>
             </Link>
           ) : null}
           <form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>

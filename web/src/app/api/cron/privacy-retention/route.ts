@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { handlePrivacyRetentionCron, privilegedRetentionClient } from "@/features/privacy/retentionCleanup";
+import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
 /**
@@ -27,5 +28,7 @@ export async function GET(request: NextRequest) {
     createClient: privilegedRetentionClient,
   });
   await sendCronFailureAlert("privacy-retention", outcome.status, outcome.body);
+  // Nur ein Lauf, der wirklich stattgefunden hat (200 oder 500), zaehlt fuer das Dashboard.
+  if (outcome.status === 200 || outcome.status === 500) await recordCronHeartbeat("privacy-retention", outcome.status === 200);
   return NextResponse.json(outcome.body, { status: outcome.status });
 }

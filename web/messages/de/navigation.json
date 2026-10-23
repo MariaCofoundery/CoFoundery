@@ -83,5 +83,6 @@
   "advisorFollow": "Begleitung",
   "advisorInvite": "Einladen",
   "advisorOrg": "Organisation",
-  "admin": "Admin"
+  "admin": "Admin",
+  "adminAttention": "{count} offen im Admin-Bereich"
 }

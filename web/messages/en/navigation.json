@@ -83,5 +83,6 @@
   "advisorFollow": "Support",
   "advisorInvite": "Invite",
   "advisorOrg": "Organization",
-  "admin": "Admin"
+  "admin": "Admin",
+  "adminAttention": "{count} open in the admin area"
 }

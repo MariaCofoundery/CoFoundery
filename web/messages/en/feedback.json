@@ -30,5 +30,6 @@
   "requiredHint": "The first three questions are especially important for me; everything else is optional.",
   "cancel": "Cancel",
   "saving": "Saving...",
-  "submit": "Send feedback"
+  "submit": "Send feedback",
+  "nameNotice": "Your name is stored with the feedback and only read by the founder."
 }

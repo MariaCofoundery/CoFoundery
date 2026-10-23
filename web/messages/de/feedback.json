@@ -30,5 +30,6 @@
   "requiredHint": "Die ersten drei Fragen sind für mich besonders wichtig, alles andere ist optional.",
   "cancel": "Abbrechen",
   "saving": "Speichere...",
-  "submit": "Feedback senden"
+  "submit": "Feedback senden",
+  "nameNotice": "Dein Name wird mit dem Feedback gespeichert und nur von der Gründerin gelesen."
 }

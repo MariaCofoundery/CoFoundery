@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
+import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
 /**
@@ -55,6 +56,7 @@ export async function GET(request: NextRequest) {
   }
 
   const result = await runSuggestionNotifications(BATCH);
+  await recordCronHeartbeat("connect-suggestions", result.ok);
   if (!result.ok) {
     const status = result.reason === "missing_service_role" ? 503 : 500;
     await sendCronFailureAlert("connect-suggestions", status, result);

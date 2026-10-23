@@ -1,0 +1,80 @@
+{
+  "title": "Admin",
+  "intro": "What to do today, what came in and how things are running. No scores, no rankings; names only appear with feedback.",
+  "feedback": {
+    "title": "Feedback",
+    "newCount": "{count} new",
+    "tabs": {
+      "new": "New",
+      "all": "All",
+      "read": "Read"
+    },
+    "new": "New",
+    "read": "Read",
+    "deleted": "No name given",
+    "source": {
+      "nav": "from the bar",
+      "workbook": "after the workbook"
+    },
+    "accountSince": "Account since {date}",
+    "noAnswer": "No answer",
+    "markRead": "Mark as read",
+    "markNew": "Mark as new again",
+    "nextNew": "Next new one",
+    "saving": "Saving …",
+    "older": "Show older",
+    "newer": "Show newer",
+    "loadError": "The feedback could not be loaded just now.",
+    "empty": {
+      "new": "Nothing new. Feedback appears here when it comes in.",
+      "all": "No feedback yet.",
+      "read": "Nothing marked as read yet."
+    }
+  },
+  "overview": {
+    "loadError": "The numbers could not be loaded just now.",
+    "accounts": {
+      "title": "Accounts · this week",
+      "text": "{prev} the week before. {onboarded} completed the introduction. {highlight} active profiles ticked the highlight box."
+    },
+    "connect": {
+      "title": "Connect · new entries",
+      "seeking": "{count} requests",
+      "offering": "{count} offers",
+      "problems": "{count} problems",
+      "ventures": "{count} ventures"
+    },
+    "operations": {
+      "title": "Operations",
+      "suggestions": "Suggestions",
+      "retention": "Cleanup run",
+      "dump": "Database dump",
+      "daysAgo": "{count, plural, =0 {today} =1 {1 day ago} other {# days ago}}",
+      "dumpDone": "Done today",
+      "saving": "…",
+      "state": {
+        "ok": "running",
+        "late": "has not run for a while",
+        "failed": "failed last time",
+        "never": "not reported yet"
+      }
+    },
+    "todo": {
+      "title": "To do",
+      "empty": "Nothing open.",
+      "reports": "{count, plural, one {open report in moderation} other {open reports in moderation}}",
+      "radar": "{count, plural, one {new signal in the problem radar to review} other {new signals in the problem radar to review}}",
+      "highlights": "{count, plural, one {highlight ends in 3 days} other {highlights end in 3 days}}",
+      "open": "Open"
+    },
+    "areas": {
+      "title": "Areas",
+      "moderation": "Moderation",
+      "highlights": "Highlights",
+      "radar": "Problem radar",
+      "board": "Problem board",
+      "research": "Research",
+      "text": "Everything platform admins manage, with the numbers in front."
+    }
+  }
+}

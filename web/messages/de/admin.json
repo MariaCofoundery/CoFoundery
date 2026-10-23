@@ -1,0 +1,80 @@
+{
+  "title": "Admin",
+  "intro": "Was heute zu tun ist, was hereingekommen ist und wie es läuft. Keine Scores, keine Rangliste; Namen siehst du nur beim Feedback.",
+  "feedback": {
+    "title": "Feedback",
+    "newCount": "{count} neu",
+    "tabs": {
+      "new": "Neu",
+      "all": "Alle",
+      "read": "Gelesen"
+    },
+    "new": "Neu",
+    "read": "Gelesen",
+    "deleted": "Name nicht angegeben",
+    "source": {
+      "nav": "aus der Leiste",
+      "workbook": "nach dem Workbook"
+    },
+    "accountSince": "Konto seit {date}",
+    "noAnswer": "Keine Angabe",
+    "markRead": "Als gelesen markieren",
+    "markNew": "Wieder als neu markieren",
+    "nextNew": "Nächstes neues",
+    "saving": "Speichert …",
+    "older": "Ältere anzeigen",
+    "newer": "Neuere anzeigen",
+    "loadError": "Das Feedback ließ sich gerade nicht laden.",
+    "empty": {
+      "new": "Nichts Neues. Wenn Feedback hereinkommt, steht es hier.",
+      "all": "Noch kein Feedback.",
+      "read": "Noch nichts als gelesen markiert."
+    }
+  },
+  "overview": {
+    "loadError": "Die Zahlen ließen sich gerade nicht laden.",
+    "accounts": {
+      "title": "Konten · diese Woche",
+      "text": "{prev} in der Woche davor. {onboarded} haben den Einstieg abgeschlossen. {highlight} aktive Profile haben das Highlight-Häkchen gesetzt."
+    },
+    "connect": {
+      "title": "Connect · neue Einträge",
+      "seeking": "{count} Gesuche",
+      "offering": "{count} Angebote",
+      "problems": "{count} Probleme",
+      "ventures": "{count} Unternehmen"
+    },
+    "operations": {
+      "title": "Betrieb",
+      "suggestions": "Vorschläge",
+      "retention": "Löschlauf",
+      "dump": "Datenbank-Dump",
+      "daysAgo": "{count, plural, =0 {heute} =1 {vor 1 Tag} other {vor # Tagen}}",
+      "dumpDone": "Heute gemacht",
+      "saving": "…",
+      "state": {
+        "ok": "läuft",
+        "late": "länger nicht gelaufen",
+        "failed": "zuletzt fehlgeschlagen",
+        "never": "noch nicht gemeldet"
+      }
+    },
+    "todo": {
+      "title": "Zu tun",
+      "empty": "Nichts offen.",
+      "reports": "{count, plural, one {offene Meldung in der Moderation} other {offene Meldungen in der Moderation}}",
+      "radar": "{count, plural, one {neues Signal im Problem-Radar zu prüfen} other {neue Signale im Problem-Radar zu prüfen}}",
+      "highlights": "{count, plural, one {Highlight läuft in 3 Tagen aus} other {Highlights laufen in 3 Tagen aus}}",
+      "open": "Öffnen"
+    },
+    "areas": {
+      "title": "Bereiche",
+      "moderation": "Moderation",
+      "highlights": "Highlights",
+      "radar": "Problem-Radar",
+      "board": "Problembrett",
+      "research": "Research",
+      "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor."
+    }
+  }
+}
