@@ -2,9 +2,9 @@ import { getTranslations } from "next-intl/server";
 import { setTeamShareAction } from "@/features/teams/teamShareActions";
 
 const PRIMARY =
-  "inline-flex min-h-11 items-center justify-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
+  "inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2";
 const SECONDARY =
-  "inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
+  "inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2";
 
 /**
  * "Mit diesem Team teilen" (Phase 11.7B).
@@ -36,7 +36,7 @@ export async function TeamShareCard({
     <section
       id="teamfreigabe"
       aria-labelledby="team-share-title"
-      className={`ws-no-print scroll-mt-24 rounded-2xl border ${active ? "border-emerald-200 bg-emerald-50/50" : "border-violet-200 bg-violet-50/50"} ${compact ? "p-4" : "p-5 sm:p-6"}`}
+      className={`ws-no-print scroll-mt-24 rounded-[24px] border ${active ? "border-[#bfe8d1] bg-[#f3fbf7]" : "border-[#e4e2f0] bg-white"} ${compact ? "p-4" : "p-5 sm:p-7"}`}
     >
       <h2 id="team-share-title" className="flex items-center gap-2 text-lg font-semibold text-slate-950">
         <span aria-hidden="true" className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-sm ${active ? "bg-emerald-600 text-white" : "border border-slate-300 bg-white text-slate-500"}`}>

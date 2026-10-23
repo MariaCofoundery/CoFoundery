@@ -93,11 +93,14 @@
         "text": "Freiwillige Formate, die ihr jeweils zu zweit macht. Was dabei herauskommt, gilt für dieses Paar – nicht automatisch für das ganze Team."
       },
       "commit": {
-        "title": "Vereinbaren",
+        "title": "Vereinbaren und üben",
         "text": "Was ihr besprochen habt, haltet ihr im Founder Setup gemeinsam fest. Gültig ist, was alle aktuellen Mitglieder bestätigt haben."
       },
       "resources": {
         "title": "Zum Nachschlagen"
+      },
+      "together": {
+        "title": "Gemeinsam anschauen"
       }
     },
     "header": {
@@ -763,6 +766,8 @@
     "you": "Du",
     "strengths": "Stärken",
     "direction": "Antrieb",
-    "noneYet": "Noch nichts bestätigt."
+    "noneYet": "Noch nichts bestätigt.",
+    "cardText": "Was jede Person freigibt, nebeneinander.",
+    "cardCta": "Ansehen"
   }
 }

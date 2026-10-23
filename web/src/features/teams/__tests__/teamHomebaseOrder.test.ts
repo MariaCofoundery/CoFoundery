@@ -41,7 +41,8 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
   const understand = header;
   const deepen = at('t("groups.discover.title")');
   const agree = at('t("groups.commit.title")');
-  const resources = at('t("groups.resources.title")');
+  // Konzeptboard 34: die Library ist eine Kachel in „Vereinbaren und üben" - kein eigener Abschnitt mehr.
+  const resources = at("<FounderLibraryHomebaseCard");
   const history = at('id="team-alignment"');
   const advisor = at("<FounderRelationshipAdvisorPanel");
 
@@ -49,6 +50,11 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
   assert.ok(header < deepen, "Kopf und Statuszeile stehen oben");
   assert.ok(understand < deepen && deepen < agree, "die drei Ebenen stehen nicht in Reihenfolge");
   assert.ok(agree < resources && resources < history && history < advisor, "Nachschlagen und Rueckblick stehen nicht am Ende");
+  // Gemeinsam anschauen steht vor dem Vertiefen zu zweit und enthaelt die drei Teamkarten.
+  assert.ok(at('t("groups.together.title")') < deepen, "Gemeinsam anschauen steht nach dem Vertiefen");
+  for (const card of ["<BetaTeamCard", "<TradeoffsTeamCard", "<TeamStrengthsCard"]) {
+    assert.ok(at(card) > at('t("groups.together.title")') && at(card) < deepen, `${card} steht nicht unter Gemeinsam anschauen`);
+  }
 
   // Jedes Angebot sitzt in seiner Ebene.
   const overview = source("src/features/teams/TeamOverview.tsx");
@@ -60,7 +66,7 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
     assert.ok(at(entry) > deepen && at(entry) < agree, `${entry} steht nicht unter Vertiefen`);
   }
   assert.ok(at('aria-labelledby="team-setup-title"') > agree && at('aria-labelledby="team-setup-title"') < resources);
-  assert.ok(at("<FounderLibraryHomebaseCard") > resources && at("<FounderLibraryHomebaseCard") < history);
+  assert.ok(at("<FounderLibraryHomebaseCard") < history);
   assert.ok(at('t("agreements.title")') > history, "historische Notizen stehen ausserhalb des Rueckblicks");
 
   // Die Zusage aus Phase 9.2 bleibt: Founder Setup ist vor den optionalen

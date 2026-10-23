@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { IconTile } from "@/features/ui/Icons";
 import { tradeoffsCardState } from "@/features/modules/tradeoffs/teamParse";
 import { loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
 
@@ -37,25 +38,19 @@ export async function BetaTeamCard({
   }[state];
 
   return (
-    <section className="scroll-mt-24" aria-labelledby="team-beta-title" data-beta-team-card={state}>
-      <h2 id="team-beta-title" className="flex items-center gap-2 text-lg font-semibold text-slate-950">
-        {t("team.title")}
-        <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px] font-normal text-slate-600">{t("badge")}</span>
-      </h2>
-      <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">{t("team.text")}</p>
-      <article className="mt-4 flex flex-col rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-base font-semibold text-slate-950">{tModules("venture_core_beta.title")}</h3>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{tModules("venture_core_beta.summary")}</p>
-        <p className="mt-3 text-sm font-medium text-slate-800">{view.status}</p>
-        <div className="mt-4">
-          <Link
-            href={view.href}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            {view.label}
-          </Link>
-        </div>
-      </article>
-    </section>
+    <article className="card-lift flex h-full flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" data-beta-team-card={state}>
+      <div className="flex items-center justify-between gap-2">
+        <IconTile name="rocket" tone="violet" />
+        <span className="rounded-full bg-[#fdecc8] px-2.5 py-0.5 text-[13px] font-semibold text-[#7a4300]">{t("badge")}</span>
+      </div>
+      <h3 className="text-xl font-semibold leading-tight text-[#0b1f3a]">{tModules("venture_core_beta.title")}</h3>
+      <p className="text-sm leading-[1.55] text-[#5f5e7a]">{tModules("venture_core_beta.summary")}</p>
+      <span className="self-start rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]">{view.status}</span>
+      <div className="mt-auto pt-1">
+        <Link href={view.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4]">
+          {view.label}
+        </Link>
+      </div>
+    </article>
   );
 }

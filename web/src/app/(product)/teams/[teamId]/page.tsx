@@ -10,6 +10,8 @@ import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/Founde
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { TeamPageHeader } from "@/features/teams/TeamPageHeader";
 import { TeamOverview } from "@/features/teams/TeamOverview";
+import { IconTile } from "@/features/ui/Icons";
+import { TeamStrengthsCard } from "@/features/teams/TeamStrengthsCard";
 import { TeamShareCard } from "@/features/teams/TeamShareCard";
 import { BetaTeamCard } from "@/features/modules/ui/BetaTeamCard";
 import { TradeoffsTeamCard } from "@/features/modules/ui/TradeoffsTeamCard";
@@ -31,10 +33,10 @@ type TeamHomebasePageProps = {
 
 const SECTION_CLASS =
   "rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-6";
-const CARD_CLASS = "flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5";
+const CARD_CLASS = "flex h-full flex-col rounded-[24px] border border-[#e4e2f0] bg-white p-6";
 const CARD_LINK_CLASS =
   "inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
-const GROUP_TITLE_CLASS = "text-lg font-semibold text-slate-950";
+const GROUP_TITLE_CLASS = "text-2xl font-semibold tracking-tight text-[#0b1f3a]";
 const GROUP_TEXT_CLASS = "mt-1 max-w-3xl text-sm leading-6 text-slate-600";
 const LINK_CLASS =
   "inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2";
@@ -200,12 +202,18 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
         {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
             Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
             freigegeben haben. Hier steht nur die eigene Lage. */}
-        <BetaTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
-        <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+        <section aria-labelledby="team-together-title">
+          <h2 id="team-together-title" className={GROUP_TITLE_CLASS}>{t("groups.together.title")}</h2>
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <BetaTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+            <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+            <TeamStrengthsCard client={supabase} teamId={teamId} />
+          </div>
+        </section>
 
         {/* VERTIEFEN: ausdruecklich zu zweit. Nur tatsaechlich vorhandene
             Paare - keine erfundenen Paarungen, keine neuen Relationships. */}
-        <details id="team-deep-dives" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white/70 p-4" open={!isPairTeam}>
+        <details id="team-deep-dives" className="scroll-mt-24 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3" open={!isPairTeam}>
           <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("deepen.summary")}</summary>
         <section className="mt-4" aria-labelledby="team-deepen-title">
           <h2 id="team-deepen-title" className={GROUP_TITLE_CLASS}>{t("groups.discover.title")}</h2>
@@ -294,11 +302,13 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             Mitglieder bestaetigt haben. */}
         <section aria-labelledby="team-agree-title">
           <h2 id="team-agree-title" className={GROUP_TITLE_CLASS}>{t("groups.commit.title")}</h2>
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <article
-            className="mt-4 rounded-2xl border border-violet-200/80 bg-violet-50/40 p-5 sm:p-6"
+            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
             aria-labelledby="team-setup-title"
           >
-            <h3 id="team-setup-title" className="text-lg font-semibold text-slate-950">{t("setup.title")}</h3>
+            <div className="flex items-center justify-between gap-2"><IconTile name="pencil" tone="green" /></div>
+            <h3 id="team-setup-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("setup.title")}</h3>
             <p className="mt-4 text-sm font-medium text-slate-800">
               {setupCounts
                 ? setupT("summary", {
@@ -324,7 +334,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <Link
                 href={`/teams/${teamId}/setup`}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
               >
                 {t("setup.open")}
               </Link>
@@ -335,19 +345,12 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
               ) : null}
             </div>
           </article>
-        </section>
-
-        <section aria-labelledby="team-resources-title">
-          <h2 id="team-resources-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-            {t("groups.resources.title")}
-          </h2>
-          <div className="mt-3">
-            <FounderLibraryHomebaseCard teamId={teamId} />
+          <FounderLibraryHomebaseCard teamId={teamId} />
           </div>
         </section>
 
         {/* Rueckblick: eingeklappt, am Ende, nicht gleichrangig. */}
-        <details id="team-alignment" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white/70 p-4">
+        <details id="team-alignment" className="scroll-mt-24 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
           <summary className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("alignment.history")}</summary>
         <section
           className={`${SECTION_CLASS} scroll-mt-32`}

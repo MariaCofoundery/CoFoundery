@@ -370,8 +370,8 @@ test("homebase and dashboard system copy stay structurally parallel in DE and EN
   const enText = JSON.stringify(en);
   // Seit Phase 9.4B traegt der Kopf den Teamnamen; die drei Ebenen sind
   // benannt.
-  assert.match(deText, /"Verstehen".*"Vertiefen".*"Vereinbaren"/);
-  assert.match(enText, /"Understand".*"Go deeper".*"Agree"/);
+  assert.match(deText, /"Verstehen".*"Vertiefen".*"Vereinbaren und üben"/);
+  assert.match(enText, /"Understand".*"Go deeper".*"Agree and practise"/);
   assert.doesNotMatch(enText, /Unsere|Zusammenarbeit|Vereinbarungen|Öffnen/);
 
   const page = readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8");

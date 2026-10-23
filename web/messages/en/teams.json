@@ -93,11 +93,14 @@
         "text": "Optional formats you do as a pair. What comes out of them applies to that pair – not automatically to the whole team."
       },
       "commit": {
-        "title": "Agree",
+        "title": "Agree and practise",
         "text": "What you have discussed, you record together in Founder Setup. What counts is what all current members have confirmed."
       },
       "resources": {
         "title": "For reference"
+      },
+      "together": {
+        "title": "Look at together"
       }
     },
     "header": {
@@ -763,6 +766,8 @@
     "you": "You",
     "strengths": "Strengths",
     "direction": "Drive",
-    "noneYet": "Nothing confirmed yet."
+    "noneYet": "Nothing confirmed yet.",
+    "cardText": "What each person shares, side by side.",
+    "cardCta": "View"
   }
 }
