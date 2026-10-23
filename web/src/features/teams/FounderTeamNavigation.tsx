@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type NavigationKey = "overview" | "workstyle" | "roles" | "setup" | "library" | "alignment";
+type NavigationKey = "overview" | "workstyle" | "roles" | "setup" | "library" | "alignment" | "venture" | "tradeoffs";
 
 type Props = {
   teamId: string;
@@ -10,6 +10,8 @@ type Props = {
     overview: string;
     workstyle: string;
     roles: string;
+    venture: string;
+    tradeoffs: string;
     setup: string;
     library: string;
     /** Nicht mehr in der Leiste (Phase 11.7B) - fruehere Auswertungen stehen auf der Uebersicht. */
@@ -34,6 +36,8 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
     { key: "overview" as const, href: `/teams/${team}` },
     { key: "workstyle" as const, href: `/teams/${team}/workstyle` },
     { key: "roles" as const, href: `/teams/${encodeURIComponent(teamId)}/roles` },
+    { key: "venture" as const, href: `/teams/${team}/vorhaben-beta` },
+    { key: "tradeoffs" as const, href: `/teams/${team}/zielkonflikte` },
     { key: "setup" as const, href: `/teams/${team}/setup` },
     { key: "library" as const, href: `/teams/${team}/founder-library` },
   ];

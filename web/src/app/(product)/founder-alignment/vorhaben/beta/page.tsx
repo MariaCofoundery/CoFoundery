@@ -31,7 +31,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * Entwurf mit Autospeichern, eigene Abgabe, Neubeginn, Freigabe, Widerruf. `venture-alignment-v1` bleibt
  * unveraendert und ist von hier aus nicht erreichbar.
  *
- * NUR FUER FREIGESCHALTETE KONTEN (`gate.ts`): fuer alle anderen gibt es diese Seite nicht (404).
+ * Fuer alle angemeldeten Konten offen. Das fruehere Freischalt-Gate (`gate.ts`) ist entfernt.
  * Es gibt keinen stillen Wechsel von v1 auf die Beta.
  *
  * DREI ZUSTAENDE, EINE SEITE:

@@ -269,7 +269,7 @@ test("Discovery missing-input tasks are personal, deduplicated and owner-only", 
   assert.deepEqual(ownMissing.map((task) => [task.id, task.kind, task.discoveryStage]), [
     ["discovery-journey:own-inputs", "CONTINUE_PERSONAL", "own_inputs_missing"],
   ]);
-  assert.equal(ownMissing[0]?.href, "/me/profile/workstyle");
+  assert.equal(ownMissing[0]?.href, "/research/workstyle-pretest?version=8.5a-v3");
 
   const onlyPartnerMissing = buildFounderDashboardTasks(signals({
     discoveryJourneys: [

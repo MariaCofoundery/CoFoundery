@@ -317,7 +317,6 @@ test("die Seite baut keine Erfassungsoberflaeche nach", () => {
     "/profile/interview",
     "/profile/direction",
     "/profile?step=areas",
-    "/profile?step=ownership",
     "/profile?step=strengths",
     "/profile?step=resources",
     "/profile?step=identity",

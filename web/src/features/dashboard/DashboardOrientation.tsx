@@ -35,12 +35,12 @@ export async function DashboardPath({ profile, hasTeam, teamId = null }: { profi
     },
     {
       key: "compare",
-      href: teamId ? `/teams/${encodeURIComponent(teamId)}` : "/connections",
+      href: teamId ? `/teams/${encodeURIComponent(teamId)}` : "/invite/new",
       state: hasTeam ? ("here" as const) : ("quiet" as const),
       label: hasTeam ? t("state.here") : t("state.open"),
       active: profile === "done" && hasTeam,
     },
-    { key: "agree", href: teamId ? `/teams/${encodeURIComponent(teamId)}/setup` : "/connections", state: "quiet" as const, label: t("state.inTeam"), active: false },
+    { key: "agree", href: teamId ? `/teams/${encodeURIComponent(teamId)}/setup` : "/invite/new", state: "quiet" as const, label: t("state.inTeam"), active: false },
   ];
 
   const icons: Record<string, { icon: IconName; tone: IconTone }> = {
@@ -207,9 +207,9 @@ export async function DashboardTeamCard({ teams, selectedTeamId }: { teams: Foun
 /** "Zum Vertiefen" und der Hinweis zum Umgang mit Daten - ruhig, zwei Flaechen nebeneinander. */
 export async function DashboardDeepen() {
   const t = await getTranslations("dashboard.deepen");
-  const deepen: Record<"tradeoffs" | "strengths", { icon: IconName; tone: IconTone }> = {
-    tradeoffs: { icon: "scale", tone: "amber" },
-    strengths: { icon: "chat", tone: "teal" },
+  const deepen: Record<"tradeoffs" | "strengths", { icon: IconName; tone: IconTone; href: string }> = {
+    tradeoffs: { icon: "scale", tone: "amber", href: "/founder-alignment/vorhaben/zielkonflikte" },
+    strengths: { icon: "chat", tone: "teal", href: "/profile/strengths-interview" },
   };
   return (
     <section id="dashboard-block-deepen" className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]" aria-labelledby="dashboard-deepen-title">
@@ -219,7 +219,7 @@ export async function DashboardDeepen() {
         <ul className="mt-3">
           {(["tradeoffs", "strengths"] as const).map((key) => (
             <li key={key} className="border-t border-slate-100">
-              <Link href="/fragebogen" className="flex items-start gap-4 py-3.5">
+              <Link href={deepen[key].href} className="flex items-start gap-4 py-3.5">
                 <IconTile name={deepen[key].icon} tone={deepen[key].tone} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-base font-semibold text-slate-950">{t(`${key}.title`)}</span>

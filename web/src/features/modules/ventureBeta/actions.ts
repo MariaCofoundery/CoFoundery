@@ -22,8 +22,7 @@ import { createClient } from "@/lib/supabase/server";
  * 20261207120000) lehnt ein fremdes Vorhaben, einen unbekannten Block und eine unvollstaendige Abgabe
  * ab. Hier steht, was fuer eine freundliche Rueckmeldung gebraucht wird.
  *
- * GEATED, NICHT BERECHTIGT: Die Beta ist nur fuer freigeschaltete Konten erreichbar (`gate.ts`). Das
- * ist Sichtbarkeit, keine Zugriffsregel - die liegt in der Datenbank.
+ * Die Beta ist fuer alle angemeldeten Konten offen. Die Zugriffsregel liegt in der Datenbank.
  *
  * KEINE STILLE UEBERNAHME. Antworten aus v1 oder einer fruehen Abgabe werden nur kopiert, wenn die
  * Person es ausdruecklich anstoesst (`startBeta` mit `source`) - in einen NEUEN Entwurf, den sie

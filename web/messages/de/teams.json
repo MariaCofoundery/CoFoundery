@@ -176,6 +176,8 @@
     "library": "Library",
     "alignment": "Frühere Auswertungen",
     "roles": "Fähigkeiten & Verantwortung",
+    "venture": "Vorhaben",
+    "tradeoffs": "Werte & Zielkonflikte",
     "workstyle": "Euer Zusammenspiel"
   },
   "commitmentLab": {

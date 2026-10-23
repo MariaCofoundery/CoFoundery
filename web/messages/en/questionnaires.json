@@ -34,6 +34,7 @@
   "noVenture": "Questionnaires about a venture need a venture. It is created as soon as you invite someone or start a comparison.",
   "team": {
     "cta": "Open in the team",
+    "ctaNoTeam": "Invite a co-founder",
     "setup": {
       "title": "Founder Setup",
       "text": "20 topics you agree in writing. Every comparison ends here."

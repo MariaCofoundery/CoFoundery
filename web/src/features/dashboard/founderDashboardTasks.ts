@@ -1,3 +1,4 @@
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import type { FounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 
 export const DASHBOARD_TASK_KINDS = [
@@ -345,7 +346,7 @@ export function buildFounderDashboardTasks(
       id: "discovery-journey:own-inputs",
       kind: "CONTINUE_PERSONAL",
       type: "discovery_intro",
-      href: "/me/profile/workstyle",
+      href: CURRENT_WORKSTYLE_HREF,
       createdAt: newestDiscoveryOwnInputJourney.updatedAt,
       contextLabel: null,
       personLabel: null,
@@ -501,7 +502,7 @@ export function buildFounderDashboardTasks(
       id: "personal:founder-alignment",
       kind: "CONTINUE_PERSONAL",
       type: "founder_alignment_continue",
-      href: "/me/profile/workstyle",
+      href: CURRENT_WORKSTYLE_HREF,
       createdAt: signals.now,
       contextLabel: null,
       personLabel: null,
@@ -513,7 +514,7 @@ export function buildFounderDashboardTasks(
       id: "personal:values",
       kind: "CONTINUE_PERSONAL",
       type: "values_continue",
-      href: "/me/values",
+      href: CURRENT_WORKSTYLE_HREF,
       createdAt: signals.now,
       contextLabel: null,
       personLabel: null,

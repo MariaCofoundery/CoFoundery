@@ -71,6 +71,8 @@ export async function TeamPageHeader({
           overview: navigationT("overview"),
           workstyle: navigationT("workstyle"),
           roles: navigationT("roles"),
+          venture: navigationT("venture"),
+          tradeoffs: navigationT("tradeoffs"),
           setup: navigationT("setup"),
           library: navigationT("library"),
         }}

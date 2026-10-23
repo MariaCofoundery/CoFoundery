@@ -21,7 +21,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * Vier Ebenen: Über mich · Für dieses Vorhaben · Zum Vertiefen · Mit dem Team. Eine Vertiefung ist ein
  * Angebot, nie eine Lücke. Keine Prozente, kein „x von y".
  *
- * Venture Alignment (Beta) erscheint nur fuer freigeschaltete Konten.
+ * Venture Alignment (Beta) erscheint fuer alle angemeldeten Konten.
  */
 const MINUTES: Record<string, number> = {
   workstyle: 12,
@@ -91,9 +91,9 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
   const shown = (key: string) => !filter || filter === key;
   const teamBase = venture ? `/teams/${encodeURIComponent(venture.id)}` : "/connections";
   const teamCards = [
-    { key: "setup", tag: "together", href: venture ? `${teamBase}/setup` : "/connections" },
-    { key: "commitment", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/connections" },
-    { key: "exercises", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/connections" },
+    { key: "setup", tag: "together", href: venture ? `${teamBase}/setup` : "/invite/new" },
+    { key: "commitment", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/invite/new" },
+    { key: "exercises", tag: "pair", href: venture ? `${teamBase}#team-deep-dives` : "/invite/new" },
   ] as const;
 
   // „Beginne hier": EIN naechster Schritt, in einer festen Reihenfolge. Der Rest steht leiser
@@ -195,14 +195,6 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
                   </Link>
                 </li>
               ))}
-              {group.key === "venture" ? (
-                <li data-module="limits" data-state="planned" aria-disabled="true" className="flex flex-col gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-5 text-slate-500">
-                  <span className="self-start rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-600">{t("soon.tag")}</span>
-                  <h3 className="text-base font-semibold">{t("soon.limits.title")}</h3>
-                  <p className="text-sm leading-6">{t("soon.limits.text")}</p>
-                  <p className="text-xs">{t("soon.meta")}</p>
-                </li>
-              ) : null}
             </ul>
           </section>
         )
@@ -225,7 +217,7 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
               <h3 className="text-base font-semibold text-slate-950">{t(`team.${key}.title`)}</h3>
               <p className="text-sm leading-6 text-slate-600">{t(`team.${key}.text`)}</p>
               <Link href={href} className="mt-auto inline-flex min-h-11 items-center self-start rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-800">
-                {t("team.cta")}
+                {venture ? t("team.cta") : t("team.ctaNoTeam")}
               </Link>
             </li>
           ))}
