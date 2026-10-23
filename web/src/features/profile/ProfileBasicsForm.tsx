@@ -617,15 +617,15 @@ export function ProfileBasicsForm({
           <h2 className={`font-semibold text-slate-950 ${isWelcomeStep ? "text-3xl" : "mt-2 text-2xl"}`}>
             {meta.title}
           </h2>
-          {meta.hint ? (
+          {(isWelcomeStep && welcomeLetter ? t("onboarding.letterLead") : meta.hint) ? (
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              {meta.hint}
+              {isWelcomeStep && welcomeLetter ? t("onboarding.letterLead") : meta.hint}
             </p>
           ) : null}
           {isWelcomeStep && welcomeLetter ? (
             <>
               {welcomeLetter}
-              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600">{t("onboarding.welcomeText")}</p>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600">{t("onboarding.letterNext")}</p>
             </>
           ) : isWelcomeStep ? (
             <>
@@ -737,7 +737,7 @@ export function ProfileBasicsForm({
               disabled={!canGoNext}
               className="inline-flex min-h-11 items-center rounded-full bg-[linear-gradient(120deg,var(--brand-accent),var(--brand-primary))] px-6 text-sm font-semibold text-slate-900 shadow-[0_10px_28px_rgba(124,58,237,0.16)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
             >
-              {activeStep === "welcome" ? t("onboarding.startButton") : nextButtonLabel}
+              {activeStep === "welcome" ? t(welcomeLetter ? "onboarding.letterStart" : "onboarding.startButton") : nextButtonLabel}
             </button>
           )}
         </div>

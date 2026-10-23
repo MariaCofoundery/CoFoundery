@@ -58,3 +58,23 @@ test("eine fehlende Datenbankfunktion ist ein eigener Fall und kein Lesefehler",
   assert.equal(isMissingDatabaseFunction({ code: "42501", message: "platform_admin_required" }), false);
   assert.equal(isMissingDatabaseFunction(null), false);
 });
+
+test("jede Admin-Unterseite hat einen Weg zurueck in den Admin-Bereich", () => {
+  const pages: Array<[string, RegExp]> = [
+    ["src/app/(product)/admin/moderation/page.tsx", /href="\/admin"/],
+    ["src/app/(product)/admin/highlights/page.tsx", /href="\/admin"/],
+    ["src/app/(product)/admin/research/workstyle-pretest/page.tsx", /href="\/admin"/],
+    // Das Layout traegt alle Seiten unter /admin/problem-radar.
+    ["src/app/(product)/admin/problem-radar/layout.tsx", /href="\/admin"/],
+  ];
+  for (const [path, pattern] of pages) assert.match(source(path), pattern, `${path}: kein Link nach /admin`);
+  for (const path of pages.map(([file]) => file)) assert.doesNotMatch(source(path), /href="\/account"/, `${path}: fuehrt noch aufs Konto`);
+});
+
+test("Highlights lassen sich aus einer Auswahl vergeben, nicht nur ueber einen eingefuegten Link", () => {
+  const page = source("src/app/(product)/admin/highlights/page.tsx");
+  assert.match(page, /admin_list_highlight_candidates/);
+  assert.match(page, /name="link" value=\{`\/connect\/\$\{PATH\[item\.kind\]\}\/\$\{item\.id\}`\}/);
+  const sql = source("../supabase/migrations/20261226120000_admin_highlight_candidates.sql");
+  assert.match(sql, /p\.highlightable/, "nur Eintraege von Menschen, die zugestimmt haben");
+});

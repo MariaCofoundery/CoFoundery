@@ -93,7 +93,10 @@
           "connect": "Create my Connect profile"
         }
       },
-      "photoLater": "You can add a photo later in your profile – you don't need one here."
+      "photoLater": "You can add a photo later in your profile – you don't need one here.",
+      "letterLead": "Take your time looking around and use the platform for yourself. First, a few words from me.",
+      "letterNext": "That was the welcome. Next we only ask for your name and where you would like to start.",
+      "letterStart": "Let’s go"
     },
     "avatar": {
       "title": "Avatar",
@@ -479,9 +482,6 @@
     "fromLabel": "From Maria, founder",
     "photoAlt": "Maria, founder of Made2Found",
     "greeting": "Hi, I'm Maria.",
-    "story1": "I became a mother at 17 and then followed a fairly classic career path. In 2025 I founded something myself and failed, badly. For many reasons. One of them: working together with my co-founder was difficult. After that I fell into a pretty nasty crisis.",
-    "story2": "Made2Found came out of that time. I believe that if you talk early about the right things and are honest and open with each other, working together can hold. Then problems don't only surface when it is already too late and people slide into a crisis. I want to prevent that.",
-    "story3": "It matters to me that we support each other. Take what you need. And if you like, write to me. I'm around here myself.",
     "signoff": "Have fun, Maria",
     "valuesTitle": "How we treat each other here",
     "values": {
@@ -516,6 +516,13 @@
     "returningTitle": "Good to have you here.",
     "returningIntro": "Before you carry on, a few words from me and how we treat each other here. You will only see this once.",
     "returningConfirm": "Read, continue",
-    "returningSaving": "One moment …"
+    "returningSaving": "One moment …",
+    "story1": "Founding is a roller coaster – and sometimes it derails. That is exactly what happened to me in 2025: after years as a sole entrepreneur and in a classic job, I joined a startup and fell flat on my face. Mostly because the dynamics and the communication between me and my co-founder were off. The crisis afterwards was worse than bad.",
+    "story2": "Made2Found came out of exactly that time. I became a mother at 17, I know detours, and I firmly believe: there is not <em>one</em> right way to found.",
+    "story3": "Success depends on so many individual factors and life realities. But teams almost never fail because of a lack of will or a bad idea – they fail because of things left unsaid.",
+    "story4": "If we talk early about the right things, clarify expectations and treat each other honestly, working together holds. Then conflicts do not surface only when it is already too late and people slide into a crisis. That is what I want to prevent.",
+    "story5": "See Made2Found as your protected space: take what you need, get answers to the delicate questions and build partnerships that withstand real storms.",
+    "story6": "And if you like, write to me directly at any time. I am around here myself every day.",
+    "story7": "So glad you are here!"
   }
 }

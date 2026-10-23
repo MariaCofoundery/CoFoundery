@@ -939,7 +939,7 @@
     "CONNECT_LIMITED_EVIDENCE": "Dieser Vorschlag basiert auf wenigen Angaben."
   },
   "highlightAdmin": {
-    "back": "Zurück",
+    "back": "Zurück zum Admin-Bereich",
     "title": "Highlights verwalten",
     "intro": "Hier legst du fest, welche Einträge auf der Connect-Übersicht hervorgehoben werden. Drei Plätze gibt es; eine Empfehlung und eine Anzeige können dabei sein, der Rest wird zufällig gezogen. Jede Karte sagt, warum sie dort steht.",
     "newTitle": "Neuen Platz vergeben",
@@ -983,7 +983,17 @@
       "notfound": "Zu diesem Link gibt es keinen Eintrag, oder er hat keinen Besitzer.",
       "error": "Das hat nicht geklappt. Versuch es noch einmal."
     },
-    "noConsentHint": "Die Person hat das Highlight-Häkchen nicht gesetzt. Der Platz wird erst gezeigt, wenn sie zustimmt. Frag sie am besten vorher."
+    "noConsentHint": "Die Person hat das Highlight-Häkchen nicht gesetzt. Der Platz wird erst gezeigt, wenn sie zustimmt. Frag sie am besten vorher.",
+    "pick": {
+      "title": "Was soll hervorgehoben werden?",
+      "intro": "Eine Auswahl der Einträge, die gezeigt werden dürfen: veröffentlicht, und die Person hat das Highlight-Häkchen gesetzt. Klick auf einen Eintrag, wähle „Empfohlen von uns“ oder „Anzeige“ und das Enddatum.",
+      "open": "Hervorheben",
+      "placed": "läuft gerade",
+      "save": "Hervorheben",
+      "empty": "Noch niemand hat das Highlight-Häkchen gesetzt. Sobald es jemand tut, stehen seine Einträge hier.",
+      "error": "Die Auswahl ließ sich gerade nicht laden."
+    },
+    "linkAlternative": "Oder einen Link einfügen"
   },
   "highlightPrompt": {
     "eyebrow": "Neu in Connect",

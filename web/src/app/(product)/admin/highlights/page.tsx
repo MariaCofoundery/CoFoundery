@@ -8,6 +8,8 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+type Candidate = { kind: "listing" | "venture" | "person" | "problem"; id: string; title: string | null; owner_name: string | null; at: string | null; placed: boolean };
+const PATH = { listing: "listings", venture: "ventures", person: "people", problem: "problems" } as const;
 const input = "mt-1 block min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
 const button = "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 disabled:opacity-50";
 
@@ -21,6 +23,8 @@ export default async function HighlightsAdminPage({ searchParams }: {
     getLocale(),
     client.rpc("admin_list_connect_highlight_placements"),
   ]);
+  const candidatesResult = await client.rpc("admin_list_highlight_candidates");
+  const candidates = (candidatesResult.error ? [] : (candidatesResult.data ?? [])) as Candidate[];
   const rows = (error ? [] : (data ?? [])) as PlacementRow[];
   const day = (value: string) => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(value));
   const defaultEnd = new Date(Date.now() + 28 * 86_400_000).toISOString().slice(0, 10);
@@ -31,7 +35,7 @@ export default async function HighlightsAdminPage({ searchParams }: {
   }));
 
   return <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-    <Link href="/account" className="text-sm text-slate-600 underline">{t("back")}</Link>
+    <Link href="/admin" className="text-sm text-slate-600 underline">{"← "}{t("back")}</Link>
     <h1 className="mt-4 text-2xl font-semibold text-slate-950">{t("title")}</h1>
     <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("intro")}</p>
 
@@ -39,7 +43,9 @@ export default async function HighlightsAdminPage({ searchParams }: {
     {result && result !== "saved" && result !== "deleted" ? <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-900">{t(`results.${result === "notfound" || result === "invalid" ? result : "error"}`)}</p> : null}
     {error ? <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-900">{t("results.error")}</p> : null}
 
-    <form action={saveHighlightPlacementAction} className="mt-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
+    <details className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+    <summary className="cursor-pointer text-sm font-semibold text-slate-800">{t("linkAlternative")}</summary>
+    <form action={saveHighlightPlacementAction} className="mt-4 space-y-4">
       <h2 className="text-lg font-semibold text-slate-950">{t("newTitle")}</h2>
       <label className="block text-sm font-medium">{t("link")}
         <input name="link" required className={input} placeholder="https://made2found.de/connect/listings/…" />
@@ -61,6 +67,39 @@ export default async function HighlightsAdminPage({ searchParams }: {
       </label>
       <SubmitButton label={t("save")} pendingLabel={t("saving")} className={button} />
     </form>
+    </details>
+
+    <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="pick-title">
+      <h2 id="pick-title" className="text-lg font-semibold text-slate-950">{t("pick.title")}</h2>
+      <p className="mt-1 text-sm leading-6 text-slate-600">{t("pick.intro")}</p>
+      {candidatesResult.error ? <p role="alert" className="mt-3 text-sm text-red-900">{t("pick.error")}</p> : candidates.length === 0 ? <p className="mt-3 text-sm text-slate-500">{t("pick.empty")}</p> : <ul className="mt-4 divide-y divide-slate-100">
+        {candidates.map((item) => <li key={`${item.kind}-${item.id}`} className="py-3">
+          <details>
+            <summary className="flex cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 text-sm [&::-webkit-details-marker]:hidden">
+              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">{t(`kinds.${item.kind}`)}</span>
+              <span className="min-w-0 flex-1 font-semibold text-slate-950 [overflow-wrap:anywhere]">{item.title ?? t("gone")}</span>
+              {item.owner_name && item.kind !== "person" ? <span className="text-slate-500">{item.owner_name}</span> : null}
+              {item.placed ? <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-900">{t("pick.placed")}</span> : null}
+              <span className="font-semibold text-violet-800">{t("pick.open")}</span>
+            </summary>
+            <form action={saveHighlightPlacementAction} className="mt-3 space-y-3 rounded-xl bg-slate-50 p-4">
+              <input type="hidden" name="link" value={`/connect/${PATH[item.kind]}/${item.id}`} />
+              <div className="flex flex-wrap gap-4 text-sm">
+                <label className="flex min-h-11 items-center gap-2"><input type="radio" name="source" value="editorial" defaultChecked />{t("sources.editorial")}</label>
+                <label className="flex min-h-11 items-center gap-2"><input type="radio" name="source" value="sponsored" />{t("sources.sponsored")}</label>
+              </div>
+              <label className="block text-sm font-medium">{t("note")}
+                <textarea name="note" maxLength={240} rows={2} className={`${input} p-3`} />
+              </label>
+              <label className="block text-sm font-medium">{t("endsOn")}
+                <input name="ends_on" type="date" required defaultValue={defaultEnd} className={`${input} sm:max-w-xs`} />
+              </label>
+              <SubmitButton label={t("pick.save")} pendingLabel={t("saving")} className={button} />
+            </form>
+          </details>
+        </li>)}
+      </ul>}
+    </section>
 
     {groups.map(({ state, items }) => <section key={state} className="mt-8">
       <h2 className="text-lg font-semibold text-slate-950">{t(`groups.${state}`)} <span className="text-sm font-normal text-slate-500">({items.length})</span></h2>

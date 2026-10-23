@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(16);
+select plan(19);
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at) values
  ('da5b0000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dash-admin@example.invalid',now(),now(),now()),
  ('da5b0000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dash-admin2@example.invalid',now(),now(),now()),
@@ -36,6 +36,17 @@ reset role; select set_config('request.jwt.claim.sub','da5b0000-0000-4000-8000-0
 select is(public.admin_attention_count(),1,'the attention count is new feedback plus open reports');
 select ok(public.admin_dashboard_stats() ? 'accounts_week' and public.admin_dashboard_stats() ? 'cron','the stats carry the expected keys');
 select lives_ok($$select public.admin_mark_reminder_done('db_dump',true)$$,'the dump reminder exists');
+
+-- Highlight-Auswahlliste
+reset role; select set_config('request.jwt.claim.sub','da5b0000-0000-4000-8000-000000000003',true); set local role authenticated;
+select throws_ok($$select * from public.admin_list_highlight_candidates()$$,'42501',null,'only for admins');
+reset role; select set_config('request.jwt.claim.sub','da5b0000-0000-4000-8000-000000000001',true); set local role authenticated;
+select is((select count(*) from public.admin_list_highlight_candidates()),0::bigint,'without anyone who ticked the highlight box, there is nothing to pick');
+reset role;
+insert into public.network_memberships(user_id,status) values('da5b0000-0000-4000-8000-000000000003','active') on conflict(user_id) do update set status='active';
+insert into public.network_profiles(user_id,display_name,headline,bio,network_roles,status,published_at,expertise,highlightable) values('da5b0000-0000-4000-8000-000000000003','Absender','Headline text','A complete synthetic biography for the picker.',array['founder'],'active',now(),array['software'],true);
+select set_config('request.jwt.claim.sub','da5b0000-0000-4000-8000-000000000001',true); set local role authenticated;
+select is((select count(*) from public.admin_list_highlight_candidates() j where j->>'kind'='person'),1::bigint,'a person who agreed appears');
 
 -- Herzschlag
 reset role; set local role service_role;

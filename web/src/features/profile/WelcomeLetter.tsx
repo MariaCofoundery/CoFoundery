@@ -12,6 +12,7 @@ import { getTranslations } from "next-intl/server";
  */
 const MARIA_PHOTO_SRC: string | null = "/brand/maria.jpg";
 
+const STORY = ["story1", "story2", "story3", "story4", "story5", "story6", "story7"] as const;
 const VALUES = ["kind", "respect", "honest", "yours"] as const;
 
 export async function WelcomeLetter() {
@@ -41,9 +42,9 @@ export async function WelcomeLetter() {
             <h3 className="mt-1 text-2xl font-semibold text-slate-950">{t("greeting")}</h3>
           </div>
         </div>
-        <p className="text-[15px] leading-7 text-slate-700">{t("story1")}</p>
-        <p className="text-[15px] leading-7 text-slate-700">{t("story2")}</p>
-        <p className="text-[15px] leading-7 text-slate-700">{t("story3")}</p>
+        {STORY.map((key) => (
+          <p key={key} className="text-[15px] leading-7 text-slate-700">{t.rich(key, { em: (chunks) => <em>{chunks}</em> })}</p>
+        ))}
         <p className="text-lg font-semibold text-slate-950">{t("signoff")}</p>
       </article>
 

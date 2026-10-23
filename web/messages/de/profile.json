@@ -93,7 +93,10 @@
           "connect": "Mein Connect-Profil anlegen"
         }
       },
-      "photoLater": "Ein Foto kannst du später im Profil ergänzen – es ist hier nicht nötig."
+      "photoLater": "Ein Foto kannst du später im Profil ergänzen – es ist hier nicht nötig.",
+      "letterLead": "Schau dich in Ruhe um und nutz die Plattform für dich. Vorher kurz ein paar Worte von mir.",
+      "letterNext": "Das war die Begrüßung. Als Nächstes fragen wir dich nur nach deinem Namen und womit du anfangen möchtest.",
+      "letterStart": "Los geht’s"
     },
     "avatar": {
       "title": "Avatar",
@@ -479,9 +482,6 @@
     "fromLabel": "Von Maria, Gründerin",
     "photoAlt": "Maria, Gründerin von Made2Found",
     "greeting": "Hi, ich bin Maria.",
-    "story1": "Ich bin mit 17 Mama geworden und bin danach erst mal einen klassischen beruflichen Weg gegangen. 2025 habe ich dann selbst gegründet und bin krachend gescheitert. Aus vielen Gründen. Einer davon: Das Zusammenspiel mit meinem Mitgründer war schwierig. Danach bin ich in eine ziemlich fiese Krise geraten.",
-    "story2": "Aus dieser Zeit ist Made2Found entstanden. Ich glaube: Wenn man früh über die richtigen Dinge spricht und ehrlich und offen miteinander umgeht, wird die Zusammenarbeit tragfähig. Dann tauchen Probleme nicht erst auf, wenn es schon zu spät ist und Menschen in eine Krise rutschen. Das möchte ich verhindern.",
-    "story3": "Mir ist auch wichtig, dass wir uns gegenseitig unterstützen. Nimm mit, was du brauchst. Und wenn du magst, schreib mir. Ich bin hier auch selbst unterwegs.",
     "signoff": "Viel Spaß, Maria",
     "valuesTitle": "So gehen wir hier miteinander um",
     "values": {
@@ -516,6 +516,13 @@
     "returningTitle": "Schön, dass du da bist.",
     "returningIntro": "Bevor es weitergeht, ein paar Worte von mir und wie wir hier miteinander umgehen. Das siehst du nur dieses eine Mal.",
     "returningConfirm": "Gelesen, weiter",
-    "returningSaving": "Einen Moment …"
+    "returningSaving": "Einen Moment …",
+    "story1": "Gründen ist eine Achterbahnfahrt – und manchmal entgleist sie. Genau das ist mir 2025 passiert: Nach Jahren als Einzelunternehmerin sowie im klassischen Job bin ich in ein Startup eingestiegen und übel auf die Nase gefallen. Vor allem, weil die Dynamik und die Kommunikation zwischen mir und meinem Mitgründer nicht gestimmt haben. Die Krise danach war mehr als schlimm.",
+    "story2": "Genau aus dieser Zeit ist Made2Found entstanden. Ich bin mit 17 Mama geworden, kenne Umwege und bin fest davon überzeugt: Es gibt nicht <em>den einen</em> richtigen Weg zu gründen.",
+    "story3": "Erfolg hängt von so vielen individuellen Faktoren und Lebensrealitäten ab. Aber Teams scheitern fast nie an mangelndem Willen oder einer schlechten Idee – sie scheitern an ungesagten Worten.",
+    "story4": "Wenn wir früh über die richtigen Dinge sprechen, Erwartungen klären und ehrlich miteinander umgehen, wird Zusammenarbeit tragfähig. Dann tauchen Konflikte nicht erst auf, wenn es schon zu spät ist und Menschen in eine Krise rutschen. Genau das möchte ich verhindern.",
+    "story5": "Sieh Made2Found als deinen geschützten Raum: Nimm dir mit, was du brauchst, hol dir Antworten auf die heiklen Fragen und bau Partnerschaften auf, die echten Stürmen standhalten.",
+    "story6": "Und wenn du magst, schreib mir jederzeit direkt. Ich bin hier selbst täglich unterwegs.",
+    "story7": "Schön, dass du dabei bist!"
   }
 }

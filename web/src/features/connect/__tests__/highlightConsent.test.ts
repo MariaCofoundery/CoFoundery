@@ -81,7 +81,26 @@ test("Der Begruessungsbrief wird bestehenden Konten einmal gezeigt, ohne Backfil
   assert.match(sql, /add column if not exists welcome_letter_seen_at timestamptz;/);
   assert.doesNotMatch(sql, /\bupdate\b/i, "ein Backfill wuerde den Brief fuer alle Bestandskonten ueberspringen");
   const gate = source("src/features/profile/WelcomeLetterGate.tsx");
-  assert.match(gate, /if \(error \|\| !data\?\.onboarding_completed_at \|\| data\.welcome_letter_seen_at\) return null/);
+  assert.match(gate, /if \(error \|\| !data\?\.onboarding_completed_at \|\| \(data\.welcome_letter_version \?\? 0\) >= WELCOME_LETTER_VERSION\) return null/);
   assert.match(source("src/app/layout.tsx"), /<WelcomeLetterGate client=/);
   assert.match(source("src/features/profile/onboardingCompletion.ts"), /welcome_letter_seen_at/);
+});
+
+test("der Begruessungsbrief ist versioniert: eine neue Fassung wird bestehenden Konten einmal gezeigt", () => {
+  const version = source("src/features/profile/welcomeLetterVersion.ts");
+  assert.match(version, /WELCOME_LETTER_VERSION = (\d+)/);
+  assert.match(source("src/features/profile/welcomeLetterActions.ts"), /welcome_letter_version: WELCOME_LETTER_VERSION/);
+  // Der Einstieg darf nicht daran scheitern, dass die Spalte noch fehlt.
+  const completion = source("src/features/profile/onboardingCompletion.ts");
+  assert.match(completion, /update\(\{ welcome_letter_version: WELCOME_LETTER_VERSION \}\)/);
+  assert.doesNotMatch(completion.split("welcome_letter_version")[0], /welcome_letter_version/);
+  assert.match(source("../supabase/migrations/20261225120000_welcome_letter_version.sql"), /add column if not exists welcome_letter_version integer;/);
+});
+
+test("der Brief steht so im Text, wie er im Konzeptboard 29 steht", () => {
+  const de = JSON.parse(source("messages/de/profile.json")).welcomeLetter;
+  assert.match(de.story1, /^Gründen ist eine Achterbahnfahrt/);
+  assert.match(de.story5, /geschützten Raum/);
+  assert.match(de.story7, /Schön, dass du dabei bist!/);
+  assert.match(source("src/features/profile/WelcomeLetter.tsx"), /"story7"/);
 });

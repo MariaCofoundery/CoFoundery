@@ -25,7 +25,7 @@ export default async function ModerationPage({ searchParams }: {
   const labelClass = "text-xs font-semibold text-slate-500";
   const buttonClass = "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 disabled:opacity-50";
   return <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-    <Link href="/account" className="text-sm text-slate-600 underline">{t("back")}</Link>
+    <Link href="/admin" className="text-sm text-slate-600 underline">{"← "}{t("back")}</Link>
     <h1 className="mt-4 text-2xl font-semibold text-slate-950">{t("title")}</h1>
     <p className="mt-2 text-sm leading-6 text-slate-600">{t("contextLimit")}</p>
     <form method="get" className="my-6 flex flex-wrap items-end gap-3">

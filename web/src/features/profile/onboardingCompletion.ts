@@ -1,3 +1,4 @@
+import { WELCOME_LETTER_VERSION } from "@/features/profile/welcomeLetterVersion";
 import type { createClient } from "@/lib/supabase/server";
 
 type Client = Awaited<ReturnType<typeof createClient>>;
@@ -21,4 +22,7 @@ export async function markOnboardingComplete(client: Client, userId: string) {
     .update({ onboarding_completed_at: new Date().toISOString(), welcome_letter_seen_at: new Date().toISOString() })
     .eq("user_id", userId)
     .is("onboarding_completed_at", null);
+  // Die Fassung separat und ohne Folgen bei einem Fehler: Fehlt die Spalte noch
+  // (Code vor Migration), darf der Einstieg dennoch abschliessen.
+  await client.from("person_core").update({ welcome_letter_version: WELCOME_LETTER_VERSION }).eq("user_id", userId);
 }

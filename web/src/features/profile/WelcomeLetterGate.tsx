@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { WELCOME_LETTER_VERSION } from "@/features/profile/welcomeLetterVersion";
 import { WelcomeLetter } from "@/features/profile/WelcomeLetter";
 import { confirmWelcomeLetterAction } from "@/features/profile/welcomeLetterActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -19,10 +20,10 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 export async function WelcomeLetterGate({ client, userId }: { client: SupabaseClient; userId: string }) {
   const { data, error } = await client
     .from("person_core")
-    .select("onboarding_completed_at, welcome_letter_seen_at")
+    .select("onboarding_completed_at, welcome_letter_version")
     .eq("user_id", userId)
     .maybeSingle();
-  if (error || !data?.onboarding_completed_at || data.welcome_letter_seen_at) return null;
+  if (error || !data?.onboarding_completed_at || (data.welcome_letter_version ?? 0) >= WELCOME_LETTER_VERSION) return null;
 
   const t = await getTranslations("profile.welcomeLetter");
   return (

@@ -939,7 +939,7 @@
     "CONNECT_LIMITED_EVIDENCE": "This suggestion is based on limited information."
   },
   "highlightAdmin": {
-    "back": "Back",
+    "back": "Back to the admin area",
     "title": "Manage highlights",
     "intro": "Here you decide which entries are highlighted on the Connect overview. There are three spots; one recommendation and one ad can be among them, the rest is drawn at random. Each card says why it is there.",
     "newTitle": "Assign a new spot",
@@ -983,7 +983,17 @@
       "notfound": "There is no entry for this link, or it has no owner.",
       "error": "That did not work. Please try again."
     },
-    "noConsentHint": "This person has not ticked the highlight box. The placement is only shown once they agree. Best to ask them first."
+    "noConsentHint": "This person has not ticked the highlight box. The placement is only shown once they agree. Best to ask them first.",
+    "pick": {
+      "title": "What should be highlighted?",
+      "intro": "A selection of the entries that may be shown: published, and the person ticked the highlight box. Click an entry, choose “Recommended by us” or “Ad” and the end date.",
+      "open": "Highlight",
+      "placed": "running now",
+      "save": "Highlight",
+      "empty": "Nobody has ticked the highlight box yet. As soon as someone does, their entries appear here.",
+      "error": "The selection could not be loaded just now."
+    },
+    "linkAlternative": "Or paste a link"
   },
   "highlightPrompt": {
     "eyebrow": "New in Connect",

@@ -1,6 +1,6 @@
 {
   "entry": "Moderation",
-  "back": "Zurück zum Konto",
+  "back": "Zurück zum Admin-Bereich",
   "title": "Meldungen moderieren",
   "contextLimit": "Meldungen beziehen sich auf eine Unterhaltung oder Kontaktanfrage, nicht auf eine einzelne Nachricht. Private Nachrichtenverläufe werden hier nicht geladen.",
   "filter": "Status",

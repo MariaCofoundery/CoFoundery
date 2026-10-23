@@ -23,7 +23,7 @@ export default async function RadarLayout({
         aria-label={t("title")}
         className="flex flex-wrap gap-x-5 gap-y-2 text-sm underline"
       >
-        <Link className="inline-flex min-h-11 items-center" href="/account">
+        <Link className="inline-flex min-h-11 items-center" href="/admin">
           {t("account")}
         </Link>
         <Link className="inline-flex min-h-11 items-center" href={radarRoot}>
