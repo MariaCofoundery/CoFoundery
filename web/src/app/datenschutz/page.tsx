@@ -134,9 +134,8 @@ export default function DatenschutzPage() {
               - Abgeschlossene Auftragsverarbeitungsverträge (AVV/DPA) mit Vercel, Supabase und
                 Resend bestätigen.
               - Genaue Vertragspartner (Gesellschaft, Sitz) eintragen; im Repo nicht belegt.
-              - Supabase-Region: Nur ein Codekommentar nennt London (web/src/lib/__tests__/
-                functionRegion.test.ts), keine Konfiguration. Vor Veröffentlichung im
-                Supabase-Dashboard bestätigen.
+              - Supabase-Region: London (eu-west-2), laut Supabase-Dashboard am 23.10.2026
+                bestätigt.
               - Resend-Region: im Repo nicht belegt.
               - Welcher Dienst die Anmelde-E-Mails von Supabase Auth versendet (Supabase-Standard
                 oder eigenes SMTP), ist im Repo nicht belegt (supabase/config.toml: SMTP
@@ -145,7 +144,7 @@ export default function DatenschutzPage() {
             <List
               items={[
                 "Vercel – Hosting der Website und der Serverfunktionen. Die Serverfunktionen laufen nach unserer Konfiguration in der Region London (Vereinigtes Königreich).",
-                "Supabase – Datenbank, Anmeldung (Authentifizierung) und Dateispeicher, z. B. für Profilfotos.",
+                "Supabase – Datenbank, Anmeldung (Authentifizierung) und Dateispeicher, z. B. für Profilfotos. Die Datenbank liegt in der Region London (Vereinigtes Königreich).",
                 "Resend – Versand von E-Mails aus dem Produkt, z. B. Einladungen und Benachrichtigungen.",
               ]}
             />
@@ -170,7 +169,7 @@ export default function DatenschutzPage() {
               - Bis dahin bewusst keine Aussage „alle Daten bleiben in der EU“.
             */}
             <p>
-              Unsere Serverfunktionen laufen im Vereinigten Königreich und damit außerhalb der EU.
+              Unsere Serverfunktionen und unsere Datenbank liegen im Vereinigten Königreich und damit außerhalb der EU.
               Die Anbieter haben ihren Sitz bzw. Unterauftragnehmer teilweise in den USA, sodass ein
               Zugriff aus Drittländern nicht ausgeschlossen werden kann. Übermittlungen in Staaten
               außerhalb der EU bzw. des EWR erfolgen nur, wenn die gesetzlichen Voraussetzungen
