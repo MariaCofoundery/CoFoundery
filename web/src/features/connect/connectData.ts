@@ -48,6 +48,9 @@ export async function getActiveConnectListings(client: Client, filters: Record<s
   if (isOneOf(CONNECT_REMOTE_MODES, filters.remote_mode)) query = query.eq("remote_mode", filters.remote_mode);
   if (isOneOf(CONNECT_GEOGRAPHIC_SCOPES, filters.geographic_scope)) query = query.eq("geographic_scope", filters.geographic_scope);
   if (filters.topic) query = query.contains("topics", [filters.topic]);
+  if (filters.location) query = query.contains("locations", [filters.location]);
+  // Kommagetrennt: "Remote moeglich" schliesst hybrid und flexibel ein.
+  if (filters.remote_modes) query = query.in("remote_mode", filters.remote_modes.split(",").filter((mode) => isOneOf(CONNECT_REMOTE_MODES, mode)));
   if (filters.industry) query = query.contains("industries", [filters.industry]);
   // Freitext ueber Titel, Beschreibung, Themen und Branchen. search_text haelt
   // der Trigger aus 20260915120000 aktuell; ilike findet dabei auch Teile von

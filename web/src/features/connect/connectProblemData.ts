@@ -37,6 +37,8 @@ export async function getActiveConnectProblems(
 
   if (filters.intent) query = query.eq("author_intent", filters.intent);
   if (filters.geographic_scope) query = query.eq("geographic_scope", filters.geographic_scope);
+  if (filters.topic) query = query.contains("topics", [filters.topic]);
+  if (filters.location) query = query.contains("locations", [filters.location]);
 
   const term = (filters.q ?? "").trim();
   if (term) {

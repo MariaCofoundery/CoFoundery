@@ -707,7 +707,7 @@
   "tabs": {
     "label": "Bereiche in Connect",
     "people": "Menschen",
-    "listings": "Angebote & Gesuche",
+    "listings": "Entdecken",
     "problems": "Probleme",
     "ventures": "Unternehmen & Projekte"
   },
@@ -993,5 +993,35 @@
     "hint": "Wenn du das nicht möchtest, nimm das Häkchen raus. Du kannst es jederzeit in deinem Connect-Profil ändern.",
     "save": "Speichern",
     "saving": "Speichert …"
+  },
+  "feed": {
+    "kinds": {
+      "seeking": "Gesuch",
+      "offering": "Angebot",
+      "problem": "Problem",
+      "person": "Mensch",
+      "venture": "Unternehmen"
+    },
+    "view": "Ansehen",
+    "art": "Art",
+    "artOptions": {
+      "seeking": "Gesuche",
+      "offering": "Angebote",
+      "problem": "Probleme",
+      "person": "Menschen",
+      "venture": "Unternehmen & Projekte"
+    },
+    "topic": "Thema",
+    "topicAll": "Alle Themen",
+    "place": "Ort",
+    "placeAll": "Alle Orte",
+    "work": "Arbeitsort",
+    "workOptions": {
+      "remote": "Remote möglich",
+      "onsite": "Vor Ort"
+    },
+    "workHint": "Betrifft nur Gesuche und Angebote.",
+    "resultMore": "Die ersten {count} Einträge · neueste zuerst",
+    "result": "{count, plural, one {# Eintrag} other {# Einträge}} · neueste zuerst"
   }
 }

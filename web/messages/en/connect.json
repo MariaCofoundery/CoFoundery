@@ -707,7 +707,7 @@
   "tabs": {
     "label": "Areas in Connect",
     "people": "People",
-    "listings": "Offers & requests",
+    "listings": "Discover",
     "problems": "Problems",
     "ventures": "Companies & projects"
   },
@@ -993,5 +993,35 @@
     "hint": "If you would rather not, untick the box. You can change this at any time in your Connect profile.",
     "save": "Save",
     "saving": "Saving …"
+  },
+  "feed": {
+    "kinds": {
+      "seeking": "Request",
+      "offering": "Offer",
+      "problem": "Problem",
+      "person": "Person",
+      "venture": "Venture"
+    },
+    "view": "View",
+    "art": "Type",
+    "artOptions": {
+      "seeking": "Requests",
+      "offering": "Offers",
+      "problem": "Problems",
+      "person": "People",
+      "venture": "Ventures & projects"
+    },
+    "topic": "Topic",
+    "topicAll": "All topics",
+    "place": "Place",
+    "placeAll": "All places",
+    "work": "Work location",
+    "workOptions": {
+      "remote": "Remote possible",
+      "onsite": "On site"
+    },
+    "workHint": "Applies to requests and offers only.",
+    "resultMore": "The first {count} entries · newest first",
+    "result": "{count, plural, one {# entry} other {# entries}} · newest first"
   }
 }

@@ -281,7 +281,7 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
 
   // Und die Trefferzahl liegt mit ihm drin: Wie viele Treffer es gibt, sieht
   // man an den Treffern - die Zahl ist eine Antwort aufs Eingrenzen.
-  const countAt = page.indexOf('t("resultCount"');
+  const countAt = page.indexOf('t("feed.result');
   assert.ok(countAt > openerAt && countAt > closeAt, "die Trefferzahl steht ausserhalb");
 
   // Und die Faehigkeiten-Auswahl liegt hinter dem eingeklappten Merken.
