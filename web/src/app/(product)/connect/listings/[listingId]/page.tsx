@@ -33,34 +33,128 @@ export default async function ListingDetail({ params, searchParams }: { params: 
   const locations = normalizeConnectLocations(listing.locations);
   const timeframe = formatConnectContentTimeframe(listing.starts_on, listing.ends_on, locale, { from: t("timeframe.from"), until: t("timeframe.until") });
   const framework = [locations.length ? locations.join(" & ") : null, listing.geographic_scope ? t(`scopes.${listing.geographic_scope}`) : null, listing.remote_mode ? t(`remote.${listing.remote_mode}`) : null, timeframe, listing.venture_stage ? t(`stages.${listing.venture_stage}`) : null].filter(Boolean);
-  return <main className="min-h-screen bg-slate-50 px-5 py-9"><div className="mx-auto max-w-3xl"><Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("navigation.overview")}</Link>{knownKey(query.saved, CONNECT_PUBLICATION_KEYS) ? <p role="status" className="mb-4 mt-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.listing.${knownKey(query.saved, CONNECT_PUBLICATION_KEYS)}`)}</p> : null}{query.contact === "sent" ? <p className="mb-4 mt-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t("contact.sent")}</p> : null}{aiNotice ? <p role="status" className="mb-4 mt-3 rounded-2xl bg-slate-100 p-4 text-sm text-slate-800">{t(`resources.notice.${aiNotice}`)}</p> : null}<article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-9">
-    <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
-    <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-semibold uppercase tracking-[.14em] text-white">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p>{own ? <div className="flex flex-wrap gap-2">{listing.visibility === "public" && listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) > new Date()) ? <Link href={`/connect/l/${listing.public_slug}`} className="inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-violet-800">{t("visibility.openPublicPage")}</Link> : null}<Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900">{t("actions.edit")}</Link></div> : null}</div>
-    <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{listing.title}</h1></header>
-    <section className="mt-8"><h2 className="text-lg font-semibold">{t("detail.what")}</h2><p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700">{listing.summary}</p></section>
-    {listing.topics.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.topics")}</h2><div className="mt-3 flex flex-wrap gap-2">{listing.topics.map((v) => <span key={v} className="rounded-full bg-slate-100 px-3 py-1 text-sm">{v}</span>)}</div></section> : null}
-    {listing.industries.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.industries")}</h2><p className="mt-2 text-slate-600">{listing.industries.join(" · ")}</p></section> : null}
-    {framework.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.framework")}</h2><p className="mt-2 text-slate-600">{framework.join(" · ")}</p></section> : null}
-    {profile ? <section className="mt-8 rounded-2xl bg-slate-50 p-5"><p className="text-xs font-semibold uppercase tracking-[.16em] text-slate-500">{t("detail.person")}</p><div className="mt-3 flex items-center gap-4"><ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" /><div><h2 className="text-xl font-semibold">{profile.display_name}</h2><p className="mt-1 text-sm text-slate-600">{profile.headline}</p></div></div><p className="mt-3 leading-7 text-slate-700">{profile.bio}</p>
-      {/* Hier faellt die Entscheidung, ob man schreibt - also steht hier auch,
-          in welcher Form diese Person ansprechbar ist. Genau das nimmt der
-          ersten Nachricht die Huerde. */}
-      {profile.open_to_formats?.length ? <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[.16em] text-slate-500">{t("profile.openToHeading")}</p><div className="mt-2 flex flex-wrap gap-2">{profile.open_to_formats.map((format) => <span key={format} className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-sm text-violet-900">{t(`profile.openTo.${format}`)}</span>)}</div></div> : null}
-      {profile.network_reach ? <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[.16em] text-slate-500">{t("profile.reachHeading")}</p><p className="mt-1 leading-7 text-slate-700">{profile.network_reach}</p></div> : null}
-      {profile.contact_note ? <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[.16em] text-slate-500">{t("profile.contactNoteHeading")}</p><p className="mt-1 leading-7 text-slate-700">{profile.contact_note}</p></div> : null}
-      </section> : null}
-    {!own ? <section className="mt-8 border-t border-slate-100 pt-6">{blockState?.interaction_blocked ? <p className="text-sm text-slate-600">{t("safety.blockedState")}</p> : !contactRequest ? (hasProfile ? <Link href={`/connect/listings/${listing.id}/contact`} className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold">{t("contact.cta")}</Link> : <div><p className="text-sm leading-6 text-slate-700">{t("contact.profileRequiredText")}</p><Link href={`/connect/profile?next=${encodeURIComponent(`/connect/listings/${listing.id}/contact`)}`} className="mt-3 inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-5 py-3 text-sm font-semibold">{t("contact.profileRequiredCta")}</Link></div>) : <div><p className="font-semibold text-slate-900">{t(`contact.listingStatus.${contactRequest.status}`)}</p><p className="mt-1 text-sm text-slate-600">{t(`contact.statusText.${contactRequest.status}`)}</p><Link href="/connect/contacts" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("contact.openContacts")}</Link></div>}</section> : null}
-  </article>
-    {ownActive && aiAvailable ? <ListingAiSection listingId={listing.id} jobState={aiJobState} /> : null}
-    <DisclosedCapability
-      rows={disclosedCapability}
-      copy={{
-        title: capabilityT("foreign.title"),
-        familyLabel: (familyId) => capabilityT(`families.${familyId}`),
-        areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
-        levelLabel: (level) => capabilityT(`levels.${level}`),
-        ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
-      }}
-    />
-  </div></main>;
+  const TILE = "flex min-w-0 flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6";
+  const H3 = "text-xl font-semibold leading-tight text-[#0b1f3a]";
+  const LABEL = "text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]";
+  const BTN_PRIMARY = "inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90";
+  const BTN_ON_BRAND = "inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-[18px] text-[15px] font-semibold text-[#4a2fb8]";
+  const CHIP = "rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]";
+  const isPublicLive = listing.visibility === "public" && listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) > new Date());
+  const savedKey = knownKey(query.saved, CONNECT_PUBLICATION_KEYS);
+  return (
+    <main className="mx-auto w-full max-w-5xl px-5 py-9">
+      <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-[#5f5e7a] hover:text-[#0b1f3a]">← {t("navigation.overview")}</Link>
+      {savedKey ? <p role="status" className="mb-4 mt-3 rounded-2xl bg-[#e3f6ec] p-4 text-sm text-[#17794a]">{t(`success.listing.${savedKey}`)}</p> : null}
+      {query.contact === "sent" ? <p className="mb-4 mt-3 rounded-2xl bg-[#e3f6ec] p-4 text-sm text-[#17794a]">{t("contact.sent")}</p> : null}
+      {aiNotice ? <p role="status" className="mb-4 mt-3 rounded-2xl bg-[#f1f0f7] p-4 text-sm text-[#33325e]">{t(`resources.notice.${aiNotice}`)}</p> : null}
+
+      <header className="brand-panel relative mt-3 overflow-hidden rounded-[28px] px-6 py-8 sm:px-9">
+        <span aria-hidden="true" className="orb -top-16 right-16 hidden h-44 w-44 md:block" />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="rounded-full bg-white px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{t(`directions.${listing.direction}`)}</span>
+            <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[13px] font-semibold text-white">{t(`categories.${listing.category}`)}</span>
+          </div>
+          {own ? (
+            <div className="flex flex-wrap gap-2">
+              {isPublicLive ? <Link href={`/connect/l/${listing.public_slug}`} className={BTN_ON_BRAND}>{t("visibility.openPublicPage")}</Link> : null}
+              <Link href={`/connect/listings/${listing.id}/edit`} className={BTN_ON_BRAND}>{t("actions.edit")}</Link>
+            </div>
+          ) : null}
+        </div>
+        <h1 className="mt-3 max-w-3xl text-[30px] font-semibold leading-[1.2] sm:text-[34px]">{listing.title}</h1>
+        {framework.length ? <p className="mt-3 text-[15px] text-white opacity-95">{framework.join(" · ")}</p> : null}
+      </header>
+
+      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="flex min-w-0 flex-col gap-5">
+          <section className={TILE}>
+            <h2 className={H3}>{t("detail.what")}</h2>
+            <p className="whitespace-pre-wrap text-base leading-[1.65] text-[#0b1f3a]">{listing.summary}</p>
+          </section>
+          {listing.topics.length ? (
+            <section className={TILE}>
+              <h2 className={H3}>{t("detail.topics")}</h2>
+              <div className="flex flex-wrap gap-1.5">{listing.topics.map((v) => <span key={v} className={CHIP}>{v}</span>)}</div>
+            </section>
+          ) : null}
+          {listing.industries.length ? (
+            <section className={TILE}>
+              <h2 className={H3}>{t("detail.industries")}</h2>
+              <p className="text-[#5f5e7a]">{listing.industries.join(" · ")}</p>
+            </section>
+          ) : null}
+          {ownActive && aiAvailable ? <ListingAiSection listingId={listing.id} jobState={aiJobState} /> : null}
+          <DisclosedCapability
+            rows={disclosedCapability}
+            copy={{
+              title: capabilityT("foreign.title"),
+              familyLabel: (familyId) => capabilityT(`families.${familyId}`),
+              areaLabel: (areaId) => capabilityT(`areaLabels.${areaId}`),
+              levelLabel: (level) => capabilityT(`levels.${level}`),
+              ownershipLabel: (wish) => capabilityT(`ownershipWishes.${wish}`),
+            }}
+          />
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-5">
+          {profile ? (
+            <section className={TILE}>
+              <p className={LABEL}>{t("detail.person")}</p>
+              <div className="flex items-center gap-3.5">
+                <ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" />
+                <div className="min-w-0">
+                  <h2 className="break-words text-[19px] font-semibold leading-tight text-[#0b1f3a]">{profile.display_name}</h2>
+                  <p className="mt-0.5 text-sm text-[#5f5e7a]">{profile.headline}</p>
+                </div>
+              </div>
+              {profile.bio ? <p className="text-[15px] leading-7 text-[#0b1f3a]">{profile.bio}</p> : null}
+              {/* Hier faellt die Entscheidung, ob man schreibt - also steht hier auch,
+                  in welcher Form diese Person ansprechbar ist. Genau das nimmt der
+                  ersten Nachricht die Huerde. */}
+              {profile.open_to_formats?.length ? (
+                <div>
+                  <p className={LABEL}>{t("profile.openToHeading")}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {profile.open_to_formats.map((format) => <span key={format} className="rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{t(`profile.openTo.${format}`)}</span>)}
+                  </div>
+                </div>
+              ) : null}
+              {profile.network_reach ? (
+                <div>
+                  <p className={LABEL}>{t("profile.reachHeading")}</p>
+                  <p className="mt-1 text-[15px] leading-7 text-[#0b1f3a]">{profile.network_reach}</p>
+                </div>
+              ) : null}
+              {profile.contact_note ? (
+                <div>
+                  <p className={LABEL}>{t("profile.contactNoteHeading")}</p>
+                  <p className="mt-1 text-[15px] leading-7 text-[#0b1f3a]">{profile.contact_note}</p>
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+
+          {!own ? <section className={`${TILE} border-[#d9cff8] bg-[#f5f2fe]`}>
+              {blockState?.interaction_blocked ? (
+                <p className="text-sm text-[#5f5e7a]">{t("safety.blockedState")}</p>
+              ) : !contactRequest ? (
+                hasProfile ? <Link href={`/connect/listings/${listing.id}/contact`} className={BTN_PRIMARY}>{t("contact.cta")}</Link> : (
+                  <div>
+                    <p className="text-sm leading-6 text-[#33325e]">{t("contact.profileRequiredText")}</p>
+                    <Link href={`/connect/profile?next=${encodeURIComponent(`/connect/listings/${listing.id}/contact`)}`} className={`${BTN_PRIMARY} mt-3`}>{t("contact.profileRequiredCta")}</Link>
+                  </div>
+                )
+              ) : (
+                <div>
+                  <p className="text-[17px] font-semibold text-[#0b1f3a]">{t(`contact.listingStatus.${contactRequest.status}`)}</p>
+                  <p className="mt-1 text-sm text-[#5f5e7a]">{t(`contact.statusText.${contactRequest.status}`)}</p>
+                  <Link href="/connect/contacts" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-[#6d49e0] hover:underline">{t("contact.openContacts")}</Link>
+                </div>
+              )}
+            </section> : null}
+        </div>
+      </div>
+    </main>
+  );
 }

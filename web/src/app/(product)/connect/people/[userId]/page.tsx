@@ -55,29 +55,34 @@ export default async function ConnectPersonPage({
   // Policy. Hier wird nur nicht gezeigt, was sie nicht herausgibt.
   const visibleVentures = ventures.filter((venture) => venture.status === "active" || isOwn);
 
-  const card = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
+  const card = "rounded-[24px] border border-[#e4e2f0] bg-white p-6";
+  const BTN_PRIMARY = "inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90";
+  const BTN_QUIET = "inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] hover:bg-[#e9e7f4]";
+  const BTN_ON_BRAND = "inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-white px-[18px] text-[15px] font-semibold text-[#4a2fb8] sm:ml-auto";
+  const LABEL = "text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]";
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10">
+    <main className="mx-auto max-w-5xl px-5 py-10">
       <Link
         href="/connect/people"
-        className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-[#5f5e7a] hover:text-[#0b1f3a]"
       >
         ← {t("tabs.people")}
       </Link>
 
-      <header className="mt-4 brand-panel flex flex-col gap-4 rounded-[28px] p-6 sm:flex-row sm:items-start sm:p-8">
+      <header className="brand-panel relative mt-4 flex flex-col gap-4 overflow-hidden rounded-[28px] px-6 py-8 sm:flex-row sm:items-center sm:px-9">
+        <span aria-hidden="true" className="orb -top-16 right-60 hidden h-40 w-40 md:block" />
         <ConnectAvatar
           profile={person}
           displayName={person.display_name}
-          className="h-20 w-20 shrink-0 rounded-2xl object-cover"
+          className="h-[88px] w-[88px] shrink-0 rounded-full border-2 border-white/60 object-cover"
         />
         <div className="min-w-0">
-          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
+          <h1 className="text-[32px] font-semibold leading-tight sm:text-[34px]">
             {person.display_name}
           </h1>
           {person.headline ? (
-            <p className="mt-2 text-lg leading-7 text-white">{person.headline}</p>
+            <p className="mt-1.5 text-base leading-7 text-white opacity-95">{person.headline}</p>
           ) : null}
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white">
             {person.location_region ? <span>{person.location_region}</span> : null}
@@ -90,7 +95,7 @@ export default async function ConnectPersonPage({
         {isOwn ? (
           <Link
             href="/connect/profile"
-            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-4 text-sm font-semibold text-violet-800 sm:ml-auto"
+            className={BTN_ON_BRAND}
           >
             {t("actions.edit")}
           </Link>
@@ -100,7 +105,7 @@ export default async function ConnectPersonPage({
              ist. */
           <Link
             href={`/connect/people/${person.user_id}/contact`}
-            className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-5 text-sm font-semibold text-violet-800 sm:ml-auto"
+            className={BTN_ON_BRAND}
           >
             {t("contact.cta")}
           </Link>
@@ -109,16 +114,16 @@ export default async function ConnectPersonPage({
 
       {person.bio ? (
         <section className={`${card} mt-6`}>
-          <p className="whitespace-pre-line text-sm leading-7 text-slate-700">{person.bio}</p>
+          <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]">{person.bio}</p>
         </section>
       ) : null}
 
       {person.expertise.length || person.industries.length ? (
         <section className={`${card} mt-4`}>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <h2 className={LABEL}>
             {t("people.expertiseTitle")}
           </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-700">
+          <p className="mt-2 text-[15px] leading-7 text-[#0b1f3a]">
             {[...person.expertise, ...person.industries].join(" · ")}
           </p>
         </section>
@@ -128,7 +133,7 @@ export default async function ConnectPersonPage({
           das ist der Teil, der aus einem Verzeichnis ein Netzwerk macht. */}
       {person.open_to_formats.length || person.contact_note ? (
         <section className={`${card} mt-4`}>
-          <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <h2 className={LABEL}>
             {t("people.openToTitle")}
           </h2>
           {person.open_to_formats.length ? (
@@ -136,7 +141,7 @@ export default async function ConnectPersonPage({
               {person.open_to_formats.map((format) => (
                 <span
                   key={format}
-                  className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700"
+                  className="rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]"
                 >
                   {t(`profile.openTo.${format}`)}
                 </span>
@@ -155,7 +160,7 @@ export default async function ConnectPersonPage({
           ------------------------------------------------------------------- */}
       {visibleVentures.length ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-950">{t("ventures.ofPersonTitle")}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("ventures.ofPersonTitle")}</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {visibleVentures.map((venture) => {
               const logo = ventureLogoUrl(venture);
@@ -171,7 +176,7 @@ export default async function ConnectPersonPage({
                       />
                     ) : null}
                     <div className="min-w-0">
-                      <h3 className="truncate font-semibold text-slate-900">
+                      <h3 className="truncate text-lg font-semibold text-[#0b1f3a]">
                         <Link href={`/connect/ventures/${venture.id}`} className="hover:underline">
                           {venture.name}
                         </Link>
@@ -188,7 +193,7 @@ export default async function ConnectPersonPage({
                       target="_blank"
                       rel="noreferrer noopener"
                       title={t("ventures.openLinkHint")}
-                      className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline"
+                      className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-[#6d49e0] hover:underline"
                     >
                       {t("ventures.openWebsite")}
                     </a>
@@ -207,27 +212,27 @@ export default async function ConnectPersonPage({
           ------------------------------------------------------------------- */}
       {listings.length ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-950">{t("people.listingsTitle")}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("people.listingsTitle")}</h2>
           <div className="mt-3 grid gap-3">
             {listings.map((listing) => (
               <article key={listing.id} className={`${card} flex flex-wrap items-center gap-4`}>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                  <p className={LABEL}>
                     {t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}
                   </p>
-                  <h3 className="mt-1 font-semibold text-slate-900">{listing.title}</h3>
+                  <h3 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{listing.title}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={`/connect/listings/${listing.id}`}
-                    className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                    className={BTN_QUIET}
                   >
                     {t("actions.details")}
                   </Link>
                   {!isOwn ? (
                     <Link
                       href={`/connect/listings/${listing.id}/contact`}
-                      className="inline-flex min-h-11 items-center rounded-full bg-[color:var(--brand-primary)] px-4 text-sm font-semibold text-slate-900"
+                      className={BTN_PRIMARY}
                     >
                       {t("contact.cta")}
                     </Link>
@@ -241,19 +246,19 @@ export default async function ConnectPersonPage({
 
       {problems.length ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-950">{t("people.problemsTitle")}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("people.problemsTitle")}</h2>
           <div className="mt-3 grid gap-3">
             {problems.map((problem) => (
               <article key={problem.id} className={`${card} flex flex-wrap items-center gap-4`}>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                  <p className={LABEL}>
                     {t(`problems.intents.${problem.author_intent}`)}
                   </p>
-                  <h3 className="mt-1 font-semibold text-slate-900">{problem.title}</h3>
+                  <h3 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{problem.title}</h3>
                 </div>
                 <Link
                   href={`/connect/problems/${problem.id}`}
-                  className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className={BTN_QUIET}
                 >
                   {t("actions.details")}
                 </Link>
