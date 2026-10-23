@@ -28,19 +28,28 @@ export async function SourceForm({ source }: { source?: RadarSource }) {
     <SaveButton />
   </form>;
 }
-export async function SignalForm({ sources, signal }: { sources: RadarSource[]; signal?: RadarSignal }) {
+/** Genau eine nutzbare Quelle zur Domain der Adresse: vorwaehlen. Sonst nicht raten. */
+function usableForUrl(sources: RadarSource[], url?: string) {
+  if (!url) return "";
+  let host = "";
+  try { host = new URL(url).hostname.toLowerCase(); } catch { return ""; }
+  const matches = sources.filter((source) => source.usable && source.domain === host);
+  return matches.length === 1 ? matches[0].id : "";
+}
+export async function SignalForm({ sources, signal, candidate }: { sources: RadarSource[]; signal?: RadarSignal; candidate?: { id: string; url: string; title: string | null; source_date: string | null } }) {
   const t = await getTranslations("radar");
   return <form action={saveRadarSignalAction} className="mt-5 space-y-4">
     <Identity value={signal} />
+    {candidate ? <input type="hidden" name="candidate_id" value={candidate.id} /> : null}
     <p className="rounded-xl bg-slate-50 p-4 text-sm leading-6">{t("ownWords")}</p>
-    <label className="block text-sm font-medium">{t("fields.source_id")}<select name="source_id" required defaultValue={signal?.source_id ?? ""} className={inputClass}>
+    <label className="block text-sm font-medium">{t("fields.source_id")}<select name="source_id" required defaultValue={signal?.source_id ?? usableForUrl(sources, candidate?.url)} className={inputClass}>
       <option value="" disabled>{t("chooseSource")}</option>
       {sources.filter(s => s.usable && (!signal || s.id===signal.source_id)).map(s => <option key={s.id} value={s.id}>{s.name} · {s.domain}{s.allowed_path}</option>)}
     </select></label>
-    <label className="block text-sm font-medium">{t("fields.source_url")}<input name="source_url" type="url" required readOnly={!!signal} maxLength={2048} defaultValue={signal?.source_url ?? ""} className={inputClass} /></label>
+    <label className="block text-sm font-medium">{t("fields.source_url")}<input name="source_url" type="url" required readOnly={!!signal} maxLength={2048} defaultValue={signal?.source_url ?? candidate?.url ?? ""} className={inputClass} /></label>
     {!signal ? <label className="block text-sm font-medium">{t("fields.stable_public_item_id")}<input name="stable_public_item_id" maxLength={120} className={inputClass} /><span className="text-xs text-slate-500">{t("itemHint")}</span></label> : null}
-    <label className="block text-sm font-medium">{t("fields.source_title")}<input name="source_title" maxLength={200} defaultValue={signal?.source_title ?? ""} className={inputClass} /></label>
-    <label className="block text-sm font-medium">{t("fields.source_date")}<input name="source_date" type="date" defaultValue={signal?.source_date ?? ""} className={inputClass} /></label>
+    <label className="block text-sm font-medium">{t("fields.source_title")}<input name="source_title" maxLength={200} defaultValue={signal?.source_title ?? candidate?.title ?? ""} className={inputClass} /></label>
+    <label className="block text-sm font-medium">{t("fields.source_date")}<input name="source_date" type="date" defaultValue={signal?.source_date ?? candidate?.source_date ?? ""} className={inputClass} /></label>
     <div className="grid gap-4 sm:grid-cols-2">{(["source_language","summary_language"] as const).map(key => <label key={key} className="text-sm font-medium">{t(`fields.${key}`)}<select name={key} defaultValue={signal?.[key] ?? 'de'} className={inputClass}><option value="de">{t("options.de")}</option><option value="en">{t("options.en")}</option></select></label>)}</div>
     {([["summary",800],["problem_observation",1000],["affected_context",400]] as const).map(([key,max]) => <label key={key} className="block text-sm font-medium">{t(`fields.${key}`)}<textarea name={key} required maxLength={max} rows={3} defaultValue={signal?.[key] ?? ""} className={inputClass} /></label>)}
     <label className="block text-sm font-medium">{t("fields.tags")}<input name="tags" maxLength={327} defaultValue={signal?.tags.join(', ') ?? ""} className={inputClass} /></label>

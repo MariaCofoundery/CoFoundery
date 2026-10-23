@@ -3,7 +3,7 @@
   "account": "Account",
   "signals": "Signals",
   "sources": "Source register",
-  "scope": "Internal manual pilot: IT, digital workflows and software problems in small teams and organisations. DE/EN, preferably DACH/EU. No automated retrieval.",
+  "scope": "Internal pilot: IT, digital work processes and software problems in small teams and organisations. DE/EN, preferably DACH/EU. You enter findings by hand, or take over candidates from the weekly scan when it is switched on for an approved source.",
   "save": "Save",
   "saving": "Saving …",
   "addSignal": "Add signal",
@@ -214,5 +214,50 @@
       "reviewed": "Reviewed",
       "archived": "Archived"
     }
+  },
+  "candidates": {
+    "title": "Candidates",
+    "intro": "What the weekly scan found: title, date and address of a public post, nothing else. Look at the post and decide: take it over as a signal (in your own words) or dismiss it. Doing nothing loses nothing, open candidates expire after 30 days.",
+    "weekly": "Weekly scan",
+    "weeklyHint": "When switched on, it only runs for sources you approved in the source register, set active and gave a retrieval method and search terms. Off is the default.",
+    "enabled": "Weekly scan switched on",
+    "ready": "ready to scan",
+    "notReady": "not approved yet or not active",
+    "lastRun": "Last run: {date} · {outcome} · {count} new",
+    "neverRun": "Has not run yet.",
+    "noSources": "No source with the retrieval method “Official API” yet. Add one in the source register.",
+    "scanNow": "Scan now",
+    "scanning": "Scanning …",
+    "open": "Open candidates",
+    "empty": "No open candidates.",
+    "openSource": "Open post",
+    "take": "Take over as signal",
+    "dismiss": "Dismiss",
+    "outcomes": {
+      "started": "running",
+      "ok": "successful",
+      "empty": "nothing found",
+      "http_error": "source unreachable",
+      "format_error": "unexpected response",
+      "timeout": "too slow",
+      "source_changed": "source changed meanwhile",
+      "disabled": "switched off"
+    },
+    "scan": {
+      "ok": "Scan finished: {count} new candidates.",
+      "partial": "Scan partly finished: {count} new candidates, one source had an error.",
+      "none": "Nothing to scan: no source is due, approved and switched on (one hour pause after a successful run).",
+      "notconfigured": "The scan is not set up yet: the database connection for the collector role is missing.",
+      "error": "The scan failed. Please try again later."
+    }
+  },
+  "collection": {
+    "title": "Automatic retrieval",
+    "hint": "Only for sources with the retrieval method “Official API”. Every change here resets the approval: approve again and set active afterwards.",
+    "adapter": "Retrieval",
+    "none": "No automatic retrieval",
+    "hn": "Hacker News (Algolia search)",
+    "queries": "Search terms, one per line",
+    "queriesHint": "At most five, 2 to 80 characters each. Searches Ask HN posts of the last eight days, for example “is there a tool”."
   }
 }

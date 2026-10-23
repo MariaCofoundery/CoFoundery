@@ -3,7 +3,7 @@
   "account": "Konto",
   "signals": "Signale",
   "sources": "Quellenregister",
-  "scope": "Interner manueller Pilot: IT, digitale Arbeitsprozesse und Softwareprobleme in kleinen Teams und Organisationen. DE/EN, bevorzugt DACH/EU. Keine automatischen Abrufe.",
+  "scope": "Interner Pilot: IT, digitale Arbeitsprozesse und Softwareprobleme in kleinen Teams und Organisationen. DE/EN, bevorzugt DACH/EU. Funde trägst du von Hand ein, oder du übernimmst Kandidaten aus dem Wochenscan, wenn er für eine freigegebene Quelle eingeschaltet ist.",
   "save": "Speichern",
   "saving": "Wird gespeichert …",
   "addSignal": "Signal hinzufügen",
@@ -214,5 +214,50 @@
       "reviewed": "Geprüft",
       "archived": "Archiviert"
     }
+  },
+  "candidates": {
+    "title": "Kandidaten",
+    "intro": "Was der Wochenscan gefunden hat: Titel, Datum und Adresse eines öffentlichen Beitrags, nichts sonst. Schau dir den Beitrag an und entscheide: als Signal übernehmen (mit eigenen Worten) oder verwerfen. Wer nichts tut, verliert nichts, offene Kandidaten verfallen nach 30 Tagen.",
+    "weekly": "Wochenscan",
+    "weeklyHint": "Eingeschaltet läuft er nur für Quellen, die du im Quellenregister freigegeben hast, aktiv geschaltet und mit einer Abrufart und Suchbegriffen versehen hast. Aus ist der Standard.",
+    "enabled": "Wochenscan eingeschaltet",
+    "ready": "bereit zum Scan",
+    "notReady": "noch nicht freigegeben oder nicht aktiv",
+    "lastRun": "Letzter Lauf: {date} · {outcome} · {count} neu",
+    "neverRun": "Noch nicht gelaufen.",
+    "noSources": "Noch keine Quelle mit der Abrufart „Offizielle API“. Lege sie im Quellenregister an.",
+    "scanNow": "Jetzt scannen",
+    "scanning": "Scannt …",
+    "open": "Offene Kandidaten",
+    "empty": "Keine offenen Kandidaten.",
+    "openSource": "Beitrag öffnen",
+    "take": "Als Signal übernehmen",
+    "dismiss": "Verwerfen",
+    "outcomes": {
+      "started": "läuft",
+      "ok": "erfolgreich",
+      "empty": "nichts gefunden",
+      "http_error": "Quelle nicht erreichbar",
+      "format_error": "Antwort unerwartet",
+      "timeout": "zu langsam",
+      "source_changed": "Quelle zwischendurch geändert",
+      "disabled": "ausgeschaltet"
+    },
+    "scan": {
+      "ok": "Scan fertig: {count} neue Kandidaten.",
+      "partial": "Scan teilweise fertig: {count} neue Kandidaten, bei einer Quelle gab es einen Fehler.",
+      "none": "Nichts zu scannen: Keine Quelle ist fällig, freigegeben und eingeschaltet (nach einem erfolgreichen Lauf eine Stunde Pause).",
+      "notconfigured": "Der Scan ist noch nicht eingerichtet: Es fehlt die Datenbankverbindung für die Sammler-Rolle.",
+      "error": "Der Scan ist fehlgeschlagen. Versuch es später noch einmal."
+    }
+  },
+  "collection": {
+    "title": "Automatischer Abruf",
+    "hint": "Nur für Quellen mit der Abrufart „Offizielle API“. Jede Änderung hier setzt die Freigabe zurück: danach neu freigeben und aktiv schalten.",
+    "adapter": "Abrufart",
+    "none": "Kein automatischer Abruf",
+    "hn": "Hacker News (Algolia-Suche)",
+    "queries": "Suchbegriffe, einer pro Zeile",
+    "queriesHint": "Höchstens fünf, je 2 bis 80 Zeichen. Gesucht wird in Ask-HN-Beiträgen der letzten acht Tage, zum Beispiel „is there a tool“."
   }
 }

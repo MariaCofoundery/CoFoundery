@@ -29,6 +29,7 @@ export type RadarSource = {
   is_public: boolean; permission_state: string; status: string; source_language: string; region: string; target_context: string;
   source_nature: string; source_origin: string; policy_references: string; review_note: string;
   reviewed_at: string | null; review_due_at: string | null; usable: boolean;
+  collection_adapter: string | null; collection_queries: string[];
 };
 export type RadarSignal = {
   id: string; source_id: string; revision: number; source_url: string | null; source_title: string | null; source_date: string | null;
@@ -36,4 +37,15 @@ export type RadarSignal = {
   affected_context: string | null; tags: string[]; review_status: string; sensitivity: string; usage_block: boolean; availability: string;
   created_by: string | null; reviewed_by: string | null; reviewed_at: string | null; review_due_at: string; delete_after: string | null;
   source_name: string; source_type: string; source_region: string; source_usable: boolean; usable: boolean; overdue: boolean; expired: boolean;
+};
+export type RadarCandidate = {
+  id: string; source_id: string; source_name: string; url: string | null; title: string | null;
+  source_date: string | null; collected_at: string; state: string;
+};
+export type RadarCollectionStatus = {
+  enabled: boolean; open_candidates: number;
+  sources: Array<{
+    id: string; name: string; revision: number; adapter: string | null; queries: string[]; collectable: boolean;
+    last_run: { finished_at: string | null; outcome: string; fetched: number; added: number } | null;
+  }>;
 };
