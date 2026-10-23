@@ -13,13 +13,17 @@ begin
     coalesce(new.summary, '') || ' ' ||
     coalesce(array_to_string(new.topics, ' '), '') || ' ' ||
     coalesce(array_to_string(new.industries, ' '), '') || ' ' ||
-    coalesce(array_to_string(new.locations, ' '), '');
+    -- Ueber to_jsonb gelesen: Die Schema-Reparatur (network_schema_drift_repair) kennt Zustaende ohne
+    -- diese Spalte, und der Trigger darf dort nicht scheitern.
+    coalesce((select string_agg(x, ' ') from jsonb_array_elements_text(to_jsonb(new) -> 'locations') as t(x)), '');
   return new;
 end;
 $$;
 drop trigger if exists network_listing_search_text on public.network_listings;
 create trigger network_listing_search_text
-  before insert or update of title, summary, topics, industries, locations
+  -- Ohne Spaltenliste: Ein Trigger, der "update of locations" nennt, haengt an dieser Spalte und
+  -- blockiert sie beim Reparieren von Schema-Abweichungen (siehe network_schema_drift_repair).
+  before insert or update
   on public.network_listings
   for each row execute function public.set_network_listing_search_text();
 update public.network_listings
