@@ -7,7 +7,7 @@ import { loadModuleContext } from "@/features/modules/loadModuleContext";
 import { MODULE_REGISTRY } from "@/features/modules/registry";
 import type { ModuleDefinition, ModuleState } from "@/features/modules/types";
 import { findVentures } from "@/features/instruments/align/ventureResolution";
-import { AppIcon, IconTile } from "@/features/ui/Icons";
+import { AppIcon, IconTile, type IconName, type IconTone } from "@/features/ui/Icons";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -34,10 +34,29 @@ const MINUTES: Record<string, number> = {
 };
 
 const STATE_CLASS: Record<ModuleState, string> = {
-  not_started: "bg-slate-100 text-slate-600",
-  in_progress: "bg-violet-100 text-violet-800",
-  done_for_now: "bg-emerald-100 text-emerald-800",
+  not_started: "bg-[#f1f0f7] text-[#33325e]",
+  in_progress: "bg-[#efeafd] text-[#4a2fb8]",
+  done_for_now: "bg-[#e3f6ec] text-[#17794a]",
 };
+
+/** Symbol und Farbe je Fragebogen (Konzeptboard 33): die Farbe sagt, WELCHER Fragebogen es ist - nie, wie gut. */
+const MODULE_ICON: Record<string, { icon: IconName; tone: IconTone }> = {
+  workstyle: { icon: "chart", tone: "teal" },
+  strengths: { icon: "heart", tone: "pink" },
+  capability: { icon: "tools", tone: "violet" },
+  direction: { icon: "spark", tone: "amber" },
+  venture_core: { icon: "rocket", tone: "amber" },
+  venture_core_beta: { icon: "rocket", tone: "violet" },
+  venture_tradeoffs: { icon: "scale", tone: "amber" },
+};
+const TEAM_ICON: Record<string, { icon: IconName; tone: IconTone }> = {
+  setup: { icon: "pencil", tone: "green" },
+  commitment: { icon: "link", tone: "amber" },
+  exercises: { icon: "game", tone: "blue" },
+};
+const CARD = "card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6";
+const BTN_PRIMARY = "inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90";
+const BTN_QUIET = "inline-flex min-h-11 items-center justify-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] hover:bg-[#e9e7f4]";
 
 export default async function QuestionnairesPage({ searchParams }: { searchParams?: Promise<{ vorhaben?: string; gruppe?: string }> }) {
   const { data: auth } = await getRequestUser();
@@ -108,29 +127,37 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 md:px-10">
-      <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
-      <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">{t("intro")}</p>
+      <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight text-[#0b1f3a]">{t("title")}</h1>
+      <p className="mt-1.5 max-w-xl text-base leading-7 text-[#5f5e7a]">{t("intro")}</p>
 
       {first && !filter ? (
-        <section aria-labelledby="q-start" className="brand-panel relative mt-8 overflow-hidden rounded-[28px] p-6 sm:p-8">
+        <section aria-labelledby="q-start" className="brand-panel relative mt-7 overflow-hidden rounded-[28px] px-6 py-7 sm:px-9">
+          <span aria-hidden="true" className="orb -top-12 right-36 hidden h-36 w-36 sm:block" />
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <IconTile name="check" tone="white" />
+            <div className="flex min-w-0 items-center gap-[18px]">
+              <span aria-hidden="true" className="hidden h-14 w-14 flex-none items-center justify-center rounded-[14px] bg-white/20 sm:inline-flex">
+                <AppIcon name={MODULE_ICON[first.def.moduleId]?.icon ?? "check"} />
+              </span>
               <div className="max-w-xl">
-                <p id="q-start" className="text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                <p id="q-start" className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">
                   {first.def.moduleId === "workstyle" ? t("start.here") : t("start.next")}
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{tModules(`${first.def.moduleId}.title`)}</h2>
-                <p className="mt-2 text-sm leading-7 text-white">
+                <h2 className="mt-0.5 text-[28px] font-semibold leading-tight sm:text-[30px]">{tModules(`${first.def.moduleId}.title`)}</h2>
+                <p className="mt-1.5 text-[15.5px] leading-6 text-white opacity-95">
                   {first.def.moduleId === "workstyle" ? t("start.workstyleLead") : tModules(`${first.def.moduleId}.summary`)}
                 </p>
-                <p className="mt-1 text-xs text-white">{t("minutes", { minutes: MINUTES[first.def.moduleId] ?? 10 })}</p>
               </div>
             </div>
-            <Link href={first.href} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-violet-800">
-              {cta(first.state)}
-              <AppIcon name="arrow" className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-row items-center gap-3 sm:flex-col sm:items-end sm:gap-2">
+              <Link href={first.href} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-[18px] text-[15px] font-semibold text-[#4a2fb8]">
+                {cta(first.state)}
+                <AppIcon name="arrow" className="h-4 w-4" />
+              </Link>
+              <span className="flex items-center gap-1.5 text-[13.5px] text-white opacity-90">
+                <AppIcon name="clock" className="h-4 w-4" />
+                {t("minutes", { minutes: MINUTES[first.def.moduleId] ?? 10 })}
+              </span>
+            </div>
           </div>
           {later.length > 0 ? (
             <p className="mt-5 border-t border-white/30 pt-4 text-sm text-white">
@@ -152,7 +179,7 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
               key={key ?? "all"}
               href={`/fragebogen${qs.toString() ? `?${qs}` : ""}`}
               aria-current={active ? "true" : undefined}
-              className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm ${active ? "bg-slate-900 font-semibold text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+              className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-semibold ${active ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : "border-[#d8d5ea] bg-white text-[#33325e] hover:bg-[#f5f2fe]"}`}
             >
               {t(`filters.${key ?? "all"}`)}
             </Link>
@@ -163,36 +190,41 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
       {groups.map((group) =>
         group.cards.length === 0 || !shown(group.key) ? null : (
           <section key={group.key} className="mt-10" aria-labelledby={`q-${group.key}`} data-group={group.key}>
-            <h2 id={`q-${group.key}`} className="text-lg font-semibold text-slate-950">
-              {t(`groups.${group.key}.title`)}
-              {group.key === "venture" && venture?.name ? <span className="ml-2 text-sm font-normal text-slate-500">· {venture.name}</span> : null}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">{t(`groups.${group.key}.lead`)}</p>
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h2 id={`q-${group.key}`} className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+                {t(`groups.${group.key}.title`)}
+                {group.key === "venture" && venture?.name ? <span className="ml-2 text-sm font-normal text-[#5f5e7a]">· {venture.name}</span> : null}
+              </h2>
+              <p className="text-sm text-[#5f5e7a]">{t(`groups.${group.key}.lead`)}</p>
+            </div>
             <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {group.cards.map(({ def, state, href }) => (
                 <li
                   key={def.moduleId}
                   data-module={def.moduleId}
                   data-state={state}
-                  className={`flex flex-col gap-2 rounded-2xl border bg-white p-5 ${group.key === "deepening" ? "border-dashed border-slate-300" : "border-slate-200"}`}
+                  className={`${CARD} ${group.key === "deepening" ? "border-dashed !border-[#d8d5ea]" : ""}`}
                 >
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATE_CLASS[state]}`}>{t(`state.${state}`)}</span>
-                    {def.moduleId === "venture_core_beta" ? (
-                      <span className="rounded-full border border-violet-300 px-2.5 py-0.5 text-xs font-semibold text-violet-800">{t("beta")}</span>
-                    ) : null}
+                  <div className="flex items-center justify-between gap-2">
+                    <IconTile name={MODULE_ICON[def.moduleId]?.icon ?? "check"} tone={MODULE_ICON[def.moduleId]?.tone ?? "violet"} />
+                    <div className="flex flex-wrap justify-end gap-1.5">
+                      <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${STATE_CLASS[state]}`}>{t(`state.${state}`)}</span>
+                      {def.moduleId === "venture_core_beta" ? (
+                        <span className="rounded-full bg-[#fdecc8] px-2.5 py-0.5 text-[13px] font-semibold text-[#7a4300]">{t("beta")}</span>
+                      ) : null}
+                    </div>
                   </div>
-                  <h3 className="text-base font-semibold text-slate-950">{tModules(`${def.moduleId}.title`)}</h3>
-                  <p className="text-sm leading-6 text-slate-600">{tModules(`${def.moduleId}.summary`)}</p>
-                  <p className="text-xs text-slate-500">{t("minutes", { minutes: MINUTES[def.moduleId] ?? 10 })}</p>
-                  <Link
-                    href={href}
-                    className={`mt-auto inline-flex min-h-11 items-center self-start rounded-xl px-4 text-sm font-semibold ${
-                      state === "done_for_now" ? "border border-slate-200 bg-slate-50 text-slate-800" : "brand-here"
-                    }`}
-                  >
-                    {cta(state)}
-                  </Link>
+                  <h3 className="text-xl font-semibold leading-tight text-[#0b1f3a]">{tModules(`${def.moduleId}.title`)}</h3>
+                  <p className="text-sm leading-[1.55] text-[#5f5e7a]">{tModules(`${def.moduleId}.summary`)}</p>
+                  <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+                    <span className="flex items-center gap-1.5 text-[13.5px] text-[#5f5e7a]">
+                      <AppIcon name="clock" className="h-4 w-4" />
+                      {t("minutes", { minutes: MINUTES[def.moduleId] ?? 10 })}
+                    </span>
+                    <Link href={href} className={first && href === first.href && state !== "done_for_now" ? BTN_PRIMARY : BTN_QUIET}>
+                      {cta(state)}
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -208,30 +240,46 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
 
       {shown("team") ? (
       <section className="mt-10" aria-labelledby="q-team" data-group="team">
-        <h2 id="q-team" className="text-lg font-semibold text-slate-950">{t("groups.team.title")}</h2>
-        <p className="mt-1 text-sm text-slate-500">{t("groups.team.lead")}</p>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h2 id="q-team" className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("groups.team.title")}</h2>
+          <p className="text-sm text-[#5f5e7a]">{t("groups.team.lead")}</p>
+        </div>
         <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {teamCards.map(({ key, tag, href }) => (
-            <li key={key} className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-5">
-              <span className={`self-start rounded-full px-2.5 py-0.5 text-xs font-semibold ${tag === "pair" ? "bg-amber-100 text-amber-900" : "bg-violet-100 text-violet-800"}`}>{t(`tags.${tag}`)}</span>
-              <h3 className="text-base font-semibold text-slate-950">{t(`team.${key}.title`)}</h3>
-              <p className="text-sm leading-6 text-slate-600">{t(`team.${key}.text`)}</p>
-              <Link href={href} className="mt-auto inline-flex min-h-11 items-center self-start rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-800">
-                {venture ? t("team.cta") : t("team.ctaNoTeam")}
-              </Link>
+            <li key={key} className={CARD}>
+              <div className="flex items-center justify-between gap-2">
+                <IconTile name={TEAM_ICON[key].icon} tone={TEAM_ICON[key].tone} />
+                <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${tag === "pair" ? "bg-[#fdecc8] text-[#7a4300]" : "bg-[#e3f6ec] text-[#17794a]"}`}>{t(`tags.${tag}`)}</span>
+              </div>
+              <h3 className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t(`team.${key}.title`)}</h3>
+              <p className="text-sm leading-[1.55] text-[#5f5e7a]">{t(`team.${key}.text`)}</p>
+              <div className="mt-auto pt-1">
+                <Link href={href} className={BTN_QUIET}>
+                  {venture ? t("team.cta") : t("team.ctaNoTeam")}
+                </Link>
+              </div>
             </li>
           ))}
         </ul>
       </section>
       ) : null}
 
-      <section className="mt-10 rounded-2xl bg-slate-50 p-5">
-        <h2 className="text-base font-semibold text-slate-950">{t("how.title")}</h2>
-        <dl className="mt-3 grid gap-4 text-sm leading-6 text-slate-600 md:grid-cols-4">
-          {(["purpose", "not", "method", "privacy"] as const).map((key) => (
-            <div key={key}>
-              <dt className="font-semibold text-violet-800">{t(`how.${key}.label`)}</dt>
-              <dd className="mt-1">{t(`how.${key}.text`)}</dd>
+      <section className="mt-10 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-label={t("how.title")}>
+        <dl className="grid gap-5 md:grid-cols-4">
+          {(
+            [
+              { key: "purpose", icon: "spark", tone: "violet" },
+              { key: "not", icon: "shield", tone: "green" },
+              { key: "method", icon: "book", tone: "blue" },
+              { key: "privacy", icon: "lock", tone: "amber" },
+            ] as const
+          ).map(({ key, icon, tone }) => (
+            <div key={key} className="flex items-start gap-3">
+              <IconTile name={icon} tone={tone} size="sm" />
+              <div className="min-w-0">
+                <dt className="font-semibold text-[#0b1f3a]">{t(`how.${key}.label`)}</dt>
+                <dd className="mt-0.5 text-[13.5px] leading-[1.5] text-[#5f5e7a]">{t(`how.${key}.text`)}</dd>
+              </div>
             </div>
           ))}
         </dl>

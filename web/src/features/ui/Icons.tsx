@@ -21,7 +21,16 @@ export type IconName =
   | "network"
   | "shield"
   | "lock"
-  | "arrow";
+  | "arrow"
+  | "chart"
+  | "tools"
+  | "heart"
+  | "rocket"
+  | "spark"
+  | "clock"
+  | "book"
+  | "link"
+  | "game";
 
 const PATHS: Record<IconName, ReactNode> = {
   check: <path d="M5 12l5 5L20 7" />,
@@ -64,6 +73,35 @@ const PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+  chart: <path d="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6" />,
+  tools: (
+    <>
+      <path d="M14.5 6.5a4 4 0 0 0 5 5L10 21l-3-3 9.5-9.5" />
+      <path d="M14.5 6.5l3-3" />
+    </>
+  ),
+  heart: <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />,
+  rocket: (
+    <>
+      <path d="M5 19c0-3 1.5-4.5 3-4.5M14 4c3.5 0 6 2.5 6 6-3 4-6 6-9 7l-4-4c1-3 3-6 7-9z" />
+      <circle cx="14.5" cy="9.5" r="1.3" />
+    </>
+  ),
+  spark: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v4l3 2" />
+    </>
+  ),
+  book: <path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h10" />,
+  link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
+  game: (
+    <>
+      <rect x="3" y="8" width="18" height="9" rx="4" />
+      <path d="M8 10.5v4M6 12.5h4M16 11.5h.01M18 13.5h.01" />
+    </>
+  ),
 };
 
 export function AppIcon({ name, className = "h-6 w-6" }: { name: IconName; className?: string }) {
