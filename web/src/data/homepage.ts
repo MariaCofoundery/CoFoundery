@@ -59,7 +59,7 @@ const de = {
   ],
   advisorLine: "Du begleitest Gründende?", advisorLink: "Hier geht es für Advisor weiter →",
   bandTitle: ["Reden kostet ein paar Minuten.", "Nicht reden kann teuer werden."],
-  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung",
+  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung", phone: "Aufs Handy (PDF)",
   seoTitle: "Made2Found – Erst reden. Dann gründen.",
   seoDescription: "Finde raus, wie du arbeitest, seht, wo ihr verschieden tickt, und haltet Rollen, Zeit, Geld und Entscheidungen fest. Made2Found für Mitgründer:innen, in der geschlossenen Beta.",
 };
@@ -113,7 +113,7 @@ const en: typeof de = {
   ],
   advisorLine: "You support founders?", advisorLink: "Advisors continue here →",
   bandTitle: ["Talking takes a few minutes.", "Not talking can get expensive."],
-  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach",
+  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach", phone: "On your phone (PDF)",
   seoTitle: "Made2Found – Talk first. Then found.",
   seoDescription: "Find out how you work, see where you tick differently, and put roles, time, money and decisions in writing. Made2Found for co-founders, in closed beta.",
 };

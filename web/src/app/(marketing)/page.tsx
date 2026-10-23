@@ -155,7 +155,7 @@ export default async function Page() {
       </main>
       <footer className={`${styles.container} ${styles.footer}`}>
         <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{content.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
-        <nav aria-label={content.legal}><Link href="/impressum">{content.legal}</Link><Link href="/datenschutz">{content.privacy}</Link><Link href="/informierte-entscheidungen">{content.stance}</Link></nav>
+        <nav aria-label={content.legal}><Link href="/impressum">{content.legal}</Link><Link href="/datenschutz">{content.privacy}</Link><Link href="/informierte-entscheidungen">{content.stance}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{content.phone}</a></nav>
       </footer>
     </div>
   );

@@ -41,6 +41,7 @@ export default async function AccountPage({
 
   if (!user) redirect("/login?next=/account");
 
+  const phoneT = await getTranslations("profile.welcomeLetter.phone");
   const [
     params,
     roleViews,
@@ -153,6 +154,14 @@ export default async function AccountPage({
           eigener Abschnitt: Hier entsteht eine Aussage ueber das Verhaeltnis
           zwischen Menschen, die es vorher nicht gab. */}
       <TeamReviewSection requests={teamReviewRequests} />
+
+      <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <h2 className="text-lg font-semibold text-slate-950">{phoneT("title")}</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-600">{phoneT("text")}</p>
+        <a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener" className="mt-3 inline-flex min-h-11 items-center font-semibold text-violet-700 underline underline-offset-2">
+          {phoneT("link")}
+        </a>
+      </section>
 
       <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <DeleteAccountSection
