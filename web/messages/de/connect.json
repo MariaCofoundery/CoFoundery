@@ -794,7 +794,7 @@
     }
   },
   "highlight": {
-    "title": "Aus dem Netzwerk",
+    "title": "Highlights",
     "randomNote": "Eine wechselnde Zufallsauswahl aus aktuellen freigegebenen Inhalten – keine persönliche Empfehlung.",
     "kinds": {
       "seeking": "Sucht",
@@ -804,7 +804,8 @@
       "problem": "Problem"
     },
     "disclosures": {
-      "editorial": "Von uns hervorgehoben",
+      "none": "Zufällig ausgewählt",
+      "editorial": "Empfohlen von Maria",
       "sponsored": "Anzeige"
     },
     "has": {
@@ -812,7 +813,16 @@
       "offering": "{count, plural, one {1 Angebot} other {# Angebote}}",
       "seeking": "{count, plural, one {1 Gesuch} other {# Gesuche}}"
     },
-    "yours": "Von dir"
+    "yours": "Von dir",
+    "subtitle": "Drei Plätze, die gerade im Netzwerk gezeigt werden. Bei jedem steht, warum er hier ist.",
+    "howTitle": "Wie Highlights entstehen",
+    "how": "Drei Plätze. Wir können einen Eintrag selbst empfehlen, ein Platz kann bezahlt sein und ist dann als Anzeige gekennzeichnet. Alle übrigen werden zufällig gezogen. Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in Vorschläge erlaubt hat.",
+    "disclosureMeta": {
+      "none": "Per Zufall",
+      "editorial": "Von der Plattform",
+      "sponsored": "Bezahlt"
+    },
+    "adNote": "Wer „Anzeige“ ist, hat dafür bezahlt. Das beeinflusst weder die Suche noch deine Vorschläge."
   },
   "suggestions": {
     "title": "Für dich",
@@ -830,7 +840,8 @@
     "emptyCta": "Profil ergänzen",
     "note": "Höchstens drei neue Vorschläge innerhalb von sieben Tagen. Neue Hinweise können auch entstehen, wenn du gerade nicht hier bist. E-Mail und Push richten sich nach deinen Einstellungen. Benachrichtigungen nennen nur die Anzahl und einen Link, keine vorgeschlagenen Namen oder Inhaltstitel.",
     "emptyCtaAsk": "Gesuch einstellen",
-    "all": "Alle Vorschläge"
+    "all": "Alle Vorschläge",
+    "strip": "{count, plural, one {1 neuer Vorschlag} other {# neue Vorschläge}} diese Woche, jeweils mit dem Wort, das ihn ausgelöst hat"
   },
   "lifecycle": {
     "participation": "Deine CONNECT-Teilnahme",
@@ -920,5 +931,51 @@
     "CONNECT_REMOTE_POSSIBLE": "Das Angebot ist remote möglich.",
     "CONNECT_UNKNOWN_LOCATION": "Zum Ort fehlen Angaben.",
     "CONNECT_LIMITED_EVIDENCE": "Dieser Vorschlag basiert auf wenigen Angaben."
+  },
+  "highlightAdmin": {
+    "back": "Zurück",
+    "title": "Highlights verwalten",
+    "intro": "Hier legst du fest, welche Einträge auf der Connect-Übersicht hervorgehoben werden. Drei Plätze gibt es; eine Empfehlung und eine Anzeige können dabei sein, der Rest wird zufällig gezogen. Jede Karte sagt, warum sie dort steht.",
+    "newTitle": "Neuen Platz vergeben",
+    "link": "Link zum Eintrag",
+    "linkHint": "Öffne den Eintrag in Connect und kopiere die Adresse aus dem Browser. Es geht für Gesuche, Angebote, Unternehmen, Profile und Probleme.",
+    "source": "Warum steht er dort?",
+    "sources": {
+      "editorial": "Empfohlen von uns",
+      "sponsored": "Anzeige"
+    },
+    "sourceHints": {
+      "editorial": "Du empfiehlst ihn. Auf der Karte steht „Empfohlen von Maria“.",
+      "sponsored": "Jemand hat dafür bezahlt. Die Karte ist automatisch als „Anzeige“ gekennzeichnet, das lässt sich nicht abschalten."
+    },
+    "note": "Warum empfiehlst du ihn? (optional)",
+    "noteHint": "Ein, zwei Sätze, höchstens 240 Zeichen. Wird nur bei einer Empfehlung gezeigt.",
+    "endsOn": "Läuft bis einschließlich",
+    "save": "Platz vergeben",
+    "saving": "Speichert …",
+    "groups": {
+      "running": "Läuft gerade",
+      "planned": "Geplant",
+      "ended": "Abgelaufen"
+    },
+    "none": "Nichts.",
+    "kinds": {
+      "listing": "Gesuch oder Angebot",
+      "venture": "Unternehmen oder Projekt",
+      "person": "Profil",
+      "problem": "Problem"
+    },
+    "remove": "Entfernen",
+    "removing": "Entfernt …",
+    "gone": "Eintrag nicht mehr vorhanden",
+    "goneHint": "Der Eintrag existiert nicht mehr. Der Platz wird nicht angezeigt.",
+    "visibilityHint": "Ein Platz ist keine Freigabe: Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in Vorschläge erlaubt hat. Ein laufender Platz kann deshalb unsichtbar sein.",
+    "results": {
+      "saved": "Der Platz ist gespeichert.",
+      "deleted": "Der Platz ist entfernt.",
+      "invalid": "Das hat nicht gepasst. Prüfe Link, Enddatum (in der Zukunft) und die Länge des Satzes.",
+      "notfound": "Zu diesem Link gibt es keinen Eintrag, oder er hat keinen Besitzer.",
+      "error": "Das hat nicht geklappt. Versuch es noch einmal."
+    }
   }
 }

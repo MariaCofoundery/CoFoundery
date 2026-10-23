@@ -22,6 +22,12 @@ import type { ConnectHighlight as Highlight } from "@/features/connect/connectHi
  * Hinweis, der erst mit dem Geld gebaut wird, wird beim Einbau vergessen.
  * Ein Test haelt fest, dass "sponsored" nie ohne Kennzeichnung erscheint.
  */
+const DISCLOSURE_STYLE: Record<Highlight["disclosure"], string> = {
+  none: "bg-emerald-100 text-emerald-900",
+  editorial: "bg-violet-100 text-violet-900",
+  sponsored: "bg-amber-100 text-amber-950",
+};
+
 export async function ConnectHighlight({ highlights }: { highlights: Highlight[] }) {
   if (highlights.length === 0) return null;
 
@@ -30,15 +36,25 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
   return (
     <section
       aria-label={t("title")}
-      className="connect-highlight rounded-3xl border border-violet-200/70 bg-gradient-to-br from-violet-50/60 via-white to-cyan-50/50 p-5 sm:p-6"
+      className="connect-highlight rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-cyan-50 p-5 sm:p-7"
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-[.14em] text-violet-800">
-          {t("title")}
-        </h2>
-        {/* Dass es Zufall ist, gehoert dazu: Sonst liest es sich als Auswahl
-            des Hauses - also als Empfehlung. */}
-        <p className="text-xs text-slate-500">{t("randomNote")}</p>
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-950">{t("title")}</h2>
+          <p className="mt-1 text-sm text-slate-600">{t("subtitle")}</p>
+        </div>
+        {/* Wie es zustande kommt, steht hier und nicht auf einer eigenen
+            Seite: Wer sich wundert, warum etwas oben steht, soll es sofort
+            lesen koennen. */}
+        <details className="text-sm">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center font-semibold text-violet-800 underline underline-offset-4">{t("howTitle")}</summary>
+          <div className="mt-2 max-w-md space-y-2 rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-5 text-slate-600">
+            <p>{t("how")}</p>
+            {/* Dass es Zufall ist, gehoert dazu: Sonst liest es sich als Auswahl
+                des Hauses - also als Empfehlung. */}
+            <p>{t("randomNote")}</p>
+          </div>
+        </details>
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -46,9 +62,19 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
           <Link
             key={`${highlight.kind}:${highlight.id}`}
             href={highlight.href}
-            className="connect-highlight-card flex min-w-0 flex-col break-words rounded-2xl border border-slate-200 bg-white/92 p-4 shadow-[0_2px_10px_rgba(15,23,42,0.04)] hover:border-violet-300"
+            className="connect-highlight-card flex min-w-0 flex-col break-words rounded-3xl border border-violet-100 bg-white p-5 shadow-[0_10px_28px_rgba(109,73,224,0.10)] hover:border-violet-300"
           >
-            <p className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
+            {/* JEDE KARTE SAGT, WARUM SIE HIER STEHT: Zufall, Empfehlung oder
+                Anzeige. Auch der Zufall bekommt eine Marke - sonst waere nur
+                der Rest gekennzeichnet, und "nichts dran" las sich als
+                Empfehlung. */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${DISCLOSURE_STYLE[highlight.disclosure]}`}>
+                {t(`disclosures.${highlight.disclosure}`)}
+              </span>
+              <span className="text-xs text-slate-500">{t(`disclosureMeta.${highlight.disclosure}`)}</span>
+            </div>
+            <p className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-violet-700">
               {t(`kinds.${highlight.kind}`)}
               {/* Damit niemand raetselt, warum da der eigene Name steht. */}
               {highlight.isOwn ? (
@@ -60,6 +86,10 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
             <h3 className="mt-2 font-semibold leading-6 text-slate-950">{highlight.title}</h3>
             {highlight.text ? (
               <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-600">{highlight.text}</p>
+            ) : null}
+
+            {highlight.note ? (
+              <p className="mt-2 text-sm leading-6 text-slate-700">{highlight.note}</p>
             ) : null}
 
             {/* Bei einem Menschen: was er mitbringt. Eine Karte mit Name und
@@ -93,14 +123,12 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
               </span>
             ) : null}
 
-            {highlight.disclosure !== "none" ? (
-              <span className="mt-3 text-xs font-medium text-slate-500">
-                {t(`disclosures.${highlight.disclosure}`)}
-              </span>
-            ) : null}
           </Link>
         ))}
       </div>
+      {highlights.some((highlight) => highlight.disclosure === "sponsored") ? (
+        <p className="mt-3 text-xs text-slate-500">{t("adNote")}</p>
+      ) : null}
     </section>
   );
 }

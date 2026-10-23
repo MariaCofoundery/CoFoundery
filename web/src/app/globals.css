@@ -954,3 +954,13 @@ body {
     display: block;
   }
 }
+
+/* Connect-Uebersicht: Die Eingrenzung steht am Bildschirm als Seitenleiste immer offen.
+   Auf dem Telefon bleibt sie eingeklappt, bis jemand sie braucht. `::details-content`
+   ist neuer; wo es fehlt, bleibt sie auch am Bildschirm einklappbar - das geht nur
+   auf Kosten eines Klicks. */
+@media (min-width: 1024px) {
+  .connect-filter-details::details-content { content-visibility: visible; }
+  .connect-filter-details > summary { pointer-events: none; list-style: none; }
+  .connect-filter-details > summary::-webkit-details-marker { display: none; }
+}

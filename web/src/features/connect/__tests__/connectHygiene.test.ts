@@ -28,6 +28,7 @@ function highlightClient(rows: Record<string, Row[]>, eligible: string[], fail =
         const table = ({ listing: "network_listings", venture: "network_ventures", person: "network_profiles", problem: "network_problems" } as Record<string,string>)[args.p_kind ?? ""];
         return { data: (rows[table] ?? []).filter((row) => row.status === "active" && (!row.expires_at || String(row.expires_at) > new Date().toISOString())), error: null };
       }
+      if (name === "list_connect_highlight_placements") return { data: [], error: null };
       assert.equal(name, "get_connect_highlight_owners"); requested.push(...args.p_user_ids);
       return { data: eligible.map((user_id) => ({ user_id, display_name: user_id })), error: fail ? {} : null };
     },

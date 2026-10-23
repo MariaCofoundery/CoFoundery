@@ -69,7 +69,7 @@ test("und in der anderen Richtung: eine Personenkarte zeigt, was jemand mitbring
   // zu zeigen, waere Arbeit fuer den Papierkorb. (Am 21.09.2026 hiess die
   // Stelle noch `shuffle(candidates)`; seit die Auswahl reihum durch die Sorten
   // geht, ist es `pickAcrossKinds` - die Reihenfolge bleibt dieselbe Zusage.)
-  const pickAt = data.indexOf("pickAcrossKinds(candidates, limit)");
+  const pickAt = data.indexOf("pickAcrossKinds(");
   const attachAt = data.indexOf("attachWhatPeopleHave(client, chosen)");
   assert.ok(pickAt > 0 && attachAt > pickAt);
 

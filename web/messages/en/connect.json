@@ -794,7 +794,7 @@
     }
   },
   "highlight": {
-    "title": "From the network",
+    "title": "Highlights",
     "randomNote": "A changing random selection of current eligible content — not a personal recommendation.",
     "kinds": {
       "seeking": "Looking for",
@@ -804,7 +804,8 @@
       "problem": "Problem"
     },
     "disclosures": {
-      "editorial": "Highlighted by us",
+      "none": "Chosen at random",
+      "editorial": "Recommended by Maria",
       "sponsored": "Ad"
     },
     "has": {
@@ -812,7 +813,16 @@
       "offering": "{count, plural, one {1 offer} other {# offers}}",
       "seeking": "{count, plural, one {1 request} other {# requests}}"
     },
-    "yours": "Yours"
+    "yours": "Yours",
+    "subtitle": "Three spots currently shown in the network. Each one says why it is here.",
+    "howTitle": "How highlights are chosen",
+    "how": "Three spots. We can recommend an entry ourselves, one spot can be paid for and is then marked as an ad. All others are drawn at random. Only entries that are published and whose owner allows suggestions are shown.",
+    "disclosureMeta": {
+      "none": "Random",
+      "editorial": "From the platform",
+      "sponsored": "Paid"
+    },
+    "adNote": "Whoever is marked “Ad” has paid for it. This affects neither search nor your suggestions."
   },
   "suggestions": {
     "title": "For you",
@@ -830,7 +840,8 @@
     "emptyCta": "Complete your profile",
     "note": "At most three new suggestions within seven days. New suggestions can also appear while you are away. Email and push follow your settings. Notifications contain only a count and a link, not suggested names or content titles.",
     "emptyCtaAsk": "Post a request",
-    "all": "All suggestions"
+    "all": "All suggestions",
+    "strip": "{count, plural, one {1 new suggestion} other {# new suggestions}} this week, each with the word that triggered it"
   },
   "lifecycle": {
     "participation": "Your CONNECT participation",
@@ -920,5 +931,51 @@
     "CONNECT_REMOTE_POSSIBLE": "The offer is available remotely.",
     "CONNECT_UNKNOWN_LOCATION": "The location is not specified.",
     "CONNECT_LIMITED_EVIDENCE": "This suggestion is based on limited information."
+  },
+  "highlightAdmin": {
+    "back": "Back",
+    "title": "Manage highlights",
+    "intro": "Here you decide which entries are highlighted on the Connect overview. There are three spots; one recommendation and one ad can be among them, the rest is drawn at random. Each card says why it is there.",
+    "newTitle": "Assign a new spot",
+    "link": "Link to the entry",
+    "linkHint": "Open the entry in Connect and copy the address from the browser. Works for requests, offers, companies, profiles and problems.",
+    "source": "Why is it there?",
+    "sources": {
+      "editorial": "Recommended by us",
+      "sponsored": "Ad"
+    },
+    "sourceHints": {
+      "editorial": "You recommend it. The card says “Recommended by Maria”.",
+      "sponsored": "Someone paid for it. The card is automatically marked “Ad”; this cannot be turned off."
+    },
+    "note": "Why do you recommend it? (optional)",
+    "noteHint": "One or two sentences, at most 240 characters. Only shown for a recommendation.",
+    "endsOn": "Runs until (inclusive)",
+    "save": "Assign spot",
+    "saving": "Saving …",
+    "groups": {
+      "running": "Running now",
+      "planned": "Planned",
+      "ended": "Ended"
+    },
+    "none": "Nothing.",
+    "kinds": {
+      "listing": "Request or offer",
+      "venture": "Company or project",
+      "person": "Profile",
+      "problem": "Problem"
+    },
+    "remove": "Remove",
+    "removing": "Removing …",
+    "gone": "Entry no longer exists",
+    "goneHint": "The entry no longer exists. The spot is not shown.",
+    "visibilityHint": "A spot is not a consent: only entries that are published and whose owner allows suggestions are shown. A running spot can therefore be invisible.",
+    "results": {
+      "saved": "The spot is saved.",
+      "deleted": "The spot is removed.",
+      "invalid": "That did not fit. Check the link, the end date (in the future) and the length of the sentence.",
+      "notfound": "There is no entry for this link, or it has no owner.",
+      "error": "That did not work. Please try again."
+    }
   }
 }

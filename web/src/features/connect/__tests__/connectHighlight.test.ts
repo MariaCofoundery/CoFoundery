@@ -6,6 +6,7 @@ import {
   HIGHLIGHT_DISCLOSURES,
   HIGHLIGHT_KINDS,
   pickAcrossKinds,
+  pickPlacements,
   type ConnectHighlight,
 } from "@/features/connect/connectHighlightData";
 
@@ -33,17 +34,19 @@ const PAGE = "src/app/(product)/connect/page.tsx";
  */
 
 test("bezahlte Plaetze koennen nicht unbeschriftet erscheinen", () => {
-  // § 5a UWG: Werbung muss als solche erkennbar sein. Das Feld dafuer steht
-  // von Anfang an im Typ und wird von Anfang an angezeigt - ein Hinweis, der
-  // erst mit dem Geld gebaut wird, wird beim Einbau vergessen.
+  // § 5a UWG: Werbung muss als solche erkennbar sein. Seit die Verwaltung
+  // Plaetze vergeben kann, ist das nicht mehr Vorsorge, sondern Betrieb. Und
+  // JEDE Karte traegt eine Marke, auch der Zufall: Waere nur der Rest
+  // gekennzeichnet, las sich "nichts dran" als Empfehlung.
   assert.deepEqual([...HIGHLIGHT_DISCLOSURES], ["none", "editorial", "sponsored"]);
 
   const component = codeOnly(COMPONENT);
   assert.match(
     component,
-    /highlight\.disclosure !== "none" \?[\s\S]{0,200}disclosures\.\$\{highlight\.disclosure\}/,
+    /disclosures\.\$\{highlight\.disclosure\}/,
     "die Kennzeichnung wird nicht angezeigt"
   );
+  assert.doesNotMatch(component, /disclosure !== "none"/, "die Marke darf nicht an einer Bedingung haengen");
 
   for (const locale of ["de", "en"]) {
     const disclosures = (
@@ -51,20 +54,22 @@ test("bezahlte Plaetze koennen nicht unbeschriftet erscheinen", () => {
         highlight: { disclosures: Record<string, string> };
       }
     ).highlight.disclosures;
-    assert.ok(disclosures.sponsored, `${locale}: der Text fuer bezahlte Plaetze fehlt`);
-    assert.ok(disclosures.editorial, `${locale}: der Text fuer hervorgehobene fehlt`);
+    for (const key of HIGHLIGHT_DISCLOSURES) assert.ok(disclosures[key], `${locale}: disclosures.${key} fehlt`);
     // "Anzeige" oder "Ad" - kein Euphemismus. "Empfohlen" oder "Partner" waere
     // genau die Umschreibung, die das Gesetz meint.
     assert.match(disclosures.sponsored, locale === "de" ? /^Anzeige$/ : /^Ad$/);
   }
 });
 
-test("heute ist alles Zufall, und das steht auch dran", () => {
-  // Ohne diesen Satz liest sich das Feld als Auswahl DES HAUSES - also als
-  // Empfehlung, und zwar fuer Menschen.
+test("bezahlt ist nur, was die Verwaltung dazu gemacht hat, und der Zufall bleibt Zufall", () => {
   const data = codeOnly(DATA);
+  // Aus dem Zufall wird nichts Bezahltes: die vier Sorten bleiben "none".
   assert.equal((data.match(/disclosure: "none"/g) ?? []).length, 4, "je Sorte einmal");
-  assert.doesNotMatch(data, /disclosure: "sponsored"/, "es gibt noch nichts Bezahltes");
+  // Die Marke eines Platzes kommt aus der Quelle des Platzes, nirgends sonst.
+  assert.match(data, /disclosure: row\.source/);
+  assert.doesNotMatch(data, /disclosure: "sponsored"/);
+  // Die Begruendung einer Empfehlung wird bei einer Anzeige nicht uebernommen.
+  assert.match(data, /note: row\.source === "editorial" \? row\.note : null/);
 
   const component = codeOnly(COMPONENT);
   assert.match(component, /randomNote/);
@@ -75,7 +80,39 @@ test("heute ist alles Zufall, und das steht auch dran", () => {
       }
     ).highlight;
     assert.ok(highlight.randomNote, `${locale}: der Hinweis auf den Zufall fehlt`);
+    assert.ok(highlight.adNote, `${locale}: der Hinweis zur Anzeige fehlt`);
   }
+});
+
+test("Plaetze: hoechstens eine Empfehlung und eine Anzeige, nie derselbe Mensch zweimal", () => {
+  const make = (owner: string, disclosure: ConnectHighlight["disclosure"], id: string) =>
+    ({ kind: "offering", id, title: id, text: "", href: "/connect", disclosure, isOwn: false, has: null, note: null,
+       person: { user_id: owner } }) as unknown as ConnectHighlight;
+  const many = [
+    make("a", "editorial", "e1"), make("b", "editorial", "e2"),
+    make("c", "sponsored", "s1"), make("d", "sponsored", "s2"),
+  ];
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    const chosen = pickPlacements(many, 3);
+    assert.equal(chosen.length, 2);
+    assert.deepEqual(chosen.map((entry) => entry.disclosure).sort(), ["editorial", "sponsored"]);
+  }
+  // Gehoeren Empfehlung und Anzeige demselben Menschen, bleibt eine Karte.
+  assert.equal(pickPlacements([make("a", "editorial", "e1"), make("a", "sponsored", "s1")], 3).length, 1);
+  // Kein Platz: nichts.
+  assert.equal(pickPlacements([], 3).length, 0);
+});
+
+test("ein Platz verdraengt nur dann Zufall, wenn er laeuft, und mischt am Ende mit", () => {
+  const data = codeOnly(DATA);
+  // Die Plaetze kommen aus der Datenbank, die dieselbe Freigabe pruefte wie bei
+  // den Zufallskarten; der Besitzer wird danach noch einmal geprueft.
+  assert.match(data, /list_connect_highlight_placements/);
+  assert.match(data, /placementOwnerId/);
+  // Ein ausgefallener Platz-Abruf laesst es beim Zufall.
+  assert.match(data, /placementResult\.error \? \[\]/);
+  // Zum Schluss wird gemischt: Die Reihenfolge ist keine Rangfolge, auch nicht fuer eine Anzeige.
+  assert.match(data, /const chosen = shuffle\(\[/);
 });
 
 test("gemischt wird, nicht bewertet", () => {
@@ -90,7 +127,7 @@ test("gemischt wird, nicht bewertet", () => {
   // ueber alle hinweg - das gab der Mehrheit die Plaetze (siehe den Test
   // "die Auswahl mischt die Sorten").
   assert.doesNotMatch(data, /shuffle\(candidates\)\.slice/);
-  assert.match(data, /pickAcrossKinds\(candidates, limit\)/);
+  assert.match(data, /pickAcrossKinds\(/);
 });
 
 test("alle vier Sorten koennen erscheinen, und jede sagt, was sie ist", () => {
@@ -129,7 +166,7 @@ test("man darf sich selbst im Highlight sehen - und erfaehrt es", () => {
   // Aber die Karte sagt es, sonst wundert man sich, warum da der eigene Name
   // steht.
   // Die drei Zuweisungen, nicht die Typzeile mitgezaehlt.
-  assert.equal((data.match(/=== currentUserId/g) ?? []).length, 4, "je Sorte einmal");
+  assert.equal((data.match(/=== currentUserId/g) ?? []).length, 5, "je Sorte einmal, dazu die Plaetze");
   const component = codeOnly("src/features/connect/ConnectHighlight.tsx");
   assert.match(component, /highlight\.isOwn \?/);
   assert.match(component, /t\("yours"\)/);
@@ -225,8 +262,11 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
   assert.doesNotMatch(filterSection, /className=\{card\}/, "der Filter ist wieder eine volle Karte");
 
   // Zwei eingeklappte Bereiche: die Auswahlen und das Merken.
-  assert.match(page, /<details className="w-full" open=\{activeFilterCount > 0\}>/);
-  assert.match(page, /<details className="mt-3 border-t border-slate-100 pt-3">/);
+  // Seit dem Umbau auf Filter links (Board 28, 23.10.2026) liegt der Filter als Seitenleiste
+  // neben der Liste: Auf dem Telefon bleibt er eingeklappt, am Bildschirm ist er offen
+  // (globals.css, `.connect-filter-details`). Das Merken bleibt eingeklappt.
+  assert.match(page, /<details className="connect-filter-details" open=\{activeFilterCount > 0\}>/);
+  assert.match(page, /<details>\s*<summary[^>]*>\{t\("rememberSearch"\)\}/);
 
   // NACHGESCHAERFT AM 21.09.2026, und das ist die Umkehrung dessen, was hier
   // vorher stand: "Ich meine eigentlich, dass der ganze Bereich unter den
@@ -234,8 +274,8 @@ test("vom Filterblock ist eine Zeile sichtbar, der Rest ist eingeklappt", () => 
   // so weiter, dieses ganze Feld, was da ist, sollte erst da sein, wenn ich es
   // aufklappe." Der Anwenden-Knopf stand bis dahin bewusst beim Suchfeld -
   // jetzt liegt er im eingeklappten Teil, und sichtbar bleibt nur das Feld.
-  const openerAt = page.indexOf('<details className="w-full"');
-  const applyAt = page.indexOf('t("filters.apply")');
+  const openerAt = page.indexOf('<details className="connect-filter-details"');
+  const applyAt = page.lastIndexOf('t("filters.apply")');
   const closeAt = page.indexOf("</details>", openerAt);
   assert.ok(openerAt > 0 && applyAt > openerAt && applyAt > closeAt, "der Anwenden-Knopf ist sichtbar");
 

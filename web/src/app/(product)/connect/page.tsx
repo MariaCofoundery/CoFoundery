@@ -60,26 +60,18 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
       </header>
 
+      {/* Erst die Highlights, dann "Fuer dich" als schmale Zeile: Highlights sind fuer alle
+          gleich und sagen, warum sie dastehen; "Fuer dich" ist persoenlich und lebt auf
+          der Vorschlagsseite. Beides in einem Kasten, und man hielte einen bezahlten
+          Platz fuer eine persoenliche Empfehlung. */}
+      <ConnectHighlight highlights={highlights} />
       {suggestionStrip.length > 0 ? (
-        <section aria-labelledby="connect-for-you">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="connect-for-you" className="text-xl font-semibold text-slate-950">{t("suggestions.title")}</h2>
-            <Link href="/connect/suggestions" className="text-sm font-semibold text-violet-800 underline underline-offset-4">{t("suggestions.all")}</Link>
-          </div>
-          <ul className="mt-3 grid gap-4 md:grid-cols-3">
-            {suggestionStrip.map((suggestion) => (
-              <li key={suggestion.id} className="flex flex-col gap-2 rounded-3xl border border-slate-200 bg-white p-5">
-                <span className="self-start rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">{t(`suggestions.kinds.${suggestion.kind}`)}</span>
-                <Link href={suggestion.href} className="text-base font-semibold leading-snug text-slate-950 hover:underline">{suggestion.title}</Link>
-                <p className="text-sm leading-6 text-slate-600">{t("suggestions.because", { terms: suggestion.matchedTerms.join(", ") })}</p>
-              </li>
-            ))}
-          </ul>
+        <section aria-labelledby="connect-for-you" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3">
+          <p className="text-sm text-slate-600"><span id="connect-for-you" className="font-semibold text-slate-950">{t("suggestions.title")}</span> · {t("suggestions.strip", { count: suggestionStrip.length })}</p>
+          <Link href="/connect/suggestions" className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-violet-800">{t("suggestions.all")}</Link>
         </section>
       ) : null}
 
-
-      <ConnectHighlight highlights={highlights} />
       <section className="rounded-2xl bg-slate-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("post.title")}</p>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("post.text")}</p>
@@ -90,48 +82,45 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </div>
       </section>
 
-      {/* Ein Suchfeld oben, die Eingrenzung eingeklappt. Vorher war es ein
-          Formular mit fuenf Feldern ueber den Treffern - das fuehlt sich an
-          wie Ausfuellen, nicht wie Anfassen. */}
-      {/* KLEINER GEMACHT am 21.09.2026: Der Kasten war so gross wie eine
-          Anzeige und stand vor allem, was man eigentlich sehen will. Jetzt
-          eine Zeile - Suchfeld und "Filter" nebeneinander, ohne Rahmen. */}
-      <section className="rounded-2xl border border-slate-200/70 bg-white/60 p-4"><form className="grid gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            name="q"
-            type="search"
-            defaultValue={filters.q}
-            className={`${field} min-w-0 flex-1`}
-            placeholder={t("filters.search")}
-            aria-label={t("filters.search")}
-          />
-        </div>
-        <details className="w-full" open={activeFilterCount > 0}>
-        <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <select name="direction" defaultValue={filters.direction || ""} className={field} aria-label={t("filters.direction")}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select>
-        <select name="category" defaultValue={filters.category || ""} className={field} aria-label={t("filters.category")}><option value="">{t("filters.allCategories")}</option>{CONNECT_CATEGORIES.map((v) => <option key={v} value={v}>{t(`categories.${v}`)}</option>)}</select>
-        <select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={field} aria-label={t("filters.scope")}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select>
-        <select name="remote_mode" defaultValue={filters.remote_mode || ""} className={field} aria-label={t("filters.remote")}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select>
-        </div>
-        {/* Zuruecksetzen nur, wenn es etwas zurueckzusetzen gibt. Die
-            Trefferzahl steht daneben und beantwortet die Frage, ob das
-            Eingrenzen etwas gebracht hat - sie gehoert deshalb hierhin, neben
-            die Regler, und nicht ueber die Treffer, die man ohnehin sieht. */}
-        </details>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <button className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
-          {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
-          <span className="ml-auto text-sm text-slate-500">{t("resultCount", { count: listings.length })}</span>
-        </div>
+      {/* Suche oben ueber die ganze Breite, die Eingrenzung links, die Eintraege als Liste.
+          Das Suchfeld liegt ausserhalb des Formulars und gehoert ueber `form` dazu. */}
+      <section className="flex flex-wrap items-center gap-3">
+        <input
+          name="q"
+          type="search"
+          form="connect-filter"
+          defaultValue={filters.q}
+          className={`${field} min-w-0 flex-1`}
+          placeholder={t("filters.search")}
+          aria-label={t("filters.search")}
+        />
+        <button form="connect-filter" className="min-h-11 shrink-0 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
+      </section>
 
-      </form>
+      <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
+        <div className="space-y-4">
+          <form id="connect-filter" className="rounded-3xl border border-slate-200 bg-white p-5">
+            <details className="connect-filter-details" open={activeFilterCount > 0}>
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-800">{t("filtersLabel")}{activeFilterCount ? ` (${activeFilterCount})` : ""}</summary>
+              <div className="mt-3 grid gap-3">
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.direction")}<select name="direction" defaultValue={filters.direction || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allDirections")}</option>{CONNECT_DIRECTIONS.map((v) => <option key={v} value={v}>{t(`directions.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.category")}<select name="category" defaultValue={filters.category || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allCategories")}</option>{CONNECT_CATEGORIES.map((v) => <option key={v} value={v}>{t(`categories.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.scope")}<select name="geographic_scope" defaultValue={filters.geographic_scope || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allScopes")}</option>{CONNECT_GEOGRAPHIC_SCOPES.map((v) => <option key={v} value={v}>{t(`scopes.${v}`)}</option>)}</select></label>
+                <label className="grid gap-1 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{t("filters.remote")}<select name="remote_mode" defaultValue={filters.remote_mode || ""} className={`${field} font-normal normal-case tracking-normal`}><option value="">{t("filters.allRemote")}</option>{CONNECT_REMOTE_MODES.map((v) => <option key={v} value={v}>{t(`remote.${v}`)}</option>)}</select></label>
+              </div>
+            </details>
+            {/* Zuruecksetzen nur, wenn es etwas zurueckzusetzen gibt. */}
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button className="min-h-11 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white">{t("filters.apply")}</button>
+              {isFiltered ? <Link href="/connect" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-500 underline underline-offset-2">{t("empty.reset")}</Link> : null}
+            </div>
+          </form>
+        <div className="rounded-3xl border border-slate-200 bg-white/70 p-5">
         {/* AUCH EINGEKLAPPT, seit dem 21.09.2026: Dieser Block war der Rest der
             grossen Filterflaeche - mit der Faehigkeiten-Auswahl darin war er
             grosser als die eingeklappten Filter darueber. Speichern ist der
             zweite Schritt nach dem Eingrenzen, nicht der erste beim Ansehen. */}
-        <details className="mt-3 border-t border-slate-100 pt-3">
+        <details>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("rememberSearch")}</summary>
         <form action={saveConnectSearchAction} className="mt-3">
           <input type="hidden" name="q" value={filters.q ?? ""} />
@@ -161,8 +150,12 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
         </form>
         <Link href="/connect/searches" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("searches.open")}</Link>
         </details>
-      </section>
-      {listings.length ? <section aria-label={t("browseTitle")} className="grid gap-4 md:grid-cols-2">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
+        </div>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-sm text-slate-500">{t("resultCount", { count: listings.length })}</p>
+      {listings.length ? <section aria-label={t("browseTitle")} className="divide-y divide-slate-100 overflow-hidden rounded-3xl border border-slate-200 bg-white">{listings.map((listing) => <ConnectListingCard key={listing.id} listing={listing} t={t} locale={locale} />)}</section> : <section className={`${card} text-center`}>
         {/* Zwei verschiedene Leerzustaende, die vorher gleich aussahen.
             Wer ohne Filter auf eine leere Flaeche kommt, ist der erste
             Mensch hier - "kein Eintrag passt zu allen Kriterien" und ein
@@ -180,6 +173,8 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           <Link href="/connect/ventures/mine" className={`${action} border border-slate-200`}>{t("empty.createVenture")}</Link>
         </div>
       </section>}
+        </div>
+      </div>
     </div>
   <ConnectPagination path="/connect" filters={filters} count={listingsRows.length} />
 </main>;

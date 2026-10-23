@@ -44,7 +44,13 @@ export type ConnectHighlight = {
    * Karte sagt es, sonst wundert man sich, warum da der eigene Name steht.
    */
   isOwn: boolean;
+  /**
+   * "none" heisst: aus dem Zufall gezogen - und auch das steht auf der Karte.
+   * "editorial" und "sponsored" kommen aus einem Platz der Verwaltung.
+   */
   disclosure: HighlightDisclosure;
+  /** Warum wir es empfehlen - nur bei "editorial" und nur, wenn eingetragen. */
+  note: string | null;
 };
 
 /** Aus wie vielen der neuesten Eintraege je Sorte gemischt wird. */
@@ -66,12 +72,15 @@ export async function getConnectHighlights(
   currentUserId: string,
   limit = 3
 ): Promise<ConnectHighlight[]> {
-  const [listingResult, ventureResult, personResult, problemResult] = await Promise.all([
+  const [listingResult, ventureResult, personResult, problemResult, placementResult] = await Promise.all([
     client.rpc("list_connect_highlight_candidates", { p_kind: "listing" }),
     client.rpc("list_connect_highlight_candidates", { p_kind: "venture" }),
     client.rpc("list_connect_highlight_candidates", { p_kind: "person" }),
     client.rpc("list_connect_highlight_candidates", { p_kind: "problem" }),
+    // Plaetze der Verwaltung. Fehlt die Antwort, bleibt es beim Zufall.
+    client.rpc("list_connect_highlight_placements"),
   ]);
+  const placements = ((placementResult.error ? [] : placementResult.data) ?? []) as HighlightPlacementRow[];
   const listings = (listingResult.data ?? []) as ConnectListing[];
   const ventures = (ventureResult.data ?? []) as ConnectVenture[];
   const people = (personResult.data ?? []) as ConnectProfile[];
@@ -82,6 +91,7 @@ export async function getConnectHighlights(
     ...ventures.map((venture) => venture.owner_user_id),
     ...people.map((person) => person.user_id),
     ...problems.flatMap((problem) => problem.author_user_id ? [problem.author_user_id] : []),
+    ...placements.flatMap(placementOwnerId),
   ])];
   if (!ownerIds.length) return [];
   const { data: owners, error: ownerError } = await client.rpc("get_connect_highlight_owners", { p_user_ids: ownerIds });
@@ -106,6 +116,7 @@ export async function getConnectHighlights(
       has: null,
       isOwn: listing.owner_user_id === currentUserId,
       disclosure: "none",
+      note: null,
     });
   }
 
@@ -125,6 +136,7 @@ export async function getConnectHighlights(
       has: null,
       isOwn: venture.owner_user_id === currentUserId,
       disclosure: "none",
+      note: null,
     });
   }
 
@@ -143,6 +155,7 @@ export async function getConnectHighlights(
       has: { ventures: 0, offering: 0, seeking: 0 },
       isOwn: person.user_id === currentUserId,
       disclosure: "none",
+      note: null,
     });
   }
 
@@ -163,12 +176,98 @@ export async function getConnectHighlights(
     if (!owner) continue;
     candidates.push({ kind: "problem", id: problem.id, title: problem.title, text: problem.description,
       href: `/connect/problems/${problem.id}`, person: owner, has: null,
-      isOwn: owner.user_id === currentUserId, disclosure: "none" });
+      isOwn: owner.user_id === currentUserId, disclosure: "none", note: null });
   }
 
-  const chosen = pickAcrossKinds(candidates, limit);
+  // ERST DIE PLAETZE, DANN ZUFALL. Hoechstens eine Empfehlung und eine
+  // Anzeige, der Rest bleibt Zufall - ein Platz verdraengt also nie alles.
+  // Die Besitzer der Plaetze werden aus dem Zufall herausgenommen, damit
+  // niemand zweimal in einer Reihe steht. Gemischt wird zum Schluss: Die
+  // Reihenfolge ist keine Rangfolge, auch fuer eine Anzeige nicht.
+  const placed = pickPlacements(
+    placements.flatMap((row) => {
+      const highlight = placementToHighlight(row, profileByUserId, currentUserId);
+      return highlight ? [highlight] : [];
+    }),
+    limit
+  );
+  const placedOwners = new Set(placed.flatMap((highlight) => highlight.person ? [highlight.person.user_id] : []));
+  const chosen = shuffle([
+    ...placed,
+    ...pickAcrossKinds(
+      candidates.filter((candidate) => !candidate.person || !placedOwners.has(candidate.person.user_id)),
+      limit - placed.length
+    ),
+  ]);
 
   await attachWhatPeopleHave(client, chosen);
+  return chosen;
+}
+
+type HighlightPlacementRow = {
+  placement_id: string;
+  source: "editorial" | "sponsored";
+  note: string | null;
+  kind: "listing" | "venture" | "person" | "problem";
+  item: ConnectListing | ConnectVenture | ConnectProfile | ConnectProblem;
+};
+
+function placementOwnerId(row: HighlightPlacementRow): string[] {
+  const item = row.item as unknown as Record<string, string | null>;
+  const owner = row.kind === "person" ? item.user_id : row.kind === "problem" ? item.author_user_id : item.owner_user_id;
+  return owner ? [owner] : [];
+}
+
+/** Ein Platz der Verwaltung als Karte - ohne den Besitzer (Freigabe) gibt es keine. */
+function placementToHighlight(
+  row: HighlightPlacementRow,
+  profileByUserId: Map<string, ConnectProfile>,
+  currentUserId: string
+): ConnectHighlight | null {
+  const [ownerId] = placementOwnerId(row);
+  const owner = ownerId ? profileByUserId.get(ownerId) : null;
+  if (!owner) return null;
+  const base = {
+    person: owner,
+    isOwn: owner.user_id === currentUserId,
+    disclosure: row.source,
+    note: row.source === "editorial" ? row.note : null,
+  } as const;
+  if (row.kind === "listing") {
+    const listing = row.item as ConnectListing;
+    return { ...base, kind: listing.direction === "seeking" ? "seeking" : "offering", id: listing.id, title: listing.title,
+      text: listing.summary, href: `/connect/listings/${listing.id}`, has: null };
+  }
+  if (row.kind === "venture") {
+    const venture = row.item as ConnectVenture;
+    return { ...base, kind: "venture", id: venture.id, title: venture.name, text: venture.what_it_does,
+      href: `/connect/ventures/${venture.id}`, has: null };
+  }
+  if (row.kind === "problem") {
+    const problem = row.item as ConnectProblem;
+    return { ...base, kind: "problem", id: problem.id, title: problem.title, text: problem.description,
+      href: `/connect/problems/${problem.id}`, has: null };
+  }
+  const person = row.item as ConnectProfile;
+  return { ...base, kind: "person", id: person.user_id, title: person.display_name, text: person.headline,
+    href: `/connect/people/${person.user_id}`, has: { ventures: 0, offering: 0, seeking: 0 } };
+}
+
+/**
+ * Hoechstens eine Empfehlung und eine Anzeige, jeweils zufaellig unter den
+ * laufenden, und nie zwei Karten desselben Menschen.
+ *
+ * Exportiert, damit der Test die Regel ausfuehren kann.
+ */
+export function pickPlacements(placed: ConnectHighlight[], limit: number) {
+  const chosen: ConnectHighlight[] = [];
+  const owners = new Set<string>();
+  for (const disclosure of ["editorial", "sponsored"] as const) {
+    if (chosen.length >= limit) break;
+    const next = shuffle(placed.filter((highlight) => highlight.disclosure === disclosure))
+      .find((highlight) => highlight.person && !owners.has(highlight.person.user_id));
+    if (next?.person) { owners.add(next.person.user_id); chosen.push(next); }
+  }
   return chosen;
 }
 

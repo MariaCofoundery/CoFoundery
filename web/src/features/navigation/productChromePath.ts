@@ -10,6 +10,7 @@ export function isProductChromePath(pathname: string) {
     pathname === "/team-intake" || pathname.startsWith("/team-intake/") ||
     pathname === "/account" ||
     pathname === "/admin/moderation" ||
+    pathname === "/admin/highlights" ||
     // Praefix, nicht exakt: /profile hat Unterseiten (der Vergleich), und die
     // gehoeren genauso in die Produkt-Navigation.
     pathname === "/profile" ||
