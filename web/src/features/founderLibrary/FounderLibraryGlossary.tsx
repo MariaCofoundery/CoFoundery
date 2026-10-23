@@ -70,87 +70,114 @@ export function FounderLibraryGlossary({ teamId, locale, terms, setupTopicLabels
 
   const filters: FounderLibraryCategoryFilter[] = ["all", ...FOUNDER_LIBRARY_CATEGORY_KEYS];
 
+  const CATEGORY_TONE: Record<FounderLibraryCategoryKey, string> = {
+    equity_financing: "bg-[#e3f6ec] text-[#17794a]",
+    contracts_governance: "bg-[#e1effa] text-[#0b5a8a]",
+    legal_form_liability: "bg-[#fdecc8] text-[#7a4300]",
+    company_building: "bg-[#efeafd] text-[#4a2fb8]",
+  } as Record<FounderLibraryCategoryKey, string>;
+  const presentLetters = groups.map(([letter]) => letter);
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
   return (
-    <div className="mt-8">
-      <div className="border-b border-slate-200 pb-6">
-        <label htmlFor="founder-library-search" className="text-sm font-semibold text-slate-800">{labels.searchLabel}</label>
-        <div className="relative mt-2">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-slate-400">
-            <circle cx="11" cy="11" r="6.5" />
-            <path d="m16 16 4 4" />
-          </svg>
-          <input
-            id="founder-library-search"
-            type="search"
-            value={query}
-            onChange={(event) => updateQuery(event.target.value)}
-            placeholder={labels.searchPlaceholder}
-            className="min-h-12 w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 text-base text-slate-950 shadow-sm outline-none placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
-          />
+    <div className="mt-7">
+      <div className="flex flex-col gap-4">
+        <div>
+          <label htmlFor="founder-library-search" className="sr-only">{labels.searchLabel}</label>
+          <div className="relative">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#8b89aa]">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input
+              id="founder-library-search"
+              type="search"
+              value={query}
+              onChange={(event) => updateQuery(event.target.value)}
+              placeholder={labels.searchPlaceholder}
+              className="min-h-12 w-full rounded-xl border border-[#d8d5ea] bg-white py-3 pl-12 pr-4 text-base text-[#0b1f3a] outline-none placeholder:text-[#8b89aa] focus:border-[#6d49e0] focus:ring-4 focus:ring-[#6d49e0]/15"
+            />
+          </div>
         </div>
 
-        <div className="mt-4" role="group" aria-label={labels.filtersLabel}>
-          <div className="flex flex-wrap gap-2">
-            {filters.map((filter) => {
-              const selected = category === filter;
-              return (
-                <button
-                  key={filter}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => updateCategory(filter)}
-                  className={`min-h-10 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${selected ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"}`}
-                >
-                  {filter === "all" ? labels.allCategories : labels.categories[filter]}
-                </button>
-              );
-            })}
-          </div>
+        <div role="group" aria-label={labels.filtersLabel} className="flex flex-wrap gap-2">
+          {filters.map((filter) => {
+            const selected = category === filter;
+            return (
+              <button
+                key={filter}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => updateCategory(filter)}
+                className={`min-h-10 rounded-full border px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] ${selected ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : "border-[#d8d5ea] bg-white text-[#33325e] hover:bg-[#f5f2fe]"}`}
+              >
+                {filter === "all" ? labels.allCategories : labels.categories[filter]}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* A bis Z: Buchstaben mit Begriffen springen dorthin, die anderen stehen blass da. */}
+        <div className="flex flex-wrap gap-1.5" aria-hidden={groups.length === 0}>
+          {ALPHABET.map((letter) =>
+            presentLetters.includes(letter) ? (
+              <a key={letter} href={`#glossary-letter-${letter}`} className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#efeafd] text-sm font-bold text-[#4a2fb8] hover:bg-[#e4dcfb]">{letter}</a>
+            ) : (
+              <span key={letter} className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] text-sm font-bold text-[#c4c2d8]">{letter}</span>
+            ),
+          )}
         </div>
       </div>
 
       <div className="mt-7" aria-live="polite">
         {groups.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="font-medium text-slate-900">{labels.noResults}</p>
-            <p className="mt-2 text-sm text-slate-500">{labels.noResultsHint}</p>
+            <p className="font-medium text-[#0b1f3a]">{labels.noResults}</p>
+            <p className="mt-2 text-sm text-[#5f5e7a]">{labels.noResultsHint}</p>
           </div>
         ) : (
-          <div className="space-y-9">
+          <div className="space-y-8">
             {groups.map(([letter, entries]) => (
-              <section key={letter} aria-labelledby={`glossary-letter-${letter}`}>
-                <h2 id={`glossary-letter-${letter}`} className="text-sm font-semibold uppercase tracking-[0.18em] text-amber-700">{letter}</h2>
-                <div className="mt-2 divide-y divide-slate-200 border-y border-slate-200">
+              <section key={letter} aria-labelledby={`glossary-letter-${letter}`} className="scroll-mt-24">
+                <div className="mb-3 flex items-center gap-3">
+                  <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#efeafd] text-xl font-bold text-[#4a2fb8]">{letter}</span>
+                  <h2 id={`glossary-letter-${letter}`} className="sr-only">{letter}</h2>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
                   {entries.map((entry) => {
                     const isOpen = openTermId === entry.id;
+                    const definition = entry.shortDefinition;
                     const panelId = `glossary-panel-${entry.id}`;
                     return (
-                      <article key={entry.id}>
+                      <article key={entry.id} className={`rounded-[18px] border bg-white transition-shadow ${isOpen ? "border-[#d9cff8] md:col-span-2" : "border-[#e4e2f0] hover:shadow-[0_10px_24px_rgba(109,73,224,0.10)]"}`}>
                         <button
                           type="button"
                           aria-expanded={isOpen}
                           aria-controls={panelId}
                           onClick={() => toggleEntry(entry.id)}
-                          className="group flex min-h-16 w-full items-start justify-between gap-4 rounded-sm py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 sm:py-5"
+                          className="group flex min-h-16 w-full items-center gap-3.5 rounded-[18px] px-[18px] py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0]"
                         >
-                          <span className="min-w-0">
-                            <span id={`glossary-term-${entry.id}`} className="block text-lg font-semibold tracking-tight text-slate-950 group-hover:text-amber-800">{entry.term}</span>
+                          <span aria-hidden="true" className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-[10px] bg-[#efeafd] text-base font-bold text-[#4a2fb8]">{entry.term.charAt(0).toLocaleUpperCase(locale)}</span>
+                          <span className="min-w-0 flex-1">
+                            <span id={`glossary-term-${entry.id}`} className="block text-[16.5px] font-semibold tracking-tight text-[#0b1f3a]">{entry.term}</span>
+                            {!isOpen ? <span className="mt-0.5 block truncate text-[13.5px] text-[#5f5e7a]">{definition}</span> : null}
                           </span>
-                          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" className={`mt-1 size-5 shrink-0 text-slate-500 transition-transform motion-reduce:transition-none ${isOpen ? "rotate-180" : ""}`}>
+                          <span className={`hidden flex-none rounded-full px-2.5 py-0.5 text-[13px] font-semibold sm:inline-block ${CATEGORY_TONE[entry.category] ?? "bg-[#f1f0f7] text-[#33325e]"}`}>{labels.categories[entry.category]}</span>
+                          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" className={`size-5 shrink-0 text-[#8b89aa] transition-transform motion-reduce:transition-none ${isOpen ? "rotate-180" : ""}`}>
                             <path d="m5 7.5 5 5 5-5" />
                           </svg>
                         </button>
 
                         {isOpen ? (
-                          <div id={panelId} className="pb-5 pr-9 sm:pb-6" role="region" aria-labelledby={`glossary-term-${entry.id}`}>
-                            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{labels.shortExplanation}</h3>
-                            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-700">{entry.shortDefinition}</p>
+                          <div id={panelId} className="px-[18px] pb-5 pl-[66px] pr-9" role="region" aria-labelledby={`glossary-term-${entry.id}`}>
+                            <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]">{labels.shortExplanation}</h3>
+                            <p className="mt-2 max-w-3xl text-[15px] leading-7 text-[#0b1f3a]">{entry.shortDefinition}</p>
                             {teamId && (entry.setupTopicKeys?.length ?? 0) > 0 ? (
-                              <div className="mt-5 border-l-2 border-amber-200 pl-3">
-                                <p className="text-xs text-slate-500">{labels.setupPrompt}</p>
+                              <div className="mt-4 rounded-2xl bg-[#f5f2fe] px-4 py-3">
+                                <p className="text-xs text-[#5f5e7a]">{labels.setupPrompt}</p>
                                 <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2">
                                   {entry.setupTopicKeys?.map((topicKey) => (
-                                    <Link key={topicKey} href={`/teams/${encodeURIComponent(teamId)}/setup/${encodeURIComponent(topicKey)}`} className="rounded-sm text-sm font-medium text-slate-700 underline-offset-4 hover:text-amber-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+                                    <Link key={topicKey} href={`/teams/${encodeURIComponent(teamId)}/setup/${encodeURIComponent(topicKey)}`} className="rounded-sm text-sm font-semibold text-[#6d49e0] underline-offset-4 hover:underline">
                                       {labels.openInSetup.replace("{topic}", setupTopicLabels[topicKey] ?? topicKey)}
                                     </Link>
                                   ))}

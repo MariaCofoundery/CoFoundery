@@ -218,7 +218,8 @@ test("glossary UI provides accessible search, filters, accordions, and deferred 
   assert.match(glossary, /isOpen \? \(/);
   assert.equal(glossary.match(/\{entry\.shortDefinition\}/g)?.length, 1);
   assert.doesNotMatch(glossary, /aria-describedby|definitionId/);
-  assert.doesNotMatch(glossary, /href=.*founder-library.*entry|grid-cols-[234]/);
+  // Konzeptboard 36: zwei Spalten ab md, ein aufgeklappter Begriff nimmt die ganze Zeile.
+  assert.doesNotMatch(glossary, /href=.*founder-library.*entry|grid-cols-[34]/);
   assert.doesNotMatch(view + glossary, /resourceTypes|resource\.phases|phaseLabel/);
 });
 

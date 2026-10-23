@@ -50,6 +50,27 @@ export async function FounderLibraryView({
     getLocale(),
   ]);
 
+  const tab = (active: boolean, onBrand: boolean) =>
+    `inline-flex min-h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] ${
+      active
+        ? onBrand
+          ? "bg-white text-[#4a2fb8]"
+          : "bg-[#0b1f3a] text-white"
+        : onBrand
+          ? "text-white hover:bg-white/15"
+          : "border border-[#d8d5ea] bg-white text-[#33325e] hover:bg-[#f5f2fe]"
+    }`;
+  const tabs = (onBrand: boolean) => (
+    <nav aria-label={t("views.label")} className={onBrand ? "inline-flex gap-1 rounded-full bg-white/20 p-1" : "mt-6 flex gap-2"}>
+      <Link href={pathname} aria-current={view === "glossary" ? "page" : undefined} className={tab(view === "glossary", onBrand)}>
+        {t("views.glossary")}
+      </Link>
+      <Link href={`${pathname}?view=updates`} aria-current={view === "updates" ? "page" : undefined} className={tab(view === "updates", onBrand)}>
+        {t("views.updates")}
+      </Link>
+    </nav>
+  );
+
   return (
     <main className={`mx-auto w-full max-w-5xl px-4 sm:px-6 ${teamHeader ? "py-5 sm:py-6" : "py-8 sm:py-10"}`}>
       {teamHeader ? (
@@ -66,35 +87,22 @@ export async function FounderLibraryView({
           {backLabel}
         </Link>
       ) : null}
-      <header className="mt-6 border-b border-slate-200 pb-7 sm:pb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{view === "glossary" ? t("eyebrow") : t("updates.eyebrow")}</p>
-        <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-slate-950">{view === "glossary" ? t("title") : t("updates.title")}</h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">{view === "glossary" ? t("intro") : t("updates.intro")}</p>
-        {view === "glossary" ? <p className="mt-3 max-w-3xl text-xs leading-6 text-slate-500">{t("professionalNote")}</p> : null}
+      <header className="brand-panel relative mt-5 grid items-center gap-5 overflow-hidden rounded-[28px] px-6 py-8 sm:px-9 md:grid-cols-[minmax(0,1fr)_auto]">
+        <span aria-hidden="true" className="orb -top-14 right-52 hidden h-36 w-36 md:block" />
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{view === "glossary" ? t("eyebrow") : t("updates.eyebrow")}</p>
+          <h1 className="mt-1 max-w-2xl text-[30px] font-semibold leading-[1.15] tracking-tight sm:text-[34px]">{view === "glossary" ? t("title") : t("updates.title")}</h1>
+          <p className="mt-2 max-w-xl text-[15.5px] leading-7 text-white opacity-95">{view === "glossary" ? t("intro") : t("updates.intro")}</p>
+          {view === "glossary" ? <p className="mt-2 max-w-xl text-[13px] leading-6 text-white opacity-90">{t("professionalNote")}</p> : null}
+        </div>
+        <div className="md:justify-self-end">{tabs(true)}</div>
       </header>
 
       {contextNavigation}
       </>
       )}
 
-      <nav aria-label={t("views.label")} className="mt-7 border-b border-slate-200">
-        <div className="flex gap-6">
-          <Link
-            href={pathname}
-            aria-current={view === "glossary" ? "page" : undefined}
-            className={`rounded-sm border-b-2 pb-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${view === "glossary" ? "border-slate-900 text-slate-950" : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800"}`}
-          >
-            {t("views.glossary")}
-          </Link>
-          <Link
-            href={`${pathname}?view=updates`}
-            aria-current={view === "updates" ? "page" : undefined}
-            className={`rounded-sm border-b-2 pb-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${view === "updates" ? "border-slate-900 text-slate-950" : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800"}`}
-          >
-            {t("views.updates")}
-          </Link>
-        </div>
-      </nav>
+      {teamHeader ? tabs(false) : null}
 
       {view === "glossary" ? (
         <FounderLibraryGlossary

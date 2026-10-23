@@ -44,11 +44,11 @@ export function FounderLibraryUpdates({ locale, updates, sources, labels }: Prop
 
   return (
     <div className="mt-8">
-      <section className="divide-y divide-slate-200" aria-label={labels.updatesListLabel}>
+      <section className="grid gap-4" aria-label={labels.updatesListLabel}>
         {sortFounderLibraryUpdates(updates).map((update) => (
-          <article key={update.id} className="py-7 sm:py-8">
+          <article key={update.id} className="rounded-[24px] border border-[#e4e2f0] bg-white p-6 sm:p-[26px]">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-slate-500">
-              <span className="text-amber-800">
+              <span className="rounded-full bg-[#fdecc8] px-2.5 py-0.5 text-[13px] font-semibold text-[#7a4300]">
                 {labels.statusDatePrefixes[update.status]}{" "}
                 <time dateTime={update.date}>{dateFormatter.format(new Date(`${update.date}T00:00:00Z`))}</time>
               </span>
@@ -57,8 +57,8 @@ export function FounderLibraryUpdates({ locale, updates, sources, labels }: Prop
               <span aria-hidden="true">·</span>
               <span>{labels.categories[update.category]}</span>
             </div>
-            <h2 className="mt-3 max-w-3xl text-xl font-semibold tracking-tight text-slate-950">{update.title}</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-700">{update.relevance}</p>
+            <h2 className="mt-3 max-w-3xl text-xl font-semibold tracking-tight text-[#0b1f3a]">{update.title}</h2>
+            <p className="mt-2 max-w-3xl text-[15px] leading-7 text-[#5f5e7a]">{update.relevance}</p>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
               <a
                 href={update.sourceUrl}
@@ -76,9 +76,9 @@ export function FounderLibraryUpdates({ locale, updates, sources, labels }: Prop
         ))}
       </section>
 
-      <section className="mt-8 border-t border-slate-200 pt-8" aria-labelledby="founder-library-official-sources">
-        <h2 id="founder-library-official-sources" className="text-xl font-semibold tracking-tight text-slate-950">{labels.officialSourcesTitle}</h2>
-        <div className="mt-4 divide-y divide-slate-200 border-y border-slate-200">
+      <section className="mt-8 rounded-[24px] border border-[#e4e2f0] bg-white p-6 sm:p-[26px]" aria-labelledby="founder-library-official-sources">
+        <h2 id="founder-library-official-sources" className="text-xl font-semibold tracking-tight text-[#0b1f3a]">{labels.officialSourcesTitle}</h2>
+        <div className="mt-4 divide-y divide-[#e4e2f0]">
           {sources.map((source) => (
             <article key={source.id} className="py-5">
               <a
