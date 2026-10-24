@@ -299,6 +299,17 @@ export async function sendConnectMessageAction(formData: FormData) {
   redirect(`/messages/${conversationId}?sent=1`);
 }
 
+/** Eine eigene Nachricht zuruecknehmen: Der Text wird in der Datenbank geloescht, der Verlauf zeigt "Nachricht zurueckgenommen". */
+export async function retractConnectMessageAction(formData: FormData) {
+  const { client } = await requireSignedInForMessages();
+  const conversationId = String(formData.get("conversation_id") ?? "").trim();
+  const messageId = String(formData.get("message_id") ?? "").trim();
+  if (!conversationId || !messageId) redirect("/messages");
+  const { error } = await client.rpc("retract_network_message", { p_message_id: messageId });
+  refreshMessaging(conversationId);
+  redirect(`/messages/${conversationId}?${error ? "error=message" : "retracted=1"}`);
+}
+
 export async function blockConnectUserAction(formData: FormData) {
   const { client } = await requireSignedInForMessages();
   const otherUserId = String(formData.get("other_user_id") ?? "").trim();

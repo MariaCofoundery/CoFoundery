@@ -290,7 +290,11 @@
       "history": "Frühere Unterhaltung"
     },
     "inboxEmptyFind": "Menschen finden",
-    "inboxEmptyConnect": "CONNECT öffnen"
+    "inboxEmptyConnect": "CONNECT öffnen",
+    "retracted": "Nachricht zurückgenommen",
+    "retract": "Zurücknehmen",
+    "retractConfirm": "Der Text wird gelöscht und verschwindet für euch beide. Was schon gelesen wurde, lässt sich nicht zurückholen.",
+    "retractAction": "Nachricht zurücknehmen"
   },
   "my": {
     "title": "Meine Beiträge",

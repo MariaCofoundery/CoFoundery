@@ -290,7 +290,11 @@
       "history": "Earlier conversation"
     },
     "inboxEmptyFind": "Find people",
-    "inboxEmptyConnect": "Open CONNECT"
+    "inboxEmptyConnect": "Open CONNECT",
+    "retracted": "Message retracted",
+    "retract": "Retract",
+    "retractConfirm": "The text is deleted and disappears for both of you. What has already been read cannot be taken back.",
+    "retractAction": "Retract message"
   },
   "my": {
     "title": "My contributions",

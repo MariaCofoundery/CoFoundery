@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requireSignedInForMessages } from "@/features/connect/conversationAccess";
-import { sendConnectMessageAction } from "@/features/connect/connectActions";
+import { retractConnectMessageAction, sendConnectMessageAction } from "@/features/connect/connectActions";
 import { getConnectBlockState, getConnectConversation, getConnectMessages, getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { ConnectMarkConversationRead } from "@/features/connect/ConnectMarkConversationRead";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
@@ -81,10 +81,13 @@ export default async function ConversationPage({
         {messages.length ? <ol className="space-y-4">
           {messages.map((message) => {
             const own = message.sender_user_id === user.id;
+            // Zurueckgenommen heisst: Der Text ist in der Datenbank geloescht, die Huelle bleibt, damit der Verlauf nicht springt.
+            const retracted = message.body === "";
             return <li key={message.id} className={`flex ${own ? "justify-end" : "justify-start"}`}>
-              <article className={`max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] ${own ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-900"}`}>
-                <p className={`text-xs font-semibold ${own ? "text-slate-300" : "text-slate-500"}`}>{own ? t("messages.you") : counterpartName}</p>
-                <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{message.body}</p>
+              <article className={`max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] ${retracted ? "border border-dashed border-slate-300 bg-transparent text-slate-500" : own ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-900"}`}>
+                <p className={`text-xs font-semibold ${own && !retracted ? "text-slate-300" : "text-slate-500"}`}>{own ? t("messages.you") : counterpartName}</p>
+                {retracted ? <p className="mt-1 text-sm italic leading-6">{t("messages.retracted")}</p> : <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{message.body}</p>}
+                {own && !retracted ? <details className="mt-2 text-xs"><summary className="inline-flex min-h-9 cursor-pointer items-center text-slate-300 underline underline-offset-2">{t("messages.retract")}</summary><form action={retractConnectMessageAction} className="mt-2 rounded-xl bg-slate-800 p-3"><input type="hidden" name="conversation_id" value={conversationId} /><input type="hidden" name="message_id" value={message.id} /><p className="leading-5 text-slate-200">{t("messages.retractConfirm")}</p><button type="submit" className="mt-2 inline-flex min-h-9 items-center rounded-lg bg-white px-3 text-xs font-semibold text-slate-900">{t("messages.retractAction")}</button></form></details> : null}
                 <time dateTime={message.created_at} className={`mt-2 block text-[11px] ${own ? "text-slate-400" : "text-slate-500"}`}>{dateTime.format(new Date(message.created_at))}</time>
               </article>
             </li>;
