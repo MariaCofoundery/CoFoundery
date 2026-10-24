@@ -51,9 +51,7 @@ const EXPORTED_TABLES = [
   { table: "network_ventures", column: "owner_user_id" },
   { table: "network_problems", column: "author_user_id" },
   { table: "network_problem_approaches", column: "author_user_id" },
-  { table: "network_messages", column: "sender_user_id" },
   { table: "network_contact_requests", column: "sender_user_id" },
-  { table: "network_blocks", column: "blocker_user_id" },
   { table: "network_problem_interests", column: "user_id" },
   { table: "network_problem_confirmations", column: "user_id" },
   { table: "connect_suggestions", column: "recipient_user_id" },
@@ -71,10 +69,21 @@ const EXPORTED_TABLES = [
  */
 const CHILD_TABLES = [
   { table: "alignment_answers", column: "assessment_id", parent: "assessments" },
-  { table: "workstyle_pretest_sessions", column: "assessment_id", parent: "assessments" },
-  { table: "workstyle_research_responses", column: "assessment_id", parent: "assessments" },
   { table: "person_capability_evidence", column: "entry_id", parent: "person_capability_entries" },
   { table: "capability_interview_turns", column: "session_id", parent: "capability_interview_sessions" },
+] as const;
+
+/**
+ * Vier Bereiche, die normale Konten nicht direkt lesen duerfen: die eigenen gesendeten Nachrichten, die eigenen
+ * Sperren, die eigenen Sitzungen der Arbeitsweise-Befragung und die eigenen Forschungsantworten. Sie kommen ueber
+ * `export_my_restricted_data` - eine schmale Funktion, die nur Zeilen der aufrufenden Person liefert. Vorher stand
+ * hier im Export "permission denied", und die Daten fehlten (Art. 15 und 20 DSGVO).
+ */
+export const ACCOUNT_EXPORT_RESTRICTED_TABLES = [
+  "network_messages",
+  "network_blocks",
+  "workstyle_pretest_sessions",
+  "workstyle_research_responses",
 ] as const;
 
 export type AccountExport = {
@@ -125,6 +134,18 @@ export async function buildAccountExport(
       continue;
     }
     daten[table] = data ?? [];
+  }
+
+  const restricted = await client.rpc("export_my_restricted_data");
+  if (restricted.error || !restricted.data || typeof restricted.data !== "object") {
+    for (const table of ACCOUNT_EXPORT_RESTRICTED_TABLES) {
+      nichtEnthalten.push({ tabelle: table, grund: restricted.error?.message ?? "no_data" });
+    }
+  } else {
+    const rows = restricted.data as Record<string, unknown>;
+    for (const table of ACCOUNT_EXPORT_RESTRICTED_TABLES) {
+      daten[table] = Array.isArray(rows[table]) ? (rows[table] as unknown[]) : [];
+    }
   }
 
   return {

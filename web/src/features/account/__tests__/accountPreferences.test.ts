@@ -6,7 +6,7 @@ import {
   isNotificationKind,
   notificationKindsByArea,
 } from "@/features/account/notificationKinds";
-import { ACCOUNT_EXPORT_CHILD_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
+import { ACCOUNT_EXPORT_CHILD_TABLES, ACCOUNT_EXPORT_RESTRICTED_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
@@ -224,6 +224,19 @@ test("der Export liest mit den Rechten der Person, nicht privilegiert", () => {
   for (const wanted of ["person_strengths", "person_resources", "direction_statements", "alignment_answers", "person_capability_evidence", "advisor_person_grants"]) {
     assert.ok(tables.includes(wanted), `${wanted} fehlt im Export`);
   }
+});
+
+test("die eigenen Nachrichten, Sperren und Forschungsantworten sind im Export - ueber eine schmale Funktion", () => {
+  // GEMELDET AM 24.10.2026 beim ersten Export: Vier Tabellen standen unter "nichtEnthalten" mit "permission denied",
+  // obwohl es die eigenen Daten sind (Art. 15 und 20 DSGVO).
+  const code = source("src/features/account/accountExport.ts");
+  assert.match(code, /client\.rpc\("export_my_restricted_data"\)/);
+  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  const sql = source("../supabase/migrations/20261228120000_account_export_restricted_tables.sql");
+  assert.match(sql, /where m\.sender_user_id = uid/);
+  assert.match(sql, /where b\.blocker_user_id = uid/);
+  assert.match(sql, /grant execute on function public\.export_my_restricted_data\(\) to authenticated/);
+  assert.doesNotMatch(sql, /grant select on public\.network_messages/);
 });
 
 test("eine fehlende Tabelle laesst den Export nicht platzen, sondern wird genannt", () => {
