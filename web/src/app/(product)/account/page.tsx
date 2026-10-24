@@ -134,6 +134,8 @@ export default async function AccountPage({
       </p>
       <h1 className="mt-1.5 text-[34px] font-semibold leading-[1.2] tracking-tight text-[#0b1f3a]">{t("utilities.account")}</h1>
       <p className="mt-1.5 max-w-xl text-base leading-7 text-[#5f5e7a]">{t("account.sharedText")}</p>
+      {/* Die Beta-Phase steht hier, wo man seine Einstellungen liest: Funktionen koennen sich aendern. */}
+      <p className="mt-4 inline-flex max-w-xl items-start gap-2 rounded-2xl bg-[#fdecc8] px-4 py-2.5 text-[13.5px] leading-6 text-[#7a4300]" role="note">{t("account.betaNote")}</p>
 
       <div className="mt-7 grid items-start gap-7 lg:grid-cols-[230px_minmax(0,1fr)]">
         {/* Die Navigation springt zu den Abschnitten - sie ist eine Liste von Ankern, keine Statusanzeige. */}

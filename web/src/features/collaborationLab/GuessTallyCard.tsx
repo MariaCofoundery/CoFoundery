@@ -8,7 +8,10 @@ import type { GuessTallyRound, GuessTallySummary } from "@/features/collaboratio
  * antwortet, und verglichen wurde bisher nur Situation fuer Situation. Die
  * Summe ist der Moment, den man mitnimmt.
  *
- * KEINE WERTUNG, KEIN ZIEL.
+ * KEINE WERTUNG, KEIN ZIEL, KEINE ZAHL.
+ *   Seit dem 24.10.2026 steht auch keine Trefferzahl mehr da ("3 von 5"): Die Seiten sagen "es gibt keine
+ *   richtigen Antworten", und eine Zaehlung war ein Punktestand. Es bleibt der Satz, der beschreibt, was die
+ *   Einschaetzungen gezeigt haben.
  *   Es steht keine Prozentzahl da und nichts, was nach "gut" oder "schlecht"
  *   aussieht. Zwei Menschen, die sich selten richtig einschaetzen, haben nicht
  *   verloren - sie haben etwas gefunden, worueber sich zu reden lohnt. Genau
@@ -31,10 +34,6 @@ export async function GuessTallyCard({
   const hasHistory = summary.rounds.length > (round ? 1 : 0);
   if (!round && !hasHistory) return null;
 
-  const headline = round
-    ? t("roundHeadline", { hits: round.ownHits, total: round.promptCount, name: partnerName })
-    : t("acrossHeadline", { hits: summary.ownHits, total: summary.totalPrompts, name: partnerName });
-
   // Der Satz darunter richtet sich danach, wie es gelaufen ist - ohne zu
   // bewerten. "Wenig Treffer" ist die interessantere Lage, nicht die
   // schlechtere.
@@ -44,29 +43,12 @@ export async function GuessTallyCard({
 
   return (
     <section
-      className={`rounded-[24px] border border-[#d9cff8]/80 bg-[linear-gradient(120deg,rgba(124,58,237,.07),rgba(34,211,238,.08))] p-6 ${
+      className={`rounded-[24px] border border-[#d9cff8] bg-[#f5f2fe] p-6 ${
         variant === "entry" ? "mt-6" : "mt-8"
       } sm:p-8`}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#4a2fb8]">{t("eyebrow")}</p>
-      <p className="mt-3 text-2xl font-semibold leading-9 tracking-tight text-[#0b1f3a]">{headline}</p>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-[#33325e]">{t(`tone.${tone}`, { name: partnerName })}</p>
-
-      {round ? (
-        <p className="mt-4 text-sm leading-6 text-[#5f5e7a]">
-          {t("otherDirection", { name: partnerName, hits: round.partnerHits, total: round.promptCount })}
-        </p>
-      ) : null}
-
-      {hasHistory ? (
-        <p className="mt-4 border-t border-[#d9cff8]/70 pt-4 text-sm leading-6 text-[#5f5e7a]">
-          {t("across", {
-            hits: summary.ownHits,
-            total: summary.totalPrompts,
-            rounds: summary.rounds.length,
-          })}
-        </p>
-      ) : null}
+      <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#4a2fb8]">{t("eyebrow")}</p>
+      <p className="mt-3 max-w-2xl text-xl font-semibold leading-8 tracking-tight text-[#0b1f3a]">{t(`tone.${tone}`, { name: partnerName })}</p>
     </section>
   );
 }

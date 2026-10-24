@@ -13,17 +13,23 @@ type Stats = {
   cron: Record<string, { last_run_at: string; ok: boolean }>;
 };
 
+type CheckCounts = { started_total: number; started_30d: number; completed_total?: number; abandoned_total?: number };
+type TeamCheckStats = { read_my_mind: CheckCounts; founder_in_the_wild: CheckCounts; commitment_lab: CheckCounts };
+
 const card = "flex min-w-0 flex-col gap-2.5 rounded-[22px] border border-[#e4e2f0] bg-white p-[22px]";
 const label = "text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]";
 const pill = "inline-block min-w-[22px] rounded-full px-2 py-0.5 text-center text-[13px] font-bold";
 
 /** Zaehler, "Zu tun" und Betrieb. Keine Scores, keine Rangliste, kein Personenbezug. */
 export async function AdminOverview({ client }: { client: SupabaseClient }) {
-  const [t, stats, dump] = await Promise.all([
+  const [t, stats, dump, teamChecks] = await Promise.all([
     getTranslations("admin.overview"),
     client.rpc("admin_dashboard_stats"),
     client.rpc("admin_reminder_status", { p_key: "db_dump" }),
+    // Leise: fehlt die Funktion noch (Datenbank-Update steht aus), bleibt nur diese Karte weg.
+    client.rpc("admin_team_check_stats"),
   ]);
+  const checks = teamChecks.error ? null : (teamChecks.data as TeamCheckStats | null);
   if (stats.error || !stats.data) return <p role="alert" className="text-sm">{isMissingDatabaseFunction(stats.error) ? t("migrationMissing") : t("loadError")}</p>;
   const s = stats.data as Stats;
   const dumpDays = daysSince(typeof dump.data === "string" ? dump.data : null);
@@ -78,7 +84,31 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
         </article>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      {checks ? (
+        <section className={`${card} mt-4`} aria-labelledby="team-checks-title">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="team-checks-title" className="text-[21px] font-semibold text-slate-950">{t("teamChecks.title")}</h2>
+            <p className="text-[13.5px] text-[#5f5e7a]">{t("teamChecks.note")}</p>
+          </div>
+          <ul className="grid gap-3 md:grid-cols-3">
+            {(["read_my_mind", "founder_in_the_wild", "commitment_lab"] as const).map((key) => {
+              const c = checks[key];
+              return (
+                <li key={key} className="flex flex-col gap-1.5 rounded-2xl bg-[#f7f6fb] p-4">
+                  <p className="text-[15px] font-semibold">{t(`teamChecks.names.${key}`)}</p>
+                  <p className="font-serif text-[28px] font-semibold leading-none">{c.started_total}</p>
+                  <p className="text-[13.5px] leading-relaxed text-[#5f5e7a]">
+                    {t("teamChecks.started", { recent: c.started_30d })}
+                    {typeof c.completed_total === "number" ? ` ${t("teamChecks.finished", { completed: c.completed_total, abandoned: c.abandoned_total ?? 0 })}` : ""}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="mt-4 grid gap-4 md:grid-cols-2">
         <article className={card}>
           <h2 className="text-[21px] font-semibold text-slate-950">{t("todo.title")}</h2>
           {todos.length === 0 ? <p className="text-sm text-[#5f5e7a]">{t("todo.empty")}</p> : (

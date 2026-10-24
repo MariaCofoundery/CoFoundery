@@ -77,6 +77,17 @@
       "research": "Research",
       "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor."
     },
-    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie."
+    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
+    "teamChecks": {
+      "title": "Team-Checks · Nutzung",
+      "note": "Nur Zähler, ohne Namen. Zeigt, ob die Checks überhaupt genutzt werden.",
+      "names": {
+        "read_my_mind": "Read My Mind",
+        "founder_in_the_wild": "Founder in the Wild",
+        "commitment_lab": "Commitment Lab"
+      },
+      "started": "Gestartet insgesamt, {recent} in den letzten 30 Tagen.",
+      "finished": "{completed} abgeschlossen, {abandoned} abgebrochen."
+    }
   }
 }

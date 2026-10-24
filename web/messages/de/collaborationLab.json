@@ -220,11 +220,7 @@
     "opening": "Wird aufgedeckt …"
   },
   "tally": {
-    "eyebrow": "Wie gut kennt ihr euch?",
-    "roundHeadline": "{hits, plural, =0 {Du hast {name} in dieser Runde kein einziges Mal richtig eingeschätzt.} one {Du hast {name} einmal von {total} richtig eingeschätzt.} other {Du hast {name} # von {total} Mal richtig eingeschätzt.}}",
-    "acrossHeadline": "{hits, plural, =0 {Bisher hast du {name} noch nie richtig eingeschätzt.} one {Bisher hast du {name} einmal von {total} richtig eingeschätzt.} other {Bisher hast du {name} # von {total} Mal richtig eingeschätzt.}}",
-    "otherDirection": "{hits, plural, =0 {{name} hat dich in dieser Runde kein einziges Mal getroffen.} one {{name} hat dich einmal von {total} getroffen.} other {{name} hat dich # von {total} Mal getroffen.}}",
-    "across": "Über {rounds, plural, one {eine Runde} other {# Runden}} zusammen: {hits} von {total}.",
+    "eyebrow": "Eure Einschätzungen",
     "tone": {
       "all": "Ihr liegt richtig übereinander – das ist selten. Spannend wird jetzt die Frage, woran das liegt: Kennt ihr euch wirklich so gut, oder habt ihr einfach ähnliche Reflexe?",
       "many": "Ihr lest euch in vielem richtig. Die Stellen, an denen ihr danebenlagt, sind die interessanten – dort weicht etwas voneinander ab, was ihr beide für selbstverständlich haltet.",

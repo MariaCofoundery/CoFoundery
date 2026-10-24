@@ -77,6 +77,17 @@
       "research": "Research",
       "text": "Everything platform admins manage, with the numbers in front."
     },
-    "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear."
+    "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
+    "teamChecks": {
+      "title": "Team checks · usage",
+      "note": "Counts only, no names. Shows whether the checks are used at all.",
+      "names": {
+        "read_my_mind": "Read My Mind",
+        "founder_in_the_wild": "Founder in the Wild",
+        "commitment_lab": "Commitment Lab"
+      },
+      "started": "Started in total, {recent} in the last 30 days.",
+      "finished": "{completed} completed, {abandoned} abandoned."
+    }
   }
 }

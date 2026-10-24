@@ -568,7 +568,8 @@
     "nav": {
       "connect": "Connect",
       "delete": "Konto löschen"
-    }
+    },
+    "betaNote": "Made2Found ist in der Beta-Phase. Funktionen, Abläufe und Texte können sich ändern, und manches ist noch in Entwicklung. Wenn dir etwas auffällt, schreib uns über „Feedback“."
   },
   "coFounderInvitePage": {
     "backToDashboard": "Zurück zum Dashboard",
