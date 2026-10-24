@@ -23,7 +23,7 @@ export function cronAlertNeeded(status: number, body: AlertBody): boolean {
   return status === 503 && body.reason === "missing_service_role";
 }
 
-const STEP_KEYS = ["researchCleanup", "eventCleanup", "operationalCleanup"] as const;
+const STEP_KEYS = ["researchCleanup", "eventCleanup", "operationalCleanup", "personalCleanup"] as const;
 
 export function buildCronAlertPayload(job: CronJobName, status: number, body: AlertBody) {
   const steps = STEP_KEYS.filter((key) => key in body).map((key) => `- ${key}: ${String(body[key])}`);

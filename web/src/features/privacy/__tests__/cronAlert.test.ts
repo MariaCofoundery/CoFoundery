@@ -19,6 +19,7 @@ test("Die Mail nennt Lauf, Status und Schritte, keine Zahlen und keine Fehlertex
     researchCleanup: "ok",
     eventCleanup: "failed",
     operationalCleanup: "ok",
+    personalCleanup: "ok",
     counts: { research: { deletedResearchEvents: 41 } },
     message: "duplicate key value (user_id)=(abc)",
   });

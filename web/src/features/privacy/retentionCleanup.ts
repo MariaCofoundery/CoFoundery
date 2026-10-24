@@ -29,6 +29,9 @@ export const RESEARCH_RETENTION_DAYS = 30;
 /** Abgeschlossene KI-Aufgaben und alte Hinweise in der Anwendung (`purge_stale_operational_rows`). */
 export const AI_JOB_RETENTION_DAYS = 90;
 export const NOTICE_RETENTION_DAYS = 180;
+/** Feedback verliert nach 60 Tagen den Personenbezug; nie angenommene, abgelaufene Einladungen werden nach 60 Tagen geloescht (`purge_stale_personal_rows`). */
+export const FEEDBACK_ANONYMIZE_DAYS = 60;
+export const INVITATION_RETENTION_DAYS = 60;
 
 type RpcError = { code?: string | null } | null;
 type RpcResult = { data: unknown; error: RpcError };
@@ -45,11 +48,13 @@ export type PrivacyRetentionResult = {
   researchCleanup: StepStatus;
   eventCleanup: StepStatus;
   operationalCleanup: StepStatus;
+  personalCleanup: StepStatus;
   /** Nur Zählwerte, die die SQL-Funktionen selbst zurückgeben. */
   counts: {
     research: { retentionDays: number; deletedResearchEvents: number; deletedProductAnalyticsEvents: number } | null;
     events: { closedEvents: number; deletedAnswers: number; deletedParticipants: number } | null;
     operational: { deletedAiJobs: number; deletedNotices: number } | null;
+    personal: { anonymizedFeedback: number; deletedInvitations: number } | null;
   };
 };
 
@@ -92,17 +97,23 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
     p_job_days: AI_JOB_RETENTION_DAYS,
     p_notice_days: NOTICE_RETENTION_DAYS,
   });
+  const personal = await runStep(client, "purge_stale_personal_rows", {
+    p_feedback_days: FEEDBACK_ANONYMIZE_DAYS,
+    p_invitation_days: INVITATION_RETENTION_DAYS,
+  });
   return {
-    ok: research.ok && events.ok && operational.ok,
+    ok: research.ok && events.ok && operational.ok && personal.ok,
     researchCleanup: research.ok ? "ok" : "failed",
     eventCleanup: events.ok ? "ok" : "failed",
     operationalCleanup: operational.ok ? "ok" : "failed",
+    personalCleanup: personal.ok ? "ok" : "failed",
     counts: {
       research: research.ok
         ? pickCounts(research.data, ["retentionDays", "deletedResearchEvents", "deletedProductAnalyticsEvents"] as const)
         : null,
       events: events.ok ? pickCounts(events.data, ["closedEvents", "deletedAnswers", "deletedParticipants"] as const) : null,
       operational: operational.ok ? pickCounts(operational.data, ["deletedAiJobs", "deletedNotices"] as const) : null,
+      personal: personal.ok ? pickCounts(personal.data, ["anonymizedFeedback", "deletedInvitations"] as const) : null,
     },
   };
 }
