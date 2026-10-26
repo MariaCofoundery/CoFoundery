@@ -7,6 +7,8 @@ import {
   getFounderSetupCatalogItem,
 } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
+import { buildFounderSetupLegalReview } from "@/features/teams/founderSetupLegalReview";
+import { founderLibraryTermHref } from "@/features/founderLibrary/glossaryLinking";
 import { PrintButton } from "@/features/teams/PrintButton";
 import { normalizeLocale } from "@/i18n/config";
 import { getRequestUser } from "@/lib/supabase/server";
@@ -54,6 +56,7 @@ export default async function FounderSetupDocument({
 
   const settled = setup.items.filter((item) => item.currentConfirmedRevision);
   const open = setup.items.filter((item) => !item.currentConfirmedRevision);
+  const legalReview = buildFounderSetupLegalReview(setup.items);
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10 print:max-w-none print:px-0 print:py-0">
@@ -133,6 +136,32 @@ export default async function FounderSetupDocument({
           </p>
         </section>
       ) : null}
+
+      <section className="mt-9 break-inside-avoid rounded-xl border border-slate-300 p-5">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-700">
+          {t("document.legalReview.title")}
+        </h2>
+        <p className="mt-2 text-sm leading-7 text-slate-700">{t("document.legalReview.intro")}</p>
+        <ul className="mt-4 space-y-2">
+          {legalReview.map((entry) => (
+            <li key={entry.key} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
+              <span className="font-medium text-slate-950">{t(`items.${entry.key}.title`)}</span>
+              <span className="flex flex-wrap items-baseline gap-x-3 text-slate-600">
+                {t(`document.legalReview.status.${entry.status}`)}
+                {entry.libraryTermSlug ? (
+                  <Link
+                    href={founderLibraryTermHref(entry.libraryTermSlug)}
+                    className="text-xs font-medium text-slate-600 underline underline-offset-4 print:hidden"
+                  >
+                    {t("document.legalReview.libraryLink")}
+                  </Link>
+                ) : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-xs leading-6 text-slate-500">{t("document.legalReview.note")}</p>
+      </section>
 
       <p className="mt-9 border-t border-slate-300 pt-4 text-xs leading-6 text-slate-500">
         {t("document.disclaimer")}

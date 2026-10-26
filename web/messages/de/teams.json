@@ -635,7 +635,19 @@
       "disclaimer": "Dieses Dokument hält fest, worauf ihr euch verständigt habt. Es ersetzt keine rechtliche oder steuerliche Beratung und ist kein Gesellschaftsvertrag.",
       "print": "Drucken oder als PDF sichern",
       "open": "Dokument ansehen",
-      "openHelp": "Alles, was ihr gemeinsam bestätigt habt – zum Ausdrucken oder Mitnehmen."
+      "openHelp": "Alles, was ihr gemeinsam bestätigt habt – zum Ausdrucken oder Mitnehmen.",
+      "legalReview": {
+        "title": "Mit einer Beratung klären",
+        "intro": "Bei diesen Themen hat eine Vereinbarung rechtliche Folgen. Legt sie einer Anwältin, einem Anwalt oder einer Steuerberatung vor, bevor ihr euch darauf verlasst.",
+        "status": {
+          "open": "Noch nicht besprochen",
+          "discussed": "In Klärung",
+          "reconfirm": "Neu zu bestätigen, die Runde hat sich geändert",
+          "confirmed": "Von allen bestätigt"
+        },
+        "libraryLink": "Begriff nachlesen",
+        "note": "Die Liste sagt nicht, was rechtlich richtig ist. Sie zeigt nur, wo ihr euch Rat holen solltet."
+      }
     },
     "stages": {
       "open": "Offen",

@@ -158,3 +158,47 @@ test("das Dokument ist von der Uebersicht aus erreichbar", () => {
   assert.match(source("src/features/teams/PrintButton.tsx"), /window\.print\(\)/);
   assert.match(source("src/features/teams/PrintButton.tsx"), /^"use client";/);
 });
+
+// ---------------------------------------------------------------------------
+// "Mit einer Beratung klaeren" im Vereinbarungs-Dokument
+// ---------------------------------------------------------------------------
+import { buildFounderSetupLegalReview } from "@/features/teams/founderSetupLegalReview";
+import { buildFounderSetupReadModel } from "@/features/teams/founderSetupModel";
+
+test("die Beratungsliste enthaelt genau die Themen mit rechtlicher Notiz", () => {
+  const model = buildFounderSetupReadModel({
+    teamId: "t", currentUserId: "a",
+    members: [{ userId: "a", displayName: "A" }, { userId: "b", displayName: "B" }],
+    itemRows: [], revisionRows: [], confirmationRows: [],
+  });
+  const list = buildFounderSetupLegalReview(model.items);
+  assert.deepEqual(
+    list.map((entry) => entry.key).sort(),
+    FOUNDER_SETUP_CATALOG.filter((item) => item.legalNote).map((item) => item.key).sort()
+  );
+  assert.ok(list.every((entry) => entry.status === "open"));
+  assert.equal(list.find((entry) => entry.key === "vesting")?.libraryTermSlug, "vesting");
+});
+
+test("bestaetigt heisst: die aktuelle Runde hat bestaetigt, nicht irgendwann jemand", () => {
+  const itemRows = [{ id: "i1", team_id: "t", item_key: "vesting", work_status: "discussing", working_note: "", current_confirmed_revision_id: "r1", pending_revision_id: null }];
+  const revisionRows = [{ id: "r1", setup_item_id: "i1", resolution_status: "clarified", note: "x", documentation_reference: null, proposed_by_user_id: "a", created_at: "2026-01-01", confirmed_at: "2026-01-02" }];
+  const status = (members: string[], confirmedBy: string[]) =>
+    buildFounderSetupLegalReview(buildFounderSetupReadModel({
+      teamId: "t", currentUserId: "a",
+      members: members.map((userId) => ({ userId, displayName: userId })),
+      itemRows, revisionRows,
+      confirmationRows: confirmedBy.map((user_id) => ({ revision_id: "r1", user_id, confirmed_at: "2026-01-02" })),
+    }).items).find((entry) => entry.key === "vesting")?.status;
+  assert.equal(status(["a", "b"], ["a", "b"]), "confirmed");
+  assert.equal(status(["a", "b", "c"], ["a", "b"]), "reconfirm");
+});
+
+test("das Dokument zeigt die Beratungsliste, beide Sprachen haben die Texte", () => {
+  assert.match(source(DOCUMENT), /buildFounderSetupLegalReview/);
+  for (const locale of ["de", "en"]) {
+    const doc = setupCopy(locale).document as unknown as { legalReview: { title: string; note: string; status: Record<string, string> } };
+    assert.ok(doc.legalReview.title && doc.legalReview.note);
+    for (const k of ["open", "discussed", "reconfirm", "confirmed"]) assert.ok(doc.legalReview.status[k], `${locale}: ${k}`);
+  }
+});

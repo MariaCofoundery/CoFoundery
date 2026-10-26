@@ -635,7 +635,19 @@
       "disclaimer": "This document records what you have agreed on. It is no substitute for legal or tax advice and is not a set of articles of association.",
       "print": "Print or save as PDF",
       "open": "View the document",
-      "openHelp": "Everything the two of you confirmed – to print or take with you."
+      "openHelp": "Everything the two of you confirmed – to print or take with you.",
+      "legalReview": {
+        "title": "To clear with an adviser",
+        "intro": "For these topics an agreement has legal consequences. Show them to a lawyer or tax adviser before you rely on them.",
+        "status": {
+          "open": "Not discussed yet",
+          "discussed": "In discussion",
+          "reconfirm": "Needs confirming again, the team has changed",
+          "confirmed": "Confirmed by everyone"
+        },
+        "libraryLink": "Read up on the term",
+        "note": "The list does not say what is legally right. It only shows where you should get advice."
+      }
     },
     "stages": {
       "open": "Open",
