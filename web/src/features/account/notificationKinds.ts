@@ -32,6 +32,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "discovery_intro_request", area: "find" },
   { kind: "discovery_intro_accepted", area: "find" },
   { kind: "discovery_saved_search", area: "find" },
+  { kind: "team_check_in", area: "align" },
   { kind: "read_my_mind", area: "align" },
   { kind: "founder_in_the_wild", area: "align" },
 ] as const;
@@ -72,6 +73,9 @@ export function notificationKindsByArea(area: NotificationArea) {
  */
 export const NOTIFICATION_EMAIL_OPT_INS = [
   { kind: "connect_suggestions_email", parent: "connect_suggestions" },
+  // Erinnerung an einen faelligen Team-Check-in: kommt vom Zeitplan, nicht von
+  // einem Menschen - deshalb dieselbe Regel wie bei den Vorschlaegen.
+  { kind: "team_check_in_email", parent: "team_check_in" },
 ] as const;
 
 export type NotificationEmailOptIn = (typeof NOTIFICATION_EMAIL_OPT_INS)[number]["kind"];

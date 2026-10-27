@@ -196,8 +196,7 @@
       "title": "Abstand",
       "label": "Abstand zwischen den Check-ins",
       "option": "alle {days} Tage",
-      "help": "Das Team wählt den Abstand und kann ihn jederzeit ändern. Einen Check-in kann man überspringen.",
-      "noReminder": "Erinnerungen per E-Mail gibt es noch nicht. Der Check-in steht hier und auf der Team-Übersicht, wenn er fällig ist."
+      "help": "Das Team wählt den Abstand und kann ihn jederzeit ändern. Einen Check-in kann man überspringen."
     },
     "due": {
       "now": "Der nächste Check-in ist fällig.",
@@ -307,6 +306,17 @@
       "start": "Check-in öffnen",
       "none": "Noch keine bestätigte Vereinbarung",
       "open": "Check-in ansehen"
+    },
+    "reminders": {
+      "title": "Erinnerung an den Check-in",
+      "state": {
+        "off": "Du hast die Erinnerung abgeschaltet.",
+        "email": "Du wirst per E-Mail und, wenn am Gerät erlaubt, per Mitteilung erinnert.",
+        "push": "Du wirst per Mitteilung auf dein Gerät erinnert. Eine E-Mail bekommst du nicht.",
+        "none": "Du hast keine Mitteilung auf dem Gerät erlaubt und keine E-Mail gewählt. So bekommst du keine Erinnerung."
+      },
+      "missWarning": "Ohne Erinnerung kann ein fälliger Check-in unbemerkt bleiben. Hier auf der Seite und auf der Team-Übersicht steht er trotzdem, sobald er fällig ist.",
+      "link": "Erinnerung im Konto einstellen"
     }
   },
   "testProject": {

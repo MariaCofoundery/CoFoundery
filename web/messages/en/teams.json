@@ -196,8 +196,7 @@
       "title": "Interval",
       "label": "Time between check-ins",
       "option": "every {days} days",
-      "help": "The team chooses the interval and can change it at any time. A check-in can be skipped.",
-      "noReminder": "There are no email reminders yet. The check-in appears here and on the team overview when it is due."
+      "help": "The team chooses the interval and can change it at any time. A check-in can be skipped."
     },
     "due": {
       "now": "The next check-in is due.",
@@ -307,6 +306,17 @@
       "start": "Open check-in",
       "none": "No confirmed agreement yet",
       "open": "View check-in"
+    },
+    "reminders": {
+      "title": "Check-in reminder",
+      "state": {
+        "off": "You switched the reminder off.",
+        "email": "You are reminded by email and, if allowed on your device, by notification.",
+        "push": "You are reminded by notification on your device. You will not get an email.",
+        "none": "You have not allowed notifications on this device and not chosen email. You will not get a reminder."
+      },
+      "missWarning": "Without a reminder, a due check-in can go unnoticed. It still shows up on this page and on the team overview once it is due.",
+      "link": "Set the reminder in your account"
     }
   },
   "testProject": {

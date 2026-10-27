@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 
 import { NOTIFICATION_EMAIL_OPT_INS } from "@/features/account/notificationKinds";
@@ -218,7 +218,14 @@ test("die Zustimmungsliste im Code und die in der Datenbank sind dieselbe", () =
   // Waere die Liste hier laenger, liefe eine Zustimmung in einen
   // Constraint-Fehler; waere sie kuerzer, gaebe es einen Mailweg ohne Haken.
   // Dasselbe Muster wie bei den Abbestellungen.
-  const migration = sqlCodeOnly(MIGRATION);
+  // Die gueltige Liste steht in der JUENGSTEN Migration, die sie nennt
+  // (append-only) - ein fester Pfad uebersaehe jede spaetere Erweiterung.
+  const dir = "../supabase/migrations";
+  const latest = readdirSync(dir)
+    .filter((name) => name.endsWith(".sql") && readFileSync(`${dir}/${name}`, "utf8").includes("notification_opt_ins_kind_check"))
+    .sort()
+    .at(-1) as string;
+  const migration = sqlCodeOnly(`${dir}/${latest}`);
   const block = migration.slice(
     migration.indexOf("notification_opt_ins_kind_check"),
     migration.indexOf("))", migration.indexOf("notification_opt_ins_kind_check"))

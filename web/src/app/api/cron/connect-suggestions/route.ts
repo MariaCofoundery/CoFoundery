@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
 import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
@@ -55,13 +56,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: "unauthorized" }, { status: 401 });
   }
 
+  // Check-in-Erinnerungen laufen im selben Lauf mit: Vercel Hobby erlaubt nur
+  // zwei Zeitplaene, und beide sind belegt. Ein Fehler hier darf die
+  // Vorschlaege nicht verhindern - und umgekehrt.
+  const reminders = await runCheckInReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok);
-  if (!result.ok) {
-    const status = result.reason === "missing_service_role" ? 503 : 500;
-    await sendCronFailureAlert("connect-suggestions", status, result);
-    return NextResponse.json(result, { status });
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok);
+  if (!result.ok || !reminders.ok) {
+    const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
+    const body = { ...result, ok: false, checkInReminders: reminders };
+    await sendCronFailureAlert("connect-suggestions", status, body);
+    return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json(result, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders }, { status: 200 });
 }

@@ -387,7 +387,10 @@ export type NetworkNotificationCopyKind =
   // entsteht, weil eine Mengenschnittmenge etwas gefunden hat - deshalb geht
   // sie nur mit ausdruecklicher Zustimmung hinaus, und deshalb sagt ihre
   // Fusszeile etwas anderes.
-  | "connect_suggestions";
+  | "connect_suggestions"
+  // Erinnerung an einen faelligen Team-Check-in. Kommt vom Zeitplan, nennt weder
+  // Team noch Person.
+  | "team_check_in";
 
 /**
  * Welcher Bereich ueber der Ueberschrift steht.
@@ -398,6 +401,7 @@ export type NetworkNotificationCopyKind =
  * sonst im falschen Bereich.
  */
 function notificationArea(kind: NetworkNotificationCopyKind) {
+  if (kind === "team_check_in") return "Made2Found Team";
   return kind.startsWith("discovery_intro") ? "Made2Found Find" : "Made2Found Connect";
 }
 
@@ -466,6 +470,14 @@ export function getNetworkNotificationEmailCopy(
             : `${count} things in Connect overlap with what you wrote about yourself. Every suggestion shows you the word that triggered it.`,
         cta: "Open suggestions",
       },
+      team_check_in: {
+        subject: "Your team check-in is due",
+        headline: "Time for your check-in",
+        // KEIN TEAMNAME: Die Mail landet in einem Postfach, dessen Weg wir nicht kennen.
+        intro:
+          "It has been a while since your team confirmed its agreements. A check-in takes a few minutes and shows whether they still hold.",
+        cta: "Open the check-in",
+      },
     }[input.kind];
 
     return {
@@ -480,7 +492,9 @@ export function getNetworkNotificationEmailCopy(
       // hat - und dann muss die Mail selbst daran erinnern, sonst liest sie
       // sich wie ungefragte Post.
       note:
-        input.kind === "connect_suggestions"
+        input.kind === "team_check_in"
+          ? "You are getting this email because you agreed to it in your account settings. One reminder per due check-in, nothing more."
+          : input.kind === "connect_suggestions"
           ? "You are getting this email because you agreed to it in your account settings. At most once per batch, and never more than three suggestions a week."
           : "We only notify you about your own activity, and at most once per event.",
       settings: "You can switch these emails off in your account settings.",
@@ -537,6 +551,14 @@ export function getNetworkNotificationEmailCopy(
           : `In Connect gibt es ${count} Dinge, die sich mit deinen eigenen Angaben überschneiden. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.`,
       cta: "Vorschläge öffnen",
     },
+    team_check_in: {
+      subject: "Euer Team-Check-in ist fällig",
+      headline: "Zeit für euren Check-in",
+      // KEIN TEAMNAME: Die Mail landet in einem Postfach, dessen Weg wir nicht kennen.
+      intro:
+        "Eure Vereinbarungen sind eine Weile her. Ein Check-in dauert ein paar Minuten und zeigt, ob sie noch gelten.",
+      cta: "Check-in öffnen",
+    },
   }[input.kind];
 
   return {
@@ -548,7 +570,9 @@ export function getNetworkNotificationEmailCopy(
     // Zustimmung, weil sie der Grund ist, aus dem diese Mail ueberhaupt
     // hinausgeht.
     note:
-      input.kind === "connect_suggestions"
+      input.kind === "team_check_in"
+        ? "Du bekommst diese Mail, weil du ihr in deinen Kontoeinstellungen ausdrücklich zugestimmt hast. Eine Erinnerung je fälligem Check-in, nicht mehr."
+        : input.kind === "connect_suggestions"
         ? "Du bekommst diese Mail, weil du ihr in deinen Kontoeinstellungen ausdrücklich zugestimmt hast. Höchstens einmal je Schwung, und nie mehr als drei Vorschläge pro Woche."
         : "Wir benachrichtigen dich nur über deine eigenen Vorgänge, und höchstens einmal je Vorgang.",
     settings: "Du kannst diese Mails in deinen Kontoeinstellungen abschalten.",

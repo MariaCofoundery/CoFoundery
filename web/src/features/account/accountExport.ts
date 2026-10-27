@@ -42,6 +42,8 @@ const EXPORTED_TABLES = [
   { table: "team_check_in_submissions", column: "user_id" },
   { table: "team_check_in_retro_invites", column: "user_id" },
   { table: "team_check_in_retro_answers", column: "user_id" },
+  // Stempel der Check-in-Erinnerung: nur "es wurde erinnert", kein Inhalt.
+  { table: "team_check_in_reminders", column: "user_id" },
   { table: "founder_team_setup_discussion_entries", column: "author_user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.

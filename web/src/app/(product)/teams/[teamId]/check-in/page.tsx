@@ -62,6 +62,20 @@ export default async function CheckInPage({ params, searchParams }: Props) {
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(checkInHref(teamId))}`);
   const view = await getTeamCheckIn(teamId, user.id, supabase);
+  // Eigener Erinnerungsstatus (Zeilensicherheit: nur die eigenen Zeilen). Fehlt etwas, gilt
+  // der Standard: Mitteilung an, Mail aus.
+  const [optOutResult, optInResult, pushResult] = await Promise.all([
+    supabase.from("notification_opt_outs").select("kind").eq("user_id", user.id).eq("kind", "team_check_in").maybeSingle(),
+    supabase.from("notification_opt_ins").select("kind").eq("user_id", user.id).eq("kind", "team_check_in_email").maybeSingle(),
+    supabase.from("push_subscriptions").select("user_id", { count: "exact", head: true }).eq("user_id", user.id),
+  ]);
+  const reminderState: "off" | "email" | "push" | "none" = optOutResult.data
+    ? "off"
+    : optInResult.data
+      ? "email"
+      : (pushResult.count ?? 0) > 0
+        ? "push"
+        : "none";
   if (!view) return <TeamUnavailable teamId={teamId} />;
 
   const [t, setupT, teamLabel, rawLocale] = await Promise.all([
@@ -251,7 +265,14 @@ export default async function CheckInPage({ params, searchParams }: Props) {
         <section className={CARD} aria-labelledby="ci-settings-title">
           <h2 id="ci-settings-title" className="text-xl font-semibold text-[#0b1f3a]">{t("settings.title")}</h2>
           <div className="mt-3"><CheckInIntervalControl teamId={teamId} current={view.intervalDays} labels={labels} /></div>
-          <p className="mt-3 text-[13px] leading-5 text-[#5f5e7a]">{t("settings.noReminder")}</p>
+          <div className="mt-4 rounded-2xl bg-[#f7f6fb] px-4 py-3 text-[13.5px] leading-6 text-[#3f3e5a]">
+            <p className="font-semibold text-[#0b1f3a]">{t("reminders.title")}</p>
+            <p className="mt-1">{t(`reminders.state.${reminderState}`)}</p>
+            <p className="mt-1 text-[#5f5e7a]">{t("reminders.missWarning")}</p>
+            <Link href="/account#post" className="mt-2 inline-block font-semibold text-[#6d49e0] underline underline-offset-2">
+              {t("reminders.link")}
+            </Link>
+          </div>
         </section>
       </div>
     </main>
