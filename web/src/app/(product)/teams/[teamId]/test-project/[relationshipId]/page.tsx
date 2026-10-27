@@ -205,6 +205,22 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
       <div className="mt-6 grid gap-5">
         {!current ? (
           <>
+            {previous ? (
+              <section className={CARD} aria-labelledby="tp-previous-title">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 id="tp-previous-title" className="text-xl font-semibold text-[#0b1f3a]">{t("previous.title")}</h2>
+                  <span className="rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]">{t(`previous.${previous.status === "closed" ? "closed" : "cancelled"}`)}</span>
+                </div>
+                <p className="mt-2 text-[15px] font-semibold text-[#0b1f3a]">{previous.title}</p>
+                <div className="mt-4 grid gap-4">
+                  <ResultsBlock phase="interim" responses={previousResponses} view={view} meId={user.id} t={t} title={t("results.interim")} />
+                  <ResultsBlock phase="closing" responses={previousResponses} view={view} meId={user.id} t={t} title={t("results.closing")} />
+                </div>
+                {previous.status === "closed" ? (
+                  <p className="mt-4 text-sm text-[#5f5e7a]">{t("results.next")} <Link href={`/teams/${encodeURIComponent(teamId)}/setup`} className="font-semibold text-[#6d49e0] hover:underline">{t("results.nextLink")}</Link></p>
+                ) : null}
+              </section>
+            ) : null}
             <TestProjectStarter
               teamId={teamId}
               relationshipId={relationshipId}
@@ -224,22 +240,6 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
                 done: template.done.map((item) => item[locale]),
               }))}
             />
-            {previous ? (
-              <section className={CARD} aria-labelledby="tp-previous-title">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 id="tp-previous-title" className="text-xl font-semibold text-[#0b1f3a]">{t("previous.title")}</h2>
-                  <span className="rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]">{t(`previous.${previous.status === "closed" ? "closed" : "cancelled"}`)}</span>
-                </div>
-                <p className="mt-2 text-[15px] font-semibold text-[#0b1f3a]">{previous.title}</p>
-                <div className="mt-4 grid gap-4">
-                  <ResultsBlock phase="interim" responses={previousResponses} view={view} meId={user.id} t={t} title={t("results.interim")} />
-                  <ResultsBlock phase="closing" responses={previousResponses} view={view} meId={user.id} t={t} title={t("results.closing")} />
-                </div>
-                {previous.status === "closed" ? (
-                  <p className="mt-4 text-sm text-[#5f5e7a]">{t("results.next")} <Link href={`/teams/${encodeURIComponent(teamId)}/setup`} className="font-semibold text-[#6d49e0] hover:underline">{t("results.nextLink")}</Link></p>
-                ) : null}
-              </section>
-            ) : null}
           </>
         ) : current.status === "draft" ? (
           <TestProjectEditor

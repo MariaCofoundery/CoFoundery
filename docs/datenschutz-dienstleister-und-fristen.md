@@ -25,6 +25,7 @@ Stand: 24.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche
 | Nie angenommene, abgelaufene Einladungen | 60 Tage nach Ablauf | gelöscht, samt Mailadresse |
 | Nachrichten | keine feste Frist | Teilnehmende können eigene Nachrichten zurücknehmen (Text wird gelöscht). Beim Löschen eines Kontos wird die Seite anonym |
 | Forschungsantworten bei Widerruf | sofort | gelöscht (Trigger in der Datenbank) |
+| Testprojekt (Entwurf, Zustimmungen, Antworten) | keine feste Frist, offen | bleibt, solange das Paar besteht. Beim Löschen eines Kontos fallen Zustimmungen und Antworten dieser Person weg, das Projekt bleibt ohne Namen des Erstellers. Eine feste Löschfrist ist noch zu entscheiden. |
 
 ## Anfragen von Betroffenen
 Frist ein Monat. Antworten nur an die Mailadresse des Kontos, keine Ausweiskopie. Der Export im Konto ist der Selbstbedienungsweg (Art. 15 und 20). Bei Zweifel: eine Rückfrage, die nur die Kontoinhaberin beantworten kann.

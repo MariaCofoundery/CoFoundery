@@ -219,7 +219,11 @@ export function TestProjectEditor({
 
   const save = () => run(
     () => saveTestProjectDraftAction(teamId, relationshipId, { projectId, ...values }),
-    () => testProjectHref(teamId, relationshipId, "saved")
+    () => {
+      // Gespeichert heisst: Es gibt nichts Ungespeichertes mehr, sonst bliebe "Ich stimme zu" gesperrt.
+      setDirty(false);
+      return testProjectHref(teamId, relationshipId, "saved");
+    }
   );
 
   return (
