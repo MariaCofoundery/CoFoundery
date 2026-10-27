@@ -1,9 +1,12 @@
 import { loadTeamJourneyStatus } from "@/features/teams/TeamJourneyStatus";
 import { testProjectHref } from "@/features/testProject/testProjectModel";
+import { getCheckInCardState } from "@/features/checkIn/checkInData";
+import { checkInHref } from "@/features/checkIn/checkInModel";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHomebaseCard";
@@ -139,10 +142,13 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
     !setup?.started &&
     startedLabRelationships.size === 0;
 
-  const [t, commitmentT, testProjectT, setupT, journey] = await Promise.all([
+  const locale = await getLocale();
+  const checkInCard = setup ? await getCheckInCardState(teamId, setup.items, supabase).catch(() => null) : null;
+  const [t, commitmentT, testProjectT, checkInT, setupT, journey] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.commitmentLab"),
     getTranslations("teams.testProject"),
+    getTranslations("teams.checkIn"),
     getTranslations("teams.setup"),
     loadTeamJourneyStatus({ teamId: team.id, userId: user.id, client: supabase, setup }),
   ]);
@@ -385,6 +391,30 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
                   {t("setup.document")}
                 </Link>
               ) : null}
+            </div>
+          </article>
+          <article
+            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
+            aria-labelledby="team-check-in-title"
+          >
+            <div className="flex items-center justify-between gap-2"><IconTile name="clock" tone={checkInCard?.state === "due" ? "amber" : "violet"} /></div>
+            <h3 id="team-check-in-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{checkInT("card.title")}</h3>
+            <p className="text-sm leading-6 text-slate-700">
+              {checkInCard?.state === "open"
+                ? checkInT("card.running")
+                : checkInCard?.state === "due"
+                  ? checkInT("card.dueNow")
+                  : checkInCard?.state === "scheduled" && checkInCard.due
+                    ? checkInT("card.dueOn", { date: new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium" }).format(checkInCard.due) })
+                    : checkInT("card.none")}
+            </p>
+            <div className="mt-auto flex flex-wrap items-center gap-3">
+              <Link
+                href={checkInHref(teamId)}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90"
+              >
+                {checkInT(checkInCard?.state === "open" ? "card.open" : "card.start")}
+              </Link>
             </div>
           </article>
           <FounderLibraryHomebaseCard teamId={teamId} />

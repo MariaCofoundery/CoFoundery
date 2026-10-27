@@ -182,7 +182,132 @@
     "venture": "Vorhaben",
     "tradeoffs": "Werte & Zielkonflikte",
     "workstyle": "Euer Zusammenspiel",
-    "strengths": "Stärken & Antrieb"
+    "strengths": "Stärken & Antrieb",
+    "checkin": "Check-in"
+  },
+  "checkIn": {
+    "eyebrow": "Check-in",
+    "title": "Gilt das noch so?",
+    "intro": "Nach einer Weile arbeiten sieht jede Person die Vereinbarungen noch einmal an, die ihr gemeinsam bestätigt habt. Es gibt keine Punkte und keine Gesamtbewertung.",
+    "noTopics": "Ihr habt noch keine Vereinbarung gemeinsam bestätigt. Sobald ihr im Founder Setup etwas abgeschlossen habt, könnt ihr hier nachsehen, ob es noch gilt.",
+    "toSetup": "Zum Founder Setup",
+    "disclaimer": "Das ist ein Hilfsangebot zum Sortieren, keine Rechtsberatung.",
+    "settings": {
+      "title": "Abstand",
+      "label": "Abstand zwischen den Check-ins",
+      "option": "alle {days} Tage",
+      "help": "Das Team wählt den Abstand und kann ihn jederzeit ändern. Einen Check-in kann man überspringen.",
+      "noReminder": "Erinnerungen per E-Mail gibt es noch nicht. Der Check-in steht hier und auf der Team-Übersicht, wenn er fällig ist."
+    },
+    "due": {
+      "now": "Der nächste Check-in ist fällig.",
+      "on": "Der nächste Check-in ist am {date}.",
+      "start": "Check-in starten",
+      "skip": "Diesen Check-in überspringen",
+      "none": "Sobald ihr eine Vereinbarung bestätigt habt, läuft die Zeit bis zum ersten Check-in."
+    },
+    "open": {
+      "title": "Euer Check-in",
+      "help": "Jede Person antwortet für sich. Die Antworten der anderen seht ihr erst, wenn alle abgegeben haben.",
+      "question": "Gilt das noch so, wie ihr es bestätigt habt?",
+      "answers": {
+        "same": "Ja, so",
+        "partly": "Teilweise",
+        "talk": "Wir sollten sprechen"
+      },
+      "note": "Notiz (nur für euch)",
+      "notePlaceholder": "Optional",
+      "viewAgreement": "Vereinbarung ansehen",
+      "includeLabel": "Im Check-in",
+      "excluded": "Für diesen Check-in abgewählt.",
+      "customPlaceholder": "Eigenen Punkt ergänzen, zum Beispiel: Wer zahlt die Tools?",
+      "customAdd": "Hinzufügen",
+      "customHint": "Eigener Punkt, noch keine bestätigte Vereinbarung im Setup.",
+      "frozen": "Sobald eine Person abgegeben hat, lassen sich die Themen nicht mehr ändern.",
+      "progress": "{done} von {total} beantwortet",
+      "submit": "Abgeben",
+      "mine": "Du hast abgegeben. Die Antworten der anderen siehst du, sobald alle abgegeben haben.",
+      "submitted": "{name}: abgegeben",
+      "notYet": "{name}: noch nicht",
+      "discard": "Check-in verwerfen",
+      "allAnswered": "Bitte beantworte jedes gewählte Thema."
+    },
+    "agreement": {
+      "meta": "Bestätigt am {date} von allen im Team",
+      "metaUnknown": "Bestätigt von allen im Team",
+      "custom": "Eigener Punkt, noch keine bestätigte Vereinbarung im Setup.",
+      "close": "Schließen",
+      "toTopic": "Zum Thema im Setup",
+      "empty": "Es ist kein Text hinterlegt."
+    },
+    "results": {
+      "title": "Was ihr geantwortet habt",
+      "help": "Hier steht nur, wo die Antworten auseinandergehen oder jemand sprechen möchte.",
+      "nothing": "Bei allen Themen habt ihr „Ja, so“ gesagt. Es gibt nichts zu besprechen.",
+      "calm": "Themen ohne Hinweis ({count})",
+      "talk": "Im Setup besprechen",
+      "closedOn": "Abgeschlossen am {date}",
+      "own": "{name} (du)",
+      "other": "{name}",
+      "noNote": "Keine Notiz"
+    },
+    "retro": {
+      "title": "Rückblick: was lief gut, was war schwierig?",
+      "help": "Freiwillig. Es geht um echte Erfahrungen aus eurer Zusammenarbeit, nicht um Ausnahmefälle. Wer mitmacht, entscheidet jede Person selbst.",
+      "offer": "Rückblick anbieten",
+      "questions": "Fragen für den Rückblick",
+      "questionsHelp": "Jede Frage lässt sich abwählen, ändern oder ergänzen. Ein konkretes Beispiel hilft mehr als eine allgemeine Antwort.",
+      "addQuestion": "Eigene Frage hinzufügen",
+      "itemOn": "Aktiv",
+      "remove": "Entfernen",
+      "invite": "{name} möchte kurz zurückblicken: Was lief bei uns gut, wo war es schwierig? Hast du Lust mitzumachen?",
+      "join": "Gern",
+      "decline": "Nicht jetzt",
+      "offeredByYou": "Du hast den Rückblick angeboten.",
+      "in": "{name}: dabei",
+      "out": "{name}: nicht jetzt",
+      "open": "{name}: noch offen",
+      "needTwo": "Der Rückblick beginnt, sobald mindestens zwei Personen dabei sind. Wer nicht mitmacht, bleibt ohne Folgen.",
+      "running": "Der Rückblick läuft mit {count} Personen. Wer nicht dabei ist, sieht die Antworten nicht.",
+      "answerPlaceholder": "Deine Antwort",
+      "submit": "Antworten abgeben",
+      "update": "Antworten ändern",
+      "waiting": "Du hast geantwortet. Die Antworten der anderen siehst du, sobald alle, die dabei sind, geantwortet haben.",
+      "locked": "Alle haben geantwortet. Die Antworten sind festgehalten.",
+      "resultsTitle": "Eure Antworten zum Rückblick",
+      "resultsHelp": "Nebeneinander, so wie ihr sie gegeben habt. Es gibt keinen Abgleich und keine Punkte.",
+      "noAnswer": "Keine Antwort",
+      "notIn": "Du bist beim Rückblick nicht dabei."
+    },
+    "feedback": {
+      "started": "Der Check-in läuft.",
+      "submitted": "Deine Antworten sind gespeichert.",
+      "closed": "Alle haben abgegeben. Hier steht, was ihr geantwortet habt.",
+      "skipped": "Der Check-in ist übersprungen.",
+      "interval": "Der Abstand ist gespeichert.",
+      "topic": "Gespeichert.",
+      "retro": "Gespeichert.",
+      "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
+      "errors": {
+        "team_check_in_already_open": "Es läuft schon ein Check-in.",
+        "team_check_in_no_topics": "Es gibt noch keine gemeinsam bestätigte Vereinbarung, die ihr prüfen könntet.",
+        "team_check_in_not_editable": "Das lässt sich nicht mehr ändern.",
+        "team_check_in_already_submitted": "Du hast schon abgegeben.",
+        "team_check_in_input_invalid": "Eine Angabe passt nicht. Bitte prüfe die Felder.",
+        "team_check_in_phase_locked": "Alle haben schon geantwortet. Die Antworten sind festgehalten.",
+        "team_check_in_retro_already_offered": "Der Rückblick wurde schon angeboten.",
+        "team_check_in_unavailable": "Der Check-in ist gerade nicht verfügbar."
+      }
+    },
+    "card": {
+      "title": "Check-in",
+      "dueNow": "Fällig: gilt das noch so, wie ihr es bestätigt habt?",
+      "dueOn": "Nächster Check-in am {date}",
+      "running": "Läuft",
+      "start": "Check-in öffnen",
+      "none": "Noch keine bestätigte Vereinbarung",
+      "open": "Check-in ansehen"
+    }
   },
   "testProject": {
     "eyebrow": "Testprojekt",

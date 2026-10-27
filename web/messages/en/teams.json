@@ -182,7 +182,132 @@
     "venture": "Venture",
     "tradeoffs": "Values & trade-offs",
     "workstyle": "How you work together",
-    "strengths": "Strengths & drive"
+    "strengths": "Strengths & drive",
+    "checkin": "Check-in"
+  },
+  "checkIn": {
+    "eyebrow": "Check-in",
+    "title": "Does this still hold?",
+    "intro": "After working together for a while, each person looks again at the agreements you confirmed together. There are no scores and no overall rating.",
+    "noTopics": "You have not confirmed an agreement together yet. Once you have closed a topic in the Founder Setup, you can check here whether it still holds.",
+    "toSetup": "To the Founder Setup",
+    "disclaimer": "This is a helping hand for sorting things out, not legal advice.",
+    "settings": {
+      "title": "Interval",
+      "label": "Time between check-ins",
+      "option": "every {days} days",
+      "help": "The team chooses the interval and can change it at any time. A check-in can be skipped.",
+      "noReminder": "There are no email reminders yet. The check-in appears here and on the team overview when it is due."
+    },
+    "due": {
+      "now": "The next check-in is due.",
+      "on": "The next check-in is on {date}.",
+      "start": "Start check-in",
+      "skip": "Skip this check-in",
+      "none": "Once you have confirmed an agreement, the time until the first check-in starts running."
+    },
+    "open": {
+      "title": "Your check-in",
+      "help": "Each person answers on their own. You only see each other's answers once everyone has submitted.",
+      "question": "Does this still hold the way you confirmed it?",
+      "answers": {
+        "same": "Yes, as is",
+        "partly": "Partly",
+        "talk": "We should talk"
+      },
+      "note": "Note (only for you)",
+      "notePlaceholder": "Optional",
+      "viewAgreement": "View agreement",
+      "includeLabel": "In the check-in",
+      "excluded": "Left out of this check-in.",
+      "customPlaceholder": "Add your own point, for example: who pays for the tools?",
+      "customAdd": "Add",
+      "customHint": "Own point, no confirmed agreement in the Setup yet.",
+      "frozen": "Once one person has submitted, the topics can no longer be changed.",
+      "progress": "{done} of {total} answered",
+      "submit": "Submit",
+      "mine": "You have submitted. You will see the others' answers once everyone has submitted.",
+      "submitted": "{name}: submitted",
+      "notYet": "{name}: not yet",
+      "discard": "Discard check-in",
+      "allAnswered": "Please answer every chosen topic."
+    },
+    "agreement": {
+      "meta": "Confirmed on {date} by everyone on the team",
+      "metaUnknown": "Confirmed by everyone on the team",
+      "custom": "Own point, no confirmed agreement in the Setup yet.",
+      "close": "Close",
+      "toTopic": "To the topic in the Setup",
+      "empty": "No text on record."
+    },
+    "results": {
+      "title": "What you answered",
+      "help": "This only shows where answers differ or someone wants to talk.",
+      "nothing": "You all said “Yes, as is” on every topic. There is nothing to discuss.",
+      "calm": "Topics with nothing to flag ({count})",
+      "talk": "Discuss in the Setup",
+      "closedOn": "Wrapped up on {date}",
+      "own": "{name} (you)",
+      "other": "{name}",
+      "noNote": "No note"
+    },
+    "retro": {
+      "title": "Looking back: what went well, what was hard?",
+      "help": "Voluntary. It is about real experiences from working together, not exceptions. Each person decides whether to take part.",
+      "offer": "Offer a look back",
+      "questions": "Questions for the look back",
+      "questionsHelp": "You can switch off, edit or add any question. A concrete example helps more than a general answer.",
+      "addQuestion": "Add your own question",
+      "itemOn": "Active",
+      "remove": "Remove",
+      "invite": "{name} would like to look back briefly: what went well between us, where was it hard? Do you want to join?",
+      "join": "Gladly",
+      "decline": "Not now",
+      "offeredByYou": "You offered the look back.",
+      "in": "{name}: in",
+      "out": "{name}: not now",
+      "open": "{name}: not answered",
+      "needTwo": "The look back starts once at least two people are in. Anyone who does not take part faces no consequences.",
+      "running": "The look back is running with {count} people. Anyone who is not in does not see the answers.",
+      "answerPlaceholder": "Your answer",
+      "submit": "Submit answers",
+      "update": "Change answers",
+      "waiting": "You have answered. You will see the others' answers once everyone who is in has answered.",
+      "locked": "Everyone has answered. The answers are fixed.",
+      "resultsTitle": "Your answers to the look back",
+      "resultsHelp": "Side by side, as you gave them. There is no comparison and no score.",
+      "noAnswer": "No answer",
+      "notIn": "You are not part of the look back."
+    },
+    "feedback": {
+      "started": "The check-in is running.",
+      "submitted": "Your answers are saved.",
+      "closed": "Everyone has submitted. Here is what you answered.",
+      "skipped": "The check-in was skipped.",
+      "interval": "The interval is saved.",
+      "topic": "Saved.",
+      "retro": "Saved.",
+      "error": "That did not work. Please try again.",
+      "errors": {
+        "team_check_in_already_open": "A check-in is already running.",
+        "team_check_in_no_topics": "There is no agreement you confirmed together that you could check yet.",
+        "team_check_in_not_editable": "That can no longer be changed.",
+        "team_check_in_already_submitted": "You have already submitted.",
+        "team_check_in_input_invalid": "Something does not fit. Please check the fields.",
+        "team_check_in_phase_locked": "Everyone has already answered. The answers are fixed.",
+        "team_check_in_retro_already_offered": "The look back was already offered.",
+        "team_check_in_unavailable": "The check-in is not available right now."
+      }
+    },
+    "card": {
+      "title": "Check-in",
+      "dueNow": "Due: does this still hold the way you confirmed it?",
+      "dueOn": "Next check-in on {date}",
+      "running": "Running",
+      "start": "Open check-in",
+      "none": "No confirmed agreement yet",
+      "open": "View check-in"
+    }
   },
   "testProject": {
     "eyebrow": "Test project",

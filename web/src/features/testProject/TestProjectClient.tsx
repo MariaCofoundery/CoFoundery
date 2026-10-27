@@ -78,7 +78,7 @@ function ErrorLine({ error, labels }: { error: string | null; labels: TestProjec
 }
 
 /** Eine Liste mit Schalter, Text und Entfernen je Punkt; Punkte lassen sich ergaenzen. */
-function EditableList({
+export function EditableList({
   items, onChange, labels, placeholder, addLabel,
 }: {
   items: TestProjectItem[];

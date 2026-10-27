@@ -37,6 +37,11 @@ const EXPORTED_TABLES = [
   { table: "relationship_test_projects", column: "created_by_user_id" },
   { table: "relationship_test_project_agreements", column: "user_id" },
   { table: "relationship_test_project_responses", column: "user_id" },
+  // Check-in: eigene Antworten, Abgaben und Rueckblick. Die der anderen gehoeren ihnen.
+  { table: "team_check_in_answers", column: "user_id" },
+  { table: "team_check_in_submissions", column: "user_id" },
+  { table: "team_check_in_retro_invites", column: "user_id" },
+  { table: "team_check_in_retro_answers", column: "user_id" },
   { table: "founder_team_setup_discussion_entries", column: "author_user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.

@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { FounderTeamNavigation } from "@/features/teams/FounderTeamNavigation";
 
-type NavigationKey = "overview" | "workstyle" | "roles" | "setup" | "library" | "strengths";
+type NavigationKey = "overview" | "workstyle" | "roles" | "setup" | "library" | "strengths" | "checkin";
 
 /** "Maria + FotoMia" (wie in Verbindungen und Dashboard) - oder der Teamname, wenn das Team einen hat. */
 export async function getTeamLabel(client: SupabaseClient, teamId: string): Promise<string | null> {
@@ -74,6 +74,7 @@ export async function TeamPageHeader({
           venture: navigationT("venture"),
           tradeoffs: navigationT("tradeoffs"),
           strengths: navigationT("strengths"),
+          checkin: navigationT("checkin"),
           setup: navigationT("setup"),
           library: navigationT("library"),
         }}
