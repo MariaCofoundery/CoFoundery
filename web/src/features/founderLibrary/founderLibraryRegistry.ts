@@ -36,8 +36,8 @@ export const FOUNDER_LIBRARY_TERMS = [
   { id: "burn_rate", slug: "burn-rate", category: "equity_financing", setupTopicKeys: [], status: "available" },
   { id: "cap_table", slug: "cap-table", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
   { id: "deadlock", slug: "deadlock", category: "contracts_governance", setupTopicKeys: ["conflict_deadlock"], status: "available" },
-  { id: "dilution", slug: "dilution", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
-  { id: "drag_along_tag_along", slug: "drag-along-tag-along", category: "contracts_governance", setupTopicKeys: [], status: "available" },
+  { id: "dilution", slug: "dilution", category: "equity_financing", setupTopicKeys: ["equity", "investor_dilution"], status: "available" },
+  { id: "drag_along_tag_along", slug: "drag-along-tag-along", category: "contracts_governance", setupTopicKeys: ["company_sale"], status: "available" },
   { id: "esop_vsop", slug: "esop-vsop", category: "equity_financing", setupTopicKeys: ["equity"], status: "available" },
   { id: "founder_agreement", slug: "founder-agreement", category: "contracts_governance", setupTopicKeys: ["founder_agreements"], status: "available" },
   { id: "founder_exit", slug: "founder-exit", category: "contracts_governance", setupTopicKeys: ["founder_exit"], status: "available" },
@@ -49,9 +49,9 @@ export const FOUNDER_LIBRARY_TERMS = [
   { id: "product_market_fit", slug: "product-market-fit", category: "company_building", setupTopicKeys: [], status: "available" },
   { id: "reverse_vesting", slug: "reverse-vesting", category: "equity_financing", setupTopicKeys: ["vesting"], status: "available" },
   { id: "runway", slug: "runway", category: "equity_financing", setupTopicKeys: [], status: "available" },
-  { id: "term_sheet", slug: "term-sheet", category: "equity_financing", setupTopicKeys: [], status: "available" },
+  { id: "term_sheet", slug: "term-sheet", category: "equity_financing", setupTopicKeys: ["investor_dilution"], status: "available" },
   { id: "vesting", slug: "vesting", category: "equity_financing", setupTopicKeys: ["vesting"], status: "available" },
-  { id: "convertible_loan", slug: "convertible-loan", category: "equity_financing", setupTopicKeys: [], status: "available" },
+  { id: "convertible_loan", slug: "convertible-loan", category: "equity_financing", setupTopicKeys: ["investor_dilution"], status: "available" },
 
   // Erweiterung vom 19.09.2026. Zwanzig Begriffe waren zu wenig - und vor allem
   // fehlten sie ausgerechnet dort, wo es teuer wird: Rechtsform, Haftung,

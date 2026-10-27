@@ -202,3 +202,27 @@ test("das Dokument zeigt die Beratungsliste, beide Sprachen haben die Texte", ()
     for (const k of ["open", "discussed", "reconfirm", "confirmed"]) assert.ok(doc.legalReview.status[k], `${locale}: ${k}`);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Kapitalgeber und Verkauf (27.10.2026)
+// ---------------------------------------------------------------------------
+test("Kapitalgeber und Verkauf stehen im Katalog, in beiden Wertelisten und in der Diskussionsfunktion", () => {
+  for (const key of ["investor_dilution", "company_sale"] as const) {
+    const entry = FOUNDER_SETUP_CATALOG.find((item) => item.key === key);
+    assert.ok(entry, `${key} fehlt im Katalog`);
+    assert.equal(entry.legalNote, true, `${key} braucht den rechtlichen Hinweis`);
+    assert.equal(entry.phase, "later");
+  }
+  const migration = source("../supabase/migrations/20270101120000_founder_setup_investors_and_sale.sql");
+  // Zwei CHECK-Listen und die Funktion: je dreimal.
+  for (const key of ["investor_dilution", "company_sale", "succession", "post_exit_competition"]) {
+    assert.equal((migration.match(new RegExp(`'${key}'`, "g")) ?? []).length, 3, `${key}: nicht in allen drei Listen`);
+  }
+});
+
+test("die Zahl im Fragebogen-Text stimmt mit dem Katalog ueberein", () => {
+  for (const locale of ["de", "en"]) {
+    const text = JSON.stringify(JSON.parse(source(`messages/${locale}/questionnaires.json`)));
+    assert.ok(text.includes(`${FOUNDER_SETUP_ITEM_KEYS.length} `), `${locale}: Themenzahl veraltet`);
+  }
+});

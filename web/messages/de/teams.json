@@ -597,6 +597,16 @@
         "question": "Was passiert mit den Anteilen, wenn eine von euch stirbt?",
         "orientation": "Ohne Regelung gehen die Anteile an die Erben – Menschen, die das Unternehmen nicht kennen und oft nicht kennen wollen, und die ab dann mitentscheiden. Gesellschaftsverträge regeln das üblicherweise über eine Einziehungs- oder Abtretungsklausel mit Abfindung. Das Thema fühlt sich unangenehm an und dauert zehn Minuten; ohne Regelung dauert es Jahre."
       },
+      "investor_dilution": {
+        "title": "Kapitalgeber und Verwässerung",
+        "question": "Wie geht ihr damit um, wenn Geld von außen kommt und eure Anteile kleiner werden?",
+        "orientation": "Mit jeder Finanzierungsrunde bekommen neue Geldgeber Anteile, und eure werden prozentual kleiner. Das ist üblich, aber nicht egal: Wer entscheidet, ob ihr Geld nehmt, und ab welcher Verwässerung sagt ihr Nein? Auch Rechte der Geldgeber, etwa bei Entscheidungen oder beim Verkauf, gehören dazu. Wie sich das rechtlich auswirkt, sollte eine Beratung ansehen."
+      },
+      "company_sale": {
+        "title": "Verkauf des Unternehmens",
+        "question": "Unter welchen Bedingungen würdet ihr verkaufen, und wer entscheidet das?",
+        "orientation": "Käufer wollen oft alles oder nichts. Dann stellt sich die Frage, ob eine Person gegen den Willen der anderen verkaufen darf, ab welchem Preis ihr zustimmt und wie der Erlös verteilt wird. Verträge regeln das häufig über eine Mitverkaufspflicht (Drag-along) und ein Mitverkaufsrecht (Tag-along). Redet darüber, bevor ein Angebot da ist, und lasst die Formulierung prüfen."
+      },
       "post_exit_competition": {
         "title": "Wettbewerb nach dem Ausscheiden",
         "question": "Was darf jemand tun, der nicht mehr dabei ist?",

@@ -31,6 +31,11 @@ export const FOUNDER_SETUP_ITEM_KEYS = [
   // "Nebentaetigkeiten" regelt die Zeit waehrenddessen, nicht danach.
   "succession",
   "post_exit_competition",
+  // Neu am 27.10.2026. "Beteiligung" regelt die Aufteilung unter euch, nicht
+  // was passiert, wenn Geld von aussen kommt oder jemand das Unternehmen
+  // kaufen will. "Founder-Exit" meint, dass eine Person geht, nicht alle.
+  "investor_dilution",
+  "company_sale",
 ] as const;
 
 export type FounderSetupItemKey = (typeof FOUNDER_SETUP_ITEM_KEYS)[number];
@@ -88,6 +93,8 @@ export const FOUNDER_SETUP_CATALOG: readonly FounderSetupCatalogItem[] = [
   { key: "founder_exit", category: "change", phase: "later", weight: "critical", legalNote: true },
   { key: "succession", category: "change", phase: "later", weight: "critical", legalNote: true },
   { key: "post_exit_competition", category: "change", phase: "later", weight: "standard", legalNote: true },
+  { key: "investor_dilution", category: "money_equity", phase: "later", weight: "critical", legalNote: true },
+  { key: "company_sale", category: "change", phase: "later", weight: "critical", legalNote: true },
 ] as const;
 
 const ITEM_KEY_SET = new Set<string>(FOUNDER_SETUP_ITEM_KEYS);

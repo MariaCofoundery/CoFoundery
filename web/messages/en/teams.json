@@ -597,6 +597,16 @@
         "question": "What happens to the shares if one of you dies?",
         "orientation": "Without a rule the shares pass to the heirs – people who don't know the company, often don't want to, and who have a say from then on. Articles of association usually handle this through a redemption or transfer clause with compensation. The topic feels uncomfortable and takes ten minutes; without a rule it takes years."
       },
+      "investor_dilution": {
+        "title": "Investors and dilution",
+        "question": "How will you handle outside money coming in and your shares getting smaller?",
+        "orientation": "With every funding round new investors receive shares, and yours shrink in percentage terms. That is common, but not trivial: who decides whether you take money, and at what dilution do you say no? Investors' rights, for example over decisions or a sale, belong here too. How this works out legally is something an adviser should look at."
+      },
+      "company_sale": {
+        "title": "Selling the company",
+        "question": "Under what conditions would you sell, and who decides?",
+        "orientation": "Buyers often want everything or nothing. Then the question is whether one person may sell against the will of the others, at what price you agree, and how the proceeds are split. Contracts often cover this with a drag-along and a tag-along right. Talk about it before an offer exists, and have the wording reviewed."
+      },
       "post_exit_competition": {
         "title": "Competition after leaving",
         "question": "What may someone do who is no longer part of it?",
