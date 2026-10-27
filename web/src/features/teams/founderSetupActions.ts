@@ -131,6 +131,23 @@ export async function createFounderSetupDiscussionEntryAction(
     p_parent_entry_id: parentEntryId || null,
   });
   if (error) redirect(itemHref(teamId, itemKey, "error"));
+  // Wer schreibt, bespricht das Thema: Der Stand springt von "Offen" auf "In Klaerung",
+  // ohne dass dafuer ein Auswahlfeld noetig ist. Bestenfalls - die Notiz bleibt
+  // unveraendert, und ein Fehler hier macht den Beitrag nicht ungeschehen.
+  const { data: row } = await supabase
+    .from("founder_team_setup_items")
+    .select("work_status, working_note")
+    .eq("team_id", teamId)
+    .eq("item_key", itemKey)
+    .maybeSingle();
+  if (!row || row.work_status === "open") {
+    await supabase.rpc("save_founder_team_setup_working_state", {
+      p_team_id: teamId,
+      p_item_key: itemKey,
+      p_work_status: "discussing",
+      p_working_note: typeof row?.working_note === "string" ? row.working_note : "",
+    });
+  }
   revalidateSetup(teamId, itemKey);
   redirect(itemHref(teamId, itemKey, "commented"));
 }

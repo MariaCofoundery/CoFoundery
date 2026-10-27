@@ -25,22 +25,19 @@ test("discussion copy is structurally parallel in DE and EN", () => {
   assert.match(en.setup.discussion.visibility, /all current founders/u);
 });
 
-test("the item page keeps confirmed, discussion, and the shared note in that order", () => {
-  // GEAENDERT am 19.09.2026: Hier stand eine Folge aus FUENF Abschnitten -
-  // bestaetigt, Gespraech, Arbeitsnotiz, offener Vorschlag, Vorschlagsformular.
-  // Zwei davon waren dasselbe Textfeld unter zwei Namen, und die Seite war
-  // dadurch zu voll. Sie sind zusammengelegt; die Reihenfolge des Restes ist
-  // weiterhin die Zusage: erst was gilt, dann das Gespraech, dann das
-  // Schreiben.
+test("the item page puts the one open action first, then the conversation, then the shared result", () => {
+  // GEAENDERT am 27.10.2026 (Umbau der Themenseite): Die offene Handlung steht jetzt
+  // OBEN ("Jetzt dran"), nicht mitten auf der Seite. Danach das Gespraech, dann
+  // "Euer Stand" mit Vorschlag und Formular. Auf breiten Fenstern steht der Stand
+  // daneben, auf schmalen ueber dem Gespraech (nur die Anzeige, nicht die DOM-Folge).
   const page = readFileSync("src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx", "utf8");
-  const confirmed = page.indexOf('revisionCard("current")');
+  const now = page.indexOf('aria-labelledby="now-title"');
   const discussion = page.indexOf('aria-labelledby="discussion-title"');
-  const pending = page.indexOf('revisionCard("pending")');
-  const note = page.indexOf('aria-labelledby="note-title"');
-  assert.ok(confirmed >= 0 && discussion > confirmed, "der bestaetigte Stand steht nicht vorn");
-  assert.ok(pending > discussion, "der offene Vorschlag steht nicht nach dem Gespraech");
-  // Der offene Vorschlag steht direkt vor der Stelle, an der man ihn ersetzt.
-  assert.ok(note > pending, "man ersetzt einen Vorschlag, den man nicht gesehen hat");
+  const stand = page.indexOf('aria-labelledby="stand-title"');
+  assert.ok(now >= 0 && discussion > now, "die offene Handlung steht nicht vor dem Gespraech");
+  assert.ok(stand > discussion, "der Stand steht nicht nach dem Gespraech");
+  // Der offene Vorschlag steht vor der Stelle, an der man ihn ersetzt.
+  assert.ok(page.indexOf('revisionBlock(item.pendingRevision, "pending")') < page.indexOf("{editor}"), "man ersetzt einen Vorschlag, den man nicht gesehen hat");
   assert.match(page, /FounderSetupDiscussionComposer/u);
   assert.doesNotMatch(page, /advisor/i);
 });

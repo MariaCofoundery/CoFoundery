@@ -97,7 +97,7 @@ test("detail makes a founder's pending confirmation and CTA hierarchy explicit i
   assert.match(de.setup.detail.documentationReference, /Nur bei „Dokumentiert“/);
   assert.match(en.setup.detail.documentationReference, /For “Documented” only/);
   assert.match(detail, /variant=\{currentUserConfirmed \? "utility" : "primary"\}/);
-  assert.match(detail, /variant="utility" className="mt-4 min-h-11"/);
-  assert.match(detail, /variant="primary" className="mt-4 min-h-11"/);
+  assert.match(detail, /variant="utility" className="min-h-11"/);
+  assert.match(detail, /variant="primary" className="min-h-11"/);
   assert.match(detail, /focus-visible:ring-2/);
 });

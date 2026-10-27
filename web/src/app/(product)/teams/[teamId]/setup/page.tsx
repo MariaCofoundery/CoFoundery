@@ -6,6 +6,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { FOUNDER_SETUP_PHASE_KEYS, getFounderSetupCatalogItem } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
+import { founderSetupRailState } from "@/features/teams/founderSetupTopicNav";
 import { FounderSetupStatusChip } from "@/features/teams/FounderSetupStatusChip";
 import { FounderSetupAdvisorAccessPanel } from "@/features/teams/FounderSetupAdvisorAccessPanel";
 import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvisorAccessData";
@@ -13,6 +14,14 @@ import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getCollaborationConversationPointCounts } from "@/features/collaborationLab/collaborationConversationPoints";
 
 type Props = { params: Promise<{ teamId: string }> };
+
+const DOT = {
+  open: "border-2 border-slate-400",
+  discussing: "border-2 border-violet-500 bg-violet-100",
+  waiting_for_you: "border-2 border-amber-500 bg-amber-100",
+  awaiting_others: "border-2 border-sky-500 bg-sky-100",
+  settled: "border-2 border-teal-600 bg-teal-600",
+} as const;
 
 export default async function FounderSetupPage({ params }: Props) {
   const { teamId } = await params;
@@ -35,12 +44,15 @@ export default async function FounderSetupPage({ params }: Props) {
     getTeamLabel(supabase, teamId),
   ]);
   const counts = countFounderSetupStatuses(setup);
+  const railState = (item: (typeof setup.items)[number]) => founderSetupRailState(item, user.id);
   // Das naechste Thema: zuerst ein wichtiges, noch offenes; sonst eines, das gerade geklaert wird oder
   // auf Bestaetigung wartet; sonst das erste offene. Keine Rangfolge der Personen, nur der Reihenfolge der Seite.
   const unsettled = FOUNDER_SETUP_PHASE_KEYS.flatMap((phase) =>
     setup.items.filter((item) => getFounderSetupCatalogItem(item.key)?.phase === phase && item.stage !== "settled")
   );
+  // Was auf DICH wartet, kommt vor allem anderen: ein Vorschlag, dem nur deine Zustimmung fehlt.
   const nextItem =
+    unsettled.find((item) => railState(item) === "waiting_for_you") ??
     unsettled.find((item) => getFounderSetupCatalogItem(item.key)?.weight === "critical" && item.stage === "open") ??
     unsettled.find((item) => item.stage === "discussing" || item.stage === "awaiting_confirmation") ??
     unsettled[0] ??
@@ -69,6 +81,12 @@ export default async function FounderSetupPage({ params }: Props) {
               </li>
             ))}
           </ul>
+        ) : null}
+        {setup.started ? (
+          <div className="mt-5" role="img" aria-label={t("list.progressLabel", { done: settledCount, total: setup.items.length })}>
+            <div className="h-2 max-w-md overflow-hidden rounded-full bg-white/25"><div className="h-full rounded-full bg-white" style={{ width: `${Math.round((settledCount / Math.max(setup.items.length, 1)) * 100)}%` }} /></div>
+            <p className="mt-1.5 text-sm font-semibold text-white">{t("list.progressLabel", { done: settledCount, total: setup.items.length })}</p>
+          </div>
         ) : null}
         <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-white/15 p-4">
           <div className="min-w-0 flex-1">
@@ -120,11 +138,15 @@ export default async function FounderSetupPage({ params }: Props) {
                 <h2 id={`setup-phase-${phase}`} className="text-xl font-semibold text-slate-950">
                   {t(`phases.${phase}.title`)}
                 </h2>
-                {openCritical > 0 ? (
-                  <span className="text-sm font-medium text-amber-800">
-                    {t("phases.openCritical", { count: openCritical })}
-                  </span>
-                ) : null}
+                <div className="flex flex-wrap items-center gap-3">
+                  {openCritical > 0 ? (
+                    <span className="text-sm font-medium text-amber-800">
+                      {t("phases.openCritical", { count: openCritical })}
+                    </span>
+                  ) : null}
+                  <span className="text-sm text-slate-600">{t("list.phaseProgress", { done: items.filter((item) => item.stage === "settled").length, total: items.length })}</span>
+                  <span aria-hidden="true" className="h-1.5 w-28 overflow-hidden rounded-full bg-[#e4e2f0]"><span className="block h-full rounded-full bg-gradient-to-r from-[#6d49e0] to-[#0a80b8]" style={{ width: `${Math.round((items.filter((item) => item.stage === "settled").length / items.length) * 100)}%` }} /></span>
+                </div>
               </div>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
                 {t(`phases.${phase}.text`)}
@@ -139,6 +161,7 @@ export default async function FounderSetupPage({ params }: Props) {
                         href={`/teams/${teamId}/setup/${item.key}`}
                         className="group flex h-full min-h-16 w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 transition hover:border-violet-300 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] sm:px-5"
                       >
+                        <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 rounded-full ${DOT[railState(item)]}`} />
                         <span className="min-w-0 flex-1">
                           <span className="block font-medium text-slate-950">
                             {t(`items.${item.key}.title`)}
@@ -155,17 +178,22 @@ export default async function FounderSetupPage({ params }: Props) {
                               : ""}
                           </span>
                         </span>
-                        {/* Die Stufe traegt das Zeichen, das Ergebnis nur
-                            die Beschriftung des letzten Schritts. */}
-                        <FounderSetupStatusChip
-                          stage={item.stage}
-                          outcome={item.outcome}
-                          label={
-                            item.stage === "settled" && item.outcome
-                              ? t(`outcomes.${item.outcome}`)
-                              : t(`stages.${item.stage}`)
-                          }
-                        />
+                        {/* Die Stufe traegt das Zeichen, das Ergebnis nur die Beschriftung
+                            des letzten Schritts. Ein offenes Thema bleibt still: "Offen" an
+                            zwanzig Zeilen ist Laerm. Was auf DICH wartet, ist hervorgehoben. */}
+                        {railState(item) === "waiting_for_you" ? (
+                          <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">{t("topic.railState.waiting_for_you")}</span>
+                        ) : item.stage !== "open" ? (
+                          <FounderSetupStatusChip
+                            stage={item.stage}
+                            outcome={item.outcome}
+                            label={
+                              item.stage === "settled" && item.outcome
+                                ? t(`outcomes.${item.outcome}`)
+                                : t(`stages.${item.stage}`)
+                            }
+                          />
+                        ) : <span className="sr-only">{t("stages.open")}</span>}
                         <svg
                           aria-hidden="true"
                           viewBox="0 0 20 20"

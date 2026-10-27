@@ -994,6 +994,50 @@
       "talk": "Besprechen",
       "confirm": "Bestätigen",
       "settled": "Festgehalten"
+    },
+    "topic": {
+      "allTopics": "Alle Themen",
+      "position": "{n} von {total}",
+      "prev": "Vorheriges Thema",
+      "next": "Nächstes Thema",
+      "railLabel": "Themen im Founder Setup",
+      "youTag": "du",
+      "railState": {
+        "open": "Offen",
+        "discussing": "In Klärung",
+        "waiting_for_you": "Wartet auf dich",
+        "awaiting_others": "Wartet auf die anderen",
+        "settled": "Festgehalten"
+      },
+      "now": {
+        "kicker": "Jetzt dran",
+        "kickerYou": "Wartet auf dich",
+        "kickerSettled": "Festgehalten",
+        "open": "Noch nichts besprochen. Schreibt einen ersten Gedanken.",
+        "openCta": "Gespräch beginnen",
+        "discussing": "Ihr sprecht darüber. Seid ihr euch einig? Dann haltet den Stand fest.",
+        "discussingCta": "Stand festhalten",
+        "pendingYou": "Es gibt einen Vorschlag. Deine Bestätigung fehlt.",
+        "pendingOthers": "Du hast bestätigt. Es fehlen noch: {names}.",
+        "settled": "Ihr habt euch geeinigt. Der Stand steht in eurer Gründer-Vereinbarung.",
+        "settledCta": "Stand ändern"
+      },
+      "stand": {
+        "title": "Euer Stand",
+        "help": "Haltet fest, worauf ihr euch einigt. Als Entwurf gilt er noch nicht.",
+        "placeholder": "Zum Beispiel: Je 25 Stunden pro Woche, ab Januar.",
+        "saveDraft": "Als Entwurf speichern",
+        "propose": "Zur Bestätigung vorschlagen",
+        "moreToggle": "Ergebnis und Verweis",
+        "changeToggle": "Stand ändern",
+        "newProposalToggle": "Anders vorschlagen",
+        "proposedAs": "Vorgeschlagen als: {outcome}",
+        "conversationJump": "Zum Gespräch"
+      }
+    },
+    "list": {
+      "progressLabel": "{done} von {total} festgehalten",
+      "phaseProgress": "{done} von {total} festgehalten"
     }
   },
   "dashboard": {

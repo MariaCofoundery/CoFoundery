@@ -994,6 +994,50 @@
       "talk": "Discuss",
       "confirm": "Confirm",
       "settled": "Settled"
+    },
+    "topic": {
+      "allTopics": "All topics",
+      "position": "{n} of {total}",
+      "prev": "Previous topic",
+      "next": "Next topic",
+      "railLabel": "Topics in Founder Setup",
+      "youTag": "you",
+      "railState": {
+        "open": "Open",
+        "discussing": "In discussion",
+        "waiting_for_you": "Waiting for you",
+        "awaiting_others": "Waiting for the others",
+        "settled": "Settled"
+      },
+      "now": {
+        "kicker": "Up next",
+        "kickerYou": "Waiting for you",
+        "kickerSettled": "Settled",
+        "open": "Nothing discussed yet. Write a first thought.",
+        "openCta": "Start the conversation",
+        "discussing": "You are talking about it. Do you agree? Then write down the result.",
+        "discussingCta": "Write down the result",
+        "pendingYou": "There is a proposal. Your confirmation is missing.",
+        "pendingOthers": "You confirmed. Still missing: {names}.",
+        "settled": "You agreed. The result is part of your founder agreement.",
+        "settledCta": "Change the result"
+      },
+      "stand": {
+        "title": "Your result",
+        "help": "Write down what you agree on. As a draft it does not count yet.",
+        "placeholder": "For example: 25 hours a week each, from January.",
+        "saveDraft": "Save as draft",
+        "propose": "Propose for confirmation",
+        "moreToggle": "Outcome and reference",
+        "changeToggle": "Change the result",
+        "newProposalToggle": "Propose something else",
+        "proposedAs": "Proposed as: {outcome}",
+        "conversationJump": "To the conversation"
+      }
+    },
+    "list": {
+      "progressLabel": "{done} of {total} settled",
+      "phaseProgress": "{done} of {total} settled"
     }
   },
   "dashboard": {
