@@ -184,6 +184,154 @@
     "workstyle": "Euer Zusammenspiel",
     "strengths": "Stärken & Antrieb"
   },
+  "testProject": {
+    "eyebrow": "Testprojekt",
+    "title": "Erst zusammen arbeiten, dann entscheiden",
+    "intro": "Ihr nehmt euch eine kleine, klar umrissene Aufgabe vor, höchstens vier Wochen lang. Danach sprecht ihr darüber, wie es war. Es gibt keine Punkte und keine Bewertung.",
+    "pair": "Für {names}",
+    "disclaimer": "Keine Rechtsberatung. Das hier ist ein Hilfsangebot zum Sortieren, kein Vertrag und keine Prüfung durch eine Anwältin oder einen Anwalt. Wer etwas Verbindliches will, holt sich vorher Rat.",
+    "flow": {
+      "draft": "Entwurf",
+      "agree": "Beide stimmen zu",
+      "work": "Arbeiten",
+      "interim": "Zwischenstand",
+      "closing": "Abschluss"
+    },
+    "feedback": {
+      "saved": "Der Entwurf ist gespeichert. Die Zustimmungen sind zurückgesetzt, beide müssen noch einmal zustimmen.",
+      "agreed": "Deine Zustimmung ist gespeichert.",
+      "started": "Beide haben zugestimmt. Das Testprojekt läuft.",
+      "withdrawn": "Deine Zustimmung ist zurückgenommen.",
+      "cancelled": "Das Testprojekt ist beendet.",
+      "submitted": "Deine Antworten sind gespeichert.",
+      "closed": "Beide haben abgeschlossen. Hier steht, was ihr geantwortet habt.",
+      "error": "Das hat nicht geklappt. Bitte versuche es noch einmal.",
+      "errors": {
+        "test_project_version_changed": "Der Entwurf wurde inzwischen geändert. Sieh dir den neuen Stand an und stimme dann zu.",
+        "test_project_incomplete": "Name, Aufgabe und mindestens ein aktiver Punkt bei „Fertig, wenn“ fehlen noch.",
+        "test_project_not_editable": "Das Testprojekt läuft schon. Der Inhalt lässt sich nicht mehr ändern.",
+        "test_project_already_open": "Ihr habt schon ein Testprojekt. Beendet es, bevor ihr ein neues beginnt.",
+        "test_project_phase_locked": "Beide haben schon geantwortet. Die Antworten sind festgehalten.",
+        "test_project_input_invalid": "Eine Angabe passt nicht. Bitte prüfe die Felder.",
+        "test_project_unavailable": "Das Testprojekt ist gerade nicht verfügbar."
+      }
+    },
+    "picker": {
+      "title": "Womit wollt ihr anfangen?",
+      "help": "Wählt ein Beispiel zum Anpassen oder denkt euch etwas Eigenes aus. Alles ist ein Entwurf, den ihr beide ändern könnt.",
+      "weeks": "{count} Wochen",
+      "free": "Frei wählbar",
+      "freeTitle": "Eigenes Testprojekt",
+      "freeText": "Ihr denkt euch die Aufgabe selbst aus, mit denselben Feldern wie die Beispiele."
+    },
+    "editor": {
+      "title": "Entwurf",
+      "help": "Schalter an oder aus, Texte ändern, Punkte ergänzen. Die andere Person sieht den Entwurf und kann ihn auch ändern.",
+      "name": "Name",
+      "namePlaceholder": "Zum Beispiel: Interviews mit Hebammen",
+      "task": "Aufgabe",
+      "taskPlaceholder": "Was machen wir konkret?",
+      "weeks": "Dauer",
+      "weeksOption": "{count} Wochen",
+      "weeksOne": "1 Woche",
+      "weeksHelp": "Höchstens vier Wochen. Danach wird entschieden, nicht verlängert.",
+      "roles": "Rollen",
+      "rolesPlaceholder": "Wer macht was? Beide auf Augenhöhe.",
+      "note": "Notiz für euch beide",
+      "notePlaceholder": "Zum Beispiel: Treffen jeden Dienstag, Tools, offene Fragen",
+      "done": "Fertig, wenn",
+      "doneHelp": "Was als fertig zählt, entscheidet ihr, nicht die Plattform.",
+      "donePlaceholder": "Woran erkennt ihr, dass es fertig ist?",
+      "addDone": "Fertig-Punkt hinzufügen",
+      "rights": "Vor dem Start gemeinsam festhalten",
+      "rightsHelp": "Das sind Fragen zum Besprechen. Sie ersetzen keine rechtliche Prüfung.",
+      "addQuestion": "Eigene Frage hinzufügen",
+      "closing": "Zum Abschluss, jede Person für sich",
+      "closingHelp": "Danach sehen beide beide Antworten. Es gibt keine Bewertung und keine Punkte.",
+      "itemOn": "Aktiv",
+      "remove": "Entfernen",
+      "save": "Entwurf speichern",
+      "create": "Entwurf anlegen"
+    },
+    "agreement": {
+      "title": "Beide stimmen zu, dann geht es los",
+      "text": "Ein Entwurf bindet niemanden. Gestartet wird erst, wenn beide dem aktuellen Stand zugestimmt haben. Ändert jemand etwas, müssen beide noch einmal zustimmen.",
+      "agreed": "{name}: zugestimmt",
+      "notYet": "{name}: noch nicht",
+      "agree": "Ich stimme zu",
+      "withdraw": "Zustimmung zurücknehmen",
+      "cancel": "Entwurf verwerfen",
+      "incomplete": "Name, Aufgabe und mindestens ein aktiver Punkt bei „Fertig, wenn“ fehlen noch.",
+      "unsaved": "Du hast Änderungen, die noch nicht gespeichert sind. Speichere zuerst den Entwurf."
+    },
+    "active": {
+      "title": "Das Testprojekt läuft",
+      "daysLeft": "Noch {count} Tage",
+      "daysLeftOne": "Noch 1 Tag",
+      "endsToday": "Der Zeitraum ist um. Zeit für den Abschluss.",
+      "until": "Bis {date}",
+      "frozen": "Der Inhalt ist jetzt festgehalten und lässt sich nicht mehr ändern.",
+      "cancel": "Testprojekt beenden",
+      "cancelHelp": "Jede Person kann es jederzeit beenden.",
+      "task": "Aufgabe",
+      "roles": "Rollen",
+      "done": "Fertig, wenn",
+      "note": "Notiz",
+      "rights": "Vorher festgehalten (Fragen zum Besprechen)"
+    },
+    "interim": {
+      "title": "Zwischenstand",
+      "help": "Jede Person antwortet für sich. Sichtbar wird es erst, wenn beide geantwortet haben.",
+      "submit": "Antworten speichern",
+      "update": "Antworten ändern",
+      "waiting": "Du hast geantwortet. Die Antworten der anderen Person siehst du, sobald sie auch geantwortet hat.",
+      "locked": "Beide haben geantwortet. Die Antworten sind festgehalten.",
+      "placeholder": "Deine Antwort"
+    },
+    "closing": {
+      "title": "Abschluss",
+      "help": "Jede Person antwortet für sich. Danach sehen beide beide Antworten.",
+      "outcome": "Was möchtest du jetzt?",
+      "submit": "Abschluss abgeben",
+      "update": "Abschluss ändern",
+      "waiting": "Du hast abgeschlossen. Die Antworten der anderen Person siehst du, sobald sie auch abgeschlossen hat.",
+      "placeholder": "Deine Antwort",
+      "outcomes": {
+        "continue": "Weitermachen",
+        "found_team": "Ein Team gründen",
+        "stop": "Es lassen"
+      }
+    },
+    "results": {
+      "title": "Eure Antworten",
+      "help": "Nebeneinander, so wie ihr sie gegeben habt. Es gibt keinen Abgleich und keine Punkte.",
+      "own": "{name} (du)",
+      "other": "{name}",
+      "noAnswer": "Keine Antwort",
+      "outcome": "Will jetzt",
+      "interim": "Zwischenstand",
+      "closing": "Abschluss",
+      "hiddenOther": "Noch nicht sichtbar",
+      "next": "Wenn ihr ein Team gründen wollt, geht es im Founder Setup weiter.",
+      "nextLink": "Zum Founder Setup"
+    },
+    "previous": {
+      "title": "Letztes Testprojekt",
+      "closed": "Beendet",
+      "cancelled": "Abgebrochen",
+      "show": "Antworten ansehen"
+    },
+    "start": "Neues Testprojekt",
+    "card": {
+      "title": "Testprojekt",
+      "description": "Eine kleine Aufgabe, bis zu vier Wochen, bevor ihr euch festlegt. Beide stimmen zu, beide antworten zum Schluss.",
+      "start": "Testprojekt beginnen",
+      "continue": "Testprojekt ansehen",
+      "draft": "Entwurf",
+      "active": "Läuft",
+      "view": "Antworten ansehen"
+    }
+  },
   "commitmentLab": {
     "title": "Commitment Lab",
     "eyebrow": "Commitment & Verantwortung",

@@ -1,4 +1,5 @@
 import { loadTeamJourneyStatus } from "@/features/teams/TeamJourneyStatus";
+import { testProjectHref } from "@/features/testProject/testProjectModel";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -108,6 +109,22 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
       !result.error && result.data ? [relationshipId] : []
     )
   );
+  // Testprojekt je Paar: nur laufend oder im Entwurf. Fehlt die Tabelle noch
+  // (Migration nicht angewendet), bleibt die Karte beim Start-Knopf stehen.
+  const testProjectResult = team.alignment.length
+    ? await supabase
+        .from("relationship_test_projects")
+        .select("relationship_id, status")
+        .in("relationship_id", team.alignment.map((entry) => entry.relationshipId))
+        .in("status", ["draft", "active"])
+    : { data: [], error: null };
+  const openTestProjects = new Map(
+    testProjectResult.error
+      ? []
+      : ((testProjectResult.data ?? []) as Array<{ relationship_id: string; status: string }>).map(
+          (row) => [row.relationship_id, row.status] as const
+        )
+  );
 
   /**
    * Ein Paar, das gerade erst zusammengefunden hat.
@@ -122,9 +139,10 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
     !setup?.started &&
     startedLabRelationships.size === 0;
 
-  const [t, commitmentT, setupT, journey] = await Promise.all([
+  const [t, commitmentT, testProjectT, setupT, journey] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.commitmentLab"),
+    getTranslations("teams.testProject"),
     getTranslations("teams.setup"),
     loadTeamJourneyStatus({ teamId: team.id, userId: user.id, client: supabase, setup }),
   ]);
@@ -263,6 +281,30 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
                           className={CARD_LINK_CLASS}
                         >
                           {commitmentT(completed ? "view" : started ? "continue" : "start")}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ) : null}
+            {team.alignment.length > 0 ? (
+              <section className={CARD_CLASS} aria-labelledby="test-project-title">
+                <h3 id="test-project-title" className="text-base font-semibold text-slate-950">{testProjectT("card.title")}</h3>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{testProjectT("card.description")}</p>
+                <ul className="mt-4 grid gap-3">
+                  {team.alignment.map((entry) => {
+                    const state = openTestProjects.get(entry.relationshipId);
+                    return (
+                      <li key={entry.relationshipId} className={isPairTeam ? "flex flex-wrap items-center gap-3" : "flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"}>
+                        <div>
+                          {!isPairTeam ? (
+                            <p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: pairName(entry.participantUserIds, names, fallback) })}</p>
+                          ) : null}
+                          {state ? <p className="mt-1 text-xs font-medium text-slate-600">{testProjectT(state === "active" ? "card.active" : "card.draft")}</p> : null}
+                        </div>
+                        <Link href={testProjectHref(teamId, entry.relationshipId)} className={CARD_LINK_CLASS}>
+                          {testProjectT(state ? "card.continue" : "card.start")}
                         </Link>
                       </li>
                     );

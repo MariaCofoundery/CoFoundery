@@ -184,6 +184,154 @@
     "workstyle": "How you work together",
     "strengths": "Strengths & drive"
   },
+  "testProject": {
+    "eyebrow": "Test project",
+    "title": "Work together first, then decide",
+    "intro": "You take on a small, clearly defined task for up to four weeks. Afterwards you talk about how it went. There are no scores and no rating.",
+    "pair": "For {names}",
+    "disclaimer": "Not legal advice. This is a helping hand for sorting things out, not a contract and not a review by a lawyer. If you want something binding, get advice first.",
+    "flow": {
+      "draft": "Draft",
+      "agree": "Both agree",
+      "work": "Work",
+      "interim": "Midway",
+      "closing": "Wrap-up"
+    },
+    "feedback": {
+      "saved": "The draft is saved. Agreements were reset, so both of you need to agree again.",
+      "agreed": "Your agreement is saved.",
+      "started": "Both of you agreed. The test project is running.",
+      "withdrawn": "Your agreement is withdrawn.",
+      "cancelled": "The test project has ended.",
+      "submitted": "Your answers are saved.",
+      "closed": "Both of you have wrapped up. Here is what you each answered.",
+      "error": "That did not work. Please try again.",
+      "errors": {
+        "test_project_version_changed": "The draft was changed in the meantime. Look at the new version, then agree.",
+        "test_project_incomplete": "A name, a task and at least one active “Done when” item are still missing.",
+        "test_project_not_editable": "The test project is already running. Its content can no longer be changed.",
+        "test_project_already_open": "You already have a test project. End it before you start a new one.",
+        "test_project_phase_locked": "You both already answered. The answers are fixed.",
+        "test_project_input_invalid": "Something does not fit. Please check the fields.",
+        "test_project_unavailable": "The test project is not available right now."
+      }
+    },
+    "picker": {
+      "title": "Where do you want to start?",
+      "help": "Pick an example to adapt, or come up with your own. Everything is a draft that either of you can change.",
+      "weeks": "{count} weeks",
+      "free": "Your choice",
+      "freeTitle": "Own test project",
+      "freeText": "You come up with the task yourselves, using the same fields as the examples."
+    },
+    "editor": {
+      "title": "Draft",
+      "help": "Switch items on or off, change the text, add points. The other person sees the draft and can change it too.",
+      "name": "Name",
+      "namePlaceholder": "For example: interviews with midwives",
+      "task": "Task",
+      "taskPlaceholder": "What exactly will we do?",
+      "weeks": "Duration",
+      "weeksOption": "{count} weeks",
+      "weeksOne": "1 week",
+      "weeksHelp": "Four weeks at most. After that you decide, you do not extend.",
+      "roles": "Roles",
+      "rolesPlaceholder": "Who does what? Both as equals.",
+      "note": "Note for both of you",
+      "notePlaceholder": "For example: meet every Tuesday, tools, open questions",
+      "done": "Done when",
+      "doneHelp": "What counts as done is up to you, not the platform.",
+      "donePlaceholder": "How will you know it is done?",
+      "addDone": "Add a “done” item",
+      "rights": "Agree on before you start",
+      "rightsHelp": "These are questions to talk through. They do not replace a legal review.",
+      "addQuestion": "Add your own question",
+      "closing": "At the end, each person on their own",
+      "closingHelp": "Afterwards you both see both sets of answers. There is no rating and no score.",
+      "itemOn": "Active",
+      "remove": "Remove",
+      "save": "Save draft",
+      "create": "Create draft"
+    },
+    "agreement": {
+      "title": "Both agree, then it starts",
+      "text": "A draft does not bind anyone. It only starts once both of you have agreed to the current version. If someone changes something, you both need to agree again.",
+      "agreed": "{name}: agreed",
+      "notYet": "{name}: not yet",
+      "agree": "I agree",
+      "withdraw": "Withdraw my agreement",
+      "cancel": "Discard the draft",
+      "incomplete": "A name, a task and at least one active “Done when” item are still missing.",
+      "unsaved": "You have changes that are not saved yet. Save the draft first."
+    },
+    "active": {
+      "title": "The test project is running",
+      "daysLeft": "{count} days left",
+      "daysLeftOne": "1 day left",
+      "endsToday": "The period is over. Time to wrap up.",
+      "until": "Until {date}",
+      "frozen": "The content is now fixed and can no longer be changed.",
+      "cancel": "End the test project",
+      "cancelHelp": "Either of you can end it at any time.",
+      "task": "Task",
+      "roles": "Roles",
+      "done": "Done when",
+      "note": "Note",
+      "rights": "Agreed beforehand (questions to talk through)"
+    },
+    "interim": {
+      "title": "Midway check",
+      "help": "Each person answers on their own. It only becomes visible once you both have answered.",
+      "submit": "Save answers",
+      "update": "Change answers",
+      "waiting": "You have answered. You will see the other person's answers once they have answered too.",
+      "locked": "You both answered. The answers are fixed.",
+      "placeholder": "Your answer"
+    },
+    "closing": {
+      "title": "Wrap-up",
+      "help": "Each person answers on their own. Afterwards you both see both sets of answers.",
+      "outcome": "What do you want now?",
+      "submit": "Submit wrap-up",
+      "update": "Change wrap-up",
+      "waiting": "You have wrapped up. You will see the other person's answers once they have wrapped up too.",
+      "placeholder": "Your answer",
+      "outcomes": {
+        "continue": "Carry on",
+        "found_team": "Found a team",
+        "stop": "Leave it"
+      }
+    },
+    "results": {
+      "title": "Your answers",
+      "help": "Side by side, as you gave them. There is no comparison and no score.",
+      "own": "{name} (you)",
+      "other": "{name}",
+      "noAnswer": "No answer",
+      "outcome": "Wants now",
+      "interim": "Midway",
+      "closing": "Wrap-up",
+      "hiddenOther": "Not visible yet",
+      "next": "If you want to found a team, carry on in the Founder Setup.",
+      "nextLink": "To the Founder Setup"
+    },
+    "previous": {
+      "title": "Last test project",
+      "closed": "Ended",
+      "cancelled": "Cancelled",
+      "show": "View answers"
+    },
+    "start": "New test project",
+    "card": {
+      "title": "Test project",
+      "description": "A small task, up to four weeks, before you commit. Both agree, both answer at the end.",
+      "start": "Start a test project",
+      "continue": "View the test project",
+      "draft": "Draft",
+      "active": "Running",
+      "view": "View answers"
+    }
+  },
   "commitmentLab": {
     "title": "Commitment Lab",
     "eyebrow": "Commitment & responsibility",
