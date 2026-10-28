@@ -1,6 +1,6 @@
 # Dienstleister und Löschfristen (Arbeitsstand für die Datenschutzerklärung)
 
-Stand: 28.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche Einordnung bleibt bei der Beratung.
+Stand: 28.10.2026 (ergänzt um Punkt 7). Fakten aus dem Code und aus deinen Einträgen. Die rechtliche Einordnung bleibt bei der Beratung.
 
 ## Dienstleister, die mit Nutzerdaten zu tun haben
 | Dienst | Wofür | Daten | Region / Vertrag |
@@ -54,6 +54,7 @@ Grundsatz: Es bleibt nur, was das Produkt noch nutzt. Nach einem Check-in zeigt 
 4. **Rechtliche Hinweistexte im Founder Setup:** siehe Abschnitt unten.
 5. **„Oft ein Knackpunkt":** allgemeiner redaktioneller Hinweis mit Quellenangabe (Studien-Seite in der Founder Library), kein Personenbezug, nur zur Kenntnis.
 6. **Öffentliche Datenschutzerklärung:** Die neuen Fristen und die Erinnerung aufnehmen (siehe oben).
+7. **Finanzierungsmodul und Investor-Rolle (nur falls gebaut):** Plattform mit Investoren, die nichts empfiehlt und nicht vermittelt. Fragen zu ECSPR („matching“), Anlageberatung (Anschein), Zahlung durch Investoren, Datenschutz-Rollen und Verschwiegenheit stehen in `docs/research/phase-13/13.7-finanzierung-investor-recherche.md`. Der Wegweiser (Checkliste für Teams, keine Investorendaten, keine neue Rolle) braucht diese Klärung nicht, ein Investorenzugang schon.
 
 ## Offen: Rechtliche Hinweistexte im Founder Setup (Prüfung durch die Beratung)
 Die Vorschläge zu „Was ist bei diesem Thema rechtlich zu beachten?“ (je Setup-Thema, Entwurf in `docs/research/phase-13/13.4-recherche-rechtliche-hinweise-entwurf.md`) sind **nicht eingebaut** und nicht geprüft. Vor dem Einbau:
