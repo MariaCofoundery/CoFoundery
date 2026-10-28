@@ -32,6 +32,14 @@ export const NOTICE_RETENTION_DAYS = 180;
 /** Feedback verliert nach 60 Tagen den Personenbezug; nie angenommene, abgelaufene Einladungen werden nach 60 Tagen geloescht (`purge_stale_personal_rows`). */
 export const FEEDBACK_ANONYMIZE_DAYS = 60;
 export const INVITATION_RETENTION_DAYS = 60;
+/**
+ * Check-in und Testprojekt (`purge_stale_team_work_rows`): Antworten 365 Tage nach Abschluss,
+ * Rueckblick 180, nie gestartete Testprojekt-Entwuerfe 90, Erinnerungs-Stempel 365.
+ */
+export const TEAM_WORK_ANSWER_DAYS = 365;
+export const TEAM_WORK_RETRO_DAYS = 180;
+export const TEST_PROJECT_DRAFT_DAYS = 90;
+export const REMINDER_STAMP_DAYS = 365;
 
 type RpcError = { code?: string | null } | null;
 type RpcResult = { data: unknown; error: RpcError };
@@ -49,12 +57,22 @@ export type PrivacyRetentionResult = {
   eventCleanup: StepStatus;
   operationalCleanup: StepStatus;
   personalCleanup: StepStatus;
+  teamWorkCleanup: StepStatus;
   /** Nur Zählwerte, die die SQL-Funktionen selbst zurückgeben. */
   counts: {
     research: { retentionDays: number; deletedResearchEvents: number; deletedProductAnalyticsEvents: number } | null;
     events: { closedEvents: number; deletedAnswers: number; deletedParticipants: number } | null;
     operational: { deletedAiJobs: number; deletedNotices: number } | null;
     personal: { anonymizedFeedback: number; deletedInvitations: number } | null;
+    teamWork: {
+      deletedRetroAnswers: number;
+      deletedRetroInvites: number;
+      deletedCheckInTopics: number;
+      deletedCheckInSubmissions: number;
+      deletedTestProjectDrafts: number;
+      deletedTestProjects: number;
+      deletedReminderStamps: number;
+    } | null;
   };
 };
 
@@ -101,12 +119,19 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
     p_feedback_days: FEEDBACK_ANONYMIZE_DAYS,
     p_invitation_days: INVITATION_RETENTION_DAYS,
   });
+  const teamWork = await runStep(client, "purge_stale_team_work_rows", {
+    p_answer_days: TEAM_WORK_ANSWER_DAYS,
+    p_retro_days: TEAM_WORK_RETRO_DAYS,
+    p_draft_days: TEST_PROJECT_DRAFT_DAYS,
+    p_stamp_days: REMINDER_STAMP_DAYS,
+  });
   return {
-    ok: research.ok && events.ok && operational.ok && personal.ok,
+    ok: research.ok && events.ok && operational.ok && personal.ok && teamWork.ok,
     researchCleanup: research.ok ? "ok" : "failed",
     eventCleanup: events.ok ? "ok" : "failed",
     operationalCleanup: operational.ok ? "ok" : "failed",
     personalCleanup: personal.ok ? "ok" : "failed",
+    teamWorkCleanup: teamWork.ok ? "ok" : "failed",
     counts: {
       research: research.ok
         ? pickCounts(research.data, ["retentionDays", "deletedResearchEvents", "deletedProductAnalyticsEvents"] as const)
@@ -114,6 +139,17 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
       events: events.ok ? pickCounts(events.data, ["closedEvents", "deletedAnswers", "deletedParticipants"] as const) : null,
       operational: operational.ok ? pickCounts(operational.data, ["deletedAiJobs", "deletedNotices"] as const) : null,
       personal: personal.ok ? pickCounts(personal.data, ["anonymizedFeedback", "deletedInvitations"] as const) : null,
+      teamWork: teamWork.ok
+        ? pickCounts(teamWork.data, [
+            "deletedRetroAnswers",
+            "deletedRetroInvites",
+            "deletedCheckInTopics",
+            "deletedCheckInSubmissions",
+            "deletedTestProjectDrafts",
+            "deletedTestProjects",
+            "deletedReminderStamps",
+          ] as const)
+        : null,
     },
   };
 }

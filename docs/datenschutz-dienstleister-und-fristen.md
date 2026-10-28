@@ -1,6 +1,6 @@
 # Dienstleister und Löschfristen (Arbeitsstand für die Datenschutzerklärung)
 
-Stand: 27.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche Einordnung bleibt bei der Beratung.
+Stand: 28.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche Einordnung bleibt bei der Beratung.
 
 ## Dienstleister, die mit Nutzerdaten zu tun haben
 | Dienst | Wofür | Daten | Region / Vertrag |
@@ -25,9 +25,12 @@ Stand: 27.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche
 | Nie angenommene, abgelaufene Einladungen | 60 Tage nach Ablauf | gelöscht, samt Mailadresse |
 | Nachrichten | keine feste Frist | Teilnehmende können eigene Nachrichten zurücknehmen (Text wird gelöscht). Beim Löschen eines Kontos wird die Seite anonym |
 | Forschungsantworten bei Widerruf | sofort | gelöscht (Trigger in der Datenbank) |
-| Testprojekt (Entwurf, Zustimmungen, Antworten) | keine feste Frist, offen | bleibt, solange das Paar besteht. Beim Löschen eines Kontos fallen Zustimmungen und Antworten dieser Person weg, das Projekt bleibt ohne Namen des Erstellers. Eine feste Löschfrist ist noch zu entscheiden. |
-| Check-in (Antworten, Abgaben, Rückblick) | keine feste Frist, offen | bleibt, solange das Team besteht. Beim Löschen eines Kontos fallen die Antworten, Abgaben und Rückblick-Antworten dieser Person weg. Eine feste Löschfrist ist noch zu entscheiden. |
-| Check-in-Erinnerung (Stempel „wurde erinnert“) | keine feste Frist | Eine Zeile je Person, Team und Fälligkeit, ohne Inhalt. Fällt mit dem Konto oder dem Team weg (Kaskade). Es gibt keinen Zeitplan, der sie vorher löscht; bei Bedarf in den täglichen Löschlauf aufnehmen (z. B. 12 Monate). |
+| Testprojekt, nie gestarteter Entwurf | 90 Tage nach der letzten Änderung | gelöscht (täglicher Löschlauf, seit Migration 20270106120000) |
+| Testprojekt, beendet oder abgebrochen (Zustimmungen, Antworten) | 365 Tage nach dem Ende | das ganze Projekt wird gelöscht. Ein laufendes Projekt bleibt, solange es läuft. Beim Löschen eines Kontos fallen Zustimmungen und Antworten dieser Person ohnehin weg |
+| Check-in, Antworten, Notizen, eigene Punkte, Abgaben | 365 Tage nach Abschluss oder Überspringen | gelöscht. Offene Check-ins werden nie angefasst |
+| Check-in, Rückblick (Antworten, Einladungen, Fragen) | 180 Tage nach Abschluss | gelöscht, kürzer als die Antworten, weil Freitext und persönlicher |
+| Check-in selbst (Datum, Status, Abstand) | bleibt, solange das Team besteht | ohne Personenbezug im Inhalt; wird gebraucht, um zu berechnen, wann der nächste fällig ist |
+| Check-in-Erinnerung (Stempel „wurde erinnert“) | 365 Tage nach der Fälligkeit | gelöscht. Eine Zeile je Person, Team und Fälligkeit, ohne Inhalt |
 
 ## Benachrichtigungen: Erinnerung an den Check-in (neu, 27.10.2026)
 - **Zwei Wege, zwei Voreinstellungen.** Mitteilung aufs Gerät: an, solange nicht abbestellt (setzt die Erlaubnis im Browser voraus). E-Mail: **aus, bis die Person im Konto ausdrücklich zustimmt**, weil die Erinnerung vom Zeitplan kommt und nicht von einem Menschen. Beides unter Konto → Post, Art „Check-in fällig“.
@@ -36,12 +39,18 @@ Stand: 27.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche
 - **Dienstleister:** wie bisher Resend (Mail) und der Push-Dienst des Browsers. Kein neuer Empfänger.
 - **Technik:** läuft im vorhandenen täglichen Lauf mit (Vercel Hobby erlaubt nur zwei Zeitpläne). Ein Wechsel auf Pro würde einen eigenen Lauf erlauben, ist aber nicht nötig.
 
-## Offen: Löschfristen für Testprojekt und Check-in
-Heute gilt für beide keine feste Frist. Was zu entscheiden ist, mit einem Vorschlag:
-1. **Abgeschlossene Check-ins und Testprojekte:** Antworten nach 24 Monaten löschen? Vorschlag: ja, die Vereinbarungen im Founder Setup bleiben davon unberührt, nur die Antworten und Rückblicke fallen weg.
-2. **Rückblick-Antworten:** persönlicher als die Check-in-Antworten. Vorschlag: kürzere Frist (z. B. 12 Monate nach Abschluss).
-3. **Person verlässt das Team:** bleiben ihre früheren Antworten für die anderen sichtbar? Vorschlag: ja für abgeschlossene Check-ins (sie gehören zum gemeinsamen Verlauf), nicht für laufende. **Noch im Code zu prüfen**, bevor es in die Erklärung kommt.
-4. **Technisch:** Die Fristen kämen in den täglichen Löschlauf (`/api/cron/privacy-retention`), mit Test. Erst bauen, wenn die Frist entschieden ist.
+## Löschfristen für Testprojekt und Check-in (umgesetzt, 28.10.2026)
+Grundsatz: Es bleibt nur, was das Produkt noch nutzt. Nach einem Check-in zeigt die Seite nur den letzten abgeschlossenen; ältere Antworten hat kein Feature mehr. Die Löschung steht in der SQL-Funktion `purge_stale_team_work_rows` und läuft im täglichen Löschlauf (`/api/cron/privacy-retention`). Zahlen stehen in `retentionCleanup.ts`; die Antwort des Laufs nennt nur Zählwerte. Die Fristen sind Vorgaben, keine Rechtsfristen.
+
+**Noch zu tun, wenn es live ist:** Die öffentliche Datenschutzerklärung (`web/src/app/datenschutz/page.tsx`) nennt diese Fristen noch nicht. Der Text dort wird bewusst nur nach Prüfung geändert, deshalb nicht automatisch angepasst.
+
+## Für das Gespräch mit einer Anwältin oder einem Anwalt (gesammelt)
+1. **Person verlässt das Team, Beiträge bleiben?** Heute: Die Person verlässt das Team, ihre Beiträge im Gespräch zu einem Setup-Thema und ihre bestätigten Vereinbarungen bleiben stehen (die Bestätigungen zählen nur für aktuelle Mitglieder). Offen: Darf das Team die Beiträge behalten, wenn die Person ausscheidet und der Löschung widerspricht? Wie weit geht ihr Anspruch auf Löschung gegen das Interesse des Teams an einem nachvollziehbaren Verlauf? Alternative zur Löschung: Anonymisieren („frühere Person"). Produktidee dazu siehe unten.
+2. **Freitext im Check-in-Rückblick und in Testprojekt-Antworten:** Sind 180 bzw. 365 Tage angemessen? Rechtsgrundlage (Vertrag, berechtigtes Interesse)? Die Antworten sind nur für Teammitglieder sichtbar und nach dem Abschluss lesbar.
+3. **Erinnerungs-E-Mail zum Check-in:** Die E-Mail kommt nur nach ausdrücklichem Anklicken im Konto (Opt-in), die Mitteilung aufs Gerät ist an, wenn der Browser sie erlaubt hat. Reicht das, oder braucht die Mail zusätzlich einen Hinweis zur Abmeldung im Text (steht bereits als Fußzeile)?
+4. **Rechtliche Hinweistexte im Founder Setup:** siehe Abschnitt unten.
+5. **„Oft ein Knackpunkt":** allgemeiner redaktioneller Hinweis mit Quellenangabe (Studien-Seite in der Founder Library), kein Personenbezug, nur zur Kenntnis.
+6. **Öffentliche Datenschutzerklärung:** Die neuen Fristen und die Erinnerung aufnehmen (siehe oben).
 
 ## Offen: Rechtliche Hinweistexte im Founder Setup (Prüfung durch die Beratung)
 Die Vorschläge zu „Was ist bei diesem Thema rechtlich zu beachten?“ (je Setup-Thema, Entwurf in `docs/research/phase-13/13.4-recherche-rechtliche-hinweise-entwurf.md`) sind **nicht eingebaut** und nicht geprüft. Vor dem Einbau:
