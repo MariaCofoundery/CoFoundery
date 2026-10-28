@@ -75,3 +75,13 @@ test("the discussion data path is narrow and does not expose email or advisor ac
   assert.match(action, /create_founder_team_setup_discussion_entry/u);
   assert.doesNotMatch(advisorRead, /founder_team_setup_discussion_entries/u);
 });
+
+test("ein ausgeschiedenes Mitglied erscheint als 'Ehemaliges Mitglied', nicht als 'Founder 1'", () => {
+  const page = readFileSync("src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx", "utf8");
+  const start = page.indexOf("const memberName");
+  const body = page.slice(start, page.indexOf("};", start));
+  // Der Rueckfall fuer eine unbekannte Kennung ist die fruehere Person; nur ein bekanntes Mitglied
+  // ohne Namen bekommt "Founder n".
+  assert.match(body, /: t\("formerMember"\)/);
+  assert.doesNotMatch(body, /founderFallback", \{ index: 1 \}/);
+});

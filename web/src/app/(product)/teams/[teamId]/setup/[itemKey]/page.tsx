@@ -71,13 +71,15 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
     dateStyle: "medium",
     timeStyle: "short",
   });
-  // Null heisst: Das Konto ist geloescht - siehe Commitment Lab.
+  // Null heisst: Das Konto ist geloescht. Eine Kennung, die nicht mehr zu den aktuellen
+  // Mitgliedern gehoert, ist jemand, der das Team verlassen hat - beides "fruehere Person".
+  // (Vorher stand hier fuer ausgeschiedene Mitglieder "Founder 1" und damit ein falscher Name.)
   const memberName = (userId: string | null) => {
     if (!userId) return t("formerMember");
     const index = setup.members.findIndex((member) => member.userId === userId);
     return index >= 0
       ? setup.members[index].displayName ?? t("founderFallback", { index: index + 1 })
-      : t("founderFallback", { index: 1 });
+      : t("formerMember");
   };
   const saveAction = saveFounderSetupWorkingStateAction.bind(null, teamId, itemKey);
   const proposeAction = proposeFounderSetupRevisionAction.bind(null, teamId, itemKey);
