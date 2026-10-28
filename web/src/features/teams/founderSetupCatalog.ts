@@ -113,23 +113,29 @@ export function getFounderSetupItemsByPhase(phase: FounderSetupPhaseKey) {
 }
 
 /**
- * Themen, bei denen die Meinungen in Gruenderteams haeufig auseinandergehen.
+ * Themen, die in der Forschung haeufig als Konfliktquelle von Gruenderteams genannt
+ * werden.
  *
- * DAS IST EINE REDAKTIONELLE EINSCHAETZUNG, KEINE MESSUNG, und sie sagt nichts
- * ueber EUER Team. Sie ist getrennt von `weight`: "critical" heisst "wird teuer,
- * wenn es offen bleibt" (auch Rechtsform oder Rechte am Geschaffenen, die selten
- * streitig sind); diese Liste heisst "hier wird oft gestritten". Kein Rang, keine
- * Ampel, kein Zaehler - nur ein Hinweis am Thema.
+ * QUELLE UND GRENZE: Kozusznik & Euwema (2025), "Conflict Issues in Start-up
+ * Co-founders: Typology and Measurement", Negotiation and Conflict Management
+ * Research 18(3), 237-277, DOI 10.34891/mvb8-sm62. Interviews und zwei
+ * Befragungen mit kleinen Stichproben, Selbstauskunft, nicht repraesentativ. Das
+ * traegt "wird haeufig als Konfliktquelle genannt", NICHT "statistisch haeufig"
+ * und nichts ueber EUER Team. Vesting, Verwaesserung, Ausscheiden und anderes sind
+ * bewusst nicht dabei, solange keine Quelle sie traegt. Belege und Luecken:
+ * docs/research/phase-13/13.5-quellen-konfliktthemen.md.
+ *
+ * Getrennt von `weight` ("critical" = wird teuer, wenn es offen bleibt). Kein Rang,
+ * keine Ampel, kein Zaehler - nur ein Hinweis am Thema.
  */
 export const FOUNDER_SETUP_CONFLICT_PRONE: ReadonlySet<FounderSetupItemKey> = new Set<FounderSetupItemKey>([
+  // Geld
+  "equity",
+  "compensation",
+  "contributions_expenses",
+  // Normen
   "roles_responsibilities",
   "decision_rights",
   "time_commitment",
-  "conflict_deadlock",
-  "equity",
-  "vesting",
-  "compensation",
-  "changing_commitment",
-  "founder_exit",
-  "investor_dilution",
+  "communication",
 ]);

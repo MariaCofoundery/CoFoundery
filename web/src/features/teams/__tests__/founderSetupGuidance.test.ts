@@ -85,7 +85,7 @@ test("kritisch zaehlt weiter, der Hinweis am Thema ist 'oft strittig' und kein R
   assert.ok(critical.length < FOUNDER_SETUP_CATALOG.length, "wenn alles wichtig ist, ist nichts wichtig");
 
   // GEAENDERT am 28.10.2026: Die Zeile "wird teuer, wenn es offen bleibt" an jedem
-  // Thema ist weg. Der Hinweis am Thema ist jetzt "Oft ein Knackpunkt" (statistisch, nicht ueber das Team) - eine getrennte,
+  // Thema ist weg. Der Hinweis am Thema ist jetzt "Oft ein Knackpunkt" (Forschung nennt es haeufig, nichts ueber das Team) - eine getrennte,
   // redaktionelle Liste (FOUNDER_SETUP_CONFLICT_PRONE), kein Urteil ueber das Team.
   const overview = source(OVERVIEW);
   assert.match(overview, /FOUNDER_SETUP_CONFLICT_PRONE\.has\(item\.key\)/);
@@ -99,8 +99,10 @@ test("kritisch zaehlt weiter, der Hinweis am Thema ist 'oft strittig' und kein R
     const list = setupCopy(locale).list as unknown as Record<string, string>;
     assert.ok(list?.conflict && list?.conflictHelp, `${locale}: Hinweistext fehlt`);
     // Der Hinweis sagt nichts ueber EUER Team und ist keine Wertung.
-    assert.match(list.conflictHelp, locale === "de" ? /Statistisch gesehen[\s\S]*nicht, dass es bei euch so ist/ : /Statistically[\s\S]*does not mean it will be for you/, `${locale}: der Hinweis grenzt sich nicht ab`);
+    assert.match(list.conflictHelp, locale === "de" ? /Forschung[\s\S]*häufig[\s\S]*nicht, dass es bei euch so ist/ : /[Rr]esearch[\s\S]*does not mean it will be for you/, `${locale}: der Hinweis grenzt sich nicht ab`);
     assert.doesNotMatch(list.conflict, /Score|Punkte|riskant|gefährlich|risky|danger/i);
+    // Eine einzelne Studie mit kleinen Stichproben traegt "wird genannt", nicht "statistisch".
+    assert.doesNotMatch(list.conflictHelp, /statistisch|statistically/i, `${locale}: der Hinweis behauptet mehr, als die Quelle traegt`);
   }
 });
 
