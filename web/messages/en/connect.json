@@ -441,7 +441,8 @@
     "publish_summary": "Publication needs a description with at least 20 characters.",
     "publish_profile": "Publish your complete CONNECT profile first. Your contribution remains a draft.",
     "publish_conflict": "This contribution has changed. Reload the page and review its current state.",
-    "publish_membership": "You need active CONNECT membership to publish this contribution."
+    "publish_membership": "You need active CONNECT membership to publish this contribution.",
+    "problem_too_long": "The description and “Already tried” are too long together. Shorten one of them."
   },
   "problems": {
     "title": "What people see unsolved",
@@ -488,7 +489,10 @@
       "locationsHint": "Separate with commas, at most {max}.",
       "publish": "Publish",
       "saveDraft": "Save as draft",
-      "saveChanges": "Save changes"
+      "saveChanges": "Save changes",
+      "tried": "What do you already know, what have you tried?",
+      "triedHint": "Optional. Two sentences are enough. That way nobody starts from zero again.",
+      "triedPlaceholder": "For example: Spoke to three managers, a WhatsApp group did not last."
     },
     "profileRequiredTitle": "Publishing needs a profile first",
     "profileRequiredText": "You can save a draft at any time. A problem can only be published once your Connect profile is active – otherwise nobody can respond to it.",
@@ -607,7 +611,14 @@
     "outlivesLabel": "May stay anonymously if I delete my account",
     "outlivesHint": "Without this, the problem disappears with your account – and with it the approaches others wrote for it. With it, the text stays without your name. You will be asked again when you delete.",
     "outlivesApproachLabel": "May stay anonymously if I delete my account",
-    "outlivesApproachHint": "This approach sits on someone else's page. Without this, it disappears from there along with your account."
+    "outlivesApproachHint": "This approach sits on someone else's page. Without this, it disappears from there along with your account.",
+    "live": {
+      "title": "How your note will hang on the board",
+      "emptyTitle": "Your sentence appears here",
+      "emptyDescription": "And below it, what is missing today.",
+      "tried": "Already tried",
+      "now": "just now"
+    }
   },
   "searches": {
     "title": "My notification rules",
@@ -931,7 +942,9 @@
     },
     "workspaceHint": "To explore a problem together, you can use a private workspace. Only people explicitly invited can see the space and its contents.",
     "workspaces": "Go to your private workspaces",
-    "filterTitle": "Filter problems"
+    "filterTitle": "Filter problems",
+    "boardHint": "Sorted by age, newest first. Nothing rises to the top.",
+    "nowOnBoard": "On the board right now"
   },
   "matchingReasons": {
     "CONNECT_TOPIC_MATCH": "The offer mentions {offer_topic}; your request asks for {seek_topic}.",

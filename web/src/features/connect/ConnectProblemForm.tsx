@@ -9,6 +9,7 @@ import {
   PROBLEM_TITLE_MIN,
   type ConnectProblem,
 } from "@/features/connect/connectTypes";
+import { PROBLEM_TRIED_MAX } from "@/features/connect/problemDescription";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 
@@ -40,7 +41,7 @@ export function ConnectProblemForm({
   const isPublished = !!problem && problem.status !== "draft";
 
   return (
-    <form action={action} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
+    <form id="problem-form" action={action} className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-6">
       {problem ? <input type="hidden" name="problem_id" value={problem.id} /> : null}
 
       <label className="block text-sm font-medium">
@@ -76,6 +77,23 @@ export function ConnectProblemForm({
           {t("problems.form.descriptionHint", { min: PROBLEM_DESCRIPTION_MIN })}
         </span>
       </label>
+
+      {/* Nur beim Einstellen: Beim Bearbeiten steht der Absatz schon in der
+          Beschreibung, ein zweites Feld wuerde ihn doppeln. */}
+      {!problem ? (
+        <label className="block text-sm font-medium" htmlFor="problem-tried">
+          {t("problems.form.tried")}
+          <textarea
+            id="problem-tried"
+            name="tried"
+            rows={2}
+            maxLength={PROBLEM_TRIED_MAX}
+            placeholder={t("problems.form.triedPlaceholder")}
+            className={field}
+          />
+          <span className={hint}>{t("problems.form.triedHint")}</span>
+        </label>
+      ) : null}
 
       <fieldset>
         <legend className="text-sm font-medium">{t("problems.form.intent")}</legend>

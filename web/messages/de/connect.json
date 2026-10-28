@@ -441,7 +441,8 @@
     "publish_summary": "Für die Veröffentlichung fehlt eine Beschreibung mit mindestens 20 Zeichen.",
     "publish_profile": "Veröffentliche zuerst dein vollständiges CONNECT-Profil. Dein Beitrag bleibt als Entwurf erhalten.",
     "publish_conflict": "Der Beitrag wurde inzwischen geändert. Lade die Seite neu und prüfe den aktuellen Stand.",
-    "publish_membership": "Du brauchst eine aktive CONNECT-Mitgliedschaft, um diesen Beitrag zu veröffentlichen."
+    "publish_membership": "Du brauchst eine aktive CONNECT-Mitgliedschaft, um diesen Beitrag zu veröffentlichen.",
+    "problem_too_long": "Beschreibung und „Schon versucht\" sind zusammen zu lang. Kürze eines von beiden."
   },
   "problems": {
     "title": "Ungelöstes, das jemand sieht",
@@ -488,7 +489,10 @@
       "locationsHint": "Mit Komma trennen, maximal {max}.",
       "publish": "Veröffentlichen",
       "saveDraft": "Als Entwurf speichern",
-      "saveChanges": "Änderungen speichern"
+      "saveChanges": "Änderungen speichern",
+      "tried": "Was weißt du schon, was hast du versucht?",
+      "triedHint": "Optional. Zwei Sätze reichen. So fängt niemand wieder bei null an.",
+      "triedPlaceholder": "Zum Beispiel: Mit drei Leitungen gesprochen, eine WhatsApp-Gruppe hat nicht gehalten."
     },
     "profileRequiredTitle": "Veröffentlichen geht erst mit Profil",
     "profileRequiredText": "Als Entwurf kannst du jederzeit speichern. Veröffentlichen lässt sich ein Problem erst, wenn dein Connect-Profil aktiv ist – sonst kann niemand darauf antworten.",
@@ -607,7 +611,14 @@
     "outlivesLabel": "Darf anonym stehen bleiben, wenn ich mein Konto lösche",
     "outlivesHint": "Ohne dieses Häkchen verschwindet das Problem mit deinem Konto – und mit ihm die Ansätze, die andere dazu geschrieben haben. Mit Häkchen bleibt der Text ohne deinen Namen stehen. Du wirst beim Löschen noch einmal gefragt.",
     "outlivesApproachLabel": "Darf anonym stehen bleiben, wenn ich mein Konto lösche",
-    "outlivesApproachHint": "Dieser Ansatz steht auf der Seite einer anderen Person. Ohne Häkchen verschwindet er dort mit deinem Konto."
+    "outlivesApproachHint": "Dieser Ansatz steht auf der Seite einer anderen Person. Ohne Häkchen verschwindet er dort mit deinem Konto.",
+    "live": {
+      "title": "So hängt deine Notiz am Brett",
+      "emptyTitle": "Dein Satz erscheint hier",
+      "emptyDescription": "Und darunter das, was heute fehlt.",
+      "tried": "Schon versucht",
+      "now": "gerade eben"
+    }
   },
   "searches": {
     "title": "Meine Benachrichtigungsregeln",
@@ -931,7 +942,9 @@
     },
     "workspaceHint": "Wenn ihr gemeinsam weiterdenken möchtet, könnt ihr einen privaten Arbeitsraum nutzen. Nur ausdrücklich eingeladene Personen sehen den Raum und seine Inhalte.",
     "workspaces": "Zu deinen privaten Arbeitsräumen",
-    "filterTitle": "Probleme eingrenzen"
+    "filterTitle": "Probleme eingrenzen",
+    "boardHint": "Nach Alter sortiert, neueste zuerst. Nichts steigt auf.",
+    "nowOnBoard": "Gerade am Brett"
   },
   "matchingReasons": {
     "CONNECT_TOPIC_MATCH": "Das Angebot nennt {offer_topic}; dein Gesuch sucht {seek_topic}.",

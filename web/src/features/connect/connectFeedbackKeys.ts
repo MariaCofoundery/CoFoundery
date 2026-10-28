@@ -27,6 +27,7 @@ export const CONNECT_ERROR_KEYS = [
   "venture_website",
   "problem_title",
   "problem_description",
+  "problem_too_long",
   "problem_intent",
   "interest_note",
   "perspective",

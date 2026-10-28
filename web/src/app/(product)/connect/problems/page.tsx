@@ -7,6 +7,7 @@ import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getActiveConnectProblems } from "@/features/connect/connectProblemData";
 import { CONNECT_GEOGRAPHIC_SCOPES, CONNECT_PROBLEM_INTENTS } from "@/features/connect/connectTypes";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
+import { ProblemTypewriter } from "@/features/connect/ProblemTypewriter";
 import { knownKey } from "@/i18n/knownKey";
 
 const card = "min-w-0 break-words rounded-3xl border border-violet-100 bg-white p-5 shadow-sm sm:p-6";
@@ -50,6 +51,12 @@ export default async function ConnectProblemsPage({
             <p key={paragraph}>{t(`problemHub.${paragraph}`)}</p>
           ))}
         </div>
+        {problems.length ? (
+          <ProblemTypewriter
+            lines={problems.slice(0, 5).map((problem) => problem.title)}
+            label={t("problemHub.nowOnBoard")}
+          />
+        ) : null}
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="#probleme" className={`${action} bg-white text-violet-800 hover:bg-violet-50`}>{t("problemHub.discover")}</Link>
           <Link href="/connect/problems/new" className={`${action} border border-white/60 bg-white/15 text-white hover:bg-white/25`}>{t("problemHub.create")}</Link>
@@ -113,48 +120,50 @@ export default async function ConnectProblemsPage({
         </section>
 
         {problems.length ? (
-          <section aria-label={t("problemHub.discover")} className="mt-6 space-y-4">
-            {problems.map((problem) => {
-              const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
-              return (
-                <article key={problem.id} className={card}>
-                  <p className="text-xs font-semibold uppercase tracking-[.16em] text-violet-700">
-                    {t(`problems.intents.${problem.author_intent}`)}
-                  </p>
-                  <h3 className="mt-2 break-words text-xl font-semibold">
-                    <Link href={`/connect/problems/${problem.id}`} className="hover:underline">
-                      {problem.title}
-                    </Link>
-                  </h3>
-                  <p className="mt-2 line-clamp-3 leading-7 text-slate-700">{problem.description}</p>
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-                    <span>{problem.author_user_id === null
-                      ? t("problems.formerMember")
-                      : author?.display_name ?? t("problems.unknownAuthor")}</span>
-                    {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
-                    <span className="flex flex-wrap gap-x-3">
-                      {problem.confirmation_count > 0 ? (
-                        <span>
-                          {t("problems.confirmationsCount", { count: problem.confirmation_count })}
-                        </span>
-                      ) : null}
-                      <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
-                    </span>
-                  </div>
-                  {problem.locations.length || problem.geographic_scope ? (
-                    <p className="mt-3 text-sm text-slate-500">
-                      {[...problem.locations, ...(problem.geographic_scope ? [t(`scopes.${problem.geographic_scope}`)] : [])].join(" · ")}
-                    </p>
-                  ) : null}
-                  {problem.topics.length ? (
-                    <ul aria-label={t("form.topics")} className="mt-3 flex flex-wrap gap-2">
-                      {problem.topics.map((topic) => <li key={topic} className="max-w-full rounded-full bg-violet-50 px-3 py-1 text-xs text-violet-900">{topic}</li>)}
-                    </ul>
-                  ) : null}
-                  <Link href={`/connect/problems/${problem.id}`} className={`${action} mt-4 border border-slate-200 hover:bg-slate-50`}>{t("problemHub.view")}</Link>
-                </article>
-              );
-            })}
+          <section aria-label={t("problemHub.discover")} className="problem-stage mt-6">
+            <p className="problem-stage__hint">{t("problemHub.boardHint")}</p>
+            <div className="problem-board">
+              {problems.map((problem, index) => {
+                const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
+                return (
+                  <article
+                    key={problem.id}
+                    className="problem-note"
+                    data-intent={problem.author_intent}
+                    style={{ "--i": index } as React.CSSProperties}
+                  >
+                    <p className="problem-note__tag">{t(`problems.intents.${problem.author_intent}`)}</p>
+                    <h3 className="problem-note__title">
+                      <Link href={`/connect/problems/${problem.id}`}>{problem.title}</Link>
+                    </h3>
+                    <p className="problem-note__body line-clamp-4">{problem.description}</p>
+                    {problem.topics.length ? (
+                      <ul aria-label={t("form.topics")} className="problem-note__topics">
+                        {problem.topics.map((topic) => <li key={topic}>{topic}</li>)}
+                      </ul>
+                    ) : null}
+                    <div className="problem-note__foot">
+                      <span>{problem.author_user_id === null
+                        ? t("problems.formerMember")
+                        : author?.display_name ?? t("problems.unknownAuthor")}</span>
+                      {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
+                      <span className="problem-note__counts">
+                        {problem.confirmation_count > 0 ? (
+                          <span>{t("problems.confirmationsCount", { count: problem.confirmation_count })}</span>
+                        ) : null}
+                        <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+                      </span>
+                    </div>
+                    {problem.locations.length || problem.geographic_scope ? (
+                      <p className="problem-note__meta">
+                        {[...problem.locations, ...(problem.geographic_scope ? [t(`scopes.${problem.geographic_scope}`)] : [])].join(" · ")}
+                      </p>
+                    ) : null}
+                    <Link href={`/connect/problems/${problem.id}`} className="problem-note__open">{t("problemHub.view")}</Link>
+                  </article>
+                );
+              })}
+            </div>
           </section>
         ) : (
           <section className={`${card} mt-6 text-center`}>

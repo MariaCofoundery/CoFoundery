@@ -9,6 +9,7 @@ import { getOwnConnectProfile } from "@/features/connect/connectData";
 import { notifyConnectProblemInterest } from "@/features/connect/connectNotifications";
 import { notifySavedSearchMatches } from "@/features/connect/savedSearchNotifications";
 import { getConnectProblem } from "@/features/connect/connectProblemData";
+import { composeProblemDescription } from "@/features/connect/problemDescription";
 import {
   CONNECT_GEOGRAPHIC_SCOPES,
   PROBLEM_DESCRIPTION_MAX,
@@ -76,7 +77,7 @@ export async function saveConnectProblemAction(formData: FormData) {
   const { client, user } = await requireConnectMember("/connect/problems/new");
 
   const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const typedDescription = String(formData.get("description") ?? "").trim();
   const intentValue = String(formData.get("author_intent") ?? "");
   const scope = String(formData.get("geographic_scope") ?? "regional");
   const publish = formData.get("intent") === "publish";
@@ -84,12 +85,19 @@ export async function saveConnectProblemAction(formData: FormData) {
   if (title.length < PROBLEM_TITLE_MIN || title.length > PROBLEM_TITLE_MAX) {
     back("/connect/problems/new", "problem_title");
   }
-  if (
-    description.length < PROBLEM_DESCRIPTION_MIN ||
-    description.length > PROBLEM_DESCRIPTION_MAX
-  ) {
+  // Die Mindestlaenge gilt fuer die Beschreibung allein: Das Feld "schon
+  // versucht" darf sie nicht ersetzen.
+  if (typedDescription.length < PROBLEM_DESCRIPTION_MIN) {
     back("/connect/problems/new", "problem_description");
   }
+  const composed = composeProblemDescription(
+    typedDescription,
+    String(formData.get("tried") ?? "")
+  );
+  if (!composed.ok) {
+    back("/connect/problems/new", "problem_too_long");
+  }
+  const description = composed.description;
   if (!isConnectProblemIntent(intentValue)) {
     back("/connect/problems/new", "problem_intent");
   }
