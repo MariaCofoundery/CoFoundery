@@ -143,7 +143,35 @@
     "endsOn": "Until when?",
     "endsOnHint": "Optional. With no end date, the timeframe remains flexible.",
     "stage": "Venture stage",
-    "optional": "Optional"
+    "optional": "Optional",
+    "guided": {
+      "main": "What is it about?",
+      "mainHint": "Describe concretely what you are looking for. At least 20 characters.",
+      "tried": "What have I already tried?",
+      "triedHint": "Optional. One or two sentences are enough.",
+      "stuck": "Where exactly is it stuck?",
+      "stuckHint": "Optional.",
+      "help": "What kind of help would be good?",
+      "time": "How much time may it take?",
+      "timeAny": "Any",
+      "helpKinds": {
+        "counter_view": "A second opinion",
+        "experience": "Experience",
+        "contact": "A contact",
+        "material": "Material"
+      },
+      "timeKinds": {
+        "five_minutes": "5 minutes",
+        "fifteen_minutes": "15 minutes",
+        "conversation": "A conversation"
+      },
+      "stored": {
+        "tried": "Already tried",
+        "stuck": "Where it is stuck",
+        "help": "Help",
+        "time": "Time"
+      }
+    }
   },
   "visibility": {
     "profileTitle": "Connect profile visibility",
@@ -186,7 +214,9 @@
     "industries": "Industries & topics",
     "framework": "Practical details",
     "noFramework": "No further details provided",
-    "person": "Who is behind this?"
+    "person": "Who is behind this?",
+    "noReply": "No reply yet. The request has been on the board for {days} days.",
+    "noReplyLong": "No reply for {days} days. In a small network that is common. You can phrase the request more broadly, write more about what you already tried, or close it."
   },
   "public": {
     "profileEyebrow": "Public Connect profile",
@@ -442,7 +472,8 @@
     "publish_profile": "Publish your complete CONNECT profile first. Your contribution remains a draft.",
     "publish_conflict": "This contribution has changed. Reload the page and review its current state.",
     "publish_membership": "You need active CONNECT membership to publish this contribution.",
-    "problem_too_long": "The description and “Already tried” are too long together. Shorten one of them."
+    "problem_too_long": "The description and “Already tried” are too long together. Shorten one of them.",
+    "listing_summary_too_long": "Context and guiding questions are too long together. Shorten one of the fields."
   },
   "problems": {
     "title": "What people see unsolved",

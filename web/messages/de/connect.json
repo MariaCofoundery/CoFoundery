@@ -143,7 +143,35 @@
     "endsOn": "Bis wann?",
     "endsOnHint": "Optional. Ohne Enddatum bleibt der Zeitraum flexibel.",
     "stage": "Venture-Phase",
-    "optional": "Optional"
+    "optional": "Optional",
+    "guided": {
+      "main": "Worum geht es?",
+      "mainHint": "Beschreibe konkret, was du suchst. Mindestens 20 Zeichen.",
+      "tried": "Was habe ich schon versucht?",
+      "triedHint": "Optional. Ein, zwei Sätze reichen.",
+      "stuck": "Wo genau klemmt es?",
+      "stuckHint": "Optional.",
+      "help": "Welche Hilfe wäre gut?",
+      "time": "Wie viel Zeit darf es kosten?",
+      "timeAny": "Egal",
+      "helpKinds": {
+        "counter_view": "Gegenblick",
+        "experience": "Erfahrung",
+        "contact": "Kontakt",
+        "material": "Material"
+      },
+      "timeKinds": {
+        "five_minutes": "5 Minuten",
+        "fifteen_minutes": "15 Minuten",
+        "conversation": "Ein Gespräch"
+      },
+      "stored": {
+        "tried": "Schon versucht",
+        "stuck": "Wo es klemmt",
+        "help": "Hilfe",
+        "time": "Zeit"
+      }
+    }
   },
   "visibility": {
     "profileTitle": "Sichtbarkeit des Connect-Profils",
@@ -186,7 +214,9 @@
     "industries": "Branchen & Themen",
     "framework": "Rahmen",
     "noFramework": "Keine weiteren Rahmenbedingungen angegeben",
-    "person": "Wer steckt dahinter?"
+    "person": "Wer steckt dahinter?",
+    "noReply": "Noch keine Meldung. Das Gesuch steht seit {days} Tagen auf dem Brett.",
+    "noReplyLong": "Seit {days} Tagen keine Meldung. In einem kleinen Netzwerk dauert das oft. Du kannst das Gesuch breiter formulieren, mehr dazu schreiben, was du schon versucht hast, oder es schließen."
   },
   "public": {
     "profileEyebrow": "Öffentliches Connect-Profil",
@@ -442,7 +472,8 @@
     "publish_profile": "Veröffentliche zuerst dein vollständiges CONNECT-Profil. Dein Beitrag bleibt als Entwurf erhalten.",
     "publish_conflict": "Der Beitrag wurde inzwischen geändert. Lade die Seite neu und prüfe den aktuellen Stand.",
     "publish_membership": "Du brauchst eine aktive CONNECT-Mitgliedschaft, um diesen Beitrag zu veröffentlichen.",
-    "problem_too_long": "Beschreibung und „Schon versucht\" sind zusammen zu lang. Kürze eines von beiden."
+    "problem_too_long": "Beschreibung und „Schon versucht\" sind zusammen zu lang. Kürze eines von beiden.",
+    "listing_summary_too_long": "Kontext und Leitfragen sind zusammen zu lang. Kürze eines der Felder."
   },
   "problems": {
     "title": "Ungelöstes, das jemand sieht",

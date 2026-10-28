@@ -28,6 +28,7 @@ export const CONNECT_ERROR_KEYS = [
   "problem_title",
   "problem_description",
   "problem_too_long",
+  "listing_summary_too_long",
   "problem_intent",
   "interest_note",
   "perspective",

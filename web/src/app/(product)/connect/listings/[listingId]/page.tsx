@@ -1,5 +1,5 @@
 import Link from "next/link"; import { notFound } from "next/navigation"; import { getLocale, getTranslations } from "next-intl/server";
-import { requireConnectMember } from "@/features/connect/connectAccess"; import { getConnectBlockState, getConnectListing, getOwnContactRequestForListing, hasActiveConnectProfile } from "@/features/connect/connectData";
+import { requireConnectMember } from "@/features/connect/connectAccess"; import { getConnectBlockState, getConnectListing, countContactRequestsForListing, getOwnContactRequestForListing, hasActiveConnectProfile } from "@/features/connect/connectData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
 import type { ConnectProfile } from "@/features/connect/connectTypes";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
@@ -26,6 +26,10 @@ export default async function ListingDetail({ params, searchParams }: { params: 
   // und nur, wenn gerade ein Modell erreichbar ist. Veroeffentlichen allein
   // schickt nichts an eine KI.
   const ownActive = own && listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) > new Date());
+  // Ehrliche Statuszeile nur fuer die einstellende Person: keine Zusage, wann
+  // jemand antwortet, sondern was bisher war. Ab dem ersten Tag ohne Meldung.
+  const replyCount = ownActive ? await countContactRequestsForListing(client, listing.id) : null;
+  const daysOnBoard = listing.published_at ? Math.floor((Date.now() - new Date(listing.published_at).getTime()) / 86400000) : 0;
   const [aiAvailable, aiJobState] = ownActive
     ? await Promise.all([getAiAvailability(client), getListingAiJobState(client, listing.id)])
     : [false, "none" as const];
@@ -68,6 +72,11 @@ export default async function ListingDetail({ params, searchParams }: { params: 
 
       <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-5">
+          {ownActive && replyCount === 0 && daysOnBoard >= 1 ? (
+            <p role="status" className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+              {t(daysOnBoard >= 7 ? "detail.noReplyLong" : "detail.noReply", { days: daysOnBoard })}
+            </p>
+          ) : null}
           <section className={TILE}>
             <h2 className={H3}>{t("detail.what")}</h2>
             <p className="whitespace-pre-wrap text-base leading-[1.65] text-[#0b1f3a]">{listing.summary}</p>

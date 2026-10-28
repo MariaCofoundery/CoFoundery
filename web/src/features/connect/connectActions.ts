@@ -21,6 +21,8 @@ import { ConnectValidationError, normalizeConnectContactMessage, normalizeConnec
 import { CONNECT_PHOTO_BUCKET, connectValuesForBasePhoto } from "@/features/connect/connectBasePhoto";
 import { randomUUID } from "node:crypto";
 import { requireSignedInForMessages } from "@/features/connect/conversationAccess";
+import { composeSeekingSummary, LISTING_SUMMARY_MIN } from "@/features/connect/listingSummary";
+import { getTranslations } from "next-intl/server";
 
 async function context() {
   const client = await createClient();
@@ -128,18 +130,41 @@ export async function saveConnectListingAction(formData: FormData) {
   const { client, user } = await context(); const id = String(formData.get("id") ?? "").trim();
   const rawDirection = String(formData.get("direction") ?? "seeking"); const rawCategory = String(formData.get("category") ?? "expertise");
   const editRoute = id ? `/connect/listings/${id}/edit` : `/connect/listings/new?direction=${rawDirection}&category=${rawCategory}`;
+  // Die Leitfragen beim Anlegen eines Gesuchs werden zum Kontext zusammengesetzt.
+  // Die Mindestlaenge gilt fuer den Kontext allein: "schon versucht" darf ihn nicht ersetzen.
+  let contextLength: number | null = null;
+  if (!id && formData.get("guided") === "1" && rawDirection === "seeking") {
+    const t = await getTranslations("connect.form.guided");
+    const composed = composeSeekingSummary(
+      {
+        main: String(formData.get("summary") ?? ""),
+        tried: String(formData.get("tried") ?? ""),
+        stuck: String(formData.get("stuck") ?? ""),
+        help: formData.getAll("help").map(String),
+        time: String(formData.get("time") ?? ""),
+      },
+      {
+        tried: t("stored.tried"), stuck: t("stored.stuck"), help: t("stored.help"), time: t("stored.time"),
+        helpKinds: { counter_view: t("helpKinds.counter_view"), experience: t("helpKinds.experience"), contact: t("helpKinds.contact"), material: t("helpKinds.material") },
+        timeKinds: { five_minutes: t("timeKinds.five_minutes"), fifteen_minutes: t("timeKinds.fifteen_minutes"), conversation: t("timeKinds.conversation") },
+      }
+    );
+    if (!composed.ok) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=listing_summary_too_long`);
+    formData.set("summary", composed.summary);
+    contextLength = composed.mainLength;
+  }
   let values: ReturnType<typeof parseConnectListing>;
   try { values = parseConnectListing(formData); }
   catch (error) { redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=${error instanceof ConnectValidationError ? error.code : "save"}`); }
   const publish = formData.get("intent") === "publish";
   if (values.starts_on && values.ends_on && values.ends_on < values.starts_on) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=invalid_dates`);
-  if (publish && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
+  if (publish && (!listingPublishable(values) || (contextLength !== null && contextLength < LISTING_SUMMARY_MIN))) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
   const currentListing = id
     ? await client.from("network_listings").select("status,published_at,expires_at,visibility,public_slug").eq("id", id).eq("owner_user_id", user.id).maybeSingle()
     : { data: null, error: null };
   if (currentListing.error || (id && !currentListing.data)) redirect("/connect/my?error=save");
   const nextStatus = savedPublicationStatus(currentListing.data?.status, publish);
-  if (nextStatus === "active" && !listingPublishable(values)) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
+  if (nextStatus === "active" && (!listingPublishable(values) || (contextLength !== null && contextLength < LISTING_SUMMARY_MIN))) redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=incomplete`);
   const listingVisibility = connectPublicationVisibility(formData.get("visibility"));
   if (listingVisibility === "public" && currentListing.data?.visibility !== "public" && formData.get("confirm_public_visibility") !== "yes") {
     redirect(`${editRoute}${editRoute.includes("?") ? "&" : "?"}error=public_confirmation`);

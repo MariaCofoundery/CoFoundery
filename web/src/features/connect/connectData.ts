@@ -144,3 +144,13 @@ export async function getOwnConnectBlocks(client: Client) {
   if (error) return [];
   return (data ?? []) as ConnectBlockedMember[];
 }
+
+/** Wie viele Meldungen (Kontaktanfragen) ein eigenes Gesuch bisher bekommen hat. */
+export async function countContactRequestsForListing(client: Client, listingId: string) {
+  const { count, error } = await client
+    .from("network_contact_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("listing_id", listingId);
+  if (error) throw new Error("network_contact_count_failed");
+  return count ?? 0;
+}

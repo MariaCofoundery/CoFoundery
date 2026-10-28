@@ -17,6 +17,7 @@ import {
 } from "./connectTypes";
 import { normalizeConnectLocations } from "./connectPresentation";
 import { ConnectVisibilityField } from "./ConnectVisibilityField";
+import { LISTING_GUIDED_LIMITS, LISTING_HELP_KINDS, LISTING_TIME_KINDS } from "./listingSummary";
 
 const field = "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
@@ -44,17 +45,35 @@ export function ConnectListingForm({ listing, direction, category, canPublish = 
   canPublish?: boolean }) {
   const t = useTranslations("connect");
   const [selectedCategory, setSelectedCategory] = useState<ConnectCategory>(listing?.category || category || "expertise");
+  const [selectedDirection, setSelectedDirection] = useState<string>(listing?.direction || direction || "seeking");
+  // Die Leitfragen gibt es nur beim Anlegen eines Gesuchs. Beim Bearbeiten steht
+  // der Text schon im Kontext; ein zweites Feld wuerde ihn doppeln.
+  const guided = !listing && selectedDirection === "seeking";
   const showRemote = categorySupportsRemoteMode(selectedCategory);
   const showStage = categorySupportsVentureStage(selectedCategory);
 
   return <form action={saveConnectListingAction} className="space-y-6">
     {listing ? <input type="hidden" name="id" value={listing.id} /> : null}
     <div className="grid gap-5 sm:grid-cols-2">
-      <label className="text-sm font-medium">{t("form.direction")}<select name="direction" defaultValue={listing?.direction || direction || "seeking"} className={field}>{CONNECT_DIRECTIONS.map((value) => <option key={value} value={value}>{t(`directions.${value}`)}</option>)}</select></label>
+      <label className="text-sm font-medium">{t("form.direction")}<select name="direction" value={selectedDirection} onChange={(event) => setSelectedDirection(event.target.value)} className={field}>{CONNECT_DIRECTIONS.map((value) => <option key={value} value={value}>{t(`directions.${value}`)}</option>)}</select></label>
       <label className="text-sm font-medium">{t("form.category")}<select name="category" value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value as ConnectCategory)} className={field}>{CONNECT_CATEGORIES.map((value) => <option key={value} value={value}>{t(`categories.${value}`)}</option>)}</select></label>
     </div>
     <label className="block text-sm font-medium">{t("form.title")}<input name="title" required minLength={5} maxLength={100} defaultValue={listing?.title} className={field} /></label>
-    <label className="block text-sm font-medium">{t("form.summary")}<textarea name="summary" required minLength={20} maxLength={800} rows={6} defaultValue={listing?.summary} className={field} /><span className={hint}>{t("form.summaryHint")}</span></label>
+    {guided ? <div className="space-y-5">
+      <input type="hidden" name="guided" value="1" />
+      <label className="block text-sm font-medium">{t("form.guided.main")}<textarea name="summary" required minLength={20} maxLength={LISTING_GUIDED_LIMITS.main} rows={4} className={field} /><span className={hint}>{t("form.guided.mainHint")}</span></label>
+      <label className="block text-sm font-medium">{t("form.guided.tried")}<textarea name="tried" maxLength={LISTING_GUIDED_LIMITS.tried} rows={2} className={field} /><span className={hint}>{t("form.guided.triedHint")}</span></label>
+      <label className="block text-sm font-medium">{t("form.guided.stuck")}<textarea name="stuck" maxLength={LISTING_GUIDED_LIMITS.stuck} rows={2} className={field} /><span className={hint}>{t("form.guided.stuckHint")}</span></label>
+      <fieldset><legend className="text-sm font-medium">{t("form.guided.help")}</legend>
+        <div className="mt-2 flex flex-wrap gap-2">{LISTING_HELP_KINDS.map((kind) => <label key={kind} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-sm has-[:checked]:border-slate-900 has-[:checked]:bg-slate-900 has-[:checked]:text-white"><input type="checkbox" name="help" value={kind} className="sr-only" />{t(`form.guided.helpKinds.${kind}`)}</label>)}</div>
+      </fieldset>
+      <fieldset><legend className="text-sm font-medium">{t("form.guided.time")}</legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-sm has-[:checked]:border-slate-900 has-[:checked]:bg-slate-900 has-[:checked]:text-white"><input type="radio" name="time" value="" defaultChecked className="sr-only" />{t("form.guided.timeAny")}</label>
+          {LISTING_TIME_KINDS.map((kind) => <label key={kind} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-slate-200 px-4 text-sm has-[:checked]:border-slate-900 has-[:checked]:bg-slate-900 has-[:checked]:text-white"><input type="radio" name="time" value={kind} className="sr-only" />{t(`form.guided.timeKinds.${kind}`)}</label>)}
+        </div>
+      </fieldset>
+    </div> : <label className="block text-sm font-medium">{t("form.summary")}<textarea name="summary" required minLength={20} maxLength={800} rows={6} defaultValue={listing?.summary} className={field} /><span className={hint}>{t("form.summaryHint")}</span></label>}
     <div className="grid gap-5 sm:grid-cols-2">
       <label className="text-sm font-medium">{t("form.topics")}<input name="topics" defaultValue={listing?.topics.join(", ")} className={field} /><span className={hint}>{t("form.topicsHint", { max: 8 })}</span></label>
       <label className="text-sm font-medium">{t("form.industries")}<input name="industries" defaultValue={listing?.industries.join(", ")} className={field} /><span className={hint}>{t("form.industriesHint", { max: 5 })}</span></label>
