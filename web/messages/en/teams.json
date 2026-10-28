@@ -1350,6 +1350,75 @@
       "error": "The note could not be saved.",
       "unsaved": "Not saved yet",
       "visible": "All current team members can see the notes. Notes that have not been changed for a year are deleted."
-    }
+    },
+    "alignment": {
+      "title": "Team alignment",
+      "intro": "Each person answers for themselves what they want from financing. Only when everyone has submitted do you see the answers, and above all where they differ. There is no right answer.",
+      "needTwo": "The alignment needs at least two people in the team.",
+      "start": "Start the alignment",
+      "startNew": "Start a new alignment",
+      "starting": "Starting …",
+      "startError": "The alignment could not be started.",
+      "waitingFor": "You have submitted. Still missing: {names}.",
+      "youSubmitted": "Thank you, your answers are submitted.",
+      "submit": "Submit answers",
+      "submitting": "Submitting …",
+      "submitError": "The answers could not be submitted.",
+      "incomplete": "Answer all questions to submit.",
+      "unsure": "I do not know yet",
+      "resultsTitle": "Your answers",
+      "closedOn": "Completed on {date}",
+      "sameTitle": "Where you agree",
+      "differTitle": "Where you differ",
+      "unsureTitle": "Where something is still open",
+      "talk": "Discuss in Setup",
+      "noAnswers": "No answers yet.",
+      "privacy": "Only current team members see your answers, and only once everyone has submitted. They are deleted after a year.",
+      "questions": {
+        "pace": {
+          "title": "How fast should the company grow?",
+          "a": "Steadily, on our own strength",
+          "b": "Fast, even with more risk",
+          "c": "It depends on the opportunity"
+        },
+        "control": {
+          "title": "How much control do you want to keep?",
+          "a": "As many decisions as possible within the team",
+          "b": "Give investors a say in major decisions",
+          "c": "It depends on the money and the terms"
+        },
+        "dilution": {
+          "title": "How much dilution would be acceptable to you?",
+          "a": "As little as possible",
+          "b": "Even a larger one if it brings real growth",
+          "c": "I cannot say yet"
+        },
+        "exit": {
+          "title": "What is your position on selling the company?",
+          "a": "I do not want to sell",
+          "b": "A sale is conceivable for me",
+          "c": "A sale is my goal"
+        },
+        "horizon": {
+          "title": "How long do you want to stay?",
+          "a": "Up to three years",
+          "b": "Three to seven years",
+          "c": "Seven years or longer"
+        },
+        "involvement": {
+          "title": "How much influence should an investor have day to day?",
+          "a": "As little as possible",
+          "b": "Advisory, when needed",
+          "c": "Actively involved"
+        },
+        "time": {
+          "title": "How much time can you put in over the next twelve months?",
+          "a": "Alongside another activity",
+          "b": "Mostly",
+          "c": "Full time"
+        }
+      }
+    },
+    "prepTitle": "Questions for the meeting"
   }
 }

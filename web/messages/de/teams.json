@@ -1350,6 +1350,75 @@
       "error": "Die Notiz konnte nicht gespeichert werden.",
       "unsaved": "Noch nicht gespeichert",
       "visible": "Die Notizen sehen alle aktuellen Mitglieder des Teams. Notizen, die ein Jahr nicht geändert wurden, werden gelöscht."
-    }
+    },
+    "alignment": {
+      "title": "Abgleich im Team",
+      "intro": "Jede Person beantwortet für sich, was sie von einer Finanzierung will. Erst wenn alle abgegeben haben, seht ihr die Antworten, und vor allem, wo sie sich unterscheiden. Es gibt keine richtige Antwort.",
+      "needTwo": "Der Abgleich braucht mindestens zwei Personen im Team.",
+      "start": "Abgleich starten",
+      "startNew": "Neuen Abgleich starten",
+      "starting": "Wird gestartet …",
+      "startError": "Der Abgleich konnte nicht gestartet werden.",
+      "waitingFor": "Du hast abgegeben. Es fehlen noch: {names}.",
+      "youSubmitted": "Danke, deine Antworten sind abgegeben.",
+      "submit": "Antworten abgeben",
+      "submitting": "Wird abgegeben …",
+      "submitError": "Die Antworten konnten nicht abgegeben werden.",
+      "incomplete": "Beantworte alle Fragen, um abzugeben.",
+      "unsure": "Weiß ich noch nicht",
+      "resultsTitle": "Eure Antworten",
+      "closedOn": "Abgeschlossen am {date}",
+      "sameTitle": "Hier seid ihr euch einig",
+      "differTitle": "Hier unterscheidet ihr euch",
+      "unsureTitle": "Hier ist noch etwas offen",
+      "talk": "Im Setup besprechen",
+      "noAnswers": "Noch keine Antworten.",
+      "privacy": "Eure Antworten sehen nur die aktuellen Mitglieder des Teams, und erst, wenn alle abgegeben haben. Sie werden nach einem Jahr gelöscht.",
+      "questions": {
+        "pace": {
+          "title": "Wie schnell soll das Unternehmen wachsen?",
+          "a": "Stetig, aus eigener Kraft",
+          "b": "Schnell, auch mit mehr Risiko",
+          "c": "Das hängt von der Gelegenheit ab"
+        },
+        "control": {
+          "title": "Wie viel Kontrolle wollt ihr behalten?",
+          "a": "Möglichst alle Entscheidungen im Team",
+          "b": "Geldgebern bei großen Entscheidungen ein Mitspracherecht geben",
+          "c": "Das hängt vom Geld und den Bedingungen ab"
+        },
+        "dilution": {
+          "title": "Wie viel Verwässerung wäre für dich in Ordnung?",
+          "a": "So wenig wie möglich",
+          "b": "Auch eine größere, wenn sie echtes Wachstum bringt",
+          "c": "Das kann ich noch nicht sagen"
+        },
+        "exit": {
+          "title": "Wie stehst du zu einem Verkauf des Unternehmens?",
+          "a": "Ich möchte nicht verkaufen",
+          "b": "Ein Verkauf ist für mich denkbar",
+          "c": "Ein Verkauf ist mein Ziel"
+        },
+        "horizon": {
+          "title": "Wie lange möchtest du dabeibleiben?",
+          "a": "Bis zu drei Jahre",
+          "b": "Drei bis sieben Jahre",
+          "c": "Sieben Jahre oder länger"
+        },
+        "involvement": {
+          "title": "Wie viel Einfluss soll ein Geldgeber im Alltag haben?",
+          "a": "Möglichst wenig",
+          "b": "Beratend, bei Bedarf",
+          "c": "Aktiv mitarbeitend"
+        },
+        "time": {
+          "title": "Wie viel Zeit kannst du in den nächsten zwölf Monaten einbringen?",
+          "a": "Neben einer anderen Tätigkeit",
+          "b": "Überwiegend",
+          "c": "Voll"
+        }
+      }
+    },
+    "prepTitle": "Fragen für den Termin"
   }
 }

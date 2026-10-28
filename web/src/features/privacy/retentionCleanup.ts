@@ -42,6 +42,9 @@ export const TEST_PROJECT_DRAFT_DAYS = 90;
 export const REMINDER_STAMP_DAYS = 365;
 /** Teamnotizen zur Gespraechsvorbereitung im Finanzierungs-Wegweiser (`purge_stale_financing_notes`): 365 Tage ohne Aenderung. */
 export const FINANCING_NOTE_DAYS = 365;
+/** Erwartungsabgleich (`purge_stale_financing_alignments`): abgeschlossene Runden 365 Tage, nie abgeschlossene 180 Tage. */
+export const FINANCING_ALIGNMENT_CLOSED_DAYS = 365;
+export const FINANCING_ALIGNMENT_OPEN_DAYS = 180;
 
 type RpcError = { code?: string | null } | null;
 type RpcResult = { data: unknown; error: RpcError };
@@ -61,6 +64,7 @@ export type PrivacyRetentionResult = {
   personalCleanup: StepStatus;
   teamWorkCleanup: StepStatus;
   financingNotesCleanup: StepStatus;
+  financingAlignmentCleanup: StepStatus;
   /** Nur Zählwerte, die die SQL-Funktionen selbst zurückgeben. */
   counts: {
     research: { retentionDays: number; deletedResearchEvents: number; deletedProductAnalyticsEvents: number } | null;
@@ -77,6 +81,7 @@ export type PrivacyRetentionResult = {
       deletedReminderStamps: number;
     } | null;
     financingNotes: { deletedFinancingNotes: number } | null;
+    financingAlignment: { deletedClosedAlignments: number; deletedOpenAlignments: number } | null;
   };
 };
 
@@ -130,14 +135,19 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
     p_stamp_days: REMINDER_STAMP_DAYS,
   });
   const financingNotes = await runStep(client, "purge_stale_financing_notes", { p_days: FINANCING_NOTE_DAYS });
+  const financingAlignment = await runStep(client, "purge_stale_financing_alignments", {
+    p_closed_days: FINANCING_ALIGNMENT_CLOSED_DAYS,
+    p_open_days: FINANCING_ALIGNMENT_OPEN_DAYS,
+  });
   return {
-    ok: research.ok && events.ok && operational.ok && personal.ok && teamWork.ok && financingNotes.ok,
+    ok: research.ok && events.ok && operational.ok && personal.ok && teamWork.ok && financingNotes.ok && financingAlignment.ok,
     researchCleanup: research.ok ? "ok" : "failed",
     eventCleanup: events.ok ? "ok" : "failed",
     operationalCleanup: operational.ok ? "ok" : "failed",
     personalCleanup: personal.ok ? "ok" : "failed",
     teamWorkCleanup: teamWork.ok ? "ok" : "failed",
     financingNotesCleanup: financingNotes.ok ? "ok" : "failed",
+    financingAlignmentCleanup: financingAlignment.ok ? "ok" : "failed",
     counts: {
       research: research.ok
         ? pickCounts(research.data, ["retentionDays", "deletedResearchEvents", "deletedProductAnalyticsEvents"] as const)
@@ -157,6 +167,7 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
           ] as const)
         : null,
       financingNotes: financingNotes.ok ? pickCounts(financingNotes.data, ["deletedFinancingNotes"] as const) : null,
+      financingAlignment: financingAlignment.ok ? pickCounts(financingAlignment.data, ["deletedClosedAlignments", "deletedOpenAlignments"] as const) : null,
     },
   };
 }

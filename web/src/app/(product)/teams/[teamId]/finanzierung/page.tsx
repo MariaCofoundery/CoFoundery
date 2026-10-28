@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFinancingNotes, getFinancingStatuses } from "@/features/financing/financingData";
 import { FinancingNote } from "@/features/financing/FinancingNote";
+import { getFinancingAlignment } from "@/features/financing/financingAlignmentData";
+import { FinancingAlignmentForm, FinancingAlignmentStart } from "@/features/financing/FinancingAlignmentControls";
+import { FINANCING_ALIGNMENT_SETUP_TOPIC, compareFinancingAlignment } from "@/features/financing/financingAlignmentModel";
 import { FinancingStatusButton } from "@/features/financing/FinancingStatusButton";
 import {
   FINANCING_AGREEMENT_TOPICS,
@@ -40,12 +44,14 @@ export default async function FinancingPage({ params, searchParams }: Props) {
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) return <TeamUnavailable teamId={teamId} />;
 
-  const [t, setupT, teamLabel, statuses, notes] = await Promise.all([
+  const [t, setupT, teamLabel, statuses, notes, alignment, locale] = await Promise.all([
     getTranslations("teams.financing"),
     getTranslations("teams.setup"),
     getTeamLabel(supabase, teamId),
     getFinancingStatuses(teamId, supabase),
     view === "prep" ? getFinancingNotes(teamId, supabase) : Promise.resolve(new Map()),
+    view === "prep" ? getFinancingAlignment(teamId, supabase) : Promise.resolve({ open: null, lastClosed: null }),
+    getLocale(),
   ]);
   const setupItem = (key: string) => setup.items.find((item) => item.key === key);
   const nameOf = (userId: string | null) => {
@@ -58,6 +64,18 @@ export default async function FinancingPage({ params, searchParams }: Props) {
     const item = setupItem(key);
     return t(`stages.${item?.stage ?? "open"}`);
   };
+
+  const alignT = (key: string, values?: Record<string, string>) => t(`alignment.${key}`, values);
+  const answerLabel = (question: string, answer: string) =>
+    answer === "unsure" ? alignT("unsure") : alignT(`questions.${question}.${answer}`);
+  const memberCount = setup.members.length;
+  const mySubmitted = alignment.open?.submittedUserIds.includes(user.id) ?? false;
+  const missingNames = alignment.open
+    ? setup.members
+        .filter((member) => !alignment.open!.submittedUserIds.includes(member.userId))
+        .map((member) => nameOf(member.userId) ?? "")
+    : [];
+  const comparison = alignment.lastClosed ? compareFinancingAlignment(alignment.lastClosed.answers) : [];
 
   const tab = (which: FinancingView) => (
     <Link
@@ -160,8 +178,98 @@ export default async function FinancingPage({ params, searchParams }: Props) {
       {view === "prep" ? (
         <div className="mt-5 grid gap-4">
           <p className="rounded-2xl border border-[#e4e2f0] bg-[#f7f6fb] px-4 py-3 text-sm leading-6 text-[#5f5e7a]">{t("prepNote")}</p>
-          <section className={CARD}>
-            <ul className="grid gap-3">
+          <section className={CARD} aria-labelledby="financing-alignment-title">
+            <h2 id="financing-alignment-title" className="text-xl font-semibold text-[#0b1f3a]">{alignT("title")}</h2>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-[#5f5e7a]">{alignT("intro")}</p>
+            <p className="mt-1 text-xs leading-5 text-[#5f5e7a]">{alignT("privacy")}</p>
+
+            {memberCount < 2 ? (
+              <p className="mt-4 rounded-2xl bg-[#f7f6fb] px-4 py-3 text-sm text-[#5f5e7a]">{alignT("needTwo")}</p>
+            ) : alignment.open && !mySubmitted ? (
+              <div className="mt-4">
+                <FinancingAlignmentForm
+                  teamId={teamId}
+                  alignmentId={alignment.open.id}
+                  copy={{
+                    questions: Object.fromEntries(
+                      (["pace", "control", "dilution", "exit", "horizon", "involvement", "time"] as const).map((question) => [
+                        question,
+                        { title: alignT(`questions.${question}.title`), a: alignT(`questions.${question}.a`), b: alignT(`questions.${question}.b`), c: alignT(`questions.${question}.c`) },
+                      ])
+                    ) as never,
+                    unsure: alignT("unsure"),
+                    submit: alignT("submit"),
+                    submitting: alignT("submitting"),
+                    error: alignT("submitError"),
+                    incomplete: alignT("incomplete"),
+                  }}
+                />
+              </div>
+            ) : alignment.open ? (
+              <div className="mt-4 rounded-2xl bg-[#f7f6fb] px-4 py-3 text-sm leading-6 text-[#33325e]">
+                <p className="font-semibold text-[#0b1f3a]">{alignT("youSubmitted")}</p>
+                {missingNames.length > 0 ? <p className="mt-1">{alignT("waitingFor", { names: missingNames.join(", ") })}</p> : null}
+              </div>
+            ) : (
+              <div className="mt-4">
+                <FinancingAlignmentStart
+                  teamId={teamId}
+                  label={alignment.lastClosed ? alignT("startNew") : alignT("start")}
+                  pendingLabel={alignT("starting")}
+                  errorText={alignT("startError")}
+                />
+              </div>
+            )}
+
+            {alignment.lastClosed ? (
+              <div className="mt-6 border-t border-[#e4e2f0] pt-4">
+                <h3 className="text-base font-semibold text-[#0b1f3a]">{alignT("resultsTitle")}</h3>
+                {alignment.lastClosed.closedAt ? (
+                  <p className="mt-0.5 text-xs text-[#5f5e7a]">
+                    {alignT("closedOn", { date: new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium" }).format(new Date(alignment.lastClosed.closedAt)) })}
+                  </p>
+                ) : null}
+                {(["differ", "open", "same"] as const).map((state) => {
+                  const entries = comparison.filter((entry) => entry.state === state);
+                  if (entries.length === 0) return null;
+                  return (
+                    <div key={state} className="mt-4">
+                      <h4 className="text-xs font-bold uppercase tracking-[0.1em] text-[#5f5e7a]">
+                        {alignT(state === "differ" ? "differTitle" : state === "open" ? "unsureTitle" : "sameTitle")}
+                      </h4>
+                      <ul className="mt-2 grid gap-2">
+                        {entries.map((entry) => (
+                          <li key={entry.question} className="rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
+                            <p className="font-medium text-[#0b1f3a]">{alignT(`questions.${entry.question}.title`)}</p>
+                            {state === "same" ? (
+                              <p className="mt-1 text-sm text-[#33325e]">{answerLabel(entry.question, entry.answers[0]?.answer ?? "unsure")}</p>
+                            ) : (
+                              <ul className="mt-2 grid gap-1.5">
+                                {entry.answers.map((answer) => (
+                                  <li key={answer.userId} className="flex flex-wrap gap-x-2 text-sm text-[#33325e]">
+                                    <span className="font-semibold text-[#0b1f3a]">{nameOf(answer.userId) ?? setupT("formerMember")}:</span>
+                                    <span>{answerLabel(entry.question, answer.answer)}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                            {state !== "same" ? (
+                              <Link href={`/teams/${encodeURIComponent(teamId)}/setup/${FINANCING_ALIGNMENT_SETUP_TOPIC[entry.question]}`} className="mt-2 inline-block text-sm font-semibold text-[#6d49e0] underline underline-offset-2">
+                                {alignT("talk")}
+                              </Link>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
+          <section className={CARD} aria-labelledby="financing-prep-title">
+            <h2 id="financing-prep-title" className="text-xl font-semibold text-[#0b1f3a]">{t("prepTitle")}</h2>
+            <ul className="mt-4 grid gap-3">
               {FINANCING_PREP_QUESTIONS.map((key) => (
                 <li key={key}>
                   <FinancingNote
