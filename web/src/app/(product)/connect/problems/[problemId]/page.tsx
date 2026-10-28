@@ -21,6 +21,8 @@ import {
   getOwnConnectProblemInterest,
 } from "@/features/connect/connectProblemData";
 import { ProblemApproaches } from "@/features/connect/ProblemApproaches";
+import { ProblemNight } from "@/features/connect/ProblemNight";
+import { splitProblemDescription } from "@/features/connect/problemDescription";
 import { ProblemConfirmations } from "@/features/connect/ProblemConfirmations";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import {
@@ -31,7 +33,7 @@ import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "rounded-3xl border border-slate-200 bg-white p-6";
+const card = "problem-paper p-6";
 const field =
   "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
@@ -108,14 +110,19 @@ export default async function ConnectProblemPage({
   ]);
 
   const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
+  const described = splitProblemDescription(problem.description);
   const errorKey = knownKey(query.error, CONNECT_ERROR_KEYS);
   const saved = SAVED_KEYS.includes(query.saved ?? "") ? query.saved : null;
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
-      <Link href="/connect/problems" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
-        ← {t("problems.backToBoard")}
-      </Link>
+    <ProblemNight>
+    <main className="mx-auto max-w-3xl px-5 pb-16 pt-8">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+        <Link href="/connect/problems" className="problem-back">
+          ← {t("problems.backToBoard")}
+        </Link>
+        {isAuthor && isPublished && <Link href={`/connect/workspaces/new?problem=${problem.id}`} className="problem-btn problem-btn--ghost">{workspaceText("new")}</Link>}
+      </div>
 
       {saved ? (
         <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
@@ -134,14 +141,13 @@ export default async function ConnectProblemPage({
         </p>
       ) : null}
 
-      {isAuthor && isPublished && <Link href={`/connect/workspaces/new?problem=${problem.id}`} className="mt-4 inline-flex min-h-11 items-center rounded-full border border-violet-200 bg-white px-5 py-3 text-sm font-semibold">{workspaceText("new")}</Link>}
-      <header className="brand-panel mt-5 rounded-[28px] p-6 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[.14em] text-white">
+      <header className="problem-hero" data-intent={problem.author_intent}>
+        <p className="problem-hero__eyebrow">
           {t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{problem.title}</h1>
+        <h1 className="problem-hero__title problem-hero__title--small">{problem.title}</h1>
       </header>
-      <article className={`${card} mt-4`}>
+      <article className={`${card} mt-6`}>
         {/* Es gibt niemanden mehr, der es pflegt oder antwortet. Das gehoert
             an den Anfang, nicht ans Ende - sonst schreibt jemand eine
             Meldung ins Leere. */}
@@ -155,7 +161,13 @@ export default async function ConnectProblemPage({
             {t(`problems.statuses.${problem.status}`)}
           </p>
         ) : null}
-        <p className="mt-4 whitespace-pre-wrap leading-7 text-slate-700">{problem.description}</p>
+        <p className="mt-4 whitespace-pre-wrap text-lg leading-8 text-slate-800">{described.main}</p>
+        {described.tried ? (
+          <div className="mt-5 rounded-2xl border-l-4 border-cyan-400 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-cyan-800">{t("problems.live.tried")}</p>
+            <p className="mt-1 whitespace-pre-wrap leading-7 text-slate-700">{described.tried}</p>
+          </div>
+        ) : null}
 
         {problem.locations.length || problem.topics.length || problem.industries.length ? (
           <p className="mt-4 text-sm text-slate-500">
@@ -308,5 +320,6 @@ export default async function ConnectProblemPage({
         </section>
       ) : null}
     </main>
+    </ProblemNight>
   );
 }

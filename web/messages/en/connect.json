@@ -944,7 +944,8 @@
     "workspaces": "Go to your private workspaces",
     "filterTitle": "Filter problems",
     "boardHint": "Sorted by age, newest first. Nothing rises to the top.",
-    "nowOnBoard": "On the board right now"
+    "nowOnBoard": "On the board right now",
+    "more": "Read more"
   },
   "matchingReasons": {
     "CONNECT_TOPIC_MATCH": "The offer mentions {offer_topic}; your request asks for {seek_topic}.",

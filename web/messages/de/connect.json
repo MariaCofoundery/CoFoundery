@@ -944,7 +944,8 @@
     "workspaces": "Zu deinen privaten Arbeitsräumen",
     "filterTitle": "Probleme eingrenzen",
     "boardHint": "Nach Alter sortiert, neueste zuerst. Nichts steigt auf.",
-    "nowOnBoard": "Gerade am Brett"
+    "nowOnBoard": "Gerade am Brett",
+    "more": "Mehr dazu"
   },
   "matchingReasons": {
     "CONNECT_TOPIC_MATCH": "Das Angebot nennt {offer_topic}; dein Gesuch sucht {seek_topic}.",

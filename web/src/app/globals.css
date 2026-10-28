@@ -998,43 +998,161 @@ body {
    bewegt sich mehr oder weniger als eine andere, und nichts steigt auf. Mit
    "Bewegung reduzieren" steht alles still und ist trotzdem vollstaendig.
    --------------------------------------------------------------------------- */
-.problem-stage {
+/* Der Grund des ganzen Problembereichs: Nacht mit zwei langsam wandernden
+   Lichtflaechen. Inhalte, die man liest oder ausfuellt, liegen darauf als
+   helle Karten ("Papier") - die Seiten darunter bleiben so lesbar, ohne dass
+   jede Komponente ein dunkles Gegenstueck braucht. */
+.problem-night {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  border-radius: 28px;
-  padding: 1.25rem;
+  min-height: 70vh;
   background: #0a1120;
   color: #edf3ff;
-  isolation: isolate;
 }
-.problem-stage::before,
-.problem-stage::after {
+.problem-night::before,
+.problem-night::after {
   content: "";
   position: absolute;
   z-index: -1;
-  width: 60%;
+  width: 60vmax;
   aspect-ratio: 1;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(90px);
   opacity: 0.45;
   pointer-events: none;
 }
-.problem-stage::before {
-  top: -25%;
-  left: -15%;
+.problem-night::before {
+  top: -20vmax;
+  left: -16vmax;
   background: radial-gradient(circle, rgba(103, 232, 249, 0.4), transparent 65%);
   animation: problem-drift-a 26s ease-in-out infinite alternate;
 }
-.problem-stage::after {
-  bottom: -30%;
-  right: -15%;
+.problem-night::after {
+  bottom: -24vmax;
+  right: -16vmax;
   background: radial-gradient(circle, rgba(167, 139, 250, 0.38), transparent 65%);
   animation: problem-drift-b 32s ease-in-out infinite alternate;
 }
-@keyframes problem-drift-a { to { transform: translate(14%, 12%) scale(1.12); } }
-@keyframes problem-drift-b { to { transform: translate(-12%, -10%) scale(1.08); } }
+@keyframes problem-drift-a { to { transform: translate(9vmax, 7vmax) scale(1.12); } }
+@keyframes problem-drift-b { to { transform: translate(-8vmax, -6vmax) scale(1.08); } }
 
-.problem-stage__hint {
+.problem-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9fb0cc;
+  text-decoration: none;
+}
+.problem-back:hover { color: #edf3ff; }
+
+/* Kopf: Schrift direkt auf der Nacht, ohne Kasten. */
+.problem-hero { padding-block: 1.5rem 0.5rem; }
+.problem-hero__eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #67e8f9;
+}
+.problem-hero__title {
+  margin-top: 0.75rem;
+  max-width: 18ch;
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  background: linear-gradient(100deg, #ffffff 30%, #67e8f9 70%, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.problem-hero__title--small { font-size: clamp(1.75rem, 4.5vw, 2.75rem); max-width: 26ch; }
+.problem-hero__lead { margin-top: 1rem; max-width: 40rem; font-size: 1.125rem; line-height: 1.6; color: #b4c2da; }
+.problem-hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+.problem-hero__more { margin-top: 1.25rem; max-width: 40rem; color: #9fb0cc; }
+.problem-hero__more summary { min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: #67e8f9; }
+.problem-hero__more p { margin-top: 0.5rem; line-height: 1.6; }
+.problem-hero__meta { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.875rem; color: #9fb0cc; }
+
+/* Knoepfe auf der Nacht */
+.problem-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.problem-btn--primary {
+  color: #06222a;
+  background: linear-gradient(100deg, #67e8f9, #9cf3ff);
+  box-shadow: 0 10px 30px -10px rgba(103, 232, 249, 0.7);
+}
+.problem-btn--primary:hover { transform: translateY(-2px); }
+.problem-btn--ghost { color: #edf3ff; border: 1px solid rgba(190, 215, 255, 0.3); background: rgba(255, 255, 255, 0.05); }
+.problem-btn--ghost:hover { border-color: #67e8f9; }
+.problem-btn:focus-visible,
+.problem-hero__more summary:focus-visible,
+.problem-back:focus-visible { outline: 3px solid rgba(103, 232, 249, 0.55); outline-offset: 2px; }
+
+/* Glaskarten fuer Ablauf und Filter */
+.problem-glass {
+  border: 1px solid rgba(190, 215, 255, 0.16);
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(8px);
+  padding: 1.25rem;
+}
+.problem-glass__title { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #9fb0cc; }
+.problem-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 1rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.problem-steps li { position: relative; display: flex; gap: 0.75rem; align-items: flex-start; font-size: 0.9375rem; line-height: 1.4; color: #dbe5f5; }
+.problem-steps__n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid #67e8f9;
+  color: #67e8f9;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  box-shadow: 0 0 14px -4px #67e8f9;
+}
+.problem-glass__note { margin-top: 1rem; font-size: 0.9rem; line-height: 1.55; color: #9fb0cc; }
+.problem-glass__link { display: inline-flex; align-items: center; min-height: 44px; font-size: 0.9rem; font-weight: 600; color: #67e8f9; text-underline-offset: 4px; }
+.problem-input {
+  min-height: 48px;
+  width: 100%;
+  padding: 0 1rem;
+  border: 1px solid rgba(190, 215, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #edf3ff;
+  font-size: 0.9375rem;
+  outline: none;
+}
+.problem-input:focus { border-color: #67e8f9; background: rgba(255, 255, 255, 0.09); }
+.problem-input::placeholder { color: #8394b0; }
+.problem-input option { color: #0f172a; }
+
+/* Helle Karte auf der Nacht: fuer alles, was man liest oder ausfuellt. */
+.problem-paper {
+  border-radius: 24px;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.8);
+}
+
+.problem-board-wrap__hint {
   font-size: 0.875rem;
   font-style: italic;
   color: #9fb0cc;
@@ -1150,10 +1268,10 @@ body {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #64748b;
+  color: #9fb0cc;
 }
 .problem-note--live {
-  background: #0a1120;
+  background: #111b2f;
   --tilt: -1.4deg;
 }
 .problem-note--live[data-intent="wants_to_build"] { --tilt: 1.3deg; }
@@ -1206,8 +1324,8 @@ body {
 @keyframes problem-caret { 50% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .problem-stage::before,
-  .problem-stage::after,
+  .problem-night::before,
+  .problem-night::after,
   .problem-note,
   .problem-typewriter__caret { animation: none; }
   .problem-note { transition: none; }

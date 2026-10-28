@@ -4,6 +4,7 @@ import { join } from "node:path";
 import test from "node:test";
 import {
   PROBLEM_TRIED_LABEL,
+  splitProblemDescription,
   PROBLEM_TRIED_MAX,
   composeProblemDescription,
 } from "@/features/connect/problemDescription";
@@ -54,7 +55,7 @@ test("Das Brett bleibt nach Aktualitaet geordnet und fuehrt keine Rangfolge ein"
   // Die Bewegung haengt am Index der Anzeige, nicht an Zuspruch.
   assert.match(page, /"--i": index/);
   assert.doesNotMatch(page, /--i":\s*problem\./);
-  assert.match(board, /prefers-reduced-motion: reduce\) \{\s*\.problem-stage::before/);
+  assert.match(board, /prefers-reduced-motion: reduce\) \{\s*\.problem-night::before/);
 });
 
 test("Die Schreibzeile zeigt echte Titel und steht ohne Bewegungswunsch still", () => {
@@ -75,4 +76,34 @@ test("Die Live-Notiz hoert nur zu: kein Speichern, keine Netzwerkzugriffe", () =
 test("Beim Bearbeiten gibt es das Feld 'schon versucht' nicht, damit der Absatz nicht doppelt entsteht", () => {
   const form = read("features/connect/ConnectProblemForm.tsx");
   assert.match(form, /\{!problem \? \(\s*<label[^>]*htmlFor="problem-tried"/);
+});
+
+test("Der angehaengte Absatz wird in der Ansicht wieder abgetrennt", () => {
+  const composed = composeProblemDescription("Beschreibung", "Mit drei Leitungen gesprochen.");
+  assert.ok(composed.ok);
+  if (composed.ok) {
+    assert.deepEqual(splitProblemDescription(composed.description), {
+      main: "Beschreibung",
+      tried: "Mit drei Leitungen gesprochen.",
+    });
+  }
+  // Ein Text, der die Beschriftung nur irgendwo enthaelt, bleibt unveraendert.
+  const plain = `Wir haben es so erlebt. ${PROBLEM_TRIED_LABEL} nichts half.`;
+  assert.deepEqual(splitProblemDescription(plain), { main: plain, tried: null });
+  assert.deepEqual(splitProblemDescription(`Text\n\n${PROBLEM_TRIED_LABEL}   `), {
+    main: `Text\n\n${PROBLEM_TRIED_LABEL}   `,
+    tried: null,
+  });
+});
+
+test("Alle Seiten des Problembereichs liegen auf demselben Grund", () => {
+  for (const path of [
+    "app/(product)/connect/problems/page.tsx",
+    "app/(product)/connect/problems/new/page.tsx",
+    "app/(product)/connect/problems/[problemId]/page.tsx",
+    "app/(product)/connect/problems/[problemId]/edit/page.tsx",
+  ]) {
+    assert.match(read(path), /<ProblemNight>/, `${path} liegt nicht auf dem Grund des Problembereichs`);
+    assert.doesNotMatch(read(path), /brand-panel/, `${path} hat noch den alten Kopf`);
+  }
 });

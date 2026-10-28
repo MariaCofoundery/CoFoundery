@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { hasActiveConnectProfile } from "@/features/connect/connectData";
 import { ConnectProblemForm } from "@/features/connect/ConnectProblemForm";
+import { ProblemNight } from "@/features/connect/ProblemNight";
 import { updateConnectProblemAction } from "@/features/connect/connectProblemActions";
 import { getConnectProblem } from "@/features/connect/connectProblemData";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
@@ -37,16 +38,17 @@ export default async function EditConnectProblemPage({
   const errorKey = knownKey(query.error, CONNECT_ERROR_KEYS);
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
+    <ProblemNight>
+    <main className="mx-auto max-w-3xl px-5 pb-16 pt-8">
       <Link
         href={`/connect/problems/${problemId}`}
-        className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600"
+        className="problem-back"
       >
         ← {t("problems.backToProblem")}
       </Link>
-      <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
-        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("problems.editTitle")}</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-white">{t("problems.editText")}</p>
+      <header className="problem-hero">
+        <h1 className="problem-hero__title problem-hero__title--small">{t("problems.editTitle")}</h1>
+        <p className="problem-hero__lead">{t("problems.editText")}</p>
       </header>
 
       {errorKey ? (
@@ -57,5 +59,6 @@ export default async function EditConnectProblemPage({
 
       <ConnectProblemForm action={updateConnectProblemAction} problem={problem} canPublish={canPublish} t={t} />
     </main>
+    </ProblemNight>
   );
 }

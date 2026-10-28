@@ -33,3 +33,17 @@ export function composeProblemDescription(
   if (composed.length > PROBLEM_DESCRIPTION_MAX) return { ok: false, reason: "too_long" };
   return { ok: true, description: composed };
 }
+
+/**
+ * Trennt den angehaengten Absatz wieder ab, damit die Ansicht ihn
+ * hervorheben kann. Nur der letzte Absatz zaehlt, und nur, wenn er mit der
+ * Beschriftung beginnt - ein Text, der das Wort sonst irgendwo enthaelt,
+ * bleibt unveraendert.
+ */
+export function splitProblemDescription(description: string): { main: string; tried: string | null } {
+  const marker = `\n\n${PROBLEM_TRIED_LABEL} `;
+  const at = description.lastIndexOf(marker);
+  if (at === -1) return { main: description, tried: null };
+  const tried = description.slice(at + marker.length).trim();
+  return tried ? { main: description.slice(0, at), tried } : { main: description, tried: null };
+}

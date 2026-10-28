@@ -5,6 +5,7 @@ import { hasActiveConnectProfile } from "@/features/connect/connectData";
 import { ConnectProfileRequired } from "@/features/connect/ConnectProfileRequired";
 import { ConnectProblemForm } from "@/features/connect/ConnectProblemForm";
 import { ProblemLiveNote } from "@/features/connect/ProblemLiveNote";
+import { ProblemNight } from "@/features/connect/ProblemNight";
 import { CONNECT_PROBLEM_INTENTS } from "@/features/connect/connectTypes";
 import { saveConnectProblemAction } from "@/features/connect/connectProblemActions";
 import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
@@ -23,13 +24,14 @@ export default async function NewConnectProblemPage({
   const errorKey = knownKey(params.error, CONNECT_ERROR_KEYS);
 
   return (
-    <main className="mx-auto max-w-5xl px-5 py-10">
-      <Link href="/connect/problems" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">
+    <ProblemNight>
+    <main className="mx-auto max-w-5xl px-5 pb-16 pt-8">
+      <Link href="/connect/problems" className="problem-back">
         ← {t("problems.backToBoard")}
       </Link>
-      <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
-        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("problems.createTitle")}</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-white">{t("problems.createText")}</p>
+      <header className="problem-hero">
+        <h1 className="problem-hero__title problem-hero__title--small">{t("problems.createTitle")}</h1>
+        <p className="problem-hero__lead">{t("problems.createText")}</p>
       </header>
 
       {errorKey ? (
@@ -68,5 +70,6 @@ export default async function NewConnectProblemPage({
         </div>
       </div>
     </main>
+    </ProblemNight>
   );
 }
