@@ -8,7 +8,7 @@ Stand: 28.10.2026 (ergänzt um Punkt 7). Fakten aus dem Code und aus deinen Eint
 | Supabase | Datenbank, Anmeldung, Dateien | alle Konto- und Produktdaten | London (`eu-west-2`). Auftragsverarbeitung (DPA) ist Teil der Nutzungsbedingungen. Übermittlung nach Großbritannien: Angemessenheitsbeschluss der EU bis Dezember 2031 (von außen bestätigen lassen) |
 | Vercel | Hosting der Anwendung | Anfragen, Protokolle | Funktionen in London (`lhr1`). DPA, EU-US Data Privacy Framework und Standardvertragsklauseln |
 | Resend | Mailversand (Einladungen, Hinweise) | Empfängeradresse, Mailtext | Irland (`eu-west-1`). DPA vorhanden |
-| IONOS | Postfach hello@… | Korrespondenz | Deutschland. AV-Vertrag prüfen |
+| IONOS | Postfach hello@… | Korrespondenz | Deutschland. Vertrag aus 2026: Der AV-Vertrag ist bei Verträgen seit 19.07.2022 Teil der AGB, ein gesonderter Abschluss ist nicht nötig (Angabe von IONOS, Stand Oktober 2026) |
 
 ## Werkzeuge ohne Nutzerdaten im Betrieb
 - **GitHub:** hält den Quellcode, keine Nutzerdaten.

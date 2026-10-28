@@ -20,7 +20,7 @@ Maria. Sie entscheidet über Einordnung, Meldung und Benachrichtigung. Sie dokum
 | Danach | **Ursache beheben, Test ergänzen, Lehren dokumentieren.** |
 
 ## Zuständige Aufsichtsbehörde (Berlin)
-Berliner Beauftragte für Datenschutz und Informationsfreiheit (BlnBDI), Alt-Moabit 59–61, 10555 Berlin. Meldeformular auf der Seite der Behörde (datenschutz-berlin.de, Bereich „Datenpanne"). Telefon und Mail stehen dort. **Vor dem ersten Gebrauch den Link und das Formular öffnen und hier eintragen:** ______.
+Berliner Beauftragte für Datenschutz und Informationsfreiheit (BlnBDI), Alt-Moabit 59–61, 10555 Berlin (Eingang: Alt-Moabit 60). Telefon +49 30 13889-0, Fax +49 30 2155050, E-Mail mailbox@datenschutz-berlin.de. Kontaktseite: https://www.datenschutz-berlin.de/ueber-uns/kontakt/. Das Formular für die Meldung einer Datenpanne liegt auf der Seite der Behörde (Bereich „Datenpanne"); den genauen Link beim ersten Gebrauch dort öffnen und hier nachtragen: ______.
 
 ## Technische Sofortmaßnahmen (je nach Fall)
 - **Zugang gestohlen oder Verdacht auf Missbrauch:** in Supabase und Vercel die Schlüssel erneuern (Service-Role-Key, CRON_SECRET, JWT-Secret), danach in Vercel neu setzen und neu deployen. Das meldet alle Sitzungen ab.
