@@ -9,6 +9,9 @@ import {
 } from "@/features/founderLibrary/founderLibraryRegistry";
 import { FounderLibraryGlossary } from "@/features/founderLibrary/FounderLibraryGlossary";
 import { FounderLibraryUpdates } from "@/features/founderLibrary/FounderLibraryUpdates";
+import { FounderLibraryResearch } from "@/features/founderLibrary/FounderLibraryResearch";
+import { FOUNDER_LIBRARY_RESEARCH_SOURCES } from "@/features/founderLibrary/founderLibraryResearchRegistry";
+import { FOUNDER_SETUP_CONFLICT_PRONE } from "@/features/teams/founderSetupCatalog";
 import {
   FOUNDER_LIBRARY_OFFICIAL_SOURCES,
   FOUNDER_LIBRARY_UPDATES,
@@ -18,7 +21,8 @@ import {
   type LocalizedFounderLibraryUpdate,
 } from "@/features/founderLibrary/founderLibraryUpdatesRegistry";
 
-export type FounderLibraryViewKey = "glossary" | "updates";
+export type { FounderLibraryViewKey } from "@/features/founderLibrary/founderLibraryViewKey";
+import type { FounderLibraryViewKey } from "@/features/founderLibrary/founderLibraryViewKey";
 
 type Props = {
   view: FounderLibraryViewKey;
@@ -68,6 +72,9 @@ export async function FounderLibraryView({
       <Link href={`${pathname}?view=updates`} aria-current={view === "updates" ? "page" : undefined} className={tab(view === "updates", onBrand)}>
         {t("views.updates")}
       </Link>
+      <Link href={`${pathname}?view=research`} aria-current={view === "research" ? "page" : undefined} className={tab(view === "research", onBrand)}>
+        {t("views.research")}
+      </Link>
     </nav>
   );
 
@@ -76,8 +83,8 @@ export async function FounderLibraryView({
       {teamHeader ? (
         <>
           {teamHeader}
-          <p className="mt-4 max-w-3xl text-lg font-medium leading-7 text-slate-900">{view === "glossary" ? t("title") : t("updates.title")}</p>
-          <p className="mt-1 max-w-3xl text-base leading-7 text-slate-700">{view === "glossary" ? t("intro") : t("updates.intro")}</p>
+          <p className="mt-4 max-w-3xl text-lg font-medium leading-7 text-slate-900">{view === "glossary" ? t("title") : view === "research" ? t("research.title") : t("updates.title")}</p>
+          <p className="mt-1 max-w-3xl text-base leading-7 text-slate-700">{view === "glossary" ? t("intro") : view === "research" ? t("research.intro") : t("updates.intro")}</p>
           {view === "glossary" ? <p className="mt-2 max-w-3xl text-xs leading-6 text-slate-500">{t("professionalNote")}</p> : null}
         </>
       ) : (
@@ -90,9 +97,9 @@ export async function FounderLibraryView({
       <header className="brand-panel relative mt-5 grid items-center gap-5 overflow-hidden rounded-[28px] px-6 py-8 sm:px-9 md:grid-cols-[minmax(0,1fr)_auto]">
         <span aria-hidden="true" className="orb -top-14 right-52 hidden h-36 w-36 md:block" />
         <div className="min-w-0">
-          <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{view === "glossary" ? t("eyebrow") : t("updates.eyebrow")}</p>
-          <h1 className="mt-1 max-w-2xl text-[30px] font-semibold leading-[1.15] tracking-tight sm:text-[34px]">{view === "glossary" ? t("title") : t("updates.title")}</h1>
-          <p className="mt-2 max-w-xl text-[15.5px] leading-7 text-white opacity-95">{view === "glossary" ? t("intro") : t("updates.intro")}</p>
+          <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{view === "glossary" ? t("eyebrow") : view === "research" ? t("research.eyebrow") : t("updates.eyebrow")}</p>
+          <h1 className="mt-1 max-w-2xl text-[30px] font-semibold leading-[1.15] tracking-tight sm:text-[34px]">{view === "glossary" ? t("title") : view === "research" ? t("research.title") : t("updates.title")}</h1>
+          <p className="mt-2 max-w-xl text-[15.5px] leading-7 text-white opacity-95">{view === "glossary" ? t("intro") : view === "research" ? t("research.intro") : t("updates.intro")}</p>
           {view === "glossary" ? <p className="mt-2 max-w-xl text-[13px] leading-6 text-white opacity-90">{t("professionalNote")}</p> : null}
         </div>
         <div className="md:justify-self-end">{tabs(true)}</div>
@@ -129,6 +136,27 @@ export async function FounderLibraryView({
             noResultsHint: t("search.noResultsHint"),
             setupPrompt: t("setupPrompt"),
             openInSetup: t.raw("openInSetup"),
+          }}
+        />
+      ) : view === "research" ? (
+        <FounderLibraryResearch
+          sources={FOUNDER_LIBRARY_RESEARCH_SOURCES.map((source) => ({
+            ...source,
+            summary: t(`research.entries.${source.id}.summary`),
+            limits: t(`research.entries.${source.id}.limits`),
+          }))}
+          conflictTopicTitles={[...FOUNDER_SETUP_CONFLICT_PRONE].map((key) => setupT(`items.${key}.title`))}
+          labels={{
+            listLabel: t("research.listLabel"),
+            doi: t("research.doi"),
+            open: t("research.open"),
+            summary: t("research.summary"),
+            limits: t("research.limits"),
+            usedForTitle: t("research.usedForTitle"),
+            usedFor: t("research.usedFor"),
+            notCoveredTitle: t("research.notCoveredTitle"),
+            notCovered: t("research.notCovered"),
+            disclaimer: t("research.disclaimer"),
           }}
         />
       ) : (

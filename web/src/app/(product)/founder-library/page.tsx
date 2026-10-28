@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
+import { founderLibraryViewFrom } from "@/features/founderLibrary/founderLibraryViewKey";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
 import { getRequestUser } from "@/lib/supabase/server";
 
@@ -10,7 +11,7 @@ type Props = {
 
 export default async function GlobalFounderLibraryPage({ searchParams }: Props) {
   const pathname = "/founder-library";
-  const view = (await searchParams)?.view === "updates" ? "updates" : "glossary";
+  const view = founderLibraryViewFrom((await searchParams)?.view);
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(pathname)}`);
 

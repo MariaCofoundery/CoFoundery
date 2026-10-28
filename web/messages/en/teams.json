@@ -1047,7 +1047,8 @@
         "settled": "Settled"
       },
       "conflict": "Often a sticking point",
-      "conflictHelp": "Research often names this topic as a source of conflict in founder teams. It does not mean it will be for you."
+      "conflictHelp": "Research often names this topic as a source of conflict in founder teams. It does not mean it will be for you.",
+      "conflictSources": "Where we know this from"
     }
   },
   "dashboard": {

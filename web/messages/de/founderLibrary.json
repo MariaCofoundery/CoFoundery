@@ -9,7 +9,8 @@
   "views": {
     "label": "Founder-Library-Ansicht",
     "glossary": "Begriffe",
-    "updates": "Updates & Quellen"
+    "updates": "Updates & Quellen",
+    "research": "Studien"
   },
   "search": {
     "label": "Glossar durchsuchen",
@@ -342,6 +343,27 @@
     "pitch_deck": {
       "term": "Pitch Deck",
       "shortDefinition": "Die kurze Präsentation, mit der ein Startup sich bei Kapitalgebern vorstellt: Problem, Lösung, Markt, Team, Zahlen, Bedarf."
+    }
+  },
+  "research": {
+    "eyebrow": "Studien",
+    "title": "Woher unsere Hinweise kommen",
+    "intro": "Wo wir uns im Produkt auf Forschung stützen, steht hier: die Quelle, was sie aussagt und was nicht.",
+    "listLabel": "Studien",
+    "doi": "DOI",
+    "open": "Studie öffnen",
+    "summary": "Worum es geht",
+    "limits": "Was sie nicht aussagt",
+    "usedForTitle": "Wofür wir sie nutzen",
+    "usedFor": "Für den Hinweis „Oft ein Knackpunkt“ im Founder Setup. Er steht bei diesen Themen:",
+    "notCoveredTitle": "Was wir nicht belegen können",
+    "notCovered": "Bei allen anderen Themen im Founder Setup zeigen wir den Hinweis nicht, weil wir dafür keine Quelle haben. Das heißt nicht, dass es dort keine Konflikte gibt.",
+    "disclaimer": "Eine Auswahl, kein Anspruch auf Vollständigkeit. Die Hinweise sagen nichts über euer Team und ersetzen keine Beratung.",
+    "entries": {
+      "kozusznik_euwema_2025": {
+        "summary": "Die Studie unterscheidet drei Bereiche, in denen Gründerinnen und Gründer Konflikte untereinander erleben: Geld, Normen und Vision. Daraus entwickeln die Autor:innen eine Messskala für Konflikte unter Mitgründern.",
+        "limits": "Interviews und Befragungen mit vergleichsweise kleinen Stichproben, nach Angaben der Befragten selbst und nicht repräsentativ. Die Studie zeigt, welche Themen als Konfliktquellen genannt werden, nicht wie oft Teams darüber streiten. Über ein einzelnes Team sagt sie nichts."
+      }
     }
   }
 }

@@ -9,7 +9,8 @@
   "views": {
     "label": "Founder Library view",
     "glossary": "Glossary",
-    "updates": "Updates & Sources"
+    "updates": "Updates & Sources",
+    "research": "Studien"
   },
   "search": {
     "label": "Search the glossary",
@@ -342,6 +343,27 @@
     "pitch_deck": {
       "term": "Pitch deck",
       "shortDefinition": "The short presentation a startup uses to introduce itself to investors: problem, solution, market, team, numbers, what it needs."
+    }
+  },
+  "research": {
+    "eyebrow": "Studies",
+    "title": "Where our hints come from",
+    "intro": "Wherever the product relies on research, it is listed here: the source, what it says and what it does not.",
+    "listLabel": "Studies",
+    "doi": "DOI",
+    "open": "Open the study",
+    "summary": "What it is about",
+    "limits": "What it does not say",
+    "usedForTitle": "What we use it for",
+    "usedFor": "For the hint “Often a sticking point” in Founder Setup. It appears on these topics:",
+    "notCoveredTitle": "What we cannot support",
+    "notCovered": "On all other Founder Setup topics we do not show the hint, because we have no source for it. That does not mean there are no conflicts there.",
+    "disclaimer": "A selection, not complete. The hints say nothing about your team and are not a substitute for advice.",
+    "entries": {
+      "kozusznik_euwema_2025": {
+        "summary": "The study distinguishes three areas in which founders experience conflict with each other: money, norms and vision. From this the authors develop a measurement scale for co-founder conflict.",
+        "limits": "Interviews and surveys with comparatively small samples, self-reported and not representative. The study shows which topics are named as sources of conflict, not how often teams argue about them. It says nothing about a single team."
+      }
     }
   }
 }

@@ -1047,7 +1047,8 @@
         "settled": "Festgehalten"
       },
       "conflict": "Oft ein Knackpunkt",
-      "conflictHelp": "In der Forschung werden diese Themen häufig als Konfliktquellen in Gründerteams genannt. Das heißt nicht, dass es bei euch so ist."
+      "conflictHelp": "In der Forschung werden diese Themen häufig als Konfliktquellen in Gründerteams genannt. Das heißt nicht, dass es bei euch so ist.",
+      "conflictSources": "Woher wir das wissen"
     }
   },
   "dashboard": {

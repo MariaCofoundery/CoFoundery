@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { getTranslations } from "next-intl/server";
+import { founderLibraryViewFrom } from "@/features/founderLibrary/founderLibraryViewKey";
 import { FounderLibraryView } from "@/features/founderLibrary/FounderLibraryView";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
@@ -13,7 +14,7 @@ type Props = {
 
 export default async function FounderLibraryPage({ params, searchParams }: Props) {
   const { teamId } = await params;
-  const view = (await searchParams)?.view === "updates" ? "updates" : "glossary";
+  const view = founderLibraryViewFrom((await searchParams)?.view);
   const supabase = await createClient();
   const { data: { user } } = await getRequestUser();
   const pathname = `/teams/${encodeURIComponent(teamId)}/founder-library`;

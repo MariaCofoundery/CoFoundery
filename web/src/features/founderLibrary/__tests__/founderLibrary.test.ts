@@ -252,7 +252,7 @@ test("global Founder Library is founder-authenticated without requiring a team",
   assert.match(page, /await (getRequestUser\(\)|supabase\.auth\.getUser\(\))/);
   assert.match(page, /getDashboardRoleViews\(user\.id\)/);
   assert.match(page, /if \(!roles\.hasFounder\)/);
-  assert.match(page, /\?\.view === "updates" \? "updates" : "glossary"/);
+  assert.match(page, /founderLibraryViewFrom\(\(await searchParams\)\?\.view\)/);
   assert.match(page, /pathname="\/founder-library"|pathname=\{pathname\}/);
   assert.doesNotMatch(page, /getFounderTeamHomebase|teamId|membership/);
   assert.match(view, /teamId\?/);

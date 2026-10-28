@@ -250,7 +250,7 @@ export default async function FounderSetupPage({ params, searchParams }: Props) 
         </summary>
         <p className="mt-3 text-sm leading-7 text-slate-600">{t("legendStages")}</p>
         <p className="mt-2 text-sm leading-7 text-slate-600">{t("legendOutcomes")}</p>
-        <p className="mt-2 text-sm leading-7 text-slate-600"><span className="font-semibold text-rose-800">{t("list.conflict")}</span>: {t("list.conflictHelp")}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-600"><span className="font-semibold text-rose-800">{t("list.conflict")}</span>: {t("list.conflictHelp")} <Link href="/founder-library?view=research" className="font-semibold underline underline-offset-2">{t("list.conflictSources")}</Link></p>
         <dl className="mt-4 grid gap-3 sm:grid-cols-3">
           {(["clarified", "documented", "not_relevant"] as const).map((outcome) => (
             <div key={outcome} className="rounded-xl bg-slate-50 px-4 py-3">
