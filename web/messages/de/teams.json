@@ -785,6 +785,11 @@
       "error": "Die Änderung konnte gerade nicht sicher gespeichert werden. Bitte versuche es erneut."
     },
     "items": {
+      "vision_goals": {
+        "title": "Vision und Ziele",
+        "question": "Wohin soll das Unternehmen, und was ist euch dabei wichtig?",
+        "orientation": "Wo soll das Unternehmen in fünf Jahren stehen? Wollt ihr schnell wachsen, unabhängig bleiben oder etwas aufbauen, das ihr später verkauft? Auch Werte gehören dazu: Wie wollt ihr arbeiten, und was kommt für euch nicht infrage? Konflikte entstehen oft nicht über das Ziel selbst, sondern weil zwei Menschen stillschweigend etwas Verschiedenes wollen. Hier gibt es kein Richtig oder Falsch, nur gut oder schlecht abgestimmt."
+      },
       "roles_responsibilities": {
         "title": "Rollen & Verantwortlichkeiten",
         "question": "Wer übernimmt welche Bereiche, und wo liegen Verantwortungs- und Entscheidungsgrenzen?",

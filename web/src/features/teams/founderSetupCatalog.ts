@@ -8,6 +8,9 @@ export const FOUNDER_SETUP_CATEGORY_KEYS = [
 export type FounderSetupCategoryKey = (typeof FOUNDER_SETUP_CATEGORY_KEYS)[number];
 
 export const FOUNDER_SETUP_ITEM_KEYS = [
+  // Neu am 28.10.2026. Die Forschung zu Konflikten unter Mitgruendern nennt neben Geld und
+  // Normen die Vision als eigenen Bereich (docs/research/phase-13/13.5-quellen-konfliktthemen.md).
+  "vision_goals",
   "roles_responsibilities",
   "decision_rights",
   "time_commitment",
@@ -73,6 +76,7 @@ export type FounderSetupCatalogItem = {
 };
 
 export const FOUNDER_SETUP_CATALOG: readonly FounderSetupCatalogItem[] = [
+  { key: "vision_goals", category: "collaboration", phase: "before", weight: "standard", legalNote: false },
   { key: "roles_responsibilities", category: "collaboration", phase: "before", weight: "critical", legalNote: false },
   { key: "decision_rights", category: "collaboration", phase: "before", weight: "critical", legalNote: false },
   { key: "time_commitment", category: "collaboration", phase: "before", weight: "critical", legalNote: false },
@@ -138,4 +142,6 @@ export const FOUNDER_SETUP_CONFLICT_PRONE: ReadonlySet<FounderSetupItemKey> = ne
   "decision_rights",
   "time_commitment",
   "communication",
+  // Vision
+  "vision_goals",
 ]);

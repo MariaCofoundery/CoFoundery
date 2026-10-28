@@ -785,6 +785,11 @@
       "error": "The change could not be saved safely right now. Please try again."
     },
     "items": {
+      "vision_goals": {
+        "title": "Vision and goals",
+        "question": "Where should the company go, and what matters to you on the way?",
+        "orientation": "Where should the company be in five years? Do you want to grow fast, stay independent, or build something you sell later? Values belong here too: how do you want to work, and what is off the table for you? Conflicts often do not arise over the goal itself but because two people quietly want different things. There is no right or wrong here, only well or poorly aligned."
+      },
       "roles_responsibilities": {
         "title": "Roles & responsibilities",
         "question": "Who takes on which areas, and where do responsibility and decision boundaries lie?",

@@ -231,3 +231,19 @@ test("die Zahl im Fragebogen-Text stimmt mit dem Katalog ueberein", () => {
     assert.ok(text.includes(`${FOUNDER_SETUP_ITEM_KEYS.length} `), `${locale}: Themenzahl veraltet`);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Vision und Ziele (28.10.2026)
+// ---------------------------------------------------------------------------
+test("Vision und Ziele steht im Katalog, in beiden Wertelisten und in der Diskussionsfunktion", () => {
+  const entry = FOUNDER_SETUP_CATALOG.find((item) => item.key === "vision_goals");
+  assert.ok(entry, "vision_goals fehlt im Katalog");
+  assert.equal(entry.phase, "before");
+  assert.equal(entry.legalNote, false);
+  assert.ok(FOUNDER_SETUP_CONFLICT_PRONE.has("vision_goals"), "die Studie nennt Vision als eigenen Konfliktbereich");
+  const migration = source("../supabase/migrations/20270105120000_founder_setup_vision_goals.sql");
+  // Alle 23 Themen in allen drei Listen (zwei CHECK-Listen und die Funktion).
+  for (const key of FOUNDER_SETUP_ITEM_KEYS) {
+    assert.equal((migration.match(new RegExp(`'${key}'`, "g")) ?? []).length, 3, `${key}: nicht in allen drei Listen`);
+  }
+});
