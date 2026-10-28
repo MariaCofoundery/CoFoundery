@@ -55,7 +55,7 @@ test("Das Brett bleibt nach Aktualitaet geordnet und fuehrt keine Rangfolge ein"
   // Die Bewegung haengt am Index der Anzeige, nicht an Zuspruch.
   assert.match(page, /"--i": index/);
   assert.doesNotMatch(page, /--i":\s*problem\./);
-  assert.match(board, /prefers-reduced-motion: reduce\) \{\s*\.problem-night::before/);
+  assert.match(board, /prefers-reduced-motion: reduce\) \{\s*\.problem-note,/);
 });
 
 test("Die Schreibzeile zeigt echte Titel und steht ohne Bewegungswunsch still", () => {
@@ -106,4 +106,24 @@ test("Alle Seiten des Problembereichs liegen auf demselben Grund", () => {
     assert.match(read(path), /<ProblemNight>/, `${path} liegt nicht auf dem Grund des Problembereichs`);
     assert.doesNotMatch(read(path), /brand-panel/, `${path} hat noch den alten Kopf`);
   }
+});
+
+test("Das Problembrett zeigt zwoelf Notizen je Seite und hat keine schweren Effekte mehr", () => {
+  const page = read("app/(product)/connect/problems/page.tsx");
+  const data = read("features/connect/connectProblemData.ts");
+  const paging = read("features/connect/connectBrowsePage.ts");
+  assert.match(paging, /PROBLEM_PAGE_SIZE = 12/);
+  assert.match(page, /problemsRows\.slice\(0, PROBLEM_PAGE_SIZE\)/);
+  assert.match(page, /pageSize=\{PROBLEM_PAGE_SIZE\}/);
+  assert.match(data, /connectOffset\(filters\.page, PROBLEM_PAGE_SIZE\)/);
+
+  // Die Seite blieb beim Scrollen haengen: bewegte, weichgezeichnete Ebenen und
+  // Glas-Unschaerfe auf jeder Karte sind genau die Dinge, die das ausloesen.
+  const css = read("app/globals.css");
+  const problemCss = css.slice(css.indexOf(".problem-night {"), css.indexOf("@media (prefers-reduced-motion: reduce) {\n  .problem-note,"));
+  assert.ok(problemCss.length > 1000, "der Abschnitt wurde nicht gefunden");
+  assert.doesNotMatch(problemCss, /backdrop-filter/);
+  assert.doesNotMatch(problemCss, /filter:\s*blur/);
+  assert.doesNotMatch(problemCss, /\.problem-night(::before|::after)/);
+  assert.doesNotMatch(problemCss, /\.problem-night \{[^}]*overflow:\s*hidden/);
 });

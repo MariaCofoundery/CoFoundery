@@ -1,5 +1,5 @@
 import { ConnectPagination } from "@/features/connect/ConnectPagination";
-import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
+import { PROBLEM_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -29,7 +29,7 @@ export default async function ConnectProblemsPage({
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client } = await requireConnectMember("/connect/problems");
   const problemsRows = await getActiveConnectProblems(client, filters);
-  const problems = problemsRows.slice(0, CONNECT_PAGE_SIZE);
+  const problems = problemsRows.slice(0, PROBLEM_PAGE_SIZE);
   const authors = await getConnectProfilesByUserIds(
     client,
     problems.map((problem) => problem.author_user_id).filter((id): id is string => id !== null)
@@ -206,7 +206,7 @@ export default async function ConnectProblemsPage({
             </div>
           </section>
         )}
-        <ConnectPagination path="/connect/problems" filters={filters} count={problemsRows.length} />
+        <ConnectPagination path="/connect/problems" filters={filters} count={problemsRows.length} pageSize={PROBLEM_PAGE_SIZE} />
       </section>
     </main>
     </ProblemNight>

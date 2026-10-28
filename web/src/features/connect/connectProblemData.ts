@@ -1,6 +1,6 @@
 import { orIlike, placeTerms, topicTerms } from "@/features/connect/connectFilterCatalog";
 import "server-only";
-import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
+import { connectOffset, PROBLEM_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -34,7 +34,7 @@ export async function getActiveConnectProblems(
     // Nach Aktualitaet, nie nach Interesse: Eine Sortierung nach Zuspruch
     // waere eine Rangliste, und genau die soll das Brett nicht sein.
     .order("published_at", { ascending: false })
-    .order("id", { ascending: true }).range(connectOffset(filters.page), connectOffset(filters.page) + CONNECT_PAGE_SIZE);
+    .order("id", { ascending: true }).range(connectOffset(filters.page, PROBLEM_PAGE_SIZE), connectOffset(filters.page, PROBLEM_PAGE_SIZE) + PROBLEM_PAGE_SIZE);
 
   if (filters.intent) query = query.eq("author_intent", filters.intent);
   if (filters.geographic_scope) query = query.eq("geographic_scope", filters.geographic_scope);
