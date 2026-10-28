@@ -111,3 +111,25 @@ export function getFounderSetupCatalogItem(key: FounderSetupItemKey) {
 export function getFounderSetupItemsByPhase(phase: FounderSetupPhaseKey) {
   return FOUNDER_SETUP_CATALOG.filter((item) => item.phase === phase);
 }
+
+/**
+ * Themen, bei denen die Meinungen in Gruenderteams haeufig auseinandergehen.
+ *
+ * DAS IST EINE REDAKTIONELLE EINSCHAETZUNG, KEINE MESSUNG, und sie sagt nichts
+ * ueber EUER Team. Sie ist getrennt von `weight`: "critical" heisst "wird teuer,
+ * wenn es offen bleibt" (auch Rechtsform oder Rechte am Geschaffenen, die selten
+ * streitig sind); diese Liste heisst "hier wird oft gestritten". Kein Rang, keine
+ * Ampel, kein Zaehler - nur ein Hinweis am Thema.
+ */
+export const FOUNDER_SETUP_CONFLICT_PRONE: ReadonlySet<FounderSetupItemKey> = new Set<FounderSetupItemKey>([
+  "roles_responsibilities",
+  "decision_rights",
+  "time_commitment",
+  "conflict_deadlock",
+  "equity",
+  "vesting",
+  "compensation",
+  "changing_commitment",
+  "founder_exit",
+  "investor_dilution",
+]);

@@ -13,7 +13,7 @@ import { FounderSetupTopicRail } from "@/features/teams/FounderSetupTopicRail";
 import { buildFounderSetupRail, founderSetupTopicPosition } from "@/features/teams/founderSetupTopicNav";
 import Link from "next/link";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
-import { getFounderSetupCatalogItem, isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
+import { FOUNDER_SETUP_CONFLICT_PRONE, getFounderSetupCatalogItem, isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup, getFounderSetupDiscussion } from "@/features/teams/founderSetupData";
 import { groupFounderSetupDiscussionEntries } from "@/features/teams/founderSetupDiscussion";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
@@ -214,7 +214,12 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
       </div>
 
       <section className="brand-panel mt-3 rounded-[28px] p-5 sm:p-7" aria-labelledby="topic-title">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t(`categories.${catalogItem.category}`)}</p>
+        <p className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white">
+          {t(`categories.${catalogItem.category}`)}
+          {FOUNDER_SETUP_CONFLICT_PRONE.has(itemKey) ? (
+            <span title={t("list.conflictHelp")} className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-semibold normal-case tracking-normal text-white">{t("list.conflict")}</span>
+          ) : null}
+        </p>
         <h1 id="topic-title" className="mt-2 text-3xl font-semibold leading-tight">{t(`items.${itemKey}.title`)}</h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t(`items.${itemKey}.question`)}</p>
         {/* Wo das Thema steht - in Worten und mit Punkt, ohne Zahl. */}

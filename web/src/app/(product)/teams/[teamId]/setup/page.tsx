@@ -3,7 +3,7 @@ import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
-import { FOUNDER_SETUP_PHASE_KEYS, getFounderSetupCatalogItem } from "@/features/teams/founderSetupCatalog";
+import { FOUNDER_SETUP_CONFLICT_PRONE, FOUNDER_SETUP_PHASE_KEYS, getFounderSetupCatalogItem } from "@/features/teams/founderSetupCatalog";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { countFounderSetupStatuses } from "@/features/teams/founderSetupModel";
 import { founderSetupRailState } from "@/features/teams/founderSetupTopicNav";
@@ -13,7 +13,10 @@ import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvis
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getCollaborationConversationPointCounts } from "@/features/collaborationLab/collaborationConversationPoints";
 
-type Props = { params: Promise<{ teamId: string }> };
+type Props = { params: Promise<{ teamId: string }>; searchParams: Promise<{ filter?: string }> };
+
+const FILTERS = ["all", "waiting_for_you", "working", "open", "settled"] as const;
+type Filter = (typeof FILTERS)[number];
 
 const DOT = {
   open: "border-2 border-slate-400",
@@ -23,8 +26,10 @@ const DOT = {
   settled: "border-2 border-teal-600 bg-teal-600",
 } as const;
 
-export default async function FounderSetupPage({ params }: Props) {
+export default async function FounderSetupPage({ params, searchParams }: Props) {
   const { teamId } = await params;
+  const { filter: rawFilter } = await searchParams;
+  const filter: Filter = (FILTERS as readonly string[]).includes(rawFilter ?? "") ? (rawFilter as Filter) : "all";
   const supabase = await createClient();
   const { data: { user } } = await getRequestUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/teams/${teamId}/setup`)}`);
@@ -45,6 +50,15 @@ export default async function FounderSetupPage({ params }: Props) {
   ]);
   const counts = countFounderSetupStatuses(setup);
   const railState = (item: (typeof setup.items)[number]) => founderSetupRailState(item, user.id);
+  const matches = (item: (typeof setup.items)[number], which: Filter) => {
+    const state = railState(item);
+    if (which === "all") return true;
+    if (which === "waiting_for_you") return state === "waiting_for_you";
+    if (which === "working") return state === "discussing" || state === "awaiting_others" || state === "waiting_for_you";
+    if (which === "open") return state === "open";
+    return state === "settled";
+  };
+  const filterCounts = Object.fromEntries(FILTERS.map((which) => [which, setup.items.filter((item) => matches(item, which)).length])) as Record<Filter, number>;
   // Das naechste Thema: zuerst ein wichtiges, noch offenes; sonst eines, das gerade geklaert wird oder
   // auf Bestaetigung wartet; sonst das erste offene. Keine Rangfolge der Personen, nur der Reihenfolge der Seite.
   const unsettled = FOUNDER_SETUP_PHASE_KEYS.flatMap((phase) =>
@@ -109,6 +123,21 @@ export default async function FounderSetupPage({ params }: Props) {
 
       {setup.items.some(item => item.rosterConfirmationMissing) ? <p className="mt-5 rounded-xl border border-slate-200 p-4 text-sm leading-6">{t("rosterChanged")}</p> : null}
 
+      {/* Ein Blick auf alles Offene oder alles, was auf dich wartet - ohne
+          jedes Thema aufzumachen. Reine Links mit ?filter=, kein Zustand. */}
+      <nav aria-label={t("list.filterLabel")} className="mt-6 flex flex-wrap gap-2">
+        {FILTERS.map((which) => (
+          <Link
+            key={which}
+            href={which === "all" ? `/teams/${teamId}/setup` : `/teams/${teamId}/setup?filter=${which}`}
+            aria-current={filter === which ? "true" : undefined}
+            className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] ${filter === which ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : "border-[#e4e2f0] bg-white text-[#0b1f3a] hover:bg-[#f7f6fb]"}`}
+          >
+            {t(`list.filters.${which}`)} <span className={filter === which ? "text-white/80" : "text-[#5f5e7a]"}>{filterCounts[which]}</span>
+          </Link>
+        ))}
+      </nav>
+
       {/* ---------------------------------------------------------------
           Phasen statt einer Liste von zwanzig.
 
@@ -122,9 +151,10 @@ export default async function FounderSetupPage({ params }: Props) {
           --------------------------------------------------------------- */}
       <div className="mt-7 grid gap-8">
         {FOUNDER_SETUP_PHASE_KEYS.map((phase) => {
-          const items = setup.items.filter(
+          const phaseItems = setup.items.filter(
             (item) => getFounderSetupCatalogItem(item.key)?.phase === phase
           );
+          const items = phaseItems.filter((item) => matches(item, filter));
           if (items.length === 0) return null;
           const openCritical = items.filter(
             (item) =>
@@ -144,8 +174,8 @@ export default async function FounderSetupPage({ params }: Props) {
                       {t("phases.openCritical", { count: openCritical })}
                     </span>
                   ) : null}
-                  <span className="text-sm text-slate-600">{t("list.phaseProgress", { done: items.filter((item) => item.stage === "settled").length, total: items.length })}</span>
-                  <span aria-hidden="true" className="h-1.5 w-28 overflow-hidden rounded-full bg-[#e4e2f0]"><span className="block h-full rounded-full bg-gradient-to-r from-[#6d49e0] to-[#0a80b8]" style={{ width: `${Math.round((items.filter((item) => item.stage === "settled").length / items.length) * 100)}%` }} /></span>
+                  <span className="text-sm text-slate-600">{t("list.phaseProgress", { done: phaseItems.filter((item) => item.stage === "settled").length, total: phaseItems.length })}</span>
+                  <span aria-hidden="true" className="h-1.5 w-28 overflow-hidden rounded-full bg-[#e4e2f0]"><span className="block h-full rounded-full bg-gradient-to-r from-[#6d49e0] to-[#0a80b8]" style={{ width: `${Math.round((phaseItems.filter((item) => item.stage === "settled").length / phaseItems.length) * 100)}%` }} /></span>
                 </div>
               </div>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
@@ -154,7 +184,6 @@ export default async function FounderSetupPage({ params }: Props) {
               <ul className="mt-4 grid gap-3 md:grid-cols-2">
                 {items.map((item) => {
                   const catalogItem = getFounderSetupCatalogItem(item.key);
-                  const isCritical = catalogItem?.weight === "critical";
                   return (
                     <li key={item.key}>
                       <Link
@@ -171,19 +200,20 @@ export default async function FounderSetupPage({ params }: Props) {
                             {conversationPointCounts.get(item.key)
                               ? ` · ${t("conversationPoints.listHint", { count: conversationPointCounts.get(item.key)! })}`
                               : ""}
-                            {/* Nicht "wichtiger", sondern: teuer, wenn es
-                                offen bleibt und es darauf ankommt. */}
-                            {isCritical && item.stage === "open"
-                              ? ` · ${t("weights.critical")}`
-                              : ""}
                           </span>
                         </span>
+                        {/* Hier gehen die Meinungen oft auseinander - ein Hinweis am Thema,
+                            kein Urteil ueber euch. Bewusst nicht rot und nicht "wichtig". */}
+                        {FOUNDER_SETUP_CONFLICT_PRONE.has(item.key) ? (
+                          <span title={t("list.conflictHelp")} className="hidden shrink-0 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-800 ring-1 ring-inset ring-rose-200 sm:inline-flex">{t("list.conflict")}</span>
+                        ) : null}
                         {/* Die Stufe traegt das Zeichen, das Ergebnis nur die Beschriftung
-                            des letzten Schritts. Ein offenes Thema bleibt still: "Offen" an
-                            zwanzig Zeilen ist Laerm. Was auf DICH wartet, ist hervorgehoben. */}
+                            des letzten Schritts. Jedes Thema traegt eines - auch "Offen",
+                            damit man den Stand an der Liste ablesen kann. Was auf DICH
+                            wartet, ist hervorgehoben. */}
                         {railState(item) === "waiting_for_you" ? (
                           <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">{t("topic.railState.waiting_for_you")}</span>
-                        ) : item.stage !== "open" ? (
+                        ) : (
                           <FounderSetupStatusChip
                             stage={item.stage}
                             outcome={item.outcome}
@@ -193,7 +223,7 @@ export default async function FounderSetupPage({ params }: Props) {
                                 : t(`stages.${item.stage}`)
                             }
                           />
-                        ) : <span className="sr-only">{t("stages.open")}</span>}
+                        )}
                         <svg
                           aria-hidden="true"
                           viewBox="0 0 20 20"
@@ -220,6 +250,7 @@ export default async function FounderSetupPage({ params }: Props) {
         </summary>
         <p className="mt-3 text-sm leading-7 text-slate-600">{t("legendStages")}</p>
         <p className="mt-2 text-sm leading-7 text-slate-600">{t("legendOutcomes")}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-600"><span className="font-semibold text-rose-800">{t("list.conflict")}</span>: {t("list.conflictHelp")}</p>
         <dl className="mt-4 grid gap-3 sm:grid-cols-3">
           {(["clarified", "documented", "not_relevant"] as const).map((outcome) => (
             <div key={outcome} className="rounded-xl bg-slate-50 px-4 py-3">

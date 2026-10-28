@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
-  FOUNDER_SETUP_CATALOG,
+  FOUNDER_SETUP_CATALOG, FOUNDER_SETUP_CONFLICT_PRONE,
   FOUNDER_SETUP_ITEM_KEYS,
   FOUNDER_SETUP_PHASE_KEYS,
   getFounderSetupItemsByPhase,
@@ -79,25 +79,28 @@ test("die Themen sind in Phasen geordnet, nicht alle auf einmal", () => {
   }
 });
 
-test("teuer ist sichtbar, und nur solange es offen ist", () => {
+test("kritisch zaehlt weiter, der Hinweis am Thema ist 'oft strittig' und kein Rang", () => {
   const critical = FOUNDER_SETUP_CATALOG.filter((item) => item.weight === "critical");
-  assert.ok(critical.length >= 8, "zu wenige Themen als teuer gekennzeichnet");
+  assert.ok(critical.length >= 8, "zu wenige Themen als kritisch gekennzeichnet");
   assert.ok(critical.length < FOUNDER_SETUP_CATALOG.length, "wenn alles wichtig ist, ist nichts wichtig");
 
-  // Ein Thema, an dem ihr schon arbeitet, soll nicht weiter mahnen. Die
-  // Bedingung haengt seit der Trennung von Stufe und Ergebnis (18.09.2026) an
-  // der STUFE - "offen" heisst dort: noch niemand hat es angefasst.
-  assert.match(source(OVERVIEW), /isCritical && item\.stage === "open"/);
+  // GEAENDERT am 28.10.2026: Die Zeile "wird teuer, wenn es offen bleibt" an jedem
+  // Thema ist weg. Der Hinweis am Thema ist jetzt "Oft strittig" - eine getrennte,
+  // redaktionelle Liste (FOUNDER_SETUP_CONFLICT_PRONE), kein Urteil ueber das Team.
+  const overview = source(OVERVIEW);
+  assert.match(overview, /FOUNDER_SETUP_CONFLICT_PRONE\.has\(item\.key\)/);
+  assert.doesNotMatch(overview, /weights\.critical/);
+  assert.ok(FOUNDER_SETUP_CONFLICT_PRONE.size >= 5 && FOUNDER_SETUP_CONFLICT_PRONE.size < FOUNDER_SETUP_CATALOG.length, "der Hinweis verliert seinen Sinn, wenn er alles oder fast nichts trifft");
+  for (const key of FOUNDER_SETUP_CONFLICT_PRONE) {
+    assert.ok(FOUNDER_SETUP_CATALOG.some((item) => item.key === key), `unbekanntes Thema: ${key}`);
+  }
 
   for (const locale of ["de", "en"]) {
-    const weights = setupCopy(locale).weights as unknown as Record<string, string>;
-    assert.ok(weights?.critical, `${locale}: weights.critical fehlt`);
-    // "wichtig" allein waere eine Rangfolge. Es geht um die Folge.
-    assert.match(
-      weights.critical,
-      locale === "de" ? /teuer|offen/ : /expensive|open/,
-      `${locale}: die Kennzeichnung sagt nicht, worum es geht`
-    );
+    const list = setupCopy(locale).list as unknown as Record<string, string>;
+    assert.ok(list?.conflict && list?.conflictHelp, `${locale}: Hinweistext fehlt`);
+    // Der Hinweis sagt nichts ueber EUER Team und ist keine Wertung.
+    assert.match(list.conflictHelp, locale === "de" ? /nichts darüber|häufig/ : /nothing about|often/, `${locale}: der Hinweis grenzt sich nicht ab`);
+    assert.doesNotMatch(list.conflict, /Score|Punkte|riskant|gefährlich|risky|danger/i);
   }
 });
 

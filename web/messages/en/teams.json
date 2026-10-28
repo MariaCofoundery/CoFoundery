@@ -1037,7 +1037,17 @@
     },
     "list": {
       "progressLabel": "{done} of {total} settled",
-      "phaseProgress": "{done} of {total} settled"
+      "phaseProgress": "{done} of {total} settled",
+      "filterLabel": "Filter topics",
+      "filters": {
+        "all": "All",
+        "waiting_for_you": "Waiting for you",
+        "working": "In progress",
+        "open": "Open",
+        "settled": "Settled"
+      },
+      "conflict": "Often disputed",
+      "conflictHelp": "Opinions on this topic often differ in founder teams. It says nothing about how it is for you."
     }
   },
   "dashboard": {

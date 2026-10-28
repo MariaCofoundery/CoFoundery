@@ -1037,7 +1037,17 @@
     },
     "list": {
       "progressLabel": "{done} von {total} festgehalten",
-      "phaseProgress": "{done} von {total} festgehalten"
+      "phaseProgress": "{done} von {total} festgehalten",
+      "filterLabel": "Themen filtern",
+      "filters": {
+        "all": "Alle",
+        "waiting_for_you": "Wartet auf dich",
+        "working": "In Arbeit",
+        "open": "Offen",
+        "settled": "Festgehalten"
+      },
+      "conflict": "Oft strittig",
+      "conflictHelp": "Bei diesem Thema gehen die Meinungen in Gründerteams häufig auseinander. Das sagt nichts darüber, wie es bei euch ist."
     }
   },
   "dashboard": {
