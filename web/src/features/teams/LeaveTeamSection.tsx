@@ -21,6 +21,7 @@ export async function LeaveTeamSection({ teamId, memberCount, failed = false }: 
             <li>{t("consequences.share")}</li>
             <li>{t("consequences.report")}</li>
             <li>{t("consequences.setup")}</li>
+            <li>{t("consequences.contributions")}</li>
             <li>{t("consequences.personal")}</li>
             {memberCount <= 2 ? <li>{t("consequences.pair")}</li> : null}
           </ul>

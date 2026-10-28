@@ -1092,6 +1092,7 @@
       "share": "Your team share for this team ends.",
       "report": "Your current team report may no longer be available to the others.",
       "setup": "Agreements already confirmed in Founder Setup are not rewritten; they only count if all current members have confirmed them.",
+      "contributions": "Contributions you wrote in the team stay visible to the team without your name (“former member”). If you want specific contributions removed, write to hello@cofoundery.de. We will review your request.",
       "personal": "Your personal details stay in your own profile.",
       "pair": "In a team of two, the other person remains alone in the team and can invite new members."
     },

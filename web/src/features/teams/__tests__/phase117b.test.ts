@@ -108,8 +108,14 @@ test("Team verlassen: nur die eigene Person, Folgen vorher, zweiter Klick", () =
   assert.match(leave, /leaveTeamAction\.bind\(null, teamId\)/);
   assert.match(leave, /<details/);
   assert.doesNotMatch(leave, /removeMember|p_user_id/);
-  for (const key of ["access", "share", "report", "setup", "personal"])
+  for (const key of ["access", "share", "report", "setup", "contributions", "personal"])
     assert.ok(json("messages/de/teams.json").leave.consequences[key], key);
+  // Beitraege: ohne Namen sichtbar, Entfernung nur auf Anfrage und ohne Zusage.
+  const contributions = json("messages/de/teams.json").leave.consequences.contributions as string;
+  assert.match(contributions, /ohne deinen Namen/);
+  assert.match(contributions, /hello@cofoundery\.de/);
+  assert.match(contributions, /Wir prüfen deine Anfrage/);
+  assert.doesNotMatch(contributions, /werden gelöscht|wird gelöscht|innerhalb von/);
 });
 
 test("Vorhaben: keine eigene ShareForm, Hinweis vor dem Absenden", () => {
