@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TeamTabsActiveIntoView } from "@/features/teams/TeamTabsActiveIntoView";
 
 type NavigationKey = "overview" | "workstyle" | "roles" | "setup" | "library" | "alignment" | "venture" | "tradeoffs" | "strengths" | "checkin";
 
@@ -31,6 +32,9 @@ type Props = {
  * Pills - global gibt es die farbige Pille, in der zweiten Ebene den
  * Unterstrich, hier denselben Unterstrich. Auf dem Telefon horizontal
  * scrollbar statt umbrechend; jedes Ziel bleibt mindestens 44 Pixel hoch.
+ *
+ * Ab "sm" bricht die Leiste um (28.10.2026): Mit neun Reitern passte sie auf einem Laptop
+ * nicht mehr in eine Zeile, und "Check-in" lag ausserhalb des sichtbaren Bereichs.
  */
 export function FounderTeamNavigation({ teamId, active, labels }: Props) {
   const team = encodeURIComponent(teamId);
@@ -47,8 +51,8 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
   ];
 
   return (
-    <nav aria-label={labels.ariaLabel} className="ws-no-print team-tabs -mx-4 mt-4 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:px-0">
-      <ul className="flex min-w-max items-end gap-1 sm:gap-2">
+    <nav aria-label={labels.ariaLabel} className="ws-no-print team-tabs -mx-4 mt-4 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+      <ul className="flex min-w-max items-end gap-1 sm:min-w-0 sm:flex-wrap sm:gap-x-2">
         {items.map((item) => (
           <li key={item.key}>
             <Link
@@ -65,6 +69,7 @@ export function FounderTeamNavigation({ teamId, active, labels }: Props) {
           </li>
         ))}
       </ul>
+      <TeamTabsActiveIntoView />
     </nav>
   );
 }
