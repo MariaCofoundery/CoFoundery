@@ -1046,8 +1046,8 @@
         "open": "Offen",
         "settled": "Festgehalten"
       },
-      "conflict": "Oft strittig",
-      "conflictHelp": "Bei diesem Thema gehen die Meinungen in Gründerteams häufig auseinander. Das sagt nichts darüber, wie es bei euch ist."
+      "conflict": "Oft ein Knackpunkt",
+      "conflictHelp": "Statistisch gesehen gibt es bei diesem Thema in Gründerteams oft Knackpunkte oder Streit. Das heißt nicht, dass es bei euch so ist."
     }
   },
   "dashboard": {
