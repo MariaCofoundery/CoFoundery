@@ -24,7 +24,9 @@ export type DashboardTaskType =
   | "founder_in_the_wild_handoff"
   | "founder_in_the_wild_reveal"
   | "commitment_lab_continue"
-  | "founder_setup_continue";
+  | "founder_setup_continue"
+  | "check_in_open"
+  | "check_in_due";
 
 export type FounderDashboardTask = {
   id: string;
@@ -124,6 +126,13 @@ export type FounderDashboardTaskSignals = {
     updatedAt: string;
   }>;
   setupConfirmations: Array<{ revisionId: string; userId: string }>;
+  /** Team-Check-ins, bei denen fuer diese Person etwas zu tun ist (siehe getCheckInTaskState). */
+  checkIns?: Array<{
+    teamId: string;
+    teamLabel: string | null;
+    state: "due" | "open_needs_you";
+    at: string;
+  }>;
   commitmentLabs: Array<{
     relationshipId: string;
     updatedAt: string;
@@ -173,6 +182,7 @@ const NEEDS_YOU_PRIORITY: Partial<Record<DashboardTaskType, number>> = {
   relationship_advisor_consent: 2,
   setup_advisor_consent: 3,
   setup_confirmation: 4,
+  check_in_open: 4,
   read_my_mind_invitation: 2,
   founder_in_the_wild_handoff: 2,
   founder_in_the_wild_reveal: 2,
@@ -559,6 +569,21 @@ export function buildFounderDashboardTasks(
       contextLabel: activeItem.teamLabel,
       personLabel: null,
       itemKey: activeItem.itemKey,
+    });
+  }
+
+  // Check-in: laeuft einer und die eigene Abgabe fehlt, wartet er auf dich; ist der naechste
+  // faellig, ist es eine gemeinsame Aufgabe. Beides fuehrt direkt in den Check-in des Teams.
+  for (const checkIn of signals.checkIns ?? []) {
+    tasks.push({
+      id: `check-in:${checkIn.teamId}:${checkIn.state}`,
+      kind: checkIn.state === "open_needs_you" ? "NEEDS_YOU" : "CONTINUE_SHARED",
+      type: checkIn.state === "open_needs_you" ? "check_in_open" : "check_in_due",
+      href: `/teams/${encodeURIComponent(checkIn.teamId)}/check-in`,
+      createdAt: checkIn.at,
+      contextLabel: checkIn.teamLabel,
+      personLabel: null,
+      itemKey: null,
     });
   }
 

@@ -40,6 +40,8 @@ export const TEAM_WORK_ANSWER_DAYS = 365;
 export const TEAM_WORK_RETRO_DAYS = 180;
 export const TEST_PROJECT_DRAFT_DAYS = 90;
 export const REMINDER_STAMP_DAYS = 365;
+/** Teamnotizen zur Gespraechsvorbereitung im Finanzierungs-Wegweiser (`purge_stale_financing_notes`): 365 Tage ohne Aenderung. */
+export const FINANCING_NOTE_DAYS = 365;
 
 type RpcError = { code?: string | null } | null;
 type RpcResult = { data: unknown; error: RpcError };
@@ -58,6 +60,7 @@ export type PrivacyRetentionResult = {
   operationalCleanup: StepStatus;
   personalCleanup: StepStatus;
   teamWorkCleanup: StepStatus;
+  financingNotesCleanup: StepStatus;
   /** Nur Zählwerte, die die SQL-Funktionen selbst zurückgeben. */
   counts: {
     research: { retentionDays: number; deletedResearchEvents: number; deletedProductAnalyticsEvents: number } | null;
@@ -73,6 +76,7 @@ export type PrivacyRetentionResult = {
       deletedTestProjects: number;
       deletedReminderStamps: number;
     } | null;
+    financingNotes: { deletedFinancingNotes: number } | null;
   };
 };
 
@@ -125,13 +129,15 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
     p_draft_days: TEST_PROJECT_DRAFT_DAYS,
     p_stamp_days: REMINDER_STAMP_DAYS,
   });
+  const financingNotes = await runStep(client, "purge_stale_financing_notes", { p_days: FINANCING_NOTE_DAYS });
   return {
-    ok: research.ok && events.ok && operational.ok && personal.ok && teamWork.ok,
+    ok: research.ok && events.ok && operational.ok && personal.ok && teamWork.ok && financingNotes.ok,
     researchCleanup: research.ok ? "ok" : "failed",
     eventCleanup: events.ok ? "ok" : "failed",
     operationalCleanup: operational.ok ? "ok" : "failed",
     personalCleanup: personal.ok ? "ok" : "failed",
     teamWorkCleanup: teamWork.ok ? "ok" : "failed",
+    financingNotesCleanup: financingNotes.ok ? "ok" : "failed",
     counts: {
       research: research.ok
         ? pickCounts(research.data, ["retentionDays", "deletedResearchEvents", "deletedProductAnalyticsEvents"] as const)
@@ -150,6 +156,7 @@ export async function runPrivacyRetention(client: RetentionRpcClient): Promise<P
             "deletedReminderStamps",
           ] as const)
         : null,
+      financingNotes: financingNotes.ok ? pickCounts(financingNotes.data, ["deletedFinancingNotes"] as const) : null,
     },
   };
 }

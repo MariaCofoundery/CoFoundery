@@ -183,3 +183,38 @@ export async function getCheckInCardState(
   });
   return { state: due && due.getTime() <= Date.now() ? "due" : "scheduled", due };
 }
+
+/**
+ * Fuer die Aufgabenliste auf der Startseite: ist fuer diese Person im Team etwas zu tun?
+ *
+ *   "due"            Es laeuft keiner, und der naechste ist faellig (gemeinsame Aufgabe).
+ *   "open_needs_you" Ein Check-in laeuft, und die Person hat noch nicht abgegeben.
+ *
+ * Alles andere (nichts faellig, abgegeben, kein bestaetigtes Thema) ist keine Aufgabe.
+ */
+export async function getCheckInTaskState(
+  teamId: string,
+  userId: string,
+  setupItems: ReadonlyArray<{ outcome: string | null; currentConfirmedRevision: { confirmedAt: string | null } | null }>,
+  client?: Client
+): Promise<{ state: "due" | "open_needs_you"; at: string } | null> {
+  const supabase = client ?? (await createClient());
+  const card = await getCheckInCardState(teamId, setupItems, supabase);
+  if (!card) return null;
+  if (card.state === "due") return { state: "due", at: card.due?.toISOString() ?? new Date().toISOString() };
+  if (card.state !== "open") return null;
+  const { data: open } = await supabase
+    .from("team_check_ins")
+    .select("id, started_at")
+    .eq("team_id", teamId)
+    .eq("status", "open")
+    .maybeSingle();
+  if (!open) return null;
+  const { data: submission } = await supabase
+    .from("team_check_in_submissions")
+    .select("user_id")
+    .eq("check_in_id", open.id)
+    .eq("user_id", userId)
+    .maybeSingle();
+  return submission ? null : { state: "open_needs_you", at: String(open.started_at) };
+}

@@ -1326,7 +1326,7 @@
         "q2": "Wachstum, Unabhängigkeit oder Verkauf?"
       }
     },
-    "prepNote": "Neutrale Fragen für einen Termin. Es gibt keine richtigen Antworten. Besprecht sie am besten zuerst im Team.",
+    "prepNote": "Neutrale Fragen für einen Termin. Es gibt keine richtigen Antworten. Besprecht sie am besten zuerst im Team. Die Notizen sehen alle aktuellen Mitglieder des Teams. Notizen, die ein Jahr nicht geändert wurden, werden gelöscht.",
     "prep": {
       "purpose": "Was wollen wir mit dem Geld erreichen, und bis wann?",
       "governance": "Wie viel Mitsprache soll eine Investorin oder ein Investor haben, und worüber?",
@@ -1341,6 +1341,15 @@
       "title": "Finanzierung",
       "text": "Worauf ihr vor und während einer Finanzierung achten könnt. Eine Checkliste ohne Wertung, kein Investor-Matching.",
       "open": "Wegweiser öffnen"
+    },
+    "notes": {
+      "placeholder": "Eure Notiz (höchstens 600 Zeichen)",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "saving": "Wird gespeichert …",
+      "error": "Die Notiz konnte nicht gespeichert werden.",
+      "unsaved": "Noch nicht gespeichert",
+      "visible": "Die Notizen sehen alle aktuellen Mitglieder des Teams. Notizen, die ein Jahr nicht geändert wurden, werden gelöscht."
     }
   }
 }

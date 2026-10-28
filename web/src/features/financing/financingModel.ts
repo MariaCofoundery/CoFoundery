@@ -70,6 +70,11 @@ export const FINANCING_AGREEMENT_TOPICS: readonly FounderSetupItemKey[] = [
 /** Fragen fuer die Gespraechsvorbereitung. Neutral, ohne Zielvorgabe. */
 export const FINANCING_PREP_QUESTIONS = ["purpose", "governance", "reporting", "sale", "beyondMoney"] as const;
 
+export const FINANCING_NOTE_MAX = 600;
+
+export const isFinancingQuestionKey = (value: unknown): boolean =>
+  typeof value === "string" && (FINANCING_PREP_QUESTIONS as readonly string[]).includes(value);
+
 export type FinancingView = "guide" | "agreements" | "prep";
 export const financingViewFrom = (value: string | undefined): FinancingView =>
   value === "agreements" || value === "prep" ? value : "guide";

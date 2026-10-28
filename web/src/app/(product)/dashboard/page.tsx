@@ -771,6 +771,22 @@ function presentDashboardTask(
         text: t("tasks.items.commitmentLab.text", { context }),
         action: t("tasks.items.commitmentLab.action"),
       };
+    case "check_in_open":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.checkInOpen.title", { context }),
+        text: t("tasks.items.checkInOpen.text"),
+        action: t("tasks.items.checkInOpen.action"),
+      };
+    case "check_in_due":
+      return {
+        ...task,
+        eyebrow,
+        title: t("tasks.items.checkInDue.title", { context }),
+        text: t("tasks.items.checkInDue.text"),
+        action: t("tasks.items.checkInDue.action"),
+      };
     case "founder_setup_continue": {
       const topic = task.itemKey
         ? setupT(`items.${task.itemKey}.title`)

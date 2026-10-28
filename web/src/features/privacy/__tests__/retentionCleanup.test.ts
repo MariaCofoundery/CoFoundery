@@ -37,6 +37,7 @@ function fakeClient(responses: Record<string, { data?: unknown; error?: { code?:
 }
 
 const OK_RESPONSES = {
+  purge_stale_financing_notes: { data: { financingNoteDays: 365, deletedFinancingNotes: 2 } },
   purge_old_research_events: {
     data: { retentionDays: 30, cutoff: "2026-09-13T00:00:00Z", deletedResearchEvents: 4, deletedProductAnalyticsEvents: 2 },
   },
@@ -101,7 +102,7 @@ test("korrektes Geheimnis: 200 und beide Schritte ok", async () => {
   const { outcome, calls } = await run(`Bearer ${SECRET}`, SECRET);
   assert.equal(outcome.status, 200);
   assert.equal(outcome.body.ok, true);
-  assert.equal(calls.length, 5);
+  assert.equal(calls.length, 6);
 });
 
 test("ohne Service-Role-Schlüssel: 503, nichts wird aufgerufen", async () => {
@@ -121,6 +122,7 @@ test("jede Funktion genau einmal, Forschung mit 30 Tagen", async () => {
     { fn: "purge_stale_operational_rows", args: { p_job_days: 90, p_notice_days: 180 } },
     { fn: "purge_stale_personal_rows", args: { p_feedback_days: 60, p_invitation_days: 60 } },
     { fn: "purge_stale_team_work_rows", args: { p_answer_days: 365, p_retro_days: 180, p_draft_days: 90, p_stamp_days: 365 } },
+    { fn: "purge_stale_financing_notes", args: { p_days: 365 } },
   ]);
   assert.equal(RESEARCH_RETENTION_DAYS, 30);
 });
@@ -134,6 +136,7 @@ test("die Zählwerte der Funktionen gehen in die Antwort, sonst nichts", async (
     operationalCleanup: "ok",
     personalCleanup: "ok",
     teamWorkCleanup: "ok",
+    financingNotesCleanup: "ok",
     counts: {
       research: { retentionDays: 30, deletedResearchEvents: 4, deletedProductAnalyticsEvents: 2 },
       events: { closedEvents: 1, deletedAnswers: 12, deletedParticipants: 3 },
@@ -143,6 +146,7 @@ test("die Zählwerte der Funktionen gehen in die Antwort, sonst nichts", async (
         deletedRetroAnswers: 1, deletedRetroInvites: 1, deletedCheckInTopics: 4, deletedCheckInSubmissions: 2,
         deletedTestProjectDrafts: 1, deletedTestProjects: 2, deletedReminderStamps: 3,
       },
+      financingNotes: { deletedFinancingNotes: 2 },
     },
   });
 });
@@ -161,7 +165,7 @@ test("Forschungs-Löschung scheitert: 500, Event-Löschung läuft trotzdem", asy
     assert.equal(outcome.body.ok, false);
     assert.equal("researchCleanup" in outcome.body && outcome.body.researchCleanup, "failed");
     assert.equal("eventCleanup" in outcome.body && outcome.body.eventCleanup, "ok");
-    assert.equal(calls.length, 5, "die weiteren Schritte hängen nicht am ersten");
+    assert.equal(calls.length, 6, "die weiteren Schritte hängen nicht am ersten");
   } finally {
     log.restore();
   }
@@ -193,6 +197,7 @@ test("alle scheitern, auch per Ausnahme: 500, alle failed, keine Zählwerte", as
       purge_stale_operational_rows: { throws: true },
       purge_stale_personal_rows: { throws: true },
       purge_stale_team_work_rows: { throws: true },
+      purge_stale_financing_notes: { throws: true },
     });
     assert.equal(outcome.status, 500);
     assert.deepEqual(outcome.body, {
@@ -202,7 +207,8 @@ test("alle scheitern, auch per Ausnahme: 500, alle failed, keine Zählwerte", as
       operationalCleanup: "failed",
       personalCleanup: "failed",
       teamWorkCleanup: "failed",
-      counts: { research: null, events: null, operational: null, personal: null, teamWork: null },
+      financingNotesCleanup: "failed",
+      counts: { research: null, events: null, operational: null, personal: null, teamWork: null, financingNotes: null },
     });
   } finally {
     log.restore();

@@ -81,3 +81,18 @@ test("Wegweiser: nur Mitglieder lesen und aendern, ohne Summe oder Balken in der
   assert.match(actions, /rpc\("set_team_financing_item"/);
   assert.doesNotMatch(actions, /\.from\("team_financing_items"\)/);
 });
+
+test("Notizen: die Fragen im Code und die CHECK-Liste der Notizen sind dieselben, nur Mitglieder schreiben, es gibt eine Loeschfrist", () => {
+  const notes = source("../supabase/migrations/20270109120000_team_financing_notes.sql")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/^\s*--.*$/gm, "");
+  const block = notes.slice(notes.indexOf("team_financing_notes_key_check"), notes.indexOf("))", notes.indexOf("team_financing_notes_key_check")));
+  const inDatabase = [...block.matchAll(/'([A-Za-z]+)'/g)].map((match) => match[1]).sort();
+  assert.deepEqual([...FINANCING_PREP_QUESTIONS].sort(), inDatabase);
+  assert.match(notes, /is_current_user_founder_team_member\(team_id\)/);
+  assert.doesNotMatch(notes, /grant (insert|update|delete)/i);
+  assert.match(notes, /revoke all on function public\.purge_stale_financing_notes\(integer\) from public, anon, authenticated/);
+  assert.match(notes, /grant execute on function public\.purge_stale_financing_notes\(integer\) to service_role/);
+  const retention = source("src/features/privacy/retentionCleanup.ts");
+  assert.match(retention, /purge_stale_financing_notes/);
+});

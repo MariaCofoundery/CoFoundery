@@ -175,6 +175,16 @@
         "title": "{context}: Founder Setup fortsetzen",
         "text": "Am Thema „{topic}“ wurde bereits gemeinsam gearbeitet.",
         "action": "Fortsetzen"
+      },
+      "checkInOpen": {
+        "title": "Check-in in {context}",
+        "text": "Euer Team prüft gerade, ob die Vereinbarungen noch gelten. Deine Antworten fehlen noch.",
+        "action": "Check-in ausfüllen"
+      },
+      "checkInDue": {
+        "title": "Check-in in {context} ist fällig",
+        "text": "Es ist Zeit zu prüfen, ob eure Vereinbarungen noch gelten. Das dauert ein paar Minuten.",
+        "action": "Check-in öffnen"
       }
     }
   },

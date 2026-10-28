@@ -1326,7 +1326,7 @@
         "q2": "Growth, independence or a sale?"
       }
     },
-    "prepNote": "Neutral questions for a meeting. There are no right answers. It is best to talk them through in the team first.",
+    "prepNote": "Neutral questions for a meeting. There are no right answers. It is best to talk them through in the team first. All current team members can see the notes. Notes that have not been changed for a year are deleted.",
     "prep": {
       "purpose": "What do we want to achieve with the money, and by when?",
       "governance": "How much say should an investor have, and on what?",
@@ -1341,6 +1341,15 @@
       "title": "Funding",
       "text": "What to look at before and during fundraising. A checklist without scoring, no investor matching.",
       "open": "Open the guide"
+    },
+    "notes": {
+      "placeholder": "Your note (up to 600 characters)",
+      "save": "Save",
+      "saved": "Saved",
+      "saving": "Saving …",
+      "error": "The note could not be saved.",
+      "unsaved": "Not saved yet",
+      "visible": "All current team members can see the notes. Notes that have not been changed for a year are deleted."
     }
   }
 }

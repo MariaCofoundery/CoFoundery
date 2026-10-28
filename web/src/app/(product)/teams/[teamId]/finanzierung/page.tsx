@@ -5,7 +5,8 @@ import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
-import { getFinancingStatuses } from "@/features/financing/financingData";
+import { getFinancingNotes, getFinancingStatuses } from "@/features/financing/financingData";
+import { FinancingNote } from "@/features/financing/FinancingNote";
 import { FinancingStatusButton } from "@/features/financing/FinancingStatusButton";
 import {
   FINANCING_AGREEMENT_TOPICS,
@@ -39,11 +40,12 @@ export default async function FinancingPage({ params, searchParams }: Props) {
   const setup = await getFounderSetup(teamId, user.id, supabase);
   if (!setup) return <TeamUnavailable teamId={teamId} />;
 
-  const [t, setupT, teamLabel, statuses] = await Promise.all([
+  const [t, setupT, teamLabel, statuses, notes] = await Promise.all([
     getTranslations("teams.financing"),
     getTranslations("teams.setup"),
     getTeamLabel(supabase, teamId),
     getFinancingStatuses(teamId, supabase),
+    view === "prep" ? getFinancingNotes(teamId, supabase) : Promise.resolve(new Map()),
   ]);
   const setupItem = (key: string) => setup.items.find((item) => item.key === key);
   const nameOf = (userId: string | null) => {
@@ -161,7 +163,22 @@ export default async function FinancingPage({ params, searchParams }: Props) {
           <section className={CARD}>
             <ul className="grid gap-3">
               {FINANCING_PREP_QUESTIONS.map((key) => (
-                <li key={key} className="rounded-2xl bg-[#f7f6fb] px-4 py-3 text-[15px] font-medium text-[#0b1f3a]">{t(`prep.${key}`)}</li>
+                <li key={key}>
+                  <FinancingNote
+                    teamId={teamId}
+                    questionKey={key}
+                    question={t(`prep.${key}`)}
+                    initial={notes.get(key)?.note ?? ""}
+                    labels={{
+                      placeholder: t("notes.placeholder"),
+                      save: t("notes.save"),
+                      saved: t("notes.saved"),
+                      saving: t("notes.saving"),
+                      error: t("notes.error"),
+                      unsaved: t("notes.unsaved"),
+                    }}
+                  />
+                </li>
               ))}
             </ul>
           </section>

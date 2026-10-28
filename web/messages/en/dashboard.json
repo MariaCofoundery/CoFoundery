@@ -175,6 +175,16 @@
         "title": "{context}: continue Founder Setup",
         "text": "You already started working together on “{topic}”.",
         "action": "Continue"
+      },
+      "checkInOpen": {
+        "title": "Check-in in {context}",
+        "text": "Your team is checking whether its agreements still hold. Your answers are still missing.",
+        "action": "Fill in the check-in"
+      },
+      "checkInDue": {
+        "title": "Check-in in {context} is due",
+        "text": "It is time to check whether your agreements still hold. It takes a few minutes.",
+        "action": "Open the check-in"
       }
     }
   },

@@ -48,6 +48,7 @@ const EXPORTED_TABLES = [
   { table: "team_departure_choices", column: "user_id" },
   // Finanzierungs-Wegweiser: nur "wer hat einen Status zuletzt gesetzt".
   { table: "team_financing_items", column: "updated_by_user_id" },
+  { table: "team_financing_notes", column: "updated_by_user_id" },
   { table: "founder_team_setup_discussion_entries", column: "author_user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.

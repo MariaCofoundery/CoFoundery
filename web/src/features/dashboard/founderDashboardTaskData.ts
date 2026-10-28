@@ -2,6 +2,8 @@ import "server-only";
 
 import { buildFounderDashboardTasks } from "@/features/dashboard/founderDashboardTasks";
 import type { InvitationDashboardRow } from "@/features/reporting/actions";
+import { getCheckInTaskState } from "@/features/checkIn/checkInData";
+import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvisorAccessData";
 import { isFounderSetupItemKey } from "@/features/teams/founderSetupCatalog";
 import type { FounderTeamDashboardSummary } from "@/features/teams/founderTeamHomebaseModel";
@@ -411,6 +413,32 @@ export async function getFounderDashboardTasks(params: {
           revisionId: confirmation.revision_id,
           userId: confirmation.user_id,
         })),
+    checkIns: (
+      await Promise.all(
+        params.teams.map(async (team) => {
+          try {
+            const setup = await getFounderSetup(team.id, currentUserId, supabase);
+            if (!setup) return null;
+            const state = await getCheckInTaskState(team.id, currentUserId, setup.items, supabase);
+            if (!state) return null;
+            return {
+              teamId: team.id,
+              teamLabel:
+                team.name ??
+                (team.members
+                  .map((member) => member.displayName)
+                  .filter((name): name is string => Boolean(name))
+                  .join(" + ") || null),
+              state: state.state,
+              at: state.at,
+            };
+          } catch {
+            // Eine fehlende Tabelle oder Abfrage macht aus dem Check-in keine Aufgabe - mehr nicht.
+            return null;
+          }
+        })
+      )
+    ).flatMap((entry) => (entry ? [entry] : [])),
     commitmentLabs: commitmentLabs.map((lab) => ({
           relationshipId: lab.relationship_id,
           updatedAt: lab.updated_at,
