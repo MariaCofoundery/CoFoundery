@@ -1165,5 +1165,182 @@
     "continueFeedback": "You carry on. The question is closed.",
     "dissolvedFeedback": "You dissolved the team.",
     "error": "Your choice could not be saved right now. Please try again."
+  },
+  "financing": {
+    "eyebrow": "Funding",
+    "title": "Funding",
+    "tabs": {
+      "label": "View",
+      "guide": "Guide",
+      "agreements": "Your agreements",
+      "prep": "Before the conversation"
+    },
+    "hero": {
+      "guide": {
+        "title": "What to look at before and during fundraising",
+        "intro": "This page sorts topics that are often discussed before and during fundraising. It does not assess your team and does not recommend investors or forms of financing."
+      },
+      "agreements": {
+        "title": "What your agreements already say",
+        "intro": "The topics from your Founder Setup that people often ask about when funding comes up."
+      },
+      "prep": {
+        "title": "Preparing for a conversation",
+        "intro": "Questions you can answer for yourselves beforehand. It is about your position, not about the right answer."
+      }
+    },
+    "guideNote": "Every item has a status that you set yourselves. There is no total: open is not failing, and “not relevant” is a valid answer. All current members can change the status, and it is visible to team members only.",
+    "statuses": {
+      "open": "Open",
+      "progress": "In progress",
+      "done": "Settled",
+      "na": "Not relevant"
+    },
+    "statusError": "The status could not be saved.",
+    "setupHint": "In Founder Setup: {state}",
+    "setupLink": "Open in Setup",
+    "lastChanged": "last {name}",
+    "areas": {
+      "team": {
+        "title": "The team",
+        "text": "Who does what, and is it written down?"
+      },
+      "shares": {
+        "title": "Shares and ownership",
+        "text": "Who owns how much, and what changes with outside money?"
+      },
+      "rights": {
+        "title": "Rights to what you create",
+        "text": "Who owns what you build?"
+      },
+      "documents": {
+        "title": "Documents",
+        "text": "What you can show when someone asks."
+      },
+      "goal": {
+        "title": "Your goal with the money",
+        "text": "What you want to achieve before you approach anyone."
+      }
+    },
+    "items": {
+      "roles_defined": {
+        "title": "Roles and responsibilities are named",
+        "hint": "Who decides what?"
+      },
+      "time_stated": {
+        "title": "Each person's time is spoken out loud",
+        "hint": "Who is in full time, who is not, and will it stay that way?"
+      },
+      "tie_break": {
+        "title": "You know how you decide when you disagree",
+        "hint": "Including a deadlock."
+      },
+      "exit_discussed": {
+        "title": "You have discussed what happens if someone leaves",
+        "hint": "Leaving and vesting."
+      },
+      "split_written": {
+        "title": "The split of shares is written down",
+        "hint": ""
+      },
+      "dilution_discussed": {
+        "title": "You have talked about dilution",
+        "hint": "How do your shares change with each round?"
+      },
+      "contributions_listed": {
+        "title": "Contributions, expenses and commitments are listed",
+        "hint": "Including commitments such as options or loans."
+      },
+      "ip_clarified": {
+        "title": "It is written down who owns the results",
+        "hint": "Code, brand, texts, data."
+      },
+      "side_activities_disclosed": {
+        "title": "Side activities are disclosed",
+        "hint": ""
+      },
+      "accounts_access": {
+        "title": "Accounts and access are sorted out",
+        "hint": "Who has access to what?"
+      },
+      "short_intro": {
+        "title": "A short introduction exists",
+        "hint": ""
+      },
+      "financial_plan": {
+        "title": "A financial plan exists",
+        "hint": ""
+      },
+      "contracts_sorted": {
+        "title": "Your contracts are filed in order",
+        "hint": ""
+      },
+      "purpose_one_sentence": {
+        "title": "You can say in one sentence what you need money for",
+        "hint": ""
+      },
+      "say_in_governance": {
+        "title": "You have discussed how much say you would give",
+        "hint": ""
+      },
+      "sale_stance": {
+        "title": "You share a position on a sale",
+        "hint": "And who decides."
+      }
+    },
+    "agreementsNote": "This is your own view of your Founder Setup, not an investor's. It shows what is already settled on these topics, what is still open, and which questions are often asked. Nobody outside the team sees it.",
+    "stages": {
+      "open": "Not discussed yet",
+      "discussing": "In discussion",
+      "awaiting_confirmation": "Confirmation open",
+      "settled": "Settled"
+    },
+    "questionsToggle": "Questions often asked about this",
+    "topicQuestions": {
+      "equity": {
+        "q1": "How did the split come about?",
+        "q2": "Is it reviewed against contribution?"
+      },
+      "vesting": {
+        "q1": "When do your shares fully belong to you?",
+        "q2": "What happens if someone leaves early?"
+      },
+      "investor_dilution": {
+        "q1": "At what dilution do you say no?",
+        "q2": "Who decides whether you take money?"
+      },
+      "company_sale": {
+        "q1": "Under which conditions would you sell?",
+        "q2": "May one person sell against the will of the others?"
+      },
+      "founder_exit": {
+        "q1": "What happens to the shares when someone leaves?",
+        "q2": "Is there a deadline?"
+      },
+      "decision_rights": {
+        "q1": "Who has the last word on which topics?",
+        "q2": "What applies in a deadlock?"
+      },
+      "vision_goals": {
+        "q1": "Where should the company be in five years?",
+        "q2": "Growth, independence or a sale?"
+      }
+    },
+    "prepNote": "Neutral questions for a meeting. There are no right answers. It is best to talk them through in the team first.",
+    "prep": {
+      "purpose": "What do we want to achieve with the money, and by when?",
+      "governance": "How much say should an investor have, and on what?",
+      "reporting": "How do we want to report, and how often?",
+      "sale": "What is our position on a sale, and who decides?",
+      "beyondMoney": "What matters to us besides the money?"
+    },
+    "disclaimer": "Not legal, tax or investment advice. Get legal advice for contracts. This page does not recommend investors or forms of financing.",
+    "sourcesTitle": "Where we know this from",
+    "sources": "In a survey of 889 institutional venture capitalists at 681 firms, the management team is named as more important than product or technology (Gompers, Gornall, Kaplan & Strebulaev, Journal of Financial Economics 2020). This says nothing about how things look for you. The topics on this page are a selection, not a complete list.",
+    "card": {
+      "title": "Funding",
+      "text": "What to look at before and during fundraising. A checklist without scoring, no investor matching.",
+      "open": "Open the guide"
+    }
   }
 }

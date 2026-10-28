@@ -20,6 +20,7 @@ import { TeamShareCard } from "@/features/teams/TeamShareCard";
 import { BetaTeamCard } from "@/features/modules/ui/BetaTeamCard";
 import { TradeoffsTeamCard } from "@/features/modules/ui/TradeoffsTeamCard";
 import { LeaveTeamSection } from "@/features/teams/LeaveTeamSection";
+import { financingHref } from "@/features/financing/financingModel";
 import { TeamDepartureCard } from "@/features/teams/TeamDepartureCard";
 import { getOpenTeamDepartures } from "@/features/teams/teamDepartureData";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
@@ -147,13 +148,14 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
   const locale = await getLocale();
   const openDepartures = await getOpenTeamDepartures(team.id, supabase).catch(() => []);
   const checkInCard = setup ? await getCheckInCardState(teamId, setup.items, supabase).catch(() => null) : null;
-  const [t, commitmentT, testProjectT, checkInT, setupT, departureT, journey] = await Promise.all([
+  const [t, commitmentT, testProjectT, checkInT, setupT, departureT, financingT, journey] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.commitmentLab"),
     getTranslations("teams.testProject"),
     getTranslations("teams.checkIn"),
     getTranslations("teams.setup"),
     getTranslations("teams.departure"),
+    getTranslations("teams.financing"),
     loadTeamJourneyStatus({ teamId: team.id, userId: user.id, client: supabase, setup }),
   ]);
   const fallback = (index: number) => t("founders.fallback", { index });
@@ -375,7 +377,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
             Mitglieder bestaetigt haben. */}
         <section aria-labelledby="team-agree-title">
           <h2 id="team-agree-title" className={GROUP_TITLE_CLASS}>{t("groups.commit.title")}</h2>
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <article
             className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
             aria-labelledby="team-setup-title"
@@ -440,6 +442,17 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
               >
                 {checkInT(checkInCard?.state === "open" ? "card.open" : "card.start")}
               </Link>
+            </div>
+          </article>
+          <article
+            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
+            aria-labelledby="team-financing-title"
+          >
+            <div className="flex items-center justify-between gap-2"><IconTile name="spark" tone="violet" /></div>
+            <h3 id="team-financing-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{financingT("card.title")}</h3>
+            <p className="text-sm leading-6 text-slate-700">{financingT("card.text")}</p>
+            <div className="mt-auto flex flex-wrap items-center gap-3">
+              <Link href={financingHref(teamId)} className={CARD_LINK_CLASS}>{financingT("card.open")}</Link>
             </div>
           </article>
           <FounderLibraryHomebaseCard teamId={teamId} />

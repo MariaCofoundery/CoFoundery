@@ -31,6 +31,7 @@ Stand: 28.10.2026. Fakten aus dem Code und aus deinen Einträgen. Die rechtliche
 | Check-in, Rückblick (Antworten, Einladungen, Fragen) | 180 Tage nach Abschluss | gelöscht, kürzer als die Antworten, weil Freitext und persönlicher |
 | Check-in selbst (Datum, Status, Abstand) | bleibt, solange das Team besteht | ohne Personenbezug im Inhalt; wird gebraucht, um zu berechnen, wann der nächste fällig ist |
 | Check-in-Erinnerung (Stempel „wurde erinnert“) | 365 Tage nach der Fälligkeit | gelöscht. Eine Zeile je Person, Team und Fälligkeit, ohne Inhalt |
+| Finanzierungs-Wegweiser (Status je Punkt) | keine feste Frist | bleibt, solange das Team besteht. Enthält nur den Status und wer ihn zuletzt gesetzt hat, keinen Freitext. Beim Löschen eines Kontos wird „zuletzt gesetzt von“ leer, der Status bleibt (gehört dem Team) |
 
 ## Benachrichtigungen: Erinnerung an den Check-in (neu, 27.10.2026)
 - **Zwei Wege, zwei Voreinstellungen.** Mitteilung aufs Gerät: an, solange nicht abbestellt (setzt die Erlaubnis im Browser voraus). E-Mail: **aus, bis die Person im Konto ausdrücklich zustimmt**, weil die Erinnerung vom Zeitplan kommt und nicht von einem Menschen. Beides unter Konto → Post, Art „Check-in fällig“.

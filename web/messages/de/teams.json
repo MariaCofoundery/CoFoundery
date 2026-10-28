@@ -1165,5 +1165,182 @@
     "continueFeedback": "Ihr macht weiter. Die Frage ist geschlossen.",
     "dissolvedFeedback": "Ihr habt das Team aufgelöst.",
     "error": "Die Wahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
+  },
+  "financing": {
+    "eyebrow": "Finanzierung",
+    "title": "Finanzierung",
+    "tabs": {
+      "label": "Ansicht",
+      "guide": "Wegweiser",
+      "agreements": "Eure Vereinbarungen",
+      "prep": "Vor dem Gespräch"
+    },
+    "hero": {
+      "guide": {
+        "title": "Worauf ihr vor und während einer Finanzierung achten könnt",
+        "intro": "Diese Seite sortiert Themen, die vor und während einer Finanzierung oft besprochen werden. Sie bewertet euer Team nicht und empfiehlt keine Investoren oder Finanzierungsformen."
+      },
+      "agreements": {
+        "title": "Was in euren Vereinbarungen schon steht",
+        "intro": "Die Themen aus eurem Founder Setup, bei denen bei einer Finanzierung oft nachgefragt wird."
+      },
+      "prep": {
+        "title": "Vorbereitung auf ein Gespräch",
+        "intro": "Fragen, die ihr vorher für euch beantworten könnt. Es geht um eure Haltung, nicht um die richtige Antwort."
+      }
+    },
+    "guideNote": "Jeder Punkt hat einen Status, den ihr selbst setzt. Es gibt keine Gesamtzahl: Offen ist kein Versagen, und „nicht relevant“ ist eine gültige Antwort. Alle aktuellen Mitglieder können den Status ändern, er ist nur für Teammitglieder sichtbar.",
+    "statuses": {
+      "open": "Offen",
+      "progress": "In Arbeit",
+      "done": "Geklärt",
+      "na": "Nicht relevant"
+    },
+    "statusError": "Der Status konnte nicht gespeichert werden.",
+    "setupHint": "Im Founder Setup: {state}",
+    "setupLink": "Im Setup öffnen",
+    "lastChanged": "zuletzt {name}",
+    "areas": {
+      "team": {
+        "title": "Das Team",
+        "text": "Wer macht was, und ist es festgehalten?"
+      },
+      "shares": {
+        "title": "Anteile und Beteiligung",
+        "text": "Wem gehört wie viel, und was ändert sich mit Geld von außen?"
+      },
+      "rights": {
+        "title": "Rechte am Geschaffenen",
+        "text": "Wem gehört, was ihr aufbaut?"
+      },
+      "documents": {
+        "title": "Unterlagen",
+        "text": "Was ihr zeigen könnt, wenn jemand fragt."
+      },
+      "goal": {
+        "title": "Euer Ziel mit dem Geld",
+        "text": "Was ihr erreichen wollt, bevor ihr jemanden anspricht."
+      }
+    },
+    "items": {
+      "roles_defined": {
+        "title": "Rollen und Verantwortung sind benannt",
+        "hint": "Wer entscheidet worüber?"
+      },
+      "time_stated": {
+        "title": "Die Zeit jeder Person ist ausgesprochen",
+        "hint": "Wer ist hauptberuflich dabei, wer nicht, und bleibt das so?"
+      },
+      "tie_break": {
+        "title": "Ihr wisst, wie ihr bei Meinungsverschiedenheiten entscheidet",
+        "hint": "Auch bei einem Patt."
+      },
+      "exit_discussed": {
+        "title": "Ihr habt besprochen, was passiert, wenn jemand geht",
+        "hint": "Ausscheiden und Vesting."
+      },
+      "split_written": {
+        "title": "Die Aufteilung der Anteile steht schriftlich fest",
+        "hint": ""
+      },
+      "dilution_discussed": {
+        "title": "Ihr habt über Verwässerung gesprochen",
+        "hint": "Wie ändern sich eure Anteile mit jeder Runde?"
+      },
+      "contributions_listed": {
+        "title": "Einlagen, Ausgaben und Zusagen sind aufgelistet",
+        "hint": "Auch Zusagen wie Optionen oder Darlehen."
+      },
+      "ip_clarified": {
+        "title": "Es ist schriftlich geklärt, wem Ergebnisse gehören",
+        "hint": "Code, Marke, Texte, Daten."
+      },
+      "side_activities_disclosed": {
+        "title": "Nebentätigkeiten sind offengelegt",
+        "hint": ""
+      },
+      "accounts_access": {
+        "title": "Konten und Zugänge sind geregelt",
+        "hint": "Wer hat Zugriff worauf?"
+      },
+      "short_intro": {
+        "title": "Eine Kurzvorstellung liegt vor",
+        "hint": ""
+      },
+      "financial_plan": {
+        "title": "Eine Zahlenplanung liegt vor",
+        "hint": ""
+      },
+      "contracts_sorted": {
+        "title": "Eure Verträge sind sortiert abgelegt",
+        "hint": ""
+      },
+      "purpose_one_sentence": {
+        "title": "Ihr könnt in einem Satz sagen, wofür ihr Geld braucht",
+        "hint": ""
+      },
+      "say_in_governance": {
+        "title": "Ihr habt besprochen, wie viel Mitsprache ihr geben wollt",
+        "hint": ""
+      },
+      "sale_stance": {
+        "title": "Ihr habt eine gemeinsame Haltung zu einem Verkauf",
+        "hint": "Und wer das entscheidet."
+      }
+    },
+    "agreementsNote": "Das ist eure eigene Sicht auf euer Founder Setup, nicht die eines Investors. Es zeigt, was bei diesen Themen schon geklärt ist und was offen bleibt, und welche Fragen dazu oft gestellt werden. Niemand außerhalb des Teams sieht das.",
+    "stages": {
+      "open": "Noch nicht besprochen",
+      "discussing": "In Klärung",
+      "awaiting_confirmation": "Bestätigung offen",
+      "settled": "Geklärt"
+    },
+    "questionsToggle": "Fragen, die dazu oft gestellt werden",
+    "topicQuestions": {
+      "equity": {
+        "q1": "Wie ist die Aufteilung entstanden?",
+        "q2": "Wird sie nach Leistung überprüft?"
+      },
+      "vesting": {
+        "q1": "Ab wann gehören euch eure Anteile ganz?",
+        "q2": "Was passiert, wenn jemand früh geht?"
+      },
+      "investor_dilution": {
+        "q1": "Ab welcher Verwässerung sagt ihr Nein?",
+        "q2": "Wer entscheidet, ob ihr Geld nehmt?"
+      },
+      "company_sale": {
+        "q1": "Unter welchen Bedingungen würdet ihr verkaufen?",
+        "q2": "Darf eine Person gegen den Willen der anderen verkaufen?"
+      },
+      "founder_exit": {
+        "q1": "Was geschieht mit den Anteilen, wenn jemand geht?",
+        "q2": "Gibt es eine Frist?"
+      },
+      "decision_rights": {
+        "q1": "Wer hat das letzte Wort bei welchen Themen?",
+        "q2": "Was gilt bei einem Patt?"
+      },
+      "vision_goals": {
+        "q1": "Wo soll das Unternehmen in fünf Jahren stehen?",
+        "q2": "Wachstum, Unabhängigkeit oder Verkauf?"
+      }
+    },
+    "prepNote": "Neutrale Fragen für einen Termin. Es gibt keine richtigen Antworten. Besprecht sie am besten zuerst im Team.",
+    "prep": {
+      "purpose": "Was wollen wir mit dem Geld erreichen, und bis wann?",
+      "governance": "Wie viel Mitsprache soll eine Investorin oder ein Investor haben, und worüber?",
+      "reporting": "Wie wollen wir berichten, und wie oft?",
+      "sale": "Wie stehen wir zu einem Verkauf, und wer entscheidet?",
+      "beyondMoney": "Was ist uns neben dem Geld wichtig?"
+    },
+    "disclaimer": "Keine Rechts-, Steuer- oder Anlageberatung. Für Verträge holt euch rechtlichen Rat. Diese Seite empfiehlt keine Investoren oder Finanzierungsformen.",
+    "sourcesTitle": "Woher wir das wissen",
+    "sources": "In einer Befragung von 889 institutionellen Wagniskapitalgebern bei 681 Firmen wird das Management-Team als wichtiger genannt als Produkt oder Technologie (Gompers, Gornall, Kaplan & Strebulaev, Journal of Financial Economics 2020). Das sagt nichts darüber, wie es bei euch aussieht. Die Themen auf dieser Seite sind eine Auswahl, keine vollständige Liste.",
+    "card": {
+      "title": "Finanzierung",
+      "text": "Worauf ihr vor und während einer Finanzierung achten könnt. Eine Checkliste ohne Wertung, kein Investor-Matching.",
+      "open": "Wegweiser öffnen"
+    }
   }
 }
