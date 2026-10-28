@@ -11,7 +11,7 @@ import { ProblemTypewriter } from "@/features/connect/ProblemTypewriter";
 import { ProblemNight } from "@/features/connect/ProblemNight";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "problem-paper min-w-0 break-words p-5 sm:p-6";
+const card = "problem-card min-w-0 break-words p-5 sm:p-6";
 const field = "problem-input";
 
 /**

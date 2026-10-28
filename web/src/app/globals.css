@@ -1144,13 +1144,54 @@ body {
 .problem-input::placeholder { color: #8394b0; }
 .problem-input option { color: #0f172a; }
 
-/* Helle Karte auf der Nacht: fuer alles, was man liest oder ausfuellt. */
-.problem-paper {
+/* Karte auf der Nacht: dunkles Glas, kein weisses Feld.
+   Die Bausteine darin (Ansaetze, Bestaetigungen, Formulare) sind mit hellen
+   Tailwind-Farben gebaut. Statt jeden einzeln umzuschreiben, wird ihre Palette
+   hier auf der Karte umgelegt; ausserhalb des Problembereichs aendert sich
+   nichts. */
+.problem-night { color-scheme: dark; }
+.problem-card {
+  border: 1px solid rgba(190, 215, 255, 0.16);
   border-radius: 24px;
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.8);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.035));
+  color: #edf3ff;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.8);
 }
+.problem-card .text-slate-900,
+.problem-card .text-slate-800 { color: #f1f5ff; }
+.problem-card .text-slate-700 { color: #d3def0; }
+.problem-card .text-slate-600 { color: #b4c2da; }
+.problem-card .text-slate-500 { color: #9fb0cc; }
+.problem-card .text-violet-800,
+.problem-card .text-cyan-800 { color: #67e8f9; }
+.problem-card .text-rose-900 { color: #ffb4b4; }
+.problem-card .text-amber-950 { color: #fde7a6; }
+.problem-card .bg-white { background-color: rgba(255, 255, 255, 0.06); }
+.problem-card .bg-slate-50,
+.problem-card .bg-slate-100 { background-color: rgba(255, 255, 255, 0.05); }
+.problem-card .bg-rose-50 { background-color: rgba(255, 120, 120, 0.12); }
+.problem-card .bg-amber-50 { background-color: rgba(251, 191, 36, 0.12); }
+.problem-card .border-slate-100,
+.problem-card .border-slate-200,
+.problem-card .border-slate-300 { border-color: rgba(190, 215, 255, 0.2); }
+.problem-card .border-rose-200 { border-color: rgba(255, 140, 140, 0.4); }
+.problem-card input,
+.problem-card textarea,
+.problem-card select { color: #edf3ff; }
+.problem-card input::placeholder,
+.problem-card textarea::placeholder { color: #8394b0; }
+.problem-card option { color: #0f172a; }
+/* Die Hauptknopffarbe ist hell: Schrift darauf bleibt dunkel. */
+.problem-card [class*="--brand-primary"],
+.problem-night [class*="--brand-primary"] { color: #06222a; }
+.problem-card :focus-visible { outline: 3px solid rgba(103, 232, 249, 0.5); outline-offset: 2px; }
+/* Hinweise ausserhalb der Karten (Rueckmeldung, Profil noetig) */
+.problem-night .bg-amber-50 { background-color: rgba(251, 191, 36, 0.14); }
+.problem-night .text-amber-900 { color: #fde7a6; }
+.problem-night .border-amber-200 { border-color: rgba(251, 191, 36, 0.35); }
+.problem-night .bg-emerald-50 { background-color: rgba(52, 211, 153, 0.14); }
+.problem-night .text-emerald-900 { color: #a7f3d0; }
 
 .problem-board-wrap__hint {
   font-size: 0.875rem;

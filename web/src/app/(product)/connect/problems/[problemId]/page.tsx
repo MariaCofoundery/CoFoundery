@@ -33,7 +33,7 @@ import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { knownKey } from "@/i18n/knownKey";
 
-const card = "problem-paper p-6";
+const card = "problem-card p-6";
 const field =
   "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
 const hint = "mt-1 block text-xs leading-5 text-slate-500";

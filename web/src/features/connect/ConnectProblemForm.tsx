@@ -41,7 +41,7 @@ export function ConnectProblemForm({
   const isPublished = !!problem && problem.status !== "draft";
 
   return (
-    <form id="problem-form" action={action} className="problem-paper mt-6 space-y-6 p-6">
+    <form id="problem-form" action={action} className="problem-card mt-6 space-y-6 p-6">
       {problem ? <input type="hidden" name="problem_id" value={problem.id} /> : null}
 
       <label className="block text-sm font-medium">
