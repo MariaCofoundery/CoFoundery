@@ -63,5 +63,13 @@ Die Vorschläge zu „Was ist bei diesem Thema rechtlich zu beachten?“ (je Set
 - entscheiden, ob Verweise auf Gesetze (z. B. GmbHG, Vesting, Wettbewerbsverbot) genannt werden oder nur allgemein formuliert wird.
 Die bestehende Liste „Mit einer Beratung klären“ im Setup-Dokument bleibt, so wie sie ist, ohne Rechtsaussage.
 
+## Offen: Sicherung der Datenbank (zurückgestellt, 28.10.2026)
+Supabase Free legt keine automatischen Sicherungen an. Solange es unter 30 Nutzer:innen und keine echten Forschungsdaten gibt, ist das vertretbar. Geplant ist ein lokales Skript (`npm run backup`), das von Hand gestartet wird, verschlüsselt (`age`) ablegt und die Datei von Hand auf eine externe Festplatte kommt. Es soll **vollständig** sein, nicht nur ein Teil:
+- Datenbank mit allen Schemas, die Nutzerdaten enthalten, auch die Konten (`auth`),
+- Dateien im Storage (z. B. Profilbilder), die ein Datenbank-Dump nicht enthält,
+- ein Rückspiel-Test in die lokale Datenbank, bevor die Sicherung als gültig gilt,
+- eine Aufbewahrungsfrist (Vorschlag: 28 Tage) mit Begründung hier; gelöschte Konten leben bis dahin in alten Sicherungen weiter. Das muss zur Aussage über die Löschung in der Datenschutzerklärung passen (Frage an die Beratung).
+Auslöser, spätestens dann zu bauen: bevor echte Nutzer:innen in größerer Zahl kommen, bevor Forschungsdaten ausgewertet werden, oder bevor auf einen bezahlten Tarif gewechselt wird, je nachdem, was zuerst eintritt.
+
 ## Anfragen von Betroffenen
 Frist ein Monat. Antworten nur an die Mailadresse des Kontos, keine Ausweiskopie. Der Export im Konto ist der Selbstbedienungsweg (Art. 15 und 20). Bei Zweifel: eine Rückfrage, die nur die Kontoinhaberin beantworten kann.
