@@ -220,7 +220,8 @@ export type ConnectProblemIntent = (typeof CONNECT_PROBLEM_INTENTS)[number];
 export const CONNECT_PROBLEM_ORIGINS = ["member", "public_source"] as const;
 export type ConnectProblemOrigin = (typeof CONNECT_PROBLEM_ORIGINS)[number];
 
-export const CONNECT_PROBLEM_STATUSES = ["draft", "active", "withdrawn", "resolved"] as const;
+/** `in_progress`: fuer andere ausgeblendet, weil die Person daran arbeitet. */
+export const CONNECT_PROBLEM_STATUSES = ["draft", "active", "in_progress", "withdrawn", "resolved"] as const;
 export type ConnectProblemStatus = (typeof CONNECT_PROBLEM_STATUSES)[number];
 
 /** Muessen mit den Check-Constraints in 20260915140000 uebereinstimmen. */

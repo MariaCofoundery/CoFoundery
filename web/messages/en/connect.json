@@ -473,7 +473,8 @@
     "statuses": {
       "draft": "Not published yet. Only you can see this.",
       "withdrawn": "Withdrawn.",
-      "resolved": "Marked as solved."
+      "resolved": "Marked as solved.",
+      "in_progress": "Taken off the board because you are working on it. Only you see this."
     },
     "form": {
       "title": "What is it about, in one sentence?",
@@ -523,7 +524,8 @@
       "draft": "Draft",
       "withdrawn": "Withdrawn",
       "resolved": "Solved",
-      "active": "Published"
+      "active": "Published",
+      "in_progress": "We are working on it"
     },
     "backToProblem": "Back to the problem",
     "editTitle": "Edit problem",
@@ -892,16 +894,20 @@
     "public": "Visibility: public",
     "members": "Visibility: CONNECT members",
     "problem": {
+      "in_progress": "We are working on it – take it off the board",
       "active": "Republish / reopen problem",
       "withdrawn": "Withdraw publication",
       "resolved": "Mark problem resolved",
-      "delete": "Permanently delete problem"
+      "delete": "Permanently delete problem",
+      "back_on_board": "Put back on the board"
     },
     "problemConsequences": {
+      "in_progress": "Other members no longer see the problem on the board, and no new replies or approaches can be added. You and everyone you are already talking to or sharing a private workspace with keep working on it. You can put it back on the board, mark it as solved or withdraw it at any time.",
       "active": "This version becomes active with the displayed visibility. Check whether a previously resolved problem has actually reoccurred. Moderation or membership restrictions prevent republication. Private workspace data stays unchanged.",
       "withdrawn": "The problem disappears from CONNECT and its public page. New interests and delivery stop. Conversations and private workspaces remain. You can explicitly republish later.",
       "resolved": "The problem is no longer actively offered. It remains in your content as resolved. Conversations and private spaces remain. Reopening requires a separate confirmation.",
-      "delete": "The problem version, its approaches and interests are permanently deleted. Existing conversations remain as history. Private workspaces and ventures are not deleted; problem references are detached. No restore is available."
+      "delete": "The problem version, its approaches and interests are permanently deleted. Existing conversations remain as history. Private workspaces and ventures are not deleted; problem references are detached. No restore is available.",
+      "back_on_board": "The problem is visible to all members on the board again, at the position of its original date. New replies and approaches are possible again. Existing conversations and private workspaces stay as they are."
     },
     "listing": {
       "pause": "Withdraw publication",

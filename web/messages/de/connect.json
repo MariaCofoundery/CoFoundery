@@ -473,7 +473,8 @@
     "statuses": {
       "draft": "Noch nicht veröffentlicht. Nur du siehst das hier.",
       "withdrawn": "Zurückgezogen.",
-      "resolved": "Als gelöst markiert."
+      "resolved": "Als gelöst markiert.",
+      "in_progress": "Vom Brett genommen, weil du daran arbeitest. Nur du siehst das hier."
     },
     "form": {
       "title": "Worum geht es, in einem Satz?",
@@ -523,7 +524,8 @@
       "draft": "Entwurf",
       "withdrawn": "Zurückgezogen",
       "resolved": "Gelöst",
-      "active": "Veröffentlicht"
+      "active": "Veröffentlicht",
+      "in_progress": "Wir arbeiten daran"
     },
     "backToProblem": "Zurück zum Problem",
     "editTitle": "Problem bearbeiten",
@@ -892,16 +894,20 @@
     "public": "Sichtbarkeit: öffentlich",
     "members": "Sichtbarkeit: CONNECT-Mitglieder",
     "problem": {
+      "in_progress": "Wir arbeiten daran – vom Brett nehmen",
       "active": "Problem erneut veröffentlichen / öffnen",
       "withdrawn": "Veröffentlichung zurückziehen",
       "resolved": "Problem als gelöst markieren",
-      "delete": "Problem endgültig löschen"
+      "delete": "Problem endgültig löschen",
+      "back_on_board": "Wieder aufs Brett stellen"
     },
     "problemConsequences": {
+      "in_progress": "Das Problem steht für andere nicht mehr auf dem Brett, und es kommen keine neuen Meldungen oder Ansätze mehr dazu. Du und alle, mit denen du schon im Gespräch oder in einem privaten Arbeitsraum bist, arbeiten weiter daran. Du kannst es jederzeit wieder aufs Brett stellen, als gelöst markieren oder zurückziehen.",
       "active": "Diese Fassung wird mit der angezeigten Sichtbarkeit erneut aktiv. Prüfe insbesondere, ob ein als gelöst markiertes Problem tatsächlich erneut besteht. Eine Moderations- oder Mitgliedschaftssperre verhindert die Wiederveröffentlichung. Private Arbeitsdaten bleiben unverändert.",
       "withdrawn": "Das Problem verschwindet aus CONNECT und seiner öffentlichen Seite. Neue Interessen und Auslieferungen enden. Gespräche und private Arbeitsräume bleiben erhalten. Eine spätere ausdrückliche Wiederveröffentlichung ist möglich.",
       "resolved": "Das Problem wird nicht mehr aktiv angeboten. Es bleibt bei deinen Inhalten als gelöst erhalten. Gespräche und private Räume bleiben bestehen. Erneutes Öffnen erfordert eine eigene Bestätigung.",
-      "delete": "Die Problemfassung, ihre Lösungsansätze und Interessen werden endgültig gelöscht. Bestehende Gespräche bleiben als Verlauf erhalten. Private Arbeitsräume und Ventures werden nicht gelöscht; ihre Problemverknüpfung wird gelöst. Keine Wiederherstellung."
+      "delete": "Die Problemfassung, ihre Lösungsansätze und Interessen werden endgültig gelöscht. Bestehende Gespräche bleiben als Verlauf erhalten. Private Arbeitsräume und Ventures werden nicht gelöscht; ihre Problemverknüpfung wird gelöst. Keine Wiederherstellung.",
+      "back_on_board": "Das Problem steht wieder für alle Mitglieder auf dem Brett, an der Stelle seines ursprünglichen Datums. Neue Meldungen und Ansätze sind wieder möglich. Bestehende Gespräche und private Arbeitsräume bleiben unverändert."
     },
     "listing": {
       "pause": "Veröffentlichung zurückziehen",

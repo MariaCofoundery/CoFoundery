@@ -275,14 +275,14 @@ export async function acceptConnectProblemInterestAction(formData: FormData) {
   redirect(`/connect/messages/${data}`);
 }
 
-/** Zurueckziehen oder als geloest markieren - beides nur durch die Person selbst. */
+/** Zurueckziehen, als geloest markieren oder "wir arbeiten daran" - nur durch die Person selbst. */
 export async function updateConnectProblemStatusAction(formData: FormData) {
   const { client, user } = await requireConnectMember();
   const problemId = String(formData.get("problem_id") ?? "").trim();
   const next = String(formData.get("status") ?? "");
   const path = `/connect/problems/${problemId}`;
 
-  if (next !== "withdrawn" && next !== "resolved" && next !== "active" && next !== "delete") {
+  if (next !== "withdrawn" && next !== "resolved" && next !== "active" && next !== "in_progress" && next !== "delete") {
     back(path, "save");
   }
 

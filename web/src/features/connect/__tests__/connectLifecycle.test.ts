@@ -30,7 +30,7 @@ test("DE/EN explain separate lifecycle consequences and retained conversations",
       "confirmConsequences",
     ])
       assert.ok(c.lifecycle[key]);
-    for (const action of ["withdrawn", "resolved", "active", "delete"])
+    for (const action of ["in_progress", "withdrawn", "resolved", "active", "delete"])
       assert.ok(c.lifecycle.problemConsequences[action]);
     for (const action of ["pause", "complete", "publish", "renew", "delete"])
       assert.ok(c.lifecycle.listingConsequences[action]);
@@ -40,7 +40,7 @@ test("DE/EN explain separate lifecycle consequences and retained conversations",
     );
     assert.equal(
       new Set(Object.values(c.lifecycle.problemConsequences)).size,
-      4,
+      6,
     );
   }
 });
