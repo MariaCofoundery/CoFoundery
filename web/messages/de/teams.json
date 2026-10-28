@@ -1134,5 +1134,36 @@
     "noneYet": "Noch nichts bestätigt.",
     "cardText": "Was jede Person freigibt, nebeneinander.",
     "cardCta": "Ansehen"
+  },
+  "departure": {
+    "eyebrow": "Ein Mitglied hat das Team verlassen · {date}",
+    "title": "Wie geht es weiter?",
+    "intro": "Ihr entscheidet gemeinsam. Solange nicht alle dasselbe gewählt haben, bleibt die Frage offen. Nichts wird gelöscht, und eure bestätigten Vereinbarungen bleiben, wie sie sind.",
+    "choices": {
+      "continue": {
+        "label": "Wir machen weiter",
+        "short": "Weitermachen",
+        "help": "Das Team besteht wie bisher."
+      },
+      "dissolve": {
+        "label": "Wir lösen das Team auf",
+        "short": "Auflösen",
+        "help": "Das Team wird archiviert."
+      },
+      "later": {
+        "label": "Wir entscheiden später",
+        "short": "Später",
+        "help": "Die Frage bleibt offen."
+      }
+    },
+    "whoChose": "Wer hat was gewählt?",
+    "you": "du",
+    "notChosen": "noch nicht gewählt",
+    "split": "Ihr habt unterschiedlich gewählt. Sprecht kurz darüber, bis ihr dasselbe wählt.",
+    "note": "Beim Auflösen bleiben die Inhalte bis zu ihren üblichen Löschfristen erhalten, und ihr könnt sie bis dahin nicht mehr gemeinsam bearbeiten.",
+    "savedFeedback": "Deine Wahl wurde gespeichert.",
+    "continueFeedback": "Ihr macht weiter. Die Frage ist geschlossen.",
+    "dissolvedFeedback": "Ihr habt das Team aufgelöst.",
+    "error": "Die Wahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
   }
 }

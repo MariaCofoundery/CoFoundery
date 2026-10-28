@@ -20,6 +20,8 @@ import { TeamShareCard } from "@/features/teams/TeamShareCard";
 import { BetaTeamCard } from "@/features/modules/ui/BetaTeamCard";
 import { TradeoffsTeamCard } from "@/features/modules/ui/TradeoffsTeamCard";
 import { LeaveTeamSection } from "@/features/teams/LeaveTeamSection";
+import { TeamDepartureCard } from "@/features/teams/TeamDepartureCard";
+import { getOpenTeamDepartures } from "@/features/teams/teamDepartureData";
 import { parseTeamReadiness } from "@/features/reporting/workstyle/teamReadiness";
 import { FounderRelationshipAdvisorPanel } from "@/features/teams/FounderRelationshipAdvisorPanel";
 import {
@@ -32,7 +34,7 @@ import { getFounderSetupAdvisorAccess } from "@/features/teams/founderSetupAdvis
 
 type TeamHomebasePageProps = {
   params: Promise<{ teamId: string }>;
-  searchParams?: Promise<{ teamfreigabe?: string; verlassen?: string }>;
+  searchParams?: Promise<{ teamfreigabe?: string; verlassen?: string; austritt?: string }>;
 };
 
 const SECTION_CLASS =
@@ -143,13 +145,15 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
     startedLabRelationships.size === 0;
 
   const locale = await getLocale();
+  const openDepartures = await getOpenTeamDepartures(team.id, supabase).catch(() => []);
   const checkInCard = setup ? await getCheckInCardState(teamId, setup.items, supabase).catch(() => null) : null;
-  const [t, commitmentT, testProjectT, checkInT, setupT, journey] = await Promise.all([
+  const [t, commitmentT, testProjectT, checkInT, setupT, departureT, journey] = await Promise.all([
     getTranslations("teams.homebase"),
     getTranslations("teams.commitmentLab"),
     getTranslations("teams.testProject"),
     getTranslations("teams.checkIn"),
     getTranslations("teams.setup"),
+    getTranslations("teams.departure"),
     loadTeamJourneyStatus({ teamId: team.id, userId: user.id, client: supabase, setup }),
   ]);
   const fallback = (index: number) => t("founders.fallback", { index });
@@ -208,6 +212,18 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
         journey={journey}
         canInvite={team.members.length < 4}
       />
+      {/* Nach einem Austritt: die Verbleibenden entscheiden gemeinsam, wie es weitergeht. */}
+      <TeamDepartureCard
+        teamId={team.id}
+        currentUserId={user.id}
+        members={team.members.map((member, index) => ({ userId: member.userId, displayName: founderNames[index] }))}
+        departures={openDepartures}
+      />
+      {query.austritt ? (
+        <p role="status" className="mt-3 rounded-xl bg-slate-100 px-4 py-3 text-sm text-slate-700">
+          {departureT(query.austritt === "aufgeloest" ? "dissolvedFeedback" : query.austritt === "weiter" ? "continueFeedback" : query.austritt === "gespeichert" ? "savedFeedback" : "error")}
+        </p>
+      ) : null}
       {linkedAdvisors.length > 0 ? (
         <p className="mt-3 text-sm leading-6 text-slate-600">{t("header.advisors", { names: linkedAdvisors.join(", ") })}</p>
       ) : null}

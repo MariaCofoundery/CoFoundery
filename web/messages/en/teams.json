@@ -1134,5 +1134,36 @@
     "noneYet": "Nothing confirmed yet.",
     "cardText": "What each person shares, side by side.",
     "cardCta": "View"
+  },
+  "departure": {
+    "eyebrow": "A member left the team · {date}",
+    "title": "What happens next?",
+    "intro": "You decide together. As long as not everyone has chosen the same, the question stays open. Nothing is deleted, and your confirmed agreements stay as they are.",
+    "choices": {
+      "continue": {
+        "label": "We carry on",
+        "short": "Carry on",
+        "help": "The team stays as it is."
+      },
+      "dissolve": {
+        "label": "We dissolve the team",
+        "short": "Dissolve",
+        "help": "The team is archived."
+      },
+      "later": {
+        "label": "We decide later",
+        "short": "Later",
+        "help": "The question stays open."
+      }
+    },
+    "whoChose": "Who chose what?",
+    "you": "you",
+    "notChosen": "not chosen yet",
+    "split": "You chose differently. Talk it over briefly until you choose the same.",
+    "note": "When you dissolve the team, the content is kept until its usual deletion periods, and you can no longer edit it together.",
+    "savedFeedback": "Your choice was saved.",
+    "continueFeedback": "You carry on. The question is closed.",
+    "dissolvedFeedback": "You dissolved the team.",
+    "error": "Your choice could not be saved right now. Please try again."
   }
 }
