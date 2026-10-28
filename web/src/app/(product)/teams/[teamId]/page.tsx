@@ -251,6 +251,39 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           </div>
         </section>
 
+        {/* TESTPROJEKT: eine kleine echte Aufgabe zu zweit, bevor man sich festlegt. Steht
+            bewusst NICHT im eingeklappten "Vertiefen", sondern sichtbar: Es ist der
+            konkreteste Weg, die Zusammenarbeit auszuprobieren. */}
+        {team.alignment.length > 0 ? (
+          <section aria-labelledby="test-project-title">
+            <div className="grid gap-4 lg:grid-cols-3">
+              <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6 lg:col-span-3">
+                <div className="flex items-center justify-between gap-2"><IconTile name="spark" tone="violet" /></div>
+                <h2 id="test-project-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{testProjectT("card.title")}</h2>
+                <p className="max-w-3xl text-sm leading-6 text-slate-700">{testProjectT("card.description")}</p>
+                <ul className="grid gap-3">
+                  {team.alignment.map((entry) => {
+                    const state = openTestProjects.get(entry.relationshipId);
+                    return (
+                      <li key={entry.relationshipId} className={isPairTeam ? "flex flex-wrap items-center gap-3" : "flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"}>
+                        <div>
+                          {!isPairTeam ? (
+                            <p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: pairName(entry.participantUserIds, names, fallback) })}</p>
+                          ) : null}
+                          {state ? <p className="mt-1 text-xs font-medium text-slate-600">{testProjectT(state === "active" ? "card.active" : "card.draft")}</p> : null}
+                        </div>
+                        <Link href={testProjectHref(teamId, entry.relationshipId)} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+                          {testProjectT(state ? "card.continue" : "card.start")}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </article>
+            </div>
+          </section>
+        ) : null}
+
         {/* VERTIEFEN: ausdruecklich zu zweit. Nur tatsaechlich vorhandene
             Paare - keine erfundenen Paarungen, keine neuen Relationships. */}
         <details id="team-deep-dives" className="scroll-mt-24 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3" open={!isPairTeam}>
@@ -303,30 +336,6 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
                           className={CARD_LINK_CLASS}
                         >
                           {commitmentT(completed ? "view" : started ? "continue" : "start")}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ) : null}
-            {team.alignment.length > 0 ? (
-              <section className={CARD_CLASS} aria-labelledby="test-project-title">
-                <h3 id="test-project-title" className="text-base font-semibold text-slate-950">{testProjectT("card.title")}</h3>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{testProjectT("card.description")}</p>
-                <ul className="mt-4 grid gap-3">
-                  {team.alignment.map((entry) => {
-                    const state = openTestProjects.get(entry.relationshipId);
-                    return (
-                      <li key={entry.relationshipId} className={isPairTeam ? "flex flex-wrap items-center gap-3" : "flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"}>
-                        <div>
-                          {!isPairTeam ? (
-                            <p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: pairName(entry.participantUserIds, names, fallback) })}</p>
-                          ) : null}
-                          {state ? <p className="mt-1 text-xs font-medium text-slate-600">{testProjectT(state === "active" ? "card.active" : "card.draft")}</p> : null}
-                        </div>
-                        <Link href={testProjectHref(teamId, entry.relationshipId)} className={CARD_LINK_CLASS}>
-                          {testProjectT(state ? "card.continue" : "card.start")}
                         </Link>
                       </li>
                     );
