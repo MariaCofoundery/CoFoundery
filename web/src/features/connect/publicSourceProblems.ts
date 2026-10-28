@@ -10,9 +10,12 @@ import type { ConnectGeographicScope } from "@/features/connect/connectTypes";
  * Quelle ein Verband, ein Unternehmen oder eine Eigenangabe ist, steht das in
  * `sourceNote`. Die Texte halten sich an das, was die Quelle sagt.
  *
- * Eingespielt werden sie nicht ueber das Formular, sondern mit
- * `supabase/scripts/public_source_problems.sql` (erzeugt aus dieser Liste mit
- * `npm run public-problems:sql`). Ein Test prueft, dass beides zusammenpasst.
+ * Eingespielt werden sie nicht ueber das Formular, sondern mit der Migration
+ * `supabase/migrations/20270111130000_problem_public_source_seed.sql` (erzeugt
+ * aus dieser Liste mit `npm run public-problems:sql`). Ein Test prueft, dass
+ * beides zusammenpasst. Eine angewendete Migration aendert man nicht mehr:
+ * Kommen spaeter Eintraege dazu, entsteht dafuer eine neue Liste und eine neue
+ * Migration.
  */
 export type PublicSourceProblem = {
   /** Stabil: Das Einspielen ueberschreibt den Eintrag mit diesem Schluessel. */
@@ -324,5 +327,89 @@ export const PUBLIC_SOURCE_PROBLEMS: readonly PublicSourceProblem[] = [
     sourceUrl: "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Unmet_health_care_needs_statistics",
     sourceYear: "2024",
     sourceNote: "Amtliche Statistik",
+  },
+  {
+    key: "vz-pflege-haushaltshilfe-2026",
+    title: "Hilfe im Haushalt für Pflegebedürftige zu organisieren ist aufwendig",
+    description:
+      "Laut Verbraucherzentrale haben viele Pflegedienste für Haushaltshilfe keine personellen Kapazitäten. Die Kosten des Entlastungsbetrags werden nur erstattet, wenn der Anbieter nach Landesrecht anerkannt ist, und die Voraussetzungen unterscheiden sich je Bundesland.",
+    scope: "germany",
+    locations: [],
+    topics: ["Pflege", "Haushalt", "Entlastung"],
+    industries: ["Pflege"],
+    sourceName: "Verbraucherzentrale, Ratgeber Haushaltshilfe in der Pflege",
+    sourceUrl: "https://www.verbraucherzentrale.de/wissen/gesundheit-pflege/pflegeantrag-und-leistungen/haushaltshilfe-die-pflege-mit-haushaltsnahen-dienstleistungen-ergaenzen-42698",
+    sourceYear: "2026",
+    sourceNote: "Ratgebertext der Verbraucherzentrale, Stand 13.08.2026",
+  },
+  {
+    key: "berlin-buergerbeauftragter-2023",
+    title: "Berliner warten auf Anträge und erreichen ihre Behörde nicht",
+    description:
+      "Der Berliner Bürgerbeauftragte nennt im Jahresbericht 2023 Verzögerungen bei der Antragsbearbeitung, fehlende Erreichbarkeit der Behörden und mangelnde Transparenz als überwiegende Probleme in laufenden Verwaltungsvorgängen.",
+    scope: "regional",
+    locations: ["Berlin"],
+    topics: ["Behörden", "Bearbeitungszeit", "Erreichbarkeit"],
+    industries: ["Öffentliche Verwaltung"],
+    sourceName: "Bürger- und Polizeibeauftragter des Landes Berlin, Jahresbericht",
+    sourceUrl: "https://www.berlin.de/buerger-polizeibeauftragter/aktuelles/pressemitteilungen/pressemitteilung.1439251.php",
+    sourceYear: "2023",
+    sourceNote: "Amtlicher Jahresbericht 2023, vorgestellt 2024",
+  },
+  {
+    key: "dehoga-no-shows-2025",
+    title: "Reservierte Tische bleiben ohne Absage leer",
+    description:
+      "87 % der 250 von Dehoga befragten Gastronomen und Hoteliers kennen No-Shows aus eigener Erfahrung. Von den Betroffenen fragen 38 % Reservierungen vorab telefonisch oder per E-Mail nach.",
+    scope: "germany",
+    locations: [],
+    topics: ["Reservierungen", "No-Shows", "Planung"],
+    industries: ["Gastronomie", "Hotellerie"],
+    sourceName: "Dehoga-Umfrage, berichtet von HOGAPAGE (dpa)",
+    sourceUrl: "https://www.hogapage.de/nachrichten/wirtschaft/gastronomie/no-shows-belasten-die-gastronomie-viele-g%C3%A4ste-reservieren-und-kommen-nicht/",
+    sourceYear: "2025",
+    sourceNote: "Verbandsumfrage unter 250 Betrieben nach Angaben von Dehoga NRW; Region und Zeitraum nicht angegeben",
+  },
+  {
+    key: "ehi-retouren-2025",
+    title: "Onlinehändler bearbeiten große Mengen Retouren",
+    description:
+      "In einer Befragung von 124 Onlinehändlern im DACH-Raum meldeten 87,7 % der Textilhändler Rücksendequoten bis 50 %, weitere 12,2 % darüber. 34,4 % erfassen Retourengründe nur manuell, 27 % können die Bearbeitungskosten je Artikel nicht beziffern.",
+    scope: "germany",
+    locations: [],
+    topics: ["Retouren", "E-Commerce", "Kosten"],
+    industries: ["Einzelhandel", "E-Commerce"],
+    sourceName: "EHI-Studie zu Retouren und Rentabilität, berichtet von stores+shops",
+    sourceUrl: "https://www.stores-shops.de/technology/supply-chain/ehi-studie-zu-retouren-und-rentabilitaet/",
+    sourceYear: "2025",
+    sourceNote: "Branchenstudie, 124 Onlinehändler im DACH-Raum, überwiegend größere Unternehmen",
+  },
+  {
+    key: "freelancermap-akquise-2025",
+    title: "Selbstständige verbringen mehrere Stunden pro Woche mit Akquise",
+    description:
+      "In einer Befragung von 2.151 Freelancern im DACH-Raum gaben 35 % drei bis fünf Stunden pro Woche für Projektakquise an, 15 % mehr als zehn Stunden.",
+    scope: "germany",
+    locations: [],
+    topics: ["Selbstständigkeit", "Akquise", "Zeitaufwand"],
+    industries: ["Freelancing"],
+    sourceName: "freelancermap, Umfrage zur Auftragslage der Freelancer",
+    sourceUrl: "https://www.freelancermap.de/blog/umfrage-auftragslage-freelancer-2025/",
+    sourceYear: "2025",
+    sourceNote: "Plattformumfrage unter 2.151 Freelancern im DACH-Raum, Juni 2025",
+  },
+  {
+    key: "vgsd-ghosting-2026",
+    title: "Auftraggeber melden sich nach einem Kontakt nicht mehr",
+    description:
+      "84 % von 5.412 befragten Selbstständigen haben beruflich bereits Ghosting erlebt: Nach einem zunächst aussichtsreichen Kontakt kommt keine Antwort oder Absage mehr.",
+    scope: "germany",
+    locations: [],
+    topics: ["Selbstständigkeit", "Akquise", "Ghosting"],
+    industries: ["Freelancing"],
+    sourceName: "Freelancer-Kompass 2026 von freelancermap, berichtet vom VGSD",
+    sourceUrl: "https://www.vgsd.de/wenn-der-kunde-ploetzlich-abtaucht-84-prozent-aller-freelancer-innen-erleben-ghosting/",
+    sourceYear: "2026",
+    sourceNote: "Plattformumfrage unter 5.412 Selbstständigen, November 2025 bis Februar 2026",
   },
 ];

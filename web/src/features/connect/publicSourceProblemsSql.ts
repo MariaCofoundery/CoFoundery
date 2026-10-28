@@ -31,7 +31,7 @@ export function buildPublicSourceProblemsSql(problems: readonly PublicSourceProb
   return `-- Eintraege aus oeffentlichen Quellen fuers Problembrett.
 -- ERZEUGT aus web/src/features/connect/publicSourceProblems.ts mit
 -- \`npm run public-problems:sql\`. Nicht von Hand aendern, sondern die Liste.
--- Voraussetzung: Migration 20270111120000_problem_public_source.sql ist angewendet.
+-- Setzt Migration 20270111120000_problem_public_source.sql voraus.
 -- Wiederholbar: ein zweiter Lauf aktualisiert die Eintraege.
 begin;
 

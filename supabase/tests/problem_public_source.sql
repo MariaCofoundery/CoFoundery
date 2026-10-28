@@ -1,5 +1,8 @@
 begin;
 select plan(12);
+-- Die Migration spielt Eintraege aus oeffentlichen Quellen ein. Dieser Test zaehlt
+-- eigene Zeilen und geht von einem leeren Brett aus; die Transaktion wird zurueckgerollt.
+delete from public.network_problems where origin = 'public_source';
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
 values

@@ -1,6 +1,9 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(9);
+-- Die Migration spielt Eintraege aus oeffentlichen Quellen ein. Dieser Test zaehlt
+-- eigene Zeilen und geht von einem leeren Brett aus; die Transaktion wird zurueckgerollt.
+delete from public.network_problems where origin = 'public_source';
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at) values
  ('ad110000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','rem-admin@example.invalid',now(),now(),now()),
  ('ad110000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','rem-member@example.invalid',now(),now(),now());

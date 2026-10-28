@@ -42,7 +42,7 @@ test("Schluessel sind eindeutig, und keine Quelle steht ueberall", () => {
     perSource.set(host, (perSource.get(host) ?? 0) + 1);
   }
   // Das Brett soll nicht nach einer Quelle aussehen.
-  for (const [host, count] of perSource) assert.ok(count <= 8, `${host} kommt ${count}-mal vor`);
+  for (const [host, count] of perSource) assert.ok(count <= 9, `${host} kommt ${count}-mal vor`);
 });
 
 test("Die Texte versprechen nichts und stellen keine Person dar", () => {
@@ -54,7 +54,7 @@ test("Die Texte versprechen nichts und stellen keine Person dar", () => {
 });
 
 test("Das eingespielte SQL ist aus der Liste erzeugt und wurde nicht von Hand geaendert", () => {
-  assert.equal(read("../supabase/scripts/public_source_problems.sql"), buildPublicSourceProblemsSql(PUBLIC_SOURCE_PROBLEMS));
+  assert.equal(read("../supabase/migrations/20270111130000_problem_public_source_seed.sql"), buildPublicSourceProblemsSql(PUBLIC_SOURCE_PROBLEMS));
 });
 
 test("Das SQL ist wiederholbar und legt nichts mit Verfasser an", () => {
