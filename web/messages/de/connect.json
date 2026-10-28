@@ -618,6 +618,16 @@
       "emptyDescription": "Und darunter das, was heute fehlt.",
       "tried": "Schon versucht",
       "now": "gerade eben"
+    },
+    "source": {
+      "tag": "Aus öffentlichen Quellen",
+      "eyebrow": "Aus öffentlichen Quellen zusammengestellt",
+      "byline": "Aus öffentlichen Quellen zusammengestellt",
+      "sourceTitle": "Quelle",
+      "sourceOpen": "Quelle öffnen",
+      "noReplyTitle": "Hier antwortet niemand persönlich",
+      "noReplyText": "Dieser Eintrag stammt aus einer öffentlichen Quelle und wurde nicht von einem Mitglied eingestellt. Du kannst „Kenne ich auch“ sagen oder beschreiben, wie du es angehen würdest. Eine Meldung „Ich würde daran arbeiten“ gibt es hier nicht, weil sie niemanden erreichen würde.",
+      "boardNote": "Einträge mit gestricheltem Rand stammen aus öffentlichen Quellen, nicht von Mitgliedern."
     }
   },
   "searches": {

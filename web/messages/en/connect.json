@@ -618,6 +618,16 @@
       "emptyDescription": "And below it, what is missing today.",
       "tried": "Already tried",
       "now": "just now"
+    },
+    "source": {
+      "tag": "From public sources",
+      "eyebrow": "Compiled from public sources",
+      "byline": "Compiled from public sources",
+      "sourceTitle": "Source",
+      "sourceOpen": "Open source",
+      "noReplyTitle": "Nobody replies personally here",
+      "noReplyText": "This entry comes from a public source and was not posted by a member. You can say “I know this too” or describe how you would approach it. There is no “I would work on this” here, because it would not reach anyone.",
+      "boardNote": "Entries with a dashed border come from public sources, not from members."
     }
   },
   "searches": {

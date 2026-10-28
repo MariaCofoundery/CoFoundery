@@ -216,6 +216,10 @@ export function categorySupportsVentureStage(category: ConnectCategory) {
 export const CONNECT_PROBLEM_INTENTS = ["observation", "wants_to_build", "already_building"] as const;
 export type ConnectProblemIntent = (typeof CONNECT_PROBLEM_INTENTS)[number];
 
+/** Von einer Person eingestellt, oder aus einer oeffentlichen Quelle zusammengestellt. */
+export const CONNECT_PROBLEM_ORIGINS = ["member", "public_source"] as const;
+export type ConnectProblemOrigin = (typeof CONNECT_PROBLEM_ORIGINS)[number];
+
 export const CONNECT_PROBLEM_STATUSES = ["draft", "active", "withdrawn", "resolved"] as const;
 export type ConnectProblemStatus = (typeof CONNECT_PROBLEM_STATUSES)[number];
 
@@ -252,6 +256,15 @@ export type ConnectProblem = {
   visibility: ConnectVisibility;
   public_slug: string;
   created_at: string;
+  /**
+   * `public_source`: kein Verfasser, die Quelle steht dabei. Das ist etwas
+   * anderes als ein leerer Verfasser bei `member` (Konto geloescht).
+   */
+  origin: ConnectProblemOrigin;
+  source_name: string | null;
+  source_url: string | null;
+  source_year: string | null;
+  source_note: string | null;
   network_profiles?: ConnectProfile | ConnectProfile[] | null;
 };
 

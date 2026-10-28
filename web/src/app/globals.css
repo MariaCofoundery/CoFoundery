@@ -1224,6 +1224,10 @@ body {
 }
 .problem-note[data-intent="wants_to_build"] { --tone: #a78bfa; --tilt: 1.1deg; }
 .problem-note[data-intent="already_building"] { --tone: #fbbf24; --tilt: -0.6deg; }
+/* Aus einer oeffentlichen Quelle: gestrichelter Rand, neutrale Farbe. */
+.problem-note[data-origin="public_source"] { --tone: #94a3b8; border-style: dashed; }
+.problem-note__source { margin-top: 1rem; font-size: 0.8125rem; color: #9fb0cc; }
+.problem-note__source a { color: #c9d6ec; text-underline-offset: 3px; }
 .problem-note:hover,
 .problem-note:focus-within {
   transform: rotate(0deg) translateY(-6px);

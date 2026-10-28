@@ -59,6 +59,9 @@ export default async function ConnectProblemPage({
 
   const workspaceText = await getTranslations("problemWorkspace");
   const isAuthor = problem.author_user_id === user.id;
+  // Aus einer oeffentlichen Quelle: kein Verfasser, der antworten koennte, und
+  // kein "ehemaliges Mitglied" - das waere eine falsche Aussage.
+  const fromSource = problem.origin === "public_source";
   const isPublished = problem.status === "active";
   const [authors, ownInterest, interests, hasProfile, confirmations, ownConfirmation, approaches] =
     await Promise.all([
@@ -143,7 +146,7 @@ export default async function ConnectProblemPage({
 
       <header className="problem-hero" data-intent={problem.author_intent}>
         <p className="problem-hero__eyebrow">
-          {t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}
+          {fromSource ? t("problems.source.eyebrow") : t(`problems.intents.${problem.author_intent}`)} · {t(`scopes.${problem.geographic_scope}`)}
         </p>
         <h1 className="problem-hero__title problem-hero__title--small">{problem.title}</h1>
       </header>
@@ -151,7 +154,7 @@ export default async function ConnectProblemPage({
         {/* Es gibt niemanden mehr, der es pflegt oder antwortet. Das gehoert
             an den Anfang, nicht ans Ende - sonst schreibt jemand eine
             Meldung ins Leere. */}
-        {problem.author_user_id === null ? (
+        {problem.author_user_id === null && !fromSource ? (
           <p className="mt-3 rounded-2xl bg-slate-100 p-3 text-sm leading-6 text-slate-700">
             {t("problems.orphanNotice")}
           </p>
@@ -175,13 +178,33 @@ export default async function ConnectProblemPage({
           </p>
         ) : null}
 
+        {fromSource && problem.source_name && problem.source_url ? (
+          <div className="mt-5 rounded-2xl border border-dashed border-slate-300 p-4">
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t("problems.source.sourceTitle")}</p>
+            <p className="mt-1 font-medium text-slate-900">
+              {[problem.source_name, problem.source_year].filter(Boolean).join(" · ")}
+            </p>
+            {problem.source_note ? <p className="mt-1 text-sm leading-6 text-slate-600">{problem.source_note}</p> : null}
+            <a
+              href={problem.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline underline-offset-4"
+            >
+              {t("problems.source.sourceOpen")}
+            </a>
+          </div>
+        ) : null}
+
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm text-slate-600">
           <span>
-            {problem.author_user_id === null
-              ? t("problems.formerMember")
-              : author?.display_name ?? t("problems.unknownAuthor")}
+            {fromSource
+              ? t("problems.source.byline")
+              : problem.author_user_id === null
+                ? t("problems.formerMember")
+                : author?.display_name ?? t("problems.unknownAuthor")}
           </span>
-          <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+          {fromSource ? null : <span>{t("problems.interestCount", { count: problem.interest_count })}</span>}
         </div>
       </article>
 
@@ -260,8 +283,17 @@ export default async function ConnectProblemPage({
         </section>
       ) : null}
 
+      {/* Aus einer Quelle: niemand, der antwortet. Statt des Interesse-Formulars
+          steht, was man stattdessen tun kann. */}
+      {fromSource ? (
+        <section className={`${card} mt-6`}>
+          <h2 className="text-lg font-semibold">{t("problems.source.noReplyTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{t("problems.source.noReplyText")}</p>
+        </section>
+      ) : null}
+
       {/* Die fremde Sicht: Interesse zeigen oder zurueckziehen. */}
-      {!isAuthor && isPublished ? (
+      {!isAuthor && !fromSource && isPublished ? (
         <section className={`${card} mt-6`}>
           {ownInterest ? (
             <>

@@ -122,18 +122,25 @@ export default async function ConnectProblemsPage({
 
         {problems.length ? (
           <section aria-label={t("problemHub.discover")} className="mt-6">
-            <p className="problem-board-wrap__hint">{t("problemHub.boardHint")}</p>
+            <p className="problem-board-wrap__hint">
+              {t("problemHub.boardHint")}
+              {problems.some((problem) => problem.origin === "public_source") ? ` ${t("problems.source.boardNote")}` : ""}
+            </p>
             <div className="problem-board">
               {problems.map((problem, index) => {
                 const author = problem.author_user_id ? authors.get(problem.author_user_id) : undefined;
+                const fromSource = problem.origin === "public_source";
                 return (
                   <article
                     key={problem.id}
                     className="problem-note"
                     data-intent={problem.author_intent}
+                    data-origin={problem.origin}
                     style={{ "--i": index } as React.CSSProperties}
                   >
-                    <p className="problem-note__tag">{t(`problems.intents.${problem.author_intent}`)}</p>
+                    <p className="problem-note__tag">
+                      {fromSource ? t("problems.source.tag") : t(`problems.intents.${problem.author_intent}`)}
+                    </p>
                     <h3 className="problem-note__title">
                       <Link href={`/connect/problems/${problem.id}`}>{problem.title}</Link>
                     </h3>
@@ -143,18 +150,31 @@ export default async function ConnectProblemsPage({
                         {problem.topics.map((topic) => <li key={topic}>{topic}</li>)}
                       </ul>
                     ) : null}
-                    <div className="problem-note__foot">
-                      <span>{problem.author_user_id === null
-                        ? t("problems.formerMember")
-                        : author?.display_name ?? t("problems.unknownAuthor")}</span>
-                      {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
-                      <span className="problem-note__counts">
+                    {fromSource ? (
+                      // Statt einer Person: woher der Eintrag kommt. Ohne Zahl fuer
+                      // Interesse, weil es hier niemanden gibt, der antwortet.
+                      <div className="problem-note__foot">
+                        <span>{[problem.source_name, problem.source_year].filter(Boolean).join(" · ")}</span>
                         {problem.confirmation_count > 0 ? (
-                          <span>{t("problems.confirmationsCount", { count: problem.confirmation_count })}</span>
+                          <span className="problem-note__counts">
+                            <span>{t("problems.confirmationsCount", { count: problem.confirmation_count })}</span>
+                          </span>
                         ) : null}
-                        <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
-                      </span>
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="problem-note__foot">
+                        <span>{problem.author_user_id === null
+                          ? t("problems.formerMember")
+                          : author?.display_name ?? t("problems.unknownAuthor")}</span>
+                        {/* Nur die Zahlen, nie die Namen - und nie als Sortierkriterium. */}
+                        <span className="problem-note__counts">
+                          {problem.confirmation_count > 0 ? (
+                            <span>{t("problems.confirmationsCount", { count: problem.confirmation_count })}</span>
+                          ) : null}
+                          <span>{t("problems.interestCount", { count: problem.interest_count })}</span>
+                        </span>
+                      </div>
+                    )}
                     {problem.locations.length || problem.geographic_scope ? (
                       <p className="problem-note__meta">
                         {[...problem.locations, ...(problem.geographic_scope ? [t(`scopes.${problem.geographic_scope}`)] : [])].join(" · ")}
