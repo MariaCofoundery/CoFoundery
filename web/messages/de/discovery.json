@@ -664,6 +664,33 @@
       "workstyleOff": "Arbeitsweise: nicht freigegeben – niemand sieht Hinweise dazu.",
       "never": "Nie sichtbar in FIND: deine private Suche, deine einzelnen Antworten, Team-, Advisor- und Forschungsdaten.",
       "change": "Ändern"
+    },
+    "cards": {
+      "idea": {
+        "title": "Wie weit ist deine Idee?"
+      },
+      "search": {
+        "title": "Wie aktiv suchst du?"
+      }
+    },
+    "flow": {
+      "back": "Zurück",
+      "next": "Weiter",
+      "stepOf": "Schritt {current} von {total}",
+      "publishTitle": "Soll Find dich zeigen?",
+      "titles": {
+        "bring": "Was du einbringst",
+        "time": "Zeit und Platz",
+        "idea": "Idee",
+        "search": "Suche",
+        "seeking": "Wen du suchst",
+        "publish": "Zeigen"
+      },
+      "missingTitle": "Pflicht · das fehlt noch",
+      "missingNote": "Solange das fehlt, bleibt „Veröffentlichen“ gesperrt. Speichern geht jederzeit.",
+      "allSet": "Alles Nötige ist ausgefüllt. Du kannst jetzt veröffentlichen.",
+      "fix": "Ausfüllen →",
+      "identityFix": "Im Profil ergänzen →"
     }
   },
   "intros": {

@@ -72,7 +72,11 @@ test("a paused profile is resumed, not published again", () => {
 // ---------------------------------------------------------------------------
 test("the publish issues are listed where the action is, and only there", () => {
   const page = codeOnly(PAGE);
-  assert.match(page, /<PublishIssuesCard issues=\{publishIssues\}/);
+  // Seit der Kartenreise steht die Liste als Pflicht-Box auf der letzten Karte (FindCardFlow),
+  // direkt vor dem Knopf - und nur dort.
+  assert.match(page, /<FindCardFlow/);
+  assert.doesNotMatch(page, /<PublishIssuesCard/);
+  assert.match(codeOnly("src/features/discovery/FindCardFlow.tsx"), /copy\.missingTitle/);
   // Die Meldung oben bekommt keine Liste mehr - nach einem gescheiterten
   // Veroeffentlichen stand dieselbe Aufzaehlung zweimal da.
   assert.match(page, /<PageMessage[\s\S]{0,120}issues=\{\[\]\}/);

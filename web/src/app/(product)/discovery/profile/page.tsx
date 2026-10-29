@@ -56,6 +56,7 @@ import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { FindCardFlow } from "@/features/discovery/FindCardFlow";
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { FIND_CARD, FIND_FIELD } from "@/features/discovery/findUi";
 
@@ -354,31 +355,6 @@ function StatusCard({
   );
 }
 
-function PublishIssuesCard({
-  issues,
-  t,
-}: {
-  issues: DiscoveryProfilePublishIssue[];
-  t: DiscoveryT;
-}) {
-  if (issues.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-      <p className="text-sm font-semibold text-amber-900">
-        {t("profile.actions.publishIssues")}
-      </p>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-amber-800">
-        {issues.map((issue) => (
-          <li key={issue}>{translatePublishIssue(issue, t)}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export default async function DiscoveryProfilePage({
   searchParams,
 }: {
@@ -451,7 +427,30 @@ export default async function DiscoveryProfilePage({
   });
   const pageMessage = localizedFeedback ? t(localizedFeedback.messageKey) : null;
   const profile = { ...emptyProfile(), ...(loadedProfile ?? {}) };
-  const publishIssues = getDiscoveryProfilePublishIssues(profile);
+  // Name und Headline kommen aus dem Kernprofil, nicht aus diesem Formular (das Speichern liest
+  // sie von dort). Fuer ein neues Profil ist `profile.displayName` deshalb leer - die Luecken
+  // muessen aus dem Kern kommen, sonst meldet die Seite einen Namen als fehlend, der laengst steht.
+  const identityIssues = (
+    (["displayName", "headline"] as const).filter((issue) =>
+      issue === "displayName" ? (core?.display_name ?? "").trim().length < 2 : (core?.headline ?? "").trim().length < 3
+    )
+  );
+  const publishIssues = [
+    ...identityIssues,
+    ...getDiscoveryProfilePublishIssues(profile).filter((issue) => issue !== "displayName" && issue !== "headline"),
+  ];
+  // Nach dem Speichern oder einem abgewiesenen Veroeffentlichen landet man auf der letzten Karte,
+  // wo die Rueckmeldung steht - sonst auf der ersten.
+  const flowInitialStep = [
+    params.draftResult,
+    params.draftError,
+    params.publishResult,
+    params.publishError,
+    params.pauseResult,
+    params.pauseError,
+  ].some((value) => searchParamValue(value) !== undefined)
+    ? 5
+    : 0;
   async function saveProfileDraft(formData: FormData) {
     "use server";
     const result = await saveDiscoveryProfileDraftAction(formData);
@@ -525,7 +524,7 @@ export default async function DiscoveryProfilePage({
             className={`${CARD_CLASS} discovery-rise`}
             style={{ "--rise-delay": "120ms" } as CSSProperties}
           >
-            <form action={saveProfileDraft} className="grid gap-5">
+            <form action={saveProfileDraft} noValidate className="grid gap-5">
               <div className={INNER_SECTION_CLASS}>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -541,6 +540,12 @@ export default async function DiscoveryProfilePage({
 
               </div>
 
+              <FindCardFlow
+                initialStep={flowInitialStep}
+                publishStatus={profile.status ?? "draft"}
+                identityIssues={identityIssues}
+                cards={[
+                  { id: "bring", node: (
               <div className={INNER_SECTION_CLASS}>
                 <h2 className="text-xl font-semibold text-slate-950">{t("profile.brings.title")}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.brings.description")}</p>
@@ -574,6 +579,8 @@ export default async function DiscoveryProfilePage({
                 </div>
               </div>
 
+                  ) },
+                  { id: "time", node: (
               <div className={INNER_SECTION_CLASS}>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -648,10 +655,6 @@ export default async function DiscoveryProfilePage({
                     />
                   </fieldset>
                 </div>
-
-                {/* Untereinander statt in drei Spalten: Die Antworten sind
-                    Saetze, keine Stichwoerter - nebeneinander brachen sie auf
-                    zwei Zeilen und die Spalten wurden ungleich hoch. */}
                 <div className="mt-5 grid gap-6">
                   <fieldset>
                     <legend className={LABEL_CLASS}>{t("profile.venture.commitment")}</legend>
@@ -665,6 +668,13 @@ export default async function DiscoveryProfilePage({
                       }))}
                     />
                   </fieldset>
+                </div>
+              </div>
+                  ) },
+                  { id: "idea", node: (
+              <div className={INNER_SECTION_CLASS}>
+                <h2 className="text-xl font-semibold text-slate-950">{t("profile.cards.idea.title")}</h2>
+                <div className="mt-5 grid gap-6">
                   <fieldset>
                     <legend className={LABEL_CLASS}>{t("profile.venture.stage")}</legend>
                     <DiscoveryChoiceField
@@ -709,6 +719,11 @@ export default async function DiscoveryProfilePage({
                   <span className={HELP_CLASS}>{t("profile.venture.recentStepHint")}</span>
                 </label>
 
+              </div>
+                  ) },
+                  { id: "search", node: (
+              <div className={INNER_SECTION_CLASS}>
+                <h2 className="text-xl font-semibold text-slate-950">{t("profile.cards.search.title")}</h2>
                 <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5 md:grid-cols-2">
                   <label>
                     <span className={LABEL_CLASS}>{t("profile.intent.searchIntent")}</span>
@@ -770,7 +785,8 @@ export default async function DiscoveryProfilePage({
                   </p>
                 ) : null}
               </div>
-
+                  ) },
+                  { id: "seeking", node: (
               <div className={INNER_SECTION_CLASS}>
                 <h2 className="text-xl font-semibold text-slate-950">{t("profile.seeking.title")}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.seeking.description")}</p>
@@ -801,14 +817,9 @@ export default async function DiscoveryProfilePage({
                 </div>
               </div>
 
-              <PublishIssuesCard issues={publishIssues} t={t} />
-
-              {/* Speichern steht zuerst - und zwar nicht nur optisch: Die
-                  Eingabetaste in einem Textfeld loest den ersten Knopf im
-                  Formular aus. Stuende dort das Veroeffentlichen, wuerde ein
-                  Zeilenumbruch im falschen Moment das Profil sichtbar machen.
-                  Die Hauptaktion steht deshalb rechts, wie ueberall sonst. */}
-              <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+                  ) },
+                ]}
+                saveNode={(
                 <SubmitButton
                   label={
                     profile.status === "active"
@@ -818,6 +829,9 @@ export default async function DiscoveryProfilePage({
                   pendingLabel={t("profile.actions.saving")}
                   className={profile.status === "active" ? PRIMARY_BUTTON_CLASS : SECONDARY_BUTTON_CLASS}
                 />
+                )}
+                publishNode={(
+                  <>
                 {profile.status !== "active" ? (
                   <SubmitButton
                     intent="publish"
@@ -835,7 +849,9 @@ export default async function DiscoveryProfilePage({
                     className={PRIMARY_BUTTON_CLASS}
                   />
                 ) : null}
-              </div>
+                  </>
+                )}
+                helpNode={(
               <p className="text-xs leading-5 text-slate-500 sm:text-right">
                 {t(
                   profile.status === "active"
@@ -845,6 +861,37 @@ export default async function DiscoveryProfilePage({
                       : "profile.actions.publishHelp"
                 )}
               </p>
+                )}
+                copy={{
+                  back: t("profile.flow.back"),
+                  next: t("profile.flow.next"),
+                  stepOf: t("profile.flow.stepOf", { current: "{current}", total: "{total}" }),
+                  cardTitles: {
+                    bring: t("profile.flow.titles.bring"),
+                    time: t("profile.flow.titles.time"),
+                    idea: t("profile.flow.titles.idea"),
+                    search: t("profile.flow.titles.search"),
+                    seeking: t("profile.flow.titles.seeking"),
+                    publish: t("profile.flow.titles.publish"),
+                  },
+                  publishTitle: t("profile.flow.publishTitle"),
+                  missingTitle: t("profile.flow.missingTitle"),
+                  missingNote: t("profile.flow.missingNote"),
+                  allSet: t("profile.flow.allSet"),
+                  fix: t("profile.flow.fix"),
+                  identityFix: t("profile.flow.identityFix"),
+                  issueLabels: {
+                    displayName: t("profile.publishIssueItems.displayName"),
+                    headline: t("profile.publishIssueItems.headline"),
+                    ownRoles: t("profile.publishIssueItems.ownRoles"),
+                    seekingRoles: t("profile.publishIssueItems.seekingRoles"),
+                    availability: t("profile.publishIssueItems.availability"),
+                    commitment: t("profile.publishIssueItems.commitment"),
+                    ventureStage: t("profile.publishIssueItems.ventureStage"),
+                    ventureGoal: t("profile.publishIssueItems.ventureGoal"),
+                  },
+                }}
+              />
             </form>
 
             {profile.status === "active" ? (

@@ -664,6 +664,33 @@
       "workstyleOff": "Work style: not shared – nobody sees hints about it.",
       "never": "Never visible in FIND: your private search, your individual answers, team, advisor and research data.",
       "change": "Change"
+    },
+    "cards": {
+      "idea": {
+        "title": "How far is your idea?"
+      },
+      "search": {
+        "title": "How actively are you searching?"
+      }
+    },
+    "flow": {
+      "back": "Back",
+      "next": "Next",
+      "stepOf": "Step {current} of {total}",
+      "publishTitle": "Should Find show you?",
+      "titles": {
+        "bring": "What you bring",
+        "time": "Time and room",
+        "idea": "Idea",
+        "search": "Search",
+        "seeking": "Who you look for",
+        "publish": "Show"
+      },
+      "missingTitle": "Required · still missing",
+      "missingNote": "While this is missing, “Publish” stays locked. Saving works any time.",
+      "allSet": "Everything required is filled in. You can publish now.",
+      "fix": "Fill in →",
+      "identityFix": "Add in your profile →"
     }
   },
   "intros": {
