@@ -6,6 +6,7 @@ import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { WelcomeLetter } from "@/features/profile/WelcomeLetter";
 import { WelcomeAlignmentVisual } from "@/features/profile/WelcomeAlignmentVisual";
+import { isProfileJourneyEnabled } from "@/features/profile/journey/journeyFlag";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 function buildWelcomeNextParam(nextPath: string) {
@@ -28,7 +29,7 @@ function buildWelcomeNextParam(nextPath: string) {
 export default async function WelcomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ intent?: string; next?: string }>;
+  searchParams: Promise<{ intent?: string; next?: string; classic?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("profile.welcome");
@@ -58,6 +59,14 @@ export default async function WelcomePage({
   // Wer schon eingefuehrt wurde, wird nicht noch einmal eingefuehrt.
   if (core?.onboarding_completed_at) {
     redirect(nextPath);
+  }
+
+  // Die Kartenreise ist ein Zusatzweg, solange `PROFILE_JOURNEY` nicht gesetzt ist.
+  // Wer ausdruecklich den bisherigen Einstieg will (`classic=1`, etwa als Advisor),
+  // bekommt ihn auch dann. Ein Advisor-Link aus dem Magic Link (`intent=advisor`)
+  // bleibt ebenfalls im bisherigen Einstieg: Die Reise kennt diese Rolle nicht.
+  if (isProfileJourneyEnabled() && params.classic !== "1" && params.intent !== "advisor") {
+    redirect(`/welcome/reise${nextPath === "/dashboard" ? "" : `?next=${encodeURIComponent(nextPath)}`}`);
   }
 
   const fallbackAvatarUrl = profile?.avatar_url?.trim() || null;

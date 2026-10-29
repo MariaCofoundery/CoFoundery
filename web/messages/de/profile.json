@@ -651,5 +651,158 @@
     "story5": "Sieh Made2Found als deinen geschützten Raum: Nimm dir mit, was du brauchst, hol dir Antworten auf die heiklen Fragen und bau Partnerschaften auf, die echten Stürmen standhalten.",
     "story6": "Und wenn du magst, schreib mir jederzeit direkt. Ich bin hier selbst täglich unterwegs.",
     "story7": "Schön, dass du dabei bist!"
+  },
+  "journey": {
+    "title": "Dein Profil in wenigen Karten",
+    "back": "Zurück",
+    "next": "Weiter",
+    "skip": "Überspringen",
+    "finish": "Los geht’s",
+    "finishing": "Einen Moment …",
+    "progress": "{current} von {total}",
+    "saved": "Gespeichert",
+    "classic": "Ich bin Advisor oder möchte den bisherigen Einstieg nutzen",
+    "errors": {
+      "areas": "Wähle bitte mindestens einen Bereich.",
+      "name": "Wie sollen wir dich nennen? Ein Name fehlt noch.",
+      "save": "Das hat nicht geklappt. Versuch es bitte noch einmal.",
+      "join": "Der Zugang zu Connect hat nicht geklappt. Versuch es bitte noch einmal."
+    },
+    "areas": {
+      "q": "Wofür bist du hier?",
+      "hint": "Such dir aus, was du nutzen willst. Du siehst danach nur noch, was dazu gehört, und kannst später jederzeit etwas ergänzen.",
+      "align": {
+        "name": "Align",
+        "text": "Verstehen, wie du arbeitest, und das mit deinem Team besprechen."
+      },
+      "find": {
+        "name": "Find",
+        "text": "Mitgründerinnen und Mitgründer finden, die zu dir passen."
+      },
+      "connect": {
+        "name": "Connect",
+        "text": "Menschen, Wissen und Möglichkeiten im Netzwerk finden."
+      }
+    },
+    "name": {
+      "q": "Wie sollen wir dich nennen?",
+      "placeholder": "Dein Name",
+      "hint": "So erscheinst du später, wo du etwas freigibst."
+    },
+    "headline": {
+      "q": "Wer bist du in einer Zeile?",
+      "placeholder": "Zum Beispiel: Gründerin, baut Vertrieb für B2B-Software auf",
+      "hint": "Das steht später als Überschrift an deinem Profil."
+    },
+    "about": {
+      "q": "Und in zwei Sätzen?",
+      "placeholder": "Zum Beispiel: Ich baue seit acht Jahren Vertrieb für B2B-Software auf und suche jemanden für Produkt und Technik.",
+      "hint": "Den Lebenslauf kannst du später in deinem Profil einlesen."
+    },
+    "can": {
+      "q": "Worin bist du besonders stark?",
+      "hint": "Tippe an, was zu dir passt. Wenn du magst, wirst du genauer.",
+      "whatBelongs": "Was gehört dazu?",
+      "chosen": "gewählt",
+      "select": "wählen",
+      "unselect": "abwählen"
+    },
+    "foci": {
+      "product": {
+        "name": "Produkt",
+        "text": "Herausfinden, was gebaut werden soll, und dafür sorgen, dass es Menschen wirklich hilft.",
+        "parts": "Product Discovery | Product Management | Strategie & Roadmap | UX & Interface Design | Prototyping"
+      },
+      "tech": {
+        "name": "Technik",
+        "text": "Es bauen und am Laufen halten.",
+        "parts": "Software-Entwicklung | Technische Architektur | Data & Analytics | AI & Machine Learning | Hardware & Produktion | Security"
+      },
+      "design": {
+        "name": "Design",
+        "text": "Wie es aussieht, sich anfühlt und bedient wird.",
+        "parts": "UX & Interface Design | Prototyping | Marke & Auftritt"
+      },
+      "sales": {
+        "name": "Vertrieb",
+        "text": "Kundschaft gewinnen und Abschlüsse machen.",
+        "parts": "B2B Sales | B2C Wachstum & Akquise | Partnerschaften & Business Development | Customer Success"
+      },
+      "marketing": {
+        "name": "Marketing",
+        "text": "Bekannt werden und Nachfrage erzeugen.",
+        "parts": "Marketing & Brand | Performance Marketing | Community | Positionierung"
+      },
+      "finance": {
+        "name": "Finanzen",
+        "text": "Zahlen, Planung und Geld von außen.",
+        "parts": "Finanzplanung & Forecast | Unit Economics | Buchhaltung & Controlling | Fundraising | Investor Relations"
+      },
+      "operations": {
+        "name": "Betrieb & Team",
+        "text": "Dafür sorgen, dass der Laden läuft und das Team funktioniert.",
+        "parts": "Operations | Prozesse & Tooling | Recruiting & Hiring | Führung & People Management | Organisationsaufbau"
+      },
+      "strategy": {
+        "name": "Strategie",
+        "text": "Wie das Unternehmen Geld verdient und wohin es will.",
+        "parts": "Geschäftsmodell | Pricing & Monetarisierung | Strategische Planung"
+      },
+      "research": {
+        "name": "Research",
+        "text": "Verstehen, was Menschen und Markt brauchen, bevor man baut.",
+        "parts": "Kundeninterviews | User Research | Markt- & Wettbewerbsanalyse | Zielgruppen & Segmentierung | Branchen- & Domänenwissen"
+      }
+    },
+    "where": {
+      "q": "Wo und wie arbeitest du am liebsten?",
+      "onsite": {
+        "name": "Vor Ort",
+        "text": "Im selben Raum"
+      },
+      "hybrid": {
+        "name": "Hybrid",
+        "text": "Mal so, mal so"
+      },
+      "remote": {
+        "name": "Remote",
+        "text": "Von überall"
+      },
+      "flexible": {
+        "name": "Flexibel",
+        "text": "Je nach Lage"
+      }
+    },
+    "alignPlan": {
+      "q": "Align braucht etwas mehr Zeit",
+      "hint": "Zusammen etwa 30 Minuten, dafür bekommst du am Ende ein genaueres Bild. Du kannst jederzeit pausieren, alles bleibt gespeichert.",
+      "rows": {
+        "workstyle": "Arbeitsweise",
+        "strengths": "Stärken",
+        "drive": "Antrieb"
+      },
+      "minutes": "ca. {minutes} Min",
+      "first": {
+        "name": "Erst nur die Arbeitsweise",
+        "text": "Etwa 12 Minuten. Den Rest holst du später nach. Unser Vorschlag."
+      },
+      "all": {
+        "name": "Alles jetzt, mit Ruhe",
+        "text": "Etwa 30 Minuten. Nimm dir Zeit, es lohnt sich."
+      },
+      "later": {
+        "name": "Erst die normalen Profildaten",
+        "text": "Align wartet auf dich, du kannst es jederzeit starten."
+      }
+    },
+    "done": {
+      "q": "Das war der Anfang",
+      "text": "Nichts davon ist für andere sichtbar. Was du zeigen willst, gibst du später selbst frei – jede Freigabe einzeln.",
+      "next": "Als Nächstes",
+      "nextAlign": "Die Fragen zu deiner Arbeitsweise",
+      "nextFind": "Dein Find-Profil",
+      "nextConnect": "Dein Connect-Profil",
+      "nextDashboard": "Dein Überblick"
+    }
   }
 }

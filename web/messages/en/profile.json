@@ -651,5 +651,158 @@
     "story5": "See Made2Found as your protected space: take what you need, get answers to the delicate questions and build partnerships that withstand real storms.",
     "story6": "And if you like, write to me directly at any time. I am around here myself every day.",
     "story7": "So glad you are here!"
+  },
+  "journey": {
+    "title": "Your profile in a few cards",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "finish": "Let’s go",
+    "finishing": "One moment …",
+    "progress": "{current} of {total}",
+    "saved": "Saved",
+    "classic": "I’m an advisor or I’d rather use the previous onboarding",
+    "errors": {
+      "areas": "Please choose at least one area.",
+      "name": "What should we call you? A name is still missing.",
+      "save": "That didn’t work. Please try again.",
+      "join": "Getting you into Connect didn’t work. Please try again."
+    },
+    "areas": {
+      "q": "What are you here for?",
+      "hint": "Pick what you want to use. After that you only see what belongs to it, and you can add more later.",
+      "align": {
+        "name": "Align",
+        "text": "Understand how you work and talk it through with your team."
+      },
+      "find": {
+        "name": "Find",
+        "text": "Find co-founders who fit you."
+      },
+      "connect": {
+        "name": "Connect",
+        "text": "Find people, knowledge and opportunities in the network."
+      }
+    },
+    "name": {
+      "q": "What should we call you?",
+      "placeholder": "Your name",
+      "hint": "This is how you appear wherever you choose to share something."
+    },
+    "headline": {
+      "q": "Who are you in one line?",
+      "placeholder": "For example: Founder, building sales for B2B software",
+      "hint": "This becomes the headline of your profile later."
+    },
+    "about": {
+      "q": "And in two sentences?",
+      "placeholder": "For example: I’ve built sales for B2B software for eight years and I’m looking for someone for product and tech.",
+      "hint": "You can read in your CV later in your profile."
+    },
+    "can": {
+      "q": "What are you especially good at?",
+      "hint": "Tap what fits you. If you like, get more specific.",
+      "whatBelongs": "What does it include?",
+      "chosen": "selected",
+      "select": "select",
+      "unselect": "deselect"
+    },
+    "foci": {
+      "product": {
+        "name": "Product",
+        "text": "Figuring out what to build and making sure it really helps people.",
+        "parts": "Product discovery | Product management | Strategy & roadmap | UX & interface design | Prototyping"
+      },
+      "tech": {
+        "name": "Tech",
+        "text": "Building it and keeping it running.",
+        "parts": "Software development | Technical architecture | Data & analytics | AI & machine learning | Hardware & production | Security"
+      },
+      "design": {
+        "name": "Design",
+        "text": "How it looks, feels and is used.",
+        "parts": "UX & interface design | Prototyping | Brand & visual identity"
+      },
+      "sales": {
+        "name": "Sales",
+        "text": "Winning customers and closing deals.",
+        "parts": "B2B sales | B2C growth & acquisition | Partnerships & business development | Customer success"
+      },
+      "marketing": {
+        "name": "Marketing",
+        "text": "Getting known and creating demand.",
+        "parts": "Marketing & brand | Performance marketing | Community | Positioning"
+      },
+      "finance": {
+        "name": "Finance",
+        "text": "Numbers, planning and outside money.",
+        "parts": "Financial planning & forecast | Unit economics | Accounting & controlling | Fundraising | Investor relations"
+      },
+      "operations": {
+        "name": "Operations & team",
+        "text": "Making sure the company runs and the team works.",
+        "parts": "Operations | Processes & tooling | Recruiting & hiring | Leadership & people management | Building the organization"
+      },
+      "strategy": {
+        "name": "Strategy",
+        "text": "How the company makes money and where it is headed.",
+        "parts": "Business model | Pricing & monetization | Strategic planning"
+      },
+      "research": {
+        "name": "Research",
+        "text": "Understanding what people and the market need before building.",
+        "parts": "Customer interviews | User research | Market & competitor analysis | Target groups & segmentation | Industry & domain knowledge"
+      }
+    },
+    "where": {
+      "q": "Where and how do you like to work?",
+      "onsite": {
+        "name": "On site",
+        "text": "In the same room"
+      },
+      "hybrid": {
+        "name": "Hybrid",
+        "text": "A bit of both"
+      },
+      "remote": {
+        "name": "Remote",
+        "text": "From anywhere"
+      },
+      "flexible": {
+        "name": "Flexible",
+        "text": "Depends"
+      }
+    },
+    "alignPlan": {
+      "q": "Align takes a bit more time",
+      "hint": "About 30 minutes in total, and you get a more detailed picture at the end. You can pause any time, everything stays saved.",
+      "rows": {
+        "workstyle": "Work style",
+        "strengths": "Strengths",
+        "drive": "Drive"
+      },
+      "minutes": "approx. {minutes} min",
+      "first": {
+        "name": "Just the work style first",
+        "text": "About 12 minutes. You catch up on the rest later. Our suggestion."
+      },
+      "all": {
+        "name": "Everything now, calmly",
+        "text": "About 30 minutes. Take your time, it’s worth it."
+      },
+      "later": {
+        "name": "The regular profile details first",
+        "text": "Align waits for you, you can start it any time."
+      }
+    },
+    "done": {
+      "q": "That was the start",
+      "text": "None of this is visible to others. What you want to show, you release yourself later – each release on its own.",
+      "next": "Next up",
+      "nextAlign": "The questions about your work style",
+      "nextFind": "Your Find profile",
+      "nextConnect": "Your Connect profile",
+      "nextDashboard": "Your overview"
+    }
   }
 }
