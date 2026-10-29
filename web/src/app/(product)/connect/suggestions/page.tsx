@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { dismissConnectSuggestionAction } from "@/features/connect/connectSuggestionActions";
+import { ConnectMarkSuggestionsSeen } from "@/features/connect/ConnectMarkSuggestionsSeen";
 import {
   generateConnectSuggestions,
   getOwnConnectSuggestions,
@@ -23,6 +24,7 @@ export default async function ConnectSuggestionsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
+      <ConnectMarkSuggestionsSeen newCount={suggestions.filter((suggestion) => suggestion.isNew).length} />
       <Link
         href="/connect"
         className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950"

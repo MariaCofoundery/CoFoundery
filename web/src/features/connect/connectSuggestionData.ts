@@ -20,6 +20,8 @@ export type ConnectSuggestion = {
   /** Die Woerter, die zum Treffer gefuehrt haben. Der Grund, als Daten. */
   matchedTerms: string[];
   owner: ConnectProfile | null;
+  /** Noch nicht in der Vorschlagsliste gesehen. Nur fuer die Zahl in der Navigation. */
+  isNew: boolean;
 };
 
 type Row = {
@@ -29,6 +31,7 @@ type Row = {
   problem_id: string | null;
   subject_owner_user_id: string;
   matched_terms: string[];
+  seen_at: string | null;
   network_listings: { id: string; title: string; summary: string } | null;
   network_ventures: { id: string; name: string; what_it_does: string } | null;
   network_problems: { id: string; title: string; description: string } | null;
@@ -62,13 +65,29 @@ export async function countOpenConnectSuggestions(client: SupabaseClient) {
   return error ? 0 : (count ?? 0);
 }
 
+/**
+ * Wie viele offene Vorschlaege die Person noch nicht gesehen hat.
+ *
+ * Das ist die Zahl an "Connect" und an "Entdecken" in der Navigation. Offen
+ * und neu sind verschieden: Die Zahl verschwindet, sobald die Vorschlagsliste
+ * geoeffnet wurde, auch wenn die Vorschlaege dort weiter liegen.
+ */
+export async function countNewConnectSuggestions(client: SupabaseClient) {
+  const { count, error } = await client
+    .from("connect_suggestions")
+    .select("id", { count: "exact", head: true })
+    .is("dismissed_at", null)
+    .is("seen_at", null);
+  return error ? 0 : (count ?? 0);
+}
+
 export async function getOwnConnectSuggestions(
   client: SupabaseClient
 ): Promise<ConnectSuggestion[]> {
   const { data, error } = await client
     .from("connect_suggestions")
     .select(
-      "id, listing_id, venture_id, problem_id, person_user_id, subject_owner_user_id, matched_terms," +
+      "id, listing_id, venture_id, problem_id, person_user_id, subject_owner_user_id, matched_terms, seen_at," +
         " network_listings(id, title, summary)," +
         " network_ventures(id, name, what_it_does)," +
         " network_problems(id, title, description)"
@@ -100,6 +119,7 @@ export async function getOwnConnectSuggestions(
     const base = {
       id: row.id,
       matchedTerms: row.matched_terms,
+      isNew: row.seen_at === null,
       owner: null as ConnectProfile | null,
     };
 

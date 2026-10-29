@@ -217,11 +217,11 @@ test("der Weg dorthin sagt, dass etwas dort liegt", () => {
   // Seit alle drei Bereiche ihre Ziele in der Leiste tragen, steht sie dort -
   // und damit auf JEDER Connect-Seite statt nur auf dreien.
   const layout = codeOnly("src/app/layout.tsx");
-  assert.match(layout, /countOpenConnectSuggestions/);
-  assert.match(layout, /connectSuggestionCount=\{connectSuggestionCount\}/);
+  assert.match(layout, /countNewConnectSuggestions/);
+  assert.match(layout, /newConnectSuggestionCount=\{newConnectSuggestionCount\}/);
 
   const shell = codeOnly("src/features/navigation/ProductShell.tsx");
-  assert.match(shell, /connectSuggestionCount > 0/);
+  assert.match(shell, /newConnectSuggestionCount > 0/);
 
   // NICHT ROT. Rot ist in Connect fuer das reserviert, wo ein Mensch auf eine
   // Antwort wartet - eine Anfrage, eine Nachricht. Ein Vorschlag wartet nicht,
@@ -233,7 +233,7 @@ test("der Weg dorthin sagt, dass etwas dort liegt", () => {
   // Die Zahl braucht einen vorlesbaren Namen - "3" allein sagt einem
   // Screenreader nichts.
   assert.match(shell, /aria-label=\{subItem\.count\.label\}/);
-  assert.match(shell, /tConnect\("mine\.suggestionCount", \{ count: connectSuggestionCount \}\)/);
+  assert.match(shell, /tConnect\("mine\.suggestionCount", \{ count: newConnectSuggestionCount \}\)/);
   for (const locale of ["de", "en"]) {
     const mine = (
       JSON.parse(readFileSync(`messages/${locale}/connect.json`, "utf8")) as {

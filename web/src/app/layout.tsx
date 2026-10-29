@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
-import { countOpenConnectSuggestions } from "@/features/connect/connectSuggestionData";
+import { countNewConnectSuggestions } from "@/features/connect/connectSuggestionData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnProfileImage } from "@/features/profile/profileData";
 import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
@@ -110,7 +110,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         }))
     : Promise.resolve({ isPlatformAdmin: false, adminAttentionCount: 0 });
 
-  const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, connectSuggestionCount] = user
+  const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, newConnectSuggestionCount] = user
     ? await Promise.all([
         getDashboardRoleViews(user.id).catch(() => ({
           hasFounder: false,
@@ -133,7 +133,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         // KANN: Es geht ausdruecklich nichts per Mail hinaus. Die Zahl stand
         // bis zum 30.09.2026 an der eigenen Reihe in Connect; seit die Ziele
         // in der Leiste stehen, steht sie dort.
-        countOpenConnectSuggestions(supabase as unknown as SupabaseClient).catch(() => 0),
+        countNewConnectSuggestions(supabase as unknown as SupabaseClient).catch(() => 0),
       ])
     : [
         {
@@ -177,7 +177,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             avatarImageUrl={profileImage.imageUrl}
             incomingOpenRequestCount={incomingOpenRequestCount}
             incomingConnectContactCount={incomingConnectContactCount}
-            connectSuggestionCount={connectSuggestionCount}
+            newConnectSuggestionCount={newConnectSuggestionCount}
             unreadConnectMessageCount={unreadConnectMessageCount}
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}

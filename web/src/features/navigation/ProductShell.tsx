@@ -35,7 +35,7 @@ type Props = {
   incomingOpenRequestCount: number;
   incomingConnectContactCount: number;
   /** Wie viele Vorschlaege auf eine Entscheidung warten. */
-  connectSuggestionCount?: number;
+  newConnectSuggestionCount?: number;
   unreadConnectMessageCount: number;
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
@@ -53,13 +53,15 @@ type Props = {
  * gezaehlt werden - Vorstellungsanfragen bei Find, Kontaktanfragen und
  * ungelesene Nachrichten bei Connect.
  */
-type AreaBadge = { kind: "intro" | "attention"; count: number };
+type AreaBadge = { kind: "intro" | "attention" | "suggestions"; count: number };
 
 type NavigationItem = {
   href: string;
   label: string;
   isActive: (pathname: string) => boolean;
   badge?: AreaBadge;
+  /** Eine zweite, ruhigere Zahl neben der ersten - bei Connect: neue Vorschlaege. */
+  extraBadge?: AreaBadge;
   /**
    * Seiten INNERHALB dieses Bereichs.
    *
@@ -75,10 +77,10 @@ type NavigationItem = {
     /**
      * Eine Zahl neben dem Namen — wenn dort etwas wartet.
      *
-     * NICHT ROT. Rot ist fuer das reserviert, wo ein Mensch auf eine Antwort
-     * wartet: eine Anfrage, eine Nachricht. Ein Vorschlag wartet nicht, und
-     * eine rote Zahl, die auch fuer Unwichtiges leuchtet, verliert ihre
-     * Bedeutung fuer das Wichtige.
+     * NICHT ROT, sondern das Lila aus dem Logo. Rot ist fuer das reserviert,
+     * wo ein Mensch auf eine Antwort wartet: eine Anfrage, eine Nachricht. Ein
+     * Vorschlag wartet nicht, und eine rote Zahl, die auch fuer Unwichtiges
+     * leuchtet, verliert ihre Bedeutung fuer das Wichtige.
      */
     count?: { value: number; label: string };
   }[];
@@ -217,6 +219,16 @@ function ConnectAttentionBadge({ count, label }: { count: number; label: string 
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
 }
 
+/**
+ * Neue Vorschlaege: dasselbe Lila wie das Logo, nicht rot. Rot bleibt dem
+ * vorbehalten, wo ein Mensch auf eine Antwort wartet. Ein Vorschlag wartet
+ * nicht - er soll nur bemerkt werden.
+ */
+function NewSuggestionsBadge({ count, label }: { count: number; label: string }) {
+  if (count < 1) return null;
+  return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-[#6d49e0] px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
+}
+
 function normalizeDisplayName(value: string | null) {
   const trimmed = value?.trim();
   return trimmed && trimmed.length > 0 ? trimmed : null;
@@ -242,7 +254,7 @@ export function ProductShell({
   avatarImageUrl = null,
   incomingOpenRequestCount,
   incomingConnectContactCount,
-  connectSuggestionCount = 0,
+  newConnectSuggestionCount = 0,
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
@@ -527,6 +539,7 @@ export function ProductShell({
     label: t("areaConnect"),
     isActive: (currentPathname) => currentPathname.startsWith("/connect"),
     badge: { kind: "attention", count: connectAttentionCount },
+    extraBadge: { kind: "suggestions", count: newConnectSuggestionCount },
     // Eine einzige Leiste: die vier Arten zu entdecken, dann Kontakte und
     // Mein Connect. Es gibt keine zweite Reiterreihe auf den Seiten mehr -
     // vorher stand "Probleme" zweimal da, und "Entdecken" fuehrte auf dieselbe
@@ -536,8 +549,8 @@ export function ProductShell({
         href: "/connect",
         label: tConnect("tabs.listings"),
         isActive: (path: string) => path === "/connect" || /^\/connect\/(listings|suggestions)(\/|$)/.test(path),
-        // Die Vorschlaege stehen als Streifen oben auf der Startseite; die Zahl bleibt hier, nicht rot.
-        ...(connectSuggestionCount > 0 ? { count: { value: connectSuggestionCount, label: tConnect("mine.suggestionCount", { count: connectSuggestionCount }) } } : {}),
+        // Neue Vorschlaege: lila Zahl. Sie verschwindet, wenn die Liste geoeffnet wurde.
+        ...(newConnectSuggestionCount > 0 ? { count: { value: newConnectSuggestionCount, label: tConnect("mine.suggestionCount", { count: newConnectSuggestionCount }) } } : {}),
       },
       { href: "/connect/people", label: tConnect("tabs.people"), isActive: (path: string) => /^\/connect\/people(?:\/|$)/.test(path) },
       { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
@@ -611,9 +624,13 @@ export function ProductShell({
   // aller Zaehler. Sonst waere ein geschlossenes Menue ein blinder Fleck.
   const menuAttentionCount = connectAttentionCount + Math.max(0, incomingOpenRequestCount) + Math.max(0, waitingNoticeCount);
 
-  function areaBadge(badge: AreaBadge | undefined) {
+  function areaBadge(badge: AreaBadge | undefined, extra?: AreaBadge): React.ReactNode {
     if (!badge) return null;
-    return badge.kind === "intro" ? (
+    const extraBadge = extra ? areaBadge(extra) : null;
+    if (badge.kind === "suggestions") {
+      return <NewSuggestionsBadge count={badge.count} label={tConnect("mine.suggestionCount", { count: badge.count })} />;
+    }
+    const main = badge.kind === "intro" ? (
       <IncomingRequestBadge count={badge.count} />
     ) : (
       <ConnectAttentionBadge
@@ -621,6 +638,7 @@ export function ProductShell({
         label={t("connectAttentionBadge", { count: badge.count })}
       />
     );
+    return extraBadge ? <>{main}{extraBadge}</> : main;
   }
 
   if (!isProductChromePath(pathname)) {
@@ -679,7 +697,7 @@ export function ProductShell({
                       className={`${areaLinkClassName(item.isActive(pathname))} inline-flex items-center gap-2`}
                     >
                       <span>{item.label}</span>
-                      {areaBadge(item.badge)}
+                      {areaBadge(item.badge, item.extraBadge)}
                     </Link>
                   </span>
                 ))}
@@ -808,6 +826,13 @@ export function ProductShell({
                     label={t("menuAttentionBadge", { count: menuAttentionCount })}
                   />
                 ) : null}
+                {/* Neue Vorschlaege daneben, lila: Sie zaehlen nicht zur roten Summe. */}
+                {!isMenuOpen ? (
+                  <NewSuggestionsBadge
+                    count={newConnectSuggestionCount}
+                    label={tConnect("mine.suggestionCount", { count: newConnectSuggestionCount })}
+                  />
+                ) : null}
               </button>
             </div>
           </div>
@@ -848,7 +873,7 @@ export function ProductShell({
                       href={item.href}
                       active={item.isActive(pathname)}
                       onNavigate={closeMenu}
-                      badge={areaBadge(item.badge)}
+                      badge={areaBadge(item.badge, item.extraBadge)}
                     >
                       {item.label}
                     </MobileMenuLink>
@@ -957,7 +982,7 @@ export function ProductShell({
                     {subItem.count ? (
                       <span
                         aria-label={subItem.count.label}
-                        className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-slate-200 px-1.5 py-0.5 text-[.68rem] font-semibold leading-none text-slate-700"
+                        className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-[#6d49e0] px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white"
                       >
                         {Math.min(subItem.count.value, 99)}
                       </span>
