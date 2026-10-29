@@ -1043,7 +1043,14 @@ body {
   max-width: 18ch;
   font-size: clamp(2rem, 6vw, 3.75rem);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.12;
+  /* Der Farbverlauf steht nur innerhalb des Kastens der Zeile. Was darueber oder
+     darunter hinausragt (Punkte auf Ae/Oe/Ue, Unterlaengen von g, p, y und
+     Kommas), wurde abgeschnitten. Der Innenabstand macht den Kasten hoch genug,
+     der negative Aussenabstand haelt das Layout wie vorher. */
+  padding-block: 0.14em 0.2em;
+  margin-top: calc(0.75rem - 0.14em);
+  margin-bottom: -0.2em;
   letter-spacing: -0.02em;
   text-wrap: balance;
   background: linear-gradient(100deg, #ffffff 30%, #67e8f9 70%, #a78bfa);
@@ -1051,7 +1058,7 @@ body {
   background-clip: text;
   color: transparent;
 }
-.problem-hero__title--small { font-size: clamp(1.75rem, 4.5vw, 2.75rem); max-width: 26ch; }
+.problem-hero__title--small { font-size: clamp(1.75rem, 4.5vw, 2.75rem); max-width: 26ch; line-height: 1.15; }
 .problem-hero__lead { margin-top: 1rem; max-width: 40rem; font-size: 1.125rem; line-height: 1.6; color: #b4c2da; }
 .problem-hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
 .problem-hero__more { margin-top: 1.25rem; max-width: 40rem; color: #9fb0cc; }

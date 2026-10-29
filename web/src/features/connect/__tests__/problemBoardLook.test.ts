@@ -140,3 +140,13 @@ test("Auf dem Handy bewegt sich auf dem Problembrett nichts", () => {
   const component = read("features/connect/ProblemTypewriter.tsx");
   assert.match(component, /problem-typewriter--static/);
 });
+
+test("Die Ueberschrift mit Farbverlauf schneidet nichts ab", () => {
+  const css = read("app/globals.css");
+  const title = css.slice(css.indexOf(".problem-hero__title {"), css.indexOf(".problem-hero__title--small"));
+  // Der Verlauf liegt nur im Kasten der Zeile: Ohne Innenabstand verschwinden
+  // Unterlaengen (g, p, y, Komma) und die Punkte auf Ae, Oe und Ue.
+  assert.match(title, /background-clip: text/);
+  assert.match(title, /padding-block: 0\.14em 0\.2em/);
+  assert.match(title, /line-height: 1\.12/);
+});
