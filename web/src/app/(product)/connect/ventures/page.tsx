@@ -115,10 +115,20 @@ export default async function ConnectVentureDirectoryPage({
 
                 <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-700">{venture.what_it_does}</p>
                 {venture.audience ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                  <p className="mt-2 line-clamp-2 break-words text-sm leading-6 text-slate-500">
                     {t("ventures.audienceLabel")}: {venture.audience}
                   </p>
                 ) : null}
+
+                {/* Die Karte kuerzt die Texte - dann muss der Weg zum ganzen
+                    Eintrag sichtbar sein. Bis 29.10.2026 war der Name der einzige
+                    Link; wer den Text nicht ganz sah, fand den Weg nicht. */}
+                <Link
+                  href={`/connect/ventures/${venture.id}`}
+                  className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                >
+                  {t("ventures.openDetails")}
+                </Link>
 
                 {/* Der Mensch dahinter - ohne ihn waere das ein Handelsregister. */}
                 {owner ? (
