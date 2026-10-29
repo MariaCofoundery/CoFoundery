@@ -73,24 +73,42 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getRequestLocale();
+  // Sprache, Cookie und Anmeldung sind voneinander unabhaengig und laufen
+  // gleichzeitig. `getRequestUser` oeffnet seinen Client selbst; der Netzwerkgang
+  // zum Auth-Server ist der laengste Schritt und soll nicht hinter den beiden
+  // anderen warten.
+  const [locale, cookieStore, userResult] = await Promise.all([
+    getRequestLocale(),
+    cookies(),
+    getRequestUser(),
+  ]);
   const messages = getMessages(locale);
   // Nur die Leiste liest diesen Wert - zuletzt genutzter Arbeitskontext, keine Berechtigung.
-  const storedWorkContext = parseWorkContext((await cookies()).get(WORK_CONTEXT_COOKIE)?.value);
+  const storedWorkContext = parseWorkContext(cookieStore.get(WORK_CONTEXT_COOKIE)?.value);
   const supabase = await createClient();
   const {
     data: { user },
-  } = await getRequestUser();
+  } = userResult;
 
   // Nur fuer die Darstellung des Menueeintrags "Admin". Wer es nicht ist oder wenn die
   // Abfrage scheitert, sieht ihn nicht; der Zugang selbst liegt auf den Admin-Seiten.
-  const isPlatformAdmin = user?.id
-    ? await Promise.resolve(supabase.rpc("is_platform_admin")).then(({ data }) => data === true).catch(() => false)
-    : false;
-  // Die Zahl am Menuepunkt: neues Feedback plus offene Meldungen. Nur fuer Admins gefragt.
-  const adminAttentionCount = isPlatformAdmin
-    ? await Promise.resolve(supabase.rpc("admin_attention_count")).then(({ data }) => (typeof data === "number" ? data : 0)).catch(() => 0)
-    : 0;
+  // Die Zahl am Menuepunkt (neues Feedback plus offene Meldungen) wird nur fuer
+  // Admins gefragt. BEIDE LAUFEN NEBEN DEN UEBRIGEN ABFRAGEN UNTEN: Bis zum
+  // 29.10.2026 standen sie davor und liessen jede Seite eines Admins auf zwei
+  // Datenbankgaenge nacheinander warten, bevor irgendetwas anderes begann.
+  const adminState: Promise<{ isPlatformAdmin: boolean; adminAttentionCount: number }> = user?.id
+    ? Promise.resolve(supabase.rpc("is_platform_admin"))
+        .then(({ data }) => data === true)
+        .catch(() => false)
+        .then(async (isPlatformAdmin) => ({
+          isPlatformAdmin,
+          adminAttentionCount: isPlatformAdmin
+            ? await Promise.resolve(supabase.rpc("admin_attention_count"))
+                .then(({ data }) => (typeof data === "number" ? data : 0))
+                .catch(() => 0)
+            : 0,
+        }))
+    : Promise.resolve({ isPlatformAdmin: false, adminAttentionCount: 0 });
 
   const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, connectSuggestionCount] = user
     ? await Promise.all([
@@ -133,6 +151,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         0,
         "undecided" as const,
       ];
+  const { isPlatformAdmin, adminAttentionCount } = await adminState;
   // Der Kern ist die einzige Datenquelle fuer den Namen; vorher konkurrierten
   // hier profiles und network_profiles. Die beiden Auth-Metadaten-Stufen und
   // das E-Mail-Praefix bleiben als reine Anzeige-Rueckfaelle fuer Menschen,
