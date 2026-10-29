@@ -1,6 +1,6 @@
 import { orIlike, placeTerms, topicTerms } from "@/features/connect/connectFilterCatalog";
 import "server-only";
-import { connectOffset, PROBLEM_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
+import { connectOffset, CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -23,9 +23,16 @@ type Client = SupabaseClient;
  * Zeile selbst. Eine zweite Pruefung hier waere eine zweite Wahrheit.
  */
 
+/**
+ * `pageSize`: Die gemeinsame Liste (`connectFeedData`) holt von jeder Art Seite fuer
+ * Seite mit der Standardgroesse und mischt sie danach; das Problembrett zeigt
+ * weniger je Seite und sagt das ausdruecklich. Ohne Angabe gilt die Standardgroesse,
+ * sonst bekaeme die gemeinsame Liste zu wenige Probleme.
+ */
 export async function getActiveConnectProblems(
   client: Client,
-  filters: Record<string, string | undefined>
+  filters: Record<string, string | undefined>,
+  pageSize: number = CONNECT_PAGE_SIZE
 ) {
   let query = client
     .from("connect_discovery_problems")
@@ -34,7 +41,7 @@ export async function getActiveConnectProblems(
     // Nach Aktualitaet, nie nach Interesse: Eine Sortierung nach Zuspruch
     // waere eine Rangliste, und genau die soll das Brett nicht sein.
     .order("published_at", { ascending: false })
-    .order("id", { ascending: true }).range(connectOffset(filters.page, PROBLEM_PAGE_SIZE), connectOffset(filters.page, PROBLEM_PAGE_SIZE) + PROBLEM_PAGE_SIZE);
+    .order("id", { ascending: true }).range(connectOffset(filters.page, pageSize), connectOffset(filters.page, pageSize) + pageSize);
 
   if (filters.intent) query = query.eq("author_intent", filters.intent);
   if (filters.geographic_scope) query = query.eq("geographic_scope", filters.geographic_scope);

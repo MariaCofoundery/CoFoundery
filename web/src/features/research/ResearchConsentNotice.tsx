@@ -20,7 +20,14 @@ export function ResearchConsentNotice({ onDecision }: { onDecision: (state: Rese
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/30 p-4 backdrop-blur-sm md:items-center print:hidden" role="presentation">
+    // Der Rahmen scrollt, der Inhalt wird mittig oder unten ausgerichtet. Vorher war
+    // der Rahmen selbst ein Flex-Container ohne Scrollen: Auf kleinen Bildschirmen
+    // (und bei grosser Schrift) ragte das Fenster oben ueber den Rand, der obere Teil
+    // war abgeschnitten und nicht erreichbar, und die Seite dahinter liess sich nicht
+    // mehr bewegen - auf jeder Seite, bis man geantwortet hatte. Ohne Weichzeichner:
+    // Er ist auf Handys ein bekannter Ausloeser fuer Darstellungsfehler.
+    <div className="fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-slate-950/40 print:hidden" role="presentation">
+      <div className="flex min-h-full items-end justify-center p-4 md:items-center">
       <section role="dialog" aria-modal="true" aria-labelledby="research-consent-title" aria-describedby="research-consent-body" className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl md:p-8">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-violet-700">{t("eyebrow")}</p>
         <h2 id="research-consent-title" className="mt-3 text-2xl font-semibold text-slate-950">{t("title")}</h2>
@@ -31,6 +38,7 @@ export function ResearchConsentNotice({ onDecision }: { onDecision: (state: Rese
         </div>
         {error ? <p role="alert" className="mt-4 text-sm text-red-700">{t("error")}</p> : null}
       </section>
+      </div>
     </div>
   );
 }

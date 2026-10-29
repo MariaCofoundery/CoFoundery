@@ -78,6 +78,9 @@ export function ConnectFeedRow({ entry, t, locale }: { entry: ConnectFeedEntry; 
           <ConnectAvatar profile={by} displayName={by.display_name || "Connect"} className="h-7 w-7 shrink-0 rounded-full object-cover" />
           <span className="truncate">{by.display_name}</span>
         </Link>
+      ) : entry.kind === "problem" && entry.problem.origin === "public_source" ? (
+        // Aus einer oeffentlichen Quelle: kein Verfasser, die Zeile sagt woher.
+        <span className="min-w-0 shrink-0 truncate text-[13px] text-[#5f5e7a] md:w-40">{t("problems.source.tag")}</span>
       ) : <span className="hidden md:block md:w-40" />}
       <Link href={href} className="shrink-0 self-start text-sm font-semibold text-[#6d49e0] hover:underline md:self-center">{t("feed.view")} →</Link>
     </article>

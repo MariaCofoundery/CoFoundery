@@ -26,7 +26,10 @@ export async function HighlightConsentPrompt({ client, userId }: { client: Supab
 
   const t = await getTranslations("connect.highlightPrompt");
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/30 p-4 backdrop-blur-sm md:items-center" role="presentation">
+    // Siehe ResearchConsentNotice: Der Rahmen scrollt, damit auf kleinen Bildschirmen
+    // nichts oben abgeschnitten wird.
+    <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-slate-950/40" role="presentation">
+      <div className="flex min-h-full items-end justify-center p-4 md:items-center">
       <form
         action={answerHighlightPromptAction}
         role="dialog"
@@ -48,6 +51,7 @@ export async function HighlightConsentPrompt({ client, userId }: { client: Supab
           className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 disabled:opacity-60"
         />
       </form>
+      </div>
     </div>
   );
 }

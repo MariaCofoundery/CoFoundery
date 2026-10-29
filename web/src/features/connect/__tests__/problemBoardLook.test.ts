@@ -117,7 +117,11 @@ test("Das Problembrett zeigt zwoelf Notizen je Seite und hat keine schweren Effe
   assert.match(paging, /PROBLEM_PAGE_SIZE = 12/);
   assert.match(page, /problemsRows\.slice\(0, PROBLEM_PAGE_SIZE\)/);
   assert.match(page, /pageSize=\{PROBLEM_PAGE_SIZE\}/);
-  assert.match(data, /connectOffset\(filters\.page, PROBLEM_PAGE_SIZE\)/);
+  assert.match(data, /connectOffset\(filters\.page, pageSize\)/);
+  assert.match(page, /getActiveConnectProblems\(client, filters, PROBLEM_PAGE_SIZE\)/);
+  // Die gemeinsame Liste ruft ohne Groesse auf und bekommt die Standardgroesse: Sonst fehlten ihr Probleme.
+  assert.match(data, /pageSize: number = CONNECT_PAGE_SIZE/);
+  assert.doesNotMatch(read("features/connect/connectFeedData.ts"), /PROBLEM_PAGE_SIZE/);
 
   // Die Seite blieb beim Scrollen haengen: bewegte, weichgezeichnete Ebenen und
   // Glas-Unschaerfe auf jeder Karte sind genau die Dinge, die das ausloesen.

@@ -28,7 +28,7 @@ export default async function ConnectProblemsPage({
 }) {
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client } = await requireConnectMember("/connect/problems");
-  const problemsRows = await getActiveConnectProblems(client, filters);
+  const problemsRows = await getActiveConnectProblems(client, filters, PROBLEM_PAGE_SIZE);
   const problems = problemsRows.slice(0, PROBLEM_PAGE_SIZE);
   const authors = await getConnectProfilesByUserIds(
     client,
