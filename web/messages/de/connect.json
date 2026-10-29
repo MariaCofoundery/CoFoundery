@@ -411,7 +411,32 @@
     "highlightableTitle": "Als Highlight gezeigt werden",
     "highlightableLabel": "Ich bin offen dafür, als Highlight in Connect gezeigt zu werden",
     "highlightableHint": "Ganz oben in Connect stehen drei Highlights, die alle Mitglieder sehen. Sie sind zufällig gezogen, von uns empfohlen oder bezahlt, und jede Karte sagt dazu, warum sie dort steht. Mit dem Häkchen darf dein Profil oder einer deiner Einträge dort erscheinen.",
-    "highlightableOffHint": "Das Häkchen ist vorgewählt, du entscheidest. Ohne Häkchen erscheinst du dort nie, auch nicht, wenn wir dich empfehlen wollten. Du kannst es jederzeit abschalten, dann verschwindest du auch aus laufenden Highlights."
+    "highlightableOffHint": "Das Häkchen ist vorgewählt, du entscheidest. Ohne Häkchen erscheinst du dort nie, auch nicht, wenn wir dich empfehlen wollten. Du kannst es jederzeit abschalten, dann verschwindest du auch aus laufenden Highlights.",
+    "flow": {
+      "back": "Zurück",
+      "next": "Weiter",
+      "stepOf": "Schritt {current} von {total}",
+      "showTitle": "Soll Connect dich zeigen?",
+      "titles": {
+        "role": "Wer du bist",
+        "reach": "Wen du kennst",
+        "open": "Ansprechbar",
+        "show": "Zeigen"
+      },
+      "missingTitle": "Pflicht · das fehlt noch",
+      "missingNote": "Solange das fehlt, bleibt „Veröffentlichen“ gesperrt. Einen Entwurf speichern geht jederzeit.",
+      "allSet": "Alles Nötige ist ausgefüllt. Du kannst jetzt veröffentlichen.",
+      "fix": "Ausfüllen →",
+      "identityFix": "Im Profil ergänzen →",
+      "roleMissing": "Wähle mindestens eine Rolle.",
+      "status": {
+        "draft": "Entwurf",
+        "active": "Sichtbar"
+      },
+      "rolesQ": "Wer bist du im Netzwerk?",
+      "reachQ": "Wen kennst du?",
+      "openQ": "Wofür bist du ansprechbar?"
+    }
   },
   "safety": {
     "block": "Blockieren",

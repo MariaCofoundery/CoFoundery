@@ -411,7 +411,32 @@
     "highlightableTitle": "Being shown as a highlight",
     "highlightableLabel": "I am open to being shown as a highlight in Connect",
     "highlightableHint": "At the top of Connect there are three highlights that every member sees. They are drawn at random, recommended by us or paid for, and each card says why it is there. With this box ticked, your profile or one of your entries may appear there.",
-    "highlightableOffHint": "The box is pre-ticked, but it is your call. Without the tick you never appear there, not even if we wanted to recommend you. You can switch it off at any time, and you disappear from running highlights as well."
+    "highlightableOffHint": "The box is pre-ticked, but it is your call. Without the tick you never appear there, not even if we wanted to recommend you. You can switch it off at any time, and you disappear from running highlights as well.",
+    "flow": {
+      "back": "Back",
+      "next": "Next",
+      "stepOf": "Step {current} of {total}",
+      "showTitle": "Should Connect show you?",
+      "titles": {
+        "role": "Who you are",
+        "reach": "Who you know",
+        "open": "Open to",
+        "show": "Show"
+      },
+      "missingTitle": "Required · still missing",
+      "missingNote": "While this is missing, “Publish” stays locked. You can always save a draft.",
+      "allSet": "Everything required is filled in. You can publish now.",
+      "fix": "Fill in →",
+      "identityFix": "Add in your profile →",
+      "roleMissing": "Choose at least one role.",
+      "status": {
+        "draft": "Draft",
+        "active": "Visible"
+      },
+      "rolesQ": "Who are you in the network?",
+      "reachQ": "Who do you know?",
+      "openQ": "What are you open to?"
+    }
   },
   "safety": {
     "block": "Block",
