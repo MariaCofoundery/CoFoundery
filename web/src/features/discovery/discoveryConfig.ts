@@ -179,3 +179,54 @@ export const DISCOVERY_PRIORITY_OPTIONS = DISCOVERY_PRIORITY_KEYS.map((value) =>
   value,
   ...DISCOVERY_PRIORITY_META[value],
 }));
+
+
+/**
+ * Die Unterbereiche eines Schwerpunkts - stabile Kennungen, keine Beschriftungen.
+ *
+ * DIE REIHENFOLGE IST TEIL DES VERTRAGS: `messages/<sprache>/discovery.json` haelt
+ * unter `roleHelp.<rolle>.parts` die Beschriftungen in genau dieser Reihenfolge
+ * (mit " | " getrennt). Es wird nur hinten angehaengt, nie umsortiert oder
+ * gestrichen - gespeichert ist die Kennung, nicht das Wort. So bleibt ein
+ * Profil in jeder Sprache lesbar.
+ *
+ * "Anderer Schwerpunkt" hat keine: Dort steht das freie Feld.
+ */
+export const DISCOVERY_ROLE_PART_IDS = {
+  tech: ["software", "architecture", "data", "ai", "hardware", "security"],
+  product: ["discovery", "management", "roadmap", "ux", "prototyping"],
+  sales: ["b2b", "b2c", "partnerships", "customer_success"],
+  growth: ["performance", "b2c", "partnerships", "data"],
+  marketing: ["brand", "performance", "community", "positioning"],
+  operations: ["operations", "processes", "recruiting", "leadership", "organization"],
+  finance: ["planning", "unit_economics", "controlling", "fundraising", "investor_relations"],
+  design: ["ux", "prototyping", "brand_identity"],
+  strategy: ["business_model", "pricing", "planning"],
+  research: ["interviews", "user_research", "market", "segmentation", "domain"],
+  community: ["community", "network", "moderation"],
+} as const satisfies Partial<Record<DiscoveryFounderRole, readonly string[]>>;
+
+export type DiscoveryRolePartRole = keyof typeof DISCOVERY_ROLE_PART_IDS;
+
+/** Hoechstens so viele Unterbereiche je Seite (eigene / gesuchte). */
+export const DISCOVERY_ROLE_PART_LIMIT = 16;
+
+/** Eine gespeicherte Kennung hat die Form "<rolle>.<teil>", zum Beispiel "product.discovery". */
+export function isDiscoveryRolePartId(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const [role, part, ...rest] = value.split(".");
+  if (rest.length > 0 || !role || !part) return false;
+  const parts = (DISCOVERY_ROLE_PART_IDS as Record<string, readonly string[]>)[role];
+  return Boolean(parts?.includes(part));
+}
+
+/** Die neun Schwerpunkte, die man in Find waehlen kann (Growth und Community gehen in Marketing und Vertrieb auf). */
+export const DISCOVERY_VISIBLE_ROLES = [
+  "product", "tech", "design", "sales", "marketing", "finance", "operations", "strategy", "research", "other",
+] as const satisfies readonly DiscoveryFounderRole[];
+
+/** Alte Auswahl wird beim naechsten Speichern auf die neun Schwerpunkte gelegt. */
+export const DISCOVERY_ROLE_LEGACY_MAP: Partial<Record<DiscoveryFounderRole, DiscoveryFounderRole>> = {
+  growth: "marketing",
+  community: "marketing",
+};

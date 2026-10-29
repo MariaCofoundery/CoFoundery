@@ -102,6 +102,8 @@ export function buildDiscoveryV2Candidate(
       seekingRoles: profile.seekingRoles,
       ownRoleOther: profile.ownRoleOther ?? null,
       seekingRoleOther: profile.seekingRoleOther ?? null,
+      ownRoleParts: profile.ownRoleParts ?? [],
+      seekingRoleParts: profile.seekingRoleParts ?? [],
       expertise: profile.expertise,
       industries: profile.industries,
       locationRegion: profile.locationRegion,

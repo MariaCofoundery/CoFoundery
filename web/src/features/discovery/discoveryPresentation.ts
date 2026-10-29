@@ -1,3 +1,4 @@
+import { DISCOVERY_ROLE_PART_IDS } from "@/features/discovery/discoveryConfig";
 import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
 
 export type DiscoverySearchBriefCriterion =
@@ -83,4 +84,26 @@ export function discoveryRoleLabels(
 ) {
   const text = other?.trim();
   return roles.map((role) => (role === "other" && text ? text : labelFor(role)));
+}
+
+
+/**
+ * Beschriftungen gespeicherter Unterbereiche ("product.discovery" -> "Product Discovery").
+ *
+ * Die Kennung steht in `DISCOVERY_ROLE_PART_IDS`, die Beschriftungen in den
+ * Sprachdateien unter `roleHelp.<rolle>.parts` in derselben Reihenfolge.
+ * Unbekannte Kennungen fallen weg, statt als Rohtext zu erscheinen.
+ */
+export function discoveryRolePartLabels(
+  ids: readonly string[] | undefined,
+  partsFor: (role: string) => string
+): string[] {
+  return (ids ?? []).flatMap((id) => {
+    const [role, part] = id.split(".");
+    const list = (DISCOVERY_ROLE_PART_IDS as Record<string, readonly string[]>)[role] ?? [];
+    const index = list.indexOf(part);
+    if (index < 0) return [];
+    const label = partsFor(role).split(" | ")[index];
+    return label ? [label] : [];
+  });
 }

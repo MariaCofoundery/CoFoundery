@@ -11,6 +11,7 @@ import { FIND_CHIP, FIND_PRIMARY } from "@/features/discovery/findUi";
 import {
   compactDiscoveryValues,
   discoveryRoleLabels,
+  discoveryRolePartLabels,
 } from "@/features/discovery/discoveryPresentation";
 import type {
   DiscoveryCandidate,
@@ -134,6 +135,9 @@ export function FounderDiscoveryCard({
       roleLabel(t, role as DiscoveryFounderRole)
     )
   );
+  // Unterbereiche, die die Person selbst gewaehlt hat - hoechstens vier je Gruppe, damit die Karte kurz bleibt.
+  const ownParts = discoveryRolePartLabels(profile.ownRoleParts, (role) => t(`roleHelp.${role}.parts`)).slice(0, 4);
+  const seekingParts = discoveryRolePartLabels(profile.seekingRoleParts, (role) => t(`roleHelp.${role}.parts`)).slice(0, 4);
   const expertise = compactDiscoveryValues(profile.expertise);
   const seekingRoles = compactDiscoveryValues(
     discoveryRoleLabels(profile.seekingRoles, profile.seekingRoleOther, (role) =>
@@ -171,8 +175,8 @@ export function FounderDiscoveryCard({
       </div>
 
       <div className="mt-5 grid gap-4 border-t border-[#e4e2f0] pt-5 sm:grid-cols-2">
-        <CardValueGroup title={t("v2.cards.brings")} values={[...roles.visible, ...expertise.visible]} remaining={roles.remaining + expertise.remaining} t={t} />
-        <CardValueGroup title={t("v2.cards.seeks")} values={seekingRoles.visible} remaining={seekingRoles.remaining} t={t} />
+        <CardValueGroup title={t("v2.cards.brings")} values={[...roles.visible, ...ownParts, ...expertise.visible]} remaining={roles.remaining + expertise.remaining} t={t} />
+        <CardValueGroup title={t("v2.cards.seeks")} values={[...seekingRoles.visible, ...seekingParts]} remaining={seekingRoles.remaining} t={t} />
       </div>
 
       <div className="mt-5 border-t border-[#e4e2f0] pt-5">

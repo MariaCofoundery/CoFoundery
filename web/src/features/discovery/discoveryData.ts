@@ -58,6 +58,8 @@ type DiscoveryV2SearchRow = {
   seeking_roles: DiscoveryFounderRole[];
   own_role_other: string | null;
   seeking_role_other: string | null;
+  own_role_parts?: string[] | null;
+  seeking_role_parts?: string[] | null;
   expertise: string[];
   location_region: string | null;
   remote_mode: DiscoveryRemoteMode;
@@ -120,6 +122,8 @@ type FounderDiscoveryProfileRow = {
   seeking_roles: string[];
   own_role_other: string | null;
   seeking_role_other: string | null;
+  own_role_parts?: string[] | null;
+  seeking_role_parts?: string[] | null;
   expertise: string[];
   industries: string[];
   location_region: string | null;
@@ -164,6 +168,8 @@ const DISCOVERY_PROFILE_COLUMNS = [
   "seeking_roles",
   "own_role_other",
   "seeking_role_other",
+  "own_role_parts",
+  "seeking_role_parts",
   "expertise",
   "industries",
   "location_region",
@@ -240,6 +246,8 @@ function mapProfileRow(row: FounderDiscoveryProfileRow): FounderDiscoveryProfile
     seekingRoles: row.seeking_roles as DiscoveryFounderRole[],
     ownRoleOther: row.own_role_other,
     seekingRoleOther: row.seeking_role_other,
+    ownRoleParts: row.own_role_parts ?? [],
+    seekingRoleParts: row.seeking_role_parts ?? [],
     expertise: row.expertise ?? [],
     industries: row.industries,
     locationRegion: row.location_region,
@@ -290,6 +298,8 @@ export function toDiscoveryProfilePreview(profile: FounderDiscoveryProfile): Dis
     ownRoles: profile.ownRoles,
     ownRoleOther: profile.ownRoleOther,
     seekingRoleOther: profile.seekingRoleOther,
+    ownRoleParts: profile.ownRoleParts,
+    seekingRoleParts: profile.seekingRoleParts,
     seekingRoles: profile.seekingRoles,
     expertise: profile.expertise,
     industries: profile.industries,
@@ -374,6 +384,8 @@ export async function upsertOwnDiscoveryProfile(
         own_roles: normalized.ownRoles,
         own_role_other: normalized.ownRoleOther,
         seeking_role_other: normalized.seekingRoleOther,
+        own_role_parts: normalized.ownRoleParts,
+        seeking_role_parts: normalized.seekingRoleParts,
         seeking_roles: normalized.seekingRoles,
         expertise: normalized.expertise,
         industries: normalized.industries,
@@ -710,6 +722,8 @@ export async function getDiscoveryCandidatesForCurrentUser(
     ownRoles: row.own_roles,
     ownRoleOther: row.own_role_other,
     seekingRoleOther: row.seeking_role_other,
+    ownRoleParts: row.own_role_parts ?? [],
+    seekingRoleParts: row.seeking_role_parts ?? [],
     seekingRoles: row.seeking_roles,
     expertise: row.expertise ?? [],
     industries: [],
@@ -805,6 +819,8 @@ export async function getDiscoveryExploreProfilesForCurrentUser(
         seekingRoles: row.seeking_roles,
         ownRoleOther: row.own_role_other,
         seekingRoleOther: row.seeking_role_other,
+        ownRoleParts: row.own_role_parts ?? [],
+        seekingRoleParts: row.seeking_role_parts ?? [],
         expertise: row.expertise ?? [],
         industries: [],
         locationRegion: row.location_region,

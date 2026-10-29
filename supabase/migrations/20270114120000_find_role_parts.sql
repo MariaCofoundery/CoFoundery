@@ -1,0 +1,213 @@
+begin;
+
+-- ---------------------------------------------------------------------------
+-- Find: Unterbereiche der Schwerpunkte
+-- ---------------------------------------------------------------------------
+--
+-- Wer "Product" waehlt, kann angeben, was genau er darin kann - und was die
+-- andere Person darin koennen soll. Gespeichert wird die KENNUNG
+-- ("product.discovery"), nicht das Wort: Die Beschriftungen liegen in den
+-- Sprachdateien, die Reihenfolge ist Teil des Vertrags (nur hinten anhaengen).
+--
+-- DAS FIND-PROFIL, NICHT DIE FAEHIGKEITEN: Die Angabe steht im Find-Profil und
+-- gilt mit dessen Veroeffentlichung. Sie wird nie aus `person_capability_entries`
+-- uebernommen - Faehigkeiten sind standardmaessig privat, Find ist
+-- veroeffentlicht. Eine Uebernahme gibt es nur auf ausdruecklichen Klick.
+--
+-- Das Aendern des Rueckgabetyps der Suche braucht drop und create.
+-- ---------------------------------------------------------------------------
+
+alter table public.founder_discovery_profiles
+  add column own_role_parts text[] not null default '{}',
+  add column seeking_role_parts text[] not null default '{}';
+
+alter table public.founder_discovery_profiles
+  add constraint founder_discovery_profiles_role_parts_check check (
+    cardinality(own_role_parts) <= 16
+    and cardinality(seeking_role_parts) <= 16
+    and octet_length(array_to_string(own_role_parts, ',')) <= 600
+    and octet_length(array_to_string(seeking_role_parts, ',')) <= 600
+  );
+
+comment on column public.founder_discovery_profiles.own_role_parts is
+  'Unterbereiche der eigenen Schwerpunkte als Kennungen "<rolle>.<teil>". Nur zu gewaehlten Rollen; die Anwendung bereinigt das beim Speichern.';
+comment on column public.founder_discovery_profiles.seeking_role_parts is
+  'Unterbereiche der gesuchten Schwerpunkte, gleiche Form.';
+
+drop function if exists public.search_founder_discovery_profiles_v2(
+  text[], text[], text, text[], smallint, integer, integer, text[], text[], text[], text[]
+);
+
+-- ---------------------------------------------------------------------------
+-- FIND: Ort ohne Zusatz vergleichen
+-- ---------------------------------------------------------------------------
+-- Die Suche verglich den Ort bisher als ganzen Text: "Berlin" und "Berlin, DE"
+-- passten nicht zusammen, obwohl dieselbe Stadt gemeint ist. Jetzt zaehlt der
+-- Teil vor dem ersten Komma. Gleiche Signatur wie 20261216120000, nur diese
+-- Bedingung ist neu.
+create or replace function public.search_founder_discovery_profiles_v2(
+  p_roles text[] default '{}'::text[],
+  p_expertise text[] default '{}'::text[],
+  p_location_region text default null,
+  p_remote_modes text[] default '{}'::text[],
+  p_min_availability smallint default null,
+  p_page_size integer default 12,
+  p_offset integer default 0,
+  p_capability_areas text[] default '{}'::text[],
+  p_search_intents text[] default '{}'::text[],
+  p_start_horizons text[] default '{}'::text[],
+  p_commitment_levels text[] default '{}'::text[]
+)
+returns table (
+  id uuid,
+  candidate_user_id uuid,
+  display_name text,
+  headline text,
+  own_roles text[],
+  seeking_roles text[],
+  own_role_other text,
+  seeking_role_other text,
+  expertise text[],
+  location_region text,
+  remote_mode text,
+  availability_hours_per_week smallint,
+  availability_flexibility text,
+  availability_condition text,
+  commitment_level text,
+  venture_stage text,
+  venture_goal text,
+  search_intent text,
+  start_horizon text,
+  published_at timestamptz,
+  own_role_parts text[],
+  seeking_role_parts text[],
+  total_count bigint
+)
+language sql
+stable
+security definer
+set search_path to ''
+as $$
+  with filtered as (
+    select profile.*
+    from public.founder_discovery_profiles profile
+    where auth.uid() is not null
+      -- Stand bis zum 30.09.2026 in der Zeilensicherheit. Ohne diese Zeile
+      -- waere die Funktion die Hintertuer um sie herum.
+      and public.is_current_user_discovery_founder()
+      and profile.status = 'active'
+      and profile.user_id <> auth.uid()
+      -- NEU (20261130120000): nur, wer die Founder-Rolle aktuell hat ...
+      and public.discovery_profile_owner_is_founder(profile.user_id)
+      -- ... und ohne Blockierung zwischen beiden, egal in welche Richtung.
+      and not public.is_network_interaction_blocked(profile.user_id, auth.uid())
+      and (
+        coalesce(cardinality(p_roles), 0) = 0
+        or profile.own_roles && p_roles
+      )
+      and (
+        coalesce(cardinality(p_expertise), 0) = 0
+        or exists (
+          select 1
+          from unnest(profile.expertise) profile_expertise
+          join unnest(p_expertise) requested_expertise
+            on lower(btrim(profile_expertise)) = lower(btrim(requested_expertise))
+        )
+      )
+      -- NEU (20261217120000): Verglichen wird der Ort vor dem ersten Komma.
+      -- "Berlin" findet damit auch "Berlin, DE" und umgekehrt, "Bern" aber
+      -- nicht "Bernau". Wer keinen Ort angegeben hat, faellt bei einer Suche
+      -- danach weiter heraus.
+      and (
+        nullif(btrim(p_location_region), '') is null
+        or (
+          nullif(btrim(profile.location_region), '') is not null
+          and lower(btrim(split_part(profile.location_region, ',', 1)))
+            = lower(btrim(split_part(p_location_region, ',', 1)))
+        )
+      )
+      and (
+        coalesce(cardinality(p_remote_modes), 0) = 0
+        or profile.remote_mode = any(p_remote_modes)
+      )
+      and (
+        p_min_availability is null
+        or profile.availability_hours_per_week >= p_min_availability
+      )
+      -- WER SEINE BEREICHE PRIVAT HAELT, WIRD UEBER SIE NICHT GEFUNDEN.
+      and (
+        coalesce(cardinality(p_capability_areas), 0) = 0
+        or exists (
+          select 1
+          from public.person_capability_entries entry
+          join public.person_core core on core.user_id = entry.user_id
+          where entry.user_id = profile.user_id
+            and entry.area_id = any (p_capability_areas)
+            and core.capability_disclosure in ('areas', 'areas_depth_on_contact')
+        )
+      )
+      -- Wer nichts angegeben hat, faellt bei einer Suche danach heraus. Ein
+      -- leeres Feld ist keine Antwort, und "vielleicht passt es ja doch"
+      -- waere geraten.
+      and (
+        coalesce(cardinality(p_search_intents), 0) = 0
+        or profile.search_intent = any (p_search_intents)
+      )
+      and (
+        coalesce(cardinality(p_start_horizons), 0) = 0
+        or profile.start_horizon = any (p_start_horizons)
+      )
+      -- NEU (20261216120000): Einsatz ("Vollzeit", "All-in" ...). Gleiche
+      -- Regel wie davor: mehrere Werte sind ein ODER, leer heisst egal, und
+      -- wer nichts angegeben hat, faellt bei einer Suche danach heraus.
+      and (
+        coalesce(cardinality(p_commitment_levels), 0) = 0
+        or profile.commitment_level = any (p_commitment_levels)
+      )
+  )
+  select
+    profile.id,
+    profile.user_id as candidate_user_id,
+    profile.display_name,
+    profile.headline,
+    profile.own_roles,
+    profile.seeking_roles,
+    profile.own_role_other,
+    profile.seeking_role_other,
+    profile.expertise,
+    profile.location_region,
+    profile.remote_mode,
+    profile.availability_hours_per_week,
+    profile.availability_flexibility,
+    profile.availability_condition,
+    profile.commitment_level,
+    profile.venture_stage,
+    profile.venture_goal,
+    profile.search_intent,
+    profile.start_horizon,
+    profile.published_at,
+    profile.own_role_parts,
+    profile.seeking_role_parts,
+    count(*) over() as total_count
+  from filtered profile
+  order by profile.published_at desc nulls last, profile.id
+  limit greatest(coalesce(p_page_size, 12), 1)
+  offset greatest(coalesce(p_offset, 0), 0);
+$$;
+
+comment on function public.search_founder_discovery_profiles_v2(
+  text[], text[], text, text[], smallint, integer, integer, text[], text[], text[], text[]
+) is
+  'Die Suche in FIND. Prueft Faehigkeitsbereiche, ohne sie herauszugeben - und '
+  'nur bei Menschen, die ihre Bereiche freigegeben haben. Filtert nach Einsatz. '
+  'Liefert die selbst gewaehlten Unterbereiche der Schwerpunkte mit.';
+
+revoke all on function public.search_founder_discovery_profiles_v2(
+  text[], text[], text, text[], smallint, integer, integer, text[], text[], text[], text[]
+) from public, anon;
+grant execute on function public.search_founder_discovery_profiles_v2(
+  text[], text[], text, text[], smallint, integer, integer, text[], text[], text[], text[]
+) to authenticated;
+
+
+commit;

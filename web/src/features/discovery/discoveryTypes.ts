@@ -138,6 +138,12 @@ export type FounderDiscoveryProfile = {
   /** Was "Anderer Schwerpunkt" konkret heisst - leer, solange other nicht gewaehlt ist. */
   ownRoleOther: string | null;
   seekingRoleOther: string | null;
+  /**
+   * Unterbereiche der gewaehlten Schwerpunkte, als Kennungen ("product.discovery"). Nur zu
+   * gewaehlten Rollen. Optional, weil das Matching (das sie nicht nutzt) Profile ohne sie baut.
+   */
+  ownRoleParts?: string[];
+  seekingRoleParts?: string[];
   expertise: string[];
   industries: string[];
   locationRegion: string | null;
@@ -182,6 +188,8 @@ export type DiscoveryProfileInput = Partial<{
   seekingRoles: unknown;
   ownRoleOther: unknown;
   seekingRoleOther: unknown;
+  ownRoleParts: unknown;
+  seekingRoleParts: unknown;
   expertise: unknown;
   industries: unknown;
   locationRegion: unknown;
@@ -281,7 +289,8 @@ export type DiscoveryProfilePreview = Pick<
   | "searchIntent"
   | "startHorizon"
   | "publishedAt"
->;
+> &
+  Pick<FounderDiscoveryProfile, "ownRoleParts" | "seekingRoleParts">;
 
 /**
  * Ein Matching-Reason für eine Trefferkarte (FIND v0.1, E3c) - NUR Presenter-Ausgabe

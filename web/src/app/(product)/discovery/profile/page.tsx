@@ -4,8 +4,11 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   DISCOVERY_COMMITMENT_OPTIONS,
+  DISCOVERY_ROLE_LEGACY_MAP,
   DISCOVERY_ROLE_OPTIONS,
+  DISCOVERY_ROLE_PART_IDS,
   DISCOVERY_SELECTION_LIMITS,
+  DISCOVERY_VISIBLE_ROLES,
   DISCOVERY_VENTURE_GOAL_OPTIONS,
   DISCOVERY_VENTURE_STAGE_OPTIONS,
 } from "@/features/discovery/discoveryConfig";
@@ -93,6 +96,8 @@ function emptyProfile(): Partial<FounderDiscoveryProfile> {
     bio: "",
     ownRoles: [],
     seekingRoles: [],
+    ownRoleParts: [],
+    seekingRoleParts: [],
     expertise: [],
     industries: [],
     locationRegion: "",
@@ -114,10 +119,35 @@ function discoveryRoleLabel(t: DiscoveryT, value: DiscoveryFounderRole) {
 /** Erklaerung und Unterbereiche eines Schwerpunkts. "Anderer Schwerpunkt" hat keine: Dort steht das freie Feld. */
 function discoveryRoleHelp(t: DiscoveryT, value: DiscoveryFounderRole) {
   if (value === "other") return {};
+  const ids = (DISCOVERY_ROLE_PART_IDS as Record<string, readonly string[]>)[value] ?? [];
+  const labels = t(`roleHelp.${value}.parts`).split(" | ");
   return {
     help: t(`roleHelp.${value}.text`),
-    parts: t(`roleHelp.${value}.parts`).split(" | "),
+    // Kennung und Beschriftung stehen in derselben Reihenfolge (siehe DISCOVERY_ROLE_PART_IDS).
+    parts: ids.map((id, index) => ({ id: `${value}.${id}`, label: labels[index] ?? id })),
   };
+}
+
+/** Die neun Schwerpunkte plus "Anderer". Eine fruehere Auswahl (Growth, Community) wird auf Marketing gelegt. */
+const VISIBLE_ROLE_OPTIONS = DISCOVERY_ROLE_OPTIONS.filter((option) =>
+  (DISCOVERY_VISIBLE_ROLES as readonly string[]).includes(option.value)
+);
+
+function withLegacyRolesMapped(values: DiscoveryFounderRole[] | undefined, max: number) {
+  const mapped = (values ?? []).map((role) => DISCOVERY_ROLE_LEGACY_MAP[role] ?? role);
+  return Array.from(new Set(mapped)).slice(0, max);
+}
+
+/** Beschriftungen gespeicherter Unterbereiche, fuer die Vorschau. */
+function rolePartLabelList(ids: string[] | undefined, t: DiscoveryT) {
+  return (ids ?? [])
+    .map((id) => {
+      const [role, part] = id.split(".");
+      const list = (DISCOVERY_ROLE_PART_IDS as Record<string, readonly string[]>)[role] ?? [];
+      const index = list.indexOf(part);
+      return index >= 0 ? t(`roleHelp.${role}.parts`).split(" | ")[index] : null;
+    })
+    .filter((label): label is string => Boolean(label));
 }
 
 function formatRoleList(
@@ -521,12 +551,14 @@ export default async function DiscoveryProfilePage({
                     <DiscoveryRoleField
                       name="ownRoles"
                       otherName="ownRoleOther"
-                      options={DISCOVERY_ROLE_OPTIONS.map((option) => ({
+                      partName="ownRolePart"
+                      initialParts={profile.ownRoleParts ?? []}
+                      options={VISIBLE_ROLE_OPTIONS.map((option) => ({
                         value: option.value,
                         label: discoveryRoleLabel(t, option.value),
                         ...discoveryRoleHelp(t, option.value),
                       }))}
-                      initialSelected={profile.ownRoles ?? []}
+                      initialSelected={withLegacyRolesMapped(profile.ownRoles, DISCOVERY_SELECTION_LIMITS.ownRoles)}
                       initialOther={profile.ownRoleOther ?? null}
                       max={DISCOVERY_SELECTION_LIMITS.ownRoles}
                       copy={{
@@ -748,11 +780,13 @@ export default async function DiscoveryProfilePage({
                   <DiscoveryRoleField
                     name="seekingRoles"
                     otherName="seekingRoleOther"
-                    options={DISCOVERY_ROLE_OPTIONS.map((option) => ({
+                    partName="seekingRolePart"
+                    initialParts={profile.seekingRoleParts ?? []}
+                    options={VISIBLE_ROLE_OPTIONS.map((option) => ({
                       value: option.value,
                       label: discoveryRoleLabel(t, option.value),
                     }))}
-                    initialSelected={profile.seekingRoles ?? []}
+                    initialSelected={withLegacyRolesMapped(profile.seekingRoles, DISCOVERY_SELECTION_LIMITS.seekingRoles)}
                     initialOther={profile.seekingRoleOther ?? null}
                     max={DISCOVERY_SELECTION_LIMITS.seekingRoles}
                     copy={{
@@ -897,11 +931,11 @@ export default async function DiscoveryProfilePage({
                 <dl className="mt-5 grid gap-3 text-sm">
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.brings")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles, profile.ownRoleOther, t)}</dd>
+                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles, profile.ownRoleOther, t)}{rolePartLabelList(profile.ownRoleParts, t).length > 0 ? <span className="mt-0.5 block text-xs text-slate-500">{rolePartLabelList(profile.ownRoleParts, t).join(" · ")}</span> : null}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.seeks")}</dt>
-                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.seekingRoles, profile.seekingRoleOther, t)}</dd>
+                    <dd className="mt-1 text-slate-600">{formatRoleList(profile.seekingRoles, profile.seekingRoleOther, t)}{rolePartLabelList(profile.seekingRoleParts, t).length > 0 ? <span className="mt-0.5 block text-xs text-slate-500">{rolePartLabelList(profile.seekingRoleParts, t).join(" · ")}</span> : null}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.interests")}</dt>

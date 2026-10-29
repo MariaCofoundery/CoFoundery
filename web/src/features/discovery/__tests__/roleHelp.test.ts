@@ -21,13 +21,11 @@ test("jeder Schwerpunkt außer „Anderer“ hat Erklärung und Unterbereiche, d
   }
 });
 
-test("die Erklärung ist reine Anzeige: höchstens eine offen, nichts wird gespeichert", () => {
+test("die Erklärung klappt auf, und es ist immer nur eine offen", () => {
   const field = src("src/features/discovery/DiscoveryRoleField.tsx");
   assert.match(field, /openOne/);
   assert.match(field, /aria-expanded=\{openOne === option\.value\}/);
-  // Die Unterbereiche haben kein name-Attribut: Sie landen in keinem Formular.
-  const parts = field.slice(field.indexOf("option.parts.map"), field.indexOf("option.parts.map") + 300);
-  assert.doesNotMatch(parts, /<input|name=/);
+  assert.match(field, /setOpenOne\(\(current\) => \(current === option\.value \? null : option\.value\)\)/);
 });
 
 test("die Links auf der Find-Seite führen zum richtigen Schritt", () => {

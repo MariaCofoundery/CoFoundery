@@ -39,27 +39,38 @@ type Copy = {
 export function DiscoveryRoleField({
   name,
   otherName,
+  partName,
   options,
   initialSelected,
+  initialParts,
   initialOther,
   max,
   copy,
 }: {
   name: string;
   otherName: string;
-  /** `help` und `parts` sind reine Erklaerung: Sie werden nicht gespeichert. */
-  options: { value: DiscoveryFounderRole; label: string; help?: string; parts?: string[] }[];
+  /** Name der versteckten Felder fuer die gewaehlten Unterbereiche. */
+  partName: string;
+  initialParts: string[];
+  /** `parts` sind die waehlbaren Unterbereiche (Kennung + Beschriftung); gespeichert wird die Kennung. */
+  options: { value: DiscoveryFounderRole; label: string; help?: string; parts?: { id: string; label: string }[] }[];
   initialSelected: DiscoveryFounderRole[];
   initialOther: string | null;
   max: number;
   copy: Copy;
 }) {
   const [selected, setSelected] = useState<DiscoveryFounderRole[]>(initialSelected);
+  const [parts, setParts] = useState<string[]>(initialParts);
   const atLimit = selected.length >= max;
   // Immer nur eine Erklaerung offen: Wer die naechste aufklappt, schliesst die vorige.
   const [openOne, setOpenOne] = useState<DiscoveryFounderRole | null>(null);
 
   function toggle(value: DiscoveryFounderRole) {
+    if (selected.includes(value)) {
+      // Wer Product abwaehlt, verliert auch dessen Unterbereiche.
+      setParts((current) => current.filter((id) => !id.startsWith(`${value}.`)));
+      setOpenOne((open) => (open === value ? null : open));
+    }
     setSelected((current) =>
       current.includes(value)
         ? current.filter((item) => item !== value)
@@ -69,9 +80,19 @@ export function DiscoveryRoleField({
     );
   }
 
+  function togglePart(id: string) {
+    setParts((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  }
+
   return (
     <div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Gespeichert wird die Kennung, nur zu gewaehlten Rollen. */}
+      {parts
+        .filter((id) => selected.includes(id.split(".")[0] as DiscoveryFounderRole))
+        .map((id) => (
+          <input key={id} type="hidden" name={partName} value={id} />
+        ))}
+      <div className="mt-3 grid gap-2 sm:grid-cols-1 lg:grid-cols-2">
         {options.map((option) => {
           const checked = selected.includes(option.value);
           // Gesetzte bleiben immer anklickbar - sonst koennte man die Auswahl
@@ -129,14 +150,29 @@ export function DiscoveryRoleField({
                         onClick={() => setOpenOne((current) => (current === option.value ? null : option.value))}
                         className="ml-7 mt-1 inline-flex min-h-9 items-center text-xs font-semibold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
                       >
-                        {copy.whatBelongs} {openOne === option.value ? "\u25B4" : "\u25BE"}
+                        {copy.whatBelongs}{(() => { const n = parts.filter((id) => id.startsWith(`${option.value}.`)).length; return n > 0 ? ` \u00b7 ${n}` : ""; })()} {openOne === option.value ? "\u25B4" : "\u25BE"}
                       </button>
                       {openOne === option.value ? (
-                        <ul className="mt-1 flex flex-wrap gap-1.5 pl-7">
-                          {option.parts.map((part) => (
-                            <li key={part} className="rounded-lg bg-slate-100 px-2 py-1 text-xs text-slate-700">{part}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-1 flex flex-wrap gap-1.5 pl-7">
+                          {option.parts.map((part) => {
+                            const picked = parts.includes(part.id);
+                            return (
+                              <button
+                                key={part.id}
+                                type="button"
+                                aria-pressed={picked}
+                                onClick={() => togglePart(part.id)}
+                                className={`min-h-9 rounded-lg border px-2.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${
+                                  picked
+                                    ? "border-violet-700 bg-violet-700 text-white"
+                                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                {part.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       ) : null}
                     </>
                   ) : null}

@@ -30,8 +30,10 @@ import {
   normalizeDiscoveryAlignmentPreferences,
 } from "@/features/discovery/discoveryV2Alignment";
 import {
+  DISCOVERY_ROLE_PART_LIMIT,
   DISCOVERY_SELECTION_LIMITS,
   DISCOVERY_TEXT_LIMITS,
+  isDiscoveryRolePartId,
 } from "@/features/discovery/discoveryConfig";
 import type { DiscoveryProfilePublishIssue } from "@/features/discovery/discoveryProfileFeedback";
 
@@ -241,6 +243,19 @@ function normalizeRoleOther(value: unknown, roles: DiscoveryFounderRole[]) {
   return text.length >= 2 ? text : null;
 }
 
+/**
+ * Unterbereiche gelten nur zu einem gewaehlten Schwerpunkt: Wer Product
+ * abwaehlt, verliert auch dessen Unterbereiche, statt sie unsichtbar im Profil
+ * stehen zu lassen. Unbekannte Kennungen fallen weg.
+ */
+function normalizeRoleParts(value: unknown, roles: readonly DiscoveryFounderRole[]) {
+  const entries = Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
+  const unique = Array.from(new Set(entries.filter(isDiscoveryRolePartId)));
+  return unique
+    .filter((id) => roles.includes(id.split(".")[0] as DiscoveryFounderRole))
+    .slice(0, DISCOVERY_ROLE_PART_LIMIT);
+}
+
 export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}) {
   const flexibility = normalizeAvailabilityFlexibility(input.availabilityFlexibility);
   const conditionText = normalizeText(
@@ -275,6 +290,8 @@ export function normalizeDiscoveryProfileInput(input: DiscoveryProfileInput = {}
     // unsichtbar im Profil stehen zu bleiben.
     ownRoleOther: normalizeRoleOther(input.ownRoleOther, ownRoles),
     seekingRoleOther: normalizeRoleOther(input.seekingRoleOther, seekingRoles),
+    ownRoleParts: normalizeRoleParts(input.ownRoleParts, ownRoles),
+    seekingRoleParts: normalizeRoleParts(input.seekingRoleParts, seekingRoles),
     expertise: normalizeStringArray(input.expertise, DISCOVERY_TEXT_LIMITS.expertise).slice(
       0,
       DISCOVERY_SELECTION_LIMITS.expertise
