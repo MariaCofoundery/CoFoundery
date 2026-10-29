@@ -125,6 +125,14 @@
         "title": "In Connect",
         "text": "Who you are in the network – descriptive, no permissions."
       }
+    },
+    "cards": {
+      "back": "Back",
+      "next": "Next",
+      "stepOf": "Step {current} of {total}",
+      "label": "Details",
+      "links": "LinkedIn",
+      "roles": "Role"
     }
   },
   "steps": {

@@ -125,6 +125,14 @@
         "title": "In Connect",
         "text": "Wer du im Netzwerk bist – beschreibend, ohne Berechtigung."
       }
+    },
+    "cards": {
+      "back": "Zurück",
+      "next": "Weiter",
+      "stepOf": "Schritt {current} von {total}",
+      "label": "Angaben",
+      "links": "LinkedIn",
+      "roles": "Rolle"
     }
   },
   "steps": {

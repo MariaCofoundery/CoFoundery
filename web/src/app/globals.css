@@ -1374,3 +1374,14 @@ body {
   .problem-typewriter__caret { animation: none; }
   .problem-note { transition: none; }
 }
+
+/* "Ueber dich" als Karten (IdentityCardFlow): Es ist immer nur die Gruppe zu sehen, deren Name am Rahmen steht.
+   Die anderen bleiben im Dokument und werden mitgeschickt. */
+.idcards [data-card] { display: none; }
+.idcards[data-active="who"] [data-card="who"],
+.idcards[data-active="where"] [data-card="where"],
+.idcards[data-active="what"] [data-card="what"],
+.idcards[data-active="links"] [data-card="links"],
+.idcards[data-active="roles"] [data-card="roles"] { display: block; }
+.idcards [data-card] fieldset { border-top-width: 0; padding-top: 0; }
+.idcards [data-card] legend { font-size: 1.25rem; font-weight: 600; color: rgb(2 6 23); margin-bottom: 0.25rem; }

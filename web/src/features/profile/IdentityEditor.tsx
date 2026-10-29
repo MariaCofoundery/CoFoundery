@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ConnectSubmitButton as SubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { ANALYZED_AREA_IDS } from "@/features/capability/narrativeAnalysis";
+import { IdentityCardFlow, type IdentityCardId } from "@/features/profile/IdentityCardFlow";
 import { CvImportField } from "@/features/profile/CvImportField";
 import { CV_INDUSTRY_KEYS } from "@/features/profile/cvIndustries";
 import { IDENTITY_THRESHOLDS, type IdentityGap, type IdentityReturnPath } from "@/features/profile/identityReadiness";
@@ -41,6 +42,8 @@ export async function IdentityEditor({
   avatarUrl,
   showPhoto = true,
   photoUsage = null,
+  cards = false,
+  initialCard = "who",
 }: {
   core: PersonCore | null;
   currentRoles: ProfileRole[];
@@ -53,8 +56,41 @@ export async function IdentityEditor({
   avatarUrl: string | null | undefined;
   showPhoto?: boolean;
   photoUsage?: PhotoUsage | null;
+  /** Die Gruppen als Karten, eine nach der anderen (nur im eigenen Profil, nicht eingebettet). */
+  cards?: boolean;
+  initialCard?: IdentityCardId;
 }) {
   const t = await getTranslations("capability");
+  const cardIds: IdentityCardId[] = ["who", "where", "what", "links", ...(currentRoles.length > 0 ? (["roles"] as const) : [])];
+  const initialStep = Math.max(0, cardIds.indexOf(initialCard));
+  // Nur mit `cards` werden die Gruppen zu Karten; sonst steht alles wie bisher untereinander.
+  const group = (id: IdentityCardId, node: React.ReactNode) => (cards ? <div data-card={id}>{node}</div> : node);
+  const saveButton = <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />;
+  const shell = (nodes: React.ReactNode) =>
+    cards ? (
+      <IdentityCardFlow
+        ids={cardIds}
+        initialStep={initialStep}
+        saveNode={saveButton}
+        copy={{
+          back: t("identity.cards.back"),
+          next: t("identity.cards.next"),
+          stepOf: t("identity.cards.stepOf", { current: "{current}", total: "{total}" }),
+          label: t("identity.cards.label"),
+          titles: {
+            who: t("aboutYou.groups.who"),
+            where: t("aboutYou.groups.where"),
+            what: t("aboutYou.groups.what"),
+            links: t("identity.cards.links"),
+            roles: t("identity.cards.roles"),
+          },
+        }}
+      >
+        {nodes}
+      </IdentityCardFlow>
+    ) : (
+      nodes
+    );
   return (
     <>
         {showPhoto ? (
@@ -129,6 +165,8 @@ export async function IdentityEditor({
 
               `fieldset`/`legend` und nicht `div`/`h3`: Dieselbe Gliederung,
               die man sieht, hoert auch, wer das Formular vorgelesen bekommt. */}
+          {shell(<>
+          {group("who", (
           <fieldset className="space-y-5 border-t border-slate-200 pt-5">
             <legend className="text-sm font-semibold text-slate-900">
               {t("aboutYou.groups.who")}
@@ -153,7 +191,9 @@ export async function IdentityEditor({
             <span className={hint}>{t("identity.bioHint")}</span>
           </label>
           </fieldset>
+          ))}
 
+          {group("where", (
           <fieldset className="space-y-5 border-t border-slate-200 pt-5">
             <legend className="text-sm font-semibold text-slate-900">
               {t("aboutYou.groups.where")}
@@ -177,7 +217,9 @@ export async function IdentityEditor({
             </label>
           </div>
           </fieldset>
+          ))}
 
+          {group("what", (
           <fieldset className="space-y-5 border-t border-slate-200 pt-5">
             <legend className="text-sm font-semibold text-slate-900">
               {t("aboutYou.groups.what")}
@@ -237,6 +279,7 @@ export async function IdentityEditor({
             }}
           />
           </fieldset>
+          ))}
 
           {/* Das LinkedIn-Profil steht hier und nicht in einem eigenen
               Bereich: Es ist dieselbe Art Angabe wie Name und Headline - eine
@@ -247,6 +290,7 @@ export async function IdentityEditor({
               Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
               nicht als Prop ueber die Grenze reichen - das hat in dieser
               Codebasis schon zweimal die Produktion lahmgelegt. */}
+          {group("links", (
           <LinkedInField
             initialUrl={core?.linkedin_url ?? ""}
             initialVisibility={
@@ -271,6 +315,7 @@ export async function IdentityEditor({
               },
             }}
           />
+          ))}
           {/* Rollen sind eine Navigationsangabe, keine Berechtigung: Wer
               "Advisor" anhakt, sieht das Advisor-Dashboard - was darauf steht,
               entscheidet weiterhin RLS ueber advisor_user_id. Deshalb darf das
@@ -280,7 +325,7 @@ export async function IdentityEditor({
               Einem Connect-Konto hier "Founder" anzubieten waere eine
               Selbstfreischaltung ins Founder-Produkt und damit eine
               Produktentscheidung, nicht ein Formularfeld. */}
-          {currentRoles.length > 0 ? (
+          {currentRoles.length > 0 ? group("roles", (
             <fieldset id="roles" className="scroll-mt-24">
               <legend className="text-sm font-medium">{t("identity.rolesLegend")}</legend>
               <p className={hint}>{t("identity.rolesHint")}</p>
@@ -301,9 +346,10 @@ export async function IdentityEditor({
                 ))}
               </div>
             </fieldset>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-3">
-            <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />
+          )) : null}
+          </>)}
+          {!cards ? <div className="flex flex-wrap items-center gap-3">
+            {saveButton}
             {/* Der Weg zurueck, wenn Connect oder Discovery hierher geschickt
                 hat. Ohne ihn war die Identitaetsseite eine Sackgasse. */}
             {returnPath ? (
@@ -311,7 +357,7 @@ export async function IdentityEditor({
                 {t(`identity.backTo.${returnPath === "/connect/profile" ? "connect" : "discovery"}`)}
               </Link>
             ) : null}
-          </div>
+          </div> : null}
         </form>
     </>
   );

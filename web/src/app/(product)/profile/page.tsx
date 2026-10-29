@@ -625,6 +625,9 @@ export default async function ProfilePage({
           in HTML nicht. */}
       {step === "identity" ? (
         <IdentityEditor
+          cards
+          // Ein abgewiesener LinkedIn-Link bringt einen zur Karte, wo er steht.
+          initialCard={params.error === "linkedin" ? "links" : "who"}
           core={core}
           currentRoles={currentRoles}
           returnPath={returnPath}

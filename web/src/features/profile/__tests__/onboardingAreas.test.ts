@@ -228,7 +228,7 @@ test("das Versprechen der Umkehrbarkeit deckt sich mit dem, was /profile zulaess
   // Einstieg der vorsichtigsten Wahl keinen Haken versprechen, den es fuer
   // sie nicht gibt.
   const profilePage = source("src/app/(product)/profile/page.tsx"); // inkl. IdentityEditor (siehe source)
-  const gateIsClosed = /\{currentRoles\.length > 0 \? \(\s*<fieldset[^>]*>/.test(profilePage);
+  const gateIsClosed = /\{currentRoles\.length > 0 \? (?:\(|group\("roles", \()\s*<fieldset[^>]*>/.test(profilePage);
 
   const form = source(FORM);
   assert.equal(

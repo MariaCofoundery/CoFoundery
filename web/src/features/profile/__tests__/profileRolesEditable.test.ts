@@ -56,7 +56,8 @@ test("the section is hidden for people who have no such role yet", () => {
   // Einem Connect-Konto hier "Founder" anzubieten waere eine
   // Selbstfreischaltung ins Founder-Produkt - eine Produktentscheidung, kein
   // Formularfeld.
-  assert.match(page, /\{currentRoles\.length > 0 \? \(/);
+  // Seit den Karten steht das Tor als `currentRoles.length > 0 ? group("roles", (` - dieselbe Bedingung.
+  assert.match(page, /\{currentRoles\.length > 0 \? (?:\(|group\("roles", \()/);
 });
 
 test("roles stay a navigation hint, not an authorisation", () => {
