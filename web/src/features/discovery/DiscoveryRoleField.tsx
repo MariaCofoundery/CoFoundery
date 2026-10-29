@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { DiscoveryFounderRole } from "@/features/discovery/discoveryTypes";
+import { FOCUS_HUES, FOCUS_ICONS } from "@/features/profile/journey/focusVisuals";
 
 type Copy = {
   limitReached: string;
@@ -92,7 +93,7 @@ export function DiscoveryRoleField({
         .map((id) => (
           <input key={id} type="hidden" name={partName} value={id} />
         ))}
-      <div className="mt-3 grid gap-2 sm:grid-cols-1 lg:grid-cols-2">
+      <div className="mt-3 grid gap-2.5">
         {options.map((option) => {
           const checked = selected.includes(option.value);
           // Gesetzte bleiben immer anklickbar - sonst koennte man die Auswahl
@@ -100,31 +101,44 @@ export function DiscoveryRoleField({
           const disabled = !checked && atLimit;
           const expands = option.value === "other" && checked;
 
+          const hue = FOCUS_HUES[option.value] ?? FOCUS_HUES.other;
+          const open = openOne === option.value;
+          const pickedCount = parts.filter((id) => id.startsWith(`${option.value}.`)).length;
+
           return (
             /* Die Karte ist ein div, nicht das label: Sonst wuerde ein Klick
                in das Textfeld darin das Ankreuzfeld umschalten - das label
                gilt ja fuer die Rolle. */
             <div
               key={option.value}
-              className={`rounded-2xl border transition ${
-                expands ? "sm:col-span-2 lg:col-span-3" : ""
-              } ${
+              style={checked ? { borderColor: hue } : undefined}
+              className={`overflow-hidden rounded-[1.15rem] border-[1.5px] transition ${
                 checked
-                  ? "border-slate-900 bg-slate-900/[0.04]"
+                  ? "bg-white"
                   : disabled
                     ? "border-slate-100 bg-slate-50"
                     : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
               <label
-                className={`flex min-h-11 items-center gap-3 px-3 py-2 text-sm ${
-                  checked
-                    ? "font-medium text-slate-900"
-                    : disabled
-                      ? "cursor-not-allowed text-slate-400"
-                      : "cursor-pointer text-slate-700"
-                }`}
+                className={`grid grid-cols-[2.6rem_1fr_1.75rem] items-center gap-3 p-3 ${
+                  disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                } focus-within:ring-2 focus-within:ring-violet-500`}
               >
+                <span
+                  aria-hidden="true"
+                  className="grid h-[2.6rem] w-[2.6rem] place-items-center rounded-xl"
+                  style={{ background: checked ? hue : `${hue}22`, color: checked ? "#fff" : hue }}
+                >
+                  <svg viewBox="0 0 24 24" className="h-[1.3rem] w-[1.3rem] fill-none stroke-current" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={FOCUS_ICONS[option.value] ?? FOCUS_ICONS.other} />
+                  </svg>
+                </span>
+                <span className="grid gap-0.5">
+                  <strong className="text-[0.95rem] text-slate-950">{option.label}</strong>
+                  {option.help ? <span className="text-[0.8rem] font-medium leading-snug text-slate-500">{option.help}</span> : null}
+                </span>
+                {/* Das Ankreuzfeld bleibt ein echtes Feld (wird mitgeschickt, per Tastatur erreichbar); gezeigt wird der Haken. */}
                 <input
                   type="checkbox"
                   name={name}
@@ -132,56 +146,57 @@ export function DiscoveryRoleField({
                   checked={checked}
                   disabled={disabled}
                   onChange={() => toggle(option.value)}
-                  className="h-4 w-4 rounded border-slate-300 text-slate-950 focus:ring-2 focus:ring-slate-300"
+                  className="sr-only"
                 />
-                <span>{option.label}</span>
+                <span
+                  aria-hidden="true"
+                  className={`grid h-7 w-7 place-items-center rounded-full border-2 transition ${checked ? "text-white" : "border-slate-300 text-transparent"}`}
+                  style={checked ? { background: hue, borderColor: hue } : undefined}
+                >
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                </span>
               </label>
 
-              {/* Erklaerung und Unterbereiche - nur zum Lesen, nichts davon wird
-                  gespeichert. "Product" oder "Growth" sagen nicht jedem etwas. */}
-              {option.help ? (
-                <div className="px-3 pb-2">
-                  <p className="pl-7 text-xs leading-5 text-slate-500">{option.help}</p>
-                  {option.parts && option.parts.length > 0 ? (
-                    <>
-                      <button
-                        type="button"
-                        aria-expanded={openOne === option.value}
-                        onClick={() => setOpenOne((current) => (current === option.value ? null : option.value))}
-                        className="ml-7 mt-1 inline-flex min-h-9 items-center text-xs font-semibold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-                      >
-                        {copy.whatBelongs}{(() => { const n = parts.filter((id) => id.startsWith(`${option.value}.`)).length; return n > 0 ? ` \u00b7 ${n}` : ""; })()} {openOne === option.value ? "\u25B4" : "\u25BE"}
-                      </button>
-                      {openOne === option.value ? (
-                        <div className="mt-1 flex flex-wrap gap-1.5 pl-7">
-                          {option.parts.map((part) => {
-                            const picked = parts.includes(part.id);
-                            return (
-                              <button
-                                key={part.id}
-                                type="button"
-                                aria-pressed={picked}
-                                onClick={() => togglePart(part.id)}
-                                className={`min-h-9 rounded-lg border px-2.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${
-                                  picked
-                                    ? "border-violet-700 bg-violet-700 text-white"
-                                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                                }`}
-                              >
-                                {part.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                    </>
-                  ) : null}
-                </div>
+              {/* Unterbereiche: waehlbar, gespeichert als Kennungen. Immer nur eine Karte offen. */}
+              {option.parts && option.parts.length > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setOpenOne((current) => (current === option.value ? null : option.value))}
+                    className="ml-[4.35rem] inline-flex min-h-9 items-center pb-1 text-xs font-bold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+                  >
+                    {copy.whatBelongs}{pickedCount > 0 ? ` \u00b7 ${pickedCount}` : ""} {open ? "\u25B4" : "\u25BE"}
+                  </button>
+                  <div className={`grid transition-[grid-template-rows] duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                    <div className="min-h-0 overflow-hidden">
+                      <div className="flex flex-wrap gap-1.5 px-3 pb-4 pl-[4.35rem]">
+                        {option.parts.map((part) => {
+                          const picked = parts.includes(part.id);
+                          return (
+                            <button
+                              key={part.id}
+                              type="button"
+                              tabIndex={open ? 0 : -1}
+                              aria-pressed={picked}
+                              onClick={() => togglePart(part.id)}
+                              className={`min-h-9 rounded-[10px] border-[1.5px] px-3 text-[0.82rem] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${
+                                picked ? "text-white" : "border-slate-200 bg-white text-slate-800 hover:border-slate-300"
+                              }`}
+                              style={picked ? { background: hue, borderColor: hue } : undefined}
+                            >
+                              {part.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </>
               ) : null}
 
               {/* Das Feld gehoert in dieselbe Karte, unter das Ankreuzfeld,
-                  das es hervorgerufen hat. Darunter im Freien war nicht zu
-                  erkennen, wozu es gehoert. */}
+                  das es hervorgerufen hat. */}
               {expands ? (
                 <div className="border-t border-slate-900/10 px-3 pb-3 pt-3">
                   <label className="block text-sm font-medium text-slate-900">

@@ -123,7 +123,8 @@ test("the status is shown once, not as a row of pseudo-switches", () => {
     /\(\["draft", "active", "paused"\] as const\)\.map/,
     "alle drei Zustaende nebeneinander sahen aus wie eine Umschaltung"
   );
-  assert.match(page, /t\(`status\.\$\{status\}`\)/);
+  // Seit dem Feinschliff als Marke an der Kopfzeile, nicht als eigene Karte.
+  assert.match(page, /t\(`status\.\$\{profile\.status \?\? "draft"\}`\)/);
 });
 
 // ---------------------------------------------------------------------------
@@ -216,8 +217,10 @@ test("no completeness percentage - only what concretely is still missing", () =>
   // Die Person sieht nur, was konkret fehlt - und nur sie selbst.
   const page = codeOnly(PAGE);
   assert.doesNotMatch(page, /role="progressbar"|CompletionMeter|completionCount|percent/);
-  assert.match(page, /<OpenItems issues=\{issues\} t=\{t\} \/>/);
-  assert.match(page, /translatePublishIssue\(issue, t\)/);
+  // Was fehlt, steht als Pflicht-Box auf der letzten Karte (FindCardFlow) - konkret, ohne Zaehler.
+  const flow = codeOnly("src/features/discovery/FindCardFlow.tsx");
+  assert.match(flow, /copy\.missingTitle/);
+  assert.doesNotMatch(flow, /role="progressbar"|percent|\d\s*%/);
 });
 
 /**
@@ -529,7 +532,8 @@ test("the free text opens inside the card it belongs to", () => {
   // Und es bekommt den Fokus, damit man nicht sucht, wo man tippen soll.
   assert.match(field, /name=\{otherName\}\s*\n\s*required\s*\n\s*autoFocus/);
   // Ueber die volle Breite, sonst quetscht sich der Satz in ein Drittel.
-  assert.match(field, /expands \? "sm:col-span-2 lg:col-span-3" : ""/);
+  // (Seit dem Feinschliff stehen die Schwerpunkte untereinander, die Karte hat also ohnehin die volle Breite.)
+  assert.doesNotMatch(field, /grid-cols-2|lg:grid-cols-3/);
 });
 
 test("the three choices stack instead of sitting in three columns", () => {
@@ -835,7 +839,7 @@ test("die Zeit gehört zum Rahmen, nicht zu den Fähigkeiten", () => {
   // Rollen. Damit las sich der Zeitrahmen wie eine Fähigkeit.
   const page = source(PAGE);
   const brings = page.indexOf('t("profile.brings.title")');
-  const rahmen = page.indexOf('t("profile.venture.eyebrow")');
+  const rahmen = page.indexOf('t("profile.venture.title")');
   const stunden = page.indexOf('name="availabilityHoursPerWeek"');
   assert.ok(brings > 0 && rahmen > brings, "die Abschnitte stehen nicht in dieser Reihenfolge");
   assert.ok(stunden > rahmen, "die Stunden stehen noch bei den Fähigkeiten");

@@ -20,7 +20,7 @@ test("Speichern und Veröffentlichen laufen über dieselben Aktionen wie vorher"
   const page = code(PAGE);
   assert.match(page, /formAction=\{publishProfileFromForm\}/);
   assert.match(page, /formAction=\{saveDraftAndLeave\.bind\(null, "\/connect\/problems"\)\}/);
-  assert.match(page, /<form action=\{pauseProfile\}>/);
+  assert.match(page, /<form action=\{pauseProfile\}/);
 });
 
 test("die Pflicht-Box spiegelt die Regeln des Servers, und Veröffentlichen ist gesperrt, solange etwas fehlt", () => {

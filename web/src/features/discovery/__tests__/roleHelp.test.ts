@@ -24,7 +24,7 @@ test("jeder Schwerpunkt außer „Anderer“ hat Erklärung und Unterbereiche, d
 test("die Erklärung klappt auf, und es ist immer nur eine offen", () => {
   const field = src("src/features/discovery/DiscoveryRoleField.tsx");
   assert.match(field, /openOne/);
-  assert.match(field, /aria-expanded=\{openOne === option\.value\}/);
+  assert.match(field, /const open = openOne === option\.value[\s\S]*aria-expanded=\{open\}/);
   assert.match(field, /setOpenOne\(\(current\) => \(current === option\.value \? null : option\.value\)\)/);
 });
 

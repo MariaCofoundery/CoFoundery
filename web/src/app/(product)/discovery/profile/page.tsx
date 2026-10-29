@@ -268,92 +268,7 @@ function PageMessage({
  * keine Profilqualitaet in Prozent ausdruecken. Stattdessen nur, was konkret
  * noch fehlt, und nur fuer die Person selbst.
  */
-function OpenItems({
-  issues,
-  t,
-}: {
-  issues: DiscoveryProfilePublishIssue[];
-  t: DiscoveryT;
-}) {
-  return (
-    <div className="mt-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-        {t("profile.status.openItemsTitle")}
-      </p>
-      {issues.length === 0 ? (
-        <p className="mt-2 text-sm leading-6 text-slate-700">{t("profile.status.completionDone")}</p>
-      ) : (
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700">
-          {issues.map((issue) => (
-            <li key={issue}>{translatePublishIssue(issue, t)}</li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
 
-function StatusCard({
-  profile,
-  issues,
-  t,
-}: {
-  profile: Partial<FounderDiscoveryProfile>;
-  issues: DiscoveryProfilePublishIssue[];
-  t: DiscoveryT;
-}) {
-  const status = profile.status ?? "draft";
-  const hint =
-    status === "active"
-      ? t("profile.status.activeHint")
-      : status === "paused"
-        ? t("profile.status.pausedHint")
-        : t("profile.status.draftHint");
-
-  return (
-    <section
-      className={`${CARD_CLASS} discovery-rise`}
-      style={{ "--rise-delay": "60ms" } as CSSProperties}
-    >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {t("profile.status.eyebrow")}
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            {t("profile.actions.visibilityTitle")}
-          </h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">{hint}</p>
-        </div>
-        {/* Nur der Zustand, der gilt. Alle drei nebeneinander sahen aus wie
-            eine Umschaltung, war aber reine Anzeige - und die Ueberschrift
-            sagt dasselbe schon. */}
-        <span
-          className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
-            status === "active"
-              ? "bg-emerald-100 text-emerald-900"
-              : status === "paused"
-                ? "bg-amber-100 text-amber-900"
-                : "bg-slate-100 text-slate-700"
-          }`}
-        >
-          <span
-            aria-hidden
-            className={`h-2 w-2 rounded-full ${
-              status === "active"
-                ? "bg-emerald-600"
-                : status === "paused"
-                  ? "bg-amber-600"
-                  : "bg-slate-400"
-            }`}
-          />
-          {t(`status.${status}`)}
-        </span>
-      </div>
-      {status !== "active" || issues.length > 0 ? <OpenItems issues={issues} t={t} /> : null}
-    </section>
-  );
-}
 
 export default async function DiscoveryProfilePage({
   searchParams,
@@ -435,10 +350,6 @@ export default async function DiscoveryProfilePage({
       issue === "displayName" ? (core?.display_name ?? "").trim().length < 2 : (core?.headline ?? "").trim().length < 3
     )
   );
-  const publishIssues = [
-    ...identityIssues,
-    ...getDiscoveryProfilePublishIssues(profile).filter((issue) => issue !== "displayName" && issue !== "headline"),
-  ];
   // Nach dem Speichern oder einem abgewiesenen Veroeffentlichen landet man auf der letzten Karte,
   // wo die Rueckmeldung steht - sonst auf der ersten.
   const flowInitialStep = [
@@ -497,13 +408,34 @@ export default async function DiscoveryProfilePage({
           <span aria-hidden>←</span>
           {t("common.backToDiscovery")}
         </Link>
-        <header className="brand-panel rounded-[28px] p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("common.brandEyebrow")}</p>
-          <h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("profile.title")}</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-white">{t("profile.subtitle")}</p>
+        <header className="brand-panel rounded-[24px] p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("common.brandEyebrow")}</p>
+              <h1 className="mt-1 text-2xl font-semibold leading-tight sm:text-3xl">{t("profile.title")}</h1>
+            </div>
+            {/* Der Zustand, der gilt - als Marke an der Kopfzeile statt als eigene Karte. */}
+            <span
+              className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
+                (profile.status ?? "draft") === "active"
+                  ? "bg-emerald-100 text-emerald-900"
+                  : profile.status === "paused"
+                    ? "bg-amber-100 text-amber-900"
+                    : "bg-white/90 text-slate-800"
+              }`}
+            >
+              <span
+                aria-hidden
+                className={`h-2 w-2 rounded-full ${
+                  (profile.status ?? "draft") === "active" ? "bg-emerald-600" : profile.status === "paused" ? "bg-amber-600" : "bg-slate-400"
+                }`}
+              />
+              {t(`status.${profile.status ?? "draft"}`)}
+            </span>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white">{t("profile.subtitle")}</p>
         </header>
 
-        <StatusCard profile={profile} issues={publishIssues} t={t} />
         <PageMessage
           message={pageMessage}
           issues={[]}
@@ -525,21 +457,6 @@ export default async function DiscoveryProfilePage({
             style={{ "--rise-delay": "120ms" } as CSSProperties}
           >
             <form action={saveProfileDraft} noValidate className="grid gap-5">
-              <div className={INNER_SECTION_CLASS}>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    {t("profile.publicProfile.eyebrow")}
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold text-slate-950">
-                    {t("profile.publicProfile.title")}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {t("profile.publicProfile.description")}
-                  </p>
-                </div>
-
-              </div>
-
               <FindCardFlow
                 initialStep={flowInitialStep}
                 publishStatus={profile.status ?? "draft"}
@@ -548,7 +465,6 @@ export default async function DiscoveryProfilePage({
                   { id: "bring", node: (
               <div className={INNER_SECTION_CLASS}>
                 <h2 className="text-xl font-semibold text-slate-950">{t("profile.brings.title")}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.brings.description")}</p>
                 <div className="mt-5 grid gap-5">
                   <div>
                     <p className={LABEL_CLASS}>{t("profile.publicProfile.ownRoles")}</p>
@@ -582,16 +498,10 @@ export default async function DiscoveryProfilePage({
                   ) },
                   { id: "time", node: (
               <div className={INNER_SECTION_CLASS}>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    {t("profile.venture.eyebrow")}
-                  </p>
+                <div className="grid gap-5">
                   <h2 className="mt-2 text-xl font-semibold text-slate-950">
                     {t("profile.venture.title")}
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {t("profile.venture.description")}
-                  </p>
 
                   {/* -----------------------------------------------------
                       DIE ZEIT GEHOERT ZUM RAHMEN, NICHT ZU DEN FAEHIGKEITEN
@@ -789,7 +699,6 @@ export default async function DiscoveryProfilePage({
                   { id: "seeking", node: (
               <div className={INNER_SECTION_CLASS}>
                 <h2 className="text-xl font-semibold text-slate-950">{t("profile.seeking.title")}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{t("profile.seeking.description")}</p>
                 <div className="mt-5">
                   <p className={LABEL_CLASS}>{t("profile.publicProfile.seekingRoles")}</p>
                   <p className={HELP_CLASS}>{t("profile.publicProfile.seekingRolesHelp", { count: DISCOVERY_SELECTION_LIMITS.seekingRoles })}</p>
@@ -894,58 +803,22 @@ export default async function DiscoveryProfilePage({
               />
             </form>
 
-            {profile.status === "active" ? (
-              <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-xl text-xs leading-5 text-slate-500">
-                  {t("profile.actions.pauseHelp")}
-                </p>
-                <form action={pauseProfile}>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-slate-200 pt-4 text-sm">
+              <Link href="/discovery/suche" className="inline-flex min-h-10 items-center font-semibold text-violet-800 hover:underline">
+                {t("v2.alignment.movedCta")} →
+              </Link>
+              {profile.status === "active" ? (
+                <form action={pauseProfile} title={t("profile.actions.pauseHelp")}>
                   <SubmitButton
                     label={t("profile.actions.pause")}
                     pendingLabel={t("profile.actions.saving")}
-                    className={SECONDARY_BUTTON_CLASS}
+                    className="inline-flex min-h-10 items-center font-semibold text-slate-600 underline underline-offset-4 hover:text-slate-950"
                   />
                 </form>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </section>
 
-          {/* ---------------------------------------------------------------
-              DIE ALTEN ALIGNMENT-PRIORITAETEN SIND WEG
-              ---------------------------------------------------------------
-
-              Hier standen sechs Kategorien zur Auswahl - Unternehmenslogik,
-              Entscheidungslogik, Arbeitsstruktur, Commitment,
-              Risikoorientierung, Konfliktstil -, dazu je eine Wichtigkeit und
-              "aehnlich oder ergaenzend". Die FIND-Spec streicht sie in
-              Abschnitt 20: Sie stammen aus einer aelteren Architektur und
-              vermischen venturebezogene Themen mit portablen
-              Arbeitspraeferenzen.
-
-              An ihrer Stelle steht "Deine Suche" - dieselbe Frage, mit den
-              sechs Themen des Arbeitsprofils, drei Richtungen und einem
-              Gewicht. Und sie steht dort ZUSAMMEN mit dem praktischen Rahmen
-              und den Faehigkeiten, statt an einer dritten Stelle.
-
-              Ein Verweis und kein zweites Formular: Zwei Orte fuer dieselbe
-              Frage waren genau das Problem. */}
-          <section
-            className={`${CARD_CLASS} discovery-rise`}
-            style={{ "--rise-delay": "180ms" } as CSSProperties}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              {t("v2.alignment.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-              {t("v2.alignment.movedTitle")}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {t("v2.alignment.movedText")}
-            </p>
-            <Link href="/discovery/suche" className={`${SECONDARY_BUTTON_CLASS} mt-4`}>
-              {t("v2.alignment.movedCta")}
-            </Link>
-          </section>
           </div>
 
           <aside className="flex flex-col gap-5 lg:sticky lg:top-24">

@@ -80,5 +80,5 @@ test("das Formular speichert Kennungen, nur zu gewählten Schwerpunkten", () => 
   assert.match(field, /selected\.includes\(id\.split\("\."\)\[0\]/);
   // Abwählen entfernt die Unterbereiche, und es ist immer nur einer offen.
   assert.match(field, /startsWith\(`\$\{value\}\.`\)/);
-  assert.match(field, /aria-expanded=\{openOne === option\.value\}/);
+  assert.match(field, /const open = openOne === option\.value[\s\S]*aria-expanded=\{open\}/);
 });
