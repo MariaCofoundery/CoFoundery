@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 
+// Die Schreibbewegung gibt es nur auf grossen Bildschirmen und nur ohne
+// Bewegungswunsch. Auf dem Handy springt sonst die ganze Seite, sobald die Zeile
+// einen Umbruch mehr oder weniger hat, und die Notizen darunter wandern mit.
+const CALM_QUERY = "(prefers-reduced-motion: reduce), (max-width: 767px)";
+
 /**
  * Schreibt die Titel der Probleme, die gerade am Brett haengen, nacheinander
  * hin und loescht sie wieder.
@@ -15,10 +20,12 @@ import { useEffect, useState } from "react";
 export function ProblemTypewriter({ lines, label }: { lines: string[]; label: string }) {
   const [index, setIndex] = useState(0);
   const [shown, setShown] = useState(lines[0]?.length ?? 0);
+  const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
     if (lines.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia(CALM_QUERY).matches) return;
+    setAnimated(true);
 
     let line = 0;
     let chars = lines[0].length;
@@ -52,13 +59,16 @@ export function ProblemTypewriter({ lines, label }: { lines: string[]; label: st
     // Der erste Titel steht erst eine Weile still, bevor es losgeht.
     deleting = true;
     timer = setTimeout(step, 3200);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setAnimated(false);
+    };
   }, [lines]);
 
   const text = (lines[index] ?? "").slice(0, shown);
 
   return (
-    <p className="problem-typewriter" aria-label={`${label}: ${lines[0] ?? ""}`}>
+    <p className={`problem-typewriter${animated ? "" : " problem-typewriter--static"}`} aria-label={`${label}: ${lines[0] ?? ""}`}>
       <span className="problem-typewriter__label">{label}</span>
       <span aria-hidden="true" className="problem-typewriter__text">
         {text}

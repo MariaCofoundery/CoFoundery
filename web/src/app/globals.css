@@ -1207,11 +1207,18 @@ body {
 .problem-note[data-origin="public_source"] { --tone: #94a3b8; border-style: dashed; }
 .problem-note__source { margin-top: 1rem; font-size: 0.8125rem; color: #9fb0cc; }
 .problem-note__source a { color: #c9d6ec; text-underline-offset: 3px; }
-.problem-note:hover,
-.problem-note:focus-within {
-  transform: rotate(0deg) translateY(-6px);
-  border-color: var(--tone);
-  box-shadow: 0 26px 40px -20px rgba(0, 0, 0, 0.8), 0 0 36px -10px var(--tone);
+@media (hover: hover) {
+  .problem-note:hover,
+  .problem-note:focus-within {
+    transform: rotate(0deg) translateY(-6px);
+    border-color: var(--tone);
+    box-shadow: 0 26px 40px -20px rgba(0, 0, 0, 0.8), 0 0 36px -10px var(--tone);
+  }
+}
+/* Auf dem Handy landen die Notizen nicht nacheinander: Beim Lesen und Scrollen
+   soll nichts in Bewegung sein. */
+@media (max-width: 767px) {
+  .problem-note { animation: none; }
 }
 .problem-note::before {
   content: "";
@@ -1336,6 +1343,14 @@ body {
   opacity: 0.8;
 }
 .problem-typewriter__text { font-size: 1.125rem; font-weight: 600; }
+/* Platz fuer zwei Zeilen reservieren: Ein Umbruch mehr oder weniger darf die Seite
+   darunter nicht verschieben. */
+@media (min-width: 768px) {
+  .problem-typewriter { min-height: 3.75rem; }
+}
+/* Ohne Schreibbewegung steht der Titel ruhig da, ohne blinkenden Strich. */
+.problem-typewriter--static .problem-typewriter__caret { display: none; }
+.problem-typewriter--static { min-height: 0; }
 .problem-typewriter__caret {
   display: inline-block;
   width: 2px;

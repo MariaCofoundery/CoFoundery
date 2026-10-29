@@ -63,6 +63,8 @@ test("Die Schreibzeile zeigt echte Titel und steht ohne Bewegungswunsch still", 
   const component = read("features/connect/ProblemTypewriter.tsx");
   assert.match(page, /lines=\{problems\.slice\(0, 5\)\.map\(\(problem\) => problem\.title\)\}/);
   assert.match(component, /prefers-reduced-motion: reduce/);
+  // Auf dem Handy bleibt sie still: Die Zeile wuerde sonst die Seite verschieben.
+  assert.match(component, /max-width: 767px/);
   assert.match(component, /useState\(lines\[0\]\?\.length \?\? 0\)/);
 });
 
@@ -126,4 +128,15 @@ test("Das Problembrett zeigt zwoelf Notizen je Seite und hat keine schweren Effe
   assert.doesNotMatch(problemCss, /filter:\s*blur/);
   assert.doesNotMatch(problemCss, /\.problem-night(::before|::after)/);
   assert.doesNotMatch(problemCss, /\.problem-night \{[^}]*overflow:\s*hidden/);
+});
+
+test("Auf dem Handy bewegt sich auf dem Problembrett nichts", () => {
+  const css = read("app/globals.css");
+  // Der Hover-Hub gilt nur, wo es einen Mauszeiger gibt; auf dem Touchscreen bliebe er nach dem Tippen haengen.
+  assert.match(css, /@media \(hover: hover\) \{\s*\.problem-note:hover/);
+  assert.match(css, /@media \(max-width: 767px\) \{\s*\.problem-note \{ animation: none; \}/);
+  // Platz fuer die Schreibzeile ist reserviert, damit ein Umbruch nichts verschiebt.
+  assert.match(css, /@media \(min-width: 768px\) \{\s*\.problem-typewriter \{ min-height: 3\.75rem; \}/);
+  const component = read("features/connect/ProblemTypewriter.tsx");
+  assert.match(component, /problem-typewriter--static/);
 });
