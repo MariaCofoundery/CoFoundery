@@ -661,7 +661,7 @@
     "finishing": "One moment …",
     "progress": "{current} of {total}",
     "saved": "Saved",
-    "classic": "I’m an advisor or I’d rather use the previous onboarding",
+    "classic": "Use the previous onboarding instead",
     "errors": {
       "areas": "Please choose at least one area.",
       "name": "What should we call you? A name is still missing.",
@@ -682,6 +682,44 @@
       "connect": {
         "name": "Connect",
         "text": "Find people, knowledge and opportunities in the network."
+      },
+      "advise": {
+        "name": "Advisor",
+        "text": "Support teams and founders, with their consent."
+      },
+      "more": "More",
+      "less": "Less",
+      "infoLabels": {
+        "what": "What is it?",
+        "ask": "What we ask you",
+        "lands": "Where you land next",
+        "visible": "Who sees what"
+      },
+      "info": {
+        "align": {
+          "what": "A way to understand how you work and talk it through with your team.",
+          "ask": "Short questions about everyday situations, about 30 minutes in total. You can do it in parts and pause.",
+          "lands": "The questions about your work style.",
+          "visible": "Nobody sees anything unless you share it with a team yourself."
+        },
+        "find": {
+          "what": "Find co-founders who fit you.",
+          "ask": "What you bring, how much room founding has right now, how far your idea is and who you are looking for.",
+          "lands": "Your Find profile, which you finish there.",
+          "visible": "Only visible once you publish your Find profile yourself."
+        },
+        "connect": {
+          "what": "The network: find people, knowledge and opportunities, share problems and make offers.",
+          "ask": "Who you are in the network and what you are open to.",
+          "lands": "Your Connect profile.",
+          "visible": "Members only see it once you switch it on yourself."
+        },
+        "advise": {
+          "what": "Support teams and individual founders, with their explicit consent.",
+          "ask": "Nothing extra in this onboarding.",
+          "lands": "Your advisor area.",
+          "visible": "You only see what someone explicitly shares with you."
+        }
       }
     },
     "name": {
@@ -802,7 +840,10 @@
       "nextAlign": "The questions about your work style",
       "nextFind": "Your Find profile",
       "nextConnect": "Your Connect profile",
-      "nextDashboard": "Your overview"
+      "nextDashboard": "Your overview",
+      "startQ": "Where would you like to start?",
+      "startHint": "You can find the other areas in the menu any time afterwards.",
+      "nextAdvise": "Your advisor area"
     }
   }
 }

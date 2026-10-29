@@ -661,7 +661,7 @@
     "finishing": "Einen Moment …",
     "progress": "{current} von {total}",
     "saved": "Gespeichert",
-    "classic": "Ich bin Advisor oder möchte den bisherigen Einstieg nutzen",
+    "classic": "Lieber den bisherigen Einstieg nutzen",
     "errors": {
       "areas": "Wähle bitte mindestens einen Bereich.",
       "name": "Wie sollen wir dich nennen? Ein Name fehlt noch.",
@@ -682,6 +682,44 @@
       "connect": {
         "name": "Connect",
         "text": "Menschen, Wissen und Möglichkeiten im Netzwerk finden."
+      },
+      "advise": {
+        "name": "Advisor",
+        "text": "Teams und Gründerinnen begleiten, mit ihrer Freigabe."
+      },
+      "more": "Mehr dazu",
+      "less": "Weniger",
+      "infoLabels": {
+        "what": "Was ist das?",
+        "ask": "Das fragen wir dich",
+        "lands": "Wohin du danach kommst",
+        "visible": "Wer sieht was"
+      },
+      "info": {
+        "align": {
+          "what": "Ein Weg, zu verstehen, wie du arbeitest, und das mit deinem Team zu besprechen.",
+          "ask": "Kurze Fragen zu Situationen aus dem Alltag, zusammen etwa 30 Minuten. Du kannst in Teilen machen und pausieren.",
+          "lands": "Auf die Fragen zu deiner Arbeitsweise.",
+          "visible": "Niemand sieht etwas, solange du es nicht selbst mit einem Team teilst."
+        },
+        "find": {
+          "what": "Mitgründerinnen und Mitgründer finden, die zu dir passen.",
+          "ask": "Was du einbringst, wie viel Platz Gründen gerade hat, wie weit deine Idee ist und wen du suchst.",
+          "lands": "Auf dein Find-Profil, das du dort fertig machst.",
+          "visible": "Erst sichtbar, wenn du dein Find-Profil selbst veröffentlichst."
+        },
+        "connect": {
+          "what": "Das Netzwerk: Menschen, Wissen und Möglichkeiten finden, Probleme teilen und Angebote machen.",
+          "ask": "Wer du im Netzwerk bist und wofür du ansprechbar bist.",
+          "lands": "Auf dein Connect-Profil.",
+          "visible": "Mitglieder sehen es erst, wenn du es selbst einschaltest."
+        },
+        "advise": {
+          "what": "Teams und einzelne Gründerinnen und Gründer begleiten, mit ihrer ausdrücklichen Freigabe.",
+          "ask": "In diesem Einstieg nichts Zusätzliches.",
+          "lands": "In deinen Advisor-Bereich.",
+          "visible": "Du siehst nur, was dir jemand ausdrücklich freigibt."
+        }
       }
     },
     "name": {
@@ -802,7 +840,10 @@
       "nextAlign": "Die Fragen zu deiner Arbeitsweise",
       "nextFind": "Dein Find-Profil",
       "nextConnect": "Dein Connect-Profil",
-      "nextDashboard": "Dein Überblick"
+      "nextDashboard": "Dein Überblick",
+      "startQ": "Womit möchtest du anfangen?",
+      "startHint": "Die anderen Bereiche findest du danach jederzeit im Menü.",
+      "nextAdvise": "Dein Advisor-Bereich"
     }
   }
 }

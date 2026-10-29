@@ -8,6 +8,7 @@ import {
   needsFounderRole,
   nextPathFor,
   parseJourneyPayload,
+  rolesFor,
   startAreaFor,
 } from "@/features/profile/journey/journeyModel";
 import { isProfileJourneyEnabled } from "@/features/profile/journey/journeyFlag";
@@ -67,12 +68,36 @@ test("der Abschluss führt in den ersten Bereich, der jetzt etwas zu tun hat", (
   assert.equal(nextPathFor({ areas: [], alignPlan: "first" }), "/dashboard");
 });
 
+test("Advisor ist ein eigener Bereich: Rolle, Absicht, Interesse und Ziel", () => {
+  assert.deepEqual(rolesFor(["connect"]), []);
+  assert.deepEqual(rolesFor(["advise"]), ["advisor"]);
+  assert.deepEqual(rolesFor(["find", "advise"]), ["founder", "advisor"]);
+  assert.equal(intentionFor(["advise"]), "Begleiten");
+  assert.equal(intentionFor(["find", "advise"], "advise"), "Begleiten");
+  assert.equal(intentionFor(["find", "advise"], "find"), "Suche");
+  assert.deepEqual(interestsFor(["advise", "connect"]), ["connect", "advise"]);
+  assert.equal(nextPathFor({ areas: ["advise"], alignPlan: "first" }), "/advisor/dashboard");
+});
+
+test("womit man anfängt, bestimmt der Abschluss; nicht Gewähltes zählt nicht", () => {
+  const both = { areas: ["find", "advise"] as ("find" | "advise")[], alignPlan: "first" as const };
+  assert.equal(nextPathFor({ ...both, start: "advise" }), "/advisor/dashboard");
+  assert.equal(nextPathFor({ ...both, start: "find" }), "/discovery/profile");
+  assert.equal(nextPathFor({ ...both, start: "connect" as never }), "/discovery/profile");
+  assert.equal(startAreaFor(["find", "advise"], "advise"), "advise");
+  const parsed = parseJourneyPayload(payload({ areas: ["find", "advise"], start: "align" }));
+  assert.equal(parsed?.start, "");
+  assert.equal(parseJourneyPayload(payload({ areas: ["find", "advise"], start: "advise" }))?.start, "advise");
+});
+
 test("die Reise ist ein Zusatzweg: ohne Schalter schickt /welcome niemanden dorthin", () => {
   assert.equal(isProfileJourneyEnabled({}), false);
   assert.equal(isProfileJourneyEnabled({ PROFILE_JOURNEY: "false" }), false);
   assert.equal(isProfileJourneyEnabled({ PROFILE_JOURNEY: " TRUE " }), true);
   const welcome = code("src/app/welcome/page.tsx");
-  assert.match(welcome, /isProfileJourneyEnabled\(\) && params\.classic !== "1" && params\.intent !== "advisor"/);
+  assert.match(welcome, /isProfileJourneyEnabled\(\) && params\.classic !== "1"/);
+  // Ein Advisor-Link geht mit und belegt in der Reise "Advisor" vor.
+  assert.match(welcome, /params\.intent === "advisor"\) query\.set\("intent", "advisor"\)/);
 });
 
 test("der Abschluss veröffentlicht nichts und markiert zuletzt", () => {
@@ -81,11 +106,11 @@ test("der Abschluss veröffentlicht nichts und markiert zuletzt", () => {
   assert.doesNotMatch(action, /status\s*[:=]\s*["']active|published|photo_visible|visibility|discovery|network_profiles/i);
   // Reihenfolge: Mitgliedschaft vor der Markierung
   assert.ok(action.indexOf("join_network_as_member") < action.indexOf("markOnboardingComplete(client"));
-  // Nur Connect legt keine profiles-Zeile an
-  assert.match(action, /if \(needsFounderRole\(payload\.areas\)\)/);
-  // Rolle immer nur founder, nie advisor
-  assert.match(action, /roles: \["founder"\]/);
-  assert.doesNotMatch(action, /advisor/);
+  // Nur Connect legt keine profiles-Zeile an (rolesFor ist dann leer)
+  // Die Rollen kommen aus dem Modell, nie aus dem Browser
+  assert.match(action, /const roles = rolesFor\(payload\.areas\)/);
+  assert.match(action, /if \(roles\.length > 0\)/);
+  assert.doesNotMatch(action, /formData\.get\("roles"\)/);
 });
 
 test("die Reise gibt dieselbe Pforte wie der Einstieg und speichert nichts auf dem Weg", () => {

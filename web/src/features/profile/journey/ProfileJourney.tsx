@@ -10,6 +10,7 @@ import {
   JOURNEY_FOCI,
   JOURNEY_REMOTE_MODES,
   nextPathFor,
+  startAreaFor,
   type JourneyAlignPlan,
   type JourneyArea,
   type JourneyFocus,
@@ -62,15 +63,20 @@ function FinishButton({ label, pendingLabel }: { label: string; pendingLabel: st
  */
 export function ProfileJourney({
   initialName,
+  initialAreas = [],
   next,
   error,
 }: {
   initialName: string;
+  /** Vorbelegt nur, wenn ein Magic Link ausdruecklich eine Rolle mitbringt. */
+  initialAreas?: JourneyArea[];
   next: string;
   error: string | null;
 }) {
   const t = useTranslations("profile.journey");
-  const [areas, setAreas] = useState<JourneyArea[]>([]);
+  const [areas, setAreas] = useState<JourneyArea[]>(initialAreas);
+  const [start, setStart] = useState<JourneyArea | "">("");
+  const [infoOpen, setInfoOpen] = useState<JourneyArea | null>(null);
   const [name, setName] = useState(initialName);
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
@@ -98,8 +104,9 @@ export function ProfileJourney({
     return out;
   }, [foci, subs, t]);
 
-  const payload = JSON.stringify({ areas, name, headline, bio, foci, expertise, where, alignPlan });
-  const nextPath = nextPathFor({ areas, alignPlan });
+  const effectiveStart = startAreaFor(areas, start);
+  const payload = JSON.stringify({ areas, name, headline, bio, foci, expertise, where, alignPlan, start: effectiveStart });
+  const nextPath = nextPathFor({ areas, alignPlan, start: effectiveStart });
   const canNext = step === "areas" ? areas.length > 0 : step === "name" ? name.trim().length > 0 : true;
   const isDone = step === "done";
 
@@ -148,7 +155,9 @@ export function ProfileJourney({
         ? t("done.nextFind")
         : nextPath === "/connect/profile"
           ? t("done.nextConnect")
-          : t("done.nextAlign");
+          : nextPath === "/advisor/dashboard"
+            ? t("done.nextAdvise")
+            : t("done.nextAlign");
 
   return (
     <form action={completeJourneyAction} onKeyDown={onKeyDown} className="mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,.3)]">
@@ -182,11 +191,30 @@ export function ProfileJourney({
               <div className="grid gap-2.5">
                 {JOURNEY_AREAS.map((area) => {
                   const on = areas.includes(area);
+                  const open = infoOpen === area;
                   return (
-                    <button key={area} type="button" aria-pressed={on} onClick={() => toggleArea(area)} className={`flex min-h-16 items-center justify-between gap-3 rounded-2xl border-[1.5px] p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${on ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
-                      <span><strong className="block text-base text-slate-950">{t(`areas.${area}.name`)}</strong><span className="mt-0.5 block text-sm leading-5 text-slate-600">{t(`areas.${area}.text`)}</span></span>
-                      <Check on={on} />
-                    </button>
+                    <div key={area} className={`overflow-hidden rounded-2xl border-[1.5px] transition ${on ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white"}`}>
+                      <button type="button" aria-pressed={on} onClick={() => toggleArea(area)} className="flex min-h-16 w-full items-center justify-between gap-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">
+                        <span><strong className="block text-base text-slate-950">{t(`areas.${area}.name`)}</strong><span className="mt-0.5 block text-sm leading-5 text-slate-600">{t(`areas.${area}.text`)}</span></span>
+                        <Check on={on} />
+                      </button>
+                      {/* Was passiert, wenn ich das waehle? Eine Karte offen, die anderen zu. */}
+                      <button type="button" aria-expanded={open} onClick={() => setInfoOpen(open ? null : area)} className="ml-4 inline-flex min-h-9 items-center gap-1 pb-1 text-xs font-bold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">
+                        {open ? t("areas.less") : t("areas.more")} <span aria-hidden="true">{open ? "\u25B4" : "\u25BE"}</span>
+                      </button>
+                      <div className={`grid transition-[grid-template-rows] duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                        <div className="min-h-0 overflow-hidden">
+                          <dl className="grid gap-3 px-4 pb-4 text-sm leading-6">
+                            {(["what", "ask", "lands", "visible"] as const).map((row) => (
+                              <div key={row}>
+                                <dt className="text-[11px] font-bold uppercase tracking-[.08em] text-slate-500">{t(`areas.infoLabels.${row}`)}</dt>
+                                <dd className="text-slate-800">{t(`areas.info.${area}.${row}`)}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                        </div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -301,6 +329,23 @@ export function ProfileJourney({
           {step === "done" ? (
             <>
               <p className="text-base leading-7 text-slate-700">{t("done.text")}</p>
+              {areas.length > 1 ? (
+                <div className="grid gap-2">
+                  <p className="text-sm font-bold text-slate-900">{t("done.startQ")}</p>
+                  <div className="grid gap-2">
+                    {JOURNEY_AREAS.filter((area) => areas.includes(area)).map((area) => {
+                      const on = effectiveStart === area;
+                      return (
+                        <button key={area} type="button" aria-pressed={on} onClick={() => setStart(area)} className={`flex min-h-12 items-center justify-between gap-3 rounded-2xl border-[1.5px] px-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${on ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
+                          <strong className="text-base text-slate-950">{t(`areas.${area}.name`)}</strong>
+                          <Check on={on} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-sm text-slate-500">{t("done.startHint")}</p>
+                </div>
+              ) : null}
               <div className="rounded-2xl bg-slate-100 p-4"><span className="text-[11px] font-bold uppercase tracking-[.08em] text-slate-500">{t("done.next")}</span><p className="mt-1 text-base font-semibold text-slate-950">{nextLabel}</p></div>
             </>
           ) : null}

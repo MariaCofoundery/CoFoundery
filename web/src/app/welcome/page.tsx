@@ -64,9 +64,12 @@ export default async function WelcomePage({
   // Die Kartenreise ist ein Zusatzweg, solange `PROFILE_JOURNEY` nicht gesetzt ist.
   // Wer ausdruecklich den bisherigen Einstieg will (`classic=1`, etwa als Advisor),
   // bekommt ihn auch dann. Ein Advisor-Link aus dem Magic Link (`intent=advisor`)
-  // bleibt ebenfalls im bisherigen Einstieg: Die Reise kennt diese Rolle nicht.
-  if (isProfileJourneyEnabled() && params.classic !== "1" && params.intent !== "advisor") {
-    redirect(`/welcome/reise${nextPath === "/dashboard" ? "" : `?next=${encodeURIComponent(nextPath)}`}`);
+  // geht mit und belegt in der Reise "Advisor" vor.
+  if (isProfileJourneyEnabled() && params.classic !== "1") {
+    const query = new URLSearchParams();
+    if (nextPath !== "/dashboard") query.set("next", nextPath);
+    if (params.intent === "advisor") query.set("intent", "advisor");
+    redirect(`/welcome/reise${query.size > 0 ? `?${query.toString()}` : ""}`);
   }
 
   const fallbackAvatarUrl = profile?.avatar_url?.trim() || null;

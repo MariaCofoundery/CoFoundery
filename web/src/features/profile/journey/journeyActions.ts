@@ -9,9 +9,9 @@ import {
   focusSkillFor,
   intentionFor,
   interestsFor,
-  needsFounderRole,
   nextPathFor,
   parseJourneyPayload,
+  rolesFor,
 } from "@/features/profile/journey/journeyModel";
 import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
 import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/profileData";
@@ -23,7 +23,8 @@ const BACK = "/welcome/reise";
  * Der Abschluss der Kartenreise.
  *
  * DERSELBE ENDZUSTAND WIE DER BISHERIGE EINSTIEG, nur ueber andere Fragen:
- *   - Align oder Find: `profiles` mit Rolle founder, Schwerpunkt und Absicht
+ *   - Align oder Find: `profiles` mit Rolle founder, Advisor mit Rolle advisor
+ *     (beides zusammen geht), dazu Schwerpunkt und Absicht
  *     (`upsertProfileBasicsAction`).
  *   - Nur Connect: KEINE profiles-Zeile. `profiles.roles` traegt
  *     `default '{founder}'`; eine Zeile anzulegen, um "keine Rolle"
@@ -53,14 +54,17 @@ export async function completeJourneyAction(formData: FormData) {
   if (!payload || payload.areas.length === 0) redirect(`${BACK}?error=areas`);
   if (payload.name.length < 1) redirect(`${BACK}?error=name`);
 
-  if (needsFounderRole(payload.areas)) {
+  // Rollen: Align oder Find machen zur Founderin, Advisor zum Advisor, beides geht.
+  // Nur Connect: keine Rolle, also keine profiles-Zeile.
+  const roles = rolesFor(payload.areas);
+  if (roles.length > 0) {
     const existing = await getProfileBasicsRow(client, user.id).catch(() => null);
     const { error } = await upsertProfileBasicsRow(client, {
       user_id: user.id,
       display_name: payload.name,
       focus_skill: focusSkillFor(payload.foci),
-      intention: intentionFor(payload.areas),
-      roles: ["founder"],
+      intention: intentionFor(payload.areas, payload.start),
+      roles,
       avatar_id: existing?.avatar_id ?? null,
       avatar_url: existing?.avatar_url ?? null,
       headline: existing?.headline ?? null,

@@ -15,7 +15,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 export default async function WelcomeJourneyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string; error?: string; intent?: string }>;
 }) {
   const params = await searchParams;
   const next = normalizeNextPath(params.next);
@@ -43,6 +43,8 @@ export default async function WelcomeJourneyPage({
         </div>
         <ProfileJourney
           initialName={profile?.display_name ?? core?.display_name ?? ""}
+          // Nur ein ausdruecklicher Advisor-Link belegt vor; sonst waehlt die Person selbst.
+          initialAreas={params.intent === "advisor" ? ["advise"] : []}
           next={next}
           error={params.error ?? null}
         />

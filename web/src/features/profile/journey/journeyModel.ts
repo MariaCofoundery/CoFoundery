@@ -9,7 +9,7 @@ import { intentionForOnboarding, parseInterests, type InterestArea } from "@/fea
  * steht, wie aus den Antworten diese Werte werden.
  */
 
-export const JOURNEY_AREAS = ["align", "find", "connect"] as const;
+export const JOURNEY_AREAS = ["align", "find", "connect", "advise"] as const;
 export type JourneyArea = (typeof JOURNEY_AREAS)[number];
 
 export const JOURNEY_FOCI = [
@@ -43,6 +43,8 @@ export type JourneyPayload = {
   expertise: string[];
   where: JourneyRemoteMode | "";
   alignPlan: JourneyAlignPlan;
+  /** Womit angefangen wird. Nur ein gewaehlter Bereich zaehlt; sonst der erste. */
+  start: JourneyArea | "";
 };
 
 function pickFrom<T extends string>(values: unknown, allowed: readonly T[]): T[] {
@@ -96,12 +98,22 @@ export function parseJourneyPayload(raw: unknown): JourneyPayload | null {
     expertise,
     where,
     alignPlan,
+    start: areas.includes(input.start as JourneyArea) ? (input.start as JourneyArea) : "",
   };
 }
 
 /** Align oder Find machen aus einem Konto ein Founder-Konto. Nur Connect nicht - dort gibt es bewusst keine Rolle. */
 export function needsFounderRole(areas: readonly JourneyArea[]) {
   return areas.includes("align") || areas.includes("find");
+}
+
+export function needsAdvisorRole(areas: readonly JourneyArea[]) {
+  return areas.includes("advise");
+}
+
+/** Die Rollen fuer `profiles.roles`. Leer heisst: keine profiles-Zeile anlegen (nur Connect). */
+export function rolesFor(areas: readonly JourneyArea[]): ("founder" | "advisor")[] {
+  return [...(needsFounderRole(areas) ? (["founder"] as const) : []), ...(needsAdvisorRole(areas) ? (["advisor"] as const) : [])];
 }
 
 /** Wie der bisherige Einstieg den Schwerpunkt ausdrueckt (Freitext, nicht leer). */
@@ -121,32 +133,42 @@ export function focusSkillFor(foci: readonly JourneyFocus[]) {
   return foci.length > 0 ? FOCUS_SKILL[foci[0]] : "Allrounder";
 }
 
-/** Womit angefangen wird: der erste gewaehlte Bereich in fester Reihenfolge. */
-export function startAreaFor(areas: readonly JourneyArea[]): JourneyArea | "" {
+/** Womit angefangen wird: die ausdrueckliche Wahl, sonst der erste gewaehlte Bereich in fester Reihenfolge. */
+export function startAreaFor(areas: readonly JourneyArea[], start: JourneyArea | "" = ""): JourneyArea | "" {
+  if (start && areas.includes(start)) return start;
   return JOURNEY_AREAS.find((area) => areas.includes(area)) ?? "";
 }
 
-export function intentionFor(areas: readonly JourneyArea[]) {
-  return intentionForOnboarding("founder", startAreaFor(areas));
+/** Die Absicht wie im bisherigen Einstieg: Begleiten, wenn der Advisor-Bereich der Anfang ist, sonst Suche oder Selbsttest. */
+export function intentionFor(areas: readonly JourneyArea[], start: JourneyArea | "" = "") {
+  const first = startAreaFor(areas, start);
+  if (first === "advise" || (needsAdvisorRole(areas) && !needsFounderRole(areas))) return "Begleiten" as const;
+  return intentionForOnboarding("founder", first === "find" ? "find" : first);
 }
 
 export function interestsFor(areas: readonly JourneyArea[]): InterestArea[] {
   return parseInterests(areas);
 }
 
+function pathFor(area: JourneyArea, alignPlan: JourneyAlignPlan): string | null {
+  if (area === "align") return alignPlan === "later" ? null : CURRENT_WORKSTYLE_HREF;
+  if (area === "find") return "/discovery/profile";
+  if (area === "connect") return "/connect/profile";
+  return "/advisor/dashboard";
+}
+
 /**
- * Wohin der Abschluss fuehrt: in den ersten Bereich, der jetzt etwas zu tun
- * hat. Wer bei Align "erst die normalen Profildaten" gewaehlt hat, wird nicht
- * in den Fragebogen geschickt.
+ * Wohin der Abschluss fuehrt: in den gewaehlten Anfang, sonst in den ersten
+ * Bereich, der jetzt etwas zu tun hat. Wer bei Align "erst die normalen
+ * Profildaten" gewaehlt hat, wird nicht in den Fragebogen geschickt.
  */
-export function nextPathFor(payload: Pick<JourneyPayload, "areas" | "alignPlan">): string {
-  for (const area of JOURNEY_AREAS) {
+export function nextPathFor(payload: Pick<JourneyPayload, "areas" | "alignPlan"> & { start?: JourneyArea | "" }): string {
+  const first = startAreaFor(payload.areas, payload.start ?? "");
+  const order = first ? [first, ...JOURNEY_AREAS.filter((area) => area !== first)] : [...JOURNEY_AREAS];
+  for (const area of order) {
     if (!payload.areas.includes(area)) continue;
-    if (area === "align") {
-      if (payload.alignPlan === "later") continue;
-      return CURRENT_WORKSTYLE_HREF;
-    }
-    return area === "find" ? "/discovery/profile" : "/connect/profile";
+    const path = pathFor(area, payload.alignPlan);
+    if (path) return path;
   }
   return "/dashboard";
 }
