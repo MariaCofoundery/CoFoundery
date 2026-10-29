@@ -958,5 +958,52 @@
     "searches": "Gespeicherte Suchen",
     "saved": "Gemerkte",
     "yourSearch": "Deine Suche"
-  }
+  },
+  "roleHelp": {
+    "tech": {
+      "text": "Es bauen und am Laufen halten.",
+      "parts": "Software-Entwicklung | Technische Architektur | Data & Analytics | AI & Machine Learning | Hardware & Produktion | Security"
+    },
+    "product": {
+      "text": "Herausfinden, was gebaut werden soll, und dafür sorgen, dass es Menschen wirklich hilft.",
+      "parts": "Product Discovery | Product Management | Strategie & Roadmap | UX & Interface Design | Prototyping"
+    },
+    "sales": {
+      "text": "Kundschaft gewinnen und Abschlüsse machen.",
+      "parts": "B2B Sales | B2C Wachstum & Akquise | Partnerschaften & Business Development | Customer Success"
+    },
+    "growth": {
+      "text": "Wachstum antreiben, vor allem über Zahlen, Kanäle und Tests.",
+      "parts": "Performance Marketing | B2C Wachstum & Akquise | Partnerschaften & Business Development | Data & Analytics"
+    },
+    "marketing": {
+      "text": "Bekannt werden und Nachfrage erzeugen.",
+      "parts": "Marketing & Brand | Performance Marketing | Community | Positionierung"
+    },
+    "operations": {
+      "text": "Dafür sorgen, dass der Laden läuft und das Team funktioniert.",
+      "parts": "Operations | Prozesse & Tooling | Recruiting & Hiring | Führung & People Management | Organisationsaufbau"
+    },
+    "finance": {
+      "text": "Zahlen, Planung und Geld von außen.",
+      "parts": "Finanzplanung & Forecast | Unit Economics | Buchhaltung & Controlling | Fundraising | Investor Relations"
+    },
+    "design": {
+      "text": "Wie es aussieht, sich anfühlt und bedient wird.",
+      "parts": "UX & Interface Design | Prototyping | Marke & Auftritt"
+    },
+    "strategy": {
+      "text": "Wie das Unternehmen Geld verdient und wohin es will.",
+      "parts": "Geschäftsmodell | Pricing & Monetarisierung | Strategische Planung"
+    },
+    "research": {
+      "text": "Verstehen, was Menschen und Markt brauchen, bevor man baut.",
+      "parts": "Kundeninterviews | User Research | Markt- & Wettbewerbsanalyse | Zielgruppen & Segmentierung | Branchen- & Domänenwissen"
+    },
+    "community": {
+      "text": "Menschen um ein Thema sammeln und zusammenhalten.",
+      "parts": "Community | Netzwerk aufbauen & halten | Moderation & Gespräche führen"
+    }
+  },
+  "roleHelpOpen": "Was gehört dazu?"
 }

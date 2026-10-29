@@ -111,6 +111,15 @@ function discoveryRoleLabel(t: DiscoveryT, value: DiscoveryFounderRole) {
   return t(`roles.${value}`);
 }
 
+/** Erklaerung und Unterbereiche eines Schwerpunkts. "Anderer Schwerpunkt" hat keine: Dort steht das freie Feld. */
+function discoveryRoleHelp(t: DiscoveryT, value: DiscoveryFounderRole) {
+  if (value === "other") return {};
+  return {
+    help: t(`roleHelp.${value}.text`),
+    parts: t(`roleHelp.${value}.parts`).split(" | "),
+  };
+}
+
 function formatRoleList(
   values: DiscoveryFounderRole[] | undefined,
   other: string | null | undefined,
@@ -515,6 +524,7 @@ export default async function DiscoveryProfilePage({
                       options={DISCOVERY_ROLE_OPTIONS.map((option) => ({
                         value: option.value,
                         label: discoveryRoleLabel(t, option.value),
+                        ...discoveryRoleHelp(t, option.value),
                       }))}
                       initialSelected={profile.ownRoles ?? []}
                       initialOther={profile.ownRoleOther ?? null}
@@ -525,6 +535,7 @@ export default async function DiscoveryProfilePage({
                         otherPlaceholder: t("profile.publicProfile.ownRoleOtherPlaceholder"),
                         otherHint: t("profile.publicProfile.ownRoleOtherHint"),
                         counterByCount: countLabels(t, DISCOVERY_SELECTION_LIMITS.ownRoles),
+                        whatBelongs: t("roleHelpOpen"),
                       }}
                     />
                   </div>
@@ -750,6 +761,7 @@ export default async function DiscoveryProfilePage({
                       otherPlaceholder: t("profile.publicProfile.seekingRoleOtherPlaceholder"),
                       otherHint: t("profile.publicProfile.seekingRoleOtherHint"),
                       counterByCount: countLabels(t, DISCOVERY_SELECTION_LIMITS.seekingRoles),
+                      whatBelongs: t("roleHelpOpen"),
                     }}
                   />
                 </div>
@@ -965,11 +977,11 @@ export default async function DiscoveryProfilePage({
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 <li>
                   {t(core?.photo_visible_to_members ? "profile.visibility.photoOn" : "profile.visibility.photoOff")}{" "}
-                  <Link href="/profile" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
+                  <Link href="/profile?step=identity" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
                 </li>
                 <li>
                   {t(`profile.visibility.capability.${["areas", "areas_depth_on_contact"].includes(capabilityDisclosure) ? capabilityDisclosure : "private"}`)}{" "}
-                  <Link href="/profile" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
+                  <Link href="/profile?step=sichtbarkeit" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
                 </li>
                 <li>
                   {t(workstyleShared ? "profile.visibility.workstyleOn" : "profile.visibility.workstyleOff")}{" "}

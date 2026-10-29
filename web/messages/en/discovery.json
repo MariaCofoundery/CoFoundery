@@ -958,5 +958,52 @@
     "searches": "Saved searches",
     "saved": "Saved",
     "yourSearch": "Your search"
-  }
+  },
+  "roleHelp": {
+    "tech": {
+      "text": "Building it and keeping it running.",
+      "parts": "Software development | Technical architecture | Data & analytics | AI & machine learning | Hardware & production | Security"
+    },
+    "product": {
+      "text": "Figuring out what to build and making sure it really helps people.",
+      "parts": "Product discovery | Product management | Strategy & roadmap | UX & interface design | Prototyping"
+    },
+    "sales": {
+      "text": "Winning customers and closing deals.",
+      "parts": "B2B sales | B2C growth & acquisition | Partnerships & business development | Customer success"
+    },
+    "growth": {
+      "text": "Driving growth, mostly through numbers, channels and tests.",
+      "parts": "Performance marketing | B2C growth & acquisition | Partnerships & business development | Data & analytics"
+    },
+    "marketing": {
+      "text": "Getting known and creating demand.",
+      "parts": "Marketing & brand | Performance marketing | Community | Positioning"
+    },
+    "operations": {
+      "text": "Making sure the company runs and the team works.",
+      "parts": "Operations | Processes & tooling | Recruiting & hiring | Leadership & people management | Building the organization"
+    },
+    "finance": {
+      "text": "Numbers, planning and outside money.",
+      "parts": "Financial planning & forecast | Unit economics | Accounting & controlling | Fundraising | Investor relations"
+    },
+    "design": {
+      "text": "How it looks, feels and is used.",
+      "parts": "UX & interface design | Prototyping | Brand & visual identity"
+    },
+    "strategy": {
+      "text": "How the company makes money and where it is headed.",
+      "parts": "Business model | Pricing & monetization | Strategic planning"
+    },
+    "research": {
+      "text": "Understanding what people and the market need before building.",
+      "parts": "Customer interviews | User research | Market & competitor analysis | Target groups & segmentation | Industry & domain knowledge"
+    },
+    "community": {
+      "text": "Gathering people around a topic and keeping them together.",
+      "parts": "Community | Building and keeping a network | Moderating & leading conversations"
+    }
+  },
+  "roleHelpOpen": "What does it include?"
 }

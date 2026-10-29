@@ -17,6 +17,8 @@ type Copy = {
    * "a server-side exception has occurred". Genau das ist hier passiert.
    */
   counterByCount: string[];
+  /** Beschriftung des Aufklappers unter einer Rolle ("Was gehoert dazu?"). */
+  whatBelongs: string;
 };
 
 /**
@@ -45,7 +47,8 @@ export function DiscoveryRoleField({
 }: {
   name: string;
   otherName: string;
-  options: { value: DiscoveryFounderRole; label: string }[];
+  /** `help` und `parts` sind reine Erklaerung: Sie werden nicht gespeichert. */
+  options: { value: DiscoveryFounderRole; label: string; help?: string; parts?: string[] }[];
   initialSelected: DiscoveryFounderRole[];
   initialOther: string | null;
   max: number;
@@ -53,6 +56,8 @@ export function DiscoveryRoleField({
 }) {
   const [selected, setSelected] = useState<DiscoveryFounderRole[]>(initialSelected);
   const atLimit = selected.length >= max;
+  // Immer nur eine Erklaerung offen: Wer die naechste aufklappt, schliesst die vorige.
+  const [openOne, setOpenOne] = useState<DiscoveryFounderRole | null>(null);
 
   function toggle(value: DiscoveryFounderRole) {
     setSelected((current) =>
@@ -110,6 +115,33 @@ export function DiscoveryRoleField({
                 />
                 <span>{option.label}</span>
               </label>
+
+              {/* Erklaerung und Unterbereiche - nur zum Lesen, nichts davon wird
+                  gespeichert. "Product" oder "Growth" sagen nicht jedem etwas. */}
+              {option.help ? (
+                <div className="px-3 pb-2">
+                  <p className="pl-7 text-xs leading-5 text-slate-500">{option.help}</p>
+                  {option.parts && option.parts.length > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        aria-expanded={openOne === option.value}
+                        onClick={() => setOpenOne((current) => (current === option.value ? null : option.value))}
+                        className="ml-7 mt-1 inline-flex min-h-9 items-center text-xs font-semibold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+                      >
+                        {copy.whatBelongs} {openOne === option.value ? "\u25B4" : "\u25BE"}
+                      </button>
+                      {openOne === option.value ? (
+                        <ul className="mt-1 flex flex-wrap gap-1.5 pl-7">
+                          {option.parts.map((part) => (
+                            <li key={part} className="rounded-lg bg-slate-100 px-2 py-1 text-xs text-slate-700">{part}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
 
               {/* Das Feld gehoert in dieselbe Karte, unter das Ankreuzfeld,
                   das es hervorgerufen hat. Darunter im Freien war nicht zu

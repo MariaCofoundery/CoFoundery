@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
-import { getIdentityGaps, type IdentityReturnPath } from "@/features/profile/identityReadiness";
+import { getIdentityGaps, IDENTITY_THRESHOLDS, type IdentityReturnPath } from "@/features/profile/identityReadiness";
 import type { PersonCore } from "@/features/profile/personCoreData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getPhotoUsage } from "@/features/profile/photoUsageData";
@@ -43,6 +43,7 @@ export async function IdentityInlineCard({
   const photoUsage = await getPhotoUsage(client, userId, core?.photo_visible_to_members ?? false);
   const saved = (["identity", "photo_usage", "photo", "photo_removed"] as const).find((key) => key === params.saved) ?? null;
   const error = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
+  const gaps = getIdentityGaps(core);
   const summary = (c: PersonCore | null) => [c?.headline, c?.location_region].filter(Boolean).join(" · ");
 
   return (
@@ -53,7 +54,15 @@ export async function IdentityInlineCard({
       {error ? <p role="alert" className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(`errors.${error}`)}</p> : null}
       <p className="mt-3 text-base font-semibold text-slate-950">{core?.display_name || t("identity.inline.empty")}</p>
       {summary(core) ? <p className="text-sm text-slate-600">{summary(core)}</p> : null}
-      <details className="group mt-3" open={Boolean(error)}>
+      {/* Fehlt etwas zum Veroeffentlichen, steht es hier - nicht erst im
+          zugeklappten Formular. Die Karte ist dann auch gleich offen. */}
+      {gaps.length > 0 ? (
+        <p role="status" className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm leading-6 text-amber-900">
+          {t("identity.publishTitle")}{" "}
+          {gaps.map((gap) => t(`identity.gaps.${gap}`, { min: IDENTITY_THRESHOLDS[gap] })).join(" · ")}
+        </p>
+      ) : null}
+      <details className="group mt-3" open={Boolean(error) || gaps.length > 0}>
         <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-semibold text-violet-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 [&::-webkit-details-marker]:hidden">
           {t("identity.inline.edit")}
         </summary>
@@ -63,7 +72,7 @@ export async function IdentityInlineCard({
             currentRoles={normalizeProfileRoles(basics?.roles)}
             returnPath={returnPath}
             inline
-            identityGaps={getIdentityGaps(core)}
+            identityGaps={gaps}
             showGaps
             connectActive={false}
             avatarId={basics?.avatar_id ?? null}
