@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { readCvFile } from "@/features/profile/cvFileText";
 import {
   CV_MAX_EXPERTISE,
   CV_MAX_INDUSTRIES,
@@ -40,6 +41,10 @@ type Copy = {
    */
   chosenCount: string;
   fileUnsupported: string;
+  fileTooBig: string;
+  fileNoText: string;
+  fileUnreadable: string;
+  fileReading: string;
 };
 
 /**
@@ -78,7 +83,8 @@ export function CvImportField({
   const [analysis, setAnalysis] = useState<CvAnalysis | null>(null);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [applied, setApplied] = useState(false);
-  const [fileError, setFileError] = useState(false);
+  const [fileError, setFileError] = useState<"unsupported" | "tooBig" | "noText" | "unreadable" | null>(null);
+  const [reading, setReading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const label = (kind: "expertise" | "industries", key: string) =>
@@ -105,17 +111,23 @@ export function CvImportField({
   };
 
   const readFile = async (file: File) => {
-    setFileError(false);
-    // Nur Text. PDF und Word im Browser zu zerlegen hiesse eine grosse
-    // Fremdbibliothek zu laden - fuer eine Bequemlichkeit, die ein
-    // Kopieren-und-Einfuegen auch loest.
-    if (!/\.(txt|md|markdown)$/i.test(file.name) && !file.type.startsWith("text/")) {
-      setFileError(true);
-      if (fileInput.current) fileInput.current.value = "";
+    setFileError(null);
+    setReading(true);
+    // PDF, Word und Text - alles hier im Browser. Die Bibliotheken fuer PDF und
+    // Word laedt `readCvFile` erst jetzt nach.
+    const result = await readCvFile(file);
+    setReading(false);
+    if (fileInput.current) fileInput.current.value = "";
+    if (!result.ok) {
+      setFileError(result.reason);
       return;
     }
-    setText(await file.text());
-    if (fileInput.current) fileInput.current.value = "";
+    setText(result.text);
+    // Gleich auswerten: Wer eine Datei waehlt, will das Ergebnis sehen, nicht
+    // noch einmal klicken. Angehakt wird trotzdem nichts.
+    setAnalysis(analyzeCv(result.text));
+    setChosen(new Set());
+    setApplied(false);
   };
 
   /** Traegt die angehakten Vorschlaege in die beiden Profilfelder ein. */
@@ -204,7 +216,7 @@ export function CvImportField({
             <input
               ref={fileInput}
               type="file"
-              accept=".txt,.md,text/plain,text/markdown"
+              accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
               className="sr-only"
               onChange={(event) => {
                 const file = event.target.files?.[0];
@@ -229,9 +241,22 @@ export function CvImportField({
         </div>
       </div>
 
+      {reading ? (
+        <p role="status" className="mt-3 text-sm leading-6 text-slate-600">
+          {copy.fileReading}
+        </p>
+      ) : null}
+
       {fileError ? (
         <p role="alert" className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-          {copy.fileUnsupported}
+          {
+            {
+              unsupported: copy.fileUnsupported,
+              tooBig: copy.fileTooBig,
+              noText: copy.fileNoText,
+              unreadable: copy.fileUnreadable,
+            }[fileError]
+          }
         </p>
       ) : null}
 

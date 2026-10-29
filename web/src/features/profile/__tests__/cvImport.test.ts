@@ -188,13 +188,8 @@ test("der Beta-Stand steht dran, bevor man aufklappt", () => {
     assert.ok(cv.betaBadge, `${locale}: das Abzeichen fehlt`);
     assert.match(
       cv.betaNote,
-      locale === "de" ? /Kopieren und Einfügen/ : /copy and paste/,
+      locale === "de" ? /PDF, Word/ : /PDF, Word/,
       `${locale}: der Hinweis sagt nicht, was heute geht`
-    );
-    assert.match(
-      cv.betaNote,
-      locale === "de" ? /demnächst/ : /coming soon/,
-      `${locale}: der Hinweis sagt nicht, dass es weitergeht`
     );
   }
 });

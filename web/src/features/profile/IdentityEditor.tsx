@@ -230,6 +230,10 @@ export async function IdentityEditor({
               clear: t("identity.cv.clear"),
               chosenCount: t("identity.cv.chosenCount"),
               fileUnsupported: t("identity.cv.fileUnsupported"),
+              fileTooBig: t("identity.cv.fileTooBig"),
+              fileNoText: t("identity.cv.fileNoText"),
+              fileUnreadable: t("identity.cv.fileUnreadable"),
+              fileReading: t("identity.cv.fileReading"),
             }}
           />
           </fieldset>

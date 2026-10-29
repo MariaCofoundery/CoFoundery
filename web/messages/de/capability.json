@@ -61,12 +61,12 @@
     "cv": {
       "title": "Lebenslauf einlesen (optional)",
       "betaBadge": "Beta",
-      "betaNote": "Noch Beta: Einlesen geht im Moment nur per Kopieren und Einfügen – willkommen zurück in den 2000ern 😉 Dateien direkt zu lesen bauen wir demnächst ein.",
-      "text": "Füge deinen Lebenslauf als Text ein. Das Tool markiert, welche Kenntnisse und Branchen es darin wiedererkennt – du entscheidest, was davon ins Profil wandert.",
-      "privacyNote": "Dein Lebenslauf bleibt in deinem Browser. Er wird nicht hochgeladen, nicht an eine KI geschickt und nirgends gespeichert. Wenn du die Seite verlässt, ist er weg.",
+      "betaNote": "Noch Beta: Du kannst PDF, Word (.docx) oder Text einlesen oder den Text einfügen. Erkannt wird nur, was in unserer Wortliste steht – nichts davon ersetzt, dass du dein Profil selbst prüfst.",
+      "text": "Lade deinen Lebenslauf als PDF, Word-Datei oder Text hoch oder füge ihn ein. Das Tool markiert, welche Kenntnisse und Branchen es darin wiedererkennt – du entscheidest, was davon ins Profil wandert.",
+      "privacyNote": "Dein Lebenslauf bleibt in deinem Browser. Die Datei wird hier auf deinem Gerät gelesen, nicht hochgeladen, nicht an eine KI geschickt und nirgends gespeichert. Wenn du die Seite verlässt, ist er weg.",
       "textareaLabel": "Text deines Lebenslaufs",
-      "placeholder": "Hier einfügen – Strg+A, Strg+C in deinem PDF, dann Strg+V hier.",
-      "fileLabel": "Textdatei auswählen",
+      "placeholder": "Hier einfügen – oder oben eine Datei auswählen.",
+      "fileLabel": "Datei auswählen (PDF, Word, Text)",
       "analyze": "Text auswerten",
       "tooShort": "Das ist noch zu wenig Text, um etwas Sinnvolles zu finden. Füge ruhig den ganzen Lebenslauf ein.",
       "nothingFound": "Hier konnten wir nichts wiedererkennen.",
@@ -78,7 +78,11 @@
       "applied": "Übernommen – schau dir die Felder oben an und speichere dann.",
       "clear": "Text löschen",
       "chosenCount": "ausgewählt",
-      "fileUnsupported": "Diese Datei können wir nicht lesen. Es geht nur reiner Text (.txt oder .md) – bei einem PDF oder Word-Dokument kopierst du den Inhalt am besten direkt ins Feld."
+      "fileTooBig": "Die Datei ist größer als 10 MB – für einen Lebenslauf ist das ungewöhnlich viel. Speichere ihn ohne große Bilder neu oder füge den Text ein.",
+      "fileNoText": "In dieser Datei steckt kein lesbarer Text, vermutlich ist es ein Scan oder ein Foto. Dann füge den Text bitte direkt ein oder trag deine Kenntnisse oben selbst ein.",
+      "fileUnreadable": "Diese Datei ließ sich nicht öffnen. Vielleicht ist sie beschädigt oder mit einem Passwort geschützt. Du kannst den Text auch direkt einfügen.",
+      "fileReading": "Datei wird gelesen …",
+      "fileUnsupported": "Diese Datei können wir nicht lesen. Es gehen PDF, Word (.docx) und Text (.txt oder .md). Ein altes Word-Dokument (.doc) speicherst du dafür neu als .docx oder PDF."
     },
     "photo": {
       "title": "Dein Foto",

@@ -31,9 +31,11 @@
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.95.3",
+    "fflate": "0.8.2",
     "framer-motion": "^12.34.0",
     "next": "15.5.20",
     "next-intl": "^3.26.5",
+    "pdfjs-dist": "4.10.38",
     "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "react": "19.2.7",

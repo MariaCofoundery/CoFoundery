@@ -61,12 +61,12 @@
     "cv": {
       "title": "Import from your CV (optional)",
       "betaBadge": "Beta",
-      "betaNote": "Still in beta: for now this only works with copy and paste – welcome back to the 2000s 😉 Reading files directly is coming soon.",
-      "text": "Paste your CV as text. The tool marks which skills and industries it recognizes – you decide what goes into your profile.",
-      "privacyNote": "Your CV stays in your browser. It is not uploaded, not sent to an AI, and not stored anywhere. Once you leave the page it's gone.",
+      "betaNote": "Still beta: you can read in a PDF, Word (.docx) or text file, or paste the text. Only what is in our word list is recognized – you still review your profile yourself.",
+      "text": "Upload your CV as a PDF, Word file or text, or paste it. The tool marks which skills and industries it recognizes in it – you decide what goes into your profile.",
+      "privacyNote": "Your CV stays in your browser. The file is read here on your device, not uploaded, not sent to an AI and not stored anywhere. When you leave the page, it is gone.",
       "textareaLabel": "Text of your CV",
-      "placeholder": "Paste it here – Ctrl+A, Ctrl+C in your PDF, then Ctrl+V here.",
-      "fileLabel": "Choose a text file",
+      "placeholder": "Paste here – or choose a file above.",
+      "fileLabel": "Choose a file (PDF, Word, text)",
       "analyze": "Analyze text",
       "tooShort": "That's not enough text to find anything useful yet. Go ahead and paste your whole CV.",
       "nothingFound": "We couldn't recognize anything here.",
@@ -78,7 +78,11 @@
       "applied": "Added – check the fields above, then save.",
       "clear": "Clear text",
       "chosenCount": "selected",
-      "fileUnsupported": "We can't read that file. Only plain text works (.txt or .md) – for a PDF or Word document, it's best to copy the contents straight into the field."
+      "fileTooBig": "The file is larger than 10 MB, which is unusual for a CV. Save it again without large images or paste the text.",
+      "fileNoText": "There is no readable text in this file, probably it is a scan or a photo. Please paste the text directly or enter your skills above yourself.",
+      "fileUnreadable": "That file could not be opened. It may be damaged or password-protected. You can also paste the text directly.",
+      "fileReading": "Reading the file …",
+      "fileUnsupported": "We can't read that file. PDF, Word (.docx) and text (.txt or .md) work. Save an old Word document (.doc) again as .docx or PDF."
     },
     "photo": {
       "title": "Your photo",
