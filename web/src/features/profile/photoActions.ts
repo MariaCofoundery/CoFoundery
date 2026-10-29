@@ -9,6 +9,7 @@ import {
   uploadAvatarToStorage,
 } from "@/features/profile/avatarStorage";
 import { syncConnectBasePhoto } from "@/features/connect/connectBasePhoto";
+import { parseIdentityReturnPath } from "@/features/profile/identityReadiness";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -56,11 +57,17 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const ZURUECK = "/profile?step=identity";
 
-function zurueck(query: string): never {
+/**
+ * Wohin es nach dem Speichern zurueckgeht. Wer das Foto auf Connect oder FIND aendert,
+ * bleibt dort: Eine Allowlist (`parseIdentityReturnPath`) entscheidet, was erlaubt ist.
+ * Ohne Rueckweg bleibt es bei /profile.
+ */
+function zurueck(query: string, rueckweg: string | null): never {
   revalidatePath("/profile");
   revalidatePath("/me/profile");
   // Connect kann das Basisfoto als Kopie tragen - siehe `syncConnectBasePhoto`.
   revalidatePath("/connect", "layout");
+  if (rueckweg) redirect(`${rueckweg}?${query}#identity`);
   redirect(`${ZURUECK}&${query}#foto`);
 }
 
@@ -78,6 +85,34 @@ async function kontext() {
  * uebernommen, ein eigenes Bild als eigene Kopie im Connect-Eimer; ein eigenes
  * Connect-Bild (`network_upload`) bleibt unberuehrt.
  */
+/**
+ * Schreibt die Bildfelder - und merkt, wenn es keine Zeile gibt.
+ *
+ * Ein `update` ohne passende Zeile ist fuer PostgREST kein Fehler. Wer sich ueber
+ * Connect angemeldet und noch kein Basisprofil gespeichert hat, hat keine Zeile in
+ * `profiles` (die entsteht erst mit den Rollen). Bis zum 29.10.2026 meldete diese
+ * Aktion dort "Foto gespeichert", hatte aber nichts geschrieben - und das hochgeladene
+ * Bild blieb als Datei ohne Besitzer im Eimer liegen.
+ *
+ * Gibt es keine Zeile, wird eine angelegt, mit LEEREN Rollen: Die Voreinstellung der
+ * Spalte ist `founder`, und das wuerde ein Connect-Konto ohne Zutun zum Founder-Konto
+ * machen (`hasFounder`, Einstieg, Navigation).
+ */
+async function bildSpeichern(
+  client: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  werte: { avatar_id: string | null; avatar_url: string | null }
+): Promise<boolean> {
+  const { error, count } = await client
+    .from("profiles")
+    .update(werte, { count: "exact" })
+    .eq("user_id", userId);
+  if (error) return false;
+  if (count && count > 0) return true;
+  const { error: angelegt } = await client.from("profiles").insert({ user_id: userId, roles: [], ...werte });
+  return !angelegt;
+}
+
 /** Was gerade gespeichert ist - gebraucht, um die alte Datei loszuwerden. */
 async function aktuellesBild(client: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const { data } = await client
@@ -90,48 +125,41 @@ async function aktuellesBild(client: Awaited<ReturnType<typeof createClient>>, u
 
 export async function saveProfilePhotoAction(formData: FormData): Promise<void> {
   const { user, client } = await kontext();
+  const weg = parseIdentityReturnPath(formData.get("next"));
   const vorher = await aktuellesBild(client, user.id);
 
   // Eine Illustration aus der Bibliothek.
   const avatarId = normalizeAvatarId(String(formData.get("avatar_id") ?? "") || null);
   if (avatarId) {
-    const { error } = await client
-      .from("profiles")
-      .update({ avatar_id: avatarId, avatar_url: null })
-      .eq("user_id", user.id);
-    if (error) zurueck("error=photo_save");
+    if (!(await bildSpeichern(client, user.id, { avatar_id: avatarId, avatar_url: null }))) zurueck("error=photo_save", weg);
 
     await syncConnectBasePhoto(client, user.id, { avatar_id: avatarId, avatar_url: null });
     await deleteStoredAvatarIfOwned(client, user.id, vorher);
-    zurueck("saved=photo");
+    zurueck("saved=photo", weg);
   }
 
   // Oder ein eigenes Bild. Es kommt als Daten-URL an, im Browser auf 320 px
   // verkleinert - siehe `avatarImage.ts`.
   const dataUrl = String(formData.get("avatar_image") ?? "");
-  if (!dataUrl.startsWith("data:image/")) zurueck("error=photo_empty");
+  if (!dataUrl.startsWith("data:image/")) zurueck("error=photo_empty", weg);
 
   const { path, error: uploadFehler } = await uploadAvatarToStorage(client, user.id, dataUrl);
   if (!path) {
-    zurueck(uploadFehler === "avatar_too_large" ? "error=photo_too_large" : "error=photo_save");
+    zurueck(uploadFehler === "avatar_too_large" ? "error=photo_too_large" : "error=photo_save", weg);
   }
 
-  const { error } = await client
-    .from("profiles")
-    .update({ avatar_url: path, avatar_id: null })
-    .eq("user_id", user.id);
-  if (error) {
+  if (!(await bildSpeichern(client, user.id, { avatar_url: path, avatar_id: null }))) {
     // Die Zeile ist nicht geschrieben - dann darf die gerade hochgeladene
     // Datei auch nicht liegen bleiben.
     await deleteStoredAvatarIfOwned(client, user.id, path);
-    zurueck("error=photo_save");
+    zurueck("error=photo_save", weg);
   }
 
   // Nutzt Connect das Basisfoto, bekommt es eine neue Kopie - und die alte
   // Kopie verschwindet. Erst danach das alte Original.
-  await syncConnectBasePhoto(client, user.id, { avatar_id: null, avatar_url: path });
+  await syncConnectBasePhoto(client, user.id, { avatar_url: path, avatar_id: null });
   await deleteStoredAvatarIfOwned(client, user.id, vorher);
-  zurueck("saved=photo");
+  zurueck("saved=photo", weg);
 }
 
 /**
@@ -141,17 +169,18 @@ export async function saveProfilePhotoAction(formData: FormData): Promise<void> 
  * Ein Bild, das nur aus der Anzeige genommen wird, ist nicht gelöscht - und
  * genau das würde jemand annehmen, der hier klickt.
  */
-export async function removeProfilePhotoAction(): Promise<void> {
+export async function removeProfilePhotoAction(formData: FormData): Promise<void> {
   const { user, client } = await kontext();
+  const weg = parseIdentityReturnPath(formData.get("next"));
   const vorher = await aktuellesBild(client, user.id);
 
   const { error } = await client
     .from("profiles")
     .update({ avatar_url: null, avatar_id: null })
     .eq("user_id", user.id);
-  if (error) zurueck("error=photo_save");
+  if (error) zurueck("error=photo_save", weg);
 
   await syncConnectBasePhoto(client, user.id, null);
   await deleteStoredAvatarIfOwned(client, user.id, vorher);
-  zurueck("saved=photo_removed");
+  zurueck("saved=photo_removed", weg);
 }

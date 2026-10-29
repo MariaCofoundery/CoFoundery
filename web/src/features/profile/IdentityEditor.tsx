@@ -63,6 +63,7 @@ export async function IdentityEditor({
             displayName={core?.display_name?.trim() || ""}
             avatarId={avatarId ?? null}
             avatarUrl={avatarUrl ?? null}
+            returnPath={inline ? returnPath : null}
             copy={{
               title: t("identity.photo.title"),
               help: t("identity.photo.help"),

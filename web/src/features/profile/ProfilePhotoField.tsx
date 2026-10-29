@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
 import { toAvatarDataUrl } from "@/features/profile/avatarImage";
@@ -45,11 +45,14 @@ export function ProfilePhotoField({
   displayName,
   avatarId,
   avatarUrl,
+  returnPath = null,
   copy,
 }: {
   displayName: string;
   avatarId: string | null;
   avatarUrl: string | null;
+  /** Wo es nach dem Speichern weitergeht (Connect, FIND). Leer: auf /profile. */
+  returnPath?: string | null;
   copy: {
     title: string;
     help: string;
@@ -74,6 +77,15 @@ export function ProfilePhotoField({
   const vorschauId = neueIllustration ?? (neuesBild ? null : avatarId);
   const vorschauUrl = neuesBild ?? (neueIllustration ? null : avatarUrl);
   const etwasGewaehlt = Boolean(neuesBild || neueIllustration);
+  const formularRef = useRef<HTMLFormElement | null>(null);
+
+  // WAEHLEN HEISST SPEICHERN. Bis zum 29.10.2026 blieb die Wahl im Browser stehen, bis
+  // jemand "Foto speichern" drueckte. Auf Connect stehen aber drei weitere
+  // Speichern-Knoepfe auf derselben Seite: Wer einen von ihnen drueckte, verlor das
+  // Foto ohne Meldung. Jetzt geht die Wahl sofort ab.
+  useEffect(() => {
+    if (etwasGewaehlt) formularRef.current?.requestSubmit();
+  }, [etwasGewaehlt, neuesBild, neueIllustration]);
 
   async function dateiGewaehlt(event: ChangeEvent<HTMLInputElement>) {
     const datei = event.target.files?.[0];
@@ -169,7 +181,8 @@ export function ProfilePhotoField({
             Kern und das Bild liegen in verschiedenen Tabellen, und ein
             Formular in einem Formular gibt es in HTML nicht. */}
         {etwasGewaehlt ? (
-          <form action={saveProfilePhotoAction}>
+          <form action={saveProfilePhotoAction} ref={formularRef}>
+            {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
             <input type="hidden" name="avatar_id" value={neueIllustration ?? ""} />
             <input type="hidden" name="avatar_image" value={neuesBild ?? ""} />
             <SubmitButton
@@ -182,6 +195,7 @@ export function ProfilePhotoField({
 
         {avatarId || avatarUrl ? (
           <form action={removeProfilePhotoAction}>
+            {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
             <button
               type="submit"
               className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"

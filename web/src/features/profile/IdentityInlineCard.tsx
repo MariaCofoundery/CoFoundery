@@ -11,7 +11,7 @@ import type { createClient } from "@/lib/supabase/server";
 type Client = Awaited<ReturnType<typeof createClient>>;
 
 // Nur bekannte Schluessel an t() geben (ein erfundener Parameter wuerde als Pfad auf der Seite landen).
-const ERROR_KEYS = ["save", "published_incomplete", "roles", "linkedin", "photo_reuse", "photo_upload"];
+const ERROR_KEYS = ["save", "published_incomplete", "roles", "linkedin", "photo_reuse", "photo_upload", "photo_save", "photo_empty", "photo_too_large"];
 
 /**
  * "Aus deinem Profil" auf FIND und Connect: dieselbe Identitaet wie in `/profile`,
@@ -41,7 +41,7 @@ export async function IdentityInlineCard({
     getProfileBasicsRow(client, userId).catch(() => null),
   ]);
   const photoUsage = await getPhotoUsage(client, userId, core?.photo_visible_to_members ?? false);
-  const saved = params.saved === "identity" ? "identity" : params.saved === "photo_usage" ? "photo_usage" : null;
+  const saved = (["identity", "photo_usage", "photo", "photo_removed"] as const).find((key) => key === params.saved) ?? null;
   const error = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   const summary = (c: PersonCore | null) => [c?.headline, c?.location_region].filter(Boolean).join(" · ");
 
