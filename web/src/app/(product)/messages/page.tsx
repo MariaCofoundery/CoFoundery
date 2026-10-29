@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { AnnouncementCard } from "@/features/announcements/AnnouncementCard";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { requireSignedInForMessages } from "@/features/connect/conversationAccess";
 import {
@@ -46,7 +47,7 @@ async function getEmptyInboxLinks(
 }
 
 export default async function MessagesPage() {
-  const [t, locale] = await Promise.all([getTranslations("connect"), getLocale()]);
+  const [t, tNotice, locale] = await Promise.all([getTranslations("connect"), getTranslations("notices.announcements"), getLocale()]);
   const { client, user } = await requireSignedInForMessages();
 
   const [conversations, notices] = await Promise.all([
@@ -57,6 +58,19 @@ export default async function MessagesPage() {
   // entstehen - nur in Bereiche, die die Person auch betreten kann.
   const emptyLinks =
     conversations.length === 0 ? await getEmptyInboxLinks(client, user.id) : { find: false, connect: false };
+
+  // Mitteilungen der Plattform, die diese Person schon gesehen hat (das Archiv der Pop-ups).
+  const announcements = (
+    (await client.rpc("list_my_announcements", { p_locale: locale }).then((result) => (result.error ? [] : result.data ?? []))) as {
+      id: string;
+      title: string;
+      body: string;
+      cta_label: string | null;
+      cta_href: string | null;
+      first_seen_at: string;
+      dismissed_at: string | null;
+    }[]
+  );
 
   const counterpartIds = conversations
     .map((conversation) => conversation.counterpart_user_id)
@@ -88,6 +102,44 @@ export default async function MessagesPage() {
           <span className="mt-1 block text-sm text-slate-600">{t("messages.welcome.text")}</span>
         </span>
       </Link>
+
+      {/* Mitteilungen von Made2Found: das Archiv der Pop-ups. Wer eine weggeklickt hat, findet sie hier wieder. */}
+      {announcements.length > 0 ? (
+        <section aria-labelledby="announcements-title" className="mt-4">
+          <h2 id="announcements-title" className="text-xs font-bold uppercase tracking-[.1em] text-slate-500">{tNotice("inboxTitle")}</h2>
+          <ul className="mt-2 grid gap-2">
+            {announcements.map((item) => (
+              <li key={item.id}>
+                <details className="group rounded-2xl border border-pink-100 bg-pink-50/40">
+                  <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 [&::-webkit-details-marker]:hidden">
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold text-slate-950">{item.title}</span>
+                      <span className="mt-0.5 block text-xs text-slate-500">{dateTime.format(new Date(item.first_seen_at))}</span>
+                    </span>
+                    <span aria-hidden="true" className="text-slate-400 transition group-open:rotate-90">›</span>
+                  </summary>
+                  <div className="px-3 pb-3">
+                    <AnnouncementCard
+                      eyebrow={tNotice("eyebrow")}
+                      title={item.title}
+                      body={item.body}
+                      actions={
+                        item.cta_href && item.cta_label ? (
+                          item.cta_href.startsWith("/") ? (
+                            <Link href={item.cta_href} className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold">{item.cta_label}</Link>
+                          ) : (
+                            <a href={item.cta_href} target="_blank" rel="noopener noreferrer" className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold">{item.cta_label}</a>
+                          )
+                        ) : null
+                      }
+                    />
+                  </div>
+                </details>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {conversations.length === 0 ? (
         <div className="mt-4 rounded-3xl border border-dashed border-slate-300 px-5 py-8 text-center">

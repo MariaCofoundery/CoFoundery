@@ -126,7 +126,7 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
         <article className={card}>
           <h2 className="text-[21px] font-semibold text-slate-950">{t("areas.title")}</h2>
           <div className="flex flex-wrap gap-2.5">
-            {([["/admin/moderation", "moderation"], ["/admin/highlights", "highlights"], ["/admin/problem-radar", "radar"], ["/admin/problem-radar/board", "board"], ["/admin/research/workstyle-pretest", "research"]] as const).map(([href, key]) => (
+            {([["/admin/moderation", "moderation"], ["/admin/highlights", "highlights"], ["/admin/announcements", "announcements"], ["/admin/problem-radar", "radar"], ["/admin/problem-radar/board", "board"], ["/admin/research/workstyle-pretest", "research"]] as const).map(([href, key]) => (
               <Link key={key} href={href} className="inline-flex min-h-11 items-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t(`areas.${key}`)}</Link>
             ))}
           </div>

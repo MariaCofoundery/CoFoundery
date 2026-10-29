@@ -10,6 +10,7 @@ import { clearAllInterviewDrafts } from "@/features/interviews/interviewDrafts";
 import { DashboardViewSwitch } from "@/features/dashboard/DashboardViewSwitch";
 import { IncomingRequestBadge } from "@/features/discovery/IncomingRequestBadge";
 import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
+import { AnnouncementPopup } from "@/features/announcements/AnnouncementPopup";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { getConnectAttentionCount, getMessagesAttentionCount } from "@/features/connect/connectPresentation";
@@ -227,6 +228,28 @@ function ConnectAttentionBadge({ count, label }: { count: number; label: string 
 function NewSuggestionsBadge({ count, label }: { count: number; label: string }) {
   if (count < 1) return null;
   return <span aria-label={label} title={label} className="inline-flex min-w-5 items-center justify-center rounded-full bg-[#6d49e0] px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white">{Math.min(count, 99)}</span>;
+}
+
+/**
+ * Das rosa Herz fuer Admins: Im Admin-Bereich wartet etwas (neues Feedback,
+ * offene Meldungen). Es sitzt am Bild oben rechts und zaehlt nicht mit - es sagt
+ * nur "schau mal nach". Fuer alle anderen gibt es es nicht.
+ */
+function AdminHeart({ count, label, className = "" }: { count: number; label: string; className?: string }) {
+  if (count < 1) return null;
+  return (
+    <span role="img" aria-label={label} title={label} className={`inline-flex ${className}`}>
+      <svg viewBox="0 0 24 24" className="h-4 w-4 drop-shadow-[0_0_0_#fff]" aria-hidden="true">
+        <path
+          d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.7 5 6 5c1.9 0 3.3 1 4.1 2.3L12 9.6l1.9-2.3C14.7 6 16.1 5 18 5c3.3 0 5.1 3.4 3.6 6.8C19.5 16.4 12 21 12 21z"
+          fill="#ec4899"
+          stroke="#ffffff"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
 }
 
 function normalizeDisplayName(value: string | null) {
@@ -826,6 +849,10 @@ export function ProductShell({
                     label={t("menuAttentionBadge", { count: menuAttentionCount })}
                   />
                 ) : null}
+                {/* Das rosa Herz fuer Admins, wenn im Admin-Bereich etwas wartet. */}
+                {!isMenuOpen && isPlatformAdmin ? (
+                  <AdminHeart count={adminAttentionCount} label={t("adminAttention", { count: adminAttentionCount })} />
+                ) : null}
                 {/* Neue Vorschlaege daneben, lila: Sie zaehlen nicht zur roten Summe. */}
                 {!isMenuOpen ? (
                   <NewSuggestionsBadge
@@ -1036,6 +1063,8 @@ export function ProductShell({
         {hasFounder && researchConsentState === "undecided" ? (
           <ResearchConsentNotice onDecision={setResearchConsentState} />
         ) : null}
+        {/* Mitteilungen der Plattform. Wartet auf ein freies Fenster, siehe AnnouncementPopup. */}
+        <AnnouncementPopup />
       </div>
     </ProductNavigationOverrideContext.Provider>
   );
@@ -1131,13 +1160,18 @@ function ProfileMenu({
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
-        <ProfileAvatar
-          displayName={normalizedName}
-          avatarId={avatarId}
-          imageUrl={avatarImageUrl}
-          className="h-8 w-8 shrink-0 rounded-full object-cover"
-          fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
-        />
+        <span className="relative inline-flex shrink-0">
+          <ProfileAvatar
+            displayName={normalizedName}
+            avatarId={avatarId}
+            imageUrl={avatarImageUrl}
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
+            fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
+          />
+          {isPlatformAdmin ? (
+            <AdminHeart count={adminAttentionCount} label={t("adminAttention", { count: adminAttentionCount })} className="absolute -right-1.5 -top-1.5" />
+          ) : null}
+        </span>
         {/* Der Name ist das Erste, was weicht: kuerzer (truncate), und bei
             vollem Kopf gar nicht - nie die Bereiche links. */}
         <span className={showName ? "hidden min-w-0 max-w-28 truncate xl:inline" : "sr-only"}>{normalizedName}</span>

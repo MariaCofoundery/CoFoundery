@@ -75,7 +75,8 @@
       "radar": "Problem radar",
       "board": "Problem board",
       "research": "Research",
-      "text": "Everything platform admins manage, with the numbers in front."
+      "text": "Everything platform admins manage, with the numbers in front.",
+      "announcements": "Announcements"
     },
     "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
     "teamChecks": {
@@ -88,6 +89,56 @@
       },
       "started": "Started in total, {recent} in the last 30 days.",
       "finished": "{completed} completed, {abandoned} abandoned."
+    }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "back": "Back to admin",
+    "intro": "An announcement appears as a pop-up in the platform. The look is always the same, you enter the content here. Whoever clicks it away has read it: it then sits in Messages and does not come back.",
+    "newTitle": "New announcement",
+    "editTitle": "Edit announcement",
+    "titleDe": "Title (German)",
+    "bodyDe": "Text (German)",
+    "bodyHint": "Plain text, paragraphs with a blank line. Up to 1500 characters.",
+    "titleEn": "Title (English, optional)",
+    "bodyEn": "Text (English, optional)",
+    "enHint": "Without an English title and text, everyone sees the German one.",
+    "ctaLabelDe": "Button label (German, optional)",
+    "ctaLabelEn": "Button label (English)",
+    "ctaHref": "Button target",
+    "ctaHint": "A path in the app, for example /connect, or an address starting with https://",
+    "showOnce": "Once only",
+    "showOnceHint": "Shown once, even if someone does not click it away. Without the tick it comes back on every visit until it is clicked away.",
+    "startsOn": "Show from (optional)",
+    "endsOn": "Show until (optional)",
+    "save": "Save",
+    "saving": "Saving …",
+    "cancel": "Cancel",
+    "preview": "What it looks like",
+    "groups": {
+      "active": "Running",
+      "draft": "Drafts",
+      "archived": "Archived"
+    },
+    "empty": "No announcement yet.",
+    "stats": "{seen} seen, {dismissed} clicked away",
+    "once": "once only",
+    "repeat": "until clicked away",
+    "edit": "Edit",
+    "actions": {
+      "publish": "Publish",
+      "publishing": "Publishing …",
+      "archive": "Archive",
+      "archiving": "Archiving …",
+      "draft": "Back to draft",
+      "drafting": "…"
+    },
+    "results": {
+      "saved": "Saved.",
+      "status": "Status changed.",
+      "invalid": "Please fill in title and text. English only together (title and text), a button needs a label and a target, and the target a path or https://.",
+      "notfound": "That announcement no longer exists.",
+      "error": "That didn’t work."
     }
   }
 }

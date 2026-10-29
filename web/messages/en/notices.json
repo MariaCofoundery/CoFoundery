@@ -16,5 +16,16 @@
     "read_my_mind_handoff": "Read My Mind: the other side has answered. Your turn.",
     "founder_in_the_wild_handoff": "Founder in the Wild: the other side has filled it in. Your turn.",
     "collaboration_conversation_marker": "The other side would like to talk about a particular point."
+  },
+  "announcements": {
+    "eyebrow": "Announcement",
+    "dismiss": "Got it",
+    "later": "You can find it again later under Messages.",
+    "close": "Close",
+    "inboxTitle": "Announcements from Made2Found",
+    "inboxEmpty": "",
+    "seen": "seen",
+    "dismissed": "read",
+    "open": "Open"
   }
 }

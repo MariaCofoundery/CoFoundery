@@ -75,7 +75,8 @@
       "radar": "Problem-Radar",
       "board": "Problembrett",
       "research": "Research",
-      "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor."
+      "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor.",
+      "announcements": "Mitteilungen"
     },
     "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
     "teamChecks": {
@@ -88,6 +89,56 @@
       },
       "started": "Gestartet insgesamt, {recent} in den letzten 30 Tagen.",
       "finished": "{completed} abgeschlossen, {abandoned} abgebrochen."
+    }
+  },
+  "announcements": {
+    "title": "Mitteilungen an alle",
+    "back": "Zurück zum Admin-Bereich",
+    "intro": "Eine Mitteilung erscheint als Pop-up in der Plattform. Das Aussehen ist immer gleich, den Inhalt trägst du hier ein. Wer sie wegklickt, hat sie gelesen: Sie liegt danach in den Nachrichten und kommt nicht wieder.",
+    "newTitle": "Neue Mitteilung",
+    "editTitle": "Mitteilung bearbeiten",
+    "titleDe": "Titel (deutsch)",
+    "bodyDe": "Text (deutsch)",
+    "bodyHint": "Reiner Text, Absätze mit Leerzeile. Bis 1500 Zeichen.",
+    "titleEn": "Titel (englisch, freiwillig)",
+    "bodyEn": "Text (englisch, freiwillig)",
+    "enHint": "Ohne englischen Titel und Text sehen alle den deutschen.",
+    "ctaLabelDe": "Knopf, Beschriftung (deutsch, freiwillig)",
+    "ctaLabelEn": "Knopf, Beschriftung (englisch)",
+    "ctaHref": "Knopf, Ziel",
+    "ctaHint": "Ein Pfad in der App, zum Beispiel /connect, oder eine Adresse mit https://",
+    "showOnce": "Einmalig",
+    "showOnceHint": "Wird einmal gezeigt, auch wenn jemand sie nicht wegklickt. Ohne Haken kommt sie bei jedem Besuch wieder, bis sie weggeklickt ist.",
+    "startsOn": "Zeigen ab (freiwillig)",
+    "endsOn": "Zeigen bis (freiwillig)",
+    "save": "Speichern",
+    "saving": "Speichert …",
+    "cancel": "Abbrechen",
+    "preview": "So sieht es aus",
+    "groups": {
+      "active": "Läuft",
+      "draft": "Entwürfe",
+      "archived": "Archiviert"
+    },
+    "empty": "Noch keine Mitteilung.",
+    "stats": "{seen} gesehen, {dismissed} weggeklickt",
+    "once": "einmalig",
+    "repeat": "bis weggeklickt",
+    "edit": "Bearbeiten",
+    "actions": {
+      "publish": "Veröffentlichen",
+      "publishing": "Veröffentlicht …",
+      "archive": "Archivieren",
+      "archiving": "Archiviert …",
+      "draft": "Zurück zum Entwurf",
+      "drafting": "…"
+    },
+    "results": {
+      "saved": "Gespeichert.",
+      "status": "Status geändert.",
+      "invalid": "Bitte Titel und Text ausfüllen. Englisch nur zusammen (Titel und Text), ein Knopf braucht Beschriftung und Ziel, das Ziel ein Pfad oder https://.",
+      "notfound": "Die Mitteilung gibt es nicht mehr.",
+      "error": "Das hat nicht geklappt."
     }
   }
 }
