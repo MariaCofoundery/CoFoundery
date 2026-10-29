@@ -47,9 +47,9 @@ export async function IdentityInlineCard({
   const summary = (c: PersonCore | null) => [c?.headline, c?.location_region].filter(Boolean).join(" · ");
 
   return (
-    <section id="identity" className="mt-6 rounded-3xl border border-violet-100 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="identity-inline-title">
-      <h2 id="identity-inline-title" className="text-lg font-semibold text-slate-950">{t("identity.inline.title")}</h2>
-      <p className="mt-1 text-sm leading-6 text-slate-600">{t("identity.inline.text")}</p>
+    <section id="identity" className="mt-6 rounded-3xl border border-violet-100 bg-white p-4 shadow-sm sm:p-5" aria-labelledby="identity-inline-title">
+      <h2 id="identity-inline-title" className="text-base font-semibold text-slate-950">{t("identity.inline.title")}</h2>
+      <p className="mt-1 text-xs leading-5 text-slate-500">{t("identity.inline.text")}</p>
       {saved ? <p role="status" className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-900">{t(`success.${saved}`)}</p> : null}
       {error ? <p role="alert" className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(`errors.${error}`)}</p> : null}
       <p className="mt-3 text-base font-semibold text-slate-950">{core?.display_name || t("identity.inline.empty")}</p>

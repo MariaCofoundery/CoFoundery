@@ -826,29 +826,26 @@ export default async function DiscoveryProfilePage({
               className={`${CARD_CLASS} discovery-rise`}
               style={{ "--rise-delay": "180ms" } as CSSProperties}
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                {t("profile.preview.eyebrow")}
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+              <h2 className="text-lg font-semibold text-slate-950">
                 {t("profile.preview.title")}
               </h2>
-              <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-sm font-semibold text-slate-950">
                   {previewText(
                     core?.display_name || profile.displayName,
                     t("profile.preview.displayNameFallback")
                   )}
                 </p>
-                <p className="mt-2 text-xl font-semibold leading-7 text-slate-950">
+                <p className="mt-1 text-lg font-semibold leading-7 text-slate-950">
                   {previewText(
                     core?.headline || profile.headline,
                     t("profile.preview.headlineFallback")
                   )}
                 </p>
-                <p className="mt-3 text-sm leading-6 text-slate-600">
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
                   {previewText(core?.bio || profile.bio, t("profile.preview.bioFallback"))}
                 </p>
-                <dl className="mt-5 grid gap-3 text-sm">
+                <dl className="mt-4 grid gap-2.5 text-sm">
                   <div>
                     <dt className="font-semibold text-slate-900">{t("profile.preview.brings")}</dt>
                     <dd className="mt-1 text-slate-600">{formatRoleList(profile.ownRoles, profile.ownRoleOther, t)}{rolePartLabelList(profile.ownRoleParts, t).length > 0 ? <span className="mt-0.5 block text-xs text-slate-500">{rolePartLabelList(profile.ownRoleParts, t).join(" · ")}</span> : null}</dd>
@@ -921,14 +918,13 @@ export default async function DiscoveryProfilePage({
               <p className="mt-3 text-xs leading-5 text-slate-500">
                 {t("profile.preview.privacy")}
               </p>
-            </section>
-
-            {/* Das sehen andere in FIND ausserdem - je nach eigener Freigabe. */}
-            <section className={CARD_CLASS} aria-labelledby="find-visibility-title">
-              <h2 id="find-visibility-title" className="text-lg font-semibold text-slate-950">
+              {/* Das sehen andere in FIND ausserdem - je nach eigener Freigabe. Gleiche Karte
+                  wie die Vorschau: Beides beantwortet "Was sehen die anderen?". */}
+              <div className="mt-5 border-t border-slate-200 pt-4" role="group" aria-labelledby="find-visibility-title">
+              <h2 id="find-visibility-title" className="text-sm font-bold text-slate-950">
                 {t("profile.visibility.title")}
               </h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
                 <li>
                   {t(core?.photo_visible_to_members ? "profile.visibility.photoOn" : "profile.visibility.photoOff")}{" "}
                   <Link href="/profile?step=identity" className="font-medium text-slate-900 underline">{t("profile.visibility.change")}</Link>
@@ -951,6 +947,7 @@ export default async function DiscoveryProfilePage({
                   editHref="/profile?step=areas"
                 />
               ) : null}
+              </div>
             </section>
 
           </aside>
