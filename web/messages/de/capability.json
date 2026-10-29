@@ -914,7 +914,7 @@
     "overview": "Übersicht",
     "about": "Über mich",
     "align": "Align",
-    "visibility": "Sichtbarkeit",
+    "visibility": "Freigaben",
     "find": "Find",
     "connect": "Connect",
     "sub": {
@@ -1006,5 +1006,84 @@
     "save": "Speichern",
     "saving": "Wird gespeichert …",
     "saved": "Gespeichert."
+  },
+  "freigaben": {
+    "title": "Deine Freigaben",
+    "text": "So ist es gerade eingestellt. Jede Freigabe gilt nur für sich, keine zieht eine andere nach. Nichts davon ist zu Beginn an.",
+    "change": "Ändern →",
+    "on": "an",
+    "off": "aus",
+    "groups": {
+      "you": "Du",
+      "align": "Align",
+      "find": "Find",
+      "connect": "Connect",
+      "account": "Konto"
+    },
+    "rows": {
+      "photo": {
+        "title": "Dein Bild für eingeloggte Mitglieder",
+        "on": "Mitglieder sehen dein Foto",
+        "off": "Nicht sichtbar, andere sehen deine Initialen"
+      },
+      "linkedin": {
+        "title": "Dein LinkedIn-Link",
+        "none": "Kein Link eingetragen",
+        "private": "Nur du siehst ihn",
+        "contacts": "Nur Kontakte, mit denen du schon im Gespräch bist"
+      },
+      "capability": {
+        "title": "Was du kannst",
+        "private": "Privat: niemand sieht deine Bereiche",
+        "areas": "Bereiche sichtbar",
+        "areas_depth_on_contact": "Bereiche sichtbar, Tiefe auf Kontakt"
+      },
+      "matching": {
+        "title": "Fähigkeiten für Find-Vorschläge nutzen",
+        "on": "Erlaubt",
+        "off": "Nicht erlaubt"
+      },
+      "align": {
+        "title": "Arbeitsweise mit einem Team teilen",
+        "state": "Je Team",
+        "text": "Du entscheidest pro Team, nie vorab."
+      },
+      "find": {
+        "title": "Dein Find-Profil",
+        "draft": "Nicht veröffentlicht",
+        "active": "Veröffentlicht für angemeldete Founder",
+        "paused": "Pausiert"
+      },
+      "workstyle": {
+        "title": "Arbeitsweise im Find-Profil zeigen",
+        "on": "Andere sehen Hinweise zu deiner Arbeitsweise",
+        "off": "Nicht freigegeben"
+      },
+      "connect": {
+        "title": "Dein Connect-Profil",
+        "draft": "Nicht sichtbar",
+        "members": "Für Connect-Mitglieder sichtbar",
+        "public": "Öffentlich sichtbar",
+        "paused": "Pausiert"
+      },
+      "suggest": {
+        "title": "Anderen vorgeschlagen werden",
+        "on": "Du wirst in „Für dich“ vorgeschlagen",
+        "off": "Du wirst nicht vorgeschlagen"
+      },
+      "highlight": {
+        "title": "Als Highlight in Connect",
+        "on": "Erlaubt",
+        "off": "Nicht erlaubt"
+      },
+      "research": {
+        "title": "Forschung",
+        "accepted": "Du nimmst teil",
+        "declined": "Du nimmst nicht teil",
+        "undecided": "Noch nicht entschieden",
+        "unknown": "Nicht abrufbar"
+      }
+    },
+    "never": "Nie sichtbar: deine private Suche, deine einzelnen Antworten, Team-, Advisor- und Forschungsdaten."
   }
 }

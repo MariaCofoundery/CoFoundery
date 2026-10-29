@@ -209,7 +209,8 @@ test("die Komponente steht nur im FIND-Profil und im Schritt Sichtbarkeit, jewei
   assert.match(find, /\{matchingPermission \? \(\s*<CapabilityMatchingPermissionSection/);
   const profile = read(editor);
   assert.match(profile, /step === "sichtbarkeit" && hasDiscovery && isFindV01RankingEnabled\(\)/);
-  assert.match(profile, /\{step === "sichtbarkeit" && matchingAllowed !== null \? \(\s*<CapabilityMatchingPermissionSection/);
+  // Seit der Übersicht "Freigaben" steht der Abschnitt in einem Anker-Rahmen (id="capability-matching").
+  assert.match(profile, /\{step === "sichtbarkeit" && matchingAllowed !== null \? \(\s*<div id="capability-matching"[^>]*>\s*<CapabilityMatchingPermissionSection/);
   // Ohne Fähigkeiten der Hinweis (Komponente), mit Fähigkeiten der Umschalter - aus echten Einträgen.
   assert.match(find, /hasCapabilities: entries\.length > 0, allowed: permission\.allowed/);
   assert.match(profile, /hasCapabilities=\{entries\.length > 0\}/);
@@ -234,7 +235,10 @@ test("next: nur die erlaubten Rückwege", () => {
 test("next reist durch Bereiche und Sichtbarkeit und führt zurück", () => {
   const page = read("src/app/(product)/profile/page.tsx");
   for (const action of ["saveCapabilityAreasAction", "saveCapabilityDisclosureAction"]) {
-    const form = page.slice(page.indexOf(`<form action={${action}}`), page.indexOf(`<form action={${action}}`) + 400);
+    // Das Formular darf eine id tragen (Anker der Übersicht "Freigaben").
+    const at = page.search(new RegExp(`<form (?:id="[^"]+" )?action=\\{${action}\\}`));
+    assert.ok(at >= 0, `${action}: Formular nicht gefunden`);
+    const form = page.slice(at, at + 400);
     assert.match(form, /returnPath \? <input type="hidden" name="next" value=\{returnPath\} \/> : null/, `${action}: next fehlt im Formular`);
   }
   assert.match(page, /redirect\(back \? `\/profile\?step=areas&next=\$\{encodeURIComponent\(back\)\}` : "\/profile\?step=areas"\)/, "alte Verantwortungs-Links behalten next");

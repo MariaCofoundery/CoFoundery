@@ -39,6 +39,10 @@ import {
 } from "@/features/profile/identityReadiness";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
 import { InterestsCard } from "@/features/profile/InterestsCard";
+import { FreigabenOverview, type FreigabenData } from "@/features/profile/FreigabenOverview";
+import { getResearchConsentState } from "@/features/research/consent";
+import { getOwnDiscoveryProfile } from "@/features/discovery/discoveryData";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { ProfileTabs } from "@/features/profile/ProfileTabs";
 import { getPhotoUsage } from "@/features/profile/photoUsageData";
 import { getPersonCore } from "@/features/profile/personCoreData";
@@ -180,7 +184,7 @@ export default async function ProfilePage({
       .then(({ data }) => (data?.capability_disclosure as string | undefined) ?? "private")
       .catch(() => "private"),
     // Nur fuer den Hinweis, dass Aenderungen sofort oeffentlich wirken.
-    Promise.resolve(supabase.from("network_profiles").select("status").eq("user_id", user.id).maybeSingle())
+    Promise.resolve(supabase.from("network_profiles").select("status,visibility,suggestable,highlightable").eq("user_id", user.id).maybeSingle())
       .then(({ data }) => data)
       .catch(() => null),
     Promise.resolve(supabase.rpc("is_network_member")).then(({ data }) => data === true).catch(() => false),
@@ -226,6 +230,42 @@ export default async function ProfilePage({
   const matchingAllowed =
     step === "sichtbarkeit" && hasDiscovery && isFindV01RankingEnabled()
       ? (await getCapabilityMatchingPermission(supabase, user.id)).allowed
+      : null;
+  // Die Uebersicht "Freigaben": nur im Schritt Sichtbarkeit gelesen, nur lesend.
+  const freigaben: FreigabenData | null =
+    step === "sichtbarkeit"
+      ? await Promise.all([
+          hasDiscovery ? getOwnDiscoveryProfile(user.id).catch(() => null) : Promise.resolve(null),
+          hasDiscovery
+            ? Promise.resolve(
+                supabase
+                  .from("founder_search_preferences")
+                  .select("workstyle_discovery_enabled,workstyle_discovery_consent_version")
+                  .eq("user_id", user.id)
+                  .maybeSingle()
+              )
+                .then((result) => result.data)
+                .catch(() => null)
+            : Promise.resolve(null),
+          getResearchConsentState(supabase as unknown as SupabaseClient, user.id).catch(() => "unknown" as const),
+        ]).then(([findProfile, workstyleRow, research]) => ({
+          photoVisible: core?.photo_visible_to_members === true,
+          linkedinUrl: core?.linkedin_url ?? null,
+          linkedinVisibility: core?.linkedin_visibility ?? null,
+          disclosure: typeof disclosure === "string" ? disclosure : "private",
+          matchingAllowed,
+          hasFind: hasDiscovery,
+          findStatus: findProfile?.status ?? null,
+          workstyleShared:
+            workstyleRow?.workstyle_discovery_enabled === true &&
+            workstyleRow?.workstyle_discovery_consent_version === "workstyle_discovery_v1",
+          hasConnect: isConnectMember,
+          connectStatus: connectProfile?.status ?? null,
+          connectVisibility: connectProfile?.visibility ?? null,
+          suggestable: connectProfile ? connectProfile.suggestable : null,
+          highlightable: connectProfile ? connectProfile.highlightable : null,
+          research,
+        }))
       : null;
   // Nur bekannte Schluessel an t() geben. Ein manipulierter Query-Parameter
   // wuerde sonst als roher Schluesselpfad auf der Seite landen: next-intl
@@ -852,8 +892,10 @@ export default async function ProfilePage({
       {/* Die Freigabe. Eigener Abschnitt, weil es eine eigene Entscheidung ist:
           was ich eingetragen habe und wie weit ich es weitergebe sind zwei
           Fragen. Erscheint nur, wenn es ueberhaupt etwas freizugeben gibt. */}
+      {freigaben ? <FreigabenOverview data={freigaben} /> : null}
+
       {step === "sichtbarkeit" ? (
-        <form action={saveCapabilityDisclosureAction} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
+        <form id="capability-disclosure" action={saveCapabilityDisclosureAction} className="mt-8 scroll-mt-24 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
           {/* Rueckweg wie im Identitaetsschritt (Allowlist parseIdentityReturnPath). */}
           {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
           <div>
@@ -911,12 +953,14 @@ export default async function ProfilePage({
       {/* Eine zweite, eigene Entscheidung neben der Sichtbarkeit: ob Made2Found die
           Fähigkeiten für FIND-Vorschläge VERWENDEN darf. Ändert die Sichtbarkeit nicht. */}
       {step === "sichtbarkeit" && matchingAllowed !== null ? (
-        <CapabilityMatchingPermissionSection
-          hasCapabilities={entries.length > 0}
-          initialAllowed={matchingAllowed}
-          editHref="/profile?step=areas"
-          className="mt-4 rounded-3xl border border-slate-200 bg-white p-6"
-        />
+        <div id="capability-matching" className="scroll-mt-24">
+          <CapabilityMatchingPermissionSection
+            hasCapabilities={entries.length > 0}
+            initialAllowed={matchingAllowed}
+            editHref="/profile?step=areas"
+            className="mt-4 rounded-3xl border border-slate-200 bg-white p-6"
+          />
+        </div>
       ) : null}
 
       {/* Rueckverweise in die Kontexte. Hier stehen Inhalte, dort wird

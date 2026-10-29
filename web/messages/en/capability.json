@@ -914,7 +914,7 @@
     "overview": "Overview",
     "about": "About me",
     "align": "Align",
-    "visibility": "Visibility",
+    "visibility": "Sharing",
     "find": "Find",
     "connect": "Connect",
     "sub": {
@@ -1006,5 +1006,84 @@
     "save": "Save",
     "saving": "Saving …",
     "saved": "Saved."
+  },
+  "freigaben": {
+    "title": "Your sharing settings",
+    "text": "This is how it is set right now. Each setting applies on its own, none pulls another one along. Nothing here is on at the start.",
+    "change": "Change →",
+    "on": "on",
+    "off": "off",
+    "groups": {
+      "you": "You",
+      "align": "Align",
+      "find": "Find",
+      "connect": "Connect",
+      "account": "Account"
+    },
+    "rows": {
+      "photo": {
+        "title": "Your photo for signed-in members",
+        "on": "Members see your photo",
+        "off": "Not visible, others see your initials"
+      },
+      "linkedin": {
+        "title": "Your LinkedIn link",
+        "none": "No link entered",
+        "private": "Only you see it",
+        "contacts": "Only contacts you are already talking to"
+      },
+      "capability": {
+        "title": "What you can do",
+        "private": "Private: nobody sees your areas",
+        "areas": "Areas visible",
+        "areas_depth_on_contact": "Areas visible, depth on contact"
+      },
+      "matching": {
+        "title": "Use capabilities for Find suggestions",
+        "on": "Allowed",
+        "off": "Not allowed"
+      },
+      "align": {
+        "title": "Share your work style with a team",
+        "state": "Per team",
+        "text": "You decide per team, never in advance."
+      },
+      "find": {
+        "title": "Your Find profile",
+        "draft": "Not published",
+        "active": "Published for signed-in founders",
+        "paused": "Paused"
+      },
+      "workstyle": {
+        "title": "Show work style in your Find profile",
+        "on": "Others see hints about your work style",
+        "off": "Not shared"
+      },
+      "connect": {
+        "title": "Your Connect profile",
+        "draft": "Not visible",
+        "members": "Visible to Connect members",
+        "public": "Publicly visible",
+        "paused": "Paused"
+      },
+      "suggest": {
+        "title": "Be suggested to others",
+        "on": "You appear in “For you”",
+        "off": "You are not suggested"
+      },
+      "highlight": {
+        "title": "As a highlight in Connect",
+        "on": "Allowed",
+        "off": "Not allowed"
+      },
+      "research": {
+        "title": "Research",
+        "accepted": "You take part",
+        "declined": "You do not take part",
+        "undecided": "Not decided yet",
+        "unknown": "Unavailable"
+      }
+    },
+    "never": "Never visible: your private search, your individual answers, team, advisor and research data."
   }
 }
