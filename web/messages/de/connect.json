@@ -320,6 +320,13 @@
       "history": "Frühere Unterhaltung"
     },
     "inboxEmptyFind": "Menschen finden",
+    "welcome": {
+      "label": "Willkommen",
+      "title": "Maria, Gründerin",
+      "text": "Ein paar Worte von mir und wie wir hier miteinander umgehen.",
+      "back": "Zurück zum Postfach",
+      "photoAlt": "Maria, Gründerin von Made2Found"
+    },
     "inboxEmptyConnect": "CONNECT öffnen",
     "retracted": "Nachricht zurückgenommen",
     "retract": "Zurücknehmen",

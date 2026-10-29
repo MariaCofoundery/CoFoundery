@@ -320,6 +320,13 @@
       "history": "Earlier conversation"
     },
     "inboxEmptyFind": "Find people",
+    "welcome": {
+      "label": "Welcome",
+      "title": "Maria, founder",
+      "text": "A few words from me and how we treat each other here.",
+      "back": "Back to inbox",
+      "photoAlt": "Maria, founder of Made2Found"
+    },
     "inboxEmptyConnect": "Open CONNECT",
     "retracted": "Message retracted",
     "retract": "Retract",

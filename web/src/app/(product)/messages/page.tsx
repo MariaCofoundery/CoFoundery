@@ -74,8 +74,23 @@ export default async function MessagesPage() {
 
       <WaitingNotices notices={notices} />
 
+      {/* Marias Begruessung: fuer alle, jederzeit, ohne Antwortfeld. Kein Gespraech. */}
+      <Link
+        href="/messages/willkommen"
+        prefetch={false}
+        className="mt-8 flex min-h-16 items-center gap-4 rounded-2xl border border-violet-200 bg-violet-50/60 p-4 transition hover:border-violet-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- ein festes Bild aus /public */}
+        <img src="/brand/maria.jpg" alt={t("messages.welcome.photoAlt")} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold text-slate-950">{t("messages.welcome.title")}</span>
+          <span className="mt-1 block text-xs font-medium uppercase tracking-[.12em] text-slate-500">{t("messages.welcome.label")}</span>
+          <span className="mt-1 block text-sm text-slate-600">{t("messages.welcome.text")}</span>
+        </span>
+      </Link>
+
       {conversations.length === 0 ? (
-        <div className="mt-8 rounded-3xl border border-dashed border-slate-300 px-5 py-8 text-center">
+        <div className="mt-4 rounded-3xl border border-dashed border-slate-300 px-5 py-8 text-center">
           <h2 className="text-lg font-semibold text-slate-950">{t("messages.inboxEmptyTitle")}</h2>
           <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
             {t("messages.inboxEmptyText")}
@@ -96,7 +111,7 @@ export default async function MessagesPage() {
           ) : null}
         </div>
       ) : (
-        <ul className="mt-8 space-y-3">
+        <ul className="mt-3 space-y-3">
           {conversations.map((conversation) => {
             const name =
               conversation.counterpart_display_name ?? t("messages.formerMember");
