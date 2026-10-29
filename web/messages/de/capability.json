@@ -132,7 +132,9 @@
       "stepOf": "Schritt {current} von {total}",
       "label": "Angaben",
       "links": "LinkedIn",
-      "roles": "Rolle"
+      "roles": "Rolle",
+      "photo": "Foto",
+      "interests": "Wofür du hier bist"
     }
   },
   "steps": {

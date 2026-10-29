@@ -39,5 +39,7 @@ test("Startseite und Profil nutzen sie nur als Vorschlag", () => {
   assert.match(areas, /interests = \[\]/);
   assert.match(areas, /\.sort\(\(a, b\) => Number\(wanted\(b\.key\)\) - Number\(wanted\(a\.key\)\)\)/);
   const page = readFileSync("src/app/(product)/profile/page.tsx", "utf8");
-  assert.match(page, /step === "identity" \? <InterestsCard/);
+  // Seit den Karten steht die Interessenkarte als Schritt im Rahmen des Identitätsschritts.
+  assert.match(page, /<div data-card="interests">\s*<InterestsCard/);
+  assert.match(page, /step === "identity" \? \(\s*<IdentityCardFlow/);
 });

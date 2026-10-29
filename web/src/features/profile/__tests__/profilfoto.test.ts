@@ -99,8 +99,8 @@ test("geaendert wird an einer Stelle - und dort steht auch das Bild", () => {
   assert.match(ueberDich, /<ProfilePhotoField/);
   // Beim Schritt, bei dem die anderen Basisangaben stehen.
   // Die Seite bindet den Identitaets-Editor ein, in dem Bild und Formular zusammen stehen.
-  assert.match(ueberDich, /\{step === "identity" \? \(\s*<IdentityEditor/);
-  assert.match(codeOnly(join("src", "features", "profile", "IdentityEditor.tsx")), /<section[\s\S]{0,200}<ProfilePhotoField/);
+  assert.match(ueberDich, /\{step === "identity" \? \(\s*<IdentityCardFlow[\s\S]*?<IdentityEditor/);
+  assert.match(codeOnly(join("src", "features", "profile", "IdentityEditor.tsx")), /<section[\s\S]{0,300}<ProfilePhotoField/);
 
   // „Das bist du" und die Druckfassung LESEN nur.
   for (const datei of [DAS_BIST_DU, DRUCK]) {

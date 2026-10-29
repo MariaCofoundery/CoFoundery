@@ -38,6 +38,7 @@ import {
   parseIdentityReturnPath,
 } from "@/features/profile/identityReadiness";
 import { IdentityEditor } from "@/features/profile/IdentityEditor";
+import { IdentityCardFlow, type IdentityCardId } from "@/features/profile/IdentityCardFlow";
 import { InterestsCard } from "@/features/profile/InterestsCard";
 import { FreigabenOverview, type FreigabenData } from "@/features/profile/FreigabenOverview";
 import { getResearchConsentState } from "@/features/research/consent";
@@ -227,6 +228,8 @@ export default async function ProfilePage({
   const step = isPageStep(params.step) ? params.step : null;
   // CAPABILITY-MATCHING-FREIGABE (E3c): nur im Schritt Sichtbarkeit, nur mit FIND-Zugang
   // und nur, wenn FIND hier tatsächlich mit Matching v0.1 rankt (Server-Flag).
+  // Die Schritte von "Ueber mich": Foto, die Gruppen des Identitaetsformulars (Rolle nur mit Rolle), Interessen.
+  const identityCardIds: IdentityCardId[] = ["photo", "who", "where", "what", "links", ...(currentRoles.length > 0 ? (["roles"] as const) : []), "interests"];
   const matchingAllowed =
     step === "sichtbarkeit" && hasDiscovery && isFindV01RankingEnabled()
       ? (await getCapabilityMatchingPermission(supabase, user.id)).allowed
@@ -624,25 +627,46 @@ export default async function ProfilePage({
           verschiedenen Tabellen, und ein Formular in einem Formular gibt es
           in HTML nicht. */}
       {step === "identity" ? (
-        <IdentityEditor
-          cards
-          // Ein abgewiesener LinkedIn-Link bringt einen zur Karte, wo er steht.
-          initialCard={params.error === "linkedin" ? "links" : "who"}
-          core={core}
-          currentRoles={currentRoles}
-          returnPath={returnPath}
-          identityGaps={identityGaps}
-          showGaps={isConnectMember || hasDiscovery}
-          connectActive={connectProfile?.status === "active"}
-          avatarId={basisProfil.avatarId ?? null}
-          avatarUrl={basisProfil.avatarUrl ?? null}
-          photoUsage={await getPhotoUsage(supabase, user.id, core?.photo_visible_to_members ?? false)}
-        />
+        <IdentityCardFlow
+          ids={identityCardIds}
+          initialStep={Math.max(0, identityCardIds.indexOf(params.error === "linkedin" ? "links" : "photo"))}
+          formId="identity-form"
+          copy={{
+            back: t("identity.cards.back"),
+            next: t("identity.cards.next"),
+            stepOf: t("identity.cards.stepOf", { current: "{current}", total: "{total}" }),
+            label: t("identity.cards.label"),
+            save: t("identity.submit"),
+            titles: {
+              photo: t("identity.cards.photo"),
+              who: t("aboutYou.groups.who"),
+              where: t("aboutYou.groups.where"),
+              what: t("aboutYou.groups.what"),
+              links: t("identity.cards.links"),
+              roles: t("identity.cards.roles"),
+              interests: t("identity.cards.interests"),
+            },
+          }}
+        >
+          <IdentityEditor
+            cards
+            core={core}
+            currentRoles={currentRoles}
+            returnPath={returnPath}
+            identityGaps={identityGaps}
+            showGaps={isConnectMember || hasDiscovery}
+            connectActive={connectProfile?.status === "active"}
+            avatarId={basisProfil.avatarId ?? null}
+            avatarUrl={basisProfil.avatarUrl ?? null}
+            photoUsage={await getPhotoUsage(supabase, user.id, core?.photo_visible_to_members ?? false)}
+          />
+          {/* WOFUER ICH HIER BIN - eine Absicht, die nur die Startseite steuert.
+              Eigenes Formular mit eigener Aktion; ein eigener Schritt der Karten. */}
+          <div data-card="interests">
+            <InterestsCard client={supabase} userId={user.id} />
+          </div>
+        </IdentityCardFlow>
       ) : null}
-
-      {/* WOFUER ICH HIER BIN - eine Absicht, die nur die Startseite steuert.
-          Eigenes Formular, nach dem Identitaetsformular. */}
-      {step === "identity" ? <InterestsCard client={supabase} userId={user.id} /> : null}
 
       {/* SO SIEHT ES AUS. Dieselbe Darstellung wie auf „Das bist du" - wer
           gerade Bio und Branchen eingetragen hat, sieht hier, was daraus

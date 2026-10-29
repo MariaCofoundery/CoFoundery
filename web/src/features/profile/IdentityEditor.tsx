@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ConnectSubmitButton as SubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { ANALYZED_AREA_IDS } from "@/features/capability/narrativeAnalysis";
-import { IdentityCardFlow, type IdentityCardId } from "@/features/profile/IdentityCardFlow";
+import type { IdentityCardId } from "@/features/profile/IdentityCardFlow";
 import { CvImportField } from "@/features/profile/CvImportField";
 import { CV_INDUSTRY_KEYS } from "@/features/profile/cvIndustries";
 import { IDENTITY_THRESHOLDS, type IdentityGap, type IdentityReturnPath } from "@/features/profile/identityReadiness";
@@ -43,7 +43,6 @@ export async function IdentityEditor({
   showPhoto = true,
   photoUsage = null,
   cards = false,
-  initialCard = "who",
 }: {
   core: PersonCore | null;
   currentRoles: ProfileRole[];
@@ -56,44 +55,15 @@ export async function IdentityEditor({
   avatarUrl: string | null | undefined;
   showPhoto?: boolean;
   photoUsage?: PhotoUsage | null;
-  /** Die Gruppen als Karten, eine nach der anderen (nur im eigenen Profil, nicht eingebettet). */
+  /** Die Gruppen tragen `data-card` fuer den Rahmen `IdentityCardFlow` (nur im eigenen Profil, nicht eingebettet). */
   cards?: boolean;
-  initialCard?: IdentityCardId;
 }) {
   const t = await getTranslations("capability");
-  const cardIds: IdentityCardId[] = ["who", "where", "what", "links", ...(currentRoles.length > 0 ? (["roles"] as const) : [])];
-  const initialStep = Math.max(0, cardIds.indexOf(initialCard));
-  // Nur mit `cards` werden die Gruppen zu Karten; sonst steht alles wie bisher untereinander.
   const group = (id: IdentityCardId, node: React.ReactNode) => (cards ? <div data-card={id}>{node}</div> : node);
   const saveButton = <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />;
-  const shell = (nodes: React.ReactNode) =>
-    cards ? (
-      <IdentityCardFlow
-        ids={cardIds}
-        initialStep={initialStep}
-        saveNode={saveButton}
-        copy={{
-          back: t("identity.cards.back"),
-          next: t("identity.cards.next"),
-          stepOf: t("identity.cards.stepOf", { current: "{current}", total: "{total}" }),
-          label: t("identity.cards.label"),
-          titles: {
-            who: t("aboutYou.groups.who"),
-            where: t("aboutYou.groups.where"),
-            what: t("aboutYou.groups.what"),
-            links: t("identity.cards.links"),
-            roles: t("identity.cards.roles"),
-          },
-        }}
-      >
-        {nodes}
-      </IdentityCardFlow>
-    ) : (
-      nodes
-    );
   return (
     <>
-        {showPhoto ? (
+        {showPhoto ? group("photo", (
 <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
           <ProfilePhotoField
             displayName={core?.display_name?.trim() || ""}
@@ -123,8 +93,8 @@ export async function IdentityEditor({
             />
           ) : null}
         </section>
-      ) : null}
-        <form action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
+      )) : null}
+        <form id="identity-form" action={saveIdentityAction} className="mt-8 space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
           {/* Reist mit, damit das Speichern zurueckfuehrt, wo es hergekommen
               ist - siehe parseIdentityReturnPath fuer die Allowlist. */}
           {returnPath ? <input type="hidden" name="next" value={returnPath} /> : null}
@@ -165,7 +135,6 @@ export async function IdentityEditor({
 
               `fieldset`/`legend` und nicht `div`/`h3`: Dieselbe Gliederung,
               die man sieht, hoert auch, wer das Formular vorgelesen bekommt. */}
-          {shell(<>
           {group("who", (
           <fieldset className="space-y-5 border-t border-slate-200 pt-5">
             <legend className="text-sm font-semibold text-slate-900">
@@ -347,7 +316,6 @@ export async function IdentityEditor({
               </div>
             </fieldset>
           )) : null}
-          </>)}
           {!cards ? <div className="flex flex-wrap items-center gap-3">
             {saveButton}
             {/* Der Weg zurueck, wenn Connect oder Discovery hierher geschickt
