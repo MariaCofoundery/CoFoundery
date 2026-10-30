@@ -1,3 +1,4 @@
+import { buildAdvisorConfirmedFounderSetup, type AdvisorConfirmedFounderSetupItem, type AdvisorConfirmedFounderSetupRow } from "@/features/teams/founderSetupAdvisorAccessModel";
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -21,6 +22,7 @@ export type OrgTeamProgram = {
   category: string | null;
   isAlumni: boolean;
   soloConfirmed: boolean;
+  includesSetup: boolean;
 };
 
 export type TeamProgramInvite = {
@@ -43,6 +45,7 @@ export type MyTeamProgram = {
   contactNames: string[];
   adminNames: string[];
   soloConfirmed: boolean;
+  includesSetup: boolean;
 };
 
 export type TeamProgramInviteOption = {
@@ -68,6 +71,7 @@ export async function getOrgTeamPrograms(client: SupabaseClient, orgId: string):
     category: (row.category as string | null) ?? null,
     isAlumni: row.is_alumni === true,
     soloConfirmed: row.solo_confirmed === true,
+    includesSetup: row.includes_setup === true,
   }));
 }
 
@@ -96,6 +100,7 @@ export async function getMyTeamPrograms(client: SupabaseClient): Promise<MyTeamP
     contactNames: ((row.contact_names as string[] | null) ?? []).filter((name) => name.length > 0),
     adminNames: ((row.admin_names as string[] | null) ?? []).filter((name) => name.length > 0),
     soloConfirmed: row.solo_confirmed === true,
+    includesSetup: row.includes_setup === true,
   }));
 }
 
@@ -254,4 +259,11 @@ export async function getProgramBrandingForCode(client: SupabaseClient, code: st
     accent: (row.accent as string | null) ?? null,
     accentB: (row.accent_b as string | null) ?? null,
   };
+}
+
+/** Das bestaetigte Founder Setup eines Programm-Teams - nur, wenn das Programm es einschliesst und aktiv ist. */
+export async function getProgramConfirmedSetup(client: SupabaseClient, programId: string): Promise<AdvisorConfirmedFounderSetupItem[]> {
+  const { data, error } = await client.rpc("get_program_confirmed_setup", { p_program_id: programId });
+  if (error || !Array.isArray(data)) return [];
+  return buildAdvisorConfirmedFounderSetup(data as AdvisorConfirmedFounderSetupRow[]);
 }

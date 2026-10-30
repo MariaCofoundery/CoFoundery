@@ -238,3 +238,18 @@ test("Code-Seite: Logo und Farben der Organisation, nur was die oeffentliche Sei
   const publicPage = readFileSync("src/app/p/[slug]/page.tsx", "utf8");
   assert.match(publicPage, /ProgramBrandHeader/);
 });
+
+test("Programm schliesst das Founder Setup ein: nur lesend, nur gemeinsam bestaetigt, nur fuer Inhaber und Bezugspersonen, im Text ausdruecklich", () => {
+  const sql = readFileSync("../supabase/migrations/20270205120000_program_includes_setup.sql", "utf8");
+  assert.match(sql, /p\.includes_setup\s+and public\.team_program_is_active/);
+  assert.match(sql, /revision\.confirmed_at is not null/);
+  assert.match(sql, /team_program_contacts/);
+  assert.doesNotMatch(sql, /grant execute[^;]*anon/);
+  const view = readFileSync("src/features/advisor/ProgramSetupView.tsx", "utf8");
+  assert.doesNotMatch(view, /action=|<form|rpc\(/);
+  const messages = JSON.parse(readFileSync("messages/de/advisor.json", "utf8"));
+  assert.match(messages.teamProgram.meaning, /Founder Setup/);
+  assert.match(messages.programPage.privacyNote, /Founder Setup/);
+  const privacy = readFileSync("src/app/datenschutz/page.tsx", "utf8");
+  assert.match(privacy, /bestätigten Vereinbarungen im Founder Setup, nur lesend/);
+});

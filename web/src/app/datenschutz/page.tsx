@@ -342,7 +342,10 @@ export default function DatenschutzPage() {
                 "Eine Organisation kann eine öffentliche Programmseite einrichten (Kurzname, Willkommenstext, Logo). Sie ist erst nach ausdrücklicher Veröffentlichung für alle mit dem Link sichtbar und zeigt nichts über Teams oder Mitglieder. Mit einem gültigen Programmcode oder einer gültigen Programm-Einladung kann man über diesen Weg auch ein Konto anlegen.",
                 "Mit einem Programmcode kann ein Team selbst beitreten. Wir speichern den Code, wie oft er benutzt wurde und bis wann er gilt. Gibst du einen falschen Code ein, speichern wir den Fehlversuch mit deinem Konto, höchstens einen Tag lang, damit niemand Codes durchprobieren kann.",
                 "Lädt eine Organisation per E-Mail ein, geben Inhaberinnen oder Inhaber dafür eine E-Mail-Adresse ein. Wir nutzen sie nur für den Versand der Einladung über unseren E-Mail-Dienst und speichern sie nicht.",
-                "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Entscheidungen.",
+                "Mit der Zustimmung zum Programm sehen die Inhaberinnen und Inhaber der Organisation und die Bezugspersonen deines Teams auch die gemeinsam bestätigten Vereinbarungen im Founder Setup, nur lesend. Entwürfe und Punkte, die nicht alle bestätigt haben, sehen sie nicht. Das steht vor der Zustimmung ausdrücklich da. Programme, die vor dieser Regel begonnen haben, bekommen sie nicht nachträglich.",
+                "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen und Team-Review bleiben getrennte Entscheidungen.",
+                "Wer über einen Programmcode ein Konto anlegt, wird mit diesem Code verknüpft (damit ein Code nicht beliebig viele Konten erzeugt: höchstens fünf je Team-Platz). Das Konto bleibt damit verknüpft, bis du es löschst. Mit dem Löschen entfällt die Verknüpfung.",
+                "Besteht ein Team nur aus einer Person, kann das Team selbst oder die Organisation (Inhaber oder Bezugsperson) es als vollständig markieren. Wir speichern, wann und von wem. Die Markierung ersetzt keine Zustimmung.",
                 "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen, Programmprofil, Meilensteine und Updates werden gelöscht.",
               ]}
             />

@@ -765,7 +765,7 @@
     "iApproved": "Du hast zugestimmt",
     "end": "Programm beenden",
     "endHint": "Jede Person im Team kann das jederzeit beenden.",
-    "meaning": "Zustimmen heißt: Die Organisation sieht, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet.",
+    "meaning": "Zustimmen heißt: Die Organisation (Inhaber und Bezugspersonen) sieht, was dein Team ins Programm einträgt, und die gemeinsam bestätigten Vereinbarungen im Founder Setup, nur lesend. Arbeitsweisen und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet.",
     "inviteTitle": "Einladung ins Programm von {org}",
     "inviteText": "Wähle das Team, das teilnehmen soll. Erst wenn alle im Team zugestimmt haben, ist es aktiv.",
     "inviteNoTeam": "Du bist in keinem Team, das teilnehmen könnte. Lege zuerst ein Team an oder tritt einem bei.",
@@ -905,7 +905,13 @@
     "soloTeamText": "Wenn ihr wirklich nur eine Person seid, markiere das Team als vollständig. Dann sieht die Organisation euer Programm schon jetzt.",
     "soloTeamConfirm": "Wir sind vollständig (eine Person)",
     "soloMarkedForTeam": "Dein Team ist als Ein-Personen-Team markiert. Kommt eine zweite Person dazu, müssen beide zustimmen.",
-    "soloUndo": "Markierung zurücknehmen"
+    "soloUndo": "Markierung zurücknehmen",
+    "tabSetup": "Founder Setup",
+    "setupTitle": "Founder Setup",
+    "setupText": "Die Vereinbarungen, die alle im Team gemeinsam bestätigt haben. Nur lesend. Entwürfe und Punkte, die nicht jede Person bestätigt hat, fehlen.",
+    "setupNotIncluded": "Dieses Programm begann, bevor das Founder Setup Teil der Zustimmung war. Es ist hier deshalb nicht sichtbar.",
+    "setupEmpty": "Noch gibt es keine gemeinsam bestätigten Punkte im Founder Setup.",
+    "meaningWithoutSetup": "Zustimmen hieß: Die Organisation sieht, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet."
   },
   "programPage": {
     "title": "Programmseite",
@@ -936,7 +942,7 @@
     "step2": "Melde dich an oder lege ein Konto an.",
     "step3": "Wähle dein Team.",
     "step4": "Alle im Team stimmen zu, dann seid ihr im Programm.",
-    "privacyNote": "Mit dem Beitritt sieht die Organisation nur, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und weitere Freigaben bleiben eigene Entscheidungen.",
+    "privacyNote": "Mit dem Beitritt sieht die Organisation, was dein Team ins Programm einträgt, und die gemeinsam bestätigten Vereinbarungen im Founder Setup, nur lesend. Arbeitsweisen und weitere Freigaben bleiben eigene Entscheidungen.",
     "poweredBy": "Bereitgestellt von Made2Found",
     "errors": {
       "slug_taken": "Dieser Kurzname ist schon vergeben. Nimm einen anderen.",

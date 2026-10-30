@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
+import { ProgramSetupView } from "@/features/advisor/ProgramSetupView";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { ProgramProfileView } from "@/features/advisor/ProgramProfile";
@@ -11,6 +12,7 @@ import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
 import {
   getOrgTeamPrograms,
   getProgramAccess,
+  getProgramConfirmedSetup,
   getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
@@ -22,9 +24,11 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 /**
  * Ein Team im Programm, aus Sicht der Bezugsperson oder des Inhabers.
  *
- * Es steht nur, was das Team ins Programm einbringt: Stand der Zustimmung,
- * Bezugspersonen, Meilensteine. Arbeitsweisen, Founder Setup und Team-Review
- * sind eigene Freigaben und stehen hier nicht.
+ * Es steht, was das Team ins Programm einbringt: Stand der Zustimmung,
+ * Bezugspersonen, Meilensteine - und das gemeinsam bestaetigte Founder Setup,
+ * weil die Zustimmung zum Programm es ausdruecklich einschliesst (nur lesend,
+ * nur bestaetigte Punkte). Arbeitsweisen und Team-Review sind eigene Freigaben
+ * und stehen hier nicht.
  */
 export default async function AdvisorProgramTeamPage({
   params,
@@ -36,8 +40,9 @@ export default async function AdvisorProgramTeamPage({
   const { programId } = await params;
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
   const tabParam = ((await searchParams) ?? {}).tab;
-  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" ? tabParam : "overview";
+  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
+  const locale = await getLocale();
   const {
     data: { user },
   } = await getRequestUser();
@@ -58,7 +63,7 @@ export default async function AdvisorProgramTeamPage({
   }
   if (!program || !orgOfProgram) notFound();
 
-  const [members, milestones, questions, updates, due, profile, accessRows] = await Promise.all([
+  const [members, milestones, questions, updates, due, profile, accessRows, setupItems] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
     program.isActive && (tab === "meilensteine" || tab === "overview") ? listProgramMilestones(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? getProgramUpdateQuestions(client, programId) : Promise.resolve([]),
@@ -66,6 +71,7 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && (tab === "updates" || tab === "overview") ? getProgramUpdateDue(client, programId) : Promise.resolve(null),
     program.isActive && tab === "overview" ? getProgramProfile(client, programId) : Promise.resolve(null),
     program.isActive && tab === "freigaben" ? getProgramAccess(client, orgOfProgram.id) : Promise.resolve([]),
+    program.isActive && tab === "setup" ? getProgramConfirmedSetup(client, programId) : Promise.resolve([]),
   ]);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
@@ -74,6 +80,7 @@ export default async function AdvisorProgramTeamPage({
     ["overview", t("tabOverview"), base],
     ["meilensteine", t("tabMilestones"), `${base}?tab=meilensteine`],
     ["updates", t("tabUpdates"), `${base}?tab=updates`],
+    ["setup", t("tabSetup"), `${base}?tab=setup`],
     ["freigaben", t("tabAccess"), `${base}?tab=freigaben`],
   ];
   const facts = [program.batch, program.category, program.isAlumni ? t("metaAlumni") : null].filter(Boolean).join(" · ");
@@ -138,6 +145,8 @@ export default async function AdvisorProgramTeamPage({
             </dl>
             <ProgramProfileView profile={profile} />
           </div>
+        ) : tab === "setup" ? (
+          <ProgramSetupView items={setupItems} includesSetup={program.includesSetup} locale={locale} />
         ) : tab === "freigaben" ? (
           <TeamAccessList programId={programId} access={accessRows.find((row) => row.programId === programId) ?? null} />
         ) : tab === "updates" ? (

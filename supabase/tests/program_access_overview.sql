@@ -15,8 +15,9 @@ insert into public.founder_teams(id, name, team_context) values ('e6000000-0000-
 insert into public.founder_team_members(team_id, user_id) values
 ('e6000000-0000-4000-8000-0000000000b0','e6000000-0000-4000-8000-000000000002'),
 ('e6000000-0000-4000-8000-0000000000b0','e6000000-0000-4000-8000-000000000003');
-insert into public.team_programs(id, org_id, team_id, status, activated_at) values
-('e6000000-0000-4000-8000-0000000000c0','e6000000-0000-4000-8000-0000000000a0','e6000000-0000-4000-8000-0000000000b0','active', now());
+-- Dieses Programm begann vor dem Setup-Text (includes_setup = false): hier zaehlt nur die Freigabe ueber Begleitbeziehungen.
+insert into public.team_programs(id, org_id, team_id, status, activated_at, includes_setup) values
+('e6000000-0000-4000-8000-0000000000c0','e6000000-0000-4000-8000-0000000000a0','e6000000-0000-4000-8000-0000000000b0','active', now(), false);
 insert into public.team_program_consents(program_id, founder_user_id) values
 ('e6000000-0000-4000-8000-0000000000c0','e6000000-0000-4000-8000-000000000002'),
 ('e6000000-0000-4000-8000-0000000000c0','e6000000-0000-4000-8000-000000000003');
