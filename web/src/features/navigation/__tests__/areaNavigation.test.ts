@@ -31,10 +31,12 @@ test("the bar carries areas, and only areas", () => {
     "areaConnect",
     "advisorFollow",
     "advisorInvite",
-    "advisorOrg",
   ]) {
     assert.match(shell, new RegExp(`label: t\\("${area}"\\)`), `${area} fehlt als Bereich`);
   }
+  // Der Organisationseintrag zeigt bei genau einer Organisation deren Namen, sonst "Organisation".
+  assert.match(shell, /label: advisorOrgLabel/);
+  assert.match(shell, /advisorOrgNames\.length === 1[\s\S]*?: t\("advisorOrg"\)/);
   // Align ist seit der UX-Neuordnung (19.10.2026) wieder ein Bereich - mit Profil und Team in der zweiten Reihe.
   // (Produktentscheidung: drei Produktbereiche Align, Find, Connect; Start davor.)
   assert.match(shell, /label: t\("areaAlign"\)/);
@@ -197,4 +199,12 @@ test("auch Profil leuchtet auf, wenn man dort ist", () => {
 
   // Und der Ort wird weiterhin auch vorgelesen, nicht nur gefaerbt.
   assert.match(shell, /href="\/me\/profile"[\s\S]{0,120}aria-current=\{isProfilePath\(pathname\) \? "page"/);
+});
+
+test("wer einer Organisation angehoert, sieht den Advisor-Bereich - ohne dass das Einsicht gibt", () => {
+  const data = readFileSync("src/features/dashboard/dashboardRoleData.ts", "utf8");
+  assert.match(data, /advisorOrgNames\.length > 0/);
+  assert.match(data, /\.from\("advisor_org_members"\)[\s\S]*?\.eq\("status", "active"\)/);
+  // Nur Namen werden gelesen, keine Mitglieder- oder Teamdaten.
+  assert.match(data, /\.from\("advisor_orgs"\)\.select\("name"\)/);
 });

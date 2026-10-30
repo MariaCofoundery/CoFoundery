@@ -24,6 +24,8 @@ export type DashboardRoleViews = {
   hasFounder: boolean;
   hasAdvisor: boolean;
   roles: DashboardRoleKey[];
+  /** Namen der Organisationen, in denen die Person aktiv Mitglied ist (leer, wenn keine). */
+  advisorOrgNames?: string[];
 };
 
 type AdvisorAccessRow = {
@@ -245,7 +247,7 @@ function advisorFollowUp(value: unknown): AdvisorDashboardTeam["followUp"] {
 
 export async function getDashboardRoleViews(userId: string): Promise<DashboardRoleViews> {
   const supabase = await createClient();
-  const [profile, advisorAccess, relationshipAdvisorAccess] = await Promise.all([
+  const [profile, advisorAccess, relationshipAdvisorAccess, advisorOrgNames] = await Promise.all([
     getProfileBasicsRow(supabase, userId).catch(() => null),
     supabase
       .from("founder_alignment_workbook_advisors")
@@ -253,6 +255,7 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
       .eq("advisor_user_id", userId)
       .limit(1),
     listRelationshipAdvisorsForUser(userId, supabase),
+    listActiveAdvisorOrgNames(supabase, userId),
   ]);
 
   const roles = normalizeProfileRoles(profile?.roles ?? null);
@@ -260,13 +263,40 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
   const hasAdvisor =
     hasProfileRole(roles, "advisor") ||
     Boolean((advisorAccess.data ?? []).length > 0) ||
-    relationshipAdvisorAccess.length > 0;
+    relationshipAdvisorAccess.length > 0 ||
+    // Wer einer Organisation angehoert, soll den Bereich dazu sehen, auch ohne
+    // gewaehlte Advisor-Rolle. Das zeigt nur die Navigation und die
+    // Organisationsseite; Einsicht in Personen oder Teams gibt es weiter nur
+    // ueber deren Freigaben.
+    advisorOrgNames.length > 0;
 
   return {
     hasFounder,
     hasAdvisor,
     roles,
+    advisorOrgNames,
   };
+}
+
+async function listActiveAdvisorOrgNames(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<string[]> {
+  try {
+    const { data: memberships } = await supabase
+      .from("advisor_org_members")
+      .select("org_id")
+      .eq("user_id", userId)
+      .eq("status", "active");
+    const orgIds = (memberships ?? []).map((row) => row.org_id as string);
+    if (orgIds.length === 0) return [];
+    const { data: orgs } = await supabase.from("advisor_orgs").select("name").in("id", orgIds);
+    return (orgs ?? [])
+      .map((org) => String(org.name ?? "").trim())
+      .filter((name) => name.length > 0);
+  } catch {
+    return [];
+  }
 }
 
 export async function getAdvisorDashboardProfile(userId: string): Promise<AdvisorDashboardProfile> {

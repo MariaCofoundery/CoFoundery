@@ -116,6 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           hasFounder: false,
           hasAdvisor: false,
           roles: [],
+          advisorOrgNames: [] as string[],
         })),
         getPersonCore(supabase, user.id).catch(() => null),
         getOwnProfileImage(supabase, user.id).catch(() => ({ avatarId: null, imageUrl: null })),
@@ -140,6 +141,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           hasFounder: false,
           hasAdvisor: false,
           roles: [],
+          advisorOrgNames: [] as string[],
         },
         null,
         { avatarId: null, imageUrl: null },
@@ -170,6 +172,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ProductShell
             hasFounder={roleViews.hasFounder}
             hasAdvisor={roleViews.hasAdvisor}
+            advisorOrgNames={roleViews.advisorOrgNames ?? []}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             displayName={displayName}

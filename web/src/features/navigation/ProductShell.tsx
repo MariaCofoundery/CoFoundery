@@ -28,6 +28,8 @@ type Props = {
   children: React.ReactNode;
   hasFounder: boolean;
   hasAdvisor: boolean;
+  /** Eine Organisation: ihr Name steht im Menue. Mehrere oder keine: "Organisation". */
+  advisorOrgNames?: string[];
   hasConnect: boolean;
   hasConnectAccount: boolean;
   displayName: string | null;
@@ -270,6 +272,7 @@ export function ProductShell({
   children,
   hasFounder,
   hasAdvisor,
+  advisorOrgNames = [],
   hasConnect,
   hasConnectAccount,
   displayName,
@@ -469,6 +472,12 @@ export function ProductShell({
   // Der Advisor-Baum: nur bestehende Ziele. Vorher stand hier nur ein Eintrag
   // zum Advisor-Dashboard; Personen, Reviews und Intake erreichte man nur ueber
   // Anker dort, und auf den Unterseiten zeigte die Leiste keinen Ort.
+  const advisorOrgLabel =
+    advisorOrgNames.length === 1
+      ? advisorOrgNames[0].length > 22
+        ? `${advisorOrgNames[0].slice(0, 21).trimEnd()}…`
+        : advisorOrgNames[0]
+      : t("advisorOrg");
   const advisorItems: NavigationItem[] = isConnectOnly || isFounderView || !hasAdvisor ? [] : [
     {
       href: "/advisor/dashboard",
@@ -497,7 +506,7 @@ export function ProductShell({
     },
     {
       href: "/advisor/organisation",
-      label: t("advisorOrg"),
+      label: advisorOrgLabel,
       isActive: (currentPathname) => currentPathname === "/advisor/organisation",
     },
   ];
