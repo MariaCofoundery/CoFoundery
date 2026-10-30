@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
+import { alignOfLine } from "@/features/advisor/programTextAlign";
 
 /**
  * Einfache Formatierung fuer den Willkommenstext einer Programmseite - ohne
  * HTML. Erlaubt sind **fett**, *kursiv*, ++groesser++ (bis zu drei Stufen), --kleiner-- (bis zu zwei), Listen mit
- * "- " und Absaetze durch Leerzeilen. Alles andere bleibt Text; es gibt keine Links und kein HTML, damit
+ * "- ", Ausrichtung pro Zeile (::c mittig, ::r rechts) und Absaetze durch Leerzeilen. Alles andere bleibt Text; es gibt keine Links und kein HTML, damit
  * eine Organisation auf ihrer Seite nichts einschleusen kann, das wie eine
  * Anwendungsseite aussieht oder woanders hinfuehrt.
  */
@@ -44,12 +45,23 @@ export function ProgramRichText({ text, className }: { text: string; className?:
         }
         return (
           <p key={index} className="mt-2 first:mt-0">
-            {lines.map((line, i) => (
-              <span key={i}>
-                {i > 0 ? <br /> : null}
-                {inline(line)}
-              </span>
-            ))}
+            {lines.map((line, i) => {
+              const { align, rest } = alignOfLine(line);
+              if (align === "left") {
+                return (
+                  <span key={i}>
+                    {i > 0 && alignOfLine(lines[i - 1]).align === "left" ? <br /> : null}
+                    {inline(rest)}
+                  </span>
+                );
+              }
+              // Eine ausgerichtete Zeile steht als eigener Block, sonst wirkt text-align nicht.
+              return (
+                <span key={i} className={`block ${align === "center" ? "text-center" : "text-right"}`}>
+                  {inline(rest)}
+                </span>
+              );
+            })}
           </p>
         );
       })}

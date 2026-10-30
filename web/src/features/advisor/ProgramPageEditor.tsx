@@ -3,6 +3,7 @@
 import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { DEFAULT_ACCENT, DEFAULT_ACCENT_B, GRADIENT_PRESETS, accentStyles, parseAccent } from "@/features/advisor/programAccent";
 import { ProgramRichText } from "@/features/advisor/programRichText";
+import { changeTextAlign, type TextAlign } from "@/features/advisor/programTextAlign";
 import { changeTextSize } from "@/features/advisor/programTextSize";
 import { saveProgramPageAction } from "@/features/advisor/teamProgramActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -35,6 +36,9 @@ export type ProgramPageLabels = {
   bold: string;
   italic: string;
   list: string;
+  alignLeft: string;
+  alignCenter: string;
+  alignRight: string;
   formatHint: string;
 };
 
@@ -140,6 +144,16 @@ export function ProgramPageEditor({
     setWelcome(result.text);
   }
 
+  /** Richtet die Zeilen unter der Auswahl aus; die Regeln stehen in programTextAlign.ts. Die Auswahl bleibt stehen. */
+  function changeAlign(align: TextAlign) {
+    const area = textRef.current;
+    if (!area) return;
+    const result = changeTextAlign(welcome, area.selectionStart, area.selectionEnd, align);
+    if (result.text.length > 600) return;
+    pendingSelection.current = [result.selectionStart, result.selectionEnd];
+    setWelcome(result.text);
+  }
+
   /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). Die Auswahl bleibt stehen. */
   function format(kind: "bold" | "italic" | "list") {
     const area = textRef.current;
@@ -211,6 +225,21 @@ export function ProgramPageEditor({
                 className={`grid h-9 w-9 place-items-center rounded-lg border border-slate-300 bg-white text-sm text-slate-800 hover:bg-slate-100 ${extra}`}
               >
                 {glyph}
+              </button>
+            ))}
+            <span className="mx-1 h-5 w-px bg-slate-300" aria-hidden="true" />
+            {([["left", labels.alignLeft, "M3 5h14M3 9h9M3 13h14M3 17h9"], ["center", labels.alignCenter, "M3 5h14M6 9h8M3 13h14M6 17h8"], ["right", labels.alignRight, "M3 5h14M8 9h9M3 13h14M8 17h9"]] as const).map(([align, label, path]) => (
+              <button
+                key={align}
+                type="button"
+                aria-label={label}
+                title={label}
+                onClick={() => changeAlign(align)}
+                className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 bg-white text-slate-800 hover:bg-slate-100"
+              >
+                <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                  <path d={path} />
+                </svg>
               </button>
             ))}
           </div>

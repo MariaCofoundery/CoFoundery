@@ -932,11 +932,14 @@
     "bold": "Fett",
     "italic": "Kursiv",
     "list": "Liste",
-    "formatHint": "Fett: **Text**, kursiv: *Text*, Liste: Zeilen mit „- “ am Anfang. A+ und A− ändern die Größe stufenweise, jeder Klick eine Stufe (bis zu drei größer, zwei kleiner). Ohne Markierung gilt das Wort an der Schreibmarke.",
+    "formatHint": "Fett: **Text**, kursiv: *Text*, Liste: Zeilen mit „- “ am Anfang. A+ und A− ändern die Größe stufenweise, jeder Klick eine Stufe (bis zu drei größer, zwei kleiner). Ohne Markierung gilt das Wort an der Schreibmarke. Die drei Ausrichtungs-Knöpfe wirken auf alle Zeilen unter der Markierung (ohne Markierung: die aktuelle Zeile); von Hand: „::c “ mittig, „::r “ rechts am Zeilenanfang.",
     "accentA": "Farbe 1",
     "accentB": "Farbe 2",
     "accentHint": "Wähle einen fertigen Verlauf oder tippe eigene Hex-Codes wie #6D49E0. Zwei gleiche Farben ergeben eine einfarbige Fläche. Die Schrift wird automatisch hell oder dunkel, damit sie lesbar bleibt.",
     "bigger": "Größer",
+    "alignLeft": "Linksbündig",
+    "alignCenter": "Mittig",
+    "alignRight": "Rechtsbündig",
     "smaller": "Kleiner"
   }
 }

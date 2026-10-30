@@ -271,6 +271,9 @@ export default async function AdvisorOrganisationPage({
                   bold: tAdvisor("programPage.bold"),
                   italic: tAdvisor("programPage.italic"),
                   list: tAdvisor("programPage.list"),
+                  alignLeft: tAdvisor("programPage.alignLeft"),
+                  alignCenter: tAdvisor("programPage.alignCenter"),
+                  alignRight: tAdvisor("programPage.alignRight"),
                   formatHint: tAdvisor("programPage.formatHint"),
                 }}
               />
