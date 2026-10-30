@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
-import { consentTeamProgramAction, endTeamProgramAction } from "@/features/advisor/teamProgramActions";
+import { consentTeamProgramAction, endTeamProgramAction, openTeamProgramCodeAction } from "@/features/advisor/teamProgramActions";
 import {
   getMyTeamPrograms,
   getProgramProfile,
@@ -20,7 +20,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
  * Programm: in welchen Programmen ist mein Team, und wer liest mit? Die
  * Zustimmung steht hier, damit jede Person im Team sie selbst gibt.
  */
-export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string }> }) {
+export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string }> }) {
   const t = await getTranslations("advisor.teamProgram");
   const {
     data: { user },
@@ -48,7 +48,8 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
       programs.filter((program) => program.isActive).map(async (program) => [program.programId, await listProgramMilestones(client, program.programId)] as const),
     ),
   );
-  const isNew = ((await searchParams) ?? {}).neu === "1";
+  const query = (await searchParams) ?? {};
+  const isNew = query.neu === "1";
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
@@ -59,6 +60,16 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
           {t("pageNew")}
         </p>
       ) : null}
+
+      <form action={openTeamProgramCodeAction} className="mt-6 grid gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4 sm:max-w-md">
+        <label>
+          <span className="block text-sm font-semibold text-slate-900">{t("codeEntryTitle")}</span>
+          <span className="block text-xs leading-5 text-slate-600">{t("codeEntryText")}</span>
+          <input name="code" required maxLength={12} autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label={t("codeEntryLabel")} className="mt-2 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm uppercase tracking-[.2em]" />
+        </label>
+        {query.code === "invalid" ? <p role="alert" className="text-xs text-rose-800">{t("codeEntryInvalid")}</p> : null}
+        <SubmitButton label={t("codeEntryGo")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white" />
+      </form>
 
       {programs.length === 0 ? (
         <p className="mt-6 text-sm text-slate-600">{t("pageEmpty")}</p>

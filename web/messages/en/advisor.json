@@ -818,6 +818,25 @@
     "inviteMailSent": "The invitation is on its way by email. We only used the address for that and did not store it.",
     "inviteMailFailed": "The email could not be sent. Pass the link below on yourself.",
     "inviteMailInvalid": "The email address does not look right. The link is still below.",
-    "inviteLimit": "There are already 25 open invitations. Withdraw one or wait until one expires."
+    "inviteLimit": "There are already 25 open invitations. Withdraw one or wait until one expires.",
+    "codesTitle": "Program codes",
+    "codesText": "A team can join on its own with a code. Each code applies to a limited number of teams and expires; you can revoke it at any time. Everyone on the team still has to agree.",
+    "codeLabel": "Label (e.g. Batch 2026/2)",
+    "codeMaxUses": "Teams (at most)",
+    "codeValidDays": "Valid (days)",
+    "codeCreate": "Create code",
+    "codeUses": "{uses} of {max} teams",
+    "codeExpires": "valid until {date}",
+    "codeRevoke": "Revoke",
+    "codeRevoked": "revoked",
+    "codeExpired": "expired",
+    "codeLimit": "There are already five active codes. Revoke one before creating a new one.",
+    "codeEntryTitle": "Enter a program code",
+    "codeEntryText": "Did an organization give you a program code? Enter it here.",
+    "codeEntryLabel": "Code",
+    "codeEntryGo": "Continue",
+    "codeEntryInvalid": "The code has eight characters made of letters and digits.",
+    "codeInvalid": "This code is not valid (any more) – or you entered a wrong code too often. Try again in an hour.",
+    "codeNoTeam": "You have no team that could join with this code."
   }
 }

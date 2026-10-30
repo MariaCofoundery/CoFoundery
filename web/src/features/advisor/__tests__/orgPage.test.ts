@@ -115,3 +115,14 @@ test("Einladung per Mail: Adresse wird nicht gespeichert, Link bleibt ein Hash, 
   const mail = readFileSync("src/lib/email/sendTeamProgramInviteEmail.ts", "utf8");
   assert.match(mail, /nirgends gespeichert/);
 });
+
+test("Programmcode: begrenzt, sperrbar, Fehlversuche gezaehlt, das Team stimmt weiter selbst zu", () => {
+  const sql = readFileSync("../supabase/migrations/20270128120000_team_program_codes.sql", "utf8");
+  assert.match(sql, /max_uses/);
+  assert.match(sql, /team_program_code_may_try/);
+  assert.match(sql, /team_program_try_activate\(v_program\)/);
+  assert.match(sql, /status = 'revoked'/);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("start_team_program_by_code"/);
+  assert.match(actions, /CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"/);
+});

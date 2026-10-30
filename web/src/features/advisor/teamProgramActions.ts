@@ -224,3 +224,54 @@ export async function requestProgramTeamReviewAction(formData: FormData) {
   revalidatePath("/advisor/programm");
   redirect(/^\/advisor\/programm\/[0-9a-f-]{36}\?tab=freigaben$/.test(back) ? back : "/advisor/organisation");
 }
+
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const normalizeCode = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+
+/** Der Code wird hier erzeugt (ohne verwechselbare Zeichen) und im Klartext gespeichert, damit der Inhaber ihn wieder sehen kann. */
+export async function createTeamProgramCodeAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSettings(orgId));
+  const bytes = randomBytes(8);
+  const code = Array.from(bytes, (byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join("");
+  const number = (name: string, fallback: number) => {
+    const text = String(formData.get(name) ?? "").trim();
+    return /^\d{1,3}$/.test(text) ? Number(text) : fallback;
+  };
+  const { error } = await client.rpc("create_team_program_code", {
+    p_org_id: orgId,
+    p_code: code,
+    p_label: String(formData.get("label") ?? "").trim().slice(0, 120) || null,
+    p_max_uses: number("maxUses", 10),
+    p_valid_days: number("validDays", 90),
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(orgSettings(orgId, error ? (error.code === "53400" ? "&programCodeError=limit" : "&orgError=org_forbidden") : ""));
+}
+
+export async function revokeTeamProgramCodeAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSettings(orgId));
+  await client.rpc("revoke_team_program_code", { p_code_id: String(formData.get("codeId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  redirect(orgSettings(orgId));
+}
+
+/** Vom Feld auf /programm: bringt den eingegebenen Code zur Auswahlseite. */
+export async function openTeamProgramCodeAction(formData: FormData) {
+  await requireUser("/programm");
+  const code = normalizeCode(String(formData.get("code") ?? ""));
+  redirect(code.length === 8 ? `/programm/code/${code}` : "/programm?code=invalid");
+}
+
+export async function startTeamProgramByCodeAction(formData: FormData) {
+  const code = normalizeCode(String(formData.get("code") ?? ""));
+  const client = await requireUser(`/programm/code/${code}`);
+  const { data, error } = await client.rpc("start_team_program_by_code", {
+    p_code: code,
+    p_team_id: String(formData.get("teamId") ?? ""),
+  });
+  if (error || !data) redirect(`/programm/code/${code}?fehler=1`);
+  revalidatePath("/programm");
+  redirect("/programm?neu=1");
+}

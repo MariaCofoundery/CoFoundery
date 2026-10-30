@@ -200,3 +200,36 @@ export async function getProgramAccess(client: SupabaseClient, orgId: string): P
     founderSetup: row.founder_setup === "active" ? "active" : row.founder_setup === "requested" ? "requested" : "none",
   }));
 }
+
+export type TeamProgramCode = {
+  codeId: string;
+  label: string | null;
+  code: string;
+  uses: number;
+  maxUses: number;
+  expiresAt: string;
+  status: "active" | "revoked" | "expired";
+};
+
+export async function listTeamProgramCodes(client: SupabaseClient, orgId: string): Promise<TeamProgramCode[]> {
+  const { data } = await client.rpc("list_team_program_codes", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    codeId: row.code_id as string,
+    label: (row.label as string | null) ?? null,
+    code: row.code as string,
+    uses: Number(row.uses ?? 0),
+    maxUses: Number(row.max_uses ?? 0),
+    expiresAt: row.expires_at as string,
+    status: row.status === "revoked" ? "revoked" : row.status === "expired" ? "expired" : "active",
+  }));
+}
+
+export async function getTeamProgramCodeOptions(client: SupabaseClient, code: string): Promise<TeamProgramInviteOption[]> {
+  const { data } = await client.rpc("get_team_program_code_options", { p_code: code });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    orgName: row.org_name as string,
+    teamId: row.team_id as string,
+    teamName: (row.team_name as string | null) ?? null,
+    memberCount: Number(row.member_count ?? 0),
+  }));
+}

@@ -818,6 +818,25 @@
     "inviteMailSent": "Die Einladung ist per E-Mail unterwegs. Die Adresse haben wir nur dafür benutzt und nicht gespeichert.",
     "inviteMailFailed": "Die E-Mail ließ sich nicht senden. Gib den Link unten selbst weiter.",
     "inviteMailInvalid": "Die E-Mail-Adresse sieht nicht richtig aus. Der Link steht trotzdem unten.",
-    "inviteLimit": "Es gibt schon 25 offene Einladungen. Ziehe eine zurück oder warte, bis eine abläuft."
+    "inviteLimit": "Es gibt schon 25 offene Einladungen. Ziehe eine zurück oder warte, bis eine abläuft.",
+    "codesTitle": "Programmcodes",
+    "codesText": "Ein Team kann mit einem Code selbst beitreten. Jeder Code gilt für eine begrenzte Zahl Teams und läuft ab; du kannst ihn jederzeit sperren. Auch hier müssen alle im Team zustimmen.",
+    "codeLabel": "Bezeichnung (z. B. Batch 2026/2)",
+    "codeMaxUses": "Teams (höchstens)",
+    "codeValidDays": "Gültig (Tage)",
+    "codeCreate": "Code erzeugen",
+    "codeUses": "{uses} von {max} Teams",
+    "codeExpires": "gültig bis {date}",
+    "codeRevoke": "Sperren",
+    "codeRevoked": "gesperrt",
+    "codeExpired": "abgelaufen",
+    "codeLimit": "Es gibt schon fünf aktive Codes. Sperre einen, bevor du einen neuen erzeugst.",
+    "codeEntryTitle": "Programmcode eingeben",
+    "codeEntryText": "Hast du von einer Organisation einen Programmcode bekommen? Trag ihn hier ein.",
+    "codeEntryLabel": "Code",
+    "codeEntryGo": "Weiter",
+    "codeEntryInvalid": "Der Code hat acht Zeichen aus Buchstaben und Ziffern.",
+    "codeInvalid": "Dieser Code gilt nicht (mehr) – oder du hast zu oft einen falschen Code eingegeben. Versuche es in einer Stunde noch einmal.",
+    "codeNoTeam": "Du hast kein Team, das mit diesem Code beitreten könnte."
   }
 }

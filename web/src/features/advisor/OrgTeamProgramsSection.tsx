@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
+  createTeamProgramCodeAction,
   createTeamProgramInviteAction,
+  revokeTeamProgramCodeAction,
   revokeTeamProgramInviteAction,
   setProgramMetaAction,
   setTeamProgramContactsAction,
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
-import type { OrgTeamProgram, TeamProgramInvite } from "@/features/advisor/teamProgramData";
+import type { OrgTeamProgram, TeamProgramCode, TeamProgramInvite } from "@/features/advisor/teamProgramData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
@@ -24,6 +26,8 @@ export async function OrgTeamProgramsSection({
   freshToken,
   mailState,
   inviteError,
+  codes,
+  codeError,
 }: {
   org: AdvisorOrg;
   members: OrgMember[];
@@ -34,6 +38,8 @@ export async function OrgTeamProgramsSection({
   /** Ergebnis des Mailversands direkt nach dem Erzeugen (sent | failed | invalid). */
   mailState: string | null;
   inviteError: string | null;
+  codes: TeamProgramCode[];
+  codeError: string | null;
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const isOwner = org.role === "owner" && org.status === "active";
@@ -97,6 +103,55 @@ export async function OrgTeamProgramsSection({
               </li>
             ))}
           </ul>
+        </div>
+      ) : null}
+
+      {isOwner ? (
+        <div className="mt-6 border-t border-slate-100 pt-5">
+          <h3 className="text-sm font-semibold text-slate-900">{t("codesTitle")}</h3>
+          <p className="mt-1 max-w-2xl text-xs leading-6 text-slate-600">{t("codesText")}</p>
+          <form action={createTeamProgramCodeAction} className="mt-3 grid items-end gap-3 sm:grid-cols-4">
+            <input type="hidden" name="orgId" value={org.id} />
+            <label className="sm:col-span-2">
+              <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("codeLabel")}</span>
+              <input name="label" maxLength={120} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+            </label>
+            <label>
+              <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("codeMaxUses")}</span>
+              <input name="maxUses" inputMode="numeric" defaultValue="10" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+            </label>
+            <label>
+              <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("codeValidDays")}</span>
+              <input name="validDays" inputMode="numeric" defaultValue="90" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+            </label>
+            <SubmitButton label={t("codeCreate")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700" />
+          </form>
+          {codeError === "limit" ? <p role="alert" className="mt-2 text-sm text-rose-800">{t("codeLimit")}</p> : null}
+          {codes.length > 0 ? (
+            <ul className="mt-3 grid gap-2">
+              {codes.map((entry) => (
+                <li key={entry.codeId} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 px-4 py-2 text-sm">
+                  <span className="min-w-0 text-slate-800">
+                    <span className="font-mono text-base font-semibold tracking-[.18em] text-slate-950">
+                      {entry.code.slice(0, 4)}-{entry.code.slice(4)}
+                    </span>
+                    <span className="ml-2 text-slate-500">
+                      {entry.label ? `${entry.label} · ` : ""}
+                      {t("codeUses", { uses: entry.uses, max: entry.maxUses })} · {t("codeExpires", { date: entry.expiresAt.slice(0, 10) })}
+                      {entry.status === "revoked" ? ` · ${t("codeRevoked")}` : entry.status === "expired" ? ` · ${t("codeExpired")}` : ""}
+                    </span>
+                  </span>
+                  {entry.status === "active" ? (
+                    <form action={revokeTeamProgramCodeAction}>
+                      <input type="hidden" name="orgId" value={org.id} />
+                      <input type="hidden" name="codeId" value={entry.codeId} />
+                      <SubmitButton label={t("codeRevoke")} pendingLabel="…" className="inline-flex min-h-11 items-center px-3 text-sm font-medium text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline" />
+                    </form>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       ) : null}
 
