@@ -36,7 +36,7 @@ export async function WaitingNotices({ notices }: { notices: WaitingNotice[] }) 
           >
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-medium text-slate-950">
-                {t(`kinds.${notice.kind}`)}
+                {t(`kinds.${notice.kind}`, { org: notice.orgName ?? "" })}
               </span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {t("since", { date: date.format(new Date(notice.createdAt)) })}

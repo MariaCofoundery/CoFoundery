@@ -78,3 +78,11 @@ test("Programm-Dashboard: Zaehler und Filter, alphabetisch, keine Wertung", () =
   const sql = readFileSync("../supabase/migrations/20270123120000_team_program_batch_category.sql", "utf8");
   assert.match(sql, /can_manage_team_program/);
 });
+
+test("Programm-Hinweis: die Organisation wird beim Anzeigen gelesen, nicht in der Zeile gespeichert", () => {
+  const data = readFileSync("src/features/notifications/inAppNoticeData.ts", "utf8");
+  assert.match(data, /get_my_team_programs/);
+  const sql = readFileSync("../supabase/migrations/20270124120000_program_invited_notice.sql", "utf8");
+  assert.match(sql, /'program_invited'/);
+  assert.match(sql, /m\.user_id <> v_user/);
+});

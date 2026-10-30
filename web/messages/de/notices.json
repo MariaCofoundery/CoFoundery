@@ -16,7 +16,8 @@
     "read_my_mind_handoff": "Read My Mind: Die andere Seite hat geantwortet. Du bist dran.",
     "founder_in_the_wild_handoff": "Founder in the Wild: Die andere Seite hat ausgefüllt. Du bist dran.",
     "collaboration_conversation_marker": "Die andere Seite möchte über einen bestimmten Punkt sprechen.",
-    "program_update_due": "Das nächste Update an dein Programm steht an."
+    "program_update_due": "Das nächste Update an dein Programm steht an.",
+    "program_invited": "{org} hat dein Team zu seinem Programm eingeladen. Dein Team ist erst dabei, wenn alle zugestimmt haben."
   },
   "announcements": {
     "eyebrow": "Mitteilung",

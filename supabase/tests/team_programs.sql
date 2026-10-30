@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(16);
+select extensions.plan(18);
 
 -- Team <-> Programm: Die Organisation laedt ein, das Team stimmt zu, jedes
 -- AKTUELLE Mitglied muss zustimmen, Mitgliedschaft in der Organisation gibt nichts frei.
@@ -53,6 +53,15 @@ create temp table prog as select public.start_team_program(repeat('a', 64), 'e20
 grant select on prog to authenticated;
 select extensions.is(
   (select status from public.get_my_team_programs() limit 1), 'invited', 'one consent is not enough while a member is missing');
+
+-- Die anderen im Team bekommen einen Hinweis im Postfach, der Einloesende nicht.
+reset role;
+select extensions.is(
+  (select count(*)::int from public.in_app_notices where kind = 'program_invited' and subject_id = (select id from prog)), 1, 'the other team member gets one notice');
+select extensions.is(
+  (select count(*)::int from public.in_app_notices where kind = 'program_invited' and recipient_user_id = 'e2000000-0000-4000-8000-000000000003'), 0, 'the person who redeemed gets none');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"e2000000-0000-4000-8000-000000000003","role":"authenticated"}';
 
 -- Der Token ist verbraucht.
 select extensions.throws_ok(

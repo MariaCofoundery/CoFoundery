@@ -16,7 +16,8 @@
     "read_my_mind_handoff": "Read My Mind: the other side has answered. Your turn.",
     "founder_in_the_wild_handoff": "Founder in the Wild: the other side has filled it in. Your turn.",
     "collaboration_conversation_marker": "The other side would like to talk about a particular point.",
-    "program_update_due": "The next update for your program is coming up."
+    "program_update_due": "The next update for your program is coming up.",
+    "program_invited": "{org} has invited your team to its program. Your team is only in once everyone has agreed."
   },
   "announcements": {
     "eyebrow": "Announcement",
