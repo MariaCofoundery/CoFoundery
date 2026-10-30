@@ -609,7 +609,12 @@
       "view": "Ansehen",
       "recentTitle": "Zuletzt begleitet",
       "recentAll": "Alle ansehen →",
-      "recentEmpty": "Noch niemand verknüpft."
+      "recentEmpty": "Noch niemand verknüpft.",
+      "programDeadline": "Frist erreicht: {team}, „{title}“, noch kein Stand eingetragen",
+      "programUpdate": "{overdue, select, yes {Update überfällig} other {Update fällig}} am {date}: {team}",
+      "tileTeams": "Teams im Programm",
+      "tileUpdates": "Updates in 14 Tagen",
+      "tileInvites": "offene Einladungen"
     },
     "follow": {
       "title": "Begleitung",

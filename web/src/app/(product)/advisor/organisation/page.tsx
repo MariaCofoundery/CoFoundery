@@ -103,31 +103,41 @@ export default async function AdvisorOrganisationPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[.12em] text-violet-700">{t("eyebrow")}</p>
-          <h1 className="mt-1 break-words text-3xl font-semibold tracking-tight text-slate-950">{org.name}</h1>
-          {org.locationRegion || org.status === "suspended" ? (
-            <p className="mt-1 text-sm text-slate-600">
-              {[org.locationRegion, org.status === "suspended" ? t("orgPage.suspendedShort") : null].filter(Boolean).join(" · ")}
-            </p>
-          ) : null}
-          {org.focus.length > 0 ? (
-            <ul aria-label={t("orgPage.focusLabel")} className="mt-3 flex flex-wrap gap-2">
-              {org.focus.map((entry) => (
-                <li key={entry} className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-800">
-                  {entry}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-        <p className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
-          {org.personSeatLimit === null
-            ? t("orgPage.seatsOpen", { used: seatsUsed })
-            : t("orgPage.seatsLimited", { used: seatsUsed, limit: org.personSeatLimit })}
-        </p>
-      </header>
+      <AdvisorPageHeader
+        eyebrow={[t("eyebrow"), org.locationRegion, org.status === "suspended" ? t("orgPage.suspendedShort") : null].filter(Boolean).join(" · ")}
+        title={org.name}
+        action={
+          <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">
+            {org.personSeatLimit === null
+              ? t("orgPage.seatsOpen", { used: seatsUsed })
+              : t("orgPage.seatsLimited", { used: seatsUsed, limit: org.personSeatLimit })}
+          </span>
+        }
+      >
+        {org.focus.length > 0 ? (
+          <ul aria-label={t("orgPage.focusLabel")} className="mb-4 flex flex-wrap gap-2">
+            {org.focus.map((entry) => (
+              <li key={entry} className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-indigo-100 ring-1 ring-white/15">
+                {entry}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <nav aria-label={t("orgPage.tabsLabel")} className="flex flex-wrap gap-2">
+          {TABS.map((entry, index) => (
+            <Link
+              key={entry}
+              href={base(entry)}
+              aria-current={tab === entry ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold ${
+                tab === entry ? "bg-white text-indigo-900" : "bg-white/10 text-indigo-100 hover:bg-white/20"
+              }`}
+            >
+              {tabLabels[index] ?? entry}
+            </Link>
+          ))}
+        </nav>
+      </AdvisorPageHeader>
 
       {orgs.length > 1 ? (
         <nav aria-label={t("orgPage.orgSwitchLabel")} className="mt-4 flex flex-wrap gap-2">
@@ -145,21 +155,6 @@ export default async function AdvisorOrganisationPage({
           ))}
         </nav>
       ) : null}
-
-      <nav aria-label={t("orgPage.tabsLabel")} className="mt-6 flex flex-wrap gap-x-6 gap-y-1 border-b border-slate-200">
-        {TABS.map((entry, index) => (
-          <Link
-            key={entry}
-            href={base(entry)}
-            aria-current={tab === entry ? "page" : undefined}
-            className={`-mb-px inline-flex min-h-11 items-center border-b-[3px] text-sm font-semibold ${
-              tab === entry ? "border-violet-600 text-slate-950" : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            {tabLabels[index] ?? entry}
-          </Link>
-        ))}
-      </nav>
 
       <div className="mt-6">
         {tab === "overview" ? (

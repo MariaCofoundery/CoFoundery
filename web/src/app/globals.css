@@ -936,6 +936,41 @@ body {
   color: #ffffff;
 }
 
+/* Kopf des Advisor-Bereichs: tiefes Indigo mit einem Lichtschein oben rechts (Richtung C aus dem Optik-Vorschlag, 31.10.2026). */
+.advisor-hero {
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  background-color: #17173a;
+  background-image: radial-gradient(120% 140% at 8% 0%, #2c2470 0%, #17173a 62%);
+}
+
+.advisor-hero::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -90px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 195, 238, 0.28), rgba(76, 195, 238, 0) 70%);
+  pointer-events: none;
+}
+
+@media print {
+  .advisor-hero {
+    background-image: none !important;
+    background-color: transparent !important;
+    color: #0f172a !important;
+  }
+  .advisor-hero * {
+    color: inherit !important;
+  }
+  .advisor-hero::after {
+    display: none;
+  }
+}
+
 @media print {
   /* Im Ausdruck steht die Marken-Flaeche ohne Verlauf: schwarz auf weiss, wie jede andere Seite. */
   .brand-panel {

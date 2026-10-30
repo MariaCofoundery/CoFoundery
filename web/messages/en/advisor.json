@@ -609,7 +609,12 @@
       "view": "View",
       "recentTitle": "Recently supported",
       "recentAll": "View all →",
-      "recentEmpty": "Nobody linked yet."
+      "recentEmpty": "Nobody linked yet.",
+      "programDeadline": "Deadline reached: {team}, \"{title}\", no progress entered yet",
+      "programUpdate": "{overdue, select, yes {Update overdue} other {Update due}} on {date}: {team}",
+      "tileTeams": "Teams in the program",
+      "tileUpdates": "Updates in 14 days",
+      "tileInvites": "open invitations"
     },
     "follow": {
       "title": "Support",

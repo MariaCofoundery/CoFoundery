@@ -127,3 +127,15 @@ test("Programmcode: begrenzt, sperrbar, Fehlversuche gezaehlt, das Team stimmt w
   assert.match(actions, /rpc\("start_team_program_by_code"/);
   assert.match(actions, /CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"/);
 });
+
+test("Advisor-Optik: ein gemeinsamer dunkler Kopf, die Startseite zeigt Programm-Fristen und Updates ohne Wertung", () => {
+  const header = readFileSync("src/features/advisor/AdvisorPageHeader.tsx", "utf8");
+  assert.match(header, /advisor-hero/);
+  const css = readFileSync("src/app/globals.css", "utf8");
+  assert.match(css, /\.advisor-hero \{/);
+  assert.match(css, /@media print \{\s*\.advisor-hero/);
+  const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.match(start, /getOrgMilestoneDeadlines/);
+  assert.match(start, /getProgramUpdateDue/);
+  assert.doesNotMatch(start, /score|rank|percent|compatib/i);
+});
