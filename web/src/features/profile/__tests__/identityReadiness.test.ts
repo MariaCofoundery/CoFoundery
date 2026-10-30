@@ -199,15 +199,18 @@ test("saving reports failure when no row was written", () => {
 // ---------------------------------------------------------------------------
 // Erreichbarkeit
 // ---------------------------------------------------------------------------
-test("the profile is in the navigation bar, not only behind the avatar", () => {
+test("the profile is reachable behind the avatar and in the mobile menu, not as an extra bar entry", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
   // GEAENDERT am 18.09.2026: Das Profil steht weiterhin sichtbar in der
   // Kopfzeile - aber rechts bei Konto und Sprache statt zwischen den
   // Bereichen. Es ist ein Querschnitt, kein Ort.
   // Der Eintrag in der Kopfzeile traegt navLinkClassName; der zweite Treffer
   // auf /profile ist das Menue hinter dem Bild, das es immer gab.
+  // GEAENDERT am 30.10.2026 (Maria): Mit fuenf Advisor-Bereichen ueberlappte die Leiste; der
+  // Kurzlink ist raus, das Menue hinter dem Bild und das Mobilmenue tragen das Profil.
   const navLinks = shell.match(/href="\/me\/profile"[\s\S]{0,200}?navLinkClassName/g) ?? [];
-  assert.equal(navLinks.length, 1, "genau ein sichtbarer Eintrag in der Kopfzeile");
+  assert.equal(navLinks.length, 0, "kein eigener Eintrag mehr in der Kopfzeile");
+  assert.match(shell, /href="\/me\/profile"[\s\S]{0,200}role="menuitem"/);
   assert.doesNotMatch(
     shell,
     /href="\/me\/profile"[\s\S]{0,120}areaLinkClassName/,

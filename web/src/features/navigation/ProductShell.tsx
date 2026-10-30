@@ -783,10 +783,9 @@ export function ProductShell({
                 ----------------------------------------------------------- */}
             <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-2 xl:flex-1 xl:flex-nowrap">
               <div className="hidden min-w-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 xl:flex xl:flex-nowrap">
-                {/* Das Profil ist kein Bereich, sondern ein Querschnitt: Es
-                    gehoert zu Konto und Sprache, nicht zwischen die Orte. Aber
-                    es bleibt SICHTBAR - im Menue hinter dem Bild zu verstecken
-                    war genau die Beschwerde, die es hierher gebracht hat. */}
+                {/* Das Profil steht nicht mehr als eigener Eintrag in der Leiste: Es liegt im
+                    Menue hinter dem Bild rechts (und im Mobilmenue). Die Leiste war mit
+                    fuenf Advisor-Bereichen zu voll, und das Postfach ueberlappte Connect. */}
                 {/* Das Postfach steht hier und nicht zwischen den Bereichen:
                     Es ist ein Querschnitt wie das Profil - Gespraeche kommen
                     aus Connect und aus Find. Der Zaehler war ohnehin schon da,
@@ -811,17 +810,6 @@ export function ProductShell({
                       />
                     </span>
                   </Link>
-                ) : null}
-                {showProfileShortcut ? (
-                  <span className={navigationItems.length >= 5 ? "hidden 2xl:contents" : "contents"}>
-                    <Link
-                      href="/me/profile"
-                      aria-current={isProfilePath(pathname) ? "page" : undefined}
-                      className={navLinkClassName(isProfilePath(pathname))}
-                    >
-                      {t("myProfile")}
-                    </Link>
-                  </span>
                 ) : null}
                 <ProductFeedbackEntry
                   source="nav"

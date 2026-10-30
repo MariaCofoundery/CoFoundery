@@ -150,10 +150,11 @@ test("Einladen: erst die Wahl zwischen drei Wegen, dann genau ein Formular; Ruec
   assert.match(page, /way === "program" && !isOwner/);
 });
 
-test("Kopfleiste: bei fuenf Bereichen weichen Etikett und Profil-Kurzlink unter 1536 Pixeln", () => {
+test("Kopfleiste: bei fuenf Bereichen weicht das Etikett unter 1536 Pixeln, der Profil-Kurzlink steht nicht mehr in der Leiste", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   assert.match(shell, /navigationItems\.length >= 5 \? "sm:inline-flex xl:hidden 2xl:inline-flex"/);
-  assert.match(shell, /navigationItems\.length >= 5 \? "hidden 2xl:contents"/);
+  // Maria am 30.10.2026: Das Profil steht im Menue hinter dem Bild, nicht zusaetzlich in der Leiste.
+  assert.doesNotMatch(shell, /hidden 2xl:contents/);
 });
 
 test("Teamseite: dunkler Kopf mit Reitern, Kacheln im Ueberblick, Freigaben als Punkte mit Legende", () => {

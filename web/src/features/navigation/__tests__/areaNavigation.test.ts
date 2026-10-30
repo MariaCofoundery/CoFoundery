@@ -197,8 +197,9 @@ test("auch Profil leuchtet auf, wenn man dort ist", () => {
   assert.match(navLink, /brand-here font-semibold/);
   assert.doesNotMatch(navLink, /bg-slate-100 text-slate-950/);
 
-  // Und der Ort wird weiterhin auch vorgelesen, nicht nur gefaerbt.
-  assert.match(shell, /href="\/me\/profile"[\s\S]{0,120}aria-current=\{isProfilePath\(pathname\) \? "page"/);
+  // Seit 30.10.2026 steht der Eintrag nicht mehr in der Leiste, sondern im Menue hinter dem Bild
+  // und im Mobilmenue (dort wird der Ort weiterhin vorgelesen).
+  assert.match(shell, /href="\/me\/profile"[\s\S]{0,120}active=\{isProfilePath\(pathname\)\}/);
 });
 
 test("wer einer Organisation angehoert, sieht den Advisor-Bereich - ohne dass das Einsicht gibt", () => {
