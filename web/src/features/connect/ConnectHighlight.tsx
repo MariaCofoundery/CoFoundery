@@ -77,11 +77,9 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
                 title={t("pinned")}
                 className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
               >
-                <svg viewBox="0 0 24 24" className="h-5 w-5 rotate-[40deg]" aria-hidden="true">
-                  <path d="M12 11.5 13.1 21h-2.2z" fill="#9d174d" />
-                  <rect x="5.5" y="9.2" width="13" height="2.8" rx="1.4" fill="#db2777" stroke="#9d174d" strokeWidth="1" strokeLinejoin="round" />
-                  <path d="M8 9.2V6a4 3.2 0 0 1 8 0v3.2z" fill="#f472b6" stroke="#9d174d" strokeWidth="1" strokeLinejoin="round" />
-                  <path d="M9.7 8V6.2" stroke="#fff" strokeWidth="1.1" strokeLinecap="round" opacity=".7" />
+                <svg viewBox="0 0 24 24" className="h-5 w-5 rotate-[35deg]" aria-hidden="true">
+                  <path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" fill="#ec4899" stroke="#9d174d" strokeWidth="0.9" strokeLinejoin="round" />
+                  <path d="M10 4.5v4.5" stroke="#fff" strokeWidth="1.1" strokeLinecap="round" opacity=".6" />
                 </svg>
               </span>
             ) : null}
