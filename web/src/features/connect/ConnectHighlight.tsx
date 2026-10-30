@@ -75,11 +75,13 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
                 role="img"
                 aria-label={t("pinned")}
                 title={t("pinned")}
-                className="absolute right-2.5 top-2.5 grid h-8 w-8 rotate-[18deg] place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
+                className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                  <path d="M9 3h6l-.9 6.2 3.4 3.3v1.5h-5.5V21l-1-1.2-1 1.2v-6H4.5v-1.5l3.4-3.3z" fill="#ec4899" stroke="#be185d" strokeWidth="1.2" strokeLinejoin="round" />
-                  <circle cx="12" cy="6" r="1.1" fill="#fff" opacity=".7" />
+                  <path d="M12 12.5v8.5" stroke="#9d174d" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                  <rect x="6" y="9" width="12" height="3.2" rx="1.4" fill="#db2777" stroke="#9d174d" strokeWidth="1.2" strokeLinejoin="round" />
+                  <rect x="8.5" y="2.5" width="7" height="7" rx="1.8" fill="#ec4899" stroke="#9d174d" strokeWidth="1.2" strokeLinejoin="round" />
+                  <path d="M10.4 4.6v3" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" opacity=".6" />
                 </svg>
               </span>
             ) : null}
