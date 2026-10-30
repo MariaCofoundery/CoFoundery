@@ -279,3 +279,12 @@ test("Team entfernen: nur der Inhaber, mit Rueckfrage, das Team erfaehrt es", ()
   const notices = JSON.parse(readFileSync("messages/de/notices.json", "utf8"));
   assert.ok(notices.kinds.program_removed);
 });
+
+test("Organisation: eine Infobox sagt, dass beim Beenden nichts aufbewahrt wird", () => {
+  const org = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(org, /t\("retentionText"\)/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.ok(messages.teamProgram.retentionText, locale);
+  }
+});

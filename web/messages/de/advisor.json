@@ -915,7 +915,9 @@
     "removeTeam": "Team aus dem Programm entfernen",
     "removeTeamText": "Das Team wird informiert. Euer Zugriff endet sofort, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates) werden gelöscht. Das lässt sich nicht rückgängig machen. Das Team kann später mit einem neuen Code oder einer neuen Einladung wieder beitreten.",
     "removeTeamConfirm": "Ja, Team entfernen",
-    "teamRemoved": "Das Team wurde aus dem Programm entfernt und informiert."
+    "teamRemoved": "Das Team wurde aus dem Programm entfernt und informiert.",
+    "retentionTitle": "Was beim Beenden mit den Daten passiert",
+    "retentionText": "Wird ein Team aus dem Programm entfernt oder beendet es die Teilnahme, endet euer Zugriff, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates) werden gelöscht. Wir haben uns bewusst dafür entschieden, nichts aufzubewahren: Das Team hat nur im Rahmen des Programms zugestimmt. Wenn ihr Angaben für eure eigene Auswertung braucht, haltet sie vorher in euren eigenen Unterlagen fest, mit Wissen des Teams."
   },
   "programPage": {
     "title": "Programmseite",

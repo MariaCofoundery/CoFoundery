@@ -63,6 +63,10 @@ export async function OrgTeamProgramsSection({
       <section aria-labelledby="org-programs-title" className={CARD}>
         <h2 id="org-programs-title" className="text-xl font-semibold text-slate-950">{t("programsTitle")}</h2>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("sectionText")}</p>
+        <aside className="mt-3 max-w-2xl rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" aria-label={t("retentionTitle")}>
+          <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("retentionTitle")}</p>
+          <p className="mt-1 text-sm leading-6 text-slate-700">{t("retentionText")}</p>
+        </aside>
 
         {programs.length === 0 ? (
           <p className="mt-4 rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-sm leading-6 text-slate-600">

@@ -915,7 +915,9 @@
     "removeTeam": "Remove team from the program",
     "removeTeamText": "The team is told. Your access ends immediately, and the team's program data (contact people, program profile, milestones, updates) is deleted. This cannot be undone. The team can join again later with a new code or invitation.",
     "removeTeamConfirm": "Yes, remove team",
-    "teamRemoved": "The team was removed from the program and informed."
+    "teamRemoved": "The team was removed from the program and informed.",
+    "retentionTitle": "What happens to the data when a team leaves",
+    "retentionText": "If a team is removed from the program or ends its participation, your access ends and the team's program data (contact people, program profile, milestones, updates) is deleted. We deliberately chose not to retain anything: the team only agreed within the program. If you need information for your own evaluation, record it in your own files beforehand, with the team's knowledge."
   },
   "programPage": {
     "title": "Program page",
