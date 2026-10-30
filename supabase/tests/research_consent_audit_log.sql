@@ -1,6 +1,6 @@
 \set ON_ERROR_STOP on
 
--- Nachweis der Research-Einwilligung (Migration 20261127120000).
+-- Nachweis der Research-Einwilligung (Migration 20270129130000).
 
 begin;
 

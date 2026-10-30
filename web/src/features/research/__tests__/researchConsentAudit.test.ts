@@ -13,13 +13,13 @@ import {
 } from "@/features/research/consentVersion";
 
 /**
- * Nachweis der Research-Einwilligung (Migration 20261127120000).
+ * Nachweis der Research-Einwilligung (Migration 20270129130000).
  *
  * Das Verhalten in der Datenbank prüft supabase/tests/research_consent_audit_log.sql.
  * Hier steht, was Code und Migration zusammenhalten muss.
  */
 
-const MIGRATION = "../supabase/migrations/20261127120000_research_consent_audit_log.sql";
+const MIGRATION = "../supabase/migrations/20270129130000_research_consent_audit_log.sql";
 const messages = (locale: string) => JSON.parse(readFileSync(`messages/${locale}/researchConsent.json`, "utf8"));
 
 test("fachliche Version und Textrevision sind zwei Konstanten", () => {

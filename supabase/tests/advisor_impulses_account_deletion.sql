@@ -1,6 +1,6 @@
 \set ON_ERROR_STOP on
 
--- Advisor-Impulse verschwinden mit dem Konto des Advisors (Migration 20261126120000).
+-- Advisor-Impulse verschwinden mit dem Konto des Advisors (Migration 20270129120000).
 
 begin;
 

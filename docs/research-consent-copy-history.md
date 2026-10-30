@@ -9,7 +9,7 @@ Interne Dokumentation, keine Nutzeroberfläche. Stand: 14.10.2026.
 | **Fachliche Version** `research_consent_v1` | Wofür eingewilligt wird: pseudonyme `research_events` mit fester Positivliste (Migration 20260830160000). Ändert sich nur, wenn sich der Umfang der Verarbeitung ändert. | `RESEARCH_CONSENT_VERSION` (`web/src/features/research/consentVersion.ts`), an jedem Ereignis, im Insert-Trigger, beim Widerruf, beim Aufräumen, in der Analyse-Sicht |
 | **Textrevision** `research_consent_copy_…` | Welcher Wortlaut angezeigt wurde. Ändert sich mit jeder inhaltlichen Textänderung. DE und EN gehören zur selben Revision; die Sprache wird je Entscheidung gespeichert. | `RESEARCH_CONSENT_COPY_REVISION`, Tabelle `research_consent_copy_revisions` (mit SHA-256 je Sprache und Stelle), `research_consent_audit_log` |
 
-Seit Migration 20261127120000 schreibt jede Entscheidung (zustimmen, ablehnen, widerrufen) eine Zeile in `research_consent_audit_log`: Aktion, fachliche Version, Textrevision, Sprache, Stelle (Dialog oder Kontoeinstellung), SHA-256 des angezeigten Wortlauts, Zeitpunkt. Die Zeilen werden nie geändert; sie verschwinden nur mit dem Konto.
+Seit Migration 20270129130000 schreibt jede Entscheidung (zustimmen, ablehnen, widerrufen) eine Zeile in `research_consent_audit_log`: Aktion, fachliche Version, Textrevision, Sprache, Stelle (Dialog oder Kontoeinstellung), SHA-256 des angezeigten Wortlauts, Zeitpunkt. Die Zeilen werden nie geändert; sie verschwinden nur mit dem Konto.
 
 **Eine neue Textfassung braucht eine neue Revision:** neue Konstante, neue Zeilen in `research_consent_copy_revisions` per Migration. Der Test `researchConsentAudit.test.ts` schlägt fehl, wenn der Wortlaut sich ändert, ohne dass die registrierten Hashes nachziehen.
 
