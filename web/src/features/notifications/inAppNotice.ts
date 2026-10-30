@@ -52,6 +52,7 @@ export const IN_APP_NOTICE_KINDS = [
   "collaboration_conversation_marker",
   "program_update_due",
   "program_invited",
+  "program_review_requested",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

@@ -805,11 +805,14 @@
     "accessNone": "not shared",
     "accessRequested": "requested, waiting for consent",
     "accessWorkstyle": "The work style team report is only reachable through an active team review.",
-    "accessAsk": "If you need a view, talk to the team. Requests go through group evaluations (team review) and access to Founder Setup.",
+    "accessAsk": "You can request a team review from the team here. You ask for Founder Setup access the usual way, through your support relationship.",
     "accessNoneRight": "Not shared is a valid answer and not a shortcoming.",
     "accessEmpty": "No team in the program yet.",
     "accessTeam": "Team",
     "accessReviewsLink": "Open group evaluations",
-    "tabAccess": "Approvals"
+    "tabAccess": "Approvals",
+    "requestReview": "Request team review",
+    "requestNote": "Message to the team (optional)",
+    "requestHint": "The team decides for itself under Account. The review only becomes active once everyone has agreed, and it ends again with any change in the team."
   }
 }

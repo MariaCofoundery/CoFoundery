@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(4);
+select extensions.plan(8);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','e6000000-0000-4000-8000-000000000001','authenticated','authenticated','chefin@example.com','',now(),'{}','{}',now(),now()),
@@ -48,6 +48,20 @@ set local request.jwt.claims = '{"sub":"e6000000-0000-4000-8000-000000000001","r
 select extensions.is(
   (select team_review from public.get_program_access_for_me('e6000000-0000-4000-8000-0000000000a0') limit 1),
   'none', 'after a roster change it no longer counts');
+
+-- Anfrage pro Team: nicht fuer Gruendende des Teams, wohl fuer Inhaber und Bezugspersonen.
+set local request.jwt.claims = '{"sub":"e6000000-0000-4000-8000-000000000002","role":"authenticated"}';
+select extensions.throws_ok(
+  $$select public.request_program_team_review('e6000000-0000-4000-8000-0000000000c0', 'bitte')$$,
+  '42501', null, 'a founder cannot request a review of their own team');
+set local request.jwt.claims = '{"sub":"e6000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.isnt(public.request_program_team_review('e6000000-0000-4000-8000-0000000000c0', 'bitte'), null, 'the owner can request a team review');
+select extensions.is(
+  (select team_review from public.get_program_access_for_me('e6000000-0000-4000-8000-0000000000a0') limit 1),
+  'requested', 'the overview shows it as requested');
+select extensions.throws_ok(
+  $$select public.request_program_team_review('e6000000-0000-4000-8000-0000000000c0', 'nochmal')$$,
+  '23505', null, 'asking twice for the same team is refused');
 
 -- Ohne Zustimmung aller ist das Programm nicht aktiv: dann gibt es keine Zeile.
 reset role;

@@ -190,13 +190,13 @@ export async function getProgramProfile(client: SupabaseClient, programId: strin
   };
 }
 
-export type ProgramAccess = { programId: string; teamReview: "active" | "none"; founderSetup: "active" | "requested" | "none" };
+export type ProgramAccess = { programId: string; teamReview: "active" | "requested" | "none"; founderSetup: "active" | "requested" | "none" };
 
 export async function getProgramAccess(client: SupabaseClient, orgId: string): Promise<ProgramAccess[]> {
   const { data } = await client.rpc("get_program_access_for_me", { p_org_id: orgId });
   return ((data ?? []) as Record<string, string>[]).map((row) => ({
     programId: row.program_id,
-    teamReview: row.team_review === "active" ? "active" : "none",
+    teamReview: row.team_review === "active" ? "active" : row.team_review === "requested" ? "requested" : "none",
     founderSetup: row.founder_setup === "active" ? "active" : row.founder_setup === "requested" ? "requested" : "none",
   }));
 }

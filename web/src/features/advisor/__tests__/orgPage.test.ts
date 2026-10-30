@@ -95,3 +95,13 @@ test("Freigaben-Uebersicht: nur Staende, keine Gesamtzahl, nicht freigegeben ist
   assert.match(sql, /team_access_ended_at is null/);
   assert.match(sql, /team_program_is_active\(p\.id\)/);
 });
+
+test("Anfrage pro Team ist keine Freigabe: dieselbe Review-Anfrage, das Team entscheidet selbst", () => {
+  const sql = readFileSync("../supabase/migrations/20270126120000_program_team_review_request.sql", "utf8");
+  assert.match(sql, /insert into public\.advisor_team_reviews/);
+  assert.match(sql, /insert into public\.advisor_team_review_members/);
+  assert.doesNotMatch(sql, /status\s*=\s*'active'[\s\S]{0,40}insert into public\.advisor_team_reviews/);
+  assert.match(sql, /can_manage_team_program/);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("request_program_team_review"/);
+});

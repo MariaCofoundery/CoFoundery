@@ -805,11 +805,14 @@
     "accessNone": "nicht freigegeben",
     "accessRequested": "angefragt, wartet auf Zustimmung",
     "accessWorkstyle": "Der Arbeitsweisen-Teambericht ist nur über eine aktive Team-Review erreichbar.",
-    "accessAsk": "Wenn du eine Einsicht brauchst, sprich das Team an. Anfragen laufen über Gruppenauswertungen (Team-Review) und den Zugang zum Founder Setup.",
+    "accessAsk": "Eine Team-Review kannst du hier beim Team anfragen. Den Zugang zum Founder Setup bittest du wie bisher über die Begleitung an.",
     "accessNoneRight": "Nicht freigegeben ist eine gültige Antwort und kein Mangel.",
     "accessEmpty": "Noch kein Team im Programm.",
     "accessTeam": "Team",
     "accessReviewsLink": "Gruppenauswertungen öffnen",
-    "tabAccess": "Freigaben"
+    "tabAccess": "Freigaben",
+    "requestReview": "Team-Review anfragen",
+    "requestNote": "Nachricht an das Team (optional)",
+    "requestHint": "Das Team entscheidet selbst unter Konto. Erst wenn alle zugestimmt haben, wird die Review aktiv, und bei jeder Änderung im Team endet sie wieder."
   }
 }

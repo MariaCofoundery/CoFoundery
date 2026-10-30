@@ -17,7 +17,8 @@
     "founder_in_the_wild_handoff": "Founder in the Wild: the other side has filled it in. Your turn.",
     "collaboration_conversation_marker": "The other side would like to talk about a particular point.",
     "program_update_due": "The next update for your program is coming up.",
-    "program_invited": "{org} has invited your team to its program. Your team is only in once everyone has agreed."
+    "program_invited": "{org} has invited your team to its program. Your team is only in once everyone has agreed.",
+    "program_review_requested": "An advisor in your program is asking your team for a team review. You decide under Account whether to agree – nothing happens without everyone's consent."
   },
   "announcements": {
     "eyebrow": "Announcement",

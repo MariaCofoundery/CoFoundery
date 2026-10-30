@@ -89,7 +89,7 @@ export async function endTeamProgramAction(formData: FormData) {
 /** Zurueck nur auf die eigenen Programmseiten - kein freies Ziel aus dem Formular. */
 const safeReturn = (value: FormDataEntryValue | null) => {
   const text = String(value ?? "");
-  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}(\?tab=(meilensteine|updates))?$/.test(text) ? text : "/programm";
+  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}(\?tab=(meilensteine|updates|freigaben))?$/.test(text) ? text : "/programm";
 };
 const toInt = (value: FormDataEntryValue | null) => {
   const text = String(value ?? "").trim();
@@ -188,4 +188,17 @@ export async function setProgramMetaAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   redirect(orgSettings(orgId));
+}
+
+/** Die Anfrage ist keine Freigabe: Das Team entscheidet selbst, die Datenbank legt dieselbe Review-Anfrage an wie bisher. */
+export async function requestProgramTeamReviewAction(formData: FormData) {
+  const programId = String(formData.get("programId") ?? "");
+  const back = `/advisor/programm/${programId}?tab=freigaben`;
+  const client = await requireUser(back);
+  await client.rpc("request_program_team_review", {
+    p_program_id: programId,
+    p_note: String(formData.get("note") ?? "").slice(0, 400),
+  });
+  revalidatePath("/advisor/programm");
+  redirect(/^\/advisor\/programm\/[0-9a-f-]{36}\?tab=freigaben$/.test(back) ? back : "/advisor/organisation");
 }

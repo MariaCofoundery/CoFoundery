@@ -115,7 +115,7 @@ export default async function AdvisorProgramTeamPage({
           <ProgramProfileView profile={profile} />
           </div>
         ) : tab === "freigaben" ? (
-          <TeamAccessList access={accessRows.find((row) => row.programId === programId) ?? null} />
+          <TeamAccessList programId={programId} access={accessRows.find((row) => row.programId === programId) ?? null} />
         ) : tab === "updates" ? (
           <ManageProgramUpdates programId={programId} questions={questions} due={due} updates={updates} returnTo={`${base}?tab=updates`} />
         ) : (

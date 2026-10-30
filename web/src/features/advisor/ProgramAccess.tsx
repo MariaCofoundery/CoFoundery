@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { requestProgramTeamReviewAction } from "@/features/advisor/teamProgramActions";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import type { ProgramAccess } from "@/features/advisor/teamProgramData";
 
 type State = "active" | "requested" | "none";
@@ -69,7 +71,7 @@ export async function ProgramAccessTable({
 }
 
 /** Dieselben Stande fuer ein einzelnes Team, mit dem Programm selbst als erster Zeile. */
-export async function TeamAccessList({ access }: { access: ProgramAccess | null }) {
+export async function TeamAccessList({ access, programId }: { access: ProgramAccess | null; programId: string }) {
   const t = await getTranslations("advisor.teamProgram");
   const rows: [string, State][] = [
     [t("accessProgram"), "active"],
@@ -90,11 +92,19 @@ export async function TeamAccessList({ access }: { access: ProgramAccess | null 
           </li>
         ))}
       </ul>
+      {(access?.teamReview ?? "none") === "none" ? (
+        <form action={requestProgramTeamReviewAction} className="grid gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4">
+          <input type="hidden" name="programId" value={programId} />
+          <label>
+            <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("requestNote")}</span>
+            <textarea name="note" maxLength={400} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <p className="text-xs leading-6 text-slate-600">{t("requestHint")}</p>
+          <SubmitButton label={t("requestReview")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white" />
+        </form>
+      ) : null}
       <p className="text-xs leading-6 text-slate-600">{t("accessNoneRight")} {t("accessWorkstyle")}</p>
-      <p className="text-xs leading-6 text-slate-600">
-        {t("accessAsk")}{" "}
-        <Link href="/advisor/begleitung?art=gruppen" className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("accessReviewsLink")}</Link>
-      </p>
+      <p className="text-xs leading-6 text-slate-600">{t("accessAsk")}</p>
     </section>
   );
 }
