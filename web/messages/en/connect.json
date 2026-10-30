@@ -920,7 +920,9 @@
       "editorial": "From the platform",
       "sponsored": "Paid"
     },
-    "adNote": "Whoever is marked “Ad” has paid for it. This affects neither search nor your suggestions."
+    "adNote": "Whoever is marked “Ad” has paid for it. This affects neither search nor your suggestions.",
+    "noteFrom": "Maria recommends",
+    "pinned": "Pinned"
   },
   "suggestions": {
     "title": "For you",
@@ -1092,7 +1094,10 @@
       "empty": "Nobody has ticked the highlight box yet. As soon as someone does, their entries appear here.",
       "error": "The selection could not be loaded just now."
     },
-    "linkAlternative": "Or paste a link"
+    "linkAlternative": "Or paste a link",
+    "pin": "Pin it",
+    "pinHint": "Always stands first in the carousel while it runs. Only one can be pinned, a new one replaces the old one. Recommendations only, never ads.",
+    "pinnedTag": "Pinned"
   },
   "highlightPrompt": {
     "eyebrow": "New in Connect",

@@ -12,7 +12,7 @@ export type HomepageExampleRow = { label: string; a?: string; b?: string; both?:
 
 const de = {
   skip: "Zum Inhalt", menu: "Menü", close: "Menü schließen", navigation: "Hauptnavigation",
-  login: "Ich habe schon ein Konto", start: "Jetzt starten", try: "Jetzt starten",
+  login: "Login", start: "Jetzt starten", try: "Jetzt starten",
   navSo: "So funktioniert es", navAreas: "Align, Find, Connect",
   kicker: "„Wir verstehen uns super“ ist keine Gründungsgrundlage.",
   headline: ["Erst ", "reden.", "Dann gründen."],
@@ -66,7 +66,7 @@ const de = {
 
 const en: typeof de = {
   skip: "Skip to content", menu: "Menu", close: "Close menu", navigation: "Main navigation",
-  login: "I already have an account", start: "Get started", try: "Get started",
+  login: "Log in", start: "Get started", try: "Get started",
   navSo: "How it works", navAreas: "Align, Find, Connect",
   kicker: "“We get along great” is not a basis for a company.",
   headline: ["Talk ", "first.", "Then found."],

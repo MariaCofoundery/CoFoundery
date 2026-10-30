@@ -593,14 +593,6 @@
     "lead": "Send your co-founder an invitation by email. After that, you each decide for yourselves what to share with each other.",
     "leadTeam": "You are inviting someone to “{name}”. Work style and sharing remain personal decisions."
   },
-  "inviteStart": {
-    "eyebrow": "Currently free during the test phase.",
-    "supportCta": "Support the test phase (€39)",
-    "paymentWindowHint": "Payment opens in a new window. After that, you can simply continue here.",
-    "invoiceHint": "If you need an invoice, send us your billing details by email after payment.",
-    "regularPrice": "Regular price later: €99 per founder team",
-    "moreInfo": "More about supporting us"
-  },
   "coFounderInviteForm": {
     "title": "Invite a co-founder",
     "targetTeam": "Invitation to “{name}”. The person joins this existing team. Workstyle and sharing remain individual decisions.",

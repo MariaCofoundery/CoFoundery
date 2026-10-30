@@ -48,7 +48,7 @@ export function HomepageNav() {
         </nav>
         <div className={styles.desktopActions}>
           <PublicLanguageSwitcher />
-          <Link href="/login">{content.login}</Link>
+          <Link href="/login" className={`${styles.smallButton} ${styles.smallButtonGhost}`}>{content.login}</Link>
           <Link href="/start" className={styles.smallButton}>{content.start}</Link>
         </div>
         <button ref={menuButton} className={styles.menuButton} aria-expanded={isOpen} aria-controls="marketing-menu" aria-label={isOpen ? content.close : content.menu} onClick={() => setIsOpen((open) => !open)}>
@@ -59,7 +59,7 @@ export function HomepageNav() {
         <nav aria-label={content.navigation}>
           <Link href="/#so" onClick={() => setIsOpen(false)}>{content.navSo}</Link>
           <Link href="/#bereiche" onClick={() => setIsOpen(false)}>{content.navAreas}</Link>
-          <Link href="/login" onClick={() => setIsOpen(false)}>{content.login}</Link>
+          <Link href="/login" className={`${styles.smallButton} ${styles.smallButtonGhost}`} onClick={() => setIsOpen(false)}>{content.login}</Link>
           <Link href="/start" className={styles.smallButton} onClick={() => setIsOpen(false)}>{content.start}</Link>
         </nav>
         <PublicLanguageSwitcher />

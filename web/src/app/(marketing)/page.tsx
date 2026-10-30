@@ -54,7 +54,7 @@ export default async function Page() {
               <p className={`${styles.rise} ${styles.d3} ${styles.lead}`}>{content.lead}</p>
               <div className={`${styles.rise} ${styles.d4} ${styles.heroActions}`}>
                 <Link href="/start" className={styles.ctaButton}>{content.start}<Arrow /></Link>
-                <Link href="/login" className={styles.heroLink}>{content.login}</Link>
+                <Link href="/login" className={styles.loginButton}>{content.login}</Link>
               </div>
               <p className={`${styles.rise} ${styles.d4} ${styles.fine}`}>
                 {content.fineStart}<br />{content.fineBeta}{" "}
@@ -148,7 +148,7 @@ export default async function Page() {
             <h2 id="band-title">{content.bandTitle[0]}<br />{content.bandTitle[1]}</h2>
             <div className={styles.heroActions}>
               <Link href="/start" className={styles.ctaButton}>{content.start}<Arrow /></Link>
-              <Link href="/login" className={styles.heroLink}>{content.login}</Link>
+              <Link href="/login" className={styles.loginButton}>{content.login}</Link>
             </div>
           </div>
         </section>

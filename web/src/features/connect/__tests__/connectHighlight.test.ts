@@ -112,7 +112,28 @@ test("ein Platz verdraengt nur dann Zufall, wenn er laeuft, und mischt am Ende m
   // Ein ausgefallener Platz-Abruf laesst es beim Zufall.
   assert.match(data, /placementResult\.error \? \[\]/);
   // Zum Schluss wird gemischt: Die Reihenfolge ist keine Rangfolge, auch nicht fuer eine Anzeige.
-  assert.match(data, /const chosen = shuffle\(\[/);
+  // Seit dem Anpinnen über `orderHighlights`: gemischt, und nur eine angepinnte Empfehlung steht vorn.
+  assert.match(data, /const chosen = orderHighlights\(\[/);
+  const order = data.slice(data.indexOf("export function orderHighlights"));
+  assert.match(order.slice(0, 400), /const mixed = shuffle\(items\)/);
+  assert.match(order.slice(0, 400), /mixed\.filter\(\(item\) => item\.pinned\)/);
+});
+
+test("anpinnen gilt nur für Empfehlungen, nie für Anzeigen, und höchstens eine", () => {
+  const data = codeOnly(DATA);
+  // Aus der Zeile: nur bei "editorial" wird die Marke überhaupt gesetzt.
+  assert.match(data, /pinned: row\.source === "editorial" && row\.pinned === true/);
+  const actions = codeOnly("src/features/connect/highlightPlacementActions.ts");
+  assert.match(actions, /p_pinned: source === "editorial" && formData\.get\("pinned"\) === "yes"/);
+  const sql = readFileSync("../supabase/migrations/20270116120000_highlight_pin.sql", "utf8");
+  assert.match(sql, /check \(not pinned or source = 'editorial'\)/);
+  assert.match(sql, /update public\.connect_highlight_placements set pinned = false where pinned/);
+});
+
+test("der Satz aus der Verwaltung ist als solcher erkennbar: abgesetzt, mit Absender", () => {
+  const card = codeOnly("src/features/connect/ConnectHighlight.tsx");
+  assert.match(card, /<figure[\s\S]*?<figcaption[\s\S]*?t\("noteFrom"\)[\s\S]*?<blockquote[\s\S]*?highlight\.note/);
+  assert.match(card, /highlight\.pinned \?/);
 });
 
 test("gemischt wird, nicht bewertet", () => {

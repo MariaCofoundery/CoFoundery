@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { getTranslations } from "next-intl/server";
 import { CoFounderInviteForm } from "@/features/dashboard/CoFounderInviteForm";
-import { MatchingStartBlock } from "@/features/dashboard/MatchingStartBlock";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 export default async function NewInvitePage({ searchParams }: { searchParams: Promise<{ team?: string }> }) {
@@ -47,7 +46,6 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
       </header>
       <div className="mt-8">
         <CoFounderInviteForm targetTeam={targetTeam} />
-        {!targetTeam && <MatchingStartBlock />}
       </div>
     </main>
   );

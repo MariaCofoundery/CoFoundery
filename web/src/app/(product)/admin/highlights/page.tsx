@@ -65,6 +65,10 @@ export default async function HighlightsAdminPage({ searchParams }: {
       <label className="block text-sm font-medium">{t("endsOn")}
         <input name="ends_on" type="date" required defaultValue={defaultEnd} className={`${input} sm:max-w-xs`} />
       </label>
+      <label className="flex min-h-11 items-start gap-3 text-sm">
+        <input type="checkbox" name="pinned" value="yes" className="mt-1 h-4 w-4" />
+        <span><b>{t("pin")}</b><span className="mt-0.5 block text-xs font-normal text-slate-500">{t("pinHint")}</span></span>
+      </label>
       <SubmitButton label={t("save")} pendingLabel={t("saving")} className={button} />
     </form>
     </details>
@@ -94,6 +98,10 @@ export default async function HighlightsAdminPage({ searchParams }: {
               <label className="block text-sm font-medium">{t("endsOn")}
                 <input name="ends_on" type="date" required defaultValue={defaultEnd} className={`${input} sm:max-w-xs`} />
               </label>
+              <label className="flex min-h-11 items-start gap-3 text-sm">
+                <input type="checkbox" name="pinned" value="yes" className="mt-1 h-4 w-4" />
+                <span><b>{t("pin")}</b><span className="mt-0.5 block text-xs font-normal text-slate-500">{t("pinHint")}</span></span>
+              </label>
               <SubmitButton label={t("pick.save")} pendingLabel={t("saving")} className={button} />
             </form>
           </details>
@@ -108,6 +116,7 @@ export default async function HighlightsAdminPage({ searchParams }: {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-semibold text-slate-950">{row.title ?? t("gone")}</p>
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${row.source === "sponsored" ? "bg-amber-100 text-amber-950" : "bg-violet-100 text-violet-900"}`}>{t(`sources.${row.source}`)}</span>
+            {row.pinned ? <span className="rounded-full bg-pink-100 px-3 py-1 text-xs font-semibold text-pink-800">{t("pinnedTag")}</span> : null}
           </div>
           <p className="mt-1 text-xs text-slate-500">{t(`kinds.${row.kind}`)}{row.owner_name ? ` · ${row.owner_name}` : ""} · {day(row.starts_at)} – {day(row.ends_at)}</p>
           {row.note ? <p className="mt-2 text-sm text-slate-700">{row.note}</p> : null}

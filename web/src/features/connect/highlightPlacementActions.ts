@@ -30,6 +30,8 @@ export async function saveHighlightPlacementAction(formData: FormData) {
     p_note: source === "editorial" ? note || null : null,
     p_starts_at: null,
     p_ends_at: end.toISOString(),
+    // Anpinnen gilt nur fuer eine Empfehlung, nie fuer eine Anzeige (Reihenfolge ist keine Rangfolge).
+    p_pinned: source === "editorial" && formData.get("pinned") === "yes",
   });
   if (error) redirect(`${PAGE}?result=${error.code === "P0002" ? "notfound" : "error"}`);
   revalidatePath(PAGE);

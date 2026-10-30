@@ -593,14 +593,6 @@
     "lead": "Schick deiner Co-Founderin oder deinem Co-Founder eine Einladung per E-Mail. Ihr entscheidet danach beide selbst, was ihr miteinander teilt.",
     "leadTeam": "Du lädst jemanden in „{name}“ ein. Arbeitsweise und Freigaben bleiben persönliche Entscheidungen."
   },
-  "inviteStart": {
-    "eyebrow": "Aktuell in der Testphase kostenlos.",
-    "supportCta": "Testphase unterstützen (39 €)",
-    "paymentWindowHint": "Die Zahlung öffnet ein neues Fenster. Danach könnt ihr hier einfach weitermachen.",
-    "invoiceHint": "Wenn ihr eine Rechnung braucht, schickt uns eure Rechnungsdaten nach der Zahlung per E-Mail.",
-    "regularPrice": "Regulärer Preis später: 99 € pro Founder-Team",
-    "moreInfo": "Mehr zur Unterstützung"
-  },
   "coFounderInviteForm": {
     "title": "Co-Founder einladen",
     "targetTeam": "Einladung zu „{name}“. Die Person tritt diesem bestehenden Team bei. Arbeitsweise und Freigaben bleiben persönliche Entscheidungen.",

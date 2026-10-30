@@ -51,6 +51,8 @@ export type ConnectHighlight = {
   disclosure: HighlightDisclosure;
   /** Warum wir es empfehlen - nur bei "editorial" und nur, wenn eingetragen. */
   note: string | null;
+  /** Eine angepinnte Empfehlung steht immer vorn. Nur bei "editorial". */
+  pinned?: boolean;
 };
 
 /** Aus wie vielen der neuesten Eintraege je Sorte gemischt wird. */
@@ -192,7 +194,7 @@ export async function getConnectHighlights(
     limit
   );
   const placedOwners = new Set(placed.flatMap((highlight) => highlight.person ? [highlight.person.user_id] : []));
-  const chosen = shuffle([
+  const chosen = orderHighlights([
     ...placed,
     ...pickAcrossKinds(
       candidates.filter((candidate) => !candidate.person || !placedOwners.has(candidate.person.user_id)),
@@ -208,6 +210,7 @@ type HighlightPlacementRow = {
   placement_id: string;
   source: "editorial" | "sponsored";
   note: string | null;
+  pinned?: boolean;
   kind: "listing" | "venture" | "person" | "problem";
   item: ConnectListing | ConnectVenture | ConnectProfile | ConnectProblem;
 };
@@ -232,6 +235,7 @@ function placementToHighlight(
     isOwn: owner.user_id === currentUserId,
     disclosure: row.source,
     note: row.source === "editorial" ? row.note : null,
+    pinned: row.source === "editorial" && row.pinned === true,
   } as const;
   if (row.kind === "listing") {
     const listing = row.item as ConnectListing;
@@ -264,7 +268,9 @@ export function pickPlacements(placed: ConnectHighlight[], limit: number) {
   const owners = new Set<string>();
   for (const disclosure of ["editorial", "sponsored"] as const) {
     if (chosen.length >= limit) break;
-    const next = shuffle(placed.filter((highlight) => highlight.disclosure === disclosure))
+    const pool = placed.filter((highlight) => highlight.disclosure === disclosure);
+    // Eine angepinnte Empfehlung gewinnt vor dem Zufall, sonst wird gelost.
+    const next = [...pool.filter((highlight) => highlight.pinned), ...shuffle(pool.filter((highlight) => !highlight.pinned))]
       .find((highlight) => highlight.person && !owners.has(highlight.person.user_id));
     if (next?.person) { owners.add(next.person.user_id); chosen.push(next); }
   }
@@ -272,14 +278,14 @@ export function pickPlacements(placed: ConnectHighlight[], limit: number) {
 }
 
 /**
- * Reihum durch die Sorten, innerhalb jeder Sorte zufaellig.
- *
- * Die Sortenfolge selbst ist auch gemischt - sonst stuende immer ein Gesuch
- * vorn, und die Reihenfolge waere eine Rangfolge.
- *
- * Exportiert, damit der Test die Mischung wirklich ausfuehren kann und nicht
- * nur im Quelltext nachliest, dass sie da steht.
+ * Die Reihenfolge der Karten: Gemischt, nur eine angepinnte Empfehlung steht
+ * vorn. Sonst ist die Reihenfolge keine Rangfolge - auch fuer eine Anzeige nicht.
  */
+export function orderHighlights(items: ConnectHighlight[]) {
+  const mixed = shuffle(items);
+  return [...mixed.filter((item) => item.pinned), ...mixed.filter((item) => !item.pinned)];
+}
+
 export function pickAcrossKinds(candidates: ConnectHighlight[], limit: number) {
   const byKind = new Map<HighlightKind, ConnectHighlight[]>();
   for (const candidate of candidates) {

@@ -920,7 +920,9 @@
       "editorial": "Von der Plattform",
       "sponsored": "Bezahlt"
     },
-    "adNote": "Wer „Anzeige“ ist, hat dafür bezahlt. Das beeinflusst weder die Suche noch deine Vorschläge."
+    "adNote": "Wer „Anzeige“ ist, hat dafür bezahlt. Das beeinflusst weder die Suche noch deine Vorschläge.",
+    "noteFrom": "Maria empfiehlt",
+    "pinned": "Angepinnt"
   },
   "suggestions": {
     "title": "Für dich",
@@ -1092,7 +1094,10 @@
       "empty": "Noch niemand hat das Highlight-Häkchen gesetzt. Sobald es jemand tut, stehen seine Einträge hier.",
       "error": "Die Auswahl ließ sich gerade nicht laden."
     },
-    "linkAlternative": "Oder einen Link einfügen"
+    "linkAlternative": "Oder einen Link einfügen",
+    "pin": "Anpinnen",
+    "pinHint": "Steht immer vorn im Karussell, solange es läuft. Es ist höchstens eine angepinnt, eine neue löst die alte ab. Nur bei Empfehlungen, nie bei Anzeigen.",
+    "pinnedTag": "Angepinnt"
   },
   "highlightPrompt": {
     "eyebrow": "Neu in Connect",

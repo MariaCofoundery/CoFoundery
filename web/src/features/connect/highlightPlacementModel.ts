@@ -46,6 +46,7 @@ export type PlacementRow = {
   kind: PlacementKind;
   target_id: string;
   note: string | null;
+  pinned?: boolean;
   starts_at: string;
   ends_at: string;
   title: string | null;
