@@ -766,6 +766,17 @@
     "questionsHint": "One question per line, five at most. Without your own questions the default ones apply.",
     "questionsSave": "Save questions",
     "updatesTeamNote": "The contacts and the owners of the organization see the answers.",
-    "tabUpdates": "Updates"
+    "tabUpdates": "Updates",
+    "profileTitle": "Program profile",
+    "profileText": "The team provides these details for the program. They are free text and do not come from your personal profiles.",
+    "profileTeamNote": "The contacts and the owners of the organization can see them.",
+    "profileCompany": "Name of the company or project",
+    "profileFounders": "Founders",
+    "profileAddress": "Address",
+    "profileEmail": "Email",
+    "profilePhone": "Phone",
+    "profileSave": "Save profile",
+    "profileEmpty": "The team has not created a program profile yet.",
+    "tabOverviewProfile": "Program profile"
   }
 }

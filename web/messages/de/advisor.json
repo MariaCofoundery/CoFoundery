@@ -766,6 +766,17 @@
     "questionsHint": "Eine Frage pro Zeile, höchstens fünf. Ohne eigene Fragen gelten die Standardfragen.",
     "questionsSave": "Fragen speichern",
     "updatesTeamNote": "Die Antworten sehen die Bezugspersonen und die Inhaber der Organisation.",
-    "tabUpdates": "Updates"
+    "tabUpdates": "Updates",
+    "profileTitle": "Programmprofil",
+    "profileText": "Diese Angaben macht das Team für das Programm. Sie sind frei und kommen nicht aus euren persönlichen Profilen.",
+    "profileTeamNote": "Sehen können sie die Bezugspersonen und die Inhaberinnen und Inhaber der Organisation.",
+    "profileCompany": "Name des Unternehmens oder Projekts",
+    "profileFounders": "Gründerinnen und Gründer",
+    "profileAddress": "Adresse",
+    "profileEmail": "E-Mail",
+    "profilePhone": "Telefon",
+    "profileSave": "Profil speichern",
+    "profileEmpty": "Das Team hat noch kein Programmprofil angelegt.",
+    "tabOverviewProfile": "Programmprofil"
   }
 }

@@ -159,3 +159,19 @@ export async function setProgramUpdateQuestionsAction(formData: FormData) {
   revalidatePath("/advisor/programm");
   redirect(back);
 }
+
+export async function saveProgramProfileAction(formData: FormData) {
+  const client = await requireUser("/programm");
+  const text = (name: string, max: number) => String(formData.get(name) ?? "").slice(0, max);
+  await client.rpc("save_team_program_profile", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_company_name: text("companyName", 120),
+    p_founders: text("founders", 300),
+    p_address: text("address", 300),
+    p_contact_email: text("contactEmail", 200),
+    p_contact_phone: text("contactPhone", 50),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect("/programm");
+}

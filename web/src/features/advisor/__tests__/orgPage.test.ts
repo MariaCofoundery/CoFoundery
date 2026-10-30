@@ -61,3 +61,12 @@ test("Programm-Updates: Hinweis im Postfach plus Mitteilung und Mail nach Zustim
   assert.match(notify, /'program_update_email'/);
   assert.match(notify, /wants_email_channel/);
 });
+
+test("Programmprofil: nur das Team schreibt, Ende des Programms loescht alles Eingetragene", () => {
+  const sql = readFileSync("../supabase/migrations/20270121120000_team_program_profile.sql", "utf8");
+  assert.match(sql, /delete from public\.team_program_profiles where program_id = p_program_id/);
+  assert.match(sql, /delete from public\.team_program_milestones where program_id = p_program_id/);
+  assert.match(sql, /delete from public\.team_program_updates where program_id = p_program_id/);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_team_program_profile"/);
+});

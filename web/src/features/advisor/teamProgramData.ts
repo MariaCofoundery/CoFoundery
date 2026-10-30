@@ -162,3 +162,24 @@ export async function getProgramUpdateDue(client: SupabaseClient, programId: str
   const { data } = await client.rpc("get_program_update_due", { p_program_id: programId });
   return typeof data === "string" ? data : null;
 }
+
+export type ProgramProfile = {
+  companyName: string | null;
+  founders: string | null;
+  address: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+};
+
+export async function getProgramProfile(client: SupabaseClient, programId: string): Promise<ProgramProfile | null> {
+  const { data } = await client.rpc("get_team_program_profile", { p_program_id: programId });
+  const row = ((data ?? []) as Record<string, string | null>[])[0];
+  if (!row) return null;
+  return {
+    companyName: row.company_name ?? null,
+    founders: row.founders ?? null,
+    address: row.address ?? null,
+    contactEmail: row.contact_email ?? null,
+    contactPhone: row.contact_phone ?? null,
+  };
+}

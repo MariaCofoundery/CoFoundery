@@ -231,7 +231,11 @@ test("die eigenen Nachrichten, Sperren und Forschungsantworten sind im Export - 
   // obwohl es die eigenen Daten sind (Art. 15 und 20 DSGVO).
   const code = source("src/features/account/accountExport.ts");
   assert.match(code, /client\.rpc\("export_my_restricted_data"\)/);
-  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "team_program_consents", "team_program_milestones", "team_program_profiles", "team_program_updates", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  const programSql = source("../supabase/migrations/20270122120000_export_team_program_data.sql");
+  for (const table of ["team_program_consents", "team_program_milestones", "team_program_profiles", "team_program_updates"]) {
+    assert.match(programSql, new RegExp(`'${table}'`));
+  }
   const sql = source("../supabase/migrations/20261228120000_account_export_restricted_tables.sql");
   assert.match(sql, /where m\.sender_user_id = uid/);
   assert.match(sql, /where b\.blocker_user_id = uid/);

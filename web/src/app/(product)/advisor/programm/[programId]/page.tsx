@@ -4,9 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
+import { ProgramProfileView } from "@/features/advisor/ProgramProfile";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
 import {
   getOrgTeamPrograms,
+  getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
   listProgramMilestones,
@@ -53,12 +55,13 @@ export default async function AdvisorProgramTeamPage({
   }
   if (!program || !orgOfProgram) notFound();
 
-  const [members, milestones, questions, updates, due] = await Promise.all([
+  const [members, milestones, questions, updates, due, profile] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
     program.isActive && tab === "meilensteine" ? listProgramMilestones(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? getProgramUpdateQuestions(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? listProgramUpdates(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? getProgramUpdateDue(client, programId) : Promise.resolve(null),
+    program.isActive && tab === "overview" ? getProgramProfile(client, programId) : Promise.resolve(null),
   ]);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
@@ -94,6 +97,7 @@ export default async function AdvisorProgramTeamPage({
             {t("teamPageInactive")} ({t("statusWaiting", { approved: program.approvedCount, total: program.memberCount })})
           </p>
         ) : tab === "overview" ? (
+          <div className="grid gap-4">
           <dl className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
               <dd className="text-2xl font-extrabold text-slate-950">{program.memberCount}</dd>
@@ -104,6 +108,8 @@ export default async function AdvisorProgramTeamPage({
               <dd className="mt-1 text-sm text-slate-800">{program.contactUserIds.map(nameOf).join(", ") || t("contactsNone")}</dd>
             </div>
           </dl>
+          <ProgramProfileView profile={profile} />
+          </div>
         ) : tab === "updates" ? (
           <ManageProgramUpdates programId={programId} questions={questions} due={due} updates={updates} returnTo={`${base}?tab=updates`} />
         ) : (

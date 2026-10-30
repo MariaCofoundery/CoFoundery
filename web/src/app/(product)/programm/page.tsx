@@ -4,12 +4,14 @@ import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { consentTeamProgramAction, endTeamProgramAction } from "@/features/advisor/teamProgramActions";
 import {
   getMyTeamPrograms,
+  getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
   listProgramMilestones,
   listProgramUpdates,
 } from "@/features/advisor/teamProgramData";
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
+import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -31,12 +33,13 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
       programs
         .filter((program) => program.isActive)
         .map(async (program) => {
-          const [questions, updates, due] = await Promise.all([
+          const [questions, updates, due, profile] = await Promise.all([
             getProgramUpdateQuestions(client, program.programId),
             listProgramUpdates(client, program.programId),
             getProgramUpdateDue(client, program.programId),
+            getProgramProfile(client, program.programId),
           ]);
-          return [program.programId, { questions, updates, due }] as const;
+          return [program.programId, { questions, updates, due, profile }] as const;
         }),
     ),
   );
@@ -97,6 +100,9 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               {program.isActive ? (
                 <>
                 <div className="mt-5 border-t border-slate-100 pt-4">
+                  <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
+                </div>
+                <div className="mt-6 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />
                 </div>
                 <div className="mt-6 border-t border-slate-100 pt-4">

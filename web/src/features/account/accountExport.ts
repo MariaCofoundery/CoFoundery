@@ -105,6 +105,11 @@ export const ACCOUNT_EXPORT_RESTRICTED_TABLES = [
   "network_blocks",
   "workstyle_pretest_sessions",
   "workstyle_research_responses",
+  // Programm: die eigenen Zustimmungen und Eintraege.
+  "team_program_consents",
+  "team_program_updates",
+  "team_program_milestones",
+  "team_program_profiles",
 ] as const;
 
 export type AccountExport = {
