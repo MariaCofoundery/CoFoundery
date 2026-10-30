@@ -898,7 +898,14 @@
     "newTeamNeedsFounder": "Um ein Team anzulegen, brauchst du in deinem Profil die Rolle „Founder“. Ergänze sie und komme dann über deinen Code zurück.",
     "waitingForCofounders": "Wartet auf Mitgründer:innen",
     "waitingText": "Dein Team besteht bisher nur aus dir. Für die Organisation sichtbar wird es, sobald mindestens eine zweite Person dabei ist und zugestimmt hat.",
-    "waitingInvite": "Mitgründer:innen einladen"
+    "waitingInvite": "Mitgründer:innen einladen",
+    "soloText": "In diesem Team ist nur eine Person. Wenn das so gewollt ist, kannst du das Team als vollständig markieren. Es zählt dann für dich als aktiv. Die Zustimmung der Person bleibt Voraussetzung.",
+    "soloConfirm": "Team ist vollständig (eine Person)",
+    "soloMarked": "Als Ein-Personen-Team markiert.",
+    "soloTeamText": "Wenn ihr wirklich nur eine Person seid, markiere das Team als vollständig. Dann sieht die Organisation euer Programm schon jetzt.",
+    "soloTeamConfirm": "Wir sind vollständig (eine Person)",
+    "soloMarkedForTeam": "Dein Team ist als Ein-Personen-Team markiert. Kommt eine zweite Person dazu, müssen beide zustimmen.",
+    "soloUndo": "Markierung zurücknehmen"
   },
   "programPage": {
     "title": "Programmseite",

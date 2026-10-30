@@ -20,6 +20,7 @@ export type OrgTeamProgram = {
   batch: string | null;
   category: string | null;
   isAlumni: boolean;
+  soloConfirmed: boolean;
 };
 
 export type TeamProgramInvite = {
@@ -41,6 +42,7 @@ export type MyTeamProgram = {
   approvedCount: number;
   contactNames: string[];
   adminNames: string[];
+  soloConfirmed: boolean;
 };
 
 export type TeamProgramInviteOption = {
@@ -65,6 +67,7 @@ export async function getOrgTeamPrograms(client: SupabaseClient, orgId: string):
     batch: (row.batch as string | null) ?? null,
     category: (row.category as string | null) ?? null,
     isAlumni: row.is_alumni === true,
+    soloConfirmed: row.solo_confirmed === true,
   }));
 }
 
@@ -92,6 +95,7 @@ export async function getMyTeamPrograms(client: SupabaseClient): Promise<MyTeamP
     approvedCount: Number(row.approved_count ?? 0),
     contactNames: ((row.contact_names as string[] | null) ?? []).filter((name) => name.length > 0),
     adminNames: ((row.admin_names as string[] | null) ?? []).filter((name) => name.length > 0),
+    soloConfirmed: row.solo_confirmed === true,
   }));
 }
 

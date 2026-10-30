@@ -6,6 +6,7 @@ import {
   revokeTeamProgramCodeAction,
   revokeTeamProgramInviteAction,
   setProgramMetaAction,
+  setTeamProgramSoloAction,
   setTeamProgramContactsAction,
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
@@ -83,6 +84,16 @@ export async function OrgTeamProgramsSection({
                     </span>
                   </span>
                 </div>
+                {!program.isActive && program.memberCount === 1 && (isOwner || program.isContact) ? (
+                  <form action={setTeamProgramSoloAction} className="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
+                    <input type="hidden" name="orgId" value={org.id} />
+                    <input type="hidden" name="programId" value={program.programId} />
+                    <input type="hidden" name="confirmed" value="yes" />
+                    <p className="text-sm leading-6 text-violet-900">{t("soloText")}</p>
+                    <SubmitButton label={t("soloConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900" />
+                  </form>
+                ) : null}
+                {program.soloConfirmed && program.memberCount === 1 ? <p className="mt-1 text-xs text-slate-500">{t("soloMarked")}</p> : null}
                 {program.isActive ? (
                   <Link href={`/advisor/programm/${program.programId}`} className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
                     {t("openTeam")} →

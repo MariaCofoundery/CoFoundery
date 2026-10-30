@@ -214,3 +214,16 @@ test("Stufe 2: Team anlegen und beitreten, Konten zaehlen, Alleinstart wartet au
   assert.match(programm, /waitingForCofounders/);
   assert.doesNotMatch(page + programm, /score|rank|percent|compatib|ampel|traffic/i);
 });
+
+test("Ein-Personen-Team: Markierung durch Team oder Organisation, ersetzt keine Zustimmung, nur das Team nimmt sie zurueck", () => {
+  const sql = readFileSync("../supabase/migrations/20270203120000_program_solo_teams.sql", "utf8");
+  assert.match(sql, /solo_confirmed_at is not null/);
+  // Die Zustimmung bleibt in der Aktiv-Regel stehen.
+  assert.match(sql, /not exists \(\s*select 1 from public\.founder_team_members m\s*where m\.team_id = program\.team_id\s*and not exists \(\s*select 1 from public\.team_program_consents/);
+  assert.match(sql, /team_program_not_solo/);
+  const org = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(org, /setTeamProgramSoloAction/);
+  assert.doesNotMatch(org, /name="confirmed" value="no"/);
+  const programm = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.match(programm, /soloUndo/);
+});

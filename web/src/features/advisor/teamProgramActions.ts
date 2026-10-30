@@ -217,6 +217,23 @@ export async function setProgramMetaAction(formData: FormData) {
   redirect(orgSettings(orgId));
 }
 
+/**
+ * "Team ist vollstaendig": markiert ein Team mit genau einer Person als Ein-Personen-Team.
+ * Das Team selbst oder die Organisation (Inhaber, Bezugsperson) setzt es; zuruecknehmen kann nur das Team.
+ * Eine Zustimmung ersetzt es nicht - die Datenbank prueft das.
+ */
+export async function setTeamProgramSoloAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgId ? orgSettings(orgId) : "/programm");
+  await client.rpc("set_team_program_solo", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_confirmed: formData.get("confirmed") === "yes",
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgId ? orgSettings(orgId) : "/programm");
+}
+
 /** Die Anfrage ist keine Freigabe: Das Team entscheidet selbst, die Datenbank legt dieselbe Review-Anfrage an wie bisher. */
 export async function requestProgramTeamReviewAction(formData: FormData) {
   const programId = String(formData.get("programId") ?? "");

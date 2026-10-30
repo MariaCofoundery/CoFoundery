@@ -898,7 +898,14 @@
     "newTeamNeedsFounder": "To create a team you need the role “Founder” in your profile. Add it, then come back with your code.",
     "waitingForCofounders": "Waiting for co-founders",
     "waitingText": "Your team is just you so far. It becomes visible to the organization once at least one more person has joined and agreed.",
-    "waitingInvite": "Invite co-founders"
+    "waitingInvite": "Invite co-founders",
+    "soloText": "This team has only one person. If that is intended, you can mark the team as complete. It then counts as active for you. The person's agreement is still required.",
+    "soloConfirm": "Team is complete (one person)",
+    "soloMarked": "Marked as a one-person team.",
+    "soloTeamText": "If you really are just one person, mark your team as complete. The organization then sees your program right away.",
+    "soloTeamConfirm": "We are complete (one person)",
+    "soloMarkedForTeam": "Your team is marked as a one-person team. If a second person joins, both have to agree.",
+    "soloUndo": "Undo the mark"
   },
   "programPage": {
     "title": "Program page",

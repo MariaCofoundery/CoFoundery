@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
-import { consentTeamProgramAction, endTeamProgramAction, openTeamProgramCodeAction } from "@/features/advisor/teamProgramActions";
+import { consentTeamProgramAction, endTeamProgramAction, openTeamProgramCodeAction, setTeamProgramSoloAction } from "@/features/advisor/teamProgramActions";
 import {
   getMyTeamPrograms,
   getProgramProfile,
@@ -81,7 +81,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold text-slate-950">{program.orgName}</h2>
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${program.isActive ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>
-                  {program.isActive ? t("statusActive") : program.memberCount < 2 ? t("waitingForCofounders") : t("approvedOf", { approved: program.approvedCount, total: program.memberCount })}
+                  {program.isActive ? t("statusActive") : program.memberCount < 2 && !program.soloConfirmed ? t("waitingForCofounders") : t("approvedOf", { approved: program.approvedCount, total: program.memberCount })}
                 </span>
               </div>
               <div className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
@@ -93,11 +93,19 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 </p>
                 {program.adminNames.length > 0 ? <p>{t("adminsLine", { names: program.adminNames.join(", ") })}</p> : null}
               </div>
-              {program.memberCount < 2 ? (
+              {program.memberCount < 2 && !program.soloConfirmed ? (
                 <p className="mt-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm leading-6 text-violet-900">
                   {t("waitingText")}{" "}
                   <Link href={`/invite/new?team=${program.teamId}`} className="font-semibold underline underline-offset-4">{t("waitingInvite")}</Link>
                 </p>
+              ) : null}
+              {program.memberCount === 1 ? (
+                <form action={setTeamProgramSoloAction} className="mt-2">
+                  <input type="hidden" name="programId" value={program.programId} />
+                  <input type="hidden" name="confirmed" value={program.soloConfirmed ? "no" : "yes"} />
+                  <p className="text-xs leading-6 text-slate-600">{program.soloConfirmed ? t("soloMarkedForTeam") : t("soloTeamText")}</p>
+                  <SubmitButton label={program.soloConfirmed ? t("soloUndo") : t("soloTeamConfirm")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800" />
+                </form>
               ) : null}
               <p className="mt-3 text-xs leading-6 text-slate-600">{t("meaning")}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
