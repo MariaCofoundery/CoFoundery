@@ -27,19 +27,29 @@ export async function AdvisorOrgSection({
   orgs,
   members,
   error = null,
+  part = "all",
 }: {
   orgs: AdvisorOrg[];
   members: OrgMember[];
   /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
   error?: OrgActionErrorCode | null;
+  /** Die Organisationsseite zeigt Mitglieder und Profil getrennt; ohne Angabe steht alles zusammen. */
+  part?: "all" | "members" | "profile";
 }) {
   const t = await getTranslations("advisor.org");
   const org = orgs[0] ?? null;
+  const showHeader = part === "all";
+  const showProfile = part === "all" || part === "profile";
+  const showMembers = part === "all" || part === "members";
 
   return (
     <section id="advisor-org" className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
-      <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
-      <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("text")}</p>
+      {showHeader ? (
+        <>
+          <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{t("text")}</p>
+        </>
+      ) : null}
 
       {error ? (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
@@ -70,7 +80,7 @@ export async function AdvisorOrgSection({
         </form>
       ) : (
         <>
-          <p className="mt-4 break-words text-sm font-medium text-slate-900">{org.name}</p>
+          {showHeader ? <p className="mt-4 break-words text-sm font-medium text-slate-900">{org.name}</p> : null}
           {org.status === "suspended" ? (
             <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
               {t("suspended")}
@@ -89,8 +99,8 @@ export async function AdvisorOrgSection({
               er bestimmt aber nicht, was sie über sich sagt. Die Regel steht
               in der Datenbank; hier wird das Formular nur nicht gezeigt.
               -------------------------------------------------------------- */}
-          {org.role === "owner" && org.status === "active" ? (
-            <details className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60">
+          {showProfile && org.role === "owner" && org.status === "active" ? (
+            <details open={part === "profile"} className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60">
               <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-slate-800">
                 {t("profileTitle")}
               </summary>
@@ -172,7 +182,7 @@ export async function AdvisorOrgSection({
             </details>
           ) : null}
 
-          {org.role === "owner" && org.status === "active" ? (
+          {showMembers && org.role === "owner" && org.status === "active" ? (
             <form action={inviteOrgAdvisorAction} className="mt-4 flex flex-wrap items-end gap-3">
               <input type="hidden" name="orgId" value={org.id} />
               <label className="min-w-0 flex-1">
@@ -194,6 +204,7 @@ export async function AdvisorOrgSection({
             </form>
           ) : null}
 
+          {showMembers ? (
           <ul className="mt-5 space-y-2">
             {members.map((member) => (
               <li
@@ -227,10 +238,11 @@ export async function AdvisorOrgSection({
               </li>
             ))}
           </ul>
+          ) : null}
 
           {/* Phase 12C.1B: selbst gehen. Die letzte Inhaberin bekommt statt des
               Knopfs den Hinweis - die Datenbank wuerde es ohnehin ablehnen. */}
-          {org.role === null ? null : org.role === "owner" &&
+          {!showMembers || org.role === null ? null : org.role === "owner" &&
           members.filter((member) => member.role === "owner" && member.status === "active").length <= 1 ? (
             <p className="mt-4 text-xs leading-6 text-slate-500">{t("leaveLastOwner")}</p>
           ) : (
@@ -245,9 +257,11 @@ export async function AdvisorOrgSection({
           )}
 
           {/* WAS EINE MITGLIEDSCHAFT BEDEUTET - dort, wo sie vergeben wird. */}
-          <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">
-            {t("membershipMeaning")}
-          </p>
+          {showMembers ? (
+            <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">
+              {t("membershipMeaning")}
+            </p>
+          ) : null}
         </>
       )}
     </section>

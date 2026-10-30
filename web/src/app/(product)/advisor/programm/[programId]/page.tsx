@@ -71,7 +71,7 @@ export default async function AdvisorProgramTeamPage({
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link href={`/advisor/organisation?org=${orgOfProgram.id}&tab=settings`} className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+      <Link href={`/advisor/organisation?org=${orgOfProgram.id}&tab=program`} className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
         ← {t("backToOrg")}
       </Link>
       <p className="mt-2 text-xs font-semibold uppercase tracking-[.12em] text-violet-700">{t("teamPageEyebrow")} · {orgOfProgram.name}</p>

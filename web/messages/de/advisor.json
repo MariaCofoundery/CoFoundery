@@ -673,7 +673,7 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
-      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder und Einstellungen",
+      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -691,7 +691,7 @@
   },
   "teamProgram": {
     "sectionTitle": "Teams im Programm",
-    "sectionText": "Ein Team tritt bei, wenn alle im Team ausdrücklich zustimmen. Du lädst mit einem Link ein, das Team wählt selbst, welches seiner Teams teilnimmt. Mitglied deiner Organisation zu sein gibt dir keine Einsicht in ein Team.",
+    "sectionText": "Ein Team ist erst dabei, wenn alle im Team ausdrücklich zugestimmt haben. Mitglied deiner Organisation zu sein gibt dir keine Einsicht in ein Team.",
     "inviteLabel": "Bezeichnung (z. B. Batch 2026/1)",
     "inviteCreate": "Einladungslink erzeugen",
     "inviteShownOnce": "Dieser Link wird nur jetzt angezeigt. Kopiere ihn und gib ihn an das Team weiter.",
@@ -837,6 +837,8 @@
     "codeEntryGo": "Weiter",
     "codeEntryInvalid": "Der Code hat acht Zeichen aus Buchstaben und Ziffern.",
     "codeInvalid": "Dieser Code gilt nicht (mehr) – oder du hast zu oft einen falschen Code eingegeben. Versuche es in einer Stunde noch einmal.",
-    "codeNoTeam": "Du hast kein Team, das mit diesem Code beitreten könnte."
+    "codeNoTeam": "Du hast kein Team, das mit diesem Code beitreten könnte.",
+    "inviteCardTitle": "Team einladen",
+    "inviteCardText": "Du erzeugst einen Link, den das Team einlöst. Optional schicken wir ihn per E-Mail an eine Gründerin oder einen Gründer."
   }
 }

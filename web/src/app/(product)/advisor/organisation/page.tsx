@@ -22,9 +22,10 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "settings"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "profile"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_OF = (value: string | undefined): Tab => TABS.find((tab) => tab === value) ?? "overview";
+// "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
+const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "members" : TABS.find((tab) => tab === value) ?? "overview");
 
 /**
  * Organisation - ein Programm oder eine Beratung mit mehreren Advisorinnen.
@@ -81,17 +82,17 @@ export default async function AdvisorOrganisationPage({
 
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
-  const needsPrograms = tab === "settings" || tab === "overview" || tab === "access";
+  const needsPrograms = tab === "program" || tab === "overview" || tab === "access";
   const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
-    needsPrograms && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
+    tab === "program" && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
-    tab === "settings" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
+    tab === "program" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -220,9 +221,17 @@ export default async function AdvisorOrganisationPage({
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}
 
-        {tab === "settings" ? (
+        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="members" /> : null}
+
+        {tab === "profile" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="profile" /> : null}
+
+        {tab === "program" ? (
           <>
-            <AdvisorOrgSection orgs={[org]} members={members} error={orgError} />
+            {orgError ? (
+              <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
+                {tAdvisor(`org.errors.${orgError}`)}
+              </p>
+            ) : null}
             <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
           </>
         ) : null}

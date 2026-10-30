@@ -21,13 +21,14 @@ import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErr
  */
 
 const PATH = "/advisor/organisation";
-// Alle Aktionen gehoeren zum Reiter "Mitglieder und Einstellungen" - dorthin kehren sie zurueck.
+// Mitglieder-Aktionen kehren in den Reiter "Mitglieder" zurueck, das Profil in seinen eigenen.
 const ANCHOR = "";
-const TAB = "tab=settings";
+const TAB = "tab=members";
+const PROFILE_TAB = "tab=profile";
 
-function back(error: OrgActionErrorCode): never {
+function back(error: OrgActionErrorCode, tab = TAB): never {
   revalidatePath(PATH);
-  redirect(`${PATH}?${TAB}&orgError=${encodeURIComponent(error)}${ANCHOR}`);
+  redirect(`${PATH}?${tab}&orgError=${encodeURIComponent(error)}${ANCHOR}`);
 }
 
 /**
@@ -39,9 +40,9 @@ async function assertOrgActive(client: Awaited<ReturnType<typeof createClient>>,
   if ((data as { status?: string } | null)?.status === "suspended") back("org_suspended");
 }
 
-function done(): never {
+function done(tab = TAB): never {
   revalidatePath(PATH);
-  redirect(`${PATH}?${TAB}${ANCHOR}`);
+  redirect(`${PATH}?${tab}${ANCHOR}`);
 }
 
 async function requireUser() {
@@ -138,7 +139,7 @@ export async function updateAdvisorOrgProfileAction(formData: FormData) {
   const { client } = await requireUser();
 
   const orgId = String(formData.get("orgId") ?? "").trim();
-  if (!orgId) back("org_failed");
+  if (!orgId) back("org_failed", PROFILE_TAB);
   await assertOrgActive(client, orgId);
 
   // Schwerpunkte kommen als eine Zeile mit Kommas - acht sind das Maximum,
@@ -158,6 +159,6 @@ export async function updateAdvisorOrgProfileAction(formData: FormData) {
     p_focus: focus.length > 0 ? focus : null,
     p_location_region: String(formData.get("locationRegion") ?? "").trim() || null,
   });
-  if (error) back(orgErrorCode(error.message));
-  done();
+  if (error) back(orgErrorCode(error.message), PROFILE_TAB);
+  done(PROFILE_TAB);
 }

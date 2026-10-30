@@ -673,7 +673,7 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "tabs": "Overview | Teams | People | Approvals | Members and settings",
+      "tabs": "Overview | Teams | People | Approvals | Members | Program | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -691,7 +691,7 @@
   },
   "teamProgram": {
     "sectionTitle": "Teams in the program",
-    "sectionText": "A team joins when everyone on it explicitly agrees. You invite with a link, and the team chooses which of its teams takes part. Being a member of your organization gives you no access to a team.",
+    "sectionText": "A team only joins when everyone on it explicitly agrees. Being a member of your organization gives you no access to a team.",
     "inviteLabel": "Label (e.g. Batch 2026/1)",
     "inviteCreate": "Create invite link",
     "inviteShownOnce": "This link is only shown now. Copy it and pass it on to the team.",
@@ -837,6 +837,8 @@
     "codeEntryGo": "Continue",
     "codeEntryInvalid": "The code has eight characters made of letters and digits.",
     "codeInvalid": "This code is not valid (any more) – or you entered a wrong code too often. Try again in an hour.",
-    "codeNoTeam": "You have no team that could join with this code."
+    "codeNoTeam": "You have no team that could join with this code.",
+    "inviteCardTitle": "Invite a team",
+    "inviteCardText": "You create a link that the team redeems. Optionally we send it by email to a founder."
   }
 }

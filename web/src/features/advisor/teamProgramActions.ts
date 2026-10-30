@@ -25,7 +25,7 @@ async function requireUser(next: string) {
 }
 
 const orgSettings = (orgId: string, extra = "") =>
-  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=settings${extra}`;
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
 
 /**
  * Der Link steht NUR in der Antwort dieses Aufrufs - gespeichert wird nur der

@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "settings"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "profile"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -19,8 +19,9 @@ test("die Seite zeigt Zaehler und Plaetze - keine Gesamtwertung, keine Rangfolge
 
 test("Aktionen der Organisation kehren in den Reiter Mitglieder und Einstellungen zurueck", () => {
   const actions = readFileSync("src/features/advisor/orgActions.ts", "utf8");
-  assert.match(actions, /const TAB = "tab=settings"/);
-  assert.match(page, /tab === "settings" \? \(\s*<>\s*<AdvisorOrgSection/);
+  assert.match(actions, /const TAB = "tab=members"/);
+  assert.match(page, /tab === "members" \? <AdvisorOrgSection/);
+  assert.match(page, /tab === "profile" \? <AdvisorOrgSection/);
   assert.match(page, /<OrgTeamProgramsSection/);
 });
 
