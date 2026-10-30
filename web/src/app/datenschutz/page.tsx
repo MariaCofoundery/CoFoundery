@@ -20,7 +20,7 @@ import Link from "next/link";
  *     ends_at (20261125120000), gleicher Cron -> innerhalb von rund zwei Tagen.
  *   - Abgeschlossene KI-Aufgaben (90 Tage) und Hinweise in der Anwendung (180 Tage):
  *     purge_stale_operational_rows (Migration 20261213120000), gleicher Cron.
- *   - Cookies und Browserspeicher: Laufzeiten aus dem Code (siehe Abschnitt 22).
+ *   - Cookies und Browserspeicher: Laufzeiten aus dem Code (siehe Abschnitt 21).
  * Alle anderen Daten: bis zur Löschung des Kontos bzw. solange erforderlich.
  */
 
@@ -188,7 +188,7 @@ export default function DatenschutzPage() {
               items={[
                 "verarbeitet werden deine E-Mail-Adresse, der Anmeldezeitpunkt und technische Sitzungsdaten",
                 "die Sprache, in der du Made2Found nutzt, damit die Anmelde-E-Mail in dieser Sprache ankommt",
-                "nach der Anmeldung halten Sitzungs-Cookies dich angemeldet (Abschnitt 22)",
+                "nach der Anmeldung halten Sitzungs-Cookies dich angemeldet (Abschnitt 21)",
               ]}
             />
             <p>Rechtsgrundlage ist die Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO).</p>
@@ -299,7 +299,7 @@ export default function DatenschutzPage() {
             />
             <p>
               Gemeinsame Inhalte betreffen mehrere Personen. Was bei der Löschung eines Kontos mit
-              ihnen geschieht, steht in Abschnitt 25.
+              ihnen geschieht, steht in Abschnitt 24.
             </p>
             <p>Rechtsgrundlage ist die Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO).</p>
           </BulletSection>
@@ -461,7 +461,7 @@ export default function DatenschutzPage() {
               items={[
                 "Diese Ereignisse speichern wir ohne deinen Namen, ohne E-Mail-Adresse und ohne Nutzerkennung.",
                 "Sie enthalten keine ausgewählten Antworten, keine Freitexte und keine Auswertungen.",
-                "Sie werden automatisch gelöscht (Abschnitt 24).",
+                "Sie werden automatisch gelöscht (Abschnitt 23).",
               ]}
             />
             <p>
@@ -531,7 +531,7 @@ export default function DatenschutzPage() {
             <p>
               Andere Teilnehmende sehen dein Kurzprofil nur über den Vergleich, dem du zugestimmt
               hast. Deine Teilnahme- und Antwortdaten werden automatisch innerhalb von rund zwei
-              Tagen nach Ende des Events gelöscht (Abschnitt 24). Das Event selbst (Name, Zeitraum)
+              Tagen nach Ende des Events gelöscht (Abschnitt 23). Das Event selbst (Name, Zeitraum)
               bleibt bestehen; es enthält keine Angaben über Teilnehmende.
             </p>
             {/*
@@ -550,21 +550,7 @@ export default function DatenschutzPage() {
             </p>
           </BulletSection>
 
-          <BulletSection number="20" title="Freiwillige Unterstützung (PayPal)">
-            <p>
-              Du kannst die Testphase freiwillig unterstützen. Dafür verlinken wir auf eine
-              Zahlungsseite von PayPal (PayPal Europe S.à r.l. et Cie, S.C.A.). Die Zahlung findet
-              vollständig bei PayPal statt; PayPal verarbeitet die Daten in eigener Verantwortung
-              nach seinen Datenschutzbestimmungen. Made2Found speichert keine Zahlungsdaten.
-            </p>
-            <p>
-              Wenn du uns für eine Rechnung Daten per E-Mail schickst, verarbeiten wir sie zur
-              Rechnungsstellung und bewahren sie auf, soweit wir gesetzlich dazu verpflichtet sind
-              (Art. 6 Abs. 1 lit. c DSGVO).
-            </p>
-          </BulletSection>
-
-          <BulletSection number="21" title="Kontakt per E-Mail">
+          <BulletSection number="20" title="Kontakt per E-Mail">
             <p>
               Wenn du uns per E-Mail schreibst, verarbeiten wir deine Nachricht und deine Angaben,
               um dein Anliegen zu bearbeiten. Für unser E-Mail-Postfach nutzen wir Gmail (Google
@@ -577,7 +563,7 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
-          <BulletSection number="22" title="Cookies und Speicherung im Browser">
+          <BulletSection number="21" title="Cookies und Speicherung im Browser">
             <p>
               Wir verwenden nur Speicherungen, die für die Funktionen nötig sind, die du nutzt.
               Werbe-, Analyse- oder Tracking-Cookies setzen wir nicht; deshalb gibt es auch keinen
@@ -608,7 +594,7 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
-          <BulletSection number="23" title="Server-Protokolle">
+          <BulletSection number="22" title="Server-Protokolle">
             <p>
               Beim Aufruf der Website und bei der Nutzung der Serverfunktionen verarbeiten unsere
               Hosting- und Datenbankdienstleister technisch notwendige Verbindungsdaten, z. B.
@@ -626,7 +612,7 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
-          <BulletSection number="24" title="Speicherdauer">
+          <BulletSection number="23" title="Speicherdauer">
             <p>
               Wir speichern personenbezogene Daten nicht länger als nötig. Konkrete automatische
               Fristen gibt es dort, wo sie technisch umgesetzt sind:
@@ -638,7 +624,7 @@ export default function DatenschutzPage() {
                 "Abgeschlossene Aufgaben der KI-Warteschlange (nur Verweise und technische Angaben, keine Inhalte) löschen wir automatisch nach 90 Tagen, Hinweise in der Anwendung nach 180 Tagen.",
                 "Push-Zustelladressen speichern wir, bis du Push ausschaltest, der Push-Dienst sie als ungültig meldet oder du dein Konto löschst.",
                 "Einladungen laufen nach 14 bzw. 30 Tagen ab. Abgelaufene Einladungen werden derzeit nicht automatisch gelöscht, sondern spätestens mit dem Konto der einladenden Person.",
-                "Die Laufzeiten von Cookies und Browserspeicher stehen in Abschnitt 22.",
+                "Die Laufzeiten von Cookies und Browserspeicher stehen in Abschnitt 21.",
               ]}
             />
             <p>
@@ -654,7 +640,7 @@ export default function DatenschutzPage() {
             </p>
           </BulletSection>
 
-          <BulletSection number="25" title="Konto löschen und gemeinsame Daten">
+          <BulletSection number="24" title="Konto löschen und gemeinsame Daten">
             <p>
               Du kannst dein Konto jederzeit in deinen Kontoeinstellungen löschen. Die Löschung
               erfolgt sofort und kann nicht rückgängig gemacht werden.
@@ -691,13 +677,13 @@ export default function DatenschutzPage() {
             </p>
           </BulletSection>
 
-          <BulletSection number="26" title="Deine Rechte">
+          <BulletSection number="25" title="Deine Rechte">
             <p>Du hast das Recht auf:</p>
             <List
               items={[
                 "Auskunft über deine Daten (Art. 15 DSGVO)",
                 "Berichtigung unrichtiger Daten (Art. 16 DSGVO) – die meisten Angaben kannst du direkt im Produkt ändern",
-                "Löschung (Art. 17 DSGVO) – dein Konto kannst du selbst löschen (Abschnitt 25)",
+                "Löschung (Art. 17 DSGVO) – dein Konto kannst du selbst löschen (Abschnitt 24)",
                 "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
                 "Datenübertragbarkeit (Art. 20 DSGVO) – einen Export wesentlicher Kontodaten kannst du in deinen Kontoeinstellungen herunterladen; eine vollständige Auskunft erhältst du auf Anfrage",
                 "Widerspruch gegen Verarbeitungen auf Grundlage unseres berechtigten Interesses (Art. 21 DSGVO)",
@@ -711,7 +697,7 @@ export default function DatenschutzPage() {
             <p>Für alle Anliegen genügt eine E-Mail an hello@cofoundery.de.</p>
           </BulletSection>
 
-          <BulletSection number="27" title="Kontakt">
+          <BulletSection number="26" title="Kontakt">
             <p>Bei Fragen zum Datenschutz:</p>
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
               <p>Maria Schulz</p>
