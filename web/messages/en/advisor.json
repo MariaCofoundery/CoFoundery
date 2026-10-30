@@ -376,7 +376,7 @@
   },
   "personInvites": {
     "title": "Invite a person",
-    "text": "You invite people by email address. There is no people search — it would reveal whether an address has an account.",
+    "text": "You invite people by email and ask for access to parts of their profile. Several people, for example the members of a team, go out in one go. There is no people search – it would reveal whether an address has an account.",
     "emailLabel": "Email address",
     "scopesLabel": "What are you asking for?",
     "scopesHint": "Select each one individually. A blanket request gets a blanket answer — usually none.",
@@ -390,7 +390,17 @@
     "holderLabel": "On whose behalf?",
     "holderOrg": "{name}",
     "holderSelf": "In your own name",
-    "holderHint": "On behalf of the organization, the access stays there when you leave — in your own name, it ends with you."
+    "holderHint": "On behalf of the organization, the access stays there when you leave — in your own name, it ends with you.",
+    "stepWho": "Who do you invite?",
+    "addEmail": "Add",
+    "removeEmail": "Remove {email}",
+    "emailsHint": "Type an address and confirm with Enter. You can add several people at once, each one gets their own invitation. You can also paste a list.",
+    "emailInvalid": "That does not look like an email address.",
+    "noticeInvited": "{count, plural, =1 {The invitation is on its way.} other {# invitations are on their way.}}",
+    "noticeFailed": "{failed, plural, =1 {One address did not work.} other {# addresses did not work.}}",
+    "errorEmail": "Please enter at least one valid email address.",
+    "errorScopes": "Please choose at least one area you are asking about.",
+    "errorCreate": "That did not work just now. Please try again."
   },
   "org": {
     "title": "Your organization",

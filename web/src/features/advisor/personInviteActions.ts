@@ -40,16 +40,19 @@ export async function invitePersonAction(formData: FormData) {
   } = await client.auth.getUser();
   if (!user?.id) redirect(`/login?next=${encodeURIComponent(PATH)}`);
 
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  // Mehrere Adressen auf einmal: jede bekommt ihre EIGENE Einladung mit eigenem Link.
+  // Was noch im Eingabefeld steht (`emailDraft`), zaehlt mit - es soll nichts verloren gehen.
+  const raw = [...formData.getAll("email"), ...String(formData.get("emailDraft") ?? "").split(/[\s,;]+/)]
+    .map((value) => String(value).trim().toLowerCase())
+    .filter((value) => value.length > 0);
+  const emails = [...new Set(raw)].slice(0, 20);
+  const valid = emails.filter((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
   const note = String(formData.get("note") ?? "").trim();
   const scopes = ADVISOR_SCOPES.filter((scope) => formData.get(`scope_${scope}`) === "on");
 
-  if (!email.includes("@") || email.length < 3) back("email");
+  if (valid.length === 0) back("email");
   // Ohne Umfang ist die Einladung eine Frage ohne Inhalt.
   if (scopes.length === 0) back("scopes");
-
-  const token = randomBytes(24).toString("hex");
-  const tokenHash = createHash("sha256").update(token).digest("hex");
 
   // IN WESSEN NAMEN gefragt wird, entscheidet der Halter des spaeteren
   // Zugangs - und damit, ob er bleibt, wenn diese Advisorin geht. Ob sie in
@@ -57,27 +60,38 @@ export async function invitePersonAction(formData: FormData) {
   const holder = String(formData.get("holder") ?? "self");
   const orgId = holder.startsWith("org:") ? holder.slice(4) : null;
 
-  const { error } = await client.rpc("create_advisor_person_invite", {
-    p_email: email,
-    p_token_hash: tokenHash,
-    p_scopes: scopes,
-    p_note: note.length > 0 ? note : null,
-    p_org_id: orgId,
-  });
-  if (error) back("create");
+  let sent = 0;
+  let failed = emails.length - valid.length;
+  for (const email of valid) {
+    const token = randomBytes(24).toString("hex");
+    const tokenHash = createHash("sha256").update(token).digest("hex");
+    const { error } = await client.rpc("create_advisor_person_invite", {
+      p_email: email,
+      p_token_hash: tokenHash,
+      p_scopes: scopes,
+      p_note: note.length > 0 ? note : null,
+      p_org_id: orgId,
+    });
+    if (error) {
+      failed += 1;
+      continue;
+    }
+    sent += 1;
+    // DIE MAIL IST BESTENFALLS. Geht sie nicht raus, ist die Einladung trotzdem
+    // angelegt - und der Advisor sieht sie in seiner Liste samt Zustand. Eine
+    // Einladung, die an einem Mailfehler scheitert, waere schlimmer: Dann stuende
+    // nirgends, dass gefragt wurde.
+    await sendAdvisorPersonInviteEmail({
+      recipientEmail: email,
+      note: note.length > 0 ? note : null,
+      url: `${getPublicAppOrigin()}/invite/person-access/${token}`,
+    });
+  }
 
-  // DIE MAIL IST BESTENFALLS. Geht sie nicht raus, ist die Einladung trotzdem
-  // angelegt - und der Advisor sieht sie in seiner Liste samt Zustand. Eine
-  // Einladung, die an einem Mailfehler scheitert, wäre schlimmer: Dann stünde
-  // nirgends, dass gefragt wurde.
-  await sendAdvisorPersonInviteEmail({
-    recipientEmail: email,
-    note: note.length > 0 ? note : null,
-    url: `${getPublicAppOrigin()}/invite/person-access/${token}`,
-  });
-
+  // Wenn gar nichts angelegt werden konnte, ist das ein Fehler und kein Erfolg.
+  if (sent === 0) back("create");
   revalidatePath(PATH);
-  redirect(`${PATH}?notice=invited#person-invites`);
+  redirect(`${PATH}?notice=invited&count=${sent}&failed=${failed}#person-invites`);
 }
 
 export async function revokePersonInviteAction(formData: FormData) {

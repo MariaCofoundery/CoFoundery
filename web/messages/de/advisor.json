@@ -376,7 +376,7 @@
   },
   "personInvites": {
     "title": "Eine Person einladen",
-    "text": "Du lädst über die E-Mail-Adresse ein. Es gibt keine Personensuche — die würde verraten, ob es zu einer Adresse ein Konto gibt.",
+    "text": "Du lädst Menschen per E-Mail ein und bittest sie um Einsicht in einzelne Bereiche ihres Profils. Mehrere Personen, zum Beispiel die Mitglieder eines Teams, gehen in einem Zug. Es gibt keine Personensuche – sie würde verraten, ob es zu einer Adresse ein Konto gibt.",
     "emailLabel": "E-Mail-Adresse",
     "scopesLabel": "Worum bittest du?",
     "scopesHint": "Einzeln ankreuzen. Wer pauschal fragt, bekommt eine pauschale Antwort — meistens keine.",
@@ -390,7 +390,17 @@
     "holderLabel": "In wessen Namen?",
     "holderOrg": "{name}",
     "holderSelf": "In deinem eigenen Namen",
-    "holderHint": "Im Namen der Organisation bleibt der Zugang dort, wenn du gehst — im eigenen Namen endet er mit dir."
+    "holderHint": "Im Namen der Organisation bleibt der Zugang dort, wenn du gehst — im eigenen Namen endet er mit dir.",
+    "stepWho": "Wen lädst du ein?",
+    "addEmail": "Hinzufügen",
+    "removeEmail": "{email} entfernen",
+    "emailsHint": "Eine Adresse eintippen und mit Enter bestätigen. Mehrere Personen gehen auf einmal, jede bekommt ihre eigene Einladung. Du kannst auch eine Liste einfügen.",
+    "emailInvalid": "Das sieht nicht nach einer E-Mail-Adresse aus.",
+    "noticeInvited": "{count, plural, =1 {Die Einladung ist unterwegs.} other {# Einladungen sind unterwegs.}}",
+    "noticeFailed": "{failed, plural, =1 {Bei einer Adresse hat es nicht geklappt.} other {Bei # Adressen hat es nicht geklappt.}}",
+    "errorEmail": "Bitte gib mindestens eine gültige E-Mail-Adresse ein.",
+    "errorScopes": "Bitte wähle mindestens einen Bereich, um den du bittest.",
+    "errorCreate": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
   },
   "org": {
     "title": "Deine Organisation",

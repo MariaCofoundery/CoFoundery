@@ -22,13 +22,14 @@ const ART: Record<string, Way> = { person: "person", team: "team", runde: "round
 export default async function AdvisorInvitePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ art?: string; error?: string; notice?: string }>;
+  searchParams?: Promise<{ art?: string; error?: string; notice?: string; count?: string; failed?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   // Rueckmeldungen der Personen-Einladung (?error=, ?notice=) fuehren zurueck in diese Ansicht.
   const art: Way | null = ART[query.art ?? ""] ?? (query.error || query.notice ? "person" : null);
   const t = await getTranslations("advisor.area");
   const tIntake = await getTranslations("intake");
+  const tInvites = await getTranslations("advisor.personInvites");
   const {
     data: { user },
   } = await getRequestUser();
@@ -117,6 +118,17 @@ export default async function AdvisorInvitePage({
           <Link href="/advisor/einladen" className="inline-flex min-h-11 w-fit items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
             ← {t("invite.back")}
           </Link>
+          {art === "person" && query.notice === "invited" ? (
+            <p role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-900">
+              {tInvites("noticeInvited", { count: Math.max(1, Number(query.count) || 1) })}
+              {Number(query.failed) > 0 ? ` ${tInvites("noticeFailed", { failed: Number(query.failed) })}` : ""}
+            </p>
+          ) : null}
+          {art === "person" && query.error ? (
+            <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
+              {query.error === "email" ? tInvites("errorEmail") : query.error === "scopes" ? tInvites("errorScopes") : tInvites("errorCreate")}
+            </p>
+          ) : null}
           {art === "person" ? <PersonInviteSection invites={personInvites} orgs={orgs} /> : null}
           {art === "team" ? (
             <section id="team-invite">
