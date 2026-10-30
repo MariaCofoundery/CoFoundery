@@ -3,6 +3,7 @@
 import { ChangeEvent, useRef, useState } from "react";
 import { DEFAULT_ACCENT, DEFAULT_ACCENT_B, GRADIENT_PRESETS, accentStyles, parseAccent } from "@/features/advisor/programAccent";
 import { ProgramRichText } from "@/features/advisor/programRichText";
+import { changeTextSize } from "@/features/advisor/programTextSize";
 import { saveProgramPageAction } from "@/features/advisor/teamProgramActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -119,8 +120,16 @@ export function ProgramPageEditor({
   const url = `${origin}/p/${slug || "…"}`;
   const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}` : "");
 
+  /** Eine Stufe groesser oder kleiner; die Regeln stehen in programTextSize.ts. */
+  function changeSize(delta: 1 | -1) {
+    const area = textRef.current;
+    if (!area) return;
+    setWelcome(changeTextSize(welcome, area.selectionStart, area.selectionEnd, delta).slice(0, 600));
+    requestAnimationFrame(() => area.focus());
+  }
+
   /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). */
-  function format(kind: "bold" | "italic" | "list" | "bigger" | "smaller") {
+  function format(kind: "bold" | "italic" | "list") {
     const area = textRef.current;
     if (!area) return;
     const start = area.selectionStart;
@@ -131,7 +140,7 @@ export function ProgramPageEditor({
       const lines = (selected || "").split("\n");
       next = welcome.slice(0, start) + lines.map((line) => (line.startsWith("- ") ? line : `- ${line}`)).join("\n") + welcome.slice(end);
     } else {
-      const mark = kind === "bold" ? "**" : kind === "italic" ? "*" : kind === "bigger" ? "++" : "--";
+      const mark = kind === "bold" ? "**" : "*";
       next = welcome.slice(0, start) + mark + selected + mark + welcome.slice(end);
     }
     setWelcome(next.slice(0, 600));
@@ -181,7 +190,7 @@ export function ProgramPageEditor({
                 type="button"
                 aria-label={label}
                 title={label}
-                onClick={() => format(kind)}
+                onClick={() => (kind === "bigger" ? changeSize(1) : kind === "smaller" ? changeSize(-1) : format(kind))}
                 className={`grid h-9 w-9 place-items-center rounded-lg border border-slate-300 bg-white text-sm text-slate-800 hover:bg-slate-100 ${extra}`}
               >
                 {glyph}

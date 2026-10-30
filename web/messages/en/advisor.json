@@ -932,7 +932,7 @@
     "bold": "Bold",
     "italic": "Italic",
     "list": "List",
-    "formatHint": "Bold: **text**, italic: *text*, larger: ++text++, smaller: --text--, list: lines starting with \"- \". Nothing more, which keeps the page calm and safe.",
+    "formatHint": "Bold: **text**, italic: *text*, list: lines starting with \"- \". A+ and A− change the size in steps, one step per click (up to three larger, two smaller). Without a selection the word at the cursor is used.",
     "accentA": "Color 1",
     "accentB": "Color 2",
     "accentHint": "Pick a ready-made gradient or type your own hex codes like #6D49E0. Two identical colors make a solid fill. The text turns light or dark automatically so it stays readable.",

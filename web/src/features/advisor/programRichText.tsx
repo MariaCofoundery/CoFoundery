@@ -2,15 +2,25 @@ import type { ReactNode } from "react";
 
 /**
  * Einfache Formatierung fuer den Willkommenstext einer Programmseite - ohne
- * HTML. Erlaubt sind **fett**, *kursiv*, ++groesser++, --kleiner--, Listen mit
+ * HTML. Erlaubt sind **fett**, *kursiv*, ++groesser++ (bis zu drei Stufen), --kleiner-- (bis zu zwei), Listen mit
  * "- " und Absaetze durch Leerzeilen. Alles andere bleibt Text; es gibt keine Links und kein HTML, damit
  * eine Organisation auf ihrer Seite nichts einschleusen kann, das wie eine
  * Anwendungsseite aussieht oder woanders hinfuehrt.
  */
+/**
+ * Groessenstufen: ++Text++ (eine Stufe groesser), +++Text+++ (zwei), ++++Text++++ (drei);
+ * --Text-- (eine Stufe kleiner), ---Text--- (zwei). Die Knoepfe im Editor zaehlen die Stufen;
+ * von Hand tippen geht genauso.
+ */
+const BIGGER = ["", "text-[1.25em] font-semibold leading-snug", "text-[1.6em] font-semibold leading-tight", "text-[2.1em] font-bold leading-tight"];
+const SMALLER = ["", "text-[0.85em]", "text-[0.7em]"];
+
 function inline(text: string): ReactNode[] {
-  return text.split(/(\+\+[^+\n]+\+\+|--[^-\n]+--|\*\*[^*]+\*\*|\*[^*\n]+\*)/g).map((part, index) => {
-    if (part.startsWith("++") && part.endsWith("++") && part.length > 4) return <span key={index} className="text-[1.35em] font-semibold leading-tight">{part.slice(2, -2)}</span>;
-    if (part.startsWith("--") && part.endsWith("--") && part.length > 4) return <span key={index} className="text-[0.82em]">{part.slice(2, -2)}</span>;
+  return text.split(/(\+{2,4}[^+\n]+\+{2,4}|-{2,3}[^-\n]+-{2,3}|\*\*[^*]+\*\*|\*[^*\n]+\*)/g).map((part, index) => {
+    const plus = part.match(/^(\+{2,4})([^+\n]+)\1$/);
+    if (plus) return <span key={index} className={BIGGER[plus[1].length - 1]}>{plus[2]}</span>;
+    const minus = part.match(/^(-{2,3})([^-\n]+)\1$/);
+    if (minus) return <span key={index} className={SMALLER[minus[1].length - 1]}>{minus[2]}</span>;
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4) return <strong key={index}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("*") && part.endsWith("*") && part.length > 2) return <em key={index}>{part.slice(1, -1)}</em>;
     return part;
