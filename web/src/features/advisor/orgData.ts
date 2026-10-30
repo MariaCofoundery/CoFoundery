@@ -27,6 +27,11 @@ export type AdvisorOrg = {
   websiteUrl: string | null;
   focus: string[];
   locationRegion: string | null;
+  /** Programmseite (`/p/<Kurzname>`), seit 31.10.2026. */
+  programSlug: string | null;
+  programPagePublished: boolean;
+  programWelcome: string | null;
+  hasProgramLogo: boolean;
 };
 
 export type OrgMember = {
@@ -65,7 +70,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 
   const { data: orgs } = await client
     .from("advisor_orgs")
-    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region")
+    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region, program_slug, program_page_published, program_welcome, program_logo_path")
     .in(
       "id",
       rows.map((row) => row.org_id)
@@ -81,6 +86,10 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
       website_url: string | null;
       focus: string[] | null;
       location_region: string | null;
+      program_slug: string | null;
+      program_page_published: boolean | null;
+      program_welcome: string | null;
+      program_logo_path: string | null;
     }[]
   ).map((org) => ({
     id: org.id,
@@ -92,6 +101,10 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     websiteUrl: org.website_url,
     focus: org.focus ?? [],
     locationRegion: org.location_region,
+    programSlug: org.program_slug,
+    programPagePublished: org.program_page_published === true,
+    programWelcome: org.program_welcome,
+    hasProgramLogo: Boolean(org.program_logo_path),
   }));
 }
 

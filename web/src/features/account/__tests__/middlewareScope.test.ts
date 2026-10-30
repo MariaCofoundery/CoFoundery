@@ -43,6 +43,13 @@ test("jede ausgenommene Bildroute prueft Anmeldung und Freigabe selbst", () => {
   for (const route of findAssetRoutes()) {
     const file = path.join("src/app", route, "route.ts");
     const code = source(file);
+    // Das Logo einer Programmseite ist absichtlich oeffentlich - aber nur, solange die Seite
+    // veroeffentlicht und die Organisation aktiv ist. Das prueft die Route selbst.
+    if (route.startsWith("/api/program-logo/")) {
+      assert.match(code, /eq\("program_page_published", true\)/, `${route}: prueft nicht, ob die Seite veroeffentlicht ist`);
+      assert.match(code, /eq\("status", "active"\)/, `${route}: prueft nicht, ob die Organisation aktiv ist`);
+      continue;
+    }
     assert.match(code, /auth\.getUser\(\)/, `${route}: prueft keine Anmeldung`);
     assert.match(
       code,

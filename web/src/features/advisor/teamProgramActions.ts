@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sendTeamProgramInviteEmail } from "@/lib/email/sendTeamProgramInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { decodePhotoData } from "@/features/connect/connectPhotoData";
+import { PROGRAM_LOGO_BUCKET, programStorageClient } from "@/features/advisor/programPageStorage";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -26,6 +28,8 @@ async function requireUser(next: string) {
 
 const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
+const orgPageTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=page${extra}`;
 
 /**
  * Der Link steht NUR in der Antwort dieses Aufrufs - gespeichert wird nur der
@@ -274,4 +278,60 @@ export async function startTeamProgramByCodeAction(formData: FormData) {
   if (error || !data) redirect(`/programm/code/${code}?fehler=1`);
   revalidatePath("/programm");
   redirect("/programm?neu=1");
+}
+
+/**
+ * Programmseite speichern: Kurzname, Willkommenstext, Haken "veroeffentlichen" und
+ * optional ein neues Logo (als Bild-Daten aus dem Formular). Wer die
+ * Organisation fuehrt, prueft die Datenbank; das Logo wird erst nach dieser
+ * Pruefung hochgeladen.
+ */
+export async function saveProgramPageAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPageTab(orgId));
+  const slug = String(formData.get("slug") ?? "").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  const { error } = await client.rpc("set_org_program_page", {
+    p_org_id: orgId,
+    p_slug: slug,
+    p_published: formData.get("published") === "yes",
+    p_welcome: String(formData.get("welcome") ?? "").slice(0, 600),
+  });
+  if (error) {
+    const code = error.code === "23505" ? "slug_taken" : error.code === "22023" || error.code === "23514" ? "slug_invalid" : "failed";
+    redirect(orgPageTab(orgId, `&pageError=${code}`));
+  }
+
+  const removeLogo = formData.get("removeLogo") === "yes";
+  const logoData = String(formData.get("logo_image_data") ?? "");
+  const storage = programStorageClient();
+  if (storage && (removeLogo || logoData)) {
+    let newPath: string | null = null;
+    if (logoData) {
+      const decoded = decodePhotoData(logoData);
+      if (!decoded) redirect(orgPageTab(orgId, "&pageError=logo"));
+      const extension = decoded.mimeType === "image/png" ? "png" : decoded.mimeType === "image/webp" ? "webp" : "jpg";
+      newPath = `${orgId}/logo-${randomBytes(8).toString("hex")}.${extension}`;
+      const { error: uploadError } = await storage.storage
+        .from(PROGRAM_LOGO_BUCKET)
+        .upload(newPath, decoded.buffer, { contentType: decoded.mimeType, upsert: false });
+      if (uploadError) redirect(orgPageTab(orgId, "&pageError=logo"));
+    }
+    const { data: oldPath, error: logoError } = await client.rpc("set_org_program_logo", { p_org_id: orgId, p_logo_path: newPath });
+    if (logoError) {
+      if (newPath) await storage.storage.from(PROGRAM_LOGO_BUCKET).remove([newPath]);
+      redirect(orgPageTab(orgId, "&pageError=logo"));
+    }
+    if (typeof oldPath === "string" && oldPath !== newPath) await storage.storage.from(PROGRAM_LOGO_BUCKET).remove([oldPath]);
+  }
+  revalidatePath("/advisor/organisation");
+  if (slug) revalidatePath(`/p/${slug}`);
+  redirect(orgPageTab(orgId, "&pageSaved=1"));
+}
+
+/** Von der oeffentlichen Seite: bringt den eingegebenen Code in den bekannten Beitrittsweg. */
+export async function enterProgramCodeFromPageAction(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "").replace(/[^a-z0-9-]/g, "").slice(0, 40);
+  const code = normalizeCode(String(formData.get("code") ?? ""));
+  if (code.length !== 8) redirect(`/p/${slug}?code=invalid`);
+  redirect(`/programm/code/${code}`);
 }

@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "profile"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "page", "profile"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -163,4 +163,18 @@ test("Teamseite: dunkler Kopf mit Reitern, Kacheln im Ueberblick, Freigaben als 
   const access = readFileSync("src/features/advisor/ProgramAccess.tsx", "utf8");
   assert.match(access, /legendNone/);
   assert.doesNotMatch(page + access, /score|rank|percent|compatib|ampel|traffic/i);
+});
+
+test("Programmseite: nur veroeffentlicht oeffentlich, Anmeldung nur mit gueltigem Code oder gueltiger Einladung", () => {
+  const sql = readFileSync("../supabase/migrations/20270130120000_program_page.sql", "utf8");
+  assert.match(sql, /o\.program_page_published and o\.status = 'active'/);
+  const login = readFileSync("src/app/(product)/login/page.tsx", "utf8");
+  assert.match(login, /is_valid_team_program_code/);
+  assert.match(login, /is_valid_team_program_invite/);
+  const beta = readFileSync("src/features/auth/betaAccess.ts", "utf8");
+  // Der Pfad allein darf nie genuegen: programEntryFromPath liefert nur, WAS zu pruefen ist.
+  assert.match(beta, /export function programEntryFromPath/);
+  const page = readFileSync("src/app/p/[slug]/page.tsx", "utf8");
+  assert.match(page, /get_public_program_page/);
+  assert.doesNotMatch(page, /team_programs|founder_team/);
 });

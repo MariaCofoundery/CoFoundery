@@ -18,10 +18,11 @@ export const config = {
      * jede dieser Routen prueft Anmeldung UND Freigabe selbst
      * (getUser plus can_read_member_photo beziehungsweise is_network_member).
      *
-     * Ausgenommen sind deshalb genau diese drei und die ueblichen statischen
-     * Pfade. Alles andere - jede Seite, jeder Auth-Weg - laeuft weiter
+     * Ausgenommen sind deshalb genau diese drei, das oeffentliche Logo der
+     * Programmseite (`api/program-logo/`, es prueft selbst, ob die Seite veroeffentlicht
+     * ist) und die ueblichen statischen Pfade. Alles andere - jede Seite, jeder Auth-Weg - laeuft weiter
      * durch.
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/profile/photo/|api/connect/photos/|api/connect/venture-logos/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/profile/photo/|api/connect/photos/|api/connect/venture-logos/|api/program-logo/).*)",
   ],
 };

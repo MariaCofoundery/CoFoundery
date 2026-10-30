@@ -12,6 +12,8 @@ import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
+import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
+import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramAccess, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
@@ -22,7 +24,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "profile"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "page", "profile"] as const;
 type Tab = (typeof TABS)[number];
 // "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
 const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "members" : TABS.find((tab) => tab === value) ?? "overview");
@@ -40,7 +42,7 @@ const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "memb
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -217,6 +219,54 @@ export default async function AdvisorOrganisationPage({
         ) : null}
 
         {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="members" /> : null}
+
+        {tab === "page" ? (
+          <div className="grid gap-4">
+            {query.pageSaved === "1" ? <p role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("programPage.saved")}</p> : null}
+            {query.pageError ? (
+              <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                {tAdvisor(`programPage.errors.${["slug_taken", "slug_invalid", "logo"].includes(query.pageError) ? query.pageError : "failed"}`)}
+              </p>
+            ) : null}
+            <div>
+              <h2 className="text-xl font-semibold text-slate-950">{tAdvisor("programPage.title")}</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{tAdvisor("programPage.text")}</p>
+            </div>
+            {org.role === "owner" && org.status === "active" ? (
+              <ProgramPageEditor
+                orgId={org.id}
+                orgName={org.name}
+                origin={getPublicAppOrigin()}
+                initialSlug={org.programSlug}
+                initialPublished={org.programPagePublished}
+                initialWelcome={org.programWelcome}
+                hasLogo={org.hasProgramLogo}
+                labels={{
+                  published: tAdvisor("programPage.published"),
+                  publishedHint: tAdvisor("programPage.publishedHint"),
+                  slug: tAdvisor("programPage.slug"),
+                  slugHint: tAdvisor("programPage.slugHint"),
+                  welcome: tAdvisor("programPage.welcome"),
+                  welcomePlaceholder: tAdvisor("programPage.welcomePlaceholder"),
+                  logo: tAdvisor("programPage.logo"),
+                  logoChange: tAdvisor("programPage.logoChange"),
+                  logoRemove: tAdvisor("programPage.logoRemove"),
+                  save: tAdvisor("programPage.save"),
+                  previewTitle: tAdvisor("programPage.previewTitle"),
+                  previewOpen: tAdvisor("programPage.previewOpen"),
+                  previewCode: tAdvisor("programPage.previewCode"),
+                  previewGo: tAdvisor("programPage.codeGo"),
+                  eyebrow: tAdvisor("programPage.eyebrow"),
+                  draftNote: tAdvisor("programPage.draftNote"),
+                  copy: tAdvisor("programPage.copy"),
+                  copied: tAdvisor("programPage.copied"),
+                }}
+              />
+            ) : (
+              <p className="text-sm text-slate-600">{tAdvisor("programPage.ownerOnly")}</p>
+            )}
+          </div>
+        ) : null}
 
         {tab === "profile" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="profile" /> : null}
 

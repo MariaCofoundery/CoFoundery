@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { type AuthErrorCode, normalizeNextPath } from "@/features/auth/authRedirects";
-import { canCreateAccountFromPath } from "@/features/auth/betaAccess";
+import { canCreateAccountFromPath, programEntryFromPath } from "@/features/auth/betaAccess";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { MagicLinkForm } from "@/features/auth/MagicLinkForm";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
@@ -47,7 +47,19 @@ export default async function LoginPage({
   // rausgeflogen.
   const noticeMessage =
     params.status === "signed_out_everywhere" ? t("login.status.signedOutEverywhere") : null;
-  const shouldCreateUser = canCreateAccountFromPath(nextPath);
+  let shouldCreateUser = canCreateAccountFromPath(nextPath);
+  // Ein GUELTIGER Programmcode oder eine gueltige Programm-Einladung erlaubt, aus diesem
+  // Weg ein Konto anzulegen - auch ohne Beta-Zugangscode. Die Datenbank sagt nur ja oder nein.
+  if (!shouldCreateUser) {
+    const entry = programEntryFromPath(nextPath);
+    if (entry) {
+      const { data } = await supabase.rpc(
+        entry.kind === "code" ? "is_valid_team_program_code" : "is_valid_team_program_invite",
+        entry.kind === "code" ? { p_code: entry.value } : { p_token_hash: entry.value },
+      );
+      shouldCreateUser = data === true;
+    }
+  }
 
   if (user) {
     redirect(await resolvePostAuthRedirectPath(supabase, nextPath));

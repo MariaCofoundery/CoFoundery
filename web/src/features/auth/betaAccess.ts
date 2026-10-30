@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 // Hier standen BETA_ACCESS_COOKIE_NAME und hasBetaAccessCookie: ein Cookie,
 // das nie gesetzt und nie gelesen wurde. Ein Zugangsschutz, den es nur dem
 // Namen nach gab, ist schlimmer als keiner - man haelt eine Tuer fuer
@@ -86,6 +88,26 @@ export function canCreateAccountFromPath(nextPath: string) {
   return ACCOUNT_CREATING_PREFIXES.some(
     (prefix) => path === prefix || path.startsWith(prefix.endsWith("/") ? prefix : `${prefix}/`)
   );
+}
+
+/**
+ * Programm-Einstieg ueber Code oder Einladung. Der Pfad allein erlaubt NICHTS:
+ * Die Anmeldeseite fragt die Datenbank, ob Code oder Einladung gerade gueltig
+ * sind (`is_valid_team_program_code`, `is_valid_team_program_invite`). Der Hash
+ * der Einladung wird hier berechnet, damit der Klartext nicht in die Datenbank gelangt.
+ */
+export function programEntryFromPath(nextPath: string): { kind: "code" | "invite"; value: string } | null {
+  let path: string;
+  try {
+    path = new URL(nextPath.trim(), "https://cofoundery.local").pathname;
+  } catch {
+    return null;
+  }
+  const code = path.match(/^\/programm\/code\/([A-HJ-NP-Z2-9]{8})$/);
+  if (code) return { kind: "code", value: code[1] };
+  const invite = path.match(/^\/programm\/einladung\/([0-9a-f]{48})$/);
+  if (invite) return { kind: "invite", value: createHash("sha256").update(invite[1]).digest("hex") };
+  return null;
 }
 
 /** Only the purpose-bound token invitation enables intake registration. */

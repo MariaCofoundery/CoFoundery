@@ -716,7 +716,7 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
-      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Profil",
+      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmseite | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -890,5 +890,43 @@
     "legendActive": "freigegeben",
     "legendRequested": "angefragt",
     "legendNone": "nicht freigegeben (eine gültige Antwort)"
+  },
+  "programPage": {
+    "title": "Programmseite",
+    "text": "Eine eigene Einstiegsseite für dein Programm: mit Logo, Willkommenstext und einem Feld für den Programmcode. Du gibst Teams nur diesen Link oder QR-Code. Öffentlich ist nur, was du hier einträgst, und erst mit dem Haken.",
+    "ownerOnly": "Die Programmseite richtet die Inhaberin oder der Inhaber der Organisation ein.",
+    "published": "Seite veröffentlichen",
+    "publishedHint": "Ohne Haken ist die Seite nicht erreichbar. Mit Haken kann jede Person mit dem Link sie sehen. Sie zeigt nur Name, Logo und deinen Text.",
+    "slug": "Kurzname in der Adresse",
+    "slugHint": "Nur Kleinbuchstaben, Ziffern und Bindestriche. Er steht in der Adresse und lässt sich ändern, dann gilt der alte Link nicht mehr.",
+    "welcome": "Willkommenstext",
+    "welcomePlaceholder": "Willkommen im Programm! Gib hier deinen Programmcode ein und lege los.",
+    "logo": "Logo hochladen",
+    "logoChange": "Logo ändern",
+    "logoRemove": "Logo entfernen",
+    "save": "Speichern",
+    "saved": "Gespeichert.",
+    "previewTitle": "Vorschau",
+    "previewOpen": "Seite ansehen",
+    "previewCode": "ABCD-2345",
+    "codeGo": "Weiter mit dem Code",
+    "eyebrow": "Programm",
+    "draftNote": "Noch nicht veröffentlicht: Diese Seite ist nur eine Vorschau. Setze den Haken und speichere.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "codeLabel": "Programmcode",
+    "codeInvalid": "Der Code hat acht Zeichen aus Buchstaben und Ziffern.",
+    "step1": "Gib deinen Programmcode ein.",
+    "step2": "Melde dich an oder lege ein Konto an.",
+    "step3": "Wähle dein Team.",
+    "step4": "Alle im Team stimmen zu, dann seid ihr im Programm.",
+    "privacyNote": "Mit dem Beitritt sieht die Organisation nur, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und weitere Freigaben bleiben eigene Entscheidungen.",
+    "poweredBy": "Bereitgestellt von Made2Found",
+    "errors": {
+      "slug_taken": "Dieser Kurzname ist schon vergeben. Nimm einen anderen.",
+      "slug_invalid": "Der Kurzname darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten (mindestens 3 Zeichen) und darf nicht reserviert sein. Zum Veröffentlichen braucht es einen Kurznamen.",
+      "logo": "Das Logo ließ sich nicht speichern. Nimm ein PNG, JPEG oder WebP unter 2 MB.",
+      "failed": "Das hat nicht geklappt. Bitte versuche es noch einmal."
+    }
   }
 }

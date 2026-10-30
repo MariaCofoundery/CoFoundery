@@ -716,7 +716,7 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "tabs": "Overview | Teams | People | Approvals | Members | Program | Profile",
+      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program page | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -890,5 +890,43 @@
     "legendActive": "shared",
     "legendRequested": "requested",
     "legendNone": "not shared (a valid answer)"
+  },
+  "programPage": {
+    "title": "Program page",
+    "text": "Your own landing page for your program: with logo, welcome text and a field for the program code. You only share this link or QR code with teams. Only what you enter here is public, and only once you tick the box.",
+    "ownerOnly": "The owner of the organization sets up the program page.",
+    "published": "Publish page",
+    "publishedHint": "Without the tick the page cannot be reached. With it, anyone with the link can see it. It only shows the name, logo and your text.",
+    "slug": "Short name in the address",
+    "slugHint": "Lowercase letters, digits and hyphens only. It appears in the address and can be changed, then the old link stops working.",
+    "welcome": "Welcome text",
+    "welcomePlaceholder": "Welcome to the program! Enter your program code here and get started.",
+    "logo": "Upload logo",
+    "logoChange": "Change logo",
+    "logoRemove": "Remove logo",
+    "save": "Save",
+    "saved": "Saved.",
+    "previewTitle": "Preview",
+    "previewOpen": "View page",
+    "previewCode": "ABCD-2345",
+    "codeGo": "Continue with the code",
+    "eyebrow": "Program",
+    "draftNote": "Not published yet: this page is only a preview. Tick the box and save.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "codeLabel": "Program code",
+    "codeInvalid": "The code has eight characters made of letters and digits.",
+    "step1": "Enter your program code.",
+    "step2": "Sign in or create an account.",
+    "step3": "Choose your team.",
+    "step4": "Everyone on the team agrees, then you are in the program.",
+    "privacyNote": "By joining, the organization only sees what your team enters into the program. Work styles, Founder Setup and other approvals stay separate decisions.",
+    "poweredBy": "Provided by Made2Found",
+    "errors": {
+      "slug_taken": "This short name is already taken. Choose another one.",
+      "slug_invalid": "The short name may only contain lowercase letters, digits and hyphens (at least 3 characters) and must not be reserved. Publishing needs a short name.",
+      "logo": "The logo could not be saved. Use a PNG, JPEG or WebP under 2 MB.",
+      "failed": "That did not work. Please try again."
+    }
   }
 }
