@@ -218,6 +218,18 @@ export async function setProgramMetaAction(formData: FormData) {
 }
 
 /**
+ * Die Organisation entfernt ein Team aus dem Programm. Nur der Inhaber; das Team bekommt einen Hinweis,
+ * seine Programmdaten werden geloescht (wie beim Beenden durch das Team). Die Datenbank prueft die Rolle.
+ */
+export async function removeTeamFromProgramAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSettings(orgId));
+  const { error } = await client.rpc("remove_team_from_program", { p_program_id: String(formData.get("programId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  redirect(orgSettings(orgId, error ? "&orgError=org_failed" : "&teamRemoved=1"));
+}
+
+/**
  * "Team ist vollstaendig": markiert ein Team mit genau einer Person als Ein-Personen-Team.
  * Das Team selbst oder die Organisation (Inhaber, Bezugsperson) setzt es; zuruecknehmen kann nur das Team.
  * Eine Zustimmung ersetzt es nicht - die Datenbank prueft das.

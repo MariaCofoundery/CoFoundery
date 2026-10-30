@@ -268,3 +268,14 @@ test("Mitgruender:innen: mehrere Adressen immer, ohne Zielteam wird das Team vor
   const page = readFileSync("src/app/(product)/invite/new/page.tsx", "utf8");
   assert.match(page, /4 - team\.members\.length/);
 });
+
+test("Team entfernen: nur der Inhaber, mit Rueckfrage, das Team erfaehrt es", () => {
+  const sql = readFileSync("../supabase/migrations/20270207120000_remove_team_from_program.sql", "utf8");
+  assert.match(sql, /is_advisor_org_owner_of\(v_org\)/);
+  assert.match(sql, /'program_removed'/);
+  const org = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  // Der Knopf steht nur beim Inhaber und hinter einer Rueckfrage (details).
+  assert.match(org, /\{isOwner \? \(\s*<details[\s\S]*removeTeamFromProgramAction/);
+  const notices = JSON.parse(readFileSync("messages/de/notices.json", "utf8"));
+  assert.ok(notices.kinds.program_removed);
+});

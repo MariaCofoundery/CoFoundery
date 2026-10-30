@@ -6,6 +6,7 @@ import {
   revokeTeamProgramCodeAction,
   revokeTeamProgramInviteAction,
   setProgramMetaAction,
+  removeTeamFromProgramAction,
   setTeamProgramSoloAction,
   setTeamProgramContactsAction,
 } from "@/features/advisor/teamProgramActions";
@@ -118,6 +119,18 @@ export async function OrgTeamProgramsSection({
                     </label>
                     <SubmitButton label={t("metaSave")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700" />
                   </form>
+                ) : null}
+
+                {isOwner ? (
+                  <details className="mt-3 border-t border-slate-200 pt-3">
+                    <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500 underline-offset-4 hover:text-rose-800 hover:underline">{t("removeTeam")}</summary>
+                    <form action={removeTeamFromProgramAction} className="mt-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+                      <input type="hidden" name="orgId" value={org.id} />
+                      <input type="hidden" name="programId" value={program.programId} />
+                      <p className="text-sm leading-6 text-rose-950">{t("removeTeamText")}</p>
+                      <SubmitButton label={t("removeTeamConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl bg-rose-700 px-4 py-2 text-sm font-semibold text-white" />
+                    </form>
+                  </details>
                 ) : null}
 
                 {isOwner ? (

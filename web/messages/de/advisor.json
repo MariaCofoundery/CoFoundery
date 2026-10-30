@@ -911,7 +911,11 @@
     "setupText": "Die Vereinbarungen, die alle im Team gemeinsam bestätigt haben. Nur lesend. Entwürfe und Punkte, die nicht jede Person bestätigt hat, fehlen.",
     "setupNotIncluded": "Dieses Programm begann, bevor das Founder Setup Teil der Zustimmung war. Es ist hier deshalb nicht sichtbar.",
     "setupEmpty": "Noch gibt es keine gemeinsam bestätigten Punkte im Founder Setup.",
-    "meaningWithoutSetup": "Zustimmen hieß: Die Organisation sieht, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet."
+    "meaningWithoutSetup": "Zustimmen hieß: Die Organisation sieht, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet.",
+    "removeTeam": "Team aus dem Programm entfernen",
+    "removeTeamText": "Das Team wird informiert. Euer Zugriff endet sofort, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates) werden gelöscht. Das lässt sich nicht rückgängig machen. Das Team kann später mit einem neuen Code oder einer neuen Einladung wieder beitreten.",
+    "removeTeamConfirm": "Ja, Team entfernen",
+    "teamRemoved": "Das Team wurde aus dem Programm entfernt und informiert."
   },
   "programPage": {
     "title": "Programmseite",

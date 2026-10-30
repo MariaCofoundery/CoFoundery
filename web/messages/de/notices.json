@@ -18,7 +18,8 @@
     "collaboration_conversation_marker": "Die andere Seite möchte über einen bestimmten Punkt sprechen.",
     "program_update_due": "Das nächste Update an dein Programm steht an.",
     "program_invited": "{org} hat dein Team zu seinem Programm eingeladen. Dein Team ist erst dabei, wenn alle zugestimmt haben.",
-    "program_review_requested": "Eine Beratungsperson eures Programms bittet euer Team um eine Team-Review. Unter Konto entscheidet ihr, ob ihr zustimmt – ohne Zustimmung aller passiert nichts."
+    "program_review_requested": "Eine Beratungsperson eures Programms bittet euer Team um eine Team-Review. Unter Konto entscheidet ihr, ob ihr zustimmt – ohne Zustimmung aller passiert nichts.",
+    "program_removed": "Die Organisation hat dein Team aus dem Programm entfernt. Der Zugriff der Organisation ist beendet, die Programmdaten sind gelöscht."
   },
   "announcements": {
     "eyebrow": "Mitteilung",

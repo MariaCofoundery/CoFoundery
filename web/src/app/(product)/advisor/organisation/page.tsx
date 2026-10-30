@@ -42,7 +42,7 @@ const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "memb
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -292,6 +292,7 @@ export default async function AdvisorOrganisationPage({
                 {tAdvisor(`org.errors.${orgError}`)}
               </p>
             ) : null}
+            {query.teamRemoved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.teamRemoved")}</p> : null}
             <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
           </>
         ) : null}

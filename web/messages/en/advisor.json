@@ -911,7 +911,11 @@
     "setupText": "The agreements everyone on the team has confirmed together. Read-only. Drafts and items not every person has confirmed are missing.",
     "setupNotIncluded": "This program started before the Founder Setup was part of the agreement, so it is not visible here.",
     "setupEmpty": "There are no jointly confirmed items in the Founder Setup yet.",
-    "meaningWithoutSetup": "Agreeing meant: the organization sees what your team enters into the program. Work styles, Founder Setup and team review stay separate approvals and are not opened by this."
+    "meaningWithoutSetup": "Agreeing meant: the organization sees what your team enters into the program. Work styles, Founder Setup and team review stay separate approvals and are not opened by this.",
+    "removeTeam": "Remove team from the program",
+    "removeTeamText": "The team is told. Your access ends immediately, and the team's program data (contact people, program profile, milestones, updates) is deleted. This cannot be undone. The team can join again later with a new code or invitation.",
+    "removeTeamConfirm": "Yes, remove team",
+    "teamRemoved": "The team was removed from the program and informed."
   },
   "programPage": {
     "title": "Program page",
