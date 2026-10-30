@@ -504,6 +504,10 @@
         "team_check_in": {
           "title": "Check-in fällig",
           "text": "Wenn ein Check-in deines Teams fällig ist: eine einzige Erinnerung je Fälligkeit, ohne Teamnamen. Ohne Erinnerung kann ein fälliger Check-in unbemerkt bleiben."
+        },
+        "program_update": {
+          "title": "Programm-Update fällig",
+          "text": "Wenn ein Update an dein Programm fällig ist: eine einzige Erinnerung je Fälligkeit, ohne Team- und Organisationsnamen. Ohne Erinnerung kann ein fälliges Update unbemerkt bleiben."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",
@@ -511,7 +515,8 @@
       "submitPending": "Wird gespeichert …",
       "emailOptIns": {
         "connect_suggestions_email": "Zusätzlich per E-Mail. Standardmäßig aus: Hier hat sich niemand bei dir gemeldet, deshalb fragen wir vorher. Die Mitteilung auf dein Gerät bekommst du unabhängig davon.",
-        "team_check_in_email": "Zusätzlich per E-Mail. Standardmäßig aus: Die Erinnerung kommt vom Zeitplan, nicht von einem Menschen, deshalb fragen wir vorher. Die Mitteilung auf dein Gerät bekommst du unabhängig davon."
+        "team_check_in_email": "Zusätzlich per E-Mail. Standardmäßig aus: Die Erinnerung kommt vom Zeitplan, nicht von einem Menschen, deshalb fragen wir vorher. Die Mitteilung auf dein Gerät bekommst du unabhängig davon.",
+        "program_update_email": "Zusätzlich per E-Mail. Standardmäßig aus: Die Erinnerung kommt vom Zeitplan, nicht von einem Menschen, deshalb fragen wir vorher. Die Mitteilung auf dein Gerät bekommst du unabhängig davon."
       }
     },
     "data": {

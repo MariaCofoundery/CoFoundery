@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(10);
+select extensions.plan(11);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','e4000000-0000-4000-8000-000000000001','authenticated','authenticated','chefin@example.com','',now(),'{}','{}',now(),now()),
@@ -26,10 +26,16 @@ insert into public.team_program_contacts(program_id, advisor_user_id) values
 ('e4000000-0000-4000-8000-0000000000c0','e4000000-0000-4000-8000-000000000002');
 
 -- Die Erinnerung: Faelligkeit in einem Tag -> ein Hinweis je Teammitglied, nur einmal.
-select extensions.is(public.prepare_program_update_reminders(10), 1, 'one reminder is prepared two days ahead');
+-- Einer der beiden hat die Art abbestellt, einer hat der Mail zugestimmt.
+insert into public.notification_opt_outs(user_id, kind) values ('e4000000-0000-4000-8000-000000000004', 'program_update');
+insert into public.notification_opt_ins(user_id, kind) values ('e4000000-0000-4000-8000-000000000003', 'program_update_email');
+
+create temp table due_rows as select * from public.prepare_program_update_reminders(10);
+select extensions.is((select count(*)::int from due_rows), 1, 'only the person who did not opt out gets a device notification');
+select extensions.ok((select wants_email from due_rows limit 1), 'the email goes only to the person who agreed to it');
 select extensions.is(
-  (select count(*)::int from public.in_app_notices where kind = 'program_update_due'), 2, 'every team member gets one notice');
-select extensions.is(public.prepare_program_update_reminders(10), 0, 'the same due date is never reminded twice');
+  (select count(*)::int from public.in_app_notices where kind = 'program_update_due'), 2, 'every team member still gets the inbox notice');
+select extensions.is((select count(*)::int from public.prepare_program_update_reminders(10)), 0, 'the same due date is never reminded twice');
 
 set local role authenticated;
 

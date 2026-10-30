@@ -504,6 +504,10 @@
         "team_check_in": {
           "title": "Check-in due",
           "text": "When a check-in of your team is due: one reminder per due date, without the team name. Without a reminder, a due check-in can go unnoticed."
+        },
+        "program_update": {
+          "title": "Program update due",
+          "text": "When an update to your program is due: a single reminder per due date, without team or organization names. Without it, a due update can go unnoticed."
         }
       },
       "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",
@@ -511,7 +515,8 @@
       "submitPending": "Saving …",
       "emailOptIns": {
         "connect_suggestions_email": "Also by email. Off by default: nobody got in touch with you here, so we ask first. The notification on your device is independent of this.",
-        "team_check_in_email": "Also by email. Off by default: the reminder comes from a schedule, not from a person, so we ask first. The notification on your device is independent of this."
+        "team_check_in_email": "Also by email. Off by default: the reminder comes from a schedule, not from a person, so we ask first. The notification on your device is independent of this.",
+        "program_update_email": "Also by email. Off by default: this reminder comes from a schedule, not from a person, so we ask first. The notification on your device reaches you either way."
       }
     },
     "data": {

@@ -336,6 +336,8 @@ export default function DatenschutzPage() {
               items={[
                 "Wir speichern, welches Team in welchem Programm ist, wer zugestimmt hat und wann.",
                 "Sehen können das Programm die Inhaberinnen und Inhaber der Organisation sowie die Bezugspersonen, die der Organisation deinem Team zuordnet. Du siehst, wer das ist.",
+                "Im Programm legt dein Team zusammen mit den Bezugspersonen Meilensteine fest und gibt alle zwei Wochen ein kurzes Update mit Antworten auf die Fragen der Bezugspersonen ab. Diese Angaben sehen das Team, die Bezugspersonen und die Inhaberinnen und Inhaber der Organisation, solange alle im Team zugestimmt haben.",
+                "Vor einem fälligen Update erinnern wir mit einem Hinweis in der App. Eine Mitteilung aufs Gerät oder eine E-Mail bekommst du nur, wenn du sie in deinem Konto eingeschaltet hast (Abschnitt 15); die Erinnerung nennt weder Team noch Organisation.",
                 "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Entscheidungen.",
                 "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen werden entfernt.",
               ]}

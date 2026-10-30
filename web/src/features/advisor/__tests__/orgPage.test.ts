@@ -47,13 +47,17 @@ test("Meilensteine: Fortschritt ist eine Zahl gegen das eigene Ziel, die Rueckke
   assert.match(sql, /team_program_is_active\(p_program_id\)/);
 });
 
-test("Programm-Updates: Hinweis nur im Postfach, ein Lauf im taeglichen Cron, nur Team antwortet", () => {
+test("Programm-Updates: Hinweis im Postfach plus Mitteilung und Mail nach Zustimmung, ein Lauf im taeglichen Cron, nur Team antwortet", () => {
   const route = readFileSync("src/app/api/cron/connect-suggestions/route.ts", "utf8");
   assert.match(route, /runProgramUpdateReminders\(\)/);
   const run = readFileSync("src/features/advisor/programUpdateReminders.ts", "utf8");
   assert.match(run, /prepare_program_update_reminders/);
-  assert.doesNotMatch(run, /sendNetworkNotificationEmail|deliverPushToUser/);
+  assert.match(run, /wants_email/);
+  assert.match(run, /sendNetworkNotificationEmail/);
   const sql = readFileSync("../supabase/migrations/20270119120000_team_program_updates.sql", "utf8");
   assert.match(sql, /'program_update_due'/);
   assert.match(sql, /grant execute on function public\.prepare_program_update_reminders\(integer\) to service_role/);
+  const notify = readFileSync("../supabase/migrations/20270120120000_program_update_notifications.sql", "utf8");
+  assert.match(notify, /'program_update_email'/);
+  assert.match(notify, /wants_email_channel/);
 });
