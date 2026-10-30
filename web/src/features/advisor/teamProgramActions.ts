@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sendTeamProgramInviteEmail } from "@/lib/email/sendTeamProgramInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { parseAccent } from "@/features/advisor/programAccent";
 import { decodePhotoData } from "@/features/connect/connectPhotoData";
 import { PROGRAM_LOGO_BUCKET, programStorageClient } from "@/features/advisor/programPageStorage";
 import { createClient } from "@/lib/supabase/server";
@@ -295,6 +296,7 @@ export async function saveProgramPageAction(formData: FormData) {
     p_slug: slug,
     p_published: formData.get("published") === "yes",
     p_welcome: String(formData.get("welcome") ?? "").slice(0, 600),
+    p_accent: parseAccent(String(formData.get("accent") ?? "")),
   });
   if (error) {
     const code = error.code === "23505" ? "slug_taken" : error.code === "22023" || error.code === "23514" ? "slug_invalid" : "failed";

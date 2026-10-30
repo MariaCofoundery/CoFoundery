@@ -32,6 +32,7 @@ export type AdvisorOrg = {
   programPagePublished: boolean;
   programWelcome: string | null;
   hasProgramLogo: boolean;
+  programAccent: string | null;
 };
 
 export type OrgMember = {
@@ -70,7 +71,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 
   const { data: orgs } = await client
     .from("advisor_orgs")
-    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region, program_slug, program_page_published, program_welcome, program_logo_path")
+    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region, program_slug, program_page_published, program_welcome, program_logo_path, program_accent")
     .in(
       "id",
       rows.map((row) => row.org_id)
@@ -90,6 +91,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
       program_page_published: boolean | null;
       program_welcome: string | null;
       program_logo_path: string | null;
+      program_accent: string | null;
     }[]
   ).map((org) => ({
     id: org.id,
@@ -105,6 +107,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     programPagePublished: org.program_page_published === true,
     programWelcome: org.program_welcome,
     hasProgramLogo: Boolean(org.program_logo_path),
+    programAccent: org.program_accent,
   }));
 }
 

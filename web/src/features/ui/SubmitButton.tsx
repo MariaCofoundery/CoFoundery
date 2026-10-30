@@ -24,6 +24,7 @@ export function SubmitButton({
   fieldName = "intent",
   formAction,
   formNoValidate,
+  style,
 }: {
   intent?: string;
   label: string;
@@ -42,6 +43,8 @@ export function SubmitButton({
    * solchen Knopf sonst blockieren, und die Person saesse fest.
    */
   formNoValidate?: boolean;
+  /** Fuer Knoepfe in einer Organisationsfarbe (Programmseite). */
+  style?: React.CSSProperties;
 }) {
   const { pending, data } = useFormStatus();
   const activeIntent = data?.get(fieldName);
@@ -55,6 +58,7 @@ export function SubmitButton({
       formNoValidate={formNoValidate}
       disabled={pending}
       aria-disabled={pending}
+      style={style}
       className={`${className} disabled:cursor-wait disabled:opacity-65`}
     >
       {showsPending ? pendingLabel : label}

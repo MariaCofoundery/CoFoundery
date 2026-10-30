@@ -178,3 +178,12 @@ test("Programmseite: nur veroeffentlicht oeffentlich, Anmeldung nur mit gueltige
   assert.match(page, /get_public_program_page/);
   assert.doesNotMatch(page, /team_programs|founder_team/);
 });
+
+test("Programmseite: Farbe bleibt lesbar, Formatierung ist ein enger Eigenbau ohne HTML und ohne Links", () => {
+  const accent = readFileSync("src/features/advisor/programAccent.ts", "utf8");
+  assert.match(accent, /luminance\(color\) > 0\.18/);
+  const rich = readFileSync("src/features/advisor/programRichText.tsx", "utf8");
+  assert.doesNotMatch(rich, /dangerouslySetInnerHTML|<a /);
+  const sql = readFileSync("../supabase/migrations/20270131120000_program_page_accent.sql", "utf8");
+  assert.match(sql, /program_accent ~ '\^#\[0-9a-f\]\{6\}\$'/);
+});

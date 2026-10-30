@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(10);
+select extensions.plan(12);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','e8000000-0000-4000-8000-000000000001','authenticated','authenticated','chefin@example.com','',now(),'{}','{}',now(),now()),
@@ -55,6 +55,18 @@ select public.set_org_program_logo('e8000000-0000-4000-8000-0000000000a0', 'e800
 reset role;
 set local role anon;
 select extensions.is((select has_logo from public.get_public_program_page('weitblick')), true, 'the logo shows up');
+
+-- Akzentfarbe: nur ein gueltiger Hex-Wert, und sie steht auf der oeffentlichen Seite.
+reset role;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"e8000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.throws_ok(
+  $$select public.set_org_program_page('e8000000-0000-4000-8000-0000000000a0', 'weitblick', true, 'x', 'rot')$$,
+  '23514', null, 'an accent that is not a hex value is refused');
+select public.set_org_program_page('e8000000-0000-4000-8000-0000000000a0', 'weitblick', true, 'x', '#0A80B8');
+reset role;
+set local role anon;
+select extensions.is((select accent from public.get_public_program_page('weitblick')), '#0a80b8', 'the accent is stored lowercase and shown publicly');
 
 -- Pruefungen fuer die Anmeldeseite: falsche Codes sind einfach "nein".
 select extensions.is(public.is_valid_team_program_code('ZZZZZZZZ'), false, 'an unknown code is not valid');

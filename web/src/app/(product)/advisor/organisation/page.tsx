@@ -241,6 +241,7 @@ export default async function AdvisorOrganisationPage({
                 initialPublished={org.programPagePublished}
                 initialWelcome={org.programWelcome}
                 hasLogo={org.hasProgramLogo}
+                initialAccent={org.programAccent}
                 labels={{
                   published: tAdvisor("programPage.published"),
                   publishedHint: tAdvisor("programPage.publishedHint"),
@@ -260,6 +261,12 @@ export default async function AdvisorOrganisationPage({
                   draftNote: tAdvisor("programPage.draftNote"),
                   copy: tAdvisor("programPage.copy"),
                   copied: tAdvisor("programPage.copied"),
+                  accent: tAdvisor("programPage.accent"),
+                  accentCustom: tAdvisor("programPage.accentCustom"),
+                  bold: tAdvisor("programPage.bold"),
+                  italic: tAdvisor("programPage.italic"),
+                  list: tAdvisor("programPage.list"),
+                  formatHint: tAdvisor("programPage.formatHint"),
                 }}
               />
             ) : (

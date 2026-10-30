@@ -927,6 +927,12 @@
       "slug_invalid": "The short name may only contain lowercase letters, digits and hyphens (at least 3 characters) and must not be reserved. Publishing needs a short name.",
       "logo": "The logo could not be saved. Use a PNG, JPEG or WebP under 2 MB.",
       "failed": "That did not work. Please try again."
-    }
+    },
+    "accent": "Color",
+    "accentCustom": "Custom color",
+    "bold": "Bold",
+    "italic": "Italic",
+    "list": "List",
+    "formatHint": "Bold: **text**, italic: *text*, list: lines starting with \"- \". Nothing more, which keeps the page calm and safe."
   }
 }

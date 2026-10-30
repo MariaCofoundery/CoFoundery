@@ -1,6 +1,8 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
+import { ACCENT_PRESETS, DEFAULT_ACCENT, accentStyles, parseAccent } from "@/features/advisor/programAccent";
+import { ProgramRichText } from "@/features/advisor/programRichText";
 import { saveProgramPageAction } from "@/features/advisor/teamProgramActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -23,6 +25,12 @@ export type ProgramPageLabels = {
   draftNote: string;
   copy: string;
   copied: string;
+  accent: string;
+  accentCustom: string;
+  bold: string;
+  italic: string;
+  list: string;
+  formatHint: string;
 };
 
 const SLUG_FILTER = /[^a-z0-9-]+/g;
@@ -61,6 +69,7 @@ export function ProgramPageEditor({
   initialPublished,
   initialWelcome,
   hasLogo,
+  initialAccent,
   labels,
 }: {
   orgId: string;
@@ -70,6 +79,7 @@ export function ProgramPageEditor({
   initialPublished: boolean;
   initialWelcome: string | null;
   hasLogo: boolean;
+  initialAccent: string | null;
   labels: ProgramPageLabels;
 }) {
   const suggestion = orgName.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(SLUG_FILTER, "-").replace(/^-+|-+$/g, "").slice(0, 40);
@@ -79,8 +89,30 @@ export function ProgramPageEditor({
   const [logo, setLogo] = useState("");
   const [removeLogo, setRemoveLogo] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [accent, setAccent] = useState(parseAccent(initialAccent) ?? DEFAULT_ACCENT);
+  const textRef = useRef<HTMLTextAreaElement>(null);
+  const look = accentStyles(accent);
   const url = `${origin}/p/${slug || "…"}`;
   const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}` : "");
+
+  /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). */
+  function format(kind: "bold" | "italic" | "list") {
+    const area = textRef.current;
+    if (!area) return;
+    const start = area.selectionStart;
+    const end = area.selectionEnd;
+    const selected = welcome.slice(start, end);
+    let next: string;
+    if (kind === "list") {
+      const lines = (selected || "").split("\n");
+      next = welcome.slice(0, start) + lines.map((line) => (line.startsWith("- ") ? line : `- ${line}`)).join("\n") + welcome.slice(end);
+    } else {
+      const mark = kind === "bold" ? "**" : "*";
+      next = welcome.slice(0, start) + mark + selected + mark + welcome.slice(end);
+    }
+    setWelcome(next.slice(0, 600));
+    requestAnimationFrame(() => area.focus());
+  }
 
   async function onLogo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -116,18 +148,57 @@ export function ProgramPageEditor({
           <span className="mt-1 block break-all text-xs leading-5 text-slate-500">{labels.slugHint}</span>
         </label>
 
-        <label className="block">
-          <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.welcome}</span>
+        <div className="block">
+          <label htmlFor="program-welcome" className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.welcome}</label>
+          <div className="mt-2 flex flex-wrap items-center gap-1" role="toolbar" aria-label={labels.welcome}>
+            {([["bold", labels.bold, "B", "font-extrabold"], ["italic", labels.italic, "I", "italic"], ["list", labels.list, "•", ""]] as const).map(([kind, label, glyph, extra]) => (
+              <button
+                key={kind}
+                type="button"
+                aria-label={label}
+                title={label}
+                onClick={() => format(kind)}
+                className={`grid h-9 w-9 place-items-center rounded-lg border border-slate-300 bg-white text-sm text-slate-800 hover:bg-slate-100 ${extra}`}
+              >
+                {glyph}
+              </button>
+            ))}
+          </div>
           <textarea
+            id="program-welcome"
+            ref={textRef}
             name="welcome"
-            rows={4}
+            rows={5}
             maxLength={600}
             value={welcome}
             placeholder={labels.welcomePlaceholder}
             onChange={(event) => setWelcome(event.target.value)}
-            className="mt-1 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm focus:border-violet-500 focus:outline-none focus:ring-4 focus:ring-violet-100"
           />
-        </label>
+          <span className="mt-1 block text-xs leading-5 text-slate-500">{labels.formatHint}</span>
+        </div>
+
+        <fieldset>
+          <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.accent}</legend>
+          <input type="hidden" name="accent" value={accent} />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {ACCENT_PRESETS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                aria-label={color}
+                aria-pressed={accent === color}
+                onClick={() => setAccent(color)}
+                style={{ backgroundColor: color }}
+                className={`h-9 w-9 rounded-full ring-offset-2 transition ${accent === color ? "ring-2 ring-slate-900" : "ring-1 ring-slate-200 hover:ring-slate-400"}`}
+              />
+            ))}
+            <label className="ml-1 inline-flex min-h-9 cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
+              <input type="color" value={accent} onChange={(event) => setAccent(event.target.value.toLowerCase())} className="h-9 w-9 cursor-pointer rounded-full border border-slate-300 bg-white p-0.5" />
+              {labels.accentCustom}
+            </label>
+          </div>
+        </fieldset>
 
         <div>
           <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.logo}</span>
@@ -150,7 +221,7 @@ export function ProgramPageEditor({
       <aside aria-label={labels.previewTitle} className="grid content-start gap-3">
         <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.previewTitle}</p>
         <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_50px_-24px_rgba(60,40,180,0.4)]">
-          <div className="advisor-hero px-5 pb-6 pt-6 text-center">
+          <div className="relative overflow-hidden px-5 pb-6 pt-6 text-center text-white" style={{ background: look.hero, backgroundColor: look.heroColor }}>
             <div className="relative z-10 flex flex-col items-center">
               {shownLogo ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -163,10 +234,10 @@ export function ProgramPageEditor({
             </div>
           </div>
           <div className="px-5 py-5">
-            <p className="whitespace-pre-line text-sm leading-6 text-slate-700">{welcome || labels.welcomePlaceholder}</p>
+            <ProgramRichText text={welcome || labels.welcomePlaceholder} className="text-sm leading-6 text-slate-700" />
             <div className="mt-4 grid gap-2">
               <div className="rounded-xl border border-slate-300 px-3 py-2.5 text-center text-sm font-semibold tracking-[.25em] text-slate-400">{labels.previewCode}</div>
-              <div className="brand-cta rounded-xl px-4 py-2.5 text-center text-sm font-semibold">{labels.previewGo}</div>
+              <div className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-white" style={{ backgroundImage: look.button }}>{labels.previewGo}</div>
             </div>
           </div>
         </div>
