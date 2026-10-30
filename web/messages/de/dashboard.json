@@ -623,7 +623,8 @@
       "selfInvite": "Bitte verwende die E-Mail-Adresse der anderen Person, nicht deine eigene.",
       "duplicateInvite": "Für diese Person und diesen Kontext besteht bereits eine offene Einladung.",
       "createFailed": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
-      "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut."
+      "generic": "Die Einladung konnte gerade nicht erstellt werden. Bitte versuche es erneut.",
+      "notFounder": "Um Mitgründer:innen einzuladen, brauchst du in deinem Profil die Rolle „Founder“. Ergänze sie und versuche es noch einmal."
     },
     "teamContext": {
       "label": "Wie steht ihr zueinander?",

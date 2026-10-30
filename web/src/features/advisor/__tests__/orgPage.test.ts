@@ -254,12 +254,17 @@ test("Programm schliesst das Founder Setup ein: nur lesend, nur gemeinsam bestae
   assert.match(privacy, /bestätigten Vereinbarungen im Founder Setup, nur lesend/);
 });
 
-test("Mitgruender:innen: mehrere Adressen nur mit Zielteam, jede Einladung einzeln, Label roh uebergeben", () => {
+test("Mitgruender:innen: mehrere Adressen immer, ohne Zielteam wird das Team vorher angelegt, jede Einladung einzeln", () => {
   const form = readFileSync("src/features/dashboard/CoFounderInviteForm.tsx", "utf8");
-  assert.match(form, /targetTeam \? \(\s*<EmailChipsField/);
+  assert.match(form, /<EmailChipsField/);
   assert.match(form, /t\.raw\("many\.remove"\) as string/);
-  // Jede Adresse bekommt ihre eigene Einladung ins Zielteam; ein Fehler stoppt die anderen nicht.
+  // Ohne Zielteam zuerst das Team, damit alle Einladungen auf dasselbe zeigen.
+  assert.ok(form.indexOf("createInviteTeamAction(context") < form.indexOf("for (const invitedEmail of emails)"));
+  // Jede Adresse bekommt ihre eigene Einladung; ein Fehler stoppt die anderen nicht.
   assert.match(form, /for \(const invitedEmail of emails\)[\s\S]*targetTeamId/);
+  const sql = readFileSync("../supabase/migrations/20270206120000_team_for_invitations.sql", "utf8");
+  assert.match(sql, /has_founder_assessment_access/);
+  assert.match(sql, /team\.team_context = p_team_context/);
   const page = readFileSync("src/app/(product)/invite/new/page.tsx", "utf8");
   assert.match(page, /4 - team\.members\.length/);
 });

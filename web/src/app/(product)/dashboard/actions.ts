@@ -429,3 +429,23 @@ export async function createCoFounderInvitationAction(formData: FormData): Promi
     sendEmail: true,
   });
 }
+
+/**
+ * Legt das Team an, in das mehrere Mitgruender:innen auf einmal eingeladen werden (oder gibt das eigene
+ * Einzel-Team gleichen Kontexts zurueck). Nur mit Founder-Zugang; die Datenbank prueft das.
+ */
+export async function createInviteTeamAction(
+  teamContext: string,
+  label: string
+): Promise<{ ok: true; teamId: string } | { ok: false; error: "not_a_founder" | "failed" }> {
+  const context = parseTeamContextEntry(teamContext);
+  if (!context) return { ok: false, error: "failed" };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_team_for_invitations", {
+    p_team_context: context,
+    p_name: label.trim().slice(0, 60) || null,
+  });
+  if (error?.message?.includes("not_a_founder")) return { ok: false, error: "not_a_founder" };
+  if (error || typeof data !== "string") return { ok: false, error: "failed" };
+  return { ok: true, teamId: data };
+}

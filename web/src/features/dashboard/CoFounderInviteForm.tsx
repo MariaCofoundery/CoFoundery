@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
+import { createCoFounderInvitationAction, createInviteTeamAction } from "@/app/(product)/dashboard/actions";
 import { EmailChipsField } from "@/features/advisor/EmailChipsField";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
@@ -14,10 +14,13 @@ function toAbsoluteUrl(path: string) {
 
 type InviteOutcome = { email: string; ok: boolean; sent: boolean; url: string | null; error: string | null };
 
+const LOOKS_LIKE_EMAIL = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+
 /**
- * Mit einem Zielteam koennen mehrere Mitgruender:innen auf einmal eingeladen werden (so viele,
- * wie das Team noch Plaetze hat). Ohne Zielteam bleibt es bei einer Adresse: Mehrere
- * Einladungen ohne gemeinsames Team wuerden sich nicht zu einem Team zusammenfinden.
+ * Mitgruender:innen einladen - mehrere Adressen auf einmal. Mit einem Zielteam (aus dem
+ * Team heraus geoeffnet) so viele, wie das Team noch Plaetze hat. Ohne Zielteam wird das Team
+ * vorher angelegt (oder das eigene Einzel-Team wiederverwendet), damit alle Einladungen auf
+ * dasselbe Team zeigen: Sonst bildete jede Annahme ein neues Paar-Team.
  */
 export function CoFounderInviteForm({
   targetTeam,
@@ -29,32 +32,18 @@ export function CoFounderInviteForm({
   const router = useRouter();
   const t = useTranslations("dashboard.coFounderInviteForm");
   const [label, setLabel] = useState(targetTeam?.name ?? "");
-  const [email, setEmail] = useState("");
   const [teamContext, setTeamContext] = useState<TeamContext | null>(targetTeam?.context ?? null);
-  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copyNotice, setCopyNotice] = useState<string | null>(null);
-  const [resultState, setResultState] = useState<{
-    tone: "success" | "warning";
-    recipient: string;
-    message: string;
-  } | null>(null);
   const [outcomes, setOutcomes] = useState<InviteOutcome[]>([]);
+  const [resultTeamId, setResultTeamId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const teamContextLabel =
-    teamContext === "existing_team"
-      ? t("teamContext.existingTeam")
-      : t("teamContext.preFounder");
-
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (targetTeam) {
-      await onSubmitMany(new FormData(event.currentTarget));
-      return;
-    }
-    const invitedEmail = email.trim().toLowerCase();
-    if (!invitedEmail || !invitedEmail.includes("@")) {
+    const form = new FormData(event.currentTarget);
+    const typed = String(form.get("emailDraft") ?? "").trim().toLowerCase();
+    const emails = [...new Set([...form.getAll("email").map((entry) => String(entry).toLowerCase()), ...(typed ? [typed] : [])])];
+    if (emails.length === 0 || emails.some((entry) => !LOOKS_LIKE_EMAIL.test(entry))) {
       setError(t("validation.email"));
       return;
     }
@@ -62,72 +51,32 @@ export function CoFounderInviteForm({
       setError(t("validation.teamContext"));
       return;
     }
-
+    const context = teamContext;
     setError(null);
-    setCopyNotice(null);
-    setResultState(null);
-
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.set("label", label.trim());
-      formData.set("invitedEmail", invitedEmail);
-      // Phase 10: Keine Auswahl "Basis / Werte" mehr - die Einladung fuehrt in
-      // den aktuellen Weg, der diese Module nicht kennt.
-      formData.set("includeValues", "false");
-      formData.set("teamContext", teamContext);
-      // Mit Zielteam laeuft die Einladung ueber onSubmitMany; hier gibt es nur den Weg ohne Team.
-
-      const result = await createCoFounderInvitationAction(formData);
-      if (!result.ok) {
-        setInviteUrl(null);
-        setResultState(null);
-        setError(mapInviteActionError(result.error, t));
-        return;
-      }
-
-      const absoluteInviteUrl = toAbsoluteUrl(result.inviteUrl);
-      setInviteUrl(absoluteInviteUrl);
-      setCopyNotice(null);
-      setResultState(
-        result.emailStatus === "sent"
-          ? {
-              tone: "success",
-              recipient: result.emailRecipient,
-              message: t("result.sentMessage", { email: result.emailRecipient }),
-            }
-          : {
-              tone: "warning",
-              recipient: result.emailRecipient,
-              message: t("result.manualShareMessage"),
-            }
-      );
-      router.refresh();
-    });
-  };
-
-  /** Mehrere Adressen nacheinander einladen; jede Einladung ist eine eigene, ein Fehler stoppt die anderen nicht. */
-  const onSubmitMany = async (form: FormData) => {
-    const typed = String(form.get("emailDraft") ?? "").trim().toLowerCase();
-    const emails = [...new Set([...form.getAll("email").map((entry) => String(entry).toLowerCase()), ...(typed ? [typed] : [])])];
-    if (emails.length === 0 || emails.some((entry) => !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(entry))) {
-      setError(t("validation.email"));
-      return;
-    }
-    if (!targetTeam) return;
-    setError(null);
-    setCopyNotice(null);
-    setResultState(null);
-    setInviteUrl(null);
     setOutcomes([]);
+    setResultTeamId(null);
+
     startTransition(async () => {
+      let teamId = targetTeam?.id ?? null;
+      if (!teamId) {
+        const created = await createInviteTeamAction(context, label.trim());
+        if (!created.ok) {
+          setError(created.error === "not_a_founder" ? t("actionErrors.notFounder") : t("actionErrors.createFailed"));
+          return;
+        }
+        teamId = created.teamId;
+      }
+      setResultTeamId(teamId);
+
       const results: InviteOutcome[] = [];
       for (const invitedEmail of emails) {
         const formData = new FormData();
         formData.set("label", label.trim());
         formData.set("invitedEmail", invitedEmail);
+        // Phase 10: Keine Auswahl "Basis / Werte" mehr - die Einladung fuehrt in den aktuellen Weg.
         formData.set("includeValues", "false");
-        formData.set("teamContext", targetTeam.context);
-        formData.set("targetTeamId", targetTeam.id);
+        formData.set("teamContext", context);
+        formData.set("targetTeamId", teamId);
         const result = await createCoFounderInvitationAction(formData);
         results.push(
           result.ok
@@ -140,45 +89,20 @@ export function CoFounderInviteForm({
     });
   };
 
-  const onCopy = async () => {
-    if (!inviteUrl) return;
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopyNotice(t("copy.success"));
-    } catch {
-      setCopyNotice(t("copy.error"));
-    }
-  };
-
   return (
     <section
       id="cofounder-invite-form"
       className="scroll-mt-24 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_16px_40px_rgba(15,23,42,.05)] sm:p-7"
     >
       <form onSubmit={onSubmit} className="space-y-6">
-        {targetTeam ? (
-          <EmailChipsField
-            label={t("many.label")}
-            addLabel={t("many.add")}
-            removeLabel={t.raw("many.remove") as string}
-            hint={t("many.hint", { count: freeSlots })}
-            invalidLabel={t("many.invalid")}
-            maxCount={Math.max(1, freeSlots)}
-          />
-        ) : <div>
-          <label htmlFor="invite-email" className="text-sm font-semibold text-slate-900">
-            {t("label.email")}
-          </label>
-          <input
-            id="invite-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            placeholder="cofounder@example.com"
-            className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900"
-          />
-        </div>}
+        <EmailChipsField
+          label={t("many.label")}
+          addLabel={t("many.add")}
+          removeLabel={t.raw("many.remove") as string}
+          hint={t("many.hint", { count: targetTeam ? Math.max(1, freeSlots) : 3 })}
+          invalidLabel={t("many.invalid")}
+          maxCount={targetTeam ? Math.max(1, freeSlots) : 3}
+        />
 
         {!targetTeam && <fieldset>
           <legend className="text-sm font-semibold text-slate-900">{t("teamContext.label")}</legend>
@@ -214,6 +138,7 @@ export function CoFounderInviteForm({
               type="text"
               value={label}
               onChange={(event) => setLabel(event.target.value)}
+              maxLength={60}
               placeholder={t("placeholder.projectName")}
               className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800"
             />
@@ -233,7 +158,7 @@ export function CoFounderInviteForm({
           disabled={isPending}
           className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[linear-gradient(120deg,var(--brand-accent),var(--brand-primary))] px-6 text-base font-semibold text-slate-900 shadow-[0_10px_28px_rgba(124,58,237,0.16)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          {isPending ? t("submit.pending") : targetTeam ? t("many.submit") : t("submit.idle")}
+          {isPending ? t("submit.pending") : t("many.submit")}
         </button>
       </form>
 
@@ -256,96 +181,12 @@ export function CoFounderInviteForm({
               </li>
             ))}
           </ul>
-          <a href={`/teams/${encodeURIComponent(targetTeam?.id ?? "")}`} className="mt-1 inline-flex w-fit rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700">{t("many.backToTeam")}</a>
-        </div>
-      ) : null}
-
-      {inviteUrl && resultState ? (
-        <div
-          className={`mt-5 rounded-xl border p-4 ${
-            resultState.tone === "success"
-              ? "border-emerald-200 bg-emerald-50/60"
-              : "border-amber-200 bg-amber-50/60"
-          }`}
-        >
-          <p
-            className={`text-xs font-semibold uppercase tracking-[0.08em] ${
-              resultState.tone === "success" ? "text-emerald-800" : "text-amber-800"
-            }`}
+          <a
+            href={resultTeamId ? `/teams/${encodeURIComponent(resultTeamId)}` : "/dashboard"}
+            className="mt-1 inline-flex w-fit rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700"
           >
-            {resultState.tone === "success" ? t("result.sentTitle") : t("result.createdTitle")}
-          </p>
-          <p
-            className={`mt-2 text-sm ${
-              resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
-            }`}
-          >
-            {resultState.message}
-          </p>
-          {targetTeam ? (
-            <p
-              className={`mt-2 text-sm ${
-                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
-              }`}
-            >
-              {t("targetTeam", { name: targetTeam.name })}
-            </p>
-          ) : null}
-          {teamContext ? (
-            <p
-              className={`mt-1 text-sm ${
-                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
-              }`}
-            >
-              {t("result.context", { context: teamContextLabel })}
-            </p>
-          ) : null}
-          <p
-            className={`mt-2 text-xs leading-6 ${
-              resultState.tone === "success" ? "text-emerald-800" : "text-amber-800"
-            }`}
-          >
-            {resultState.tone === "success"
-              ? t("result.successManualHint")
-              : t("result.warningManualHint")}
-          </p>
-          <p
-            className={`mt-2 break-all rounded-md border bg-white px-3 py-2 text-xs ${
-              resultState.tone === "success"
-                ? "border-emerald-200 text-emerald-900"
-                : "border-amber-200 text-amber-900"
-            }`}
-          >
-            {inviteUrl}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onCopy}
-              className={`inline-flex rounded-lg border bg-white px-3 py-1.5 text-sm ${
-                resultState.tone === "success"
-                  ? "border-emerald-300 text-emerald-900"
-                  : "border-amber-300 text-amber-900"
-              }`}
-            >
-              {t("copy.button")}
-            </button>
-            <a
-              href="/dashboard"
-              className="inline-flex rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700"
-            >
-              {t("dashboardCta")}
-            </a>
-          </div>
-          {copyNotice ? (
-            <p
-              className={`mt-2 text-xs ${
-                resultState.tone === "success" ? "text-emerald-900" : "text-amber-900"
-              }`}
-            >
-              {copyNotice}
-            </p>
-          ) : null}
+            {resultTeamId ? t("many.backToTeam") : t("dashboardCta")}
+          </a>
         </div>
       ) : null}
     </section>

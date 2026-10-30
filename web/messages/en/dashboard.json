@@ -623,7 +623,8 @@
       "selfInvite": "Please use the other person's email address rather than your own.",
       "duplicateInvite": "There is already an open invitation for this person and context.",
       "createFailed": "The invitation could not be created right now. Please try again.",
-      "generic": "The invitation could not be created right now. Please try again."
+      "generic": "The invitation could not be created right now. Please try again.",
+      "notFounder": "To invite co-founders you need the role “Founder” in your profile. Add it and try again."
     },
     "teamContext": {
       "label": "Where do you stand with each other?",
