@@ -913,11 +913,11 @@
     "setupEmpty": "Noch gibt es keine gemeinsam bestätigten Punkte im Founder Setup.",
     "meaningWithoutSetup": "Zustimmen hieß: Die Organisation sieht, was dein Team ins Programm einträgt. Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet.",
     "removeTeam": "Team aus dem Programm entfernen",
-    "removeTeamText": "Das Team wird informiert. Euer Zugriff endet sofort, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates) werden gelöscht. Das lässt sich nicht rückgängig machen. Das Team kann später mit einem neuen Code oder einer neuen Einladung wieder beitreten.",
+    "removeTeamText": "Das Team wird informiert. Euer Zugriff endet sofort, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates, Teilnahme-Einträge, Notizen zum Team) werden gelöscht. Das lässt sich nicht rückgängig machen. Das Team kann später mit einem neuen Code oder einer neuen Einladung wieder beitreten.",
     "removeTeamConfirm": "Ja, Team entfernen",
     "teamRemoved": "Das Team wurde aus dem Programm entfernt und informiert.",
     "retentionTitle": "Was beim Beenden mit den Daten passiert",
-    "retentionText": "Wird ein Team aus dem Programm entfernt oder beendet es die Teilnahme, endet euer Zugriff, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates) werden gelöscht. Wir haben uns bewusst dafür entschieden, nichts aufzubewahren: Das Team hat nur im Rahmen des Programms zugestimmt. Wenn ihr Angaben für eure eigene Auswertung braucht, haltet sie vorher in euren eigenen Unterlagen fest, mit Wissen des Teams.",
+    "retentionText": "Wird ein Team aus dem Programm entfernt oder beendet es die Teilnahme, endet euer Zugriff, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates, Teilnahme-Einträge, Notizen zum Team) werden gelöscht. Wir haben uns bewusst dafür entschieden, nichts aufzubewahren: Das Team hat nur im Rahmen des Programms zugestimmt. Wenn ihr Angaben für eure eigene Auswertung braucht, haltet sie vorher in euren eigenen Unterlagen fest, mit Wissen des Teams.",
     "planTitleH": "Programmplan",
     "planText": "Skizziert euer Programm: Education-Termine, interne und externe Veranstaltungen mit Datum, Ort, Hinweisen und To-dos. Die Teams in eurem Programm sehen den Plan.",
     "planAttendanceNote": "Die Teilnahme tragt ihr von Hand ein (da, fehlte, entschuldigt). Jedes Team sieht nur seinen eigenen Eintrag. Die Einträge werden gelöscht, sobald das Team das Programm verlässt.",
@@ -946,7 +946,9 @@
     "planError": "Das hat nicht geklappt. Prüfe die Angaben (Titel, Datum) und versuche es noch einmal.",
     "myPlanTitle": "Programmplan",
     "myPlanText": "Die Veranstaltungen der Organisationen, in deren Programm ihr aktiv seid. Eure Teilnahme tragen die Bezugspersonen ein; du siehst nur den Eintrag eures Teams.",
-    "myAttendance": "Eure Teilnahme: {status}"
+    "myAttendance": "Eure Teilnahme: {status}",
+    "tabNotes": "Notizen",
+    "notesEndNote": "Die Notizen zu diesem Team werden gelöscht, sobald das Team das Programm verlässt oder entfernt wird."
   },
   "programPage": {
     "title": "Programmseite",

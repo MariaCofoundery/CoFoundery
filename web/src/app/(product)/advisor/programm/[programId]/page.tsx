@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
+import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
+import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/notebookData";
 import { ProgramSetupView } from "@/features/advisor/ProgramSetupView";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
@@ -35,12 +37,13 @@ export default async function AdvisorProgramTeamPage({
   searchParams,
 }: {
   params: Promise<{ programId: string }>;
-  searchParams?: Promise<{ tab?: string }>;
+  searchParams?: Promise<{ tab?: string; saved?: string; error?: string }>;
 }) {
   const { programId } = await params;
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
-  const tabParam = ((await searchParams) ?? {}).tab;
-  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" ? tabParam : "overview";
+  const query = (await searchParams) ?? {};
+  const tabParam = query.tab;
+  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
   const locale = await getLocale();
   const {
@@ -82,6 +85,7 @@ export default async function AdvisorProgramTeamPage({
     ["updates", t("tabUpdates"), `${base}?tab=updates`],
     ["setup", t("tabSetup"), `${base}?tab=setup`],
     ["freigaben", t("tabAccess"), `${base}?tab=freigaben`],
+    ["notizen", t("tabNotes"), `${base}?tab=notizen`],
   ];
   const facts = [program.batch, program.category, program.isAlumni ? t("metaAlumni") : null].filter(Boolean).join(" · ");
   const contactNames = program.contactUserIds.map(nameOf).join(", ");
@@ -145,6 +149,17 @@ export default async function AdvisorProgramTeamPage({
             </dl>
             <ProgramProfileView profile={profile} />
           </div>
+        ) : tab === "notizen" ? (
+          <>
+          <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("notesEndNote")}</p>
+          <AdvisorNotebook
+            anchor={{ kind: "program", id: programId }}
+            note={await getAdvisorNoteFor(client, { kind: "program", id: programId })}
+            followUp={await getAdvisorFollowUpFor(client, { kind: "program", id: programId })}
+            saved={query.saved}
+            error={query.error}
+          />
+          </>
         ) : tab === "setup" ? (
           <ProgramSetupView items={setupItems} includesSetup={program.includesSetup} locale={locale} />
         ) : tab === "freigaben" ? (

@@ -302,3 +302,13 @@ test("Programmplan: Inhaber legt an, Inhaber und Bezugspersonen tragen ein, das 
   assert.match(mine, /getMyProgramEvents/);
   assert.doesNotMatch(mine, /getEventAttendance/);
 });
+
+test("Notizen am Programm-Team: nur Inhaber und Bezugspersonen, privat, enden mit dem Programm", () => {
+  const sql = readFileSync("../supabase/migrations/20270209120000_program_notes.sql", "utf8");
+  assert.match(sql, /can_keep_program_notes/);
+  assert.match(sql, /delete from public\.advisor_private_notes where program_id = new\.id/);
+  const actions = readFileSync("src/features/advisor/notebookActions.ts", "utf8");
+  assert.match(actions, /can_keep_program_notes/);
+  const page = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  assert.match(page, /kind: "program"/);
+});

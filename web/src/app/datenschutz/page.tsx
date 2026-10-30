@@ -347,7 +347,7 @@ export default function DatenschutzPage() {
                 "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen und Team-Review bleiben getrennte Entscheidungen.",
                 "Wer über einen Programmcode ein Konto anlegt, wird mit diesem Code verknüpft (damit ein Code nicht beliebig viele Konten erzeugt: höchstens fünf je Team-Platz). Das Konto bleibt damit verknüpft, bis du es löschst. Mit dem Löschen entfällt die Verknüpfung.",
                 "Besteht ein Team nur aus einer Person, kann das Team selbst oder die Organisation (Inhaber oder Bezugsperson) es als vollständig markieren. Wir speichern, wann und von wem. Die Markierung ersetzt keine Zustimmung.",
-                "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen, Programmprofil, Meilensteine und Updates werden gelöscht.",
+                "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen, Programmprofil, Meilensteine, Updates, Teilnahme-Einträge und die privaten Notizen der Beratenden zu deinem Team werden gelöscht. Diese Notizen sieht nur die Person, die sie schreibt.",
               ]}
             />
           </BulletSection>

@@ -24,9 +24,12 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 const MAX_NOTE = 20000;
 const MAX_FOLLOW_UP_NOTE = 2000;
 
-type Anchor = { kind: "subject" | "review"; id: string };
+type Anchor = { kind: "subject" | "review" | "program"; id: string };
+
+const columnOf = (anchor: Anchor) => (anchor.kind === "subject" ? "subject_user_id" : anchor.kind === "review" ? "review_id" : "program_id");
 
 function backTo(anchor: Anchor, query?: string) {
+  if (anchor.kind === "program") return `/advisor/programm/${anchor.id}?tab=notizen${query ? `&${query}` : ""}`;
   const base =
     anchor.kind === "subject" ? `/advisor/person/${anchor.id}` : `/advisor/review/${anchor.id}`;
   return query ? `${base}?${query}#notebook` : `${base}#notebook`;
@@ -36,7 +39,7 @@ function readAnchor(formData: FormData): Anchor | null {
   const kind = String(formData.get("anchorKind") ?? "");
   const id = String(formData.get("anchorId") ?? "").trim();
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
-  if (kind !== "subject" && kind !== "review") return null;
+  if (kind !== "subject" && kind !== "review" && kind !== "program") return null;
   return { kind, id };
 }
 
@@ -46,6 +49,11 @@ async function mayKeepNotes(
   anchor: Anchor,
   userId: string
 ) {
+  // Programm-Team: Inhaber oder Bezugsperson, solange das Programm besteht (die Notizen enden mit ihm).
+  if (anchor.kind === "program") {
+    const { data } = await client.rpc("can_keep_program_notes", { p_program_id: anchor.id });
+    return data === true;
+  }
   if (anchor.kind === "review") {
     const { data } = await client.rpc("was_ever_advisor_for_team_review", {
       p_review_id: anchor.id,
@@ -81,7 +89,7 @@ export async function saveAdvisorNoteAction(formData: FormData) {
   if (!anchor) redirect("/advisor/dashboard");
   const { client, userId } = await prepare(anchor);
 
-  const column = anchor.kind === "subject" ? "subject_user_id" : "review_id";
+  const column = columnOf(anchor);
   const body = String(formData.get("body") ?? "").slice(0, MAX_NOTE);
 
   const { error } = await client
@@ -104,7 +112,7 @@ export async function saveAdvisorFollowUpForAction(formData: FormData) {
   // Ein Datum ohne Form waere eine Wiedervorlage, die nie faellig wird.
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dueOn)) redirect(backTo(anchor, "error=due"));
 
-  const column = anchor.kind === "subject" ? "subject_user_id" : "review_id";
+  const column = columnOf(anchor);
   const note = String(formData.get("note") ?? "").slice(0, MAX_FOLLOW_UP_NOTE);
 
   const { error } = await client.from("advisor_follow_ups").upsert(
@@ -121,7 +129,7 @@ export async function completeAdvisorFollowUpForAction(formData: FormData) {
   if (!anchor) redirect("/advisor/dashboard");
   const { client, userId } = await prepare(anchor);
 
-  const column = anchor.kind === "subject" ? "subject_user_id" : "review_id";
+  const column = columnOf(anchor);
   const { error } = await client
     .from("advisor_follow_ups")
     .update({ completed_at: new Date().toISOString() })

@@ -22,11 +22,12 @@ import type { AdvisorFollowUp, AdvisorPrivateNote } from "@/features/reporting/a
 
 export type NoteAnchor =
   | { kind: "subject"; id: string }
-  | { kind: "review"; id: string };
+  | { kind: "review"; id: string }
+  | { kind: "program"; id: string };
 
 /** Welche Spalte den Anker trägt. Eine Stelle, nicht drei. */
-export function anchorColumn(anchor: NoteAnchor): "subject_user_id" | "review_id" {
-  return anchor.kind === "subject" ? "subject_user_id" : "review_id";
+export function anchorColumn(anchor: NoteAnchor): "subject_user_id" | "review_id" | "program_id" {
+  return anchor.kind === "subject" ? "subject_user_id" : anchor.kind === "review" ? "review_id" : "program_id";
 }
 
 export async function getAdvisorNoteFor(

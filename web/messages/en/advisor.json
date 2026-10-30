@@ -913,11 +913,11 @@
     "setupEmpty": "There are no jointly confirmed items in the Founder Setup yet.",
     "meaningWithoutSetup": "Agreeing meant: the organization sees what your team enters into the program. Work styles, Founder Setup and team review stay separate approvals and are not opened by this.",
     "removeTeam": "Remove team from the program",
-    "removeTeamText": "The team is told. Your access ends immediately, and the team's program data (contact people, program profile, milestones, updates) is deleted. This cannot be undone. The team can join again later with a new code or invitation.",
+    "removeTeamText": "The team is told. Your access ends immediately, and the team's program data (contact people, program profile, milestones, updates, attendance entries, notes on the team) is deleted. This cannot be undone. The team can join again later with a new code or invitation.",
     "removeTeamConfirm": "Yes, remove team",
     "teamRemoved": "The team was removed from the program and informed.",
     "retentionTitle": "What happens to the data when a team leaves",
-    "retentionText": "If a team is removed from the program or ends its participation, your access ends and the team's program data (contact people, program profile, milestones, updates) is deleted. We deliberately chose not to retain anything: the team only agreed within the program. If you need information for your own evaluation, record it in your own files beforehand, with the team's knowledge.",
+    "retentionText": "If a team is removed from the program or ends its participation, your access ends and the team's program data (contact people, program profile, milestones, updates, attendance entries, notes on the team) is deleted. We deliberately chose not to retain anything: the team only agreed within the program. If you need information for your own evaluation, record it in your own files beforehand, with the team's knowledge.",
     "planTitleH": "Program plan",
     "planText": "Sketch your program: education sessions, internal and external events with date, place, notes and to-dos. The teams in your program see the plan.",
     "planAttendanceNote": "You enter attendance by hand (present, absent, excused). Each team only sees its own entry. The entries are deleted as soon as the team leaves the program.",
@@ -946,7 +946,9 @@
     "planError": "That did not work. Check the details (title, date) and try again.",
     "myPlanTitle": "Program plan",
     "myPlanText": "The events of the organizations whose program you are active in. The contact people enter your attendance; you only see your own team's entry.",
-    "myAttendance": "Your attendance: {status}"
+    "myAttendance": "Your attendance: {status}",
+    "tabNotes": "Notes",
+    "notesEndNote": "The notes on this team are deleted as soon as the team leaves the program or is removed."
   },
   "programPage": {
     "title": "Program page",
