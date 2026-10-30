@@ -11,6 +11,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
+import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { getOrgMilestoneDeadlines, getOrgTeamPrograms, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
@@ -37,7 +38,7 @@ const TAB_OF = (value: string | undefined): Tab => TABS.find((tab) => tab === va
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; batch?: string; category?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -79,7 +80,7 @@ export default async function AdvisorOrganisationPage({
 
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
-  const needsPrograms = tab === "settings";
+  const needsPrograms = tab === "settings" || tab === "overview";
   const [seatsUsed, members, teams, people, programs, invites, deadlines] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
@@ -159,6 +160,7 @@ export default async function AdvisorOrganisationPage({
       <div className="mt-6">
         {tab === "overview" ? (
           <div className="grid gap-6">
+            <OrgProgramOverview orgId={org.id} programs={programs} batch={query.batch?.slice(0, 60) || null} category={query.category?.slice(0, 60) || null} />
             {org.description ? <p className="max-w-3xl text-sm leading-7 text-slate-700">{org.description}</p> : null}
             <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[

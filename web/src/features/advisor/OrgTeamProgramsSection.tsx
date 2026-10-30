@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import {
   createTeamProgramInviteAction,
   revokeTeamProgramInviteAction,
+  setProgramMetaAction,
   setTeamProgramContactsAction,
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
@@ -108,6 +109,25 @@ export async function OrgTeamProgramsSection({
                   <Link href={`/advisor/programm/${program.programId}`} className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
                     {t("openTeam")}
                   </Link>
+                ) : null}
+                {isOwner || program.isContact ? (
+                  <form action={setProgramMetaAction} className="mt-3 grid items-end gap-3 sm:grid-cols-4">
+                    <input type="hidden" name="orgId" value={org.id} />
+                    <input type="hidden" name="programId" value={program.programId} />
+                    <label>
+                      <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("metaBatch")}</span>
+                      <input name="batch" maxLength={60} defaultValue={program.batch ?? ""} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+                    </label>
+                    <label>
+                      <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("metaCategory")}</span>
+                      <input name="category" maxLength={60} defaultValue={program.category ?? ""} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+                    </label>
+                    <label className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-800">
+                      <input type="checkbox" name="alumni" value="yes" defaultChecked={program.isAlumni} className="h-4 w-4" />
+                      {t("metaAlumni")}
+                    </label>
+                    <SubmitButton label={t("metaSave")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700" />
+                  </form>
                 ) : null}
                 {isOwner ? (
                   <form action={setTeamProgramContactsAction} className="mt-3">

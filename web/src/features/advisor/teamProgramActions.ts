@@ -175,3 +175,17 @@ export async function saveProgramProfileAction(formData: FormData) {
   revalidatePath("/advisor/programm");
   redirect("/programm");
 }
+
+/** Batch, Kategorie und Alumni setzen Bezugspersonen und Inhaber; die Datenbank prueft das. */
+export async function setProgramMetaAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSettings(orgId));
+  await client.rpc("set_team_program_meta", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_batch: String(formData.get("batch") ?? "").slice(0, 60),
+    p_category: String(formData.get("category") ?? "").slice(0, 60),
+    p_is_alumni: formData.get("alumni") === "yes",
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(orgSettings(orgId));
+}

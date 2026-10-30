@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(7);
+select extensions.plan(10);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000001','authenticated','authenticated','chefin@example.com','',now(),'{}','{}',now(),now()),
@@ -46,6 +46,19 @@ select extensions.is_empty(
 set local request.jwt.claims = '{"sub":"e5000000-0000-4000-8000-000000000001","role":"authenticated"}';
 select extensions.is(
   (select count(*)::int from public.get_team_program_profile('e5000000-0000-4000-8000-0000000000c0')), 1, 'the owner reads it');
+
+-- Batch, Kategorie, Alumni: Sache der Organisation (Bezugsperson, Inhaber), nicht des Teams.
+set local request.jwt.claims = '{"sub":"e5000000-0000-4000-8000-000000000003","role":"authenticated"}';
+select extensions.throws_ok(
+  $$select public.set_team_program_meta('e5000000-0000-4000-8000-0000000000c0', 'Batch 1', 'Software', false)$$,
+  '42501', null, 'the team cannot set batch and category');
+set local request.jwt.claims = '{"sub":"e5000000-0000-4000-8000-000000000002","role":"authenticated"}';
+select public.set_team_program_meta('e5000000-0000-4000-8000-0000000000c0', ' Batch 2026/1 ', 'Software', true);
+set local request.jwt.claims = '{"sub":"e5000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.is(
+  (select batch from public.get_org_team_programs('e5000000-0000-4000-8000-0000000000a0') limit 1), 'Batch 2026/1', 'the contact sets the batch, the owner reads it trimmed');
+select extensions.ok(
+  (select is_alumni from public.get_org_team_programs('e5000000-0000-4000-8000-0000000000a0') limit 1), 'and the alumni status');
 
 -- Beendet das Team das Programm, ist auch das Eingetragene weg.
 set local request.jwt.claims = '{"sub":"e5000000-0000-4000-8000-000000000003","role":"authenticated"}';

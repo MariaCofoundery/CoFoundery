@@ -17,6 +17,9 @@ export type OrgTeamProgram = {
   approvedCount: number;
   contactUserIds: string[];
   isContact: boolean;
+  batch: string | null;
+  category: string | null;
+  isAlumni: boolean;
 };
 
 export type TeamProgramInvite = {
@@ -59,6 +62,9 @@ export async function getOrgTeamPrograms(client: SupabaseClient, orgId: string):
     approvedCount: Number(row.approved_count ?? 0),
     contactUserIds: (row.contact_user_ids as string[] | null) ?? [],
     isContact: row.is_contact === true,
+    batch: (row.batch as string | null) ?? null,
+    category: (row.category as string | null) ?? null,
+    isAlumni: row.is_alumni === true,
   }));
 }
 

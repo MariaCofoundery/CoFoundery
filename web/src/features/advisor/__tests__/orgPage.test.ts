@@ -70,3 +70,11 @@ test("Programmprofil: nur das Team schreibt, Ende des Programms loescht alles Ei
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /rpc\("save_team_program_profile"/);
 });
+
+test("Programm-Dashboard: Zaehler und Filter, alphabetisch, keine Wertung", () => {
+  const ui = readFileSync("src/features/advisor/OrgProgramOverview.tsx", "utf8");
+  assert.match(ui, /dashAlumni/);
+  assert.doesNotMatch(ui, /score|rank|percent|compatib|ampel|traffic|sort\([^)]*(done|approved)/i);
+  const sql = readFileSync("../supabase/migrations/20270123120000_team_program_batch_category.sql", "utf8");
+  assert.match(sql, /can_manage_team_program/);
+});
