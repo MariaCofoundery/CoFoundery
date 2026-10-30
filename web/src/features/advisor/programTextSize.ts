@@ -38,5 +38,11 @@ export function changeTextSize(text: string, selectionStart: number, selectionEn
 
   const next = Math.max(-MAX_SMALLER, Math.min(MAX_BIGGER, level + delta));
   const mark = next > 0 ? "+".repeat(next + 1) : next < 0 ? "-".repeat(-next + 1) : "";
-  return text.slice(0, start) + mark + inner + mark + text.slice(end);
+  // Die Auswahl bleibt auf dem Text selbst (ohne die Zeichen), damit der naechste Klick
+  // dieselbe Stelle trifft und man nicht neu markieren muss.
+  return {
+    text: text.slice(0, start) + mark + inner + mark + text.slice(end),
+    selectionStart: start + mark.length,
+    selectionEnd: start + mark.length + inner.length,
+  };
 }

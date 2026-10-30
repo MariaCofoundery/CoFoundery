@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { DEFAULT_ACCENT, DEFAULT_ACCENT_B, GRADIENT_PRESETS, accentStyles, parseAccent } from "@/features/advisor/programAccent";
 import { ProgramRichText } from "@/features/advisor/programRichText";
 import { changeTextSize } from "@/features/advisor/programTextSize";
@@ -104,6 +104,16 @@ export function ProgramPageEditor({
   const [hexA, setHexA] = useState(startA);
   const [hexB, setHexB] = useState(startB);
   const textRef = useRef<HTMLTextAreaElement>(null);
+  // Nach einer Groessenaenderung wird die Auswahl wiederhergestellt, sobald der neue Text im Feld steht.
+  const pendingSelection = useRef<[number, number] | null>(null);
+  useLayoutEffect(() => {
+    const area = textRef.current;
+    if (area && pendingSelection.current) {
+      area.focus();
+      area.setSelectionRange(pendingSelection.current[0], pendingSelection.current[1]);
+      pendingSelection.current = null;
+    }
+  }, [welcome]);
   const look = accentStyles(colorA, colorB);
 
   function setBoth(a: string, b: string) {
@@ -120,15 +130,17 @@ export function ProgramPageEditor({
   const url = `${origin}/p/${slug || "…"}`;
   const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}` : "");
 
-  /** Eine Stufe groesser oder kleiner; die Regeln stehen in programTextSize.ts. */
+  /** Eine Stufe groesser oder kleiner; die Regeln stehen in programTextSize.ts. Die Auswahl bleibt stehen. */
   function changeSize(delta: 1 | -1) {
     const area = textRef.current;
     if (!area) return;
-    setWelcome(changeTextSize(welcome, area.selectionStart, area.selectionEnd, delta).slice(0, 600));
-    requestAnimationFrame(() => area.focus());
+    const result = changeTextSize(welcome, area.selectionStart, area.selectionEnd, delta);
+    if (result.text.length > 600) return;
+    pendingSelection.current = [result.selectionStart, result.selectionEnd];
+    setWelcome(result.text);
   }
 
-  /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). */
+  /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). Die Auswahl bleibt stehen. */
   function format(kind: "bold" | "italic" | "list") {
     const area = textRef.current;
     if (!area) return;
@@ -136,15 +148,20 @@ export function ProgramPageEditor({
     const end = area.selectionEnd;
     const selected = welcome.slice(start, end);
     let next: string;
+    let selection: [number, number];
     if (kind === "list") {
       const lines = (selected || "").split("\n");
-      next = welcome.slice(0, start) + lines.map((line) => (line.startsWith("- ") ? line : `- ${line}`)).join("\n") + welcome.slice(end);
+      const listed = lines.map((line) => (line.startsWith("- ") ? line : `- ${line}`)).join("\n");
+      next = welcome.slice(0, start) + listed + welcome.slice(end);
+      selection = [start, start + listed.length];
     } else {
       const mark = kind === "bold" ? "**" : "*";
       next = welcome.slice(0, start) + mark + selected + mark + welcome.slice(end);
+      selection = [start + mark.length, start + mark.length + selected.length];
     }
-    setWelcome(next.slice(0, 600));
-    requestAnimationFrame(() => area.focus());
+    if (next.length > 600) return;
+    pendingSelection.current = selection;
+    setWelcome(next);
   }
 
   async function onLogo(event: ChangeEvent<HTMLInputElement>) {
