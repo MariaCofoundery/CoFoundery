@@ -12,11 +12,12 @@ test("die zweite Reihe unter Align liest sich als Weg", () => {
   // selbst an.
   const reihenfolge = [...shell.matchAll(/label: t\("(align[A-Za-z]+)"\)/g)].map((m) => m[1]);
   // Seit 19.10.2026: Fragebögen (beantworten) -> Profil (das eigene Bild) -> Team (vergleichen und
-  // vereinbaren) -> Library (nachlesen).
+  // vereinbaren) -> Programm (seit 31.10.2026: Code eintragen, sehen wer mitliest) -> Library (nachlesen).
   assert.deepEqual(reihenfolge, [
     "alignQuestionnaires",
     "alignProfile",
     "alignTeam",
+    "alignProgram",
     "alignLibrary",
   ]);
 });

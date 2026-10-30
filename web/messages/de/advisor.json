@@ -635,7 +635,7 @@
     },
     "invite": {
       "title": "Einladen",
-      "text": "Vier Wege, je nachdem, wen du einlädst. Eine Einladung ist kein Zugang – er entsteht erst, wenn die Eingeladenen ihn freigeben.",
+      "text": "Drei Wege, je nachdem, was du vorhast. Eine Einladung ist kein Zugang – er entsteht erst, wenn die Eingeladenen zustimmen.",
       "roundTitle": "Team-Runde",
       "roundCta": "Team-Runde starten",
       "roundList": "Bisherige Runden",
@@ -643,9 +643,9 @@
       "programOwnerOnly": "Nur die Inhaberin oder der Inhaber einer Organisation kann Teams ins Programm einladen.",
       "ways": {
         "person": {
-          "title": "Eine Person",
-          "text": "Du bittest eine einzelne Person um Einsicht in einzelne Bereiche ihres Profils, etwa ihre Fähigkeiten.",
-          "sees": "Sie sieht nur, wer fragt und welche Bereiche gemeint sind, und entscheidet selbst.",
+          "title": "Menschen begleiten",
+          "text": "Du lädst eine Person per E-Mail ein und bittest um Einsicht in einzelne Bereiche ihres Profils. Willst du ein ganzes Team begleiten, lädst du die Mitglieder nacheinander ein, jede Person für sich.",
+          "sees": "Jede Person sieht, wer fragt und was gemeint ist, und entscheidet selbst.",
           "cta": "Person einladen"
         },
         "team": {
@@ -655,15 +655,15 @@
           "cta": "Zwei Gründende einladen"
         },
         "round": {
-          "title": "Team-Runde",
-          "text": "Du führst mehrere Teams durch eine gemeinsame Befragungsrunde.",
-          "sees": "Jedes Team sieht nur seine eigene Runde.",
-          "cta": "Team-Runde ansehen"
+          "title": "Team befragen",
+          "text": "Du fragst die zwei bis vier Gründenden eines Teams, jede Person einzeln und unabhängig, nach ihrer Sicht auf die gemeinsame Arbeit. Zwei Zwecke: ein Aufnahmegespräch vorbereiten oder die Zusammenarbeit reflektieren.",
+          "sees": "Die Antworten stehen erst nebeneinander, wenn alle abgegeben haben. Es gibt keine Bewertung und kein Ranking, nur eine Grundlage für ein Gespräch.",
+          "cta": "Befragung starten"
         },
         "program": {
           "title": "Team ins Programm",
-          "text": "Du lädst ein Team in das Programm deiner Organisation ein, per Link, E-Mail oder Code.",
-          "sees": "Das Team stimmt zu, und zwar alle im Team. Weitere Freigaben öffnen sich dadurch nicht.",
+          "text": "Für Organisationen: Du holst ein Team, das schon Made2Found nutzt, in dein Programm, per Link, E-Mail oder Code. Das Team gibt den Code unter Align > Programm ein.",
+          "sees": "Alle im Team stimmen zu. Du siehst Programmprofil, Meilensteine und Updates, sonst nichts.",
           "cta": "Zum Programm"
         }
       }

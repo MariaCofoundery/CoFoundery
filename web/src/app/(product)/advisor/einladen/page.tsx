@@ -13,8 +13,10 @@ import { AdvisorTeamInviteForm } from "@/features/dashboard/AdvisorTeamInviteFor
  * Einladen - ein Ort fuer die drei Wege: Person, Team, Team-Runde.
  * Zu jedem steht, was die eingeladene Seite sieht (in den Bloecken selbst).
  */
-const WAYS = ["person", "team", "round", "program"] as const;
-type Way = (typeof WAYS)[number];
+// Drei Wege stehen zur Wahl. "team" (zwei Gruendende als Paar) bleibt als alte Ansicht ueber ?art=team
+// erreichbar, steht aber nicht mehr in der Auswahl: Wer ein Team begleitet, laedt dessen Mitglieder einzeln ein.
+const WAYS = ["person", "round", "program"] as const;
+type Way = (typeof WAYS)[number] | "team";
 const ART: Record<string, Way> = { person: "person", team: "team", runde: "round" };
 
 export default async function AdvisorInvitePage({

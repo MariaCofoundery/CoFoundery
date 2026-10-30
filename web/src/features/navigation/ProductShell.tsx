@@ -414,6 +414,7 @@ export function ProductShell({
     currentPathname.startsWith("/report/") ||
     // Vorhaben, Vergleich und fruehere Workbookstaende sind Teamkontext.
     (currentPathname.startsWith("/founder-alignment") && !isQuestionnairesArea(currentPathname));
+  const isProgramArea = (currentPathname: string) => currentPathname === "/programm" || currentPathname.startsWith("/programm/");
   const isLibraryArea = (currentPathname: string) => currentPathname.startsWith("/founder-library");
 
   const founderItems: NavigationItem[] = isConnectOnly || !isFounderView ? [] : [
@@ -429,7 +430,8 @@ export function ProductShell({
         isQuestionnairesArea(currentPathname) ||
         isProfileArea(currentPathname) ||
         isTeamsArea(currentPathname) ||
-        isLibraryArea(currentPathname),
+        isLibraryArea(currentPathname) ||
+        isProgramArea(currentPathname),
       // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst beantworten, dann das
       // eigene Bild, dann das Team, dann das Nachlesen.
       subItems: [
@@ -454,6 +456,17 @@ export function ProductShell({
           label: t("alignTeam"),
           isActive: isTeamsArea,
         },
+        // Das Programm einer Organisation: hier traegt ein Team einen Programmcode
+        // ein und sieht, in welchem Programm es ist und wer mitliest.
+        ...(hasFounder
+          ? [
+              {
+                href: "/programm",
+                label: t("alignProgram"),
+                isActive: isProgramArea,
+              },
+            ]
+          : []),
         ...(hasFounder
           ? [
               {

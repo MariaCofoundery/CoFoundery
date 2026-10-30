@@ -140,9 +140,9 @@ test("Advisor-Optik: ein gemeinsamer dunkler Kopf, die Startseite zeigt Programm
   assert.doesNotMatch(start, /score|rank|percent|compatib/i);
 });
 
-test("Einladen: erst die Wahl zwischen vier Wegen, dann genau ein Formular; Rueckmeldungen fuehren in die Personen-Ansicht", () => {
+test("Einladen: erst die Wahl zwischen drei Wegen, dann genau ein Formular; Rueckmeldungen fuehren in die Personen-Ansicht", () => {
   const page = readFileSync("src/app/(product)/advisor/einladen/page.tsx", "utf8");
-  assert.match(page, /const WAYS = \["person", "team", "round", "program"\]/);
+  assert.match(page, /const WAYS = \["person", "round", "program"\]/);
   assert.match(page, /query\.error \|\| query\.notice \? "person"/);
   assert.match(page, /art === "person" \? <PersonInviteSection/);
   assert.match(page, /art === "team" \?/);

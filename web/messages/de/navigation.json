@@ -84,5 +84,6 @@
   "advisorInvite": "Einladen",
   "advisorOrg": "Organisation",
   "admin": "Admin",
-  "adminAttention": "{count} offen im Admin-Bereich"
+  "adminAttention": "{count} offen im Admin-Bereich",
+  "alignProgram": "Programm"
 }

@@ -635,7 +635,7 @@
     },
     "invite": {
       "title": "Invite",
-      "text": "Four ways, depending on who you invite. An invitation is not access – access only exists once the invited people approve it.",
+      "text": "Three ways, depending on what you want to do. An invitation is not access – access only exists once the invited people agree.",
       "roundTitle": "Team round",
       "roundCta": "Start a team round",
       "roundList": "Previous rounds",
@@ -643,9 +643,9 @@
       "programOwnerOnly": "Only the owner of an organization can invite teams to the program.",
       "ways": {
         "person": {
-          "title": "One person",
-          "text": "You ask a single person for access to parts of their profile, for example their capabilities.",
-          "sees": "They only see who is asking and which parts are meant, and decide for themselves.",
+          "title": "Support people",
+          "text": "You invite a person by email and ask for access to parts of their profile. If you want to support a whole team, invite the members one after another, each person for themselves.",
+          "sees": "Each person sees who is asking and what is meant, and decides for themselves.",
           "cta": "Invite a person"
         },
         "team": {
@@ -655,15 +655,15 @@
           "cta": "Invite two founders"
         },
         "round": {
-          "title": "Team round",
-          "text": "You guide several teams through a shared survey round.",
-          "sees": "Each team only sees its own round.",
-          "cta": "View team rounds"
+          "title": "Survey a team",
+          "text": "You ask the two to four founders of a team, each one separately and independently, for their view of working together. Two purposes: prepare an admission conversation or reflect on the collaboration.",
+          "sees": "The answers only appear side by side once everyone has submitted. There is no rating and no ranking, just a basis for a conversation.",
+          "cta": "Start a survey"
         },
         "program": {
           "title": "Team into the program",
-          "text": "You invite a team to your organization's program, by link, email or code.",
-          "sees": "The team agrees, everyone on it. No further approvals open because of this.",
+          "text": "For organizations: you bring a team that already uses Made2Found into your program, by link, email or code. The team enters the code under Align > Program.",
+          "sees": "Everyone on the team agrees. You see the program profile, milestones and updates, nothing else.",
           "cta": "Go to program"
         }
       }
