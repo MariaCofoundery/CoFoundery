@@ -297,6 +297,7 @@ export async function saveProgramPageAction(formData: FormData) {
     p_published: formData.get("published") === "yes",
     p_welcome: String(formData.get("welcome") ?? "").slice(0, 600),
     p_accent: parseAccent(String(formData.get("accent") ?? "")),
+    p_accent_b: parseAccent(String(formData.get("accentB") ?? "")),
   });
   if (error) {
     const code = error.code === "23505" ? "slug_taken" : error.code === "22023" || error.code === "23514" ? "slug_invalid" : "failed";

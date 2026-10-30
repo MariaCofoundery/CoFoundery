@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useRef, useState } from "react";
-import { ACCENT_PRESETS, DEFAULT_ACCENT, accentStyles, parseAccent } from "@/features/advisor/programAccent";
+import { DEFAULT_ACCENT, DEFAULT_ACCENT_B, GRADIENT_PRESETS, accentStyles, parseAccent } from "@/features/advisor/programAccent";
 import { ProgramRichText } from "@/features/advisor/programRichText";
 import { saveProgramPageAction } from "@/features/advisor/teamProgramActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -26,7 +26,11 @@ export type ProgramPageLabels = {
   copy: string;
   copied: string;
   accent: string;
-  accentCustom: string;
+  accentA: string;
+  accentB: string;
+  accentHint: string;
+  bigger: string;
+  smaller: string;
   bold: string;
   italic: string;
   list: string;
@@ -70,6 +74,7 @@ export function ProgramPageEditor({
   initialWelcome,
   hasLogo,
   initialAccent,
+  initialAccentB,
   labels,
 }: {
   orgId: string;
@@ -80,6 +85,7 @@ export function ProgramPageEditor({
   initialWelcome: string | null;
   hasLogo: boolean;
   initialAccent: string | null;
+  initialAccentB: string | null;
   labels: ProgramPageLabels;
 }) {
   const suggestion = orgName.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(SLUG_FILTER, "-").replace(/^-+|-+$/g, "").slice(0, 40);
@@ -89,14 +95,32 @@ export function ProgramPageEditor({
   const [logo, setLogo] = useState("");
   const [removeLogo, setRemoveLogo] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [accent, setAccent] = useState(parseAccent(initialAccent) ?? DEFAULT_ACCENT);
+  const startA = parseAccent(initialAccent) ?? DEFAULT_ACCENT;
+  const startB = parseAccent(initialAccentB) ?? (initialAccent ? startA : DEFAULT_ACCENT_B);
+  const [colorA, setColorA] = useState(startA);
+  const [colorB, setColorB] = useState(startB);
+  // Was gerade im Hex-Feld steht - auch, wenn es noch kein gueltiger Code ist.
+  const [hexA, setHexA] = useState(startA);
+  const [hexB, setHexB] = useState(startB);
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const look = accentStyles(accent);
+  const look = accentStyles(colorA, colorB);
+
+  function setBoth(a: string, b: string) {
+    setColorA(a);
+    setColorB(b);
+    setHexA(a);
+    setHexB(b);
+  }
+  function typeHex(which: "a" | "b", value: string) {
+    (which === "a" ? setHexA : setHexB)(value);
+    const parsed = parseAccent(value);
+    if (parsed) (which === "a" ? setColorA : setColorB)(parsed);
+  }
   const url = `${origin}/p/${slug || "…"}`;
   const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}` : "");
 
   /** Umschliesst die Auswahl mit Zeichen (fett, kursiv) oder setzt "- " vor jede Zeile (Liste). */
-  function format(kind: "bold" | "italic" | "list") {
+  function format(kind: "bold" | "italic" | "list" | "bigger" | "smaller") {
     const area = textRef.current;
     if (!area) return;
     const start = area.selectionStart;
@@ -107,7 +131,7 @@ export function ProgramPageEditor({
       const lines = (selected || "").split("\n");
       next = welcome.slice(0, start) + lines.map((line) => (line.startsWith("- ") ? line : `- ${line}`)).join("\n") + welcome.slice(end);
     } else {
-      const mark = kind === "bold" ? "**" : "*";
+      const mark = kind === "bold" ? "**" : kind === "italic" ? "*" : kind === "bigger" ? "++" : "--";
       next = welcome.slice(0, start) + mark + selected + mark + welcome.slice(end);
     }
     setWelcome(next.slice(0, 600));
@@ -151,7 +175,7 @@ export function ProgramPageEditor({
         <div className="block">
           <label htmlFor="program-welcome" className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.welcome}</label>
           <div className="mt-2 flex flex-wrap items-center gap-1" role="toolbar" aria-label={labels.welcome}>
-            {([["bold", labels.bold, "B", "font-extrabold"], ["italic", labels.italic, "I", "italic"], ["list", labels.list, "•", ""]] as const).map(([kind, label, glyph, extra]) => (
+            {([["bold", labels.bold, "B", "font-extrabold"], ["italic", labels.italic, "I", "italic"], ["bigger", labels.bigger, "A+", "text-base font-semibold"], ["smaller", labels.smaller, "A−", "text-xs"], ["list", labels.list, "•", ""]] as const).map(([kind, label, glyph, extra]) => (
               <button
                 key={kind}
                 type="button"
@@ -178,26 +202,56 @@ export function ProgramPageEditor({
           <span className="mt-1 block text-xs leading-5 text-slate-500">{labels.formatHint}</span>
         </div>
 
-        <fieldset>
+        <fieldset className="grid gap-3">
           <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.accent}</legend>
-          <input type="hidden" name="accent" value={accent} />
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            {ACCENT_PRESETS.map((color) => (
-              <button
-                key={color}
-                type="button"
-                aria-label={color}
-                aria-pressed={accent === color}
-                onClick={() => setAccent(color)}
-                style={{ backgroundColor: color }}
-                className={`h-9 w-9 rounded-full ring-offset-2 transition ${accent === color ? "ring-2 ring-slate-900" : "ring-1 ring-slate-200 hover:ring-slate-400"}`}
-              />
-            ))}
-            <label className="ml-1 inline-flex min-h-9 cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
-              <input type="color" value={accent} onChange={(event) => setAccent(event.target.value.toLowerCase())} className="h-9 w-9 cursor-pointer rounded-full border border-slate-300 bg-white p-0.5" />
-              {labels.accentCustom}
-            </label>
+          <input type="hidden" name="accent" value={colorA} />
+          <input type="hidden" name="accentB" value={colorB} />
+          <div className="flex flex-wrap gap-2">
+            {GRADIENT_PRESETS.map((preset) => {
+              const on = colorA === preset.a && colorB === preset.b;
+              return (
+                <button
+                  key={preset.name}
+                  type="button"
+                  aria-label={preset.name}
+                  aria-pressed={on}
+                  title={preset.name}
+                  onClick={() => setBoth(preset.a, preset.b)}
+                  style={{ background: preset.a === preset.b ? preset.a : `linear-gradient(135deg, ${preset.a}, ${preset.b})` }}
+                  className={`h-10 w-14 rounded-xl ring-offset-2 transition ${on ? "ring-2 ring-slate-900" : "ring-1 ring-slate-200 hover:ring-slate-400"}`}
+                />
+              );
+            })}
           </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {([["a", labels.accentA, colorA, hexA], ["b", labels.accentB, colorB, hexB]] as const).map(([which, label, color, hex]) => (
+              <div key={which}>
+                <span className="block text-xs font-medium text-slate-600">{label}</span>
+                <div className="mt-1 flex items-center gap-2">
+                  <input
+                    type="color"
+                    aria-label={label}
+                    value={color}
+                    onChange={(event) => (which === "a" ? (setColorA(event.target.value.toLowerCase()), setHexA(event.target.value.toLowerCase())) : (setColorB(event.target.value.toLowerCase()), setHexB(event.target.value.toLowerCase())))}
+                    className="h-11 w-11 shrink-0 cursor-pointer rounded-xl border border-slate-300 bg-white p-1"
+                  />
+                  <input
+                    type="text"
+                    inputMode="text"
+                    aria-label={`${label} (Hex)`}
+                    value={hex}
+                    maxLength={7}
+                    spellCheck={false}
+                    autoComplete="off"
+                    onChange={(event) => typeHex(which, event.target.value)}
+                    aria-invalid={!parseAccent(hex)}
+                    className={`min-h-11 w-full rounded-xl border px-3 font-mono text-sm uppercase ${parseAccent(hex) ? "border-slate-300" : "border-rose-400 bg-rose-50"}`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <span className="text-xs leading-5 text-slate-500">{labels.accentHint}</span>
         </fieldset>
 
         <div>
@@ -221,15 +275,15 @@ export function ProgramPageEditor({
       <aside aria-label={labels.previewTitle} className="grid content-start gap-3">
         <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{labels.previewTitle}</p>
         <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_50px_-24px_rgba(60,40,180,0.4)]">
-          <div className="relative overflow-hidden px-5 pb-6 pt-6 text-center text-white" style={{ background: look.hero, backgroundColor: look.heroColor }}>
+          <div className="relative overflow-hidden px-5 pb-6 pt-6 text-center" style={{ background: look.background, color: look.text }}>
             <div className="relative z-10 flex flex-col items-center">
               {shownLogo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={shownLogo} alt="" className="h-14 w-14 rounded-xl bg-white object-contain p-1.5 shadow" />
               ) : (
-                <span className="grid h-14 w-14 place-items-center rounded-xl bg-white/15 text-xl font-extrabold ring-1 ring-white/25">{orgName.slice(0, 1).toUpperCase()}</span>
+                <span className="grid h-14 w-14 place-items-center rounded-xl bg-current/10 text-xl font-extrabold ring-1 ring-current/25">{orgName.slice(0, 1).toUpperCase()}</span>
               )}
-              <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-200">{labels.eyebrow}</p>
+              <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] opacity-75">{labels.eyebrow}</p>
               <p className="mt-1 break-words text-xl font-semibold tracking-tight">{orgName}</p>
             </div>
           </div>
@@ -237,7 +291,7 @@ export function ProgramPageEditor({
             <ProgramRichText text={welcome || labels.welcomePlaceholder} className="text-sm leading-6 text-slate-700" />
             <div className="mt-4 grid gap-2">
               <div className="rounded-xl border border-slate-300 px-3 py-2.5 text-center text-sm font-semibold tracking-[.25em] text-slate-400">{labels.previewCode}</div>
-              <div className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-white" style={{ backgroundImage: look.button }}>{labels.previewGo}</div>
+              <div className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold" style={{ background: look.button, color: look.buttonText }}>{labels.previewGo}</div>
             </div>
           </div>
         </div>

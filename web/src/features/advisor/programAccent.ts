@@ -1,29 +1,36 @@
 /**
- * Akzentfarbe einer Programmseite. Gespeichert wird nur ein Hex-Wert
- * (`#rrggbb`); daraus entstehen hier Kopfflaeche und Knopf. Damit weisse Schrift
- * lesbar bleibt, wird die Farbe bei Bedarf abgedunkelt - die Organisation kann
- * also keine Kombination waehlen, die man nicht lesen kann.
+ * Farben einer Programmseite: zwei Farben fuer den Verlauf, Hex-Codes wie in
+ * Canva (`#rrggbb`). Die Farben werden unveraendert benutzt - nichts wird
+ * eingedunkelt oder gemischt, damit der Verlauf so aussieht, wie er gewaehlt
+ * wurde. Lesbar bleibt die Schrift darauf, weil ihre FARBE sich anpasst
+ * (weiss auf dunkel, dunkel auf hell), nicht die Flaeche.
  */
 export const DEFAULT_ACCENT = "#6d49e0";
-export const ACCENT_PRESETS = ["#6d49e0", "#0a80b8", "#0f766e", "#15803d", "#c2410c", "#be185d", "#b91c1c", "#334155"] as const;
+export const DEFAULT_ACCENT_B = "#0a80b8";
 
+/** Fertige Verlaeufe zum Anklicken; wer mehr will, tippt eigene Hex-Codes. */
+export const GRADIENT_PRESETS: { name: string; a: string; b: string }[] = [
+  { name: "Aurora", a: "#6d49e0", b: "#0a80b8" },
+  { name: "Ocean", a: "#0a80b8", b: "#14b8a6" },
+  { name: "Wald", a: "#166534", b: "#10b981" },
+  { name: "Sunset", a: "#f97316", b: "#ec4899" },
+  { name: "Beere", a: "#be185d", b: "#7c3aed" },
+  { name: "Tinte", a: "#1e293b", b: "#4338ca" },
+  { name: "Gold", a: "#f59e0b", b: "#fde68a" },
+  { name: "Schiefer", a: "#334155", b: "#334155" },
+];
+
+/** Nimmt `#abc`, `abc`, `#aabbcc` oder `AABBCC` und liefert `#aabbcc` - oder null. */
 export function parseAccent(value: string | null | undefined): string | null {
-  const text = (value ?? "").trim().toLowerCase();
-  return /^#[0-9a-f]{6}$/.test(text) ? text : null;
+  const text = (value ?? "").trim().toLowerCase().replace(/^#/, "");
+  if (/^[0-9a-f]{3}$/.test(text)) return `#${text[0]}${text[0]}${text[1]}${text[1]}${text[2]}${text[2]}`;
+  return /^[0-9a-f]{6}$/.test(text) ? `#${text}` : null;
 }
 
 type Rgb = [number, number, number];
 
 function toRgb(hex: string): Rgb {
   return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
-}
-
-function toHex([r, g, b]: Rgb) {
-  return `#${[r, g, b].map((channel) => Math.round(Math.max(0, Math.min(255, channel))).toString(16).padStart(2, "0")).join("")}`;
-}
-
-function mix(a: Rgb, b: Rgb, amountOfA: number): Rgb {
-  return [a[0] * amountOfA + b[0] * (1 - amountOfA), a[1] * amountOfA + b[1] * (1 - amountOfA), a[2] * amountOfA + b[2] * (1 - amountOfA)];
 }
 
 function luminance([r, g, b]: Rgb) {
@@ -34,22 +41,28 @@ function luminance([r, g, b]: Rgb) {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
 
-/** Dunkelt ab, bis weisse Schrift darauf ein Kontrastverhaeltnis von mindestens 4,5 erreicht. */
-function readable(hex: string): Rgb {
-  let color = toRgb(hex);
-  for (let step = 0; step < 20 && luminance(color) > 0.18; step += 1) color = mix(color, [0, 0, 0], 0.92);
-  return color;
+/** Schriftfarbe auf einer Flaeche: weiss auf dunkel, fast schwarz auf hell. */
+function inkOn(hex: string): "#ffffff" | "#0f172a" {
+  const white = 1.05 / (luminance(toRgb(hex)) + 0.05);
+  const dark = (luminance(toRgb(hex)) + 0.05) / (luminance([15, 23, 42]) + 0.05);
+  return white >= dark ? "#ffffff" : "#0f172a";
 }
 
-export function accentStyles(value: string | null | undefined) {
-  const accent = parseAccent(value) ?? DEFAULT_ACCENT;
-  const base = readable(accent);
-  const ink: Rgb = [11, 11, 36];
+export function accentStyles(a: string | null | undefined, b: string | null | undefined) {
+  const first = parseAccent(a) ?? DEFAULT_ACCENT;
+  const second = parseAccent(b) ?? parseAccent(a) ?? DEFAULT_ACCENT_B;
+  const solid = first === second;
+  // Die Schrift muss auf BEIDEN Enden lesbar sein; im Zweifel gewinnt die, die auf dem schlechteren Ende noch passt.
+  const inkA = inkOn(first);
+  const inkB = inkOn(second);
+  const text = inkA === inkB ? inkA : luminance(toRgb(first)) + luminance(toRgb(second)) > 1 ? "#0f172a" : "#ffffff";
+  const background = solid ? first : `linear-gradient(135deg, ${first}, ${second})`;
   return {
-    accent: toHex(base),
-    hero: `radial-gradient(120% 140% at 8% 0%, ${toHex(mix(base, ink, 0.6))} 0%, ${toHex(mix(base, ink, 0.24))} 62%)`,
-    heroColor: toHex(mix(base, ink, 0.24)),
-    button: `linear-gradient(120deg, ${toHex(base)}, ${toHex(readable(toHex(mix(base, [10, 128, 184], 0.55))))})`,
-    soft: toHex(mix(base, [255, 255, 255], 0.1)),
+    first,
+    second,
+    text,
+    background,
+    button: solid ? first : `linear-gradient(120deg, ${first}, ${second})`,
+    buttonText: inkOn(solid ? first : luminance(toRgb(first)) + luminance(toRgb(second)) > 1 ? "#ffffff" : "#000000"),
   };
 }

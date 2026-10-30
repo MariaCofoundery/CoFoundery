@@ -28,10 +28,10 @@ export default async function ProgramPublicPage({
   if (!/^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug)) notFound();
   const client = await createClient();
   const { data } = await client.rpc("get_public_program_page", { p_slug: slug });
-  const page = ((data ?? []) as { org_name: string; welcome: string | null; has_logo: boolean; accent: string | null }[])[0];
+  const page = ((data ?? []) as { org_name: string; welcome: string | null; has_logo: boolean; accent: string | null; accent_b: string | null }[])[0];
   if (!page) notFound();
   const t = await getTranslations("advisor.programPage");
-  const look = accentStyles(page.accent);
+  const look = accentStyles(page.accent, page.accent_b);
   const prefill = (query.code ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
 
   return (
@@ -40,17 +40,17 @@ export default async function ProgramPublicPage({
         <PublicLanguageSwitcher />
       </div>
       <section className="mx-auto mt-4 w-full max-w-xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,0.35)]">
-        <div className="relative overflow-hidden px-6 pb-8 pt-8 text-center text-white sm:px-10" style={{ background: look.hero, backgroundColor: look.heroColor }}>
+        <div className="relative overflow-hidden px-6 pb-8 pt-8 text-center sm:px-10" style={{ background: look.background, color: look.text }}>
           <div className="relative z-10 flex flex-col items-center">
             {page.has_logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={`/api/program-logo/${slug}`} alt="" className="h-20 w-20 rounded-2xl bg-white object-contain p-2 shadow-lg" />
             ) : (
-              <span className="grid h-20 w-20 place-items-center rounded-2xl bg-white/15 text-3xl font-extrabold ring-1 ring-white/25">
+              <span className="grid h-20 w-20 place-items-center rounded-2xl bg-current/10 text-3xl font-extrabold ring-1 ring-current/25">
                 {page.org_name.slice(0, 1).toUpperCase()}
               </span>
             )}
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200">{t("eyebrow")}</p>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] opacity-75">{t("eyebrow")}</p>
             <h1 className="mt-2 break-words text-3xl font-semibold tracking-tight sm:text-4xl">{page.org_name}</h1>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default async function ProgramPublicPage({
               />
             </label>
             {query.code === "invalid" ? <p role="alert" className="text-sm text-rose-700">{t("codeInvalid")}</p> : null}
-            <SubmitButton label={t("codeGo")} pendingLabel="…" style={{ backgroundImage: look.button }} className="inline-flex min-h-12 items-center justify-center rounded-2xl px-6 text-base font-semibold text-white" />
+            <SubmitButton label={t("codeGo")} pendingLabel="…" style={{ background: look.button, color: look.buttonText }} className="inline-flex min-h-12 items-center justify-center rounded-2xl px-6 text-base font-semibold" />
           </form>
 
           <ol className="mt-8 grid gap-3 border-t border-slate-100 pt-6 text-sm text-slate-700">

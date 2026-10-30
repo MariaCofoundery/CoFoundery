@@ -928,11 +928,15 @@
       "logo": "The logo could not be saved. Use a PNG, JPEG or WebP under 2 MB.",
       "failed": "That did not work. Please try again."
     },
-    "accent": "Color",
-    "accentCustom": "Custom color",
+    "accent": "Gradient colors",
     "bold": "Bold",
     "italic": "Italic",
     "list": "List",
-    "formatHint": "Bold: **text**, italic: *text*, list: lines starting with \"- \". Nothing more, which keeps the page calm and safe."
+    "formatHint": "Bold: **text**, italic: *text*, larger: ++text++, smaller: --text--, list: lines starting with \"- \". Nothing more, which keeps the page calm and safe.",
+    "accentA": "Color 1",
+    "accentB": "Color 2",
+    "accentHint": "Pick a ready-made gradient or type your own hex codes like #6D49E0. Two identical colors make a solid fill. The text turns light or dark automatically so it stays readable.",
+    "bigger": "Larger",
+    "smaller": "Smaller"
   }
 }

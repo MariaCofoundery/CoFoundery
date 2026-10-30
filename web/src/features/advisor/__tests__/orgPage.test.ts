@@ -181,7 +181,9 @@ test("Programmseite: nur veroeffentlicht oeffentlich, Anmeldung nur mit gueltige
 
 test("Programmseite: Farbe bleibt lesbar, Formatierung ist ein enger Eigenbau ohne HTML und ohne Links", () => {
   const accent = readFileSync("src/features/advisor/programAccent.ts", "utf8");
-  assert.match(accent, /luminance\(color\) > 0\.18/);
+  assert.match(accent, /export function parseAccent/);
+  // Farben werden unveraendert benutzt - nichts wird gemischt oder abgedunkelt.
+  assert.doesNotMatch(accent, /function mix|function readable/);
   const rich = readFileSync("src/features/advisor/programRichText.tsx", "utf8");
   assert.doesNotMatch(rich, /dangerouslySetInnerHTML|<a /);
   const sql = readFileSync("../supabase/migrations/20270131120000_program_page_accent.sql", "utf8");
