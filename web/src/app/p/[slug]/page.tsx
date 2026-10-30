@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { ProgramBrandHeader } from "@/features/advisor/ProgramBrandHeader";
 import { accentStyles } from "@/features/advisor/programAccent";
 import { ProgramRichText } from "@/features/advisor/programRichText";
 import { enterProgramCodeFromPageAction } from "@/features/advisor/teamProgramActions";
@@ -40,20 +41,7 @@ export default async function ProgramPublicPage({
         <PublicLanguageSwitcher />
       </div>
       <section className="mx-auto mt-4 w-full max-w-xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,0.35)]">
-        <div className="relative overflow-hidden px-6 pb-8 pt-8 text-center sm:px-10" style={{ background: look.background, color: look.text }}>
-          <div className="relative z-10 flex flex-col items-center">
-            {page.has_logo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/api/program-logo/${slug}`} alt="" className="h-20 w-20 rounded-2xl bg-white object-contain p-2 shadow-lg" />
-            ) : (
-              <span className="grid h-20 w-20 place-items-center rounded-2xl bg-current/10 text-3xl font-extrabold ring-1 ring-current/25">
-                {page.org_name.slice(0, 1).toUpperCase()}
-              </span>
-            )}
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] opacity-75">{t("eyebrow")}</p>
-            <h1 className="mt-2 break-words text-3xl font-semibold tracking-tight sm:text-4xl">{page.org_name}</h1>
-          </div>
-        </div>
+        <ProgramBrandHeader orgName={page.org_name} slug={slug} hasLogo={page.has_logo} look={look} eyebrow={t("eyebrow")} />
         <div className="px-6 py-8 sm:px-10">
           {page.welcome ? <ProgramRichText text={page.welcome} className="text-base leading-7 text-slate-700" /> : null}
 

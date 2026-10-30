@@ -227,3 +227,14 @@ test("Ein-Personen-Team: Markierung durch Team oder Organisation, ersetzt keine 
   const programm = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
   assert.match(programm, /soloUndo/);
 });
+
+test("Code-Seite: Logo und Farben der Organisation, nur was die oeffentliche Seite zeigt, nur veroeffentlicht", () => {
+  const sql = readFileSync("../supabase/migrations/20270204120000_program_branding_for_code.sql", "utf8");
+  assert.match(sql, /o\.program_page_published/);
+  assert.doesNotMatch(sql, /grant execute[^;]*anon/);
+  const page = readFileSync("src/app/(product)/programm/code/[code]/page.tsx", "utf8");
+  assert.match(page, /getProgramBrandingForCode/);
+  assert.match(page, /ProgramBrandHeader/);
+  const publicPage = readFileSync("src/app/p/[slug]/page.tsx", "utf8");
+  assert.match(publicPage, /ProgramBrandHeader/);
+});

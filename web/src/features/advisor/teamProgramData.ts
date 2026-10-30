@@ -239,3 +239,19 @@ export async function getTeamProgramCodeOptions(client: SupabaseClient, code: st
     memberCount: Number(row.member_count ?? 0),
   }));
 }
+
+export type ProgramBranding = { slug: string; orgName: string; hasLogo: boolean; accent: string | null; accentB: string | null };
+
+/** Logo und Farben der Organisation hinter einem Code - nur, was ihre oeffentliche Seite ohnehin zeigt. */
+export async function getProgramBrandingForCode(client: SupabaseClient, code: string): Promise<ProgramBranding | null> {
+  const { data } = await client.rpc("get_program_branding_for_code", { p_code: code });
+  const row = ((data ?? []) as Record<string, unknown>[])[0];
+  if (!row) return null;
+  return {
+    slug: row.slug as string,
+    orgName: row.org_name as string,
+    hasLogo: row.has_logo === true,
+    accent: (row.accent as string | null) ?? null,
+    accentB: (row.accent_b as string | null) ?? null,
+  };
+}
