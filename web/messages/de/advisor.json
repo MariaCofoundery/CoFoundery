@@ -670,6 +670,23 @@
     },
     "group": {
       "eyebrow": "Gruppenauswertung · Advisor-Ansicht"
+    },
+    "orgPage": {
+      "tabsLabel": "Bereiche der Organisation",
+      "tabs": "Übersicht | Teams | Personen | Mitglieder und Einstellungen",
+      "orgSwitchLabel": "Organisation wählen",
+      "seatsLimited": "{used} von {limit} Plätzen belegt",
+      "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
+      "statTeams": "Teams, die du begleitest",
+      "statPeople": "Personen, die du begleitest",
+      "statMembers": "Mitglieder der Organisation",
+      "statWaiting": "Teams warten auf Freigabe",
+      "overviewNote": "Die Zahlen zählen nur, was du selbst begleitest und was dir freigegeben wurde. Eine Übersicht über alle Teams der Organisation folgt, sobald Teams das ausdrücklich freigeben können.",
+      "teamsEmpty": "Du begleitest noch kein Team. Lade eins unter „Einladen“ ein.",
+      "peopleTitle": "Personen, die du begleitest",
+      "teamsTitle": "Teams, die du begleitest",
+      "focusLabel": "Schwerpunkte",
+      "suspendedShort": "ausgesetzt"
     }
   }
 }

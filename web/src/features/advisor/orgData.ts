@@ -96,6 +96,21 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 }
 
 /**
+ * Wie viele Menschen die Organisation gerade begleitet: verschiedene Personen
+ * mit aktiver Freigabe. Nur eine Zahl, keine Namen. Die Zeilensicherheit zeigt
+ * Mitgliedern die Freigaben ihrer Organisation (Migration 20261043120000).
+ */
+export async function countOrgSeatsUsed(client: SupabaseClient, orgId: string): Promise<number> {
+  const { data } = await client
+    .from("advisor_person_grants")
+    .select("subject_user_id")
+    .eq("org_id", orgId)
+    .eq("status", "active")
+    .limit(5000);
+  return new Set(((data ?? []) as { subject_user_id: string }[]).map((row) => row.subject_user_id)).size;
+}
+
+/**
  * Die Mitglieder der Organisation - mit Namen (Phase 12C.1C).
  *
  * `person_core` ist nur fuer die eigene Person lesbar; der Name kommt deshalb

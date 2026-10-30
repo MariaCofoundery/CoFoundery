@@ -670,6 +670,23 @@
     },
     "group": {
       "eyebrow": "Group review · advisor view"
+    },
+    "orgPage": {
+      "tabsLabel": "Sections of the organization",
+      "tabs": "Overview | Teams | People | Members and settings",
+      "orgSwitchLabel": "Choose organization",
+      "seatsLimited": "{used} of {limit} seats used",
+      "seatsOpen": "{used} seats used, no upper limit",
+      "statTeams": "Teams you support",
+      "statPeople": "People you support",
+      "statMembers": "Members of the organization",
+      "statWaiting": "Teams waiting for approval",
+      "overviewNote": "The numbers only count what you support yourself and what was shared with you. An overview of all teams in the organization follows once teams can explicitly share it.",
+      "teamsEmpty": "You are not supporting a team yet. Invite one under \"Invite\".",
+      "peopleTitle": "People you support",
+      "teamsTitle": "Teams you support",
+      "focusLabel": "Focus areas",
+      "suspendedShort": "suspended"
     }
   }
 }

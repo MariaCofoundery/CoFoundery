@@ -21,11 +21,13 @@ import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErr
  */
 
 const PATH = "/advisor/organisation";
+// Alle Aktionen gehoeren zum Reiter "Mitglieder und Einstellungen" - dorthin kehren sie zurueck.
 const ANCHOR = "";
+const TAB = "tab=settings";
 
 function back(error: OrgActionErrorCode): never {
   revalidatePath(PATH);
-  redirect(`${PATH}?orgError=${encodeURIComponent(error)}${ANCHOR}`);
+  redirect(`${PATH}?${TAB}&orgError=${encodeURIComponent(error)}${ANCHOR}`);
 }
 
 /**
@@ -39,7 +41,7 @@ async function assertOrgActive(client: Awaited<ReturnType<typeof createClient>>,
 
 function done(): never {
   revalidatePath(PATH);
-  redirect(`${PATH}${ANCHOR}`);
+  redirect(`${PATH}?${TAB}${ANCHOR}`);
 }
 
 async function requireUser() {
