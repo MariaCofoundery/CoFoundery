@@ -330,7 +330,7 @@ test("R: leere Zustaende bieten einen passenden naechsten Schritt", () => {
   const intros = read("src/app/(product)/discovery/intros/page.tsx");
   assert.match(intros, /intros\.receivedEmptyCta/);
   assert.match(intros, /intros\.sentEmptyCta/);
-  assert.match(read("src/app/(product)/advisor/group/page.tsx"), /href="\/advisor\/einladen#person-invites"[\s\S]*nobodyCta/);
+  assert.match(read("src/app/(product)/advisor/group/page.tsx"), /href="\/advisor\/einladen\?art=person#person-invites"[\s\S]*nobodyCta/);
   assert.match(read("src/features/advisor/PersonInviteSection.tsx"), /id="person-invites"/);
 });
 

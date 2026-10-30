@@ -635,10 +635,38 @@
     },
     "invite": {
       "title": "Einladen",
-      "text": "Drei Wege: eine Person, ein Team oder eine Team-Runde. Eine Einladung ist kein Zugang – er entsteht erst, wenn die Eingeladenen ihn freigeben.",
+      "text": "Vier Wege, je nachdem, wen du einlädst. Eine Einladung ist kein Zugang – er entsteht erst, wenn die Eingeladenen ihn freigeben.",
       "roundTitle": "Team-Runde",
       "roundCta": "Team-Runde starten",
-      "roundList": "Bisherige Runden"
+      "roundList": "Bisherige Runden",
+      "back": "Alle Wege",
+      "programOwnerOnly": "Nur die Inhaberin oder der Inhaber einer Organisation kann Teams ins Programm einladen.",
+      "ways": {
+        "person": {
+          "title": "Eine Person",
+          "text": "Du bittest eine einzelne Person um Einsicht in einzelne Bereiche ihres Profils, etwa ihre Fähigkeiten.",
+          "sees": "Sie sieht nur, wer fragt und welche Bereiche gemeint sind, und entscheidet selbst.",
+          "cta": "Person einladen"
+        },
+        "team": {
+          "title": "Ein Team aus zwei Gründenden",
+          "text": "Du lädst zwei Gründende ein, die gemeinsam entscheiden, was du von ihrem Team sehen darfst.",
+          "sees": "Beide müssen zustimmen, sonst bleibt der Zugang zu.",
+          "cta": "Zwei Gründende einladen"
+        },
+        "round": {
+          "title": "Team-Runde",
+          "text": "Du führst mehrere Teams durch eine gemeinsame Befragungsrunde.",
+          "sees": "Jedes Team sieht nur seine eigene Runde.",
+          "cta": "Team-Runde ansehen"
+        },
+        "program": {
+          "title": "Team ins Programm",
+          "text": "Du lädst ein Team in das Programm deiner Organisation ein, per Link, E-Mail oder Code.",
+          "sees": "Das Team stimmt zu, und zwar alle im Team. Weitere Freigaben öffnen sich dadurch nicht.",
+          "cta": "Zum Programm"
+        }
+      }
     },
     "org": {
       "title": "Organisation",

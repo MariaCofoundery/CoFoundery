@@ -139,3 +139,19 @@ test("Advisor-Optik: ein gemeinsamer dunkler Kopf, die Startseite zeigt Programm
   assert.match(start, /getProgramUpdateDue/);
   assert.doesNotMatch(start, /score|rank|percent|compatib/i);
 });
+
+test("Einladen: erst die Wahl zwischen vier Wegen, dann genau ein Formular; Rueckmeldungen fuehren in die Personen-Ansicht", () => {
+  const page = readFileSync("src/app/(product)/advisor/einladen/page.tsx", "utf8");
+  assert.match(page, /const WAYS = \["person", "team", "round", "program"\]/);
+  assert.match(page, /query\.error \|\| query\.notice \? "person"/);
+  assert.match(page, /art === "person" \? <PersonInviteSection/);
+  assert.match(page, /art === "team" \?/);
+  // Teams ins Programm laedt nur der Inhaber ein.
+  assert.match(page, /way === "program" && !isOwner/);
+});
+
+test("Kopfleiste: bei fuenf Bereichen weichen Etikett und Profil-Kurzlink unter 1536 Pixeln", () => {
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  assert.match(shell, /navigationItems\.length >= 5 \? "sm:inline-flex xl:hidden 2xl:inline-flex"/);
+  assert.match(shell, /navigationItems\.length >= 5 \? "hidden 2xl:contents"/);
+});

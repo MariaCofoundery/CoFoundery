@@ -635,10 +635,38 @@
     },
     "invite": {
       "title": "Invite",
-      "text": "Three ways: a person, a team or a team round. An invitation is not access – it only exists once the invited people release it.",
+      "text": "Four ways, depending on who you invite. An invitation is not access – access only exists once the invited people approve it.",
       "roundTitle": "Team round",
       "roundCta": "Start a team round",
-      "roundList": "Previous rounds"
+      "roundList": "Previous rounds",
+      "back": "All ways",
+      "programOwnerOnly": "Only the owner of an organization can invite teams to the program.",
+      "ways": {
+        "person": {
+          "title": "One person",
+          "text": "You ask a single person for access to parts of their profile, for example their capabilities.",
+          "sees": "They only see who is asking and which parts are meant, and decide for themselves.",
+          "cta": "Invite a person"
+        },
+        "team": {
+          "title": "A team of two founders",
+          "text": "You invite two founders who decide together what you may see of their team.",
+          "sees": "Both have to agree, otherwise access stays closed.",
+          "cta": "Invite two founders"
+        },
+        "round": {
+          "title": "Team round",
+          "text": "You guide several teams through a shared survey round.",
+          "sees": "Each team only sees its own round.",
+          "cta": "View team rounds"
+        },
+        "program": {
+          "title": "Team into the program",
+          "text": "You invite a team to your organization's program, by link, email or code.",
+          "sees": "The team agrees, everyone on it. No further approvals open because of this.",
+          "cta": "Go to program"
+        }
+      }
     },
     "org": {
       "title": "Organization",

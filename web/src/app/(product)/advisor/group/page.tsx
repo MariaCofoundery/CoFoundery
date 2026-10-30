@@ -97,7 +97,7 @@ export default async function AdvisorGroupPage({
               <p>{t("nobody")}</p>
               {/* Phase 12C.1C: der Weg zur Personen-Einladung statt Sackgasse. */}
               <Link
-                href="/advisor/einladen#person-invites"
+                href="/advisor/einladen?art=person#person-invites"
                 className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
               >
                 {t("nobodyCta")}

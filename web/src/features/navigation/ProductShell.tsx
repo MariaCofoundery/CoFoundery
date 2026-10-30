@@ -474,8 +474,8 @@ export function ProductShell({
   // Anker dort, und auf den Unterseiten zeigte die Leiste keinen Ort.
   const advisorOrgLabel =
     advisorOrgNames.length === 1
-      ? advisorOrgNames[0].length > 22
-        ? `${advisorOrgNames[0].slice(0, 21).trimEnd()}…`
+      ? advisorOrgNames[0].length > 16
+        ? `${advisorOrgNames[0].slice(0, 15).trimEnd()}…`
         : advisorOrgNames[0]
       : t("advisorOrg");
   const advisorItems: NavigationItem[] = isConnectOnly || isFounderView || !hasAdvisor ? [] : [
@@ -707,7 +707,9 @@ export function ProductShell({
                 <BrandLogo className="h-8 md:h-9" priority sizes="(min-width: 768px) 144px, 128px" />
               </Link>
               {/* Solange die Testphase laeuft: ein ruhiges Etikett, das sagt, wo man ist. */}
-              <span className="-ml-1 hidden rounded-full border border-violet-300 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-violet-700 sm:inline-flex">
+              {/* Mit fuenf Bereichen (Advisor-Ansicht) ist die Leiste zwischen 1280 und 1536 Pixeln voll: Dann
+                  weicht das Etikett, damit die Werkzeuge rechts nicht ueber die Bereiche geschoben werden. */}
+              <span className={`-ml-1 hidden rounded-full border border-violet-300 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-violet-700 ${navigationItems.length >= 5 ? "sm:inline-flex xl:hidden 2xl:inline-flex" : "sm:inline-flex"}`}>
                 {t("betaBadge")}
               </span>
 
@@ -798,13 +800,15 @@ export function ProductShell({
                   </Link>
                 ) : null}
                 {showProfileShortcut ? (
-                  <Link
-                    href="/me/profile"
-                    aria-current={isProfilePath(pathname) ? "page" : undefined}
-                    className={navLinkClassName(isProfilePath(pathname))}
-                  >
-                    {t("myProfile")}
-                  </Link>
+                  <span className={navigationItems.length >= 5 ? "hidden 2xl:contents" : "contents"}>
+                    <Link
+                      href="/me/profile"
+                      aria-current={isProfilePath(pathname) ? "page" : undefined}
+                      className={navLinkClassName(isProfilePath(pathname))}
+                    >
+                      {t("myProfile")}
+                    </Link>
+                  </span>
                 ) : null}
                 <ProductFeedbackEntry
                   source="nav"

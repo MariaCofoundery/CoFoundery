@@ -116,7 +116,7 @@ export default async function AdvisorStartPage() {
       ? [{ key: "team-invites", text: t("start.teamInvites", { count: pendingInvites.length }), href: "/advisor/begleitung?art=teams", cta: t("start.view") }]
       : []),
     ...(openPersonInvites > 0
-      ? [{ key: "person-invites", text: t("start.personInvites", { count: openPersonInvites }), href: "/advisor/einladen#person-invites", cta: t("start.view") }]
+      ? [{ key: "person-invites", text: t("start.personInvites", { count: openPersonInvites }), href: "/advisor/einladen?art=person#person-invites", cta: t("start.view") }]
       : []),
   ];
 
