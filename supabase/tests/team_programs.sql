@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(18);
+select extensions.plan(19);
 
 -- Team <-> Programm: Die Organisation laedt ein, das Team stimmt zu, jedes
 -- AKTUELLE Mitglied muss zustimmen, Mitgliedschaft in der Organisation gibt nichts frei.
@@ -113,6 +113,16 @@ set local request.jwt.claims = '{"sub":"e2000000-0000-4000-8000-000000000001","r
 select extensions.is_empty(
   $$select * from public.get_org_team_programs('e2000000-0000-4000-8000-0000000000a0')$$,
   'and for the organisation');
+
+-- Hoechstens 25 offene Einladungen je Organisation.
+reset role;
+insert into public.team_program_invites (org_id, token_hash)
+select 'e2000000-0000-4000-8000-0000000000a0', lpad(to_hex(g), 64, '0') from generate_series(1, 25) as g;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"e2000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.throws_ok(
+  $$select public.create_team_program_invite('e2000000-0000-4000-8000-0000000000a0', repeat('c', 64), 'zu viel')$$,
+  '53400', null, 'more than 25 open invitations are refused');
 
 select * from extensions.finish();
 rollback;

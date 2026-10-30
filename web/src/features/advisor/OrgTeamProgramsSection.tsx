@@ -22,6 +22,8 @@ export async function OrgTeamProgramsSection({
   programs,
   invites,
   freshToken,
+  mailState,
+  inviteError,
 }: {
   org: AdvisorOrg;
   members: OrgMember[];
@@ -29,6 +31,9 @@ export async function OrgTeamProgramsSection({
   invites: TeamProgramInvite[];
   /** Nur direkt nach dem Erzeugen: der Link wird danach nie wieder gezeigt. */
   freshToken: string | null;
+  /** Ergebnis des Mailversands direkt nach dem Erzeugen (sent | failed | invalid). */
+  mailState: string | null;
+  inviteError: string | null;
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const isOwner = org.role === "owner" && org.status === "active";
@@ -49,6 +54,10 @@ export async function OrgTeamProgramsSection({
             <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("inviteLabel")}</span>
             <input name="label" maxLength={120} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
           </label>
+          <label className="min-w-0 flex-1">
+            <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("inviteEmail")}</span>
+            <input name="email" type="email" maxLength={200} autoComplete="off" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+          </label>
           <SubmitButton
             label={t("inviteCreate")}
             pendingLabel="…"
@@ -57,6 +66,12 @@ export async function OrgTeamProgramsSection({
         </form>
       ) : null}
 
+      {inviteError === "limit" ? <p role="alert" className="mt-3 text-sm text-rose-800">{t("inviteLimit")}</p> : null}
+      {mailState ? (
+        <p role="status" className="mt-3 text-sm text-slate-700">
+          {mailState === "sent" ? t("inviteMailSent") : mailState === "invalid" ? t("inviteMailInvalid") : t("inviteMailFailed")}
+        </p>
+      ) : null}
       {freshUrl ? (
         <div role="status" className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3">
           <p className="text-sm font-semibold text-violet-900">{t("inviteShownOnce")}</p>

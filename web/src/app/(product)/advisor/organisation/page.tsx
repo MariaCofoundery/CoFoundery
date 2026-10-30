@@ -39,7 +39,7 @@ const TAB_OF = (value: string | undefined): Tab => TABS.find((tab) => tab === va
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; batch?: string; category?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; batch?: string; category?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -222,7 +222,7 @@ export default async function AdvisorOrganisationPage({
         {tab === "settings" ? (
           <>
             <AdvisorOrgSection orgs={[org]} members={members} error={orgError} />
-            <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} />
+            <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} />
           </>
         ) : null}
       </div>

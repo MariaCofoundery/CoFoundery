@@ -105,3 +105,13 @@ test("Anfrage pro Team ist keine Freigabe: dieselbe Review-Anfrage, das Team ent
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /rpc\("request_program_team_review"/);
 });
+
+test("Einladung per Mail: Adresse wird nicht gespeichert, Link bleibt ein Hash, offene Einladungen sind begrenzt", () => {
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /sendTeamProgramInviteEmail/);
+  assert.doesNotMatch(actions, /p_email|invitee_email/);
+  const sql = readFileSync("../supabase/migrations/20270127120000_team_program_invite_cap.sql", "utf8");
+  assert.match(sql, />= 25/);
+  const mail = readFileSync("src/lib/email/sendTeamProgramInviteEmail.ts", "utf8");
+  assert.match(mail, /nirgends gespeichert/);
+});

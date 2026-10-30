@@ -339,6 +339,7 @@ export default function DatenschutzPage() {
                 "Dein Team kann ein Programmprofil mit freien Angaben anlegen (Name des Unternehmens, Gründerinnen und Gründer, Adresse, E-Mail, Telefon). Es kommt nicht aus euren persönlichen Profilen und ist für dieselben Personen sichtbar wie die übrigen Angaben im Programm.",
                 "Im Programm legt dein Team zusammen mit den Bezugspersonen Meilensteine fest und gibt alle zwei Wochen ein kurzes Update mit Antworten auf die Fragen der Bezugspersonen ab. Diese Angaben sehen das Team, die Bezugspersonen und die Inhaberinnen und Inhaber der Organisation, solange alle im Team zugestimmt haben.",
                 "Vor einem fälligen Update erinnern wir mit einem Hinweis in der App. Eine Mitteilung aufs Gerät oder eine E-Mail bekommst du nur, wenn du sie in deinem Konto eingeschaltet hast (Abschnitt 15); die Erinnerung nennt weder Team noch Organisation.",
+                "Lädt eine Organisation per E-Mail ein, geben Inhaberinnen oder Inhaber dafür eine E-Mail-Adresse ein. Wir nutzen sie nur für den Versand der Einladung über unseren E-Mail-Dienst und speichern sie nicht.",
                 "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Entscheidungen.",
                 "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen, Programmprofil, Meilensteine und Updates werden gelöscht.",
               ]}

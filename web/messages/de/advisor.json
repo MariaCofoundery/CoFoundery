@@ -813,6 +813,11 @@
     "tabAccess": "Freigaben",
     "requestReview": "Team-Review anfragen",
     "requestNote": "Nachricht an das Team (optional)",
-    "requestHint": "Das Team entscheidet selbst unter Konto. Erst wenn alle zugestimmt haben, wird die Review aktiv, und bei jeder Änderung im Team endet sie wieder."
+    "requestHint": "Das Team entscheidet selbst unter Konto. Erst wenn alle zugestimmt haben, wird die Review aktiv, und bei jeder Änderung im Team endet sie wieder.",
+    "inviteEmail": "E-Mail einer Gründerin oder eines Gründers (optional)",
+    "inviteMailSent": "Die Einladung ist per E-Mail unterwegs. Die Adresse haben wir nur dafür benutzt und nicht gespeichert.",
+    "inviteMailFailed": "Die E-Mail ließ sich nicht senden. Gib den Link unten selbst weiter.",
+    "inviteMailInvalid": "Die E-Mail-Adresse sieht nicht richtig aus. Der Link steht trotzdem unten.",
+    "inviteLimit": "Es gibt schon 25 offene Einladungen. Ziehe eine zurück oder warte, bis eine abläuft."
   }
 }

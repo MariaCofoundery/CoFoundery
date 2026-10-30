@@ -3,6 +3,8 @@
 import { createHash, randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendTeamProgramInviteEmail } from "@/lib/email/sendTeamProgramInviteEmail";
+import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -25,7 +27,11 @@ async function requireUser(next: string) {
 const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=settings${extra}`;
 
-/** Der Link steht NUR in der Antwort dieses Aufrufs - gespeichert wird nur der Hash. */
+/**
+ * Der Link steht NUR in der Antwort dieses Aufrufs - gespeichert wird nur der
+ * Hash. Optional geht er zusaetzlich per Mail an eine Gruenderin oder einen
+ * Gruender; die Adresse wird nur dafuer benutzt und nicht gespeichert.
+ */
 export async function createTeamProgramInviteAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const client = await requireUser(orgSettings(orgId));
@@ -36,8 +42,24 @@ export async function createTeamProgramInviteAction(formData: FormData) {
     p_label: String(formData.get("label") ?? "").trim().slice(0, 120) || null,
   });
   revalidatePath("/advisor/organisation");
-  if (error) redirect(orgSettings(orgId, "&orgError=org_forbidden"));
-  redirect(orgSettings(orgId, `&programInvite=${token}`));
+  if (error) redirect(orgSettings(orgId, error.code === "53400" ? "&programInviteError=limit" : "&orgError=org_forbidden"));
+
+  let mailed = "";
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (email) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) {
+      mailed = "&programInviteMail=invalid";
+    } else {
+      const { data: org } = await client.from("advisor_orgs").select("name").eq("id", orgId).maybeSingle();
+      const result = await sendTeamProgramInviteEmail({
+        recipientEmail: email,
+        orgName: String((org as { name?: string } | null)?.name ?? ""),
+        url: `${getPublicAppOrigin()}/programm/einladung/${token}`,
+      });
+      mailed = result.ok ? "&programInviteMail=sent" : "&programInviteMail=failed";
+    }
+  }
+  redirect(orgSettings(orgId, `&programInvite=${token}${mailed}`));
 }
 
 export async function revokeTeamProgramInviteAction(formData: FormData) {

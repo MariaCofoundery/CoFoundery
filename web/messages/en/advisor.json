@@ -813,6 +813,11 @@
     "tabAccess": "Approvals",
     "requestReview": "Request team review",
     "requestNote": "Message to the team (optional)",
-    "requestHint": "The team decides for itself under Account. The review only becomes active once everyone has agreed, and it ends again with any change in the team."
+    "requestHint": "The team decides for itself under Account. The review only becomes active once everyone has agreed, and it ends again with any change in the team.",
+    "inviteEmail": "Email of a founder (optional)",
+    "inviteMailSent": "The invitation is on its way by email. We only used the address for that and did not store it.",
+    "inviteMailFailed": "The email could not be sent. Pass the link below on yourself.",
+    "inviteMailInvalid": "The email address does not look right. The link is still below.",
+    "inviteLimit": "There are already 25 open invitations. Withdraw one or wait until one expires."
   }
 }
