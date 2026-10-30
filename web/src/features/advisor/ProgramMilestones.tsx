@@ -71,7 +71,7 @@ export async function ProgramMilestones({
               </div>
               {percent !== null ? (
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${percent}%`}>
-                  <div className="h-full rounded-full bg-violet-500" style={{ width: `${percent}%` }} />
+                  <div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-500" style={{ width: `${percent}%` }} />
                 </div>
               ) : null}
               <details className="mt-2">

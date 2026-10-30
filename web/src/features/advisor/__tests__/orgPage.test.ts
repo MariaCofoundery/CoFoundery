@@ -155,3 +155,12 @@ test("Kopfleiste: bei fuenf Bereichen weichen Etikett und Profil-Kurzlink unter 
   assert.match(shell, /navigationItems\.length >= 5 \? "sm:inline-flex xl:hidden 2xl:inline-flex"/);
   assert.match(shell, /navigationItems\.length >= 5 \? "hidden 2xl:contents"/);
 });
+
+test("Teamseite: dunkler Kopf mit Reitern, Kacheln im Ueberblick, Freigaben als Punkte mit Legende", () => {
+  const page = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  assert.match(page, /<AdvisorPageHeader/);
+  assert.match(page, /tileOpenMilestones/);
+  const access = readFileSync("src/features/advisor/ProgramAccess.tsx", "utf8");
+  assert.match(access, /legendNone/);
+  assert.doesNotMatch(page + access, /score|rank|percent|compatib|ampel|traffic/i);
+});

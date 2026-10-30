@@ -87,11 +87,24 @@ export async function TeamAccessList({ access, programId }: { access: ProgramAcc
       <ul className="grid gap-2">
         {rows.map(([label, state]) => (
           <li key={label} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
-            <span className="font-semibold text-slate-900">{label}</span>
+            <span className="flex items-center gap-3 font-semibold text-slate-900">
+              <span
+                aria-hidden="true"
+                className={`h-3 w-3 rounded-full border-2 ${
+                  state === "active" ? "border-emerald-500 bg-emerald-500" : state === "requested" ? "border-amber-400 bg-amber-400" : "border-slate-300 bg-white"
+                }`}
+              />
+              {label}
+            </span>
             <Pill state={state} t={t} />
           </li>
         ))}
       </ul>
+      <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+        <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-emerald-500" />{t("legendActive")}</span>
+        <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-amber-400" />{t("legendRequested")}</span>
+        <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border-2 border-slate-300" />{t("legendNone")}</span>
+      </p>
       {(access?.teamReview ?? "none") === "none" ? (
         <form action={requestProgramTeamReviewAction} className="grid gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4">
           <input type="hidden" name="programId" value={programId} />

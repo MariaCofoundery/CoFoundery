@@ -872,6 +872,13 @@
     "codeInvalid": "This code is not valid (any more) – or you entered a wrong code too often. Try again in an hour.",
     "codeNoTeam": "You have no team that could join with this code.",
     "inviteCardTitle": "Invite a team",
-    "inviteCardText": "You create a link that the team redeems. Optionally we send it by email to a founder."
+    "inviteCardText": "You create a link that the team redeems. Optionally we send it by email to a founder.",
+    "tileMembers": "People on the team",
+    "tileOpenMilestones": "open milestones",
+    "tileContacts": "Contacts",
+    "tileNextUpdate": "next update",
+    "legendActive": "shared",
+    "legendRequested": "requested",
+    "legendNone": "not shared (a valid answer)"
   }
 }

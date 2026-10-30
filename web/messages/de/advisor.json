@@ -872,6 +872,13 @@
     "codeInvalid": "Dieser Code gilt nicht (mehr) – oder du hast zu oft einen falschen Code eingegeben. Versuche es in einer Stunde noch einmal.",
     "codeNoTeam": "Du hast kein Team, das mit diesem Code beitreten könnte.",
     "inviteCardTitle": "Team einladen",
-    "inviteCardText": "Du erzeugst einen Link, den das Team einlöst. Optional schicken wir ihn per E-Mail an eine Gründerin oder einen Gründer."
+    "inviteCardText": "Du erzeugst einen Link, den das Team einlöst. Optional schicken wir ihn per E-Mail an eine Gründerin oder einen Gründer.",
+    "tileMembers": "Personen im Team",
+    "tileOpenMilestones": "offene Meilensteine",
+    "tileContacts": "Bezugspersonen",
+    "tileNextUpdate": "nächstes Update",
+    "legendActive": "freigegeben",
+    "legendRequested": "angefragt",
+    "legendNone": "nicht freigegeben (eine gültige Antwort)"
   }
 }
