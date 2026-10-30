@@ -19,3 +19,7 @@
 # oeffentlichen Supabase-URL. Sie wandern hier also aus Ordnung heraus, nicht
 # wegen eines Lecks.
 supabase/.temp/
+
+# Falls `vercel link` oder eine .env einmal im Hauptordner liegt (web/.gitignore deckt nur web/ ab).
+.vercel
+.env*
