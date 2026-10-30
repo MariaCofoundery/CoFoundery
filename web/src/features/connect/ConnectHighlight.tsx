@@ -63,20 +63,31 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
           <Link
             key={`${highlight.kind}:${highlight.id}`}
             href={highlight.href}
-            className="connect-highlight-card flex min-w-0 flex-col break-words rounded-3xl border border-violet-100 bg-white p-5 shadow-[0_10px_28px_rgba(109,73,224,0.10)] hover:border-violet-300"
+            className="connect-highlight-card relative flex min-w-0 flex-col break-words rounded-3xl border border-violet-100 bg-white p-5 shadow-[0_10px_28px_rgba(109,73,224,0.10)] hover:border-violet-300"
           >
             {/* JEDE KARTE SAGT, WARUM SIE HIER STEHT: Zufall, Empfehlung oder
                 Anzeige. Auch der Zufall bekommt eine Marke - sonst waere nur
                 der Rest gekennzeichnet, und "nichts dran" las sich als
                 Empfehlung. */}
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            {/* Angepinnt zeigt eine Nadel in der Ecke statt eines Wortes; der Text bleibt fuer Screenreader. */}
+            {highlight.pinned ? (
+              <span
+                role="img"
+                aria-label={t("pinned")}
+                title={t("pinned")}
+                className="absolute -right-2 -top-3 grid h-9 w-9 rotate-[18deg] place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path d="M9 3h6l-.9 6.2 3.4 3.3v1.5h-5.5V21l-1-1.2-1 1.2v-6H4.5v-1.5l3.4-3.3z" fill="#ec4899" stroke="#be185d" strokeWidth="1.2" strokeLinejoin="round" />
+                  <circle cx="12" cy="6" r="1.1" fill="#fff" opacity=".7" />
+                </svg>
+              </span>
+            ) : null}
+            <div className={`flex flex-wrap items-center justify-between gap-2${highlight.pinned ? " pr-6" : ""}`}>
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${DISCLOSURE_STYLE[highlight.disclosure]}`}>
                 {t(`disclosures.${highlight.disclosure}`)}
               </span>
               <span className="flex items-center gap-2 text-xs text-slate-500">
-                {highlight.pinned ? (
-                  <span className="rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-800">{t("pinned")}</span>
-                ) : null}
                 {t(`disclosureMeta.${highlight.disclosure}`)}
               </span>
             </div>
