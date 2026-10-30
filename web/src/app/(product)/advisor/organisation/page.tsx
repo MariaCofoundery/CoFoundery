@@ -10,6 +10,8 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
+import { getOrgTeamPrograms, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -35,7 +37,7 @@ const TAB_OF = (value: string | undefined): Tab => TABS.find((tab) => tab === va
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -77,11 +79,14 @@ export default async function AdvisorOrganisationPage({
 
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
-  const [seatsUsed, members, teams, people] = await Promise.all([
+  const needsPrograms = tab === "settings";
+  const [seatsUsed, members, teams, people, programs, invites] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
+    needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
+    needsPrograms && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -190,7 +195,12 @@ export default async function AdvisorOrganisationPage({
           </section>
         ) : null}
 
-        {tab === "settings" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} /> : null}
+        {tab === "settings" ? (
+          <>
+            <AdvisorOrgSection orgs={[org]} members={members} error={orgError} />
+            <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} />
+          </>
+        ) : null}
       </div>
     </main>
   );

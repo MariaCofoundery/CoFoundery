@@ -37,6 +37,8 @@ export function isProductChromePath(pathname: string) {
     pathname.startsWith("/report/") ||
     pathname.startsWith("/founder-alignment/") ||
     pathname.startsWith("/teams/") ||
+    pathname === "/programm" ||
+    pathname.startsWith("/programm/") ||
     pathname === "/invite/new"
   );
 }

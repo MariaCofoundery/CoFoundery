@@ -324,6 +324,24 @@ export default function DatenschutzPage() {
             </p>
           </BulletSection>
 
+          <BulletSection number="9b" title="Teilnahme an einem Programm einer Organisation">
+            <p>
+              Eine Advisor-Organisation, zum Beispiel ein Accelerator, kann dein Team zu ihrem
+              Programm einladen. Die Teilnahme beginnt erst, wenn jede Person im Team ausdrücklich
+              zugestimmt hat. Kommt jemand ins Team, ist die Zustimmung für das Team nicht mehr
+              vollständig, bis auch diese Person zugestimmt hat. Jede Person im Team kann die
+              Teilnahme jederzeit beenden.
+            </p>
+            <List
+              items={[
+                "Wir speichern, welches Team in welchem Programm ist, wer zugestimmt hat und wann.",
+                "Sehen können das Programm die Inhaberinnen und Inhaber der Organisation sowie die Bezugspersonen, die der Organisation deinem Team zuordnet. Du siehst, wer das ist.",
+                "Die Teilnahme öffnet keine weiteren Freigaben: Arbeitsweisen, Founder Setup und Team-Review bleiben getrennte Entscheidungen.",
+                "Beendest du die Teilnahme, endet der Zugriff der Organisation auf das Programm; zugeordnete Bezugspersonen werden entfernt.",
+              ]}
+            />
+          </BulletSection>
+
           <BulletSection number="10" title="FIND – Mitgründende finden">
             <List
               items={[

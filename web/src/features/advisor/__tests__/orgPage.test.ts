@@ -20,5 +20,17 @@ test("die Seite zeigt Zaehler und Plaetze - keine Gesamtwertung, keine Rangfolge
 test("Aktionen der Organisation kehren in den Reiter Mitglieder und Einstellungen zurueck", () => {
   const actions = readFileSync("src/features/advisor/orgActions.ts", "utf8");
   assert.match(actions, /const TAB = "tab=settings"/);
-  assert.match(page, /tab === "settings" \? <AdvisorOrgSection/);
+  assert.match(page, /tab === "settings" \? \(\s*<>\s*<AdvisorOrgSection/);
+  assert.match(page, /<OrgTeamProgramsSection/);
+});
+
+test("Team-Programm: Zustimmung und Einloesen laufen nur ueber die Datenbankfunktionen, der Link steht nur einmal da", () => {
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  for (const rpc of ["create_team_program_invite", "start_team_program", "consent_team_program", "end_team_program", "set_team_program_contacts"]) {
+    assert.match(actions, new RegExp(`rpc\\("${rpc}"`));
+  }
+  assert.match(actions, /createHash\("sha256"\)/);
+  const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(section, /inviteShownOnce/);
+  assert.match(section, /\[0-9a-f\]\{48\}/);
 });
