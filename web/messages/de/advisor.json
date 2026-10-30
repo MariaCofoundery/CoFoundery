@@ -673,7 +673,7 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
-      "tabs": "Übersicht | Teams | Personen | Mitglieder und Einstellungen",
+      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder und Einstellungen",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -795,6 +795,21 @@
     "dashNoBatch": "ohne Batch",
     "dashNoCategory": "ohne Kategorie",
     "dashEmpty": "Noch kein Team im Programm.",
-    "dashNone": "Kein Team passt zu diesem Filter."
+    "dashNone": "Kein Team passt zu diesem Filter.",
+    "accessTitle": "Freigaben",
+    "accessText": "Was dein Zugang zu den Teams im Programm gerade zeigt. Das Programm selbst öffnet nichts davon: Jede Einsicht ist eine eigene Entscheidung des Teams.",
+    "accessProgram": "Programmdaten",
+    "accessReview": "Team-Review",
+    "accessSetup": "Founder Setup",
+    "accessActive": "für dich freigegeben",
+    "accessNone": "nicht freigegeben",
+    "accessRequested": "angefragt, wartet auf Zustimmung",
+    "accessWorkstyle": "Der Arbeitsweisen-Teambericht ist nur über eine aktive Team-Review erreichbar.",
+    "accessAsk": "Wenn du eine Einsicht brauchst, sprich das Team an. Anfragen laufen über Gruppenauswertungen (Team-Review) und den Zugang zum Founder Setup.",
+    "accessNoneRight": "Nicht freigegeben ist eine gültige Antwort und kein Mangel.",
+    "accessEmpty": "Noch kein Team im Programm.",
+    "accessTeam": "Team",
+    "accessReviewsLink": "Gruppenauswertungen öffnen",
+    "tabAccess": "Freigaben"
   }
 }

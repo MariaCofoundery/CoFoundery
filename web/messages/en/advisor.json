@@ -673,7 +673,7 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "tabs": "Overview | Teams | People | Members and settings",
+      "tabs": "Overview | Teams | People | Approvals | Members and settings",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -795,6 +795,21 @@
     "dashNoBatch": "no batch",
     "dashNoCategory": "no category",
     "dashEmpty": "No team in the program yet.",
-    "dashNone": "No team matches this filter."
+    "dashNone": "No team matches this filter.",
+    "accessTitle": "Approvals",
+    "accessText": "What your access to the teams in the program shows right now. The program itself opens none of this: every view is the team's own decision.",
+    "accessProgram": "Program data",
+    "accessReview": "Team review",
+    "accessSetup": "Founder Setup",
+    "accessActive": "shared with you",
+    "accessNone": "not shared",
+    "accessRequested": "requested, waiting for consent",
+    "accessWorkstyle": "The work style team report is only reachable through an active team review.",
+    "accessAsk": "If you need a view, talk to the team. Requests go through group evaluations (team review) and access to Founder Setup.",
+    "accessNoneRight": "Not shared is a valid answer and not a shortcoming.",
+    "accessEmpty": "No team in the program yet.",
+    "accessTeam": "Team",
+    "accessReviewsLink": "Open group evaluations",
+    "tabAccess": "Approvals"
   }
 }

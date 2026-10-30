@@ -12,7 +12,8 @@ import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramAccess, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -21,7 +22,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "settings"] as const;
+const TABS = ["overview", "teams", "people", "access", "settings"] as const;
 type Tab = (typeof TABS)[number];
 const TAB_OF = (value: string | undefined): Tab => TABS.find((tab) => tab === value) ?? "overview";
 
@@ -80,8 +81,8 @@ export default async function AdvisorOrganisationPage({
 
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
-  const needsPrograms = tab === "settings" || tab === "overview";
-  const [seatsUsed, members, teams, people, programs, invites, deadlines] = await Promise.all([
+  const needsPrograms = tab === "settings" || tab === "overview" || tab === "access";
+  const [seatsUsed, members, teams, people, programs, invites, deadlines, access] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
@@ -89,6 +90,7 @@ export default async function AdvisorOrganisationPage({
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
     needsPrograms && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
+    tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -211,6 +213,10 @@ export default async function AdvisorOrganisationPage({
             <h2 id="org-people-title" className="text-xl font-semibold text-slate-950">{t("orgPage.peopleTitle")}</h2>
             <AccompaniedPeopleList people={people} />
           </section>
+        ) : null}
+
+        {tab === "access" ? (
+          <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}
 
         {tab === "settings" ? (

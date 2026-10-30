@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "settings"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "settings"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -85,4 +85,13 @@ test("Programm-Hinweis: die Organisation wird beim Anzeigen gelesen, nicht in de
   const sql = readFileSync("../supabase/migrations/20270124120000_program_invited_notice.sql", "utf8");
   assert.match(sql, /'program_invited'/);
   assert.match(sql, /m\.user_id <> v_user/);
+});
+
+test("Freigaben-Uebersicht: nur Staende, keine Gesamtzahl, nicht freigegeben ist eine gueltige Antwort", () => {
+  const ui = readFileSync("src/features/advisor/ProgramAccess.tsx", "utf8");
+  assert.match(ui, /accessNoneRight/);
+  assert.doesNotMatch(ui, /score|rank|percent|compatib|ampel|traffic/i);
+  const sql = readFileSync("../supabase/migrations/20270125120000_program_access_overview.sql", "utf8");
+  assert.match(sql, /team_access_ended_at is null/);
+  assert.match(sql, /team_program_is_active\(p\.id\)/);
 });

@@ -189,3 +189,14 @@ export async function getProgramProfile(client: SupabaseClient, programId: strin
     contactPhone: row.contact_phone ?? null,
   };
 }
+
+export type ProgramAccess = { programId: string; teamReview: "active" | "none"; founderSetup: "active" | "requested" | "none" };
+
+export async function getProgramAccess(client: SupabaseClient, orgId: string): Promise<ProgramAccess[]> {
+  const { data } = await client.rpc("get_program_access_for_me", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, string>[]).map((row) => ({
+    programId: row.program_id,
+    teamReview: row.team_review === "active" ? "active" : "none",
+    founderSetup: row.founder_setup === "active" ? "active" : row.founder_setup === "requested" ? "requested" : "none",
+  }));
+}
