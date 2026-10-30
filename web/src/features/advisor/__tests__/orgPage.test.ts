@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "page", "profile"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "page", "profile"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -287,4 +287,18 @@ test("Organisation: eine Infobox sagt, dass beim Beenden nichts aufbewahrt wird"
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.retentionText, locale);
   }
+});
+
+test("Programmplan: Inhaber legt an, Inhaber und Bezugspersonen tragen ein, das Team sieht nur den eigenen Eintrag, keine Wertung", () => {
+  const sql = readFileSync("../supabase/migrations/20270208120000_program_plan.sql", "utf8");
+  assert.match(sql, /save_program_event[\s\S]*is_advisor_org_owner_of\(p_org_id\)/);
+  assert.match(sql, /team_program_contacts c where c\.program_id = p_program_id/);
+  assert.match(sql, /delete_attendance_when_program_ends/);
+  assert.match(sql, /get_my_program_events[\s\S]*team_program_is_active/);
+  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
+  const mine = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.doesNotMatch(plan + mine, /score|rank|percent|compatib|ampel|traffic/i);
+  // Das Team liest ueber die eigene Funktion, nie die Teilnahmeliste der Organisation.
+  assert.match(mine, /getMyProgramEvents/);
+  assert.doesNotMatch(mine, /getEventAttendance/);
 });

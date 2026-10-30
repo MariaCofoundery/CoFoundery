@@ -267,3 +267,50 @@ export async function getProgramConfirmedSetup(client: SupabaseClient, programId
   if (error || !Array.isArray(data)) return [];
   return buildAdvisorConfirmedFounderSetup(data as AdvisorConfirmedFounderSetupRow[]);
 }
+
+export type ProgramEvent = {
+  eventId: string;
+  title: string;
+  kind: "education" | "internal" | "external";
+  startsAt: string;
+  location: string | null;
+  notes: string | null;
+  todos: string | null;
+};
+export type MyProgramEvent = ProgramEvent & { programId: string; orgName: string; myStatus: "present" | "absent" | "excused" | null };
+export type EventAttendanceRow = { programId: string; teamName: string | null; status: "present" | "absent" | "excused" | null };
+
+const eventOf = (row: Record<string, unknown>): ProgramEvent => ({
+  eventId: row.event_id as string,
+  title: row.title as string,
+  kind: row.kind === "internal" ? "internal" : row.kind === "external" ? "external" : "education",
+  startsAt: row.starts_at as string,
+  location: (row.location as string | null) ?? null,
+  notes: (row.notes as string | null) ?? null,
+  todos: (row.todos as string | null) ?? null,
+});
+const statusOf = (value: unknown) => (value === "present" || value === "absent" || value === "excused" ? value : null);
+
+export async function listProgramEvents(client: SupabaseClient, orgId: string): Promise<ProgramEvent[]> {
+  const { data } = await client.rpc("list_program_events", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map(eventOf);
+}
+
+export async function getEventAttendance(client: SupabaseClient, eventId: string): Promise<EventAttendanceRow[]> {
+  const { data } = await client.rpc("get_event_attendance", { p_event_id: eventId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    programId: row.program_id as string,
+    teamName: (row.team_name as string | null) ?? null,
+    status: statusOf(row.status),
+  }));
+}
+
+export async function getMyProgramEvents(client: SupabaseClient): Promise<MyProgramEvent[]> {
+  const { data } = await client.rpc("get_my_program_events");
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    ...eventOf(row),
+    programId: row.program_id as string,
+    orgName: row.org_name as string,
+    myStatus: statusOf(row.my_status),
+  }));
+}

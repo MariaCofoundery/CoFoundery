@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { consentTeamProgramAction, endTeamProgramAction, openTeamProgramCodeAction, setTeamProgramSoloAction } from "@/features/advisor/teamProgramActions";
 import {
@@ -14,6 +15,7 @@ import {
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
+import { getMyProgramEvents } from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -29,6 +31,8 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   if (!user) redirect(buildLoginRedirectPath("/programm"));
   const client = await createClient();
   const programs = await getMyTeamPrograms(client);
+  const planEvents = await getMyProgramEvents(client);
+  const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short" });
   const updatesByProgram = new Map(
     await Promise.all(
       programs
@@ -71,6 +75,30 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
         {query.code === "invalid" ? <p role="alert" className="text-xs text-rose-800">{t("codeEntryInvalid")}</p> : null}
         <SubmitButton label={t("codeEntryGo")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white" />
       </form>
+
+      {planEvents.length > 0 ? (
+        <section aria-labelledby="my-plan-title" className="mt-6 rounded-3xl border border-slate-200 bg-white p-5">
+          <h2 id="my-plan-title" className="text-lg font-semibold text-slate-950">{t("myPlanTitle")}</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-600">{t("myPlanText")}</p>
+          <ul className="mt-3 divide-y divide-slate-100">
+            {planEvents.map((event) => (
+              <li key={`${event.programId}-${event.eventId}`} className="py-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="font-semibold text-slate-950">{event.title}</span>
+                  <span className="text-sm text-slate-600">{dateFormat.format(new Date(event.startsAt))}</span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  {event.orgName} · {t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
+                  {event.location ? ` · ${event.location}` : ""}
+                </p>
+                {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{event.notes}</p> : null}
+                {event.todos ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><span className="font-semibold">{t("planTodos")}: </span>{event.todos}</p> : null}
+                {event.myStatus ? <p className="mt-1 text-xs font-semibold text-violet-800">{t("myAttendance", { status: t(`attend_${event.myStatus}`) })}</p> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {programs.length === 0 ? (
         <p className="mt-6 text-sm text-slate-600">{t("pageEmpty")}</p>

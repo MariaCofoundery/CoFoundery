@@ -29,6 +29,8 @@ async function requireUser(next: string) {
 
 const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
+const orgPlanTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
 const orgPageTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=page${extra}`;
 
@@ -383,4 +385,52 @@ export async function enterProgramCodeFromPageAction(formData: FormData) {
   const code = normalizeCode(String(formData.get("code") ?? ""));
   if (code.length !== 8) redirect(`/p/${slug}?code=invalid`);
   redirect(`/programm/code/${code}`);
+}
+
+/** Programmplan: Veranstaltung anlegen oder aendern. Nur der Inhaber; die Datenbank prueft das. */
+export async function saveProgramEventAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const when = new Date(String(formData.get("startsAt") ?? ""));
+  const kind = String(formData.get("kind") ?? "education");
+  if (Number.isNaN(when.getTime()) || !["education", "internal", "external"].includes(kind)) {
+    redirect(orgPlanTab(orgId, "&planError=invalid"));
+  }
+  const { error } = await client.rpc("save_program_event", {
+    p_org_id: orgId,
+    p_event_id: String(formData.get("eventId") ?? "") || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 160),
+    p_kind: kind,
+    p_starts_at: when.toISOString(),
+    p_location: String(formData.get("location") ?? "").slice(0, 200),
+    p_notes: String(formData.get("notes") ?? "").slice(0, 2000),
+    p_todos: String(formData.get("todos") ?? "").slice(0, 2000),
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&planError=failed" : "&planSaved=1"));
+}
+
+export async function deleteProgramEventAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  await client.rpc("delete_program_event", { p_event_id: String(formData.get("eventId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId));
+}
+
+/** Teilnahme eintragen (Inhaber oder Bezugsperson des Teams); leer nimmt den Eintrag zurueck. */
+export async function setProgramAttendanceAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const status = String(formData.get("status") ?? "");
+  await client.rpc("set_program_attendance", {
+    p_event_id: String(formData.get("eventId") ?? ""),
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_status: ["present", "absent", "excused"].includes(status) ? status : null,
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(String(formData.get("eventId") ?? ""))}`));
 }
