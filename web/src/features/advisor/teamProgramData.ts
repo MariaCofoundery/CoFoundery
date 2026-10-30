@@ -101,3 +101,43 @@ export async function getTeamProgramInviteOptions(
     memberCount: Number(row.member_count ?? 0),
   }));
 }
+
+export type ProgramMilestone = {
+  milestoneId: string;
+  title: string;
+  dueOn: string | null;
+  targetCount: number | null;
+  doneCount: number;
+};
+
+export type MilestoneDeadline = {
+  programId: string;
+  teamName: string | null;
+  title: string;
+  dueOn: string;
+  targetCount: number | null;
+  doneCount: number;
+};
+
+export async function listProgramMilestones(client: SupabaseClient, programId: string): Promise<ProgramMilestone[]> {
+  const { data } = await client.rpc("list_team_program_milestones", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    milestoneId: row.milestone_id as string,
+    title: row.title as string,
+    dueOn: (row.due_on as string | null) ?? null,
+    targetCount: row.target_count === null || row.target_count === undefined ? null : Number(row.target_count),
+    doneCount: Number(row.done_count ?? 0),
+  }));
+}
+
+export async function getOrgMilestoneDeadlines(client: SupabaseClient, orgId: string): Promise<MilestoneDeadline[]> {
+  const { data } = await client.rpc("get_org_milestone_deadlines", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    programId: row.program_id as string,
+    teamName: (row.team_name as string | null) ?? null,
+    title: row.milestone_title as string,
+    dueOn: row.due_on as string,
+    targetCount: row.target_count === null || row.target_count === undefined ? null : Number(row.target_count),
+    doneCount: Number(row.done_count ?? 0),
+  }));
+}

@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { consentTeamProgramAction, endTeamProgramAction } from "@/features/advisor/teamProgramActions";
-import { getMyTeamPrograms } from "@/features/advisor/teamProgramData";
+import { getMyTeamPrograms, listProgramMilestones } from "@/features/advisor/teamProgramData";
+import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -16,7 +17,13 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
     data: { user },
   } = await getRequestUser();
   if (!user) redirect(buildLoginRedirectPath("/programm"));
-  const programs = await getMyTeamPrograms(await createClient());
+  const client = await createClient();
+  const programs = await getMyTeamPrograms(client);
+  const milestonesByProgram = new Map(
+    await Promise.all(
+      programs.filter((program) => program.isActive).map(async (program) => [program.programId, await listProgramMilestones(client, program.programId)] as const),
+    ),
+  );
   const isNew = ((await searchParams) ?? {}).neu === "1";
 
   return (
@@ -66,6 +73,11 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 </form>
               </div>
               <p className="mt-1 text-xs text-slate-500">{t("endHint")}</p>
+              {program.isActive ? (
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>

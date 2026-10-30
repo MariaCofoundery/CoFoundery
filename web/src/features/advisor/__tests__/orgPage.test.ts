@@ -34,3 +34,15 @@ test("Team-Programm: Zustimmung und Einloesen laufen nur ueber die Datenbankfunk
   assert.match(section, /inviteShownOnce/);
   assert.match(section, /\[0-9a-f\]\{48\}/);
 });
+
+test("Meilensteine: Fortschritt ist eine Zahl gegen das eigene Ziel, die Rueckkehr ist begrenzt, es gibt keine Wertung", () => {
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_team_program_milestone"/);
+  assert.match(actions, /safeReturn/);
+  const ui = readFileSync("src/features/advisor/ProgramMilestones.tsx", "utf8");
+  assert.match(ui, /msProgress/);
+  assert.doesNotMatch(ui, /score|rank|compatib|ampel|traffic/i);
+  const sql = readFileSync("../supabase/migrations/20270118120000_team_program_milestones.sql", "utf8");
+  assert.match(sql, /can_use_team_program/);
+  assert.match(sql, /team_program_is_active\(p_program_id\)/);
+});

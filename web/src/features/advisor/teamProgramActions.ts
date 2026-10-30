@@ -85,3 +85,43 @@ export async function endTeamProgramAction(formData: FormData) {
   revalidatePath("/programm");
   redirect("/programm");
 }
+
+/** Zurueck nur auf die eigenen Programmseiten - kein freies Ziel aus dem Formular. */
+const safeReturn = (value: FormDataEntryValue | null) => {
+  const text = String(value ?? "");
+  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}(\?tab=meilensteine)?$/.test(text) ? text : "/programm";
+};
+const toInt = (value: FormDataEntryValue | null) => {
+  const text = String(value ?? "").trim();
+  return /^\d{1,4}$/.test(text) ? Number(text) : null;
+};
+
+export async function saveProgramMilestoneAction(formData: FormData) {
+  const back = safeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  const due = String(formData.get("dueOn") ?? "").trim();
+  const target = toInt(formData.get("target"));
+  await client.rpc("save_team_program_milestone", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_milestone_id: String(formData.get("milestoneId") ?? "") || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 160),
+    p_due_on: /^\d{4}-\d{2}-\d{2}$/.test(due) ? due : null,
+    p_target_count: target && target > 0 ? target : null,
+    p_done_count: toInt(formData.get("done")) ?? 0,
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+export async function deleteProgramMilestoneAction(formData: FormData) {
+  const back = safeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("delete_team_program_milestone", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_milestone_id: String(formData.get("milestoneId") ?? ""),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}

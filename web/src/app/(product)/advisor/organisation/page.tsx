@@ -11,7 +11,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
-import { getOrgTeamPrograms, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -80,13 +80,14 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "settings";
-  const [seatsUsed, members, teams, people, programs, invites] = await Promise.all([
+  const [seatsUsed, members, teams, people, programs, invites, deadlines] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
     needsPrograms && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
+    tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -172,6 +173,21 @@ export default async function AdvisorOrganisationPage({
                 </div>
               ))}
             </dl>
+            {deadlines.length > 0 ? (
+              <section aria-labelledby="org-deadlines-title" className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <h2 id="org-deadlines-title" className="text-sm font-semibold text-slate-900">{tAdvisor("teamProgram.deadlinesTitle")}</h2>
+                <p className="mt-1 text-xs leading-6 text-slate-600">{tAdvisor("teamProgram.deadlinesText")}</p>
+                <ul className="mt-2 grid gap-1 text-sm text-slate-800">
+                  {deadlines.map((entry, index) => (
+                    <li key={`${entry.programId}-${index}`}>
+                      <Link href={`/advisor/programm/${entry.programId}?tab=meilensteine`} className="underline-offset-4 hover:underline">
+                        {tAdvisor("teamProgram.deadlineLine", { team: entry.teamName ?? tAdvisor("teamProgram.unnamedTeam"), title: entry.title, date: entry.dueOn })}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
             <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("orgPage.overviewNote")}</p>
           </div>
         ) : null}

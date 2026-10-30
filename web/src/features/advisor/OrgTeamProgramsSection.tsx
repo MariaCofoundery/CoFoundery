@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   createTeamProgramInviteAction,
@@ -103,6 +104,11 @@ export async function OrgTeamProgramsSection({
                       : t("statusWaiting", { approved: program.approvedCount, total: program.memberCount })}
                   </span>
                 </div>
+                {program.isActive ? (
+                  <Link href={`/advisor/programm/${program.programId}`} className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+                    {t("openTeam")}
+                  </Link>
+                ) : null}
                 {isOwner ? (
                   <form action={setTeamProgramContactsAction} className="mt-3">
                     <input type="hidden" name="orgId" value={org.id} />
