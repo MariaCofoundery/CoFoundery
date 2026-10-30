@@ -15,12 +15,14 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
     redirect(`/login?next=${encodeURIComponent(teamId ? `/invite/new?team=${teamId}` : "/invite/new")}`);
   }
 
+  let freeSlots = 3;
   let targetTeam: { id: string; name: string; context: "pre_founder" | "existing_team" } | undefined;
   if (teamId) {
     const { getFounderTeamHomebase } = await import("@/features/teams/founderTeamHomebaseData");
     const team = await getFounderTeamHomebase(teamId, user.id, await createClient());
     if (!team) return <TeamUnavailable teamId={teamId} />;
     if (team.members.length >= 4) redirect(`/teams/${teamId}`);
+    freeSlots = Math.max(1, 4 - team.members.length);
     targetTeam = { id: team.id, name: team.name ?? team.members.map(m => m.displayName ?? "Founder").join(" + "), context: team.teamContext };
   }
 
@@ -45,7 +47,7 @@ export default async function NewInvitePage({ searchParams }: { searchParams: Pr
         </p>
       </header>
       <div className="mt-8">
-        <CoFounderInviteForm targetTeam={targetTeam} />
+        <CoFounderInviteForm targetTeam={targetTeam} freeSlots={freeSlots} />
       </div>
     </main>
   );

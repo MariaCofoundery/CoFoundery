@@ -664,7 +664,19 @@
     "dashboardCta": "Go to dashboard",
     "sharingTitle": "What is shared",
     "sharingNote": "The invitation shares nothing automatically. After accepting, each person decides for themselves what to share with the other. Your shared report only appears once everyone has shared their work style with each other, then for all of you at the same time.",
-    "optionalName": "Name your team or project (optional)"
+    "optionalName": "Name your team or project (optional)",
+    "many": {
+      "label": "Co-founders' email addresses",
+      "add": "Add",
+      "remove": "Remove {email}",
+      "hint": "Separate several addresses with Enter, comma or space; you can paste a list. Up to {count} places are still free in the team.",
+      "invalid": "At least one address does not look right. Please check it.",
+      "submit": "Send invitations",
+      "resultTitle": "Result",
+      "sent": "Invitation sent by email.",
+      "manual": "The email did not go out. Please pass this link on yourself:",
+      "backToTeam": "Back to the team"
+    }
   },
   "participantInvite": {
     "projectLabel": "Team or project name",

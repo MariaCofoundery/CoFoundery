@@ -253,3 +253,13 @@ test("Programm schliesst das Founder Setup ein: nur lesend, nur gemeinsam bestae
   const privacy = readFileSync("src/app/datenschutz/page.tsx", "utf8");
   assert.match(privacy, /bestätigten Vereinbarungen im Founder Setup, nur lesend/);
 });
+
+test("Mitgruender:innen: mehrere Adressen nur mit Zielteam, jede Einladung einzeln, Label roh uebergeben", () => {
+  const form = readFileSync("src/features/dashboard/CoFounderInviteForm.tsx", "utf8");
+  assert.match(form, /targetTeam \? \(\s*<EmailChipsField/);
+  assert.match(form, /t\.raw\("many\.remove"\) as string/);
+  // Jede Adresse bekommt ihre eigene Einladung ins Zielteam; ein Fehler stoppt die anderen nicht.
+  assert.match(form, /for \(const invitedEmail of emails\)[\s\S]*targetTeamId/);
+  const page = readFileSync("src/app/(product)/invite/new/page.tsx", "utf8");
+  assert.match(page, /4 - team\.members\.length/);
+});

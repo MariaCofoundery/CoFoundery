@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createCoFounderInvitationAction } from "@/app/(product)/dashboard/actions";
+import { EmailChipsField } from "@/features/advisor/EmailChipsField";
 import { toPublicAppUrl } from "@/lib/publicAppOrigin";
 type TeamContext = "pre_founder" | "existing_team";
 
@@ -11,7 +12,20 @@ function toAbsoluteUrl(path: string) {
   return typeof window === "undefined" ? path : toPublicAppUrl(path, window.location.origin);
 }
 
-export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string; name: string; context: TeamContext } }) {
+type InviteOutcome = { email: string; ok: boolean; sent: boolean; url: string | null; error: string | null };
+
+/**
+ * Mit einem Zielteam koennen mehrere Mitgruender:innen auf einmal eingeladen werden (so viele,
+ * wie das Team noch Plaetze hat). Ohne Zielteam bleibt es bei einer Adresse: Mehrere
+ * Einladungen ohne gemeinsames Team wuerden sich nicht zu einem Team zusammenfinden.
+ */
+export function CoFounderInviteForm({
+  targetTeam,
+  freeSlots = 3,
+}: {
+  targetTeam?: { id: string; name: string; context: TeamContext };
+  freeSlots?: number;
+}) {
   const router = useRouter();
   const t = useTranslations("dashboard.coFounderInviteForm");
   const [label, setLabel] = useState(targetTeam?.name ?? "");
@@ -25,6 +39,7 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
     recipient: string;
     message: string;
   } | null>(null);
+  const [outcomes, setOutcomes] = useState<InviteOutcome[]>([]);
   const [isPending, startTransition] = useTransition();
 
   const teamContextLabel =
@@ -34,6 +49,10 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (targetTeam) {
+      await onSubmitMany(new FormData(event.currentTarget));
+      return;
+    }
     const invitedEmail = email.trim().toLowerCase();
     if (!invitedEmail || !invitedEmail.includes("@")) {
       setError(t("validation.email"));
@@ -56,7 +75,7 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
       // den aktuellen Weg, der diese Module nicht kennt.
       formData.set("includeValues", "false");
       formData.set("teamContext", teamContext);
-      if (targetTeam) formData.set("targetTeamId", targetTeam.id);
+      // Mit Zielteam laeuft die Einladung ueber onSubmitMany; hier gibt es nur den Weg ohne Team.
 
       const result = await createCoFounderInvitationAction(formData);
       if (!result.ok) {
@@ -86,6 +105,41 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
     });
   };
 
+  /** Mehrere Adressen nacheinander einladen; jede Einladung ist eine eigene, ein Fehler stoppt die anderen nicht. */
+  const onSubmitMany = async (form: FormData) => {
+    const typed = String(form.get("emailDraft") ?? "").trim().toLowerCase();
+    const emails = [...new Set([...form.getAll("email").map((entry) => String(entry).toLowerCase()), ...(typed ? [typed] : [])])];
+    if (emails.length === 0 || emails.some((entry) => !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(entry))) {
+      setError(t("validation.email"));
+      return;
+    }
+    if (!targetTeam) return;
+    setError(null);
+    setCopyNotice(null);
+    setResultState(null);
+    setInviteUrl(null);
+    setOutcomes([]);
+    startTransition(async () => {
+      const results: InviteOutcome[] = [];
+      for (const invitedEmail of emails) {
+        const formData = new FormData();
+        formData.set("label", label.trim());
+        formData.set("invitedEmail", invitedEmail);
+        formData.set("includeValues", "false");
+        formData.set("teamContext", targetTeam.context);
+        formData.set("targetTeamId", targetTeam.id);
+        const result = await createCoFounderInvitationAction(formData);
+        results.push(
+          result.ok
+            ? { email: invitedEmail, ok: true, sent: result.emailStatus === "sent", url: toAbsoluteUrl(result.inviteUrl), error: null }
+            : { email: invitedEmail, ok: false, sent: false, url: null, error: mapInviteActionError(result.error, t) }
+        );
+        setOutcomes([...results]);
+      }
+      router.refresh();
+    });
+  };
+
   const onCopy = async () => {
     if (!inviteUrl) return;
     try {
@@ -102,7 +156,16 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
       className="scroll-mt-24 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_16px_40px_rgba(15,23,42,.05)] sm:p-7"
     >
       <form onSubmit={onSubmit} className="space-y-6">
-        <div>
+        {targetTeam ? (
+          <EmailChipsField
+            label={t("many.label")}
+            addLabel={t("many.add")}
+            removeLabel={t.raw("many.remove") as string}
+            hint={t("many.hint", { count: freeSlots })}
+            invalidLabel={t("many.invalid")}
+            maxCount={Math.max(1, freeSlots)}
+          />
+        ) : <div>
           <label htmlFor="invite-email" className="text-sm font-semibold text-slate-900">
             {t("label.email")}
           </label>
@@ -115,7 +178,7 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
             placeholder="cofounder@example.com"
             className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900"
           />
-        </div>
+        </div>}
 
         {!targetTeam && <fieldset>
           <legend className="text-sm font-semibold text-slate-900">{t("teamContext.label")}</legend>
@@ -170,11 +233,32 @@ export function CoFounderInviteForm({ targetTeam }: { targetTeam?: { id: string;
           disabled={isPending}
           className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[linear-gradient(120deg,var(--brand-accent),var(--brand-primary))] px-6 text-base font-semibold text-slate-900 shadow-[0_10px_28px_rgba(124,58,237,0.16)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          {isPending ? t("submit.pending") : t("submit.idle")}
+          {isPending ? t("submit.pending") : targetTeam ? t("many.submit") : t("submit.idle")}
         </button>
       </form>
 
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
+
+      {outcomes.length > 0 ? (
+        <div className="mt-5 grid gap-2" role="status" aria-live="polite">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">{t("many.resultTitle")}</p>
+          <ul className="grid gap-2">
+            {outcomes.map((outcome) => (
+              <li
+                key={outcome.email}
+                className={`rounded-xl border px-4 py-3 text-sm ${outcome.ok ? (outcome.sent ? "border-emerald-200 bg-emerald-50/60 text-emerald-900" : "border-amber-200 bg-amber-50/60 text-amber-900") : "border-rose-200 bg-rose-50/60 text-rose-900"}`}
+              >
+                <span className="font-semibold">{outcome.email}</span>
+                <span className="block">{outcome.ok ? (outcome.sent ? t("many.sent") : t("many.manual")) : outcome.error}</span>
+                {outcome.ok && !outcome.sent && outcome.url ? (
+                  <span className="mt-1 block break-all rounded-md border border-amber-200 bg-white px-3 py-2 text-xs">{outcome.url}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <a href={`/teams/${encodeURIComponent(targetTeam?.id ?? "")}`} className="mt-1 inline-flex w-fit rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700">{t("many.backToTeam")}</a>
+        </div>
+      ) : null}
 
       {inviteUrl && resultState ? (
         <div

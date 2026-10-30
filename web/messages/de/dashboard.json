@@ -664,7 +664,19 @@
     "dashboardCta": "Zum Dashboard",
     "sharingTitle": "Was geteilt wird",
     "sharingNote": "Mit der Einladung wird nichts automatisch geteilt. Nach der Annahme entscheidet jede Person selbst, was sie für die andere freigibt. Euer gemeinsamer Bericht erscheint erst, wenn alle ihre Arbeitsweise füreinander freigegeben haben, dann für alle gleichzeitig.",
-    "optionalName": "Team oder Projekt benennen (optional)"
+    "optionalName": "Team oder Projekt benennen (optional)",
+    "many": {
+      "label": "E-Mail-Adressen der Mitgründer:innen",
+      "add": "Hinzufügen",
+      "remove": "{email} entfernen",
+      "hint": "Mehrere Adressen mit Enter, Komma oder Leerzeichen trennen; du kannst eine Liste einfügen. Es sind noch bis zu {count} Plätze im Team frei.",
+      "invalid": "Mindestens eine Adresse sieht nicht richtig aus. Bitte prüfe sie.",
+      "submit": "Einladungen senden",
+      "resultTitle": "Ergebnis",
+      "sent": "Einladung per E-Mail verschickt.",
+      "manual": "Die E-Mail ging nicht raus. Gib diesen Link bitte selbst weiter:",
+      "backToTeam": "Zurück zum Team"
+    }
   },
   "participantInvite": {
     "projectLabel": "Team- oder Projektname",
