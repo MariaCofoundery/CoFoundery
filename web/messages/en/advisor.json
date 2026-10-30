@@ -622,6 +622,7 @@
       "recentEmpty": "Nobody linked yet.",
       "programDeadline": "Deadline reached: {team}, \"{title}\", no progress entered yet",
       "programUpdate": "{overdue, select, yes {Update overdue} other {Update due}} on {date}: {team}",
+      "programFollowUp": "{overdue, select, yes {Follow-up overdue} other {Follow-up due}} on {date}: {team}",
       "tileTeams": "Teams in the program",
       "tileUpdates": "Updates in 14 days",
       "tileInvites": "open invitations"

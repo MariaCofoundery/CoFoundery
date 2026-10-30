@@ -314,3 +314,18 @@ export async function getMyProgramEvents(client: SupabaseClient): Promise<MyProg
     myStatus: statusOf(row.my_status),
   }));
 }
+
+/** Faellige Wiedervorlagen der eigenen Notizen an Programm-Teams (RLS: nur die eigenen), bis zu `withinDays` Tage voraus. */
+export async function listDueProgramFollowUps(client: SupabaseClient, withinDays = 7): Promise<{ programId: string; dueOn: string }[]> {
+  const horizon = new Date();
+  horizon.setDate(horizon.getDate() + withinDays);
+  const { data, error } = await client
+    .from("advisor_follow_ups")
+    .select("program_id, due_on")
+    .not("program_id", "is", null)
+    .is("completed_at", null)
+    .lte("due_on", horizon.toISOString().slice(0, 10))
+    .order("due_on", { ascending: true });
+  if (error || !Array.isArray(data)) return [];
+  return (data as { program_id: string; due_on: string }[]).map((row) => ({ programId: row.program_id, dueOn: row.due_on }));
+}

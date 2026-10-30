@@ -8,7 +8,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { getAccompaniedPeople, getMyAdvisorOrgs, withAccompaniedNames } from "@/features/advisor/orgData";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramUpdateDue } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramUpdateDue, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
@@ -36,7 +36,7 @@ export default async function AdvisorStartPage() {
 
   // Der angemeldete Zugang, nicht der privilegierte.
   const client = await createClient();
-  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, orgs] = await Promise.all([
+  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, orgs, programFollowUps] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
@@ -45,6 +45,7 @@ export default async function AdvisorStartPage() {
     withAccompaniedNames(client, await getAccompaniedPeople(client)),
     client.from("advisor_person_invites").select("id, status").eq("status", "sent"),
     getMyAdvisorOrgs(client),
+    listDueProgramFollowUps(client),
   ]);
   if (!roleViews.hasAdvisor) redirect("/dashboard");
 
@@ -98,6 +99,17 @@ export default async function AdvisorStartPage() {
       cta: t("start.view"),
       icon: "cal" as const,
     })),
+    ...programFollowUps.flatMap((entry) => {
+      const program = programData.flatMap((data) => data.active).find((candidate) => candidate.programId === entry.programId);
+      if (!program) return [];
+      return [{
+        key: `program-followup-${entry.programId}`,
+        text: t("start.programFollowUp", { team: program.teamName ?? t("kinds.unnamed"), date: entry.dueOn, overdue: entry.dueOn < todayIso ? "yes" : "no" }),
+        href: `/advisor/programm/${entry.programId}?tab=notizen`,
+        cta: t("start.open"),
+        icon: "flag" as const,
+      }];
+    }),
     ...overdueTeams.map((team) => ({
       key: `due-${team.invitationId}`,
       text: t("start.overdue", { name: teamName(team) }),

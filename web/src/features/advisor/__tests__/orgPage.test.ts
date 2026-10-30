@@ -312,3 +312,11 @@ test("Notizen am Programm-Team: nur Inhaber und Bezugspersonen, privat, enden mi
   const page = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
   assert.match(page, /kind: "program"/);
 });
+
+test("Heute zeigt faellige Wiedervorlagen an Programm-Teams, nur die eigenen", () => {
+  const page = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.match(page, /listDueProgramFollowUps\(client\)/);
+  assert.match(page, /tab=notizen/);
+  const data = readFileSync("src/features/advisor/teamProgramData.ts", "utf8");
+  assert.match(data, /from\("advisor_follow_ups"\)[\s\S]*not\("program_id", "is", null\)/);
+});
