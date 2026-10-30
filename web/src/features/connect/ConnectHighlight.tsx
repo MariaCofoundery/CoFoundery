@@ -75,7 +75,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
                 role="img"
                 aria-label={t("pinned")}
                 title={t("pinned")}
-                className="absolute -right-2 -top-3 grid h-9 w-9 rotate-[18deg] place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
+                className="absolute right-2.5 top-2.5 grid h-8 w-8 rotate-[18deg] place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(219,39,119,0.28)] ring-1 ring-pink-200"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                   <path d="M9 3h6l-.9 6.2 3.4 3.3v1.5h-5.5V21l-1-1.2-1 1.2v-6H4.5v-1.5l3.4-3.3z" fill="#ec4899" stroke="#be185d" strokeWidth="1.2" strokeLinejoin="round" />
@@ -83,7 +83,7 @@ export async function ConnectHighlight({ highlights }: { highlights: Highlight[]
                 </svg>
               </span>
             ) : null}
-            <div className={`flex flex-wrap items-center justify-between gap-2${highlight.pinned ? " pr-6" : ""}`}>
+            <div className={`flex flex-wrap items-center justify-between gap-2${highlight.pinned ? " pr-9" : ""}`}>
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${DISCLOSURE_STYLE[highlight.disclosure]}`}>
                 {t(`disclosures.${highlight.disclosure}`)}
               </span>
