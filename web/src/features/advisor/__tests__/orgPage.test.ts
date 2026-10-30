@@ -190,3 +190,10 @@ test("Programmseite: Farbe bleibt lesbar, Formatierung ist ein enger Eigenbau oh
   const sql = readFileSync("../supabase/migrations/20270131120000_program_page_accent.sql", "utf8");
   assert.match(sql, /program_accent ~ '\^#\[0-9a-f\]\{6\}\$'/);
 });
+
+test("Einladen: das Entfernen-Label mit {email} wird roh uebergeben, sonst bricht die Seite auf dem Server", () => {
+  // Vercel 30.10.2026: FORMATTING_ERROR "{email} entfernen" - t() verlangt den Wert, das Feld setzt ihn erst im Browser.
+  const section = readFileSync("src/features/advisor/PersonInviteSection.tsx", "utf8");
+  assert.match(section, /removeLabel=\{t\.raw\("removeEmail"\) as string\}/);
+  assert.doesNotMatch(section, /removeLabel=\{t\("removeEmail"\)\}/);
+});

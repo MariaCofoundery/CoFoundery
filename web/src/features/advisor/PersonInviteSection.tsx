@@ -56,7 +56,7 @@ export async function PersonInviteSection({
           <EmailChipsField
             label={t("emailLabel")}
             addLabel={t("addEmail")}
-            removeLabel={t("removeEmail")}
+            removeLabel={t.raw("removeEmail") as string}
             hint={t("emailsHint")}
             invalidLabel={t("emailInvalid")}
           />
