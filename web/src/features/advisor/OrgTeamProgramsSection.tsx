@@ -220,7 +220,7 @@ export async function OrgTeamProgramsSection({
                       </span>
                       <span className="block text-xs text-slate-500">
                         {entry.label ? `${entry.label} · ` : ""}
-                        {t("codeUses", { uses: entry.uses, max: entry.maxUses })} · {t("codeExpires", { date: entry.expiresAt.slice(0, 10) })}
+                        {t("codeUses", { uses: entry.uses, max: entry.maxUses })} · {t("codeAccounts", { accounts: entry.accounts, max: entry.maxUses * 5 })} · {t("codeExpires", { date: entry.expiresAt.slice(0, 10) })}
                         {entry.status === "revoked" ? ` · ${t("codeRevoked")}` : entry.status === "expired" ? ` · ${t("codeExpired")}` : ""}
                       </span>
                     </span>

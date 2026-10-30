@@ -282,6 +282,23 @@ export async function startTeamProgramByCodeAction(formData: FormData) {
 }
 
 /**
+ * Fuer Personen ohne Team: legt ein Team mit ihnen an und tritt dem Programm bei.
+ * Ohne Founder-Rolle gibt es kein Team (dieselbe Regel wie beim ersten Vorhaben).
+ */
+export async function createTeamForProgramCodeAction(formData: FormData) {
+  const code = normalizeCode(String(formData.get("code") ?? ""));
+  const client = await requireUser(`/programm/code/${code}`);
+  const { data, error } = await client.rpc("create_team_for_program_code", {
+    p_code: code,
+    p_name: String(formData.get("teamName") ?? "").trim().slice(0, 60) || null,
+  });
+  if (error?.message?.includes("not_a_founder")) redirect(`/programm/code/${code}?fehler=rolle`);
+  if (error || !data) redirect(`/programm/code/${code}?fehler=1`);
+  revalidatePath("/programm");
+  redirect("/programm?neu=1");
+}
+
+/**
  * Programmseite speichern: Kurzname, Willkommenstext, Haken "veroeffentlichen" und
  * optional ein neues Logo (als Bild-Daten aus dem Formular). Wer die
  * Organisation fuehrt, prueft die Datenbank; das Logo wird erst nach dieser

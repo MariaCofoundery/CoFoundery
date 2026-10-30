@@ -8,17 +8,23 @@ insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_co
 ('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000001','authenticated','authenticated','chefin@example.com','',now(),'{}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000002','authenticated','authenticated','kontakt@example.com','',now(),'{}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000003','authenticated','authenticated','a@example.com','',now(),'{}','{}',now(),now()),
-('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000004','authenticated','authenticated','andere@example.com','',now(),'{}','{}',now(),now());
+('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000004','authenticated','authenticated','andere@example.com','',now(),'{}','{}',now(),now()),
+('00000000-0000-0000-0000-000000000000','e5000000-0000-4000-8000-000000000005','authenticated','authenticated','b@example.com','',now(),'{}','{}',now(),now());
 insert into public.advisor_orgs(id, name) values ('e5000000-0000-4000-8000-0000000000a0', 'Programm Vier');
 insert into public.advisor_org_members(org_id, user_id, role, status) values
 ('e5000000-0000-4000-8000-0000000000a0','e5000000-0000-4000-8000-000000000001','owner','active'),
 ('e5000000-0000-4000-8000-0000000000a0','e5000000-0000-4000-8000-000000000002','advisor','active'),
 ('e5000000-0000-4000-8000-0000000000a0','e5000000-0000-4000-8000-000000000004','advisor','active');
 insert into public.founder_teams(id, name, team_context) values ('e5000000-0000-4000-8000-0000000000b0', 'Team Seeblick', 'existing_team');
-insert into public.founder_team_members(team_id, user_id) values ('e5000000-0000-4000-8000-0000000000b0','e5000000-0000-4000-8000-000000000003');
+-- Ein Team gilt erst ab zwei Personen als aktiv.
+insert into public.founder_team_members(team_id, user_id) values
+('e5000000-0000-4000-8000-0000000000b0','e5000000-0000-4000-8000-000000000003'),
+('e5000000-0000-4000-8000-0000000000b0','e5000000-0000-4000-8000-000000000005');
 insert into public.team_programs(id, org_id, team_id, status, activated_at) values
 ('e5000000-0000-4000-8000-0000000000c0','e5000000-0000-4000-8000-0000000000a0','e5000000-0000-4000-8000-0000000000b0','active', now());
-insert into public.team_program_consents(program_id, founder_user_id) values ('e5000000-0000-4000-8000-0000000000c0','e5000000-0000-4000-8000-000000000003');
+insert into public.team_program_consents(program_id, founder_user_id) values
+('e5000000-0000-4000-8000-0000000000c0','e5000000-0000-4000-8000-000000000003'),
+('e5000000-0000-4000-8000-0000000000c0','e5000000-0000-4000-8000-000000000005');
 insert into public.team_program_contacts(program_id, advisor_user_id) values ('e5000000-0000-4000-8000-0000000000c0','e5000000-0000-4000-8000-000000000002');
 
 set local role authenticated;

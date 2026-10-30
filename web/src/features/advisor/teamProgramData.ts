@@ -207,6 +207,7 @@ export type TeamProgramCode = {
   code: string;
   uses: number;
   maxUses: number;
+  accounts: number;
   expiresAt: string;
   status: "active" | "revoked" | "expired";
 };
@@ -219,6 +220,7 @@ export async function listTeamProgramCodes(client: SupabaseClient, orgId: string
     code: row.code as string,
     uses: Number(row.uses ?? 0),
     maxUses: Number(row.max_uses ?? 0),
+    accounts: Number(row.accounts ?? 0),
     expiresAt: row.expires_at as string,
     status: row.status === "revoked" ? "revoked" : row.status === "expired" ? "expired" : "active",
   }));

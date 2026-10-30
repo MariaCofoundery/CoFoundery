@@ -889,7 +889,16 @@
     "tileNextUpdate": "nächstes Update",
     "legendActive": "freigegeben",
     "legendRequested": "angefragt",
-    "legendNone": "nicht freigegeben (eine gültige Antwort)"
+    "legendNone": "nicht freigegeben (eine gültige Antwort)",
+    "codeAccounts": "{accounts} von {max} Konten",
+    "newTeamIntro": "Du hast noch kein Team. Leg hier eins an: Du trittst dem Programm gleich bei und kannst danach deine Mitgründer:innen einladen. Du kannst auch erst einmal allein starten.",
+    "newTeamName": "Name des Teams (optional)",
+    "newTeamHint": "Das Programm ist für die Organisation erst sichtbar, wenn mindestens zwei Personen im Team sind und alle zugestimmt haben.",
+    "newTeamCreate": "Team anlegen und beitreten",
+    "newTeamNeedsFounder": "Um ein Team anzulegen, brauchst du in deinem Profil die Rolle „Founder“. Ergänze sie und komme dann über deinen Code zurück.",
+    "waitingForCofounders": "Wartet auf Mitgründer:innen",
+    "waitingText": "Dein Team besteht bisher nur aus dir. Für die Organisation sichtbar wird es, sobald mindestens eine zweite Person dabei ist und zugestimmt hat.",
+    "waitingInvite": "Mitgründer:innen einladen"
   },
   "programPage": {
     "title": "Programmseite",

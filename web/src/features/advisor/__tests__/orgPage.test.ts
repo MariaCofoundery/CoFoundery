@@ -197,3 +197,20 @@ test("Einladen: das Entfernen-Label mit {email} wird roh uebergeben, sonst brich
   assert.match(section, /removeLabel=\{t\.raw\("removeEmail"\) as string\}/);
   assert.doesNotMatch(section, /removeLabel=\{t\("removeEmail"\)\}/);
 });
+
+test("Stufe 2: Team anlegen und beitreten, Konten zaehlen, Alleinstart wartet auf Mitgruender:innen", () => {
+  const sql = readFileSync("../supabase/migrations/20270202120000_program_new_teams.sql", "utf8");
+  // Aktiv erst ab zwei Personen; die Zustimmung gilt weiter am aktuellen Roster.
+  assert.match(sql, /count\(\*\) from public\.founder_team_members m where m\.team_id = program\.team_id\) >= 2/);
+  // Hoechstens fuenf Konten je Team-Platz, gezaehlt erst beim Ankommen.
+  assert.match(sql, /< c\.max_uses \* 5/);
+  // Ein falscher Code legt kein Team an: erst pruefen, dann create_solo_venture.
+  assert.ok(sql.indexOf("return null;") < sql.indexOf("create_solo_venture()"));
+  assert.match(sql, /create trigger notify_new_member_about_team_program/);
+  const page = readFileSync("src/app/(product)/programm/code/[code]/page.tsx", "utf8");
+  assert.match(page, /record_team_program_code_arrival/);
+  assert.match(page, /createTeamForProgramCodeAction/);
+  const programm = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.match(programm, /waitingForCofounders/);
+  assert.doesNotMatch(page + programm, /score|rank|percent|compatib|ampel|traffic/i);
+});

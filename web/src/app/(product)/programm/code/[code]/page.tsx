@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
-import { startTeamProgramByCodeAction } from "@/features/advisor/teamProgramActions";
+import { createTeamForProgramCodeAction, startTeamProgramByCodeAction } from "@/features/advisor/teamProgramActions";
 import { getTeamProgramCodeOptions } from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -25,16 +25,35 @@ export default async function TeamProgramCodePage({
   } = await getRequestUser();
   if (!user) redirect(buildLoginRedirectPath(`/programm/code/${code}`));
 
-  const failed = ((await searchParams) ?? {}).fehler === "1";
-  const options = /^[A-HJ-NP-Z2-9]{8}$/.test(code) ? await getTeamProgramCodeOptions(await createClient(), code) : [];
+  const fehler = ((await searchParams) ?? {}).fehler;
+  const failed = fehler === "1";
+  const needsFounderRole = fehler === "rolle";
+  const supabase = await createClient();
+  const validFormat = /^[A-HJ-NP-Z2-9]{8}$/.test(code);
+  // Ankommen zaehlt als Konto fuer diesen Code (hoechstens fuenf je Team-Platz); ein falscher Code tut nichts.
+  if (validFormat) await supabase.rpc("record_team_program_code_arrival", { p_code: code });
+  const options = validFormat ? await getTeamProgramCodeOptions(supabase, code) : [];
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
       {options.length === 0 ? (
         <>
           <h1 className="text-2xl font-semibold text-slate-950">{t("pageTitle")}</h1>
-          <p role="alert" className="mt-4 text-sm leading-7 text-slate-700">{failed ? t("inviteFailed") : t("codeInvalid")}</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">{t("codeNoTeam")}</p>
+          {needsFounderRole ? (
+            <p role="alert" className="mt-4 text-sm leading-7 text-slate-700">{t("newTeamNeedsFounder")}</p>
+          ) : failed ? (
+            <p role="alert" className="mt-4 text-sm leading-7 text-slate-700">{t("inviteFailed")}</p>
+          ) : null}
+          <p className="mt-4 text-sm leading-7 text-slate-700">{t("newTeamIntro")}</p>
+          <form action={createTeamForProgramCodeAction} className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+            <input type="hidden" name="code" value={code} />
+            <label>
+              <span className="block text-sm font-semibold text-slate-900">{t("newTeamName")}</span>
+              <input name="teamName" maxLength={60} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" />
+            </label>
+            <p className="text-xs leading-6 text-slate-600">{t("newTeamHint")}</p>
+            <SubmitButton label={t("newTeamCreate")} pendingLabel="…" className="brand-cta inline-flex min-h-11 w-fit items-center rounded-xl px-5 text-sm font-semibold" />
+          </form>
         </>
       ) : (
         <>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -80,7 +81,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold text-slate-950">{program.orgName}</h2>
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${program.isActive ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>
-                  {program.isActive ? t("statusActive") : t("approvedOf", { approved: program.approvedCount, total: program.memberCount })}
+                  {program.isActive ? t("statusActive") : program.memberCount < 2 ? t("waitingForCofounders") : t("approvedOf", { approved: program.approvedCount, total: program.memberCount })}
                 </span>
               </div>
               <div className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
@@ -92,6 +93,12 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 </p>
                 {program.adminNames.length > 0 ? <p>{t("adminsLine", { names: program.adminNames.join(", ") })}</p> : null}
               </div>
+              {program.memberCount < 2 ? (
+                <p className="mt-3 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm leading-6 text-violet-900">
+                  {t("waitingText")}{" "}
+                  <Link href={`/invite/new?team=${program.teamId}`} className="font-semibold underline underline-offset-4">{t("waitingInvite")}</Link>
+                </p>
+              ) : null}
               <p className="mt-3 text-xs leading-6 text-slate-600">{t("meaning")}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 {program.iApproved ? (
