@@ -50,6 +50,7 @@ export const IN_APP_NOTICE_KINDS = [
   "read_my_mind_handoff",
   "founder_in_the_wild_handoff",
   "collaboration_conversation_marker",
+  "program_update_due",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

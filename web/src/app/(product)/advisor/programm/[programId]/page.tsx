@@ -3,8 +3,15 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
+import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
-import { getOrgTeamPrograms, listProgramMilestones } from "@/features/advisor/teamProgramData";
+import {
+  getOrgTeamPrograms,
+  getProgramUpdateDue,
+  getProgramUpdateQuestions,
+  listProgramMilestones,
+  listProgramUpdates,
+} from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -23,7 +30,8 @@ export default async function AdvisorProgramTeamPage({
 }) {
   const { programId } = await params;
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
-  const tab = ((await searchParams) ?? {}).tab === "meilensteine" ? "meilensteine" : "overview";
+  const tabParam = ((await searchParams) ?? {}).tab;
+  const tab = tabParam === "meilensteine" || tabParam === "updates" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
   const {
     data: { user },
@@ -45,9 +53,12 @@ export default async function AdvisorProgramTeamPage({
   }
   if (!program || !orgOfProgram) notFound();
 
-  const [members, milestones] = await Promise.all([
+  const [members, milestones, questions, updates, due] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
-    program.isActive ? listProgramMilestones(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "meilensteine" ? listProgramMilestones(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "updates" ? getProgramUpdateQuestions(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "updates" ? listProgramUpdates(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "updates" ? getProgramUpdateDue(client, programId) : Promise.resolve(null),
   ]);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
@@ -64,6 +75,7 @@ export default async function AdvisorProgramTeamPage({
         {[
           ["overview", t("tabOverview"), base],
           ["meilensteine", t("tabMilestones"), `${base}?tab=meilensteine`],
+          ["updates", t("tabUpdates"), `${base}?tab=updates`],
         ].map(([key, label, href]) => (
           <Link
             key={key}
@@ -92,6 +104,8 @@ export default async function AdvisorProgramTeamPage({
               <dd className="mt-1 text-sm text-slate-800">{program.contactUserIds.map(nameOf).join(", ") || t("contactsNone")}</dd>
             </div>
           </dl>
+        ) : tab === "updates" ? (
+          <ManageProgramUpdates programId={programId} questions={questions} due={due} updates={updates} returnTo={`${base}?tab=updates`} />
         ) : (
           <ProgramMilestones programId={programId} milestones={milestones} returnTo={`${base}?tab=meilensteine`} />
         )}

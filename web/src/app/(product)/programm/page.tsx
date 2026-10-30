@@ -2,7 +2,14 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { consentTeamProgramAction, endTeamProgramAction } from "@/features/advisor/teamProgramActions";
-import { getMyTeamPrograms, listProgramMilestones } from "@/features/advisor/teamProgramData";
+import {
+  getMyTeamPrograms,
+  getProgramUpdateDue,
+  getProgramUpdateQuestions,
+  listProgramMilestones,
+  listProgramUpdates,
+} from "@/features/advisor/teamProgramData";
+import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -19,6 +26,20 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   if (!user) redirect(buildLoginRedirectPath("/programm"));
   const client = await createClient();
   const programs = await getMyTeamPrograms(client);
+  const updatesByProgram = new Map(
+    await Promise.all(
+      programs
+        .filter((program) => program.isActive)
+        .map(async (program) => {
+          const [questions, updates, due] = await Promise.all([
+            getProgramUpdateQuestions(client, program.programId),
+            listProgramUpdates(client, program.programId),
+            getProgramUpdateDue(client, program.programId),
+          ]);
+          return [program.programId, { questions, updates, due }] as const;
+        }),
+    ),
+  );
   const milestonesByProgram = new Map(
     await Promise.all(
       programs.filter((program) => program.isActive).map(async (program) => [program.programId, await listProgramMilestones(client, program.programId)] as const),
@@ -74,9 +95,19 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               </div>
               <p className="mt-1 text-xs text-slate-500">{t("endHint")}</p>
               {program.isActive ? (
+                <>
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />
                 </div>
+                <div className="mt-6 border-t border-slate-100 pt-4">
+                  <TeamProgramUpdates
+                    programId={program.programId}
+                    questions={updatesByProgram.get(program.programId)?.questions ?? []}
+                    due={updatesByProgram.get(program.programId)?.due ?? null}
+                    updates={updatesByProgram.get(program.programId)?.updates ?? []}
+                  />
+                </div>
+                </>
               ) : null}
             </li>
           ))}

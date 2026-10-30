@@ -89,7 +89,7 @@ export async function endTeamProgramAction(formData: FormData) {
 /** Zurueck nur auf die eigenen Programmseiten - kein freies Ziel aus dem Formular. */
 const safeReturn = (value: FormDataEntryValue | null) => {
   const text = String(value ?? "");
-  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}(\?tab=meilensteine)?$/.test(text) ? text : "/programm";
+  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}(\?tab=(meilensteine|updates))?$/.test(text) ? text : "/programm";
 };
 const toInt = (value: FormDataEntryValue | null) => {
   const text = String(value ?? "").trim();
@@ -122,6 +122,40 @@ export async function deleteProgramMilestoneAction(formData: FormData) {
     p_milestone_id: String(formData.get("milestoneId") ?? ""),
   });
   revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+export async function submitProgramUpdateAction(formData: FormData) {
+  const client = await requireUser("/programm");
+  const answers = formData
+    .getAll("question")
+    .map((question, index) => ({
+      q: String(question).slice(0, 200),
+      a: String(formData.getAll("answer")[index] ?? "").slice(0, 2000),
+    }))
+    .filter((entry) => entry.q.trim() !== "");
+  if (answers.length > 0) {
+    await client.rpc("submit_program_update", {
+      p_program_id: String(formData.get("programId") ?? ""),
+      p_answers: answers,
+    });
+  }
+  revalidatePath("/programm");
+  redirect("/programm");
+}
+
+export async function setProgramUpdateQuestionsAction(formData: FormData) {
+  const back = safeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("set_program_update_questions", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_questions: String(formData.get("questions") ?? "")
+      .split("\n")
+      .map((line) => line.trim().slice(0, 200))
+      .filter((line) => line.length > 0)
+      .slice(0, 5),
+  });
   revalidatePath("/advisor/programm");
   redirect(back);
 }

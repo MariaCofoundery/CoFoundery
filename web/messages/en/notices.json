@@ -15,7 +15,8 @@
     "discovery_intro_accepted": "Your introduction request was accepted. You can write to each other now.",
     "read_my_mind_handoff": "Read My Mind: the other side has answered. Your turn.",
     "founder_in_the_wild_handoff": "Founder in the Wild: the other side has filled it in. Your turn.",
-    "collaboration_conversation_marker": "The other side would like to talk about a particular point."
+    "collaboration_conversation_marker": "The other side would like to talk about a particular point.",
+    "program_update_due": "The next update for your program is coming up."
   },
   "announcements": {
     "eyebrow": "Announcement",

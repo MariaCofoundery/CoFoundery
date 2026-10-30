@@ -753,6 +753,19 @@
     "tabMilestones": "Meilensteine",
     "openTeam": "Öffnen",
     "backToOrg": "Zur Organisation",
-    "teamPageInactive": "Dieses Programm ist gerade nicht aktiv: Es fehlt die Zustimmung von jemandem im Team."
+    "teamPageInactive": "Dieses Programm ist gerade nicht aktiv: Es fehlt die Zustimmung von jemandem im Team.",
+    "updatesTitle": "Updates",
+    "updatesText": "Alle zwei Wochen ein kurzes Update an das Programm. Die Fragen legen die Bezugspersonen fest.",
+    "updateDue": "Nächstes Update fällig am {date}",
+    "defaultQuestions": "Was sind aktuelle Schwierigkeiten? | Wie können wir euch helfen?",
+    "updateSubmit": "Update abschicken",
+    "updatesPast": "Bisherige Updates",
+    "updatesNone": "Noch kein Update eingereicht.",
+    "updateAnswerLabel": "Antwort",
+    "questionsTitle": "Fragen für die Updates",
+    "questionsHint": "Eine Frage pro Zeile, höchstens fünf. Ohne eigene Fragen gelten die Standardfragen.",
+    "questionsSave": "Fragen speichern",
+    "updatesTeamNote": "Die Antworten sehen die Bezugspersonen und die Inhaber der Organisation.",
+    "tabUpdates": "Updates"
   }
 }

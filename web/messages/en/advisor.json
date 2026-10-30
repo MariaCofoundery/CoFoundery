@@ -753,6 +753,19 @@
     "tabMilestones": "Milestones",
     "openTeam": "Open",
     "backToOrg": "Back to organization",
-    "teamPageInactive": "This program is not active right now: someone on the team has not agreed yet."
+    "teamPageInactive": "This program is not active right now: someone on the team has not agreed yet.",
+    "updatesTitle": "Updates",
+    "updatesText": "A short update to the program every two weeks. The contacts set the questions.",
+    "updateDue": "Next update due on {date}",
+    "defaultQuestions": "What are your current difficulties? | How can we help you?",
+    "updateSubmit": "Send update",
+    "updatesPast": "Past updates",
+    "updatesNone": "No update submitted yet.",
+    "updateAnswerLabel": "Answer",
+    "questionsTitle": "Questions for the updates",
+    "questionsHint": "One question per line, five at most. Without your own questions the default ones apply.",
+    "questionsSave": "Save questions",
+    "updatesTeamNote": "The contacts and the owners of the organization see the answers.",
+    "tabUpdates": "Updates"
   }
 }

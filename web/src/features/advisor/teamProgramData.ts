@@ -141,3 +141,24 @@ export async function getOrgMilestoneDeadlines(client: SupabaseClient, orgId: st
     doneCount: Number(row.done_count ?? 0),
   }));
 }
+
+export type ProgramUpdate = { updateId: string; submittedAt: string; answers: { q: string; a: string }[] };
+
+export async function getProgramUpdateQuestions(client: SupabaseClient, programId: string): Promise<string[]> {
+  const { data } = await client.rpc("list_program_update_questions", { p_program_id: programId });
+  return ((data ?? []) as { question: string }[]).map((row) => row.question);
+}
+
+export async function listProgramUpdates(client: SupabaseClient, programId: string): Promise<ProgramUpdate[]> {
+  const { data } = await client.rpc("list_program_updates", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    updateId: row.update_id as string,
+    submittedAt: row.submitted_at as string,
+    answers: Array.isArray(row.answers) ? (row.answers as { q: string; a: string }[]) : [],
+  }));
+}
+
+export async function getProgramUpdateDue(client: SupabaseClient, programId: string): Promise<string | null> {
+  const { data } = await client.rpc("get_program_update_due", { p_program_id: programId });
+  return typeof data === "string" ? data : null;
+}

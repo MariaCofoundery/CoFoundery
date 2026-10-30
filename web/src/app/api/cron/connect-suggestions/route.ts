@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { runProgramUpdateReminders } from "@/features/advisor/programUpdateReminders";
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
 import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
@@ -60,14 +61,15 @@ export async function GET(request: NextRequest) {
   // zwei Zeitplaene, und beide sind belegt. Ein Fehler hier darf die
   // Vorschlaege nicht verhindern - und umgekehrt.
   const reminders = await runCheckInReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
+  const programUpdates = await runProgramUpdateReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok);
-  if (!result.ok || !reminders.ok) {
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok);
+  if (!result.ok || !reminders.ok || !programUpdates.ok) {
     const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
-    const body = { ...result, ok: false, checkInReminders: reminders };
+    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates };
     await sendCronFailureAlert("connect-suggestions", status, body);
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates }, { status: 200 });
 }
