@@ -41,7 +41,7 @@ export default async function ProgramPublicPage({
           <div className="relative z-10 flex flex-col items-center">
             {page.has_logo ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/api/program-logo/${slug}/logo`} alt="" className="h-20 w-20 rounded-2xl bg-white object-contain p-2 shadow-lg" />
+              <img src={`/api/program-logo/${slug}`} alt="" className="h-20 w-20 rounded-2xl bg-white object-contain p-2 shadow-lg" />
             ) : (
               <span className="grid h-20 w-20 place-items-center rounded-2xl bg-white/15 text-3xl font-extrabold ring-1 ring-white/25">
                 {page.org_name.slice(0, 1).toUpperCase()}

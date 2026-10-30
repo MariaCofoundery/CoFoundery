@@ -80,7 +80,7 @@ export function ProgramPageEditor({
   const [removeLogo, setRemoveLogo] = useState(false);
   const [copied, setCopied] = useState(false);
   const url = `${origin}/p/${slug || "…"}`;
-  const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}/logo` : "");
+  const shownLogo = removeLogo ? "" : logo || (hasLogo && initialSlug ? `/api/program-logo/${initialSlug}` : "");
 
   async function onLogo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
