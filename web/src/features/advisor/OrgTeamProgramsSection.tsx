@@ -41,11 +41,14 @@ export async function OrgTeamProgramsSection({
   codes,
   codeError,
   stars = [],
+  part = "teams",
 }: {
   org: AdvisorOrg;
   members: OrgMember[];
   programs: OrgTeamProgram[];
   stars?: OrgProgramStars[];
+  /** "teams": die Karten der Teams im Programm (taeglich); "enroll": Einladungen und Codes (einmal einrichten). */
+  part?: "teams" | "enroll";
   invites: TeamProgramInvite[];
   /** Nur direkt nach dem Erzeugen: der Link wird danach nie wieder gezeigt. */
   freshToken: string | null;
@@ -64,6 +67,7 @@ export async function OrgTeamProgramsSection({
 
   return (
     <div className="grid gap-6">
+      {part === "teams" ? (
       <section aria-labelledby="org-programs-title" className={CARD}>
         <h2 id="org-programs-title" className="text-xl font-semibold text-slate-950">{t("programsTitle")}</h2>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("sectionText")}</p>
@@ -76,7 +80,7 @@ export async function OrgTeamProgramsSection({
           <div className="mt-4">
             <EmptyState
               text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
-              actions={isOwner ? [{ href: "#org-invite-title", label: t("programsEmptyInvite"), primary: true }, { href: "#org-codes-title", label: t("programsEmptyCode") }] : []}
+              actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }] : []}
             />
           </div>
         ) : (
@@ -189,8 +193,9 @@ export async function OrgTeamProgramsSection({
           </ul>
         )}
       </section>
+      ) : null}
 
-      {isOwner ? (
+      {part === "enroll" && isOwner ? (
         <section aria-labelledby="org-invite-title" className="grid gap-4 md:grid-cols-2">
           <div className={CARD}>
             <h2 id="org-invite-title" className="scroll-mt-24 text-lg font-semibold text-slate-950">{t("inviteCardTitle")}</h2>

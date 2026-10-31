@@ -29,6 +29,8 @@ async function requireUser(next: string) {
 
 const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
+const orgEnrollTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=enroll${extra}`;
 const orgPlanTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
 const orgSuccessTab = (orgId: string, extra = "") =>
@@ -43,7 +45,7 @@ const orgPageTab = (orgId: string, extra = "") =>
  */
 export async function createTeamProgramInviteAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgSettings(orgId));
+  const client = await requireUser(orgEnrollTab(orgId));
   const token = randomBytes(24).toString("hex");
   const { error } = await client.rpc("create_team_program_invite", {
     p_org_id: orgId,
@@ -51,7 +53,7 @@ export async function createTeamProgramInviteAction(formData: FormData) {
     p_label: String(formData.get("label") ?? "").trim().slice(0, 120) || null,
   });
   revalidatePath("/advisor/organisation");
-  if (error) redirect(orgSettings(orgId, error.code === "53400" ? "&programInviteError=limit" : "&orgError=org_forbidden"));
+  if (error) redirect(orgEnrollTab(orgId, error.code === "53400" ? "&programInviteError=limit" : "&orgError=org_forbidden"));
 
   let mailed = "";
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
@@ -68,15 +70,15 @@ export async function createTeamProgramInviteAction(formData: FormData) {
       mailed = result.ok ? "&programInviteMail=sent" : "&programInviteMail=failed";
     }
   }
-  redirect(orgSettings(orgId, `&programInvite=${token}${mailed}`));
+  redirect(orgEnrollTab(orgId, `&programInvite=${token}${mailed}`));
 }
 
 export async function revokeTeamProgramInviteAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgSettings(orgId));
+  const client = await requireUser(orgEnrollTab(orgId));
   await client.rpc("revoke_team_program_invite", { p_invite_id: String(formData.get("inviteId") ?? "") });
   revalidatePath("/advisor/organisation");
-  redirect(orgSettings(orgId));
+  redirect(orgEnrollTab(orgId));
 }
 
 export async function setTeamProgramContactsAction(formData: FormData) {
@@ -269,7 +271,7 @@ const normalizeCode = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/
 /** Der Code wird hier erzeugt (ohne verwechselbare Zeichen) und im Klartext gespeichert, damit der Inhaber ihn wieder sehen kann. */
 export async function createTeamProgramCodeAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgSettings(orgId));
+  const client = await requireUser(orgEnrollTab(orgId));
   const bytes = randomBytes(8);
   const code = Array.from(bytes, (byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join("");
   const number = (name: string, fallback: number) => {
@@ -284,15 +286,15 @@ export async function createTeamProgramCodeAction(formData: FormData) {
     p_valid_days: number("validDays", 90),
   });
   revalidatePath("/advisor/organisation");
-  redirect(orgSettings(orgId, error ? (error.code === "53400" ? "&programCodeError=limit" : "&orgError=org_forbidden") : ""));
+  redirect(orgEnrollTab(orgId, error ? (error.code === "53400" ? "&programCodeError=limit" : "&orgError=org_forbidden") : ""));
 }
 
 export async function revokeTeamProgramCodeAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgSettings(orgId));
+  const client = await requireUser(orgEnrollTab(orgId));
   await client.rpc("revoke_team_program_code", { p_code_id: String(formData.get("codeId") ?? "") });
   revalidatePath("/advisor/organisation");
-  redirect(orgSettings(orgId));
+  redirect(orgEnrollTab(orgId));
 }
 
 /** Vom Feld auf /programm: bringt den eingegebenen Code zur Auswahlseite. */

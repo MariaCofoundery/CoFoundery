@@ -720,8 +720,8 @@
     "orgPage": {
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Operations | Set up | Manage",
-      "groupHints": "Where you work every day with teams and people. | Set up once, rarely touch again: program page and achievements. | In the background: approvals, members and the organization profile.",
-      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile",
+      "groupHints": "Where you work every day with teams and people. | Set up once, rarely touch again: enroll teams, program page and achievements. | In the background: approvals, members and the organization profile.",
+      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile | Enroll teams",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",

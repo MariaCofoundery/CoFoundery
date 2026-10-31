@@ -30,7 +30,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -39,7 +39,7 @@ type Tab = (typeof TABS)[number];
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "run", tabs: ["overview", "teams", "people", "program", "plan"] },
-  { key: "setup", tabs: ["page", "success"] },
+  { key: "setup", tabs: ["enroll", "page", "success"] },
   { key: "manage", tabs: ["access", "members", "profile"] },
 ];
 // "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
@@ -100,17 +100,17 @@ export default async function AdvisorOrganisationPage({
 
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
-  const needsPrograms = tab === "program" || tab === "overview" || tab === "access";
+  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access";
   const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
-    tab === "program" && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
+    tab === "enroll" && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
-    tab === "program" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
+    tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
@@ -218,7 +218,7 @@ export default async function AdvisorOrganisationPage({
               text={t("orgPage.teamsEmpty")}
               actions={[
                 { href: "/advisor/einladen?art=team", label: t("orgPage.teamsEmptyInvite"), primary: true },
-                { href: base("program"), label: t("orgPage.teamsEmptyProgram") },
+                { href: base("enroll"), label: t("orgPage.teamsEmptyProgram") },
               ]}
             />
           ) : (
@@ -331,7 +331,7 @@ export default async function AdvisorOrganisationPage({
 
         {tab === "profile" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="profile" /> : null}
 
-        {tab === "program" ? (
+        {tab === "program" || tab === "enroll" ? (
           <>
             {orgError ? (
               <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
@@ -339,7 +339,7 @@ export default async function AdvisorOrganisationPage({
               </p>
             ) : null}
             {query.teamRemoved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.teamRemoved")}</p> : null}
-            <OrgTeamProgramsSection org={org} members={members} programs={programs} stars={programStars} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
+            <OrgTeamProgramsSection part={tab === "enroll" ? "enroll" : "teams"} org={org} members={members} programs={programs} stars={programStars} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
           </>
         ) : null}
       </div>

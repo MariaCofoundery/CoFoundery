@@ -720,8 +720,8 @@
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betrieb | Einrichten | Verwalten",
-      "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Einmal einrichten, selten wieder anfassen: Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
-      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmplan | Erfolge | Programmseite | Profil",
+      "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Einmal einrichten, selten wieder anfassen: Teams aufnehmen, Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
+      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmplan | Erfolge | Programmseite | Profil | Teams aufnehmen",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
