@@ -2,9 +2,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import {
   confirmProgramOutcomeAction,
   removeProgramOutcomeAction,
+  saveOutcomeCommentAction,
   reportProgramOutcomeAction,
 } from "@/features/advisor/teamProgramActions";
-import { countStars, type ProgramOutcome } from "@/features/advisor/teamProgramData";
+import { countStars, type OutcomeComment, type ProgramOutcome } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -20,11 +21,13 @@ export async function ProgramOutcomes({
   outcomes,
   mode,
   returnTo,
+  comments = [],
 }: {
   programId: string;
   outcomes: ProgramOutcome[];
   mode: "team" | "org";
   returnTo: string;
+  comments?: OutcomeComment[];
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const format = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium" });
@@ -62,6 +65,27 @@ export async function ProgramOutcomes({
                     {entry.achievedOn ? ` · ${format.format(new Date(entry.achievedOn))}` : ""}
                   </p>
                   {entry.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{entry.note}</p> : null}
+                  {entry.confirmed ? (
+                    <div className="mt-2 grid gap-1 border-t border-amber-200/70 pt-2">
+                      {(["team", "org"] as const).map((side) => {
+                        const text = comments.find((comment) => comment.outcomeId === entry.outcomeId && comment.side === side)?.body ?? "";
+                        if (side !== mode) {
+                          return text ? <p key={side} className="text-sm leading-6 text-slate-700"><span className="font-semibold">{t(side === "team" ? "commentTeam" : "commentOrg")}: </span>{text}</p> : null;
+                        }
+                        return (
+                          <form key={side} action={saveOutcomeCommentAction} className="flex flex-wrap items-end gap-2">
+                            <input type="hidden" name="returnTo" value={returnTo} />
+                            <input type="hidden" name="outcomeId" value={entry.outcomeId as string} />
+                            <label className="min-w-0 flex-1">
+                              <span className="block text-xs text-slate-500">{t("commentMine")}</span>
+                              <input name="body" maxLength={500} defaultValue={text} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />
+                            </label>
+                            <SubmitButton label={t("commentSave")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700" />
+                          </form>
+                        );
+                      })}
+                    </div>
+                  ) : null}
                   <div className="mt-1 flex flex-wrap gap-2">
                     {mode === "org" && !entry.confirmed ? (
                       <form action={confirmProgramOutcomeAction}>

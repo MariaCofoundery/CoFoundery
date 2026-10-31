@@ -15,8 +15,10 @@ import {
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
-import { getMyProgramEvents, getProgramOutcomes } from "@/features/advisor/teamProgramData";
+import { getCheckIns, getMyProgramEvents, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
+import { ProgramRewards } from "@/features/advisor/ProgramRewards";
+import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -51,7 +53,15 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   );
   const outcomesByProgram = new Map(
     await Promise.all(
-      programs.filter((program) => program.isActive).map(async (program) => [program.programId, await getProgramOutcomes(client, program.programId)] as const),
+      programs.filter((program) => program.isActive).map(async (program) => {
+        const [outcomes, comments, rewards, checkIns] = await Promise.all([
+          getProgramOutcomes(client, program.programId),
+          getOutcomeComments(client, program.programId),
+          getProgramRewards(client, program.programId),
+          getCheckIns(client, program.programId),
+        ]);
+        return [program.programId, { outcomes, comments, rewards, checkIns }] as const;
+      }),
     ),
   );
   const milestonesByProgram = new Map(
@@ -163,7 +173,11 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                   <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
                 </div>
                 <div className="mt-6 border-t border-slate-100 pt-4">
-                  <ProgramOutcomes programId={program.programId} outcomes={outcomesByProgram.get(program.programId) ?? []} mode="team" returnTo="/programm" />
+                  <div className="grid gap-8">
+                    <ProgramOutcomes programId={program.programId} outcomes={outcomesByProgram.get(program.programId)?.outcomes ?? []} mode="team" returnTo="/programm" comments={outcomesByProgram.get(program.programId)?.comments ?? []} />
+                    <ProgramRewards programId={program.programId} rewards={outcomesByProgram.get(program.programId)?.rewards ?? []} mode="team" returnTo="/programm" />
+                    <ProgramCheckIn programId={program.programId} checkIns={outcomesByProgram.get(program.programId)?.checkIns ?? []} returnTo="/programm" />
+                  </div>
                 </div>
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />

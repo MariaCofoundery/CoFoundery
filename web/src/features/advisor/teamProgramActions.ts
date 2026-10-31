@@ -492,3 +492,63 @@ export async function saveOutcomeCatalogItemAction(formData: FormData) {
   revalidatePath("/advisor/organisation");
   redirect(orgSuccessTab(orgId, error ? "&successError=1" : ""));
 }
+
+/** Belohnung der Organisation anlegen oder aendern. Nur der Inhaber. */
+export async function saveRewardAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSuccessTab(orgId));
+  const rewardId = String(formData.get("rewardId") ?? "");
+  const { error } = await client.rpc("save_reward", {
+    p_org_id: orgId,
+    p_reward_id: rewardId || null,
+    p_stars: Math.min(200, Math.max(1, Number(formData.get("stars") ?? 1) || 1)),
+    p_title: String(formData.get("title") ?? "").slice(0, 120),
+    p_description: String(formData.get("description") ?? "").slice(0, 500),
+    p_active: formData.has("activeFlag") ? formData.get("active") === "yes" : true,
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgSuccessTab(orgId, error ? "&successError=1" : ""));
+}
+
+export async function setRewardRedeemedAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("set_reward_redeemed", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_reward_id: String(formData.get("rewardId") ?? ""),
+    p_redeemed: formData.get("redeemed") === "yes",
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+/** Der eigene Satz zu einem Erfolg - jede Seite schreibt nur ihren; leer loescht ihn. */
+export async function saveOutcomeCommentAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("save_outcome_comment", {
+    p_outcome_id: String(formData.get("outcomeId") ?? ""),
+    p_body: String(formData.get("body") ?? "").slice(0, 500),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+/** Ein Gespraech zum Stand festhalten, mit gemeinsamer Zusammenfassung und optional dem naechsten Termin. */
+export async function saveCheckInAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  const date = (value: FormDataEntryValue | null) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value ?? "")) ? String(value) : null);
+  await client.rpc("save_check_in", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_held_on: date(formData.get("heldOn")) ?? new Date().toISOString().slice(0, 10),
+    p_summary: String(formData.get("summary") ?? "").slice(0, 2000),
+    p_next_on: date(formData.get("nextOn")),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}

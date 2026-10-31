@@ -54,6 +54,7 @@ export const IN_APP_NOTICE_KINDS = [
   "program_invited",
   "program_review_requested",
   "program_removed",
+  "program_reward_unlocked",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

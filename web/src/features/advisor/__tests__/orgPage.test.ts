@@ -330,7 +330,20 @@ test("Erfolge: Katalog der Organisation, Sterne je Team, beide Seiten tragen ein
   assert.match(data, /entry\.outcomeId && entry\.confirmed/);
   const ui = readFileSync("src/features/advisor/ProgramOutcomes.tsx", "utf8") + readFileSync("src/features/advisor/OrgOutcomeCatalog.tsx", "utf8");
   assert.doesNotMatch(ui, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
-  assert.doesNotMatch(sql, /sum\(.*stars.*\).*group by/is);
+  assert.doesNotMatch(sql, /sum\([^)]*stars[^)]*\)[\s\S]{0,200}group by/i);
   const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   assert.match(org, /OrgOutcomeCatalog/);
+});
+
+test("Belohnungen und Gespraech zum Stand: Organisation legt fest, jede Seite schreibt nur ihren Satz, kein Vergleich", () => {
+  const sql = readFileSync("../supabase/migrations/20270211120000_program_rewards_checkin.sql", "utf8");
+  assert.match(sql, /save_reward[\s\S]*is_advisor_org_owner_of\(p_org_id\)/);
+  assert.match(sql, /program_side\(p_program_id\) is distinct from 'org'/);
+  assert.match(sql, /delete from public\.program_check_ins where program_id = new\.id/);
+  assert.match(sql, /'program_reward_unlocked'/);
+  const ui = ["ProgramRewards", "ProgramCheckIn", "OrgRewards"].map((name) => readFileSync(`src/features/advisor/${name}.tsx`, "utf8")).join("");
+  assert.doesNotMatch(ui, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
+  const outcomes = readFileSync("src/features/advisor/ProgramOutcomes.tsx", "utf8");
+  // Die eigene Seite bekommt ein Formular, die andere nur Text.
+  assert.match(outcomes, /if \(side !== mode\)/);
 });

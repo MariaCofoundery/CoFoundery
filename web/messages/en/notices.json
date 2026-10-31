@@ -19,7 +19,8 @@
     "program_update_due": "The next update for your program is coming up.",
     "program_invited": "{org} has invited your team to its program. Your team is only in once everyone has agreed.",
     "program_review_requested": "An advisor in your program is asking your team for a team review. You decide under Account whether to agree – nothing happens without everyone's consent.",
-    "program_removed": "The organization removed your team from the program. The organization's access has ended and the program data is deleted."
+    "program_removed": "The organization removed your team from the program. The organization's access has ended and the program data is deleted.",
+    "program_reward_unlocked": "Your team has unlocked a reward. Take a look under Program."
   },
   "announcements": {
     "eyebrow": "Announcement",

@@ -371,3 +371,59 @@ export async function getProgramOutcomes(client: SupabaseClient, programId: stri
 export function countStars(outcomes: ProgramOutcome[]) {
   return outcomes.filter((entry) => entry.outcomeId && entry.confirmed).reduce((sum, entry) => sum + entry.stars, 0);
 }
+
+export type OrgReward = { rewardId: string; starsNeeded: number; title: string; description: string | null; active: boolean };
+export type ProgramReward = {
+  rewardId: string;
+  starsNeeded: number;
+  title: string;
+  description: string | null;
+  starsTotal: number;
+  unlockedAt: string | null;
+  redeemedAt: string | null;
+};
+export type OutcomeComment = { outcomeId: string; side: "team" | "org"; body: string };
+export type CheckIn = { checkInId: string; heldOn: string; summary: string | null; nextOn: string | null };
+
+export async function getOrgRewards(client: SupabaseClient, orgId: string): Promise<OrgReward[]> {
+  const { data } = await client.rpc("get_org_rewards", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    rewardId: row.reward_id as string,
+    starsNeeded: Number(row.stars_needed ?? 0),
+    title: row.title as string,
+    description: (row.description as string | null) ?? null,
+    active: row.active === true,
+  }));
+}
+
+export async function getProgramRewards(client: SupabaseClient, programId: string): Promise<ProgramReward[]> {
+  const { data } = await client.rpc("get_program_rewards", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    rewardId: row.reward_id as string,
+    starsNeeded: Number(row.stars_needed ?? 0),
+    title: row.title as string,
+    description: (row.description as string | null) ?? null,
+    starsTotal: Number(row.stars_total ?? 0),
+    unlockedAt: (row.unlocked_at as string | null) ?? null,
+    redeemedAt: (row.redeemed_at as string | null) ?? null,
+  }));
+}
+
+export async function getOutcomeComments(client: SupabaseClient, programId: string): Promise<OutcomeComment[]> {
+  const { data } = await client.rpc("get_outcome_comments", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    outcomeId: row.outcome_id as string,
+    side: row.side === "org" ? "org" : "team",
+    body: row.body as string,
+  }));
+}
+
+export async function getCheckIns(client: SupabaseClient, programId: string): Promise<CheckIn[]> {
+  const { data } = await client.rpc("get_check_ins", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    checkInId: row.check_in_id as string,
+    heldOn: row.held_on as string,
+    summary: (row.summary as string | null) ?? null,
+    nextOn: (row.next_on as string | null) ?? null,
+  }));
+}
