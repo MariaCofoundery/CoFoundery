@@ -43,7 +43,8 @@
       "nextLook": "Next look",
       "approval": "Approval",
       "report": "Report",
-      "followUp": "Follow-up"
+      "followUp": "Follow-up",
+      "teamAccess": "Access to the team report"
     },
     "inviteTeam": {
       "eyebrow": "New founder connection",

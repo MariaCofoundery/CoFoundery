@@ -257,18 +257,18 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
 
 function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string }) {
   return (
-    <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
+    <article className="advisor-card p-4 sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
             <TeamFounderAvatars team={team} />
-            <div>
+            <div className="min-w-0">
               <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
                 {team.teamContext === "existing_team"
                   ? t("teamContext.existingRelationship")
                   : t("teamContext.exploringRelationship")}
               </p>
-              <h3 className="mt-1 text-xl font-semibold text-slate-950">
+              <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
                 {team.founderAName} & {team.founderBName}
               </h3>
               {team.teamName ? (
@@ -279,7 +279,7 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
+          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3 [&>p]:min-w-0 [&>p]:break-words">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
                 {t("dashboard.fields.status")}
@@ -301,7 +301,8 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
           </div>
         </div>
 
-        <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-64">
+        <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-64">
+          <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-slate-400">{t("dashboard.fields.teamAccess")}</p>
           <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${accessStatusClassName(team.accessStatus)}`}>
             {accessStatusLabel(team, t)}
           </span>
@@ -310,7 +311,7 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
           </p>
           <p className="mt-1 leading-6 text-slate-600">{accessStatusDescription(team, t)}</p>
           <div className="mt-4 grid gap-2">
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
               <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.report")}</span>
               <span
                 // BEHOBEN am 20.09.2026: Hier stand `team.reportReady &&
@@ -445,11 +446,11 @@ function PendingInviteCard({
   locale: string;
 }) {
   return (
-    <article className="rounded-[28px] border border-slate-200 bg-white/92 p-6 shadow-[0_14px_38px_rgba(15,23,42,0.045)]">
+    <article className="advisor-card p-4 sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 max-w-3xl">
           <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("dashboard.pending.type")}</p>
-          <h3 className="mt-1 text-xl font-semibold text-slate-950">
+          <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
             {invite.teamName || `${invite.founderALabel} & ${invite.founderBLabel}`}
           </h3>
           {invite.teamName ? (
@@ -458,7 +459,7 @@ function PendingInviteCard({
             </p>
           ) : null}
 
-          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3">
+          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3 [&>p]:min-w-0 [&>p]:break-words">
             <p>
               <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
                 {t("dashboard.fields.status")}
@@ -480,13 +481,17 @@ function PendingInviteCard({
           </div>
         </div>
 
-        <div className="w-full rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
+        <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
           <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-            {invite.status === "expired" ? t("dashboard.statuses.invitationExpired") : t("dashboard.statuses.founderInvited")}
+            {invite.founderAStarted && invite.founderBStarted
+              ? t("dashboard.statuses.accepted")
+              : invite.status === "expired"
+                ? t("dashboard.statuses.invitationExpired")
+                : t("dashboard.statuses.founderInvited")}
           </span>
           <div className="mt-4 grid gap-2">
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderALabel}</span>
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="min-w-0 break-all text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderALabel}</span>
               <span
                 className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
                   invite.founderAStarted
@@ -504,8 +509,8 @@ function PendingInviteCard({
                 </form>
               ) : null}
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderBLabel}</span>
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
+              <span className="min-w-0 break-all text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderBLabel}</span>
               <span
                 className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
                   invite.founderBStarted
@@ -535,7 +540,7 @@ function PendingInviteCard({
               </button>
             </form>
           ) : null}
-          {invite.status === "expired" ? (
+          {invite.status === "expired" && !(invite.founderAStarted && invite.founderBStarted) ? (
             <a href="#advisor-invite-form" className="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100">
               {t("dashboard.pending.createNew")}
             </a>

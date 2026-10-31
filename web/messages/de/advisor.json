@@ -43,7 +43,8 @@
       "nextLook": "Nächster Blick",
       "approval": "Freigabe",
       "report": "Report",
-      "followUp": "Follow-up"
+      "followUp": "Follow-up",
+      "teamAccess": "Zugang zum Team-Report"
     },
     "inviteTeam": {
       "eyebrow": "Neues Team",

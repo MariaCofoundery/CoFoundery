@@ -425,3 +425,11 @@ test("Heute weist auf Erfolge hin, die auf Bestaetigung warten: nur bei eingesch
   assert.match(today, /tab=erfolge/);
   assert.doesNotMatch(today, /stars/i);
 });
+
+test("Begleitung auf dem Handy: Karten mit kleinerem Rand, lange Namen brechen um, abgelaufene Einladung widerspricht nicht dem Start beider Founder", () => {
+  const list = readFileSync("src/features/advisor/AdvisorTeamsList.tsx", "utf8");
+  assert.equal((list.match(/advisor-card p-4 sm:p-6/g) ?? []).length, 2);
+  assert.match(list, /break-all[^"]*">\{invite\.founderALabel\}/);
+  assert.match(list, /invite\.founderAStarted && invite\.founderBStarted\s*\?\s*t\("dashboard\.statuses\.accepted"\)/);
+  assert.match(list, /invite\.status === "expired" && !\(invite\.founderAStarted && invite\.founderBStarted\)/);
+});
