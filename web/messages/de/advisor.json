@@ -686,6 +686,8 @@
     "person": {
       "eyebrow": "Person · Advisor-Ansicht",
       "tabsLabel": "Ansichten dieser Person",
+      "groupLabels": "Betrieb | Einrichten | Verwalten",
+      "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Einmal einrichten, selten wieder anfassen: Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
       "tabs": {
         "ueber": "Über sie",
         "faehigkeiten": "Fähigkeiten",

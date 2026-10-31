@@ -10,6 +10,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
@@ -30,6 +31,16 @@ import {
 
 const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile"] as const;
 type Tab = (typeof TABS)[number];
+
+/**
+ * Drei Gruppen statt zehn Reitern: Betrieb (taeglich), Einrichten (zu Beginn, selten wieder), Verwalten (Hintergrund).
+ * Die Reiter selbst und ihre Adressen bleiben - nur die Anordnung ist neu.
+ */
+const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
+  { key: "run", tabs: ["overview", "teams", "people", "program", "plan"] },
+  { key: "setup", tabs: ["page", "success"] },
+  { key: "manage", tabs: ["access", "members", "profile"] },
+];
 // "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
 const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "members" : TABS.find((tab) => tab === value) ?? "overview");
 
@@ -133,20 +144,16 @@ export default async function AdvisorOrganisationPage({
             ))}
           </ul>
         ) : null}
-        <nav aria-label={t("orgPage.tabsLabel")} className="flex flex-wrap gap-2">
-          {TABS.map((entry, index) => (
-            <Link
-              key={entry}
-              href={base(entry)}
-              aria-current={tab === entry ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold ${
-                tab === entry ? "bg-white text-indigo-900" : "bg-white/10 text-indigo-100 hover:bg-white/20"
-              }`}
-            >
-              {tabLabels[index] ?? entry}
-            </Link>
-          ))}
-        </nav>
+        <OrgAreaNav
+          ariaLabel={t("orgPage.tabsLabel")}
+          activeTab={tab}
+          groups={AREA_GROUPS.map((group, groupIndex) => ({
+            key: group.key,
+            label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
+            hint: t("orgPage.groupHints").split(" | ")[groupIndex] ?? "",
+            tabs: group.tabs.map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+          }))}
+        />
       </AdvisorPageHeader>
 
       {orgs.length > 1 ? (

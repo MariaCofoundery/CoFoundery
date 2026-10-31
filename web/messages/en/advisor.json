@@ -686,6 +686,8 @@
     "person": {
       "eyebrow": "Person · advisor view",
       "tabsLabel": "Views of this person",
+      "groupLabels": "Operations | Set up | Manage",
+      "groupHints": "Where you work every day with teams and people. | Set up once, rarely touch again: program page and achievements. | In the background: approvals, members and the organization profile.",
       "tabs": {
         "ueber": "About",
         "faehigkeiten": "Skills",

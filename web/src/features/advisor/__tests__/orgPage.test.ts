@@ -360,3 +360,17 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   const privacy = readFileSync("src/app/datenschutz/page.tsx", "utf8");
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
+
+test("Organisation: die zehn Reiter stehen in drei Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+  const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("];", page.indexOf("const AREA_GROUPS")));
+  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "setup", "manage"].includes(key));
+  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile"];
+  assert.deepEqual([...used].sort(), [...tabs].sort());
+  assert.match(page, /<OrgAreaNav/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 3, locale);
+    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 3, locale);
+  }
+});
