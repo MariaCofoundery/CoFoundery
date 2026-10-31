@@ -411,3 +411,11 @@ test("Optik Schritt 4: Team-Karten zeigen Sterne und Weg zur naechsten Belohnung
   const team = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
   assert.match(team, /className="advisor-card flex items-start gap-3/);
 });
+
+test("Heute weist auf Erfolge hin, die auf Bestaetigung warten: nur bei eingeschalteter Funktion, je Team, ohne Summe", () => {
+  const today = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.match(today, /successOn\s*\?/);
+  assert.match(today, /outcome\.outcomeId && !outcome\.confirmed/);
+  assert.match(today, /tab=erfolge/);
+  assert.doesNotMatch(today, /stars/i);
+});

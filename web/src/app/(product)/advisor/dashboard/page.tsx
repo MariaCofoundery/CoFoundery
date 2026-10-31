@@ -9,7 +9,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { getAccompaniedPeople, getMyAdvisorOrgs, withAccompaniedNames } from "@/features/advisor/orgData";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramUpdateDue, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getProgramUpdateDue, getSuccessEnabled, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
@@ -55,10 +55,14 @@ export default async function AdvisorStartPage() {
   // zwoelf Teams, damit die Startseite nicht auf viele Abfragen wartet.
   const programData = await Promise.all(
     orgs.slice(0, 3).map(async (org) => {
-      const [deadlines, programs] = await Promise.all([getOrgMilestoneDeadlines(client, org.id), getOrgTeamPrograms(client, org.id)]);
+      const [deadlines, programs, successOn] = await Promise.all([getOrgMilestoneDeadlines(client, org.id), getOrgTeamPrograms(client, org.id), getSuccessEnabled(client, org.id)]);
       const active = programs.filter((program) => program.isActive).slice(0, 12);
       const dues = await Promise.all(active.map(async (program) => ({ program, due: await getProgramUpdateDue(client, program.programId) })));
-      return { org, deadlines, active, dues };
+      // Erfolge, die ein Team gemeldet hat und die noch auf Bestaetigung warten (Organisation traegt direkt bestaetigt ein). Nur wenn die Funktion an ist; je Team, ohne Summe.
+      const pendingOutcomes = successOn
+        ? (await Promise.all(active.map(async (program) => ({ program, count: (await getProgramOutcomes(client, program.programId)).filter((outcome) => outcome.outcomeId && !outcome.confirmed).length })))).filter((entry) => entry.count > 0)
+        : [];
+      return { org, deadlines, active, dues, pendingOutcomes };
     }),
   );
   const inTwoWeeks = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
@@ -99,6 +103,13 @@ export default async function AdvisorStartPage() {
       href: `/advisor/programm/${entry.program.programId}?tab=updates`,
       cta: t("start.view"),
       icon: "cal" as const,
+    })),
+    ...programData.flatMap((entry) => entry.pendingOutcomes).map((entry) => ({
+      key: `outcome-${entry.program.programId}`,
+      text: t("start.programOutcomes", { team: entry.program.teamName ?? t("kinds.unnamed"), count: entry.count }),
+      href: `/advisor/programm/${entry.program.programId}?tab=erfolge`,
+      cta: t("start.open"),
+      icon: "flag" as const,
     })),
     ...programFollowUps.flatMap((entry) => {
       const program = programData.flatMap((data) => data.active).find((candidate) => candidate.programId === entry.programId);

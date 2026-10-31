@@ -626,7 +626,8 @@
       "programFollowUp": "{overdue, select, yes {Wiedervorlage überfällig} other {Wiedervorlage fällig}} am {date}: {team}",
       "tileTeams": "Teams im Programm",
       "tileUpdates": "Updates in 14 Tagen",
-      "tileInvites": "offene Einladungen"
+      "tileInvites": "offene Einladungen",
+      "programOutcomes": "{team}: {count, plural, one {# Erfolg wartet} other {# Erfolge warten}} auf Bestätigung"
     },
     "follow": {
       "title": "Begleitung",

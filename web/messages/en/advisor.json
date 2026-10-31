@@ -626,7 +626,8 @@
       "programFollowUp": "{overdue, select, yes {Follow-up overdue} other {Follow-up due}} on {date}: {team}",
       "tileTeams": "Teams in the program",
       "tileUpdates": "Updates in 14 days",
-      "tileInvites": "open invitations"
+      "tileInvites": "open invitations",
+      "programOutcomes": "{team}: {count, plural, one {# achievement is} other {# achievements are}} waiting for confirmation"
     },
     "follow": {
       "title": "Support",
