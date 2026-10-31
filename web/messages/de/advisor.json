@@ -686,8 +686,6 @@
     "person": {
       "eyebrow": "Person · Advisor-Ansicht",
       "tabsLabel": "Ansichten dieser Person",
-      "groupLabels": "Betrieb | Einrichten | Verwalten",
-      "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Einmal einrichten, selten wieder anfassen: Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
       "tabs": {
         "ueber": "Über sie",
         "faehigkeiten": "Fähigkeiten",
@@ -719,6 +717,8 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
+      "groupLabels": "Betrieb | Einrichten | Verwalten",
+      "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Einmal einrichten, selten wieder anfassen: Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
       "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmplan | Erfolge | Programmseite | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
