@@ -5,6 +5,7 @@ import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
 import { getAdvisorFollowUpFor, getAdvisorNoteFor } from "@/features/advisor/notebookData";
+import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramSetupView } from "@/features/advisor/ProgramSetupView";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
@@ -15,6 +16,7 @@ import {
   getOrgTeamPrograms,
   getProgramAccess,
   getProgramConfirmedSetup,
+  getProgramOutcomes,
   getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
@@ -43,7 +45,7 @@ export default async function AdvisorProgramTeamPage({
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
   const query = (await searchParams) ?? {};
   const tabParam = query.tab;
-  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" ? tabParam : "overview";
+  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" || tabParam === "erfolge" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
   const locale = await getLocale();
   const {
@@ -66,7 +68,7 @@ export default async function AdvisorProgramTeamPage({
   }
   if (!program || !orgOfProgram) notFound();
 
-  const [members, milestones, questions, updates, due, profile, accessRows, setupItems] = await Promise.all([
+  const [members, milestones, questions, updates, due, profile, accessRows, setupItems, outcomes] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
     program.isActive && (tab === "meilensteine" || tab === "overview") ? listProgramMilestones(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? getProgramUpdateQuestions(client, programId) : Promise.resolve([]),
@@ -75,6 +77,7 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && tab === "overview" ? getProgramProfile(client, programId) : Promise.resolve(null),
     program.isActive && tab === "freigaben" ? getProgramAccess(client, orgOfProgram.id) : Promise.resolve([]),
     program.isActive && tab === "setup" ? getProgramConfirmedSetup(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "erfolge" ? getProgramOutcomes(client, programId) : Promise.resolve([]),
   ]);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
@@ -83,6 +86,7 @@ export default async function AdvisorProgramTeamPage({
     ["overview", t("tabOverview"), base],
     ["meilensteine", t("tabMilestones"), `${base}?tab=meilensteine`],
     ["updates", t("tabUpdates"), `${base}?tab=updates`],
+    ["erfolge", t("tabOutcomes"), `${base}?tab=erfolge`],
     ["setup", t("tabSetup"), `${base}?tab=setup`],
     ["freigaben", t("tabAccess"), `${base}?tab=freigaben`],
     ["notizen", t("tabNotes"), `${base}?tab=notizen`],
@@ -149,6 +153,8 @@ export default async function AdvisorProgramTeamPage({
             </dl>
             <ProgramProfileView profile={profile} />
           </div>
+        ) : tab === "erfolge" ? (
+          <ProgramOutcomes programId={programId} outcomes={outcomes} mode="org" returnTo={`${base}?tab=erfolge`} />
         ) : tab === "notizen" ? (
           <>
           <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("notesEndNote")}</p>

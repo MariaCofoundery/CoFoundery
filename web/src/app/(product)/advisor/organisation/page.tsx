@@ -10,13 +10,14 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOutcomeCatalog, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -25,7 +26,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "page", "profile"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile"] as const;
 type Tab = (typeof TABS)[number];
 // "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
 const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "members" : TABS.find((tab) => tab === value) ?? "overview");
@@ -43,7 +44,7 @@ const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "memb
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; open?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; open?: string; successError?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -86,7 +87,7 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "overview" || tab === "access";
-  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents] = await Promise.all([
+  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
@@ -97,6 +98,7 @@ export default async function AdvisorOrganisationPage({
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "program" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
+    tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -290,6 +292,13 @@ export default async function AdvisorOrganisationPage({
             {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
             {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.planError")}</p> : null}
             <OrgProgramPlan orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} events={planEvents} openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null} />
+          </>
+        ) : null}
+
+        {tab === "success" ? (
+          <>
+            {query.successError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.catalogError")}</p> : null}
+            <OrgOutcomeCatalog orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} items={outcomeCatalog} />
           </>
         ) : null}
 

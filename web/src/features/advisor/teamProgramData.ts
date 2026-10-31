@@ -329,3 +329,45 @@ export async function listDueProgramFollowUps(client: SupabaseClient, withinDays
   if (error || !Array.isArray(data)) return [];
   return (data as { program_id: string; due_on: string }[]).map((row) => ({ programId: row.program_id, dueOn: row.due_on }));
 }
+
+export type OutcomeCatalogItem = { catalogId: string; defaultKey: string | null; title: string | null; stars: number; active: boolean };
+export type ProgramOutcome = {
+  catalogId: string;
+  defaultKey: string | null;
+  title: string | null;
+  stars: number;
+  outcomeId: string | null;
+  achievedOn: string | null;
+  note: string | null;
+  confirmed: boolean;
+};
+
+export async function getOutcomeCatalog(client: SupabaseClient, orgId: string): Promise<OutcomeCatalogItem[]> {
+  const { data } = await client.rpc("get_outcome_catalog", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    catalogId: row.catalog_id as string,
+    defaultKey: (row.default_key as string | null) ?? null,
+    title: (row.title as string | null) ?? null,
+    stars: Number(row.stars ?? 1),
+    active: row.active === true,
+  }));
+}
+
+export async function getProgramOutcomes(client: SupabaseClient, programId: string): Promise<ProgramOutcome[]> {
+  const { data } = await client.rpc("get_program_outcomes", { p_program_id: programId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    catalogId: row.catalog_id as string,
+    defaultKey: (row.default_key as string | null) ?? null,
+    title: (row.title as string | null) ?? null,
+    stars: Number(row.stars ?? 1),
+    outcomeId: (row.outcome_id as string | null) ?? null,
+    achievedOn: (row.achieved_on as string | null) ?? null,
+    note: (row.note as string | null) ?? null,
+    confirmed: row.confirmed === true,
+  }));
+}
+
+/** Sterne eines Teams: nur bestaetigte Ergebnisse zaehlen. Je Team, nie ueber Teams hinweg. */
+export function countStars(outcomes: ProgramOutcome[]) {
+  return outcomes.filter((entry) => entry.outcomeId && entry.confirmed).reduce((sum, entry) => sum + entry.stars, 0);
+}

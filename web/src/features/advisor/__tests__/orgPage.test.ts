@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "page", "profile"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -319,4 +319,18 @@ test("Heute zeigt faellige Wiedervorlagen an Programm-Teams, nur die eigenen", (
   assert.match(page, /tab=notizen/);
   const data = readFileSync("src/features/advisor/teamProgramData.ts", "utf8");
   assert.match(data, /from\("advisor_follow_ups"\)[\s\S]*not\("program_id", "is", null\)/);
+});
+
+test("Erfolge: Katalog der Organisation, Sterne je Team, beide Seiten tragen ein, keine Rangliste", () => {
+  const sql = readFileSync("../supabase/migrations/20270210120000_program_success.sql", "utf8");
+  assert.match(sql, /save_outcome_catalog_item[\s\S]*is_advisor_org_owner_of\(p_org_id\)/);
+  assert.match(sql, /delete_outcomes_when_program_ends/);
+  // Sterne zaehlen nur bestaetigte Ergebnisse, und nie ueber Teams hinweg.
+  const data = readFileSync("src/features/advisor/teamProgramData.ts", "utf8");
+  assert.match(data, /entry\.outcomeId && entry\.confirmed/);
+  const ui = readFileSync("src/features/advisor/ProgramOutcomes.tsx", "utf8") + readFileSync("src/features/advisor/OrgOutcomeCatalog.tsx", "utf8");
+  assert.doesNotMatch(ui, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
+  assert.doesNotMatch(sql, /sum\(.*stars.*\).*group by/is);
+  const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(org, /OrgOutcomeCatalog/);
 });

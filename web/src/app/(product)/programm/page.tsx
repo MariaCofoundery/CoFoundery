@@ -15,7 +15,8 @@ import {
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
-import { getMyProgramEvents } from "@/features/advisor/teamProgramData";
+import { getMyProgramEvents, getProgramOutcomes } from "@/features/advisor/teamProgramData";
+import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -46,6 +47,11 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
           ]);
           return [program.programId, { questions, updates, due, profile }] as const;
         }),
+    ),
+  );
+  const outcomesByProgram = new Map(
+    await Promise.all(
+      programs.filter((program) => program.isActive).map(async (program) => [program.programId, await getProgramOutcomes(client, program.programId)] as const),
     ),
   );
   const milestonesByProgram = new Map(
@@ -155,6 +161,9 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 <>
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
+                </div>
+                <div className="mt-6 border-t border-slate-100 pt-4">
+                  <ProgramOutcomes programId={program.programId} outcomes={outcomesByProgram.get(program.programId) ?? []} mode="team" returnTo="/programm" />
                 </div>
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />

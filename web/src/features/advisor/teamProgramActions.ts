@@ -31,6 +31,8 @@ const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
 const orgPlanTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
+const orgSuccessTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=success${extra}`;
 const orgPageTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=page${extra}`;
 
@@ -433,4 +435,60 @@ export async function setProgramAttendanceAction(formData: FormData) {
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
   redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(String(formData.get("eventId") ?? ""))}`));
+}
+
+/** Zurueck nur auf die eigenen Seiten: /programm oder das Erfolge-Tab des Teams. */
+const outcomeReturn = (value: FormDataEntryValue | null) => {
+  const text = String(value ?? "");
+  return text === "/programm" || /^\/advisor\/programm\/[0-9a-f-]{36}\?tab=erfolge$/.test(text) ? text : "/programm";
+};
+
+/** Ein Ergebnis eintragen: das Team meldet, Inhaber und Bezugspersonen tragen direkt bestaetigt ein. */
+export async function reportProgramOutcomeAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  const date = String(formData.get("achievedOn") ?? "");
+  await client.rpc("report_program_outcome", {
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_catalog_id: String(formData.get("catalogId") ?? ""),
+    p_achieved_on: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : new Date().toISOString().slice(0, 10),
+    p_note: String(formData.get("note") ?? "").slice(0, 500),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+export async function confirmProgramOutcomeAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("confirm_program_outcome", { p_outcome_id: String(formData.get("outcomeId") ?? "") });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+export async function removeProgramOutcomeAction(formData: FormData) {
+  const back = outcomeReturn(formData.get("returnTo"));
+  const client = await requireUser(back);
+  await client.rpc("remove_program_outcome", { p_outcome_id: String(formData.get("outcomeId") ?? "") });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
+/** Katalog der Organisation: Punkt ergaenzen, Sterne aendern, ein- oder ausschalten. Nur der Inhaber. */
+export async function saveOutcomeCatalogItemAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSuccessTab(orgId));
+  const catalogId = String(formData.get("catalogId") ?? "");
+  const { error } = await client.rpc("save_outcome_catalog_item", {
+    p_org_id: orgId,
+    p_catalog_id: catalogId || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 120),
+    p_stars: Number(formData.get("stars") ?? 1) || 1,
+    p_active: formData.has("activeFlag") ? formData.get("active") === "yes" : formData.get("active") !== "no",
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(orgSuccessTab(orgId, error ? "&successError=1" : ""));
 }
