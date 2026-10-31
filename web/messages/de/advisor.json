@@ -1037,7 +1037,9 @@
     "successOffNote": "Ausschalten löscht nichts: Die Teams sehen es nur nicht mehr, und alles erscheint wieder, wenn ihr einschaltet. Gelöscht wird es erst mit dem Ende des Programms eines Teams.",
     "programsEmptyInvite": "Team einladen",
     "programsEmptyCode": "Programmcode erzeugen",
-    "membersCount": "{count, plural, one {# Person} other {# Personen}}"
+    "membersCount": "{count, plural, one {# Person} other {# Personen}}",
+    "enrollOtherWay": "Hier nimmst du Teams in dein Programm auf. Möchtest du stattdessen eine Person oder ein Team mit Report begleiten, geht das unter „Einladen“.",
+    "enrollOtherWayLink": "Zu „Einladen“"
   },
   "programPage": {
     "title": "Programmseite",

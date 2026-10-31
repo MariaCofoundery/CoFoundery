@@ -433,3 +433,12 @@ test("Begleitung auf dem Handy: Karten mit kleinerem Rand, lange Namen brechen u
   assert.match(list, /invite\.founderAStarted && invite\.founderBStarted\s*\?\s*t\("dashboard\.statuses\.accepted"\)/);
   assert.match(list, /invite\.status === "expired" && !\(invite\.founderAStarted && invite\.founderBStarted\)/);
 });
+
+test("Advisor-Menue: Programm-Team-Seiten gehoeren zur Organisation, Einladen und Teams aufnehmen verweisen aufeinander", () => {
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  assert.match(shell, /currentPathname\.startsWith\("\/advisor\/programm\/"\)/);
+  const invite = readFileSync("src/app/(product)/advisor/einladen/page.tsx", "utf8");
+  assert.match(invite, /program: "\/advisor\/organisation\?tab=enroll"/);
+  const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(section, /href="\/advisor\/einladen"/);
+});

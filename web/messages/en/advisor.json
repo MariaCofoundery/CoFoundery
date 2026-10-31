@@ -1037,7 +1037,9 @@
     "successOffNote": "Switching off deletes nothing: teams just no longer see it, and everything reappears when you switch on again. It is only deleted when a team's program ends.",
     "programsEmptyInvite": "Invite a team",
     "programsEmptyCode": "Create a program code",
-    "membersCount": "{count, plural, one {# person} other {# people}}"
+    "membersCount": "{count, plural, one {# person} other {# people}}",
+    "enrollOtherWay": "Here you enroll teams in your program. To follow a person or a team with a report instead, use “Invite”.",
+    "enrollOtherWayLink": "Go to “Invite”"
   },
   "programPage": {
     "title": "Program page",

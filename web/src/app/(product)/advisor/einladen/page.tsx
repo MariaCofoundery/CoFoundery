@@ -79,7 +79,7 @@ export default async function AdvisorInvitePage({
     person: "/advisor/einladen?art=person",
     team: "/advisor/einladen?art=team",
     round: "/advisor/einladen?art=runde",
-    program: "/advisor/organisation?tab=program",
+    program: "/advisor/organisation?tab=enroll",
   };
 
   return (

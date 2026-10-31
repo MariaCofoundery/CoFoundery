@@ -520,7 +520,8 @@ export function ProductShell({
     {
       href: "/advisor/organisation",
       label: advisorOrgLabel,
-      isActive: (currentPathname) => currentPathname === "/advisor/organisation",
+      // Die Seiten eines Teams im Programm erreicht man ueber die Organisation.
+      isActive: (currentPathname) => currentPathname === "/advisor/organisation" || currentPathname.startsWith("/advisor/programm/"),
     },
   ];
 

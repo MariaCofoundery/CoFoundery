@@ -195,6 +195,13 @@ export async function OrgTeamProgramsSection({
       </section>
       ) : null}
 
+      {part === "enroll" ? (
+        <p className="text-sm leading-6 text-slate-600">
+          {t("enrollOtherWay")}{" "}
+          <Link href="/advisor/einladen" className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("enrollOtherWayLink")}</Link>
+        </p>
+      ) : null}
+
       {part === "enroll" && isOwner ? (
         <section aria-labelledby="org-invite-title" className="grid gap-4 md:grid-cols-2">
           <div className={CARD}>
