@@ -51,7 +51,7 @@ export async function ProgramOutcomes({
         {outcomes.map((entry) => {
           const reported = Boolean(entry.outcomeId);
           return (
-            <li key={entry.catalogId} className={`rounded-2xl border px-4 py-3 ${entry.confirmed ? "border-amber-300 bg-amber-50/60" : "border-slate-200 bg-white"}`}>
+            <li key={entry.catalogId} className={`rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(40,30,110,0.05)] ${entry.confirmed ? "border-amber-300 bg-amber-50/60" : "border-slate-200 bg-white"}`}>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-sm font-semibold text-slate-950">{label(entry)}</span>
                 <span className={`text-sm ${entry.confirmed ? "text-amber-500" : "text-slate-400"}`} aria-label={t("outcomeStarsLabel", { count: entry.stars })}>

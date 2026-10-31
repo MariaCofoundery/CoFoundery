@@ -21,7 +21,7 @@ import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -101,7 +101,7 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "overview" || tab === "access";
-  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled] = await Promise.all([
+  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
@@ -115,6 +115,7 @@ export default async function AdvisorOrganisationPage({
     tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
     tab === "success" ? getSuccessEnabled(client, org.id) : Promise.resolve(false),
+    tab === "program" ? getOrgProgramStars(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -338,7 +339,7 @@ export default async function AdvisorOrganisationPage({
               </p>
             ) : null}
             {query.teamRemoved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.teamRemoved")}</p> : null}
-            <OrgTeamProgramsSection org={org} members={members} programs={programs} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
+            <OrgTeamProgramsSection org={org} members={members} programs={programs} stars={programStars} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
           </>
         ) : null}
       </div>

@@ -432,3 +432,16 @@ export async function getSuccessEnabled(client: SupabaseClient, orgId: string): 
   const { data } = await client.rpc("get_success_enabled", { p_org_id: orgId });
   return data === true;
 }
+
+export type OrgProgramStars = { programId: string; stars: number; nextStars: number | null; nextTitle: string | null };
+
+/** Sterne und naechste Belohnung je Team fuer die Karten der Organisation; leer, wenn Erfolge aus sind. Je Team, keine Summe. */
+export async function getOrgProgramStars(client: SupabaseClient, orgId: string): Promise<OrgProgramStars[]> {
+  const { data } = await client.rpc("get_org_program_stars", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    programId: row.program_id as string,
+    stars: Number(row.stars ?? 0),
+    nextStars: row.next_stars === null || row.next_stars === undefined ? null : Number(row.next_stars),
+    nextTitle: (row.next_title as string | null) ?? null,
+  }));
+}

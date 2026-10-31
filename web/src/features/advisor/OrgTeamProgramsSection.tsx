@@ -11,7 +11,7 @@ import {
   setTeamProgramContactsAction,
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
-import type { OrgTeamProgram, TeamProgramCode, TeamProgramInvite } from "@/features/advisor/teamProgramData";
+import type { OrgProgramStars, OrgTeamProgram, TeamProgramCode, TeamProgramInvite } from "@/features/advisor/teamProgramData";
 import { TeamAvatar } from "@/features/advisor/TeamAvatar";
 import { EmptyState } from "@/features/advisor/EmptyState";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -40,10 +40,12 @@ export async function OrgTeamProgramsSection({
   inviteError,
   codes,
   codeError,
+  stars = [],
 }: {
   org: AdvisorOrg;
   members: OrgMember[];
   programs: OrgTeamProgram[];
+  stars?: OrgProgramStars[];
   invites: TeamProgramInvite[];
   /** Nur direkt nach dem Erzeugen: der Link wird danach nie wieder gezeigt. */
   freshToken: string | null;
@@ -94,6 +96,24 @@ export async function OrgTeamProgramsSection({
                     </span>
                   </span>
                 </div>
+                {(() => {
+                  const entry = stars.find((candidate) => candidate.programId === program.programId);
+                  if (!entry) return null;
+                  const percent = entry.nextStars ? Math.min(100, Math.round((entry.stars / entry.nextStars) * 100)) : 100;
+                  return (
+                    <div className="mt-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">★ {entry.stars}</span>
+                        {entry.nextTitle ? <span className="text-xs text-slate-600">{t("rewardsNext", { missing: Math.max(0, (entry.nextStars ?? 0) - entry.stars), title: entry.nextTitle })}</span> : null}
+                      </div>
+                      {entry.nextTitle ? (
+                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={entry.nextStars ?? 0} aria-valuenow={Math.min(entry.stars, entry.nextStars ?? 0)}>
+                          <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-300" style={{ width: `${percent}%` }} />
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })()}
                 {!program.isActive && program.memberCount === 1 && (isOwner || program.isContact) ? (
                   <form action={setTeamProgramSoloAction} className="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
                     <input type="hidden" name="orgId" value={org.id} />

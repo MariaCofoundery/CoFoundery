@@ -400,3 +400,14 @@ test("Optik Schritt 3: Heute mit Icon-Kacheln und Karten, Organisation mit Team-
   const avatar = readFileSync("src/features/advisor/TeamAvatar.tsx", "utf8");
   assert.doesNotMatch(avatar + today, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
 });
+
+test("Optik Schritt 4: Team-Karten zeigen Sterne und Weg zur naechsten Belohnung, je Team, keine Summe oder Reihenfolge nach Sternen", () => {
+  const sql = readFileSync("../supabase/migrations/20270213120000_org_program_stars.sql", "utf8");
+  assert.match(sql, /org_success_enabled\(p_org_id\)/);
+  assert.match(sql, /order by t\.name nulls last/);
+  assert.doesNotMatch(sql, /order by[^;]*program_star_total/);
+  const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(section, /candidate\.programId === program\.programId/);
+  const team = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  assert.match(team, /className="advisor-card flex items-start gap-3/);
+});
