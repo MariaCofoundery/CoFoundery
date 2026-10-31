@@ -766,7 +766,7 @@
     "iApproved": "You have agreed",
     "end": "End program",
     "endHint": "Anyone on the team can end this at any time.",
-    "meaning": "Agreeing means: the organization (owners and contact people) sees what your team enters into the program, and the agreements confirmed together in the Founder Setup, read-only. Work styles and team review stay separate approvals and are not opened by this. The organization also records whether your team took part in program events; you see your own entry.",
+    "meaning": "Agreeing means: the organization (owners and contact people) sees what your team enters into the program, and the agreements confirmed together in the Founder Setup, read-only. Work styles and team review stay separate approvals and are not opened by this. The organization also records whether your team took part in program events; you see your own entry. If the organization uses achievements, both sides record stars, rewards and a progress conversation; you see everything about your team.",
     "inviteTitle": "Invitation to the program of {org}",
     "inviteText": "Choose the team that should take part. It only becomes active once everyone on the team has agreed.",
     "inviteNoTeam": "You are not on a team that could take part. Create a team first or join one.",
@@ -1020,7 +1020,14 @@
     "checkInHeld": "Talked on",
     "checkInNextLabel": "Next conversation (optional)",
     "checkInSummary": "Summary",
-    "checkInSave": "Record"
+    "checkInSave": "Record",
+    "successSwitchTitle": "Achievements, stars and rewards",
+    "successSwitchText": "A playful part of the program: teams collect stars for results they reach, you set rewards and talk regularly about where they stand. It is optional. If you do not need it, it stays off and your teams see none of it.",
+    "successIsOn": "Switched on",
+    "successIsOff": "Switched off (default)",
+    "successTurnOn": "Switch on",
+    "successTurnOff": "Switch off",
+    "successOffNote": "Switching off deletes nothing: teams just no longer see it, and everything reappears when you switch on again. It is only deleted when a team's program ends."
   },
   "programPage": {
     "title": "Program page",

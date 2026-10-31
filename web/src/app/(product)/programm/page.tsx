@@ -172,6 +172,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
                 </div>
+                {(outcomesByProgram.get(program.programId)?.outcomes.length ?? 0) > 0 ? (
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <div className="grid gap-8">
                     <ProgramOutcomes programId={program.programId} outcomes={outcomesByProgram.get(program.programId)?.outcomes ?? []} mode="team" returnTo="/programm" comments={outcomesByProgram.get(program.programId)?.comments ?? []} />
@@ -179,6 +180,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                     <ProgramCheckIn programId={program.programId} checkIns={outcomesByProgram.get(program.programId)?.checkIns ?? []} returnTo="/programm" />
                   </div>
                 </div>
+                ) : null}
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />
                 </div>

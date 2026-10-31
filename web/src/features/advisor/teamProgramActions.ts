@@ -552,3 +552,14 @@ export async function saveCheckInAction(formData: FormData) {
   revalidatePath("/advisor/programm");
   redirect(back);
 }
+
+/** Erfolge, Sterne, Belohnungen und Gespraech zum Stand ein- oder ausschalten. Nur der Inhaber; sie sind standardmaessig aus. */
+export async function setSuccessEnabledAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgSuccessTab(orgId));
+  const { error } = await client.rpc("set_success_enabled", { p_org_id: orgId, p_enabled: formData.get("enabled") === "yes" });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(orgSuccessTab(orgId, error ? "&successError=1" : ""));
+}

@@ -10,6 +10,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
@@ -18,7 +19,7 @@ import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgRewards, getOutcomeCatalog, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -88,7 +89,7 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "overview" || tab === "access";
-  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards] = await Promise.all([
+  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
@@ -101,6 +102,7 @@ export default async function AdvisorOrganisationPage({
     tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
+    tab === "success" ? getSuccessEnabled(client, org.id) : Promise.resolve(false),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -300,8 +302,15 @@ export default async function AdvisorOrganisationPage({
         {tab === "success" ? (
           <>
             {query.successError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.catalogError")}</p> : null}
-            <OrgOutcomeCatalog orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} items={outcomeCatalog} />
-            <OrgRewards orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} rewards={orgRewards} />
+            <div className="grid gap-8">
+              <OrgSuccessSwitch orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} enabled={successEnabled} />
+              {successEnabled ? (
+                <div>
+                  <OrgOutcomeCatalog orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} items={outcomeCatalog} />
+                  <OrgRewards orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} rewards={orgRewards} />
+                </div>
+              ) : null}
+            </div>
           </>
         ) : null}
 

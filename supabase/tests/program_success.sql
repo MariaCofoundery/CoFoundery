@@ -8,6 +8,7 @@ insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_co
 select '00000000-0000-0000-0000-000000000000', ('f0000000-0000-4000-8000-00000000000' || n)::uuid, 'authenticated', 'authenticated', 'u' || n || '@example.com', '', now(), '{}', '{}', now(), now()
 from generate_series(1, 6) n;
 insert into public.advisor_orgs(id, name) values ('f0000000-0000-4000-8000-0000000000a0', 'Programm Sechzehn');
+update public.advisor_orgs set program_success_enabled = true where id = 'f0000000-0000-4000-8000-0000000000a0';
 insert into public.advisor_org_members(org_id, user_id, role, status) values
 ('f0000000-0000-4000-8000-0000000000a0','f0000000-0000-4000-8000-000000000001','owner','active'),
 ('f0000000-0000-4000-8000-0000000000a0','f0000000-0000-4000-8000-000000000004','advisor','active'),

@@ -347,3 +347,16 @@ test("Belohnungen und Gespraech zum Stand: Organisation legt fest, jede Seite sc
   // Die eigene Seite bekommt ein Formular, die andere nur Text.
   assert.match(outcomes, /if \(side !== mode\)/);
 });
+
+test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, der Inhaber schaltet", () => {
+  const sql = readFileSync("../supabase/migrations/20270212120000_program_success_optional.sql", "utf8");
+  assert.match(sql, /program_success_enabled boolean not null default false/);
+  assert.match(sql, /set_success_enabled[\s\S]*is_advisor_org_owner_of\(p_org_id\)/);
+  assert.match(sql, /org_success_enabled\(p\.org_id\)/);
+  const mine = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.match(mine, /outcomes\.length \?\? 0\) > 0/);
+  const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(org, /successEnabled \? \(/);
+  const privacy = readFileSync("src/app/datenschutz/page.tsx", "utf8");
+  assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
+});

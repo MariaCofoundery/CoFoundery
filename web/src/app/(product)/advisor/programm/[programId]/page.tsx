@@ -22,6 +22,7 @@ import {
   getOutcomeComments,
   getProgramOutcomes,
   getProgramRewards,
+  getSuccessEnabled,
   getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
@@ -87,6 +88,7 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && tab === "erfolge" ? getProgramRewards(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getCheckIns(client, programId) : Promise.resolve([]),
   ]);
+  const successEnabled = await getSuccessEnabled(client, orgOfProgram.id);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
 
@@ -94,7 +96,7 @@ export default async function AdvisorProgramTeamPage({
     ["overview", t("tabOverview"), base],
     ["meilensteine", t("tabMilestones"), `${base}?tab=meilensteine`],
     ["updates", t("tabUpdates"), `${base}?tab=updates`],
-    ["erfolge", t("tabOutcomes"), `${base}?tab=erfolge`],
+    ...(successEnabled ? ([["erfolge", t("tabOutcomes"), `${base}?tab=erfolge`]] as [string, string, string][]) : []),
     ["setup", t("tabSetup"), `${base}?tab=setup`],
     ["freigaben", t("tabAccess"), `${base}?tab=freigaben`],
     ["notizen", t("tabNotes"), `${base}?tab=notizen`],

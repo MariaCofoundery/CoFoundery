@@ -766,7 +766,7 @@
     "iApproved": "Du hast zugestimmt",
     "end": "Programm beenden",
     "endHint": "Jede Person im Team kann das jederzeit beenden.",
-    "meaning": "Zustimmen heißt: Die Organisation (Inhaber und Bezugspersonen) sieht, was dein Team ins Programm einträgt, und die gemeinsam bestätigten Vereinbarungen im Founder Setup, nur lesend. Arbeitsweisen und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet. Die Organisation trägt außerdem ein, ob euer Team an Programmveranstaltungen teilgenommen hat; ihr seht euren Eintrag.",
+    "meaning": "Zustimmen heißt: Die Organisation (Inhaber und Bezugspersonen) sieht, was dein Team ins Programm einträgt, und die gemeinsam bestätigten Vereinbarungen im Founder Setup, nur lesend. Arbeitsweisen und Team-Review bleiben getrennte Freigaben und werden dadurch nicht geöffnet. Die Organisation trägt außerdem ein, ob euer Team an Programmveranstaltungen teilgenommen hat; ihr seht euren Eintrag. Nutzt die Organisation Erfolge, tragen beide Seiten Sterne, Belohnungen und ein Gespräch zum Stand ein; du siehst alles zu deinem Team.",
     "inviteTitle": "Einladung ins Programm von {org}",
     "inviteText": "Wähle das Team, das teilnehmen soll. Erst wenn alle im Team zugestimmt haben, ist es aktiv.",
     "inviteNoTeam": "Du bist in keinem Team, das teilnehmen könnte. Lege zuerst ein Team an oder tritt einem bei.",
@@ -1020,7 +1020,14 @@
     "checkInHeld": "Gesprochen am",
     "checkInNextLabel": "Nächstes Gespräch (optional)",
     "checkInSummary": "Zusammenfassung",
-    "checkInSave": "Festhalten"
+    "checkInSave": "Festhalten",
+    "successSwitchTitle": "Erfolge, Sterne und Belohnungen",
+    "successSwitchText": "Ein spielerischer Teil des Programms: Teams sammeln Sterne für erreichte Ergebnisse, ihr legt Belohnungen fest und sprecht regelmäßig über den Stand. Das ist freiwillig. Wenn ihr es nicht braucht, bleibt es aus, und eure Teams sehen nichts davon.",
+    "successIsOn": "Eingeschaltet",
+    "successIsOff": "Ausgeschaltet (Voreinstellung)",
+    "successTurnOn": "Einschalten",
+    "successTurnOff": "Ausschalten",
+    "successOffNote": "Ausschalten löscht nichts: Die Teams sehen es nur nicht mehr, und alles erscheint wieder, wenn ihr einschaltet. Gelöscht wird es erst mit dem Ende des Programms eines Teams."
   },
   "programPage": {
     "title": "Programmseite",

@@ -427,3 +427,8 @@ export async function getCheckIns(client: SupabaseClient, programId: string): Pr
     nextOn: (row.next_on as string | null) ?? null,
   }));
 }
+
+export async function getSuccessEnabled(client: SupabaseClient, orgId: string): Promise<boolean> {
+  const { data } = await client.rpc("get_success_enabled", { p_org_id: orgId });
+  return data === true;
+}
