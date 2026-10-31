@@ -12,11 +12,12 @@ import {
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type { OrgTeamProgram, TeamProgramCode, TeamProgramInvite } from "@/features/advisor/teamProgramData";
+import { TeamAvatar } from "@/features/advisor/TeamAvatar";
 import { EmptyState } from "@/features/advisor/EmptyState";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
-const CARD = "rounded-3xl border border-slate-200 bg-white p-5 sm:p-6";
+const CARD = "advisor-card p-5 sm:p-6";
 const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
 const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm";
 const PRIMARY = "inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white";
@@ -79,9 +80,9 @@ export async function OrgTeamProgramsSection({
         ) : (
           <ul className="mt-4 grid gap-4">
             {programs.map((program) => (
-              <li key={program.programId} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+              <li key={program.programId} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(40,30,110,0.05)]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-base font-semibold text-slate-950">{program.teamName ?? t("unnamedTeam")}</span>
+                  <span className="flex min-w-0 items-center gap-3"><TeamAvatar name={program.teamName ?? "?"} /><span className="min-w-0"><span className="block truncate text-base font-semibold text-slate-950">{program.teamName ?? t("unnamedTeam")}</span><span className="block text-xs text-slate-500">{t("membersCount", { count: program.memberCount })}{program.batch ? ` · ${program.batch}` : ""}</span></span></span>
                   <span className="flex flex-wrap items-center gap-2">
                     {program.isAlumni ? <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-800">{t("metaAlumni")}</span> : null}
                     <span

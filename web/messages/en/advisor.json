@@ -1034,7 +1034,8 @@
     "successTurnOff": "Switch off",
     "successOffNote": "Switching off deletes nothing: teams just no longer see it, and everything reappears when you switch on again. It is only deleted when a team's program ends.",
     "programsEmptyInvite": "Invite a team",
-    "programsEmptyCode": "Create a program code"
+    "programsEmptyCode": "Create a program code",
+    "membersCount": "{count, plural, one {# person} other {# people}}"
   },
   "programPage": {
     "title": "Program page",

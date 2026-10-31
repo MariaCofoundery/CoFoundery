@@ -82,7 +82,7 @@ export async function OrgProgramPlan({
   const attendance = openEventId ? await getEventAttendance(client, openEventId) : [];
 
   const renderEvent = (event: ProgramEvent) => (
-    <li key={event.eventId} className="rounded-2xl border border-slate-200 bg-white p-4">
+    <li key={event.eventId} className="advisor-card p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-base font-semibold text-slate-950">{event.title}</span>
         <span className="text-sm text-slate-600">{format.format(new Date(event.startsAt))}</span>

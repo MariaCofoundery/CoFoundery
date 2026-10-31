@@ -387,3 +387,16 @@ test("Leere Bereiche zeigen den logischen naechsten Schritt statt nur einen Satz
   assert.match(readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8"), /open=\{events\.length === 0\}/);
   assert.match(readFileSync("src/features/advisor/ProgramMilestones.tsx", "utf8"), /open=\{milestones\.length === 0\}/);
 });
+
+test("Optik Schritt 3: Heute mit Icon-Kacheln und Karten, Organisation mit Team-Karten, ohne Wertung", () => {
+  const css = readFileSync("src/app/globals.css", "utf8");
+  assert.match(css, /\.advisor-card \{/);
+  const today = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.match(today, /<TeamAvatar/);
+  assert.match(today, /className="advisor-card flex items-start gap-3/);
+  const programs = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(programs, /<TeamAvatar/);
+  // Die Farbe des Avatars folgt dem Namen und sagt nichts ueber das Team.
+  const avatar = readFileSync("src/features/advisor/TeamAvatar.tsx", "utf8");
+  assert.doesNotMatch(avatar + today, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
+});

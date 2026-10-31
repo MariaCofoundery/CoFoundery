@@ -6,7 +6,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 export async function OrgSuccessSwitch({ orgId, isOwner, enabled }: { orgId: string; isOwner: boolean; enabled: boolean }) {
   const t = await getTranslations("advisor.teamProgram");
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="success-switch-title">
+    <section className="advisor-card p-5 sm:p-6" aria-labelledby="success-switch-title">
       <h2 id="success-switch-title" className="text-xl font-semibold text-slate-950">{t("successSwitchTitle")}</h2>
       <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("successSwitchText")}</p>
       <p className="mt-2 text-sm font-semibold text-slate-900">{enabled ? t("successIsOn") : t("successIsOff")}</p>

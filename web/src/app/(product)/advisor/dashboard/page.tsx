@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
+import { TeamAvatar } from "@/features/advisor/TeamAvatar";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -13,7 +14,7 @@ import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 
-const CARD = "rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.04)]";
+const CARD = "advisor-card p-6";
 const LINK =
   "inline-flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50";
 
@@ -164,21 +165,26 @@ export default async function AdvisorStartPage() {
           }
         />
 
-        <dl className="mt-6 grid grid-cols-3 gap-3">
+        <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
-            [t("start.tileTeams"), programTeamCount],
-            [t("start.tileUpdates"), programUpdates.length],
-            [t("start.tileInvites"), openInviteCount],
-          ].map(([label, value]) => (
-            <div key={label as string} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-              <dd className="text-2xl font-extrabold tracking-tight text-slate-950">{value}</dd>
-              <dt className="mt-0.5 text-xs leading-5 text-slate-600">{label}</dt>
+            [t("start.tileTeams"), programTeamCount, <path key="a" d="M3 12h4l3-8 4 16 3-8h4" />, "bg-violet-100 text-violet-700"],
+            [t("start.tileUpdates"), programUpdates.length, <><rect key="b" x="4" y="5.5" width="16" height="14" rx="3" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></>, "bg-amber-100 text-amber-800"],
+            [t("start.tileInvites"), openInviteCount, <><rect key="c" x="3.5" y="5.5" width="17" height="13" rx="3" /><path d="m4.5 8 7.5 5.5L19.5 8" /></>, "bg-emerald-100 text-emerald-800"],
+          ].map(([label, value, icon, tone]) => (
+            <div key={label as string} className="advisor-card flex items-start gap-3 px-4 py-4">
+              <span aria-hidden="true" className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${tone as string}`}>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{icon as React.ReactNode}</svg>
+              </span>
+              <div>
+                <dd className="text-3xl font-bold leading-none tracking-tight text-slate-950">{value as number}</dd>
+                <dt className="mt-1 text-sm leading-5 text-slate-600">{label as string}</dt>
+              </div>
             </div>
           ))}
         </dl>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <section aria-labelledby="advisor-waiting-title" className={`${CARD} ${waiting.length > 0 ? "border-amber-200 bg-amber-50/60" : ""}`}>
+          <section aria-labelledby="advisor-waiting-title" className={CARD}>
             <h2 id="advisor-waiting-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
               {waiting.length > 0 ? t("start.waitingTitle", { count: waiting.length }) : t("start.waitingTitleNone")}
             </h2>
@@ -187,14 +193,14 @@ export default async function AdvisorStartPage() {
             ) : (
               <ul className="mt-4 grid gap-3">
                 {waiting.map((item) => (
-                  <li key={item.key} className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 text-sm text-slate-900">
+                  <li key={item.key} className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900">
                     <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-violet-100 text-violet-700">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         {item.icon === "flag" ? <path d="M6 20V4.5M6 5h11l-2.2 3.5L17 12H6" /> : item.icon === "cal" ? <><rect x="4" y="5.5" width="16" height="14" rx="3" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></> : item.icon === "lock" ? <><rect x="5" y="10.5" width="14" height="9" rx="3" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /></> : <><rect x="3.5" y="5.5" width="17" height="13" rx="3" /><path d="m4.5 8 7.5 5.5L19.5 8" /></>}
                       </svg>
                     </span>
                     <span className="min-w-0">{item.text}</span>
-                    <Link href={item.href} className="font-semibold text-violet-800 underline-offset-4 hover:underline">
+                    <Link href={item.href} className="inline-flex min-h-10 items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50">
                       {item.cta}
                     </Link>
                   </li>
@@ -218,8 +224,9 @@ export default async function AdvisorStartPage() {
               <>
                 <ul className="mt-4 grid gap-3">
                   {recent.map((item) => (
-                    <li key={item.key} className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                      <Link href={item.href} className="font-semibold text-slate-900 underline-offset-4 hover:underline">
+                    <li key={item.key} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-2.5 text-sm">
+                      <TeamAvatar name={item.label} />
+                      <Link href={item.href} className="min-w-0 flex-1 truncate font-semibold text-slate-900 underline-offset-4 hover:underline">
                         {item.label}
                       </Link>
                       <span className="rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-semibold text-violet-800">{item.kind}</span>

@@ -1422,3 +1422,11 @@ body {
 .idcards[data-active="interests"] [data-card="interests"] { display: block; }
 .idcards [data-card] fieldset { border-top-width: 0; padding-top: 0; }
 .idcards [data-card] legend { font-size: 1.25rem; font-weight: 600; color: rgb(2 6 23); margin-bottom: 0.25rem; }
+
+/* Advisor-Karten: heller Grund, weicher Schatten (Schritt 3 der Optik). */
+.advisor-card {
+  border: 1px solid #e4e1f1;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(40, 30, 110, 0.06), 0 8px 24px -12px rgba(40, 30, 110, 0.18);
+}

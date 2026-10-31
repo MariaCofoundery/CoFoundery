@@ -1034,7 +1034,8 @@
     "successTurnOff": "Ausschalten",
     "successOffNote": "Ausschalten löscht nichts: Die Teams sehen es nur nicht mehr, und alles erscheint wieder, wenn ihr einschaltet. Gelöscht wird es erst mit dem Ende des Programms eines Teams.",
     "programsEmptyInvite": "Team einladen",
-    "programsEmptyCode": "Programmcode erzeugen"
+    "programsEmptyCode": "Programmcode erzeugen",
+    "membersCount": "{count, plural, one {# Person} other {# Personen}}"
   },
   "programPage": {
     "title": "Programmseite",
