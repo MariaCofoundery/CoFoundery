@@ -95,7 +95,7 @@ export async function ProgramMilestones({
         })}
       </ul>
 
-      <details className="rounded-2xl border border-dashed border-slate-300 bg-white/70 px-4 py-2">
+      <details open={milestones.length === 0} className="rounded-2xl border border-dashed border-slate-300 bg-white/70 px-4 py-2">
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">{t("msAdd")}</summary>
         <form action={saveProgramMilestoneAction} className="grid gap-3 pb-3">
           <input type="hidden" name="programId" value={programId} />

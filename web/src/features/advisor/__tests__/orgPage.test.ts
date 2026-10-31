@@ -374,3 +374,16 @@ test("Organisation: die zehn Reiter stehen in drei Gruppen, jeder Reiter genau e
     assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 3, locale);
   }
 });
+
+test("Leere Bereiche zeigen den logischen naechsten Schritt statt nur einen Satz", () => {
+  const people = readFileSync("src/features/advisor/AccompaniedPeopleList.tsx", "utf8");
+  assert.match(people, /EmptyState[\s\S]*\/advisor\/einladen\?art=person/);
+  const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(org, /<EmptyState[\s\S]*einladen\?art=team/);
+  const programs = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(programs, /#org-invite-title/);
+  assert.match(programs, /id="org-codes-title"/);
+  // Plan und Meilensteine oeffnen das Formular, solange noch nichts da ist.
+  assert.match(readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8"), /open=\{events\.length === 0\}/);
+  assert.match(readFileSync("src/features/advisor/ProgramMilestones.tsx", "utf8"), /open=\{milestones\.length === 0\}/);
+});

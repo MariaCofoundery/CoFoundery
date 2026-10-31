@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { EmptyState } from "@/features/advisor/EmptyState";
 import type { AccompaniedPersonNamed } from "@/features/advisor/orgData";
 
 /**
@@ -11,7 +12,9 @@ import type { AccompaniedPersonNamed } from "@/features/advisor/orgData";
 export async function AccompaniedPeopleList({ people }: { people: AccompaniedPersonNamed[] }) {
   const t = await getTranslations("advisor.org");
   return people.length === 0 ? (
-    <p className="mt-2 text-sm leading-6 text-slate-600">{t("peopleEmpty")}</p>
+    <div className="mt-3">
+      <EmptyState text={t("peopleEmpty")} actions={[{ href: "/advisor/einladen?art=person", label: t("peopleEmptyInvite"), primary: true }]} />
+    </div>
   ) : (
     <ul className="mt-3 grid gap-3">
       {people.map((person) => (

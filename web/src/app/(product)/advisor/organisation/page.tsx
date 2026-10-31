@@ -10,6 +10,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
+import { EmptyState } from "@/features/advisor/EmptyState";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
@@ -212,7 +213,13 @@ export default async function AdvisorOrganisationPage({
 
         {tab === "teams" ? (
           teams.length === 0 ? (
-            <p className="text-sm leading-6 text-slate-600">{t("orgPage.teamsEmpty")}</p>
+            <EmptyState
+              text={t("orgPage.teamsEmpty")}
+              actions={[
+                { href: "/advisor/einladen?art=team", label: t("orgPage.teamsEmptyInvite"), primary: true },
+                { href: base("program"), label: t("orgPage.teamsEmptyProgram") },
+              ]}
+            />
           ) : (
             <div>
               <TeamSection title={tAdvisor("dashboard.readySectionTitle")} description={tAdvisor("dashboard.readySectionDescription")} teams={readyTeams} t={tAdvisor} locale={locale} />

@@ -463,7 +463,8 @@
       "email": "Please enter a valid email address.",
       "org_failed": "That did not work just now. Please try again."
     },
-    "personOpen": "View"
+    "personOpen": "View",
+    "peopleEmptyInvite": "Invite a person"
   },
   "personView": {
     "back": "Back to people & groups",
@@ -732,7 +733,9 @@
       "peopleTitle": "People you support",
       "teamsTitle": "Teams you support",
       "focusLabel": "Focus areas",
-      "suspendedShort": "suspended"
+      "suspendedShort": "suspended",
+      "teamsEmptyInvite": "Invite a team",
+      "teamsEmptyProgram": "Teams in the program"
     }
   },
   "teamProgram": {
@@ -1029,7 +1032,9 @@
     "successIsOff": "Switched off (default)",
     "successTurnOn": "Switch on",
     "successTurnOff": "Switch off",
-    "successOffNote": "Switching off deletes nothing: teams just no longer see it, and everything reappears when you switch on again. It is only deleted when a team's program ends."
+    "successOffNote": "Switching off deletes nothing: teams just no longer see it, and everything reappears when you switch on again. It is only deleted when a team's program ends.",
+    "programsEmptyInvite": "Invite a team",
+    "programsEmptyCode": "Create a program code"
   },
   "programPage": {
     "title": "Program page",

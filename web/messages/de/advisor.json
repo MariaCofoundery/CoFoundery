@@ -463,7 +463,8 @@
       "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
       "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
     },
-    "personOpen": "Ansehen"
+    "personOpen": "Ansehen",
+    "peopleEmptyInvite": "Person einladen"
   },
   "personView": {
     "back": "Zurück zu Personen & Gruppen",
@@ -732,7 +733,9 @@
       "peopleTitle": "Personen, die du begleitest",
       "teamsTitle": "Teams, die du begleitest",
       "focusLabel": "Schwerpunkte",
-      "suspendedShort": "ausgesetzt"
+      "suspendedShort": "ausgesetzt",
+      "teamsEmptyInvite": "Team einladen",
+      "teamsEmptyProgram": "Teams im Programm"
     }
   },
   "teamProgram": {
@@ -1029,7 +1032,9 @@
     "successIsOff": "Ausgeschaltet (Voreinstellung)",
     "successTurnOn": "Einschalten",
     "successTurnOff": "Ausschalten",
-    "successOffNote": "Ausschalten löscht nichts: Die Teams sehen es nur nicht mehr, und alles erscheint wieder, wenn ihr einschaltet. Gelöscht wird es erst mit dem Ende des Programms eines Teams."
+    "successOffNote": "Ausschalten löscht nichts: Die Teams sehen es nur nicht mehr, und alles erscheint wieder, wenn ihr einschaltet. Gelöscht wird es erst mit dem Ende des Programms eines Teams.",
+    "programsEmptyInvite": "Team einladen",
+    "programsEmptyCode": "Programmcode erzeugen"
   },
   "programPage": {
     "title": "Programmseite",

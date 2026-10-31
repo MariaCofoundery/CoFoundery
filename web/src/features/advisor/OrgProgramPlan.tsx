@@ -155,7 +155,7 @@ export async function OrgProgramPlan({
         <p className="mt-2 max-w-2xl rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("planAttendanceNote")}</p>
       </div>
       {isOwner ? (
-        <details className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4">
+        <details open={events.length === 0} className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4">
           <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">{t("planNew")}</summary>
           <form action={saveProgramEventAction} className="mt-3 grid gap-3">
             <input type="hidden" name="orgId" value={orgId} />

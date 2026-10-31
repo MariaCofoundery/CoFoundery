@@ -12,6 +12,7 @@ import {
 } from "@/features/advisor/teamProgramActions";
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type { OrgTeamProgram, TeamProgramCode, TeamProgramInvite } from "@/features/advisor/teamProgramData";
+import { EmptyState } from "@/features/advisor/EmptyState";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
@@ -69,9 +70,12 @@ export async function OrgTeamProgramsSection({
         </aside>
 
         {programs.length === 0 ? (
-          <p className="mt-4 rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-sm leading-6 text-slate-600">
-            {isOwner ? t("programsEmpty") : t("programsEmptyContact")}
-          </p>
+          <div className="mt-4">
+            <EmptyState
+              text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
+              actions={isOwner ? [{ href: "#org-invite-title", label: t("programsEmptyInvite"), primary: true }, { href: "#org-codes-title", label: t("programsEmptyCode") }] : []}
+            />
+          </div>
         ) : (
           <ul className="mt-4 grid gap-4">
             {programs.map((program) => (
@@ -168,7 +172,7 @@ export async function OrgTeamProgramsSection({
       {isOwner ? (
         <section aria-labelledby="org-invite-title" className="grid gap-4 md:grid-cols-2">
           <div className={CARD}>
-            <h2 id="org-invite-title" className="text-lg font-semibold text-slate-950">{t("inviteCardTitle")}</h2>
+            <h2 id="org-invite-title" className="scroll-mt-24 text-lg font-semibold text-slate-950">{t("inviteCardTitle")}</h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">{t("inviteCardText")}</p>
             <form action={createTeamProgramInviteAction} className="mt-4 grid gap-3">
               <input type="hidden" name="orgId" value={org.id} />
@@ -217,7 +221,7 @@ export async function OrgTeamProgramsSection({
           </div>
 
           <div className={CARD}>
-            <h2 className="text-lg font-semibold text-slate-950">{t("codesTitle")}</h2>
+            <h2 id="org-codes-title" className="scroll-mt-24 text-lg font-semibold text-slate-950">{t("codesTitle")}</h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">{t("codesText")}</p>
             <form action={createTeamProgramCodeAction} className="mt-4 grid gap-3">
               <input type="hidden" name="orgId" value={org.id} />
