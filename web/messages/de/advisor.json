@@ -1042,7 +1042,8 @@
     "membersCount": "{count, plural, one {# Person} other {# Personen}}",
     "enrollOtherWay": "Hier nimmst du Teams in dein Programm auf. Möchtest du stattdessen eine Person oder ein Team mit Report begleiten, geht das unter „Einladen“.",
     "enrollOtherWayLink": "Zu „Einladen“",
-    "programsEmptyExample": "Beispiel ansehen"
+    "programsEmptyExample": "Beispiel ansehen",
+    "dashBarsNote": "Die Balken zeigen, wie viele Teams je Batch und Kategorie im Programm sind. Sie zählen nur, sortiert wird nach Name."
   },
   "programPage": {
     "title": "Programmseite",

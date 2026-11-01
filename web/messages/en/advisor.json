@@ -1042,7 +1042,8 @@
     "membersCount": "{count, plural, one {# person} other {# people}}",
     "enrollOtherWay": "Here you enroll teams in your program. To follow a person or a team with a report instead, use “Invite”.",
     "enrollOtherWayLink": "Go to “Invite”",
-    "programsEmptyExample": "View example"
+    "programsEmptyExample": "View example",
+    "dashBarsNote": "The bars show how many teams are in each batch and category. They only count, and the order is by name."
   },
   "programPage": {
     "title": "Program page",

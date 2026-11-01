@@ -75,6 +75,9 @@ test("Programmprofil: nur das Team schreibt, Ende des Programms loescht alles Ei
 test("Programm-Dashboard: Zaehler und Filter, alphabetisch, keine Wertung", () => {
   const ui = readFileSync("src/features/advisor/OrgProgramOverview.tsx", "utf8");
   assert.match(ui, /dashAlumni/);
+  // Balken je Batch und Kategorie, Teams ohne Angabe stehen in einer eigenen Zeile; Reihenfolge bleibt alphabetisch.
+  assert.match(ui, /breakdown\(t\("dashByBatch"\), batches, withoutBatch, t\("dashNoBatch"\)\)/);
+  assert.match(ui, /dashBarsNote/);
   assert.doesNotMatch(ui, /score|rank|percent|compatib|ampel|traffic|sort\([^)]*(done|approved)/i);
   const sql = readFileSync("../supabase/migrations/20270123120000_team_program_batch_category.sql", "utf8");
   assert.match(sql, /can_manage_team_program/);

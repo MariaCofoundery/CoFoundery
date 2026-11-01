@@ -31,6 +31,28 @@ export async function OrgProgramOverview({
   };
   const batches = count(active.map((program) => program.batch));
   const categories = count(active.map((program) => program.category));
+  const withoutBatch = active.filter((program) => !program.batch).length;
+  const withoutCategory = active.filter((program) => !program.category).length;
+  const breakdown = (title: string, rows: [string, number][], missing: number, missingLabel: string) => {
+    const lines: [string, number][] = missing > 0 ? [...rows, [missingLabel, missing]] : rows;
+    if (lines.length === 0) return null;
+    return (
+      <section className="advisor-card p-4 sm:p-5">
+        <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+        <ul className="mt-3 grid gap-2.5">
+          {lines.map(([name, n]) => (
+            <li key={name} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_2rem] items-center gap-3 text-sm">
+              <span className="truncate text-slate-800">{name}</span>
+              <span className="h-2.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                <span className="block h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-500" style={{ width: `${Math.max(4, Math.round((n / active.length) * 100))}%` }} />
+              </span>
+              <span className="text-right font-semibold tabular-nums text-slate-900">{n}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  };
   const shown = active.filter(
     (program) => (!batch || program.batch === batch) && (!category || program.category === category),
   );
@@ -60,12 +82,20 @@ export async function OrgProgramOverview({
           [t("dashCategories"), categories.length],
           [t("dashAlumni"), alumni.length],
         ].map(([label, value]) => (
-          <div key={label as string} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+          <div key={label as string} className="advisor-card px-4 py-3">
             <dd className="text-2xl font-extrabold tracking-tight text-slate-950">{value}</dd>
             <dt className="mt-0.5 text-xs leading-5 text-slate-600">{label}</dt>
           </div>
         ))}
       </dl>
+
+      {active.length > 0 && (batches.length > 0 || categories.length > 0) ? (
+        <div className="grid gap-3 lg:grid-cols-2">
+          {breakdown(t("dashByBatch"), batches, withoutBatch, t("dashNoBatch"))}
+          {breakdown(t("dashByCategory"), categories, withoutCategory, t("dashNoCategory"))}
+          <p className="text-xs leading-6 text-slate-600 lg:col-span-2">{t("dashBarsNote")}</p>
+        </div>
+      ) : null}
 
       {batches.length > 0 ? (
         <nav aria-label={t("dashByBatch")} className="flex flex-wrap items-center gap-2">
@@ -96,7 +126,7 @@ export async function OrgProgramOverview({
         <ul className="grid gap-3 sm:grid-cols-2">
           {shown.map((program) => (
             <li key={program.programId}>
-              <Link href={`/advisor/programm/${program.programId}`} className="block rounded-2xl border border-slate-200 bg-white px-4 py-3 hover:border-violet-300">
+              <Link href={`/advisor/programm/${program.programId}`} className="advisor-card block px-4 py-3 hover:border-violet-300">
                 <span className="font-semibold text-slate-900">{program.teamName ?? t("unnamedTeam")}</span>
                 <span className="mt-1 flex flex-wrap gap-2 text-xs text-slate-600">
                   <span>{program.batch ?? t("dashNoBatch")}</span>
