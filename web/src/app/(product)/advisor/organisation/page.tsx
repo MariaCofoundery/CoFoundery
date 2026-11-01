@@ -31,6 +31,7 @@ import {
   getAccompaniedPeople,
   getMyAdvisorOrgs,
   getOrgMembers,
+  getOrgOpenInvites,
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
@@ -106,6 +107,7 @@ export default async function AdvisorOrganisationPage({
   const members = await getOrgMembers(client, org.id);
   const soloOrg = org.role === "owner" && members.filter((member) => member.status === "active").length === 1;
   const tab = query.tab ? TAB_OF(query.tab) : soloOrg ? "program" : "overview";
+  const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const SOLO_HIDDEN: Tab[] = ["overview", "teams", "people", "access"];
 
   const needsTeams = tab === "overview" || tab === "teams";
@@ -254,7 +256,7 @@ export default async function AdvisorOrganisationPage({
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}
 
-        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="members" /> : null}
+        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} part="members" /> : null}
 
         {tab === "page" ? (
           <div className="grid gap-4">

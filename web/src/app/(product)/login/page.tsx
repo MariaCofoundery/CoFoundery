@@ -48,17 +48,17 @@ export default async function LoginPage({
   const noticeMessage =
     params.status === "signed_out_everywhere" ? t("login.status.signedOutEverywhere") : null;
   let shouldCreateUser = canCreateAccountFromPath(nextPath);
+  const entry = programEntryFromPath(nextPath);
+  let orgInviteOpen = false;
   // Ein GUELTIGER Programmcode oder eine gueltige Programm-Einladung erlaubt, aus diesem
   // Weg ein Konto anzulegen - auch ohne Beta-Zugangscode. Die Datenbank sagt nur ja oder nein.
-  if (!shouldCreateUser) {
-    const entry = programEntryFromPath(nextPath);
-    if (entry) {
-      const { data } = await supabase.rpc(
-        entry.kind === "code" ? "is_valid_team_program_code" : "is_valid_team_program_invite",
-        entry.kind === "code" ? { p_code: entry.value } : { p_token_hash: entry.value },
-      );
-      shouldCreateUser = data === true;
-    }
+  if (!shouldCreateUser && entry) {
+    const { data } =
+      entry.kind === "code"
+        ? await supabase.rpc("is_valid_team_program_code", { p_code: entry.value })
+        : await supabase.rpc(entry.kind === "advisor-org" ? "is_valid_advisor_org_invite" : "is_valid_team_program_invite", { p_token_hash: entry.value });
+    shouldCreateUser = data === true;
+    orgInviteOpen = entry.kind === "advisor-org" && data === true;
   }
 
   if (user) {
@@ -81,7 +81,7 @@ export default async function LoginPage({
           {t("login.subtitle")}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
-          {shouldCreateUser ? t("login.invitationSignupHint") : t("login.newUserHint")}
+          {orgInviteOpen ? t("login.orgInviteHint") : shouldCreateUser ? t("login.invitationSignupHint") : t("login.newUserHint")}
         </p>
         {errorMessage ? (
           <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">

@@ -137,6 +137,25 @@ export async function countOrgSeatsUsed(client: SupabaseClient, orgId: string): 
  * Mitgliedern, gibt nur den Anzeigenamen heraus und zeigt beendete
  * Mitgliedschaften nur Inhaberinnen.
  */
+export type OrgOpenInvite = { email: string; role: "owner" | "advisor"; sentAt: string; expiresAt: string };
+
+/** Einladungen, die noch nicht angenommen sind. Die Zeilensicherheit zeigt sie nur Mitgliedern der Organisation. */
+export async function getOrgOpenInvites(client: SupabaseClient, orgId: string): Promise<OrgOpenInvite[]> {
+  const { data } = await client
+    .from("advisor_org_invites")
+    .select("invitee_email, role, created_at, expires_at")
+    .eq("org_id", orgId)
+    .eq("status", "sent")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  return ((data ?? []) as { invitee_email: string; role: string; created_at: string; expires_at: string }[]).map((row) => ({
+    email: row.invitee_email,
+    role: row.role === "owner" ? "owner" : "advisor",
+    sentAt: row.created_at,
+    expiresAt: row.expires_at,
+  }));
+}
+
 export async function getOrgMembers(
   client: SupabaseClient,
   orgId: string

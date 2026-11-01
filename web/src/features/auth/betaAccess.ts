@@ -93,10 +93,10 @@ export function canCreateAccountFromPath(nextPath: string) {
 /**
  * Programm-Einstieg ueber Code oder Einladung. Der Pfad allein erlaubt NICHTS:
  * Die Anmeldeseite fragt die Datenbank, ob Code oder Einladung gerade gueltig
- * sind (`is_valid_team_program_code`, `is_valid_team_program_invite`). Der Hash
+ * sind (`is_valid_team_program_code`, `is_valid_team_program_invite`, `is_valid_advisor_org_invite`). Der Hash
  * der Einladung wird hier berechnet, damit der Klartext nicht in die Datenbank gelangt.
  */
-export function programEntryFromPath(nextPath: string): { kind: "code" | "invite"; value: string } | null {
+export function programEntryFromPath(nextPath: string): { kind: "code" | "invite" | "advisor-org"; value: string } | null {
   let path: string;
   try {
     path = new URL(nextPath.trim(), "https://cofoundery.local").pathname;
@@ -107,6 +107,9 @@ export function programEntryFromPath(nextPath: string): { kind: "code" | "invite
   if (code) return { kind: "code", value: code[1] };
   const invite = path.match(/^\/programm\/einladung\/([0-9a-f]{48})$/);
   if (invite) return { kind: "invite", value: createHash("sha256").update(invite[1]).digest("hex") };
+  // Einladung in eine Organisation (Advisor). Gleiche Regel: der Pfad allein erlaubt nichts, die Datenbank prueft.
+  const orgInvite = path.match(/^\/invite\/advisor-org\/([0-9a-f]{48})$/);
+  if (orgInvite) return { kind: "advisor-org", value: createHash("sha256").update(orgInvite[1]).digest("hex") };
   return null;
 }
 

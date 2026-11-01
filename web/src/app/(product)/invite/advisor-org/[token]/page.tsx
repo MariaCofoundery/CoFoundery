@@ -19,6 +19,8 @@ type Preview =
   | { state: "claimed" | "expired" | "revoked" | "unverified" | "unavailable" };
 
 const SUCCESS = "/advisor/organisation";
+/** Nach dem Beitritt direkt in die Organisation, der man beigetreten ist: wer mehrere hat, soll nicht in einer anderen landen. */
+const successFor = (orgId: unknown) => (typeof orgId === "string" && /^[0-9a-f-]{36}$/i.test(orgId) ? `${SUCCESS}?org=${orgId}&tab=members` : SUCCESS);
 
 export default async function ClaimAdvisorOrgInvitePage({
   params,
@@ -46,8 +48,8 @@ export default async function ClaimAdvisorOrgInvitePage({
   async function joinAction() {
     "use server";
     const actionClient = await createClient();
-    const { error } = await actionClient.rpc("claim_advisor_org_invite", { p_token_hash: tokenHash });
-    if (!error) redirect(SUCCESS);
+    const { data: joinedOrg, error } = await actionClient.rpc("claim_advisor_org_invite", { p_token_hash: tokenHash });
+    if (!error) redirect(successFor(joinedOrg));
     // Doppelt abgeschickt: Die erste Einloesung hat schon gegriffen.
     const { data: after } = await actionClient.rpc("get_advisor_org_invite_preview", { p_token_hash: tokenHash });
     if ((after as Preview | null)?.state === "claimed") redirect(SUCCESS);

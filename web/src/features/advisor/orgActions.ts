@@ -3,7 +3,7 @@
 import { createHash, randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { sendAdvisorPersonInviteEmail } from "@/lib/email/sendAdvisorPersonInviteEmail";
+import { sendAdvisorOrgInviteEmail } from "@/lib/email/sendAdvisorOrgInviteEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErrors";
@@ -80,29 +80,36 @@ export async function startMyProgramAction(formData: FormData) {
 }
 
 export async function inviteOrgAdvisorAction(formData: FormData) {
-  const { client } = await requireUser();
+  const { client, userId } = await requireUser();
   const orgId = String(formData.get("orgId") ?? "");
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!email.includes("@")) back("email");
   await assertOrgActive(client, orgId);
 
   const token = randomBytes(24).toString("hex");
+  const role = formData.get("role") === "owner" ? "owner" : "advisor";
   const { error } = await client.rpc("create_advisor_org_invite", {
     p_org_id: orgId,
     p_email: email,
     p_token_hash: createHash("sha256").update(token).digest("hex"),
-    p_role: formData.get("role") === "owner" ? "owner" : "advisor",
+    p_role: role,
   });
   if (error) back(orgErrorCode(error.message));
 
-  // Dieselbe Mail wie bei einer Person, mit einer anderen Adresse dahinter:
-  // Sie sagt, dass jemand fragt, und sie verspricht nichts.
-  await sendAdvisorPersonInviteEmail({
+  // Eine eigene Mail fuer die Einladung in die Organisation, nicht die an eine begleitete Person:
+  // sie nennt, wer einlaedt, wohin, in welcher Rolle und mit welcher Adresse man sich anmeldet.
+  const [{ data: org }, { data: inviter }] = await Promise.all([
+    client.from("advisor_orgs").select("name").eq("id", orgId).maybeSingle(),
+    client.from("person_core").select("display_name").eq("user_id", userId).maybeSingle(),
+  ]);
+  await sendAdvisorOrgInviteEmail({
     recipientEmail: email,
-    note: null,
+    orgName: String((org as { name?: string } | null)?.name ?? "").trim() || "deiner Organisation",
+    inviterName: String((inviter as { display_name?: string } | null)?.display_name ?? "").trim() || null,
+    role,
     url: `${getPublicAppOrigin()}/invite/advisor-org/${token}`,
   });
-  done();
+  done(`tab=members&org=${encodeURIComponent(orgId)}`);
 }
 
 export async function setOrgMembershipAction(formData: FormData) {

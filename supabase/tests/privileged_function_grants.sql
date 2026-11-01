@@ -42,6 +42,11 @@ select extensions.plan(7);
 -- Token-Hash mit 192 Bit, Code mit rund 8 * 10^11 Moeglichkeiten und Nutzungsgrenze.
 -- Beide Pruefungen antworten nur mit ja/nein.
 --
+-- DAZUGEKOMMEN AM 01.11.2026: is_valid_advisor_org_invite. Die Anmeldeseite fragt damit, ob eine
+-- Einladung in eine Organisation gerade offen ist, damit die eingeladene Person ohne Konto einen
+-- Magic Link bekommt. GEPRUEFT UND KEIN LECK: Token-Hash mit 192 Bit, Antwort nur ja/nein, keine
+-- Organisation und keine Adresse; beitreten kann man danach nur mit der Adresse der Einladung.
+--
 -- Der Wachhund hat also nicht gebellt, weil etwas offen war, sondern weil eine
 -- Ausnahme hinzukam, ueber die ein Mensch entscheiden muss. Das ist seine
 -- Aufgabe - und deshalb bleibt die Liste eine Liste und wird keine Regel
@@ -64,7 +69,8 @@ select extensions.is(
        'list_public_network_sitemap',
        'get_public_program_page',
        'is_valid_team_program_invite',
-       'is_valid_team_program_code'
+       'is_valid_team_program_code',
+       'is_valid_advisor_org_invite'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');

@@ -6,7 +6,7 @@ import {
   setOrgMembershipAction,
   leaveOrgAction,
 } from "@/features/advisor/orgActions";
-import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
+import type { AdvisorOrg, OrgMember, OrgOpenInvite } from "@/features/advisor/orgData";
 import type { OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -26,11 +26,14 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 export async function AdvisorOrgSection({
   orgs,
   members,
+  openInvites = [],
   error = null,
   part = "all",
 }: {
   orgs: AdvisorOrg[];
   members: OrgMember[];
+  /** Eingeladen, aber noch nicht beigetreten: damit man sieht, dass die Einladung angekommen ist oder noch aussteht. */
+  openInvites?: OrgOpenInvite[];
   /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
   error?: OrgActionErrorCode | null;
   /** Die Organisationsseite zeigt Mitglieder und Profil getrennt; ohne Angabe steht alles zusammen. */
@@ -202,6 +205,26 @@ export async function AdvisorOrgSection({
                 className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
               />
             </form>
+          ) : null}
+
+          {showMembers && openInvites.length > 0 ? (
+            <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+              <h3 className="text-sm font-semibold text-amber-950">{t("openInvitesTitle")}</h3>
+              <p className="mt-1 text-xs leading-5 text-amber-900">{t("openInvitesText")}</p>
+              <ul className="mt-2 space-y-1">
+                {openInvites.map((invite) => (
+                  <li key={`${invite.email}-${invite.sentAt}`} className="break-all text-sm text-amber-950">
+                    {invite.email}
+                    <span className="text-amber-800">
+                      {" · "}
+                      {t(`roles.${invite.role}`)}
+                      {" · "}
+                      {t("openInviteUntil", { date: new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(invite.expiresAt)) })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
 
           {showMembers ? (
