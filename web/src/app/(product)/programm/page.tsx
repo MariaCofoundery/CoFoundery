@@ -14,11 +14,12 @@ import {
   listProgramUpdates,
 } from "@/features/advisor/teamProgramData";
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
+import { TeamProgramLearning } from "@/features/advisor/ProgramLearning";
 import { TeamProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { ProgramOrgDataTeamView } from "@/features/advisor/ProgramOrgData";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
-import { getCheckIns, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
+import { getCheckIns, getMyLearning, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramRewards } from "@/features/advisor/ProgramRewards";
 import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
@@ -39,6 +40,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   const programs = await getMyTeamPrograms(client);
   const planEvents = await getMyProgramEvents(client);
   const materials = await getMyProgramMaterials(client);
+  const learning = await getMyLearning(client);
   const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short" });
   const updatesByProgram = new Map(
     await Promise.all(
@@ -122,6 +124,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
       ) : null}
 
       <TeamProgramMaterials materials={materials} />
+      <TeamProgramLearning modules={learning} />
 
       {programs.length === 0 ? (
         <p className="mt-6 text-sm text-slate-600">{t("pageEmpty")}</p>

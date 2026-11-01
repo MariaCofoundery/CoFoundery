@@ -462,6 +462,66 @@ export async function setEventExpertsAction(formData: FormData) {
   redirect(orgPlanTab(orgId, error ? "&planError=invalid" : `&planSaved=1&open=${encodeURIComponent(eventId)}`));
 }
 
+/** Lernbereich: Module und Lektionen mit Links. Nur der Inhaber; die Datenbank prueft das und verlangt https. */
+const intOrNull = (value: FormDataEntryValue | null, min: number, max: number) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  return Number.isFinite(n) && n >= min && n <= max ? n : null;
+};
+
+export async function saveLearningModuleAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const { error } = await client.rpc("save_learning_module", {
+    p_org_id: orgId,
+    p_module_id: String(formData.get("moduleId") ?? "") || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 120),
+    p_description: String(formData.get("description") ?? "").slice(0, 500),
+    p_position: intOrNull(formData.get("position"), 0, 9999),
+    p_published: formData.get("published") === "on",
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
+}
+
+export async function deleteLearningModuleAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  await client.rpc("delete_learning_module", { p_module_id: String(formData.get("moduleId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, "#learning-title"));
+}
+
+export async function saveLearningLessonAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const url = String(formData.get("url") ?? "").trim().slice(0, 500);
+  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgPlanTab(orgId, "&learningError=invalid#learning-title"));
+  const { error } = await client.rpc("save_learning_lesson", {
+    p_module_id: String(formData.get("moduleId") ?? ""),
+    p_lesson_id: String(formData.get("lessonId") ?? "") || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 160),
+    p_note: String(formData.get("note") ?? "").slice(0, 500),
+    p_url: url,
+    p_minutes: intOrNull(formData.get("minutes"), 1, 600),
+    p_speaker: String(formData.get("speaker") ?? "").slice(0, 120),
+    p_position: intOrNull(formData.get("position"), 0, 9999),
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
+}
+
+export async function deleteLearningLessonAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  await client.rpc("delete_learning_lesson", { p_lesson_id: String(formData.get("lessonId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, "#learning-title"));
+}
+
 /** Links zu den Programmunterlagen: nur der Inhaber; die Datenbank prueft das und verlangt https. */
 export async function saveProgramMaterialAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");

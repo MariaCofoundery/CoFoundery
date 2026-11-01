@@ -621,3 +621,19 @@ test("Speaker an Veranstaltungen: nur Inhaber ordnen zu, Teams sehen keine Namen
   const events = readFileSync("../supabase/migrations/20270208120000_program_plan.sql", "utf8");
   assert.doesNotMatch(events.slice(events.indexOf("get_my_program_events")), /event_experts/);
 });
+
+test("Lernbereich: nur Links, nur der Inhaber schreibt, Teams sehen nur Veroeffentlichtes, keine Auswertung", () => {
+  const sql = readFileSync("../supabase/migrations/20270220120000_program_learning.sql", "utf8");
+  assert.match(sql, /url ~\* '\^https:\/\/\[\^\[:space:\]\]\+\$'/);
+  assert.match(sql, /is_advisor_org_owner_of/);
+  assert.match(sql, /m\.published/);
+  assert.match(sql, /team_program_is_active\(p\.id\)/);
+  assert.doesNotMatch(sql, /viewed|opened_at|progress|completed/i);
+  const ui = readFileSync("src/features/advisor/ProgramLearning.tsx", "utf8");
+  assert.match(ui, /rel="noopener noreferrer"/);
+  assert.doesNotMatch(ui, /<iframe|<video|<embed|<object|score|rank|percent/i);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /learningError=invalid/);
+  const team = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.match(team, /getMyLearning/);
+});

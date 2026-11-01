@@ -517,6 +517,55 @@ export async function getMyProgramMaterials(client: SupabaseClient): Promise<(Pr
   return ((data ?? []) as Record<string, unknown>[]).map((row) => ({ ...materialOf(row), orgName: row.org_name as string }));
 }
 
+export type LearningLesson = { lessonId: string; title: string; note: string | null; url: string; minutes: number | null; speaker: string | null; position: number };
+export type LearningModule = { moduleId: string; title: string; description: string | null; position: number; published: boolean; lessons: LearningLesson[] };
+
+/** Zeilen (Modul links, Lektion optional) zu Modulen mit Lektionen zusammenfassen; die Reihenfolge der Zeilen bleibt. */
+function groupLearning(rows: Record<string, unknown>[]): LearningModule[] {
+  const modules = new Map<string, LearningModule>();
+  for (const row of rows) {
+    const moduleId = row.module_id as string;
+    let entry = modules.get(moduleId);
+    if (!entry) {
+      entry = {
+        moduleId,
+        title: row.module_title as string,
+        description: (row.module_description as string | null) ?? null,
+        position: Number(row.module_position ?? 100),
+        published: row.published !== false,
+        lessons: [],
+      };
+      modules.set(moduleId, entry);
+    }
+    if (row.lesson_id) {
+      entry.lessons.push({
+        lessonId: row.lesson_id as string,
+        title: row.lesson_title as string,
+        note: (row.note as string | null) ?? null,
+        url: row.url as string,
+        minutes: row.minutes == null ? null : Number(row.minutes),
+        speaker: (row.speaker as string | null) ?? null,
+        position: Number(row.lesson_position ?? 100),
+      });
+    }
+  }
+  return [...modules.values()];
+}
+
+/** Der Lernbereich der Organisation, auch Entwuerfe (Inhaber und Mitglieder). */
+export async function listLearning(client: SupabaseClient, orgId: string): Promise<LearningModule[]> {
+  const { data } = await client.rpc("list_learning", { p_org_id: orgId });
+  return groupLearning((data ?? []) as Record<string, unknown>[]);
+}
+
+/** Veroeffentlichte Module der Organisationen, in deren Programm das eigene Team aktiv ist. */
+export async function getMyLearning(client: SupabaseClient): Promise<(LearningModule & { orgName: string })[]> {
+  const { data } = await client.rpc("get_my_learning");
+  const rows = (data ?? []) as Record<string, unknown>[];
+  const orgOf = new Map(rows.map((row) => [row.module_id as string, row.org_name as string]));
+  return groupLearning(rows.map((row) => ({ ...row, published: true }))).map((entry) => ({ ...entry, orgName: orgOf.get(entry.moduleId) ?? "" }));
+}
+
 export type ProgramExpert = {
   expertId: string;
   name: string;
