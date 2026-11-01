@@ -428,12 +428,17 @@ test("Heute weist auf Erfolge hin, die auf Bestaetigung warten: nur bei eingesch
   assert.doesNotMatch(today, /stars/i);
 });
 
-test("Begleitung auf dem Handy: Karten mit kleinerem Rand, lange Namen brechen um, abgelaufene Einladung widerspricht nicht dem Start beider Founder", () => {
+test("Begleitung auf dem Handy: kompakte Karten, lange Namen brechen um, abgelaufene Einladung widerspricht nicht dem Start beider Founder", () => {
   const list = readFileSync("src/features/advisor/AdvisorTeamsList.tsx", "utf8");
-  assert.equal((list.match(/advisor-card p-4 sm:p-6/g) ?? []).length, 2);
-  assert.match(list, /break-all[^"]*">\{invite\.founderALabel\}/);
-  assert.match(list, /invite\.founderAStarted && invite\.founderBStarted\s*\?\s*t\("dashboard\.statuses\.accepted"\)/);
-  assert.match(list, /invite\.status === "expired" && !\(invite\.founderAStarted && invite\.founderBStarted\)/);
+  assert.equal((list.match(/advisor-card p-4 sm:p-5/g) ?? []).length, 2);
+  assert.match(list, /break-all[^"]*">\{founder\.label\}/);
+  assert.match(list, /bothStarted\s*\?\s*t\("dashboard\.statuses\.accepted"\)/);
+  assert.match(list, /invite\.status === "expired" && !bothStarted/);
+  // Kein Hinweis mehr auf das alte Workbook in den Texten der Karten.
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.doesNotMatch(messages.dashboard.accessDescription.ready + messages.dashboard.readySectionDescription, /workbook/i, locale);
+  }
 });
 
 test("Advisor-Menue: Programm-Team-Seiten gehoeren zur Organisation, Einladen und Teams aufnehmen verweisen aufeinander", () => {

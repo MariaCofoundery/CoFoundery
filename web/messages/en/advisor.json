@@ -31,7 +31,7 @@
     "pausedTeamsTitle": "Paused access",
     "pausedTeamsDescription": "Teams where your advisor access is not active.",
     "readySectionTitle": "Ready for support",
-    "readySectionDescription": "Relationship approval is complete. The advisor report is your current entry point; earlier workbook content remains available when needed.",
+    "readySectionDescription": "Both founders have approved. The advisor report is your entry point.",
     "waitingSectionTitle": "Waiting for approval",
     "waitingSectionDescription": "These teams are visible, but not fully approved yet. Keep an eye on the approval status.",
     "pausedSectionTitle": "Access paused",
@@ -138,7 +138,7 @@
     },
     "accessDescription": {
       "revoked": "Access to this team has ended. The report, snapshot and workbook are no longer available – the team stays in this list so you know where you stand.",
-      "ready": "Relationship approval is complete. The report and snapshot become available as soon as each is ready. Historical workbook content remains accessible separately.",
+      "ready": "Both founders have approved. The report and snapshot are available as soon as they are ready.",
       "paused": "At least one founder approval is not active right now. Until that changes, the content is closed. Once both have approved again, you can pick up where you left off.",
       "waiting": "One founder approval is still missing. Once both founders approve, the team is open for advisor support."
     },

@@ -68,30 +68,6 @@ function reportStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   return t("dashboard.statuses.preparing");
 }
 
-function teamStandLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
-  if (team.accessStatus === "paused" || team.accessStatus === "revoked") {
-    return t("dashboard.statuses.advisorPaused");
-  }
-
-  if (team.accessStatus === "waiting_for_approval") {
-    return t("dashboard.statuses.waitingApproval");
-  }
-
-  if (team.reportReady) {
-    return t("dashboard.statuses.reportReady");
-  }
-
-  if (team.activityStatus === "founder_reaction_ready") {
-    return t("dashboard.statuses.founderReactionReady");
-  }
-
-  if (team.activityStatus === "founder_reaction_open") {
-    return t("dashboard.statuses.founderReactionOpen");
-  }
-
-  return t("dashboard.statuses.currentStatus");
-}
-
 function teamAttentionLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
   if (team.accessStatus !== "ready") {
     return team.accessStatus === "paused" || team.accessStatus === "revoked"
@@ -120,18 +96,6 @@ function founderSetupStatusLabel(team: AdvisorDashboardTeam, t: AdvisorT) {
     return t("dashboard.setupStatuses.activeEmpty");
   }
   return t(`dashboard.setupStatuses.${status}`);
-}
-
-function teamLastActivityLabel(team: AdvisorDashboardTeam, t: AdvisorT, locale: string) {
-  const teamContext =
-    team.teamContext === "existing_team"
-      ? t("teamContext.existingTeam")
-      : t("teamContext.preFounder");
-  const timestamp = team.lastActivityAt
-    ? formatPendingTimestamp(team.lastActivityAt, locale)
-    : t("dashboard.statuses.noActivity");
-
-  return `${teamContext} · ${t("dashboard.lastActivityPrefix")} ${timestamp}`;
 }
 
 /**
@@ -190,16 +154,6 @@ function advisorFollowUpLabel(followUp: AdvisorDashboardTeam["followUp"], t: Adv
   return t("dashboard.followUps.none");
 }
 
-function pendingStandLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
-  if (invite.founderAStarted && invite.founderBStarted) {
-    return t("dashboard.statuses.bothStarted");
-  }
-  if (invite.founderAStarted || invite.founderBStarted) {
-    return t("dashboard.statuses.oneStarted");
-  }
-  return t("dashboard.statuses.teamStarting");
-}
-
 function pendingAttentionLabel(invite: AdvisorPendingTeamInvite, t: AdvisorT) {
   if (!invite.founderAStarted && !invite.founderBStarted) {
     return t("dashboard.statuses.waitingFirstStart");
@@ -255,117 +209,71 @@ function TeamFounderAvatars({ team }: { team: AdvisorDashboardTeam }) {
   );
 }
 
-function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string }) {
+function Chip({ label, value, toneClass }: { label: string; value: string; toneClass: string }) {
   return (
-    <article className="advisor-card p-4 sm:p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-3">
-            <TeamFounderAvatars team={team} />
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                {team.teamContext === "existing_team"
-                  ? t("teamContext.existingRelationship")
-                  : t("teamContext.exploringRelationship")}
-              </p>
-              <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
-                {team.founderAName} & {team.founderBName}
-              </h3>
-              {team.teamName ? (
-                <p className="mt-1 text-sm text-slate-600">
-                  {t("dashboard.teamProject", { name: team.teamName })}
-                </p>
-              ) : null}
-            </div>
-          </div>
+    <span className={`inline-flex min-w-0 max-w-full flex-wrap items-center gap-x-1.5 rounded-full border px-3 py-1 text-xs ${toneClass}`}>
+      <span className="text-[11px] uppercase tracking-[0.12em] opacity-70">{label}</span>
+      <span className="font-semibold">{value}</span>
+    </span>
+  );
+}
 
-          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3 [&>p]:min-w-0 [&>p]:break-words">
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.status")}
-              </span>
-              {teamStandLabel(team, t)}
-            </p>
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.last")}
-              </span>
-              {teamLastActivityLabel(team, t, locale)}
-            </p>
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.nextLook")}
-              </span>
-              {teamAttentionLabel(team, t)}
+function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT; locale: string }) {
+  const setupPause = describeAdvisorFounderSetupPause(team.founderSetupAccess);
+  const last = team.lastActivityAt ? formatPendingTimestamp(team.lastActivityAt, locale) : t("dashboard.statuses.noActivity");
+  return (
+    <article className="advisor-card p-4 sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <TeamFounderAvatars team={team} />
+          <div className="min-w-0">
+            <h3 className="break-words text-lg font-semibold leading-snug text-slate-950">
+              {team.founderAName} & {team.founderBName}
+            </h3>
+            <p className="mt-0.5 break-words text-sm text-slate-600">
+              {team.teamName ? `${t("dashboard.teamProject", { name: team.teamName })} · ` : ""}
+              {team.teamContext === "existing_team" ? t("teamContext.existingRelationship") : t("teamContext.exploringRelationship")}
             </p>
           </div>
         </div>
-
-        <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-64">
-          <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-slate-400">{t("dashboard.fields.teamAccess")}</p>
-          <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${accessStatusClassName(team.accessStatus)}`}>
-            {accessStatusLabel(team, t)}
-          </span>
-          <p className="mt-3 font-medium text-slate-900">
-            {t("dashboard.fields.approval")}: {approvalSummary(team, t)}
-          </p>
-          <p className="mt-1 leading-6 text-slate-600">{accessStatusDescription(team, t)}</p>
-          <div className="mt-4 grid gap-2">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("dashboard.fields.report")}</span>
-              <span
-                // BEHOBEN am 20.09.2026: Hier stand `team.reportReady &&
-                // team.workbookAvailable`. Ein fertiger Report sah damit
-                // gedaempft aus, solange kein historisches Workbook existierte
-                // - und das Workbook ist aus diesem Bereich jetzt ganz weg. Die
-                // Ampel haengt an dem, was sie anzeigt.
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${progressToneClassName({
-                  active: team.reportReady,
-                  tone: team.reportReady ? "success" : "warning",
-                })}`}
-              >
-                {reportStatusLabel(team, t)}
-              </span>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Founder Setup</span>
-                <span className="text-right text-xs font-medium text-slate-700">
-                  {founderSetupStatusLabel(team, t)}
-                </span>
-              </div>
-              {/* "Freigabe pausiert" allein liess raten. Der Grund steht in den
-                  Zahlen, die ohnehin mitkommen - und benennt den ZUSTAND, nicht
-                  das Ereignis: Ein Team mit einer Person kann eine Loeschung,
-                  einen Austritt oder eine Entfernung hinter sich haben. */}
-              {describeAdvisorFounderSetupPause(team.founderSetupAccess) ? (
-                <p className="mt-1.5 text-left text-xs leading-5 text-slate-500">
-                  {t(
-                    `dashboard.setupPauseReasons.${describeAdvisorFounderSetupPause(
-                      team.founderSetupAccess
-                    )}`
-                  )}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
+        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${accessStatusClassName(team.accessStatus)}`}>
+          {accessStatusLabel(team, t)} · {approvalSummary(team, t)}
+        </span>
       </div>
 
-      {/* -----------------------------------------------------------------
-          DIE REIHE HATTE VIER GLEICH LAUTE KNOEPFE und darunter, im Kasten
-          mit dem Zustand des Teams, die eigene Wiedervorlage. Das war die
-          unlogische Optik: Was das TEAM angeht und was man sich SELBST
-          vorgenommen hat, stand durcheinander, und kein Knopf war der
-          naechste Schritt.
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Chip
+          label={t("dashboard.fields.report")}
+          value={reportStatusLabel(team, t)}
+          // Die Ampel haengt an dem, was sie anzeigt: am fertigen Report, nicht an einem historischen Workbook.
+          toneClass={progressToneClassName({
+            active: team.reportReady,
+            tone: team.reportReady ? "success" : "warning",
+          })}
+        />
+        <Chip
+          label="Founder Setup"
+          value={founderSetupStatusLabel(team, t)}
+          toneClass={progressToneClassName({ active: team.founderSetupAccess.status === "active", tone: "success" })}
+        />
+        <Chip label={t("dashboard.fields.last")} value={last} toneClass="border-slate-200 bg-slate-50 text-slate-600" />
+      </div>
 
-          Jetzt: Das Sitzungsblatt ist der eine hervorgehobene Weg - dort
-          liegt die eigene Arbeit, und von dort geht es weiter zum Report.
-          Der Report daneben, der Snapshot als stiller Export. Und die
-          eigene Wiedervorlage steht rechts, abgesetzt von allem, was das
-          Team betrifft.
-          ----------------------------------------------------------------- */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-5">
+      <p className="mt-3 text-sm leading-6 text-slate-700">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-slate-400">{t("dashboard.fields.nextLook")}</span>{" "}
+        <span className="font-medium text-slate-900">{teamAttentionLabel(team, t)}</span>
+      </p>
+      {setupPause ? (
+        <p className="mt-1 text-xs leading-5 text-slate-500">{t(`dashboard.setupPauseReasons.${setupPause}`)}</p>
+      ) : null}
+      <details className="mt-2 text-xs leading-5 text-slate-500">
+        <summary className="inline-flex min-h-8 cursor-pointer items-center font-medium text-slate-600">{t("dashboard.fields.teamAccess")}</summary>
+        <p className="mt-1 max-w-xl">{accessStatusDescription(team, t)}</p>
+      </details>
+
+      {/* Genau EIN hervorgehobener Weg - das Sitzungsblatt, wo die eigene Arbeit liegt. Der Report daneben,
+          der Snapshot still. Die eigene Wiedervorlage steht abgesetzt von allem, was das Team betrifft. */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-4">
         <div className="flex flex-wrap items-center gap-3">
           {team.reportAvailable ? (
             <>
@@ -378,9 +286,7 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
             </>
           ) : (
             <span className={DISABLED_CTA_CLASS}>
-              {team.accessStatus === "ready"
-                ? t("dashboard.reportNotReady")
-                : accessStatusLabel(team, t)}
+              {team.accessStatus === "ready" ? t("dashboard.reportNotReady") : accessStatusLabel(team, t)}
             </span>
           )}
           {team.snapshotAvailable ? (
@@ -390,13 +296,10 @@ function TeamCard({ team, t, locale }: { team: AdvisorDashboardTeam; t: AdvisorT
           ) : null}
         </div>
         <p className="text-xs leading-5 text-slate-500">
-          <span className="uppercase tracking-[0.14em] text-slate-400">
-            {t("dashboard.fields.followUp")}
-          </span>{" "}
+          <span className="uppercase tracking-[0.14em] text-slate-400">{t("dashboard.fields.followUp")}</span>{" "}
           {advisorFollowUpLabel(team.followUp, t)}
         </p>
       </div>
-
     </article>
   );
 }
@@ -445,108 +348,79 @@ function PendingInviteCard({
   t: AdvisorT;
   locale: string;
 }) {
+  const bothStarted = invite.founderAStarted && invite.founderBStarted;
+  const badge = bothStarted
+    ? t("dashboard.statuses.accepted")
+    : invite.status === "expired"
+      ? t("dashboard.statuses.invitationExpired")
+      : t("dashboard.statuses.founderInvited");
+  const founders: { slot: "founderA" | "founderB"; label: string; started: boolean; key: "A" | "B" }[] = [
+    { slot: "founderA", label: invite.founderALabel, started: invite.founderAStarted, key: "A" },
+    { slot: "founderB", label: invite.founderBLabel, started: invite.founderBStarted, key: "B" },
+  ];
   return (
-    <article className="advisor-card p-4 sm:p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 max-w-3xl">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{t("dashboard.pending.type")}</p>
-          <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
+    <article className="advisor-card p-4 sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="break-words text-lg font-semibold leading-snug text-slate-950">
             {invite.teamName || `${invite.founderALabel} & ${invite.founderBLabel}`}
           </h3>
-          {invite.teamName ? (
-            <p className="mt-1 text-sm text-slate-600">
-              {invite.founderALabel} & {invite.founderBLabel}
-            </p>
-          ) : null}
-
-          <div className="mt-5 grid gap-3 text-sm leading-6 text-slate-600 md:grid-cols-3 [&>p]:min-w-0 [&>p]:break-words">
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.status")}
-              </span>
-              {pendingStandLabel(invite, t)}
-            </p>
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.last")}
-              </span>
-              {formatPendingTimestamp(invite.lastActivityAt, locale)}
-            </p>
-            <p>
-              <span className="block text-[11px] uppercase tracking-[0.16em] text-slate-400">
-                {t("dashboard.fields.nextLook")}
-              </span>
-              {pendingAttentionLabel(invite, t)}
-            </p>
-          </div>
+          <p className="mt-0.5 break-words text-sm text-slate-600">
+            {invite.teamName ? `${invite.founderALabel} & ${invite.founderBLabel} · ` : ""}
+            {t("dashboard.pending.type")}
+          </p>
         </div>
+        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${bothStarted ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"}`}>
+          {badge}
+        </span>
+      </div>
 
-        <div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm lg:w-72">
-          <span className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
-            {invite.founderAStarted && invite.founderBStarted
-              ? t("dashboard.statuses.accepted")
-              : invite.status === "expired"
-                ? t("dashboard.statuses.invitationExpired")
-                : t("dashboard.statuses.founderInvited")}
-          </span>
-          <div className="mt-4 grid gap-2">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="min-w-0 break-all text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderALabel}</span>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+        {founders.map((founder) => (
+          <li key={founder.slot} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 px-3 py-2">
+            <span className="min-w-0 break-all text-sm font-medium text-slate-900">{founder.label}</span>
+            <span className="flex items-center gap-3">
               <span
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
-                  invite.founderAStarted
-                    ? "border-emerald-200 bg-emerald-50/80 text-emerald-800"
-                    : "border-slate-200 bg-slate-50 text-slate-500"
+                className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                  founder.started ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-slate-50 text-slate-500"
                 }`}
               >
-                {pendingFounderProgressLabel(invite, "A", t)}
+                {pendingFounderProgressLabel(invite, founder.key, t)}
               </span>
-              {!invite.founderAStarted && invite.status === "pending" ? (
+              {!founder.started && invite.status === "pending" ? (
                 <form action={resendAdvisorTeamInviteFounderAction}>
                   <input type="hidden" name="pendingTeamId" value={invite.id} />
-                  <input type="hidden" name="founderSlot" value="founderA" />
+                  <input type="hidden" name="founderSlot" value={founder.slot} />
                   <button type="submit" className="text-xs font-medium text-slate-700 underline underline-offset-4">{t("dashboard.pending.resend")}</button>
                 </form>
               ) : null}
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 bg-white/85 px-3 py-2">
-              <span className="min-w-0 break-all text-xs uppercase tracking-[0.14em] text-slate-500">{invite.founderBLabel}</span>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] ${
-                  invite.founderBStarted
-                    ? "border-emerald-200 bg-emerald-50/80 text-emerald-800"
-                    : "border-slate-200 bg-slate-50 text-slate-500"
-                }`}
-              >
-                {pendingFounderProgressLabel(invite, "B", t)}
-              </span>
-              {!invite.founderBStarted && invite.status === "pending" ? (
-                <form action={resendAdvisorTeamInviteFounderAction}>
-                  <input type="hidden" name="pendingTeamId" value={invite.id} />
-                  <input type="hidden" name="founderSlot" value="founderB" />
-                  <button type="submit" className="text-xs font-medium text-slate-700 underline underline-offset-4">{t("dashboard.pending.resend")}</button>
-                </form>
-              ) : null}
-            </div>
-          </div>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-3 text-sm leading-6 text-slate-700">
+        <span className="text-[11px] uppercase tracking-[0.14em] text-slate-400">{t("dashboard.fields.nextLook")}</span>{" "}
+        <span className="font-medium text-slate-900">{pendingAttentionLabel(invite, t)}</span>
+        <span className="text-slate-500"> · {t("dashboard.fields.last")} {formatPendingTimestamp(invite.lastActivityAt, locale)}</span>
+      </p>
+
+      {invite.status === "pending" || (invite.status === "expired" && !bothStarted) ? (
+        <div className="mt-3 flex flex-wrap gap-2">
           {invite.status === "pending" ? (
-            <form action={revokeAdvisorPendingTeamInviteAction} className="mt-4">
+            <form action={revokeAdvisorPendingTeamInviteAction}>
               <input type="hidden" name="pendingTeamId" value={invite.id} />
-              <button
-                type="submit"
-                className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800"
-              >
+              <button type="submit" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800">
                 {t("dashboard.pending.remove")}
               </button>
             </form>
-          ) : null}
-          {invite.status === "expired" && !(invite.founderAStarted && invite.founderBStarted) ? (
-            <a href="#advisor-invite-form" className="mt-4 inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100">
+          ) : (
+            <a href="#advisor-invite-form" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100">
               {t("dashboard.pending.createNew")}
             </a>
-          ) : null}
+          )}
         </div>
-      </div>
+      ) : null}
     </article>
   );
 }

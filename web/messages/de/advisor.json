@@ -31,7 +31,7 @@
     "pausedTeamsTitle": "Pausierter Zugriff",
     "pausedTeamsDescription": "Teams, bei denen deine Advisor-Freigabe nicht aktiv ist.",
     "readySectionTitle": "Bereit zur Begleitung",
-    "readySectionDescription": "Die Team-Freigabe ist vollständig. Der Advisor Report ist dein aktueller Einstieg; frühere Workbook-Inhalte bleiben bei Bedarf erreichbar.",
+    "readySectionDescription": "Beide Founder haben zugestimmt. Der Advisor Report ist dein Einstieg.",
     "waitingSectionTitle": "Wartet auf Freigabe",
     "waitingSectionDescription": "Diese Teams sind sichtbar, aber noch nicht vollständig freigegeben. Behalte den Freigabestand im Blick.",
     "pausedSectionTitle": "Zugriff pausiert",
@@ -138,7 +138,7 @@
     },
     "accessDescription": {
       "revoked": "Die Freigabe für dieses Team ist beendet. Report, Snapshot und Workbook sind nicht mehr zugänglich – das Team bleibt hier in der Liste, damit du weißt, woran du bist.",
-      "ready": "Die Team-Freigabe ist vollständig. Report und Snapshot sind verfügbar, sobald der jeweilige Stand vorliegt. Historische Workbook-Inhalte bleiben separat erreichbar.",
+      "ready": "Beide Founder haben zugestimmt. Report und Snapshot sind da, sobald sie vorliegen.",
       "paused": "Mindestens eine Founder-Freigabe ist gerade nicht aktiv. Solange das so ist, sind die Inhalte geschlossen. Sobald wieder beide zugestimmt haben, kommst du an derselben Stelle weiter.",
       "waiting": "Eine Founder-Freigabe fehlt noch. Sobald beide zugestimmt haben, ist das Team für die Begleitung offen."
     },
