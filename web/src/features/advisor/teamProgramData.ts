@@ -552,6 +552,18 @@ function groupLearning(rows: Record<string, unknown>[]): LearningModule[] {
   return [...modules.values()];
 }
 
+export type ModuleShare = { moduleId: string; programId: string | null; subjectUserId: string | null };
+
+/** Wem welches Modul freigeschaltet ist (Inhaber und Mitglieder der Organisation). */
+export async function listModuleShares(client: SupabaseClient, orgId: string): Promise<ModuleShare[]> {
+  const { data } = await client.rpc("list_module_shares", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    moduleId: row.module_id as string,
+    programId: (row.program_id as string | null) ?? null,
+    subjectUserId: (row.subject_user_id as string | null) ?? null,
+  }));
+}
+
 /** Der Lernbereich der Organisation, auch Entwuerfe (Inhaber und Mitglieder). */
 export async function listLearning(client: SupabaseClient, orgId: string): Promise<LearningModule[]> {
   const { data } = await client.rpc("list_learning", { p_org_id: orgId });

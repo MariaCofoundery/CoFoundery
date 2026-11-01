@@ -637,3 +637,21 @@ test("Lernbereich: nur Links, nur der Inhaber schreibt, Teams sehen nur Veroeffe
   const team = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
   assert.match(team, /getMyLearning/);
 });
+
+test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Voraussetzung und wird bei jedem Lesen geprueft", () => {
+  const sql = readFileSync("../supabase/migrations/20270222120000_learning_audience.sql", "utf8");
+  // Nur mit aktivem, nicht widerrufenem, nicht abgelaufenem Umfang base.
+  assert.match(sql, /g\.scope = 'base'/);
+  assert.match(sql, /g\.revoked_at is null/);
+  assert.match(sql, /person_not_accompanied/);
+  // Beim Lesen wird die Freigabe neu geprueft, nicht nur beim Freischalten.
+  assert.match(sql, /public\.person_grant_covers_org\(auth\.uid\(\), m\.org_id\)/);
+  assert.match(sql, /revoke all on function public\.person_grant_covers_org/);
+  assert.doesNotMatch(sql, /viewed|opened_at|progress|completed/i);
+  const ui = readFileSync("src/features/advisor/ProgramLearning.tsx", "utf8");
+  assert.match(ui, /setModuleAudienceAction/);
+  assert.match(ui, /learningAudienceNote/);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  // Das Modulformular aendert den Kreis nicht mehr nebenbei.
+  assert.match(actions, /p_published: null/);
+});

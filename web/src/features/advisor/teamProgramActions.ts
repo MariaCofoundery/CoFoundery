@@ -477,11 +477,28 @@ export async function saveLearningModuleAction(formData: FormData) {
     p_title: String(formData.get("title") ?? "").slice(0, 120),
     p_description: String(formData.get("description") ?? "").slice(0, 500),
     p_position: intOrNull(formData.get("position"), 0, 9999),
-    p_published: formData.get("published") === "on",
+    // Der Kreis wird getrennt festgelegt (setModuleAudienceAction); hier bleibt er unveraendert.
+    p_published: null,
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
   redirect(orgPlanTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
+}
+
+/** Fuer wen ein Modul sichtbar ist: alle Teams, einzelne Teams, einzelne Personen. Die Datenbank prueft jede Person und jedes Team. */
+export async function setModuleAudienceAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const ids = (name: string) => formData.getAll(name).map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  const { error } = await client.rpc("set_module_audience", {
+    p_module_id: String(formData.get("moduleId") ?? ""),
+    p_all_programs: formData.get("allPrograms") === "on",
+    p_program_ids: ids("programId"),
+    p_person_ids: ids("personId"),
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&learningError=audience#learning-title" : "#learning-title"));
 }
 
 export async function deleteLearningModuleAction(formData: FormData) {

@@ -25,7 +25,7 @@ import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listLearning, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -111,9 +111,9 @@ export default async function AdvisorOrganisationPage({
   const SOLO_HIDDEN: Tab[] = ["overview", "teams", "people", "access"];
 
   const needsTeams = tab === "overview" || tab === "teams";
-  const needsPeople = tab === "overview" || tab === "people";
-  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access";
-  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars, outcomeCounts, learning] = await Promise.all([
+  const needsPeople = tab === "overview" || tab === "people" || tab === "plan";
+  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "plan";
+  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -131,6 +131,7 @@ export default async function AdvisorOrganisationPage({
     tab === "program" ? getOrgProgramStars(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgOutcomeCounts(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listLearning(client, org.id) : Promise.resolve([]),
+    tab === "plan" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -337,9 +338,16 @@ export default async function AdvisorOrganisationPage({
             <div className="mt-8">
               <OrgProgramMaterials orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} materials={materials} />
             </div>
-            {query.learningError ? <p role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.learningError")}</p> : null}
+            {query.learningError ? <p role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor(query.learningError === "audience" ? "teamProgram.learningAudienceError" : "teamProgram.learningError")}</p> : null}
             <div className="mt-8">
-              <OrgProgramLearning orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} modules={learning} />
+              <OrgProgramLearning
+                orgId={org.id}
+                isOwner={org.role === "owner" && org.status === "active"}
+                modules={learning}
+                shares={moduleShares}
+                teams={programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))}
+                people={people.filter((person) => person.scopes.includes("base") && person.name).map((person) => ({ userId: person.subjectUserId, name: person.name as string }))}
+              />
             </div>
           </>
         ) : null}
