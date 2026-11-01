@@ -80,7 +80,7 @@ export async function OrgTeamProgramsSection({
           <div className="mt-4">
             <EmptyState
               text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
-              actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }] : []}
+              actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }, { href: "/advisor/beispiel", label: t("programsEmptyExample") }] : [{ href: "/advisor/beispiel", label: t("programsEmptyExample") }]}
             />
           </div>
         ) : (

@@ -30,6 +30,7 @@ const LINK =
  */
 export default async function AdvisorStartPage() {
   const t = await getTranslations("advisor.area");
+  const tExample = await getTranslations("advisor.example");
   const {
     data: { user },
   } = await getRequestUser();
@@ -218,6 +219,9 @@ export default async function AdvisorStartPage() {
                 ))}
               </ul>
             )}
+            <Link href="/advisor/beispiel" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+              {tExample("link")}
+            </Link>
           </section>
 
           <section aria-labelledby="advisor-recent-title" className={CARD}>

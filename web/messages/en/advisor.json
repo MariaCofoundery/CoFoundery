@@ -1039,7 +1039,8 @@
     "programsEmptyCode": "Create a program code",
     "membersCount": "{count, plural, one {# person} other {# people}}",
     "enrollOtherWay": "Here you enroll teams in your program. To follow a person or a team with a report instead, use “Invite”.",
-    "enrollOtherWayLink": "Go to “Invite”"
+    "enrollOtherWayLink": "Go to “Invite”",
+    "programsEmptyExample": "View example"
   },
   "programPage": {
     "title": "Program page",
@@ -1091,5 +1092,36 @@
     "alignCenter": "Center",
     "alignRight": "Align right",
     "smaller": "Smaller"
+  },
+  "example": {
+    "eyebrow": "Example",
+    "title": "What it looks like with a team",
+    "teamName": "Team Nova",
+    "banner": "This is a made-up team. Everything here is for viewing only, nothing is saved and nobody is notified.",
+    "badge": "Example",
+    "sub": "An example of a team in the program",
+    "tabOverview": "Overview",
+    "tabMilestones": "Milestones",
+    "tabUpdates": "Updates",
+    "tabOutcomes": "Achievements",
+    "tabTeamView": "The team's view",
+    "teamViewNote": "This is how the team sees its own page: it reports achievements, sees its rewards, keeps milestones and writes updates.",
+    "link": "View example",
+    "fixtureCommentTeam": "Twelve interviews, three of them with later pilot customers.",
+    "fixtureCommentOrg": "Strong. Next time we will talk about what you take from this into the prototype.",
+    "fixtureReward1": "Coaching hour",
+    "fixtureReward1Text": "One hour with a mentor of your choice.",
+    "fixtureReward2": "Demo day slot",
+    "fixtureReward2Text": "You present at the next demo day.",
+    "fixtureReward3": "Introduction to investors",
+    "fixtureCheckIn": "We talked about the first customer conversations and what counts next.",
+    "fixtureMilestone1": "Hold 15 customer conversations",
+    "fixtureMilestone2": "Win three pilot customers",
+    "fixtureMilestone3": "Release a first version",
+    "fixtureQuestions": "What have you achieved since the last update? | Where are you stuck right now? | How can we help?",
+    "fixtureAnswers": "Held twelve interviews and finished the prototype. | We do not yet know how best to approach pilot customers. | An introduction to two companies in your network.",
+    "fixtureCompany": "Nova Labs",
+    "fixtureFounders": "Ada and Jonas",
+    "fixtureAddress": "Example Street 1, 12345 Example City"
   }
 }

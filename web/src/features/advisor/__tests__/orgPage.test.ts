@@ -160,10 +160,12 @@ test("Kopfleiste: bei fuenf Bereichen weicht das Etikett unter 1536 Pixeln, der 
 test("Teamseite: dunkler Kopf mit Reitern, Kacheln im Ueberblick, Freigaben als Punkte mit Legende", () => {
   const page = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
   assert.match(page, /<AdvisorPageHeader/);
-  assert.match(page, /tileOpenMilestones/);
+  assert.match(page, /<ProgramOverviewTiles/);
+  const tiles = readFileSync("src/features/advisor/ProgramOverviewTiles.tsx", "utf8");
+  assert.match(tiles, /tileOpenMilestones/);
   const access = readFileSync("src/features/advisor/ProgramAccess.tsx", "utf8");
   assert.match(access, /legendNone/);
-  assert.doesNotMatch(page + access, /score|rank|percent|compatib|ampel|traffic/i);
+  assert.doesNotMatch(page + tiles + access, /score|rank|percent|compatib|ampel|traffic/i);
 });
 
 test("Programmseite: nur veroeffentlicht oeffentlich, Anmeldung nur mit gueltigem Code oder gueltiger Einladung", () => {
@@ -414,7 +416,7 @@ test("Optik Schritt 4: Team-Karten zeigen Sterne und Weg zur naechsten Belohnung
   assert.doesNotMatch(sql, /order by[^;]*program_star_total/);
   const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
   assert.match(section, /candidate\.programId === program\.programId/);
-  const team = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  const team = readFileSync("src/features/advisor/ProgramOverviewTiles.tsx", "utf8");
   assert.match(team, /className="advisor-card flex items-start gap-3/);
 });
 
@@ -441,4 +443,21 @@ test("Advisor-Menue: Programm-Team-Seiten gehoeren zur Organisation, Einladen un
   assert.match(invite, /program: "\/advisor\/organisation\?tab=enroll"/);
   const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
   assert.match(section, /href="\/advisor\/einladen"/);
+});
+
+test("Beispiel-Vorschau: nur lesend, gesperrt, ohne Datenbank, erreichbar von Heute und der leeren Programmliste", () => {
+  const page = readFileSync("src/app/(product)/advisor/beispiel/page.tsx", "utf8");
+  assert.match(page, /<fieldset disabled/);
+  assert.match(page, /\[&_a\]:pointer-events-none/);
+  assert.doesNotMatch(page, /createClient|\.rpc\(|\.from\(/);
+  assert.match(page, /hasAdvisor/);
+  const fixtures = readFileSync("src/features/advisor/exampleProgram.ts", "utf8");
+  assert.doesNotMatch(fixtures, /createClient|\.rpc\(|score|rank|percent/i);
+  assert.match(readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8"), /href="\/advisor\/beispiel"/);
+  assert.match(readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8"), /href: "\/advisor\/beispiel"/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.ok(messages.example.banner && messages.example.fixtureQuestions, locale);
+    assert.equal(messages.example.fixtureQuestions.split(" | ").length, messages.example.fixtureAnswers.split(" | ").length, locale);
+  }
 });

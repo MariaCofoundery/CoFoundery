@@ -1039,7 +1039,8 @@
     "programsEmptyCode": "Programmcode erzeugen",
     "membersCount": "{count, plural, one {# Person} other {# Personen}}",
     "enrollOtherWay": "Hier nimmst du Teams in dein Programm auf. Möchtest du stattdessen eine Person oder ein Team mit Report begleiten, geht das unter „Einladen“.",
-    "enrollOtherWayLink": "Zu „Einladen“"
+    "enrollOtherWayLink": "Zu „Einladen“",
+    "programsEmptyExample": "Beispiel ansehen"
   },
   "programPage": {
     "title": "Programmseite",
@@ -1091,5 +1092,36 @@
     "alignCenter": "Mittig",
     "alignRight": "Rechtsbündig",
     "smaller": "Kleiner"
+  },
+  "example": {
+    "eyebrow": "Beispiel",
+    "title": "So sieht es mit einem Team aus",
+    "teamName": "Team Nova",
+    "banner": "Das ist ein erfundenes Team. Alles hier ist nur zum Ansehen, nichts wird gespeichert und niemand wird benachrichtigt.",
+    "badge": "Beispiel",
+    "sub": "Ein Beispiel für ein Team im Programm",
+    "tabOverview": "Überblick",
+    "tabMilestones": "Meilensteine",
+    "tabUpdates": "Updates",
+    "tabOutcomes": "Erfolge",
+    "tabTeamView": "Sicht des Teams",
+    "teamViewNote": "So sieht das Team seine eigene Seite: Es meldet Erfolge, sieht seine Belohnungen, pflegt Meilensteine und schreibt Updates.",
+    "link": "Beispiel ansehen",
+    "fixtureCommentTeam": "Zwölf Interviews, drei davon mit späteren Pilotkunden.",
+    "fixtureCommentOrg": "Stark. Wir sprechen im nächsten Gespräch darüber, was ihr daraus für den Prototyp mitnehmt.",
+    "fixtureReward1": "Coaching-Stunde",
+    "fixtureReward1Text": "Eine Stunde mit einer Mentorin eurer Wahl.",
+    "fixtureReward2": "Platz im Demo-Day",
+    "fixtureReward2Text": "Ihr stellt beim nächsten Demo-Day vor.",
+    "fixtureReward3": "Einführung bei Investoren",
+    "fixtureCheckIn": "Wir haben über die ersten Kundengespräche gesprochen und was als Nächstes zählt.",
+    "fixtureMilestone1": "15 Kundengespräche führen",
+    "fixtureMilestone2": "Drei Pilotkunden gewinnen",
+    "fixtureMilestone3": "Erste Version veröffentlichen",
+    "fixtureQuestions": "Was habt ihr seit dem letzten Update erreicht? | Wo hakt es gerade? | Wobei können wir euch helfen?",
+    "fixtureAnswers": "Zwölf Interviews geführt und den Prototyp fertig. | Wir wissen noch nicht, wie wir Pilotkunden am besten ansprechen. | Eine Einführung bei zwei Unternehmen aus eurem Netzwerk.",
+    "fixtureCompany": "Nova Labs",
+    "fixtureFounders": "Ada und Jonas",
+    "fixtureAddress": "Beispielstraße 1, 12345 Beispielstadt"
   }
 }
