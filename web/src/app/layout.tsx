@@ -173,6 +173,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasFounder={roleViews.hasFounder}
             hasAdvisor={roleViews.hasAdvisor}
             advisorOrgNames={roleViews.advisorOrgNames ?? []}
+            advisorSoloOrg={roleViews.advisorSoloOrg ?? false}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             displayName={displayName}

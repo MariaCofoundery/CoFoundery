@@ -30,6 +30,7 @@ type Props = {
   hasAdvisor: boolean;
   /** Eine Organisation: ihr Name steht im Menue. Mehrere oder keine: "Organisation". */
   advisorOrgNames?: string[];
+  advisorSoloOrg?: boolean;
   hasConnect: boolean;
   hasConnectAccount: boolean;
   displayName: string | null;
@@ -273,6 +274,7 @@ export function ProductShell({
   hasFounder,
   hasAdvisor,
   advisorOrgNames = [],
+  advisorSoloOrg = false,
   hasConnect,
   hasConnectAccount,
   displayName,
@@ -486,7 +488,7 @@ export function ProductShell({
   // zum Advisor-Dashboard; Personen, Reviews und Intake erreichte man nur ueber
   // Anker dort, und auf den Unterseiten zeigte die Leiste keinen Ort.
   const advisorOrgLabel =
-    advisorOrgNames.length === 0
+    advisorOrgNames.length === 0 || (advisorSoloOrg && advisorOrgNames.length === 1)
       ? t("advisorMyProgram")
       : advisorOrgNames.length === 1
       ? advisorOrgNames[0].length > 16

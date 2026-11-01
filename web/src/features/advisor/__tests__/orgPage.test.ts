@@ -480,7 +480,7 @@ test("Mein Programm: ohne Organisation ein Einstieg mit einem Klick, bei allein 
   const actions = readFileSync("src/features/advisor/orgActions.ts", "utf8");
   assert.match(actions, /startMyProgramAction[\s\S]*create_advisor_org/);
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  assert.match(shell, /advisorOrgNames\.length === 0\s*\?\s*t\("advisorMyProgram"\)/);
+  assert.match(shell, /advisorOrgNames\.length === 0 \|\| \(advisorSoloOrg && advisorOrgNames\.length === 1\)\s*\?\s*t\("advisorMyProgram"\)/);
   const start = readFileSync("src/features/advisor/MyProgramStart.tsx", "utf8");
   assert.match(start, /\/advisor\/beispiel/);
   assert.doesNotMatch(start, /score|rank|percent/i);
@@ -517,4 +517,11 @@ test("Abgelaufene Team-Einladungen bleiben zwei Wochen sichtbar, danach nicht me
   assert.match(data, /Date\.parse\(row\.expires_at\) > staleBefore/);
   const slice = data.slice(data.indexOf("export async function getAdvisorPendingTeamInvites"), data.indexOf("export async function getAdvisorPendingTeamInvites") + 2500);
   assert.doesNotMatch(slice, /\.delete\(|\.update\(/);
+});
+
+test("Menue: allein gefuehrte Organisation heisst Mein Programm, geteilte behaelt ihren Namen", () => {
+  const data = readFileSync("src/features/dashboard/dashboardRoleData.ts", "utf8");
+  assert.match(data, /solo = \(active \?\? \[\]\)\.length === 1/);
+  assert.match(data, /role === "owner"/);
+  assert.match(readFileSync("src/app/layout.tsx", "utf8"), /advisorSoloOrg=\{roleViews\.advisorSoloOrg \?\? false\}/);
 });

@@ -26,6 +26,8 @@ export type DashboardRoleViews = {
   roles: DashboardRoleKey[];
   /** Namen der Organisationen, in denen die Person aktiv Mitglied ist (leer, wenn keine). */
   advisorOrgNames?: string[];
+  /** Einzige Organisation, in der die Person allein aktiv ist: im Menue "Mein Programm" statt Organisationsname. */
+  advisorSoloOrg?: boolean;
 };
 
 type AdvisorAccessRow = {
@@ -247,7 +249,7 @@ function advisorFollowUp(value: unknown): AdvisorDashboardTeam["followUp"] {
 
 export async function getDashboardRoleViews(userId: string): Promise<DashboardRoleViews> {
   const supabase = await createClient();
-  const [profile, advisorAccess, relationshipAdvisorAccess, advisorOrgNames] = await Promise.all([
+  const [profile, advisorAccess, relationshipAdvisorAccess, advisorOrgs] = await Promise.all([
     getProfileBasicsRow(supabase, userId).catch(() => null),
     supabase
       .from("founder_alignment_workbook_advisors")
@@ -255,11 +257,12 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
       .eq("advisor_user_id", userId)
       .limit(1),
     listRelationshipAdvisorsForUser(userId, supabase),
-    listActiveAdvisorOrgNames(supabase, userId),
+    listActiveAdvisorOrgs(supabase, userId),
   ]);
 
   const roles = normalizeProfileRoles(profile?.roles ?? null);
   const hasFounder = hasProfileRole(roles, "founder");
+  const advisorOrgNames = advisorOrgs.names;
   const hasAdvisor =
     hasProfileRole(roles, "advisor") ||
     Boolean((advisorAccess.data ?? []).length > 0) ||
@@ -275,27 +278,38 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
     hasAdvisor,
     roles,
     advisorOrgNames,
+    advisorSoloOrg: advisorOrgs.solo,
   };
 }
 
-async function listActiveAdvisorOrgNames(
+async function listActiveAdvisorOrgs(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-): Promise<string[]> {
+): Promise<{ names: string[]; solo: boolean }> {
   try {
     const { data: memberships } = await supabase
       .from("advisor_org_members")
-      .select("org_id")
+      .select("org_id, role")
       .eq("user_id", userId)
       .eq("status", "active");
     const orgIds = (memberships ?? []).map((row) => row.org_id as string);
-    if (orgIds.length === 0) return [];
+    if (orgIds.length === 0) return { names: [], solo: false };
     const { data: orgs } = await supabase.from("advisor_orgs").select("name").in("id", orgIds);
-    return (orgs ?? [])
+    const names = (orgs ?? [])
       .map((org) => String(org.name ?? "").trim())
       .filter((name) => name.length > 0);
+    let solo = false;
+    if (orgIds.length === 1 && memberships?.[0]?.role === "owner") {
+      const { data: active } = await supabase
+        .from("advisor_org_members")
+        .select("user_id")
+        .eq("org_id", orgIds[0])
+        .eq("status", "active");
+      solo = (active ?? []).length === 1;
+    }
+    return { names, solo };
   } catch {
-    return [];
+    return { names: [], solo: false };
   }
 }
 
