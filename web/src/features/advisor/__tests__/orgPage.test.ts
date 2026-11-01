@@ -401,12 +401,13 @@ test("Optik Schritt 3: Heute mit Icon-Kacheln und Karten, Organisation mit Team-
   assert.match(css, /\.advisor-card \{/);
   const today = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   assert.match(today, /<TeamAvatar/);
-  assert.match(today, /className="advisor-card flex items-start gap-3/);
+  const view = readFileSync("src/features/advisor/TodayView.tsx", "utf8");
+  assert.match(view, /className="advisor-card flex items-start gap-3/);
   const programs = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
   assert.match(programs, /<TeamAvatar/);
   // Die Farbe des Avatars folgt dem Namen und sagt nichts ueber das Team.
   const avatar = readFileSync("src/features/advisor/TeamAvatar.tsx", "utf8");
-  assert.doesNotMatch(avatar + today, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
+  assert.doesNotMatch(avatar + today + view, /score|rank|percent|compatib|leaderboard|ampel|traffic/i);
 });
 
 test("Optik Schritt 4: Team-Karten zeigen Sterne und Weg zur naechsten Belohnung, je Team, keine Summe oder Reihenfolge nach Sternen", () => {
@@ -488,4 +489,23 @@ test("Mein Programm: ohne Organisation ein Einstieg mit einem Klick, bei allein 
     const nav = JSON.parse(readFileSync(`messages/${locale}/navigation.json`, "utf8"));
     assert.ok(nav.advisorMyProgram, locale);
   }
+});
+
+test("Beispiel-Vorschau: Heute, Teamkarten und Programmplan nutzen dieselben Bausteine, lesen nichts und sortieren nicht nach Sternen", () => {
+  const page = readFileSync("src/app/(product)/advisor/beispiel/page.tsx", "utf8");
+  assert.match(page, /const TABS = \["today", "cards", "plan", "overview"/);
+  assert.match(page, /<TodayTiles/);
+  assert.match(page, /<WaitingItems/);
+  assert.match(page, /<OrgTeamProgramsSection part="teams"/);
+  assert.match(page, /exampleAttendance=\{exampleOrg\.attendance\}/);
+  assert.doesNotMatch(page, /createClient|\.rpc\(|\.from\(/);
+  const dashboard = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
+  assert.match(dashboard, /<TodayTiles/);
+  assert.match(dashboard, /<WaitingItems/);
+  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
+  assert.match(plan, /exampleAttendance \?\? /);
+  const fixtures = readFileSync("src/features/advisor/exampleProgram.ts", "utf8");
+  // Die Teams stehen alphabetisch (Lumen, Nova, Orbit), nicht nach Sternen.
+  assert.match(fixtures, /team\(1, t\("fixtureTeamLumen"\)[\s\S]*team\(2, t\("teamName"\)[\s\S]*team\(3, t\("fixtureTeamOrbit"\)/);
+  assert.doesNotMatch(fixtures, /sort\(|score|rank|percent/i);
 });

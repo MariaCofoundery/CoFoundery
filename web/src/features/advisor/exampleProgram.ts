@@ -1,5 +1,10 @@
+import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type {
   CheckIn,
+  EventAttendanceRow,
+  OrgProgramStars,
+  OrgTeamProgram,
+  ProgramEvent,
   OutcomeComment,
   ProgramMilestone,
   ProgramOutcome,
@@ -71,4 +76,69 @@ export function buildExampleProgram(t: Text) {
     contactPhone: null,
   };
   return { programId: PROGRAM_ID, outcomes, comments, rewards, checkIns, milestones, questions, updates, profile, due: dayOffset(9) };
+}
+
+const SELF_ID = "00000000-0000-4000-8000-000000000999";
+
+/** Die Organisation, die Teams und der Plan der Vorschau: drei erfundene Teams, alphabetisch, ohne Reihenfolge nach Sternen. */
+export function buildExampleOrg(t: Text) {
+  const org: AdvisorOrg = {
+    id: "00000000-0000-4000-8000-000000000002",
+    name: t("fixtureOrg"),
+    personSeatLimit: null,
+    role: "owner",
+    status: "active",
+    description: null,
+    websiteUrl: null,
+    focus: [],
+    locationRegion: null,
+    programSlug: null,
+    programPagePublished: false,
+    programWelcome: null,
+    hasProgramLogo: false,
+    programAccent: null,
+    programAccentB: null,
+  };
+  const members: OrgMember[] = [{ userId: SELF_ID, role: "owner", status: "active", displayName: null, isSelf: true }];
+  const team = (n: number, name: string, over: Partial<OrgTeamProgram>): OrgTeamProgram => ({
+    programId: `00000000-0000-4000-8000-0000000002${String(n).padStart(2, "0")}`,
+    teamId: `00000000-0000-4000-8000-0000000003${String(n).padStart(2, "0")}`,
+    teamName: name,
+    status: "active",
+    isActive: true,
+    memberCount: 2,
+    approvedCount: 2,
+    contactUserIds: [SELF_ID],
+    isContact: true,
+    batch: t("fixtureBatch"),
+    category: null,
+    isAlumni: false,
+    soloConfirmed: false,
+    includesSetup: true,
+    ...over,
+  });
+  const programs: OrgTeamProgram[] = [
+    team(1, t("fixtureTeamLumen"), { memberCount: 1, approvedCount: 1, soloConfirmed: true }),
+    team(2, t("teamName"), {}),
+    team(3, t("fixtureTeamOrbit"), { status: "invited", isActive: false, approvedCount: 1, contactUserIds: [] }),
+  ];
+  const stars: OrgProgramStars[] = [
+    { programId: programs[0].programId, stars: 7, nextStars: 10, nextTitle: t("fixtureReward3") },
+    { programId: programs[1].programId, stars: 4, nextStars: 6, nextTitle: t("fixtureReward2") },
+  ];
+  const at = (days: number, hour: number) => {
+    const d = new Date(Date.now() + days * 86400000);
+    d.setHours(hour, 0, 0, 0);
+    return d.toISOString();
+  };
+  const events: ProgramEvent[] = [
+    { eventId: "00000000-0000-4000-8000-000000000401", title: t("fixtureEvent1"), kind: "education", startsAt: at(6, 10), location: t("fixtureRoom"), notes: t("fixtureEvent1Notes"), todos: null },
+    { eventId: "00000000-0000-4000-8000-000000000402", title: t("fixtureEvent2"), kind: "external", startsAt: at(20, 16), location: null, notes: null, todos: t("fixtureEvent2Todos") },
+    { eventId: "00000000-0000-4000-8000-000000000403", title: t("fixtureEvent3"), kind: "internal", startsAt: at(-10, 9), location: t("fixtureRoom"), notes: null, todos: null },
+  ];
+  const attendance: EventAttendanceRow[] = [
+    { programId: programs[0].programId, teamName: programs[0].teamName, status: "present" },
+    { programId: programs[1].programId, teamName: programs[1].teamName, status: null },
+  ];
+  return { org, members, programs, stars, events, attendance };
 }

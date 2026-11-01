@@ -4,7 +4,7 @@ import {
   saveProgramEventAction,
   setProgramAttendanceAction,
 } from "@/features/advisor/teamProgramActions";
-import { getEventAttendance, type ProgramEvent } from "@/features/advisor/teamProgramData";
+import { getEventAttendance, type EventAttendanceRow, type ProgramEvent } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -65,21 +65,23 @@ export async function OrgProgramPlan({
   isOwner,
   events,
   openEventId,
+  exampleAttendance,
 }: {
   orgId: string;
   isOwner: boolean;
   events: ProgramEvent[];
   openEventId: string | null;
+  /** Nur die Beispiel-Vorschau: fertige Teilnahme-Zeilen, dann wird nichts aus der Datenbank gelesen. */
+  exampleAttendance?: EventAttendanceRow[];
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const locale = getPresentationLocale(await getLocale());
   const format = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
-  const client = await createClient();
   const now = Date.now();
   const upcoming = events.filter((event) => new Date(event.startsAt).getTime() >= now - 24 * 3600 * 1000);
   const past = events.filter((event) => !upcoming.includes(event)).reverse();
   // Die Teilnahme wird nur fuer die geoeffnete Veranstaltung gelesen.
-  const attendance = openEventId ? await getEventAttendance(client, openEventId) : [];
+  const attendance = exampleAttendance ?? (openEventId ? await getEventAttendance(await createClient(), openEventId) : []);
 
   const renderEvent = (event: ProgramEvent) => (
     <li key={event.eventId} className="advisor-card p-4">
