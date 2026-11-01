@@ -121,7 +121,9 @@
       "noActivity": "No activity yet",
       "currentStatus": "Current status available",
       "waitReport": "Wait for the advisor report",
-      "openReport": "View advisor report"
+      "openReport": "View advisor report",
+      "setupIncomplete": "Setup not completed",
+      "inviteAgain": "Please invite the team again"
     },
     "setupStatuses": {
       "not_granted": "Not shared",

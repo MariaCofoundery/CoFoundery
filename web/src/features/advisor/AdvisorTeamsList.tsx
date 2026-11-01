@@ -349,9 +349,13 @@ function PendingInviteCard({
   locale: string;
 }) {
   const bothStarted = invite.founderAStarted && invite.founderBStarted;
+  const expired = invite.status === "expired";
+  // Beide haben beansprucht, die Einrichtung ist aber nie fertig geworden und die Einladung abgelaufen: das sagt die Karte so.
   const badge = bothStarted
-    ? t("dashboard.statuses.accepted")
-    : invite.status === "expired"
+    ? expired
+      ? t("dashboard.statuses.setupIncomplete")
+      : t("dashboard.statuses.accepted")
+    : expired
       ? t("dashboard.statuses.invitationExpired")
       : t("dashboard.statuses.founderInvited");
   const founders: { slot: "founderA" | "founderB"; label: string; started: boolean; key: "A" | "B" }[] = [
@@ -370,7 +374,7 @@ function PendingInviteCard({
             {t("dashboard.pending.type")}
           </p>
         </div>
-        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${bothStarted ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"}`}>
+        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${bothStarted && !expired ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-700"}`}>
           {badge}
         </span>
       </div>
@@ -401,11 +405,11 @@ function PendingInviteCard({
 
       <p className="mt-3 text-sm leading-6 text-slate-700">
         <span className="text-[11px] uppercase tracking-[0.14em] text-slate-400">{t("dashboard.fields.nextLook")}</span>{" "}
-        <span className="font-medium text-slate-900">{pendingAttentionLabel(invite, t)}</span>
+        <span className="font-medium text-slate-900">{expired ? t("dashboard.statuses.inviteAgain") : pendingAttentionLabel(invite, t)}</span>
         <span className="text-slate-500"> · {t("dashboard.fields.last")} {formatPendingTimestamp(invite.lastActivityAt, locale)}</span>
       </p>
 
-      {invite.status === "pending" || (invite.status === "expired" && !bothStarted) ? (
+      {invite.status === "pending" || expired ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {invite.status === "pending" ? (
             <form action={revokeAdvisorPendingTeamInviteAction}>

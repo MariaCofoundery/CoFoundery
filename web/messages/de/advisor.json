@@ -121,7 +121,9 @@
       "noActivity": "Noch keine Aktivität",
       "currentStatus": "Aktueller Stand verfügbar",
       "waitReport": "Advisor Report abwarten",
-      "openReport": "Advisor Report ansehen"
+      "openReport": "Advisor Report ansehen",
+      "setupIncomplete": "Einrichtung nicht abgeschlossen",
+      "inviteAgain": "Bitte lade das Team neu ein"
     },
     "setupStatuses": {
       "not_granted": "Nicht freigegeben",

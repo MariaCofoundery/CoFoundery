@@ -433,8 +433,9 @@ test("Begleitung auf dem Handy: kompakte Karten, lange Namen brechen um, abgelau
   const list = readFileSync("src/features/advisor/AdvisorTeamsList.tsx", "utf8");
   assert.equal((list.match(/advisor-card p-4 sm:p-5/g) ?? []).length, 2);
   assert.match(list, /break-all[^"]*">\{founder\.label\}/);
-  assert.match(list, /bothStarted\s*\?\s*t\("dashboard\.statuses\.accepted"\)/);
-  assert.match(list, /invite\.status === "expired" && !bothStarted/);
+  assert.match(list, /bothStarted\s*\?\s*expired\s*\?\s*t\("dashboard\.statuses\.setupIncomplete"\)\s*:\s*t\("dashboard\.statuses\.accepted"\)/);
+  assert.match(list, /setupIncomplete/);
+  assert.match(list, /invite\.status === "pending" \|\| expired/);
   // Kein Hinweis mehr auf das alte Workbook in den Texten der Karten.
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
@@ -508,4 +509,12 @@ test("Beispiel-Vorschau: Heute, Teamkarten und Programmplan nutzen dieselben Bau
   // Die Teams stehen alphabetisch (Lumen, Nova, Orbit), nicht nach Sternen.
   assert.match(fixtures, /team\(1, t\("fixtureTeamLumen"\)[\s\S]*team\(2, t\("teamName"\)[\s\S]*team\(3, t\("fixtureTeamOrbit"\)/);
   assert.doesNotMatch(fixtures, /sort\(|score|rank|percent/i);
+});
+
+test("Abgelaufene Team-Einladungen bleiben zwei Wochen sichtbar, danach nicht mehr, und werden nicht geloescht", () => {
+  const data = readFileSync("src/features/dashboard/advisorTeamInviteData.ts", "utf8");
+  assert.match(data, /EXPIRED_INVITE_VISIBLE_DAYS = 14/);
+  assert.match(data, /Date\.parse\(row\.expires_at\) > staleBefore/);
+  const slice = data.slice(data.indexOf("export async function getAdvisorPendingTeamInvites"), data.indexOf("export async function getAdvisorPendingTeamInvites") + 2500);
+  assert.doesNotMatch(slice, /\.delete\(|\.update\(/);
 });

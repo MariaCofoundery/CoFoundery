@@ -66,6 +66,9 @@ type InvitationBootstrapRow = {
   accepted_at: string | null;
 };
 
+/** So lange bleibt eine abgelaufene Einladung in der Liste des Advisors sichtbar. */
+export const EXPIRED_INVITE_VISIBLE_DAYS = 14;
+
 export type AdvisorPendingTeamInvite = {
   id: string;
   teamName: string | null;
@@ -240,7 +243,13 @@ export async function getAdvisorPendingTeamInvites(userId: string): Promise<Advi
     return [];
   }
 
-  const rows = data as AdvisorTeamInviteRow[];
+  // Abgelaufene Einladungen stehen noch zwei Wochen da, damit man sie neu verschicken kann; danach sind sie nur noch
+  // Ballast, und abgelaufene Zeilen lassen sich in der Datenbank nicht mehr aendern, also auch nicht entfernen.
+  const staleBefore = Date.now() - EXPIRED_INVITE_VISIBLE_DAYS * 86400000;
+  const rows = (data as AdvisorTeamInviteRow[]).filter((row) => {
+    const expired = row.status === "expired" || Date.parse(row.expires_at) <= Date.now();
+    return !expired || Date.parse(row.expires_at) > staleBefore;
+  });
   const userIds = [
     ...new Set(
       rows
