@@ -20,7 +20,8 @@ select extensions.plan(7);
 -- ---------------------------------------------------------------------------
 -- Keine security-definer-Funktion ohne Aufruferpruefung darf fuer anon
 -- ausfuehrbar sein - ausser den SECHS oeffentlichen Projektionen, die genau
--- dafuer gebaut wurden und ihre Bedingungen selbst pruefen.
+-- dafuer gebaut wurden und ihre Bedingungen selbst pruefen, und den DREI
+-- Programm-Funktionen unten (20270215: ausdrueckliche Grants, geprueft).
 --
 -- DAZUGEKOMMEN AM 21.09.2026: `get_public_network_profile_linkedin`. Sie ist
 -- am 19.09.2026 mit den LinkedIn-Adressen entstanden und stand seither in
@@ -34,6 +35,12 @@ select extensions.plan(7);
 -- haben ist keine Zustimmung dazu, den Klarnamen-Lebenslauf daneben zu
 -- stellen. Der anon-Grant ist ausdruecklich gesetzt, und die oeffentlichen
 -- Netzwerkseiten brauchen ihn.
+--
+-- DAZUGEKOMMEN AM 01.11.2026: get_public_program_page, is_valid_team_program_invite,
+-- is_valid_team_program_code. Sie standen seit Januar/Februar rot in diesem Test.
+-- GEPRUEFT UND KEIN LECK: oeffentliche Programmseite (nur Veroeffentlichtes),
+-- Token-Hash mit 192 Bit, Code mit rund 8 * 10^11 Moeglichkeiten und Nutzungsgrenze.
+-- Beide Pruefungen antworten nur mit ja/nein.
 --
 -- Der Wachhund hat also nicht gebellt, weil etwas offen war, sondern weil eine
 -- Ausnahme hinzukam, ueber die ein Mensch entscheiden muss. Das ist seine
@@ -54,7 +61,10 @@ select extensions.is(
        'get_public_network_problem',
        'list_public_network_profile_listings',
        'list_public_network_profile_ventures',
-       'list_public_network_sitemap'
+       'list_public_network_sitemap',
+       'get_public_program_page',
+       'is_valid_team_program_invite',
+       'is_valid_team_program_code'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');
