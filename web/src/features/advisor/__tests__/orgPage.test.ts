@@ -549,3 +549,20 @@ test("Stammdaten: die Organisation schreibt ueber die Datenbankfunktion, das Tea
   assert.match(sql, /create trigger team_programs_delete_org_data/);
   assert.match(sql, /'team_program_org_data'/);
 });
+
+test("Programmunterlagen: nur Links (https), der Inhaber schreibt, das Team liest ohne Formular", () => {
+  const ui = readFileSync("src/features/advisor/ProgramMaterials.tsx", "utf8");
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_program_material"/);
+  assert.match(actions, /\^https:\\\/\\\/\\S\+\$/);
+  // Das Team bekommt eine Leseansicht ohne Formular, Links oeffnen ohne Referrer und ohne Zugriff auf das Fenster.
+  const teamView = ui.slice(ui.indexOf("export async function TeamProgramMaterials"));
+  assert.doesNotMatch(teamView, /<form|<input|<textarea/);
+  assert.match(ui, /rel="noopener noreferrer"/);
+  assert.doesNotMatch(ui, /type="file"|score|rank|percent|compatib/i);
+  assert.match(readFileSync("src/app/(product)/programm/page.tsx", "utf8"), /<TeamProgramMaterials/);
+  assert.match(page, /<OrgProgramMaterials/);
+  const sql = readFileSync("../supabase/migrations/20270216120000_program_materials.sql", "utf8");
+  assert.match(sql, /url ~\* '\^https:\/\/\[\^\[:space:\]\]\+\$'/);
+  assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
+});

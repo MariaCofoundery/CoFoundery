@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { buildExampleOrg, buildExampleProgram } from "@/features/advisor/exampleProgram";
+import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { TodayTiles, WaitingItems, type WaitingItem } from "@/features/advisor/TodayView";
@@ -116,6 +117,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
             <div className="grid gap-4">
               <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("planNote")}</p>
               <OrgProgramPlan orgId={exampleOrg.org.id} isOwner events={exampleOrg.events} openEventId={exampleOrg.events[0].eventId} exampleAttendance={exampleOrg.attendance} />
+              <OrgProgramMaterials orgId={exampleOrg.org.id} isOwner materials={exampleOrg.materials} />
             </div>
           ) : tab === "overview" ? (
             <div className="grid gap-4">

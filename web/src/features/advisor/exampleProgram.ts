@@ -6,6 +6,7 @@ import type {
   OrgTeamProgram,
   ProgramEvent,
   OutcomeComment,
+  ProgramMaterial,
   ProgramMilestone,
   ProgramOutcome,
   ProgramOrgData,
@@ -153,5 +154,9 @@ export function buildExampleOrg(t: Text) {
     { programId: programs[0].programId, teamName: programs[0].teamName, status: "present" },
     { programId: programs[1].programId, teamName: programs[1].teamName, status: null },
   ];
-  return { org, members, programs, stars, events, attendance };
+  const materials: ProgramMaterial[] = [
+    { materialId: "00000000-0000-4000-8000-000000000501", title: t("fixtureMaterial1"), url: "https://example.org/programm/folien", note: t("fixtureMaterial1Note") },
+    { materialId: "00000000-0000-4000-8000-000000000502", title: t("fixtureMaterial2"), url: "https://example.org/programm/aufzeichnungen", note: null },
+  ];
+  return { org, members, programs, stars, events, attendance, materials };
 }

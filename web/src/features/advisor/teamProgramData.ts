@@ -477,3 +477,24 @@ export async function getOrgProgramStars(client: SupabaseClient, orgId: string):
     nextTitle: (row.next_title as string | null) ?? null,
   }));
 }
+
+export type ProgramMaterial = { materialId: string; title: string; url: string; note: string | null };
+
+const materialOf = (row: Record<string, unknown>): ProgramMaterial => ({
+  materialId: row.material_id as string,
+  title: row.title as string,
+  url: row.url as string,
+  note: (row.note as string | null) ?? null,
+});
+
+/** Links zu den Programmunterlagen der Organisation (Inhaber und Mitglieder). */
+export async function listProgramMaterials(client: SupabaseClient, orgId: string): Promise<ProgramMaterial[]> {
+  const { data } = await client.rpc("list_program_materials", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map(materialOf);
+}
+
+/** Die Links der Organisationen, in deren Programm das eigene Team aktiv ist. */
+export async function getMyProgramMaterials(client: SupabaseClient): Promise<(ProgramMaterial & { orgName: string })[]> {
+  const { data } = await client.rpc("get_my_program_materials");
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({ ...materialOf(row), orgName: row.org_name as string }));
+}

@@ -449,6 +449,33 @@ export async function deleteProgramEventAction(formData: FormData) {
   redirect(orgPlanTab(orgId));
 }
 
+/** Links zu den Programmunterlagen: nur der Inhaber; die Datenbank prueft das und verlangt https. */
+export async function saveProgramMaterialAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const url = String(formData.get("url") ?? "").trim().slice(0, 500);
+  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgPlanTab(orgId, "&materialError=invalid#materials-title"));
+  const { error } = await client.rpc("save_program_material", {
+    p_org_id: orgId,
+    p_material_id: String(formData.get("materialId") ?? "") || null,
+    p_title: String(formData.get("title") ?? "").slice(0, 160),
+    p_url: url,
+    p_note: String(formData.get("note") ?? "").slice(0, 300),
+  });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&materialError=failed#materials-title" : "#materials-title"));
+}
+
+export async function deleteProgramMaterialAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  await client.rpc("delete_program_material", { p_material_id: String(formData.get("materialId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, "#materials-title"));
+}
+
 /** Teilnahme eintragen (Inhaber oder Bezugsperson des Teams); leer nimmt den Eintrag zurueck. */
 export async function setProgramAttendanceAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");

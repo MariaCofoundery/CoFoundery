@@ -1060,7 +1060,21 @@
     "orgDataSave": "Save master data",
     "orgDataTeamTitle": "What your organization keeps about you",
     "orgDataTeamText": "Your organization enters this itself. You can read it but not change it. Talk to your contact person if something is wrong.",
-    "orgDataTeamEmpty": "Your organization has not entered anything yet."
+    "orgDataTeamEmpty": "Your organization has not entered anything yet.",
+    "materialsTitle": "Program materials",
+    "materialsText": "Links to your own storage: folders, slides, recordings. The teams in the program see them on their program page.",
+    "materialsNote2": "Made2Found stores no files, only the link. Whoever opens it lands in your storage and needs the right access there. Check that the teams may open the folder.",
+    "materialsEmpty": "No materials linked yet.",
+    "materialsNew": "Add a link",
+    "materialsEdit": "Edit",
+    "materialsSave": "Save",
+    "materialsDelete": "Remove link",
+    "materialsTitleField": "Title",
+    "materialsUrl": "Address (https)",
+    "materialsNote": "Note (optional)",
+    "materialsError": "The link could not be saved. It must start with https://, and only the owner can add it.",
+    "myMaterialsTitle": "Program materials",
+    "myMaterialsText": "Your organization linked these for the program."
   },
   "programPage": {
     "title": "Program page",
@@ -1158,7 +1172,10 @@
     "fixtureEvent3": "Kick-off",
     "todayNote": "This is what “Today” looks like once teams are in the program. Each row leads to the matching page.",
     "cardsNote": "This is what the teams in the program look like. The stars belong to each team on its own, and the cards are sorted by name, not by stars.",
-    "planNote": "This is what the program plan looks like with events and attendance."
+    "planNote": "This is what the program plan looks like with events and attendance.",
+    "fixtureMaterial1": "Pitch slides from the education days",
+    "fixtureMaterial1Note": "As of the last session",
+    "fixtureMaterial2": "Workshop recordings"
   },
   "myProgram": {
     "pageTitle": "My program",

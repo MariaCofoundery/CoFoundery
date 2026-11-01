@@ -1060,7 +1060,21 @@
     "orgDataSave": "Stammdaten speichern",
     "orgDataTeamTitle": "Was eure Organisation über euch führt",
     "orgDataTeamText": "Diese Angaben trägt die Organisation selbst ein. Ihr könnt sie lesen, aber nicht ändern. Sprecht eure Bezugsperson an, wenn etwas nicht stimmt.",
-    "orgDataTeamEmpty": "Die Organisation hat noch nichts eingetragen."
+    "orgDataTeamEmpty": "Die Organisation hat noch nichts eingetragen.",
+    "materialsTitle": "Programmunterlagen",
+    "materialsText": "Links zu euren Ablagen: Ordner, Folien, Aufzeichnungen. Die Teams im Programm sehen sie auf ihrer Programm-Seite.",
+    "materialsNote2": "Made2Found speichert keine Dateien, nur den Link. Wer ihn öffnet, landet bei eurer Ablage und braucht dort die passenden Rechte. Prüft, ob die Teams den Ordner öffnen dürfen.",
+    "materialsEmpty": "Noch keine Unterlagen verlinkt.",
+    "materialsNew": "Link hinzufügen",
+    "materialsEdit": "Bearbeiten",
+    "materialsSave": "Speichern",
+    "materialsDelete": "Link entfernen",
+    "materialsTitleField": "Titel",
+    "materialsUrl": "Adresse (https)",
+    "materialsNote": "Hinweis (optional)",
+    "materialsError": "Der Link konnte nicht gespeichert werden. Er muss mit https:// beginnen, und nur die Inhaberin oder der Inhaber darf ihn anlegen.",
+    "myMaterialsTitle": "Unterlagen zum Programm",
+    "myMaterialsText": "Diese Links hat eure Organisation für das Programm abgelegt."
   },
   "programPage": {
     "title": "Programmseite",
@@ -1158,7 +1172,10 @@
     "fixtureEvent3": "Auftakt",
     "todayNote": "So sieht „Heute“ aus, wenn Teams im Programm sind. Jede Zeile führt zur passenden Seite.",
     "cardsNote": "So sehen die Teams im Programm aus. Die Sterne gehören jedem Team einzeln, die Karten sind nach Namen sortiert, nicht nach Sternen.",
-    "planNote": "So sieht der Programmplan mit Terminen und Teilnahme aus."
+    "planNote": "So sieht der Programmplan mit Terminen und Teilnahme aus.",
+    "fixtureMaterial1": "Pitch-Folien der Education-Tage",
+    "fixtureMaterial1Note": "Stand der letzten Session",
+    "fixtureMaterial2": "Aufzeichnungen der Workshops"
   },
   "myProgram": {
     "pageTitle": "Mein Programm",
