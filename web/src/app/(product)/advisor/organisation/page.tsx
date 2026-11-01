@@ -16,6 +16,7 @@ import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
+import { OrgProgramExperts } from "@/features/advisor/OrgProgramExperts";
 import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
@@ -23,7 +24,7 @@ import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -32,7 +33,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -40,7 +41,7 @@ type Tab = (typeof TABS)[number];
  * Die Reiter selbst und ihre Adressen bleiben - nur die Anordnung ist neu.
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "run", tabs: ["overview", "teams", "people", "program", "plan"] },
+  { key: "run", tabs: ["overview", "teams", "people", "program", "plan", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "success"] },
   { key: "manage", tabs: ["access", "members", "profile"] },
 ];
@@ -60,7 +61,7 @@ const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "memb
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; open?: string; successError?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; expertError?: string; q?: string; open?: string; successError?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -109,7 +110,7 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access";
-  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
+  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -120,6 +121,7 @@ export default async function AdvisorOrganisationPage({
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
+    tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
     tab === "success" ? getSuccessEnabled(client, org.id) : Promise.resolve(false),
@@ -312,6 +314,13 @@ export default async function AdvisorOrganisationPage({
               <p className="text-sm text-slate-600">{tAdvisor("programPage.ownerOnly")}</p>
             )}
           </div>
+        ) : null}
+
+        {tab === "experts" ? (
+          <>
+            {query.expertError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.expertsError")}</p> : null}
+            <OrgProgramExperts orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} experts={experts} query={(query.q ?? "").slice(0, 80)} />
+          </>
         ) : null}
 
         {tab === "plan" ? (

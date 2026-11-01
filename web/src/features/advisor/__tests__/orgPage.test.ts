@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -113,7 +113,11 @@ test("Anfrage pro Team ist keine Freigabe: dieselbe Review-Anfrage, das Team ent
 test("Einladung per Mail: Adresse wird nicht gespeichert, Link bleibt ein Hash, offene Einladungen sind begrenzt", () => {
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /sendTeamProgramInviteEmail/);
-  assert.doesNotMatch(actions, /p_email|invitee_email/);
+  // Die Adresse einer eingeladenen Person wird nie gespeichert. Ausgenommen ist der Block der Experten-Liste: dort ist die
+  // E-Mail der Kontakt einer Expertin oder eines Experten, den die Organisation bewusst fuehrt (Einladungen gehoeren nicht dazu).
+  const withoutExperts = actions.replace(/\/\*\* Ohne Schema wird https:\/\/[\s\S]*?(?=\/\*\* Teilnahme eintragen)/, "");
+  assert.notEqual(withoutExperts.length, actions.length);
+  assert.doesNotMatch(withoutExperts, /p_email|invitee_email/);
   const sql = readFileSync("../supabase/migrations/20270127120000_team_program_invite_cap.sql", "utf8");
   assert.match(sql, />= 25/);
   const mail = readFileSync("src/lib/email/sendTeamProgramInviteEmail.ts", "utf8");
@@ -366,11 +370,11 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die elf Reiter stehen in drei Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+test("Organisation: die zwoelf Reiter stehen in drei Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
   const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "setup", "manage"].includes(key));
-  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll"];
+  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
@@ -565,4 +569,25 @@ test("Programmunterlagen: nur Links (https), der Inhaber schreibt, das Team lies
   const sql = readFileSync("../supabase/migrations/20270216120000_program_materials.sql", "utf8");
   assert.match(sql, /url ~\* '\^https:\/\/\[\^\[:space:\]\]\+\$'/);
   assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
+});
+
+test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts, Datenschutz-Hinweis ist da", () => {
+  const ui = readFileSync("src/features/advisor/OrgProgramExperts.tsx", "utf8");
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_program_expert"/);
+  assert.match(page, /<OrgProgramExperts/);
+  // Die Liste gibt es nur in der Organisation, nie auf der Team-Seite oder im Team-Programm.
+  assert.doesNotMatch(readFileSync("src/app/(product)/programm/page.tsx", "utf8"), /Expert/);
+  assert.match(ui, /expertsPrivacy/);
+  assert.match(ui, /rel="noopener noreferrer"/);
+  // Keine Preise, keine Dateien, keine Bewertung; sortiert wird nach Name.
+  assert.doesNotMatch(ui, /type="file"|price|preis|betrag|score|rank|percent|compatib/i);
+  const sql = readFileSync("../supabase/migrations/20270217120000_program_experts.sql", "utf8");
+  assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
+  assert.match(sql, /order by e\.archived, lower\(e\.name\)/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.ok(messages.teamProgram.expertsPrivacy, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 12, locale);
+  }
 });

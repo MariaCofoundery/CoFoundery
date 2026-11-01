@@ -33,6 +33,8 @@ const orgEnrollTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=enroll${extra}`;
 const orgPlanTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
+const orgExpertsTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=experts${extra}`;
 const orgSuccessTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=success${extra}`;
 const orgPageTab = (orgId: string, extra = "") =>
@@ -474,6 +476,52 @@ export async function deleteProgramMaterialAction(formData: FormData) {
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
   redirect(orgPlanTab(orgId, "#materials-title"));
+}
+
+/** Ohne Schema wird https:// vorangestellt; alles andere als https lehnt die Datenbank ab. */
+const withHttps = (value: string, max: number) => {
+  const text = value.trim().slice(0, max);
+  return text && !/^[a-z][a-z0-9+.-]*:/i.test(text) ? `https://${text}` : text;
+};
+
+/** Experten und Speaker: nur der Inhaber schreibt; die Datenbank prueft das. Die Liste sieht keine Person ausserhalb der Organisation. */
+export async function saveProgramExpertAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgExpertsTab(orgId));
+  const text = (name: string, max: number) => String(formData.get(name) ?? "").slice(0, max);
+  const { error } = await client.rpc("save_program_expert", {
+    p_org_id: orgId,
+    p_expert_id: String(formData.get("expertId") ?? "") || null,
+    p_name: text("name", 120),
+    p_topic: text("topic", 200),
+    p_company: text("company", 120),
+    p_email: text("email", 200),
+    p_phone: text("phone", 50),
+    p_website: withHttps(text("website", 300), 300),
+    p_offer_link: withHttps(text("offerLink", 500), 500),
+    p_note: text("note", 1000),
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(orgExpertsTab(orgId, error ? "&expertError=failed#experts-title" : "#experts-title"));
+}
+
+export async function setProgramExpertArchivedAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgExpertsTab(orgId));
+  await client.rpc("set_program_expert_archived", {
+    p_expert_id: String(formData.get("expertId") ?? ""),
+    p_archived: formData.get("archived") === "yes",
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(orgExpertsTab(orgId, "#experts-title"));
+}
+
+export async function deleteProgramExpertAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgExpertsTab(orgId));
+  await client.rpc("delete_program_expert", { p_expert_id: String(formData.get("expertId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  redirect(orgExpertsTab(orgId, "#experts-title"));
 }
 
 /** Teilnahme eintragen (Inhaber oder Bezugsperson des Teams); leer nimmt den Eintrag zurueck. */

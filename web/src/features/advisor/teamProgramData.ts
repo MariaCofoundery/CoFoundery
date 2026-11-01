@@ -498,3 +498,33 @@ export async function getMyProgramMaterials(client: SupabaseClient): Promise<(Pr
   const { data } = await client.rpc("get_my_program_materials");
   return ((data ?? []) as Record<string, unknown>[]).map((row) => ({ ...materialOf(row), orgName: row.org_name as string }));
 }
+
+export type ProgramExpert = {
+  expertId: string;
+  name: string;
+  topic: string | null;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  offerLink: string | null;
+  note: string | null;
+  archived: boolean;
+};
+
+/** Die interne Liste der Experten und Speaker (Inhaber und Mitglieder der Organisation). */
+export async function listProgramExperts(client: SupabaseClient, orgId: string): Promise<ProgramExpert[]> {
+  const { data } = await client.rpc("list_program_experts", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    expertId: row.expert_id as string,
+    name: row.name as string,
+    topic: (row.topic as string | null) ?? null,
+    company: (row.company as string | null) ?? null,
+    email: (row.email as string | null) ?? null,
+    phone: (row.phone as string | null) ?? null,
+    website: (row.website as string | null) ?? null,
+    offerLink: (row.offer_link as string | null) ?? null,
+    note: (row.note as string | null) ?? null,
+    archived: row.archived === true,
+  }));
+}
