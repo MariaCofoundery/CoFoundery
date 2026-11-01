@@ -6,6 +6,7 @@ import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { consentTeamProgramAction, endTeamProgramAction, openTeamProgramCodeAction, setTeamProgramSoloAction } from "@/features/advisor/teamProgramActions";
 import {
   getMyTeamPrograms,
+  getProgramOrgData,
   getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
@@ -13,6 +14,7 @@ import {
   listProgramUpdates,
 } from "@/features/advisor/teamProgramData";
 import { TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
+import { ProgramOrgDataTeamView } from "@/features/advisor/ProgramOrgData";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { getCheckIns, getMyProgramEvents, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
@@ -41,13 +43,14 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
       programs
         .filter((program) => program.isActive)
         .map(async (program) => {
-          const [questions, updates, due, profile] = await Promise.all([
+          const [questions, updates, due, profile, orgData] = await Promise.all([
             getProgramUpdateQuestions(client, program.programId),
             listProgramUpdates(client, program.programId),
             getProgramUpdateDue(client, program.programId),
             getProgramProfile(client, program.programId),
+            getProgramOrgData(client, program.programId),
           ]);
-          return [program.programId, { questions, updates, due, profile }] as const;
+          return [program.programId, { questions, updates, due, profile, orgData }] as const;
         }),
     ),
   );
@@ -171,6 +174,9 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 <>
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
+                </div>
+                <div className="mt-6 border-t border-slate-100 pt-4">
+                  <ProgramOrgDataTeamView data={updatesByProgram.get(program.programId)?.orgData ?? null} />
                 </div>
                 {(outcomesByProgram.get(program.programId)?.outcomes.length ?? 0) > 0 ? (
                 <div className="mt-6 border-t border-slate-100 pt-4">

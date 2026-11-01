@@ -8,6 +8,7 @@ import type {
   OutcomeComment,
   ProgramMilestone,
   ProgramOutcome,
+  ProgramOrgData,
   ProgramProfile,
   ProgramReward,
   ProgramUpdate,
@@ -75,7 +76,19 @@ export function buildExampleProgram(t: Text) {
     contactEmail: "team@example.org",
     contactPhone: null,
   };
-  return { programId: PROGRAM_ID, outcomes, comments, rewards, checkIns, milestones, questions, updates, profile, due: dayOffset(9) };
+  const orgData: ProgramOrgData = {
+    companyName: t("fixtureCompany"),
+    legalForm: "GmbH",
+    address: t("fixtureAddress"),
+    contactName: t("fixtureFounders").split(" ")[0] ?? null,
+    contactEmail: "team@example.org",
+    contactPhone: null,
+    website: null,
+    admittedOn: null,
+    reference: "A-17",
+    note: null,
+  };
+  return { programId: PROGRAM_ID, outcomes, comments, rewards, checkIns, milestones, questions, updates, profile, orgData, due: dayOffset(9) };
 }
 
 const SELF_ID = "00000000-0000-4000-8000-000000000999";

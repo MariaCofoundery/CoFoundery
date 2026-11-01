@@ -12,6 +12,7 @@ import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramSetupView } from "@/features/advisor/ProgramSetupView";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
+import { ProgramOrgDataForm } from "@/features/advisor/ProgramOrgData";
 import { ProgramProfileView } from "@/features/advisor/ProgramProfile";
 import { TeamAccessList } from "@/features/advisor/ProgramAccess";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
@@ -24,6 +25,7 @@ import {
   getProgramOutcomes,
   getProgramRewards,
   getSuccessEnabled,
+  getProgramOrgData,
   getProgramProfile,
   getProgramUpdateDue,
   getProgramUpdateQuestions,
@@ -75,13 +77,14 @@ export default async function AdvisorProgramTeamPage({
   }
   if (!program || !orgOfProgram) notFound();
 
-  const [members, milestones, questions, updates, due, profile, accessRows, setupItems, outcomes, outcomeComments, rewards, checkIns] = await Promise.all([
+  const [members, milestones, questions, updates, due, profile, orgData, accessRows, setupItems, outcomes, outcomeComments, rewards, checkIns] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
     program.isActive && (tab === "meilensteine" || tab === "overview") ? listProgramMilestones(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? getProgramUpdateQuestions(client, programId) : Promise.resolve([]),
     program.isActive && tab === "updates" ? listProgramUpdates(client, programId) : Promise.resolve([]),
     program.isActive && (tab === "updates" || tab === "overview") ? getProgramUpdateDue(client, programId) : Promise.resolve(null),
     program.isActive && tab === "overview" ? getProgramProfile(client, programId) : Promise.resolve(null),
+    program.isActive && tab === "overview" ? getProgramOrgData(client, programId) : Promise.resolve(null),
     program.isActive && tab === "freigaben" ? getProgramAccess(client, orgOfProgram.id) : Promise.resolve([]),
     program.isActive && tab === "setup" ? getProgramConfirmedSetup(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getProgramOutcomes(client, programId) : Promise.resolve([]),
@@ -151,6 +154,7 @@ export default async function AdvisorProgramTeamPage({
           <div className="grid gap-4">
             <ProgramOverviewTiles memberCount={program.memberCount} openMilestones={openMilestones} contactCount={program.contactUserIds.length} due={due} />
             <ProgramProfileView profile={profile} />
+            <ProgramOrgDataForm programId={programId} data={orgData} />
           </div>
         ) : tab === "erfolge" ? (
           <div className="grid gap-8">

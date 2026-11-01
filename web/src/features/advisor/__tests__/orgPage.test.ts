@@ -528,3 +528,24 @@ test("Menue: allein gefuehrte Organisation heisst Mein Programm, geteilte behael
   assert.match(data, /role === "owner"/);
   assert.match(readFileSync("src/app/layout.tsx", "utf8"), /advisorSoloOrg=\{roleViews\.advisorSoloOrg \?\? false\}/);
 });
+
+test("Stammdaten: die Organisation schreibt ueber die Datenbankfunktion, das Team sieht sie nur schreibgeschuetzt", () => {
+  const ui = readFileSync("src/features/advisor/ProgramOrgData.tsx", "utf8");
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_team_program_org_data"/);
+  assert.doesNotMatch(actions.slice(actions.indexOf("saveProgramOrgDataAction")), /\.from\("team_program_org_data"\)/);
+  // Das Formular steht nur in der Sicht der Organisation, das Team bekommt eine Leseansicht ohne Formular.
+  const teamView = ui.slice(ui.indexOf("export async function ProgramOrgDataTeamView"));
+  assert.doesNotMatch(teamView, /<form|<input|<textarea/);
+  const teamPage = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.match(teamPage, /<ProgramOrgDataTeamView/);
+  assert.doesNotMatch(teamPage, /<ProgramOrgDataForm/);
+  const advisorPage = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  assert.match(advisorPage, /<ProgramOrgDataForm/);
+  assert.doesNotMatch(ui, /score|rank|percent|compatib/i);
+  const sql = readFileSync("../supabase/migrations/20270214120000_program_org_data.sql", "utf8");
+  assert.match(sql, /can_manage_team_program\(p_program_id\)/);
+  assert.match(sql, /can_use_team_program\(p_program_id\)/);
+  assert.match(sql, /create trigger team_programs_delete_org_data/);
+  assert.match(sql, /'team_program_org_data'/);
+});

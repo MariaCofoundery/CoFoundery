@@ -11,6 +11,7 @@ import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramOverviewTiles } from "@/features/advisor/ProgramOverviewTiles";
+import { ProgramOrgDataForm } from "@/features/advisor/ProgramOrgData";
 import { ProgramProfileView } from "@/features/advisor/ProgramProfile";
 import { ProgramRewards } from "@/features/advisor/ProgramRewards";
 import { ManageProgramUpdates, TeamProgramUpdates } from "@/features/advisor/ProgramUpdates";
@@ -120,6 +121,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
             <div className="grid gap-4">
               <ProgramOverviewTiles memberCount={2} openMilestones={openMilestones} contactCount={1} due={example.due} />
               <ProgramProfileView profile={example.profile} />
+              <ProgramOrgDataForm programId={example.programId} data={example.orgData} />
             </div>
           ) : tab === "milestones" ? (
             <ProgramMilestones programId={example.programId} milestones={example.milestones} returnTo={noReturn} />

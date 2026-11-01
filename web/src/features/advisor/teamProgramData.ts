@@ -199,6 +199,38 @@ export async function getProgramProfile(client: SupabaseClient, programId: strin
   };
 }
 
+export type ProgramOrgData = {
+  companyName: string | null;
+  legalForm: string | null;
+  address: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  website: string | null;
+  admittedOn: string | null;
+  reference: string | null;
+  note: string | null;
+};
+
+/** Stammdaten, die die Organisation zum Team fuehrt. Das Team darf sie lesen, nicht schreiben. */
+export async function getProgramOrgData(client: SupabaseClient, programId: string): Promise<ProgramOrgData | null> {
+  const { data } = await client.rpc("get_team_program_org_data", { p_program_id: programId });
+  const row = ((data ?? []) as Record<string, string | null>[])[0];
+  if (!row) return null;
+  return {
+    companyName: row.company_name ?? null,
+    legalForm: row.legal_form ?? null,
+    address: row.address ?? null,
+    contactName: row.contact_name ?? null,
+    contactEmail: row.contact_email ?? null,
+    contactPhone: row.contact_phone ?? null,
+    website: row.website ?? null,
+    admittedOn: row.admitted_on ?? null,
+    reference: row.reference ?? null,
+    note: row.note ?? null,
+  };
+}
+
 export type ProgramAccess = { programId: string; teamReview: "active" | "requested" | "none"; founderSetup: "active" | "requested" | "none" };
 
 export async function getProgramAccess(client: SupabaseClient, orgId: string): Promise<ProgramAccess[]> {

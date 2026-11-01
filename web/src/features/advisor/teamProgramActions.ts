@@ -209,6 +209,31 @@ export async function saveProgramProfileAction(formData: FormData) {
   redirect("/programm");
 }
 
+/** Die Organisation pflegt ihre Stammdaten zum Team; die Datenbank prueft, wer das darf. */
+export async function saveProgramOrgDataAction(formData: FormData) {
+  const programId = String(formData.get("programId") ?? "");
+  const back = `/advisor/programm/${encodeURIComponent(programId)}`;
+  const client = await requireUser(back);
+  const text = (name: string, max: number) => String(formData.get(name) ?? "").slice(0, max);
+  const admitted = text("admittedOn", 10);
+  await client.rpc("save_team_program_org_data", {
+    p_program_id: programId,
+    p_company_name: text("companyName", 120),
+    p_legal_form: text("legalForm", 60),
+    p_address: text("address", 300),
+    p_contact_name: text("contactName", 120),
+    p_contact_email: text("contactEmail", 200),
+    p_contact_phone: text("contactPhone", 50),
+    p_website: text("website", 200),
+    p_admitted_on: /^\d{4}-\d{2}-\d{2}$/.test(admitted) ? admitted : null,
+    p_reference: text("reference", 60),
+    p_note: text("note", 1000),
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/programm");
+  redirect(back);
+}
+
 /** Batch, Kategorie und Alumni setzen Bezugspersonen und Inhaber; die Datenbank prueft das. */
 export async function setProgramMetaAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
