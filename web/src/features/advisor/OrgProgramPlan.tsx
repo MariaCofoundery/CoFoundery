@@ -2,9 +2,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import {
   deleteProgramEventAction,
   saveProgramEventAction,
+  setEventExpertsAction,
   setProgramAttendanceAction,
 } from "@/features/advisor/teamProgramActions";
-import { getEventAttendance, type EventAttendanceRow, type ProgramEvent } from "@/features/advisor/teamProgramData";
+import { getEventAttendance, listEventExperts, listProgramExperts, type EventAttendanceRow, type EventExpert, type ProgramEvent, type ProgramExpert } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -66,6 +67,7 @@ export async function OrgProgramPlan({
   events,
   openEventId,
   exampleAttendance,
+  exampleSpeakers,
 }: {
   orgId: string;
   isOwner: boolean;
@@ -73,6 +75,8 @@ export async function OrgProgramPlan({
   openEventId: string | null;
   /** Nur die Beispiel-Vorschau: fertige Teilnahme-Zeilen, dann wird nichts aus der Datenbank gelesen. */
   exampleAttendance?: EventAttendanceRow[];
+  /** Nur die Beispiel-Vorschau: fertige Speaker-Zeilen und Auswahl, dann wird nichts aus der Datenbank gelesen. */
+  exampleSpeakers?: { assigned: EventExpert[]; choices: ProgramExpert[] };
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const locale = getPresentationLocale(await getLocale());
@@ -82,6 +86,11 @@ export async function OrgProgramPlan({
   const past = events.filter((event) => !upcoming.includes(event)).reverse();
   // Die Teilnahme wird nur fuer die geoeffnete Veranstaltung gelesen.
   const attendance = exampleAttendance ?? (openEventId ? await getEventAttendance(await createClient(), openEventId) : []);
+
+  // Speaker sind nur fuer die Organisation da; Teams bekommen diese Seite nie.
+  const supabase = exampleSpeakers ? null : await createClient();
+  const assigned = exampleSpeakers?.assigned ?? (supabase ? await listEventExperts(supabase, orgId) : []);
+  const choices = exampleSpeakers?.choices ?? (isOwner && supabase ? (await listProgramExperts(supabase, orgId)).filter((entry) => !entry.archived) : []);
 
   const renderEvent = (event: ProgramEvent) => (
     <li key={event.eventId} className="advisor-card p-4">
@@ -93,6 +102,12 @@ export async function OrgProgramPlan({
         {t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
         {event.location ? ` · ${event.location}` : ""}
       </p>
+      {assigned.some((entry) => entry.eventId === event.eventId) ? (
+        <p className="mt-2 text-sm text-slate-800">
+          <span className="font-semibold">{t("planSpeakers")}: </span>
+          {assigned.filter((entry) => entry.eventId === event.eventId).map((entry) => entry.name).join(", ")}
+        </p>
+      ) : null}
       <details className="mt-3" open={openEventId === event.eventId}>
         <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-violet-800">{t("planAttendance")}</summary>
         {openEventId === event.eventId ? (
@@ -130,6 +145,38 @@ export async function OrgProgramPlan({
           <a href={`/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan&open=${event.eventId}`} className="mt-1 inline-flex min-h-11 items-center text-sm text-slate-600 underline underline-offset-4">{t("planAttendanceOpen")}</a>
         )}
       </details>
+      {isOwner ? (
+        <details className="mt-1 border-t border-slate-100 pt-2">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500">{t("planSpeakersEdit")}</summary>
+          {(() => {
+            const mine = assigned.filter((entry) => entry.eventId === event.eventId);
+            const options = [
+              ...choices.map((entry) => ({ id: entry.expertId, label: entry.name, topic: entry.topic })),
+              ...mine.filter((entry) => !choices.some((choice) => choice.expertId === entry.expertId)).map((entry) => ({ id: entry.expertId, label: entry.name, topic: entry.topic })),
+            ];
+            return options.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-600">{t("planSpeakersNone")}</p>
+            ) : (
+              <form action={setEventExpertsAction} className="mt-2 grid gap-2">
+                <input type="hidden" name="orgId" value={orgId} />
+                <input type="hidden" name="eventId" value={event.eventId} />
+                <ul className="grid gap-1">
+                  {options.map((option) => (
+                    <li key={option.id}>
+                      <label className="flex min-h-11 items-center gap-3 text-sm text-slate-900">
+                        <input type="checkbox" name="expertId" value={option.id} defaultChecked={mine.some((entry) => entry.expertId === option.id)} className="size-5" />
+                        <span>{option.label}{option.topic ? <span className="text-slate-600"> · {option.topic}</span> : null}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs leading-5 text-slate-600">{t("planSpeakersNote")}</p>
+                <SubmitButton label={t("planSave")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white" />
+              </form>
+            );
+          })()}
+        </details>
+      ) : null}
       {isOwner ? (
         <details className="mt-1 border-t border-slate-100 pt-2">
           <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500">{t("planEdit")}</summary>

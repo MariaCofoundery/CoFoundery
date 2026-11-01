@@ -606,3 +606,18 @@ test("Ergebnisse je Batch: nur Zaehlungen bestaetigter Ergebnisse, keine Sterne,
   const de = readFileSync("messages/de/advisor.json", "utf8");
   assert.match(de, /"outcomesCountedNote": "Eure bestätigten Ergebnisse fließen ohne Teamnamen/);
 });
+
+test("Speaker an Veranstaltungen: nur Inhaber ordnen zu, Teams sehen keine Namen", () => {
+  const sql = readFileSync("../supabase/migrations/20270219120000_program_event_experts.sql", "utf8");
+  assert.match(sql, /is_advisor_org_owner_of\(v_org\)/);
+  assert.match(sql, /expert_not_in_org/);
+  assert.match(sql, /on delete cascade/);
+  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
+  assert.match(plan, /setEventExpertsAction/);
+  assert.match(plan, /planSpeakersNote/);
+  // Die Team-Seite und die Team-Funktion kennen keine Speaker.
+  const team = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  assert.doesNotMatch(team, /Speaker|listEventExperts|planSpeakers/);
+  const events = readFileSync("../supabase/migrations/20270208120000_program_plan.sql", "utf8");
+  assert.doesNotMatch(events.slice(events.indexOf("get_my_program_events")), /event_experts/);
+});

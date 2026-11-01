@@ -451,6 +451,17 @@ export async function deleteProgramEventAction(formData: FormData) {
   redirect(orgPlanTab(orgId));
 }
 
+/** Speaker einer Veranstaltung: nur der Inhaber; die Datenbank prueft das und verlangt Personen derselben Organisation. */
+export async function setEventExpertsAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const eventId = String(formData.get("eventId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const ids = formData.getAll("expertId").map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  const { error } = await client.rpc("set_event_experts", { p_event_id: eventId, p_expert_ids: ids });
+  revalidatePath("/advisor/organisation");
+  redirect(orgPlanTab(orgId, error ? "&planError=invalid" : `&planSaved=1&open=${encodeURIComponent(eventId)}`));
+}
+
 /** Links zu den Programmunterlagen: nur der Inhaber; die Datenbank prueft das und verlangt https. */
 export async function saveProgramMaterialAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");

@@ -2,8 +2,10 @@ import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type {
   CheckIn,
   EventAttendanceRow,
+  EventExpert,
   OrgProgramStars,
   OrgTeamProgram,
+  ProgramExpert,
   ProgramEvent,
   OutcomeComment,
   ProgramMaterial,
@@ -158,5 +160,11 @@ export function buildExampleOrg(t: Text) {
     { materialId: "00000000-0000-4000-8000-000000000501", title: t("fixtureMaterial1"), url: "https://example.org/programm/folien", note: t("fixtureMaterial1Note") },
     { materialId: "00000000-0000-4000-8000-000000000502", title: t("fixtureMaterial2"), url: "https://example.org/programm/aufzeichnungen", note: null },
   ];
-  return { org, members, programs, stars, events, attendance, materials };
+  const speaker = (n: number, name: string, topic: string): ProgramExpert => ({
+    expertId: `00000000-0000-4000-8000-0000000006${String(n).padStart(2, "0")}`,
+    name, topic, company: null, email: null, phone: null, website: null, offerLink: null, note: null, archived: false,
+  });
+  const choices = [speaker(1, t("fixtureSpeaker1"), t("fixtureSpeaker1Topic")), speaker(2, t("fixtureSpeaker2"), t("fixtureSpeaker2Topic"))];
+  const assigned: EventExpert[] = [{ eventId: events[0].eventId, expertId: choices[0].expertId, name: choices[0].name, topic: choices[0].topic, archived: false }];
+  return { org, members, programs, stars, events, attendance, materials, speakers: { assigned, choices } };
 }

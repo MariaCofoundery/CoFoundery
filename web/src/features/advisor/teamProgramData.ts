@@ -530,6 +530,20 @@ export type ProgramExpert = {
   archived: boolean;
 };
 
+export type EventExpert = { eventId: string; expertId: string; name: string; topic: string | null; archived: boolean };
+
+/** Wer bei welcher Veranstaltung spricht; nur fuer die Organisation, Teams bekommen das nie. */
+export async function listEventExperts(client: SupabaseClient, orgId: string): Promise<EventExpert[]> {
+  const { data } = await client.rpc("list_event_experts", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    eventId: row.event_id as string,
+    expertId: row.expert_id as string,
+    name: row.name as string,
+    topic: (row.topic as string | null) ?? null,
+    archived: row.archived === true,
+  }));
+}
+
 /** Die interne Liste der Experten und Speaker (Inhaber und Mitglieder der Organisation). */
 export async function listProgramExperts(client: SupabaseClient, orgId: string): Promise<ProgramExpert[]> {
   const { data } = await client.rpc("list_program_experts", { p_org_id: orgId });
