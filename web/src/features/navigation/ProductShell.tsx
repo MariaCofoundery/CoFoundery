@@ -486,7 +486,9 @@ export function ProductShell({
   // zum Advisor-Dashboard; Personen, Reviews und Intake erreichte man nur ueber
   // Anker dort, und auf den Unterseiten zeigte die Leiste keinen Ort.
   const advisorOrgLabel =
-    advisorOrgNames.length === 1
+    advisorOrgNames.length === 0
+      ? t("advisorMyProgram")
+      : advisorOrgNames.length === 1
       ? advisorOrgNames[0].length > 16
         ? `${advisorOrgNames[0].slice(0, 15).trimEnd()}…`
         : advisorOrgNames[0]

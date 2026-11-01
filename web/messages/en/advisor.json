@@ -1123,5 +1123,17 @@
     "fixtureCompany": "Nova Labs",
     "fixtureFounders": "Ada and Jonas",
     "fixtureAddress": "Example Street 1, 12345 Example City"
+  },
+  "myProgram": {
+    "pageTitle": "My program",
+    "pageText": "Milestones, achievements and updates with your teams, even without an organization.",
+    "title": "Take teams through a program",
+    "text": "You bring teams into your own program and support them with milestones, updates and, if you like, achievements you celebrate together. You do not need a large organization for this.",
+    "points": "Enroll teams by link, email or code. | Keep milestones, updates and dates. | Celebrate achievements as stars, switched on and off as you like. | A team only joins once everyone on the team has agreed.",
+    "nameLabel": "Name of your program",
+    "namePlaceholder": "e.g. Mueller Startup Coaching",
+    "start": "Start my program",
+    "example": "View an example first",
+    "hint": "This creates an organization in the background, in which you are the only member. You can invite colleagues later under “Members”."
   }
 }

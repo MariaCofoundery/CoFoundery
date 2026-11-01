@@ -1123,5 +1123,17 @@
     "fixtureCompany": "Nova Labs",
     "fixtureFounders": "Ada und Jonas",
     "fixtureAddress": "Beispielstraße 1, 12345 Beispielstadt"
+  },
+  "myProgram": {
+    "pageTitle": "Mein Programm",
+    "pageText": "Meilensteine, Erfolge und Updates mit deinen Teams, auch ohne Organisation.",
+    "title": "Mit deinen Teams durch ein Programm gehen",
+    "text": "Du holst Teams in dein eigenes Programm und begleitest sie mit Meilensteinen, Updates und, wenn du magst, gemeinsam gefeierten Erfolgen. Du brauchst dafür keine große Organisation.",
+    "points": "Teams per Link, E-Mail oder Code aufnehmen. | Meilensteine, Updates und Termine festhalten. | Erfolge als Sterne feiern, ein- und ausschaltbar. | Ein Team ist erst dabei, wenn alle im Team zugestimmt haben.",
+    "nameLabel": "Name deines Programms",
+    "namePlaceholder": "z. B. Gründercoaching Müller",
+    "start": "Mein Programm starten",
+    "example": "Erst ein Beispiel ansehen",
+    "hint": "Dabei wird im Hintergrund eine Organisation angelegt, in der du allein bist. Kolleginnen und Kollegen kannst du später unter „Mitglieder“ einladen."
   }
 }

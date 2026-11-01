@@ -466,3 +466,26 @@ test("Beispiel-Vorschau: nur lesend, gesperrt, ohne Datenbank, erreichbar von He
     assert.equal(messages.example.fixtureQuestions.split(" | ").length, messages.example.fixtureAnswers.split(" | ").length, locale);
   }
 });
+
+test("Mein Programm: ohne Organisation ein Einstieg mit einem Klick, bei allein gefuehrter Organisation nur der noetige Teil", () => {
+  const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(page, /<MyProgramStart/);
+  assert.match(page, /const SOLO_HIDDEN: Tab\[\] = \["overview", "teams", "people", "access"\]/);
+  assert.match(page, /org\.role === "owner" && members\.filter\(\(member\) => member\.status === "active"\)\.length === 1/);
+  assert.match(page, /query\.tab \? TAB_OF\(query\.tab\) : soloOrg \? "program" : "overview"/);
+  // Mitglieder, Programmseite und Profil bleiben erreichbar.
+  assert.doesNotMatch(page.slice(page.indexOf("SOLO_HIDDEN")), /SOLO_HIDDEN: Tab\[\] = \[[^\]]*(members|page|profile)/);
+  const actions = readFileSync("src/features/advisor/orgActions.ts", "utf8");
+  assert.match(actions, /startMyProgramAction[\s\S]*create_advisor_org/);
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  assert.match(shell, /advisorOrgNames\.length === 0\s*\?\s*t\("advisorMyProgram"\)/);
+  const start = readFileSync("src/features/advisor/MyProgramStart.tsx", "utf8");
+  assert.match(start, /\/advisor\/beispiel/);
+  assert.doesNotMatch(start, /score|rank|percent/i);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.equal(messages.myProgram.points.split(" | ").length, 4, locale);
+    const nav = JSON.parse(readFileSync(`messages/${locale}/navigation.json`, "utf8"));
+    assert.ok(nav.advisorMyProgram, locale);
+  }
+});

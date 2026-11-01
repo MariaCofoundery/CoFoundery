@@ -11,6 +11,7 @@ import { getRequestLocale } from "@/i18n/getLocale";
 import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { EmptyState } from "@/features/advisor/EmptyState";
+import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
@@ -62,7 +63,6 @@ export default async function AdvisorOrganisationPage({
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
-  const tab = TAB_OF(query.tab);
   const [t, tAdvisor, locale] = await Promise.all([
     getTranslations("advisor.area"),
     getTranslations("advisor"),
@@ -90,20 +90,26 @@ export default async function AdvisorOrganisationPage({
   if (!org) {
     return (
       <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <AdvisorPageHeader eyebrow={t("eyebrow")} title={t("org.title")} text={t("org.text")} />
+        <AdvisorPageHeader eyebrow={t("eyebrow")} title={tAdvisor("myProgram.pageTitle")} text={tAdvisor("myProgram.pageText")} />
         <div className="mt-7">
-          <AdvisorOrgSection orgs={[]} members={[]} error={orgError} />
+          <MyProgramStart error={orgError} />
         </div>
       </main>
     );
   }
 
+  // Wer die Organisation allein fuehrt, sieht nur den Teil, den ein eigenes Programm braucht. Uebersicht, Teams,
+  // Personen und Freigaben wiederholen dort Begleitung und Heute; Mitglieder, Programmseite und Profil bleiben.
+  const members = await getOrgMembers(client, org.id);
+  const soloOrg = org.role === "owner" && members.filter((member) => member.status === "active").length === 1;
+  const tab = query.tab ? TAB_OF(query.tab) : soloOrg ? "program" : "overview";
+  const SOLO_HIDDEN: Tab[] = ["overview", "teams", "people", "access"];
+
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access";
-  const [seatsUsed, members, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
+  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
-    getOrgMembers(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
@@ -153,7 +159,7 @@ export default async function AdvisorOrganisationPage({
             key: group.key,
             label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
             hint: t("orgPage.groupHints").split(" | ")[groupIndex] ?? "",
-            tabs: group.tabs.map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+            tabs: group.tabs.filter((entry) => !soloOrg || !SOLO_HIDDEN.includes(entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
           }))}
         />
       </AdvisorPageHeader>

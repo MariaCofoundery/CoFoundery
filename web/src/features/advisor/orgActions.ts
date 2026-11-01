@@ -64,6 +64,21 @@ export async function createAdvisorOrgAction(formData: FormData) {
   done();
 }
 
+/**
+ * "Mein Programm starten": legt die Organisation an, in der die Person allein ist, und fuehrt zum
+ * ersten Schritt - Teams aufnehmen. Dieselbe Funktion wie beim Anlegen einer Organisation; es gibt
+ * kein zweites Recht.
+ */
+export async function startMyProgramAction(formData: FormData) {
+  const { client } = await requireUser();
+  const name = String(formData.get("name") ?? "").trim();
+  if (name.length < 2 || name.length > 120) back("org_name", "tab=enroll");
+
+  const { error } = await client.rpc("create_advisor_org", { p_name: name });
+  if (error) back(orgErrorCode(error.message), "tab=enroll");
+  done("tab=enroll");
+}
+
 export async function inviteOrgAdvisorAction(formData: FormData) {
   const { client } = await requireUser();
   const orgId = String(formData.get("orgId") ?? "");

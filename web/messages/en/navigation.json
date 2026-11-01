@@ -85,5 +85,6 @@
   "advisorOrg": "Organization",
   "admin": "Admin",
   "adminAttention": "{count} open in the admin area",
-  "alignProgram": "Program"
+  "alignProgram": "Program",
+  "advisorMyProgram": "My program"
 }
