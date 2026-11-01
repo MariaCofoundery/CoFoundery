@@ -465,6 +465,24 @@ export async function getSuccessEnabled(client: SupabaseClient, orgId: string): 
   return data === true;
 }
 
+export type OutcomeCountRow = { batch: string | null; catalogId: string; defaultKey: string | null; title: string | null; teamsTotal: number; teamsDone: number };
+
+/**
+ * Bestaetigte Ergebnisse je Batch als "x von y Teams" fuer die Uebersicht der Organisation. Nur Zaehlungen,
+ * keine Sterne, keine Teamnamen; leer, wenn Erfolge aus sind. Die Datenbankfunktion bestimmt, was gezaehlt wird.
+ */
+export async function getOrgOutcomeCounts(client: SupabaseClient, orgId: string): Promise<OutcomeCountRow[]> {
+  const { data } = await client.rpc("get_org_outcome_counts", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    batch: (row.batch as string | null) ?? null,
+    catalogId: row.catalog_id as string,
+    defaultKey: (row.default_key as string | null) ?? null,
+    title: (row.title as string | null) ?? null,
+    teamsTotal: Number(row.teams_total ?? 0),
+    teamsDone: Number(row.teams_done ?? 0),
+  }));
+}
+
 export type OrgProgramStars = { programId: string; stars: number; nextStars: number | null; nextTitle: string | null };
 
 /** Sterne und naechste Belohnung je Team fuer die Karten der Organisation; leer, wenn Erfolge aus sind. Je Team, keine Summe. */

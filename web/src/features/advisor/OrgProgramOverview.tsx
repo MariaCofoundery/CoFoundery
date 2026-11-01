@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import type { OrgTeamProgram } from "@/features/advisor/teamProgramData";
+import type { OrgTeamProgram, OutcomeCountRow } from "@/features/advisor/teamProgramData";
 
 /**
  * Das Programm auf einen Blick: Zaehler und Filter, keine Wertung.
@@ -12,11 +12,13 @@ import type { OrgTeamProgram } from "@/features/advisor/teamProgramData";
 export async function OrgProgramOverview({
   orgId,
   programs,
+  outcomeCounts = [],
   batch,
   category,
 }: {
   orgId: string;
   programs: OrgTeamProgram[];
+  outcomeCounts?: OutcomeCountRow[];
   batch: string | null;
   category: string | null;
 }) {
@@ -53,6 +55,10 @@ export async function OrgProgramOverview({
       </section>
     );
   };
+  // Ergebnisse je Batch: "x von y Teams", in der Reihenfolge des Katalogs, nie nach Ergebnissen sortiert.
+  const outcomeLabel = (row: OutcomeCountRow) => (row.defaultKey ? t(`outcome_${row.defaultKey}`) : (row.title ?? ""));
+  const outcomeBatches = new Map<string | null, OutcomeCountRow[]>();
+  for (const row of outcomeCounts) outcomeBatches.set(row.batch, [...(outcomeBatches.get(row.batch) ?? []), row]);
   const shown = active.filter(
     (program) => (!batch || program.batch === batch) && (!category || program.category === category),
   );
@@ -95,6 +101,35 @@ export async function OrgProgramOverview({
           {breakdown(t("dashByCategory"), categories, withoutCategory, t("dashNoCategory"))}
           <p className="text-xs leading-6 text-slate-600 lg:col-span-2">{t("dashBarsNote")}</p>
         </div>
+      ) : null}
+
+      {outcomeBatches.size > 0 ? (
+        <section aria-labelledby="org-outcomes-title" className="grid gap-3">
+          <div>
+            <h3 id="org-outcomes-title" className="text-base font-semibold text-slate-950">{t("dashOutcomesTitle")}</h3>
+            <p className="mt-1 max-w-2xl text-xs leading-6 text-slate-600">{t("dashOutcomesNote")}</p>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {[...outcomeBatches.entries()].map(([name, rows]) => (
+              <section key={name ?? "none"} className="advisor-card p-4 sm:p-5">
+                <h4 className="text-sm font-semibold text-slate-900">
+                  {name ?? t("dashNoBatch")} <span className="font-normal text-slate-600">· {t("dashOutcomesTeams", { count: rows[0].teamsTotal })}</span>
+                </h4>
+                <ul className="mt-3 grid gap-2.5">
+                  {rows.map((row) => (
+                    <li key={row.catalogId} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] items-center gap-3 text-sm">
+                      <span className="truncate text-slate-800">{outcomeLabel(row)}</span>
+                      <span className="h-2.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                        <span className="block h-full rounded-full bg-gradient-to-r from-violet-500 to-sky-500" style={{ width: `${row.teamsDone === 0 ? 0 : Math.max(4, Math.round((row.teamsDone / row.teamsTotal) * 100))}%` }} />
+                      </span>
+                      <span className="text-right text-xs font-semibold tabular-nums text-slate-900">{t("dashOutcomesOf", { done: row.teamsDone, total: row.teamsTotal })}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </section>
       ) : null}
 
       {batches.length > 0 ? (

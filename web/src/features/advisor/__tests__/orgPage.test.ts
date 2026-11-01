@@ -591,3 +591,18 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
     assert.equal(messages.area.orgPage.tabs.split(" | ").length, 12, locale);
   }
 });
+
+test("Ergebnisse je Batch: nur Zaehlungen bestaetigter Ergebnisse, keine Sterne, keine Namen, Hinweis fuer Teams", () => {
+  const ui = readFileSync("src/features/advisor/OrgProgramOverview.tsx", "utf8");
+  assert.match(ui, /dashOutcomesOf/);
+  assert.doesNotMatch(ui, /stars|sort\([^)]*(done|teamsDone)/i);
+  const sql = readFileSync("../supabase/migrations/20270218120000_program_outcome_counts.sql", "utf8");
+  assert.match(sql, /confirmed_at is not null/);
+  assert.match(sql, /org_success_enabled\(p_org_id\)/);
+  assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
+  assert.doesNotMatch(sql, /stars|team_name|founder_teams/);
+  const team = readFileSync("src/features/advisor/ProgramOutcomes.tsx", "utf8");
+  assert.match(team, /mode === "team" \? <p[^>]*>\{t\("outcomesCountedNote"\)\}/);
+  const de = readFileSync("messages/de/advisor.json", "utf8");
+  assert.match(de, /"outcomesCountedNote": "Eure bestätigten Ergebnisse fließen ohne Teamnamen/);
+});

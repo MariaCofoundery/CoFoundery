@@ -24,7 +24,7 @@ import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getSuccessEnabled, getProgramAccess, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -110,7 +110,7 @@ export default async function AdvisorOrganisationPage({
   const needsTeams = tab === "overview" || tab === "teams";
   const needsPeople = tab === "overview" || tab === "people";
   const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access";
-  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars] = await Promise.all([
+  const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars, outcomeCounts] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -126,6 +126,7 @@ export default async function AdvisorOrganisationPage({
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
     tab === "success" ? getSuccessEnabled(client, org.id) : Promise.resolve(false),
     tab === "program" ? getOrgProgramStars(client, org.id) : Promise.resolve([]),
+    tab === "overview" ? getOrgOutcomeCounts(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -188,7 +189,7 @@ export default async function AdvisorOrganisationPage({
       <div className="mt-6">
         {tab === "overview" ? (
           <div className="grid gap-6">
-            <OrgProgramOverview orgId={org.id} programs={programs} batch={query.batch?.slice(0, 60) || null} category={query.category?.slice(0, 60) || null} />
+            <OrgProgramOverview orgId={org.id} programs={programs} outcomeCounts={outcomeCounts} batch={query.batch?.slice(0, 60) || null} category={query.category?.slice(0, 60) || null} />
             {org.description ? <p className="max-w-3xl text-sm leading-7 text-slate-700">{org.description}</p> : null}
             <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[

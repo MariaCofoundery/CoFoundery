@@ -41,6 +41,7 @@ export async function ProgramOutcomes({
       <div>
         <h3 id={`outcomes-${programId}`} className="text-base font-semibold text-slate-950">{t("outcomesTitle")}</h3>
         <p className="mt-1 text-xs leading-5 text-slate-600">{mode === "team" ? t("outcomesTextTeam") : t("outcomesTextOrg")}</p>
+        {mode === "team" ? <p className="mt-1 text-xs leading-5 text-slate-600">{t("outcomesCountedNote")}</p> : null}
         <p className="mt-2 flex items-baseline gap-2 text-slate-950">
           <span className="text-3xl font-extrabold tracking-tight text-amber-500" aria-hidden="true">★</span>
           <span className="text-3xl font-extrabold tracking-tight">{total}</span>
