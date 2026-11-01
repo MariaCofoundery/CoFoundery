@@ -4,13 +4,14 @@ type Group = { key: string; label: string; hint: string; tabs: { key: string; la
 
 const ICONS: Record<string, string> = {
   run: "M3 12h4l3-8 4 16 3-8h4",
+  learn: "M4 5h6a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H4V5zM20 5h-6a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h7V5z",
   setup: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4",
   manage: "M12 3l8 4v5c0 4.5-3.4 7.6-8 9-4.6-1.4-8-4.5-8-9V7l8-4z",
 };
 
 /**
- * Die Bereiche der Organisation in drei Gruppen statt zehn Reitern in einer Reihe:
- * laufender Betrieb (taeglich), Einrichten (zu Beginn, selten wieder) und Verwalten (Hintergrund).
+ * Die Bereiche der Organisation in vier Gruppen statt vierzehn Reitern in einer Reihe:
+ * laufender Betrieb (taeglich), Planen und Lernen, Einrichten (zu Beginn, selten wieder) und Verwalten (Hintergrund).
  * Die Gruppe sagt in einem Satz, wofuer sie da ist.
  */
 export function OrgAreaNav({ groups, activeTab, ariaLabel }: { groups: Group[]; activeTab: string; ariaLabel: string }) {

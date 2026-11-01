@@ -725,9 +725,9 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "groupLabels": "Operations | Set up | Manage",
-      "groupHints": "Where you work every day with teams and people. | Set up once, rarely touch again: enroll teams, program page and achievements. | In the background: approvals, members and the organization profile.",
-      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile | Enroll teams | Experts",
+      "groupLabels": "Operations | Plan and learn | Set up | Manage",
+      "groupHints": "Your daily work with teams and people. | Dates, materials and learning content for your teams and the people you support. | Set up once, rarely touched again: enroll teams, program page and results. | In the background: releases, members and the organization profile.",
+      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile | Enroll teams | Experts | Materials | Learning area",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",

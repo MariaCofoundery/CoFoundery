@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -370,17 +370,17 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die zwoelf Reiter stehen in drei Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+test("Organisation: die vierzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
-  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "setup", "manage"].includes(key));
-  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"];
+  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "learn", "setup", "manage"].includes(key));
+  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
-    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 3, locale);
-    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 3, locale);
+    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 4, locale);
+    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 4, locale);
     assert.equal(messages.area.orgPage.tabs.split(" | ").length, tabs.length, locale);
   }
   // Einladungen und Codes liegen im Reiter "Teams aufnehmen", die Teamkarten im Reiter "Programm".
@@ -588,7 +588,7 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 12, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 14, locale);
   }
 });
 
@@ -654,4 +654,19 @@ test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Vorausset
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   // Das Modulformular aendert den Kreis nicht mehr nebenbei.
   assert.match(actions, /p_published: null/);
+});
+
+test("Planen und Lernen: Termine, Unterlagen und Lernbereich sind je ein eigener Reiter mit eigener Rueckkehr", () => {
+  const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(page, /\{ key: "learn", tabs: \["plan", "materials", "learning"\] \}/);
+  assert.match(page, /tab === "materials" \? \(/);
+  assert.match(page, /tab === "learning" \? \(/);
+  // Jeder Reiter liest nur seine eigenen Daten.
+  assert.match(page, /tab === "materials" \? listProgramMaterials/);
+  assert.match(page, /tab === "learning" \? listLearning/);
+  const plan = page.slice(page.indexOf('{tab === "plan" ? ('), page.indexOf('{tab === "materials" ? ('));
+  assert.doesNotMatch(plan, /OrgProgramMaterials|OrgProgramLearning/);
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions, /tab=materials/);
+  assert.match(actions, /tab=learning/);
 });

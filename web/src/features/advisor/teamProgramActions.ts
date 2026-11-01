@@ -33,6 +33,10 @@ const orgEnrollTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=enroll${extra}`;
 const orgPlanTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
+const orgMaterialsTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=materials${extra}`;
+const orgLearningTab = (orgId: string, extra = "") =>
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=learning${extra}`;
 const orgExpertsTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=experts${extra}`;
 const orgSuccessTab = (orgId: string, extra = "") =>
@@ -470,7 +474,7 @@ const intOrNull = (value: FormDataEntryValue | null, min: number, max: number) =
 
 export async function saveLearningModuleAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgLearningTab(orgId));
   const { error } = await client.rpc("save_learning_module", {
     p_org_id: orgId,
     p_module_id: String(formData.get("moduleId") ?? "") || null,
@@ -482,13 +486,13 @@ export async function saveLearningModuleAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
+  redirect(orgLearningTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
 }
 
 /** Fuer wen ein Modul sichtbar ist: alle Teams, einzelne Teams, einzelne Personen. Die Datenbank prueft jede Person und jedes Team. */
 export async function setModuleAudienceAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgLearningTab(orgId));
   const ids = (name: string) => formData.getAll(name).map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
   const { error } = await client.rpc("set_module_audience", {
     p_module_id: String(formData.get("moduleId") ?? ""),
@@ -498,23 +502,23 @@ export async function setModuleAudienceAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, error ? "&learningError=audience#learning-title" : "#learning-title"));
+  redirect(orgLearningTab(orgId, error ? "&learningError=audience#learning-title" : "#learning-title"));
 }
 
 export async function deleteLearningModuleAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgLearningTab(orgId));
   await client.rpc("delete_learning_module", { p_module_id: String(formData.get("moduleId") ?? "") });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, "#learning-title"));
+  redirect(orgLearningTab(orgId, "#learning-title"));
 }
 
 export async function saveLearningLessonAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgLearningTab(orgId));
   const url = String(formData.get("url") ?? "").trim().slice(0, 500);
-  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgPlanTab(orgId, "&learningError=invalid#learning-title"));
+  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgLearningTab(orgId, "&learningError=invalid#learning-title"));
   const { error } = await client.rpc("save_learning_lesson", {
     p_module_id: String(formData.get("moduleId") ?? ""),
     p_lesson_id: String(formData.get("lessonId") ?? "") || null,
@@ -527,24 +531,24 @@ export async function saveLearningLessonAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
+  redirect(orgLearningTab(orgId, error ? "&learningError=failed#learning-title" : "#learning-title"));
 }
 
 export async function deleteLearningLessonAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgLearningTab(orgId));
   await client.rpc("delete_learning_lesson", { p_lesson_id: String(formData.get("lessonId") ?? "") });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, "#learning-title"));
+  redirect(orgLearningTab(orgId, "#learning-title"));
 }
 
 /** Links zu den Programmunterlagen: nur der Inhaber; die Datenbank prueft das und verlangt https. */
 export async function saveProgramMaterialAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgMaterialsTab(orgId));
   const url = String(formData.get("url") ?? "").trim().slice(0, 500);
-  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgPlanTab(orgId, "&materialError=invalid#materials-title"));
+  if (!/^https:\/\/\S+$/i.test(url)) redirect(orgMaterialsTab(orgId, "&materialError=invalid#materials-title"));
   const { error } = await client.rpc("save_program_material", {
     p_org_id: orgId,
     p_material_id: String(formData.get("materialId") ?? "") || null,
@@ -554,16 +558,16 @@ export async function saveProgramMaterialAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, error ? "&materialError=failed#materials-title" : "#materials-title"));
+  redirect(orgMaterialsTab(orgId, error ? "&materialError=failed#materials-title" : "#materials-title"));
 }
 
 export async function deleteProgramMaterialAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgPlanTab(orgId));
+  const client = await requireUser(orgMaterialsTab(orgId));
   await client.rpc("delete_program_material", { p_material_id: String(formData.get("materialId") ?? "") });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, "#materials-title"));
+  redirect(orgMaterialsTab(orgId, "#materials-title"));
 }
 
 /** Ohne Schema wird https:// vorangestellt; alles andere als https lehnt die Datenbank ab. */

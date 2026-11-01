@@ -35,15 +35,16 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
- * Drei Gruppen statt zehn Reitern: Betrieb (taeglich), Einrichten (zu Beginn, selten wieder), Verwalten (Hintergrund).
+ * Vier Gruppen statt vierzehn Reitern: Betrieb (taeglich), Planen und Lernen (Termine, Unterlagen, Lernbereich), Einrichten (zu Beginn, selten wieder), Verwalten (Hintergrund).
  * Die Reiter selbst und ihre Adressen bleiben - nur die Anordnung ist neu.
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "run", tabs: ["overview", "teams", "people", "program", "plan", "experts"] },
+  { key: "run", tabs: ["overview", "teams", "people", "program", "experts"] },
+  { key: "learn", tabs: ["plan", "materials", "learning"] },
   { key: "setup", tabs: ["enroll", "page", "success"] },
   { key: "manage", tabs: ["access", "members", "profile"] },
 ];
@@ -111,8 +112,8 @@ export default async function AdvisorOrganisationPage({
   const SOLO_HIDDEN: Tab[] = ["overview", "teams", "people", "access"];
 
   const needsTeams = tab === "overview" || tab === "teams";
-  const needsPeople = tab === "overview" || tab === "people" || tab === "plan";
-  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "plan";
+  const needsPeople = tab === "overview" || tab === "people" || tab === "learning";
+  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, teams, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, successEnabled, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsTeams ? getAdvisorDashboardTeams(user.id) : Promise.resolve([]),
@@ -123,15 +124,15 @@ export default async function AdvisorOrganisationPage({
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
-    tab === "plan" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
+    tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "success" ? getOrgRewards(client, org.id) : Promise.resolve([]),
     tab === "success" ? getSuccessEnabled(client, org.id) : Promise.resolve(false),
     tab === "program" ? getOrgProgramStars(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgOutcomeCounts(client, org.id) : Promise.resolve([]),
-    tab === "plan" ? listLearning(client, org.id) : Promise.resolve([]),
-    tab === "plan" ? listModuleShares(client, org.id) : Promise.resolve([]),
+    tab === "learning" ? listLearning(client, org.id) : Promise.resolve([]),
+    tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
 
   const tabLabels = t("orgPage.tabs").split(" | ");
@@ -334,12 +335,22 @@ export default async function AdvisorOrganisationPage({
             {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
             {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.planError")}</p> : null}
             <OrgProgramPlan orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} events={planEvents} openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null} />
-            {query.materialError ? <p role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.materialsError")}</p> : null}
-            <div className="mt-8">
+          </>
+        ) : null}
+
+        {tab === "materials" ? (
+          <>
+            {query.materialError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.materialsError")}</p> : null}
+            <div>
               <OrgProgramMaterials orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} materials={materials} />
             </div>
-            {query.learningError ? <p role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor(query.learningError === "audience" ? "teamProgram.learningAudienceError" : "teamProgram.learningError")}</p> : null}
-            <div className="mt-8">
+          </>
+        ) : null}
+
+        {tab === "learning" ? (
+          <>
+            {query.learningError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor(query.learningError === "audience" ? "teamProgram.learningAudienceError" : "teamProgram.learningError")}</p> : null}
+            <div>
               <OrgProgramLearning
                 orgId={org.id}
                 isOwner={org.role === "owner" && org.status === "active"}
