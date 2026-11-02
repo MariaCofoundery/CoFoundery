@@ -13,6 +13,7 @@ import { ProgramSetupView } from "@/features/advisor/ProgramSetupView";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { ManageProgramUpdates } from "@/features/advisor/ProgramUpdates";
 import { ProgramOrgDataForm } from "@/features/advisor/ProgramOrgData";
+import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { ProgramProfileView } from "@/features/advisor/ProgramProfile";
 import { TeamAccessList } from "@/features/advisor/ProgramAccess";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
@@ -154,7 +155,7 @@ export default async function AdvisorProgramTeamPage({
           <div className="grid gap-4">
             <ProgramOverviewTiles memberCount={program.memberCount} openMilestones={openMilestones} contactCount={program.contactUserIds.length} due={due} />
             <ProgramProfileView profile={profile} />
-            <ProgramOrgDataForm programId={programId} data={orgData} />
+            {hasOrgFeature(orgOfProgram, "orgdata") ? <ProgramOrgDataForm programId={programId} data={orgData} /> : null}
           </div>
         ) : tab === "erfolge" ? (
           <div className="grid gap-8">

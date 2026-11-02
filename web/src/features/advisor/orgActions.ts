@@ -7,6 +7,7 @@ import { sendAdvisorOrgInviteEmail } from "@/lib/email/sendAdvisorOrgInviteEmail
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErrors";
+import { isOrgFeature } from "@/features/advisor/orgFeatures";
 
 /**
  * Organisation anlegen, Menschen aufnehmen, Mitgliedschaft beenden.
@@ -59,9 +60,10 @@ export async function createAdvisorOrgAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   if (name.length < 2 || name.length > 120) back("org_name");
 
-  const { error } = await client.rpc("create_advisor_org", { p_name: name });
+  const { data, error } = await client.rpc("create_advisor_org", { p_name: name });
   if (error) back(orgErrorCode(error.message));
-  done();
+  // Neue Organisationen waehlen zuerst, welche Bereiche sie brauchen.
+  done(featuresTab(data));
 }
 
 /**
@@ -74,9 +76,26 @@ export async function startMyProgramAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   if (name.length < 2 || name.length > 120) back("org_name", "tab=enroll");
 
-  const { error } = await client.rpc("create_advisor_org", { p_name: name });
+  const { data, error } = await client.rpc("create_advisor_org", { p_name: name });
   if (error) back(orgErrorCode(error.message), "tab=enroll");
-  done("tab=enroll");
+  done(featuresTab(data));
+}
+
+/** Zur Auswahl der Bereiche, mit der Organisation, die gerade angelegt wurde. */
+function featuresTab(orgId: unknown) {
+  return typeof orgId === "string" && /^[0-9a-f-]{36}$/i.test(orgId) ? `tab=features&setup=1&org=${orgId}` : "tab=features&setup=1";
+}
+
+/** Bereiche der Organisation waehlen: nur der Inhaber; die Datenbank prueft das und kennt nur die bekannten Namen. */
+export async function setOrgFeaturesAction(formData: FormData) {
+  const { client } = await requireUser();
+  const orgId = String(formData.get("orgId") ?? "");
+  await assertOrgActive(client, orgId);
+  const wanted = formData.getAll("feature").map(String).filter(isOrgFeature);
+  const { error } = await client.rpc("set_org_features", { p_org_id: orgId, p_features: wanted });
+  if (error) back(orgErrorCode(error.message), `tab=features&org=${encodeURIComponent(orgId)}`);
+  // Die erste Auswahl fuehrt weiter, spaetere bleiben auf der Seite und sagen, dass sie gespeichert sind.
+  done(formData.get("setup") === "1" ? `org=${encodeURIComponent(orgId)}` : `tab=features&saved=1&org=${encodeURIComponent(orgId)}`);
 }
 
 export async function inviteOrgAdvisorAction(formData: FormData) {

@@ -100,6 +100,8 @@ const SELF_ID = "00000000-0000-4000-8000-000000000999";
 export function buildExampleOrg(t: Text) {
   const org: AdvisorOrg = {
     id: "00000000-0000-4000-8000-000000000002",
+    features: ["plan", "materials", "learning", "experts", "orgdata", "success"],
+    featuresSetupDone: true,
     name: t("fixtureOrg"),
     personSeatLimit: null,
     role: "owner",

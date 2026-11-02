@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -370,11 +370,11 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die vierzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+test("Organisation: die fuenfzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
   const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "learn", "setup", "manage"].includes(key));
-  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"];
+  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
@@ -588,7 +588,7 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 14, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 15, locale);
   }
 });
 
@@ -659,14 +659,42 @@ test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Vorausset
 test("Planen und Lernen: Termine, Unterlagen und Lernbereich sind je ein eigener Reiter mit eigener Rueckkehr", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   assert.match(page, /\{ key: "learn", tabs: \["plan", "materials", "learning"\] \}/);
-  assert.match(page, /tab === "materials" \? \(/);
-  assert.match(page, /tab === "learning" \? \(/);
+  assert.match(page, /tab === "materials" && !tabOff \? \(/);
+  assert.match(page, /tab === "learning" && !tabOff \? \(/);
   // Jeder Reiter liest nur seine eigenen Daten.
   assert.match(page, /tab === "materials" \? listProgramMaterials/);
   assert.match(page, /tab === "learning" \? listLearning/);
-  const plan = page.slice(page.indexOf('{tab === "plan" ? ('), page.indexOf('{tab === "materials" ? ('));
+  const plan = page.slice(page.indexOf('{tab === "plan" && !tabOff ? ('), page.indexOf('{tab === "materials" && !tabOff ? ('));
   assert.doesNotMatch(plan, /OrgProgramMaterials|OrgProgramLearning/);
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /tab=materials/);
   assert.match(actions, /tab=learning/);
+});
+
+test("Funktionen: neue Organisationen waehlen einmal, aus heisst verbergen, Teams lesen nur Eingeschaltetes", () => {
+  const sql = readFileSync("../supabase/migrations/20270223120000_org_features.sql", "utf8");
+  // Bestehende Organisationen behalten alles; nur neu angelegte bekommen die Auswahl.
+  assert.match(sql, /features_setup_done boolean not null default true/);
+  assert.match(sql, /values \(btrim\(p_name\), v_user, array\['plan', 'materials', 'learning'\]::text\[\], false\)/);
+  // Alle vier Funktionen, die Teams lesen, fragen nach dem Schalter, in der Datenbank.
+  for (const [fn, key] of [["get_my_program_events", "plan"], ["get_my_program_materials", "materials"], ["get_my_learning", "learning"], ["get_team_program_org_data", "orgdata"]]) {
+    const start = sql.indexOf(`function public.${fn}(`);
+    assert.ok(start > 0, fn);
+    const body = sql.slice(start, sql.indexOf("revoke all on function", start));
+    assert.match(body, new RegExp(`org_feature_enabled\\([a-z.]+org_id, '${key}'\\)`), fn);
+  }
+  // Ausschalten loescht nichts.
+  assert.doesNotMatch(sql, /delete from|truncate/i);
+  const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
+  assert.match(page, /!org\.featuresSetupDone && tab !== "features"/);
+  assert.match(page, /tabEnabled\(org, entry\)/);
+  assert.match(page, /\.filter\(\(group\) => group\.tabs\.length > 0\)/);
+  const actions = readFileSync("src/features/advisor/orgActions.ts", "utf8");
+  assert.match(actions, /tab=features&setup=1/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    for (const key of ["plan", "materials", "learning", "experts", "orgdata", "success"]) {
+      assert.ok(messages.org.features[`${key}Title`] && messages.org.features[`${key}Text`], `${locale} ${key}`);
+    }
+  }
 });

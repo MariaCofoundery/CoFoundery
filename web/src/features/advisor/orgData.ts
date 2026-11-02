@@ -14,6 +14,10 @@ import type { AdvisorScope } from "@/features/advisor/personAccessData";
 
 export type AdvisorOrg = {
   id: string;
+  /** Eingeschaltete Bereiche (siehe orgFeatures.ts), einschliesslich "success". */
+  features: string[];
+  /** Neue Organisationen bestaetigen die Auswahl einmal; bestehende gelten als bestaetigt. */
+  featuresSetupDone: boolean;
   name: string;
   personSeatLimit: number | null;
   role: "owner" | "advisor" | null;
@@ -72,7 +76,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
 
   const { data: orgs } = await client
     .from("advisor_orgs")
-    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region, program_slug, program_page_published, program_welcome, program_logo_path, program_accent, program_accent_b")
+    .select("id, name, status, person_seat_limit, description, website_url, focus, location_region, program_slug, program_page_published, program_welcome, program_logo_path, program_accent, program_accent_b, features, features_setup_done, program_success_enabled")
     .in(
       "id",
       rows.map((row) => row.org_id)
@@ -94,9 +98,14 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
       program_logo_path: string | null;
       program_accent: string | null;
       program_accent_b: string | null;
+      features: string[] | null;
+      features_setup_done: boolean | null;
+      program_success_enabled: boolean | null;
     }[]
   ).map((org) => ({
     id: org.id,
+    features: [...(org.features ?? []), ...(org.program_success_enabled ? ["success"] : [])],
+    featuresSetupDone: org.features_setup_done !== false,
     name: org.name,
     status: org.status === "suspended" ? "suspended" : "active",
     personSeatLimit: org.person_seat_limit,

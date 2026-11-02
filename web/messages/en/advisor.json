@@ -470,7 +470,33 @@
       "org_failed": "That did not work just now. Please try again."
     },
     "personOpen": "View",
-    "peopleEmptyInvite": "Invite a person"
+    "peopleEmptyInvite": "Invite a person",
+    "features": {
+      "title": "Features",
+      "text": "Choose which areas your organization uses. What you switch off disappears for you and for the teams, but is not deleted.",
+      "setupTitle": "What do you need?",
+      "setupText": "Choose the areas you want to use. You can change this at any time under Set up → Features, and nothing is lost.",
+      "alwaysOn": "Always included: enrolling teams, the program with team cards, milestones and updates, members and profile.",
+      "planTitle": "Program plan and attendance",
+      "planText": "Dates and tasks for your teams. You enter attendance by hand.",
+      "materialsTitle": "Materials",
+      "materialsText": "Links to your storage: folders, slides, recordings. The teams see them.",
+      "learningTitle": "Learning area",
+      "learningText": "Modules with lessons as links, visible to all teams, selected teams or selected people you support.",
+      "expertsTitle": "Experts and speakers",
+      "expertsText": "An internal list with contact details and topics. Teams never see it.",
+      "orgdataTitle": "Startup master data",
+      "orgdataText": "Company name, address, contact person and more, kept by you. The team sees it read-only.",
+      "successTitle": "Results",
+      "successText": "Results, stars and rewards per team and counts per batch. Settings are under Set up → Results.",
+      "offNote": "A switched-off area disappears from the menu, also for the teams. Your entries stay if you switch it on again.",
+      "save": "Save",
+      "saveSetup": "Continue",
+      "saved": "Saved.",
+      "ownerOnly": "Only the owner can change this.",
+      "offNotice": "This area is switched off.",
+      "offNoticeLink": "Switch it on under Features"
+    }
   },
   "personView": {
     "back": "Back to people & groups",
@@ -727,7 +753,7 @@
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Operations | Plan and learn | Set up | Manage",
       "groupHints": "Your daily work with teams and people. | Dates, materials and learning content for your teams and the people you support. | Set up once, rarely touched again: enroll teams, program page and results. | In the background: releases, members and the organization profile.",
-      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile | Enroll teams | Experts | Materials | Learning area",
+      "tabs": "Overview | Teams | People | Approvals | Members | Program | Program plan | Achievements | Program page | Profile | Enroll teams | Experts | Materials | Learning area | Features",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",

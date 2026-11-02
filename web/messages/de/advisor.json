@@ -470,7 +470,33 @@
       "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
     },
     "personOpen": "Ansehen",
-    "peopleEmptyInvite": "Person einladen"
+    "peopleEmptyInvite": "Person einladen",
+    "features": {
+      "title": "Funktionen",
+      "text": "Wähle, welche Bereiche eure Organisation nutzt. Was du ausschaltest, verschwindet für dich und für die Teams, wird aber nicht gelöscht.",
+      "setupTitle": "Was brauchst du?",
+      "setupText": "Wähle die Bereiche, die du nutzen willst. Du kannst das jederzeit unter Einrichten → Funktionen ändern, und es geht dabei nichts verloren.",
+      "alwaysOn": "Immer dabei: Teams aufnehmen, das Programm mit den Teamkarten, Meilensteine und Updates, Mitglieder und Profil.",
+      "planTitle": "Programmplan und Teilnahme",
+      "planText": "Termine und Aufgaben für eure Teams. Die Teilnahme tragt ihr von Hand ein.",
+      "materialsTitle": "Unterlagen",
+      "materialsText": "Links zu euren Ablagen: Ordner, Folien, Aufzeichnungen. Die Teams sehen sie.",
+      "learningTitle": "Lernbereich",
+      "learningText": "Module mit Lektionen als Links, sichtbar für alle Teams, einzelne Teams oder einzelne Begleitete.",
+      "expertsTitle": "Experten und Speaker",
+      "expertsText": "Eine interne Liste mit Kontaktdaten und Themen. Teams sehen sie nie.",
+      "orgdataTitle": "Stammdaten der Startups",
+      "orgdataText": "Firmenname, Adresse, Ansprechperson und mehr, von euch gepflegt. Das Team sieht sie nur lesend.",
+      "successTitle": "Erfolge",
+      "successText": "Ergebnisse, Sterne und Belohnungen je Team und Zahlen je Batch. Die Einstellungen stehen unter Einrichten → Erfolge.",
+      "offNote": "Ein ausgeschalteter Bereich verschwindet aus dem Menü, auch für die Teams. Eure Einträge bleiben erhalten, wenn ihr ihn wieder einschaltet.",
+      "save": "Speichern",
+      "saveSetup": "Weiter",
+      "saved": "Gespeichert.",
+      "ownerOnly": "Nur die Inhaberin oder der Inhaber kann das ändern.",
+      "offNotice": "Dieser Bereich ist ausgeschaltet.",
+      "offNoticeLink": "Unter Funktionen einschalten"
+    }
   },
   "personView": {
     "back": "Zurück zu Personen & Gruppen",
@@ -727,7 +753,7 @@
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betrieb | Planen und Lernen | Einrichten | Verwalten",
       "groupHints": "Hier arbeitest du täglich mit Teams und Personen. | Termine, Unterlagen und Lerninhalte für eure Teams und Begleiteten. | Einmal einrichten, selten wieder anfassen: Teams aufnehmen, Programmseite und Erfolge. | Im Hintergrund: Freigaben, Mitglieder und das Profil der Organisation.",
-      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmplan | Erfolge | Programmseite | Profil | Teams aufnehmen | Experten | Unterlagen | Lernbereich",
+      "tabs": "Übersicht | Teams | Personen | Freigaben | Mitglieder | Programm | Programmplan | Erfolge | Programmseite | Profil | Teams aufnehmen | Experten | Unterlagen | Lernbereich | Funktionen",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",

@@ -17,6 +17,8 @@ import { OrgSuccessSwitch } from "@/features/advisor/OrgSuccessSwitch";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
 import { OrgProgramExperts } from "@/features/advisor/OrgProgramExperts";
+import { OrgFeaturesForm } from "@/features/advisor/OrgFeaturesForm";
+import { hasOrgFeature, tabEnabled } from "@/features/advisor/orgFeatures";
 import { OrgProgramLearning } from "@/features/advisor/ProgramLearning";
 import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
@@ -35,7 +37,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning"] as const;
+const TABS = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -45,7 +47,7 @@ type Tab = (typeof TABS)[number];
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "run", tabs: ["overview", "teams", "people", "program", "experts"] },
   { key: "learn", tabs: ["plan", "materials", "learning"] },
-  { key: "setup", tabs: ["enroll", "page", "success"] },
+  { key: "setup", tabs: ["enroll", "features", "page", "success"] },
   { key: "manage", tabs: ["access", "members", "profile"] },
 ];
 // "settings" hiess bis zum 31.10.2026 der eine Reiter fuer alles; alte Links landen bei den Mitgliedern.
@@ -64,7 +66,7 @@ const TAB_OF = (value: string | undefined): Tab => (value === "settings" ? "memb
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; expertError?: string; q?: string; open?: string; successError?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -108,6 +110,12 @@ export default async function AdvisorOrganisationPage({
   const members = await getOrgMembers(client, org.id);
   const soloOrg = org.role === "owner" && members.filter((member) => member.status === "active").length === 1;
   const tab = query.tab ? TAB_OF(query.tab) : soloOrg ? "program" : "overview";
+  // Neue Organisationen bestaetigen zuerst, welche Bereiche sie brauchen. Nur die Inhaberin wird dorthin geleitet.
+  if (org.role === "owner" && org.status === "active" && !org.featuresSetupDone && tab !== "features") {
+    redirect(`${base("features")}&setup=1`);
+  }
+  // Ein ausgeschalteter Bereich erreicht man auch ueber eine alte Adresse nicht: die Seite sagt, wo man ihn einschaltet.
+  const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const SOLO_HIDDEN: Tab[] = ["overview", "teams", "people", "access"];
 
@@ -170,8 +178,8 @@ export default async function AdvisorOrganisationPage({
             key: group.key,
             label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
             hint: t("orgPage.groupHints").split(" | ")[groupIndex] ?? "",
-            tabs: group.tabs.filter((entry) => !soloOrg || !SOLO_HIDDEN.includes(entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
-          }))}
+            tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+          })).filter((group) => group.tabs.length > 0)}
         />
       </AdvisorPageHeader>
 
@@ -323,22 +331,22 @@ export default async function AdvisorOrganisationPage({
           </div>
         ) : null}
 
-        {tab === "experts" ? (
+        {tab === "experts" && !tabOff ? (
           <>
             {query.expertError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.expertsError")}</p> : null}
             <OrgProgramExperts orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} experts={experts} query={(query.q ?? "").slice(0, 80)} />
           </>
         ) : null}
 
-        {tab === "plan" ? (
+        {tab === "plan" && !tabOff ? (
           <>
             {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
             {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.planError")}</p> : null}
-            <OrgProgramPlan orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} events={planEvents} openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null} />
+            <OrgProgramPlan withSpeakers={hasOrgFeature(org, "experts")} orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} events={planEvents} openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null} />
           </>
         ) : null}
 
-        {tab === "materials" ? (
+        {tab === "materials" && !tabOff ? (
           <>
             {query.materialError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.materialsError")}</p> : null}
             <div>
@@ -347,7 +355,7 @@ export default async function AdvisorOrganisationPage({
           </>
         ) : null}
 
-        {tab === "learning" ? (
+        {tab === "learning" && !tabOff ? (
           <>
             {query.learningError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor(query.learningError === "audience" ? "teamProgram.learningAudienceError" : "teamProgram.learningError")}</p> : null}
             <div>
@@ -361,6 +369,23 @@ export default async function AdvisorOrganisationPage({
               />
             </div>
           </>
+        ) : null}
+
+        {tabOff ? (
+          <p role="status" className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm leading-6 text-slate-700">
+            {tAdvisor("org.features.offNotice")}{" "}
+            <Link href={base("features")} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{tAdvisor("org.features.offNoticeLink")}</Link>
+          </p>
+        ) : null}
+
+        {tab === "features" ? (
+          <OrgFeaturesForm
+            orgId={org.id}
+            isOwner={org.role === "owner" && org.status === "active"}
+            enabled={org.features}
+            setup={query.setup === "1"}
+            saved={query.saved === "1"}
+          />
         ) : null}
 
         {tab === "success" ? (

@@ -68,6 +68,7 @@ export async function OrgProgramPlan({
   openEventId,
   exampleAttendance,
   exampleSpeakers,
+  withSpeakers = true,
 }: {
   orgId: string;
   isOwner: boolean;
@@ -77,6 +78,8 @@ export async function OrgProgramPlan({
   exampleAttendance?: EventAttendanceRow[];
   /** Nur die Beispiel-Vorschau: fertige Speaker-Zeilen und Auswahl, dann wird nichts aus der Datenbank gelesen. */
   exampleSpeakers?: { assigned: EventExpert[]; choices: ProgramExpert[] };
+  /** Nur mit eingeschaltetem Bereich "Experten": sonst keine Speaker an Veranstaltungen. */
+  withSpeakers?: boolean;
 }) {
   const t = await getTranslations("advisor.teamProgram");
   const locale = getPresentationLocale(await getLocale());
@@ -88,7 +91,7 @@ export async function OrgProgramPlan({
   const attendance = exampleAttendance ?? (openEventId ? await getEventAttendance(await createClient(), openEventId) : []);
 
   // Speaker sind nur fuer die Organisation da; Teams bekommen diese Seite nie.
-  const supabase = exampleSpeakers ? null : await createClient();
+  const supabase = exampleSpeakers || !withSpeakers ? null : await createClient();
   const assigned = exampleSpeakers?.assigned ?? (supabase ? await listEventExperts(supabase, orgId) : []);
   const choices = exampleSpeakers?.choices ?? (isOwner && supabase ? (await listProgramExperts(supabase, orgId)).filter((entry) => !entry.archived) : []);
 
@@ -145,7 +148,7 @@ export async function OrgProgramPlan({
           <a href={`/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan&open=${event.eventId}`} className="mt-1 inline-flex min-h-11 items-center text-sm text-slate-600 underline underline-offset-4">{t("planAttendanceOpen")}</a>
         )}
       </details>
-      {isOwner ? (
+      {isOwner && withSpeakers ? (
         <details className="mt-1 border-t border-slate-100 pt-2">
           <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500">{t("planSpeakersEdit")}</summary>
           {(() => {
