@@ -698,3 +698,18 @@ test("Funktionen: neue Organisationen waehlen einmal, aus heisst verbergen, Team
     }
   }
 });
+
+test("Beispiel Gruppenauswertung: nur lesend, dieselben Bauteile wie die echte Seite, keine Datenbank, keine Wertung", () => {
+  const page = readFileSync("src/app/(product)/advisor/beispiel/page.tsx", "utf8");
+  assert.match(page, /tab === "group"/);
+  assert.match(page, /CapabilityTeamReadoutView data=\{exampleGroup\.group\}/);
+  assert.match(page, /<AlignmentSideBySide/);
+  const real = readFileSync("src/app/(product)/advisor/review/[reviewId]/page.tsx", "utf8");
+  assert.match(real, /CapabilityTeamReadoutView/);
+  assert.match(real, /AlignmentSideBySide/);
+  const fixture = readFileSync("src/features/advisor/exampleGroup.ts", "utf8");
+  assert.doesNotMatch(fixture, /createClient|supabase|rpc\(/);
+  assert.match(fixture, /buildCapabilityTeamReadout/);
+  // Das Beispiel steht im gesperrten Block: kein Feld und kein Knopf loest etwas aus.
+  assert.match(page, /<fieldset disabled/);
+});

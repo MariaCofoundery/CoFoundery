@@ -4,6 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { buildExampleOrg, buildExampleProgram } from "@/features/advisor/exampleProgram";
+import { AdvisorNotebook } from "@/features/advisor/AdvisorNotebook";
+import { AlignmentSideBySide } from "@/features/advisor/AlignmentSideBySide";
+import { buildExampleGroup } from "@/features/advisor/exampleGroup";
+import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
+import { getRequestLocale } from "@/i18n/getLocale";
 import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
@@ -20,7 +25,7 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { getRequestUser } from "@/lib/supabase/server";
 
-const TABS = ["today", "cards", "plan", "overview", "milestones", "updates", "outcomes", "team"] as const;
+const TABS = ["today", "cards", "plan", "overview", "milestones", "updates", "outcomes", "team", "group"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -43,6 +48,9 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
   const roleViews = await getDashboardRoleViews(user.id);
   if (!roleViews.hasAdvisor) redirect("/dashboard");
 
+  const tReview = await getTranslations("advisor.review");
+  const locale = await getRequestLocale();
+  const exampleGroup = buildExampleGroup(t("fixtureGroupNames").split(" | "));
   const example = buildExampleProgram((key) => t(key));
   const exampleOrg = buildExampleOrg((key) => t(key));
   const today = new Date().toISOString().slice(0, 10);
@@ -65,6 +73,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
     updates: t("tabUpdates"),
     outcomes: t("tabOutcomes"),
     team: t("tabTeamView"),
+    group: t("tabGroup"),
   };
   const openMilestones = example.milestones.filter((milestone) => milestone.targetCount === null || milestone.doneCount < milestone.targetCount).length;
 
@@ -74,7 +83,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
       <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <AdvisorPageHeader
           eyebrow={`${t("eyebrow")} · ${t("title")}`}
-          title={tab === "today" || tab === "cards" || tab === "plan" ? exampleOrg.org.name : teamName}
+          title={tab === "today" || tab === "cards" || tab === "plan" ? exampleOrg.org.name : tab === "group" ? exampleGroup.included.join(", ") : teamName}
           text={t("sub")}
           action={<span className="inline-flex rounded-full bg-amber-300/20 px-3 py-1.5 text-xs font-semibold text-amber-100 ring-1 ring-amber-200/40">{t("badge")}</span>}
         >
@@ -134,6 +143,34 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
               <ProgramOutcomes programId={example.programId} outcomes={example.outcomes} mode="org" returnTo={noReturn} comments={example.comments} />
               <ProgramRewards programId={example.programId} rewards={example.rewards} mode="org" returnTo={noReturn} />
               <ProgramCheckIn programId={example.programId} checkIns={example.checkIns} returnTo={noReturn} />
+            </div>
+          ) : tab === "group" ? (
+            <div className="grid gap-8">
+              <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("groupNote")}</p>
+              <p className="max-w-3xl text-sm leading-7 text-slate-600">{tReview("intro")}</p>
+              <section>
+                <h2 className="text-lg font-semibold text-slate-950">{tReview("rolesTitle")}</h2>
+                <p className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-sm leading-6 text-slate-600">
+                  {tReview("rolesOmitted", { count: 1 })}
+                </p>
+                <div className="mt-4">
+                  <CapabilityTeamReadoutView data={exampleGroup.group} />
+                </div>
+              </section>
+              <AlignmentSideBySide
+                people={exampleGroup.alignment}
+                locale={locale}
+                copy={{ title: tReview("alignmentTitle"), intro: tReview("alignmentIntro"), noValue: tReview("alignmentNoValue"), basis: tReview("alignmentBasis") }}
+              />
+              <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4 text-sm leading-6 text-slate-600">
+                {tReview("alignmentMissing", { names: exampleGroup.withoutAlignment.join(", ") })}
+              </p>
+              <p className="rounded-2xl border border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-700">{tReview("notAVerdict")}</p>
+              <AdvisorNotebook
+                anchor={{ kind: "review", id: "00000000-0000-4000-8000-000000000777" }}
+                note={{ body: t("fixtureGroupNote"), updatedAt: null }}
+                followUp={{ dueOn: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10), note: t("fixtureGroupFollowUp"), completedAt: null }}
+              />
             </div>
           ) : (
             <div className="grid gap-8">
