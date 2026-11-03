@@ -44,8 +44,6 @@ const EXPORTED_TABLES = [
   { table: "team_check_in_submissions", column: "user_id" },
   { table: "team_check_in_retro_invites", column: "user_id" },
   { table: "team_check_in_retro_answers", column: "user_id" },
-  // Stempel der Check-in-Erinnerung: nur "es wurde erinnert", kein Inhalt.
-  { table: "team_check_in_reminders", column: "user_id" },
   // Austritt: nur die eigene Wahl zur Frage "Wie geht es weiter?".
   { table: "team_departure_choices", column: "user_id" },
   // Finanzierungs-Wegweiser: nur "wer hat einen Status zuletzt gesetzt".
@@ -135,6 +133,11 @@ export const ACCOUNT_EXPORT_RESTRICTED_TABLES = [
   "team_program_updates",
   "team_program_milestones",
   "team_program_profiles",
+  // Liefert die Funktion seit 20270214120000; fehlte bis 03.11.2026 in dieser Liste.
+  "team_program_org_data",
+  // Stempel der Check-in-Erinnerung (nur "es wurde erinnert", kein Inhalt). Die
+  // Tabelle ist fuer Konten geschlossen; direkt gelesen stand hier "permission denied".
+  "team_check_in_reminders",
 ] as const;
 
 export type AccountExport = {
@@ -145,7 +148,7 @@ export type AccountExport = {
 };
 
 const HINWEIS =
-  "Dieser Export enthaelt, was unter deinem Konto gespeichert ist. Nachrichten anderer Menschen sind nicht dabei - auch nicht in Gespraechen, an denen du beteiligt warst: Sie gehoeren der Person, die sie geschrieben hat. Belege aus deiner Faehigkeitsaufstellung sind ebenfalls nicht enthalten. Gemeinsame Dokumente aus frueheren Fassungen (Workbooks, Paarberichte, Matching-Raeume) enthalten auch Angaben einer anderen Person und sind deshalb nicht dabei; du kannst sie in der App weiter ansehen.";
+  "Dieser Export enthaelt, was unter deinem Konto gespeichert ist. Nachrichten anderer Menschen sind nicht dabei - auch nicht in Gespraechen, an denen du beteiligt warst: Sie gehoeren der Person, die sie geschrieben hat. Deine Belege aus der Faehigkeitsaufstellung sind dabei - ausser dir bekommt sie niemand zu sehen. Gemeinsame Dokumente aus frueheren Fassungen (Workbooks, Paarberichte, Matching-Raeume) enthalten auch Angaben einer anderen Person und sind deshalb nicht dabei; du kannst sie in der App weiter ansehen.";
 
 /**
  * Sammelt die Daten einer Person.

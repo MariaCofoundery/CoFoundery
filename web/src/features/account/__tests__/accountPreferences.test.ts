@@ -258,7 +258,10 @@ test("die eigenen Nachrichten, Sperren und Forschungsantworten sind im Export - 
   // obwohl es die eigenen Daten sind (Art. 15 und 20 DSGVO).
   const code = source("src/features/account/accountExport.ts");
   assert.match(code, /client\.rpc\("export_my_restricted_data"\)/);
-  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "team_program_consents", "team_program_milestones", "team_program_profiles", "team_program_updates", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "team_check_in_reminders", "team_program_consents", "team_program_milestones", "team_program_org_data", "team_program_profiles", "team_program_updates", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  // Die Erinnerungsstempel kommen nur ueber die Funktion; die Tabelle bleibt fuer Konten geschlossen.
+  assert.ok(!ACCOUNT_EXPORT_TABLES.some((entry) => (entry.table as string) === "team_check_in_reminders"));
+  assert.match(source("../supabase/migrations/20270305120000_export_check_in_reminders.sql"), /from public\.team_check_in_reminders r where r\.user_id = uid/);
   const programSql = source("../supabase/migrations/20270122120000_export_team_program_data.sql");
   for (const table of ["team_program_consents", "team_program_milestones", "team_program_profiles", "team_program_updates"]) {
     assert.match(programSql, new RegExp(`'${table}'`));
@@ -287,6 +290,10 @@ test("der Export wird als Datei ausgeliefert und nicht zwischengespeichert", () 
 test("der Export sagt, was NICHT drin ist", () => {
   const code = source("src/features/account/accountExport.ts");
   assert.match(code, /Nachrichten anderer Menschen sind nicht dabei/);
+  // Die eigenen Belege SIND dabei (eigener Text); "niemand sieht sie" heisst: niemand ausser der Person.
+  assert.ok((ACCOUNT_EXPORT_CHILD_TABLES as readonly { table: string }[]).some((entry) => entry.table === "person_capability_evidence"));
+  assert.match(code, /Deine Belege aus der Faehigkeitsaufstellung sind dabei/);
+  assert.doesNotMatch(code, /Belege aus deiner Faehigkeitsaufstellung sind ebenfalls nicht enthalten/);
   for (const locale of ["de", "en"]) {
     const data = accountCopy(locale).data as unknown as { scope?: string };
     assert.ok((data?.scope ?? "").length > 40, `${locale}: der Umfang wird nicht erklaert`);
