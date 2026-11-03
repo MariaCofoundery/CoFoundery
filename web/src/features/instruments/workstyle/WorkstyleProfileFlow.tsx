@@ -187,25 +187,12 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
       <p className="leading-7 text-slate-700">{t("your_development_responses_context_entries_completion_times_m040")}</p>
       <Link href="/me/profile/workstyle" className={secondary}>{t("go_to_workstyle_profile_m041")}</Link>
     </div>}
-    {profileDone && !session?.withdrawn_at && !session?.consent_version && <form className={`space-y-6 ${card}`} onSubmit={event => {
-      event.preventDefault(); const data = new FormData(event.currentTarget);
-      run(async () => {
-        const result = await startWorkstyleResearch(consent, contextFrom(data));
-        if (!result.ok) return setError(serverError(result.error));
-        setSession(result.session); setPosition(firstOpen(researchItemsOf(result.session), result.session));
-      });
-    }}>
-      <div className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("optional")}</p>
-        <h2 className="text-2xl font-semibold tracking-[-0.01em]">{t("help_develop_made2found")}</h2>
-        <p className="leading-7 text-slate-700">{t("with")} {DEVELOPMENT_COUNT} {t("additional_situations_you_can_help_us_develop")}</p>
-      </div>
-      <ConsentDetails consent={consent} onConsent={setConsent} />
-      <div className="flex flex-wrap gap-3">
-        <button disabled={pending || !consent} className={button}>{t("start_development_questions")}</button>
-        <Link href="/me/profile/workstyle" className={secondary}>{t("no_thanks")}</Link>
-      </div>
-    </form>}
+    {/* Seit v4: keine neue v3-Einwilligung (die DB lehnt sie ab). Forschung kommt mit einer grundsaetzlichen Einwilligung zurueck. */}
+    {profileDone && !session?.withdrawn_at && !session?.consent_version && <div className={`space-y-4 ${card}`}>
+      <h2 className="text-xl font-semibold">{t("v3_research_closed_title")}</h2>
+      <p className="leading-7 text-slate-700">{t("v3_research_closed_body")}</p>
+      <Link href="/me/profile/workstyle" className={secondary}>{t("go_to_workstyle_profile_m041")}</Link>
+    </div>}
     {profileDone && consented && !session?.completed_at && <>
       {questions(research, t("development_question"), t("development_questions_progress"))}
       <p className="mt-6 text-center text-sm text-slate-600">{t("each_response_is_saved")} <Link href="/me/profile/workstyle" className="font-medium text-slate-900 underline">{t("continue_later")}</Link></p>
@@ -297,7 +284,6 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
         {mixed && session.completed_at && <p className="mt-6 text-sm text-slate-600">{t("your")} {DEVELOPMENT_COUNT} {t("development_responses_do_not_change_your_current")} <Link href={RESEARCH_HREF} className="underline">{t("manage_research_participation")}</Link></p>}
       </div>
       <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
-        {!session.consent_version && !session.withdrawn_at && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("support_research_later")}</Link>}
         {consented && !mixed && openResearch > 0 && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("continue_development_questions_m093")}</Link>}
         {/* Seit v4 wird diese Fassung nicht neu begonnen: neu beantwortet wird die aktuelle Fassung. */}
         <Link href={CURRENT_WORKSTYLE_HREF} className="min-h-11 py-3 underline">{t("go_to_current_version")}</Link>

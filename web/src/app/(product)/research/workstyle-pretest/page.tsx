@@ -28,7 +28,9 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
   // Phase 10 - Cutover: Fruehere Fassungen nur noch fuer Menschen, die dort
   // schon eine Teilnahme haben (HISTORICAL). Alle anderen - auch ohne
   // Anmeldung - landen in der aktuellen Fassung.
-  if (version !== CURRENT_WORKSTYLE_VERSION && (!user || !(await getMyWorkstylePretest(version)))) {
+  // Seit v4: eine leere v3-Teilnahme (nichts beantwortet, keine Einwilligung) hat nichts fortzusetzen.
+  const earlier = version !== CURRENT_WORKSTYLE_VERSION && user ? await getMyWorkstylePretest(version) : null;
+  if (version !== CURRENT_WORKSTYLE_VERSION && (!earlier || (version === "8.5a-v3" && !earlier.submitted_at && !earlier.consent_version && earlier.answers.length === 0))) {
     redirect(query.invitationId ? `${CURRENT_WORKSTYLE_HREF}&invitationId=${encodeURIComponent(query.invitationId)}` : CURRENT_WORKSTYLE_HREF);
   }
   const teamId = user && query.invitationId ? await currentTeamForInvitation(await createClient(), user.id, query.invitationId) : null;

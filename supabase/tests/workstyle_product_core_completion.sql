@@ -49,9 +49,26 @@ begin
  end loop;
  return r;
 end $$;
+-- Seit 20270302120000 legt keine Funktion mehr eine neue v3-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, genau wie die frueheren Startfunktionen
+-- sie geschrieben haben; fortgesetzt, gespeichert und gelesen wird ueber die RPCs.
+create function pg_temp.seed_v3(p uuid,consent text default null,ctx jsonb default '{}',research_set text default null,mixed boolean default true) returns uuid language plpgsql as $$
+declare id uuid;
+begin
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile','founder-workstyle-pretest-8-5a-v3') returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,consent_given_at,context,manifest_version,resume_position,research_set,research_set_version,item_order)
+ values(id,'8.5a-v3',null,consent,case when consent is not null then clock_timestamp() end,coalesce(ctx,'{}'),'3.0.0',0,
+  research_set,case when research_set is not null then 'research-sets/1.0.0' end,
+  case when research_set is not null then public.workstyle_research_order('research-sets/1.0.0',research_set,mixed) end);
+ return id;
+end $$;
 create function pg_temp.start_product(n integer,p_new boolean default false) returns uuid language plpgsql as $$
 declare id uuid;
 begin
+ -- Ohne bestehende Teilnahme als Datenzeile; die echte Funktion setzt danach fort.
+ if not exists(select 1 from public.assessments where user_id=pg_temp.person(n) and instrument_id='founder-workstyle-pretest-8-5a-v3') then
+  perform pg_temp.seed_v3(pg_temp.person(n));
+ end if;
  perform pg_temp.act(n);
  execute 'set local role authenticated';
  id:=(public.start_workstyle_product(p_new)->>'assessment_id')::uuid;
@@ -120,11 +137,11 @@ reset role;
 -- C-Variante) 28 von 29 Core-Antworten: noch kein Arbeitsprofil.
 select pg_temp.answer(1,'core',28);
 select pg_temp.ok(pg_temp.submitted(1) is null and pg_temp.profile(1,1) is null,'C: 28/29 core is not a product profile');
--- Phase 11.6C: Forschung gibt es zu Beginn (gemischt) oder nach dem fertigen Profil, nicht mittendrin.
+-- Seit v4 keine neue v3-Einwilligung, auch nicht mitten im Arbeitsprofil.
 select pg_temp.act(1);
 set local role authenticated;
 do $$ begin
- begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'research mid-profile'; exception when check_violation then null; end;
+ begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'research mid-profile'; exception when object_not_in_prerequisite_state then null; end;
 end $$;
 reset role;
 select pg_temp.ok((pg_temp.session(1)).resume_position>0,'resume position persisted for product part');
@@ -154,11 +171,22 @@ insert into public.founder_team_members(team_id,user_id) values
  ('e8561000-0000-4000-8000-000000000001',pg_temp.person(1)),('e8561000-0000-4000-8000-000000000001',pg_temp.person(2)),
  ('e8561000-0000-4000-8000-000000000002',pg_temp.person(1)),('e8561000-0000-4000-8000-000000000002',pg_temp.person(2)),('e8561000-0000-4000-8000-000000000002',pg_temp.person(6));
 
--- H) Forschung separat: Einwilligung nachtraeglich, Produktabschluss unveraendert.
+-- H) Forschung separat: bestehende nachtraegliche Einwilligung, Produktabschluss unveraendert.
+-- Neue Einwilligungen gibt es seit v4 nicht mehr (Person 6); die von Person 1 stammt von vorher.
 create temp table product_time as select pg_temp.submitted(1) t;
+select pg_temp.act(6);
+set local role authenticated;
+do $$ begin
+ begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'late v3 opt-in accepted'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
+reset role;
+select pg_temp.ok((pg_temp.session(6)).consent_version is null and (pg_temp.session(6)).research_set is null,'H: since v4 no new late v3 opt-in');
+update public.workstyle_pretest_sessions set consent_version='workstyle_research_v3',consent_given_at=clock_timestamp(),context='{"founder_experience":"1","team_size":"two"}',
+ research_set='A',research_set_version='research-sets/1.0.0',item_order=public.workstyle_research_order('research-sets/1.0.0','A',false)
+where assessment_id=(select assessment from core_people where n=1);
 select pg_temp.act(1);
 set local role authenticated;
-select pg_temp.ok(public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}')->>'consent_version'='workstyle_research_v3','H: explicit research opt-in after product completion');
+select pg_temp.ok(public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}')->>'consent_version'='workstyle_research_v3','H: an existing research opt-in resumes');
 do $$ begin
  begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"many","team_size":"two"}'); raise exception 'invalid context'; exception when invalid_parameter_value then null; end;
 end $$;
@@ -193,16 +221,14 @@ select public.save_workstyle_feedback((select assessment from core_people where 
 reset role;
 
 -- D) Bestehende 52/52-Teilnahme ueber den bisherigen Einstieg bleibt vollstaendig.
-select pg_temp.act(3);
-update core_people set assessment=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"2-3","team_size":"two"}')->>'assessment_id')::uuid where n=3;
+update core_people set assessment=pg_temp.seed_v3(pg_temp.person(3),'workstyle_research_v3','{"founder_experience":"2-3","team_size":"two"}') where n=3;
 do $$ declare i public.workstyle_item_versions; begin
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop perform pg_temp.save(3,i); end loop;
 end $$;
 select pg_temp.ok(pg_temp.submitted(3) is not null and (pg_temp.session(3)).completed_at is not null and jsonb_array_length(pg_temp.profile(3,3)->'answers')=29,'D: 52/52 participation stays complete');
 
 -- C) Bestehende Teilnahme mit Einwilligung: 28 Core + 23 Forschung -> kein Arbeitsprofil.
-select pg_temp.act(4);
-update core_people set assessment=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"0","team_size":"solo"}')->>'assessment_id')::uuid where n=4;
+update core_people set assessment=pg_temp.seed_v3(pg_temp.person(4),'workstyle_research_v3','{"founder_experience":"0","team_size":"solo"}') where n=4;
 do $$ declare i public.workstyle_item_versions; last_core text; begin
  select item_key into last_core from public.workstyle_item_versions where assessment_version='8.5a-v3' and pg_temp.is_core(definition) order by position desc limit 1;
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and item_key<>last_core and definition->>'revision_of' is null order by position loop perform pg_temp.save(4,i); end loop;
@@ -213,8 +239,7 @@ select pg_temp.answer(4,'core');
 select pg_temp.ok(pg_temp.submitted(4) is not null and (pg_temp.session(4)).completed_at=pg_temp.submitted(4),'C: last core answer completes product and the already finished research');
 
 -- Expliziter Abschluss fuer bestehende Staende (gleiche Regel wie die Bestandsuebernahme).
-select pg_temp.act(8);
-update core_people set assessment=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"0","team_size":"solo"}')->>'assessment_id')::uuid where n=8;
+update core_people set assessment=pg_temp.seed_v3(pg_temp.person(8),'workstyle_research_v3','{"founder_experience":"0","team_size":"solo"}') where n=8;
 select pg_temp.answer(8,'core',5);
 -- I) Widerruf einer unvollstaendigen Teilnahme mit Einwilligung loescht wie bisher.
 select pg_temp.act(8);
@@ -277,12 +302,17 @@ select public.set_discovery_workstyle_consent(true);
 select pg_temp.ok((select count(*)=0 from public.get_discovery_workstyle_signals(pg_temp.person(2))),'F: no FIND signals from v3 profiles');
 reset role;
 
--- Neu erheben: nur nach abgeschlossenem Arbeitsprofil, wieder ohne Einwilligung; das
--- bisherige Arbeitsprofil bleibt das aktuelle, bis das neue fertig ist.
+-- Neu erheben: seit v4 nicht mehr in v3 (neu beantwortet wird v4, siehe workstyle_pretest_v4).
 create temp table before_retake as select pg_temp.profile(6,6)->>'assessment_id' id;
-select pg_temp.ok(pg_temp.start_product(6,true)::text<>(select id from before_retake),'retake creates a new participation');
-select pg_temp.ok((pg_temp.session(6)).consent_version is null and pg_temp.profile(6,6)->>'assessment_id'=(select id from before_retake),'retake: no inherited consent, previous profile stays current');
+select pg_temp.act(6);
+set local role authenticated;
+do $$ begin
+ begin perform public.start_workstyle_product(true); raise exception 'v3 retake accepted'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
+reset role;
+select pg_temp.ok((select count(*)=1 from public.assessments where user_id=pg_temp.person(6) and instrument_id='founder-workstyle-pretest-8-5a-v3')
+ and pg_temp.profile(6,6)->>'assessment_id'=(select id from before_retake),'retake: no new v3 participation, the existing profile stays');
 
-select extensions.pass('v3 product completion uses 29 core items; research optional, separate and consented; since v4 the v3 profile is owner-only');
+select extensions.pass('v3 product completion uses 29 core items; research optional, separate and consented; since v4 the v3 profile is owner-only and v3 only resumes');
 select * from extensions.finish();
 rollback;

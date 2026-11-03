@@ -64,18 +64,20 @@ test("Abschluss: Arbeitsprofil zuerst, Forschung nur als freiwilliges, nachgeord
   // Phase 11.7B: statt "Freigaben fuer ..." einmal zum Zusammenspiel des Teams (dort die Teamfreigabe).
   const order = ["Arbeitsprofil ansehen", "Zum Zusammenspiel mit", "Zum Dashboard"].map(m => actions.indexOf(m));
   order.forEach((at, n) => assert.ok(at > (n ? order[n - 1] : -1), `Reihenfolge ${n}`));
+  // Seit v4 (20270302120000): kein Angebot mehr, nachtraeglich in die v3-Forschung einzuwilligen.
   const done = flow.slice(flow.indexOf("Dein Arbeitsprofil ist bereit."));
-  assert.ok(done.indexOf("{actions}") < done.indexOf("Forschung später unterstützen"), "Forschung nur nachgeordnet");
-  assert.match(done, /!session\.consent_version && !session\.withdrawn_at && <Link href=\{RESEARCH_HREF\}/);
+  assert.doesNotMatch(done, /Forschung später unterstützen|!session\.consent_version && !session\.withdrawn_at && <Link href=\{RESEARCH_HREF\}/);
   // Kein automatisches Weiterleiten in die Forschung.
   assert.doesNotMatch(flow, /router\.push|redirect\(|location\.href/);
 });
 
-test("Forschung: eigene Einleitung, Einwilligung nicht vorausgewaehlt, Ablehnen gleichwertig, widerrufbar", () => {
+test("Forschung v3: keine neue Einwilligung, Einwilligung nicht vorausgewaehlt, bestehende widerrufbar", () => {
   const flow = code(FLOW);
   assert.match(flow, /const \[consent, setConsent\] = useState\(false\)/);
-  assert.match(flow, /disabled=\{pending \|\| !consent\}/);
-  assert.match(flow, /<Link href="\/me\/profile\/workstyle" className=\{secondary\}>\s*Nein, danke\s*<\/Link>/);
+  // Forschungsteil ohne Einwilligung: Hinweis statt Einwilligungsformular.
+  const research = flow.slice(flow.indexOf('if (part === "research")'), flow.indexOf("return <section", flow.indexOf('if (part === "research")') + 40));
+  assert.match(research, /profileDone && !session\?\.withdrawn_at && !session\?\.consent_version && <div className=\{`space-y-4 \$\{card\}`\}>\s*<h2[^>]*>\s*Keine neuen Entwicklungsfragen in dieser Fassung/);
+  assert.doesNotMatch(research, /startWorkstyleResearch|Nein, danke|<ConsentDetails/);
   assert.match(flow, /Sie verändern dein Arbeitsprofil und deinen Report nicht\./);
   assert.match(flow, /auch die zu deinem Arbeitsprofil/);
   assert.match(flow, /Forschungseinwilligung widerrufen/);

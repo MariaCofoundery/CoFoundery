@@ -150,8 +150,9 @@ test("route: the current version opens the v4 questionnaire; v3 only resumes and
   assert.match(page, /const version = query\.version \?\? CURRENT_WORKSTYLE_VERSION;/);
   assert.match(page, /if \(version === "8\.5a-v4"\) \{/);
   assert.match(page, /<WorkstyleV4Flow initialSession=\{session\} context=\{completionContext\} previousVersion=\{Boolean\(previous\?\.submitted_at\)\} \/>/);
-  // Earlier versions only for people who already have a participation there.
-  assert.match(page, /if \(version !== CURRENT_WORKSTYLE_VERSION && \(!user \|\| !\(await getMyWorkstylePretest\(version\)\)\)\) \{/);
+  // Earlier versions only for people who already have a participation there; an empty v3 one has nothing to resume.
+  assert.match(page, /const earlier = version !== CURRENT_WORKSTYLE_VERSION && user \? await getMyWorkstylePretest\(version\) : null;/);
+  assert.match(page, /if \(version !== CURRENT_WORKSTYLE_VERSION && \(!earlier \|\| \(version === "8\.5a-v3" && !earlier\.submitted_at && !earlier\.consent_version && earlier\.answers\.length === 0\)\)\) \{/);
   const v3 = code("src/features/instruments/workstyle/WorkstyleProfileFlow.tsx");
   assert.doesNotMatch(v3, /startWorkstyleProduct\(true\)/);
   assert.match(v3, /<Link href=\{CURRENT_WORKSTYLE_HREF\}[^>]*>\s*Neue Fassung beantworten\s*<\/Link>/);

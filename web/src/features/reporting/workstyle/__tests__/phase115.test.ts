@@ -108,7 +108,9 @@ test("Abschluss: Erfolg, eigenes Arbeitsprofil, Zusammenspiel, Dashboard - Forsc
   // Phase 11.6C: Aktionen sind ein gemeinsamer Block; Forschung danach nur noch als kleiner Link.
   const actions = ui.slice(ui.indexOf("const actions ="), ui.indexOf("const withdrawal ="));
   assert.ok(actions.indexOf("Arbeitsprofil ansehen") < actions.indexOf("Zum Dashboard"));
-  assert.ok(done.indexOf("{actions}") < done.indexOf("Forschung später unterstützen"));
+  // Seit 20270302120000 gibt es kein nachtraegliches Forschungsangebot mehr im v3-Abschluss.
+  assert.ok(done.indexOf("{actions}") > 0);
+  assert.doesNotMatch(done, /Forschung später unterstützen/);
   assert.match(done, /Niemand sieht deine Antworten automatisch/);
   // Phase 11.7B: geteilt wird einmal mit dem Team, nicht je Person.
   assert.match(actions, /\/teams\/\$\{context\.teamId\}\/workstyle/);

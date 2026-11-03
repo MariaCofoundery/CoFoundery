@@ -20,6 +20,19 @@ begin
  end loop;
  return result;
 end $$;
+-- Seit 20270302120000 legt keine Funktion mehr eine neue v3-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, genau wie die frueheren Startfunktionen
+-- sie geschrieben haben; fortgesetzt, gespeichert und gelesen wird ueber die RPCs.
+create function pg_temp.seed_v3(p uuid,consent text default null,ctx jsonb default '{}',research_set text default null,mixed boolean default true) returns uuid language plpgsql as $$
+declare id uuid;
+begin
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile','founder-workstyle-pretest-8-5a-v3') returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,consent_given_at,context,manifest_version,resume_position,research_set,research_set_version,item_order)
+ values(id,'8.5a-v3',null,consent,case when consent is not null then clock_timestamp() end,coalesce(ctx,'{}'),'3.0.0',0,
+  research_set,case when research_set is not null then 'research-sets/1.0.0' end,
+  case when research_set is not null then public.workstyle_research_order('research-sets/1.0.0',research_set,mixed) end);
+ return id;
+end $$;
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
 select '00000000-0000-0000-0000-000000000000',id,'authenticated','authenticated',email,'',now(),'{}','{}',now(),now()
 from (values ('e8530000-0000-4000-8000-000000000001'::uuid,'v3-a@example.test'),('e8530000-0000-4000-8000-000000000002'::uuid,'v3-b@example.test'),('e8530000-0000-4000-8000-000000000003'::uuid,'v3-advisor@example.test'),('e8530000-0000-4000-8000-000000000004'::uuid,'v3-admin@example.test')) x(id,email);
@@ -40,7 +53,9 @@ do $$ begin
  begin insert into public.assessments(user_id,module,instrument_id) values(auth.uid(),'founder_profile','founder-workstyle-pretest-8-5a-v3'); raise exception 'direct assessment bypass'; exception when insufficient_privilege then null; end;
  begin perform public.get_workstyle_research_dataset_version('8.5a-v3'); raise exception 'non-admin access'; exception when insufficient_privilege then null; end;
 end $$;
-insert into v3_ids select auth.uid(),(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}')->>'assessment_id')::uuid,null;
+reset role;
+insert into v3_ids select 'e8530000-0000-4000-8000-000000000001',pg_temp.seed_v3('e8530000-0000-4000-8000-000000000001','workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'),null;
+set local role authenticated;
 select pg_temp.check_v3((public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}',true)->>'assessment_id')::uuid=(select assessment from v3_ids where person=auth.uid()),'duplicate start resumes');
 select pg_temp.check_v3(public.get_my_workstyle_pretest_version('8.5a-v3')->>'manifest_version'='3.0.0' and public.get_my_workstyle_pretest_version('8.5a-v3')->>'form' is null,'manifest and null form');
 do $$ declare id uuid:=(select assessment from v3_ids where person=auth.uid()); begin
@@ -120,7 +135,9 @@ select pg_temp.check_v3(public.get_workstyle_team_inputs('e8531000-0000-4000-800
 reset role;
 select set_config('request.jwt.claims','{"sub":"e8530000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 set local role authenticated;
-update v3_ids set assessment=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"2-3","team_size":"two"}')->>'assessment_id')::uuid where person=auth.uid();
+reset role;
+update v3_ids set assessment=pg_temp.seed_v3('e8530000-0000-4000-8000-000000000002','workstyle_research_v3','{"founder_experience":"2-3","team_size":"two"}') where person='e8530000-0000-4000-8000-000000000002';
+set local role authenticated;
 select pg_temp.fill_v3((select assessment from v3_ids where person=auth.uid()),true);
 reset role;
 select pg_temp.check_v3((select count(*)=29 and bool_and(value is null and missing_code='cannot_assess') from public.alignment_answers where assessment_id=(select assessment from v3_ids where person='e8530000-0000-4000-8000-000000000002')),'all core missing responses are NULL');

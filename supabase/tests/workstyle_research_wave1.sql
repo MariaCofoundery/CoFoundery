@@ -21,9 +21,32 @@ create function pg_temp.is_core(d jsonb) returns boolean language sql as $$ sele
 create function pg_temp.session(n integer) returns public.workstyle_pretest_sessions language sql as $$
  select s.* from public.workstyle_pretest_sessions s join public.assessments a on a.id=s.assessment_id
  where a.user_id=pg_temp.person(n) and s.assessment_version='8.5a-v3' order by s.started_at desc limit 1 $$;
-create function pg_temp.call(n integer,fn text) returns jsonb language plpgsql as $$
-declare r jsonb;
+-- Seit 20270302120000 legt keine Funktion mehr eine neue v3-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, genau wie die frueheren Startfunktionen
+-- sie geschrieben haben; fortgesetzt, gespeichert und gelesen wird ueber die RPCs.
+create function pg_temp.seed_v3(p uuid,consent text default null,ctx jsonb default '{}',research_set text default null,mixed boolean default true) returns uuid language plpgsql as $$
+declare id uuid;
 begin
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile','founder-workstyle-pretest-8-5a-v3') returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,consent_given_at,context,manifest_version,resume_position,research_set,research_set_version,item_order)
+ values(id,'8.5a-v3',null,consent,case when consent is not null then clock_timestamp() end,coalesce(ctx,'{}'),'3.0.0',0,
+  research_set,case when research_set is not null then 'research-sets/1.0.0' end,
+  case when research_set is not null then public.workstyle_research_order('research-sets/1.0.0',research_set,mixed) end);
+ return id;
+end $$;
+create function pg_temp.call(n integer,fn text) returns jsonb language plpgsql as $$
+declare r jsonb; a_n integer; b_n integer;
+begin
+ -- Ohne bestehende Teilnahme: als Datenzeile anlegen, bei Forschung mit der frueheren
+ -- Ausgleichsregel fuer das Set. Danach setzt die echte Funktion fort.
+ if fn in ('research','product') and (pg_temp.session(n)).assessment_id is null then
+  if fn='research' then
+   select count(*) filter(where research_set='A'),count(*) filter(where research_set='B') into a_n,b_n
+   from public.workstyle_pretest_sessions where research_set_version='research-sets/1.0.0';
+   perform pg_temp.seed_v3(pg_temp.person(n),'workstyle_research_v3','{"founder_experience":"1","team_size":"two"}',
+    case when a_n<b_n then 'A' when b_n<a_n then 'B' when random()<0.5 then 'A' else 'B' end,true);
+  else perform pg_temp.seed_v3(pg_temp.person(n)); end if;
+ end if;
  perform pg_temp.act(n);
  execute 'set local role authenticated';
  if fn='research' then r:=public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}');
@@ -82,7 +105,7 @@ select pg_temp.ok((pg_temp.session(1)).research_set is null and (pg_temp.session
  and (select submitted_at is not null from public.assessments where id=(select assessment from w_people where n=1))
  and not exists(select 1 from public.workstyle_research_responses where assessment_id=(select assessment from w_people where n=1)),'A: product-only, 29 core, no set, no research data');
 
--- B/G) Mit Forschung zu Beginn: Teilnahme wird angelegt, Set + Version + 37er-Reihenfolge.
+-- B/G) Bestehende Teilnahme mit Forschung zu Beginn: Set + Version + 37er-Reihenfolge.
 select pg_temp.call(2,'research');
 select pg_temp.ok((pg_temp.session(2)).research_set in ('A','B') and (pg_temp.session(2)).research_set_version='research-sets/1.0.0'
  and (pg_temp.session(2)).consent_version='workstyle_research_v3','B/G: set and set version stored at consent');
@@ -114,12 +137,10 @@ select pg_temp.call(2,'research'); select pg_temp.call(2,'product');
 select pg_temp.ok((pg_temp.call(2,'mine')->>'research_set')=(select s from w_first) and (pg_temp.call(2,'mine')->'item_order')=(select o from w_first)
  and (select count(*)=1 from public.workstyle_pretest_sessions s join public.assessments a on a.id=s.assessment_id where a.user_id=pg_temp.person(2)),'D/E/F: repeated start and reload keep set and order; one participation');
 
--- C) Ausgleich: aufeinanderfolgende Zusagen wechseln sich ab (|A-B| <= 1).
-do $$ declare n integer; a_n integer; b_n integer; begin
- for n in 3..14 loop perform pg_temp.call(n,'research');
-  select count(*) filter(where research_set='A'),count(*) filter(where research_set='B') into a_n,b_n from public.workstyle_pretest_sessions where research_set_version='research-sets/1.0.0';
-  perform pg_temp.ok(abs(a_n-b_n)<=1,'C: sets stay balanced after each assignment');
- end loop;
+-- Bestehende Teilnahmen mit Forschung fuer die folgenden Faelle. (Die Zuteilung beim
+-- Einwilligen und ihr Ausgleich entfallen seit 20270302120000: keine neuen v3-Einwilligungen.)
+do $$ declare n integer; begin
+ for n in 3..14 loop perform pg_temp.call(n,'research'); end loop;
 end $$;
 
 -- Produktabschluss im 37er-Ablauf: 28 Core + alle 8 Forschung -> nicht fertig.
@@ -180,17 +201,22 @@ select pg_temp.ok((select submitted_at is not null from public.assessments where
 select pg_temp.answer(6);
 select pg_temp.ok((pg_temp.session(6)).completed_at is not null,'14: research resumes in stored order and completes');
 
--- Mitten im Arbeitsprofil keine Forschung; nach fertigem Profil nur die 8 Set-Items.
+-- Seit v4: weder mitten im Arbeitsprofil noch nach dem fertigen Profil eine neue v3-Einwilligung.
 select pg_temp.call(15,'product'); select pg_temp.answer(15,3);
 select pg_temp.act(15);
 set local role authenticated;
 do $$ begin
- begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'mid-profile research'; exception when check_violation then null; end;
+ begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'mid-profile research'; exception when object_not_in_prerequisite_state then null; end;
 end $$;
 reset role;
 select pg_temp.answer(15);
-select pg_temp.call(15,'research');
-select pg_temp.ok(jsonb_array_length((pg_temp.session(15)).item_order)=8 and (pg_temp.session(15)).research_set in ('A','B'),'late opt-in: only the 8 set items');
+select pg_temp.act(15);
+set local role authenticated;
+do $$ begin
+ begin perform public.start_workstyle_research('workstyle_research_v3','{"founder_experience":"1","team_size":"two"}'); raise exception 'late v3 opt-in accepted'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
+reset role;
+select pg_temp.ok((pg_temp.session(15)).consent_version is null and (pg_temp.session(15)).research_set is null and (pg_temp.session(15)).item_order is null,'since v4: no late v3 research opt-in');
 
 -- E) Widerruf: fertiges Profil bleibt, Forschung inkl. Set und Reihenfolge geloescht.
 select pg_temp.call(4,'withdraw');
@@ -204,7 +230,8 @@ create temp table w7 as select assessment from w_people where n=7;
 select pg_temp.call(7,'withdraw');
 select pg_temp.ok(not exists(select 1 from public.assessments where id=(select assessment from w7)),'incomplete consented participation erased as before');
 
--- full-23-Bestand: bisheriger Einstieg ohne Set; Ueberarbeitungen dort nicht erlaubt.
+-- full-23-Bestand: bisheriger Einstieg ohne Set (setzt nur fort); Ueberarbeitungen dort nicht erlaubt.
+select pg_temp.seed_v3(pg_temp.person(16),'workstyle_research_v3','{"founder_experience":"1","team_size":"two"}');
 select pg_temp.act(16);
 set local role authenticated;
 do $$ declare id uuid; v record; begin
