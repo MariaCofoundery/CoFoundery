@@ -23,6 +23,22 @@ end $$;
 -- Seit 20270302120000 legt keine Funktion mehr eine neue v3-Teilnahme an. Bestehende
 -- Teilnahmen entstehen hier als Datenzeilen, genau wie die frueheren Startfunktionen
 -- sie geschrieben haben; fortgesetzt, gespeichert und gelesen wird ueber die RPCs.
+-- Seit 20270304120000 legt keine Funktion mehr eine neue v1/v2-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, wie start_workstyle_pretest sie schrieb
+-- (v1 mit der frueheren Formzuteilung A/B/C); fortgesetzt und gespeichert wird ueber die RPCs.
+create function pg_temp.seed_pretest(p uuid,version text,consent text,ctx jsonb) returns jsonb language plpgsql as $$
+declare id uuid; sid uuid; f text;
+begin
+ if version='8.5a-v1' then
+  select x.form into f from (values('A'),('B'),('C')) x(form)
+  left join public.workstyle_pretest_sessions s on s.form=x.form and s.assessment_version=version
+  group by x.form order by count(s.assessment_id),x.form limit 1;
+ end if;
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile',public.workstyle_instrument_for(version)) returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,context,manifest_version,resume_position)
+ values(id,version,f,consent,ctx,case version when '8.5a-v2' then '2.0.0' end,case when version='8.5a-v2' then 0 end) returning session_id into sid;
+ return jsonb_build_object('assessment_id',id,'session_id',sid,'form',f);
+end $$;
 create function pg_temp.seed_v3(p uuid,consent text default null,ctx jsonb default '{}',research_set text default null,mixed boolean default true) returns uuid language plpgsql as $$
 declare id uuid;
 begin
@@ -103,7 +119,9 @@ select pg_temp.check_v3(not exists(select 1 from public.alignment_answers where 
 do $$ begin
  begin perform public.save_workstyle_pretest_v3((select assessment from v3_ids limit 1),'DEC-R2','8.4-v0.4',3,null,null,null,100,true); raise exception 'foreign finalization'; exception when insufficient_privilege then null; end;
 end $$;
-insert into v3_ids select auth.uid(),null,(public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"0","team_size":"two"}')->>'assessment_id')::uuid;
+reset role;
+insert into v3_ids select auth.uid(),null,(pg_temp.seed_pretest(auth.uid(),'8.5a-v2','workstyle_research_v2','{"founder_experience":"0","team_size":"two"}')->>'assessment_id')::uuid;
+set local role authenticated;
 do $$ declare i record; id uuid:=(select old_assessment from v3_ids where person=auth.uid()); begin
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v2' order by position loop perform public.save_workstyle_pretest_answer(id,i.item_key,i.item_version,3,null); end loop;
  perform public.finish_workstyle_pretest_v2(id,'8.4-v0.3',3,null,100);

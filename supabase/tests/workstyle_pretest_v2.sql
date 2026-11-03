@@ -6,6 +6,22 @@ create function pg_temp.check_v2(condition boolean,label text) returns void lang
 begin if condition is not true then raise exception 'workstyle v2: %',label; end if; end $$;
 create temp table v2_ids(person uuid primary key,v1 uuid,v2 uuid);
 grant all on v2_ids to authenticated;
+-- Seit 20270304120000 legt keine Funktion mehr eine neue v1/v2-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, wie start_workstyle_pretest sie schrieb
+-- (v1 mit der frueheren Formzuteilung A/B/C); fortgesetzt und gespeichert wird ueber die RPCs.
+create function pg_temp.seed_pretest(p uuid,version text,consent text,ctx jsonb) returns jsonb language plpgsql as $$
+declare id uuid; sid uuid; f text;
+begin
+ if version='8.5a-v1' then
+  select x.form into f from (values('A'),('B'),('C')) x(form)
+  left join public.workstyle_pretest_sessions s on s.form=x.form and s.assessment_version=version
+  group by x.form order by count(s.assessment_id),x.form limit 1;
+ end if;
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile',public.workstyle_instrument_for(version)) returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,context,manifest_version,resume_position)
+ values(id,version,f,consent,ctx,case version when '8.5a-v2' then '2.0.0' end,case when version='8.5a-v2' then 0 end) returning session_id into sid;
+ return jsonb_build_object('assessment_id',id,'session_id',sid,'form',f);
+end $$;
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
 select '00000000-0000-0000-0000-000000000000',id,'authenticated','authenticated',email,'',now(),'{}','{}',now(),now()
 from (values ('e8520000-0000-4000-8000-000000000001'::uuid,'v2-a@example.test'),('e8520000-0000-4000-8000-000000000002'::uuid,'v2-b@example.test'),('e8520000-0000-4000-8000-000000000003'::uuid,'v2-advisor@example.test'),('e8520000-0000-4000-8000-000000000004'::uuid,'v2-admin@example.test')) x(id,email);
@@ -23,7 +39,9 @@ do $$ begin
  begin perform public.get_workstyle_research_dataset_version('8.5a-v2'); raise exception 'non-admin access'; exception when insufficient_privilege then null; end;
  begin insert into public.assessments(user_id,module,instrument_id) values(auth.uid(),'founder_profile','founder-workstyle-pretest-8-5a-v2'); raise exception 'direct v2 assessment bypass'; exception when insufficient_privilege then null; end;
 end $$;
-insert into v2_ids select auth.uid(),(public.start_workstyle_pretest('workstyle_research_v1','{"founder_experience":"none","team_size":"solo"}')->>'assessment_id')::uuid,(public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"2-3","team_size":"solo"}')->>'assessment_id')::uuid;
+reset role;
+insert into v2_ids select auth.uid(),(pg_temp.seed_pretest(auth.uid(),'8.5a-v1','workstyle_research_v1','{"founder_experience":"none","team_size":"solo"}')->>'assessment_id')::uuid,(pg_temp.seed_pretest(auth.uid(),'8.5a-v2','workstyle_research_v2','{"founder_experience":"2-3","team_size":"solo"}')->>'assessment_id')::uuid;
+set local role authenticated;
 select pg_temp.check_v2((public.get_my_workstyle_pretest()->>'assessment_id')::uuid=(select v1 from v2_ids where person=auth.uid()),'historical no-arg v1 remains available alongside v2');
 select pg_temp.check_v2(public.get_my_workstyle_pretest()->>'form' in ('A','B','C'),'v1 still assigns ABC');
 select pg_temp.check_v2((public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"6_plus","team_size":"solo"}',true)->>'assessment_id')::uuid=(select v2 from v2_ids where person=auth.uid()),'v2 repeated start resumes same draft');
@@ -79,7 +97,9 @@ do $$ begin
  begin perform public.finish_workstyle_pretest_v2((select v2 from v2_ids limit 1),'8.4-v0.3',null,'cannot_assess'); raise exception 'foreign finalize'; exception when insufficient_privilege then null; end;
  begin perform public.set_workstyle_pretest_position((select v2 from v2_ids limit 1),0); raise exception 'foreign navigation'; exception when insufficient_privilege then null; end;
 end $$;
-insert into v2_ids select auth.uid(),(public.start_workstyle_pretest('workstyle_research_v1','{"founder_experience":"first_venture","team_size":"two"}')->>'assessment_id')::uuid,null;
+reset role;
+insert into v2_ids select auth.uid(),(pg_temp.seed_pretest(auth.uid(),'8.5a-v1','workstyle_research_v1','{"founder_experience":"first_venture","team_size":"two"}')->>'assessment_id')::uuid,null;
+set local role authenticated;
 do $$ declare id uuid; i record; s jsonb; begin
  s:=public.get_my_workstyle_pretest(); id:=(s->>'assessment_id')::uuid;
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v1' and (definition->>'usage'='core' or definition->>'form'=s->>'form') order by case when definition->>'usage'='core' then 0 else 1 end,position loop
@@ -112,7 +132,9 @@ select pg_temp.check_v2(public.get_workstyle_team_inputs('e8521000-0000-4000-800
 reset role;
 select set_config('request.jwt.claims','{"sub":"e8520000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 set local role authenticated;
-update v2_ids set v2=(public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"prefer_not_to_say","team_size":"two"}')->>'assessment_id')::uuid where person=auth.uid();
+reset role;
+update v2_ids set v2=(pg_temp.seed_pretest(auth.uid(),'8.5a-v2','workstyle_research_v2','{"founder_experience":"prefer_not_to_say","team_size":"two"}')->>'assessment_id')::uuid where person=auth.uid();
+set local role authenticated;
 do $$ declare i record; id uuid:=(select v2 from v2_ids where person=auth.uid()); begin
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v2' and position<36 order by position loop perform public.save_workstyle_pretest_answer(id,i.item_key,i.item_version,3,null,100); end loop;
  perform public.finish_workstyle_pretest_v2(id,'8.4-v0.3',3,null,100);
@@ -159,10 +181,13 @@ select pg_temp.check_v2((select count(*)=30 from public.alignment_answers where 
 select pg_temp.check_v2((select count(*)=20 from public.alignment_answers where assessment_id=(select v1 from v2_ids where person='e8520000-0000-4000-8000-000000000001')),'v1 history survives');
 select pg_temp.check_v2(not exists(select 1 from public.workstyle_research_responses where assessment_id=(select v2 from v2_ids where person='e8520000-0000-4000-8000-000000000001')),'R1 responses erased');
 set local role authenticated;
-select public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"0","team_size":"solo"}',true);
+-- Seit 20270304120000: kein v2-Neu-Erheben nach dem Widerruf.
+do $$ begin
+ begin perform public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"0","team_size":"solo"}',true); raise exception 'v2 retake accepted'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
 select public.withdraw_workstyle_research();
 reset role;
-select pg_temp.check_v2((select count(*)=2 from public.assessments where user_id='e8520000-0000-4000-8000-000000000001' and instrument_id like 'founder-workstyle-pretest%'),'withdrawn unfinished v2 retake deleted, two completed histories retained');
+select pg_temp.check_v2((select count(*)=2 from public.assessments where user_id='e8520000-0000-4000-8000-000000000001' and instrument_id like 'founder-workstyle-pretest%'),'no v2 retake after withdrawal, two completed histories retained');
 select extensions.pass('v2 versions, fixed order, all missing, resume, atomic finish/retry, private research, feedback, access, mixed-version denial, withdrawal');
 select * from extensions.finish();
 rollback;

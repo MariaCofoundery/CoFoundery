@@ -140,9 +140,25 @@ select pg_temp.check_report(public.get_workstyle_product_team('e8541000-0000-400
 select pg_temp.check_report(public.get_workstyle_product_snapshot(current_setting('report.snapshot')::uuid) is null,'snapshot cannot bypass new exclusions');
 reset role;
 -- Only v4 is current: a later completed historical instrument never replaces it.
+-- Seit 20270304120000 legt keine Funktion mehr eine neue v1/v2-Teilnahme an. Bestehende
+-- Teilnahmen entstehen hier als Datenzeilen, wie start_workstyle_pretest sie schrieb
+-- (v1 mit der frueheren Formzuteilung A/B/C); fortgesetzt und gespeichert wird ueber die RPCs.
+create function pg_temp.seed_pretest(p uuid,version text,consent text,ctx jsonb) returns jsonb language plpgsql as $$
+declare id uuid; sid uuid; f text;
+begin
+ if version='8.5a-v1' then
+  select x.form into f from (values('A'),('B'),('C')) x(form)
+  left join public.workstyle_pretest_sessions s on s.form=x.form and s.assessment_version=version
+  group by x.form order by count(s.assessment_id),x.form limit 1;
+ end if;
+ insert into public.assessments(user_id,module,instrument_id) values(p,'founder_profile',public.workstyle_instrument_for(version)) returning assessments.id into id;
+ insert into public.workstyle_pretest_sessions(assessment_id,assessment_version,form,consent_version,context,manifest_version,resume_position)
+ values(id,version,f,consent,ctx,case version when '8.5a-v2' then '2.0.0' end,case when version='8.5a-v2' then 0 end) returning session_id into sid;
+ return jsonb_build_object('assessment_id',id,'session_id',sid,'form',f);
+end $$;
 select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000004","role":"authenticated"}',true);
 do $$declare aid uuid;i record;begin
- aid:=(public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+ aid:=(pg_temp.seed_pretest('e8540000-0000-4000-8000-000000000004','8.5a-v2','workstyle_research_v2','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v2' order by position loop perform public.save_workstyle_pretest_answer(aid,i.item_key,i.item_version,3,null);end loop;
  perform public.finish_workstyle_pretest_v2(aid,'8.4-v0.3',3,null,100);
  update public.assessments set created_at=clock_timestamp()+interval '1 minute' where public.assessments.id=aid;

@@ -1,5 +1,5 @@
 \set ON_ERROR_STOP on
--- 20270302120000: Workstyle v3 wird seit v4 nur noch fortgesetzt, nie neu begonnen.
+-- 20270302120000 / 20270304120000: Workstyle v1, v2 und v3 werden seit v4 nur noch fortgesetzt, nie neu begonnen.
 -- Keine neue Teilnahme, keine neue Einwilligung, kein Neu-Erheben; bestehende
 -- Teilnahmen laufen weiter (fortsetzen, speichern, widerrufen).
 begin;
@@ -72,6 +72,15 @@ do $$ begin
 end $$;
 reset role;
 select pg_temp.ok(pg_temp.v3_count(1)=0 and not exists(select 1 from public.workstyle_pretest_sessions s join public.assessments a on a.id=s.assessment_id where a.user_id=pg_temp.person(1)),'1: nothing was created');
+-- 20270304120000: v1 und v2 ebenso.
+select pg_temp.act(1);
+set local role authenticated;
+do $$ begin
+ begin perform public.start_workstyle_pretest('workstyle_research_v1','{"founder_experience":"none","team_size":"solo"}'); raise exception 'new v1 start'; exception when object_not_in_prerequisite_state then null; end;
+ begin perform public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"1","team_size":"solo"}',true); raise exception 'new v2 start'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
+reset role;
+select pg_temp.ok(not exists(select 1 from public.assessments where user_id=pg_temp.person(1) and instrument_id like 'founder-workstyle-pretest-8-5a-v_' and instrument_id<>'founder-workstyle-pretest-8-5a-v4'),'1: no v1/v2/v3 participation was created');
 -- v4 bleibt der Weg fuer neue Arbeitsprofile.
 select pg_temp.act(1);
 set local role authenticated;
