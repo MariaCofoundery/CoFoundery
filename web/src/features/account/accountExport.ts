@@ -78,6 +78,26 @@ const EXPORTED_TABLES = [
   { table: "connect_suggestions", column: "recipient_user_id" },
   { table: "in_app_notices", column: "recipient_user_id" },
   { table: "product_feedback", column: "user_id" },
+
+  // Fruehere Fassungen (seit 03.11.2026 im Export): eigene Zeilen, solange sie
+  // gespeichert sind. Umstiegsentscheidungen, eigene Matching-Eingaben, und als
+  // Advisor die eigenen Zugaenge zu Paaren. (matching_session_participants fehlt
+  // bewusst: Ihre Leseregel verweist auf sich selbst und bricht jeden direkten
+  // Lesezugriff mit "infinite recursion" ab.)
+  { table: "instrument_transitions", column: "user_id" },
+  { table: "invitation_matching_inputs", column: "user_id" },
+  { table: "relationship_advisors", column: "advisor_user_id" },
+  { table: "founder_alignment_workbook_advisors", column: "advisor_user_id" },
+] as const;
+
+/**
+ * Tabellen mit zwei Beteiligten in zwei Spalten (Einladungen: wer einlud, wer
+ * eingeladen wurde; Beziehungen: die beiden Personen). Gelesen werden nur Zeilen,
+ * in denen die Person selbst steht - in einer der beiden Spalten.
+ */
+const PAIR_TABLES = [
+  { table: "invitations", columns: ["inviter_user_id", "invitee_user_id"] },
+  { table: "relationships", columns: ["user_a_id", "user_b_id"] },
 ] as const;
 
 /**
@@ -90,6 +110,11 @@ const EXPORTED_TABLES = [
  */
 const CHILD_TABLES = [
   { table: "alignment_answers", column: "assessment_id", parent: "assessments" },
+  // Die Antworten des frueheren v1-Fragebogens und der Antwortverlauf je Frage.
+  { table: "assessment_answers", column: "assessment_id", parent: "assessments" },
+  { table: "alignment_item_views", column: "assessment_id", parent: "assessments" },
+  // Wer zu den eigenen Beziehungen als Advisor eingetragen ist ("wer es sieht").
+  { table: "relationship_advisors", column: "relationship_id", parent: "relationships" },
   { table: "person_capability_evidence", column: "entry_id", parent: "person_capability_entries" },
   { table: "capability_interview_turns", column: "session_id", parent: "capability_interview_sessions" },
 ] as const;
@@ -120,7 +145,7 @@ export type AccountExport = {
 };
 
 const HINWEIS =
-  "Dieser Export enthaelt, was unter deinem Konto gespeichert ist. Nachrichten anderer Menschen sind nicht dabei - auch nicht in Gespraechen, an denen du beteiligt warst: Sie gehoeren der Person, die sie geschrieben hat. Belege aus deiner Faehigkeitsaufstellung sind ebenfalls nicht enthalten.";
+  "Dieser Export enthaelt, was unter deinem Konto gespeichert ist. Nachrichten anderer Menschen sind nicht dabei - auch nicht in Gespraechen, an denen du beteiligt warst: Sie gehoeren der Person, die sie geschrieben hat. Belege aus deiner Faehigkeitsaufstellung sind ebenfalls nicht enthalten. Gemeinsame Dokumente aus frueheren Fassungen (Workbooks, Paarberichte, Matching-Raeume) enthalten auch Angaben einer anderen Person und sind deshalb nicht dabei; du kannst sie in der App weiter ansehen.";
 
 /**
  * Sammelt die Daten einer Person.
@@ -147,11 +172,23 @@ export async function buildAccountExport(
     daten[table] = data ?? [];
   }
 
+  for (const { table, columns } of PAIR_TABLES) {
+    const { data, error } = await client
+      .from(table)
+      .select("*")
+      .or(columns.map((column) => `${column}.eq.${userId}`).join(","));
+    if (error) {
+      nichtEnthalten.push({ tabelle: table, grund: error.message });
+      continue;
+    }
+    daten[table] = data ?? [];
+  }
+
   for (const { table, column, parent } of CHILD_TABLES) {
     const parents = (daten[parent] ?? []) as { id?: string }[];
     const ids = parents.map((row) => row.id).filter((id): id is string => typeof id === "string");
     if (ids.length === 0) {
-      daten[table] = [];
+      daten[table] = daten[table] ?? [];
       continue;
     }
     const { data, error } = await client.from(table).select("*").in(column, ids);
@@ -159,7 +196,10 @@ export async function buildAccountExport(
       nichtEnthalten.push({ tabelle: table, grund: error.message });
       continue;
     }
-    daten[table] = data ?? [];
+    // Steht die Tabelle schon aus einer anderen Richtung im Export (z. B.
+    // relationship_advisors als Advisor), kommen die Zeilen dazu, ohne doppelt.
+    const seen = new Set((daten[table] ?? []).map((row) => JSON.stringify(row)));
+    daten[table] = [...(daten[table] ?? []), ...(data ?? []).filter((row) => !seen.has(JSON.stringify(row)))];
   }
 
   const restricted = await client.rpc("export_my_restricted_data");
@@ -184,3 +224,4 @@ export async function buildAccountExport(
 
 export const ACCOUNT_EXPORT_TABLES = EXPORTED_TABLES;
 export const ACCOUNT_EXPORT_CHILD_TABLES = CHILD_TABLES;
+export const ACCOUNT_EXPORT_PAIR_TABLES = PAIR_TABLES;

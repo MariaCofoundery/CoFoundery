@@ -6,7 +6,7 @@ import {
   isNotificationKind,
   notificationKindsByArea,
 } from "@/features/account/notificationKinds";
-import { ACCOUNT_EXPORT_CHILD_TABLES, ACCOUNT_EXPORT_RESTRICTED_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
+import { ACCOUNT_EXPORT_CHILD_TABLES, ACCOUNT_EXPORT_PAIR_TABLES, ACCOUNT_EXPORT_RESTRICTED_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const readJson = (path: string) => JSON.parse(source(path)) as Record<string, unknown>;
@@ -223,6 +223,33 @@ test("der Export liest mit den Rechten der Person, nicht privilegiert", () => {
   const tables: string[] = [...ACCOUNT_EXPORT_TABLES.map((entry) => entry.table), ...ACCOUNT_EXPORT_CHILD_TABLES.map((entry) => entry.table)];
   for (const wanted of ["person_strengths", "person_resources", "direction_statements", "alignment_answers", "person_capability_evidence", "advisor_person_grants"]) {
     assert.ok(tables.includes(wanted), `${wanted} fehlt im Export`);
+  }
+});
+
+test("eigene Daten aus frueheren Fassungen sind im Export, gemeinsame Dokumente ausdruecklich nicht", () => {
+  // Seit 03.11.2026: Solange Altdaten gespeichert sind, gehoeren die eigenen in die Auskunft (Art. 15 DSGVO).
+  const tables: string[] = [
+    ...ACCOUNT_EXPORT_TABLES.map((entry) => entry.table),
+    ...ACCOUNT_EXPORT_CHILD_TABLES.map((entry) => entry.table),
+    ...ACCOUNT_EXPORT_PAIR_TABLES.map((entry) => entry.table),
+  ];
+  for (const wanted of ["assessment_answers", "alignment_item_views", "instrument_transitions", "invitations", "relationships", "relationship_advisors", "invitation_matching_inputs", "founder_alignment_workbook_advisors"]) {
+    assert.ok(tables.includes(wanted), `${wanted} fehlt im Export`);
+  }
+  // Zwei Beteiligte: nur Zeilen, in denen die Person selbst in einer der beiden Spalten steht.
+  const code = source("src/features/account/accountExport.ts");
+  assert.match(code, /\.or\(columns\.map\(\(column\) => `\$\{column\}\.eq\.\$\{userId\}`\)\.join\(","\)\)/);
+  for (const entry of ACCOUNT_EXPORT_PAIR_TABLES) {
+    assert.ok(entry.columns.every((column) => column.endsWith("_id")), `${entry.table}: keine Personenspalten`);
+  }
+  // Gemeinsame Dokumente mit Angaben anderer bleiben draussen - und der Export sagt das.
+  for (const shared of ["founder_alignment_workbooks", "report_runs", "matching_workspaces", "matching_report_runs"]) {
+    assert.ok(!tables.includes(shared), `${shared} enthaelt Angaben einer anderen Person`);
+  }
+  assert.match(code, /Gemeinsame Dokumente aus frueheren Fassungen/);
+  for (const locale of ["de", "en"]) {
+    const data = accountCopy(locale).data as unknown as { scope?: string };
+    assert.match(data.scope ?? "", locale === "de" ? /Workbooks, Paarberichte/ : /workbooks, pair reports/, locale);
   }
 });
 

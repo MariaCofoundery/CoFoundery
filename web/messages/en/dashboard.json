@@ -522,7 +522,7 @@
     "data": {
       "title": "Your data",
       "text": "You can download everything stored under your account at any time – as one file that opens in any text editor.",
-      "scope": "Not included: messages other people wrote – those are theirs. And the evidence from your capability snapshot, which we never pass on anywhere.",
+      "scope": "Not included: messages other people wrote – those are theirs. And the evidence from your capability snapshot, which we never pass on anywhere. Shared documents from earlier versions (workbooks, pair reports, matching rooms) also contain another person’s entries and are therefore not included; you can still view them in the app.",
       "download": "Download my data"
     },
     "push": {

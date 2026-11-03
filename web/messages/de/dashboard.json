@@ -522,7 +522,7 @@
     "data": {
       "title": "Deine Daten",
       "text": "Du kannst jederzeit alles herunterladen, was unter deinem Konto gespeichert ist – als eine Datei, die sich mit jedem Texteditor öffnen lässt.",
-      "scope": "Nicht dabei: Nachrichten, die andere Menschen geschrieben haben – die gehören ihnen. Und deine Belege aus der Fähigkeitsaufstellung, die geben wir grundsätzlich nirgendwohin weiter.",
+      "scope": "Nicht dabei: Nachrichten, die andere Menschen geschrieben haben – die gehören ihnen. Und deine Belege aus der Fähigkeitsaufstellung, die geben wir grundsätzlich nirgendwohin weiter. Gemeinsame Dokumente aus früheren Fassungen (Workbooks, Paarberichte, Matching-Räume) enthalten auch Angaben einer anderen Person und sind deshalb nicht dabei; du kannst sie in der App weiter ansehen.",
       "download": "Daten herunterladen"
     },
     "push": {
