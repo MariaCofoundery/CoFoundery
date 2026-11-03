@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -115,7 +115,8 @@ test("kein unbekannter Lesezugriff auf research_events oder die Analyse-Sicht", 
   };
   walk("src");
   walk("scripts");
-  walk("../supabase/functions");
+  // Edge Functions gibt es seit 03.11.2026 keine mehr; kommt eine dazu, gilt die Regel auch dort.
+  if (existsSync("../supabase/functions")) walk("../supabase/functions");
   const unknown = found.filter((path) => !KNOWN_RESEARCH_READERS.has(path.replace(/^\.\.\//, "")));
   assert.deepEqual(unknown, [], "neuer Lesezugriff auf Forschungsdaten - Schutzregel für Altdaten umsetzen");
   assert.ok(found.includes("scripts/item-analysis.ts"), "Gegenprobe: der bekannte Leser wird gefunden");

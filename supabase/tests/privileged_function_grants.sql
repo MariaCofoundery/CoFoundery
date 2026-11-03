@@ -117,10 +117,11 @@ select extensions.ok(
   (select proacl::text not like '%authenticated=X%' from pg_proc p join pg_namespace n on n.oid=p.pronamespace
    where n.nspname='public' and p.proname='delete_founder_account_data'),
   'und auch nicht fuer beliebige angemeldete Nutzer - die Anwendung ruft sie mit der Service-Rolle');
+-- delete_user_operational_data ist seit 20270303120000 entfernt (kein Aufrufer mehr).
 select extensions.ok(
-  (select proacl::text not like '%anon=X%' from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+  not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
    where n.nspname='public' and p.proname='delete_user_operational_data'),
-  'delete_user_operational_data ist fuer anon nicht ausfuehrbar');
+  'delete_user_operational_data gibt es nicht mehr');
 
 -- ---------------------------------------------------------------------------
 -- 3. Was absichtlich erreichbar bleibt
