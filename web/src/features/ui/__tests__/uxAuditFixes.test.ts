@@ -238,7 +238,6 @@ test("the report builders keep their ASCII-safe prose on purpose", () => {
   assert.match(source("src/features/reporting/heroTextBuilder.ts"), /Staerke|fuer |naechst/);
   for (const view of [
     "src/features/reporting/SelfReportView.tsx",
-    "src/features/reporting/DecisionEngineSection.tsx",
     "src/features/reporting/workbookRendering.ts",
   ]) {
     assert.match(source(view), /normalizeGermanText/, `${view} muss normalisieren`);

@@ -27,21 +27,21 @@ const codeOnly = (path: string) =>
  * Trigger entfernt.
  */
 
+// Seit 03.11.2026 ohne die beiden Aktionen des alten v1-Fragebogens
+// (questionnaire/actions.ts, actionsB.ts): nirgends mehr verwendet, entfernt.
 const SCHREIBWEGE = [
   join("src", "features", "profile", "actions.ts"),
   join("src", "app", "(product)", "dashboard", "actions.ts"),
-  join("src", "features", "questionnaire", "actions.ts"),
-  join("src", "features", "questionnaire", "actionsB.ts"),
 ];
 
-test("alle vier Aktionen schreiben den Namen in den Kern", () => {
+test("alle Aktionen schreiben den Namen in den Kern", () => {
   for (const datei of SCHREIBWEGE) {
     const code = codeOnly(datei);
     assert.match(code, /writeDisplayNameToCore\(/, `${datei}: schreibt nicht in den Kern`);
   }
 });
 
-test("drei davon fassen profiles gar nicht mehr an", () => {
+test("nur die Profilaktion fasst profiles noch an", () => {
   // `upsertProfileBasicsAction` ist die Ausnahme: Sie trägt Rollen, Avatar,
   // Schwerpunkt und Absicht, und die liegen auf `profiles`. Sie schreibt den
   // Namen dort mit, damit eine frisch angelegte Zeile nicht ohne ihn dasteht
@@ -65,18 +65,6 @@ test("der Einstieg schreibt erst die Zeile, dann den Kern", () => {
   const upsert = code.indexOf("upsertProfileBasicsRow");
   const kern = code.indexOf("writeDisplayNameToCore");
   assert.ok(upsert > 0 && kern > upsert, "der Kern wird vor der Zeile geschrieben");
-});
-
-test("der Fragebogen liest den Namen auch aus dem Kern", () => {
-  // Sonst schriebe er in den Kern und läse aus der Kopie — und für Konten
-  // ohne `profiles`-Zeile stünde dort nie etwas.
-  for (const datei of [
-    join("src", "features", "questionnaire", "actions.ts"),
-    join("src", "features", "questionnaire", "actionsB.ts"),
-  ]) {
-    const code = codeOnly(datei);
-    assert.match(code, /from\("person_core"\)[\s\S]{0,80}display_name/, datei);
-  }
 });
 
 test("leer loescht den Namen nicht", () => {

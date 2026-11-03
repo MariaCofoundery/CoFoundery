@@ -12,10 +12,6 @@ const clientSource = fs.readFileSync(
   path.resolve(root, "src/features/reporting/FounderAlignmentWorkbookClient.tsx"),
   "utf8"
 );
-const introSource = fs.readFileSync(
-  path.resolve(root, "src/features/reporting/FounderAlignmentWorkbookIntro.tsx"),
-  "utf8"
-);
 const de = JSON.parse(
   fs.readFileSync(path.resolve(root, "messages/de/workbook.json"), "utf8")
 ) as MessageTree;
@@ -64,14 +60,9 @@ test("workbook core chrome messages are complete and parallel", () => {
   }
 });
 
-test("intro presents all three deep-dive pilots as equal direct choices", () => {
-  assert.match(introSource, /decisionRulesHref/u);
-  assert.match(introSource, /collaborationConflictHref/u);
-  assert.match(introSource, /openPointsHref/u);
-  assert.match(introSource, /intro\.topics\.decisionRules\.title/u);
-  assert.match(introSource, /intro\.topics\.collaborationConflict\.title/u);
-  assert.match(introSource, /intro\.topics\.openPoints\.title/u);
-  assert.doesNotMatch(introSource, /prioritizedStepIds|suggestedTopics/u);
+// Die frueher hier geprueften Intro-Karten (FounderAlignmentWorkbookIntro.tsx) wurden am
+// 03.11.2026 entfernt: nirgends mehr verwendet. Die Inhalte der Vertiefungen bleiben geprueft.
+test("deep-dive pilot steps keep their titles", () => {
   assert.equal(
     getWorkbookContent("de").steps.find((step) => step.id === "decision_rules")?.title,
     "Entscheidungen & Entscheidungshoheit"

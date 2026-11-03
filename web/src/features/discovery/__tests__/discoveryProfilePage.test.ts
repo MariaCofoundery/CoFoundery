@@ -176,7 +176,6 @@ test("locationLabel exists nowhere any more", () => {
     "src/features/discovery/discoveryIntroData.ts",
     "src/features/discovery/discoveryV2Search.ts",
     "src/features/discovery/discoverySavedSearchMatching.ts",
-    "src/features/matchingCore/matchingCoreData.ts",
   ];
   for (const file of files) {
     assert.doesNotMatch(

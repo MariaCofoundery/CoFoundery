@@ -4,7 +4,6 @@ import path from "node:path";
 import test from "node:test";
 import { buildChallengeExamples } from "@/features/reporting/challengeTextBuilder";
 import { buildComplementExamples } from "@/features/reporting/complementTextBuilder";
-import { buildFounderMatchingTextExamples } from "@/features/reporting/founderMatchingTextBuilder";
 import { buildHeroTextExamples } from "@/features/reporting/heroTextBuilder";
 import { buildPatternExamples } from "@/features/reporting/patternTextBuilder";
 import { normalizeGermanText } from "@/lib/normalizeGermanText";
@@ -33,17 +32,6 @@ test("generated reporting texts stay free of mojibake and known false umlauts", 
     ...buildComplementExamples().flatMap((entry) =>
       entry.complements.flatMap((complement) => [complement.title, complement.description])
     ),
-    ...Object.values(buildFounderMatchingTextExamples()).flatMap((entry) => [
-      entry.hero,
-      entry.stableBase.title,
-      entry.stableBase.body,
-      entry.strongestComplement.title,
-      entry.strongestComplement.body,
-      entry.biggestTension.title,
-      entry.biggestTension.body,
-      entry.dailyDynamics,
-      ...entry.agreements,
-    ]),
   ];
 
   for (const text of generatedTexts) {

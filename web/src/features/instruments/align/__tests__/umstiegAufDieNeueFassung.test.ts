@@ -47,23 +47,6 @@ test("eine getroffene Entscheidung beendet den Hinweis", () => {
   }
 });
 
-test("der Hinweis sagt die drei Dinge, die sonst fehlen", () => {
-  const text = readFileSync(
-    join("src", "features", "instruments", "align", "AlignAnnounce.tsx"), "utf8");
-
-  // Befristet - weil es stimmt, und es erst kurz vorher zu sagen waere unfair.
-  assert.match(text, /nicht unbegrenzt|befristet/i);
-  // Die Daten bleiben - das ist die eigentliche Sorge.
-  assert.match(text, /Daten bleiben|Antworten sind weiter da/i);
-  // Der unangenehme Satz: Vergleich nur innerhalb einer Fassung.
-  assert.match(text, /nur innerhalb einer Fassung/i);
-
-  // Und drei Knoepfe, von denen keiner hervorgehoben ist.
-  for (const knopf of ["retake", "keep_previous", "postponeTransitionV21"]) {
-    assert.ok(text.includes(knopf), knopf);
-  }
-});
-
 test("die neue Fassung steht im Menü, nicht nur auf einer Karte", () => {
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"), "utf8");

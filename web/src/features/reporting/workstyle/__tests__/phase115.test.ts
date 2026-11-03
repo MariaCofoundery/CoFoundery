@@ -84,8 +84,8 @@ test("Teamreport-Seite: konkrete Bereitschaft nur für Mitglieder, nur ein Knopf
 });
 
 test("Fragebogen: Fortschritt in Markenfarben mit echter Zahl, Scroll unter der Kopfleiste, Fokus auf die Frage", () => {
-  // Fortschritt und Fragekarte sind gemeinsam genutzt (Phase 11.6: auch fuer den Forschungsteil).
-  const ui = code("src/features/instruments/workstyle/WorkstylePretestV2.tsx");
+  // Fortschritt und Fragekarte sind gemeinsam genutzt (seit v4 in einer eigenen Datei, fuer alle Fassungen).
+  const ui = code("src/features/instruments/workstyle/WorkstyleQuestion.tsx");
   assert.doesNotMatch(ui, /<progress/);
   assert.match(ui, /role="progressbar"/);
   assert.match(ui, /from-violet-600 to-cyan-400/);
@@ -94,10 +94,10 @@ test("Fragebogen: Fortschritt in Markenfarben mit echter Zahl, Scroll unter der 
   assert.match(ui, /scroll-mt-36/);
   assert.match(ui, /focus\(\{ preventScroll: true \}\)/);
   assert.match(ui, />\s*Zurück\s*</);
-  // Aktueller Ablauf: warm, mit echter Anzahl, ohne erfundene Minuten.
-  const flow = code("src/features/instruments/workstyle/WorkstyleProfileFlow.tsx");
+  // Aktueller Ablauf (v4): warm, mit echter Anzahl, ohne erfundene Minuten.
+  const flow = code("src/features/instruments/workstyle/WorkstyleV4Flow.tsx");
   assert.match(flow, /Mach’s dir kurz bequem\./);
-  assert.match(flow, /Dein Arbeitsprofil basiert auf\s+\{coreItems\.length\}\s+Situationen\./);
+  assert.match(flow, /Dein Arbeitsprofil basiert auf\s+\{items\.length\}\s+Situationen\./);
   assert.match(flow, /Später weitermachen/);
   assert.doesNotMatch(flow, /Minuten|minutes/);
 });

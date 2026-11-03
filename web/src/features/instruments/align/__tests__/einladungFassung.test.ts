@@ -27,7 +27,6 @@ import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
 const lies = (...pfad: string[]) => readFileSync(join(...pfad), "utf8");
 
 const flow = lies("src", "features", "onboarding", "invitationFlow.ts");
-const version = lies("src", "features", "instruments", "align", "invitationVersion.ts");
 const migration = lies(
   "..", "supabase", "migrations", "20261084120000_invitation_version.sql");
 
@@ -43,19 +42,11 @@ test("die aktuelle Einladung führt zum bestehenden Team oder v0.4", () => {
   );
 });
 
-test("im Zweifel bleibt es bei der bisherigen Fassung", () => {
-  // Geht die Auskunft schief, ist der Status quo die schonendere Antwort: Sie
-  // führt dorthin, wo die Einladung bisher immer hinführte, statt ein Paar auf
-  // zwei Fassungen zu verteilen.
-  assert.match(version, /if \(error \|\| data === null \|\| data === undefined\) return "previous";/);
-  assert.match(version, /catch \{\s*return "previous";/);
-});
-
 test("die Kennung des Instruments steht nur an einer Stelle", () => {
   // Sie kommt als Parameter in die Datenbankfunktion. Eine zweite Schreibweise
   // im SQL wäre eine zweite Wahrheit, die beim nächsten Umbenennen
   // stillschweigend falsch wird.
-  assert.match(version, /p_instrument: CURRENT_INSTRUMENT_ID/);
+  // (Der TS-Aufrufer invitationVersion.ts ist seit 03.11.2026 entfernt; die Migration bleibt.)
   assert.ok(
     !migration.includes(CURRENT_INSTRUMENT_ID),
     "die Migration schreibt die Kennung selbst hin",

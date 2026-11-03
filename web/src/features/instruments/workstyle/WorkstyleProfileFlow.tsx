@@ -8,7 +8,7 @@ import { useState, useTransition } from "react";
 import { workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { workstyleV3Item } from "@/features/instruments/workstyle/researchSets";
 import { saveWorkstyleFeedback, saveWorkstyleV3, startWorkstyleProduct, startWorkstyleResearch, withdrawWorkstyleResearch } from "@/features/instruments/workstyle/actions";
-import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstylePretestV2";
+import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstyleQuestion";
 import { WorkstyleFeedback } from "@/features/instruments/workstyle/WorkstylePretest";
 import type { PretestSession, ResearchContext } from "@/features/instruments/workstyle/data";
 import { researchConsentDocument } from "@/features/instruments/workstyle/researchConsent";

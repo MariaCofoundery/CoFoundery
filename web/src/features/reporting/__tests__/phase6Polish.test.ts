@@ -102,7 +102,6 @@ test("Seitentitel, Manifest und Logos haengen am zentralen Namen", () => {
     join("src", "app", "layout.tsx"),
     join("src", "app", "manifest.ts"),
     join("src", "features", "navigation", "ProductShell.tsx"),
-    join("src", "components", "marketing", "LandingTopNav.tsx"),
     join("src", "features", "connect", "PublicConnectShell.tsx"),
     join("src", "components", "brand", "BrandLogo.tsx"),
   ]) {

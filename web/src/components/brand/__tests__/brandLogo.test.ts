@@ -54,7 +54,7 @@ test("mails use the light-background PNG at its own aspect ratio", () => {
 
 test("no brand component still points at the old CoFoundery logo", () => {
   for (const file of [
-    "src/components/brand/BrandLogo.tsx", "src/components/marketing/HomepageNav.tsx", "src/components/marketing/LandingTopNav.tsx",
+    "src/components/brand/BrandLogo.tsx", "src/components/marketing/HomepageNav.tsx",
     "src/app/(marketing)/page.tsx", "src/app/(marketing)/informierte-entscheidungen/page.tsx",
     "src/features/navigation/ProductShell.tsx", "src/features/connect/PublicConnectShell.tsx",
     "src/features/reporting/FounderAlignmentWorkbookClient.tsx", "src/features/reporting/DebugConversationGuidePreview.tsx",
