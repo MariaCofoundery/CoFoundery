@@ -4,6 +4,8 @@ import manifestV2 from "../../../../docs/founder-workstyle-pretest-8.5a-v2.json"
 
 import manifestV3 from "../../../../docs/founder-workstyle-pretest-8.5a-v3.json";
 
+import manifestV4 from "../../../../docs/founder-workstyle-pretest-8.5a-v4.json";
+
 export type WorkstyleForm = "A" | "B" | "C";
 export type WorkstyleResponseFormat = "frequency" | "experience_weight" | "ambiguity_comfort" | "ambiguity_discomfort" | "likelihood" | "influence" | "seriousness" | "comparative" | "behavioral";
 export type WorkstyleSourceType = "live_reference" | "adapted" | "new";
@@ -67,10 +69,13 @@ export function validateWorkstyleRegistry(registry: WorkstyleRegistry): void {
   if (registry.assessment_key !== "founder-workstyle-pretest" || !registry.assessment_version || !registry.pool_version) fail("version");
   if (Object.values(registry.scoring).some(value => value !== false)) fail("unsupported_scoring");
   if (!["candidate_for_pretest", "archived"].includes(registry.status)) fail("status");
-  const v3 = registry.assessment_version === "8.5a-v3";
-  const fixed = v3 || registry.assessment_version === "8.5a-v2";
+  // v4: die 29 Produktfragen der Endfassung, kein Forschungsteil; A/B wie in v3.
+  const v4 = registry.assessment_version === "8.5a-v4";
+  const categorical = v4 || registry.assessment_version === "8.5a-v3";
+  const fixed = categorical || registry.assessment_version === "8.5a-v2";
+  const contract = v4 ? { pool: 29, core: 29, research: 0, item: "v4.0" } : categorical ? { pool: 52, core: 29, research: 23, item: "8.4-v0.4" } : { pool: 36, core: 30, research: 6, item: "8.4-v0.3" };
   const assigned = fixed ? [...(registry.item_order ?? [])] : [...registry.core_item_keys, ...FORMS.flatMap(form => registry.forms[form])];
-  if (fixed && (registry.design !== "fixed" || Object.keys(registry.forms).length || assigned.length !== (v3 ? 52 : 36) || registry.core_item_keys.length !== (v3 ? 29 : 30) || registry.actual_counts.research_only !== (v3 ? 23 : 6))) fail("fixed_design");
+  if (fixed && (registry.design !== "fixed" || Object.keys(registry.forms).length || assigned.length !== contract.pool || registry.core_item_keys.length !== contract.core || registry.actual_counts.research_only !== contract.research)) fail("fixed_design");
   if (new Set(assigned).size !== assigned.length) fail("duplicate_assignment");
   const keys = registry.items.map(item => item.item_key);
   if (new Set(keys).size !== keys.length || keys.length !== assigned.length || assigned.some(key => !keys.includes(key))) fail("item_coverage");
@@ -84,11 +89,12 @@ export function validateWorkstyleRegistry(registry: WorkstyleRegistry): void {
   }
   for (const item of registry.items) {
     if (!/^(EVI|EXP|EL|VOICE|AMB|ORG|DEC|FS)-(?:\d{2}|R[12])$/.test(item.item_key) || !item.item_version || item.assessment_version !== registry.assessment_version) fail("item_identity");
-    if (!item.prompt.trim() || !item.construct || (!registry.response_formats[item.response_format] && !(v3 && ["comparative", "behavioral"].includes(item.response_format)))) fail("item_content");
+    if (!item.prompt.trim() || !item.construct || (!registry.response_formats[item.response_format] && !(categorical && ["comparative", "behavioral"].includes(item.response_format)))) fail("item_content");
     if (!["live_reference", "adapted", "new"].includes(item.source_type) || item.source_status !== item.source_type) fail("source_type");
-    if (fixed && (item.item_version !== (v3 ? "8.4-v0.4" : "8.4-v0.3") || item.missing_reasons.length !== 1 || item.stem !== null || item.form !== null)) fail("v2_item_contract");
+    if (fixed && (item.item_version !== contract.item || item.missing_reasons.length !== 1 || item.stem !== null || item.form !== null)) fail("v2_item_contract");
+    if (v4 && (item.scientific_status !== "core" || item.area_status !== "development_area" || item.response_format === "behavioral")) fail("v4_product_only");
     if (item.missing_reasons.some(reason => reason !== "cannot_assess")) fail("missing_reason");
-    if (v3) {
+    if (categorical) {
       if (!["core", "core_research", "candidate_core", "research"].includes(item.scientific_status ?? "")) fail("scientific_status");
       if ((item.scientific_status === "core") !== (item.usage === "core")) fail("development_privacy_boundary");
       if (["DEC", "FS"].includes(item.area_key ?? "") && !item.research_only) fail("candidate_or_facet_in_product");
@@ -123,9 +129,12 @@ validateWorkstyleRegistry(manifestV2 as WorkstyleRegistry);
 export const WORKSTYLE_PRETEST_V2 = freezeDeep(manifestV2 as WorkstyleRegistry);
 validateWorkstyleRegistry(manifestV3 as WorkstyleRegistry);
 export const WORKSTYLE_PRETEST_V3 = freezeDeep(manifestV3 as WorkstyleRegistry);
+validateWorkstyleRegistry(manifestV4 as WorkstyleRegistry);
+export const WORKSTYLE_PRETEST_V4 = freezeDeep(manifestV4 as WorkstyleRegistry);
 
 /** Exact resolution; never reinterpret an unknown historical version as the newest. */
 export function workstyleRegistryFor(assessmentVersion: string): WorkstyleRegistry {
+  if (assessmentVersion === WORKSTYLE_PRETEST_V4.assessment_version) return WORKSTYLE_PRETEST_V4;
   if (assessmentVersion === WORKSTYLE_PRETEST_V3.assessment_version) return WORKSTYLE_PRETEST_V3;
   if (assessmentVersion === WORKSTYLE_PRETEST_V2.assessment_version) return WORKSTYLE_PRETEST_V2;
   if (assessmentVersion !== WORKSTYLE_PRETEST_V1.assessment_version) throw new Error("unknown_workstyle_assessment_version");

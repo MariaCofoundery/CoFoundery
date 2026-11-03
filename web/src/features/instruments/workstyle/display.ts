@@ -1,11 +1,17 @@
 /** Display-only overlay. Persisted IDs, versions, order and response values stay unchanged. */
 import en from "./display.en.json";
+import enV4 from "./display.v4.en.json";
 import type { AppLocale } from "@/i18n/config";
 import { workstyleResponseOptions, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 
+type ItemCopy = { prompt: string; alternatives?: Record<string, string>; options?: Record<string, string> };
+/** Each version has its own wording; scales and A/B labels are shared. */
+const ITEMS: Record<string, Record<string, ItemCopy>> = { "8.5a-v3": en.items, "8.5a-v4": enV4.items };
+
 export function workstyleDisplayItem(item: WorkstyleItem, locale: AppLocale): WorkstyleItem {
-  if (locale !== "en" || item.assessment_version !== "8.5a-v3") return item;
-  const copy = (en.items as Record<string, { prompt: string; alternatives?: Record<string, string>; options?: Record<string, string> }>)[item.item_key];
+  const items = ITEMS[item.assessment_version];
+  if (locale !== "en" || !items) return item;
+  const copy = items[item.item_key];
   if (!copy) throw new Error(`missing_workstyle_display:${item.item_key}`);
   return {
     ...item, prompt: copy.prompt,
@@ -16,7 +22,7 @@ export function workstyleDisplayItem(item: WorkstyleItem, locale: AppLocale): Wo
 
 export function workstyleDisplayOptions(item: WorkstyleItem, locale: AppLocale) {
   const options = workstyleResponseOptions(item);
-  if (locale !== "en" || item.assessment_version !== "8.5a-v3") return options;
+  if (locale !== "en" || !ITEMS[item.assessment_version]) return options;
   const display = workstyleDisplayItem(item, locale);
   if (display.options?.length) return display.options.map(o => ({ value: o.option_id, label: o.label }));
   const labels = (en.response_formats as Record<string, string[]>)[item.response_format];

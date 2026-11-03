@@ -172,9 +172,9 @@ function profile(overrides: Record<string, V>, fallback: V = 3): ProductProfile 
   return {
     person_id: "p",
     assessment_id: "a-p",
-    instrument_id: "founder-workstyle-pretest-8-5a-v3",
-    manifest_version: "3.0.0",
-    item_version: "8.4-v0.4",
+    instrument_id: "founder-workstyle-pretest-8-5a-v4",
+    manifest_version: "4.0.0",
+    item_version: "v4.0",
     completed_at: "2026-10-05",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = i.item_key in overrides ? overrides[i.item_key] : fallback;

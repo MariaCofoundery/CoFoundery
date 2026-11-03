@@ -81,7 +81,8 @@ test("Forschung: eigene Einleitung, Einwilligung nicht vorausgewaehlt, Ablehnen 
   assert.match(flow, /Forschungseinwilligung widerrufen/);
   assert.match(flow, /Dein Arbeitsprofil bleibt\./);
   const actions = code("src/features/instruments/workstyle/actions.ts");
-  assert.match(actions, /export async function startWorkstyleProduct\(newAssessment = false\) \{\s*const client = await createClient\(\);\s*const \{ data, error \} = await client\.rpc\("start_workstyle_product"/);
+  // Seit v4: v3 wird nur fortgesetzt, nie neu begonnen; weiterhin ohne Einwilligung.
+  assert.match(actions, /export async function startWorkstyleProduct\(newAssessment = false\) \{\s*if \(newAssessment \|\| !\(await getMyWorkstylePretest\("8\.5a-v3"\)\)\)\s*return \{ ok: false as const[^}]*\};\s*const client = await createClient\(\);\s*const \{ data, error \} = await client\.rpc\("start_workstyle_product"/);
   assert.match(actions, /export async function startWorkstyleResearch\(consent: boolean, context: ResearchContext\) \{\s*if \(consent !== true\)/);
 });
 
@@ -97,10 +98,14 @@ test("Route: bestehende Seite unterscheidet Arbeitsprofil und Forschung, keine n
   assert.match(settings, /version=8\.5a-v3&teil=forschung/);
 });
 
-test("Profil: Forschungsangebot nur zum fertigen, aktuellen Arbeitsprofil, nie im Druck oder Snapshot", () => {
+test("Profil: seit v4 kein Forschungsangebot, ein v3-Profil laesst sich nicht teilen", () => {
   const page = code("src/app/me/profile/workstyle/page.tsx");
-  assert.match(page, /!snapshot && current && participation\?\.submitted_at && participation\.assessment_id === current\.assessment_id &&\s*!participation\.withdrawn_at && !participation\.completed_at/);
-  assert.match(page, /className="ws-no-print mt-10 rounded-2xl border border-dashed/);
+  // Die aktuelle Fassung hat keinen Forschungsteil.
+  assert.doesNotMatch(page, /researchOffer|teil=forschung|getMyWorkstylePretest/);
+  // Eine fruehere Fassung: Hinweis zur neuen Fassung, keine Freigaben.
+  assert.match(page, /const older = profile \? isOlderWorkstyleProfile\(profile\) : false;/);
+  assert.match(page, /\{!older && <section id="freigaben"/);
+  // Die Texte bleiben fuer einen spaeteren Forschungsteil mit eigener Einwilligung.
   for (const locale of ["de", "en"]) {
     const r = json(`messages/${locale}/report.json`).workstyle;
     assert.ok(r.researchOffer.title && r.researchOffer.offer && r.researchOffer.continue, locale);

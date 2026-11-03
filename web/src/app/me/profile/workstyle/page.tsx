@@ -9,13 +9,13 @@ import { saveProductSnapshot } from "@/features/reporting/workstyle/actions";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
 import {
   PRODUCT_ITEMS,
+  isOlderWorkstyleProfile,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
 import { getShareState } from "@/features/instruments/align/shareData";
 import { ShareForm } from "@/features/instruments/align/ShareForm";
 import { PrintReportButton } from "@/features/reporting/PrintReportButton";
-import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
-import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getTranslations } from "next-intl/server";
 import { getRequestLocale as getLocale } from "@/i18n/getLocale";
@@ -36,10 +36,9 @@ export default async function Page({
   const client = await createClient();
   const query = await searchParams;
   const t0 = await getTranslations("report.workstyle");
-  const [current, shares, participation, memberships, teamShares] = await Promise.all([
+  const [current, shares, memberships, teamShares] = await Promise.all([
     getProductWorkstyle(client, user.id),
     getShareState(user.id, "workstyle", null),
-    getMyWorkstylePretest(CURRENT_WORKSTYLE_VERSION).catch(() => null),
     client.from("founder_team_members").select("team_id").eq("user_id", user.id),
     client.from("team_shares").select("team_id").eq("owner_user_id", user.id).is("revoked_at", null),
   ]);
@@ -58,13 +57,10 @@ export default async function Page({
   if (query.snapshot && (!snapshot || snapshot.input.person_id !== user.id))
     notFound();
   const profile = snapshot?.input ?? current;
-  // Phase 11.6: freiwilliger Forschungsteil - nur zum aktuellen, fertigen
-  // Arbeitsprofil, ohne Widerruf und solange er nicht abgeschlossen ist.
-  const researchOffer =
-    !snapshot && current && participation?.submitted_at && participation.assessment_id === current.assessment_id &&
-    !participation.withdrawn_at && !participation.completed_at
-      ? participation.consent_version ? "continue" : "offer"
-      : null;
+  // Seit v4: Ein Profil der frueheren Fassung sieht nur die Person selbst. Es
+  // laesst sich nicht teilen und zaehlt nicht fuer Teams oder FIND.
+  // Die aktuelle Fassung hat keinen Forschungsteil, daher kein Forschungsangebot.
+  const older = profile ? isOlderWorkstyleProfile(profile) : false;
   const [t, locale] = await Promise.all([getTranslations("report.workstyle"), getLocale()]);
   // Ausfuehrliche Fassung: alle Einzelantworten aufgeklappt und im Druck enthalten.
   const full = query.ansicht === "ausfuehrlich";
@@ -107,8 +103,17 @@ export default async function Page({
               })}
             </p>
           )}
+          {older && (
+            <section aria-labelledby="ws-older-version" className="ws-no-print mb-7 rounded-2xl border border-amber-200 bg-amber-50/60 p-5 sm:p-6">
+              <h2 id="ws-older-version" className="text-lg font-semibold text-slate-950">{t("olderVersion.title")}</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">{t("olderVersion.body")}</p>
+              <Link className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-slate-900 px-4 font-semibold text-white" href={CURRENT_WORKSTYLE_HREF}>
+                {t("olderVersion.cta")}
+              </Link>
+            </section>
+          )}
           <IndividualWorkstyle locale={locale} profile={profile} full={full} />
-          <section id="freigaben" aria-labelledby="ws-sharing-title" className="ws-no-print mt-10 scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+          {!older && <section id="freigaben" aria-labelledby="ws-sharing-title" className="ws-no-print mt-10 scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
             <h2 id="ws-sharing-title" className="text-xl font-semibold text-slate-950">{t("sharing.title")}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("sharing.intro")}</p>
             {teams.length > 0 ? (
@@ -149,16 +154,7 @@ export default async function Page({
                 />
               </div>
             </details>
-          </section>
-          {researchOffer && (
-            <section aria-labelledby="ws-research-offer" className="ws-no-print mt-10 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6">
-              <h2 id="ws-research-offer" className="text-lg font-semibold">{t("researchOffer.title")}</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">{t("researchOffer.body")}</p>
-              <Link className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-800" href={`${CURRENT_WORKSTYLE_HREF}&teil=forschung`}>
-                {t(researchOffer === "continue" ? "researchOffer.continue" : "researchOffer.offer")}
-              </Link>
-            </section>
-          )}
+          </section>}
         </>
       ) : (
         <section className="rounded-2xl border border-slate-200 bg-white p-6">

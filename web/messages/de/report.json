@@ -172,6 +172,11 @@
       "individualTitle": "Einzelne Personen und Advisors",
       "individualIntro": "Für einzelne Kontakte und Advisors kannst du deine Arbeitsweise weiterhin einzeln freigeben und dabei einzelne Fragen ausblenden. Im Team gilt immer die Teamfreigabe – dort lässt sich nichts einzeln ausblenden."
     },
-    "moreActions": "Mehr"
+    "moreActions": "Mehr",
+    "olderVersion": {
+      "title": "Frühere Fassung",
+      "body": "Dieser Bericht beruht auf der früheren Fassung des Arbeitsprofils. Er bleibt für dich sichtbar, sonst sieht ihn niemand. Für dein Team, Freigaben und FIND zählt nur die neue Fassung mit überarbeiteten Fragen.",
+      "cta": "Neue Fassung beantworten"
+    }
   }
 }

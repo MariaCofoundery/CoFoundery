@@ -1,5 +1,5 @@
 import type { AppLocale } from "@/i18n/config";
-import { COPY_EN, SITUATIONS_EN, PREFERENCES_EN, TEAM_EN, ORG_DIFFERS_EN } from "@/features/reporting/workstyle/displayCopyEn";
+import { COPY_EN, SITUATIONS_EN, PREFERENCES_EN, TEAM_EN, ORG_DIFFERS_EN, EVI_DIRECTION_V3_EN } from "@/features/reporting/workstyle/displayCopyEn";
 import { workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
 /**
  * Report-Aussagen fuer workstyle-report/1.0.0 - deterministisch, ohne LLM.
@@ -13,9 +13,11 @@ import { workstyleDisplayOptions } from "@/features/instruments/workstyle/displa
  *
  * Evidenzregeln (Bereichsaussage, Einzelbericht):
  * - Grundlage sind nur die ordinalen Items EINES Antwortformats je Bereich
- *   (`patternItems`). EXP-01 (Format "seriousness") und die ORG-Zweierwahlen
- *   werden nicht mit anderen Formaten verrechnet, sondern als einzelne
- *   Antworten wiedergegeben (`itemNotes`).
+ *   (`patternItems`), und zwar die der Fassung, aus der das Profil stammt.
+ *   Zweierwahlen (ORG, seit v4 auch EVI-01/-03/-05) und in v3 EXP-01 (Format
+ *   "seriousness") werden nicht mit anderen Formaten verrechnet, sondern als
+ *   einzelne Antworten wiedergegeben (`itemNotes`). Seit v4 ist EXP-01 eine
+ *   Einfluss-Frage wie die uebrigen EXP-Fragen und zaehlt zur Richtung.
  * - Fehlende Antworten ("Kann ich noch nicht einschätzen") zaehlen nicht als
  *   Mitte, sondern gar nicht. Mindestens `minAnswered` = min(3, Anzahl Items)
  *   beantwortete Situationen; sonst `insufficient` und keine Deutung.
@@ -36,11 +38,14 @@ import { workstyleDisplayOptions } from "@/features/instruments/workstyle/displa
 import {
   AREAS,
   PRODUCT_ITEMS,
+  isOlderWorkstyleProfile,
+  productItemsFor,
   rawChoice,
   responseBand,
   type AreaKey,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
+import type { WorkstyleItem } from "@/features/instruments/workstyle/registry";
 
 export type Band = "lower" | "middle" | "upper";
 export type MixedVariant = "both" | "upper" | "lower";
@@ -56,7 +61,7 @@ export const SITUATIONS: Record<string, string> = {
   "EVI-03": "eine getroffene Entscheidung bei deutlicher Gegeninformation erneut prüfen",
   "EVI-05": "die eigene Einschätzung prüfen, wenn jemand einen nachvollziehbaren Gegenpunkt bringt",
   "EVI-06": "einem Widerspruch zwischen seriösen Quellen nachgehen",
-  "EXP-01": "einen vertrauten Eindruck ernst nehmen, den du noch nicht begründen kannst",
+  "EXP-01": "einen ersten Eindruck „das kenne ich“ bei einem neuen Vorgehen einfließen lassen",
   "EXP-02": "frühere Erfahrung gegenüber einer Lösung, die auf dem Papier überzeugt",
   "EXP-03": "Erfahrung bei zwei gleich guten Möglichkeiten",
   "EXP-04": "Erfahrung bei einem Problem, das du schon mehrfach erlebt hast",
@@ -108,10 +113,10 @@ type AreaCopy = {
 const COPY: Record<AreaKey, AreaCopy> = {
   EVI: {
     direction: {
-      // EVI-01 Gegenargumente, -02 unsichere Annahme, -03/-05 Gegeninformation/Gegenpunkt, -06 widersprüchliche Quellen
-      upper: "Wenn eine Entscheidung ansteht, schaust du lieber noch einmal genauer hin: Du suchst nach Gegenargumenten, prüfst unsichere Annahmen und gehst Informationen nach, die dagegen sprechen.",
-      lower: "Eine Einschätzung, die steht, lässt du eher stehen: Gezielt nach Gegenargumenten zu suchen oder Gegeninformationen nachzugehen, ist in diesen Situationen für dich eher nicht der nächste Schritt.",
-      middle: "Ob du eine Einschätzung noch einmal prüfst, lässt du in den meisten Situationen offen – mal eher ja, mal eher nein.",
+      // v4: nur EVI-02 unsichere Annahme und -06 widersprüchliche Quellen; EVI-01/-03/-05 sind Zweierwahlen
+      upper: "Hängt euer nächster Schritt an einer unsicheren Annahme oder widersprechen sich seriöse Quellen, schaust du lieber noch einmal genauer hin, bevor du dich festlegst.",
+      lower: "Hängt euer nächster Schritt an einer unsicheren Annahme oder widersprechen sich seriöse Quellen, ist genaueres Nachprüfen für dich eher nicht der nächste Schritt.",
+      middle: "Ob du eine unsichere Annahme oder widersprüchliche Quellen genauer prüfst, lässt du eher offen – mal eher ja, mal eher nein.",
     },
     // Gemischt: je nachdem, welche Pole die Antworten tatsaechlich enthalten (Phase 1, Profil).
     mixedBy: { both: "Manches lässt du stehen, anderes prüfst du noch einmal genauer.", upper: "Manches prüfst du noch einmal genauer, bei anderem legst du dich nicht fest.", lower: "Manches lässt du eher stehen, bei anderem legst du dich nicht fest." },
@@ -225,8 +230,19 @@ export const AREA_POLES: Record<AreaKey, { left: string; right: string }> = {
   ORG: { left: "einfach anfangen", right: "erst Schritte klären" },
 };
 
-/** ORG-Zweierwahlen: je eine ausgeschriebene Wahl aus dem Optionstext, "eher" oder "deutlich eher" nach Antwort. */
+/** Fruehere Fassung (v3): EVI-01/-03/-05 waren Wahrscheinlichkeitsfragen und gehoerten zur Richtung. */
+const EVI_DIRECTION_V3: Record<Band, string> = {
+  // EVI-01 Gegenargumente, -02 unsichere Annahme, -03/-05 Gegeninformation/Gegenpunkt, -06 widersprüchliche Quellen
+  upper: "Wenn eine Entscheidung ansteht, schaust du lieber noch einmal genauer hin: Du suchst nach Gegenargumenten, prüfst unsichere Annahmen und gehst Informationen nach, die dagegen sprechen.",
+  lower: "Eine Einschätzung, die steht, lässt du eher stehen: Gezielt nach Gegenargumenten zu suchen oder Gegeninformationen nachzugehen, ist in diesen Situationen für dich eher nicht der nächste Schritt.",
+  middle: "Ob du eine Einschätzung noch einmal prüfst, lässt du in den meisten Situationen offen – mal eher ja, mal eher nein.",
+};
+
+/** Zweierwahlen (ORG, seit v4 auch EVI): je eine ausgeschriebene Wahl aus dem Optionstext, "eher" oder "deutlich eher" nach Antwort. */
 const PREFERENCES: Record<string, { context: string; A: string; B: string }> = {
+  "EVI-01": { context: "Wenn dir eine von mehreren Möglichkeiten spontan am besten gefällt", A: "suchst du {eher} vor der Festlegung gezielt nach Gegenargumenten", B: "startest du {eher} mit deinem Favoriten und achtest unterwegs auf handfeste Gegengründe" },
+  "EVI-03": { context: "Wenn nach einer Entscheidung neue Informationen dagegen sprechen", A: "nimmst du die Entscheidung {eher} direkt wieder auf und prüfst, ob du umsteuerst", B: "bleibst du {eher} zunächst dabei und prüfst, ob die neuen Informationen schwer genug wiegen" },
+  "EVI-05": { context: "Wenn jemand im Team einen nachvollziehbaren Gegenpunkt einbringt", A: "gehst du den Punkt {eher} direkt durch und hinterfragst deine Einschätzung", B: "bleibst du {eher} zunächst bei deiner Einschätzung und suchst weitere Hinweise" },
   "ORG-03": { context: "Wenn mehrere wichtige Aufgaben konkurrieren", A: "hältst du {eher} mehrere davon parallel in Bewegung", B: "konzentrierst du dich {eher} auf wenige und lässt anderes warten" },
   "ORG-04": { context: "Wenn eine Aufgabe länger dauert als gedacht", A: "bringst du sie {eher} zunächst wie geplant zu Ende", B: "passt du deinen weiteren Plan {eher} früh an" },
   "ORG-07": { context: "Wenn während konzentrierter Arbeit eine wichtige neue Anfrage kommt", A: "unterbrichst du {eher} und kümmerst dich um das Neue", B: "bleibst du {eher} bei dem, woran du gerade arbeitest" },
@@ -235,26 +251,28 @@ const PREFERENCES: Record<string, { context: string; A: string; B: string }> = {
 
 /**
  * Items, aus denen eine Bereichsrichtung abgeleitet werden darf: ordinal und
- * je Bereich EIN Antwortformat. EXP-01 ("seriousness") und alle Zweierwahlen
- * sind ausgenommen und erscheinen nur als Einzelantwort.
+ * je Bereich EIN Antwortformat. Alle Zweierwahlen und in v3 EXP-01
+ * ("seriousness") sind ausgenommen und erscheinen nur als Einzelantwort.
+ * Ohne Profil gilt die aktuelle Fassung.
  */
-export function patternItems(area: AreaKey) {
-  return PRODUCT_ITEMS.filter(
+export function patternItems(area: AreaKey, items: readonly WorkstyleItem[] = PRODUCT_ITEMS) {
+  return items.filter(
     (i) => i.area_key === area && !["comparative", "behavioral", "seriousness"].includes(i.response_format),
   );
 }
 
-export function minAnswered(area: AreaKey) {
-  return Math.min(3, patternItems(area).length);
+export function minAnswered(area: AreaKey, items: readonly WorkstyleItem[] = PRODUCT_ITEMS) {
+  return Math.min(3, patternItems(area, items).length);
 }
 
 /** Muster eines Bereichs aus den gleichformatigen Ordinalantworten - ohne Zahl nach aussen. */
 export function areaPattern(profile: ProductProfile, area: AreaKey): AreaPattern {
-  const bands = patternItems(area).flatMap((i) => {
+  const items = productItemsFor(profile);
+  const bands = patternItems(area, items).flatMap((i) => {
     const band = responseBand(profile, i.item_key);
     return band === "lower" || band === "middle" || band === "upper" ? [{ key: i.item_key, band: band as Band }] : [];
   });
-  const required = minAnswered(area);
+  const required = minAnswered(area, items);
   if (bands.length < required) return { kind: "insufficient", answered: bands.length, required };
   const count = (b: Band) => bands.filter((x) => x.band === b).length;
   for (const band of ["upper", "lower", "middle"] as Band[]) {
@@ -277,20 +295,24 @@ export function areaPattern(profile: ProductProfile, area: AreaKey): AreaPattern
 
 /** Einzelantworten, die nicht in die Bereichsrichtung eingehen - woertlich wiedergegeben. */
 function itemNotes(profile: ProductProfile, area: AreaKey, locale: AppLocale): { claim: string; text: string }[] {
+  const items = productItemsFor(profile);
   if (area === "EXP") {
+    // Nur v3: dort hat EXP-01 ein eigenes Format; seit v4 zaehlt es zur Richtung.
+    if (items.find((i) => i.item_key === "EXP-01")?.response_format !== "seriousness") return [];
     const choice = rawChoice(profile, "EXP-01");
     return choice
       ? [{ claim: "EXP.ITEM.EXP-01", text: locale === "en" ? `How seriously you take a familiar impression before you can explain it: “${displayChoiceLabel(profile, "EXP-01", locale)}”.` : `Wie ernst du einen vertrauten Eindruck nimmst, den du noch nicht begründen kannst: „${choice.label}“.` }]
       : [];
   }
-  if (area !== "ORG") return [];
   return Object.entries(PREFERENCES).flatMap(([key, copy]) => {
+    const item = items.find((i) => i.item_key === key);
+    if (item?.area_key !== area || item.response_format !== "comparative") return [];
     const choice = rawChoice(profile, key);
     if (!choice || typeof choice.value !== "string") return [];
     const side = choice.value.endsWith("_a") ? "A" : choice.value.endsWith("_b") ? "B" : null;
     if (!side) return [];
     const strong = choice.value.startsWith("strong_");
-    return [{ claim: `ORG.ITEM.${key}`, text: locale === "en" ? `${PREFERENCES_EN[key].context}, ${PREFERENCES_EN[key][side].replace("{preference}", strong ? "strongly prefer to" : "tend to")}.` : `${copy.context}, ${copy[side].replace("{eher}", strong ? "deutlich eher" : "eher")}.` }];
+    return [{ claim: `${area}.ITEM.${key}`, text: locale === "en" ? `${PREFERENCES_EN[key].context}, ${PREFERENCES_EN[key][side].replace("{preference}", strong ? "strongly prefer to" : "tend to")}.` : `${copy.context}, ${copy[side].replace("{eher}", strong ? "deutlich eher" : "eher")}.` }];
   });
 }
 
@@ -305,7 +327,7 @@ export type AreaNarrative = {
   exception: string | null;
   /** Bei gemischtem Muster: Situationen je Antwortbereich. */
   situations: { band: Band; label: string; items: string[] }[];
-  /** Einzelantworten ausserhalb der Bereichsrichtung (EXP-01, ORG-Zweierwahlen). */
+  /** Einzelantworten ausserhalb der Bereichsrichtung (Zweierwahlen, in v3 EXP-01). */
   itemNotes: { claim: string; text: string }[];
   /** Wie viele Situationen des Bereichs ohne Einschaetzung sind - sie fliessen nicht ein. */
   missing: number;
@@ -317,7 +339,7 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
   const copy: AreaCopy = locale === "en" ? COPY_EN[area] : COPY[area];
   const pattern = areaPattern(profile, area);
   const notes = itemNotes(profile, area, locale);
-  const missing = PRODUCT_ITEMS.filter((i) => i.area_key === area && !rawChoice(profile, i.item_key)).length;
+  const missing = productItemsFor(profile).filter((i) => i.area_key === area && !rawChoice(profile, i.item_key)).length;
   const base = { key: area, pattern, itemNotes: notes, missing, exception: null, situations: [] };
   if (pattern.kind === "insufficient") {
     return {
@@ -326,6 +348,8 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
       core:
         area === "ORG" && notes.length
           ? locale === "en" ? "There are not enough responses about next steps and checkpoints to describe a pattern yet." : "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
+          : area === "EVI" && notes.length
+            ? locale === "en" ? "There are not enough responses about uncertain assumptions and conflicting sources to describe a pattern yet." : "Zu unsicheren Annahmen und widersprüchlichen Quellen liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
           : locale === "en" ? "There are not enough responses to describe a pattern in this area yet." : "Für diesen Bereich liegen zu wenige Antworten vor, um etwas daraus abzuleiten.",
       note: null,
       question: null,
@@ -341,7 +365,7 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
   return {
     ...base,
     claim: `${area}.DIRECTION.${pattern.band.toUpperCase()}.${pattern.strength.toUpperCase()}`,
-    core: copy.direction[pattern.band],
+    core: area === "EVI" && isOlderWorkstyleProfile(profile) ? (locale === "en" ? EVI_DIRECTION_V3_EN : EVI_DIRECTION_V3)[pattern.band] : copy.direction[pattern.band],
     exception: pattern.exception
       ? locale === "en" ? `In one situation you are less definite: ${SITUATIONS_EN[pattern.exception]}.` : `Nur in einer Situation legst du dich weniger fest: ${SITUATIONS[pattern.exception]}.`
       : null,
@@ -404,13 +428,14 @@ export type OverviewMark =
 export function overviewMark(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): OverviewMark {
   const pattern = areaPattern(profile, area);
   if (pattern.kind === "insufficient") return { kind: "none" };
-  const choices = patternItems(area)
+  const items = patternItems(area, productItemsFor(profile));
+  const choices = items
     .flatMap((i) => {
       const c = rawChoice(profile, i.item_key);
       return c && typeof c.value === "number" ? [c] : [];
     })
     .sort((a, b) => a.position - b.position);
-  const firstItem = patternItems(area)[0];
+  const firstItem = items[0];
   const options = workstyleDisplayOptions(firstItem, locale);
   if (pattern.kind === "direction") {
     const median = choices[Math.floor((choices.length - 1) / 2)];
@@ -432,7 +457,7 @@ export type SituationDot = { itemKey: string; position: number; situation: strin
 
 export function situationDots(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): SituationDot[] {
   if (areaPattern(profile, area).kind === "insufficient") return [];
-  const items = patternItems(area);
+  const items = patternItems(area, productItemsFor(profile));
   const firstItem = items[0];
   if (!firstItem) return [];
   const options = workstyleDisplayOptions(firstItem, locale);
@@ -475,7 +500,7 @@ const TEAM_COPY: Record<AreaKey, TeamCopy> = {
   EVI: {
     similar: {
       upper: { text: "Ihr schaut {alle} lieber noch einmal genauer hin, bevor eine Entscheidung steht.", question: "Wie entscheidet ihr, wenn Informationen unvollständig bleiben – und wer stößt dann die Umsetzung an?" },
-      lower: { text: "Ihr {alle} lasst eine erste Einschätzung eher stehen, statt gezielt nach Gegenargumenten zu suchen.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
+      lower: { text: "Unsichere Annahmen und widersprüchliche Quellen prüft ihr {alle} vor einer Entscheidung eher nicht noch einmal genauer nach.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
     },
     differs: {
       summary: "Bei manchen Situationen liegt ihr nah beieinander, bei anderen würdet ihr eher unterschiedlich reagieren. Besonders sichtbar wird das bei der Frage, wann eine Entscheidung noch einmal geöffnet werden sollte.",
@@ -582,7 +607,8 @@ function isOpposite(bands: string[]) {
 }
 
 export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale: AppLocale = "de"): TeamAreaFinding {
-  const items = PRODUCT_ITEMS.filter((i) => i.area_key === area);
+  // Ein Team vergleicht immer genau eine Fassung (validProductTeam).
+  const items = (people.length ? productItemsFor(people[0].profile) : PRODUCT_ITEMS).filter((i) => i.area_key === area);
   // Nur Situationen, die ALLE beantwortet haben. Fehlende Antworten sind keine Mitte.
   const shared = items.filter((i) => people.every((p) => responseBand(p.profile, i.item_key) !== null));
   const bandsOf = (key: string) => people.map((p) => responseBand(p.profile, key) as string);
@@ -593,7 +619,10 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale
 
   const situations = [...opposite, ...different.filter((i) => !opposite.includes(i))].slice(0, 2).map((i) => ({
     item: i.item_key,
-    label: locale === "en" ? SITUATIONS_EN[i.item_key] ?? PREFERENCES_EN[i.item_key]?.context ?? i.prompt : SITUATIONS[i.item_key] ?? PREFERENCES[i.item_key]?.context ?? i.prompt,
+    // Zweierwahlen mit ihrem Anlass, Skalenfragen mit der Situation.
+    label: i.response_format === "comparative"
+      ? (locale === "en" ? PREFERENCES_EN : PREFERENCES)[i.item_key]?.context ?? i.prompt
+      : (locale === "en" ? SITUATIONS_EN : SITUATIONS)[i.item_key] ?? i.prompt,
     groups: [...new Set(bandsOf(i.item_key))]
       .sort((a, b) => BAND_ORDER.indexOf(a) - BAND_ORDER.indexOf(b))
       .map((band) => ({
@@ -654,6 +683,6 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale
 /** Localize the selected label without changing its value or position. */
 export function displayChoiceLabel(profile: ProductProfile, key: string, locale: AppLocale) {
   const choice = rawChoice(profile, key);
-  const item = PRODUCT_ITEMS.find(i => i.item_key === key);
+  const item = productItemsFor(profile).find(i => i.item_key === key);
   return choice && item ? workstyleDisplayOptions(item, locale)[choice.position].label : null;
 }

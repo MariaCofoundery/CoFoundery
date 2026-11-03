@@ -1,0 +1,75 @@
+{
+  "items": {
+    "ORG-01": { "prompt": "You are starting a larger project. How likely are you to first work out the next concrete steps before you get going?" },
+    "EXP-01": { "prompt": "Someone suggests a new approach to your team. You immediately feel: \"I know this, I have been through something like it before,\" but you cannot explain why just yet. How strongly does this first impression influence your assessment?" },
+    "VOICE-01": { "prompt": "Your team has already more or less agreed on a decision. You notice another point against it. How likely are you to raise it anyway?" },
+    "AMB-01": { "prompt": "You receive different feedback on a new idea and cannot yet tell which feedback is more relevant. How uncomfortable does this feel?" },
+    "EL-01": { "prompt": "You are choosing between two approaches, both of which you could try on a small scale. How likely are you to test something before deciding?" },
+    "EVI-01": {
+      "prompt": "You have three options, and one immediately appeals to you most. Which describes you better?",
+      "alternatives": {
+        "A": "Before committing, I deliberately look for counterarguments so I can spot weaknesses early.",
+        "B": "I start with my favorite to make progress and watch along the way for solid reasons against it."
+      }
+    },
+    "EXP-02": { "prompt": "A plan looks coherent on paper, but your experience from earlier situations makes you hesitate. How strongly does this prior experience influence your judgment of the plan?" },
+    "ORG-03": {
+      "prompt": "Several important tasks compete for your attention at the same time. Which describes the way you work better?",
+      "alternatives": {
+        "A": "I keep several topics moving in parallel so that nothing comes to a complete stop.",
+        "B": "I focus on a few things and accept that others must wait."
+      }
+    },
+    "AMB-02": { "prompt": "A problem comes up and there are several plausible explanations, but for now there is no way to find out which one is actually right. How uncomfortable does this uncertainty feel?" },
+    "VOICE-02": { "prompt": "You learn something that matters to your work together but could weigh on the mood in the team. How likely are you to bring it up soon?" },
+    "EVI-02": { "prompt": "Your next step hinges on an assumption you are not yet sure about. How likely are you to deliberately check it before you commit?" },
+    "EXP-03": { "prompt": "Two options look equally good on the facts alone. But one of them strongly reminds you of earlier situations. How strongly does this personal experience tip your choice?" },
+    "AMB-04": { "prompt": "You are analyzing a problem, but every new piece of information makes the overall picture more confusing and raises further questions. How uncomfortable does this feel?" },
+    "ORG-04": {
+      "prompt": "A task takes much longer than expected. Which describes the way you work better?",
+      "alternatives": {
+        "A": "I finish the task I started as planned before I rearrange the schedule.",
+        "B": "I adjust my schedule to the delay early, before I continue."
+      }
+    },
+    "EL-02": { "prompt": "Your team has two plausible approaches and the discussion is not moving forward. Both could be tried with little effort. How likely are you to suggest a concrete test?" },
+    "EXP-04": { "prompt": "You face a challenge you have encountered several times in a similar form. How strongly do you draw on those experiences to assess what matters this time?" },
+    "VOICE-03": { "prompt": "A difficult topic was postponed and never revisited. Something important remains unresolved for you. How likely are you to put the topic back on the table yourself?" },
+    "EL-05": { "prompt": "An initial attempt gives no clear answer. How likely are you to deliberately change one thing and try again?" },
+    "AMB-05": { "prompt": "You need to keep working on something even though an important question remains open. How uncomfortable does this feel?" },
+    "ORG-02": { "prompt": "A task runs over several weeks, and nobody sets interim deadlines for you. How likely are you to set your own milestones to check where you stand?" },
+    "EVI-03": {
+      "prompt": "You have made a decision. Shortly afterward, new information comes up that argues against it. Which describes you better?",
+      "alternatives": {
+        "A": "I reopen the decision right away and check whether I should change course.",
+        "B": "I stick with the decision for now and check whether the new information carries enough weight to change course."
+      }
+    },
+    "EL-04": { "prompt": "You are unsure how the market will respond to a new feature or offer. How likely are you to show potential users a simple first version early (for example, a sketch or a mock-up) instead of finishing it internally?" },
+    "VOICE-04": { "prompt": "A decision is made that you consider wrong from a professional perspective. How likely are you to tell your team that you see the situation differently?" },
+    "EVI-05": {
+      "prompt": "Someone on the team sees something differently and raises a point that makes sense. Which describes you better?",
+      "alternatives": {
+        "A": "I go through the point right away and question my own assessment.",
+        "B": "I stick with my assessment for now and look for further evidence that supports or weakens the point."
+      }
+    },
+    "EXP-06": { "prompt": "You need to make a decision even though some information is still missing. But you know the field very well. How strongly do you rely on your own experience when you choose?" },
+    "VOICE-05": { "prompt": "The group wants to close a topic, but an important point remains open for you. How likely are you to say that you are not ready yet?" },
+    "ORG-07": {
+      "prompt": "You are concentrating on an important topic when another important request comes in. Which describes you better?",
+      "alternatives": {
+        "A": "I interrupt my work fairly quickly and take care of the new request right away.",
+        "B": "I first stay with what I am working on and push the new request back."
+      }
+    },
+    "EVI-06": { "prompt": "Two sources you generally consider reliable contradict each other on an important question. How likely are you to look more closely at why they differ?" },
+    "ORG-08": {
+      "prompt": "Your plan still basically works, but several smaller things turn out differently than expected. Which describes you better?",
+      "alternatives": {
+        "A": "I only change my plan when the deviations really start to carry weight.",
+        "B": "I prefer to keep adjusting my plan even for smaller changes."
+      }
+    }
+  }
+}

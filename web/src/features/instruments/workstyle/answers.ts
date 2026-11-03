@@ -1,4 +1,4 @@
-import { workstyleItemFor, type WorkstyleForm } from "@/features/instruments/workstyle/registry";
+import { WORKSTYLE_PRETEST_V4, workstyleItemFor, type WorkstyleForm, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { workstyleV3Item } from "@/features/instruments/workstyle/researchSets";
 
 export type WorkstyleAnswerValue =
@@ -19,7 +19,7 @@ export function parseWorkstyleAnswer(
   input: unknown,
 ): VersionedWorkstyleAnswer {
   if (identity.assessment_version === "8.5a-v1" ? !assignedForm || !["A", "B", "C"].includes(assignedForm) : assignedForm !== null) throw new Error("unknown_workstyle_form");
-  if (identity.assessment_version === "8.5a-v3") throw new Error("workstyle_v3_answer_parser_required");
+  if (identity.assessment_version === "8.5a-v3" || identity.assessment_version === "8.5a-v4") throw new Error("workstyle_v3_answer_parser_required");
   const item = workstyleItemFor(identity.item_key, identity.item_version, identity.assessment_version);
   if (item.research_only && item.form !== assignedForm) throw new Error("workstyle_item_not_assigned");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("invalid_workstyle_answer");
@@ -39,7 +39,7 @@ export function parseWorkstyleAnswer(
 
 export type WorkstyleV3Answer = Readonly<{
   assessment_key: "founder-workstyle-pretest";
-  assessment_version: "8.5a-v3";
+  assessment_version: "8.5a-v3" | "8.5a-v4";
   item_key: string;
   item_version: string;
   response_value: number | null;
@@ -51,7 +51,15 @@ export type WorkstyleV3Answer = Readonly<{
 /** Preserve category identity and presentation independently from ordinal values. */
 export function parseWorkstyleV3Answer(itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
   // Phase 11.6C: auch die Welle-1-Ueberarbeitungen (EVI-04r, EL-03r, EL-06r).
-  const item = workstyleV3Item(itemKey);
+  return parseCategoricalAnswer(workstyleV3Item(itemKey), "8.5a-v3", itemKey, itemVersion, input);
+}
+
+/** v4: dieselbe Antwortform wie v3, nur die 29 Produktfragen der eigenen Fassung. */
+export function parseWorkstyleV4Answer(itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
+  return parseCategoricalAnswer(WORKSTYLE_PRETEST_V4.items.find(item => item.item_key === itemKey), "8.5a-v4", itemKey, itemVersion, input);
+}
+
+function parseCategoricalAnswer(item: WorkstyleItem | undefined, assessmentVersion: WorkstyleV3Answer["assessment_version"], itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
   if (!item || item.item_version !== itemVersion) throw new Error("unknown_workstyle_item");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("invalid_workstyle_answer");
   const data = input as Record<string, unknown>;
@@ -67,7 +75,7 @@ export function parseWorkstyleV3Answer(itemKey: string, itemVersion: string, inp
     ? typeof option === "string" && item.options?.some(o => o.option_id === option)
     : typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 5);
   if (!valid || (missing !== null && missing !== "cannot_assess")) throw new Error("invalid_workstyle_answer");
-  return { assessment_key: "founder-workstyle-pretest", assessment_version: "8.5a-v3", item_key: itemKey, item_version: itemVersion,
+  return { assessment_key: "founder-workstyle-pretest", assessment_version: assessmentVersion, item_key: itemKey, item_version: itemVersion,
     response_value: value as number | null, response_option: option as string | null, missing_reason: missing as "cannot_assess" | null,
     rendered_order: item.rendered_order ? [...item.rendered_order] : null };
 }

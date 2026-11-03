@@ -1,5 +1,6 @@
 import { getRequestLocale as getDisplayLocale } from "@/i18n/getLocale";
 import { IndividualWorkstyle } from "@/features/reporting/workstyle/IndividualWorkstyle";
+import { isOlderWorkstyleProfile } from "@/features/reporting/workstyle/model";
 import { WorkstyleProfileSummary } from "@/features/reporting/workstyle/WorkstyleProfileSummary";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -516,6 +517,15 @@ export default async function FounderProfilePage({
                 <Link className="mt-4 inline-block underline" href="/me/profile/workstyle">
                   {t("currentWorkstyle.openReport")}
                 </Link>
+                {/* Seit v4: ein Profil der frueheren Fassung zaehlt nur noch fuer dich selbst. */}
+                {isOlderWorkstyleProfile(workstyleV04) && (
+                  <p className="mt-4 rounded-xl bg-amber-50/60 p-4 text-sm leading-6 text-slate-700">
+                    {(await getTranslations("report.workstyle"))("olderVersion.body")}{" "}
+                    <Link className="font-medium underline" href={CURRENT_WORKSTYLE_HREF}>
+                      {(await getTranslations("report.workstyle"))("olderVersion.cta")}
+                    </Link>
+                  </p>
+                )}
               </>
             ) : (
               <MissingSection

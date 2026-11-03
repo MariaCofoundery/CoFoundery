@@ -56,18 +56,18 @@ export const WORKSTYLE_MODULE: ModuleDefinition = {
   input: {
     method: "questionnaire",
     storage: "assessments",
-    writesTo: "assessments + alignment_answers (29 Core-Antworten); Forschung getrennt in workstyle_research_responses",
+    writesTo: "assessments + alignment_answers (29 Produktantworten); seit v4 kein Forschungsteil",
   },
   versions: [
     {
       versionId: CURRENT_WORKSTYLE_VERSION,
       // Pflicht bei storage = assessments; der Adapter filtert danach.
       instrumentId: CURRENT_WORKSTYLE_INSTRUMENT,
-      compatGroup: "workstyle-8.5a-v3",
+      compatGroup: "workstyle-8.5a-v4",
     },
   ],
   completion: {
-    source: "assessments.submitted_at des aktuellen Instruments; die DB (workstyle_v3_sync_completion) setzt es, sobald alle Core-Items beantwortet sind",
+    source: "assessments.submitted_at des aktuellen Instruments; die DB (workstyle_v4_sync_completion) setzt es, sobald alle 29 Fragen beantwortet sind",
   },
   sharing: { ceiling: "answers", sensitivity: "standard", bindsTo: "existing_contract" },
   renderers: { profileCard: "me-profile:arbeitsweise", detail: "/me/profile/workstyle" },

@@ -1,7 +1,10 @@
 import {
   WORKSTYLE_PRETEST_V3,
+  WORKSTYLE_PRETEST_V4,
   workstyleResponseOptions,
+  type WorkstyleRegistry,
 } from "@/features/instruments/workstyle/registry";
+import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import type {
   CapabilityArea,
   CapabilityFamily,
@@ -9,13 +12,32 @@ import type {
 } from "@/features/capability/capabilityTypes";
 
 export const REPORT_SCHEMA = "workstyle-report/1.0.0";
-export const PRODUCT_ITEMS = WORKSTYLE_PRETEST_V3.items.filter(
-  (i) =>
-    i.scientific_status === "core" &&
-    i.usage === "core" &&
-    !i.research_only &&
-    i.area_status === "development_area",
-);
+const productItemsOf = (registry: WorkstyleRegistry) =>
+  registry.items.filter(
+    (i) =>
+      i.scientific_status === "core" &&
+      i.usage === "core" &&
+      !i.research_only &&
+      i.area_status === "development_area",
+  );
+/** Aktuelle Fassung (v4): gilt fuer Teams, Freigaben, FIND und Advisor-Sichten. */
+export const PRODUCT_ITEMS = productItemsOf(WORKSTYLE_PRETEST_V4);
+/** Fruehere Fassung (v3): nur noch der eigene Bericht der Person. */
+export const PRODUCT_ITEMS_V3 = productItemsOf(WORKSTYLE_PRETEST_V3);
+const REPORT_VERSIONS = [
+  { instrument: "founder-workstyle-pretest-8-5a-v4", manifest: "4.0.0", item: "v4.0", items: PRODUCT_ITEMS },
+  { instrument: "founder-workstyle-pretest-8-5a-v3", manifest: "3.0.0", item: "8.4-v0.4", items: PRODUCT_ITEMS_V3 },
+] as const;
+/** Die Fragen genau der Fassung, aus der das Profil stammt. Kein Rueckfall auf eine andere Fassung. */
+export function productItemsFor(profile: Pick<ProductProfile, "instrument_id">) {
+  const version = REPORT_VERSIONS.find((v) => v.instrument === profile.instrument_id);
+  if (!version) throw new Error("unknown_workstyle_report_version");
+  return version.items;
+}
+/** Ein Profil der frueheren Fassung: fuer die Person selbst lesbar, fuer niemanden sonst. */
+export function isOlderWorkstyleProfile(profile: Pick<ProductProfile, "instrument_id">) {
+  return profile.instrument_id !== CURRENT_WORKSTYLE_INSTRUMENT;
+}
 export const AREAS = [
   {
     key: "EVI",
@@ -141,13 +163,14 @@ export type ProductSnapshot<T> = {
 
 /** Product allowlist is checked again at the rendering boundary. No fallback between instruments. */
 export function validProductProfile(p: ProductProfile): boolean {
+  const version = REPORT_VERSIONS.find((v) => v.instrument === p.instrument_id);
   return (
-    p.instrument_id === "founder-workstyle-pretest-8-5a-v3" &&
-    p.manifest_version === "3.0.0" &&
-    p.item_version === "8.4-v0.4" &&
+    !!version &&
+    p.manifest_version === version.manifest &&
+    p.item_version === version.item &&
     new Set(p.answers.map((a) => a.item_key)).size === p.answers.length &&
     p.answers.every((a) =>
-      PRODUCT_ITEMS.some(
+      version.items.some(
         (i) => i.item_key === a.item_key && i.item_version === a.item_version,
       ),
     )
@@ -161,13 +184,15 @@ export function validProductTeam(t: ProductTeam): boolean {
     t.people.every(
       (p) =>
         p.person_id === p.workstyle.person_id &&
+        // Teams vergleichen nur die aktuelle Fassung; eine fruehere bleibt privat.
+        p.workstyle.instrument_id === CURRENT_WORKSTYLE_INSTRUMENT &&
         validProductProfile(p.workstyle) &&
         p.workstyle.answers.length === PRODUCT_ITEMS.length,
     )
   );
 }
 export function rawChoice(profile: ProductProfile, key: string) {
-  const item = PRODUCT_ITEMS.find((i) => i.item_key === key);
+  const item = productItemsFor(profile).find((i) => i.item_key === key);
   const answer = profile.answers.find(
     (a) => a.item_key === key && a.item_version === item?.item_version,
   );
@@ -218,8 +243,9 @@ export function responseBand(
         : "middle";
 }
 export function individualAreas(profile: ProductProfile) {
+  const older = isOlderWorkstyleProfile(profile);
   return AREAS.map((area) => {
-    const items = PRODUCT_ITEMS.filter((i) => i.area_key === area.key);
+    const items = productItemsFor(profile).filter((i) => i.area_key === area.key);
     const answered = items.filter((i) => rawChoice(profile, i.item_key));
     const evidence = answered.map((i) => ({
       key: i.item_key,
@@ -231,24 +257,45 @@ export function individualAreas(profile: ProductProfile) {
       AreaKey,
       { key: string; lower: string; middle: string; upper: string }
     > = {
-      EVI: {
-        key: "EVI-01",
-        lower:
-          "Wenn dir eine Möglichkeit spontan gefällt, beschreibst du die gezielte Suche nach Gegenargumenten als eher unwahrscheinlich.",
-        middle:
-          "Bei einem spontanen Favoriten hängt die Suche nach Gegenargumenten für dich von der Situation ab.",
-        upper:
-          "Auch wenn dir eine Möglichkeit spontan gefällt, suchst du nach eigener Einschätzung eher gezielt nach Gegenargumenten.",
-      },
-      EXP: {
-        key: "EXP-01",
-        lower:
-          "Ein vertrautes Muster, das du noch nicht erklären kannst, nimmst du zunächst eher wenig ernst.",
-        middle:
-          "Ein vertrautes Muster, das du noch nicht erklären kannst, nimmst du teilweise als Hinweis auf.",
-        upper:
-          "Ein vertrautes Muster nimmst du eher ernst, auch wenn du noch nicht genau erklären kannst, woher der Eindruck kommt.",
-      },
+      // v4: EVI-01/-03/-05 sind Zweierwahlen; die Skalenaussage kommt aus EVI-02.
+      EVI: older
+        ? {
+            key: "EVI-01",
+            lower:
+              "Wenn dir eine Möglichkeit spontan gefällt, beschreibst du die gezielte Suche nach Gegenargumenten als eher unwahrscheinlich.",
+            middle:
+              "Bei einem spontanen Favoriten hängt die Suche nach Gegenargumenten für dich von der Situation ab.",
+            upper:
+              "Auch wenn dir eine Möglichkeit spontan gefällt, suchst du nach eigener Einschätzung eher gezielt nach Gegenargumenten.",
+          }
+        : {
+            key: "EVI-02",
+            lower:
+              "Hängt euer nächster Schritt an einer unsicheren Vermutung, beschreibst du ein gezieltes Überprüfen vor der Festlegung als eher unwahrscheinlich.",
+            middle:
+              "Ob du eine unsichere Vermutung vor der Festlegung gezielt überprüfst, hängt für dich von der Situation ab.",
+            upper:
+              "Hängt euer nächster Schritt an einer unsicheren Vermutung, überprüfst du sie nach eigener Einschätzung eher gezielt, bevor ihr euch festlegt.",
+          },
+      EXP: older
+        ? {
+            key: "EXP-01",
+            lower:
+              "Ein vertrautes Muster, das du noch nicht erklären kannst, nimmst du zunächst eher wenig ernst.",
+            middle:
+              "Ein vertrautes Muster, das du noch nicht erklären kannst, nimmst du teilweise als Hinweis auf.",
+            upper:
+              "Ein vertrautes Muster nimmst du eher ernst, auch wenn du noch nicht genau erklären kannst, woher der Eindruck kommt.",
+          }
+        : {
+            key: "EXP-01",
+            lower:
+              "Kommt dir ein neues Vorgehen sofort bekannt vor, ohne dass du es schon begründen kannst, beeinflusst dieser erste Eindruck deine Einschätzung eher wenig.",
+            middle:
+              "Kommt dir ein neues Vorgehen sofort bekannt vor, fließt dieser erste Eindruck teilweise in deine Einschätzung ein.",
+            upper:
+              "Kommt dir ein neues Vorgehen sofort bekannt vor, beeinflusst dieser erste Eindruck deine Einschätzung eher stark, auch wenn du ihn noch nicht begründen kannst.",
+          },
       EL: {
         key: "EL-01",
         lower:
@@ -329,6 +376,10 @@ export function individualAreas(profile: ProductProfile) {
           ? responseBand(profile, detail.key) === "A"
             ? "Einen grundsätzlich funktionierenden Plan änderst du eher erst, wenn Abweichungen relevant werden."
             : "Einen grundsätzlich funktionierenden Plan passt du eher schon bei kleineren Veränderungen an."
+          : area.key === "EVI" && !older
+            ? responseBand(profile, detail.key) === "A"
+              ? "Sprechen nach einer Entscheidung neue Informationen dagegen, nimmst du sie eher direkt wieder auf und prüfst, ob du umsteuerst."
+              : "Sprechen nach einer Entscheidung neue Informationen dagegen, bleibst du eher zunächst dabei und prüfst, ob sie schwer genug wiegen."
           : area.key === "EXP"
             ? `In einem vertrauten Thema beziehst du deine Erfahrung bei fehlenden Informationen „${detailChoice.label}“ ein.`
             : area.key === "AMB"
@@ -352,8 +403,9 @@ export type PatternCategory =
   | "DISCUSSION_POINT"
   | "INSUFFICIENT_DATA";
 export function teamPatterns(people: ProductMember[]) {
+  const all = people.length ? productItemsFor(people[0].workstyle) : PRODUCT_ITEMS;
   return AREAS.map((area) => {
-    const items = PRODUCT_ITEMS.filter((i) => i.area_key === area.key);
+    const items = all.filter((i) => i.area_key === area.key);
     const shared = items.filter((i) =>
       people.every((p) => responseBand(p.workstyle, i.item_key) !== null),
     );
@@ -428,10 +480,10 @@ export function teamPatterns(people: ProductMember[]) {
 
 /** DISPLAY ONLY, never persisted or used by interpretation/matching:
  * lower ordinal median = an actually selected category, no interpolation.
- * Only homogeneous ordinal formats per area. EXP seriousness and all FC are excluded.
+ * Only homogeneous ordinal formats per area. EXP seriousness (v3) and all FC are excluded.
  * At least half of eligible items (and at least two) must be present. No missing imputation. */
 export function displayPosition(profile: ProductProfile, area: AreaKey) {
-  const items = PRODUCT_ITEMS.filter(
+  const items = productItemsFor(profile).filter(
     (i) =>
       i.area_key === area &&
       !["comparative", "behavioral", "seriousness"].includes(i.response_format),

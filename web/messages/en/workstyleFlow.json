@@ -130,5 +130,7 @@
   "entry_sharing": "Taking part does not share your responses with the team.",
   "entry_previous": "Open previous participation",
   "entry_earlier": "Open earlier participation",
-  "progress": "Progress"
+  "progress": "Progress",
+  "v4_previous_version_note": "We have revised the questions. Your previous workstyle profile stays visible to you. For your team, sharing, and FIND, only the new version counts from now on.",
+  "go_to_current_version": "Answer the new version"
 }

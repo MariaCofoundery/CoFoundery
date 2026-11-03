@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import {
   AREAS,
   PRODUCT_ITEMS,
+  PRODUCT_ITEMS_V3,
   teamPatterns,
   type AreaKey,
   type ProductMember,
@@ -35,9 +36,9 @@ function profile(id: string, fallback: V, overrides: Record<string, V> = {}): Pr
   return {
     person_id: id,
     assessment_id: `a-${id}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v3",
-    manifest_version: "3.0.0",
-    item_version: "8.4-v0.4",
+    instrument_id: "founder-workstyle-pretest-8-5a-v4",
+    manifest_version: "4.0.0",
+    item_version: "v4.0",
     completed_at: "2026-10-05",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = i.item_key in overrides ? overrides[i.item_key] : fallback;
@@ -151,13 +152,19 @@ test("mixed erzeugt keine Richtung, insufficient keine Deutung", () => {
 
 test("Missing wird nie als Mitte behandelt", () => {
   // 3 x oben + 2 x Missing: ALL, nicht MOST - Missing ist keine "teils/teils"-Ausnahme.
-  const p = withArea("EVI", [5, 4, 5, null, null]);
-  assert.deepEqual(areaPattern(p, "EVI"), { kind: "direction", band: "upper", strength: "all", exception: null });
-  const n = areaNarrative(p, "EVI");
+  // (Seit v4 hat EXP fuenf gleichformatige Fragen, EVI nur noch zwei.)
+  const p = withArea("EXP", [5, 4, 5, null, null]);
+  assert.deepEqual(areaPattern(p, "EXP"), { kind: "direction", band: "upper", strength: "all", exception: null });
+  const n = areaNarrative(p, "EXP");
   assert.equal(n.missing, 2);
   assert.equal(n.exception, null);
   // 2 x oben + 3 x Missing reicht nicht (mindestens drei beantwortete Situationen).
-  assert.equal(areaPattern(withArea("EVI", [5, 5, null, null, null]), "EVI").kind, "insufficient");
+  assert.equal(areaPattern(withArea("EXP", [5, 5, null, null, null]), "EXP").kind, "insufficient");
+  // EVI: eine von zwei Skalenfragen reicht nicht, auch wenn die Zweierwahlen beantwortet sind.
+  const evi = areaNarrative(withArea("EVI", [5, null], 5), "EVI");
+  assert.equal(evi.pattern.kind, "insufficient");
+  assert.equal(evi.itemNotes.length, 3);
+  assert.match(evi.core, /Zu unsicheren Annahmen und widersprüchlichen Quellen liegen zu wenige Antworten vor/);
   // Team: eine fehlende Antwort nimmt die Situation aus dem Vergleich, statt sie als Mitte zu werten.
   const people: TeamMemberInput[] = [
     { person_id: "1", name: "A", profile: profile("1", 5) },
@@ -168,13 +175,24 @@ test("Missing wird nie als Mitte behandelt", () => {
   assert.ok(f.situations.every((s) => s.item !== "EVI-01"));
 });
 
-test("EXP-01 und ORG-Zweierwahlen werden nicht mit anderen Formaten verrechnet", () => {
-  const exp = profile("1", 3, { "EXP-02": 5, "EXP-03": 5, "EXP-04": 4, "EXP-06": 5, "EXP-01": 1 });
+test("Zweierwahlen (EVI, ORG) werden nicht mit Skalen verrechnet; EXP-01 zaehlt seit v4 zur Richtung", () => {
+  // v4: EXP-01 ist eine Einfluss-Frage wie EXP-02 bis -06.
+  const exp = profile("1", 3, { "EXP-01": 5, "EXP-02": 5, "EXP-03": 5, "EXP-04": 4, "EXP-06": 5 });
   const n = areaNarrative(exp, "EXP");
-  assert.equal(n.claim, "EXP.DIRECTION.UPPER.ALL", "das andere Format kippt die Richtung nicht");
-  assert.match(n.itemNotes.map((x) => x.text).join(" "), /„gar nicht ernst“/);
-  assert.ok(!patternItems("EXP").some((i) => i.item_key === "EXP-01"));
-  assert.ok(!patternItems("ORG").some((i) => i.response_format === "comparative"));
+  assert.equal(n.claim, "EXP.DIRECTION.UPPER.ALL");
+  assert.deepEqual(n.itemNotes, []);
+  assert.deepEqual(patternItems("EXP").map((i) => i.item_key).sort(), ["EXP-01", "EXP-02", "EXP-03", "EXP-04", "EXP-06"]);
+  assert.equal(areaNarrative(profile("1", 3, { "EXP-01": 1, "EXP-02": 5, "EXP-03": 5, "EXP-04": 4, "EXP-06": 5 }), "EXP").pattern.kind, "mixed");
+  // v4: EVI-01/-03/-05 sind Zweierwahlen; die Richtung tragen nur EVI-02 und EVI-06.
+  assert.deepEqual(patternItems("EVI").map((i) => i.item_key), ["EVI-02", "EVI-06"]);
+  const evi = areaNarrative(profile("3", 5, { "EVI-01": "a", "EVI-03": "B", "EVI-05": "A" }), "EVI");
+  assert.equal(evi.claim, "EVI.DIRECTION.UPPER.ALL");
+  assert.match(evi.core, /unsicheren Annahme oder widersprechen sich seriöse Quellen/);
+  assert.doesNotMatch(evi.core, /Gegenargument/, "EVI-01 ist keine Skalenfrage mehr");
+  assert.deepEqual(evi.itemNotes.map((x) => x.claim), ["EVI.ITEM.EVI-01", "EVI.ITEM.EVI-03", "EVI.ITEM.EVI-05"]);
+  assert.match(evi.itemNotes[0].text, /deutlich eher vor der Festlegung gezielt nach Gegenargumenten/);
+  assert.match(evi.itemNotes[1].text, /bleibst du eher zunächst dabei/);
+  for (const area of AREAS.map((a) => a.key)) assert.ok(!patternItems(area).some((i) => i.response_format === "comparative"), area);
   const org = profile("2", 5, { "ORG-03": "a", "ORG-04": "b", "ORG-07": "A", "ORG-08": "B" });
   const o = areaNarrative(org, "ORG");
   assert.equal(o.claim, "ORG.DIRECTION.UPPER.ALL");
@@ -305,4 +323,20 @@ test("Situations-Punkte: dieselben Antworten wie Richtung und Spannweite - nicht
   assert.match(src, /dots=\{many \? \[\] : situationDots\(p\.profile, area\.key, locale\)\}/);
   assert.match(src, /<ul className="sr-only">/);
   assert.doesNotMatch(src.replace("no overall score or ranking", ""), /radar|spider|score|Prozent/i);
+});
+
+test("der eigene Bericht der frueheren Fassung (v3) liest weiter nach v3-Regeln", () => {
+  const v3: ProductProfile = {
+    person_id: "v3", assessment_id: "a-v3", instrument_id: "founder-workstyle-pretest-8-5a-v3", manifest_version: "3.0.0", item_version: "8.4-v0.4", completed_at: "2026-10-05",
+    answers: PRODUCT_ITEMS_V3.map((i) => ({ item_key: i.item_key, item_version: i.item_version, missing_reason: null,
+      value: i.response_format === "comparative" ? { optionId: "lean_b" } : { scale: i.item_key === "EXP-01" ? 1 : 5 } })),
+  };
+  // v3: EXP-01 ("seriousness") bleibt eine Einzelantwort, EVI-01/-03/-05 sind Skalen.
+  const exp = areaNarrative(v3, "EXP");
+  assert.equal(exp.claim, "EXP.DIRECTION.UPPER.ALL");
+  assert.match(exp.itemNotes.map((x) => x.text).join(" "), /„gar nicht ernst“/);
+  const evi = areaNarrative(v3, "EVI");
+  assert.equal(evi.claim, "EVI.DIRECTION.UPPER.ALL");
+  assert.match(evi.core, /Du suchst nach Gegenargumenten/);
+  assert.deepEqual(evi.itemNotes, []);
 });

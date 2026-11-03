@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   PRODUCT_ITEMS,
+  PRODUCT_ITEMS_V3,
   AREAS,
   displayPosition,
   rawChoice,
@@ -24,9 +25,9 @@ const member = (n: number, value = 4): ProductMember => ({
   workstyle: {
     person_id: String(n),
     assessment_id: `a${n}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v3",
-    manifest_version: "3.0.0",
-    item_version: "8.4-v0.4",
+    instrument_id: "founder-workstyle-pretest-8-5a-v4",
+    manifest_version: "4.0.0",
+    item_version: "v4.0",
     completed_at: "2026-10-04",
     answers: PRODUCT_ITEMS.map((i) => ({
       item_key: i.item_key,
@@ -213,13 +214,10 @@ test("overview is a lower ordinal median of eligible core answers, with no missi
     ["EXP-02", "EXP-03", "EXP-04", "EXP-06"].includes(a.item_key),
   );
   [1, 2, 4, 5].forEach((scale, n) => (exp[n].value = { scale }));
-  assert.equal(displayPosition(p, "EXP")?.value, 2);
-  p.answers.find((a) => a.item_key === "EXP-01")!.value = { scale: 5 };
-  assert.equal(
-    displayPosition(p, "EXP")?.value,
-    2,
-    "different seriousness format excluded",
-  );
+  // Seit v4 ist EXP-01 eine Einfluss-Frage und zaehlt mit (hier 4).
+  assert.equal(displayPosition(p, "EXP")?.value, 4);
+  p.answers.find((a) => a.item_key === "EXP-01")!.value = { scale: 1 };
+  assert.equal(displayPosition(p, "EXP")?.value, 2, "EXP-01 shares the influence format since v4");
   exp.slice(0, 3).forEach((a) => {
     a.value = null;
     a.missing_reason = "cannot_assess";
@@ -231,4 +229,28 @@ test("overview is a lower ordinal median of eligible core answers, with no missi
     null,
     "FC does not replace missing ordinal evidence",
   );
+});
+
+test("v3 stays readable for the owner only: valid profile, never part of a team, no version mix", () => {
+  const v3 = {
+    ...member(9).workstyle,
+    instrument_id: "founder-workstyle-pretest-8-5a-v3",
+    manifest_version: "3.0.0",
+    item_version: "8.4-v0.4",
+    answers: PRODUCT_ITEMS_V3.map((i) => ({ item_key: i.item_key, item_version: i.item_version, value: i.response_format === "comparative" || i.response_format === "behavioral" ? { optionId: "lean_b" } : { scale: 4 }, missing_reason: null })),
+  };
+  assert.equal(validProductProfile(v3), true);
+  assert.equal(individualAreas(v3).length, 6);
+  // v4 answers under a v3 identity (or the reverse) are rejected, no silent fallback.
+  assert.equal(validProductProfile({ ...member(9).workstyle, instrument_id: v3.instrument_id, manifest_version: "3.0.0", item_version: "8.4-v0.4" }), false);
+  assert.equal(validProductProfile({ ...v3, instrument_id: "founder-workstyle-pretest-8-5a-v4", manifest_version: "4.0.0", item_version: "v4.0" }), false);
+  const t = team(2);
+  t.people[1] = { ...t.people[1], workstyle: { ...v3, person_id: t.people[1].person_id } };
+  assert.equal(validProductTeam(t), false, "a team never mixes versions");
+  t.people[0] = { ...t.people[0], workstyle: { ...v3, person_id: t.people[0].person_id } };
+  assert.equal(validProductTeam(t), false, "teams compare the current version only");
+  // v4 EVI observation comes from EVI-02, the comparative EVI-03 is described as a choice.
+  const evi = individualAreas(member(1).workstyle).find((a) => a.key === "EVI")!;
+  assert.match(evi.observation, /unsicheren Vermutung/);
+  assert.match(evi.observation, /bleibst du eher zunächst dabei/);
 });

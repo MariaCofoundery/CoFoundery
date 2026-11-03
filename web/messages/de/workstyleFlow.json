@@ -130,5 +130,7 @@
   "entry_sharing": "Die Teilnahme erteilt keine Teamfreigabe.",
   "entry_previous": "Vorherige Teilnahme öffnen",
   "entry_earlier": "Frühere Teilnahme öffnen",
-  "progress": "Fortschritt"
+  "progress": "Fortschritt",
+  "v4_previous_version_note": "Wir haben die Fragen überarbeitet. Dein bisheriges Arbeitsprofil bleibt für dich sichtbar. Für dein Team, Freigaben und FIND zählt ab jetzt nur die neue Fassung.",
+  "go_to_current_version": "Neue Fassung beantworten"
 }

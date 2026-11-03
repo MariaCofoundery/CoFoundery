@@ -3,6 +3,7 @@ import { workstyleAreas, reportText } from "./display";
 import { workstyleDisplayItem, workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
 import {
   PRODUCT_ITEMS,
+  productItemsFor,
   rawChoice,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
@@ -44,7 +45,7 @@ export function WorkstyleSignature({
             <h4 className="mb-3 text-base font-semibold">
               {people.length === 1 ? area.title : area.team}
             </h4>
-            {PRODUCT_ITEMS.filter((i) => i.area_key === area.key).map(
+            {(people.length ? productItemsFor(people[0].profile) : PRODUCT_ITEMS).filter((i) => i.area_key === area.key).map(
               (item) => {
                 const displayItem = workstyleDisplayItem(item, locale);
                 const options = workstyleDisplayOptions(item, locale);

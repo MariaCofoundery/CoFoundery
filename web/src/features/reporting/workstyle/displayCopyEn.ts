@@ -13,7 +13,7 @@ export const SITUATIONS_EN: Record<string, string> = {
   "EVI-03": "reconsidering a decision when clear contrary information emerges",
   "EVI-05": "reviewing your assessment when someone raises a counterpoint you can understand",
   "EVI-06": "investigating a disagreement between reliable sources",
-  "EXP-01": "taking a familiar impression seriously before you can explain it",
+  "EXP-01": "letting a first \"I know this\" impression shape your view of a new approach",
   "EXP-02": "drawing on experience when a solution looks convincing on paper",
   "EXP-03": "drawing on experience when two options look equally good",
   "EXP-04": "drawing on experience with a problem you have encountered repeatedly",
@@ -35,6 +35,10 @@ export const SITUATIONS_EN: Record<string, string> = {
   "ORG-02": "setting your own checkpoints for longer tasks",
 };
 export const PREFERENCES_EN: Record<string, { context: string; A: string; B: string }> = {
+  // v4: EVI-01, -03 and -05 are A/B choices.
+  "EVI-01": { context: "When one of several options immediately appeals to you most", A: "you {preference} look for counterarguments before committing", B: "you {preference} start with your favorite and watch for solid reasons against it along the way" },
+  "EVI-03": { context: "When new information argues against a decision you have made", A: "you {preference} reopen the decision right away and check whether to change course", B: "you {preference} stick with it for now and check whether the information carries enough weight" },
+  "EVI-05": { context: "When someone on the team raises a point that makes sense", A: "you {preference} go through it right away and question your own assessment", B: "you {preference} stick with your assessment for now and look for further evidence" },
   "ORG-03": { context: "When several important tasks compete", A: "you {preference} keep several moving in parallel", B: "you {preference} focus on fewer tasks and let others wait" },
   "ORG-04": { context: "When a task takes longer than expected", A: "you {preference} finish it as planned first", B: "you {preference} adjust your remaining plan early" },
   "ORG-07": { context: "When an important new request arrives during focused work", A: "you {preference} interrupt your work and take care of it", B: "you {preference} stay with your current work" },
@@ -50,7 +54,8 @@ export const POLES_EN = {
 };
 export const COPY_EN = {
   EVI: {
-    direction: { upper: "When a decision is coming up, you prefer to take another close look: you look for counterarguments, check uncertain assumptions, and follow up on information that points the other way.", lower: "Once you've made an assessment, you tend to let it stand. In these situations, deliberately looking for counterarguments or investigating contrary information is less likely to be your next step.", middle: "In most situations, you leave it open whether you would review an assessment again: sometimes yes, sometimes no." },
+    // v4: only EVI-02 (uncertain assumption) and EVI-06 (conflicting sources) carry the direction.
+    direction: { upper: "When your next step hinges on an uncertain assumption or reliable sources contradict each other, you prefer to take another close look before you commit.", lower: "When your next step hinges on an uncertain assumption or reliable sources contradict each other, checking more closely is less likely to be your next step.", middle: "Whether you check an uncertain assumption or conflicting sources more closely, you tend to leave open: sometimes yes, sometimes no." },
     mixedBy: { both: "You let some assessments stand and take another close look at others.", upper: "Some things you take another close look at; on others you don't lean either way.", lower: "Some assessments you tend to let stand; on others you don't lean either way." },
     short: { upper: "You prefer another close look.", lower: "You tend to keep the first assessment.", middle: "Usually somewhere in between." },
     bands: { upper: "Here you tend to check again", middle: "Here it depends", lower: "Here you tend to let it stand" },
@@ -95,7 +100,7 @@ export const COPY_EN = {
 };
 export const TEAM_EN = {
   EVI: {
-    similar: { upper: { text: "You {all} prefer another close look before a decision is final.", question: "How do you decide when information remains incomplete, and who starts putting the decision into practice?" }, lower: { text: "You {all} tend to let the first assessment stand rather than deliberately look for counterarguments.", question: "How do you recognize when a decision should be revisited?" } },
+    similar: { upper: { text: "You {all} prefer another close look before a decision is final.", question: "How do you decide when information remains incomplete, and who starts putting the decision into practice?" }, lower: { text: "You {all} tend not to check uncertain assumptions or conflicting sources more closely before deciding.", question: "How do you recognize when a decision should be revisited?" } },
     differs: { summary: "In some situations your responses are close, and in others you would respond differently. This is most visible when it comes to revisiting a decision.", text: "When deciding together, one person may want to check an assessment again while another wants to move forward. You may see differently when a decision is final. These approaches could complement each other if you agree in advance when to revisit a decision.", question: "What new information would lead you to revisit a decision, and who can initiate that?" },
     card: { label: "Decisions", question: "When do we revisit a decision, and when do we deliberately let it stand?" },
   },
@@ -131,3 +136,6 @@ export const ORG_DIFFERS_EN: Record<string, { summary: string; text: string; que
   "ORG-04": { summary: "When a task takes longer than expected, you would take different approaches: finish it as planned first or adjust the plan early.", text: "When a task takes longer than expected, one person may finish it as planned first while another adjusts the remaining plan early. You may differ on when to rearrange the shared plan.", question: "When do you rearrange a shared plan if a task takes longer, and who raises this?" },
   "ORG-08": { summary: "When smaller things turn out differently than planned, you would adjust the plan at different points.", text: "With smaller deviations, one person may adjust the plan early while another waits until the deviations matter. You may differ on when a change affects the shared plan.", question: "At what point does a deviation affect your shared plan, and who raises it?" },
 };
+
+/** Earlier version (v3): EVI-01, -03 and -05 were likelihood questions and part of the direction. */
+export const EVI_DIRECTION_V3_EN = { upper: "When a decision is coming up, you prefer to take another close look: you look for counterarguments, check uncertain assumptions, and follow up on information that points the other way.", lower: "Once you've made an assessment, you tend to let it stand. In these situations, deliberately looking for counterarguments or investigating contrary information is less likely to be your next step.", middle: "In most situations, you leave it open whether you would review an assessment again: sometimes yes, sometimes no." };

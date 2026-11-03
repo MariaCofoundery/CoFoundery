@@ -12,6 +12,7 @@ import {
 import {
   areaPattern,
   individualNarratives,
+  patternItems,
   teamAreaFinding,
   type TeamMemberInput,
 } from "@/features/reporting/workstyle/narrative";
@@ -35,9 +36,9 @@ function profile(id: string, fallback: number, overrides: Values = {}): ProductP
   return {
     person_id: id,
     assessment_id: `a-${id}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v3",
-    manifest_version: "3.0.0",
-    item_version: "8.4-v0.4",
+    instrument_id: "founder-workstyle-pretest-8-5a-v4",
+    manifest_version: "4.0.0",
+    item_version: "v4.0",
     completed_at: "2026-10-04",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = overrides[i.item_key] ?? fallback;
@@ -55,7 +56,8 @@ function profile(id: string, fallback: number, overrides: Values = {}): ProductP
 }
 
 const person = (id: string, name: string, p: ProductProfile): TeamMemberInput => ({ person_id: id, name, profile: p });
-const evi = PRODUCT_ITEMS.filter((i) => i.area_key === "EVI").map((i) => i.item_key);
+// Seit v4 tragen nur EVI-02 und EVI-06 die Richtung; EVI-01/-03/-05 sind Zweierwahlen.
+const evi = patternItems("EVI").map((i) => i.item_key);
 
 /** Alles, was ein Bericht an Text erzeugt - fuer die Negativpruefungen. */
 function allText(people: TeamMemberInput[]) {
@@ -71,7 +73,7 @@ function allText(people: TeamMemberInput[]) {
 }
 
 test("ein gemischtes Antwortmuster bekommt keine Richtung, sondern die Situationen", () => {
-  const p = profile("1", 3, { [evi[0]]: 1, [evi[1]]: 5, [evi[2]]: 1, [evi[3]]: 5 });
+  const p = profile("1", 3, { [evi[0]]: 1, [evi[1]]: 5 });
   const pattern = areaPattern(p, "EVI");
   assert.equal(pattern.kind, "mixed");
   const n = individualNarratives(p).find((x) => x.area.key === "EVI")!.narrative;

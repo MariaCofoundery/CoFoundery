@@ -2,6 +2,7 @@ import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { getInvitationJoinDecision } from "@/features/reporting/actions";
 import { logInviteFlowDebug } from "@/features/onboarding/inviteFlowDebug";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 
 type InvitationJoinMode = "needs_questionnaires" | "choice_existing_or_update" | "report_ready";
 export type InvitationContinueLabelKey =
@@ -66,7 +67,7 @@ export function buildInvitationQuestionnaireHref(
  * einem Fragebogen, den er nicht gesucht hat.
  */
 export function buildInvitationAlignHref(invitationId: string) {
-  return `/research/workstyle-pretest?version=8.5a-v3&invitationId=${encodeURIComponent(invitationId)}`;
+  return `${CURRENT_WORKSTYLE_HREF}&invitationId=${encodeURIComponent(invitationId)}`;
 }
 
 export function buildInvitationStartHref(invitationId: string) {

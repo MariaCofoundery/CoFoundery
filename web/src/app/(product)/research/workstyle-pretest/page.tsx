@@ -7,6 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import { WorkstylePretestV2 } from "@/features/instruments/workstyle/WorkstylePretestV2";
 import { WorkstyleProfileFlow } from "@/features/instruments/workstyle/WorkstyleProfileFlow";
+import { WorkstyleV4Flow } from "@/features/instruments/workstyle/WorkstyleV4Flow";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
@@ -21,8 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function WorkstylePretestPage({ searchParams }: { searchParams: Promise<{ version?: string; invitationId?: string; teil?: string }> }) {
   const [locale, t] = await Promise.all([getRequestLocale(), getTranslations("workstyleFlow")]);
   const query = await searchParams;
-  const version = query.version ?? "8.5a-v3";
-  if (!["8.5a-v1", "8.5a-v2", "8.5a-v3"].includes(version)) notFound();
+  const version = query.version ?? CURRENT_WORKSTYLE_VERSION;
+  if (!["8.5a-v1", "8.5a-v2", "8.5a-v3", "8.5a-v4"].includes(version)) notFound();
   const { data: { user } } = await getRequestUser();
   // Phase 10 - Cutover: Fruehere Fassungen nur noch fuer Menschen, die dort
   // schon eine Teilnahme haben (HISTORICAL). Alle anderen - auch ohne
@@ -39,6 +40,17 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
     ? { teamId, partnerNames: (team?.members ?? []).filter(m => m.userId !== user.id).map(m => m.displayName ?? "Founder") }
     : null;
   const research = version === "8.5a-v3" && query.teil === "forschung";
+  // Aktuelle Fassung: nur die 29 Produktfragen, kein Forschungsteil.
+  if (version === "8.5a-v4") {
+    const [session, previous] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v3")]) : [null, null];
+    return <main lang={locale} className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">
+      <h1 className="text-3xl font-semibold">{t("entry_title")}</h1>
+      {teamId && <p className="mt-4"><Link className="underline" href={`/teams/${teamId}/workstyle`}>{t("entry_back")}</Link> · {t("entry_sharing")}</p>}
+      {user ? <WorkstyleV4Flow initialSession={session} context={completionContext} previousVersion={Boolean(previous?.submitted_at)} />
+        : <div className="mt-6 space-y-4"><p>{t("entry_intro")}</p><p>{t("entry_answer")}</p><p>{t("entry_no_right")}</p><Link className="underline" href={`/login?next=${encodeURIComponent(`/research/workstyle-pretest?version=${version}`)}`}>{t("entry_login")}</Link></div>}
+      {previous && !previous.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v3">{t("entry_previous")}</Link></p>}
+    </main>;
+  }
   if (version === "8.5a-v2" || version === "8.5a-v3") {
     const [session, historical, historicalV2] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v1"), version === "8.5a-v3" ? getMyWorkstylePretest("8.5a-v2") : Promise.resolve(null)]) : [null, null, null];
     return <main lang={locale} className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">

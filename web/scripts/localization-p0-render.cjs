@@ -27,8 +27,8 @@ const {IndividualWorkstyle} = require(path.resolve('web/src/features/reporting/w
 const {TeamWorkstyleReport} = require(path.resolve('web/src/features/reporting/workstyle/TeamWorkstyleReport.tsx'));
 const {PRODUCT_ITEMS, validProductProfile, validProductTeam} = require(path.resolve('web/src/features/reporting/workstyle/model.ts'));
 const member = (n, scale = 4) => ({person_id: String(n), name: `Person ${n}`, capabilities: [], alignment: null,
-  workstyle: {person_id: String(n), assessment_id: `audit-${n}`, instrument_id: 'founder-workstyle-pretest-8-5a-v3',
-    manifest_version: '3.0.0', item_version: '8.4-v0.4', completed_at: '2026-10-04',
+  workstyle: {person_id: String(n), assessment_id: `audit-${n}`, instrument_id: 'founder-workstyle-pretest-8-5a-v4',
+    manifest_version: '4.0.0', item_version: 'v4.0', completed_at: '2026-10-04',
     answers: PRODUCT_ITEMS.map(i => ({item_key: i.item_key, item_version: i.item_version,
       value: i.response_format === 'comparative' ? {optionId: scale < 3 ? 'lean_a' : 'lean_b'} : {scale}, missing_reason: null}))}});
 const people = [member(1), member(2, 1)];
@@ -48,7 +48,7 @@ const {readAnswer} = require(path.resolve('web/src/features/instruments/v21/read
 const {individualNarratives, teamAreaFinding} = require(path.resolve('web/src/features/reporting/workstyle/narrative.ts'));
 const german = /[äöüßÄÖÜ]|\b(?:oder|noch|von|zum|zur|wird|werden|sind|bitte|Deine|Dein|Euer|Eure|Antworten|Einwände|Bereich|Bereiche|keine|nicht|möchte|Frage|Fragen|Vorgehen|Erfahrung|Verantwortung|Unterschiedliche|Ähnliche|Vorhaben|Anliegen|Zusammenspiel)\b/;
 const noGerman = (text, label) => assert.doesNotMatch(text, german, label);
-for (const item of [...workstyleSessionItems('8.5a-v3', null), ...REVISED_RESEARCH_ITEMS]) {
+for (const item of [...workstyleSessionItems('8.5a-v3', null), ...workstyleSessionItems('8.5a-v4', null), ...REVISED_RESEARCH_ITEMS]) {
   const before = JSON.stringify(item), en = workstyleDisplayItem(item, 'en');
   noGerman(en.prompt, item.item_key);
   en.alternatives?.forEach(a => noGerman(a.label, item.item_key));

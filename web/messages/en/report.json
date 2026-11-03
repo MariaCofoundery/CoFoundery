@@ -172,6 +172,11 @@
       "individualTitle": "Individual people and advisors",
       "individualIntro": "With individual contacts and advisors, you can still share how you work one by one and hide specific questions. Within a team, the team share always applies, so nothing can be hidden individually there."
     },
-    "moreActions": "More"
+    "moreActions": "More",
+    "olderVersion": {
+      "title": "Earlier version",
+      "body": "This report is based on the earlier version of the workstyle profile. It stays visible to you and to no one else. For your team, sharing, and FIND, only the new version with revised questions counts.",
+      "cta": "Answer the new version"
+    }
   }
 }

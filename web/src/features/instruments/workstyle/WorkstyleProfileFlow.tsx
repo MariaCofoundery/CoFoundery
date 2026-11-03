@@ -12,10 +12,11 @@ import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext }
 import { WorkstyleFeedback } from "@/features/instruments/workstyle/WorkstylePretest";
 import type { PretestSession, ResearchContext } from "@/features/instruments/workstyle/data";
 import { researchConsentDocument } from "@/features/instruments/workstyle/researchConsent";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import type { AppLocale } from "@/i18n/config";
 
 /**
- * Aktueller Ablauf (8.5a-v3).
+ * Frueherer Ablauf (8.5a-v3), seit v4 nur fuer bestehende Teilnahmen.
  *
  * Phase 11.6C: Der Einstieg bietet zwei gleichwertige Wege -
  * - "Nur mein Arbeitsprofil": 29 Core-Situationen, ohne Forschungseinwilligung;
@@ -105,7 +106,6 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
   // Nach "Los geht's" sofort zur ersten Frage - auch bevor es eine Antwort gibt.
   const [started, setStarted] = useState(false);
   const [consent, setConsent] = useState(false);
-  const [confirmRetake, setConfirmRetake] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
   const [feedbackDone, setFeedbackDone] = useState(Boolean(initialSession?.feedback));
   const [error, setError] = useState("");
@@ -299,17 +299,8 @@ export function WorkstyleProfileFlow({ initialSession, part = "profile", context
       <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
         {!session.consent_version && !session.withdrawn_at && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("support_research_later")}</Link>}
         {consented && !mixed && openResearch > 0 && <Link href={RESEARCH_HREF} className="min-h-11 py-3 underline">{t("continue_development_questions_m093")}</Link>}
-        {!confirmRetake ? <button className="min-h-11 underline" onClick={() => setConfirmRetake(true)}>{t("answer_the_workstyle_questions_again_later")}</button>
-          : <div className="w-full rounded-2xl border border-slate-200 bg-white p-4 leading-6">
-            <p>{t("you_will_answer_the_situations_again_your")}</p>
-            <div className="mt-3 flex flex-wrap gap-3">
-              <button className={secondary} disabled={pending} onClick={() => run(async () => {
-                const result = await startWorkstyleProduct(true); if (!result.ok) return setError(serverError(result.error));
-                setSession(result.session); setPosition(0); setConfirmRetake(false); setChoice(null); setConsent(false); setStarted(false);
-              })}>{t("start_again")}</button>
-              <button className={secondary} onClick={() => setConfirmRetake(false)}>{t("cancel_m097")}</button>
-            </div>
-          </div>}
+        {/* Seit v4 wird diese Fassung nicht neu begonnen: neu beantwortet wird die aktuelle Fassung. */}
+        <Link href={CURRENT_WORKSTYLE_HREF} className="min-h-11 py-3 underline">{t("go_to_current_version")}</Link>
       </div>
     </>}
   </section>;

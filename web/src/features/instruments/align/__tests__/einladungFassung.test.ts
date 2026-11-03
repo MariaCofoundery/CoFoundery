@@ -39,7 +39,7 @@ test("die aktuelle Einladung führt zum bestehenden Team oder v0.4", () => {
   // den er nicht gesucht hat.
   assert.match(
     flow,
-    /return `\/research\/workstyle-pretest\?version=8.5a-v3&invitationId=\$\{encodeURIComponent\(invitationId\)\}`;/,
+    /return `\$\{CURRENT_WORKSTYLE_HREF\}&invitationId=\$\{encodeURIComponent\(invitationId\)\}`;/,
   );
 });
 

@@ -1,6 +1,7 @@
 import { getRequestLocale } from "@/i18n/getLocale";
 import { alignmentDisplayText } from "@/features/instruments/align/display";
 import Link from "next/link";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 
 /**
  * Die Wege innerhalb der neuen Fassung.
@@ -60,7 +61,7 @@ export async function AlignNav({
     {
       href: state.profileSubmitted
         ? "/me/profile/workstyle"
-        : "/research/workstyle-pretest?version=8.5a-v3",
+        : CURRENT_WORKSTYLE_HREF,
       label: copy("Wie du arbeitest"),
       // Beide Seiten desselben Bogens gelten als derselbe Ort.
       matches: (path: string) => path.startsWith("/research/workstyle-pretest") || path === "/me/profile/workstyle",

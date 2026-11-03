@@ -1,3 +1,5 @@
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
+
 export type FounderWorkProfileState = "new" | "legacy" | "started" | "completed";
 
 /** Presentation only: completion stays defined by the existing submission flow. */
@@ -13,5 +15,5 @@ export function resolveFounderWorkProfileState(input: {
 }
 
 export function founderWorkProfileHref(state: FounderWorkProfileState): string {
-  return state === "completed" ? "/me/profile/workstyle" : "/research/workstyle-pretest?version=8.5a-v3";
+  return state === "completed" ? "/me/profile/workstyle" : CURRENT_WORKSTYLE_HREF;
 }

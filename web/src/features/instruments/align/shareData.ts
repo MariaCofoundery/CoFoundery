@@ -3,6 +3,7 @@ import "server-only";
 import type { AssessmentScope } from "@/features/instruments/align/registries";
 import { INSTRUMENT_OF } from "@/features/instruments/align/reportData";
 import type { ShareRecipient } from "@/features/instruments/align/ShareForm";
+import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -74,7 +75,7 @@ export async function getShareState(
     .from("assessments")
     .select("id")
     .eq("user_id", userId)
-    .eq("instrument_id", scope === "workstyle" ? "founder-workstyle-pretest-8-5a-v3" : INSTRUMENT_OF[scope])
+    .eq("instrument_id", scope === "workstyle" ? CURRENT_WORKSTYLE_INSTRUMENT : INSTRUMENT_OF[scope])
     .not("submitted_at", "is", null)
     .order("created_at", { ascending: false })
     .limit(1);

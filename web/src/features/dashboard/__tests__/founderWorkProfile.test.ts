@@ -50,8 +50,8 @@ const hooks = registerHooks({
 const { AlignWorkstyleStatus } = await import("@/features/instruments/align/AlignCard");
 const { getAlignDashboardState } = await import("@/features/instruments/align/dashboardData");
 hooks.deregister();
-function assessment(id: string, instrument = "founder-workstyle-pretest-8-5a-v3", submitted: string | null = null, created = "2026-10-01"): Row {
-  return { id, user_id: "own", instrument_id: instrument, module: instrument === "founder-workstyle-pretest-8-5a-v3" ? "founder_profile" : "base", submitted_at: submitted, created_at: created };
+function assessment(id: string, instrument = "founder-workstyle-pretest-8-5a-v4", submitted: string | null = null, created = "2026-10-01"): Row {
+  return { id, user_id: "own", instrument_id: instrument, module: instrument === "founder-workstyle-pretest-8-5a-v4" ? "founder_profile" : "base", submitted_at: submitted, created_at: created };
 }
 for (const locale of ["de", "en"]) for (const state of ["new", "legacy", "started", "completed"] as const) {
   test(`${locale}: actual dashboard reader and card render ${state}`, async () => {

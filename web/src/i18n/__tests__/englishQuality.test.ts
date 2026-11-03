@@ -20,7 +20,7 @@ const FILES = [
   "src/features/instruments/align/display.en.json", "src/features/instruments/align/displayOptions.en.json",
   "src/features/instruments/align/cards.en.json", "src/features/instruments/align/cardsLegacy.en.json",
   "src/features/instruments/align/screens.profile.en.json", "src/features/instruments/align/screens.venture.en.json",
-  "src/features/instruments/workstyle/display.en.json",
+  "src/features/instruments/workstyle/display.en.json", "src/features/instruments/workstyle/display.v4.en.json",
 ];
 
 function entries(file: string) {
