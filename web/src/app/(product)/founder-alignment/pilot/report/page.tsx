@@ -16,7 +16,9 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 /**
  * Der eigene Bericht zu v2.1 - sichtbar, aber nicht ausgeliefert.
  *
- * In Production 404, wie alle Seiten unter `debug`.
+ * Bewusst auch in Production erreichbar (keine 404): Das ist der einzige Ort,
+ * an dem v2.1-Freigaben eingesehen und widerrufen werden koennen. Erreichbar
+ * ueber den Archivblock im Dashboard (VersionArchiveCard) und /founder-alignment/versionen.
  */
 
 export default async function ReportV21Page() {

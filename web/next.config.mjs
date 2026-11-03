@@ -10,6 +10,8 @@ const nextConfig = {
     // would stick in browser caches long after these paths stop mattering.
     return [
       { source: "/network", destination: "/connect", permanent: false },
+      // Fruehere statische Beispielseite (sprach von "Kompatibilitaet"); alte Links landen auf der Startseite.
+      { source: "/beispiel-auswertung", destination: "/", permanent: false },
       { source: "/network/:path*", destination: "/connect/:path*", permanent: false },
     ];
   },

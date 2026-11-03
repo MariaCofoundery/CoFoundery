@@ -32,10 +32,14 @@ test("account route is owner-only, uses the shared delete UI, and loads no produ
   // `notification_opt_outs` "diese Art nicht" heisst. Zwei Tabellen, weil die
   // ABWESENHEIT einer Zeile das eine Mal ja und das andere Mal nein bedeutet;
   // beides sind Kontoangaben und keine Produktdaten.
+  //
+  // DAZU AM 03.11.2026: Die offenen Einladungen zaehlt die Seite jetzt in
+  // `invitations`; `participants` war seit Februar 2026 geloescht, der Zaehler
+  // stand dadurch immer auf 0.
   const tables = [...page.matchAll(/\.from\("([^"]+)"\)/g)].map((match) => match[1]);
   assert.deepEqual(
     [...new Set(tables)].sort(),
-    ["notification_opt_ins", "notification_opt_outs", "participants", "person_core"],
+    ["invitations", "notification_opt_ins", "notification_opt_outs", "person_core"],
     "die Kontoseite laedt etwas anderes als Kontoangaben"
   );
 });

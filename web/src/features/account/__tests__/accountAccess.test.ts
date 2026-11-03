@@ -95,9 +95,12 @@ test("offene Einladungen an die alte Adresse werden vorher genannt", () => {
   );
 
   const page = source(PAGE);
-  assert.match(page, /\.from\("participants"\)/);
-  assert.match(page, /\.is\("user_id", null\)/, "auch schon angenommene Einladungen wuerden gezaehlt");
-  assert.match(page, /\.eq\("invited_email"/);
+  // Die heutige Einladungstabelle; participants gibt es seit Februar 2026 nicht mehr.
+  assert.match(page, /\.from\("invitations"\)/);
+  assert.doesNotMatch(page, /\.from\("participants"\)/);
+  assert.match(page, /\.is\("invitee_user_id", null\)/, "auch schon zugeordnete Einladungen wuerden gezaehlt");
+  assert.match(page, /\.is\("accepted_at", null\)\s*\.is\("revoked_at", null\)\s*\.gt\("expires_at"/, "nur wirklich offene Einladungen");
+  assert.match(page, /\.eq\("invitee_email"/);
 
   assert.match(source(SECTION), /pendingInvitations > 0 \?/);
   for (const locale of ["de", "en"]) {

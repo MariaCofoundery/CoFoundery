@@ -79,19 +79,23 @@ export default async function AccountPage({
       .then(({ data }) => data ?? [])
       .catch((): { kind: string }[] => []),
     getResearchConsentState(supabase, user.id).catch(() => "unknown" as const),
-    // Offene Einladungen an die AKTUELLE Adresse. Die Policy auf participants
-    // ordnet ueber die Mailadresse im Token zu - nach einem Wechsel greift sie
-    // nicht mehr. Die Zeilen sind durch genau diese Policy sichtbar, es
-    // braucht also keinen privilegierten Zugriff.
+    // Offene Einladungen an die AKTUELLE Adresse. Die Policy auf invitations
+    // (invitations_select_invitee) ordnet ueber die Mailadresse zu - nach einem
+    // Wechsel greift sie nicht mehr. Die Zeilen sind durch genau diese Policy
+    // sichtbar, es braucht also keinen privilegierten Zugriff. (Bis 03.11.2026
+    // stand hier die seit Februar geloeschte Tabelle participants: immer 0.)
     Promise.resolve(
       supabase
-        .from("participants")
+        .from("invitations")
         .select("id", { count: "exact", head: true })
-        .is("user_id", null)
+        .is("invitee_user_id", null)
+        .is("accepted_at", null)
+        .is("revoked_at", null)
+        .gt("expires_at", new Date().toISOString())
         // Ausdruecklich, obwohl die Policy dasselbe tut: Eine Abfrage, deren
         // Ergebnis sich erst aus der Zeilensicherheit ergibt, liest sich beim
-        // naechsten Mal wie ein Fehler.
-        .eq("invited_email", (user.email ?? "").trim().toLowerCase())
+        // naechsten Mal wie ein Fehler. invitee_email ist per Constraint klein und getrimmt.
+        .eq("invitee_email", (user.email ?? "").trim().toLowerCase())
     )
       .then(({ count }) => count ?? 0)
       .catch(() => 0),
