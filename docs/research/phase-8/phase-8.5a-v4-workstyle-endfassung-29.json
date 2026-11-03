@@ -1,0 +1,226 @@
+[
+ {
+  "key": "ORG-01",
+  "format": "likelihood",
+  "prompt": "Bei einem größeren Vorhaben: Wie wahrscheinlich ist es, dass du dir zuerst die nächsten konkreten Schritte zurechtlegst, bevor du ins Machen kommst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "ORG-02",
+  "format": "likelihood",
+  "prompt": "Eine Aufgabe läuft über mehrere Wochen und niemand setzt dir Zwischentermine. Wie wahrscheinlich ist es, dass du dir selbst Zwischenziele setzt, an denen du prüfst, wo du stehst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "ORG-03",
+  "format": "comparative",
+  "prompt": "Mehrere wichtige Aufgaben konkurrieren gleichzeitig um deine Aufmerksamkeit. Was beschreibt deine Arbeitsweise eher?",
+  "alternatives": [
+   "Ich halte mehrere Themen parallel in Bewegung, damit nichts ganz stehen bleibt.",
+   "Ich konzentriere mich auf wenige Dinge und akzeptiere, dass anderes warten muss."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "ORG-04",
+  "format": "comparative",
+  "prompt": "Eine Aufgabe dauert deutlich länger als gedacht. Was beschreibt deine Arbeitsweise eher?",
+  "alternatives": [
+   "Ich ziehe die begonnene Aufgabe erst wie geplant zu Ende durch, bevor ich den Zeitplan neu sortiere.",
+   "Ich passe meinen Zeitplan früh an die Verzögerung an, bevor ich weitermache."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "ORG-07",
+  "format": "comparative",
+  "prompt": "Du arbeitest gerade konzentriert an einem wichtigen Thema und eine ebenfalls wichtige neue Anfrage kommt rein. Was beschreibt dich eher?",
+  "alternatives": [
+   "Ich unterbreche relativ schnell und kümmere mich direkt um das Neue.",
+   "Ich halte erst an dem fest, woran ich gerade arbeite, und schiebe das Neue nach hinten."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "ORG-08",
+  "format": "comparative",
+  "prompt": "Dein Plan funktioniert grundsätzlich noch, aber mehrere kleinere Dinge laufen anders als gedacht. Was beschreibt dich eher?",
+  "alternatives": [
+   "Ich ändere meinen Plan erst, wenn die Abweichungen wirklich spürbar ins Gewicht fallen.",
+   "Ich passe meinen Plan lieber schon bei kleineren Veränderungen laufend an."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "EXP-01",
+  "format": "influence",
+  "prompt": "Jemand schlägt euch ein neues Vorgehen vor. Du hast sofort das Gefühl: ‚Das kenne ich, so etwas habe ich schon einmal erlebt‘ – kannst es im Moment aber noch nicht genau begründen. Wie stark beeinflusst dieser erste Eindruck deine Einschätzung?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EXP-02",
+  "format": "influence",
+  "prompt": "Ein Konzept wirkt auf dem Papier schlüssig, aber deine Erfahrung aus früheren Situationen lässt dich zögern. Wie stark beeinflusst diese Vorerfahrung dein Urteil über den Plan?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EXP-03",
+  "format": "influence",
+  "prompt": "Zwei Optionen wirken rein sachlich gleich gut. Bei einer davon hast du jedoch ein starkes Wiedererkennen aus früheren Situationen. Wie stark gibt diese persönliche Erfahrung den Ausschlag für deine Wahl?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EXP-04",
+  "format": "influence",
+  "prompt": "Du stehst vor einer Herausforderung, die du in ähnlicher Form schon mehrfach erlebt hast. Wie stark greifst du auf diese Erfahrungen zurück, um einzuschätzen, worauf es diesmal ankommt?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EXP-06",
+  "format": "influence",
+  "prompt": "Ihr müsst eine Entscheidung treffen, für die euch noch einige Informationen fehlen. Du kennst das Themenfeld aber sehr gut. Wie stark stützt du dich bei deiner Wahl auf dein eigenes Erfahrungswissen?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EVI-01",
+  "format": "comparative",
+  "prompt": "Du hast drei Möglichkeiten vor dir und eine davon gefällt dir spontan am besten. Was beschreibt dich eher?",
+  "alternatives": [
+   "Ich suche vor der Festlegung gezielt nach Gegenargumenten, um Schwächen früh zu sehen.",
+   "Ich starte mit meinem Favoriten, um voranzukommen, und achte unterwegs darauf, ob handfeste Gründe dagegen auftauchen."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "EVI-02",
+  "format": "likelihood",
+  "prompt": "Euer nächster Schritt steht und fällt mit einer Vermutung, bei der ihr euch noch nicht sicher seid. Wie wahrscheinlich ist es, dass du sie gezielt überprüfst, bevor ihr euch festlegt?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EVI-03",
+  "format": "comparative",
+  "prompt": "Du hast dich entschieden. Kurz darauf tauchen neue Informationen auf, die gegen deine Entscheidung sprechen. Was beschreibt dich eher?",
+  "alternatives": [
+   "Ich nehme die Entscheidung direkt wieder auf und prüfe, ob ich umsteuern sollte.",
+   "Ich bleibe zunächst bei der Entscheidung und prüfe, ob die neuen Informationen schwer genug wiegen, um umzusteuern."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "EVI-05",
+  "format": "comparative",
+  "prompt": "Jemand im Team sieht eine Sache anders als du und bringt einen nachvollziehbaren Punkt ein. Was beschreibt dich eher?",
+  "alternatives": [
+   "Ich gehe den Punkt direkt durch und hinterfrage meine eigene Einschätzung.",
+   "Ich bleibe zunächst bei meiner Einschätzung und suche nach weiteren Hinweisen, die den Punkt stützen oder entkräften."
+  ],
+  "unchanged": false
+ },
+ {
+  "key": "EVI-06",
+  "format": "likelihood",
+  "prompt": "Zwei Quellen, die du grundsätzlich für seriös hältst, widersprechen sich bei einer wichtigen Frage. Wie wahrscheinlich ist es, dass du genauer prüfst, woher der Unterschied kommt?",
+  "alternatives": null,
+  "unchanged": true
+ },
+ {
+  "key": "VOICE-01",
+  "format": "likelihood",
+  "prompt": "Ihr seid euch bei einer Entscheidung im Team eigentlich schon einig. Dir fällt aber noch ein Punkt auf, der dagegen spricht. Wie wahrscheinlich ist es, dass du ihn trotzdem noch ansprichst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "VOICE-02",
+  "format": "likelihood",
+  "prompt": "Du erfährst etwas, das für eure gemeinsame Arbeit wichtig ist, aber die Stimmung im Team belasten könnte. Wie wahrscheinlich ist es, dass du es zeitnah zur Sprache bringst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "VOICE-03",
+  "format": "likelihood",
+  "prompt": "Ein schwieriges Thema wurde vertagt und danach nicht wieder aufgegriffen. Für dich ist aber noch etwas Wichtiges offen. Wie wahrscheinlich ist es, dass du das Thema selbst wieder auf den Tisch bringst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "VOICE-04",
+  "format": "likelihood",
+  "prompt": "Eine Entscheidung wird getroffen, die du fachlich für falsch hältst. Wie wahrscheinlich ist es, dass du im Team sagst, dass du die Lage anders einschätzt?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "VOICE-05",
+  "format": "likelihood",
+  "prompt": "Die Runde möchte ein Thema abschließen, aber für dich ist ein wichtiger Punkt noch offen. Wie wahrscheinlich ist es, dass du sagst, dass du noch nicht so weit bist?",
+  "alternatives": null,
+  "unchanged": true
+ },
+ {
+  "key": "AMB-01",
+  "format": "ambiguity_discomfort",
+  "prompt": "Du bekommst zu einer neuen Idee unterschiedliche Rückmeldungen und kannst noch nicht einschätzen, welches Feedback relevanter ist. Wie unangenehm ist das für dich?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "AMB-02",
+  "format": "ambiguity_discomfort",
+  "prompt": "Ein Problem tritt auf und es gibt mehrere plausible Erklärungen, aber vorerst keine Möglichkeit herauszufinden, welche wirklich stimmt. Wie unangenehm ist diese Unklarheit für dich?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "AMB-04",
+  "format": "ambiguity_discomfort",
+  "prompt": "Ihr analysiert ein Problem, aber jede neue Information macht das Gesamtbild nur noch verworrener und wirft weitere Fragen auf. Wie unangenehm ist das für dich?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "AMB-05",
+  "format": "ambiguity_discomfort",
+  "prompt": "Ihr müsst mit einem Thema weiterarbeiten, obwohl eine wichtige Frage noch offen ist. Wie unangenehm ist das für dich?",
+  "alternatives": null,
+  "unchanged": true
+ },
+ {
+  "key": "EL-01",
+  "format": "likelihood",
+  "prompt": "Du schwankst zwischen zwei Wegen und beide lassen sich im Kleinen ausprobieren. Wie wahrscheinlich ist es, dass du erst etwas testest, bevor du dich festlegst?",
+  "alternatives": null,
+  "unchanged": true
+ },
+ {
+  "key": "EL-02",
+  "format": "likelihood",
+  "prompt": "Ihr habt im Team zwei plausible Ansätze und kommt im Gespräch nicht wirklich weiter. Beide ließen sich mit wenig Aufwand ausprobieren. Wie wahrscheinlich ist es, dass du einen konkreten Test vorschlägst?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EL-04",
+  "format": "likelihood",
+  "prompt": "Du bist unsicher, wie der Markt auf ein neues Feature oder Angebot reagiert. Wie wahrscheinlich ist es, dass du potenziellen Nutzern frühzeitig eine einfache erste Version zeigst (z. B. eine Skizze oder einen Dummy), anstatt es intern fertig auszuarbeiten?",
+  "alternatives": null,
+  "unchanged": false
+ },
+ {
+  "key": "EL-05",
+  "format": "likelihood",
+  "prompt": "Ein erster Versuch bringt keine klare Antwort. Wie wahrscheinlich ist es, dass du gezielt einen Punkt veränderst und es noch einmal probierst?",
+  "alternatives": null,
+  "unchanged": false
+ }
+]
