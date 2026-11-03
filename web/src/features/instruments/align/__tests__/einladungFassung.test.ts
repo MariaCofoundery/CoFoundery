@@ -69,9 +69,11 @@ test("die Auskunft über eine fremde Person ist eng zugeschnitten", () => {
 test("nach dem Einstieg wird nicht anders entschieden als beim Einstieg", () => {
   // Die Abschlussseite schickte bei `needs_questionnaires` immer in den alten
   // Bogen - derselbe Weg mit zwei Zielen.
+  // Seit 03.11.2026 entscheidet die Abschlussseite gar nicht mehr selbst: Sie
+  // leitet auf den Einstieg (/join/start) weiter, der dann entscheidet.
   const done = lies("src", "app", "(product)", "invite", "[sessionId]", "done", "page.tsx");
-  assert.match(done, /ziel\.labelKey === "align"/);
-  assert.match(done, /resolveInvitationContinueTarget\(invitationId\)/);
+  assert.match(done, /redirect\(`\/join\/start\?invitationId=\$\{encodeURIComponent\(sessionId\)\}`\)/);
+  assert.doesNotMatch(done, /resolveInvitationContinueTarget|ensureReportRunForInvitation|applyExistingInvitationProfileChoice/);
 });
 
 test("Phase 10: keine Einladung fuehrt mehr in die bisherige Fassung", () => {
