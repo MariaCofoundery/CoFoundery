@@ -142,12 +142,13 @@ select pg_temp.ok((select r from w4) between 0 and 7 and (select submitted_at is
 select pg_temp.ok((select jsonb_array_length(public.get_workstyle_product_profile(pg_temp.person(4))->'answers') from (select pg_temp.act(4)) x)=29,'32.C: report input has exactly 29 core answers');
 insert into public.founder_teams(id,name,team_context) values('e8581000-0000-4000-8000-000000000001','Wave team','existing_team');
 insert into public.founder_team_members(team_id,user_id) values('e8581000-0000-4000-8000-000000000001',pg_temp.person(4)),('e8581000-0000-4000-8000-000000000001',pg_temp.person(1));
+-- Seit v4 ist ein v3-Profil kein aktuelles Arbeitsprofil mehr und laesst sich nicht teilen.
 do $$ begin
  perform pg_temp.act(4); execute 'set local role authenticated';
- perform public.share_workstyle_product(pg_temp.person(1));
+ begin perform public.share_workstyle_product(pg_temp.person(1)); raise exception 'v3 profile shared'; exception when check_violation then null; end;
  execute 'reset role';
 end $$;
-select pg_temp.ok(exists(select 1 from public.alignment_shares where assessment_id=(select assessment from w_people where n=4) and recipient_user_id=pg_temp.person(1)),'32.D: partial research does not block sharing');
+select pg_temp.ok(not exists(select 1 from public.alignment_shares where assessment_id=(select assessment from w_people where n=4) and recipient_user_id=pg_temp.person(1)),'32.D: since v4 a v3 profile can no longer be shared');
 select pg_temp.ok((select public.get_workstyle_product_profile(pg_temp.person(4))::text from (select pg_temp.act(4)) x) !~ '(DEC-|FS-|EVI-R1|VOICE-R1|AMB-06|EXP-05|ORG-0[56]|EL-03r|EL-06r|EVI-04r|EXP-R1|VOICE-06|AMB-03|AMB-R1)','no research item in the product profile');
 
 -- Forschungsabschluss Welle 1 = 8 Set-Items (nicht 23).

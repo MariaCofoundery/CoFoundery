@@ -15,10 +15,10 @@ insert into public.founder_team_members(team_id,user_id) select 'e9511000-0000-4
 do $$ declare p record;i record;id uuid;begin
  for p in select * from discovery_people where n<=4 loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
   update discovery_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
-   perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,case when i.definition->>'response_format' not in ('comparative','behavioral') then case when p.n=2 then 5 else 1 end end,case when i.definition->>'response_format' in ('comparative','behavioral') then i.definition->'options'->0->>'option_id' end,null,nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
+   perform public.save_workstyle_v4(id,i.item_key,i.item_version,case when i.definition->>'response_format'<>'comparative' then case when p.n=2 then 5 else 1 end end,case when i.definition->>'response_format'='comparative' then i.definition->'options'->0->>'option_id' end,null,nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
@@ -80,10 +80,11 @@ do $$begin
  begin perform public.open_discovery_workstyle_team('e9514000-0000-4000-8000-000000000001');raise exception 'foreign start accepted';exception when insufficient_privilege then null;end;
 end $$;
 reset role;
--- A newer incompatible completion blocks an older v0.4 profile; never fall back.
+-- Only v4 counts: a newer historical completion does not replace the current v4 profile
+-- (cross-version pairs are covered in workstyle_pretest_v4).
 insert into public.assessments(user_id,module,instrument_id,submitted_at,created_at) values('e9510000-0000-4000-8000-000000000002','founder_profile','founder-workstyle-pretest-8-5a-v2',now(),now()+interval '1 day');
 set local role authenticated;
-select pg_temp.check_discovery((select count(*)=0 from public.get_discovery_workstyle_signals('e9510000-0000-4000-8000-000000000002')),'no fallback across versions');
+select pg_temp.check_discovery((select count(*)=6 from public.get_discovery_workstyle_signals('e9510000-0000-4000-8000-000000000002')),'newer historical completion does not replace v4');
 select set_config('request.jwt.claims','{"sub":"e9510000-0000-4000-8000-000000000005","role":"authenticated"}',true);
 select pg_temp.check_discovery((select count(*)=0 from public.get_discovery_workstyle_signals('e9510000-0000-4000-8000-000000000001')),'outsider without own consent denied');
 reset role;

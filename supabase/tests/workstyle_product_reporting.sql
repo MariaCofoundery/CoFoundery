@@ -15,10 +15,10 @@ insert into public.founder_team_members(team_id,user_id) select 'e8541000-0000-4
 do $$ declare p record;i record;id uuid;begin
  for p in select * from report_people where n<=4 loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
   update report_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
-   perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
+   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
@@ -139,7 +139,7 @@ set local role authenticated;
 select pg_temp.check_report(public.get_workstyle_product_team('e8541000-0000-4000-8000-000000000001')->>'status'='not_ready','hidden core not ready');
 select pg_temp.check_report(public.get_workstyle_product_snapshot(current_setting('report.snapshot')::uuid) is null,'snapshot cannot bypass new exclusions');
 reset role;
--- Newest completed historical instrument is not silently replaced by older v3.
+-- Only v4 is current: a later completed historical instrument never replaces it.
 select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000004","role":"authenticated"}',true);
 do $$declare aid uuid;i record;begin
  aid:=(public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
@@ -148,9 +148,27 @@ do $$declare aid uuid;i record;begin
  update public.assessments set created_at=clock_timestamp()+interval '1 minute' where public.assessments.id=aid;
 end $$;
 set local role authenticated;
-select pg_temp.check_report(public.get_workstyle_product_profile(auth.uid()) is null,'no older version fallback');
+select pg_temp.check_report(public.get_workstyle_product_profile(auth.uid())->>'assessment_version'='8.5a-v4','newer historical completion does not replace v4');
 select pg_temp.check_report(not has_table_privilege('authenticated','public.workstyle_product_snapshots','SELECT'),'snapshots RPC only');
 reset role;
-select extensions.pass('workstyle product reporting: 2/3/4, grants, snapshots, exclusions and version isolation');
+-- A v3 profile is an older version: readable by its owner only, never through a share.
+select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000006","role":"authenticated"}',true);
+do $$declare aid uuid;i record;begin
+ aid:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+ for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
+  perform public.save_workstyle_pretest_v3(aid,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+ end loop;
+ update report_people set assessment=aid where n=6;
+end $$;
+insert into public.alignment_shares(assessment_id,recipient_user_id) select assessment,'e8540000-0000-4000-8000-000000000001' from report_people where n=6;
+set local role authenticated;
+select pg_temp.check_report((select p->>'assessment_version'='8.5a-v3' and p->>'item_version'='8.4-v0.4' and jsonb_array_length(p->'answers')=29
+ from public.get_workstyle_product_profile(auth.uid()) p),'own v3 report stays readable as older version');
+reset role;
+select set_config('request.jwt.claims','{"sub":"e8540000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+set local role authenticated;
+select pg_temp.check_report(public.get_workstyle_product_profile('e8540000-0000-4000-8000-000000000006') is null,'v3 profile not visible through a directed share');
+reset role;
+select extensions.pass('workstyle product reporting: 2/3/4, grants, snapshots, exclusions, v4 current and v3 owner-only');
 select * from extensions.finish();
 rollback;

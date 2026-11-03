@@ -24,10 +24,10 @@ create temp table aa_assessment(n integer,id uuid);
 do $$ declare n integer; i record; id uuid; begin
  for n in 1..3 loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',pg_temp.p(n),'role','authenticated')::text,true);
-  id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
   insert into aa_assessment values(n,id);
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
-   perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
+   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;

@@ -19,16 +19,15 @@ insert into public.founder_teams(id,name,team_context) values
 insert into public.founder_team_members(team_id,user_id) select 'e8771000-0000-4000-8000-000000000001',person from ts_people where n<=2;
 insert into public.founder_team_members(team_id,user_id) select 'e8771000-0000-4000-8000-000000000002',person from ts_people where n in(1,6);
 insert into public.founder_team_members(team_id,user_id) select 'e8771000-0000-4000-8000-000000000003',person from ts_people where n in(7,8);
--- Aktuelle v0.4-Profile fuer 1-4 und 7-8 ueber die echte Schreibgrenze, mit
--- Forschungseinwilligung (Forschungsantworten existieren, duerfen aber nie
--- im Teamkontext erscheinen).
+-- Aktuelle v4-Profile fuer 1-4 und 7-8 ueber die echte Schreibgrenze (v4 hat
+-- keinen Forschungsteil).
 do $$ declare p record;i record;id uuid;begin
  for p in select * from ts_people where n in(1,2,3,4,7,8) loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
   update ts_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
-   perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
+   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
@@ -141,11 +140,12 @@ select pg_temp.check_team(pg_temp.caps_for(1,2) @> '[{"area_id":"fundraising","a
 select pg_temp.check_team(jsonb_array_length(pg_temp.disclosed_for(1,2,'discovery'))=0 and jsonb_array_length(pg_temp.disclosed_for(1,2,'connect'))=0 and jsonb_array_length(pg_temp.disclosed_for(1,2,'team'))=0,'C: FIND/CONNECT (and the context-free team ladder) still follow capability_disclosure');
 select pg_temp.check_team(exists(select 1 from jsonb_array_elements(pg_temp.team_for(1)->'people') p, jsonb_array_elements(p->'capabilities') c
  where p->>'person_id'=(select person::text from ts_people where n=2) and c->>'ownership_wish'='own'),'C: team report carries capability depth');
--- Forschung nie: nur 29 Core-Antworten, keine Forschungs-Items, Forschungstabelle fuer Mitglieder unsichtbar.
+-- Forschung nie: nur die 29 aktuellen v4-Core-Antworten, v4 hat keine Forschungsantworten, Forschungstabelle fuer Mitglieder unsichtbar.
 select pg_temp.check_team(not exists(select 1 from jsonb_array_elements(pg_temp.team_for(1)->'people') p where jsonb_array_length(p->'workstyle'->'answers')<>29),'C: only 29 core answers');
 select pg_temp.check_team(not exists(select 1 from jsonb_array_elements(pg_temp.team_for(1)->'people') p, jsonb_array_elements(p->'workstyle'->'answers') a
- join public.workstyle_item_versions i on i.item_key=a->>'item_key' and i.assessment_version='8.5a-v3' where i.definition->>'usage'<>'core'),'C: no research item in team report');
-select pg_temp.check_team(exists(select 1 from public.workstyle_research_responses r where r.assessment_id=(select assessment from ts_people where n=1)),'C: research answers exist for the fixture');
+ where not exists(select 1 from public.workstyle_item_versions i where i.instrument_id='founder-workstyle-pretest-8-5a-v4'
+  and i.item_key=a->>'item_key' and i.item_version=a->>'item_version' and i.definition->>'usage'='core')),'C: only current v4 core items in team report');
+select pg_temp.check_team(not exists(select 1 from public.workstyle_research_responses r where r.assessment_id=(select assessment from ts_people where n=1)),'C: v4 fixture has no research answers');
 select pg_temp.check_team(not has_table_privilege('authenticated','public.workstyle_research_responses','select'),'C: research table not readable by clients at all');
 -- FIND bleibt unberuehrt.
 select pg_temp.check_team(not exists(select 1 from public.founder_search_preferences where user_id in(select person from ts_people where n<=2) and workstyle_discovery_enabled),'C: no FIND opt-in from team share');

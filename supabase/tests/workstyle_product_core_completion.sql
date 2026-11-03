@@ -244,75 +244,27 @@ reset role;
 select pg_temp.ok(pg_temp.submitted(2) is not null and (pg_temp.session(2)).withdrawn_at is null
  and (select count(*)=29 from public.alignment_answers where assessment_id=(select assessment from core_people where n=2)),'I: research withdrawal never touches a product-only profile');
 
--- E) Core-Abschluss reicht fuer die Team-Bereitschaft.
-select pg_temp.ok(pg_temp.team(1,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready' and pg_temp.team(2,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','E: no shares, no team report');
-
--- Advisor fuer das Paar (Gruppenfreigabe beider Mitglieder).
+-- E/F) Seit v4 ist ein v3-Profil kein aktuelles Arbeitsprofil mehr. Auch mit
+-- gegenseitigen Freigaben, Advisor-Gruppen- und Personenfreigabe und FIND-Einwilligung
+-- sieht ausser der Person selbst niemand etwas. Die positiven Wege prueft v4
+-- (workstyle_team_mutual_readiness, advisor_access_integrity, workstyle_product_reporting).
 insert into public.advisor_team_reviews(id,advisor_user_id,requested_by_user_id,status,activated_at) values
- ('e8563000-0000-4000-8000-000000000001',pg_temp.person(5),pg_temp.person(5),'active',now()),
- ('e8563000-0000-4000-8000-000000000002',pg_temp.person(5),pg_temp.person(5),'active',now());
+ ('e8563000-0000-4000-8000-000000000001',pg_temp.person(5),pg_temp.person(5),'active',now());
 insert into public.advisor_team_review_members(review_id,subject_user_id,decision,decided_at) values
- ('e8563000-0000-4000-8000-000000000001',pg_temp.person(1),'approved',now()),('e8563000-0000-4000-8000-000000000001',pg_temp.person(2),'approved',now()),
- ('e8563000-0000-4000-8000-000000000002',pg_temp.person(1),'approved',now()),('e8563000-0000-4000-8000-000000000002',pg_temp.person(2),'approved',now()),('e8563000-0000-4000-8000-000000000002',pg_temp.person(6),'approved',now());
--- Phase 12C.1B: wie bei der Aktivierung an das Team mit exakt dieser Gruppe binden.
+ ('e8563000-0000-4000-8000-000000000001',pg_temp.person(1),'approved',now()),('e8563000-0000-4000-8000-000000000001',pg_temp.person(2),'approved',now());
 update public.advisor_team_reviews set team_id=public.advisor_team_review_matching_team(id),team_bound_at=now() where team_id is null and status='active';
-
--- Advisor C) Nur Personenfreigabe von 1: Einzelansicht ja, Teambericht nein.
-select pg_temp.share_with_advisor(1);
-select pg_temp.ok(jsonb_array_length(pg_temp.profile(5,1)->'answers')=29 and pg_temp.profile(5,2) is null,'Advisor C: person share allows only that individual view');
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','Advisor C: no team report from one person share');
--- Advisor A) Beide geben dem Advisor frei, aber nicht einander: niemand sieht den Teambericht.
-select pg_temp.share_with_advisor(2);
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready'
- and pg_temp.team(1,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready'
- and pg_temp.team(2,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','Advisor A: not mutual-ready -> no report for A, B or advisor');
-select pg_temp.share_with(1,2);
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready'
- and pg_temp.team(2,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','Advisor A: one-sided member share is still not ready, also for the advisor');
-select pg_temp.act(5);
-set local role authenticated;
-select pg_temp.ok(public.get_workstyle_team_share_readiness('e8561000-0000-4000-8000-000000000001') is null,'Advisor: no member-level readiness details');
-select pg_temp.ok(public.get_workstyle_team_inputs('e8561000-0000-4000-8000-000000000001')='{"status":"not_ready"}'::jsonb,'Advisor: legacy team adapter follows the same rule');
-reset role;
--- Advisor B / E) Gegenseitig bereit: dieselbe Grundlage fuer A, B und den Advisor.
-select pg_temp.share_with(2,1);
-select pg_temp.ok(pg_temp.team(1,'e8561000-0000-4000-8000-000000000001')->>'status'='ready'
- and pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='ready','Advisor B: mutual-ready -> members and advisor see the report');
-select pg_temp.ok(pg_temp.team_workstyle(1,'e8561000-0000-4000-8000-000000000001')=pg_temp.team_workstyle(2,'e8561000-0000-4000-8000-000000000001')
- and pg_temp.team_workstyle(1,'e8561000-0000-4000-8000-000000000001')=pg_temp.team_workstyle(5,'e8561000-0000-4000-8000-000000000001'),'Advisor B / E: identical workstyle input for both founders and the advisor');
-select pg_temp.ok((select count(*)=2 from jsonb_array_elements(pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->'people') p where jsonb_array_length(p->'workstyle'->'answers')=29),'E: product-only and research-withdrawn profiles both count with 29 core answers');
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')::text not like '%DEC-%' and pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')::text not like '%FS-%','no research items in the advisor team report');
-select pg_temp.act(5);
-set local role authenticated;
-create temp table advisor_snapshot as select public.create_workstyle_product_snapshot('e8561000-0000-4000-8000-000000000001',null) id;
-select pg_temp.ok(public.get_workstyle_product_snapshot((select id from advisor_snapshot)) is not null,'Advisor B: snapshot while ready');
-reset role;
--- Advisor E) Widerruf: weder Team noch Advisor haben einen aktuellen Teambericht.
-select pg_temp.act(2);
-set local role authenticated;
-select public.share_workstyle_product(pg_temp.person(1),'{}',true);
-reset role;
+select pg_temp.share_with_advisor(1); select pg_temp.share_with_advisor(2);
+insert into public.alignment_shares(assessment_id,recipient_user_id) values
+ ((select assessment from core_people where n=1),pg_temp.person(2)),((select assessment from core_people where n=2),pg_temp.person(1));
+select pg_temp.ok(pg_temp.profile(5,1) is null and pg_temp.profile(2,1) is null and jsonb_array_length(pg_temp.profile(1,1)->'answers')=29,'E: v3 profile is owner-only, also with person shares');
 select pg_temp.ok(pg_temp.team(1,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready'
- and pg_temp.team(2,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready'
- and pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','Advisor E: revoke hides the report for team and advisor');
-select pg_temp.act(5);
+ and pg_temp.team(5,'e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','E: mutual v3 shares give no team report, also not for the advisor');
+select pg_temp.act(1);
 set local role authenticated;
-select pg_temp.ok(public.get_workstyle_product_snapshot((select id from advisor_snapshot)) is null,'Advisor E: stored advisor snapshot is no longer served as current');
+select pg_temp.ok((select bool_and(not (m->>'has_current_workstyle')::boolean) from jsonb_array_elements(public.get_workstyle_team_share_readiness('e8561000-0000-4000-8000-000000000001')->'members') m),'E: a v3 profile is not a current work profile in readiness');
+select pg_temp.act(5);
+select pg_temp.ok(public.get_workstyle_team_inputs('e8561000-0000-4000-8000-000000000001')->>'status'='not_ready','E: legacy team adapter gives the advisor nothing either');
 reset role;
-select pg_temp.ok(jsonb_array_length(pg_temp.profile(5,2)->'answers')=29,'Advisor E: the separate person share to the advisor stays untouched');
-select pg_temp.share_with(2,1);
-
--- Advisor D) Drei Founder, die dritte Person fehlt: auch der Advisor sieht nichts.
-select pg_temp.share_with_advisor(6);
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000002')->>'status'='not_ready'
- and pg_temp.team(1,'e8561000-0000-4000-8000-000000000002')->>'status'='not_ready','Advisor D: third founder missing -> no report, also for the advisor');
-select pg_temp.share_with(6,1); select pg_temp.share_with(6,2);
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000002')->>'status'='not_ready','Advisor D: still missing shares to the third founder');
-select pg_temp.share_with(1,6); select pg_temp.share_with(2,6);
-select pg_temp.ok(pg_temp.team(5,'e8561000-0000-4000-8000-000000000002')->>'status'='ready'
- and pg_temp.team_workstyle(5,'e8561000-0000-4000-8000-000000000002')=pg_temp.team_workstyle(6,'e8561000-0000-4000-8000-000000000002'),'Advisor D: all three mutual -> advisor and members share one basis');
-
--- F) FIND-Workstyle mit Core-Abschluss ohne Forschung.
 insert into public.founder_discovery_profiles(user_id,status,display_name,headline,bio,own_roles,seeking_roles,industries,remote_mode,availability_hours_per_week,commitment_level,venture_stage,venture_goal,expertise)
 select person,'active','Core founder','Working together','-','{tech}','{sales}','{}','remote',20,'full_time','idea_validating','profitable_business','{}' from core_people where n in (2,6);
 select pg_temp.act(2);
@@ -322,7 +274,7 @@ reset role;
 select pg_temp.act(6);
 set local role authenticated;
 select public.set_discovery_workstyle_consent(true);
-select pg_temp.ok((select count(*)=6 from public.get_discovery_workstyle_signals(pg_temp.person(2))),'F: FIND workstyle signals work with core-only profiles');
+select pg_temp.ok((select count(*)=0 from public.get_discovery_workstyle_signals(pg_temp.person(2))),'F: no FIND signals from v3 profiles');
 reset role;
 
 -- Neu erheben: nur nach abgeschlossenem Arbeitsprofil, wieder ohne Einwilligung; das
@@ -331,6 +283,6 @@ create temp table before_retake as select pg_temp.profile(6,6)->>'assessment_id'
 select pg_temp.ok(pg_temp.start_product(6,true)::text<>(select id from before_retake),'retake creates a new participation');
 select pg_temp.ok((pg_temp.session(6)).consent_version is null and pg_temp.profile(6,6)->>'assessment_id'=(select id from before_retake),'retake: no inherited consent, previous profile stays current');
 
-select extensions.pass('product completion uses 29 core items; research optional, separate and consented; team report mutual also for advisors');
+select extensions.pass('v3 product completion uses 29 core items; research optional, separate and consented; since v4 the v3 profile is owner-only');
 select * from extensions.finish();
 rollback;

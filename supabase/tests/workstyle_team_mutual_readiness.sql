@@ -13,14 +13,14 @@ insert into mutual_people select n,('e8550000-0000-4000-8000-'||lpad(n::text,12,
 insert into public.profiles(user_id,display_name,roles) select person,'Mutual '||n,array['founder'] from mutual_people on conflict(user_id) do update set roles=excluded.roles,display_name=excluded.display_name;
 insert into public.founder_teams(id,name,team_context) values('e8551000-0000-4000-8000-000000000001','Mutual team','existing_team');
 insert into public.founder_team_members(team_id,user_id) select 'e8551000-0000-4000-8000-000000000001',person from mutual_people where n<=2;
--- Aktuelle v0.4-Profile fuer 1-3 ueber die echte Schreibgrenze; 4 hat keines.
+-- Aktuelle v4-Profile fuer 1-3 ueber die echte Schreibgrenze; 4 hat keines.
 do $$ declare p record;i record;id uuid;begin
  for p in select * from mutual_people where n<=3 loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_pretest('workstyle_research_v3','{"founder_experience":"1","team_size":"larger"}')->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
   update mutual_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where assessment_version='8.5a-v3' and definition->>'revision_of' is null order by position loop
-   perform public.save_workstyle_pretest_v3(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb),100,i.position=52);
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
+   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
