@@ -65,7 +65,6 @@ const ERLAUBT = [
   // eigenen Registry (`docs/venture-alignment-v2-beta1-registry.json`).
   join("src", "features", "modules", "ventureBeta") + sep,
   join("src", "features", "modules", "ui", "BetaFlow.tsx"),
-  join("src", "app", "(product)", "founder-alignment", "vergleich") + sep,
   join("src", "app", "(product)", "founder-alignment", "suche") + sep,
   // Das eigene Gesamtbild. Seit dem 30.09.2026 zeigt es das aktuelle
   // Arbeitsprofil statt des v1-Berichts - mit derselben Lesbarmachung wie
@@ -347,8 +346,8 @@ test("Gesprächskarten bekommen Namen und kein „Du“", () => {
   // „Du“ dort einzusetzen ergibt „Du sagt manchmal“ - beim Durchklicken am
   // 29.09.2026 genau so gesehen. Die Tabelle daneben darf „Du“ behalten:
   // dort ist es ein Spaltenkopf und kein Satz.
+  // (align/comparisonData.ts ist mit dem fruehen Paarvergleich am 03.11.2026 entfallen.)
   const dateien = [
-    join("src", "features", "instruments", "align", "comparisonData.ts"),
     join("src", "app", "(product)", "founder-alignment", "pilot", "compare", "[partnerId]", "page.tsx"),
   ];
   for (const datei of dateien) {

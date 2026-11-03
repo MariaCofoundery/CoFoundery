@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import { getItemsV22 } from "@/features/instruments/align/registries";
 import { alignmentDisplayEntry, alignmentDisplayText } from "@/features/instruments/align/display";
 import { readAnswer } from "@/features/instruments/v21/readoutV21";
-import { buildCards, CARD_LIBRARY } from "@/features/instruments/align/conversationCards";
 import { buildCardsV21, CARD_LIBRARY_V21 } from "@/features/instruments/v21/conversationCardsV21";
 import type { ItemComparison } from "@/features/instruments/v21/comparisonV21";
 
@@ -53,7 +52,8 @@ test("P0-04: partner interpolation localizes the owned template and preserves th
   assert.notEqual(alignmentDisplayText(r02.prompt,"en"), r02.prompt, "R02 hat keine EN-Fassung");
 });
 
-for (const [name, library, build] of [["current", CARD_LIBRARY, buildCards],["historical", CARD_LIBRARY_V21, buildCardsV21]] as const) {
+// Die Kartenbibliothek des fruehen Paarvergleichs (align/conversationCards) ist mit der Seite am 03.11.2026 entfallen.
+for (const [name, library, build] of [["historical", CARD_LIBRARY_V21, buildCardsV21]] as const) {
   test(`P0-06: ${name} discussion cards preserve selection/IDs while all copy is EN`, () => {
     for (const card of library.cards) {
       const id = "itemIds" in card.trigger ? card.trigger.itemIds[0] : "TEST";

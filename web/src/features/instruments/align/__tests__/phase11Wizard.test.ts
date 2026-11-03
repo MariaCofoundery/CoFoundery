@@ -223,11 +223,6 @@ test("Abschnittstitel ohne U/K-, S-, R- … Kuerzel - DE und EN; die Schluessel 
 });
 
 // ---------------------------------------------------------------------------
-// 7. Vergleich mit FIND-Kontakten: erst im gemeinsamen Vorhaben
+// 7. (entfallen am 03.11.2026) Der fruehe Paarvergleich /founder-alignment/vergleich
+// ist entfernt; der Vorhaben-Vergleich liegt heute im Team (/teams/[teamId]/vorhaben-beta).
 // ---------------------------------------------------------------------------
-test("der Vorhaben-Vergleich erscheint nur im gemeinsamen Vorhaben", () => {
-  const page = read("src", "app", "(product)", "founder-alignment", "vergleich", "[partnerId]", "page.tsx");
-  assert.match(page, /const vorhaben = venture && zusammenImVorhaben\s*\? await buildScopeComparison\(\s*"venture_alignment", auth\.user\.id, partnerId, venture\.id,/);
-  // Und die Antworten der anderen Person werden nur zu DIESEM Vorhaben gelesen.
-  assert.match(read("src", "features", "instruments", "align", "comparisonData.ts"), /await suche\.eq\("venture_id", ventureId\)\.maybeSingle\(\)/);
-});

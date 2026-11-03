@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-import { deepDiveLinks } from "@/features/instruments/align/deepDive";
 import { CURRENT_WORKSTYLE_INSTRUMENT, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import {
   CAPABILITY_MODULE,
@@ -351,12 +350,10 @@ test("Setup-Handoffs der Bestandsmodule entsprechen dem, was das Produkt heute v
   const heute = new Set(AREAS.map((area) => workstyleSetupHandoff(area.key)?.topic).filter(Boolean));
   assert.deepEqual(new Set(WORKSTYLE_MODULE.setupHandoff?.map((h) => h.target)), heute);
 
-  // Venture Alignment: Abschnittslinks auf der Paarvergleichsseite (alle Phasen).
-  const venture = new Set(deepDiveLinks("venture_alignment", "existing_team").map((link) => link.itemKey));
-  assert.deepEqual(new Set(VENTURE_CORE_MODULE.setupHandoff?.map((h) => h.target)), venture);
-
-  // Strengths, Capability, Direction: heute kein Handoff - die Registry erfindet keinen.
-  for (const def of [STRENGTHS_MODULE, CAPABILITY_MODULE, DIRECTION_MODULE]) {
+  // Strengths, Capability, Direction und seit 03.11.2026 auch Venture Alignment v1
+  // (die Paarvergleichsseite mit den Abschnittslinks ist entfernt): heute kein
+  // Handoff - die Registry erfindet keinen.
+  for (const def of [STRENGTHS_MODULE, CAPABILITY_MODULE, DIRECTION_MODULE, VENTURE_CORE_MODULE]) {
     assert.equal(def.setupHandoff, undefined, def.moduleId);
   }
 });

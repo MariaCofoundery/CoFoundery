@@ -12,6 +12,8 @@ const nextConfig = {
       { source: "/network", destination: "/connect", permanent: false },
       // Fruehere statische Beispielseite (sprach von "Kompatibilitaet"); alte Links landen auf der Startseite.
       { source: "/beispiel-auswertung", destination: "/", permanent: false },
+      // Frueherer Paarvergleich ("Testfassung", nirgends verlinkt); der heutige Vorhaben-Vergleich liegt im Team.
+      { source: "/founder-alignment/vergleich/:partnerId", destination: "/connections", permanent: false },
       { source: "/network/:path*", destination: "/connect/:path*", permanent: false },
     ];
   },

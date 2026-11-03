@@ -168,18 +168,10 @@ export const VENTURE_CORE_MODULE: ModuleDefinition = {
     profileCard: "me-profile:vorhaben",
     detail: "/founder-alignment/vorhaben/antworten",
   },
-  // Heute: Abschnittslinks auf der Paarvergleichsseite (`deepDiveLinks`).
-  setupHandoff: [
-    { target: "decision_rights", when: "always" },
-    { target: "communication", when: "always" },
-    { target: "time_commitment", when: "always" },
-    { target: "contributions_expenses", when: "always" },
-    { target: "conflict_deadlock", when: "always" },
-    { target: "personal_financial_risk", when: "always" },
-    { target: "outside_activities", when: "always" },
-    { target: "prolonged_absence", when: "always" },
-    { target: "changing_commitment", when: "always" },
-  ],
+  // Kein Setup-Handoff mehr: Die Abschnittslinks standen auf der fruehen
+  // Paarvergleichsseite (/founder-alignment/vergleich), die am 03.11.2026 entfernt
+  // wurde. Der heutige Vorhaben-Vergleich im Team (/teams/[teamId]/vorhaben-beta)
+  // gehoert zu einem anderen Instrument.
   i18n: { namespace: "modules" },
 };
 

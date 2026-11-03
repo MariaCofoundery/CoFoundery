@@ -98,7 +98,7 @@ test("an answer option reads the same in readouts, maps and discussion prompts",
     assert.equal(alignmentOptionText(item.prompt, "mittel", "en"), "Moderately", id);
   }
   // Maps and both card libraries use the prompt-aware mapping.
-  for (const file of ["src/features/instruments/align/AlignMaps.tsx", "src/features/instruments/align/conversationCards.ts", "src/features/instruments/v21/conversationCardsV21.ts"]) {
+  for (const file of ["src/features/instruments/align/AlignMaps.tsx", "src/features/instruments/v21/conversationCardsV21.ts"]) {
     const source = readFileSync(file, "utf8");
     assert.match(source, /alignmentOptionText\(/, file);
     assert.doesNotMatch(source, /alignmentDisplayText\((value\.label|v|label|row\.(ordinal|a|b)\.label)\b/, file);
