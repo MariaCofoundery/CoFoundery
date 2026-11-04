@@ -258,10 +258,13 @@ test("die eigenen Nachrichten, Sperren und Forschungsantworten sind im Export - 
   // obwohl es die eigenen Daten sind (Art. 15 und 20 DSGVO).
   const code = source("src/features/account/accountExport.ts");
   assert.match(code, /client\.rpc\("export_my_restricted_data"\)/);
-  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "team_check_in_reminders", "team_program_consents", "team_program_milestones", "team_program_org_data", "team_program_profiles", "team_program_updates", "workstyle_pretest_sessions", "workstyle_research_responses"]);
+  assert.deepEqual([...ACCOUNT_EXPORT_RESTRICTED_TABLES].sort(), ["network_blocks", "network_messages", "team_check_in_reminders", "team_program_consents", "team_program_event_rsvps", "team_program_milestones", "team_program_org_data", "team_program_profiles", "team_program_updates", "workstyle_pretest_sessions", "workstyle_research_responses"]);
   // Die Erinnerungsstempel kommen nur ueber die Funktion; die Tabelle bleibt fuer Konten geschlossen.
   assert.ok(!ACCOUNT_EXPORT_TABLES.some((entry) => (entry.table as string) === "team_check_in_reminders"));
   assert.match(source("../supabase/migrations/20270305120000_export_check_in_reminders.sql"), /from public\.team_check_in_reminders r where r\.user_id = uid/);
+  // Die Zusagen ebenso (Tabelle fuer Konten geschlossen).
+  assert.ok(!ACCOUNT_EXPORT_TABLES.some((entry) => (entry.table as string) === "team_program_event_rsvps"));
+  assert.match(source("../supabase/migrations/20270307120000_program_event_rsvps.sql"), /from public\.team_program_event_rsvps v where v\.user_id = uid/);
   const programSql = source("../supabase/migrations/20270122120000_export_team_program_data.sql");
   for (const table of ["team_program_consents", "team_program_milestones", "team_program_profiles", "team_program_updates"]) {
     assert.match(programSql, new RegExp(`'${table}'`));

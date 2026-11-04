@@ -959,7 +959,7 @@
     "retentionText": "Wird ein Team aus dem Programm entfernt oder beendet es die Teilnahme, endet euer Zugriff, und die Programmdaten des Teams (Bezugspersonen, Programmprofil, Meilensteine, Updates, Teilnahme-Einträge, Notizen zum Team) werden gelöscht. Wir haben uns bewusst dafür entschieden, nichts aufzubewahren: Das Team hat nur im Rahmen des Programms zugestimmt. Wenn ihr Angaben für eure eigene Auswertung braucht, haltet sie vorher in euren eigenen Unterlagen fest, mit Wissen des Teams.",
     "planTitleH": "Programmplan",
     "planText": "Skizziert euer Programm: Education-Termine, interne und externe Veranstaltungen mit Datum, Ort, Hinweisen und To-dos. Die Teams in eurem Programm sehen den Plan.",
-    "planAttendanceNote": "Die Teilnahme tragt ihr von Hand ein (da, fehlte, entschuldigt). Jedes Team sieht nur seinen eigenen Eintrag. Die Einträge werden gelöscht, sobald das Team das Programm verlässt.",
+    "planAttendanceNote": "Die Teilnahme tragt ihr von Hand ein (da, fehlte, entschuldigt). Daneben steht, wer zugesagt hat – das tragen die Teams selbst ein. Jedes Team sieht nur seinen eigenen Eintrag. Die Einträge werden gelöscht, sobald das Team das Programm verlässt.",
     "planNew": "Neue Veranstaltung",
     "planTitle": "Titel",
     "planWhen": "Datum und Uhrzeit",
@@ -988,7 +988,7 @@
     "planSaved": "Veranstaltung gespeichert.",
     "planError": "Das hat nicht geklappt. Prüfe die Angaben (Titel, Datum) und versuche es noch einmal.",
     "myPlanTitle": "Programmplan",
-    "myPlanText": "Die Veranstaltungen der Organisationen, in deren Programm ihr aktiv seid. Eure Teilnahme tragen die Bezugspersonen ein; du siehst nur den Eintrag eures Teams.",
+    "myPlanText": "Die Veranstaltungen der Organisationen, in deren Programm ihr aktiv seid. Sag zu oder ab – für dich oder gleich fürs ganze Team. Die Teilnahme tragen die Bezugspersonen ein; du siehst nur den Eintrag eures Teams.",
     "myAttendance": "Eure Teilnahme: {status}",
     "tabNotes": "Notizen",
     "notesEndNote": "Die Notizen zu diesem Team werden gelöscht, sobald das Team das Programm verlässt oder entfernt wird.",
@@ -1170,7 +1170,21 @@
     "expertsOfferLink": "Ablage für Angebote und Rechnungen",
     "expertsOfferLinkHint": "Nur ein Link zu eurer eigenen Ablage. Made2Found speichert keine Dateien und keine Beträge.",
     "expertsNote": "Notiz (zum Beispiel: weitere Angebote wie 1:1-Coaching)",
-    "expertsError": "Die Angaben konnten nicht gespeichert werden. Der Name ist nötig, Adressen müssen mit https:// beginnen, und nur die Inhaberin oder der Inhaber darf eintragen."
+    "expertsError": "Die Angaben konnten nicht gespeichert werden. Der Name ist nötig, Adressen müssen mit https:// beginnen, und nur die Inhaberin oder der Inhaber darf eintragen.",
+    "rsvpQuestion": "Kommst du?",
+    "rsvp_yes": "Ich komme",
+    "rsvp_no": "Ich kann nicht",
+    "rsvpState_yes": "kommt",
+    "rsvpState_no": "kann nicht",
+    "rsvpState_open": "noch offen",
+    "rsvpYou": "du",
+    "rsvpSetForYou": "Für dich eingetragen – du kannst es ändern.",
+    "rsvpWholeLabel": "Für alle, die noch nicht selbst geantwortet haben:",
+    "rsvpWholeYes": "Wir kommen",
+    "rsvpWholeNo": "Wir können nicht",
+    "rsvpNote": "Deine Antwort sehen dein Team und die Programmleitung. Wer selbst geantwortet hat, wird nicht überschrieben.",
+    "planRsvpTitle": "Zusagen",
+    "planRsvpSummary": "{yes, plural, one {# kommt} other {# kommen}} · {no, plural, one {# kann nicht} other {# können nicht}} · {open} offen"
   },
   "programPage": {
     "title": "Programmseite",
@@ -1280,7 +1294,10 @@
     "fixtureSpeaker2": "Ben Beispiel",
     "fixtureSpeaker2Topic": "Vertrieb",
     "fixtureMaterial1Note": "Stand der letzten Session",
-    "fixtureMaterial2": "Aufzeichnungen der Workshops"
+    "fixtureMaterial2": "Aufzeichnungen der Workshops",
+    "fixturePerson1": "Mira",
+    "fixturePerson2": "Tom",
+    "fixturePerson3": "Aylin"
   },
   "myProgram": {
     "pageTitle": "Mein Programm",

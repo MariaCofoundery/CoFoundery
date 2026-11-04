@@ -19,10 +19,11 @@ import { TeamProgramMaterials } from "@/features/advisor/ProgramMaterials";
 import { ProgramOrgDataTeamView } from "@/features/advisor/ProgramOrgData";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
-import { getCheckIns, getMyLearning, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
+import { getCheckIns, getMyLearning, getMyProgramEventRsvps, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramRewards } from "@/features/advisor/ProgramRewards";
 import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
+import { ProgramEventRsvp } from "@/features/advisor/ProgramEventRsvp";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -39,6 +40,8 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   const client = await createClient();
   const programs = await getMyTeamPrograms(client);
   const planEvents = await getMyProgramEvents(client);
+  const rsvps = planEvents.length > 0 ? await getMyProgramEventRsvps(client) : [];
+  const now = Date.now();
   const materials = await getMyProgramMaterials(client);
   const learning = await getMyLearning(client);
   const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short" });
@@ -105,7 +108,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
           <p className="mt-1 text-xs leading-5 text-slate-600">{t("myPlanText")}</p>
           <ul className="mt-3 divide-y divide-slate-100">
             {planEvents.map((event) => (
-              <li key={`${event.programId}-${event.eventId}`} className="py-3">
+              <li key={`${event.programId}-${event.eventId}`} id={`event-${event.eventId}`} className="scroll-mt-24 py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-semibold text-slate-950">{event.title}</span>
                   <span className="text-sm text-slate-600">{dateFormat.format(new Date(event.startsAt))}</span>
@@ -117,6 +120,14 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                 {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{event.notes}</p> : null}
                 {event.todos ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><span className="font-semibold">{t("planTodos")}: </span>{event.todos}</p> : null}
                 {event.myStatus ? <p className="mt-1 text-xs font-semibold text-violet-800">{t("myAttendance", { status: t(`attend_${event.myStatus}`) })}</p> : null}
+                {/* Zusagen nur vor Beginn - danach zaehlt die eingetragene Teilnahme. */}
+                {new Date(event.startsAt).getTime() > now ? (
+                  <ProgramEventRsvp
+                    programId={event.programId}
+                    eventId={event.eventId}
+                    rows={rsvps.filter((row) => row.programId === event.programId && row.eventId === event.eventId)}
+                  />
+                ) : null}
               </li>
             ))}
           </ul>

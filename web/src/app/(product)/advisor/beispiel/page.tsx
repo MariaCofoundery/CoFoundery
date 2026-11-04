@@ -125,7 +125,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
           ) : tab === "plan" ? (
             <div className="grid gap-4">
               <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("planNote")}</p>
-              <OrgProgramPlan orgId={exampleOrg.org.id} isOwner events={exampleOrg.events} openEventId={exampleOrg.events[0].eventId} exampleAttendance={exampleOrg.attendance} exampleSpeakers={exampleOrg.speakers} />
+              <OrgProgramPlan orgId={exampleOrg.org.id} isOwner events={exampleOrg.events} openEventId={exampleOrg.events[0].eventId} exampleAttendance={exampleOrg.attendance} exampleRsvps={exampleOrg.rsvps} exampleSpeakers={exampleOrg.speakers} />
               <OrgProgramMaterials orgId={exampleOrg.org.id} isOwner materials={exampleOrg.materials} />
             </div>
           ) : tab === "overview" ? (

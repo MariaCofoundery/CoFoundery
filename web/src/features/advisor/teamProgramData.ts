@@ -347,6 +347,38 @@ export async function getMyProgramEvents(client: SupabaseClient): Promise<MyProg
   }));
 }
 
+/**
+ * Zusagen zu Veranstaltungen ("ich komme / ich kann nicht"), je Person (20270307120000).
+ * `response` null heisst: noch nicht geantwortet. Nur aktuelle Mitglieder.
+ */
+export type EventRsvp = { programId: string; userId: string; name: string | null; response: "yes" | "no" | null };
+export type MyEventRsvp = EventRsvp & { eventId: string; bySelf: boolean; isMe: boolean };
+
+const rsvpOf = (value: unknown) => (value === "yes" || value === "no" ? value : null);
+
+export async function getMyProgramEventRsvps(client: SupabaseClient): Promise<MyEventRsvp[]> {
+  const { data } = await client.rpc("get_my_program_event_rsvps");
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    programId: row.program_id as string,
+    eventId: row.event_id as string,
+    userId: row.user_id as string,
+    name: (row.display_name as string | null) ?? null,
+    response: rsvpOf(row.response),
+    bySelf: row.by_self === true,
+    isMe: row.is_me === true,
+  }));
+}
+
+export async function getEventRsvps(client: SupabaseClient, eventId: string): Promise<EventRsvp[]> {
+  const { data } = await client.rpc("get_event_rsvps", { p_event_id: eventId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    programId: row.program_id as string,
+    userId: row.user_id as string,
+    name: (row.display_name as string | null) ?? null,
+    response: rsvpOf(row.response),
+  }));
+}
+
 /** Faellige Wiedervorlagen der eigenen Notizen an Programm-Teams (RLS: nur die eigenen), bis zu `withinDays` Tage voraus. */
 export async function listDueProgramFollowUps(client: SupabaseClient, withinDays = 7): Promise<{ programId: string; dueOn: string }[]> {
   const horizon = new Date();

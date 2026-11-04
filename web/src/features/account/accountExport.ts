@@ -138,6 +138,8 @@ export const ACCOUNT_EXPORT_RESTRICTED_TABLES = [
   // Stempel der Check-in-Erinnerung (nur "es wurde erinnert", kein Inhalt). Die
   // Tabelle ist fuer Konten geschlossen; direkt gelesen stand hier "permission denied".
   "team_check_in_reminders",
+  // Die eigenen Zusagen zu Programm-Veranstaltungen (seit 20270307120000).
+  "team_program_event_rsvps",
 ] as const;
 
 export type AccountExport = {

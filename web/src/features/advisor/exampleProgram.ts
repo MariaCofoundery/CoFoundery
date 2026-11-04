@@ -2,6 +2,7 @@ import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type {
   CheckIn,
   EventAttendanceRow,
+  EventRsvp,
   EventExpert,
   OrgProgramStars,
   OrgTeamProgram,
@@ -158,6 +159,12 @@ export function buildExampleOrg(t: Text) {
     { programId: programs[0].programId, teamName: programs[0].teamName, status: "present" },
     { programId: programs[1].programId, teamName: programs[1].teamName, status: null },
   ];
+  const person = (n: number) => `00000000-0000-4000-8000-0000000007${String(n).padStart(2, "0")}`;
+  const rsvps: EventRsvp[] = [
+    { programId: programs[0].programId, userId: person(1), name: t("fixturePerson1"), response: "yes" },
+    { programId: programs[0].programId, userId: person(2), name: t("fixturePerson2"), response: "yes" },
+    { programId: programs[1].programId, userId: person(3), name: t("fixturePerson3"), response: null },
+  ];
   const materials: ProgramMaterial[] = [
     { materialId: "00000000-0000-4000-8000-000000000501", title: t("fixtureMaterial1"), url: "https://example.org/programm/folien", note: t("fixtureMaterial1Note") },
     { materialId: "00000000-0000-4000-8000-000000000502", title: t("fixtureMaterial2"), url: "https://example.org/programm/aufzeichnungen", note: null },
@@ -168,5 +175,5 @@ export function buildExampleOrg(t: Text) {
   });
   const choices = [speaker(1, t("fixtureSpeaker1"), t("fixtureSpeaker1Topic")), speaker(2, t("fixtureSpeaker2"), t("fixtureSpeaker2Topic"))];
   const assigned: EventExpert[] = [{ eventId: events[0].eventId, expertId: choices[0].expertId, name: choices[0].name, topic: choices[0].topic, archived: false }];
-  return { org, members, programs, stars, events, attendance, materials, speakers: { assigned, choices } };
+  return { org, members, programs, stars, events, attendance, rsvps, materials, speakers: { assigned, choices } };
 }

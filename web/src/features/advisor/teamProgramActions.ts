@@ -631,6 +631,25 @@ export async function setProgramAttendanceAction(formData: FormData) {
   redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(String(formData.get("eventId") ?? ""))}`));
 }
 
+/**
+ * Zusage zu einer Veranstaltung (Team-Mitglied, vor Beginn). `whole=1` traegt sie fuer alle ein,
+ * die noch nicht selbst geantwortet haben; leer nimmt die eigene zurueck.
+ */
+export async function setProgramEventRsvpAction(formData: FormData) {
+  const client = await requireUser("/programm");
+  const eventId = String(formData.get("eventId") ?? "");
+  const response = String(formData.get("response") ?? "");
+  await client.rpc("set_program_event_rsvp", {
+    p_event_id: eventId,
+    p_program_id: String(formData.get("programId") ?? ""),
+    p_response: response === "yes" || response === "no" ? response : null,
+    p_whole_team: formData.get("whole") === "1",
+  });
+  revalidatePath("/programm");
+  revalidatePath("/advisor/organisation");
+  redirect(`/programm#event-${encodeURIComponent(eventId)}`);
+}
+
 /** Zurueck nur auf die eigenen Seiten: /programm oder das Erfolge-Tab des Teams. */
 const outcomeReturn = (value: FormDataEntryValue | null) => {
   const text = String(value ?? "");

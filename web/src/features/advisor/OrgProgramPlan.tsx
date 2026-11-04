@@ -5,7 +5,7 @@ import {
   setEventExpertsAction,
   setProgramAttendanceAction,
 } from "@/features/advisor/teamProgramActions";
-import { getEventAttendance, listEventExperts, listProgramExperts, type EventAttendanceRow, type EventExpert, type ProgramEvent, type ProgramExpert } from "@/features/advisor/teamProgramData";
+import { getEventAttendance, getEventRsvps, listEventExperts, listProgramExperts, type EventAttendanceRow, type EventExpert, type EventRsvp, type ProgramEvent, type ProgramExpert } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -67,6 +67,7 @@ export async function OrgProgramPlan({
   events,
   openEventId,
   exampleAttendance,
+  exampleRsvps,
   exampleSpeakers,
   withSpeakers = true,
 }: {
@@ -76,6 +77,8 @@ export async function OrgProgramPlan({
   openEventId: string | null;
   /** Nur die Beispiel-Vorschau: fertige Teilnahme-Zeilen, dann wird nichts aus der Datenbank gelesen. */
   exampleAttendance?: EventAttendanceRow[];
+  /** Nur die Beispiel-Vorschau: fertige Zusagen (sonst keine). */
+  exampleRsvps?: EventRsvp[];
   /** Nur die Beispiel-Vorschau: fertige Speaker-Zeilen und Auswahl, dann wird nichts aus der Datenbank gelesen. */
   exampleSpeakers?: { assigned: EventExpert[]; choices: ProgramExpert[] };
   /** Nur mit eingeschaltetem Bereich "Experten": sonst keine Speaker an Veranstaltungen. */
@@ -89,6 +92,13 @@ export async function OrgProgramPlan({
   const past = events.filter((event) => !upcoming.includes(event)).reverse();
   // Die Teilnahme wird nur fuer die geoeffnete Veranstaltung gelesen.
   const attendance = exampleAttendance ?? (openEventId ? await getEventAttendance(await createClient(), openEventId) : []);
+  // Die Zusagen der Teams (je Person, 20270307120000) - ebenso nur fuer die geoeffnete Veranstaltung.
+  const rsvps = exampleAttendance ? (exampleRsvps ?? []) : openEventId ? await getEventRsvps(await createClient(), openEventId) : [];
+  const rsvpSummary = {
+    yes: rsvps.filter((row) => row.response === "yes").length,
+    no: rsvps.filter((row) => row.response === "no").length,
+    open: rsvps.filter((row) => row.response === null).length,
+  };
 
   // Speaker sind nur fuer die Organisation da; Teams bekommen diese Seite nie.
   const supabase = exampleSpeakers || !withSpeakers ? null : await createClient();
@@ -117,10 +127,30 @@ export async function OrgProgramPlan({
           attendance.length === 0 ? (
             <p className="mt-2 text-sm text-slate-600">{t("planAttendanceEmpty")}</p>
           ) : (
+            <>
+            {rsvps.length > 0 ? (
+              <p className="mt-2 text-sm text-slate-700">
+                <span className="font-semibold">{t("planRsvpTitle")}: </span>
+                {t("planRsvpSummary", rsvpSummary)}
+              </p>
+            ) : null}
             <ul className="mt-2 divide-y divide-slate-100">
               {attendance.map((row) => (
                 <li key={row.programId} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                  <span className="text-sm font-medium text-slate-900">{row.teamName ?? t("unnamedTeam")}</span>
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-slate-900">{row.teamName ?? t("unnamedTeam")}</span>
+                    {rsvps.some((entry) => entry.programId === row.programId) ? (
+                      <ul className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-slate-600">
+                        {rsvps
+                          .filter((entry) => entry.programId === row.programId)
+                          .map((entry) => (
+                            <li key={entry.userId}>
+                              {entry.name ?? t("unnamedPerson")}: {t(`rsvpState_${entry.response ?? "open"}`)}
+                            </li>
+                          ))}
+                      </ul>
+                    ) : null}
+                  </div>
                   <form action={setProgramAttendanceAction} className="flex flex-wrap gap-1">
                     <input type="hidden" name="orgId" value={orgId} />
                     <input type="hidden" name="eventId" value={event.eventId} />
@@ -143,6 +173,7 @@ export async function OrgProgramPlan({
                 </li>
               ))}
             </ul>
+            </>
           )
         ) : (
           <a href={`/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan&open=${event.eventId}`} className="mt-1 inline-flex min-h-11 items-center text-sm text-slate-600 underline underline-offset-4">{t("planAttendanceOpen")}</a>

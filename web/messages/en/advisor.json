@@ -959,7 +959,7 @@
     "retentionText": "If a team is removed from the program or ends its participation, your access ends and the team's program data (contact people, program profile, milestones, updates, attendance entries, notes on the team) is deleted. We deliberately chose not to retain anything: the team only agreed within the program. If you need information for your own evaluation, record it in your own files beforehand, with the team's knowledge.",
     "planTitleH": "Program plan",
     "planText": "Sketch your program: education sessions, internal and external events with date, place, notes and to-dos. The teams in your program see the plan.",
-    "planAttendanceNote": "You enter attendance by hand (present, absent, excused). Each team only sees its own entry. The entries are deleted as soon as the team leaves the program.",
+    "planAttendanceNote": "You enter attendance by hand (present, absent, excused). Next to it you see who said they're coming – the teams enter that themselves. Each team only sees its own entry. The entries are deleted as soon as the team leaves the program.",
     "planNew": "New event",
     "planTitle": "Title",
     "planWhen": "Date and time",
@@ -988,7 +988,7 @@
     "planSaved": "Event saved.",
     "planError": "That did not work. Check the details (title, date) and try again.",
     "myPlanTitle": "Program plan",
-    "myPlanText": "The events of the organizations whose program you are active in. The contact people enter your attendance; you only see your own team's entry.",
+    "myPlanText": "Events of the organizations whose program you are active in. Say whether you're coming – for yourself or for the whole team at once. Attendance is entered by the contacts; you only see your team's entry.",
     "myAttendance": "Your attendance: {status}",
     "tabNotes": "Notes",
     "notesEndNote": "The notes on this team are deleted as soon as the team leaves the program or is removed.",
@@ -1170,7 +1170,21 @@
     "expertsOfferLink": "Storage for offers and invoices",
     "expertsOfferLinkHint": "Only a link to your own storage. Made2Found stores no files and no amounts.",
     "expertsNote": "Note (for example: other offers such as 1:1 coaching)",
-    "expertsError": "The entry could not be saved. A name is required, addresses must start with https://, and only the owner can add entries."
+    "expertsError": "The entry could not be saved. A name is required, addresses must start with https://, and only the owner can add entries.",
+    "rsvpQuestion": "Are you coming?",
+    "rsvp_yes": "I'm coming",
+    "rsvp_no": "I can't make it",
+    "rsvpState_yes": "coming",
+    "rsvpState_no": "can't make it",
+    "rsvpState_open": "not answered yet",
+    "rsvpYou": "you",
+    "rsvpSetForYou": "Entered for you – you can change it.",
+    "rsvpWholeLabel": "For everyone who hasn't answered themselves yet:",
+    "rsvpWholeYes": "We're coming",
+    "rsvpWholeNo": "We can't make it",
+    "rsvpNote": "Your team and the program leads see your reply. Anyone who answered themselves is not overwritten.",
+    "planRsvpTitle": "Replies",
+    "planRsvpSummary": "{yes} coming · {no} can't make it · {open} not answered"
   },
   "programPage": {
     "title": "Program page",
@@ -1280,7 +1294,10 @@
     "fixtureSpeaker2": "Ben Example",
     "fixtureSpeaker2Topic": "Sales",
     "fixtureMaterial1Note": "As of the last session",
-    "fixtureMaterial2": "Workshop recordings"
+    "fixtureMaterial2": "Workshop recordings",
+    "fixturePerson1": "Mira",
+    "fixturePerson2": "Tom",
+    "fixturePerson3": "Aylin"
   },
   "myProgram": {
     "pageTitle": "My program",
