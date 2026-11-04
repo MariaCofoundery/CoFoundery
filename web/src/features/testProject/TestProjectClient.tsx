@@ -7,17 +7,20 @@ import { SwitchTrack } from "@/features/account/accountUi";
 import {
   agreeTestProjectAction,
   cancelTestProjectAction,
+  saveTestProjectContributionAction,
   saveTestProjectDraftAction,
   submitTestProjectResponseAction,
   withdrawTestProjectAgreementAction,
   type TestProjectActionResult,
 } from "@/features/testProject/testProjectActions";
 import {
+  TEST_PROJECT_BOTH,
   TEST_PROJECT_LIMITS,
   TEST_PROJECT_OUTCOMES,
   isTestProjectDraftComplete,
   testProjectHref,
   type TestProjectItem,
+  type TestProjectTask,
 } from "@/features/testProject/testProjectModel";
 
 const CARD = "rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-[26px]";
@@ -47,6 +50,7 @@ export type TestProjectDraftValues = {
   done: TestProjectItem[];
   rights: TestProjectItem[];
   closing: TestProjectItem[];
+  tasks: TestProjectTask[];
 };
 
 /** Alle Texte kommen als flache Tabelle vom Server; hier steht keine Sprache. */
@@ -119,8 +123,72 @@ export function EditableList({
   );
 }
 
+/**
+ * Wer macht was (Feedback an Maria, 04.11.2026): je Aufgabe Text, Person oder beide, und optional
+ * der Bereich. Die Bereiche schlaegt eine Liste aus dem Capability-Vokabular vor; frei schreiben geht auch.
+ */
+export function TaskList({
+  tasks, onChange, participants, fieldSuggestions, labels,
+}: {
+  tasks: TestProjectTask[];
+  onChange: (tasks: TestProjectTask[]) => void;
+  participants: TestProjectParticipant[];
+  fieldSuggestions: string[];
+  labels: TestProjectLabels;
+}) {
+  const update = (index: number, patch: Partial<TestProjectTask>) =>
+    onChange(tasks.map((task, i) => (i === index ? { ...task, ...patch } : task)));
+  return (
+    <div>
+      <datalist id="tp-task-fields">
+        {fieldSuggestions.map((field) => <option key={field} value={field} />)}
+      </datalist>
+      <ul className="grid gap-3">
+        {tasks.map((task, index) => (
+          <li key={index} className="grid gap-2 rounded-2xl border border-[#e4e2f0] bg-white p-3 sm:grid-cols-[minmax(0,1fr)_11rem_10rem_auto] sm:items-center sm:border-0 sm:p-0">
+            <input
+              type="text"
+              value={task.t}
+              maxLength={TEST_PROJECT_LIMITS.taskText}
+              placeholder={labels["editor.taskPlaceholderItem"]}
+              aria-label={labels["editor.taskItem"]}
+              onChange={(event) => update(index, { t: event.target.value })}
+              className="min-h-11 w-full min-w-0 rounded-xl border border-[#d8d5ea] bg-white px-3.5 py-2 text-[15px] text-[#0b1f3a] outline-none focus:border-[#6d49e0] focus:ring-4 focus:ring-[#6d49e0]/15"
+            />
+            <select
+              value={task.who}
+              aria-label={labels["editor.taskWho"]}
+              onChange={(event) => update(index, { who: event.target.value })}
+              className="min-h-11 w-full rounded-xl border border-[#d8d5ea] bg-white px-3 text-[15px] text-[#0b1f3a]"
+            >
+              {participants.map((person) => <option key={person.userId} value={person.userId}>{person.name}</option>)}
+              <option value={TEST_PROJECT_BOTH}>{labels["editor.taskBoth"]}</option>
+            </select>
+            <input
+              type="text"
+              list="tp-task-fields"
+              value={task.f ?? ""}
+              maxLength={TEST_PROJECT_LIMITS.taskField}
+              placeholder={labels["editor.taskFieldPlaceholder"]}
+              aria-label={labels["editor.taskField"]}
+              onChange={(event) => update(index, { f: event.target.value })}
+              className="min-h-11 w-full min-w-0 rounded-xl border border-[#d8d5ea] bg-white px-3 text-[15px] text-[#0b1f3a]"
+            />
+            <button type="button" aria-label={labels.remove} onClick={() => onChange(tasks.filter((_, i) => i !== index))} className="inline-flex h-11 w-11 flex-none items-center justify-center justify-self-end rounded-lg text-[#5f5e7a] hover:bg-[#f1f0f7]">
+              <span aria-hidden="true" className="text-lg leading-none">×</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {tasks.length < TEST_PROJECT_LIMITS.items ? (
+        <button type="button" onClick={() => onChange([...tasks, { t: "", who: TEST_PROJECT_BOTH, f: null }])} className={`${BTN_SECONDARY} mt-3 min-h-9 px-3.5 text-sm`}>{labels["editor.addTask"]}</button>
+      ) : null}
+    </div>
+  );
+}
+
 export function TestProjectStarter({
-  teamId, relationshipId, templates, labels, freeIcon, rights, closing, participants,
+  teamId, relationshipId, templates, labels, freeIcon, rights, closing, participants, fieldSuggestions,
 }: {
   teamId: string;
   relationshipId: string;
@@ -130,6 +198,7 @@ export function TestProjectStarter({
   rights: string[];
   closing: string[];
   participants: TestProjectParticipant[];
+  fieldSuggestions: string[];
 }) {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [chosen, setChosen] = useState(false);
@@ -175,6 +244,7 @@ export function TestProjectStarter({
           projectId={null}
           version={null}
           participants={participants}
+          fieldSuggestions={fieldSuggestions}
           ownAgreed={false}
           labels={labels}
           initial={{
@@ -187,6 +257,7 @@ export function TestProjectStarter({
             done: (selected?.done ?? ["", ""]).map((t) => ({ t, on: true })),
             rights: rights.map((t) => ({ t, on: true })),
             closing: closing.map((t) => ({ t, on: true })),
+            tasks: [{ t: "", who: TEST_PROJECT_BOTH, f: null }],
           }}
         />
       ) : null}
@@ -197,7 +268,7 @@ export function TestProjectStarter({
 export type TestProjectParticipant = { userId: string; name: string; agreed: boolean };
 
 export function TestProjectEditor({
-  teamId, relationshipId, projectId, version, initial, participants, ownAgreed, labels,
+  teamId, relationshipId, projectId, version, initial, participants, fieldSuggestions, ownAgreed, labels, contribution,
 }: {
   teamId: string;
   relationshipId: string;
@@ -205,8 +276,11 @@ export function TestProjectEditor({
   version: number | null;
   initial: TestProjectDraftValues;
   participants: TestProjectParticipant[];
+  fieldSuggestions: string[];
   ownAgreed: boolean;
   labels: TestProjectLabels;
+  /** Erst wenn es den Entwurf gibt: "Das bringe ich ein". */
+  contribution?: ContributionProps;
 }) {
   const [values, setValues] = useState<TestProjectDraftValues>(initial);
   const [dirty, setDirty] = useState(projectId === null);
@@ -265,6 +339,11 @@ export function TestProjectEditor({
             </label>
           </div>
         </div>
+        <div className="mt-6">
+          <p className={LABEL}>{labels["editor.tasks"]}</p>
+          <p className="mt-1 text-[13px] leading-5 text-[#5f5e7a]">{labels["editor.tasksHelp"]}</p>
+          <div className="mt-3"><TaskList tasks={values.tasks} onChange={(tasks) => set("tasks", tasks)} participants={participants} fieldSuggestions={fieldSuggestions} labels={labels} /></div>
+        </div>
         <div className="mt-6 rounded-[18px] bg-[#efeafd] p-5">
           <p className={LABEL}>{labels["editor.rights"]}</p>
           <div className="mt-3"><EditableList items={values.rights} onChange={(items) => set("rights", items)} labels={labels} addLabel={labels["editor.addQuestion"]} /></div>
@@ -281,6 +360,12 @@ export function TestProjectEditor({
         <div className="mt-3"><ErrorLine error={error} labels={labels} /></div>
       </section>
 
+      {projectId && contribution ? (
+        <ContributionPanel teamId={teamId} relationshipId={relationshipId} projectId={projectId} labels={labels} {...contribution} />
+      ) : (
+        <p className="rounded-2xl bg-[#f7f6fb] px-4 py-3 text-sm text-[#5f5e7a]">{labels["contribution.afterCreate"]}</p>
+      )}
+
       {projectId && version !== null ? (
         <AgreementPanel
           teamId={teamId} relationshipId={relationshipId} projectId={projectId} version={version}
@@ -288,6 +373,83 @@ export function TestProjectEditor({
         />
       ) : null}
     </div>
+  );
+}
+
+export type ContributionProps = {
+  own: { text: string; areaIds: string[] };
+  other: { name: string; text: string; areaIds: string[] };
+  /** Eigene Bereiche aus "Wo kennst du dich aus?" als Vorschlag. */
+  suggestions: string[];
+  areaLabels: Record<string, string>;
+};
+
+/**
+ * "Das bringe ich ein": Jede Person schreibt nur ihren eigenen Teil (die Datenbank erzwingt das).
+ * Vorschlaege kommen aus den eigenen Bereichen; geteilt wird erst, was die Person antippt.
+ */
+function ContributionPanel({
+  teamId, relationshipId, projectId, labels, own, other, suggestions, areaLabels,
+}: ContributionProps & { teamId: string; relationshipId: string; projectId: string; labels: TestProjectLabels }) {
+  const [text, setText] = useState(own.text);
+  const [areaIds, setAreaIds] = useState<string[]>(own.areaIds);
+  const { run, pending, error } = useRun();
+  const dirty = text !== own.text || areaIds.join() !== own.areaIds.join();
+  const offered = [...new Set([...suggestions, ...areaIds])];
+  const toggle = (id: string) =>
+    setAreaIds((current) => current.includes(id) ? current.filter((entry) => entry !== id) : current.length < TEST_PROJECT_LIMITS.contributionAreas ? [...current, id] : current);
+  return (
+    <section className={CARD} aria-labelledby="tp-contribution-title">
+      <div className="flex items-start gap-3.5">
+        <IconTile name="spark" tone="violet" />
+        <div className="min-w-0">
+          <h2 id="tp-contribution-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{labels["contribution.title"]}</h2>
+          <p className="mt-1 text-sm leading-6 text-[#5f5e7a]">{labels["contribution.help"].replace("{name}", other.name)}</p>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-6 lg:grid-cols-2">
+        <div className="min-w-0">
+          <label className="text-sm font-medium text-[#33325e]">{labels["contribution.own"]}
+            <textarea className={`${INPUT} min-h-24`} maxLength={TEST_PROJECT_LIMITS.contribution} value={text} placeholder={labels["contribution.placeholder"]} onChange={(event) => setText(event.target.value)} />
+          </label>
+          <p className="mt-3 text-[13px] font-medium text-[#33325e]">{labels["contribution.suggestions"]}</p>
+          {offered.length === 0 ? (
+            <p className="mt-1 text-[13px] leading-5 text-[#5f5e7a]">{labels["contribution.suggestionsNone"]}</p>
+          ) : (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {offered.map((id) => {
+                const on = areaIds.includes(id);
+                return (
+                  <button key={id} type="button" aria-pressed={on} onClick={() => toggle(id)} className={`min-h-11 rounded-full border px-3.5 text-sm ${on ? "border-[#6d49e0] bg-[#6d49e0] font-semibold text-white" : "border-[#d8d5ea] bg-white text-[#33325e] hover:border-[#6d49e0]"}`}>
+                    {areaLabels[id] ?? id}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button type="button" className={BTN} disabled={pending || !dirty} onClick={() => run(() => saveTestProjectContributionAction(teamId, relationshipId, projectId, { text, areaIds }), () => testProjectHref(teamId, relationshipId, "saved"))}>{labels["contribution.save"]}</button>
+          </div>
+          <p className="mt-2 text-[13px] leading-5 text-[#5f5e7a]">{labels["contribution.resetNote"]}</p>
+          <div className="mt-2"><ErrorLine error={error} labels={labels} /></div>
+        </div>
+        <div className="min-w-0 rounded-2xl bg-[#f7f6fb] p-4">
+          <p className={LABEL}>{labels["contribution.other"].replace("{name}", other.name)}</p>
+          {other.text || other.areaIds.length ? (
+            <>
+              {other.text ? <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]">{other.text}</p> : null}
+              {other.areaIds.length ? (
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {other.areaIds.map((id) => <li key={id} className="rounded-full bg-white px-3 py-1 text-sm text-[#33325e]">{areaLabels[id] ?? id}</li>)}
+                </ul>
+              ) : null}
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-[#5f5e7a]">{labels["contribution.otherEmpty"].replace("{name}", other.name)}</p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

@@ -39,6 +39,8 @@ const EXPORTED_TABLES = [
   { table: "relationship_test_projects", column: "created_by_user_id" },
   { table: "relationship_test_project_agreements", column: "user_id" },
   { table: "relationship_test_project_responses", column: "user_id" },
+  // "Das bringe ich ein" (seit 20270309120000): nur der eigene Beitrag.
+  { table: "relationship_test_project_contributions", column: "user_id" },
   // Check-in: eigene Antworten, Abgaben und Rueckblick. Die der anderen gehoeren ihnen.
   { table: "team_check_in_answers", column: "user_id" },
   { table: "team_check_in_submissions", column: "user_id" },

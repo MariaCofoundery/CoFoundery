@@ -8,8 +8,10 @@ import {
   isTestProjectPhase,
   isTestProjectTemplateKey,
   sanitizeTestProjectItems,
+  sanitizeTestProjectTasks,
   testProjectHref,
   type TestProjectItem,
+  type TestProjectTask,
 } from "@/features/testProject/testProjectModel";
 
 export type TestProjectActionResult = { ok: true; projectId?: string; status?: string } | { ok: false; error: string };
@@ -25,6 +27,7 @@ export type TestProjectDraftInput = {
   done: TestProjectItem[];
   rights: TestProjectItem[];
   closing: TestProjectItem[];
+  tasks: TestProjectTask[];
 };
 
 const text = (value: unknown, max: number) => (typeof value === "string" ? value.trim().slice(0, max) : "");
@@ -38,6 +41,12 @@ async function authenticated() {
 function refresh(teamId: string, relationshipId: string) {
   revalidatePath(`/teams/${teamId}`);
   revalidatePath(testProjectHref(teamId, relationshipId));
+}
+
+/** Die beiden Personen des Paares - "wer" einer Aufgabe muss eine davon sein (die Datenbank prueft es auch). */
+async function pairOf(supabase: Awaited<ReturnType<typeof createClient>>, relationshipId: string) {
+  const { data } = await supabase.from("relationships").select("user_a_id, user_b_id").eq("id", relationshipId).maybeSingle();
+  return data ? [String(data.user_a_id), String(data.user_b_id)] : [];
 }
 
 /** Die Datenbank liefert benannte Fehler; die Oberflaeche braucht nur einen Schluessel. */
@@ -69,6 +78,7 @@ export async function saveTestProjectDraftAction(
     p_done: sanitizeTestProjectItems(input.done),
     p_rights: sanitizeTestProjectItems(input.rights),
     p_closing: sanitizeTestProjectItems(input.closing),
+    p_tasks: sanitizeTestProjectTasks(input.tasks, await pairOf(auth.supabase, relationshipId)),
   });
   if (error) return { ok: false, error: errorKey(error.message) };
   refresh(teamId, relationshipId);
@@ -139,4 +149,25 @@ export async function submitTestProjectResponseAction(
   if (error) return { ok: false, error: errorKey(error.message) };
   refresh(teamId, relationshipId);
   return { ok: true, status: typeof data === "string" ? data : undefined };
+}
+
+/** "Das bringe ich ein": nur der eigene Beitrag, nur im Entwurf. Setzt beide Zustimmungen zurueck. */
+export async function saveTestProjectContributionAction(
+  teamId: string,
+  relationshipId: string,
+  projectId: string,
+  input: { text: string; areaIds: string[] }
+): Promise<TestProjectActionResult> {
+  const auth = await authenticated();
+  if (!auth) return { ok: false, error: "test_project_unavailable" };
+  const areaIds = [...new Set((Array.isArray(input.areaIds) ? input.areaIds : []).filter((id) => typeof id === "string" && /^[a-z0-9_]{1,64}$/.test(id)))]
+    .slice(0, TEST_PROJECT_LIMITS.contributionAreas);
+  const { error } = await auth.supabase.rpc("save_test_project_contribution", {
+    p_project_id: projectId,
+    p_text: text(input.text, TEST_PROJECT_LIMITS.contribution),
+    p_area_ids: areaIds,
+  });
+  if (error) return { ok: false, error: errorKey(error.message) };
+  refresh(teamId, relationshipId);
+  return { ok: true, projectId };
 }

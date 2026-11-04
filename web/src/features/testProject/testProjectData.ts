@@ -9,15 +9,17 @@ import {
   isTestProjectTemplateKey,
   normalizeTestProjectAnswers,
   normalizeTestProjectItems,
+  normalizeTestProjectTasks,
   type TestProject,
   type TestProjectAgreement,
+  type TestProjectContribution,
   type TestProjectResponse,
 } from "@/features/testProject/testProjectModel";
 
 type Client = Awaited<ReturnType<typeof createClient>>;
 
 const PROJECT_COLUMNS =
-  "id, relationship_id, created_by_user_id, template_key, title, task, weeks, roles, note, done_items, rights_items, closing_items, draft_version, status, started_at, ends_at, closed_at";
+  "id, relationship_id, created_by_user_id, template_key, title, task, weeks, roles, note, done_items, rights_items, closing_items, task_items, draft_version, status, started_at, ends_at, closed_at";
 
 function toProject(row: Record<string, unknown>): TestProject | null {
   const status = isTestProjectStatus(row.status);
@@ -35,6 +37,7 @@ function toProject(row: Record<string, unknown>): TestProject | null {
     doneItems: normalizeTestProjectItems(row.done_items),
     rightsItems: normalizeTestProjectItems(row.rights_items),
     closingItems: normalizeTestProjectItems(row.closing_items),
+    taskItems: normalizeTestProjectTasks(row.task_items),
     draftVersion: typeof row.draft_version === "number" ? row.draft_version : 1,
     status,
     startedAt: typeof row.started_at === "string" ? row.started_at : null,
@@ -76,13 +79,25 @@ export async function getTestProject(
   const previous = projects.find((project) => project.status === "closed" || project.status === "cancelled") ?? null;
 
   const shownIds = [current?.id, previous?.id].filter((id): id is string => Boolean(id));
-  const [agreementResult, responseResult] = shownIds.length === 0
-    ? [{ data: [], error: null }, { data: [], error: null }]
+  const [agreementResult, responseResult, contributionResult] = shownIds.length === 0
+    ? [{ data: [], error: null }, { data: [], error: null }, { data: [], error: null }]
     : await Promise.all([
         supabase.from("relationship_test_project_agreements").select("project_id, user_id, draft_version").in("project_id", shownIds),
         supabase.from("relationship_test_project_responses").select("project_id, user_id, phase, answers, outcome").in("project_id", shownIds),
+        supabase.from("relationship_test_project_contributions").select("project_id, user_id, text, area_ids").in("project_id", shownIds),
       ]);
-  if (agreementResult.error || responseResult.error) throw new Error("test_project_unavailable");
+  if (agreementResult.error || responseResult.error || contributionResult.error) throw new Error("test_project_unavailable");
+
+  const contributionsByProject = new Map<string, TestProjectContribution[]>();
+  for (const row of (contributionResult.data ?? []) as Array<Record<string, unknown>>) {
+    const list = contributionsByProject.get(String(row.project_id)) ?? [];
+    list.push({
+      userId: String(row.user_id),
+      text: typeof row.text === "string" ? row.text : "",
+      areaIds: Array.isArray(row.area_ids) ? row.area_ids.filter((id): id is string => typeof id === "string") : [],
+    });
+    contributionsByProject.set(String(row.project_id), list);
+  }
 
   const agreementsByProject = new Map<string, TestProjectAgreement[]>();
   for (const row of (agreementResult.data ?? []) as Array<Record<string, unknown>>) {
@@ -113,8 +128,10 @@ export async function getTestProject(
     current,
     currentAgreements: current ? agreementsByProject.get(current.id) ?? [] : [],
     currentResponses: current ? responsesByProject.get(current.id) ?? [] : [],
+    currentContributions: current ? contributionsByProject.get(current.id) ?? [] : [],
     previous,
     previousResponses: previous ? responsesByProject.get(previous.id) ?? [] : [],
+    previousContributions: previous ? contributionsByProject.get(previous.id) ?? [] : [],
   };
 }
 

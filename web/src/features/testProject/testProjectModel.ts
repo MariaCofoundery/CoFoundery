@@ -6,6 +6,8 @@
  * Gesamtbewertung, keine Punkte, kein "passt / passt nicht". Die Plattform legt
  * nicht fest, was "fertig" ist - das tragen die beiden selbst ein.
  */
+import { bringsArea } from "@/features/capability/capabilityTypes";
+
 export const TEST_PROJECT_TEMPLATE_KEYS = ["interviews", "landing", "market", "pitch", "prototype", "offer"] as const;
 export type TestProjectTemplateKey = (typeof TEST_PROJECT_TEMPLATE_KEYS)[number];
 
@@ -30,10 +32,24 @@ export const TEST_PROJECT_LIMITS = {
   weeksMax: 4,
   answer: 3000,
   question: 200,
+  taskText: 160,
+  taskField: 60,
+  contribution: 400,
+  contributionAreas: 6,
 } as const;
 
 /** Ein Punkt in einer der drei Listen: Schalter und Text. */
 export type TestProjectItem = { t: string; on: boolean };
+
+/**
+ * Eine Aufgabe im Plan (seit 04.11.2026, Feedback an Maria): was, wer - eine der beiden
+ * Personen (user id) oder "both" - und optional der Bereich ("Vertrieb", "Tech" ...).
+ */
+export const TEST_PROJECT_BOTH = "both";
+export type TestProjectTask = { t: string; who: string; f: string | null };
+
+/** "Das bringe ich ein": je Person, nur von ihr selbst geschrieben. Bereiche aus dem Capability-Vokabular. */
+export type TestProjectContribution = { userId: string; text: string; areaIds: string[] };
 
 export type TestProject = {
   id: string;
@@ -48,6 +64,7 @@ export type TestProject = {
   doneItems: TestProjectItem[];
   rightsItems: TestProjectItem[];
   closingItems: TestProjectItem[];
+  taskItems: TestProjectTask[];
   draftVersion: number;
   status: TestProjectStatus;
   startedAt: string | null;
@@ -94,6 +111,57 @@ export function sanitizeTestProjectItems(value: unknown): TestProjectItem[] {
   return normalizeTestProjectItems(value)
     .map((item) => ({ t: item.t.trim(), on: item.on }))
     .filter((item) => item.t !== "");
+}
+
+/** Aufgaben aus der Datenbank; alles Unerwartete faellt weg statt zu werfen. */
+export function normalizeTestProjectTasks(value: unknown): TestProjectTask[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is { t: string; who: string; f?: unknown } =>
+      Boolean(item) && typeof item === "object" &&
+      typeof (item as { t?: unknown }).t === "string" && typeof (item as { who?: unknown }).who === "string")
+    .map((item) => ({
+      t: item.t.slice(0, TEST_PROJECT_LIMITS.taskText),
+      who: item.who,
+      f: typeof item.f === "string" && item.f.trim() !== "" ? item.f.slice(0, TEST_PROJECT_LIMITS.taskField) : null,
+    }))
+    .slice(0, TEST_PROJECT_LIMITS.items);
+}
+
+/**
+ * Aufgaben aus dem Formular: leere fallen weg, "wer" muss eine der beiden Personen oder
+ * "both" sein (sonst "both"). Die Datenbank prueft dasselbe noch einmal.
+ */
+export function sanitizeTestProjectTasks(value: unknown, participantUserIds: readonly string[]): TestProjectTask[] {
+  return normalizeTestProjectTasks(value)
+    .map((task) => ({
+      t: task.t.trim(),
+      who: task.who === TEST_PROJECT_BOTH || participantUserIds.includes(task.who) ? task.who : TEST_PROJECT_BOTH,
+      f: task.f?.trim() || null,
+    }))
+    .filter((task) => task.t !== "");
+}
+
+/** Aufgaben je Person, dann gemeinsame - in der Reihenfolge der Liste. */
+export function groupTestProjectTasks(tasks: readonly TestProjectTask[], participantUserIds: readonly string[]) {
+  return [...participantUserIds, TEST_PROJECT_BOTH]
+    .map((who) => ({ who, tasks: tasks.filter((task) => task.who === who) }))
+    .filter((group) => group.tasks.length > 0);
+}
+
+/**
+ * Vorschlaege fuer "Das bringe ich ein" aus den eigenen Angaben unter "Wo kennst du dich aus?":
+ * Bereiche mit Erfahrung (nicht "Keine") oder dem Wunsch, sie zu uebernehmen oder beizutragen.
+ * Nur Vorschlaege - geteilt wird erst, was die Person antippt.
+ */
+export function contributionSuggestions(
+  entries: readonly { area_id: string; application_level: number | null; ownership_wish: string | null }[]
+) {
+  return entries
+    .filter((entry) => (entry.application_level ?? 0) >= 2 || entry.ownership_wish === "own" || entry.ownership_wish === "contribute")
+    // "Keine" Erfahrung ist eine Angabe zum Bereich, kein Beitrag.
+    .filter(bringsArea)
+    .map((entry) => entry.area_id);
 }
 
 export function normalizeTestProjectAnswers(value: unknown): TestProjectAnswer[] {

@@ -386,7 +386,16 @@
       "itemOn": "Aktiv",
       "remove": "Entfernen",
       "save": "Entwurf speichern",
-      "create": "Entwurf anlegen"
+      "create": "Entwurf anlegen",
+      "tasks": "Wer macht was?",
+      "tasksHelp": "Teilt die Arbeit auf – nach Fähigkeiten, Fachgebiet oder Rolle. Eine Aufgabe kann auch bei euch beiden liegen.",
+      "taskItem": "Aufgabe",
+      "taskPlaceholderItem": "z. B. Gesprächsleitfaden schreiben",
+      "taskWho": "Wer",
+      "taskBoth": "Beide",
+      "taskField": "Bereich",
+      "taskFieldPlaceholder": "Bereich (optional)",
+      "addTask": "Aufgabe hinzufügen"
     },
     "agreement": {
       "title": "Beide stimmen zu, dann geht es los",
@@ -412,7 +421,11 @@
       "roles": "Rollen",
       "done": "Fertig, wenn",
       "note": "Notiz",
-      "rights": "Vorher festgehalten (Fragen zum Besprechen)"
+      "rights": "Vorher festgehalten (Fragen zum Besprechen)",
+      "tasks": "Wer macht was",
+      "both": "Beide",
+      "you": "Du",
+      "contributions": "Das bringt ihr ein"
     },
     "interim": {
       "title": "Zwischenstand",
@@ -465,6 +478,19 @@
       "draft": "Entwurf",
       "active": "Läuft",
       "view": "Antworten ansehen"
+    },
+    "contribution": {
+      "title": "Das bringe ich ein",
+      "help": "Was du fachlich in dieses Testprojekt einbringst. Hier schreibst nur du; {name} sieht es.",
+      "own": "Dein Beitrag",
+      "placeholder": "z. B. Ich habe schon Interviews mit Kliniken geführt und kenne die Abläufe.",
+      "suggestions": "Aus „Wo kennst du dich aus?“ – antippen, um es zu zeigen:",
+      "suggestionsNone": "Wenn du unter „Wo kennst du dich aus?“ Bereiche einträgst, erscheinen sie hier als Vorschlag.",
+      "save": "Beitrag speichern",
+      "other": "{name} bringt ein",
+      "otherEmpty": "{name} hat noch nichts eingetragen.",
+      "afterCreate": "Sobald der Entwurf gespeichert ist, trägt jede Person ein, was sie einbringt.",
+      "resetNote": "Eine Änderung hier gilt als neuer Plan: Ihr stimmt beide neu zu."
     }
   },
   "commitmentLab": {

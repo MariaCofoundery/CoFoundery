@@ -8,6 +8,7 @@ import { AppIcon, IconTile } from "@/features/ui/Icons";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { normalizeLocale } from "@/i18n/config";
 import { getTestProject, type TestProjectView } from "@/features/testProject/testProjectData";
+import { getCapabilityVocabulary, getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import {
   TEST_PROJECT_CLOSING_QUESTIONS,
   TEST_PROJECT_INTERIM_QUESTIONS,
@@ -15,11 +16,15 @@ import {
   TEST_PROJECT_TEMPLATES,
 } from "@/features/testProject/testProjectTemplates";
 import {
+  TEST_PROJECT_BOTH,
   activeTestProjectItems,
+  contributionSuggestions,
+  groupTestProjectTasks,
   hasAgreedToCurrentDraft,
   isTestProjectPhaseComplete,
   testProjectDaysLeft,
   testProjectHref,
+  type TestProjectContribution,
   type TestProjectPhase,
   type TestProjectResponse,
 } from "@/features/testProject/testProjectModel";
@@ -49,7 +54,8 @@ function buildLabels(t: Translator): TestProjectLabels {
   const labels: TestProjectLabels = {};
   const groups: Array<[string, string[]]> = [
     ["picker", ["title", "help", "weeks", "free", "freeTitle", "freeText"]],
-    ["editor", ["title", "help", "name", "namePlaceholder", "task", "taskPlaceholder", "weeks", "weeksOption", "weeksOne", "weeksHelp", "roles", "rolesPlaceholder", "note", "notePlaceholder", "done", "doneHelp", "donePlaceholder", "addDone", "rights", "rightsHelp", "addQuestion", "closing", "closingHelp", "itemOn", "remove", "save", "create"]],
+    ["editor", ["tasks", "tasksHelp", "taskItem", "taskPlaceholderItem", "taskWho", "taskBoth", "taskField", "taskFieldPlaceholder", "addTask", "title", "help", "name", "namePlaceholder", "task", "taskPlaceholder", "weeks", "weeksOption", "weeksOne", "weeksHelp", "roles", "rolesPlaceholder", "note", "notePlaceholder", "done", "doneHelp", "donePlaceholder", "addDone", "rights", "rightsHelp", "addQuestion", "closing", "closingHelp", "itemOn", "remove", "save", "create"]],
+    ["contribution", ["title", "help", "own", "placeholder", "suggestions", "suggestionsNone", "save", "other", "otherEmpty", "afterCreate", "resetNote"]],
     ["agreement", ["title", "text", "agreed", "notYet", "agree", "withdraw", "cancel", "incomplete", "unsaved"]],
     ["active", ["cancel", "cancelHelp"]],
     ["interim", ["placeholder", "submit", "update"]],
@@ -147,11 +153,19 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
   const view = await getTestProject(teamId, relationshipId, user.id, supabase);
   if (!view) return <TeamUnavailable teamId={teamId} />;
 
-  const [t, teamLabel, rawLocale] = await Promise.all([
+  const [t, tCapability, teamLabel, rawLocale, vocabulary, ownEntries] = await Promise.all([
     getTranslations("teams.testProject"),
+    getTranslations("capability"),
     getTeamLabel(supabase, teamId),
     getLocale(),
+    getCapabilityVocabulary(supabase),
+    getOwnCapabilityEntries(supabase, user.id),
   ]);
+  // Bereichsnamen aus dem Vokabular: Vorschlaege fuer "Bereich" an Aufgaben und Namen der Beitrags-Bereiche.
+  const areaLabels = Object.fromEntries(
+    vocabulary.areas.map((area) => [area.area_id, tCapability.has(`areaLabels.${area.area_id}`) ? tCapability(`areaLabels.${area.area_id}`) : area.area_id])
+  );
+  const fieldSuggestions = [...new Set(Object.values(areaLabels))].sort((a, b) => a.localeCompare(b));
   const locale = normalizeLocale(rawLocale);
   const date = new Intl.DateTimeFormat(getPresentationLocale(rawLocale), { dateStyle: "medium" });
   const labels = buildLabels(t);
@@ -174,6 +188,9 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
   const rights = TEST_PROJECT_RIGHTS_QUESTIONS.map((q) => q[locale]);
   const closingDefaults = TEST_PROJECT_CLOSING_QUESTIONS.map((q) => q[locale]);
   const daysLeft = current?.status === "active" ? testProjectDaysLeft(current.endsAt) : null;
+  const nameOf = (id: string) => view.participantNames[view.participantUserIds.indexOf(id)] ?? "Founder";
+  const otherId = view.participantUserIds.find((id) => id !== user.id) ?? "";
+  const contributionOf = (list: TestProjectContribution[], id: string) => list.find((entry) => entry.userId === id) ?? { text: "", areaIds: [] };
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
@@ -229,6 +246,7 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
               freeIcon="spark"
               rights={rights}
               closing={closingDefaults}
+              fieldSuggestions={fieldSuggestions}
               templates={TEST_PROJECT_TEMPLATES.map((template) => ({
                 key: template.key,
                 icon: template.icon,
@@ -248,8 +266,15 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
             projectId={current.id}
             version={current.draftVersion}
             participants={participants}
+            fieldSuggestions={fieldSuggestions}
             ownAgreed={hasAgreedToCurrentDraft(current, currentAgreements, user.id)}
             labels={labels}
+            contribution={{
+              own: contributionOf(view.currentContributions, user.id),
+              other: { name: nameOf(otherId), ...contributionOf(view.currentContributions, otherId) },
+              suggestions: contributionSuggestions(ownEntries).filter((id) => id in areaLabels),
+              areaLabels,
+            }}
             initial={{
               templateKey: current.templateKey,
               title: current.title,
@@ -260,6 +285,7 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
               done: current.doneItems,
               rights: current.rightsItems,
               closing: current.closingItems,
+              tasks: current.taskItems,
             }}
           />
         ) : (
@@ -282,6 +308,42 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
                 {current.note ? <div><dt className={LABEL}>{t("active.note")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6">{current.note}</dd></div> : null}
                 {activeTestProjectItems(current.rightsItems).length ? <div className="sm:col-span-2"><dt className={LABEL}>{t("active.rights")}</dt><dd className="mt-1"><ul className="list-disc pl-5 text-[15px] leading-6">{activeTestProjectItems(current.rightsItems).map((item, i) => <li key={i}>{item.t}</li>)}</ul></dd></div> : null}
               </dl>
+              {current.taskItems.length ? (
+                <div className="mt-5">
+                  <p className={LABEL}>{t("active.tasks")}</p>
+                  <div className="mt-2 grid gap-3 sm:grid-cols-3">
+                    {groupTestProjectTasks(current.taskItems, view.participantUserIds).map((group) => (
+                      <div key={group.who} className="rounded-2xl bg-[#f7f6fb] p-4">
+                        <p className="text-sm font-semibold text-[#0b1f3a]">{group.who === TEST_PROJECT_BOTH ? t("active.both") : group.who === user.id ? t("active.you") : nameOf(group.who)}</p>
+                        <ul className="mt-2 grid gap-1.5 text-[15px] leading-6">
+                          {group.tasks.map((task, i) => (
+                            <li key={i}>{task.t}{task.f ? <span className="ml-1.5 rounded-full bg-white px-2 py-0.5 text-[13px] text-[#5f5e7a]">{task.f}</span> : null}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+              {view.currentContributions.length ? (
+                <div className="mt-5">
+                  <p className={LABEL}>{t("active.contributions")}</p>
+                  <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                    {view.participantUserIds.filter((id) => view.currentContributions.some((entry) => entry.userId === id)).map((id) => {
+                      const entry = contributionOf(view.currentContributions, id);
+                      return (
+                        <div key={id} className="rounded-2xl bg-[#f7f6fb] p-4">
+                          <p className="text-sm font-semibold text-[#0b1f3a]">{id === user.id ? t("active.you") : nameOf(id)}</p>
+                          {entry.text ? <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6">{entry.text}</p> : null}
+                          {entry.areaIds.length ? (
+                            <ul className="mt-2 flex flex-wrap gap-1.5">{entry.areaIds.map((areaId) => <li key={areaId} className="rounded-full bg-white px-3 py-1 text-sm text-[#33325e]">{areaLabels[areaId] ?? areaId}</li>)}</ul>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
               <p className="mt-4 text-[13px] text-[#5f5e7a]">{t("active.frozen")}</p>
             </section>
 

@@ -386,7 +386,16 @@
       "itemOn": "Active",
       "remove": "Remove",
       "save": "Save draft",
-      "create": "Create draft"
+      "create": "Create draft",
+      "tasks": "Who does what?",
+      "tasksHelp": "Split the work – by skills, field or role. A task can also sit with both of you.",
+      "taskItem": "Task",
+      "taskPlaceholderItem": "e.g. write the interview guide",
+      "taskWho": "Who",
+      "taskBoth": "Both",
+      "taskField": "Area",
+      "taskFieldPlaceholder": "Area (optional)",
+      "addTask": "Add task"
     },
     "agreement": {
       "title": "Both agree, then it starts",
@@ -412,7 +421,11 @@
       "roles": "Roles",
       "done": "Done when",
       "note": "Note",
-      "rights": "Agreed beforehand (questions to talk through)"
+      "rights": "Agreed beforehand (questions to talk through)",
+      "tasks": "Who does what",
+      "both": "Both",
+      "you": "You",
+      "contributions": "What you bring"
     },
     "interim": {
       "title": "Midway check",
@@ -465,6 +478,19 @@
       "draft": "Draft",
       "active": "Running",
       "view": "View answers"
+    },
+    "contribution": {
+      "title": "What I bring",
+      "help": "What you bring to this test project in terms of expertise. Only you write here; {name} sees it.",
+      "own": "Your contribution",
+      "placeholder": "e.g. I have already interviewed clinics and know how they work.",
+      "suggestions": "From “Where do you know your way around?” – tap to show it:",
+      "suggestionsNone": "If you add areas under “Where do you know your way around?”, they appear here as suggestions.",
+      "save": "Save contribution",
+      "other": "{name} brings",
+      "otherEmpty": "{name} hasn't added anything yet.",
+      "afterCreate": "Once the draft is saved, each person adds what they bring.",
+      "resetNote": "A change here counts as a new plan: you both agree again."
     }
   },
   "commitmentLab": {

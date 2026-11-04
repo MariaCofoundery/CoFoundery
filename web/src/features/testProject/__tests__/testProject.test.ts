@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  TEST_PROJECT_BOTH,
   TEST_PROJECT_LIMITS,
+  contributionSuggestions,
+  groupTestProjectTasks,
+  normalizeTestProjectTasks,
+  sanitizeTestProjectTasks,
   activeTestProjectItems,
   hasAgreedToCurrentDraft,
   isTestProjectDraftComplete,
@@ -126,4 +131,66 @@ test("die Migration: beide stimmen zu, Version, Antworten erst nach beiden, kein
 test("Export und Team-Seite kennen das Testprojekt", () => {
   assert.match(source("src/features/account/accountExport.ts"), /relationship_test_project_responses/);
   assert.match(source("src/app/(product)/teams/[teamId]/page.tsx"), /testProjectHref\(teamId, entry\.relationshipId\)/);
+});
+
+test("Aufgaben je Person: 'wer' ist eine der beiden oder beide, leere fallen weg", () => {
+  const pair = ["a-user", "b-user"];
+  assert.deepEqual(
+    sanitizeTestProjectTasks(
+      [
+        { t: " Leitfaden schreiben ", who: "a-user", f: " Vertrieb " },
+        { t: "   ", who: "b-user", f: null },
+        { t: "Gespraeche fuehren", who: "jemand-anderes", f: "" },
+        { t: 3, who: "a-user" },
+      ],
+      pair
+    ),
+    [
+      { t: "Leitfaden schreiben", who: "a-user", f: "Vertrieb" },
+      { t: "Gespraeche fuehren", who: TEST_PROJECT_BOTH, f: null },
+    ]
+  );
+  assert.equal(normalizeTestProjectTasks([{ t: "x".repeat(400), who: "a-user", f: "y".repeat(100) }])[0].f?.length, TEST_PROJECT_LIMITS.taskField);
+  assert.deepEqual(
+    groupTestProjectTasks(
+      [{ t: "1", who: "both", f: null }, { t: "2", who: "b-user", f: null }, { t: "3", who: "a-user", f: null }],
+      pair
+    ).map((group) => [group.who, group.tasks.map((task) => task.t)]),
+    [["a-user", ["3"]], ["b-user", ["2"]], ["both", ["1"]]]
+  );
+});
+
+test("Vorschlaege fuer 'Das bringe ich ein': eigene Bereiche mit Erfahrung oder Beitragswunsch - nie 'Keine'", () => {
+  assert.deepEqual(
+    contributionSuggestions([
+      { area_id: "b2b_sales", application_level: 4, ownership_wish: null },
+      { area_id: "fundraising", application_level: null, ownership_wish: "contribute" },
+      { area_id: "accounting_controlling", application_level: 1, ownership_wish: "own" },
+      { area_id: "ux_design", application_level: null, ownership_wish: "grow_into" },
+    ]),
+    ["b2b_sales", "fundraising"]
+  );
+});
+
+test("Aufgaben und Beitrag gehoeren zum Plan: jede Aenderung setzt beide Zustimmungen zurueck, nach dem Start eingefroren", () => {
+  const sql = source("../supabase/migrations/20270309120000_test_project_tasks.sql");
+  assert.match(sql, /task_items = coalesce\(p_tasks, task_items\)/);
+  assert.match(sql, /e\.item ->> 'who' in \(r\.user_a_id::text, r\.user_b_id::text\)/);
+  // Nur der eigene Beitrag: die Funktion schreibt immer mit auth.uid().
+  assert.match(sql, /values \(p_project_id, v_user_id, v_text, v_areas\)/);
+  assert.match(sql, /if v_project\.status <> 'draft' then\s+raise exception 'test_project_not_editable'/);
+  assert.match(sql, /delete from public\.relationship_test_project_agreements where project_id = p_project_id;\s+end;/);
+  assert.match(sql, /revoke all on public\.relationship_test_project_contributions from public, anon, authenticated;/);
+  // Im Export nur die eigene Zeile.
+  assert.match(source("src/features/account/accountExport.ts"), /table: "relationship_test_project_contributions", column: "user_id"/);
+});
+
+test("die Oberflaeche zeigt, wer was macht, und teilt Bereiche erst nach Antippen", () => {
+  const client = source("src/features/testProject/TestProjectClient.tsx");
+  const page = source("src/app/(product)/teams/[teamId]/test-project/[relationshipId]/page.tsx");
+  assert.match(client, /<option value=\{TEST_PROJECT_BOTH\}>/);
+  assert.match(client, /aria-pressed=\{on\} onClick=\{\(\) => toggle\(id\)\}/);
+  assert.match(page, /contributionSuggestions\(ownEntries\)/);
+  assert.match(page, /groupTestProjectTasks\(current\.taskItems, view\.participantUserIds\)/);
+  assert.doesNotMatch(client + page, /score|ranking|percent/i);
 });
