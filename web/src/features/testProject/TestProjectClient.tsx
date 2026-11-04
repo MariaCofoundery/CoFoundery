@@ -22,6 +22,7 @@ import {
   type TestProjectItem,
   type TestProjectTask,
 } from "@/features/testProject/testProjectModel";
+import { UserText } from "@/features/ui/UserText";
 
 const CARD = "rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-[26px]";
 const INPUT = "mt-2 min-h-11 w-full rounded-xl border border-[#d8d5ea] bg-white px-3.5 py-2 text-[15px] text-[#0b1f3a] outline-none focus:border-[#6d49e0] focus:ring-4 focus:ring-[#6d49e0]/15";
@@ -437,7 +438,7 @@ function ContributionPanel({
           <p className={LABEL}>{labels["contribution.other"].replace("{name}", other.name)}</p>
           {other.text || other.areaIds.length ? (
             <>
-              {other.text ? <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]">{other.text}</p> : null}
+              {other.text ? <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]"><UserText text={other.text} /></p> : null}
               {other.areaIds.length ? (
                 <ul className="mt-2 flex flex-wrap gap-1.5">
                   {other.areaIds.map((id) => <li key={id} className="rounded-full bg-white px-3 py-1 text-sm text-[#33325e]">{areaLabels[id] ?? id}</li>)}

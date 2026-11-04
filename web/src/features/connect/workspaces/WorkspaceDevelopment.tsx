@@ -4,6 +4,7 @@ import type { ProblemWorkspace } from "./model";
 import type { WorkspaceDevelopment as Development } from "./developmentModel";
 import { workspaceSession } from "./data";
 import { card, button } from "./styles";
+import { UserText } from "@/features/ui/UserText";
 export async function WorkspaceDevelopment({
   workspace: w,
 }: {
@@ -72,10 +73,10 @@ export async function WorkspaceDevelopment({
             </Link>
             <p>{common(o.status)}</p>
             <p className="whitespace-pre-wrap break-words">
-              {o.affected_group}
+              <UserText text={o.affected_group} />
             </p>
             <p className="whitespace-pre-wrap break-words">
-              {o.opportunity_statement}
+              <UserText text={o.opportunity_statement} />
             </p>
             {o.venture ? (
               <Link

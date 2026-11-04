@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Die Vorlage einer Mitteilung. Das Aussehen ist immer gleich; Titel, Text und
@@ -39,7 +40,7 @@ export function AnnouncementCard({
         <h2 id={titleId} className="text-[1.45rem] font-extrabold leading-tight tracking-tight text-slate-950">{title}</h2>
         <div className="grid gap-3 text-[0.95rem] leading-7 text-slate-700">
           {body.split(/\n{2,}/).map((paragraph, index) => (
-            <p key={index} className="whitespace-pre-line">{paragraph}</p>
+            <p key={index} className="whitespace-pre-line"><UserText text={paragraph} /></p>
           ))}
         </div>
         {actions ? <div className="mt-1 grid gap-2">{actions}</div> : null}

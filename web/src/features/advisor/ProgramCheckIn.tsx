@@ -3,6 +3,7 @@ import { saveCheckInAction } from "@/features/advisor/teamProgramActions";
 import type { CheckIn } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das Gespraech zum Stand: Beide Seiten halten fest, dass und worueber gesprochen wurde, und wann das
@@ -47,7 +48,7 @@ export async function ProgramCheckIn({ programId, checkIns, returnTo }: { progra
           {checkIns.map((entry) => (
             <li key={entry.checkInId} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
               <p className="text-sm font-semibold text-slate-950">{format.format(new Date(entry.heldOn))}</p>
-              {entry.summary ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{entry.summary}</p> : null}
+              {entry.summary ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={entry.summary} /></p> : null}
             </li>
           ))}
         </ul>

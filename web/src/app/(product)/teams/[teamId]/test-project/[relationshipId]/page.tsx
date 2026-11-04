@@ -35,6 +35,7 @@ import {
   TestProjectStarter,
   type TestProjectLabels,
 } from "@/features/testProject/TestProjectClient";
+import { UserText } from "@/features/ui/UserText";
 
 type Props = {
   params: Promise<{ teamId: string; relationshipId: string }>;
@@ -121,7 +122,7 @@ function ResultsBlock({
                   {byUser.map((entry) => (
                     <div key={entry.id} className="min-w-0 rounded-xl border border-[#e4e2f0] bg-white p-3">
                       <p className={LABEL}>{t(entry.id === meId ? "results.own" : "results.other", { name: entry.name })}</p>
-                      <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]">{entry.response?.answers[index]?.a.trim() || t("results.noAnswer")}</p>
+                      <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]"><UserText text={entry.response?.answers[index]?.a.trim() || t("results.noAnswer")} /></p>
                     </div>
                   ))}
                 </div>
@@ -302,10 +303,10 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
                 </div>
               </div>
               <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div><dt className={LABEL}>{t("active.task")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6">{current.task}</dd></div>
-                {current.roles ? <div><dt className={LABEL}>{t("active.roles")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6">{current.roles}</dd></div> : null}
+                <div><dt className={LABEL}>{t("active.task")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6"><UserText text={current.task} /></dd></div>
+                {current.roles ? <div><dt className={LABEL}>{t("active.roles")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6"><UserText text={current.roles} /></dd></div> : null}
                 <div><dt className={LABEL}>{t("active.done")}</dt><dd className="mt-1"><ul className="list-disc pl-5 text-[15px] leading-6">{activeTestProjectItems(current.doneItems).map((item, i) => <li key={i}>{item.t}</li>)}</ul></dd></div>
-                {current.note ? <div><dt className={LABEL}>{t("active.note")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6">{current.note}</dd></div> : null}
+                {current.note ? <div><dt className={LABEL}>{t("active.note")}</dt><dd className="mt-1 whitespace-pre-wrap text-[15px] leading-6"><UserText text={current.note} /></dd></div> : null}
                 {activeTestProjectItems(current.rightsItems).length ? <div className="sm:col-span-2"><dt className={LABEL}>{t("active.rights")}</dt><dd className="mt-1"><ul className="list-disc pl-5 text-[15px] leading-6">{activeTestProjectItems(current.rightsItems).map((item, i) => <li key={i}>{item.t}</li>)}</ul></dd></div> : null}
               </dl>
               {current.taskItems.length ? (
@@ -334,7 +335,7 @@ export default async function TestProjectPage({ params, searchParams }: Props) {
                       return (
                         <div key={id} className="rounded-2xl bg-[#f7f6fb] p-4">
                           <p className="text-sm font-semibold text-[#0b1f3a]">{id === user.id ? t("active.you") : nameOf(id)}</p>
-                          {entry.text ? <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6">{entry.text}</p> : null}
+                          {entry.text ? <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6"><UserText text={entry.text} /></p> : null}
                           {entry.areaIds.length ? (
                             <ul className="mt-2 flex flex-wrap gap-1.5">{entry.areaIds.map((areaId) => <li key={areaId} className="rounded-full bg-white px-3 py-1 text-sm text-[#33325e]">{areaLabels[areaId] ?? areaId}</li>)}</ul>
                           ) : null}

@@ -10,6 +10,7 @@ export type AdminFeedbackRow = {
   q1: string; q2: string; q3: string; q4_choice: string | null; q4_other_text: string | null; q5: string | null; is_new: boolean;
 };
 import { FEEDBACK_TABS as TABS, type FeedbackTab as Tab } from "@/features/admin/feedbackTab";
+import { UserText } from "@/features/ui/UserText";
 export { parseFeedbackTab } from "@/features/admin/feedbackTab";
 const PAGE = 25;
 
@@ -98,7 +99,7 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page }: { cl
                 {selected.is_new ? <span className="rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{t("new")}</span> : null}
               </div>
               {([["q1", selected.q1], ["q2", selected.q2], ["q3", selected.q3]] as const).map(([key, answer]) => (
-                <div key={key}><p className="text-[13px] font-semibold text-[#5f5e7a]">{tf(`questions.${key}`).replace(/^\d+\.\s*/, "")}</p><p className="mt-1 whitespace-pre-line text-[15px] leading-relaxed text-slate-950">{answer}</p></div>
+                <div key={key}><p className="text-[13px] font-semibold text-[#5f5e7a]">{tf(`questions.${key}`).replace(/^\d+\.\s*/, "")}</p><p className="mt-1 whitespace-pre-line text-[15px] leading-relaxed text-slate-950"><UserText text={answer} /></p></div>
               ))}
               <div>
                 <p className="text-[13px] font-semibold text-[#5f5e7a]">{tf("questions.q4").replace(/^\d+\.\s*/, "")}</p>
@@ -106,7 +107,7 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page }: { cl
               </div>
               <div>
                 <p className="text-[13px] font-semibold text-[#5f5e7a]">{tf("questions.q5").replace(/^\d+\.\s*/, "")}</p>
-                <p className={`mt-1 whitespace-pre-line text-[15px] leading-relaxed ${selected.q5 ? "text-slate-950" : "text-[#5f5e7a]"}`}>{selected.q5 || t("noAnswer")}</p>
+                <p className={`mt-1 whitespace-pre-line text-[15px] leading-relaxed ${selected.q5 ? "text-slate-950" : "text-[#5f5e7a]"}`}><UserText text={selected.q5 || t("noAnswer")} /></p>
               </div>
               <form action={markFeedbackReadAction} className="mt-2 flex flex-wrap items-center gap-3 border-t border-[#e4e2f0] pt-4">
                 <input type="hidden" name="id" value={selected.id} />

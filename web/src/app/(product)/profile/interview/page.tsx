@@ -19,6 +19,7 @@ import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
 import { SpeakButton } from "@/features/interviews/SpeakButton";
 import { spokenText } from "@/features/interviews/interviewAudio";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das geführte Gespräch.
@@ -182,7 +183,7 @@ export default async function CapabilityInterviewPage({
                             : meta.text}
                         </p>
                         <p className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-600">
-                          {turn.answer}
+                          <UserText text={turn.answer} />
                         </p>
                       </div>
                     );

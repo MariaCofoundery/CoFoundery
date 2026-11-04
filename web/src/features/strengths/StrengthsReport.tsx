@@ -8,6 +8,7 @@ import {
   type StrengthDomain,
   type StrengthThemeId,
 } from "@/features/strengths/strengthThemes";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Der Einzelreport zu den Stärken: vier Bereiche, darin die Themen, die die
@@ -134,7 +135,7 @@ export async function StrengthsReport({
             {counterAnswers.map((entry) => (
               <div key={entry.questionId} className="rounded-2xl bg-white p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t(`report.needs.${entry.questionId}`)}</dt>
-                <dd className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-800">{entry.answer}</dd>
+                <dd className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-800"><UserText text={entry.answer} /></dd>
               </div>
             ))}
           </dl>

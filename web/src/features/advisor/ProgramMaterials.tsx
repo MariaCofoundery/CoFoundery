@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { deleteProgramMaterialAction, saveProgramMaterialAction } from "@/features/advisor/teamProgramActions";
 import type { ProgramMaterial } from "@/features/advisor/teamProgramData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 const FIELD = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm";
 const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
@@ -22,7 +23,7 @@ function MaterialLink({ material }: { material: ProgramMaterial }) {
         {material.title}
       </a>
       <p className="break-all text-xs text-slate-500">{hostOf(material.url)}</p>
-      {material.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{material.note}</p> : null}
+      {material.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={material.note} /></p> : null}
     </div>
   );
 }

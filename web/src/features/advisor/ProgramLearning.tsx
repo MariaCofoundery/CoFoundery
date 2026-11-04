@@ -8,6 +8,7 @@ import {
 } from "@/features/advisor/teamProgramActions";
 import type { LearningLesson, LearningModule, ModuleShare } from "@/features/advisor/teamProgramData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 const FIELD = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm";
 const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
@@ -36,7 +37,7 @@ function LessonLine({ lesson, t }: { lesson: LearningLesson; t: T }) {
         {lesson.minutes ? ` · ${t("learningMinutes", { count: lesson.minutes })}` : ""}
         {lesson.speaker ? ` · ${lesson.speaker}` : ""}
       </p>
-      {lesson.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{lesson.note}</p> : null}
+      {lesson.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={lesson.note} /></p> : null}
     </div>
   );
 }

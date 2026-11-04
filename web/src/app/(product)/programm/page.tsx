@@ -26,6 +26,7 @@ import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
 import { ProgramEventRsvp } from "@/features/advisor/ProgramEventRsvp";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Programm: in welchen Programmen ist mein Team, und wer liest mit? Die
@@ -117,7 +118,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                   {event.orgName} · {t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
                   {event.location ? ` · ${event.location}` : ""}
                 </p>
-                {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{event.notes}</p> : null}
+                {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={event.notes} /></p> : null}
                 {event.todos ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><span className="font-semibold">{t("planTodos")}: </span>{event.todos}</p> : null}
                 {event.myStatus ? <p className="mt-1 text-xs font-semibold text-violet-800">{t("myAttendance", { status: t(`attend_${event.myStatus}`) })}</p> : null}
                 {/* Zusagen nur vor Beginn - danach zaehlt die eingetragene Teilnahme. */}

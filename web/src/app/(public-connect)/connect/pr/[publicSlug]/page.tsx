@@ -9,6 +9,7 @@ import { getPublicConnectProblem } from "@/features/connect/publicConnectData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { PRODUCT_NAME } from "@/features/brand";
+import { UserText } from "@/features/ui/UserText";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -81,7 +82,7 @@ export default async function PublicConnectProblemPage({
             {t(`problems.intents.${problem.author_intent}`)}
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">{problem.title}</h1>
-          <p className="mt-6 whitespace-pre-wrap leading-7 text-slate-700">{problem.description}</p>
+          <p className="mt-6 whitespace-pre-wrap leading-7 text-slate-700"><UserText text={problem.description} /></p>
 
           {problem.topics.length ? (
             <section className="mt-7">

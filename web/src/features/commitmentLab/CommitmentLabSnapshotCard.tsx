@@ -4,6 +4,7 @@ import {
   type CommitmentLabFounderEntry,
   type CommitmentLabObligation,
 } from "@/features/commitmentLab/commitmentLabModel";
+import { UserText } from "@/features/ui/UserText";
 
 type Labels = {
   time: string;
@@ -78,7 +79,7 @@ function SnapshotText({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-[#5f5e7a]">{label}</dt>
-      <dd className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-[#33325e]">{value}</dd>
+      <dd className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-[#33325e]"><UserText text={value} /></dd>
     </div>
   );
 }

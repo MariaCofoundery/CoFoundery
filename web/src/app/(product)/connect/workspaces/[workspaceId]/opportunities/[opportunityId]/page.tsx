@@ -14,6 +14,7 @@ import {
 } from "@/features/connect/workspaces/developmentActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { card, field, button } from "@/features/connect/workspaces/styles";
+import { UserText } from "@/features/ui/UserText";
 export default async function Page({
   params,
   searchParams,
@@ -61,13 +62,13 @@ export default async function Page({
       {query.saved && <p role="status">{common("saved")}</p>}
       <section className={card}>
         <h2 className="font-semibold">{t("affectedGroup")}</h2>
-        <p className="whitespace-pre-wrap break-words">{o.affected_group}</p>
+        <p className="whitespace-pre-wrap break-words"><UserText text={o.affected_group} /></p>
         <h2 className="font-semibold">{t("statement")}</h2>
         <p className="whitespace-pre-wrap break-words">
-          {o.opportunity_statement}
+          <UserText text={o.opportunity_statement} />
         </p>
         <h2 className="font-semibold">{t("value")}</h2>
-        <p className="whitespace-pre-wrap break-words">{o.possible_value}</p>
+        <p className="whitespace-pre-wrap break-words"><UserText text={o.possible_value} /></p>
       </section>
       {!!o.entry_ids.length && (
         <section className={card}>

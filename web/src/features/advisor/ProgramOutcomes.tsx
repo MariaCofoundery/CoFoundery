@@ -8,6 +8,7 @@ import {
 import { countStars, type OutcomeComment, type ProgramOutcome } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 const stars = (count: number, filled: boolean) => (filled ? "★" : "☆").repeat(count);
 
@@ -65,7 +66,7 @@ export async function ProgramOutcomes({
                     {entry.confirmed ? t("outcomeConfirmed") : t("outcomeWaiting")}
                     {entry.achievedOn ? ` · ${format.format(new Date(entry.achievedOn))}` : ""}
                   </p>
-                  {entry.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{entry.note}</p> : null}
+                  {entry.note ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={entry.note} /></p> : null}
                   {entry.confirmed ? (
                     <div className="mt-2 grid gap-1 border-t border-amber-200/70 pt-2">
                       {(["team", "org"] as const).map((side) => {

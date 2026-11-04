@@ -10,6 +10,7 @@ import { getPublicConnectVentures } from "@/features/connect/connectVentureData"
 import { createClient } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { PRODUCT_NAME } from "@/features/brand";
+import { UserText } from "@/features/ui/UserText";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,7 +51,7 @@ export default async function PublicConnectProfilePage({ params }: { params: Pro
           <p className="mt-2 text-lg text-slate-600">{profile.headline}</p>
         </div>
       </div>
-      <p className="mt-7 whitespace-pre-wrap leading-7 text-slate-700">{profile.bio}</p>
+      <p className="mt-7 whitespace-pre-wrap leading-7 text-slate-700"><UserText text={profile.bio} /></p>
       {profile.network_roles.length ? <div className="mt-6 flex flex-wrap gap-2">{profile.network_roles.map((role) => <span key={role} className="rounded-full bg-violet-50 px-3 py-1 text-sm text-violet-800">{t(`roles.${role}`)}</span>)}</div> : null}
       <div className="mt-7 grid gap-5 sm:grid-cols-2">
         {profile.expertise.length ? <section><h2 className="font-semibold">{t("detail.topics")}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{profile.expertise.join(" · ")}</p></section> : null}
@@ -63,7 +64,7 @@ export default async function PublicConnectProfilePage({ params }: { params: Pro
     {ventures.length ? <section className="mt-10"><h2 className="text-2xl font-semibold">{t("ventures.title")}</h2><div className="mt-5 space-y-4">{ventures.map((venture) => <article key={venture.name} className="rounded-3xl border border-slate-200 bg-white p-5">
       <h3 className="text-xl font-semibold">{venture.name}</h3>
       {venture.role_label ? <p className="mt-1 text-sm text-slate-500">{venture.role_label}</p> : null}
-      <p className="mt-3 whitespace-pre-wrap leading-7 text-slate-700">{venture.what_it_does}</p>
+      <p className="mt-3 whitespace-pre-wrap leading-7 text-slate-700"><UserText text={venture.what_it_does} /></p>
       <div className="mt-4 rounded-2xl border-l-[3px] border-violet-400 bg-white px-4 py-3"><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("ventures.audienceHeading")}</p><p className="mt-1 text-sm leading-6 text-slate-700">{venture.audience}</p></div>
       {venture.motivation ? <div className="mt-3"><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("ventures.motivationHeading")}</p><p className="mt-1 text-sm leading-6 text-slate-700">{venture.motivation}</p></div> : null}
       {venture.website ? <a href={venture.website} target="_blank" rel="noreferrer noopener nofollow" title={t("ventures.openLinkHint")} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("ventures.openLink")}</a> : null}

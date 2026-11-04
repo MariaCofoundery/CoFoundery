@@ -10,6 +10,7 @@ import {
   type IntakeRound,
 } from "@/features/team-intake/model";
 import { saveIntakeAction } from "@/features/team-intake/actions";
+import { UserText } from "@/features/ui/UserText";
 export const button =
   "inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50";
 const input =
@@ -230,7 +231,7 @@ export async function AnswerList({
               {t(`fields.${key}`)}
             </dt>
             <dd className="mt-1 whitespace-pre-wrap break-words leading-7">
-              {text}
+              <UserText text={text} />
             </dd>
           </div>
         );
@@ -273,7 +274,7 @@ export async function OwnPreview({
       <section className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
         <h2 className="font-semibold">{t("privateTitle")}</h2>
         <p>{own.private_requested ? t("privateRequest") : t("missing")}</p>
-        <p className="whitespace-pre-wrap break-words">{own.private_note}</p>
+        <p className="whitespace-pre-wrap break-words"><UserText text={own.private_note} /></p>
       </section>
     </div>
   );

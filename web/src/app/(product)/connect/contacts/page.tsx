@@ -12,6 +12,7 @@ import { getMemberLinkedInUrls } from "@/features/profile/linkedInData";
 import { LinkedInLink } from "@/features/profile/LinkedInLink";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_CONTACT_KEYS, CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
+import { UserText } from "@/features/ui/UserText";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function safetyCopy(t: T) { return {
@@ -30,7 +31,7 @@ function ContactCard({ request, direction, t, locale, profile, blockState }: { r
       <div className="mt-2 flex items-center gap-3"><ConnectAvatar profile={profile} displayName={counterpart} /><h3 className="text-lg font-semibold text-slate-950">{counterpart}</h3></div>
       {direction === "incoming" && request.sender_headline_snapshot ? <p className="mt-1 text-sm text-slate-500">{request.sender_headline_snapshot}</p> : null}
       <p className="mt-3 text-sm font-semibold text-violet-800">{request.listing_title_snapshot}</p>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">{request.message}</p>
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={request.message} /></p>
       <p className="mt-3 text-xs text-slate-500">{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(request.created_at))}</p>
       <ConnectSafetyActions otherUserId={counterpartId} contactRequestId={request.id} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} />
     </div>{request.status === "pending" && !blockState.interaction_blocked ? <ConnectContactActions id={request.id} direction={direction} t={t} /> : null}</div>

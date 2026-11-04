@@ -12,6 +12,7 @@ import {
   NARRATIVE_MIN_LENGTH,
 } from "./capabilityTypes";
 import { analyzeNarrativeWithRules, type NarrativeAnalysis } from "./narrativeAnalysis";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Schritt 1 des Snapshots, in zwei Phasen.
@@ -147,7 +148,7 @@ export function CapabilitySnapshotStart({
           <summary className="min-h-11 cursor-pointer text-sm font-semibold">
             {t("confirm.showNarrative")}
           </summary>
-          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{narrative}</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={narrative} /></p>
         </details>
 
         <div className="flex flex-wrap items-center gap-3">

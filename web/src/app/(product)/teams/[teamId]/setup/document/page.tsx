@@ -13,6 +13,7 @@ import { PrintButton } from "@/features/teams/PrintButton";
 import { normalizeLocale } from "@/i18n/config";
 import { getRequestUser } from "@/lib/supabase/server";
 import { createClient } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Was am Ende herauskommt.
@@ -110,7 +111,7 @@ export default async function FounderSetupDocument({
                     </div>
                     {item.currentConfirmedRevision?.note ? (
                       <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                        {item.currentConfirmedRevision.note}
+                        <UserText text={item.currentConfirmedRevision.note} />
                       </p>
                     ) : null}
                     {item.currentConfirmedRevision?.documentationReference ? (

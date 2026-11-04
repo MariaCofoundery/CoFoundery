@@ -32,6 +32,7 @@ import {
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { knownKey } from "@/i18n/knownKey";
+import { UserText } from "@/features/ui/UserText";
 
 const card = "problem-card p-6";
 const field =
@@ -164,11 +165,11 @@ export default async function ConnectProblemPage({
             {t(`problems.statuses.${problem.status}`)}
           </p>
         ) : null}
-        <p className="mt-4 whitespace-pre-wrap text-lg leading-8 text-slate-800">{described.main}</p>
+        <p className="mt-4 whitespace-pre-wrap text-lg leading-8 text-slate-800"><UserText text={described.main} /></p>
         {described.tried ? (
           <div className="mt-5 rounded-2xl border-l-4 border-cyan-400 bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-[.14em] text-cyan-800">{t("problems.live.tried")}</p>
-            <p className="mt-1 whitespace-pre-wrap leading-7 text-slate-700">{described.tried}</p>
+            <p className="mt-1 whitespace-pre-wrap leading-7 text-slate-700"><UserText text={described.tried} /></p>
           </div>
         ) : null}
 
@@ -264,7 +265,7 @@ export default async function ConnectProblemPage({
                   <p className="font-medium">
                     {interestedProfiles.get(interest.user_id)?.display_name ?? t("problems.unknownAuthor")}
                   </p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{interest.note}</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={interest.note} /></p>
                   <form action={acceptConnectProblemInterestAction} className="mt-3">
                     <input type="hidden" name="interest_id" value={interest.id} />
                     <input type="hidden" name="problem_id" value={problem.id} />
@@ -298,7 +299,7 @@ export default async function ConnectProblemPage({
           {ownInterest ? (
             <>
               <h2 className="text-lg font-semibold">{t("problems.yourInterestTitle")}</h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{ownInterest.note}</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={ownInterest.note} /></p>
               <p className={hint}>{t("problems.yourInterestText")}</p>
               <form action={withdrawConnectProblemInterestAction} className="mt-4">
                 <input type="hidden" name="problem_id" value={problem.id} />

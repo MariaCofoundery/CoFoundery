@@ -23,6 +23,7 @@ import {
 } from "@/features/connect/connectTypes";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Der Schritt vom Problem zum Ansatz.
@@ -93,7 +94,7 @@ export async function ProblemApproaches({
                   <p className="mt-1 text-sm text-slate-600">{author.headline}</p>
                 ) : null}
                 <p className="mt-3 whitespace-pre-wrap leading-7 text-slate-800">
-                  {approach.summary}
+                  <UserText text={approach.summary} />
                 </p>
                 <dl className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div>
@@ -128,7 +129,7 @@ export async function ProblemApproaches({
                           {t("problems.yourApproachReplyTitle")}
                         </p>
                         <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                          {ownReplies.get(approach.id)?.note}
+                          <UserText text={ownReplies.get(approach.id)?.note} />
                         </p>
                         <form action={withdrawConnectProblemInterestAction} className="mt-3">
                           <input type="hidden" name="problem_id" value={problemId} />
@@ -310,7 +311,7 @@ export async function ProblemApproaches({
                               t("problems.unknownAuthor")}
                           </p>
                           <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                            {reply.note}
+                            <UserText text={reply.note} />
                           </p>
                           <form action={acceptConnectProblemInterestAction} className="mt-3">
                             <input type="hidden" name="interest_id" value={reply.id} />

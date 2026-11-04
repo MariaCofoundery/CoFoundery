@@ -26,6 +26,7 @@ import {
   type CheckInRetroState,
   type CheckInTopicCard,
 } from "@/features/checkIn/CheckInClient";
+import { UserText } from "@/features/ui/UserText";
 
 type Props = { params: Promise<{ teamId: string }>; searchParams: Promise<{ result?: string }> };
 
@@ -137,7 +138,7 @@ export default async function CheckInPage({ params, searchParams }: Props) {
         <li key={answer.userId} className="min-w-0 rounded-xl border border-[#e4e2f0] bg-white p-3">
           <p className={LABEL}>{t(answer.userId === user.id ? "results.own" : "results.other", { name: nameOf(answer.userId) })}</p>
           <p className="mt-1 text-[15px] font-semibold text-[#0b1f3a]">{t(`open.answers.${answer.answer}`)}</p>
-          <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-[#5f5e7a]">{answer.note.trim() || t("results.noNote")}</p>
+          <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-[#5f5e7a]"><UserText text={answer.note.trim() || t("results.noNote")} /></p>
         </li>
       ))}
       {topicOf(detail, entry.topicId)?.itemKey && entry.answers.some((answer) => answer.answer === "talk") ? (
@@ -249,7 +250,7 @@ export default async function CheckInPage({ params, searchParams }: Props) {
                           {row.byUser.map((entry) => (
                             <div key={entry.id} className="min-w-0 rounded-xl border border-[#e4e2f0] bg-white p-3">
                               <p className={LABEL}>{t(entry.id === user.id ? "results.own" : "results.other", { name: nameOf(entry.id) })}</p>
-                              <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]">{entry.answer.trim() || t("retro.noAnswer")}</p>
+                              <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-6 text-[#0b1f3a]"><UserText text={entry.answer.trim() || t("retro.noAnswer")} /></p>
                             </div>
                           ))}
                         </div>

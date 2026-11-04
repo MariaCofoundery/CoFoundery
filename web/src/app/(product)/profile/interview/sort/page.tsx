@@ -23,6 +23,7 @@ import {
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { InterviewSortForm } from "@/features/capability/InterviewSortForm";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Antworten einordnen.
@@ -162,7 +163,7 @@ export default async function InterviewSortPage({
               {question ? t(`interview.questions.${question.id}.title`) : meta?.text}
             </h2>
             <p className="mt-3 whitespace-pre-line rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
-              {turn.answer}
+              <UserText text={turn.answer} />
             </p>
           </section>
 

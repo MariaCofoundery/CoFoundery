@@ -71,6 +71,7 @@ import { CoverageRoles } from "@/features/reporting/CoverageMap";
 import { FounderProfileBase } from "@/features/reporting/FounderProfileBase";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 const field =
   "mt-2 min-h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100";
@@ -830,7 +831,7 @@ export default async function ProfilePage({
                           <ul className="mt-3 space-y-2">
                             {entry.evidence.map((evidence) => (
                               <li key={evidence.id} className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                                <p className="whitespace-pre-wrap">{evidence.narrative}</p>
+                                <p className="whitespace-pre-wrap"><UserText text={evidence.narrative} /></p>
                                 {/* Rueckfrage vor dem Loeschen: Das hier ist
                                     der laengste selbst geschriebene Text im
                                     Produkt und war auf einen Klick weg. */}

@@ -9,6 +9,7 @@ import type {
 } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
+import { UserText } from "@/features/ui/UserText";
 
 export async function AdvisorFounderSetupSection({
   items,
@@ -87,7 +88,7 @@ export async function AdvisorFounderSetupSection({
                       </div>
                       {item.note ? (
                         <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                          {item.note}
+                          <UserText text={item.note} />
                         </p>
                       ) : null}
                       {item.documentationReference ? (

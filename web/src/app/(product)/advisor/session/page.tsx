@@ -28,6 +28,7 @@ import { advisorRelationshipHasFounderTeam } from "@/features/teams/founderSetup
 import { describeAdvisorFounderSetupPause } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 const CARD = "rounded-3xl border border-slate-200/80 bg-white/95 p-6 md:p-7";
 const INPUT =
@@ -330,7 +331,7 @@ export default async function AdvisorSessionPage({
                   </div>
                   {item.note ? (
                     <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                      {item.note}
+                      <UserText text={item.note} />
                     </p>
                   ) : null}
                 </li>
@@ -356,7 +357,7 @@ export default async function AdvisorSessionPage({
                     {entry.title}
                   </p>
                   <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                    {entry.text}
+                    <UserText text={entry.text} />
                   </p>
                 </li>
               ))}

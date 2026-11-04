@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { deleteProgramExpertAction, saveProgramExpertAction, setProgramExpertArchivedAction } from "@/features/advisor/teamProgramActions";
 import type { ProgramExpert } from "@/features/advisor/teamProgramData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 const FIELD = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm";
 const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
@@ -84,7 +85,7 @@ function ExpertCard({ expert, orgId, isOwner, t }: { expert: ProgramExpert; orgI
           ) : null,
         )}
       </dl>
-      {expert.note ? <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{expert.note}</p> : null}
+      {expert.note ? <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={expert.note} /></p> : null}
       {isOwner ? (
         <details className="mt-2 border-t border-slate-100 pt-2">
           <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500">{t("expertsEdit")}</summary>

@@ -19,6 +19,7 @@ import { alignmentPatterns, readoutText } from "@/features/reporting/workstyle/a
 import capabilityDe from "../../../../messages/de/capability.json";
 import setupDe from "../../../../messages/de/teams.json";
 import "@/features/reporting/workstyle/report.css";
+import { UserText } from "@/features/ui/UserText";
 
 const GLANCE_EN = { similar: "Your responses are close here.", nuance: "Your responses are mostly close here.", opposite: "You take different approaches in some situations.", insufficient: "Not enough shared responses yet." };
 
@@ -305,7 +306,7 @@ export function TeamWorkstyleReport({
                 <p className="mt-2 text-sm">
                   {(setupCopy.setup.outcomes as Record<string, string>)[s.resolution_status] ?? s.resolution_status}
                 </p>
-                {s.note && <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{s.note}</p>}
+                {s.note && <p className="mt-2 whitespace-pre-wrap text-sm leading-6"><UserText text={s.note} /></p>}
                 <p className="mt-2 text-xs text-slate-500">{reportText(locale, "Bestätigt am", "Confirmed on")} {new Date(s.confirmed_at).toLocaleDateString(locale === "en" ? "en-US" : "de-DE")}</p>
               </article>
             ))}

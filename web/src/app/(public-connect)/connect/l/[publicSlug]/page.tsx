@@ -11,6 +11,7 @@ import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/feat
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { PRODUCT_NAME } from "@/features/brand";
+import { UserText } from "@/features/ui/UserText";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -46,7 +47,7 @@ export default async function PublicConnectListingPage({ params }: { params: Pro
   return <PublicConnectShell><main className="mx-auto max-w-3xl px-5 py-10 md:px-8 md:py-14"><article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-9">
     <p className="text-xs font-semibold uppercase tracking-[.18em] text-violet-700">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p>
     <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">{listing.title}</h1>
-    <section className="mt-8"><h2 className="text-lg font-semibold">{t("detail.what")}</h2><p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700">{listing.summary}</p></section>
+    <section className="mt-8"><h2 className="text-lg font-semibold">{t("detail.what")}</h2><p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700"><UserText text={listing.summary} /></p></section>
     {listing.topics.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.topics")}</h2><div className="mt-3 flex flex-wrap gap-2">{listing.topics.map((topic) => <span key={topic} className="rounded-full bg-slate-100 px-3 py-1 text-sm">{topic}</span>)}</div></section> : null}
     {listing.industries.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.industries")}</h2><p className="mt-2 text-slate-600">{listing.industries.join(" · ")}</p></section> : null}
     {facts.length ? <section className="mt-7"><h2 className="font-semibold">{t("detail.framework")}</h2><p className="mt-2 text-slate-600">{facts.join(" · ")}</p></section> : null}

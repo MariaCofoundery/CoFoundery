@@ -6,6 +6,7 @@ import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getConnectVenture, getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Die Seite eines Unternehmens.
@@ -98,7 +99,7 @@ export default async function ConnectVenturePage({
           {t("ventures.whatItDoes")}
         </h2>
         <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
-          {venture.what_it_does}
+          <UserText text={venture.what_it_does} />
         </p>
       </section>
 
@@ -109,7 +110,7 @@ export default async function ConnectVenturePage({
           {t("ventures.audience")}
         </h2>
         <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-800">
-          {venture.audience}
+          <UserText text={venture.audience} />
         </p>
       </section>
 
@@ -119,7 +120,7 @@ export default async function ConnectVenturePage({
             {t("ventures.motivation")}
           </h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
-            {venture.motivation}
+            <UserText text={venture.motivation} />
           </p>
         </section>
       ) : null}

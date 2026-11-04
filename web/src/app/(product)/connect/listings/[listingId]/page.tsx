@@ -10,6 +10,7 @@ import { CONNECT_PUBLICATION_KEYS } from "@/features/connect/connectFeedbackKeys
 import { getAiAvailability } from "@/features/ai/aiAvailability";
 import { getListingAiJobState } from "@/features/connect/connectAiData";
 import { ListingAiSection } from "@/features/connect/ListingAiSection";
+import { UserText } from "@/features/ui/UserText";
 export default async function ListingDetail({ params, searchParams }: { params: Promise<{listingId:string}>; searchParams: Promise<Record<string,string|undefined>> }) {
   const { listingId } = await params; const [t, locale, query] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]); const { client, user } = await requireConnectMember(`/connect/listings/${listingId}`); const listing = await getConnectListing(client, listingId); if (!listing) notFound();
   const profileValue = listing.network_profiles; const profile = (Array.isArray(profileValue) ? profileValue[0] : profileValue) as ConnectProfile | null;
@@ -79,7 +80,7 @@ export default async function ListingDetail({ params, searchParams }: { params: 
           ) : null}
           <section className={TILE}>
             <h2 className={H3}>{t("detail.what")}</h2>
-            <p className="whitespace-pre-wrap text-base leading-[1.65] text-[#0b1f3a]">{listing.summary}</p>
+            <p className="whitespace-pre-wrap text-base leading-[1.65] text-[#0b1f3a]"><UserText text={listing.summary} /></p>
           </section>
           {listing.topics.length ? (
             <section className={TILE}>

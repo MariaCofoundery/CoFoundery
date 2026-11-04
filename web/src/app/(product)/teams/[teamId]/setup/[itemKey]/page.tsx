@@ -26,6 +26,7 @@ import {
 } from "@/features/teams/founderSetupActions";
 import { normalizeLocale } from "@/i18n/config";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
+import { UserText } from "@/features/ui/UserText";
 
 type Props = {
   params: Promise<{ teamId: string; itemKey: string }>;
@@ -166,7 +167,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
           />
           {kind === "pending" ? <span className="text-xs text-slate-600">{t("topic.stand.proposedAs", { outcome: t(`outcomes.${revision.resolutionStatus}`) })}</span> : null}
         </div>
-        <p className="mt-3 whitespace-pre-wrap rounded-2xl border border-[#e4e2f0] bg-[#f7f6fb] px-4 py-3 text-sm leading-7 text-slate-800">{revision.note || t("detail.noNote")}</p>
+        <p className="mt-3 whitespace-pre-wrap rounded-2xl border border-[#e4e2f0] bg-[#f7f6fb] px-4 py-3 text-sm leading-7 text-slate-800"><UserText text={revision.note || t("detail.noNote")} /></p>
         {revision.documentationReference ? (
           <p className="mt-3 text-sm text-slate-600">
             {t("detail.documentationReference")}: {href ? (
@@ -292,7 +293,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
                         <p className="text-xs text-slate-500">
                           {memberName(thread.root.authorUserId)} · {dateFormatter.format(new Date(thread.root.createdAt))}
                         </p>
-                        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-7 text-slate-800">{thread.root.body}</p>
+                        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-7 text-slate-800"><UserText text={thread.root.body} /></p>
                         {thread.replies.length > 0 ? (
                           <ol className="mt-3 space-y-3 border-l-2 border-[#d9cff8] pl-4">
                             {thread.replies.map((reply) => (
@@ -300,7 +301,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
                                 <p className="text-xs text-slate-500">
                                   {memberName(reply.authorUserId)} · {dateFormatter.format(new Date(reply.createdAt))}
                                 </p>
-                                <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700">{reply.body}</p>
+                                <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={reply.body} /></p>
                               </li>
                             ))}
                           </ol>

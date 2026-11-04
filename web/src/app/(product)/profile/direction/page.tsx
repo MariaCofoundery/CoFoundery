@@ -34,6 +34,7 @@ import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
 import { ProfileTabsForUser } from "@/features/profile/ProfileTabs";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das Direction-Gespräch.
@@ -263,7 +264,7 @@ export default async function DirectionInterviewPage({
                         : answer.questionId}
                   </p>
                   <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
-                    {answer.answer}
+                    <UserText text={answer.answer} />
                   </p>
                   {/* Nur noch der ZUSTAND je Antwort - gelesen wird über den
                       einen Knopf oben. Sechs Knöpfe für dieselbe Entscheidung

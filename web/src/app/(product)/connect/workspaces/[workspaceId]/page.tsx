@@ -21,6 +21,7 @@ import {
 } from "@/features/connect/workspaces/actions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { card, button, field } from "@/features/connect/workspaces/styles";
+import { UserText } from "@/features/ui/UserText";
 export default async function Page({
   params,
   searchParams,
@@ -49,7 +50,7 @@ export default async function Page({
           </p>
           <h1 className="mt-2 break-words text-3xl font-semibold leading-tight sm:text-4xl">{w.title}</h1>
           <p className="mt-3 whitespace-pre-wrap break-words leading-7 text-white">
-            {w.description}
+            <UserText text={w.description} />
           </p>
         </div>
         <p className="text-sm text-slate-600">{t("privacy")}</p>
@@ -272,7 +273,7 @@ export default async function Page({
                       </p>
                     )}
                     <p className="whitespace-pre-wrap break-words leading-7">
-                      {e.content}
+                      <UserText text={e.content} />
                     </p>
                     <p className="text-sm text-slate-600">
                       {t("by", { name: e.author_name })} · {t("updated")}:{" "}

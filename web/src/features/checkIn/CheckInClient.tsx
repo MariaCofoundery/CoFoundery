@@ -19,6 +19,7 @@ import {
   type CheckInActionResult,
 } from "@/features/checkIn/checkInActions";
 import { CHECK_IN_ANSWERS, CHECK_IN_INTERVALS, CHECK_IN_LIMITS, checkInHref, type CheckInItem } from "@/features/checkIn/checkInModel";
+import { UserText } from "@/features/ui/UserText";
 
 const CARD = "rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-[26px]";
 const INPUT = "mt-2 min-h-11 w-full rounded-xl border border-[#d8d5ea] bg-white px-3.5 py-2 text-[15px] text-[#0b1f3a] outline-none focus:border-[#6d49e0] focus:ring-4 focus:ring-[#6d49e0]/15";
@@ -113,7 +114,7 @@ function AgreementDialog({ topic, labels, onClose }: { topic: CheckInTopicCard; 
       <div role="dialog" aria-modal="true" aria-labelledby="ci-agreement-title" className="grid max-h-[90vh] w-full max-w-lg gap-3 overflow-auto rounded-[24px] border border-[#e4e2f0] bg-white p-6" onClick={(event) => event.stopPropagation()}>
         <h2 id="ci-agreement-title" className="text-xl font-semibold text-[#0b1f3a]">{topic.title}</h2>
         <p className="text-sm text-[#5f5e7a]">{topic.itemKey ? (topic.agreedOn ? fill(labels["agreement.meta"], { date: topic.agreedOn }) : labels["agreement.metaUnknown"]) : labels["agreement.custom"]}</p>
-        {topic.itemKey ? <p className="whitespace-pre-wrap rounded-r-xl border-l-4 border-[#6d49e0] bg-[#efeafd] px-4 py-2.5 text-[15px] leading-6 text-[#0b1f3a]">{topic.agreedNote?.trim() || labels["agreement.empty"]}</p> : null}
+        {topic.itemKey ? <p className="whitespace-pre-wrap rounded-r-xl border-l-4 border-[#6d49e0] bg-[#efeafd] px-4 py-2.5 text-[15px] leading-6 text-[#0b1f3a]"><UserText text={topic.agreedNote?.trim() || labels["agreement.empty"]} /></p> : null}
         <div className="flex flex-wrap gap-3">
           {topic.setupHref ? <Link href={topic.setupHref} className={BTN_SECONDARY}>{labels["agreement.toTopic"]}</Link> : null}
           <button type="button" className={BTN} onClick={onClose} autoFocus>{labels["agreement.close"]}</button>

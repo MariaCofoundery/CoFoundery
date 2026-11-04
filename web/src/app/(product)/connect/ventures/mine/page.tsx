@@ -11,6 +11,7 @@ import { CONNECT_ERROR_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { VENTURE_MAX } from "@/features/connect/connectTypes";
 import { ConfirmSubmitButton } from "@/features/ui/ConfirmSubmitButton";
 import { knownKey } from "@/i18n/knownKey";
+import { UserText } from "@/features/ui/UserText";
 
 const card = "rounded-3xl border border-slate-200 bg-white p-6";
 const SAVED_KEYS = ["venture", "venture_deleted"];
@@ -95,7 +96,7 @@ export default async function ConnectVenturesPage({
               ) : null}
 
               <p className="mt-4 whitespace-pre-wrap leading-7 text-slate-700">
-                {venture.what_it_does}
+                <UserText text={venture.what_it_does} />
               </p>
 
               {/* Die Zielgruppe steht abgesetzt, nicht im Fliesstext: Wer sie

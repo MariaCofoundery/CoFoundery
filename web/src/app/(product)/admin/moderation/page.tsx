@@ -5,6 +5,7 @@ import { requirePlatformAdmin } from "@/features/moderation/access";
 import { moderateReportAction } from "@/features/moderation/actions";
 import { moderationFilter, moderationPage, moderationPageSize, moderationStatuses, moderationUrl, type ModerationReport } from "@/features/moderation/model";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -49,7 +50,7 @@ export default async function ModerationPage({ searchParams }: {
           <div><dt className={labelClass}>{t("reporter")}</dt><dd>{report.reporter_name ?? t("noName")}<span className="block font-mono text-xs text-slate-500">{report.reporter_user_id}</span></dd></div>
           <div><dt className={labelClass}>{t("reported")}</dt><dd>{report.reported_name ?? t("noName")}<span className="block font-mono text-xs text-slate-500">{report.reported_user_id}</span></dd></div>
           <div className="sm:col-span-2"><dt className={labelClass}>{t("origin")}</dt><dd>{t(`origins.${report.origin}`)}{report.context_title ? ` · ${report.context_title}` : ""}</dd></div>
-          <div className="sm:col-span-2"><dt className={labelClass}>{t("description")}</dt><dd className="mt-1 whitespace-pre-wrap">{report.comment ?? t("noComment")}</dd></div>
+          <div className="sm:col-span-2"><dt className={labelClass}>{t("description")}</dt><dd className="mt-1 whitespace-pre-wrap"><UserText text={report.comment ?? t("noComment")} /></dd></div>
         </dl>
         <details className="mt-4 text-xs text-slate-500">
           <summary className="flex min-h-11 cursor-pointer items-center font-medium">{t("references")}</summary>

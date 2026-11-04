@@ -9,6 +9,7 @@ import {
   getConnectPerson,
 } from "@/features/connect/connectPeopleData";
 import { getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Die Profilseite eines Mitglieds.
@@ -114,7 +115,7 @@ export default async function ConnectPersonPage({
 
       {person.bio ? (
         <section className={`${card} mt-6`}>
-          <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]">{person.bio}</p>
+          <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]"><UserText text={person.bio} /></p>
         </section>
       ) : null}
 

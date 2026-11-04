@@ -10,6 +10,7 @@ import {
 } from "./developmentModel";
 import { publishWorkspaceAction } from "./developmentActions";
 import { card, button } from "./styles";
+import { UserText } from "@/features/ui/UserText";
 export function PublicationForm({
   workspaceId,
   initial,
@@ -48,7 +49,7 @@ export function PublicationForm({
           <p>{t("publicAuthor")}</p>
           <h3 className="break-words text-xl font-semibold">{preview.title}</h3>
           <p className="whitespace-pre-wrap break-words">
-            {preview.description}
+            <UserText text={preview.description} />
           </p>
           <dl className="space-y-3 break-words">
             <div>

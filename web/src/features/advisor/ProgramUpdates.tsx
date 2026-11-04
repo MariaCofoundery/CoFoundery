@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { setProgramUpdateQuestionsAction, submitProgramUpdateAction } from "@/features/advisor/teamProgramActions";
 import type { ProgramUpdate } from "@/features/advisor/teamProgramData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 
 const AREA = "mt-1 min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm";
 
@@ -22,7 +23,7 @@ async function PastUpdates({ updates }: { updates: ProgramUpdate[] }) {
                 {update.answers.map((entry, index) => (
                   <div key={index}>
                     <dt className="text-sm font-semibold text-slate-900">{entry.q}</dt>
-                    <dd className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">{entry.a || "–"}</dd>
+                    <dd className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-700"><UserText text={entry.a || "–"} /></dd>
                   </div>
                 ))}
               </dl>

@@ -38,6 +38,7 @@ import { getMemberPhotos } from "@/features/profile/memberPhotoData";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { FIND_CARD, FIND_PRIMARY, FIND_SECONDARY } from "@/features/discovery/findUi";
+import { UserText } from "@/features/ui/UserText";
 
 const CARD_CLASS = FIND_CARD;
 const PRIMARY_CTA_CLASS = FIND_PRIMARY;
@@ -426,7 +427,7 @@ export default async function DiscoveryProfileDetailPage({
                 {formatText(profile.headline, t)}
               </p>
               {profile.bio.trim() ? (
-                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-7 text-white">{profile.bio}</p>
+                <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-7 text-white"><UserText text={profile.bio} /></p>
               ) : null}
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
                 {profile.locationRegion ? (

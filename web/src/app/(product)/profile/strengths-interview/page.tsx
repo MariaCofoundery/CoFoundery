@@ -26,6 +26,7 @@ import {
 } from "@/features/strengths/strengthsInterviewGuide";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das Stärken-Interview.
@@ -251,7 +252,7 @@ export default async function StrengthsInterviewPage({
                   <p className="text-sm font-medium text-slate-900">
                     {asked ? t(`interview.questions.${asked.id}.title`) : answer.questionId}
                   </p>
-                  <p className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-600">{answer.answer}</p>
+                  <p className="mt-1 whitespace-pre-line text-sm leading-6 text-slate-600"><UserText text={answer.answer} /></p>
                 </li>
               );
             })}

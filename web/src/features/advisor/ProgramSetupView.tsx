@@ -3,6 +3,7 @@ import { FOUNDER_SETUP_CATALOG, FOUNDER_SETUP_CATEGORY_KEYS } from "@/features/t
 import type { AdvisorConfirmedFounderSetupItem } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { safeDocumentationHref } from "@/features/teams/founderSetupModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das Founder Setup eines Programm-Teams, nur lesend: die gemeinsam bestaetigten Punkte.
@@ -54,7 +55,7 @@ export async function ProgramSetupView({
                             {t(`statuses.${item.resolutionStatus}`)}
                           </span>
                         </div>
-                        {item.note ? <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">{item.note}</p> : null}
+                        {item.note ? <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={item.note} /></p> : null}
                         {item.documentationReference ? (
                           <p className="mt-3 text-sm text-slate-600">
                             {href ? (

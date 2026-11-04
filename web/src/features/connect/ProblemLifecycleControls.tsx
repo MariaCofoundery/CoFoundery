@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { updateConnectProblemStatusAction } from "./connectProblemActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { UserText } from "@/features/ui/UserText";
 export async function ProblemLifecycleControls({
   problem,
 }: {
@@ -48,7 +49,7 @@ export async function ProblemLifecycleControls({
               <div className="space-y-2 rounded-xl bg-slate-50 p-4">
                 <h3 className="font-semibold">{problem.title}</h3>
                 <p className="whitespace-pre-wrap break-words">
-                  {problem.description}
+                  <UserText text={problem.description} />
                 </p>
                 <p>
                   {t(problem.visibility === "public" ? "public" : "members")}

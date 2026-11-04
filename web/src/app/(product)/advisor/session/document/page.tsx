@@ -10,6 +10,7 @@ import { getAdvisorReportPageData } from "@/features/reporting/advisorReportPage
 import { getAdvisorFollowUp } from "@/features/reporting/advisorWorkspaceData";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { UserText } from "@/features/ui/UserText";
 
 /**
  * Das Uebergabedokument - was am Ende einer Begleitung herauskommt.
@@ -126,7 +127,7 @@ export default async function AdvisorSessionDocumentPage({
                 </div>
                 {item.note ? (
                   <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                    {item.note}
+                    <UserText text={item.note} />
                   </p>
                 ) : null}
                 {item.documentationReference ? (
@@ -151,7 +152,7 @@ export default async function AdvisorSessionDocumentPage({
               <li key={entry.key} className="break-inside-avoid">
                 <h3 className="font-semibold text-slate-950">{entry.title}</h3>
                 <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-800">
-                  {entry.text}
+                  <UserText text={entry.text} />
                 </p>
               </li>
             ))}

@@ -67,7 +67,8 @@ const hooks = registerHooks({
       : next(s, c);
   },
   load(s, c, next) {
-    return s.endsWith(".tsx") && s.includes("/team-intake/")
+    // Seit 04.11.2026 rendern die Antworten eingegebenen Text ueber `UserText` (fett/kursiv).
+    return s.endsWith(".tsx") && (s.includes("/team-intake/") || s.endsWith("/features/ui/UserText.tsx"))
       ? {
           format: "module",
           shortCircuit: true,

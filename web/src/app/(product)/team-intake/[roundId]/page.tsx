@@ -19,6 +19,7 @@ import {
   type IntakeReport,
   type IntakeRound,
 } from "@/features/team-intake/model";
+import { UserText } from "@/features/ui/UserText";
 export default async function Page({
   params,
   searchParams,
@@ -243,7 +244,7 @@ export default async function Page({
                           </h4>
                           {n.requested && <p>{t("privateRequest")}</p>}
                           <p className="whitespace-pre-wrap break-words">
-                            {n.note}
+                            <UserText text={n.note} />
                           </p>
                         </article>
                       ))
