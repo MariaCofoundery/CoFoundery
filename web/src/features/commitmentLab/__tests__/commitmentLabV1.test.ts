@@ -191,8 +191,9 @@ test("homebase keeps pair Commitment Lab optional in 'Vertiefen', apart from Set
   const lab = page.indexOf('id="commitment-lab-title"');
   const setup = page.indexOf('id="team-setup-title"');
   const alignment = page.indexOf('id="team-alignment"');
-  // Phase 9.4B: Vertiefen (zu zweit) -> Vereinbaren -> Rueckblick.
-  assert.ok(deepen >= 0 && lab > deepen && setup > lab && alignment > setup);
+  // Seit 04.11.2026: Setup ist eine Grundlage (vorn), das Lab eine Uebung zu zweit (eingeklappt
+  // danach), dann der Rueckblick.
+  assert.ok(deepen >= 0 && setup >= 0 && setup < deepen && lab > deepen && alignment > lab);
   assert.match(page, /startedLabRelationships\.has\(entry\.relationshipId\)/);
   assert.match(page, /is_commitment_lab_complete/);
   assert.match(page, /completedLabRelationships\.has\(entry\.relationshipId\)/);

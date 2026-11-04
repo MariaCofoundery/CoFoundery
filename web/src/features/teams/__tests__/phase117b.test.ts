@@ -131,7 +131,9 @@ test("Navigation: Teamseiten ohne Brotkrume und ohne „Zum Team“, ruhige Reit
   const nav = code("src/features/teams/FounderTeamNavigation.tsx");
   assert.doesNotMatch(nav, /bg-slate-900|#team-alignment/);
   assert.match(nav, /border-b-2/);
-  assert.match(nav, /overflow-x-auto/);
+  // Seit 04.11.2026 drei Reiter und "Mehr" - die Leiste bricht um statt zu scrollen.
+  assert.match(nav, /flex flex-wrap/);
+  assert.match(nav, /<details className="team-more relative">/);
   assert.match(nav, /ws-no-print/);
   const header = code("src/features/teams/TeamPageHeader.tsx");
   assert.match(header, /href="\/connections"/);

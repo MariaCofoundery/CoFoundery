@@ -94,8 +94,8 @@ test("homebase placement, controls, and DE/EN copy follow the Slice 2A contract"
     "Read My Mind steht vor dem Commitment Lab"
   );
   assert.ok(
-    cardPosition < homebase.indexOf('t("groups.commit.title")'),
-    "Read My Mind steht ausserhalb von Vertiefen"
+    cardPosition < homebase.indexOf('id="team-alignment"'),
+    "Read My Mind steht ausserhalb der Uebungen zu zweit"
   );
   assert.match(form, /type=\{multi \? "checkbox" : "radio"\}/);
   assert.match(form, /disabled=\{!complete \|\| allLocked\}/);

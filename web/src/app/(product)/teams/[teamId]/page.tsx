@@ -13,7 +13,8 @@ import { ReadMyMindHomebaseCard } from "@/features/collaborationLab/ReadMyMindHo
 import { FounderInTheWildHomebaseCard } from "@/features/founderInTheWild/FounderInTheWildHomebaseCard";
 import { FounderLibraryHomebaseCard } from "@/features/founderLibrary/FounderLibraryHomebaseCard";
 import { TeamPageHeader } from "@/features/teams/TeamPageHeader";
-import { TeamOverview } from "@/features/teams/TeamOverview";
+import { TeamOverview, teamFocus } from "@/features/teams/TeamOverview";
+import { ventureHref } from "@/features/teams/TeamJourneyStatus";
 import { IconTile } from "@/features/ui/Icons";
 import { TeamStrengthsCard } from "@/features/teams/TeamStrengthsCard";
 import { TeamShareCard } from "@/features/teams/TeamShareCard";
@@ -186,17 +187,33 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
     ),
   ];
 
+  const focus = teamFocus(journey);
+  const team64 = encodeURIComponent(team.id);
+  const waitingCount = (teamShareActive ? 0 : 1) + (pendingSetupAdvisorTask ? 1 : 0) + (rosterChanged ? 1 : 0);
+  const coreCard = (on: boolean) =>
+    `card-lift flex h-full flex-col gap-3 rounded-[24px] bg-white p-6 ${
+      on ? "border-2 border-[#6d49e0] shadow-[0_0_0_4px_rgba(109,73,224,0.10)]" : "border border-[#e4e2f0]"
+    }`;
+  const chip = (tone: "done" | "doing" | "open") =>
+    `inline-flex items-center self-start rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${
+      tone === "done" ? "bg-[#e3f6ec] text-[#17794a]" : tone === "doing" ? "bg-[#efeafd] text-[#4a2fb8]" : "bg-[#f1f0f7] text-[#33325e]"
+    }`;
+  const reportTone = journey.work !== "present" ? "open" : journey.report === "available" ? "done" : journey.report === "shareMissing" ? "doing" : "open";
+  const ventureTone = journey.venture === "present" ? "done" : journey.venture === "inProgress" ? "doing" : "open";
+  const PRIMARY_LINK =
+    "mt-auto inline-flex min-h-11 items-center justify-center self-start rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
+  const QUIET_LINK =
+    "mt-auto inline-flex min-h-11 items-center justify-center self-start rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-[#0b1f3a] transition hover:bg-[#e9e7f4]";
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
       {/* -----------------------------------------------------------------
-          PHASE 9.4B / 11.7B: EIN GEMEINSAMER ARBEITSRAUM
+          SEIT 04.11.2026: KERN, ERGAENZUNG, HINTERGRUND (Entwurf "Teamseite, Profil, Menü").
 
-          Oben der kompakte Teamkopf mit "← Verbindungen" und der lokalen
-          Teamnavigation (Phase 11.7B, statt Brotkrume und eigener Leiste
-          unter der Karte). Darunter das Team selbst (Menschen, Einladung,
-          Status), die Teamfreigabe und drei Ebenen: Verstehen, Vertiefen
-          (zu zweit), Vereinbaren. Ganz unten leise: Rueckblick und Team
-          verlassen.
+          Oben der Teamkopf mit dem naechsten Schritt und "Euer Weg". Darunter, nur wenn etwas offen
+          ist, "Wartet auf euch". Dann die drei Grundlagen (Zusammenspiel, Vorhaben, Founder Setup)
+          als grosse Karten, "Im Alltag" (Testprojekt, Check-in), "Wenn ihr mögt" als kleine Karten
+          und ganz unten eingeklappt: Uebungen zu zweit, fruehere Auswertungen, Teamfreigabe.
           ----------------------------------------------------------------- */}
       <TeamPageHeader teamId={teamId} active="overview" title={title} eyebrow={t("eyebrow")} hideTitle />
 
@@ -230,40 +247,120 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
         <p className="mt-3 text-sm leading-6 text-slate-600">{t("header.advisors", { names: linkedAdvisors.join(", ") })}</p>
       ) : null}
 
-      <div className="mt-5">
-        <TeamShareCard
-          teamId={team.id}
-          active={teamShareActive}
-          legacyShared={Boolean(viewerShare?.shared_with_team && !viewerShare.team_share_active)}
-          returnTo={`/teams/${encodeURIComponent(team.id)}#teamfreigabe`}
-          status={query.teamfreigabe ?? null}
-        />
-      </div>
+      {/* WARTET AUF EUCH: nur, wenn jemand etwas tun muss. Die Teamfreigabe steht hier, solange sie
+          fehlt - ohne sie gibt es kein Zusammenspiel. Steht sie, liegt sie eingeklappt unten. */}
+      {waitingCount > 0 ? (
+        <section aria-labelledby="team-waiting-title" className="mt-5 rounded-[24px] border border-[#f3dca8] bg-[#fff8ea] p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <IconTile name="bell" tone="amber" />
+            <h2 id="team-waiting-title" className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#7a4300]">{t("groups.waiting.title")}</h2>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {!teamShareActive ? (
+              <TeamShareCard
+                teamId={team.id}
+                active={teamShareActive}
+                legacyShared={Boolean(viewerShare?.shared_with_team && !viewerShare.team_share_active)}
+                returnTo={`/teams/${team64}#teamfreigabe`}
+                status={query.teamfreigabe ?? null}
+              />
+            ) : null}
+            {pendingSetupAdvisorTask ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4">
+                <div className="min-w-0">
+                  <p className="text-[15px] font-semibold text-slate-900">{t("setup.advisorTask.title")}</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">{t("setup.advisorTask.description")}</p>
+                </div>
+                <Link href={`/teams/${teamId}/setup#advisor-setup-access`} className={CARD_LINK_CLASS}>{t("setup.advisorTask.cta")}</Link>
+              </div>
+            ) : null}
+            {rosterChanged ? (
+              <p className="rounded-2xl bg-white p-4 text-sm leading-6 text-slate-700">{setupT("rosterChanged")}</p>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
-      <div className="mt-8 grid gap-10">
-        {/* GEMEINSAM VERTIEFEN: Vertiefungen fuer das ganze Team - ein gemeinsamer
-            Vergleich erst, wenn alle aktuellen Mitglieder abgeschlossen und
-            freigegeben haben. Hier steht nur die eigene Lage. */}
-        <section aria-labelledby="team-together-title">
-          <h2 id="team-together-title" className={GROUP_TITLE_CLASS}>{t("groups.together.title")}</h2>
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            <BetaTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
-            <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
-            <TeamStrengthsCard client={supabase} teamId={teamId} />
+      <div className="mt-10 grid gap-12">
+        {/* KERN: die drei Grundlagen. Genau eine Karte ist hervorgehoben - die, an der der naechste
+            Schritt liegt (dieselbe Regel wie im Kopf). */}
+        <section aria-labelledby="team-core-title">
+          <h2 id="team-core-title" className={GROUP_TITLE_CLASS}>{t("groups.core.title")}</h2>
+          <p className={GROUP_TEXT_CLASS}>{t("groups.core.text")}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <article className={coreCard(focus === "report")} aria-labelledby="team-report-title">
+              <div className="flex items-center justify-between gap-2">
+                <IconTile name="team" tone={focus === "report" ? "brand" : "violet"} />
+                <span className={chip(reportTone)}>{journey.work !== "present" ? t("journey.workFirst") : t(`journey.report.${journey.report}`)}</span>
+              </div>
+              <h3 id="team-report-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("core.report.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{t("core.report.text")}</p>
+              <Link
+                href={journey.work !== "present" ? "/me/profile/workstyle" : journey.report === "shareMissing" ? "#teamfreigabe" : `/teams/${team64}/workstyle`}
+                className={focus === "report" ? PRIMARY_LINK : QUIET_LINK}
+              >
+                {t(journey.work !== "present" ? "core.report.work" : journey.report === "shareMissing" ? "core.report.share" : "core.report.open")}
+              </Link>
+            </article>
+
+            <article className={coreCard(focus === "venture")} aria-labelledby="team-venture-title">
+              <div className="flex items-center justify-between gap-2">
+                <IconTile name="rocket" tone={focus === "venture" ? "brand" : "teal"} />
+                <span className={chip(ventureTone)}>{t(`journey.assessment.${journey.venture}`)}</span>
+              </div>
+              <h3 id="team-venture-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("core.venture.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{t("core.venture.text")}</p>
+              <Link href={ventureHref(team.id, journey.venture)} className={focus === "venture" ? PRIMARY_LINK : QUIET_LINK}>
+                {t("core.venture.open")}
+              </Link>
+            </article>
+
+            {/* VEREINBAREN: Founder Setup ist der verbindliche Ort. Zahlen nur aus dem bestehenden
+                Readmodel; bestaetigt ist, was alle AKTUELLEN Mitglieder bestaetigt haben. */}
+            <article className={coreCard(focus === "setup")} aria-labelledby="team-setup-title">
+              <div className="flex items-center justify-between gap-2">
+                <IconTile name="pencil" tone={focus === "setup" ? "brand" : "green"} />
+                <span className={chip(journey.setup === "confirmed" ? "done" : setup?.started ? "doing" : "open")}>{t(`journey.setup.${journey.setup}`)}</span>
+              </div>
+              <h3 id="team-setup-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("setup.title")}</h3>
+              <p className="text-sm font-medium leading-6 text-slate-800">
+                {setupCounts
+                  ? setupT("summary", {
+                      clarified: setupCounts.clarified + setupCounts.documented + setupCounts.not_relevant,
+                      discussing: setupCounts.discussing,
+                      open: setupCounts.open,
+                      pending: setupCounts.confirmation_pending,
+                    })
+                  : setup
+                    ? t("setup.notStarted")
+                    : t("journey.setup.unavailable")}
+              </p>
+              <div className="mt-auto flex flex-wrap items-center gap-3">
+                <Link href={`/teams/${teamId}/setup`} className={focus === "setup" ? PRIMARY_LINK.replace("mt-auto ", "") : QUIET_LINK.replace("mt-auto ", "")}>
+                  {t("setup.open")}
+                </Link>
+                {setup?.started ? (
+                  <Link href={`/teams/${teamId}/setup/document`} className="inline-flex min-h-11 items-center text-[15px] font-semibold text-[#5b21b6] underline-offset-4 hover:underline">
+                    {t("setup.document")}
+                  </Link>
+                ) : null}
+              </div>
+            </article>
           </div>
         </section>
 
-        {/* TESTPROJEKT: eine kleine echte Aufgabe zu zweit, bevor man sich festlegt. Steht
-            bewusst NICHT im eingeklappten "Vertiefen", sondern sichtbar: Es ist der
-            konkreteste Weg, die Zusammenarbeit auszuprobieren. */}
-        {team.alignment.length > 0 ? (
-          <section aria-labelledby="test-project-title">
-            <div className="grid gap-4 lg:grid-cols-3">
-              <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6 lg:col-span-3">
-                <div className="flex items-center justify-between gap-2"><IconTile name="spark" tone="violet" /></div>
-                <h2 id="test-project-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{testProjectT("card.title")}</h2>
-                <p className="max-w-3xl text-sm leading-6 text-slate-700">{testProjectT("card.description")}</p>
-                <ul className="grid gap-3">
+        {/* IM ALLTAG: ausprobieren und dranbleiben. Das Testprojekt ist der konkreteste Weg, die
+            Zusammenarbeit zu erproben; der Check-in haelt Vereinbarungen lebendig. */}
+        <section id="im-alltag" aria-labelledby="team-everyday-title" className="scroll-mt-24">
+          <h2 id="team-everyday-title" className={GROUP_TITLE_CLASS}>{t("groups.everyday.title")}</h2>
+          <p className={GROUP_TEXT_CLASS}>{t("groups.everyday.text")}</p>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {team.alignment.length > 0 ? (
+              <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="test-project-title">
+                <div className="flex items-center justify-between gap-2"><IconTile name="flask" tone="amber" /></div>
+                <h3 id="test-project-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{testProjectT("card.title")}</h3>
+                <p className="text-sm leading-6 text-slate-700">{testProjectT("card.description")}</p>
+                <ul className="mt-auto grid gap-3">
                   {team.alignment.map((entry) => {
                     const state = openTestProjects.get(entry.relationshipId);
                     return (
@@ -274,7 +371,7 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
                           ) : null}
                           {state ? <p className="mt-1 text-xs font-medium text-slate-600">{testProjectT(state === "active" ? "card.active" : "card.draft")}</p> : null}
                         </div>
-                        <Link href={testProjectHref(teamId, entry.relationshipId)} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+                        <Link href={testProjectHref(teamId, entry.relationshipId)} className={QUIET_LINK.replace("mt-auto ", "")}>
                           {testProjectT(state ? "card.continue" : "card.start")}
                         </Link>
                       </li>
@@ -282,186 +379,159 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
                   })}
                 </ul>
               </article>
-            </div>
-          </section>
-        ) : null}
-
-        {/* VERTIEFEN: ausdruecklich zu zweit. Nur tatsaechlich vorhandene
-            Paare - keine erfundenen Paarungen, keine neuen Relationships. */}
-        <details id="team-deep-dives" className="scroll-mt-24 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3" open={!isPairTeam}>
-          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("deepen.summary")}</summary>
-        <section className="mt-4" aria-labelledby="team-deepen-title">
-          <h2 id="team-deepen-title" className={GROUP_TITLE_CLASS}>{t("groups.discover.title")}</h2>
-          {isNewPair ? (
-            <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 px-5 py-4 text-sm leading-7 text-slate-700">
-              {t("groups.whereToStart")}
-            </p>
-          ) : null}
-          {isPairTeam ? (
-            <p className="mt-4 text-sm font-semibold text-slate-900">
-              {t("deepen.pair", { names: founderNames.join(" & ") })}
-            </p>
-          ) : (
-            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">{t("deepen.twoOnly")}</p>
-          )}
-
-          <div className="mt-4 grid gap-4">
-            {team.alignment.length > 0 ? (
-              <section className={CARD_CLASS} aria-labelledby="commitment-lab-title">
-                <h3 id="commitment-lab-title" className="text-base font-semibold text-slate-950">{commitmentT("title")}</h3>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{commitmentT("description")}</p>
-                <ul className="mt-4 grid gap-3">
-                  {team.alignment.map((entry) => {
-                    const participants = pairName(entry.participantUserIds, names, fallback);
-                    const started = startedLabRelationships.has(entry.relationshipId);
-                    const completed = completedLabRelationships.has(entry.relationshipId);
-                    return (
-                      <li
-                        key={entry.relationshipId}
-                        className={
-                          // Im Zweierteam steht das Paar schon oben - dann
-                          // keine leere umrandete Zeile, nur Zustand und Aktion.
-                          isPairTeam
-                            ? "flex flex-wrap items-center gap-3"
-                            : "flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"
-                        }
-                      >
-                        <div>
-                          {/* Im Zweierteam ist das Paar oben genannt; ab drei steht es an jeder Zeile. */}
-                          {!isPairTeam ? (
-                            <p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>
-                          ) : null}
-                          {completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}
-                        </div>
-                        <Link
-                          href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`}
-                          className={CARD_LINK_CLASS}
-                        >
-                          {commitmentT(completed ? "view" : started ? "continue" : "start")}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
             ) : null}
-            <div className="grid gap-4 lg:grid-cols-2">
-              <ReadMyMindHomebaseCard
-                currentUserId={user.id}
-                team={{
-                  id: team.id,
-                  name: team.name,
-                  members: team.members.map((member) => ({
-                    userId: member.userId,
-                    displayName: member.displayName,
-                    avatarId: member.avatarId,
-                    avatarUrl: member.avatarUrl,
-                  })),
-                }}
-              />
-              <FounderInTheWildHomebaseCard
-                currentUserId={user.id}
-                team={{
-                  id: team.id,
-                  name: team.name,
-                  members: team.members.map((member) => ({ userId: member.userId, displayName: member.displayName, avatarId: member.avatarId, avatarUrl: member.avatarUrl })),
-                }}
-              />
-            </div>
-          </div>
-        </section>
-        </details>
-
-        {/* VEREINBAREN: Founder Setup ist der verbindliche Ort. Zahlen nur aus
-            dem bestehenden Readmodel; bestaetigt ist, was alle AKTUELLEN
-            Mitglieder bestaetigt haben. */}
-        <section aria-labelledby="team-agree-title">
-          <h2 id="team-agree-title" className={GROUP_TITLE_CLASS}>{t("groups.commit.title")}</h2>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <article
-            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
-            aria-labelledby="team-setup-title"
-          >
-            <div className="flex items-center justify-between gap-2"><IconTile name="pencil" tone="green" /></div>
-            <h3 id="team-setup-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("setup.title")}</h3>
-            <p className="mt-4 text-sm font-medium text-slate-800">
-              {setupCounts
-                ? setupT("summary", {
-                    clarified: setupCounts.clarified + setupCounts.documented + setupCounts.not_relevant,
-                    discussing: setupCounts.discussing,
-                    open: setupCounts.open,
-                    pending: setupCounts.confirmation_pending,
-                  })
-                : setup
-                  ? t("setup.notStarted")
-                  : t("journey.setup.unavailable")}
-            </p>
-            {rosterChanged ? (
-              <p className="mt-3 rounded-xl border border-slate-200 bg-white/80 p-4 text-sm leading-6 text-slate-700">{setupT("rosterChanged")}</p>
-            ) : null}
-            {pendingSetupAdvisorTask ? (
-              <div className="mt-4 rounded-xl border border-violet-200 bg-white/80 p-4">
-                <p className="text-sm font-semibold text-slate-900">{t("setup.advisorTask.title")}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{t("setup.advisorTask.description")}</p>
-                <Link href={`/teams/${teamId}/setup#advisor-setup-access`} className={`${CARD_LINK_CLASS} mt-3`}>{t("setup.advisorTask.cta")}</Link>
-              </div>
-            ) : null}
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <Link
-                href={`/teams/${teamId}/setup`}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2"
-              >
-                {t("setup.open")}
-              </Link>
-              {setup?.started ? (
-                <Link href={`/teams/${teamId}/setup/document`} className={CARD_LINK_CLASS}>
-                  {t("setup.document")}
-                </Link>
-              ) : null}
-            </div>
-          </article>
-          <article
-            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
-            aria-labelledby="team-check-in-title"
-          >
-            <div className="flex items-center justify-between gap-2"><IconTile name="clock" tone={checkInCard?.state === "due" ? "amber" : "violet"} /></div>
-            <h3 id="team-check-in-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{checkInT("card.title")}</h3>
-            <p className="text-sm leading-6 text-slate-700">
-              {checkInCard?.state === "open"
-                ? checkInT("card.running")
-                : checkInCard?.state === "due"
-                  ? checkInT("card.dueNow")
-                  : checkInCard?.state === "scheduled" && checkInCard.due
-                    ? checkInT("card.dueOn", { date: new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium" }).format(checkInCard.due) })
-                    : checkInT("card.none")}
-            </p>
-            <div className="mt-auto flex flex-wrap items-center gap-3">
-              <Link
-                href={checkInHref(teamId)}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-[18px] text-[15px] font-semibold text-white hover:opacity-90"
-              >
+            <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-check-in-title">
+              <div className="flex items-center justify-between gap-2"><IconTile name="clock" tone={checkInCard?.state === "due" ? "amber" : "blue"} /></div>
+              <h3 id="team-check-in-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{checkInT("card.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">
+                {checkInCard?.state === "open"
+                  ? checkInT("card.running")
+                  : checkInCard?.state === "due"
+                    ? checkInT("card.dueNow")
+                    : checkInCard?.state === "scheduled" && checkInCard.due
+                      ? checkInT("card.dueOn", { date: new Intl.DateTimeFormat(getPresentationLocale(locale), { dateStyle: "medium" }).format(checkInCard.due) })
+                      : checkInT("card.none")}
+              </p>
+              <Link href={checkInHref(teamId)} className={QUIET_LINK}>
                 {checkInT(checkInCard?.state === "open" ? "card.open" : "card.start")}
               </Link>
-            </div>
-          </article>
-          <article
-            className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6"
-            aria-labelledby="team-financing-title"
-          >
-            <div className="flex items-center justify-between gap-2"><IconTile name="spark" tone="violet" /></div>
-            <h3 id="team-financing-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{financingT("card.title")}</h3>
-            <p className="text-sm leading-6 text-slate-700">{financingT("card.text")}</p>
-            <div className="mt-auto flex flex-wrap items-center gap-3">
-              <Link href={financingHref(teamId)} className={CARD_LINK_CLASS}>{financingT("card.open")}</Link>
-            </div>
-          </article>
-          <FounderLibraryHomebaseCard teamId={teamId} />
+            </article>
           </div>
         </section>
 
-        {/* Rueckblick: eingeklappt, am Ende, nicht gleichrangig. */}
-        <details id="team-alignment" className="scroll-mt-24 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
-          <summary className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">{t("alignment.history")}</summary>
+        {/* ERGAENZUNG: kleine Karten. Helfen bei einzelnen Fragen, sind aber kein Schritt. */}
+        <section aria-labelledby="team-extras-title">
+          <h2 id="team-extras-title" className={GROUP_TITLE_CLASS}>{t("groups.extras.title")}</h2>
+          <p className={GROUP_TEXT_CLASS}>{t("groups.extras.text")}</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <TeamStrengthsCard client={supabase} teamId={teamId} />
+            <TradeoffsTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+            <BetaTeamCard client={supabase} teamId={teamId} memberCount={team.members.length} />
+            <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-roles-title">
+              <div className="flex items-center justify-between gap-2"><IconTile name="tools" tone="violet" /></div>
+              <h3 id="team-roles-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("extras.roles.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{t("extras.roles.text")}</p>
+              <Link href={`/teams/${team64}/roles`} className={QUIET_LINK}>{t("extras.roles.open")}</Link>
+            </article>
+            <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-financing-title">
+              <div className="flex items-center justify-between gap-2"><IconTile name="chart" tone="green" /></div>
+              <h3 id="team-financing-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{financingT("card.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{financingT("card.text")}</p>
+              <Link href={financingHref(teamId)} className={QUIET_LINK}>{financingT("card.open")}</Link>
+            </article>
+            <FounderLibraryHomebaseCard teamId={teamId} />
+            <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-program-title">
+              <div className="flex items-center justify-between gap-2"><IconTile name="globe" tone="blue" /></div>
+              <h3 id="team-program-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("extras.program.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{t("extras.program.text")}</p>
+              <Link href="/programm" className={QUIET_LINK}>{t("extras.program.open")}</Link>
+            </article>
+          </div>
+        </section>
+
+        {/* HINTERGRUND: eingeklappt, nie weg. */}
+        <div className="grid gap-4">
+          {/* VERTIEFEN: ausdruecklich zu zweit. Nur tatsaechlich vorhandene
+              Paare - keine erfundenen Paarungen, keine neuen Relationships. */}
+          <details id="team-deep-dives" className="scroll-mt-24 rounded-[24px] border border-dashed border-[#d8d5ea] bg-white px-5 py-3">
+            <summary className="flex min-h-12 cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 [&::-webkit-details-marker]:hidden">
+              <span className="flex">
+                <IconTile name="chat" tone="pink" size="sm" />
+                <span className="-ml-1.5 rounded-xl ring-2 ring-white"><IconTile name="globe" tone="teal" size="sm" /></span>
+                <span className="-ml-1.5 rounded-xl ring-2 ring-white"><IconTile name="heart" tone="violet" size="sm" /></span>
+              </span>
+              <span className="text-base font-semibold text-slate-900">{t("deepen.summary")}</span>
+              <span className="text-sm text-slate-600">{t("deepen.summaryHint")}</span>
+            </summary>
+            <section className="mt-4 pb-3" aria-labelledby="team-deepen-title">
+              <h2 id="team-deepen-title" className="sr-only">{t("groups.discover.title")}</h2>
+              <p className="max-w-3xl text-sm leading-6 text-slate-600">{t("groups.discover.text")}</p>
+              {isNewPair ? (
+                <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/80 px-5 py-4 text-sm leading-7 text-slate-700">
+                  {t("groups.whereToStart")}
+                </p>
+              ) : null}
+              {isPairTeam ? (
+                <p className="mt-4 text-sm font-semibold text-slate-900">
+                  {t("deepen.pair", { names: founderNames.join(" & ") })}
+                </p>
+              ) : (
+                <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">{t("deepen.twoOnly")}</p>
+              )}
+
+              <div className="mt-4 grid gap-4">
+                {team.alignment.length > 0 ? (
+                  <section className={CARD_CLASS} aria-labelledby="commitment-lab-title">
+                    <h3 id="commitment-lab-title" className="text-base font-semibold text-slate-950">{commitmentT("title")}</h3>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{commitmentT("description")}</p>
+                    <ul className="mt-4 grid gap-3">
+                      {team.alignment.map((entry) => {
+                        const participants = pairName(entry.participantUserIds, names, fallback);
+                        const started = startedLabRelationships.has(entry.relationshipId);
+                        const completed = completedLabRelationships.has(entry.relationshipId);
+                        return (
+                          <li
+                            key={entry.relationshipId}
+                            className={
+                              // Im Zweierteam steht das Paar schon oben - dann
+                              // keine leere umrandete Zeile, nur Zustand und Aktion.
+                              isPairTeam
+                                ? "flex flex-wrap items-center gap-3"
+                                : "flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"
+                            }
+                          >
+                            <div>
+                              {/* Im Zweierteam ist das Paar oben genannt; ab drei steht es an jeder Zeile. */}
+                              {!isPairTeam ? (
+                                <p className="text-sm font-semibold text-slate-900">{commitmentT("pair", { names: participants })}</p>
+                              ) : null}
+                              {completed ? <p className="mt-1 text-xs font-medium text-slate-600">{commitmentT("completed")}</p> : null}
+                            </div>
+                            <Link
+                              href={`/teams/${encodeURIComponent(teamId)}/commitment-lab/${encodeURIComponent(entry.relationshipId)}`}
+                              className={CARD_LINK_CLASS}
+                            >
+                              {commitmentT(completed ? "view" : started ? "continue" : "start")}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ) : null}
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <ReadMyMindHomebaseCard
+                    currentUserId={user.id}
+                    team={{
+                      id: team.id,
+                      name: team.name,
+                      members: team.members.map((member) => ({
+                        userId: member.userId,
+                        displayName: member.displayName,
+                        avatarId: member.avatarId,
+                        avatarUrl: member.avatarUrl,
+                      })),
+                    }}
+                  />
+                  <FounderInTheWildHomebaseCard
+                    currentUserId={user.id}
+                    team={{
+                      id: team.id,
+                      name: team.name,
+                      members: team.members.map((member) => ({ userId: member.userId, displayName: member.displayName, avatarId: member.avatarId, avatarUrl: member.avatarUrl })),
+                    }}
+                  />
+                </div>
+              </div>
+            </section>
+          </details>
+
+          {/* Rueckblick: eingeklappt, am Ende, nicht gleichrangig. */}
+          <details id="team-alignment" className="scroll-mt-24 rounded-[24px] border border-dashed border-[#d8d5ea] bg-white px-5 py-3">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 rounded-lg text-base font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+              <IconTile name="book" tone="violet" size="sm" />
+              {t("alignment.history")}
+            </summary>
         <section
           className={`${SECTION_CLASS} scroll-mt-32`}
           aria-labelledby="team-alignment-title"
@@ -573,7 +643,27 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
           )}
         </section>
 
-        </details>
+          </details>
+
+          {/* Die Teamfreigabe, wenn sie steht: hier zum Nachlesen und Zuruecknehmen. */}
+          {teamShareActive ? (
+            <details className="scroll-mt-24 rounded-[24px] border border-dashed border-[#d8d5ea] bg-white px-5 py-3" open={Boolean(query.teamfreigabe)}>
+              <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 text-base font-semibold text-slate-900 [&::-webkit-details-marker]:hidden">
+                <IconTile name="shield" tone="green" size="sm" />
+                {t("shareDetails")}
+              </summary>
+              <div className="mt-3 pb-3">
+                <TeamShareCard
+                  teamId={team.id}
+                  active={teamShareActive}
+                  legacyShared={Boolean(viewerShare?.shared_with_team && !viewerShare.team_share_active)}
+                  returnTo={`/teams/${team64}#teamfreigabe`}
+                  status={query.teamfreigabe ?? null}
+                />
+              </div>
+            </details>
+          ) : null}
+        </div>
 
         <FounderRelationshipAdvisorPanel team={team} currentUserId={user.id} names={names} />
 

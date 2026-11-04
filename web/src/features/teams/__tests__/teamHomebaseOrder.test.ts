@@ -27,7 +27,7 @@ const groups = (locale: string) =>
  *
  * Jetzt drei Gruppen in der Reihenfolge, in der ein Paar sich bewegt.
  */
-test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben erreichbar", () => {
+test("seit 04.11.2026: Grundlagen, Im Alltag, Wenn ihr mögt, dann eingeklappt Übungen zu zweit und Rückblick", () => {
   const page = source(PAGE);
   const at = (needle: string) => {
     const index = page.indexOf(needle);
@@ -35,50 +35,56 @@ test("Phase 9.4B: Verstehen, Vertiefen, Vereinbaren - und Setup bleibt von oben 
     return index;
   };
 
-  // Kopf, naechster Schritt und die vier Bereiche stehen in TeamOverview.
+  // Kopf, naechster Schritt und "Euer Weg" stehen in TeamOverview.
   const header = at("<TeamOverview");
-  const status = header;
-  const understand = header;
+  const waiting = at('t("groups.waiting.title")');
+  const core = at('t("groups.core.title")');
+  const everyday = at('t("groups.everyday.title")');
+  const extras = at('t("groups.extras.title")');
   const deepen = at('t("groups.discover.title")');
-  const agree = at('t("groups.commit.title")');
-  // Konzeptboard 34: die Library ist eine Kachel in „Vereinbaren und üben" - kein eigener Abschnitt mehr.
-  const resources = at("<FounderLibraryHomebaseCard");
   const history = at('id="team-alignment"');
   const advisor = at("<FounderRelationshipAdvisorPanel");
 
-  // Die Ebenen in der Reihenfolge, in der ein Team sie benutzt.
-  assert.ok(header < deepen, "Kopf und Statuszeile stehen oben");
-  assert.ok(understand < deepen && deepen < agree, "die drei Ebenen stehen nicht in Reihenfolge");
-  assert.ok(agree < resources && resources < history && history < advisor, "Nachschlagen und Rueckblick stehen nicht am Ende");
-  // Gemeinsam anschauen steht vor dem Vertiefen zu zweit und enthaelt die drei Teamkarten.
-  assert.ok(at('t("groups.together.title")') < deepen, "Gemeinsam anschauen steht nach dem Vertiefen");
-  for (const card of ["<BetaTeamCard", "<TradeoffsTeamCard", "<TeamStrengthsCard"]) {
-    assert.ok(at(card) > at('t("groups.together.title")') && at(card) < deepen, `${card} steht nicht unter Gemeinsam anschauen`);
+  // Kern vorn, Ergaenzung danach, Hintergrund eingeklappt am Ende.
+  assert.ok(at("<TeamPageHeader") < header, "der Teamkopf steht nicht ganz oben");
+  assert.ok(header < waiting && waiting < core, "Wartet auf euch steht nicht direkt unter dem Kopf");
+  assert.ok(core < everyday && everyday < extras && extras < deepen && deepen < history && history < advisor, "die Ebenen stehen nicht in Reihenfolge");
+  // Die drei Grundlagen.
+  for (const card of ['aria-labelledby="team-report-title"', 'aria-labelledby="team-venture-title"', 'aria-labelledby="team-setup-title"']) {
+    assert.ok(at(card) > core && at(card) < everyday, `${card} steht nicht unter den Grundlagen`);
   }
+  // Im Alltag: Testprojekt und Check-in.
+  for (const card of ['aria-labelledby="test-project-title"', 'aria-labelledby="team-check-in-title"']) {
+    assert.ok(at(card) > everyday && at(card) < extras, `${card} steht nicht im Alltag`);
+  }
+  // Ergaenzungen als kleine Karten.
+  for (const card of ["<TeamStrengthsCard", "<TradeoffsTeamCard", "<BetaTeamCard", 'aria-labelledby="team-roles-title"', 'aria-labelledby="team-financing-title"', "<FounderLibraryHomebaseCard", 'aria-labelledby="team-program-title"']) {
+    assert.ok(at(card) > extras && at(card) < deepen, `${card} steht nicht unter Wenn ihr mögt`);
+  }
+  // Die Uebungen zu zweit sind eingeklappt und stehen nach den Ergaenzungen.
+  assert.match(page, /<details id="team-deep-dives"/);
+  assert.doesNotMatch(page, /<details id="team-deep-dives"[^>]*\bopen=/);
+  for (const entry of ['aria-labelledby="commitment-lab-title"', "<ReadMyMindHomebaseCard", "<FounderInTheWildHomebaseCard"]) {
+    assert.ok(at(entry) > deepen && at(entry) < history, `${entry} steht nicht unter den Uebungen zu zweit`);
+  }
+  assert.ok(at('t("agreements.title")') > history, "historische Notizen stehen ausserhalb des Rueckblicks");
+  // Genau eine Grundlage ist hervorgehoben - dieselbe Regel wie der naechste Schritt im Kopf.
+  assert.match(page, /const focus = teamFocus\(journey\)/);
+  assert.match(source("src/features/teams/TeamOverview.tsx"), /const here: StationKey = teamFocus\(journey\)/);
 
-  // Jedes Angebot sitzt in seiner Ebene.
   const overview = source("src/features/teams/TeamOverview.tsx");
   for (const entry of ["/me/profile/workstyle", "ventureHref(teamId, journey.venture)", "/workstyle`", "/setup`"]) {
-    assert.ok(overview.includes(entry), `${entry} fehlt in den Bereichen des Teamkopfs`);
+    assert.ok(overview.includes(entry), `${entry} fehlt im Teamkopf`);
   }
   assert.doesNotMatch(overview, /%|percent|von\s+\d|\bscore\b/i);
-  for (const entry of ['aria-labelledby="commitment-lab-title"', "<ReadMyMindHomebaseCard", "<FounderInTheWildHomebaseCard"]) {
-    assert.ok(at(entry) > deepen && at(entry) < agree, `${entry} steht nicht unter Vertiefen`);
-  }
-  assert.ok(at('aria-labelledby="team-setup-title"') > agree && at('aria-labelledby="team-setup-title"') < resources);
-  assert.ok(at("<FounderLibraryHomebaseCard") < history);
-  assert.ok(at('t("agreements.title")') > history, "historische Notizen stehen ausserhalb des Rueckblicks");
 
-  // Die Zusage aus Phase 9.2 bleibt: Founder Setup ist vor den optionalen
-  // Vertiefungen erreichbar - ueber die Statuszeile im Kopf und die
-  // Teamnavigation, beide oberhalb von "Vertiefen".
+  // Founder Setup bleibt von oben erreichbar: Weg im Kopf, Karte unter den Grundlagen und Reiter.
   assert.match(source("src/features/teams/TeamJourneyStatus.tsx"), /href: `\/teams\/\$\{team\}\/setup`/);
   assert.match(source("src/features/teams/FounderTeamNavigation.tsx"), /key: "setup" as const/);
-  // Phase 11.7B: Die Teamnavigation steht im kompakten Teamkopf ganz oben.
   assert.match(source("src/features/teams/TeamPageHeader.tsx"), /<FounderTeamNavigation/);
-  assert.ok(at("<TeamPageHeader") < header, "der Teamkopf steht nicht ganz oben");
-  // Teamfreigabe direkt unter dem Kopf, Team verlassen ganz am Ende.
-  assert.ok(at("<TeamShareCard") > status && at("<TeamShareCard") < deepen, "die Teamfreigabe steht nicht oben");
+  // Teamfreigabe: fehlt sie, steht sie unter "Wartet auf euch"; steht sie, eingeklappt unten.
+  assert.ok(page.indexOf("<TeamShareCard") > waiting && page.indexOf("<TeamShareCard") < core, "die fehlende Teamfreigabe steht nicht oben");
+  assert.ok(page.lastIndexOf("<TeamShareCard") > history, "die bestehende Teamfreigabe liegt nicht unten");
   assert.ok(at("<LeaveTeamSection") > advisor, "Team verlassen steht nicht am Ende");
 });
 
@@ -97,7 +103,8 @@ test("die Statuszeile behaelt vier getrennte Zustaende ohne Gesamtwert", () => {
   assert.match(status, /rosterConfirmationMissing/);
   for (const locale of ["de", "en"]) {
     const journey = (readJson(`messages/${locale}/teams.json`).homebase as Record<string, unknown>).journey as Record<string, Record<string, string>>;
-    assert.deepEqual(Object.keys(journey.items), ["work", "venture", "report", "setup"]);
+    // "everyday" (seit 04.11.2026) ist eine eigene Station - kein Gesamtwert.
+    assert.deepEqual(Object.keys(journey.items), ["work", "venture", "report", "setup", "everyday"]);
   }
 });
 

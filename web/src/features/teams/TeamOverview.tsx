@@ -6,11 +6,29 @@ import { ventureHref, type TeamJourneyState } from "@/features/teams/TeamJourney
 
 type Member = { userId: string; displayName: string; avatarId?: string | null; avatarUrl?: string | null };
 type StepKey = "work" | "venture" | "report" | "setup";
+type StationKey = "report" | "venture" | "setup" | "everyday";
 type Tone = "done" | "doing" | "open";
 
-/** Kleine Bildzeichen, rein beschreibend: Person, Vorhaben, Ueberlappung, Absprache. */
-function StepGlyph({ name }: { name: StepKey }) {
-  const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+const GLYPH = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+
+function CheckGlyph() {
+  return (
+    <svg {...GLYPH} strokeWidth={2.2}>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+/** Kleine Bildzeichen, rein beschreibend: Person, Vorhaben, Ueberlappung, Absprache, Alltag. */
+function StepGlyph({ name }: { name: StepKey | "everyday" }) {
+  const common = GLYPH;
+  if (name === "everyday")
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </svg>
+    );
   if (name === "work")
     return (
       <svg {...common}>
@@ -39,6 +57,18 @@ function StepGlyph({ name }: { name: StepKey }) {
       <path d="M9 15.5h6" />
     </svg>
   );
+}
+
+/**
+ * Welche der drei Grundlagen gerade dran ist - dieselbe Reihenfolge wie der naechste Schritt im Kopf:
+ * erst die eigene Arbeitsweise (und die Teamfreigabe), dann das Vorhaben, dann das Setup. Die Seite
+ * hebt damit genau eine Karte hervor.
+ */
+export function teamFocus(journey: TeamJourneyState): "report" | "venture" | "setup" {
+  if (journey.work !== "present") return "report";
+  if (journey.venture !== "present") return "venture";
+  if (journey.report === "shareMissing" || journey.report === "available") return "report";
+  return "setup";
 }
 
 /**
@@ -95,15 +125,38 @@ export async function TeamOverview({
           : journey.report === "available"
             ? { key: "report", href: href.report }
             : { key: "setup", href: href.setup };
-  const steps: StepKey[] = ["work", "venture", "report", "setup"];
 
   const chip: Record<Tone, string> = {
     done: "bg-[#e3f6ec] text-[#17794a]",
     doing: "bg-[#efeafd] text-[#4a2fb8]",
     open: "bg-[#f1f0f7] text-[#33325e]",
   };
-  // Die Station, die als Naechstes dran ist, pulsiert - die erste, die noch nicht steht.
-  const here = steps.find((key) => tone[key] !== "done") ?? null;
+  // Vier Stationen statt vier Kacheln: Die Arbeitsweise ist die Voraussetzung fuer das Zusammenspiel
+  // und steht deshalb dort mit drin. "Im Alltag" (Testprojekt, Check-in) wird moeglich, sobald ein
+  // Thema bestaetigt ist.
+  const everydayOpen = journey.setup === "confirmed";
+  const stations: { key: StationKey; glyph: StepKey | "everyday"; label: string; status: string; tone: Tone; href: string }[] = [
+    {
+      key: "report",
+      glyph: "report",
+      label: t("journey.items.report"),
+      status: tone.work !== "done" ? t("journey.workFirst") : status.report,
+      tone: tone.work !== "done" ? "open" : tone.report,
+      href: tone.work !== "done" ? href.work : journey.report === "shareMissing" ? "#teamfreigabe" : href.report,
+    },
+    { key: "venture", glyph: "venture", label: t("journey.items.venture"), status: status.venture, tone: tone.venture, href: href.venture },
+    { key: "setup", glyph: "setup", label: t("journey.items.setup"), status: status.setup, tone: tone.setup, href: href.setup },
+    {
+      key: "everyday",
+      glyph: "everyday",
+      label: t("journey.items.everyday"),
+      status: t(everydayOpen ? "journey.everyday.open" : "journey.everyday.later"),
+      tone: everydayOpen ? "doing" : "open",
+      href: "#im-alltag",
+    },
+  ];
+  // Die Station, an der der naechste Schritt liegt, pulsiert.
+  const here: StationKey = teamFocus(journey);
 
   return (
     <>
@@ -160,36 +213,42 @@ export async function TeamOverview({
         </div>
       </section>
 
+      {/* EUER WEG (seit 04.11.2026, Entwurf "Teamseite, Profil, Menü"): runde Stationen auf einer
+          gestrichelten Linie wie im Profil - Zusammenspiel, Vorhaben, Founder Setup, Im Alltag. Die
+          Station, an der der naechste Schritt liegt, pulsiert. Zustaende stehen als Text, nie nur als Farbe. */}
       <section aria-labelledby="team-journey-title" className="mt-5 rounded-[24px] border border-[#e4e2f0] bg-white px-5 py-6 sm:px-7">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="team-journey-title" className="text-[22px] font-semibold tracking-tight text-[#0b1f3a]">{t("journey.label")}</h2>
+          <span className="text-[13.5px] text-[#5f5e7a]">{t("journey.note")}</span>
         </div>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((key) => (
-            <li key={key} className="min-w-0">
-              <Link
-                href={href[key]}
-                className={`card-lift flex h-full flex-col gap-2.5 rounded-[22px] border bg-white p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] ${
-                  here === key ? "border-[#6d49e0] shadow-[0_0_0_4px_rgba(109,73,224,0.10)]" : "border-[#e4e2f0]"
-                }`}
-              >
-                <span
-                  className={`flex h-11 w-11 items-center justify-center rounded-[14px] ${
-                    here === key
-                      ? "profile-step-here bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white"
-                      : tone[key] === "done"
-                        ? "bg-[#e3f6ec] text-[#17794a]"
-                        : "bg-[#efeafd] text-[#4a2fb8]"
-                  }`}
+        <ol className="relative mt-5 grid grid-cols-2 gap-x-2 gap-y-5 sm:grid-cols-4">
+          <span aria-hidden="true" className="absolute inset-x-10 top-6 hidden border-t-2 border-dashed border-[#d8d5ea] sm:block" />
+          {stations.map((station) => {
+            const state = station.key === here ? "here" : station.tone === "done" ? "done" : "open";
+            return (
+              <li key={station.key} aria-current={state === "here" ? "step" : undefined} className="relative min-w-0">
+                <Link
+                  href={station.href}
+                  className="flex flex-col items-center gap-2 rounded-2xl px-1 py-1 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0]"
                 >
-                  <StepGlyph name={key} />
-                </span>
-                <span className="text-base font-semibold text-[#0b1f3a]">{t(`journey.items.${key}`)}</span>
-                <span className={`mt-auto inline-flex items-center self-start rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${chip[tone[key]]}`}>{status[key]}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <span
+                    className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
+                      state === "done"
+                        ? "border-[#bfe8d1] bg-[#e3f6ec] text-[#17794a]"
+                        : state === "here"
+                          ? "profile-step-here border-transparent bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white"
+                          : "border-[#d8d5ea] bg-white text-[#8b89aa]"
+                    }`}
+                  >
+                    {state === "done" ? <CheckGlyph /> : <StepGlyph name={station.glyph} />}
+                  </span>
+                  <span className={`text-sm font-semibold sm:text-[15px] ${state === "here" ? "text-[#0b1f3a]" : "text-[#33325e]"}`}>{station.label}</span>
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${chip[station.tone]}`}>{station.status}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
       </section>
     </>
   );

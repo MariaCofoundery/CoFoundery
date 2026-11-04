@@ -101,18 +101,34 @@
       },
       "together": {
         "title": "Gemeinsam anschauen"
+      },
+      "waiting": {
+        "title": "Wartet auf euch"
+      },
+      "core": {
+        "title": "Eure Grundlagen",
+        "text": "Die drei Dinge, auf die es ankommt. Alles andere baut darauf auf."
+      },
+      "everyday": {
+        "title": "Im Alltag",
+        "text": "Ausprobieren und dranbleiben. Am meisten bringt es, wenn das Founder Setup steht."
+      },
+      "extras": {
+        "title": "Wenn ihr mögt",
+        "text": "Ergänzungen. Sie helfen bei einzelnen Fragen, ihr müsst sie nicht machen."
       }
     },
     "header": {
       "advisors": "Begleitung: {names}"
     },
     "journey": {
-      "label": "Stand eurer Bereiche",
+      "label": "Euer Weg",
       "items": {
         "work": "Deine Arbeitsweise",
         "venture": "Deine Angaben zum Vorhaben",
         "report": "Euer Zusammenspiel",
-        "setup": "Founder Setup"
+        "setup": "Founder Setup",
+        "everyday": "Im Alltag"
       },
       "assessment": {
         "unavailable": "Status nicht verfügbar",
@@ -132,6 +148,12 @@
         "reconfirm": "Erneut zu bestätigen",
         "clarifying": "In Klärung",
         "open": "Offen"
+      },
+      "note": "Orientierung, keine Wertung",
+      "workFirst": "Erst deine Arbeitsweise",
+      "everyday": {
+        "open": "Jetzt möglich",
+        "later": "Nach dem Setup"
       }
     },
     "understand": {
@@ -155,8 +177,9 @@
     },
     "deepen": {
       "pair": "Ihr zwei: {names}",
-      "summary": "Zusammenarbeit zu zweit vertiefen",
-      "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid."
+      "summary": "Übungen zu zweit",
+      "twoOnly": "Read My Mind und Founder in the Wild könnt ihr derzeit nur in Teams mit genau zwei Foundern starten. Das Commitment Lab nutzt ihr mit den Personen, mit denen ihr direkt verbunden seid.",
+      "summaryHint": "Read My Mind, Founder in the Wild, Commitment Lab"
     },
     "backShort": "Teams",
     "overview": {
@@ -170,7 +193,34 @@
         "setup": "Im Founder Setup vereinbaren"
       }
     },
-    "editDetails": "Name und Beschreibung ändern"
+    "editDetails": "Name und Beschreibung ändern",
+    "core": {
+      "report": {
+        "title": "Euer Zusammenspiel",
+        "text": "Wo ihr ähnlich arbeitet und wo verschieden, mit Fragen für eure Gespräche.",
+        "open": "Bericht lesen",
+        "share": "Arbeitsweise teilen",
+        "work": "Arbeitsweise beantworten"
+      },
+      "venture": {
+        "title": "Euer Vorhaben",
+        "text": "Zeit, Geld, Entscheidungen und Ziele: eure Sichten nebeneinander.",
+        "open": "Ansehen"
+      }
+    },
+    "extras": {
+      "roles": {
+        "title": "Fähigkeiten & Verantwortung",
+        "text": "Wer im Team was kann und was verantworten will.",
+        "open": "Ansehen"
+      },
+      "program": {
+        "title": "Programm",
+        "text": "Einen Programmcode eintragen oder sehen, in welchem Programm ihr seid und wer mitliest.",
+        "open": "Zum Programm"
+      }
+    },
+    "shareDetails": "Teamfreigabe"
   },
   "teamNavigation": {
     "ariaLabel": "Bereiche des Founder-Teams",
@@ -183,7 +233,8 @@
     "tradeoffs": "Werte & Zielkonflikte",
     "workstyle": "Euer Zusammenspiel",
     "strengths": "Stärken & Antrieb",
-    "checkin": "Check-in"
+    "checkin": "Check-in",
+    "more": "Mehr"
   },
   "checkIn": {
     "eyebrow": "Check-in",

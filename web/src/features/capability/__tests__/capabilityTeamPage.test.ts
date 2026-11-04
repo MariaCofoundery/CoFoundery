@@ -214,7 +214,9 @@ test("die Seite ist nur fuer Mitglieder des Teams", () => {
 test("der Reiter steht in der Team-Navigation", () => {
   // Eine Seite, die niemand findet, ist keine.
   const nav = source("src/features/teams/FounderTeamNavigation.tsx");
-  assert.match(nav, /key: "roles" as const, href: `\/teams\/\$\{encodeURIComponent\(teamId\)\}\/roles`/);
+  // Seit 04.11.2026 unter "Mehr" - und als Karte auf der Teamseite.
+  assert.match(nav, /key: "roles" as const, href: `\/teams\/\$\{team\}\/roles`/);
+  assert.match(source("src/app/(product)/teams/[teamId]/page.tsx"), /href=\{`\/teams\/\$\{team64\}\/roles`\}/);
 
   for (const locale of ["de", "en"]) {
     const navigation = (

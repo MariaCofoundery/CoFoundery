@@ -77,6 +77,7 @@ export async function TeamPageHeader({
           checkin: navigationT("checkin"),
           setup: navigationT("setup"),
           library: navigationT("library"),
+          more: navigationT("more"),
         }}
       />
       {children ? <div className="ws-no-print mt-4 flex flex-wrap items-center gap-3">{children}</div> : null}
