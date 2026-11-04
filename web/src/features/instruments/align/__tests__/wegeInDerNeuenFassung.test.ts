@@ -108,13 +108,11 @@ test("nach dem Absenden passiert etwas", () => {
 test("der zweite Bereich heißt überall gleich", () => {
   // „Euer Vorhaben“ setzt ein Wir voraus, das es oft noch nicht gibt -
   // Solo-Foundernde und Leute vor der Co-Founder-Suche fielen damit durch.
-  for (const datei of [
-    join("src", "features", "instruments", "align", "AlignNav.tsx"),
-    join("src", "features", "instruments", "align", "AlignCard.tsx"),
-  ]) {
-    const text = readFileSync(datei, "utf8");
-    assert.match(text, /Was du aufbauen willst|t\("ventureTitle"\)/, datei);
-  }
+  const text = readFileSync(join("src", "features", "instruments", "align", "AlignNav.tsx"), "utf8");
+  assert.match(text, /Was du aufbauen willst/);
+  // Seit 04.11.2026 auch als dritter Schritt im Weg der Startseite.
+  const de = JSON.parse(readFileSync(join("messages", "de", "dashboard.json"), "utf8"));
+  assert.equal(de.start.path.foundation.venture, "Was du aufbauen willst");
 
   // Auf der Seite selbst steht der Name nicht mehr von Hand: Er ist die
   // Überschrift der Startseite des Fragebogens und kommt aus dem UX-Review.

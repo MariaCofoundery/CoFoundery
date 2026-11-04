@@ -101,8 +101,9 @@ test("der Link zum bisherigen Report zeigt auf die Stelle, die es gibt", () => {
   // Die Archivkarte sagt „dein bisheriger Report bleibt erhalten“. Wenn der
   // Link danach ins Leere geht, ist das eine Behauptung. Hier gepinnt, damit
   // eine Umbenennung der Route auffaellt.
+  // Seit 04.11.2026 steht der Archivkasten im Profil (`ProfileArchive`).
   const dashboard = readFileSync(
-    join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+    join("src", "features", "profile", "ProfileArchive.tsx"), "utf8");
   const data = readFileSync(
     join("src", "features", "instruments", "v21", "dashboardVersionData.ts"), "utf8");
 
@@ -110,6 +111,6 @@ test("der Link zum bisherigen Report zeigt auf die Stelle, die es gibt", () => {
   assert.ok(ziel, "der Archivkasten verlinkt keinen Report");
   assert.ok(
     dashboard.includes(`"${ziel}"`),
-    `${ziel} wird vom Dashboard nirgends sonst verlinkt - gibt es die Route?`,
+    `${ziel} wird vom Archiv nirgends sonst verlinkt - gibt es die Route?`,
   );
 });

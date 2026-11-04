@@ -128,6 +128,7 @@ export default async function AccountPage({
     ...(hasConnectAccount ? [{ id: "connect", label: t("account.nav.connect"), icon: "link" as const }] : []),
     { id: "daten", label: t("account.data.title"), icon: "download" },
     { id: "handy", label: phoneT("navLabel"), icon: "phone" },
+    { id: "hilfe", label: t("account.help.nav"), icon: "chat" },
     { id: "loeschen", label: t("account.nav.delete"), icon: "warn", danger: true },
   ];
 
@@ -195,6 +196,16 @@ export default async function AccountPage({
             </div>
             <a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener" className={ACCOUNT_SECONDARY}>
               {phoneT("link")}
+            </a>
+          </section>
+
+          {/* Stand bis 04.11.2026 nur eingeklappt auf der Startseite. */}
+          <section id="hilfe" className={`${ACCOUNT_CARD} mt-5 flex flex-wrap items-center gap-4`}>
+            <div className="min-w-0 flex-[1_1_300px]">
+              <AccountHead icon="chat" tone="teal" title={t("account.help.title")} text={t("account.help.text")} />
+            </div>
+            <a href={`mailto:hello@cofoundery.de?subject=${encodeURIComponent(t("account.help.subject"))}`} className={ACCOUNT_SECONDARY}>
+              {t("actions.contactSupport")}
             </a>
           </section>
 

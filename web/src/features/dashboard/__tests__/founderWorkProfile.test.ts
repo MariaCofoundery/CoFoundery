@@ -98,8 +98,12 @@ test("completion has precedence over answer count", () => {
 });
 test("dashboard preserves historical report and values context without generic legacy tasks", () => {
   const source=readFileSync("src/app/(product)/dashboard/page.tsx","utf8");
-  assert.match(source,/hasSubmittedBase && <Link href="\/me\/report"/);
-  assert.match(source,/hasSubmittedBase && hasSubmittedValues/);
-  assert.match(source,/task.id !== "personal:founder-alignment" && task.id !== "personal:values"/);
+  // Seit 04.11.2026 im Archiv des Profils statt am Ende der Startseite.
+  const archive=readFileSync("src/features/profile/ProfileArchive.tsx","utf8");
+  assert.match(archive,/hasSubmittedBase && <Link href="\/me\/report"/);
+  assert.match(archive,/hasSubmittedBase && hasSubmittedValues/);
+  // Die fruehere Werte- und Alignment-Reflexion wird nicht als Aufgabe angeboten.
+  assert.match(readFileSync("src/features/dashboard/founderStart.ts","utf8"),/task\.type !== "values_continue" && task\.type !== "founder_alignment_continue"/);
+  assert.match(source,/\.filter\(isShownOnStart\)/);
   assert.doesNotMatch(source,/<AlignAnnounce|<TransitionAnnounce|href="\/me\/base"|href="\/me\/values"/);
 });

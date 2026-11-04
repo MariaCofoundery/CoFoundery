@@ -5,28 +5,11 @@
     "contextLabel": "Founder context",
     "error": "The action could not be completed right now. Please try again.",
     "loadError": "The dashboard could not be loaded completely right now. Please try again.",
-    "primary": {
-      "complete_profile": "Complete your profile",
-      "workstyle_start": "How you work – start now",
-      "workstyle_continue": "How you work – continue"
-    },
-    "primaryText": {
-      "complete_profile": "A few basic details are still missing – it only takes a moment.",
-      "workstyle_start": "How you work is the basis for conversations within your team.",
-      "workstyle_continue": "You have already started – pick up where you left off."
-    },
     "invitationErrors": {
       "expired": "This invitation has expired. Ask the person who invited you to send a new one.",
       "revoked": "This invitation was withdrawn and is no longer valid.",
       "invitation_not_found": "This invitation is no longer available – it may already have been used or withdrawn."
-    },
-    "nextStep": "Your next step",
-    "go": "Let’s go",
-    "headline": "How do you work together – and what do you want to agree on?",
-    "allQuestionnaires": "See all questionnaires",
-    "previous": "Previous item",
-    "next": "Next item",
-    "goTo": "Item"
+    }
   },
   "actions": {
     "continueAlignment": "Continue Founder Alignment",
@@ -60,10 +43,6 @@
     "description": "Only concrete actions and work you already started and can continue.",
     "showAll": "Show all",
     "showLess": "Show less",
-    "empty": {
-      "title": "Nothing is waiting for you right now.",
-      "text": "You can open your connections and teams whenever you want to continue."
-    },
     "kinds": {
       "NEEDS_YOU": "Waiting for you",
       "CONTINUE_PERSONAL": "Continue personally",
@@ -284,33 +263,6 @@
   "team": {
     "eyebrow": "Founder workspace",
     "title": "Your teams & connections",
-    "cards": {
-      "empty": "No founder connection yet.",
-      "founderFallback": "Founder {index}",
-      "founderUnknown": "Founder connection",
-      "avatarAlt": "Profile of {name}",
-      "statusLabel": "Existing work",
-      "openTeam": "Open team",
-      "openConnection": "Open connection",
-      "contexts": {
-        "existingTeam": "Existing founder team",
-        "potentialTeam": "Potential collaboration",
-        "existingConnection": "Founder connection in an existing team context",
-        "potentialConnection": "Potential collaboration"
-      },
-      "statuses": {
-        "setupConfirmed": "{count, plural, one {1 topic confirmed} other {# topics confirmed}}",
-        "setupInProgress": "Founder Setup in progress",
-        "alignmentReport": "Alignment report available",
-        "alignmentReportWith": "Alignment with {name} · report available",
-        "commitmentLab": "Commitment Lab started",
-        "commitmentLabWith": "Commitment Lab with {name} · started",
-        "advisor": "Advisor connected",
-        "advisorWith": "Advisor for the connection with {name} · connected",
-        "connectionPending": "Founder connection requested",
-        "alignmentInProgress": "Alignment in progress"
-      }
-    },
     "reports": "Alignment reports",
     "partner": "Partner: {email}",
     "status": "Status: {status}",
@@ -589,7 +541,13 @@
       "connect": "Connect",
       "delete": "Delete account"
     },
-    "betaNote": "Made2Found is in beta. Features, flows and texts may change, and some things are still in development. If you notice something, tell us through “Feedback”."
+    "betaNote": "Made2Found is in beta. Features, flows and texts may change, and some things are still in development. If you notice something, tell us through “Feedback”.",
+    "help": {
+      "title": "Help & contact",
+      "text": "If something does not work or you have a question, write to us – we reply personally.",
+      "subject": "Question about Made2Found",
+      "nav": "Help"
+    }
   },
   "coFounderInvitePage": {
     "backToDashboard": "Back to dashboard",
@@ -764,14 +722,8 @@
     "steps": "{count} steps, independent of a venture",
     "answers": "Your answers",
     "search": "What you are looking for",
-    "ventureTitle": "What you want to build",
-    "ventureDescription": "Time, money, goals and rules – for a venture, not in general.",
-    "begin": "Start",
-    "continue": "Continue",
     "unnamed": "Unnamed",
-    "onlyYou": " – just you",
     "ventureSteps": "{count} sections on goals, commitments, rules and boundaries",
-    "confirm": "Someone has joined – review your information",
     "comparisonTitle": "Side by side",
     "comparisonEmpty": "You can compare once you are connected, have both submitted and shared your answers with each other.",
     "compare": "Compare with {name}",
@@ -804,51 +756,6 @@
     },
     "moreSummary": "More about your profile"
   },
-  "path": {
-    "title": "Your path",
-    "lead": "First understand how each person works. Then compare. Then agree in writing.",
-    "understand": {
-      "title": "Understand me",
-      "text": "Ways of working, strengths, skills, direction – your profile."
-    },
-    "compare": {
-      "title": "Compare us",
-      "text": "Where you agree, where you differ – as a conversation, not a grade."
-    },
-    "agree": {
-      "title": "Agree",
-      "text": "Founder Setup: roles, time, money, decisions – in writing, together."
-    },
-    "state": {
-      "done": "Done",
-      "started": "In progress",
-      "open": "Not yet",
-      "here": "Continue here",
-      "inTeam": "In the team"
-    }
-  },
-  "areas": {
-    "title": "You can also",
-    "lead": "Areas you are not using yet. Everything stays voluntary and separate from your team.",
-    "cards": {
-      "find": {
-        "title": "Find",
-        "text": "Find co-founders – you say what you are looking for and what you bring.",
-        "cta": "Open Find"
-      },
-      "connect": {
-        "title": "Connect",
-        "text": "Network: share expertise, offers and problems.",
-        "cta": "Open Connect"
-      },
-      "advisor": {
-        "title": "Support founders",
-        "text": "As an advisor – alone or in an organization such as an accelerator.",
-        "cta": "Add the role"
-      }
-    },
-    "wanted": "Your interest"
-  },
   "teamCard": {
     "title": "Your team",
     "someone": "Co-founder",
@@ -867,22 +774,164 @@
     "editAria": "Edit name and description",
     "editShort": "Name and description"
   },
-  "deepen": {
-    "title": "To go deeper",
-    "lead": "Optional. Nothing here is missing from your profile.",
-    "view": "View →",
-    "tradeoffs": {
-      "title": "Values & trade-offs",
-      "text": "Four situations where two things can both be right · 5 min."
+  "start": {
+    "eyebrow": "Your next step",
+    "next": {
+      "complete_profile": {
+        "title": "Complete your profile",
+        "text": "A few basic details are still missing – it only takes a moment.",
+        "action": "Go to profile"
+      },
+      "workstyle_start": {
+        "title": "Describe how you work",
+        "text": "29 situations from everyday founder life. There are no right or wrong answers, and every answer is saved straight away. This becomes your workstyle profile – private until you share it yourself.",
+        "action": "Let’s go"
+      },
+      "workstyle_continue": {
+        "title": "Pick up where you left off",
+        "text": "Your answers so far are saved. This becomes your workstyle profile – private until you share it yourself.",
+        "action": "Continue"
+      },
+      "capability": {
+        "title": "Show where your experience lies",
+        "text": "Choose the areas you have experience in and say for each whether you would like to take responsibility for it. This is not an assessment but a basis for your roles.",
+        "action": "Choose areas"
+      },
+      "venture_start": {
+        "title": "Describe what you want to build",
+        "text": "Questions about your venture. Each person answers on their own – you decide what you share.",
+        "action": "Open the questions"
+      },
+      "venture_continue": {
+        "title": "Finish the questions about your venture",
+        "text": "Your answers so far are saved.",
+        "action": "Continue"
+      },
+      "invite": {
+        "title": "Invite your co-founders",
+        "text": "Together you clarify how you work together and record your agreements. Each person decides what they show to whom.",
+        "action": "Invite co-founders"
+      },
+      "setup_confirm": {
+        "title": "{count, plural, one {One agreement is} other {# agreements are}} waiting for your joint yes",
+        "text": "In the Founder Setup of “{team}”. Only the confirmation is missing.",
+        "action": "Go to Founder Setup"
+      },
+      "setup_continue": {
+        "title": "Reach agreement in the Founder Setup",
+        "text": "In “{team}” {open, plural, one {one topic is still open} other {# topics are still open}}.",
+        "action": "Continue"
+      },
+      "setup_start": {
+        "title": "Record your agreements",
+        "text": "{total} topics, from roles to exit – in the Founder Setup of “{team}”. You work through them at your own pace, one at a time.",
+        "action": "Go to Founder Setup"
+      },
+      "test_project": {
+        "title": "Try out your collaboration in a test project",
+        "text": "A small project with a fixed end. Afterwards you see whether your agreements hold up in everyday work.",
+        "action": "Go to test project"
+      },
+      "test_project_running": {
+        "title": "Your test project is running",
+        "text": "At the end you look back together: what held up, what do you want to adjust?",
+        "action": "Go to test project"
+      },
+      "rhythm": {
+        "title": "Set your check-in rhythm",
+        "text": "Every 30, 60 or 90 days you take a short look at your agreements together: what is going well, what do you want to clarify?",
+        "action": "Choose a rhythm"
+      },
+      "check_in_open": {
+        "title": "Your check-in is running",
+        "text": "Answer the questions for yourself – afterwards you see your answers side by side.",
+        "action": "Go to check-in"
+      },
+      "check_in_due": {
+        "title": "Your check-in is due",
+        "text": "Take a short look at your agreements together: what is going well, what do you want to clarify?",
+        "action": "Start check-in"
+      },
+      "check_in_scheduled": {
+        "title": "Your next check-in is on {date}",
+        "text": "That is what you set in “{team}”. Until then there is nothing to do here.",
+        "action": "Go to check-in"
+      },
+      "team_steady": {
+        "title": "Your Founder Setup is in place",
+        "text": "All topics in “{team}” are agreed.",
+        "action": "Go to team"
+      }
     },
-    "strengths": {
-      "title": "Strengths interview",
-      "text": "What you do well day to day, in conversation · 15 min."
+    "adjust": "Does an agreement no longer fit? Adjust it in the Founder Setup",
+    "path": {
+      "label": "Your path",
+      "foundation": {
+        "work": "How you work",
+        "can": "Where your experience lies",
+        "venture": "What you want to build",
+        "agree": "Agree with your team"
+      },
+      "foundationDone": "Foundations: all four steps done",
+      "everydayTitle": "Everyday work",
+      "everyday": {
+        "testProject": "Test project",
+        "rhythm": "Set check-in rhythm",
+        "steady": "Check in regularly"
+      },
+      "state": {
+        "done": "done",
+        "current": "up next",
+        "open": "still open"
+      }
     },
-    "privacy": {
-      "title": "How Made2Found handles your data",
-      "text": "Submitting shares nothing. You decide per questionnaire whether and with whom to share – and can take it back any time.",
-      "link": "Who sees what →"
-    }
+    "waiting": {
+      "title": "Waiting for you",
+      "count": "{count, plural, one {one item} other {# items}}",
+      "previous": "Back",
+      "next": "Next",
+      "running": "In progress:",
+      "ventureConfirm": {
+        "label": "Venture",
+        "text": "Someone new has joined “{team}”. Do your venture answers still fit?",
+        "action": "Confirm"
+      }
+    },
+    "stand": {
+      "title": "Where you stand",
+      "profile": "Profile",
+      "profileAllDone": "All parts done.",
+      "profileDone": "Done: {done}.",
+      "profileOpen": "Still open: {open}.",
+      "parts": {
+        "work": "Workstyle",
+        "can": "Areas",
+        "strengths": "Strengths",
+        "direction": "Direction"
+      },
+      "toProfile": "Go to profile",
+      "teamSettled": "{settled, plural, =0 {No topic agreed yet} one {One topic agreed} other {# topics agreed}}",
+      "teamAwaiting": "{count, plural, one {one waiting for confirmation} other {# waiting for confirmation}}",
+      "teamAllSettled": "All topics agreed",
+      "testProjectClosed": "Test project completed",
+      "maybe": "If you like",
+      "financing": "Financing guide",
+      "tradeoffs": "Values & trade-offs",
+      "otherTeams": "Other teams"
+    },
+    "talk": {
+      "title": "For your next conversation",
+      "from": "From how you work together, area “{label}”",
+      "link": "Open how you work together"
+    },
+    "solo": {
+      "inviteTitle": "Not founding alone?",
+      "inviteText": "Invite your co-founders. Each person decides what they show to whom.",
+      "inviteCta": "Invite co-founders",
+      "findTitle": "No team yet?",
+      "findText": "In Find you meet people who want to build something similar.",
+      "findCta": "Find co-founders"
+    },
+    "privacy": "How we handle your data"
   }
 }

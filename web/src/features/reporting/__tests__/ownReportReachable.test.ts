@@ -38,17 +38,16 @@ test("das Ergebnis steht unter „Über dich“, beim Namen genannt", () => {
   // Kopfbereich traegt hoechstens eine Hauptaktion). Das eigene Ergebnis steht
   // jetzt als erste Karte im Bereich "Über dich" - und in der Leiste unter
   // "Profil", von jeder Seite aus.
+  // Seit 04.11.2026 fuehrt "Dein Stand" auf der Startseite zum Profil.
   const dashboard = codeOnly(DASHBOARD);
-  // Seit dem Umbau der Startseite fuehrt der erste Schritt des Wegs („Ich verstehen") zum Profil.
-  const orientation = codeOnly("src/features/dashboard/DashboardOrientation.tsx");
-  assert.match(dashboard, /<DashboardPath/);
-  assert.match(orientation, /key: "understand",\s*href: "\/me\/profile"/);
+  assert.match(dashboard, /<DashboardAside/);
+  assert.match(codeOnly("src/features/dashboard/DashboardAside.tsx"), /href="\/me\/profile"/);
 });
 
 test("das eigene Gesamtprofil hängt nicht vom alten v1-Report ab", () => {
   const dashboard = codeOnly(DASHBOARD);
   assert.doesNotMatch(dashboard, /hasIndividualReport/);
-  assert.match(codeOnly("src/features/dashboard/DashboardOrientation.tsx"), /href: "\/me\/profile"/);
+  assert.match(codeOnly("src/features/dashboard/DashboardAside.tsx"), /href="\/me\/profile"/);
 });
 
 test("und von jeder Align-Seite aus, nicht nur vom Dashboard", () => {

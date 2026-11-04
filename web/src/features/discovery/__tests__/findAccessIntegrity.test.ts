@@ -15,7 +15,6 @@ const sql = () => read(MIGRATION).replace(/--.*$/gm, "");
 
 /** Lesen den Anzeigenamen der Gegenseite in bestehenden Beziehungen. */
 const RELATIONSHIP_NAME_READERS = [
-  "src/features/dashboard/founderDashboardConnectionData.ts",
   "src/features/dashboard/founderDashboardTaskData.ts",
   "src/features/capability/capabilityComparisonData.ts",
   "src/features/matchingCore/matchingCoreReportData.ts",

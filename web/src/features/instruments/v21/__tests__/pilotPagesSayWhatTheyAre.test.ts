@@ -43,10 +43,10 @@ const PILOT = join("src", "app", "(product)", "founder-alignment", "pilot");
 const ERLAUBT = [
   join("src", "features", "reporting", "workstyle"),
   join("src", "app", "(product)", "founder-alignment", "versionen") + sep,
-  // Das Dashboard: Hinweis auf die neue Fassung und der Archivkasten. Es
-  // FUEHRT dorthin, es enthaelt den Fragebogen nicht - ein eigener Test unten
-  // haelt das fest.
-  join("src", "app", "(product)", "dashboard") + sep,
+  // Das Archiv im Profil (bis 04.11.2026 auf der Startseite): der Archivkasten.
+  // Es FUEHRT dorthin, es enthaelt den Fragebogen nicht - ein eigener Test
+  // unten haelt das fest.
+  join("src", "features", "profile", "ProfileArchive.tsx"),
   // Die Advisor-Seite: Sie zeigt fremde Antworten, wenn sie freigegeben sind.
   // Ein eigener Test unten haelt fest, dass sie dort nichts anfassen kann.
   join("src", "app", "(product)", "advisor", "person") + sep,
@@ -184,16 +184,18 @@ test("die Wahlseite nennt beide Fassungen und empfiehlt keine", () => {
   );
 });
 
-test("das Dashboard fuehrt zur Testfassung, enthaelt sie aber nicht", () => {
+test("das Archiv fuehrt zur Testfassung, enthaelt sie aber nicht", () => {
   // Der Unterschied ist wichtig: Ein Link ist in Ordnung, ein zweiter
   // Fragebogen an anderer Stelle nicht. Sonst gaebe es zwei Wege, dieselbe
-  // Antwort zu geben, und beide wuerden auseinanderlaufen.
-  const page = readFileSync(
-    join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+  // Antwort zu geben, und beide wuerden auseinanderlaufen. Seit 04.11.2026
+  // steht der Archivkasten im Profil, nicht mehr auf der Startseite.
+  const page = readFileSync(join("src", "app", "(product)", "dashboard", "page.tsx"), "utf8");
+  const archive = readFileSync(join("src", "features", "profile", "ProfileArchive.tsx"), "utf8");
   assert.ok(!page.includes("<TransitionAnnounce"), "archived pilot is not promoted");
-  assert.match(page, /VersionArchiveCard/);
+  assert.ok(!page.includes("VersionArchiveCard"));
+  assert.match(archive, /VersionArchiveCard/);
   for (const verboten of ["QuestionnaireV21", "AnswerFieldV21", "saveAnswerV21", "ReportViewV21"]) {
-    assert.ok(!page.includes(verboten), `das Dashboard enthaelt ${verboten}`);
+    assert.ok(!archive.includes(verboten), `das Archiv enthaelt ${verboten}`);
   }
 });
 

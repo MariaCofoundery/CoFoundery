@@ -132,8 +132,10 @@ test("Zitat des Tages: stabil je Tag, für alle Rollen gleich, kuratiert und ohn
   const a = quoteIndexFor(new Date("2026-10-05T06:00:00Z"));
   assert.equal(a, quoteIndexFor(new Date("2026-10-05T20:00:00Z")), "derselbe Berliner Tag");
   assert.notEqual(a, quoteIndexFor(new Date("2026-10-06T06:00:00Z")));
-  for (const page of ["src/app/(product)/dashboard/page.tsx", "src/app/(product)/advisor/dashboard/page.tsx"])
-    assert.equal((code(page).match(/<QuoteOfTheDay/g) ?? []).length, 1, page);
+  // Seit 04.11.2026 nur noch auf der Advisor-Startseite; die Founder-Startseite
+  // traegt stattdessen eine Frage aus dem eigenen Teambericht.
+  assert.equal((code("src/app/(product)/advisor/dashboard/page.tsx").match(/<QuoteOfTheDay/g) ?? []).length, 1);
+  assert.equal((code("src/app/(product)/dashboard/page.tsx").match(/<QuoteOfTheDay/g) ?? []).length, 0);
   for (const locale of ["de", "en"]) {
     const q = json(`messages/${locale}/common.json`).quoteOfTheDay.quotes;
     assert.equal(Object.keys(q).length, QUOTE_COUNT);

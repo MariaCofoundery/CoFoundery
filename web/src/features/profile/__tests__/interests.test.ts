@@ -34,10 +34,10 @@ test("die Absicht gibt nie Zugang: sie steht im Kern, nicht in Rollen oder Freig
   assert.doesNotMatch(core, /interests/);
 });
 
-test("Startseite und Profil nutzen sie nur als Vorschlag", () => {
-  const areas = readFileSync("src/features/dashboard/DashboardOrientation.tsx", "utf8");
-  assert.match(areas, /interests = \[\]/);
-  assert.match(areas, /\.sort\(\(a, b\) => Number\(wanted\(b\.key\)\) - Number\(wanted\(a\.key\)\)\)/);
+test("das Profil nutzt sie nur als Vorschlag", () => {
+  // Seit 04.11.2026 zeigt die Startseite keinen Streifen "Das kannst du auch"
+  // mehr, den die Absicht sortiert hatte - sie liest die Absicht nicht.
+  assert.doesNotMatch(readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"), /getInterests|interests/);
   const page = readFileSync("src/app/(product)/profile/page.tsx", "utf8");
   // Seit den Karten steht die Interessenkarte als Schritt im Rahmen des Identitätsschritts.
   assert.match(page, /<div data-card="interests">\s*<InterestsCard/);

@@ -42,10 +42,10 @@ test("A/B/C: \"Fortsetzen\" (resume) leitet nur weiter und schreibt nichts", () 
   assert.ok(!/SERVICE_ROLE|createSupabaseClient|createPrivilegedClient/.test(route), "kein Service-Role-Client mehr");
   assert.ok(!/\.(update|upsert|insert|delete)\(|\.rpc\(|\.from\(/.test(route), "kein Datenbankzugriff im GET");
   assert.match(route, /NextResponse\.redirect\(new URL\(buildInvitationStartHref\(invitationId\)/);
-  // Dashboard-Aufgabe, Dashboard-Einladungskarte und Verbindungen zeigen auf diesen Weg.
+  // Die Aufgabe auf der Startseite und die Verbindungen zeigen auf diesen Weg
+  // (die eingeklappte Einladungsliste der Startseite gibt es seit 04.11.2026 nicht mehr).
   assert.match(source("src/features/dashboard/founderDashboardTasks.ts"), /href: `\/invite\/\$\{encodeURIComponent\(invitation\.id\)\}\/resume`/);
   assert.match(source("src/features/connections/founderConnectionsModel.ts"), /`\/invite\/\$\{encodeURIComponent\(invitation\.id\)\}\/resume`/);
-  assert.match(source("src/app/(product)/dashboard/page.tsx"), /const resumeHref = buildInvitationResumeHref\(invite\.id\)/);
 });
 
 test("A: kein Route Handler (GET/HEAD) und keine Seite nimmt eine Einladung an", () => {

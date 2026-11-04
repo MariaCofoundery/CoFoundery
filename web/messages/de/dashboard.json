@@ -5,28 +5,11 @@
     "contextLabel": "Founder-Kontext",
     "error": "Die Aktion konnte gerade nicht abgeschlossen werden. Bitte versuche es erneut.",
     "loadError": "Das Dashboard konnte gerade nicht vollständig geladen werden. Bitte versuche es erneut.",
-    "primary": {
-      "complete_profile": "Profil vervollständigen",
-      "workstyle_start": "Wie du arbeitest – jetzt starten",
-      "workstyle_continue": "Wie du arbeitest – fortsetzen"
-    },
-    "primaryText": {
-      "complete_profile": "Ein paar Basisangaben fehlen noch – sie dauern nur einen Moment.",
-      "workstyle_start": "Deine Arbeitsweise ist die Grundlage für Gespräche im Team.",
-      "workstyle_continue": "Du hast schon begonnen – mach dort weiter, wo du aufgehört hast."
-    },
     "invitationErrors": {
       "expired": "Diese Einladung ist abgelaufen. Bitte die einladende Person, dir eine neue zu schicken.",
       "revoked": "Diese Einladung wurde zurückgezogen und gilt nicht mehr.",
       "invitation_not_found": "Diese Einladung ist nicht mehr verfügbar – vielleicht wurde sie schon genutzt oder zurückgezogen."
-    },
-    "nextStep": "Dein nächster Schritt",
-    "go": "Los geht’s",
-    "headline": "Wie arbeitet ihr zusammen – und worauf wollt ihr euch einigen?",
-    "allQuestionnaires": "Alle Fragebögen ansehen",
-    "previous": "Vorheriger Hinweis",
-    "next": "Nächster Hinweis",
-    "goTo": "Hinweis"
+    }
   },
   "actions": {
     "continueAlignment": "Founder Alignment fortsetzen",
@@ -60,10 +43,6 @@
     "description": "Nur konkrete Aufgaben und bereits begonnene Arbeit, die du fortsetzen kannst.",
     "showAll": "Alle anzeigen",
     "showLess": "Weniger anzeigen",
-    "empty": {
-      "title": "Aktuell wartet nichts auf dich.",
-      "text": "Du kannst deine Verbindungen und Teams jederzeit weiter öffnen."
-    },
     "kinds": {
       "NEEDS_YOU": "Wartet auf dich",
       "CONTINUE_PERSONAL": "Persönlich fortsetzen",
@@ -284,33 +263,6 @@
   "team": {
     "eyebrow": "Founder-Arbeitsbereich",
     "title": "Deine Teams & Verbindungen",
-    "cards": {
-      "empty": "Noch keine Founder-Verbindung vorhanden.",
-      "founderFallback": "Founder {index}",
-      "founderUnknown": "Founder-Verbindung",
-      "avatarAlt": "Profil von {name}",
-      "statusLabel": "Vorhandene Arbeitsstände",
-      "openTeam": "Team öffnen",
-      "openConnection": "Verbindung öffnen",
-      "contexts": {
-        "existingTeam": "Bestehendes Founder-Team",
-        "potentialTeam": "Mögliche Zusammenarbeit",
-        "existingConnection": "Founder-Verbindung im bestehenden Teamkontext",
-        "potentialConnection": "Mögliche Zusammenarbeit"
-      },
-      "statuses": {
-        "setupConfirmed": "{count, plural, one {1 Thema bestätigt} other {# Themen bestätigt}}",
-        "setupInProgress": "Founder Setup in Arbeit",
-        "alignmentReport": "Alignment Report vorhanden",
-        "alignmentReportWith": "Alignment mit {name} · Report vorhanden",
-        "commitmentLab": "Commitment Lab begonnen",
-        "commitmentLabWith": "Commitment Lab mit {name} · begonnen",
-        "advisor": "Advisor verbunden",
-        "advisorWith": "Advisor für die Verbindung mit {name} · verbunden",
-        "connectionPending": "Founder-Verbindung angefragt",
-        "alignmentInProgress": "Alignment in Arbeit"
-      }
-    },
     "reports": "Alignment Reports",
     "partner": "Partner: {email}",
     "status": "Status: {status}",
@@ -589,7 +541,13 @@
       "connect": "Connect",
       "delete": "Konto löschen"
     },
-    "betaNote": "Made2Found ist in der Beta-Phase. Funktionen, Abläufe und Texte können sich ändern, und manches ist noch in Entwicklung. Wenn dir etwas auffällt, schreib uns über „Feedback“."
+    "betaNote": "Made2Found ist in der Beta-Phase. Funktionen, Abläufe und Texte können sich ändern, und manches ist noch in Entwicklung. Wenn dir etwas auffällt, schreib uns über „Feedback“.",
+    "help": {
+      "title": "Hilfe & Kontakt",
+      "text": "Wenn etwas nicht funktioniert oder du eine Frage hast, schreib uns – wir antworten persönlich.",
+      "subject": "Frage zu Made2Found",
+      "nav": "Hilfe"
+    }
   },
   "coFounderInvitePage": {
     "backToDashboard": "Zurück zum Dashboard",
@@ -764,14 +722,8 @@
     "steps": "{count} Schritte, unabhängig vom Vorhaben",
     "answers": "Deine Antworten",
     "search": "Wonach du suchst",
-    "ventureTitle": "Was du aufbauen willst",
-    "ventureDescription": "Zeit, Geld, Ziele und Regeln – für ein Vorhaben, nicht allgemein.",
-    "begin": "Anfangen",
-    "continue": "Weiter ausfüllen",
     "unnamed": "Ohne Namen",
-    "onlyYou": " – nur du",
     "ventureSteps": "{count} Abschnitte zu Zielen, Zusagen, Regeln und Grenzen",
-    "confirm": "Jemand ist dazugekommen – sieh deine Angaben noch einmal an",
     "comparisonTitle": "Nebeneinander",
     "comparisonEmpty": "Vergleichen könnt ihr euch, sobald ihr verbunden seid, beide abgegeben und einander freigegeben habt.",
     "compare": "Mit {name} vergleichen",
@@ -804,51 +756,6 @@
     },
     "moreSummary": "Mehr zu deinem Profil"
   },
-  "path": {
-    "title": "Euer Weg",
-    "lead": "Erst verstehen, wie jede Person arbeitet. Dann vergleichen. Dann verbindlich vereinbaren.",
-    "understand": {
-      "title": "Ich verstehen",
-      "text": "Arbeitsweise, Stärken, Fähigkeiten, Richtung – dein Profil."
-    },
-    "compare": {
-      "title": "Uns vergleichen",
-      "text": "Wo seid ihr einig, wo unterschiedlich – als Gespräch, nicht als Note."
-    },
-    "agree": {
-      "title": "Vereinbaren",
-      "text": "Founder Setup: Rollen, Zeit, Geld, Entscheidungen – schriftlich und gemeinsam."
-    },
-    "state": {
-      "done": "Steht",
-      "started": "Begonnen",
-      "open": "Noch offen",
-      "here": "Hier geht es weiter",
-      "inTeam": "Im Team"
-    }
-  },
-  "areas": {
-    "title": "Das kannst du auch",
-    "lead": "Bereiche, die du noch nicht nutzt. Alles bleibt freiwillig und getrennt von deinem Team.",
-    "cards": {
-      "find": {
-        "title": "Find",
-        "text": "Mitgründer:innen finden – du sagst, was du suchst und mitbringst.",
-        "cta": "Find öffnen"
-      },
-      "connect": {
-        "title": "Connect",
-        "text": "Netzwerk: Expertise, Angebote und Probleme teilen.",
-        "cta": "Connect öffnen"
-      },
-      "advisor": {
-        "title": "Gründende begleiten",
-        "text": "Als Advisor – allein oder in einer Organisation wie einem Accelerator.",
-        "cta": "Rolle ergänzen"
-      }
-    },
-    "wanted": "Dein Interesse"
-  },
   "teamCard": {
     "title": "Dein Team",
     "someone": "Mitgründer:in",
@@ -867,22 +774,164 @@
     "editAria": "Name und Beschreibung ändern",
     "editShort": "Name und Beschreibung"
   },
-  "deepen": {
-    "title": "Zum Vertiefen",
-    "lead": "Freiwillig. Nichts davon fehlt deinem Profil.",
-    "view": "Ansehen →",
-    "tradeoffs": {
-      "title": "Werte & Zielkonflikte",
-      "text": "Vier Situationen, in denen zwei Dinge richtig sein können · 5 Min."
+  "start": {
+    "eyebrow": "Dein nächster Schritt",
+    "next": {
+      "complete_profile": {
+        "title": "Profil vervollständigen",
+        "text": "Ein paar Basisangaben fehlen noch – sie dauern nur einen Moment.",
+        "action": "Zum Profil"
+      },
+      "workstyle_start": {
+        "title": "Beschreib, wie du arbeitest",
+        "text": "29 Situationen aus dem Gründeralltag. Es gibt kein Richtig oder Falsch, jede Antwort wird sofort gespeichert. Daraus entsteht dein Arbeitsprofil – privat, bis du es selbst teilst.",
+        "action": "Los geht’s"
+      },
+      "workstyle_continue": {
+        "title": "Mach weiter, wo du aufgehört hast",
+        "text": "Deine bisherigen Antworten sind gespeichert. Daraus entsteht dein Arbeitsprofil – privat, bis du es selbst teilst.",
+        "action": "Weitermachen"
+      },
+      "capability": {
+        "title": "Zeig, wo du dich auskennst",
+        "text": "Wähle die Bereiche, in denen du Erfahrung hast, und sag zu jedem, ob du ihn verantworten möchtest. Das ist keine Bewertung, sondern eine Grundlage für eure Rollen.",
+        "action": "Bereiche wählen"
+      },
+      "venture_start": {
+        "title": "Beschreib, was du aufbauen willst",
+        "text": "Fragen zu eurem Vorhaben. Jede Person antwortet für sich – was du teilst, entscheidest du selbst.",
+        "action": "Fragen öffnen"
+      },
+      "venture_continue": {
+        "title": "Beantworte die Fragen zu eurem Vorhaben zu Ende",
+        "text": "Deine bisherigen Antworten sind gespeichert.",
+        "action": "Weitermachen"
+      },
+      "invite": {
+        "title": "Lade deine Co-Founder ein",
+        "text": "Gemeinsam klärt ihr, wie ihr zusammenarbeitet, und haltet eure Vereinbarungen fest. Was ihr wem zeigt, entscheidet jede Person selbst.",
+        "action": "Co-Founder einladen"
+      },
+      "setup_confirm": {
+        "title": "{count, plural, one {Eine Vereinbarung wartet} other {# Vereinbarungen warten}} auf euer gemeinsames Ja",
+        "text": "Im Founder Setup von „{team}“. Es fehlt nur noch die Bestätigung.",
+        "action": "Zum Founder Setup"
+      },
+      "setup_continue": {
+        "title": "Einigt euch im Founder Setup",
+        "text": "In „{team}“ {open, plural, one {ist noch ein Thema offen} other {sind noch # Themen offen}}.",
+        "action": "Weitermachen"
+      },
+      "setup_start": {
+        "title": "Haltet eure Vereinbarungen fest",
+        "text": "{total} Themen, von Rollen bis Ausstieg – im Founder Setup von „{team}“. Ihr klärt sie in eurem Tempo, eins nach dem anderen.",
+        "action": "Zum Founder Setup"
+      },
+      "test_project": {
+        "title": "Probiert eure Zusammenarbeit im Testprojekt aus",
+        "text": "Ein kleines Projekt mit festem Ende. Danach seht ihr, ob eure Vereinbarungen im Alltag tragen.",
+        "action": "Zum Testprojekt"
+      },
+      "test_project_running": {
+        "title": "Euer Testprojekt läuft",
+        "text": "Am Ende schaut ihr gemeinsam zurück: Was hat getragen, was wollt ihr anpassen?",
+        "action": "Zum Testprojekt"
+      },
+      "rhythm": {
+        "title": "Legt euren Check-in-Rhythmus fest",
+        "text": "Alle 30, 60 oder 90 Tage schaut ihr kurz gemeinsam auf eure Vereinbarungen: Was läuft gut, was wollt ihr klären?",
+        "action": "Rhythmus wählen"
+      },
+      "check_in_open": {
+        "title": "Euer Check-in läuft",
+        "text": "Beantworte die Fragen für dich – danach seht ihr eure Antworten nebeneinander.",
+        "action": "Zum Check-in"
+      },
+      "check_in_due": {
+        "title": "Euer Check-in ist fällig",
+        "text": "Schaut kurz gemeinsam auf eure Vereinbarungen: Was läuft gut, was wollt ihr klären?",
+        "action": "Check-in starten"
+      },
+      "check_in_scheduled": {
+        "title": "Euer nächster Check-in ist am {date}",
+        "text": "So habt ihr es in „{team}“ festgelegt. Bis dahin müsst ihr hier nichts tun.",
+        "action": "Zum Check-in"
+      },
+      "team_steady": {
+        "title": "Euer Founder Setup steht",
+        "text": "Alle Themen in „{team}“ sind vereinbart.",
+        "action": "Zum Team"
+      }
     },
-    "strengths": {
-      "title": "Stärken-Interview",
-      "text": "Was du im Alltag gut machst, im Gespräch · 15 Min."
+    "adjust": "Passt eine Vereinbarung nicht mehr? Im Founder Setup anpassen",
+    "path": {
+      "label": "Dein Weg",
+      "foundation": {
+        "work": "Wie du arbeitest",
+        "can": "Wo du dich auskennst",
+        "venture": "Was du aufbauen willst",
+        "agree": "Mit deinem Team einigen"
+      },
+      "foundationDone": "Grundlagen: alle vier Schritte erledigt",
+      "everydayTitle": "Im Alltag",
+      "everyday": {
+        "testProject": "Testprojekt",
+        "rhythm": "Check-in-Rhythmus festlegen",
+        "steady": "Regelmäßig abstimmen"
+      },
+      "state": {
+        "done": "erledigt",
+        "current": "jetzt dran",
+        "open": "noch offen"
+      }
     },
-    "privacy": {
-      "title": "So geht Made2Found mit deinen Daten um",
-      "text": "Abgeben teilt nichts. Du entscheidest je Fragebogen, ob und mit wem du teilst – und kannst es jederzeit zurücknehmen.",
-      "link": "Wer sieht was →"
-    }
+    "waiting": {
+      "title": "Wartet auf dich",
+      "count": "{count, plural, one {ein Eintrag} other {# Einträge}}",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "running": "Läuft gerade:",
+      "ventureConfirm": {
+        "label": "Vorhaben",
+        "text": "Jemand ist neu in „{team}“. Passen deine Antworten zum Vorhaben noch?",
+        "action": "Bestätigen"
+      }
+    },
+    "stand": {
+      "title": "Dein Stand",
+      "profile": "Profil",
+      "profileAllDone": "Alle Teile fertig.",
+      "profileDone": "Fertig: {done}.",
+      "profileOpen": "Noch offen: {open}.",
+      "parts": {
+        "work": "Arbeitsweise",
+        "can": "Bereiche",
+        "strengths": "Stärken",
+        "direction": "Richtung"
+      },
+      "toProfile": "Zum Profil",
+      "teamSettled": "{settled, plural, =0 {Noch kein Thema vereinbart} one {Ein Thema vereinbart} other {# Themen vereinbart}}",
+      "teamAwaiting": "{count, plural, one {eins wartet auf Bestätigung} other {# warten auf Bestätigung}}",
+      "teamAllSettled": "Alle Themen vereinbart",
+      "testProjectClosed": "Testprojekt abgeschlossen",
+      "maybe": "Wenn ihr mögt",
+      "financing": "Finanzierungs-Wegweiser",
+      "tradeoffs": "Werte & Zielkonflikte",
+      "otherTeams": "Andere Teams"
+    },
+    "talk": {
+      "title": "Für euer nächstes Gespräch",
+      "from": "Aus eurem Zusammenspiel, Bereich „{label}“",
+      "link": "Zu eurem Zusammenspiel"
+    },
+    "solo": {
+      "inviteTitle": "Gründest du nicht allein?",
+      "inviteText": "Lade deine Co-Founder ein. Was ihr wem zeigt, entscheidet jede Person selbst.",
+      "inviteCta": "Co-Founder einladen",
+      "findTitle": "Noch kein Team?",
+      "findText": "In Find lernst du Menschen kennen, die etwas Ähnliches aufbauen wollen.",
+      "findCta": "Co-Founder finden"
+    },
+    "privacy": "So gehen wir mit deinen Daten um"
   }
 }

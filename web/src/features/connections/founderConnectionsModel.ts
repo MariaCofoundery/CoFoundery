@@ -24,6 +24,8 @@ export type PotentialFounderConnection = {
   state: "request_pending" | "intro_accepted" | "alignment_in_progress";
   href: string;
   createdAt: string;
+  /** Nur bei Einladungen: Eine verschickte, noch offene Einladung bekommt ihren Link hier, nicht auf der Startseite. */
+  invitationStatus?: FounderConnectionInvitationRow["status"];
 };
 
 export type FounderConnectionsReadModel = {
@@ -164,6 +166,7 @@ export function buildFounderConnectionsReadModel(params: {
           ? `/invite/${encodeURIComponent(invitation.id)}/resume`
           : `/dashboard?invitationId=${encodeURIComponent(invitation.id)}`,
       createdAt: invitation.createdAt,
+      invitationStatus: invitation.status,
     })),
   ].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 

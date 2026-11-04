@@ -28,14 +28,16 @@ const versionen = lies(
   "src", "app", "(product)", "founder-alignment", "versionen", "page.tsx");
 
 test("das aktuelle Arbeitsprofil steht unabhängig von Legacy genau einmal oben", () => {
-  // Seit dem Umbau der Startseite steht der Stand der Arbeitsweise im Weg
-  // („Ich verstehen"), aus demselben Zustand wie zuvor - und vor den frueheren Auswertungen.
-  assert.equal(dashboard.split("<DashboardPath").length - 1, 1);
-  assert.match(dashboard, /alignState\.profile\.submitted \? "done"/);
-  assert.ok(dashboard.indexOf("<DashboardPath") < dashboard.indexOf('id="dashboard-legacy-title"'));
+  // Seit dem 04.11.2026 steht die Arbeitsweise als erster Schritt im Weg der
+  // Startseite - aus demselben Zustand wie zuvor; die frueheren Auswertungen
+  // stehen im Archiv des Profils, nicht mehr auf der Startseite.
+  assert.equal(dashboard.split("<DashboardNextStep").length - 1, 1);
+  assert.match(dashboard, /work: workProfileState === "completed"/);
+  assert.match(dashboard, /alignWorkProfileState\(alignState\)/);
+  assert.ok(!dashboard.includes('id="dashboard-legacy-title"'));
   assert.ok(!dashboard.includes("<AlignAnnounce"));
   assert.ok(!dashboard.includes("<TransitionAnnounce"));
-  assert.match(dashboard, /hasSubmittedBase && <Link href="\/me\/report"/);
+  assert.match(lies("src", "features", "profile", "ProfileArchive.tsx"), /hasSubmittedBase && <Link href="\/me\/report"/);
 });
 
 test("die Versionsseite schickt weiter, wo es nichts zu wählen gibt", () => {

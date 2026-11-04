@@ -67,7 +67,9 @@ test("profile menu keeps Connect identity separate and exposes Account for every
 
 test("Founder dashboard delegates deletion to shared Account settings", () => {
   const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
-  assert.match(dashboard, /href="\/account"/);
+  // Seit 04.11.2026 kein eigener Kontoblock mehr auf der Startseite: Das Konto
+  // ist ueber das Profilmenue in der Leiste erreichbar.
+  assert.match(readFileSync("src/features/navigation/ProductShell.tsx", "utf8"), /href="\/account"/);
   assert.doesNotMatch(dashboard, /<DeleteAccountSection/);
 });
 

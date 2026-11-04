@@ -6,6 +6,7 @@ import { getAccountDeletionNotices } from "@/features/account/accountDeletionNot
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { getFounderConnections } from "@/features/connections/founderConnectionsData";
 import { TeamDetailsEditor } from "@/features/teams/TeamDetailsEditor";
+import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD = "rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-7";
@@ -34,13 +35,14 @@ export default async function ConnectionsPage({ searchParams }: { searchParams?:
   } = await getRequestUser();
   if (!user) redirect("/login?next=%2Fconnections");
 
-  const [connections, deletionNotices, t, tNav] = await Promise.all([
+  const [connections, deletionNotices, t, tNav, tDashboard] = await Promise.all([
     getFounderConnections(user.id, user.email, supabase),
     // Hier ist die Stelle, an der etwas fehlt: Wer sich geloescht hat, stand
     // vorher in dieser Liste. Dass jemand weg ist, faellt genau hier auf.
     getAccountDeletionNotices(supabase, ["founder_connection", "founder_advisor"]),
     getTranslations("teams.connections"),
     getTranslations("teams.teamNavigation"),
+    getTranslations("dashboard"),
   ]);
 
   const teams = connections.teams;
@@ -245,15 +247,32 @@ export default async function ConnectionsPage({ searchParams }: { searchParams?:
                         {contextLabel(connection.teamContext)}
                       </p>
                     </div>
-                    <Link href={connection.href} className={open ? PRIMARY : LINK}>
-                      {open ? t("answer") : connection.state === "request_pending" ? t("respond") : t("continue")}
-                    </Link>
+                    {/* Eine verschickte, noch offene Einladung: Den Link gibt es hier
+                        zum Kopieren (bis 04.11.2026 nur eingeklappt auf der Startseite). */}
+                    {connection.source === "invitation" &&
+                    connection.direction === "sent" &&
+                    (connection.invitationStatus === "sent" || connection.invitationStatus === "opened") ? (
+                      <SentInvitationLinkToggle invitationId={connection.id} status={connection.invitationStatus} />
+                    ) : (
+                      <Link href={connection.href} className={open ? PRIMARY : LINK}>
+                        {open ? t("answer") : connection.state === "request_pending" ? t("respond") : t("continue")}
+                      </Link>
+                    )}
                   </li>
                 );
               })}
             </ul>
           )}
         </section>
+
+        {/* Team-Intake bleibt erreichbar - Founder koennen Teilnehmende sein.
+            Aber leise: angelegt werden Intakes im Advisor-Kontext. */}
+        <p className="text-sm leading-6 text-slate-500">
+          {tDashboard("team.teamIntakeText")}{" "}
+          <Link href="/team-intake" className="underline hover:text-slate-900">
+            {tDashboard("team.teamIntakeLink")}
+          </Link>
+        </p>
       </div>
     </main>
   );

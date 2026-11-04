@@ -92,7 +92,8 @@ test("exactly one point is filled: the one you are standing on", () => {
 
   // Und eine Stelle fuer beide Orte, sonst laufen sie auseinander.
   assert.match(
-    readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
+    // Seit 04.11.2026 in eigenem Baustein: "Dein naechster Schritt".
+    readFileSync("src/features/dashboard/DashboardNextStep.tsx", "utf8"),
     /brand-panel/,
     // Seit der UX-Neuordnung (19.10.2026) ist der Hauptweg eine Marken-Flaeche (derselbe Verlauf, gross, weisse
     // Schrift) - eine Klasse in globals.css, nicht kopiert.
@@ -114,9 +115,10 @@ test("being somewhere is announced, not only coloured", () => {
 });
 
 test("nothing was stranded by taking it out of the bar", () => {
-  // Verbindungen: vom Dashboard verlinkt, und "Teams & Verbindungen" markiert
-  // sich dort.
-  assert.match(source("src/app/(product)/dashboard/page.tsx"), /href="\/connections"/);
+  // Verbindungen: ein Bereich der Leiste (seit 04.11.2026 nicht mehr
+  // zusaetzlich eingeklappt auf der Startseite), und "Teams & Verbindungen"
+  // markiert sich dort.
+  assert.match(source(SHELL), /href: "\/connections"/);
   assert.match(source(SHELL), /currentPathname === "\/connections"/);
 
   // Die begleiteten Teams des Advisors: stehen in der Leiste, weil das
@@ -168,21 +170,20 @@ test("the language switch is a footnote, not a button pair", () => {
 });
 
 test("the connections are reachable near the top of the dashboard", () => {
-  // GEAENDERT IN PHASE 9.4A: Der Kopfbereich traegt keine drei Wege mehr. Die
-  // Teams und Verbindungen sind der erste Inhaltsbereich nach dem, was
-  // ansteht - und ein eigener Bereich in der Leiste.
+  // GEAENDERT AM 04.11.2026: Der eingeklappte Teams-Block unten ist weg.
+  // "Teams & Verbindungen" ist ein Bereich der Leiste; auf der Startseite steht
+  // das gewaehlte Team in "Dein Stand" neben dem naechsten Schritt, mit Link,
+  // und weitere Teams sind dort waehlbar.
   const dashboard = source("src/app/(product)/dashboard/page.tsx");
-  const tasksAt = dashboard.indexOf('id="dashboard-block-tasks"');
-  const teamsAt = dashboard.indexOf('id="dashboard-block-connections"');
-  const linkAt = dashboard.indexOf('href="/connections"', teamsAt);
-  const legacyAt = dashboard.indexOf('id="dashboard-legacy-title"');
-  assert.ok(tasksAt > -1 && teamsAt > tasksAt, "alle Verbindungen folgen auf das, was ansteht");
-  // GEAENDERT: Was ansteht steht in der Marken-Flaeche des Kopfes, das Team-Kaestchen daneben.
-  assert.ok(dashboard.indexOf("<DashboardTeamCard") > tasksAt && dashboard.indexOf("<DashboardTeamCard") < teamsAt, "Aufgaben im Kopf, das aktuelle Team daneben, dann die Verbindungen");
-  assert.ok(tasksAt < dashboard.indexOf("data-dashboard-hero") + 4000 && tasksAt > dashboard.indexOf("data-dashboard-hero"), "was ansteht steht im Kopfbereich");
-  assert.ok(linkAt > teamsAt && linkAt < legacyAt, "der Weg zu allen Verbindungen steht im Teams-Bereich");
+  const aside = source("src/features/dashboard/DashboardAside.tsx");
+  const nextAt = dashboard.indexOf("<DashboardNextStep");
+  assert.ok(nextAt > -1 && dashboard.indexOf("<DashboardWaiting") > nextAt, "was ansteht folgt dem naechsten Schritt");
+  assert.ok(dashboard.indexOf("<DashboardAside") > nextAt, "die leise Spalte steht daneben");
+  assert.match(aside, /<Link href=\{teamPath!\}/);
+  assert.match(aside, /href=\{`\/dashboard\?team=\$\{encodeURIComponent\(other\.id\)\}`\}/);
   assert.match(source(SHELL), /href: "\/connections",\s*label: t\("alignTeam"\)/);
 });
+
 
 test("auch Profil leuchtet auf, wenn man dort ist", () => {
   // Maria am 18.09.2026: Der Reiter Profil war auf /profile praktisch nicht zu

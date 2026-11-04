@@ -67,29 +67,26 @@ test("Fragebögen: eine Bibliothek aus der Modul-Registry, jede Karte gleich auf
   }
 });
 
-test("Startseite: der naechste Schritt als Marken-Flaeche, „Euer Weg\", Find und Connect - ohne Prozent", () => {
+test("Startseite: der naechste Schritt als Marken-Flaeche, der Weg darin, die leise Spalte daneben - ohne Prozent", () => {
+  // Neu am 04.11.2026 (Entwurf "Startseite Founder"): keine Ueberschrift, kein
+  // Zitat, kein Karussell; die Marken-Flaeche mit den Kreisen bleibt.
   const dashboard = code("src/app/(product)/dashboard/page.tsx");
-  assert.match(dashboard, /className="brand-panel (relative )?flex /);
-  // Konzeptboard 32: Ueberschrift links, das Zitat leise rechts daneben - beide vor der Marken-Flaeche.
-  assert.ok(dashboard.indexOf("hero.headline") < dashboard.indexOf("<QuoteOfTheDay"), "Zitat neben der Ueberschrift");
-  assert.ok(dashboard.indexOf("<QuoteOfTheDay") < dashboard.indexOf('id="dashboard-block-tasks"'), "Zitat vor der Marken-Flaeche");
-  assert.match(dashboard, /className="orb /);
-  assert.match(dashboard, /<DashboardPath/);
-  // Kopf: Marken-Flaeche mit naechstem Schritt, Aufgaben (nur wenn etwas wartet) und Zitat, daneben die Team-Karte; dann Weg, Vertiefen, Find/Connect-Streifen.
-  assert.match(dashboard, /<DashboardTeamCard/);
-  assert.match(dashboard, /<DashboardDeepen/);
-  assert.match(dashboard, /<DashboardAreas/);
-  // Aufgaben stehen als Eintraege im Karussell; ohne Aufgabe und ohne Schritt bleibt ein ruhiger Leer-Eintrag.
-  assert.match(dashboard, /heroItems\.length === 0/);
+  const next = code("src/features/dashboard/DashboardNextStep.tsx");
+  const aside = code("src/features/dashboard/DashboardAside.tsx");
+  assert.match(next, /className="brand-panel relative /);
+  assert.match(next, /className="orb /);
+  assert.doesNotMatch(dashboard, /hero\.headline|<QuoteOfTheDay|<HeroCarousel|<DashboardPath|<DashboardDeepen|<DashboardAreas|<DashboardTeamCard/);
   // Die Profilangaben (4 Karten) sind von der Startseite ins Menue gewandert.
   assert.doesNotMatch(dashboard, /aboutYou\./);
-  const order = ["data-dashboard-hero", 'id="dashboard-block-tasks"', "<DashboardTeamCard", "<DashboardPath", "<DashboardDeepen", "<DashboardAreas", 'id="dashboard-block-connections"', 'id="dashboard-block-account"'].map((m) => dashboard.indexOf(m));
+  const order = ["<DashboardNextStep", "<DashboardWaiting", "<DashboardAside", 't("start.privacy")'].map((m) => dashboard.indexOf(m));
   assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
-  const orientation = code("src/features/dashboard/DashboardOrientation.tsx");
-  assert.doesNotMatch(orientation, /%|percent|von\s+\d|\bscore\b/i);
+  for (const source of [next, aside, code("src/features/dashboard/DashboardWaiting.tsx")]) {
+    assert.doesNotMatch(source, /%|percent|von\s+\d|\bscore\b/i);
+  }
   const css = read("src/app/globals.css");
   assert.match(css, /\.brand-panel \{[^}]*linear-gradient\(120deg, #6d49e0, #0a80b8\)[^}]*color: #ffffff/);
 });
+
 
 test("Profil: Hero, „Auf einen Blick\", Seitenleiste und Abschnitte als Karten - ohne Wert, ohne Prozent", () => {
   const page = code("src/app/me/profile/page.tsx");

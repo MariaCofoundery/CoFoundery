@@ -1,55 +1,41 @@
-import { getInterests } from "@/features/profile/interestsData";
+import { getLocale, getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
-import Link from "next/link";
-import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
-import { HeroCarousel, type HeroItem } from "@/features/dashboard/HeroCarousel";
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
-import { DashboardConnectionCards } from "@/features/dashboard/DashboardConnectionCards";
-import { DashboardAreas, DashboardDeepen, DashboardPath, DashboardTeamCard } from "@/features/dashboard/DashboardOrientation";
+import { DashboardNextStep } from "@/features/dashboard/DashboardNextStep";
+import { DashboardWaiting, type RunningEntry, type WaitingCard } from "@/features/dashboard/DashboardWaiting";
+import { DashboardAside } from "@/features/dashboard/DashboardAside";
 import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
-import { getFounderDashboardConnectionsV2 } from "@/features/dashboard/founderDashboardConnectionData";
-import { buildFounderDashboardConnections } from "@/features/dashboard/founderDashboardConnections";
 import type { FounderDashboardTask } from "@/features/dashboard/founderDashboardTasks";
 import {
-  resolveDashboardPrimaryAction,
-  resolveDiscoveryFoundationState,
-} from "@/features/dashboard/founderDashboardV2";
-import { founderWorkProfileHref } from "@/features/dashboard/founderWorkProfileState";
+  duplicatesNextStep,
+  isShownOnStart,
+  resolveFounderStart,
+  type StartInput,
+} from "@/features/dashboard/founderStart";
+import { getStartConversationPrompt, getStartTeamState } from "@/features/dashboard/founderStartData";
+import { berlinDayNumber } from "@/features/dashboard/quoteDayIndex";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
-import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
-import { signOutAllSessionsAction } from "@/app/(product)/dashboard/actions";
-import { SentInvitationLinkToggle } from "@/features/dashboard/SentInvitationLinkToggle";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ProfileBasicsForm } from "@/features/profile/ProfileBasicsForm";
 import { isCoreProfileComplete } from "@/features/profile/profileCompletion";
-import { getOwnDiscoveryProfile } from "@/features/discovery/discoveryData";
 import {
   debug_invitation_readiness,
   finalizeInvitationIfReady,
   getInvitationDashboardRows,
   getLatestSelfAlignmentReport,
-  type InvitationDashboardRow,
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
-import {
-  buildInvitationDashboardHref,
-  buildInvitationResumeHref,
-} from "@/features/onboarding/invitationFlow";
+import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
-import { VersionArchiveCard } from "@/features/instruments/v21/VersionArchiveCard";
-import { getDashboardVersionState } from "@/features/instruments/v21/dashboardVersionData";
-import {
-  AlignVentureActions,
-  alignWorkProfileState,
-} from "@/features/instruments/align/AlignCard";
+import { alignWorkProfileState } from "@/features/instruments/align/AlignCard";
 import { getAlignDashboardState } from "@/features/instruments/align/dashboardData";
-import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import type { AppLocale } from "@/i18n/config";
 
 const INVITATION_ERROR_KEYS = new Set(["expired", "revoked", "invitation_not_found"]);
 
@@ -61,58 +47,36 @@ type DashboardSearchParams = {
   team?: string;
 };
 
-type ReportRunRow = {
-  id: string;
-  invitation_id: string;
-  modules: string[];
-  created_at: string;
-  invitations:
-    | {
-        id: string;
-        label: string | null;
-        invitee_email: string;
-        status: string;
-        created_at: string;
-      }
-    | Array<{
-        id: string;
-        label: string | null;
-        invitee_email: string;
-        status: string;
-        created_at: string;
-      }>
-    | null;
-};
-
-type AssessmentProgressRow = {
-  id: string;
-  module: "base" | "values";
-  submitted_at: string | null;
-  created_at: string;
-};
-
 type DashboardT = Awaited<ReturnType<typeof getTranslations>>;
 
-const REPORT_CTA_CLASS =
-  "inline-flex rounded-lg border border-[color:var(--brand-primary)] bg-[color:var(--brand-primary)] px-3 py-1.5 text-xs font-medium text-slate-900 transition-colors hover:bg-[color:var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
-const UTILITY_CTA_CLASS =
-  "inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2";
-function staggerStyle(delayMs: number) {
-  return {
-    animationDelay: `${delayMs}ms`,
-  };
-}
-
+/**
+ * Die Founder-Startseite (seit 04.11.2026, Entwurf "Startseite Founder").
+ *
+ *   1. Begruessung - eine Zeile, keine Ueberschrift, kein Zitat.
+ *   2. Dein naechster Schritt - die Marken-Flaeche mit genau EINEM Schritt und
+ *      dem Weg (Grundlagen, danach "Im Alltag"). `founderStart.ts`.
+ *   3. Wartet auf dich - kleine Karten zum Wischen, darunter "Laeuft gerade".
+ *   4. Daneben leise: Dein Stand, eine Frage fuer euer naechstes Gespraech,
+ *      ohne Team: einladen und Find.
+ *   5. Unten nur der Weg zum Datenschutz.
+ *
+ * Was frueher hier stand, steht jetzt dort, wo es hingehoert: Teams und
+ * Verbindungen (mit verschickten Einladungen) unter /connections, Support und
+ * "alle Sitzungen abmelden" unter /account, fruehere Auswertungen im Archiv von
+ * /me/profile. Read My Mind, Founder in the Wild und das Commitment Lab sind
+ * Uebungen zu zweit und stehen auf der Teamseite - nur eine Einladung zu Read
+ * My Mind erscheint hier, weil dort jemand wartet.
+ */
 export default async function DashboardPage({
   searchParams,
 }: {
   searchParams: Promise<DashboardSearchParams>;
 }) {
   const supabase = await createClient();
-  const [t, teamsT, setupT] = await Promise.all([
+  const [t, setupT, locale] = await Promise.all([
     getTranslations("dashboard"),
-    getTranslations("teams.dashboard"),
     getTranslations("teams.setup"),
+    getLocale(),
   ]);
   const {
     data: { user },
@@ -127,68 +91,24 @@ export default async function DashboardPage({
     await finalizeInvitationIfReady(params.invitationId);
   }
 
-  const [
-    selfReport,
-    profileData,
-    initialInvitationRows,
-    initialRunsResult,
-    roleViews,
-    founderTeams,
-    discoveryProfile,
-    assessmentProgressResult,
-  ] =
-    await Promise.all([
-      getLatestSelfAlignmentReport(),
-      getProfileBasicsRow(supabase, user.id).catch(() => null),
-      getInvitationDashboardRows(),
-      supabase
-        .from("report_runs")
-        .select(
-          "id, invitation_id, modules, created_at, invitations:invitation_id(id, label, invitee_email, status, created_at)"
-        )
-        .order("created_at", { ascending: false })
-        .limit(20),
-      getDashboardRoleViews(user.id),
-      getFounderTeamDashboardSummaries(user.id, supabase).catch((error) => {
-        console.error("dashboard founder teams load failed", error);
-        return [];
-      }),
-      getOwnDiscoveryProfile(user.id, supabase).catch((error) => {
-        console.error("dashboard discovery profile load failed", error);
-        return null;
-      }),
-      supabase
-        .from("assessments")
-        .select("id, module, submitted_at, created_at")
-        .eq("user_id", user.id)
-        .in("module", ["base", "values"])
-        .eq("instrument_id", CURRENT_INSTRUMENT_ID)
-        .order("created_at", { ascending: false }),
-    ]);
+  const [profileData, initialInvitationRows, roleViews, founderTeams] = await Promise.all([
+    getProfileBasicsRow(supabase, user.id).catch(() => null),
+    getInvitationDashboardRows(),
+    getDashboardRoleViews(user.id),
+    getFounderTeamDashboardSummaries(user.id, supabase).catch((error) => {
+      console.error("dashboard founder teams load failed", error);
+      return [];
+    }),
+  ]);
 
   if (!roleViews.hasFounder) {
     if (roleViews.hasAdvisor) redirect("/advisor/dashboard");
     const { data: hasConnect } = await supabase.rpc("is_network_member");
     redirect(hasConnect === true ? "/connect" : "/start");
   }
-  // Erst hier, nicht oben im grossen Promise.all: Wer kein Founder ist, wird
-  // vorher weitergeleitet und soll diese Abfragen nicht bezahlen.
-  // Connect gibt es nur fuer Netzwerk-Mitglieder - dieselbe Frage wie die Leiste.
-  const isNetworkMember = await supabase
-    .rpc("is_network_member")
-    .then(({ data }) => data === true, () => false);
-  // „Das kannst du auch": nur, was noch nicht in Gebrauch ist. Connect zaehlt als
-  // genutzt, sobald es ein eigenes Profil gibt (Mitglied ist jede Founderin automatisch).
-  const hasConnectProfile = await Promise.resolve(
-    supabase.from("network_profiles").select("user_id").eq("user_id", user.id).maybeSingle()
-  ).then(({ data }) => Boolean(data), () => false);
-  const interests = await getInterests(supabase, user.id);
-  const versionState = await getDashboardVersionState(user.id);
   const alignState = await getAlignDashboardState(user.id);
 
   let invitationRows = initialInvitationRows;
-  let runsResult = initialRunsResult;
-
   const currentTeamEntries = await Promise.all(invitationRows.filter(i => i.status === "accepted").map(async i => [i.id, await currentTeamForInvitation(supabase, user.id, i.id)] as const));
   const currentTeamByInvitation = new Map(currentTeamEntries);
   const pendingFinalizeIds = invitationRows
@@ -207,56 +127,17 @@ export default async function DashboardPage({
         });
       }
     });
-
-    [invitationRows, runsResult] = await Promise.all([
-      getInvitationDashboardRows(),
-      supabase
-        .from("report_runs")
-        .select(
-          "id, invitation_id, modules, created_at, invitations:invitation_id(id, label, invitee_email, status, created_at)"
-        )
-        .order("created_at", { ascending: false })
-        .limit(20),
-    ]);
+    invitationRows = await getInvitationDashboardRows();
   }
 
-  if (runsResult.error) {
-    console.error("dashboard report runs load failed", runsResult.error);
-    return <main className="p-8">{t("hero.loadError")}</main>;
-  }
-
-  const reportRuns = (runsResult.data ?? []) as ReportRunRow[];
   const needsOnboarding = !isCoreProfileComplete(profileData);
-  const sentInvites = invitationRows.filter((row) => row.direction === "sent");
-  const receivedInvites = invitationRows.filter((row) => row.direction === "incoming");
-  const sentInvitesSorted = sortInvitationsByCreatedAtDesc(sentInvites);
-  const receivedInvitesSorted = sortInvitationsByCreatedAtDesc(receivedInvites);
   const isDev = process.env.NODE_ENV !== "production";
-  const debugByInvitationId = isDev
-    ? new Map<string, InvitationReadinessDebug>(
-        await Promise.all(
-          invitationRows.map(async (invitation) => [
-            invitation.id,
-            await debug_invitation_readiness(invitation.id, { attemptFinalize: true }),
-          ] as const)
-        )
-      )
-    : new Map<string, InvitationReadinessDebug>();
-
-  const hasSubmittedBase = Boolean(selfReport);
-  const hasSubmittedValues = selfReport?.valuesModuleStatus === "completed";
-  const assessmentProgress = assessmentProgressResult.error
-    ? []
-    : ((assessmentProgressResult.data ?? []) as AssessmentProgressRow[]);
-  const latestBaseAssessment = assessmentProgress.find((row) => row.module === "base") ?? null;
-  const latestValuesAssessment = assessmentProgress.find((row) => row.module === "values") ?? null;
-  const hasStartedBase = Boolean(latestBaseAssessment);
-  const hasStartedValues = Boolean(latestValuesAssessment && !latestValuesAssessment.submitted_at);
-  const readyReports = reportRuns.slice(0, 3);
-  const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
   const displayName =
     profileData?.display_name?.trim() || user.email?.split("@")[0]?.trim() || "Founder";
-  const actionableIncomingInvites = receivedInvitesSorted.filter((invite) => !invite.isReportReady);
+  const invitationById = new Map(invitationRows.map((invitation) => [invitation.id, invitation]));
+  const actionableIncomingInvites = invitationRows
+    .filter((row) => row.direction === "incoming" && !row.isReportReady)
+    .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
   const prioritizedIncomingInvite =
     actionableIncomingInvites.find((invite) => invite.status === "accepted") ??
     actionableIncomingInvites[0] ??
@@ -274,100 +155,107 @@ export default async function DashboardPage({
       ? `/report/${encodeURIComponent(contextualInvitation.id)}`
       : `/dashboard?invitationId=${encodeURIComponent(contextualInvitation.id)}`
     : null;
-  const discoveryFoundationState = resolveDiscoveryFoundationState(discoveryProfile?.status);
-  const connectionOverview = await getFounderDashboardConnectionsV2({
-    currentUserId: user.id,
-    teams: founderTeams,
-    invitations: invitationRows,
-    client: supabase,
-  }).catch((error) => {
-    console.error("dashboard connection overview load failed", error);
-    return buildFounderDashboardConnections({
-      currentUserId: user.id,
-      teams: founderTeams,
-      invitations: [],
-      signals: {
-        relationships: [],
-        reports: [],
-        commitmentLabs: [],
-        relationshipAdvisors: [],
-        setupItems: [],
-        counterpartNames: new Map(),
-      },
-    });
-  });
-  const dashboardTasks = await getFounderDashboardTasks({
-    currentUserId: user.id,
-    invitations: invitationRows,
-    founderAlignmentStarted: alignState.profile.started,
-    founderAlignmentSubmitted: alignState.profile.submitted,
-    valuesStarted: hasStartedValues,
-    valuesSubmitted: hasSubmittedValues,
-    teams: founderTeams,
-    client: supabase,
-  }).catch((error) => {
-    console.error("dashboard tasks load failed", error);
-    return [];
-  });
-  // Legacy invitation tasks remain actionable; generic old questionnaires are
-  // no longer promoted as current personal modules.
-  const taskPresentations = dashboardTasks.filter((task) =>
-    task.id !== "personal:founder-alignment" && task.id !== "personal:values"
-  ).map((task) =>
-    presentDashboardTask(task, t, setupT)
-  );
-  const selectedTeamId = founderTeams.find((team) => team.id === params.team)?.id ?? founderTeams[0]?.id ?? null;
-  const supportEmail = "hello@cofoundery.de";
-  const profileAvatarId = profileData?.avatar_id?.trim() || null;
-  const profileImageUrl = profileAvatarId
-    ? null
-    : profileData?.avatar_url?.trim() || null;
-  // Hoechstens eine Hauptaktion; alles, was andere betrifft, steht unter
-  // "Was gerade ansteht". Ist das Arbeitsprofil nicht lesbar, keine Aktion.
-  const workProfileState = alignState.show ? alignWorkProfileState(alignState) : "completed";
-  const primaryAction = resolveDashboardPrimaryAction({ needsOnboarding, workProfileState });
-  const primaryActionHref =
-    primaryAction === "complete_profile" ? "#dashboard-block-profile-data" : founderWorkProfileHref(workProfileState);
-  const hasHistory =
-    readyReports.length > 0 || hasSubmittedBase || alignState.knowsPrevious || versionState.next.started;
 
-  const selfReportDebug = selfReport
-    ? {
-        baseAssessmentId: selfReport.selfAssessmentMeta?.baseAssessmentId ?? selfReport.sessionId,
-        valuesAssessmentId: selfReport.selfAssessmentMeta?.valuesAssessmentId ?? null,
-        valuesAnsweredA: selfReport.valuesAnsweredA,
-        valuesTotal: selfReport.valuesTotal,
-        scoresA: selfReport.scoresA,
-      }
+  // Ein Team sind zwei bis vier Founder. Ein Vorhaben, an dem jemand allein
+  // arbeitet, ist ein `founder_teams`-Eintrag mit einer Person - fuer den Weg
+  // zaehlt es als Vorhaben, nicht als Team.
+  const teamName = (team: (typeof founderTeams)[number]) =>
+    team.name?.trim() || team.members.map((member) => member.displayName ?? "Founder").join(" + ");
+  const realTeams = founderTeams.filter((team) => team.members.length >= 2);
+  const selectedTeam = realTeams.find((team) => team.id === params.team) ?? realTeams[0] ?? null;
+  const ventureOf = (venture: { started: boolean; submitted: boolean } | undefined) =>
+    venture?.submitted ? ("present" as const) : venture?.started ? ("inProgress" as const) : ("open" as const);
+  const ventureWithoutTeam = alignState.ventures.some((venture) => venture.submitted)
+    ? ("present" as const)
+    : alignState.ventures.some((venture) => venture.started)
+      ? ("inProgress" as const)
+      : ("open" as const);
+
+  const [teamState, capabilityCount, strengthCount, directionCount, dashboardTasks] = await Promise.all([
+    selectedTeam
+      ? getStartTeamState({
+          client: supabase,
+          userId: user.id,
+          teamId: selectedTeam.id,
+          venture: ventureOf(alignState.ventures.find((venture) => venture.id === selectedTeam.id)),
+        })
+      : Promise.resolve(null),
+    countOwn(supabase, "person_capability_entries", user.id),
+    countOwn(supabase, "person_strengths", user.id),
+    countOwn(supabase, "direction_statements", user.id),
+    getFounderDashboardTasks({
+      currentUserId: user.id,
+      invitations: invitationRows,
+      founderAlignmentStarted: alignState.profile.started,
+      founderAlignmentSubmitted: alignState.profile.submitted,
+      // Die fruehere Werte-Reflexion ist kein Schritt mehr (`isShownOnStart`).
+      valuesStarted: false,
+      valuesSubmitted: false,
+      teams: founderTeams,
+      client: supabase,
+    }).catch((error) => {
+      console.error("dashboard tasks load failed", error);
+      return [] as FounderDashboardTask[];
+    }),
+  ]);
+
+  // Ist das Arbeitsprofil nicht lesbar, gilt es als fertig - lieber kein
+  // Schritt als einer, der auf eine falsche Annahme baut.
+  const workProfileState = alignState.show ? alignWorkProfileState(alignState) : "completed";
+  const startInput: StartInput = {
+    needsOnboarding,
+    work: workProfileState,
+    capabilityAreas: capabilityCount,
+    ventureWithoutTeam,
+    team: teamState,
+  };
+  const start = resolveFounderStart(startInput);
+  const conversation = selectedTeam
+    ? await getStartConversationPrompt({
+        client: supabase,
+        teamId: selectedTeam.id,
+        locale: locale as AppLocale,
+        dayIndex: berlinDayNumber(new Date()),
+      })
     : null;
-  const invitationDebugEntries = invitationRows.map((invitation) => ({
-    id: invitation.id,
-    debug: debugByInvitationId.get(invitation.id) ?? null,
-  }));
-  const reportRunSummaries = reportRuns.map((run) => ({
-    id: run.id,
-    invitationId: run.invitation_id,
-    modules: run.modules ?? [],
-    createdAt: run.created_at,
-  }));
-  const heroItems: HeroItem[] = [
-    ...(primaryAction
-      ? [{
-          key: "primary",
-          eyebrow: t("hero.nextStep"),
-          title: t(`hero.primary.${primaryAction}`),
-          text: t(`hero.primaryText.${primaryAction}`),
-          href: primaryActionHref,
-          action: t("hero.go"),
-        }]
-      : []),
-    ...taskPresentations.slice(0, 3).map((task) => ({ key: task.id, eyebrow: task.eyebrow, title: task.title, text: task.text, href: task.href, action: task.action })),
+
+  const shownTasks = dashboardTasks
+    .filter(isShownOnStart)
+    .filter((task) => !duplicatesNextStep(task, start.next))
+    .map((task) => presentDashboardTask(task, t, setupT));
+  const waitingCards: WaitingCard[] = [
+    ...shownTasks
+      .filter((task) => task.kind === "NEEDS_YOU")
+      .map((task) => ({ id: task.id, label: task.title, title: task.text, href: task.href, action: task.action })),
+    // Jemand ist neu im Team, seit die Person ihre Vorhaben-Antworten bestaetigt hat.
+    ...alignState.ventures
+      .filter((venture) => venture.confirm)
+      .map((venture) => ({
+        id: `venture-confirm:${venture.id}`,
+        label: t("start.waiting.ventureConfirm.label"),
+        title: t("start.waiting.ventureConfirm.text", { team: venture.name ?? t("workProfile.unnamed") }),
+        href: `/founder-alignment/vorhaben/bestaetigen?venture=${encodeURIComponent(venture.id)}`,
+        action: t("start.waiting.ventureConfirm.action"),
+      })),
   ];
-  if (heroItems.length === 0) {
-    heroItems.push({ key: "empty", eyebrow: t("hero.nextStep"), title: t("tasks.empty.title"), text: t("tasks.empty.text"), href: "/fragebogen", action: t("hero.allQuestionnaires") });
-  }
+  const running: RunningEntry[] = shownTasks
+    .filter((task) => task.kind !== "NEEDS_YOU")
+    .map((task) => ({ id: task.id, title: task.title, href: task.href }));
+
+  const selfReport = isDev ? await getLatestSelfAlignmentReport() : null;
+  const debugByInvitationId = isDev
+    ? new Map<string, InvitationReadinessDebug>(
+        await Promise.all(
+          invitationRows.map(async (invitation) => [
+            invitation.id,
+            await debug_invitation_readiness(invitation.id, { attemptFinalize: true }),
+          ] as const)
+        )
+      )
+    : new Map<string, InvitationReadinessDebug>();
+
   return (
-    <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-10 md:px-10 xl:px-12">
+    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 md:px-10 xl:px-12">
       {contextualInvitation ? (
         <ProductNavigationOverride
           matchingHref={contextualMatchingHref}
@@ -386,215 +274,120 @@ export default async function DashboardPage({
         </p>
       ) : null}
 
-      {/* -----------------------------------------------------------------
-          PHASE 9.4A: VIER FRAGEN, VIER BEREICHE
-          -----------------------------------------------------------------
+      <p className="mb-5 text-lg text-[#5f5e7a]">{t("hero.greeting", { name: displayName })}</p>
 
-          1. Begruessung (hoechstens eine Hauptaktion)
-          2. Was wartet auf mich?          -> Was gerade ansteht
-          3. Woran arbeite ich mit wem?    -> Deine Teams & Verbindungen
-          4. Wo pflege ich mein Profil?    -> Über dich
-          Danach nur noch Eingeklapptes: fruehere Auswertungen und Konto.
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <DashboardNextStep
+            start={start}
+            teamName={selectedTeam ? teamName(selectedTeam) : null}
+            setupTotal={teamState?.setup?.total ?? 0}
+            locale={locale}
+          />
 
-          Zitat, Ausblick, Karussell, Netzwerk-Box und die Abschnittsleiste
-          sind weg - sie standen gleichrangig neben dem, was ansteht, und
-          machten die Seite laenger, nicht klarer. Menschen suchen geht ueber
-          FIND in der Leiste, Connect hat dort seinen Zaehler. */}
-      <section data-dashboard-hero className="mb-8">
-        {/* Begruessung und Ueberschrift links, das Zitat des Tages leise rechts daneben (Konzeptboard 32). */}
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0 flex-[1_1_420px]">
-            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]">{t("hero.greeting", { name: displayName })}</p>
-            <h1 className="mt-1.5 max-w-3xl text-[2rem] font-semibold leading-[1.15] tracking-tight text-[#0b1f3a] sm:text-[2.25rem]">{t("hero.headline")}</h1>
-          </div>
-          <QuoteOfTheDay tone="light" className="max-w-[300px] !rounded-[18px] !border-[#e4e2f0] !bg-white" />
-        </div>
-        <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          {/* EINE SACHE AUF EINMAL: der naechste Schritt, danach die Aufgaben - zum Weiterklicken. */}
-          <div id="dashboard-block-tasks" className="brand-panel relative flex scroll-mt-28 flex-col justify-center gap-3 overflow-hidden rounded-[28px] px-6 py-8 sm:px-9">
-            {/* Schwebende Kreise: reiner Schmuck, stehen still bei „Bewegung reduzieren". */}
-            <span aria-hidden="true" className="orb -right-8 -top-10 hidden h-44 w-44 sm:block" />
-            <span aria-hidden="true" className="orb bottom-[-20px] right-28 hidden h-24 w-24 sm:block" style={{ animationDelay: "0.8s" }} />
-            <span aria-hidden="true" className="orb right-16 top-24 hidden h-10 w-10 bg-white/20 sm:block" style={{ animationDelay: "0.3s" }} />
-            <HeroCarousel
-              items={heroItems}
-              secondary={{ href: "/fragebogen", label: t("hero.allQuestionnaires") }}
-              labels={{ previous: t("hero.previous"), next: t("hero.next"), goTo: t("hero.goTo") }}
-            />
-          </div>
-          <DashboardTeamCard teams={founderTeams} selectedTeamId={params.team ?? null} />
-        </div>
-      </section>
+          {needsOnboarding ? (
+            <section id="dashboard-block-profile" className="scroll-mt-28 rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-6">
+              <details id="dashboard-block-profile-data" className="scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
+                <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
+                  {t("utilities.profileCreate")}
+                </summary>
+                <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
+                <div className="mt-4 border-t border-slate-200 pt-4">
+                  {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als
+                      ein Editor. Wer das Basisprofil ausgefuellt hat, geht auf
+                      /profile. */}
+                  {needsOnboarding ? (
+                    <ProfileBasicsForm
+                      mode="onboarding"
+                      initialValues={{
+                        display_name: profileData?.display_name ?? null,
+                        focus_skill: profileData?.focus_skill ?? null,
+                        intention: profileData?.intention ?? null,
+                        roles: profileData?.roles ?? null,
+                        avatar_id: profileData?.avatar_id ?? null,
+                        avatar_url: profileData?.avatar_url ?? null,
+                      }}
+                      submitLabel={t("actions.saveProfile")}
+                      onSuccessRedirectTo={contextualDashboardHref}
+                      variant="accent"
+                      fallbackAvatarUrl={profileData?.avatar_id?.trim() ? null : profileData?.avatar_url?.trim() || null}
+                    />
+                  ) : null}
+                </div>
+              </details>
+            </section>
+          ) : null}
 
-      <DashboardPath
-        profile={alignState.profile.submitted ? "done" : alignState.profile.started ? "started" : "open"}
-        hasTeam={founderTeams.length > 0}
-        teamId={selectedTeamId}
-      />
-
-      {needsOnboarding ? (
-        <section id="dashboard-block-profile" className="mb-8 scroll-mt-28 rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-6">
-          <details id="dashboard-block-profile-data" className="mt-4 scroll-mt-28 rounded-2xl border border-slate-200/80 bg-white/88 p-4" open>
-            <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-              {t("utilities.profileCreate")}
-            </summary>
-            <p className="mt-2 text-xs leading-5 text-slate-500">{t("utilities.profileHelp")}</p>
-            <div className="mt-4 border-t border-slate-200 pt-4">
-              {/* Der Erststart bleibt hier: ein Einstieg ist etwas anderes als
-                  ein Editor. Wer das Basisprofil ausgefuellt hat, geht auf
-                  /profile. */}
-              {needsOnboarding ? (
-                <ProfileBasicsForm
-                  mode="onboarding"
-                  initialValues={{
-                    display_name: profileData?.display_name ?? null,
-                    focus_skill: profileData?.focus_skill ?? null,
-                    intention: profileData?.intention ?? null,
-                    roles: profileData?.roles ?? null,
-                    avatar_id: profileData?.avatar_id ?? null,
-                    avatar_url: profileData?.avatar_url ?? null,
-                  }}
-                  submitLabel={t("actions.saveProfile")}
-                  onSuccessRedirectTo={contextualDashboardHref}
-                  variant="accent"
-                  fallbackAvatarUrl={profileImageUrl}
-                />
-              ) : null}
-            </div>
-          </details>
-        </section>
-      ) : null}
-
-      <DashboardDeepen />
-
-      <DashboardAreas showFind={!discoveryProfile} showConnect={isNetworkMember && !hasConnectProfile} showAdvisor={!roleViews.hasAdvisor} interests={interests} />
-
-      <details id="dashboard-block-connections" className="mb-3 scroll-mt-28 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.title")}</summary>
-        <div className="mt-4">
-          <DashboardConnectionCards overview={connectionOverview} />
-          <div className="mt-4 flex justify-end">
-            <Link href="/connections" className={UTILITY_CTA_CLASS}>{teamsT("allConnections")}</Link>
-          </div>
-        <details className="mt-5 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-900">{t("team.moreSummary")}</summary>
-          <div className="mt-4">
-        <div className="mt-5">
-          <AlignVentureActions state={alignState} />
+          <DashboardWaiting
+            cards={waitingCards}
+            running={running}
+            labels={{
+              title: t("start.waiting.title"),
+              count: t("start.waiting.count", { count: waitingCards.length }),
+              previous: t("start.waiting.previous"),
+              next: t("start.waiting.next"),
+              running: t("start.waiting.running"),
+            }}
+          />
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/80 pt-4">
-          <Link href="/invite/new" className={UTILITY_CTA_CLASS}>
-            {t("actions.inviteCofounder")}
-          </Link>
-          {/* Team-Intake bleibt erreichbar - Founder koennen Teilnehmende
-              sein. Aber leise und nicht als eigener Bereich: angelegt werden
-              Intakes im Advisor-Kontext, dort steht es in der Leiste. */}
-          <p className="text-xs leading-5 text-slate-500">
-            {t("team.teamIntakeText")}{" "}
-            <Link href="/team-intake" className="underline hover:text-slate-900">
-              {t("team.teamIntakeLink")}
-            </Link>
-          </p>
-        </div>
+        <DashboardAside
+          parts={{
+            work: workProfileState === "completed",
+            can: capabilityCount > 0,
+            strengths: strengthCount > 0,
+            direction: directionCount > 0,
+          }}
+          team={
+            selectedTeam && teamState
+              ? {
+                  id: selectedTeam.id,
+                  name: teamName(selectedTeam),
+                  setup: teamState.setup,
+                  everyday: start.phase === "everyday",
+                  testProjectClosed: teamState.testProject === "closed",
+                }
+              : null
+          }
+          otherTeams={realTeams.filter((team) => team.id !== selectedTeam?.id).map((team) => ({ id: team.id, name: teamName(team) }))}
+          conversation={conversation}
+          showInvite={start.next.kind !== "invite"}
+        />
+      </div>
 
-          </div>
-        </details>
-
-        {actionableIncomingInvites.length + sentInvitesSorted.length > 0 ? (
-          <details className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">{t("team.invitationsSummary")}</p>
-                <p className="mt-1 text-xs leading-5 text-slate-600">{t("team.invitationsSummaryText")}</p>
-              </div>
-              <span className="text-xs tracking-[0.08em] text-slate-500">
-                {actionableIncomingInvites.length + sentInvitesSorted.length}
-              </span>
-            </summary>
-            <div className="mt-4 space-y-2">
-              {actionableIncomingInvites.length > 0
-                ? actionableIncomingInvites.map((invite) => (
-                    <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactIncomingInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
-                    </div>
-                  ))
-                : sentInvitesSorted.map((invite) => (
-                    <div key={invite.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      {renderCompactSentInvitationRow(invite, t, currentTeamByInvitation.get(invite.id))}
-                    </div>
-                  ))}
-            </div>
-          </details>
-        ) : null}
-        </div>
-      </details>
-
-      {/* Fruehere Auswertungen: erhalten und erreichbar, aber eingeklappt und
-          nur, wenn es etwas gibt. Sie sind Rueckblick, nicht der aktuelle Weg. */}
-      {hasHistory ? (
-        <details className="mb-3 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3" aria-labelledby="dashboard-legacy-title">
-          <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-            <h2 id="dashboard-legacy-title" className="inline text-sm font-semibold text-slate-900">{t("legacy.title")}</h2>
-            <span className="mt-1 block pl-4 text-xs font-normal leading-5 text-slate-600">{t("legacy.description")}</span>
-          </summary>
-          <div className="mt-4 space-y-3 text-sm">
-            {readyReports.length > 0 ? (
-              <div className="space-y-2">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t("team.reports")}</h3>
-                {readyReports.map((run) => (
-                  <div key={run.id} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                    {renderCompactReportRow(run, t)}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-            {hasSubmittedBase && <Link href="/me/report" className="inline-block underline">{t("legacy.report")}</Link>}
-            {hasSubmittedBase && hasSubmittedValues && <p className="text-slate-600">{t("legacy.values")}</p>}
-            {(alignState.knowsPrevious || versionState.next.started) && (
-              <div>
-                <Link href="/founder-alignment/versionen" className="inline-block underline">{t("legacy.answers")}</Link>
-                {versionState.next.started && (
-                  <VersionArchiveCard
-                    decision={versionState.decision}
-                    previous={versionState.previous}
-                    next={versionState.next}
-                    connectionsNext={versionState.connectionsNext}
-                    archived={versionState.archived}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        </details>
-      ) : null}
-
-      {/* Konto: /account bietet Support und "alle Sitzungen abmelden" nicht an,
-          deshalb bleibt beides hier - eingeklappt am Ende. */}
-      <details id="dashboard-block-account" className="mb-8 scroll-mt-28 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
-        <summary className="cursor-pointer rounded-lg text-sm font-semibold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)] focus-visible:ring-offset-2">
-          {t("utilities.account")}
-        </summary>
-        <div className="mt-4 border-t border-slate-200 pt-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{t("account.emailLabel")}</p>
-          <p className="mt-2 text-sm font-medium text-slate-900">{user.email ?? t("account.emailUnavailable")}</p>
-          <p className="mt-2 text-xs leading-5 text-slate-500">{t("account.magicLinkText")}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a href={`mailto:${supportEmail}?subject=${encodeURIComponent(t("account.supportSubject"))}`} className={UTILITY_CTA_CLASS}>{t("actions.contactSupport")}</a>
-            <form action={signOutAllSessionsAction}><button type="submit" className={UTILITY_CTA_CLASS}>{t("actions.signOutAll")}</button></form>
-            <Link href="/account" className={UTILITY_CTA_CLASS}>{t("account.manage")}</Link>
-          </div>
-        </div>
-      </details>
+      <footer className="mt-12 text-sm">
+        <Link href="/datenschutz" className="text-[#5f5e7a] underline underline-offset-4 hover:text-[#0b1f3a]">
+          {t("start.privacy")}
+        </Link>
+      </footer>
 
       <DashboardDevSection
         enabled={isDev}
-        selfReportDebug={selfReportDebug}
-        invitationDebugEntries={invitationDebugEntries}
-        reportRuns={reportRunSummaries}
+        selfReportDebug={
+          selfReport
+            ? {
+                baseAssessmentId: selfReport.selfAssessmentMeta?.baseAssessmentId ?? selfReport.sessionId,
+                valuesAssessmentId: selfReport.selfAssessmentMeta?.valuesAssessmentId ?? null,
+                valuesAnsweredA: selfReport.valuesAnsweredA,
+                valuesTotal: selfReport.valuesTotal,
+                scoresA: selfReport.scoresA,
+              }
+            : null
+        }
+        invitationDebugEntries={invitationRows.map((invitation) => ({
+          id: invitation.id,
+          debug: debugByInvitationId.get(invitation.id) ?? null,
+        }))}
+        reportRuns={[]}
       />
     </main>
   );
+}
+
+/** Wie viele eigene Zeilen eine Tabelle hat; bei einem Fehler 0 - die Startseite faellt nicht deshalb aus. */
+async function countOwn(client: Awaited<ReturnType<typeof createClient>>, table: string, userId: string) {
+  const { count, error } = await client.from(table).select("user_id", { count: "exact", head: true }).eq("user_id", userId);
+  return error ? 0 : count ?? 0;
 }
 
 function presentDashboardTask(
@@ -800,229 +593,4 @@ function presentDashboardTask(
       };
     }
   }
-}
-
-
-function formatDate(value: string | null | undefined, t: DashboardT) {
-  if (!value) return t("date.unknown");
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return t("date.unknown");
-  return date.toLocaleDateString(t("date.locale"));
-}
-
-function resolveIncomingInviterName(invite: InvitationDashboardRow) {
-  const inviterDisplayName = invite.inviterDisplayName?.trim();
-  if (inviterDisplayName) return inviterDisplayName;
-  const inviterEmail = invite.inviterEmail?.trim();
-  if (inviterEmail) return inviterEmail;
-  return "Co-Founder";
-}
-
-function formatIncomingInviteTitle(invite: InvitationDashboardRow, t: DashboardT) {
-  return t("team.invitedBy", { name: resolveIncomingInviterName(invite) });
-}
-
-function getIncomingInviteStatusLabel(invite: InvitationDashboardRow, t: DashboardT) {
-  if (invite.isReportReady) return t("team.statuses.reportReady");
-  if (invite.isReadyForMatching) return t("team.statuses.matchingReady");
-  const requiresValues = invite.requiredModules.includes("values");
-  const inviteeHasAllRequired =
-    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  return inviteeHasAllRequired ? t("team.statuses.waitingForPartner") : t("team.statuses.questionnaireOpen");
-}
-
-function getSentInviteStatusLabel(invite: InvitationDashboardRow, t: DashboardT) {
-  if (invite.isReportReady) return t("team.statuses.reportReady");
-  if (invite.isReadyForMatching) return t("team.statuses.matchingReady");
-  const requiresValues = invite.requiredModules.includes("values");
-  const inviterHasAllRequired =
-    invite.inviterBaseSubmitted && (!requiresValues || invite.inviterValuesSubmitted);
-  const inviteeHasAllRequired =
-    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  if (!inviterHasAllRequired) return t("team.statuses.yourAnswersMissing");
-  return inviteeHasAllRequired ? t("team.statuses.matchingReady") : t("team.statuses.waitingForPartner");
-}
-
-function formatInvitationModules(modules: string[], t: DashboardT) {
-  const moduleKeys = (modules ?? []).filter((value): value is string => Boolean(value));
-  if (moduleKeys.length === 0) return t("team.moduleLabels.base");
-
-  const labels = moduleKeys.map((key) => {
-    if (key === "base") return t("team.moduleLabels.base");
-    if (key === "values") return t("team.moduleLabels.values");
-    return key;
-  });
-  return [...new Set(labels)].join(", ");
-}
-
-function sortInvitationsByCreatedAtDesc(invites: InvitationDashboardRow[]) {
-  return [...invites].sort((left, right) => {
-    const leftTime = Date.parse(left.createdAt);
-    const rightTime = Date.parse(right.createdAt);
-    if (Number.isNaN(leftTime) && Number.isNaN(rightTime)) return 0;
-    if (Number.isNaN(leftTime)) return 1;
-    if (Number.isNaN(rightTime)) return -1;
-    return rightTime - leftTime;
-  });
-}
-
-function resolveInvitationTeamName(label: string | null | undefined, inviteeEmail: string | null | undefined) {
-  const normalizedLabel = label?.trim();
-  if (!normalizedLabel) return null;
-
-  const normalizedInviteeEmail = inviteeEmail?.trim().toLowerCase();
-  if (normalizedInviteeEmail && normalizedLabel.toLowerCase() === normalizedInviteeEmail) {
-    return null;
-  }
-
-  const inviteeLocalPart = normalizedInviteeEmail?.split("@")[0]?.trim();
-  if (inviteeLocalPart && normalizedLabel.toLowerCase() === inviteeLocalPart) {
-    return null;
-  }
-
-  return normalizedLabel;
-}
-
-function renderCompactSentInvitationRow(invite: InvitationDashboardRow, t: DashboardT, currentTeam?: string | null) {
-  const teamName = resolveInvitationTeamName(invite.label, invite.inviteeEmail);
-  const title = teamName || invite.inviteeEmail;
-
-  return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-      <div className="min-w-0">
-        <p className="font-medium text-slate-900">{title}</p>
-        {teamName ? (
-          <p className="mt-1 text-xs text-slate-500">
-            {t("team.partner", { email: invite.inviteeEmail })}
-          </p>
-        ) : null}
-        <p className="mt-1 text-sm text-slate-600">
-          {t("team.status", { status: getSentInviteStatusLabel(invite, t) })}
-        </p>
-        <p className="text-xs text-slate-500">
-          {/* Phase 10: keine "Module: Basis, Werte" mehr - neue Einladungen
-              fuehren in den aktuellen Weg, der keine Module kennt. */}
-          {t("team.expires", { date: formatDate(invite.expiresAt, t) })}
-        </p>
-      </div>
-
-      <div className="shrink-0">
-        {currentTeam || invite.isReportReady ? (
-          <Link href={currentTeam ? `/teams/${currentTeam}/workstyle` : `/report/${invite.id}`} className={REPORT_CTA_CLASS}>
-            {t("actions.open")}
-          </Link>
-        ) : (
-          <SentInvitationLinkToggle invitationId={invite.id} status={invite.status} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function renderCompactIncomingInvitationRow(invite: InvitationDashboardRow, t: DashboardT, currentTeam?: string | null) {
-  const action = currentTeam ? { href: `/teams/${currentTeam}/workstyle`, label: t("team.incomingActions.openTeamReport"), className: REPORT_CTA_CLASS, canOpenCompletionStatus: false } : buildIncomingInvitationAction(invite, t);
-  const helperText = null;
-
-  return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-      <div className="min-w-0">
-        <p className="font-medium text-slate-900">{formatIncomingInviteTitle(invite, t)}</p>
-        <p className="mt-1 text-sm text-slate-600">
-          {t("team.status", { status: getIncomingInviteStatusLabel(invite, t) })}
-        </p>
-        <p className="text-xs text-slate-500">
-          {t("team.created", { date: formatDate(invite.createdAt, t) })}
-        </p>
-        {helperText ? <p className="mt-1 text-xs text-amber-700">{helperText}</p> : null}
-      </div>
-
-      <a
-        href={action.href}
-        className={action.className}
-      >
-        {action.label}
-      </a>
-    </div>
-  );
-}
-
-function buildIncomingInvitationAction(invite: InvitationDashboardRow, t: DashboardT) {
-  const requiresValues = invite.requiredModules.includes("values");
-  const inviteeHasAllRequired =
-    invite.inviteeBaseSubmitted && (!requiresValues || invite.inviteeValuesSubmitted);
-  const isAccepted = invite.status === "accepted";
-  const resumeHref = buildInvitationResumeHref(invite.id);
-  const canOpenCompletionStatus = isAccepted && (invite.isReadyForMatching || inviteeHasAllRequired);
-
-  return {
-    href: resumeHref,
-    // Phase 10: Die Beschriftung leitet sich nicht mehr aus dem Fortschritt im
-    // frueheren Basis-/Werte-Fragebogen ab. /invite/:id/resume fuehrt ueber
-    // /join/start in den aktuellen Weg; ein frueherer Bericht bleibt lesbar.
-    label: invite.isReportReady
-      ? t("actions.open")
-      : canOpenCompletionStatus
-        ? t("team.incomingActions.openStatus")
-        : t("team.incomingActions.openInvitation"),
-    className: invite.isReportReady
-      ? REPORT_CTA_CLASS
-      : "inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700",
-    canOpenCompletionStatus,
-  };
-}
-
-function renderCompactReportRow(run: ReportRunRow, t: DashboardT) {
-  const invitation = Array.isArray(run.invitations) ? run.invitations[0] ?? null : run.invitations;
-  const teamName = resolveInvitationTeamName(invitation?.label, invitation?.invitee_email);
-
-  return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-      <div className="min-w-0">
-        <p className="font-medium text-slate-900">
-          {teamName ?? invitation?.invitee_email ?? run.invitation_id}
-        </p>
-        <p className="mt-1 text-sm text-slate-600">
-          {t("team.modules", { modules: formatInvitationModules(run.modules ?? [], t) })}
-        </p>
-        <p className="text-xs text-slate-500">
-          {t("team.created", { date: formatDate(run.created_at, t) })}
-        </p>
-      </div>
-
-      <Link href={`/report/${run.invitation_id}`} className={REPORT_CTA_CLASS}>
-        {t("actions.open")}
-      </Link>
-    </div>
-  );
-}
-
-function DashboardProfileAvatar({
-  displayName,
-  avatarId,
-  imageUrl,
-}: {
-  displayName: string;
-  avatarId: string | null;
-  imageUrl: string | null;
-}) {
-  return (
-    <ProfileAvatar
-      displayName={displayName}
-      avatarId={avatarId}
-      imageUrl={imageUrl}
-      className="h-16 w-16 rounded-full border border-white/80 object-cover shadow-[0_12px_24px_rgba(15,23,42,0.08)]"
-      fallbackClassName="flex h-16 w-16 items-center justify-center rounded-full border border-white/80 bg-[linear-gradient(135deg,rgba(103,232,249,0.16),rgba(255,255,255,0.9)_48%,rgba(124,58,237,0.08))] text-base font-semibold text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.06)]"
-    />
-  );
-}
-
-
-function ConnectionsIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5l3.75 3.75-3.75 3.75" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 16.5L4.5 12.75 8.25 9" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 11.25H8.25m7.5 1.5H4.5" />
-    </svg>
-  );
 }

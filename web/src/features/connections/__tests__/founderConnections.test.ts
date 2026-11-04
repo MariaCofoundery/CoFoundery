@@ -171,13 +171,10 @@ test("global and contextual navigation use the new DE/EN information architectur
   assert.equal(deNavigation.areaFind, "Find");
   assert.equal(deNavigation.areaTeams, "Teams & Verbindungen");
   assert.equal(enNavigation.areaTeams, "Teams & connections");
-  // Die Zusage bleibt: erreichbar. Das Dashboard verlinkt sie, und der
-  // Bereich markiert sich auf dieser Adresse als aktiv.
-  assert.match(
-    readFileSync("src/app/(product)/dashboard/page.tsx", "utf8"),
-    /href="\/connections"/,
-    "vom Dashboard aus erreichbar"
-  );
+  // Die Zusage bleibt: erreichbar. Seit 04.11.2026 ueber die Leiste (der
+  // eingeklappte Teams-Block der Startseite ist weg), und der Bereich markiert
+  // sich auf dieser Adresse als aktiv.
+  assert.match(shell, /href: "\/connections"/, "aus der Leiste erreichbar");
   assert.match(shell, /currentPathname === "\/connections"/, "der Bereich markiert sich dort");
   assert.doesNotMatch(shell, /<NavigationContextMenu/);
   assert.equal(isProductChromePath("/connections"), true);

@@ -150,6 +150,8 @@ export type TeamCheckInView = NonNullable<Awaited<ReturnType<typeof getTeamCheck
 export type CheckInCardState = {
   state: "none" | "due" | "scheduled" | "open";
   due: Date | null;
+  /** Das Team hat einen Rhythmus gewaehlt oder schon einen Check-in gehabt. */
+  rhythmSet: boolean;
 };
 
 /**
@@ -169,9 +171,10 @@ export async function getCheckInCardState(
   ]);
   if (settingsResult.error || checkInsResult.error) return null;
   const rows = (checkInsResult.data ?? []) as Array<{ status: string; closed_at: string | null }>;
-  if (rows.some((row) => row.status === "open")) return { state: "open", due: null };
+  const rhythmSet = Boolean(settingsResult.data) || rows.length > 0;
+  if (rows.some((row) => row.status === "open")) return { state: "open", due: null, rhythmSet };
   const eligible = setupItems.filter((item) => item.currentConfirmedRevision && item.outcome !== "not_relevant");
-  if (eligible.length === 0) return { state: "none", due: null };
+  if (eligible.length === 0) return { state: "none", due: null, rhythmSet };
   const confirmed = eligible
     .map((item) => item.currentConfirmedRevision?.confirmedAt ?? null)
     .filter((value): value is string => Boolean(value))
@@ -181,7 +184,7 @@ export async function getCheckInCardState(
     lastClosedAt: rows.find((row) => row.status !== "open" && row.closed_at)?.closed_at ?? null,
     earliestConfirmedAt: confirmed[0] ?? null,
   });
-  return { state: due && due.getTime() <= Date.now() ? "due" : "scheduled", due };
+  return { state: due && due.getTime() <= Date.now() ? "due" : "scheduled", due, rhythmSet };
 }
 
 /**

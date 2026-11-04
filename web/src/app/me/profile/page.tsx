@@ -30,6 +30,7 @@ import { FounderProfileDirection } from "@/features/reporting/FounderProfileDire
 import { FounderProfileStrengths } from "@/features/reporting/FounderProfileStrengths";
 import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { ProfileArchive } from "@/features/profile/ProfileArchive";
 import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
 import { ProfileOverview, type OverviewWorkBar } from "@/features/reporting/ProfileOverview";
 import { workDirectionBars } from "@/features/reporting/profileGlanceLines";
@@ -1047,6 +1048,15 @@ export default async function FounderProfilePage({
                 </div>
               </ProfileDetails>
             ) : null}
+
+            {/* Fruehere Auswertungen und Fassungen (bis 04.11.2026 auf der Startseite). */}
+            <ProfileArchive
+              client={supabase}
+              userId={user.id}
+              hasSubmittedBase={Boolean(report)}
+              hasSubmittedValues={report?.valuesModuleStatus === "completed"}
+              locale={locale}
+            />
           </div>
 
           {/* UEBER DIESE AUSWERTUNG - EINMAL. Die vier Einschraenkungen bleiben

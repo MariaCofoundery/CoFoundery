@@ -480,8 +480,8 @@ test("an available report is not modeled as a task without a viewed-state contra
   assert.doesNotMatch(modelSource, /NEW_RESULT|alignment_report/);
   assert.doesNotMatch(dataSource, /reports:/);
   assert.doesNotMatch(dashboardSource, /tasks\.items\.alignmentReport/);
-  assert.match(dashboardSource, /href=\{`\/report\/\$\{run\.invitation_id\}`\}/);
-  assert.match(dashboardSource, /dashboard-block-connections/);
+  // Ein frueherer Report bleibt lesbar - seit 04.11.2026 im Archiv des Profils.
+  assert.match(readFileSync("src/features/profile/ProfileArchive.tsx", "utf8"), /href=\{`\/report\/\$\{run\.invitation_id\}`\}/);
   assert.doesNotMatch(JSON.stringify(tasks), /workbook|deep.dive/i);
 });
 
@@ -612,28 +612,19 @@ test("Discovery journey task copy is parallel, actionable and non-evaluative", (
   );
 });
 
-test("task UI and DE/EN messages preserve the three-item limit and empty state", () => {
-  const component = readFileSync("src/features/dashboard/HeroCarousel.tsx", "utf8");
+test("Wartet auf dich zeigt jeden Eintrag als Karte und steht nur da, wenn es etwas gibt", () => {
+  const component = readFileSync("src/features/dashboard/DashboardWaiting.tsx", "utf8");
   const dashboard = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
-  type TaskMessages = {
-    tasks: { empty: { title: string }; kinds: Record<string, string> };
-  };
-  const de = JSON.parse(
-    readFileSync("messages/de/dashboard.json", "utf8")
-  ) as TaskMessages;
-  const en = JSON.parse(
-    readFileSync("messages/en/dashboard.json", "utf8")
-  ) as TaskMessages;
-  // Seit dem 20.10.2026 zeigt das Karussell eine Sache auf einmal; hoechstens drei Aufgaben nach dem naechsten Schritt.
-  assert.match(dashboard, /taskPresentations\.slice\(0, 3\)/);
-  assert.match(component, /aria-live="polite"/);
+  type TaskMessages = { tasks: { kinds: Record<string, string> } };
+  const de = JSON.parse(readFileSync("messages/de/dashboard.json", "utf8")) as TaskMessages;
+  const en = JSON.parse(readFileSync("messages/en/dashboard.json", "utf8")) as TaskMessages;
+  // Seit dem 04.11.2026 keine Obergrenze und kein Karussell mehr: Man wischt
+  // durch alle Karten, nichts geht verloren. Ist nichts offen, fehlt der Bereich.
+  assert.doesNotMatch(dashboard, /slice\(0, 3\)/);
+  assert.match(component, /if \(cards\.length === 0 && running\.length === 0\) return null;/);
   assert.doesNotMatch(component, /aria-expanded|showAll/);
-  assert.match(dashboard, /dashboard-block-tasks/);
-  // Die Abschnittsleiste gibt es seit Phase 9.4A nicht mehr; der Bereich
-  // traegt seinen Titel selbst.
-  assert.match(dashboard, /t\("tasks\.empty\.title"\)/);
+  assert.match(component, /id="dashboard-block-tasks"/);
   assert.doesNotMatch(dashboard, /prioritizedTask|resolvedHeroPanel/);
-  assert.equal(de.tasks.empty.title, "Aktuell wartet nichts auf dich.");
-  assert.equal(en.tasks.empty.title, "Nothing is waiting for you right now.");
   assert.deepEqual(Object.keys(de.tasks.kinds), Object.keys(en.tasks.kinds));
 });
+

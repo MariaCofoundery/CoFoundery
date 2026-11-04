@@ -1,9 +1,9 @@
 import type { DashboardTaskKind } from "@/features/dashboard/founderDashboardTasks";
 
 /**
- * Eine Aufgabe, wie sie die Startseite zeigt. Die Anzeige selbst ist seit dem
- * 20.10.2026 das Karussell in der Marken-Flaeche (`HeroCarousel`): der naechste
- * Schritt zuerst, danach hoechstens drei Aufgaben - eine Sache auf einmal.
+ * Eine Aufgabe, wie sie die Startseite zeigt. Seit dem 04.11.2026 stehen
+ * Aufgaben als Karten unter "Wartet auf dich" (`DashboardWaiting`) bzw. in der
+ * Zeile "Laeuft gerade" - der naechste Schritt steht getrennt darueber.
  */
 export type DashboardTaskPresentation = {
   id: string;
