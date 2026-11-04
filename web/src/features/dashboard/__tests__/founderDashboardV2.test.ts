@@ -106,8 +106,8 @@ test("Zitat, Ausblick, Karussell, Netzwerk-Box und Abschnittsleiste sind weg", (
   }
   assert.doesNotMatch(dashboardSource, /hero\.heroConnections|hero\.heroFind|hero\.heroOwnProfile/);
   assert.doesNotMatch(dashboardSource, /Team Context/);
-  // Die Library bleibt erreichbar - ueber die Leiste.
-  assert.match(shellSource, /href: "\/founder-library"/);
+  // Die Library bleibt erreichbar - seit 04.11.2026 ueber die Teamseite statt ueber die Leiste.
+  assert.match(readFileSync("src/app/(product)/teams/[teamId]/page.tsx", "utf8"), /founder-library|FounderLibraryHomebaseCard/);
 });
 
 test("Team-Intake bleibt fuer Founder erreichbar, aber leise unter Teams & Verbindungen", () => {

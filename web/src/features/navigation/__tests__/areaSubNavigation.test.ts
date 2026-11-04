@@ -28,7 +28,9 @@ test("Align hat eigene Unterseiten in der Leiste", () => {
   const shell = source(SHELL);
   assert.match(shell, /subItems/);
   assert.match(shell, /href: "\/connections"/);
-  assert.match(shell, /href: "\/founder-library"/);
+  // Die Library steht seit 04.11.2026 nicht mehr in der Leiste, sondern auf der Teamseite; ihre Seiten
+  // halten "Team" aktiv.
+  assert.match(shell, /isTeamsArea\(currentPathname\) \|\| isLibraryArea\(currentPathname\)/);
   assert.match(shell, /activeAreaSubItems/);
 });
 
@@ -103,7 +105,6 @@ test("alle drei Bereiche tragen ihre Ziele in der Leiste", () => {
     // Align
     "/me/profile",
     "/connections",
-    "/founder-library",
     // Find
     "/discovery",
     "/discovery/intros",

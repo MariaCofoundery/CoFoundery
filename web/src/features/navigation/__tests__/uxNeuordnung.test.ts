@@ -15,14 +15,16 @@ const code = (path: string) => read(path).replace(/\/\*[\s\S]*?\*\//g, " ").repl
 const SHELL = "src/features/navigation/ProductShell.tsx";
 const PAGE = "src/app/(product)/fragebogen/page.tsx";
 
-test("Align fasst Fragebögen, Profil, Team und Library zusammen - als zweite Reihe unter den vier Bereichen", () => {
+test("Align fasst Profil und Team zusammen - als zweite Reihe unter den vier Bereichen", () => {
   const shell = code(SHELL);
   const founder = shell.slice(shell.indexOf("const founderItems"), shell.indexOf("const advisorItems"));
   // Genau ein Align-Bereich im Founder-Baum (statt Profil und Teams & Verbindungen einzeln).
   assert.equal([...founder.matchAll(/label: t\("area[A-Za-z]+"\)/g)].length, 2, "Start und Align");
   assert.match(founder, /label: t\("areaAlign"\)/);
-  const order = ["alignQuestionnaires", "alignProfile", "alignTeam", "alignLibrary"].map((k) => founder.indexOf(`t("${k}")`));
-  assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), "Weg: Fragebögen, Profil, Team, Library");
+  const order = ["alignProfile", "alignTeam"].map((k) => founder.indexOf(`t("${k}")`));
+  assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), "Weg: Profil, Team");
+  // Seit 04.11.2026 keine eigenen Eintraege mehr fuer Fragebögen und Library.
+  assert.doesNotMatch(founder, /t\("alignQuestionnaires"\)|t\("alignLibrary"\)/);
   // Die Bereiche der Leiste: Start, Align, Find, Connect.
   assert.match(shell, /\.\.\.founderItems,\s*\.\.\.advisorItems,\s*\.\.\.\(isFounderView && hasFounder \? \[findItem\] : \[\]\),\s*\.\.\.\(hasConnect \? \[connectItem\] : \[\]\)/);
 });

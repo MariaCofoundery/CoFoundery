@@ -51,9 +51,11 @@ test("die neue Fassung steht im Menü, nicht nur auf einer Karte", () => {
   const shell = readFileSync(
     join("src", "features", "navigation", "ProductShell.tsx"), "utf8");
   // Seit 19.10.2026 liegt die Fassung unter „Fragebögen" (Align): Die Bibliothek listet sie aus der
-  // Modul-Registry, und der Reiter bleibt auf dem Fragebogen selbst aktiv.
+  // Modul-Registry, und der Reiter bleibt auf dem Fragebogen selbst aktiv. Seit 04.11.2026 hat
+  // „Fragebögen" keinen eigenen Eintrag mehr - die Seiten halten „Profil" aktiv, und das Profil
+  // verlinkt die Bibliothek.
   assert.match(shell, /isQuestionnairesArea[\s\S]{0,600}workstyle-pretest/);
-  assert.match(shell, /label: t\("alignQuestionnaires"\)/);
+  assert.match(shell, /isProfileArea\(currentPathname\) \|\| isQuestionnairesArea\(currentPathname\)/);
   const bibliothek = readFileSync(join("src", "app", "(product)", "fragebogen", "page.tsx"), "utf8");
   assert.match(bibliothek, /MODULE_REGISTRY/);
 });

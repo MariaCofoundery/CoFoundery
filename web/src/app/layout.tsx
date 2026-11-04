@@ -156,6 +156,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         "undecided" as const,
       ];
   const { isPlatformAdmin, adminAttentionCount } = await adminState;
+  // "Programm" steht im Menue nur, wenn ein eigenes Team in einem Programm ist oder dazu eingeladen
+  // wurde (seit 04.11.2026). Den Programmcode traegt man sonst ueber die Teamseite ein.
+  const hasTeamProgram = user
+    ? await Promise.resolve(supabase.rpc("get_my_team_programs"))
+        .then(({ data }) => Array.isArray(data) && data.length > 0)
+        .catch(() => false)
+    : false;
   // Der Kern ist die einzige Datenquelle fuer den Namen; vorher konkurrierten
   // hier profiles und network_profiles. Die beiden Auth-Metadaten-Stufen und
   // das E-Mail-Praefix bleiben als reine Anzeige-Rueckfaelle fuer Menschen,
@@ -178,6 +185,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             advisorSoloOrg={roleViews.advisorSoloOrg ?? false}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
+            hasTeamProgram={hasTeamProgram}
             displayName={displayName}
             avatarId={profileImage.avatarId}
             avatarImageUrl={profileImage.imageUrl}

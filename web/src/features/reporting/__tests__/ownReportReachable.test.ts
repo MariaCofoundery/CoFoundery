@@ -71,7 +71,7 @@ test("der Reiter loest sich nicht auf, wenn man ihn anklickt", () => {
   // Seit 19.10.2026 unter Align: der Reiter „Profil" in der zweiten Reihe.
   const profileActive = shell.slice(shell.indexOf("const isProfileArea"), shell.indexOf("const isQuestionnairesArea"));
   assert.match(profileActive, /currentPathname\.startsWith\("\/me\/"\)/);
-  assert.match(shell, /label: t\("alignProfile"\),\s*isActive: isProfileArea/);
+  assert.match(shell, /label: t\("alignProfile"\),\s*isActive: \(currentPathname: string\) => isProfileArea\(currentPathname\)/);
 
   // Und die Seite traegt die Produktleiste ueberhaupt.
   assert.match(codeOnly(CHROME), /pathname\.startsWith\("\/me\/"\)/);

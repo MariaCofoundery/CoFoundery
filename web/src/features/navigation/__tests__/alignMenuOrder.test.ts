@@ -11,15 +11,11 @@ test("die zweite Reihe unter Align liest sich als Weg", () => {
   // Nachlesen. Vorher stand "Verbindungen" vorn - man faengt aber bei sich
   // selbst an.
   const reihenfolge = [...shell.matchAll(/label: t\("(align[A-Za-z]+)"\)/g)].map((m) => m[1]);
-  // Seit 19.10.2026: Fragebögen (beantworten) -> Profil (das eigene Bild) -> Team (vergleichen und
-  // vereinbaren) -> Programm (seit 31.10.2026: Code eintragen, sehen wer mitliest) -> Library (nachlesen).
-  assert.deepEqual(reihenfolge, [
-    "alignQuestionnaires",
-    "alignProfile",
-    "alignTeam",
-    "alignProgram",
-    "alignLibrary",
-  ]);
+  // Seit 04.11.2026 (Raster Kern / Ergaenzung / Hintergrund): Profil (das eigene Bild) -> Team
+  // (vergleichen und vereinbaren) -> Programm (nur, wenn ein eigenes Team darin ist oder eingeladen
+  // wurde). Fragebögen und Library sind Ergaenzungen: ueber Profil, Startseite und Teamseite erreichbar.
+  assert.deepEqual(reihenfolge, ["alignProfile", "alignTeam", "alignProgram"]);
+  assert.match(shell, /\.\.\.\(hasFounder && hasTeamProgram/);
 });
 
 test("Verbindungen steht auch ohne Founder-Rolle da", () => {

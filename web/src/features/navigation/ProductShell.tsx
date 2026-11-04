@@ -33,6 +33,8 @@ type Props = {
   advisorSoloOrg?: boolean;
   hasConnect: boolean;
   hasConnectAccount: boolean;
+  /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
+  hasTeamProgram?: boolean;
   displayName: string | null;
   avatarId?: string | null;
   avatarImageUrl?: string | null;
@@ -277,6 +279,7 @@ export function ProductShell({
   advisorSoloOrg = false,
   hasConnect,
   hasConnectAccount,
+  hasTeamProgram = false,
   displayName,
   avatarId = null,
   avatarImageUrl = null,
@@ -426,7 +429,7 @@ export function ProductShell({
       isActive: (currentPathname) => currentPathname === "/dashboard",
     },
     {
-      href: hasFounder ? "/fragebogen" : "/connections",
+      href: hasFounder ? "/me/profile" : "/connections",
       label: t("areaAlign"),
       isActive: (currentPathname) =>
         isQuestionnairesArea(currentPathname) ||
@@ -434,20 +437,18 @@ export function ProductShell({
         isTeamsArea(currentPathname) ||
         isLibraryArea(currentPathname) ||
         isProgramArea(currentPathname),
-      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst beantworten, dann das
-      // eigene Bild, dann das Team, dann das Nachlesen.
+      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst das eigene Bild, dann das Team.
+      //
+      // SEIT 04.11.2026 NUR NOCH DAS (Feedback an Maria: Kern vorn, Ergaenzung erreichbar). Die
+      // Fragebögen erreicht man ueber das Profil und die Startseite, die Library ueber Teamseite und
+      // Founder Setup - beide Bereiche halten den Reiter, unter dem sie jetzt stehen, aktiv.
       subItems: [
         ...(hasFounder
           ? [
               {
-                href: "/fragebogen",
-                label: t("alignQuestionnaires"),
-                isActive: isQuestionnairesArea,
-              },
-              {
                 href: "/me/profile",
                 label: t("alignProfile"),
-                isActive: isProfileArea,
+                isActive: (currentPathname: string) => isProfileArea(currentPathname) || isQuestionnairesArea(currentPathname),
               },
             ]
           : []),
@@ -456,27 +457,16 @@ export function ProductShell({
         {
           href: "/connections",
           label: t("alignTeam"),
-          isActive: isTeamsArea,
+          isActive: (currentPathname: string) =>
+            isTeamsArea(currentPathname) || isLibraryArea(currentPathname) || (!hasTeamProgram && isProgramArea(currentPathname)),
         },
-        // Das Programm einer Organisation: hier traegt ein Team einen Programmcode
-        // ein und sieht, in welchem Programm es ist und wer mitliest.
-        ...(hasFounder
+        // Das Programm einer Organisation: nur, wenn ein eigenes Team darin ist oder eingeladen wurde.
+        ...(hasFounder && hasTeamProgram
           ? [
               {
                 href: "/programm",
                 label: t("alignProgram"),
                 isActive: isProgramArea,
-              },
-            ]
-          : []),
-        ...(hasFounder
-          ? [
-              {
-                // Sekundaer: Wissen fuer Setup und Zusammenarbeit. Im Team
-                // steht die Library zusaetzlich in der Teamnavigation.
-                href: "/founder-library",
-                label: t("alignLibrary"),
-                isActive: isLibraryArea,
               },
             ]
           : []),
