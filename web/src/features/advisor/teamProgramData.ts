@@ -2,6 +2,7 @@ import { buildAdvisorConfirmedFounderSetup, type AdvisorConfirmedFounderSetupIte
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ReportAttendanceRow, ReportCheckInRow } from "@/features/advisor/programReport";
 
 /**
  * Team <-> Programm (Migration 20270117120000). Gelesen wird nur ueber die
@@ -377,6 +378,43 @@ export async function getEventRsvps(client: SupabaseClient, eventId: string): Pr
     name: (row.display_name as string | null) ?? null,
     response: rsvpOf(row.response),
   }));
+}
+
+/** Die Zeilen der Auswertung (20270308120000); zusammengefasst wird in `programReport.ts`. */
+export async function getOrgReportRows(
+  client: SupabaseClient,
+  orgId: string,
+  range: { from: string | null; to: string | null }
+): Promise<{ attendance: ReportAttendanceRow[]; checkIns: ReportCheckInRow[] }> {
+  const params = { p_org_id: orgId, p_from: range.from, p_to: range.to };
+  const [attendance, checkIns] = await Promise.all([
+    client.rpc("get_org_report_attendance", params),
+    client.rpc("get_org_report_check_ins", params),
+  ]);
+  const number = (value: unknown) => Number(value ?? 0);
+  const nullableNumber = (value: unknown) => (value === null || value === undefined ? null : Number(value));
+  return {
+    attendance: ((attendance.data ?? []) as Record<string, unknown>[]).map((row) => ({
+      eventId: row.event_id as string,
+      title: row.title as string,
+      kind: row.kind === "internal" ? "internal" : row.kind === "external" ? "external" : "education",
+      startsAt: row.starts_at as string,
+      programId: row.program_id as string,
+      teamName: (row.team_name as string | null) ?? null,
+      members: number(row.members),
+      attendance: statusOf(row.attendance),
+      rsvpYes: number(row.rsvp_yes),
+      rsvpNo: number(row.rsvp_no),
+    })),
+    checkIns: ((checkIns.data ?? []) as Record<string, unknown>[]).map((row) => ({
+      programId: row.program_id as string,
+      teamName: (row.team_name as string | null) ?? null,
+      members: number(row.members),
+      checkIns: nullableNumber(row.check_ins),
+      lastHeldOn: (row.last_held_on as string | null) ?? null,
+      nextOn: (row.next_on as string | null) ?? null,
+    })),
+  };
 }
 
 /** Faellige Wiedervorlagen der eigenen Notizen an Programm-Teams (RLS: nur die eigenen), bis zu `withinDays` Tage voraus. */

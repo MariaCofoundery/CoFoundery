@@ -53,7 +53,8 @@ export async function ProgramEventRsvp({ programId, eventId, rows }: { programId
 
       {others.length > 0 ? (
         <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
-          {rows.map((row) => (
+          {/* Die eigene Zeile zuerst, danach die anderen wie geliefert. */}
+          {[me, ...others].map((row) => (
             <li key={row.userId}>
               <span className="font-medium text-slate-900">{row.isMe ? t("rsvpYou") : row.name ?? t("unnamedPerson")}</span>
               {": "}

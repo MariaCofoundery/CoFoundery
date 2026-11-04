@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
 test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features"\]/);
+  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features", "report"\]/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -370,11 +370,11 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die fuenfzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+test("Organisation: die sechzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
   const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "learn", "setup", "manage"].includes(key));
-  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features"];
+  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features", "report"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
@@ -588,7 +588,7 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 15, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 16, locale);
   }
 });
 
