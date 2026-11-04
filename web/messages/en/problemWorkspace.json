@@ -1,6 +1,6 @@
 {
   "title": "Your workspaces",
-  "intro": "Work together privately on a problem. Only explicitly invited members have access.",
+  "intro": "A private space where you and people you invite keep working on a problem question – with observations, assumptions and ideas, before anything is published.",
   "new": "Create private workspace",
   "back": "Back to overview",
   "browse": "Back to CONNECT",
@@ -136,5 +136,27 @@
   "radarImport": "Radar starting context · The named person performed the import, not authored the external source. Later independent edits are retained separately.",
   "restore": "Reopen workspace",
   "restoreHelp": "This private workspace becomes editable again with its existing members. Revoked invitations and old tokens stay invalid. Published problems and archived opportunities do not change.",
-  "restoreConfirm": "I want to reopen this workspace with these consequences."
+  "restoreConfirm": "I want to reopen this workspace with these consequences.",
+  "explain": {
+    "title": "How a workspace works",
+    "example": "For example: you found a problem on the problem board that won't let you go, and want to collect what you know with two people and test a first idea.",
+    "items": {
+      "what": {
+        "title": "What is it?",
+        "text": "A shared notebook for one problem question. You create it and are its owner."
+      },
+      "contents": {
+        "title": "What goes in?",
+        "text": "Entries with a type: observation, perspective of those affected, assumption, approach or test – with a source if you like."
+      },
+      "who": {
+        "title": "Who is in?",
+        "text": "Only members you explicitly invite. Contributors write their own entries, viewers only read."
+      },
+      "out": {
+        "title": "What becomes visible?",
+        "text": "Nothing automatically. When you are ready, you deliberately publish your own problem statement – entries, names and sources stay private."
+      }
+    }
+  }
 }

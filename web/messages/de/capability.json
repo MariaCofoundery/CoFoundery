@@ -98,8 +98,10 @@
     "inline": {
       "title": "Aus deinem Profil",
       "text": "Das pflegst du einmal – es gilt für Align, Find und Connect. Hier kannst du es direkt ändern.",
-      "edit": "Angaben bearbeiten",
-      "empty": "Noch nichts eingetragen."
+      "edit": "Name, Foto & Vorstellung bearbeiten",
+      "empty": "Noch nichts eingetragen.",
+      "close": "Zuklappen",
+      "openHint": "Änderungen gelten überall: im Profil, in der Co-Founder-Suche und in Connect. Gespeichert wird hier, du bleibst auf dieser Seite."
     },
     "photoUsage": {
       "title": "Wo dein Foto zu sehen ist",

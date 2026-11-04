@@ -32,7 +32,7 @@ const secondary = "inline-flex min-h-11 items-center rounded-full border border-
  */
 export async function IdentityEditor({
   core,
-  currentRoles,
+  currentRoles: roles,
   returnPath,
   inline = false,
   identityGaps,
@@ -59,6 +59,8 @@ export async function IdentityEditor({
   cards?: boolean;
 }) {
   const t = await getTranslations("capability");
+  // Die Rollenwahl steuert die Plattform, nicht Connect oder FIND - eingebettet (`inline`) wird keine angeboten.
+  const currentRoles = inline ? [] : roles;
   const group = (id: IdentityCardId, node: React.ReactNode) => (cards ? <div data-card={id}>{node}</div> : node);
   const saveButton = <SubmitButton label={t("identity.submit")} pendingLabel={t("pending.save")} className={primary} />;
   return (
@@ -213,40 +215,43 @@ export async function IdentityEditor({
               Die Beschriftungen werden hier aufgeloest, weil CvImportField
               eine Client-Komponente ist: Eine Uebersetzungsfunktion laesst sich
               nicht ueber die Grenze reichen. */}
-          <CvImportField
-            expertiseLabels={Object.fromEntries(
-              ANALYZED_AREA_IDS.map((areaId) => [areaId, t(`areaLabels.${areaId}`)])
-            )}
-            industryLabels={Object.fromEntries(
-              CV_INDUSTRY_KEYS.map((key) => [key, t(`industryLabels.${key}`)])
-            )}
-            copy={{
-              title: t("identity.cv.title"),
-              betaBadge: t("identity.cv.betaBadge"),
-              betaNote: t("identity.cv.betaNote"),
-              text: t("identity.cv.text"),
-              privacyNote: t("identity.cv.privacyNote"),
-              textareaLabel: t("identity.cv.textareaLabel"),
-              placeholder: t("identity.cv.placeholder"),
-              fileLabel: t("identity.cv.fileLabel"),
-              analyze: t("identity.cv.analyze"),
-              tooShort: t("identity.cv.tooShort"),
-              nothingFound: t("identity.cv.nothingFound"),
-              nothingFoundHint: t("identity.cv.nothingFoundHint"),
-              expertiseTitle: t("identity.cv.expertiseTitle"),
-              industriesTitle: t("identity.cv.industriesTitle"),
-              because: t("identity.cv.because"),
-              apply: t("identity.cv.apply"),
-              applied: t("identity.cv.applied"),
-              clear: t("identity.cv.clear"),
-              chosenCount: t("identity.cv.chosenCount"),
-              fileUnsupported: t("identity.cv.fileUnsupported"),
-              fileTooBig: t("identity.cv.fileTooBig"),
-              fileNoText: t("identity.cv.fileNoText"),
-              fileUnreadable: t("identity.cv.fileUnreadable"),
-              fileReading: t("identity.cv.fileReading"),
-            }}
-          />
+          {/* Eingebettet (Connect, FIND) ohne den Lebenslauf-Import: der gehoert in den Profil-Editor. */}
+          {!inline ? (
+            <CvImportField
+              expertiseLabels={Object.fromEntries(
+                ANALYZED_AREA_IDS.map((areaId) => [areaId, t(`areaLabels.${areaId}`)])
+              )}
+              industryLabels={Object.fromEntries(
+                CV_INDUSTRY_KEYS.map((key) => [key, t(`industryLabels.${key}`)])
+              )}
+              copy={{
+                title: t("identity.cv.title"),
+                betaBadge: t("identity.cv.betaBadge"),
+                betaNote: t("identity.cv.betaNote"),
+                text: t("identity.cv.text"),
+                privacyNote: t("identity.cv.privacyNote"),
+                textareaLabel: t("identity.cv.textareaLabel"),
+                placeholder: t("identity.cv.placeholder"),
+                fileLabel: t("identity.cv.fileLabel"),
+                analyze: t("identity.cv.analyze"),
+                tooShort: t("identity.cv.tooShort"),
+                nothingFound: t("identity.cv.nothingFound"),
+                nothingFoundHint: t("identity.cv.nothingFoundHint"),
+                expertiseTitle: t("identity.cv.expertiseTitle"),
+                industriesTitle: t("identity.cv.industriesTitle"),
+                because: t("identity.cv.because"),
+                apply: t("identity.cv.apply"),
+                applied: t("identity.cv.applied"),
+                clear: t("identity.cv.clear"),
+                chosenCount: t("identity.cv.chosenCount"),
+                fileUnsupported: t("identity.cv.fileUnsupported"),
+                fileTooBig: t("identity.cv.fileTooBig"),
+                fileNoText: t("identity.cv.fileNoText"),
+                fileUnreadable: t("identity.cv.fileUnreadable"),
+                fileReading: t("identity.cv.fileReading"),
+              }}
+            />
+          ) : null}
           </fieldset>
           ))}
 
@@ -320,7 +325,7 @@ export async function IdentityEditor({
             {saveButton}
             {/* Der Weg zurueck, wenn Connect oder Discovery hierher geschickt
                 hat. Ohne ihn war die Identitaetsseite eine Sackgasse. */}
-            {returnPath ? (
+            {returnPath && !inline ? (
               <Link href={returnPath} className={secondary}>
                 {t(`identity.backTo.${returnPath === "/connect/profile" ? "connect" : "discovery"}`)}
               </Link>

@@ -1,6 +1,6 @@
 {
   "title": "Deine Arbeitsräume",
-  "intro": "Privat gemeinsam an einer Problemfrage arbeiten. Nur ausdrücklich eingeladene Mitglieder haben Zugang.",
+  "intro": "Ein privater Raum, in dem du mit Menschen, die du einlädst, an einer Problemfrage weiterdenkst – mit Beobachtungen, Annahmen und Ideen, bevor irgendetwas veröffentlicht wird.",
   "new": "Privaten Arbeitsraum erstellen",
   "back": "Zur Übersicht",
   "browse": "Zu CONNECT",
@@ -136,5 +136,27 @@
   "radarImport": "Radar-Startkontext · Die angegebene Person hat den Import übernommen, nicht die externe Quelle verfasst. Spätere eigene Bearbeitungen werden getrennt erhalten.",
   "restore": "Arbeitsraum wieder öffnen",
   "restoreHelp": "Dieser private Arbeitsraum wird wieder bearbeitbar. Die bestehende Besetzung bleibt unverändert. Widerrufene Einladungen und alte Tokens bleiben ungültig. Veröffentlichte Probleme und archivierte Opportunities ändern sich nicht.",
-  "restoreConfirm": "Ich möchte diesen Arbeitsraum mit diesen Folgen wieder öffnen."
+  "restoreConfirm": "Ich möchte diesen Arbeitsraum mit diesen Folgen wieder öffnen.",
+  "explain": {
+    "title": "So funktioniert ein Arbeitsraum",
+    "example": "Zum Beispiel: Du hast auf dem Problembrett ein Problem gefunden, das dich nicht loslässt, und willst mit zwei Leuten sammeln, was ihr wisst, und eine erste Idee testen.",
+    "items": {
+      "what": {
+        "title": "Was ist das?",
+        "text": "Ein gemeinsamer Notizraum zu einer Problemfrage. Du legst ihn an und bist Owner."
+      },
+      "contents": {
+        "title": "Was kommt hinein?",
+        "text": "Einträge mit Art: Beobachtung, Perspektive von Betroffenen, Annahme, Lösungsansatz oder Test – auf Wunsch mit Quelle."
+      },
+      "who": {
+        "title": "Wer ist dabei?",
+        "text": "Nur Mitglieder, die du ausdrücklich einlädst. Contributors schreiben eigene Einträge, Viewer lesen nur."
+      },
+      "out": {
+        "title": "Was wird sichtbar?",
+        "text": "Nichts automatisch. Wenn ihr so weit seid, veröffentlichst du bewusst eine eigene Problemfassung – Einträge, Namen und Quellen bleiben privat."
+      }
+    }
+  }
 }

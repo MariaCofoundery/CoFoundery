@@ -98,8 +98,10 @@
     "inline": {
       "title": "From your profile",
       "text": "You maintain this once – it applies to Align, Find and Connect. You can change it right here.",
-      "edit": "Edit details",
-      "empty": "Nothing entered yet."
+      "edit": "Edit name, photo & intro",
+      "empty": "Nothing entered yet.",
+      "close": "Close",
+      "openHint": "Changes apply everywhere: in your profile, in the co-founder search and in Connect. You save here and stay on this page."
     },
     "photoUsage": {
       "title": "Where your photo is shown",
