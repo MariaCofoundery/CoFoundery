@@ -213,16 +213,19 @@ test("the new error keys are allowed and have copy", () => {
 // Uebersicht und Bearbeiten
 // ---------------------------------------------------------------------------
 test("drafts are reachable, and there is no second overview", () => {
+  // Seit 05.11.2026 im Bereich "Probleme" (/connect/problems/mine); "Mein Connect" verweist dorthin.
+  const mine = source("src/app/(product)/connect/problems/mine/page.tsx");
   const my = source("src/app/(product)/connect/my/page.tsx");
   // Ohne diesen Abschnitt waeren Entwuerfe nur ueber den direkten Link
   // erreichbar - eine Funktion, die halb gebaut ist.
-  assert.match(my, /getOwnConnectProblems\(client, user\.id\)/);
+  assert.match(mine, /getOwnConnectProblems\(client, user\.id\)/);
+  assert.match(mine, /\/connect\/problems\/\$\{problem\.id\}\/edit/);
   assert.match(my, /my\.problemsTitle/);
-  assert.match(my, /\/connect\/problems\/\$\{problem\.id\}\/edit/);
+  assert.match(my, /href="\/connect\/problems\/mine"/);
 
-  const de = readJson("messages/de/connect.json").my as Record<string, string>;
+  const de = readJson("messages/de/connect.json") as { my: Record<string, string>; problemsArea: Record<string, string> };
   // "Meine Probleme" liest sich wie persoenliche Sorgen.
-  assert.doesNotMatch(de.problemsTitle, /Meine Probleme/);
+  for (const text of [de.my.problemsTitle, de.problemsArea.mine, de.problemsArea.mineTitle]) assert.doesNotMatch(text, /Meine Probleme/);
 });
 
 test("the form exists once, for creating and editing", () => {

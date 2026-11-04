@@ -1139,5 +1139,15 @@
     "result": "{count, plural, one {# Eintrag} other {# Einträge}} · neueste zuerst",
     "topicPlaceholder": "Thema oder Stichwort",
     "placePlaceholder": "Stadt oder Bundesland"
+  },
+  "problemsArea": {
+    "label": "Bereiche bei den Problemen",
+    "board": "Problembrett",
+    "mine": "Von dir geschildert",
+    "workspaces": "Arbeitsräume",
+    "mineTitle": "Was du geschildert hast",
+    "mineText": "Was du auf dem Problembrett geschildert hast – auch Entwürfe. Aus einem veröffentlichten Problem kannst du einen privaten Arbeitsraum starten.",
+    "mineCount": "{count, plural, one {# Problem geschildert} other {# Probleme geschildert}}",
+    "mineLink": "Ansehen"
   }
 }

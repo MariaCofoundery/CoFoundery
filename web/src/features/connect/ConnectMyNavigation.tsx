@@ -3,8 +3,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 export function ConnectMyNavigation() {
-  const path = usePathname(); const t = useTranslations("connect"); const w = useTranslations("problemWorkspace");
-  const links = [["/connect/my", t("my.overview")], ["/connect/profile", t("actions.profile")], ["/connect/ventures/mine", t("beta.ownVentures")], ["/connect/workspaces", w("title")], ["/connect/searches", t("searches.title")]];
+  const path = usePathname(); const t = useTranslations("connect");
+  // Die Arbeitsraeume stehen seit 05.11.2026 im Bereich "Probleme" (`ConnectProblemsNavigation`).
+  const links = [["/connect/my", t("my.overview")], ["/connect/profile", t("actions.profile")], ["/connect/ventures/mine", t("beta.ownVentures")], ["/connect/searches", t("searches.title")]];
   if (!links.some(([href]) => path === href || path.startsWith(href + "/"))) return null;
   return <nav aria-label={t("beta.mine")} className="mx-auto flex max-w-5xl flex-wrap gap-2 px-5 pt-5">{links.map(([href, label]) => <Link key={href} href={href} aria-current={path === href ? "page" : undefined} className={`inline-flex min-h-11 items-center rounded-2xl border px-4 text-sm ${path === href ? "brand-here font-semibold" : "bg-white text-slate-600"}`}>{label}</Link>)}</nav>;
 }

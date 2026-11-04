@@ -53,33 +53,14 @@ export default async function MyConnectPage({ searchParams }: { searchParams: Pr
             );
           })() : null}</div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
     })}
-    {/* Geschilderte Probleme stehen hier und nicht in einer zweiten
-        Uebersicht: Ein Ort fuer alles, was man eingestellt hat. Und ohne
-        diesen Abschnitt waeren Entwuerfe nur ueber den direkten Link
-        erreichbar - eine Funktion, die halb gebaut ist. */}
-    <section className="mt-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    {/* Die eigenen Probleme stehen seit 05.11.2026 im Bereich "Probleme" (/connect/problems/mine).
+        Hier bleibt ein Verweis, damit man sie auch von der eigenen Uebersicht aus findet. */}
+    <section className="mt-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+      <div>
         <h2 className="text-lg font-semibold">{t("my.problemsTitle")}</h2>
-        <Link href="/connect/problems/new" className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 hover:underline">{t("problems.create")}</Link>
+        <p className="mt-1 text-sm text-slate-600">{problems.length ? t("problemsArea.mineCount", { count: problems.length }) : t("my.problemsEmpty")}</p>
       </div>
-      {problems.length ? <div className="mt-3 space-y-3">{problems.map((problem) => (
-        <article key={problem.id} className="rounded-2xl border border-slate-200 bg-white p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">
-                {t(`problems.intents.${problem.author_intent}`)}
-                {problem.status !== "active" ? ` · ${t(`problems.shortStatuses.${problem.status}`)}` : null}
-              </p>
-              <h3 className="mt-2 font-semibold">{problem.title}</h3>
-              <p className="mt-1 text-xs text-slate-500">{t("problems.interestCount", { count: problem.interest_count })}</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Link href={`/connect/problems/${problem.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link>
-              <Link href={`/connect/problems/${problem.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link>
-            </div>
-          </div>
-        </article>
-      ))}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.problemsEmpty")}</p>}
+      <Link href="/connect/problems/mine" className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-violet-800 hover:border-violet-300">{t("problemsArea.mineLink")} →</Link>
     </section>
   </main>;
 }

@@ -35,5 +35,10 @@ test("closed beta has four areas, four discovery types and private management li
   for (const key of ["connectContacts", "connectMine", "tabs.listings", "tabs.people", "tabs.problems", "tabs.ventures"]) assert.ok(shell.includes(key));
   assert.ok(!existsSync("src/features/connect/ConnectTabs.tsx"), "die zweite Reiterreihe ist zurueck");
   const own = readFileSync("src/features/connect/ConnectMyNavigation.tsx", "utf8");
-  for (const path of ["/connect/profile", "/connect/my", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"]) assert.ok(own.includes(path));
+  for (const path of ["/connect/profile", "/connect/my", "/connect/searches", "/connect/ventures/mine"]) assert.ok(own.includes(path));
+  // Seit 05.11.2026 stehen die Arbeitsraeume im Bereich "Probleme".
+  assert.ok(!own.includes("/connect/workspaces"));
+  const problems = readFileSync("src/features/connect/ConnectProblemsNavigation.tsx", "utf8");
+  for (const path of ["/connect/problems", "/connect/problems/mine", "/connect/workspaces"]) assert.ok(problems.includes(`"${path}"`), path);
+  assert.match(shell, /\/\^\\\/connect\\\/\(problems\|workspaces\)/);
 });

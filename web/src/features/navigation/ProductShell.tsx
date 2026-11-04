@@ -593,7 +593,8 @@ export function ProductShell({
         ...(newConnectSuggestionCount > 0 ? { count: { value: newConnectSuggestionCount, label: tConnect("mine.suggestionCount", { count: newConnectSuggestionCount }) } } : {}),
       },
       { href: "/connect/people", label: tConnect("tabs.people"), isActive: (path: string) => /^\/connect\/people(?:\/|$)/.test(path) },
-      { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/problems(?:\/|$)/.test(path) },
+      // Die Arbeitsraeume gehoeren seit 05.11.2026 zum Bereich "Probleme".
+      { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/(problems|workspaces)(?:\/|$)/.test(path) },
       { href: "/connect/ventures", label: tConnect("tabs.ventures"), isActive: (path: string) => path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine") },
       {
         href: "/connect/contacts",
@@ -601,7 +602,7 @@ export function ProductShell({
         isActive: (path: string) => path.startsWith("/connect/contacts") || path.startsWith("/connect/messages"),
         ...(connectAttentionCount > 0 ? { count: { value: connectAttentionCount, label: t("connectAttentionBadge", { count: connectAttentionCount }) } } : {}),
       },
-      { href: "/connect/my", label: t("connectMine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/workspaces", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
+      { href: "/connect/my", label: t("connectMine"), isActive: (path: string) => ["/connect/my", "/connect/profile", "/connect/searches", "/connect/ventures/mine"].some((prefix) => path.startsWith(prefix)) },
     ],
   };
 

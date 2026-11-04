@@ -1139,5 +1139,15 @@
     "result": "{count, plural, one {# entry} other {# entries}} · newest first",
     "topicPlaceholder": "Topic or keyword",
     "placePlaceholder": "City or state"
+  },
+  "problemsArea": {
+    "label": "Problem areas",
+    "board": "Problem board",
+    "mine": "Described by you",
+    "workspaces": "Workspaces",
+    "mineTitle": "What you described",
+    "mineText": "What you described on the problem board – drafts included. From a published problem you can start a private workspace.",
+    "mineCount": "{count, plural, one {# problem described} other {# problems described}}",
+    "mineLink": "View"
   }
 }

@@ -1,4 +1,5 @@
 import { ConnectMyNavigation } from "@/features/connect/ConnectMyNavigation";
+import { ConnectProblemsNavigation } from "@/features/connect/ConnectProblemsNavigation";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -7,5 +8,5 @@ import type { ReactNode } from "react";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function ConnectMemberLayout({ children }: { children: ReactNode }) {
-  return <><ConnectMyNavigation />{children}</>;
+  return <><ConnectMyNavigation /><ConnectProblemsNavigation />{children}</>;
 }
