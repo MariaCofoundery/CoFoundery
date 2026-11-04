@@ -74,23 +74,24 @@ test("ersetzen heisst: die alte Datei geht", () => {
 
 test("die Mechanik ist dieselbe wie im Einstieg, nicht eine zweite", () => {
   const feld = codeOnly(FELD);
-  // Dieselbe Verkleinerung, dieselbe Bibliothek, dieselbe Vorschau.
+  // Derselbe Zuschnitt, dieselbe Bildgroesse, dieselbe Bibliothek, dieselbe Vorschau.
   assert.match(feld, /from "@\/features\/profile\/avatarImage"/);
   assert.match(feld, /from "@\/features\/profile\/avatarLibrary"/);
   assert.match(feld, /<ProfileAvatar/);
+  // Roh gelesen: `codeOnly` haelt das "/*" in accept="image/*" fuer einen Kommentarbeginn.
+  assert.match(source(FELD), /output=\{AVATAR_IMAGE_OUTPUT\}/);
 
-  // Und der Einstieg benutzt jetzt dieselbe herausgeloeste Verkleinerung.
+  // Und der Einstieg benutzt denselben Zuschnitt mit derselben Groesse.
   const einstieg = codeOnly(join("src", "features", "profile", "ProfileBasicsForm.tsx"));
   assert.match(einstieg, /from "@\/features\/profile\/avatarImage"/);
-  assert.ok(
-    !einstieg.includes("canvas.toDataURL"),
-    "der Einstieg verkleinert noch einmal selbst",
-  );
+  assert.match(source(join("src", "features", "profile", "ProfileBasicsForm.tsx")), /output=\{AVATAR_IMAGE_OUTPUT\}/);
+  assert.ok(!einstieg.includes("canvas.toDataURL"), "der Einstieg verkleinert noch einmal selbst");
 
-  // Kein neues Bildsystem: kein Zuschneiden, keine Filter, keine
-  // Gesichtserkennung.
-  for (const zuviel of ["crop", "rotate", "filter(", "face", "detect"]) {
+  // SEIT 04.11.2026 MIT AUSSCHNITT (Wunsch von Maria) - aber kein neues Bildsystem:
+  // keine Filter, kein Drehen, keine Gesichtserkennung.
+  for (const zuviel of ["rotate", "filter(", "face", "detect"]) {
     assert.ok(!feld.toLowerCase().includes(zuviel), `das Feld baut ${zuviel}`);
+    assert.ok(!codeOnly(join("src", "features", "ui", "ImageCropDialog.tsx")).toLowerCase().includes(zuviel), `der Zuschnitt baut ${zuviel}`);
   }
 });
 

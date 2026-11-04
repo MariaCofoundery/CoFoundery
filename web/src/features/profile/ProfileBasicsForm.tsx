@@ -10,7 +10,8 @@ import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
 // Herausgeloest, damit „Ueber dich" dieselbe Verkleinerung benutzt und nicht
 // eine zweite mit einer anderen Zahl darin.
-import { toAvatarDataUrl } from "@/features/profile/avatarImage";
+import { ImageCropDialog } from "@/features/ui/ImageCropDialog";
+import { AVATAR_IMAGE_OUTPUT } from "@/features/profile/avatarImage";
 import {
   PROFILE_ROLE_OPTIONS,
   normalizeProfileRoles,
@@ -191,6 +192,7 @@ export function ProfileBasicsForm({
       ? initialValues.focus_skill
       : null;
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
   const initialAvatarUrl = initialValues.avatar_url?.trim() || fallbackAvatarUrl || "";
   const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState(
     initialValues.avatar_id?.trim() ? "" : initialAvatarUrl
@@ -356,6 +358,21 @@ export function ProfileBasicsForm({
           className="hidden"
           onChange={handleAvatarUpload}
         />
+
+        {cropFile ? (
+          <ImageCropDialog
+            file={cropFile}
+            shape="photo"
+            output={AVATAR_IMAGE_OUTPUT}
+            onCancel={() => setCropFile(null)}
+            onConfirm={(dataUrl) => {
+              setUploadedAvatarUrl(dataUrl);
+              setUploadedAvatarLabel(t("uploadedFile", { fileName: cropFile.name }));
+              setSelectedAvatarId("");
+              setCropFile(null);
+            }}
+          />
+        ) : null}
 
         {avatarPickerOpen ? (
           <div className="md:col-span-2 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -584,10 +601,8 @@ export function ProfileBasicsForm({
     if (!file) return;
 
     try {
-      const dataUrl = await toAvatarDataUrl(file);
-      setUploadedAvatarUrl(dataUrl);
-      setUploadedAvatarLabel(t("uploadedFile", { fileName: file.name }));
-      setSelectedAvatarId("");
+      // Erst der Ausschnitt (seit 04.11.2026), dann wie bisher.
+      setCropFile(file);
       setAvatarPickerOpen(false);
     } finally {
       event.target.value = "";

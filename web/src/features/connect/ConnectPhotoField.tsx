@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useState } from "react";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { ImageCropDialog } from "@/features/ui/ImageCropDialog";
 
 type Choice = "keep" | "existing" | "upload" | "none";
 
@@ -33,12 +34,13 @@ export function ConnectPhotoField({
         ? { avatarId: null, imageUrl: null }
         : { avatarId: currentAvatarId, imageUrl: currentPhotoUrl };
 
-  async function onUpload(event: ChangeEvent<HTMLInputElement>) {
+  // Erst der Ausschnitt (seit 04.11.2026), dann wie bisher: 640 px, JPEG.
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  function onUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (!file) return;
-    const dataUrl = await resizeImage(file);
-    setUploaded(dataUrl);
-    setChoice("upload");
+    event.target.value = "";
+    if (!file || !file.type.match(/^image\/(jpeg|png|webp)$/)) return;
+    setCropFile(file);
   }
 
   return <fieldset className="rounded-2xl border border-slate-200 p-5">
@@ -56,32 +58,21 @@ export function ConnectPhotoField({
     <label className="mt-4 block text-sm font-medium text-slate-800">{copy.upload}
       <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onUpload} className="mt-2 block min-h-11 w-full rounded-xl border border-slate-200 p-2 text-sm" />
     </label>
+    {cropFile ? (
+      <ImageCropDialog
+        file={cropFile}
+        shape="photo"
+        output={{ size: 640, type: "image/jpeg", quality: 0.84 }}
+        onCancel={() => setCropFile(null)}
+        onConfirm={(dataUrl) => {
+          setUploaded(dataUrl);
+          setChoice("upload");
+          setCropFile(null);
+        }}
+      />
+    ) : null}
     <input type="hidden" name="photo_choice" value={choice} />
     <input type="hidden" name="photo_image_data" value={choice === "upload" ? uploaded : ""} />
 
   </fieldset>;
-}
-
-async function resizeImage(file: File) {
-  if (!file.type.match(/^image\/(jpeg|png|webp)$/)) throw new Error("network_photo_type_invalid");
-  const url = URL.createObjectURL(file);
-  try {
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const value = new window.Image();
-      value.onload = () => resolve(value);
-      value.onerror = () => reject(new Error("network_photo_load_failed"));
-      value.src = url;
-    });
-    const max = 640;
-    const scale = Math.min(1, max / Math.max(image.width, image.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(image.width * scale));
-    canvas.height = Math.max(1, Math.round(image.height * scale));
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("network_photo_canvas_unavailable");
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.84);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }

@@ -96,5 +96,16 @@
       "toAdvisor": "Go to advisor overview",
       "toPeople": "Go to people & groups"
     }
+  },
+  "imageCrop": {
+    "title": "Choose the crop",
+    "hint": "Drag or use the arrow keys to move, use the slider to zoom. The circle shows what round views will show.",
+    "hintLogo": "Drag or use the arrow keys to move. Use the slider to zoom in or out – free space stays transparent.",
+    "area": "Image crop – move with the arrow keys, zoom with plus and minus",
+    "zoom": "Size",
+    "cancel": "Cancel",
+    "confirm": "Apply",
+    "failed": "The image could not be edited here. Please upload it again.",
+    "adjust": "Adjust crop"
   }
 }

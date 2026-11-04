@@ -96,5 +96,16 @@
       "toAdvisor": "Zur Advisor-Übersicht",
       "toPeople": "Zu Personen & Gruppen"
     }
+  },
+  "imageCrop": {
+    "title": "Bildausschnitt wählen",
+    "hint": "Zum Verschieben ziehen oder die Pfeiltasten nutzen, mit dem Regler vergrößern. Der Kreis zeigt, was in runden Ansichten zu sehen ist.",
+    "hintLogo": "Zum Verschieben ziehen oder die Pfeiltasten nutzen. Mit dem Regler vergrößern oder verkleinern – ein freier Rand bleibt durchsichtig.",
+    "area": "Bildausschnitt – mit den Pfeiltasten verschieben, mit Plus und Minus vergrößern",
+    "zoom": "Größe",
+    "cancel": "Abbrechen",
+    "confirm": "Übernehmen",
+    "failed": "Das Bild ließ sich hier nicht bearbeiten. Lade es bitte noch einmal hoch.",
+    "adjust": "Ausschnitt ändern"
   }
 }

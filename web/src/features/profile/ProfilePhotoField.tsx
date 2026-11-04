@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useTranslations } from "next-intl";
 
 import { AVATAR_LIBRARY } from "@/features/profile/avatarLibrary";
-import { toAvatarDataUrl } from "@/features/profile/avatarImage";
-import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
+import { ImageCropDialog } from "@/features/ui/ImageCropDialog";
+import { AVATAR_IMAGE_OUTPUT } from "@/features/profile/avatarImage";
+import { ProfileAvatar, resolveProfileAvatarUrl } from "@/features/profile/ProfileAvatar";
 import {
   removeProfilePhotoAction,
   saveProfilePhotoAction,
@@ -31,8 +33,9 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
  * (`avatarStorage.ts`). Nichts davon ist hier noch einmal gebaut — es ist
  * herausgelöst und wird von beiden Stellen benutzt.
  *
- * Kein Zuschneiden, keine Filter, keine Gesichtserkennung: Was es im Einstieg
- * nicht gibt, entsteht auch nicht hier.
+ * SEIT 04.11.2026 MIT AUSSCHNITT (Feedback an Maria): Wer ein Bild waehlt, legt
+ * im `ImageCropDialog` fest, was zu sehen ist - auch spaeter noch einmal am
+ * gespeicherten Bild. Keine Filter, keine Gesichtserkennung.
  *
  * ---------------------------------------------------------------------------
  * DIE VORSCHAU IST DAS, WAS GESPEICHERT WIRD
@@ -78,6 +81,9 @@ export function ProfilePhotoField({
   const vorschauUrl = neuesBild ?? (neueIllustration ? null : avatarUrl);
   const etwasGewaehlt = Boolean(neuesBild || neueIllustration);
   const formularRef = useRef<HTMLFormElement | null>(null);
+  const tCrop = useTranslations("common.imageCrop");
+  // Ein gewaehltes Bild geht erst durch den Ausschnitt; oder ein gespeichertes wird neu zugeschnitten.
+  const [zuschnitt, setZuschnitt] = useState<{ file?: File; src?: string } | null>(null);
 
   // WAEHLEN HEISST SPEICHERN. Bis zum 29.10.2026 blieb die Wahl im Browser stehen, bis
   // jemand "Foto speichern" drueckte. Auf Connect stehen aber drei weitere
@@ -91,8 +97,7 @@ export function ProfilePhotoField({
     const datei = event.target.files?.[0];
     if (!datei) return;
     try {
-      setNeuesBild(await toAvatarDataUrl(datei));
-      setNeueIllustration(null);
+      setZuschnitt({ file: datei });
       setBibliothekOffen(false);
     } finally {
       // Damit dieselbe Datei noch einmal gewählt werden kann.
@@ -128,6 +133,15 @@ export function ProfilePhotoField({
           >
             {hatBild ? copy.change : copy.add}
           </button>
+          {avatarUrl && !avatarId && !etwasGewaehlt ? (
+            <button
+              type="button"
+              onClick={() => setZuschnitt({ src: resolveProfileAvatarUrl(avatarUrl) ?? undefined })}
+              className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-4 text-sm font-medium text-slate-700"
+            >
+              {tCrop("adjust")}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setBibliothekOffen((offen) => !offen)}
@@ -145,6 +159,21 @@ export function ProfilePhotoField({
         className="hidden"
         onChange={dateiGewaehlt}
       />
+
+      {zuschnitt ? (
+        <ImageCropDialog
+          file={zuschnitt.file}
+          src={zuschnitt.src}
+          shape="photo"
+          output={AVATAR_IMAGE_OUTPUT}
+          onCancel={() => setZuschnitt(null)}
+          onConfirm={(dataUrl) => {
+            setZuschnitt(null);
+            setNeuesBild(dataUrl);
+            setNeueIllustration(null);
+          }}
+        />
+      ) : null}
 
       {bibliothekOffen ? (
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">

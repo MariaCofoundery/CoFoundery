@@ -99,7 +99,7 @@ export function ProfileAvatar({
   );
 }
 
-function resolveProfileAvatarUrl(value: string | null | undefined) {
+export function resolveProfileAvatarUrl(value: string | null | undefined) {
   const normalized = (value ?? "").trim();
   if (!normalized) return null;
   if (

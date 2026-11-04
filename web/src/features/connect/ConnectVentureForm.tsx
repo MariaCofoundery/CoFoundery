@@ -15,6 +15,7 @@ import {
   type ConnectVenture,
 } from "@/features/connect/connectTypes";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { ImageCropDialog } from "@/features/ui/ImageCropDialog";
 
 const field =
   "mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
@@ -37,10 +38,12 @@ export function ConnectVentureForm({
   const t = useTranslations("connect");
   const [logo, setLogo] = useState("");
 
-  async function onLogo(event: ChangeEvent<HTMLInputElement>) {
+  // Erst der Ausschnitt (seit 04.11.2026): quadratisch wie in den Listen, mit durchsichtigem Rand.
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  function onLogo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (!file) return;
-    setLogo(await readAsDataUrl(file));
+    event.target.value = "";
+    if (file) setLogoFile(file);
   }
 
   return (
@@ -52,6 +55,18 @@ export function ConnectVentureForm({
       <form action={saveConnectVentureAction} className="mt-5 grid gap-5">
         {venture ? <input type="hidden" name="venture_id" value={venture.id} /> : null}
         <input type="hidden" name="logo_image_data" value={logo} />
+        {logoFile ? (
+          <ImageCropDialog
+            file={logoFile}
+            shape="logo"
+            output={{ size: 512, type: "image/png" }}
+            onCancel={() => setLogoFile(null)}
+            onConfirm={(dataUrl) => {
+              setLogo(dataUrl);
+              setLogoFile(null);
+            }}
+          />
+        ) : null}
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-medium">
@@ -186,11 +201,3 @@ export function ConnectVentureForm({
 }
 
 /** Die Datei als data:-URL. Die Groessenpruefung macht der Server. */
-function readAsDataUrl(file: File) {
-  return new Promise<string>((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
-    reader.onerror = () => resolve("");
-    reader.readAsDataURL(file);
-  });
-}
