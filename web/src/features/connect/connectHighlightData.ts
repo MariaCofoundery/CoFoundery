@@ -181,25 +181,28 @@ export async function getConnectHighlights(
       isOwn: owner.user_id === currentUserId, disclosure: "none", note: null });
   }
 
-  // ERST DIE PLAETZE, DANN ZUFALL. Seit 04.11.2026 (gemeldet von Maria:
-  // "wenn ich mehrere highlighte mit empfohlen von Maria, sind die trotzdem
-  // als zufaellig ausgewaehlt markiert"): Empfehlungen fuellen die Plaetze,
-  // hoechstens eine Anzeige kommt dazu, der Zufall fuellt den Rest. Die
-  // Besitzer der Plaetze werden aus dem Zufall herausgenommen, damit niemand
-  // zweimal in einer Reihe steht. Gemischt wird zum Schluss: Die Reihenfolge
-  // ist keine Rangfolge, auch fuer eine Anzeige nicht.
+  // FESTE PLAETZE, DANN ROTATION (Maria, 04.11.2026: "die Plaetze sollen
+  // rotieren - es sei denn, das eine angepinnte, das soll immer dastehen").
+  // Fest sind nur die angepinnte Empfehlung und hoechstens eine laufende
+  // Anzeige. Alle anderen Plaetze werden bei jedem Aufruf neu gezogen - aus
+  // den normalen Eintraegen UND den uebrigen Empfehlungen, die dabei ein
+  // etwas hoeheres Gewicht haben. Jede Karte traegt ihre Kennzeichnung. Die
+  // Besitzer der festen Plaetze werden aus der Ziehung genommen, damit
+  // niemand zweimal in einer Reihe steht. Gemischt wird zum Schluss: Die
+  // Reihenfolge ist keine Rangfolge, auch fuer eine Anzeige nicht.
   const placementHighlights = placements.flatMap((row) => {
     const highlight = placementToHighlight(row, profileByUserId, currentUserId);
     return highlight ? [highlight] : [];
   });
   const placed = pickPlacements(placementHighlights, limit);
   const placedOwners = new Set(placed.flatMap((highlight) => highlight.person ? [highlight.person.user_id] : []));
+  const notPlaced = (highlight: ConnectHighlight) => !highlight.person || !placedOwners.has(highlight.person.user_id);
   const chosen = orderHighlights([
     ...placed,
     ...pickAcrossKinds(
-      labelPlacedCandidates(
-        candidates.filter((candidate) => !candidate.person || !placedOwners.has(candidate.person.user_id)),
-        placementHighlights
+      rotationPool(
+        labelPlacedCandidates(candidates.filter(notPlaced), placementHighlights),
+        placementHighlights.filter((highlight) => highlight.disclosure === "editorial" && !highlight.pinned).filter(notPlaced)
       ),
       limit - placed.length
     ),
@@ -261,11 +264,8 @@ function placementToHighlight(
 }
 
 /**
- * Die Plaetze der Verwaltung: Empfehlungen fuellen die Plaetze (angepinnte zuerst, sonst gelost),
- * hoechstens eine Anzeige kommt dazu - und nie zwei Karten desselben Menschen.
- *
- * Bis 04.11.2026 hoechstens EINE Empfehlung: Weitere empfohlene Eintraege konnten nur noch ueber den
- * Zufall erscheinen und trugen dann "Zufällig ausgewählt".
+ * Die festen Plaetze: eine angepinnte Empfehlung steht immer da, dazu hoechstens eine Anzeige - nie
+ * zwei Karten desselben Menschen. Alles andere rotiert (`rotationPool`).
  *
  * Exportiert, damit der Test die Regel ausfuehren kann.
  */
@@ -278,17 +278,31 @@ export function pickPlacements(placed: ConnectHighlight[], limit: number) {
     chosen.push(highlight);
     return true;
   };
-  const editorial = placed.filter((highlight) => highlight.disclosure === "editorial");
-  const pinned = editorial.filter((highlight) => highlight.pinned);
-  const others = shuffle(editorial.filter((highlight) => !highlight.pinned));
-  // Eine angepinnte Empfehlung steht immer da.
-  for (const highlight of pinned) take(highlight);
+  // Hoechstens eine angepinnte Empfehlung (das Anpinnen ersetzt eine fruehere).
+  take(placed.find((highlight) => highlight.disclosure === "editorial" && highlight.pinned));
   // Hoechstens eine Anzeige.
   for (const highlight of shuffle(placed.filter((entry) => entry.disclosure === "sponsored"))) {
     if (take(highlight)) break;
   }
-  for (const highlight of others) take(highlight);
   return chosen;
+}
+
+/** Wie viel haeufiger eine Empfehlung in der Rotation gezogen wird als ein normaler Eintrag. */
+export const EDITORIAL_WEIGHT = 2;
+
+/**
+ * Der Topf fuer die rotierenden Plaetze: die normalen Kandidaten und die nicht angepinnten
+ * Empfehlungen (die nicht schon als Kandidat drinstehen), jede mit ihrer Kennzeichnung. Die
+ * Reihenfolge ist eine gewichtete Ziehung (Efraimidis-Spirakis): Empfehlungen liegen haeufiger vorn,
+ * aber nie sicher.
+ */
+export function rotationPool(candidates: ConnectHighlight[], editorial: ConnectHighlight[], random: () => number = Math.random) {
+  const seen = new Set(candidates.map((candidate) => `${candidate.kind}:${candidate.id}`));
+  const pool = [...candidates, ...editorial.filter((highlight) => !seen.has(`${highlight.kind}:${highlight.id}`))];
+  return pool
+    .map((highlight) => ({ highlight, key: Math.pow(random(), 1 / (highlight.disclosure === "editorial" ? EDITORIAL_WEIGHT : 1)) }))
+    .sort((a, b) => b.key - a.key)
+    .map((entry) => entry.highlight);
 }
 
 /**
@@ -318,7 +332,9 @@ export function pickAcrossKinds(candidates: ConnectHighlight[], limit: number) {
     byKind.set(candidate.kind, [...(byKind.get(candidate.kind) ?? []), candidate]);
   }
 
-  const queues = shuffle([...byKind.keys()]).map((kind) => shuffle(byKind.get(kind) ?? []));
+  // Die Sorten in zufaelliger Folge; innerhalb einer Sorte gilt die Reihenfolge des Topfs
+  // (`rotationPool` hat schon gewichtet gezogen).
+  const queues = shuffle([...byKind.keys()]).map((kind) => [...(byKind.get(kind) ?? [])]);
   const chosen: ConnectHighlight[] = [];
   const owners = new Set<string>();
 

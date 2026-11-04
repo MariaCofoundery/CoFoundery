@@ -8,6 +8,7 @@ import {
   pickAcrossKinds,
   labelPlacedCandidates,
   pickPlacements,
+  rotationPool,
   type ConnectHighlight,
 } from "@/features/connect/connectHighlightData";
 
@@ -85,31 +86,51 @@ test("bezahlt ist nur, was die Verwaltung dazu gemacht hat, und der Zufall bleib
   }
 });
 
-test("Plaetze: Empfehlungen fuellen die Plaetze, hoechstens eine Anzeige, nie derselbe Mensch zweimal", () => {
+test("feste Plaetze: nur die angepinnte Empfehlung und hoechstens eine Anzeige - der Rest rotiert", () => {
   const make = (owner: string, disclosure: ConnectHighlight["disclosure"], id: string, pinned = false) =>
     ({ kind: "offering", id, title: id, text: "", href: "/connect", disclosure, isOwn: false, has: null, note: null, pinned,
        person: { user_id: owner } }) as unknown as ConnectHighlight;
-  // Gemeldet am 04.11.2026: mehrere Empfehlungen erschienen als "zufällig ausgewählt".
-  const editorialOnly = [make("a", "editorial", "e1"), make("b", "editorial", "e2"), make("c", "editorial", "e3")];
-  assert.deepEqual(pickPlacements(editorialOnly, 3).map((entry) => entry.disclosure), ["editorial", "editorial", "editorial"]);
+  // Gemeldet am 04.11.2026: "die Plaetze sollen rotieren" - Empfehlungen ohne Pin belegen keinen festen Platz.
+  assert.deepEqual(pickPlacements([make("a", "editorial", "e1"), make("b", "editorial", "e2")], 3), []);
   const many = [
-    make("a", "editorial", "e1"), make("b", "editorial", "e2"), make("e", "editorial", "e3"),
+    make("a", "editorial", "e1"), make("b", "editorial", "e2"), make("p", "editorial", "pin", true),
     make("c", "sponsored", "s1"), make("d", "sponsored", "s2"),
   ];
-  for (let attempt = 0; attempt < 50; attempt += 1) {
-    const chosen = pickPlacements(many, 3);
-    assert.equal(chosen.length, 3);
-    assert.deepEqual(chosen.map((entry) => entry.disclosure).sort(), ["editorial", "editorial", "sponsored"]);
-  }
-  // Die angepinnte Empfehlung ist immer dabei.
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    const chosen = pickPlacements([...many, make("p", "editorial", "pin", true)], 3);
-    assert.ok(chosen.some((entry) => entry.id === "pin"));
+    const chosen = pickPlacements(many, 3);
+    assert.deepEqual(chosen.map((entry) => entry.disclosure).sort(), ["editorial", "sponsored"]);
+    assert.ok(chosen.some((entry) => entry.id === "pin"), "die angepinnte Empfehlung fehlt");
   }
-  // Gehoeren Empfehlung und Anzeige demselben Menschen, bleibt eine Karte.
-  assert.equal(pickPlacements([make("a", "editorial", "e1"), make("a", "sponsored", "s1")], 3).length, 1);
-  // Kein Platz: nichts.
+  // Gehoeren Pin und Anzeige demselben Menschen, bleibt eine Karte.
+  assert.equal(pickPlacements([make("a", "editorial", "e1", true), make("a", "sponsored", "s1")], 3).length, 1);
   assert.equal(pickPlacements([], 3).length, 0);
+});
+
+test("die rotierenden Plaetze: Empfehlungen sind mal dabei und mal nicht - aber haeufiger", () => {
+  const make = (id: string, disclosure: ConnectHighlight["disclosure"]) =>
+    ({ kind: "venture", id, title: id, text: "", href: "/connect", disclosure, isOwn: false, has: null, note: null,
+       person: { user_id: id } }) as unknown as ConnectHighlight;
+  const normal = Array.from({ length: 6 }, (_, index) => make(`n${index}`, "none"));
+  const recommended = [make("e1", "editorial"), make("e2", "editorial")];
+  // Eine Empfehlung, die schon als Kandidat drinsteht, kommt nicht doppelt in den Topf.
+  assert.equal(rotationPool([...normal, make("e1", "editorial")], recommended).length, 8);
+  let editorialShown = 0;
+  let normalShown = 0;
+  let neverEditorial = 0;
+  const runs = 3000;
+  for (let run = 0; run < runs; run += 1) {
+    const chosen = pickAcrossKinds(rotationPool(normal, recommended), 2);
+    const editorialHere = chosen.filter((entry) => entry.disclosure === "editorial").length;
+    editorialShown += editorialHere;
+    normalShown += chosen.length - editorialHere;
+    if (editorialHere === 0) neverEditorial += 1;
+    // Was gezogen wird, traegt seine Kennzeichnung.
+    for (const entry of chosen) assert.equal(entry.disclosure, entry.id.startsWith("e") ? "editorial" : "none");
+  }
+  // Je Eintrag: eine Empfehlung erscheint deutlich haeufiger als ein normaler Eintrag ...
+  assert.ok(editorialShown / 2 > (normalShown / 6) * 1.3, `${editorialShown / 2} vs ${normalShown / 6}`);
+  // ... aber die Plaetze rotieren: oft steht gar keine Empfehlung da.
+  assert.ok(neverEditorial > runs * 0.2, `nur ${neverEditorial} von ${runs} Ziehungen ohne Empfehlung`);
 });
 
 test("zieht der Zufall einen Eintrag mit Platz, traegt er dessen Kennzeichnung", () => {
