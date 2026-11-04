@@ -9,18 +9,27 @@ import { getTranslations } from "next-intl/server";
  *
  * Das Foto liegt in /public/brand (quadratisch zugeschnitten, 720 px). Ist
  * keins eingetragen, steht eine Kreisflaeche mit dem Anfangsbuchstaben da.
+ *
+ * `wide` (seit 04.11.2026, Feedback an Maria: "muss auf einen Screen passen"): fuer den einmaligen
+ * Brief und das Postfach. Am Rechner steht der Brief in zwei Textspalten, daneben Regeln und Hinweise -
+ * auf einem Laptop ohne Scrollen. Am Handy bleibt alles untereinander. Der Einstieg (`/welcome`)
+ * nutzt die schmale Fassung.
  */
 const MARIA_PHOTO_SRC: string | null = "/brand/maria.jpg";
 
 const STORY = ["story1", "story2", "story3", "story4", "story5", "story6", "story7"] as const;
 const VALUES = ["kind", "respect", "honest", "yours"] as const;
 
-export async function WelcomeLetter() {
+export async function WelcomeLetter({ wide = false }: { wide?: boolean } = {}) {
   const t = await getTranslations("profile.welcomeLetter");
 
   return (
-    <div className="mt-5 grid gap-5 text-left md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:items-start">
-      <article className="flex min-w-0 flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+    <div
+      className={`mt-5 grid gap-5 text-left ${
+        wide ? "lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1fr)] lg:items-start" : "md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:items-start"
+      }`}
+    >
+      <article className={`flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 ${wide ? "gap-3" : "gap-4"}`}>
         <div className="flex items-center gap-4">
           {MARIA_PHOTO_SRC ? (
             // eslint-disable-next-line @next/next/no-img-element -- ein festes Bild aus /public
@@ -42,13 +51,20 @@ export async function WelcomeLetter() {
             <h3 className="mt-1 text-2xl font-semibold text-slate-950">{t("greeting")}</h3>
           </div>
         </div>
-        {STORY.map((key) => (
-          <p key={key} className="text-[15px] leading-7 text-slate-700">{t.rich(key, { em: (chunks) => <em>{chunks}</em> })}</p>
-        ))}
-        <p className="text-lg font-semibold text-slate-950">{t("signoff")}</p>
+        <div className={wide ? "lg:columns-2 lg:gap-8" : "flex flex-col gap-4"}>
+          {STORY.map((key) => (
+            <p
+              key={key}
+              className={`text-[15px] text-slate-700 ${wide ? "mb-3 break-inside-avoid leading-[1.65]" : "leading-7"}`}
+            >
+              {t.rich(key, { em: (chunks) => <em>{chunks}</em> })}
+            </p>
+          ))}
+          <p className={`text-lg font-semibold text-slate-950 ${wide ? "break-inside-avoid" : ""}`}>{t("signoff")}</p>
+        </div>
       </article>
 
-      <div className="flex min-w-0 flex-col gap-5">
+      <div className={`flex min-w-0 flex-col ${wide ? "gap-4" : "gap-5"}`}>
         <section className="rounded-3xl border border-violet-200 bg-violet-50/60 p-5 sm:p-6">
           <h3 className="text-lg font-semibold text-slate-950">{t("valuesTitle")}</h3>
           <ol className="mt-3 grid gap-3">

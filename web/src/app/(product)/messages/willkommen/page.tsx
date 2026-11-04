@@ -19,11 +19,11 @@ export default async function WelcomeMessagePage() {
   await requireSignedInForMessages("/messages/willkommen");
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-10">
+    <main className="mx-auto w-full max-w-6xl px-5 py-10">
       <Link href="/messages" className="text-sm font-medium text-slate-600 underline underline-offset-2 hover:text-slate-950">
         {t("back")}
       </Link>
-      <WelcomeLetter />
+      <WelcomeLetter wide />
     </main>
   );
 }
