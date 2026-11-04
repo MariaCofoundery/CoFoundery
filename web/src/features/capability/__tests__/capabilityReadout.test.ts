@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
-import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
+import { buildCapabilityReadout, READOUT_FINDING_KEYS } from "@/features/capability/capabilityReadout";
+import { bringsArea, DEPTH_LEVEL, NO_EXPERIENCE_LEVEL } from "@/features/capability/capabilityTypes";
 import type {
   ApplicationLevel,
   CapabilityArea,
@@ -167,6 +167,40 @@ test("every area appears in exactly one finding", () => {
   assert.equal(new Set(listed).size, entries.length);
 });
 
+test("'Keine' Erfahrung ohne Wunsch ist eine eigene Angabe, nicht 'noch offen'", () => {
+  // Wunsch von Maria (04.11.2026): "das kann ich nicht" soll in der
+  // Auswertung stehen. Wer dazu einen Wunsch angibt, landet dort, wo der
+  // Wunsch hingehoert - Koennen ist nicht Wollen.
+  assert.equal(NO_EXPERIENCE_LEVEL, 1);
+  assert.deepEqual(finding([entry("b2b_sales", 1, null)], "noExperience")?.areaIds, ["b2b_sales"]);
+  assert.deepEqual(finding([entry("b2b_sales", 1, "grow_into")], "growingInto")?.areaIds, ["b2b_sales"]);
+  assert.deepEqual(finding([entry("b2b_sales", 1, "prefer_external")], "handsOver")?.areaIds, ["b2b_sales"]);
+  assert.deepEqual(finding([entry("b2b_sales", 1, "own")], "ownsWithLessExperience")?.areaIds, ["b2b_sales"]);
+  assert.deepEqual(finding([entry("b2b_sales", 1, "unclear")], "undecided")?.areaIds, ["b2b_sales"]);
+});
+
+test("'Keine' zaehlt nirgends als 'bringt den Bereich mit'", () => {
+  assert.equal(bringsArea({ application_level: 1 }), false);
+  for (const level of [null, 2, 3, 4, 5]) assert.equal(bringsArea({ application_level: level }), true, String(level));
+  // Gemerkte Suchen (Connect und FIND) lesen eigene Bereiche hierueber.
+  assert.match(source("src/features/connect/savedSearchData.ts"), /\.filter\(bringsArea\)/);
+  // Dieselbe Regel in der Datenbank: Suche und freigegebene Sicht.
+  const migration = source("../supabase/migrations/20270306120000_capability_no_experience.sql");
+  assert.equal(migration.match(/application_level is distinct from 1/g)?.length, 2);
+});
+
+test("der Editor bietet 'Keine' zuerst an und sortiert den Ueberblick wie die Auswertung", () => {
+  const editor = source("src/features/capability/CapabilityAreasEditor.tsx");
+  assert.match(editor, /const OFFERED_LEVELS: readonly ApplicationLevel\[\] = APPLICATION_LEVELS;/);
+  assert.match(editor, /buildCapabilityReadout\(/);
+  assert.match(editor, /copy\.groups\[group\.key\]/);
+  for (const locale of ["de", "en"]) {
+    const areasCopy = readJson(`messages/${locale}/capability.json`).areas as Record<string, Record<string, string>>;
+    assert.equal(areasCopy.levelsShort["1"], locale === "de" ? "Keine" : "None");
+    assert.deepEqual(Object.keys(areasCopy.overviewGroups), [...READOUT_FINDING_KEYS], locale);
+  }
+});
+
 test("unclear is treated as open, not as a missing answer", () => {
   const entries = [entry("b2b_sales", 3, "unclear")];
   assert.deepEqual(finding(entries, "undecided")?.areaIds, ["b2b_sales"]);
@@ -217,7 +251,7 @@ test("both locales carry every finding with title and text", () => {
   const en = (readJson("messages/en/capability.json").readout as Record<string, unknown>).findings as Record<string, Record<string, string>>;
 
   assert.deepEqual(Object.keys(de), Object.keys(en));
-  for (const key of ["anchor", "ownsWithLessExperience", "canButHandsOver", "growingInto", "contributes", "handsOver", "undecided"]) {
+  for (const key of READOUT_FINDING_KEYS) {
     assert.ok(de[key]?.title, `de fehlt readout.findings.${key}.title`);
     assert.ok(de[key]?.text, `de fehlt readout.findings.${key}.text`);
     assert.ok(en[key]?.title, `en fehlt readout.findings.${key}.title`);

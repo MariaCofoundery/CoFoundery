@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 
-import { OWNERSHIP_WISHES, type ApplicationLevel, type OwnershipWish } from "./capabilityTypes";
+import { buildCapabilityReadout, type ReadoutFindingKey } from "./capabilityReadout";
+import { APPLICATION_LEVELS, OWNERSHIP_WISHES, type ApplicationLevel, type OwnershipWish } from "./capabilityTypes";
 
 /**
  * Bereiche, Erfahrung und Verantwortung an EINEM Ort.
@@ -28,6 +29,12 @@ import { OWNERSHIP_WISHES, type ApplicationLevel, type OwnershipWish } from "./c
  *
  * Alle Texte kommen fertig aufgeloest - eine Uebersetzungsfunktion laesst sich
  * nicht ueber die Client-Grenze reichen.
+ *
+ * SEIT 04.11.2026 (Feedback an Maria): Je Bereich gibt es "Keine" Erfahrung,
+ * und der Ueberblick sortiert waehrend des Klickens nach dem, was sich ergibt -
+ * "das will ich verantworten", "will ich lernen", "soll lieber jemand anderes
+ * machen", "kann ich nicht". Er nutzt dieselbe Auswertung wie das Profil
+ * (`buildCapabilityReadout`), damit beide nie verschieden sortieren.
  */
 export type EditorArea = { id: string; label: string; hint: string; hasExample: boolean };
 export type EditorFamily = { id: string; label: string; areas: EditorArea[] };
@@ -42,6 +49,7 @@ export type EditorCopy = {
   overviewTitle: string;
   overviewEmpty: string;
   overviewNote: string;
+  groups: Record<ReadoutFindingKey, string>;
   hasExample: string;
   hintOpen: string;
   levels: Record<string, string>;
@@ -49,9 +57,10 @@ export type EditorCopy = {
   familiesLabel: string;
 };
 
-// Die Stufe 1 ("noch nicht praktisch angewandt") passt nicht zu "hier habe ich
-// gearbeitet" und wird nicht angeboten - nur gezeigt, wenn sie schon dasteht.
-const OFFERED_LEVELS: ApplicationLevel[] = [2, 3, 4, 5];
+// Bis 04.11.2026 fehlte die Stufe 1 hier ("passt nicht zu: hier habe ich
+// gearbeitet"). Jetzt steht sie als "Keine" vorn: Wer einen Bereich lernen
+// oder abgeben will, soll sagen koennen, dass er dort nichts mitbringt.
+const OFFERED_LEVELS: readonly ApplicationLevel[] = APPLICATION_LEVELS;
 
 export function CapabilityAreasEditor({
   families,
@@ -79,6 +88,22 @@ export function CapabilityAreasEditor({
   const visible = needle
     ? all.filter((area) => area.label.toLowerCase().includes(needle))
     : all.filter((area) => area.familyId === activeFamily);
+  const overview = useMemo(() => {
+    // Die Reihenfolge des Vokabulars ueber alle Felder hinweg.
+    const areas = families.flatMap((family) => family.areas.map((area) => ({ area_id: area.id, family_id: family.id })));
+    return buildCapabilityReadout(
+      Object.entries(chosen).map(([areaId, value]) => ({
+        id: areaId,
+        area_id: areaId,
+        application_level: value.level,
+        ownership_wish: value.wish,
+        evidence: [],
+      })),
+      areas.map((area, index) => ({ ...area, sort_order: index })),
+      families.map((family, index) => ({ family_id: family.id, sort_order: index }))
+    ).findings;
+  }, [chosen, families]);
+  const labelOf = useMemo(() => new Map(all.map((area) => [area.id, area.label])), [all]);
   const countIn = (familyId: string) =>
     families.find((family) => family.id === familyId)?.areas.filter((area) => chosen[area.id]).length ?? 0;
 
@@ -164,7 +189,6 @@ export function CapabilityAreasEditor({
         {visible.length === 0 ? <p className="text-sm text-slate-600">{copy.noResults}</p> : null}
         {visible.map((area) => {
           const value = chosen[area.id];
-          const levels: ApplicationLevel[] = value?.level === 1 ? [1, ...OFFERED_LEVELS] : OFFERED_LEVELS;
           return (
             <div
               key={area.id}
@@ -201,7 +225,7 @@ export function CapabilityAreasEditor({
                   <div>
                     <p className="mb-2 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{copy.levelTitle}</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {levels.map((level) => (
+                      {OFFERED_LEVELS.map((level) => (
                         <button key={level} type="button" aria-pressed={value.level === level} onClick={() => setLevel(area.id, level)} className={chip(value.level === level)}>
                           {copy.levels[String(level)]}
                         </button>
@@ -227,24 +251,27 @@ export function CapabilityAreasEditor({
 
       <aside aria-label={copy.overviewTitle} className="rounded-2xl bg-slate-50 p-5 lg:col-span-2">
         <h3 className="text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{copy.overviewTitle}</h3>
-        {Object.keys(chosen).length === 0 ? (
+        {overview.length === 0 ? (
           <p className="mt-3 text-sm text-slate-600">{copy.overviewEmpty}</p>
         ) : (
-          <div className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
-            {families.map((family) => {
-              const picked = family.areas.filter((area) => chosen[area.id]);
-              if (picked.length === 0) return null;
-              return (
-                <div key={family.id}>
-                  <p className="text-xs text-slate-500">{family.label}</p>
-                  <div className="mt-1 flex flex-wrap gap-1.5">
-                    {picked.map((area) => (
-                      <span key={area.id} className="rounded-full bg-violet-100 px-2.5 py-1 text-xs text-violet-900">{area.label}</span>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="mt-3 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            {overview.map((group) => (
+              <div key={group.key}>
+                <p className="text-sm font-semibold text-slate-800">{copy.groups[group.key]}</p>
+                <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                  {group.areaIds.map((areaId) => {
+                    const level = chosen[areaId]?.level;
+                    return (
+                      <li key={areaId} className="rounded-full bg-violet-100 px-2.5 py-1 text-xs text-violet-900">
+                        {labelOf.get(areaId) ?? areaId}
+                        {/* Die Erfahrung steht dabei, getrennt vom Wunsch: Koennen ist nicht Wollen. */}
+                        {level ? <span className="text-violet-700"> · {copy.levels[String(level)]}</span> : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
         <p className="mt-4 text-xs leading-5 text-slate-500">{copy.overviewNote}</p>

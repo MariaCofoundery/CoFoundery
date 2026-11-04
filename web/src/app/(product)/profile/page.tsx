@@ -17,7 +17,11 @@ import {
   getPendingStrengthProposals,
   getPersonStrengths,
 } from "@/features/capability/strengthData";
-import { buildCapabilityReadout } from "@/features/capability/capabilityReadout";
+import {
+  buildCapabilityReadout,
+  READOUT_FINDING_KEYS,
+  type ReadoutFindingKey,
+} from "@/features/capability/capabilityReadout";
 import { CapabilitySnapshotStart } from "@/features/capability/CapabilitySnapshotStart";
 import { getUnsortedInterviewAnswers } from "@/features/capability/capabilityInterviewData";
 import { getComparablePeople, type ComparablePerson } from "@/features/capability/capabilityComparisonData";
@@ -556,6 +560,9 @@ export default async function ProfilePage({
               overviewTitle: t("areas.overviewTitle"),
               overviewEmpty: t("areas.overviewEmpty"),
               overviewNote: t("areas.overviewNote"),
+              groups: Object.fromEntries(
+                READOUT_FINDING_KEYS.map((key) => [key, t(`areas.overviewGroups.${key}`)])
+              ) as Record<ReadoutFindingKey, string>,
               hasExample: t("areas.hasExample"),
               hintOpen: t("areas.hintOpen"),
               familiesLabel: t("areas.familiesLabel"),

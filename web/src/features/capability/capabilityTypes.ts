@@ -18,6 +18,24 @@ export const DEPTH_LEVEL = 4;
 export type ApplicationLevel = (typeof APPLICATION_LEVELS)[number];
 
 /**
+ * Stufe 1 heisst im Editor "Keine" (seit 04.11.2026, Wunsch von Maria: je
+ * Bereich ein klares "keine Erfahrung"). Inhaltlich ist es dieselbe Stufe wie
+ * vorher ("noch nicht praktisch angewandt") - deshalb kein neuer Wert.
+ *
+ * Wer so einen Bereich waehlt, sagt etwas ueber ihn ("will ich lernen",
+ * "soll lieber jemand anderes machen") - er bringt ihn aber NICHT mit. Wo ein
+ * Bereich ohne Stufe als "hat die Person" gelesen wird (Suche nach Bereichen,
+ * gemerkte Suchen, die freigegebene Sicht ohne Tiefe), zaehlt er deshalb nicht.
+ * Dieselbe Regel steht in der Datenbank (20270306120000).
+ */
+export const NO_EXPERIENCE_LEVEL = 1;
+
+/** Ob ein Eintrag als "bringt diesen Bereich mit" gelesen werden darf. */
+export function bringsArea(entry: { application_level: number | null }) {
+  return entry.application_level !== NO_EXPERIENCE_LEVEL;
+}
+
+/**
  * Die sechs Ownership-Zustaende. CAN ist nicht WANT TO OWN: eine hohe
  * Anwendungsstufe zusammen mit `prefer_other` ist ein ausdruecklich gueltiger
  * Zustand, kein Widerspruch.

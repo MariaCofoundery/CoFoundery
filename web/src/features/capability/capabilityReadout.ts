@@ -1,4 +1,4 @@
-import { DEPTH_LEVEL } from "@/features/capability/capabilityTypes";
+import { DEPTH_LEVEL, NO_EXPERIENCE_LEVEL } from "@/features/capability/capabilityTypes";
 import type { CapabilityArea, CapabilityEntry, CapabilityFamily } from "./capabilityTypes";
 
 /**
@@ -47,8 +47,25 @@ export type ReadoutFindingKey =
   | "contributes"
   /** Soll lieber jemand anders uebernehmen - ohne angegebene Tiefe. */
   | "handsOver"
+  /**
+   * "Keine" Erfahrung und kein Wunsch dazu - "das kann ich nicht" (04.11.2026).
+   * Eine ausdrueckliche Angabe, deshalb nicht unter "noch offen".
+   */
+  | "noExperience"
   /** Wunsch noch offen. Kein Urteil, nur eine offene Stelle. */
   | "undecided";
+
+/** Alle Befunde in der Reihenfolge, in der sie erscheinen. */
+export const READOUT_FINDING_KEYS: readonly ReadoutFindingKey[] = [
+  "anchor",
+  "ownsWithLessExperience",
+  "canButHandsOver",
+  "growingInto",
+  "contributes",
+  "handsOver",
+  "noExperience",
+  "undecided",
+];
 
 export type ReadoutFinding = {
   key: ReadoutFindingKey;
@@ -81,15 +98,10 @@ export function buildCapabilityReadout(
   const handsOver = (entry: CapabilityEntry) =>
     entry.ownership_wish !== null && (HANDS_OVER as readonly string[]).includes(entry.ownership_wish);
 
-  const bucket: Record<ReadoutFindingKey, string[]> = {
-    anchor: [],
-    ownsWithLessExperience: [],
-    canButHandsOver: [],
-    growingInto: [],
-    contributes: [],
-    handsOver: [],
-    undecided: [],
-  };
+  const bucket = Object.fromEntries(READOUT_FINDING_KEYS.map((key) => [key, [] as string[]])) as Record<
+    ReadoutFindingKey,
+    string[]
+  >;
 
   for (const entry of entries) {
     // Die Reihenfolge ist die Aussagekraft: Der erste zutreffende Befund
@@ -121,6 +133,8 @@ export function buildCapabilityReadout(
       bucket.contributes.push(entry.area_id);
     } else if (handsOver(entry)) {
       bucket.handsOver.push(entry.area_id);
+    } else if (entry.application_level === NO_EXPERIENCE_LEVEL && entry.ownership_wish === null) {
+      bucket.noExperience.push(entry.area_id);
     } else {
       // Bleibt: kein Wunsch angegeben oder ausdruecklich "noch unklar".
       bucket.undecided.push(entry.area_id);
@@ -143,7 +157,7 @@ export function buildCapabilityReadout(
   const focusFamilyId =
     ranked.length && (ranked.length === 1 || ranked[0][1] > ranked[1][1]) ? ranked[0][0] : null;
 
-  const findings = (Object.keys(bucket) as ReadoutFindingKey[])
+  const findings = READOUT_FINDING_KEYS
     .filter((key) => bucket[key].length > 0)
     .map((key) => ({ key, areaIds: inOrder(bucket[key]) }));
 

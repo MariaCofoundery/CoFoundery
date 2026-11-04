@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { bringsArea } from "@/features/capability/capabilityTypes";
 import type { SavedSearchCriteria } from "./savedSearchMatching";
 
 type Client = SupabaseClient;
@@ -137,8 +138,11 @@ export async function getDisclosedOwnCapabilityAreas(client: Client, userId: str
 
   const { data } = await client
     .from("person_capability_entries")
-    .select("area_id")
+    .select("area_id,application_level")
     .eq("user_id", userId);
 
-  return ((data ?? []) as { area_id: string }[]).map((row) => row.area_id);
+  // "Keine Erfahrung" ist eine Angabe zum Bereich, kein Treffer fuer ihn.
+  return ((data ?? []) as { area_id: string; application_level: number | null }[])
+    .filter(bringsArea)
+    .map((row) => row.area_id);
 }

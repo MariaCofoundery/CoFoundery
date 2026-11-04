@@ -182,13 +182,13 @@
     "noResults": "I can't find an area for that. Try another search term or browse the fields.",
     "levelTitle": "How much experience?",
     "wishTitle": "Responsibility for it",
-    "overviewTitle": "Your overview",
+    "overviewTitle": "What this adds up to",
     "overviewEmpty": "Nothing chosen yet.",
     "overviewNote": "Only you see this. Who else sees it is set under “Visibility”. Five to ten areas already give a meaningful picture.",
     "hasExample": "You wrote an example for this area. To remove it, delete the example first.",
     "familiesLabel": "Fields",
     "levelsShort": {
-      "1": "Not applied yet",
+      "1": "None",
       "2": "Tried out",
       "3": "Independently",
       "4": "Repeatedly",
@@ -202,10 +202,20 @@
       "prefer_external": "Rather external",
       "unclear": "Unclear"
     },
-    "textLead": "Choose the areas where you have worked hands-on – the important ones rather than everything you ever touched. For each you can add how much experience you have and whether you want to be responsible for it. Both are optional.",
+    "textLead": "Choose the areas that matter for you – where you have worked, or that you want to learn or would rather hand over. The important ones rather than all of them. For each you can add how much experience you have (including “None”) and whether you want to be responsible for it. Both are optional.",
     "titleNew": "Where do you know your way around?",
     "submitNew": "Save",
-    "hintOpen": "What does this mean?"
+    "hintOpen": "What does this mean?",
+    "overviewGroups": {
+      "anchor": "I want to own this",
+      "ownsWithLessExperience": "I want to own this – little experience so far",
+      "canButHandsOver": "I can do this – others should own it",
+      "growingInto": "I want to grow into this",
+      "contributes": "I contribute",
+      "handsOver": "Others should rather do this",
+      "noExperience": "No experience",
+      "undecided": "Still open"
+    }
   },
   "ownership": {
     "title": "Which of these do you not want to own long term?",
@@ -216,7 +226,7 @@
   },
   "levels": {
     "label": "Experience",
-    "1": "Not applied in practice yet",
+    "1": "No practical experience",
     "2": "Tried with support",
     "3": "Applied independently",
     "4": "Applied repeatedly",
@@ -278,6 +288,10 @@
       "handsOver": {
         "title": "Rather with someone else",
         "text": "According to what you've stated, others should rather take these areas on – within the team or externally."
+      },
+      "noExperience": {
+        "title": "Where you have no experience",
+        "text": "Here you explicitly said “None” for experience and gave no preference. For dividing roles, that matters as much as what you can do."
       },
       "undecided": {
         "title": "Still open",

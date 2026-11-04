@@ -182,13 +182,13 @@
     "noResults": "Dazu finde ich keinen Bereich. Probier einen anderen Suchbegriff oder blättere durch die Felder.",
     "levelTitle": "Wie viel Erfahrung?",
     "wishTitle": "Verantwortung dafür",
-    "overviewTitle": "Dein Überblick",
+    "overviewTitle": "Was sich ergibt",
     "overviewEmpty": "Noch nichts gewählt.",
     "overviewNote": "Das siehst nur du. Wer es sonst sieht, legst du unter „Sichtbarkeit“ fest. Mit fünf bis zehn Bereichen ist das Bild schon aussagekräftig.",
     "hasExample": "Zu diesem Bereich hast du ein Beispiel geschrieben. Um ihn zu entfernen, lösche zuerst das Beispiel.",
     "familiesLabel": "Felder",
     "levelsShort": {
-      "1": "Noch nicht angewandt",
+      "1": "Keine",
       "2": "Ausprobiert",
       "3": "Selbstständig",
       "4": "Wiederholt",
@@ -202,10 +202,20 @@
       "prefer_external": "Lieber extern",
       "unclear": "Unklar"
     },
-    "textLead": "Wähle die Bereiche, in denen du praktisch gearbeitet hast – lieber die wichtigen als alle, die du mal berührt hast. Zu jedem Bereich kannst du dazusagen, wie viel Erfahrung du hast und ob du ihn verantworten willst. Beides ist freiwillig.",
+    "textLead": "Wähle die Bereiche, die für dich eine Rolle spielen – in denen du gearbeitet hast, die du lernen oder lieber abgeben willst. Lieber die wichtigen als alle. Zu jedem Bereich kannst du dazusagen, wie viel Erfahrung du hast (auch „Keine“) und ob du ihn verantworten willst. Beides ist freiwillig.",
     "titleNew": "Wo kennst du dich aus?",
     "submitNew": "Speichern",
-    "hintOpen": "Was bedeutet das?"
+    "hintOpen": "Was bedeutet das?",
+    "overviewGroups": {
+      "anchor": "Will ich verantworten",
+      "ownsWithLessExperience": "Will ich verantworten – bisher wenig Erfahrung",
+      "canButHandsOver": "Kann ich – sollen aber andere verantworten",
+      "growingInto": "Will ich hineinwachsen",
+      "contributes": "Trage ich bei",
+      "handsOver": "Sollen lieber andere machen",
+      "noExperience": "Keine Erfahrung",
+      "undecided": "Noch offen"
+    }
   },
   "ownership": {
     "title": "Was davon möchtest du nicht dauerhaft verantworten?",
@@ -216,7 +226,7 @@
   },
   "levels": {
     "label": "Erfahrung",
-    "1": "Noch nicht praktisch angewandt",
+    "1": "Keine praktische Erfahrung",
     "2": "Mit Unterstützung ausprobiert",
     "3": "Selbstständig angewandt",
     "4": "Wiederholt angewandt",
@@ -278,6 +288,10 @@
       "handsOver": {
         "title": "Lieber bei jemand anderem",
         "text": "Diese Bereiche sollen nach deiner Angabe eher andere übernehmen – im Team oder extern."
+      },
+      "noExperience": {
+        "title": "Wo du keine Erfahrung hast",
+        "text": "Hier hast du ausdrücklich „Keine“ Erfahrung angegeben und keinen Wunsch dazu. Für die Rollenverteilung ist das genauso wichtig wie das, was du kannst."
       },
       "undecided": {
         "title": "Noch offen",
