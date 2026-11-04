@@ -280,9 +280,9 @@
       "one": "Part I",
       "two": "Part II",
       "three": "Part III",
-      "oneTitle": "Who you are",
+      "oneTitle": "How you work",
       "twoTitle": "What you bring",
-      "threeTitle": "What drives you"
+      "threeTitle": "Where you want to go"
     },
     "sections": {
       "step": "Section {index}",
@@ -584,7 +584,14 @@
         "have": "{name}: You can add to your picture of it at any time. Only the people you share with see it.",
         "unnamed": "Your venture",
         "create": "Create a venture",
-        "open": "View"
+        "open": "View",
+        "themes": {
+          "time": "Time",
+          "money": "Money",
+          "decisions": "Decisions",
+          "goals": "Goals",
+          "limits": "Limits"
+        }
       },
       "share": {
         "title": "Who sees what",
@@ -601,7 +608,36 @@
           "title": "Advisor",
           "text": "Only people you invite"
         }
+      },
+      "editProfile": "Edit profile",
+      "glanceEyebrow": "Summary",
+      "glanceTitle": "At a glance",
+      "glanceNote": "From your own answers, without AI and without rating",
+      "status": {
+        "ready": "✓ Ready",
+        "open": "Still open",
+        "areas": "✓ {count, plural, one {# area} other {# areas}}",
+        "answered": "✓ Answered"
+      },
+      "readInReport": "Read in the report ↓",
+      "extrasLabel": "Also, if you like",
+      "extras": {
+        "strengths": "Strengths",
+        "strengthsCount": "Strengths · {count}",
+        "direction": "What drives you",
+        "directionOpen": "What drives you · open",
+        "background": "Background & network",
+        "questionnaires": "All questionnaires"
       }
+    },
+    "report": {
+      "jump": "Continue to the full report",
+      "eyebrow": "In detail",
+      "title": "Your report",
+      "parts": "in three parts",
+      "contents": "Contents",
+      "appendixLink": "Appendix: who sees what, method, earlier versions",
+      "appendix": "Appendix"
     }
   },
   "welcomeLetter": {

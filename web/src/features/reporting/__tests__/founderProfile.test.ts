@@ -278,25 +278,27 @@ test("die Seite steht in drei Teilen und sieben Abschnitten", () => {
   const ids = [...page.matchAll(/id: "([a-z-]+)", title: t\("(?:sections|venture)\.\w+"\)/g)].map(
     (treffer) => treffer[1],
   );
+  // Seit 04.11.2026 in der Reihenfolge des Berichts: I Arbeitsweise, II Bereiche, Staerken,
+  // Hintergrund, III Vorhaben und Antrieb, dann der Anhang.
   assert.deepEqual(ids, [
-    "hintergrund",
     "arbeitsweise",
-    "staerken",
     "mitbringst",
-    "antrieb",
+    "staerken",
+    "hintergrund",
     "vorhaben",
+    "antrieb",
     "details",
   ]);
   // Phase 1.1: „So willst du gründen" statt der Teamkarten-Liste.
   assert.match(page, /\{ id: "vorhaben", title: t\("venture\.title"\) \}/);
   assert.match(page, /sections\.filter\(\(section\) => zeigt\[section\.id\]\)/);
 
-  // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe. Vorhaben
-  // und Details stehen ausserhalb der Teile, neutral.
+  // Je Teil eine Farbe, und keine davon ist eine Bedeutungsfarbe. Das Vorhaben
+  // gehoert seit 04.11.2026 zu Teil III; die Details stehen im Anhang, neutral.
   // `onBrand` ist keine Saeulenfarbe, sondern die Gestalt des Kopfes (Ueber dich).
   const tones = [...page.matchAll(/tone="(\w+)"/g)].map((treffer) => treffer[1]).filter((ton) => ton !== "onBrand");
   assert.deepEqual([...new Set(tones)].sort(), ["emerald", "indigo", "violet"]);
-  assert.match(page, /"vorhaben",\s*"slate"/);
+  assert.match(page, /"vorhaben",\s*"violet"/);
   assert.match(page, /"details",\s*"slate"/);
 });
 

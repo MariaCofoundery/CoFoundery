@@ -32,7 +32,7 @@ import { InstrumentNote } from "@/features/reporting/InstrumentNote";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { ProfileArchive } from "@/features/profile/ProfileArchive";
 import { ProfilePdfChoice } from "@/features/reporting/ProfilePdfChoice";
-import { ProfileOverview, type OverviewWorkBar } from "@/features/reporting/ProfileOverview";
+import { ProfileOverview, ProfileShareOverview, type OverviewWorkBar } from "@/features/reporting/ProfileOverview";
 import { workDirectionBars } from "@/features/reporting/profileGlanceLines";
 import { ProfileDetails } from "@/features/reporting/ProfileDetails";
 import { ProfilePart } from "@/features/reporting/ProfilePart";
@@ -121,6 +121,21 @@ type SectionId =
   | "vorhaben"
   | "details";
 
+/**
+ * Die drei Teile des ausfuehrlichen Berichts, fuer das Inhaltsverzeichnis. Die Abschnitte stehen in
+ * `sections`; hier nur, welcher Abschnitt zu welchem Teil gehoert (seit 04.11.2026).
+ */
+const REPORT_PARTS = [
+  { id: "teil-wer", numeral: "I", tone: "indigo", titleKey: "parts.oneTitle", sections: ["arbeitsweise"] },
+  { id: "teil-was", numeral: "II", tone: "emerald", titleKey: "parts.twoTitle", sections: ["mitbringst", "staerken", "hintergrund"] },
+  { id: "teil-wohin", numeral: "III", tone: "violet", titleKey: "parts.threeTitle", sections: ["vorhaben", "antrieb"] },
+] as const;
+const PART_TONE: Record<(typeof REPORT_PARTS)[number]["tone"], string> = {
+  indigo: "bg-[#efeafd] text-[#4a2fb8]",
+  emerald: "bg-[#e3f6ec] text-[#17794a]",
+  violet: "bg-[#fde8f1] text-[#a3195b]",
+};
+
 export default async function FounderProfilePage({
   searchParams,
 }: {
@@ -199,13 +214,15 @@ export default async function FounderProfilePage({
 
   // Die Abschnitte einmal als Daten. Der Sprungbalken oben und die
   // Ueberschriften darunter duerfen nicht auseinanderlaufen.
+  // SEIT 04.11.2026 IN DER REIHENFOLGE DES BERICHTS: Teil I Arbeitsweise, Teil II Bereiche, Staerken,
+  // Hintergrund, Teil III Vorhaben und Antrieb, dann der Anhang.
   const sections: { id: SectionId; title: string }[] = [
-    { id: "hintergrund", title: t("sections.background") },
     { id: "arbeitsweise", title: t("sections.work") },
-    { id: "staerken", title: t("sections.strengths") },
     { id: "mitbringst", title: t("sections.bring") },
-    { id: "antrieb", title: t("sections.direction") },
+    { id: "staerken", title: t("sections.strengths") },
+    { id: "hintergrund", title: t("sections.background") },
     { id: "vorhaben", title: t("venture.title") },
+    { id: "antrieb", title: t("sections.direction") },
     { id: "details", title: t("sections.details") },
   ];
 
@@ -357,19 +374,6 @@ export default async function FounderProfilePage({
                 lessLabel: t("base.less"),
               }}
             />
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-white">{t("head.intro")}</p>
-            {/* Zwei Fassungen zum Weitergeben - klein, im Kopf; die Wahl steht weiter vor dem Klick. */}
-            <div className="no-print mt-4">
-              <ProfilePdfChoice
-                copy={{
-                  title: t("print.chooseTitle"),
-                  shortTitle: t("print.badgeShort"),
-                  shortText: t("print.shortText"),
-                  fullTitle: t("print.badgeFull"),
-                  fullText: t("print.fullText"),
-                }}
-              />
-            </div>
           </>
         }
         done={{
@@ -389,6 +393,7 @@ export default async function FounderProfilePage({
         }}
         hasStrengths={hasStrengths}
         hasDirection={hasDirection}
+        strengthCount={strengths.length}
         capabilityMap={capabilityMap}
         areaLabel={areaLabel}
         familyLabel={(familyId) => tCapability(`families.${familyId}`)}
@@ -400,35 +405,60 @@ export default async function FounderProfilePage({
         hasVenture={Boolean(aktuellesVorhaben)}
       />
 
+
       {/* ------------------------------------------------------------------
-          DER SPRUNGBALKEN
-
-          Neun Abschnitte sind laenger als vier Saeulen. Er ist eine Liste von
-          Ankern und KEINE Statusanzeige: Hier stand bis zum 01.10.2026
-          "ausgefuellt / noch offen" je Kachel, und das war ein
-          Fortschrittsbalken in anderer Schreibweise.
-
-          NICHT MITGEDRUCKT. Im Ausdruck waere er ein Inhaltsverzeichnis fuer
-          eine Seite, die man am Stueck liest.
+          DER UEBERGANG (seit 04.11.2026): Bis hier die Kurzfassung, ab hier
+          der ausfuehrliche Bericht - deutlich getrennt, mit einem Knopf, der
+          dorthin springt. Nicht mitgedruckt.
           ------------------------------------------------------------------ */}
+      <div className="no-print mt-8 flex items-center gap-4" aria-hidden="false">
+        <span aria-hidden="true" className="h-px flex-1 bg-[#d8d5ea]" />
+        <a
+          href="#bericht"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-[15px] font-semibold text-white shadow-[0_8px_20px_rgba(11,31,58,0.18)] hover:bg-[#13294a]"
+        >
+          {t("report.jump")}
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="M6 13l6 6 6-6" /></svg>
+        </a>
+        <span aria-hidden="true" className="h-px flex-1 bg-[#d8d5ea]" />
+      </div>
+
+      {/* ------------------------------------------------------------------
+          DER AUSFUEHRLICHE BERICHT: eigener Kopf mit Stand und den Fassungen
+          zum Weitergeben, links das Inhaltsverzeichnis, rechts das Blatt mit
+          drei nummerierten Teilen und dem Anhang.
+          ------------------------------------------------------------------ */}
+      <section id="bericht" aria-labelledby="bericht-title" className="mt-10 scroll-mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <span aria-hidden="true" className="no-print flex h-[52px] w-[52px] flex-none items-center justify-center rounded-[16px] bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M7 3h8l4 4v14H7z" /><path d="M15 3v4h4" /><path d="M10 12h6" /><path d="M10 16h6" /></svg>
+            </span>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#6d49e0]">{t("report.eyebrow")}</p>
+              <h2 id="bericht-title" className="mt-0.5 text-[28px] font-semibold tracking-tight text-[#0b1f3a]">{t("report.title")}</h2>
+              <p className="mt-1 text-[15px] text-[#5f5e7a]">{asOf ? `${asOf} · ${t("report.parts")}` : t("report.parts")}</p>
+            </div>
+          </div>
+          {/* Zwei Fassungen zum Weitergeben - die Wahl steht weiter vor dem Klick. */}
+          <div className="no-print">
+            <ProfilePdfChoice
+              copy={{
+                title: t("print.chooseTitle"),
+                shortTitle: t("print.badgeShort"),
+                shortText: t("print.shortText"),
+                fullTitle: t("print.badgeFull"),
+                fullText: t("print.fullText"),
+              }}
+            />
+          </div>
+        </div>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{t("head.intro")}</p>
+
+      {/* UNTER `lg` EINE ZEILE ZUM SCHIEBEN (Sprungmarken), DARUEBER DAS
+          INHALTSVERZEICHNIS LINKS. Beides Anker, keine Statusanzeige, nicht
+          mitgedruckt. */}
       <nav aria-label={t("head.jumpTo")} className="no-print mt-6 lg:hidden">
-        {/* UNTER `lg` EINE ZEILE ZUM SCHIEBEN, DARUEBER UMBRUCH.
-
-            Bis Phase 6 lag die Grenze bei `sm` (640 px). Nachgemessen am
-            01.10.2026: Neun Sprungmarken brauchen zusammen rund 1490 px. Bei
-            768 und 820 px wurden daraus drei Zeilen und 148 px - auf einem
-            Tablet wieder ein Inhaltsverzeichnis vor dem Inhalt. Erst ab
-            1024 px (848 px Spalte) sind es zwei Zeilen; das ist die
-            Desktop-Fassung, und die bleibt umbrechend.
-
-            Gemessen am 01.10.2026 im Browser: Bei 320 px standen acht
-            Sprungmarken in sieben Zeilen und 356 px hoch - fast ein ganzer
-            Bildschirm Inhaltsverzeichnis, bevor der Inhalt anfaengt. Bei
-            375 px waren es sechs Zeilen.
-
-            `-mx-6 px-6` laesst die Zeile bis an den Bildschirmrand laufen,
-            damit man sieht, dass dort noch etwas kommt. Der Rollbereich ist
-            der der Liste; die Seite selbst wird dadurch nicht breiter. */}
         <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 lg:mx-0 lg:flex-wrap lg:overflow-x-visible lg:px-0 lg:pb-0">
           {sichtbar
             .map((section) => (
@@ -443,60 +473,43 @@ export default async function FounderProfilePage({
             ))}
         </ul>
       </nav>
-      <div className="mt-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
-        {/* DIE SEITENLEISTE: am Rechner bleibt sie sichtbar und zeigt, wo man ist. Eine Liste von Ankern -
-            keine Statusanzeige, keine Zaehler. Nicht mitgedruckt. */}
+      <div className="mt-6 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8">
         <aside aria-label={t("head.jumpTo")} className="no-print hidden lg:block">
-          <ul className="sticky top-6 space-y-0.5 text-sm">
-            <li>
-              <a href="#auf-einen-blick" className="block rounded-lg px-3 py-2 font-semibold text-slate-900 hover:bg-slate-100">{t("glance.title")}</a>
-            </li>
-            {sichtbar.map((section) => (
-              <li key={section.id}>
-                <a href={`#${section.id}`} className="block rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">{section.title}</a>
-              </li>
+          <nav className="sticky top-6 rounded-[22px] border border-[#e4e2f0] bg-white p-3.5">
+            <p className="px-2.5 pb-2 pt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#5f5e7a]">{t("report.contents")}</p>
+            {REPORT_PARTS.map((part) => (
+              <div key={part.id} className="mt-1.5 first:mt-0">
+                <a href={`#${part.id}`} className="flex min-h-10 items-center gap-2.5 rounded-xl px-2.5 text-[15px] font-semibold text-[#0b1f3a] hover:bg-[#f5f3ff]">
+                  <span className={`flex h-6 w-6 flex-none items-center justify-center rounded-lg text-xs font-semibold ${PART_TONE[part.tone]}`}>{part.numeral}</span>
+                  {t(part.titleKey)}
+                </a>
+                <ul>
+                  {sichtbar
+                    // Ein Abschnitt, der so heisst wie sein Teil, steht nicht noch einmal darunter.
+                    .filter((section) => (part.sections as readonly string[]).includes(section.id) && section.title !== t(part.titleKey))
+                    .map((section) => (
+                      <li key={section.id}>
+                        <a href={`#${section.id}`} className="flex min-h-9 items-center rounded-xl pl-11 pr-2.5 text-sm text-[#33325e] hover:bg-[#f5f3ff] hover:text-[#0b1f3a]">{section.title}</a>
+                      </li>
+                    ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+            <a href="#details" className="mt-2 flex min-h-10 items-center rounded-xl border-t border-[#eeedf5] px-2.5 pt-1 text-sm text-[#5f5e7a] hover:bg-[#f5f3ff]">{t("report.appendixLink")}</a>
+          </nav>
         </aside>
-        <div className="min-w-0">
-
+        <div className="min-w-0 rounded-[28px] border border-[#e4e2f0] bg-white px-5 py-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)] sm:px-9 sm:py-8 print:rounded-none print:border-0 print:p-0 print:shadow-none">
 
       {/* ==================================================================
-          TEIL I - WER DU BIST
+          TEIL I - WIE DU ARBEITEST
           ================================================================== */}
       <ProfilePart
         id="teil-wer"
         tone="indigo"
+        numeral="I"
         eyebrow={t("parts.one")}
         title={t("parts.oneTitle")}
       >
-        {/* 1 - Dein Hintergrund: Ort, Schwerpunkte, Branchen - und die Rollen.
-            Der Ueber-mich-Text steht im Kopf; hier bliebe er doppelt, und mit
-            allem im Kopf war der zu voll. */}
-        {teil(
-          "hintergrund",
-          "indigo",
-          <>
-            <FounderProfileBase
-              core={core}
-              part="facts"
-              copy={{
-                title: null,
-                region: t("base.region"),
-                remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
-                expertise: t("base.expertise"),
-                industries: t("base.industries"),
-                linkedin: t("base.linkedin"),
-                empty: t("base.empty"),
-                completeHref: "/profile?step=identity",
-                completeCta: t("base.completeCta"),
-              }}
-            />
-            <RolesOverview client={supabase} userId={user.id} />
-            <EditLink href="/profile?step=identity" label={t("edit")} />
-          </>
-        )}
-
         {/* 2 - Wie du arbeitest. DIE KURZFASSUNG (Phase 1).
 
             Je Bereich EIN Satz auf der Karte, dazu was die Karten nicht sagen:
@@ -538,85 +551,19 @@ export default async function FounderProfilePage({
             {/* Phase C: Vertiefungen haengen an dem Core-Bereich, den sie vertiefen.
                 Solange keine registriert ist, entsteht hier weder Markup noch eine Abfrage. */}
             <ProfileDeepenings anchorModuleId="workstyle" userId={user.id} />
-          </>
+          </>,
+          false
         )}
 
-        {/* 3 - Deine Staerken. Zusammenfassung: die ersten fuenf.
-            Aufklapper: alle, und dort die Herkunft. */}
-        {teil(
-          "staerken",
-          "indigo",
-          strengths.length > 0 ? (
-            <>
-              <FounderProfileStrengths
-                strengths={strengths}
-                limit={STRENGTHS_IN_SUMMARY}
-                copy={{
-                  title: null,
-                  intro: t("strengthsSection.intro"),
-                  self: t("strengths.self"),
-                  reflected: (who) => t("strengths.reflected", { who }),
-                  frequency: (value) => tCapability(`strengths.frequencies.${value}`),
-                  group: (value) => tCapability(`strengths.groups.${value}`),
-                  unanswered: t("strengths.unanswered"),
-                }}
-              />
-              {mehrStaerken ? (
-                <ProfileDetails
-                  summary={t("strengthsSection.detailsSummary")}
-                  hint={t("strengthsSection.more", {
-                    count: strengths.length - STRENGTHS_IN_SUMMARY,
-                  })}
-                >
-                  <FounderProfileStrengths
-                    strengths={strengths}
-                    originLabel={originLabel}
-                    copy={{
-                      title: null,
-                      intro: null,
-                      self: t("strengths.self"),
-                      reflected: (who) => t("strengths.reflected", { who }),
-                      frequency: (value) => tCapability(`strengths.frequencies.${value}`),
-                      group: (value) => tCapability(`strengths.groups.${value}`),
-                      unanswered: t("strengths.unanswered"),
-                    }}
-                  />
-                </ProfileDetails>
-              ) : null}
-              {strengths.some((strength) => strength.theme) ? (
-                <p className="mt-3">
-                  <Link href="/me/profile/strengths" className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
-                    {t("strengthsSection.report")} →
-                  </Link>
-                </p>
-              ) : null}
-              <EditLink href="/profile?step=strengths" label={t("edit")} />
-            </>
-          ) : (
-            // EIN WEG, DIREKT: `/profile?step=strengths` ist ein eigener Schritt
-            // im Editor (PAGE_STEPS) mit Formular zum Festhalten. Keine zweite
-            // Aktion fuer KI-Vorschlaege - die entstehen nur, wenn der
-            // Worker laeuft, und ein Knopf, der dann nichts tut, waere eine
-            // Attrappe.
-            <MissingSection
-              title={t("strengthsSection.empty")}
-              text={t("strengthsSection.emptyText")}
-              href="/profile?step=strengths"
-              cta={t("strengthsSection.emptyCta")}
-              // Das Stärken-Interview - ein eigenes Gespräch, nicht das
-              // Capability-Interview (bis 18.10.2026 führte dieser Link dorthin).
-              secondary={{ href: "/profile/strengths-interview", cta: t("strengthsSection.interviewCta") }}
-            />
-          )
-        )}
       </ProfilePart>
 
       {/* ==================================================================
-          TEIL II - WAS DU MITBRINGST
+          TEIL II - WAS DU MITBRINGST: Bereiche, Staerken, Hintergrund
           ================================================================== */}
       <ProfilePart
         id="teil-was"
         tone="emerald"
+        numeral="II"
         eyebrow={t("parts.two")}
         title={t("parts.twoTitle")}
       >
@@ -769,71 +716,113 @@ export default async function FounderProfilePage({
           </>,
           false
         )}
-      </ProfilePart>
-
-      {/* ==================================================================
-          TEIL III - WAS DICH ANTREIBT
-          ================================================================== */}
-      <ProfilePart
-        id="teil-wohin"
-        tone="violet"
-        eyebrow={t("parts.three")}
-        title={t("parts.threeTitle")}
-      >
-        {/* 5 - Was dich antreibt.
-
-            NUR BESTAETIGTE AUSSAGEN. Ein Vorschlag eines Modells ist keine
-            Aussage ueber einen Menschen, solange der Mensch ihn nicht
-            bestaetigt hat.
-
-            DIE RUBRIKEN SIND DIE FACETTEN. Es gibt keine Zusammenfassung
-            darueber und keine Typologie. */}
+        {/* 3 - Deine Staerken. Zusammenfassung: die ersten fuenf.
+            Aufklapper: alle, und dort die Herkunft. */}
         {teil(
-          "antrieb",
-          "violet",
-          directionStatements.length > 0 ? (
+          "staerken",
+          "emerald",
+          strengths.length > 0 ? (
             <>
-              <FounderProfileDirection
-                statements={directionStatements}
-                facets={DIRECTION_FACETS}
-                limitPerFacet={DIRECTION_PER_FACET}
+              <FounderProfileStrengths
+                strengths={strengths}
+                limit={STRENGTHS_IN_SUMMARY}
                 copy={{
                   title: null,
-                  intro: t("direction.intro"),
-                  facetLabel: (facet) => tDirection(facet),
+                  intro: t("strengthsSection.intro"),
+                  self: t("strengths.self"),
+                  reflected: (who) => t("strengths.reflected", { who }),
+                  frequency: (value) => tCapability(`strengths.frequencies.${value}`),
+                  group: (value) => tCapability(`strengths.groups.${value}`),
+                  unanswered: t("strengths.unanswered"),
                 }}
               />
-              {mehrRichtung ? (
+              {mehrStaerken ? (
                 <ProfileDetails
-                  summary={t("directionSection.detailsSummary")}
-                  hint={detailsHint(directionStatements.length)}
+                  summary={t("strengthsSection.detailsSummary")}
+                  hint={t("strengthsSection.more", {
+                    count: strengths.length - STRENGTHS_IN_SUMMARY,
+                  })}
                 >
-                  <FounderProfileDirection
-                    statements={directionStatements}
-                    facets={DIRECTION_FACETS}
+                  <FounderProfileStrengths
+                    strengths={strengths}
                     originLabel={originLabel}
                     copy={{
                       title: null,
                       intro: null,
-                      facetLabel: (facet) => tDirection(facet),
+                      self: t("strengths.self"),
+                      reflected: (who) => t("strengths.reflected", { who }),
+                      frequency: (value) => tCapability(`strengths.frequencies.${value}`),
+                      group: (value) => tCapability(`strengths.groups.${value}`),
+                      unanswered: t("strengths.unanswered"),
                     }}
                   />
                 </ProfileDetails>
               ) : null}
-              <EditLink href="/profile/direction" label={t("edit")} />
+              {strengths.some((strength) => strength.theme) ? (
+                <p className="mt-3">
+                  <Link href="/me/profile/strengths" className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+                    {t("strengthsSection.report")} →
+                  </Link>
+                </p>
+              ) : null}
+              <EditLink href="/profile?step=strengths" label={t("edit")} />
             </>
           ) : (
+            // EIN WEG, DIREKT: `/profile?step=strengths` ist ein eigener Schritt
+            // im Editor (PAGE_STEPS) mit Formular zum Festhalten. Keine zweite
+            // Aktion fuer KI-Vorschlaege - die entstehen nur, wenn der
+            // Worker laeuft, und ein Knopf, der dann nichts tut, waere eine
+            // Attrappe.
             <MissingSection
-              title={t("directionSection.empty")}
-              text={t("missingDirection.text")}
-              href="/profile/direction"
-              cta={t("missingDirection.cta")}
+              title={t("strengthsSection.empty")}
+              text={t("strengthsSection.emptyText")}
+              href="/profile?step=strengths"
+              cta={t("strengthsSection.emptyCta")}
+              // Das Stärken-Interview - ein eigenes Gespräch, nicht das
+              // Capability-Interview (bis 18.10.2026 führte dieser Link dorthin).
+              secondary={{ href: "/profile/strengths-interview", cta: t("strengthsSection.interviewCta") }}
             />
-          ),
-          false
+          )
         )}
+        {/* 1 - Dein Hintergrund: Ort, Schwerpunkte, Branchen - und die Rollen.
+            Der Ueber-mich-Text steht im Kopf; hier bliebe er doppelt, und mit
+            allem im Kopf war der zu voll. */}
+        {teil(
+          "hintergrund",
+          "emerald",
+          <>
+            <FounderProfileBase
+              core={core}
+              part="facts"
+              copy={{
+                title: null,
+                region: t("base.region"),
+                remoteMode: (mode) => tCapability(`remoteModes.${mode}`),
+                expertise: t("base.expertise"),
+                industries: t("base.industries"),
+                linkedin: t("base.linkedin"),
+                empty: t("base.empty"),
+                completeHref: "/profile?step=identity",
+                completeCta: t("base.completeCta"),
+              }}
+            />
+            <RolesOverview client={supabase} userId={user.id} />
+            <EditLink href="/profile?step=identity" label={t("edit")} />
+          </>
+        )}
+
       </ProfilePart>
 
+      {/* ==================================================================
+          TEIL III - WOHIN DU WILLST: Vorhaben, dann Antrieb
+          ================================================================== */}
+      <ProfilePart
+        id="teil-wohin"
+        tone="violet"
+        numeral="III"
+        eyebrow={t("parts.three")}
+        title={t("parts.threeTitle")}
+      >
       {/* ------------------------------------------------------------------
           6 - SO WILLST DU GRÜNDEN (Phase 1.1)
 
@@ -848,10 +837,10 @@ export default async function FounderProfilePage({
           Und NICHT in der Druckfassung: Vorhabensangaben gelten fuer ein
           Vorhaben und einen Zeitraum, nicht fuer die Person.
           ------------------------------------------------------------------ */}
-      <div className="mt-12">
+      <div>
         {teil(
           "vorhaben",
-          "slate",
+          "violet",
           <>
             <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("venture.intro")}</p>
             {aktuellesVorhaben && visibleVentures.length > 1 ? (
@@ -939,6 +928,67 @@ export default async function FounderProfilePage({
         )}
       </div>
 
+        {/* 5 - Was dich antreibt.
+
+            NUR BESTAETIGTE AUSSAGEN. Ein Vorschlag eines Modells ist keine
+            Aussage ueber einen Menschen, solange der Mensch ihn nicht
+            bestaetigt hat.
+
+            DIE RUBRIKEN SIND DIE FACETTEN. Es gibt keine Zusammenfassung
+            darueber und keine Typologie. */}
+        {teil(
+          "antrieb",
+          "violet",
+          directionStatements.length > 0 ? (
+            <>
+              <FounderProfileDirection
+                statements={directionStatements}
+                facets={DIRECTION_FACETS}
+                limitPerFacet={DIRECTION_PER_FACET}
+                copy={{
+                  title: null,
+                  intro: t("direction.intro"),
+                  facetLabel: (facet) => tDirection(facet),
+                }}
+              />
+              {mehrRichtung ? (
+                <ProfileDetails
+                  summary={t("directionSection.detailsSummary")}
+                  hint={detailsHint(directionStatements.length)}
+                >
+                  <FounderProfileDirection
+                    statements={directionStatements}
+                    facets={DIRECTION_FACETS}
+                    originLabel={originLabel}
+                    copy={{
+                      title: null,
+                      intro: null,
+                      facetLabel: (facet) => tDirection(facet),
+                    }}
+                  />
+                </ProfileDetails>
+              ) : null}
+              <EditLink href="/profile/direction" label={t("edit")} />
+            </>
+          ) : (
+            <MissingSection
+              title={t("directionSection.empty")}
+              text={t("missingDirection.text")}
+              href="/profile/direction"
+              cta={t("missingDirection.cta")}
+            />
+          )
+        )}
+      </ProfilePart>
+
+      {/* ==================================================================
+          ANHANG: wer was sieht, Details & Methodik, fruehere Fassungen
+          ================================================================== */}
+      <div className="mt-14 border-t-2 border-dashed border-[#e4e2f0] pt-8 print:border-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{t("report.appendix")}</p>
+        <div className="mt-4">
+          <ProfileShareOverview />
+        </div>
       {/* ------------------------------------------------------------------
           7 - DETAILS & METHODIK
 
@@ -1084,8 +1134,10 @@ export default async function FounderProfilePage({
           <p className="no-print mt-3 text-xs leading-5 text-slate-500">{t("whatThisIs.private")}</p>
         </>
       )}
+      </div>
         </div>
       </div>
+      </section>
     </main>
   );
 }

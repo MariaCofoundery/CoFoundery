@@ -7,8 +7,10 @@ import type { CapabilityMap, CapabilityRole } from "@/features/reporting/capabil
 /**
  * „Dein Profil auf einen Blick" - der Kopf von /me/profile (Konzeptboard 31).
  *
- * Fuenf Dinge, von oben nach unten: der Kopf mit dem EINEN naechsten Schritt, der Weg durchs Profil, zwei
- * Spalten („Was ich kann" / „Was mich ausmacht"), das Vorhaben und „Wer sieht was".
+ * SEIT 04.11.2026 EINE EIGENE ZONE ueber dem ausfuehrlichen Bericht: der Kopf mit dem EINEN naechsten Schritt,
+ * „Auf einen Blick" mit drei Kern-Karten (Wie ich arbeite, Was ich kann, So willst du gründen) und die Leiste
+ * „Dazu, wenn du magst". Die Stationen des Wegs bestimmen weiter den naechsten Schritt; gezeigt werden sie als
+ * Stand auf den Karten. „Wer sieht was" steht im Anhang (`ProfileShareOverview`).
  *
  * DETERMINISTISCH, OHNE WERT: Es steht da, was die Person selbst angegeben oder bestaetigt hat. Keine Prozente,
  * kein „x von y", keine Rangfolge. Der Weg zeigt Stationen, keinen Fortschritt: eine Station ist erledigt, die
@@ -40,13 +42,14 @@ export type ProfileOverviewProps = {
   strengths: string[];
   direction: string[];
   workBars: OverviewWorkBar[];
+  /** Wie viele Staerken bestaetigt sind - fuer die Leiste "Dazu, wenn du magst". */
+  strengthCount: number;
   hasWorkProfile: boolean;
   ventureName: string | null;
   hasVenture: boolean;
 };
 
-const FAMILIES_SHOWN = 3;
-const ROWS_PER_FAMILY = 3;
+const ROWS_IN_GLANCE = 4;
 
 const ROLE_TONE: Record<Exclude<CapabilityRole, "unset">, string> = {
   own: "bg-[#e3f6ec] text-[#17794a]",
@@ -81,21 +84,14 @@ const ICONS = {
 };
 
 const STATIONS: { key: OverviewStation }[] = [{ key: "basis" }, { key: "work" }, { key: "can" }, { key: "makes" }, { key: "venture" }];
-const STATION_ICON: Record<OverviewStation, ReactNode> = {
-  basis: ICONS.person,
-  work: ICONS.chart,
-  can: ICONS.tools,
-  makes: ICONS.heart,
-  venture: ICONS.rocket,
-};
 
-const TILE = "flex min-w-0 flex-col gap-2.5 rounded-3xl border border-[#e4e2f0] bg-white p-[26px]";
-const LABEL = "text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]";
+const CORE_CARD =
+  "card-lift relative flex min-w-0 flex-col gap-3.5 overflow-hidden rounded-[26px] bg-white p-6 shadow-[0_10px_28px_rgba(76,52,170,0.10)]";
+const CARD_FOOT = "mt-auto inline-flex min-h-11 items-center border-t border-[#eeedf5] pt-3 font-semibold text-[#5b21b6] hover:underline";
 const MUTED = "text-sm leading-[1.55] text-[#5f5e7a]";
 const BTN = "inline-flex min-h-11 items-center justify-center rounded-xl px-[18px] text-[15px] font-semibold";
 const BTN_PRIMARY = `${BTN} bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white hover:opacity-90`;
 const BTN_QUIET = `${BTN} bg-[#f1f0f7] text-[#0b1f3a] hover:bg-[#e9e7f4]`;
-const LINK = "inline-flex min-h-11 items-center font-semibold text-[#6d49e0] hover:underline";
 
 function IconBox({ icon, bg, fg }: { icon: ReactNode; bg: string; fg: string }) {
   return (
@@ -121,25 +117,31 @@ export async function ProfileOverview(props: ProfileOverviewProps) {
         : props.hrefs[next];
   const nextKey = next === "makes" ? (props.hasStrengths ? "direction" : "strengths") : (next ?? "done");
 
-  const shownFamilies = props.capabilityMap.families.slice(0, FAMILIES_SHOWN);
-  const hiddenAreas =
-    props.capabilityMap.counts.areas -
-    shownFamilies.reduce((sum, family) => sum + Math.min(family.rows.length, ROWS_PER_FAMILY), 0);
+  // In der Kurzfassung hoechstens vier Bereiche - die Karte steht in einer schmalen Spalte. Alles steht im Bericht.
+  const shownRows = props.capabilityMap.families.flatMap((family) => family.rows).slice(0, ROWS_IN_GLANCE);
+  const hiddenAreas = props.capabilityMap.counts.areas - shownRows.length;
   const rolesShown = new Set<Exclude<CapabilityRole, "unset">>();
-  for (const family of shownFamilies) {
-    for (const row of family.rows.slice(0, ROWS_PER_FAMILY)) {
-      if (row.role !== "unset") rolesShown.add(row.role);
-    }
+  for (const row of shownRows) {
+    if (row.role !== "unset") rolesShown.add(row.role);
   }
+  const chip = (on: boolean) =>
+    `inline-flex items-center self-start rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${on ? "bg-[#e3f6ec] text-[#17794a]" : "bg-[#f1f0f7] text-[#33325e]"}`;
 
   return (
-    <div className="flex flex-col gap-6" data-profile-overview>
+    // ZONE 1: AUF EINEN BLICK (seit 04.11.2026, Entwurf "Teamseite, Profil, Menü"). Eine eigene, farbig
+    // hinterlegte Zone - darunter beginnt der ausfuehrliche Bericht. Im Druck faellt der Hintergrund weg.
+    <div
+      className="flex flex-col gap-6 rounded-[36px] bg-[linear-gradient(180deg,#ece6fd,#f2eefd,#f7f6fb)] p-3 sm:p-6 print:rounded-none print:bg-none print:p-0"
+      data-profile-overview
+    >
       {/* DER KOPF: wer, und der eine naechste Schritt. */}
       <section
         id="auf-einen-blick"
-        className="page-section brand-panel grid scroll-mt-6 items-center gap-7 rounded-[28px] px-6 py-8 sm:px-9 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] print:rounded-none print:px-0"
+        className="page-section brand-panel relative grid scroll-mt-6 items-center gap-7 overflow-hidden rounded-[30px] px-6 py-8 shadow-[0_24px_48px_rgba(76,52,170,0.22)] sm:px-9 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] print:rounded-none print:px-0 print:shadow-none"
       >
-        <div className="flex min-w-0 items-center gap-5">
+        <span aria-hidden="true" className="orb -top-14 left-1/2 hidden h-44 w-44 md:block" />
+        <span aria-hidden="true" className="orb bottom-6 right-7 hidden h-10 w-10 bg-white/20 md:block" />
+        <div className="relative flex min-w-0 items-center gap-5">
           {props.avatar}
           <div className="min-w-0">
             <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{t("eyebrow")}</p>
@@ -147,10 +149,12 @@ export async function ProfileOverview(props: ProfileOverviewProps) {
             {props.headline || props.regionLine ? (
               <p className="mt-1.5 text-base text-white opacity-95">{[props.headline, props.regionLine].filter(Boolean).join(" · ")}</p>
             ) : null}
-            {props.asOf ? <p className="mt-1 text-xs text-white opacity-90">{props.asOf}</p> : null}
+            <Link href={props.hrefs.basis} className="no-print mt-2 inline-flex min-h-10 items-center text-[15px] font-semibold text-white underline underline-offset-4">
+              {t("editProfile")}
+            </Link>
           </div>
         </div>
-        <div className="no-print flex min-w-0 flex-col gap-2.5 rounded-[22px] bg-white p-5 text-[#0b1f3a]">
+        <div className="no-print relative flex min-w-0 flex-col gap-2.5 rounded-[22px] bg-white p-5 text-[#0b1f3a]">
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#4a2fb8]">{t("next.label")}</p>
           <strong className="text-[21px] font-semibold leading-tight">{t(`next.${nextKey}.title`)}</strong>
           <p className={MUTED}>{t(`next.${nextKey}.text`)}</p>
@@ -159,220 +163,172 @@ export async function ProfileOverview(props: ProfileOverviewProps) {
             {next ? <Link href="/dashboard" className={BTN_QUIET}>{t("next.later")}</Link> : null}
           </div>
         </div>
-        {props.heroExtra ? <div className="min-w-0 md:col-span-2">{props.heroExtra}</div> : null}
+        {props.heroExtra ? <div className="relative min-w-0 md:col-span-2">{props.heroExtra}</div> : null}
       </section>
 
-      {/* DER WEG: Stationen, kein Fortschritt. */}
-      <section className="no-print flex flex-col gap-4 rounded-3xl border border-[#e4e2f0] bg-white px-5 py-6 sm:px-7" aria-labelledby="profile-path-title">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="profile-path-title" className="text-[22px] font-semibold tracking-tight">{t("path.title")}</h2>
-          <span className="text-[13.5px] text-[#5f5e7a]">{t("path.note")}</span>
+      <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-1 px-1 sm:px-2">
+        <div>
+          <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#6d49e0]">{t("glanceEyebrow")}</p>
+          <h2 className="mt-1 text-[28px] font-semibold tracking-tight text-[#0b1f3a]">{t("glanceTitle")}</h2>
         </div>
-        <ol className="relative -mx-5 flex items-start gap-1.5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
-          <div aria-hidden="true" className="absolute inset-x-10 top-6 hidden border-t-2 border-dashed border-[#d8d5ea] sm:block" />
-          {STATIONS.map(({ key }) => {
-            const state = done[key] ? "done" : key === next ? "here" : "open";
-            return (
-              <li
-                key={key}
-                aria-current={state === "here" ? "step" : undefined}
-                className={`relative flex min-w-[84px] flex-1 flex-col items-center gap-2 text-center text-[13px] font-semibold sm:text-sm ${state === "here" ? "text-[#0b1f3a]" : "text-[#5f5e7a]"}`}
-              >
-                <span
-                  className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
-                    state === "done"
-                      ? "border-[#bfe8d1] bg-[#e3f6ec] text-[#17794a]"
-                      : state === "here"
-                        ? "profile-step-here border-transparent bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] text-white"
-                        : "border-[#d8d5ea] bg-white text-[#8b89aa]"
-                  }`}
-                >
-                  {state === "done" ? ICONS.check : STATION_ICON[key]}
-                </span>
-                <span className="break-words">{t(`path.${key}`)}</span>
-                <span className="sr-only">{t(`path.state.${state}`)}</span>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
+        <p className="text-[14.5px] text-[#5f5e7a]">{t("glanceNote")}</p>
+      </div>
 
-      <div className="grid items-start gap-5 lg:grid-cols-2">
-        {/* WAS ICH KANN: Fachliches. Erfahrung und Rolle getrennt, nie verrechnet. */}
-        <article className={TILE} id="was-ich-kann">
-          <div className="flex items-center gap-3.5">
-            <IconBox icon={ICONS.tools} bg="#efeafd" fg="#4a2fb8" />
-            <div className="min-w-0">
-              <h2 className="text-[21px] font-semibold leading-tight">{t("can.title")}</h2>
-              <p className={MUTED}>{t("can.sub")}</p>
-            </div>
+      {/* DIE DREI KERN-KARTEN: gleich hoch, jede mit Farbstreifen, Stand und dem Sprung in den Bericht. */}
+      <div className="grid items-stretch gap-5 md:grid-cols-3">
+        {/* WIE ICH ARBEITE: nur, was getragen in eine Richtung zeigt - eine Lage zwischen zwei Polen. */}
+        <article className={CORE_CARD} id="wie-ich-arbeite">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[5px] bg-[#7c6cf0]" />
+          <div className="flex items-center justify-between gap-3">
+            <IconBox icon={ICONS.chart} bg="#efeafd" fg="#4a2fb8" />
+            <span className={chip(props.hasWorkProfile)}>{props.hasWorkProfile ? t("status.ready") : t("status.open")}</span>
           </div>
-          {shownFamilies.length > 0 ? (
-            <div className="mt-2.5">
-              {shownFamilies.map((family) => (
-                <div key={family.familyId} className="flex flex-col gap-2.5 border-t border-[#e4e2f0] py-3.5 first:border-t-0">
-                  <p className={LABEL}>{props.familyLabel(family.familyId)}</p>
-                  {family.rows.slice(0, ROWS_PER_FAMILY).map((row) => (
-                    <div key={row.areaId} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 text-[15px] sm:grid-cols-[minmax(0,150px)_minmax(0,1fr)_auto]">
-                      <span className="min-w-0 break-words font-semibold">{props.areaLabel(row.areaId)}</span>
-                      <span
-                        className="order-3 col-span-2 flex gap-1 sm:order-none sm:col-span-1"
-                        role="img"
-                        aria-label={row.level ? t("can.level", { level: row.level }) : t("can.noLevel")}
-                      >
-                        {[1, 2, 3, 4, 5].map((step) => (
-                          <span key={step} className={`h-2 flex-1 rounded ${row.level && step <= row.level ? "bg-[#6d49e0]" : "bg-[#ece9f8]"}`} />
-                        ))}
-                      </span>
-                      {row.role !== "unset" ? (
-                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${ROLE_TONE[row.role]}`}>{t(`can.roles.${row.role}`)}</span>
-                      ) : (
-                        <span />
-                      )}
-                    </div>
-                  ))}
+          <div>
+            <h3 className="text-[21px] font-semibold leading-tight">{t("work.title")}</h3>
+            <p className={MUTED}>{t("work.sub")}</p>
+          </div>
+          {props.workBars.length > 0 ? (
+            <div className="flex flex-col gap-3.5">
+              {props.workBars.map((bar, index) => (
+                <div key={bar.key} className="flex min-w-0 flex-col gap-1.5">
+                  <span className="text-[14.5px] font-semibold">{bar.label}</span>
+                  <span className="relative block h-2 rounded bg-[#ece9f8]">
+                    <i
+                      className={`profile-grow absolute top-1/2 -ml-2 block h-4 w-4 rounded-full border-[3px] border-white bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] shadow ${bar.side === "upper" ? "left-5/6" : "left-1/6"}`}
+                      style={{ animationDelay: `${index * 0.15}s` }}
+                    />
+                  </span>
+                  <span className="flex justify-between gap-3 text-[12.5px] text-[#5f5e7a]">
+                    <span className="min-w-0 break-words">{bar.left}</span>
+                    <span className="min-w-0 break-words text-right">{bar.right}</span>
+                  </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className={`${MUTED} mt-2`}>{t("can.empty")}</p>
+            <p className={MUTED}>{props.hasWorkProfile ? t("work.noDirection") : t("work.empty")}</p>
           )}
-          {rolesShown.size > 0 ? (
-            <ul className="mt-1.5 flex flex-wrap gap-2.5">
-              {[...rolesShown].map((role) => (
-                <li key={role} className={`inline-block rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${ROLE_TONE[role]}`}>{t(`can.legend.${role}`)}</li>
-              ))}
-            </ul>
-          ) : null}
-          {hiddenAreas > 0 ? <p className={MUTED}>{t("can.more", { count: hiddenAreas })}</p> : null}
-          <Link href={props.hrefs.can} className={`${LINK} no-print mt-1.5`}>
-            {shownFamilies.length > 0 ? t("can.edit") : t("can.start")}
+          <Link href={props.hasWorkProfile ? "#arbeitsweise" : props.hrefs.work} className={`${CARD_FOOT} no-print`}>
+            {props.hasWorkProfile ? t("readInReport") : t("work.start")}
           </Link>
         </article>
 
-        <div className="flex min-w-0 flex-col gap-5">
-          {/* WAS MICH AUSMACHT: Persoenliches. */}
-          <article className={TILE} id="was-mich-ausmacht">
-            <div className="flex items-center gap-3.5">
-              <IconBox icon={ICONS.heart} bg="#fde8f1" fg="#a3195b" />
-              <div className="min-w-0">
-                <h2 className="text-[21px] font-semibold leading-tight">{t("makes.title")}</h2>
-                <p className={MUTED}>{t("makes.sub")}</p>
-              </div>
+        {/* WAS ICH KANN: Fachliches. Erfahrung und Rolle getrennt, nie verrechnet. */}
+        <article className={CORE_CARD} id="was-ich-kann">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[5px] bg-[#3b8fd1]" />
+          <div className="flex items-center justify-between gap-3">
+            <IconBox icon={ICONS.tools} bg="#e1effa" fg="#0b5a8a" />
+            <span className={chip(props.capabilityMap.counts.areas > 0)}>
+              {props.capabilityMap.counts.areas > 0 ? t("status.areas", { count: props.capabilityMap.counts.areas }) : t("status.open")}
+            </span>
+          </div>
+          <div>
+            <h3 className="text-[21px] font-semibold leading-tight">{t("can.title")}</h3>
+            <p className={MUTED}>{t("can.sub")}</p>
+          </div>
+          {shownRows.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {shownRows.map((row) => (
+                <div key={row.areaId} className="flex min-w-0 flex-col gap-1.5">
+                  <span className="flex items-center justify-between gap-2 text-[15px]">
+                    <span className="min-w-0 break-words font-semibold">{props.areaLabel(row.areaId)}</span>
+                    {row.role !== "unset" ? (
+                      <span className={`inline-block shrink-0 rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${ROLE_TONE[row.role]}`}>{t(`can.roles.${row.role}`)}</span>
+                    ) : null}
+                  </span>
+                  <span className="flex gap-1" role="img" aria-label={row.level ? t("can.level", { level: row.level }) : t("can.noLevel")}>
+                    {[1, 2, 3, 4, 5].map((step) => (
+                      <span key={step} className={`h-2 flex-1 rounded ${row.level && step <= row.level ? "bg-[#6d49e0]" : "bg-[#ece9f8]"}`} />
+                    ))}
+                  </span>
+                </div>
+              ))}
+              {hiddenAreas > 0 ? <p className={MUTED}>{t("can.more", { count: hiddenAreas })}</p> : null}
             </div>
-            <div className="mt-2 flex flex-col gap-2.5">
-              <p className={LABEL}>{t("makes.strengths")}</p>
-              {props.strengths.length > 0 ? (
-                props.strengths.map((line, index) => (
-                  <div key={line} className="profile-rise flex items-start gap-3 rounded-2xl bg-[#f7f6fb] px-3.5 py-3" style={{ animationDelay: `${0.1 + index * 0.15}s` }}>
-                    <span className="mt-0.5 flex-none text-[#a3195b]">{ICONS.spark}</span>
-                    <span className="min-w-0 break-words text-[15.5px] leading-[1.5]">{line}</span>
-                  </div>
-                ))
-              ) : (
-                <p className={MUTED}>{t("makes.strengthsEmpty")}</p>
-              )}
-              <p className={`${LABEL} mt-1.5`}>{t("makes.direction")}</p>
-              {props.direction.length > 0 ? (
-                props.direction.map((line, index) => (
-                  <div key={line} className="profile-rise flex items-start gap-3 rounded-2xl bg-[#fff8e6] px-3.5 py-3" style={{ animationDelay: `${0.4 + index * 0.15}s` }}>
-                    <span className="mt-0.5 flex-none text-[#7a4300]">{ICONS.flag}</span>
-                    <span className="min-w-0 break-words text-[15.5px] leading-[1.5]">{line}</span>
-                  </div>
-                ))
-              ) : (
-                <p className={MUTED}>{t("makes.directionEmpty")}</p>
-              )}
-            </div>
-            <div className="no-print mt-1.5 flex flex-wrap items-center gap-x-5">
-              <Link href={props.hasStrengths ? "#staerken" : props.hrefs.strengths} className={LINK}>
-                {props.hasStrengths ? t("makes.seeStrengths") : t("makes.startStrengths")}
-              </Link>
-              <Link href={props.hasDirection ? "#antrieb" : props.hrefs.direction} className={LINK}>
-                {props.hasDirection ? t("makes.seeDirection") : t("makes.startDirection")}
-              </Link>
-            </div>
-          </article>
+          ) : (
+            <p className={MUTED}>{t("can.empty")}</p>
+          )}
+          <Link href={shownRows.length > 0 ? "#mitbringst" : props.hrefs.can} className={`${CARD_FOOT} no-print`}>
+            {shownRows.length > 0 ? t("readInReport") : t("can.start")}
+          </Link>
+        </article>
 
-          {/* WIE ICH ARBEITE: nur, was getragen in eine Richtung zeigt - eine Lage zwischen zwei Polen. */}
-          <article className={TILE} id="wie-ich-arbeite">
-            <div className="flex items-center gap-3.5">
-              <IconBox icon={ICONS.chart} bg="#dff4f3" fg="#0b6b6e" />
-              <div className="min-w-0">
-                <h2 className="text-[21px] font-semibold leading-tight">{t("work.title")}</h2>
-                <p className={MUTED}>{t("work.sub")}</p>
-              </div>
-            </div>
-            {props.workBars.length > 0 ? (
-              <div className="mt-1.5 flex flex-col gap-3.5">
-                {props.workBars.map((bar, index) => (
-                  <div key={bar.key} className="grid grid-cols-[minmax(0,1fr)] gap-1.5 sm:grid-cols-[150px_minmax(0,1fr)] sm:items-center sm:gap-3">
-                    <span className="text-[14.5px] font-semibold">{bar.label}</span>
-                    <span className="flex min-w-0 flex-col gap-1">
-                      <span className="relative block h-2 rounded bg-[#ece9f8]">
-                        <i
-                          className={`profile-grow absolute top-1/2 -ml-2 block h-4 w-4 rounded-full border-[3px] border-white bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] shadow ${bar.side === "upper" ? "left-5/6" : "left-1/6"}`}
-                          style={{ animationDelay: `${index * 0.15}s` }}
-                        />
-                      </span>
-                      <span className="flex justify-between gap-3 text-[12.5px] text-[#5f5e7a]">
-                        <span className="min-w-0 break-words">{bar.left}</span>
-                        <span className="min-w-0 break-words text-right">{bar.right}</span>
-                      </span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className={`${MUTED} mt-1.5`}>{props.hasWorkProfile ? t("work.noDirection") : t("work.empty")}</p>
-            )}
-            <Link href={props.hrefs.work} className={`${LINK} no-print mt-1.5`}>
-              {props.hasWorkProfile ? t("work.open") : t("work.start")}
-            </Link>
-          </article>
-        </div>
+        {/* SO WILLST DU GRUENDEN */}
+        <article className={CORE_CARD} aria-labelledby="profile-venture-title">
+          <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[5px] bg-[#1f9e9a]" />
+          <div className="flex items-center justify-between gap-3">
+            <IconBox icon={ICONS.rocket} bg="#dff4f3" fg="#0b6b6e" />
+            <span className={chip(props.hasVenture)}>{props.hasVenture ? t("status.answered") : t("status.open")}</span>
+          </div>
+          <div>
+            <h3 id="profile-venture-title" className="text-[21px] font-semibold leading-tight">{t("venture.title")}</h3>
+            <p className={`${MUTED} mt-1`}>{props.hasVenture ? t("venture.have", { name: props.ventureName ?? t("venture.unnamed") }) : t("venture.text")}</p>
+          </div>
+          <ul className="flex flex-wrap gap-1.5">
+            {(["time", "money", "decisions", "goals", "limits"] as const).map((key) => (
+              <li key={key} className="rounded-full bg-[#dff4f3] px-2.5 py-0.5 text-[13px] font-semibold text-[#0b6b6e]">{t(`venture.themes.${key}`)}</li>
+            ))}
+          </ul>
+          <Link href={props.hasVenture ? "#vorhaben" : props.hrefs.venture} className={`${CARD_FOOT} no-print`}>
+            {props.hasVenture ? t("readInReport") : t("venture.create")}
+          </Link>
+        </article>
       </div>
 
-      {/* SO WILLST DU GRUENDEN */}
-      <section className={`${TILE} flex-row flex-wrap items-center gap-5`} aria-labelledby="profile-venture-title">
-        <IconBox icon={ICONS.rocket} bg="#fdecc8" fg="#7a4300" />
-        <div className="min-w-0 flex-[1_1_360px]">
-          <h2 id="profile-venture-title" className="text-[21px] font-semibold leading-tight">{t("venture.title")}</h2>
-          <p className={`${MUTED} mt-1`}>{props.hasVenture ? t("venture.have", { name: props.ventureName ?? t("venture.unnamed") }) : t("venture.text")}</p>
-        </div>
-        <Link href={props.hasVenture ? "#vorhaben" : props.hrefs.venture} className={`${BTN_PRIMARY} no-print`}>
-          {props.hasVenture ? t("venture.open") : t("venture.create")}
-        </Link>
-      </section>
-
-      {/* WER SIEHT WAS: Jede Freigabe einzeln, an ihrem eigenen Ort. Hier steht kein Zustand - der liegt dort. */}
-      <section className="no-print flex flex-col gap-3.5 rounded-3xl border border-[#e4e2f0] bg-white px-5 py-6 sm:px-7" aria-labelledby="profile-share-title">
-        <div className="flex items-center gap-3">
-          <span className="text-[#4a2fb8]">{ICONS.lock}</span>
-          <h2 id="profile-share-title" className="text-[22px] font-semibold tracking-tight">{t("share.title")}</h2>
-        </div>
-        <p className={`${MUTED} max-w-[640px]`}>{t("share.text")}</p>
-        <ul className="grid gap-3 md:grid-cols-3">
-          {(
-            [
-              { key: "team", href: "/connections", icon: ICONS.team },
-              { key: "find", href: "/profile?step=sichtbarkeit", icon: ICONS.search },
-              { key: "advisor", href: "/account", icon: ICONS.advisor },
-            ] as const
-          ).map((item) => (
-            <li key={item.key}>
-              <Link href={item.href} className="flex items-center gap-3 rounded-2xl border border-[#e4e2f0] bg-white px-3.5 py-3 text-[14.5px] transition-colors hover:border-[#6d49e0] hover:bg-[#f5f2fe]">
-                <span className="flex-none text-[#4a2fb8]">{item.icon}</span>
-                <span className="min-w-0">
-                  <strong className="block">{t(`share.${item.key}.title`)}</strong>
-                  <span className="block text-[13px] text-[#5f5e7a]">{t(`share.${item.key}.text`)}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
+      {/* DAZU, WENN DU MAGST: die Ergaenzungen als Leiste, nicht als Karten. */}
+      <nav aria-label={t("extrasLabel")} className="no-print flex flex-wrap items-center gap-2.5 rounded-[20px] border border-[#e4e2f0] bg-white/70 px-3.5 py-3">
+        <span className="mr-1 text-[15px] font-semibold text-[#33325e]">{t("extrasLabel")}</span>
+        {(
+          [
+            { key: "strengths", href: props.hasStrengths ? "#staerken" : props.hrefs.strengths, icon: ICONS.spark, bg: "#fdecc8", fg: "#7a4300", label: props.hasStrengths ? t("extras.strengthsCount", { count: props.strengthCount }) : t("extras.strengths") },
+            { key: "direction", href: props.hasDirection ? "#antrieb" : props.hrefs.direction, icon: ICONS.flag, bg: "#fde8f1", fg: "#a3195b", label: props.hasDirection ? t("extras.direction") : t("extras.directionOpen") },
+            { key: "background", href: "#hintergrund", icon: ICONS.person, bg: "#e3f6ec", fg: "#17794a", label: t("extras.background") },
+            { key: "questionnaires", href: "/fragebogen", icon: ICONS.chart, bg: "#efeafd", fg: "#4a2fb8", label: t("extras.questionnaires") },
+          ] as const
+        ).map((item) => (
+          <Link
+            key={item.key}
+            href={item.href}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#e4e2f0] bg-white py-1 pl-1.5 pr-3.5 text-[15px] text-[#0b1f3a] transition hover:border-[#6d49e0]"
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-full [&_svg]:h-4 [&_svg]:w-4" style={{ background: item.bg, color: item.fg }}>{item.icon}</span>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </div>
+  );
+}
+
+/** "Wer sieht was" - seit 04.11.2026 im Anhang des Berichts: jede Freigabe einzeln, an ihrem eigenen Ort. */
+export async function ProfileShareOverview() {
+  const t = await getTranslations("profile.founderProfile.atAGlance");
+  return (
+    <section className="no-print flex flex-col gap-3.5 rounded-3xl border border-[#e4e2f0] bg-white px-5 py-6 sm:px-7" aria-labelledby="profile-share-title">
+      <div className="flex items-center gap-3">
+        <span className="text-[#4a2fb8]">{ICONS.lock}</span>
+        <h2 id="profile-share-title" className="text-[22px] font-semibold tracking-tight">{t("share.title")}</h2>
+      </div>
+      <p className={`${MUTED} max-w-[640px]`}>{t("share.text")}</p>
+      <ul className="grid gap-3 md:grid-cols-3">
+        {(
+          [
+            { key: "team", href: "/connections", icon: ICONS.team },
+            { key: "find", href: "/profile?step=sichtbarkeit", icon: ICONS.search },
+            { key: "advisor", href: "/account", icon: ICONS.advisor },
+          ] as const
+        ).map((item) => (
+          <li key={item.key}>
+            <Link href={item.href} className="flex items-center gap-3 rounded-2xl border border-[#e4e2f0] bg-white px-3.5 py-3 text-[14.5px] transition-colors hover:border-[#6d49e0] hover:bg-[#f5f2fe]">
+              <span className="flex-none text-[#4a2fb8]">{item.icon}</span>
+              <span className="min-w-0">
+                <strong className="block">{t(`share.${item.key}.title`)}</strong>
+                <span className="block text-[13px] text-[#5f5e7a]">{t(`share.${item.key}.text`)}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

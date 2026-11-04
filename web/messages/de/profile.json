@@ -280,9 +280,9 @@
       "one": "Teil I",
       "two": "Teil II",
       "three": "Teil III",
-      "oneTitle": "Wer du bist",
+      "oneTitle": "Wie du arbeitest",
       "twoTitle": "Was du mitbringst",
-      "threeTitle": "Was dich antreibt"
+      "threeTitle": "Wohin du willst"
     },
     "sections": {
       "step": "Abschnitt {index}",
@@ -584,7 +584,14 @@
         "have": "{name}: Du kannst dein Bild davon jederzeit ergänzen. Es sieht nur, wen du freigibst.",
         "unnamed": "Dein Vorhaben",
         "create": "Vorhaben anlegen",
-        "open": "Ansehen"
+        "open": "Ansehen",
+        "themes": {
+          "time": "Zeit",
+          "money": "Geld",
+          "decisions": "Entscheidungen",
+          "goals": "Ziele",
+          "limits": "Grenzen"
+        }
       },
       "share": {
         "title": "Wer sieht was",
@@ -601,7 +608,36 @@
           "title": "Advisor",
           "text": "Nur wen du einlädst"
         }
+      },
+      "editProfile": "Profil bearbeiten",
+      "glanceEyebrow": "Kurzfassung",
+      "glanceTitle": "Auf einen Blick",
+      "glanceNote": "Aus deinen eigenen Antworten, ohne KI und ohne Wertung",
+      "status": {
+        "ready": "✓ Steht",
+        "open": "Noch offen",
+        "areas": "✓ {count, plural, one {# Bereich} other {# Bereiche}}",
+        "answered": "✓ Beantwortet"
+      },
+      "readInReport": "Im Bericht lesen ↓",
+      "extrasLabel": "Dazu, wenn du magst",
+      "extras": {
+        "strengths": "Stärken",
+        "strengthsCount": "Stärken · {count}",
+        "direction": "Was dich antreibt",
+        "directionOpen": "Was dich antreibt · offen",
+        "background": "Hintergrund & Netzwerk",
+        "questionnaires": "Alle Fragebögen"
       }
+    },
+    "report": {
+      "jump": "Weiter zum ausführlichen Bericht",
+      "eyebrow": "Ausführlich",
+      "title": "Dein Bericht",
+      "parts": "in drei Teilen",
+      "contents": "Inhalt",
+      "appendixLink": "Anhang: wer was sieht, Methodik, frühere Fassungen",
+      "appendix": "Anhang"
     }
   },
   "welcomeLetter": {
