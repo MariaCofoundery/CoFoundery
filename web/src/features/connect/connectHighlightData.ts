@@ -181,23 +181,26 @@ export async function getConnectHighlights(
       isOwn: owner.user_id === currentUserId, disclosure: "none", note: null });
   }
 
-  // ERST DIE PLAETZE, DANN ZUFALL. Hoechstens eine Empfehlung und eine
-  // Anzeige, der Rest bleibt Zufall - ein Platz verdraengt also nie alles.
-  // Die Besitzer der Plaetze werden aus dem Zufall herausgenommen, damit
-  // niemand zweimal in einer Reihe steht. Gemischt wird zum Schluss: Die
-  // Reihenfolge ist keine Rangfolge, auch fuer eine Anzeige nicht.
-  const placed = pickPlacements(
-    placements.flatMap((row) => {
-      const highlight = placementToHighlight(row, profileByUserId, currentUserId);
-      return highlight ? [highlight] : [];
-    }),
-    limit
-  );
+  // ERST DIE PLAETZE, DANN ZUFALL. Seit 04.11.2026 (gemeldet von Maria:
+  // "wenn ich mehrere highlighte mit empfohlen von Maria, sind die trotzdem
+  // als zufaellig ausgewaehlt markiert"): Empfehlungen fuellen die Plaetze,
+  // hoechstens eine Anzeige kommt dazu, der Zufall fuellt den Rest. Die
+  // Besitzer der Plaetze werden aus dem Zufall herausgenommen, damit niemand
+  // zweimal in einer Reihe steht. Gemischt wird zum Schluss: Die Reihenfolge
+  // ist keine Rangfolge, auch fuer eine Anzeige nicht.
+  const placementHighlights = placements.flatMap((row) => {
+    const highlight = placementToHighlight(row, profileByUserId, currentUserId);
+    return highlight ? [highlight] : [];
+  });
+  const placed = pickPlacements(placementHighlights, limit);
   const placedOwners = new Set(placed.flatMap((highlight) => highlight.person ? [highlight.person.user_id] : []));
   const chosen = orderHighlights([
     ...placed,
     ...pickAcrossKinds(
-      candidates.filter((candidate) => !candidate.person || !placedOwners.has(candidate.person.user_id)),
+      labelPlacedCandidates(
+        candidates.filter((candidate) => !candidate.person || !placedOwners.has(candidate.person.user_id)),
+        placementHighlights
+      ),
       limit - placed.length
     ),
   ]);
@@ -258,23 +261,46 @@ function placementToHighlight(
 }
 
 /**
- * Hoechstens eine Empfehlung und eine Anzeige, jeweils zufaellig unter den
- * laufenden, und nie zwei Karten desselben Menschen.
+ * Die Plaetze der Verwaltung: Empfehlungen fuellen die Plaetze (angepinnte zuerst, sonst gelost),
+ * hoechstens eine Anzeige kommt dazu - und nie zwei Karten desselben Menschen.
+ *
+ * Bis 04.11.2026 hoechstens EINE Empfehlung: Weitere empfohlene Eintraege konnten nur noch ueber den
+ * Zufall erscheinen und trugen dann "Zufällig ausgewählt".
  *
  * Exportiert, damit der Test die Regel ausfuehren kann.
  */
 export function pickPlacements(placed: ConnectHighlight[], limit: number) {
   const chosen: ConnectHighlight[] = [];
   const owners = new Set<string>();
-  for (const disclosure of ["editorial", "sponsored"] as const) {
-    if (chosen.length >= limit) break;
-    const pool = placed.filter((highlight) => highlight.disclosure === disclosure);
-    // Eine angepinnte Empfehlung gewinnt vor dem Zufall, sonst wird gelost.
-    const next = [...pool.filter((highlight) => highlight.pinned), ...shuffle(pool.filter((highlight) => !highlight.pinned))]
-      .find((highlight) => highlight.person && !owners.has(highlight.person.user_id));
-    if (next?.person) { owners.add(next.person.user_id); chosen.push(next); }
+  const take = (highlight: ConnectHighlight | undefined) => {
+    if (!highlight?.person || owners.has(highlight.person.user_id) || chosen.length >= limit) return false;
+    owners.add(highlight.person.user_id);
+    chosen.push(highlight);
+    return true;
+  };
+  const editorial = placed.filter((highlight) => highlight.disclosure === "editorial");
+  const pinned = editorial.filter((highlight) => highlight.pinned);
+  const others = shuffle(editorial.filter((highlight) => !highlight.pinned));
+  // Eine angepinnte Empfehlung steht immer da.
+  for (const highlight of pinned) take(highlight);
+  // Hoechstens eine Anzeige.
+  for (const highlight of shuffle(placed.filter((entry) => entry.disclosure === "sponsored"))) {
+    if (take(highlight)) break;
   }
+  for (const highlight of others) take(highlight);
   return chosen;
+}
+
+/**
+ * Ein Eintrag mit laufendem Platz traegt dessen Kennzeichnung auch dann, wenn ihn der Zufall zieht -
+ * eine Empfehlung bleibt eine Empfehlung, und eine Anzeige ist nie "zufällig ausgewählt".
+ */
+export function labelPlacedCandidates(candidates: ConnectHighlight[], placements: ConnectHighlight[]) {
+  const byItem = new Map(placements.map((placement) => [`${placement.kind}:${placement.id}`, placement]));
+  return candidates.map((candidate) => {
+    const placement = byItem.get(`${candidate.kind}:${candidate.id}`);
+    return placement ? { ...candidate, disclosure: placement.disclosure, note: placement.note, pinned: placement.pinned } : candidate;
+  });
 }
 
 /**

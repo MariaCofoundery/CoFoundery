@@ -914,7 +914,7 @@
     "yours": "Yours",
     "subtitle": "Three spots currently shown in the network. Each one says why it is here.",
     "howTitle": "How highlights are chosen",
-    "how": "Three spots. We can recommend an entry ourselves, one spot can be paid for and is then marked as an ad. All others are drawn at random. Only entries that are published and whose owner has explicitly agreed to it are shown.",
+    "how": "Three spots. We can recommend entries ourselves, one spot can be paid for and is then marked as an ad. Free spots are drawn at random. Only entries that are published and whose owner has explicitly agreed to it are shown.",
     "disclosureMeta": {
       "none": "Random",
       "editorial": "From the platform",
@@ -1042,7 +1042,7 @@
   "highlightAdmin": {
     "back": "Back to the admin area",
     "title": "Manage highlights",
-    "intro": "Here you decide which entries are highlighted on the Connect overview. There are three spots; one recommendation and one ad can be among them, the rest is drawn at random. Each card says why it is there.",
+    "intro": "Here you decide which entries are highlighted on the Connect overview. There are three spots: recommendations fill them first (a pinned one always comes first), one ad can be added, free spots are drawn at random. Each card says why it is there.",
     "newTitle": "Assign a new spot",
     "link": "Link to the entry",
     "linkHint": "Open the entry in Connect and copy the address from the browser. Works for requests, offers, companies, profiles and problems.",

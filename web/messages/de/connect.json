@@ -914,7 +914,7 @@
     "yours": "Von dir",
     "subtitle": "Drei Plätze, die gerade im Netzwerk gezeigt werden. Bei jedem steht, warum er hier ist.",
     "howTitle": "Wie Highlights entstehen",
-    "how": "Drei Plätze. Wir können einen Eintrag selbst empfehlen, ein Platz kann bezahlt sein und ist dann als Anzeige gekennzeichnet. Alle übrigen werden zufällig gezogen. Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in dem ausdrücklich zugestimmt hat.",
+    "how": "Drei Plätze. Wir können Einträge selbst empfehlen, ein Platz kann bezahlt sein und ist dann als Anzeige gekennzeichnet. Freie Plätze werden zufällig gezogen. Gezeigt wird nur, was veröffentlicht ist und wessen Besitzer:in dem ausdrücklich zugestimmt hat.",
     "disclosureMeta": {
       "none": "Per Zufall",
       "editorial": "Von der Plattform",
@@ -1042,7 +1042,7 @@
   "highlightAdmin": {
     "back": "Zurück zum Admin-Bereich",
     "title": "Highlights verwalten",
-    "intro": "Hier legst du fest, welche Einträge auf der Connect-Übersicht hervorgehoben werden. Drei Plätze gibt es; eine Empfehlung und eine Anzeige können dabei sein, der Rest wird zufällig gezogen. Jede Karte sagt, warum sie dort steht.",
+    "intro": "Hier legst du fest, welche Einträge auf der Connect-Übersicht hervorgehoben werden. Drei Plätze gibt es: Empfehlungen füllen sie zuerst (eine angepinnte steht immer vorn), dazu kann eine Anzeige kommen, freie Plätze werden zufällig gezogen. Jede Karte sagt, warum sie dort steht.",
     "newTitle": "Neuen Platz vergeben",
     "link": "Link zum Eintrag",
     "linkHint": "Öffne den Eintrag in Connect und kopiere die Adresse aus dem Browser. Es geht für Gesuche, Angebote, Unternehmen, Profile und Probleme.",
