@@ -66,6 +66,9 @@ const EXPORTED_TABLES = [
   // Teamraum-Chat (seit 20270318120000): eigene Nachrichten und Gelesen-Staende.
   { table: "advisor_org_chat_messages", column: "author_user_id" },
   { table: "advisor_org_chat_reads", column: "user_id" },
+  // Social-Media-Kalender (seit 20270319120000): angelegte Postings und Kampagnen.
+  { table: "advisor_org_posts", column: "created_by_user_id" },
+  { table: "advisor_org_campaigns", column: "created_by_user_id" },
   // Foerderauflagen (seit 20270314120000): angelegte Foerderungen, Auflagen, Nachweise und festgehaltene Staende.
   { table: "advisor_org_grants", column: "created_by_user_id" },
   { table: "advisor_org_requirements", column: "created_by_user_id" },

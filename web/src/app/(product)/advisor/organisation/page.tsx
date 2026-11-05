@@ -14,6 +14,9 @@ import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgT
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
 import { OrgChatList } from "@/features/advisor/OrgChatList";
+import { SocialCalendar } from "@/features/advisor/SocialCalendar";
+import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts } from "@/features/advisor/socialCalendarData";
+import { isChannel, monthGrid, monthOf } from "@/features/advisor/socialCalendarModel";
 import { listMyOrgChats } from "@/features/advisor/orgChatData";
 import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
@@ -45,7 +48,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "social", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -56,7 +59,7 @@ type Tab = (typeof TABS)[number];
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "plan", "report", "funding"] },
   // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
-  { key: "team", tabs: ["week", "tasks", "chat", "pages", "who"] },
+  { key: "team", tabs: ["week", "tasks", "chat", "social", "pages", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -79,7 +82,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string; chatError?: string; month?: string; channel?: string; post?: string; newPost?: string; event?: string; socialError?: string; socialSaved?: string; socialDeleted?: string; socialCreated?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -146,7 +149,7 @@ export default async function AdvisorOrganisationPage({
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
-    tab === "plan" || tab === "week" || tab === "tasks" || tab === "pages" ? listProgramEvents(client, org.id) : Promise.resolve([]),
+    tab === "plan" || tab === "week" || tab === "tasks" || tab === "pages" || tab === "social" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -321,6 +324,40 @@ export default async function AdvisorOrganisationPage({
             newGrant={query.newGrant === "1"}
           />
         ) : null}
+        {tab === "social" ? await (async () => {
+          const today = new Date().toISOString().slice(0, 10);
+          const month = monthOf(query.month, today);
+          const grid = monthGrid(month);
+          const [posts, eventPosts, campaigns, selected] = await Promise.all([
+            listOrgPosts(client, org.id, grid[0][0].day, grid[grid.length - 1][6].day),
+            listOrgEventPosts(client, org.id),
+            listOrgCampaigns(client, org.id),
+            /^[0-9a-f-]{36}$/.test(query.post ?? "") ? getOrgPost(client, org.id, query.post as string) : Promise.resolve(null),
+          ]);
+          return (
+            <SocialCalendar
+              ctx={{
+                orgId: org.id,
+                me: user.id,
+                isOwner,
+                canWrite: org.status === "active",
+                today,
+                month,
+                locale: getPresentationLocale(await getLocale()),
+                members: members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed") })),
+                events: planEvents.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt })),
+                posts,
+                eventPosts,
+                campaigns,
+                channel: isChannel(query.channel) ? query.channel : null,
+                feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
+              }}
+              selected={selected}
+              newDay={selected ? null : /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? (query.newPost as string) : null}
+              newEvent={/^[0-9a-f-]{36}$/.test(query.event ?? "") ? (query.event as string) : null}
+            />
+          );
+        })() : null}
         {tab === "chat" ? (
           <OrgChatList
             orgId={org.id}
