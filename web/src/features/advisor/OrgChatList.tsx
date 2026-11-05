@@ -64,10 +64,7 @@ export async function OrgChatList({
   return (
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-950">{t("listTitle")}</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("listText")}</p>
-        </div>
+        <p className="max-w-2xl text-[15px] leading-6 text-slate-700">{t("listText")}</p>
         <QuietQuickSwitch paused={quiet.pausedUntil !== null} back={teamraumHref("chat", orgId)} compact />
       </div>
       {quiet.quietNow ? <p role="status" className="rounded-xl bg-sky-50 px-4 py-2.5 text-sm text-sky-900">{t("quietNow")}</p> : null}
@@ -82,7 +79,7 @@ export async function OrgChatList({
       </form>
       {query.trim().length >= 2 ? (
         <section aria-labelledby="chat-search-title" className="advisor-card p-4">
-          <h3 id="chat-search-title" className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("searchResults", { count: hits.length, query })}</h3>
+          <h3 id="chat-search-title" className="text-[13px] font-semibold text-slate-700">{t("searchResults", { count: hits.length, query })}</h3>
           {hits.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("searchNone")}</p> : null}
           <ul className="mt-2 divide-y divide-slate-100">
             {hits.map((hit) => (
@@ -129,11 +126,11 @@ export async function OrgChatList({
           <form action={createOrgChatGroupAction} className="mt-3 grid gap-3">
             <input type="hidden" name="orgId" value={orgId} />
             <label className="block max-w-sm">
-              <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupName")}</span>
+              <span className="block text-sm font-semibold text-slate-900">{t("groupName")}</span>
               <input name="name" required maxLength={80} placeholder={t("groupNamePlaceholder")} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />
             </label>
             <fieldset>
-              <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupMembers")}</legend>
+              <legend className="text-[13px] font-semibold text-slate-700">{t("groupMembers")}</legend>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {members.filter((member) => member.userId !== me).map((member) => (
                   <label key={member.userId} className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm has-[:checked]:border-violet-300 has-[:checked]:bg-violet-50">
@@ -151,7 +148,7 @@ export async function OrgChatList({
 
       {canWrite && startable.length > 0 ? (
         <section aria-labelledby="chat-new-title">
-          <h3 id="chat-new-title" className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("newDirect")}</h3>
+          <h3 id="chat-new-title" className="text-[13px] font-semibold text-slate-700">{t("newDirect")}</h3>
           <ul className="mt-2 flex flex-wrap gap-2">
             {startable.map((member) => (
               <li key={member.userId}>

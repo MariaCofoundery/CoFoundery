@@ -14,7 +14,7 @@ import { CHANNELS, CHANNEL_STYLE, suggestCampaign, type CalendarEvent, type Camp
  * Regeln im Browser, kein Dienst).
  */
 const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
+const LABEL = "block text-sm font-semibold text-slate-900";
 
 type Draft = CampaignSuggestion["posts"][number] & { key: number; include: boolean };
 

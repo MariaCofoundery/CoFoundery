@@ -41,6 +41,20 @@ const unbounded = localFont({
   display: "swap",
 });
 
+// Inter (SIL Open Font License 1.1, aus @fontsource/inter 5.3.0) fuer die Arbeitsbereiche - Teamraum und
+// Programm (Entwurf vom 05.11.2026): Listen, Formulare und Chat lesen sich ohne Serifen leichter. Lokal wie
+// die anderen beiden Schriften, damit kein Aufruf an einen Schriftendienst geht.
+const inter = localFont({
+  src: [
+    { path: "./fonts/inter-latin-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/inter-latin-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/inter-latin-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/inter-latin-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(getPublicAppOrigin() || DEFAULT_PUBLIC_APP_ORIGIN),
   title: `${PRODUCT_FULL_NAME} | Menschen, Fähigkeiten und Vorhaben zusammenbringen`,
@@ -181,7 +195,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     null;
 
   return (
-    <html lang={locale} className={`${spectral.variable} ${unbounded.variable}`}>
+    <html lang={locale} className={`${spectral.variable} ${unbounded.variable} ${inter.variable}`}>
       <body>
         <I18nProvider locale={locale} messages={messages}>
           <ProductShell

@@ -24,7 +24,7 @@ export function useDictationCopy(): DictationCopy {
   };
 }
 
-export function DictationButton({ dictation }: { dictation: DictationHandle }) {
+export function DictationButton({ dictation, inline = false }: { dictation: DictationHandle; inline?: boolean }) {
   const t = useTranslations("common.dictation");
   // "unknown" heisst: der Client hat noch nicht geprueft. Dann den Knopf
   // zeigen - ihn nachtraeglich einzublenden waere ein Sprung im Layout.
@@ -34,7 +34,8 @@ export function DictationButton({ dictation }: { dictation: DictationHandle }) {
     <button
       type="button"
       onClick={dictation.toggle}
-      className={`absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${
+      // inline: als eigener Knopf neben einem einzeiligen Feld (Teamraum "Diese Woche"), nicht ueber dem Feld.
+      className={`${inline ? "relative h-11 w-11 shrink-0 rounded-xl" : "absolute right-3 top-3 h-9 w-9 rounded-full"} inline-flex items-center justify-center border transition ${
         dictation.active
           ? "border-[color:var(--brand-primary)]/30 bg-[color:var(--brand-primary)]/10 text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
           : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"

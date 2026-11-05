@@ -28,7 +28,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -158,41 +158,48 @@ export default async function AdvisorOrganisationPage({
   })() : null;
 
   const tabLabels = t("orgPage.tabs").split(" | ");
+  const areaGroups = AREA_GROUPS.map((group, groupIndex) => ({
+    key: group.key,
+    label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
+    tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+  })).filter((group) => group.tabs.length > 0);
+  // Teams im Programm (Entwurf 05.11.2026): je Team der naechste Meilenstein und das letzte Update. Nur Teams, die
+  // diese Person sieht - die Abfragen laufen unter ihren Rechten.
+  const lastActivity: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null }> =
+    tab === "program"
+      ? await (async () => {
+          const today = new Date().toISOString().slice(0, 10);
+          const active = programs.filter((program) => program.isActive);
+          const [milestones, updates] = await Promise.all([
+            getOrgMilestoneDeadlines(client, org.id),
+            Promise.all(active.map(async (program) => [program.programId, (await listProgramUpdates(client, program.programId)).map((update) => update.submittedAt).sort().at(-1) ?? null] as const)),
+          ]);
+          return Object.fromEntries(
+            active.map((program) => {
+              const own = milestones.filter((entry) => entry.programId === program.programId).sort((x, y) => (x.dueOn < y.dueOn ? -1 : 1));
+              const next = own.find((entry) => entry.dueOn >= today) ?? own[0] ?? null;
+              return [program.programId, { milestone: next ? { title: next.title, dueOn: next.dueOn } : null, lastUpdate: updates.find(([id]) => id === program.programId)?.[1] ?? null }];
+            }),
+          );
+        })()
+      : {};
+  // Die Plaetze stehen seit dem Entwurf beim Reiter "Teams im Programm", nicht mehr im Kopf.
+  const seatsText = org.personSeatLimit === null ? t("orgPage.seatsOpen", { used: seatsUsed }) : t("orgPage.seatsLimited", { used: seatsUsed, limit: org.personSeatLimit });
   const activeMembers = members.filter((member) => member.status === "active").length;
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <AdvisorPageHeader
-        eyebrow={[t("eyebrow"), org.locationRegion, org.status === "suspended" ? t("orgPage.suspendedShort") : null].filter(Boolean).join(" · ")}
-        title={org.name}
-        action={
-          <span className="inline-flex rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">
-            {org.personSeatLimit === null
-              ? t("orgPage.seatsOpen", { used: seatsUsed })
-              : t("orgPage.seatsLimited", { used: seatsUsed, limit: org.personSeatLimit })}
-          </span>
-        }
-      >
-        {org.focus.length > 0 ? (
-          <ul aria-label={t("orgPage.focusLabel")} className="mb-4 flex flex-wrap gap-2">
-            {org.focus.map((entry) => (
-              <li key={entry} className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-indigo-100 ring-1 ring-white/15">
-                {entry}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <OrgAreaNav
-          ariaLabel={t("orgPage.tabsLabel")}
-          activeTab={tab}
-          groups={AREA_GROUPS.map((group, groupIndex) => ({
-            key: group.key,
-            label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
-            hint: t("orgPage.groupHints").split(" | ")[groupIndex] ?? "",
-            tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
-          })).filter((group) => group.tabs.length > 0)}
-        />
-      </AdvisorPageHeader>
+    <main className="work-ui mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      {/* Schmaler Kopf (Entwurf vom 05.11.2026): Ort und Schwerpunkte, Name, die drei Gruppen. Darunter die Reiter. */}
+      <header className="advisor-hero flex flex-col gap-4 rounded-[22px] px-6 py-5 sm:px-7 md:flex-row md:items-center md:justify-between">
+        <div className="relative z-10 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[.12em] text-indigo-200">
+            {[org.locationRegion, org.focus.join(", ") || null, org.status === "suspended" ? t("orgPage.suspendedShort") : null].filter(Boolean).join(" · ") || t("eyebrow")}
+          </p>
+          <h1 className="font-brand mt-1 break-words text-[28px] font-semibold leading-tight text-white sm:text-[30px]">{org.name}</h1>
+        </div>
+        <OrgAreaNav part="groups" ariaLabel={t("orgPage.tabsLabel")} activeTab={tab} groups={areaGroups} />
+      </header>
+      <OrgAreaNav part="tabs" ariaLabel={t("orgPage.tabsLabel")} activeTab={tab} groups={areaGroups} />
 
       {orgs.length > 1 ? (
         <nav aria-label={t("orgPage.orgSwitchLabel")} className="mt-4 flex flex-wrap gap-2">
@@ -429,7 +436,7 @@ export default async function AdvisorOrganisationPage({
               </p>
             ) : null}
             {query.teamRemoved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.teamRemoved")}</p> : null}
-            <OrgTeamProgramsSection part={tab === "enroll" ? "enroll" : "teams"} org={org} members={members} programs={programs} stars={programStars} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
+            <OrgTeamProgramsSection part={tab === "enroll" ? "enroll" : "teams"} seatsText={seatsText} lastActivity={lastActivity} org={org} members={members} programs={programs} stars={programStars} invites={invites} freshToken={query.programInvite ?? null} mailState={["sent", "failed", "invalid"].includes(query.programInviteMail ?? "") ? (query.programInviteMail as string) : null} inviteError={query.programInviteError === "limit" ? "limit" : null} codes={codes} codeError={query.programCodeError === "limit" ? "limit" : null} />
           </>
         ) : null}
       </div>

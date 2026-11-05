@@ -30,7 +30,7 @@ import {
 export type PagesFeedback = { error: string | null; saved: boolean; deleted: boolean; taskCreated: boolean };
 
 const CARD = "advisor-card";
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
+const LABEL = "block text-sm font-semibold text-slate-900";
 const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
 const CHIP = "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold";
 
@@ -302,7 +302,7 @@ export async function TeamraumPages({
       <div className="flex flex-wrap items-start gap-5">
         <nav aria-label={t("treeLabel")} className={`${CARD} w-full p-3 md:w-72 md:flex-none`}>
           <div className="flex items-center justify-between px-2 pb-2 pt-1">
-            <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("treeLabel")}</p>
+            <p className="text-[13px] font-semibold text-slate-700">{t("treeLabel")}</p>
             {ctx.canWrite ? (
               <Link href={href("pages", { newDoc: "1" })} aria-label={t("new")} className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-lg leading-none text-slate-700 hover:bg-slate-50">+</Link>
             ) : null}
@@ -325,7 +325,7 @@ export async function TeamraumPages({
           </ul>
           <div className="mt-3 border-t border-slate-100 pt-3">
             <div className="flex items-center justify-between px-2 pb-1">
-              <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("notesLabel")}</p>
+              <p className="text-[13px] font-semibold text-slate-700">{t("notesLabel")}</p>
               {ctx.canWrite ? (
                 <Link href={href("pages", { newDoc: "1", note: "1" })} aria-label={t("newNote")} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-base leading-none text-slate-700 hover:bg-slate-50">+</Link>
               ) : null}
@@ -343,7 +343,7 @@ export async function TeamraumPages({
             </ul>
           </div>
           <div className="mt-3 border-t border-slate-100 pt-3">
-            <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("templatesLabel")}</p>
+            <p className="px-2 pb-1 text-[13px] font-semibold text-slate-700">{t("templatesLabel")}</p>
             <ul className="grid gap-0.5">
               {templates.map((entry) => (
                 <li key={entry.id}>

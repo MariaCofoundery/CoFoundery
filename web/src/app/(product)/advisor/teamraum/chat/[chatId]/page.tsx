@@ -55,7 +55,7 @@ export default async function OrgChatPage({
   const here = teamraumChatHref(org.id, chat.id);
 
   return (
-    <main className="mx-auto flex h-[calc(100dvh-4.5rem)] w-full xl:h-[calc(100dvh-6.5rem)] max-w-3xl flex-col bg-slate-50/60 sm:border-x sm:border-slate-200">
+    <main className="work-ui mx-auto flex h-[calc(100dvh-4.5rem)] w-full xl:h-[calc(100dvh-6.5rem)] max-w-3xl flex-col bg-slate-50/60 sm:border-x sm:border-slate-200">
       <header className="flex items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-5">
         <Link href={listHref} aria-label={t("back")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-700 hover:bg-slate-100">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
@@ -92,11 +92,11 @@ export default async function OrgChatPage({
                 <input type="hidden" name="orgId" value={org.id} />
                 <input type="hidden" name="chatId" value={chat.id} />
                 <label className="block max-w-sm">
-                  <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupName")}</span>
+                  <span className="block text-sm font-semibold text-slate-900">{t("groupName")}</span>
                   <input name="name" required maxLength={80} defaultValue={chat.name ?? ""} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />
                 </label>
                 <fieldset>
-                  <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupMembers")}</legend>
+                  <legend className="text-sm font-semibold text-slate-900">{t("groupMembers")}</legend>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {members.filter((member) => member.status === "active").map((member) => (
                       <label key={member.userId} className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm has-[:checked]:border-violet-300 has-[:checked]:bg-violet-50">

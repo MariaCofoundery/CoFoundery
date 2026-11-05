@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DictationBadge, DictationButton, DictationMessage, useDictationCopy } from "@/features/dictation/DictationControls";
 import { useDictation } from "@/features/dictation/useDictation";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -14,8 +14,8 @@ import { suggestTasks, type DictationMember, type DictationProgram, type TaskSug
  * aendern oder abwaehlen; erst "Anlegen" schreibt - ueber dieselbe Datenbankfunktion wie jede Aufgabe.
  */
 
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
-const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
+const LABEL = "block text-sm font-semibold text-slate-900";
+const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px]";
 
 type Draft = TaskSuggestion & { key: number; include: boolean };
 
@@ -26,6 +26,8 @@ export function DictateTasks({
   today,
   members,
   programs,
+  variant = "block",
+  moreHref,
 }: {
   orgId: string;
   tab: "week" | "tasks";
@@ -33,6 +35,9 @@ export function DictateTasks({
   today: string;
   members: DictationMember[];
   programs: DictationProgram[];
+  /** "line": eine Zeile mit Mikrofon und "Anlegen" (Diese Woche, Entwurf 05.11.2026). Gespeichert wird erst nach dem Vorschlag. */
+  variant?: "block" | "line";
+  moreHref?: string;
 }) {
   const t = useTranslations("advisor.teamraum.dictate");
   const locale = useLocale();
@@ -40,6 +45,15 @@ export function DictateTasks({
   const [text, setText] = useState("");
   const [drafts, setDrafts] = useState<Draft[] | null>(null);
   const dictation = useDictation({ value: text, onChange: setText, locale, copy });
+  // Am Telefon passt das Beispiel nicht in die Zeile - dort nur "Neue Aufgabe …".
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 639px)");
+    const update = () => setNarrow(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
 
   const recognize = () => {
     setDrafts(suggestTasks(text, { me, members, programs, today }).map((suggestion, index) => ({ ...suggestion, key: index, include: true })));
@@ -47,8 +61,43 @@ export function DictateTasks({
   const change = (key: number, patch: Partial<Draft>) => setDrafts((current) => current?.map((draft) => (draft.key === key ? { ...draft, ...patch } : draft)) ?? null);
   const chosen = (drafts ?? []).filter((draft) => draft.include && draft.title.trim().length > 0);
 
+  const input = variant === "line" ? (
+    <>
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white py-1.5 pl-4 pr-1.5 shadow-sm focus-within:border-violet-400">
+        <span aria-hidden="true" className="text-xl font-semibold text-violet-600">+</span>
+        <label htmlFor={`dictate-${tab}`} className="sr-only">{t("lineLabel")}</label>
+        <input
+          id={`dictate-${tab}`}
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && text.trim().length >= 3) {
+              event.preventDefault();
+              recognize();
+            }
+          }}
+          maxLength={4000}
+          placeholder={narrow ? t("linePlaceholderShort") : t("linePlaceholder")}
+          className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-slate-950 outline-none placeholder:text-slate-500"
+        />
+        <DictationButton dictation={dictation} inline />
+        <button type="button" onClick={recognize} disabled={text.trim().length < 3} className="brand-cta inline-flex min-h-11 shrink-0 items-center rounded-xl px-4 text-sm font-semibold sm:px-5">
+          {t("lineAdd")}
+        </button>
+      </div>
+      <DictationBadge dictation={dictation} />
+      <DictationMessage dictation={dictation} />
+      <p className="px-1 text-[13px] leading-5 text-slate-600">
+        {t("lineHint")}{" "}
+        {moreHref ? <a href={moreHref} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("lineMore")}</a> : null}
+      </p>
+    </>
+  ) : null;
+
   return (
-    <div className="grid gap-3">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
+      {input}
+      {variant === "line" ? null : (<>
       <div className="relative">
         <label htmlFor={`dictate-${tab}`} className="sr-only">{t("label")}</label>
         <textarea
@@ -68,8 +117,9 @@ export function DictateTasks({
         <button type="button" onClick={recognize} disabled={text.trim().length < 3} className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 bg-white px-4 text-sm font-semibold text-violet-800 hover:bg-violet-50 disabled:opacity-50">
           {t("recognize")}
         </button>
-        <span className="text-xs text-slate-500">{t("hint")}</span>
+        <span className="text-[13px] text-slate-600">{t("hint")}</span>
       </div>
+      </>)}
 
       {drafts !== null ? (
         drafts.length === 0 ? (

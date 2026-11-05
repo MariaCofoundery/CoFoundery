@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { ChipChoice } from "@/features/ui/ChipChoice";
 import { UserText } from "@/features/ui/UserText";
 import { DictateTasks } from "@/features/advisor/DictateTasks";
 import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
@@ -65,20 +66,28 @@ export type TeamraumContext = {
   feedback: { error: string | null; saved: boolean; deleted: boolean; created: number | null };
 };
 
-const CARD = "advisor-card p-5 sm:p-6";
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
-const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
+// Entwurf vom 05.11.2026: weisse Flaechen mit feiner Linie, Feldnamen normal geschrieben und dunkel.
+const CARD = "rounded-[18px] border border-slate-200 bg-white p-5 sm:p-6";
+const LABEL = "block text-sm font-semibold text-slate-900";
+const INPUT = "mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px]";
 const PRIMARY = "brand-cta inline-flex min-h-11 w-fit items-center rounded-xl px-5 text-sm font-semibold";
 const QUIET = "inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-50";
 const CHIP = "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold";
 const TONES = ["bg-violet-100 text-violet-800", "bg-teal-100 text-teal-800", "bg-pink-100 text-pink-800", "bg-sky-100 text-sky-800", "bg-amber-100 text-amber-900", "bg-emerald-100 text-emerald-800"];
 const NEXT: Record<TaskStatus, TaskStatus> = { open: "doing", doing: "done", waiting: "doing", done: "open" };
-const COLUMN_TONE: Record<TaskStatus, string> = { open: "bg-indigo-50/70", doing: "bg-violet-50/80", waiting: "bg-amber-50/70", done: "bg-emerald-50/70" };
+const STATUS_DOT: Record<TaskStatus, string> = { open: "bg-slate-400", doing: "bg-blue-600", waiting: "bg-amber-600", done: "bg-emerald-700" };
 
 const toneOf = (userId: string) => TONES[[...userId].reduce((sum, char) => sum + char.charCodeAt(0), 0) % TONES.length];
-const initialOf = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
+const initialOf = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0] ?? "")
+    .join("")
+    .toUpperCase() || "?";
 
-export function Avatar({ userId, name, size = "h-7 w-7 text-xs" }: { userId: string; name: string; size?: string }) {
+export function Avatar({ userId, name, size = "h-7 w-7 text-[11px]" }: { userId: string; name: string; size?: string }) {
   return (
     <span title={name} aria-hidden="true" className={`inline-grid shrink-0 place-items-center rounded-full font-semibold ${size} ${toneOf(userId)}`}>
       {initialOf(name)}
@@ -128,52 +137,74 @@ async function Feedback({ ctx }: { ctx: TeamraumContext }) {
   return null;
 }
 
-/** Das Formular fuer neue und bestehende Aufgaben. "quick" zeigt nur, was man beim schnellen Eintragen braucht. */
-async function TaskForm({ ctx, tab, filter, task, quick = false }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; quick?: boolean }) {
+/** Tage fuer die Knoepfe "Heute, Morgen, Freitag, Naechste Woche" - doppelte fallen weg. */
+function dueChoices(today: string, t: (key: string) => string) {
+  const weekday = new Date(`${today}T00:00:00Z`).getUTCDay();
+  const friday = addDays(today, (5 - weekday + 7) % 7 || 7);
+  const monday = addDays(today, (8 - weekday) % 7 || 7);
+  const seen = new Set<string>();
+  return [
+    { value: today, label: t("form.today") },
+    { value: addDays(today, 1), label: t("form.tomorrow") },
+    { value: friday, label: t("form.friday") },
+    { value: monday, label: t("form.nextWeek") },
+  ].filter((choice) => (seen.has(choice.value) ? false : (seen.add(choice.value), true)));
+}
+
+/** Das Formular fuer neue und bestehende Aufgaben: das Noetige vorn, Beschreibung, Checkliste und Veranstaltung auf Wunsch. */
+async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; cancelHref?: string }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf } = helpers(ctx);
   // Ein Startup verknuepfen kann man nur mit Teams, die man sieht. Eine bestehende fremde Verknuepfung bleibt still erhalten.
   const keepsHiddenProgram = Boolean(task?.programId && !ctx.programs.some((program) => program.programId === task.programId));
   const upcoming = ctx.events.filter((event) => event.startsAt.slice(0, 10) >= addDays(ctx.today, -14) || event.eventId === task?.eventId);
+  const people = [
+    ...ctx.members.filter((member) => member.isSelf).map((member) => ({ value: member.userId, label: t("form.meShort") })),
+    ...ctx.members.filter((member) => !member.isSelf).map((member) => ({ value: member.userId, label: member.name })),
+    { value: "", label: t("form.nobodyYet") },
+  ];
+  const hasMore = Boolean(task && (task.details || task.checklist.length > 0 || task.eventId || task.status !== "open"));
   return (
-    <form action={saveOrgTaskAction} className={quick ? "grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end" : "grid gap-4"}>
+    <form action={saveOrgTaskAction} className="grid gap-5">
       <Hidden ctx={ctx} tab={tab} filter={filter} taskId={task?.id} />
-      <label className={quick ? "" : "block"}>
-        <span className={LABEL}>{t("form.title")}</span>
-        <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} placeholder={quick ? t("form.quickPlaceholder") : undefined} className={INPUT} disabled={!ctx.canWrite} />
+      <label className="block">
+        <span className={LABEL}>{t("form.titleQuestion")}</span>
+        <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} className={INPUT} disabled={!ctx.canWrite} />
       </label>
-      <div className={quick ? "contents" : "grid gap-4 sm:grid-cols-2"}>
-        <label>
-          <span className={LABEL}>{t("form.assignee")}</span>
-          <select name="assignee" defaultValue={task ? task.assigneeUserId ?? "" : ctx.me} className={INPUT} disabled={!ctx.canWrite}>
-            <option value="">{t("nobody")}</option>
-            {ctx.members.map((member) => (
-              <option key={member.userId} value={member.userId}>{member.isSelf ? t("me", { name: member.name }) : member.name}</option>
+      <div>
+        <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
+        {people.length <= 7 ? (
+          <ChipChoice name="assignee" label={t("form.assigneeQuestion")} options={people} defaultValue={task ? task.assigneeUserId ?? "" : ctx.me} disabled={!ctx.canWrite} />
+        ) : (
+          <select name="assignee" aria-label={t("form.assigneeQuestion")} defaultValue={task ? task.assigneeUserId ?? "" : ctx.me} className={INPUT} disabled={!ctx.canWrite}>
+            {people.map((person) => <option key={person.value || "nobody"} value={person.value}>{person.label}</option>)}
+          </select>
+        )}
+      </div>
+      <div>
+        <span className={`${LABEL} mb-2`}>{t("form.dueQuestion")}</span>
+        <ChipChoice name="dueOn" label={t("form.dueQuestion")} options={dueChoices(ctx.today, t)} defaultValue={task?.dueOn ?? ""} allowEmpty customDate={{ label: t("form.pickDate"), inputLabel: t("form.due") }} disabled={!ctx.canWrite} />
+      </div>
+      <label className="block">
+        <span className={LABEL}>{t("form.program")}</span>
+        {keepsHiddenProgram ? (
+          <>
+            <input type="hidden" name="programId" value={task?.programId ?? ""} />
+            <span className="mt-1 flex min-h-11 items-center text-sm text-slate-600">{t("hiddenProgram")}</span>
+          </>
+        ) : (
+          <select name="programId" defaultValue={task?.programId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
+            <option value="">{t("form.internal")}</option>
+            {ctx.programs.map((program) => (
+              <option key={program.programId} value={program.programId}>{program.name}</option>
             ))}
           </select>
-        </label>
-        <label>
-          <span className={LABEL}>{t("form.due")}</span>
-          <input type="date" name="dueOn" defaultValue={task?.dueOn ?? ""} className={INPUT} disabled={!ctx.canWrite} />
-        </label>
-        <label>
-          <span className={LABEL}>{t("form.program")}</span>
-          {keepsHiddenProgram ? (
-            <>
-              <input type="hidden" name="programId" value={task?.programId ?? ""} />
-              <span className="mt-1 flex min-h-11 items-center text-sm text-slate-600">{t("hiddenProgram")}</span>
-            </>
-          ) : (
-            <select name="programId" defaultValue={task?.programId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
-              <option value="">{t("form.internal")}</option>
-              {ctx.programs.map((program) => (
-                <option key={program.programId} value={program.programId}>{program.name}</option>
-              ))}
-            </select>
-          )}
-        </label>
-        {!quick ? (
-          <>
+        )}
+      </label>
+      <details open={hasMore} className="group">
+        <summary className="flex min-h-10 w-fit cursor-pointer list-none items-center text-[15px] font-medium text-violet-800 group-open:hidden">{t("form.more")}</summary>
+        <div className="grid gap-5">
+          <div className="grid gap-5 sm:grid-cols-2">
             <label>
               <span className={LABEL}>{t("form.event")}</span>
               <select name="eventId" defaultValue={task?.eventId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
@@ -191,31 +222,30 @@ async function TaskForm({ ctx, tab, filter, task, quick = false }: { ctx: Teamra
                 ))}
               </select>
             </label>
-          </>
-        ) : null}
-      </div>
-      {!quick ? (
-        <>
+          </div>
           <label className="block">
             <span className={LABEL}>{t("form.details")}</span>
             <textarea name="details" rows={4} maxLength={4000} defaultValue={task?.details ?? ""} className={`${INPUT} py-2`} disabled={!ctx.canWrite} />
-            <span className="mt-1 block text-xs text-slate-500">{t("form.detailsHint")}</span>
+            <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.detailsHint")}</span>
           </label>
           <label className="block">
             <span className={LABEL}>{t("form.checklist")}</span>
-            <textarea name="checklist" rows={4} defaultValue={task ? checklistToText(task.checklist) : ""} className={`${INPUT} py-2 font-mono text-[13px]`} disabled={!ctx.canWrite} />
-            <span className="mt-1 block text-xs text-slate-500">{t("form.checklistHint")}</span>
+            <textarea name="checklist" rows={4} defaultValue={task ? checklistToText(task.checklist) : ""} className={`${INPUT} py-2`} disabled={!ctx.canWrite} />
+            <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.checklistHint")}</span>
           </label>
-        </>
-      ) : (
-        <input type="hidden" name="status" value="open" />
-      )}
-      {ctx.canWrite ? <SubmitButton label={task ? t("form.save") : t("form.add")} pendingLabel="…" className={PRIMARY} /> : null}
+        </div>
+      </details>
+      {ctx.canWrite ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <SubmitButton label={task ? t("form.save") : t("form.add")} pendingLabel="…" className={`${PRIMARY} max-md:min-h-[52px] max-md:w-full max-md:justify-center max-md:text-base`} />
+          {cancelHref ? <Link href={cancelHref} className="inline-flex min-h-11 items-center px-2 text-[15px] text-slate-600 underline-offset-4 hover:underline">{t("form.cancel")}</Link> : null}
+        </div>
+      ) : null}
     </form>
   );
 }
 
-async function TaskCard({ ctx, task, filter, selected }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; selected: boolean }) {
+async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; selected: boolean; back: Record<string, string> }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf, memberOf, programOf, eventOf, href } = helpers(ctx);
   const assignee = memberOf(task.assigneeUserId);
@@ -224,36 +254,37 @@ async function TaskCard({ ctx, task, filter, selected }: { ctx: TeamraumContext;
   const progress = checklistProgress(task);
   const overdue = isOverdue(task, ctx.today);
   return (
-    <article className={`advisor-card grid gap-2 p-3.5 ${selected ? "ring-2 ring-violet-500" : ""} ${task.status === "done" ? "opacity-75" : ""} ${!task.assigneeUserId && task.status !== "done" ? "border-dashed" : ""}`}>
-      <Link href={`${href("tasks", { ...(filter !== "all" ? { filter } : {}), task: task.id })}#task-detail`} className={`text-[15px] font-semibold leading-6 text-slate-950 underline-offset-4 hover:underline ${task.status === "done" ? "line-through" : ""}`}>
-        {task.title}
-      </Link>
-      <div className="flex flex-wrap gap-1.5">
-        {task.programId ? <span className={`${CHIP} bg-violet-100 text-violet-800`}>{program?.name ?? t("hiddenProgram")}</span> : <span className={`${CHIP} bg-sky-100 text-sky-800`}>{t("internal")}</span>}
-        {event ? <span className={`${CHIP} bg-amber-100 text-amber-900`}>{event.title}</span> : null}
-        {task.pageId && ctx.pageTitles.has(task.pageId) ? (
-          <Link href={href("pages", { doc: task.pageId })} className={`${CHIP} bg-pink-100 text-pink-800 underline-offset-4 hover:underline`}>{ctx.pageTitles.get(task.pageId)}</Link>
-        ) : null}
-        {task.dueOn ? <span className={`${CHIP} ${overdue ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}`}>{overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : t("dueOn", { date: dayOf(task.dueOn) })}</span> : null}
+    <article className={`grid gap-2 rounded-[14px] border bg-white px-3.5 py-3 ${selected ? "border-violet-400 ring-2 ring-violet-200" : "border-slate-200"} ${task.status === "done" ? "opacity-75" : ""}`}>
+      <h4 className="text-[14.5px] font-semibold leading-snug text-slate-950">
+        <Link href={`${href("tasks", { ...back, task: task.id })}#task-detail`} className={`underline-offset-4 hover:underline ${task.status === "done" ? "line-through" : ""}`}>{task.title}</Link>
+      </h4>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-slate-600">
+        {assignee ? (
+          <span className="inline-flex items-center gap-1.5"><Avatar userId={assignee.userId} name={assignee.name} size="h-[22px] w-[22px] text-[10px]" />{assignee.isSelf ? t("form.meShort") : assignee.name}</span>
+        ) : task.status !== "done" && ctx.canWrite ? (
+          <form action={takeOrgTaskAction}>
+            <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+            <SubmitButton label={t("take")} pendingLabel="…" className="inline-flex min-h-7 items-center rounded-full border border-dashed border-violet-300 bg-violet-50 px-2.5 text-xs font-semibold text-violet-800" />
+          </form>
+        ) : (
+          <span className="font-semibold text-amber-800">{t("nobody")}</span>
+        )}
+        {task.dueOn ? <span className={overdue ? "font-semibold text-rose-700" : ""}>{overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : dayOf(task.dueOn)}</span> : null}
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs text-slate-500">{progress.total > 0 ? t("checklistProgress", progress) : ""}</span>
-        <div className="flex items-center gap-1.5">
-          {!task.assigneeUserId && task.status !== "done" && ctx.canWrite ? (
-            <form action={takeOrgTaskAction}>
-              <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
-              <SubmitButton label={t("take")} pendingLabel="…" className="inline-flex min-h-9 items-center rounded-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50" />
-            </form>
-          ) : null}
-          {ctx.canWrite ? (
-            <form action={moveOrgTaskAction}>
-              <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
-              <input type="hidden" name="status" value={NEXT[task.status]} />
-              <SubmitButton label={t(`move.${task.status}`)} pendingLabel="…" className="inline-flex min-h-9 items-center rounded-full px-2.5 text-xs font-semibold text-violet-800 underline-offset-4 hover:underline" />
-            </form>
-          ) : null}
-          {assignee ? <Avatar userId={assignee.userId} name={assignee.name} /> : <span className="text-xs font-semibold text-amber-800">{t("nobody")}</span>}
-        </div>
+      <div className="flex flex-wrap items-center gap-1.5 text-[12.5px] text-slate-600">
+        <span className="inline-flex h-[22px] items-center rounded-full bg-slate-100 px-2 text-xs font-medium text-slate-700">{task.programId ? program?.name ?? t("hiddenProgram") : t("internal")}</span>
+        {event ? <span className="inline-flex h-[22px] items-center rounded-full bg-amber-50 px-2 text-xs font-medium text-amber-900">{event.title}</span> : null}
+        {task.pageId && ctx.pageTitles.has(task.pageId) ? (
+          <Link href={href("pages", { doc: task.pageId })} className="inline-flex h-[22px] items-center rounded-full bg-pink-50 px-2 text-xs font-medium text-pink-900 underline-offset-4 hover:underline">{ctx.pageTitles.get(task.pageId)}</Link>
+        ) : null}
+        {progress.total > 0 ? <span>☑ {progress.done}/{progress.total}</span> : null}
+        {ctx.canWrite ? (
+          <form action={moveOrgTaskAction} className="ml-auto">
+            <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+            <input type="hidden" name="status" value={NEXT[task.status]} />
+            <SubmitButton label={t(`move.${task.status}`)} pendingLabel="…" className="inline-flex min-h-7 items-center rounded-full px-1.5 text-xs font-semibold text-violet-800 underline-offset-4 hover:underline" />
+          </form>
+        ) : null}
       </div>
     </article>
   );
@@ -268,7 +299,7 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
     <section id="task-detail" aria-labelledby="task-detail-title" className={`${CARD} mt-6 scroll-mt-24 border-violet-200`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[.14em] text-violet-700">{t("detail.eyebrow")}</p>
+          <p className="text-[13px] font-semibold text-violet-800">{t("detail.eyebrow")}</p>
           <h2 id="task-detail-title" className="mt-1 text-xl font-semibold text-slate-950">{task.title}</h2>
           <p className="mt-1 text-xs text-slate-500">
             {t("detail.meta", { name: creator?.name ?? t("formerMember"), date: timeOf(task.createdAt) })}
@@ -310,7 +341,7 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
       ) : null}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-        <details className="rounded-2xl border border-slate-200 bg-white/70 p-4" open={ctx.feedback.error !== null}>
+        <details className="self-start rounded-2xl border border-slate-200 bg-white/70 p-4" open={ctx.feedback.error !== null}>
           <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">{t("detail.edit")}</summary>
           <div className="mt-3">
             <TaskForm ctx={ctx} tab="tasks" filter={filter} task={task} />
@@ -349,7 +380,7 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
                 <span className="sr-only">{t("detail.commentLabel")}</span>
                 <textarea name="body" required rows={2} maxLength={2000} placeholder={t("detail.commentPlaceholder")} className={`${INPUT} py-2`} />
               </label>
-              <SubmitButton label={t("detail.comment")} pendingLabel="…" className={QUIET} />
+              <SubmitButton label={t("detail.comment")} pendingLabel="…" className={`${QUIET} w-fit`} />
             </form>
           ) : null}
         </section>
@@ -370,49 +401,87 @@ export const TASK_VIEWS = ["board", "list", "calendar"] as const;
 export type TaskView = (typeof TASK_VIEWS)[number];
 export const taskViewOf = (value: unknown): TaskView => ((TASK_VIEWS as readonly unknown[]).includes(value) ? (value as TaskView) : "board");
 
-/** Aufgaben als Liste: nach Faelligkeit, Erledigtes eingeklappt darunter. */
-async function TaskList({ ctx, tasks, filter }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter }) {
+/** Aufgaben als Liste: am Rechner eine Tabelle nach Faelligkeit, am Telefon nach Stand gruppiert zum Aufklappen. */
+async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter; back: Record<string, string>; mobileOnly?: boolean }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf, memberOf, programOf, href } = helpers(ctx);
   const open = tasks.filter((task) => task.status !== "done").sort(byDue);
   const done = tasks.filter((task) => task.status === "done").sort((a, b) => ((a.doneAt ?? "") < (b.doneAt ?? "") ? 1 : -1)).slice(0, 30);
+  const link = (task: OrgTask) => `${href("tasks", { ...back, task: task.id })}#task-detail`;
   const row = (task: OrgTask) => {
     const assignee = memberOf(task.assigneeUserId);
     const overdue = isOverdue(task, ctx.today);
     return (
       <tr key={task.id} className="border-t border-slate-100">
-        <td className="py-2.5 pr-3">
-          <Link href={`${href("tasks", { view: "list", ...(filter !== "all" ? { filter } : {}), task: task.id })}#task-detail`} className={`font-medium text-slate-900 underline-offset-4 hover:underline ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</Link>
+        <td className="py-3 pr-3">
+          <Link href={link(task)} className={`font-medium text-slate-950 underline-offset-4 hover:underline ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</Link>
         </td>
-        <td className="py-2.5 pr-3"><span className={`${CHIP} ${COLUMN_TONE[task.status]} text-slate-800`}>{t(`status.${task.status}`)}</span></td>
-        <td className="py-2.5 pr-3 text-slate-700">{assignee ? assignee.name : <span className="font-semibold text-amber-800">{t("nobody")}</span>}</td>
-        <td className={`py-2.5 pr-3 ${overdue ? "font-semibold text-rose-700" : "text-slate-700"}`}>{task.dueOn ? dayOf(task.dueOn) : "–"}</td>
-        <td className="py-2.5 text-slate-600">{task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal")}</td>
+        <td className="py-3 pr-3"><span className="inline-flex items-center gap-2 text-slate-800"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[task.status]}`} />{t(`status.${task.status}`)}</span></td>
+        <td className="py-3 pr-3 text-slate-800">{assignee ? assignee.name : <span className="font-semibold text-amber-800">{t("nobody")}</span>}</td>
+        <td className={`py-3 pr-3 ${overdue ? "font-semibold text-rose-700" : "text-slate-800"}`}>{task.dueOn ? dayOf(task.dueOn) : "–"}</td>
+        <td className="py-3 text-slate-700">{task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal")}</td>
       </tr>
     );
   };
+  const mobileRow = (task: OrgTask, index: number) => {
+    const assignee = memberOf(task.assigneeUserId);
+    const overdue = isOverdue(task, ctx.today);
+    const team = task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal");
+    const due = task.dueOn ? (overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : dayOf(task.dueOn)) : null;
+    return (
+      <li key={task.id} className={index > 0 ? "border-t border-slate-100" : ""}>
+        <Link href={link(task)} className="flex min-h-14 items-center gap-3 px-4 py-3">
+          {assignee ? <Avatar userId={assignee.userId} name={assignee.name} size="h-[30px] w-[30px] text-[11px]" /> : <span aria-hidden="true" className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full border border-dashed border-slate-300 text-xs text-slate-500">?</span>}
+          <span className="min-w-0 flex-1">
+            <span className={`block text-[15px] font-medium text-slate-950 ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</span>
+            <span className={`mt-0.5 block text-[13px] ${overdue ? "text-rose-700" : "text-slate-600"}`}>{[due, team, assignee ? null : t("nobodyShort")].filter(Boolean).join(" · ")}</span>
+          </span>
+        </Link>
+      </li>
+    );
+  };
+  const groups = TASK_STATUSES.map((status) => ({ status, items: (status === "done" ? done : open.filter((task) => task.status === status)) }));
   return (
-    <div className="advisor-card mt-5 overflow-x-auto p-4">
-      <table className="w-full min-w-[640px] border-collapse text-sm">
-        <thead>
-          <tr className="text-left text-xs uppercase tracking-[.08em] text-slate-500">
-            <th className="py-2 pr-3 font-semibold">{t("list.task")}</th>
-            <th className="py-2 pr-3 font-semibold">{t("form.status")}</th>
-            <th className="py-2 pr-3 font-semibold">{t("form.assignee")}</th>
-            <th className="py-2 pr-3 font-semibold">{t("form.due")}</th>
-            <th className="py-2 font-semibold">{t("form.program")}</th>
-          </tr>
-        </thead>
-        <tbody>{open.map(row)}</tbody>
-      </table>
-      {open.length === 0 ? <p className="py-3 text-sm text-slate-600">{t("empty.open")}</p> : null}
-      {done.length > 0 ? (
-        <details className="mt-3">
-          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("list.done", { count: done.length })}</summary>
-          <table className="w-full min-w-[640px] border-collapse text-sm"><tbody>{done.map(row)}</tbody></table>
-        </details>
-      ) : null}
-    </div>
+    <>
+      {mobileOnly ? null : (
+        <div className="mt-5 hidden overflow-x-auto rounded-[18px] border border-slate-200 bg-white p-4 md:block">
+          <table className="w-full min-w-[640px] border-collapse text-[14px]">
+            <thead>
+              <tr className="text-left text-[12.5px] text-slate-600">
+                <th className="py-2 pr-3 font-semibold">{t("list.task")}</th>
+                <th className="py-2 pr-3 font-semibold">{t("form.status")}</th>
+                <th className="py-2 pr-3 font-semibold">{t("form.assignee")}</th>
+                <th className="py-2 pr-3 font-semibold">{t("form.due")}</th>
+                <th className="py-2 font-semibold">{t("form.program")}</th>
+              </tr>
+            </thead>
+            <tbody>{open.map(row)}</tbody>
+          </table>
+          {open.length === 0 ? <p className="py-3 text-sm text-slate-600">{t("empty.open")}</p> : null}
+          {done.length > 0 ? (
+            <details className="mt-3">
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("list.done", { count: done.length })}</summary>
+              <table className="w-full min-w-[640px] border-collapse text-[14px]"><tbody>{done.map(row)}</tbody></table>
+            </details>
+          ) : null}
+        </div>
+      )}
+      <div className="mt-4 grid gap-1 md:hidden">
+        {groups.map(({ status, items }) => (
+          <details key={status} open={status === "open"} className="group">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-1 text-[15px] font-semibold text-slate-950">
+              <span className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} />{t(`status.${status}`)}</span>
+              <span className="text-sm font-medium text-slate-600">{items.length} <span aria-hidden="true" className="inline-block transition group-open:rotate-90">›</span></span>
+            </summary>
+            {items.length === 0 ? (
+              <p className="px-1 pb-3 text-sm text-slate-600">{t(`empty.${status}`)}</p>
+            ) : (
+              <ul className="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{items.map(mobileRow)}</ul>
+            )}
+          </details>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -476,7 +545,7 @@ async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContex
       </ol>
       {undated.length > 0 ? (
         <section aria-labelledby="undated-title" className="advisor-card p-4">
-          <h3 id="undated-title" className="text-xs font-semibold uppercase tracking-[.14em] text-slate-600">{t("calendar.undated", { count: undated.length })}</h3>
+          <h3 id="undated-title" className="text-[15px] font-semibold text-slate-950">{t("calendar.undated", { count: undated.length })}</h3>
           <p className="mt-1 text-xs text-slate-500">{t("calendar.undatedHint")}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">{undated.map(chip)}</div>
         </section>
@@ -485,91 +554,192 @@ async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContex
   );
 }
 
-export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments, view = "board", month }: { ctx: TeamraumContext; filter: TaskFilter; selectedTaskId: string | null; comments: TaskComment[]; view?: TaskView; month?: string }) {
+export type BoardOptions = {
+  /** Ansicht ausdruecklich gewaehlt? Sonst: Board am Rechner, Liste am Telefon. */
+  viewChosen: boolean;
+  query: string;
+  showDone: boolean;
+  newOpen: boolean;
+  dictateOpen: boolean;
+};
+
+export async function TeamraumBoard({
+  ctx,
+  filter,
+  selectedTaskId,
+  comments,
+  view = "board",
+  month,
+  options = { viewChosen: false, query: "", showDone: false, newOpen: false, dictateOpen: false },
+}: {
+  ctx: TeamraumContext;
+  filter: TaskFilter;
+  selectedTaskId: string | null;
+  comments: TaskComment[];
+  view?: TaskView;
+  month?: string;
+  options?: BoardOptions;
+}) {
   const t = await getTranslations("advisor.teamraum");
   const { href } = helpers(ctx);
-  const filtered = filterTasks(ctx.tasks, filter, ctx.me);
+  const needle = options.query.trim().toLocaleLowerCase(ctx.locale);
+  const filtered = filterTasks(ctx.tasks, filter, ctx.me).filter((task) => !needle || `${task.title} ${task.details ?? ""}`.toLocaleLowerCase(ctx.locale).includes(needle));
   const columns = boardColumns(filtered);
   const selected = selectedTaskId ? ctx.tasks.find((task) => task.id === selectedTaskId) ?? null : null;
   const calendarMonth = month ?? ctx.today.slice(0, 7);
+  // Was eine Adresse behalten soll, wenn man darin etwas oeffnet: Ansicht, Filter, Suche.
+  const keep: Record<string, string> = {
+    ...(options.viewChosen ? { view } : {}),
+    ...(view === "calendar" ? { month: calendarMonth } : {}),
+    ...(filter !== "all" ? { filter } : {}),
+    ...(needle ? { q: options.query.trim() } : {}),
+    ...(options.showDone ? { done: "1" } : {}),
+  };
+  const closeHref = href("tasks", keep);
+  const viewLink = (entry: TaskView, active: boolean) => (
+    <Link
+      key={entry}
+      href={href("tasks", { ...keep, view: entry, month: "" })}
+      aria-current={active ? "page" : undefined}
+      className={`inline-flex min-h-[34px] flex-1 items-center justify-center rounded-lg px-3.5 text-[13.5px] md:flex-none ${active ? "bg-white font-semibold text-slate-950 shadow-sm" : "font-medium text-slate-600 hover:text-slate-900"}`}
+    >
+      {t(`views.${entry}`)}
+    </Link>
+  );
+  const doneCount = columns.done.length + columns.doneHidden;
+  const board = (
+    <div className="mt-5 grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {TASK_STATUSES.map((status) => (
+        <section key={status} aria-labelledby={`col-${status}`} className="grid content-start gap-2.5 rounded-2xl bg-[#ECEDF6] p-3">
+          <h3 id={`col-${status}`} className="mx-1 my-0.5 flex items-center justify-between text-sm font-semibold text-slate-950">
+            <span className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-[9px] w-[9px] rounded-full ${STATUS_DOT[status]}`} />{t(`status.${status}`)}</span>
+            <span className="text-[13px] font-medium text-slate-600">{status === "done" ? doneCount : columns[status].length}</span>
+          </h3>
+          {status === "done" && !options.showDone ? (
+            doneCount > 0 ? (
+              <Link href={href("tasks", { ...keep, done: "1" })} className="grid min-h-10 place-items-center rounded-xl border border-dashed border-slate-300 text-[13px] font-medium text-slate-700 hover:bg-white/60">
+                {t("board.showDone", { count: doneCount })}
+              </Link>
+            ) : (
+              <p className="mx-1 text-[13px] leading-5 text-slate-600">{t("empty.done")}</p>
+            )
+          ) : (
+            <>
+              {columns[status].length === 0 ? <p className="mx-1 text-[13px] leading-5 text-slate-600">{t(`empty.${status}`)}</p> : null}
+              {columns[status].map((task) => (
+                <TaskCard key={task.id} ctx={ctx} task={task} filter={filter} selected={task.id === selectedTaskId} back={keep} />
+              ))}
+              {status === "done" && columns.doneHidden > 0 ? <p className="mx-1 text-[13px] text-slate-600">{t("board.doneHidden", { count: columns.doneHidden })}</p> : null}
+            </>
+          )}
+        </section>
+      ))}
+    </div>
+  );
+
   return (
     <div>
       <Feedback ctx={ctx} />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-950">{t("board.title")}</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("board.text")}</p>
+        <div className="flex w-full flex-wrap items-center gap-3 md:w-auto">
+          {/* Am Telefon steht die Liste vorn und ist ohne Wahl die Ansicht; am Rechner das Board. */}
+          <nav aria-label={t("views.label")} className="flex w-full rounded-[10px] bg-[#E9EAF3] p-[3px] md:hidden">
+            {(["list", "board", "calendar"] as const).map((entry) => viewLink(entry, options.viewChosen ? view === entry : entry === "list"))}
+          </nav>
+          <nav aria-label={t("views.label")} className="hidden rounded-[10px] bg-[#E9EAF3] p-[3px] md:flex">
+            {TASK_VIEWS.map((entry) => viewLink(entry, view === entry))}
+          </nav>
+          <span aria-hidden="true" className="hidden h-6 w-px bg-slate-300 md:block" />
+          <nav aria-label={t("board.filterLabel")} className="flex flex-wrap gap-1.5">
+            {TASK_FILTERS.map((entry) => {
+              const count = entry === "nobody" ? unassignedTasks(ctx.tasks).length : 0;
+              return (
+                <Link
+                  key={entry}
+                  href={href("tasks", { ...keep, filter: entry === "all" ? "" : entry })}
+                  aria-current={filter === entry ? "page" : undefined}
+                  className={`inline-flex min-h-9 items-center rounded-full border px-3.5 text-[13.5px] ${filter === entry ? "border-slate-950 bg-slate-950 font-medium text-white" : "border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-50"}`}
+                >
+                  {t(`filters.${entry}`)}{count > 0 ? ` · ${count}` : ""}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-        <nav aria-label={t("views.label")} className="inline-flex rounded-full border border-slate-200 bg-white p-1">
-          {TASK_VIEWS.map((entry) => (
-            <Link
-              key={entry}
-              href={href("tasks", { ...(entry !== "board" ? { view: entry } : {}), ...(filter !== "all" ? { filter } : {}) })}
-              aria-current={view === entry ? "page" : undefined}
-              className={`inline-flex min-h-9 items-center rounded-full px-4 text-sm ${view === entry ? "bg-slate-900 font-semibold text-white" : "text-slate-700 hover:bg-slate-50"}`}
-            >
-              {t(`views.${entry}`)}
-            </Link>
-          ))}
-        </nav>
-        <nav aria-label={t("board.filterLabel")} className="flex flex-wrap gap-1.5">
-          {TASK_FILTERS.map((entry) => (
-            <Link
-              key={entry}
-              href={href("tasks", { ...(view !== "board" ? { view } : {}), ...(entry !== "all" ? { filter: entry } : {}) })}
-              aria-current={filter === entry ? "page" : undefined}
-              className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${filter === entry ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
-            >
-              {t(`filters.${entry}`)}
-            </Link>
-          ))}
-        </nav>
-        </div>
+        <form method="get" action={href("tasks").split("?")[0]} role="search" className="hidden md:block">
+          <input type="hidden" name="org" value={ctx.orgId} />
+          {Object.entries(keep).filter(([key]) => key !== "q").map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
+          <label className="flex h-[38px] w-60 items-center gap-2 rounded-[10px] border border-slate-300 bg-white px-3 text-[13.5px] text-slate-600 focus-within:border-violet-400">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+            <span className="sr-only">{t("board.search")}</span>
+            <input type="search" name="q" defaultValue={options.query} maxLength={80} placeholder={t("board.search")} className="min-w-0 flex-1 bg-transparent text-slate-950 outline-none placeholder:text-slate-500" />
+          </label>
+        </form>
       </div>
+      {needle ? (
+        <p role="status" className="mt-3 text-sm text-slate-700">
+          {t("board.searchResult", { count: filtered.length, query: options.query.trim() })}{" "}
+          <Link href={href("tasks", { ...keep, q: "" })} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("board.searchClear")}</Link>
+        </p>
+      ) : null}
 
-      {ctx.canWrite ? (
-        <details className={`${CARD} mt-4`} open={ctx.tasks.length === 0}>
-          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-violet-800">+ {t("board.new")}</summary>
-          <div className="mt-3">
-            <TaskForm ctx={ctx} tab="tasks" filter={filter} />
-          </div>
-          <div className="mt-5 border-t border-slate-100 pt-4">
-            <p className="text-sm font-semibold text-slate-900">{t("week.dictateTitle")}</p>
-            <p className="mt-1 text-xs leading-5 text-slate-600">{t("week.dictateText")}</p>
-            <div className="mt-3">
-              <DictateTasks orgId={ctx.orgId} tab="tasks" me={ctx.me} today={ctx.today} members={ctx.members.map(({ userId, name }) => ({ userId, name }))} programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))} />
+      {ctx.canWrite && options.dictateOpen ? (
+        <section aria-labelledby="dictate-title" className={`${CARD} mt-5`}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="dictate-title" className="text-[17px] font-semibold text-slate-950">{t("week.dictateTitle")}</h2>
+              <p className="mt-1 text-[14px] leading-6 text-slate-600">{t("week.dictateText")}</p>
             </div>
+            <Link href={closeHref} className="inline-flex min-h-10 items-center px-2 text-[15px] text-slate-600 underline-offset-4 hover:underline">{t("form.cancel")}</Link>
           </div>
-        </details>
+          <div className="mt-4">
+            <DictateTasks orgId={ctx.orgId} tab="tasks" me={ctx.me} today={ctx.today} members={ctx.members.map(({ userId, name }) => ({ userId, name }))} programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))} />
+          </div>
+        </section>
       ) : null}
 
-      {view === "list" ? <TaskList ctx={ctx} tasks={filtered} filter={filter} /> : null}
-      {view === "calendar" ? <TaskCalendar ctx={ctx} tasks={filtered} filter={filter} month={calendarMonth} /> : null}
-      {view === "board" ? (
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {TASK_STATUSES.map((status) => (
-          <section key={status} aria-labelledby={`col-${status}`} className={`grid content-start gap-2.5 rounded-3xl p-3 ${COLUMN_TONE[status]}`}>
-            <h3 id={`col-${status}`} className="flex items-center justify-between px-1 text-sm font-semibold text-slate-800">
-              {t(`status.${status}`)} <span className="text-slate-500">{columns[status].length + (status === "done" ? columns.doneHidden : 0)}</span>
-            </h3>
-            {columns[status].length === 0 ? <p className="px-1 text-xs leading-5 text-slate-500">{t(`empty.${status}`)}</p> : null}
-            {columns[status].map((task) => (
-              <TaskCard key={task.id} ctx={ctx} task={task} filter={filter} selected={task.id === selectedTaskId} />
-            ))}
-            {status === "done" && columns.doneHidden > 0 ? <p className="px-1 text-xs text-slate-500">{t("board.doneHidden", { count: columns.doneHidden })}</p> : null}
+      {ctx.canWrite && options.newOpen ? (
+        <>
+          {/* Am Telefon ein Blatt von unten ueber der Liste; am Rechner eine Flaeche ueber dem Board. */}
+          <Link href={closeHref} aria-label={t("form.cancel")} className="fixed inset-0 z-40 bg-slate-950/40 md:hidden" />
+          <section
+            aria-labelledby="new-task-title"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-white px-[18px] pb-7 pt-2.5 shadow-[0_-10px_30px_rgba(20,21,43,.18)] md:static md:z-auto md:mt-5 md:max-h-none md:overflow-visible md:rounded-[18px] md:border md:border-slate-200 md:p-6 md:shadow-none"
+          >
+            <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-10 rounded-full bg-slate-300 md:hidden" />
+            <h2 id="new-task-title" className="mb-4 text-[19px] font-bold text-slate-950">{t("board.new")}</h2>
+            <TaskForm ctx={ctx} tab="tasks" filter={filter} cancelHref={closeHref} />
           </section>
-        ))}
-      </div>
+        </>
       ) : null}
 
+      {view === "calendar" && options.viewChosen ? <TaskCalendar ctx={ctx} tasks={filtered} filter={filter} month={calendarMonth} /> : null}
+      {view === "list" && options.viewChosen ? <TaskList ctx={ctx} tasks={filtered} filter={filter} back={keep} /> : null}
+      {view === "board" && options.viewChosen ? board : null}
+      {!options.viewChosen ? (
+        <>
+          <div className="hidden md:block">{board}</div>
+          <TaskList ctx={ctx} tasks={filtered} filter={filter} back={keep} mobileOnly />
+        </>
+      ) : null}
 
-      {selected ? <TaskDetail ctx={ctx} task={selected} filter={filter} comments={comments} back={view === "board" ? {} : { view, ...(view === "calendar" ? { month: calendarMonth } : {}) }} /> : null}
+      {ctx.canWrite && !options.newOpen ? (
+        <Link
+          href={href("tasks", { ...keep, new: "1" })}
+          aria-label={t("board.new")}
+          className="fixed bottom-6 right-5 z-30 grid h-[58px] w-[58px] place-items-center rounded-full bg-gradient-to-br from-[#6d49e0] to-[#0a80b8] text-3xl text-white shadow-[0_8px_20px_rgba(80,50,200,.35)] md:hidden"
+        >
+          +
+        </Link>
+      ) : null}
+
+      {selected ? <TaskDetail ctx={ctx} task={selected} filter={filter} comments={comments} back={keep} /> : null}
     </div>
   );
 }
 
-/** Diese Woche: schnell eintragen, was dich betrifft, Termine, was noch niemand macht. */
+/** Diese Woche: eine Zeile zum Eintragen, was dich betrifft, Termine, was noch niemand macht (Entwurf 05.11.2026). */
 export async function TeamraumWeek({
   ctx,
   followUps,
@@ -580,120 +750,148 @@ export async function TeamraumWeek({
   nextCheckIns: { programId: string; nextOn: string }[];
 }) {
   const t = await getTranslations("advisor.teamraum");
-  const { dayOf, timeOf, programOf, memberOf, href } = helpers(ctx);
+  const { dayOf, programOf, href } = helpers(ctx);
+  const weekday = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", timeZone: "UTC" });
+  const weekdayOf = (iso: string) => weekday.format(new Date(`${iso.slice(0, 10)}T00:00:00Z`)).replace(".", "");
+  const clock = new Intl.DateTimeFormat(ctx.locale, { hour: "2-digit", minute: "2-digit" });
   const week = myWeek(ctx.tasks, ctx.me, ctx.today);
   const horizon = addDays(ctx.today, 7);
   const events = ctx.events.filter((event) => event.startsAt.slice(0, 10) >= ctx.today && event.startsAt.slice(0, 10) <= horizon);
   const unassigned = unassignedTasks(ctx.tasks);
-  const recentDone = ctx.tasks
-    .filter((task) => task.status === "done" && task.doneAt && task.doneAt.slice(0, 10) >= addDays(ctx.today, -7))
-    .sort((a, b) => ((a.doneAt ?? "") < (b.doneAt ?? "") ? 1 : -1))
-    .slice(0, 6);
   // Gespraeche zum Stand und Wiedervorlagen nur fuer Teams, die man sieht und die bald dran sind.
   const talks = nextCheckIns.filter((entry) => entry.nextOn <= horizon && programOf(entry.programId));
   const myFollowUps = followUps.filter((entry) => programOf(entry.programId));
   const mineCount = week.overdue.length + week.thisWeek.length + talks.length + myFollowUps.length;
-  const taskLine = (task: OrgTask) => (
-    <li key={task.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-      <Link href={`${href("tasks", { task: task.id })}#task-detail`} className="min-w-0 text-sm font-medium text-slate-900 underline-offset-4 hover:underline">
-        {task.title}
-      </Link>
-      <span className="flex flex-wrap items-center gap-1.5">
-        {task.programId ? <span className={`${CHIP} bg-violet-100 text-violet-800`}>{programOf(task.programId)?.name ?? t("hiddenProgram")}</span> : null}
-        {task.dueOn ? <span className={`${CHIP} ${isOverdue(task, ctx.today) ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}`}>{dayOf(task.dueOn)}</span> : null}
-      </span>
+  const ROW = "flex min-h-14 items-center gap-3 border-t border-slate-100 py-2.5 first:border-t-0";
+  const subOf = (task: OrgTask) => {
+    const progress = checklistProgress(task);
+    return [
+      task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal"),
+      progress.total > 0 ? t("checklistOf", progress) : null,
+    ].filter(Boolean).join(" · ");
+  };
+  const tick = (task: OrgTask) =>
+    ctx.canWrite ? (
+      <form action={moveOrgTaskAction}>
+        <Hidden ctx={ctx} tab="week" taskId={task.id} />
+        <input type="hidden" name="status" value="done" />
+        <button type="submit" aria-label={t("week.markDone", { task: task.title })} className="grid h-11 w-11 shrink-0 place-items-center rounded-full">
+          <span aria-hidden="true" className="h-[22px] w-[22px] rounded-full border-2 border-slate-400 bg-white hover:border-violet-500" />
+        </button>
+      </form>
+    ) : (
+      <span aria-hidden="true" className="mx-[11px] h-[22px] w-[22px] shrink-0 rounded-full border-2 border-slate-300" />
+    );
+  const taskRow = (task: OrgTask, showDay: boolean) => (
+    <li key={task.id} className={ROW}>
+      {tick(task)}
+      <div className="min-w-0 flex-1">
+        <Link href={`${href("tasks", { task: task.id })}#task-detail`} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{task.title}</Link>
+        <p className="mt-0.5 text-[13px] text-slate-600">{showDay || !task.dueOn ? subOf(task) : [subOf(task), t("week.since", { date: dayOf(task.dueOn) })].join(" · ")}</p>
+      </div>
+      {showDay && task.dueOn ? <span className="shrink-0 text-[13px] font-semibold text-slate-700">{weekdayOf(task.dueOn)}</span> : null}
     </li>
   );
+  const softRow = (key: string, link: string, title: string, sub: string, on: string) => (
+    <li key={key} className={ROW}>
+      <span aria-hidden="true" className="mx-[11px] grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full bg-violet-100 text-[11px] text-violet-800">●</span>
+      <div className="min-w-0 flex-1">
+        <Link href={link} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{title}</Link>
+        <p className="mt-0.5 text-[13px] text-slate-600">{sub}</p>
+      </div>
+      <span className={`shrink-0 text-[13px] font-semibold ${on < ctx.today ? "text-rose-700" : "text-slate-700"}`}>{weekdayOf(on)}</span>
+    </li>
+  );
+  const PANEL = "rounded-[18px] border border-slate-200 bg-white px-5 py-[18px]";
+  const H2 = "flex items-center justify-between text-[15px] font-semibold text-slate-950";
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <Feedback ctx={ctx} />
       {ctx.canWrite ? (
-        <section aria-labelledby="week-quick-title" className="rounded-3xl border border-violet-200 bg-violet-50/70 p-5 sm:p-6">
-          <h2 id="week-quick-title" className="text-lg font-semibold text-slate-950">{t("week.quickTitle")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600">{t("week.quickText")}</p>
-          <div className="mt-4">
-            <TaskForm ctx={ctx} tab="week" quick />
-          </div>
-          {/* Mehrere auf einmal: diktieren oder tippen, Vorschlaege pruefen, anlegen (taskDictation.ts). */}
-          <details className="mt-4 rounded-2xl border border-violet-200 bg-white/80 p-4">
-            <summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-violet-800">{t("week.dictateTitle")}</summary>
-            <p className="mt-1 text-xs leading-5 text-slate-600">{t("week.dictateText")}</p>
-            <div className="mt-3">
-              <DictateTasks orgId={ctx.orgId} tab="week" me={ctx.me} today={ctx.today} members={ctx.members.map(({ userId, name }) => ({ userId, name }))} programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))} />
-            </div>
-          </details>
-        </section>
+        <DictateTasks
+          variant="line"
+          moreHref={href("tasks", { new: "1" })}
+          orgId={ctx.orgId}
+          tab="week"
+          me={ctx.me}
+          today={ctx.today}
+          members={ctx.members.map(({ userId, name }) => ({ userId, name }))}
+          programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))}
+        />
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-        <section aria-labelledby="week-mine-title" className={CARD}>
-          <h2 id="week-mine-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("week.mineTitle", { count: mineCount })}</h2>
-          {mineCount === 0 ? <p className="mt-3 text-sm leading-6 text-slate-600">{t("week.mineNone")}</p> : null}
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <section aria-labelledby="week-mine-title" className={PANEL}>
+          <h2 id="week-mine-title" className={H2}>
+            <span>{t("week.mine")}</span>
+            <Link href={href("tasks", { filter: "mine" })} className="text-[13px] font-medium text-violet-800 underline-offset-4 hover:underline">{t("week.allTasks")}</Link>
+          </h2>
+          {mineCount === 0 ? <p className="mt-3 text-[15px] leading-6 text-slate-700">{t("week.mineNone")}</p> : null}
           {week.overdue.length > 0 ? (
             <>
-              <h3 className="mt-4 text-sm font-semibold text-rose-800">{t("week.overdue")}</h3>
-              <ul className="divide-y divide-slate-100">{week.overdue.map(taskLine)}</ul>
+              <h3 className="mt-4 text-[13px] font-semibold text-rose-700">{t("week.overdueCount", { count: week.overdue.length })}</h3>
+              <ul>{week.overdue.map((task) => taskRow(task, false))}</ul>
             </>
           ) : null}
-          {week.thisWeek.length > 0 ? (
+          {week.thisWeek.length + talks.length + myFollowUps.length > 0 ? (
             <>
-              <h3 className="mt-4 text-sm font-semibold text-slate-900">{t("week.thisWeek")}</h3>
-              <ul className="divide-y divide-slate-100">{week.thisWeek.map(taskLine)}</ul>
-            </>
-          ) : null}
-          {talks.length > 0 || myFollowUps.length > 0 ? (
-            <>
-              <h3 className="mt-4 text-sm font-semibold text-slate-900">{t("week.talks")}</h3>
-              <ul className="divide-y divide-slate-100">
-                {talks.map((entry) => (
-                  <li key={`talk-${entry.programId}`} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                    <Link href={`/advisor/programm/${entry.programId}`} className="font-medium text-slate-900 underline-offset-4 hover:underline">{t("week.talkLine", { team: programOf(entry.programId)?.name ?? "" })}</Link>
-                    <span className={`${CHIP} ${entry.nextOn < ctx.today ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}`}>{dayOf(entry.nextOn)}</span>
-                  </li>
-                ))}
-                {myFollowUps.map((entry) => (
-                  <li key={`fu-${entry.programId}`} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                    <Link href={`/advisor/programm/${entry.programId}?tab=notizen`} className="font-medium text-slate-900 underline-offset-4 hover:underline">{t("week.followUpLine", { team: programOf(entry.programId)?.name ?? "" })}</Link>
-                    <span className={`${CHIP} ${entry.dueOn < ctx.today ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}`}>{dayOf(entry.dueOn)}</span>
-                  </li>
-                ))}
+              <h3 className="mt-4 text-[13px] font-semibold text-slate-600">{t("week.thisWeekCount", { count: week.thisWeek.length + talks.length + myFollowUps.length })}</h3>
+              <ul>
+                {week.thisWeek.map((task) => taskRow(task, true))}
+                {talks.map((entry) => softRow(`talk-${entry.programId}`, `/advisor/programm/${entry.programId}`, t("week.talkLine", { team: programOf(entry.programId)?.name ?? "" }), t("week.talkSub"), entry.nextOn))}
+                {myFollowUps.map((entry) => softRow(`fu-${entry.programId}`, `/advisor/programm/${entry.programId}?tab=notizen`, t("week.followUpLine", { team: programOf(entry.programId)?.name ?? "" }), t("week.followUpSub"), entry.dueOn))}
               </ul>
             </>
           ) : null}
           {week.later > 0 ? (
-            <p className="mt-4 text-xs text-slate-500">
+            <p className="mt-3 text-[13px] text-slate-600">
               {t("week.later", { count: week.later })}{" "}
               <Link href={href("tasks", { filter: "mine" })} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("week.allMine")}</Link>
             </p>
           ) : null}
         </section>
 
-        <div className="grid content-start gap-6">
-          <section aria-labelledby="week-events-title" className={CARD}>
-            <h2 id="week-events-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("week.eventsTitle")}</h2>
-            {events.length === 0 ? <p className="mt-3 text-sm text-slate-600">{t("week.eventsNone")}</p> : null}
-            <ul className="mt-2 divide-y divide-slate-100">
+        <div className="grid content-start gap-5">
+          <section aria-labelledby="week-events-title" className={PANEL}>
+            <h2 id="week-events-title" className={H2}>
+              <span>{t("week.events")}</span>
+              <Link href={`/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "plan" }).toString()}`} className="text-[13px] font-medium text-violet-800 underline-offset-4 hover:underline">{t("week.planLink")}</Link>
+            </h2>
+            {events.length === 0 ? <p className="mt-3 text-[15px] text-slate-700">{t("week.eventsNone")}</p> : null}
+            <ul>
               {events.map((event) => (
-                <li key={event.eventId} className="py-2 text-sm">
-                  <Link href={`/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "plan", open: event.eventId }).toString()}`} className="font-medium text-slate-900 underline-offset-4 hover:underline">{event.title}</Link>
-                  <span className="block text-xs text-slate-500">{[timeOf(event.startsAt), event.location].filter(Boolean).join(" · ")}</span>
+                <li key={event.eventId} className="flex items-start gap-3 border-t border-slate-100 py-3 first:mt-1 first:border-t-0">
+                  <span className="w-[46px] shrink-0 rounded-[10px] bg-violet-100 py-1 text-center text-violet-900">
+                    <span className="block text-[11px] font-semibold uppercase">{weekdayOf(event.startsAt)}</span>
+                    <span className="block text-[17px] font-bold leading-tight">{Number(event.startsAt.slice(8, 10))}</span>
+                  </span>
+                  <span className="min-w-0">
+                    <Link href={`/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "plan", open: event.eventId }).toString()}`} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{event.title}</Link>
+                    <span className="mt-0.5 block text-[13px] text-slate-600">{[clock.format(new Date(event.startsAt)), event.location].filter(Boolean).join(" · ")}</span>
+                  </span>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section aria-labelledby="week-nobody-title" className={`${CARD} ${unassigned.length > 0 ? "border-amber-200" : ""}`}>
-            <h2 id="week-nobody-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("week.nobodyTitle", { count: unassigned.length })}</h2>
-            {unassigned.length === 0 ? <p className="mt-3 text-sm text-slate-600">{t("week.nobodyNone")}</p> : null}
-            <ul className="mt-2 divide-y divide-slate-100">
+          <section aria-labelledby="week-nobody-title" className={PANEL}>
+            <h2 id="week-nobody-title" className={H2}>
+              <span>{t("week.nobody")}</span>
+              <span className="text-[13px] font-medium text-slate-600">{unassigned.length}</span>
+            </h2>
+            {unassigned.length === 0 ? <p className="mt-3 text-[15px] text-slate-700">{t("week.nobodyNone")}</p> : null}
+            <ul className="mt-1">
               {unassigned.slice(0, 6).map((task) => (
-                <li key={task.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                  <Link href={`${href("tasks", { task: task.id })}#task-detail`} className="min-w-0 text-sm font-medium text-slate-900 underline-offset-4 hover:underline">{task.title}</Link>
+                <li key={task.id} className="flex items-center gap-3 border-t border-slate-100 py-2.5 first:border-t-0">
+                  <div className="min-w-0 flex-1">
+                    <Link href={`${href("tasks", { task: task.id })}#task-detail`} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{task.title}</Link>
+                    <p className="mt-0.5 text-[13px] text-slate-600">{[subOf(task), task.dueOn ? t("week.until", { date: dayOf(task.dueOn) }) : null].filter(Boolean).join(" · ")}</p>
+                  </div>
                   {ctx.canWrite ? (
                     <form action={takeOrgTaskAction}>
                       <Hidden ctx={ctx} tab="week" taskId={task.id} />
-                      <SubmitButton label={t("take")} pendingLabel="…" className="inline-flex min-h-9 items-center rounded-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50" />
+                      <SubmitButton label={t("take")} pendingLabel="…" className="inline-flex min-h-9 items-center rounded-[10px] border border-violet-300 bg-violet-50 px-3 text-[13px] font-semibold text-violet-800" />
                     </form>
                   ) : null}
                 </li>
@@ -705,23 +903,6 @@ export async function TeamraumWeek({
           </section>
         </div>
       </div>
-
-      {recentDone.length > 0 ? (
-        <section aria-labelledby="week-done-title" className={CARD}>
-          <h2 id="week-done-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("week.doneTitle")}</h2>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-            {recentDone.map((task) => {
-              const who = memberOf(task.assigneeUserId);
-              return (
-                <li key={task.id} className="flex items-center gap-2 text-sm text-slate-700">
-                  {who ? <Avatar userId={who.userId} name={who.name} size="h-6 w-6 text-[11px]" /> : null}
-                  <span className="min-w-0 line-through decoration-slate-400">{task.title}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
     </div>
   );
 }
@@ -738,10 +919,7 @@ export async function TeamraumWho({ ctx, nextCheckIns }: { ctx: TeamraumContext;
   return (
     <div className="grid gap-6">
       <Feedback ctx={ctx} />
-      <div>
-        <h2 className="text-xl font-semibold text-slate-950">{t("who.title")}</h2>
-        <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("who.text")}</p>
-      </div>
+      <p className="-mt-2 max-w-2xl text-[15px] leading-6 text-slate-700">{t("who.text")}</p>
 
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {ctx.members.map((member) => {
@@ -816,7 +994,7 @@ export async function TeamraumWho({ ctx, nextCheckIns }: { ctx: TeamraumContext;
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[520px] border-collapse text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-[.08em] text-slate-500">
+                <tr className="text-left text-[12.5px] text-slate-600">
                   <th className="py-2 pr-3 font-semibold">{t("who.colStartup")}</th>
                   <th className="py-2 pr-3 font-semibold">{t("who.colContact")}</th>
                   <th className="py-2 pr-3 font-semibold">{t("who.colNextTalk")}</th>

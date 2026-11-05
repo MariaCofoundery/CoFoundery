@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import {
   createTeamProgramCodeAction,
   createTeamProgramInviteAction,
@@ -18,7 +19,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
 const CARD = "advisor-card p-5 sm:p-6";
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
+const LABEL = "block text-sm font-semibold text-slate-900";
 const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm";
 const PRIMARY = "inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white";
 const QUIET = "inline-flex min-h-11 items-center px-2 text-sm font-medium text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline";
@@ -42,11 +43,17 @@ export async function OrgTeamProgramsSection({
   codeError,
   stars = [],
   part = "teams",
+  seatsText = null,
+  lastActivity = {},
 }: {
   org: AdvisorOrg;
   members: OrgMember[];
   programs: OrgTeamProgram[];
   stars?: OrgProgramStars[];
+  /** Plaetze der Organisation, steht unter der Ueberschrift "Teams im Programm". */
+  seatsText?: string | null;
+  /** Je Team: naechster Meilenstein und letztes Update (nur Reiter "Teams im Programm"). */
+  lastActivity?: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null }>;
   /** "teams": die Karten der Teams im Programm (taeglich); "enroll": Einladungen und Codes (einmal einrichten). */
   part?: "teams" | "enroll";
   invites: TeamProgramInvite[];
@@ -64,134 +71,171 @@ export async function OrgTeamProgramsSection({
   const nameOf = (userId: string) => activeMembers.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const freshUrl = freshToken && /^[0-9a-f]{48}$/.test(freshToken) ? `${getPublicAppOrigin()}/programm/einladung/${freshToken}` : null;
   const openInvites = invites.filter((invite) => invite.status === "open");
+  const waitingCount = programs.filter((program) => !program.isActive).length;
+  const locale = getPresentationLocale(await getLocale());
+  const dayFormat = new Intl.DateTimeFormat(locale, { day: "numeric", month: "numeric", timeZone: "UTC" });
+  const dayOf = (iso: string) => dayFormat.format(new Date(`${iso}T00:00:00Z`));
+  const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const ago = (iso: string) => relative.format(-Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000)), "day");
 
   return (
     <div className="grid gap-6">
       {part === "teams" ? (
-      <section aria-labelledby="org-programs-title" className={CARD}>
-        <h2 id="org-programs-title" className="text-xl font-semibold text-slate-950">{t("programsTitle")}</h2>
-        <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("sectionText")}</p>
-        <aside className="mt-3 max-w-2xl rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" aria-label={t("retentionTitle")}>
-          <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("retentionTitle")}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-700">{t("retentionText")}</p>
-        </aside>
+      <section aria-labelledby="org-programs-title" className="grid gap-4">
+        {/* Entwurf vom 05.11.2026: Zeilen statt Karten - Team, Ansprechpersonen, naechster Meilenstein, letztes
+            Update. Was man an einem Team einstellt, steht aufgeklappt unter seiner Zeile. */}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 id="org-programs-title" className="text-xl font-semibold text-slate-950">{t("programsTitle")}</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {[t("programsActive", { count: programs.filter((program) => program.isActive).length }), waitingCount > 0 ? t("programsWaiting", { count: waitingCount }) : null, seatsText].filter(Boolean).join(" · ")}
+            </p>
+          </div>
+          {/* Ohne Team stehen dieselben Wege im leeren Zustand darunter - nicht zweimal. */}
+          {isOwner && programs.length > 0 ? (
+            <div className="flex flex-wrap gap-2.5">
+              <Link href={`/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50">{t("programCodeButton")}</Link>
+              <Link href={`/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`} className="brand-cta inline-flex min-h-11 items-center rounded-xl px-[18px] text-sm font-semibold">+ {t("programsEmptyInvite")}</Link>
+            </div>
+          ) : null}
+        </div>
 
         {programs.length === 0 ? (
-          <div className="mt-4">
-            <EmptyState
-              text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
-              actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }, { href: "/advisor/beispiel", label: t("programsEmptyExample") }] : [{ href: "/advisor/beispiel", label: t("programsEmptyExample") }]}
-            />
-          </div>
+          <EmptyState
+            text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
+            actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }, { href: "/advisor/beispiel", label: t("programsEmptyExample") }] : [{ href: "/advisor/beispiel", label: t("programsEmptyExample") }]}
+          />
         ) : (
-          <ul className="mt-4 grid gap-4">
-            {programs.map((program) => (
-              <li key={program.programId} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(40,30,110,0.05)]">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-3"><TeamAvatar name={program.teamName ?? "?"} /><span className="min-w-0"><span className="block truncate text-base font-semibold text-slate-950">{program.teamName ?? t("unnamedTeam")}</span><span className="block text-xs text-slate-500">{t("membersCount", { count: program.memberCount })}{program.batch ? ` · ${program.batch}` : ""}</span></span></span>
-                  <span className="flex flex-wrap items-center gap-2">
-                    {program.isAlumni ? <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-800">{t("metaAlumni")}</span> : null}
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        program.isActive ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"
-                      }`}
-                    >
-                      {program.isActive ? t("statusActive") : t("statusWaiting", { approved: program.approvedCount, total: program.memberCount })}
-                    </span>
-                  </span>
-                </div>
-                {(() => {
-                  const entry = stars.find((candidate) => candidate.programId === program.programId);
-                  if (!entry) return null;
-                  const percent = entry.nextStars ? Math.min(100, Math.round((entry.stars / entry.nextStars) * 100)) : 100;
-                  return (
-                    <div className="mt-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">★ {entry.stars}</span>
-                        {entry.nextTitle ? <span className="text-xs text-slate-600">{t("rewardsNext", { missing: Math.max(0, (entry.nextStars ?? 0) - entry.stars), title: entry.nextTitle })}</span> : null}
-                      </div>
-                      {entry.nextTitle ? (
-                        <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={entry.nextStars ?? 0} aria-valuenow={Math.min(entry.stars, entry.nextStars ?? 0)}>
-                          <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-300" style={{ width: `${percent}%` }} />
-                        </div>
-                      ) : null}
+          <div className="overflow-hidden rounded-[18px] border border-slate-200 bg-white">
+            <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)_96px] gap-4 bg-slate-50 px-5 py-3 text-[12.5px] font-semibold text-slate-600 md:grid">
+              <span>{t("colTeam")}</span><span>{t("contactsLabel")}</span><span>{t("colMilestone")}</span><span>{t("colUpdate")}</span><span />
+            </div>
+            <ul>
+              {programs.map((program) => {
+                const entry = stars.find((candidate) => candidate.programId === program.programId);
+                const activity = lastActivity[program.programId];
+                const contacts = program.contactUserIds.map(nameOf).join(", ");
+                return (
+                  <li key={program.programId} className={`border-t border-slate-100 first:border-t-0 ${program.isActive ? "" : "bg-violet-50/40"}`}>
+                    <div className="grid gap-x-4 gap-y-1.5 px-5 py-3.5 text-sm md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)_96px] md:items-center">
+                      <span className="flex min-w-0 items-center gap-3">
+                        <TeamAvatar name={program.teamName ?? "?"} size={32} />
+                        <span className="min-w-0">
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-slate-950">{program.teamName ?? t("unnamedTeam")}</span>
+                          {program.isAlumni ? <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-800">{t("metaAlumni")}</span> : null}
+                          {entry ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">★ {entry.stars}</span> : null}
+                        </span>
+                        <span className="block text-[13px] text-slate-600">
+                          {program.isActive
+                            ? [program.batch, program.category, t("membersCount", { count: program.memberCount })].filter(Boolean).join(" · ")
+                            : t("statusWaiting", { approved: program.approvedCount, total: program.memberCount })}
+                        </span>
+                        {entry?.nextTitle ? <span className="block text-[12.5px] text-amber-900">{t("rewardsNext", { missing: Math.max(0, (entry.nextStars ?? 0) - entry.stars), title: entry.nextTitle })}</span> : null}
+                        </span>
+                      </span>
+                      <span className="text-[13px] text-slate-600"><span className="font-semibold text-slate-700 md:hidden">{t("contactsLabel")}: </span>{contacts || t("contactsNone")}</span>
+                      <span className="text-slate-900">
+                        {activity?.milestone ? (
+                          <>
+                            {activity.milestone.title}
+                            <span className="block text-[13px] text-slate-600">{t("milestoneUntil", { date: dayOf(activity.milestone.dueOn) })}</span>
+                          </>
+                        ) : program.isActive ? <span className="text-[13px] text-slate-500">{t("noMilestone")}</span> : null}
+                      </span>
+                      <span className="text-[13px] text-slate-600">{activity ? (activity.lastUpdate ? ago(activity.lastUpdate) : t("noUpdate")) : null}</span>
+                      <span>
+                        {program.isActive ? (
+                          <Link href={`/advisor/programm/${program.programId}`} className="inline-flex min-h-11 items-center text-[13.5px] font-semibold text-violet-800 underline-offset-4 hover:underline">{t("openTeam")} →</Link>
+                        ) : null}
+                      </span>
                     </div>
-                  );
-                })()}
-                {!program.isActive && program.memberCount === 1 && (isOwner || program.isContact) ? (
-                  <form action={setTeamProgramSoloAction} className="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
-                    <input type="hidden" name="orgId" value={org.id} />
-                    <input type="hidden" name="programId" value={program.programId} />
-                    <input type="hidden" name="confirmed" value="yes" />
-                    <p className="text-sm leading-6 text-violet-900">{t("soloText")}</p>
-                    <SubmitButton label={t("soloConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900" />
-                  </form>
-                ) : null}
-                {program.soloConfirmed && program.memberCount === 1 ? <p className="mt-1 text-xs text-slate-500">{t("soloMarked")}</p> : null}
-                {program.isActive ? (
-                  <Link href={`/advisor/programm/${program.programId}`} className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
-                    {t("openTeam")} →
-                  </Link>
-                ) : null}
+                    {isOwner || program.isContact ? (
+                      <details className="group px-5 pb-1">
+                        <summary className="-mt-1 inline-flex min-h-10 cursor-pointer list-none items-center text-[13px] font-medium text-slate-600 underline-offset-4 hover:text-slate-950 hover:underline">{t("teamSettings")}</summary>
+                        <div className="pb-4">
+                      {!program.isActive && program.memberCount === 1 && (isOwner || program.isContact) ? (
+                        <form action={setTeamProgramSoloAction} className="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
+                          <input type="hidden" name="orgId" value={org.id} />
+                          <input type="hidden" name="programId" value={program.programId} />
+                          <input type="hidden" name="confirmed" value="yes" />
+                          <p className="text-sm leading-6 text-violet-900">{t("soloText")}</p>
+                          <SubmitButton label={t("soloConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl border border-violet-300 bg-white px-4 py-2 text-sm font-semibold text-violet-900" />
+                        </form>
+                      ) : null}
+                      {program.soloConfirmed && program.memberCount === 1 ? <p className="mt-1 text-xs text-slate-500">{t("soloMarked")}</p> : null}
 
-                {isOwner || program.isContact ? (
-                  <form action={setProgramMetaAction} className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
-                    <input type="hidden" name="orgId" value={org.id} />
-                    <input type="hidden" name="programId" value={program.programId} />
-                    <label>
-                      <span className={LABEL}>{t("metaBatch")}</span>
-                      <input name="batch" maxLength={60} defaultValue={program.batch ?? ""} className={INPUT} />
-                    </label>
-                    <label>
-                      <span className={LABEL}>{t("metaCategory")}</span>
-                      <input name="category" maxLength={60} defaultValue={program.category ?? ""} className={INPUT} />
-                    </label>
-                    <label className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-800">
-                      <input type="checkbox" name="alumni" value="yes" defaultChecked={program.isAlumni} className="h-4 w-4" />
-                      {t("metaAlumni")}
-                    </label>
-                    <SubmitButton label={t("metaSave")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700" />
-                  </form>
-                ) : null}
-
-                {isOwner ? (
-                  <details className="mt-3 border-t border-slate-200 pt-3">
-                    <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500 underline-offset-4 hover:text-rose-800 hover:underline">{t("removeTeam")}</summary>
-                    <form action={removeTeamFromProgramAction} className="mt-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
-                      <input type="hidden" name="orgId" value={org.id} />
-                      <input type="hidden" name="programId" value={program.programId} />
-                      <p className="text-sm leading-6 text-rose-950">{t("removeTeamText")}</p>
-                      <SubmitButton label={t("removeTeamConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl bg-rose-700 px-4 py-2 text-sm font-semibold text-white" />
-                    </form>
-                  </details>
-                ) : null}
-
-                {isOwner ? (
-                  <form action={setTeamProgramContactsAction} className="mt-4 border-t border-slate-200 pt-3">
-                    <input type="hidden" name="orgId" value={org.id} />
-                    <input type="hidden" name="programId" value={program.programId} />
-                    <fieldset>
-                      <legend className={LABEL}>{t("contactsLabel")}</legend>
-                      <div className="mt-1 flex flex-wrap gap-x-5">
-                        {activeMembers.map((member) => (
-                          <label key={member.userId} className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-800">
-                            <input type="checkbox" name="contact" value={member.userId} defaultChecked={program.contactUserIds.includes(member.userId)} className="h-4 w-4" />
-                            {member.displayName ?? t("unnamedPerson")}
+                      {isOwner || program.isContact ? (
+                        <form action={setProgramMetaAction} className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
+                          <input type="hidden" name="orgId" value={org.id} />
+                          <input type="hidden" name="programId" value={program.programId} />
+                          <label>
+                            <span className={LABEL}>{t("metaBatch")}</span>
+                            <input name="batch" maxLength={60} defaultValue={program.batch ?? ""} className={INPUT} />
                           </label>
-                        ))}
-                      </div>
-                    </fieldset>
-                    <SubmitButton label={t("contactsSave")} pendingLabel="…" className="mt-1 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700" />
-                  </form>
-                ) : (
-                  <p className="mt-3 border-t border-slate-200 pt-3 text-sm text-slate-600">
-                    {t("contactsLabel")}: {program.contactUserIds.map(nameOf).join(", ") || t("contactsNone")}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
+                          <label>
+                            <span className={LABEL}>{t("metaCategory")}</span>
+                            <input name="category" maxLength={60} defaultValue={program.category ?? ""} className={INPUT} />
+                          </label>
+                          <label className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-800">
+                            <input type="checkbox" name="alumni" value="yes" defaultChecked={program.isAlumni} className="h-4 w-4" />
+                            {t("metaAlumni")}
+                          </label>
+                          <SubmitButton label={t("metaSave")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700" />
+                        </form>
+                      ) : null}
+
+                      {isOwner ? (
+                        <details className="mt-3 border-t border-slate-200 pt-3">
+                          <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500 underline-offset-4 hover:text-rose-800 hover:underline">{t("removeTeam")}</summary>
+                          <form action={removeTeamFromProgramAction} className="mt-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+                            <input type="hidden" name="orgId" value={org.id} />
+                            <input type="hidden" name="programId" value={program.programId} />
+                            <p className="text-sm leading-6 text-rose-950">{t("removeTeamText")}</p>
+                            <SubmitButton label={t("removeTeamConfirm")} pendingLabel="…" className="mt-2 inline-flex min-h-11 items-center rounded-xl bg-rose-700 px-4 py-2 text-sm font-semibold text-white" />
+                          </form>
+                        </details>
+                      ) : null}
+
+                      {isOwner ? (
+                        <form action={setTeamProgramContactsAction} className="mt-4 border-t border-slate-200 pt-3">
+                          <input type="hidden" name="orgId" value={org.id} />
+                          <input type="hidden" name="programId" value={program.programId} />
+                          <fieldset>
+                            <legend className={LABEL}>{t("contactsLabel")}</legend>
+                            <div className="mt-1 flex flex-wrap gap-x-5">
+                              {activeMembers.map((member) => (
+                                <label key={member.userId} className="inline-flex min-h-11 items-center gap-2 text-sm text-slate-800">
+                                  <input type="checkbox" name="contact" value={member.userId} defaultChecked={program.contactUserIds.includes(member.userId)} className="h-4 w-4" />
+                                  {member.displayName ?? t("unnamedPerson")}
+                                </label>
+                              ))}
+                            </div>
+                          </fieldset>
+                          <SubmitButton label={t("contactsSave")} pendingLabel="…" className="mt-1 inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700" />
+                        </form>
+                      ) : (
+                        <p className="mt-3 border-t border-slate-200 pt-3 text-sm text-slate-600">
+                          {t("contactsLabel")}: {program.contactUserIds.map(nameOf).join(", ") || t("contactsNone")}
+                        </p>
+                      )}
+                        </div>
+                      </details>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         )}
+
+        <details className="rounded-[14px] border border-slate-200 bg-white px-[18px]">
+          <summary className="flex min-h-12 cursor-pointer items-center text-sm font-medium text-slate-700">{t("retentionQuestion")}</summary>
+          <div className="grid gap-2 pb-4 text-sm leading-6 text-slate-700">
+            <p>{t("sectionText")}</p>
+            <p>{t("retentionText")}</p>
+          </div>
+        </details>
       </section>
       ) : null}
 

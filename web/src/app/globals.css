@@ -15,6 +15,7 @@
   --font-display: var(--font-unbounded);
   --font-body-fallback: "Spectral", "Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif;
   --font-display-fallback: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --font-inter: ui-sans-serif;
   --ink: #101a2a;
   --ink-soft: #2b4b6f;
   --muted: #41576d;
@@ -931,6 +932,21 @@ body {
    hellste Tuerkis des Logos bleibt Dekoration. Nicht fuer kleine Flaechen und
    nicht fuer mehr als einen Block je Seite.
    --------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   Arbeitsbereiche (Entwurf vom 05.11.2026, freigegeben): Teamraum und Programm
+   lesen sich in Inter - Listen, Formulare und Chat ohne Serifen. Ueberschriften
+   bleiben in Spectral (Marke), mit .font-brand. Erst diese Bereiche; die ganze
+   App folgt hoechstens nach dem Beta-Feedback.
+   --------------------------------------------------------------------------- */
+.work-ui {
+  font-family: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.work-ui .font-brand,
+.font-brand {
+  font-family: var(--font-body), var(--font-body-fallback);
+}
+
 .brand-panel {
   background-image: linear-gradient(120deg, #6d49e0, #0a80b8);
   color: #ffffff;

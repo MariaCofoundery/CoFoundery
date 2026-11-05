@@ -1185,7 +1185,18 @@
     "rsvpWholeNo": "We can't make it",
     "rsvpNote": "Your team and the program leads see your reply. Anyone who answered themselves is not overwritten.",
     "planRsvpTitle": "Replies",
-    "planRsvpSummary": "{yes} coming · {no} can't make it · {open} not answered"
+    "planRsvpSummary": "{yes} coming · {no} can't make it · {open} not answered",
+    "programsActive": "{count, plural, =0 {No team yet} one {One team taking part} other {# teams taking part}}",
+    "programsWaiting": "{count, plural, one {one waiting for consent} other {# waiting for consent}}",
+    "programCodeButton": "Program code",
+    "colTeam": "Team",
+    "colMilestone": "Next milestone",
+    "colUpdate": "Last update",
+    "milestoneUntil": "by {date}",
+    "noMilestone": "no open milestone",
+    "noUpdate": "none yet",
+    "teamSettings": "Settings for this team",
+    "retentionQuestion": "When does a team take part – and what happens to the data when it leaves the program?"
   },
   "programPage": {
     "title": "Program page",
@@ -1426,14 +1437,30 @@
       "checklist": "Checklist",
       "checklistHint": "One line per item. “[x]” in front means done.",
       "add": "Add task",
-      "save": "Save"
+      "save": "Save",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "friday": "Friday",
+      "nextWeek": "Next week",
+      "pickDate": "Date …",
+      "meShort": "Me",
+      "nobodyYet": "Not yet",
+      "titleQuestion": "What needs doing?",
+      "assigneeQuestion": "Who takes care of it?",
+      "dueQuestion": "By when?",
+      "more": "+ Description, checklist, event",
+      "cancel": "Cancel"
     },
     "board": {
       "title": "Tasks",
       "text": "Everything the team has to do – for teams in the program or internal. Only your team sees this, never the startups.",
       "filterLabel": "Show tasks",
       "new": "New task",
-      "doneHidden": "and {count} older"
+      "doneHidden": "and {count} older",
+      "showDone": "{count, plural, one {Show one done} other {Show # done}}",
+      "search": "Search tasks",
+      "searchResult": "{count, plural, =0 {No task} one {One task} other {# tasks}} with “{query}”.",
+      "searchClear": "Clear search"
     },
     "detail": {
       "eyebrow": "Open",
@@ -1469,7 +1496,19 @@
       "nobodyAll": "All unassigned",
       "doneTitle": "Recently done",
       "dictateTitle": "Several at once – dictate or type",
-      "dictateText": "Just speak or write. That becomes suggestions with person, deadline and team that you only check."
+      "dictateText": "Just speak or write. That becomes suggestions with person, deadline and team that you only check.",
+      "mine": "For you",
+      "allTasks": "All tasks",
+      "overdueCount": "Overdue · {count}",
+      "thisWeekCount": "This week · {count}",
+      "talkSub": "Progress conversation",
+      "followUpSub": "Follow-up from your notes",
+      "since": "since {date}",
+      "until": "by {date}",
+      "events": "Dates",
+      "planLink": "Program plan",
+      "nobody": "Nobody assigned",
+      "markDone": "Mark “{task}” as done"
     },
     "who": {
       "title": "Who does what",
@@ -1581,7 +1620,13 @@
       "nobody": "Nobody yet",
       "me": "{name} (you)",
       "create": "{count, plural, one {Create task} other {Create # tasks}}",
-      "discard": "Discard"
+      "discard": "Discard",
+      "lineLabel": "New task",
+      "linePlaceholder": "New task – one line is enough, e.g. “Jonas asks the jury by Friday”",
+      "lineAdd": "Add",
+      "lineHint": "Person and date are picked up from the sentence – you see the suggestion before anything is saved.",
+      "lineMore": "More details",
+      "linePlaceholderShort": "New task …"
     },
     "created": "{count, plural, =0 {No task created.} one {One task created.} other {# tasks created.}}",
     "push": {
@@ -1619,8 +1664,23 @@
     "screen": {
       "title": "Team space",
       "hint": "Only for your own team, never for the startups.",
-      "orgSwitch": "Choose organization"
-    }
+      "orgSwitch": "Choose organization",
+      "eyebrow": "{org} · only for your own team",
+      "eyebrowWeek": "{org} · {from} – {to}",
+      "sections": {
+        "week": "This week",
+        "tasks": "Tasks",
+        "chat": "Chat",
+        "social": "Social media",
+        "pages": "Pages",
+        "who": "Who does what"
+      },
+      "dictate": "Dictate",
+      "newTask": "New task",
+      "sectionsLabel": "Team space sections"
+    },
+    "nobodyShort": "nobody assigned",
+    "checklistOf": "{done} of {total} done"
   },
   "funding": {
     "title": "Funding requirements",

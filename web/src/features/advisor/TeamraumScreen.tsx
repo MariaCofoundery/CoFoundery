@@ -18,7 +18,7 @@ import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getOrgTeamPrograms, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
-import { teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
+import { TEAMRAUM_SECTIONS, teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 
 export type TeamraumQuery = Record<string, string | undefined>;
 
@@ -151,7 +151,23 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
     if (section === "week") return <TeamraumWeek ctx={ctx} followUps={followUps} nextCheckIns={nextCheckIns} />;
     if (section === "who") return <TeamraumWho ctx={ctx} nextCheckIns={nextCheckIns} />;
     if (section === "tasks") {
-      return <TeamraumBoard ctx={ctx} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} view={taskViewOf(query.view)} month={monthOf(query.month, today)} />;
+      return (
+        <TeamraumBoard
+          ctx={ctx}
+          filter={taskFilterOf(query.filter)}
+          selectedTaskId={selectedTaskId}
+          comments={taskComments}
+          view={taskViewOf(query.view)}
+          month={monthOf(query.month, today)}
+          options={{
+            viewChosen: query.view === "board" || query.view === "list" || query.view === "calendar",
+            query: (query.q ?? "").slice(0, 80),
+            showDone: query.done === "1",
+            newOpen: query.new === "1",
+            dictateOpen: query.dictate === "1",
+          }}
+        />
+      );
     }
     // Neue Seite: leer, aus einer mitgelieferten Vorlage oder aus einer eigenen Vorlage der Organisation.
     const builtIn = isBuiltInTemplate(query.template) ? query.template : null;
@@ -172,29 +188,63 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
     );
   })();
 
+  // Kopf nach dem Entwurf vom 05.11.2026: eine kleine Zeile (Organisation, bei "Diese Woche" die Woche), darunter
+  // der Teil als Ueberschrift. Bei den Aufgaben stehen "Diktieren" und "+ Neue Aufgabe" rechts daneben.
+  const monday = addDays(today, -((new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7));
+  const range = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" });
+  const eyebrow =
+    section === "week"
+      ? t("eyebrowWeek", { org: org.name, from: Number(monday.slice(8)), to: range.format(new Date(`${addDays(monday, 6)}T00:00:00Z`)) })
+      : t("eyebrow", { org: org.name });
+  const keepForActions = Object.fromEntries(["view", "filter", "q", "month"].filter((key) => query[key]).map((key) => [key, query[key] as string]));
+
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-slate-200 pb-4">
+    <main className="work-ui mx-auto w-full max-w-6xl px-4 pb-28 pt-5 sm:px-6 sm:pt-7 md:pb-12 lg:px-8">
+      {/* Unter 1280 Pixeln zeigt die Leiste oben keine zweite Reihe - die Teile stehen dann hier (Entwurf: Handy). */}
+      <nav aria-label={t("sectionsLabel")} className="-mx-4 -mt-5 mb-5 flex gap-5 overflow-x-auto border-b border-slate-200 px-4 text-[14.5px] [scrollbar-width:none] sm:-mx-6 sm:-mt-7 sm:px-6 xl:hidden">
+        {TEAMRAUM_SECTIONS.map((entry) => (
+          <Link
+            key={entry}
+            href={teamraumHref(entry, orgs.length > 1 ? org.id : null)}
+            aria-current={entry === section ? "page" : undefined}
+            className={`-mb-px inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 ${entry === section ? "border-slate-950 font-semibold text-slate-950" : "border-transparent text-slate-600"}`}
+          >
+            {t(`sections.${entry}`)}
+          </Link>
+        ))}
+      </nav>
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
-            {t("title")} <span className="font-normal text-slate-500">· {org.name}</span>
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">{t("hint")}</p>
+          <p className="text-[13px] text-slate-600">{eyebrow}</p>
+          <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight tracking-tight text-slate-950 sm:text-[34px]">{t(`sections.${section}`)}</h1>
         </div>
-        {orgs.length > 1 ? (
-          <nav aria-label={t("orgSwitch")} className="flex flex-wrap gap-2">
-            {orgs.map((entry) => (
-              <Link
-                key={entry.id}
-                href={teamraumHref(section, entry.id)}
-                aria-current={entry.id === org.id ? "page" : undefined}
-                className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${entry.id === org.id ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
-              >
-                {entry.name}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {orgs.length > 1 ? (
+            <nav aria-label={t("orgSwitch")} className="flex flex-wrap gap-2">
+              {orgs.map((entry) => (
+                <Link
+                  key={entry.id}
+                  href={teamraumHref(section, entry.id)}
+                  aria-current={entry.id === org.id ? "page" : undefined}
+                  className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${entry.id === org.id ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
+                >
+                  {entry.name}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
+          {section === "tasks" && canWrite ? (
+            <>
+              <Link href={teamraumHref("tasks", org.id, { ...keepForActions, dictate: "1" })} className="hidden min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 md:inline-flex">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+                {t("dictate")}
               </Link>
-            ))}
-          </nav>
-        ) : null}
+              <Link href={teamraumHref("tasks", org.id, { ...keepForActions, new: "1" })} className="brand-cta hidden min-h-11 items-center rounded-xl px-[18px] text-sm font-semibold md:inline-flex">
+                + {t("newTask")}
+              </Link>
+            </>
+          ) : null}
+        </div>
       </header>
       {content}
     </main>

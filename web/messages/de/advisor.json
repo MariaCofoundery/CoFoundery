@@ -1185,7 +1185,18 @@
     "rsvpWholeNo": "Wir können nicht",
     "rsvpNote": "Deine Antwort sehen dein Team und die Programmleitung. Wer selbst geantwortet hat, wird nicht überschrieben.",
     "planRsvpTitle": "Zusagen",
-    "planRsvpSummary": "{yes, plural, one {# kommt} other {# kommen}} · {no, plural, one {# kann nicht} other {# können nicht}} · {open} offen"
+    "planRsvpSummary": "{yes, plural, one {# kommt} other {# kommen}} · {no, plural, one {# kann nicht} other {# können nicht}} · {open} offen",
+    "programsActive": "{count, plural, =0 {Noch kein Team dabei} one {Ein Team dabei} other {# Teams dabei}}",
+    "programsWaiting": "{count, plural, one {eins wartet auf Zustimmung} other {# warten auf Zustimmung}}",
+    "programCodeButton": "Programmcode",
+    "colTeam": "Team",
+    "colMilestone": "Nächster Meilenstein",
+    "colUpdate": "Letztes Update",
+    "milestoneUntil": "bis {date}",
+    "noMilestone": "kein Meilenstein offen",
+    "noUpdate": "noch keins",
+    "teamSettings": "Einstellungen zu diesem Team",
+    "retentionQuestion": "Wann ist ein Team dabei – und was passiert mit den Daten, wenn es das Programm verlässt?"
   },
   "programPage": {
     "title": "Programmseite",
@@ -1426,14 +1437,30 @@
       "checklist": "Checkliste",
       "checklistHint": "Eine Zeile je Punkt. „[x]“ vorne heißt erledigt.",
       "add": "Aufgabe anlegen",
-      "save": "Speichern"
+      "save": "Speichern",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "friday": "Freitag",
+      "nextWeek": "Nächste Woche",
+      "pickDate": "Datum …",
+      "meShort": "Ich",
+      "nobodyYet": "Noch offen",
+      "titleQuestion": "Was ist zu tun?",
+      "assigneeQuestion": "Wer kümmert sich?",
+      "dueQuestion": "Bis wann?",
+      "more": "+ Beschreibung, Checkliste, Veranstaltung",
+      "cancel": "Abbrechen"
     },
     "board": {
       "title": "Aufgaben",
       "text": "Alles, was im Team zu tun ist – für Teams im Programm oder intern. Nur euer Team sieht das, nie die Startups.",
       "filterLabel": "Aufgaben zeigen",
       "new": "Neue Aufgabe",
-      "doneHidden": "und {count} ältere"
+      "doneHidden": "und {count} ältere",
+      "showDone": "{count, plural, one {Eine erledigte anzeigen} other {# erledigte anzeigen}}",
+      "search": "Aufgabe suchen",
+      "searchResult": "{count, plural, =0 {Keine Aufgabe} one {Eine Aufgabe} other {# Aufgaben}} mit „{query}“.",
+      "searchClear": "Suche aufheben"
     },
     "detail": {
       "eyebrow": "Geöffnet",
@@ -1469,7 +1496,19 @@
       "nobodyAll": "Alle ohne Person",
       "doneTitle": "Zuletzt erledigt",
       "dictateTitle": "Mehrere auf einmal – diktieren oder tippen",
-      "dictateText": "Sprich oder schreib einfach drauflos. Daraus werden Vorschläge mit Person, Frist und Team, die du nur noch prüfst."
+      "dictateText": "Sprich oder schreib einfach drauflos. Daraus werden Vorschläge mit Person, Frist und Team, die du nur noch prüfst.",
+      "mine": "Für dich",
+      "allTasks": "Alle Aufgaben",
+      "overdueCount": "Überfällig · {count}",
+      "thisWeekCount": "Diese Woche · {count}",
+      "talkSub": "Gespräch zum Stand",
+      "followUpSub": "Wiedervorlage aus euren Notizen",
+      "since": "seit {date}",
+      "until": "bis {date}",
+      "events": "Termine",
+      "planLink": "Programmplan",
+      "nobody": "Niemand zuständig",
+      "markDone": "„{task}“ als erledigt markieren"
     },
     "who": {
       "title": "Wer macht was",
@@ -1581,7 +1620,13 @@
       "nobody": "Noch niemand",
       "me": "{name} (du)",
       "create": "{count, plural, one {Aufgabe anlegen} other {# Aufgaben anlegen}}",
-      "discard": "Verwerfen"
+      "discard": "Verwerfen",
+      "lineLabel": "Neue Aufgabe",
+      "linePlaceholder": "Neue Aufgabe – eine Zeile reicht, z. B. „Jonas fragt bis Freitag die Jury an“",
+      "lineAdd": "Anlegen",
+      "lineHint": "Person und Datum werden aus dem Satz erkannt – du siehst den Vorschlag, bevor er gespeichert wird.",
+      "lineMore": "Mehr Angaben",
+      "linePlaceholderShort": "Neue Aufgabe …"
     },
     "created": "{count, plural, =0 {Keine Aufgabe angelegt.} one {Eine Aufgabe angelegt.} other {# Aufgaben angelegt.}}",
     "push": {
@@ -1619,8 +1664,23 @@
     "screen": {
       "title": "Teamraum",
       "hint": "Nur für euch im Team, nie für die Startups.",
-      "orgSwitch": "Organisation wählen"
-    }
+      "orgSwitch": "Organisation wählen",
+      "eyebrow": "{org} · nur für euch im Team",
+      "eyebrowWeek": "{org} · {from}. – {to}",
+      "sections": {
+        "week": "Diese Woche",
+        "tasks": "Aufgaben",
+        "chat": "Chat",
+        "social": "Social Media",
+        "pages": "Seiten",
+        "who": "Wer macht was"
+      },
+      "dictate": "Diktieren",
+      "newTask": "Neue Aufgabe",
+      "sectionsLabel": "Teile des Teamraums"
+    },
+    "nobodyShort": "niemand zuständig",
+    "checklistOf": "{done} von {total} erledigt"
   },
   "funding": {
     "title": "Förderauflagen",

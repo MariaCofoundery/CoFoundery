@@ -49,7 +49,7 @@ export type SocialContext = {
 };
 
 const CARD = "advisor-card p-5 sm:p-6";
-const LABEL = "block text-xs font-semibold uppercase tracking-[.12em] text-slate-500";
+const LABEL = "block text-sm font-semibold text-slate-900";
 const INPUT = "mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm";
 const STATUS_STYLE: Record<OrgPost["status"], string> = {
   idea: "border border-dashed border-slate-300 bg-white",
@@ -224,10 +224,7 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
       {message ? <p role={message.tone === "rose" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${message.tone === "rose" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
 
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("text")}</p>
-        </div>
+        <p className="max-w-2xl text-[15px] leading-6 text-slate-700">{t("text")}</p>
         <div className="flex flex-wrap items-center gap-2">
           <nav aria-label={t("viewLabel")} className="inline-flex rounded-full border border-slate-200 bg-white p-1">
             {(["month", "week"] as const).map((entry) => (
@@ -349,7 +346,7 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="uncovered-title" className={`${CARD} ${uncovered.length > 0 ? "border-amber-200" : ""}`}>
-          <h3 id="uncovered-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("uncoveredTitle", { count: uncovered.length })}</h3>
+          <h3 id="uncovered-title" className="text-[15px] font-semibold text-slate-950">{t("uncoveredTitle", { count: uncovered.length })}</h3>
           {uncovered.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("uncoveredNone")}</p> : null}
           <ul className="mt-2 divide-y divide-slate-100">
             {uncovered.map((event) => (
@@ -364,7 +361,7 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
         </section>
 
         <section aria-labelledby="campaigns-title" className={CARD}>
-          <h3 id="campaigns-title" className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">{t("campaignsTitle")}</h3>
+          <h3 id="campaigns-title" className="text-[15px] font-semibold text-slate-950">{t("campaignsTitle")}</h3>
           {ctx.campaigns.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("campaignsNone")}</p> : null}
           <ul className="mt-2 divide-y divide-slate-100">
             {ctx.campaigns.slice(0, 12).map((campaign) => (

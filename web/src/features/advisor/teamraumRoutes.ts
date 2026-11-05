@@ -26,9 +26,9 @@ export function teamraumPath(section: TeamraumSection) {
   return SEGMENT[section] ? `${TEAMRAUM_BASE}/${SEGMENT[section]}` : TEAMRAUM_BASE;
 }
 
-/** Ein Teil des Teamraums einer Organisation, mit weiteren Angaben (Filter, Ansicht, geoeffnete Aufgabe ...). */
+/** Ein Teil des Teamraums einer Organisation, mit weiteren Angaben (Filter, Ansicht, geoeffnete Aufgabe ...). Leere Angaben fallen weg. */
 export function teamraumHref(section: TeamraumSection, orgId: string | null, extra: Record<string, string> = {}) {
-  const params = new URLSearchParams({ ...(orgId ? { org: orgId } : {}), ...extra });
+  const params = new URLSearchParams({ ...(orgId ? { org: orgId } : {}), ...Object.fromEntries(Object.entries(extra).filter(([, value]) => value !== "")) });
   const text = params.toString();
   return text ? `${teamraumPath(section)}?${text}` : teamraumPath(section);
 }
