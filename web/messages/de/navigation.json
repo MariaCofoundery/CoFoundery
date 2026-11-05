@@ -97,5 +97,77 @@
   "teamraumPages": "Seiten",
   "teamraumWho": "Wer macht was",
   "teamraumChatCount": "{count, plural, one {Eine ungelesene Nachricht} other {# ungelesene Nachrichten}}",
-  "areaEvents": "Events"
+  "areaEvents": "Events",
+  "workspace": {
+    "label": "Arbeitsbereich",
+    "navLabel": "Stationen",
+    "groups": {
+      "work": "Arbeiten",
+      "program": "Programm",
+      "network": "Netzwerk"
+    },
+    "items": {
+      "home": "Heute",
+      "tasks": "Aufgaben",
+      "chat": "Chat",
+      "calendar": "Kalender",
+      "social": "Social Media",
+      "pages": "Seiten",
+      "teams": "Teams",
+      "report": "Auswertung",
+      "funding": "Förderauflagen",
+      "follow": "Begleitung",
+      "content": "Inhalte",
+      "events": "Events",
+      "setup": "Einrichten",
+      "myProgram": "Mein Programm"
+    },
+    "children": {
+      "followList": "Wen du begleitest",
+      "invite": "Einladen"
+    },
+    "more": "Mehr",
+    "moreClose": "Schließen",
+    "tabsLabel": "Reiter",
+    "skip": "Zum Inhalt",
+    "org": "Organisation",
+    "orgFallback": "Mein Programm",
+    "search": {
+      "open": "Suchen",
+      "placeholder": "Bereiche und Aktionen suchen",
+      "label": "Bereiche und Aktionen suchen",
+      "none": "Dazu gibt es nichts. Probier einen Bereich wie „Kalender“ oder eine Aktion wie „Termin“.",
+      "hint": "Suche über die Bereiche und das, was man anlegen kann – Inhalte noch nicht.",
+      "close": "Suche schließen",
+      "stations": "Bereiche",
+      "actions": "Anlegen"
+    },
+    "create": {
+      "button": "Neu",
+      "menuLabel": "Von überall anlegen",
+      "title": "Von überall anlegen",
+      "task": {
+        "label": "Aufgabe",
+        "hint": "für dich, andere oder ein Team"
+      },
+      "event": {
+        "label": "Termin",
+        "hint": "mit Posts, Aufgaben, Förderung"
+      },
+      "events": {
+        "label": "Mehrere Termine",
+        "hint": "als Liste tippen oder diktieren"
+      },
+      "post": {
+        "label": "Post",
+        "hint": "LinkedIn, Instagram"
+      },
+      "message": {
+        "label": "Nachricht",
+        "hint": "im Teamraum-Chat"
+      }
+    },
+    "notifications": "Nachrichten und Hinweise",
+    "dateLabel": "Heute"
+  }
 }

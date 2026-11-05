@@ -25,6 +25,8 @@ import {
   type WorkContext,
 } from "@/features/navigation/workContext";
 import { TEAMRAUM_BASE, TEAMRAUM_SECTIONS, teamraumPath, teamraumSectionOfPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
+import { WorkspaceChrome } from "@/features/navigation/workspace/WorkspaceChrome";
+import { isWorkspacePath } from "@/features/navigation/workspace/workspaceNav";
 
 type Props = {
   children: React.ReactNode;
@@ -745,6 +747,99 @@ export function ProductShell({
 
   if (!isProductChromePath(pathname)) {
     return <>{children}</>;
+  }
+
+  // ---------------------------------------------------------------------
+  // ADVISOR-ARBEITSBEREICH MIT SEITENLEISTE (Entwurf vom 05.11.2026, freigegeben)
+  // ---------------------------------------------------------------------
+  //
+  // Teamraum und Programm waren zwei getrennte Bereiche mit je eigener Reihe: man kam schwer hin und her.
+  // In der Advisor-Ansicht steht jetzt EINE Seitenleiste mit allen Stationen und oben eine schlanke Leiste
+  // (Organisation, Suche, "+ Neu", Nachrichten, Profil); auf dem Handy fuenf Reiter unten. Die Founder-Ansicht
+  // und Connect behalten die Leiste oben. Reine Darstellung - jede Seite prueft ihren Zugang selbst.
+  const useWorkspace = hasAdvisor && resolvedActiveView === "advisor" && !isConnectOnly && !isSuspendedConnectOnly && isWorkspacePath(pathname);
+  if (useWorkspace) {
+    return (
+      <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
+        <RememberLastPlace />
+        <WorkspaceChrome
+          hasOrg={advisorOrgNames.length > 0}
+          orgLabel={advisorOrgLabel}
+          chatUnread={advisorChatUnread}
+          messagesCount={messagesAttentionCount}
+          slots={{
+            profile: (
+              <ProfileMenu
+                displayName={displayName}
+                avatarId={avatarId}
+                avatarImageUrl={avatarImageUrl}
+                accountOnly={false}
+                isPlatformAdmin={isPlatformAdmin}
+                adminAttentionCount={adminAttentionCount}
+                showName={false}
+              />
+            ),
+            language: <LanguageSwitcher compact />,
+            viewSwitch: <DashboardViewSwitch activeView={resolvedActiveView} hasFounder={hasFounder} hasAdvisor={hasAdvisor} onSelect={chooseWorkContext} compact />,
+            feedback: (
+              <ProductFeedbackEntry
+                source="nav"
+                invitationId={resolvedFeedbackInvitationId}
+                variant="nav"
+                triggerClassName="shrink-0 whitespace-nowrap rounded-full border border-violet-300 px-3 py-1.5 text-[13px] font-semibold text-violet-700 transition hover:bg-violet-50"
+              />
+            ),
+            moreExtras: (
+              <>
+                <div className="flex min-h-11 items-center gap-3 px-3 py-2">
+                  <ProfileAvatar
+                    displayName={normalizeDisplayName(displayName) || t("profileFallback")}
+                    avatarId={avatarId}
+                    imageUrl={avatarImageUrl}
+                    className="h-8 w-8 shrink-0 rounded-full object-cover"
+                    fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-700"
+                  />
+                  <span className="min-w-0 truncate text-sm font-semibold text-slate-900">{normalizeDisplayName(displayName) || t("profileFallback")}</span>
+                </div>
+                <MobileMenuLink
+                  href="/messages"
+                  active={pathname.startsWith("/messages")}
+                  onNavigate={closeMenu}
+                  badge={<ConnectAttentionBadge count={messagesAttentionCount} label={t("messagesAttentionBadge", { count: messagesAttentionCount })} />}
+                >
+                  {t("messages")}
+                </MobileMenuLink>
+                <MobileMenuLink href="/me/profile" active={isProfilePath(pathname)} onNavigate={closeMenu}>
+                  {t("myProfile")}
+                </MobileMenuLink>
+                <MobileMenuLink href="/account" active={pathname.startsWith("/account")} onNavigate={closeMenu}>
+                  {t("account")}
+                </MobileMenuLink>
+                {isPlatformAdmin ? (
+                  <MobileMenuLink href="/admin" active={pathname === "/admin" || pathname.startsWith("/admin/")} onNavigate={closeMenu}>
+                    {t("admin")}{adminAttentionCount > 0 ? ` (${Math.min(adminAttentionCount, 99)})` : ""}
+                  </MobileMenuLink>
+                ) : null}
+                <ProductFeedbackEntry source="nav" invitationId={resolvedFeedbackInvitationId} variant="nav" triggerClassName={MOBILE_MENU_ROW_CLASS} />
+                <form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>
+                  <button type="submit" className={`${MOBILE_MENU_ROW_CLASS} w-full text-left`}>
+                    {t("logout")}
+                  </button>
+                </form>
+                <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-200/80 pt-3">
+                  <LanguageSwitcher />
+                  <DashboardViewSwitch activeView={resolvedActiveView} hasFounder={hasFounder} hasAdvisor={hasAdvisor} onSelect={chooseWorkContext} />
+                </div>
+              </>
+            ),
+          }}
+        >
+          {children}
+          {hasFounder && researchConsentState === "undecided" ? <ResearchConsentNotice onDecision={setResearchConsentState} /> : null}
+          <AnnouncementPopup />
+        </WorkspaceChrome>
+      </ProductNavigationOverrideContext.Provider>
+    );
   }
 
   return (

@@ -89,7 +89,8 @@ test("beide Seiten sind ohne Founder-Rolle erreichbar", () => {
 
   const mobil = shell.slice(
     shell.indexOf("{!isSuspendedConnectOnly ? ("),
-    shell.indexOf('<MobileMenuLink href="/account"'),
+    // Der Arbeitsbereich (Advisor-Seitenleiste) hat unter "Mehr" einen eigenen Konto-Eintrag davor.
+    shell.lastIndexOf('<MobileMenuLink href="/account"'),
   );
   assert.doesNotMatch(mobil, /href="\/profile"/);
   assert.match(mobil, /href="\/me\/profile"/);

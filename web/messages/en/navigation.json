@@ -97,5 +97,77 @@
   "teamraumPages": "Pages",
   "teamraumWho": "Who does what",
   "teamraumChatCount": "{count, plural, one {One unread message} other {# unread messages}}",
-  "areaEvents": "Events"
+  "areaEvents": "Events",
+  "workspace": {
+    "label": "Workspace",
+    "navLabel": "Stations",
+    "groups": {
+      "work": "Work",
+      "program": "Program",
+      "network": "Network"
+    },
+    "items": {
+      "home": "Today",
+      "tasks": "Tasks",
+      "chat": "Chat",
+      "calendar": "Calendar",
+      "social": "Social media",
+      "pages": "Pages",
+      "teams": "Teams",
+      "report": "Report",
+      "funding": "Funding conditions",
+      "follow": "Accompanying",
+      "content": "Content",
+      "events": "Events",
+      "setup": "Set up",
+      "myProgram": "My program"
+    },
+    "children": {
+      "followList": "Who you accompany",
+      "invite": "Invite"
+    },
+    "more": "More",
+    "moreClose": "Close",
+    "tabsLabel": "Tabs",
+    "skip": "Skip to content",
+    "org": "Organization",
+    "orgFallback": "My program",
+    "search": {
+      "open": "Search",
+      "placeholder": "Search areas and actions",
+      "label": "Search areas and actions",
+      "none": "Nothing found. Try an area such as “Calendar” or an action such as “Event”.",
+      "hint": "Searches the areas and what you can create – not content yet.",
+      "close": "Close search",
+      "stations": "Areas",
+      "actions": "Create"
+    },
+    "create": {
+      "button": "New",
+      "menuLabel": "Create from anywhere",
+      "title": "Create from anywhere",
+      "task": {
+        "label": "Task",
+        "hint": "for you, others or a team"
+      },
+      "event": {
+        "label": "Event",
+        "hint": "with posts, tasks, funding"
+      },
+      "events": {
+        "label": "Several events",
+        "hint": "type or dictate a list"
+      },
+      "post": {
+        "label": "Post",
+        "hint": "LinkedIn, Instagram"
+      },
+      "message": {
+        "label": "Message",
+        "hint": "in the team room chat"
+      }
+    },
+    "notifications": "Messages and notices",
+    "dateLabel": "Today"
+  }
 }

@@ -97,7 +97,8 @@ test("the answer form wires the buffer to autosave, load and submit", () => {
 
 test("every explicit sign-out clears the drafts first; an expired session does not", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
-  assert.equal(shell.split("<form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>").length, 3);
+  // Drei Abmelden-Knoepfe: Kontomenue, Mobilmenue und "Mehr" im Arbeitsbereich (Seitenleiste, 05.11.2026).
+  assert.equal(shell.split("<form action={signOutAction} onSubmit={() => clearAllInterviewDrafts()}>").length, 4);
   assert.doesNotMatch(shell, /<form action=\{signOutAction\}>/);
   assert.match(source("src/features/account/AccountAccessSection.tsx"), /<ClearDraftsForm action=\{signOutEverywhereAction\}/);
   assert.match(source("src/features/account/DeleteAccountSection.tsx"), /clearAllInterviewDrafts\(\);\s*startTransition/);
