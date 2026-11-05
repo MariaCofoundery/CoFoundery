@@ -38,6 +38,8 @@ export const NOTIFICATION_KINDS = [
   { kind: "founder_in_the_wild", area: "align" },
   // Teamraum einer Organisation: zugeteilt, kommentiert, heute faellig (nur Hinweis und Mitteilung, keine Mail).
   { kind: "org_tasks", area: "advisor" },
+  // Teamraum-Chat (20270318120000): nur Mitteilung aufs Geraet, der Text steht nie darin.
+  { kind: "org_chat", area: "advisor" },
 ] as const;
 
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

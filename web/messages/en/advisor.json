@@ -763,7 +763,7 @@
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Care | Team space | Content for the teams | Set up",
       "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | How you organize yourselves as a team: what is due this week, tasks, pages and who does what. Only for you, never for the startups. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | This week | Tasks | Pages | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
+      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | This week | Tasks | Chat | Pages | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -1734,6 +1734,40 @@
       "team": "For per-team requirements, each piece of evidence needs a team.",
       "program": "You cannot record anything for this team – you do not support it.",
       "invalid": "Please check the details: period, target and date."
+    }
+  },
+  "chat": {
+    "listTitle": "Chat",
+    "listText": "Write to each other – in the team chat for everyone or directly one to one. Only your team reads along, never the startups.",
+    "teamTitle": "Team chat",
+    "teamSubtitle": "{org} · {count, plural, one {# member} other {# members}}",
+    "openTeam": "Open team chat",
+    "newDirect": "New direct chat with",
+    "noMessages": "No message yet",
+    "you": "You",
+    "retracted": "Message withdrawn",
+    "formerMember": "Former member",
+    "mutedShort": "muted",
+    "privacyNote": "Only the members of your team see messages (direct chats only the two of you). Whoever leaves the organization no longer reads along. You can withdraw a message of your own.",
+    "back": "Back to chats",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "quietNow": "Off hours – your phone stays silent, messages wait here.",
+    "messagesLabel": "Messages",
+    "emptyTeam": "The team chat is still quiet. Write the first message.",
+    "emptyDirect": "No message yet. Write the first one.",
+    "retract": "Withdraw",
+    "inputLabel": "Message",
+    "placeholder": "Message …",
+    "send": "Send",
+    "enterHint": "Enter sends · Shift+Enter for a new line",
+    "readOnly": "You can no longer write here.",
+    "errorSend": "The message did not go out. Please try again.",
+    "errorMember": "This person is no longer on the team.",
+    "push": {
+      "teamTitle": "New message in the team chat",
+      "directTitle": "New message from {name}",
+      "body": "Open the chat to read it."
     }
   }
 }

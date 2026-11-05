@@ -327,7 +327,7 @@ export default function DatenschutzPage() {
               im Team und Abwesenheiten mit Vertretung ein. Das sehen nur die aktiven Mitglieder
               dieser Organisation, nie die Teams im Programm. Eigene Notizen sieht nur, wer sie schreibt – auch nicht die Führung –, bis sie mit dem Team geteilt werden. Hängt eine Aufgabe an einem Team im
               Programm, sehen den Namen des Teams nur Mitglieder, die dieses Team ohnehin betreuen.
-              Endet eine Mitgliedschaft, verlieren ihre Aufgaben die Zuständigkeit und ihre Angabe zu
+              Im Chat des Teamraums lesen alle aktiven Mitglieder den Teamchat, Direktchats nur die beiden Beteiligten; eine eigene Nachricht lässt sich zurücknehmen, mit dem Konto gehen die eigenen Nachrichten. Mitteilungen aufs Gerät zum Chat nennen nie den Text. Endet eine Mitgliedschaft, verlieren ihre Aufgaben die Zuständigkeit und ihre Angabe zu
               Rolle und Abwesenheit wird gelöscht; mit dem Konto gehen auch die eigenen Kommentare.
             </p>
           </BulletSection>

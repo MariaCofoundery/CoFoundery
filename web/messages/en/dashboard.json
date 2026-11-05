@@ -465,6 +465,10 @@
         "org_tasks": {
           "title": "Tasks in the team space",
           "text": "When someone gives you a task, comments on one of your tasks or one is due today – as a notification on your device, without the task title. The in-app notice always comes."
+        },
+        "org_chat": {
+          "title": "Chat in the team space",
+          "text": "New messages in the team chat and your direct chats – as a notification on your device, without the text. You can also mute single chats there."
         }
       },
       "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",

@@ -13,6 +13,9 @@ import { TeamraumBoard, TeamraumWeek, TeamraumWho, type TeamraumContext } from "
 import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
+import { OrgChatList } from "@/features/advisor/OrgChatList";
+import { listMyOrgChats } from "@/features/advisor/orgChatData";
+import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
@@ -42,7 +45,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -53,7 +56,7 @@ type Tab = (typeof TABS)[number];
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "plan", "report", "funding"] },
   // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
-  { key: "team", tabs: ["week", "tasks", "pages", "who"] },
+  { key: "team", tabs: ["week", "tasks", "chat", "pages", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -316,6 +319,17 @@ export default async function AdvisorOrganisationPage({
             snapshots={funding.snapshots}
             suggestion={isSuggestionKey(query.suggest) ? query.suggest : null}
             newGrant={query.newGrant === "1"}
+          />
+        ) : null}
+        {tab === "chat" ? (
+          <OrgChatList
+            orgId={org.id}
+            me={user.id}
+            members={members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed") }))}
+            chats={await listMyOrgChats(client, org.id)}
+            quiet={await getMyQuietHours(client)}
+            canWrite={org.status === "active"}
+            locale={getPresentationLocale(await getLocale())}
           />
         ) : null}
         {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}

@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
  * Feierabend speichern und den Schnellschalter setzen (20270317120000). Rueckweg: ein fester Pfad aus
  * einer kurzen Liste, nie eine uebergebene Adresse.
  */
-const BACK = ["/account", "/advisor/organisation"] as const;
+const BACK = ["/account", "/advisor/organisation", "/advisor/organisation/chat"] as const;
 const backOf = (formData: FormData, extra: string) => {
   const raw = String(formData.get("back") ?? "");
   const path = BACK.find((entry) => raw === entry || raw.startsWith(`${entry}?`)) ? raw.split("#")[0] : "/account";

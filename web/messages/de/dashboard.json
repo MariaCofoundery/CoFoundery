@@ -465,6 +465,10 @@
         "org_tasks": {
           "title": "Aufgaben im Teamraum",
           "text": "Wenn dir jemand eine Aufgabe zuteilt, eine deiner Aufgaben kommentiert oder eine heute fällig ist – als Mitteilung aufs Gerät, ohne den Titel der Aufgabe. Der Hinweis in der App kommt immer."
+        },
+        "org_chat": {
+          "title": "Chat im Teamraum",
+          "text": "Neue Nachrichten im Teamchat und in deinen Direktchats – als Mitteilung aufs Gerät, ohne den Text. Einzelne Chats kannst du auch dort stummschalten."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",

@@ -763,7 +763,7 @@
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betreuen | Teamraum | Inhalte für die Teams | Einrichten",
       "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben, Seiten und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Diese Woche | Aufgaben | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Diese Woche | Aufgaben | Chat | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -1734,6 +1734,40 @@
       "team": "Bei Auflagen je Team gehört zu jedem Nachweis ein Team.",
       "program": "Für dieses Team kannst du nichts eintragen – du betreust es nicht.",
       "invalid": "Bitte prüfe die Angaben: Laufzeit, Ziel und Datum."
+    }
+  },
+  "chat": {
+    "listTitle": "Chat",
+    "listText": "Schreibt euch im Team – im Teamchat für alle oder direkt zu zweit. Nur euer Team liest mit, nie die Startups.",
+    "teamTitle": "Teamchat",
+    "teamSubtitle": "{org} · {count, plural, one {# Mitglied} other {# Mitglieder}}",
+    "openTeam": "Teamchat öffnen",
+    "newDirect": "Neuer Direktchat mit",
+    "noMessages": "Noch keine Nachricht",
+    "you": "Du",
+    "retracted": "Nachricht zurückgenommen",
+    "formerMember": "Früheres Mitglied",
+    "mutedShort": "stumm",
+    "privacyNote": "Nachrichten sehen nur die Mitglieder eures Teams (Direktchats nur ihr beide). Wer die Organisation verlässt, liest nicht mehr mit. Eine eigene Nachricht kannst du zurücknehmen.",
+    "back": "Zurück zu den Chats",
+    "mute": "Stumm",
+    "unmute": "Ton an",
+    "quietNow": "Feierabend – dein Telefon bleibt still, Nachrichten warten hier.",
+    "messagesLabel": "Nachrichten",
+    "emptyTeam": "Noch ist es still im Teamchat. Schreib die erste Nachricht.",
+    "emptyDirect": "Noch keine Nachricht. Schreib die erste.",
+    "retract": "Zurücknehmen",
+    "inputLabel": "Nachricht",
+    "placeholder": "Nachricht …",
+    "send": "Senden",
+    "enterHint": "Enter sendet · Umschalt+Enter für eine neue Zeile",
+    "readOnly": "Hier kannst du nicht mehr schreiben.",
+    "errorSend": "Die Nachricht ging nicht raus. Bitte versuch es noch einmal.",
+    "errorMember": "Diese Person ist nicht mehr im Team.",
+    "push": {
+      "teamTitle": "Neue Nachricht im Teamchat",
+      "directTitle": "Neue Nachricht von {name}",
+      "body": "Öffne den Chat, um sie zu lesen."
     }
   }
 }

@@ -136,7 +136,7 @@ test("Teamraum: Aktionen bauen den Rueckweg selbst und rufen nur die Datenbankfu
 
 test("Teamraum: eigene Gruppe in der Organisation, auf dem Advisor-Start und im Kontoexport", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(page, /\{ key: "team", tabs: \["week", "tasks", "pages", "who"\] \}/);
+  assert.match(page, /\{ key: "team", tabs: \["week", "tasks", "chat", "pages", "who"\] \}/);
   assert.match(page, /canWrite: org\.status === "active"/);
   const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   assert.match(start, /listMyDueOrgTasks\(client, user\.id\)/);
