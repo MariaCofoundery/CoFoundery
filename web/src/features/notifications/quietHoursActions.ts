@@ -8,10 +8,11 @@ import { createClient } from "@/lib/supabase/server";
  * Feierabend speichern und den Schnellschalter setzen (20270317120000). Rueckweg: ein fester Pfad aus
  * einer kurzen Liste, nie eine uebergebene Adresse.
  */
-const BACK = ["/account", "/advisor/organisation", "/advisor/organisation/chat"] as const;
+// Konto, Chatliste oder ein Gespraech im Teamraum (seit 05.11.2026 eigene Adressen).
+const BACK = /^\/(account|advisor\/teamraum\/chat(\/[0-9a-f-]{36})?)(\?[^#]*)?$/;
 const backOf = (formData: FormData, extra: string) => {
-  const raw = String(formData.get("back") ?? "");
-  const path = BACK.find((entry) => raw === entry || raw.startsWith(`${entry}?`)) ? raw.split("#")[0] : "/account";
+  const raw = String(formData.get("back") ?? "").split("#")[0];
+  const path = BACK.test(raw) ? raw : "/account";
   return `${path}${path.includes("?") ? "&" : "?"}${extra}${path === "/account" ? "#feierabend" : ""}`;
 };
 const timeOrNull = (value: FormDataEntryValue | null) => {
@@ -51,6 +52,6 @@ export async function pauseNotificationsAction(formData: FormData) {
   const parsed = until ? new Date(until) : null;
   const { error } = await client.rpc("pause_my_notifications", { p_until: parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString() : null });
   revalidatePath("/account");
-  revalidatePath("/advisor/organisation");
+  revalidatePath("/advisor/teamraum", "layout");
   redirect(backOf(formData, error ? "quiet=invalid" : "quiet=paused"));
 }

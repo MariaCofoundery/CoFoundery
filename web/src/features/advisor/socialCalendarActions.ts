@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isChannel, isPostStatus } from "@/features/advisor/socialCalendarModel";
+import { TEAMRAUM_BASE, teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Social-Media-Kalender schreiben (20270319120000). Wer darf, entscheidet die Datenbank. Der Rueckweg wird
@@ -26,8 +27,8 @@ const timeOrNull = (value: unknown) => {
 
 function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const orgId = uuidOrNull(formData.get("orgId"));
-  if (!orgId) return "/advisor/organisation";
-  const params = new URLSearchParams({ org: orgId, tab: "social" });
+  if (!orgId) return TEAMRAUM_BASE;
+  const params = new URLSearchParams();
   const month = String(formData.get("month") ?? "");
   if (/^\d{4}-\d{2}$/.test(month)) params.set("month", month);
   const week = String(formData.get("week") ?? "");
@@ -36,7 +37,7 @@ function backTo(formData: FormData, extra: Record<string, string> = {}) {
     params.set("week", week);
   }
   for (const [key, value] of Object.entries(extra)) params.set(key, value);
-  return `/advisor/organisation?${params.toString()}`;
+  return teamraumHref("social", orgId, Object.fromEntries(params));
 }
 
 async function requireUser(next: string) {
@@ -49,7 +50,7 @@ async function requireUser(next: string) {
 }
 
 function finish(path: string) {
-  revalidatePath("/advisor/organisation");
+  revalidatePath("/advisor/teamraum", "layout");
   redirect(path);
 }
 
@@ -154,6 +155,6 @@ export async function movePostToDayAction(postId: string, day: string): Promise<
   if (!UUID.test(postId) || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false };
   const client = await createClient();
   const { error } = await client.rpc("move_org_post", { p_post_id: postId, p_planned_on: day, p_status: null });
-  if (!error) revalidatePath("/advisor/organisation");
+  if (!error) revalidatePath("/advisor/teamraum", "layout");
   return { ok: !error };
 }

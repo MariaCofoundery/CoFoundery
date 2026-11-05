@@ -24,6 +24,7 @@ import {
   writeWorkContextCookie,
   type WorkContext,
 } from "@/features/navigation/workContext";
+import { TEAMRAUM_BASE, TEAMRAUM_SECTIONS, teamraumPath, teamraumSectionOfPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 
 type Props = {
   children: React.ReactNode;
@@ -93,6 +94,15 @@ type NavigationItem = {
      */
     count?: { value: number; label: string };
   }[];
+};
+
+const TEAMRAUM_LABEL: Record<TeamraumSection, "teamraumWeek" | "teamraumTasks" | "teamraumChat" | "teamraumSocial" | "teamraumPages" | "teamraumWho"> = {
+  week: "teamraumWeek",
+  tasks: "teamraumTasks",
+  chat: "teamraumChat",
+  social: "teamraumSocial",
+  pages: "teamraumPages",
+  who: "teamraumWho",
 };
 
 type NavigationOverride = {
@@ -489,6 +499,16 @@ export function ProductShell({
         ? `${advisorOrgNames[0].slice(0, 15).trimEnd()}…`
         : advisorOrgNames[0]
       : t("advisorOrg");
+  const isAdvisorFollowArea = (currentPathname: string) =>
+    ["/advisor/begleitung", "/advisor/group", "/advisor/person", "/advisor/review", "/advisor/report", "/advisor/snapshot", "/advisor/session"].some(
+      (base) => currentPathname === base || currentPathname.startsWith(`${base}/`),
+    );
+  // Person, Team und Team-Runde (frueher „Intake") an einem Ort.
+  const isAdvisorInviteArea = (currentPathname: string) =>
+    currentPathname === "/advisor/einladen" ||
+    currentPathname === "/team-intake" ||
+    currentPathname.startsWith("/team-intake/") ||
+    currentPathname.startsWith("/advisor/intake");
   const advisorItems: NavigationItem[] = isConnectOnly || isFounderView || !hasAdvisor ? [] : [
     {
       href: "/advisor/dashboard",
@@ -498,30 +518,54 @@ export function ProductShell({
     {
       // Alles, was man begleitet: Teams, Personen, Gruppenauswertungen - und
       // die Seiten dazu (Person, Review, Report, Snapshot, Sitzung).
+      //
+      // EINLADEN STEHT SEIT DEM 05.11.2026 HIER (Wunsch Maria): Eine Einladung ist
+      // der Anfang einer Begleitung, kein eigener Ort. Sie hat in der zweiten Reihe
+      // ihren Platz behalten - Person, Team-Runde und Team ins Programm an einem Ort.
       href: "/advisor/begleitung",
       label: t("advisorFollow"),
-      isActive: (currentPathname) =>
-        ["/advisor/begleitung", "/advisor/group", "/advisor/person", "/advisor/review", "/advisor/report", "/advisor/snapshot", "/advisor/session"].some(
-          (base) => currentPathname === base || currentPathname.startsWith(`${base}/`),
-        ),
-    },
-    {
-      // Person, Team und Team-Runde (frueher „Intake") an einem Ort.
-      href: "/advisor/einladen",
-      label: t("advisorInvite"),
-      isActive: (currentPathname) =>
-        currentPathname === "/advisor/einladen" ||
-        currentPathname === "/team-intake" ||
-        currentPathname.startsWith("/team-intake/") ||
-        currentPathname.startsWith("/advisor/intake"),
+      isActive: (currentPathname) => isAdvisorFollowArea(currentPathname) || isAdvisorInviteArea(currentPathname),
+      subItems: [
+        { href: "/advisor/begleitung", label: t("advisorFollowList"), isActive: isAdvisorFollowArea },
+        { href: "/advisor/einladen", label: t("advisorInvite"), isActive: isAdvisorInviteArea },
+      ],
     },
     {
       href: "/advisor/organisation",
       label: advisorOrgLabel,
-      badge: advisorChatUnread > 0 ? { kind: "chat", count: advisorChatUnread } : undefined,
       // Die Seiten eines Teams im Programm erreicht man ueber die Organisation.
-      isActive: (currentPathname) => currentPathname === "/advisor/organisation" || currentPathname.startsWith("/advisor/programm/") || currentPathname === "/advisor/beispiel",
+      isActive: (currentPathname) =>
+        currentPathname === "/advisor/organisation" ||
+        currentPathname.startsWith("/advisor/organisation/") ||
+        currentPathname.startsWith("/advisor/programm/") ||
+        currentPathname === "/advisor/beispiel",
     },
+    // ---------------------------------------------------------------------
+    // DER TEAMRAUM IST EIN EIGENER BEREICH (05.11.2026)
+    // ---------------------------------------------------------------------
+    //
+    // Vorher eine Reitergruppe der Organisation, drei Klicks tief unter einem
+    // grossen Kopf. Maria: "ein eigener Arbeitsraum" - dort arbeitet das Team
+    // der Organisation jeden Tag, das ist etwas anderes als die Teams im
+    // Programm zu betreuen. Nur wer in einer Organisation ist, hat einen.
+    ...(advisorOrgNames.length > 0
+      ? [
+          {
+            href: TEAMRAUM_BASE,
+            label: t("advisorTeamraum"),
+            badge: advisorChatUnread > 0 ? ({ kind: "chat", count: advisorChatUnread } as const) : undefined,
+            isActive: (currentPathname: string) => teamraumSectionOfPath(currentPathname) !== null,
+            subItems: TEAMRAUM_SECTIONS.map((section) => ({
+              href: teamraumPath(section),
+              label: t(TEAMRAUM_LABEL[section]),
+              isActive: (currentPathname: string) => teamraumSectionOfPath(currentPathname) === section,
+              ...(section === "chat" && advisorChatUnread > 0
+                ? { count: { value: advisorChatUnread, label: t("teamraumChatCount", { count: advisorChatUnread }) } }
+                : {}),
+            })),
+          },
+        ]
+      : []),
   ];
 
   const findItem: NavigationItem = {

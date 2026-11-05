@@ -59,5 +59,5 @@ test("Chat Stufe 2: Dateinamen sicher, Anhaenge nur ueber die geprueften Wege, K
   const deletion = readFileSync("src/features/account/deleteFounderAccount.ts", "utf8");
   assert.match(deletion, /const chatFileCleanup = await deleteOwnedChatFiles\(privileged, userId\);/);
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  assert.match(shell, /badge: advisorChatUnread > 0 \? \{ kind: "chat", count: advisorChatUnread \} : undefined/);
+  assert.match(shell, /badge: advisorChatUnread > 0 \? \(\{ kind: "chat", count: advisorChatUnread \} as const\) : undefined/);
 });

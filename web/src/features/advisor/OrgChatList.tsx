@@ -6,6 +6,7 @@ import { QuietQuickSwitch } from "@/features/notifications/QuietQuickSwitch";
 import type { QuietHours } from "@/features/notifications/QuietHoursSection";
 import type { ChatSummary } from "@/features/advisor/orgChatModel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { teamraumChatHref, teamraumHref, teamraumPath } from "@/features/advisor/teamraumRoutes";
 
 /** Die Chats im Teamraum: Teamchat, eigene Direktchats, neuer Direktchat (20270318120000). */
 export async function OrgChatList({
@@ -41,7 +42,7 @@ export async function OrgChatList({
   };
   const withChat = new Set(directs.map((chat) => chat.otherUserId));
   const startable = members.filter((member) => member.userId !== me && !withChat.has(member.userId));
-  const href = (chatId: string) => `/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: chatId }).toString()}`;
+  const href = (chatId: string) => teamraumChatHref(orgId, chatId);
   const preview = (chat: ChatSummary) =>
     chat.lastMessageAt === null ? t("noMessages") : `${chat.lastAuthorUserId === me ? t("you") : nameOf(chat.lastAuthorUserId)}: ${chat.lastBody ?? t("retracted")}`;
   const Row = ({ chat, title, avatar }: { chat: ChatSummary; title: string; avatar: string }) => (
@@ -67,13 +68,12 @@ export async function OrgChatList({
           <h2 className="text-xl font-semibold text-slate-950">{t("listTitle")}</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("listText")}</p>
         </div>
-        <QuietQuickSwitch paused={quiet.pausedUntil !== null} back={`/advisor/organisation?org=${orgId}&tab=chat`} compact />
+        <QuietQuickSwitch paused={quiet.pausedUntil !== null} back={teamraumHref("chat", orgId)} compact />
       </div>
       {quiet.quietNow ? <p role="status" className="rounded-xl bg-sky-50 px-4 py-2.5 text-sm text-sky-900">{t("quietNow")}</p> : null}
 
-      <form role="search" method="get" action="/advisor/organisation" className="flex gap-2">
+      <form role="search" method="get" action={teamraumPath("chat")} className="flex gap-2">
         <input type="hidden" name="org" value={orgId} />
-        <input type="hidden" name="tab" value="chat" />
         <label className="min-w-0 flex-1">
           <span className="sr-only">{t("searchLabel")}</span>
           <input type="search" name="q" defaultValue={query} minLength={2} maxLength={100} placeholder={t("searchPlaceholder")} className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />

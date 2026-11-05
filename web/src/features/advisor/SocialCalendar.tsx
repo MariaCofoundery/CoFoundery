@@ -20,6 +20,7 @@ import {
   type OrgCampaign,
   type OrgPost,
 } from "@/features/advisor/socialCalendarModel";
+import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Social-Media-Kalender im Teamraum (20270319120000): Monat auf einen Blick, Postings farbig je Kanal,
@@ -69,13 +70,11 @@ function Hidden({ ctx, postId }: { ctx: SocialContext; postId?: string }) {
 }
 
 const href = (ctx: SocialContext, extra: Record<string, string> = {}) =>
-  `/advisor/organisation?${new URLSearchParams({
-    org: ctx.orgId,
-    tab: "social",
+  teamraumHref("social", ctx.orgId, {
     ...(ctx.view === "week" ? { view: "week", week: ctx.week } : { month: ctx.month }),
     ...(ctx.channel ? { channel: ctx.channel } : {}),
     ...extra,
-  }).toString()}`;
+  });
 
 async function PostPill({ ctx, post, large = false }: { ctx: SocialContext; post: OrgPost; large?: boolean }) {
   const t = await getTranslations("advisor.social");
@@ -263,7 +262,7 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
       </div>
 
       {ctx.canWrite ? (
-        <details className="brand-panel rounded-3xl p-5 sm:p-6">
+        <details className="rounded-3xl border border-violet-200 bg-violet-50/70 p-5 sm:p-6">
           <summary className="flex min-h-11 cursor-pointer items-center text-base font-semibold text-slate-950">{t("plan.title")}</summary>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("plan.text")}</p>
           <div className="mt-4">

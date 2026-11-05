@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loadFunding } from "@/features/advisor/fundingData";
 import { getOrgTeamPrograms } from "@/features/advisor/teamProgramData";
 import { grantOf, isEventKind, isRequirementKind, isRequirementMeasure, MEASURES_OF_KIND } from "@/features/advisor/fundingModel";
+import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Foerderauflagen schreiben. Wer darf, prueft die Datenbank (20270314120000): Foerderung, Auflagen
@@ -140,7 +141,7 @@ export async function requirementTaskAction(formData: FormData) {
   const { data, error } = await client.rpc("create_org_task_for_requirement", { p_requirement_id: uuidOrNull(formData.get("requirementId")) });
   const orgId = uuidOrNull(formData.get("orgId"));
   if (error || !orgId || typeof data !== "string") finish(backTo(formData, { fundingError: "failed" }));
-  finish(`/advisor/organisation?${new URLSearchParams({ org: orgId as string, tab: "tasks", task: data as string }).toString()}#task-detail`);
+  finish(`${teamraumHref("tasks", orgId as string, { task: data as string })}#task-detail`);
 }
 
 /** Den Bericht so ablegen, wie er gerade ist. Gerechnet wird hier, mit denselben Daten wie im Reiter. */

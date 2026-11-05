@@ -8,6 +8,7 @@ import { deliverPushToUser } from "@/features/notifications/pushDelivery";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { ATTACHMENT_MAX_BYTES, ATTACHMENT_TYPES, REACTIONS, safeFileName } from "@/features/advisor/orgChatModel";
 import { ORG_CHAT_BUCKET, orgChatStorageClient } from "@/features/advisor/orgChatStorage";
+import { teamraumChatHref, teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Teamraum-Chat schreiben (20270318120000). Wer darf, entscheidet die Datenbank. Gesendet wird aus dem
@@ -62,7 +63,7 @@ async function pushChatMessage(client: Awaited<ReturnType<typeof createClient>>,
         // Gruppenname ja (das Team hat ihn selbst vergeben), Text nie.
         title: direct && senderName ? t("directTitle", { name: senderName }) : groupName ? t("groupTitle", { name: groupName }) : t("teamTitle"),
         body: t("body"),
-        url: `/advisor/organisation/chat?${new URLSearchParams({ org: row.org_id, chat: row.chat_id }).toString()}`,
+        url: teamraumChatHref(row.org_id, row.chat_id),
         tag: `org_chat:${row.chat_id}`,
       });
     }),
@@ -122,33 +123,33 @@ export async function toggleOrgChatReaction(messageId: string, emoji: string): P
 /** Eine eigene Gruppe anlegen - und hinein. */
 export async function createOrgChatGroupAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
-  if (!UUID.test(orgId)) redirect("/advisor/organisation");
+  if (!UUID.test(orgId)) redirect("/advisor/teamraum/chat");
   const members = formData.getAll("member").map(String).filter((id) => UUID.test(id));
   const client = await createClient();
   const { data, error } = await client.rpc("create_org_chat_group", { p_org_id: orgId, p_name: String(formData.get("name") ?? "").slice(0, 80), p_member_ids: members });
-  if (error || typeof data !== "string") redirect(`/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "chat", chatError: "1" }).toString()}`);
-  redirect(`/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: data as string }).toString()}`);
+  if (error || typeof data !== "string") redirect(teamraumHref("chat", orgId, { chatError: "1" }));
+  redirect(teamraumChatHref(orgId, data as string));
 }
 
 export async function updateOrgChatGroupAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const chatId = String(formData.get("chatId") ?? "");
-  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/organisation");
+  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/teamraum/chat");
   const members = formData.getAll("member").map(String).filter((id) => UUID.test(id));
   const client = await createClient();
   const { error } = await client.rpc("update_org_chat_group", { p_chat_id: chatId, p_name: String(formData.get("name") ?? "").slice(0, 80), p_member_ids: members });
-  revalidatePath("/advisor/organisation/chat");
-  redirect(`/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: chatId, ...(error ? { groupError: "1" } : { groupSaved: "1" }) }).toString()}`);
+  revalidatePath("/advisor/teamraum", "layout");
+  redirect(teamraumChatHref(orgId, chatId, error ? { groupError: "1" } : { groupSaved: "1" }));
 }
 
 export async function leaveOrgChatGroupAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const chatId = String(formData.get("chatId") ?? "");
-  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/organisation");
+  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/teamraum/chat");
   const client = await createClient();
   await client.rpc("leave_org_chat_group", { p_chat_id: chatId });
-  revalidatePath("/advisor/organisation");
-  redirect(`/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "chat" }).toString()}`);
+  revalidatePath("/advisor/teamraum", "layout");
+  redirect(teamraumHref("chat", orgId));
 }
 
 export async function markOrgChatRead(chatId: string): Promise<void> {
@@ -161,19 +162,19 @@ export async function markOrgChatRead(chatId: string): Promise<void> {
 export async function openOrgChatAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const withUser = String(formData.get("withUserId") ?? "");
-  if (!UUID.test(orgId)) redirect("/advisor/organisation");
+  if (!UUID.test(orgId)) redirect("/advisor/teamraum/chat");
   const client = await createClient();
   const { data, error } = await client.rpc("open_org_chat", { p_org_id: orgId, p_with_user_id: UUID.test(withUser) ? withUser : null });
-  if (error || typeof data !== "string") redirect(`/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "chat", chatError: "1" }).toString()}`);
-  redirect(`/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: data as string }).toString()}`);
+  if (error || typeof data !== "string") redirect(teamraumHref("chat", orgId, { chatError: "1" }));
+  redirect(teamraumChatHref(orgId, data as string));
 }
 
 export async function setOrgChatMutedAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const chatId = String(formData.get("chatId") ?? "");
-  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/organisation");
+  if (!UUID.test(orgId) || !UUID.test(chatId)) redirect("/advisor/teamraum/chat");
   const client = await createClient();
   await client.rpc("set_org_chat_muted", { p_chat_id: chatId, p_muted: formData.get("muted") === "yes" });
-  revalidatePath("/advisor/organisation/chat");
-  redirect(`/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: chatId }).toString()}`);
+  revalidatePath("/advisor/teamraum", "layout");
+  redirect(teamraumChatHref(orgId, chatId));
 }

@@ -15,6 +15,7 @@ import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { listMyDueOrgTasks } from "@/features/advisor/teamraumData";
+import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 const CARD = "advisor-card p-6";
 const LINK =
@@ -102,7 +103,7 @@ export default async function AdvisorStartPage() {
     ...myTasks.map((task) => ({
       key: `task-${task.id}`,
       text: t("start.orgTask", { title: task.title, date: task.dueOn ?? "", overdue: task.dueOn && task.dueOn < todayIso ? "yes" : "no" }),
-      href: `/advisor/organisation?${new URLSearchParams({ org: task.orgId, tab: "tasks", task: task.id }).toString()}#task-detail`,
+      href: `${teamraumHref("tasks", task.orgId, { task: task.id })}#task-detail`,
       cta: t("start.open"),
       icon: "flag" as const,
     })),

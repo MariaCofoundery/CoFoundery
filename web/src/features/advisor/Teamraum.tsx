@@ -38,6 +38,7 @@ import {
   type TaskFilter,
   type TaskStatus,
 } from "@/features/advisor/teamraumModel";
+import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Teamraum (seit 05.11.2026): Diese Woche, Aufgaben, Wer macht was - fuer das Team der Organisation.
@@ -94,7 +95,7 @@ export function helpers(ctx: TeamraumContext) {
     memberOf: (userId: string | null) => (userId ? ctx.members.find((member) => member.userId === userId) ?? null : null),
     programOf: (programId: string | null) => (programId ? ctx.programs.find((program) => program.programId === programId) ?? null : null),
     eventOf: (eventId: string | null) => (eventId ? ctx.events.find((event) => event.eventId === eventId) ?? null : null),
-    href: (tab: "week" | "tasks" | "pages" | "who", extra: Record<string, string> = {}) => `/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab, ...extra }).toString()}`,
+    href: (tab: "week" | "tasks" | "pages" | "who", extra: Record<string, string> = {}) => teamraumHref(tab, ctx.orgId, extra),
   };
 }
 
@@ -608,7 +609,7 @@ export async function TeamraumWeek({
     <div className="grid gap-6">
       <Feedback ctx={ctx} />
       {ctx.canWrite ? (
-        <section aria-labelledby="week-quick-title" className="brand-panel rounded-3xl p-5 sm:p-6">
+        <section aria-labelledby="week-quick-title" className="rounded-3xl border border-violet-200 bg-violet-50/70 p-5 sm:p-6">
           <h2 id="week-quick-title" className="text-lg font-semibold text-slate-950">{t("week.quickTitle")}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">{t("week.quickText")}</p>
           <div className="mt-4">

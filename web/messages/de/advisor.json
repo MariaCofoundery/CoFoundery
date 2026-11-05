@@ -761,9 +761,9 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
-      "groupLabels": "Betreuen | Teamraum | Inhalte für die Teams | Einrichten",
-      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben, Seiten und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Diese Woche | Aufgaben | Chat | Social Media | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "groupLabels": "Betreuen | Inhalte für die Teams | Einrichten",
+      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -1615,6 +1615,11 @@
       "dragHint": "Aufgaben auf einen anderen Tag ziehen, um die Fälligkeit zu ändern.",
       "undated": "Ohne Datum ({count})",
       "undatedHint": "Auf einen Tag im Kalender ziehen, um ein Datum zu setzen."
+    },
+    "screen": {
+      "title": "Teamraum",
+      "hint": "Nur für euch im Team, nie für die Startups.",
+      "orgSwitch": "Organisation wählen"
     }
   },
   "funding": {

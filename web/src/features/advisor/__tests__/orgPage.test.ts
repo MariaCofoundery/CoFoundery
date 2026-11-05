@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
-test("die Organisationsseite hat zwanzig Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "social", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"\]/);
+test("die Organisationsseite hat vierzehn Reiter und waehlt zwischen mehreren Organisationen", () => {
+  assert.match(page, /\["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"\]/);
   // "Teams" und "Personen" (die eigene Begleitung) leben unter "Begleitung"; alte Adressen fuehren dorthin.
   assert.match(page, /teams: "\/advisor\/begleitung\?art=teams", people: "\/advisor\/begleitung\?art=personen"/);
   assert.match(page, /value === "success" \? "features"/);
@@ -376,17 +376,17 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die zwanzig Reiter stehen in vier Gruppen, jeder Reiter genau einmal", () => {
+test("Organisation: die vierzehn Reiter stehen in drei Gruppen, jeder Reiter genau einmal", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
-  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["care", "team", "content", "setup"].includes(key));
-  const tabs = ["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "social", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"];
+  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["care", "content", "setup"].includes(key));
+  const tabs = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
-    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 4, locale);
-    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 4, locale);
+    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 3, locale);
+    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 3, locale);
     assert.equal(messages.area.orgPage.tabs.split(" | ").length, tabs.length, locale);
   }
   // Einladungen und Codes liegen im Reiter "Teams aufnehmen", die Teamkarten im Reiter "Programm".
@@ -595,7 +595,7 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 20, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 14, locale);
   }
 });
 

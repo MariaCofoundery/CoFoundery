@@ -761,9 +761,9 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "groupLabels": "Care | Team space | Content for the teams | Set up",
-      "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | How you organize yourselves as a team: what is due this week, tasks, pages and who does what. Only for you, never for the startups. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | This week | Tasks | Chat | Social media | Pages | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
+      "groupLabels": "Care | Content for the teams | Set up",
+      "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
+      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -1615,6 +1615,11 @@
       "dragHint": "Drag tasks to another day to change the due date.",
       "undated": "Without a date ({count})",
       "undatedHint": "Drag onto a day in the calendar to set a date."
+    },
+    "screen": {
+      "title": "Team space",
+      "hint": "Only for your own team, never for the startups.",
+      "orgSwitch": "Choose organization"
     }
   },
   "funding": {

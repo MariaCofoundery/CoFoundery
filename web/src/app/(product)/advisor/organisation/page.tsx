@@ -9,19 +9,9 @@ import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
-import { TeamraumBoard, TeamraumWeek, TeamraumWho, taskViewOf, type TeamraumContext } from "@/features/advisor/Teamraum";
-import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
-import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
-import { OrgChatList } from "@/features/advisor/OrgChatList";
-import { SocialCalendar } from "@/features/advisor/SocialCalendar";
-import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts } from "@/features/advisor/socialCalendarData";
-import { addDays, isChannel, monthGrid, monthOf, weekOf } from "@/features/advisor/socialCalendarModel";
-import { listMyOrgChats, searchOrgChats } from "@/features/advisor/orgChatData";
-import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
-import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
-import { taskFilterOf } from "@/features/advisor/teamraumModel";
+import { legacyTeamraumPath } from "@/features/advisor/teamraumRoutes";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
@@ -38,7 +28,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -48,7 +38,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "chat", "social", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -58,8 +48,6 @@ type Tab = (typeof TABS)[number];
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "plan", "report", "funding"] },
-  // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
-  { key: "team", tabs: ["week", "tasks", "chat", "social", "pages", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -68,6 +56,8 @@ const TAB_OF = (value: string | undefined): Tab =>
   value === "settings" ? "members" : value === "success" ? "features" : TABS.find((tab) => tab === value) ?? "overview";
 // Was frueher hier stand und jetzt unter "Begleitung" lebt.
 const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?art=teams", people: "/advisor/begleitung?art=personen" };
+// Der Teamraum (Diese Woche, Aufgaben, Chat, Social Media, Seiten, Wer macht was) ist seit dem 05.11.2026 ein
+// eigener Bereich im Hauptmenue. Alte Adressen stehen in Hinweisen und Push-Mitteilungen; sie werden weitergeleitet.
 
 /**
  * Organisation - ein Programm oder eine Beratung mit mehreren Advisorinnen.
@@ -82,7 +72,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string; chatError?: string; month?: string; channel?: string; post?: string; newPost?: string; event?: string; socialError?: string; socialSaved?: string; socialDeleted?: string; socialCreated?: string; view?: string; week?: string }>;
+  searchParams?: Promise<Record<string, string | undefined> & { orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string; chatError?: string; month?: string; channel?: string; post?: string; newPost?: string; event?: string; socialError?: string; socialSaved?: string; socialDeleted?: string; socialCreated?: string; view?: string; week?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -92,6 +82,8 @@ export default async function AdvisorOrganisationPage({
   } = await getRequestUser();
   if (!user) redirect(buildLoginRedirectPath("/advisor/organisation"));
   if (query.tab && MOVED_TO_FOLLOW[query.tab]) redirect(MOVED_TO_FOLLOW[query.tab]);
+  const teamraumPath = legacyTeamraumPath(query);
+  if (teamraumPath) redirect(teamraumPath);
 
   const client = await createClient();
   const [roleViews, orgs] = await Promise.all([getDashboardRoleViews(user.id), getMyAdvisorOrgs(client)]);
@@ -135,12 +127,7 @@ export default async function AdvisorOrganisationPage({
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const needsPeople = tab === "learning";
-  const teamraumTab = tab === "week" || tab === "tasks" || tab === "pages" || tab === "who";
-  const UUID = /^[0-9a-f-]{36}$/;
-  const docId = tab === "pages" && UUID.test(query.doc ?? "") ? (query.doc as string) : null;
-  const templatePageId = tab === "pages" && query.newDoc === "1" && UUID.test(query.template ?? "") ? (query.template as string) : null;
-  const selectedTaskId = tab === "tasks" && /^[0-9a-f-]{36}$/.test(query.task ?? "") ? (query.task as string) : null;
-  const needsPrograms = teamraumTab || tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
+  const needsPrograms = tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -149,7 +136,7 @@ export default async function AdvisorOrganisationPage({
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
-    tab === "plan" || tab === "week" || tab === "tasks" || tab === "pages" || tab === "social" ? listProgramEvents(client, org.id) : Promise.resolve([]),
+    tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -159,43 +146,6 @@ export default async function AdvisorOrganisationPage({
     tab === "learning" ? listLearning(client, org.id) : Promise.resolve([]),
     tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
-
-  const [orgTasks, presence, taskComments, followUps, nextCheckIns, orgPages, openPage, templatePage] = await Promise.all([
-    teamraumTab ? listOrgTasks(client, org.id) : Promise.resolve([]),
-    tab === "who" ? listOrgPresence(client, org.id) : Promise.resolve([]),
-    selectedTaskId ? listTaskComments(client, selectedTaskId) : Promise.resolve([]),
-    tab === "week" ? listDueProgramFollowUps(client) : Promise.resolve([]),
-    tab === "week" || tab === "who" ? getOrgNextCheckIns(client, org.id) : Promise.resolve([]),
-    tab === "pages" || tab === "tasks" ? listOrgPages(client, org.id) : Promise.resolve([]),
-    docId ? getOrgPage(client, org.id, docId) : Promise.resolve(null),
-    templatePageId ? getOrgPage(client, org.id, templatePageId) : Promise.resolve(null),
-  ]);
-  // Neue Seite: leer, aus einer mitgelieferten Vorlage oder aus einer eigenen Vorlage der Organisation.
-  const builtIn = isBuiltInTemplate(query.template) ? query.template : null;
-  const pagePrefill = {
-    title: templatePage ? templatePage.title : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.title`) : "",
-    body: templatePage ? templatePage.body : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.body`) : "",
-    parentId: UUID.test(query.parent ?? "") ? (query.parent as string) : null,
-    isNote: query.note === "1",
-  };
-  const pageMode: "view" | "edit" | "new" = query.newDoc === "1" ? "new" : openPage && query.edit === "1" ? "edit" : "view";
-  const teamraum: TeamraumContext | null = teamraumTab
-    ? {
-        orgId: org.id,
-        me: user.id,
-        isOwner,
-        canWrite: org.status === "active",
-        members: members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed"), role: member.role, isSelf: member.isSelf })),
-        programs: programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam"), contactUserIds: program.contactUserIds, isActive: program.isActive })),
-        events: planEvents,
-        tasks: orgTasks,
-        presence,
-        pageTitles: new Map(orgPages.map((entry) => [entry.id, entry.title])),
-        today: new Date().toISOString().slice(0, 10),
-        locale: getPresentationLocale(await getLocale()),
-        feedback: { error: query.taskError ?? null, saved: query.taskSaved === "1", deleted: query.taskDeleted === "1", created: /^\d{1,2}$/.test(query.taskCreated ?? "") ? Number(query.taskCreated) : null },
-      }
-    : null;
 
   // Foerderauflagen: die gewaehlte Foerderung (sonst die juengste), ihr Stand, Nachweise und festgehaltene Staende.
   const funding = tab === "funding" && !tabOff ? await (async () => {
@@ -324,73 +274,6 @@ export default async function AdvisorOrganisationPage({
             newGrant={query.newGrant === "1"}
           />
         ) : null}
-        {tab === "social" ? await (async () => {
-          const today = new Date().toISOString().slice(0, 10);
-          const view = query.view === "week" ? "week" : "month";
-          const week = weekOf(query.week, today);
-          const month = view === "week" ? week.slice(0, 7) : monthOf(query.month, today);
-          const grid = monthGrid(month);
-          const from = view === "week" ? week : grid[0][0].day;
-          const to = view === "week" ? addDays(week, 6) : grid[grid.length - 1][6].day;
-          const [posts, eventPosts, campaigns, selected] = await Promise.all([
-            listOrgPosts(client, org.id, from, to),
-            listOrgEventPosts(client, org.id),
-            listOrgCampaigns(client, org.id),
-            /^[0-9a-f-]{36}$/.test(query.post ?? "") ? getOrgPost(client, org.id, query.post as string) : Promise.resolve(null),
-          ]);
-          return (
-            <SocialCalendar
-              ctx={{
-                orgId: org.id,
-                me: user.id,
-                isOwner,
-                canWrite: org.status === "active",
-                today,
-                month,
-                view,
-                week,
-                locale: getPresentationLocale(await getLocale()),
-                members: members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed") })),
-                events: planEvents.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt })),
-                posts,
-                eventPosts,
-                campaigns,
-                channel: isChannel(query.channel) ? query.channel : null,
-                feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
-              }}
-              selected={selected}
-              newDay={selected ? null : /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? (query.newPost as string) : null}
-              newEvent={/^[0-9a-f-]{36}$/.test(query.event ?? "") ? (query.event as string) : null}
-            />
-          );
-        })() : null}
-        {tab === "chat" ? (
-          <OrgChatList
-            orgId={org.id}
-            me={user.id}
-            members={members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed") }))}
-            chats={await listMyOrgChats(client, org.id)}
-            quiet={await getMyQuietHours(client)}
-            canWrite={org.status === "active"}
-            locale={getPresentationLocale(await getLocale())}
-            query={(query.q ?? "").slice(0, 100)}
-            hits={(query.q ?? "").trim().length >= 2 ? await searchOrgChats(client, org.id, query.q as string) : []}
-          />
-        ) : null}
-        {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}
-        {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} view={taskViewOf(query.view)} month={monthOf(query.month, new Date().toISOString().slice(0, 10))} /> : null}
-        {teamraum && tab === "pages" ? (
-          <TeamraumPages
-            ctx={teamraum}
-            pages={orgPages}
-            page={openPage}
-            mode={pageMode}
-            prefill={pagePrefill}
-            feedback={{ error: query.docError ?? null, saved: query.docSaved === "1", deleted: query.docDeleted === "1", taskCreated: query.docTask === "1" }}
-          />
-        ) : null}
-        {teamraum && tab === "who" ? <TeamraumWho ctx={teamraum} nextCheckIns={nextCheckIns} /> : null}
-
         {tab === "access" ? (
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}

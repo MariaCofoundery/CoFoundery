@@ -374,7 +374,7 @@ export async function TeamraumPages({
           ) : page ? (
             <PageView ctx={ctx} page={page} pages={pages} />
           ) : (
-            <section className="brand-panel rounded-3xl p-6 sm:p-8">
+            <section className="rounded-3xl border border-violet-200 bg-violet-50/70 p-6 sm:p-8">
               <h2 className="text-xl font-semibold text-slate-950">{t("introTitle")}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("introText")}</p>
               {ctx.canWrite ? (

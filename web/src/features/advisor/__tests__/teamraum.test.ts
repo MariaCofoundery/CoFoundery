@@ -131,13 +131,21 @@ test("Teamraum: Aktionen bauen den Rueckweg selbst und rufen nur die Datenbankfu
   }
   assert.doesNotMatch(actions, /\.from\("advisor_org_/);
   assert.doesNotMatch(actions, /formData\.get\("returnTo"\)/);
-  assert.match(actions, /\["week", "tasks", "pages", "who"\]\.includes/);
+  // Zurueck geht es nur in einen der vier Teile, die die Aktionen kennen - zusammengesetzt ueber teamraumHref.
+  assert.match(actions, /raw === "week" \|\| raw === "pages" \|\| raw === "who" \? raw : "tasks"/);
+  assert.match(actions, /return teamraumHref\(tab, orgId, /);
 });
 
-test("Teamraum: eigene Gruppe in der Organisation, auf dem Advisor-Start und im Kontoexport", () => {
+test("Teamraum: eigener Bereich im Hauptmenue, auf dem Advisor-Start und im Kontoexport", () => {
+  // Seit 05.11.2026 ein eigener Bereich mit eigenen Adressen, nicht mehr eine Reitergruppe der Organisation.
+  const screen = readFileSync("src/features/advisor/TeamraumScreen.tsx", "utf8");
+  assert.match(screen, /const canWrite = org\.status === "active"/);
+  assert.match(screen, /if \(!roleViews\.hasAdvisor\) redirect\("\/dashboard"\)/);
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(page, /\{ key: "team", tabs: \["week", "tasks", "chat", "social", "pages", "who"\] \}/);
-  assert.match(page, /canWrite: org\.status === "active"/);
+  assert.doesNotMatch(page, /key: "team"/);
+  assert.match(page, /const teamraumPath = legacyTeamraumPath\(query\);\n  if \(teamraumPath\) redirect\(teamraumPath\);/);
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  assert.match(shell, /\.\.\.\(advisorOrgNames\.length > 0\s*\? \[\s*\{\s*href: TEAMRAUM_BASE,/);
   const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   assert.match(start, /listMyDueOrgTasks\(client, user\.id\)/);
   const exported = readFileSync("src/features/account/accountExport.ts", "utf8");

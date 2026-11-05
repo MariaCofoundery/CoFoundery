@@ -87,5 +87,14 @@
   "adminAttention": "{count} open in the admin area",
   "alignProgram": "Program",
   "advisorMyProgram": "My program",
-  "advisorChatUnread": "{count, plural, one {One unread message in the team space} other {# unread messages in the team space}}"
+  "advisorChatUnread": "{count, plural, one {One unread message in the team space} other {# unread messages in the team space}}",
+  "advisorFollowList": "People you accompany",
+  "advisorTeamraum": "Team space",
+  "teamraumWeek": "This week",
+  "teamraumTasks": "Tasks",
+  "teamraumChat": "Chat",
+  "teamraumSocial": "Social media",
+  "teamraumPages": "Pages",
+  "teamraumWho": "Who does what",
+  "teamraumChatCount": "{count, plural, one {One unread message} other {# unread messages}}"
 }

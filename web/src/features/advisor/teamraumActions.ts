@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isTaskStatus, parseChecklist, taskFilterOf } from "@/features/advisor/teamraumModel";
 import { pushOrgTaskNotices } from "@/features/advisor/teamraumNotifications";
+import { TEAMRAUM_BASE, teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 /**
  * Teamraum schreiben. Wer darf, prueft die Datenbank (20270312120000): aktives Mitglied einer
@@ -25,13 +26,14 @@ const dateOrNull = (value: FormDataEntryValue | null) => {
 /** Zurueck in den Reiter, aus dem das Formular kam - zusammengesetzt, nie eine uebergebene Adresse. */
 function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const orgId = uuidOrNull(formData.get("orgId"));
-  if (!orgId) return "/advisor/organisation";
-  const tab = ["week", "tasks", "pages", "who"].includes(String(formData.get("tab"))) ? String(formData.get("tab")) : "tasks";
-  const params = new URLSearchParams({ org: orgId, tab });
+  if (!orgId) return TEAMRAUM_BASE;
+  const raw = String(formData.get("tab"));
+  const tab = raw === "week" || raw === "pages" || raw === "who" ? raw : "tasks";
+  const params = new URLSearchParams();
   const filter = taskFilterOf(formData.get("filter"));
   if (tab === "tasks" && filter !== "all") params.set("filter", filter);
   for (const [key, value] of Object.entries(extra)) params.set(key, value);
-  return `/advisor/organisation?${params.toString()}`;
+  return teamraumHref(tab, orgId, Object.fromEntries(params));
 }
 
 async function requireUser(next: string) {
@@ -47,7 +49,7 @@ const errorOf = (message: string | undefined) =>
   /assignee_not_member/.test(message ?? "") ? "member" : /program_not_visible/.test(message ?? "") ? "program" : "failed";
 
 function finish(path: string) {
-  revalidatePath("/advisor/organisation");
+  revalidatePath("/advisor/teamraum", "layout");
   revalidatePath("/advisor/dashboard");
   redirect(path);
 }
@@ -251,6 +253,6 @@ export async function moveTaskDueAction(taskId: string, day: string): Promise<{ 
   if (!UUID.test(taskId) || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false };
   const client = await createClient();
   const { error } = await client.rpc("set_org_task_due", { p_task_id: taskId, p_due_on: day });
-  if (!error) revalidatePath("/advisor/organisation");
+  if (!error) revalidatePath("/advisor/teamraum", "layout");
   return { ok: !error };
 }

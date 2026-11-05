@@ -293,7 +293,7 @@ export async function OrgFunding({
       </div>
 
       {grants.length === 0 || newGrant ? (
-        <section className="brand-panel rounded-3xl p-6 sm:p-8">
+        <section className="rounded-3xl border border-violet-200 bg-violet-50/70 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-slate-950">{grants.length === 0 ? t("emptyTitle") : t("grant.add")}</h2>
           {grants.length === 0 ? <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-700">{t("emptyText")}</p> : null}
           <div className="mt-5">{ownerCanEdit ? <GrantForm ctx={ctx} /> : <p className="text-sm text-slate-600">{t("ownerOnly")}</p>}</div>
