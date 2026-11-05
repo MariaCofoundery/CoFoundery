@@ -245,3 +245,12 @@ export async function createOrgTasksAction(formData: FormData) {
   }
   finish(backTo(formData, failed ? { taskError: "failed", taskCreated: String(created) } : { taskSaved: "1", taskCreated: String(created) }));
 }
+
+/** Aus dem Aufgaben-Kalender: eine Aufgabe auf einen anderen Tag ziehen. */
+export async function moveTaskDueAction(taskId: string, day: string): Promise<{ ok: boolean }> {
+  if (!UUID.test(taskId) || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false };
+  const client = await createClient();
+  const { error } = await client.rpc("set_org_task_due", { p_task_id: taskId, p_due_on: day });
+  if (!error) revalidatePath("/advisor/organisation");
+  return { ok: !error };
+}

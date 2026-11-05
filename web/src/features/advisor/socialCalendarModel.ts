@@ -92,6 +92,16 @@ export function monthGrid(month: string): { day: string; inMonth: boolean }[][] 
   return weeks;
 }
 
+/** Der Montag der Woche, in der ein Tag liegt. */
+export const mondayOf = (iso: string) => addDays(iso, -((weekdayOf(iso) + 6) % 7));
+export const weekOf = (value: string | undefined, today: string) => mondayOf(value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : today);
+/** Kalenderwoche nach ISO 8601 (Woche mit dem ersten Donnerstag ist KW 1). */
+export function isoWeekNumber(iso: string) {
+  const thursday = addDays(mondayOf(iso), 3);
+  const firstThursday = addDays(mondayOf(`${thursday.slice(0, 4)}-01-04`), 3);
+  return 1 + Math.round((Date.parse(`${thursday}T00:00:00Z`) - Date.parse(`${firstThursday}T00:00:00Z`)) / (7 * 86400000));
+}
+
 export function postsByDay(posts: OrgPost[]): Map<string, OrgPost[]> {
   const map = new Map<string, OrgPost[]>();
   for (const post of [...posts].sort((a, b) => (a.plannedTime ?? "99") < (b.plannedTime ?? "99") ? -1 : 1)) {

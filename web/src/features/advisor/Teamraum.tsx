@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { UserText } from "@/features/ui/UserText";
 import { DictateTasks } from "@/features/advisor/DictateTasks";
+import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
+import { monthGrid, shiftMonth } from "@/features/advisor/socialCalendarModel";
 import type { ProgramEvent } from "@/features/advisor/teamProgramData";
 import {
   addOrgTaskCommentAction,
@@ -13,12 +15,14 @@ import {
   saveOrgTaskAction,
   setMyOrgPresenceAction,
   takeOrgTaskAction,
+  moveTaskDueAction,
 } from "@/features/advisor/teamraumActions";
 import {
   TASK_FILTERS,
   TASK_STATUSES,
   addDays,
   boardColumns,
+  byDue,
   checklistProgress,
   checklistToText,
   filterTasks,
@@ -254,7 +258,7 @@ async function TaskCard({ ctx, task, filter, selected }: { ctx: TeamraumContext;
   );
 }
 
-async function TaskDetail({ ctx, task, filter, comments }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; comments: TaskComment[] }) {
+async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; comments: TaskComment[]; back?: Record<string, string> }) {
   const t = await getTranslations("advisor.teamraum");
   const { memberOf, timeOf, href } = helpers(ctx);
   const creator = memberOf(task.createdByUserId);
@@ -269,7 +273,7 @@ async function TaskDetail({ ctx, task, filter, comments }: { ctx: TeamraumContex
             {t("detail.meta", { name: creator?.name ?? t("formerMember"), date: timeOf(task.createdAt) })}
           </p>
         </div>
-        <Link href={href("tasks", filter !== "all" ? { filter } : {})} className={QUIET}>{t("detail.close")}</Link>
+        <Link href={href("tasks", { ...back, ...(filter !== "all" ? { filter } : {}) })} className={QUIET}>{t("detail.close")}</Link>
       </div>
 
       {task.details ? (
@@ -361,11 +365,132 @@ async function TaskDetail({ ctx, task, filter, comments }: { ctx: TeamraumContex
 }
 
 /** Aufgaben als Board: Offen, In Arbeit, Wartet, Erledigt. */
-export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: { ctx: TeamraumContext; filter: TaskFilter; selectedTaskId: string | null; comments: TaskComment[] }) {
+export const TASK_VIEWS = ["board", "list", "calendar"] as const;
+export type TaskView = (typeof TASK_VIEWS)[number];
+export const taskViewOf = (value: unknown): TaskView => ((TASK_VIEWS as readonly unknown[]).includes(value) ? (value as TaskView) : "board");
+
+/** Aufgaben als Liste: nach Faelligkeit, Erledigtes eingeklappt darunter. */
+async function TaskList({ ctx, tasks, filter }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter }) {
+  const t = await getTranslations("advisor.teamraum");
+  const { dayOf, memberOf, programOf, href } = helpers(ctx);
+  const open = tasks.filter((task) => task.status !== "done").sort(byDue);
+  const done = tasks.filter((task) => task.status === "done").sort((a, b) => ((a.doneAt ?? "") < (b.doneAt ?? "") ? 1 : -1)).slice(0, 30);
+  const row = (task: OrgTask) => {
+    const assignee = memberOf(task.assigneeUserId);
+    const overdue = isOverdue(task, ctx.today);
+    return (
+      <tr key={task.id} className="border-t border-slate-100">
+        <td className="py-2.5 pr-3">
+          <Link href={`${href("tasks", { view: "list", ...(filter !== "all" ? { filter } : {}), task: task.id })}#task-detail`} className={`font-medium text-slate-900 underline-offset-4 hover:underline ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</Link>
+        </td>
+        <td className="py-2.5 pr-3"><span className={`${CHIP} ${COLUMN_TONE[task.status]} text-slate-800`}>{t(`status.${task.status}`)}</span></td>
+        <td className="py-2.5 pr-3 text-slate-700">{assignee ? assignee.name : <span className="font-semibold text-amber-800">{t("nobody")}</span>}</td>
+        <td className={`py-2.5 pr-3 ${overdue ? "font-semibold text-rose-700" : "text-slate-700"}`}>{task.dueOn ? dayOf(task.dueOn) : "–"}</td>
+        <td className="py-2.5 text-slate-600">{task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal")}</td>
+      </tr>
+    );
+  };
+  return (
+    <div className="advisor-card mt-5 overflow-x-auto p-4">
+      <table className="w-full min-w-[640px] border-collapse text-sm">
+        <thead>
+          <tr className="text-left text-xs uppercase tracking-[.08em] text-slate-500">
+            <th className="py-2 pr-3 font-semibold">{t("list.task")}</th>
+            <th className="py-2 pr-3 font-semibold">{t("form.status")}</th>
+            <th className="py-2 pr-3 font-semibold">{t("form.assignee")}</th>
+            <th className="py-2 pr-3 font-semibold">{t("form.due")}</th>
+            <th className="py-2 font-semibold">{t("form.program")}</th>
+          </tr>
+        </thead>
+        <tbody>{open.map(row)}</tbody>
+      </table>
+      {open.length === 0 ? <p className="py-3 text-sm text-slate-600">{t("empty.open")}</p> : null}
+      {done.length > 0 ? (
+        <details className="mt-3">
+          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700">{t("list.done", { count: done.length })}</summary>
+          <table className="w-full min-w-[640px] border-collapse text-sm"><tbody>{done.map(row)}</tbody></table>
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+/** Aufgaben als Monatskalender nach Faelligkeit - per Ziehen auf einen anderen Tag. */
+async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter; month: string }) {
+  const t = await getTranslations("advisor.teamraum");
+  const { memberOf, href } = helpers(ctx);
+  const grid = monthGrid(month);
+  const label = new Intl.DateTimeFormat(ctx.locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T00:00:00Z`));
+  const dayLong = new Intl.DateTimeFormat(ctx.locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+  const weekdays = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(ctx.locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, 10, 2 + index))));
+  const byDay = new Map<string, OrgTask[]>();
+  for (const task of tasks) if (task.dueOn) byDay.set(task.dueOn, [...(byDay.get(task.dueOn) ?? []), task]);
+  const undated = tasks.filter((task) => !task.dueOn && task.status !== "done");
+  const nav = (next: string) => href("tasks", { view: "calendar", month: next, ...(filter !== "all" ? { filter } : {}) });
+  const chip = (task: OrgTask) => {
+    const assignee = memberOf(task.assigneeUserId);
+    return (
+      <DraggableItem key={task.id} id={task.id} kind="task">
+        <Link
+          href={`${href("tasks", { view: "calendar", month, ...(filter !== "all" ? { filter } : {}), task: task.id })}#task-detail`}
+          className={`flex items-center gap-1 rounded-lg border px-1.5 py-1 text-[12px] leading-4 ${task.status === "done" ? "border-emerald-200 bg-emerald-50/70 text-slate-500 line-through" : isOverdue(task, ctx.today) ? "border-rose-200 bg-rose-50 text-rose-900" : "border-slate-200 bg-white text-slate-800"}`}
+          title={task.title}
+        >
+          {assignee ? <span aria-hidden="true" className={`grid h-4 w-4 shrink-0 place-items-center rounded-full text-[9px] font-semibold ${toneOf(assignee.userId)}`}>{initialOf(assignee.name)}</span> : null}
+          <span className="truncate">{task.title}</span>
+        </Link>
+      </DraggableItem>
+    );
+  };
+  return (
+    <div className="mt-5 grid gap-4">
+      <nav aria-label={t("calendar.monthNav")} className="flex items-center gap-1.5">
+        <Link href={nav(shiftMonth(month, -1))} aria-label={t("calendar.prev")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white">‹</Link>
+        <span className="min-w-36 text-center font-semibold capitalize text-slate-950">{label}</span>
+        <Link href={nav(shiftMonth(month, 1))} aria-label={t("calendar.next")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white">›</Link>
+        <span className="ml-2 hidden text-xs text-slate-500 md:inline">{t("calendar.dragHint")}</span>
+      </nav>
+      <div className="hidden overflow-hidden rounded-3xl border border-slate-200 bg-white md:block">
+        <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+          {weekdays.map((weekday) => <p key={weekday} className="px-2 py-2 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{weekday}</p>)}
+        </div>
+        {grid.map((week) => (
+          <div key={week[0].day} className="grid grid-cols-7 border-b border-slate-100 last:border-b-0">
+            {week.map((cell) => (
+              <DropDay key={cell.day} day={cell.day} kind="task" move={moveTaskDueAction} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`min-h-28 border-r border-slate-100 p-1.5 last:border-r-0 ${cell.inMonth ? "" : "bg-slate-50/70"}`}>
+                <span className={`grid h-7 min-w-7 place-items-center rounded-full px-1 text-xs font-semibold ${cell.day === ctx.today ? "bg-violet-600 text-white" : cell.inMonth ? "text-slate-700" : "text-slate-400"}`}>{Number(cell.day.slice(8))}</span>
+                <div className="mt-1 grid gap-1">{(byDay.get(cell.day) ?? []).map(chip)}</div>
+              </DropDay>
+            ))}
+          </div>
+        ))}
+      </div>
+      <ol className="grid gap-3 md:hidden">
+        {grid.flat().filter((cell) => cell.inMonth && (byDay.get(cell.day)?.length ?? 0) > 0).map((cell) => (
+          <li key={cell.day} className="advisor-card p-3">
+            <p className={`text-sm font-semibold ${cell.day === ctx.today ? "text-violet-700" : "text-slate-900"}`}>{dayLong.format(new Date(`${cell.day}T00:00:00Z`))}</p>
+            <div className="mt-2 grid gap-1.5">{(byDay.get(cell.day) ?? []).map(chip)}</div>
+          </li>
+        ))}
+      </ol>
+      {undated.length > 0 ? (
+        <section aria-labelledby="undated-title" className="advisor-card p-4">
+          <h3 id="undated-title" className="text-xs font-semibold uppercase tracking-[.14em] text-slate-600">{t("calendar.undated", { count: undated.length })}</h3>
+          <p className="mt-1 text-xs text-slate-500">{t("calendar.undatedHint")}</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">{undated.map(chip)}</div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments, view = "board", month }: { ctx: TeamraumContext; filter: TaskFilter; selectedTaskId: string | null; comments: TaskComment[]; view?: TaskView; month?: string }) {
   const t = await getTranslations("advisor.teamraum");
   const { href } = helpers(ctx);
-  const columns = boardColumns(filterTasks(ctx.tasks, filter, ctx.me));
+  const filtered = filterTasks(ctx.tasks, filter, ctx.me);
+  const columns = boardColumns(filtered);
   const selected = selectedTaskId ? ctx.tasks.find((task) => task.id === selectedTaskId) ?? null : null;
+  const calendarMonth = month ?? ctx.today.slice(0, 7);
   return (
     <div>
       <Feedback ctx={ctx} />
@@ -374,11 +499,24 @@ export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: {
           <h2 className="text-xl font-semibold text-slate-950">{t("board.title")}</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("board.text")}</p>
         </div>
+        <div className="flex flex-wrap items-center gap-3">
+        <nav aria-label={t("views.label")} className="inline-flex rounded-full border border-slate-200 bg-white p-1">
+          {TASK_VIEWS.map((entry) => (
+            <Link
+              key={entry}
+              href={href("tasks", { ...(entry !== "board" ? { view: entry } : {}), ...(filter !== "all" ? { filter } : {}) })}
+              aria-current={view === entry ? "page" : undefined}
+              className={`inline-flex min-h-9 items-center rounded-full px-4 text-sm ${view === entry ? "bg-slate-900 font-semibold text-white" : "text-slate-700 hover:bg-slate-50"}`}
+            >
+              {t(`views.${entry}`)}
+            </Link>
+          ))}
+        </nav>
         <nav aria-label={t("board.filterLabel")} className="flex flex-wrap gap-1.5">
           {TASK_FILTERS.map((entry) => (
             <Link
               key={entry}
-              href={href("tasks", entry !== "all" ? { filter: entry } : {})}
+              href={href("tasks", { ...(view !== "board" ? { view } : {}), ...(entry !== "all" ? { filter: entry } : {}) })}
               aria-current={filter === entry ? "page" : undefined}
               className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${filter === entry ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
             >
@@ -386,6 +524,7 @@ export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: {
             </Link>
           ))}
         </nav>
+        </div>
       </div>
 
       {ctx.canWrite ? (
@@ -404,6 +543,9 @@ export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: {
         </details>
       ) : null}
 
+      {view === "list" ? <TaskList ctx={ctx} tasks={filtered} filter={filter} /> : null}
+      {view === "calendar" ? <TaskCalendar ctx={ctx} tasks={filtered} filter={filter} month={calendarMonth} /> : null}
+      {view === "board" ? (
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {TASK_STATUSES.map((status) => (
           <section key={status} aria-labelledby={`col-${status}`} className={`grid content-start gap-2.5 rounded-3xl p-3 ${COLUMN_TONE[status]}`}>
@@ -418,8 +560,10 @@ export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: {
           </section>
         ))}
       </div>
+      ) : null}
 
-      {selected ? <TaskDetail ctx={ctx} task={selected} filter={filter} comments={comments} /> : null}
+
+      {selected ? <TaskDetail ctx={ctx} task={selected} filter={filter} comments={comments} back={view === "board" ? {} : { view, ...(view === "calendar" ? { month: calendarMonth } : {}) }} /> : null}
     </div>
   );
 }

@@ -72,3 +72,18 @@ test("Kalender: nur Mitglieder, nichts wird veroeffentlicht, Freigabe vor dem Ei
   assert.doesNotMatch(calendar, /has-\[:checked\]:\$\{/);
   assert.match(readFileSync("src/features/account/accountExport.ts", "utf8"), /table: "advisor_org_posts"/);
 });
+
+test("Kalender: Woche ab Montag, Kalenderwoche nach ISO, Ziehen in Monat und Woche", async () => {
+  const { isoWeekNumber, mondayOf } = await import("@/features/advisor/socialCalendarModel");
+  assert.equal(mondayOf("2026-11-05"), "2026-11-02");
+  assert.equal(mondayOf("2026-11-08"), "2026-11-02");
+  assert.equal(isoWeekNumber("2026-11-05"), 45);
+  assert.equal(isoWeekNumber("2027-01-01"), 53);
+  assert.equal(isoWeekNumber("2027-01-04"), 1);
+  const calendar = readFileSync("src/features/advisor/SocialCalendar.tsx", "utf8");
+  assert.equal((calendar.match(/<DropDay /g) ?? []).length, 2);
+  assert.match(calendar, /<DraggableItem id=\{post\.id\} kind="post">/);
+  const tasks = readFileSync("src/features/advisor/Teamraum.tsx", "utf8");
+  assert.match(tasks, /export const TASK_VIEWS = \["board", "list", "calendar"\] as const;/);
+  assert.match(tasks, /<DropDay key=\{cell\.day\} day=\{cell\.day\} kind="task" move=\{moveTaskDueAction\}/);
+});

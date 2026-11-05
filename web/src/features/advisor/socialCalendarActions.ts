@@ -30,6 +30,11 @@ function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const params = new URLSearchParams({ org: orgId, tab: "social" });
   const month = String(formData.get("month") ?? "");
   if (/^\d{4}-\d{2}$/.test(month)) params.set("month", month);
+  const week = String(formData.get("week") ?? "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(week)) {
+    params.set("view", "week");
+    params.set("week", week);
+  }
   for (const [key, value] of Object.entries(extra)) params.set(key, value);
   return `/advisor/organisation?${params.toString()}`;
 }
@@ -142,4 +147,13 @@ export async function createCampaignAction(formData: FormData) {
     if (!postError) created += 1;
   }
   finish(backTo(formData, { month: days[0].slice(0, 7), socialCreated: String(created) }));
+}
+
+/** Aus dem Kalender: ein Posting auf einen anderen Tag ziehen. */
+export async function movePostToDayAction(postId: string, day: string): Promise<{ ok: boolean }> {
+  if (!UUID.test(postId) || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false };
+  const client = await createClient();
+  const { error } = await client.rpc("move_org_post", { p_post_id: postId, p_planned_on: day, p_status: null });
+  if (!error) revalidatePath("/advisor/organisation");
+  return { ok: !error };
 }

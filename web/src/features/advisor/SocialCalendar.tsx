@@ -3,13 +3,15 @@ import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { UserText } from "@/features/ui/UserText";
 import { PlanCampaign } from "@/features/advisor/PlanCampaign";
-import { deleteCampaignAction, deletePostAction, savePostAction, setPostStatusAction } from "@/features/advisor/socialCalendarActions";
+import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
+import { deleteCampaignAction, deletePostAction, movePostToDayAction, savePostAction, setPostStatusAction } from "@/features/advisor/socialCalendarActions";
 import {
   CHANNELS,
   CHANNEL_STYLE,
   POST_STATUSES,
   addDays,
   eventsWithoutPosts,
+  isoWeekNumber,
   monthGrid,
   postsByDay,
   shiftMonth,
@@ -32,6 +34,9 @@ export type SocialContext = {
   canWrite: boolean;
   today: string;
   month: string;
+  view: "month" | "week";
+  /** Montag der gezeigten Woche. */
+  week: string;
   locale: string;
   members: { userId: string; name: string }[];
   events: CalendarEvent[];
@@ -57,18 +62,26 @@ function Hidden({ ctx, postId }: { ctx: SocialContext; postId?: string }) {
     <>
       <input type="hidden" name="orgId" value={ctx.orgId} />
       <input type="hidden" name="month" value={ctx.month} />
+      {ctx.view === "week" ? <input type="hidden" name="week" value={ctx.week} /> : null}
       {postId ? <input type="hidden" name="postId" value={postId} /> : null}
     </>
   );
 }
 
 const href = (ctx: SocialContext, extra: Record<string, string> = {}) =>
-  `/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "social", month: ctx.month, ...(ctx.channel ? { channel: ctx.channel } : {}), ...extra }).toString()}`;
+  `/advisor/organisation?${new URLSearchParams({
+    org: ctx.orgId,
+    tab: "social",
+    ...(ctx.view === "week" ? { view: "week", week: ctx.week } : { month: ctx.month }),
+    ...(ctx.channel ? { channel: ctx.channel } : {}),
+    ...extra,
+  }).toString()}`;
 
-async function PostPill({ ctx, post }: { ctx: SocialContext; post: OrgPost }) {
+async function PostPill({ ctx, post, large = false }: { ctx: SocialContext; post: OrgPost; large?: boolean }) {
   const t = await getTranslations("advisor.social");
   const first = post.channels[0] ?? "other";
   return (
+    <DraggableItem id={post.id} kind="post">
     <Link
       href={`${href(ctx, { post: post.id })}#post-editor`}
       className={`block rounded-lg border-l-4 px-1.5 py-1 text-[12px] leading-4 text-slate-800 hover:ring-2 hover:ring-violet-300 ${CHANNEL_STYLE[first].bar} ${STATUS_STYLE[post.status]}`}
@@ -79,12 +92,18 @@ async function PostPill({ ctx, post }: { ctx: SocialContext; post: OrgPost }) {
         {post.plannedTime ? <span className="shrink-0 font-semibold text-slate-500">{post.plannedTime}</span> : null}
         <span className={`truncate ${post.status === "published" ? "text-slate-500" : "font-medium"}`}>{post.title}</span>
       </span>
-      {post.channels.length > 1 ? (
+      {large ? (
+        <span className="mt-1 flex flex-wrap gap-1">
+          {post.channels.map((channel) => <span key={channel} className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${CHANNEL_STYLE[channel].chip}`}>{t(`channels.${channel}`)}</span>)}
+          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">{t(`status.${post.status}`)}</span>
+        </span>
+      ) : post.channels.length > 1 ? (
         <span className="mt-0.5 flex gap-0.5" aria-hidden="true">
           {post.channels.map((channel) => <span key={channel} className={`h-1.5 w-1.5 rounded-full ${CHANNEL_STYLE[channel].dot}`} />)}
         </span>
       ) : null}
     </Link>
+    </DraggableItem>
   );
 }
 
@@ -187,6 +206,9 @@ async function PostEditor({ ctx, post, newDay, newEvent }: { ctx: SocialContext;
 export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx: SocialContext; selected: OrgPost | null; newDay: string | null; newEvent: string | null }) {
   const t = await getTranslations("advisor.social");
   const monthLabel = new Intl.DateTimeFormat(ctx.locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ctx.month}-01T00:00:00Z`));
+  const weekDays = Array.from({ length: 7 }, (_, index) => addDays(ctx.week, index));
+  const short = new Intl.DateTimeFormat(ctx.locale, { day: "numeric", month: "short", timeZone: "UTC" });
+  const weekLabel = t("weekLabel", { number: isoWeekNumber(ctx.week), from: short.format(new Date(`${weekDays[0]}T00:00:00Z`)), to: short.format(new Date(`${weekDays[6]}T00:00:00Z`)) });
   const weekdays = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(ctx.locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, 10, 2 + index))));
   const dayLong = new Intl.DateTimeFormat(ctx.locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
   const visiblePosts = ctx.channel ? ctx.posts.filter((post) => post.channels.includes(ctx.channel as Channel)) : ctx.posts;
@@ -207,12 +229,26 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
           <h2 className="text-xl font-semibold text-slate-950">{t("title")}</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("text")}</p>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <nav aria-label={t("viewLabel")} className="inline-flex rounded-full border border-slate-200 bg-white p-1">
+            {(["month", "week"] as const).map((entry) => (
+              <Link
+                key={entry}
+                href={href({ ...ctx, view: entry, week: entry === "week" ? (ctx.view === "week" ? ctx.week : ctx.month === ctx.today.slice(0, 7) ? ctx.today : `${ctx.month}-01`) : ctx.week, month: entry === "month" ? (ctx.view === "week" ? ctx.week.slice(0, 7) : ctx.month) : ctx.month })}
+                aria-current={ctx.view === entry ? "page" : undefined}
+                className={`inline-flex min-h-9 items-center rounded-full px-4 text-sm ${ctx.view === entry ? "bg-slate-900 font-semibold text-white" : "text-slate-700 hover:bg-slate-50"}`}
+              >
+                {t(`views.${entry}`)}
+              </Link>
+            ))}
+          </nav>
         <nav aria-label={t("monthNav")} className="flex items-center gap-1.5">
-          <Link href={href(ctx, { month: shiftMonth(ctx.month, -1) })} aria-label={t("prev")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">‹</Link>
-          <span className="min-w-36 text-center text-base font-semibold capitalize text-slate-950">{monthLabel}</span>
-          <Link href={href(ctx, { month: shiftMonth(ctx.month, 1) })} aria-label={t("next")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">›</Link>
-          <Link href={href(ctx, { month: ctx.today.slice(0, 7) })} className="ml-1 inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-3 text-sm text-slate-700 hover:bg-slate-50">{t("today")}</Link>
+          <Link href={ctx.view === "week" ? href(ctx, { week: addDays(ctx.week, -7) }) : href(ctx, { month: shiftMonth(ctx.month, -1) })} aria-label={t("prev")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">‹</Link>
+          <span className="min-w-36 text-center text-base font-semibold capitalize text-slate-950">{ctx.view === "week" ? weekLabel : monthLabel}</span>
+          <Link href={ctx.view === "week" ? href(ctx, { week: addDays(ctx.week, 7) }) : href(ctx, { month: shiftMonth(ctx.month, 1) })} aria-label={t("next")} className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">›</Link>
+          <Link href={ctx.view === "week" ? href(ctx, { week: ctx.today }) : href(ctx, { month: ctx.today.slice(0, 7) })} className="ml-1 inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-3 text-sm text-slate-700 hover:bg-slate-50">{t("today")}</Link>
         </nav>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("filterLabel")}>
@@ -238,7 +274,28 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
 
       {selected || newDay ? <PostEditor ctx={ctx} post={selected} newDay={newDay} newEvent={newEvent} /> : null}
 
+      {ctx.view === "week" ? (
+        <div className="grid gap-3 md:grid-cols-7 md:gap-0 md:overflow-hidden md:rounded-3xl md:border md:border-slate-200 md:bg-white">
+          {weekDays.map((day) => (
+            <DropDay key={day} day={day} kind="post" move={movePostToDayAction} label={dayLong.format(new Date(`${day}T00:00:00Z`))} className="advisor-card min-h-40 p-2.5 md:rounded-none md:border-0 md:border-r md:border-slate-100 md:shadow-none md:last:border-r-0">
+              <div className="flex items-center justify-between">
+                <p className={`text-sm font-semibold ${day === ctx.today ? "text-violet-700" : "text-slate-900"}`}>
+                  <span className="md:block md:text-xs md:font-semibold md:uppercase md:tracking-[.1em] md:text-slate-500">{new Intl.DateTimeFormat(ctx.locale, { weekday: "short", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`))}</span>{" "}
+                  <span className={`md:mt-0.5 md:inline-grid md:h-8 md:min-w-8 md:place-items-center md:rounded-full md:text-base ${day === ctx.today ? "md:bg-violet-600 md:text-white" : ""}`}>{Number(day.slice(8))}.</span>
+                </p>
+                {ctx.canWrite ? <Link href={`${href(ctx, { newPost: day })}#post-editor`} aria-label={t("addOn", { day: dayLong.format(new Date(`${day}T00:00:00Z`)) })} className="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-violet-50 hover:text-violet-700">+</Link> : null}
+              </div>
+              <div className="mt-2 grid gap-1.5">
+                {(eventsByDay.get(day) ?? []).map((event) => <p key={event.eventId} className="rounded-md bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900">★ {event.title}</p>)}
+                {(byDay.get(day) ?? []).map((post) => <PostPill key={post.id} ctx={ctx} post={post} large />)}
+              </div>
+            </DropDay>
+          ))}
+        </div>
+      ) : null}
+
       {/* Raster ab mittlerer Breite */}
+      {ctx.view === "month" ? (
       <div className="hidden overflow-hidden rounded-3xl border border-slate-200 bg-white md:block">
         <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
           {weekdays.map((weekday) => <p key={weekday} className="px-2 py-2 text-xs font-semibold uppercase tracking-[.1em] text-slate-500">{weekday}</p>)}
@@ -248,7 +305,7 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
             {week.map((cell) => {
               const isToday = cell.day === ctx.today;
               return (
-                <div key={cell.day} className={`group relative min-h-32 border-r border-slate-100 p-1.5 last:border-r-0 ${cell.inMonth ? "" : "bg-slate-50/70"}`}>
+                <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative min-h-32 border-r border-slate-100 p-1.5 last:border-r-0 ${cell.inMonth ? "" : "bg-slate-50/70"}`}>
                   <div className="flex items-center justify-between">
                     <span className={`grid h-7 min-w-7 place-items-center rounded-full px-1 text-xs font-semibold ${isToday ? "bg-violet-600 text-white" : cell.inMonth ? "text-slate-700" : "text-slate-400"}`}>{Number(cell.day.slice(8))}</span>
                     {ctx.canWrite ? (
@@ -261,14 +318,17 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
                     ))}
                     {(byDay.get(cell.day) ?? []).map((post) => <PostPill key={post.id} ctx={ctx} post={post} />)}
                   </div>
-                </div>
+                </DropDay>
               );
             })}
           </div>
         ))}
       </div>
 
+      ) : null}
+
       {/* Liste auf dem Telefon */}
+      {ctx.view === "month" ? (
       <ol className="grid gap-3 md:hidden">
         {agendaDays.length === 0 ? <li className="text-sm text-slate-600">{t("monthEmpty")}</li> : null}
         {agendaDays.map((cell) => (
@@ -285,6 +345,8 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
         ))}
         {ctx.canWrite ? <li><Link href={`${href(ctx, { newPost: ctx.today })}#post-editor`} className="brand-cta inline-flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold">+ {t("form.new")}</Link></li> : null}
       </ol>
+      ) : null}
+      {ctx.view === "month" ? <p className="hidden text-xs text-slate-500 md:block">{t("dragHint")}</p> : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="uncovered-title" className={`${CARD} ${uncovered.length > 0 ? "border-amber-200" : ""}`}>
