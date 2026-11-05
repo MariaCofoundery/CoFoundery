@@ -474,6 +474,9 @@ export default function DatenschutzPage() {
               in deinem Browser erlaubst. Dann speichern wir die Zustelladresse deines Browsers,
               die zugehörigen Schlüssel, eine gekürzte Browserkennung und den Zeitpunkt der letzten
               Nutzung.
+              Stellst du Feierabend-Zeiten ein, speichern wir Zeitfenster, Tage, deine Zeitzone und
+              einen Schnellschalter; in dieser Zeit schicken wir keine Mitteilung aufs Gerät, Hinweise
+              in der App bleiben.
             </p>
             <List
               items={[

@@ -30,11 +30,13 @@ import { ACCOUNT_CARD, ACCOUNT_SECONDARY, AccountHead } from "@/features/account
 import { DeleteAccountSection } from "@/features/account/DeleteAccountSection";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { QuietHoursSection, getMyQuietHours } from "@/features/notifications/QuietHoursSection";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; connectError?: string }>;
+  searchParams: Promise<{ status?: string; connectError?: string; quiet?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -105,6 +107,7 @@ export default async function AccountPage({
   // Nur bekannte Schluessel an t() geben - ein manipulierter Parameter wuerde
   // sonst als roher Schluesselpfad auf der Seite landen.
   const status = isAccountStatus(params.status) ? params.status : null;
+  const quietT = await getTranslations("notices.quiet");
   const hasConnectAccount = membershipResult.data === true;
   const accountLocale: AppLocale | null = preferences?.locale ? normalizeLocale(preferences.locale) : null;
   const optedOut = (optedOutRows as { kind: string }[])
@@ -125,6 +128,7 @@ export default async function AccountPage({
     { id: "anmeldung", label: t("account.access.title"), icon: "person" },
     { id: "sprache", label: t("account.locale.title"), icon: "globe" },
     { id: "post", label: t("account.notifications.title"), icon: "bell" },
+    { id: "feierabend", label: quietT("title"), icon: "clock" },
     ...(hasConnectAccount ? [{ id: "connect", label: t("account.nav.connect"), icon: "link" as const }] : []),
     { id: "daten", label: t("account.data.title"), icon: "download" },
     { id: "handy", label: phoneT("navLabel"), icon: "phone" },
@@ -171,6 +175,9 @@ export default async function AccountPage({
             showAdvisorKinds={roleViews.hasAdvisor}
             status={status}
           />
+
+          {/* Feierabend (20270317120000): direkt nach den Benachrichtigungen, dort sucht man ihn. */}
+          <QuietHoursSection quiet={await getMyQuietHours(supabase)} status={params.quiet ?? null} locale={getPresentationLocale(accountLocale ?? "de")} />
 
           <ConnectParticipationSection error={params.connectError === "1"} />
           <AccountDataSection>

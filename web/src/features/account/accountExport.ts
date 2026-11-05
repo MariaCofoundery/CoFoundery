@@ -23,6 +23,8 @@ const EXPORTED_TABLES = [
   { table: "profiles", column: "user_id" },
   { table: "research_consent_preferences", column: "user_id" },
   { table: "notification_opt_outs", column: "user_id" },
+  // Feierabend-Zeiten (seit 20270317120000).
+  { table: "notification_quiet_hours", column: "user_id" },
   // Welche Mitteilungen der Plattform diese Person gesehen oder weggeklickt hat.
   { table: "announcement_receipts", column: "user_id" },
 

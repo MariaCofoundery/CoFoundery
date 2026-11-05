@@ -35,5 +35,29 @@
     "seen": "seen",
     "dismissed": "read",
     "open": "Open"
+  },
+  "quiet": {
+    "title": "Off hours",
+    "text": "During these times your phone stays silent. Messages, tasks and notices still arrive and wait in the app – someone working at 10 pm can write to you without bothering you.",
+    "enabled": "Turn on off hours",
+    "from": "From",
+    "until": "Until",
+    "windowHint": "Every day – may cross midnight, e.g. 18:00 to 08:00.",
+    "days": "Whole days silent",
+    "always": "Applies to all notifications on your device, not to emails. Nothing is sent later: what arrives in that time you see the next time you open the app.",
+    "save": "Save",
+    "saved": "Saved.",
+    "invalid": "Please check the times: start and end must not be the same.",
+    "quietNow": "Off hours right now – your phone stays silent.",
+    "pausedUntil": "Off hours until {time} – your phone stays silent.",
+    "pauseUntilMorning": "Off hours now until 8 am tomorrow",
+    "resume": "End off hours",
+    "day0": "Sun",
+    "day1": "Mon",
+    "day2": "Tue",
+    "day3": "Wed",
+    "day4": "Thu",
+    "day5": "Fri",
+    "day6": "Sat"
   }
 }

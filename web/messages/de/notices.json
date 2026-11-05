@@ -35,5 +35,29 @@
     "seen": "gesehen",
     "dismissed": "gelesen",
     "open": "Öffnen"
+  },
+  "quiet": {
+    "title": "Feierabend",
+    "text": "Zu diesen Zeiten bleibt dein Telefon still. Nachrichten, Aufgaben und Hinweise kommen trotzdem an und warten in der App – wer um 22 Uhr arbeitet, kann dir schreiben, ohne dass es dich stört.",
+    "enabled": "Feierabend-Zeiten einschalten",
+    "from": "Ab",
+    "until": "Bis",
+    "windowHint": "Jeden Tag – darf über Mitternacht gehen, z. B. 18:00 bis 08:00.",
+    "days": "Ganze Tage still",
+    "always": "Gilt für alle Mitteilungen aufs Gerät, nicht für E-Mails. Nachgeholt wird nichts: Was in der Zeit kommt, siehst du beim nächsten Öffnen der App.",
+    "save": "Speichern",
+    "saved": "Gespeichert.",
+    "invalid": "Bitte prüfe die Zeiten: Beginn und Ende dürfen nicht gleich sein.",
+    "quietNow": "Gerade ist Feierabend – dein Telefon bleibt still.",
+    "pausedUntil": "Feierabend bis {time} – dein Telefon bleibt still.",
+    "pauseUntilMorning": "Jetzt Feierabend bis morgen 8 Uhr",
+    "resume": "Feierabend beenden",
+    "day0": "So",
+    "day1": "Mo",
+    "day2": "Di",
+    "day3": "Mi",
+    "day4": "Do",
+    "day5": "Fr",
+    "day6": "Sa"
   }
 }

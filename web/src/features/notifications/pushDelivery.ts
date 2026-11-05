@@ -57,6 +57,11 @@ export async function deliverPushToUser(userId: string, payload: PushPayload) {
   const client = privilegedClient();
   if (!client) return { sent: 0, removed: 0 };
 
+  // Feierabend (20270317120000): Das Telefon bleibt still, der Hinweis in der App ist schon da.
+  // Nachgeholt wird nichts - wer die App oeffnet, sieht, was liegt.
+  const { data: quiet } = await client.rpc("is_quiet_now", { p_user_id: userId });
+  if (quiet === true) return { sent: 0, removed: 0 };
+
   const { data, error } = await client
     .from("push_subscriptions")
     .select("id, endpoint, p256dh, auth, failure_count")
