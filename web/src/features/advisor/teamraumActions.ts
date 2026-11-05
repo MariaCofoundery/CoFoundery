@@ -25,7 +25,7 @@ const dateOrNull = (value: FormDataEntryValue | null) => {
 function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const orgId = uuidOrNull(formData.get("orgId"));
   if (!orgId) return "/advisor/organisation";
-  const tab = ["week", "tasks", "who"].includes(String(formData.get("tab"))) ? String(formData.get("tab")) : "tasks";
+  const tab = ["week", "tasks", "pages", "who"].includes(String(formData.get("tab"))) ? String(formData.get("tab")) : "tasks";
   const params = new URLSearchParams({ org: orgId, tab });
   const filter = taskFilterOf(formData.get("filter"));
   if (tab === "tasks" && filter !== "all") params.set("filter", filter);
@@ -126,4 +126,62 @@ export async function setMyOrgPresenceAction(formData: FormData) {
     p_stand_in_user_id: uuidOrNull(formData.get("standIn")),
   });
   finish(backTo(formData, error ? { taskError: errorOf(error.message) } : { taskSaved: "1" }));
+}
+
+// ---------------------------------------------------------------------------
+// Seiten (Stufe 2, 20270313120000). Die Formulare schicken tab=pages mit.
+// ---------------------------------------------------------------------------
+
+const pageErrorOf = (message: string | undefined) =>
+  /org_page_changed/.test(message ?? "") ? "changed" : /org_page_too_deep/.test(message ?? "") ? "deep" : /org_page_has_children/.test(message ?? "") ? "children" : "failed";
+
+export async function saveOrgPageAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const pageId = uuidOrNull(formData.get("pageId"));
+  const expected = String(formData.get("expected") ?? "");
+  const { data, error } = await client.rpc("save_org_page", {
+    p_page_id: pageId,
+    p_org_id: uuidOrNull(formData.get("orgId")),
+    p_parent_id: uuidOrNull(formData.get("parentId")),
+    p_title: String(formData.get("title") ?? "").slice(0, 160),
+    p_body: String(formData.get("body") ?? "").slice(0, 50000),
+    p_event_id: uuidOrNull(formData.get("eventId")),
+    p_is_template: formData.get("isTemplate") === "yes",
+    p_expected_updated_at: pageId && expected ? expected : null,
+  });
+  if (error) finish(backTo(formData, { ...(pageId ? { doc: pageId, edit: "1" } : { newDoc: "1" }), docError: pageErrorOf(error.message) }));
+  finish(backTo(formData, { doc: String(data ?? pageId ?? ""), docSaved: "1" }));
+}
+
+export async function deleteOrgPageAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const pageId = uuidOrNull(formData.get("pageId"));
+  const { error } = await client.rpc("delete_org_page", { p_page_id: pageId });
+  if (error) finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), docError: pageErrorOf(error.message) }));
+  finish(backTo(formData, { docDeleted: "1" }));
+}
+
+export async function checkOrgPageItemAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const pageId = uuidOrNull(formData.get("pageId"));
+  const index = Number(formData.get("index"));
+  const { error } = await client.rpc("check_org_page_item", {
+    p_page_id: pageId,
+    p_item: Number.isInteger(index) ? index : -1,
+    p_text: String(formData.get("text") ?? "").slice(0, 400),
+    p_done: formData.get("done") === "yes",
+  });
+  finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), ...(error ? { docError: pageErrorOf(error.message) } : {}) }));
+}
+
+export async function createTaskFromPageItemAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const pageId = uuidOrNull(formData.get("pageId"));
+  const index = Number(formData.get("index"));
+  const { error } = await client.rpc("create_org_task_from_page_item", {
+    p_page_id: pageId,
+    p_item: Number.isInteger(index) ? index : -1,
+    p_text: String(formData.get("text") ?? "").slice(0, 400),
+  });
+  finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), ...(error ? { docError: pageErrorOf(error.message) } : { docTask: "1" }) }));
 }

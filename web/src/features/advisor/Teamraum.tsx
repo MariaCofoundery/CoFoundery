@@ -52,6 +52,8 @@ export type TeamraumContext = {
   events: ProgramEvent[];
   tasks: OrgTask[];
   presence: MemberPresence[];
+  /** Titel der Seiten (Stufe 2) - fuer den Hinweis auf einer Aufgabe, die aus einer Seite kommt. */
+  pageTitles: Map<string, string>;
   today: string;
   locale: string;
   feedback: { error: string | null; saved: boolean; deleted: boolean };
@@ -70,7 +72,7 @@ const COLUMN_TONE: Record<TaskStatus, string> = { open: "bg-indigo-50/70", doing
 const toneOf = (userId: string) => TONES[[...userId].reduce((sum, char) => sum + char.charCodeAt(0), 0) % TONES.length];
 const initialOf = (name: string) => (name.trim()[0] ?? "?").toUpperCase();
 
-function Avatar({ userId, name, size = "h-7 w-7 text-xs" }: { userId: string; name: string; size?: string }) {
+export function Avatar({ userId, name, size = "h-7 w-7 text-xs" }: { userId: string; name: string; size?: string }) {
   return (
     <span title={name} aria-hidden="true" className={`inline-grid shrink-0 place-items-center rounded-full font-semibold ${size} ${toneOf(userId)}`}>
       {initialOf(name)}
@@ -78,7 +80,7 @@ function Avatar({ userId, name, size = "h-7 w-7 text-xs" }: { userId: string; na
   );
 }
 
-function helpers(ctx: TeamraumContext) {
+export function helpers(ctx: TeamraumContext) {
   const day = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "UTC" });
   const time = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
   return {
@@ -87,7 +89,7 @@ function helpers(ctx: TeamraumContext) {
     memberOf: (userId: string | null) => (userId ? ctx.members.find((member) => member.userId === userId) ?? null : null),
     programOf: (programId: string | null) => (programId ? ctx.programs.find((program) => program.programId === programId) ?? null : null),
     eventOf: (eventId: string | null) => (eventId ? ctx.events.find((event) => event.eventId === eventId) ?? null : null),
-    href: (tab: "week" | "tasks" | "who", extra: Record<string, string> = {}) => `/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab, ...extra }).toString()}`,
+    href: (tab: "week" | "tasks" | "pages" | "who", extra: Record<string, string> = {}) => `/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab, ...extra }).toString()}`,
   };
 }
 
@@ -219,6 +221,9 @@ async function TaskCard({ ctx, task, filter, selected }: { ctx: TeamraumContext;
       <div className="flex flex-wrap gap-1.5">
         {task.programId ? <span className={`${CHIP} bg-violet-100 text-violet-800`}>{program?.name ?? t("hiddenProgram")}</span> : <span className={`${CHIP} bg-sky-100 text-sky-800`}>{t("internal")}</span>}
         {event ? <span className={`${CHIP} bg-amber-100 text-amber-900`}>{event.title}</span> : null}
+        {task.pageId && ctx.pageTitles.has(task.pageId) ? (
+          <Link href={href("pages", { doc: task.pageId })} className={`${CHIP} bg-pink-100 text-pink-800 underline-offset-4 hover:underline`}>{ctx.pageTitles.get(task.pageId)}</Link>
+        ) : null}
         {task.dueOn ? <span className={`${CHIP} ${overdue ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}`}>{overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : t("dueOn", { date: dayOf(task.dueOn) })}</span> : null}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">

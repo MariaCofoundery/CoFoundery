@@ -26,6 +26,7 @@ const task = (overrides: Partial<OrgTask>): OrgTask => ({
   dueOn: null,
   programId: null,
   eventId: null,
+  pageId: null,
   checklist: [],
   createdByUserId: "me",
   createdAt: "2026-11-01T10:00:00Z",
@@ -130,12 +131,12 @@ test("Teamraum: Aktionen bauen den Rueckweg selbst und rufen nur die Datenbankfu
   }
   assert.doesNotMatch(actions, /\.from\("advisor_org_/);
   assert.doesNotMatch(actions, /formData\.get\("returnTo"\)/);
-  assert.match(actions, /\["week", "tasks", "who"\]\.includes/);
+  assert.match(actions, /\["week", "tasks", "pages", "who"\]\.includes/);
 });
 
 test("Teamraum: eigene Gruppe in der Organisation, auf dem Advisor-Start und im Kontoexport", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(page, /\{ key: "team", tabs: \["week", "tasks", "who"\] \}/);
+  assert.match(page, /\{ key: "team", tabs: \["week", "tasks", "pages", "who"\] \}/);
   assert.match(page, /canWrite: org\.status === "active"/);
   const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   assert.match(start, /listMyDueOrgTasks\(client, user\.id\)/);

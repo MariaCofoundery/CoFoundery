@@ -23,6 +23,8 @@ export type OrgTask = {
   dueOn: string | null;
   programId: string | null;
   eventId: string | null;
+  /** Seit 20270313120000: aus einer Haekchen-Zeile dieser Seite entstanden. */
+  pageId: string | null;
   checklist: ChecklistItem[];
   createdByUserId: string | null;
   createdAt: string;
@@ -159,6 +161,7 @@ export function taskOf(row: Record<string, unknown>): OrgTask {
     dueOn: (row.due_on as string | null) ?? null,
     programId: (row.program_id as string | null) ?? null,
     eventId: (row.event_id as string | null) ?? null,
+    pageId: (row.page_id as string | null) ?? null,
     checklist,
     createdByUserId: (row.created_by_user_id as string | null) ?? null,
     createdAt: row.created_at as string,

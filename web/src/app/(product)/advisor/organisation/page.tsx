@@ -10,7 +10,9 @@ import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { TeamraumBoard, TeamraumWeek, TeamraumWho, type TeamraumContext } from "@/features/advisor/Teamraum";
-import { getOrgNextCheckIns, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
+import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
+import { TeamraumPages } from "@/features/advisor/TeamraumPages";
+import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
@@ -38,7 +40,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "week", "tasks", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "week", "tasks", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -49,7 +51,7 @@ type Tab = (typeof TABS)[number];
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "plan", "report"] },
   // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
-  { key: "team", tabs: ["week", "tasks", "who"] },
+  { key: "team", tabs: ["week", "tasks", "pages", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -72,7 +74,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -125,7 +127,10 @@ export default async function AdvisorOrganisationPage({
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const needsPeople = tab === "learning";
-  const teamraumTab = tab === "week" || tab === "tasks" || tab === "who";
+  const teamraumTab = tab === "week" || tab === "tasks" || tab === "pages" || tab === "who";
+  const UUID = /^[0-9a-f-]{36}$/;
+  const docId = tab === "pages" && UUID.test(query.doc ?? "") ? (query.doc as string) : null;
+  const templatePageId = tab === "pages" && query.newDoc === "1" && UUID.test(query.template ?? "") ? (query.template as string) : null;
   const selectedTaskId = tab === "tasks" && /^[0-9a-f-]{36}$/.test(query.task ?? "") ? (query.task as string) : null;
   const needsPrograms = teamraumTab || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
@@ -136,7 +141,7 @@ export default async function AdvisorOrganisationPage({
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
-    tab === "plan" || tab === "week" || tab === "tasks" ? listProgramEvents(client, org.id) : Promise.resolve([]),
+    tab === "plan" || tab === "week" || tab === "tasks" || tab === "pages" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -147,13 +152,24 @@ export default async function AdvisorOrganisationPage({
     tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
 
-  const [orgTasks, presence, taskComments, followUps, nextCheckIns] = await Promise.all([
+  const [orgTasks, presence, taskComments, followUps, nextCheckIns, orgPages, openPage, templatePage] = await Promise.all([
     teamraumTab ? listOrgTasks(client, org.id) : Promise.resolve([]),
     tab === "who" ? listOrgPresence(client, org.id) : Promise.resolve([]),
     selectedTaskId ? listTaskComments(client, selectedTaskId) : Promise.resolve([]),
     tab === "week" ? listDueProgramFollowUps(client) : Promise.resolve([]),
     tab === "week" || tab === "who" ? getOrgNextCheckIns(client, org.id) : Promise.resolve([]),
+    tab === "pages" || tab === "tasks" ? listOrgPages(client, org.id) : Promise.resolve([]),
+    docId ? getOrgPage(client, org.id, docId) : Promise.resolve(null),
+    templatePageId ? getOrgPage(client, org.id, templatePageId) : Promise.resolve(null),
   ]);
+  // Neue Seite: leer, aus einer mitgelieferten Vorlage oder aus einer eigenen Vorlage der Organisation.
+  const builtIn = isBuiltInTemplate(query.template) ? query.template : null;
+  const pagePrefill = {
+    title: templatePage ? templatePage.title : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.title`) : "",
+    body: templatePage ? templatePage.body : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.body`) : "",
+    parentId: UUID.test(query.parent ?? "") ? (query.parent as string) : null,
+  };
+  const pageMode: "view" | "edit" | "new" = query.newDoc === "1" ? "new" : openPage && query.edit === "1" ? "edit" : "view";
   const teamraum: TeamraumContext | null = teamraumTab
     ? {
         orgId: org.id,
@@ -165,6 +181,7 @@ export default async function AdvisorOrganisationPage({
         events: planEvents,
         tasks: orgTasks,
         presence,
+        pageTitles: new Map(orgPages.map((entry) => [entry.id, entry.title])),
         today: new Date().toISOString().slice(0, 10),
         locale: getPresentationLocale(await getLocale()),
         feedback: { error: query.taskError ?? null, saved: query.taskSaved === "1", deleted: query.taskDeleted === "1" },
@@ -269,6 +286,16 @@ export default async function AdvisorOrganisationPage({
 
         {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}
         {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} /> : null}
+        {teamraum && tab === "pages" ? (
+          <TeamraumPages
+            ctx={teamraum}
+            pages={orgPages}
+            page={openPage}
+            mode={pageMode}
+            prefill={pagePrefill}
+            feedback={{ error: query.docError ?? null, saved: query.docSaved === "1", deleted: query.docDeleted === "1", taskCreated: query.docTask === "1" }}
+          />
+        ) : null}
         {teamraum && tab === "who" ? <TeamraumWho ctx={teamraum} nextCheckIns={nextCheckIns} /> : null}
 
         {tab === "access" ? (

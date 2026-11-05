@@ -2,13 +2,14 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { taskOf, type MemberPresence, type OrgTask, type TaskComment } from "@/features/advisor/teamraumModel";
+import { pageOf, type OrgPage, type OrgPageSummary } from "@/features/advisor/teamraumPageModel";
 
 /**
  * Teamraum lesen - mit dem normalen Zugang. Die Zeilensicherheit zeigt nur Mitgliedern der
  * Organisation etwas (20270312120000); ein Team im Programm bekommt hier nie eine Zeile.
  */
 
-const TASK_COLUMNS = "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, checklist, created_by_user_id, created_at, updated_at, done_at";
+const TASK_COLUMNS = "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, checklist, created_by_user_id, created_at, updated_at, done_at";
 
 export async function listOrgTasks(client: SupabaseClient, orgId: string): Promise<OrgTask[]> {
   const { data, error } = await client
@@ -73,4 +74,27 @@ export async function getOrgNextCheckIns(client: SupabaseClient, orgId: string):
   const { data, error } = await client.rpc("get_org_report_check_ins", { p_org_id: orgId, p_from: null, p_to: null });
   if (error || !Array.isArray(data)) return [];
   return (data as { program_id: string; next_on: string | null }[]).flatMap((row) => (row.next_on ? [{ programId: row.program_id, nextOn: row.next_on }] : []));
+}
+
+/** Alle Seiten der Organisation ohne Text - fuer den Baum. */
+export async function listOrgPages(client: SupabaseClient, orgId: string): Promise<OrgPageSummary[]> {
+  const { data, error } = await client
+    .from("advisor_org_pages")
+    .select("id, parent_id, title, is_template, event_id, created_by_user_id, updated_by_user_id, updated_at")
+    .eq("org_id", orgId)
+    .order("title", { ascending: true })
+    .limit(500);
+  if (error || !Array.isArray(data)) return [];
+  return (data as Record<string, unknown>[]).map(pageOf);
+}
+
+export async function getOrgPage(client: SupabaseClient, orgId: string, pageId: string): Promise<OrgPage | null> {
+  const { data, error } = await client
+    .from("advisor_org_pages")
+    .select("id, parent_id, title, body, is_template, event_id, created_by_user_id, updated_by_user_id, updated_at")
+    .eq("org_id", orgId)
+    .eq("id", pageId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return pageOf(data as Record<string, unknown>);
 }

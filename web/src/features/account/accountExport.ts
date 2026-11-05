@@ -60,6 +60,7 @@ const EXPORTED_TABLES = [
   { table: "advisor_org_tasks", column: "created_by_user_id" },
   { table: "advisor_org_task_comments", column: "author_user_id" },
   { table: "advisor_org_member_presence", column: "user_id" },
+  { table: "advisor_org_pages", column: "created_by_user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.
   { table: "assessment_team_shares", column: "owner_user_id" },

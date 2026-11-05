@@ -760,8 +760,8 @@
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betreuen | Teamraum | Inhalte für die Teams | Einrichten",
-      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine und Auswertung. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Diese Woche | Aufgaben | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine und Auswertung. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben, Seiten und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Diese Woche | Aufgaben | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -1492,6 +1492,67 @@
       "colNextTalk": "Nächstes Gespräch",
       "colOpen": "Offene Aufgaben",
       "noContact": "Noch niemand"
+    },
+    "pages": {
+      "treeLabel": "Seiten",
+      "treeEmpty": "Noch keine Seite. Fang mit einer Vorlage an.",
+      "templatesLabel": "Vorlagen",
+      "new": "Neue Seite",
+      "newChild": "Unterseite anlegen",
+      "edit": "Bearbeiten",
+      "editTitle": "„{title}“ bearbeiten",
+      "save": "Seite speichern",
+      "cancel": "Abbrechen",
+      "delete": "Seite löschen",
+      "useTemplate": "Neue Seite aus dieser Vorlage",
+      "titleLabel": "Titel",
+      "parentLabel": "Liegt unter",
+      "parentNone": "Oberste Ebene",
+      "eventLabel": "Gehört zu Veranstaltung",
+      "eventNone": "Keine",
+      "bodyLabel": "Inhalt",
+      "formatHint": "Schreiben wie gewohnt: „# “ oder „## “ für Überschriften, „- “ für Listen, „[ ] “ für Häkchen (jede kann eine Aufgabe werden), **fett** und *kursiv*.",
+      "isTemplate": "Als Vorlage für neue Seiten anbieten",
+      "belongsTo": "Gehört zu: {title} · {date}",
+      "template": "Vorlage",
+      "onlyTeam": "Nur euer Team",
+      "lastEdited": "Zuletzt {name}, {date}",
+      "emptyBody": "Diese Seite ist noch leer.",
+      "taskChip": "Aufgabe",
+      "makeTask": "Als Aufgabe",
+      "linked": "Verknüpft:",
+      "eventLink": "Veranstaltung {title}",
+      "linkedTasks": "{count, plural, one {# Aufgabe} other {# Aufgaben}}",
+      "saved": "Seite gespeichert.",
+      "deleted": "Seite gelöscht.",
+      "taskCreated": "Aufgabe angelegt. Person und Datum legst du in der Aufgabe fest.",
+      "errors": {
+        "failed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+        "changed": "Jemand hat die Seite inzwischen gespeichert. Deine Fassung wurde nicht übernommen, damit nichts überschrieben wird. Lies den neuen Stand und füge deine Änderung erneut ein.",
+        "deep": "Seiten gehen höchstens drei Ebenen tief.",
+        "children": "Diese Seite hat Unterseiten. Verschiebe oder lösche sie zuerst."
+      },
+      "draftTitle": "Deine nicht gespeicherte Fassung",
+      "draftHint": "Kopiere, was du behalten willst, und füge es oben in den neuen Stand ein.",
+      "introTitle": "Seiten für euer Team",
+      "introText": "Handbuch, Abläufe, Checklisten, Protokolle der Teamrunden – alles, was ihr sonst in Ordnern sucht. Jede Häkchen-Zeile kann mit einem Klick eine Aufgabe werden und erscheint dann auch auf dem Board. Nur euer Team sieht die Seiten, nie die Startups.",
+      "templates": {
+        "event": {
+          "title": "Event-Checkliste",
+          "hint": "Vorher, am Tag, danach – mit Häkchen.",
+          "body": "Was bis zur Veranstaltung stehen muss. Jede Häkchen-Zeile kann eine Aufgabe werden.\n\n## Vorher\n[ ] Raum und Technik bestätigen\n[ ] Einladung an die Teams\n[ ] Speaker oder Jury anfragen\n[ ] Catering klären\n\n## Am Tag\n- Einlass ab\n- Ablauf\n\n## Danach\n[ ] Teilnahme im Programmplan eintragen\n[ ] Unterlagen teilen\n[ ] Dank an Speaker"
+        },
+        "meeting": {
+          "title": "Protokoll Teamrunde",
+          "hint": "Stand, Entscheidungen, wer macht was.",
+          "body": "## Dabei\n- \n\n## Stand je Team\n- \n\n## Entschieden\n- \n\n## Wer macht was\n[ ] \n\n## Nächste Runde\n- "
+        },
+        "onboarding": {
+          "title": "Onboarding neuer Advisor",
+          "hint": "Zugänge, Teams, erste Woche.",
+          "body": "Willkommen im Team! Das hier hilft in den ersten Tagen.\n\n## Zugänge\n[ ] Einladung in die Organisation angenommen\n[ ] Rolle unter „Wer macht was“ eingetragen\n\n## Teams kennenlernen\n[ ] Teams im Programm durchsehen\n[ ] Bezugsperson für erste Teams werden\n\n## Erste Woche\n[ ] Programmplan ansehen\n[ ] An der nächsten Teamrunde teilnehmen"
+        }
+      }
     }
   }
 }
