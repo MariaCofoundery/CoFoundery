@@ -30,6 +30,34 @@ export async function SetupCard({ orgId, items, done, next }: { orgId: string; i
   );
 }
 
+/**
+ * Das Band "Diese Woche" (Entwurf 05.11.2026): drei ehrliche Zaehler - Termine in den naechsten sieben Tagen, offene
+ * Aufgaben fuer dich, Termine ohne geplante Posts. Jede Zahl ist ein Link dorthin; keine Wertung, kein Vergleich.
+ */
+export async function StartWeekBand({ nextTitle, items }: { nextTitle: string | null; items: { key: "events" | "tasks" | "posts"; count: number; href: string }[] }) {
+  const t = await getTranslations("advisor.area.start.week");
+  return (
+    <section aria-label={t("label")} className="relative flex flex-wrap items-center gap-x-10 gap-y-4 overflow-hidden rounded-[22px] bg-[#17173A] px-6 py-5 text-white sm:px-7">
+      <svg aria-hidden="true" width="340" height="170" viewBox="0 0 340 170" className="pointer-events-none absolute -right-5 -top-2.5 hidden sm:block">
+        <circle cx="250" cy="50" r="70" fill="#6D49E0" opacity="0.35" />
+        <circle cx="180" cy="140" r="44" fill="#0A80B8" opacity="0.4" />
+        <circle cx="318" cy="140" r="22" fill="#F5B544" opacity="0.8" />
+        <path d="M20 150 C 90 60, 190 70, 330 18" stroke="#B9A6FF" strokeWidth="2" fill="none" strokeDasharray="3 7" />
+      </svg>
+      <div className="relative flex min-w-[12rem] flex-col gap-1">
+        <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#B9A6FF]">{t("title")}</span>
+        <span className="font-brand text-[22px] font-semibold leading-tight">{nextTitle ?? t("quiet")}</span>
+      </div>
+      {items.map((item) => (
+        <Link key={item.key} href={item.href} className="relative flex items-baseline gap-2 text-white hover:underline">
+          <span className="font-brand text-[34px] font-semibold leading-none">{item.count}</span>
+          <span className="text-[14.5px] text-[#DCDDF2]">{t(`items.${item.key}`, { count: item.count })}</span>
+        </Link>
+      ))}
+    </section>
+  );
+}
+
 /** Vier Wege vom Start in die Bereiche - mit dem, was dort gerade ansteht. */
 export async function StartTiles({ tiles }: { tiles: StartTile[] }) {
   const t = await getTranslations("advisor.area.start.tiles");

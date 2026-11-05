@@ -16,7 +16,7 @@ import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamIn
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { listMyOpenOrgTasks, listUpcomingOrgTasks } from "@/features/advisor/teamraumData";
 import { StartTasks, startTasksViewOf } from "@/features/advisor/StartTasks";
-import { SetupCard, StartEvents, StartTiles, type StartEvent, type StartTile } from "@/features/advisor/StartOverview";
+import { SetupCard, StartEvents, StartTiles, StartWeekBand, type StartEvent, type StartTile } from "@/features/advisor/StartOverview";
 import { loadSetup } from "@/features/advisor/setup/setupData";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { listOrgEventPosts } from "@/features/advisor/socialCalendarData";
@@ -270,6 +270,16 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
         </header>
 
         <div className="work-ui mt-5 grid gap-5">
+          {orgs.length > 0 ? (
+            <StartWeekBand
+              nextTitle={startEvents.find((entry) => !entry.ecosystem)?.title ?? null}
+              items={[
+                { key: "events", count: startEvents.filter((entry) => !entry.ecosystem && Date.parse(entry.startsAt) <= nowMs + 7 * 86_400_000).length, href: calendarHref(orgs[0].id, { ansicht: "woche" }) },
+                { key: "tasks", count: myTasks.filter((task) => task.status !== "done").length, href: "/advisor/teamraum/aufgaben" },
+                { key: "posts", count: startEvents.filter((entry) => entry.needsPosts).length, href: startEvents.find((entry) => entry.needsPosts)?.needsPosts ?? calendarHref(orgs[0].id) },
+              ]}
+            />
+          ) : null}
           {setupOrg && setup && !setup.hidden && !setup.progress.complete && setup.progress.next ? (
             <SetupCard orgId={setupOrg.id} items={setup.progress.items} done={setup.progress.done} next={setup.progress.next} />
           ) : null}

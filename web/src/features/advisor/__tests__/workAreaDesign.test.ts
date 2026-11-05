@@ -49,9 +49,10 @@ test("Diese Woche: eine Zeile, gespeichert wird erst nach dem Vorschlag; keine W
   assert.doesNotMatch(board + dictate, /score|percent|ranking|compatib/i);
 });
 
-test("Programm: schmaler Kopf mit den drei Gruppen, Teams als Zeilen, Datenschutz-Text zum Aufklappen", () => {
+test("Programm: schmaler Kopf, Reiter der Gruppe (die Gruppen stehen in der Seitenleiste), Teams als Zeilen, Datenschutz-Text zum Aufklappen", () => {
   const page = read("src/app/(product)/advisor/organisation/page.tsx");
-  assert.match(page, /<OrgAreaNav part="groups"/);
+  // Seit dem 05.11.2026 wechselt die Seitenleiste zwischen den Gruppen; der Kopf traegt sie nicht mehr doppelt.
+  assert.doesNotMatch(page, /<OrgAreaNav part="groups"/);
   assert.match(page, /<OrgAreaNav part="tabs"/);
   assert.doesNotMatch(page.slice(page.indexOf("return (\n    <main className=\"work-ui")), /<AdvisorPageHeader/);
   const section = read("src/features/advisor/OrgTeamProgramsSection.tsx");

@@ -215,7 +215,7 @@ export default async function AdvisorOrganisationPage({
 
   return (
     <main className="work-ui mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      {/* Schmaler Kopf (Entwurf vom 05.11.2026): Ort und Schwerpunkte, Name, die drei Gruppen. Darunter die Reiter. */}
+      {/* Schmaler Kopf (Entwurf vom 05.11.2026): Ort und Schwerpunkte, Name. Die Bereiche stehen in der Seitenleiste; darunter die Reiter der Gruppe. */}
       <header className="advisor-hero flex flex-col gap-4 rounded-[22px] px-6 py-5 sm:px-7 md:flex-row md:items-center md:justify-between">
         <div className="relative z-10 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[.12em] text-indigo-200">
@@ -223,7 +223,6 @@ export default async function AdvisorOrganisationPage({
           </p>
           <h1 className="font-brand mt-1 break-words text-[28px] font-semibold leading-tight text-white sm:text-[30px]">{org.name}</h1>
         </div>
-        <OrgAreaNav part="groups" ariaLabel={t("orgPage.tabsLabel")} activeTab={tab} groups={areaGroups} />
       </header>
       <OrgAreaNav part="tabs" ariaLabel={t("orgPage.tabsLabel")} activeTab={tab} groups={areaGroups} />
 

@@ -725,6 +725,16 @@
         "morning": "Guten Morgen, {name}",
         "day": "Guten Tag, {name}",
         "evening": "Guten Abend, {name}"
+      },
+      "week": {
+        "label": "Diese Woche",
+        "title": "Diese Woche",
+        "quiet": "Gerade ruhig",
+        "items": {
+          "events": "{count, plural, one {Termin} other {Termine}}",
+          "tasks": "{count, plural, one {Aufgabe für dich} other {Aufgaben für dich}}",
+          "posts": "{count, plural, one {Termin ohne Posts} other {Termine ohne Posts}}"
+        }
       }
     },
     "follow": {

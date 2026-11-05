@@ -5,7 +5,6 @@ import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
-import { berlinDayOf } from "@/lib/berlinTime";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { listSavedEcoItems } from "@/features/advisor/calendar/calendarData";
@@ -19,7 +18,6 @@ import {
   hiddenLayersOf,
   hiddenParam,
   itemsByDay,
-  layerParam,
   monthGrid,
   monthOf,
   shiftMonth,

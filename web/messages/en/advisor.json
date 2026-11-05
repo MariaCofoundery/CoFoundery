@@ -725,6 +725,16 @@
         "morning": "Good morning, {name}",
         "day": "Good afternoon, {name}",
         "evening": "Good evening, {name}"
+      },
+      "week": {
+        "label": "This week",
+        "title": "This week",
+        "quiet": "Quiet right now",
+        "items": {
+          "events": "{count, plural, one {event} other {events}}",
+          "tasks": "{count, plural, one {task for you} other {tasks for you}}",
+          "posts": "{count, plural, one {event without posts} other {events without posts}}"
+        }
       }
     },
     "follow": {
