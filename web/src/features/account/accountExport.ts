@@ -61,6 +61,11 @@ const EXPORTED_TABLES = [
   { table: "advisor_org_task_comments", column: "author_user_id" },
   { table: "advisor_org_member_presence", column: "user_id" },
   { table: "advisor_org_pages", column: "created_by_user_id" },
+  // Foerderauflagen (seit 20270314120000): angelegte Foerderungen, Auflagen, Nachweise und festgehaltene Staende.
+  { table: "advisor_org_grants", column: "created_by_user_id" },
+  { table: "advisor_org_requirements", column: "created_by_user_id" },
+  { table: "advisor_org_requirement_entries", column: "created_by_user_id" },
+  { table: "advisor_org_funding_snapshots", column: "taken_by_user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.
   { table: "assessment_team_shares", column: "owner_user_id" },

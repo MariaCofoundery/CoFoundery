@@ -12,6 +12,8 @@ import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { TeamraumBoard, TeamraumWeek, TeamraumWho, type TeamraumContext } from "@/features/advisor/Teamraum";
 import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
+import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
+import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
@@ -40,7 +42,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "week", "tasks", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "week", "tasks", "pages", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -49,7 +51,7 @@ type Tab = (typeof TABS)[number];
  * und ist jetzt nur noch dort. "Erfolge" hatte einen zweiten Schalter; er steht jetzt unter "Funktionen & Erfolge".
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "care", tabs: ["overview", "program", "plan", "report"] },
+  { key: "care", tabs: ["overview", "program", "plan", "report", "funding"] },
   // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
   { key: "team", tabs: ["week", "tasks", "pages", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
@@ -74,7 +76,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -132,7 +134,7 @@ export default async function AdvisorOrganisationPage({
   const docId = tab === "pages" && UUID.test(query.doc ?? "") ? (query.doc as string) : null;
   const templatePageId = tab === "pages" && query.newDoc === "1" && UUID.test(query.template ?? "") ? (query.template as string) : null;
   const selectedTaskId = tab === "tasks" && /^[0-9a-f-]{36}$/.test(query.task ?? "") ? (query.task as string) : null;
-  const needsPrograms = teamraumTab || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
+  const needsPrograms = teamraumTab || tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -187,6 +189,16 @@ export default async function AdvisorOrganisationPage({
         feedback: { error: query.taskError ?? null, saved: query.taskSaved === "1", deleted: query.taskDeleted === "1" },
       }
     : null;
+
+  // Foerderauflagen: die gewaehlte Foerderung (sonst die juengste), ihr Stand, Nachweise und festgehaltene Staende.
+  const funding = tab === "funding" && !tabOff ? await (async () => {
+    const grants = await listGrants(client, org.id);
+    const grant = query.newGrant === "1" ? null : grants.find((entry) => entry.id === query.grant) ?? grants[0] ?? null;
+    const teamNames = new Map(programs.map((program) => [program.programId, program.teamName ?? tAdvisor("teamProgram.unnamedTeam")]));
+    const today = new Date().toISOString().slice(0, 10);
+    const [loaded, snapshots] = grant ? await Promise.all([loadFunding(client, grant, teamNames, today), isOwner ? listFundingSnapshots(client, grant.id) : Promise.resolve([])]) : [null, []];
+    return { grants, grant, today, loaded, snapshots };
+  })() : null;
 
   const tabLabels = t("orgPage.tabs").split(" | ");
   const activeMembers = members.filter((member) => member.status === "active").length;
@@ -284,6 +296,27 @@ export default async function AdvisorOrganisationPage({
           </div>
         ) : null}
 
+        {funding ? (
+          <OrgFunding
+            ctx={{
+              orgId: org.id,
+              isOwner,
+              canWrite: org.status === "active",
+              locale: getPresentationLocale(await getLocale()),
+              today: funding.today,
+              programs: programs.filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") })),
+              feedback: { error: query.fundingError ?? null, saved: query.fundingSaved === "1", deleted: query.fundingDeleted === "1", snapshot: query.fundingSnapshot === "1" },
+            }}
+            grants={funding.grants}
+            grant={funding.grant}
+            requirements={funding.loaded?.requirements ?? []}
+            entries={funding.loaded?.entries ?? []}
+            report={funding.loaded?.report ?? null}
+            snapshots={funding.snapshots}
+            suggestion={isSuggestionKey(query.suggest) ? query.suggest : null}
+            newGrant={query.newGrant === "1"}
+          />
+        ) : null}
         {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}
         {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} /> : null}
         {teamraum && tab === "pages" ? (

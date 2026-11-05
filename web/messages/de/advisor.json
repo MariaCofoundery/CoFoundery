@@ -495,7 +495,9 @@
       "saved": "Gespeichert.",
       "ownerOnly": "Nur die Inhaberin oder der Inhaber kann das ändern.",
       "offNotice": "Dieser Bereich ist ausgeschaltet.",
-      "offNoticeLink": "Unter Funktionen einschalten"
+      "offNoticeLink": "Unter Funktionen einschalten",
+      "fundingTitle": "Förderauflagen",
+      "fundingText": "Für geförderte Programme: Auflagen aus dem Bescheid einpflegen, abhaken und den Sachbericht ziehen."
     },
     "saved": "Gespeichert.",
     "roleLabel": "Rolle",
@@ -760,8 +762,8 @@
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betreuen | Teamraum | Inhalte für die Teams | Einrichten",
-      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine und Auswertung. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben, Seiten und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Diese Woche | Aufgaben | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben, Seiten und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Diese Woche | Aufgaben | Seiten | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -1553,6 +1555,143 @@
           "body": "Willkommen im Team! Das hier hilft in den ersten Tagen.\n\n## Zugänge\n[ ] Einladung in die Organisation angenommen\n[ ] Rolle unter „Wer macht was“ eingetragen\n\n## Teams kennenlernen\n[ ] Teams im Programm durchsehen\n[ ] Bezugsperson für erste Teams werden\n\n## Erste Woche\n[ ] Programmplan ansehen\n[ ] An der nächsten Teamrunde teilnehmen"
         }
       }
+    }
+  },
+  "funding": {
+    "title": "Förderauflagen",
+    "text": "Was eure Förderung vorschreibt – eingepflegt, abgehakt und als Bericht für den Sachbericht. Wo es geht, zählt sich der Stand selbst aus Programmplan, Teilnahme und Gesprächen; den Rest tragt ihr mit Nachweis ein.",
+    "grantsLabel": "Förderungen",
+    "emptyTitle": "Eure erste Förderung",
+    "emptyText": "Legt die Förderung mit Laufzeit an, dann die Auflagen aus dem Bescheid. Gezählt wird innerhalb der Laufzeit.",
+    "ownerOnly": "Förderungen und Auflagen legt die Führung der Organisation an.",
+    "visibleTeamsOnly": "Zahlen je Team siehst du nur für Teams, die du betreust. Den vollständigen Bericht zieht die Führung.",
+    "fulfilled": "erfüllt",
+    "open": "noch offen",
+    "overdue": "Frist überschritten",
+    "dueOn": "bis {date}",
+    "ofTarget": "{achieved} von {target}",
+    "teamsFulfilled": "{done} von {total} Teams erfüllt (Ziel je Team: {target})",
+    "noTeamsVisible": "Noch kein Team im Programm sichtbar.",
+    "evidenceTitle": "Nachweise",
+    "evidenceSummary": "{count, plural, =0 {Nachweis eintragen} one {# Nachweis · eintragen} other {# Nachweise · eintragen}}",
+    "evidenceDelete": "Entfernen",
+    "asTask": "Als Aufgabe aufs Board",
+    "editRequirement": "Auflage bearbeiten",
+    "deleteRequirement": "Auflage löschen",
+    "requirementsEmpty": "Noch keine Auflage. Unten eintragen – die Vorschläge helfen beim Start.",
+    "addTitle": "Auflage hinzufügen",
+    "suggestionsText": "Typische Auflagen als Vorschlag – anklicken, anpassen, speichern.",
+    "hours": "Stunden",
+    "saved": "Gespeichert.",
+    "snapshotSaved": "Stand festgehalten.",
+    "kinds": {
+      "once": "Einmalig",
+      "count": "Zielzahl",
+      "per_team": "Je Team"
+    },
+    "measureOptions": {
+      "manual": "Von Hand mit Nachweisen",
+      "events": "Veranstaltungen im Programmplan zählen",
+      "teams": "Teams im Programm zählen",
+      "event_attendance": "Teilnahme je Team zählen",
+      "check_ins": "Gespräche zum Stand je Team zählen"
+    },
+    "measures": {
+      "manual": "Von Hand mit Nachweisen",
+      "events": "Zählt Veranstaltungen im Programmplan ({kind})",
+      "teams": "Zählt Teams im Programm",
+      "event_attendance": "Zählt Teilnahme je Team ({kind})",
+      "check_ins": "Zählt Gespräche zum Stand je Team"
+    },
+    "eventKinds": {
+      "any": "alle Arten",
+      "education": "Bildung",
+      "internal": "intern",
+      "external": "extern"
+    },
+    "suggestions": {
+      "workshops": "Workshops durchführen",
+      "teams": "Startups ins Programm aufnehmen",
+      "attendance": "Teilnahme je Team an Workshops",
+      "coaching": "Coaching-Stunden je Team",
+      "talks": "Gespräche zum Stand je Team",
+      "interim": "Zwischenbericht einreichen",
+      "final": "Verwendungsnachweis einreichen"
+    },
+    "form": {
+      "title": "Auflage",
+      "kind": "Art",
+      "measure": "Wie gezählt wird",
+      "eventKind": "Nur Veranstaltungen der Art",
+      "target": "Ziel",
+      "unit": "Einheit",
+      "unitPlaceholder": "z. B. Stunden",
+      "dueOn": "Frist",
+      "notes": "Notiz (z. B. Fundstelle im Bescheid)",
+      "hint": "Einmalig: erfüllt mit einem Nachweis oder einer erledigten Aufgabe. Zielzahl: für die ganze Organisation. Je Team: für jedes Team im Programm. Was nicht zur Art passt, wird von Hand gezählt.",
+      "add": "Auflage hinzufügen",
+      "save": "Speichern"
+    },
+    "entry": {
+      "doneOn": "Datum",
+      "amount": "Menge",
+      "team": "Team",
+      "note": "Nachweis",
+      "notePlaceholder": "z. B. Teilnehmerliste, Protokoll, Rechnung …",
+      "add": "Eintragen",
+      "markDone": "Als erfüllt eintragen"
+    },
+    "grant": {
+      "label": "Förderung",
+      "name": "Name der Förderung",
+      "namePlaceholder": "z. B. Landesprogramm Gründungsförderung 2027",
+      "funder": "Geldgeber",
+      "reference": "Aktenzeichen",
+      "startsOn": "Laufzeit von",
+      "endsOn": "Laufzeit bis",
+      "notes": "Notizen",
+      "add": "Förderung anlegen",
+      "save": "Speichern",
+      "edit": "Förderung bearbeiten",
+      "delete": "Förderung mit allen Auflagen löschen",
+      "period": "Laufzeit {from} – {to} · gezählt bis {until}"
+    },
+    "report": {
+      "view": "Sachbericht ansehen",
+      "csv": "CSV",
+      "back": "Zurück zu den Förderauflagen",
+      "eyebrow": "Sachbericht · Förderauflagen",
+      "period": "Laufzeit",
+      "countedUntil": "Gezählt bis",
+      "snapshotOf": "Festgehaltener Stand vom",
+      "summary": "{fulfilled} von {total} Auflagen erfüllt",
+      "footnote": "Gezählt aus dem Programmplan, der Teilnahme und den Gesprächen zum Stand innerhalb der Laufzeit, dazu die eingetragenen Nachweise. Zahlen je Team nur für Teams im Programm.",
+      "print": "Drucken oder als PDF speichern"
+    },
+    "snapshots": {
+      "title": "Stand festhalten",
+      "text": "Endet ein Programm, löscht das System Teilnahme und Gespräche dieses Teams. Damit ein Bericht später nicht schrumpft, haltet den Stand fest – etwa vor dem Zwischenbericht. Ein festgehaltener Stand bleibt, wie er ist.",
+      "note": "Notiz",
+      "notePlaceholder": "z. B. Zwischenbericht 30.6.",
+      "take": "Stand jetzt festhalten",
+      "delete": "Löschen"
+    },
+    "csv": {
+      "requirement": "Auflage",
+      "kind": "Art",
+      "team": "Team",
+      "target": "Ziel",
+      "achieved": "Erreicht",
+      "unit": "Einheit",
+      "status": "Stand",
+      "allTeams": "alle Teams"
+    },
+    "errors": {
+      "failed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+      "owner": "Das kann nur die Führung der Organisation.",
+      "team": "Bei Auflagen je Team gehört zu jedem Nachweis ein Team.",
+      "program": "Für dieses Team kannst du nichts eintragen – du betreust es nicht.",
+      "invalid": "Bitte prüfe die Angaben: Laufzeit, Ziel und Datum."
     }
   }
 }

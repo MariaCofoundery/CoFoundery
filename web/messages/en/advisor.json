@@ -495,7 +495,9 @@
       "saved": "Saved.",
       "ownerOnly": "Only the owner can change this.",
       "offNotice": "This area is switched off.",
-      "offNoticeLink": "Switch it on under Features"
+      "offNoticeLink": "Switch it on under Features",
+      "fundingTitle": "Funding requirements",
+      "fundingText": "For funded programs: enter the requirements from the award letter, tick them off and pull the funder report."
     },
     "saved": "Saved.",
     "roleLabel": "Role",
@@ -760,8 +762,8 @@
     "orgPage": {
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Care | Team space | Content for the teams | Set up",
-      "groupHints": "Daily work with the teams in the program: overview, teams, dates and report. | How you organize yourselves as a team: what is due this week, tasks, pages and who does what. Only for you, never for the startups. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | This week | Tasks | Pages | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
+      "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | How you organize yourselves as a team: what is due this week, tasks, pages and who does what. Only for you, never for the startups. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
+      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | This week | Tasks | Pages | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -1553,6 +1555,143 @@
           "body": "Welcome to the team! This helps in the first days.\n\n## Access\n[ ] Accepted the invitation to the organization\n[ ] Entered a role under “Who does what”\n\n## Get to know the teams\n[ ] Look through the teams in the program\n[ ] Become contact person for first teams\n\n## First week\n[ ] Look at the program plan\n[ ] Join the next team meeting"
         }
       }
+    }
+  },
+  "funding": {
+    "title": "Funding requirements",
+    "text": "What your funding requires – entered, ticked off and ready for the funder report. Where possible the status counts itself from the program plan, attendance and check-ins; you add the rest with evidence.",
+    "grantsLabel": "Grants",
+    "emptyTitle": "Your first grant",
+    "emptyText": "Add the grant with its period, then the requirements from the award letter. Counting happens within the period.",
+    "ownerOnly": "Grants and requirements are set up by the people leading the organization.",
+    "visibleTeamsOnly": "You see per-team numbers only for teams you support. The lead pulls the complete report.",
+    "fulfilled": "fulfilled",
+    "open": "still open",
+    "overdue": "deadline passed",
+    "dueOn": "by {date}",
+    "ofTarget": "{achieved} of {target}",
+    "teamsFulfilled": "{done} of {total} teams fulfilled (target per team: {target})",
+    "noTeamsVisible": "No team in the program visible yet.",
+    "evidenceTitle": "Evidence",
+    "evidenceSummary": "{count, plural, =0 {Add evidence} one {# piece of evidence · add} other {# pieces of evidence · add}}",
+    "evidenceDelete": "Remove",
+    "asTask": "Put on the board as a task",
+    "editRequirement": "Edit requirement",
+    "deleteRequirement": "Delete requirement",
+    "requirementsEmpty": "No requirement yet. Add one below – the suggestions help you start.",
+    "addTitle": "Add requirement",
+    "suggestionsText": "Typical requirements as suggestions – click, adjust, save.",
+    "hours": "hours",
+    "saved": "Saved.",
+    "snapshotSaved": "Status kept.",
+    "kinds": {
+      "once": "One-off",
+      "count": "Target number",
+      "per_team": "Per team"
+    },
+    "measureOptions": {
+      "manual": "By hand with evidence",
+      "events": "Count events in the program plan",
+      "teams": "Count teams in the program",
+      "event_attendance": "Count attendance per team",
+      "check_ins": "Count check-ins per team"
+    },
+    "measures": {
+      "manual": "By hand with evidence",
+      "events": "Counts events in the program plan ({kind})",
+      "teams": "Counts teams in the program",
+      "event_attendance": "Counts attendance per team ({kind})",
+      "check_ins": "Counts check-ins per team"
+    },
+    "eventKinds": {
+      "any": "all kinds",
+      "education": "education",
+      "internal": "internal",
+      "external": "external"
+    },
+    "suggestions": {
+      "workshops": "Run workshops",
+      "teams": "Take startups into the program",
+      "attendance": "Workshop attendance per team",
+      "coaching": "Coaching hours per team",
+      "talks": "Check-ins per team",
+      "interim": "Submit interim report",
+      "final": "Submit final statement of use"
+    },
+    "form": {
+      "title": "Requirement",
+      "kind": "Kind",
+      "measure": "How it is counted",
+      "eventKind": "Only events of kind",
+      "target": "Target",
+      "unit": "Unit",
+      "unitPlaceholder": "e.g. hours",
+      "dueOn": "Deadline",
+      "notes": "Note (e.g. clause in the award letter)",
+      "hint": "One-off: fulfilled by one piece of evidence or a done task. Target number: for the whole organization. Per team: for each team in the program. Anything that does not fit the kind is counted by hand.",
+      "add": "Add requirement",
+      "save": "Save"
+    },
+    "entry": {
+      "doneOn": "Date",
+      "amount": "Amount",
+      "team": "Team",
+      "note": "Evidence",
+      "notePlaceholder": "e.g. attendance list, minutes, invoice …",
+      "add": "Add",
+      "markDone": "Record as fulfilled"
+    },
+    "grant": {
+      "label": "Grant",
+      "name": "Name of the grant",
+      "namePlaceholder": "e.g. regional startup program 2027",
+      "funder": "Funder",
+      "reference": "Reference number",
+      "startsOn": "Period from",
+      "endsOn": "Period until",
+      "notes": "Notes",
+      "add": "Add grant",
+      "save": "Save",
+      "edit": "Edit grant",
+      "delete": "Delete grant with all requirements",
+      "period": "Period {from} – {to} · counted until {until}"
+    },
+    "report": {
+      "view": "View funder report",
+      "csv": "CSV",
+      "back": "Back to funding requirements",
+      "eyebrow": "Funder report · requirements",
+      "period": "Period",
+      "countedUntil": "Counted until",
+      "snapshotOf": "Status kept on",
+      "summary": "{fulfilled} of {total} requirements fulfilled",
+      "footnote": "Counted from the program plan, attendance and check-ins within the period, plus the recorded evidence. Per-team numbers only for teams in the program.",
+      "print": "Print or save as PDF"
+    },
+    "snapshots": {
+      "title": "Keep the status",
+      "text": "When a program ends, the system deletes that team's attendance and check-ins. So a report does not shrink later, keep the status – for example before the interim report. A kept status stays as it is.",
+      "note": "Note",
+      "notePlaceholder": "e.g. interim report 30 June",
+      "take": "Keep the status now",
+      "delete": "Delete"
+    },
+    "csv": {
+      "requirement": "Requirement",
+      "kind": "Kind",
+      "team": "Team",
+      "target": "Target",
+      "achieved": "Achieved",
+      "unit": "Unit",
+      "status": "Status",
+      "allTeams": "all teams"
+    },
+    "errors": {
+      "failed": "That did not work. Please try again.",
+      "owner": "Only the people leading the organization can do that.",
+      "team": "For per-team requirements, each piece of evidence needs a team.",
+      "program": "You cannot record anything for this team – you do not support it.",
+      "invalid": "Please check the details: period, target and date."
     }
   }
 }

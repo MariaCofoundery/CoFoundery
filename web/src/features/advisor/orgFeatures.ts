@@ -2,11 +2,11 @@
  * Welche Bereiche eine Organisation eingeschaltet hat.
  *
  * Immer dabei, ohne Auswahl: Teams aufnehmen, das Programm mit Teamkarten, Meilensteine und Updates,
- * Mitglieder und Profil. Schaltbar sind die sechs hier. "Aus" verbirgt, loescht nichts; fuer Teams
+ * Mitglieder und Profil. Schaltbar sind die sieben hier. "Aus" verbirgt, loescht nichts; fuer Teams
  * gilt es in der Datenbank (org_feature_enabled), diese Datei sorgt nur dafuer, dass die Oberflaeche
  * dasselbe sagt.
  */
-export const ORG_FEATURES = ["plan", "materials", "learning", "experts", "orgdata", "success"] as const;
+export const ORG_FEATURES = ["plan", "materials", "learning", "experts", "orgdata", "success", "funding"] as const;
 export type OrgFeature = (typeof ORG_FEATURES)[number];
 
 /** Die kleine Vorbelegung neuer Organisationen; sie steht auch in create_advisor_org. */
@@ -18,6 +18,8 @@ export const FEATURE_OF_TAB: Partial<Record<string, OrgFeature>> = {
   materials: "materials",
   learning: "learning",
   experts: "experts",
+  // Foerderauflagen (20270314120000): nur fuer gefoerderte Programme, standardmaessig aus.
+  funding: "funding",
 };
 
 export const isOrgFeature = (value: string): value is OrgFeature => (ORG_FEATURES as readonly string[]).includes(value);
