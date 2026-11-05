@@ -20,7 +20,10 @@
     "program_invited": "{org} has invited your team to its program. Your team is only in once everyone has agreed.",
     "program_review_requested": "An advisor in your program is asking your team for a team review. You decide under Account whether to agree – nothing happens without everyone's consent.",
     "program_removed": "The organization removed your team from the program. The organization's access has ended and the program data is deleted.",
-    "program_reward_unlocked": "Your team has unlocked a reward. Take a look under Program."
+    "program_reward_unlocked": "Your team has unlocked a reward. Take a look under Program.",
+    "org_task_assigned": "You were given a task in the team space.",
+    "org_task_comment": "New comment on a task in the team space.",
+    "org_task_due": "One of your tasks in the team space is due today."
   },
   "announcements": {
     "eyebrow": "Announcement",

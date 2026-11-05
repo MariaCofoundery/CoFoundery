@@ -168,6 +168,7 @@ export default async function AccountPage({
             optedOut={optedOut}
             emailOptIns={emailOptIns}
             showSuggestionTest={hasConnectAccount}
+            showAdvisorKinds={roleViews.hasAdvisor}
             status={status}
           />
 

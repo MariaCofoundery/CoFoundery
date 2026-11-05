@@ -410,7 +410,8 @@
       "areas": {
         "align": "Align",
         "find": "Find",
-        "connect": "Connect"
+        "connect": "Connect",
+        "advisor": "Accelerator & Advisor"
       },
       "kinds": {
         "contact_request": {
@@ -460,6 +461,10 @@
         "program_update": {
           "title": "Programm-Update fällig",
           "text": "Wenn ein Update an dein Programm fällig ist: eine einzige Erinnerung je Fälligkeit, ohne Team- und Organisationsnamen. Ohne Erinnerung kann ein fälliges Update unbemerkt bleiben."
+        },
+        "org_tasks": {
+          "title": "Aufgaben im Teamraum",
+          "text": "Wenn dir jemand eine Aufgabe zuteilt, eine deiner Aufgaben kommentiert oder eine heute fällig ist – als Mitteilung aufs Gerät, ohne den Titel der Aufgabe. Der Hinweis in der App kommt immer."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",

@@ -148,3 +148,20 @@ test("Teamraum: eigene Gruppe in der Organisation, auf dem Advisor-Start und im 
     assert.ok(messages.area.start.orgTask, locale);
   }
 });
+
+test("Teamraum-Mitteilungen: Hinweis in der Datenbank, Mitteilung ohne Titel, abbestellbar, taeglicher Lauf", () => {
+  const sql = readFileSync("../supabase/migrations/20270316120000_org_task_notices.sql", "utf8");
+  assert.match(sql, /p_recipient_user_id = auth\.uid\(\)/);
+  assert.match(sql, /public\.wants_email_notification\(n\.recipient_user_id, 'org_tasks'\)/);
+  assert.match(sql, /after delete on public\.advisor_org_tasks/);
+  const push = readFileSync("src/features/advisor/teamraumNotifications.ts", "utf8");
+  assert.doesNotMatch(push, /title: task|\.title\b(?!\`)|programName|teamName/);
+  for (const locale of ["de", "en"]) {
+    const copy = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8")).teamraum.push;
+    for (const kind of ["org_task_assigned", "org_task_comment", "org_task_due"]) assert.ok(copy[kind].title && copy[kind].body, `${locale} ${kind}`);
+  }
+  const cron = readFileSync("src/app/api/cron/connect-suggestions/route.ts", "utf8");
+  assert.match(cron, /runOrgTaskDueNotices\(\)/);
+  const account = readFileSync("src/features/account/AccountPreferencesSection.tsx", "utf8");
+  assert.match(account, /\.filter\(\(\{ kind \}\) => !optedOut\.includes\(kind\)\)\s*\.map\(\(\{ kind \}\) => <input key=\{kind\} type="hidden" name="notification" value=\{kind\} \/>\)/);
+});

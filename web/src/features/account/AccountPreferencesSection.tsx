@@ -31,10 +31,12 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 const CARD = `${CARD0} mt-5`;
 
 /** Symbol und Farbe je Bereich - die Farbe sagt, WORUM es geht, nie wie wichtig. */
-const AREA_ICON: Record<string, { icon: IconName; tone: IconTone }> = {
+// Je Bereich ein Symbol - als Record ueber NOTIFICATION_AREAS, damit ein neuer Bereich ohne Symbol schon im Typecheck auffaellt.
+const AREA_ICON: Record<(typeof NOTIFICATION_AREAS)[number], { icon: IconName; tone: IconTone }> = {
   align: { icon: "spark", tone: "violet" },
   find: { icon: "search", tone: "teal" },
   connect: { icon: "link", tone: "blue" },
+  advisor: { icon: "team", tone: "amber" },
 };
 
 /**
@@ -49,6 +51,7 @@ export async function AccountPreferencesSection({
   optedOut,
   emailOptIns,
   showSuggestionTest,
+  showAdvisorKinds = true,
   status,
 }: {
   /** Null heisst "nicht entschieden" - dann entscheidet der Browser. */
@@ -62,6 +65,12 @@ export async function AccountPreferencesSection({
    * Bereich, den diese Person nicht hat.
    */
   showSuggestionTest: boolean;
+  /**
+   * Der Bereich "Accelerator & Advisor" nur fuer Menschen mit Advisor-Zugang. Ausgeblendet wird er
+   * nicht abbestellt: Die Speichern-Aktion behandelt alles, was fehlt, als abbestellt - deshalb
+   * reisen die bisherigen Haken versteckt mit.
+   */
+  showAdvisorKinds?: boolean;
   status: AccountStatus | null;
 }) {
   const t = await getTranslations("dashboard");
@@ -128,6 +137,11 @@ export async function AccountPreferencesSection({
           {NOTIFICATION_AREAS.map((area) => {
             const kinds = NOTIFICATION_KINDS.filter((entry) => entry.area === area);
             if (kinds.length === 0) return null;
+            if (area === "advisor" && !showAdvisorKinds) {
+              return kinds
+                .filter(({ kind }) => !optedOut.includes(kind))
+                .map(({ kind }) => <input key={kind} type="hidden" name="notification" value={kind} />);
+            }
             return (
               <fieldset key={area} className="mt-5 first:mt-0">
                 <legend className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#5f5e7a]">

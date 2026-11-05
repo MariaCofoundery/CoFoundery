@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { runProgramUpdateReminders } from "@/features/advisor/programUpdateReminders";
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
+import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
 import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
@@ -62,14 +63,16 @@ export async function GET(request: NextRequest) {
   // Vorschlaege nicht verhindern - und umgekehrt.
   const reminders = await runCheckInReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   const programUpdates = await runProgramUpdateReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
+  // Teamraum: heute faellige Aufgaben (20270316120000) - im selben Lauf, aus demselben Grund.
+  const orgTasks = await runOrgTaskDueNotices().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok);
-  if (!result.ok || !reminders.ok || !programUpdates.ok) {
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok);
+  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok) {
     const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
-    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates };
+    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks };
     await sendCronFailureAlert("connect-suggestions", status, body);
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks }, { status: 200 });
 }

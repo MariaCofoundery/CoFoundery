@@ -55,6 +55,10 @@ export const IN_APP_NOTICE_KINDS = [
   "program_review_requested",
   "program_removed",
   "program_reward_unlocked",
+  // Teamraum (20270316120000): entstehen in der Datenbank, nicht ueber createInAppNotice.
+  "org_task_assigned",
+  "org_task_comment",
+  "org_task_due",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

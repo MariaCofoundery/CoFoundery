@@ -1583,7 +1583,21 @@
       "create": "{count, plural, one {Aufgabe anlegen} other {# Aufgaben anlegen}}",
       "discard": "Verwerfen"
     },
-    "created": "{count, plural, =0 {Keine Aufgabe angelegt.} one {Eine Aufgabe angelegt.} other {# Aufgaben angelegt.}}"
+    "created": "{count, plural, =0 {Keine Aufgabe angelegt.} one {Eine Aufgabe angelegt.} other {# Aufgaben angelegt.}}",
+    "push": {
+      "org_task_assigned": {
+        "title": "Neue Aufgabe für dich",
+        "body": "Dir wurde im Teamraum eine Aufgabe zugeteilt."
+      },
+      "org_task_comment": {
+        "title": "Neuer Kommentar",
+        "body": "Jemand hat eine Aufgabe im Teamraum kommentiert."
+      },
+      "org_task_due": {
+        "title": "Heute fällig",
+        "body": "Eine deiner Aufgaben im Teamraum ist heute fällig."
+      }
+    }
   },
   "funding": {
     "title": "Förderauflagen",

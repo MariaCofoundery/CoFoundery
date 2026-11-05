@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isTaskStatus, parseChecklist, taskFilterOf } from "@/features/advisor/teamraumModel";
+import { pushOrgTaskNotices } from "@/features/advisor/teamraumNotifications";
 
 /**
  * Teamraum schreiben. Wer darf, prueft die Datenbank (20270312120000): aktives Mitglied einer
@@ -56,7 +57,7 @@ export async function saveOrgTaskAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const taskId = uuidOrNull(formData.get("taskId"));
   const status = formData.get("status");
-  const { error } = await client.rpc("save_org_task", {
+  const { data: savedId, error } = await client.rpc("save_org_task", {
     p_task_id: taskId,
     p_org_id: uuidOrNull(formData.get("orgId")),
     p_title: String(formData.get("title") ?? "").slice(0, 200),
@@ -69,6 +70,8 @@ export async function saveOrgTaskAction(formData: FormData) {
     p_checklist: parseChecklist(String(formData.get("checklist") ?? "")),
   });
   if (error) finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), taskError: errorOf(error.message) }));
+  // Wer neu zustaendig ist, hat den Hinweis schon (Datenbank); hier noch die Mitteilung aufs Geraet.
+  if (typeof savedId === "string") await pushOrgTaskNotices(client, savedId, "org_task_assigned");
   finish(backTo(formData, taskId ? { task: taskId, taskSaved: "1" } : { taskSaved: "1" }));
 }
 
@@ -107,6 +110,7 @@ export async function addOrgTaskCommentAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const taskId = uuidOrNull(formData.get("taskId"));
   const { error } = await client.rpc("add_org_task_comment", { p_task_id: taskId, p_body: String(formData.get("body") ?? "").slice(0, 2000) });
+  if (!error && taskId) await pushOrgTaskNotices(client, taskId, "org_task_comment");
   finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), ...(error ? { taskError: "failed" } : {}) }));
 }
 
@@ -221,7 +225,7 @@ export async function createOrgTasksAction(formData: FormData) {
   let created = 0;
   let failed = false;
   for (const task of tasks) {
-    const { error } = await client.rpc("save_org_task", {
+    const { data: savedId, error } = await client.rpc("save_org_task", {
       p_task_id: null,
       p_org_id: orgId,
       p_title: task.title,
@@ -234,7 +238,10 @@ export async function createOrgTasksAction(formData: FormData) {
       p_checklist: [],
     });
     if (error) failed = true;
-    else created += 1;
+    else {
+      created += 1;
+      if (typeof savedId === "string") await pushOrgTaskNotices(client, savedId, "org_task_assigned");
+    }
   }
   finish(backTo(formData, failed ? { taskError: "failed", taskCreated: String(created) } : { taskSaved: "1", taskCreated: String(created) }));
 }

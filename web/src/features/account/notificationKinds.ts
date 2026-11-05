@@ -36,13 +36,15 @@ export const NOTIFICATION_KINDS = [
   { kind: "program_update", area: "align" },
   { kind: "read_my_mind", area: "align" },
   { kind: "founder_in_the_wild", area: "align" },
+  // Teamraum einer Organisation: zugeteilt, kommentiert, heute faellig (nur Hinweis und Mitteilung, keine Mail).
+  { kind: "org_tasks", area: "advisor" },
 ] as const;
 
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number]["kind"];
 
 export type NotificationArea = (typeof NOTIFICATION_KINDS)[number]["area"];
 
-export const NOTIFICATION_AREAS = ["align", "find", "connect"] as const;
+export const NOTIFICATION_AREAS = ["align", "find", "connect", "advisor"] as const;
 
 export function isNotificationKind(value: unknown): value is NotificationKind {
   return NOTIFICATION_KINDS.some((entry) => entry.kind === value);
