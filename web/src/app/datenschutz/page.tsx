@@ -322,6 +322,14 @@ export default function DatenschutzPage() {
               Notizen und Wiedervorlagen eines Advisors sieht nur der Advisor selbst – weder die
               Founder noch andere Mitglieder seiner Organisation.
             </p>
+            <p>
+              Im Teamraum einer Organisation tragen ihre Mitglieder Aufgaben, Kommentare, ihre Rolle
+              im Team und Abwesenheiten mit Vertretung ein. Das sehen nur die aktiven Mitglieder
+              dieser Organisation, nie die Teams im Programm. Hängt eine Aufgabe an einem Team im
+              Programm, sehen den Namen des Teams nur Mitglieder, die dieses Team ohnehin betreuen.
+              Endet eine Mitgliedschaft, verlieren ihre Aufgaben die Zuständigkeit und ihre Angabe zu
+              Rolle und Abwesenheit wird gelöscht; mit dem Konto gehen auch die eigenen Kommentare.
+            </p>
           </BulletSection>
 
           <BulletSection number="9b" title="Teilnahme an einem Programm einer Organisation">

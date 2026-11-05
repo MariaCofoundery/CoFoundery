@@ -666,7 +666,8 @@
       "tileUpdates": "Updates in 14 days",
       "tileInvites": "open invitations",
       "programOutcomes": "{team}: {count, plural, one {# achievement is} other {# achievements are}} waiting for confirmation",
-      "programCut": "Deadlines and updates are shown here for at most three organizations and twelve teams each. You'll find the rest under “Organization”."
+      "programCut": "Deadlines and updates are shown here for at most three organizations and twelve teams each. You'll find the rest under “Organization”.",
+      "orgTask": "{overdue, select, yes {Task overdue} other {Task due}} on {date}: {title}"
     },
     "follow": {
       "title": "Support",
@@ -758,9 +759,9 @@
     },
     "orgPage": {
       "tabsLabel": "Sections of the organization",
-      "groupLabels": "Care | Content for the teams | Set up",
-      "groupHints": "Daily work with the teams in the program: overview, teams, dates and report. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
+      "groupLabels": "Care | Team space | Content for the teams | Set up",
+      "groupHints": "Daily work with the teams in the program: overview, teams, dates and report. | How you organize yourselves as a team: what is due this week, tasks and who does what. Only for you, never for the startups. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
+      "tabs": "Overview | Teams in the program | Program plan | Report | This week | Tasks | Who does what | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
       "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
@@ -1366,5 +1367,131 @@
     "csvNextCheckIn": "Next conversation",
     "fileAttendance": "attendance",
     "fileTeams": "teams"
+  },
+  "teamraum": {
+    "nobody": "Nobody yet",
+    "me": "{name} (you)",
+    "internal": "Internal",
+    "hiddenProgram": "a team in the program",
+    "formerMember": "Former member",
+    "take": "Take it",
+    "dueOn": "by {date}",
+    "overdueSince": "overdue since {date}",
+    "checklistProgress": "Checklist {done} of {total}",
+    "saved": "Saved.",
+    "deleted": "Task deleted.",
+    "readOnly": "The organization is suspended. You can read everything but change nothing.",
+    "errors": {
+      "failed": "That did not work. Please try again.",
+      "member": "Only an active member of the organization can be responsible or stand in.",
+      "program": "You cannot link a task to this team – you are not its contact person."
+    },
+    "status": {
+      "open": "Open",
+      "doing": "In progress",
+      "waiting": "Waiting",
+      "done": "Done"
+    },
+    "move": {
+      "open": "Start →",
+      "doing": "Done ✓",
+      "waiting": "Continue →",
+      "done": "Reopen"
+    },
+    "empty": {
+      "open": "Nothing open.",
+      "doing": "Nobody is working on anything right now.",
+      "waiting": "Nothing is waiting.",
+      "done": "Nothing done yet."
+    },
+    "filters": {
+      "all": "All",
+      "mine": "Mine",
+      "nobody": "Unassigned"
+    },
+    "form": {
+      "title": "Task",
+      "quickPlaceholder": "What needs doing?",
+      "assignee": "Responsible",
+      "due": "Due",
+      "program": "Belongs to",
+      "internal": "Internal (no team)",
+      "event": "Event",
+      "noEvent": "None",
+      "status": "Status",
+      "details": "Description",
+      "detailsHint": "**bold** and *italic* work.",
+      "checklist": "Checklist",
+      "checklistHint": "One line per item. “[x]” in front means done.",
+      "add": "Add task",
+      "save": "Save"
+    },
+    "board": {
+      "title": "Tasks",
+      "text": "Everything the team has to do – for teams in the program or internal. Only your team sees this, never the startups.",
+      "filterLabel": "Show tasks",
+      "new": "New task",
+      "doneHidden": "and {count} older"
+    },
+    "detail": {
+      "eyebrow": "Open",
+      "meta": "Created by {name}, {date}",
+      "close": "Close",
+      "checklist": "Checklist ({done} of {total})",
+      "check": "Tick “{item}”",
+      "uncheck": "Reopen “{item}”",
+      "edit": "Edit",
+      "comments": "{count, plural, =0 {Comments} one {# comment} other {# comments}}",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Question, note, status …",
+      "comment": "Comment",
+      "deleteComment": "Withdraw comment",
+      "delete": "Delete task"
+    },
+    "week": {
+      "quickTitle": "Quick add",
+      "quickText": "One line is enough. You are responsible at first – you can change that any time.",
+      "mineTitle": "For you this week ({count})",
+      "mineNone": "Nothing is due for you this week.",
+      "overdue": "Overdue",
+      "thisWeek": "In the next seven days",
+      "talks": "Check-ins and follow-ups",
+      "talkLine": "Check-in: {team}",
+      "followUpLine": "Follow-up: {team}",
+      "later": "{count, plural, one {One more task} other {# more tasks}} later or without a date.",
+      "allMine": "All my tasks",
+      "eventsTitle": "Dates this week",
+      "eventsNone": "No event in the program plan this week.",
+      "nobodyTitle": "Nobody responsible yet ({count})",
+      "nobodyNone": "Everything has someone.",
+      "nobodyAll": "All unassigned",
+      "doneTitle": "Recently done"
+    },
+    "who": {
+      "title": "Who does what",
+      "text": "Responsibilities in the team at a glance: who supports which teams, who has which role and who is standing in. Numbers are counts, not ratings.",
+      "lead": "Lead",
+      "noRole": "No role entered yet",
+      "away": "Away until {date}",
+      "awayWithStandIn": "Away until {date} · {name} stands in",
+      "awayShort": "away",
+      "contactFor": "Contact person for",
+      "openTasks": "{open, plural, =0 {No open tasks} one {# open task} other {# open tasks}}{overdue, plural, =0 {} other { · # overdue}}",
+      "mineTitle": "Your details: role, absence, stand-in",
+      "teamRole": "Your role in the team",
+      "teamRolePlaceholder": "e.g. events & partners",
+      "awayUntil": "Away until",
+      "standIn": "Stand-in",
+      "save": "Save",
+      "mineHint": "Absence ends by itself after the date. The whole team sees the stand-in.",
+      "startupsTitle": "Teams in the program and responsibility",
+      "startupsEdit": "Set contact persons",
+      "startupsNone": "You do not see an active team in the program yet.",
+      "colStartup": "Team",
+      "colContact": "Contact person",
+      "colNextTalk": "Next check-in",
+      "colOpen": "Open tasks",
+      "noContact": "Nobody yet"
+    }
   }
 }

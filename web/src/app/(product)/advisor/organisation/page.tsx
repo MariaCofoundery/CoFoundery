@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
@@ -9,6 +9,10 @@ import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
+import { TeamraumBoard, TeamraumWeek, TeamraumWho, type TeamraumContext } from "@/features/advisor/Teamraum";
+import { getOrgNextCheckIns, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
+import { taskFilterOf } from "@/features/advisor/teamraumModel";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
 import { OrgProgramExperts } from "@/features/advisor/OrgProgramExperts";
@@ -24,7 +28,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listTeamProgramCodes, listTeamProgramInvites, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -34,7 +38,7 @@ import {
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
 
-const TABS = ["overview", "program", "plan", "report", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "week", "tasks", "who", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -44,6 +48,8 @@ type Tab = (typeof TABS)[number];
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "plan", "report"] },
+  // Teamraum (seit 05.11.2026): wie sich das Team der Organisation selbst organisiert - nie fuer die Teams im Programm.
+  { key: "team", tabs: ["week", "tasks", "who"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -66,7 +72,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -119,7 +125,9 @@ export default async function AdvisorOrganisationPage({
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const needsPeople = tab === "learning";
-  const needsPrograms = tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
+  const teamraumTab = tab === "week" || tab === "tasks" || tab === "who";
+  const selectedTaskId = tab === "tasks" && /^[0-9a-f-]{36}$/.test(query.task ?? "") ? (query.task as string) : null;
+  const needsPrograms = teamraumTab || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -128,7 +136,7 @@ export default async function AdvisorOrganisationPage({
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
-    tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
+    tab === "plan" || tab === "week" || tab === "tasks" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -138,6 +146,30 @@ export default async function AdvisorOrganisationPage({
     tab === "learning" ? listLearning(client, org.id) : Promise.resolve([]),
     tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
+
+  const [orgTasks, presence, taskComments, followUps, nextCheckIns] = await Promise.all([
+    teamraumTab ? listOrgTasks(client, org.id) : Promise.resolve([]),
+    tab === "who" ? listOrgPresence(client, org.id) : Promise.resolve([]),
+    selectedTaskId ? listTaskComments(client, selectedTaskId) : Promise.resolve([]),
+    tab === "week" ? listDueProgramFollowUps(client) : Promise.resolve([]),
+    tab === "week" || tab === "who" ? getOrgNextCheckIns(client, org.id) : Promise.resolve([]),
+  ]);
+  const teamraum: TeamraumContext | null = teamraumTab
+    ? {
+        orgId: org.id,
+        me: user.id,
+        isOwner,
+        canWrite: org.status === "active",
+        members: members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed"), role: member.role, isSelf: member.isSelf })),
+        programs: programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam"), contactUserIds: program.contactUserIds, isActive: program.isActive })),
+        events: planEvents,
+        tasks: orgTasks,
+        presence,
+        today: new Date().toISOString().slice(0, 10),
+        locale: getPresentationLocale(await getLocale()),
+        feedback: { error: query.taskError ?? null, saved: query.taskSaved === "1", deleted: query.taskDeleted === "1" },
+      }
+    : null;
 
   const tabLabels = t("orgPage.tabs").split(" | ");
   const activeMembers = members.filter((member) => member.status === "active").length;
@@ -234,6 +266,10 @@ export default async function AdvisorOrganisationPage({
             <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("orgPage.overviewNote")}</p>
           </div>
         ) : null}
+
+        {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}
+        {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} /> : null}
+        {teamraum && tab === "who" ? <TeamraumWho ctx={teamraum} nextCheckIns={nextCheckIns} /> : null}
 
         {tab === "access" ? (
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />

@@ -55,6 +55,11 @@ const EXPORTED_TABLES = [
   { table: "team_financing_alignment_answers", column: "user_id" },
   { table: "team_financing_alignment_submissions", column: "user_id" },
   { table: "founder_team_setup_discussion_entries", column: "author_user_id" },
+  // Teamraum einer Organisation (seit 20270312120000): angelegte Aufgaben, eigene Kommentare und die
+  // eigene Angabe unter "Wer macht was". Lesbar, solange die Mitgliedschaft aktiv ist.
+  { table: "advisor_org_tasks", column: "created_by_user_id" },
+  { table: "advisor_org_task_comments", column: "author_user_id" },
+  { table: "advisor_org_member_presence", column: "user_id" },
   { table: "founder_team_members", column: "user_id" },
   // Was die Person freigegeben hat: wer es sieht, ist Teil der Auskunft.
   { table: "assessment_team_shares", column: "owner_user_id" },

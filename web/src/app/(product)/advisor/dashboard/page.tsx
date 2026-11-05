@@ -14,6 +14,7 @@ import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getPr
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
+import { listMyDueOrgTasks } from "@/features/advisor/teamraumData";
 
 const CARD = "advisor-card p-6";
 const LINK =
@@ -39,7 +40,7 @@ export default async function AdvisorStartPage() {
 
   // Der angemeldete Zugang, nicht der privilegierte.
   const client = await createClient();
-  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, orgs, programFollowUps] = await Promise.all([
+  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, orgs, programFollowUps, myTasks] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
@@ -49,6 +50,7 @@ export default async function AdvisorStartPage() {
     client.from("advisor_person_invites").select("id, status").eq("status", "sent"),
     getMyAdvisorOrgs(client),
     listDueProgramFollowUps(client),
+    listMyDueOrgTasks(client, user.id),
   ]);
   if (!roleViews.hasAdvisor) redirect("/dashboard");
 
@@ -96,6 +98,14 @@ export default async function AdvisorStartPage() {
   const teamName = (team: (typeof teams)[number]) => team.teamName?.trim() || `${team.founderAName} & ${team.founderBName}`;
 
   const waiting: WaitingItem[] = [
+    // Teamraum: eigene Aufgaben, ueberfaellig oder in den naechsten sieben Tagen faellig.
+    ...myTasks.map((task) => ({
+      key: `task-${task.id}`,
+      text: t("start.orgTask", { title: task.title, date: task.dueOn ?? "", overdue: task.dueOn && task.dueOn < todayIso ? "yes" : "no" }),
+      href: `/advisor/organisation?${new URLSearchParams({ org: task.orgId, tab: "tasks", task: task.id }).toString()}#task-detail`,
+      cta: t("start.open"),
+      icon: "flag" as const,
+    })),
     ...programDeadlines.map((entry, index) => ({
       key: `deadline-${entry.programId}-${index}`,
       text: t("start.programDeadline", { team: entry.teamName ?? t("kinds.unnamed"), title: entry.title }),

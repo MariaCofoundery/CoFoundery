@@ -666,7 +666,8 @@
       "tileUpdates": "Updates in 14 Tagen",
       "tileInvites": "offene Einladungen",
       "programOutcomes": "{team}: {count, plural, one {# Erfolg wartet} other {# Erfolge warten}} auf Bestätigung",
-      "programCut": "Fristen und Updates stehen hier für höchstens drei Organisationen und je zwölf Teams. Alle weiteren findest du unter „Organisation“."
+      "programCut": "Fristen und Updates stehen hier für höchstens drei Organisationen und je zwölf Teams. Alle weiteren findest du unter „Organisation“.",
+      "orgTask": "{overdue, select, yes {Aufgabe überfällig} other {Aufgabe fällig}} am {date}: {title}"
     },
     "follow": {
       "title": "Begleitung",
@@ -758,9 +759,9 @@
     },
     "orgPage": {
       "tabsLabel": "Bereiche der Organisation",
-      "groupLabels": "Betreuen | Inhalte für die Teams | Einrichten",
-      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine und Auswertung. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "groupLabels": "Betreuen | Teamraum | Inhalte für die Teams | Einrichten",
+      "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine und Auswertung. | Wie ihr euch als Team organisiert: was diese Woche ansteht, Aufgaben und wer was macht. Nur für euch, nie für die Startups. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Diese Woche | Aufgaben | Wer macht was | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
       "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
@@ -1366,5 +1367,131 @@
     "csvNextCheckIn": "Nächstes Gespräch",
     "fileAttendance": "teilnahme",
     "fileTeams": "teams"
+  },
+  "teamraum": {
+    "nobody": "Noch niemand",
+    "me": "{name} (du)",
+    "internal": "Intern",
+    "hiddenProgram": "ein Team im Programm",
+    "formerMember": "Früheres Mitglied",
+    "take": "Übernehmen",
+    "dueOn": "bis {date}",
+    "overdueSince": "überfällig seit {date}",
+    "checklistProgress": "Checkliste {done} von {total}",
+    "saved": "Gespeichert.",
+    "deleted": "Aufgabe gelöscht.",
+    "readOnly": "Die Organisation ist ausgesetzt. Du kannst alles lesen, aber nichts ändern.",
+    "errors": {
+      "failed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+      "member": "Zuständig sein oder vertreten kann nur ein aktives Mitglied der Organisation.",
+      "program": "Mit diesem Team kannst du keine Aufgabe verknüpfen – du bist dort nicht Bezugsperson."
+    },
+    "status": {
+      "open": "Offen",
+      "doing": "In Arbeit",
+      "waiting": "Wartet",
+      "done": "Erledigt"
+    },
+    "move": {
+      "open": "Anfangen →",
+      "doing": "Erledigt ✓",
+      "waiting": "Weiter →",
+      "done": "Wieder öffnen"
+    },
+    "empty": {
+      "open": "Nichts Offenes.",
+      "doing": "Gerade arbeitet niemand an etwas.",
+      "waiting": "Nichts wartet.",
+      "done": "Noch nichts erledigt."
+    },
+    "filters": {
+      "all": "Alle",
+      "mine": "Meine",
+      "nobody": "Ohne Person"
+    },
+    "form": {
+      "title": "Aufgabe",
+      "quickPlaceholder": "Was ist zu tun?",
+      "assignee": "Zuständig",
+      "due": "Bis wann",
+      "program": "Gehört zu",
+      "internal": "Intern (kein Team)",
+      "event": "Veranstaltung",
+      "noEvent": "Keine",
+      "status": "Stand",
+      "details": "Beschreibung",
+      "detailsHint": "**fett** und *kursiv* gehen.",
+      "checklist": "Checkliste",
+      "checklistHint": "Eine Zeile je Punkt. „[x]“ vorne heißt erledigt.",
+      "add": "Aufgabe anlegen",
+      "save": "Speichern"
+    },
+    "board": {
+      "title": "Aufgaben",
+      "text": "Alles, was im Team zu tun ist – für Teams im Programm oder intern. Nur euer Team sieht das, nie die Startups.",
+      "filterLabel": "Aufgaben zeigen",
+      "new": "Neue Aufgabe",
+      "doneHidden": "und {count} ältere"
+    },
+    "detail": {
+      "eyebrow": "Geöffnet",
+      "meta": "Angelegt von {name}, {date}",
+      "close": "Schließen",
+      "checklist": "Checkliste ({done} von {total})",
+      "check": "„{item}“ abhaken",
+      "uncheck": "„{item}“ wieder öffnen",
+      "edit": "Bearbeiten",
+      "comments": "{count, plural, =0 {Kommentare} one {# Kommentar} other {# Kommentare}}",
+      "commentLabel": "Kommentar",
+      "commentPlaceholder": "Frage, Hinweis, Stand …",
+      "comment": "Kommentieren",
+      "deleteComment": "Kommentar zurücknehmen",
+      "delete": "Aufgabe löschen"
+    },
+    "week": {
+      "quickTitle": "Schnell eintragen",
+      "quickText": "Eine Zeile reicht. Zuständig bist erst einmal du – das lässt sich jederzeit ändern.",
+      "mineTitle": "Für dich diese Woche ({count})",
+      "mineNone": "Diese Woche steht für dich nichts an.",
+      "overdue": "Überfällig",
+      "thisWeek": "In den nächsten sieben Tagen",
+      "talks": "Gespräche und Wiedervorlagen",
+      "talkLine": "Gespräch zum Stand: {team}",
+      "followUpLine": "Wiedervorlage: {team}",
+      "later": "{count, plural, one {Eine weitere Aufgabe} other {# weitere Aufgaben}} später oder ohne Datum.",
+      "allMine": "Alle meine Aufgaben",
+      "eventsTitle": "Termine diese Woche",
+      "eventsNone": "Diese Woche keine Veranstaltung im Programmplan.",
+      "nobodyTitle": "Noch niemand zuständig ({count})",
+      "nobodyNone": "Alles hat jemanden.",
+      "nobodyAll": "Alle ohne Person",
+      "doneTitle": "Zuletzt erledigt"
+    },
+    "who": {
+      "title": "Wer macht was",
+      "text": "Zuständigkeiten im Team auf einen Blick: wer welche Teams begleitet, wer welche Rolle hat und wer gerade vertritt. Zahlen sind Anzahl, keine Bewertung.",
+      "lead": "Führung",
+      "noRole": "Noch keine Rolle eingetragen",
+      "away": "Abwesend bis {date}",
+      "awayWithStandIn": "Abwesend bis {date} · vertreten von {name}",
+      "awayShort": "abwesend",
+      "contactFor": "Bezugsperson für",
+      "openTasks": "{open, plural, =0 {Keine offenen Aufgaben} one {# offene Aufgabe} other {# offene Aufgaben}}{overdue, plural, =0 {} other { · # überfällig}}",
+      "mineTitle": "Deine Angaben: Rolle, Abwesenheit, Vertretung",
+      "teamRole": "Deine Rolle im Team",
+      "teamRolePlaceholder": "z. B. Events & Partner",
+      "awayUntil": "Abwesend bis",
+      "standIn": "Vertreten durch",
+      "save": "Speichern",
+      "mineHint": "Abwesenheit endet von selbst nach dem Datum. Die Vertretung sieht das ganze Team.",
+      "startupsTitle": "Teams im Programm und Zuständigkeit",
+      "startupsEdit": "Bezugspersonen festlegen",
+      "startupsNone": "Du siehst noch kein aktives Team im Programm.",
+      "colStartup": "Team",
+      "colContact": "Bezugsperson",
+      "colNextTalk": "Nächstes Gespräch",
+      "colOpen": "Offene Aufgaben",
+      "noContact": "Noch niemand"
+    }
   }
 }
