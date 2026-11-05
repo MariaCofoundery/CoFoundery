@@ -1467,7 +1467,9 @@
       "nobodyTitle": "Nobody responsible yet ({count})",
       "nobodyNone": "Everything has someone.",
       "nobodyAll": "All unassigned",
-      "doneTitle": "Recently done"
+      "doneTitle": "Recently done",
+      "dictateTitle": "Several at once – dictate or type",
+      "dictateText": "Just speak or write. That becomes suggestions with person, deadline and team that you only check."
     },
     "who": {
       "title": "Who does what",
@@ -1562,7 +1564,26 @@
       "noteHint": "A note of your own: only you see it – not even the lead. “Share with the team” turns it into a page for everyone on the team.",
       "share": "Share with the team",
       "makePrivate": "Make private again"
-    }
+    },
+    "dictate": {
+      "label": "Dictate or type tasks",
+      "placeholder": "e.g. “Pia should confirm the room by Friday and Jonas asks the jury. Also I need to write the feedback for the midwife app next week.”",
+      "recognize": "Suggest tasks",
+      "hint": "Person, deadline and team are recognized. You only correct.",
+      "none": "I did not find a task in that. Write one thing per sentence.",
+      "found": "{count, plural, one {One task found} other {# tasks found}} – check and adjust:",
+      "include": "Include",
+      "title": "Task",
+      "assignee": "Responsible",
+      "due": "Due",
+      "program": "Belongs to",
+      "internal": "Internal",
+      "nobody": "Nobody yet",
+      "me": "{name} (you)",
+      "create": "{count, plural, one {Create task} other {Create # tasks}}",
+      "discard": "Discard"
+    },
+    "created": "{count, plural, =0 {No task created.} one {One task created.} other {# tasks created.}}"
   },
   "funding": {
     "title": "Funding requirements",

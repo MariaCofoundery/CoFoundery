@@ -198,3 +198,43 @@ export async function setOrgPageVisibilityAction(formData: FormData) {
   });
   finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), ...(error ? { docError: pageErrorOf(error.message) } : { docSaved: "1" }) }));
 }
+
+/**
+ * Mehrere Aufgaben auf einmal - aus den Diktat-Vorschlaegen (DictateTasks). Jede einzeln ueber
+ * save_org_task, also mit denselben Pruefungen wie eine von Hand angelegte. Hoechstens zwanzig.
+ */
+export async function createOrgTasksAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  let items: unknown = [];
+  try {
+    items = JSON.parse(String(formData.get("tasks") ?? "[]"));
+  } catch {
+    items = [];
+  }
+  const tasks = (Array.isArray(items) ? items : []).slice(0, 20).flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const entry = item as Record<string, unknown>;
+    const title = typeof entry.title === "string" ? entry.title.trim().slice(0, 200) : "";
+    return title ? [{ title, assignee: uuidOrNull(String(entry.assigneeUserId ?? "")), dueOn: dateOrNull(String(entry.dueOn ?? "")), programId: uuidOrNull(String(entry.programId ?? "")) }] : [];
+  });
+  const orgId = uuidOrNull(formData.get("orgId"));
+  let created = 0;
+  let failed = false;
+  for (const task of tasks) {
+    const { error } = await client.rpc("save_org_task", {
+      p_task_id: null,
+      p_org_id: orgId,
+      p_title: task.title,
+      p_details: "",
+      p_status: "open",
+      p_assignee_user_id: task.assignee,
+      p_due_on: task.dueOn,
+      p_program_id: task.programId,
+      p_event_id: null,
+      p_checklist: [],
+    });
+    if (error) failed = true;
+    else created += 1;
+  }
+  finish(backTo(formData, failed ? { taskError: "failed", taskCreated: String(created) } : { taskSaved: "1", taskCreated: String(created) }));
+}

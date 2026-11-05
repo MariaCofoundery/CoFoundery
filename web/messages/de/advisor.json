@@ -1467,7 +1467,9 @@
       "nobodyTitle": "Noch niemand zuständig ({count})",
       "nobodyNone": "Alles hat jemanden.",
       "nobodyAll": "Alle ohne Person",
-      "doneTitle": "Zuletzt erledigt"
+      "doneTitle": "Zuletzt erledigt",
+      "dictateTitle": "Mehrere auf einmal – diktieren oder tippen",
+      "dictateText": "Sprich oder schreib einfach drauflos. Daraus werden Vorschläge mit Person, Frist und Team, die du nur noch prüfst."
     },
     "who": {
       "title": "Wer macht was",
@@ -1562,7 +1564,26 @@
       "noteHint": "Eine eigene Notiz: Nur du siehst sie – auch nicht die Führung. Mit „Mit dem Team teilen“ wird sie eine Seite für alle im Team.",
       "share": "Mit dem Team teilen",
       "makePrivate": "Wieder nur für mich"
-    }
+    },
+    "dictate": {
+      "label": "Aufgaben diktieren oder tippen",
+      "placeholder": "z. B. „Pia soll bis Freitag den Raum bestätigen und Jonas fragt die Jury an. Außerdem muss ich nächste Woche das Feedback für die Hebammen-App schreiben.“",
+      "recognize": "Vorschläge erkennen",
+      "hint": "Erkannt werden Person, Frist und Team. Du korrigierst nur noch.",
+      "none": "Darin habe ich keine Aufgabe erkannt. Schreib eine Sache je Satz.",
+      "found": "{count, plural, one {Eine Aufgabe erkannt} other {# Aufgaben erkannt}} – prüfen und anpassen:",
+      "include": "Übernehmen",
+      "title": "Aufgabe",
+      "assignee": "Zuständig",
+      "due": "Bis wann",
+      "program": "Gehört zu",
+      "internal": "Intern",
+      "nobody": "Noch niemand",
+      "me": "{name} (du)",
+      "create": "{count, plural, one {Aufgabe anlegen} other {# Aufgaben anlegen}}",
+      "discard": "Verwerfen"
+    },
+    "created": "{count, plural, =0 {Keine Aufgabe angelegt.} one {Eine Aufgabe angelegt.} other {# Aufgaben angelegt.}}"
   },
   "funding": {
     "title": "Förderauflagen",

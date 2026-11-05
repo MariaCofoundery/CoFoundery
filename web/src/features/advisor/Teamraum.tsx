@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { UserText } from "@/features/ui/UserText";
+import { DictateTasks } from "@/features/advisor/DictateTasks";
 import type { ProgramEvent } from "@/features/advisor/teamProgramData";
 import {
   addOrgTaskCommentAction,
@@ -56,7 +57,7 @@ export type TeamraumContext = {
   pageTitles: Map<string, string>;
   today: string;
   locale: string;
-  feedback: { error: string | null; saved: boolean; deleted: boolean };
+  feedback: { error: string | null; saved: boolean; deleted: boolean; created: number | null };
 };
 
 const CARD = "advisor-card p-5 sm:p-6";
@@ -110,7 +111,11 @@ async function Feedback({ ctx }: { ctx: TeamraumContext }) {
     return <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{t(`errors.${["member", "program"].includes(ctx.feedback.error) ? ctx.feedback.error : "failed"}`)}</p>;
   }
   if (ctx.feedback.saved || ctx.feedback.deleted) {
-    return <p role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{t(ctx.feedback.deleted ? "deleted" : "saved")}</p>;
+    return (
+      <p role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+        {ctx.feedback.deleted ? t("deleted") : ctx.feedback.created !== null ? t("created", { count: ctx.feedback.created }) : t("saved")}
+      </p>
+    );
   }
   if (!ctx.canWrite) {
     return <p role="note" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">{t("readOnly")}</p>;
@@ -389,6 +394,13 @@ export async function TeamraumBoard({ ctx, filter, selectedTaskId, comments }: {
           <div className="mt-3">
             <TaskForm ctx={ctx} tab="tasks" filter={filter} />
           </div>
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <p className="text-sm font-semibold text-slate-900">{t("week.dictateTitle")}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-600">{t("week.dictateText")}</p>
+            <div className="mt-3">
+              <DictateTasks orgId={ctx.orgId} tab="tasks" me={ctx.me} today={ctx.today} members={ctx.members.map(({ userId, name }) => ({ userId, name }))} programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))} />
+            </div>
+          </div>
         </details>
       ) : null}
 
@@ -458,6 +470,14 @@ export async function TeamraumWeek({
           <div className="mt-4">
             <TaskForm ctx={ctx} tab="week" quick />
           </div>
+          {/* Mehrere auf einmal: diktieren oder tippen, Vorschlaege pruefen, anlegen (taskDictation.ts). */}
+          <details className="mt-4 rounded-2xl border border-violet-200 bg-white/80 p-4">
+            <summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-violet-800">{t("week.dictateTitle")}</summary>
+            <p className="mt-1 text-xs leading-5 text-slate-600">{t("week.dictateText")}</p>
+            <div className="mt-3">
+              <DictateTasks orgId={ctx.orgId} tab="week" me={ctx.me} today={ctx.today} members={ctx.members.map(({ userId, name }) => ({ userId, name }))} programs={ctx.programs.map(({ programId, name }) => ({ programId, name }))} />
+            </div>
+          </details>
         </section>
       ) : null}
 
