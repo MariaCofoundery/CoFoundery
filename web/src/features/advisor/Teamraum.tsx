@@ -97,7 +97,7 @@ export function Avatar({ userId, name, size = "h-7 w-7 text-[11px]" }: { userId:
 
 export function helpers(ctx: TeamraumContext) {
   const day = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "UTC" });
-  const time = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
+  const time = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   return {
     dayOf: (iso: string) => day.format(new Date(`${iso}T00:00:00Z`)),
     timeOf: (iso: string) => time.format(new Date(iso)),
@@ -761,7 +761,7 @@ export async function TeamraumWeek({
   const { dayOf, programOf, href } = helpers(ctx);
   const weekday = new Intl.DateTimeFormat(ctx.locale, { weekday: "short", timeZone: "UTC" });
   const weekdayOf = (iso: string) => weekday.format(new Date(`${iso.slice(0, 10)}T00:00:00Z`)).replace(".", "");
-  const clock = new Intl.DateTimeFormat(ctx.locale, { hour: "2-digit", minute: "2-digit" });
+  const clock = new Intl.DateTimeFormat(ctx.locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   const week = myWeek(ctx.tasks, ctx.me, ctx.today);
   const horizon = addDays(ctx.today, 7);
   const events = ctx.events.filter((event) => event.startsAt.slice(0, 10) >= ctx.today && event.startsAt.slice(0, 10) <= horizon);

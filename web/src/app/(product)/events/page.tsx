@@ -44,7 +44,7 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
     ...founderProgramEvents.filter((event) => upcoming(event.startsAt)).map((event) => ({
       kind: "program" as const,
       key: `p-${event.programId}-${event.eventId}`,
-      title: event.title,
+      title: event.formatLabel ? `${event.formatLabel}: ${event.title}` : event.title,
       startsAt: event.startsAt,
       place: event.location,
       label: t("fromProgram", { org: event.orgName }),
@@ -70,7 +70,7 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
       filter={eventFilterOf(query.filter)}
       region={isRegion(query.region) || query.region === "online" ? query.region : null}
       locale={locale}
-      canSubmit={orgs.some((org) => org.status === "active")}
+      canSubmit={roleViews.hasFounder || orgs.some((org) => org.status === "active")}
       submissions={submissions}
       submitted={query.submitted === "1"}
     />

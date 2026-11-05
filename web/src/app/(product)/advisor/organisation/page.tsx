@@ -12,6 +12,8 @@ import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
 import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { legacyTeamraumPath } from "@/features/advisor/teamraumRoutes";
+import { EventFormats } from "@/features/advisor/EventFormats";
+import { listOrgEventPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
@@ -28,7 +30,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -146,6 +148,21 @@ export default async function AdvisorOrganisationPage({
     tab === "learning" ? listLearning(client, org.id) : Promise.resolve([]),
     tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
+
+  // Programmplan (20270324120000): Formate, Post-Vorlagen und wie viele Postings je Veranstaltung schon geplant sind.
+  const planExtras =
+    (tab === "plan" || tab === "features") && !tabOff
+      ? await (async () => {
+          const [formats, templates, eventPosts] = await Promise.all([
+            listEventFormats(client, org.id),
+            tab === "plan" ? listPostTemplates(client, org.id) : Promise.resolve([]),
+            tab === "plan" ? listOrgEventPosts(client, org.id) : Promise.resolve([]),
+          ]);
+          const postCounts = new Map<string, number>();
+          for (const post of eventPosts) if (post.eventId) postCounts.set(post.eventId, (postCounts.get(post.eventId) ?? 0) + 1);
+          return { formats, templates, postCounts };
+        })()
+      : null;
 
   // Foerderauflagen: die gewaehlte Foerderung (sonst die juengste), ihr Stand, Nachweise und festgehaltene Staende.
   const funding = tab === "funding" && !tabOff ? await (async () => {
@@ -366,7 +383,21 @@ export default async function AdvisorOrganisationPage({
           <>
             {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
             {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.planError")}</p> : null}
-            <OrgProgramPlan withSpeakers={hasOrgFeature(org, "experts")} orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} events={planEvents} openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null} />
+            <OrgProgramPlan
+              withSpeakers={hasOrgFeature(org, "experts")}
+              orgId={org.id}
+              isOwner={org.role === "owner" && org.status === "active"}
+              events={planEvents}
+              openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null}
+              formats={planExtras?.formats ?? []}
+              social={planExtras && org.status === "active" ? { templates: planExtras.templates, postCounts: planExtras.postCounts, today: new Date().toISOString().slice(0, 10) } : null}
+              feedback={{
+                created: /^\d{1,2}$/.test(query.planCreated ?? "") ? Number(query.planCreated) : null,
+                postsCreated: /^\d{1,2}$/.test(query.postsCreated ?? "") ? Number(query.postsCreated) : null,
+                postsError: query.postsError === "1",
+                formatError: query.formatError === "1",
+              }}
+            />
           </>
         ) : null}
 
@@ -411,6 +442,14 @@ export default async function AdvisorOrganisationPage({
               setup={query.setup === "1"}
               saved={query.saved === "1"}
             />
+            {hasOrgFeature(org, "plan") ? (
+              <section aria-labelledby="org-formats-title" className="scroll-mt-24">
+                <h2 id="org-formats-title" className="text-xl font-semibold text-slate-950">{tAdvisor("teamProgram.formats.setupTitle")}</h2>
+                <div className="mt-2">
+                  <EventFormats orgId={org.id} formats={planExtras?.formats ?? []} isOwner={isOwner} back="features" error={query.formatError === "1"} />
+                </div>
+              </section>
+            ) : null}
             {/* Ein Schalter fuer Erfolge (oben, mit den anderen Bereichen); was dazugehoert, steht darunter. */}
             {hasOrgFeature(org, "success") ? (
               <section id="erfolge" aria-labelledby="org-success-title" className="scroll-mt-24">

@@ -1,3 +1,5 @@
+import { parseEventList } from "@/features/advisor/eventListParser";
+
 /**
  * Social-Media-Kalender im Teamraum (20270319120000): Kanaele, Monatsraster, Veranstaltungen ohne
  * Posting - und die Planungshilfe "Kampagne reinsprechen".
@@ -191,11 +193,47 @@ function topicsOf(text: string): string[] {
   return parts.length >= 2 ? parts : [];
 }
 
+/** Was im Namen eines Postings nichts zu suchen hat: Kanaele, "Post", "auf". */
+function postTitleOf(title: string) {
+  let result = title;
+  for (const [, pattern] of CHANNEL_WORDS) result = result.replace(new RegExp(pattern.source, "giu"), " ");
+  result = result
+    .replace(unicode(/\b(?:\d+|ein|eine|einen|zwei|drei)?\s*(?:postings?|posts?|beiträge|beitraege|beitrag)\b/gi), " ")
+    .replace(unicode(/\b(?:auf|und|zum|zur|zu|für|fuer|kampagne)\b/gi), " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s,;:–—\-.]+|[\s,;:–—\-]+$/g, "")
+    .trim();
+  return result ? result[0].toLocaleUpperCase("de") + result.slice(1) : "";
+}
+
 export function suggestCampaign(text: string, context: { today: string; events: CalendarEvent[] }): CampaignSuggestion | null {
   const clean = text.replace(/\s+/g, " ").trim();
   if (clean.length < 5) return null;
 
   const channels = CHANNEL_WORDS.filter(([, pattern]) => pattern.test(clean)).map(([channel]) => channel);
+
+  // Mehrere Termine mit eigenem Namen ("Masterclass Pricing am 12.11., Fireside Chat am 19.11."): je Termin ein
+  // Posting, benannt wie der Termin - nicht "Kampagne 1/2" (Rueckmeldung Maria, 05.11.2026).
+  const namedDates = parseEventList(text, { today: context.today })
+    .map((entry) => ({ ...entry, title: postTitleOf(entry.title) }))
+    .filter((entry) => /\p{L}{2,}/u.test(entry.title));
+  if (namedDates.length >= 2 && new Set(namedDates.map((entry) => entry.title.toLocaleLowerCase("de"))).size === namedDates.length) {
+    const named = clean.match(unicode(/\bkampagne\s+(?:zum|zur|zu|für|fuer|über|ueber|namens|„|")?\s*([^,.;„"“:]+?)(?=\s*(?:[,.;"“:]|\bmit\b|\bam\b|\bund\b|$))/i))?.[1]?.trim();
+    const name = (named || namedDates.map((entry) => entry.title).slice(0, 3).join(", ")).slice(0, 120);
+    const fallbackTime = clean.match(/\b(?:um|at)\s+(\d{1,2})(?::(\d{2}))?\s*(?:uhr|h|am|pm)?\b/i);
+    const posts = namedDates.slice(0, 20).map((entry) => {
+      const event = context.events.find((candidate) => candidate.startsAt.slice(0, 10) === entry.day || entry.title.toLocaleLowerCase("de").includes(candidate.title.trim().toLocaleLowerCase("de")));
+      return {
+        title: entry.title.slice(0, 160),
+        plannedOn: entry.day,
+        plannedTime: entry.time ?? (fallbackTime && Number(fallbackTime[1]) <= 23 ? `${pad(Number(fallbackTime[1]))}:${fallbackTime[2] ?? "00"}` : null),
+        channels: channels.length > 0 ? channels : [],
+        eventId: event?.eventId ?? null,
+      };
+    });
+    const days = posts.map((post) => post.plannedOn).sort();
+    return { name: name[0].toLocaleUpperCase("de") + name.slice(1), startsOn: days[0] ?? null, endsOn: days[days.length - 1] ?? null, posts };
+  }
   const event = [...context.events]
     .filter((entry) => entry.title.trim().length >= 3)
     .sort((a, b) => b.title.length - a.title.length)

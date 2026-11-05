@@ -54,7 +54,7 @@
   "submit": {
     "back": "Zurück zu den Events",
     "title": "Event vorschlagen",
-    "intro": "Kennst du ein öffentliches Event aus dem Startup-Ökosystem? Trag die Fakten ein und verlinke die offizielle Seite. Nach unserer Prüfung sehen es alle.",
+    "intro": "Kennst du ein öffentliches Event aus dem Startup-Ökosystem? Trag die Fakten ein und verlinke die offizielle Seite. Nach unserer Prüfung sehen es alle – dein Name steht nicht dabei.",
     "org": "Für welche Organisation",
     "eventTitle": "Titel",
     "day": "Datum",
@@ -74,10 +74,11 @@
     "errors": {
       "confirm": "Bitte bestätige, dass das Event öffentlich ist und du nur Fakten einträgst.",
       "tooMany": "Du hast schon 20 Vorschläge, die auf Prüfung warten.",
-      "notAllowed": "Vorschlagen kann nur, wer Mitglied einer aktiven Organisation ist.",
+      "notAllowed": "Vorschlagen können Gründende und Mitglieder einer aktiven Organisation.",
       "url": "Der Link muss mit https:// beginnen.",
       "invalid": "Bitte prüfe Datum und Angaben – das Event darf nicht in der Vergangenheit liegen."
-    }
+    },
+    "asFounder": "Ohne Organisation – als Gründer:in"
   },
   "admin": {
     "back": "Admin",
@@ -121,6 +122,9 @@
       "regionNone": "Keins / bundesweit",
       "permissionNote": "Wo steht die Erlaubnis?",
       "permissionPlaceholder": "z. B. Lizenzseite https://… oder „Mail von Name an Maria vom 12.11.2026“"
-    }
-  }
+    },
+    "byFounder": "vorgeschlagen von einer Gründerin oder einem Gründer",
+    "pendingBadge": "{count} warten"
+  },
+  "fromCommunity": "Aus der Community vorgeschlagen, von uns geprüft"
 }

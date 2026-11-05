@@ -21,6 +21,10 @@ import {
   type OrgPost,
 } from "@/features/advisor/socialCalendarModel";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
+import { EventPostSuggestions } from "@/features/advisor/EventPostSuggestions";
+import { PostTemplateEditor } from "@/features/advisor/PostTemplateEditor";
+import type { PostTemplate } from "@/features/advisor/postPlanning";
+import { berlinDayOf } from "@/lib/berlinTime";
 
 /**
  * Social-Media-Kalender im Teamraum (20270319120000): Monat auf einen Blick, Postings farbig je Kanal,
@@ -44,6 +48,8 @@ export type SocialContext = {
   posts: OrgPost[];
   eventPosts: OrgPost[];
   campaigns: OrgCampaign[];
+  /** Post-Vorlagen fuer Veranstaltungen (20270324120000). */
+  templates: PostTemplate[];
   channel: Channel | null;
   feedback: { error: boolean; saved: boolean; deleted: boolean; created: number | null };
 };
@@ -344,22 +350,32 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
       ) : null}
       {ctx.view === "month" ? <p className="hidden text-xs text-slate-500 md:block">{t("dragHint")}</p> : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="uncovered-title" className={`${CARD} ${uncovered.length > 0 ? "border-amber-200" : ""}`}>
-          <h3 id="uncovered-title" className="text-[15px] font-semibold text-slate-950">{t("uncoveredTitle", { count: uncovered.length })}</h3>
-          {uncovered.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("uncoveredNone")}</p> : null}
-          <ul className="mt-2 divide-y divide-slate-100">
-            {uncovered.map((event) => (
-              <li key={event.eventId} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                <span className="min-w-0 text-sm"><span className="font-semibold text-slate-900">{event.title}</span> <span className="text-slate-500">· {dayLong.format(new Date(`${event.startsAt.slice(0, 10)}T00:00:00Z`))}</span></span>
-                {ctx.canWrite ? (
-                  <Link href={`${href(ctx, { month: addDays(event.startsAt.slice(0, 10), -3).slice(0, 7), newPost: addDays(event.startsAt.slice(0, 10), -3), event: event.eventId })}#post-editor`} className="inline-flex min-h-9 items-center rounded-full border border-dashed border-violet-300 bg-white px-3 text-xs font-semibold text-violet-800">{t("planForEvent")}</Link>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </section>
+      {/* Veranstaltungen ohne Posting: Vorschlaege nach Vorlage, erst "uebernehmen" schreibt (20270324120000). */}
+      <section id="event-posts" aria-labelledby="uncovered-title" className={`${CARD} scroll-mt-24 ${uncovered.length > 0 ? "border-amber-200" : ""}`}>
+        <h3 id="uncovered-title" className="text-[15px] font-semibold text-slate-950">{t("uncoveredTitle", { count: uncovered.length })}</h3>
+        <p className="mt-1 text-[14px] leading-6 text-slate-700">{t("suggest.intro")}</p>
+        <div className="mt-4">
+          {ctx.canWrite ? (
+            <EventPostSuggestions
+              orgId={ctx.orgId}
+              back="social"
+              today={ctx.today}
+              locale={ctx.locale}
+              events={uncovered.slice(0, 12).map((event) => ({ eventId: event.eventId, title: event.title, day: berlinDayOf(event.startsAt) }))}
+              templates={ctx.templates}
+              templatesHref="#post-templates"
+            />
+          ) : uncovered.length === 0 ? <p className="text-sm text-slate-600">{t("uncoveredNone")}</p> : null}
+        </div>
+      </section>
 
+      <details id="post-templates" className={`${CARD} scroll-mt-24`}>
+        <summary className="flex min-h-11 cursor-pointer items-center text-[15px] font-semibold text-slate-950">{t("templates.title", { count: ctx.templates.length })}</summary>
+        <p className="mb-4 mt-1 text-[14px] leading-6 text-slate-700">{t("templates.text")}</p>
+        <PostTemplateEditor orgId={ctx.orgId} month={ctx.month} templates={ctx.templates} canWrite={ctx.canWrite} />
+      </details>
+
+      <div className="grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="campaigns-title" className={CARD}>
           <h3 id="campaigns-title" className="text-[15px] font-semibold text-slate-950">{t("campaignsTitle")}</h3>
           {ctx.campaigns.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("campaignsNone")}</p> : null}

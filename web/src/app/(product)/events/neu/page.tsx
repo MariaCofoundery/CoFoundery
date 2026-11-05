@@ -7,6 +7,7 @@ import { submitEventAction } from "@/features/events/eventsActions";
 import { REGIONS } from "@/features/events/eventsModel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 
 const LABEL = "block text-sm font-semibold text-slate-900";
 const INPUT = "mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px]";
@@ -23,9 +24,10 @@ export default async function SubmitEventPage({ searchParams }: { searchParams?:
   } = await getRequestUser();
   if (!user) redirect(buildLoginRedirectPath("/events/neu"));
   const client = await createClient();
-  const [t, tEvents, orgs] = await Promise.all([getTranslations("events.submit"), getTranslations("events"), getMyAdvisorOrgs(client)]);
+  const [t, tEvents, orgs, roleViews] = await Promise.all([getTranslations("events.submit"), getTranslations("events"), getMyAdvisorOrgs(client), getDashboardRoleViews(user.id)]);
   const active = orgs.filter((org) => org.status === "active");
-  if (active.length === 0) redirect("/events");
+  // Seit 05.11.2026 auch Gruendende - ohne Organisation; geprueft wird genauso (Admin-Freigabe).
+  if (active.length === 0 && !roleViews.hasFounder) redirect("/events");
   const error = ERRORS.find((entry) => entry === query.error) ?? null;
 
   return (
@@ -36,13 +38,16 @@ export default async function SubmitEventPage({ searchParams }: { searchParams?:
       {error ? <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{t(`errors.${error}`)}</p> : null}
 
       <form action={submitEventAction} className="mt-6 grid gap-5 rounded-[18px] border border-slate-200 bg-white p-5 sm:p-6">
-        {active.length > 1 ? (
+        {active.length + (roleViews.hasFounder ? 1 : 0) > 1 ? (
           <label className="block">
             <span className={LABEL}>{t("org")}</span>
-            <select name="orgId" className={INPUT}>{active.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}</select>
+            <select name="orgId" className={INPUT}>
+              {active.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}
+              {roleViews.hasFounder ? <option value="">{t("asFounder")}</option> : null}
+            </select>
           </label>
         ) : (
-          <input type="hidden" name="orgId" value={active[0].id} />
+          <input type="hidden" name="orgId" value={active[0]?.id ?? ""} />
         )}
         <label className="block">
           <span className={LABEL}>{t("eventTitle")}</span>

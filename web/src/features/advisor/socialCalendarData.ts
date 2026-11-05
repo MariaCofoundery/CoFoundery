@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { postOf, type OrgCampaign, type OrgPost } from "@/features/advisor/socialCalendarModel";
+import { stepsOf, type PostTemplate } from "@/features/advisor/postPlanning";
 
 /** Social-Media-Kalender lesen - normaler Zugang, die Zeilensicherheit entscheidet (20270319120000). */
 
@@ -36,4 +37,11 @@ export async function listOrgCampaigns(client: SupabaseClient, orgId: string): P
     endsOn: row.ends_on,
     notes: row.notes,
   }));
+}
+
+/** Post-Vorlagen der Organisation (20270324120000). */
+export async function listPostTemplates(client: SupabaseClient, orgId: string): Promise<PostTemplate[]> {
+  const { data, error } = await client.from("advisor_org_post_templates").select("id, name, steps").eq("org_id", orgId).order("name", { ascending: true });
+  if (error || !Array.isArray(data)) return [];
+  return (data as { id: string; name: string; steps: unknown }[]).map((row) => ({ templateId: row.id, name: row.name, steps: stepsOf(row.steps) }));
 }

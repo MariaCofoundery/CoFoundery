@@ -32,7 +32,7 @@ export async function OrgChatList({
 }) {
   const t = await getTranslations("advisor.chat");
   const nameOf = (userId: string | null) => members.find((member) => member.userId === userId)?.name ?? t("formerMember");
-  const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
+  const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   const team = chats.find((chat) => chat.kind === "team") ?? null;
   const directs = chats.filter((chat) => chat.kind === "direct");
   const groups = chats.filter((chat) => chat.kind === "group");

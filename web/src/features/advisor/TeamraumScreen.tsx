@@ -10,7 +10,7 @@ import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgT
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgChatList } from "@/features/advisor/OrgChatList";
 import { SocialCalendar } from "@/features/advisor/SocialCalendar";
-import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts } from "@/features/advisor/socialCalendarData";
+import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { addDays, isChannel, monthGrid, monthOf, weekOf } from "@/features/advisor/socialCalendarModel";
 import { listMyOrgChats, searchOrgChats } from "@/features/advisor/orgChatData";
 import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
@@ -85,10 +85,11 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
       const grid = monthGrid(month);
       const from = view === "week" ? week : grid[0][0].day;
       const to = view === "week" ? addDays(week, 6) : grid[grid.length - 1][6].day;
-      const [posts, eventPosts, campaigns, selected] = await Promise.all([
+      const [posts, eventPosts, campaigns, templates, selected] = await Promise.all([
         listOrgPosts(client, org.id, from, to),
         listOrgEventPosts(client, org.id),
         listOrgCampaigns(client, org.id),
+        listPostTemplates(client, org.id),
         UUID.test(query.post ?? "") ? getOrgPost(client, org.id, query.post as string) : Promise.resolve(null),
       ]);
       return (
@@ -108,6 +109,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
             posts,
             eventPosts,
             campaigns,
+            templates,
             channel: isChannel(query.channel) ? query.channel : null,
             feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
           }}

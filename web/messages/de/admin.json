@@ -66,7 +66,8 @@
       "reports": "{count, plural, one {offene Meldung in der Moderation} other {offene Meldungen in der Moderation}}",
       "radar": "{count, plural, one {neues Signal im Problem-Radar zu prüfen} other {neue Signale im Problem-Radar zu prüfen}}",
       "highlights": "{count, plural, one {Highlight läuft in 3 Tagen aus} other {Highlights laufen in 3 Tagen aus}}",
-      "open": "Öffnen"
+      "open": "Öffnen",
+      "events": "{count, plural, one {Event-Vorschlag wartet auf Freigabe} other {Event-Vorschläge warten auf Freigabe}}"
     },
     "areas": {
       "title": "Bereiche",

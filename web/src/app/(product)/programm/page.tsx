@@ -45,7 +45,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   const now = Date.now();
   const materials = await getMyProgramMaterials(client);
   const learning = await getMyLearning(client);
-  const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short" });
+  const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   const updatesByProgram = new Map(
     await Promise.all(
       programs
@@ -115,7 +115,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                   <span className="text-sm text-slate-600">{dateFormat.format(new Date(event.startsAt))}</span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  {event.orgName} · {t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
+                  {event.orgName} · {event.formatLabel ? `${event.formatLabel} · ` : ""}{t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
                   {event.location ? ` · ${event.location}` : ""}
                 </p>
                 {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={event.notes} /></p> : null}

@@ -87,3 +87,16 @@ test("Kalender: Woche ab Montag, Kalenderwoche nach ISO, Ziehen in Monat und Woc
   assert.match(tasks, /export const TASK_VIEWS = \["board", "list", "calendar"\] as const;/);
   assert.match(tasks, /<DropDay key=\{cell\.day\} day=\{cell\.day\} kind="task" move=\{moveTaskDueAction\}/);
 });
+
+test("Kampagnen-Planer: mehrere Termine mit eigenem Namen - je Termin ein Posting, benannt wie der Termin", () => {
+  const result = suggestCampaign("Postings auf LinkedIn und Instagram: Masterclass Pricing am 12.11. um 9 Uhr, Fireside Chat mit Anna am 19.11. und Demo Day am 3.12.", { today: "2026-11-05", events: [] });
+  assert.ok(result);
+  assert.deepEqual(result.posts.map((post) => [post.title, post.plannedOn]), [
+    ["Masterclass Pricing", "2026-11-12"],
+    ["Fireside Chat mit Anna", "2026-11-19"],
+    ["Demo Day", "2026-12-03"],
+  ]);
+  assert.deepEqual(result.posts[0].channels, ["linkedin", "instagram"]);
+  assert.equal(result.posts[0].plannedTime, "09:00");
+  assert.doesNotMatch(result.posts.map((post) => post.title).join(" "), /Kampagne|\d\/\d/);
+});

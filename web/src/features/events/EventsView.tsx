@@ -55,7 +55,7 @@ export async function EventsView({
         ) : null}
       </span>
     ) : (
-      <span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-900">{t("fromOrg", { org: event.submittedOrgName ?? t("anOrg") })}</span>
+      <span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-900">{event.submittedOrgName ? t("fromOrg", { org: event.submittedOrgName }) : t("fromCommunity")}</span>
     );
 
   const card = (entry: CalendarEntry) => {

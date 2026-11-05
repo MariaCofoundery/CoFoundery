@@ -309,6 +309,9 @@ export type ProgramEvent = {
   location: string | null;
   notes: string | null;
   todos: string | null;
+  /** Format der Organisation (Masterclass, Fireside Chat ...), seit 20270324120000. */
+  formatId?: string | null;
+  formatLabel?: string | null;
 };
 export type MyProgramEvent = ProgramEvent & { programId: string; orgName: string; myStatus: "present" | "absent" | "excused" | null };
 export type EventAttendanceRow = { programId: string; teamName: string | null; status: "present" | "absent" | "excused" | null };
@@ -321,7 +324,18 @@ const eventOf = (row: Record<string, unknown>): ProgramEvent => ({
   location: (row.location as string | null) ?? null,
   notes: (row.notes as string | null) ?? null,
   todos: (row.todos as string | null) ?? null,
+  formatId: (row.format_id as string | null) ?? null,
+  formatLabel: (row.format_label as string | null) ?? null,
 });
+
+export type EventFormat = { formatId: string; label: string };
+
+/** Die Formate einer Organisation (Mitglieder lesen, Inhaberin pflegt). */
+export async function listEventFormats(client: SupabaseClient, orgId: string): Promise<EventFormat[]> {
+  const { data, error } = await client.from("program_event_formats").select("id, label").eq("org_id", orgId).order("label", { ascending: true });
+  if (error || !Array.isArray(data)) return [];
+  return (data as { id: string; label: string }[]).map((row) => ({ formatId: row.id, label: row.label }));
+}
 const statusOf = (value: unknown) => (value === "present" || value === "absent" || value === "excused" ? value : null);
 
 export async function listProgramEvents(client: SupabaseClient, orgId: string): Promise<ProgramEvent[]> {

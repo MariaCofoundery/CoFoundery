@@ -22,12 +22,14 @@ const pill = "inline-block min-w-[22px] rounded-full px-2 py-0.5 text-center tex
 
 /** Zaehler, "Zu tun" und Betrieb. Keine Scores, keine Rangliste, kein Personenbezug. */
 export async function AdminOverview({ client }: { client: SupabaseClient }) {
-  const [t, stats, dump, teamChecks] = await Promise.all([
+  const [t, stats, dump, teamChecks, pendingEvents] = await Promise.all([
     getTranslations("admin.overview"),
     client.rpc("admin_dashboard_stats"),
     client.rpc("admin_reminder_status", { p_key: "db_dump" }),
     // Leise: fehlt die Funktion noch (Datenbank-Update steht aus), bleibt nur diese Karte weg.
     client.rpc("admin_team_check_stats"),
+    // Event-Kalender (20270323120000): Vorschlaege, die auf Freigabe warten. Fehlt die Tabelle noch, bleibt es leise bei 0.
+    client.from("ecosystem_events").select("id", { count: "exact", head: true }).eq("status", "pending"),
   ]);
   const checks = teamChecks.error ? null : (teamChecks.data as TeamCheckStats | null);
   if (stats.error || !stats.data) return <p role="alert" className="text-sm">{isMissingDatabaseFunction(stats.error) ? t("migrationMissing") : t("loadError")}</p>;
@@ -40,6 +42,7 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
     { count: s.open_reports, href: "/admin/moderation", key: "reports", tone: "bg-[#fdecc8] text-[#7a4300]" },
     { count: s.radar_new, href: "/admin/problem-radar", key: "radar", tone: "bg-[#efeafd] text-[#4a2fb8]" },
     { count: s.highlights_ending, href: "/admin/highlights", key: "highlights", tone: "bg-[#dcf3ef] text-[#0b5d56]" },
+    { count: pendingEvents.error ? 0 : pendingEvents.count ?? 0, href: "/admin/events", key: "events", tone: "bg-[#e6f3f9] text-[#075e88]" },
   ].filter((item) => item.count > 0);
 
   return (

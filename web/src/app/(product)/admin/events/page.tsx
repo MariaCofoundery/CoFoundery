@@ -40,7 +40,7 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
             <li key={event.id} className="rounded-2xl border border-slate-200 p-4">
               <p className="text-[15px] font-semibold text-slate-950">{event.title}</p>
               <p className="mt-0.5 text-[13px] text-slate-600">
-                {[when.format(new Date(event.startsAt)), event.online ? tEvents("online") : null, event.place, event.region ? tEvents(`regions.${event.region}`) : null, event.organizer, event.submittedOrgName ? t("by", { org: event.submittedOrgName }) : null].filter(Boolean).join(" · ")}
+                {[when.format(new Date(event.startsAt)), event.online ? tEvents("online") : null, event.place, event.region ? tEvents(`regions.${event.region}`) : null, event.organizer, event.submittedOrgName ? t("by", { org: event.submittedOrgName }) : t("byFounder")].filter(Boolean).join(" · ")}
               </p>
               <a href={event.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-9 items-center break-all text-[13px] font-semibold text-violet-800 underline underline-offset-2">{event.url}</a>
               <p className="mt-1 text-[13px] text-slate-600">{t("checkHint")}</p>

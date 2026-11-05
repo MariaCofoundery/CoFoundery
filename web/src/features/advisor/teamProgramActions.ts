@@ -9,6 +9,7 @@ import { parseAccent } from "@/features/advisor/programAccent";
 import { decodePhotoData } from "@/features/connect/connectPhotoData";
 import { PROGRAM_LOGO_BUCKET, programStorageClient } from "@/features/advisor/programPageStorage";
 import { createClient } from "@/lib/supabase/server";
+import { berlinLocalToIso, berlinToIso } from "@/lib/berlinTime";
 
 /**
  * Team <-> Programm. Die Regeln stehen in der Datenbank (Migration
@@ -17,6 +18,8 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 const hashOf = (token: string) => createHash("sha256").update(token).digest("hex");
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 async function requireUser(next: string) {
   const client = await createClient();
@@ -427,11 +430,13 @@ export async function enterProgramCodeFromPageAction(formData: FormData) {
 export async function saveProgramEventAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const client = await requireUser(orgPlanTab(orgId));
-  const when = new Date(String(formData.get("startsAt") ?? ""));
+  // Deutsche Zeit, nicht die des Servers (Vercel laeuft in UTC).
+  const whenIso = berlinLocalToIso(String(formData.get("startsAt") ?? ""));
   const kind = String(formData.get("kind") ?? "education");
-  if (Number.isNaN(when.getTime()) || !["education", "internal", "external"].includes(kind)) {
+  if (!whenIso || !["education", "internal", "external"].includes(kind)) {
     redirect(orgPlanTab(orgId, "&planError=invalid"));
   }
+  const when = new Date(whenIso as string);
   const { error } = await client.rpc("save_program_event", {
     p_org_id: orgId,
     p_event_id: String(formData.get("eventId") ?? "") || null,
@@ -441,10 +446,71 @@ export async function saveProgramEventAction(formData: FormData) {
     p_location: String(formData.get("location") ?? "").slice(0, 200),
     p_notes: String(formData.get("notes") ?? "").slice(0, 2000),
     p_todos: String(formData.get("todos") ?? "").slice(0, 2000),
+    p_format_id: UUID_RE.test(String(formData.get("formatId") ?? "")) ? String(formData.get("formatId")) : null,
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
   redirect(orgPlanTab(orgId, error ? "&planError=failed" : "&planSaved=1"));
+}
+
+/**
+ * Mehrere Veranstaltungen auf einmal (Sammel-Eintrag im Programmplan, 05.11.2026): die Vorschlaege aus Text oder
+ * Diktat, von der Person geprueft. Jede geht durch dieselbe Datenbankfunktion wie das einzelne Formular.
+ */
+export async function createProgramEventsAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  let rows: unknown[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("events") ?? "[]"));
+    rows = Array.isArray(parsed) ? parsed.slice(0, 40) : [];
+  } catch {
+    rows = [];
+  }
+  let created = 0;
+  for (const raw of rows) {
+    const row = raw as { title?: unknown; day?: unknown; time?: unknown; location?: unknown; formatId?: unknown; kind?: unknown };
+    const startsAt = berlinToIso(String(row.day ?? ""), typeof row.time === "string" && row.time ? row.time : "00:00");
+    const title = String(row.title ?? "").trim().slice(0, 160);
+    const kind = ["education", "internal", "external"].includes(String(row.kind)) ? String(row.kind) : "education";
+    if (!startsAt || !title) continue;
+    const { error } = await client.rpc("save_program_event", {
+      p_org_id: orgId,
+      p_event_id: null,
+      p_title: title,
+      p_kind: kind,
+      p_starts_at: startsAt,
+      p_location: String(row.location ?? "").slice(0, 200),
+      p_notes: "",
+      p_todos: "",
+      p_format_id: UUID_RE.test(String(row.formatId ?? "")) ? String(row.formatId) : null,
+    });
+    if (!error) created += 1;
+  }
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, created > 0 ? `&planCreated=${created}#plan-social` : "&planError=failed"));
+}
+
+/** Formate (Masterclass, Fireside Chat ...): anlegen und loeschen - nur die Inhaberin. Rueckweg: Plan oder Einrichten. */
+const formatsBack = (orgId: string, formData: FormData, extra = "") =>
+  formData.get("back") === "features" ? `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=features${extra}#formats` : orgPlanTab(orgId, `${extra}#formats`);
+
+export async function saveEventFormatAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const { error } = await client.rpc("save_program_event_format", { p_org_id: orgId, p_label: String(formData.get("label") ?? "").slice(0, 60) });
+  revalidatePath("/advisor/organisation");
+  redirect(formatsBack(orgId, formData, error ? "&formatError=1" : ""));
+}
+
+export async function deleteEventFormatAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  await client.rpc("delete_program_event_format", { p_format_id: String(formData.get("formatId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(formatsBack(orgId, formData));
 }
 
 export async function deleteProgramEventAction(formData: FormData) {

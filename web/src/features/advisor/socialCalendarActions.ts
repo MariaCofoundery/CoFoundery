@@ -158,3 +158,77 @@ export async function movePostToDayAction(postId: string, day: string): Promise<
   if (!error) revalidatePath("/advisor/teamraum", "layout");
   return { ok: !error };
 }
+
+/**
+ * Post-Vorlagen (20270324120000): "eine Woche vorher LinkedIn und Instagram, einen Tag danach LinkedIn". Die
+ * Schritte kommen als JSON aus dem Editor; die Datenbank raeumt sie auf.
+ */
+export async function savePostTemplateAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  let steps: unknown = [];
+  try {
+    steps = JSON.parse(String(formData.get("steps") ?? "[]"));
+  } catch {
+    steps = [];
+  }
+  const { error } = await client.rpc("save_org_post_template", {
+    p_template_id: uuidOrNull(formData.get("templateId")),
+    p_org_id: uuidOrNull(formData.get("orgId")),
+    p_name: String(formData.get("name") ?? "").slice(0, 80),
+    p_steps: steps,
+  });
+  finish(`${backTo(formData, error ? { templateError: "1" } : { templateSaved: "1" })}#post-templates`);
+}
+
+export async function deletePostTemplateAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  await client.rpc("delete_org_post_template", { p_template_id: uuidOrNull(formData.get("templateId")) });
+  finish(`${backTo(formData)}#post-templates`);
+}
+
+/**
+ * Vorgeschlagene Postings zu Veranstaltungen uebernehmen - erst nach "passt". Jedes geht durch save_org_post wie
+ * ein einzelnes Posting, als Idee mit Tag, Uhrzeit, einem Kanal und der Veranstaltung. Rueckweg: Plan oder Kalender.
+ */
+export async function createEventPostsAction(formData: FormData) {
+  const orgId = uuidOrNull(formData.get("orgId"));
+  const fromPlan = formData.get("back") === "plan";
+  const back = (extra: Record<string, string>) =>
+    fromPlan && orgId
+      ? `/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "plan", ...extra }).toString()}#plan-social`
+      : backTo(formData, extra);
+  const client = await requireUser(back({}));
+  let rows: unknown[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("posts") ?? "[]"));
+    rows = Array.isArray(parsed) ? parsed.slice(0, 60) : [];
+  } catch {
+    rows = [];
+  }
+  let created = 0;
+  for (const raw of rows) {
+    const row = raw as { title?: unknown; plannedOn?: unknown; plannedTime?: unknown; channel?: unknown; eventId?: unknown };
+    const plannedOn = dateOrNull(row.plannedOn);
+    if (!plannedOn || !isChannel(row.channel)) continue;
+    const { error } = await client.rpc("save_org_post", {
+      p_post_id: null,
+      p_org_id: orgId,
+      p_title: String(row.title ?? "").slice(0, 160),
+      p_body: "",
+      p_channels: [row.channel],
+      p_planned_on: plannedOn,
+      p_planned_time: timeOrNull(row.plannedTime),
+      p_status: "idea",
+      p_campaign_id: null,
+      p_event_id: uuidOrNull(String(row.eventId ?? "")),
+      p_assignee_user_id: null,
+    });
+    if (!error) created += 1;
+  }
+  if (fromPlan) {
+    revalidatePath("/advisor/organisation");
+    revalidatePath("/advisor/teamraum", "layout");
+    redirect(back(created > 0 ? { postsCreated: String(created) } : { postsError: "1" }));
+  }
+  finish(back(created > 0 ? { socialCreated: String(created) } : { socialError: "1" }));
+}

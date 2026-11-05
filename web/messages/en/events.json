@@ -54,7 +54,7 @@
   "submit": {
     "back": "Back to events",
     "title": "Suggest an event",
-    "intro": "Know a public event from the startup ecosystem? Enter the facts and link the official page. Once we have checked it, everyone can see it.",
+    "intro": "Know a public event from the startup ecosystem? Enter the facts and link the official page. Once we have checked it, everyone can see it – your name is not shown.",
     "org": "For which organization",
     "eventTitle": "Title",
     "day": "Date",
@@ -74,10 +74,11 @@
     "errors": {
       "confirm": "Please confirm that the event is public and that you only enter facts.",
       "tooMany": "You already have 20 suggestions waiting for review.",
-      "notAllowed": "Only members of an active organization can suggest events.",
+      "notAllowed": "Founders and members of an active organization can suggest events.",
       "url": "The link must start with https://.",
       "invalid": "Please check the date and details – the event must not be in the past."
-    }
+    },
+    "asFounder": "No organization – as a founder"
   },
   "admin": {
     "back": "Admin",
@@ -121,6 +122,9 @@
       "regionNone": "None / nationwide",
       "permissionNote": "Where is the permission documented?",
       "permissionPlaceholder": "e.g. licence page https://… or “Email from name to Maria on 12 Nov 2026”"
-    }
-  }
+    },
+    "byFounder": "suggested by a founder",
+    "pendingBadge": "{count} waiting"
+  },
+  "fromCommunity": "Suggested by the community, checked by us"
 }
