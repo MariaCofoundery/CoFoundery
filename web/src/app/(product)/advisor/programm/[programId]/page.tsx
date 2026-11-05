@@ -96,7 +96,7 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && tab === "erfolge" ? getProgramOutcomes(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getOutcomeComments(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getProgramRewards(client, programId) : Promise.resolve([]),
-    program.isActive && tab === "erfolge" ? getCheckIns(client, programId) : Promise.resolve([]),
+    program.isActive && tab === "overview" ? getCheckIns(client, programId) : Promise.resolve([]),
   ]);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
@@ -158,6 +158,8 @@ export default async function AdvisorProgramTeamPage({
         ) : tab === "overview" ? (
           <div className="grid gap-4">
             <ProgramOverviewTiles memberCount={program.memberCount} openMilestones={openMilestones} contactCount={program.contactUserIds.length} due={due} />
+            {/* Gespraech zum Stand: im Ueberblick und unabhaengig von Erfolgen (seit 05.11.2026). */}
+            <ProgramCheckIn programId={programId} checkIns={checkIns} returnTo={base} />
             <ProgramProfileView profile={profile} />
             {hasOrgFeature(orgOfProgram, "orgdata") ? <ProgramOrgDataForm programId={programId} data={orgData} /> : null}
           </div>
@@ -165,7 +167,6 @@ export default async function AdvisorProgramTeamPage({
           <div className="grid gap-8">
             <ProgramOutcomes programId={programId} outcomes={outcomes} mode="org" returnTo={`${base}?tab=erfolge`} comments={outcomeComments} />
             <ProgramRewards programId={programId} rewards={rewards} mode="org" returnTo={`${base}?tab=erfolge`} />
-            <ProgramCheckIn programId={programId} checkIns={checkIns} returnTo={`${base}?tab=erfolge`} />
           </div>
         ) : tab === "notizen" ? (
           <>

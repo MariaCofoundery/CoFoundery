@@ -193,6 +193,21 @@ export async function AdvisorOrgSection({
                 />
               </form>
             </details>
+          ) : showProfile && part === "profile" ? (
+            // Leseansicht fuer Mitglieder, die nicht fuehren - vorher war der Reiter fuer sie leer.
+            <dl className="advisor-card mt-4 grid gap-3 p-5 text-sm sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-x-6">
+              {[
+                [t("profileDescriptionLabel"), org.description],
+                [t("profileWebsiteLabel"), org.websiteUrl],
+                [t("profileRegionLabel"), org.locationRegion],
+                [t("profileFocusLabel"), org.focus.join(", ")],
+              ].map(([label, value]) => (
+                <div key={label} className="contents">
+                  <dt className="font-semibold text-slate-700">{label}</dt>
+                  <dd className="break-words text-slate-800">{value || "–"}</dd>
+                </div>
+              ))}
+            </dl>
           ) : null}
 
           {showMembers && org.role === "owner" && org.status === "active" ? (

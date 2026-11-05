@@ -39,8 +39,9 @@ const orgLearningTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=learning${extra}`;
 const orgExpertsTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=experts${extra}`;
+// Erfolge stehen seit 05.11.2026 unter "Funktionen & Erfolge".
 const orgSuccessTab = (orgId: string, extra = "") =>
-  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=success${extra}`;
+  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=features${extra}#erfolge`;
 const orgPageTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=page${extra}`;
 
@@ -752,7 +753,8 @@ export async function saveOutcomeCommentAction(formData: FormData) {
 
 /** Ein Gespraech zum Stand festhalten, mit gemeinsamer Zusammenfassung und optional dem naechsten Termin. */
 export async function saveCheckInAction(formData: FormData) {
-  const back = outcomeReturn(formData.get("returnTo"));
+  // Das Gespraech steht im Ueberblick der Team-Seite (ohne ?tab), nicht mehr unter Erfolge.
+  const back = safeReturn(formData.get("returnTo"));
   const client = await requireUser(back);
   const date = (value: FormDataEntryValue | null) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value ?? "")) ? String(value) : null);
   await client.rpc("save_check_in", {
@@ -764,15 +766,4 @@ export async function saveCheckInAction(formData: FormData) {
   revalidatePath("/programm");
   revalidatePath("/advisor/programm");
   redirect(back);
-}
-
-/** Erfolge, Sterne, Belohnungen und Gespraech zum Stand ein- oder ausschalten. Nur der Inhaber; sie sind standardmaessig aus. */
-export async function setSuccessEnabledAction(formData: FormData) {
-  const orgId = String(formData.get("orgId") ?? "");
-  const client = await requireUser(orgSuccessTab(orgId));
-  const { error } = await client.rpc("set_success_enabled", { p_org_id: orgId, p_enabled: formData.get("enabled") === "yes" });
-  revalidatePath("/advisor/organisation");
-  revalidatePath("/programm");
-  revalidatePath("/advisor/programm");
-  redirect(orgSuccessTab(orgId, error ? "&successError=1" : ""));
 }

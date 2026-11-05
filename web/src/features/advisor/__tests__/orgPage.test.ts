@@ -4,8 +4,11 @@ import { readFileSync } from "node:fs";
 
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
-test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features", "report"\]/);
+test("die Organisationsseite hat dreizehn Reiter und waehlt zwischen mehreren Organisationen", () => {
+  assert.match(page, /\["overview", "program", "plan", "report", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"\]/);
+  // "Teams" und "Personen" (die eigene Begleitung) leben unter "Begleitung"; alte Adressen fuehren dorthin.
+  assert.match(page, /teams: "\/advisor\/begleitung\?art=teams", people: "\/advisor\/begleitung\?art=personen"/);
+  assert.match(page, /value === "success" \? "features"/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
   assert.match(page, /orgs\.length > 1/);
 });
@@ -13,8 +16,9 @@ test("die Organisationsseite hat vier Reiter und waehlt zwischen mehreren Organi
 test("die Seite zeigt Zaehler und Plaetze - keine Gesamtwertung, keine Rangfolge", () => {
   assert.match(page, /countOrgSeatsUsed\(/);
   assert.doesNotMatch(page, /score|rank|percent|compatib/i);
-  // Teams kommen aus dem, was diese Person ohnehin sehen darf.
-  assert.match(page, /getAdvisorDashboardTeams\(user\.id\)/);
+  // Die Zahlen der Uebersicht kommen aus den Programmen der Organisation, nicht aus der eigenen Begleitung.
+  assert.match(page, /programs\.filter\(\(program\) => program\.isActive\)\.length/);
+  assert.doesNotMatch(page, /getAdvisorDashboardTeams/);
 });
 
 test("Aktionen der Organisation kehren in den Reiter Mitglieder und Einstellungen zurueck", () => {
@@ -365,22 +369,24 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   const mine = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
   assert.match(mine, /outcomes\.length \?\? 0\) > 0/);
   const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(org, /successEnabled \? \(/);
+  // Ein Schalter: Katalog und Belohnungen stehen unter "Funktionen & Erfolge", nur wenn eingeschaltet.
+  assert.match(org, /hasOrgFeature\(org, "success"\) \? \(/);
+  assert.doesNotMatch(org, /OrgSuccessSwitch/);
   const privacy = readFileSync("src/app/datenschutz/page.tsx", "utf8");
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die sechzehn Reiter stehen in vier Gruppen, jeder Reiter genau einmal, die Adressen bleiben", () => {
+test("Organisation: die dreizehn Reiter stehen in drei Gruppen, jeder Reiter genau einmal", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
-  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["run", "learn", "setup", "manage"].includes(key));
-  const tabs = ["overview", "teams", "people", "access", "members", "program", "plan", "success", "page", "profile", "enroll", "experts", "materials", "learning", "features", "report"];
+  const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["care", "content", "setup"].includes(key));
+  const tabs = ["overview", "program", "plan", "report", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"];
   assert.deepEqual([...used].sort(), [...tabs].sort());
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
-    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 4, locale);
-    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 4, locale);
+    assert.equal(messages.area.orgPage.groupLabels.split(" | ").length, 3, locale);
+    assert.equal(messages.area.orgPage.groupHints.split(" | ").length, 3, locale);
     assert.equal(messages.area.orgPage.tabs.split(" | ").length, tabs.length, locale);
   }
   // Einladungen und Codes liegen im Reiter "Teams aufnehmen", die Teamkarten im Reiter "Programm".
@@ -393,9 +399,8 @@ test("Organisation: die sechzehn Reiter stehen in vier Gruppen, jeder Reiter gen
 test("Leere Bereiche zeigen den logischen naechsten Schritt statt nur einen Satz", () => {
   const people = readFileSync("src/features/advisor/AccompaniedPeopleList.tsx", "utf8");
   assert.match(people, /EmptyState[\s\S]*\/advisor\/einladen\?art=person/);
-  const org = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(org, /<EmptyState[\s\S]*einladen\?art=team/);
   const programs = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
+  assert.match(programs, /<EmptyState/);
   assert.match(programs, /#org-invite-title/);
   assert.match(programs, /id="org-codes-title"/);
   // Plan und Meilensteine oeffnen das Formular, solange noch nichts da ist.
@@ -479,7 +484,9 @@ test("Beispiel-Vorschau: nur lesend, gesperrt, ohne Datenbank, erreichbar von He
 test("Mein Programm: ohne Organisation ein Einstieg mit einem Klick, bei allein gefuehrter Organisation nur der noetige Teil", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   assert.match(page, /<MyProgramStart/);
-  assert.match(page, /const SOLO_HIDDEN: Tab\[\] = \["overview", "teams", "people", "access"\]/);
+  assert.match(page, /const SOLO_HIDDEN: Tab\[\] = \["overview", "access"\]/);
+  // Ausgeblendet heisst auch ueber die Adresse nicht erreichbar.
+  assert.match(page, /soloOrg && SOLO_HIDDEN\.includes\(requestedTab\) \? "program" : requestedTab/);
   assert.match(page, /org\.role === "owner" && members\.filter\(\(member\) => member\.status === "active"\)\.length === 1/);
   assert.match(page, /query\.tab \? TAB_OF\(query\.tab\) : soloOrg \? "program" : "overview"/);
   // Mitglieder, Programmseite und Profil bleiben erreichbar.
@@ -588,7 +595,7 @@ test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts,
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 16, locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 13, locale);
   }
 });
 
@@ -658,7 +665,8 @@ test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Vorausset
 
 test("Planen und Lernen: Termine, Unterlagen und Lernbereich sind je ein eigener Reiter mit eigener Rueckkehr", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(page, /\{ key: "learn", tabs: \["plan", "materials", "learning"\] \}/);
+  assert.match(page, /\{ key: "care", tabs: \["overview", "program", "plan", "report"\] \}/);
+  assert.match(page, /\{ key: "content", tabs: \["materials", "learning", "experts"\] \}/);
   assert.match(page, /tab === "materials" && !tabOff \? \(/);
   assert.match(page, /tab === "learning" && !tabOff \? \(/);
   // Jeder Reiter liest nur seine eigenen Daten.
@@ -712,4 +720,32 @@ test("Beispiel Gruppenauswertung: nur lesend, dieselben Bauteile wie die echte S
   assert.match(fixture, /buildCapabilityTeamReadout/);
   // Das Beispiel steht im gesperrten Block: kein Feld und kein Knopf loest etwas aus.
   assert.match(page, /<fieldset disabled/);
+});
+
+test("Gespraech zum Stand gehoert zur Begleitung: im Ueberblick der Team-Seite, auch ohne Erfolge", () => {
+  const team = readFileSync("src/app/(product)/advisor/programm/[programId]/page.tsx", "utf8");
+  const overview = team.slice(team.indexOf('tab === "overview" ? ('), team.indexOf('tab === "erfolge" ? ('));
+  assert.match(overview, /<ProgramCheckIn programId=\{programId\} checkIns=\{checkIns\} returnTo=\{base\} \/>/);
+  const success = team.slice(team.indexOf('tab === "erfolge" ? ('), team.indexOf('tab === "notizen" ? ('));
+  assert.doesNotMatch(success, /ProgramCheckIn/);
+  // Die Aktion fuehrt zur Team-Seite zurueck, nicht nach /programm.
+  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
+  assert.match(actions.slice(actions.indexOf("export async function saveCheckInAction")), /^[^}]*safeReturn\(formData\.get\("returnTo"\)\)/);
+  // Auf der Seite des Teams steht es ausserhalb des Erfolge-Blocks.
+  const mine = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
+  const outcomesBlock = mine.slice(mine.indexOf("outcomes.length ?? 0) > 0"), mine.indexOf("<ProgramMilestones"));
+  assert.match(outcomesBlock, /\) : null\}[\s\S]*<ProgramCheckIn/);
+  const sql = readFileSync("../supabase/migrations/20270311120000_check_ins_without_success.sql", "utf8");
+  assert.doesNotMatch(sql.slice(sql.indexOf("function public.program_check_in_side")), /org_success_enabled/);
+});
+
+test("Einrichten fuer alle lesbar: wer nicht fuehrt, sieht einen Hinweis und das Profil statt einer leeren Seite", () => {
+  assert.match(page, /!isOwner && \(tab === "enroll" \|\| tab === "page" \|\| tab === "features" \|\| tab === "profile"\)/);
+  assert.match(page, /orgPage\.ownerOnlyNote/);
+  const section = readFileSync("src/features/advisor/AdvisorOrgSection.tsx", "utf8");
+  assert.match(section, /\) : showProfile && part === "profile" \? \(/);
+  for (const locale of ["de", "en"]) {
+    const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
+    assert.match(messages.area.orgPage.ownerOnlyNote, /\{names\}/, locale);
+  }
 });

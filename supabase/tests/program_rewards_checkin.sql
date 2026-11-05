@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(15);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
 select '00000000-0000-0000-0000-000000000000', ('f1000000-0000-4000-8000-00000000000' || n)::uuid, 'authenticated', 'authenticated', 'u' || n || '@example.com', '', now(), '{}', '{}', now(), now()
@@ -61,6 +61,16 @@ select public.save_check_in('f1000000-0000-4000-8000-0000000000c0', current_date
 select extensions.is((select count(*)::int from public.get_check_ins('f1000000-0000-4000-8000-0000000000c0')), 1, 'a talk is recorded');
 set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000006","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.get_check_ins('f1000000-0000-4000-8000-0000000000c0')), 0, 'a stranger sees nothing');
+
+-- Ohne Erfolge: Gespraeche bleiben (sie gehoeren zur Begleitung), Kommentare und Belohnungen nicht.
+reset role;
+update public.advisor_orgs set program_success_enabled = false where id = 'f1000000-0000-4000-8000-0000000000a0';
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f1000000-0000-4000-8000-000000000002","role":"authenticated"}';
+select public.save_check_in('f1000000-0000-4000-8000-0000000000c0', current_date, 'Auch ohne Sterne', null);
+select extensions.is((select count(*)::int from public.get_check_ins('f1000000-0000-4000-8000-0000000000c0')), 2, 'without achievements the team still records and reads talks');
+select extensions.is((select count(*)::int from public.get_outcome_comments('f1000000-0000-4000-8000-0000000000c0')), 0, 'but comments on results stay hidden');
+select extensions.is((select count(*)::int from public.get_program_rewards('f1000000-0000-4000-8000-0000000000c0')), 0, 'and so do rewards');
 
 -- Ende des Programms.
 reset role;

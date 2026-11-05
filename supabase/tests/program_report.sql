@@ -76,11 +76,11 @@ select extensions.is(
   (select count(*)::int from public.get_org_report_attendance('ed000000-0000-4000-8000-0000000000a0', current_date, null)),
   2, 'the period limits the events');
 
--- Gespraeche: ohne Erfolge nicht erfasst.
+-- Gespraeche zaehlen auch ohne Erfolge (seit 20270311120000 - sie gehoeren zur Begleitung).
 select extensions.is(
   (select check_ins from public.get_org_report_check_ins('ed000000-0000-4000-8000-0000000000a0', null, null)
    where program_id = 'ed000000-0000-4000-8000-0000000000c0'),
-  null, 'without achievements, conversations are not recorded - null, not zero');
+  2, 'without achievements, conversations are still counted');
 
 reset role;
 update public.advisor_orgs set program_success_enabled = true where id = 'ed000000-0000-4000-8000-0000000000a0';

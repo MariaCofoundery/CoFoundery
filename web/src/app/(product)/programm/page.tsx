@@ -202,10 +202,13 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                   <div className="grid gap-8">
                     <ProgramOutcomes programId={program.programId} outcomes={outcomesByProgram.get(program.programId)?.outcomes ?? []} mode="team" returnTo="/programm" comments={outcomesByProgram.get(program.programId)?.comments ?? []} />
                     <ProgramRewards programId={program.programId} rewards={outcomesByProgram.get(program.programId)?.rewards ?? []} mode="team" returnTo="/programm" />
-                    <ProgramCheckIn programId={program.programId} checkIns={outcomesByProgram.get(program.programId)?.checkIns ?? []} returnTo="/programm" />
                   </div>
                 </div>
                 ) : null}
+                {/* Gespraech zum Stand gehoert zur Begleitung und steht auch ohne Erfolge (seit 05.11.2026). */}
+                <div className="mt-6 border-t border-slate-100 pt-4">
+                  <ProgramCheckIn programId={program.programId} checkIns={outcomesByProgram.get(program.programId)?.checkIns ?? []} returnTo="/programm" />
+                </div>
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <ProgramMilestones programId={program.programId} milestones={milestonesByProgram.get(program.programId) ?? []} returnTo="/programm" />
                 </div>
