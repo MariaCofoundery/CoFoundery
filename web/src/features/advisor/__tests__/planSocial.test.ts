@@ -36,8 +36,10 @@ test("Social Media: Vorschlaege in eigenem Feld, gespeichert erst nach Uebernehm
   const actions = read("src/features/advisor/socialCalendarActions.ts");
   assert.match(actions, /export async function createEventPostsAction[\s\S]*p_status: "idea"/);
   assert.match(read("src/features/advisor/OrgProgramPlan.tsx"), /<EventPostSuggestions/);
-  assert.match(read("src/features/advisor/SocialCalendar.tsx"), /<EventPostSuggestions/);
-  assert.match(read("src/features/advisor/SocialCalendar.tsx"), /<PostTemplateEditor /);
+  // Seit dem 05.11.2026 im Panel des Termins ("Vorlage anwenden"); die Vorlagen sind ein eigener Reiter im Social-Kalender.
+  assert.match(read("src/features/advisor/calendar/EventPanel.tsx"), /<EventPostSuggestions[\s\S]*back="calendar"/);
+  assert.match(read("src/features/advisor/SocialCalendar.tsx"), /<PostTemplateCards /);
+  assert.match(read("src/features/advisor/PostTemplateCards.tsx"), /<PostTemplateEditor /);
 });
 
 test("Event-Kalender: Gruendende schlagen vor, Admins sehen die Zahl wartender Vorschlaege", () => {

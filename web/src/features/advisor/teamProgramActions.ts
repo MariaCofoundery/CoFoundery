@@ -10,6 +10,7 @@ import { decodePhotoData } from "@/features/connect/connectPhotoData";
 import { PROGRAM_LOGO_BUCKET, programStorageClient } from "@/features/advisor/programPageStorage";
 import { createClient } from "@/lib/supabase/server";
 import { berlinLocalToIso, berlinToIso } from "@/lib/berlinTime";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { getTranslations } from "next-intl/server";
 
 /**
@@ -35,8 +36,19 @@ const orgSettings = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=program${extra}`;
 const orgEnrollTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=enroll${extra}`;
-const orgPlanTab = (orgId: string, extra = "") =>
-  `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=plan${extra}`;
+// Der Programmplan ist seit dem 05.11.2026 der Kalender (/advisor/kalender). Die Aufrufe unten reichen weiter,
+// was sie schon kannten: "&open=<id>" oeffnet das Panel des Termins, "#formats" die Formate; Anker fallen weg.
+const orgPlanTab = (orgId: string, extra = "") => {
+  const [query, anchor = ""] = extra.replace(/^&/, "").split("#");
+  const params = new URLSearchParams(query);
+  const open = params.get("open");
+  if (open) {
+    params.delete("open");
+    params.set("termin", open);
+  }
+  if (anchor === "formats") params.set("ansicht", "formate");
+  return calendarHref(orgId, Object.fromEntries(params));
+};
 const orgMaterialsTab = (orgId: string, extra = "") =>
   `/advisor/organisation?org=${encodeURIComponent(orgId)}&tab=materials${extra}`;
 const orgLearningTab = (orgId: string, extra = "") =>
@@ -427,6 +439,37 @@ export async function enterProgramCodeFromPageAction(formData: FormData) {
   redirect(`/programm/code/${code}`);
 }
 
+/** "Event-Orga": eine Checkliste im Teamraum, verknuepft mit dem Termin, faellig drei Tage davor. */
+async function createOrgaChecklist(client: Awaited<ReturnType<typeof createClient>>, orgId: string, eventId: string, title: string, day: string) {
+  const t = await getTranslations("advisor.teamProgram.event");
+  const due = berlinToIso(day, "00:00") ? new Date(Date.parse(`${day}T00:00:00Z`) - 3 * 86_400_000).toISOString().slice(0, 10) : null;
+  return client.rpc("save_org_task", {
+    p_task_id: null,
+    p_org_id: orgId,
+    p_title: t("orgaTaskTitle", { title }).slice(0, 200),
+    p_details: null,
+    p_status: "open",
+    p_due_on: due,
+    p_program_id: null,
+    p_event_id: eventId,
+    p_checklist: t("orgaTaskChecklist").split(" | ").map((text) => ({ text, done: false })),
+    p_assignee_user_ids: [],
+  });
+}
+
+/** Aus dem Panel eines Termins: die Orga-Checkliste nachtraeglich anlegen (nur wenn es noch keine Aufgabe zum Termin gibt). */
+export async function createEventChecklistAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const eventId = String(formData.get("eventId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const title = String(formData.get("title") ?? "").slice(0, 160);
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("day") ?? "")) ? String(formData.get("day")) : "";
+  const { count } = await client.from("advisor_org_tasks").select("id", { count: "exact", head: true }).eq("org_id", orgId).eq("event_id", eventId);
+  if (UUID_RE.test(eventId) && day && !count) await createOrgaChecklist(client, orgId, eventId, title, day);
+  revalidatePath("/advisor/teamraum", "layout");
+  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(eventId)}&reiter=aufgaben`));
+}
+
 /** Programmplan: Veranstaltung anlegen oder aendern. Nur der Inhaber; die Datenbank prueft das. */
 export async function saveProgramEventAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
@@ -437,7 +480,9 @@ export async function saveProgramEventAction(formData: FormData) {
   const endTime = String(formData.get("endTime") ?? "");
   const startsAt = formData.has("day") ? berlinToIso(day, startTime) : berlinLocalToIso(String(formData.get("startsAt") ?? ""));
   const endsAt = formData.has("day") && endTime ? berlinToIso(day, endTime) : null;
-  if (!startsAt) redirect(orgPlanTab(orgId, "&planError=invalid"));
+  // Bei einem Fehler bleibt das Panel offen: mit dem Termin, den man gerade aendert, sonst als neuer.
+  const reopen = formData.get("eventId") ? `&bearbeiten=${encodeURIComponent(String(formData.get("eventId")))}` : "&neu=termin";
+  if (!startsAt) redirect(orgPlanTab(orgId, `&planError=invalid${reopen}`));
   const pick = <T extends string>(value: FormDataEntryValue | null, allowed: readonly T[], fallback: T): T => (allowed.includes(String(value) as T) ? (String(value) as T) : fallback);
   const audience = pick(formData.get("audience"), ["all", "selected", "internal"] as const, "all");
   const eventId = String(formData.get("eventId") ?? "") || null;
@@ -465,29 +510,16 @@ export async function saveProgramEventAction(formData: FormData) {
   });
   if (error) {
     const reason = /audience_invalid/.test(error.message) ? "audience" : /public_url_required|url/.test(error.message) ? "publicUrl" : "failed";
-    redirect(orgPlanTab(orgId, `&planError=${reason}`));
+    redirect(orgPlanTab(orgId, `&planError=${reason}${reopen}`));
   }
   // Aufgaben dazu (nur beim Anlegen): eine Checkliste "Event-Orga" im Teamraum, verknuepft mit dem Termin.
-  if (!eventId && formData.get("orgaTask") === "yes" && typeof savedId === "string") {
-    const t = await getTranslations("advisor.teamProgram.event");
-    const due = berlinToIso(day, "00:00") ? new Date(Date.parse(`${day}T00:00:00Z`) - 3 * 86_400_000).toISOString().slice(0, 10) : null;
-    await client.rpc("save_org_task", {
-      p_task_id: null,
-      p_org_id: orgId,
-      p_title: t("orgaTaskTitle", { title }).slice(0, 200),
-      p_details: null,
-      p_status: "open",
-      p_due_on: due,
-      p_program_id: null,
-      p_event_id: savedId,
-      p_checklist: t("orgaTaskChecklist").split(" | ").map((text) => ({ text, done: false })),
-      p_assignee_user_ids: [],
-    });
-  }
+  if (!eventId && formData.get("orgaTask") === "yes" && typeof savedId === "string") await createOrgaChecklist(client, orgId, savedId, title, day);
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
   revalidatePath("/advisor/teamraum", "layout");
-  redirect(orgPlanTab(orgId, "&planSaved=1"));
+  // Danach steht der Termin im Kalender offen - mit seinem Monat und, wenn er neu ist, bei den Posts.
+  const openId = typeof savedId === "string" ? savedId : eventId;
+  redirect(orgPlanTab(orgId, `&planSaved=1&monat=${day.slice(0, 7)}${openId ? `&open=${encodeURIComponent(openId)}` : ""}`));
 }
 
 /**
@@ -577,7 +609,7 @@ export async function setEventExpertsAction(formData: FormData) {
   const ids = formData.getAll("expertId").map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
   const { error } = await client.rpc("set_event_experts", { p_event_id: eventId, p_expert_ids: ids });
   revalidatePath("/advisor/organisation");
-  redirect(orgPlanTab(orgId, error ? "&planError=invalid" : `&planSaved=1&open=${encodeURIComponent(eventId)}`));
+  redirect(orgPlanTab(orgId, error ? "&planError=invalid" : `&planSaved=1&open=${encodeURIComponent(eventId)}&reiter=details`));
 }
 
 /** Lernbereich: Module und Lektionen mit Links. Nur der Inhaber; die Datenbank prueft das und verlangt https. */
@@ -742,7 +774,7 @@ export async function setProgramAttendanceAction(formData: FormData) {
   });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(String(formData.get("eventId") ?? ""))}`));
+  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(String(formData.get("eventId") ?? ""))}&reiter=teilnahme`));
 }
 
 /**

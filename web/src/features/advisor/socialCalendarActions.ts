@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isChannel, isPostStatus } from "@/features/advisor/socialCalendarModel";
 import { TEAMRAUM_BASE, teamraumHref } from "@/features/advisor/teamraumRoutes";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 /**
  * Social-Media-Kalender schreiben (20270319120000). Wer darf, entscheidet die Datenbank. Der Rueckweg wird
@@ -177,13 +178,13 @@ export async function savePostTemplateAction(formData: FormData) {
     p_name: String(formData.get("name") ?? "").slice(0, 80),
     p_steps: steps,
   });
-  finish(`${backTo(formData, error ? { templateError: "1" } : { templateSaved: "1" })}#post-templates`);
+  finish(backTo(formData, { reiter: "vorlagen", ...(error ? { templateError: "1" } : { templateSaved: "1" }) }));
 }
 
 export async function deletePostTemplateAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   await client.rpc("delete_org_post_template", { p_template_id: uuidOrNull(formData.get("templateId")) });
-  finish(`${backTo(formData)}#post-templates`);
+  finish(backTo(formData, { reiter: "vorlagen" }));
 }
 
 /**
@@ -192,10 +193,13 @@ export async function deletePostTemplateAction(formData: FormData) {
  */
 export async function createEventPostsAction(formData: FormData) {
   const orgId = uuidOrNull(formData.get("orgId"));
-  const fromPlan = formData.get("back") === "plan";
+  // Rueckweg: der Kalender (aus dem Panel eines Termins), der Programmplan von frueher oder der Social-Kalender.
+  const fromCalendar = formData.get("back") === "calendar" && orgId !== null;
+  const fromPlan = fromCalendar || formData.get("back") === "plan";
+  const eventParam = uuidOrNull(formData.get("termin"));
   const back = (extra: Record<string, string>) =>
     fromPlan && orgId
-      ? `/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "plan", ...extra }).toString()}#plan-social`
+      ? calendarHref(orgId, { ...extra, termin: eventParam, reiter: eventParam ? "social" : null })
       : backTo(formData, extra);
   const client = await requireUser(back({}));
   let rows: unknown[] = [];
@@ -226,6 +230,7 @@ export async function createEventPostsAction(formData: FormData) {
     if (!error) created += 1;
   }
   if (fromPlan) {
+    revalidatePath("/advisor/kalender");
     revalidatePath("/advisor/organisation");
     revalidatePath("/advisor/teamraum", "layout");
     redirect(back(created > 0 ? { postsCreated: String(created) } : { postsError: "1" }));

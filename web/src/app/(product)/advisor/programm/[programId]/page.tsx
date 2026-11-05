@@ -34,6 +34,7 @@ import {
   listProgramUpdates,
 } from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 /**
  * Ein Team im Programm, aus Sicht der Bezugsperson oder des Inhabers.
@@ -151,7 +152,7 @@ export default async function AdvisorProgramTeamPage({
           ← {t("backToOrg")}
         </Link>
         <Link href={`/advisor/teamraum/aufgaben?${new URLSearchParams({ org: orgOfProgram.id, team: programId }).toString()}`} className="inline-flex min-h-11 items-center text-sm font-medium text-violet-800 underline-offset-4 hover:underline">{t("teamTasks")}</Link>
-        <Link href={`/advisor/organisation?${new URLSearchParams({ org: orgOfProgram.id, tab: "plan" }).toString()}`} className="inline-flex min-h-11 items-center text-sm font-medium text-violet-800 underline-offset-4 hover:underline">{t("teamDates")}</Link>
+        <Link href={calendarHref(orgOfProgram.id)} className="inline-flex min-h-11 items-center text-sm font-medium text-violet-800 underline-offset-4 hover:underline">{t("teamDates")}</Link>
       </nav>
 
       <div className="mt-2">

@@ -113,10 +113,12 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
             campaigns,
             templates,
             channel: isChannel(query.channel) ? query.channel : null,
+            reiter: query.reiter === "vorlagen" || query.reiter === "kampagnen" ? query.reiter : "kalender",
+            templateEdit: query.vorlage === "neu" ? "neu" : UUID.test(query.vorlage ?? "") ? (query.vorlage as string) : null,
             feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
           }}
           selected={selected}
-          newDay={selected ? null : /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? (query.newPost as string) : null}
+          newDay={selected ? null : query.newPost === "heute" ? today : /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? (query.newPost as string) : null}
           newEvent={UUID.test(query.event ?? "") ? (query.event as string) : null}
         />
       );
@@ -170,6 +172,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
             newOpen: query.new === "1",
             dictateOpen: query.dictate === "1",
             programId: /^[0-9a-f-]{36}$/.test(query.team ?? "") ? (query.team as string) : null,
+            eventId: UUID.test(query.event ?? "") ? (query.event as string) : null,
           }}
         />
       );

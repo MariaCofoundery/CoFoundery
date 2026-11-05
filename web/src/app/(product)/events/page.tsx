@@ -12,6 +12,7 @@ import { eventFilterOf, isRegion, type CalendarEntry } from "@/features/events/e
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getTranslations } from "next-intl/server";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
         startsAt: event.startsAt,
         place: event.location,
         label: t("fromPlan", { org: org.name }),
-        href: `/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan", open: event.eventId }).toString()}`,
+        href: calendarHref(org.id, { termin: event.eventId }),
       })),
     ),
     ...ecosystem.map((event) => ({ kind: "ecosystem" as const, key: `e-${event.id}`, event, saved: saved.has(event.id) })),

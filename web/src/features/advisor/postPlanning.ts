@@ -101,3 +101,8 @@ export function stepsOf(value: unknown): TemplateStep[] {
       : [];
   });
 }
+
+/** Wo auf dem Zeitstrahl einer Vorlage ein Schritt steht: 0 % links, 100 % rechts. Der Termin selbst liegt bei 0 Tagen. */
+export function timelinePosition(days: number, min: number, max: number) {
+  return ((Math.min(max, Math.max(min, days)) - min) / (max - min)) * 100;
+}

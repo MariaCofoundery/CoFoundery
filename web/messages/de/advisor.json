@@ -2177,7 +2177,27 @@
       "cancel": "Abbrechen",
       "daysBefore": "{count, plural, one {1 Tag vorher} other {# Tage vorher}}",
       "daysAfter": "{count, plural, one {1 Tag danach} other {# Tage danach}}",
-      "same": "am Tag"
+      "same": "am Tag",
+      "stepsLabel": "Posts",
+      "weekendNote": "Fällt ein Post auf Wochenende oder Feiertag, schlägt der Kalender Freitag oder Montag vor.",
+      "channelMore": "Weitere …"
+    },
+    "tabsLabel": "Social Media",
+    "tabs": {
+      "kalender": "Kalender",
+      "vorlagen": "Vorlagen",
+      "kampagnen": "Kampagnen"
+    },
+    "addTemplate": "Vorlage",
+    "addPost": "Post",
+    "noPostsBanner": "{count, plural, one {Ein Termin hat noch keine Posts:} other {# Termine haben noch keine Posts:}}",
+    "noPostsAction": "Vorlage anwenden",
+    "cards": {
+      "default": "Standard",
+      "summary": "{count, plural, one {Ein Post} other {# Posts}} · {channels}",
+      "event": "Termin",
+      "apply": "Auf Termin anwenden",
+      "newHint": "z. B. „3 Posts zu Event y“"
     }
   },
   "setup": {
@@ -2293,11 +2313,7 @@
       "program": {
         "0": {
           "title": "Mein Programm",
-          "text": "Hier betreut ihr die Teams im Programm: Teams, Programmplan, Auswertung und – wenn eingeschaltet – Förderauflagen. Oben wechselst du zwischen Betreuen, Inhalte für die Teams und Einrichten."
-        },
-        "1": {
-          "title": "Programmplan",
-          "text": "Termine mit Format, Zeit, Ort und für wen. Die Teams sehen, was für sie ist, und sagen zu. Dazu gibt es Vorschläge für Social Media und, auf Wunsch, eine Orga-Checkliste im Teamraum."
+          "text": "Hier betreut ihr die Teams im Programm: Teams, Auswertung und – wenn eingeschaltet – Förderauflagen. Links in der Seitenleiste wechselst du zwischen den Bereichen."
         }
       },
       "events": {
@@ -2305,8 +2321,120 @@
           "title": "Events",
           "text": "Termine aus eurem Programm und aus dem Startup-Ökosystem – nur Fakten mit Link zur offiziellen Seite. Mit dem Lesezeichen merkst du dir ein Event; eigene Vorschläge prüfen wir vor der Veröffentlichung."
         }
+      },
+      "calendar": {
+        "0": {
+          "title": "Kalender",
+          "text": "Termine, Posts, Aufgaben-Fristen und gemerkte Events auf einen Blick. Oben schaltest du Ebenen ein und aus und wechselst zwischen Monat, Woche, Liste und Formaten."
+        },
+        "1": {
+          "title": "Termin anklicken",
+          "text": "Ein Klick öffnet den Termin rechts: Posts mit „Vorlage anwenden“, Aufgaben, Teilnahme und Details. „Bearbeiten“ und „+ Termin“ öffnen ein Panel – der Kalender bleibt dahinter."
+        }
       }
     },
     "findAgain": "Alles Schritt für Schritt einrichten:"
+  },
+  "calendar": {
+    "title": "Kalender",
+    "viewLabel": "Ansicht",
+    "rangeLabel": "Zeitraum",
+    "views": {
+      "month": "Monat",
+      "week": "Woche",
+      "list": "Liste",
+      "formats": "Formate"
+    },
+    "today": "Heute",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "addEvent": "Termin",
+    "addMany": "Mehrere eintragen",
+    "orgSwitch": "Organisation wechseln",
+    "layersLabel": "Zeigen:",
+    "layers": {
+      "program": "Programm-Termine",
+      "post": "Posts",
+      "task": "Aufgaben-Fristen",
+      "eco": "Ökosystem"
+    },
+    "layersHint": "Klick auf einen Termin öffnet ihn rechts. Aus dem Ökosystem erscheinen die Events, die du gemerkt hast.",
+    "needsPosts": "{count, plural, one {Ein Termin hat noch keine Posts:} other {# Termine haben noch keine Posts:}}",
+    "needsPostsAction": "Vorlage anwenden",
+    "moreCount": "+{count} mehr",
+    "addOn": "Termin am {day} anlegen",
+    "agendaEmpty": "In diesem Zeitraum steht nichts an.",
+    "weekLabel": "KW {number} · {from} – {to}",
+    "internalShort": "intern",
+    "weekendWarn": "Wochenende oder Feiertag",
+    "formatsText": "Formate sind die Arten eurer Termine – Masterclass, Pitch in Progress, Fireside Chat. Förderauflagen können nach Format zählen.",
+    "disabled": {
+      "title": "Der Kalender ist ausgeschaltet",
+      "text": "Der Programmplan ist für diese Organisation nicht eingeschaltet. Unter „Funktionen“ lässt er sich einschalten.",
+      "link": "Zu den Funktionen"
+    },
+    "sheet": {
+      "close": "Schließen",
+      "cancel": "Abbrechen",
+      "newEyebrow": "Neuer Termin",
+      "editEyebrow": "Termin bearbeiten",
+      "bulkEyebrow": "Mehrere Termine",
+      "newTitle": "Neuer Termin",
+      "editTitle": "Termin bearbeiten",
+      "bulkTitle": "Mehrere Termine auf einmal",
+      "saveChanges": "Änderungen speichern"
+    },
+    "panel": {
+      "close": "Schließen",
+      "edit": "Bearbeiten",
+      "hostUs": "Wir veranstalten",
+      "hostPartner": "Partner veranstaltet",
+      "noFormat": "Termin",
+      "tabsLabel": "Zum Termin",
+      "tabs": {
+        "social": "Social Media",
+        "tasks": "Aufgaben",
+        "teams": "Teilnahme",
+        "details": "Details"
+      },
+      "socialInternal": "Nur für euer Team – zu diesem Termin gibt es keine Posts.",
+      "postsTitle": "{count, plural, =0 {Posts zu diesem Termin} one {Ein Post zu diesem Termin} other {# Posts zu diesem Termin}}",
+      "manageTemplates": "Vorlagen verwalten",
+      "noPosts": "Noch keine Posts zu diesem Termin.",
+      "applyTitle": "Vorlage anwenden",
+      "applyText": "Wähle eine Vorlage – die Tage rechne ich aus, Wochenenden und Feiertage werden markiert. Erst mit „übernehmen“ werden daraus Posts.",
+      "noTasks": "Noch keine Aufgaben zu diesem Termin.",
+      "createChecklist": "Orga-Checkliste anlegen",
+      "taskStatus": {
+        "open": "Offen",
+        "doing": "In Arbeit",
+        "waiting": "Wartet",
+        "done": "Erledigt"
+      },
+      "due": "bis {day}",
+      "checklistProgress": "{done} von {total} erledigt",
+      "addTask": "Aufgabe zu diesem Termin",
+      "teamsInternal": "Die Teams sehen diesen Termin nicht – eine Teilnahme gibt es nicht.",
+      "internalNote": "Interne Notiz · nur für euch",
+      "publicLabel": "Event-Kalender",
+      "publicNot": "nicht öffentlich"
+    },
+    "form": {
+      "titlePlaceholder": "Wie heißt der Termin?",
+      "when": "Wann",
+      "audienceAll": "Alle Teams",
+      "audienceSelected": "Ausgewählte",
+      "audienceInternal": "Nur wir",
+      "hostUs": "Wir veranstalten",
+      "hostPartner": "Partner",
+      "attached": "Was dranhängt",
+      "checklistTitle": "Orga-Checkliste im Teamraum",
+      "checklistHint": "Raum, Technik, Catering, Einladung – mit dem Termin verknüpft",
+      "socialTitle": "Social-Posts vorschlagen",
+      "socialHint": "Nach dem Speichern wählst du im Termin eine Vorlage – mit Hinweis bei Wochenende oder Feiertag",
+      "socialInternal": "Nicht bei Terminen nur für euer Team",
+      "publicTitle": "Öffentlich im Event-Kalender",
+      "publicHint": "Als Vorschlag – nur Fakten und Link, nach unserer Freigabe"
+    }
   }
 }

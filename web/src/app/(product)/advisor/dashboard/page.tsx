@@ -20,6 +20,7 @@ import { SetupCard, StartEvents, StartTiles, type StartEvent, type StartTile } f
 import { loadSetup } from "@/features/advisor/setup/setupData";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { listOrgEventPosts } from "@/features/advisor/socialCalendarData";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 const CARD = "advisor-card p-6";
 const LINK =
@@ -156,9 +157,9 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
       key: `p-${event.eventId}`,
       title: event.formatLabel ? `${event.formatLabel}: ${event.title}` : event.title,
       startsAt: event.startsAt,
-      href: `/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan", open: event.eventId }).toString()}`,
+      href: calendarHref(org.id, { termin: event.eventId }),
       ecosystem: false,
-      needsPosts: hasPosts || event.audience === "internal" || org.status !== "active" ? null : `/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan" }).toString()}#plan-social`,
+      needsPosts: hasPosts || event.audience === "internal" || org.status !== "active" ? null : calendarHref(org.id, { termin: event.eventId, reiter: "social" }),
     })),
     ...ecosystemSoon.rows.map((row) => ({ key: `e-${row.id}`, title: row.title, startsAt: row.starts_at, href: `/events#${row.id}`, ecosystem: true, needsPosts: null })),
   ];

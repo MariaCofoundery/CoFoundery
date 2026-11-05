@@ -40,6 +40,7 @@ import {
   type TaskStatus,
 } from "@/features/advisor/teamraumModel";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 /**
  * Teamraum (seit 05.11.2026): Diese Woche, Aufgaben, Wer macht was - fuer das Team der Organisation.
@@ -154,7 +155,7 @@ function dueChoices(today: string, t: (key: string) => string) {
 }
 
 /** Das Formular fuer neue und bestehende Aufgaben: das Noetige vorn, Beschreibung, Checkliste und Veranstaltung auf Wunsch. */
-async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; cancelHref?: string }) {
+async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = null }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; cancelHref?: string; defaultEventId?: string | null }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf } = helpers(ctx);
   // Ein Startup verknuepfen kann man nur mit Teams, die man sieht. Eine bestehende fremde Verknuepfung bleibt still erhalten.
@@ -165,7 +166,7 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumC
     ...ctx.members.filter((member) => !member.isSelf).map((member) => ({ value: member.userId, label: member.name })),
   ];
   const chosen = task ? task.assigneeUserIds : [ctx.me];
-  const hasMore = Boolean(task && (task.details || task.checklist.length > 0 || task.eventId || task.status !== "open"));
+  const hasMore = Boolean(defaultEventId || (task && (task.details || task.checklist.length > 0 || task.eventId || task.status !== "open")));
   return (
     <form action={saveOrgTaskAction} className="grid gap-5">
       <Hidden ctx={ctx} tab={tab} filter={filter} taskId={task?.id} />
@@ -211,7 +212,7 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumC
           <div className="grid gap-5 sm:grid-cols-2">
             <label>
               <span className={LABEL}>{t("form.event")}</span>
-              <select name="eventId" defaultValue={task?.eventId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
+              <select name="eventId" defaultValue={task?.eventId ?? defaultEventId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
                 <option value="">{t("form.noEvent")}</option>
                 {upcoming.map((event) => (
                   <option key={event.eventId} value={event.eventId}>{`${dayOf(event.startsAt.slice(0, 10))} · ${event.title}`}</option>
@@ -569,6 +570,8 @@ export type BoardOptions = {
   showDone: boolean;
   /** Nur Aufgaben zu diesem Team im Programm (Link von der Teamzeile, 05.11.2026). */
   programId?: string | null;
+  /** Neue Aufgabe zu diesem Termin (Link aus dem Panel des Termins im Kalender). */
+  eventId?: string | null;
   newOpen: boolean;
   dictateOpen: boolean;
 };
@@ -729,7 +732,7 @@ export async function TeamraumBoard({
           >
             <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-10 rounded-full bg-slate-300 md:hidden" />
             <h2 id="new-task-title" className="mb-4 text-[19px] font-bold text-slate-950">{t("board.new")}</h2>
-            <TaskForm ctx={ctx} tab="tasks" filter={filter} cancelHref={closeHref} />
+            <TaskForm ctx={ctx} tab="tasks" filter={filter} cancelHref={closeHref} defaultEventId={options.eventId ?? null} />
           </section>
         </>
       ) : null}
@@ -876,7 +879,7 @@ export async function TeamraumWeek({
           <section aria-labelledby="week-events-title" className={PANEL}>
             <h2 id="week-events-title" className={H2}>
               <span>{t("week.events")}</span>
-              <Link href={`/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "plan" }).toString()}`} className="text-[13px] font-medium text-violet-800 underline-offset-4 hover:underline">{t("week.planLink")}</Link>
+              <Link href={calendarHref(ctx.orgId)} className="text-[13px] font-medium text-violet-800 underline-offset-4 hover:underline">{t("week.planLink")}</Link>
             </h2>
             {events.length === 0 ? <p className="mt-3 text-[15px] text-slate-700">{t("week.eventsNone")}</p> : null}
             <ul>
@@ -887,7 +890,7 @@ export async function TeamraumWeek({
                     <span className="block text-[17px] font-bold leading-tight">{Number(event.startsAt.slice(8, 10))}</span>
                   </span>
                   <span className="min-w-0">
-                    <Link href={`/advisor/organisation?${new URLSearchParams({ org: ctx.orgId, tab: "plan", open: event.eventId }).toString()}`} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{event.title}</Link>
+                    <Link href={calendarHref(ctx.orgId, { termin: event.eventId })} className="block text-[15px] font-medium text-slate-950 underline-offset-4 hover:underline">{event.title}</Link>
                     <span className="mt-0.5 block text-[13px] text-slate-600">{[clock.format(new Date(event.startsAt)), event.location].filter(Boolean).join(" · ")}</span>
                   </span>
                 </li>

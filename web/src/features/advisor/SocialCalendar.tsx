@@ -21,10 +21,9 @@ import {
   type OrgPost,
 } from "@/features/advisor/socialCalendarModel";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
-import { EventPostSuggestions } from "@/features/advisor/EventPostSuggestions";
-import { PostTemplateEditor } from "@/features/advisor/PostTemplateEditor";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
+import { PostTemplateCards } from "@/features/advisor/PostTemplateCards";
 import type { PostTemplate } from "@/features/advisor/postPlanning";
-import { berlinDayOf } from "@/lib/berlinTime";
 
 /**
  * Social-Media-Kalender im Teamraum (20270319120000): Monat auf einen Blick, Postings farbig je Kanal,
@@ -51,6 +50,10 @@ export type SocialContext = {
   /** Post-Vorlagen fuer Veranstaltungen (20270324120000). */
   templates: PostTemplate[];
   channel: Channel | null;
+  /** Reiter: Kalender (Voreinstellung), Vorlagen, Kampagnen. */
+  reiter: "kalender" | "vorlagen" | "kampagnen";
+  /** Vorlage im Editor: "new" fuer eine neue, sonst die Kennung. */
+  templateEdit: string | null;
   feedback: { error: boolean; saved: boolean; deleted: boolean; created: number | null };
 };
 
@@ -77,6 +80,7 @@ function Hidden({ ctx, postId }: { ctx: SocialContext; postId?: string }) {
 
 const href = (ctx: SocialContext, extra: Record<string, string> = {}) =>
   teamraumHref("social", ctx.orgId, {
+    ...(ctx.reiter !== "kalender" ? { reiter: ctx.reiter } : {}),
     ...(ctx.view === "week" ? { view: "week", week: ctx.week } : { month: ctx.month }),
     ...(ctx.channel ? { channel: ctx.channel } : {}),
     ...extra,
@@ -225,10 +229,47 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
   const agendaDays = grid.flat().filter((cell) => cell.inMonth && ((byDay.get(cell.day)?.length ?? 0) > 0 || (eventsByDay.get(cell.day)?.length ?? 0) > 0));
   const message = ctx.feedback.error ? { tone: "rose", text: t("error") } : ctx.feedback.created !== null ? { tone: "emerald", text: t("created", { count: ctx.feedback.created }) } : ctx.feedback.saved || ctx.feedback.deleted ? { tone: "emerald", text: t("saved") } : null;
 
+  const tabs = ["kalender", "vorlagen", "kampagnen"] as const;
+  const tabHref = (tab: (typeof tabs)[number]) => teamraumHref("social", ctx.orgId, tab === "kalender" ? {} : { reiter: tab });
+
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-5">
       {message ? <p role={message.tone === "rose" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${message.tone === "rose" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
 
+
+      <div className="flex flex-wrap items-center gap-3">
+        <nav aria-label={t("tabsLabel")} className="inline-flex rounded-xl bg-[#E9EAF3] p-[3px]">
+          {tabs.map((tab) => (
+            <Link key={tab} href={tabHref(tab)} aria-current={ctx.reiter === tab ? "page" : undefined} className={`inline-flex min-h-10 items-center rounded-[9px] px-4 text-sm font-semibold ${ctx.reiter === tab ? "bg-white text-slate-950 shadow-[0_1px_3px_rgba(23,23,58,0.14)]" : "text-slate-700 hover:text-slate-950"}`}>
+              {t(`tabs.${tab}`)}
+            </Link>
+          ))}
+        </nav>
+        <span className="flex-1" />
+        {ctx.canWrite ? (
+          <>
+            <Link href={teamraumHref("social", ctx.orgId, { reiter: "vorlagen", vorlage: "neu" })} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+              {t("addTemplate")}
+            </Link>
+            <Link href={`${href({ ...ctx, reiter: "kalender" }, { newPost: ctx.today })}#post-editor`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#6D49E0] px-4 text-sm font-semibold text-white hover:bg-[#5B36D6]">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+              {t("addPost")}
+            </Link>
+          </>
+        ) : null}
+      </div>
+
+      {uncovered.length > 0 && ctx.canWrite ? (
+        <Link href={calendarHref(ctx.orgId, { termin: uncovered[0].eventId, reiter: "social" })} className="flex flex-wrap items-center gap-3 rounded-2xl bg-[#FFF4E0] px-4 py-3.5 text-[#5C3300] hover:brightness-95">
+          <span aria-hidden="true" className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[10px] bg-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></svg></span>
+          <span className="min-w-0 flex-1 text-[14.5px]"><strong>{t("noPostsBanner", { count: uncovered.length })}</strong> {uncovered.slice(0, 3).map((event) => event.title).join(", ")}</span>
+          <span className="text-[14px] font-bold text-[#7A4300]">{t("noPostsAction")} →</span>
+        </Link>
+      ) : null}
+
+      {ctx.reiter === "kalender" ? (
+        <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <p className="max-w-2xl text-[15px] leading-6 text-slate-700">{t("text")}</p>
         <div className="flex flex-wrap items-center gap-2">
@@ -263,16 +304,6 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
         ))}
         <span className="ml-2 inline-flex items-center gap-1.5 text-xs text-slate-500"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-sm bg-amber-400" />{t("eventLegend")}</span>
       </div>
-
-      {ctx.canWrite ? (
-        <details className="rounded-3xl border border-violet-200 bg-violet-50/70 p-5 sm:p-6">
-          <summary className="flex min-h-11 cursor-pointer items-center text-base font-semibold text-slate-950">{t("plan.title")}</summary>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("plan.text")}</p>
-          <div className="mt-4">
-            <PlanCampaign orgId={ctx.orgId} month={ctx.month} today={ctx.today} events={ctx.events} />
-          </div>
-        </details>
-      ) : null}
 
       {selected || newDay ? <PostEditor ctx={ctx} post={selected} newDay={newDay} newEvent={newEvent} /> : null}
 
@@ -350,32 +381,24 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
       ) : null}
       {ctx.view === "month" ? <p className="hidden text-xs text-slate-500 md:block">{t("dragHint")}</p> : null}
 
-      {/* Veranstaltungen ohne Posting: Vorschlaege nach Vorlage, erst "uebernehmen" schreibt (20270324120000). */}
-      <section id="event-posts" aria-labelledby="uncovered-title" className={`${CARD} scroll-mt-24 ${uncovered.length > 0 ? "border-amber-200" : ""}`}>
-        <h3 id="uncovered-title" className="text-[15px] font-semibold text-slate-950">{t("uncoveredTitle", { count: uncovered.length })}</h3>
-        <p className="mt-1 text-[14px] leading-6 text-slate-700">{t("suggest.intro")}</p>
-        <div className="mt-4">
-          {ctx.canWrite ? (
-            <EventPostSuggestions
-              orgId={ctx.orgId}
-              back="social"
-              today={ctx.today}
-              locale={ctx.locale}
-              events={uncovered.slice(0, 12).map((event) => ({ eventId: event.eventId, title: event.title, day: berlinDayOf(event.startsAt) }))}
-              templates={ctx.templates}
-              templatesHref="#post-templates"
-            />
-          ) : uncovered.length === 0 ? <p className="text-sm text-slate-600">{t("uncoveredNone")}</p> : null}
-        </div>
-      </section>
+        </>
+      ) : null}
 
-      <details id="post-templates" className={`${CARD} scroll-mt-24`}>
-        <summary className="flex min-h-11 cursor-pointer items-center text-[15px] font-semibold text-slate-950">{t("templates.title", { count: ctx.templates.length })}</summary>
-        <p className="mb-4 mt-1 text-[14px] leading-6 text-slate-700">{t("templates.text")}</p>
-        <PostTemplateEditor orgId={ctx.orgId} month={ctx.month} templates={ctx.templates} canWrite={ctx.canWrite} />
-      </details>
+      {ctx.reiter === "vorlagen" ? <PostTemplateCards orgId={ctx.orgId} month={ctx.month} templates={ctx.templates} canWrite={ctx.canWrite} editing={ctx.templateEdit} /> : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {ctx.reiter === "kampagnen" ? (
+        <>
+      {ctx.canWrite ? (
+        <details className="rounded-3xl border border-violet-200 bg-violet-50/70 p-5 sm:p-6">
+          <summary className="flex min-h-11 cursor-pointer items-center text-base font-semibold text-slate-950">{t("plan.title")}</summary>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("plan.text")}</p>
+          <div className="mt-4">
+            <PlanCampaign orgId={ctx.orgId} month={ctx.month} today={ctx.today} events={ctx.events} />
+          </div>
+        </details>
+      ) : null}
+
+      <div className="grid gap-6">
         <section aria-labelledby="campaigns-title" className={CARD}>
           <h3 id="campaigns-title" className="text-[15px] font-semibold text-slate-950">{t("campaignsTitle")}</h3>
           {ctx.campaigns.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("campaignsNone")}</p> : null}
@@ -399,6 +422,8 @@ export async function SocialCalendar({ ctx, selected, newDay, newEvent }: { ctx:
           <p className="mt-2 text-xs text-slate-500">{t("campaignDeleteHint")}</p>
         </section>
       </div>
+        </>
+      ) : null}
     </div>
   );
 }

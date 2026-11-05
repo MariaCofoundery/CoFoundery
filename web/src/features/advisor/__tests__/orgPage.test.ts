@@ -381,7 +381,9 @@ test("Organisation: die vierzehn Reiter stehen in drei Gruppen, jeder Reiter gen
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
   const used = [...block.matchAll(/"([a-z]+)"/g)].map((match) => match[1]).filter((key) => !["care", "content", "setup"].includes(key));
   const tabs = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"];
-  assert.deepEqual([...used].sort(), [...tabs].sort());
+  // "plan" ist seit dem 05.11.2026 der Kalender: kein Reiter mehr, die alte Adresse leitet dorthin (Beschriftungen bleiben an ihrer Stelle).
+  assert.deepEqual([...used].sort(), tabs.filter((tab) => tab !== "plan").sort());
+  assert.match(page, /if \(query\.tab === "plan"\) \{[\s\S]*redirect\(\s*calendarHref\(/);
   assert.match(page, /<OrgAreaNav/);
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
@@ -666,15 +668,18 @@ test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Vorausset
 
 test("Planen und Lernen: Termine, Unterlagen und Lernbereich sind je ein eigener Reiter mit eigener Rueckkehr", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
-  assert.match(page, /\{ key: "care", tabs: \["overview", "program", "plan", "report", "funding"\] \}/);
+  assert.match(page, /\{ key: "care", tabs: \["overview", "program", "report", "funding"\] \}/);
   assert.match(page, /\{ key: "content", tabs: \["materials", "learning", "experts"\] \}/);
   assert.match(page, /tab === "materials" && !tabOff \? \(/);
   assert.match(page, /tab === "learning" && !tabOff \? \(/);
   // Jeder Reiter liest nur seine eigenen Daten.
   assert.match(page, /tab === "materials" \? listProgramMaterials/);
   assert.match(page, /tab === "learning" \? listLearning/);
-  const plan = page.slice(page.indexOf('{tab === "plan" && !tabOff ? ('), page.indexOf('{tab === "materials" && !tabOff ? ('));
-  assert.doesNotMatch(plan, /OrgProgramMaterials|OrgProgramLearning/);
+  // Der Programmplan liegt im Kalender: Sammel-Eintrag im Panel, Formate in der Ansicht "Formate".
+  assert.doesNotMatch(page, /<OrgProgramPlan/);
+  const calendar = readFileSync("src/features/advisor/calendar/CalendarScreen.tsx", "utf8");
+  assert.match(calendar, /<EventFormats /);
+  assert.match(readFileSync("src/features/advisor/calendar/EventSheet.tsx", "utf8"), /<PlanEventList /);
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /tab=materials/);
   assert.match(actions, /tab=learning/);

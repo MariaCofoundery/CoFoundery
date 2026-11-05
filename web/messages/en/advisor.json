@@ -2177,7 +2177,27 @@
       "cancel": "Cancel",
       "daysBefore": "{count, plural, one {1 day before} other {# days before}}",
       "daysAfter": "{count, plural, one {1 day after} other {# days after}}",
-      "same": "on the day"
+      "same": "on the day",
+      "stepsLabel": "Posts",
+      "weekendNote": "If a post falls on a weekend or public holiday, the calendar suggests Friday or Monday.",
+      "channelMore": "More …"
+    },
+    "tabsLabel": "Social media",
+    "tabs": {
+      "kalender": "Calendar",
+      "vorlagen": "Templates",
+      "kampagnen": "Campaigns"
+    },
+    "addTemplate": "Template",
+    "addPost": "Post",
+    "noPostsBanner": "{count, plural, one {One event has no posts yet:} other {# events have no posts yet:}}",
+    "noPostsAction": "Apply template",
+    "cards": {
+      "default": "Standard",
+      "summary": "{count, plural, one {One post} other {# posts}} · {channels}",
+      "event": "Event",
+      "apply": "Apply to an event",
+      "newHint": "e.g. “3 posts for event y”"
     }
   },
   "setup": {
@@ -2293,11 +2313,7 @@
       "program": {
         "0": {
           "title": "My program",
-          "text": "This is where you look after the teams in the program: teams, program plan, report and – if switched on – funding requirements. At the top you switch between care, content for the teams and setup."
-        },
-        "1": {
-          "title": "Program plan",
-          "text": "Dates with format, time, place and for whom. Teams see what is meant for them and reply. You get social media suggestions and, if you like, an organization checklist in the team space."
+          "text": "This is where you look after the teams in the program: teams, report and – if switched on – funding requirements. In the sidebar on the left you move between the areas."
         }
       },
       "events": {
@@ -2305,8 +2321,120 @@
           "title": "Events",
           "text": "Dates from your program and from the startup ecosystem – facts only, with a link to the official page. Save an event with the bookmark; we check your own suggestions before they are published."
         }
+      },
+      "calendar": {
+        "0": {
+          "title": "Calendar",
+          "text": "Events, posts, task deadlines and saved events at a glance. At the top you switch layers on and off and move between month, week, list and formats."
+        },
+        "1": {
+          "title": "Click an event",
+          "text": "A click opens the event on the right: posts with “apply template”, tasks, attendance and details. “Edit” and “+ Event” open a panel – the calendar stays behind it."
+        }
       }
     },
     "findAgain": "Set everything up step by step:"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "viewLabel": "View",
+    "rangeLabel": "Period",
+    "views": {
+      "month": "Month",
+      "week": "Week",
+      "list": "List",
+      "formats": "Formats"
+    },
+    "today": "Today",
+    "prev": "Previous",
+    "next": "Next",
+    "addEvent": "Event",
+    "addMany": "Add several",
+    "orgSwitch": "Switch organization",
+    "layersLabel": "Show:",
+    "layers": {
+      "program": "Program events",
+      "post": "Posts",
+      "task": "Task deadlines",
+      "eco": "Ecosystem"
+    },
+    "layersHint": "Click an event to open it on the right. Events you saved appear from the ecosystem.",
+    "needsPosts": "{count, plural, one {One event has no posts yet:} other {# events have no posts yet:}}",
+    "needsPostsAction": "Apply template",
+    "moreCount": "+{count} more",
+    "addOn": "Add an event on {day}",
+    "agendaEmpty": "Nothing is scheduled in this period.",
+    "weekLabel": "Week {number} · {from} – {to}",
+    "internalShort": "internal",
+    "weekendWarn": "Weekend or public holiday",
+    "formatsText": "Formats are the kinds of events you run – masterclass, pitch in progress, fireside chat. Funding conditions can count by format.",
+    "disabled": {
+      "title": "The calendar is switched off",
+      "text": "The program plan is not switched on for this organization. You can switch it on under “Features”.",
+      "link": "Go to features"
+    },
+    "sheet": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "newEyebrow": "New event",
+      "editEyebrow": "Edit event",
+      "bulkEyebrow": "Several events",
+      "newTitle": "New event",
+      "editTitle": "Edit event",
+      "bulkTitle": "Several events at once",
+      "saveChanges": "Save changes"
+    },
+    "panel": {
+      "close": "Close",
+      "edit": "Edit",
+      "hostUs": "We host",
+      "hostPartner": "Hosted by a partner",
+      "noFormat": "Event",
+      "tabsLabel": "About this event",
+      "tabs": {
+        "social": "Social media",
+        "tasks": "Tasks",
+        "teams": "Attendance",
+        "details": "Details"
+      },
+      "socialInternal": "Only for your team – there are no posts for this event.",
+      "postsTitle": "{count, plural, =0 {Posts for this event} one {One post for this event} other {# posts for this event}}",
+      "manageTemplates": "Manage templates",
+      "noPosts": "No posts for this event yet.",
+      "applyTitle": "Apply template",
+      "applyText": "Choose a template – I work out the days and mark weekends and public holidays. Only “apply” turns them into posts.",
+      "noTasks": "No tasks for this event yet.",
+      "createChecklist": "Create organization checklist",
+      "taskStatus": {
+        "open": "Open",
+        "doing": "In progress",
+        "waiting": "Waiting",
+        "done": "Done"
+      },
+      "due": "due {day}",
+      "checklistProgress": "{done} of {total} done",
+      "addTask": "Task for this event",
+      "teamsInternal": "Teams do not see this event – there is no attendance.",
+      "internalNote": "Internal note · only for you",
+      "publicLabel": "Event calendar",
+      "publicNot": "not public"
+    },
+    "form": {
+      "titlePlaceholder": "What is the event called?",
+      "when": "When",
+      "audienceAll": "All teams",
+      "audienceSelected": "Selected",
+      "audienceInternal": "Only us",
+      "hostUs": "We host",
+      "hostPartner": "Partner",
+      "attached": "What is attached",
+      "checklistTitle": "Organization checklist in the team space",
+      "checklistHint": "Room, tech, catering, invitation – linked to the event",
+      "socialTitle": "Suggest social posts",
+      "socialHint": "After saving you pick a template in the event – with a note for weekends and public holidays",
+      "socialInternal": "Not for events only for your team",
+      "publicTitle": "Public in the event calendar",
+      "publicHint": "As a suggestion – facts and link only, after our approval"
+    }
   }
 }

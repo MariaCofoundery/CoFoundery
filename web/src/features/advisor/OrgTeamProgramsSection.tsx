@@ -17,6 +17,7 @@ import { TeamAvatar } from "@/features/advisor/TeamAvatar";
 import { EmptyState } from "@/features/advisor/EmptyState";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 const CARD = "advisor-card p-5 sm:p-6";
 const LABEL = "block text-sm font-semibold text-slate-900";
@@ -155,7 +156,7 @@ export async function OrgTeamProgramsSection({
                         <Link href={`/advisor/teamraum/aufgaben?${new URLSearchParams({ org: org.id, team: program.programId }).toString()}`} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">
                           {t("rowTasks", { count: activity?.openTasks ?? 0 })}
                         </Link>
-                        <Link href={`/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan" }).toString()}`} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">{t("rowDates")}</Link>
+                        <Link href={calendarHref(org.id)} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">{t("rowDates")}</Link>
                       </p>
                     ) : null}
                     {isOwner || program.isContact ? (

@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { FirstVisitTip } from "@/features/ui/FirstVisitTip";
 
-const STEP_COUNT: Record<"teamraum" | "program" | "events", number> = { teamraum: 3, program: 2, events: 1 };
+const STEP_COUNT: Record<"teamraum" | "program" | "events" | "calendar", number> = { teamraum: 3, program: 1, events: 1, calendar: 2 };
 
 /** Die Tipps beim ersten Besuch je Bereich - Texte aus advisor.setup.tips. */
 export async function AreaTips({ area }: { area: keyof typeof STEP_COUNT }) {

@@ -10,12 +10,12 @@ import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
-import { listEventCountingRequirements, listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
+import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { legacyTeamraumPath } from "@/features/advisor/teamraumRoutes";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { EventFormats } from "@/features/advisor/EventFormats";
 import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
-import { listOrgEventPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
@@ -24,7 +24,6 @@ import { OrgFeaturesForm } from "@/features/advisor/OrgFeaturesForm";
 import { hasOrgFeature, tabEnabled } from "@/features/advisor/orgFeatures";
 import { OrgProgramLearning } from "@/features/advisor/ProgramLearning";
 import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
-import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { OrgProgramOverview } from "@/features/advisor/OrgProgramOverview";
 import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
@@ -32,7 +31,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramEvents, listProgramExperts, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramExperts, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -52,7 +51,7 @@ type Tab = (typeof TABS)[number];
  * und ist jetzt nur noch dort. "Erfolge" hatte einen zweiten Schalter; er steht jetzt unter "Funktionen & Erfolge".
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "care", tabs: ["overview", "program", "plan", "report", "funding"] },
+  { key: "care", tabs: ["overview", "program", "report", "funding"] },
   { key: "content", tabs: ["materials", "learning", "experts"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
@@ -89,6 +88,18 @@ export default async function AdvisorOrganisationPage({
   if (query.tab && MOVED_TO_FOLLOW[query.tab]) redirect(MOVED_TO_FOLLOW[query.tab]);
   const teamraumPath = legacyTeamraumPath(query);
   if (teamraumPath) redirect(teamraumPath);
+  // Der Programmplan ist seit dem 05.11.2026 der Kalender. Alte Adressen (Hinweise, Lesezeichen) landen dort,
+  // mit dem geoeffneten Termin und den Rueckmeldungen von frueher.
+  if (query.tab === "plan") {
+    const open = /^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null;
+    redirect(
+      calendarHref(query.org ?? null, {
+        termin: open,
+        ...Object.fromEntries(["planSaved", "planError", "planCreated", "postsCreated", "postsError", "formatError"].filter((key) => query[key]).map((key) => [key, query[key]])),
+        ansicht: query.formatError ? "formate" : null,
+      }),
+    );
+  }
 
   const client = await createClient();
   const [roleViews, orgs] = await Promise.all([getDashboardRoleViews(user.id), getMyAdvisorOrgs(client)]);
@@ -132,8 +143,8 @@ export default async function AdvisorOrganisationPage({
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const needsPeople = tab === "learning";
-  const needsPrograms = tab === "plan" || tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
-  const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
+  const needsPrograms = tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
+  const [seatsUsed, people, programs, invites, deadlines, access, codes, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
@@ -141,7 +152,6 @@ export default async function AdvisorOrganisationPage({
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
-    tab === "plan" ? listProgramEvents(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -152,21 +162,8 @@ export default async function AdvisorOrganisationPage({
     tab === "learning" ? listModuleShares(client, org.id) : Promise.resolve([]),
   ]);
 
-  // Programmplan (20270324120000): Formate, Post-Vorlagen und wie viele Postings je Veranstaltung schon geplant sind.
-  const planExtras =
-    (tab === "plan" || tab === "features") && !tabOff
-      ? await (async () => {
-          const [formats, templates, eventPosts, requirements] = await Promise.all([
-            listEventFormats(client, org.id),
-            tab === "plan" ? listPostTemplates(client, org.id) : Promise.resolve([]),
-            tab === "plan" ? listOrgEventPosts(client, org.id) : Promise.resolve([]),
-            tab === "plan" && hasOrgFeature(org, "funding") ? listEventCountingRequirements(client, org.id) : Promise.resolve([]),
-          ]);
-          const postCounts = new Map<string, number>();
-          for (const post of eventPosts) if (post.eventId) postCounts.set(post.eventId, (postCounts.get(post.eventId) ?? 0) + 1);
-          return { formats, templates, postCounts, requirements };
-        })()
-      : null;
+  // Formate (20270324120000) stehen unter "Funktionen"; der Plan selbst ist der Kalender.
+  const planExtras = tab === "features" && !tabOff ? { formats: await listEventFormats(client, org.id) } : null;
 
   // Foerderauflagen: die gewaehlte Foerderung (sonst die juengste), ihr Stand, Nachweise und festgehaltene Staende.
   const funding = tab === "funding" && !tabOff ? await (async () => {
@@ -404,30 +401,6 @@ export default async function AdvisorOrganisationPage({
         {/* Auswertung (Feedback an Maria, 04.11.2026): Zahlen zu Veranstaltungen, Teilnahme und Gespraechen. */}
         {tab === "report" ? (
           <OrgProgramReport orgId={org.id} isOwner={org.role === "owner"} range={parseReportRange(query.from, query.to)} />
-        ) : null}
-
-        {tab === "plan" && !tabOff ? (
-          <>
-            {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
-            {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{query.planError === "audience" ? tAdvisor("teamProgram.event.errorAudience") : query.planError === "publicUrl" ? tAdvisor("teamProgram.event.errorPublicUrl") : tAdvisor("teamProgram.planError")}</p> : null}
-            <OrgProgramPlan
-              withSpeakers={hasOrgFeature(org, "experts")}
-              orgId={org.id}
-              isOwner={org.role === "owner" && org.status === "active"}
-              events={planEvents}
-              openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null}
-              formats={planExtras?.formats ?? []}
-              programChoices={programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))}
-              countingRequirements={planExtras?.requirements ?? []}
-              social={planExtras && org.status === "active" ? { templates: planExtras.templates, postCounts: planExtras.postCounts, today: new Date().toISOString().slice(0, 10) } : null}
-              feedback={{
-                created: /^\d{1,2}$/.test(query.planCreated ?? "") ? Number(query.planCreated) : null,
-                postsCreated: /^\d{1,2}$/.test(query.postsCreated ?? "") ? Number(query.postsCreated) : null,
-                postsError: query.postsError === "1",
-                formatError: query.formatError === "1",
-              }}
-            />
-          </>
         ) : null}
 
         {tab === "materials" && !tabOff ? (

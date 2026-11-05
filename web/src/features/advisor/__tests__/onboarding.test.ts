@@ -47,7 +47,8 @@ test("Termine: Fuer wen statt Art, interne nie fuer Teams, Aufgaben und Foerderu
   assert.match(form, /name="orgaTask"/);
   assert.match(form, /name="internalNote"/);
   const actions = read("src/features/advisor/teamProgramActions.ts");
-  assert.match(actions, /formData\.get\("orgaTask"\) === "yes"[\s\S]*client\.rpc\("save_org_task"[\s\S]*p_event_id: savedId/);
+  assert.match(actions, /formData\.get\("orgaTask"\) === "yes"[\s\S]*createOrgaChecklist\(client, orgId, savedId/);
+  assert.match(actions, /async function createOrgaChecklist[\s\S]*client\.rpc\("save_org_task"[\s\S]*p_event_id: eventId/);
   // Teamzeile und Teamseite fuehren zu Aufgaben und Terminen dieses Teams.
   assert.match(read("src/features/advisor/OrgTeamProgramsSection.tsx"), /\/advisor\/teamraum\/aufgaben\?\$\{new URLSearchParams\(\{ org: org\.id, team: program\.programId \}\)/);
   assert.match(read("src/app/(product)/advisor/programm/[programId]/page.tsx"), /team: programId/);

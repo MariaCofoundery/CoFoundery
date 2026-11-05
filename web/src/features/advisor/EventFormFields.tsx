@@ -3,10 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { EventAudience, EventHost, EventVenue, ProgramEvent } from "@/features/advisor/teamProgramData";
-
-const LABEL = "mb-1.5 block text-sm font-semibold text-slate-900";
-const INPUT = "min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px]";
-const HINT = "mt-1.5 block text-[13px] leading-5 text-slate-600";
+import { OptionalField, SECTION_TITLE, Segmented, Switch, TILE, TILE_INPUT, TILE_LABEL } from "@/features/ui/FormControls";
 
 type Requirement = { title: string; grantName: string; formatId: string | null; eventKind: "education" | "internal" | "external" | null };
 
@@ -21,199 +18,236 @@ function berlinParts(iso: string | null | undefined) {
   return { day: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
 }
 
-function Chips<T extends string>({ name, label, value, options, onChange }: { name: string; label: string; value: T; options: { value: T; label: string }[]; onChange: (value: T) => void }) {
-  return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-1.5">
-      <input type="hidden" name={name} value={value} />
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          aria-pressed={value === option.value}
-          onClick={() => onChange(option.value)}
-          className={`inline-flex min-h-10 items-center rounded-full border px-3.5 text-sm ${value === option.value ? "border-violet-500 bg-violet-50 font-semibold text-violet-900" : "border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-50"}`}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
+const Icon = ({ children }: { children: React.ReactNode }) => (
+  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    {children}
+  </svg>
+);
 
 /**
- * Ein Termin im Programmplan (Entwurf vom 05.11.2026, statt "Art"): Format, Zeit, Wo, Fuer wen, Pflicht,
- * Veranstalter, Hinweise fuer die Teams, eine Notiz nur fuers eigene Team - und rechts, was am Termin haengt:
- * Aufgaben im Teamraum, oeffentlich im Event-Kalender, fuer welche Foerderauflage er zaehlt.
+ * Ein Termin als Formular im Seitenpanel (Entwurf vom 05.11.2026): der Titel gross, dann Format, Wann, Wo, Fuer wen,
+ * Pflicht und Veranstalter - und "Was dranhaengt": die Orga-Checkliste im Teamraum, Posts, der Event-Kalender und die
+ * Foerderauflage, jedes einzeln zu- oder abschaltbar. Hinweise und Notizen erscheinen auf Wunsch.
  */
 export function EventFormFields({
   event,
   formats,
   programs,
   requirements,
+  defaultDay = "",
+  formatsHref = "#",
 }: {
   event?: ProgramEvent;
   formats: { formatId: string; label: string }[];
   programs: { programId: string; name: string }[];
   requirements: Requirement[];
+  /** Vorbelegter Tag, wenn man im Kalender auf einen Tag klickt. */
+  defaultDay?: string;
+  /** Wohin "+ Neues Format" fuehrt (die Formate im Kalender). */
+  formatsHref?: string;
 }) {
   const t = useTranslations("advisor.teamProgram.event");
+  const tc = useTranslations("advisor.calendar.form");
   const start = berlinParts(event?.startsAt);
   const end = berlinParts(event?.endsAt);
   const [formatId, setFormatId] = useState(event?.formatId ?? "");
   const [venue, setVenue] = useState<EventVenue>(event?.venue ?? "onsite");
   const [audience, setAudience] = useState<EventAudience>(event?.audience ?? "all");
   const [host, setHost] = useState<EventHost>(event?.host ?? "us");
-  const [mandatory, setMandatory] = useState(event?.mandatory ? "yes" : "no");
+  const [mandatory, setMandatory] = useState(Boolean(event?.mandatory));
+  const [checklist, setChecklist] = useState(false);
   const [makePublic, setMakePublic] = useState(Boolean(event?.publicStatus));
-  const kind = audience === "internal" ? "internal" : host === "partner" ? "external" : "education";
+  const [chosenTeams, setChosenTeams] = useState<string[]>(event?.programIds ?? []);
+  const internal = audience === "internal";
+  const kind = internal ? "internal" : host === "partner" ? "external" : "education";
   const counts = requirements.filter((entry) => (entry.formatId === null || entry.formatId === formatId) && (entry.eventKind === null || entry.eventKind === kind) && (entry.formatId !== null || entry.eventKind !== null));
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start">
-      <div className="grid gap-5">
-        <label className="block">
-          <span className={LABEL}>{t("title")}</span>
-          <input name="title" required maxLength={160} defaultValue={event?.title ?? ""} className={INPUT} />
-        </label>
+    <div className="grid gap-6 px-5 pb-6 pt-2 sm:px-7">
+      <label className="block">
+        <span className="sr-only">{t("title")}</span>
+        <input
+          name="title"
+          required
+          maxLength={160}
+          defaultValue={event?.title ?? ""}
+          placeholder={tc("titlePlaceholder")}
+          className="font-brand w-full border-0 border-b-2 border-slate-200 bg-transparent pb-2.5 pt-1 text-[28px] font-semibold leading-tight text-slate-950 outline-none placeholder:font-normal placeholder:text-slate-400 focus:border-violet-500"
+        />
+      </label>
 
-        <div>
-          <span className={LABEL}>{t("format")}</span>
-          <input type="hidden" name="formatId" value={formatId} />
-          <div role="group" aria-label={t("format")} className="flex flex-wrap gap-1.5">
-            {formats.map((format) => (
-              <button
-                key={format.formatId}
-                type="button"
-                aria-pressed={formatId === format.formatId}
-                onClick={() => setFormatId(formatId === format.formatId ? "" : format.formatId)}
-                className={`inline-flex min-h-10 items-center rounded-full border px-3.5 text-sm ${formatId === format.formatId ? "border-violet-500 bg-violet-50 font-semibold text-violet-900" : "border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-50"}`}
-              >
-                {format.label}
-              </button>
-            ))}
-            <a href="#formats" className="inline-flex min-h-10 items-center rounded-full border border-dashed border-violet-300 px-3.5 text-sm font-semibold text-violet-800">+ {t("newFormat")}</a>
-          </div>
+      <div className="grid gap-2.5">
+        <span className="text-[13px] font-bold text-slate-700">{t("format")}</span>
+        <input type="hidden" name="formatId" value={formatId} />
+        <div role="group" aria-label={t("format")} className="flex flex-wrap gap-2">
+          {formats.map((format) => (
+            <button
+              key={format.formatId}
+              type="button"
+              aria-pressed={formatId === format.formatId}
+              onClick={() => setFormatId(formatId === format.formatId ? "" : format.formatId)}
+              className={`inline-flex min-h-10 items-center rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold transition ${formatId === format.formatId ? "border-violet-500 bg-violet-50 text-violet-900" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+            >
+              {format.label}
+            </button>
+          ))}
+          <a href={formatsHref} className="inline-flex min-h-10 items-center rounded-full border-[1.5px] border-dashed border-violet-300 px-3.5 text-[13.5px] font-bold text-violet-800">+ {t("newFormat")}</a>
         </div>
+      </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="block">
-            <span className={LABEL}>{t("day")}</span>
-            <input type="date" name="day" required defaultValue={start.day} className={INPUT} />
+      <div className="grid gap-2.5">
+        <span className={SECTION_TITLE}>
+          <span className="text-violet-700"><Icon><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icon></span>
+          {tc("when")}
+        </span>
+        <div className="grid gap-2.5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <label className={TILE}>
+            <span className={TILE_LABEL}>{t("day")}</span>
+            <input type="date" name="day" required defaultValue={start.day || defaultDay} className={TILE_INPUT} />
           </label>
-          <label className="block">
-            <span className={LABEL}>{t("start")}</span>
-            <input type="time" name="startTime" defaultValue={start.time} className={INPUT} />
+          <label className={TILE}>
+            <span className={TILE_LABEL}>{t("start")}</span>
+            <input type="time" name="startTime" defaultValue={start.time} className={TILE_INPUT} />
           </label>
-          <label className="block">
-            <span className={LABEL}>{t("end")}</span>
-            <input type="time" name="endTime" defaultValue={end.time} className={INPUT} />
-          </label>
-        </div>
-
-        <div>
-          <span className={LABEL}>{t("where")}</span>
-          <Chips name="venue" label={t("where")} value={venue} onChange={setVenue} options={[{ value: "onsite", label: t("venue.onsite") }, { value: "online", label: t("venue.online") }, { value: "hybrid", label: t("venue.hybrid") }]} />
-          <label className="mt-2 block">
-            <span className="sr-only">{venue === "online" ? t("linkLabel") : t("placeLabel")}</span>
-            <input name="location" maxLength={200} defaultValue={event?.location ?? ""} placeholder={venue === "online" ? t("linkPlaceholder") : t("placePlaceholder")} className={INPUT} />
+          <label className={TILE}>
+            <span className={TILE_LABEL}>{t("end")}</span>
+            <input type="time" name="endTime" defaultValue={end.time} className={TILE_INPUT} />
           </label>
         </div>
+      </div>
 
-        <div>
-          <span className={LABEL}>{t("forWhom")}</span>
-          <Chips name="audience" label={t("forWhom")} value={audience} onChange={setAudience} options={[{ value: "all", label: t("audience.all") }, { value: "selected", label: t("audience.selected") }, { value: "internal", label: t("audience.internal") }]} />
-          {audience === "internal" ? <span className={HINT}>{t("internalHint")}</span> : null}
-          {audience === "selected" ? (
-            programs.length === 0 ? (
-              <span className={HINT}>{t("noTeams")}</span>
-            ) : (
-              <fieldset className="mt-2 flex flex-wrap gap-x-5">
-                <legend className="sr-only">{t("audience.selected")}</legend>
-                {programs.map((program) => (
-                  <label key={program.programId} className="inline-flex min-h-11 items-center gap-2 text-[15px] text-slate-800">
-                    <input type="checkbox" name="programId" value={program.programId} defaultChecked={event?.programIds?.includes(program.programId)} className="size-5" />
-                    {program.name}
-                  </label>
-                ))}
-              </fieldset>
-            )
-          ) : null}
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <span className={LABEL}>{t("participation")}</span>
-            <Chips name="mandatory" label={t("participation")} value={mandatory} onChange={setMandatory} options={[{ value: "yes", label: t("mandatory") }, { value: "no", label: t("optional") }]} />
-          </div>
-          <div>
-            <span className={LABEL}>{t("host")}</span>
-            <Chips name="host" label={t("host")} value={host} onChange={setHost} options={[{ value: "us", label: t("hostUs") }, { value: "partner", label: t("hostPartner") }]} />
-          </div>
-        </div>
-
-        <label className="block">
-          <span className={LABEL}>{t("notes")}</span>
-          <textarea name="notes" rows={2} maxLength={2000} defaultValue={event?.notes ?? ""} className={`${INPUT} py-2`} />
-        </label>
-        <label className="block">
-          <span className={LABEL}>{t("todos")}</span>
-          <textarea name="todos" rows={2} maxLength={2000} defaultValue={event?.todos ?? ""} className={`${INPUT} py-2`} />
-        </label>
-        <label className="block">
-          <span className={LABEL}>{t("internalNote")}</span>
-          <input name="internalNote" maxLength={2000} defaultValue={event?.internalNote ?? ""} placeholder={t("internalNotePlaceholder")} className={INPUT} />
-          <span className={HINT}>{t("internalNoteHint")}</span>
+      <div className="grid gap-2.5">
+        <span className={SECTION_TITLE}>
+          <span className="text-violet-700"><Icon><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></Icon></span>
+          {t("where")}
+        </span>
+        <Segmented name="venue" label={t("where")} value={venue} onChange={setVenue} options={[{ value: "onsite", label: t("venue.onsite") }, { value: "online", label: t("venue.online") }, { value: "hybrid", label: t("venue.hybrid") }]} />
+        <label className={TILE}>
+          <span className={TILE_LABEL}>{venue === "online" ? t("linkLabel") : t("placeLabel")}</span>
+          <input name="location" maxLength={200} defaultValue={event?.location ?? ""} placeholder={venue === "online" ? t("linkPlaceholder") : t("placePlaceholder")} className={TILE_INPUT} />
         </label>
       </div>
 
-      <div className="grid gap-3">
-        {!event ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-[15px] font-semibold text-slate-950">{t("tasksTitle")}</p>
-            <p className="mt-1 text-[13px] leading-5 text-slate-600">{t("tasksText")}</p>
-            <label className="mt-2 flex min-h-11 items-center gap-2.5 text-[14px] text-slate-800">
-              <input type="checkbox" name="orgaTask" value="yes" className="size-5" />
-              {t("tasksChecklist")}
-            </label>
-          </div>
-        ) : null}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="text-[15px] font-semibold text-slate-950">{t("socialTitle")}</p>
-          <p className="mt-1 text-[13px] leading-5 text-slate-600">{t("socialText")}</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="text-[15px] font-semibold text-slate-950">{t("publicTitle")}</p>
-          <input type="hidden" name="makePublic" value={audience === "internal" ? "no" : makePublic ? "yes" : "no"} />
-          {audience === "internal" ? (
-            <p className="mt-1 text-[13px] leading-5 text-slate-600">{t("publicInternal")}</p>
+      <div className="grid gap-2.5">
+        <span className={SECTION_TITLE}>
+          <span className="text-violet-700"><Icon><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5" /></Icon></span>
+          {t("forWhom")}
+        </span>
+        <Segmented name="audience" label={t("forWhom")} value={audience} onChange={setAudience} options={[{ value: "all", label: tc("audienceAll") }, { value: "selected", label: tc("audienceSelected") }, { value: "internal", label: tc("audienceInternal") }]} />
+        {internal ? <span className="text-[13px] leading-5 text-slate-600">{t("internalHint")}</span> : null}
+        {audience === "selected" ? (
+          programs.length === 0 ? (
+            <span className="text-[13px] leading-5 text-slate-600">{t("noTeams")}</span>
           ) : (
-            <>
-              <label className="mt-2 flex items-start gap-2.5 text-[14px] leading-5 text-slate-800">
-                <input type="checkbox" checked={makePublic} onChange={(change) => setMakePublic(change.target.checked)} className="mt-0.5 size-5 shrink-0" />
-                {t("publicCheck")}
-              </label>
+            <div role="group" aria-label={t("audience.selected")} className="flex flex-wrap gap-2">
+              {programs.map((program) => {
+                const on = chosenTeams.includes(program.programId);
+                return (
+                  <label key={program.programId} className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold ${on ? "border-violet-500 bg-violet-50 text-violet-900" : "border-slate-300 bg-white text-slate-700"}`}>
+                    <input type="checkbox" name="programId" value={program.programId} checked={on} onChange={() => setChosenTeams(on ? chosenTeams.filter((id) => id !== program.programId) : [...chosenTeams, program.programId])} className="size-4" />
+                    {program.name}
+                  </label>
+                );
+              })}
+            </div>
+          )
+        ) : null}
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="rounded-[14px] bg-[#F4F5FB]">
+            <Switch name="mandatory" label={t("mandatory")} checked={mandatory} onChange={setMandatory} />
+          </div>
+          <Segmented name="host" label={t("host")} value={host} onChange={setHost} options={[{ value: "us", label: tc("hostUs") }, { value: "partner", label: tc("hostPartner") }]} className="self-stretch" />
+        </div>
+      </div>
+
+      <div className="grid gap-2.5">
+        <span className={SECTION_TITLE}>
+          <span className="text-violet-700"><Icon><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" /><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></Icon></span>
+          {tc("attached")}
+        </span>
+        <div className="divide-y divide-slate-100 overflow-hidden rounded-[18px] border border-slate-200 bg-white">
+          {!event ? (
+            <Switch
+              name="orgaTask"
+              label={tc("checklistTitle")}
+              hint={tc("checklistHint")}
+              checked={checklist}
+              onChange={setChecklist}
+              icon={<Icon><rect x="3" y="3" width="18" height="18" rx="4" /><path d="m8 12 3 3 5-6" /></Icon>}
+            />
+          ) : null}
+          <div className="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-pink-100 text-pink-800"><Icon><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6l-6 4H4a1 1 0 0 0-1 1z" /><path d="M17 8a5 5 0 0 1 0 8" /></Icon></span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="text-[14.5px] font-semibold text-slate-950">{tc("socialTitle")}</span>
+              <span className="text-[12.5px] leading-[1.4] text-slate-600">{internal ? tc("socialInternal") : tc("socialHint")}</span>
+            </span>
+          </div>
+          {internal ? (
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-sky-100 text-sky-800"><Icon><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></Icon></span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="text-[14.5px] font-semibold text-slate-950">{t("publicTitle")}</span>
+                <span className="text-[12.5px] leading-[1.4] text-slate-600">{t("publicInternal")}</span>
+              </span>
+              <input type="hidden" name="makePublic" value="no" />
+            </div>
+          ) : (
+            <div>
+              <Switch
+                name="makePublic"
+                label={tc("publicTitle")}
+                hint={tc("publicHint")}
+                checked={makePublic}
+                onChange={setMakePublic}
+                tone="sky"
+                icon={<Icon><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></Icon>}
+              />
               {makePublic ? (
-                <label className="mt-2 block">
-                  <span className="mb-1 block text-[13px] font-semibold text-slate-900">{t("publicUrl")}</span>
-                  <input type="url" name="publicUrl" pattern="https://.+" required defaultValue={event?.publicUrl ?? ""} placeholder="https://" className={INPUT} />
+                <label className={`${TILE} mx-4 mb-3.5 ml-[4.25rem]`}>
+                  <span className={TILE_LABEL}>{t("publicUrl")}</span>
+                  <input type="url" name="publicUrl" pattern="https://.+" required defaultValue={event?.publicUrl ?? ""} placeholder="https://" className={TILE_INPUT} />
                 </label>
               ) : null}
-              {event?.publicStatus ? <p className="mt-2 text-[13px] font-semibold text-slate-700">{t(`publicStatus.${event.publicStatus}`)}</p> : null}
-            </>
+              {event?.publicStatus ? <p className="mb-3 ml-[4.25rem] text-[13px] font-semibold text-slate-700">{t(`publicStatus.${event.publicStatus}`)}</p> : null}
+            </div>
           )}
+          {requirements.length > 0 ? (
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-emerald-100 text-emerald-800"><Icon><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="m9 15 2 2 4-4" /></Icon></span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="text-[14.5px] font-semibold text-slate-950">{t("fundingTitle")}</span>
+                <span className="text-[12.5px] leading-[1.4] text-slate-600">
+                  {counts.length === 0 ? t("fundingNone") : counts.map((entry) => t("fundingCounts", { title: entry.title, grant: entry.grantName })).join(" · ")}
+                </span>
+              </span>
+            </div>
+          ) : null}
         </div>
-        {requirements.length > 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-[15px] font-semibold text-slate-950">{t("fundingTitle")}</p>
-            {counts.length === 0 ? (
-              <p className="mt-1 text-[13px] leading-5 text-slate-600">{t("fundingNone")}</p>
-            ) : (
-              <ul className="mt-1 grid gap-1 text-[13.5px] text-slate-800">
-                {counts.map((entry) => <li key={`${entry.grantName}-${entry.title}`}>{t("fundingCounts", { title: entry.title, grant: entry.grantName })}</li>)}
-              </ul>
-            )}
-          </div>
-        ) : null}
+      </div>
+
+      <div className="flex flex-wrap items-start gap-2.5">
+        <div className="contents">
+          <OptionalField label={t("notes")} startOpen={Boolean(event?.notes)}>
+            <label className={`${TILE} w-full`}>
+              <span className={TILE_LABEL}>{t("notes")}</span>
+              <textarea name="notes" rows={2} maxLength={2000} defaultValue={event?.notes ?? ""} className={`${TILE_INPUT} resize-y font-normal`} />
+            </label>
+          </OptionalField>
+          <OptionalField label={t("todos")} startOpen={Boolean(event?.todos)}>
+            <label className={`${TILE} w-full`}>
+              <span className={TILE_LABEL}>{t("todos")}</span>
+              <textarea name="todos" rows={2} maxLength={2000} defaultValue={event?.todos ?? ""} className={`${TILE_INPUT} resize-y font-normal`} />
+            </label>
+          </OptionalField>
+          <OptionalField label={t("internalNote")} startOpen={Boolean(event?.internalNote)}>
+            <label className={`${TILE} w-full bg-amber-50`}>
+              <span className="text-xs font-semibold text-amber-900">{t("internalNote")}</span>
+              <input name="internalNote" maxLength={2000} defaultValue={event?.internalNote ?? ""} placeholder={t("internalNotePlaceholder")} className={TILE_INPUT} />
+              <span className="text-xs text-amber-900">{t("internalNoteHint")}</span>
+            </label>
+          </OptionalField>
+        </div>
       </div>
     </div>
   );
