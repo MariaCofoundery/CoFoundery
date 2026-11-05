@@ -80,7 +80,7 @@ export async function getOrgNextCheckIns(client: SupabaseClient, orgId: string):
 export async function listOrgPages(client: SupabaseClient, orgId: string): Promise<OrgPageSummary[]> {
   const { data, error } = await client
     .from("advisor_org_pages")
-    .select("id, parent_id, title, is_template, event_id, created_by_user_id, updated_by_user_id, updated_at")
+    .select("id, parent_id, title, is_template, visibility, event_id, created_by_user_id, updated_by_user_id, updated_at")
     .eq("org_id", orgId)
     .order("title", { ascending: true })
     .limit(500);
@@ -91,7 +91,7 @@ export async function listOrgPages(client: SupabaseClient, orgId: string): Promi
 export async function getOrgPage(client: SupabaseClient, orgId: string, pageId: string): Promise<OrgPage | null> {
   const { data, error } = await client
     .from("advisor_org_pages")
-    .select("id, parent_id, title, body, is_template, event_id, created_by_user_id, updated_by_user_id, updated_at")
+    .select("id, parent_id, title, body, is_template, visibility, event_id, created_by_user_id, updated_by_user_id, updated_at")
     .eq("org_id", orgId)
     .eq("id", pageId)
     .maybeSingle();

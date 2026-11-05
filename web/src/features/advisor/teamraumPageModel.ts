@@ -76,6 +76,8 @@ export type OrgPageSummary = {
   parentId: string | null;
   title: string;
   isTemplate: boolean;
+  /** Seit 20270315120000: 'private' ist eine eigene Notiz - nur die Verfasserin sieht sie. */
+  visibility: "team" | "private";
   eventId: string | null;
   createdByUserId: string | null;
   updatedByUserId: string | null;
@@ -86,7 +88,8 @@ export type PageTreeEntry = OrgPageSummary & { depth: number; childCount: number
 
 /** Der Baum in Lesereihenfolge: jede Seite, darunter ihre Unterseiten, je Ebene nach Titel. Vorlagen stehen gesondert. */
 export function buildPageTree(pages: OrgPageSummary[]): PageTreeEntry[] {
-  const regular = pages.filter((page) => !page.isTemplate);
+  // Vorlagen und eigene Notizen stehen gesondert.
+  const regular = pages.filter((page) => !page.isTemplate && page.visibility === "team");
   const known = new Set(regular.map((page) => page.id));
   const childrenOf = new Map<string | null, OrgPageSummary[]>();
   for (const page of regular) {
@@ -141,6 +144,7 @@ export function pageOf(row: Record<string, unknown>): OrgPage {
     parentId: (row.parent_id as string | null) ?? null,
     title: row.title as string,
     isTemplate: row.is_template === true,
+    visibility: row.visibility === "private" ? "private" : "team",
     eventId: (row.event_id as string | null) ?? null,
     createdByUserId: (row.created_by_user_id as string | null) ?? null,
     updatedByUserId: (row.updated_by_user_id as string | null) ?? null,

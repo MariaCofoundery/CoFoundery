@@ -1554,7 +1554,14 @@
           "hint": "Access, teams, first week.",
           "body": "Welcome to the team! This helps in the first days.\n\n## Access\n[ ] Accepted the invitation to the organization\n[ ] Entered a role under “Who does what”\n\n## Get to know the teams\n[ ] Look through the teams in the program\n[ ] Become contact person for first teams\n\n## First week\n[ ] Look at the program plan\n[ ] Join the next team meeting"
         }
-      }
+      },
+      "notesLabel": "My notes",
+      "notesEmpty": "Only for you. You can share any note with the team later.",
+      "newNote": "New note",
+      "onlyYou": "Only you",
+      "noteHint": "A note of your own: only you see it – not even the lead. “Share with the team” turns it into a page for everyone on the team.",
+      "share": "Share with the team",
+      "makePrivate": "Make private again"
     }
   },
   "funding": {

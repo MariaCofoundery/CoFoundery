@@ -1554,7 +1554,14 @@
           "hint": "Zugänge, Teams, erste Woche.",
           "body": "Willkommen im Team! Das hier hilft in den ersten Tagen.\n\n## Zugänge\n[ ] Einladung in die Organisation angenommen\n[ ] Rolle unter „Wer macht was“ eingetragen\n\n## Teams kennenlernen\n[ ] Teams im Programm durchsehen\n[ ] Bezugsperson für erste Teams werden\n\n## Erste Woche\n[ ] Programmplan ansehen\n[ ] An der nächsten Teamrunde teilnehmen"
         }
-      }
+      },
+      "notesLabel": "Meine Notizen",
+      "notesEmpty": "Nur für dich. Teilen kannst du jede Notiz später mit dem Team.",
+      "newNote": "Neue Notiz",
+      "onlyYou": "Nur für dich",
+      "noteHint": "Eine eigene Notiz: Nur du siehst sie – auch nicht die Führung. Mit „Mit dem Team teilen“ wird sie eine Seite für alle im Team.",
+      "share": "Mit dem Team teilen",
+      "makePrivate": "Wieder nur für mich"
     }
   },
   "funding": {

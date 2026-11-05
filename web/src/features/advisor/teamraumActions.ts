@@ -148,6 +148,8 @@ export async function saveOrgPageAction(formData: FormData) {
     p_event_id: uuidOrNull(formData.get("eventId")),
     p_is_template: formData.get("isTemplate") === "yes",
     p_expected_updated_at: pageId && expected ? expected : null,
+    // Nur fuer neue Seiten: eine eigene Notiz ist privat (20270315120000).
+    p_visibility: formData.get("visibility") === "private" ? "private" : "team",
   });
   if (error) finish(backTo(formData, { ...(pageId ? { doc: pageId, edit: "1" } : { newDoc: "1" }), docError: pageErrorOf(error.message) }));
   finish(backTo(formData, { doc: String(data ?? pageId ?? ""), docSaved: "1" }));
@@ -184,4 +186,15 @@ export async function createTaskFromPageItemAction(formData: FormData) {
     p_text: String(formData.get("text") ?? "").slice(0, 400),
   });
   finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), ...(error ? { docError: pageErrorOf(error.message) } : { docTask: "1" }) }));
+}
+
+/** Eine eigene Notiz mit dem Team teilen - oder wieder privat machen. Nur, wer sie geschrieben hat. */
+export async function setOrgPageVisibilityAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const pageId = uuidOrNull(formData.get("pageId"));
+  const { error } = await client.rpc("set_org_page_visibility", {
+    p_page_id: pageId,
+    p_visibility: formData.get("visibility") === "private" ? "private" : "team",
+  });
+  finish(backTo(formData, { ...(pageId ? { doc: pageId } : {}), ...(error ? { docError: pageErrorOf(error.message) } : { docSaved: "1" }) }));
 }

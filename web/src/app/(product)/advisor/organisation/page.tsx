@@ -76,7 +76,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -170,6 +170,7 @@ export default async function AdvisorOrganisationPage({
     title: templatePage ? templatePage.title : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.title`) : "",
     body: templatePage ? templatePage.body : builtIn ? tAdvisor(`teamraum.pages.templates.${builtIn}.body`) : "",
     parentId: UUID.test(query.parent ?? "") ? (query.parent as string) : null,
+    isNote: query.note === "1",
   };
   const pageMode: "view" | "edit" | "new" = query.newDoc === "1" ? "new" : openPage && query.edit === "1" ? "edit" : "view";
   const teamraum: TeamraumContext | null = teamraumTab

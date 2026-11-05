@@ -325,7 +325,7 @@ export default function DatenschutzPage() {
             <p>
               Im Teamraum einer Organisation tragen ihre Mitglieder Aufgaben, Seiten, Kommentare, ihre Rolle
               im Team und Abwesenheiten mit Vertretung ein. Das sehen nur die aktiven Mitglieder
-              dieser Organisation, nie die Teams im Programm. Hängt eine Aufgabe an einem Team im
+              dieser Organisation, nie die Teams im Programm. Eigene Notizen sieht nur, wer sie schreibt – auch nicht die Führung –, bis sie mit dem Team geteilt werden. Hängt eine Aufgabe an einem Team im
               Programm, sehen den Namen des Teams nur Mitglieder, die dieses Team ohnehin betreuen.
               Endet eine Mitgliedschaft, verlieren ihre Aufgaben die Zuständigkeit und ihre Angabe zu
               Rolle und Abwesenheit wird gelöscht; mit dem Konto gehen auch die eigenen Kommentare.

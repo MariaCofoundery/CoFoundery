@@ -9,6 +9,7 @@ import {
   createTaskFromPageItemAction,
   deleteOrgPageAction,
   saveOrgPageAction,
+  setOrgPageVisibilityAction,
 } from "@/features/advisor/teamraumActions";
 import {
   BUILT_IN_TEMPLATES,
@@ -53,11 +54,13 @@ async function PageEditor({
   ctx: TeamraumContext;
   pages: OrgPageSummary[];
   page: OrgPage | null;
-  prefill: { title: string; body: string; parentId: string | null };
+  prefill: { title: string; body: string; parentId: string | null; isNote: boolean };
   feedback: PagesFeedback;
 }) {
   const t = await getTranslations("advisor.teamraum.pages");
   const { dayOf, href } = helpers(ctx);
+  // Eine eigene Notiz steht fuer sich: keine Oberseite, keine Vorlage (20270315120000).
+  const isNote = page ? page.visibility === "private" : prefill.isNote;
   const tree = buildPageTree(pages);
   const options = parentOptions(tree, page?.id ?? null, page ? subtreeHeight(tree, page.id) : 1);
   const formId = page ? `page-form-${page.id}` : "page-form-new";
@@ -74,11 +77,14 @@ async function PageEditor({
       <form id={formId} action={saveOrgPageAction} className="grid gap-4">
         <Hidden ctx={ctx} pageId={page?.id} />
         {page ? <input type="hidden" name="expected" value={page.updatedAt} /> : null}
+        {!page && isNote ? <input type="hidden" name="visibility" value="private" /> : null}
+        {isNote ? <p className="rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900">{t("noteHint")}</p> : null}
         <label className="block">
           <span className={LABEL}>{t("titleLabel")}</span>
           <input name="title" required maxLength={160} defaultValue={page?.title ?? prefill.title} className={`${INPUT} text-lg font-semibold`} />
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
+          {isNote ? <input type="hidden" name="parentId" value="" /> : (
           <label>
             <span className={LABEL}>{t("parentLabel")}</span>
             <select name="parentId" defaultValue={page?.parentId ?? prefill.parentId ?? ""} className={INPUT}>
@@ -88,6 +94,7 @@ async function PageEditor({
               ))}
             </select>
           </label>
+          )}
           <label>
             <span className={LABEL}>{t("eventLabel")}</span>
             <select name="eventId" defaultValue={page?.eventId ?? ""} className={INPUT}>
@@ -103,10 +110,12 @@ async function PageEditor({
           <textarea name="body" rows={18} maxLength={50000} defaultValue={page?.body ?? prefill.body} className={`${INPUT} py-3 leading-7`} />
           <span className="mt-1 block text-xs leading-5 text-slate-500">{t("formatHint")}</span>
         </label>
-        <label className="flex min-h-11 items-center gap-3 text-sm text-slate-800">
-          <input type="checkbox" name="isTemplate" value="yes" defaultChecked={page?.isTemplate ?? false} className="size-5" />
-          {t("isTemplate")}
-        </label>
+        {isNote ? null : (
+          <label className="flex min-h-11 items-center gap-3 text-sm text-slate-800">
+            <input type="checkbox" name="isTemplate" value="yes" defaultChecked={page?.isTemplate ?? false} className="size-5" />
+            {t("isTemplate")}
+          </label>
+        )}
         <div className="flex flex-wrap items-center gap-3">
           <SubmitButton label={t("save")} pendingLabel="…" className="brand-cta inline-flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold" />
           <Link href={page ? href("pages", { doc: page.id }) : href("pages")} className="inline-flex min-h-11 items-center px-2 text-sm text-slate-600 underline-offset-4 hover:underline">
@@ -135,7 +144,11 @@ async function PageView({ ctx, page, pages }: { ctx: TeamraumContext; page: OrgP
         <div className="flex flex-wrap gap-1.5">
           {event ? <span className={`${CHIP} bg-amber-100 text-amber-900`}>{t("belongsTo", { title: event.title, date: dayOf(event.startsAt.slice(0, 10)) })}</span> : null}
           {page.isTemplate ? <span className={`${CHIP} bg-sky-100 text-sky-800`}>{t("template")}</span> : null}
-          <span className={`${CHIP} bg-slate-100 text-slate-700`}>{t("onlyTeam")}</span>
+          {page.visibility === "private" ? (
+            <span className={`${CHIP} bg-sky-100 text-sky-900`}>{t("onlyYou")}</span>
+          ) : (
+            <span className={`${CHIP} bg-slate-100 text-slate-700`}>{t("onlyTeam")}</span>
+          )}
         </div>
         <p className="flex items-center gap-2 text-xs text-slate-500">
           {editor ? <Avatar userId={editor.userId} name={editor.name} size="h-6 w-6 text-[11px]" /> : null}
@@ -220,7 +233,20 @@ async function PageView({ ctx, page, pages }: { ctx: TeamraumContext; page: OrgP
       {ctx.canWrite ? (
         <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
           <Link href={href("pages", { doc: page.id, edit: "1" })} className="inline-flex min-h-11 items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white">{t("edit")}</Link>
-          <Link href={href("pages", { newDoc: "1", parent: page.id })} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50">{t("newChild")}</Link>
+          {page.visibility === "team" ? (
+            <Link href={href("pages", { newDoc: "1", parent: page.id })} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50">{t("newChild")}</Link>
+          ) : null}
+          {page.createdByUserId === ctx.me && (page.visibility === "private" || children.length === 0) ? (
+            <form action={setOrgPageVisibilityAction}>
+              <Hidden ctx={ctx} pageId={page.id} />
+              <input type="hidden" name="visibility" value={page.visibility === "private" ? "team" : "private"} />
+              <SubmitButton
+                label={page.visibility === "private" ? t("share") : t("makePrivate")}
+                pendingLabel="…"
+                className={page.visibility === "private" ? "brand-cta inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold" : "inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"}
+              />
+            </form>
+          ) : null}
           {page.isTemplate ? (
             <Link href={href("pages", { newDoc: "1", template: page.id })} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50">{t("useTemplate")}</Link>
           ) : null}
@@ -248,13 +274,15 @@ export async function TeamraumPages({
   pages: OrgPageSummary[];
   page: OrgPage | null;
   mode: "view" | "edit" | "new";
-  prefill: { title: string; body: string; parentId: string | null };
+  prefill: { title: string; body: string; parentId: string | null; isNote: boolean };
   feedback: PagesFeedback;
 }) {
   const t = await getTranslations("advisor.teamraum.pages");
   const { href } = helpers(ctx);
   const tree = buildPageTree(pages);
-  const templates = pages.filter((entry) => entry.isTemplate);
+  const templates = pages.filter((entry) => entry.isTemplate && entry.visibility === "team");
+  // Die Zeilensicherheit liefert nur die eigenen Notizen.
+  const notes = pages.filter((entry) => entry.visibility === "private").sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
   const message = feedback.error
     ? { tone: "rose", text: t(`errors.${["changed", "deep", "children"].includes(feedback.error) ? feedback.error : "failed"}`) }
     : feedback.saved
@@ -296,6 +324,25 @@ export async function TeamraumPages({
             ))}
           </ul>
           <div className="mt-3 border-t border-slate-100 pt-3">
+            <div className="flex items-center justify-between px-2 pb-1">
+              <p className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("notesLabel")}</p>
+              {ctx.canWrite ? (
+                <Link href={href("pages", { newDoc: "1", note: "1" })} aria-label={t("newNote")} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-base leading-none text-slate-700 hover:bg-slate-50">+</Link>
+              ) : null}
+            </div>
+            {notes.length === 0 ? <p className="px-2 pb-1 text-xs leading-5 text-slate-500">{t("notesEmpty")}</p> : null}
+            <ul className="grid gap-0.5">
+              {notes.map((entry) => (
+                <li key={entry.id}>
+                  <Link href={href("pages", { doc: entry.id })} aria-current={page?.id === entry.id ? "page" : undefined} className={`flex min-h-10 items-center gap-2 rounded-xl px-2.5 text-sm ${page?.id === entry.id ? "bg-sky-100 font-semibold text-slate-950" : "text-slate-700 hover:bg-sky-50"}`}>
+                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0 text-sky-700" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9" rx="3" /><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" /></svg>
+                    {entry.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-3 border-t border-slate-100 pt-3">
             <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("templatesLabel")}</p>
             <ul className="grid gap-0.5">
               {templates.map((entry) => (
@@ -321,7 +368,7 @@ export async function TeamraumPages({
         <div className="min-w-0 flex-1 basis-96">
           {mode === "new" || (mode === "edit" && page) ? (
             <section className={`${CARD} p-5 sm:p-7`} aria-label={mode === "new" ? t("new") : t("edit")}>
-              <h2 className="mb-4 text-xl font-semibold text-slate-950">{mode === "new" ? t("new") : t("editTitle", { title: page?.title ?? "" })}</h2>
+              <h2 className="mb-4 text-xl font-semibold text-slate-950">{mode === "new" ? (prefill.isNote ? t("newNote") : t("new")) : t("editTitle", { title: page?.title ?? "" })}</h2>
               <PageEditor ctx={ctx} pages={pages} page={mode === "edit" ? page : null} prefill={prefill} feedback={feedback} />
             </section>
           ) : page ? (

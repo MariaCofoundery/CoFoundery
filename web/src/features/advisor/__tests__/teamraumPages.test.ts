@@ -8,6 +8,7 @@ const page = (id: string, parentId: string | null, title = id, isTemplate = fals
   parentId,
   title,
   isTemplate,
+  visibility: "team",
   eventId: null,
   createdByUserId: null,
   updatedByUserId: null,
@@ -70,4 +71,17 @@ test("Seiten: nur fuer Mitglieder, niemand ueberschreibt still, Seite und Board 
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     for (const key of ["event", "meeting", "onboarding"]) assert.ok(messages.teamraum.pages.templates[key].body.includes("[ ]"), `${locale} ${key}`);
   }
+});
+
+test("Eigene Notizen: privat in der Datenbank, gesondert im Baum, teilen nur durch die Verfasserin", () => {
+  const sql = readFileSync("../supabase/migrations/20270315120000_org_private_notes.sql", "utf8");
+  assert.match(sql, /and \(visibility = 'team' or created_by_user_id = auth\.uid\(\)\)/);
+  assert.match(sql, /v_page\.created_by_user_id is distinct from auth\.uid\(\)/);
+  // Auch die Fuehrung loescht eine fremde Notiz nicht.
+  assert.match(sql, /v_page\.visibility = 'team' and public\.is_advisor_org_owner_of/);
+  const tree = buildPageTree([page("n", null, "Notiz"), { ...page("p", null, "Privat"), visibility: "private" }]);
+  assert.deepEqual(tree.map((entry) => entry.id), ["n"]);
+  const ui = readFileSync("src/features/advisor/TeamraumPages.tsx", "utf8");
+  assert.match(ui, /page\.createdByUserId === ctx\.me && \(page\.visibility === "private" \|\| children\.length === 0\)/);
+  assert.match(readFileSync("src/app/datenschutz/page.tsx", "utf8"), /Eigene Notizen sieht nur, wer sie schreibt/);
 });
