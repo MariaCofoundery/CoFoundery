@@ -86,5 +86,6 @@
   "admin": "Admin",
   "adminAttention": "{count} open in the admin area",
   "alignProgram": "Program",
-  "advisorMyProgram": "My program"
+  "advisorMyProgram": "My program",
+  "advisorChatUnread": "{count, plural, one {One unread message in the team space} other {# unread messages in the team space}}"
 }

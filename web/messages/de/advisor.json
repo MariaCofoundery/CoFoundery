@@ -1597,6 +1597,24 @@
         "title": "Heute fällig",
         "body": "Eine deiner Aufgaben im Teamraum ist heute fällig."
       }
+    },
+    "views": {
+      "label": "Ansicht",
+      "board": "Board",
+      "list": "Liste",
+      "calendar": "Kalender"
+    },
+    "list": {
+      "task": "Aufgabe",
+      "done": "{count, plural, one {Eine erledigte Aufgabe} other {# erledigte Aufgaben}}"
+    },
+    "calendar": {
+      "monthNav": "Monat wählen",
+      "prev": "Voriger Monat",
+      "next": "Nächster Monat",
+      "dragHint": "Aufgaben auf einen anderen Tag ziehen, um die Fälligkeit zu ändern.",
+      "undated": "Ohne Datum ({count})",
+      "undatedHint": "Auf einen Tag im Kalender ziehen, um ein Datum zu setzen."
     }
   },
   "funding": {
@@ -1738,7 +1756,7 @@
   },
   "chat": {
     "listTitle": "Chat",
-    "listText": "Schreibt euch im Team – im Teamchat für alle oder direkt zu zweit. Nur euer Team liest mit, nie die Startups.",
+    "listText": "Schreibt euch im Team – im Teamchat für alle, in eigenen Gruppen oder direkt zu zweit. Nur euer Team liest mit, nie die Startups.",
     "teamTitle": "Teamchat",
     "teamSubtitle": "{org} · {count, plural, one {# Mitglied} other {# Mitglieder}}",
     "openTeam": "Teamchat öffnen",
@@ -1767,8 +1785,33 @@
     "push": {
       "teamTitle": "Neue Nachricht im Teamchat",
       "directTitle": "Neue Nachricht von {name}",
-      "body": "Öffne den Chat, um sie zu lesen."
-    }
+      "body": "Öffne den Chat, um sie zu lesen.",
+      "groupTitle": "Neue Nachricht in {name}"
+    },
+    "searchLabel": "Chats durchsuchen",
+    "searchPlaceholder": "In allen deinen Chats suchen …",
+    "search": "Suchen",
+    "searchResults": "{count, plural, =0 {Kein Treffer} one {Ein Treffer} other {# Treffer}} für „{query}“",
+    "searchNone": "Nichts gefunden – nur Chats, in denen du bist, werden durchsucht.",
+    "newGroup": "Neue Gruppe",
+    "groupName": "Name der Gruppe",
+    "groupNamePlaceholder": "z. B. Demo-Day-Orga",
+    "groupMembers": "Wer ist dabei",
+    "groupYouAreIn": "Du bist automatisch dabei.",
+    "groupCreate": "Gruppe anlegen",
+    "groupManage": "Gruppe bearbeiten",
+    "groupInfo": "Gruppe",
+    "groupSave": "Speichern",
+    "groupLeave": "Gruppe verlassen",
+    "groupSaved": "Gruppe gespeichert.",
+    "groupError": "Das hat nicht geklappt. Bitte prüfe den Namen.",
+    "attach": "Bild oder Datei anhängen",
+    "removeFile": "Entfernen",
+    "errorFileType": "Diese Dateiart geht hier nicht – Bilder, PDF, Word, Excel, PowerPoint, Text und CSV gehen.",
+    "errorFileSize": "Die Datei ist größer als 10 MB.",
+    "errorUpload": "Die Datei konnte nicht hochgeladen werden. Bitte versuch es noch einmal.",
+    "react": "Mit {emoji} reagieren",
+    "reactionCount": "{emoji} {count}"
   },
   "social": {
     "title": "Social Media",
@@ -1843,6 +1886,13 @@
       "include": "Übernehmen",
       "create": "{count, plural, one {Freigeben: ein Posting eintragen} other {Freigeben: # Postings eintragen}}",
       "discard": "Verwerfen"
-    }
+    },
+    "viewLabel": "Ansicht",
+    "views": {
+      "month": "Monat",
+      "week": "Woche"
+    },
+    "weekLabel": "KW {number} · {from} – {to}",
+    "dragHint": "Postings auf einen anderen Tag ziehen, um sie zu verschieben."
   }
 }

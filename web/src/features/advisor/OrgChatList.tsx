@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { openOrgChatAction } from "@/features/advisor/orgChatActions";
+import { createOrgChatGroupAction, openOrgChatAction } from "@/features/advisor/orgChatActions";
+import type { ChatSearchHit } from "@/features/advisor/orgChatData";
 import { QuietQuickSwitch } from "@/features/notifications/QuietQuickSwitch";
 import type { QuietHours } from "@/features/notifications/QuietHoursSection";
 import type { ChatSummary } from "@/features/advisor/orgChatModel";
@@ -15,6 +16,8 @@ export async function OrgChatList({
   quiet,
   canWrite,
   locale,
+  query = "",
+  hits = [],
 }: {
   orgId: string;
   me: string;
@@ -23,12 +26,19 @@ export async function OrgChatList({
   quiet: QuietHours;
   canWrite: boolean;
   locale: string;
+  query?: string;
+  hits?: ChatSearchHit[];
 }) {
   const t = await getTranslations("advisor.chat");
   const nameOf = (userId: string | null) => members.find((member) => member.userId === userId)?.name ?? t("formerMember");
   const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
   const team = chats.find((chat) => chat.kind === "team") ?? null;
   const directs = chats.filter((chat) => chat.kind === "direct");
+  const groups = chats.filter((chat) => chat.kind === "group");
+  const chatTitle = (chatId: string) => {
+    const chat = chats.find((entry) => entry.chatId === chatId);
+    return !chat ? "" : chat.kind === "team" ? t("teamTitle") : chat.kind === "group" ? chat.name ?? "" : nameOf(chat.otherUserId);
+  };
   const withChat = new Set(directs.map((chat) => chat.otherUserId));
   const startable = members.filter((member) => member.userId !== me && !withChat.has(member.userId));
   const href = (chatId: string) => `/advisor/organisation/chat?${new URLSearchParams({ org: orgId, chat: chatId }).toString()}`;
@@ -61,6 +71,35 @@ export async function OrgChatList({
       </div>
       {quiet.quietNow ? <p role="status" className="rounded-xl bg-sky-50 px-4 py-2.5 text-sm text-sky-900">{t("quietNow")}</p> : null}
 
+      <form role="search" method="get" action="/advisor/organisation" className="flex gap-2">
+        <input type="hidden" name="org" value={orgId} />
+        <input type="hidden" name="tab" value="chat" />
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">{t("searchLabel")}</span>
+          <input type="search" name="q" defaultValue={query} minLength={2} maxLength={100} placeholder={t("searchPlaceholder")} className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />
+        </label>
+        <button type="submit" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700">{t("search")}</button>
+      </form>
+      {query.trim().length >= 2 ? (
+        <section aria-labelledby="chat-search-title" className="advisor-card p-4">
+          <h3 id="chat-search-title" className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("searchResults", { count: hits.length, query })}</h3>
+          {hits.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("searchNone")}</p> : null}
+          <ul className="mt-2 divide-y divide-slate-100">
+            {hits.map((hit) => (
+              <li key={hit.messageId} className="py-2">
+                <Link href={href(hit.chatId)} className="block rounded-lg px-1 py-1 hover:bg-violet-50/60">
+                  <span className="flex items-baseline justify-between gap-2 text-xs text-slate-500">
+                    <span className="truncate font-semibold text-slate-700">{chatTitle(hit.chatId)} · {hit.authorUserId === me ? t("you") : nameOf(hit.authorUserId)}</span>
+                    <span className="shrink-0">{when.format(new Date(hit.createdAt))}</span>
+                  </span>
+                  <span className="mt-0.5 block text-sm text-slate-800">{hit.body || (hit.attachmentName ? `📎 ${hit.attachmentName}` : "")}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <ul className="advisor-card divide-y divide-slate-100 overflow-hidden p-0">
         <li>
           {team ? (
@@ -72,12 +111,43 @@ export async function OrgChatList({
             </form>
           ) : null}
         </li>
+        {groups.map((chat) => (
+          <li key={chat.chatId}>
+            <Row chat={chat} title={chat.name ?? ""} avatar={(chat.name?.trim()[0] ?? "#").toUpperCase()} />
+          </li>
+        ))}
         {directs.map((chat) => (
           <li key={chat.chatId}>
             <Row chat={chat} title={nameOf(chat.otherUserId)} avatar={(nameOf(chat.otherUserId).trim()[0] ?? "?").toUpperCase()} />
           </li>
         ))}
       </ul>
+
+      {canWrite && members.length > 1 ? (
+        <details className="advisor-card p-4">
+          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-violet-800">+ {t("newGroup")}</summary>
+          <form action={createOrgChatGroupAction} className="mt-3 grid gap-3">
+            <input type="hidden" name="orgId" value={orgId} />
+            <label className="block max-w-sm">
+              <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupName")}</span>
+              <input name="name" required maxLength={80} placeholder={t("groupNamePlaceholder")} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm" />
+            </label>
+            <fieldset>
+              <legend className="text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("groupMembers")}</legend>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {members.filter((member) => member.userId !== me).map((member) => (
+                  <label key={member.userId} className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm has-[:checked]:border-violet-300 has-[:checked]:bg-violet-50">
+                    <input type="checkbox" name="member" value={member.userId} className="size-4" />
+                    {member.name}
+                  </label>
+                ))}
+              </div>
+              <p className="mt-1 text-xs text-slate-500">{t("groupYouAreIn")}</p>
+            </fieldset>
+            <SubmitButton label={t("groupCreate")} pendingLabel="…" className="brand-cta inline-flex min-h-11 w-fit items-center rounded-xl px-5 text-sm font-semibold" />
+          </form>
+        </details>
+      ) : null}
 
       {canWrite && startable.length > 0 ? (
         <section aria-labelledby="chat-new-title">

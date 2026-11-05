@@ -45,7 +45,7 @@ select extensions.is((select count(*)::int from public.advisor_org_chat_messages
 select extensions.is((select unread from public.list_my_org_chats('e8000000-0000-4000-8000-0000000000a0') where kind = 'team'), 1, 'one unread message');
 select public.mark_org_chat_read((select id from ids where key = 'team'));
 select extensions.is((select unread from public.list_my_org_chats('e8000000-0000-4000-8000-0000000000a0') where kind = 'team'), 0, 'read is read');
-select extensions.is(public.retract_org_chat_message((select id from ids where key = 'm1')), false, 'nobody withdraws a message of someone else');
+select extensions.is(public.retract_org_chat_message((select id from ids where key = 'm1')), null, 'nobody withdraws a message of someone else');
 set local request.jwt.claims = '{"sub":"e8000000-0000-4000-8000-000000000004","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.advisor_org_chat_messages) + (select count(*)::int from public.advisor_org_chats), 0, 'a founder in the program sees no chat');
 select extensions.throws_ok($$select public.send_org_chat_message((select id from ids where key = 'team'), 'Hallo')$$, '42501', 'org_chat_not_yours', 'and cannot write into it');
@@ -54,7 +54,7 @@ select extensions.throws_ok($$insert into public.advisor_org_chat_messages(chat_
 
 -- Zuruecknehmen: der Text ist weg.
 set local request.jwt.claims = '{"sub":"e8000000-0000-4000-8000-000000000001","role":"authenticated"}';
-select extensions.is(public.retract_org_chat_message((select id from ids where key = 'm1')), true, 'the writer withdraws a message');
+select extensions.is(public.retract_org_chat_message((select id from ids where key = 'm1')), '', 'the writer withdraws a message (no file to remove)');
 select extensions.is((select body from public.advisor_org_chat_messages where id = (select id from ids where key = 'm1')), '', 'and its text is gone');
 
 -- Mitgliedschaft endet: kein Lesen mehr, kein Schreiben in den Direktchat.

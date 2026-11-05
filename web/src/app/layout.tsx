@@ -158,6 +158,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { isPlatformAdmin, adminAttentionCount } = await adminState;
   // "Programm" steht im Menue nur, wenn ein eigenes Team in einem Programm ist oder dazu eingeladen
   // wurde (seit 04.11.2026). Den Programmcode traegt man sonst ueber die Teamseite ein.
+  // Teamraum-Chat (20270321120000): ungelesene Nachrichten fuer den Menuepunkt "Organisation".
+  const advisorChatUnread = user && roleViews.hasAdvisor
+    ? await Promise.resolve(supabase.rpc("count_my_unread_org_chats"))
+        .then(({ data }) => (typeof data === "number" ? data : 0))
+        .catch(() => 0)
+    : 0;
   const hasTeamProgram = user
     ? await Promise.resolve(supabase.rpc("get_my_team_programs"))
         .then(({ data }) => Array.isArray(data) && data.length > 0)
@@ -186,6 +192,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             hasTeamProgram={hasTeamProgram}
+            advisorChatUnread={advisorChatUnread}
             displayName={displayName}
             avatarId={profileImage.avatarId}
             avatarImageUrl={profileImage.imageUrl}

@@ -66,6 +66,29 @@ async function deleteOwnedImageObjects(
   return !removal.error;
 }
 
+/**
+ * Anhaenge aus dem Teamraum-Chat (20270321120000): <person>/<organisation>/<chat>/<datei>. Drei Ebenen
+ * tief - `list` zeigt je Aufruf nur eine. Gibt false zurueck, wenn der Speicher etwas nicht bestaetigt.
+ */
+async function deleteOwnedChatFiles(privileged: NonNullable<ReturnType<typeof createPrivilegedClient>>, userId: string) {
+  const bucket = privileged.storage.from("org-chat-files");
+  const { data: orgs, error } = await bucket.list(userId, { limit: 1000 });
+  if (error) return false;
+  const paths: string[] = [];
+  for (const org of orgs ?? []) {
+    const { data: chats, error: chatError } = await bucket.list(`${userId}/${org.name}`, { limit: 1000 });
+    if (chatError) return false;
+    for (const chat of chats ?? []) {
+      const { data: files, error: fileError } = await bucket.list(`${userId}/${org.name}/${chat.name}`, { limit: 1000 });
+      if (fileError) return false;
+      for (const file of files ?? []) if (file.id) paths.push(`${userId}/${org.name}/${chat.name}/${file.name}`);
+    }
+  }
+  if (paths.length === 0) return true;
+  const removal = await bucket.remove(paths);
+  return !removal.error;
+}
+
 export async function deleteFounderAccount(
   userId: string,
   keep: { problems: boolean; approaches: boolean } = { problems: false, approaches: false }
@@ -80,7 +103,8 @@ export async function deleteFounderAccount(
   // if Storage cannot confirm the deletion.
   const avatarCleanup = await deleteOwnedImageObjects(privileged, "avatars", userId);
   const connectPhotoCleanup = await deleteOwnedImageObjects(privileged, "network-profile-images", userId);
-  if (!avatarCleanup || !connectPhotoCleanup) {
+  const chatFileCleanup = await deleteOwnedChatFiles(privileged, userId);
+  if (!avatarCleanup || !connectPhotoCleanup || !chatFileCleanup) {
     console.error("deleteFounderAccount avatar cleanup failed");
     return { ok: false, error: "cleanup_failed" };
   }

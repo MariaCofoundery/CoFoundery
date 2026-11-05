@@ -53,7 +53,7 @@ test("jede ausgenommene Bildroute prueft Anmeldung und Freigabe selbst", () => {
     assert.match(code, /auth\.getUser\(\)/, `${route}: prueft keine Anmeldung`);
     assert.match(
       code,
-      /rpc\("(can_read_member_photo|is_network_member|can_read_network_profile_photo)"/,
+      /rpc\("(can_read_member_photo|is_network_member|can_read_network_profile_photo|can_read_org_chat)"/,
       `${route}: prueft keine Freigabe`
     );
   }

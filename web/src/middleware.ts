@@ -20,9 +20,10 @@ export const config = {
      *
      * Ausgenommen sind deshalb genau diese drei, das oeffentliche Logo der
      * Programmseite (`api/program-logo/`, es prueft selbst, ob die Seite veroeffentlicht
-     * ist) und die ueblichen statischen Pfade. Alles andere - jede Seite, jeder Auth-Weg - laeuft weiter
+     * ist), die Anhaenge im Teamraum-Chat (`api/org-chat-file/`, getUser plus
+     * can_read_org_chat) und die ueblichen statischen Pfade. Alles andere - jede Seite, jeder Auth-Weg - laeuft weiter
      * durch.
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/profile/photo/|api/connect/photos/|api/connect/venture-logos/|api/program-logo/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/profile/photo/|api/connect/photos/|api/connect/venture-logos/|api/program-logo/|api/org-chat-file/).*)",
   ],
 };

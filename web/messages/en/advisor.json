@@ -1597,6 +1597,24 @@
         "title": "Due today",
         "body": "One of your tasks in the team space is due today."
       }
+    },
+    "views": {
+      "label": "View",
+      "board": "Board",
+      "list": "List",
+      "calendar": "Calendar"
+    },
+    "list": {
+      "task": "Task",
+      "done": "{count, plural, one {One done task} other {# done tasks}}"
+    },
+    "calendar": {
+      "monthNav": "Choose month",
+      "prev": "Previous month",
+      "next": "Next month",
+      "dragHint": "Drag tasks to another day to change the due date.",
+      "undated": "Without a date ({count})",
+      "undatedHint": "Drag onto a day in the calendar to set a date."
     }
   },
   "funding": {
@@ -1738,7 +1756,7 @@
   },
   "chat": {
     "listTitle": "Chat",
-    "listText": "Write to each other – in the team chat for everyone or directly one to one. Only your team reads along, never the startups.",
+    "listText": "Write to each other – in the team chat for everyone, in your own groups or directly one to one. Only your team reads along, never the startups.",
     "teamTitle": "Team chat",
     "teamSubtitle": "{org} · {count, plural, one {# member} other {# members}}",
     "openTeam": "Open team chat",
@@ -1767,8 +1785,33 @@
     "push": {
       "teamTitle": "New message in the team chat",
       "directTitle": "New message from {name}",
-      "body": "Open the chat to read it."
-    }
+      "body": "Open the chat to read it.",
+      "groupTitle": "New message in {name}"
+    },
+    "searchLabel": "Search chats",
+    "searchPlaceholder": "Search all your chats …",
+    "search": "Search",
+    "searchResults": "{count, plural, =0 {No result} one {One result} other {# results}} for “{query}”",
+    "searchNone": "Nothing found – only chats you are in are searched.",
+    "newGroup": "New group",
+    "groupName": "Group name",
+    "groupNamePlaceholder": "e.g. Demo Day planning",
+    "groupMembers": "Who is in",
+    "groupYouAreIn": "You are in automatically.",
+    "groupCreate": "Create group",
+    "groupManage": "Edit group",
+    "groupInfo": "Group",
+    "groupSave": "Save",
+    "groupLeave": "Leave group",
+    "groupSaved": "Group saved.",
+    "groupError": "That did not work. Please check the name.",
+    "attach": "Attach image or file",
+    "removeFile": "Remove",
+    "errorFileType": "This file type does not work here – images, PDF, Word, Excel, PowerPoint, text and CSV do.",
+    "errorFileSize": "The file is larger than 10 MB.",
+    "errorUpload": "The file could not be uploaded. Please try again.",
+    "react": "React with {emoji}",
+    "reactionCount": "{emoji} {count}"
   },
   "social": {
     "title": "Social media",
@@ -1843,6 +1886,13 @@
       "include": "Include",
       "create": "{count, plural, one {Approve: add one post} other {Approve: add # posts}}",
       "discard": "Discard"
-    }
+    },
+    "viewLabel": "View",
+    "views": {
+      "month": "Month",
+      "week": "Week"
+    },
+    "weekLabel": "Week {number} · {from} – {to}",
+    "dragHint": "Drag posts to another day to move them."
   }
 }

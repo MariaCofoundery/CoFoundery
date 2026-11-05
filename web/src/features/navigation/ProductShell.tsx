@@ -36,6 +36,8 @@ type Props = {
   hasConnectAccount: boolean;
   /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
   hasTeamProgram?: boolean;
+  /** Ungelesene Nachrichten im Teamraum-Chat (alle eigenen Chats, stummgeschaltete nicht). */
+  advisorChatUnread?: number;
   displayName: string | null;
   avatarId?: string | null;
   avatarImageUrl?: string | null;
@@ -60,7 +62,7 @@ type Props = {
  * gezaehlt werden - Vorstellungsanfragen bei Find, Kontaktanfragen und
  * ungelesene Nachrichten bei Connect.
  */
-type AreaBadge = { kind: "intro" | "attention" | "suggestions"; count: number };
+type AreaBadge = { kind: "intro" | "attention" | "suggestions" | "chat"; count: number };
 
 type NavigationItem = {
   href: string;
@@ -281,6 +283,7 @@ export function ProductShell({
   hasConnect,
   hasConnectAccount,
   hasTeamProgram = false,
+  advisorChatUnread = 0,
   displayName,
   avatarId = null,
   avatarImageUrl = null,
@@ -515,6 +518,7 @@ export function ProductShell({
     {
       href: "/advisor/organisation",
       label: advisorOrgLabel,
+      badge: advisorChatUnread > 0 ? { kind: "chat", count: advisorChatUnread } : undefined,
       // Die Seiten eines Teams im Programm erreicht man ueber die Organisation.
       isActive: (currentPathname) => currentPathname === "/advisor/organisation" || currentPathname.startsWith("/advisor/programm/") || currentPathname === "/advisor/beispiel",
     },
@@ -671,6 +675,10 @@ export function ProductShell({
     const extraBadge = extra ? areaBadge(extra) : null;
     if (badge.kind === "suggestions") {
       return <NewSuggestionsBadge count={badge.count} label={tConnect("mine.suggestionCount", { count: badge.count })} />;
+    }
+    if (badge.kind === "chat") {
+      // Lila wie die Vorschlaege: Eine Nachricht im Team wartet nicht wie eine Anfrage, sie soll bemerkt werden.
+      return <NewSuggestionsBadge count={badge.count} label={t("advisorChatUnread", { count: badge.count })} />;
     }
     const main = badge.kind === "intro" ? (
       <IncomingRequestBadge count={badge.count} />

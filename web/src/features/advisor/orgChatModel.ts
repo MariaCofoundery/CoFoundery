@@ -2,10 +2,31 @@
  * Teamraum-Chat (20270318120000): reine Typen und Umformungen - fuer Server und Browser.
  */
 
-export type ChatMessage = { id: string; chatId: string; authorUserId: string; body: string; createdAt: string; retracted: boolean };
+export type ChatAttachment = { name: string; type: string; size: number; isImage: boolean };
+export type ChatMessage = { id: string; chatId: string; authorUserId: string; body: string; createdAt: string; retracted: boolean; attachment: ChatAttachment | null };
+export type ChatReaction = { messageId: string; userId: string; emoji: string };
+/** Die feste Auswahl - dieselbe wie advisor_org_chat_reactions_emoji (20270321120000). */
+export const REACTIONS = ["👍", "❤️", "😂", "🎉", "🙏", "👀"] as const;
+/** Was hochgeladen werden darf - dieselbe Liste wie der Speicher org-chat-files. */
+export const ATTACHMENT_TYPES = [
+  "image/jpeg", "image/png", "image/webp", "image/gif", "image/heic",
+  "application/pdf", "text/plain", "text/csv",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+] as const;
+export const ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
+/** Ein Dateiname fuer den Speicherpfad: nur sichere Zeichen, Endung bleibt. */
+export function safeFileName(name: string) {
+  const cleaned = name.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w.-]+/g, "-").replace(/\.{2,}/g, ".").replace(/-+/g, "-").replace(/^[-.]+/, "").slice(-120);
+  return cleaned || "datei";
+}
 export type ChatSummary = {
   chatId: string;
-  kind: "team" | "direct";
+  kind: "team" | "direct" | "group";
+  name: string | null;
+  memberCount: number | null;
+  createdByUserId: string | null;
   otherUserId: string | null;
   lastMessageAt: string | null;
   lastBody: string | null;
@@ -22,6 +43,15 @@ export function messageOf(row: Record<string, unknown>): ChatMessage {
     body: typeof row.body === "string" ? row.body : "",
     createdAt: row.created_at as string,
     retracted: row.retracted_at !== null && row.retracted_at !== undefined,
+    attachment:
+      typeof row.attachment_path === "string" && row.attachment_path
+        ? {
+            name: String(row.attachment_name ?? ""),
+            type: String(row.attachment_type ?? ""),
+            size: Number(row.attachment_size ?? 0),
+            isImage: String(row.attachment_type ?? "").startsWith("image/"),
+          }
+        : null,
   };
 }
 

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dayBreaks, mergeMessages, startsGroup, type ChatMessage } from "@/features/advisor/orgChatModel";
 
-const msg = (id: string, createdAt: string, authorUserId = "a", body = "x"): ChatMessage => ({ id, chatId: "c", authorUserId, body, createdAt, retracted: false });
+const msg = (id: string, createdAt: string, authorUserId = "a", body = "x"): ChatMessage => ({ id, chatId: "c", authorUserId, body, createdAt, retracted: false, attachment: null });
 
 test("Chat: Nachrichten ohne Doppelte, zeitlich geordnet, Zuruecknahme ersetzt", () => {
   const merged = mergeMessages([msg("2", "2026-11-05T10:01:00Z"), msg("1", "2026-11-05T10:00:00Z")], [msg("3", "2026-11-05T10:02:00Z"), { ...msg("2", "2026-11-05T10:01:00Z"), body: "", retracted: true }]);
@@ -37,4 +37,27 @@ test("Chat: nur Mitglieder, Echtzeit mit Zeilensicherheit, Mitteilung ohne Text,
   const exported = readFileSync("src/features/account/accountExport.ts", "utf8");
   assert.match(exported, /table: "advisor_org_chat_messages", column: "author_user_id"/);
   assert.match(readFileSync("src/app/datenschutz/page.tsx", "utf8"), /Im Chat des Teamraums/);
+});
+
+test("Chat Stufe 2: Dateinamen sicher, Anhaenge nur ueber die geprueften Wege, Kontoloeschung raeumt auf", async () => {
+  const { safeFileName, ATTACHMENT_TYPES, REACTIONS } = await import("@/features/advisor/orgChatModel");
+  assert.equal(safeFileName("Prüfung Q4 / ../Plan.pdf"), "Prufung-Q4-.-Plan.pdf");
+  assert.doesNotMatch(safeFileName("../../etc/passwd"), /\/|\.\./);
+  assert.equal(safeFileName("..."), "datei");
+  const sql = readFileSync("../supabase/migrations/20270321120000_org_chat_extras.sql", "utf8");
+  // Dieselben Listen in Datenbank und App.
+  for (const type of ATTACHMENT_TYPES) assert.ok(sql.includes(`'${type}'`), type);
+  for (const emoji of REACTIONS) assert.ok(sql.includes(`'${emoji}'`), emoji);
+  assert.match(sql, /<> auth\.uid\(\)::text \|\| '\/' \|\| v_chat\.org_id::text \|\| '\/' \|\| p_chat_id::text/);
+  const route = readFileSync("src/app/api/org-chat-file/[messageId]/route.ts", "utf8");
+  // Erst die normale Abfrage (Zeilensicherheit), dann der Dienstschluessel.
+  assert.ok(route.indexOf('from("advisor_org_chat_messages")') < route.indexOf("orgChatStorageClient()"));
+  assert.match(route, /createSignedUrl\(row\.attachment_path, 60/);
+  const actions = readFileSync("src/features/advisor/orgChatActions.ts", "utf8");
+  const prepare = actions.slice(actions.indexOf("export async function prepareOrgChatUpload"));
+  assert.ok(prepare.indexOf('rpc("can_write_org_chat"') < prepare.indexOf("createSignedUploadUrl"));
+  const deletion = readFileSync("src/features/account/deleteFounderAccount.ts", "utf8");
+  assert.match(deletion, /const chatFileCleanup = await deleteOwnedChatFiles\(privileged, userId\);/);
+  const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
+  assert.match(shell, /badge: advisorChatUnread > 0 \? \{ kind: "chat", count: advisorChatUnread \} : undefined/);
 });

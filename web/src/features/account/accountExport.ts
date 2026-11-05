@@ -66,6 +66,10 @@ const EXPORTED_TABLES = [
   // Teamraum-Chat (seit 20270318120000): eigene Nachrichten und Gelesen-Staende.
   { table: "advisor_org_chat_messages", column: "author_user_id" },
   { table: "advisor_org_chat_reads", column: "user_id" },
+  // Chat Stufe 2 (seit 20270321120000): eigene Reaktionen, Gruppenmitgliedschaften, angelegte Gruppen.
+  { table: "advisor_org_chat_reactions", column: "user_id" },
+  { table: "advisor_org_chat_members", column: "user_id" },
+  { table: "advisor_org_chats", column: "created_by_user_id" },
   // Social-Media-Kalender (seit 20270319120000): angelegte Postings und Kampagnen.
   { table: "advisor_org_posts", column: "created_by_user_id" },
   { table: "advisor_org_campaigns", column: "created_by_user_id" },

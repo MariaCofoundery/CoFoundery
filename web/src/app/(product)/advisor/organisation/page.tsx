@@ -9,15 +9,15 @@ import { readOrgErrorCode } from "@/features/advisor/orgErrors";
 import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
-import { TeamraumBoard, TeamraumWeek, TeamraumWho, type TeamraumContext } from "@/features/advisor/Teamraum";
+import { TeamraumBoard, TeamraumWeek, TeamraumWho, taskViewOf, type TeamraumContext } from "@/features/advisor/Teamraum";
 import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgTasks, listTaskComments } from "@/features/advisor/teamraumData";
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
 import { OrgChatList } from "@/features/advisor/OrgChatList";
 import { SocialCalendar } from "@/features/advisor/SocialCalendar";
 import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts } from "@/features/advisor/socialCalendarData";
-import { isChannel, monthGrid, monthOf } from "@/features/advisor/socialCalendarModel";
-import { listMyOrgChats } from "@/features/advisor/orgChatData";
+import { addDays, isChannel, monthGrid, monthOf, weekOf } from "@/features/advisor/socialCalendarModel";
+import { listMyOrgChats, searchOrgChats } from "@/features/advisor/orgChatData";
 import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
@@ -82,7 +82,7 @@ const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?ar
 export default async function AdvisorOrganisationPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string; chatError?: string; month?: string; channel?: string; post?: string; newPost?: string; event?: string; socialError?: string; socialSaved?: string; socialDeleted?: string; socialCreated?: string }>;
+  searchParams?: Promise<{ orgError?: string; tab?: string; org?: string; programInvite?: string; programInviteMail?: string; programInviteError?: string; programCodeError?: string; batch?: string; category?: string; pageError?: string; pageSaved?: string; teamRemoved?: string; planError?: string; planSaved?: string; materialError?: string; learningError?: string; setup?: string; saved?: string; expertError?: string; q?: string; open?: string; successError?: string; from?: string; to?: string; filter?: string; task?: string; taskError?: string; taskSaved?: string; taskDeleted?: string; taskCreated?: string; doc?: string; edit?: string; newDoc?: string; template?: string; parent?: string; docError?: string; docSaved?: string; docDeleted?: string; docTask?: string; note?: string; grant?: string; newGrant?: string; suggest?: string; fundingError?: string; fundingSaved?: string; fundingDeleted?: string; fundingSnapshot?: string; chatError?: string; month?: string; channel?: string; post?: string; newPost?: string; event?: string; socialError?: string; socialSaved?: string; socialDeleted?: string; socialCreated?: string; view?: string; week?: string }>;
 }) {
   const query = (await searchParams) ?? {};
   const orgError = readOrgErrorCode(query.orgError);
@@ -326,10 +326,14 @@ export default async function AdvisorOrganisationPage({
         ) : null}
         {tab === "social" ? await (async () => {
           const today = new Date().toISOString().slice(0, 10);
-          const month = monthOf(query.month, today);
+          const view = query.view === "week" ? "week" : "month";
+          const week = weekOf(query.week, today);
+          const month = view === "week" ? week.slice(0, 7) : monthOf(query.month, today);
           const grid = monthGrid(month);
+          const from = view === "week" ? week : grid[0][0].day;
+          const to = view === "week" ? addDays(week, 6) : grid[grid.length - 1][6].day;
           const [posts, eventPosts, campaigns, selected] = await Promise.all([
-            listOrgPosts(client, org.id, grid[0][0].day, grid[grid.length - 1][6].day),
+            listOrgPosts(client, org.id, from, to),
             listOrgEventPosts(client, org.id),
             listOrgCampaigns(client, org.id),
             /^[0-9a-f-]{36}$/.test(query.post ?? "") ? getOrgPost(client, org.id, query.post as string) : Promise.resolve(null),
@@ -343,6 +347,8 @@ export default async function AdvisorOrganisationPage({
                 canWrite: org.status === "active",
                 today,
                 month,
+                view,
+                week,
                 locale: getPresentationLocale(await getLocale()),
                 members: members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("kinds.unnamed") })),
                 events: planEvents.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt })),
@@ -367,10 +373,12 @@ export default async function AdvisorOrganisationPage({
             quiet={await getMyQuietHours(client)}
             canWrite={org.status === "active"}
             locale={getPresentationLocale(await getLocale())}
+            query={(query.q ?? "").slice(0, 100)}
+            hits={(query.q ?? "").trim().length >= 2 ? await searchOrgChats(client, org.id, query.q as string) : []}
           />
         ) : null}
         {teamraum && tab === "week" ? <TeamraumWeek ctx={teamraum} followUps={followUps} nextCheckIns={nextCheckIns} /> : null}
-        {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} /> : null}
+        {teamraum && tab === "tasks" ? <TeamraumBoard ctx={teamraum} filter={taskFilterOf(query.filter)} selectedTaskId={selectedTaskId} comments={taskComments} view={taskViewOf(query.view)} month={monthOf(query.month, new Date().toISOString().slice(0, 10))} /> : null}
         {teamraum && tab === "pages" ? (
           <TeamraumPages
             ctx={teamraum}
