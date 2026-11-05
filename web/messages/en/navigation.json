@@ -96,5 +96,6 @@
   "teamraumSocial": "Social media",
   "teamraumPages": "Pages",
   "teamraumWho": "Who does what",
-  "teamraumChatCount": "{count, plural, one {One unread message} other {# unread messages}}"
+  "teamraumChatCount": "{count, plural, one {One unread message} other {# unread messages}}",
+  "areaEvents": "Events"
 }

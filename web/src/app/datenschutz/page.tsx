@@ -330,6 +330,15 @@ export default function DatenschutzPage() {
               Im Social-Media-Kalender plant das Team Postings und Kampagnen; veröffentlicht wird dort nichts, und Teams im Programm sehen ihn nicht. Im Chat des Teamraums lesen alle aktiven Mitglieder den Teamchat, eigene Gruppen nur deren Mitglieder und Direktchats nur die beiden Beteiligten. Bilder und Dateien (höchstens 10 MB) liegen in einem nicht öffentlichen Speicher und sind nur für die Beteiligten des Chats abrufbar; Reaktionen sehen alle im Chat. Eine eigene Nachricht lässt sich samt Datei zurücknehmen, mit dem Konto gehen die eigenen Nachrichten, Dateien und Reaktionen. Mitteilungen aufs Gerät zum Chat nennen nie den Text. Endet eine Mitgliedschaft, verlieren ihre Aufgaben die Zuständigkeit und ihre Angabe zu
               Rolle und Abwesenheit wird gelöscht; mit dem Konto gehen auch die eigenen Kommentare.
             </p>
+            <p>
+              Im Bereich Events stehen Termine aus deinem Programm und aus dem Startup-Ökosystem – nur Fakten
+              (Titel, Zeit, Ort, Veranstalter, Link zur offiziellen Seite), aus Quellen, die wir nutzen dürfen,
+              oder von Mitgliedern einer Organisation eingetragen und von uns vor der Veröffentlichung geprüft.
+              Bei einem Vorschlag speichern wir, wer ihn eingereicht hat und für welche Organisation; den Namen
+              der Person sieht niemand außer dir und den Plattform-Admins. Was du dir merkst, sieht nur du. Mit
+              dem Konto geht das Gemerkte; eingereichte Termine bleiben ohne Bezug zu dir stehen. Termine, die
+              länger als 60 Tage vorbei sind, löschen wir automatisch.
+            </p>
           </BulletSection>
 
           <BulletSection number="9b" title="Teilnahme an einem Programm einer Organisation">

@@ -4,6 +4,7 @@ import { runProgramUpdateReminders } from "@/features/advisor/programUpdateRemin
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
+import { runEcosystemEventImport } from "@/features/events/eventsImport";
 import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
@@ -65,14 +66,17 @@ export async function GET(request: NextRequest) {
   const programUpdates = await runProgramUpdateReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   // Teamraum: heute faellige Aufgaben (20270316120000) - im selben Lauf, aus demselben Grund.
   const orgTasks = await runOrgTaskDueNotices().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
+  // Event-Kalender (20270323120000): eingeschaltete Quellen abrufen. Ein Fehler bei einer Quelle steht an der
+  // Quelle (Admin), nicht hier - nur wenn der Lauf gar nicht starten kann, gilt er als fehlgeschlagen.
+  const events = await runEcosystemEventImport().catch(() => ({ ok: false as const, reason: "list_failed" as const }));
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok);
-  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok) {
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok);
+  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok) {
     const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
-    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks };
+    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks, events };
     await sendCronFailureAlert("connect-suggestions", status, body);
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events }, { status: 200 });
 }

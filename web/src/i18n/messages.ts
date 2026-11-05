@@ -5,7 +5,9 @@ import enRadar from "../../messages/en/radar.json";
 import deProblemWorkspace from "../../messages/de/problemWorkspace.json";
 import enProblemWorkspace from "../../messages/en/problemWorkspace.json";
 import deIntake from "../../messages/de/intake.json";
+import deEvents from "../../messages/de/events.json";
 import enIntake from "../../messages/en/intake.json";
+import enEvents from "../../messages/en/events.json";
 import type { AbstractIntlMessages } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
 import deAlignment from "../../messages/de/alignment.json";
@@ -78,6 +80,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workstyleFlow: deWorkstyleFlow,
     radar: deRadar,
     intake: deIntake,
+    events: deEvents,
     problemWorkspace: deProblemWorkspace,
     alignment: deAlignment,
     assessment: deAssessment,
@@ -116,6 +119,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     workstyleFlow: enWorkstyleFlow,
     radar: enRadar,
     intake: enIntake,
+    events: enEvents,
     problemWorkspace: enProblemWorkspace,
     alignment: enAlignment,
     assessment: enAssessment,

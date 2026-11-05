@@ -655,11 +655,19 @@ export function ProductShell({
     ],
   };
 
+  // Events (20270323120000): Programm-Termine und das Startup-Oekosystem - fuer Gruendende und Advisor gleich,
+  // deshalb ein eigener Bereich am Ende. Nicht fuer reine Connect-Konten.
+  const eventsItem: NavigationItem = {
+    href: "/events",
+    label: t("areaEvents"),
+    isActive: (currentPathname) => currentPathname === "/events" || currentPathname.startsWith("/events/"),
+  };
   const navigationItems: NavigationItem[] = [
     ...founderItems,
     ...advisorItems,
     ...(isFounderView && hasFounder ? [findItem] : []),
     ...(hasConnect ? [connectItem] : []),
+    ...((hasFounder || hasAdvisor) && !isConnectOnly ? [eventsItem] : []),
   ];
   // Wer den Founder-Baum mit Profil sieht, hat den Editor dort. Fuer alle
   // anderen (Advisor-Ansicht, nur Connect) bleibt der sichtbare Weg rechts -
