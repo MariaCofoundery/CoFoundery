@@ -182,7 +182,7 @@ async function PageView({ ctx, page, pages }: { ctx: TeamraumContext; page: OrgP
           }
           if (!block.text) return null;
           const task = taskFor(block.text);
-          const assignee = memberOf(task?.assigneeUserId ?? null);
+          const assignee = memberOf(task?.assigneeUserIds[0] ?? null);
           return (
             <div key={blockIndex} className="flex flex-wrap items-center gap-3">
               <form action={checkOrgPageItemAction}>

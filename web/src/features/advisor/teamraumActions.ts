@@ -25,6 +25,12 @@ const dateOrNull = (value: FormDataEntryValue | null) => {
 
 /** Zurueck in den Reiter, aus dem das Formular kam - zusammengesetzt, nie eine uebergebene Adresse. */
 function backTo(formData: FormData, extra: Record<string, string> = {}) {
+  // Vom Advisor-Start (Abhaken in "Aufgaben"): zurueck dorthin, mit dem gewaehlten Filter. Feste Adresse.
+  const start = String(formData.get("back") ?? "");
+  if (start === "start" || start === "start-team") {
+    const params = new URLSearchParams({ ...(start === "start-team" ? { aufgaben: "team" } : {}), ...(extra.taskError ? { taskError: "1" } : {}) });
+    return `/advisor/dashboard${params.size > 0 ? `?${params.toString()}` : ""}#start-tasks`;
+  }
   const orgId = uuidOrNull(formData.get("orgId"));
   if (!orgId) return TEAMRAUM_BASE;
   const raw = String(formData.get("tab"));
@@ -46,7 +52,7 @@ async function requireUser(next: string) {
 }
 
 const errorOf = (message: string | undefined) =>
-  /assignee_not_member/.test(message ?? "") ? "member" : /program_not_visible/.test(message ?? "") ? "program" : "failed";
+  /assignee_not_member/.test(message ?? "") ? "member" : /too_many_assignees/.test(message ?? "") ? "tooMany" : /program_not_visible/.test(message ?? "") ? "program" : "failed";
 
 function finish(path: string) {
   revalidatePath("/advisor/teamraum", "layout");
@@ -65,7 +71,8 @@ export async function saveOrgTaskAction(formData: FormData) {
     p_title: String(formData.get("title") ?? "").slice(0, 200),
     p_details: String(formData.get("details") ?? "").slice(0, 4000),
     p_status: isTaskStatus(status) ? status : "open",
-    p_assignee_user_id: uuidOrNull(formData.get("assignee")),
+    // Mehrere Zustaendige (20270322120000): jede gewaehlte Person ist ein eigenes Feld "assignee".
+    p_assignee_user_ids: [...new Set(formData.getAll("assignee").map((value) => uuidOrNull(value)).filter((value): value is string => value !== null))].slice(0, 6),
     p_due_on: dateOrNull(formData.get("dueOn")),
     p_program_id: uuidOrNull(formData.get("programId")),
     p_event_id: uuidOrNull(formData.get("eventId")),

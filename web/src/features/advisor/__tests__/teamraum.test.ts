@@ -22,7 +22,7 @@ const task = (overrides: Partial<OrgTask>): OrgTask => ({
   title: "Aufgabe",
   details: null,
   status: "open",
-  assigneeUserId: null,
+  assigneeUserIds: [],
   dueOn: null,
   programId: null,
   eventId: null,
@@ -39,12 +39,12 @@ const TODAY = "2026-11-05";
 
 test("Teamraum: Diese Woche trennt Ueberfaelliges, die naechsten sieben Tage und den Rest", () => {
   const tasks = [
-    task({ id: "late", assigneeUserId: "me", dueOn: "2026-11-03" }),
-    task({ id: "soon", assigneeUserId: "me", dueOn: "2026-11-12" }),
-    task({ id: "later", assigneeUserId: "me", dueOn: "2026-11-13" }),
-    task({ id: "nodate", assigneeUserId: "me" }),
-    task({ id: "done", assigneeUserId: "me", dueOn: "2026-11-01", status: "done" }),
-    task({ id: "other", assigneeUserId: "you", dueOn: "2026-11-04" }),
+    task({ id: "late", assigneeUserIds: ["me"], dueOn: "2026-11-03" }),
+    task({ id: "soon", assigneeUserIds: ["me"], dueOn: "2026-11-12" }),
+    task({ id: "later", assigneeUserIds: ["me"], dueOn: "2026-11-13" }),
+    task({ id: "nodate", assigneeUserIds: ["me"] }),
+    task({ id: "done", assigneeUserIds: ["me"], dueOn: "2026-11-01", status: "done" }),
+    task({ id: "other", assigneeUserIds: ["you"], dueOn: "2026-11-04" }),
   ];
   const week = myWeek(tasks, "me", TODAY);
   assert.deepEqual(week.overdue.map((entry) => entry.id), ["late"]);
@@ -68,8 +68,8 @@ test("Teamraum: Board-Spalten sortieren nach Faelligkeit, Erledigtes zuletzt erl
 
 test("Teamraum: Filter, niemand zustaendig und Zaehler je Person sind Anzahl, keine Wertung", () => {
   const tasks = [
-    task({ id: "1", assigneeUserId: "me", dueOn: "2026-11-01" }),
-    task({ id: "2", assigneeUserId: "me" }),
+    task({ id: "1", assigneeUserIds: ["me"], dueOn: "2026-11-01" }),
+    task({ id: "2", assigneeUserIds: ["me"] }),
     task({ id: "3" }),
     task({ id: "4", status: "done" }),
   ];
@@ -78,6 +78,13 @@ test("Teamraum: Filter, niemand zustaendig und Zaehler je Person sind Anzahl, ke
   assert.deepEqual(unassignedTasks(tasks).map((entry) => entry.id), ["3"]);
   assert.deepEqual(openCountsByMember(tasks, TODAY).get("me"), { open: 2, overdue: 1 });
   assert.equal(taskFilterOf("mine"), "mine");
+  // Zu zweit zustaendig (20270322120000): die Aufgabe gehoert beiden, zaehlt bei beiden und ist nicht "ohne Person".
+  const shared = [task({ id: "s", assigneeUserIds: ["me", "you"], dueOn: "2026-11-06" })];
+  assert.deepEqual(filterTasks(shared, "mine", "you").map((entry) => entry.id), ["s"]);
+  assert.deepEqual(unassignedTasks(shared), []);
+  assert.equal(openCountsByMember(shared, TODAY).get("me")?.open, 1);
+  assert.equal(openCountsByMember(shared, TODAY).get("you")?.open, 1);
+  assert.deepEqual(myWeek(shared, "you", TODAY).thisWeek.map((entry) => entry.id), ["s"]);
   assert.equal(taskFilterOf("<script>"), "all");
 });
 
@@ -147,9 +154,11 @@ test("Teamraum: eigener Bereich im Hauptmenue, auf dem Advisor-Start und im Kont
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   assert.match(shell, /\.\.\.\(advisorOrgNames\.length > 0\s*\? \[\s*\{\s*href: TEAMRAUM_BASE,/);
   const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
-  assert.match(start, /listMyDueOrgTasks\(client, user\.id\)/);
+  // Seit 05.11.2026 ein eigener Bereich "Aufgaben" auf dem Start: "Fuer mich" und "Steht an".
+  assert.match(start, /listMyOpenOrgTasks\(client, user\.id\)/);
+  assert.match(start, /<StartTasks/);
   const exported = readFileSync("src/features/account/accountExport.ts", "utf8");
-  for (const table of ["advisor_org_tasks", "advisor_org_task_comments", "advisor_org_member_presence"]) assert.match(exported, new RegExp(`table: "${table}"`));
+  for (const table of ["advisor_org_tasks", "advisor_org_task_comments", "advisor_org_member_presence", "advisor_org_task_assignees"]) assert.match(exported, new RegExp(`table: "${table}"`));
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
     assert.equal(Object.keys(messages.teamraum.status).length, 4, locale);
@@ -172,4 +181,22 @@ test("Teamraum-Mitteilungen: Hinweis in der Datenbank, Mitteilung ohne Titel, ab
   assert.match(cron, /runOrgTaskDueNotices\(\)/);
   const account = readFileSync("src/features/account/AccountPreferencesSection.tsx", "utf8");
   assert.match(account, /\.filter\(\(\{ kind \}\) => !optedOut\.includes\(kind\)\)\s*\.map\(\(\{ kind \}\) => <input key=\{kind\} type="hidden" name="notification" value=\{kind\} \/>\)/);
+});
+
+test("Aufgaben zu zweit: Tabelle, Speichern mit allen gewaehlten Personen, Start zeigt Fuer mich und Steht an", () => {
+  const sql = readFileSync("../supabase/migrations/20270322120000_org_task_assignees.sql", "utf8");
+  assert.match(sql, /create table public\.advisor_org_task_assignees/);
+  assert.match(sql, /using \(public\.is_advisor_org_member\(org_id\)\)/);
+  assert.match(sql, /cardinality\(v_ids\) > 6/);
+  // Aufrufe mit einer Person (Diktat, Code beim Ausrollen) gelten weiter.
+  assert.match(sql, /p_assignee_user_id uuid default null,[\s\S]*p_assignee_user_ids uuid\[\] default null/);
+  const actions = readFileSync("src/features/advisor/teamraumActions.ts", "utf8");
+  assert.match(actions, /p_assignee_user_ids: \[\.\.\.new Set\(formData\.getAll\("assignee"\)/);
+  // Abhaken vom Start fuehrt nur an eine feste Adresse zurueck.
+  assert.match(actions, /if \(start === "start" \|\| start === "start-team"\)/);
+  const data = readFileSync("src/features/advisor/teamraumData.ts", "utf8");
+  assert.match(data, /mine:advisor_org_task_assignees!inner\(user_id\)/);
+  const start = readFileSync("src/features/advisor/StartTasks.tsx", "utf8");
+  assert.match(start, /aufgaben=team/);
+  assert.doesNotMatch(start, /score|percent|rank/i);
 });

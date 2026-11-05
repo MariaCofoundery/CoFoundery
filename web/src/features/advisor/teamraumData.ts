@@ -9,7 +9,8 @@ import { pageOf, type OrgPage, type OrgPageSummary } from "@/features/advisor/te
  * Organisation etwas (20270312120000); ein Team im Programm bekommt hier nie eine Zeile.
  */
 
-const TASK_COLUMNS = "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, checklist, created_by_user_id, created_at, updated_at, done_at";
+const TASK_COLUMNS =
+  "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, checklist, created_by_user_id, created_at, updated_at, done_at, advisor_org_task_assignees(user_id, created_at)";
 
 export async function listOrgTasks(client: SupabaseClient, orgId: string): Promise<OrgTask[]> {
   const { data, error } = await client
@@ -53,18 +54,30 @@ export async function listOrgPresence(client: SupabaseClient, orgId: string): Pr
   }));
 }
 
-/** Fuer den Advisor-Start: eigene offene Aufgaben, faellig in den naechsten Tagen oder schon drueber - ueber alle Organisationen. */
-export async function listMyDueOrgTasks(client: SupabaseClient, userId: string, withinDays = 7): Promise<OrgTask[]> {
+/** Fuer den Advisor-Start: eigene offene Aufgaben ueber alle Organisationen - mit Datum zuerst, dann ohne. */
+export async function listMyOpenOrgTasks(client: SupabaseClient, userId: string): Promise<OrgTask[]> {
+  const { data, error } = await client
+    .from("advisor_org_tasks")
+    .select(`${TASK_COLUMNS}, mine:advisor_org_task_assignees!inner(user_id)`)
+    .eq("mine.user_id", userId)
+    .neq("status", "done")
+    .order("due_on", { ascending: true, nullsFirst: false })
+    .limit(40);
+  if (error || !Array.isArray(data)) return [];
+  return (data as Record<string, unknown>[]).map(taskOf);
+}
+
+/** Fuer den Advisor-Start: was im Team ansteht - offen, ueberfaellig oder in den naechsten Tagen faellig, egal fuer wen. */
+export async function listUpcomingOrgTasks(client: SupabaseClient, withinDays = 7): Promise<OrgTask[]> {
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + withinDays);
   const { data, error } = await client
     .from("advisor_org_tasks")
     .select(TASK_COLUMNS)
-    .eq("assignee_user_id", userId)
     .neq("status", "done")
     .lte("due_on", horizon.toISOString().slice(0, 10))
     .order("due_on", { ascending: true })
-    .limit(20);
+    .limit(40);
   if (error || !Array.isArray(data)) return [];
   return (data as Record<string, unknown>[]).map(taskOf);
 }

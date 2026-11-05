@@ -61,6 +61,7 @@ const EXPORTED_TABLES = [
   // eigene Angabe unter "Wer macht was". Lesbar, solange die Mitgliedschaft aktiv ist.
   { table: "advisor_org_tasks", column: "created_by_user_id" },
   { table: "advisor_org_task_comments", column: "author_user_id" },
+  { table: "advisor_org_task_assignees", column: "user_id" },
   { table: "advisor_org_member_presence", column: "user_id" },
   { table: "advisor_org_pages", column: "created_by_user_id" },
   // Teamraum-Chat (seit 20270318120000): eigene Nachrichten und Gelesen-Staende.

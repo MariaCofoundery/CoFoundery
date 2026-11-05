@@ -30,7 +30,7 @@ insert into ids values ('mine', public.save_org_task(null, 'e6000000-0000-4000-8
 reset role;
 select extensions.is((select count(*)::int from public.in_app_notices where kind = 'org_task_assigned' and recipient_user_id = 'e6000000-0000-4000-8000-000000000002'), 1, 'the assignee is told');
 select extensions.is((select count(*)::int from public.in_app_notices where kind = 'org_task_assigned' and recipient_user_id = 'e6000000-0000-4000-8000-000000000001'), 0, 'nobody is told about their own assignment');
-select extensions.ok((select path from public.in_app_notices where kind = 'org_task_assigned') like '/advisor/organisation?org=%&tab=tasks&task=%', 'the notice leads to the task');
+select extensions.ok((select path from public.in_app_notices where kind = 'org_task_assigned') like '/advisor/teamraum/aufgaben?org=%&task=%', 'the notice leads to the task');
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"e6000000-0000-4000-8000-000000000001","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.org_task_push_recipients((select id from ids where key = 't'), 'org_task_assigned')), 1, 'the person who assigned gets the push recipient');

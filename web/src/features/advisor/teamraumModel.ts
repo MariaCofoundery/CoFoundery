@@ -19,7 +19,8 @@ export type OrgTask = {
   title: string;
   details: string | null;
   status: TaskStatus;
-  assigneeUserId: string | null;
+  /** Seit 20270322120000 mehrere, in der Reihenfolge, in der sie eingetragen wurden. Leer = noch niemand. */
+  assigneeUserIds: string[];
   dueOn: string | null;
   programId: string | null;
   eventId: string | null;
@@ -60,8 +61,8 @@ export function byDue(a: OrgTask, b: OrgTask): number {
 }
 
 export function filterTasks(tasks: OrgTask[], filter: TaskFilter, userId: string): OrgTask[] {
-  if (filter === "mine") return tasks.filter((task) => task.assigneeUserId === userId);
-  if (filter === "nobody") return tasks.filter((task) => task.assigneeUserId === null);
+  if (filter === "mine") return tasks.filter((task) => task.assigneeUserIds.includes(userId));
+  if (filter === "nobody") return tasks.filter((task) => task.assigneeUserIds.length === 0);
   return tasks;
 }
 
@@ -82,7 +83,7 @@ export function boardColumns(tasks: OrgTask[], doneLimit = 8): Record<TaskStatus
 
 /** "Fuer dich diese Woche": eigene offene Aufgaben, ueberfaellig getrennt, sonst faellig in den naechsten sieben Tagen. */
 export function myWeek(tasks: OrgTask[], userId: string, today: string): { overdue: OrgTask[]; thisWeek: OrgTask[]; later: number } {
-  const mine = tasks.filter((task) => task.assigneeUserId === userId && isOpen(task)).sort(byDue);
+  const mine = tasks.filter((task) => task.assigneeUserIds.includes(userId) && isOpen(task)).sort(byDue);
   const horizon = addDays(today, 7);
   return {
     overdue: mine.filter((task) => isOverdue(task, today)),
@@ -92,17 +93,19 @@ export function myWeek(tasks: OrgTask[], userId: string, today: string): { overd
 }
 
 /** Noch niemand zustaendig - damit nichts liegen bleibt, weil alle dachten, jemand anderes macht es. */
-export const unassignedTasks = (tasks: OrgTask[]) => tasks.filter((task) => isOpen(task) && task.assigneeUserId === null).sort(byDue);
+export const unassignedTasks = (tasks: OrgTask[]) => tasks.filter((task) => isOpen(task) && task.assigneeUserIds.length === 0).sort(byDue);
 
 /** Je Mitglied: offene und ueberfaellige Aufgaben. Eine Anzahl, keine Wertung. */
 export function openCountsByMember(tasks: OrgTask[], today: string): Map<string, { open: number; overdue: number }> {
   const counts = new Map<string, { open: number; overdue: number }>();
   for (const task of tasks) {
-    if (!isOpen(task) || !task.assigneeUserId) continue;
-    const entry = counts.get(task.assigneeUserId) ?? { open: 0, overdue: 0 };
-    entry.open += 1;
-    if (isOverdue(task, today)) entry.overdue += 1;
-    counts.set(task.assigneeUserId, entry);
+    if (!isOpen(task)) continue;
+    for (const userId of task.assigneeUserIds) {
+      const entry = counts.get(userId) ?? { open: 0, overdue: 0 };
+      entry.open += 1;
+      if (isOverdue(task, today)) entry.overdue += 1;
+      counts.set(userId, entry);
+    }
   }
   return counts;
 }
@@ -143,6 +146,18 @@ export function parseChecklist(text: string): ChecklistItem[] {
 export const checklistToText = (items: ChecklistItem[]) => items.map((item) => `${item.done ? "[x]" : "[ ]"} ${item.text}`).join("\n");
 
 /** Die Zeile aus der Datenbank. Unbekanntes faellt weg statt zu raten. */
+/** Die Zustaendigen aus der eingebetteten Tabelle (20270322120000); ohne sie das alte Feld. */
+function assigneesOf(row: Record<string, unknown>): string[] {
+  const embedded = row.advisor_org_task_assignees;
+  if (Array.isArray(embedded)) {
+    return (embedded as { user_id?: unknown; created_at?: unknown }[])
+      .filter((entry): entry is { user_id: string; created_at?: unknown } => typeof entry.user_id === "string")
+      .sort((x, y) => String(x.created_at ?? "").localeCompare(String(y.created_at ?? "")) || x.user_id.localeCompare(y.user_id))
+      .map((entry) => entry.user_id);
+  }
+  return typeof row.assignee_user_id === "string" ? [row.assignee_user_id] : [];
+}
+
 export function taskOf(row: Record<string, unknown>): OrgTask {
   const checklist = Array.isArray(row.checklist)
     ? (row.checklist as unknown[]).flatMap((item) =>
@@ -157,7 +172,7 @@ export function taskOf(row: Record<string, unknown>): OrgTask {
     title: row.title as string,
     details: (row.details as string | null) ?? null,
     status: isTaskStatus(row.status) ? row.status : "open",
-    assigneeUserId: (row.assignee_user_id as string | null) ?? null,
+    assigneeUserIds: assigneesOf(row),
     dueOn: (row.due_on as string | null) ?? null,
     programId: (row.program_id as string | null) ?? null,
     eventId: (row.event_id as string | null) ?? null,

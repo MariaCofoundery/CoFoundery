@@ -31,10 +31,12 @@ test("Aufgaben: Inhalt zuerst - das Formular steht nur nach \"+ Neue Aufgabe\" d
   // Ohne gewaehlte Ansicht: Board am Rechner, nach Stand gruppierte Liste am Telefon.
   assert.match(board, /<div className="hidden md:block">\{board\}<\/div>\s*<TaskList [^>]*mobileOnly \/>/);
   // Wer und bis wann zum Antippen; die Werte gehen als dieselben Felder an dieselbe Aktion.
-  assert.match(board, /<ChipChoice name="assignee"/);
+  // Mehrere Zustaendige (20270322120000): jede gewaehlte Person ein eigenes Feld "assignee".
+  assert.match(board, /<ChipMultiChoice name="assignee"[^>]*max=\{6\}/);
   assert.match(board, /<ChipChoice name="dueOn"/);
   const chips = read("src/features/ui/ChipChoice.tsx");
   assert.match(chips, /<input type="hidden" name=\{name\} value=\{value\} \/>/);
+  assert.match(chips, /values\.map\(\(value\) => <input key=\{value\} type="hidden" name=\{name\} value=\{value\} \/>\)/);
 });
 
 test("Diese Woche: eine Zeile, gespeichert wird erst nach dem Vorschlag; keine Wertung", () => {

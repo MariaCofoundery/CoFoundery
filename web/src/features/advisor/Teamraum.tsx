@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
-import { ChipChoice } from "@/features/ui/ChipChoice";
+import { ChipChoice, ChipMultiChoice } from "@/features/ui/ChipChoice";
 import { UserText } from "@/features/ui/UserText";
 import { DictateTasks } from "@/features/advisor/DictateTasks";
 import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
@@ -102,6 +102,8 @@ export function helpers(ctx: TeamraumContext) {
     dayOf: (iso: string) => day.format(new Date(`${iso}T00:00:00Z`)),
     timeOf: (iso: string) => time.format(new Date(iso)),
     memberOf: (userId: string | null) => (userId ? ctx.members.find((member) => member.userId === userId) ?? null : null),
+    /** Die Zustaendigen einer Aufgabe, die noch Mitglied sind - in ihrer Reihenfolge. */
+    peopleOf: (task: OrgTask) => task.assigneeUserIds.flatMap((userId) => ctx.members.filter((member) => member.userId === userId)),
     programOf: (programId: string | null) => (programId ? ctx.programs.find((program) => program.programId === programId) ?? null : null),
     eventOf: (eventId: string | null) => (eventId ? ctx.events.find((event) => event.eventId === eventId) ?? null : null),
     href: (tab: "week" | "tasks" | "pages" | "who", extra: Record<string, string> = {}) => teamraumHref(tab, ctx.orgId, extra),
@@ -122,7 +124,7 @@ function Hidden({ ctx, tab, filter, taskId }: { ctx: TeamraumContext; tab: "week
 async function Feedback({ ctx }: { ctx: TeamraumContext }) {
   const t = await getTranslations("advisor.teamraum");
   if (ctx.feedback.error) {
-    return <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{t(`errors.${["member", "program"].includes(ctx.feedback.error) ? ctx.feedback.error : "failed"}`)}</p>;
+    return <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{t(`errors.${["member", "program", "tooMany"].includes(ctx.feedback.error) ? ctx.feedback.error : "failed"}`)}</p>;
   }
   if (ctx.feedback.saved || ctx.feedback.deleted) {
     return (
@@ -161,8 +163,8 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumC
   const people = [
     ...ctx.members.filter((member) => member.isSelf).map((member) => ({ value: member.userId, label: t("form.meShort") })),
     ...ctx.members.filter((member) => !member.isSelf).map((member) => ({ value: member.userId, label: member.name })),
-    { value: "", label: t("form.nobodyYet") },
   ];
+  const chosen = task ? task.assigneeUserIds : [ctx.me];
   const hasMore = Boolean(task && (task.details || task.checklist.length > 0 || task.eventId || task.status !== "open"));
   return (
     <form action={saveOrgTaskAction} className="grid gap-5">
@@ -173,13 +175,15 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumC
       </label>
       <div>
         <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
-        {people.length <= 7 ? (
-          <ChipChoice name="assignee" label={t("form.assigneeQuestion")} options={people} defaultValue={task ? task.assigneeUserId ?? "" : ctx.me} disabled={!ctx.canWrite} />
+        {/* Mehrere moeglich (20270322120000), hoechstens sechs. */}
+        {people.length <= 12 ? (
+          <ChipMultiChoice name="assignee" label={t("form.assigneeQuestion")} options={people} defaultValues={chosen} noneLabel={t("form.nobodyYet")} max={6} disabled={!ctx.canWrite} />
         ) : (
-          <select name="assignee" aria-label={t("form.assigneeQuestion")} defaultValue={task ? task.assigneeUserId ?? "" : ctx.me} className={INPUT} disabled={!ctx.canWrite}>
-            {people.map((person) => <option key={person.value || "nobody"} value={person.value}>{person.label}</option>)}
+          <select name="assignee" multiple size={6} aria-label={t("form.assigneeQuestion")} defaultValue={chosen} className={`${INPUT} py-2`} disabled={!ctx.canWrite}>
+            {people.map((person) => <option key={person.value} value={person.value}>{person.label}</option>)}
           </select>
         )}
+        <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.assigneeHint")}</span>
       </div>
       <div>
         <span className={`${LABEL} mb-2`}>{t("form.dueQuestion")}</span>
@@ -247,8 +251,8 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref }: { ctx: TeamraumC
 
 async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; selected: boolean; back: Record<string, string> }) {
   const t = await getTranslations("advisor.teamraum");
-  const { dayOf, memberOf, programOf, eventOf, href } = helpers(ctx);
-  const assignee = memberOf(task.assigneeUserId);
+  const { dayOf, peopleOf, programOf, eventOf, href } = helpers(ctx);
+  const people = peopleOf(task);
   const program = programOf(task.programId);
   const event = eventOf(task.eventId);
   const progress = checklistProgress(task);
@@ -259,8 +263,11 @@ async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumCo
         <Link href={`${href("tasks", { ...back, task: task.id })}#task-detail`} className={`underline-offset-4 hover:underline ${task.status === "done" ? "line-through" : ""}`}>{task.title}</Link>
       </h4>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-slate-600">
-        {assignee ? (
-          <span className="inline-flex items-center gap-1.5"><Avatar userId={assignee.userId} name={assignee.name} size="h-[22px] w-[22px] text-[10px]" />{assignee.isSelf ? t("form.meShort") : assignee.name}</span>
+        {people.length > 0 ? (
+          <span className="inline-flex items-center gap-1.5">
+            <span className="flex -space-x-1.5">{people.slice(0, 3).map((person) => <Avatar key={person.userId} userId={person.userId} name={person.name} size="h-[22px] w-[22px] text-[10px] ring-2 ring-white" />)}</span>
+            {people.map((person) => (person.isSelf ? t("form.meShort") : person.name)).join(", ")}
+          </span>
         ) : task.status !== "done" && ctx.canWrite ? (
           <form action={takeOrgTaskAction}>
             <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
@@ -404,12 +411,12 @@ export const taskViewOf = (value: unknown): TaskView => ((TASK_VIEWS as readonly
 /** Aufgaben als Liste: am Rechner eine Tabelle nach Faelligkeit, am Telefon nach Stand gruppiert zum Aufklappen. */
 async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter; back: Record<string, string>; mobileOnly?: boolean }) {
   const t = await getTranslations("advisor.teamraum");
-  const { dayOf, memberOf, programOf, href } = helpers(ctx);
+  const { dayOf, peopleOf, programOf, href } = helpers(ctx);
   const open = tasks.filter((task) => task.status !== "done").sort(byDue);
   const done = tasks.filter((task) => task.status === "done").sort((a, b) => ((a.doneAt ?? "") < (b.doneAt ?? "") ? 1 : -1)).slice(0, 30);
   const link = (task: OrgTask) => `${href("tasks", { ...back, task: task.id })}#task-detail`;
   const row = (task: OrgTask) => {
-    const assignee = memberOf(task.assigneeUserId);
+    const people = peopleOf(task);
     const overdue = isOverdue(task, ctx.today);
     return (
       <tr key={task.id} className="border-t border-slate-100">
@@ -417,14 +424,15 @@ async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx:
           <Link href={link(task)} className={`font-medium text-slate-950 underline-offset-4 hover:underline ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</Link>
         </td>
         <td className="py-3 pr-3"><span className="inline-flex items-center gap-2 text-slate-800"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[task.status]}`} />{t(`status.${task.status}`)}</span></td>
-        <td className="py-3 pr-3 text-slate-800">{assignee ? assignee.name : <span className="font-semibold text-amber-800">{t("nobody")}</span>}</td>
+        <td className="py-3 pr-3 text-slate-800">{people.length > 0 ? people.map((person) => person.name).join(", ") : <span className="font-semibold text-amber-800">{t("nobody")}</span>}</td>
         <td className={`py-3 pr-3 ${overdue ? "font-semibold text-rose-700" : "text-slate-800"}`}>{task.dueOn ? dayOf(task.dueOn) : "–"}</td>
         <td className="py-3 text-slate-700">{task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal")}</td>
       </tr>
     );
   };
   const mobileRow = (task: OrgTask, index: number) => {
-    const assignee = memberOf(task.assigneeUserId);
+    const people = peopleOf(task);
+    const assignee = people[0] ?? null;
     const overdue = isOverdue(task, ctx.today);
     const team = task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal");
     const due = task.dueOn ? (overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : dayOf(task.dueOn)) : null;
@@ -434,7 +442,7 @@ async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx:
           {assignee ? <Avatar userId={assignee.userId} name={assignee.name} size="h-[30px] w-[30px] text-[11px]" /> : <span aria-hidden="true" className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full border border-dashed border-slate-300 text-xs text-slate-500">?</span>}
           <span className="min-w-0 flex-1">
             <span className={`block text-[15px] font-medium text-slate-950 ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</span>
-            <span className={`mt-0.5 block text-[13px] ${overdue ? "text-rose-700" : "text-slate-600"}`}>{[due, team, assignee ? null : t("nobodyShort")].filter(Boolean).join(" · ")}</span>
+            <span className={`mt-0.5 block text-[13px] ${overdue ? "text-rose-700" : "text-slate-600"}`}>{[due, team, people.length > 1 ? people.map((person) => (person.isSelf ? t("form.meShort") : person.name)).join(", ") : null, assignee ? null : t("nobodyShort")].filter(Boolean).join(" · ")}</span>
           </span>
         </Link>
       </li>
@@ -488,7 +496,7 @@ async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx:
 /** Aufgaben als Monatskalender nach Faelligkeit - per Ziehen auf einen anderen Tag. */
 async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter; month: string }) {
   const t = await getTranslations("advisor.teamraum");
-  const { memberOf, href } = helpers(ctx);
+  const { peopleOf, href } = helpers(ctx);
   const grid = monthGrid(month);
   const label = new Intl.DateTimeFormat(ctx.locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T00:00:00Z`));
   const dayLong = new Intl.DateTimeFormat(ctx.locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
@@ -498,7 +506,7 @@ async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContex
   const undated = tasks.filter((task) => !task.dueOn && task.status !== "done");
   const nav = (next: string) => href("tasks", { view: "calendar", month: next, ...(filter !== "all" ? { filter } : {}) });
   const chip = (task: OrgTask) => {
-    const assignee = memberOf(task.assigneeUserId);
+    const assignee = peopleOf(task)[0] ?? null;
     return (
       <DraggableItem key={task.id} id={task.id} kind="task">
         <Link

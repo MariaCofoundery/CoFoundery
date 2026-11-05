@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { TodayTiles, WaitingItems, type WaitingItem } from "@/features/advisor/TodayView";
 import { TeamAvatar } from "@/features/advisor/TeamAvatar";
@@ -9,12 +10,13 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
-import { getAccompaniedPeople, getMyAdvisorOrgs, withAccompaniedNames } from "@/features/advisor/orgData";
+import { getAccompaniedPeople, getMyAdvisorOrgs, getOrgMembers, withAccompaniedNames } from "@/features/advisor/orgData";
 import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getProgramUpdateDue, getSuccessEnabled, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
-import { listMyDueOrgTasks } from "@/features/advisor/teamraumData";
+import { listMyOpenOrgTasks, listUpcomingOrgTasks } from "@/features/advisor/teamraumData";
+import { StartTasks, startTasksViewOf } from "@/features/advisor/StartTasks";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 
 const CARD = "advisor-card p-6";
@@ -31,7 +33,8 @@ const LINK =
  * verschiedene Freigaben. Diese Seite fuehrt sie nur zusammen, sie ersetzt
  * keine.
  */
-export default async function AdvisorStartPage() {
+export default async function AdvisorStartPage({ searchParams }: { searchParams?: Promise<{ aufgaben?: string; taskError?: string }> }) {
+  const query = (await searchParams) ?? {};
   const t = await getTranslations("advisor.area");
   const tExample = await getTranslations("advisor.example");
   const {
@@ -51,8 +54,14 @@ export default async function AdvisorStartPage() {
     client.from("advisor_person_invites").select("id, status").eq("status", "sent"),
     getMyAdvisorOrgs(client),
     listDueProgramFollowUps(client),
-    listMyDueOrgTasks(client, user.id),
+    listMyOpenOrgTasks(client, user.id),
   ]);
+  // Aufgaben (Teamraum): was im Team ansteht, und die Namen der Mitglieder fuer "wer".
+  const [upcomingTasks, memberLists] = await Promise.all([
+    orgs.length > 0 ? listUpcomingOrgTasks(client) : Promise.resolve([]),
+    Promise.all(orgs.slice(0, 5).map((org) => getOrgMembers(client, org.id))),
+  ]);
+  const memberNames = new Map(memberLists.flat().map((member) => [member.userId, member.displayName ?? t("kinds.unnamed")] as const));
   if (!roleViews.hasAdvisor) redirect("/dashboard");
 
   // Programm: Fristen und faellige Updates der Teams, die diese Person sehen darf
@@ -99,14 +108,7 @@ export default async function AdvisorStartPage() {
   const teamName = (team: (typeof teams)[number]) => team.teamName?.trim() || `${team.founderAName} & ${team.founderBName}`;
 
   const waiting: WaitingItem[] = [
-    // Teamraum: eigene Aufgaben, ueberfaellig oder in den naechsten sieben Tagen faellig.
-    ...myTasks.map((task) => ({
-      key: `task-${task.id}`,
-      text: t("start.orgTask", { title: task.title, date: task.dueOn ?? "", overdue: task.dueOn && task.dueOn < todayIso ? "yes" : "no" }),
-      href: `${teamraumHref("tasks", task.orgId, { task: task.id })}#task-detail`,
-      cta: t("start.open"),
-      icon: "flag" as const,
-    })),
+    // Teamraum-Aufgaben stehen seit 05.11.2026 in einem eigenen Bereich darunter (StartTasks), nicht mehr hier.
     ...programDeadlines.map((entry, index) => ({
       key: `deadline-${entry.programId}-${index}`,
       text: t("start.programDeadline", { team: entry.teamName ?? t("kinds.unnamed"), title: entry.title }),
@@ -219,6 +221,20 @@ export default async function AdvisorStartPage() {
         />
 
         <TodayTiles teams={programTeamCount} updates={programUpdates.length} invites={openInviteCount} labels={[t("start.tileTeams"), t("start.tileUpdates"), t("start.tileInvites")]} />
+
+        {orgs.length > 0 ? (
+          <StartTasks
+            view={startTasksViewOf(query.aufgaben)}
+            mine={myTasks}
+            upcoming={upcomingTasks}
+            orgs={orgs.map((org) => ({ id: org.id, name: org.name }))}
+            names={memberNames}
+            me={user.id}
+            today={todayIso}
+            locale={getPresentationLocale(await getLocale())}
+            error={query.taskError === "1"}
+          />
+        ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <section aria-labelledby="advisor-waiting-title" className={CARD}>

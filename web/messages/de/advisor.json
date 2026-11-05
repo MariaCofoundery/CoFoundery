@@ -669,7 +669,24 @@
       "tileInvites": "offene Einladungen",
       "programOutcomes": "{team}: {count, plural, one {# Erfolg wartet} other {# Erfolge warten}} auf Bestätigung",
       "programCut": "Fristen und Updates stehen hier für höchstens drei Organisationen und je zwölf Teams. Alle weiteren findest du unter „Organisation“.",
-      "orgTask": "{overdue, select, yes {Aufgabe überfällig} other {Aufgabe fällig}} am {date}: {title}"
+      "orgTask": "{overdue, select, yes {Aufgabe überfällig} other {Aufgabe fällig}} am {date}: {title}",
+      "tasks": {
+        "title": "Aufgaben",
+        "filterLabel": "Aufgaben zeigen",
+        "mine": "Für mich · {count}",
+        "team": "Steht an · {count}",
+        "new": "Neue Aufgabe",
+        "all": "Alle im Teamraum",
+        "error": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+        "mineNone": "Gerade liegt nichts bei dir.",
+        "teamNone": "In den nächsten sieben Tagen steht im Team nichts an.",
+        "markDone": "„{task}“ als erledigt markieren",
+        "overdue": "überfällig seit {date}",
+        "noDate": "ohne Datum",
+        "nobody": "noch niemand zuständig",
+        "me": "Ich",
+        "more": "{count, plural, one {Eine weitere} other {# weitere}} im Teamraum"
+      }
     },
     "follow": {
       "title": "Begleitung",
@@ -1397,7 +1414,8 @@
     "errors": {
       "failed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
       "member": "Zuständig sein oder vertreten kann nur ein aktives Mitglied der Organisation.",
-      "program": "Mit diesem Team kannst du keine Aufgabe verknüpfen – du bist dort nicht Bezugsperson."
+      "program": "Mit diesem Team kannst du keine Aufgabe verknüpfen – du bist dort nicht Bezugsperson.",
+      "tooMany": "Höchstens sechs Personen können für eine Aufgabe zuständig sein."
     },
     "status": {
       "open": "Offen",
@@ -1449,7 +1467,8 @@
       "assigneeQuestion": "Wer kümmert sich?",
       "dueQuestion": "Bis wann?",
       "more": "+ Beschreibung, Checkliste, Veranstaltung",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "assigneeHint": "Ihr könnt auch zu zweit oder mehr zuständig sein."
     },
     "board": {
       "title": "Aufgaben",

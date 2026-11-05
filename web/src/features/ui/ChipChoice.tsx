@@ -68,3 +68,56 @@ export function ChipChoice({
     </div>
   );
 }
+
+/**
+ * Mehrere waehlbar (Teamraum: "Wer kuemmert sich?" - seit 20270322120000 bis zu sechs Personen). Jede gewaehlte
+ * Person geht als eigenes Feld gleichen Namens mit. `noneLabel` hebt alle auf ("Noch offen").
+ */
+export function ChipMultiChoice({
+  name,
+  label,
+  options,
+  defaultValues,
+  noneLabel,
+  max,
+  disabled = false,
+}: {
+  name: string;
+  label: string;
+  options: { value: string; label: string }[];
+  defaultValues: string[];
+  noneLabel: string;
+  max: number;
+  disabled?: boolean;
+}) {
+  const [values, setValues] = useState(defaultValues);
+  const chip = (on: boolean) =>
+    `inline-flex min-h-10 items-center rounded-full border px-3.5 text-sm transition ${
+      on ? "border-violet-500 bg-violet-50 font-semibold text-violet-900" : "border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-50"
+    } disabled:opacity-50`;
+  return (
+    <div>
+      {values.map((value) => <input key={value} type="hidden" name={name} value={value} />)}
+      <div role="group" aria-label={label} className="flex flex-wrap gap-2">
+        {options.map((option) => {
+          const on = values.includes(option.value);
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={on}
+              disabled={disabled || (!on && values.length >= max)}
+              onClick={() => setValues((current) => (on ? current.filter((value) => value !== option.value) : [...current, option.value]))}
+              className={chip(on)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+        <button type="button" aria-pressed={values.length === 0} disabled={disabled} onClick={() => setValues([])} className={chip(values.length === 0)}>
+          {noneLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
