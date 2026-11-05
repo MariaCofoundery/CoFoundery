@@ -17,6 +17,7 @@ import {
   PENDING_EMAIL_MAX_AGE,
 } from "@/features/auth/pendingEmailCookie";
 import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
+import { LAST_PLACE_COOKIE, resumablePath } from "@/features/navigation/lastPlace";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -107,6 +108,9 @@ export default async function StartPage({
   const pendingEmail = (await cookies()).get(PENDING_EMAIL_COOKIE)?.value ?? null;
 
   if (user) {
+    // Die App auf dem Startbildschirm oeffnet dort, wo man zuletzt war - nur ohne eigenes Ziel (lastPlace.ts).
+    const lastPlace = params.next ? null : resumablePath((await cookies()).get(LAST_PLACE_COOKIE)?.value);
+    if (lastPlace) redirect(lastPlace);
     const destination = await resolvePostAuthRedirectPath(supabase, nextPath);
     if (destination !== "/start") redirect(destination);
   }

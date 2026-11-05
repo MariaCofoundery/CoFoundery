@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { RememberLastPlace } from "@/features/navigation/RememberLastPlace";
 import { useLocale, useTranslations } from "next-intl";
 import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { clearAllInterviewDrafts } from "@/features/interviews/interviewDrafts";
@@ -689,6 +690,7 @@ export function ProductShell({
   return (
     <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
       <div className="min-h-screen">
+        <RememberLastPlace />
         <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/78 backdrop-blur-xl print:hidden">
           {/* -----------------------------------------------------------
               GEMELDET AM 05.10.2026: "Connect steht selbst bei 2048 Pixeln
