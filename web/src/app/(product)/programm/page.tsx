@@ -34,6 +34,8 @@ import { UserText } from "@/features/ui/UserText";
  */
 export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string }> }) {
   const t = await getTranslations("advisor.teamProgram");
+  const tEvent = await getTranslations("advisor.teamProgram.event");
+  const locale = await getLocale();
   const {
     data: { user },
   } = await getRequestUser();
@@ -112,11 +114,13 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               <li key={`${event.programId}-${event.eventId}`} id={`event-${event.eventId}`} className="scroll-mt-24 py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-semibold text-slate-950">{event.title}</span>
-                  <span className="text-sm text-slate-600">{dateFormat.format(new Date(event.startsAt))}</span>
+                  <span className="text-sm text-slate-600">{dateFormat.format(new Date(event.startsAt))}{event.endsAt ? `–${new Intl.DateTimeFormat(getPresentationLocale(locale), { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" }).format(new Date(event.endsAt))}` : ""}</span>
                 </div>
-                <p className="text-xs text-slate-500">
-                  {event.orgName} · {event.formatLabel ? `${event.formatLabel} · ` : ""}{t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
-                  {event.location ? ` · ${event.location}` : ""}
+                <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500">
+                  {event.mandatory ? <span className="rounded-full bg-slate-900 px-2 py-0.5 font-semibold text-white">{tEvent("mandatory")}</span> : null}
+                  <span>
+                    {[event.orgName, event.formatLabel, tEvent(`venue.${event.venue ?? "onsite"}`), event.location, event.host === "partner" ? tEvent("hostPartner") : null].filter(Boolean).join(" · ")}
+                  </span>
                 </p>
                 {event.notes ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={event.notes} /></p> : null}
                 {event.todos ? <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-700"><span className="font-semibold">{t("planTodos")}: </span>{event.todos}</p> : null}

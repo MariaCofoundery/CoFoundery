@@ -513,7 +513,7 @@ export function ProductShell({
     {
       href: "/advisor/dashboard",
       label: t("areaStart"),
-      isActive: (currentPathname) => currentPathname === "/advisor/dashboard",
+      isActive: (currentPathname) => currentPathname === "/advisor/dashboard" || currentPathname === "/advisor/los-gehts",
     },
     {
       // Alles, was man begleitet: Teams, Personen, Gruppenauswertungen - und

@@ -515,7 +515,8 @@ test("Beispiel-Vorschau: Heute, Teamkarten und Programmplan nutzen dieselben Bau
   assert.match(page, /exampleAttendance=\{exampleOrg\.attendance\}/);
   assert.doesNotMatch(page, /createClient|\.rpc\(|\.from\(/);
   const dashboard = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
-  assert.match(dashboard, /<TodayTiles/);
+  // Seit dem Entwurf vom 05.11.2026 fuehren vier Kacheln in die Bereiche (StartTiles); "Wartet auf dich" bleibt.
+  assert.match(dashboard, /<StartTiles tiles=\{startTiles\} \/>/);
   assert.match(dashboard, /<WaitingItems/);
   const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
   assert.match(plan, /exampleAttendance \?\? /);

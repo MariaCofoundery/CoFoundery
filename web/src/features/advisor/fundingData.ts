@@ -33,7 +33,7 @@ export async function listGrants(client: SupabaseClient, orgId: string): Promise
 export async function listRequirements(client: SupabaseClient, grantId: string): Promise<Requirement[]> {
   const { data, error } = await client
     .from("advisor_org_requirements")
-    .select("id, grant_id, title, kind, measure, event_kind, target, unit, due_on, notes, sort_order")
+    .select("id, grant_id, title, kind, measure, event_kind, format_id, target, unit, due_on, notes, sort_order")
     .eq("grant_id", grantId)
     .order("sort_order", { ascending: true });
   if (error || !Array.isArray(data)) return [];
@@ -97,4 +97,33 @@ export async function loadFunding(
   const [requirements, rows] = await Promise.all([listRequirements(client, grant.id), getFundingProgress(client, grant.id)]);
   const entries = await listRequirementEntries(client, requirements.map((requirement) => requirement.id));
   return { requirements, entries, report: buildFundingReport(grant, requirements, rows, entries, teamNames, today) };
+}
+
+/**
+ * Fuer das Terminformular (20270325120000): Auflagen laufender Foerderungen, die Termine zaehlen - mit Format und
+ * Art, damit das Formular sagen kann, wofuer ein Termin zaehlt.
+ */
+export async function listEventCountingRequirements(
+  client: SupabaseClient,
+  orgId: string,
+): Promise<{ title: string; grantName: string; formatId: string | null; eventKind: "education" | "internal" | "external" | null }[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await client
+    .from("advisor_org_requirements")
+    .select("title, format_id, event_kind, measure, advisor_org_grants!inner(name, starts_on, ends_on)")
+    .eq("org_id", orgId)
+    .in("measure", ["events", "event_attendance"])
+    .lte("advisor_org_grants.starts_on", today)
+    .gte("advisor_org_grants.ends_on", today);
+  if (error || !Array.isArray(data)) return [];
+  return (data as Record<string, unknown>[]).map((row) => {
+    const grant = row.advisor_org_grants as { name?: string } | null;
+    const kind = row.event_kind;
+    return {
+      title: String(row.title ?? ""),
+      grantName: String(grant?.name ?? ""),
+      formatId: typeof row.format_id === "string" ? row.format_id : null,
+      eventKind: kind === "education" || kind === "internal" || kind === "external" ? kind : null,
+    };
+  });
 }

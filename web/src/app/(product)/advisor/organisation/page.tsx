@@ -10,9 +10,11 @@ import { AdvisorOrgSection } from "@/features/advisor/AdvisorOrgSection";
 import { MyProgramStart } from "@/features/advisor/MyProgramStart";
 import { OrgAreaNav } from "@/features/advisor/OrgAreaNav";
 import { OrgFunding, isSuggestionKey } from "@/features/advisor/OrgFunding";
-import { listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
+import { listEventCountingRequirements, listFundingSnapshots, listGrants, loadFunding } from "@/features/advisor/fundingData";
 import { legacyTeamraumPath } from "@/features/advisor/teamraumRoutes";
+import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { EventFormats } from "@/features/advisor/EventFormats";
+import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { listOrgEventPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
@@ -39,6 +41,7 @@ import {
   getOrgOpenInvites,
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
+import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
 type Tab = (typeof TABS)[number];
@@ -129,7 +132,7 @@ export default async function AdvisorOrganisationPage({
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
   const needsPeople = tab === "learning";
-  const needsPrograms = tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
+  const needsPrograms = tab === "plan" || tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, planEvents, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
@@ -153,14 +156,15 @@ export default async function AdvisorOrganisationPage({
   const planExtras =
     (tab === "plan" || tab === "features") && !tabOff
       ? await (async () => {
-          const [formats, templates, eventPosts] = await Promise.all([
+          const [formats, templates, eventPosts, requirements] = await Promise.all([
             listEventFormats(client, org.id),
             tab === "plan" ? listPostTemplates(client, org.id) : Promise.resolve([]),
             tab === "plan" ? listOrgEventPosts(client, org.id) : Promise.resolve([]),
+            tab === "plan" && hasOrgFeature(org, "funding") ? listEventCountingRequirements(client, org.id) : Promise.resolve([]),
           ]);
           const postCounts = new Map<string, number>();
           for (const post of eventPosts) if (post.eventId) postCounts.set(post.eventId, (postCounts.get(post.eventId) ?? 0) + 1);
-          return { formats, templates, postCounts };
+          return { formats, templates, postCounts, requirements };
         })()
       : null;
 
@@ -182,20 +186,28 @@ export default async function AdvisorOrganisationPage({
   })).filter((group) => group.tabs.length > 0);
   // Teams im Programm (Entwurf 05.11.2026): je Team der naechste Meilenstein und das letzte Update. Nur Teams, die
   // diese Person sieht - die Abfragen laufen unter ihren Rechten.
-  const lastActivity: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null }> =
+  const lastActivity: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null; openTasks: number }> =
     tab === "program"
       ? await (async () => {
           const today = new Date().toISOString().slice(0, 10);
           const active = programs.filter((program) => program.isActive);
-          const [milestones, updates] = await Promise.all([
+          const [milestones, updates, orgTasks] = await Promise.all([
             getOrgMilestoneDeadlines(client, org.id),
             Promise.all(active.map(async (program) => [program.programId, (await listProgramUpdates(client, program.programId)).map((update) => update.submittedAt).sort().at(-1) ?? null] as const)),
+            listOrgTasks(client, org.id),
           ]);
           return Object.fromEntries(
             active.map((program) => {
               const own = milestones.filter((entry) => entry.programId === program.programId).sort((x, y) => (x.dueOn < y.dueOn ? -1 : 1));
               const next = own.find((entry) => entry.dueOn >= today) ?? own[0] ?? null;
-              return [program.programId, { milestone: next ? { title: next.title, dueOn: next.dueOn } : null, lastUpdate: updates.find(([id]) => id === program.programId)?.[1] ?? null }];
+              return [
+                program.programId,
+                {
+                  milestone: next ? { title: next.title, dueOn: next.dueOn } : null,
+                  lastUpdate: updates.find(([id]) => id === program.programId)?.[1] ?? null,
+                  openTasks: orgTasks.filter((task) => task.programId === program.programId && task.status !== "done").length,
+                },
+              ];
             }),
           );
         })()
@@ -236,6 +248,14 @@ export default async function AdvisorOrganisationPage({
       ) : null}
 
       <div className="mt-6">
+        <AreaTips area="program" />
+        {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
+        {["enroll", "page", "features", "members", "access", "profile"].includes(tab) && query.losgehts !== "1" ? (
+          <p className="mb-4 text-[14px] text-slate-700">
+            {tAdvisor("setup.findAgain")}{" "}
+            <Link href={`/advisor/los-gehts?org=${encodeURIComponent(org.id)}`} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{tAdvisor("setup.title")} →</Link>
+          </p>
+        ) : null}
         {/* Eingerichtet wird von der Fuehrung; andere Mitglieder lesen mit und wissen, wen sie fragen. */}
         {!isOwner && (tab === "enroll" || tab === "page" || tab === "features" || tab === "profile") ? (
           <p role="note" className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
@@ -286,6 +306,7 @@ export default async function AdvisorOrganisationPage({
               locale: getPresentationLocale(await getLocale()),
               today: funding.today,
               programs: programs.filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") })),
+              formats: await listEventFormats(client, org.id),
               feedback: { error: query.fundingError ?? null, saved: query.fundingSaved === "1", deleted: query.fundingDeleted === "1", snapshot: query.fundingSnapshot === "1" },
             }}
             grants={funding.grants}
@@ -302,6 +323,12 @@ export default async function AdvisorOrganisationPage({
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}
 
+        {tab === "members" ? (
+          <p className="mb-4 text-[14px] text-slate-700">
+            {tAdvisor("org.membersWho")}{" "}
+            <Link href={`/advisor/teamraum/wer-macht-was?org=${encodeURIComponent(org.id)}`} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{tAdvisor("org.membersWhoLink")}</Link>
+          </p>
+        ) : null}
         {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} saved={query.saved === "1"} part="members" /> : null}
 
         {tab === "page" ? (
@@ -382,7 +409,7 @@ export default async function AdvisorOrganisationPage({
         {tab === "plan" && !tabOff ? (
           <>
             {query.planSaved === "1" ? <p role="status" className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">{tAdvisor("teamProgram.planSaved")}</p> : null}
-            {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.planError")}</p> : null}
+            {query.planError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{query.planError === "audience" ? tAdvisor("teamProgram.event.errorAudience") : query.planError === "publicUrl" ? tAdvisor("teamProgram.event.errorPublicUrl") : tAdvisor("teamProgram.planError")}</p> : null}
             <OrgProgramPlan
               withSpeakers={hasOrgFeature(org, "experts")}
               orgId={org.id}
@@ -390,6 +417,8 @@ export default async function AdvisorOrganisationPage({
               events={planEvents}
               openEventId={/^[0-9a-f-]{36}$/.test(query.open ?? "") ? (query.open as string) : null}
               formats={planExtras?.formats ?? []}
+              programChoices={programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))}
+              countingRequirements={planExtras?.requirements ?? []}
               social={planExtras && org.status === "active" ? { templates: planExtras.templates, postCounts: planExtras.postCounts, today: new Date().toISOString().slice(0, 10) } : null}
               feedback={{
                 created: /^\d{1,2}$/.test(query.planCreated ?? "") ? Number(query.planCreated) : null,

@@ -10,6 +10,7 @@ const req = (overrides: Partial<Requirement>): Requirement => ({
   title: "Auflage",
   kind: "count",
   measure: "manual",
+  formatId: null,
   eventKind: null,
   target: 8,
   unit: null,

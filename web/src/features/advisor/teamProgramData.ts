@@ -312,7 +312,23 @@ export type ProgramEvent = {
   /** Format der Organisation (Masterclass, Fireside Chat ...), seit 20270324120000. */
   formatId?: string | null;
   formatLabel?: string | null;
+  /** Seit 20270325120000 (statt "Art"): Ende, Wo, Fuer wen, Pflicht, Veranstalter. */
+  endsAt?: string | null;
+  venue?: EventVenue;
+  audience?: EventAudience;
+  /** Bei "ausgewaehlte Teams": welche. Nur fuer die Organisation. */
+  programIds?: string[];
+  mandatory?: boolean;
+  host?: EventHost;
+  /** Nur fuer das Team der Organisation, nie an Teams im Programm. */
+  internalNote?: string | null;
+  publicUrl?: string | null;
+  /** Vorschlag im Event-Kalender: wartet, veroeffentlicht oder abgelehnt. */
+  publicStatus?: "pending" | "published" | "rejected" | null;
 };
+export type EventVenue = "onsite" | "online" | "hybrid";
+export type EventAudience = "all" | "selected" | "internal";
+export type EventHost = "us" | "partner";
 export type MyProgramEvent = ProgramEvent & { programId: string; orgName: string; myStatus: "present" | "absent" | "excused" | null };
 export type EventAttendanceRow = { programId: string; teamName: string | null; status: "present" | "absent" | "excused" | null };
 
@@ -326,6 +342,15 @@ const eventOf = (row: Record<string, unknown>): ProgramEvent => ({
   todos: (row.todos as string | null) ?? null,
   formatId: (row.format_id as string | null) ?? null,
   formatLabel: (row.format_label as string | null) ?? null,
+  endsAt: (row.ends_at as string | null) ?? null,
+  venue: row.venue === "online" || row.venue === "hybrid" ? row.venue : "onsite",
+  audience: row.audience === "selected" || row.audience === "internal" ? row.audience : "all",
+  programIds: Array.isArray(row.program_ids) ? (row.program_ids as string[]) : [],
+  mandatory: row.mandatory === true,
+  host: row.host === "partner" ? "partner" : "us",
+  internalNote: (row.internal_note as string | null) ?? null,
+  publicUrl: (row.public_url as string | null) ?? null,
+  publicStatus: row.public_status === "pending" || row.public_status === "published" || row.public_status === "rejected" ? row.public_status : null,
 });
 
 export type EventFormat = { formatId: string; label: string };

@@ -567,6 +567,8 @@ export type BoardOptions = {
   viewChosen: boolean;
   query: string;
   showDone: boolean;
+  /** Nur Aufgaben zu diesem Team im Programm (Link von der Teamzeile, 05.11.2026). */
+  programId?: string | null;
   newOpen: boolean;
   dictateOpen: boolean;
 };
@@ -591,7 +593,10 @@ export async function TeamraumBoard({
   const t = await getTranslations("advisor.teamraum");
   const { href } = helpers(ctx);
   const needle = options.query.trim().toLocaleLowerCase(ctx.locale);
-  const filtered = filterTasks(ctx.tasks, filter, ctx.me).filter((task) => !needle || `${task.title} ${task.details ?? ""}`.toLocaleLowerCase(ctx.locale).includes(needle));
+  const teamFilter = options.programId ? ctx.programs.find((program) => program.programId === options.programId) ?? null : null;
+  const filtered = filterTasks(ctx.tasks, filter, ctx.me)
+    .filter((task) => !needle || `${task.title} ${task.details ?? ""}`.toLocaleLowerCase(ctx.locale).includes(needle))
+    .filter((task) => !teamFilter || task.programId === teamFilter.programId);
   const columns = boardColumns(filtered);
   const selected = selectedTaskId ? ctx.tasks.find((task) => task.id === selectedTaskId) ?? null : null;
   const calendarMonth = month ?? ctx.today.slice(0, 7);
@@ -602,6 +607,7 @@ export async function TeamraumBoard({
     ...(filter !== "all" ? { filter } : {}),
     ...(needle ? { q: options.query.trim() } : {}),
     ...(options.showDone ? { done: "1" } : {}),
+    ...(teamFilter ? { team: teamFilter.programId } : {}),
   };
   const closeHref = href("tasks", keep);
   const viewLink = (entry: TaskView, active: boolean) => (
@@ -685,6 +691,12 @@ export async function TeamraumBoard({
           </label>
         </form>
       </div>
+      {teamFilter ? (
+        <p role="status" className="mt-3 text-sm text-slate-700">
+          {t("board.teamFilter", { team: teamFilter.name })}{" "}
+          <Link href={href("tasks", { ...keep, team: "" })} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{t("board.searchClear")}</Link>
+        </p>
+      ) : null}
       {needle ? (
         <p role="status" className="mt-3 text-sm text-slate-700">
           {t("board.searchResult", { count: filtered.length, query: options.query.trim() })}{" "}

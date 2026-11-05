@@ -502,7 +502,9 @@
     "saved": "Saved.",
     "roleLabel": "Role",
     "makeOwner": "Add to the lead",
-    "makeAdvisor": "Remove from the lead"
+    "makeAdvisor": "Remove from the lead",
+    "membersWho": "What each person does and who stands in is in the team space:",
+    "membersWhoLink": "Who does what"
   },
   "personView": {
     "back": "Back to people & groups",
@@ -686,6 +688,43 @@
         "nobody": "nobody assigned yet",
         "me": "Me",
         "more": "{count, plural, one {One more} other {# more}} in the team space"
+      },
+      "tiles": {
+        "label": "Where to",
+        "program": {
+          "area": "My program",
+          "title": "Teams and plan",
+          "text": "{teams, plural, =0 {No team yet} one {One team} other {# teams}} · next date {next}",
+          "none": "Create your program"
+        },
+        "teamraum": {
+          "area": "Team space",
+          "title": "This week",
+          "text": "{tasks, plural, =0 {Nothing open for you} one {One task for you} other {# tasks for you}} · {unread, plural, =0 {no unread messages} one {one unread message} other {# unread messages}}"
+        },
+        "follow": {
+          "area": "Support",
+          "title": "People and teams",
+          "text": "{people} people · {teams} teams · {invites, plural, =0 {no open invitation} one {one open invitation} other {# open invitations}}"
+        },
+        "events": {
+          "area": "Events",
+          "title": "In the ecosystem",
+          "text": "{count, plural, =0 {Nothing in the next 7 days} one {One in the next 7 days} other {# in the next 7 days}}"
+        }
+      },
+      "nextEvents": {
+        "title": "Next dates",
+        "all": "All events",
+        "none": "Nothing coming up in the next two weeks.",
+        "ecosystem": "Ecosystem",
+        "noPosts": "No post planned yet",
+        "suggestions": "See suggestions"
+      },
+      "greeting": {
+        "morning": "Good morning, {name}",
+        "day": "Good afternoon, {name}",
+        "evening": "Good evening, {name}"
       }
     },
     "follow": {
@@ -983,7 +1022,7 @@
     "retentionTitle": "What happens to the data when a team leaves",
     "retentionText": "If a team is removed from the program or ends its participation, your access ends and the team's program data (contact people, program profile, milestones, updates, attendance entries, notes on the team) is deleted. We deliberately chose not to retain anything: the team only agreed within the program. If you need information for your own evaluation, record it in your own files beforehand, with the team's knowledge.",
     "planTitleH": "Program plan",
-    "planText": "Sketch your program: education sessions, internal and external events with date, place, notes and to-dos. The teams in your program see the plan.",
+    "planText": "Plan your dates: format, time, place and for whom. Teams see the dates meant for them – never those only for your team.",
     "planAttendanceNote": "You enter attendance by hand (present, absent, excused). Next to it you see who said they're coming – the teams enter that themselves. Each team only sees its own entry. The entries are deleted as soon as the team leaves the program.",
     "planNew": "New event",
     "planTitle": "Title",
@@ -1230,15 +1269,15 @@
       "time": "Time",
       "format": "Format",
       "noFormat": "No format",
-      "kind": "Type",
-      "kindEducation": "Education",
-      "kindInternal": "Internal",
-      "kindExternal": "External",
       "location": "Place or link",
       "detailsLater": "Add notes, to-dos and speakers afterwards on each event.",
       "create": "{count, plural, one {Create event} other {Create # events}}",
       "discard": "Discard",
-      "created": "{count, plural, one {One event created} other {# events created}}. Post suggestions for them are just below."
+      "created": "{count, plural, one {One event created} other {# events created}}. Post suggestions for them are just below.",
+      "forWhom": "For whom",
+      "forAll": "All teams",
+      "forAllPartner": "All teams, by partners",
+      "forUs": "Only our team"
     },
     "formats": {
       "title": "Formats ({count})",
@@ -1259,7 +1298,73 @@
       "created": "{count, plural, one {One post taken over} other {# posts taken over}}.",
       "open": "Go to the social media calendar",
       "error": "The posts could not be taken over. Please try again."
-    }
+    },
+    "event": {
+      "title": "Title",
+      "format": "Format",
+      "newFormat": "New format",
+      "day": "Date",
+      "start": "Start",
+      "end": "End",
+      "where": "Where",
+      "venue": {
+        "onsite": "On site",
+        "online": "Online",
+        "hybrid": "Hybrid"
+      },
+      "placeLabel": "Place",
+      "linkLabel": "Link",
+      "placePlaceholder": "Address or room, e.g. Basislager, Leipzig",
+      "linkPlaceholder": "Link to the online room",
+      "forWhom": "For whom",
+      "audience": {
+        "all": "All teams in the program",
+        "selected": "Selected teams",
+        "internal": "Only our team"
+      },
+      "internalHint": "Teams in the program do not see this date – e.g. a jury meeting.",
+      "noTeams": "No team in the program yet.",
+      "participation": "Attendance",
+      "mandatory": "Mandatory",
+      "optional": "Optional",
+      "host": "Hosted by",
+      "hostUs": "Us",
+      "hostPartner": "Partner / external",
+      "notes": "Notes for the teams",
+      "todos": "To-dos for the teams",
+      "internalNote": "Note for our team only",
+      "internalNotePlaceholder": "e.g. clarify the speaker fee",
+      "internalNoteHint": "Only members of your organization see this, never the teams.",
+      "internalNoteShort": "Only for you",
+      "tasksTitle": "Tasks for it",
+      "tasksText": "Go to the team space, linked to this date.",
+      "tasksChecklist": "Create the “event organization” checklist (room, tech, catering, invitation)",
+      "orgaTaskTitle": "Event organization: {title}",
+      "orgaTaskChecklist": "Confirm the room | Check the tech | Ask for catering | Invite the teams | Brief the speaker",
+      "socialTitle": "Social media",
+      "socialText": "Post suggestions appear after saving under “Social media for your events” – nothing is taken over until you say it fits.",
+      "publicTitle": "Make public",
+      "publicCheck": "Also show in the event calendar for everyone – facts and a link only, after our approval",
+      "publicUrl": "Link to registration or an info page",
+      "publicInternal": "A date only for your team is not made public.",
+      "publicStatus": {
+        "pending": "Event calendar: waiting for approval",
+        "published": "Published in the event calendar",
+        "rejected": "Not approved for the event calendar"
+      },
+      "fundingTitle": "Funding",
+      "fundingNone": "Counts for no requirement of a running grant.",
+      "fundingCounts": "Counts for “{title}” ({grant})",
+      "onlyFor": "Only for: {teams}",
+      "errorAudience": "Please choose at least one team.",
+      "errorPublicUrl": "The event calendar needs a link that starts with https://.",
+      "save": "Save date"
+    },
+    "rowTasks": "{count, plural, =0 {No open tasks} one {One open task} other {# open tasks}}",
+    "rowDates": "Dates and attendance",
+    "teamLinks": "About this team",
+    "teamTasks": "Tasks for this team",
+    "teamDates": "Dates and attendance"
   },
   "programPage": {
     "title": "Program page",
@@ -1525,7 +1630,8 @@
       "showDone": "{count, plural, one {Show one done} other {Show # done}}",
       "search": "Search tasks",
       "searchResult": "{count, plural, =0 {No task} one {One task} other {# tasks}} with “{query}”.",
-      "searchClear": "Clear search"
+      "searchClear": "Clear search",
+      "teamFilter": "Only tasks for {team}."
     },
     "detail": {
       "eyebrow": "Open",
@@ -1795,9 +1901,9 @@
     },
     "eventKinds": {
       "any": "all kinds",
-      "education": "education",
-      "internal": "internal",
-      "external": "external"
+      "education": "for the teams, by us",
+      "internal": "only for our team",
+      "external": "for the teams, by partners"
     },
     "suggestions": {
       "workshops": "Run workshops",
@@ -1812,7 +1918,7 @@
       "title": "Requirement",
       "kind": "Kind",
       "measure": "How it is counted",
-      "eventKind": "Only events of kind",
+      "eventKind": "Which dates count",
       "target": "Target",
       "unit": "Unit",
       "unitPlaceholder": "e.g. hours",
@@ -1820,7 +1926,9 @@
       "notes": "Note (e.g. clause in the award letter)",
       "hint": "One-off: fulfilled by one piece of evidence or a done task. Target number: for the whole organization. Per team: for each team in the program. Anything that does not fit the kind is counted by hand.",
       "add": "Add requirement",
-      "save": "Save"
+      "save": "Save",
+      "format": "Format",
+      "anyFormat": "Any format"
     },
     "entry": {
       "doneOn": "Date",
@@ -2071,5 +2179,134 @@
       "daysAfter": "{count, plural, one {1 day after} other {# days after}}",
       "same": "on the day"
     }
+  },
+  "setup": {
+    "title": "Let's go",
+    "progress": "{done} of {total} done",
+    "later": "Continue later – the list stays on the start page",
+    "skippedShort": "skipped – catch up any time",
+    "stepOf": "Step {step} of {total}",
+    "whereLater": "Where to find it later:",
+    "isDone": "Done – you can go there any time.",
+    "doneWhen": "The step completes by itself as soon as {when}.",
+    "doNow": "Do it now",
+    "open": "Open",
+    "skip": "Skip",
+    "nextStep": "Next step →",
+    "toStart": "To the start page →",
+    "anytime": "Every step can be done later.",
+    "plan": {
+      "formatsTitle": "a) Your formats",
+      "formatsText": "Tap what you offer – add your own.",
+      "ownFormat": "Your own format",
+      "add": "+ Add",
+      "datesTitle": "b) The first dates",
+      "datesText": "Type or dictate – one line is enough for several."
+    },
+    "steps": {
+      "profile": {
+        "title": "Your profile",
+        "short": "Name, region, focus, logo",
+        "text": "Who you are: region, focus and a short description. Teams you invite see it, and it is on your program page.",
+        "place": "My program › Setup › Profile",
+        "doneWhen": "region, focus or description are filled in"
+      },
+      "features": {
+        "title": "What you use",
+        "short": "Program plan, materials, funding requirements …",
+        "text": "Choose the areas you need. What you switch off disappears for you and the teams – nothing is deleted.",
+        "place": "My program › Setup › Features & successes",
+        "doneWhen": "you have saved the choice once"
+      },
+      "team": {
+        "title": "Your team",
+        "short": "Invite colleagues, roles",
+        "text": "Invite the people you run the program with. Each person gets a role; who looks after which teams you set on the teams later.",
+        "place": "My program › Setup › Members & roles",
+        "doneWhen": "someone is invited"
+      },
+      "plan": {
+        "title": "Plan your program",
+        "short": "Formats and first dates",
+        "text": "Decide which formats you offer and enter the first dates. Teams in the program see the plan, answer and get reminders. Later this gives post suggestions for social media and the report for your funding.",
+        "place": "My program › Care › Program plan",
+        "doneWhen": "a date is in"
+      },
+      "teams": {
+        "title": "Bring teams into the program",
+        "short": "Link, email or code, program page",
+        "text": "Invite teams by link, email or program code. A team only takes part once everyone in the team agreed – before that you see nothing of it.",
+        "place": "My program › Setup › Enroll teams",
+        "doneWhen": "an invitation or a code exists"
+      },
+      "teamraum": {
+        "title": "Your team space",
+        "short": "First tasks, chat, social media",
+        "text": "This is where you organize yourselves as a team – only you, never the startups: tasks, chat, social media calendar and pages. Create a first task or a post template.",
+        "place": "Team space in the top menu",
+        "doneWhen": "a task or a post template exists"
+      },
+      "role": {
+        "title": "Your role in the team",
+        "short": "Who does what",
+        "text": "Enter what you do in the team and when you are away – then everyone knows whom to ask and who stands in.",
+        "place": "Team space › Who does what",
+        "doneWhen": "your role is entered"
+      },
+      "phone": {
+        "title": "On your phone",
+        "short": "Install the app, notifications, quiet hours",
+        "text": "Put MADE2FOUND on your home screen, switch on notifications and set your quiet hours – then the phone stays silent and messages wait in the app.",
+        "place": "Account › Phone, notifications and quiet hours",
+        "doneWhen": "notifications are on or quiet hours are set"
+      }
+    },
+    "card": {
+      "title": "Setup · {done} of {total} done",
+      "next": "Next:",
+      "continue": "Continue",
+      "hide": "Hide setup"
+    },
+    "back": {
+      "text": "You came from “Let's go”.",
+      "link": "Back to the list"
+    },
+    "tips": {
+      "counter": "In short · {step} of {total}",
+      "next": "Next",
+      "done": "Got it",
+      "dismiss": "Don't show again",
+      "teamraum": {
+        "0": {
+          "title": "Your team space",
+          "text": "This is where you organize yourselves as a team – only you, never the startups. What you enter here only members of your organization see."
+        },
+        "1": {
+          "title": "This week",
+          "text": "Shows what is up for you: your tasks, the dates from the program plan and what nobody has taken yet. New tasks take one line – typed or dictated."
+        },
+        "2": {
+          "title": "The parts at the top",
+          "text": "Tasks (board, list, calendar), chat, social media, pages and who does what. It all connects: a task can belong to a date or a team, posts to an event."
+        }
+      },
+      "program": {
+        "0": {
+          "title": "My program",
+          "text": "This is where you look after the teams in the program: teams, program plan, report and – if switched on – funding requirements. At the top you switch between care, content for the teams and setup."
+        },
+        "1": {
+          "title": "Program plan",
+          "text": "Dates with format, time, place and for whom. Teams see what is meant for them and reply. You get social media suggestions and, if you like, an organization checklist in the team space."
+        }
+      },
+      "events": {
+        "0": {
+          "title": "Events",
+          "text": "Dates from your program and from the startup ecosystem – facts only, with a link to the official page. Save an event with the bookmark; we check your own suggestions before they are published."
+        }
+      }
+    },
+    "findAgain": "Set everything up step by step:"
   }
 }

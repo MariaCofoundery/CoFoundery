@@ -11,7 +11,7 @@ test("Programmplan: deutsche Zeit, unabhaengig von der Zeitzone des Servers", ()
   assert.equal(berlinLocalToIso("2026-11-12T18:00"), "2026-11-12T17:00:00.000Z");
   assert.equal(isoToBerlinLocal("2026-11-12T17:00:00.000Z"), "2026-11-12T18:00");
   const actions = read("src/features/advisor/teamProgramActions.ts");
-  assert.match(actions, /const whenIso = berlinLocalToIso\(/);
+  assert.match(actions, /const startsAt = formData\.has\("day"\) \? berlinToIso\(day, startTime\) : berlinLocalToIso\(/);
   assert.doesNotMatch(actions, /const when = new Date\(String\(formData\.get\("startsAt"\)/);
 });
 

@@ -53,7 +53,7 @@ export async function OrgTeamProgramsSection({
   /** Plaetze der Organisation, steht unter der Ueberschrift "Teams im Programm". */
   seatsText?: string | null;
   /** Je Team: naechster Meilenstein und letztes Update (nur Reiter "Teams im Programm"). */
-  lastActivity?: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null }>;
+  lastActivity?: Record<string, { milestone: { title: string; dueOn: string } | null; lastUpdate: string | null; openTasks?: number }>;
   /** "teams": die Karten der Teams im Programm (taeglich); "enroll": Einladungen und Codes (einmal einrichten). */
   part?: "teams" | "enroll";
   invites: TeamProgramInvite[];
@@ -150,6 +150,14 @@ export async function OrgTeamProgramsSection({
                         ) : null}
                       </span>
                     </div>
+                    {program.isActive ? (
+                      <p className="-mt-1 flex flex-wrap gap-x-4 px-5 pb-1 text-[13px]">
+                        <Link href={`/advisor/teamraum/aufgaben?${new URLSearchParams({ org: org.id, team: program.programId }).toString()}`} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">
+                          {t("rowTasks", { count: activity?.openTasks ?? 0 })}
+                        </Link>
+                        <Link href={`/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan" }).toString()}`} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">{t("rowDates")}</Link>
+                      </p>
+                    ) : null}
                     {isOwner || program.isContact ? (
                       <details className="group px-5 pb-1">
                         <summary className="-mt-1 inline-flex min-h-10 cursor-pointer list-none items-center text-[13px] font-medium text-slate-600 underline-offset-4 hover:text-slate-950 hover:underline">{t("teamSettings")}</summary>

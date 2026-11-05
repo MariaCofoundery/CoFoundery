@@ -146,9 +146,13 @@ export default async function AdvisorProgramTeamPage({
         </nav>
       </AdvisorPageHeader>
 
-      <Link href={`/advisor/organisation?org=${orgOfProgram.id}&tab=program`} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
-        ← {t("backToOrg")}
-      </Link>
+      <nav aria-label={t("teamLinks")} className="mt-4 flex flex-wrap gap-x-5">
+        <Link href={`/advisor/organisation?org=${orgOfProgram.id}&tab=program`} className="inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
+          ← {t("backToOrg")}
+        </Link>
+        <Link href={`/advisor/teamraum/aufgaben?${new URLSearchParams({ org: orgOfProgram.id, team: programId }).toString()}`} className="inline-flex min-h-11 items-center text-sm font-medium text-violet-800 underline-offset-4 hover:underline">{t("teamTasks")}</Link>
+        <Link href={`/advisor/organisation?${new URLSearchParams({ org: orgOfProgram.id, tab: "plan" }).toString()}`} className="inline-flex min-h-11 items-center text-sm font-medium text-violet-800 underline-offset-4 hover:underline">{t("teamDates")}</Link>
+      </nav>
 
       <div className="mt-2">
         {!program.isActive && !opensWhileWaiting ? (

@@ -57,6 +57,8 @@ export type FundingContext = {
   locale: string;
   today: string;
   programs: { programId: string; name: string }[];
+  /** Formate der Organisation - eine Auflage kann nur ein Format zaehlen (20270325120000). */
+  formats?: { formatId: string; label: string }[];
   feedback: { error: string | null; saved: boolean; deleted: boolean; snapshot: boolean };
 };
 
@@ -177,6 +179,15 @@ async function RequirementForm({ ctx, grantId, requirement, suggestion }: { ctx:
             {EVENT_KINDS.map((entry) => <option key={entry} value={entry}>{t(`eventKinds.${entry}`)}</option>)}
           </select>
         </label>
+        {(ctx.formats ?? []).length > 0 ? (
+          <label>
+            <span className={LABEL}>{t("form.format")}</span>
+            <select name="formatId" defaultValue={requirement?.formatId ?? ""} className={INPUT}>
+              <option value="">{t("form.anyFormat")}</option>
+              {(ctx.formats ?? []).map((format) => <option key={format.formatId} value={format.formatId}>{format.label}</option>)}
+            </select>
+          </label>
+        ) : null}
         <label>
           <span className={LABEL}>{t("form.target")}</span>
           <input name="target" inputMode="decimal" defaultValue={requirement?.target ?? preset?.target ?? ""} className={INPUT} />

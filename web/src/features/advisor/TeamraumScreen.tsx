@@ -18,7 +18,9 @@ import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getOrgTeamPrograms, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
+import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { TEAMRAUM_SECTIONS, teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
+import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 export type TeamraumQuery = Record<string, string | undefined>;
 
@@ -167,6 +169,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
             showDone: query.done === "1",
             newOpen: query.new === "1",
             dictateOpen: query.dictate === "1",
+            programId: /^[0-9a-f-]{36}$/.test(query.team ?? "") ? (query.team as string) : null,
           }}
         />
       );
@@ -248,6 +251,8 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
           ) : null}
         </div>
       </header>
+      <AreaTips area="teamraum" />
+      {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
       {content}
     </main>
   );

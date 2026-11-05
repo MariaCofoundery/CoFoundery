@@ -40,6 +40,8 @@ export type Requirement = {
   kind: RequirementKind;
   measure: RequirementMeasure;
   eventKind: EventKind | null;
+  /** Seit 20270325120000: nur Termine dieses Formats ("6 Masterclasses"). */
+  formatId: string | null;
   target: number | null;
   unit: string | null;
   dueOn: string | null;
@@ -225,6 +227,7 @@ export function requirementOf(row: Record<string, unknown>): Requirement {
     kind: isRequirementKind(row.kind) ? row.kind : "once",
     measure: isRequirementMeasure(row.measure) ? row.measure : "manual",
     eventKind: isEventKind(row.event_kind) ? row.event_kind : null,
+    formatId: typeof row.format_id === "string" ? row.format_id : null,
     target: row.target === null || row.target === undefined ? null : Number(row.target),
     unit: (row.unit as string | null) ?? null,
     dueOn: (row.due_on as string | null) ?? null,

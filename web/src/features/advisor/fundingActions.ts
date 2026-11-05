@@ -107,6 +107,7 @@ export async function saveRequirementAction(formData: FormData) {
     p_unit: String(formData.get("unit") ?? "").slice(0, 40),
     p_due_on: dateOrNull(formData.get("dueOn")),
     p_notes: String(formData.get("notes") ?? "").slice(0, 2000),
+    p_format_id: (safeMeasure === "events" || safeMeasure === "event_attendance") && uuidOrNull(formData.get("formatId")) ? uuidOrNull(formData.get("formatId")) : null,
   });
   finish(backTo(formData, error ? { fundingError: errorOf(error.message) } : { fundingSaved: "1" }));
 }

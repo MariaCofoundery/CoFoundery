@@ -17,7 +17,7 @@ type Draft = ParsedEvent & { key: number; include: boolean };
  * Programmplan: mehrere Veranstaltungen auf einmal - tippen oder diktieren, "Erkennen", jede Zeile pruefen und
  * ergaenzen, dann anlegen (eventListParser.ts, Regeln im Browser). Erst "anlegen" schreibt.
  */
-export function PlanEventList({ orgId, today, formats }: { orgId: string; today: string; formats: { formatId: string; label: string }[] }) {
+export function PlanEventList({ orgId, today, formats, back }: { orgId: string; today: string; formats: { formatId: string; label: string }[]; back?: "setup" }) {
   const t = useTranslations("advisor.teamProgram.bulk");
   const locale = useLocale();
   const copy = useDictationCopy();
@@ -54,6 +54,7 @@ export function PlanEventList({ orgId, today, formats }: { orgId: string; today:
         ) : (
           <form action={createProgramEventsAction} className="grid gap-3">
             <input type="hidden" name="orgId" value={orgId} />
+            {back ? <input type="hidden" name="back" value={back} /> : null}
             <input type="hidden" name="events" value={JSON.stringify(chosen.map(({ title, day, time, location, formatId, kind }) => ({ title, day, time, location, formatId, kind })))} />
             <p role="status" className="text-[15px] font-semibold text-slate-950">{t("found", { count: drafts.length })}</p>
             <ul className="grid gap-2">
@@ -86,11 +87,11 @@ export function PlanEventList({ orgId, today, formats }: { orgId: string; today:
                       </select>
                     </label>
                     <label>
-                      <span className={LABEL}>{t("kind")}</span>
+                      <span className={LABEL}>{t("forWhom")}</span>
                       <select value={draft.kind} onChange={(event) => change(draft.key, { kind: event.target.value as Draft["kind"] })} className={INPUT}>
-                        <option value="education">{t("kindEducation")}</option>
-                        <option value="internal">{t("kindInternal")}</option>
-                        <option value="external">{t("kindExternal")}</option>
+                        <option value="education">{t("forAll")}</option>
+                        <option value="external">{t("forAllPartner")}</option>
+                        <option value="internal">{t("forUs")}</option>
                       </select>
                     </label>
                     <label>

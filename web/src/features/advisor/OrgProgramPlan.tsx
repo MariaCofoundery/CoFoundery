@@ -7,66 +7,16 @@ import {
 } from "@/features/advisor/teamProgramActions";
 import { getEventAttendance, getEventRsvps, listEventExperts, listProgramExperts, type EventAttendanceRow, type EventExpert, type EventFormat, type EventRsvp, type ProgramEvent, type ProgramExpert } from "@/features/advisor/teamProgramData";
 import { EventFormats } from "@/features/advisor/EventFormats";
+import { EventFormFields } from "@/features/advisor/EventFormFields";
 import { EventPostSuggestions } from "@/features/advisor/EventPostSuggestions";
 import { PlanEventList } from "@/features/advisor/PlanEventList";
 import type { PostTemplate } from "@/features/advisor/postPlanning";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
-import { berlinDayOf, isoToBerlinLocal } from "@/lib/berlinTime";
+import { berlinDayOf } from "@/lib/berlinTime";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
-const FIELD = "mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px]";
-const LABEL = "block text-sm font-semibold text-slate-900";
-
-/** Fuer das datetime-local-Feld: deutsche Zeit (der Server laeuft in UTC). */
-const localValue = (iso: string) => isoToBerlinLocal(iso);
-
-type T = Awaited<ReturnType<typeof getTranslations>>;
-
-function EventFields({ event, t, formats = [] }: { event?: ProgramEvent; t: T; formats?: EventFormat[] }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <label className="sm:col-span-2">
-        <span className={LABEL}>{t("planTitle")}</span>
-        <input name="title" required maxLength={160} defaultValue={event?.title ?? ""} className={FIELD} />
-      </label>
-      <label>
-        <span className={LABEL}>{t("planWhen")}</span>
-        <input name="startsAt" type="datetime-local" required defaultValue={event ? localValue(event.startsAt) : ""} className={FIELD} />
-      </label>
-      <label>
-        <span className={LABEL}>{t("planKind")}</span>
-        <select name="kind" defaultValue={event?.kind ?? "education"} className={FIELD}>
-          <option value="education">{t("kindEducation")}</option>
-          <option value="internal">{t("kindInternal")}</option>
-          <option value="external">{t("kindExternal")}</option>
-        </select>
-      </label>
-      {formats.length > 0 ? (
-        <label className="sm:col-span-2">
-          <span className={LABEL}>{t("formats.field")}</span>
-          <select name="formatId" defaultValue={event?.formatId ?? ""} className={FIELD}>
-            <option value="">{t("formats.noFormat")}</option>
-            {formats.map((format) => <option key={format.formatId} value={format.formatId}>{format.label}</option>)}
-          </select>
-        </label>
-      ) : null}
-      <label className="sm:col-span-2">
-        <span className={LABEL}>{t("planLocation")}</span>
-        <input name="location" maxLength={200} defaultValue={event?.location ?? ""} className={FIELD} />
-      </label>
-      <label className="sm:col-span-2">
-        <span className={LABEL}>{t("planNotes")}</span>
-        <textarea name="notes" rows={2} maxLength={2000} defaultValue={event?.notes ?? ""} className={`${FIELD} py-2`} />
-      </label>
-      <label className="sm:col-span-2">
-        <span className={LABEL}>{t("planTodos")}</span>
-        <textarea name="todos" rows={2} maxLength={2000} defaultValue={event?.todos ?? ""} className={`${FIELD} py-2`} />
-      </label>
-    </div>
-  );
-}
 
 /**
  * Programmplan der Organisation: Veranstaltungen anlegen, aendern, loeschen (Inhaber) und die
@@ -82,6 +32,8 @@ export async function OrgProgramPlan({
   exampleSpeakers,
   withSpeakers = true,
   formats = [],
+  programChoices = [],
+  countingRequirements = [],
   social = null,
   feedback = { created: null, postsCreated: null, postsError: false, formatError: false },
 }: {
@@ -99,6 +51,10 @@ export async function OrgProgramPlan({
   withSpeakers?: boolean;
   /** Formate der Organisation (20270324120000). */
   formats?: EventFormat[];
+  /** Teams fuer "ausgewaehlte Teams" (20270325120000). */
+  programChoices?: { programId: string; name: string }[];
+  /** Auflagen laufender Foerderungen, die Termine zaehlen - das Formular sagt, wofuer ein Termin zaehlt. */
+  countingRequirements?: { title: string; grantName: string; formatId: string | null; eventKind: "education" | "internal" | "external" | null }[];
   /** Social Media zu den Veranstaltungen: nur fuer aktive Mitglieder (Teamraum). */
   social?: { templates: PostTemplate[]; postCounts: Map<string, number>; today: string } | null;
   feedback?: { created: number | null; postsCreated: number | null; postsError: boolean; formatError: boolean };
@@ -106,6 +62,7 @@ export async function OrgProgramPlan({
   const t = await getTranslations("advisor.teamProgram");
   const locale = getPresentationLocale(await getLocale());
   const format = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
+  const clock = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   const now = Date.now();
   const upcoming = events.filter((event) => new Date(event.startsAt).getTime() >= now - 24 * 3600 * 1000);
   const past = events.filter((event) => !upcoming.includes(event)).reverse();
@@ -128,20 +85,28 @@ export async function OrgProgramPlan({
     <li key={event.eventId} className="advisor-card p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-base font-semibold text-slate-950">{event.title}</span>
-        <span className="text-sm text-slate-600">{format.format(new Date(event.startsAt))}</span>
+        <span className="text-sm text-slate-600">{format.format(new Date(event.startsAt))}{event.endsAt ? `–${clock.format(new Date(event.endsAt))}` : ""}</span>
       </div>
-      <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-slate-600">
+      <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[13px] text-slate-600">
         {event.formatLabel ? <span className="inline-flex h-6 items-center rounded-full bg-violet-50 px-2.5 text-xs font-semibold text-violet-900">{event.formatLabel}</span> : null}
+        {event.audience === "internal" ? <span className="inline-flex h-6 items-center rounded-full bg-amber-100 px-2.5 text-xs font-semibold text-amber-900">{t("event.audience.internal")}</span> : null}
+        {event.audience === "selected" ? (
+          <span className="inline-flex h-6 items-center rounded-full bg-sky-50 px-2.5 text-xs font-semibold text-sky-900">
+            {t("event.onlyFor", { teams: (event.programIds ?? []).map((id) => programChoices.find((program) => program.programId === id)?.name).filter(Boolean).join(", ") || "–" })}
+          </span>
+        ) : null}
+        {event.mandatory ? <span className="inline-flex h-6 items-center rounded-full bg-slate-900 px-2.5 text-xs font-semibold text-white">{t("event.mandatory")}</span> : null}
         <span>
-          {t(event.kind === "internal" ? "kindInternal" : event.kind === "external" ? "kindExternal" : "kindEducation")}
-          {event.location ? ` · ${event.location}` : ""}
+          {[t(`event.venue.${event.venue ?? "onsite"}`), event.location, event.host === "partner" ? t("event.hostPartner") : null].filter(Boolean).join(" · ")}
         </span>
         {social && (social.postCounts.get(event.eventId) ?? 0) > 0 ? (
           <a href={teamraumHref("social", orgId, { month: berlinDayOf(event.startsAt).slice(0, 7) })} className="font-semibold text-violet-800 underline-offset-4 hover:underline">
             {t("socialPlanned", { count: social.postCounts.get(event.eventId) ?? 0 })}
           </a>
         ) : null}
+        {event.publicStatus ? <span className="text-xs font-semibold text-emerald-800">{t(`event.publicStatus.${event.publicStatus}`)}</span> : null}
       </p>
+      {event.internalNote ? <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[13px] text-amber-950"><span className="font-semibold">{t("event.internalNoteShort")}: </span>{event.internalNote}</p> : null}
       {assigned.some((entry) => entry.eventId === event.eventId) ? (
         <p className="mt-2 text-sm text-slate-800">
           <span className="font-semibold">{t("planSpeakers")}: </span>
@@ -244,7 +209,7 @@ export async function OrgProgramPlan({
           <form action={saveProgramEventAction} className="mt-2 grid gap-3">
             <input type="hidden" name="orgId" value={orgId} />
             <input type="hidden" name="eventId" value={event.eventId} />
-            <EventFields event={event} t={t} formats={formats} />
+            <EventFormFields event={event} formats={formats} programs={programChoices} requirements={countingRequirements} />
             <SubmitButton label={t("planSave")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white" />
           </form>
           <form action={deleteProgramEventAction} className="mt-1">
@@ -277,8 +242,8 @@ export async function OrgProgramPlan({
             <summary className="inline-flex min-h-11 cursor-pointer items-center text-[15px] font-semibold text-slate-900">{t("planNew")}</summary>
             <form action={saveProgramEventAction} className="mt-3 grid gap-3">
               <input type="hidden" name="orgId" value={orgId} />
-              <EventFields t={t} formats={formats} />
-              <SubmitButton label={t("planSave")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white" />
+              <EventFormFields formats={formats} programs={programChoices} requirements={countingRequirements} />
+              <SubmitButton label={t("event.save")} pendingLabel="…" className="brand-cta inline-flex min-h-12 w-fit items-center rounded-xl px-6 text-[15px] font-semibold" />
             </form>
           </details>
           <details open={feedback.formatError} className="rounded-2xl border border-slate-200 bg-white/70 p-4">
@@ -289,7 +254,7 @@ export async function OrgProgramPlan({
           </details>
         </div>
       ) : null}
-      {social ? (
+      {social && upcoming.length > 0 ? (
         <section id="plan-social" aria-labelledby="plan-social-title" className="scroll-mt-24 rounded-[18px] border border-slate-200 bg-white p-5">
           <h3 id="plan-social-title" className="text-[17px] font-semibold text-slate-950">{t("social.title")}</h3>
           <p className="mt-1 max-w-2xl text-[14px] leading-6 text-slate-700">{t("social.text")}</p>

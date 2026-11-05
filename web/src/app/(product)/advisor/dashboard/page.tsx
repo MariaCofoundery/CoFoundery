@@ -3,21 +3,23 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
-import { TodayTiles, WaitingItems, type WaitingItem } from "@/features/advisor/TodayView";
+import { WaitingItems, type WaitingItem } from "@/features/advisor/TodayView";
 import { TeamAvatar } from "@/features/advisor/TeamAvatar";
-import { AdvisorPageHeader } from "@/features/advisor/AdvisorPageHeader";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { getAccompaniedPeople, getMyAdvisorOrgs, getOrgMembers, withAccompaniedNames } from "@/features/advisor/orgData";
-import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getProgramUpdateDue, getSuccessEnabled, listDueProgramFollowUps } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getProgramUpdateDue, getSuccessEnabled, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
 import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamInviteData";
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { listMyOpenOrgTasks, listUpcomingOrgTasks } from "@/features/advisor/teamraumData";
 import { StartTasks, startTasksViewOf } from "@/features/advisor/StartTasks";
-import { teamraumHref } from "@/features/advisor/teamraumRoutes";
+import { SetupCard, StartEvents, StartTiles, type StartEvent, type StartTile } from "@/features/advisor/StartOverview";
+import { loadSetup } from "@/features/advisor/setup/setupData";
+import { hasOrgFeature } from "@/features/advisor/orgFeatures";
+import { listOrgEventPosts } from "@/features/advisor/socialCalendarData";
 
 const CARD = "advisor-card p-6";
 const LINK =
@@ -62,6 +64,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     Promise.all(orgs.slice(0, 5).map((org) => getOrgMembers(client, org.id))),
   ]);
   const memberNames = new Map(memberLists.flat().map((member) => [member.userId, member.displayName ?? t("kinds.unnamed")] as const));
+
   if (!roleViews.hasAdvisor) redirect("/dashboard");
 
   // Programm: Fristen und faellige Updates der Teams, die diese Person sehen darf
@@ -106,6 +109,62 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
   const people = accompanied.filter((person) => person.scopes.length > 0);
 
   const teamName = (team: (typeof teams)[number]) => team.teamName?.trim() || `${team.founderAName} & ${team.founderBName}`;
+
+  // Entwurf vom 05.11.2026: Einrichtungsstand, vier Wege in die Bereiche, naechste Termine.
+  const setupOrg = orgs.find((org) => org.role === "owner") ?? orgs[0] ?? null;
+  const locale = getPresentationLocale(await getLocale());
+  const nowMs = Date.now();
+  const [setup, unreadChats, ecosystemSoon, planLists] = await Promise.all([
+    setupOrg ? loadSetup(client, setupOrg, user.id) : Promise.resolve(null),
+    orgs.length > 0 ? client.rpc("count_my_unread_org_chats").then(({ data }) => (typeof data === "number" ? data : 0)) : Promise.resolve(0),
+    client
+      .from("ecosystem_events")
+      .select("id, title, starts_at", { count: "exact" })
+      .eq("status", "published")
+      .gte("starts_at", new Date(nowMs).toISOString())
+      .lte("starts_at", new Date(nowMs + 7 * 86_400_000).toISOString())
+      .order("starts_at", { ascending: true })
+      .limit(2)
+      .then(({ data, count }) => ({ rows: (data ?? []) as { id: string; title: string; starts_at: string }[], count: count ?? 0 })),
+    Promise.all(
+      orgs.filter((org) => hasOrgFeature(org, "plan")).slice(0, 3).map(async (org) => ({ org, events: await listProgramEvents(client, org.id), posts: await listOrgEventPosts(client, org.id) })),
+    ),
+  ]);
+  const horizonMs = nowMs + 14 * 86_400_000;
+  const planSoon = planLists
+    .flatMap(({ org, events, posts }) =>
+      events
+        .filter((event) => new Date(event.startsAt).getTime() >= nowMs && new Date(event.startsAt).getTime() <= horizonMs)
+        .map((event) => ({ org, event, hasPosts: posts.some((post) => post.eventId === event.eventId) })),
+    )
+    .sort((a, b) => (a.event.startsAt < b.event.startsAt ? -1 : 1));
+  const nextPlan = planSoon[0]?.event ?? null;
+  const dayShort = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "Europe/Berlin" });
+  const tStart = await getTranslations("advisor.area.start");
+  const startTiles: StartTile[] = [
+    {
+      key: "program",
+      href: "/advisor/organisation",
+      text: orgs.length === 0 ? tStart("tiles.program.none") : tStart("tiles.program.text", { teams: programTeamCount, next: nextPlan ? dayShort.format(new Date(nextPlan.startsAt)) : "–" }),
+    },
+    ...(orgs.length > 0 ? [{ key: "teamraum" as const, href: "/advisor/teamraum", text: tStart("tiles.teamraum.text", { tasks: myTasks.length, unread: unreadChats }) }] : []),
+    { key: "follow", href: "/advisor/begleitung", text: tStart("tiles.follow.text", { people: people.length, teams: teams.length, invites: openInviteCount }) },
+    { key: "events", href: "/events", text: tStart("tiles.events.text", { count: ecosystemSoon.count }) },
+  ];
+  const startEvents: StartEvent[] = [
+    ...planSoon.slice(0, 4).map(({ org, event, hasPosts }) => ({
+      key: `p-${event.eventId}`,
+      title: event.formatLabel ? `${event.formatLabel}: ${event.title}` : event.title,
+      startsAt: event.startsAt,
+      href: `/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan", open: event.eventId }).toString()}`,
+      ecosystem: false,
+      needsPosts: hasPosts || event.audience === "internal" || org.status !== "active" ? null : `/advisor/organisation?${new URLSearchParams({ org: org.id, tab: "plan" }).toString()}#plan-social`,
+    })),
+    ...ecosystemSoon.rows.map((row) => ({ key: `e-${row.id}`, title: row.title, startsAt: row.starts_at, href: `/events#${row.id}`, ecosystem: true, needsPosts: null })),
+  ];
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Berlin" }).format(new Date(nowMs)));
+  const greeting = hour < 11 ? "morning" : hour < 18 ? "day" : "evening";
+  const firstName = name.split(/\s+/)[0] ?? name;
 
   const waiting: WaitingItem[] = [
     // Teamraum-Aufgaben stehen seit 05.11.2026 in einem eigenen Bereich darunter (StartTasks), nicht mehr hier.
@@ -204,37 +263,33 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     <>
       <ProductNavigationOverride activeView="advisor" matchingHref={preferred?.reportHref ?? "/advisor/begleitung"} />
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <QuoteOfTheDay className="mb-4 max-w-3xl" />
-        <AdvisorPageHeader
-          eyebrow={t("eyebrow")}
-          title={t("start.title", { name })}
-          text={`${
-            teams.length + people.length > 0
-              ? t("start.summary", { people: people.length, teams: teams.length })
-              : t("start.summaryNone")
-          } ${t("start.accessNote")}`}
-          action={
-            <Link href="/advisor/einladen" className="brand-cta inline-flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold">
-              {t("start.invite")}
-            </Link>
-          }
-        />
+        <header className="work-ui">
+          <p className="text-[13px] text-slate-600">{new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Berlin" }).format(new Date(nowMs))}</p>
+          <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight text-slate-950 sm:text-[34px]">{tStart(`greeting.${greeting}`, { name: firstName })}</h1>
+        </header>
 
-        <TodayTiles teams={programTeamCount} updates={programUpdates.length} invites={openInviteCount} labels={[t("start.tileTeams"), t("start.tileUpdates"), t("start.tileInvites")]} />
-
-        {orgs.length > 0 ? (
-          <StartTasks
-            view={startTasksViewOf(query.aufgaben)}
-            mine={myTasks}
-            upcoming={upcomingTasks}
-            orgs={orgs.map((org) => ({ id: org.id, name: org.name }))}
-            names={memberNames}
-            me={user.id}
-            today={todayIso}
-            locale={getPresentationLocale(await getLocale())}
-            error={query.taskError === "1"}
-          />
-        ) : null}
+        <div className="work-ui mt-5 grid gap-5">
+          {setupOrg && setup && !setup.hidden && !setup.progress.complete && setup.progress.next ? (
+            <SetupCard orgId={setupOrg.id} items={setup.progress.items} done={setup.progress.done} next={setup.progress.next} />
+          ) : null}
+          <StartTiles tiles={startTiles} />
+          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+            {orgs.length > 0 ? (
+              <StartTasks
+                view={startTasksViewOf(query.aufgaben)}
+                mine={myTasks}
+                upcoming={upcomingTasks}
+                orgs={orgs.map((org) => ({ id: org.id, name: org.name }))}
+                names={memberNames}
+                me={user.id}
+                today={todayIso}
+                locale={locale}
+                error={query.taskError === "1"}
+              />
+            ) : null}
+            <StartEvents events={startEvents} locale={locale} />
+          </div>
+        </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <section aria-labelledby="advisor-waiting-title" className={CARD}>
@@ -283,6 +338,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
             )}
           </section>
         </div>
+        <QuoteOfTheDay className="mt-8 max-w-3xl" />
       </main>
     </>
   );

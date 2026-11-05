@@ -6,6 +6,7 @@ import { getMyAdvisorOrgs } from "@/features/advisor/orgData";
 import { getMyProgramEvents, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { EventsView } from "@/features/events/EventsView";
+import { AreaTips } from "@/features/advisor/setup/AreaTips";
 import { listMyEventSubmissions, listMySavedEventIds, listUpcomingEcosystemEvents } from "@/features/events/eventsData";
 import { eventFilterOf, isRegion, type CalendarEntry } from "@/features/events/eventsModel";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
@@ -65,6 +66,8 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
   ];
 
   return (
+    <>
+    <AreaTips area="events" />
     <EventsView
       entries={entries}
       filter={eventFilterOf(query.filter)}
@@ -74,5 +77,6 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
       submissions={submissions}
       submitted={query.submitted === "1"}
     />
+    </>
   );
 }

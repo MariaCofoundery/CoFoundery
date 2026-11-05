@@ -47,7 +47,7 @@ export async function StartTasks({
     `inline-flex min-h-9 items-center rounded-full border px-3.5 text-[13.5px] font-medium ${active ? "border-slate-950 bg-slate-950 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`;
 
   return (
-    <section id="start-tasks" aria-labelledby="start-tasks-title" className="work-ui mt-6 scroll-mt-24 rounded-[18px] border border-slate-200 bg-white px-5 py-[18px]">
+    <section id="start-tasks" aria-labelledby="start-tasks-title" className="work-ui scroll-mt-24 rounded-[18px] border border-slate-200 bg-white px-5 py-[18px]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id="start-tasks-title" className="text-[15px] font-semibold text-slate-950">{t("title")}</h2>

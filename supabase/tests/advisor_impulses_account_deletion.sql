@@ -60,23 +60,23 @@ select extensions.is(
   'löscht ein Founder sein Konto, verschwinden die Impulse mit der Beziehung'
 );
 
--- Keine personenbezogene Spalte in public ohne Fremdschlüssel bleibt übrig
+-- Keine personenbezogene Spalte in public ohne Fremdschlüssel bleibt übrig.
+-- Ueber die Systemkataloge statt information_schema (05.11.2026): dieselbe Pruefung, aber die korrelierte Abfrage
+-- ueber information_schema brauchte bei 260+ Migrationen ueber 90 Sekunden und liess die lokale Datenbank im
+-- vollen Lauf am Speicher scheitern.
 select extensions.is(
   (select count(*)::integer
-   from information_schema.columns c
-   where c.table_schema = 'public'
-     and c.data_type = 'uuid'
-     and c.column_name ~ '(user_id|author_id|advisor_id|created_by|owner_id|member_id)$'
-     and exists (select 1 from information_schema.tables t
-                 where t.table_schema = 'public' and t.table_name = c.table_name and t.table_type = 'BASE TABLE')
+   from pg_catalog.pg_attribute a
+   join pg_catalog.pg_class cl on cl.oid = a.attrelid and cl.relkind in ('r', 'p')
+   join pg_catalog.pg_namespace n on n.oid = cl.relnamespace and n.nspname = 'public'
+   where a.attnum > 0
+     and not a.attisdropped
+     and a.atttypid = 'uuid'::regtype
+     and a.attname ~ '(user_id|author_id|advisor_id|created_by|owner_id|member_id)$'
      and not exists (
-       select 1
-       from information_schema.key_column_usage k
-       join information_schema.table_constraints tc
-         on tc.constraint_name = k.constraint_name and tc.table_schema = k.table_schema
-       where tc.constraint_type = 'FOREIGN KEY'
-         and k.table_schema = 'public' and k.table_name = c.table_name and k.column_name = c.column_name)
-     and (c.table_name, c.column_name) not in (('advisor_section_impulses', 'advisor_user_id'))),
+       select 1 from pg_catalog.pg_constraint co
+       where co.conrelid = cl.oid and co.contype = 'f' and a.attnum = any (co.conkey))
+     and (cl.relname::text, a.attname::text) not in (('advisor_section_impulses', 'advisor_user_id'))),
   0,
   'außer den Impulsen (vom Trigger abgedeckt) hat jede Personen-Spalte einen Fremdschlüssel'
 );
