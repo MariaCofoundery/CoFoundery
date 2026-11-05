@@ -248,7 +248,7 @@ test("O: Org-Fehler sind sichtbar, verstaendlich und nie Datenbanktext", () => {
   const actions = read("src/features/advisor/orgActions.ts");
   assert.match(actions, /&orgError=/);
   assert.match(actions, /back\(orgErrorCode\(error\.message\)\)/);
-  assert.match(actions, /back\("org_suspended"\)/);
+  assert.match(actions, /back\("org_suspended", membersTab\(orgId\)\)/);
   assert.doesNotMatch(actions, /back\(error\.message\)/);
   const section = read("src/features/advisor/AdvisorOrgSection.tsx");
   assert.match(section, /t\(`errors\.\$\{error\}`\)/);

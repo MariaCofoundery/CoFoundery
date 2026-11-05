@@ -131,8 +131,10 @@ export async function AdvisorNotebook({
       ) : null}
 
       {/* Dass die Handakte einen Widerruf überlebt, gehört hierher: Sonst
-          schreibt niemand etwas hinein, was länger gelten soll. */}
-      <p className="mt-5 text-xs leading-5 text-slate-500">{t("survives")}</p>
+          schreibt niemand etwas hinein, was länger gelten soll. NICHT bei einem
+          Programm-Team: Dort wird sie mit dem Ende des Programms geloescht
+          (Trigger in 20270209120000) - das sagt die Seite selbst. */}
+      {anchor.kind !== "program" ? <p className="mt-5 text-xs leading-5 text-slate-500">{t("survives")}</p> : null}
     </section>
   );
 }

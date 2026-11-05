@@ -102,7 +102,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
       features_setup_done: boolean | null;
       program_success_enabled: boolean | null;
     }[]
-  ).map((org) => ({
+  ).map((org): AdvisorOrg => ({
     id: org.id,
     features: [...(org.features ?? []), ...(org.program_success_enabled ? ["success"] : [])],
     featuresSetupDone: org.features_setup_done !== false,
@@ -120,7 +120,9 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     hasProgramLogo: Boolean(org.program_logo_path),
     programAccent: org.program_accent,
     programAccentB: org.program_accent_b,
-  }));
+  }))
+    // Feste Reihenfolge nach Namen - die erste Organisation ist die vorausgewaehlte, das darf nicht vom Zufall der Abfrage abhaengen.
+    .sort((a, b) => a.name.localeCompare(b.name, "de"));
 }
 
 /**
@@ -201,10 +203,18 @@ export async function getOrgMembers(
 export async function getAccompaniedPeople(
   client: SupabaseClient
 ): Promise<AccompaniedPerson[]> {
+  // Die Zeilensicherheit zeigt auch die Freigaben, die man selbst als Person
+  // erteilt hat - wer Advisor und Founder ist, stand sonst in der eigenen
+  // Begleitliste (gefunden 05.11.2026).
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) return [];
   const { data } = await client
     .from("advisor_person_grants")
     .select("subject_user_id, scope, status")
     .in("status", ["active", "requested"])
+    .neq("subject_user_id", user.id)
     .limit(500);
 
   const byPerson = new Map<string, AccompaniedPerson>();

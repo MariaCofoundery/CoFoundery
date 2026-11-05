@@ -26,6 +26,9 @@ const PATH = "/advisor/organisation";
 const ANCHOR = "";
 const TAB = "tab=members";
 const PROFILE_TAB = "tab=profile";
+// Bei mehreren Organisationen muss der Rueckweg sagen, welche - sonst landet man in der ersten
+// (Durchsicht vom 05.11.2026).
+const membersTab = (orgId: string) => `${TAB}&org=${encodeURIComponent(orgId)}`;
 
 function back(error: OrgActionErrorCode, tab = TAB): never {
   revalidatePath(PATH);
@@ -38,7 +41,7 @@ function back(error: OrgActionErrorCode, tab = TAB): never {
  */
 async function assertOrgActive(client: Awaited<ReturnType<typeof createClient>>, orgId: string) {
   const { data } = await client.from("advisor_orgs").select("status").eq("id", orgId).maybeSingle();
-  if ((data as { status?: string } | null)?.status === "suspended") back("org_suspended");
+  if ((data as { status?: string } | null)?.status === "suspended") back("org_suspended", membersTab(orgId));
 }
 
 function done(tab = TAB): never {
@@ -102,7 +105,7 @@ export async function inviteOrgAdvisorAction(formData: FormData) {
   const { client, userId } = await requireUser();
   const orgId = String(formData.get("orgId") ?? "");
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!email.includes("@")) back("email");
+  if (!email.includes("@")) back("email", membersTab(orgId));
   await assertOrgActive(client, orgId);
 
   const token = randomBytes(24).toString("hex");
@@ -113,7 +116,7 @@ export async function inviteOrgAdvisorAction(formData: FormData) {
     p_token_hash: createHash("sha256").update(token).digest("hex"),
     p_role: role,
   });
-  if (error) back(orgErrorCode(error.message));
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
 
   // Eine eigene Mail fuer die Einladung in die Organisation, nicht die an eine begleitete Person:
   // sie nennt, wer einlaedt, wohin, in welcher Rolle und mit welcher Adresse man sich anmeldet.
@@ -123,7 +126,7 @@ export async function inviteOrgAdvisorAction(formData: FormData) {
   ]);
   await sendAdvisorOrgInviteEmail({
     recipientEmail: email,
-    orgName: String((org as { name?: string } | null)?.name ?? "").trim() || "deiner Organisation",
+    orgName: String((org as { name?: string } | null)?.name ?? "").trim() || "einer Organisation",
     inviterName: String((inviter as { display_name?: string } | null)?.display_name ?? "").trim() || null,
     role,
     url: `${getPublicAppOrigin()}/invite/advisor-org/${token}`,
@@ -140,10 +143,10 @@ export async function setOrgMembershipAction(formData: FormData) {
     p_user_id: String(formData.get("userId") ?? ""),
     p_status: formData.get("status") === "active" ? "active" : "revoked",
   });
-  if (error) back(orgErrorCode(error.message));
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
   // Keine Zeile getroffen: Die Mitgliedschaft gibt es (so) nicht mehr.
-  if (data === false) back("org_not_member");
-  done();
+  if (data === false) back("org_not_member", membersTab(orgId));
+  done(`${membersTab(orgId)}&saved=1`);
 }
 
 /**
@@ -200,6 +203,21 @@ export async function updateAdvisorOrgProfileAction(formData: FormData) {
     p_focus: focus.length > 0 ? focus : null,
     p_location_region: String(formData.get("locationRegion") ?? "").trim() || null,
   });
-  if (error) back(orgErrorCode(error.message), PROFILE_TAB);
-  done(PROFILE_TAB);
+  if (error) back(orgErrorCode(error.message), `${PROFILE_TAB}&org=${encodeURIComponent(orgId)}`);
+  done(`${PROFILE_TAB}&saved=1&org=${encodeURIComponent(orgId)}`);
+}
+
+/** Rolle eines Mitglieds aendern (seit 05.11.2026): Mitinhaberin machen oder wieder Advisor. */
+export async function setOrgMemberRoleAction(formData: FormData) {
+  const { client } = await requireUser();
+  const orgId = String(formData.get("orgId") ?? "");
+  await assertOrgActive(client, orgId);
+  const { data, error } = await client.rpc("set_advisor_org_member_role", {
+    p_org_id: orgId,
+    p_user_id: String(formData.get("userId") ?? ""),
+    p_role: formData.get("role") === "owner" ? "owner" : "advisor",
+  });
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
+  if (data === false) back("org_not_member", membersTab(orgId));
+  done(`${membersTab(orgId)}&saved=1`);
 }

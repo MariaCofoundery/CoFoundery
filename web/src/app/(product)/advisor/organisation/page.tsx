@@ -244,8 +244,9 @@ export default async function AdvisorOrganisationPage({
             <EmptyState
               text={t("orgPage.teamsEmpty")}
               actions={[
-                { href: "/advisor/einladen?art=team", label: t("orgPage.teamsEmptyInvite"), primary: true },
-                { href: base("enroll"), label: t("orgPage.teamsEmptyProgram") },
+                // In der Organisation zuerst ins Programm aufnehmen; die persoenliche Team-Einladung ist der Nebenweg.
+                { href: base("enroll"), label: t("orgPage.teamsEmptyProgram"), primary: true },
+                { href: "/advisor/einladen?art=team", label: t("orgPage.teamsEmptyInvite") },
               ]}
             />
           ) : (
@@ -268,7 +269,7 @@ export default async function AdvisorOrganisationPage({
           <ProgramAccessTable rows={access} teamNames={new Map(programs.map((program) => [program.programId, program.teamName]))} />
         ) : null}
 
-        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} part="members" /> : null}
+        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} saved={query.saved === "1"} part="members" /> : null}
 
         {tab === "page" ? (
           <div className="grid gap-4">
@@ -410,7 +411,7 @@ export default async function AdvisorOrganisationPage({
           </>
         ) : null}
 
-        {tab === "profile" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} part="profile" /> : null}
+        {tab === "profile" ? <AdvisorOrgSection orgs={[org]} members={members} error={orgError} saved={query.saved === "1"} part="profile" /> : null}
 
         {tab === "program" || tab === "enroll" ? (
           <>

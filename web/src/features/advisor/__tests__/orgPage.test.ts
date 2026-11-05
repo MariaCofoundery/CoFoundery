@@ -454,7 +454,7 @@ test("Advisor-Menue: Programm-Team-Seiten gehoeren zur Organisation, Einladen un
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
   assert.match(shell, /currentPathname\.startsWith\("\/advisor\/programm\/"\)/);
   const invite = readFileSync("src/app/(product)/advisor/einladen/page.tsx", "utf8");
-  assert.match(invite, /program: "\/advisor\/organisation\?tab=enroll"/);
+  assert.match(invite, /program: ownedOrg \? `\/advisor\/organisation\?org=\$\{ownedOrg\.id\}&tab=enroll` : "\/advisor\/organisation\?tab=enroll"/);
   const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
   assert.match(section, /href="\/advisor\/einladen"/);
 });

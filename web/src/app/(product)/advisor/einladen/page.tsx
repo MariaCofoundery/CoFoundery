@@ -51,7 +51,8 @@ export default async function AdvisorInvitePage({
     (inviteRows.data ?? []) as { id: string; invitee_email: string; status: string; scopes: string[] }[]
   ).map((row) => ({ id: row.id, inviteeEmail: row.invitee_email, status: row.status, scopes: row.scopes ?? [] }));
 
-  const isOwner = orgs.some((org) => org.role === "owner" && org.status === "active");
+  const ownedOrg = orgs.find((org) => org.role === "owner" && org.status === "active") ?? null;
+  const isOwner = ownedOrg !== null;
   const WAY_ICON: Record<Way, React.ReactNode> = {
     person: (
       <>
@@ -79,7 +80,8 @@ export default async function AdvisorInvitePage({
     person: "/advisor/einladen?art=person",
     team: "/advisor/einladen?art=team",
     round: "/advisor/einladen?art=runde",
-    program: "/advisor/organisation?tab=enroll",
+    // Mit der Organisation, die man fuehrt - sonst landete man bei mehreren in der ersten nach Namen.
+    program: ownedOrg ? `/advisor/organisation?org=${ownedOrg.id}&tab=enroll` : "/advisor/organisation?tab=enroll",
   };
 
   return (

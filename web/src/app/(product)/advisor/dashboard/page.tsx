@@ -58,27 +58,31 @@ export default async function AdvisorStartPage() {
   const programData = await Promise.all(
     orgs.slice(0, 3).map(async (org) => {
       const [deadlines, programs, successOn] = await Promise.all([getOrgMilestoneDeadlines(client, org.id), getOrgTeamPrograms(client, org.id), getSuccessEnabled(client, org.id)]);
-      const active = programs.filter((program) => program.isActive).slice(0, 12);
+      const allActive = programs.filter((program) => program.isActive);
+      const active = allActive.slice(0, 12);
       const dues = await Promise.all(active.map(async (program) => ({ program, due: await getProgramUpdateDue(client, program.programId) })));
       // Erfolge, die ein Team gemeldet hat und die noch auf Bestaetigung warten (Organisation traegt direkt bestaetigt ein). Nur wenn die Funktion an ist; je Team, ohne Summe.
       const pendingOutcomes = successOn
         ? (await Promise.all(active.map(async (program) => ({ program, count: (await getProgramOutcomes(client, program.programId)).filter((outcome) => outcome.outcomeId && !outcome.confirmed).length })))).filter((entry) => entry.count > 0)
         : [];
-      return { org, deadlines, active, dues, pendingOutcomes };
+      return { org, deadlines, active, activeCount: allActive.length, dues, pendingOutcomes };
     }),
   );
   const inTwoWeeks = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
   const todayIso = new Date().toISOString().slice(0, 10);
   const programDeadlines = programData.flatMap((entry) => entry.deadlines);
   const programUpdates = programData.flatMap((entry) => entry.dues).filter((entry) => entry.due && entry.due <= inTwoWeeks);
-  const programTeamCount = programData.reduce((sum, entry) => sum + entry.active.length, 0);
+  // Die Kachel zaehlt alle aktiven Teams der gelesenen Organisationen, nicht nur die zwoelf, deren Fristen hier stehen.
+  const programTeamCount = programData.reduce((sum, entry) => sum + entry.activeCount, 0);
+  // Abgeschnitten wird nicht mehr stillschweigend: dann steht ein Hinweis unter der Liste.
+  const programCut = orgs.length > 3 || programData.some((entry) => entry.activeCount > entry.active.length);
   const openInviteCount = (personInvites.data ?? []).length + pendingInvites.length;
 
   const metadataName =
     typeof user.user_metadata?.display_name === "string" ? user.user_metadata.display_name.trim() : "";
   const name = profile.displayName || metadataName || user.email?.split("@")[0]?.trim() || "Advisor";
 
-  const followUpByRelationship = new Map(dueFollowUps.map((entry) => [entry.relationshipId, entry]));
+  const followUpByRelationship = new Map(dueFollowUps.flatMap((entry) => (entry.relationshipId ? [[entry.relationshipId, entry] as const] : [])));
   const today = new Date().toISOString().slice(0, 10);
   const overdueTeams = teams.filter((team) => {
     const entry = team.relationshipId ? followUpByRelationship.get(team.relationshipId) : null;
@@ -123,6 +127,31 @@ export default async function AdvisorStartPage() {
         cta: t("start.open"),
         icon: "flag" as const,
       }];
+    }),
+    // Wiedervorlagen zu einer Person oder einer Teamdurchsicht (bisher nur auf ihrer eigenen Seite sichtbar).
+    ...dueFollowUps.flatMap((entry) => {
+      if (entry.subjectUserId) {
+        // Nur solange die Begleitung laeuft - sonst fuehrt der Link auf eine verschlossene Seite.
+        const person = people.find((candidate) => candidate.subjectUserId === entry.subjectUserId);
+        if (!person) return [];
+        return [{
+          key: `person-followup-${entry.subjectUserId}`,
+          text: t("start.personFollowUp", { name: person.name ?? t("kinds.unnamed"), date: entry.dueOn, overdue: entry.dueOn < todayIso ? "yes" : "no" }),
+          href: `/advisor/person/${entry.subjectUserId}#notebook`,
+          cta: t("start.open"),
+          icon: "flag" as const,
+        }];
+      }
+      if (entry.reviewId) {
+        return [{
+          key: `review-followup-${entry.reviewId}`,
+          text: t("start.reviewFollowUp", { date: entry.dueOn, overdue: entry.dueOn < todayIso ? "yes" : "no" }),
+          href: `/advisor/review/${entry.reviewId}#notebook`,
+          cta: t("start.open"),
+          icon: "flag" as const,
+        }];
+      }
+      return [];
     }),
     ...overdueTeams.map((team) => ({
       key: `due-${team.invitationId}`,
@@ -190,6 +219,7 @@ export default async function AdvisorStartPage() {
             ) : (
               <WaitingItems items={waiting} />
             )}
+            {programCut ? <p className="mt-3 text-xs leading-5 text-slate-500">{t("start.programCut")}</p> : null}
             <Link href="/advisor/beispiel" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">
               {tExample("link")}
             </Link>

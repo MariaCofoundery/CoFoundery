@@ -113,7 +113,7 @@ test("loads English feedback and advisor messages", () => {
   assert.equal(advisor.dashboard?.inviteTeam?.title, "Invite two founders");
   assert.equal(advisor.dashboard?.followUps?.none, "No follow-up set");
   assert.equal(advisor.dashboard?.statuses?.reportReady, "Report ready");
-  assert.equal(advisor.report?.backToDashboard, "Back to advisor dashboard");
+  assert.equal(advisor.report?.backToDashboard, "Back to advisor start");
   assert.equal(advisor.report?.save, "Save");
   assert.equal(advisor.invite?.openWorkbook, "View earlier workbook record");
   assert.equal(navigation.statusLabels?.inProgress, "In progress");

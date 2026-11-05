@@ -1,14 +1,16 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   createAdvisorOrgAction,
   updateAdvisorOrgProfileAction,
   inviteOrgAdvisorAction,
   setOrgMembershipAction,
+  setOrgMemberRoleAction,
   leaveOrgAction,
 } from "@/features/advisor/orgActions";
 import type { AdvisorOrg, OrgMember, OrgOpenInvite } from "@/features/advisor/orgData";
 import type { OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 /**
  * Die Organisation - anlegen, Menschen aufnehmen, sehen wen man begleitet.
@@ -28,6 +30,7 @@ export async function AdvisorOrgSection({
   members,
   openInvites = [],
   error = null,
+  saved = false,
   part = "all",
 }: {
   orgs: AdvisorOrg[];
@@ -36,10 +39,13 @@ export async function AdvisorOrgSection({
   openInvites?: OrgOpenInvite[];
   /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
   error?: OrgActionErrorCode | null;
+  /** Gespeichert (`?saved=1`) - vorher sagte die Seite nach dem Speichern nichts. */
+  saved?: boolean;
   /** Die Organisationsseite zeigt Mitglieder und Profil getrennt; ohne Angabe steht alles zusammen. */
   part?: "all" | "members" | "profile";
 }) {
   const t = await getTranslations("advisor.org");
+  const locale = getPresentationLocale(await getLocale());
   const org = orgs[0] ?? null;
   const showHeader = part === "all";
   const showProfile = part === "all" || part === "profile";
@@ -57,6 +63,10 @@ export async function AdvisorOrgSection({
       {error ? (
         <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800">
           {t(`errors.${error}`)}
+        </p>
+      ) : saved ? (
+        <p role="status" className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-900">
+          {t("saved")}
         </p>
       ) : null}
 
@@ -199,6 +209,14 @@ export async function AdvisorOrgSection({
                   className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm"
                 />
               </label>
+              {/* Die Rolle reiste bisher nicht mit (die Aktion las sie, das Formular schickte sie nie). */}
+              <label>
+                <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("roleLabel")}</span>
+                <select name="role" defaultValue="advisor" className="mt-1 min-h-11 rounded-xl border border-slate-300 bg-white px-3 text-sm">
+                  <option value="advisor">{t("roles.advisor")}</option>
+                  <option value="owner">{t("roles.owner")}</option>
+                </select>
+              </label>
               <SubmitButton
                 label={t("invite")}
                 pendingLabel={t("pending")}
@@ -219,7 +237,7 @@ export async function AdvisorOrgSection({
                       {" · "}
                       {t(`roles.${invite.role}`)}
                       {" · "}
-                      {t("openInviteUntil", { date: new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(new Date(invite.expiresAt)) })}
+                      {t("openInviteUntil", { date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(invite.expiresAt)) })}
                     </span>
                   </li>
                 ))}
@@ -247,6 +265,18 @@ export async function AdvisorOrgSection({
                   </span>
                 </span>
                 {org.role === "owner" && org.status === "active" && member.status === "active" && !member.isSelf ? (
+                  <div className="flex flex-wrap items-center gap-1">
+                  {/* Die Fuehrung uebergeben (seit 05.11.2026): ein Mitglied zur Mitinhaberin machen - oder zurueck. */}
+                  <form action={setOrgMemberRoleAction}>
+                    <input type="hidden" name="orgId" value={org.id} />
+                    <input type="hidden" name="userId" value={member.userId} />
+                    <input type="hidden" name="role" value={member.role === "owner" ? "advisor" : "owner"} />
+                    <SubmitButton
+                      label={t(member.role === "owner" ? "makeAdvisor" : "makeOwner")}
+                      pendingLabel={t("pending")}
+                      className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-medium text-violet-800 underline-offset-4 hover:underline"
+                    />
+                  </form>
                   <form action={setOrgMembershipAction}>
                     <input type="hidden" name="orgId" value={org.id} />
                     <input type="hidden" name="userId" value={member.userId} />
@@ -257,6 +287,7 @@ export async function AdvisorOrgSection({
                       className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-medium text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline"
                     />
                   </form>
+                  </div>
                 ) : null}
               </li>
             ))}

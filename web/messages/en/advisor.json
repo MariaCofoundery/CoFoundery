@@ -71,7 +71,7 @@
         "invalidFounderBEmail": "Please enter a valid email address for Founder B.",
         "emailsMustDiffer": "Please use two different founder email addresses.",
         "notAuthenticated": "Please sign in first.",
-        "duplicateInvite": "This team has already been invited and appears in your advisor dashboard.",
+        "duplicateInvite": "This team has already been invited and appears under “Support”.",
         "createFailed": "The team could not be created right now. Please try again."
       }
     },
@@ -169,7 +169,7 @@
     "eyebrow": "Advisor report",
     "missingTitle": "Report not available yet",
     "missingText": "There is no advisor report to display for this team yet. Once the founder report has been fully generated, you can work with the advisor report here.",
-    "backToDashboard": "Back to advisor dashboard",
+    "backToDashboard": "Back to advisor start",
     "openWorkbook": "Open historical working state",
     "exportSnapshot": "Export snapshot",
     "impulsesEyebrow": "Advisor prompts",
@@ -212,7 +212,7 @@
     "context": "Advisor context",
     "notAvailableTitle": "Snapshot not available yet",
     "notAvailableText": "There is no snapshot available for this team context yet.",
-    "backToDashboard": "Back to advisor dashboard",
+    "backToDashboard": "Back to advisor start",
     "export": "Export snapshot",
     "intro": "A compact coaching snapshot with focus areas, advisor prompts, founder response, and the next useful steps.",
     "teamContexts": {
@@ -456,7 +456,7 @@
       "unverified": "Please confirm your email address first. Then you can join the organization."
     },
     "leave": "Leave organization",
-    "leaveLastOwner": "You are the only person leading this organization. Hand over the lead or close the organization before you leave.",
+    "leaveLastOwner": "You are the only person leading this organization. First add another member to the lead under “Members”, or close the organization before you leave.",
     "you": "You",
     "unnamed": "No name",
     "suspended": "This organization is suspended. Access through it is currently not active.",
@@ -496,7 +496,11 @@
       "ownerOnly": "Only the owner can change this.",
       "offNotice": "This area is switched off.",
       "offNoticeLink": "Switch it on under Features"
-    }
+    },
+    "saved": "Saved.",
+    "roleLabel": "Role",
+    "makeOwner": "Add to the lead",
+    "makeAdvisor": "Remove from the lead"
   },
   "personView": {
     "back": "Back to people & groups",
@@ -656,10 +660,13 @@
       "programDeadline": "Deadline reached: {team}, \"{title}\", no progress entered yet",
       "programUpdate": "{overdue, select, yes {Update overdue} other {Update due}} on {date}: {team}",
       "programFollowUp": "{overdue, select, yes {Follow-up overdue} other {Follow-up due}} on {date}: {team}",
+      "personFollowUp": "{overdue, select, yes {Follow-up overdue} other {Follow-up due}} on {date}: {name}",
+      "reviewFollowUp": "{overdue, select, yes {Follow-up overdue} other {Follow-up due}} on {date}: team review",
       "tileTeams": "Teams in the program",
       "tileUpdates": "Updates in 14 days",
       "tileInvites": "open invitations",
-      "programOutcomes": "{team}: {count, plural, one {# achievement is} other {# achievements are}} waiting for confirmation"
+      "programOutcomes": "{team}: {count, plural, one {# achievement is} other {# achievements are}} waiting for confirmation",
+      "programCut": "Deadlines and updates are shown here for at most three organizations and twelve teams each. You'll find the rest under “Organization”."
     },
     "follow": {
       "title": "Support",

@@ -62,25 +62,31 @@ export async function getAdvisorFollowUp(
 /**
  * Alle offenen Wiedervorlagen dieser Person, die faellig sind oder es bald
  * werden. Fuer die Uebersicht - damit die Verabredung nicht nur in einem Team
- * liegt, in das man zufaellig hineinschaut.
+ * liegt, in das man zufaellig hineinschaut. Seit 05.11.2026 auch die zu einer
+ * Person und zu einer Teamdurchsicht - die standen bisher nirgends ausser auf
+ * ihrer eigenen Seite. Genau ein Anker ist gesetzt (Check in der Datenbank).
  */
 export async function listDueAdvisorFollowUps(
   client: SupabaseClient,
   withinDays = 7
-): Promise<{ relationshipId: string; dueOn: string; note: string }[]> {
+): Promise<{ relationshipId: string | null; subjectUserId: string | null; reviewId: string | null; dueOn: string; note: string }[]> {
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + withinDays);
 
   const { data, error } = await client
     .from("advisor_follow_ups")
-    .select("relationship_id, due_on, note")
+    .select("relationship_id, subject_user_id, review_id, due_on, note")
     .is("completed_at", null)
     .lte("due_on", horizon.toISOString().slice(0, 10))
     .order("due_on", { ascending: true });
 
   if (error || !Array.isArray(data)) return [];
-  return (data as { relationship_id: string; due_on: string; note: string | null }[]).map((row) => ({
+  return (
+    data as { relationship_id: string | null; subject_user_id: string | null; review_id: string | null; due_on: string; note: string | null }[]
+  ).map((row) => ({
     relationshipId: row.relationship_id,
+    subjectUserId: row.subject_user_id,
+    reviewId: row.review_id,
     dueOn: row.due_on,
     note: row.note ?? "",
   }));

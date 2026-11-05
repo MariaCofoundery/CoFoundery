@@ -55,7 +55,7 @@ export default async function AdvisorProgramTeamPage({
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
   const query = (await searchParams) ?? {};
   const tabParam = query.tab;
-  const tab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" || tabParam === "erfolge" ? tabParam : "overview";
+  const requestedTab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" || tabParam === "erfolge" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
   const locale = await getLocale();
   const {
@@ -77,6 +77,11 @@ export default async function AdvisorProgramTeamPage({
     }
   }
   if (!program || !orgOfProgram) notFound();
+  // Erfolge nur, wenn die Organisation sie eingeschaltet hat - vorher war der Reiter per URL trotzdem offen.
+  const successEnabled = await getSuccessEnabled(client, orgOfProgram.id);
+  const tab = requestedTab === "erfolge" && !successEnabled ? "overview" : requestedTab;
+  // Solange das Team noch nicht zugestimmt hat, gibt es nur Notizen und Freigaben - beide haengen nicht an der Zustimmung.
+  const opensWhileWaiting = tab === "notizen" || tab === "freigaben";
 
   const [members, milestones, questions, updates, due, profile, orgData, accessRows, setupItems, outcomes, outcomeComments, rewards, checkIns] = await Promise.all([
     getOrgMembers(client, orgOfProgram.id),
@@ -86,14 +91,13 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && (tab === "updates" || tab === "overview") ? getProgramUpdateDue(client, programId) : Promise.resolve(null),
     program.isActive && tab === "overview" ? getProgramProfile(client, programId) : Promise.resolve(null),
     program.isActive && tab === "overview" ? getProgramOrgData(client, programId) : Promise.resolve(null),
-    program.isActive && tab === "freigaben" ? getProgramAccess(client, orgOfProgram.id) : Promise.resolve([]),
+    tab === "freigaben" ? getProgramAccess(client, orgOfProgram.id) : Promise.resolve([]),
     program.isActive && tab === "setup" ? getProgramConfirmedSetup(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getProgramOutcomes(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getOutcomeComments(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getProgramRewards(client, programId) : Promise.resolve([]),
     program.isActive && tab === "erfolge" ? getCheckIns(client, programId) : Promise.resolve([]),
   ]);
-  const successEnabled = await getSuccessEnabled(client, orgOfProgram.id);
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
 
@@ -147,7 +151,7 @@ export default async function AdvisorProgramTeamPage({
       </Link>
 
       <div className="mt-2">
-        {!program.isActive ? (
+        {!program.isActive && !opensWhileWaiting ? (
           <p role="status" className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
             {t("teamPageInactive")} ({t("statusWaiting", { approved: program.approvedCount, total: program.memberCount })})
           </p>
