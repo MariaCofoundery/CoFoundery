@@ -183,6 +183,31 @@
     "up": "Move {name} up",
     "down": "Move {name} down",
     "reset": "Reset to default",
-    "back": "Back to Today"
+    "back": "Back to Today",
+    "founderText": "Hide what you do not need and move the areas into the order that suits you. “Start” always stays. This applies to you only and on all devices. Hidden areas stay reachable through search (⌘K).",
+    "backFounder": "Back to Start"
+  },
+  "founder": {
+    "label": "Navigation",
+    "navLabel": "Areas",
+    "skip": "Skip to content",
+    "tabsLabel": "Tabs",
+    "more": "More",
+    "moreClose": "Close",
+    "customize": "Customize sidebar",
+    "customizeTabs": "Customize tabs",
+    "notifications": "Messages and notices",
+    "toggle": "Expand or collapse {name}",
+    "subLabel": "Sections of {name}",
+    "search": {
+      "open": "Search",
+      "placeholder": "Search areas",
+      "label": "Search areas",
+      "none": "Nothing found. Try an area such as “Connect” or “Contacts”.",
+      "hint": "Search covers the areas and their sections – not content yet.",
+      "close": "Close search",
+      "stations": "Areas",
+      "actions": "Create"
+    }
   }
 }

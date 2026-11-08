@@ -26,6 +26,9 @@ import {
 } from "@/features/navigation/workContext";
 import { TEAMRAUM_BASE, TEAMRAUM_SECTIONS, teamraumPath, teamraumSectionOfPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 import { WorkspaceChrome } from "@/features/navigation/workspace/WorkspaceChrome";
+import { FounderChrome } from "@/features/navigation/founder/FounderChrome";
+import type { FounderAreaKey, FounderNavItem, FounderNavPrefs } from "@/features/navigation/founder/founderNav";
+import { getIncomingRequestBadgePresentation } from "@/features/discovery/discoveryIntroTypes";
 import { isWorkspacePath } from "@/features/navigation/workspace/workspaceNav";
 
 type Props = {
@@ -40,6 +43,8 @@ type Props = {
   activeOrgId?: string | null;
   /** Die eigene Seitenleiste des Advisor-Arbeitsbereichs (20270331120000). */
   advisorNavPrefs?: { hidden: string[]; order: string[] } | null;
+  /** Die eigene Founder-Leiste (20270402120000): ausgeblendet und Reihenfolge. */
+  founderNavPrefs?: FounderNavPrefs | null;
   hasConnect: boolean;
   hasConnectAccount: boolean;
   /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
@@ -73,6 +78,8 @@ type Props = {
 type AreaBadge = { kind: "intro" | "attention" | "suggestions" | "chat"; count: number };
 
 type NavigationItem = {
+  /** Nur fuer die Founder-Leiste: welcher ihrer Bereiche das ist. */
+  key?: FounderAreaKey;
   href: string;
   label: string;
   isActive: (pathname: string) => boolean;
@@ -300,6 +307,7 @@ export function ProductShell({
   advisorOrgList = [],
   activeOrgId = null,
   advisorNavPrefs = null,
+  founderNavPrefs = null,
   hasConnect,
   hasConnectAccount,
   hasTeamProgram = false,
@@ -448,11 +456,13 @@ export function ProductShell({
 
   const founderItems: NavigationItem[] = isConnectOnly || !isFounderView ? [] : [
     {
+      key: "home",
       href: "/dashboard",
       label: t("areaStart"),
       isActive: (currentPathname) => currentPathname === "/dashboard",
     },
     {
+      key: "align",
       href: hasFounder ? "/me/profile" : "/connections",
       label: t("areaAlign"),
       isActive: (currentPathname) =>
@@ -579,6 +589,7 @@ export function ProductShell({
   ];
 
   const findItem: NavigationItem = {
+    key: "find",
     href: "/discovery",
     label: t("areaFind"),
     isActive: (currentPathname) => currentPathname.startsWith("/discovery"),
@@ -634,6 +645,7 @@ export function ProductShell({
   };
 
   const connectItem: NavigationItem = {
+    key: "connect",
     href: "/connect",
     label: t("areaConnect"),
     isActive: (currentPathname) => currentPathname.startsWith("/connect"),
@@ -668,6 +680,7 @@ export function ProductShell({
   // Events (20270323120000): Programm-Termine und das Startup-Oekosystem - fuer Gruendende und Advisor gleich,
   // deshalb ein eigener Bereich am Ende. Nicht fuer reine Connect-Konten.
   const eventsItem: NavigationItem = {
+    key: "events",
     href: "/events",
     label: t("areaEvents"),
     isActive: (currentPathname) => currentPathname === "/events" || currentPathname.startsWith("/events/"),
@@ -757,28 +770,8 @@ export function ProductShell({
     return <>{children}</>;
   }
 
-  // ---------------------------------------------------------------------
-  // ADVISOR-ARBEITSBEREICH MIT SEITENLEISTE (Entwurf vom 05.11.2026, freigegeben)
-  // ---------------------------------------------------------------------
-  //
-  // Teamraum und Programm waren zwei getrennte Bereiche mit je eigener Reihe: man kam schwer hin und her.
-  // In der Advisor-Ansicht steht jetzt EINE Seitenleiste mit allen Stationen und oben eine schlanke Leiste
-  // (Organisation, Suche, "+ Neu", Nachrichten, Profil); auf dem Handy fuenf Reiter unten. Die Founder-Ansicht
-  // und Connect behalten die Leiste oben. Reine Darstellung - jede Seite prueft ihren Zugang selbst.
-  const useWorkspace = hasAdvisor && resolvedActiveView === "advisor" && !isConnectOnly && !isSuspendedConnectOnly && isWorkspacePath(pathname);
-  if (useWorkspace) {
-    return (
-      <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
-        <RememberLastPlace />
-        <WorkspaceChrome
-          hasOrg={advisorOrgNames.length > 0}
-          orgLabel={advisorOrgLabel}
-          orgs={advisorOrgList}
-          activeOrgId={activeOrgId}
-          navPrefs={advisorNavPrefs}
-          chatUnread={advisorChatUnread}
-          messagesCount={messagesAttentionCount}
-          slots={{
+  // Die Werkzeuge rechts oben und unter "Mehr" - fuer beide Seitenleisten (Advisor und Founder) dieselben.
+  const chromeSlots = {
             profile: (
               <ProfileMenu
                 displayName={displayName}
@@ -843,12 +836,101 @@ export function ProductShell({
                 </div>
               </>
             ),
-          }}
+  };
+
+  // ---------------------------------------------------------------------
+  // ADVISOR-ARBEITSBEREICH MIT SEITENLEISTE (Entwurf vom 05.11.2026, freigegeben)
+  // ---------------------------------------------------------------------
+  //
+  // Teamraum und Programm waren zwei getrennte Bereiche mit je eigener Reihe: man kam schwer hin und her.
+  // In der Advisor-Ansicht steht jetzt EINE Seitenleiste mit allen Stationen und oben eine schlanke Leiste
+  // (Organisation, Suche, "+ Neu", Nachrichten, Profil); auf dem Handy fuenf Reiter unten. Die Founder-Ansicht
+  // und Connect behalten die Leiste oben. Reine Darstellung - jede Seite prueft ihren Zugang selbst.
+  const useWorkspace = hasAdvisor && resolvedActiveView === "advisor" && !isConnectOnly && !isSuspendedConnectOnly && isWorkspacePath(pathname);
+  if (useWorkspace) {
+    return (
+      <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
+        <RememberLastPlace />
+        <WorkspaceChrome
+          hasOrg={advisorOrgNames.length > 0}
+          orgLabel={advisorOrgLabel}
+          orgs={advisorOrgList}
+          activeOrgId={activeOrgId}
+          navPrefs={advisorNavPrefs}
+          chatUnread={advisorChatUnread}
+          messagesCount={messagesAttentionCount}
+          slots={chromeSlots}
         >
           {children}
           {hasFounder && researchConsentState === "undecided" ? <ResearchConsentNotice onDecision={setResearchConsentState} /> : null}
           <AnnouncementPopup />
         </WorkspaceChrome>
+      </ProductNavigationOverrideContext.Provider>
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // FOUNDER-ANSICHT MIT SEITENLEISTE (Entwurf vom 08.11.2026, Variante A, freigegeben)
+  // ---------------------------------------------------------------------
+  //
+  // Dieselbe Bauart wie der Advisor-Arbeitsbereich: links die Bereiche, der aktive klappt auf und zeigt seine
+  // Unterpunkte; oben Ort, Suche, Nachrichten, Profil; auf dem Handy vier Reiter und "Mehr". Fuer die Founder-Ansicht
+  // und fuer Konten nur mit Connect (dort sind die Unterpunkte die Leiste). Die Eintraege kommen aus
+  // `navigationItems` - es gibt weiter nur EINE Quelle fuer die Bereiche. Reine Darstellung: jede Seite prueft ihren
+  // Zugang selbst. Wer nur Advisor ist, behaelt die Leiste oben auf den Seiten ausserhalb des Arbeitsbereichs.
+  const useFounderShell = !useWorkspace && !isSuspendedConnectOnly && (isConnectOnly || (isFounderView && hasFounder));
+  if (useFounderShell) {
+    const areaBadgeOf = (badge: AreaBadge | undefined): FounderNavItem["badge"] => {
+      if (!badge || badge.count < 1) return undefined;
+      if (badge.kind === "intro") {
+        const presentation = getIncomingRequestBadgePresentation(badge.count);
+        return presentation ? { value: badge.count, label: t(presentation.messageKey, { count: badge.count }) } : undefined;
+      }
+      return { value: badge.count, label: t("connectAttentionBadge", { count: badge.count }) };
+    };
+    const childIcons: Record<string, string> = {
+      "/connect": "discover",
+      "/connect/people": "people",
+      "/connect/problems": "problems",
+      "/connect/ventures": "ventures",
+      "/connect/contacts": "contacts",
+      "/connect/my": "mine",
+    };
+    const founderNavItems: FounderNavItem[] = navigationItems.flatMap((item) =>
+      item.key
+        ? [
+            {
+              key: item.key,
+              href: item.href,
+              label: item.label,
+              active: item.isActive(pathname),
+              badge: areaBadgeOf(item.badge),
+              children: (item.subItems ?? []).map((subItem) => ({
+                href: subItem.href,
+                label: subItem.label,
+                active: subItem.isActive(pathname),
+                icon: childIcons[subItem.href],
+                count: subItem.count,
+              })),
+            },
+          ]
+        : [],
+    );
+    return (
+      <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
+        <RememberLastPlace />
+        <FounderChrome
+          items={founderNavItems}
+          connectOnly={isConnectOnly}
+          prefs={founderNavPrefs}
+          dashboardHref={dashboardHref}
+          messagesCount={messagesAttentionCount}
+          slots={chromeSlots}
+        >
+          {children}
+          {hasFounder && researchConsentState === "undecided" ? <ResearchConsentNotice onDecision={setResearchConsentState} /> : null}
+          <AnnouncementPopup />
+        </FounderChrome>
       </ProductNavigationOverrideContext.Provider>
     );
   }

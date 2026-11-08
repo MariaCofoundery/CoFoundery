@@ -183,6 +183,31 @@
     "up": "{name} nach oben",
     "down": "{name} nach unten",
     "reset": "Auf Voreinstellung zurücksetzen",
-    "back": "Zurück zu Heute"
+    "back": "Zurück zu Heute",
+    "founderText": "Blende aus, was du nicht brauchst, und schieb die Bereiche in die Reihenfolge, die zu dir passt. „Start“ bleibt immer. Das gilt nur für dich und auf allen Geräten. Ausgeblendete Bereiche findest du weiter über die Suche (⌘K).",
+    "backFounder": "Zurück zu Start"
+  },
+  "founder": {
+    "label": "Navigation",
+    "navLabel": "Bereiche",
+    "skip": "Zum Inhalt",
+    "tabsLabel": "Reiter",
+    "more": "Mehr",
+    "moreClose": "Schließen",
+    "customize": "Seitenleiste anpassen",
+    "customizeTabs": "Reiter anpassen",
+    "notifications": "Nachrichten und Hinweise",
+    "toggle": "{name} auf- oder zuklappen",
+    "subLabel": "Unterpunkte von {name}",
+    "search": {
+      "open": "Suchen",
+      "placeholder": "Bereiche suchen",
+      "label": "Bereiche suchen",
+      "none": "Dazu gibt es nichts. Probier einen Bereich wie „Connect“ oder „Kontakte“.",
+      "hint": "Suche über die Bereiche und ihre Unterpunkte – Inhalte noch nicht.",
+      "close": "Suche schließen",
+      "stations": "Bereiche",
+      "actions": "Anlegen"
+    }
   }
 }

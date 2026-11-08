@@ -138,7 +138,7 @@ test("die angezeigten Bereiche bilden ab, was die Datenbank tatsaechlich tut", (
   // dem aufklappbaren Menue auf dem Telefon lesen zwei Ansichten dieselbe
   // Liste, und die Bedingung steht einmal an der Liste - dieselbe Aussage.
   const shell = source("src/features/navigation/ProductShell.tsx");
-  assert.match(shell, /const findItem: NavigationItem = \{\s*href: "\/discovery"/);
+  assert.match(shell, /const findItem: NavigationItem = \{\s*key: "find",\s*href: "\/discovery"/);
   assert.match(shell, /hasFounder \? \[findItem\] : \[\]/);
 });
 

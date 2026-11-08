@@ -31,7 +31,7 @@ type Slots = {
 
 const COUNT = "inline-flex min-w-5 items-center justify-center rounded-full bg-[#6d49e0] px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white";
 
-function Count({ value, label }: { value: number; label: string }) {
+export function Count({ value, label }: { value: number; label: string }) {
   if (value <= 0) return null;
   return (
     <span aria-label={label} className={COUNT}>
@@ -439,8 +439,8 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
 }
 
 /** Suche ueber die Bereiche und das, was man anlegen kann (⌘K). Keine Inhalte - das steht im Hinweis. */
-function Palette({ entries, onClose }: { entries: { key: string; group: "stations" | "actions"; label: string; href: string; hint?: string }[]; onClose: () => void }) {
-  const tw = useTranslations("navigation.workspace");
+export function Palette({ entries, onClose, ns = "navigation.workspace" }: { entries: { key: string; group: "stations" | "actions"; label: string; href: string; hint?: string }[]; onClose: () => void; ns?: "navigation.workspace" | "navigation.founder" }) {
+  const tw = useTranslations(ns);
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);

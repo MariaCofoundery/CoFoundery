@@ -187,6 +187,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .then(({ data }) => (data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null))
         .catch(() => null)
     : null;
+  // Dasselbe fuer die Founder-Ansicht (20270402120000): die eigene Leiste fuer Start, Align, Find, Connect, Events.
+  const founderNavPrefs = user && roleViews.hasFounder
+    ? await Promise.resolve(supabase.from("founder_nav_prefs").select("hidden, item_order").maybeSingle())
+        .then(({ data }) => (data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null))
+        .catch(() => null)
+    : null;
   const hasTeamProgram = user
     ? await Promise.resolve(supabase.rpc("get_my_team_programs"))
         .then(({ data }) => Array.isArray(data) && data.length > 0)
@@ -215,6 +221,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             advisorOrgList={roleViews.advisorOrgList ?? []}
             activeOrgId={parseActiveOrg(cookieStore.get(ACTIVE_ORG_COOKIE)?.value)}
             advisorNavPrefs={advisorNavPrefs}
+            founderNavPrefs={founderNavPrefs}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             hasTeamProgram={hasTeamProgram}

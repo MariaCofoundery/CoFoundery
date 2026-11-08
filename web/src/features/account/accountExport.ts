@@ -63,6 +63,7 @@ const EXPORTED_TABLES = [
   // Wer ist wer, Seitenleiste, Aufgaben/Ziele im Programm (20270327-20270331): nur die eigenen Zeilen.
   { table: "advisor_org_member_cards", column: "user_id" },
   { table: "advisor_nav_prefs", column: "user_id" },
+  { table: "founder_nav_prefs", column: "user_id" },
   { table: "team_program_tasks", column: "created_by_user_id" },
   { table: "team_program_task_comments", column: "author_user_id" },
   { table: "team_program_goals", column: "created_by_user_id" },
