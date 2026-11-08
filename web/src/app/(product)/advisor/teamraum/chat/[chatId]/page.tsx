@@ -55,7 +55,7 @@ export default async function OrgChatPage({
   const here = teamraumChatHref(org.id, chat.id);
 
   return (
-    <main className="work-ui mx-auto flex h-[calc(100dvh-4.5rem)] w-full xl:h-[calc(100dvh-6.5rem)] max-w-3xl flex-col bg-slate-50/60 sm:border-x sm:border-slate-200">
+    <main className="work-ui mx-auto flex h-[calc(100dvh-9rem)] w-full lg:h-[calc(100dvh-4.5rem)] max-w-3xl flex-col bg-slate-50/60 sm:border-x sm:border-slate-200">
       <header className="flex items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-5">
         <Link href={listHref} aria-label={t("back")} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-700 hover:bg-slate-100">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>

@@ -776,7 +776,7 @@ export async function TeamraumBoard({
         <Link
           href={href("tasks", { ...keep, new: "1" })}
           aria-label={t("board.new")}
-          className="fixed bottom-6 right-5 z-30 grid h-[58px] w-[58px] place-items-center rounded-full bg-gradient-to-br from-[#6d49e0] to-[#0a80b8] text-3xl text-white shadow-[0_8px_20px_rgba(80,50,200,.35)] md:hidden"
+          className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-5 z-30 grid h-[58px] w-[58px] place-items-center rounded-full bg-gradient-to-br from-[#6d49e0] to-[#0a80b8] text-3xl text-white shadow-[0_8px_20px_rgba(80,50,200,.35)] md:hidden"
         >
           +
         </Link>

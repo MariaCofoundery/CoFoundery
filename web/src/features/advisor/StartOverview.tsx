@@ -11,7 +11,7 @@ export async function SetupCard({ orgId, items, done, next }: { orgId: string; i
   const t = await getTranslations("advisor.setup");
   return (
     <section aria-labelledby="setup-card-title" className="flex flex-wrap items-center gap-4 rounded-[18px] border border-violet-200 bg-white px-5 py-4 sm:flex-nowrap">
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
         <h2 id="setup-card-title" className="text-[16px] font-semibold text-slate-950">{t("card.title", { done, total: items.length })}</h2>
         <p className="mt-1 text-[14px] text-slate-700">
           {t("card.next")} <strong>{t(`steps.${next}.title`)}</strong> – {t(`steps.${next}.short`)}

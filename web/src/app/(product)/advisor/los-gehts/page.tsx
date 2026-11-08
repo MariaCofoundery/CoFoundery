@@ -53,7 +53,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
 
   return (
     <main className="work-ui mx-auto grid w-full max-w-6xl gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start lg:px-8">
-      <aside className="rounded-[20px] border border-slate-200 bg-white p-5">
+      <aside className="order-2 rounded-[20px] border border-slate-200 bg-white p-5 lg:order-1">
         <p className="text-[13px] text-slate-600">{org.name}</p>
         <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight text-slate-950">{t("title")}</h1>
         <p className="mt-1 text-[14px] text-slate-700">{t("progress", { done, total })}</p>
@@ -95,7 +95,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         </form>
       </aside>
 
-      <section aria-labelledby="step-title" className="grid gap-5 rounded-[20px] border border-slate-200 bg-white p-6 sm:p-8">
+      <section aria-labelledby="step-title" className="order-1 grid gap-5 rounded-[20px] border border-slate-200 bg-white p-6 sm:p-8 lg:order-2">
         <p className="text-[13px] font-semibold text-violet-800">{t("stepOf", { step: index + 1, total })}</p>
         <h2 id="step-title" className="font-brand -mt-3 text-[30px] font-semibold leading-tight text-slate-950">{t(`steps.${current}.title`)}</h2>
         <p className="max-w-2xl text-[15.5px] leading-7 text-slate-800">{t(`steps.${current}.text`)}</p>

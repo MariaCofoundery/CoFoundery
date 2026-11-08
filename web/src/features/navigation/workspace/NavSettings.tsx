@@ -40,9 +40,9 @@ export async function NavSettings({ hasOrg, prefs, orgId, back }: { hasOrg: bool
               const fixed = (FIXED_NAV_KEYS as string[]).includes(item.key);
               const off = hidden.has(item.key);
               return (
-                <li key={item.key} className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${off ? "border-dashed border-slate-300 bg-slate-50" : "border-slate-200"}`}>
+                <li key={item.key} className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-3 py-2 ${off ? "border-dashed border-slate-300 bg-slate-50" : "border-slate-200"}`}>
                   <span className={off ? "text-slate-500" : "text-violet-700"}><WorkspaceIcon name={item.icon} size={20} /></span>
-                  <span className={`min-w-0 flex-1 text-[15px] ${off ? "text-slate-600" : "font-semibold text-slate-950"}`}>{t(`items.${item.key}`)}{off ? <span className="ml-2 text-[12.5px] font-medium text-slate-600">· {ts("hiddenBadge")}</span> : null}</span>
+                  <span className={`min-w-0 flex-1 basis-32 text-[15px] ${off ? "text-slate-600" : "font-semibold text-slate-950"}`}>{t(`items.${item.key}`)}{off ? <span className="ml-2 text-[12.5px] font-medium text-slate-600">· {ts("hiddenBadge")}</span> : null}</span>
                   {fixed ? (
                     <span className="text-[13px] text-slate-600">{ts("fixed")}</span>
                   ) : (

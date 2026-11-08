@@ -176,3 +176,19 @@ test("Seitenleiste einrichten: Seite, Onboarding-Schritt, Datenbank und Export",
     for (const key of ["title", "text", "fixed", "hide", "show", "reset"]) assert.ok(nav.settings[key], `${locale} ${key}`);
   }
 });
+
+test("Handy (Pruefung 08.11.2026): nichts wird vom Reiter unten verdeckt, Diese Woche und Wer macht was bleiben erreichbar", () => {
+  // Der Knopf "Neue Aufgabe" und das Chat-Eingabefeld liegen ueber dem Reiter unten (unter 1024 Pixeln).
+  assert.match(source("src/features/advisor/Teamraum.tsx"), /fixed bottom-\[calc\(4\.75rem\+env\(safe-area-inset-bottom\)\)\] right-5/);
+  assert.match(source("src/app/(product)/advisor/teamraum/chat/[chatId]/page.tsx"), /h-\[calc\(100dvh-9rem\)\] w-full lg:h-\[calc\(100dvh-4\.5rem\)\]/);
+  // Die Reiter der Station Aufgaben stehen auf jeder Breite - sonst fuehrt am Rechner nichts zu "Diese Woche" und "Wer macht was".
+  const screen = source("src/features/advisor/TeamraumScreen.tsx");
+  assert.match(screen, /section === "week" \|\| section === "tasks" \|\| section === "who" \? \(\s*<nav/);
+  assert.doesNotMatch(screen, /xl:hidden">\s*\{TEAMRAUM_SECTIONS/);
+  // Einrichtung: der Schritt steht auf dem Handy vor der Liste.
+  const wizard = source("src/app/(product)/advisor/los-gehts/page.tsx");
+  assert.match(wizard, /<aside className="order-2[^"]*lg:order-1">/);
+  assert.match(wizard, /<section aria-labelledby="step-title" className="order-1[^"]*lg:order-2">/);
+  // Die Seite "Seitenleiste anpassen" bricht auf schmalen Schirmen um statt ueber den Rand zu laufen.
+  assert.match(source("src/features/navigation/workspace/NavSettings.tsx"), /flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-3 py-2/);
+});

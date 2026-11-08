@@ -19,7 +19,7 @@ import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getOrgTeamPrograms, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
-import { TEAMRAUM_SECTIONS, teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
+import { teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 export type TeamraumQuery = Record<string, string | undefined>;
@@ -203,19 +203,23 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
 
   return (
     <main className="work-ui mx-auto w-full max-w-6xl px-4 pb-28 pt-5 sm:px-6 sm:pt-7 md:pb-12 lg:px-8">
-      {/* Unter 1280 Pixeln zeigt die Leiste oben keine zweite Reihe - die Teile stehen dann hier (Entwurf: Handy). */}
-      <nav aria-label={t("sectionsLabel")} className="-mx-4 -mt-5 mb-5 flex gap-5 overflow-x-auto border-b border-slate-200 px-4 text-[14.5px] [scrollbar-width:none] sm:-mx-6 sm:-mt-7 sm:px-6 xl:hidden">
-        {TEAMRAUM_SECTIONS.map((entry) => (
-          <Link
-            key={entry}
-            href={teamraumHref(entry, orgs.length > 1 ? org.id : null)}
-            aria-current={entry === section ? "page" : undefined}
-            className={`-mb-px inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 ${entry === section ? "border-slate-950 font-semibold text-slate-950" : "border-transparent text-slate-600"}`}
-          >
-            {t(`sections.${entry}`)}
-          </Link>
-        ))}
-      </nav>
+      {/* "Diese Woche", "Aufgaben" und "Wer macht was" gehoeren zur Station Aufgaben in der Seitenleiste und stehen hier als Reiter -
+          auf jeder Breite (vorher nur unter 1280 Pixeln: am Rechner kam man mit der Seitenleiste nicht mehr zu "Diese Woche"
+          und "Wer macht was"). Chat, Seiten und Vorlagen haben eigene Stationen. */}
+      {section === "week" || section === "tasks" || section === "who" ? (
+        <nav aria-label={t("sectionsLabel")} className="-mx-4 -mt-5 mb-5 flex gap-5 overflow-x-auto border-b border-slate-200 px-4 text-[14.5px] [scrollbar-width:none] sm:-mx-6 sm:-mt-7 sm:px-6 lg:mx-0 lg:mt-0 lg:px-0">
+          {(["week", "tasks", "who"] as const).map((entry) => (
+            <Link
+              key={entry}
+              href={teamraumHref(entry, orgs.length > 1 ? org.id : null)}
+              aria-current={entry === section ? "page" : undefined}
+              className={`-mb-px inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 ${entry === section ? "border-slate-950 font-semibold text-slate-950" : "border-transparent text-slate-600"}`}
+            >
+              {t(`sections.${entry}`)}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
       <header className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
           <p className="text-[13px] text-slate-600">{eyebrow}</p>
