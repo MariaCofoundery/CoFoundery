@@ -31,6 +31,9 @@ import {
   type InvitationReadinessDebug,
 } from "@/features/reporting/actions";
 import { buildInvitationDashboardHref } from "@/features/onboarding/invitationFlow";
+import { MyProgramTasks } from "@/features/advisor/MyProgramTasks";
+import { listMyProgramTasks } from "@/features/advisor/programTasksData";
+import { getMyTeamPrograms } from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getFounderTeamDashboardSummaries } from "@/features/teams/founderTeamHomebaseData";
 import { alignWorkProfileState } from "@/features/instruments/align/AlignCard";
@@ -254,6 +257,10 @@ export default async function DashboardPage({
       )
     : new Map<string, InvitationReadinessDebug>();
 
+  // Aufgaben im Programm (20270329120000): meine offenen, ueber meine aktiven Programme.
+  const myPrograms = (await getMyTeamPrograms(supabase).catch(() => [])).filter((program) => program.isActive);
+  const myProgramTasks = myPrograms.length > 0 ? await listMyProgramTasks(supabase, user.id) : [];
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 md:px-10 xl:px-12">
       {contextualInvitation ? (
@@ -278,6 +285,12 @@ export default async function DashboardPage({
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex min-w-0 flex-col gap-6">
+          <MyProgramTasks
+            tasks={myProgramTasks}
+            labelOf={(programId) => myPrograms.find((program) => program.programId === programId)?.orgName ?? null}
+            hrefOf={() => "/programm#aufgaben"}
+            today={new Date().toISOString().slice(0, 10)}
+          />
           <DashboardNextStep
             start={start}
             teamName={selectedTeam ? teamName(selectedTeam) : null}

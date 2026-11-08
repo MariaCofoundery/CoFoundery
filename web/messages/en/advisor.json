@@ -1374,7 +1374,8 @@
     "rowDates": "Dates and attendance",
     "teamLinks": "About this team",
     "teamTasks": "Tasks for this team",
-    "teamDates": "Dates and attendance"
+    "teamDates": "Dates and attendance",
+    "tabTasks": "Tasks"
   },
   "programPage": {
     "title": "Program page",
@@ -2523,5 +2524,46 @@
     "errorFailed": "That did not work.",
     "startupTitle": "Who is who in the program",
     "startupText": "The people of the organization who released themselves for you – with the contact they gave themselves."
+  },
+  "programTasks": {
+    "titleTeam": "Tasks with the organization",
+    "textTeam": "Your shared list with your organization's contacts. Both sides see it and work on it – other startups do not. “Only me” creates a task nobody else sees.",
+    "titleOrg": "Tasks with the team",
+    "textOrg": "The shared list with this startup. The team sees it too – your internal team space tasks stay invisible to the startup. “Only me” creates a task nobody else sees.",
+    "newTitle": "New task",
+    "newPlaceholder": "e.g. pitch deck by Friday",
+    "dueLabel": "Due",
+    "assigneeLabel": "Who takes care of it?",
+    "nobody": "Nobody yet",
+    "groupTeam": "Team",
+    "groupOrg": "Organization",
+    "me": "me",
+    "unnamed": "Unnamed",
+    "formerMember": "a former member",
+    "onlyMe": "Only me",
+    "onlyMeHint": "private task, visible only to you",
+    "add": "Add task",
+    "empty": "No tasks yet.",
+    "private": "Private",
+    "status": {
+      "open": "Open",
+      "doing": "In progress",
+      "done": "Done"
+    },
+    "move": {
+      "open": "Set to “In progress”",
+      "doing": "Mark as done",
+      "done": "Reopen"
+    },
+    "due": "due {day}",
+    "assignedTo": "responsible: {name}",
+    "createdBy": "created by {name}",
+    "share": "Share",
+    "makePrivate": "Only for me",
+    "delete": "Delete",
+    "doneTitle": "Done ({count})",
+    "saved": "Saved.",
+    "error": "That did not work.",
+    "mineTitle": "My tasks in the program"
   }
 }

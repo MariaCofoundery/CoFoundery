@@ -26,7 +26,8 @@
     "org_task_due": "Eine deiner Aufgaben im Teamraum ist heute fällig.",
     "advisor_org_invited": "Du wurdest eingeladen, Mitglied einer Organisation zu werden. Du entscheidest unter Einladungen, ob du annimmst.",
     "advisor_person_invited": "Ein Advisor bittet dich um Einblick in Teile deines Profils. Du entscheidest unter Einladungen – annehmen heißt nur, dass die Bitte bei dir ankommt.",
-    "founder_invited": "Eine Mitgründerin oder ein Mitgründer hat dich eingeladen. Du entscheidest auf deinem Dashboard."
+    "founder_invited": "Eine Mitgründerin oder ein Mitgründer hat dich eingeladen. Du entscheidest auf deinem Dashboard.",
+    "program_task_assigned": "Dir wurde im Programm eine Aufgabe zugewiesen. Schau in die gemeinsame Aufgabenliste."
   },
   "announcements": {
     "eyebrow": "Mitteilung",

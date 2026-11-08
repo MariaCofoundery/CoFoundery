@@ -1374,7 +1374,8 @@
     "rowDates": "Termine und Teilnahme",
     "teamLinks": "Zu diesem Team",
     "teamTasks": "Aufgaben zu diesem Team",
-    "teamDates": "Termine und Teilnahme"
+    "teamDates": "Termine und Teilnahme",
+    "tabTasks": "Aufgaben"
   },
   "programPage": {
     "title": "Programmseite",
@@ -2523,5 +2524,46 @@
     "errorFailed": "Das hat nicht geklappt.",
     "startupTitle": "Wer ist wer im Programm",
     "startupText": "Die Menschen der Organisation, die sich für euch freigegeben haben – mit dem Kontakt, den sie selbst angegeben haben."
+  },
+  "programTasks": {
+    "titleTeam": "Aufgaben mit der Organisation",
+    "textTeam": "Eure gemeinsame Liste mit den Ansprechpersonen eurer Organisation. Beide Seiten sehen sie und arbeiten daran – andere Startups nicht. „Nur ich“ legt eine Aufgabe an, die niemand sonst sieht.",
+    "titleOrg": "Aufgaben mit dem Team",
+    "textOrg": "Die gemeinsame Liste mit diesem Startup. Das Team sieht sie ebenfalls – eure internen Aufgaben im Teamraum bleiben für das Startup unsichtbar. „Nur ich“ legt eine Aufgabe an, die niemand sonst sieht.",
+    "newTitle": "Neue Aufgabe",
+    "newPlaceholder": "z. B. Pitch-Deck bis Freitag",
+    "dueLabel": "Bis",
+    "assigneeLabel": "Wer kümmert sich?",
+    "nobody": "Noch niemand",
+    "groupTeam": "Team",
+    "groupOrg": "Organisation",
+    "me": "ich",
+    "unnamed": "Ohne Namen",
+    "formerMember": "ein früheres Mitglied",
+    "onlyMe": "Nur ich",
+    "onlyMeHint": "private Aufgabe, nur für dich sichtbar",
+    "add": "Aufgabe anlegen",
+    "empty": "Noch keine Aufgabe.",
+    "private": "Privat",
+    "status": {
+      "open": "Offen",
+      "doing": "In Arbeit",
+      "done": "Erledigt"
+    },
+    "move": {
+      "open": "Auf „In Arbeit“ setzen",
+      "doing": "Als erledigt markieren",
+      "done": "Wieder öffnen"
+    },
+    "due": "bis {day}",
+    "assignedTo": "zuständig: {name}",
+    "createdBy": "angelegt von {name}",
+    "share": "Teilen",
+    "makePrivate": "Nur für mich",
+    "delete": "Löschen",
+    "doneTitle": "Erledigt ({count})",
+    "saved": "Gespeichert.",
+    "error": "Das hat nicht geklappt.",
+    "mineTitle": "Meine Aufgaben im Programm"
   }
 }

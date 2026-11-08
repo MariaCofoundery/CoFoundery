@@ -20,6 +20,8 @@ import { ProgramOrgDataTeamView } from "@/features/advisor/ProgramOrgData";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { getCheckIns, getMyLearning, getMyProgramEventRsvps, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
+import { ProgramTasks } from "@/features/advisor/ProgramTasks";
+import { getProgramTaskPeople, listProgramTasks } from "@/features/advisor/programTasksData";
 import { ProgramPeople } from "@/features/advisor/ProgramPeople";
 import { getMyProgramPeople } from "@/features/advisor/orgPeopleData";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
@@ -34,7 +36,7 @@ import { UserText } from "@/features/ui/UserText";
  * Programm: in welchen Programmen ist mein Team, und wer liest mit? Die
  * Zustimmung steht hier, damit jede Person im Team sie selbst gibt.
  */
-export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string }> }) {
+export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string; taskSaved?: string; taskError?: string }> }) {
   const t = await getTranslations("advisor.teamProgram");
   const tEvent = await getTranslations("advisor.teamProgram.event");
   const locale = await getLocale();
@@ -49,6 +51,12 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   const now = Date.now();
   const materials = await getMyProgramMaterials(client);
   const programPeople = await getMyProgramPeople(client);
+  // Aufgaben im Programm (20270329120000): je aktivem Programm die gemeinsame Liste und wer zugewiesen werden kann.
+  const tasksByProgram = new Map(
+    await Promise.all(
+      programs.filter((program) => program.isActive).map(async (program) => [program.programId, { tasks: await listProgramTasks(client, program.programId), people: await getProgramTaskPeople(client, program.programId) }] as const),
+    ),
+  );
   const learning = await getMyLearning(client);
   const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   const updatesByProgram = new Map(
@@ -199,6 +207,20 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               <p className="mt-1 text-xs text-slate-500">{t("endHint")}</p>
               {program.isActive ? (
                 <>
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <ProgramTasks
+                    programId={program.programId}
+                    side="team"
+                    tasks={tasksByProgram.get(program.programId)?.tasks ?? []}
+                    people={tasksByProgram.get(program.programId)?.people ?? []}
+                    me={user.id}
+                    isOrgOwner={false}
+                    locale={getPresentationLocale(locale)}
+                    today={new Date().toISOString().slice(0, 10)}
+                    saved={query.taskSaved === "1"}
+                    error={query.taskError === "1"}
+                  />
+                </div>
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <TeamProgramProfileForm programId={program.programId} profile={updatesByProgram.get(program.programId)?.profile ?? null} />
                 </div>

@@ -26,7 +26,8 @@
     "org_task_due": "One of your tasks in the team space is due today.",
     "advisor_org_invited": "You were invited to become a member of an organization. You decide under Invitations whether to accept.",
     "advisor_person_invited": "An advisor asks for insight into parts of your profile. You decide under Invitations – accepting only means the request reaches you.",
-    "founder_invited": "A co-founder has invited you. You decide on your dashboard."
+    "founder_invited": "A co-founder has invited you. You decide on your dashboard.",
+    "program_task_assigned": "A task in the program was assigned to you. Check the shared task list."
   },
   "announcements": {
     "eyebrow": "Announcement",

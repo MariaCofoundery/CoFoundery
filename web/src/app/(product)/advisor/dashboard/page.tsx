@@ -16,6 +16,8 @@ import { getAdvisorPendingTeamInvites } from "@/features/dashboard/advisorTeamIn
 import { listDueAdvisorFollowUps } from "@/features/reporting/advisorWorkspaceData";
 import { listMyOpenOrgTasks, listUpcomingOrgTasks } from "@/features/advisor/teamraumData";
 import { StartTasks, startTasksViewOf } from "@/features/advisor/StartTasks";
+import { MyProgramTasks } from "@/features/advisor/MyProgramTasks";
+import { listMyProgramTasks } from "@/features/advisor/programTasksData";
 import { SetupCard, StartEvents, StartTiles, StartWeekBand, type StartEvent, type StartTile } from "@/features/advisor/StartOverview";
 import { loadSetup } from "@/features/advisor/setup/setupData";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
@@ -288,6 +290,12 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
             <SetupCard orgId={setupOrg.id} items={setup.progress.items} done={setup.progress.done} next={setup.progress.next} />
           ) : null}
           <StartTiles tiles={startTiles} />
+          <MyProgramTasks
+            tasks={await listMyProgramTasks(client, user.id)}
+            labelOf={(programId) => programData.flatMap((entry) => entry.active).find((program) => program.programId === programId)?.teamName ?? null}
+            hrefOf={(programId) => `/advisor/programm/${programId}?tab=aufgaben`}
+            today={todayIso}
+          />
           <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
             {orgs.length > 0 ? (
               <StartTasks
