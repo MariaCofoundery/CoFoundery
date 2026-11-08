@@ -6,8 +6,10 @@ import deProblemWorkspace from "../../messages/de/problemWorkspace.json";
 import enProblemWorkspace from "../../messages/en/problemWorkspace.json";
 import deIntake from "../../messages/de/intake.json";
 import deEvents from "../../messages/de/events.json";
+import deInvites from "../../messages/de/invites.json";
 import enIntake from "../../messages/en/intake.json";
 import enEvents from "../../messages/en/events.json";
+import enInvites from "../../messages/en/invites.json";
 import type { AbstractIntlMessages } from "next-intl";
 import type { AppLocale } from "@/i18n/config";
 import deAlignment from "../../messages/de/alignment.json";
@@ -81,6 +83,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     radar: deRadar,
     intake: deIntake,
     events: deEvents,
+    invites: deInvites,
     problemWorkspace: deProblemWorkspace,
     alignment: deAlignment,
     assessment: deAssessment,
@@ -120,6 +123,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     radar: enRadar,
     intake: enIntake,
     events: enEvents,
+    invites: enInvites,
     problemWorkspace: enProblemWorkspace,
     alignment: enAlignment,
     assessment: enAssessment,

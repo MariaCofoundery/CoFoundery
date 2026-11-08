@@ -59,6 +59,10 @@ export const IN_APP_NOTICE_KINDS = [
   "org_task_assigned",
   "org_task_comment",
   "org_task_due",
+  // Einladungen an Menschen mit Konto (20270328120000): entstehen in der Datenbank.
+  "advisor_org_invited",
+  "advisor_person_invited",
+  "founder_invited",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

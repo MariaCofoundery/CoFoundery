@@ -1,0 +1,38 @@
+{
+  "title": "Invitations for you",
+  "text": "Invitations sent to your confirmed email address wait here. You do not have to find the link in the email.",
+  "empty": "No invitation is waiting for you right now.",
+  "emptyHint": "Invitations from co-founders are on your dashboard.",
+  "toDashboard": "To the dashboard",
+  "org": {
+    "title": "Become a member of {org}",
+    "by": "{name} invites you.",
+    "byUnknown": "You were invited.",
+    "roleOwner": "as owner",
+    "roleAdvisor": "as advisor",
+    "text": "Members see everything released to the organization. When membership ends, this access ends immediately."
+  },
+  "person": {
+    "title": "Request for insight",
+    "by": "{name} asks for insight.",
+    "byOrg": "{name} ({org}) asks for insight.",
+    "byUnknown": "An advisor asks for insight.",
+    "scopes": "What it covers",
+    "note": "Message",
+    "text": "Accepting only means the request reaches you. Whether you release anything is decided afterwards under Account – each area on its own."
+  },
+  "scope": {
+    "base": "Name and basics",
+    "alignment_report": "Self report",
+    "capability": "Capabilities",
+    "capability_depth": "Experience and responsibility",
+    "strengths": "Strengths",
+    "direction": "Direction"
+  },
+  "accept": "Accept",
+  "decline": "Decline",
+  "since": "since {date}",
+  "expires": "valid until {date}",
+  "error": "That did not work – the invitation may no longer be open.",
+  "declined": "Declined. The inviting side sees “declined”."
+}

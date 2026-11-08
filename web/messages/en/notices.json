@@ -23,7 +23,10 @@
     "program_reward_unlocked": "Your team has unlocked a reward. Take a look under Program.",
     "org_task_assigned": "You were given a task in the team space.",
     "org_task_comment": "New comment on a task in the team space.",
-    "org_task_due": "One of your tasks in the team space is due today."
+    "org_task_due": "One of your tasks in the team space is due today.",
+    "advisor_org_invited": "You were invited to become a member of an organization. You decide under Invitations whether to accept.",
+    "advisor_person_invited": "An advisor asks for insight into parts of your profile. You decide under Invitations – accepting only means the request reaches you.",
+    "founder_invited": "A co-founder has invited you. You decide on your dashboard."
   },
   "announcements": {
     "eyebrow": "Announcement",

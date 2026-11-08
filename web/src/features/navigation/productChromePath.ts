@@ -14,6 +14,7 @@ export function isProductChromePath(pathname: string) {
     pathname === "/admin/highlights" ||
     pathname === "/admin/events" ||
     // Event-Kalender (20270323120000): Liste und "Event vorschlagen".
+    pathname === "/einladungen" ||
     pathname === "/events" ||
     pathname.startsWith("/events/") ||
     // Praefix, nicht exakt: /profile hat Unterseiten (der Vergleich), und die

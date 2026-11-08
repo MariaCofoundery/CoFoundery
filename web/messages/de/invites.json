@@ -1,0 +1,38 @@
+{
+  "title": "Einladungen an dich",
+  "text": "Hier warten Einladungen auf dich, die an deine bestätigte E-Mail-Adresse gingen. Du musst nicht den Link aus der Mail suchen.",
+  "empty": "Gerade wartet keine Einladung auf dich.",
+  "emptyHint": "Einladungen von Mitgründerinnen und Mitgründern stehen auf deinem Dashboard.",
+  "toDashboard": "Zum Dashboard",
+  "org": {
+    "title": "Mitglied von {org} werden",
+    "by": "{name} lädt dich ein.",
+    "byUnknown": "Du wurdest eingeladen.",
+    "roleOwner": "als Inhaberin / Inhaber",
+    "roleAdvisor": "als Advisor",
+    "text": "Wer Mitglied ist, sieht alles, was der Organisation freigegeben wurde. Endet die Mitgliedschaft, endet dieser Zugang sofort."
+  },
+  "person": {
+    "title": "Bitte um Einblick",
+    "by": "{name} bittet dich um Einblick.",
+    "byOrg": "{name} ({org}) bittet dich um Einblick.",
+    "byUnknown": "Ein Advisor bittet dich um Einblick.",
+    "scopes": "Worum es geht",
+    "note": "Nachricht",
+    "text": "Annehmen heißt nur: die Bitte kommt bei dir an. Ob du etwas freigibst, entscheidest du danach unter Konto – jeden Bereich einzeln."
+  },
+  "scope": {
+    "base": "Name und Basisangaben",
+    "alignment_report": "Selbstbericht",
+    "capability": "Fähigkeiten",
+    "capability_depth": "Erfahrung und Verantwortung",
+    "strengths": "Stärken",
+    "direction": "Richtung"
+  },
+  "accept": "Annehmen",
+  "decline": "Ablehnen",
+  "since": "seit {date}",
+  "expires": "gültig bis {date}",
+  "error": "Das hat nicht geklappt – die Einladung ist vielleicht nicht mehr offen.",
+  "declined": "Abgelehnt. Die einladende Seite sieht „abgelehnt“."
+}

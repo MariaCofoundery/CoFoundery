@@ -23,7 +23,10 @@
     "program_reward_unlocked": "Euer Team hat eine Belohnung freigeschaltet. Schaut unter Programm nach.",
     "org_task_assigned": "Dir wurde im Teamraum eine Aufgabe zugeteilt.",
     "org_task_comment": "Neuer Kommentar zu einer Aufgabe im Teamraum.",
-    "org_task_due": "Eine deiner Aufgaben im Teamraum ist heute fällig."
+    "org_task_due": "Eine deiner Aufgaben im Teamraum ist heute fällig.",
+    "advisor_org_invited": "Du wurdest eingeladen, Mitglied einer Organisation zu werden. Du entscheidest unter Einladungen, ob du annimmst.",
+    "advisor_person_invited": "Ein Advisor bittet dich um Einblick in Teile deines Profils. Du entscheidest unter Einladungen – annehmen heißt nur, dass die Bitte bei dir ankommt.",
+    "founder_invited": "Eine Mitgründerin oder ein Mitgründer hat dich eingeladen. Du entscheidest auf deinem Dashboard."
   },
   "announcements": {
     "eyebrow": "Mitteilung",
