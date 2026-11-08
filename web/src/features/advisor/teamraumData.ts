@@ -10,7 +10,7 @@ import { pageOf, type OrgPage, type OrgPageSummary } from "@/features/advisor/te
  */
 
 const TASK_COLUMNS =
-  "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, checklist, created_by_user_id, created_at, updated_at, done_at, advisor_org_task_assignees(user_id, created_at)";
+  "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, visibility, checklist, created_by_user_id, created_at, updated_at, done_at, advisor_org_task_assignees(user_id, created_at)";
 
 export async function listOrgTasks(client: SupabaseClient, orgId: string): Promise<OrgTask[]> {
   const { data, error } = await client

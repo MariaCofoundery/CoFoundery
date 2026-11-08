@@ -40,6 +40,8 @@ import {
   getOrgOpenInvites,
   withAccompaniedNames,
 } from "@/features/advisor/orgData";
+import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
+import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
@@ -309,6 +311,11 @@ export default async function AdvisorOrganisationPage({
           </p>
         ) : null}
         {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} saved={query.saved === "1"} part="members" /> : null}
+        {tab === "members" ? (
+          <div className="mt-6">
+            <OrgPeopleCards orgId={org.id} members={members} cards={await listOrgMemberCards(client, org.id)} isOwner={isOwner} savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+          </div>
+        ) : null}
 
         {tab === "page" ? (
           <div className="grid gap-4">

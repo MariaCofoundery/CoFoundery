@@ -15,6 +15,7 @@ import {
   moveOrgTaskAction,
   saveOrgTaskAction,
   setMyOrgPresenceAction,
+  setOrgTaskVisibilityAction,
   takeOrgTaskAction,
   moveTaskDueAction,
 } from "@/features/advisor/teamraumActions";
@@ -174,6 +175,13 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
         <span className={LABEL}>{t("form.titleQuestion")}</span>
         <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} className={INPUT} disabled={!ctx.canWrite} />
       </label>
+      {!task ? (
+        <div>
+          <span className={`${LABEL} mb-2`}>{t("form.visibilityQuestion")}</span>
+          <ChipChoice name="visibility" label={t("form.visibilityQuestion")} options={[{ value: "team", label: t("form.visibilityTeam") }, { value: "private", label: t("form.visibilityPrivate") }]} defaultValue="team" disabled={!ctx.canWrite} />
+          <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.visibilityHint")}</span>
+        </div>
+      ) : null}
       <div>
         <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
         {/* Mehrere moeglich (20270322120000), hoechstens sechs. */}
@@ -280,6 +288,7 @@ async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumCo
         {task.dueOn ? <span className={overdue ? "font-semibold text-rose-700" : ""}>{overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : dayOf(task.dueOn)}</span> : null}
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-[12.5px] text-slate-600">
+        {task.visibility === "private" ? <span className="inline-flex h-[22px] items-center gap-1 rounded-full bg-slate-900 px-2 text-xs font-semibold text-white"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>{t("privateBadge")}</span> : null}
         <span className="inline-flex h-[22px] items-center rounded-full bg-slate-100 px-2 text-xs font-medium text-slate-700">{task.programId ? program?.name ?? t("hiddenProgram") : t("internal")}</span>
         {event ? <span className="inline-flex h-[22px] items-center rounded-full bg-amber-50 px-2 text-xs font-medium text-amber-900">{event.title}</span> : null}
         {task.pageId && ctx.pageTitles.has(task.pageId) ? (
@@ -345,6 +354,19 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
               </li>
             ))}
           </ul>
+        </div>
+      ) : null}
+
+      {task.visibility === "private" || (task.createdByUserId === ctx.me && ctx.canWrite) ? (
+        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+          <p className="min-w-0 flex-1 text-[14px] leading-6 text-slate-800">{task.visibility === "private" ? t("detail.privateNote") : t("detail.teamNote")}</p>
+          {task.createdByUserId === ctx.me && ctx.canWrite ? (
+            <form action={setOrgTaskVisibilityAction}>
+              <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+              <input type="hidden" name="visibility" value={task.visibility === "private" ? "team" : "private"} />
+              <SubmitButton label={task.visibility === "private" ? t("detail.shareWithTeam") : t("detail.makePrivate")} pendingLabel="…" className={QUIET} />
+            </form>
+          ) : null}
         </div>
       ) : null}
 

@@ -1599,7 +1599,8 @@
     "filters": {
       "all": "All",
       "mine": "Mine",
-      "nobody": "Unassigned"
+      "nobody": "Unassigned",
+      "private": "Private"
     },
     "form": {
       "title": "Task",
@@ -1629,7 +1630,11 @@
       "dueQuestion": "By when?",
       "more": "+ Description, checklist, event",
       "cancel": "Cancel",
-      "assigneeHint": "Two or more of you can share a task."
+      "assigneeHint": "Two or more of you can share a task.",
+      "visibilityQuestion": "Who can see this?",
+      "visibilityTeam": "Everyone on the team",
+      "visibilityPrivate": "Only me",
+      "visibilityHint": "“Only me”: the task is yours alone – no other member and not even the owner can see it. It shows only for you on Today and in the calendar."
     },
     "board": {
       "title": "Tasks",
@@ -1656,7 +1661,11 @@
       "commentPlaceholder": "Question, note, status …",
       "comment": "Comment",
       "deleteComment": "Withdraw comment",
-      "delete": "Delete task"
+      "delete": "Delete task",
+      "privateNote": "Private: only you can see this task – not the owner or other members.",
+      "teamNote": "The team can see this task.",
+      "makePrivate": "Only for me",
+      "shareWithTeam": "Share with the team"
     },
     "week": {
       "quickTitle": "Quick add",
@@ -1861,7 +1870,8 @@
       "sectionsLabel": "Team space sections"
     },
     "nobodyShort": "nobody assigned",
-    "checklistOf": "{done} of {total} done"
+    "checklistOf": "{done} of {total} done",
+    "privateBadge": "Private"
   },
   "funding": {
     "title": "Funding requirements",
@@ -2290,6 +2300,13 @@
         "text": "Put MADE2FOUND on your home screen, switch on notifications and set your quiet hours – then the phone stays silent and messages wait in the app.",
         "place": "Account › Phone, notifications and quiet hours",
         "doneWhen": "notifications are on or quiet hours are set"
+      },
+      "people": {
+        "title": "Describe your team",
+        "short": "Who is who – for the startups",
+        "text": "Briefly describe who in your organization is there for what, and tick who the startups in the program may see and contact. Each person can change or withdraw their own card; they enter their own contact. If the team changes, invite people or remove them under “Members & roles”.",
+        "place": "Sidebar › Set up › Members & roles › Who is who",
+        "doneWhen": "one card is visible to startups"
       }
     },
     "card": {
@@ -2463,5 +2480,38 @@
       "noPosts": "no posts yet",
       "nothingAhead": "Nothing is coming up."
     }
+  },
+  "people": {
+    "title": "Who is who",
+    "text": "The people of your organization. Describe them briefly and tick who the startups in the program may see and contact. The default is: not visible. Did the team change? Above you invite new members or remove someone – anyone removed loses access.",
+    "summary": "{shown} of {total} visible to startups",
+    "unnamed": "Unnamed",
+    "you": "you",
+    "roleOwner": "Owner",
+    "roleAdvisor": "Advisor",
+    "noHeadline": "No short description yet",
+    "noAbout": "No description yet.",
+    "describeYourself": "Describe yourself briefly – so startups can see who you are and how to reach you.",
+    "status": {
+      "shown": "Visible to startups",
+      "hidden": "Not visible",
+      "withdrawn": "Withdrawn by the person"
+    },
+    "headline": "Short line",
+    "headlinePlaceholder": "e.g. Supports teams with financing",
+    "about": "A few sentences",
+    "aboutPlaceholder": "What are you the right contact for?",
+    "contact": "How startups reach you",
+    "contactPlaceholder": "Email, phone or link – only what you want to share",
+    "contactOnlySelf": "Only the person enters their own contact.",
+    "showToStartups": "Startups in the program may see this",
+    "showHintSelf": "You can switch it off again at any time.",
+    "showHintOther": "The person sees this on their own card and can withdraw it at any time.",
+    "selfHiddenNote": "The person withdrew their card themselves – only they can show it again.",
+    "save": "Save",
+    "errorHidden": "The person withdrew the card themselves – only they can show it again.",
+    "errorFailed": "That did not work.",
+    "startupTitle": "Who is who in the program",
+    "startupText": "The people of the organization who released themselves for you – with the contact they gave themselves."
   }
 }

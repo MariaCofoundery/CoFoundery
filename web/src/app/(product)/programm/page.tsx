@@ -20,6 +20,8 @@ import { ProgramOrgDataTeamView } from "@/features/advisor/ProgramOrgData";
 import { TeamProgramProfileForm } from "@/features/advisor/ProgramProfile";
 import { ProgramMilestones } from "@/features/advisor/ProgramMilestones";
 import { getCheckIns, getMyLearning, getMyProgramEventRsvps, getMyProgramEvents, getMyProgramMaterials, getOutcomeComments, getProgramOutcomes, getProgramRewards } from "@/features/advisor/teamProgramData";
+import { ProgramPeople } from "@/features/advisor/ProgramPeople";
+import { getMyProgramPeople } from "@/features/advisor/orgPeopleData";
 import { ProgramOutcomes } from "@/features/advisor/ProgramOutcomes";
 import { ProgramRewards } from "@/features/advisor/ProgramRewards";
 import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
@@ -46,6 +48,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
   const rsvps = planEvents.length > 0 ? await getMyProgramEventRsvps(client) : [];
   const now = Date.now();
   const materials = await getMyProgramMaterials(client);
+  const programPeople = await getMyProgramPeople(client);
   const learning = await getMyLearning(client);
   const dateFormat = new Intl.DateTimeFormat(getPresentationLocale(await getLocale()), { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   const updatesByProgram = new Map(
@@ -141,6 +144,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
 
       <TeamProgramMaterials materials={materials} />
       <TeamProgramLearning modules={learning} />
+      <ProgramPeople people={programPeople} />
 
       {programs.length === 0 ? (
         <p className="mt-6 text-sm text-slate-600">{t("pageEmpty")}</p>

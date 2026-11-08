@@ -15,7 +15,7 @@ const count = async (query: PromiseLike<{ count: number | null; error: unknown }
 /** Was schon steht - mit dem normalen Zugang, also nur, was die Person ohnehin sehen darf. */
 export async function loadSetup(client: SupabaseClient, org: AdvisorOrg, userId: string) {
   const isOwner = org.role === "owner" && org.status === "active";
-  const [members, invites, events, programs, programInvites, codes, tasks, templates, pushes, quiet, presence, state] = await Promise.all([
+  const [members, invites, events, programs, programInvites, codes, tasks, templates, pushes, quiet, presence, state, shownCards] = await Promise.all([
     getOrgMembers(client, org.id),
     isOwner ? getOrgOpenInvites(client, org.id) : Promise.resolve([]),
     isOwner && hasOrgFeature(org, "plan") ? listProgramEvents(client, org.id) : Promise.resolve([]),
@@ -28,11 +28,14 @@ export async function loadSetup(client: SupabaseClient, org: AdvisorOrg, userId:
     count(client.from("notification_quiet_hours").select("user_id", { count: "exact", head: true }).eq("user_id", userId)),
     client.from("advisor_org_member_presence").select("team_role").eq("org_id", org.id).eq("user_id", userId).maybeSingle(),
     client.from("advisor_setup_state").select("skipped, hidden").eq("org_id", org.id).eq("user_id", userId).maybeSingle(),
+    count(client.from("advisor_org_member_cards").select("user_id", { count: "exact", head: true }).eq("org_id", org.id).eq("shown", true)),
   ]);
   const facts: SetupFacts = {
     profile: Boolean(org.locationRegion || org.focus.length > 0 || org.description),
     features: org.featuresSetupDone,
     team: members.filter((member) => member.status === "active").length > 1 || invites.length > 0,
+    // Mindestens eine Karte ist fuer die Startups sichtbar (eigene Einwilligung je Person).
+    people: shownCards > 0,
     // Ohne Programmplan gibt es diesen Schritt nicht zu tun.
     plan: !hasOrgFeature(org, "plan") || events.length > 0,
     teams: programs.length > 0 || programInvites.length > 0 || codes.length > 0,

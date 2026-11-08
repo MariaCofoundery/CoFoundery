@@ -8,7 +8,7 @@
 
 export const TASK_STATUSES = ["open", "doing", "waiting", "done"] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
-export const TASK_FILTERS = ["all", "mine", "nobody"] as const;
+export const TASK_FILTERS = ["all", "mine", "private", "nobody"] as const;
 export type TaskFilter = (typeof TASK_FILTERS)[number];
 
 export type ChecklistItem = { text: string; done: boolean };
@@ -26,6 +26,8 @@ export type OrgTask = {
   eventId: string | null;
   /** Seit 20270313120000: aus einer Haekchen-Zeile dieser Seite entstanden. */
   pageId: string | null;
+  /** "private": nur die Person, die sie angelegt hat, sieht und aendert sie - auch nicht die Fuehrung (20270326120000). */
+  visibility: "team" | "private";
   checklist: ChecklistItem[];
   createdByUserId: string | null;
   createdAt: string;
@@ -62,6 +64,8 @@ export function byDue(a: OrgTask, b: OrgTask): number {
 
 export function filterTasks(tasks: OrgTask[], filter: TaskFilter, userId: string): OrgTask[] {
   if (filter === "mine") return tasks.filter((task) => task.assigneeUserIds.includes(userId));
+  // Private Aufgaben liefert die Datenbank nur der Person, die sie angelegt hat (20270326120000).
+  if (filter === "private") return tasks.filter((task) => task.visibility === "private");
   if (filter === "nobody") return tasks.filter((task) => task.assigneeUserIds.length === 0);
   return tasks;
 }
@@ -177,6 +181,7 @@ export function taskOf(row: Record<string, unknown>): OrgTask {
     programId: (row.program_id as string | null) ?? null,
     eventId: (row.event_id as string | null) ?? null,
     pageId: (row.page_id as string | null) ?? null,
+    visibility: row.visibility === "private" ? "private" : "team",
     checklist,
     createdByUserId: (row.created_by_user_id as string | null) ?? null,
     createdAt: row.created_at as string,

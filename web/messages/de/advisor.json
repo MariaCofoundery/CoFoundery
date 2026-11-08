@@ -1599,7 +1599,8 @@
     "filters": {
       "all": "Alle",
       "mine": "Meine",
-      "nobody": "Ohne Person"
+      "nobody": "Ohne Person",
+      "private": "Privat"
     },
     "form": {
       "title": "Aufgabe",
@@ -1629,7 +1630,11 @@
       "dueQuestion": "Bis wann?",
       "more": "+ Beschreibung, Checkliste, Veranstaltung",
       "cancel": "Abbrechen",
-      "assigneeHint": "Ihr könnt auch zu zweit oder mehr zuständig sein."
+      "assigneeHint": "Ihr könnt auch zu zweit oder mehr zuständig sein.",
+      "visibilityQuestion": "Wer sieht das?",
+      "visibilityTeam": "Alle im Team",
+      "visibilityPrivate": "Nur ich",
+      "visibilityHint": "„Nur ich“: Die Aufgabe gehört dir allein – kein anderes Mitglied und auch nicht die Inhaberin sieht sie. Sie erscheint nur bei dir auf Heute und im Kalender."
     },
     "board": {
       "title": "Aufgaben",
@@ -1656,7 +1661,11 @@
       "commentPlaceholder": "Frage, Hinweis, Stand …",
       "comment": "Kommentieren",
       "deleteComment": "Kommentar zurücknehmen",
-      "delete": "Aufgabe löschen"
+      "delete": "Aufgabe löschen",
+      "privateNote": "Privat: Nur du siehst diese Aufgabe – auch nicht die Inhaberin oder andere Mitglieder.",
+      "teamNote": "Das Team sieht diese Aufgabe.",
+      "makePrivate": "Nur für mich",
+      "shareWithTeam": "Mit dem Team teilen"
     },
     "week": {
       "quickTitle": "Schnell eintragen",
@@ -1861,7 +1870,8 @@
       "sectionsLabel": "Teile des Teamraums"
     },
     "nobodyShort": "niemand zuständig",
-    "checklistOf": "{done} von {total} erledigt"
+    "checklistOf": "{done} von {total} erledigt",
+    "privateBadge": "Privat"
   },
   "funding": {
     "title": "Förderauflagen",
@@ -2290,6 +2300,13 @@
         "text": "Leg MADE2FOUND auf deinen Startbildschirm, schalte Mitteilungen ein und stell ein, wann Feierabend ist – dann bleibt das Telefon still, Nachrichten warten in der App.",
         "place": "Konto › Handy, Mitteilungen und Feierabend",
         "doneWhen": "Mitteilungen eingeschaltet oder Feierabend eingestellt ist"
+      },
+      "people": {
+        "title": "Euer Team beschreiben",
+        "short": "Wer ist wer – für die Startups",
+        "text": "Beschreibt kurz, wer in eurer Organisation wofür da ist, und klickt an, wen die Startups im Programm sehen und kontaktieren dürfen. Jede Person kann ihre Karte selbst ändern oder zurücknehmen; den Kontakt trägt sie selbst ein. Hat sich das Team geändert, ladet ihr Leute ein oder nehmt sie heraus – unter „Mitglieder & Rollen“.",
+        "place": "Seitenleiste › Einrichten › Mitglieder & Rollen › Wer ist wer",
+        "doneWhen": "eine Karte für die Startups sichtbar ist"
       }
     },
     "card": {
@@ -2463,5 +2480,38 @@
       "noPosts": "noch keine Posts",
       "nothingAhead": "Es steht nichts mehr an."
     }
+  },
+  "people": {
+    "title": "Wer ist wer",
+    "text": "Die Menschen eurer Organisation. Beschreibt sie kurz und klickt an, wen die Startups im Programm sehen und kontaktieren dürfen. Standard ist: nicht sichtbar. Hat sich das Team geändert? Oben lädst du neue Mitglieder ein oder nimmst jemanden heraus – wer entfernt wird, verliert den Zugang.",
+    "summary": "{shown} von {total} für die Startups sichtbar",
+    "unnamed": "Ohne Namen",
+    "you": "du",
+    "roleOwner": "Inhaberin / Inhaber",
+    "roleAdvisor": "Advisor",
+    "noHeadline": "Noch keine Kurzbeschreibung",
+    "noAbout": "Noch keine Beschreibung.",
+    "describeYourself": "Beschreib dich kurz – dann können die Startups sehen, wer du bist und wie sie dich erreichen.",
+    "status": {
+      "shown": "Für Startups sichtbar",
+      "hidden": "Nicht sichtbar",
+      "withdrawn": "Selbst zurückgenommen"
+    },
+    "headline": "Kurzzeile",
+    "headlinePlaceholder": "z. B. Betreut Teams in der Finanzierung",
+    "about": "Ein paar Sätze",
+    "aboutPlaceholder": "Wofür bist du die richtige Ansprechperson?",
+    "contact": "So erreichen dich die Startups",
+    "contactPlaceholder": "E-Mail, Telefon oder Link – nur, was du teilen willst",
+    "contactOnlySelf": "Den Kontakt trägt nur die Person selbst ein.",
+    "showToStartups": "Die Startups im Programm dürfen das sehen",
+    "showHintSelf": "Du kannst es jederzeit wieder ausschalten.",
+    "showHintOther": "Die Person sieht das auf ihrer eigenen Karte und kann es jederzeit zurücknehmen.",
+    "selfHiddenNote": "Die Person hat ihre Karte selbst zurückgenommen – nur sie kann sie wieder zeigen.",
+    "save": "Speichern",
+    "errorHidden": "Die Person hat die Karte selbst zurückgenommen – nur sie kann sie wieder zeigen.",
+    "errorFailed": "Das hat nicht geklappt.",
+    "startupTitle": "Wer ist wer im Programm",
+    "startupText": "Die Menschen der Organisation, die sich für euch freigegeben haben – mit dem Kontakt, den sie selbst angegeben haben."
   }
 }

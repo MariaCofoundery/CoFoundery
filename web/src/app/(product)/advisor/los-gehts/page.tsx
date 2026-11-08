@@ -10,6 +10,9 @@ import { PlanEventList } from "@/features/advisor/PlanEventList";
 import { loadSetup } from "@/features/advisor/setup/setupData";
 import { isSetupStep, stepHref, type SetupStep } from "@/features/advisor/setup/setupModel";
 import { setSetupHiddenAction, skipSetupStepAction } from "@/features/advisor/setup/setupActions";
+import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
+import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
+import { getOrgMembers } from "@/features/advisor/orgData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -22,7 +25,7 @@ const SUGGESTED_FORMATS = ["Workshop", "Masterclass", "Mentoring", "Office Hours
  * gewaehlte Schritt - was er bringt, wo man ihn spaeter findet, "jetzt machen" oder ueberspringen. Der Schritt
  * "Programm planen" geht gleich hier: Formate antippen, Termine tippen oder diktieren.
  */
-export default async function SetupPage({ searchParams }: { searchParams?: Promise<{ org?: string; schritt?: string }> }) {
+export default async function SetupPage({ searchParams }: { searchParams?: Promise<{ org?: string; schritt?: string; cardSaved?: string; cardError?: string }> }) {
   const query = (await searchParams) ?? {};
   const {
     data: { user },
@@ -40,6 +43,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
   const current: SetupStep = isSetupStep(query.schritt) && items.some((item) => item.key === query.schritt) ? query.schritt : next ?? items[items.length - 1].key;
   const index = items.findIndex((item) => item.key === current);
   const currentState = items[index]?.state ?? "open";
+  const [people, peopleCards] = current === "people" ? await Promise.all([getOrgMembers(client, org.id), listOrgMemberCards(client, org.id)]) : [[], new Map()];
   const formats = current === "plan" ? await listEventFormats(client, org.id) : [];
   const href = (step: SetupStep) => `/advisor/los-gehts?${new URLSearchParams({ org: org.id, schritt: step }).toString()}`;
 
@@ -92,6 +96,10 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         <h2 id="step-title" className="font-brand -mt-3 text-[30px] font-semibold leading-tight text-slate-950">{t(`steps.${current}.title`)}</h2>
         <p className="max-w-2xl text-[15.5px] leading-7 text-slate-800">{t(`steps.${current}.text`)}</p>
 
+        {current === "people" ? (
+          <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={setup.isOwner} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+        ) : null}
+
         {current === "plan" && currentState !== "done" ? (
           <div className="grid gap-4 xl:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 p-4">
@@ -141,7 +149,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {current !== "plan" || currentState === "done" ? (
+          {(current !== "plan" && current !== "people") || currentState === "done" ? (
             <Link href={stepHref(current, org.id)} className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">
               {currentState === "done" ? t("open") : t("doNow")}
             </Link>

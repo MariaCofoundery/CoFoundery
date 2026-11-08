@@ -65,6 +65,9 @@ export async function saveOrgTaskAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const taskId = uuidOrNull(formData.get("taskId"));
   const status = formData.get("status");
+  // Privat gilt nur beim Anlegen (bestehende Aufgaben wechseln ueber setOrgTaskVisibilityAction) und gehoert der Person
+  // allein: keine anderen Zustaendigen, kein Team im Programm.
+  const isPrivate = !taskId && formData.get("visibility") === "private";
   const { data: savedId, error } = await client.rpc("save_org_task", {
     p_task_id: taskId,
     p_org_id: uuidOrNull(formData.get("orgId")),
@@ -72,16 +75,25 @@ export async function saveOrgTaskAction(formData: FormData) {
     p_details: String(formData.get("details") ?? "").slice(0, 4000),
     p_status: isTaskStatus(status) ? status : "open",
     // Mehrere Zustaendige (20270322120000): jede gewaehlte Person ist ein eigenes Feld "assignee".
-    p_assignee_user_ids: [...new Set(formData.getAll("assignee").map((value) => uuidOrNull(value)).filter((value): value is string => value !== null))].slice(0, 6),
+    p_assignee_user_ids: isPrivate ? [] : [...new Set(formData.getAll("assignee").map((value) => uuidOrNull(value)).filter((value): value is string => value !== null))].slice(0, 6),
     p_due_on: dateOrNull(formData.get("dueOn")),
-    p_program_id: uuidOrNull(formData.get("programId")),
+    p_program_id: isPrivate ? null : uuidOrNull(formData.get("programId")),
     p_event_id: uuidOrNull(formData.get("eventId")),
     p_checklist: parseChecklist(String(formData.get("checklist") ?? "")),
+    p_visibility: isPrivate ? "private" : "team",
   });
   if (error) finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), taskError: errorOf(error.message) }));
   // Wer neu zustaendig ist, hat den Hinweis schon (Datenbank); hier noch die Mitteilung aufs Geraet.
   if (typeof savedId === "string") await pushOrgTaskNotices(client, savedId, "org_task_assigned");
   finish(backTo(formData, taskId ? { task: taskId, taskSaved: "1" } : { taskSaved: "1" }));
+}
+
+/** Eine eigene Aufgabe privat machen oder mit dem Team teilen - nur, wer sie angelegt hat (die Datenbank prueft das). */
+export async function setOrgTaskVisibilityAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const taskId = uuidOrNull(formData.get("taskId"));
+  const { error } = await client.rpc("set_org_task_visibility", { p_task_id: taskId, p_visibility: formData.get("visibility") === "private" ? "private" : "team" });
+  finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), ...(error ? { taskError: "failed" } : { taskSaved: "1" }) }));
 }
 
 export async function moveOrgTaskAction(formData: FormData) {

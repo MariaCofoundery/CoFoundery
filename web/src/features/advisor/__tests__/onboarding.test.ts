@@ -5,17 +5,18 @@ import { OWNER_STEPS, setupProgress, stepHref, type SetupFacts } from "@/feature
 
 const read = (path: string) => readFileSync(path, "utf8");
 const facts = (done: string[]): SetupFacts =>
-  Object.fromEntries(["profile", "features", "team", "plan", "teams", "teamraum", "phone", "role"].map((key) => [key, done.includes(key)])) as SetupFacts;
+  Object.fromEntries(["profile", "features", "team", "people", "plan", "teams", "teamraum", "phone", "role"].map((key) => [key, done.includes(key)])) as SetupFacts;
 
 test("Los geht's: erledigt ergibt sich aus den Daten, uebersprungen bleibt nachholbar, der naechste offene Schritt", () => {
   const progress = setupProgress(OWNER_STEPS, facts(["profile", "features", "team"]), ["plan"]);
   assert.equal(progress.done, 3);
-  assert.equal(progress.total, 7);
+  assert.equal(progress.total, 8);
   assert.equal(progress.items.find((item) => item.key === "plan")?.state, "skipped");
-  assert.equal(progress.next, "teams");
+  assert.equal(progress.next, "people");
   assert.equal(setupProgress(OWNER_STEPS, facts([...OWNER_STEPS]), []).complete, true);
   // Jeder Schritt fuehrt an seinen festen Ort und von dort zurueck.
   assert.match(stepHref("plan", "o"), /ansicht=plan&losgehts=1$/);
+  assert.match(stepHref("people", "o"), /tab=members&losgehts=1#wer-ist-wer$/);
   assert.equal(stepHref("phone", "o"), "/account#handy");
 });
 

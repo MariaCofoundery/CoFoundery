@@ -26,7 +26,7 @@ const task = (overrides: Partial<OrgTask>): OrgTask => ({
   dueOn: null,
   programId: null,
   eventId: null,
-  pageId: null,
+  pageId: null, visibility: "team",
   checklist: [],
   createdByUserId: "me",
   createdAt: "2026-11-01T10:00:00Z",
@@ -191,7 +191,7 @@ test("Aufgaben zu zweit: Tabelle, Speichern mit allen gewaehlten Personen, Start
   // Aufrufe mit einer Person (Diktat, Code beim Ausrollen) gelten weiter.
   assert.match(sql, /p_assignee_user_id uuid default null,[\s\S]*p_assignee_user_ids uuid\[\] default null/);
   const actions = readFileSync("src/features/advisor/teamraumActions.ts", "utf8");
-  assert.match(actions, /p_assignee_user_ids: \[\.\.\.new Set\(formData\.getAll\("assignee"\)/);
+  assert.match(actions, /p_assignee_user_ids: isPrivate \? \[\] : \[\.\.\.new Set\(formData\.getAll\("assignee"\)/);
   // Abhaken vom Start fuehrt nur an eine feste Adresse zurueck.
   assert.match(actions, /if \(start === "start" \|\| start === "start-team"\)/);
   const data = readFileSync("src/features/advisor/teamraumData.ts", "utf8");
