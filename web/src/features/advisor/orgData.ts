@@ -1,7 +1,9 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import type { AdvisorScope } from "@/features/advisor/personAccessData";
+import { ACTIVE_ORG_COOKIE, activeFirst, parseActiveOrg } from "@/features/advisor/activeOrg";
 
 /**
  * Die Organisation, ihre Menschen - und die Menschen, die sie begleitet.
@@ -82,7 +84,7 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
       rows.map((row) => row.org_id)
     );
 
-  return (
+  const list = (
     (orgs ?? []) as {
       id: string;
       name: string;
@@ -123,6 +125,9 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
   }))
     // Feste Reihenfolge nach Namen - die erste Organisation ist die vorausgewaehlte, das darf nicht vom Zufall der Abfrage abhaengen.
     .sort((a, b) => a.name.localeCompare(b.name, "de"));
+  // Das gewaehlte Programm (Cookie, 06.11.2026) steht vorn: Seiten ohne ?org= nehmen die erste.
+  const activeId = parseActiveOrg((await cookies()).get(ACTIVE_ORG_COOKIE)?.value);
+  return activeFirst(list, activeId);
 }
 
 /**

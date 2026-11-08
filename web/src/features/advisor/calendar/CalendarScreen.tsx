@@ -30,15 +30,20 @@ import {
   type CalendarLayer,
   type CalendarView,
 } from "@/features/advisor/calendar/calendarModel";
+import { PlanView } from "@/features/advisor/calendar/PlanView";
 import { EventPanel } from "@/features/advisor/calendar/EventPanel";
 import { EventSheet } from "@/features/advisor/calendar/EventSheet";
+import { PostSheet } from "@/features/advisor/calendar/PostSheet";
+import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
+import { movePostToDayAction } from "@/features/advisor/socialCalendarActions";
 import { EventFormats } from "@/features/advisor/EventFormats";
 import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEvents, listProgramExperts } from "@/features/advisor/teamProgramData";
 import { listEventCountingRequirements } from "@/features/advisor/fundingData";
-import { listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
+import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { isoWeekNumber } from "@/features/advisor/socialCalendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
+import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 export type CalendarQuery = Record<string, string | undefined>;
@@ -67,12 +72,13 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   if (!user) redirect(buildLoginRedirectPath("/advisor/kalender"));
 
   const client = await createClient();
-  const [roleViews, orgs, t, tp, tAdvisor, locale] = await Promise.all([
+  const [roleViews, orgs, t, tp, tAdvisor, ts, locale] = await Promise.all([
     getDashboardRoleViews(user.id),
     getMyAdvisorOrgs(client),
     getTranslations("advisor.calendar"),
     getTranslations("advisor.teamProgram"),
     getTranslations("advisor"),
+    getTranslations("advisor.social"),
     getLocale().then(getPresentationLocale),
   ]);
   if (!roleViews.hasAdvisor) redirect("/dashboard");
@@ -86,6 +92,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const month = monthOf(query.monat, today);
   const week = weekOf(query.woche, today);
   const hidden = hiddenLayersOf(query.aus);
+  const onlyPosts = query.nur === "posts";
 
   // Was bei jedem Link im Kalender mitgeht.
   const keep: Record<string, string> = {
@@ -93,6 +100,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     ...(query.monat && monthOf(query.monat, today) === query.monat ? { monat: query.monat } : {}),
     ...(view === "week" ? { woche: week } : {}),
     ...(hidden.size > 0 ? { aus: hiddenParam(hidden) } : {}),
+    ...(onlyPosts ? { nur: "posts" } : {}),
   };
   const link = (extra: Record<string, string | null | undefined> = {}) => calendarHref(orgs.length > 1 ? org.id : null, { ...keep, ...extra });
   const linkOrg = (extra: Record<string, string | null | undefined> = {}) => calendarHref(org.id, { ...keep, ...extra });
@@ -112,7 +120,8 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
 
   const selectedId = UUID.test(query.termin ?? "") ? (query.termin as string) : null;
   const editId = UUID.test(query.bearbeiten ?? "") ? (query.bearbeiten as string) : null;
-  const sheet = editId ? "edit" : query.neu === "termin" ? "new" : query.neu === "liste" ? "bulk" : null;
+  const postId = UUID.test(query.post ?? "") ? (query.post as string) : null;
+  const sheet = editId ? "edit" : query.neu === "termin" ? "new" : query.neu === "liste" ? "bulk" : postId ? "post" : query.neu === "post" ? "post-new" : null;
   const tab = tabOf(query.reiter);
   const range = visibleRange(view, month, week);
 
@@ -121,12 +130,16 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     getOrgTeamPrograms(client, org.id),
     listProgramEvents(client, org.id),
     listEventFormats(client, org.id),
-    view === "formats" ? Promise.resolve([]) : listOrgPosts(client, org.id, range.from, range.to),
+    view === "formats" || view === "plan" ? Promise.resolve([]) : listOrgPosts(client, org.id, range.from, range.to),
     listOrgEventPosts(client, org.id),
     listPostTemplates(client, org.id),
     listOrgTasks(client, org.id),
-    hidden.has("eco") || view === "formats" ? Promise.resolve([]) : listSavedEcoItems(client, user.id),
+    hidden.has("eco") || view === "formats" || view === "plan" ? Promise.resolve([]) : listSavedEcoItems(client, user.id),
     hasOrgFeature(org, "funding") ? listEventCountingRequirements(client, org.id) : Promise.resolve([]),
+  ]);
+  const [openPost, campaigns] = await Promise.all([
+    postId ? getOrgPost(client, org.id, postId) : Promise.resolve(null),
+    sheet === "post" || sheet === "post-new" ? listOrgCampaigns(client, org.id) : Promise.resolve([]),
   ]);
   const memberNames = new Map(members.map((member) => [member.userId, member.displayName ?? tAdvisor("area.kinds.unnamed")]));
   const programChoices = programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }));
@@ -140,12 +153,12 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     hidden,
     hrefs: {
       event: (eventId) => linkOrg({ termin: eventId, reiter: null }),
-      post: (post) => `${teamraumHref("social", org.id, { post: post.id, month: post.plannedOn.slice(0, 7) })}#post-editor`,
+      post: (post) => linkOrg({ post: post.id }),
       task: (task) => teamraumHref("tasks", org.id, { task: task.id }),
       eco: "/events",
     },
   });
-  const visible = items.filter((item) => item.day >= range.from && item.day <= range.to);
+  const visible = items.filter((item) => item.day >= range.from && item.day <= range.to && (!onlyPosts || item.layer === "post"));
   const byDay = itemsByDay(visible);
   const selected = selectedId ? events.find((event) => event.eventId === selectedId) ?? null : null;
   const editing = editId ? events.find((event) => event.eventId === editId) ?? null : null;
@@ -182,14 +195,20 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     ? { tone: "rose" as const, text: planError === "audience" ? tp("event.errorAudience") : planError === "publicUrl" ? tp("event.errorPublicUrl") : tp("planError") }
     : /^\d{1,2}$/.test(query.planCreated ?? "")
       ? { tone: "emerald" as const, text: tp("bulk.created", { count: Number(query.planCreated) }) }
-      : query.planSaved === "1" && !selected
+      : query.socialError === "1"
+        ? { tone: "rose" as const, text: ts("error") }
+        : query.socialSaved === "1" || query.socialDeleted === "1"
+          ? { tone: "emerald" as const, text: ts("saved") }
+          : /^\d{1,2}$/.test(query.socialCreated ?? "")
+            ? { tone: "emerald" as const, text: ts("created", { count: Number(query.socialCreated) }) }
+            : query.planSaved === "1" && !selected
         ? { tone: "emerald" as const, text: tp("planSaved") }
         : null;
 
   const chip = (item: CalendarItem, large = false) => {
     const style = LAYER_STYLE[item.layer];
     const active = Boolean(selected && item.eventId === selected.eventId && item.layer === "program");
-    return (
+    const link = (
       <Link
         key={item.key}
         href={item.href}
@@ -206,6 +225,14 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           <svg role="img" aria-label={t("weekendWarn")} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17v.5" /></svg>
         ) : null}
       </Link>
+    );
+    // Posts lassen sich auf einen anderen Tag ziehen (wie vorher im Social-Kalender).
+    return item.layer === "post" && !item.done && canWrite ? (
+      <DraggableItem key={item.key} id={item.key.slice(2)} kind="post">
+        {link}
+      </DraggableItem>
+    ) : (
+      link
     );
   };
 
@@ -270,7 +297,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           ))}
         </nav>
         <span className="flex-1" />
-        {view !== "formats" ? (
+        {view !== "formats" && view !== "plan" ? (
           <nav aria-label={t("rangeLabel")} className="flex items-center gap-1">
             <Link href={prevHref} aria-label={t("prev")} className="grid h-10 w-10 place-items-center rounded-[10px] border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">‹</Link>
             <span className="min-w-36 text-center text-[16px] font-bold capitalize text-slate-950">{view === "week" ? weekLabel : monthLabel}</span>
@@ -278,31 +305,23 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
             <Link href={todayHref} className="ml-1 inline-flex min-h-10 items-center rounded-[10px] border border-slate-200 bg-white px-3 text-[13.5px] font-semibold text-slate-800 hover:bg-slate-50">{t("today")}</Link>
           </nav>
         ) : null}
-        {isOwner ? (
+        {canWrite ? (
           <div className="flex gap-2">
-            <Link href={linkOrg({ neu: "liste" })} className="hidden min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50 sm:inline-flex">{t("addMany")}</Link>
-            <Link href={linkOrg({ neu: "termin" })} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#6D49E0] px-4 text-sm font-semibold text-white hover:bg-[#5B36D6]">
+            {isOwner ? <Link href={linkOrg({ neu: "liste" })} className="hidden min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50 sm:inline-flex">{t("addMany")}</Link> : null}
+            <Link href={linkOrg({ neu: "post", tag: today })} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50">{t("addPost")}</Link>
+            {isOwner ? <Link href={linkOrg({ neu: "termin" })} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#6D49E0] px-4 text-sm font-semibold text-white hover:bg-[#5B36D6]">
               <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
               {t("addEvent")}
-            </Link>
+            </Link> : null}
           </div>
         ) : null}
       </header>
 
-      {orgs.length > 1 ? (
-        <nav aria-label={t("orgSwitch")} className="mb-4 flex flex-wrap gap-2">
-          {orgs.map((entry) => (
-            <Link key={entry.id} href={calendarHref(entry.id, keep)} aria-current={entry.id === org.id ? "page" : undefined} className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${entry.id === org.id ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}>
-              {entry.name}
-            </Link>
-          ))}
-        </nav>
-      ) : null}
-
       <AreaTips area="calendar" />
+      {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
       {message ? <p role={message.tone === "rose" ? "alert" : "status"} className={`mb-4 rounded-xl border px-4 py-3 text-sm ${message.tone === "rose" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
 
-      {view !== "formats" ? (
+      {view !== "formats" && view !== "plan" ? (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="mr-1 text-[13px] font-semibold text-slate-700">{t("layersLabel")}</span>
           {CALENDAR_LAYERS.map((layer) => {
@@ -325,11 +344,12 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
               </Link>
             );
           })}
+          <Link href={calendarHref(orgs.length > 1 ? org.id : null, { ...keep, nur: onlyPosts ? null : "posts" })} aria-pressed={onlyPosts} className={`ml-1 inline-flex min-h-9 items-center rounded-full border px-3 text-[13.5px] font-semibold ${onlyPosts ? "border-pink-500 bg-pink-50 text-pink-950" : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"}`}>{t("onlyPosts")}</Link>
           <span className="ml-1 text-[13px] text-slate-700">{t("layersHint")}</span>
         </div>
       ) : null}
 
-      {needPosts.length > 0 && view !== "formats" ? (
+      {needPosts.length > 0 && view !== "formats" && view !== "plan" ? (
         <Link href={linkOrg({ termin: needPosts[0].eventId, reiter: "social" })} className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl bg-[#FFF4E0] px-4 py-3.5 text-[#5C3300] hover:brightness-95">
           <span aria-hidden="true" className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[10px] bg-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></svg></span>
           <span className="min-w-0 flex-1 text-[14.5px]">
@@ -363,14 +383,14 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
                       const list = byDay.get(cell.day) ?? [];
                       const weekend = new Date(`${cell.day}T00:00:00Z`).getUTCDay() % 6 === 0;
                       return (
-                        <div key={cell.day} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${cell.inMonth ? (weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
+                        <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${cell.inMonth ? (weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
                           <div className="flex items-center justify-between">
                             <span className={`grid h-[26px] min-w-[26px] place-items-center rounded-full px-1 text-[13px] font-semibold ${cell.day === today ? "bg-[#6D49E0] text-white" : cell.inMonth ? "text-slate-950" : "text-slate-500"}`}>{Number(cell.day.slice(8))}</span>
                             {isOwner ? <Link href={linkOrg({ neu: "termin", tag: cell.day })} aria-label={t("addOn", { day: dayLong.format(new Date(`${cell.day}T00:00:00Z`)) })} className="grid h-6 w-6 place-items-center rounded-full text-sm text-slate-500 opacity-0 hover:bg-violet-50 hover:text-violet-800 focus:opacity-100 group-hover:opacity-100">+</Link> : null}
                           </div>
                           {list.slice(0, 3).map((item) => chip(item))}
                           {list.length > 3 ? <Link href={calendarHref(orgs.length > 1 ? org.id : null, { ansicht: "woche", woche: weekOf(cell.day, today), ...(hidden.size > 0 ? { aus: hiddenParam(hidden) } : {}) })} className="pl-1.5 text-[12px] font-semibold text-slate-700 hover:underline">{t("moreCount", { count: list.length - 3 })}</Link> : null}
-                        </div>
+                        </DropDay>
                       );
                     })}
                   </div>
@@ -394,12 +414,38 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
             </>
           ) : null}
 
-          {view === "list" ? agenda(agendaDays(range.from, range.to)) : null}
+          {view === "plan" ? (
+            <PlanView
+              orgId={org.id}
+              isOwner={isOwner}
+              events={events}
+              postCounts={new Map(eventPosts.filter((post) => post.eventId).map((post) => [post.eventId as string, eventPosts.filter((other) => other.eventId === post.eventId).length]))}
+              formats={formats}
+              programs={programChoices}
+              today={today}
+              locale={locale}
+              keep={keep}
+            />
+          ) : null}
         </div>
         {panel}
       </div>
 
-      {sheet ? (
+      {sheet === "post" || sheet === "post-new" ? (
+        <PostSheet
+          orgId={org.id}
+          post={sheet === "post" ? openPost : null}
+          defaultDay={DAY.test(query.tag ?? "") ? (query.tag as string) : today}
+          defaultEventId={sheet === "post-new" ? selectedId : null}
+          month={month}
+          closeHref={selectedId ? closeSheetHref : closePanelHref}
+          events={events.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt }))}
+          campaigns={campaigns}
+          members={members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? tAdvisor("area.kinds.unnamed") }))}
+          canDelete={Boolean(openPost && canWrite && (openPost.createdByUserId === user.id || isOwner))}
+          locale={locale}
+        />
+      ) : sheet ? (
         <EventSheet
           kind={sheet}
           orgId={org.id}

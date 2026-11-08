@@ -226,23 +226,6 @@ export default async function AdvisorOrganisationPage({
       </header>
       <OrgAreaNav part="tabs" ariaLabel={t("orgPage.tabsLabel")} activeTab={tab} groups={areaGroups} />
 
-      {orgs.length > 1 ? (
-        <nav aria-label={t("orgPage.orgSwitchLabel")} className="mt-4 flex flex-wrap gap-2">
-          {orgs.map((entry) => (
-            <Link
-              key={entry.id}
-              href={base(tab, entry.id)}
-              aria-current={entry.id === org.id ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm ${
-                entry.id === org.id ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              {entry.name}
-            </Link>
-          ))}
-        </nav>
-      ) : null}
-
       <div className="mt-6">
         <AreaTips area="program" />
         {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}

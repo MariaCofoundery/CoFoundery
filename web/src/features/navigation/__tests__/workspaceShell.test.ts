@@ -21,12 +21,12 @@ const source = (path: string) => readFileSync(join(root, path), "utf8");
 const messages = (locale: string) => JSON.parse(source(`messages/${locale}/navigation.json`)).workspace as Record<string, unknown>;
 
 const withOrg = buildWorkspaceNav({ hasOrg: true, chatUnread: 3 });
-const activeKeys = (pathname: string, tab: string | null = null, nav = withOrg) => flattenWorkspaceNav(nav).filter((item) => item.match(pathname, tab)).map((item) => item.key);
+const activeKeys = (pathname: string, tab: string | null = null, nav = withOrg, view: string | null = null) => flattenWorkspaceNav(nav).filter((item) => item.match(pathname, tab, view)).map((item) => item.key);
 
 test("die Stationen stehen in drei Gruppen: Arbeiten, Programm, Netzwerk", () => {
   assert.deepEqual(withOrg.groups.map((group) => group.key), ["work", "program", "network"]);
-  assert.deepEqual(withOrg.groups[0].items.map((item) => item.key), ["tasks", "chat", "calendar", "social", "pages"]);
-  assert.deepEqual(withOrg.groups[1].items.map((item) => item.key), ["teams", "report", "funding"]);
+  assert.deepEqual(withOrg.groups[0].items.map((item) => item.key), ["tasks", "chat", "calendar", "pages"]);
+  assert.deepEqual(withOrg.groups[1].items.map((item) => item.key), ["teams", "plan", "social", "report", "funding"]);
   assert.deepEqual(withOrg.groups[2].items.map((item) => item.key), ["follow", "content", "events"]);
   assert.equal(withOrg.home.key, "home");
   assert.equal(withOrg.setup?.key, "setup");
@@ -47,6 +47,7 @@ test("jede Seite markiert genau eine Station", () => {
     ["/advisor/teamraum/wer-macht-was", null, "tasks"],
     ["/advisor/teamraum/chat", null, "chat"],
     ["/advisor/teamraum/chat/abc", null, "chat"],
+    ["/advisor/kalender", null, "calendar"],
     ["/advisor/kalender", null, "calendar"],
     ["/advisor/teamraum/social-media", null, "social"],
     ["/advisor/teamraum/seiten", null, "pages"],
@@ -69,6 +70,9 @@ test("jede Seite markiert genau eine Station", () => {
     ["/advisor/organisation", "enroll", "setup"],
   ];
   for (const [pathname, tab, expected] of cases) assert.deepEqual(activeKeys(pathname, tab), [expected], `${pathname}${tab ? `?tab=${tab}` : ""}`);
+  // Der Programmplan ist der Kalender mit ?ansicht=plan - eine eigene Station, nicht beide zugleich.
+  assert.deepEqual(activeKeys("/advisor/kalender", null, withOrg, "plan"), ["plan"]);
+  assert.deepEqual(activeKeys("/advisor/kalender", null, withOrg, "woche"), ["calendar"]);
 });
 
 test("der Chat-Zaehler steht am Chat, sonst nirgends", () => {
@@ -84,7 +88,7 @@ test("die Seitenleiste tragen nur Advisor-Seiten, Events, Team-Runden, Postfach 
 
 test("+ Neu fuehrt nur an Ziele, die es gibt", () => {
   assert.deepEqual(QUICK_CREATE.map((entry) => entry.key), ["task", "event", "events", "post", "message"]);
-  const stations = ["/advisor/teamraum/aufgaben", "/advisor/kalender", "/advisor/teamraum/social-media", "/advisor/teamraum/chat"];
+  const stations = ["/advisor/teamraum/aufgaben", "/advisor/kalender", "/advisor/teamraum/chat"];
   for (const entry of QUICK_CREATE) assert.ok(stations.some((station) => entry.href.startsWith(station)), entry.href);
 });
 
@@ -118,4 +122,18 @@ test("Seitenleiste, Kopfleiste, Reiter unten und Suche sind da - und nichts davo
   assert.match(chrome, /event\.metaKey \|\| event\.ctrlKey/);
   // Die Suche sagt ehrlich, was sie durchsucht.
   assert.match(source("messages/de/navigation.json"), /Inhalte noch nicht/);
+});
+
+test("zwei Programme: das gewaehlte steht in der Seitenleiste, bleibt gemerkt und blendet die anderen aus", () => {
+  const chrome = source("src/features/navigation/workspace/WorkspaceChrome.tsx");
+  assert.match(chrome, /function ProgramSwitcher/);
+  assert.match(chrome, /document\.cookie = `\$\{ACTIVE_ORG_COOKIE\}=\$\{id\}; path=\/; samesite=lax`/);
+  assert.match(chrome, /next\.set\("org", id\)/);
+  assert.match(chrome, /borderTopColor: color\.dot/);
+  // Das Programm aus dem Cookie steht in allen Abfragen vorn; Heute und Events zeigen nur dieses.
+  assert.match(source("src/features/advisor/orgData.ts"), /activeFirst\(list, activeId\)/);
+  assert.match(source("src/app/(product)/advisor/dashboard/page.tsx"), /const orgs = allOrgs\.slice\(0, 1\);/);
+  assert.match(source("src/app/(product)/events/page.tsx"), /getMyAdvisorOrgs\(client\)\)\.slice\(0, 1\)/);
+  // Nur Darstellung: der Cookie ist kein Zugang.
+  assert.doesNotMatch(source("src/features/advisor/activeOrg.ts"), /rpc\(|supabase/);
 });

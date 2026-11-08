@@ -136,6 +136,7 @@ export async function EventPanel({
               <>
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="text-[14.5px] font-bold text-slate-950">{t("postsTitle", { count: sortedPosts.length })}</h3>
+                  {canWrite ? <Link href={calendarHref(orgId, { ...extra, termin: event.eventId, neu: "post", tag: day })} className="text-[13px] font-semibold text-violet-800 underline-offset-4 hover:underline">+ {t("addPost")}</Link> : null}
                   <Link href={teamraumHref("social", orgId, { reiter: "vorlagen" })} className="text-[13px] font-semibold text-violet-800 underline-offset-4 hover:underline">{t("manageTemplates")}</Link>
                 </div>
                 {sortedPosts.length === 0 ? <p className="text-[14px] leading-6 text-slate-700">{t("noPosts")}</p> : null}
@@ -145,7 +146,7 @@ export async function EventPanel({
                     return (
                       <li key={post.id}>
                         <Link
-                          href={`${teamraumHref("social", orgId, { post: post.id, month: post.plannedOn.slice(0, 7) })}#post-editor`}
+                          href={calendarHref(orgId, { ...extra, termin: event.eventId, post: post.id })}
                           className={`flex items-center gap-3 rounded-[14px] border px-3 py-2.5 hover:bg-slate-50 ${post.status === "idea" ? "border-dashed border-pink-300" : "border-slate-200"}`}
                         >
                           <span className="flex h-[46px] w-[3.4rem] shrink-0 flex-col items-center justify-center rounded-[11px] bg-pink-100 px-1 text-center text-[11px] font-bold leading-[1.15] text-pink-900">{dayShort.format(new Date(`${post.plannedOn}T00:00:00Z`))}</span>

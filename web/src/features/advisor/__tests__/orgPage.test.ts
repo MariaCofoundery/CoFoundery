@@ -10,7 +10,7 @@ test("die Organisationsseite hat vierzehn Reiter und waehlt zwischen mehreren Or
   assert.match(page, /teams: "\/advisor\/begleitung\?art=teams", people: "\/advisor\/begleitung\?art=personen"/);
   assert.match(page, /value === "success" \? "features"/);
   assert.match(page, /orgs\.find\(\(entry\) => entry\.id === query\.org\) \?\? orgs\[0\]/);
-  assert.match(page, /orgs\.length > 1/);
+  // Das Programm wechselt seit dem 06.11.2026 die Seitenleiste; die Seite nimmt die gewaehlte (orgs[0] steht vorn).
 });
 
 test("die Seite zeigt Zaehler und Plaetze - keine Gesamtwertung, keine Rangfolge", () => {

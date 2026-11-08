@@ -35,6 +35,9 @@ type Props = {
   /** Eine Organisation: ihr Name steht im Menue. Mehrere oder keine: "Organisation". */
   advisorOrgNames?: string[];
   advisorSoloOrg?: boolean;
+  /** Dieselben Organisationen mit Kennung (Programm-Umschalter in der Seitenleiste) und die gewaehlte. */
+  advisorOrgList?: { id: string; name: string }[];
+  activeOrgId?: string | null;
   hasConnect: boolean;
   hasConnectAccount: boolean;
   /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
@@ -292,6 +295,8 @@ export function ProductShell({
   hasAdvisor,
   advisorOrgNames = [],
   advisorSoloOrg = false,
+  advisorOrgList = [],
+  activeOrgId = null,
   hasConnect,
   hasConnectAccount,
   hasTeamProgram = false,
@@ -765,6 +770,8 @@ export function ProductShell({
         <WorkspaceChrome
           hasOrg={advisorOrgNames.length > 0}
           orgLabel={advisorOrgLabel}
+          orgs={advisorOrgList}
+          activeOrgId={activeOrgId}
           chatUnread={advisorChatUnread}
           messagesCount={messagesAttentionCount}
           slots={{

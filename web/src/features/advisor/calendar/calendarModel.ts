@@ -13,13 +13,13 @@ import { berlinDayOf } from "@/lib/berlinTime";
 
 export const CALENDAR_LAYERS = ["program", "post", "task", "eco"] as const;
 export type CalendarLayer = (typeof CALENDAR_LAYERS)[number];
-export const CALENDAR_VIEWS = ["month", "week", "list", "formats"] as const;
+export const CALENDAR_VIEWS = ["month", "week", "plan", "formats"] as const;
 export type CalendarView = (typeof CALENDAR_VIEWS)[number];
 export const PANEL_TABS = ["social", "tasks", "teams", "details"] as const;
 export type PanelTab = (typeof PANEL_TABS)[number];
 
 /** Die Adresse kennt deutsche Namen, der Code englische. */
-const VIEW_PARAM: Record<CalendarView, string> = { month: "monat", week: "woche", list: "liste", formats: "formate" };
+const VIEW_PARAM: Record<CalendarView, string> = { month: "monat", week: "woche", plan: "plan", formats: "formate" };
 const LAYER_PARAM: Record<CalendarLayer, string> = { program: "termine", post: "posts", task: "aufgaben", eco: "oekosystem" };
 const TAB_PARAM: Record<PanelTab, string> = { social: "social", tasks: "aufgaben", teams: "teilnahme", details: "details" };
 

@@ -47,7 +47,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
 
   // Der angemeldete Zugang, nicht der privilegierte.
   const client = await createClient();
-  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, orgs, programFollowUps, myTasks] = await Promise.all([
+  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, allOrgs, programFollowUps, allMyTasks] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
@@ -59,9 +59,13 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     listDueProgramFollowUps(client),
     listMyOpenOrgTasks(client, user.id),
   ]);
+  // Wer in mehreren Programmen ist, sieht hier nur das gewaehlte (06.11.2026): die erste Organisation ist die aus der
+  // Seitenleiste, Aufgaben und Termine der anderen bleiben ausgeblendet.
+  const orgs = allOrgs.slice(0, 1);
+  const myTasks = allMyTasks.filter((task) => orgs.some((org) => org.id === task.orgId));
   // Aufgaben (Teamraum): was im Team ansteht, und die Namen der Mitglieder fuer "wer".
   const [upcomingTasks, memberLists] = await Promise.all([
-    orgs.length > 0 ? listUpcomingOrgTasks(client) : Promise.resolve([]),
+    orgs.length > 0 ? listUpcomingOrgTasks(client).then((tasks) => tasks.filter((task) => orgs.some((org) => org.id === task.orgId))) : Promise.resolve([]),
     Promise.all(orgs.slice(0, 5).map((org) => getOrgMembers(client, org.id))),
   ]);
   const memberNames = new Map(memberLists.flat().map((member) => [member.userId, member.displayName ?? t("kinds.unnamed")] as const));

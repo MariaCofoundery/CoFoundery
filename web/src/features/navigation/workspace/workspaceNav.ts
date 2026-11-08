@@ -16,6 +16,7 @@ export type WorkspaceIcon =
   | "social"
   | "pages"
   | "teams"
+  | "plan"
   | "report"
   | "funding"
   | "follow"
@@ -31,6 +32,7 @@ export type WorkspaceItemKey =
   | "social"
   | "pages"
   | "teams"
+  | "plan"
   | "report"
   | "funding"
   | "follow"
@@ -49,7 +51,7 @@ export type WorkspaceNavItem = {
   badge?: number;
   /** Unterpunkte, nur sichtbar, solange man im Eintrag ist. */
   children?: { key: "followList" | "invite"; href: string; match: (pathname: string) => boolean }[];
-  match: (pathname: string, tab: string | null) => boolean;
+  match: (pathname: string, tab: string | null, view?: string | null) => boolean;
 };
 
 export type WorkspaceNav = {
@@ -61,6 +63,8 @@ export type WorkspaceNav = {
 const ORG = "/advisor/organisation";
 const tabHref = (tab: string) => `${ORG}?tab=${tab}`;
 export const CALENDAR_PATH = "/advisor/kalender";
+/** Wert von ?ansicht= fuer den Programmplan. */
+export const PLAN_VIEW = "plan";
 
 const FOLLOW_BASES = ["/advisor/begleitung", "/advisor/group", "/advisor/person", "/advisor/review", "/advisor/report", "/advisor/snapshot", "/advisor/session"];
 export const isFollowPath = (pathname: string) => FOLLOW_BASES.some((base) => pathname === base || pathname.startsWith(`${base}/`));
@@ -135,8 +139,8 @@ export function buildWorkspaceNav({ hasOrg, chatUnread = 0 }: { hasOrg: boolean;
           // "Diese Woche" und "Wer macht was" gehoeren zum Aufgaben-Eintrag.
           { key: "tasks", href: teamraumPath("tasks"), icon: "tasks", match: (pathname) => inTeamraum(pathname, ["tasks", "week", "who"]) },
           { key: "chat", href: teamraumPath("chat"), icon: "chat", ...(chatUnread > 0 ? { badge: chatUnread } : {}), match: (pathname) => inTeamraum(pathname, ["chat"]) },
-          { key: "calendar", href: CALENDAR_PATH, icon: "calendar", match: (pathname) => pathname === CALENDAR_PATH },
-          { key: "social", href: teamraumPath("social"), icon: "social", match: (pathname) => inTeamraum(pathname, ["social"]) },
+          // Der Kalender haelt auch die Posts (Ebene "Posts"); Vorlagen und Kampagnen stehen unter Programm.
+          { key: "calendar", href: CALENDAR_PATH, icon: "calendar", match: (pathname, _tab, view) => pathname === CALENDAR_PATH && view !== PLAN_VIEW },
           { key: "pages", href: teamraumPath("pages"), icon: "pages", match: (pathname) => inTeamraum(pathname, ["pages"]) },
         ],
       },
@@ -149,6 +153,9 @@ export function buildWorkspaceNav({ hasOrg, chatUnread = 0 }: { hasOrg: boolean;
             icon: "teams",
             match: (pathname, tab) => (onOrg(pathname) && (tab === null || tab === "overview" || tab === "program")) || pathname.startsWith("/advisor/programm/") || pathname === "/advisor/beispiel",
           },
+          // Der Programmplan: alle Termine als Liste, hier traegt man sie ein (einzeln, mehrere auf einmal, Formate).
+          { key: "plan", href: `${CALENDAR_PATH}?ansicht=${PLAN_VIEW}`, icon: "plan", match: (pathname, _tab, view) => pathname === CALENDAR_PATH && view === PLAN_VIEW },
+          { key: "social", href: teamraumPath("social"), icon: "social", match: (pathname) => inTeamraum(pathname, ["social"]) },
           { key: "report", href: tabHref("report"), icon: "report", match: (pathname, tab) => onOrg(pathname) && tab === "report" },
           { key: "funding", href: tabHref("funding"), icon: "funding", match: (pathname, tab) => (onOrg(pathname) && tab === "funding") || pathname === "/advisor/organisation/foerderung" },
         ],
@@ -182,7 +189,7 @@ export const QUICK_CREATE = [
   { key: "task", href: `${TEAMRAUM_BASE}/aufgaben?new=1` },
   { key: "event", href: `${CALENDAR_PATH}?neu=termin` },
   { key: "events", href: `${CALENDAR_PATH}?neu=liste` },
-  { key: "post", href: `${TEAMRAUM_BASE}/social-media?newPost=heute` },
+  { key: "post", href: `${CALENDAR_PATH}?neu=post` },
   { key: "message", href: `${TEAMRAUM_BASE}/chat` },
 ] as const;
 export type QuickCreateKey = (typeof QUICK_CREATE)[number]["key"];

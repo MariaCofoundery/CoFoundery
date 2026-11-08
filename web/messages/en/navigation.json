@@ -111,7 +111,7 @@
       "tasks": "Tasks",
       "chat": "Chat",
       "calendar": "Calendar",
-      "social": "Social media",
+      "social": "Templates & campaigns",
       "pages": "Pages",
       "teams": "Teams",
       "report": "Report",
@@ -120,7 +120,8 @@
       "content": "Content",
       "events": "Events",
       "setup": "Set up",
-      "myProgram": "My program"
+      "myProgram": "My program",
+      "plan": "Program plan"
     },
     "children": {
       "followList": "Who you accompany",
@@ -168,6 +169,7 @@
       }
     },
     "notifications": "Messages and notices",
-    "dateLabel": "Today"
+    "dateLabel": "Today",
+    "program": "Program"
   }
 }

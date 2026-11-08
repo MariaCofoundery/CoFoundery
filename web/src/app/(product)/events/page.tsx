@@ -29,7 +29,8 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
 
   const client = await createClient();
   const [t, roleViews, locale] = await Promise.all([getTranslations("events"), getDashboardRoleViews(user.id), getLocale().then(getPresentationLocale)]);
-  const orgs = roleViews.hasAdvisor ? await getMyAdvisorOrgs(client) : [];
+  // Nur das gewaehlte Programm (06.11.2026), wie auf Heute.
+  const orgs = roleViews.hasAdvisor ? (await getMyAdvisorOrgs(client)).slice(0, 1) : [];
   const now = Date.now();
   const horizon = now + 90 * 86_400_000;
   const upcoming = (iso: string) => new Date(iso).getTime() >= now - 6 * 3_600_000 && new Date(iso).getTime() <= horizon;

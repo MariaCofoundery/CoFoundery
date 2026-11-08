@@ -80,9 +80,10 @@ test("Kalender: Woche ab Montag, Kalenderwoche nach ISO, Ziehen in Monat und Woc
   assert.equal(isoWeekNumber("2026-11-05"), 45);
   assert.equal(isoWeekNumber("2027-01-01"), 53);
   assert.equal(isoWeekNumber("2027-01-04"), 1);
-  const calendar = readFileSync("src/features/advisor/SocialCalendar.tsx", "utf8");
-  assert.equal((calendar.match(/<DropDay /g) ?? []).length, 2);
-  assert.match(calendar, /<DraggableItem id=\{post\.id\} kind="post">/);
+  // Posts sind seit dem 06.11.2026 eine Ebene im Kalender - und lassen sich dort auf einen anderen Tag ziehen.
+  const calendar = readFileSync("src/features/advisor/calendar/CalendarScreen.tsx", "utf8");
+  assert.equal((calendar.match(/<DropDay /g) ?? []).length, 1);
+  assert.match(calendar, /<DraggableItem key=\{item\.key\} id=\{item\.key\.slice\(2\)\} kind="post">/);
   const tasks = readFileSync("src/features/advisor/Teamraum.tsx", "utf8");
   assert.match(tasks, /export const TASK_VIEWS = \["board", "list", "calendar"\] as const;/);
   assert.match(tasks, /<DropDay key=\{cell\.day\} day=\{cell\.day\} kind="task" move=\{moveTaskDueAction\}/);

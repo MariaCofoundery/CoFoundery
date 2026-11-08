@@ -29,8 +29,17 @@ const timeOrNull = (value: unknown) => {
 function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const orgId = uuidOrNull(formData.get("orgId"));
   if (!orgId) return TEAMRAUM_BASE;
-  const params = new URLSearchParams();
   const month = String(formData.get("month") ?? "");
+  // Aus dem Kalender (seit 06.11.2026 der einzige Kalender): zurueck dorthin, Posts oeffnen im Panel.
+  if (formData.get("calendar") === "1") {
+    const { newPost, ...rest } = extra;
+    return calendarHref(orgId, {
+      ...(/^\d{4}-\d{2}$/.test(month) ? { monat: month } : {}),
+      ...(newPost !== undefined ? { neu: "post", ...(newPost ? { tag: newPost } : {}) } : {}),
+      ...rest,
+    });
+  }
+  const params = new URLSearchParams();
   if (/^\d{4}-\d{2}$/.test(month)) params.set("month", month);
   const week = String(formData.get("week") ?? "");
   if (/^\d{4}-\d{2}-\d{2}$/.test(week)) {
@@ -156,7 +165,10 @@ export async function movePostToDayAction(postId: string, day: string): Promise<
   if (!UUID.test(postId) || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return { ok: false };
   const client = await createClient();
   const { error } = await client.rpc("move_org_post", { p_post_id: postId, p_planned_on: day, p_status: null });
-  if (!error) revalidatePath("/advisor/teamraum", "layout");
+  if (!error) {
+    revalidatePath("/advisor/teamraum", "layout");
+    revalidatePath("/advisor/kalender");
+  }
   return { ok: !error };
 }
 

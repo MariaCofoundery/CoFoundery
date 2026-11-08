@@ -10,8 +10,8 @@ import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgT
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgChatList } from "@/features/advisor/OrgChatList";
 import { SocialCalendar } from "@/features/advisor/SocialCalendar";
-import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
-import { addDays, isChannel, monthGrid, monthOf, weekOf } from "@/features/advisor/socialCalendarModel";
+import { listOrgCampaigns, listPostTemplates } from "@/features/advisor/socialCalendarData";
+import { addDays, monthOf } from "@/features/advisor/socialCalendarModel";
 import { listMyOrgChats, searchOrgChats } from "@/features/advisor/orgChatData";
 import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
@@ -19,6 +19,7 @@ import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getOrgTeamPrograms, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
 import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
+import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { TEAMRAUM_SECTIONS, teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
@@ -81,45 +82,40 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
     const planEvents = section === "who" ? [] : await listProgramEvents(client, org.id);
 
     if (section === "social") {
-      const view = query.view === "week" ? "week" : "month";
-      const week = weekOf(query.week, today);
-      const month = view === "week" ? week.slice(0, 7) : monthOf(query.month, today);
-      const grid = monthGrid(month);
-      const from = view === "week" ? week : grid[0][0].day;
-      const to = view === "week" ? addDays(week, 6) : grid[grid.length - 1][6].day;
-      const [posts, eventPosts, campaigns, templates, selected] = await Promise.all([
-        listOrgPosts(client, org.id, from, to),
-        listOrgEventPosts(client, org.id),
-        listOrgCampaigns(client, org.id),
-        listPostTemplates(client, org.id),
-        UUID.test(query.post ?? "") ? getOrgPost(client, org.id, query.post as string) : Promise.resolve(null),
-      ]);
+      // Seit dem 06.11.2026 gibt es nur noch einen Kalender (Posts sind dort eine Ebene). Hier bleiben Vorlagen und
+      // Kampagnen; alte Adressen des Social-Kalenders (Posts, "+ Post", Monat) fuehren in den Kalender.
+      if (query.reiter !== "vorlagen" && query.reiter !== "kampagnen") {
+        redirect(
+          calendarHref(org.id, {
+            monat: /^\d{4}-\d{2}$/.test(query.month ?? "") ? query.month : null,
+            ansicht: query.view === "week" ? "woche" : null,
+            woche: query.view === "week" && /^\d{4}-\d{2}-\d{2}$/.test(query.week ?? "") ? query.week : null,
+            post: UUID.test(query.post ?? "") ? query.post : null,
+            neu: query.newPost ? "post" : null,
+            tag: /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? query.newPost : null,
+            termin: query.newPost && UUID.test(query.event ?? "") ? query.event : null,
+          }),
+        );
+      }
+      const month = monthOf(query.month, today);
+      const campaigns = await listOrgCampaigns(client, org.id);
+      const templates = await listPostTemplates(client, org.id);
       return (
         <SocialCalendar
           ctx={{
             orgId: org.id,
-            me: user.id,
             isOwner,
             canWrite,
             today,
             month,
-            view,
-            week,
             locale,
-            members: activeMembers.map((member) => ({ userId: member.userId, name: member.displayName ?? unnamed })),
             events: planEvents.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt })),
-            posts,
-            eventPosts,
             campaigns,
             templates,
-            channel: isChannel(query.channel) ? query.channel : null,
-            reiter: query.reiter === "vorlagen" || query.reiter === "kampagnen" ? query.reiter : "kalender",
+            reiter: query.reiter === "kampagnen" ? "kampagnen" : "vorlagen",
             templateEdit: query.vorlage === "neu" ? "neu" : UUID.test(query.vorlage ?? "") ? (query.vorlage as string) : null,
             feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
           }}
-          selected={selected}
-          newDay={selected ? null : query.newPost === "heute" ? today : /^\d{4}-\d{2}-\d{2}$/.test(query.newPost ?? "") ? (query.newPost as string) : null}
-          newEvent={UUID.test(query.event ?? "") ? (query.event as string) : null}
         />
       );
     }
@@ -227,20 +223,6 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
           <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight tracking-tight text-slate-950 sm:text-[34px]">{t(`sections.${section}`)}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          {orgs.length > 1 ? (
-            <nav aria-label={t("orgSwitch")} className="flex flex-wrap gap-2">
-              {orgs.map((entry) => (
-                <Link
-                  key={entry.id}
-                  href={teamraumHref(section, entry.id)}
-                  aria-current={entry.id === org.id ? "page" : undefined}
-                  className={`inline-flex min-h-10 items-center rounded-full border px-4 text-sm ${entry.id === org.id ? "brand-here font-semibold" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}
-                >
-                  {entry.name}
-                </Link>
-              ))}
-            </nav>
-          ) : null}
           {section === "tasks" && canWrite ? (
             <>
               <Link href={teamraumHref("tasks", org.id, { ...keepForActions, dictate: "1" })} className="hidden min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 md:inline-flex">

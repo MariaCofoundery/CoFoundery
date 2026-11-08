@@ -208,5 +208,5 @@ test("wer einer Organisation angehoert, sieht den Advisor-Bereich - ohne dass da
   assert.match(data, /advisorOrgNames\.length > 0/);
   assert.match(data, /\.from\("advisor_org_members"\)[\s\S]*?\.eq\("status", "active"\)/);
   // Nur Namen werden gelesen, keine Mitglieder- oder Teamdaten.
-  assert.match(data, /\.from\("advisor_orgs"\)\.select\("name"\)/);
+  assert.match(data, /\.from\("advisor_orgs"\)\.select\("id, name"\)/);
 });

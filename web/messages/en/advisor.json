@@ -2208,7 +2208,8 @@
       "event": "Event",
       "apply": "Apply to an event",
       "newHint": "e.g. “3 posts for event y”"
-    }
+    },
+    "toCalendar": "To the calendar"
   },
   "setup": {
     "title": "Let's go",
@@ -2256,10 +2257,10 @@
         "doneWhen": "someone is invited"
       },
       "plan": {
-        "title": "Plan your program",
-        "short": "Formats and first dates",
-        "text": "Decide which formats you offer and enter the first dates. Teams in the program see the plan, answer and get reminders. Later this gives post suggestions for social media and the report for your funding.",
-        "place": "My program › Care › Program plan",
+        "title": "Enter all events",
+        "short": "Formats and all events of the program",
+        "text": "Decide which formats you offer and enter all events of the program – type them as a list or dictate them. Teams see the plan, reply and get reminders. Later you will find everything in the program plan in the sidebar; social media suggestions and the report for your funding build on it.",
+        "place": "Sidebar › Program › Program plan",
         "doneWhen": "a date is in"
       },
       "teams": {
@@ -2352,7 +2353,7 @@
     "views": {
       "month": "Month",
       "week": "Week",
-      "list": "List",
+      "plan": "Program plan",
       "formats": "Formats"
     },
     "today": "Today",
@@ -2368,7 +2369,7 @@
       "task": "Task deadlines",
       "eco": "Ecosystem"
     },
-    "layersHint": "Click an event to open it on the right. Events you saved appear from the ecosystem.",
+    "layersHint": "Click an event or post to open it. Events you saved appear from the ecosystem.",
     "needsPosts": "{count, plural, one {One event has no posts yet:} other {# events have no posts yet:}}",
     "needsPostsAction": "Apply template",
     "moreCount": "+{count} more",
@@ -2392,7 +2393,9 @@
       "newTitle": "New event",
       "editTitle": "Edit event",
       "bulkTitle": "Several events at once",
-      "saveChanges": "Save changes"
+      "saveChanges": "Save changes",
+      "postEditEyebrow": "Edit post",
+      "postNewEyebrow": "New post"
     },
     "panel": {
       "close": "Close",
@@ -2427,7 +2430,8 @@
       "teamsInternal": "Teams do not see this event – there is no attendance.",
       "internalNote": "Internal note · only for you",
       "publicLabel": "Event calendar",
-      "publicNot": "not public"
+      "publicNot": "not public",
+      "addPost": "Post"
     },
     "form": {
       "titlePlaceholder": "What is the event called?",
@@ -2445,6 +2449,19 @@
       "socialInternal": "Not for events only for your team",
       "publicTitle": "Public in the event calendar",
       "publicHint": "As a suggestion – facts and link only, after our approval"
+    },
+    "onlyPosts": "Posts only",
+    "addPost": "Post",
+    "plan": {
+      "title": "Program plan",
+      "text": "All events of your program in one place. Add them one by one or type and dictate several at once – teams see what is meant for them and reply.",
+      "addOne": "Add event",
+      "addMany": "Add several at once",
+      "formats": "Formats ({count})",
+      "emptyTitle": "Enter all events",
+      "posts": "{count, plural, one {1 post} other {# posts}}",
+      "noPosts": "no posts yet",
+      "nothingAhead": "Nothing is coming up."
     }
   }
 }

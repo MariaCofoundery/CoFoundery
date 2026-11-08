@@ -31,7 +31,7 @@ export function stepHref(step: SetupStep, orgId: string): string {
     case "team":
       return `/advisor/organisation?org=${org}&tab=members&losgehts=1`;
     case "plan":
-      return `/advisor/organisation?org=${org}&tab=plan&losgehts=1`;
+      return `/advisor/kalender?org=${org}&ansicht=plan&losgehts=1`;
     case "teams":
       return `/advisor/organisation?org=${org}&tab=enroll&losgehts=1`;
     case "teamraum":

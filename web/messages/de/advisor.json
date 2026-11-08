@@ -2208,7 +2208,8 @@
       "event": "Termin",
       "apply": "Auf Termin anwenden",
       "newHint": "z. B. „3 Posts zu Event y“"
-    }
+    },
+    "toCalendar": "Zum Kalender"
   },
   "setup": {
     "title": "Los geht's",
@@ -2256,10 +2257,10 @@
         "doneWhen": "jemand eingeladen ist"
       },
       "plan": {
-        "title": "Euer Programm planen",
-        "short": "Formate und erste Termine",
-        "text": "Legt fest, welche Formate ihr anbietet, und tragt die ersten Termine ein. Die Teams im Programm sehen den Plan, sagen zu und bekommen Erinnerungen. Daraus entstehen später Vorschläge für Social Media und die Auswertung für eure Förderung.",
-        "place": "Mein Programm › Betreuen › Programmplan",
+        "title": "Alle Events eintragen",
+        "short": "Formate und alle Termine des Programms",
+        "text": "Legt fest, welche Formate ihr anbietet, und tragt alle Events des Programms ein – tippt sie als Liste oder diktiert sie. Die Teams sehen den Plan, sagen zu und bekommen Erinnerungen. Später findet ihr alles im Programmplan, links in der Seitenleiste; dazu kommen Vorschläge für Social Media und die Auswertung für eure Förderung.",
+        "place": "Seitenleiste › Programm › Programmplan",
         "doneWhen": "ein Termin steht"
       },
       "teams": {
@@ -2352,7 +2353,7 @@
     "views": {
       "month": "Monat",
       "week": "Woche",
-      "list": "Liste",
+      "plan": "Programmplan",
       "formats": "Formate"
     },
     "today": "Heute",
@@ -2368,7 +2369,7 @@
       "task": "Aufgaben-Fristen",
       "eco": "Ökosystem"
     },
-    "layersHint": "Klick auf einen Termin öffnet ihn rechts. Aus dem Ökosystem erscheinen die Events, die du gemerkt hast.",
+    "layersHint": "Klick auf einen Termin oder Post öffnet ihn rechts. Aus dem Ökosystem erscheinen die Events, die du gemerkt hast.",
     "needsPosts": "{count, plural, one {Ein Termin hat noch keine Posts:} other {# Termine haben noch keine Posts:}}",
     "needsPostsAction": "Vorlage anwenden",
     "moreCount": "+{count} mehr",
@@ -2392,7 +2393,9 @@
       "newTitle": "Neuer Termin",
       "editTitle": "Termin bearbeiten",
       "bulkTitle": "Mehrere Termine auf einmal",
-      "saveChanges": "Änderungen speichern"
+      "saveChanges": "Änderungen speichern",
+      "postEditEyebrow": "Post bearbeiten",
+      "postNewEyebrow": "Neuer Post"
     },
     "panel": {
       "close": "Schließen",
@@ -2427,7 +2430,8 @@
       "teamsInternal": "Die Teams sehen diesen Termin nicht – eine Teilnahme gibt es nicht.",
       "internalNote": "Interne Notiz · nur für euch",
       "publicLabel": "Event-Kalender",
-      "publicNot": "nicht öffentlich"
+      "publicNot": "nicht öffentlich",
+      "addPost": "Post"
     },
     "form": {
       "titlePlaceholder": "Wie heißt der Termin?",
@@ -2445,6 +2449,19 @@
       "socialInternal": "Nicht bei Terminen nur für euer Team",
       "publicTitle": "Öffentlich im Event-Kalender",
       "publicHint": "Als Vorschlag – nur Fakten und Link, nach unserer Freigabe"
+    },
+    "onlyPosts": "Nur Posts",
+    "addPost": "Post",
+    "plan": {
+      "title": "Programmplan",
+      "text": "Alle Termine eures Programms an einem Ort. Trag sie einzeln ein oder tippe und diktiere mehrere auf einmal – die Teams sehen, was für sie ist, und sagen zu.",
+      "addOne": "Termin eintragen",
+      "addMany": "Mehrere auf einmal",
+      "formats": "Formate ({count})",
+      "emptyTitle": "Alle Events eintragen",
+      "posts": "{count, plural, one {1 Post} other {# Posts}}",
+      "noPosts": "noch keine Posts",
+      "nothingAhead": "Es steht nichts mehr an."
     }
   }
 }

@@ -28,6 +28,8 @@ export type DashboardRoleViews = {
   advisorOrgNames?: string[];
   /** Einzige Organisation, in der die Person allein aktiv ist: im Menue "Mein Programm" statt Organisationsname. */
   advisorSoloOrg?: boolean;
+  /** Dieselben Organisationen mit Kennung, nach Namen sortiert - fuer den Programm-Umschalter in der Seitenleiste. */
+  advisorOrgList?: { id: string; name: string }[];
 };
 
 type AdvisorAccessRow = {
@@ -279,13 +281,14 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
     roles,
     advisorOrgNames,
     advisorSoloOrg: advisorOrgs.solo,
+    advisorOrgList: advisorOrgs.list,
   };
 }
 
 async function listActiveAdvisorOrgs(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-): Promise<{ names: string[]; solo: boolean }> {
+): Promise<{ names: string[]; solo: boolean; list: { id: string; name: string }[] }> {
   try {
     const { data: memberships } = await supabase
       .from("advisor_org_members")
@@ -293,11 +296,15 @@ async function listActiveAdvisorOrgs(
       .eq("user_id", userId)
       .eq("status", "active");
     const orgIds = (memberships ?? []).map((row) => row.org_id as string);
-    if (orgIds.length === 0) return { names: [], solo: false };
-    const { data: orgs } = await supabase.from("advisor_orgs").select("name").in("id", orgIds);
+    if (orgIds.length === 0) return { names: [], solo: false, list: [] };
+    const { data: orgs } = await supabase.from("advisor_orgs").select("id, name").in("id", orgIds);
     const names = (orgs ?? [])
       .map((org) => String(org.name ?? "").trim())
       .filter((name) => name.length > 0);
+    const list = (orgs ?? [])
+      .map((org) => ({ id: String(org.id), name: String(org.name ?? "").trim() }))
+      .filter((org) => org.name.length > 0)
+      .sort((a, b) => a.name.localeCompare(b.name, "de"));
     let solo = false;
     if (orgIds.length === 1 && memberships?.[0]?.role === "owner") {
       const { data: active } = await supabase
@@ -307,9 +314,9 @@ async function listActiveAdvisorOrgs(
         .eq("status", "active");
       solo = (active ?? []).length === 1;
     }
-    return { names, solo };
+    return { names, solo, list };
   } catch {
-    return { names: [], solo: false };
+    return { names: [], solo: false, list: [] };
   }
 }
 

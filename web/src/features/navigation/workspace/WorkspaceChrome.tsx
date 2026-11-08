@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ACTIVE_ORG_COOKIE, orgColor } from "@/features/advisor/activeOrg";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
@@ -45,6 +46,8 @@ export function WorkspaceChrome({
   children,
   hasOrg,
   orgLabel,
+  orgs,
+  activeOrgId,
   chatUnread,
   messagesCount,
   slots,
@@ -52,6 +55,9 @@ export function WorkspaceChrome({
   children: React.ReactNode;
   hasOrg: boolean;
   orgLabel: string;
+  /** Alle Programme der Person (nach Namen) und das gewaehlte - der Umschalter oben in der Seitenleiste. */
+  orgs: { id: string; name: string }[];
+  activeOrgId: string | null;
   chatUnread: number;
   messagesCount: number;
   slots: Slots;
@@ -59,7 +65,24 @@ export function WorkspaceChrome({
   const t = useTranslations("navigation");
   const tw = useTranslations("navigation.workspace");
   const pathname = usePathname();
-  const tab = useSearchParams().get("tab");
+  const params = useSearchParams();
+  const tab = params.get("tab");
+  const view = params.get("ansicht");
+  const router = useRouter();
+  const queryOrg = params.get("org");
+  const activeIndex = Math.max(0, orgs.findIndex((entry) => entry.id === (orgs.some((o) => o.id === queryOrg) ? queryOrg : activeOrgId)));
+  const active = orgs[activeIndex] ?? null;
+  const color = orgColor(activeIndex);
+  const writeActive = (id: string) => {
+    document.cookie = `${ACTIVE_ORG_COOKIE}=${id}; path=/; samesite=lax`;
+  };
+  // Eine Adresse mit ?org= gilt: das Programm wird gemerkt, damit Seiten ohne ?org= im selben Programm bleiben.
+  useEffect(() => {
+    if (active && queryOrg === active.id && activeOrgId !== active.id) {
+      writeActive(active.id);
+      router.refresh();
+    }
+  }, [active, queryOrg, activeOrgId, router]);
   const nav = useMemo(() => buildWorkspaceNav({ hasOrg, chatUnread }), [hasOrg, chatUnread]);
   const all = useMemo(() => flattenWorkspaceNav(nav), [nav]);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -72,7 +95,7 @@ export function WorkspaceChrome({
     setMoreOpen(false);
     setCreateOpen(false);
     setSearchOpen(false);
-  }, [pathname, tab]);
+  }, [pathname, tab, view]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -98,8 +121,20 @@ export function WorkspaceChrome({
     return () => window.removeEventListener("pointerdown", onDown);
   }, [createOpen]);
 
-  const isActive = (item: WorkspaceNavItem) => item.match(pathname, tab);
+  const isActive = (item: WorkspaceNavItem) => item.match(pathname, tab, view);
   const label = (key: WorkspaceItemKey) => tw(`items.${key}`);
+  // Programm wechseln: Wahl merken und zur selben Station im anderen Programm. Seiten zu einzelnen Dingen
+  // (ein Chat, ein Team) gehoeren zum alten Programm und fuehren auf die Station zurueck.
+  const switchTo = (id: string) => {
+    writeActive(id);
+    const here = all.find((item) => item.match(pathname, tab, view));
+    const href = here ? here.href : "/advisor/dashboard";
+    const [path, query = ""] = href.split("?");
+    const next = new URLSearchParams(query);
+    next.set("org", id);
+    router.push(`${path}?${next.toString()}`);
+    router.refresh();
+  };
   const badgeLabel = (item: WorkspaceNavItem) => (item.key === "chat" ? t("teamraumChatCount", { count: item.badge ?? 0 }) : "");
 
   const sideLink = (item: WorkspaceNavItem) => {
@@ -135,6 +170,12 @@ export function WorkspaceChrome({
     );
   };
 
+
+  const programSwitcher = (tone: "dark" | "light") =>
+    active ? (
+      <ProgramSwitcher orgs={orgs} activeId={active.id} color={color} onSwitch={switchTo} tone={tone} label={tw("program")} />
+    ) : null;
+
   const phoneTabs = hasOrg
     ? all.filter((item) => ["home", "tasks", "calendar", "chat"].includes(item.key))
     : all.filter((item) => ["home", "follow", "events"].includes(item.key));
@@ -154,6 +195,7 @@ export function WorkspaceChrome({
         <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="flex h-16 shrink-0 items-center px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF]">
           <BrandLogo tone="onDark" className="h-8" priority sizes="144px" />
         </Link>
+        {orgs.length > 0 ? <div className="px-3 pb-2">{programSwitcher("dark")}</div> : null}
         <nav aria-label={tw("navLabel")} className="flex flex-1 flex-col gap-0.5 px-3 pb-5 pt-1">
           {sideLink(nav.home)}
           {nav.groups.map((group) => (
@@ -170,19 +212,22 @@ export function WorkspaceChrome({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 flex min-h-16 items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 print:hidden sm:gap-3 sm:px-5 lg:px-6">
+        <header className="sticky top-0 z-40 flex min-h-16 items-center gap-2 border-b border-t-4 border-slate-200 bg-white px-3 py-2 print:hidden sm:gap-3 sm:px-5 lg:px-6" style={orgs.length > 1 && active ? { borderTopColor: color.dot } : { borderTopColor: "transparent" }}>
           <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="mr-1 shrink-0 lg:hidden">
             <BrandLogo className="h-7" priority sizes="112px" />
           </Link>
-          {hasOrg ? (
+          {hasOrg && active ? (
             <Link
               href="/advisor/organisation"
               title={tw("org")}
-              className="inline-flex min-h-11 min-w-0 max-w-[40%] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-950 hover:bg-slate-50 sm:max-w-[16rem]"
+              className="inline-flex min-h-11 min-w-0 max-w-[40%] items-center gap-2 rounded-xl border px-3 text-[14px] font-semibold hover:brightness-95 sm:max-w-[16rem]"
+              style={{ background: color.soft, borderColor: color.dot, color: color.text }}
             >
-              <span aria-hidden="true" className="grid h-6 w-6 shrink-0 place-items-center rounded-[7px] bg-violet-100 text-xs font-bold text-violet-800">
-                {orgLabel.slice(0, 1).toUpperCase()}
-              </span>
+              <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: color.dot }} />
+              <span className="min-w-0 truncate">{active.name}</span>
+            </Link>
+          ) : hasOrg ? (
+            <Link href="/advisor/organisation" title={tw("org")} className="inline-flex min-h-11 min-w-0 max-w-[40%] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-950 hover:bg-slate-50 sm:max-w-[16rem]">
               <span className="min-w-0 truncate">{orgLabel}</span>
             </Link>
           ) : null}
@@ -293,6 +338,7 @@ export function WorkspaceChrome({
               <span aria-hidden="true" className="mx-auto h-1.5 w-10 rounded-full bg-slate-300" />
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-8">
+              {orgs.length > 1 ? <div className="mb-3 px-1">{programSwitcher("light")}</div> : null}
               <nav aria-label={tw("navLabel")} className="flex flex-col gap-0.5">
                 {[nav.home, ...nav.groups.flatMap((group) => group.items), ...(nav.setup ? [nav.setup] : [])].map((item) => {
                   const active = isActive(item);
@@ -317,6 +363,63 @@ export function WorkspaceChrome({
       ) : null}
 
       {searchOpen ? <Palette entries={searchEntries} onClose={() => setSearchOpen(false)} /> : null}
+    </div>
+  );
+}
+
+type OrgColor = ReturnType<typeof orgColor>;
+
+/** Das Programm, in dem man arbeitet: Name mit Farbpunkt; bei mehreren Programmen ein Umschalter. */
+function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { orgs: { id: string; name: string }[]; activeId: string; color: OrgColor; onSwitch: (id: string) => void; tone: "dark" | "light"; label: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const active = orgs.find((entry) => entry.id === activeId) ?? orgs[0];
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (event: PointerEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+    };
+    window.addEventListener("pointerdown", onDown);
+    return () => window.removeEventListener("pointerdown", onDown);
+  }, [open]);
+  const dark = tone === "dark";
+  const body = (
+    <>
+      <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-[4px]" style={{ background: color.dot }} />
+      <span className="flex min-w-0 flex-1 flex-col text-left">
+        <span className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#9A9DC4]" : "text-slate-600"}`}>{label}</span>
+        <span className="truncate text-[14.5px] font-semibold">{active.name}</span>
+      </span>
+    </>
+  );
+  const frame = `flex min-h-12 w-full items-center gap-2.5 rounded-xl px-3 ${dark ? "bg-white/[0.08] text-white" : "border border-slate-200 bg-white text-slate-950"}`;
+  if (orgs.length < 2) return <div className={frame}>{body}</div>;
+  return (
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen((current) => !current)} aria-haspopup="menu" aria-expanded={open} className={`${frame} ${dark ? "hover:bg-white/[0.12]" : "hover:bg-slate-50"}`}>
+        {body}
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open ? (
+        <div role="menu" className="absolute inset-x-0 z-50 mt-1.5 rounded-xl border border-slate-200 bg-white p-1.5 text-slate-950 shadow-[0_18px_40px_rgba(23,23,58,0.2)]">
+          {orgs.map((entry, index) => (
+            <button
+              key={entry.id}
+              type="button"
+              role="menuitemradio"
+              aria-checked={entry.id === activeId}
+              onClick={() => {
+                setOpen(false);
+                if (entry.id !== activeId) onSwitch(entry.id);
+              }}
+              className={`flex min-h-11 w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[14.5px] ${entry.id === activeId ? "bg-slate-100 font-semibold" : "hover:bg-slate-50"}`}
+            >
+              <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-[4px]" style={{ background: orgColor(index).dot }} />
+              <span className="min-w-0 flex-1 truncate">{entry.name}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

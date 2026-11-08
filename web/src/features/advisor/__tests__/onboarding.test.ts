@@ -15,7 +15,7 @@ test("Los geht's: erledigt ergibt sich aus den Daten, uebersprungen bleibt nachh
   assert.equal(progress.next, "teams");
   assert.equal(setupProgress(OWNER_STEPS, facts([...OWNER_STEPS]), []).complete, true);
   // Jeder Schritt fuehrt an seinen festen Ort und von dort zurueck.
-  assert.match(stepHref("plan", "o"), /tab=plan&losgehts=1$/);
+  assert.match(stepHref("plan", "o"), /ansicht=plan&losgehts=1$/);
   assert.equal(stepHref("phone", "o"), "/account#handy");
 });
 

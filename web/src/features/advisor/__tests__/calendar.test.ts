@@ -34,7 +34,8 @@ const hrefs = { event: (id: string) => `/e/${id}`, post: (p: OrgPost) => `/p/${p
 test("Ansicht, Ebenen und Reiter stehen in der Adresse und fallen bei Unsinn auf die Voreinstellung zurueck", () => {
   assert.equal(viewOf(undefined), "month");
   assert.equal(viewOf("woche"), "week");
-  assert.equal(viewOf("liste"), "list");
+  assert.equal(viewOf("plan"), "plan");
+  assert.equal(viewOf("liste"), "month", "die Liste ist der Programmplan geworden");
   assert.equal(viewOf("formate"), "formats");
   assert.equal(viewOf("<script>"), "month");
   assert.equal(tabOf("aufgaben"), "tasks");
@@ -135,7 +136,7 @@ test("Anlegen und Aendern sind ein Seitenpanel mit Speichern unten; Escape und S
   assert.match(panel, /<form action=\{formAction\}/);
   assert.match(read("src/features/ui/EscapeCloses.tsx"), /event\.key === "Escape"/);
   // Anlegen darf nur die Inhaberin (die Datenbank prueft es ohnehin).
-  assert.match(read("src/features/advisor/calendar/CalendarScreen.tsx"), /\{isOwner \? \(\s*<div className="flex gap-2">/);
+  assert.match(read("src/features/advisor/calendar/CalendarScreen.tsx"), /\{isOwner \? <Link href=\{linkOrg\(\{ neu: "termin" \}\)\}/);
 });
 
 test("Kalender: nur Gemerktes aus dem Oekosystem, nur lesen - und die Ansicht kennt weder Zahl noch Rang", () => {
@@ -166,4 +167,27 @@ test("Texte des Kalenders in beiden Sprachen, dieselben Schluessel", () => {
   assert.deepEqual(keys(de.social.cards).sort(), keys(en.social.cards).sort());
   assert.deepEqual(keys(de.social.tabs).sort(), keys(en.social.tabs).sort());
   assert.deepEqual(keys(de.setup.tips.calendar).sort(), keys(en.setup.tips.calendar).sort());
+});
+
+test("ein Kalender: Posts sind eine Ebene, lassen sich anlegen und aendern - der Social-Kalender leitet dorthin", () => {
+  const screen = read("src/features/advisor/calendar/CalendarScreen.tsx");
+  assert.match(screen, /<PostSheet/);
+  assert.match(screen, /nur: onlyPosts \? null : "posts"/);
+  assert.match(read("src/features/advisor/calendar/PostSheet.tsx"), /name="calendar" value="1"/);
+  const actions = read("src/features/advisor/socialCalendarActions.ts");
+  assert.match(actions, /formData\.get\("calendar"\) === "1"/);
+  const screenSocial = read("src/features/advisor/TeamraumScreen.tsx");
+  assert.match(screenSocial, /query\.reiter !== "vorlagen" && query\.reiter !== "kampagnen"[\s\S]*redirect\(\s*calendarHref\(/);
+  // Sidebar: kein Social-Kalender mehr unter Arbeiten, Vorlagen und Kampagnen unter Programm.
+  assert.doesNotMatch(read("src/features/advisor/SocialCalendar.tsx"), /<DropDay|<PostEditor|monthGrid/);
+});
+
+test("Programmplan: eine Station mit grossem Eintragen, Sammelfeld und Formaten; im Onboarding ein Schritt 'Alle Events eintragen'", () => {
+  const plan = read("src/features/advisor/calendar/PlanView.tsx");
+  assert.match(plan, /<PlanEventList orgId=\{orgId\}/);
+  assert.match(plan, /neu: "termin"/);
+  assert.match(plan, /neu: "liste"/);
+  assert.match(read("src/features/advisor/setup/setupModel.ts"), /ansicht=plan&losgehts=1/);
+  const de = JSON.parse(read("messages/de/advisor.json"));
+  assert.equal(de.setup.steps.plan.title, "Alle Events eintragen");
 });

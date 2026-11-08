@@ -35,6 +35,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5" />
     </>
   ),
+  plan: (
+    <>
+      <rect x="3" y="4" width="18" height="17" rx="3" />
+      <path d="M3 9h18M8 2.5V6M16 2.5V6M8 13h8M8 17h5" />
+    </>
+  ),
   report: (
     <>
       <rect x="5" y="4" width="14" height="17" rx="2" />

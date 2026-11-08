@@ -13,6 +13,7 @@ import { ProductShell } from "@/features/navigation/ProductShell";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { ACTIVE_ORG_COOKIE, parseActiveOrg } from "@/features/advisor/activeOrg";
 import { parseWorkContext, WORK_CONTEXT_COOKIE } from "@/features/navigation/workContext";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { I18nProvider } from "@/i18n/I18nProvider";
@@ -132,6 +133,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
           advisorOrgNames: [] as string[],
           advisorSoloOrg: false,
+          advisorOrgList: [] as { id: string; name: string }[],
         })),
         getPersonCore(supabase, user.id).catch(() => null),
         getOwnProfileImage(supabase, user.id).catch(() => ({ avatarId: null, imageUrl: null })),
@@ -158,6 +160,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           roles: [],
           advisorOrgNames: [] as string[],
           advisorSoloOrg: false,
+          advisorOrgList: [] as { id: string; name: string }[],
         },
         null,
         { avatarId: null, imageUrl: null },
@@ -203,6 +206,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasAdvisor={roleViews.hasAdvisor}
             advisorOrgNames={roleViews.advisorOrgNames ?? []}
             advisorSoloOrg={roleViews.advisorSoloOrg ?? false}
+            advisorOrgList={roleViews.advisorOrgList ?? []}
+            activeOrgId={parseActiveOrg(cookieStore.get(ACTIVE_ORG_COOKIE)?.value)}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             hasTeamProgram={hasTeamProgram}
