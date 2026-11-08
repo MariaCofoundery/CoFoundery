@@ -65,6 +65,7 @@ export const IN_APP_NOTICE_KINDS = [
   "founder_invited",
   // Aufgaben im Programm (20270329120000): entstehen in der Datenbank.
   "program_task_assigned",
+  "program_task_comment",
 ] as const;
 
 export type InAppNoticeKind = (typeof IN_APP_NOTICE_KINDS)[number];

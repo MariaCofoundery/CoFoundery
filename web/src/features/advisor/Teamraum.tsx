@@ -141,17 +141,20 @@ async function Feedback({ ctx }: { ctx: TeamraumContext }) {
   return null;
 }
 
-/** Tage fuer die Knoepfe "Heute, Morgen, Freitag, Naechste Woche" - doppelte fallen weg. */
+/**
+ * Tage fuer die Knoepfe "Heute, Morgen, Freitag, In 7 Tagen" - doppelte fallen weg. "Naechste Woche" war der kommende Montag:
+ * wer am Freitag eine Aufgabe anlegte, hatte dafuer nur drei Tage (Hinweis Maria, 08.11.2026). Jetzt sind es immer sieben.
+ */
 function dueChoices(today: string, t: (key: string) => string) {
   const weekday = new Date(`${today}T00:00:00Z`).getUTCDay();
   const friday = addDays(today, (5 - weekday + 7) % 7 || 7);
-  const monday = addDays(today, (8 - weekday) % 7 || 7);
+  const inSevenDays = addDays(today, 7);
   const seen = new Set<string>();
   return [
     { value: today, label: t("form.today") },
     { value: addDays(today, 1), label: t("form.tomorrow") },
     { value: friday, label: t("form.friday") },
-    { value: monday, label: t("form.nextWeek") },
+    { value: inSevenDays, label: t("form.nextWeek") },
   ].filter((choice) => (seen.has(choice.value) ? false : (seen.add(choice.value), true)));
 }
 

@@ -35,7 +35,8 @@ import {
 } from "@/features/advisor/teamProgramData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { ProgramTasks } from "@/features/advisor/ProgramTasks";
-import { getProgramTaskPeople, listProgramTasks } from "@/features/advisor/programTasksData";
+import { ProgramGoals } from "@/features/advisor/ProgramGoals";
+import { getProgramTaskPeople, listProgramGoals, listProgramTaskComments, listProgramTasks } from "@/features/advisor/programTasksData";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 
 /**
@@ -52,13 +53,13 @@ export default async function AdvisorProgramTeamPage({
   searchParams,
 }: {
   params: Promise<{ programId: string }>;
-  searchParams?: Promise<{ tab?: string; saved?: string; error?: string; taskSaved?: string; taskError?: string }>;
+  searchParams?: Promise<{ tab?: string; saved?: string; error?: string; taskSaved?: string; taskError?: string; goalSaved?: string; goalError?: string }>;
 }) {
   const { programId } = await params;
   if (!/^[0-9a-f-]{36}$/.test(programId)) notFound();
   const query = (await searchParams) ?? {};
   const tabParam = query.tab;
-  const requestedTab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" || tabParam === "erfolge" || tabParam === "aufgaben" ? tabParam : "overview";
+  const requestedTab = tabParam === "meilensteine" || tabParam === "updates" || tabParam === "freigaben" || tabParam === "setup" || tabParam === "notizen" || tabParam === "erfolge" || tabParam === "aufgaben" || tabParam === "ziele" ? tabParam : "overview";
   const t = await getTranslations("advisor.teamProgram");
   const locale = await getLocale();
   const {
@@ -101,7 +102,10 @@ export default async function AdvisorProgramTeamPage({
     program.isActive && tab === "erfolge" ? getProgramRewards(client, programId) : Promise.resolve([]),
     program.isActive && tab === "overview" ? getCheckIns(client, programId) : Promise.resolve([]),
   ]);
-  const [programTasks, taskPeople] = program.isActive && tab === "aufgaben" ? await Promise.all([listProgramTasks(client, programId), getProgramTaskPeople(client, programId)]) : [[], []];
+  const [programTasks, taskPeople, programGoals] = program.isActive && (tab === "aufgaben" || tab === "ziele")
+    ? await Promise.all([tab === "aufgaben" ? listProgramTasks(client, programId) : Promise.resolve([]), getProgramTaskPeople(client, programId), tab === "ziele" ? listProgramGoals(client, programId) : Promise.resolve([])])
+    : [[], [], []];
+  const taskComments = tab === "aufgaben" ? await listProgramTaskComments(client, programTasks.map((task) => task.id)) : [];
   const nameOf = (userId: string) => members.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const base = `/advisor/programm/${programId}`;
 
@@ -111,6 +115,7 @@ export default async function AdvisorProgramTeamPage({
     ["updates", t("tabUpdates"), `${base}?tab=updates`],
     ...(successEnabled ? ([["erfolge", t("tabOutcomes"), `${base}?tab=erfolge`]] as [string, string, string][]) : []),
     ["aufgaben", t("tabTasks"), `${base}?tab=aufgaben`],
+    ["ziele", t("tabGoals"), `${base}?tab=ziele`],
     ["setup", t("tabSetup"), `${base}?tab=setup`],
     ["freigaben", t("tabAccess"), `${base}?tab=freigaben`],
     ["notizen", t("tabNotes"), `${base}?tab=notizen`],
@@ -189,7 +194,9 @@ export default async function AdvisorProgramTeamPage({
           />
           </>
         ) : tab === "aufgaben" ? (
-          <ProgramTasks programId={programId} side="org" tasks={programTasks} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={new Date().toISOString().slice(0, 10)} saved={query.taskSaved === "1"} error={query.taskError === "1"} />
+          <ProgramTasks programId={programId} side="org" tasks={programTasks} comments={taskComments} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={new Date().toISOString().slice(0, 10)} saved={query.taskSaved === "1"} error={query.taskError === "1"} />
+        ) : tab === "ziele" ? (
+          <ProgramGoals programId={programId} side="org" goals={programGoals} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={new Date().toISOString().slice(0, 10)} saved={query.goalSaved === "1"} error={query.goalError === "1"} />
         ) : tab === "setup" ? (
           <ProgramSetupView items={setupItems} includesSetup={program.includesSetup} locale={locale} />
         ) : tab === "freigaben" ? (
