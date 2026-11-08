@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { AnnouncementCard } from "@/features/announcements/AnnouncementCard";
+import { AnnouncementView } from "@/features/announcements/AnnouncementView";
 import {
   dismissAnnouncementAction,
   getPendingAnnouncementAction,
@@ -57,8 +57,21 @@ export function AnnouncementPopup() {
     };
   }, []);
 
+  // Die Handy-Fassung folgt der Fensterbreite (wie sm in Tailwind).
+  const [compact, setCompact] = useState(false);
   useEffect(() => {
-    if (!item) return;
+    const query = window.matchMedia("(max-width: 639px)");
+    const update = () => setCompact(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  const modal = item?.display === "card";
+  useEffect(() => {
+    // Nur die Karte haelt die Seite an. Band und Hinweis lassen sie bedienbar - kein Fokusraub,
+    // keine gesperrte Seite, kein Escape, das nebenbei etwas schliesst.
+    if (!item || !modal) return;
     closeButton.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") void dismiss();
@@ -72,7 +85,7 @@ export function AnnouncementPopup() {
       document.body.style.overflow = previous;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item]);
+  }, [item, modal]);
 
   async function dismiss(then?: string) {
     const current = item;
@@ -87,48 +100,23 @@ export function AnnouncementPopup() {
   if (!item) return null;
 
   return (
-    // Das aeussere Feld scrollt: Auf einem kleinen Bildschirm darf kein Teil der Karte abgeschnitten sein.
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-950/55 px-4 py-8" onClick={() => void dismiss()}>
-      <div className="mx-auto flex min-h-full w-full max-w-md items-center">
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="announcement-title"
-          className="w-full"
-          onClick={(event) => event.stopPropagation()}
-        >
-          <AnnouncementCard
-            eyebrow={t("eyebrow")}
-            title={item.title}
-            body={item.body}
-            titleId="announcement-title"
-            actions={
-              <>
-                {item.ctaHref && item.ctaLabel ? (
-                  <button
-                    type="button"
-                    onClick={() => void dismiss(item.ctaHref ?? undefined)}
-                    className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                  >
-                    {item.ctaLabel}
-                  </button>
-                ) : null}
-                <button
-                  ref={closeButton}
-                  type="button"
-                  onClick={() => void dismiss()}
-                  className={`inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${
-                    item.ctaHref && item.ctaLabel ? "text-slate-600 hover:text-slate-950" : "brand-cta"
-                  }`}
-                >
-                  {t("dismiss")}
-                </button>
-              </>
-            }
-            footer={t("later")}
-          />
-        </div>
-      </div>
-    </div>
+    <AnnouncementView
+      display={item.display}
+      compact={compact}
+      frame="page"
+      eyebrow={t("eyebrow")}
+      title={item.title}
+      body={item.body}
+      ctaLabel={item.ctaHref && item.ctaLabel ? item.ctaLabel : null}
+      dismissLabel={t("dismiss")}
+      closeLabel={t("close")}
+      readMoreLabel={t("readMore")}
+      lessLabel={t("less")}
+      laterNote={t("later")}
+      onCta={() => void dismiss(item.ctaHref ?? undefined)}
+      onDismiss={() => void dismiss()}
+      closeRef={closeButton}
+      titleId="announcement-title"
+    />
   );
 }

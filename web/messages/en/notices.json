@@ -39,7 +39,9 @@
     "inboxEmpty": "",
     "seen": "seen",
     "dismissed": "read",
-    "open": "Open"
+    "open": "Open",
+    "readMore": "Read more",
+    "less": "Less"
   },
   "quiet": {
     "title": "Off hours",

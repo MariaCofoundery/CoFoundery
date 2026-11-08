@@ -96,7 +96,7 @@
   "announcements": {
     "title": "Announcements",
     "back": "Back to admin",
-    "intro": "An announcement appears as a pop-up in the platform. The look is always the same, you enter the content here. Whoever clicks it away has read it: it then sits in Messages and does not come back.",
+    "intro": "An announcement appears as a pop-up in the platform. You choose how it looks and see on the right, while you write, how it will look on a computer and on a phone. You enter the content here. Whoever dismisses it has read it: it then sits in Messages and does not come back.",
     "newTitle": "New announcement",
     "editTitle": "Edit announcement",
     "titleDe": "Title (German)",
@@ -141,6 +141,35 @@
       "invalid": "Please fill in title and text. English only together (title and text), a button needs a label and a target, and the target a path or https://.",
       "notfound": "That announcement no longer exists.",
       "error": "That didn’t work."
-    }
+    },
+    "display": {
+      "label": "Appearance",
+      "card": {
+        "name": "Card",
+        "hint": "In the middle, the page pauses"
+      },
+      "banner": {
+        "name": "Banner",
+        "hint": "At the top, the page stays usable"
+      },
+      "toast": {
+        "name": "Notice",
+        "hint": "Bottom right, waits quietly"
+      }
+    },
+    "explain": {
+      "card": "Card: the page waits until someone clicks. Good for important things everyone should read – use sparingly.",
+      "banner": "Banner: the page stays usable. The banner shows the title and the first sentence, “Read more” opens the whole text. It sits at the top and scrolls away with the page, until it is dismissed.",
+      "toast": "Notice: the page stays usable, the notice waits at the bottom right. On a phone, above the tabs."
+    },
+    "previewTitle": "Preview",
+    "deviceLabel": "Device",
+    "deviceDesktop": "Computer",
+    "devicePhone": "Phone",
+    "previewPlaceholderTitle": "Title of your announcement",
+    "previewPlaceholderBody": "Your text will appear here.",
+    "showMe": "Show it to me",
+    "showMeHint": "“Show it to me” places the announcement on this page for you only, at real size. Nothing is published and nothing is recorded as seen.",
+    "englishOptional": "English version (optional)"
   }
 }

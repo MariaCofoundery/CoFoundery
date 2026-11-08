@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requirePlatformAdmin } from "@/features/moderation/access";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
-import { parseAnnouncementForm } from "@/features/announcements/announcementModel";
+import { displayOf, parseAnnouncementForm, type AnnouncementDisplay } from "@/features/announcements/announcementModel";
 
 const PAGE = "/admin/announcements";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -16,6 +16,7 @@ export type PendingAnnouncement = {
   body: string;
   ctaLabel: string | null;
   ctaHref: string | null;
+  display: AnnouncementDisplay;
 };
 
 /* -------------------------------------------------------------------------
@@ -41,6 +42,7 @@ export async function saveAnnouncementAction(formData: FormData) {
     p_show_once: v.showOnce,
     p_starts_at: v.startsAt,
     p_ends_at: v.endsAt,
+    p_display: v.display,
   });
   if (error) redirect(`${PAGE}?result=${error.code === "P0002" ? "notfound" : error.code === "23514" ? "invalid" : "error"}`);
   revalidatePath(PAGE);
@@ -78,8 +80,8 @@ export async function getPendingAnnouncementAction(): Promise<PendingAnnouncemen
   const locale = await getRequestLocale();
   const { data, error } = await client.rpc("get_pending_announcement", { p_locale: locale });
   if (error || !Array.isArray(data) || data.length === 0) return null;
-  const row = data[0] as { id: string; title: string; body: string; cta_label: string | null; cta_href: string | null };
-  return { id: row.id, title: row.title, body: row.body, ctaLabel: row.cta_label, ctaHref: row.cta_href };
+  const row = data[0] as { id: string; title: string; body: string; cta_label: string | null; cta_href: string | null; display: string | null };
+  return { id: row.id, title: row.title, body: row.body, ctaLabel: row.cta_label, ctaHref: row.cta_href, display: displayOf(row.display) };
 }
 
 export async function dismissAnnouncementAction(id: string): Promise<{ ok: boolean }> {

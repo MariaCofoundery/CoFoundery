@@ -8,6 +8,22 @@
 
 export const ANNOUNCEMENT_LIMITS = { title: 120, body: 1500, cta: 40, href: 300 } as const;
 
+/** card: Mitte, die Seite pausiert. banner: oben, die Seite bleibt bedienbar. toast: unten rechts, ebenso. */
+export const ANNOUNCEMENT_DISPLAYS = ["card", "banner", "toast"] as const;
+export type AnnouncementDisplay = (typeof ANNOUNCEMENT_DISPLAYS)[number];
+
+export function displayOf(value: unknown): AnnouncementDisplay {
+  return ANNOUNCEMENT_DISPLAYS.find((entry) => entry === value) ?? "card";
+}
+
+/** Der erste Satz des ersten Absatzes - das, was das Band zeigt, solange es zu ist. */
+export function announcementTeaser(body: string): { teaser: string; hasMore: boolean } {
+  const first = body.split(/\n{2,}/)[0]?.replace(/\s+/g, " ").trim() ?? "";
+  const match = first.match(/^.+?[.!?](?=\s|$)/);
+  const teaser = (match ? match[0] : first).trim();
+  return { teaser, hasMore: body.replace(/\s+/g, " ").trim().length > teaser.length };
+}
+
 export type AnnouncementStatus = "draft" | "active" | "archived";
 
 export type AnnouncementInput = {
@@ -19,6 +35,7 @@ export type AnnouncementInput = {
   ctaLabelEn: string | null;
   ctaHref: string | null;
   showOnce: boolean;
+  display: AnnouncementDisplay;
   startsAt: string | null;
   endsAt: string | null;
 };
@@ -80,6 +97,7 @@ export function parseAnnouncementForm(formData: FormData): { ok: true; value: An
       ctaLabelEn: ctaLabelEn || null,
       ctaHref: ctaHref || null,
       showOnce: formData.get("show_once") === "yes",
+      display: displayOf(formData.get("display")),
       startsAt,
       endsAt,
     },

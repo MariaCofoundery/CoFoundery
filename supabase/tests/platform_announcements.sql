@@ -3,7 +3,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(17);
+select extensions.plan(23);
 
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at) values
   ('00000000-0000-0000-0000-000000000000', 'ab000001-0001-4001-8001-000000000001', 'authenticated', 'authenticated', 'ann-admin@example.com', '', now(), '{}', '{}', now(), now()),
@@ -62,6 +62,22 @@ select extensions.is((select count(*)::int from public.announcement_receipts), 0
 insert into ids select 'draft', public.admin_save_announcement(null, 'Entwurf', 'noch nicht', null, null, null, null, null, true, null, null);
 set local request.jwt.claims = '{"sub":"ab000002-0002-4002-8002-000000000002","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.get_pending_announcement('de')), 0, 'ein Entwurf wird nicht gezeigt');
+
+-- Darstellung: Karte ist der Standard, Band und Hinweis sind waehlbar, nichts anderes.
+set local request.jwt.claims = '{"sub":"ab000001-0001-4001-8001-000000000001","role":"authenticated"}';
+select extensions.is((select display from public.admin_list_announcements() where title_de = 'Entwurf'), 'card', 'ohne Angabe bleibt es eine Karte');
+insert into ids select 'banner', public.admin_save_announcement(null, 'Band', 'Text', null, null, null, null, null, true, null, null, 'banner');
+insert into ids select 'toast', public.admin_save_announcement(null, 'Hinweis', 'Text', null, null, null, null, null, true, null, null, 'toast');
+select extensions.is((select display from public.admin_list_announcements() where title_de = 'Band'), 'banner', 'das Band wird gespeichert');
+select extensions.is((select display from public.admin_list_announcements() where title_de = 'Hinweis'), 'toast', 'der Hinweis wird gespeichert');
+select extensions.throws_ok(
+  $$ select public.admin_save_announcement(null, 'x', 'y', null, null, null, null, null, true, null, null, 'popup') $$,
+  '23514', null, 'eine unbekannte Darstellung wird abgewiesen');
+select public.admin_save_announcement((select v from ids where k = 'banner'), 'Band', 'Text', null, null, null, null, null, true, null, null, 'toast');
+select extensions.is((select display from public.admin_list_announcements() where title_de = 'Band'), 'toast', 'die Darstellung laesst sich spaeter aendern');
+select public.admin_set_announcement_status((select v from ids where k = 'toast'), 'active');
+set local request.jwt.claims = '{"sub":"ab000002-0002-4002-8002-000000000002","role":"authenticated"}';
+select extensions.is((select display from public.get_pending_announcement('de')), 'toast', 'das Abholen nennt die Darstellung');
 
 select * from extensions.finish();
 rollback;

@@ -96,7 +96,7 @@
   "announcements": {
     "title": "Mitteilungen an alle",
     "back": "Zurück zum Admin-Bereich",
-    "intro": "Eine Mitteilung erscheint als Pop-up in der Plattform. Das Aussehen ist immer gleich, den Inhalt trägst du hier ein. Wer sie wegklickt, hat sie gelesen: Sie liegt danach in den Nachrichten und kommt nicht wieder.",
+    "intro": "Eine Mitteilung erscheint als Pop-up in der Plattform. Du wählst, wie sie aussieht, und siehst rechts schon beim Schreiben, wie sie auf dem Computer und auf dem Handy wirkt. Den Inhalt trägst du hier ein. Wer sie wegklickt, hat sie gelesen: Sie liegt danach in den Nachrichten und kommt nicht wieder.",
     "newTitle": "Neue Mitteilung",
     "editTitle": "Mitteilung bearbeiten",
     "titleDe": "Titel (deutsch)",
@@ -141,6 +141,35 @@
       "invalid": "Bitte Titel und Text ausfüllen. Englisch nur zusammen (Titel und Text), ein Knopf braucht Beschriftung und Ziel, das Ziel ein Pfad oder https://.",
       "notfound": "Die Mitteilung gibt es nicht mehr.",
       "error": "Das hat nicht geklappt."
-    }
+    },
+    "display": {
+      "label": "Darstellung",
+      "card": {
+        "name": "Karte",
+        "hint": "In der Mitte, die Seite pausiert"
+      },
+      "banner": {
+        "name": "Band",
+        "hint": "Oben, die Seite bleibt bedienbar"
+      },
+      "toast": {
+        "name": "Hinweis",
+        "hint": "Unten rechts, wartet leise"
+      }
+    },
+    "explain": {
+      "card": "Karte: Die Seite wartet, bis man klickt. Gut für Wichtiges, das alle lesen sollen – sparsam einsetzen.",
+      "banner": "Band: Die Seite bleibt bedienbar. Titel und erster Satz stehen im Band, „Weiterlesen“ klappt den ganzen Text auf. Es steht oben und scrollt mit, bis es weggeklickt ist.",
+      "toast": "Hinweis: Die Seite bleibt bedienbar, der Hinweis wartet unten rechts. Auf dem Handy über den Reitern."
+    },
+    "previewTitle": "Vorschau",
+    "deviceLabel": "Gerät",
+    "deviceDesktop": "Computer",
+    "devicePhone": "Handy",
+    "previewPlaceholderTitle": "Titel deiner Mitteilung",
+    "previewPlaceholderBody": "Hier steht später dein Text.",
+    "showMe": "Mir selbst zeigen",
+    "showMeHint": "„Mir selbst zeigen“ legt die Mitteilung nur für dich auf diese Seite, in echter Größe. Es wird nichts veröffentlicht und nichts als gesehen vermerkt.",
+    "englishOptional": "Englische Fassung (freiwillig)"
   }
 }

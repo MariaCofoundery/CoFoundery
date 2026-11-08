@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { isSafeCtaHref, parseAnnouncementForm } from "@/features/announcements/announcementModel";
+import { announcementTeaser, displayOf, isSafeCtaHref, parseAnnouncementForm } from "@/features/announcements/announcementModel";
 
 const code = (path: string) =>
   readFileSync(path, "utf8").replace(/^\s*\/\/.*$/gm, " ").replace(/\/\*[\s\S]*?\*\//g, " ");
@@ -65,11 +65,12 @@ test("das Pop-up wartet auf ein freies Fenster, bevor es abholt, und Wegklicken 
   const popup = code("src/features/announcements/AnnouncementPopup.tsx");
   // Der Abruf vermerkt "gesehen": Er darf erst kommen, wenn kein anderer Dialog offen ist.
   assert.ok(popup.indexOf("anotherDialogIsOpen()") < popup.indexOf("getPendingAnnouncementAction()"));
-  assert.match(popup, /role="dialog"/);
   assert.match(popup, /event\.key === "Escape"/);
   assert.match(popup, /dismissAnnouncementAction\(current\.id\)/);
-  // Das äußere Feld scrollt, damit auf kleinen Bildschirmen nichts abgeschnitten ist.
-  assert.match(popup, /overflow-y-auto/);
+  // Das äußere Feld der Karte scrollt, damit auf kleinen Bildschirmen nichts abgeschnitten ist.
+  const view = code("src/features/announcements/AnnouncementView.tsx");
+  assert.match(view, /role="dialog"/);
+  assert.match(view, /overflow-y-auto/);
   // Text wird als Text gesetzt, nie als Markup.
   assert.doesNotMatch(code("src/features/announcements/AnnouncementCard.tsx"), /dangerouslySetInnerHTML/);
 });
@@ -101,4 +102,58 @@ test("deutsch und englisch haben dieselben Schlüssel", () => {
     const en = JSON.parse(readFileSync(`messages/en/${file}.json`, "utf8")).announcements;
     assert.deepEqual(keys(de).sort(), keys(en).sort(), file);
   }
+});
+
+test("drei Darstellungen: Karte ist der Standard, nichts anderes gilt", () => {
+  assert.equal(displayOf("banner"), "banner");
+  assert.equal(displayOf("toast"), "toast");
+  assert.equal(displayOf("popup"), "card");
+  assert.equal(displayOf(null), "card");
+  const ok = parseAnnouncementForm(form({ ...base, display: "banner" }));
+  assert.ok(ok.ok && ok.value.display === "banner");
+  const none = parseAnnouncementForm(form({ ...base }));
+  assert.ok(none.ok && none.value.display === "card");
+  const bad = parseAnnouncementForm(form({ ...base, display: "<script>" }));
+  assert.ok(bad.ok && bad.value.display === "card");
+});
+
+test("das Band zeigt Titel und ersten Satz; Weiterlesen nur, wenn es mehr gibt", () => {
+  const long = announcementTeaser("Erster Satz. Zweiter Satz.\n\nNoch ein Absatz.");
+  assert.equal(long.teaser, "Erster Satz.");
+  assert.equal(long.hasMore, true);
+  const short = announcementTeaser("Nur ein Satz.");
+  assert.equal(short.teaser, "Nur ein Satz.");
+  assert.equal(short.hasMore, false);
+  // Ohne Satzzeichen: der ganze erste Absatz.
+  assert.equal(announcementTeaser("Ohne Punkt\n\nZweiter Absatz").teaser, "Ohne Punkt");
+});
+
+test("nur die Karte hält die Seite an; Band und Hinweis lassen sie bedienbar", () => {
+  const popup = code("src/features/announcements/AnnouncementPopup.tsx");
+  assert.match(popup, /item\?\.display === "card"/);
+  assert.match(popup, /if \(!item \|\| !modal\) return;/);
+  const view = code("src/features/announcements/AnnouncementView.tsx");
+  const card = view.slice(view.indexOf("function Card("), view.indexOf("function Banner("));
+  const banner = view.slice(view.indexOf("function Banner("), view.indexOf("function Toast("));
+  const toast = view.slice(view.indexOf("function Toast("));
+  assert.match(card, /aria-modal="true"/);
+  assert.doesNotMatch(banner, /role="dialog"|aria-modal/);
+  assert.doesNotMatch(toast, /role="dialog"|aria-modal/);
+  // Das Abbild im Admin-Bereich und das echte Pop-up sind dieselbe Komponente.
+  assert.match(code("src/features/announcements/AnnouncementPreview.tsx"), /<AnnouncementView/);
+  assert.match(code("src/features/announcements/AnnouncementPopup.tsx"), /<AnnouncementView/);
+  // Text als Text, nie als Markup.
+  assert.doesNotMatch(view, /dangerouslySetInnerHTML/);
+});
+
+test("die Darstellung liegt in der Datenbank, mit Prüfung, und der Admin-Bereich kann sie wählen", () => {
+  const sql = readFileSync("../supabase/migrations/20270401120000_announcement_display.sql", "utf8");
+  assert.match(sql, /check \(display in \('card', 'banner', 'toast'\)\)/);
+  assert.match(sql, /default 'card'/);
+  assert.match(sql, /p_display text default 'card'/);
+  const actions = code("src/features/announcements/announcementActions.ts");
+  assert.match(actions, /p_display: v\.display/);
+  assert.match(code("src/features/announcements/AnnouncementForm.tsx"), /name="display"/);
+  const page = code("src/app/(product)/admin/announcements/page.tsx");
+  assert.match(page, /<AnnouncementForm/);
 });

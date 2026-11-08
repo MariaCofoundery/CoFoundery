@@ -39,7 +39,9 @@
     "inboxEmpty": "",
     "seen": "gesehen",
     "dismissed": "gelesen",
-    "open": "Öffnen"
+    "open": "Öffnen",
+    "readMore": "Weiterlesen",
+    "less": "Weniger"
   },
   "quiet": {
     "title": "Feierabend",
