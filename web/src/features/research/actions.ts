@@ -37,3 +37,15 @@ export async function setResearchConsentAction(state: "accepted" | "declined", s
   revalidatePath("/dashboard");
   return { ok: true as const, state };
 }
+
+/**
+ * Vermerkt, dass die Frage nach der Forschung einmal gezeigt wurde (20270403120000). Danach kommt sie nicht wieder -
+ * entschieden wird im Account. Keine Einwilligung: ohne Entscheidung gilt weiter "keine Einwilligung".
+ */
+export async function markResearchPromptSeenAction(): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { error } = await (supabase as unknown as SupabaseClient).rpc("mark_research_consent_prompt_seen");
+  return { ok: !error };
+}

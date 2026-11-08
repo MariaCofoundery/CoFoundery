@@ -62,6 +62,8 @@ type Props = {
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
   researchConsentState: ResearchConsentState;
+  /** Die Frage nach der Forschung wurde diesem Konto schon einmal gezeigt - dann kommt sie nicht wieder. */
+  researchPromptSeen?: boolean;
   /** Nur Darstellung: ob der Menueeintrag "Admin" erscheint. Der Zugang selbst wird auf /admin serverseitig geprueft. */
   isPlatformAdmin?: boolean;
   /** Neues Feedback plus offene Meldungen - die Zahl am Menuepunkt "Admin". */
@@ -321,6 +323,7 @@ export function ProductShell({
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
+  researchPromptSeen = true,
   isPlatformAdmin = false,
   adminAttentionCount = 0,
   storedWorkContext: initialStoredWorkContext = null,
@@ -331,6 +334,7 @@ export function ProductShell({
   const [navigationOverride, setNavigationOverride] = useState<NavigationOverride>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [researchConsentState, setResearchConsentState] = useState(initialResearchConsentState);
+  const [researchPromptClosed, setResearchPromptClosed] = useState(false);
   // Als Zustand und nicht nur als Prop: Das Root-Layout rendert bei einem
   // Seitenwechsel im Browser nicht neu, die Prop waere danach veraltet.
   const [storedWorkContext, setStoredWorkContext] = useState<WorkContext | null>(initialStoredWorkContext);
@@ -372,6 +376,7 @@ export function ProductShell({
 
   const closeMenu = () => setIsMenuOpen(false);
   configureResearchConsentState(researchConsentState);
+  const showResearchNotice = hasFounder && researchConsentState === "undecided" && !researchPromptSeen && !researchPromptClosed;
   const resolvedFeedbackInvitationId = navigationOverride?.feedbackInvitationId ?? null;
   // Reine Darstellung: welcher Baum steht und wohin "Start" fuehrt. Zugang
   // entscheidet jede Seite selbst.
@@ -862,7 +867,7 @@ export function ProductShell({
           slots={chromeSlots}
         >
           {children}
-          {hasFounder && researchConsentState === "undecided" ? <ResearchConsentNotice onDecision={setResearchConsentState} /> : null}
+          {showResearchNotice ? <ResearchConsentNotice onDecision={setResearchConsentState} onLater={() => setResearchPromptClosed(true)} /> : null}
           <AnnouncementPopup />
         </WorkspaceChrome>
       </ProductNavigationOverrideContext.Provider>
@@ -928,7 +933,7 @@ export function ProductShell({
           slots={chromeSlots}
         >
           {children}
-          {hasFounder && researchConsentState === "undecided" ? <ResearchConsentNotice onDecision={setResearchConsentState} /> : null}
+          {showResearchNotice ? <ResearchConsentNotice onDecision={setResearchConsentState} onLater={() => setResearchPromptClosed(true)} /> : null}
           <AnnouncementPopup />
         </FounderChrome>
       </ProductNavigationOverrideContext.Provider>
@@ -1320,8 +1325,8 @@ export function ProductShell({
         ) : null}
 
         {children}
-        {hasFounder && researchConsentState === "undecided" ? (
-          <ResearchConsentNotice onDecision={setResearchConsentState} />
+        {showResearchNotice ? (
+          <ResearchConsentNotice onDecision={setResearchConsentState} onLater={() => setResearchPromptClosed(true)} />
         ) : null}
         {/* Mitteilungen der Plattform. Wartet auf ein freies Fenster, siehe AnnouncementPopup. */}
         <AnnouncementPopup />

@@ -5,7 +5,8 @@
     "body": "Wenn du möchtest, dürfen wir ausgewählte Antworten aus deinen Fragebögen und Angaben dazu, wie du sie ausfüllst (etwa Bearbeitungszeiten), pseudonymisiert für wissenschaftliche Forschung zur Zusammenarbeit in Gründerteams verwenden — auch außerhalb von Made2Found, etwa in einer Veröffentlichung. Freitexte, Namen und E-Mail-Adressen gehören nicht dazu.\n\nDeine Teilnahme ist freiwillig. Du kannst Made2Found genauso nutzen, wenn du nicht teilnimmst, und du kannst sie jederzeit im Account beenden.",
     "decline": "Nein, danke",
     "accept": "An Forschung teilnehmen",
-    "error": "Deine Auswahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut."
+    "error": "Deine Auswahl konnte gerade nicht gespeichert werden. Bitte versuche es erneut.",
+    "later": "Später im Account entscheiden"
   },
   "settings": {
     "title": "Forschungsteilnahme",

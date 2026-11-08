@@ -1,14 +1,25 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { setResearchConsentAction } from "@/features/research/actions";
+import { markResearchPromptSeenAction, setResearchConsentAction } from "@/features/research/actions";
 import type { ResearchConsentState } from "@/features/research/client";
 
-export function ResearchConsentNotice({ onDecision }: { onDecision: (state: ResearchConsentState) => void }) {
+/**
+ * Die Frage nach der Forschung - hoechstens EINMAL je Konto (Maria, 08.11.2026: "nicht jedes Mal beim Einloggen").
+ * Beim ersten Zeigen wird vermerkt, dass gefragt wurde; danach bleibt das Fenster zu, auch ohne Antwort. Wer jetzt
+ * nicht entscheiden will, schliesst mit "Später" - das ist KEINE Einwilligung, es wird nichts fuer Forschung verwendet.
+ * Entscheiden geht jederzeit im Account.
+ */
+export function ResearchConsentNotice({ onDecision, onLater }: { onDecision: (state: ResearchConsentState) => void; onLater: () => void }) {
   const t = useTranslations("researchConsent.notice");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState(false);
+
+  // Gezeigt = gefragt. Der Vermerk steht, bevor jemand antwortet - sonst kaeme das Fenster nach einem Neuladen wieder.
+  useEffect(() => {
+    void markResearchPromptSeenAction().catch(() => null);
+  }, []);
 
   const decide = (state: "accepted" | "declined") => {
     setError(false);
@@ -36,6 +47,7 @@ export function ResearchConsentNotice({ onDecision }: { onDecision: (state: Rese
           <button autoFocus type="button" disabled={pending} onClick={() => decide("declined")} className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60">{t("decline")}</button>
           <button type="button" disabled={pending} onClick={() => decide("accepted")} className="rounded-xl border border-violet-600 bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 disabled:opacity-60">{t("accept")}</button>
         </div>
+        <button type="button" disabled={pending} onClick={onLater} className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-60">{t("later")}</button>
         {error ? <p role="alert" className="mt-4 text-sm text-red-700">{t("error")}</p> : null}
       </section>
       </div>

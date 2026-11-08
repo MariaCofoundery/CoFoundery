@@ -159,7 +159,8 @@ test("die Einwilligung wird an einer Stelle verwaltet", () => {
   assert.ok(!/<ResearchConsentSettings/.test(dashboard), "nicht mehr im Dashboard");
   assert.match(account, /<ResearchConsentSettings/);
 
-  // Gefragt wird weiterhin genau so lange, wie nichts entschieden ist.
+  // Gefragt wird nur, wenn nichts entschieden ist - und seit 08.11.2026 hoechstens einmal je Konto.
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  assert.match(shell, /researchConsentState === "undecided" \? \(/);
+  assert.match(shell, /const showResearchNotice = hasFounder && researchConsentState === "undecided"/);
+  assert.match(shell, /showResearchNotice \? \(/);
 });

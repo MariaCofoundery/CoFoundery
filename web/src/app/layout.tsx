@@ -187,6 +187,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .then(({ data }) => (data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null))
         .catch(() => null)
     : null;
+  // Die Frage nach der Forschung kommt hoechstens EINMAL je Konto (20270403120000): Wurde sie schon gezeigt, bleibt das
+  // Fenster zu - auch ohne Antwort. Ein Lesefehler zaehlt als "schon gefragt": nicht fragen ist der harmlosere Fehler.
+  const researchPromptSeen = user && researchConsentState === "undecided"
+    ? await Promise.resolve(supabase.from("research_consent_prompt_seen").select("user_id").maybeSingle())
+        .then(({ data, error }) => (error ? true : Boolean(data)))
+        .catch(() => true)
+    : true;
   // Dasselbe fuer die Founder-Ansicht (20270402120000): die eigene Leiste fuer Start, Align, Find, Connect, Events.
   const founderNavPrefs = user && roleViews.hasFounder
     ? await Promise.resolve(supabase.from("founder_nav_prefs").select("hidden, item_order").maybeSingle())
@@ -235,6 +242,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             unreadConnectMessageCount={unreadConnectMessageCount}
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}
+            researchPromptSeen={researchPromptSeen}
             isPlatformAdmin={isPlatformAdmin}
             adminAttentionCount={adminAttentionCount}
             storedWorkContext={storedWorkContext}

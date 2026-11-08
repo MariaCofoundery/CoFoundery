@@ -5,7 +5,8 @@
     "body": "If you like, we may use selected answers from your questionnaires and information on how you fill them in (such as time taken) in pseudonymised form for scientific research on collaboration in founding teams — also outside Made2Found, for example in a publication. Free text, names and email addresses are not included.\n\nTaking part is voluntary. You can use Made2Found just the same if you do not, and you can stop at any time in your account.",
     "decline": "No, thanks",
     "accept": "Participate in research",
-    "error": "We couldn't save your choice right now. Please try again."
+    "error": "We couldn't save your choice right now. Please try again.",
+    "later": "Decide later in my account"
   },
   "settings": {
     "title": "Research participation",
