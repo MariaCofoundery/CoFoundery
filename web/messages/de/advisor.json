@@ -2233,7 +2233,7 @@
     "doNow": "Jetzt machen",
     "open": "Öffnen",
     "skip": "Überspringen",
-    "nextStep": "Nächster Schritt →",
+    "nextStep": "Weiter",
     "toStart": "Zur Startseite →",
     "anytime": "Jeder Schritt lässt sich später nachholen.",
     "plan": {
@@ -2361,7 +2361,17 @@
         }
       }
     },
-    "findAgain": "Alles Schritt für Schritt einrichten:"
+    "findAgain": "Alles Schritt für Schritt einrichten:",
+    "bar": {
+      "label": "Einrichtung",
+      "step": "Schritt {step} von {total}",
+      "back": "Zurück",
+      "overview": "Alle Schritte",
+      "next": "Weiter",
+      "finish": "Fertig",
+      "end": "Einrichtung beenden"
+    },
+    "prevStep": "Zurück"
   },
   "calendar": {
     "title": "Kalender",

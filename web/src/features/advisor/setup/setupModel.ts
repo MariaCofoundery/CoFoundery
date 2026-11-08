@@ -44,3 +44,30 @@ export function stepHref(step: SetupStep, orgId: string): string {
       return "/account#handy";
   }
 }
+
+/**
+ * Die laufende Einrichtung (06.11.2026): Wer aus "Los geht's" an eine Stelle springt, behaelt unten eine Leiste mit
+ * "Zurueck" und "Weiter" - auch wenn ein Formular dort die Adresse wechselt. Der Stand steht in einem Sitzungs-Cookie
+ * (reine Darstellung, kein Zugang): `Organisation|Rolle|Schritt`. Beenden oder Fertig loescht es.
+ */
+export const SETUP_COOKIE = "ui_setup_session";
+export type SetupSession = { orgId: string; kind: "owner" | "member"; step: SetupStep };
+
+export const setupSteps = (kind: "owner" | "member"): readonly SetupStep[] => (kind === "owner" ? OWNER_STEPS : MEMBER_STEPS);
+
+export function parseSetupSession(value: string | null | undefined): SetupSession | null {
+  const [orgId, kind, step] = decodeURIComponent(value ?? "").split("|");
+  if (!/^[0-9a-f-]{36}$/.test(orgId ?? "") || (kind !== "owner" && kind !== "member") || !isSetupStep(step) || !setupSteps(kind).includes(step)) return null;
+  return { orgId, kind, step };
+}
+
+export const formatSetupSession = (session: SetupSession) => encodeURIComponent(`${session.orgId}|${session.kind}|${session.step}`);
+
+/** Der Schritt davor und danach (null am Rand). */
+export function neighbourSteps(session: SetupSession): { prev: SetupStep | null; next: SetupStep | null; index: number; total: number } {
+  const steps = setupSteps(session.kind);
+  const index = steps.indexOf(session.step);
+  return { prev: steps[index - 1] ?? null, next: steps[index + 1] ?? null, index, total: steps.length };
+}
+
+export const setupStepUrl = (orgId: string, step: SetupStep) => `/advisor/los-gehts?${new URLSearchParams({ org: orgId, schritt: step }).toString()}`;

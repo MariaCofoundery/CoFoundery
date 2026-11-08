@@ -18,7 +18,6 @@ import { isBuiltInTemplate } from "@/features/advisor/teamraumPageModel";
 import { taskFilterOf } from "@/features/advisor/teamraumModel";
 import { getOrgTeamPrograms, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getMyAdvisorOrgs, getOrgMembers } from "@/features/advisor/orgData";
-import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { TEAMRAUM_SECTIONS, teamraumHref, teamraumPath, type TeamraumSection } from "@/features/advisor/teamraumRoutes";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
@@ -237,7 +236,6 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
         </div>
       </header>
       <AreaTips area="teamraum" />
-      {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
       {content}
     </main>
   );

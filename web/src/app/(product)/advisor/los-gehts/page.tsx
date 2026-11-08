@@ -13,6 +13,7 @@ import { setSetupHiddenAction, skipSetupStepAction } from "@/features/advisor/se
 import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
 import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
 import { getOrgMembers } from "@/features/advisor/orgData";
+import { SetupSessionEnd, SetupSessionWriter } from "@/features/advisor/setup/SetupSessionClient";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -148,12 +149,9 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {(current !== "plan" && current !== "people") || currentState === "done" ? (
-            <Link href={stepHref(current, org.id)} className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">
-              {currentState === "done" ? t("open") : t("doNow")}
-            </Link>
-          ) : null}
+        <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
+          {index > 0 ? <Link href={href(items[index - 1].key)} className="inline-flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100">← {t("prevStep")}</Link> : null}
+          <span className="flex-1" />
           {currentState !== "done" && currentState !== "skipped" ? (
             <form action={skipSetupStepAction}>
               <input type="hidden" name="orgId" value={org.id} />
@@ -161,13 +159,18 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
               <SubmitButton label={t("skip")} pendingLabel="…" className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50" />
             </form>
           ) : null}
+          {(current !== "plan" && current !== "people") && currentState !== "done" ? (
+            <Link href={stepHref(current, org.id)} className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">{t("doNow")}</Link>
+          ) : null}
           {index + 1 < items.length ? (
-            <Link href={href(items[index + 1].key)} className="inline-flex min-h-12 items-center px-2 text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{t("nextStep")}</Link>
+            <Link href={href(items[index + 1].key)} className={`inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold ${currentState === "done" || current === "plan" || current === "people" ? "brand-cta" : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{t("nextStep")} →</Link>
           ) : (
-            <Link href="/advisor/dashboard" className="inline-flex min-h-12 items-center px-2 text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{t("toStart")}</Link>
+            <SetupSessionEnd href="/advisor/dashboard" className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">{t("toStart")}</SetupSessionEnd>
           )}
-          <span className="text-[13px] text-slate-600">{t("anytime")}</span>
         </div>
+        {currentState === "done" ? <p className="-mt-2 text-[13.5px] font-semibold text-emerald-800">✓ {t("isDone")}</p> : null}
+        <p className="text-[13px] text-slate-600">{t("anytime")}</p>
+        <SetupSessionWriter session={{ orgId: org.id, kind: setup.isOwner ? "owner" : "member", step: current }} />
       </section>
     </main>
   );

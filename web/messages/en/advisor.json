@@ -2233,7 +2233,7 @@
     "doNow": "Do it now",
     "open": "Open",
     "skip": "Skip",
-    "nextStep": "Next step →",
+    "nextStep": "Next",
     "toStart": "To the start page →",
     "anytime": "Every step can be done later.",
     "plan": {
@@ -2361,7 +2361,17 @@
         }
       }
     },
-    "findAgain": "Set everything up step by step:"
+    "findAgain": "Set everything up step by step:",
+    "bar": {
+      "label": "Setup",
+      "step": "Step {step} of {total}",
+      "back": "Back",
+      "overview": "All steps",
+      "next": "Next",
+      "finish": "Done",
+      "end": "End setup"
+    },
+    "prevStep": "Back"
   },
   "calendar": {
     "title": "Calendar",

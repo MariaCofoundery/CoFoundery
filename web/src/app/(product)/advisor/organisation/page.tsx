@@ -15,7 +15,6 @@ import { legacyTeamraumPath } from "@/features/advisor/teamraumRoutes";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { EventFormats } from "@/features/advisor/EventFormats";
-import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
@@ -230,7 +229,6 @@ export default async function AdvisorOrganisationPage({
 
       <div className="mt-6">
         <AreaTips area="program" />
-        {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
         {["enroll", "page", "features", "members", "access", "profile"].includes(tab) && query.losgehts !== "1" ? (
           <p className="mb-4 text-[14px] text-slate-700">
             {tAdvisor("setup.findAgain")}{" "}

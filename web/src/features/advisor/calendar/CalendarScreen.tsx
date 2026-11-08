@@ -43,7 +43,6 @@ import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPost
 import { isoWeekNumber } from "@/features/advisor/socialCalendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
-import { SetupReturnBanner } from "@/features/advisor/setup/SetupReturnBanner";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
 export type CalendarQuery = Record<string, string | undefined>;
@@ -318,7 +317,6 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
       </header>
 
       <AreaTips area="calendar" />
-      {query.losgehts === "1" ? <SetupReturnBanner orgId={org.id} /> : null}
       {message ? <p role={message.tone === "rose" ? "alert" : "status"} className={`mb-4 rounded-xl border px-4 py-3 text-sm ${message.tone === "rose" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-emerald-200 bg-emerald-50 text-emerald-900"}`}>{message.text}</p> : null}
 
       {view !== "formats" && view !== "plan" ? (

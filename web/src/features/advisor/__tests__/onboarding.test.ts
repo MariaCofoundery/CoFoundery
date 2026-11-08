@@ -25,7 +25,8 @@ test("Los geht's: Start zeigt den Stand, bis alles erledigt oder ausgeblendet is
   assert.match(start, /!setup\.hidden && !setup\.progress\.complete/);
   assert.match(start, /<StartEvents /);
   assert.match(read("src/features/advisor/TeamraumScreen.tsx"), /<AreaTips area="teamraum" \/>/);
-  assert.match(read("src/app/(product)/advisor/organisation/page.tsx"), /query\.losgehts === "1" \? <SetupReturnBanner/);
+  // Das Banner "zurueck zu Los geht's" ist seit dem 06.11.2026 die Leiste unten (SetupBar), die auch Formulare uebersteht.
+  assert.doesNotMatch(read("src/app/(product)/advisor/organisation/page.tsx"), /SetupReturnBanner/);
   const tip = read("src/features/ui/FirstVisitTip.tsx");
   assert.match(tip, /try \{\s*if \(window\.localStorage\.getItem\(key\) !== "seen"\)/);
   for (const locale of ["de", "en"]) {
@@ -53,4 +54,30 @@ test("Termine: Fuer wen statt Art, interne nie fuer Teams, Aufgaben und Foerderu
   // Teamzeile und Teamseite fuehren zu Aufgaben und Terminen dieses Teams.
   assert.match(read("src/features/advisor/OrgTeamProgramsSection.tsx"), /\/advisor\/teamraum\/aufgaben\?\$\{new URLSearchParams\(\{ org: org\.id, team: program\.programId \}\)/);
   assert.match(read("src/app/(product)/advisor/programm/[programId]/page.tsx"), /team: programId/);
+});
+
+test("Einrichtung ohne Hin und Her: Cookie merkt den Schritt, die Leiste unten fuehrt zurueck und weiter", async () => {
+  const { OWNER_STEPS, MEMBER_STEPS, formatSetupSession, neighbourSteps, parseSetupSession, setupStepUrl } = await import("@/features/advisor/setup/setupModel");
+  const org = "5498b60c-508a-4da4-b31b-9422d64b2786";
+  const session = { orgId: org, kind: "owner" as const, step: "team" as const };
+  assert.deepEqual(parseSetupSession(formatSetupSession(session)), session);
+  // Unsinn und fremde Schritte gelten nicht: ein Mitglied kennt keine Inhaber-Schritte.
+  assert.equal(parseSetupSession("quatsch"), null);
+  assert.equal(parseSetupSession(formatSetupSession({ orgId: org, kind: "member", step: "plan" as never })), null);
+  assert.equal(parseSetupSession(undefined), null);
+  const middle = neighbourSteps(session);
+  assert.deepEqual([middle.prev, middle.next, middle.total], ["features", "people", OWNER_STEPS.length]);
+  assert.equal(neighbourSteps({ orgId: org, kind: "owner", step: OWNER_STEPS[0] }).prev, null);
+  assert.equal(neighbourSteps({ orgId: org, kind: "member", step: MEMBER_STEPS[MEMBER_STEPS.length - 1] }).next, null);
+  assert.match(setupStepUrl(org, "plan"), /^\/advisor\/los-gehts\?org=[0-9a-f-]+&schritt=plan$/);
+  // Seite und Leiste.
+  const page = read("src/app/(product)/advisor/los-gehts/page.tsx");
+  assert.match(page, /<SetupSessionWriter session=\{\{ orgId: org\.id, kind: setup\.isOwner \? "owner" : "member", step: current \}\} \/>/);
+  assert.match(page, /\{t\("prevStep"\)\}/);
+  const bar = read("src/features/advisor/setup/SetupSessionClient.tsx");
+  assert.match(bar, /pathname\.startsWith\("\/advisor\/los-gehts"\)/);
+  assert.match(bar, /t\("bar\.next"\)/);
+  assert.match(read("src/features/navigation/workspace/WorkspaceChrome.tsx"), /<SetupBar \/>/);
+  // Der Cookie ist reine Darstellung.
+  assert.doesNotMatch(bar, /rpc\(|supabase/);
 });

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ACTIVE_ORG_COOKIE, orgColor } from "@/features/advisor/activeOrg";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { SetupBar } from "@/features/advisor/setup/SetupSessionClient";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
   QUICK_CREATE,
@@ -300,6 +301,7 @@ export function WorkspaceChrome({
 
         <div id="workspace-content" className="min-w-0 flex-1 pb-24 lg:pb-0">
           {children}
+          <SetupBar />
         </div>
       </div>
 
