@@ -170,6 +170,19 @@
     },
     "notifications": "Messages and notices",
     "dateLabel": "Today",
-    "program": "Program"
+    "program": "Program",
+    "customize": "Customize sidebar"
+  },
+  "settings": {
+    "title": "Your sidebar",
+    "text": "Hide what you do not need and move the stations into the order that suits you. This applies only to you and on all devices. Hidden stations stay reachable through search (⌘K).",
+    "fixed": "Always there",
+    "hide": "Hide",
+    "show": "Show",
+    "hiddenBadge": "hidden",
+    "up": "Move {name} up",
+    "down": "Move {name} down",
+    "reset": "Reset to default",
+    "back": "Back to Today"
   }
 }

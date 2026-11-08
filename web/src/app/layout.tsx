@@ -181,6 +181,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .then(({ data }) => (typeof data === "number" ? data : 0))
         .catch(() => 0)
     : 0;
+  // Die eigene Seitenleiste (20270331120000): ausgeblendet und Reihenfolge, nur fuer den Advisor-Arbeitsbereich.
+  const advisorNavPrefs = user && roleViews.hasAdvisor
+    ? await Promise.resolve(supabase.from("advisor_nav_prefs").select("hidden, item_order").maybeSingle())
+        .then(({ data }) => (data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null))
+        .catch(() => null)
+    : null;
   const hasTeamProgram = user
     ? await Promise.resolve(supabase.rpc("get_my_team_programs"))
         .then(({ data }) => Array.isArray(data) && data.length > 0)
@@ -208,6 +214,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             advisorSoloOrg={roleViews.advisorSoloOrg ?? false}
             advisorOrgList={roleViews.advisorOrgList ?? []}
             activeOrgId={parseActiveOrg(cookieStore.get(ACTIVE_ORG_COOKIE)?.value)}
+            advisorNavPrefs={advisorNavPrefs}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
             hasTeamProgram={hasTeamProgram}

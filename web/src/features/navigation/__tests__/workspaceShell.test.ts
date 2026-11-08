@@ -4,6 +4,9 @@ import { join } from "node:path";
 import test from "node:test";
 import {
   MOBILE_TAB_KEYS,
+  NAV_ITEM_KEYS,
+  applyNavPrefs,
+  orderedGroups,
   QUICK_CREATE,
   buildWorkspaceNav,
   flattenWorkspaceNav,
@@ -136,4 +139,40 @@ test("zwei Programme: das gewaehlte steht in der Seitenleiste, bleibt gemerkt un
   assert.match(source("src/app/(product)/events/page.tsx"), /getMyAdvisorOrgs\(client\)\)\.slice\(0, 1\)/);
   // Nur Darstellung: der Cookie ist kein Zugang.
   assert.doesNotMatch(source("src/features/advisor/activeOrg.ts"), /rpc\(|supabase/);
+});
+
+test("die eigene Seitenleiste: ausblenden und sortieren je Gruppe, Heute und Einrichten bleiben, Suche kennt alles", () => {
+  const full = buildWorkspaceNav({ hasOrg: true });
+  const mine = applyNavPrefs(full, { hidden: ["pages", "funding", "home", "setup"], order: ["calendar", "tasks"] });
+  // Ausgeblendetes faellt weg; Heute und Einrichten lassen sich nicht ausblenden.
+  assert.deepEqual(flattenWorkspaceNav(mine).map((item) => item.key).filter((key) => ["pages", "funding"].includes(key)), []);
+  assert.equal(mine.home.key, "home");
+  assert.equal(mine.setup?.key, "setup");
+  // Reihenfolge innerhalb der Gruppe; was nicht genannt ist, folgt in der Voreinstellung.
+  assert.deepEqual(mine.groups[0].items.map((item) => item.key), ["calendar", "tasks", "chat"]);
+  assert.equal(applyNavPrefs(full, null), full);
+  // Eine Gruppe ohne Station verschwindet.
+  const bare = applyNavPrefs(full, { hidden: ["teams", "plan", "social", "report", "funding"], order: [] });
+  assert.deepEqual(bare.groups.map((group) => group.key), ["work", "network"]);
+  // Die Einstellungsseite zeigt auch Ausgeblendetes, in der gewaehlten Reihenfolge.
+  assert.deepEqual(orderedGroups(full, { hidden: ["tasks"], order: ["calendar", "tasks"] })[0].items.map((item) => item.key), ["calendar", "tasks", "chat", "pages"]);
+});
+
+test("Seitenleiste einrichten: Seite, Onboarding-Schritt, Datenbank und Export", () => {
+  const chrome = source("src/features/navigation/workspace/WorkspaceChrome.tsx");
+  assert.match(chrome, /applyNavPrefs\(fullNav, navPrefs\)/);
+  assert.match(chrome, /\.\.\.allStations\.map\(\(item\) => \(\{ key: `s-\$\{item\.key\}`/);
+  assert.match(chrome, /href="\/advisor\/seitenleiste"/);
+  assert.match(source("src/app/(product)/advisor/los-gehts/page.tsx"), /<NavSettings hasOrg orgId=\{org\.id\} prefs=\{sidebarPrefs\} back="setup" \/>/);
+  assert.match(source("src/features/advisor/setup/setupModel.ts"), /"teamraum", "sidebar", "phone"/);
+  const sql = source("../supabase/migrations/20270331120000_advisor_nav_prefs.sql");
+  assert.match(sql, /'home' = any \(v_hidden\) or 'setup' = any \(v_hidden\)/);
+  assert.match(sql, /using \(user_id = auth\.uid\(\)\)/);
+  assert.match(source("src/features/account/accountExport.ts"), /table: "advisor_nav_prefs"/);
+  // Die Schluessel in Code und Datenbank sind dieselben.
+  for (const key of NAV_ITEM_KEYS) assert.match(sql, new RegExp(`'${key}'`), key);
+  for (const locale of ["de", "en"]) {
+    const nav = JSON.parse(source(`messages/${locale}/navigation.json`));
+    for (const key of ["title", "text", "fixed", "hide", "show", "reset"]) assert.ok(nav.settings[key], `${locale} ${key}`);
+  }
 });

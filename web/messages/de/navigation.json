@@ -170,6 +170,19 @@
     },
     "notifications": "Nachrichten und Hinweise",
     "dateLabel": "Heute",
-    "program": "Programm"
+    "program": "Programm",
+    "customize": "Seitenleiste anpassen"
+  },
+  "settings": {
+    "title": "Deine Seitenleiste",
+    "text": "Blende aus, was du nicht brauchst, und schieb die Stationen in die Reihenfolge, die zu dir passt. Das gilt nur für dich und auf allen Geräten. Ausgeblendete Stationen findest du weiter über die Suche (⌘K).",
+    "fixed": "Immer da",
+    "hide": "Ausblenden",
+    "show": "Anzeigen",
+    "hiddenBadge": "ausgeblendet",
+    "up": "{name} nach oben",
+    "down": "{name} nach unten",
+    "reset": "Auf Voreinstellung zurücksetzen",
+    "back": "Zurück zu Heute"
   }
 }

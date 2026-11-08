@@ -38,6 +38,8 @@ type Props = {
   /** Dieselben Organisationen mit Kennung (Programm-Umschalter in der Seitenleiste) und die gewaehlte. */
   advisorOrgList?: { id: string; name: string }[];
   activeOrgId?: string | null;
+  /** Die eigene Seitenleiste des Advisor-Arbeitsbereichs (20270331120000). */
+  advisorNavPrefs?: { hidden: string[]; order: string[] } | null;
   hasConnect: boolean;
   hasConnectAccount: boolean;
   /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
@@ -297,6 +299,7 @@ export function ProductShell({
   advisorSoloOrg = false,
   advisorOrgList = [],
   activeOrgId = null,
+  advisorNavPrefs = null,
   hasConnect,
   hasConnectAccount,
   hasTeamProgram = false,
@@ -772,6 +775,7 @@ export function ProductShell({
           orgLabel={advisorOrgLabel}
           orgs={advisorOrgList}
           activeOrgId={activeOrgId}
+          navPrefs={advisorNavPrefs}
           chatUnread={advisorChatUnread}
           messagesCount={messagesAttentionCount}
           slots={{

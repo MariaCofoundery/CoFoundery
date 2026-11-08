@@ -10,8 +10,10 @@ import { SetupBar } from "@/features/advisor/setup/SetupSessionClient";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
   QUICK_CREATE,
+  applyNavPrefs,
   buildWorkspaceNav,
   flattenWorkspaceNav,
+  type NavPrefs,
   type WorkspaceItemKey,
   type WorkspaceNavItem,
 } from "@/features/navigation/workspace/workspaceNav";
@@ -51,6 +53,7 @@ export function WorkspaceChrome({
   activeOrgId,
   chatUnread,
   messagesCount,
+  navPrefs,
   slots,
 }: {
   children: React.ReactNode;
@@ -61,6 +64,8 @@ export function WorkspaceChrome({
   activeOrgId: string | null;
   chatUnread: number;
   messagesCount: number;
+  /** Die eigene Seitenleiste: ausgeblendet und Reihenfolge (null: Voreinstellung). */
+  navPrefs: NavPrefs | null;
   slots: Slots;
 }) {
   const t = useTranslations("navigation");
@@ -84,8 +89,11 @@ export function WorkspaceChrome({
       router.refresh();
     }
   }, [active, queryOrg, activeOrgId, router]);
-  const nav = useMemo(() => buildWorkspaceNav({ hasOrg, chatUnread }), [hasOrg, chatUnread]);
+  const fullNav = useMemo(() => buildWorkspaceNav({ hasOrg, chatUnread }), [hasOrg, chatUnread]);
+  // Die eigene Leiste (ausgeblendet/sortiert); Suche und aktive Seite kennen immer alle Stationen.
+  const nav = useMemo(() => applyNavPrefs(fullNav, navPrefs), [fullNav, navPrefs]);
   const all = useMemo(() => flattenWorkspaceNav(nav), [nav]);
+  const allStations = useMemo(() => flattenWorkspaceNav(fullNav), [fullNav]);
   const [moreOpen, setMoreOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -128,7 +136,7 @@ export function WorkspaceChrome({
   // (ein Chat, ein Team) gehoeren zum alten Programm und fuehren auf die Station zurueck.
   const switchTo = (id: string) => {
     writeActive(id);
-    const here = all.find((item) => item.match(pathname, tab, view));
+    const here = allStations.find((item) => item.match(pathname, tab, view));
     const href = here ? here.href : "/advisor/dashboard";
     const [path, query = ""] = href.split("?");
     const next = new URLSearchParams(query);
@@ -182,7 +190,7 @@ export function WorkspaceChrome({
     : all.filter((item) => ["home", "follow", "events"].includes(item.key));
 
   const searchEntries = [
-    ...all.map((item) => ({ key: `s-${item.key}`, group: "stations" as const, label: label(item.key), href: item.href })),
+    ...allStations.map((item) => ({ key: `s-${item.key}`, group: "stations" as const, label: label(item.key), href: item.href })),
     ...(hasOrg ? QUICK_CREATE.map((entry) => ({ key: `c-${entry.key}`, group: "actions" as const, label: tw(`create.${entry.key}.label`), href: entry.href, hint: tw(`create.${entry.key}.hint`) })) : []),
   ];
 
@@ -208,6 +216,7 @@ export function WorkspaceChrome({
             </div>
           ))}
           <span className="min-h-5 flex-1" />
+          <Link href="/advisor/seitenleiste" className="mx-3 mb-1 inline-flex min-h-9 items-center text-[13px] font-medium text-[#9A9DC4] underline-offset-4 hover:text-white hover:underline">{tw("customize")}</Link>
           {nav.setup ? sideLink(nav.setup) : null}
         </nav>
       </aside>
@@ -358,7 +367,10 @@ export function WorkspaceChrome({
                   );
                 })}
               </nav>
-              <div className="mt-3 flex flex-col gap-1 border-t border-slate-200 pt-3">{slots.moreExtras}</div>
+              <div className="mt-3 flex flex-col gap-1 border-t border-slate-200 pt-3">
+                <Link href="/advisor/seitenleiste" className="flex min-h-12 items-center rounded-xl px-3 text-[15px] font-medium text-slate-900 hover:bg-slate-50">{tw("customize")}</Link>
+                {slots.moreExtras}
+              </div>
             </div>
           </div>
         </div>

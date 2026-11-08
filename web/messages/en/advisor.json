@@ -2309,6 +2309,13 @@
         "text": "Briefly describe who in your organization is there for what, and tick who the startups in the program may see and contact. Each person can change or withdraw their own card; they enter their own contact. If the team changes, invite people or remove them under “Members & roles”.",
         "place": "Sidebar › Set up › Members & roles › Who is who",
         "doneWhen": "one card is visible to startups"
+      },
+      "sidebar": {
+        "title": "Your sidebar",
+        "short": "What you need, in your order",
+        "text": "The sidebar on the left shows all stations. Hide what you do not need and sort the rest the way that suits you. It applies to each person on their own – you can change it any time. Hidden stations stay reachable through search.",
+        "place": "Sidebar › Customize sidebar",
+        "doneWhen": "the sidebar has been saved once"
       }
     },
     "card": {

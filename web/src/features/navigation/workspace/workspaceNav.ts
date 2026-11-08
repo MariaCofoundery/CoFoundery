@@ -173,6 +173,38 @@ export function buildWorkspaceNav({ hasOrg, chatUnread = 0 }: { hasOrg: boolean;
   };
 }
 
+/**
+ * Die eigene Seitenleiste (20270331120000): ausgeblendete Stationen fallen weg, der Rest steht in der gewaehlten
+ * Reihenfolge innerhalb seiner Gruppe. "Heute" und "Einrichten" bleiben immer; Gruppen ohne Station verschwinden.
+ * Reine Darstellung: Suche, Links und Adressen erreichen auch ausgeblendete Stationen.
+ */
+export type NavPrefs = { hidden: string[]; order: string[] };
+export const FIXED_NAV_KEYS: WorkspaceItemKey[] = ["home", "setup"];
+export const NAV_ITEM_KEYS: WorkspaceItemKey[] = ["home", "tasks", "chat", "calendar", "pages", "teams", "plan", "social", "report", "funding", "follow", "content", "events", "setup", "myProgram"];
+
+export function applyNavPrefs(nav: WorkspaceNav, prefs: NavPrefs | null): WorkspaceNav {
+  if (!prefs) return nav;
+  const rank = (key: string) => {
+    const index = prefs.order.indexOf(key);
+    return index === -1 ? prefs.order.length : index;
+  };
+  const visible = (item: WorkspaceNavItem) => FIXED_NAV_KEYS.includes(item.key) || !prefs.hidden.includes(item.key);
+  return {
+    home: nav.home,
+    groups: nav.groups
+      .map((group) => ({ ...group, items: group.items.filter(visible).map((item, index) => ({ item, index })).sort((a, b) => rank(a.item.key) - rank(b.item.key) || a.index - b.index).map((entry) => entry.item) }))
+      .filter((group) => group.items.length > 0),
+    setup: nav.setup,
+  };
+}
+
+/** Die Stationen je Gruppe in der gewaehlten Reihenfolge - auch die ausgeblendeten (fuer die Einstellungsseite). */
+export function orderedGroups(nav: WorkspaceNav, prefs: NavPrefs | null) {
+  const order = prefs?.order ?? [];
+  const rank = (key: string) => (order.indexOf(key) === -1 ? order.length : order.indexOf(key));
+  return nav.groups.map((group) => ({ key: group.key, items: group.items.map((item, index) => ({ item, index })).sort((a, b) => rank(a.item.key) - rank(b.item.key) || a.index - b.index).map((entry) => entry.item) }));
+}
+
 /** Alle Eintraege in der Reihenfolge der Leiste - fuer Suche und "Mehr" auf dem Handy. */
 export function flattenWorkspaceNav(nav: WorkspaceNav): WorkspaceNavItem[] {
   return [nav.home, ...nav.groups.flatMap((group) => group.items), ...(nav.setup ? [nav.setup] : [])];

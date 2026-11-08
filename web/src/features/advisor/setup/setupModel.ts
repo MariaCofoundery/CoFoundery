@@ -4,8 +4,8 @@
  * Datenbank je Person und Organisation (advisor_setup_state, 20270325120000).
  */
 
-export const OWNER_STEPS = ["profile", "features", "team", "people", "plan", "teams", "teamraum", "phone"] as const;
-export const MEMBER_STEPS = ["role", "teamraum", "phone"] as const;
+export const OWNER_STEPS = ["profile", "features", "team", "people", "plan", "teams", "teamraum", "sidebar", "phone"] as const;
+export const MEMBER_STEPS = ["role", "teamraum", "sidebar", "phone"] as const;
 export type SetupStep = (typeof OWNER_STEPS)[number] | (typeof MEMBER_STEPS)[number];
 export const isSetupStep = (value: unknown): value is SetupStep => [...OWNER_STEPS, ...MEMBER_STEPS].includes(value as never);
 
@@ -38,6 +38,8 @@ export function stepHref(step: SetupStep, orgId: string): string {
       return `/advisor/organisation?org=${org}&tab=enroll&losgehts=1`;
     case "teamraum":
       return `/advisor/teamraum?org=${org}&losgehts=1`;
+    case "sidebar":
+      return `/advisor/seitenleiste?org=${org}&losgehts=1`;
     case "role":
       return `/advisor/teamraum/wer-macht-was?org=${org}&losgehts=1`;
     case "phone":

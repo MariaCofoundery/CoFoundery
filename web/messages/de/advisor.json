@@ -2309,6 +2309,13 @@
         "text": "Beschreibt kurz, wer in eurer Organisation wofür da ist, und klickt an, wen die Startups im Programm sehen und kontaktieren dürfen. Jede Person kann ihre Karte selbst ändern oder zurücknehmen; den Kontakt trägt sie selbst ein. Hat sich das Team geändert, ladet ihr Leute ein oder nehmt sie heraus – unter „Mitglieder & Rollen“.",
         "place": "Seitenleiste › Einrichten › Mitglieder & Rollen › Wer ist wer",
         "doneWhen": "eine Karte für die Startups sichtbar ist"
+      },
+      "sidebar": {
+        "title": "Eure Seitenleiste",
+        "short": "Was ihr braucht, in eurer Reihenfolge",
+        "text": "Die Seitenleiste links zeigt alle Stationen. Blendet aus, was ihr nicht braucht, und sortiert den Rest, wie es zu euch passt. Das gilt für jede Person einzeln – ihr könnt es jederzeit ändern. Ausgeblendetes findet ihr weiter über die Suche.",
+        "place": "Seitenleiste › Seitenleiste anpassen",
+        "doneWhen": "die Seitenleiste einmal gespeichert ist"
       }
     },
     "card": {

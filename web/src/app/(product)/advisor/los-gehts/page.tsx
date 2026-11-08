@@ -13,6 +13,7 @@ import { setSetupHiddenAction, skipSetupStepAction } from "@/features/advisor/se
 import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
 import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
 import { getOrgMembers } from "@/features/advisor/orgData";
+import { NavSettings } from "@/features/navigation/workspace/NavSettings";
 import { SetupSessionEnd, SetupSessionWriter } from "@/features/advisor/setup/SetupSessionClient";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
@@ -45,6 +46,8 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
   const index = items.findIndex((item) => item.key === current);
   const currentState = items[index]?.state ?? "open";
   const [people, peopleCards] = current === "people" ? await Promise.all([getOrgMembers(client, org.id), listOrgMemberCards(client, org.id)]) : [[], new Map()];
+  const { data: navRow } = current === "sidebar" ? await client.from("advisor_nav_prefs").select("hidden, item_order").maybeSingle() : { data: null };
+  const sidebarPrefs = navRow ? { hidden: (navRow.hidden as string[]) ?? [], order: (navRow.item_order as string[]) ?? [] } : null;
   const formats = current === "plan" ? await listEventFormats(client, org.id) : [];
   const href = (step: SetupStep) => `/advisor/los-gehts?${new URLSearchParams({ org: org.id, schritt: step }).toString()}`;
 
@@ -96,6 +99,10 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         <p className="text-[13px] font-semibold text-violet-800">{t("stepOf", { step: index + 1, total })}</p>
         <h2 id="step-title" className="font-brand -mt-3 text-[30px] font-semibold leading-tight text-slate-950">{t(`steps.${current}.title`)}</h2>
         <p className="max-w-2xl text-[15.5px] leading-7 text-slate-800">{t(`steps.${current}.text`)}</p>
+
+        {current === "sidebar" ? (
+          <NavSettings hasOrg orgId={org.id} prefs={sidebarPrefs} back="setup" />
+        ) : null}
 
         {current === "people" ? (
           <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={setup.isOwner} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
@@ -159,11 +166,11 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
               <SubmitButton label={t("skip")} pendingLabel="…" className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50" />
             </form>
           ) : null}
-          {(current !== "plan" && current !== "people") && currentState !== "done" ? (
+          {(current !== "plan" && current !== "people" && current !== "sidebar") && currentState !== "done" ? (
             <Link href={stepHref(current, org.id)} className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">{t("doNow")}</Link>
           ) : null}
           {index + 1 < items.length ? (
-            <Link href={href(items[index + 1].key)} className={`inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold ${currentState === "done" || current === "plan" || current === "people" ? "brand-cta" : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{t("nextStep")} →</Link>
+            <Link href={href(items[index + 1].key)} className={`inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold ${currentState === "done" || current === "plan" || current === "people" || current === "sidebar" ? "brand-cta" : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{t("nextStep")} →</Link>
           ) : (
             <SetupSessionEnd href="/advisor/dashboard" className="brand-cta inline-flex min-h-12 items-center rounded-xl px-5 text-[15px] font-semibold">{t("toStart")}</SetupSessionEnd>
           )}

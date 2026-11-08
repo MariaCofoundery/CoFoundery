@@ -5,12 +5,12 @@ import { OWNER_STEPS, setupProgress, stepHref, type SetupFacts } from "@/feature
 
 const read = (path: string) => readFileSync(path, "utf8");
 const facts = (done: string[]): SetupFacts =>
-  Object.fromEntries(["profile", "features", "team", "people", "plan", "teams", "teamraum", "phone", "role"].map((key) => [key, done.includes(key)])) as SetupFacts;
+  Object.fromEntries(["profile", "features", "team", "people", "plan", "teams", "teamraum", "sidebar", "phone", "role"].map((key) => [key, done.includes(key)])) as SetupFacts;
 
 test("Los geht's: erledigt ergibt sich aus den Daten, uebersprungen bleibt nachholbar, der naechste offene Schritt", () => {
   const progress = setupProgress(OWNER_STEPS, facts(["profile", "features", "team"]), ["plan"]);
   assert.equal(progress.done, 3);
-  assert.equal(progress.total, 8);
+  assert.equal(progress.total, 9);
   assert.equal(progress.items.find((item) => item.key === "plan")?.state, "skipped");
   assert.equal(progress.next, "people");
   assert.equal(setupProgress(OWNER_STEPS, facts([...OWNER_STEPS]), []).complete, true);
