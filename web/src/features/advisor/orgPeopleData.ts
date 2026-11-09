@@ -6,14 +6,23 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * "Wer ist wer" (20270327120000): die Karten der Menschen einer Organisation. Mitglieder lesen alle Karten ihrer
  * Organisation (Zeilensicherheit); Startups lesen nur die sichtbaren ueber get_my_program_people.
  */
-export type MemberCard = { userId: string; shown: boolean; selfHidden: boolean; headline: string | null; about: string | null; contact: string | null };
+export type MemberCard = {
+  userId: string;
+  shown: boolean;
+  selfHidden: boolean;
+  headline: string | null;
+  about: string | null;
+  contact: string | null;
+  /** Welche Programme (Startups) die Karte sehen. null = alle Programme der Organisation (20270408120000). */
+  programIds: string[] | null;
+};
 
 export async function listOrgMemberCards(client: SupabaseClient, orgId: string): Promise<Map<string, MemberCard>> {
-  const { data, error } = await client.from("advisor_org_member_cards").select("user_id, shown, self_hidden, headline, about, contact").eq("org_id", orgId).limit(200);
+  const { data, error } = await client.from("advisor_org_member_cards").select("user_id, shown, self_hidden, headline, about, contact, audience_program_ids").eq("org_id", orgId).limit(200);
   const cards = new Map<string, MemberCard>();
   if (error || !Array.isArray(data)) return cards;
-  for (const row of data as { user_id: string; shown: boolean; self_hidden: boolean; headline: string | null; about: string | null; contact: string | null }[]) {
-    cards.set(row.user_id, { userId: row.user_id, shown: row.shown, selfHidden: row.self_hidden, headline: row.headline, about: row.about, contact: row.contact });
+  for (const row of data as { user_id: string; shown: boolean; self_hidden: boolean; headline: string | null; about: string | null; contact: string | null; audience_program_ids: string[] | null }[]) {
+    cards.set(row.user_id, { userId: row.user_id, shown: row.shown, selfHidden: row.self_hidden, headline: row.headline, about: row.about, contact: row.contact, programIds: row.audience_program_ids ?? null });
   }
   return cards;
 }

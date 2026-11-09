@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getMyAdvisorOrgs } from "@/features/advisor/orgData";
-import { listEventFormats } from "@/features/advisor/teamProgramData";
+import { getOrgTeamPrograms, listEventFormats } from "@/features/advisor/teamProgramData";
 import { saveEventFormatAction } from "@/features/advisor/teamProgramActions";
 import { PlanEventList } from "@/features/advisor/PlanEventList";
 import { loadSetup } from "@/features/advisor/setup/setupData";
@@ -46,7 +46,8 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
   const current: SetupStep = isSetupStep(query.schritt) && items.some((item) => item.key === query.schritt) ? query.schritt : next ?? items[items.length - 1].key;
   const index = items.findIndex((item) => item.key === current);
   const currentState = items[index]?.state ?? "open";
-  const [people, peopleCards] = current === "people" ? await Promise.all([getOrgMembers(client, org.id), listOrgMemberCards(client, org.id)]) : [[], new Map()];
+  const [people, peopleCards, peoplePrograms] = current === "people" ? await Promise.all([getOrgMembers(client, org.id), listOrgMemberCards(client, org.id), getOrgTeamPrograms(client, org.id)]) : [[], new Map(), []];
+  const tTeams = await getTranslations("advisor.teamProgram");
   const { data: navRow } = current === "sidebar" ? await client.from("advisor_nav_prefs").select("hidden, item_order").maybeSingle() : { data: null };
   const sidebarPrefs = navRow ? { hidden: (navRow.hidden as string[]) ?? [], order: (navRow.item_order as string[]) ?? [] } : null;
   const formats = current === "plan" ? await listEventFormats(client, org.id) : [];
@@ -106,7 +107,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         ) : null}
 
         {current === "people" ? (
-          <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={setup.isOwner} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+          <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={setup.isOwner} programs={peoplePrograms.filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tTeams("unnamedTeam") }))} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
         ) : null}
 
         {current === "plan" && currentState !== "done" ? (

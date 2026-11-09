@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(18);
 
 -- ---------------------------------------------------------------------------
 -- Wer ist wer (20270327120000): 1 Inhaberin, 2 Advisor, 3 Advisor, 4 Gruenderin im Programm, 5 Gruenderin ohne Programm.
@@ -34,10 +34,10 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000001","role":"authenticated"}';
 select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000002', 'Betreut Teams im Gruendungsprozess', 'Ben begleitet seit zehn Jahren.', 'ben@example.com', true);
 select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000003', 'Finanzierung', null, null, false);
-select extensions.is((select contact from public.advisor_org_member_cards where user_id = 'e9000000-0000-4000-8000-000000000002'), null, 'the owner cannot enter someone else''s contact');
+select extensions.is((select contact from public.advisor_org_member_cards where user_id = 'e9000000-0000-4000-8000-000000000002'), 'ben@example.com', 'the owner enters the contact of the people who may be contacted');
 select extensions.is((select count(*)::int from public.advisor_org_member_cards), 2, 'the organisation sees all cards');
 
--- Ben: ein Kontakt nur von ihm selbst; Mitglieder duerfen fremde Karten nicht aendern.
+-- Ben: pflegt seine Karte selbst; Mitglieder duerfen fremde Karten nicht aendern.
 set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000002","role":"authenticated"}';
 select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000002', 'Betreut Teams im Gruendungsprozess', 'Ben begleitet seit zehn Jahren.', 'ben@example.com', true);
 select extensions.is((select contact from public.advisor_org_member_cards where user_id = 'e9000000-0000-4000-8000-000000000002'), 'ben@example.com', 'a person enters their own contact');
@@ -67,6 +67,28 @@ update public.advisor_org_members set status = 'revoked', revoked_at = now() whe
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000004","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.get_my_program_people()), 0, 'a member who left is not shown');
+
+-- Welche Startups wen sehen (20270408120000): Team "Ohne Programm" kommt jetzt ins Programm; Carla wird nur fuer Team Eins gezeigt.
+reset role;
+insert into public.team_programs(id, org_id, team_id, status, activated_at, solo_confirmed_at) values
+('e9000000-0000-4000-8000-0000000000c1','e9000000-0000-4000-8000-0000000000a0','e9000000-0000-4000-8000-0000000000b1','active', now(), now());
+insert into public.team_program_consents(program_id, founder_user_id) values ('e9000000-0000-4000-8000-0000000000c1','e9000000-0000-4000-8000-000000000005');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000003', 'Finanzierung', null, 'carla@example.com', true, array['e9000000-0000-4000-8000-0000000000c0']::uuid[]);
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000004","role":"authenticated"}';
+select extensions.is((select count(*)::int from public.get_my_program_people() where user_id = 'e9000000-0000-4000-8000-000000000003'), 1, 'the chosen startup sees the person');
+select extensions.is((select contact from public.get_my_program_people() where user_id = 'e9000000-0000-4000-8000-000000000003'), 'carla@example.com', 'with the contact the organisation entered');
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000005","role":"authenticated"}';
+select extensions.is((select count(*)::int from public.get_my_program_people() where user_id = 'e9000000-0000-4000-8000-000000000003'), 0, 'a startup that was not chosen does not');
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000003', 'Finanzierung', null, 'carla@example.com', true, array[]::uuid[]);
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000005","role":"authenticated"}';
+select extensions.is((select count(*)::int from public.get_my_program_people() where user_id = 'e9000000-0000-4000-8000-000000000003'), 1, 'an empty list means all startups');
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000003","role":"authenticated"}';
+select extensions.throws_ok($$select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000003', 'x', null, null, true, array['e9000000-0000-4000-8000-0000000000c0']::uuid[])$$, '42501', 'org_card_not_yours', 'only the owner chooses the startups, not the person');
+set local request.jwt.claims = '{"sub":"e9000000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.throws_ok($$select public.save_org_member_card('e9000000-0000-4000-8000-0000000000a0', 'e9000000-0000-4000-8000-000000000003', 'x', null, null, true, array['e9000000-0000-4000-8000-0000000000ff']::uuid[])$$, '22023', 'org_card_audience_invalid', 'and only startups of this organisation');
 
 select * from extensions.finish();
 rollback;

@@ -2453,7 +2453,7 @@
   },
   "people": {
     "title": "Wer ist wer",
-    "text": "Die Menschen eurer Organisation. Beschreibt sie kurz und klickt an, wen die Startups im Programm sehen und kontaktieren dürfen. Standard ist: nicht sichtbar. Hat sich das Team geändert? Oben lädst du neue Mitglieder ein oder nimmst jemanden heraus – wer entfernt wird, verliert den Zugang.",
+    "text": "Die Menschen eurer Organisation. Beschreibt sie kurz, tragt ein, wie die Startups sie erreichen, und klickt an, wer von den Startups sie sehen und kontaktieren darf – alle oder nur bestimmte. Standard ist: nicht sichtbar. Hat sich das Team geändert? Oben lädst du neue Mitglieder ein oder nimmst jemanden heraus – wer entfernt wird, verliert den Zugang.",
     "summary": "{shown} von {total} für die Startups sichtbar",
     "unnamed": "Ohne Namen",
     "you": "du",
@@ -2461,7 +2461,7 @@
     "roleAdvisor": "Advisor",
     "noHeadline": "Noch keine Kurzbeschreibung",
     "noAbout": "Noch keine Beschreibung.",
-    "describeYourself": "Beschreib dich kurz – dann können die Startups sehen, wer du bist und wie sie dich erreichen.",
+    "describeYourself": "Beschreib dich kurz – dann können die Startups sehen, wer du bist.",
     "status": {
       "shown": "Für Startups sichtbar",
       "hidden": "Nicht sichtbar",
@@ -2473,16 +2473,22 @@
     "aboutPlaceholder": "Wofür bist du die richtige Ansprechperson?",
     "contact": "So erreichen dich die Startups",
     "contactPlaceholder": "E-Mail, Telefon oder Link – nur, was du teilen willst",
-    "contactOnlySelf": "Den Kontakt trägt nur die Person selbst ein.",
     "showToStartups": "Die Startups im Programm dürfen das sehen",
     "showHintSelf": "Du kannst es jederzeit wieder ausschalten.",
-    "showHintOther": "Die Person sieht das auf ihrer eigenen Karte und kann es jederzeit zurücknehmen.",
+    "showHintOther": "Du entscheidest, wer die Person kontaktieren darf. Die Person sieht ihre Karte und kann sich selbst jederzeit herausnehmen – dann zeigst nur sie sich wieder.",
     "selfHiddenNote": "Die Person hat ihre Karte selbst zurückgenommen – nur sie kann sie wieder zeigen.",
     "save": "Speichern",
     "errorHidden": "Die Person hat die Karte selbst zurückgenommen – nur sie kann sie wieder zeigen.",
     "errorFailed": "Das hat nicht geklappt.",
     "startupTitle": "Wer ist wer im Programm",
-    "startupText": "Die Menschen der Organisation, die sich für euch freigegeben haben – mit dem Kontakt, den sie selbst angegeben haben."
+    "startupText": "Die Menschen der Organisation, die ihr kontaktieren dürft – mit dem Kontakt, den die Organisation dafür angegeben hat.",
+    "contactOther": "So erreichen die Startups diese Person",
+    "audienceTitle": "Welche Startups sehen das?",
+    "audienceAll": "Alle Startups im Programm",
+    "audienceSelected": "Nur bestimmte Startups",
+    "audienceNone": "Noch kein Startup im Programm – die Auswahl gilt, sobald welche da sind.",
+    "audienceHint": "Ein Startup, das später dazukommt, sieht eine eingeschränkte Karte erst, wenn du es hier aufnimmst.",
+    "errorAudience": "Bitte wähle mindestens ein Startup aus – oder „Alle Startups im Programm“."
   },
   "programTasks": {
     "titleTeam": "Aufgaben mit der Organisation",

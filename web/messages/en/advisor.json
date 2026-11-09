@@ -1466,7 +1466,7 @@
     "fixtureMaterial1Note": "As of the last session",
     "fixtureMaterial2": "Workshop recordings",
     "tabMaterials": "Materials",
-    "materialsNote": "This is how the collection of materials for the teams looks. The programme plan itself is the calendar."
+    "materialsNote": "This is how the collection of materials for the teams looks. The program plan itself is the calendar."
   },
   "myProgram": {
     "pageTitle": "My program",
@@ -2412,7 +2412,7 @@
       "publicNot": "not public",
       "addPost": "Post",
       "archiveTitle": "Take out of the plan",
-      "archiveText": "The event disappears from the calendar, the plan and from the teams. Attendance and RSVPs are kept and still count in the report. You will find it in the archive under “Programme plan” and can restore it. A public suggestion in the event calendar is withdrawn.",
+      "archiveText": "The event disappears from the calendar, the plan and from the teams. Attendance and RSVPs are kept and still count in the report. You will find it in the archive under “Program plan” and can restore it. A public suggestion in the event calendar is withdrawn.",
       "archiveConfirm": "Yes, take it out of the plan"
     },
     "form": {
@@ -2453,7 +2453,7 @@
   },
   "people": {
     "title": "Who is who",
-    "text": "The people of your organization. Describe them briefly and tick who the startups in the program may see and contact. The default is: not visible. Did the team change? Above you invite new members or remove someone – anyone removed loses access.",
+    "text": "The people of your organization. Describe them briefly, enter how the startups reach them, and tick who among the startups may see and contact them – all or only certain ones. Default: not visible. Has the team changed? Invite new members above or remove someone – whoever is removed loses access.",
     "summary": "{shown} of {total} visible to startups",
     "unnamed": "Unnamed",
     "you": "you",
@@ -2461,7 +2461,7 @@
     "roleAdvisor": "Advisor",
     "noHeadline": "No short description yet",
     "noAbout": "No description yet.",
-    "describeYourself": "Describe yourself briefly – so startups can see who you are and how to reach you.",
+    "describeYourself": "Describe yourself briefly – then the startups can see who you are.",
     "status": {
       "shown": "Visible to startups",
       "hidden": "Not visible",
@@ -2473,16 +2473,22 @@
     "aboutPlaceholder": "What are you the right contact for?",
     "contact": "How startups reach you",
     "contactPlaceholder": "Email, phone or link – only what you want to share",
-    "contactOnlySelf": "Only the person enters their own contact.",
     "showToStartups": "Startups in the program may see this",
     "showHintSelf": "You can switch it off again at any time.",
-    "showHintOther": "The person sees this on their own card and can withdraw it at any time.",
+    "showHintOther": "You decide who may contact the person. The person sees their card and can take themselves out at any time – then only they can show themselves again.",
     "selfHiddenNote": "The person withdrew their card themselves – only they can show it again.",
     "save": "Save",
     "errorHidden": "The person withdrew the card themselves – only they can show it again.",
     "errorFailed": "That did not work.",
     "startupTitle": "Who is who in the program",
-    "startupText": "The people of the organization who released themselves for you – with the contact they gave themselves."
+    "startupText": "The people of the organization you may contact – with the contact the organization gave for that.",
+    "contactOther": "How the startups reach this person",
+    "audienceTitle": "Which startups can see this?",
+    "audienceAll": "All startups in the program",
+    "audienceSelected": "Only certain startups",
+    "audienceNone": "No startup in the program yet – the choice applies as soon as there are some.",
+    "audienceHint": "A startup that joins later only sees a restricted card once you add it here.",
+    "errorAudience": "Please choose at least one startup – or “All startups in the program”."
   },
   "programTasks": {
     "titleTeam": "Tasks with the organization",

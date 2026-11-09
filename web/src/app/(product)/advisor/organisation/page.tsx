@@ -311,7 +311,7 @@ export default async function AdvisorOrganisationPage({
         {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} saved={query.saved === "1"} part="members" /> : null}
         {tab === "members" ? (
           <div className="mt-6">
-            <OrgPeopleCards orgId={org.id} members={members} cards={await listOrgMemberCards(client, org.id)} isOwner={isOwner} savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+            <OrgPeopleCards orgId={org.id} members={members} cards={await listOrgMemberCards(client, org.id)} isOwner={isOwner} programs={(await getOrgTeamPrograms(client, org.id)).filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))} savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
           </div>
         ) : null}
 

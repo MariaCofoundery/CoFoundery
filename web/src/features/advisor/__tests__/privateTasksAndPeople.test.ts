@@ -53,12 +53,15 @@ test("Wer ist wer: Standard nicht sichtbar, Kontakt nur von der Person selbst, Z
 
 test("Wer ist wer: Karten in Mitglieder & Rollen und im Onboarding, Startups sehen sie unter Programm", () => {
   assert.match(read("src/app/(product)/advisor/organisation/page.tsx"), /<OrgPeopleCards orgId=\{org\.id\}/);
-  assert.match(read("src/app/(product)/advisor/los-gehts/page.tsx"), /<OrgPeopleCards[^>]*back="setup"/);
+  assert.match(read("src/app/(product)/advisor/los-gehts/page.tsx"), /<OrgPeopleCards[\s\S]*?back="setup"/);
   assert.match(read("src/app/(product)/programm/page.tsx"), /<ProgramPeople people=\{programPeople\} \/>/);
   const model = read("src/features/advisor/setup/setupModel.ts");
   assert.match(model, /"team", "people", "plan"/);
   const cards = read("src/features/advisor/OrgPeopleCards.tsx");
-  assert.match(cards, /member\.isSelf \? \(\s*<label className=\{TILE\}>\s*<span className=\{TILE_LABEL\}>\{t\("contact"\)\}/);
+  // Den Kontakt tragen die Person selbst UND die Inhaberin ein (seit 20270408120000); wer die Startups sind, die eine
+  // Karte sehen, bestimmt nur die Inhaberin.
+  assert.match(cards, /member\.isSelf \? t\("contact"\) : t\("contactOther"\)/);
+  assert.match(cards, /\{isOwner \? \(\s*<fieldset[\s\S]*name="audience" value="all"[\s\S]*name="audience" value="selected"[\s\S]*name="programId"/);
   assert.match(cards, /disabled=\{Boolean\(card\?\.selfHidden && !member\.isSelf\)\}/);
   // Der Kontakt wird nur als https-Link oder E-Mail zum Link.
   // Nur https-Links und schlichte Adressen werden zum Link (Prüfung in contactLink.ts, getestet in contactLink.test.ts).
@@ -73,4 +76,22 @@ test("Texte in beiden Sprachen, dieselben Schluessel", () => {
   assert.deepEqual(keys(de.people).sort(), keys(en.people).sort());
   assert.deepEqual(keys(de.setup.steps.people).sort(), keys(en.setup.steps.people).sort());
   for (const key of ["visibilityQuestion", "visibilityTeam", "visibilityPrivate", "visibilityHint"]) assert.ok(de.teamraum.form[key] && en.teamraum.form[key], key);
+});
+
+test("Wer ist wer: die Organisation trägt die Kontakte ein und bestimmt, welche Startups wen sehen", () => {
+  const sql = read("../supabase/migrations/20270408120000_org_member_cards_org_controlled.sql");
+  assert.match(sql, /add column audience_program_ids uuid\[\]/);
+  // Nur die Inhaberin wählt die Startups; ein fremdes Programm wird abgewiesen.
+  assert.match(sql, /if not v_owner then\s+raise exception 'org_card_not_yours'/);
+  assert.match(sql, /org_card_audience_invalid/);
+  // Startups sehen nur Karten, die für ihr Programm gelten.
+  assert.match(sql, /c\.audience_program_ids is null or p\.id = any \(c\.audience_program_ids\)/);
+  // Die Rücknahme durch die Person selbst bleibt: die Inhaberin zeigt niemanden wieder, der sich zurückgenommen hat.
+  assert.match(sql, /org_card_self_hidden/);
+  const action = read("src/features/advisor/orgPeopleActions.ts");
+  assert.match(action, /p_program_ids: audienceMode === "selected" \? picked : audienceMode === "all" \? \[\] : null/);
+  assert.match(action, /cardError=audience/);
+  // Beide Orte, an denen die Karten bearbeitet werden, geben die Startups mit.
+  assert.match(read("src/app/(product)/advisor/organisation/page.tsx"), /programs=\{\(await getOrgTeamPrograms/);
+  assert.match(read("src/app/(product)/advisor/los-gehts/page.tsx"), /programs=\{peoplePrograms/);
 });
