@@ -2139,9 +2139,10 @@
     "created": "{count, plural, =0 {Kein Posting angelegt.} one {Ein Posting angelegt.} other {# Postings angelegt.}}",
     "status": {
       "idea": "Idee",
-      "draft": "Entwurf",
-      "planned": "Geplant",
-      "published": "Veröffentlicht"
+      "draft": "In Arbeit",
+      "planned": "Freigegeben",
+      "published": "Veröffentlicht",
+      "review": "Zur Freigabe"
     },
     "channels": {
       "linkedin": "LinkedIn",
@@ -2171,7 +2172,27 @@
       "bodyPlaceholder": "Entwurf des Postings – **fett** und *kursiv* gehen.",
       "add": "Posting anlegen",
       "save": "Speichern",
-      "delete": "Posting löschen"
+      "delete": "Posting löschen",
+      "contentNone": "– keine –",
+      "fromDefaults": "Aus deiner Voreinstellung:",
+      "more": "Mehr Angaben",
+      "moreHint": "Marke, Säule, Format, Freigabe, Link, offene Infos",
+      "brand": "Marke",
+      "pillar": "Content-Säule",
+      "format": "Format",
+      "approver": "Freigabe durch",
+      "nobodyNeeded": "Niemand nötig",
+      "materialUrl": "Link zu Material (zum Beispiel Canva)",
+      "openInfo": "Offene Informationen",
+      "openInfoPlaceholder": "Was fehlt noch? Zum Beispiel: Zitat, Foto",
+      "tasksTitle": "Aufgaben dazu",
+      "tasksNone": "Noch keine Aufgabe an diesem Beitrag.",
+      "taskUnlink": "Lösen",
+      "taskNew": "Neue Aufgabe, zum Beispiel „Canva-Vorlage bauen“",
+      "taskDue": "Fällig am",
+      "taskExisting": "Oder eine vorhandene Teamaufgabe verknüpfen",
+      "taskAdd": "Aufgabe hinzufügen",
+      "taskHint": "Der Beitrag wird dabei mitgespeichert. Private Aufgaben lassen sich nicht verknüpfen."
     },
     "plan": {
       "title": "Kampagne planen – reinsprechen oder tippen",
@@ -2239,7 +2260,8 @@
     "tabs": {
       "kalender": "Kalender",
       "vorlagen": "Vorlagen",
-      "kampagnen": "Kampagnen"
+      "kampagnen": "Kampagnen",
+      "einstellungen": "Einstellungen"
     },
     "addTemplate": "Vorlage",
     "cards": {
@@ -2249,7 +2271,53 @@
       "apply": "Auf Termin anwenden",
       "newHint": "z. B. „3 Posts zu Event y“"
     },
-    "toCalendar": "Zum Kalender"
+    "toCalendar": "Zum Kalender",
+    "settings": {
+      "intro": "Lege einmal fest, was bei dir meistens gilt. Beim Anlegen eines Beitrags ist das schon vorgewählt – du änderst nur, was diesmal anders ist.",
+      "readOnly": "Du kannst das ansehen. Ändern darf, wer „Termine, Formate und Materialien pflegen“ darf.",
+      "error": "Das hat nicht geklappt. Der Name ist nötig und darf nicht doppelt vorkommen.",
+      "none": "– keine –",
+      "nobodyNeeded": "Niemand nötig",
+      "remove": "Entfernen",
+      "color": "Farbe",
+      "defaultsTitle": "Standard für neue Beiträge",
+      "defaultsHint": "Alles ist freiwillig. Leer heißt: nichts vorgewählt.",
+      "saveDefaults": "Standard speichern",
+      "startStatus": "Start-Stand",
+      "kinds": {
+        "brand": {
+          "title": "Marken",
+          "hint": "Unter welchem Namen trittst du auf? Jede Marke hat eine Farbe im Kalender.",
+          "add": "Neue Marke",
+          "addShort": "Marke hinzufügen"
+        },
+        "pillar": {
+          "title": "Content-Säulen",
+          "hint": "Die Themen, auf die alles einzahlt. Du bestimmst, welche es gibt.",
+          "add": "Neue Säule",
+          "addShort": "Säule hinzufügen"
+        },
+        "format": {
+          "title": "Formate",
+          "hint": "Wie der Beitrag aussieht, zum Beispiel Karussell oder Kurzvideo.",
+          "add": "Neues Format",
+          "addShort": "Format hinzufügen"
+        }
+      },
+      "colors": {
+        "violet": "Violett",
+        "sky": "Blau",
+        "amber": "Gelb",
+        "emerald": "Grün",
+        "rose": "Rot",
+        "slate": "Grau"
+      },
+      "single": {
+        "brand": "Marke",
+        "pillar": "Content-Säule",
+        "format": "Format"
+      }
+    }
   },
   "setup": {
     "title": "Los geht's",

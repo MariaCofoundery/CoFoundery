@@ -2139,9 +2139,10 @@
     "created": "{count, plural, =0 {No post created.} one {One post created.} other {# posts created.}}",
     "status": {
       "idea": "Idea",
-      "draft": "Draft",
-      "planned": "Planned",
-      "published": "Published"
+      "draft": "In progress",
+      "planned": "Approved",
+      "published": "Published",
+      "review": "For approval"
     },
     "channels": {
       "linkedin": "LinkedIn",
@@ -2171,7 +2172,27 @@
       "bodyPlaceholder": "Draft of the post – **bold** and *italic* work.",
       "add": "Add post",
       "save": "Save",
-      "delete": "Delete post"
+      "delete": "Delete post",
+      "contentNone": "– none –",
+      "fromDefaults": "From your default:",
+      "more": "More details",
+      "moreHint": "Brand, pillar, format, approval, link, open info",
+      "brand": "Brand",
+      "pillar": "Content pillar",
+      "format": "Format",
+      "approver": "Approval by",
+      "nobodyNeeded": "Nobody needed",
+      "materialUrl": "Link to material (for example Canva)",
+      "openInfo": "Open information",
+      "openInfoPlaceholder": "What is still missing? For example: quote, photo",
+      "tasksTitle": "Related tasks",
+      "tasksNone": "No task on this post yet.",
+      "taskUnlink": "Unlink",
+      "taskNew": "New task, for example \"Build the Canva template\"",
+      "taskDue": "Due on",
+      "taskExisting": "Or link an existing team task",
+      "taskAdd": "Add task",
+      "taskHint": "The post is saved along with it. Private tasks cannot be linked."
     },
     "plan": {
       "title": "Plan a campaign – dictate or type",
@@ -2239,7 +2260,8 @@
     "tabs": {
       "kalender": "Calendar",
       "vorlagen": "Templates",
-      "kampagnen": "Campaigns"
+      "kampagnen": "Campaigns",
+      "einstellungen": "Settings"
     },
     "addTemplate": "Template",
     "cards": {
@@ -2249,7 +2271,53 @@
       "apply": "Apply to an event",
       "newHint": "e.g. “3 posts for event y”"
     },
-    "toCalendar": "To the calendar"
+    "toCalendar": "To the calendar",
+    "settings": {
+      "intro": "Set once what usually applies. When you create a post it is already chosen – you only change what is different this time.",
+      "readOnly": "You can look at this. Whoever may \"manage events, formats and materials\" can change it.",
+      "error": "That did not work. A name is required and must not exist twice.",
+      "none": "– none –",
+      "nobodyNeeded": "Nobody needed",
+      "remove": "Remove",
+      "color": "Color",
+      "defaultsTitle": "Default for new posts",
+      "defaultsHint": "Everything is optional. Empty means nothing is preselected.",
+      "saveDefaults": "Save default",
+      "startStatus": "Starting status",
+      "kinds": {
+        "brand": {
+          "title": "Brands",
+          "hint": "Under which name do you appear? Each brand has a color in the calendar.",
+          "add": "New brand",
+          "addShort": "Add brand"
+        },
+        "pillar": {
+          "title": "Content pillars",
+          "hint": "The topics everything contributes to. You decide which exist.",
+          "add": "New pillar",
+          "addShort": "Add pillar"
+        },
+        "format": {
+          "title": "Formats",
+          "hint": "What the post looks like, for example carousel or short video.",
+          "add": "New format",
+          "addShort": "Add format"
+        }
+      },
+      "colors": {
+        "violet": "Violet",
+        "sky": "Blue",
+        "amber": "Yellow",
+        "emerald": "Green",
+        "rose": "Red",
+        "slate": "Gray"
+      },
+      "single": {
+        "brand": "Brand",
+        "pillar": "Content pillar",
+        "format": "Format"
+      }
+    }
   },
   "setup": {
     "title": "Let's go",

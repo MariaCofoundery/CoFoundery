@@ -40,8 +40,8 @@ import { movePostToDayAction } from "@/features/advisor/socialCalendarActions";
 import { EventFormats } from "@/features/advisor/EventFormats";
 import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEventsSplit, listProgramExperts } from "@/features/advisor/teamProgramData";
 import { listEventCountingRequirements } from "@/features/advisor/fundingData";
-import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
-import { isoWeekNumber } from "@/features/advisor/socialCalendarModel";
+import { getContentDefaults, getOrgPost, listContentItems, listLinkableTasks, listPostTasks, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
+import { BRAND_COLOR_STYLE, isoWeekNumber } from "@/features/advisor/socialCalendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
@@ -143,10 +143,16 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   // Archivierte Termine stehen nicht im Raster und nicht in der Liste, nur im Archiv des Programmplans (und in den Auswertungen).
   const events = eventSplit.active;
   const archivedEvents = eventSplit.archived;
-  const [openPost, campaigns] = await Promise.all([
+  const postSheetOpen = sheet === "post" || sheet === "post-new";
+  const [openPost, campaigns, contentItems, contentDefaults] = await Promise.all([
     postId ? getOrgPost(client, org.id, postId) : Promise.resolve(null),
-    sheet === "post" || sheet === "post-new" ? listOrgCampaigns(client, org.id) : Promise.resolve([]),
+    postSheetOpen ? listOrgCampaigns(client, org.id) : Promise.resolve([]),
+    // Marken, Saeulen, Formate: im Panel zum Waehlen, im Raster fuer die Farbe der Marke.
+    listContentItems(client, org.id),
+    postSheetOpen ? getContentDefaults(client, org.id) : Promise.resolve(null),
   ]);
+  const postTasks = postSheetOpen && openPost ? await listPostTasks(client, openPost.id) : [];
+  const linkableTasks = postSheetOpen ? await listLinkableTasks(client, org.id, postTasks.map((task) => task.taskId)) : [];
   const memberNames = new Map(members.map((member) => [member.userId, member.displayName ?? tAdvisor("area.kinds.unnamed")]));
   const programChoices = programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }));
 
@@ -215,14 +221,18 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
         ? { tone: "emerald" as const, text: tp("planSaved") }
         : null;
 
+  // Die Farbe einer Marke steht am Rand ihrer Posts (Content-Planung).
+  const brandHex = new Map(contentItems.filter((entry) => entry.kind === "brand").map((entry) => [entry.id, BRAND_COLOR_STYLE[entry.color ?? "violet"].hex] as const));
   const chip = (item: CalendarItem, large = false) => {
     const style = LAYER_STYLE[item.layer];
     const active = Boolean(selected && item.eventId === selected.eventId && item.layer === "program");
+    const brandColor = item.layer === "post" && item.brandId ? brandHex.get(item.brandId) : undefined;
     const link = (
       <Link
         key={item.key}
         href={item.href}
         title={item.label}
+        style={brandColor ? { borderLeft: `5px solid ${brandColor}` } : undefined}
         className={`flex w-full min-w-0 items-center gap-1.5 rounded-[7px] px-1.5 text-left text-[12px] font-semibold leading-4 transition hover:brightness-95 ${large ? "min-h-8 py-1.5 text-[13px]" : "min-h-6 py-0.5"} ${
           item.suggestion ? "border border-dashed border-pink-500 bg-white text-pink-950" : `${style.chip} border border-transparent`
         } ${active ? "ring-2 ring-violet-600" : ""} ${item.done ? "opacity-70" : ""}`}
@@ -454,6 +464,10 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           members={members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? tAdvisor("area.kinds.unnamed") }))}
           canDelete={Boolean(openPost && canWrite && (openPost.createdByUserId === user.id || org.isLead))}
           locale={locale}
+          content={contentItems}
+          defaults={contentDefaults}
+          tasks={postTasks}
+          linkableTasks={linkableTasks}
         />
       ) : sheet ? (
         <EventSheet

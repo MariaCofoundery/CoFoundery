@@ -66,26 +66,85 @@ function finish(path: string) {
   redirect(path);
 }
 
-export async function savePostAction(formData: FormData) {
-  const client = await requireUser(backTo(formData));
-  const postId = uuidOrNull(formData.get("postId"));
+/** Alle Felder des Beitrags aus dem Formular - dieselben fuer "Speichern" und fuer die Aufgaben-Knoepfe darunter. */
+async function persistPost(client: Awaited<ReturnType<typeof requireUser>>, formData: FormData) {
   const status = formData.get("status");
-  const plannedOn = dateOrNull(formData.get("plannedOn"));
-  const { data, error } = await client.rpc("save_org_post", {
-    p_post_id: postId,
+  const url = String(formData.get("materialUrl") ?? "").trim();
+  return client.rpc("save_org_post", {
+    p_post_id: uuidOrNull(formData.get("postId")),
     p_org_id: uuidOrNull(formData.get("orgId")),
     p_title: String(formData.get("title") ?? "").slice(0, 160),
     p_body: String(formData.get("body") ?? "").slice(0, 5000),
     p_channels: formData.getAll("channel").map(String).filter(isChannel),
-    p_planned_on: plannedOn,
+    p_planned_on: dateOrNull(formData.get("plannedOn")),
     p_planned_time: timeOrNull(formData.get("plannedTime")),
     p_status: isPostStatus(status) ? status : "idea",
     p_campaign_id: uuidOrNull(formData.get("campaignId")),
     p_event_id: uuidOrNull(formData.get("eventId")),
     p_assignee_user_id: uuidOrNull(formData.get("assignee")),
+    p_brand_id: uuidOrNull(formData.get("brandId")),
+    p_pillar_id: uuidOrNull(formData.get("pillarId")),
+    p_format_id: uuidOrNull(formData.get("formatId")),
+    p_material_url: url ? url.slice(0, 500) : null,
+    p_approver_user_id: uuidOrNull(formData.get("approver")),
+    p_open_info: String(formData.get("openInfo") ?? "").slice(0, 1000) || null,
   });
+}
+
+export async function savePostAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const postId = uuidOrNull(formData.get("postId"));
+  const plannedOn = dateOrNull(formData.get("plannedOn"));
+  const { data, error } = await persistPost(client, formData);
   if (error) finish(backTo(formData, { ...(postId ? { post: postId } : { newPost: plannedOn ?? "" }), socialError: "1" }));
   finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: String(data ?? postId ?? ""), socialSaved: "1" }));
+}
+
+/**
+ * Aufgaben an einem Beitrag: eine neue anlegen (Titel, Zustaendige, Faelligkeit) oder eine vorhandene Teamaufgabe
+ * verknuepfen. Die Knoepfe liegen im Formular des Beitrags; zuerst wird der Beitrag mit gespeichert, damit nichts
+ * verloren geht, was man gerade eingetragen hat.
+ */
+export async function addPostTaskAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const plannedOn = dateOrNull(formData.get("plannedOn"));
+  const saved = await persistPost(client, formData);
+  const postId = typeof saved.data === "string" ? saved.data : uuidOrNull(formData.get("postId"));
+  if (saved.error || !postId) finish(backTo(formData, { ...(postId ? { post: postId } : {}), socialError: "1" }));
+  const orgId = uuidOrNull(formData.get("orgId"));
+  const title = String(formData.get("taskTitle") ?? "").trim().slice(0, 200);
+  const existing = uuidOrNull(formData.get("linkTaskId"));
+  let taskId = existing;
+  if (!taskId && title) {
+    const { data, error } = await client.rpc("save_org_task", {
+      p_task_id: null,
+      p_org_id: orgId,
+      p_title: title,
+      p_details: "",
+      p_status: "open",
+      p_assignee_user_ids: uuidOrNull(formData.get("assignee")) ? [uuidOrNull(formData.get("assignee"))] : [],
+      p_due_on: dateOrNull(formData.get("taskDueOn")) ?? plannedOn,
+      p_program_id: null,
+      p_event_id: uuidOrNull(formData.get("eventId")),
+      p_checklist: [],
+      p_visibility: "team",
+    });
+    if (error || typeof data !== "string") finish(backTo(formData, { post: postId as string, socialError: "1" }));
+    taskId = data as string;
+  }
+  if (taskId) {
+    const { error } = await client.rpc("link_org_post_task", { p_post_id: postId, p_task_id: taskId });
+    if (error) finish(backTo(formData, { post: postId as string, socialError: "1" }));
+  }
+  finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: postId as string, socialSaved: "1" }));
+}
+
+export async function unlinkPostTaskAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const postId = uuidOrNull(formData.get("postId"));
+  const taskId = uuidOrNull(formData.get("unlinkTaskId"));
+  if (postId && taskId) await client.rpc("unlink_org_post_task", { p_post_id: postId, p_task_id: taskId });
+  finish(backTo(formData, { ...(postId ? { post: postId } : {}) }));
 }
 
 export async function deletePostAction(formData: FormData) {

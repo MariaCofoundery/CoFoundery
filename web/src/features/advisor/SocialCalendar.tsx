@@ -8,6 +8,8 @@ import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import { PostTemplateCards } from "@/features/advisor/PostTemplateCards";
 import type { PostTemplate } from "@/features/advisor/postPlanning";
+import { ContentSettings } from "@/features/advisor/ContentSettings";
+import type { ContentDefaults, ContentItem } from "@/features/advisor/socialCalendarModel";
 
 /**
  * Vorlagen und Kampagnen (Social Media im Teamraum, 20270319120000). Den Kalender dazu gibt es seit dem 06.11.2026
@@ -27,7 +29,9 @@ export type SocialContext = {
   campaigns: OrgCampaign[];
   /** Post-Vorlagen fuer Veranstaltungen (20270324120000). */
   templates: PostTemplate[];
-  reiter: "vorlagen" | "kampagnen";
+  reiter: "vorlagen" | "kampagnen" | "einstellungen";
+  /** Marken, Saeulen, Formate und Standard (20270411120000); `canPlan`: wer sie pflegen darf. */
+  content: { items: ContentItem[]; defaults: ContentDefaults | null; members: { userId: string; name: string }[]; canPlan: boolean; feedback: { error: boolean; saved: boolean } };
   /** Vorlage im Editor: "neu" fuer eine neue, sonst die Kennung. */
   templateEdit: string | null;
   feedback: { error: boolean; saved: boolean; deleted: boolean; created: number | null };
@@ -39,7 +43,7 @@ export async function SocialCalendar({ ctx }: { ctx: SocialContext }) {
   const t = await getTranslations("advisor.social");
   const dayLong = new Intl.DateTimeFormat(ctx.locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
   const message = ctx.feedback.error ? { tone: "rose", text: t("error") } : ctx.feedback.created !== null ? { tone: "emerald", text: t("created", { count: ctx.feedback.created }) } : ctx.feedback.saved || ctx.feedback.deleted ? { tone: "emerald", text: t("saved") } : null;
-  const tabs = ["vorlagen", "kampagnen"] as const;
+  const tabs = ["vorlagen", "kampagnen", "einstellungen"] as const;
   const tabHref = (tab: (typeof tabs)[number]) => teamraumHref("social", ctx.orgId, { reiter: tab });
 
   return (
@@ -64,6 +68,7 @@ export async function SocialCalendar({ ctx }: { ctx: SocialContext }) {
         ) : null}
       </div>
 
+      {ctx.reiter === "einstellungen" ? <ContentSettings orgId={ctx.orgId} items={ctx.content.items} defaults={ctx.content.defaults} members={ctx.content.members} canEdit={ctx.content.canPlan} feedback={ctx.content.feedback} /> : null}
       {ctx.reiter === "vorlagen" ? <PostTemplateCards orgId={ctx.orgId} month={ctx.month} templates={ctx.templates} canWrite={ctx.canWrite} editing={ctx.templateEdit} /> : null}
 
       {ctx.reiter === "kampagnen" ? (

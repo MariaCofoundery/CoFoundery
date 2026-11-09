@@ -43,6 +43,13 @@ export function useRailMode() {
   return { compact: !wide && !expanded, expanded, toggle };
 }
 
-/** Breite der Leiste ab 700 Pixel: schmal, bis die Breite reicht - oder bis jemand sie ausklappt. */
-export const railWidthClass = (expanded: boolean, fullWidth: string) =>
-  expanded ? `min-[700px]:${fullWidth}` : `min-[700px]:w-[72px] min-[1100px]:${fullWidth}`;
+/**
+ * Breite der Leiste ab 700 Pixel: schmal, bis die Breite reicht - oder bis jemand sie ausklappt. Die Klassen stehen als
+ * ganze Woerter da, weil Tailwind nur findet, was im Quelltext ausgeschrieben ist (ein zusammengesetzter Name wird nie erzeugt).
+ */
+const RAIL_WIDTHS = {
+  "w-[248px]": { expanded: "min-[700px]:w-[248px]", auto: "min-[700px]:w-[72px] min-[1100px]:w-[248px]" },
+  "w-[260px]": { expanded: "min-[700px]:w-[260px]", auto: "min-[700px]:w-[72px] min-[1100px]:w-[260px]" },
+} as const;
+
+export const railWidthClass = (expanded: boolean, fullWidth: keyof typeof RAIL_WIDTHS) => (expanded ? RAIL_WIDTHS[fullWidth].expanded : RAIL_WIDTHS[fullWidth].auto);

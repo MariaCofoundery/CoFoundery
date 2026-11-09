@@ -54,6 +54,8 @@ export type CalendarItem = {
   eventId: string | null;
   /** Wohin ein Klick fuehrt. */
   href: string;
+  /** Marke des Posts (Content-Planung): faerbt den Rand. */
+  brandId?: string | null;
 };
 
 type Hrefs = {
@@ -108,6 +110,7 @@ export function buildCalendarItems({
         warn: post.status !== "published" && !checkPostDay(post.plannedOn).ok,
         internal: false,
         eventId: post.eventId,
+        brandId: post.brandId,
         href: post.eventId ? hrefs.event(post.eventId) : hrefs.post(post),
       });
     }

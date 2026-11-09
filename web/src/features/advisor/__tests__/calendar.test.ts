@@ -27,7 +27,7 @@ const read = (path: string) => readFileSync(path, "utf8");
 const ORG = "5498b60c-508a-4da4-b31b-9422d64b2786";
 
 const event = (id: string, startsAt: string, patch: Partial<ProgramEvent> = {}): ProgramEvent => ({ eventId: id, title: `Termin ${id}`, kind: "education", startsAt, location: null, notes: null, todos: null, audience: "all", ...patch });
-const post = (id: string, plannedOn: string, patch: Partial<OrgPost> = {}): OrgPost => ({ id, title: `Post ${id}`, body: null, channels: ["linkedin"], plannedOn, plannedTime: "09:00", status: "idea", campaignId: null, eventId: null, assigneeUserId: null, createdByUserId: null, ...patch });
+const post = (id: string, plannedOn: string, patch: Partial<OrgPost> = {}): OrgPost => ({ id, title: `Post ${id}`, body: null, channels: ["linkedin"], plannedOn, plannedTime: "09:00", status: "idea", campaignId: null, eventId: null, assigneeUserId: null, createdByUserId: null, brandId: null, pillarId: null, formatId: null, materialUrl: null, approverUserId: null, openInfo: null, ...patch });
 const task = (id: string, dueOn: string | null, patch: Partial<OrgTask> = {}): OrgTask => ({ id, orgId: ORG, title: `Aufgabe ${id}`, details: null, status: "open", assigneeUserIds: [], dueOn, programId: null, eventId: null, pageId: null, visibility: "team", checklist: [], createdByUserId: null, createdAt: "", updatedAt: "", doneAt: null, ...patch });
 const hrefs = { event: (id: string) => `/e/${id}`, post: (p: OrgPost) => `/p/${p.id}`, task: (t: OrgTask) => `/t/${t.id}`, eco: "/events" };
 

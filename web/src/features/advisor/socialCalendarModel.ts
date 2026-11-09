@@ -12,7 +12,7 @@ import { parseEventList } from "@/features/advisor/eventListParser";
 
 export const CHANNELS = ["linkedin", "instagram", "facebook", "x", "tiktok", "youtube", "newsletter", "website", "other"] as const;
 export type Channel = (typeof CHANNELS)[number];
-export const POST_STATUSES = ["idea", "draft", "planned", "published"] as const;
+export const POST_STATUSES = ["idea", "draft", "review", "planned", "published"] as const;
 export type PostStatus = (typeof POST_STATUSES)[number];
 
 /** Farben je Kanal - Punkt, Leiste und Etikett. Ohne Prozentwerte, wie ueberall. */
@@ -40,7 +40,39 @@ export type OrgPost = {
   eventId: string | null;
   assigneeUserId: string | null;
   createdByUserId: string | null;
+  /** Content-Planung (20270411120000): Marke, Saeule, Format, Link zum Material, Freigabe durch, offene Informationen. */
+  brandId: string | null;
+  pillarId: string | null;
+  formatId: string | null;
+  materialUrl: string | null;
+  approverUserId: string | null;
+  openInfo: string | null;
 };
+
+export const CONTENT_KINDS = ["brand", "pillar", "format"] as const;
+export type ContentKind = (typeof CONTENT_KINDS)[number];
+/** Farben fuer Marken - feste Namen, die Darstellung steht hier und nirgends sonst. */
+export const BRAND_COLORS = ["violet", "sky", "amber", "emerald", "rose", "slate"] as const;
+export type BrandColor = (typeof BRAND_COLORS)[number];
+export const BRAND_COLOR_STYLE: Record<BrandColor, { hex: string; chip: string }> = {
+  violet: { hex: "#6D49E0", chip: "bg-violet-100 text-violet-900" },
+  sky: { hex: "#0A80B8", chip: "bg-sky-100 text-sky-900" },
+  amber: { hex: "#C27A00", chip: "bg-amber-100 text-amber-900" },
+  emerald: { hex: "#14683F", chip: "bg-emerald-100 text-emerald-900" },
+  rose: { hex: "#B42346", chip: "bg-rose-100 text-rose-900" },
+  slate: { hex: "#475569", chip: "bg-slate-200 text-slate-900" },
+};
+export const isBrandColor = (value: unknown): value is BrandColor => (BRAND_COLORS as readonly unknown[]).includes(value);
+export type ContentItem = { id: string; kind: ContentKind; name: string; color: BrandColor | null };
+export type ContentDefaults = {
+  brandId: string | null;
+  pillarId: string | null;
+  formatId: string | null;
+  channel: Channel | null;
+  approverUserId: string | null;
+  status: PostStatus | null;
+};
+export type PostTask = { taskId: string; title: string; status: string; dueOn: string | null };
 export type OrgCampaign = { id: string; name: string; startsOn: string | null; endsOn: string | null; notes: string | null };
 export type CalendarEvent = { eventId: string; title: string; startsAt: string };
 
@@ -60,6 +92,12 @@ export function postOf(row: Record<string, unknown>): OrgPost {
     eventId: (row.event_id as string | null) ?? null,
     assigneeUserId: (row.assignee_user_id as string | null) ?? null,
     createdByUserId: (row.created_by_user_id as string | null) ?? null,
+    brandId: (row.brand_id as string | null) ?? null,
+    pillarId: (row.pillar_id as string | null) ?? null,
+    formatId: (row.format_id as string | null) ?? null,
+    materialUrl: (row.material_url as string | null) ?? null,
+    approverUserId: (row.approver_user_id as string | null) ?? null,
+    openInfo: (row.open_info as string | null) ?? null,
   };
 }
 

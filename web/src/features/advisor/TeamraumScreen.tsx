@@ -11,7 +11,7 @@ import { getOrgNextCheckIns, getOrgPage, listOrgPages, listOrgPresence, listOrgT
 import { TeamraumPages } from "@/features/advisor/TeamraumPages";
 import { OrgChatList } from "@/features/advisor/OrgChatList";
 import { SocialCalendar } from "@/features/advisor/SocialCalendar";
-import { listOrgCampaigns, listPostTemplates } from "@/features/advisor/socialCalendarData";
+import { getContentDefaults, listContentItems, listOrgCampaigns, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { addDays, monthOf } from "@/features/advisor/socialCalendarModel";
 import { listMyOrgChats, searchOrgChats } from "@/features/advisor/orgChatData";
 import { getMyQuietHours } from "@/features/notifications/QuietHoursSection";
@@ -86,7 +86,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
     if (section === "social") {
       // Seit dem 06.11.2026 gibt es nur noch einen Kalender (Posts sind dort eine Ebene). Hier bleiben Vorlagen und
       // Kampagnen; alte Adressen des Social-Kalenders (Posts, "+ Post", Monat) fuehren in den Kalender.
-      if (query.reiter !== "vorlagen" && query.reiter !== "kampagnen") {
+      if (query.reiter !== "vorlagen" && query.reiter !== "kampagnen" && query.reiter !== "einstellungen") {
         redirect(
           calendarHref(org.id, {
             monat: /^\d{4}-\d{2}$/.test(query.month ?? "") ? query.month : null,
@@ -102,6 +102,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
       const month = monthOf(query.month, today);
       const campaigns = await listOrgCampaigns(client, org.id);
       const templates = await listPostTemplates(client, org.id);
+      const [contentItems, contentDefaults] = await Promise.all([listContentItems(client, org.id), getContentDefaults(client, org.id)]);
       return (
         <SocialCalendar
           ctx={{
@@ -114,7 +115,14 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
             events: planEvents.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt })),
             campaigns,
             templates,
-            reiter: query.reiter === "kampagnen" ? "kampagnen" : "vorlagen",
+            reiter: query.reiter === "kampagnen" ? "kampagnen" : query.reiter === "einstellungen" ? "einstellungen" : "vorlagen",
+            content: {
+              items: contentItems,
+              defaults: contentDefaults,
+              members: activeMembers.map((member) => ({ userId: member.userId, name: member.displayName ?? unnamed })),
+              canPlan: org.rights.plan && org.status === "active",
+              feedback: { error: query.contentError === "1", saved: query.contentSaved === "1" },
+            },
             templateEdit: query.vorlage === "neu" ? "neu" : UUID.test(query.vorlage ?? "") ? (query.vorlage as string) : null,
             feedback: { error: query.socialError === "1", saved: query.socialSaved === "1", deleted: query.socialDeleted === "1", created: /^\d{1,2}$/.test(query.socialCreated ?? "") ? Number(query.socialCreated) : null },
           }}
