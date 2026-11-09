@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FeedbackMoment } from "@/features/feedback/FeedbackMoment";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
@@ -165,7 +166,11 @@ export default async function Page({
             </Link>
           </section>
         ) : (
-          <TeamWorkstyleReport locale={locale} team={team} canDiscuss={Boolean(membership)} full={full} />
+          <>
+            <TeamWorkstyleReport locale={locale} team={team} canDiscuss={Boolean(membership)} full={full} />
+            {/* Schneller Moment: nach dem Teamvergleich - nur fuer Mitglieder, einmal je Konto. */}
+            {membership ? <FeedbackMoment moment="team_workstyle" /> : null}
+          </>
         )}
       </div>
     </main>

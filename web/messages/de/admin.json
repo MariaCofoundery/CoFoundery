@@ -50,7 +50,22 @@
       "phone": "Handy"
     },
     "oldForm": "Frühere Fassung des Formulars",
-    "noMatch": "Dazu gibt es nichts. Wähle einen anderen Filter."
+    "noMatch": "Dazu gibt es nichts. Wähle einen anderen Filter.",
+    "moments": {
+      "title": "Schnelle Fragen",
+      "none": "Noch nicht beantwortet.",
+      "yes": "Ja",
+      "no": "Nicht so",
+      "more": "Mehr gesagt",
+      "dismissed": "Weggeklickt",
+      "names": {
+        "setup_done": "Nach dem Einrichten",
+        "workstyle_report": "Nach dem eigenen Arbeitsprofil",
+        "team_workstyle": "Nach dem Teamvergleich"
+      },
+      "note": "Nur Zähler, keine Namen. Wer mehr sagt, steht unten als normales Feedback."
+    },
+    "momentChip": "Anlass"
   },
   "overview": {
     "loadError": "Die Zahlen ließen sich gerade nicht laden.",

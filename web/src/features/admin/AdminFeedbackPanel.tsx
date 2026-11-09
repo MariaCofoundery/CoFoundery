@@ -9,11 +9,11 @@ export type AdminFeedbackRow = {
   id: string; created_at: string; source: "nav" | "workbook"; sender_name: string | null; account_since: string | null;
   q1: string | null; q2: string | null; q3: string | null; q4_choice: string | null; q4_other_text: string | null; q5: string | null; is_new: boolean;
   // Seit 09.11.2026 (Panel): eine Art mit Text, der Ort, optional die Wichtigkeit, die Erlaubnis zum Anschreiben.
-  kind: FeedbackKind | null; message: string | null; importance: "minor" | "important" | "very" | null;
+  moment: FeedbackMoment | null; kind: FeedbackKind | null; message: string | null; importance: "minor" | "important" | "very" | null;
   area: string | null; page_path: string | null; device: "desktop" | "phone" | null; may_contact: boolean; contact_email: string | null;
 };
 import { FEEDBACK_AREAS, FEEDBACK_KINDS, FEEDBACK_TABS as TABS, type FeedbackTab as Tab } from "@/features/admin/feedbackTab";
-import { feedbackPathIsLinkable, type FeedbackArea, type FeedbackKind } from "@/features/feedback/feedbackModel";
+import { FEEDBACK_MOMENTS, feedbackPathIsLinkable, type FeedbackArea, type FeedbackKind, type FeedbackMoment } from "@/features/feedback/feedbackModel";
 import { UserText } from "@/features/ui/UserText";
 export { parseFeedbackTab } from "@/features/admin/feedbackTab";
 const PAGE = 25;
@@ -25,13 +25,15 @@ const PAGE = 25;
  * kommen aus dem Kernprofil; der Feedback-Dialog sagt das vorher.
  */
 export async function AdminFeedbackPanel({ client, tab, selectedId, page, kind = null, area = null }: { client: SupabaseClient; tab: Tab; selectedId: string | null; page: number; kind?: FeedbackKind | null; area?: FeedbackArea | null }) {
-  const [t, tf, locale, counts, list] = await Promise.all([
+  const [t, tf, locale, counts, list, momentCounts] = await Promise.all([
     getTranslations("admin.feedback"),
     getTranslations("feedback"),
     getLocale(),
     client.rpc("admin_feedback_counts"),
     client.rpc("admin_list_feedback", { p_tab: tab, p_offset: page * PAGE, p_kind: kind, p_area: area }),
+    client.rpc("admin_feedback_moments"),
   ]);
+  const moments = (momentCounts.error ? {} : (momentCounts.data ?? {})) as Partial<Record<FeedbackMoment, { yes: number; no: number; more: number; dismissed: number }>>;
   const rows = ((list.data ?? []) as AdminFeedbackRow[]).slice(0, PAGE);
   const hasMore = ((list.data ?? []) as AdminFeedbackRow[]).length > PAGE;
   const c = (counts.data ?? { all: 0, new: 0 }) as { all: number; new: number };
@@ -67,6 +69,26 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page, kind =
           ))}
         </nav>
       </div>
+
+      {FEEDBACK_MOMENTS.some((entry) => moments[entry]) ? (
+        <div className="border-b border-[#e4e2f0] bg-[#faf9fe] px-5 py-3.5">
+          <h3 className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#5f5e7a]">{t("moments.title")}</h3>
+          <ul className="mt-2 grid gap-x-8 gap-y-1.5 text-[14px] text-slate-950 md:grid-cols-3">
+            {FEEDBACK_MOMENTS.map((entry) => {
+              const c = moments[entry];
+              return (
+                <li key={entry}>
+                  <span className="font-semibold">{t(`moments.names.${entry}`)}</span>
+                  <span className="block text-[13.5px] text-[#5f5e7a]">
+                    {c ? `${c.yes} ${t("moments.yes")} · ${c.no} ${t("moments.no")} · ${c.more} ${t("moments.more")} · ${c.dismissed} ${t("moments.dismissed")}` : t("moments.none")}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-1.5 text-[12.5px] text-[#5f5e7a]">{t("moments.note")}</p>
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 border-b border-[#e4e2f0] px-5 py-3">
         <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("filterKind")}>
@@ -138,6 +160,7 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page, kind =
                     {areaLabel(selected.area) ? <span className="rounded-full border border-[#dcdeec] bg-[#f4f5fb] px-2.5 py-0.5 text-[13px] font-semibold text-[#33325e]">{areaLabel(selected.area)}</span> : null}
                     {selected.importance ? <span className="rounded-full bg-[#FFF0D6] px-2.5 py-0.5 text-[13px] font-bold text-[#6B3900]">{t(`importance.${selected.importance}`)}</span> : null}
                     {selected.device ? <span className="rounded-full bg-[#f1f0f7] px-2.5 py-0.5 text-[13px] font-medium text-[#33325e]">{t(`device.${selected.device}`)}</span> : null}
+                    {selected.moment ? <span className="rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{t("momentChip")}: {t(`moments.names.${selected.moment}`)}</span> : null}
                   </div>
                   <div>
                     <p className="text-[13px] font-semibold text-[#5f5e7a]">{tf(`panel.kinds.${selected.kind}.question`)}</p>

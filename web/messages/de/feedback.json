@@ -116,5 +116,23 @@
     "teamraum_social": "Vorlagen & Kampagnen",
     "teamraum_pages": "Seiten",
     "teamraum_who": "Wer macht was"
+  },
+  "moment": {
+    "label": "Kurze Frage",
+    "subline": "Eine Zeile reicht – oder gar nichts.",
+    "yes": "Ja",
+    "no": "Nicht so",
+    "more": "Mehr sagen",
+    "moreAfter": "Mehr dazu sagen",
+    "dismiss": "Nicht fragen",
+    "close": "Schließen",
+    "thanks": "Danke.",
+    "thanksYes": "Das freut mich.",
+    "thanksNo": "Magst du kurz sagen, was gefehlt hat?",
+    "questions": {
+      "setup_done": "Hat dir das Einrichten geholfen?",
+      "workstyle_report": "War dein Arbeitsprofil hilfreich für dich?",
+      "team_workstyle": "War der Teamvergleich ein guter Anstoß für ein Gespräch?"
+    }
   }
 }

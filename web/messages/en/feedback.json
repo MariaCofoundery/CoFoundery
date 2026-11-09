@@ -116,5 +116,23 @@
     "teamraum_social": "Templates & campaigns",
     "teamraum_pages": "Pages",
     "teamraum_who": "Who does what"
+  },
+  "moment": {
+    "label": "Quick question",
+    "subline": "One line is enough – or nothing at all.",
+    "yes": "Yes",
+    "no": "Not really",
+    "more": "Say more",
+    "moreAfter": "Say more about it",
+    "dismiss": "Do not ask",
+    "close": "Close",
+    "thanks": "Thank you.",
+    "thanksYes": "I am glad.",
+    "thanksNo": "Would you like to say briefly what was missing?",
+    "questions": {
+      "setup_done": "Did the set-up help you?",
+      "workstyle_report": "Was your work profile helpful to you?",
+      "team_workstyle": "Was the team comparison a good start for a conversation?"
+    }
   }
 }

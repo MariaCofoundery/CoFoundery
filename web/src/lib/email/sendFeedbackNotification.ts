@@ -39,6 +39,7 @@ export function buildFeedbackNotificationPayload(params: Params) {
 }
 
 const KIND_LABEL: Record<SanitizedFeedback["kind"], string> = { help: "Das hat geholfen", unclear: "Das war unklar", bug: "Da ist ein Fehler", missing: "Das fehlt mir" };
+const MOMENT_LABEL: Record<NonNullable<SanitizedFeedback["moment"]>, string> = { setup_done: "nach dem Einrichten", workstyle_report: "nach dem eigenen Arbeitsprofil", team_workstyle: "nach dem Teamvergleich" };
 const IMPORTANCE_LABEL: Record<NonNullable<SanitizedFeedback["importance"]>, string> = { minor: "Nebensache", important: "Wichtig", very: "Sehr wichtig" };
 
 /** Neues Feedback (Panel, 09.11.2026): Art, Ort, Text. Keine E-Mail-Adresse - die steht nur im Admin-Bereich und nur mit Erlaubnis. */
@@ -48,6 +49,7 @@ export function buildPanelFeedbackNotificationPayload(params: SanitizedFeedback 
     "",
     `Bereich: ${params.area}`,
     ...(params.pagePath ? [`Seite: ${params.pagePath}`] : []),
+    ...(params.moment ? [`Anlass: ${MOMENT_LABEL[params.moment]}`] : []),
     ...(params.importance ? [`Wichtigkeit: ${IMPORTANCE_LABEL[params.importance]}`] : []),
     ...(params.device ? [`Gerät: ${params.device === "phone" ? "Handy" : "Computer"}`] : []),
     `Darf angeschrieben werden: ${params.mayContact ? "ja" : "nein"}`,

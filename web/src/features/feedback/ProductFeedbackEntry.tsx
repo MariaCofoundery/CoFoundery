@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
 import type { ProductFeedbackSource } from "@/features/feedback/productFeedback";
-import { FEEDBACK_IMPORTANCE, FEEDBACK_KINDS, feedbackContextOf, type FeedbackImportance, type FeedbackKind } from "@/features/feedback/feedbackModel";
+import { FEEDBACK_IMPORTANCE, FEEDBACK_KINDS, feedbackContextOf, type FeedbackImportance, type FeedbackKind, type FeedbackMoment } from "@/features/feedback/feedbackModel";
 import { submitFeedbackAction } from "@/features/feedback/actions";
 // Das Diktat lag hier zuerst und ist von hier nach @/features/dictation
 // gezogen, weil inzwischen mehrere Felder es brauchen.
@@ -76,18 +76,24 @@ export function ProductFeedbackEntry({
  * ein ausdrueckliches "darf angeschrieben werden". Am Computer ein Panel rechts - die Seite dahinter bleibt sichtbar
  * und bedienbar; auf dem Handy ein Blatt von unten. Der Ort kommt aus der Adresse (der Server bestimmt ihn noch einmal).
  */
-function ProductFeedbackDialog({
+export function ProductFeedbackDialog({
   source,
   invitationId,
   onClose,
+  initialKind = null,
+  moment = null,
 }: {
   source: ProductFeedbackSource;
   invitationId: string | null;
   onClose: () => void;
+  /** Aus einer kleinen Frage: "Ja" = hat geholfen, "Nicht so" = unklar. */
+  initialKind?: FeedbackKind | null;
+  /** Aus einer kleinen Frage: wozu das Feedback gehoert. */
+  moment?: FeedbackMoment | null;
 }) {
   const t = useTranslations("feedback");
   const pathname = usePathname();
-  const [kind, setKind] = useState<FeedbackKind | null>(null);
+  const [kind, setKind] = useState<FeedbackKind | null>(initialKind);
   const [message, setMessage] = useState("");
   const [importance, setImportance] = useState<FeedbackImportance | null>(null);
   const [mayContact, setMayContact] = useState(false);
@@ -143,6 +149,7 @@ function ProductFeedbackDialog({
         mayContact,
         pathname,
         device: compact ? "phone" : "desktop",
+        moment,
       });
       if (!result.ok) {
         setError(result.reason === "invalid_input" ? t("invalidError") : t("saveError"));

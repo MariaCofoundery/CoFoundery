@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendFeedbackNotification, sendPanelFeedbackNotification } from "@/lib/email/sendFeedbackNotification";
-import { sanitizeFeedbackSubmission, type FeedbackSubmissionInput } from "@/features/feedback/feedbackModel";
+import { feedbackMomentAnswerOf, feedbackMomentOf, sanitizeFeedbackSubmission, type FeedbackSubmissionInput } from "@/features/feedback/feedbackModel";
 import {
   sanitizeProductFeedbackSubmission,
   type ProductFeedbackSubmissionInput,
@@ -92,6 +92,7 @@ export async function submitFeedbackAction(input: FeedbackSubmissionInput): Prom
     page_path: value.pagePath,
     device: value.device,
     may_contact: value.mayContact,
+    moment: value.moment,
   });
   if (error) return { ok: false, reason: "insert_failed" };
 
@@ -103,4 +104,21 @@ export async function submitFeedbackAction(input: FeedbackSubmissionInput): Prom
     console.warn("[feedback] notification_not_sent", "unexpected_mail_error");
   }
   return { ok: true };
+}
+
+/**
+ * Schneller Moment: Ja / Nicht so / Mehr sagen / weggeklickt. Je Konto und Moment gilt die ERSTE Reaktion - danach wird
+ * nicht wieder gefragt. Nichts davon ist Pflicht, und die Antworten sind im Admin-Bereich nur Zaehler.
+ */
+export async function answerFeedbackMomentAction(moment: string, answer: string): Promise<{ ok: boolean }> {
+  const checkedMoment = feedbackMomentOf(moment);
+  const checkedAnswer = feedbackMomentAnswerOf(answer);
+  if (!checkedMoment || !checkedAnswer) return { ok: false };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+  const { error } = await supabase.rpc("answer_feedback_moment", { p_moment: checkedMoment, p_answer: checkedAnswer });
+  return { ok: !error };
 }

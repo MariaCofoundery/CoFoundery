@@ -13,6 +13,16 @@ export type FeedbackImportance = (typeof FEEDBACK_IMPORTANCE)[number];
 export const FEEDBACK_DEVICES = ["desktop", "phone"] as const;
 export type FeedbackDevice = (typeof FEEDBACK_DEVICES)[number];
 
+/** Die Schluesselmomente, nach denen eine kleine Frage im Fluss steht (je Konto hoechstens einmal). */
+export const FEEDBACK_MOMENTS = ["setup_done", "workstyle_report", "team_workstyle"] as const;
+export type FeedbackMoment = (typeof FEEDBACK_MOMENTS)[number];
+export const feedbackMomentOf = (value: unknown): FeedbackMoment | null => FEEDBACK_MOMENTS.find((entry) => entry === value) ?? null;
+
+/** Ja / Nicht so; "more" = gleich zu "Mehr sagen"; "dismissed" = weggeklickt. */
+export const FEEDBACK_MOMENT_ANSWERS = ["yes", "no", "more", "dismissed"] as const;
+export type FeedbackMomentAnswer = (typeof FEEDBACK_MOMENT_ANSWERS)[number];
+export const feedbackMomentAnswerOf = (value: unknown): FeedbackMomentAnswer | null => FEEDBACK_MOMENT_ANSWERS.find((entry) => entry === value) ?? null;
+
 export const FEEDBACK_LIMITS = { message: 4000, path: 300 } as const;
 
 export const feedbackKindOf = (value: unknown): FeedbackKind | null => FEEDBACK_KINDS.find((entry) => entry === value) ?? null;
@@ -140,6 +150,8 @@ export type FeedbackSubmissionInput = {
   mayContact?: boolean;
   pathname?: string | null;
   device?: string | null;
+  /** Wozu das Feedback gehoert, wenn es aus einer kleinen Frage kommt ('Mehr sagen'). */
+  moment?: string | null;
 };
 
 export type SanitizedFeedback = {
@@ -152,6 +164,7 @@ export type SanitizedFeedback = {
   area: string;
   pagePath: string | null;
   device: FeedbackDevice | null;
+  moment: FeedbackMoment | null;
 };
 
 export function sanitizeFeedbackSubmission(input: FeedbackSubmissionInput): { ok: true; value: SanitizedFeedback } | { ok: false; error: "invalid_kind" | "missing_message" } {
@@ -175,6 +188,7 @@ export function sanitizeFeedbackSubmission(input: FeedbackSubmissionInput): { ok
       area: feedbackAreaValue(feedbackContextOf(input.pathname ?? "")),
       pagePath: sanitizeFeedbackPath(input.pathname),
       device,
+      moment: feedbackMomentOf(input.moment),
     },
   };
 }

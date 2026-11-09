@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FeedbackMoment } from "@/features/feedback/FeedbackMoment";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import {
@@ -113,6 +114,8 @@ export default async function Page({
             </section>
           )}
           <IndividualWorkstyle locale={locale} profile={profile} full={full} />
+          {/* Schneller Moment: nach dem eigenen Bericht - einmal fragen, ob er geholfen hat. */}
+          {!older ? <FeedbackMoment moment="workstyle_report" /> : null}
           {!older && <section id="freigaben" aria-labelledby="ws-sharing-title" className="ws-no-print mt-10 scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
             <h2 id="ws-sharing-title" className="text-xl font-semibold text-slate-950">{t("sharing.title")}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{t("sharing.intro")}</p>

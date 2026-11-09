@@ -20,6 +20,7 @@ import { MyProgramTasks } from "@/features/advisor/MyProgramTasks";
 import { listMyProgramTasks } from "@/features/advisor/programTasksData";
 import { SetupCard, StartEvents, StartTiles, StartWeekBand, type StartEvent, type StartTile } from "@/features/advisor/StartOverview";
 import { loadSetup } from "@/features/advisor/setup/setupData";
+import { FeedbackMoment } from "@/features/feedback/FeedbackMoment";
 import { hasOrgFeature } from "@/features/advisor/orgFeatures";
 import { listOrgEventPosts } from "@/features/advisor/socialCalendarData";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
@@ -289,6 +290,8 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
           {setupOrg && setup && !setup.hidden && !setup.progress.complete && setup.progress.next ? (
             <SetupCard orgId={setupOrg.id} items={setup.progress.items} done={setup.progress.done} next={setup.progress.next} />
           ) : null}
+          {/* Schneller Moment: Das Einrichten ist fertig - einmal fragen, ob es geholfen hat. */}
+          {setupOrg && setup && setup.progress.complete ? <FeedbackMoment moment="setup_done" /> : null}
           <StartTiles tiles={startTiles} />
           <MyProgramTasks
             tasks={await listMyProgramTasks(client, user.id)}

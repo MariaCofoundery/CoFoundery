@@ -65,6 +65,7 @@ const EXPORTED_TABLES = [
   { table: "advisor_nav_prefs", column: "user_id" },
   { table: "founder_nav_prefs", column: "user_id" },
   { table: "research_consent_prompt_seen", column: "user_id" },
+  { table: "feedback_moments", column: "user_id" },
   { table: "team_program_tasks", column: "created_by_user_id" },
   { table: "team_program_task_comments", column: "author_user_id" },
   { table: "team_program_goals", column: "created_by_user_id" },

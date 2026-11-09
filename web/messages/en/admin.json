@@ -50,7 +50,22 @@
       "phone": "Phone"
     },
     "oldForm": "Earlier version of the form",
-    "noMatch": "Nothing here. Choose a different filter."
+    "noMatch": "Nothing here. Choose a different filter.",
+    "moments": {
+      "title": "Quick questions",
+      "none": "Not answered yet.",
+      "yes": "Yes",
+      "no": "Not really",
+      "more": "Said more",
+      "dismissed": "Dismissed",
+      "names": {
+        "setup_done": "After the set-up",
+        "workstyle_report": "After the own work profile",
+        "team_workstyle": "After the team comparison"
+      },
+      "note": "Counts only, no names. Whoever says more appears below as normal feedback."
+    },
+    "momentChip": "Occasion"
   },
   "overview": {
     "loadError": "The numbers could not be loaded just now.",
