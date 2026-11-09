@@ -9,6 +9,7 @@ import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectCardFlow } from "@/features/connect/ConnectCardFlow";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { ConsentSwitch } from "@/features/connect/ConsentSwitch";
 import { ConnectProfilePreview } from "@/features/connect/ConnectProfilePreview";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
@@ -193,41 +194,8 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         previewTitle: t("visibility.publicFields"), previewItems: t("visibility.profileFields"),
       }} />
       {profile?.visibility === "public" && profile.status === "active" ? <Link href={`/connect/p/${profile.public_slug}`} className="inline-flex min-h-11 items-center font-semibold text-violet-800 hover:underline">{t("visibility.openPublicPage")}</Link> : null}
-      <fieldset className="rounded-2xl border border-slate-200 p-4">
-        <legend className="px-1 text-sm font-medium">{t("profile.suggestableTitle")}</legend>
-        <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm">
-          <input
-            type="checkbox"
-            name="suggestable"
-            value="yes"
-            defaultChecked={profile?.suggestable ?? true}
-            className="mt-1 h-4 w-4 rounded border-slate-300"
-          />
-          <span>
-            <span className="block font-medium text-slate-900">{t("profile.suggestableLabel")}</span>
-            <span className="mt-1 block leading-6 text-slate-600">{t("profile.suggestableHint")}</span>
-          </span>
-        </label>
-        <p className="mt-3 text-xs leading-5 text-slate-500">{t("profile.suggestableOffHint")}</p>
-      </fieldset>
-
-      <fieldset className="rounded-2xl border border-slate-200 p-4">
-        <legend className="px-1 text-sm font-medium">{t("profile.highlightableTitle")}</legend>
-        <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm">
-          <input
-            type="checkbox"
-            name="highlightable"
-            value="yes"
-            defaultChecked={profile?.highlight_prompt_answered_at ? profile.highlightable : true}
-            className="mt-1 h-4 w-4 rounded border-slate-300"
-          />
-          <span>
-            <span className="block font-medium text-slate-900">{t("profile.highlightableLabel")}</span>
-            <span className="mt-1 block leading-6 text-slate-600">{t("profile.highlightableHint")}</span>
-          </span>
-        </label>
-        <p className="mt-3 text-xs leading-5 text-slate-500">{t("profile.highlightableOffHint")}</p>
-      </fieldset>
+      <ConsentSwitch name="suggestable" title={t("profile.suggestableLabel")} effect={t("profile.suggestableHint")} offEffect={t("profile.suggestableOffHint")} defaultChecked={profile?.suggestable ?? true} />
+      <ConsentSwitch name="highlightable" title={t("profile.highlightableLabel")} effect={t("profile.highlightableHint")} offEffect={t("profile.highlightableOffHint")} defaultChecked={profile?.highlight_prompt_answered_at ? profile.highlightable : true} />
 
       <p className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">
         {t("profile.membersOnlyNote")}
