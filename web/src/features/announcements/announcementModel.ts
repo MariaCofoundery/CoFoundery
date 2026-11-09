@@ -1,3 +1,4 @@
+import { berlinToIso } from "@/lib/berlinTime";
 /**
  * Mitteilungen der Plattform: was der Admin-Bereich annimmt.
  *
@@ -51,16 +52,24 @@ function text(value: FormDataEntryValue | null, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+/**
+ * "Zeigen ab" / "Zeigen bis" sind Tage in BERLINER Zeit (seit 20270409120000): ab 0 Uhr, bis 23:59:59 Berliner Zeit.
+ * Sommer- und Winterzeit rechnet die Zeitzone selbst um - keine feste Verschiebung.
+ */
 function dayStart(value: FormDataEntryValue | null): string | null | "invalid" {
   const raw = typeof value === "string" ? value.trim() : "";
   if (!raw) return null;
-  return /^\d{4}-\d{2}-\d{2}$/.test(raw) && !Number.isNaN(Date.parse(raw)) ? `${raw}T00:00:00.000Z` : "invalid";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || Number.isNaN(Date.parse(raw))) return "invalid";
+  return berlinToIso(raw, "00:00") ?? "invalid";
 }
 
 function dayEnd(value: FormDataEntryValue | null): string | null | "invalid" {
   const raw = typeof value === "string" ? value.trim() : "";
   if (!raw) return null;
-  return /^\d{4}-\d{2}-\d{2}$/.test(raw) && !Number.isNaN(Date.parse(raw)) ? `${raw}T23:59:59.000Z` : "invalid";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || Number.isNaN(Date.parse(raw))) return "invalid";
+  const minute = berlinToIso(raw, "23:59");
+  // 23:59 Berliner Zeit plus 59 Sekunden: das Ende des Tages.
+  return minute ? new Date(Date.parse(minute) + 59_000).toISOString() : "invalid";
 }
 
 export function parseAnnouncementForm(formData: FormData): { ok: true; value: AnnouncementInput } | { ok: false } {

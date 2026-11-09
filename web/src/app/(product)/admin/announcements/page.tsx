@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinDayOf } from "@/lib/berlinTime";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requirePlatformAdmin } from "@/features/moderation/access";
@@ -30,7 +31,7 @@ type Row = {
 
 const button = "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 disabled:opacity-50";
 const primary = "min-h-11 rounded-xl bg-slate-950 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50";
-const day = (value: string | null) => (value ? value.slice(0, 10) : "");
+const day = (value: string | null) => (value ? berlinDayOf(value) : "");
 
 export default async function AnnouncementsAdminPage({
   searchParams,
@@ -49,7 +50,7 @@ export default async function AnnouncementsAdminPage({
   const editing = rows.find((row) => row.id === editId) ?? null;
   const result = typeof params.result === "string" ? params.result : null;
   const groups = (["active", "draft", "archived"] as const).map((status) => ({ status, items: rows.filter((row) => row.status === status) }));
-  const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
+  const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "Europe/Berlin" });
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">

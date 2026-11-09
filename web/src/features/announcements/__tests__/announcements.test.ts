@@ -37,8 +37,9 @@ test("Zeitraum und Einmaligkeit", () => {
   assert.ok(ok.ok);
   if (ok.ok) {
     assert.equal(ok.value.showOnce, true);
-    assert.equal(ok.value.startsAt, "2026-11-01T00:00:00.000Z");
-    assert.equal(ok.value.endsAt, "2026-11-30T23:59:59.000Z");
+    // Berliner Zeit, Winter (UTC+1): 0 Uhr am 1.11. ist 23 Uhr am 31.10. UTC; 23:59:59 am 30.11. ist 22:59:59 UTC.
+    assert.equal(ok.value.startsAt, "2026-10-31T23:00:00.000Z");
+    assert.equal(ok.value.endsAt, "2026-11-30T22:59:59.000Z");
   }
   // Ohne Haken: wiederkehrend.
   const repeat = parseAnnouncementForm(form({ ...base }));
@@ -156,4 +157,27 @@ test("die Darstellung liegt in der Datenbank, mit Prüfung, und der Admin-Bereic
   assert.match(code("src/features/announcements/AnnouncementForm.tsx"), /name="display"/);
   const page = code("src/app/(product)/admin/announcements/page.tsx");
   assert.match(page, /<AnnouncementForm/);
+});
+
+test("Zeigen ab/bis: Tage in Berliner Zeit, Sommer- und Winterzeit stellen sich selbst um", () => {
+  // Sommer (UTC+2): 0 Uhr am 1.7. ist 22 Uhr am 30.6. UTC; 23:59:59 am 31.7. ist 21:59:59 UTC.
+  const summer = parseAnnouncementForm(form({ ...base, starts_on: "2026-07-01", ends_on: "2026-07-31" }));
+  assert.ok(summer.ok);
+  if (summer.ok) {
+    assert.equal(summer.value.startsAt, "2026-06-30T22:00:00.000Z");
+    assert.equal(summer.value.endsAt, "2026-07-31T21:59:59.000Z");
+  }
+  // Der Tag der Umstellung (Ende der Sommerzeit am 25.10.2026): ab 0 Uhr noch Sommerzeit, bis 23:59:59 schon Winterzeit.
+  const change = parseAnnouncementForm(form({ ...base, starts_on: "2026-10-25", ends_on: "2026-10-25" }));
+  assert.ok(change.ok);
+  if (change.ok) {
+    assert.equal(change.value.startsAt, "2026-10-24T22:00:00.000Z");
+    assert.equal(change.value.endsAt, "2026-10-25T22:59:59.000Z");
+  }
+  // Der Admin-Bereich zeigt und liest dieselben Tage in Berliner Zeit.
+  const page = code("src/app/(product)/admin/announcements/page.tsx");
+  assert.match(page, /berlinDayOf\(value\)/);
+  assert.match(page, /timeZone: "Europe\/Berlin"/);
+  const sql = readFileSync("../supabase/migrations/20270409120000_announcement_berlin_days.sql", "utf8");
+  assert.match(sql, /at time zone 'Europe\/Berlin'/);
 });
