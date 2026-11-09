@@ -24,8 +24,6 @@ export function announcementTeaser(body: string): { teaser: string; hasMore: boo
   return { teaser, hasMore: body.replace(/\s+/g, " ").trim().length > teaser.length };
 }
 
-export type AnnouncementStatus = "draft" | "active" | "archived";
-
 export type AnnouncementInput = {
   titleDe: string;
   bodyDe: string;

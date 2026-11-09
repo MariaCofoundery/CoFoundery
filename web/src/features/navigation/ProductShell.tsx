@@ -160,21 +160,6 @@ function isProfilePath(pathname: string) {
   return pathname.startsWith("/me/profile") || pathname === "/profile" || pathname.startsWith("/profile/");
 }
 
-function navLinkClassName(active: boolean) {
-  // Dieselbe Hervorhebung wie bei den Bereichen: "Ich bin hier" ist dieselbe
-  // Aussage, egal ob der Ort ein Bereich oder ein Querschnitt ist. Vorher trug
-  // Profil ein blasses Grau und war auf /profile praktisch nicht zu erkennen.
-  //
-  // Phase 11.7B: Werkzeuge sind leiser als Bereiche - kleinere Schrift,
-  // weniger Innenabstand -, damit die Leiste auch bei 1280 Pixeln in EINER
-  // Zeile bleibt und nicht als eigene dritte Reihe umbricht.
-  return `shrink-0 whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition ${
-    active
-      ? "brand-here font-semibold"
-      : "font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-  }`;
-}
-
 const MOBILE_MENU_ID = "product-mobile-menu";
 
 /**
@@ -387,11 +372,6 @@ export function ProductShell({
     hasAdvisor,
     stored: storedWorkContext,
   });
-  const advisorFallbackHref = "/advisor/begleitung";
-  const resolvedMatchingHref =
-    resolvedActiveView === "advisor"
-      ? navigationOverride?.matchingHref ?? advisorFallbackHref
-      : navigationOverride?.matchingHref ?? "/connections";
   const isConnectOnly = hasConnect && !hasFounder && !hasAdvisor;
   const isSuspendedConnectOnly = hasConnectAccount && !hasConnect && !hasFounder && !hasAdvisor;
   const dashboardHref = isConnectOnly

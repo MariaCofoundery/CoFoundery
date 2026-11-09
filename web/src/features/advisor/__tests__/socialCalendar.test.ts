@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { eventsWithoutPosts, explicitDays, monthGrid, shiftMonth, spreadDays, suggestCampaign, type OrgPost } from "@/features/advisor/socialCalendarModel";
+import { explicitDays, monthGrid, shiftMonth, spreadDays, suggestCampaign } from "@/features/advisor/socialCalendarModel";
 
 // Donnerstag, 5.11.2026
 const today = "2026-11-05";
@@ -15,11 +15,6 @@ test("Kalender: Monatsraster mit Montag zuerst, ganze Wochen, Monatswechsel", ()
   assert.equal(grid[grid.length - 1][6].day, "2026-12-06");
   assert.equal(shiftMonth("2026-12", 1), "2027-01");
   assert.equal(shiftMonth("2026-01", -1), "2025-12");
-});
-
-test("Kalender: Veranstaltungen ohne Posting, nur kuenftige", () => {
-  const post = { id: "p", title: "x", body: null, channels: [], plannedOn: "2026-11-09", plannedTime: null, status: "idea", campaignId: null, eventId: "kick", assigneeUserId: null, createdByUserId: null } satisfies OrgPost;
-  assert.deepEqual(eventsWithoutPosts(events, [post], today).map((event) => event.eventId), ["demo"]);
 });
 
 test("Planungshilfe: Kampagne mit genannten Tagen, Kanaelen, Uhrzeit und Themen", () => {

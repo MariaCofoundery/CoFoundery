@@ -830,7 +830,6 @@
       "groupLabels": "Betreuen | Inhalte für die Teams | Einrichten",
       "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
       "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
-      "orgSwitchLabel": "Organisation wählen",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
       "statTeams": "Teams im Programm",
@@ -1334,11 +1333,9 @@
       },
       "internalHint": "Die Teams im Programm sehen diesen Termin nicht – z. B. eine Jury-Sitzung.",
       "noTeams": "Noch kein Team im Programm.",
-      "participation": "Teilnahme",
       "mandatory": "Pflichttermin",
       "optional": "Freiwillig",
       "host": "Veranstaltet von",
-      "hostUs": "Uns",
       "hostPartner": "Partner / extern",
       "notes": "Hinweise für die Teams",
       "todos": "To-dos für die Teams",
@@ -1346,15 +1343,9 @@
       "internalNotePlaceholder": "z. B. Speaker-Honorar klären",
       "internalNoteHint": "Sehen nur Mitglieder eurer Organisation, nie die Teams.",
       "internalNoteShort": "Nur für euch",
-      "tasksTitle": "Aufgaben dazu",
-      "tasksText": "Landen im Teamraum, verknüpft mit diesem Termin.",
-      "tasksChecklist": "Checkliste „Event-Orga“ anlegen (Raum, Technik, Catering, Einladung)",
       "orgaTaskTitle": "Event-Orga: {title}",
       "orgaTaskChecklist": "Raum bestätigen | Technik prüfen | Catering anfragen | Einladung an die Teams | Speaker briefen",
-      "socialTitle": "Social Media",
-      "socialText": "Vorschläge für Postings erscheinen nach dem Speichern unter „Social Media zu euren Veranstaltungen“ – übernommen wird erst nach „passt“.",
       "publicTitle": "Öffentlich machen",
-      "publicCheck": "Auch im Event-Kalender für alle zeigen – nur Fakten und Link, nach unserer Freigabe",
       "publicUrl": "Link zur Anmeldung oder Info-Seite",
       "publicInternal": "Ein Termin nur für euer Team wird nicht öffentlich.",
       "publicStatus": {
@@ -1461,35 +1452,22 @@
     "fixtureAddress": "Beispielstraße 1, 12345 Beispielstadt",
     "tabToday": "Heute",
     "tabCards": "Teamkarten",
-    "tabPlan": "Programmplan",
     "fixtureOrg": "Gründercoaching Beispiel",
     "fixtureBatch": "Frühjahr",
     "fixtureTeamLumen": "Team Lumen",
     "fixtureTeamOrbit": "Team Orbit",
-    "fixtureRoom": "Raum 2",
-    "fixtureEvent1": "Workshop: Kundeninterviews",
-    "fixtureEvent1Notes": "Bitte je Team zwei Gesprächsleitfäden mitbringen.",
-    "fixtureEvent2": "Demo-Day",
-    "fixtureEvent2Todos": "Zehn Folien, fünf Minuten Redezeit.",
-    "fixtureEvent3": "Auftakt",
     "todayNote": "So sieht „Heute“ aus, wenn Teams im Programm sind. Jede Zeile führt zur passenden Seite.",
     "cardsNote": "So sehen die Teams im Programm aus. Die Sterne gehören jedem Team einzeln, die Karten sind nach Namen sortiert, nicht nach Sternen.",
-    "planNote": "So sieht der Programmplan mit Terminen und Teilnahme aus.",
     "fixtureMaterial1": "Pitch-Folien der Education-Tage",
     "tabGroup": "Gruppenauswertung",
     "groupNote": "Beispiel mit erfundenen Personen: So sähe eine Gruppenauswertung aus, nachdem alle Beteiligten zugestimmt haben. Die Rollenlage stammt aus den freigegebenen Fähigkeiten, die Selbstbilder aus dem alten Fragebogen mit Basis und Werten. Es gibt keine Bewertung. Darunter steht deine private Handakte.",
     "fixtureGroupNames": "Anna Beispiel | Ben Muster | Carla Probe | Dev Demo",
     "fixtureGroupNote": "Anna und Carla wollen beide die Kundengespräche führen. Beim nächsten Termin klären, wer das übernimmt und ob Carla eher Vertrieb will.",
     "fixtureGroupFollowUp": "Gespräch zu Kundengesprächen und Finanzierung führen",
-    "fixtureSpeaker1": "Dr. Lena Muster",
-    "fixtureSpeaker1Topic": "Finanzierung",
-    "fixtureSpeaker2": "Ben Beispiel",
-    "fixtureSpeaker2Topic": "Vertrieb",
     "fixtureMaterial1Note": "Stand der letzten Session",
     "fixtureMaterial2": "Aufzeichnungen der Workshops",
-    "fixturePerson1": "Mira",
-    "fixturePerson2": "Tom",
-    "fixturePerson3": "Aylin"
+    "tabMaterials": "Materialien",
+    "materialsNote": "So sieht die Materialsammlung für die Teams aus. Der Programmplan selbst ist der Kalender."
   },
   "myProgram": {
     "pageTitle": "Mein Programm",
@@ -1856,7 +1834,6 @@
     "screen": {
       "title": "Teamraum",
       "hint": "Nur für euch im Team, nie für die Startups.",
-      "orgSwitch": "Organisation wählen",
       "eyebrow": "{org} · nur für euch im Team",
       "eyebrowWeek": "{org} · {from}. – {to}",
       "sections": {
@@ -2074,20 +2051,6 @@
     "reactionCount": "{emoji} {count}"
   },
   "social": {
-    "title": "Social Media",
-    "text": "Was wann wo rausgeht – farbig je Kanal, mit den Veranstaltungen aus dem Programmplan daneben. Gepostet wird auf der Plattform selbst; hier plant ihr.",
-    "monthNav": "Monat wählen",
-    "prev": "Voriger Monat",
-    "next": "Nächster Monat",
-    "today": "Heute",
-    "filterLabel": "Kanäle zeigen",
-    "allChannels": "Alle",
-    "eventLegend": "Veranstaltung",
-    "addOn": "Posting am {day} anlegen",
-    "monthEmpty": "In diesem Monat ist noch nichts geplant.",
-    "uncoveredTitle": "Hierzu ist noch nichts geplant ({count})",
-    "uncoveredNone": "Alle anstehenden Veranstaltungen haben ein Posting.",
-    "planForEvent": "Posting planen",
     "campaignsTitle": "Kampagnen",
     "campaignsNone": "Noch keine Kampagne. Oben reinsprechen oder tippen.",
     "campaignDelete": "Löschen",
@@ -2113,8 +2076,6 @@
       "other": "Sonstiges"
     },
     "form": {
-      "new": "Neues Posting",
-      "close": "Schließen",
       "title": "Worum geht es",
       "titleForEvent": "Posting zu {event}",
       "channels": "Kanäle",
@@ -2147,15 +2108,7 @@
       "create": "{count, plural, one {Freigeben: ein Posting eintragen} other {Freigeben: # Postings eintragen}}",
       "discard": "Verwerfen"
     },
-    "viewLabel": "Ansicht",
-    "views": {
-      "month": "Monat",
-      "week": "Woche"
-    },
-    "weekLabel": "KW {number} · {from} – {to}",
-    "dragHint": "Postings auf einen anderen Tag ziehen, um sie zu verschieben.",
     "suggest": {
-      "intro": "Vorschläge nach eurer Vorlage – erst „übernehmen“ legt die Postings als Ideen an.",
       "defaultTemplate": "Standard: LinkedIn und Instagram eine Woche vorher",
       "labelBefore": "Ankündigung",
       "labelToday": "Heute",
@@ -2177,7 +2130,6 @@
     "templates": {
       "title": "Vorlagen für Postings zu Veranstaltungen ({count})",
       "text": "Eine Vorlage legt fest, wann vor oder nach einer Veranstaltung auf welchem Kanal etwas rausgeht – z. B. eine Woche vorher LinkedIn und Instagram, drei Tage vorher LinkedIn, einen Tag danach ein Rückblick.",
-      "none": "Noch keine eigene Vorlage – bis dahin gilt: LinkedIn und Instagram eine Woche vorher.",
       "edit": "Bearbeiten",
       "delete": "Löschen",
       "editing": "Vorlage bearbeiten",
@@ -2211,9 +2163,6 @@
       "kampagnen": "Kampagnen"
     },
     "addTemplate": "Vorlage",
-    "addPost": "Post",
-    "noPostsBanner": "{count, plural, one {Ein Termin hat noch keine Posts:} other {# Termine haben noch keine Posts:}}",
-    "noPostsAction": "Vorlage anwenden",
     "cards": {
       "default": "Standard",
       "summary": "{count, plural, one {Ein Post} other {# Posts}} · {channels}",
@@ -2324,10 +2273,6 @@
       "continue": "Weitermachen",
       "hide": "Einrichten ausblenden"
     },
-    "back": {
-      "text": "Du kommst aus „Los geht's“.",
-      "link": "Zurück zur Liste"
-    },
     "tips": {
       "counter": "Kurz erklärt · {step} von {total}",
       "next": "Weiter",
@@ -2397,7 +2342,6 @@
     "next": "Weiter",
     "addEvent": "Termin",
     "addMany": "Mehrere eintragen",
-    "orgSwitch": "Organisation wechseln",
     "layersLabel": "Zeigen:",
     "layers": {
       "program": "Programm-Termine",

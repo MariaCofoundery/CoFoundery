@@ -143,8 +143,11 @@ export const feedbackPathIsLinkable = (path: string | null) =>
    Die Eingabe
    --------------------------------------------------------------------------- */
 
+/** Woher das Feedback kommt: aus der Leiste oder aus dem (aelteren) Workbook. */
+export type ProductFeedbackSource = "nav" | "workbook";
+
 export type FeedbackSubmissionInput = {
-  source: "nav" | "workbook";
+  source: ProductFeedbackSource;
   invitationId?: string | null;
   kind: string;
   message: string;

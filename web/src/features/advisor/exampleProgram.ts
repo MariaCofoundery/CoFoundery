@@ -1,13 +1,8 @@
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
 import type {
   CheckIn,
-  EventAttendanceRow,
-  EventRsvp,
-  EventExpert,
   OrgProgramStars,
   OrgTeamProgram,
-  ProgramExpert,
-  ProgramEvent,
   OutcomeComment,
   ProgramMaterial,
   ProgramMilestone,
@@ -97,7 +92,7 @@ export function buildExampleProgram(t: Text) {
 
 const SELF_ID = "00000000-0000-4000-8000-000000000999";
 
-/** Die Organisation, die Teams und der Plan der Vorschau: drei erfundene Teams, alphabetisch, ohne Reihenfolge nach Sternen. */
+/** Die Organisation, die Teams und die Materialien der Vorschau: drei erfundene Teams, alphabetisch, ohne Reihenfolge nach Sternen. */
 export function buildExampleOrg(t: Text) {
   const org: AdvisorOrg = {
     id: "00000000-0000-4000-8000-000000000002",
@@ -145,35 +140,9 @@ export function buildExampleOrg(t: Text) {
     { programId: programs[0].programId, stars: 7, nextStars: 10, nextTitle: t("fixtureReward3") },
     { programId: programs[1].programId, stars: 4, nextStars: 6, nextTitle: t("fixtureReward2") },
   ];
-  const at = (days: number, hour: number) => {
-    const d = new Date(Date.now() + days * 86400000);
-    d.setHours(hour, 0, 0, 0);
-    return d.toISOString();
-  };
-  const events: ProgramEvent[] = [
-    { eventId: "00000000-0000-4000-8000-000000000401", title: t("fixtureEvent1"), kind: "education", startsAt: at(6, 10), location: t("fixtureRoom"), notes: t("fixtureEvent1Notes"), todos: null },
-    { eventId: "00000000-0000-4000-8000-000000000402", title: t("fixtureEvent2"), kind: "external", startsAt: at(20, 16), location: null, notes: null, todos: t("fixtureEvent2Todos") },
-    { eventId: "00000000-0000-4000-8000-000000000403", title: t("fixtureEvent3"), kind: "internal", startsAt: at(-10, 9), location: t("fixtureRoom"), notes: null, todos: null },
-  ];
-  const attendance: EventAttendanceRow[] = [
-    { programId: programs[0].programId, teamName: programs[0].teamName, status: "present" },
-    { programId: programs[1].programId, teamName: programs[1].teamName, status: null },
-  ];
-  const person = (n: number) => `00000000-0000-4000-8000-0000000007${String(n).padStart(2, "0")}`;
-  const rsvps: EventRsvp[] = [
-    { programId: programs[0].programId, userId: person(1), name: t("fixturePerson1"), response: "yes" },
-    { programId: programs[0].programId, userId: person(2), name: t("fixturePerson2"), response: "yes" },
-    { programId: programs[1].programId, userId: person(3), name: t("fixturePerson3"), response: null },
-  ];
   const materials: ProgramMaterial[] = [
     { materialId: "00000000-0000-4000-8000-000000000501", title: t("fixtureMaterial1"), url: "https://example.org/programm/folien", note: t("fixtureMaterial1Note") },
     { materialId: "00000000-0000-4000-8000-000000000502", title: t("fixtureMaterial2"), url: "https://example.org/programm/aufzeichnungen", note: null },
   ];
-  const speaker = (n: number, name: string, topic: string): ProgramExpert => ({
-    expertId: `00000000-0000-4000-8000-0000000006${String(n).padStart(2, "0")}`,
-    name, topic, company: null, email: null, phone: null, website: null, offerLink: null, note: null, archived: false,
-  });
-  const choices = [speaker(1, t("fixtureSpeaker1"), t("fixtureSpeaker1Topic")), speaker(2, t("fixtureSpeaker2"), t("fixtureSpeaker2Topic"))];
-  const assigned: EventExpert[] = [{ eventId: events[0].eventId, expertId: choices[0].expertId, name: choices[0].name, topic: choices[0].topic, archived: false }];
-  return { org, members, programs, stars, events, attendance, rsvps, materials, speakers: { assigned, choices } };
+  return { org, members, programs, stars, materials };
 }

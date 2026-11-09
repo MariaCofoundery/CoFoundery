@@ -10,7 +10,6 @@ import { buildExampleGroup } from "@/features/advisor/exampleGroup";
 import { CapabilityTeamReadoutView } from "@/features/capability/CapabilityTeamReadoutView";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { OrgProgramMaterials } from "@/features/advisor/ProgramMaterials";
-import { OrgProgramPlan } from "@/features/advisor/OrgProgramPlan";
 import { OrgTeamProgramsSection } from "@/features/advisor/OrgTeamProgramsSection";
 import { TodayTiles, WaitingItems, type WaitingItem } from "@/features/advisor/TodayView";
 import { ProgramCheckIn } from "@/features/advisor/ProgramCheckIn";
@@ -25,7 +24,7 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { getRequestUser } from "@/lib/supabase/server";
 
-const TABS = ["today", "cards", "plan", "overview", "milestones", "updates", "outcomes", "team", "group"] as const;
+const TABS = ["today", "cards", "materials", "overview", "milestones", "updates", "outcomes", "team", "group"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -67,7 +66,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
   const labels: Record<Tab, string> = {
     today: t("tabToday"),
     cards: t("tabCards"),
-    plan: t("tabPlan"),
+    materials: t("tabMaterials"),
     overview: t("tabOverview"),
     milestones: t("tabMilestones"),
     updates: t("tabUpdates"),
@@ -83,7 +82,7 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
       <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <AdvisorPageHeader
           eyebrow={`${t("eyebrow")} · ${t("title")}`}
-          title={tab === "today" || tab === "cards" || tab === "plan" ? exampleOrg.org.name : tab === "group" ? exampleGroup.included.join(", ") : teamName}
+          title={tab === "today" || tab === "cards" || tab === "materials" ? exampleOrg.org.name : tab === "group" ? exampleGroup.included.join(", ") : teamName}
           text={t("sub")}
           action={<span className="inline-flex rounded-full bg-amber-300/20 px-3 py-1.5 text-xs font-semibold text-amber-100 ring-1 ring-amber-200/40">{t("badge")}</span>}
         >
@@ -122,10 +121,9 @@ export default async function AdvisorExamplePage({ searchParams }: { searchParam
               <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("cardsNote")}</p>
               <OrgTeamProgramsSection part="teams" org={exampleOrg.org} members={exampleOrg.members} programs={exampleOrg.programs} stars={exampleOrg.stars} invites={[]} freshToken={null} mailState={null} inviteError={null} codes={[]} codeError={null} />
             </div>
-          ) : tab === "plan" ? (
+          ) : tab === "materials" ? (
             <div className="grid gap-4">
-              <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("planNote")}</p>
-              <OrgProgramPlan orgId={exampleOrg.org.id} isOwner events={exampleOrg.events} openEventId={exampleOrg.events[0].eventId} exampleAttendance={exampleOrg.attendance} exampleRsvps={exampleOrg.rsvps} exampleSpeakers={exampleOrg.speakers} />
+              <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">{t("materialsNote")}</p>
               <OrgProgramMaterials orgId={exampleOrg.org.id} isOwner materials={exampleOrg.materials} />
             </div>
           ) : tab === "overview" ? (

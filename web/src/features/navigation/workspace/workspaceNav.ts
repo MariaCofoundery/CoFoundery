@@ -224,4 +224,3 @@ export const QUICK_CREATE = [
   { key: "post", href: `${CALENDAR_PATH}?neu=post` },
   { key: "message", href: `${TEAMRAUM_BASE}/chat` },
 ] as const;
-export type QuickCreateKey = (typeof QUICK_CREATE)[number]["key"];

@@ -1,42 +1,11 @@
 import { PRODUCT_NAME } from "@/features/brand";
 import "server-only";
 
-import { PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS, type SanitizedProductFeedbackSubmission } from "@/features/feedback/productFeedback";
 import type { SanitizedFeedback } from "@/features/feedback/feedbackModel";
-import feedbackCopy from "../../../messages/de/feedback.json";
 
-type Params = SanitizedProductFeedbackSubmission & { userId: string | null };
 type Result =
   | { ok: true }
   | { ok: false; error: "missing_feedback_notification_email" | "missing_resend_api_key" | "missing_resend_from_email" | "resend_request_failed" | "resend_unavailable" };
-
-/** Only the sanitized data already used by the feedback insert. No extra lookup. */
-export function buildFeedbackNotificationPayload(params: Params) {
-  const category = PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS.find((option) => option.value === params.q4Choice)?.label;
-  const text = [
-    "Neues Feedback",
-    "",
-    `Kontext: ${params.source === "workbook" ? "Workbook" : "Navigation"} (${params.source})`,
-    ...(params.invitationId ? [`Invitation-ID: ${params.invitationId}`] : []),
-    `Nutzer: ${params.userId || "anonym"}`,
-    ...(category ? [`Gewünschte Unterstützung: ${category}`] : []),
-    "",
-    "Feedback:",
-    feedbackCopy.questions.q1,
-    params.q1Value,
-    "",
-    feedbackCopy.questions.q2,
-    params.q2Value,
-    "",
-    feedbackCopy.questions.q3,
-    params.q3Value,
-    ...(params.q4OtherText ? ["", feedbackCopy.questions.q4Other, params.q4OtherText] : []),
-    ...(params.q5Text ? ["", feedbackCopy.questions.q5, params.q5Text] : []),
-  ].join("\n");
-
-  // Plain text avoids interpreting submitted content as HTML; no images or links.
-  return { subject: `Neues Feedback zu ${PRODUCT_NAME}`, text };
-}
 
 const KIND_LABEL: Record<SanitizedFeedback["kind"], string> = { help: "Das hat geholfen", unclear: "Das war unklar", bug: "Da ist ein Fehler", missing: "Das fehlt mir" };
 const MOMENT_LABEL: Record<NonNullable<SanitizedFeedback["moment"]>, string> = { setup_done: "nach dem Einrichten", workstyle_report: "nach dem eigenen Arbeitsprofil", team_workstyle: "nach dem Teamvergleich" };
@@ -88,10 +57,6 @@ async function deliver(payload: { subject: string; text: string }): Promise<Resu
   } catch {
     return { ok: false, error: "resend_unavailable" };
   }
-}
-
-export async function sendFeedbackNotification(params: Params): Promise<Result> {
-  return deliver(buildFeedbackNotificationPayload(params));
 }
 
 export async function sendPanelFeedbackNotification(params: SanitizedFeedback & { userId: string | null }): Promise<Result> {

@@ -308,7 +308,7 @@ test("Programmplan: Inhaber legt an, Inhaber und Bezugspersonen tragen ein, das 
   assert.match(sql, /team_program_contacts c where c\.program_id = p_program_id/);
   assert.match(sql, /delete_attendance_when_program_ends/);
   assert.match(sql, /get_my_program_events[\s\S]*team_program_is_active/);
-  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
+  const plan = readFileSync("src/features/advisor/calendar/EventPanel.tsx", "utf8");
   const mine = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
   assert.doesNotMatch(plan + mine, /score|rank|percent|compatib|ampel|traffic/i);
   // Das Team liest ueber die eigene Funktion, nie die Teilnahmeliste der Organisation.
@@ -405,8 +405,7 @@ test("Leere Bereiche zeigen den logischen naechsten Schritt statt nur einen Satz
   assert.match(programs, /<EmptyState/);
   assert.match(programs, /#org-invite-title/);
   assert.match(programs, /id="org-codes-title"/);
-  // Plan und Meilensteine oeffnen das Formular, solange noch nichts da ist.
-  assert.match(readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8"), /open=\{events\.length === 0\}/);
+  // Meilensteine oeffnen das Formular, solange noch nichts da ist.
   assert.match(readFileSync("src/features/advisor/ProgramMilestones.tsx", "utf8"), /open=\{milestones\.length === 0\}/);
 });
 
@@ -508,20 +507,19 @@ test("Mein Programm: ohne Organisation ein Einstieg mit einem Klick, bei allein 
   }
 });
 
-test("Beispiel-Vorschau: Heute, Teamkarten und Programmplan nutzen dieselben Bausteine, lesen nichts und sortieren nicht nach Sternen", () => {
+test("Beispiel-Vorschau: Heute, Teamkarten und Materialien nutzen dieselben Bausteine, lesen nichts und sortieren nicht nach Sternen", () => {
   const page = readFileSync("src/app/(product)/advisor/beispiel/page.tsx", "utf8");
-  assert.match(page, /const TABS = \["today", "cards", "plan", "overview"/);
+  assert.match(page, /const TABS = \["today", "cards", "materials", "overview"/);
+  // Nur das Aktuelle: der alte Programmplan-Reiter ist weg, der Plan ist der Kalender.
+  assert.doesNotMatch(page, /OrgProgramPlan|tabPlan/);
   assert.match(page, /<TodayTiles/);
   assert.match(page, /<WaitingItems/);
   assert.match(page, /<OrgTeamProgramsSection part="teams"/);
-  assert.match(page, /exampleAttendance=\{exampleOrg\.attendance\}/);
   assert.doesNotMatch(page, /createClient|\.rpc\(|\.from\(/);
   const dashboard = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   // Seit dem Entwurf vom 05.11.2026 fuehren vier Kacheln in die Bereiche (StartTiles); "Wartet auf dich" bleibt.
   assert.match(dashboard, /<StartTiles tiles=\{startTiles\} \/>/);
   assert.match(dashboard, /<WaitingItems/);
-  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
-  assert.match(plan, /exampleAttendance \?\? /);
   const fixtures = readFileSync("src/features/advisor/exampleProgram.ts", "utf8");
   // Die Teams stehen alphabetisch (Lumen, Nova, Orbit), nicht nach Sternen.
   assert.match(fixtures, /team\(1, t\("fixtureTeamLumen"\)[\s\S]*team\(2, t\("teamName"\)[\s\S]*team\(3, t\("fixtureTeamOrbit"\)/);
@@ -622,7 +620,7 @@ test("Speaker an Veranstaltungen: nur Inhaber ordnen zu, Teams sehen keine Namen
   assert.match(sql, /is_advisor_org_owner_of\(v_org\)/);
   assert.match(sql, /expert_not_in_org/);
   assert.match(sql, /on delete cascade/);
-  const plan = readFileSync("src/features/advisor/OrgProgramPlan.tsx", "utf8");
+  const plan = readFileSync("src/features/advisor/calendar/EventPanel.tsx", "utf8");
   assert.match(plan, /setEventExpertsAction/);
   assert.match(plan, /planSpeakersNote/);
   // Die Team-Seite und die Team-Funktion kennen keine Speaker.

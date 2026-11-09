@@ -21,9 +21,9 @@ test("Programmplan: Sammel-Eintrag schreibt erst nach Pruefung, jede Zeile ueber
   assert.match(list, /<form action=\{createProgramEventsAction\}/);
   const actions = read("src/features/advisor/teamProgramActions.ts");
   assert.match(actions, /export async function createProgramEventsAction[\s\S]*client\.rpc\("save_program_event"/);
-  const plan = read("src/features/advisor/OrgProgramPlan.tsx");
-  assert.match(plan, /<PlanEventList /);
-  assert.match(plan, /<EventFormats /);
+  // Der Sammel-Eintrag steht im Kalender (Liste, Panel) und im Einrichten; die Formate in der Ansicht "Formate".
+  assert.match(read("src/features/advisor/calendar/PlanView.tsx"), /<PlanEventList /);
+  assert.match(read("src/features/advisor/calendar/CalendarScreen.tsx"), /<EventFormats /);
   assert.match(read("src/app/(product)/advisor/organisation/page.tsx"), /<EventFormats orgId=\{org\.id\}[^>]*back="features"/);
 });
 
@@ -35,7 +35,6 @@ test("Social Media: Vorschlaege in eigenem Feld, gespeichert erst nach Uebernehm
   assert.match(suggestions, /check\.after/);
   const actions = read("src/features/advisor/socialCalendarActions.ts");
   assert.match(actions, /export async function createEventPostsAction[\s\S]*p_status: "idea"/);
-  assert.match(read("src/features/advisor/OrgProgramPlan.tsx"), /<EventPostSuggestions/);
   // Seit dem 05.11.2026 im Panel des Termins ("Vorlage anwenden"); die Vorlagen sind ein eigener Reiter im Social-Kalender.
   assert.match(read("src/features/advisor/calendar/EventPanel.tsx"), /<EventPostSuggestions[\s\S]*back="calendar"/);
   assert.match(read("src/features/advisor/SocialCalendar.tsx"), /<PostTemplateCards /);

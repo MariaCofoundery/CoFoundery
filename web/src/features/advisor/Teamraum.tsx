@@ -435,7 +435,7 @@ export type TaskView = (typeof TASK_VIEWS)[number];
 export const taskViewOf = (value: unknown): TaskView => ((TASK_VIEWS as readonly unknown[]).includes(value) ? (value as TaskView) : "board");
 
 /** Aufgaben als Liste: am Rechner eine Tabelle nach Faelligkeit, am Telefon nach Stand gruppiert zum Aufklappen. */
-async function TaskList({ ctx, tasks, filter, back, mobileOnly = false }: { ctx: TeamraumContext; tasks: OrgTask[]; filter: TaskFilter; back: Record<string, string>; mobileOnly?: boolean }) {
+async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: TeamraumContext; tasks: OrgTask[]; back: Record<string, string>; mobileOnly?: boolean }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf, peopleOf, programOf, href } = helpers(ctx);
   const open = tasks.filter((task) => task.status !== "done").sort(byDue);
@@ -763,12 +763,12 @@ export async function TeamraumBoard({
       ) : null}
 
       {view === "calendar" && options.viewChosen ? <TaskCalendar ctx={ctx} tasks={filtered} filter={filter} month={calendarMonth} /> : null}
-      {view === "list" && options.viewChosen ? <TaskList ctx={ctx} tasks={filtered} filter={filter} back={keep} /> : null}
+      {view === "list" && options.viewChosen ? <TaskList ctx={ctx} tasks={filtered} back={keep} /> : null}
       {view === "board" && options.viewChosen ? board : null}
       {!options.viewChosen ? (
         <>
           <div className="hidden md:block">{board}</div>
-          <TaskList ctx={ctx} tasks={filtered} filter={filter} back={keep} mobileOnly />
+          <TaskList ctx={ctx} tasks={filtered} back={keep} mobileOnly />
         </>
       ) : null}
 

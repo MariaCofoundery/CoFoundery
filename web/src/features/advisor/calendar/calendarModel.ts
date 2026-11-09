@@ -25,7 +25,6 @@ const TAB_PARAM: Record<PanelTab, string> = { social: "social", tasks: "aufgaben
 
 export const viewOf = (value: string | undefined): CalendarView => CALENDAR_VIEWS.find((view) => VIEW_PARAM[view] === value) ?? "month";
 export const viewParam = (view: CalendarView) => VIEW_PARAM[view];
-export const layerParam = (layer: CalendarLayer) => LAYER_PARAM[layer];
 export const tabOf = (value: string | undefined): PanelTab => PANEL_TABS.find((tab) => TAB_PARAM[tab] === value) ?? "social";
 export const tabParam = (tab: PanelTab) => TAB_PARAM[tab];
 

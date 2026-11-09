@@ -6,7 +6,8 @@ const source = (path: string) => readFileSync(path, "utf8");
 const sql = source("../supabase/migrations/20270307120000_program_event_rsvps.sql");
 const rsvp = source("src/features/advisor/ProgramEventRsvp.tsx");
 const teamPage = source("src/app/(product)/programm/page.tsx");
-const plan = source("src/features/advisor/OrgProgramPlan.tsx");
+// Die Organisation liest Zusagen im Kalender (Termin-Panel); die Daten holt der Kalender.
+const plan = source("src/features/advisor/calendar/CalendarScreen.tsx") + source("src/features/advisor/calendar/EventPanel.tsx");
 
 test("Zusagen: je Person, nur ja oder nein, nur vor Beginn, Tabelle geschlossen", () => {
   assert.match(sql, /primary key \(event_id, program_id, user_id\)/);

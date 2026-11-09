@@ -4,8 +4,7 @@ import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ReportActionButton } from "@/features/reporting/ReportActionButton";
-import type { ProductFeedbackSource } from "@/features/feedback/productFeedback";
-import { FEEDBACK_IMPORTANCE, FEEDBACK_KINDS, feedbackContextOf, type FeedbackImportance, type FeedbackKind, type FeedbackMoment } from "@/features/feedback/feedbackModel";
+import { FEEDBACK_IMPORTANCE, FEEDBACK_KINDS, feedbackContextOf, type FeedbackImportance, type FeedbackKind, type FeedbackMoment, type ProductFeedbackSource } from "@/features/feedback/feedbackModel";
 import { submitFeedbackAction } from "@/features/feedback/actions";
 // Das Diktat lag hier zuerst und ist von hier nach @/features/dictation
 // gezogen, weil inzwischen mehrere Felder es brauchen.

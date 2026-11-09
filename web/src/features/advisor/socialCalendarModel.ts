@@ -106,23 +106,6 @@ export function isoWeekNumber(iso: string) {
   return 1 + Math.round((Date.parse(`${thursday}T00:00:00Z`) - Date.parse(`${firstThursday}T00:00:00Z`)) / (7 * 86400000));
 }
 
-export function postsByDay(posts: OrgPost[]): Map<string, OrgPost[]> {
-  const map = new Map<string, OrgPost[]>();
-  for (const post of [...posts].sort((a, b) => (a.plannedTime ?? "99") < (b.plannedTime ?? "99") ? -1 : 1)) {
-    map.set(post.plannedOn, [...(map.get(post.plannedOn) ?? []), post]);
-  }
-  return map;
-}
-
-/** Veranstaltungen in den naechsten Tagen, zu denen noch kein Posting gehoert. */
-export function eventsWithoutPosts(events: CalendarEvent[], posts: OrgPost[], today: string, withinDays = 45): CalendarEvent[] {
-  const covered = new Set(posts.map((post) => post.eventId).filter(Boolean));
-  const horizon = addDays(today, withinDays);
-  return events
-    .filter((event) => event.startsAt.slice(0, 10) >= today && event.startsAt.slice(0, 10) <= horizon && !covered.has(event.eventId))
-    .sort((a, b) => (a.startsAt < b.startsAt ? -1 : 1));
-}
-
 // ---------------------------------------------------------------------------
 // Planungshilfe: "Ich will zum Demo Day eine Kampagne machen, fuenf Postings auf LinkedIn und Instagram ..."
 // ---------------------------------------------------------------------------

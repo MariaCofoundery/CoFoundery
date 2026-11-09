@@ -88,14 +88,6 @@ export async function savePostAction(formData: FormData) {
   finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: String(data ?? postId ?? ""), socialSaved: "1" }));
 }
 
-export async function setPostStatusAction(formData: FormData) {
-  const client = await requireUser(backTo(formData));
-  const postId = uuidOrNull(formData.get("postId"));
-  const status = formData.get("status");
-  const { error } = await client.rpc("move_org_post", { p_post_id: postId, p_planned_on: dateOrNull(formData.get("plannedOn")), p_status: isPostStatus(status) ? status : null });
-  finish(backTo(formData, { ...(postId ? { post: postId } : {}), ...(error ? { socialError: "1" } : {}) }));
-}
-
 export async function deletePostAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const { error } = await client.rpc("delete_org_post", { p_post_id: uuidOrNull(formData.get("postId")) });

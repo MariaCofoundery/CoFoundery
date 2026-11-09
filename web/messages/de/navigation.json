@@ -99,7 +99,6 @@
   "teamraumChatCount": "{count, plural, one {Eine ungelesene Nachricht} other {# ungelesene Nachrichten}}",
   "areaEvents": "Events",
   "workspace": {
-    "label": "Arbeitsbereich",
     "navLabel": "Stationen",
     "groups": {
       "work": "Arbeiten",
@@ -132,7 +131,6 @@
     "tabsLabel": "Reiter",
     "skip": "Zum Inhalt",
     "org": "Organisation",
-    "orgFallback": "Mein Programm",
     "search": {
       "open": "Suchen",
       "placeholder": "Bereiche und Aktionen suchen",
@@ -169,7 +167,6 @@
       }
     },
     "notifications": "Nachrichten und Hinweise",
-    "dateLabel": "Heute",
     "program": "Programm",
     "customize": "Seitenleiste anpassen"
   },
@@ -188,7 +185,6 @@
     "backFounder": "Zurück zu Start"
   },
   "founder": {
-    "label": "Navigation",
     "navLabel": "Bereiche",
     "skip": "Zum Inhalt",
     "tabsLabel": "Reiter",

@@ -830,7 +830,6 @@
       "groupLabels": "Care | Content for the teams | Set up",
       "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
       "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
-      "orgSwitchLabel": "Choose organization",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
       "statTeams": "Teams in the program",
@@ -1334,11 +1333,9 @@
       },
       "internalHint": "Teams in the program do not see this date – e.g. a jury meeting.",
       "noTeams": "No team in the program yet.",
-      "participation": "Attendance",
       "mandatory": "Mandatory",
       "optional": "Optional",
       "host": "Hosted by",
-      "hostUs": "Us",
       "hostPartner": "Partner / external",
       "notes": "Notes for the teams",
       "todos": "To-dos for the teams",
@@ -1346,15 +1343,9 @@
       "internalNotePlaceholder": "e.g. clarify the speaker fee",
       "internalNoteHint": "Only members of your organization see this, never the teams.",
       "internalNoteShort": "Only for you",
-      "tasksTitle": "Tasks for it",
-      "tasksText": "Go to the team space, linked to this date.",
-      "tasksChecklist": "Create the “event organization” checklist (room, tech, catering, invitation)",
       "orgaTaskTitle": "Event organization: {title}",
       "orgaTaskChecklist": "Confirm the room | Check the tech | Ask for catering | Invite the teams | Brief the speaker",
-      "socialTitle": "Social media",
-      "socialText": "Post suggestions appear after saving under “Social media for your events” – nothing is taken over until you say it fits.",
       "publicTitle": "Make public",
-      "publicCheck": "Also show in the event calendar for everyone – facts and a link only, after our approval",
       "publicUrl": "Link to registration or an info page",
       "publicInternal": "A date only for your team is not made public.",
       "publicStatus": {
@@ -1461,35 +1452,22 @@
     "fixtureAddress": "Example Street 1, 12345 Example City",
     "tabToday": "Today",
     "tabCards": "Team cards",
-    "tabPlan": "Program plan",
     "fixtureOrg": "Example Startup Coaching",
     "fixtureBatch": "Spring",
     "fixtureTeamLumen": "Team Lumen",
     "fixtureTeamOrbit": "Team Orbit",
-    "fixtureRoom": "Room 2",
-    "fixtureEvent1": "Workshop: customer interviews",
-    "fixtureEvent1Notes": "Please bring two interview guides per team.",
-    "fixtureEvent2": "Demo day",
-    "fixtureEvent2Todos": "Ten slides, five minutes of speaking time.",
-    "fixtureEvent3": "Kick-off",
     "todayNote": "This is what “Today” looks like once teams are in the program. Each row leads to the matching page.",
     "cardsNote": "This is what the teams in the program look like. The stars belong to each team on its own, and the cards are sorted by name, not by stars.",
-    "planNote": "This is what the program plan looks like with events and attendance.",
     "fixtureMaterial1": "Pitch slides from the education days",
     "tabGroup": "Group evaluation",
     "groupNote": "Example with invented people: this is what a group evaluation would look like once everyone has agreed. The role overview comes from the released capabilities, the self-images from the older questionnaire on basics and values. There is no rating. Below is your private notebook.",
     "fixtureGroupNames": "Anna Sample | Ben Example | Carla Trial | Dev Demo",
     "fixtureGroupNote": "Anna and Carla both want to lead customer conversations. Clarify at the next meeting who takes it on and whether Carla would rather do sales.",
     "fixtureGroupFollowUp": "Hold a conversation about customer conversations and funding",
-    "fixtureSpeaker1": "Dr. Lena Sample",
-    "fixtureSpeaker1Topic": "Funding",
-    "fixtureSpeaker2": "Ben Example",
-    "fixtureSpeaker2Topic": "Sales",
     "fixtureMaterial1Note": "As of the last session",
     "fixtureMaterial2": "Workshop recordings",
-    "fixturePerson1": "Mira",
-    "fixturePerson2": "Tom",
-    "fixturePerson3": "Aylin"
+    "tabMaterials": "Materials",
+    "materialsNote": "This is how the collection of materials for the teams looks. The programme plan itself is the calendar."
   },
   "myProgram": {
     "pageTitle": "My program",
@@ -1856,7 +1834,6 @@
     "screen": {
       "title": "Team space",
       "hint": "Only for your own team, never for the startups.",
-      "orgSwitch": "Choose organization",
       "eyebrow": "{org} · only for your own team",
       "eyebrowWeek": "{org} · {from} – {to}",
       "sections": {
@@ -2074,20 +2051,6 @@
     "reactionCount": "{emoji} {count}"
   },
   "social": {
-    "title": "Social media",
-    "text": "What goes out where and when – colored by channel, with the events from the program plan alongside. You post on the platform itself; here you plan.",
-    "monthNav": "Choose month",
-    "prev": "Previous month",
-    "next": "Next month",
-    "today": "Today",
-    "filterLabel": "Show channels",
-    "allChannels": "All",
-    "eventLegend": "Event",
-    "addOn": "Add a post on {day}",
-    "monthEmpty": "Nothing is planned this month yet.",
-    "uncoveredTitle": "Nothing planned for these yet ({count})",
-    "uncoveredNone": "All upcoming events have a post.",
-    "planForEvent": "Plan a post",
     "campaignsTitle": "Campaigns",
     "campaignsNone": "No campaign yet. Dictate or type one above.",
     "campaignDelete": "Delete",
@@ -2113,8 +2076,6 @@
       "other": "Other"
     },
     "form": {
-      "new": "New post",
-      "close": "Close",
       "title": "What it is about",
       "titleForEvent": "Post about {event}",
       "channels": "Channels",
@@ -2147,15 +2108,7 @@
       "create": "{count, plural, one {Approve: add one post} other {Approve: add # posts}}",
       "discard": "Discard"
     },
-    "viewLabel": "View",
-    "views": {
-      "month": "Month",
-      "week": "Week"
-    },
-    "weekLabel": "Week {number} · {from} – {to}",
-    "dragHint": "Drag posts to another day to move them.",
     "suggest": {
-      "intro": "Suggestions from your template – only “take over” creates the posts as ideas.",
       "defaultTemplate": "Default: LinkedIn and Instagram a week before",
       "labelBefore": "Announcement",
       "labelToday": "Today",
@@ -2177,7 +2130,6 @@
     "templates": {
       "title": "Templates for event posts ({count})",
       "text": "A template sets when, before or after an event, something goes out on which channel – e.g. a week before on LinkedIn and Instagram, three days before on LinkedIn, a day after a recap.",
-      "none": "No template of your own yet – until then: LinkedIn and Instagram a week before.",
       "edit": "Edit",
       "delete": "Delete",
       "editing": "Edit template",
@@ -2211,9 +2163,6 @@
       "kampagnen": "Campaigns"
     },
     "addTemplate": "Template",
-    "addPost": "Post",
-    "noPostsBanner": "{count, plural, one {One event has no posts yet:} other {# events have no posts yet:}}",
-    "noPostsAction": "Apply template",
     "cards": {
       "default": "Standard",
       "summary": "{count, plural, one {One post} other {# posts}} · {channels}",
@@ -2324,10 +2273,6 @@
       "continue": "Continue",
       "hide": "Hide setup"
     },
-    "back": {
-      "text": "You came from “Let's go”.",
-      "link": "Back to the list"
-    },
     "tips": {
       "counter": "In short · {step} of {total}",
       "next": "Next",
@@ -2397,7 +2342,6 @@
     "next": "Next",
     "addEvent": "Event",
     "addMany": "Add several",
-    "orgSwitch": "Switch organization",
     "layersLabel": "Show:",
     "layers": {
       "program": "Program events",

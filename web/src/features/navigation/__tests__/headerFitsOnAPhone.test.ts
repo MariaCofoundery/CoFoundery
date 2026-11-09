@@ -67,7 +67,7 @@ test("ein Eintrag rutscht ganz in die nächste Zeile, statt zu zerfallen", () =>
   // Ohne whitespace-nowrap quetscht Flex den Link, bis "Nachrichten" mitten
   // im Wort bricht. Ohne shrink-0 passiert dasselbe mit den Pillengruppen.
   const shell = codeOnly(SHELL);
-  for (const helper of ["areaLinkClassName", "navLinkClassName"]) {
+  for (const helper of ["areaLinkClassName"]) {
     const at = shell.indexOf(`function ${helper}(`);
     assert.ok(at > 0, `${helper} fehlt`);
     const body = shell.slice(at, shell.indexOf("}", shell.indexOf("return", at)));

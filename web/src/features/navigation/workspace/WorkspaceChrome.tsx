@@ -9,6 +9,7 @@ import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SetupBar } from "@/features/advisor/setup/SetupSessionClient";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
+  MOBILE_TAB_KEYS,
   QUICK_CREATE,
   applyNavPrefs,
   buildWorkspaceNav,
@@ -191,7 +192,7 @@ export function WorkspaceChrome({
     ) : null;
 
   const phoneTabs = hasOrg
-    ? all.filter((item) => ["home", "tasks", "calendar", "chat"].includes(item.key))
+    ? all.filter((item) => (MOBILE_TAB_KEYS as string[]).includes(item.key))
     : all.filter((item) => ["home", "follow", "events"].includes(item.key));
 
   const searchEntries = [

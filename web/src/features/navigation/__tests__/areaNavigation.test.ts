@@ -185,19 +185,8 @@ test("the connections are reachable near the top of the dashboard", () => {
 });
 
 
-test("auch Profil leuchtet auf, wenn man dort ist", () => {
-  // Maria am 18.09.2026: Der Reiter Profil war auf /profile praktisch nicht zu
-  // erkennen - er trug ein blasses Grau, waehrend die Bereiche den
-  // Markenverlauf tragen. "Ich bin hier" ist dieselbe Aussage, egal ob der Ort
-  // ein Bereich oder ein Querschnitt ist.
+test("das Profil steht im Menue hinter dem Bild, und der Ort wird vorgelesen", () => {
   const shell = readFileSync("src/features/navigation/ProductShell.tsx", "utf8");
-  const navLink = shell.slice(
-    shell.indexOf("function navLinkClassName"),
-    shell.indexOf("function ConnectAttentionBadge")
-  );
-  assert.match(navLink, /brand-here font-semibold/);
-  assert.doesNotMatch(navLink, /bg-slate-100 text-slate-950/);
-
   // Seit 30.10.2026 steht der Eintrag nicht mehr in der Leiste, sondern im Menue hinter dem Bild
   // und im Mobilmenue (dort wird der Ort weiterhin vorgelesen).
   assert.match(shell, /href="\/me\/profile"[\s\S]{0,120}active=\{isProfilePath\(pathname\)\}/);

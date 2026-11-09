@@ -4,19 +4,14 @@
   "workbookText": "Ich baue Made2Found gerade aktiv weiter - dein Feedback hilft mir extrem, das Tool wirklich besser zu machen.",
   "giveFeedback": "Feedback geben",
   "close": "Feedback schließen",
-  "dialogTitle": "Kurzer Produkt-Check",
-  "dialogText": "Ich freue mich wirklich über dein Feedback - vor allem, was dir geholfen hat, was unklar war und was noch fehlt.",
-  "requiredError": "Bitte beantworte zuerst die drei Fragen, die für mich besonders wichtig sind.",
   "invalidError": "Bitte prüfe deine Antworten noch einmal.",
   "saveError": "Das Feedback konnte gerade nicht gespeichert werden.",
-  "thanks": "Danke - das hilft mir wirklich weiter.",
   "done": "Schließen",
   "questions": {
     "q1": "1. Was war für dich der wertvollste Moment im Tool?",
     "q2": "2. Wo hat es sich nicht klar oder unnötig kompliziert angefühlt?",
     "q3": "3. Was müsste sich ändern, damit du sagen würdest: Das hat mir wirklich geholfen?",
     "q4": "4. Wobei würdest du dir noch mehr Unterstützung wünschen?",
-    "q4Other": "Was genau fehlt dir noch?",
     "q5": "5. Gibt es noch etwas, das du mir sagen möchtest?"
   },
   "assistance": {
@@ -27,10 +22,8 @@
     "konflikte_greifbarer_machen": "Konflikte greifbarer machen",
     "anderes": "Etwas anderes"
   },
-  "requiredHint": "Die ersten drei Fragen sind für mich besonders wichtig, alles andere ist optional.",
   "cancel": "Abbrechen",
   "saving": "Speichere...",
-  "submit": "Feedback senden",
   "nameNotice": "Dein Name wird mit dem Feedback gespeichert und nur von der Gründerin gelesen.",
   "panel": {
     "title": "Dein Feedback",
