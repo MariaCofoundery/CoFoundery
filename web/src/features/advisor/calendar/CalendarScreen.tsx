@@ -38,7 +38,7 @@ import { PostSheet } from "@/features/advisor/calendar/PostSheet";
 import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
 import { movePostToDayAction } from "@/features/advisor/socialCalendarActions";
 import { EventFormats } from "@/features/advisor/EventFormats";
-import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEvents, listProgramExperts } from "@/features/advisor/teamProgramData";
+import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEventsSplit, listProgramExperts } from "@/features/advisor/teamProgramData";
 import { listEventCountingRequirements } from "@/features/advisor/fundingData";
 import { getOrgPost, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { isoWeekNumber } from "@/features/advisor/socialCalendarModel";
@@ -125,10 +125,10 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const tab = tabOf(query.reiter);
   const range = visibleRange(view, month, week);
 
-  const [members, programs, events, formats, posts, eventPosts, templates, orgTasks, eco, requirements] = await Promise.all([
+  const [members, programs, eventSplit, formats, posts, eventPosts, templates, orgTasks, eco, requirements] = await Promise.all([
     getOrgMembers(client, org.id),
     getOrgTeamPrograms(client, org.id),
-    listProgramEvents(client, org.id),
+    listProgramEventsSplit(client, org.id),
     listEventFormats(client, org.id),
     view === "formats" || view === "plan" ? Promise.resolve([]) : listOrgPosts(client, org.id, range.from, range.to),
     listOrgEventPosts(client, org.id),
@@ -137,6 +137,9 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     hidden.has("eco") || view === "formats" || view === "plan" ? Promise.resolve([]) : listSavedEcoItems(client, user.id),
     hasOrgFeature(org, "funding") ? listEventCountingRequirements(client, org.id) : Promise.resolve([]),
   ]);
+  // Archivierte Termine stehen nicht im Raster und nicht in der Liste, nur im Archiv des Programmplans (und in den Auswertungen).
+  const events = eventSplit.active;
+  const archivedEvents = eventSplit.archived;
   const [openPost, campaigns] = await Promise.all([
     postId ? getOrgPost(client, org.id, postId) : Promise.resolve(null),
     sheet === "post" || sheet === "post-new" ? listOrgCampaigns(client, org.id) : Promise.resolve([]),
@@ -193,6 +196,10 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const planError = query.planError;
   const message = planError
     ? { tone: "rose" as const, text: planError === "audience" ? tp("event.errorAudience") : planError === "publicUrl" ? tp("event.errorPublicUrl") : tp("planError") }
+    : query.eventArchived === "1"
+      ? { tone: "emerald" as const, text: t("plan.archived") }
+      : query.eventRestored === "1"
+        ? { tone: "emerald" as const, text: t("plan.restored") }
     : /^\d{1,2}$/.test(query.planCreated ?? "")
       ? { tone: "emerald" as const, text: tp("bulk.created", { count: Number(query.planCreated) }) }
       : query.socialError === "1"
@@ -418,6 +425,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
               orgId={org.id}
               isOwner={isOwner}
               events={events}
+              archived={archivedEvents}
               postCounts={new Map(eventPosts.filter((post) => post.eventId).map((post) => [post.eventId as string, eventPosts.filter((other) => other.eventId === post.eventId).length]))}
               formats={formats}
               programs={programChoices}

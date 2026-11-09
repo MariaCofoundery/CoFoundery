@@ -325,6 +325,8 @@ export type ProgramEvent = {
   publicUrl?: string | null;
   /** Vorschlag im Event-Kalender: wartet, veroeffentlicht oder abgelehnt. */
   publicStatus?: "pending" | "published" | "rejected" | null;
+  /** Aus dem Plan genommen (20270407120000). Teilnahme und Zusagen bleiben, die Auswertungen zaehlen den Termin weiter. */
+  archivedAt?: string | null;
 };
 export type EventVenue = "onsite" | "online" | "hybrid";
 export type EventAudience = "all" | "selected" | "internal";
@@ -351,6 +353,7 @@ const eventOf = (row: Record<string, unknown>): ProgramEvent => ({
   internalNote: (row.internal_note as string | null) ?? null,
   publicUrl: (row.public_url as string | null) ?? null,
   publicStatus: row.public_status === "pending" || row.public_status === "published" || row.public_status === "rejected" ? row.public_status : null,
+  archivedAt: (row.archived_at as string | null) ?? null,
 });
 
 export type EventFormat = { formatId: string; label: string };
@@ -363,9 +366,16 @@ export async function listEventFormats(client: SupabaseClient, orgId: string): P
 }
 const statusOf = (value: unknown) => (value === "present" || value === "absent" || value === "excused" ? value : null);
 
+/** Die Termine im Plan - ohne die archivierten. */
 export async function listProgramEvents(client: SupabaseClient, orgId: string): Promise<ProgramEvent[]> {
+  return (await listProgramEventsSplit(client, orgId)).active;
+}
+
+/** Alle Termine der Organisation: die im Plan und die archivierten (juengste zuerst). */
+export async function listProgramEventsSplit(client: SupabaseClient, orgId: string): Promise<{ active: ProgramEvent[]; archived: ProgramEvent[] }> {
   const { data } = await client.rpc("list_program_events", { p_org_id: orgId });
-  return ((data ?? []) as Record<string, unknown>[]).map(eventOf);
+  const all = ((data ?? []) as Record<string, unknown>[]).map(eventOf);
+  return { active: all.filter((event) => !event.archivedAt), archived: all.filter((event) => event.archivedAt).sort((a, b) => (a.startsAt < b.startsAt ? 1 : -1)) };
 }
 
 export async function getEventAttendance(client: SupabaseClient, eventId: string): Promise<EventAttendanceRow[]> {

@@ -1045,7 +1045,6 @@
     "kindExternal": "External",
     "planSave": "Save",
     "planEdit": "Edit",
-    "planDelete": "Delete event",
     "planEmpty": "No events yet.",
     "planPast": "Past events",
     "planAttendance": "Enter attendance",
@@ -2411,7 +2410,10 @@
       "internalNote": "Internal note · only for you",
       "publicLabel": "Event calendar",
       "publicNot": "not public",
-      "addPost": "Post"
+      "addPost": "Post",
+      "archiveTitle": "Take out of the plan",
+      "archiveText": "The event disappears from the calendar, the plan and from the teams. Attendance and RSVPs are kept and still count in the report. You will find it in the archive under “Programme plan” and can restore it. A public suggestion in the event calendar is withdrawn.",
+      "archiveConfirm": "Yes, take it out of the plan"
     },
     "form": {
       "titlePlaceholder": "What is the event called?",
@@ -2441,7 +2443,12 @@
       "emptyTitle": "Enter all events",
       "posts": "{count, plural, one {1 post} other {# posts}}",
       "noPosts": "no posts yet",
-      "nothingAhead": "Nothing is coming up."
+      "nothingAhead": "Nothing is coming up.",
+      "archiveHeading": "Archive ({count})",
+      "archiveNote": "Archived events are frozen and still count in the report. The teams no longer see them.",
+      "restore": "Restore",
+      "archived": "The event is in the archive. Attendance and RSVPs are kept and the report still counts it.",
+      "restored": "The event is back in the plan."
     }
   },
   "people": {

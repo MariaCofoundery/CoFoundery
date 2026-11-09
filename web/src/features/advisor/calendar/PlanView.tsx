@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { PlanEventList } from "@/features/advisor/PlanEventList";
+import { restoreProgramEventAction } from "@/features/advisor/teamProgramActions";
+import { SubmitButton } from "@/features/ui/SubmitButton";
 import { calendarHref } from "@/features/advisor/calendar/calendarModel";
 import type { EventFormat, ProgramEvent } from "@/features/advisor/teamProgramData";
 import { berlinDayOf } from "@/lib/berlinTime";
@@ -14,6 +16,7 @@ export async function PlanView({
   orgId,
   isOwner,
   events,
+  archived,
   postCounts,
   formats,
   programs,
@@ -24,6 +27,8 @@ export async function PlanView({
   orgId: string;
   isOwner: boolean;
   events: ProgramEvent[];
+  /** Aus dem Plan genommen: eingefroren, zaehlen in den Auswertungen weiter, lassen sich wiederherstellen. */
+  archived: ProgramEvent[];
   postCounts: Map<string, number>;
   formats: EventFormat[];
   programs: { programId: string; name: string }[];
@@ -107,6 +112,29 @@ export async function PlanView({
         <details>
           <summary className="inline-flex min-h-11 cursor-pointer items-center text-[14px] font-semibold text-slate-700">{tp("planPast")} ({past.length})</summary>
           <ol className="mt-2 grid gap-2.5 opacity-80">{past.map(row)}</ol>
+        </details>
+      ) : null}
+      {archived.length > 0 ? (
+        <details className="rounded-[20px] border border-slate-200 bg-white p-4 sm:p-5">
+          <summary className="inline-flex min-h-11 cursor-pointer items-center text-[15px] font-bold text-slate-900">{t("archiveHeading", { count: archived.length })}</summary>
+          <p className="mt-1 max-w-2xl text-[13.5px] leading-6 text-slate-700">{t("archiveNote")}</p>
+          <ul className="mt-3 grid gap-2">
+            {archived.map((event) => (
+              <li key={event.eventId} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
+                <span className="min-w-0 flex-1 basis-56">
+                  <span className="block text-[14.5px] font-semibold text-slate-950">{event.title}</span>
+                  <span className="text-[13px] text-slate-700">{date.format(new Date(`${berlinDayOf(event.startsAt)}T00:00:00Z`))} · {clock.format(new Date(event.startsAt))}</span>
+                </span>
+                {isOwner ? (
+                  <form action={restoreProgramEventAction}>
+                    <input type="hidden" name="orgId" value={orgId} />
+                    <input type="hidden" name="eventId" value={event.eventId} />
+                    <SubmitButton label={t("restore")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50 disabled:opacity-60" />
+                  </form>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </details>
       ) : null}
     </section>

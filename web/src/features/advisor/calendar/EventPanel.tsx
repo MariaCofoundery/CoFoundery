@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { createEventChecklistAction, deleteProgramEventAction, setEventExpertsAction, setProgramAttendanceAction } from "@/features/advisor/teamProgramActions";
+import { archiveProgramEventAction, createEventChecklistAction, setEventExpertsAction, setProgramAttendanceAction } from "@/features/advisor/teamProgramActions";
 import type { EventAttendanceRow, EventExpert, EventRsvp, ProgramEvent, ProgramExpert } from "@/features/advisor/teamProgramData";
 import { EventPostSuggestions } from "@/features/advisor/EventPostSuggestions";
 import { PANEL_TABS, calendarHref, tabParam, type PanelTab } from "@/features/advisor/calendar/calendarModel";
@@ -325,11 +325,15 @@ export async function EventPanel({
               </details>
             ) : null}
             {isOwner ? (
-              <form action={deleteProgramEventAction} className="border-t border-slate-100 pt-2">
-                <input type="hidden" name="orgId" value={orgId} />
-                <input type="hidden" name="eventId" value={event.eventId} />
-                <SubmitButton label={tp("planDelete")} pendingLabel="…" className="inline-flex min-h-11 items-center text-sm font-semibold text-rose-700 underline-offset-4 hover:underline" />
-              </form>
+              <details className="border-t border-slate-100 pt-2">
+                <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-rose-700 underline-offset-4 hover:underline">{t("archiveTitle")}</summary>
+                <form action={archiveProgramEventAction} className="mt-2 grid gap-3 rounded-2xl border border-rose-200 bg-rose-50/60 p-4">
+                  <p className="text-[13.5px] leading-6 text-slate-800">{t("archiveText")}</p>
+                  <input type="hidden" name="orgId" value={orgId} />
+                  <input type="hidden" name="eventId" value={event.eventId} />
+                  <SubmitButton label={t("archiveConfirm")} pendingLabel="…" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-rose-700 px-4 text-sm font-semibold text-white hover:bg-rose-800 disabled:opacity-60" />
+                </form>
+              </details>
             ) : null}
           </>
         ) : null}

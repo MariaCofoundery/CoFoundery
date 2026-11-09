@@ -1045,7 +1045,6 @@
     "kindExternal": "Extern",
     "planSave": "Speichern",
     "planEdit": "Bearbeiten",
-    "planDelete": "Veranstaltung löschen",
     "planEmpty": "Noch keine Veranstaltungen.",
     "planPast": "Vergangene Veranstaltungen",
     "planAttendance": "Teilnahme eintragen",
@@ -2411,7 +2410,10 @@
       "internalNote": "Interne Notiz · nur für euch",
       "publicLabel": "Event-Kalender",
       "publicNot": "nicht öffentlich",
-      "addPost": "Post"
+      "addPost": "Post",
+      "archiveTitle": "Aus dem Plan nehmen",
+      "archiveText": "Der Termin verschwindet aus Kalender, Plan und bei den Teams. Teilnahme und Zusagen bleiben erhalten und zählen in der Auswertung weiter. Du findest ihn im Archiv unter „Programmplan“ und kannst ihn wiederherstellen. Ein öffentlicher Vorschlag im Event-Kalender wird zurückgenommen.",
+      "archiveConfirm": "Ja, aus dem Plan nehmen"
     },
     "form": {
       "titlePlaceholder": "Wie heißt der Termin?",
@@ -2441,7 +2443,12 @@
       "emptyTitle": "Alle Events eintragen",
       "posts": "{count, plural, one {1 Post} other {# Posts}}",
       "noPosts": "noch keine Posts",
-      "nothingAhead": "Es steht nichts mehr an."
+      "nothingAhead": "Es steht nichts mehr an.",
+      "archiveHeading": "Archiv ({count})",
+      "archiveNote": "Archivierte Termine sind eingefroren und zählen in der Auswertung weiter. Die Teams sehen sie nicht mehr.",
+      "restore": "Wiederherstellen",
+      "archived": "Der Termin ist im Archiv. Teilnahme und Zusagen bleiben, die Auswertung zählt ihn weiter.",
+      "restored": "Der Termin ist wieder im Plan."
     }
   },
   "people": {

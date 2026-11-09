@@ -592,13 +592,26 @@ export async function deleteEventFormatAction(formData: FormData) {
   redirect(formatsBack(orgId, formData));
 }
 
-export async function deleteProgramEventAction(formData: FormData) {
+/**
+ * Einen Termin aus dem Plan nehmen (archivieren, 20270407120000) - nicht loeschen: Teilnahme und Zusagen bleiben, und die
+ * Auswertungen zaehlen ihn weiter. Nur die Inhaberin; die Datenbank prueft das.
+ */
+export async function archiveProgramEventAction(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "");
   const client = await requireUser(orgPlanTab(orgId));
-  await client.rpc("delete_program_event", { p_event_id: String(formData.get("eventId") ?? "") });
+  const { error } = await client.rpc("archive_program_event", { p_event_id: String(formData.get("eventId") ?? "") });
   revalidatePath("/advisor/organisation");
   revalidatePath("/programm");
-  redirect(orgPlanTab(orgId));
+  redirect(orgPlanTab(orgId, error ? "&planError=1" : "&eventArchived=1&ansicht=plan"));
+}
+
+export async function restoreProgramEventAction(formData: FormData) {
+  const orgId = String(formData.get("orgId") ?? "");
+  const client = await requireUser(orgPlanTab(orgId));
+  const { error } = await client.rpc("restore_program_event", { p_event_id: String(formData.get("eventId") ?? "") });
+  revalidatePath("/advisor/organisation");
+  revalidatePath("/programm");
+  redirect(orgPlanTab(orgId, error ? "&planError=1" : "&eventRestored=1&ansicht=plan"));
 }
 
 /** Speaker einer Veranstaltung: nur der Inhaber; die Datenbank prueft das und verlangt Personen derselben Organisation. */
