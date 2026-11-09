@@ -2,6 +2,7 @@ import { PRODUCT_NAME } from "@/features/brand";
 import "server-only";
 
 import { PRODUCT_FEEDBACK_ASSISTANCE_OPTIONS, type SanitizedProductFeedbackSubmission } from "@/features/feedback/productFeedback";
+import type { SanitizedFeedback } from "@/features/feedback/feedbackModel";
 import feedbackCopy from "../../../messages/de/feedback.json";
 
 type Params = SanitizedProductFeedbackSubmission & { userId: string | null };
@@ -37,8 +38,29 @@ export function buildFeedbackNotificationPayload(params: Params) {
   return { subject: `Neues Feedback zu ${PRODUCT_NAME}`, text };
 }
 
+const KIND_LABEL: Record<SanitizedFeedback["kind"], string> = { help: "Das hat geholfen", unclear: "Das war unklar", bug: "Da ist ein Fehler", missing: "Das fehlt mir" };
+const IMPORTANCE_LABEL: Record<NonNullable<SanitizedFeedback["importance"]>, string> = { minor: "Nebensache", important: "Wichtig", very: "Sehr wichtig" };
+
+/** Neues Feedback (Panel, 09.11.2026): Art, Ort, Text. Keine E-Mail-Adresse - die steht nur im Admin-Bereich und nur mit Erlaubnis. */
+export function buildPanelFeedbackNotificationPayload(params: SanitizedFeedback & { userId: string | null }) {
+  const text = [
+    `Neues Feedback: ${KIND_LABEL[params.kind]}`,
+    "",
+    `Bereich: ${params.area}`,
+    ...(params.pagePath ? [`Seite: ${params.pagePath}`] : []),
+    ...(params.importance ? [`Wichtigkeit: ${IMPORTANCE_LABEL[params.importance]}`] : []),
+    ...(params.device ? [`Gerät: ${params.device === "phone" ? "Handy" : "Computer"}`] : []),
+    `Darf angeschrieben werden: ${params.mayContact ? "ja" : "nein"}`,
+    ...(params.invitationId ? [`Invitation-ID: ${params.invitationId}`] : []),
+    `Nutzer: ${params.userId || "anonym"}`,
+    "",
+    params.message,
+  ].join("\n");
+  return { subject: `Neues Feedback zu ${PRODUCT_NAME}: ${KIND_LABEL[params.kind]}`, text };
+}
+
 /** Same Resend REST/config pattern as the other lib/email/send* helpers. */
-export async function sendFeedbackNotification(params: Params): Promise<Result> {
+async function deliver(payload: { subject: string; text: string }): Promise<Result> {
   const recipient = process.env.FEEDBACK_NOTIFICATION_EMAIL?.trim();
   if (!recipient) return { ok: false, error: "missing_feedback_notification_email" };
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -56,7 +78,7 @@ export async function sendFeedbackNotification(params: Params): Promise<Result> 
         from: `${process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME} <${fromEmail}>`,
         to: [recipient],
         reply_to: process.env.RESEND_REPLY_TO_EMAIL?.trim() || undefined,
-        ...buildFeedbackNotificationPayload(params),
+        ...payload,
       }),
     });
     // Never return/log a provider response body containing submitted data.
@@ -64,4 +86,12 @@ export async function sendFeedbackNotification(params: Params): Promise<Result> 
   } catch {
     return { ok: false, error: "resend_unavailable" };
   }
+}
+
+export async function sendFeedbackNotification(params: Params): Promise<Result> {
+  return deliver(buildFeedbackNotificationPayload(params));
+}
+
+export async function sendPanelFeedbackNotification(params: SanitizedFeedback & { userId: string | null }): Promise<Result> {
+  return deliver(buildPanelFeedbackNotificationPayload(params));
 }

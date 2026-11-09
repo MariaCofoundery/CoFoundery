@@ -31,5 +31,90 @@
   "cancel": "Abbrechen",
   "saving": "Speichere...",
   "submit": "Feedback senden",
-  "nameNotice": "Dein Name wird mit dem Feedback gespeichert und nur von der Gründerin gelesen."
+  "nameNotice": "Dein Name wird mit dem Feedback gespeichert und nur von der Gründerin gelesen.",
+  "panel": {
+    "title": "Dein Feedback",
+    "subtitle": "Ein Satz reicht. Ich lese alles selbst.",
+    "context": "Du schreibst zu:",
+    "whatAbout": "Worum geht es?",
+    "genericQuestion": "Was möchtest du mir sagen?",
+    "genericHint": "Wähle oben, worum es geht – dann passt die Frage.",
+    "kinds": {
+      "help": {
+        "name": "Das hat geholfen",
+        "question": "Was hat dir hier geholfen?",
+        "placeholder": "z. B. die Übersicht, ein Satz, ein Schritt …",
+        "hint": "Das hilft mir zu sehen, was ich auf keinen Fall ändern darf."
+      },
+      "unclear": {
+        "name": "Das war unklar",
+        "question": "Wo hast du gestockt oder etwas nicht verstanden?",
+        "placeholder": "Ich habe erwartet … und gefunden …",
+        "hint": "Gern in deinen Worten: Was hast du erwartet, was hast du gefunden?"
+      },
+      "bug": {
+        "name": "Da ist ein Fehler",
+        "question": "Was wolltest du tun, und was ist passiert?",
+        "placeholder": "Ich habe auf … geklickt, und dann …",
+        "hint": "Wenn du kannst: Was hast du zuletzt angeklickt? Das spart mir die Suche."
+      },
+      "missing": {
+        "name": "Das fehlt mir",
+        "question": "Was fehlt dir hier, und wobei würde es dir helfen?",
+        "placeholder": "Ich würde gern … können, um …",
+        "hint": "Ein Beispiel aus deinem Alltag ist mehr wert als eine Funktionsliste."
+      }
+    },
+    "importance": "Wie wichtig ist dir das?",
+    "optional": "(freiwillig)",
+    "importanceLevels": {
+      "minor": "Nebensache",
+      "important": "Wichtig",
+      "very": "Sehr wichtig"
+    },
+    "contactTitle": "Du darfst mich dazu anschreiben.",
+    "contactText": "Nur für Rückfragen zu diesem Feedback. Ohne Haken lese ich nur.",
+    "send": "Senden",
+    "kindRequired": "Bitte wähle oben, worum es geht.",
+    "textRequired": "Bitte schreib kurz etwas dazu.",
+    "thanksTitle": "Danke, das ist angekommen.",
+    "thanksText": "Ich lese es persönlich. Wenn du „anschreiben“ erlaubt hast und ich etwas wissen möchte, melde ich mich bei dir.",
+    "writeMore": "Noch etwas schreiben"
+  },
+  "areas": {
+    "start": "Start",
+    "align": "Align",
+    "find": "Find",
+    "connect": "Connect",
+    "events": "Events",
+    "today": "Heute",
+    "teamraum": "Teamraum",
+    "calendar": "Kalender",
+    "program": "Programm",
+    "follow": "Begleitung",
+    "setup": "Einrichten",
+    "messages": "Nachrichten",
+    "account": "Account",
+    "other": "Diese Seite"
+  },
+  "subs": {
+    "align_profile": "Profil",
+    "align_team": "Team",
+    "align_questionnaires": "Fragebögen",
+    "find_discover": "Entdecken",
+    "find_intros": "Kennenlernen",
+    "find_profile": "Mein Find-Profil",
+    "connect_discover": "Entdecken",
+    "connect_people": "Menschen",
+    "connect_problems": "Probleme",
+    "connect_ventures": "Unternehmen & Projekte",
+    "connect_contacts": "Kontakte",
+    "connect_mine": "Mein Connect",
+    "teamraum_week": "Diese Woche",
+    "teamraum_tasks": "Aufgaben",
+    "teamraum_chat": "Chat",
+    "teamraum_social": "Vorlagen & Kampagnen",
+    "teamraum_pages": "Seiten",
+    "teamraum_who": "Wer macht was"
+  }
 }

@@ -30,7 +30,27 @@
       "all": "No feedback yet.",
       "read": "Nothing marked as read yet."
     },
-    "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear."
+    "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
+    "filterKind": "Type",
+    "filterArea": "Area",
+    "all": "All",
+    "mayContact": "May be written to",
+    "noContact": "Do not write",
+    "replyByMail": "Reply by email",
+    "mailSubject": "About your feedback",
+    "toPage": "Go to page",
+    "pagePath": "Page",
+    "importance": {
+      "minor": "Minor",
+      "important": "Important",
+      "very": "Very important"
+    },
+    "device": {
+      "desktop": "Computer",
+      "phone": "Phone"
+    },
+    "oldForm": "Earlier version of the form",
+    "noMatch": "Nothing here. Choose a different filter."
   },
   "overview": {
     "loadError": "The numbers could not be loaded just now.",

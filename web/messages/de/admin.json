@@ -30,7 +30,27 @@
       "all": "Noch kein Feedback.",
       "read": "Noch nichts als gelesen markiert."
     },
-    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie."
+    "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
+    "filterKind": "Art",
+    "filterArea": "Bereich",
+    "all": "Alle",
+    "mayContact": "Darf angeschrieben werden",
+    "noContact": "Nicht anschreiben",
+    "replyByMail": "Antwort per Mail",
+    "mailSubject": "Zu deinem Feedback",
+    "toPage": "Zur Seite",
+    "pagePath": "Seite",
+    "importance": {
+      "minor": "Nebensache",
+      "important": "Wichtig",
+      "very": "Sehr wichtig"
+    },
+    "device": {
+      "desktop": "Computer",
+      "phone": "Handy"
+    },
+    "oldForm": "Frühere Fassung des Formulars",
+    "noMatch": "Dazu gibt es nichts. Wähle einen anderen Filter."
   },
   "overview": {
     "loadError": "Die Zahlen ließen sich gerade nicht laden.",

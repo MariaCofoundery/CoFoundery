@@ -31,5 +31,90 @@
   "cancel": "Cancel",
   "saving": "Saving...",
   "submit": "Send feedback",
-  "nameNotice": "Your name is stored with the feedback and only read by the founder."
+  "nameNotice": "Your name is stored with the feedback and only read by the founder.",
+  "panel": {
+    "title": "Your feedback",
+    "subtitle": "One sentence is enough. I read everything myself.",
+    "context": "You are writing about:",
+    "whatAbout": "What is it about?",
+    "genericQuestion": "What would you like to tell me?",
+    "genericHint": "Choose above what it is about – then the question fits.",
+    "kinds": {
+      "help": {
+        "name": "This helped",
+        "question": "What helped you here?",
+        "placeholder": "e.g. the overview, a sentence, a step …",
+        "hint": "It shows me what I must not change."
+      },
+      "unclear": {
+        "name": "This was unclear",
+        "question": "Where did you get stuck or not understand something?",
+        "placeholder": "I expected … and found …",
+        "hint": "In your own words: what did you expect, what did you find?"
+      },
+      "bug": {
+        "name": "There is a bug",
+        "question": "What did you want to do, and what happened?",
+        "placeholder": "I clicked on … and then …",
+        "hint": "If you can: what did you click last? It saves me the search."
+      },
+      "missing": {
+        "name": "Something is missing",
+        "question": "What is missing here, and what would it help you with?",
+        "placeholder": "I would like to be able to … in order to …",
+        "hint": "An example from your day is worth more than a list of features."
+      }
+    },
+    "importance": "How important is this to you?",
+    "optional": "(optional)",
+    "importanceLevels": {
+      "minor": "Minor",
+      "important": "Important",
+      "very": "Very important"
+    },
+    "contactTitle": "You may write to me about this.",
+    "contactText": "Only for follow-up questions about this feedback. Without the tick I only read.",
+    "send": "Send",
+    "kindRequired": "Please choose above what it is about.",
+    "textRequired": "Please write a few words.",
+    "thanksTitle": "Thank you, it arrived.",
+    "thanksText": "I read it personally. If you allowed me to write to you and I want to know something, I will get in touch.",
+    "writeMore": "Write something else"
+  },
+  "areas": {
+    "start": "Start",
+    "align": "Align",
+    "find": "Find",
+    "connect": "Connect",
+    "events": "Events",
+    "today": "Today",
+    "teamraum": "Team room",
+    "calendar": "Calendar",
+    "program": "Programme",
+    "follow": "Support",
+    "setup": "Set-up",
+    "messages": "Messages",
+    "account": "Account",
+    "other": "This page"
+  },
+  "subs": {
+    "align_profile": "Profile",
+    "align_team": "Team",
+    "align_questionnaires": "Questionnaires",
+    "find_discover": "Discover",
+    "find_intros": "Getting to know",
+    "find_profile": "My Find profile",
+    "connect_discover": "Discover",
+    "connect_people": "People",
+    "connect_problems": "Problems",
+    "connect_ventures": "Ventures & projects",
+    "connect_contacts": "Contacts",
+    "connect_mine": "My Connect",
+    "teamraum_week": "This week",
+    "teamraum_tasks": "Tasks",
+    "teamraum_chat": "Chat",
+    "teamraum_social": "Templates & campaigns",
+    "teamraum_pages": "Pages",
+    "teamraum_who": "Who does what"
+  }
 }

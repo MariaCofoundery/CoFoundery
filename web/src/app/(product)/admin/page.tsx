@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AdminFeedbackPanel } from "@/features/admin/AdminFeedbackPanel";
-import { parseFeedbackTab } from "@/features/admin/feedbackTab";
+import { parseFeedbackArea, parseFeedbackKind, parseFeedbackTab } from "@/features/admin/feedbackTab";
 import { AdminOverview } from "@/features/admin/AdminOverview";
 import { AdminReminderCard } from "@/features/moderation/AdminReminderCard";
 import { requirePlatformAdmin } from "@/features/moderation/access";
@@ -19,6 +19,8 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Pr
   const client = await requirePlatformAdmin();
   const [t, params] = await Promise.all([getTranslations("admin"), searchParams]);
   const tab = parseFeedbackTab(typeof params.tab === "string" ? params.tab : undefined);
+  const kind = parseFeedbackKind(typeof params.kind === "string" ? params.kind : undefined);
+  const area = parseFeedbackArea(typeof params.area === "string" ? params.area : undefined);
   const selectedId = uuid(params.id) ? params.id : null;
   const page = typeof params.page === "string" && /^\d{1,3}$/.test(params.page) ? Number(params.page) : 0;
   return (
@@ -28,7 +30,7 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Pr
         <p className="mt-1.5 max-w-2xl text-base leading-7 text-[#5f5e7a]">{t("intro")}</p>
       </header>
       <AdminReminderCard />
-      <AdminFeedbackPanel client={client} tab={tab} selectedId={selectedId} page={page} />
+      <AdminFeedbackPanel client={client} tab={tab} selectedId={selectedId} page={page} kind={kind} area={area} />
       <AdminOverview client={client} />
     </main>
   );
