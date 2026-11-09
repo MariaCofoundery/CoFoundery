@@ -342,7 +342,7 @@
     "problemsTitle": "Was du geschildert hast",
     "problemsEmpty": "Du hast noch nichts geschildert.",
     "home": "Mein Connect",
-    "overview": "Übersicht",
+    "overview": "Beiträge",
     "profileTitle": "Dein Connect-Profil",
     "profileEmpty": "Du hast noch kein Connect-Profil. Erst damit können andere dich finden und du Beiträge einstellen.",
     "profileEdit": "Profil bearbeiten",
@@ -352,6 +352,14 @@
       "draft": "Entwurf – noch nicht für andere sichtbar",
       "active": "Veröffentlicht",
       "paused": "Pausiert – für andere nicht sichtbar"
+    },
+    "createShort": "+ Neuer Beitrag",
+    "more": "Mehr: pausieren, beenden, verlängern",
+    "todo": {
+      "title": "Noch offen im Profil",
+      "reach": "Wen du erreichst – ein, zwei Sätze",
+      "open": "Wofür du offen bist",
+      "note": "Kein Zwang: Dein Profil ist schon sichtbar. Das hilft nur beim Finden."
     }
   },
   "profile": {
@@ -436,6 +444,17 @@
       "rolesQ": "Wer bist du im Netzwerk?",
       "reachQ": "Wen kennst du?",
       "openQ": "Wofür bist du ansprechbar?"
+    },
+    "preview": {
+      "title": "So sehen andere dich",
+      "reach": "Wen du erreichst",
+      "open": "Offen für",
+      "empty": "noch leer",
+      "noteMembers": "Das siehst du hier so, wie angemeldete Mitglieder dich sehen. Der gespeicherte Stand; nach dem Speichern aktualisiert sich die Karte.",
+      "notePublic": "So sehen dich Mitglieder. Zusätzlich ist dein Profil öffentlich: Name, Foto und Kurzzeile sind auch ohne Anmeldung sichtbar. Der gespeicherte Stand."
+    },
+    "sections": {
+      "label": "Abschnitte des Profils"
     }
   },
   "safety": {

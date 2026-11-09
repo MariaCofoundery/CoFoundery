@@ -9,6 +9,7 @@ import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectCardFlow } from "@/features/connect/ConnectCardFlow";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { ConnectProfilePreview } from "@/features/connect/ConnectProfilePreview";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
 import { getOwnPersonResources } from "@/features/ai/personResources";
@@ -38,10 +39,16 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const [profile, params, resources, core, tCap] = await Promise.all([getOwnConnectProfile(client, user.id), searchParams, getOwnPersonResources(client), getPersonCore(client, user.id).catch(() => null), getTranslations("capability")]);
   // Name, Headline und Text ueber dich kommen aus dem Kernprofil, nicht aus diesem Formular.
   const identityGaps = getIdentityGaps(core);
+  const onePage = Boolean(profile);
+  const sectionDone = {
+    role: Boolean(profile?.network_roles?.length),
+    reach: Boolean(profile?.network_reach?.trim()),
+    open: Boolean(profile?.open_to_formats?.length),
+  };
   const continuation = params.next?.startsWith("/connect") && !params.next.includes("\\") && !params.next.startsWith("//") ? params.next : "";
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
-  return <main className="mx-auto max-w-4xl px-5 py-10">
+  return <main className={`mx-auto px-5 py-10 ${onePage ? "max-w-6xl" : "max-w-4xl"}`}>
     <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("mine.back")}</Link>
     <header className="brand-panel mt-3 rounded-[24px] p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -63,9 +70,22 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
     {/* Die Identitaet (Name, Headline, Bio, Ort, ...) steht einmal im Profil und ist hier direkt bearbeitbar -
         ausserhalb dieses Formulars, weil Formulare sich nicht verschachteln lassen. */}
     <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} />
-    <form action={saveConnectProfileAction} noValidate className="mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+    {/* Wer schon ein Profil hat, sieht alle Abschnitte auf einer Seite, mit Vorschau; der Assistent in Schritten bleibt dem ersten Anlegen. */}
+    <div className={onePage ? "mt-6 grid gap-6 lg:grid-cols-[170px_minmax(0,1fr)_300px]" : ""}>
+    {onePage ? (
+      <nav aria-label={t("profile.sections.label")} className="hidden flex-col gap-1 self-start lg:sticky lg:top-6 lg:flex">
+        {([["role", sectionDone.role], ["reach", sectionDone.reach], ["open", sectionDone.open], ["show", true]] as const).map(([id, done]) => (
+          <a key={id} href={`#abschnitt-${id}`} className="flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
+            <span aria-hidden="true" className={done ? "text-emerald-700" : "text-amber-700"}>{done ? "✓" : "○"}</span>
+            {t(`profile.flow.titles.${id}`)}
+          </a>
+        ))}
+      </nav>
+    ) : null}
+    <form action={saveConnectProfileAction} noValidate className={onePage ? "min-w-0 space-y-6" : "mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6"}>
       {continuation ? <input type="hidden" name="next" value={continuation} /> : null}
       <ConnectCardFlow
+        layout={onePage ? "page" : "steps"}
         initialStep={saved || errorKey ? 3 : 0}
         identityGaps={identityGaps}
         cards={[
@@ -238,6 +258,8 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         }}
       />
     </form>
+    {onePage && profile ? <ConnectProfilePreview profile={profile} /> : null}
+    </div>
 
     {/* Die Zugaenge stehen NEBEN dem Formular und nicht darin: Sie sind keine
         Angabe, die man abschickt, sondern eine Entscheidung je Vorschlag. */}

@@ -9,58 +9,108 @@ import { ConnectLifecycleForm } from "@/features/connect/ConnectLifecycleForm";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_ERROR_KEYS, CONNECT_LIFECYCLE_KEYS } from "@/features/connect/connectFeedbackKeys";
 
+const GROUPS = ["active", "paused", "draft", "completed"] as const;
+type Group = (typeof GROUPS)[number];
+
+/**
+ * Mein Connect (Entwurf 09.11.2026): links das Profil - was andere von dir sehen und was noch offen ist -, rechts die
+ * eigenen Beitraege mit Filter nach Zustand. Leere Zustaende sind ausgegraut statt eine Ueberschrift mit "Keine".
+ * Probleme, Ventures und Suchen stehen in der Unterleiste (`ConnectMyNavigation`), jede mit eigener Adresse.
+ */
 export default async function MyConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/my");
   const [listings, problems, profile, params] = await Promise.all([getOwnConnectListings(client, user.id), getOwnConnectProblems(client, user.id), getOwnConnectProfile(client, user.id), searchParams]);
-  const groups = ["active", "paused", "draft", "completed"] as const;
-  return <main className="mx-auto max-w-5xl px-5 py-10">
+  const now = new Date();
+  const expired = (listing: (typeof listings)[number]) => listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= now);
+  const groupOf = (listing: (typeof listings)[number]): Group => (listing.status === "completed" || expired(listing) ? "completed" : (listing.status as Group));
+  const counts = Object.fromEntries(GROUPS.map((group) => [group, listings.filter((listing) => groupOf(listing) === group).length])) as Record<Group, number>;
+  // Voreingestellt: "Aktiv"; hat man nichts Aktives, der erste Zustand mit Eintraegen.
+  const requested = GROUPS.find((group) => group === params.status);
+  const current: Group = requested ?? (counts.active > 0 ? "active" : GROUPS.find((group) => counts[group] > 0) ?? "active");
+  const rows = listings.filter((listing) => groupOf(listing) === current);
+  const open = profile ? [
+    !profile.network_reach?.trim() ? t("my.todo.reach") : null,
+    !profile.open_to_formats?.length ? t("my.todo.open") : null,
+  ].filter(Boolean) as string[] : [];
+  const here = (status: Group) => `/connect/my?status=${status}`;
+  return <main className="mx-auto max-w-6xl px-5 py-8">
     <Link href="/connect" className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("navigation.overview")}</Link>
-    <header className="brand-panel flex flex-wrap items-end justify-between gap-4 rounded-[28px] p-6 sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">{t("eyebrow")}</p><h1 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{t("my.home")}</h1></div><Link href="/connect/listings/new" className="inline-flex min-h-11 items-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-violet-800">{t("my.create")}</Link></header>
-    {/* Die Startseite von Mein Connect beginnt mit dem Profil - dem, was andere
-        von dir sehen - und nicht mit der Liste der Beitraege. */}
-    <section aria-labelledby="my-profile-title" className="mt-5 flex flex-wrap items-center gap-4 rounded-3xl border border-violet-100 bg-white p-5 shadow-sm">
-      {profile ? <ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" /> : null}
-      <div className="min-w-0 flex-1">
-        <h2 id="my-profile-title" className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("my.profileTitle")}</h2>
-        {profile ? <>
-          <p className="mt-1 font-semibold text-slate-900">{profile.display_name}</p>
-          <p className="text-sm text-slate-600">{profile.headline}</p>
-          <p className="mt-1 text-xs text-slate-500">{t(`my.profileStatus.${profile.status}`)}</p>
-        </> : <p className="mt-1 text-sm text-slate-700">{t("my.profileEmpty")}</p>}
-      </div>
-      <Link href="/connect/profile" className="inline-flex min-h-11 items-center rounded-xl border border-violet-200 px-4 text-sm font-semibold text-violet-800 hover:bg-violet-50">{profile ? t("my.profileEdit") : t("my.profileCreate")}</Link>
-    </section>
+    <header className="flex flex-wrap items-center justify-between gap-4">
+      <h1 className="font-brand text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">{t("my.home")}</h1>
+      <Link href="/connect/listings/new" className="inline-flex min-h-11 items-center rounded-xl bg-[#6D49E0] px-5 py-3 text-sm font-semibold text-white">{t("my.createShort")}</Link>
+    </header>
     {knownKey(params.changed, CONNECT_LIFECYCLE_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.lifecycle.${knownKey(params.changed, CONNECT_LIFECYCLE_KEYS)}`)}</p> : null}
     {knownKey(params.error, CONNECT_ERROR_KEYS) ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${knownKey(params.error, CONNECT_ERROR_KEYS)}`)}</p> : null}
     {params.error === "publish_profile" ? <Link href="/connect/profile" className="inline-flex min-h-11 items-center underline">{t("actions.profile")}</Link> : null}
-    <h2 className="mt-10 text-xl font-semibold">{t("my.listingsTitle")}</h2>
-    {groups.map((status) => {
-      const rows = listings.filter((listing) => status === "completed"
-        ? listing.status === "completed" || (listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()))
-        : listing.status === status && !(status === "active" && listing.expires_at && new Date(listing.expires_at) <= new Date()));
-      return <section key={status} className="mt-8"><h2 className="text-lg font-semibold">{t(`statuses.${status}`)}</h2>{rows.length ? <div className="mt-3 space-y-3">{rows.map((listing) => { const expired = listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= new Date()); return <article key={listing.id} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p><h3 className="mt-2 font-semibold">{listing.title || t("my.untitled")}</h3>
-          {/* Wann laeuft sie aus? Ohne diese Angabe kann niemand rechtzeitig
-              verlaengern - und der Ablauf nach 60 Tagen war genau dafuer
-              gedacht, nicht zum Verschwindenlassen. */}
-          {!expired && listing.status === "active" ? (() => {
-            const daysLeft = getConnectListingDaysLeft(listing.expires_at);
-            if (daysLeft === null) return null;
-            const urgent = daysLeft <= CONNECT_EXPIRY_WARNING_DAYS;
-            return (
-              <p className={`mt-1 text-xs ${urgent ? "font-semibold text-amber-800" : "text-slate-500"}`}>
-                {t("my.expiresIn", { days: daysLeft })}
-              </p>
-            );
-          })() : null}</div><div className="flex flex-wrap items-center gap-2"><Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.details")}</Link><Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-3 py-2 text-sm">{t("actions.edit")}</Link><ConnectLifecycleForm id={listing.id} status={expired ? "expired" : listing.status} /></div></div></article>; })}</div> : <p className="mt-2 text-sm text-slate-500">{t("my.empty")}</p>}</section>;
-    })}
-    {/* Die eigenen Probleme stehen seit 05.11.2026 im Bereich "Probleme" (/connect/problems/mine).
-        Hier bleibt ein Verweis, damit man sie auch von der eigenen Uebersicht aus findet. */}
-    <section className="mt-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5">
-      <div>
-        <h2 className="text-lg font-semibold">{t("my.problemsTitle")}</h2>
-        <p className="mt-1 text-sm text-slate-600">{problems.length ? t("problemsArea.mineCount", { count: problems.length }) : t("my.problemsEmpty")}</p>
-      </div>
-      <Link href="/connect/problems/mine" className="inline-flex min-h-11 items-center rounded-full border border-slate-200 px-4 text-sm font-semibold text-violet-800 hover:border-violet-300">{t("problemsArea.mineLink")} →</Link>
-    </section>
+
+    <div className="mt-6 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
+      <aside aria-labelledby="my-profile-title" className="grid gap-4">
+        <section className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-5">
+          <h2 id="my-profile-title" className="sr-only">{t("my.profileTitle")}</h2>
+          {profile ? <>
+            <div className="flex items-center gap-3">
+              <ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" />
+              <div className="min-w-0"><p className="font-semibold text-slate-950">{profile.display_name}</p><p className="text-[13.5px] leading-5 text-slate-600">{profile.headline}</p></div>
+            </div>
+            {profile.network_roles.length > 0 ? <ul className="flex flex-wrap gap-1.5">{profile.network_roles.map((role) => <li key={role} className="rounded-full bg-violet-50 px-2.5 py-1 text-[12.5px] font-semibold text-violet-900">{t(`roles.${role}`)}</li>)}</ul> : null}
+            <p className="flex items-center gap-2 text-[13.5px]"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${profile.status === "active" ? "bg-emerald-600" : "bg-slate-400"}`} /><span className="font-semibold">{t(`my.profileStatus.${profile.status}`)}</span></p>
+          </> : <p className="text-sm leading-6 text-slate-700">{t("my.profileEmpty")}</p>}
+          <Link href="/connect/profile" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white">{profile ? t("my.profileEdit") : t("my.profileCreate")}</Link>
+        </section>
+        {open.length > 0 ? (
+          <section aria-labelledby="my-open-title" className="grid gap-2 rounded-3xl border border-amber-200 bg-amber-50 p-5">
+            <h2 id="my-open-title" className="text-sm font-semibold text-amber-950">{t("my.todo.title")}</h2>
+            <ul className="grid gap-1.5 text-[13.5px] leading-5 text-amber-950">{open.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">○</span>{item}</li>)}</ul>
+            <p className="text-[12.5px] text-amber-900">{t("my.todo.note")}</p>
+          </section>
+        ) : null}
+      </aside>
+
+      <section aria-labelledby="my-listings-title" className="grid min-w-0 gap-4">
+        <h2 id="my-listings-title" className="sr-only">{t("my.listingsTitle")}</h2>
+        <nav aria-label={t("my.listingsTitle")} className="flex flex-wrap items-center gap-2">
+          {GROUPS.map((group) => (
+            <Link key={group} href={here(group)} aria-current={group === current ? "true" : undefined} className={`inline-flex min-h-11 items-center rounded-full border-[1.5px] px-4 text-sm font-semibold ${group === current ? "border-violet-600 bg-violet-50 text-slate-950" : "border-slate-300 bg-white"} ${counts[group] === 0 && group !== current ? "text-slate-500" : "text-slate-900"}`}>
+              {t(`statuses.${group}`)} · {counts[group]}
+            </Link>
+          ))}
+        </nav>
+        {rows.length === 0 ? <p className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">{t("my.empty")}</p> : (
+          <div className="grid gap-3">
+            {rows.map((listing) => {
+              const isExpired = expired(listing);
+              const daysLeft = !isExpired && listing.status === "active" ? getConnectListingDaysLeft(listing.expires_at) : null;
+              const urgent = daysLeft !== null && daysLeft <= CONNECT_EXPIRY_WARNING_DAYS;
+              return (
+                <article key={listing.id} className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-600">{t(`directions.${listing.direction}`)} · {t(`categories.${listing.category}`)}</p>
+                      <h3 className="mt-1 font-semibold text-slate-950">{listing.title || t("my.untitled")}</h3>
+                      {/* Wann laeuft sie aus? Ohne diese Angabe kann niemand rechtzeitig verlaengern. */}
+                      {daysLeft !== null ? <p className={`mt-1 text-xs ${urgent ? "font-semibold text-amber-800" : "text-slate-600"}`}>{t("my.expiresIn", { days: daysLeft })}</p> : null}
+                    </div>
+                    <Link href={`/connect/listings/${listing.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 text-sm font-semibold">{t("actions.details")}</Link>
+                    <Link href={`/connect/listings/${listing.id}/edit`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 text-sm font-semibold">{t("actions.edit")}</Link>
+                  </div>
+                  <details className="mt-2">
+                    <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("my.more")}</summary>
+                    <div className="mt-2"><ConnectLifecycleForm id={listing.id} status={isExpired ? "expired" : listing.status} /></div>
+                  </details>
+                </article>
+              );
+            })}
+          </div>
+        )}
+        {/* Die eigenen Probleme stehen im Bereich "Probleme"; hier bleibt ein Verweis. */}
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+          <div>
+            <h2 className="text-base font-semibold">{t("my.problemsTitle")}</h2>
+            <p className="mt-1 text-sm text-slate-600">{problems.length ? t("problemsArea.mineCount", { count: problems.length }) : t("my.problemsEmpty")}</p>
+          </div>
+          <Link href="/connect/problems/mine" className="inline-flex min-h-11 items-center rounded-full border border-slate-300 px-4 text-sm font-semibold text-violet-800">{t("problemsArea.mineLink")} →</Link>
+        </section>
+      </section>
+    </div>
   </main>;
 }

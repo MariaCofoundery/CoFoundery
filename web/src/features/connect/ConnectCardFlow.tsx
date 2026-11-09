@@ -46,6 +46,7 @@ export function ConnectCardFlow({
   draftNode,
   publishNode,
   copy,
+  layout = "steps",
 }: {
   cards: { id: CardId; node: ReactNode }[];
   initialStep: number;
@@ -54,12 +55,15 @@ export function ConnectCardFlow({
   draftNode: ReactNode;
   publishNode: ReactNode;
   copy: Copy;
+  /** "steps": ein Schritt pro Karte (Neue). "page": alle Abschnitte untereinander (wer schon ein Profil hat). */
+  layout?: "steps" | "page";
 }) {
   const total = cards.length + 1;
   const [index, setIndex] = useState(Math.min(Math.max(initialStep, 0), total - 1));
   const root = useRef<HTMLDivElement>(null);
   const [roleMissing, setRoleMissing] = useState(false);
-  const isShow = index === cards.length;
+  const page = layout === "page";
+  const isShow = page || index === cards.length;
 
   useEffect(() => {
     if (!isShow) return;
@@ -77,9 +81,57 @@ export function ConnectCardFlow({
 
   const missingCount = identityGaps.length + (roleMissing ? 1 : 0);
 
+  const missingBox = (
+        missingCount > 0 ? (
+          <div className="grid gap-2 rounded-2xl border border-amber-300 bg-amber-50 p-4">
+            <p className="text-[11px] font-extrabold uppercase tracking-[.08em] text-amber-900">{copy.missingTitle}</p>
+            <ul className="grid gap-1.5 text-sm text-amber-950">
+              {identityGaps.map((gap) => (
+                <li key={gap} className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span>{copy.identityLabels[gap]}</span>
+                  <a href="#identity" className="font-bold text-violet-800 underline underline-offset-2">{copy.identityFix}</a>
+                </li>
+              ))}
+              {roleMissing ? (
+                <li className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span>{copy.roleMissing}</span>
+                  {page ? <a href="#abschnitt-role" className="font-bold text-violet-800 underline underline-offset-2">{copy.fix}</a> : <button type="button" onClick={() => go(0)} className="font-bold text-violet-800 underline underline-offset-2">{copy.fix}</button>}
+                </li>
+              ) : null}
+            </ul>
+            <p className="text-xs leading-5 text-amber-900">{copy.missingNote}</p>
+          </div>
+        ) : (
+          <p role="status" className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{copy.allSet}</p>
+        )
+  );
+
   function go(to: number) {
     setIndex(Math.max(0, Math.min(total - 1, to)));
     root.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  if (page) {
+    return (
+      <div ref={root} className="grid gap-5">
+        {cards.map((card) => (
+          <section key={card.id} id={`abschnitt-${card.id}`} className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+            {card.node}
+          </section>
+        ))}
+        <section id="abschnitt-show" className="grid scroll-mt-24 gap-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+          <h2 className="text-xl font-semibold text-slate-950">{copy.showTitle}</h2>
+          {missingBox}
+          {showNode}
+        </section>
+        <div className="sticky bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur">
+          {draftNode}
+          <fieldset disabled={missingCount > 0} className="contents">
+            {publishNode}
+          </fieldset>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -117,28 +169,7 @@ export function ConnectCardFlow({
 
       <div hidden={!isShow} className="grid gap-4">
         <h2 className="text-xl font-semibold text-slate-950">{copy.showTitle}</h2>
-        {missingCount > 0 ? (
-          <div className="grid gap-2 rounded-2xl border border-amber-300 bg-amber-50 p-4">
-            <p className="text-[11px] font-extrabold uppercase tracking-[.08em] text-amber-900">{copy.missingTitle}</p>
-            <ul className="grid gap-1.5 text-sm text-amber-950">
-              {identityGaps.map((gap) => (
-                <li key={gap} className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span>{copy.identityLabels[gap]}</span>
-                  <a href="#identity" className="font-bold text-violet-800 underline underline-offset-2">{copy.identityFix}</a>
-                </li>
-              ))}
-              {roleMissing ? (
-                <li className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span>{copy.roleMissing}</span>
-                  <button type="button" onClick={() => go(0)} className="font-bold text-violet-800 underline underline-offset-2">{copy.fix}</button>
-                </li>
-              ) : null}
-            </ul>
-            <p className="text-xs leading-5 text-amber-900">{copy.missingNote}</p>
-          </div>
-        ) : (
-          <p role="status" className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{copy.allSet}</p>
-        )}
+        {missingBox}
         {showNode}
         <div className="flex flex-wrap gap-3 border-t border-slate-200 pt-5">
           {/* Entwurf speichern steht zuerst und ist nie gesperrt - die Eingabetaste loest den ersten Knopf aus. */}

@@ -342,7 +342,7 @@
     "problemsTitle": "What you described",
     "problemsEmpty": "You have not described anything yet.",
     "home": "My Connect",
-    "overview": "Overview",
+    "overview": "Posts",
     "profileTitle": "Your Connect profile",
     "profileEmpty": "You don't have a Connect profile yet. It lets others find you and lets you post.",
     "profileEdit": "Edit profile",
@@ -352,6 +352,14 @@
       "draft": "Draft – not visible to others yet",
       "active": "Published",
       "paused": "Paused – not visible to others"
+    },
+    "createShort": "+ New post",
+    "more": "More: pause, end, renew",
+    "todo": {
+      "title": "Still open in your profile",
+      "reach": "Who you reach – a sentence or two",
+      "open": "What you are open to",
+      "note": "Not required: your profile is already visible. This only helps people find you."
     }
   },
   "profile": {
@@ -436,6 +444,17 @@
       "rolesQ": "Who are you in the network?",
       "reachQ": "Who do you know?",
       "openQ": "What are you open to?"
+    },
+    "preview": {
+      "title": "How others see you",
+      "reach": "Who you reach",
+      "open": "Open to",
+      "empty": "still empty",
+      "noteMembers": "This is how signed-in members see you. It shows the saved state; the card updates after you save.",
+      "notePublic": "This is how members see you. Your profile is also public: name, photo and headline are visible without signing in. It shows the saved state."
+    },
+    "sections": {
+      "label": "Profile sections"
     }
   },
   "safety": {
