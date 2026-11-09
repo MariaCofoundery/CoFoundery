@@ -32,9 +32,11 @@ function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const month = String(formData.get("month") ?? "");
   // Aus dem Kalender (seit 06.11.2026 der einzige Kalender): zurueck dorthin, Posts oeffnen im Panel.
   if (formData.get("calendar") === "1") {
-    const { newPost, ...rest } = extra;
+    // `month` im Zusatz heisst: in den Monat des Posts springen. Der Kalender kennt den Parameter als `monat`.
+    const { newPost, month: jumpTo, ...rest } = extra;
+    const target = jumpTo && /^\d{4}-\d{2}$/.test(jumpTo) ? jumpTo : month;
     return calendarHref(orgId, {
-      ...(/^\d{4}-\d{2}$/.test(month) ? { monat: month } : {}),
+      ...(/^\d{4}-\d{2}$/.test(target) ? { monat: target } : {}),
       ...(newPost !== undefined ? { neu: "post", ...(newPost ? { tag: newPost } : {}) } : {}),
       ...rest,
     });

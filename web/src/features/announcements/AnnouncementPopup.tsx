@@ -74,14 +74,16 @@ export function AnnouncementPopup() {
     if (!item || !modal) return;
     closeButton.current?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") void dismiss();
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      void dismiss();
     };
-    window.addEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
     // Der Hintergrund scrollt nicht mit.
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKey, true);
       document.body.style.overflow = previous;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

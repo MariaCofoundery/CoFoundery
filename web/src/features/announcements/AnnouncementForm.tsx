@@ -88,10 +88,12 @@ export function AnnouncementForm({
   useEffect(() => {
     if (!showing) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setShowing(false);
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setShowing(false);
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, [showing]);
 
   return (

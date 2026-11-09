@@ -172,6 +172,9 @@ export async function EventPanel({
                     <summary className="flex min-h-10 cursor-pointer items-center text-[14.5px] font-bold text-violet-950">{t("applyTitle")}</summary>
                     <p className="mb-3 mt-1 text-[13.5px] leading-6 text-slate-700">{t("applyText")}</p>
                     <EventPostSuggestions
+                      // Neu aufbauen, wenn ein anderer Termin gewaehlt wird oder Posts angelegt wurden: Der Zustand
+                      // (Zeilen, Haken) gehoert zu EINEM Termin - sonst legte "Uebernehmen" Posts fuer den vorigen an.
+                      key={`${event.eventId}:${sortedPosts.length}`}
                       orgId={orgId}
                       back="calendar"
                       returnEventId={event.eventId}

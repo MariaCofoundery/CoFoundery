@@ -41,3 +41,8 @@ export function isoToBerlinLocal(iso: string): string {
 export function berlinDayOf(iso: string): string {
   return isoToBerlinLocal(iso).slice(0, 10);
 }
+
+/** Der heutige Tag in Berlin (YYYY-MM-DD). Der Server laeuft in UTC: `new Date().toISOString().slice(0, 10)` waere zwischen 0 und 2 Uhr gestern. */
+export function berlinToday(): string {
+  return berlinDayOf(new Date().toISOString());
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
@@ -92,7 +93,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     }),
   );
   const inTwoWeeks = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = berlinToday();
   const programDeadlines = programData.flatMap((entry) => entry.deadlines);
   const programUpdates = programData.flatMap((entry) => entry.dues).filter((entry) => entry.due && entry.due <= inTwoWeeks);
   // Die Kachel zaehlt alle aktiven Teams der gelesenen Organisationen, nicht nur die zwoelf, deren Fristen hier stehen.
@@ -106,7 +107,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
   const name = profile.displayName || metadataName || user.email?.split("@")[0]?.trim() || "Advisor";
 
   const followUpByRelationship = new Map(dueFollowUps.flatMap((entry) => (entry.relationshipId ? [[entry.relationshipId, entry] as const] : [])));
-  const today = new Date().toISOString().slice(0, 10);
+  const today = berlinToday();
   const overdueTeams = teams.filter((team) => {
     const entry = team.relationshipId ? followUpByRelationship.get(team.relationshipId) : null;
     return Boolean(entry && entry.dueOn <= today);
@@ -291,7 +292,8 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
             <SetupCard orgId={setupOrg.id} items={setup.progress.items} done={setup.progress.done} next={setup.progress.next} />
           ) : null}
           {/* Schneller Moment: Das Einrichten ist fertig - einmal fragen, ob es geholfen hat. */}
-          {setupOrg && setup && setup.progress.complete ? <FeedbackMoment moment="setup_done" /> : null}
+          {setupOrg && setup && setup.progress.complete && setup.progress.done > 0 ? <FeedbackMoment moment="setup_done" /> : null}
+          {/* Nur, wenn wirklich etwas eingerichtet wurde: Wer alles uebersprungen hat, wird nicht gefragt, ob es geholfen hat. */}
           <StartTiles tiles={startTiles} />
           <MyProgramTasks
             tasks={await listMyProgramTasks(client, user.id)}

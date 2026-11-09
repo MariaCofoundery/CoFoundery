@@ -96,7 +96,9 @@ export function monthGrid(month: string): { day: string; inMonth: boolean }[][] 
 
 /** Der Montag der Woche, in der ein Tag liegt. */
 export const mondayOf = (iso: string) => addDays(iso, -((weekdayOf(iso) + 6) % 7));
-export const weekOf = (value: string | undefined, today: string) => mondayOf(value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : today);
+/** Ein Tag aus der Adresse: nur ein echtes Datum (`2026-13-45` gibt es nicht und liesse die Seite abstuerzen). */
+const isRealDay = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+export const weekOf = (value: string | undefined, today: string) => mondayOf(value && isRealDay(value) ? value : today);
 /** Kalenderwoche nach ISO 8601 (Woche mit dem ersten Donnerstag ist KW 1). */
 export function isoWeekNumber(iso: string) {
   const thursday = addDays(mondayOf(iso), 3);

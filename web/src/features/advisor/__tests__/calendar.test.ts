@@ -134,7 +134,7 @@ test("Anlegen und Aendern sind ein Seitenpanel mit Speichern unten; Escape und S
   const panel = read("src/features/ui/SidePanel.tsx");
   assert.match(panel, /<EscapeCloses href=\{closeHref\} \/>/);
   assert.match(panel, /<form action=\{formAction\}/);
-  assert.match(read("src/features/ui/EscapeCloses.tsx"), /event\.key === "Escape"/);
+  assert.match(read("src/features/ui/EscapeCloses.tsx"), /event\.key !== "Escape"/);
   // Anlegen darf nur die Inhaberin (die Datenbank prueft es ohnehin).
   assert.match(read("src/features/advisor/calendar/CalendarScreen.tsx"), /\{isOwner \? <Link href=\{linkOrg\(\{ neu: "termin" \}\)\}/);
 });

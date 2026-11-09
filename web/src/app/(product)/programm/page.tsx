@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
@@ -217,7 +218,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                     me={user.id}
                     isOrgOwner={false}
                     locale={getPresentationLocale(locale)}
-                    today={new Date().toISOString().slice(0, 10)}
+                    today={berlinToday()}
                     saved={query.goalSaved === "1"}
                     error={query.goalError === "1"}
                   />
@@ -232,7 +233,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                     me={user.id}
                     isOrgOwner={false}
                     locale={getPresentationLocale(locale)}
-                    today={new Date().toISOString().slice(0, 10)}
+                    today={berlinToday()}
                     saved={query.taskSaved === "1"}
                     error={query.taskError === "1"}
                   />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -58,7 +59,7 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
   const activeMembers = members.filter((member) => member.status === "active");
   const isOwner = org.role === "owner" && org.status === "active";
   const canWrite = org.status === "active";
-  const today = new Date().toISOString().slice(0, 10);
+  const today = berlinToday();
   const unnamed = tArea("kinds.unnamed");
 
   const content = await (async () => {

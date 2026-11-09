@@ -119,10 +119,13 @@ export function ProductFeedbackDialog({
   useEffect(() => {
     headingRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape") return;
+      // Es schliesst nur das Panel - nicht zugleich ein Seitenpanel dahinter.
+      event.preventDefault();
+      onClose();
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [onClose]);
 
   // Nur das Blatt auf dem Handy haelt die Seite an. Am Computer bleibt sie bedienbar.

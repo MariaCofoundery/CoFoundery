@@ -61,7 +61,8 @@ test("Wer ist wer: Karten in Mitglieder & Rollen und im Onboarding, Startups seh
   assert.match(cards, /member\.isSelf \? \(\s*<label className=\{TILE\}>\s*<span className=\{TILE_LABEL\}>\{t\("contact"\)\}/);
   assert.match(cards, /disabled=\{Boolean\(card\?\.selfHidden && !member\.isSelf\)\}/);
   // Der Kontakt wird nur als https-Link oder E-Mail zum Link.
-  assert.match(read("src/features/advisor/ProgramPeople.tsx"), /\^https:\\\/\\\//);
+  // Nur https-Links und schlichte Adressen werden zum Link (Prüfung in contactLink.ts, getestet in contactLink.test.ts).
+  assert.match(read("src/features/advisor/contactLink.ts"), /\^https:\\\/\\\//);
 });
 
 test("Texte in beiden Sprachen, dieselben Schluessel", () => {

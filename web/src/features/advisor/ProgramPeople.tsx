@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { contactHref } from "@/features/advisor/contactLink";
 import type { ProgramPerson } from "@/features/advisor/orgPeopleData";
-
-const contactHref = (contact: string) => (/^https:\/\//.test(contact) ? contact : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact) ? `mailto:${contact}` : null);
 
 /**
  * "Wer ist wer" fuer die Startups (06.11.2026): die Menschen der Organisation, die ihre Karte fuer die Startups im

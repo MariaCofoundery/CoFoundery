@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -144,7 +145,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
             <div className="rounded-2xl border border-slate-200 p-4">
               <p className="text-[14px] font-semibold text-slate-950">{t("plan.datesTitle")}</p>
               <p className="mb-3 mt-1 text-[13.5px] text-slate-600">{t("plan.datesText")}</p>
-              <PlanEventList orgId={org.id} today={new Date().toISOString().slice(0, 10)} formats={formats} back="setup" />
+              <PlanEventList orgId={org.id} today={berlinToday()} formats={formats} back="setup" />
             </div>
           </div>
         ) : null}

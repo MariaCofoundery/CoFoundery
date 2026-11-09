@@ -65,7 +65,7 @@ test("das Pop-up wartet auf ein freies Fenster, bevor es abholt, und Wegklicken 
   const popup = code("src/features/announcements/AnnouncementPopup.tsx");
   // Der Abruf vermerkt "gesehen": Er darf erst kommen, wenn kein anderer Dialog offen ist.
   assert.ok(popup.indexOf("anotherDialogIsOpen()") < popup.indexOf("getPendingAnnouncementAction()"));
-  assert.match(popup, /event\.key === "Escape"/);
+  assert.match(popup, /event\.key !== "Escape"/);
   assert.match(popup, /dismissAnnouncementAction\(current\.id\)/);
   // Das äußere Feld der Karte scrollt, damit auf kleinen Bildschirmen nichts abgeschnitten ist.
   const view = code("src/features/announcements/AnnouncementView.tsx");

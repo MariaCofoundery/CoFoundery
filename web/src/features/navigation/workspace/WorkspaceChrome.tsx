@@ -106,19 +106,24 @@ export function WorkspaceChrome({
     setSearchOpen(false);
   }, [pathname, tab, view]);
 
+  // Escape schliesst nur, was dieses Geruest selbst offen hat - und sagt es (preventDefault), damit ein offenes Seitenpanel
+  // (EscapeCloses) nicht im selben Atemzug mit zugeht. Capture: Wir sind vor ihm dran.
+  const anyOpen = useRef(false);
+  anyOpen.current = moreOpen || createOpen || searchOpen;
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setSearchOpen((open) => !open);
-      } else if (event.key === "Escape") {
+      } else if (event.key === "Escape" && anyOpen.current) {
+        event.preventDefault();
         setMoreOpen(false);
         setCreateOpen(false);
         setSearchOpen(false);
       }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, []);
 
   useEffect(() => {

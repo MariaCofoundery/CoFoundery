@@ -39,6 +39,8 @@ export async function ProgramTasks({
 }) {
   const t = await getTranslations("advisor.programTasks");
   const day = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "UTC" });
+  // Ein Zeitpunkt (Kommentar) steht in Berliner Zeit - ein Datum ohne Uhrzeit (Frist) bleibt UTC, sonst rutscht es.
+  const stamp = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "Europe/Berlin" });
   const nameOf = (userId: string | null) => (userId ? (userId === me ? t("me") : people.find((person) => person.userId === userId)?.name || t("unnamed")) : null);
   const open = tasks.filter((task) => task.status !== "done").sort((a, b) => (a.dueOn ?? "9999") < (b.dueOn ?? "9999") ? -1 : 1);
   const done = tasks.filter((task) => task.status === "done");
@@ -112,16 +114,16 @@ export async function ProgramTasks({
               <ul className="grid gap-2">
                 {own.map((comment) => (
                   <li key={comment.id} className="rounded-xl bg-slate-50 px-3.5 py-2.5">
-                    <p className="flex flex-wrap items-baseline gap-x-2 text-[12.5px] text-slate-700">
+                    <div className="flex flex-wrap items-baseline gap-x-2 text-[12.5px] text-slate-700">
                       <span className="font-semibold text-slate-900">{nameOf(comment.authorUserId) ?? t("formerMember")}</span>
-                      <span>{day.format(new Date(comment.createdAt))}</span>
+                      <span>{stamp.format(new Date(comment.createdAt))}</span>
                       {comment.authorUserId === me ? (
                         <form action={deleteProgramTaskCommentAction} className="ml-auto">
                           {hidden({ commentId: comment.id })}
                           <SubmitButton label={t("deleteComment")} pendingLabel="…" className="text-[12.5px] font-medium text-rose-700 underline-offset-4 hover:underline" />
                         </form>
                       ) : null}
-                    </p>
+                    </div>
                     <p className="mt-0.5 whitespace-pre-line text-[14px] leading-6 text-slate-900">{comment.body}</p>
                   </li>
                 ))}

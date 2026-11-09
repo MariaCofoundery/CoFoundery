@@ -12,6 +12,7 @@ export type AdminFeedbackRow = {
   moment: FeedbackMoment | null; kind: FeedbackKind | null; message: string | null; importance: "minor" | "important" | "very" | null;
   area: string | null; page_path: string | null; device: "desktop" | "phone" | null; may_contact: boolean; contact_email: string | null;
 };
+import { SIMPLE_EMAIL } from "@/features/advisor/contactLink";
 import { FEEDBACK_AREAS, FEEDBACK_KINDS, FEEDBACK_TABS as TABS, type FeedbackTab as Tab } from "@/features/admin/feedbackTab";
 import { FEEDBACK_MOMENTS, feedbackPathIsLinkable, type FeedbackArea, type FeedbackKind, type FeedbackMoment } from "@/features/feedback/feedbackModel";
 import { UserText } from "@/features/ui/UserText";
@@ -178,7 +179,7 @@ export async function AdminFeedbackPanel({ client, tab, selectedId, page, kind =
                           <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
                           {t("mayContact")}
                         </span>
-                        {selected.contact_email ? (
+                        {selected.contact_email && SIMPLE_EMAIL.test(selected.contact_email) ? (
                           <a href={`mailto:${selected.contact_email}?subject=${encodeURIComponent(t("mailSubject"))}`} className="inline-flex min-h-11 items-center rounded-xl border border-[#c9ccdf] bg-white px-4 text-sm font-semibold text-slate-900 hover:bg-slate-50">{t("replyByMail")}</a>
                         ) : null}
                       </>

@@ -47,7 +47,8 @@ export const FEEDBACK_SUBS: Record<string, readonly string[]> = {
   teamraum: ["week", "tasks", "chat", "social", "pages", "who"],
 };
 
-const TEAMRAUM_SEGMENTS: Record<string, string> = { aufgaben: "tasks", chat: "chat", social: "social", seiten: "pages", wer: "who", woche: "week" };
+// Dieselben Adressteile wie in features/advisor/teamraumRoutes.ts (SEGMENT).
+const TEAMRAUM_SEGMENTS: Record<string, string> = { aufgaben: "tasks", chat: "chat", "social-media": "social", seiten: "pages", "wer-macht-was": "who" };
 
 const segmentsOf = (pathname: string) => pathname.split(/[?#]/)[0].split("/").filter(Boolean);
 
@@ -135,7 +136,8 @@ export function sanitizeFeedbackPath(pathname: string | null | undefined): strin
 }
 
 /** Eine Seite ohne ":id" laesst sich aufrufen; mit ":id" nur lesen. */
-export const feedbackPathIsLinkable = (path: string | null) => Boolean(path) && !path!.includes(":id");
+export const feedbackPathIsLinkable = (path: string | null) =>
+  Boolean(path) && /^\/[a-z0-9_-]+(\/[a-z0-9_-]+)*$/.test(path!) && !path!.includes(":id");
 
 /* ---------------------------------------------------------------------------
    Die Eingabe

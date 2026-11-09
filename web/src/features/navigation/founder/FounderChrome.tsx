@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { FounderIcon } from "@/features/navigation/founder/FounderIcon";
 import {
@@ -69,18 +69,22 @@ export function FounderChrome({
     setFolded({});
   }, [pathname]);
 
+  // Escape schliesst nur, was dieses Geruest selbst offen hat, und sagt es (preventDefault) - siehe WorkspaceChrome.
+  const anyOpen = useRef(false);
+  anyOpen.current = moreOpen || searchOpen;
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setSearchOpen((open) => !open);
-      } else if (event.key === "Escape") {
+      } else if (event.key === "Escape" && anyOpen.current) {
+        event.preventDefault();
         setMoreOpen(false);
         setSearchOpen(false);
       }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, []);
 
   // Die eigene Leiste (ausgeblendet/sortiert). Suche und Ort kennen immer alle Bereiche.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -84,7 +85,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const org = orgs.find((entry) => entry.id === query.org) ?? orgs[0] ?? null;
   if (!org) redirect("/advisor/organisation");
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = berlinToday();
   const isOwner = org.role === "owner" && org.status === "active";
   const canWrite = org.status === "active";
   const view = viewOf(query.ansicht);

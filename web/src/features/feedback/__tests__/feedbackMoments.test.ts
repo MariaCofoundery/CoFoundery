@@ -45,7 +45,7 @@ test("die Frage steht im Fluss, nie als Pop-up, und kommt je Konto höchstens ei
 
 test("die Frage steht nur an den drei Stellen - und nur, wenn der Moment wirklich da ist", () => {
   const dashboard = code("src/app/(product)/advisor/dashboard/page.tsx");
-  assert.match(dashboard, /setupOrg && setup && setup\.progress\.complete \? <FeedbackMoment moment="setup_done" \/>/);
+  assert.match(dashboard, /setupOrg && setup && setup\.progress\.complete && setup\.progress\.done > 0 \? <FeedbackMoment moment="setup_done" \/>/);
   const own = code("src/app/me/profile/workstyle/page.tsx");
   assert.match(own, /!older \? <FeedbackMoment moment="workstyle_report" \/>/);
   const team = code("src/app/(product)/teams/[teamId]/workstyle/page.tsx");

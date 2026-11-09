@@ -45,7 +45,7 @@ export function SetupBar() {
   if (!session || pathname.startsWith("/advisor/los-gehts")) return null;
   const { prev, next, index, total } = neighbourSteps(session);
   return (
-    <div role="region" aria-label={t("bar.label")} className="sticky bottom-[4.5rem] z-30 border-t border-violet-200 bg-violet-50/95 px-4 py-2.5 backdrop-blur print:hidden lg:bottom-0">
+    <div role="region" aria-label={t("bar.label")} className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 border-t border-violet-200 bg-violet-50/95 px-4 py-2.5 backdrop-blur print:hidden lg:bottom-0">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2">
         <p className="min-w-0 flex-1 text-[14px] text-violet-950">
           <span className="font-semibold">{t("bar.step", { step: index + 1, total })}</span> · {t(`steps.${session.step}.title`)}

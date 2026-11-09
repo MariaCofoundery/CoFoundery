@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinToday } from "@/lib/berlinTime";
 import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildLoginRedirectPath } from "@/features/auth/loginRedirect";
@@ -194,9 +195,9 @@ export default async function AdvisorProgramTeamPage({
           />
           </>
         ) : tab === "aufgaben" ? (
-          <ProgramTasks programId={programId} side="org" tasks={programTasks} comments={taskComments} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={new Date().toISOString().slice(0, 10)} saved={query.taskSaved === "1"} error={query.taskError === "1"} />
+          <ProgramTasks programId={programId} side="org" tasks={programTasks} comments={taskComments} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={berlinToday()} saved={query.taskSaved === "1"} error={query.taskError === "1"} />
         ) : tab === "ziele" ? (
-          <ProgramGoals programId={programId} side="org" goals={programGoals} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={new Date().toISOString().slice(0, 10)} saved={query.goalSaved === "1"} error={query.goalError === "1"} />
+          <ProgramGoals programId={programId} side="org" goals={programGoals} people={taskPeople} me={user.id} isOrgOwner={orgOfProgram.role === "owner"} locale={locale} today={berlinToday()} saved={query.goalSaved === "1"} error={query.goalError === "1"} />
         ) : tab === "setup" ? (
           <ProgramSetupView items={setupItems} includesSetup={program.includesSetup} locale={locale} />
         ) : tab === "freigaben" ? (

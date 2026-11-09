@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { currentTeamForInvitation } from "@/features/teams/currentJourneyData";
@@ -289,7 +290,7 @@ export default async function DashboardPage({
             tasks={myProgramTasks}
             labelOf={(programId) => myPrograms.find((program) => program.programId === programId)?.orgName ?? null}
             hrefOf={() => "/programm#aufgaben"}
-            today={new Date().toISOString().slice(0, 10)}
+            today={berlinToday()}
           />
           <DashboardNextStep
             start={start}
