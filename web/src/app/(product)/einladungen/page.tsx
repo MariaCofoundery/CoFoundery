@@ -47,7 +47,7 @@ export default async function InvitationsPage({ searchParams }: { searchParams?:
               </h2>
               <p className="mt-1 text-[14.5px] text-slate-800">
                 {invite.kind === "org"
-                  ? `${invite.inviterName ? t("org.by", { name: invite.inviterName }) : t("org.byUnknown")} ${invite.role ? t(invite.role === "owner" ? "org.roleOwner" : "org.roleAdvisor") : ""}`.trim()
+                  ? `${invite.inviterName ? t("org.by", { name: invite.inviterName }) : t("org.byUnknown")} ${invite.role ? t(`org.role.${invite.role}`) : ""}`.trim()
                   : invite.inviterName
                     ? invite.orgName
                       ? t("person.byOrg", { name: invite.inviterName, org: invite.orgName })

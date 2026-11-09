@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { AdvisorScope } from "@/features/advisor/personAccessData";
 import { ACTIVE_ORG_COOKIE, activeFirst, parseActiveOrg } from "@/features/advisor/activeOrg";
+import { type OrgRights, type OrgRole, isAdminRole, isLeadRole, orgRoleOf, parseOverrides, rightsOf, type OrgRightOverrides } from "@/features/advisor/orgRights";
 
 /**
  * Die Organisation, ihre Menschen - und die Menschen, die sie begleitet.
@@ -22,7 +23,14 @@ export type AdvisorOrg = {
   featuresSetupDone: boolean;
   name: string;
   personSeatLimit: number | null;
-  role: "owner" | "advisor" | null;
+  /** Admin heisst technisch `owner`. Ein Gast steht nicht unter den Mitgliedern, sondern in `advisor_org_guests`. */
+  role: OrgRole | null;
+  /** Was diese Person in der Organisation darf: Voreinstellung der Rolle plus einzeln gesetzte Rechte (Anzeige - die Datenbank prueft es). */
+  rights: OrgRights;
+  /** Admin: Funktionen, Erfolge, Foerderauflagen, Rollen. */
+  isAdmin: boolean;
+  /** Admin oder Koordination: sieht alle Startups der Organisation. */
+  isLead: boolean;
   /** Phase 12C.1C: Eine ausgesetzte Organisation sagt das im Org-Abschnitt. */
   status: "active" | "suspended";
   /**
@@ -44,8 +52,12 @@ export type AdvisorOrg = {
 
 export type OrgMember = {
   userId: string;
-  role: "owner" | "advisor";
+  role: OrgRole;
   status: "active" | "revoked";
+  /** Nur Admins sehen die einzeln gesetzten Rechte der anderen (sonst leer). */
+  rightsOverrides?: OrgRightOverrides;
+  rightsUpdatedAt?: string | null;
+  rightsUpdatedByName?: string | null;
   /** Phase 12C.1C: Anzeigename - wer verwaltet, muss sehen, wen. */
   displayName: string | null;
   isSelf: boolean;
@@ -67,13 +79,15 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     data: { user },
   } = await client.auth.getUser();
   if (!user) return [];
-  const { data: memberships } = await client
-    .from("advisor_org_members")
-    .select("org_id, role, status")
-    .eq("user_id", user.id)
-    .eq("status", "active");
+  const [{ data: memberships }, { data: guestRows }] = await Promise.all([
+    client.from("advisor_org_members").select("org_id, role, status, rights").eq("user_id", user.id).eq("status", "active"),
+    client.from("advisor_org_guests").select("org_id, status, rights").eq("user_id", user.id).eq("status", "active"),
+  ]);
 
-  const rows = (memberships ?? []) as { org_id: string; role: AdvisorOrg["role"]; status: string }[];
+  const rows = [
+    ...((memberships ?? []) as { org_id: string; role: string; rights: unknown }[]).map((row) => ({ org_id: row.org_id, role: orgRoleOf(row.role), rights: parseOverrides(row.rights) })),
+    ...((guestRows ?? []) as { org_id: string; rights: unknown }[]).map((row) => ({ org_id: row.org_id, role: "guest" as OrgRole, rights: parseOverrides(row.rights) })),
+  ];
   if (rows.length === 0) return [];
 
   const { data: orgs } = await client
@@ -112,6 +126,9 @@ export async function getMyAdvisorOrgs(client: SupabaseClient): Promise<AdvisorO
     status: org.status === "suspended" ? "suspended" : "active",
     personSeatLimit: org.person_seat_limit,
     role: rows.find((row) => row.org_id === org.id)?.role ?? null,
+    rights: rightsOf(rows.find((row) => row.org_id === org.id)?.role ?? "advisor", rows.find((row) => row.org_id === org.id)?.rights),
+    isAdmin: isAdminRole(rows.find((row) => row.org_id === org.id)?.role),
+    isLead: isLeadRole(rows.find((row) => row.org_id === org.id)?.role),
     description: org.description,
     websiteUrl: org.website_url,
     focus: org.focus ?? [],
@@ -153,7 +170,7 @@ export async function countOrgSeatsUsed(client: SupabaseClient, orgId: string): 
  * Mitgliedern, gibt nur den Anzeigenamen heraus und zeigt beendete
  * Mitgliedschaften nur Inhaberinnen.
  */
-export type OrgOpenInvite = { email: string; role: "owner" | "advisor"; sentAt: string; expiresAt: string };
+export type OrgOpenInvite = { email: string; role: OrgRole; sentAt: string; expiresAt: string };
 
 /** Einladungen, die noch nicht angenommen sind. Die Zeilensicherheit zeigt sie nur Mitgliedern der Organisation. */
 export async function getOrgOpenInvites(client: SupabaseClient, orgId: string): Promise<OrgOpenInvite[]> {
@@ -166,32 +183,68 @@ export async function getOrgOpenInvites(client: SupabaseClient, orgId: string): 
     .order("created_at", { ascending: false });
   return ((data ?? []) as { invitee_email: string; role: string; created_at: string; expires_at: string }[]).map((row) => ({
     email: row.invitee_email,
-    role: row.role === "owner" ? "owner" : "advisor",
+    role: orgRoleOf(row.role),
     sentAt: row.created_at,
     expiresAt: row.expires_at,
   }));
 }
 
+/** Gaeste sind keine Mitglieder: nur die Mitgliederverwaltung bittet ausdruecklich um sie (`withGuests`). */
 export async function getOrgMembers(
   client: SupabaseClient,
-  orgId: string
+  orgId: string,
+  options: { withGuests?: boolean } = {}
 ): Promise<OrgMember[]> {
   const { data } = await client.rpc("get_advisor_org_member_list", { p_org_id: orgId });
 
   return (
     (data ?? []) as {
       user_id: string;
-      role: OrgMember["role"];
+      role: string;
       status: OrgMember["status"];
       display_name: string | null;
       is_self: boolean;
+      rights?: unknown;
+      rights_updated_at?: string | null;
+      rights_updated_by_name?: string | null;
     }[]
   ).map((row) => ({
     userId: row.user_id,
-    role: row.role,
+    role: orgRoleOf(row.role),
     status: row.status,
     displayName: row.display_name,
     isSelf: row.is_self,
+    rightsOverrides: parseOverrides(row.rights),
+    rightsUpdatedAt: row.rights_updated_at ?? null,
+    rightsUpdatedByName: row.rights_updated_by_name ?? null,
+  })).filter((member) => options.withGuests || member.role !== "guest");
+}
+
+export type OrgInviteSuggestion = {
+  id: string;
+  email: string;
+  role: "advisor" | "guest";
+  reason: string | null;
+  status: "open" | "accepted" | "declined";
+  decisionNote: string | null;
+  createdAt: string;
+  suggestedByName: string | null;
+  mine: boolean;
+};
+
+/** Vorschlaege fuer Einladungen: Admin und Koordination sehen die offenen, wer vorgeschlagen hat, die eigenen (mit Antwort). */
+export async function getOrgInviteSuggestions(client: SupabaseClient, orgId: string): Promise<OrgInviteSuggestion[]> {
+  const { data } = await client.rpc("list_advisor_org_invite_suggestions", { p_org_id: orgId });
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    id: row.id as string,
+    email: row.email as string,
+    role: row.role === "guest" ? "guest" : "advisor",
+    reason: (row.reason as string | null) ?? null,
+    status: row.status === "accepted" ? "accepted" : row.status === "declined" ? "declined" : "open",
+    decisionNote: (row.decision_note as string | null) ?? null,
+    createdAt: row.created_at as string,
+    suggestedByName: (row.suggested_by_name as string | null) ?? null,
+    mine: row.mine === true,
   }));
 }
 

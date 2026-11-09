@@ -15,7 +15,7 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
  * das Formular unten.
  */
 type Preview =
-  | { state: "open"; org_name: string | null; role: "owner" | "advisor"; inviter_name: string | null; already_member: boolean }
+  | { state: "open"; org_name: string | null; role: "owner" | "coordinator" | "advisor" | "guest"; inviter_name: string | null; already_member: boolean }
   | { state: "claimed" | "expired" | "revoked" | "unverified" | "unavailable" };
 
 const SUCCESS = "/advisor/organisation";

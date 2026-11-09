@@ -8,6 +8,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { createClient } from "@/lib/supabase/server";
 import { orgErrorCode, type OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { isOrgFeature } from "@/features/advisor/orgFeatures";
+import { ORG_RIGHTS, type OrgRight, orgRoleOf, overridesOf } from "@/features/advisor/orgRights";
 
 /**
  * Organisation anlegen, Menschen aufnehmen, Mitgliedschaft beenden.
@@ -109,7 +110,7 @@ export async function inviteOrgAdvisorAction(formData: FormData) {
   await assertOrgActive(client, orgId);
 
   const token = randomBytes(24).toString("hex");
-  const role = formData.get("role") === "owner" ? "owner" : "advisor";
+  const role = orgRoleOf(formData.get("role"));
   const { error } = await client.rpc("create_advisor_org_invite", {
     p_org_id: orgId,
     p_email: email,
@@ -215,9 +216,95 @@ export async function setOrgMemberRoleAction(formData: FormData) {
   const { data, error } = await client.rpc("set_advisor_org_member_role", {
     p_org_id: orgId,
     p_user_id: String(formData.get("userId") ?? ""),
-    p_role: formData.get("role") === "owner" ? "owner" : "advisor",
+    p_role: orgRoleOf(formData.get("role")),
   });
   if (error) back(orgErrorCode(error.message), membersTab(orgId));
   if (data === false) back("org_not_member", membersTab(orgId));
+  done(`${membersTab(orgId)}&saved=1`);
+}
+
+/**
+ * Rechte einer Person einstellen: nur ein Admin (die Datenbank prueft das). Das Formular schickt je Recht einen Haken;
+ * gespeichert wird nur, was von der Voreinstellung der Rolle abweicht. "reset" setzt auf die Voreinstellung zurueck.
+ */
+export async function setOrgMemberRightsAction(formData: FormData) {
+  const { client } = await requireUser();
+  const orgId = String(formData.get("orgId") ?? "");
+  await assertOrgActive(client, orgId);
+  const role = orgRoleOf(formData.get("role"));
+  const wanted: Partial<Record<OrgRight, boolean>> = {};
+  if (formData.get("reset") !== "1") for (const right of ORG_RIGHTS) wanted[right] = formData.get(`right_${right}`) === "on";
+  const overrides = formData.get("reset") === "1" ? {} : overridesOf(role, wanted);
+  const { data, error } = await client.rpc("set_org_member_rights", {
+    p_org_id: orgId,
+    p_user_id: String(formData.get("userId") ?? ""),
+    p_rights: overrides,
+  });
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
+  if (data === false) back("org_not_member", membersTab(orgId));
+  done(`${membersTab(orgId)}&saved=1`);
+}
+
+/** Ein Advisor ohne das Recht "einladen" schlaegt vor; Admin oder Koordination entscheiden. */
+export async function suggestOrgInviteAction(formData: FormData) {
+  const { client } = await requireUser();
+  const orgId = String(formData.get("orgId") ?? "");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!email.includes("@")) back("email", membersTab(orgId));
+  await assertOrgActive(client, orgId);
+  const { error } = await client.rpc("suggest_advisor_org_invite", {
+    p_org_id: orgId,
+    p_email: email,
+    p_role: formData.get("role") === "guest" ? "guest" : "advisor",
+    p_reason: String(formData.get("reason") ?? "").trim().slice(0, 500) || null,
+  });
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
+  done(`${membersTab(orgId)}&saved=1`);
+}
+
+/**
+ * Einen Vorschlag entscheiden. Annehmen legt die Einladung wie jede andere an (mit der gewaehlten Rolle, auch Mail) und
+ * vermerkt danach den Vorschlag; Ablehnen vermerkt ihn mit einer kurzen Antwort. Die vorgeschlagene Person erfaehrt
+ * von einer Ablehnung nichts.
+ */
+export async function decideOrgInviteSuggestionAction(formData: FormData) {
+  const { client, userId } = await requireUser();
+  const orgId = String(formData.get("orgId") ?? "");
+  const id = String(formData.get("suggestionId") ?? "");
+  const accept = formData.get("decision") === "accept";
+  await assertOrgActive(client, orgId);
+
+  if (accept) {
+    const { data: row } = await client.from("advisor_org_invite_suggestions").select("email, role, status").eq("id", id).eq("org_id", orgId).maybeSingle();
+    const suggestion = row as { email: string; role: string; status: string } | null;
+    if (!suggestion || suggestion.status !== "open") back("org_failed", membersTab(orgId));
+    const chosen = orgRoleOf(formData.get("role"));
+    const role = chosen === "owner" || chosen === "coordinator" || chosen === "advisor" || chosen === "guest" ? chosen : "advisor";
+    const token = randomBytes(24).toString("hex");
+    const { error } = await client.rpc("create_advisor_org_invite", {
+      p_org_id: orgId,
+      p_email: suggestion.email,
+      p_token_hash: createHash("sha256").update(token).digest("hex"),
+      p_role: role,
+    });
+    if (error) back(orgErrorCode(error.message), membersTab(orgId));
+    const [{ data: org }, { data: inviter }] = await Promise.all([
+      client.from("advisor_orgs").select("name").eq("id", orgId).maybeSingle(),
+      client.from("person_core").select("display_name").eq("user_id", userId).maybeSingle(),
+    ]);
+    await sendAdvisorOrgInviteEmail({
+      recipientEmail: suggestion.email,
+      orgName: String((org as { name?: string } | null)?.name ?? "").trim() || "einer Organisation",
+      inviterName: String((inviter as { display_name?: string } | null)?.display_name ?? "").trim() || null,
+      role,
+      url: `${getPublicAppOrigin()}/invite/advisor-org/${token}`,
+    });
+  }
+  const { error } = await client.rpc("decide_advisor_org_invite_suggestion", {
+    p_id: id,
+    p_accept: accept,
+    p_note: accept ? null : String(formData.get("note") ?? "").trim().slice(0, 300) || null,
+  });
+  if (error) back(orgErrorCode(error.message), membersTab(orgId));
   done(`${membersTab(orgId)}&saved=1`);
 }

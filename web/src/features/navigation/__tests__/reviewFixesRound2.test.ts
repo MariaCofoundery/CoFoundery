@@ -20,12 +20,12 @@ test("/programm mit mehreren Programmen: Rückmeldung und Sprungmarke gehören z
 
 test("Termine anlegen bietet nur an, wer es darf; die Adresse allein öffnet kein Formular", () => {
   const chrome = code("src/features/navigation/workspace/WorkspaceChrome.tsx");
-  assert.match(chrome, /const canPlan = active\?\.isOwner !== false;/);
+  assert.match(chrome, /const canPlan = active\?\.rights \? active\.rights\.plan : active\?\.isOwner !== false;/);
   assert.match(chrome, /entry\.key !== "event" && entry\.key !== "events"/);
   assert.equal((chrome.match(/creates\.map\(/g) ?? []).length, 2, "Suche und Menü");
   const screen = code("src/features/advisor/calendar/CalendarScreen.tsx");
   assert.match(screen, /const sheet = planningSheet \? \(isOwner \? planningSheet : null\)/);
-  assert.match(code("src/features/dashboard/dashboardRoleData.ts"), /isOwner: \(memberships \?\? \[\]\)\.some/);
+  assert.match(code("src/features/dashboard/dashboardRoleData.ts"), /isOwner: role === "owner"/);
 });
 
 test("Listen verdrängen das Neue nicht: offene Aufgaben und jüngste erledigte; Organisation schon in der Abfrage", () => {

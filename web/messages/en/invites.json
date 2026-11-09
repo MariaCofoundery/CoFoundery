@@ -10,7 +10,13 @@
     "byUnknown": "You were invited.",
     "roleOwner": "as owner",
     "roleAdvisor": "as advisor",
-    "text": "Members see everything released to the organization. When membership ends, this access ends immediately."
+    "text": "Members see everything released to the organization. When membership ends, this access ends immediately.",
+    "role": {
+      "owner": "as admin",
+      "coordinator": "as coordinator",
+      "advisor": "as advisor",
+      "guest": "as guest"
+    }
   },
   "person": {
     "title": "Request for insight",

@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { type OrgRole, orgRoleOf } from "@/features/advisor/orgRights";
 
 /**
  * "Wer ist wer" (20270327120000): die Karten der Menschen einer Organisation. Mitglieder lesen alle Karten ihrer
@@ -33,7 +34,7 @@ export type ProgramPerson = {
   orgName: string;
   userId: string;
   displayName: string;
-  role: "owner" | "advisor";
+  role: OrgRole;
   teamRole: string | null;
   headline: string | null;
   about: string | null;
@@ -49,7 +50,7 @@ export async function getMyProgramPeople(client: SupabaseClient): Promise<Progra
     orgName: row.org_name as string,
     userId: row.user_id as string,
     displayName: (row.display_name as string) ?? "",
-    role: row.role === "owner" ? "owner" : "advisor",
+    role: orgRoleOf(row.role),
     teamRole: (row.team_role as string | null) ?? null,
     headline: (row.headline as string | null) ?? null,
     about: (row.about as string | null) ?? null,

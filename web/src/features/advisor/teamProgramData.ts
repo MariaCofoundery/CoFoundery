@@ -429,6 +429,17 @@ export async function getEventRsvps(client: SupabaseClient, eventId: string): Pr
   }));
 }
 
+/** Zahlen ohne Namen (get_org_numbers, 20270410120000): auch Gaeste mit dem Recht "Auswertung" sehen sie. Ohne das Recht: null. */
+export async function getOrgNumbers(
+  client: SupabaseClient,
+  orgId: string
+): Promise<{ teamsActive: number; eventsUpcoming: number; eventsHeld: number } | null> {
+  const { data } = await client.rpc("get_org_numbers", { p_org_id: orgId });
+  const row = ((data ?? []) as Record<string, unknown>[])[0];
+  if (!row) return null;
+  return { teamsActive: Number(row.teams_active ?? 0), eventsUpcoming: Number(row.events_upcoming ?? 0), eventsHeld: Number(row.events_held ?? 0) };
+}
+
 /** Die Zeilen der Auswertung (20270308120000); zusammengefasst wird in `programReport.ts`. */
 export async function getOrgReportRows(
   client: SupabaseClient,

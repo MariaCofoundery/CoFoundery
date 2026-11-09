@@ -35,6 +35,7 @@ import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
   getMyAdvisorOrgs,
+  getOrgInviteSuggestions,
   getOrgMembers,
   getOrgOpenInvites,
   withAccompaniedNames,
@@ -134,7 +135,17 @@ export default async function AdvisorOrganisationPage({
   const SOLO_HIDDEN: Tab[] = ["overview", "access"];
   const requestedTab = query.tab ? TAB_OF(query.tab) : soloOrg ? "program" : "overview";
   const tab: Tab = soloOrg && SOLO_HIDDEN.includes(requestedTab) ? "program" : requestedTab;
-  const isOwner = org.role === "owner" && org.status === "active";
+  // Admin: Funktionen, Erfolge, Foerderauflagen, Rollen. Alles andere haengt am einzelnen Recht der Person
+  // (Anzeige - die Datenbank prueft es): Einladen, Termine/Materialien, Startups aufnehmen, Profil, Wer ist wer.
+  const isOwner = org.isAdmin && org.status === "active";
+  const orgActive = org.status === "active";
+  const canInvite = org.rights.invite && orgActive;
+  const canPlan = org.rights.plan && orgActive;
+  const canTeams = org.rights.teams && orgActive;
+  const canProfile = org.rights.profile && orgActive;
+  // Ein Gast sieht hier nur die Zahlen der Auswertung.
+  if (org.role === "guest" && tab !== "report") redirect(base("report"));
+  const memberList = tab === "members" ? await getOrgMembers(client, org.id, { withGuests: true }) : members;
   const ownerNames = members.filter((member) => member.role === "owner" && member.status === "active").map((member) => member.displayName ?? t("kinds.unnamed"));
   // Neue Organisationen bestaetigen zuerst, welche Bereiche sie brauchen. Nur die Inhaberin wird dorthin geleitet.
   if (org.role === "owner" && org.status === "active" && !org.featuresSetupDone && tab !== "features") {
@@ -143,16 +154,17 @@ export default async function AdvisorOrganisationPage({
   // Ein ausgeschalteter Bereich erreicht man auch ueber eine alte Adresse nicht: die Seite sagt, wo man ihn einschaltet.
   const tabOff = !tabEnabled(org, tab);
   const openInvites = tab === "members" ? await getOrgOpenInvites(client, org.id) : [];
+  const suggestions = tab === "members" && org.role !== "guest" ? await getOrgInviteSuggestions(client, org.id) : [];
   const needsPeople = tab === "learning";
   const needsPrograms = tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
   const [seatsUsed, people, programs, invites, deadlines, access, codes, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
-    tab === "enroll" && org.role === "owner" ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
+    tab === "enroll" && canTeams ? listTeamProgramInvites(client, org.id) : Promise.resolve([]),
     tab === "overview" ? getOrgMilestoneDeadlines(client, org.id) : Promise.resolve([]),
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
-    tab === "enroll" && org.role === "owner" ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
+    tab === "enroll" && canTeams ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
     tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
@@ -180,7 +192,7 @@ export default async function AdvisorOrganisationPage({
   const areaGroups = AREA_GROUPS.map((group, groupIndex) => ({
     key: group.key,
     label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
-    tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+    tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry) && (org.role !== "guest" || entry === "report")).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
   })).filter((group) => group.tabs.length > 0);
   // Teams im Programm (Entwurf 05.11.2026): je Team der naechste Meilenstein und das letzte Update. Nur Teams, die
   // diese Person sieht - die Abfragen laufen unter ihren Rechten.
@@ -236,7 +248,7 @@ export default async function AdvisorOrganisationPage({
           </p>
         ) : null}
         {/* Eingerichtet wird von der Fuehrung; andere Mitglieder lesen mit und wissen, wen sie fragen. */}
-        {!isOwner && (tab === "enroll" || tab === "page" || tab === "features" || tab === "profile") ? (
+        {(!canTeams && tab === "enroll") || (!canProfile && (tab === "page" || tab === "profile")) || (!isOwner && tab === "features") ? (
           <p role="note" className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950">
             {t("orgPage.ownerOnlyNote", { names: ownerNames.join(", ") || t("kinds.unnamed") })}
           </p>
@@ -308,10 +320,10 @@ export default async function AdvisorOrganisationPage({
             <Link href={`/advisor/teamraum/wer-macht-was?org=${encodeURIComponent(org.id)}`} className="font-semibold text-violet-800 underline-offset-4 hover:underline">{tAdvisor("org.membersWhoLink")}</Link>
           </p>
         ) : null}
-        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={members} openInvites={openInvites} error={orgError} saved={query.saved === "1"} part="members" /> : null}
+        {tab === "members" ? <AdvisorOrgSection orgs={[org]} members={memberList} openInvites={openInvites} suggestions={suggestions} error={orgError} saved={query.saved === "1"} part="members" /> : null}
         {tab === "members" ? (
           <div className="mt-6">
-            <OrgPeopleCards orgId={org.id} members={members} cards={await listOrgMemberCards(client, org.id)} isOwner={isOwner} programs={(await getOrgTeamPrograms(client, org.id)).filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))} savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+            <OrgPeopleCards orgId={org.id} members={members} cards={await listOrgMemberCards(client, org.id)} isOwner={org.isLead && org.rights.people && orgActive} canSelf={org.rights.people && orgActive} programs={(await getOrgTeamPrograms(client, org.id)).filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))} savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
           </div>
         ) : null}
 
@@ -327,7 +339,7 @@ export default async function AdvisorOrganisationPage({
               <h2 className="text-xl font-semibold text-slate-950">{tAdvisor("programPage.title")}</h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{tAdvisor("programPage.text")}</p>
             </div>
-            {org.role === "owner" && org.status === "active" ? (
+            {canProfile ? (
               <ProgramPageEditor
                 orgId={org.id}
                 orgName={org.name}
@@ -381,20 +393,20 @@ export default async function AdvisorOrganisationPage({
         {tab === "experts" && !tabOff ? (
           <>
             {query.expertError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.expertsError")}</p> : null}
-            <OrgProgramExperts orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} experts={experts} query={(query.q ?? "").slice(0, 80)} />
+            <OrgProgramExperts orgId={org.id} isOwner={canPlan} experts={experts} query={(query.q ?? "").slice(0, 80)} />
           </>
         ) : null}
 
         {/* Auswertung (Feedback an Maria, 04.11.2026): Zahlen zu Veranstaltungen, Teilnahme und Gespraechen. */}
         {tab === "report" ? (
-          <OrgProgramReport orgId={org.id} isOwner={org.role === "owner"} range={parseReportRange(query.from, query.to)} />
+          <OrgProgramReport orgId={org.id} isOwner={org.isLead} guest={org.role === "guest"} range={parseReportRange(query.from, query.to)} />
         ) : null}
 
         {tab === "materials" && !tabOff ? (
           <>
             {query.materialError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.materialsError")}</p> : null}
             <div>
-              <OrgProgramMaterials orgId={org.id} isOwner={org.role === "owner" && org.status === "active"} materials={materials} />
+              <OrgProgramMaterials orgId={org.id} isOwner={canPlan} materials={materials} />
             </div>
           </>
         ) : null}
@@ -405,7 +417,7 @@ export default async function AdvisorOrganisationPage({
             <div>
               <OrgProgramLearning
                 orgId={org.id}
-                isOwner={org.role === "owner" && org.status === "active"}
+                isOwner={canPlan}
                 modules={learning}
                 shares={moduleShares}
                 teams={programs.map((program) => ({ programId: program.programId, name: program.teamName ?? tAdvisor("teamProgram.unnamedTeam") }))}
@@ -435,7 +447,7 @@ export default async function AdvisorOrganisationPage({
               <section aria-labelledby="org-formats-title" className="scroll-mt-24">
                 <h2 id="org-formats-title" className="text-xl font-semibold text-slate-950">{tAdvisor("teamProgram.formats.setupTitle")}</h2>
                 <div className="mt-2">
-                  <EventFormats orgId={org.id} formats={planExtras?.formats ?? []} isOwner={isOwner} back="features" error={query.formatError === "1"} />
+                  <EventFormats orgId={org.id} formats={planExtras?.formats ?? []} isOwner={canPlan} back="features" error={query.formatError === "1"} />
                 </div>
               </section>
             ) : null}

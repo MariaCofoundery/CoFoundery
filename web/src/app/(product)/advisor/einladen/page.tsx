@@ -51,7 +51,7 @@ export default async function AdvisorInvitePage({
     (inviteRows.data ?? []) as { id: string; invitee_email: string; status: string; scopes: string[] }[]
   ).map((row) => ({ id: row.id, inviteeEmail: row.invitee_email, status: row.status, scopes: row.scopes ?? [] }));
 
-  const ownedOrg = orgs.find((org) => org.role === "owner" && org.status === "active") ?? null;
+  const ownedOrg = orgs.find((org) => org.rights.teams && org.status === "active") ?? null;
   const isOwner = ownedOrg !== null;
   const WAY_ICON: Record<Way, React.ReactNode> = {
     person: (

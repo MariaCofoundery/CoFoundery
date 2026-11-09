@@ -30,6 +30,7 @@ import { FounderChrome } from "@/features/navigation/founder/FounderChrome";
 import type { FounderAreaKey, FounderNavItem, FounderNavPrefs } from "@/features/navigation/founder/founderNav";
 import { getIncomingRequestBadgePresentation } from "@/features/discovery/discoveryIntroTypes";
 import { isWorkspacePath } from "@/features/navigation/workspace/workspaceNav";
+import type { AdvisorOrgListEntry } from "@/features/dashboard/dashboardRoleData";
 
 type Props = {
   children: React.ReactNode;
@@ -39,7 +40,7 @@ type Props = {
   advisorOrgNames?: string[];
   advisorSoloOrg?: boolean;
   /** Dieselben Organisationen mit Kennung (Programm-Umschalter in der Seitenleiste) und die gewaehlte. */
-  advisorOrgList?: { id: string; name: string; isOwner?: boolean }[];
+  advisorOrgList?: AdvisorOrgListEntry[];
   activeOrgId?: string | null;
   /** Die eigene Seitenleiste des Advisor-Arbeitsbereichs (20270331120000). */
   advisorNavPrefs?: { hidden: string[]; order: string[] } | null;

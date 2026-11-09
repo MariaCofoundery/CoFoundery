@@ -419,8 +419,10 @@
     "revoked": "ended",
     "pending": "Saving …",
     "roles": {
-      "owner": "Leads the organization",
-      "advisor": "Advisor"
+      "owner": "Admin",
+      "coordinator": "Coordinator",
+      "advisor": "Advisor",
+      "guest": "Guest"
     },
     "membershipMeaning": "Members here see everything shared with the organization. When a membership ends, that access ends at once — but the consent of the person you support stays in place, so your successor doesn't have to ask again. The people you support can see at any time who is a member here.",
     "peopleTitle": "Who you support",
@@ -456,18 +458,20 @@
       "unverified": "Please confirm your email address first. Then you can join the organization."
     },
     "leave": "Leave organization",
-    "leaveLastOwner": "You are the only person leading this organization. First add another member to the lead under “Members”, or close the organization before you leave.",
+    "leaveLastOwner": "You are the only admin of this organization. First make someone else an admin under \"Members\", or close the organization, before you leave.",
     "you": "You",
     "unnamed": "No name",
     "suspended": "This organization is suspended. Access through it is currently not active.",
     "errors": {
       "org_last_owner": "You are the only owner of this organization. Hand over ownership first before you leave.",
       "org_not_member": "This membership has already ended.",
-      "org_forbidden": "Only an owner of the organization can do this.",
+      "org_forbidden": "You do not have the right for this. Ask an admin.",
       "org_suspended": "The organization is suspended. This action is not possible right now.",
       "org_name": "The name must be between 2 and 120 characters.",
       "email": "Please enter a valid email address.",
-      "org_failed": "That did not work just now. Please try again."
+      "org_failed": "That did not work just now. Please try again.",
+      "already_member": "This person already belongs to the organization.",
+      "suggestion_duplicate": "This address has already been suggested and is waiting for a reply."
     },
     "personOpen": "View",
     "peopleEmptyInvite": "Invite a person",
@@ -504,7 +508,77 @@
     "makeOwner": "Add to the lead",
     "makeAdvisor": "Remove from the lead",
     "membersWho": "What each person does and who stands in is in the team space:",
-    "membersWhoLink": "Who does what"
+    "membersWhoLink": "Who does what",
+    "roleDesc": {
+      "owner": "May do everything, including appointing admins.",
+      "coordinator": "Runs the program day to day.",
+      "advisor": "Supports startups and works in the team room.",
+      "guest": "Sees only what is shared. Changes nothing."
+    },
+    "inviteTitle": "Invite someone",
+    "inviteEmail": "Email address",
+    "inviteNote": "The person gets an invitation by email and only joins once they agree. You can change the role later.{admin}",
+    "inviteNoteAdmin": " Someone becomes an admin through the member list.",
+    "suggestTitle": "Suggest someone",
+    "suggestText": "You do not invite directly. You say who you would like; an admin or a coordinator decides. Nobody is contacted until then.",
+    "suggestRole": "Role you have in mind",
+    "suggestReason": "Why? (optional)",
+    "suggestButton": "Suggest",
+    "suggestionsTitle": "{count, plural, =1 {1 suggestion is waiting for you} other {# suggestions are waiting for you}}",
+    "suggestionMeta": "As {role} · suggested by {name}",
+    "suggestionNote": "Short reply if you decline (optional)",
+    "suggestionAccept": "Invite",
+    "suggestionDecline": "Decline",
+    "mySuggestionsTitle": "Your suggestions",
+    "suggestionStatus": {
+      "open": "waiting",
+      "accepted": "invited",
+      "declined": "not invited"
+    },
+    "membersTitle": "Members",
+    "rolesAndRights": "Role and rights",
+    "roleSave": "Save role",
+    "makeAdminOption": "Make admin …",
+    "lastAdminNote": "There is always at least one admin. Make someone else an admin first.",
+    "adminAllRights": "Admins always have all rights.",
+    "rightsTitle": "What {name} may do",
+    "rightsCustom": "Customized",
+    "rightsSave": "Save rights",
+    "rightsReset": "Back to the role default",
+    "rightsChanged": "Last changed by {name} on {date}.",
+    "rightsNever": "Never switchable one by one, admins only: appointing admins, deleting the organization, features and funding requirements.",
+    "guestOnlyResults": "A guest can only be given \"View results\". Nothing else can be unlocked for guests.",
+    "someAdminNote": "What a team has not shared stays invisible to everyone – a role in the organization does not replace the team's consent.",
+    "rights": {
+      "invite": {
+        "label": "Invite and remove members",
+        "hint": "Without this right the person can only suggest invitations."
+      },
+      "plan": {
+        "label": "Manage events, formats and materials",
+        "hint": "Change the calendar, program plan, materials, experts and learning area."
+      },
+      "teams": {
+        "label": "Admit startups and set contact people",
+        "hint": "Invite new teams into the program, set contact people, remove teams."
+      },
+      "people": {
+        "label": "Keep their own \"Who is who\" card",
+        "hint": "The card startups can see. With coordinator also the others' cards."
+      },
+      "room": {
+        "label": "The organization's team room",
+        "hint": "Tasks, chat and pages in the team."
+      },
+      "results": {
+        "label": "View results",
+        "hint": "Program numbers, read only."
+      },
+      "profile": {
+        "label": "Edit organization profile and program page",
+        "hint": "Name, description, logo, public page."
+      }
+    }
   },
   "personView": {
     "back": "Back to people & groups",
@@ -1536,7 +1610,12 @@
     "csvLastCheckIn": "Last conversation",
     "csvNextCheckIn": "Next conversation",
     "fileAttendance": "attendance",
-    "fileTeams": "teams"
+    "fileTeams": "teams",
+    "guestText": "Program numbers, without names of startups or people.",
+    "guestTeams": "Startups in the program",
+    "guestUpcoming": "Upcoming events",
+    "guestHeld": "Past events",
+    "guestOff": "The results are not enabled for you."
   },
   "teamraum": {
     "nobody": "Nobody yet",
@@ -2460,7 +2539,7 @@
     "summary": "{shown} of {total} visible to startups",
     "unnamed": "Unnamed",
     "you": "you",
-    "roleOwner": "Owner",
+    "roleOwner": "Admin",
     "roleAdvisor": "Advisor",
     "noHeadline": "No short description yet",
     "noAbout": "No description yet.",
@@ -2491,7 +2570,8 @@
     "audienceSelected": "Only certain startups",
     "audienceNone": "No startup in the program yet – the choice applies as soon as there are some.",
     "audienceHint": "A startup that joins later only sees a restricted card once you add it here.",
-    "errorAudience": "Please choose at least one startup – or “All startups in the program”."
+    "errorAudience": "Please choose at least one startup – or “All startups in the program”.",
+    "roleCoordinator": "Coordinator"
   },
   "programTasks": {
     "titleTeam": "Tasks with the organization",
@@ -2574,5 +2654,15 @@
     "reachedTitle": "Reached ({count})",
     "saved": "Saved.",
     "error": "That did not work."
+  },
+  "guestStart": {
+    "title": "Today",
+    "text": "You are a guest of this organization: you see dates and numbers, but change nothing.",
+    "next": "Upcoming events",
+    "nothing": "No events are scheduled right now.",
+    "calendar": "Calendar",
+    "plan": "Program plan",
+    "numbers": "Numbers",
+    "note": "Guests do not see individual startups, people or the team room."
   }
 }

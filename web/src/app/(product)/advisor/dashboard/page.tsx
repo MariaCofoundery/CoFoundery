@@ -10,6 +10,7 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { QuoteOfTheDay } from "@/features/dashboard/QuoteOfTheDay";
 import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
+import { GuestStart } from "@/features/advisor/GuestStart";
 import { getAccompaniedPeople, getMyAdvisorOrgs, getOrgMembers, withAccompaniedNames } from "@/features/advisor/orgData";
 import { getOrgMilestoneDeadlines, getOrgTeamPrograms, getProgramOutcomes, getProgramUpdateDue, getSuccessEnabled, listDueProgramFollowUps, listProgramEvents } from "@/features/advisor/teamProgramData";
 import { getAdvisorDashboardProfile, getAdvisorDashboardTeams } from "@/features/dashboard/dashboardRoleData";
@@ -74,6 +75,8 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
   const memberNames = new Map(memberLists.flat().map((member) => [member.userId, member.displayName ?? t("kinds.unnamed")] as const));
 
   if (!roleViews.hasAdvisor) redirect("/dashboard");
+  // Ein Gast der Organisation sieht eine eigene, schmale Startseite: nur lesen.
+  if (orgs[0]?.role === "guest") return <GuestStart client={client} org={orgs[0]} />;
 
   // Programm: Fristen und faellige Updates der Teams, die diese Person sehen darf
   // (Inhaber alle, Bezugsperson die eigenen). Hoechstens drei Organisationen und

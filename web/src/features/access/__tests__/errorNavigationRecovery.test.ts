@@ -226,7 +226,8 @@ test("N: Org-Mitgliederliste zeigt Namen und Rollen aus einer eigenen Funktion",
   const data = read("src/features/advisor/orgData.ts");
   assert.match(data, /rpc\("get_advisor_org_member_list", \{ p_org_id: orgId \}\)/);
   assert.match(data, /displayName: row\.display_name/);
-  const section = read("src/features/advisor/AdvisorOrgSection.tsx");
+  // Seit dem 09.11.2026 steht die Liste im OrgMembersPanel (Rollen, Rechte, Vorschlaege).
+  const section = read("src/features/advisor/OrgMembersPanel.tsx");
   assert.match(section, /member\.displayName \?\? t\("unnamed"\)/);
   assert.match(section, /member\.isSelf \? ` \(\$\{t\("you"\)\}\)` : ""/);
   assert.match(section, /t\(`roles\.\$\{member\.role\}`\)/);

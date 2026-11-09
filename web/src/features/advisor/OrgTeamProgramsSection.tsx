@@ -67,7 +67,9 @@ export async function OrgTeamProgramsSection({
   codeError: string | null;
 }) {
   const t = await getTranslations("advisor.teamProgram");
-  const isOwner = org.role === "owner" && org.status === "active";
+  // Aufnehmen, Ansprechpersonen und Entfernen: das Recht "teams". Alle Startups sieht, wer die Organisation fuehrt (Admin, Koordination).
+  const canTeams = org.rights.teams && org.status === "active";
+  const isLead = org.isLead && org.status === "active";
   const activeMembers = members.filter((member) => member.status === "active");
   const nameOf = (userId: string) => activeMembers.find((member) => member.userId === userId)?.displayName ?? t("unnamedPerson");
   const freshUrl = freshToken && /^[0-9a-f]{48}$/.test(freshToken) ? `${getPublicAppOrigin()}/programm/einladung/${freshToken}` : null;
@@ -93,7 +95,7 @@ export async function OrgTeamProgramsSection({
             </p>
           </div>
           {/* Ohne Team stehen dieselben Wege im leeren Zustand darunter - nicht zweimal. */}
-          {isOwner && programs.length > 0 ? (
+          {canTeams && programs.length > 0 ? (
             <div className="flex flex-wrap gap-2.5">
               <Link href={`/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50">{t("programCodeButton")}</Link>
               <Link href={`/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`} className="brand-cta inline-flex min-h-11 items-center rounded-xl px-[18px] text-sm font-semibold">+ {t("programsEmptyInvite")}</Link>
@@ -103,8 +105,8 @@ export async function OrgTeamProgramsSection({
 
         {programs.length === 0 ? (
           <EmptyState
-            text={isOwner ? t("programsEmpty") : t("programsEmptyContact")}
-            actions={isOwner ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }, { href: "/advisor/beispiel", label: t("programsEmptyExample") }] : [{ href: "/advisor/beispiel", label: t("programsEmptyExample") }]}
+            text={canTeams ? t("programsEmpty") : t("programsEmptyContact")}
+            actions={canTeams ? [{ href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-invite-title`, label: t("programsEmptyInvite"), primary: true }, { href: `/advisor/organisation?org=${encodeURIComponent(org.id)}&tab=enroll#org-codes-title`, label: t("programsEmptyCode") }, { href: "/advisor/beispiel", label: t("programsEmptyExample") }] : [{ href: "/advisor/beispiel", label: t("programsEmptyExample") }]}
           />
         ) : (
           <div className="overflow-hidden rounded-[18px] border border-slate-200 bg-white">
@@ -159,11 +161,11 @@ export async function OrgTeamProgramsSection({
                         <Link href={calendarHref(org.id)} className="inline-flex min-h-9 items-center font-medium text-violet-800 underline-offset-4 hover:underline">{t("rowDates")}</Link>
                       </p>
                     ) : null}
-                    {isOwner || program.isContact ? (
+                    {isLead || program.isContact ? (
                       <details className="group px-5 pb-1">
                         <summary className="-mt-1 inline-flex min-h-10 cursor-pointer list-none items-center text-[13px] font-medium text-slate-600 underline-offset-4 hover:text-slate-950 hover:underline">{t("teamSettings")}</summary>
                         <div className="pb-4">
-                      {!program.isActive && program.memberCount === 1 && (isOwner || program.isContact) ? (
+                      {!program.isActive && program.memberCount === 1 && (isLead || program.isContact) ? (
                         <form action={setTeamProgramSoloAction} className="mt-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
                           <input type="hidden" name="orgId" value={org.id} />
                           <input type="hidden" name="programId" value={program.programId} />
@@ -174,7 +176,7 @@ export async function OrgTeamProgramsSection({
                       ) : null}
                       {program.soloConfirmed && program.memberCount === 1 ? <p className="mt-1 text-xs text-slate-500">{t("soloMarked")}</p> : null}
 
-                      {isOwner || program.isContact ? (
+                      {isLead || program.isContact ? (
                         <form action={setProgramMetaAction} className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
                           <input type="hidden" name="orgId" value={org.id} />
                           <input type="hidden" name="programId" value={program.programId} />
@@ -194,7 +196,7 @@ export async function OrgTeamProgramsSection({
                         </form>
                       ) : null}
 
-                      {isOwner ? (
+                      {canTeams ? (
                         <details className="mt-3 border-t border-slate-200 pt-3">
                           <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium text-slate-500 underline-offset-4 hover:text-rose-800 hover:underline">{t("removeTeam")}</summary>
                           <form action={removeTeamFromProgramAction} className="mt-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
@@ -206,7 +208,7 @@ export async function OrgTeamProgramsSection({
                         </details>
                       ) : null}
 
-                      {isOwner ? (
+                      {canTeams ? (
                         <form action={setTeamProgramContactsAction} className="mt-4 border-t border-slate-200 pt-3">
                           <input type="hidden" name="orgId" value={org.id} />
                           <input type="hidden" name="programId" value={program.programId} />
@@ -255,7 +257,7 @@ export async function OrgTeamProgramsSection({
         </p>
       ) : null}
 
-      {part === "enroll" && isOwner ? (
+      {part === "enroll" && canTeams ? (
         <section aria-labelledby="org-invite-title" className="grid gap-4 md:grid-cols-2">
           <div className={CARD}>
             <h2 id="org-invite-title" className="scroll-mt-24 text-lg font-semibold text-slate-950">{t("inviteCardTitle")}</h2>

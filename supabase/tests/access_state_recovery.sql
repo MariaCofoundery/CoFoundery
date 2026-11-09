@@ -148,7 +148,7 @@ create temp table org_list(viewer integer,user_id uuid,role text,status text,dis
 do $$ declare n integer; begin
  foreach n in array array[5,4,6,7] loop
   perform pg_temp.as_user(n); execute 'set local role authenticated';
-  insert into org_list select n,* from public.get_advisor_org_member_list('e87d3000-0000-4000-8000-000000000001');
+  insert into org_list select n, l.user_id, l.role, l.status, l.display_name, l.is_self from public.get_advisor_org_member_list('e87d3000-0000-4000-8000-000000000001') l;
   execute 'reset role';
  end loop; end $$;
 select pg_temp.check((select count(*) from org_list where viewer=5)=3,'N: owner sees active and ended memberships');

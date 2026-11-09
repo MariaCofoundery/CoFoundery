@@ -287,8 +287,8 @@ test("Team entfernen: nur der Inhaber, mit Rueckfrage, das Team erfaehrt es", ()
   assert.match(sql, /is_advisor_org_owner_of\(v_org\)/);
   assert.match(sql, /'program_removed'/);
   const org = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
-  // Der Knopf steht nur beim Inhaber und hinter einer Rueckfrage (details).
-  assert.match(org, /\{isOwner \? \(\s*<details[\s\S]*removeTeamFromProgramAction/);
+  // Der Knopf steht nur, wer das Recht "Startups aufnehmen" hat, und hinter einer Rueckfrage (details).
+  assert.match(org, /\{canTeams \? \(\s*<details[\s\S]*removeTeamFromProgramAction/);
   const notices = JSON.parse(readFileSync("messages/de/notices.json", "utf8"));
   assert.ok(notices.kinds.program_removed);
 });
@@ -393,7 +393,7 @@ test("Organisation: die vierzehn Reiter stehen in drei Gruppen, jeder Reiter gen
   }
   // Einladungen und Codes liegen im Reiter "Teams aufnehmen", die Teamkarten im Reiter "Programm".
   const section = readFileSync("src/features/advisor/OrgTeamProgramsSection.tsx", "utf8");
-  assert.match(section, /part === "enroll" && isOwner/);
+  assert.match(section, /part === "enroll" && canTeams/);
   const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
   assert.match(actions, /tab=enroll/);
 });
@@ -744,7 +744,7 @@ test("Gespraech zum Stand gehoert zur Begleitung: im Ueberblick der Team-Seite, 
 });
 
 test("Einrichten fuer alle lesbar: wer nicht fuehrt, sieht einen Hinweis und das Profil statt einer leeren Seite", () => {
-  assert.match(page, /!isOwner && \(tab === "enroll" \|\| tab === "page" \|\| tab === "features" \|\| tab === "profile"\)/);
+  assert.match(page, /\(!canTeams && tab === "enroll"\) \|\| \(!canProfile && \(tab === "page" \|\| tab === "profile"\)\) \|\| \(!isOwner && tab === "features"\)/);
   assert.match(page, /orgPage\.ownerOnlyNote/);
   const section = readFileSync("src/features/advisor/AdvisorOrgSection.tsx", "utf8");
   assert.match(section, /\) : showProfile && part === "profile" \? \(/);

@@ -58,6 +58,6 @@ test("Programm: schmaler Kopf, Reiter der Gruppe (die Gruppen stehen in der Seit
   const section = read("src/features/advisor/OrgTeamProgramsSection.tsx");
   assert.match(section, /t\("colMilestone"\)/);
   assert.match(section, /<summary[^>]*>\{t\("retentionQuestion"\)\}<\/summary>/);
-  // Einstellungen je Team bleiben erreichbar - nur fuer Inhaberin und Bezugsperson.
-  assert.match(section, /isOwner \|\| program\.isContact \? \(\s*<details/);
+  // Einstellungen je Team bleiben erreichbar - nur fuer die Fuehrung (Admin, Koordination) und die Bezugsperson.
+  assert.match(section, /isLead \|\| program\.isContact \? \(\s*<details/);
 });

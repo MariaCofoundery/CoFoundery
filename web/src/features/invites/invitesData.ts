@@ -1,4 +1,5 @@
 import "server-only";
+import { type OrgRole, orgRoleOf } from "@/features/advisor/orgRights";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -11,7 +12,7 @@ export type MyInvite = {
   kind: "org" | "person";
   orgName: string | null;
   inviterName: string | null;
-  role: "owner" | "advisor" | null;
+  role: OrgRole | null;
   scopes: string[];
   note: string | null;
   createdAt: string;
@@ -26,7 +27,7 @@ export async function listMyInvites(client: SupabaseClient): Promise<MyInvite[]>
     kind: row.kind === "person" ? "person" : "org",
     orgName: (row.org_name as string | null) ?? null,
     inviterName: (row.inviter_name as string | null) ?? null,
-    role: row.role === "owner" ? "owner" : row.role === "advisor" ? "advisor" : null,
+    role: typeof row.role === "string" ? orgRoleOf(row.role) : null,
     scopes: Array.isArray(row.scopes) ? (row.scopes as string[]) : [],
     note: (row.note as string | null) ?? null,
     createdAt: row.created_at as string,

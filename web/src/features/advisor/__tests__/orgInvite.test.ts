@@ -56,7 +56,7 @@ test("Mitglieder-Reiter zeigt offene Einladungen, nur fuer Mitglieder, ohne Link
   const data = readFileSync("src/features/advisor/orgData.ts", "utf8");
   assert.match(data, /eq\("status", "sent"\)/);
   assert.doesNotMatch(data.slice(data.indexOf("getOrgOpenInvites")), /token_hash/);
-  const ui = readFileSync("src/features/advisor/AdvisorOrgSection.tsx", "utf8");
+  const ui = readFileSync("src/features/advisor/OrgMembersPanel.tsx", "utf8");
   assert.match(ui, /openInvitesTitle/);
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   assert.match(page, /openInvites=\{openInvites\}/);

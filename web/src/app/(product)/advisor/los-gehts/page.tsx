@@ -108,7 +108,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         ) : null}
 
         {current === "people" ? (
-          <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={setup.isOwner} programs={peoplePrograms.filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tTeams("unnamedTeam") }))} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
+          <OrgPeopleCards orgId={org.id} members={people} cards={peopleCards} isOwner={org.isLead && org.rights.people} canSelf={org.rights.people} programs={peoplePrograms.filter((program) => program.isActive).map((program) => ({ programId: program.programId, name: program.teamName ?? tTeams("unnamedTeam") }))} back="setup" savedUserId={query.cardSaved ?? null} error={query.cardError ?? null} />
         ) : null}
 
         {current === "plan" && currentState !== "done" ? (

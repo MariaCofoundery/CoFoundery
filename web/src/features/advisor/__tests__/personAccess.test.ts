@@ -197,7 +197,7 @@ test("der gesammelte Bereich trennt Zusage und Anfrage", () => {
   // Phase 12C.1C: Namen gibt es nur in der Mitgliederliste der Organisation -
   // aus einer eigenen Funktion, die nur Mitgliedern antwortet.
   assert.match(data, /get_advisor_org_member_list/);
-  assert.match(codeOnly("src/features/advisor/AdvisorOrgSection.tsx"), /member\.displayName \?\? t\("unnamed"\)/);
+  assert.match(codeOnly("src/features/advisor/OrgMembersPanel.tsx"), /member\.displayName \?\? t\("unnamed"\)/);
 });
 
 // ---------------------------------------------------------------------------
@@ -392,7 +392,8 @@ test("was die Organisation über sich sagt, ändert nur ihre Führung", () => {
   assert.match(migration, /member\.role = 'owner'/);
 
   // Im Formular steht sie nicht noch einmal - es wird nur nicht gezeigt.
-  assert.match(codeOnly(ORG_SECTION), /org\.role === "owner"/);
+  // (seit 09.11.2026 am Recht "profile": die Fuehrung hat es immer, andere nur, wenn ein Admin es gibt.)
+  assert.match(codeOnly(ORG_SECTION), /org\.rights\.profile/);
 });
 
 // ---------------------------------------------------------------------------

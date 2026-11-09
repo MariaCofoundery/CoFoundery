@@ -1,16 +1,9 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import {
-  createAdvisorOrgAction,
-  updateAdvisorOrgProfileAction,
-  inviteOrgAdvisorAction,
-  setOrgMembershipAction,
-  setOrgMemberRoleAction,
-  leaveOrgAction,
-} from "@/features/advisor/orgActions";
-import type { AdvisorOrg, OrgMember, OrgOpenInvite } from "@/features/advisor/orgData";
+import { getTranslations } from "next-intl/server";
+import { createAdvisorOrgAction, updateAdvisorOrgProfileAction } from "@/features/advisor/orgActions";
+import { OrgMembersPanel } from "@/features/advisor/OrgMembersPanel";
+import type { AdvisorOrg, OrgInviteSuggestion, OrgMember, OrgOpenInvite } from "@/features/advisor/orgData";
 import type { OrgActionErrorCode } from "@/features/advisor/orgErrors";
 import { SubmitButton } from "@/features/ui/SubmitButton";
-import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 /**
  * Die Organisation - anlegen, Menschen aufnehmen, sehen wen man begleitet.
@@ -29,6 +22,7 @@ export async function AdvisorOrgSection({
   orgs,
   members,
   openInvites = [],
+  suggestions = [],
   error = null,
   saved = false,
   part = "all",
@@ -37,6 +31,8 @@ export async function AdvisorOrgSection({
   members: OrgMember[];
   /** Eingeladen, aber noch nicht beigetreten: damit man sieht, dass die Einladung angekommen ist oder noch aussteht. */
   openInvites?: OrgOpenInvite[];
+  /** Vorschlaege fuer Einladungen (Advisor schlaegt vor, Admin/Koordination entscheiden). */
+  suggestions?: OrgInviteSuggestion[];
   /** Phase 12C.1C: Rueckmeldung einer Org-Aktion (`?orgError=`). */
   error?: OrgActionErrorCode | null;
   /** Gespeichert (`?saved=1`) - vorher sagte die Seite nach dem Speichern nichts. */
@@ -45,7 +41,6 @@ export async function AdvisorOrgSection({
   part?: "all" | "members" | "profile";
 }) {
   const t = await getTranslations("advisor.org");
-  const locale = getPresentationLocale(await getLocale());
   const org = orgs[0] ?? null;
   const showHeader = part === "all";
   const showProfile = part === "all" || part === "profile";
@@ -112,7 +107,7 @@ export async function AdvisorOrgSection({
               er bestimmt aber nicht, was sie über sich sagt. Die Regel steht
               in der Datenbank; hier wird das Formular nur nicht gezeigt.
               -------------------------------------------------------------- */}
-          {showProfile && org.role === "owner" && org.status === "active" ? (
+          {showProfile && org.rights.profile && org.status === "active" ? (
             <details open={part === "profile"} className="mt-4 rounded-2xl border border-slate-200 bg-slate-50/60">
               <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-slate-800">
                 {t("profileTitle")}
@@ -210,127 +205,7 @@ export async function AdvisorOrgSection({
             </dl>
           ) : null}
 
-          {showMembers && org.role === "owner" && org.status === "active" ? (
-            <form action={inviteOrgAdvisorAction} className="mt-4 flex flex-wrap items-end gap-3">
-              <input type="hidden" name="orgId" value={org.id} />
-              <label className="min-w-0 flex-1">
-                <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-                  {t("inviteLabel")}
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm"
-                />
-              </label>
-              {/* Die Rolle reiste bisher nicht mit (die Aktion las sie, das Formular schickte sie nie). */}
-              <label>
-                <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">{t("roleLabel")}</span>
-                <select name="role" defaultValue="advisor" className="mt-1 min-h-11 rounded-xl border border-slate-300 bg-white px-3 text-sm">
-                  <option value="advisor">{t("roles.advisor")}</option>
-                  <option value="owner">{t("roles.owner")}</option>
-                </select>
-              </label>
-              <SubmitButton
-                label={t("invite")}
-                pendingLabel={t("pending")}
-                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-              />
-            </form>
-          ) : null}
-
-          {showMembers && openInvites.length > 0 ? (
-            <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <h3 className="text-sm font-semibold text-amber-950">{t("openInvitesTitle")}</h3>
-              <p className="mt-1 text-xs leading-5 text-amber-900">{t("openInvitesText")}</p>
-              <ul className="mt-2 space-y-1">
-                {openInvites.map((invite) => (
-                  <li key={`${invite.email}-${invite.sentAt}`} className="break-all text-sm text-amber-950">
-                    {invite.email}
-                    <span className="text-amber-800">
-                      {" · "}
-                      {t(`roles.${invite.role}`)}
-                      {" · "}
-                      {t("openInviteUntil", { date: new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(invite.expiresAt)) })}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {showMembers ? (
-          <ul className="mt-5 space-y-2">
-            {members.map((member) => (
-              <li
-                key={member.userId}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-              >
-                {/* Phase 12C.1C: Name vor der Rolle - wer verwaltet, muss sehen, wen. */}
-                <span className="min-w-0 break-words text-slate-800">
-                  <span className="font-medium text-slate-900">
-                    {member.displayName ?? t("unnamed")}
-                    {member.isSelf ? ` (${t("you")})` : ""}
-                  </span>
-                  <span className="text-slate-500">
-                    {" · "}
-                    {t(`roles.${member.role}`)}
-                    {member.status === "revoked" ? ` · ${t("revoked")}` : ""}
-                  </span>
-                </span>
-                {org.role === "owner" && org.status === "active" && member.status === "active" && !member.isSelf ? (
-                  <div className="flex flex-wrap items-center gap-1">
-                  {/* Die Fuehrung uebergeben (seit 05.11.2026): ein Mitglied zur Mitinhaberin machen - oder zurueck. */}
-                  <form action={setOrgMemberRoleAction}>
-                    <input type="hidden" name="orgId" value={org.id} />
-                    <input type="hidden" name="userId" value={member.userId} />
-                    <input type="hidden" name="role" value={member.role === "owner" ? "advisor" : "owner"} />
-                    <SubmitButton
-                      label={t(member.role === "owner" ? "makeAdvisor" : "makeOwner")}
-                      pendingLabel={t("pending")}
-                      className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-medium text-violet-800 underline-offset-4 hover:underline"
-                    />
-                  </form>
-                  <form action={setOrgMembershipAction}>
-                    <input type="hidden" name="orgId" value={org.id} />
-                    <input type="hidden" name="userId" value={member.userId} />
-                    <input type="hidden" name="status" value="revoked" />
-                    <SubmitButton
-                      label={t("removeMember")}
-                      pendingLabel={t("pending")}
-                      className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-medium text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline"
-                    />
-                  </form>
-                  </div>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          ) : null}
-
-          {/* Phase 12C.1B: selbst gehen. Die letzte Inhaberin bekommt statt des
-              Knopfs den Hinweis - die Datenbank wuerde es ohnehin ablehnen. */}
-          {!showMembers || org.role === null ? null : org.role === "owner" &&
-          members.filter((member) => member.role === "owner" && member.status === "active").length <= 1 ? (
-            <p className="mt-4 text-xs leading-6 text-slate-500">{t("leaveLastOwner")}</p>
-          ) : (
-            <form action={leaveOrgAction} className="mt-4">
-              <input type="hidden" name="orgId" value={org.id} />
-              <SubmitButton
-                label={t("leave")}
-                pendingLabel={t("pending")}
-                className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-              />
-            </form>
-          )}
-
-          {/* WAS EINE MITGLIEDSCHAFT BEDEUTET - dort, wo sie vergeben wird. */}
-          {showMembers ? (
-            <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-600">
-              {t("membershipMeaning")}
-            </p>
-          ) : null}
+          {showMembers ? <OrgMembersPanel org={org} members={members} openInvites={openInvites} suggestions={suggestions} /> : null}
         </>
       )}
     </section>

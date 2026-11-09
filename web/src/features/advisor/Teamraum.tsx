@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { type OrgRole, isLeadRole } from "@/features/advisor/orgRights";
 import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -50,7 +51,7 @@ import { calendarHref } from "@/features/advisor/calendar/calendarModel";
  * betrachtende Person das Team ohnehin sieht (Inhaberin oder Bezugsperson); sonst "ein Team im Programm".
  */
 
-export type TeamraumMember = { userId: string; name: string; role: "owner" | "advisor"; isSelf: boolean };
+export type TeamraumMember = { userId: string; name: string; role: OrgRole; isSelf: boolean };
 export type TeamraumProgram = { programId: string; name: string; contactUserIds: string[]; isActive: boolean };
 export type TeamraumContext = {
   orgId: string;
@@ -984,7 +985,7 @@ export async function TeamraumWho({ ctx, nextCheckIns }: { ctx: TeamraumContext;
                 <Avatar userId={member.userId} name={member.name} size="h-11 w-11 text-base" />
                 <div className="min-w-0">
                   <p className="font-semibold text-slate-950">{member.isSelf ? t("me", { name: member.name }) : member.name}</p>
-                  <p className="text-sm text-slate-600">{[presence?.teamRole, member.role === "owner" ? t("who.lead") : null].filter(Boolean).join(" · ") || t("who.noRole")}</p>
+                  <p className="text-sm text-slate-600">{[presence?.teamRole, isLeadRole(member.role) ? t("who.lead") : null].filter(Boolean).join(" · ") || t("who.noRole")}</p>
                 </div>
               </div>
               {away && presence?.awayUntil ? (

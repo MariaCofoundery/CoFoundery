@@ -17,6 +17,10 @@ import {
 import { getAdvisorFounderSetupAccessState } from "@/features/teams/founderSetupAdvisorAccessData";
 import type { AdvisorFounderSetupAccessState } from "@/features/teams/founderSetupAdvisorAccessModel";
 import { CURRENT_INSTRUMENT_ID } from "@/features/instruments/instruments";
+import { type OrgRights, type OrgRole, orgRoleOf, parseOverrides, rightsOf } from "@/features/advisor/orgRights";
+
+/** Eine Organisation der Person: Rolle und Rechte steuern, was die Seitenleiste anbietet. */
+export type AdvisorOrgListEntry = { id: string; name: string; isOwner?: boolean; role?: OrgRole; rights?: OrgRights };
 
 export type DashboardRoleKey = "founder" | "advisor";
 
@@ -29,8 +33,8 @@ export type DashboardRoleViews = {
   /** Einzige Organisation, in der die Person allein aktiv ist: im Menue "Mein Programm" statt Organisationsname. */
   advisorSoloOrg?: boolean;
   /** Dieselben Organisationen mit Kennung, nach Namen sortiert - fuer den Programm-Umschalter in der Seitenleiste. */
-  /** `isOwner`: nur die Inhaberin legt Termine an (Anzeige - die Datenbank prueft es). */
-  advisorOrgList?: { id: string; name: string; isOwner?: boolean }[];
+  /** `isOwner`: Admin. `role`/`rights`: was die Person in dieser Organisation darf (Anzeige - die Datenbank prueft es). */
+  advisorOrgList?: AdvisorOrgListEntry[];
 };
 
 type AdvisorAccessRow = {
@@ -289,25 +293,33 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
 async function listActiveAdvisorOrgs(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-): Promise<{ names: string[]; solo: boolean; list: { id: string; name: string; isOwner?: boolean }[] }> {
+): Promise<{ names: string[]; solo: boolean; list: AdvisorOrgListEntry[] }> {
   try {
-    const { data: memberships } = await supabase
-      .from("advisor_org_members")
-      .select("org_id, role")
-      .eq("user_id", userId)
-      .eq("status", "active");
-    const orgIds = (memberships ?? []).map((row) => row.org_id as string);
+    const [{ data: memberRows }, { data: guestRows }] = await Promise.all([
+      supabase.from("advisor_org_members").select("org_id, role, rights").eq("user_id", userId).eq("status", "active"),
+      supabase.from("advisor_org_guests").select("org_id, rights").eq("user_id", userId).eq("status", "active"),
+    ]);
+    // Ein Gast steht in einer eigenen Tabelle und zaehlt wie ein Mitglied fuer die Navigation - mit engeren Rechten.
+    const memberships = [
+      ...(memberRows ?? []).map((row) => ({ org_id: row.org_id as string, role: orgRoleOf(row.role), rights: parseOverrides(row.rights) })),
+      ...(guestRows ?? []).map((row) => ({ org_id: row.org_id as string, role: "guest" as OrgRole, rights: parseOverrides(row.rights) })),
+    ];
+    const orgIds = memberships.map((row) => row.org_id);
     if (orgIds.length === 0) return { names: [], solo: false, list: [] };
     const { data: orgs } = await supabase.from("advisor_orgs").select("id, name").in("id", orgIds);
     const names = (orgs ?? [])
       .map((org) => String(org.name ?? "").trim())
       .filter((name) => name.length > 0);
     const list = (orgs ?? [])
-      .map((org) => ({ id: String(org.id), name: String(org.name ?? "").trim(), isOwner: (memberships ?? []).some((row) => row.org_id === org.id && row.role === "owner") }))
+      .map((org): AdvisorOrgListEntry => {
+        const mine = memberships.find((row) => row.org_id === org.id);
+        const role = mine?.role ?? "advisor";
+        return { id: String(org.id), name: String(org.name ?? "").trim(), isOwner: role === "owner", role, rights: rightsOf(role, mine?.rights) };
+      })
       .filter((org) => org.name.length > 0)
       .sort((a, b) => a.name.localeCompare(b.name, "de"));
     let solo = false;
-    if (orgIds.length === 1 && memberships?.[0]?.role === "owner") {
+    if (orgIds.length === 1 && memberships[0]?.role === "owner") {
       const { data: active } = await supabase
         .from("advisor_org_members")
         .select("user_id")

@@ -15,10 +15,12 @@ import {
   applyNavPrefs,
   buildWorkspaceNav,
   flattenWorkspaceNav,
+  limitNavByRights,
   type NavPrefs,
   type WorkspaceItemKey,
   type WorkspaceNavItem,
 } from "@/features/navigation/workspace/workspaceNav";
+import type { AdvisorOrgListEntry } from "@/features/dashboard/dashboardRoleData";
 
 type Slots = {
   /** Bild mit Menue (Profil, Konto, Abmelden). */
@@ -62,7 +64,7 @@ export function WorkspaceChrome({
   hasOrg: boolean;
   orgLabel: string;
   /** Alle Programme der Person (nach Namen) und das gewaehlte - der Umschalter oben in der Seitenleiste. */
-  orgs: { id: string; name: string; isOwner?: boolean }[];
+  orgs: AdvisorOrgListEntry[];
   activeOrgId: string | null;
   chatUnread: number;
   messagesCount: number;
@@ -80,8 +82,8 @@ export function WorkspaceChrome({
   const queryOrg = params.get("org");
   const activeIndex = Math.max(0, orgs.findIndex((entry) => entry.id === (orgs.some((o) => o.id === queryOrg) ? queryOrg : activeOrgId)));
   const active = orgs[activeIndex] ?? null;
-  // Termine legt nur die Inhaberin an: Wer nur mitarbeitet, bekommt "Termin" und "Mehrere Termine" gar nicht erst angeboten.
-  const canPlan = active?.isOwner !== false;
+  // Termine legt an, wer das Recht "Termine pflegen" hat: Wer nur mitarbeitet, bekommt "Termin" und "Mehrere Termine" gar nicht erst angeboten.
+  const canPlan = active?.rights ? active.rights.plan : active?.isOwner !== false;
   const creates = QUICK_CREATE.filter((entry) => canPlan || (entry.key !== "event" && entry.key !== "events"));
   const color = orgColor(activeIndex);
   const writeActive = (id: string) => {
@@ -94,7 +96,7 @@ export function WorkspaceChrome({
       router.refresh();
     }
   }, [active, queryOrg, activeOrgId, router]);
-  const fullNav = useMemo(() => buildWorkspaceNav({ hasOrg, chatUnread }), [hasOrg, chatUnread]);
+  const fullNav = useMemo(() => limitNavByRights(buildWorkspaceNav({ hasOrg, chatUnread }), active?.role, active?.rights), [hasOrg, chatUnread, active?.role, active?.rights]);
   // Die eigene Leiste (ausgeblendet/sortiert); Suche und aktive Seite kennen immer alle Stationen.
   const nav = useMemo(() => applyNavPrefs(fullNav, navPrefs), [fullNav, navPrefs]);
   const all = useMemo(() => flattenWorkspaceNav(nav), [nav]);

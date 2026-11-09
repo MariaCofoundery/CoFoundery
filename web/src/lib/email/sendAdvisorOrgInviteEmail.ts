@@ -1,4 +1,5 @@
 import { PRODUCT_NAME } from "@/features/brand";
+import type { OrgRole } from "@/features/advisor/orgRights";
 
 /**
  * Die Einladung eines Advisors in eine Organisation.
@@ -13,7 +14,7 @@ type Params = {
   recipientEmail: string;
   orgName: string;
   inviterName: string | null;
-  role: "owner" | "advisor";
+  role: OrgRole;
   url: string;
 };
 
@@ -50,7 +51,8 @@ export async function sendAdvisorOrgInviteEmail(params: Params): Promise<Result>
 
   const who = params.inviterName ? escapeHtml(params.inviterName) : "Jemand";
   const org = escapeHtml(params.orgName);
-  const roleText = params.role === "owner" ? "als Mit-Inhaberin oder Mit-Inhaber" : "als Advisor";
+  const roleText =
+    params.role === "owner" ? "als Admin" : params.role === "coordinator" ? "als Koordination" : params.role === "guest" ? "als Gast (nur lesend)" : "als Advisor";
   const html = [
     "<p>Hallo,</p>",
     `<p>${who} hat dich zu <strong>${org}</strong> bei ${PRODUCT_NAME} eingeladen, ${roleText}.`,
@@ -59,7 +61,7 @@ export async function sendAdvisorOrgInviteEmail(params: Params): Promise<Result>
     `<p><a href="${escapeHtml(params.url)}">Einladung ansehen</a></p>`,
     "<p><strong>So geht es weiter:</strong> Melde dich mit genau dieser E-Mail-Adresse an",
     `(${escapeHtml(params.recipientEmail)}). Hast du noch kein Konto, wird dabei eines angelegt.`,
-    "Danach siehst du die Einladung und bestätigst mit einem Klick. Erst dann wirst du Mitglied.</p>",
+    "Danach siehst du die Einladung und bestätigst mit einem Klick. Erst dann gehörst du dazu.</p>",
     "<p>Du hast die Einladung nicht erwartet? Dann ignoriere diese Mail, es passiert nichts.</p>",
   ].join("\n");
   const text =
@@ -67,7 +69,7 @@ export async function sendAdvisorOrgInviteEmail(params: Params): Promise<Result>
     `Einladung ansehen: ${params.url}\n\n` +
     `So geht es weiter: Melde dich mit genau dieser E-Mail-Adresse an (${params.recipientEmail}). ` +
     "Hast du noch kein Konto, wird dabei eines angelegt. Danach siehst du die Einladung und bestätigst mit einem Klick. " +
-    "Erst dann wirst du Mitglied.\n\n" +
+    "Erst dann gehörst du dazu.\n\n" +
     "Du hast die Einladung nicht erwartet? Dann ignoriere diese Mail, es passiert nichts.";
 
   try {

@@ -1,4 +1,5 @@
 import type { AdvisorOrg, OrgMember } from "@/features/advisor/orgData";
+import { rightsOf } from "@/features/advisor/orgRights";
 import type {
   CheckIn,
   OrgProgramStars,
@@ -101,6 +102,9 @@ export function buildExampleOrg(t: Text) {
     name: t("fixtureOrg"),
     personSeatLimit: null,
     role: "owner",
+    rights: rightsOf("owner"),
+    isAdmin: true,
+    isLead: true,
     status: "active",
     description: null,
     websiteUrl: null,

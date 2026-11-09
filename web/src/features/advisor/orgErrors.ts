@@ -10,6 +10,8 @@ export type OrgActionErrorCode =
   | "org_suspended"
   | "org_name"
   | "email"
+  | "already_member"
+  | "suggestion_duplicate"
   | "org_failed";
 
 export function orgErrorCode(message: string | null | undefined): OrgActionErrorCode {
@@ -18,6 +20,8 @@ export function orgErrorCode(message: string | null | undefined): OrgActionError
   if (/advisor_org_not_a_member/.test(text)) return "org_not_member";
   if (/advisor_org_not_yours|advisor_org_owner_required/.test(text)) return "org_forbidden";
   if (/invalid_email/.test(text)) return "email";
+  if (/already_member/.test(text)) return "already_member";
+  if (/org_suggestion_one_open|duplicate key/.test(text)) return "suggestion_duplicate";
   return "org_failed";
 }
 
@@ -28,6 +32,8 @@ const KNOWN_CODES: readonly OrgActionErrorCode[] = [
   "org_suspended",
   "org_name",
   "email",
+  "already_member",
+  "suggestion_duplicate",
   "org_failed",
 ];
 

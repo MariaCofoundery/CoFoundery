@@ -86,8 +86,9 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   if (!org) redirect("/advisor/organisation");
 
   const today = berlinToday();
-  const isOwner = org.role === "owner" && org.status === "active";
-  const canWrite = org.status === "active";
+  // `isOwner` heisst hier: darf Termine pflegen (Recht "plan"). Posts und Aufgaben im Kalender gehoeren zum Teamraum ("room").
+  const isOwner = org.rights.plan && org.status === "active";
+  const canWrite = org.status === "active" && org.rights.room;
   const view = viewOf(query.ansicht);
   const month = monthOf(query.monat, today);
   const week = weekOf(query.woche, today);
@@ -451,7 +452,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           events={events.map((event) => ({ eventId: event.eventId, title: event.title, startsAt: event.startsAt }))}
           campaigns={campaigns}
           members={members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? tAdvisor("area.kinds.unnamed") }))}
-          canDelete={Boolean(openPost && canWrite && (openPost.createdByUserId === user.id || isOwner))}
+          canDelete={Boolean(openPost && canWrite && (openPost.createdByUserId === user.id || org.isLead))}
           locale={locale}
         />
       ) : sheet ? (

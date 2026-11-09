@@ -1,10 +1,11 @@
 import { getTranslations } from "next-intl/server";
+import type { OrgRole } from "@/features/advisor/orgRights";
 import { saveOrgMemberCardAction } from "@/features/advisor/orgPeopleActions";
 import type { MemberCard } from "@/features/advisor/orgPeopleData";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { TILE, TILE_INPUT, TILE_LABEL } from "@/features/ui/FormControls";
 
-type Member = { userId: string; displayName: string | null; role: "owner" | "advisor"; status: string; isSelf: boolean };
+type Member = { userId: string; displayName: string | null; role: OrgRole; status: string; isSelf: boolean };
 
 /**
  * "Wer ist wer" fuer die Organisation (06.11.2026): je aktivem Mitglied eine Karte - Kurzzeile, ein paar Saetze,
@@ -18,6 +19,7 @@ export async function OrgPeopleCards({
   members,
   cards,
   isOwner,
+  canSelf = true,
   programs,
   back,
   savedUserId,
@@ -26,7 +28,10 @@ export async function OrgPeopleCards({
   orgId: string;
   members: Member[];
   cards: Map<string, MemberCard>;
+  /** Wer die Organisation fuehrt (Admin, Koordination) und das Recht "Wer ist wer" hat: bearbeitet auch die Karten der anderen. */
   isOwner: boolean;
+  /** Das Recht "Wer ist wer": die eigene Karte. */
+  canSelf?: boolean;
   /** Die Startups im Programm - daraus waehlt die Inhaberin, wer wen sieht. */
   programs: { programId: string; name: string }[];
   back?: "setup";
@@ -51,7 +56,7 @@ export async function OrgPeopleCards({
       <ul className="mt-4 grid gap-3">
         {ordered.map((member) => {
           const card = cards.get(member.userId) ?? null;
-          const canEdit = member.isSelf || isOwner;
+          const canEdit = (member.isSelf && canSelf) || isOwner;
           const name = member.displayName?.trim() || t("unnamed");
           const status = card?.shown ? "shown" : card?.selfHidden ? "withdrawn" : "hidden";
           return (

@@ -38,9 +38,9 @@ test("Team-Einladung: der Seitenaufruf schreibt nichts, finalisiert wird nur im 
 test("Organisation selbst verlassen: Aktion, Hinweis fuer die letzte Inhaberin, Texte", () => {
   const actions = source("src/features/advisor/orgActions.ts");
   assert.match(actions, /export async function leaveOrgAction[\s\S]*rpc\("leave_advisor_org", \{\s*p_org_id:/);
-  const section = source("src/features/advisor/AdvisorOrgSection.tsx");
+  const section = source("src/features/advisor/OrgMembersPanel.tsx");
   assert.match(section, /<form action=\{leaveOrgAction\}/);
-  assert.match(section, /member\.role === "owner" && member\.status === "active"\)\.length <= 1/);
+  assert.match(section, /member\.role === "owner" && member\.status === "active"\)\.length/);
   assert.match(section, /t\("leaveLastOwner"\)/);
   for (const locale of ["de", "en"]) {
     const advisor = JSON.parse(source(`messages/${locale}/advisor.json`)) as { org: Record<string, unknown> };

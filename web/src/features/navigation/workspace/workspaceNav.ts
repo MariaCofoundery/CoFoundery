@@ -1,4 +1,5 @@
 import { TEAMRAUM_BASE, teamraumPath, teamraumSectionOfPath } from "@/features/advisor/teamraumRoutes";
+import type { OrgRights, OrgRole } from "@/features/advisor/orgRights";
 
 /**
  * Die Stationen des Advisor-Arbeitsbereichs (Entwurf vom 05.11.2026, freigegeben): EINE Seitenleiste fuer
@@ -170,6 +171,30 @@ export function buildWorkspaceNav({ hasOrg, chatUnread = 0 }: { hasOrg: boolean;
       },
     ],
     setup: { key: "setup", href: tabHref("enroll"), icon: "setup", match: (pathname, tab) => onOrg(pathname) && tab !== null && SETUP_TABS.includes(tab) },
+  };
+}
+
+/**
+ * Was die Rolle sehen darf: Die Leiste bietet nur an, was die Person oeffnen darf (Anzeige - die Datenbank prueft es).
+ * Gast: Heute, Kalender, Programmplan und - mit dem Recht - die Auswertung. Ohne `room` fehlen Aufgaben, Chat, Seiten und
+ * Social; ohne `results` die Auswertung; "Einrichten" nur, wer etwas einrichten darf.
+ */
+export function limitNavByRights(nav: WorkspaceNav, role: OrgRole | undefined, rights: OrgRights | undefined): WorkspaceNav {
+  if (!role || !rights) return nav;
+  const drop = new Set<WorkspaceItemKey>();
+  if (role === "guest") {
+    for (const key of ["tasks", "chat", "pages", "teams", "social", "funding", "follow", "content", "events", "myProgram"] as WorkspaceItemKey[]) drop.add(key);
+  } else {
+    if (!rights.room) for (const key of ["tasks", "chat", "pages", "social"] as WorkspaceItemKey[]) drop.add(key);
+  }
+  if (!rights.results) drop.add("report");
+  const mayConfigure = role === "owner" || rights.invite || rights.teams || rights.profile || rights.plan;
+  return {
+    home: nav.home,
+    groups: nav.groups
+      .map((group) => ({ ...group, items: group.items.filter((item) => !drop.has(item.key)) }))
+      .filter((group) => group.items.length > 0),
+    setup: mayConfigure && role !== "guest" ? nav.setup : null,
   };
 }
 

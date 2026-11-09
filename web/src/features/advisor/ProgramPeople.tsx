@@ -26,7 +26,7 @@ export async function ProgramPeople({ people }: { people: ProgramPerson[] }) {
                   <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-100 text-[16px] font-bold text-violet-900">{name.slice(0, 1).toUpperCase()}</span>
                   <div className="min-w-0">
                     <p className="text-[15.5px] font-semibold text-slate-950">{name}</p>
-                    <p className="text-[13px] text-slate-600">{[person.role === "owner" ? t("roleOwner") : t("roleAdvisor"), person.teamRole].filter(Boolean).join(" · ")}</p>
+                    <p className="text-[13px] text-slate-600">{[t(person.role === "owner" ? "roleOwner" : person.role === "coordinator" ? "roleCoordinator" : "roleAdvisor"), person.teamRole].filter(Boolean).join(" · ")}</p>
                     {person.headline ? <p className="mt-1 text-[14px] font-medium text-slate-900">{person.headline}</p> : null}
                     {person.about ? <p className="mt-1 whitespace-pre-line text-[14px] leading-6 text-slate-700">{person.about}</p> : null}
                     {person.contact ? (

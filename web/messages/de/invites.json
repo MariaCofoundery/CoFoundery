@@ -10,7 +10,13 @@
     "byUnknown": "Du wurdest eingeladen.",
     "roleOwner": "als Inhaberin / Inhaber",
     "roleAdvisor": "als Advisor",
-    "text": "Wer Mitglied ist, sieht alles, was der Organisation freigegeben wurde. Endet die Mitgliedschaft, endet dieser Zugang sofort."
+    "text": "Wer Mitglied ist, sieht alles, was der Organisation freigegeben wurde. Endet die Mitgliedschaft, endet dieser Zugang sofort.",
+    "role": {
+      "owner": "als Admin",
+      "coordinator": "als Koordination",
+      "advisor": "als Advisor",
+      "guest": "als Gast"
+    }
   },
   "person": {
     "title": "Bitte um Einblick",

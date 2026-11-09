@@ -46,7 +46,7 @@ export default async function OrgChatPage({
     listChatReactions(client, chat.id),
     chat.kind === "group" ? listChatMembers(client, chat.id) : Promise.resolve([] as string[]),
   ]);
-  const canEditGroup = chat.kind === "group" && org.status === "active" && (chat.createdByUserId === user.id || (org.role === "owner" && org.status === "active"));
+  const canEditGroup = chat.kind === "group" && org.status === "active" && (chat.createdByUserId === user.id || (org.isLead && org.status === "active"));
   const names = Object.fromEntries(members.map((member) => [member.userId, member.displayName ?? t("formerMember")]));
   const other = chat.kind === "direct" ? (chat.directA === user.id ? chat.directB : chat.directA) : null;
   const otherActive = other ? members.some((member) => member.userId === other && member.status === "active") : true;

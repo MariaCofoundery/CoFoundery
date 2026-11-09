@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildProgramReport, type AttendanceStatus, type EventKind } from "@/features/advisor/programReport";
-import { getOrgReportRows } from "@/features/advisor/teamProgramData";
+import { getOrgNumbers, getOrgReportRows } from "@/features/advisor/teamProgramData";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,15 +22,45 @@ const berlinDay = (daysBack: number) => {
 export async function OrgProgramReport({
   orgId,
   isOwner,
+  guest = false,
   range,
 }: {
   orgId: string;
   isOwner: boolean;
+  /** Ein Gast sieht nur Zahlen ohne Namen: so viele Startups, so viele Termine (get_org_numbers). */
+  guest?: boolean;
   range: { from: string | null; to: string | null };
 }) {
   const t = await getTranslations("advisor.programReport");
   const tProgram = await getTranslations("advisor.teamProgram");
   const locale = getPresentationLocale(await getLocale());
+  if (guest) {
+    const numbers = await getOrgNumbers(await createClient(), orgId);
+    return (
+      <section aria-labelledby="report-title" className="grid gap-5">
+        <div>
+          <h2 id="report-title" className="text-xl font-semibold text-slate-950">{t("title")}</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("guestText")}</p>
+        </div>
+        {numbers ? (
+          <dl className="grid grid-cols-3 gap-3">
+            {[
+              [t("guestTeams"), numbers.teamsActive],
+              [t("guestUpcoming"), numbers.eventsUpcoming],
+              [t("guestHeld"), numbers.eventsHeld],
+            ].map(([label, value]) => (
+              <div key={label as string} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <dd className="text-2xl font-extrabold tracking-tight text-slate-950">{value}</dd>
+                <dt className="mt-0.5 text-xs leading-5 text-slate-600">{label}</dt>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-700">{t("guestOff")}</p>
+        )}
+      </section>
+    );
+  }
   const rows = await getOrgReportRows(await createClient(), orgId, range);
   const report = buildProgramReport(rows.attendance, rows.checkIns, new Date());
 

@@ -57,7 +57,9 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
 
   const members = await getOrgMembers(client, org.id);
   const activeMembers = members.filter((member) => member.status === "active");
-  const isOwner = org.role === "owner" && org.status === "active";
+  // Der Teamraum ist ein Recht ("room"); loeschen darf fremde Inhalte, wer die Organisation fuehrt (Admin, Koordination).
+  if (!org.rights.room) redirect("/advisor/dashboard");
+  const isOwner = org.isLead && org.status === "active";
   const canWrite = org.status === "active";
   const today = berlinToday();
   const unnamed = tArea("kinds.unnamed");

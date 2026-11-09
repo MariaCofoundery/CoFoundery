@@ -419,8 +419,10 @@
     "revoked": "beendet",
     "pending": "Wird gespeichert …",
     "roles": {
-      "owner": "Führt die Organisation",
-      "advisor": "Advisor"
+      "owner": "Admin",
+      "coordinator": "Koordination",
+      "advisor": "Advisor",
+      "guest": "Gast"
     },
     "membershipMeaning": "Wer hier Mitglied ist, sieht alles, was der Organisation freigegeben wurde. Endet die Mitgliedschaft, endet dieser Zugriff sofort — die Zustimmung der begleiteten Person bleibt aber bestehen, damit deine Nachfolge nicht neu fragen muss. Die begleiteten Personen können jederzeit sehen, wer hier Mitglied ist.",
     "peopleTitle": "Wen ihr begleitet",
@@ -456,18 +458,20 @@
       "unverified": "Bitte bestätige zuerst deine E-Mail-Adresse. Danach kannst du der Organisation beitreten."
     },
     "leave": "Organisation verlassen",
-    "leaveLastOwner": "Du führst die Organisation als Einzige. Nimm zuerst unter „Mitglieder“ ein anderes Mitglied mit in die Führung oder schließe die Organisation, bevor du gehst.",
+    "leaveLastOwner": "Du führst die Organisation als Einzige. Mach zuerst unter „Mitglieder“ jemand anderen zum Admin oder schließe die Organisation, bevor du gehst.",
     "you": "Du",
     "unnamed": "Ohne Namen",
     "suspended": "Diese Organisation ist ausgesetzt. Zugänge über sie sind derzeit nicht aktiv.",
     "errors": {
       "org_last_owner": "Du führst die Organisation als Einzige. Übertrage zuerst die Führung, bevor du gehst.",
       "org_not_member": "Diese Mitgliedschaft ist bereits beendet.",
-      "org_forbidden": "Das kann nur eine Inhaberin der Organisation.",
+      "org_forbidden": "Dafür fehlt dir das Recht. Frag einen Admin.",
       "org_suspended": "Die Organisation ist ausgesetzt. Diese Aktion ist gerade nicht möglich.",
       "org_name": "Der Name braucht zwischen 2 und 120 Zeichen.",
       "email": "Bitte gib eine gültige E-Mail-Adresse ein.",
-      "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal."
+      "org_failed": "Das hat gerade nicht geklappt. Bitte versuche es noch einmal.",
+      "already_member": "Diese Person gehört schon dazu.",
+      "suggestion_duplicate": "Diese Adresse ist schon vorgeschlagen und wartet auf eine Antwort."
     },
     "personOpen": "Ansehen",
     "peopleEmptyInvite": "Person einladen",
@@ -504,7 +508,77 @@
     "makeOwner": "Mit in die Führung nehmen",
     "makeAdvisor": "Aus der Führung nehmen",
     "membersWho": "Was jede Person im Team macht und wer vertritt, steht im Teamraum:",
-    "membersWhoLink": "Wer macht was"
+    "membersWhoLink": "Wer macht was",
+    "roleDesc": {
+      "owner": "Darf alles, auch Admins ernennen.",
+      "coordinator": "Führt das Programm im Alltag.",
+      "advisor": "Begleitet Startups und arbeitet im Teamraum.",
+      "guest": "Sieht nur, was freigegeben ist. Ändert nichts."
+    },
+    "inviteTitle": "Jemanden einladen",
+    "inviteEmail": "E-Mail-Adresse",
+    "inviteNote": "Die Person bekommt eine Einladung per E-Mail und gehört erst dazu, wenn sie zustimmt. Die Rolle kannst du später ändern.{admin}",
+    "inviteNoteAdmin": " Admin wird jemand über die Mitgliederliste.",
+    "suggestTitle": "Jemanden vorschlagen",
+    "suggestText": "Du lädst nicht selbst ein. Du sagst, wen du dir wünschst; ein Admin oder die Koordination entscheidet. Bis dahin wird niemand angeschrieben.",
+    "suggestRole": "Gewünschte Rolle",
+    "suggestReason": "Warum? (optional)",
+    "suggestButton": "Vorschlagen",
+    "suggestionsTitle": "{count, plural, =1 {1 Vorschlag wartet auf dich} other {# Vorschläge warten auf dich}}",
+    "suggestionMeta": "Als {role} · vorgeschlagen von {name}",
+    "suggestionNote": "Kurze Antwort bei Ablehnung (optional)",
+    "suggestionAccept": "Einladen",
+    "suggestionDecline": "Ablehnen",
+    "mySuggestionsTitle": "Deine Vorschläge",
+    "suggestionStatus": {
+      "open": "wartet",
+      "accepted": "eingeladen",
+      "declined": "nicht eingeladen"
+    },
+    "membersTitle": "Mitglieder",
+    "rolesAndRights": "Rolle und Rechte",
+    "roleSave": "Rolle speichern",
+    "makeAdminOption": "Zum Admin machen …",
+    "lastAdminNote": "Es bleibt immer mindestens ein Admin. Mach zuerst jemand anderen zum Admin.",
+    "adminAllRights": "Admins haben immer alle Rechte.",
+    "rightsTitle": "Was {name} darf",
+    "rightsCustom": "Angepasst",
+    "rightsSave": "Rechte speichern",
+    "rightsReset": "Auf Voreinstellung der Rolle zurück",
+    "rightsChanged": "Zuletzt geändert von {name} am {date}.",
+    "rightsNever": "Nie einzeln schaltbar, nur für Admins: Admins ernennen, Organisation löschen, Funktionen und Förderauflagen.",
+    "guestOnlyResults": "Einem Gast kann man nur „Auswertung ansehen“ geben. Alles andere ist für Gäste nicht freischaltbar.",
+    "someAdminNote": "Was ein Team nicht freigegeben hat, bleibt für alle unsichtbar – eine Rolle in der Organisation ersetzt keine Freigabe des Teams.",
+    "rights": {
+      "invite": {
+        "label": "Mitglieder einladen und entfernen",
+        "hint": "Ohne dieses Recht kann die Person Einladungen nur vorschlagen."
+      },
+      "plan": {
+        "label": "Termine, Formate und Materialien pflegen",
+        "hint": "Kalender, Programmplan, Materialien, Experten und Lernbereich ändern."
+      },
+      "teams": {
+        "label": "Startups aufnehmen und Ansprechpersonen festlegen",
+        "hint": "Neue Teams ins Programm einladen, Ansprechpersonen bestimmen, Teams entfernen."
+      },
+      "people": {
+        "label": "Eigene Karte bei „Wer ist wer“ pflegen",
+        "hint": "Die Karte, die Startups sehen können. Mit Koordination auch die der anderen."
+      },
+      "room": {
+        "label": "Teamraum der Organisation",
+        "hint": "Aufgaben, Chat und Seiten im Team."
+      },
+      "results": {
+        "label": "Auswertung ansehen",
+        "hint": "Zahlen zum Programm, nur lesend."
+      },
+      "profile": {
+        "label": "Organisationsprofil und Programmseite ändern",
+        "hint": "Name, Beschreibung, Logo, öffentliche Seite."
+      }
+    }
   },
   "personView": {
     "back": "Zurück zu Personen & Gruppen",
@@ -1536,7 +1610,12 @@
     "csvLastCheckIn": "Letztes Gespräch",
     "csvNextCheckIn": "Nächstes Gespräch",
     "fileAttendance": "teilnahme",
-    "fileTeams": "teams"
+    "fileTeams": "teams",
+    "guestText": "Zahlen zum Programm, ohne Namen von Startups oder Personen.",
+    "guestTeams": "Startups im Programm",
+    "guestUpcoming": "Kommende Termine",
+    "guestHeld": "Bisherige Termine",
+    "guestOff": "Die Auswertung ist für dich nicht freigeschaltet."
   },
   "teamraum": {
     "nobody": "Noch niemand",
@@ -2460,7 +2539,7 @@
     "summary": "{shown} von {total} für die Startups sichtbar",
     "unnamed": "Ohne Namen",
     "you": "du",
-    "roleOwner": "Inhaberin / Inhaber",
+    "roleOwner": "Admin",
     "roleAdvisor": "Advisor",
     "noHeadline": "Noch keine Kurzbeschreibung",
     "noAbout": "Noch keine Beschreibung.",
@@ -2491,7 +2570,8 @@
     "audienceSelected": "Nur bestimmte Startups",
     "audienceNone": "Noch kein Startup im Programm – die Auswahl gilt, sobald welche da sind.",
     "audienceHint": "Ein Startup, das später dazukommt, sieht eine eingeschränkte Karte erst, wenn du es hier aufnimmst.",
-    "errorAudience": "Bitte wähle mindestens ein Startup aus – oder „Alle Startups im Programm“."
+    "errorAudience": "Bitte wähle mindestens ein Startup aus – oder „Alle Startups im Programm“.",
+    "roleCoordinator": "Koordination"
   },
   "programTasks": {
     "titleTeam": "Aufgaben mit der Organisation",
@@ -2574,5 +2654,15 @@
     "reachedTitle": "Erreicht ({count})",
     "saved": "Gespeichert.",
     "error": "Das hat nicht geklappt."
+  },
+  "guestStart": {
+    "title": "Heute",
+    "text": "Du bist Gast dieser Organisation: Du siehst Termine und Zahlen, änderst aber nichts.",
+    "next": "Die nächsten Termine",
+    "nothing": "Gerade sind keine Termine eingetragen.",
+    "calendar": "Kalender",
+    "plan": "Programmplan",
+    "numbers": "Zahlen",
+    "note": "Gäste sehen keine einzelnen Startups, keine Personen und keinen Teamraum."
   }
 }
