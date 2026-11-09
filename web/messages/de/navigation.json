@@ -168,7 +168,9 @@
     },
     "notifications": "Nachrichten und Hinweise",
     "program": "Programm",
-    "customize": "Seitenleiste anpassen"
+    "customize": "Seitenleiste anpassen",
+    "railExpand": "Leiste mit Beschriftung ausklappen",
+    "railCollapse": "Leiste einklappen"
   },
   "settings": {
     "title": "Deine Seitenleiste",
@@ -205,6 +207,8 @@
       "close": "Suche schließen",
       "stations": "Bereiche",
       "actions": "Anlegen"
-    }
+    },
+    "railExpand": "Leiste mit Beschriftung ausklappen",
+    "railCollapse": "Leiste einklappen"
   }
 }

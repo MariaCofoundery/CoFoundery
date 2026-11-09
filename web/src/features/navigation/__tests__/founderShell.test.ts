@@ -74,7 +74,7 @@ test("die Shell: Founder-Ansicht und Connect allein bekommen die Seitenleiste, s
 test("die Leiste: Reiter nur auf dem Handy, Unterpunkte nur beim aktiven Bereich, keine Rechte aus der Anzeige", () => {
   const chrome = code("src/features/navigation/founder/FounderChrome.tsx");
   // Die Reiterleiste darf nicht per style auf `display` gesetzt werden - das hebt lg:hidden auf.
-  assert.match(chrome, /className="fixed inset-x-0 bottom-0 z-40 grid [^"]*lg:hidden"/);
+  assert.match(chrome, /className="fixed inset-x-0 bottom-0 z-40 grid [^"]*min-\[700px\]:hidden"/);
   assert.doesNotMatch(chrome, /style=\{\{ display:/);
   assert.match(chrome, /folded\[item\.key\] \?\? item\.active/);
   // Bei Connect allein gibt es keine eigene Leiste zum Anpassen.

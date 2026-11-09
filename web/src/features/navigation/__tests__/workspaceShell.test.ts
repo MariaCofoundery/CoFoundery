@@ -121,7 +121,7 @@ test("Seitenleiste, Kopfleiste, Reiter unten und Suche sind da - und nichts davo
   const chrome = source("src/features/navigation/workspace/WorkspaceChrome.tsx");
   assert.match(chrome, /<aside aria-label=\{tw\("navLabel"\)\}[^>]*print:hidden/);
   assert.match(chrome, /<header className="sticky top-0 z-40[^"]*print:hidden/);
-  assert.match(chrome, /<nav aria-label=\{tw\("tabsLabel"\)\}[^>]*lg:hidden/);
+  assert.match(chrome, /<nav aria-label=\{tw\("tabsLabel"\)\}[^>]*min-\[700px\]:hidden/);
   assert.match(chrome, /event\.metaKey \|\| event\.ctrlKey/);
   // Die Suche sagt ehrlich, was sie durchsucht.
   assert.match(source("messages/de/navigation.json"), /Inhalte noch nicht/);
@@ -178,9 +178,9 @@ test("Seitenleiste einrichten: Seite, Onboarding-Schritt, Datenbank und Export",
 });
 
 test("Handy (Pruefung 08.11.2026): nichts wird vom Reiter unten verdeckt, Diese Woche und Wer macht was bleiben erreichbar", () => {
-  // Der Knopf "Neue Aufgabe" und das Chat-Eingabefeld liegen ueber dem Reiter unten (unter 1024 Pixeln).
+  // Der Knopf "Neue Aufgabe" und das Chat-Eingabefeld liegen ueber dem Reiter unten (unter 700 Pixeln).
   assert.match(source("src/features/advisor/Teamraum.tsx"), /fixed bottom-\[calc\(4\.75rem\+env\(safe-area-inset-bottom\)\)\] right-5/);
-  assert.match(source("src/app/(product)/advisor/teamraum/chat/[chatId]/page.tsx"), /h-\[calc\(100dvh-9rem\)\] w-full lg:h-\[calc\(100dvh-4\.5rem\)\]/);
+  assert.match(source("src/app/(product)/advisor/teamraum/chat/[chatId]/page.tsx"), /h-\[calc\(100dvh-9rem\)\] w-full min-\[700px\]:h-\[calc\(100dvh-4\.5rem\)\]/);
   // Die Reiter der Station Aufgaben stehen auf jeder Breite - sonst fuehrt am Rechner nichts zu "Diese Woche" und "Wer macht was".
   const screen = source("src/features/advisor/TeamraumScreen.tsx");
   assert.match(screen, /section === "week" \|\| section === "tasks" \|\| section === "who" \? \(\s*<nav/);

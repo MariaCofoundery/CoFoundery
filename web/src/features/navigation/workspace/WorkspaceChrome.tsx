@@ -8,6 +8,7 @@ import { ACTIVE_ORG_COOKIE, orgColor } from "@/features/advisor/activeOrg";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SetupBar } from "@/features/advisor/setup/SetupSessionClient";
 import { useFocusTrap } from "@/features/ui/useFocusTrap";
+import { railWidthClass, useRailMode } from "@/features/navigation/useRailMode";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
   MOBILE_TAB_KEYS,
@@ -75,6 +76,8 @@ export function WorkspaceChrome({
   const t = useTranslations("navigation");
   const tw = useTranslations("navigation.workspace");
   const pathname = usePathname();
+  const rail = useRailMode();
+  const compact = rail.compact;
   const params = useSearchParams();
   const tab = params.get("tab");
   const view = params.get("ansicht");
@@ -168,15 +171,17 @@ export function WorkspaceChrome({
         <Link
           href={item.href}
           aria-current={active ? "page" : undefined}
-          className={`flex min-h-[42px] items-center gap-3 rounded-[10px] px-3 text-[14.5px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF] ${
+          title={compact ? label(item.key) : undefined}
+          aria-label={compact ? label(item.key) : undefined}
+          className={`relative flex min-h-[42px] items-center gap-3 rounded-[10px] px-3 text-[14.5px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF] ${compact ? "justify-center px-0" : ""} ${
             active ? "bg-white/[0.11] font-semibold text-white" : "font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white"
           }`}
         >
           <WorkspaceIcon name={item.icon} className={active ? "text-[#B9A6FF]" : undefined} />
-          <span className="min-w-0 flex-1 truncate">{label(item.key)}</span>
-          {item.badge ? <Count value={item.badge} label={badgeLabel(item)} /> : null}
+          {compact ? null : <span className="min-w-0 flex-1 truncate">{label(item.key)}</span>}
+          {item.badge ? (compact ? <span aria-label={badgeLabel(item)} className="absolute right-2 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#17173A] bg-[#B9A6FF]" /> : <Count value={item.badge} label={badgeLabel(item)} />) : null}
         </Link>
-        {active && item.children ? (
+        {active && item.children && !compact ? (
           <div className="ml-[30px] flex flex-col gap-0.5 border-l border-white/10 pl-3">
             {item.children.map((child) => (
               <Link
@@ -210,35 +215,46 @@ export function WorkspaceChrome({
   ];
 
   return (
-    <div className="work-ui min-h-screen bg-[#F4F5FB] lg:flex">
+    <div className="work-ui min-h-screen bg-[#F4F5FB] min-[700px]:flex">
       <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-950">
         {tw("skip")}
       </a>
 
-      <aside aria-label={tw("navLabel")} className="hidden bg-[#17173A] print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[248px] lg:shrink-0 lg:flex-col lg:overflow-y-auto">
-        <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="flex h-16 shrink-0 items-center px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF]">
-          <BrandLogo tone="onDark" className="h-8" priority sizes="144px" />
+      <aside aria-label={tw("navLabel")} data-rail={compact ? "compact" : "full"} className={`hidden bg-[#17173A] print:hidden min-[700px]:sticky min-[700px]:top-0 min-[700px]:flex min-[700px]:h-screen min-[700px]:shrink-0 min-[700px]:flex-col min-[700px]:overflow-y-auto min-[700px]:overflow-x-hidden ${railWidthClass(rail.expanded, "w-[248px]")}`}>
+        <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className={`flex h-16 shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF] ${compact ? "justify-center" : "px-5"}`}>
+          {compact ? <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-[#6D49E0] text-lg font-bold text-white">M</span> : <BrandLogo tone="onDark" className="h-8" priority sizes="144px" />}
         </Link>
-        {orgs.length > 0 ? <div className="px-3 pb-2">{programSwitcher("dark")}</div> : null}
+        {orgs.length > 0 && !compact ? <div className="px-3 pb-2">{programSwitcher("dark")}</div> : null}
         <nav aria-label={tw("navLabel")} className="flex flex-1 flex-col gap-0.5 px-3 pb-5 pt-1">
           {sideLink(nav.home)}
           {nav.groups.map((group) => (
             <div key={group.key} className="flex flex-col gap-0.5">
-              <p className="mx-3 mb-1.5 mt-[18px] text-[11px] font-semibold uppercase tracking-[0.09em] text-[#9A9DC4]">{tw(`groups.${group.key}`)}</p>
+              {compact ? <span aria-hidden="true" className="mx-3 my-2 h-px bg-white/10" /> : <p className="mx-3 mb-1.5 mt-[18px] text-[11px] font-semibold uppercase tracking-[0.09em] text-[#9A9DC4]">{tw(`groups.${group.key}`)}</p>}
               {group.items.map((item) => (
                 <div key={item.key}>{sideLink(item)}</div>
               ))}
             </div>
           ))}
           <span className="min-h-5 flex-1" />
-          <Link href="/advisor/seitenleiste" className="mx-3 mb-1 inline-flex min-h-9 items-center text-[13px] font-medium text-[#9A9DC4] underline-offset-4 hover:text-white hover:underline">{tw("customize")}</Link>
+          {compact ? null : <Link href="/advisor/seitenleiste" className="mx-3 mb-1 inline-flex min-h-9 items-center text-[13px] font-medium text-[#9A9DC4] underline-offset-4 hover:text-white hover:underline">{tw("customize")}</Link>}
           {nav.setup ? sideLink(nav.setup) : null}
+          {/* Nur zwischen 700 und 1099 Pixeln: die Leiste aus- und einklappen. */}
+          <button
+            type="button"
+            onClick={rail.toggle}
+            aria-expanded={rail.expanded}
+            aria-label={rail.expanded ? tw("railCollapse") : tw("railExpand")}
+            title={rail.expanded ? tw("railCollapse") : tw("railExpand")}
+            className="mt-1 hidden min-h-[42px] items-center justify-center rounded-[10px] text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9A6FF] min-[700px]:max-[1099px]:flex"
+          >
+            <span aria-hidden="true" className="text-lg font-bold">{rail.expanded ? "«" : "»"}</span>
+          </button>
         </nav>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-40 flex min-h-16 items-center gap-2 border-b border-t-4 border-slate-200 bg-white px-3 py-2 print:hidden sm:gap-3 sm:px-5 lg:px-6" style={orgs.length > 1 && active ? { borderTopColor: color.dot } : { borderTopColor: "transparent" }}>
-          <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="mr-1 shrink-0 lg:hidden">
+        <header className="sticky top-0 z-40 flex min-h-16 items-center gap-2 border-b border-t-4 border-slate-200 bg-white px-3 py-2 print:hidden sm:gap-3 sm:px-5 min-[700px]:px-6" style={orgs.length > 1 && active ? { borderTopColor: color.dot } : { borderTopColor: "transparent" }}>
+          <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="mr-1 shrink-0 min-[700px]:hidden">
             <BrandLogo className="h-7" priority sizes="112px" />
           </Link>
           {hasOrg && active ? (
@@ -261,20 +277,20 @@ export function WorkspaceChrome({
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label={tw("search.open")}
-            className="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 md:hidden"
+            className="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 min-[1100px]:hidden"
           >
             <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
           </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="ml-2 hidden min-h-11 max-w-[28rem] flex-1 items-center gap-2.5 rounded-xl bg-[#F4F5FB] px-3.5 text-left text-[14.5px] text-slate-600 hover:bg-slate-100 md:flex"
+            className="ml-2 hidden min-h-11 max-w-[28rem] flex-1 items-center gap-2.5 rounded-xl bg-[#F4F5FB] px-3.5 text-left text-[14.5px] text-slate-600 hover:bg-slate-100 min-[1100px]:flex"
           >
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <span className="min-w-0 flex-1 truncate">{tw("search.placeholder")}</span>
             <kbd className="rounded-md border border-slate-300 px-1.5 text-xs font-semibold text-slate-600">⌘K</kbd>
           </button>
-          <span className="hidden flex-1 md:block" />
+          <span className="hidden flex-1 min-[1100px]:block" />
 
           {hasOrg ? (
             <div ref={createRef} className="relative shrink-0">
@@ -315,7 +331,7 @@ export function WorkspaceChrome({
             <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z" /><path d="M10 21h4" /></svg>
             {messagesCount > 0 ? <span aria-hidden="true" className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-rose-500" /> : null}
           </Link>
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-2 min-[700px]:flex">
             {slots.feedback}
             {slots.viewSwitch}
             {slots.language}
@@ -323,13 +339,13 @@ export function WorkspaceChrome({
           </div>
         </header>
 
-        <div id="workspace-content" className="min-w-0 flex-1 pb-24 lg:pb-0">
+        <div id="workspace-content" className="min-w-0 flex-1 pb-24 min-[700px]:pb-0">
           {children}
           <SetupBar />
         </div>
       </div>
 
-      <nav aria-label={tw("tabsLabel")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))] print:hidden lg:hidden" style={{ gridTemplateColumns: `repeat(${phoneTabs.length + 1}, minmax(0, 1fr))` }}>
+      <nav aria-label={tw("tabsLabel")} className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))] print:hidden min-[700px]:hidden" style={{ gridTemplateColumns: `repeat(${phoneTabs.length + 1}, minmax(0, 1fr))` }}>
         {phoneTabs.map((item) => {
           const active = isActive(item);
           return (
@@ -357,7 +373,7 @@ export function WorkspaceChrome({
       </nav>
 
       {moreOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 min-[700px]:hidden">
           <button type="button" aria-label={tw("moreClose")} onClick={() => setMoreOpen(false)} className="absolute inset-0 bg-[#14152B]/45" />
           <div ref={moreRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={tw("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white outline-none">
             <div className="flex items-center justify-between px-5 pb-1 pt-3">

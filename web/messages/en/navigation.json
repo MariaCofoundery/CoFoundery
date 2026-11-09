@@ -168,7 +168,9 @@
     },
     "notifications": "Messages and notices",
     "program": "Program",
-    "customize": "Customize sidebar"
+    "customize": "Customize sidebar",
+    "railExpand": "Expand the sidebar with labels",
+    "railCollapse": "Collapse the sidebar"
   },
   "settings": {
     "title": "Your sidebar",
@@ -205,6 +207,8 @@
       "close": "Close search",
       "stations": "Areas",
       "actions": "Create"
-    }
+    },
+    "railExpand": "Expand the sidebar with labels",
+    "railCollapse": "Collapse the sidebar"
   }
 }

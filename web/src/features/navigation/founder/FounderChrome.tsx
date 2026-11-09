@@ -18,6 +18,7 @@ import {
 } from "@/features/navigation/founder/founderNav";
 import { Count, Palette } from "@/features/navigation/workspace/WorkspaceChrome";
 import { useFocusTrap } from "@/features/ui/useFocusTrap";
+import { railWidthClass, useRailMode } from "@/features/navigation/useRailMode";
 
 type Slots = {
   profile: React.ReactNode;
@@ -58,6 +59,8 @@ export function FounderChrome({
 }) {
   const t = useTranslations("navigation");
   const tf = useTranslations("navigation.founder");
+  const rail = useRailMode();
+  const compact = rail.compact;
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
@@ -130,15 +133,17 @@ export function FounderChrome({
           <Link
             href={item.href}
             aria-current={item.active && !hasChildren ? "page" : undefined}
-            className={`flex min-h-[42px] min-w-0 flex-1 items-center gap-3 rounded-[10px] px-3 text-[14.5px] transition ${FOCUS} ${
+            title={compact ? item.label : undefined}
+            aria-label={compact ? item.label : undefined}
+            className={`relative flex min-h-[42px] min-w-0 flex-1 items-center gap-3 rounded-[10px] px-3 text-[14.5px] transition ${compact ? "justify-center px-0" : ""} ${FOCUS} ${
               item.active ? "bg-white/[0.11] font-semibold text-white" : "font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white"
             }`}
           >
             <FounderIcon name={item.key} className={item.active ? "text-[#B9A6FF]" : undefined} />
-            <span className="min-w-0 flex-1 truncate">{item.label}</span>
-            {badge(item.badge)}
+            {compact ? null : <span className="min-w-0 flex-1 truncate">{item.label}</span>}
+            {compact ? (item.badge?.value ? <span aria-label={item.badge.label} className="absolute right-2 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#17173A] bg-[#B9A6FF]" /> : null) : badge(item.badge)}
           </Link>
-          {hasChildren ? (
+          {hasChildren && !compact ? (
             <button
               type="button"
               aria-expanded={open}
@@ -152,7 +157,7 @@ export function FounderChrome({
             </button>
           ) : null}
         </div>
-        {open ? <div className="ml-[30px] flex flex-col gap-0.5 border-l border-white/10 pl-3">{item.children?.map(childLink)}</div> : null}
+        {open && !compact ? <div className="ml-[30px] flex flex-col gap-0.5 border-l border-white/10 pl-3">{item.children?.map(childLink)}</div> : null}
       </div>
     );
   };
@@ -170,34 +175,36 @@ export function FounderChrome({
   const moreActive = moreEntries.some((entry) => entry.active) || messagesActive;
 
   return (
-    <div className="work-ui min-h-screen bg-[#F4F5FB] lg:flex">
+    <div className="work-ui min-h-screen bg-[#F4F5FB] min-[700px]:flex">
       <a href="#workspace-content" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-950">
         {tf("skip")}
       </a>
 
-      <aside aria-label={tf("navLabel")} className="hidden bg-[#17173A] print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[260px] lg:shrink-0 lg:flex-col lg:overflow-y-auto">
-        <div className="flex h-16 shrink-0 items-center gap-2.5 px-5">
+      <aside aria-label={tf("navLabel")} data-rail={compact ? "compact" : "full"} className={`hidden bg-[#17173A] print:hidden min-[700px]:sticky min-[700px]:top-0 min-[700px]:flex min-[700px]:h-screen min-[700px]:shrink-0 min-[700px]:flex-col min-[700px]:overflow-y-auto min-[700px]:overflow-x-hidden ${railWidthClass(rail.expanded, "w-[260px]")}`}>
+        <div className={`flex h-16 shrink-0 items-center gap-2.5 ${compact ? "justify-center" : "px-5"}`}>
           <Link href={dashboardHref} aria-label={t("logoLabel")} className={`rounded-lg ${FOCUS}`}>
-            <BrandLogo tone="onDark" className="h-8" priority sizes="144px" />
+            {compact ? <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-[#6D49E0] text-lg font-bold text-white">M</span> : <BrandLogo tone="onDark" className="h-8" priority sizes="144px" />}
           </Link>
-          <span className="rounded-full border border-[#8E6FF0]/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[#B9A6FF]">{t("betaBadge")}</span>
+          {compact ? null : <span className="rounded-full border border-[#8E6FF0]/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[#B9A6FF]">{t("betaBadge")}</span>}
         </div>
         <nav aria-label={tf("navLabel")} className="flex flex-1 flex-col gap-0.5 px-3 pb-4 pt-1">
           {connectOnly ? (
             <>
-              <p className="mx-3 mb-1.5 mt-2 text-[11px] font-semibold uppercase tracking-[0.09em] text-[#9A9DC4]">{t("areaConnect")}</p>
+              {compact ? null : <p className="mx-3 mb-1.5 mt-2 text-[11px] font-semibold uppercase tracking-[0.09em] text-[#9A9DC4]">{t("areaConnect")}</p>}
               {connectChildren.map((child) => (
                 <Link
                   key={child.href}
                   href={child.href}
                   aria-current={child.active ? "page" : undefined}
-                  className={`flex min-h-[42px] items-center gap-3 rounded-[10px] px-3 text-[14.5px] ${FOCUS} ${
+                  title={compact ? child.label : undefined}
+                  aria-label={compact ? child.label : undefined}
+                  className={`flex min-h-[42px] items-center gap-3 rounded-[10px] px-3 text-[14.5px] ${compact ? "justify-center px-0" : ""} ${FOCUS} ${
                     child.active ? "bg-white/[0.11] font-semibold text-white" : "font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white"
                   }`}
                 >
                   <FounderIcon name={child.icon ?? "dot"} className={child.active ? "text-[#B9A6FF]" : undefined} />
-                  <span className="min-w-0 flex-1 truncate">{child.label}</span>
-                  {badge(child.count)}
+                  {compact ? null : <span className="min-w-0 flex-1 truncate">{child.label}</span>}
+                  {compact ? null : badge(child.count)}
                 </Link>
               ))}
             </>
@@ -209,30 +216,43 @@ export function FounderChrome({
             <Link
               href="/messages"
               aria-current={messagesActive ? "page" : undefined}
-              className={`flex min-h-10 items-center gap-3 rounded-[10px] px-3 text-[14px] ${FOCUS} ${messagesActive ? "bg-white/[0.11] font-semibold text-white" : "font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white"}`}
+              title={compact ? t("messages") : undefined}
+              aria-label={compact ? t("messages") : undefined}
+              className={`flex min-h-10 items-center gap-3 rounded-[10px] px-3 text-[14px] ${compact ? "justify-center px-0" : ""} ${FOCUS} ${messagesActive ? "bg-white/[0.11] font-semibold text-white" : "font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white"}`}
             >
               <FounderIcon name="messages" />
-              <span className="min-w-0 flex-1 truncate">{t("messages")}</span>
-              {badge(messagesBadge)}
+              {compact ? null : <span className="min-w-0 flex-1 truncate">{t("messages")}</span>}
+              {compact ? null : badge(messagesBadge)}
             </Link>
-            {connectOnly ? null : (
+            {connectOnly || compact ? null : (
               <Link href="/me/seitenleiste" className={`flex min-h-10 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white ${FOCUS}`}>
                 <FounderIcon name="customize" />
                 {tf("customize")}
               </Link>
             )}
+            {/* Nur zwischen 700 und 1099 Pixeln: die Leiste aus- und einklappen. */}
+            <button
+              type="button"
+              onClick={rail.toggle}
+              aria-expanded={rail.expanded}
+              aria-label={rail.expanded ? tf("railCollapse") : tf("railExpand")}
+              title={rail.expanded ? tf("railCollapse") : tf("railExpand")}
+              className={`hidden min-h-10 items-center justify-center rounded-[10px] text-[#C8CAE8] hover:bg-white/[0.07] hover:text-white min-[700px]:max-[1099px]:flex ${FOCUS}`}
+            >
+              <span aria-hidden="true" className="text-lg font-bold">{rail.expanded ? "«" : "»"}</span>
+            </button>
           </div>
         </nav>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 border-b border-slate-200 bg-white print:hidden">
-          <div className="flex min-h-16 items-center gap-2 px-3 py-2 sm:gap-3 sm:px-5 lg:px-6">
-            <Link href={dashboardHref} aria-label={t("logoLabel")} className="mr-1 shrink-0 lg:hidden">
+          <div className="flex min-h-16 items-center gap-2 px-3 py-2 sm:gap-3 sm:px-5 min-[700px]:px-6">
+            <Link href={dashboardHref} aria-label={t("logoLabel")} className="mr-1 shrink-0 min-[700px]:hidden">
               <BrandLogo className="h-7" priority sizes="112px" />
             </Link>
             {trail.length > 0 ? (
-              <p aria-label={t("breadcrumbLabel")} className="hidden min-w-0 items-center gap-1.5 truncate text-[14px] text-slate-600 lg:flex">
+              <p aria-label={t("breadcrumbLabel")} className="hidden min-w-0 items-center gap-1.5 truncate text-[14px] text-slate-600 min-[1100px]:flex">
                 {trail.map((part, index) => (
                   <span key={part} className="inline-flex items-center gap-1.5">
                     {index > 0 ? <span aria-hidden="true">›</span> : null}
@@ -246,14 +266,14 @@ export function FounderChrome({
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label={tf("search.open")}
-              className="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 md:hidden"
+              className="ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 min-[1100px]:hidden"
             >
               <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             </button>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="ml-auto hidden min-h-11 w-full max-w-[22rem] items-center gap-2.5 rounded-xl bg-[#F4F5FB] px-3.5 text-left text-[14.5px] text-slate-600 hover:bg-slate-100 md:flex"
+              className="ml-auto hidden min-h-11 w-full max-w-[22rem] items-center gap-2.5 rounded-xl bg-[#F4F5FB] px-3.5 text-left text-[14.5px] text-slate-600 hover:bg-slate-100 min-[1100px]:flex"
             >
               <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
               <span className="min-w-0 flex-1 truncate">{tf("search.placeholder")}</span>
@@ -269,7 +289,7 @@ export function FounderChrome({
               <FounderIcon name="bell" />
               {messagesCount > 0 ? <span aria-hidden="true" className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-rose-500" /> : null}
             </Link>
-            <div className="hidden items-center gap-2 lg:flex">
+            <div className="hidden items-center gap-2 min-[700px]:flex">
               {slots.feedback}
               {slots.viewSwitch}
               {slots.language}
@@ -278,7 +298,7 @@ export function FounderChrome({
           </div>
 
           {chips.length > 0 ? (
-            <nav aria-label={tf("subLabel", { name: activeArea?.label ?? "" })} className="flex gap-1.5 overflow-x-auto px-3 pb-2.5 [scrollbar-width:none] sm:px-5 lg:hidden [&::-webkit-scrollbar]:hidden">
+            <nav aria-label={tf("subLabel", { name: activeArea?.label ?? "" })} className="flex gap-1.5 overflow-x-auto px-3 pb-2.5 [scrollbar-width:none] sm:px-5 min-[700px]:hidden [&::-webkit-scrollbar]:hidden">
               {chips.map((chip) => (
                 <Link
                   key={chip.href}
@@ -296,12 +316,12 @@ export function FounderChrome({
           ) : null}
         </header>
 
-        <div id="workspace-content" className="min-w-0 flex-1 pb-24 lg:pb-0">
+        <div id="workspace-content" className="min-w-0 flex-1 pb-24 min-[700px]:pb-0">
           {children}
         </div>
       </div>
 
-      <nav aria-label={tf("tabsLabel")} className="fixed inset-x-0 bottom-0 z-40 grid border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))] print:hidden lg:hidden" style={{ gridTemplateColumns: `repeat(${tabEntries.length + 1}, minmax(0, 1fr))` }}>
+      <nav aria-label={tf("tabsLabel")} className="fixed inset-x-0 bottom-0 z-40 grid border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))] print:hidden min-[700px]:hidden" style={{ gridTemplateColumns: `repeat(${tabEntries.length + 1}, minmax(0, 1fr))` }}>
         {tabEntries.map((entry) => (
           <Link
             key={entry.key}
@@ -327,7 +347,7 @@ export function FounderChrome({
       </nav>
 
       {moreOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 min-[700px]:hidden">
           <button type="button" aria-label={tf("moreClose")} onClick={() => setMoreOpen(false)} className="absolute inset-0 bg-[#14152B]/45" />
           <div ref={moreRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={tf("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white outline-none">
             <div className="flex items-center justify-between px-5 pb-1 pt-3">
