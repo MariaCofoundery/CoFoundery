@@ -2599,7 +2599,18 @@
       "archived": "Der Termin ist im Archiv. Teilnahme und Zusagen bleiben, die Auswertung zählt ihn weiter.",
       "restored": "Der Termin ist wieder im Plan."
     },
-    "dragFailed": "Verschieben hat nicht geklappt."
+    "dragFailed": "Verschieben hat nicht geklappt.",
+    "filter": {
+      "label": "Posts filtern",
+      "brand": "Marke",
+      "brandAll": "Marke: alle",
+      "pillar": "Content-Säule",
+      "pillarAll": "Säule: alle",
+      "status": "Stand",
+      "statusAll": "Stand: alle",
+      "apply": "Filtern",
+      "reset": "Filter zurücksetzen"
+    }
   },
   "people": {
     "title": "Wer ist wer",

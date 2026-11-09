@@ -41,7 +41,7 @@ import { EventFormats } from "@/features/advisor/EventFormats";
 import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEventsSplit, listProgramExperts } from "@/features/advisor/teamProgramData";
 import { listEventCountingRequirements } from "@/features/advisor/fundingData";
 import { getContentDefaults, getOrgPost, listContentItems, listLinkableTasks, listPostTasks, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
-import { BRAND_COLOR_STYLE, isoWeekNumber } from "@/features/advisor/socialCalendarModel";
+import { BRAND_COLOR_STYLE, POST_STATUSES, isoWeekNumber } from "@/features/advisor/socialCalendarModel";
 import { listOrgTasks } from "@/features/advisor/teamraumData";
 import { teamraumHref } from "@/features/advisor/teamraumRoutes";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
@@ -94,6 +94,10 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const week = weekOf(query.woche, today);
   const hidden = hiddenLayersOf(query.aus);
   const onlyPosts = query.nur === "posts";
+  // Filter der Posts (Content-Planung): Marke, Saeule, Stand. Sie wirken nur auf Posts, nicht auf Termine und Aufgaben.
+  const filterBrand = UUID.test(query.marke ?? "") ? (query.marke as string) : null;
+  const filterPillar = UUID.test(query.saeule ?? "") ? (query.saeule as string) : null;
+  const filterStatus = POST_STATUSES.find((status) => status === query.stand) ?? null;
 
   // Was bei jedem Link im Kalender mitgeht.
   const keep: Record<string, string> = {
@@ -102,6 +106,9 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     ...(view === "week" ? { woche: week } : {}),
     ...(hidden.size > 0 ? { aus: hiddenParam(hidden) } : {}),
     ...(onlyPosts ? { nur: "posts" } : {}),
+    ...(filterBrand ? { marke: filterBrand } : {}),
+    ...(filterPillar ? { saeule: filterPillar } : {}),
+    ...(filterStatus ? { stand: filterStatus } : {}),
   };
   const link = (extra: Record<string, string | null | undefined> = {}) => calendarHref(orgs.length > 1 ? org.id : null, { ...keep, ...extra });
   const linkOrg = (extra: Record<string, string | null | undefined> = {}) => calendarHref(org.id, { ...keep, ...extra });
@@ -159,7 +166,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const items = buildCalendarItems({
     events,
     // Posts zu Terminen stehen auch ausserhalb des gezeigten Zeitraums im Panel; im Raster nur die darin.
-    posts,
+    posts: posts.filter((post) => (!filterBrand || post.brandId === filterBrand) && (!filterPillar || post.pillarId === filterPillar) && (!filterStatus || post.status === filterStatus)),
     tasks: orgTasks,
     eco,
     hidden,
@@ -366,6 +373,31 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           <Link href={calendarHref(orgs.length > 1 ? org.id : null, { ...keep, nur: onlyPosts ? null : "posts" })} aria-pressed={onlyPosts} className={`ml-1 inline-flex min-h-9 items-center rounded-full border px-3 text-[13.5px] font-semibold ${onlyPosts ? "border-pink-500 bg-pink-50 text-pink-950" : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"}`}>{t("onlyPosts")}</Link>
           <span className="ml-1 text-[13px] text-slate-700">{t("layersHint")}</span>
         </div>
+      ) : null}
+
+      {view !== "formats" && view !== "plan" && !hidden.has("post") && contentItems.some((entry) => entry.kind === "brand" || entry.kind === "pillar") ? (
+        <form method="get" action="/advisor/kalender" aria-label={t("filter.label")} className="mb-4 flex flex-wrap items-center gap-2">
+          {orgs.length > 1 ? <input type="hidden" name="org" value={org.id} /> : null}
+          {Object.entries(keep).filter(([key]) => key !== "marke" && key !== "saeule" && key !== "stand").map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
+          <span className="mr-1 text-[13px] font-semibold text-slate-700">{t("filter.label")}</span>
+          <label className="sr-only" htmlFor="filter-brand">{t("filter.brand")}</label>
+          <select id="filter-brand" name="marke" defaultValue={filterBrand ?? ""} className="min-h-10 rounded-full border-[1.5px] border-slate-300 bg-white px-3 text-[13.5px] font-semibold text-slate-900">
+            <option value="">{t("filter.brandAll")}</option>
+            {contentItems.filter((entry) => entry.kind === "brand").map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+          </select>
+          <label className="sr-only" htmlFor="filter-pillar">{t("filter.pillar")}</label>
+          <select id="filter-pillar" name="saeule" defaultValue={filterPillar ?? ""} className="min-h-10 rounded-full border-[1.5px] border-slate-300 bg-white px-3 text-[13.5px] font-semibold text-slate-900">
+            <option value="">{t("filter.pillarAll")}</option>
+            {contentItems.filter((entry) => entry.kind === "pillar").map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+          </select>
+          <label className="sr-only" htmlFor="filter-status">{t("filter.status")}</label>
+          <select id="filter-status" name="stand" defaultValue={filterStatus ?? ""} className="min-h-10 rounded-full border-[1.5px] border-slate-300 bg-white px-3 text-[13.5px] font-semibold text-slate-900">
+            <option value="">{t("filter.statusAll")}</option>
+            {POST_STATUSES.map((status) => <option key={status} value={status}>{ts(`status.${status}`)}</option>)}
+          </select>
+          <button type="submit" className="inline-flex min-h-10 items-center rounded-full bg-slate-950 px-4 text-[13.5px] font-semibold text-white">{t("filter.apply")}</button>
+          {filterBrand || filterPillar || filterStatus ? <Link href={link({ marke: null, saeule: null, stand: null })} className="inline-flex min-h-10 items-center px-2 text-[13.5px] font-semibold text-violet-800 underline-offset-4 hover:underline">{t("filter.reset")}</Link> : null}
+        </form>
       ) : null}
 
       {needPosts.length > 0 && view !== "formats" && view !== "plan" ? (

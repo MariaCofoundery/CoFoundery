@@ -2599,7 +2599,18 @@
       "archived": "The event is in the archive. Attendance and RSVPs are kept and the report still counts it.",
       "restored": "The event is back in the plan."
     },
-    "dragFailed": "Moving did not work."
+    "dragFailed": "Moving did not work.",
+    "filter": {
+      "label": "Filter posts",
+      "brand": "Brand",
+      "brandAll": "Brand: all",
+      "pillar": "Content pillar",
+      "pillarAll": "Pillar: all",
+      "status": "Status",
+      "statusAll": "Status: all",
+      "apply": "Filter",
+      "reset": "Reset filters"
+    }
   },
   "people": {
     "title": "Who is who",

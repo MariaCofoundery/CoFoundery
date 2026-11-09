@@ -49,6 +49,14 @@ test("Oberflaeche: Voreinstellung ist vorgewaehlt, Mehr Angaben klappt, Aufgaben
   assert.match(read("src/features/advisor/calendar/CalendarScreen.tsx"), /borderLeft: `5px solid \$\{brandColor\}`/);
 });
 
+test("Kalender-Filter nach Marke, Saeule und Stand wirken nur auf Posts und bleiben in den Links", () => {
+  const screen = read("src/features/advisor/calendar/CalendarScreen.tsx");
+  assert.match(screen, /post\.brandId === filterBrand/);
+  assert.match(screen, /\.\.\.\(filterBrand \? \{ marke: filterBrand \} : \{\}\)/);
+  assert.match(screen, /<form method="get" action="\/advisor\/kalender"/);
+  for (const locale of ["de", "en"]) assert.ok(JSON.parse(read(`messages/${locale}/advisor.json`)).calendar.filter.apply, locale);
+});
+
 test("Texte in beiden Sprachen", () => {
   const keys = (value: unknown, prefix = ""): string[] =>
     typeof value === "object" && value !== null ? Object.entries(value).flatMap(([key, inner]) => keys(inner, `${prefix}${key}.`)) : [prefix.slice(0, -1)];
