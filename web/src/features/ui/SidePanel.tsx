@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EscapeCloses } from "@/features/ui/EscapeCloses";
+import { FocusPanel } from "@/features/ui/FocusPanel";
 
 /**
  * Ein Panel von rechts (am Handy von unten) fuer Formulare und Termine (Entwurf 05.11.2026): man bleibt auf der Seite,
@@ -32,6 +33,7 @@ export function SidePanel({
   return (
     <>
       <EscapeCloses href={closeHref} />
+      <FocusPanel titleId={titleId} trap={modal} />
       {/* Hintergrund: beim Modal immer, bei der Spalte nur am Handy. */}
       <Link href={closeHref} aria-label={closeLabel} tabIndex={-1} className={`fixed inset-0 z-[55] bg-[#14152B]/45 print:hidden ${modal ? "" : "lg:hidden"}`} />
       <section

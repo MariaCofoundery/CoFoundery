@@ -138,8 +138,8 @@ export async function addOrgTaskCommentAction(formData: FormData) {
 export async function deleteOrgTaskCommentAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const taskId = uuidOrNull(formData.get("taskId"));
-  await client.rpc("delete_org_task_comment", { p_comment_id: uuidOrNull(formData.get("commentId")) });
-  finish(backTo(formData, taskId ? { task: taskId } : {}));
+  const { error } = await client.rpc("delete_org_task_comment", { p_comment_id: uuidOrNull(formData.get("commentId")) });
+  finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), ...(error ? { taskError: "failed" } : {}) }));
 }
 
 export async function setMyOrgPresenceAction(formData: FormData) {

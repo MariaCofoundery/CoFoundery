@@ -26,9 +26,10 @@ async function context(formData: FormData) {
 }
 
 async function save(client: Awaited<ReturnType<typeof createClient>>, prefs: NavPrefs, back: string) {
-  await client.rpc("save_advisor_nav_prefs", { p_hidden: prefs.hidden, p_order: prefs.order });
+  const { error } = await client.rpc("save_advisor_nav_prefs", { p_hidden: prefs.hidden, p_order: prefs.order });
   revalidatePath("/", "layout");
-  redirect(back);
+  // Ein Fehler wird gesagt (fehler=1), nicht verschluckt: sonst sieht es aus, als waere die Einstellung gespeichert.
+  redirect(error ? `${back}${back.includes("?") ? "&" : "?"}fehler=1` : back);
 }
 
 const keyOf = (formData: FormData) => {

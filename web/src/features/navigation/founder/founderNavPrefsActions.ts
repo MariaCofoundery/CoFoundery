@@ -26,9 +26,10 @@ async function context() {
 }
 
 async function save(client: Awaited<ReturnType<typeof createClient>>, prefs: FounderNavPrefs) {
-  await client.rpc("save_founder_nav_prefs", { p_hidden: prefs.hidden, p_order: prefs.order });
+  const { error } = await client.rpc("save_founder_nav_prefs", { p_hidden: prefs.hidden, p_order: prefs.order });
   revalidatePath("/", "layout");
-  redirect(BACK);
+  // Ein Fehler wird gesagt (fehler=1), nicht verschluckt.
+  redirect(error ? `${BACK}?fehler=1` : BACK);
 }
 
 const keyOf = (formData: FormData, available: FounderAreaKey[]) => {

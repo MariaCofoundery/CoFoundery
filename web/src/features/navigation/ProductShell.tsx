@@ -39,7 +39,7 @@ type Props = {
   advisorOrgNames?: string[];
   advisorSoloOrg?: boolean;
   /** Dieselben Organisationen mit Kennung (Programm-Umschalter in der Seitenleiste) und die gewaehlte. */
-  advisorOrgList?: { id: string; name: string }[];
+  advisorOrgList?: { id: string; name: string; isOwner?: boolean }[];
   activeOrgId?: string | null;
   /** Die eigene Seitenleiste des Advisor-Arbeitsbereichs (20270331120000). */
   advisorNavPrefs?: { hidden: string[]; order: string[] } | null;

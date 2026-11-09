@@ -85,8 +85,8 @@ export async function ProgramGoals({
   };
 
   return (
-    <section id="ziele" aria-labelledby="program-goals-title" className="scroll-mt-24">
-      <h2 id="program-goals-title" className="font-brand text-[24px] font-semibold text-slate-950">{t("title")}</h2>
+    <section id={`ziele-${programId}`} aria-labelledby={`program-goals-title-${programId}`} className="scroll-mt-24">
+      <h2 id={`program-goals-title-${programId}`} className="font-brand text-[24px] font-semibold text-slate-950">{t("title")}</h2>
       <p className="mt-1 max-w-2xl text-[14.5px] leading-6 text-slate-700">{t(side === "team" ? "textTeam" : "textOrg")}</p>
       {saved ? <p role="status" className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-900">{t("saved")}</p> : null}
       {error ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-800">{t("error")}</p> : null}

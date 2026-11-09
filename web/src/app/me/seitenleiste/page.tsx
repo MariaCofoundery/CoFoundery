@@ -9,7 +9,8 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 /** Die Founder-Leiste anpassen (08.11.2026): ausblenden und sortieren, je Person. */
-export default async function FounderNavSettingsPage() {
+export default async function FounderNavSettingsPage({ searchParams }: { searchParams?: Promise<{ fehler?: string }> }) {
+  const query = (await searchParams) ?? {};
   const {
     data: { user },
   } = await getRequestUser();
@@ -25,7 +26,7 @@ export default async function FounderNavSettingsPage() {
   const prefs = data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null;
   return (
     <main className="work-ui mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-      <FounderNavSettings hasConnect={isMember === true} prefs={prefs} />
+      <FounderNavSettings hasConnect={isMember === true} prefs={prefs} error={query.fehler === "1"} />
       <Link href="/dashboard" className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">← {t("backFounder")}</Link>
     </main>
   );

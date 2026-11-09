@@ -13,14 +13,14 @@ const TASK_COLUMNS =
   "id, org_id, title, details, status, assignee_user_id, due_on, program_id, event_id, page_id, visibility, checklist, created_by_user_id, created_at, updated_at, done_at, advisor_org_task_assignees(user_id, created_at)";
 
 export async function listOrgTasks(client: SupabaseClient, orgId: string): Promise<OrgTask[]> {
-  const { data, error } = await client
-    .from("advisor_org_tasks")
-    .select(TASK_COLUMNS)
-    .eq("org_id", orgId)
-    .order("created_at", { ascending: true })
-    .limit(500);
-  if (error || !Array.isArray(data)) return [];
-  return (data as Record<string, unknown>[]).map(taskOf);
+  // Alles Offene (bis 500) und die zuletzt erledigten (bis 200): Erledigtes waechst mit der Zeit und darf das Neue nicht
+  // verdraengen - frueher fehlten ab 500 Aufgaben die NEUESTEN.
+  const [open, done] = await Promise.all([
+    client.from("advisor_org_tasks").select(TASK_COLUMNS).eq("org_id", orgId).neq("status", "done").order("created_at", { ascending: true }).limit(500),
+    client.from("advisor_org_tasks").select(TASK_COLUMNS).eq("org_id", orgId).eq("status", "done").order("done_at", { ascending: false, nullsFirst: false }).limit(200),
+  ]);
+  const rows = [...(Array.isArray(open.data) && !open.error ? open.data : []), ...(Array.isArray(done.data) && !done.error ? done.data : [])] as Record<string, unknown>[];
+  return rows.map(taskOf).sort((a, b) => (a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0));
 }
 
 export async function listTaskComments(client: SupabaseClient, taskId: string): Promise<TaskComment[]> {
@@ -55,29 +55,30 @@ export async function listOrgPresence(client: SupabaseClient, orgId: string): Pr
 }
 
 /** Fuer den Advisor-Start: eigene offene Aufgaben ueber alle Organisationen - mit Datum zuerst, dann ohne. */
-export async function listMyOpenOrgTasks(client: SupabaseClient, userId: string): Promise<OrgTask[]> {
-  const { data, error } = await client
+export async function listMyOpenOrgTasks(client: SupabaseClient, userId: string, orgId?: string): Promise<OrgTask[]> {
+  // Mit `orgId` wird in der Abfrage gefiltert - nicht erst danach: Sonst verdraengten 40 Aufgaben einer anderen Organisation die der gewaehlten.
+  let query = client
     .from("advisor_org_tasks")
     .select(`${TASK_COLUMNS}, mine:advisor_org_task_assignees!inner(user_id)`)
     .eq("mine.user_id", userId)
-    .neq("status", "done")
-    .order("due_on", { ascending: true, nullsFirst: false })
-    .limit(40);
+    .neq("status", "done");
+  if (orgId) query = query.eq("org_id", orgId);
+  const { data, error } = await query.order("due_on", { ascending: true, nullsFirst: false }).limit(40);
   if (error || !Array.isArray(data)) return [];
   return (data as Record<string, unknown>[]).map(taskOf);
 }
 
 /** Fuer den Advisor-Start: was im Team ansteht - offen, ueberfaellig oder in den naechsten Tagen faellig, egal fuer wen. */
-export async function listUpcomingOrgTasks(client: SupabaseClient, withinDays = 7): Promise<OrgTask[]> {
+export async function listUpcomingOrgTasks(client: SupabaseClient, withinDays = 7, orgId?: string): Promise<OrgTask[]> {
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + withinDays);
-  const { data, error } = await client
+  let query = client
     .from("advisor_org_tasks")
     .select(TASK_COLUMNS)
     .neq("status", "done")
-    .lte("due_on", horizon.toISOString().slice(0, 10))
-    .order("due_on", { ascending: true })
-    .limit(40);
+    .lte("due_on", horizon.toISOString().slice(0, 10));
+  if (orgId) query = query.eq("org_id", orgId);
+  const { data, error } = await query.order("due_on", { ascending: true }).limit(40);
   if (error || !Array.isArray(data)) return [];
   return (data as Record<string, unknown>[]).map(taskOf);
 }

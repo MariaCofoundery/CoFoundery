@@ -28,7 +28,7 @@ const SUGGESTED_FORMATS = ["Workshop", "Masterclass", "Mentoring", "Office Hours
  * gewaehlte Schritt - was er bringt, wo man ihn spaeter findet, "jetzt machen" oder ueberspringen. Der Schritt
  * "Programm planen" geht gleich hier: Formate antippen, Termine tippen oder diktieren.
  */
-export default async function SetupPage({ searchParams }: { searchParams?: Promise<{ org?: string; schritt?: string; cardSaved?: string; cardError?: string }> }) {
+export default async function SetupPage({ searchParams }: { searchParams?: Promise<{ org?: string; schritt?: string; cardSaved?: string; cardError?: string; fehler?: string }> }) {
   const query = (await searchParams) ?? {};
   const {
     data: { user },
@@ -59,6 +59,7 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
         <p className="text-[13px] text-slate-600">{org.name}</p>
         <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight text-slate-950">{t("title")}</h1>
         <p className="mt-1 text-[14px] text-slate-700">{t("progress", { done, total })}</p>
+        {query.fehler === "1" ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-[13.5px] text-rose-900">{t("error")}</p> : null}
         <div aria-hidden="true" className="mt-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}>
           {items.map((item) => (
             <span key={item.key} className={`h-1.5 rounded-full ${item.state === "done" ? "bg-violet-600" : item.key === current ? "bg-violet-300" : "bg-slate-200"}`} />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { deletePostAction, savePostAction } from "@/features/advisor/socialCalendarActions";
 import { CHANNELS, CHANNEL_STYLE, POST_STATUSES, type OrgCampaign, type OrgPost } from "@/features/advisor/socialCalendarModel";
@@ -89,7 +90,7 @@ export async function PostSheet({
             <span className={TILE_LABEL}>{t("form.event")}</span>
             <select name="eventId" defaultValue={post?.eventId ?? defaultEventId ?? ""} className={TILE_INPUT}>
               <option value="">{t("form.noEvent")}</option>
-              {events.map((entry) => <option key={entry.eventId} value={entry.eventId}>{`${day.format(new Date(`${entry.startsAt.slice(0, 10)}T00:00:00Z`))} · ${entry.title}`}</option>)}
+              {events.map((entry) => <option key={entry.eventId} value={entry.eventId}>{`${day.format(new Date(`${berlinDayOf(entry.startsAt)}T00:00:00Z`))} · ${entry.title}`}</option>)}
             </select>
           </label>
           <label className={TILE}>

@@ -22,18 +22,18 @@ export async function skipSetupStepAction(formData: FormData) {
   const client = await requireClient();
   const orgId = String(formData.get("orgId") ?? "");
   const step = formData.get("step");
-  if (UUID.test(orgId) && isSetupStep(step)) await client.rpc("set_advisor_setup_state", { p_org_id: orgId, p_skip: step, p_hidden: null });
+  const failed = UUID.test(orgId) && isSetupStep(step) ? Boolean((await client.rpc("set_advisor_setup_state", { p_org_id: orgId, p_skip: step, p_hidden: null })).error) : false;
   revalidatePath("/advisor/dashboard");
-  redirect(UUID.test(orgId) ? `/advisor/los-gehts?org=${orgId}` : "/advisor/los-gehts");
+  redirect(UUID.test(orgId) ? `/advisor/los-gehts?org=${orgId}${failed ? "&fehler=1" : ""}` : "/advisor/los-gehts");
 }
 
 /** Die Liste auf dem Start ausblenden (oder wieder zeigen). "Los geht's" bleibt ueber das Konto-Menue erreichbar. */
 export async function setSetupHiddenAction(formData: FormData) {
   const client = await requireClient();
   const orgId = String(formData.get("orgId") ?? "");
-  if (UUID.test(orgId)) await client.rpc("set_advisor_setup_state", { p_org_id: orgId, p_skip: null, p_hidden: formData.get("hidden") === "yes" });
+  const failed = UUID.test(orgId) ? Boolean((await client.rpc("set_advisor_setup_state", { p_org_id: orgId, p_skip: null, p_hidden: formData.get("hidden") === "yes" })).error) : false;
   // "Spaeter" beendet auch die Leiste "Schritt x von y" auf jeder Seite - sonst bliebe sie als Sitzungs-Cookie stehen.
   if (formData.get("hidden") === "yes") (await cookies()).delete(SETUP_COOKIE);
   revalidatePath("/advisor/dashboard");
-  redirect(formData.get("hidden") === "yes" ? "/advisor/dashboard" : `/advisor/los-gehts?org=${orgId}`);
+  redirect(formData.get("hidden") === "yes" && !failed ? "/advisor/dashboard" : `/advisor/los-gehts?org=${orgId}${failed ? "&fehler=1" : ""}`);
 }

@@ -182,7 +182,8 @@
     "reset": "Reset to default",
     "back": "Back to Today",
     "founderText": "Hide what you do not need and move the areas into the order that suits you. “Start” always stays. This applies to you only and on all devices. Hidden areas stay reachable through search (⌘K).",
-    "backFounder": "Back to Start"
+    "backFounder": "Back to Start",
+    "error": "Saving did not work. Please try again."
   },
   "founder": {
     "navLabel": "Areas",

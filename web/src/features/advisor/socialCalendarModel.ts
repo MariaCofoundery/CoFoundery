@@ -1,3 +1,4 @@
+import { berlinDayOf } from "@/lib/berlinTime";
 import { parseEventList } from "@/features/advisor/eventListParser";
 
 /**
@@ -207,7 +208,7 @@ export function suggestCampaign(text: string, context: { today: string; events: 
     const name = (named || namedDates.map((entry) => entry.title).slice(0, 3).join(", ")).slice(0, 120);
     const fallbackTime = clean.match(/\b(?:um|at)\s+(\d{1,2})(?::(\d{2}))?\s*(?:uhr|h|am|pm)?\b/i);
     const posts = namedDates.slice(0, 20).map((entry) => {
-      const event = context.events.find((candidate) => candidate.startsAt.slice(0, 10) === entry.day || entry.title.toLocaleLowerCase("de").includes(candidate.title.trim().toLocaleLowerCase("de")));
+      const event = context.events.find((candidate) => berlinDayOf(candidate.startsAt) === entry.day || entry.title.toLocaleLowerCase("de").includes(candidate.title.trim().toLocaleLowerCase("de")));
       return {
         title: entry.title.slice(0, 160),
         plannedOn: entry.day,
@@ -223,7 +224,7 @@ export function suggestCampaign(text: string, context: { today: string; events: 
     .filter((entry) => entry.title.trim().length >= 3)
     .sort((a, b) => b.title.length - a.title.length)
     .find((entry) => unicode(new RegExp(`(?<![\\p{L}\\d])${escape(entry.title.trim())}(?![\\p{L}\\d])`, "i")).test(clean));
-  const eventDay = event ? event.startsAt.slice(0, 10) : null;
+  const eventDay = event ? berlinDayOf(event.startsAt) : null;
 
   // Die groesste genannte Anzahl: "jeden Montag ein Post ..., insgesamt vier Posts" meint vier.
   let count = Math.max(

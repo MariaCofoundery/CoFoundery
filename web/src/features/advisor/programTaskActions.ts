@@ -16,7 +16,11 @@ function backOf(formData: FormData, extra = "") {
   const programId = uuidOrNull(formData.get("programId"));
   const goals = formData.get("area") === "goals";
   if (formData.get("side") === "org" && programId) return `/advisor/programm/${programId}?tab=${goals ? "ziele" : "aufgaben"}${extra}`;
-  return `/programm${extra ? `?${extra.replace(/^&/, "")}` : ""}#${goals ? "ziele" : "aufgaben"}`;
+  // Bei mehreren Programmen (mehrere Organisationen) muss der Rueckweg sagen, WELCHES - sonst erscheint die Rueckmeldung
+  // bei allen und der Sprung geht zum ersten.
+  const which = programId ? `program=${programId}` : "";
+  const query = [which, extra.replace(/^&/, "")].filter(Boolean).join("&");
+  return `/programm${query ? `?${query}` : ""}#${goals ? "ziele" : "aufgaben"}${programId ? `-${programId}` : ""}`;
 }
 
 async function requireClient(formData: FormData) {

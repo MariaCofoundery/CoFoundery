@@ -182,7 +182,8 @@
     "reset": "Auf Voreinstellung zurücksetzen",
     "back": "Zurück zu Heute",
     "founderText": "Blende aus, was du nicht brauchst, und schieb die Bereiche in die Reihenfolge, die zu dir passt. „Start“ bleibt immer. Das gilt nur für dich und auf allen Geräten. Ausgeblendete Bereiche findest du weiter über die Suche (⌘K).",
-    "backFounder": "Zurück zu Start"
+    "backFounder": "Zurück zu Start",
+    "error": "Das Speichern hat nicht geklappt. Bitte versuch es noch einmal."
   },
   "founder": {
     "navLabel": "Bereiche",

@@ -27,16 +27,27 @@ function anotherDialogIsOpen() {
  * Weggeklickt - ueber den Knopf, das Kreuz, die Escape-Taste oder daneben -
  * heisst: gelesen. Sie liegt danach in den Nachrichten.
  */
+/**
+ * Eine abgeholte Mitteilung, die noch nicht gezeigt werden konnte: Das Abholen vermerkt sie als gesehen (bei "einmalig" endgueltig).
+ * Wechselt die Huelle der Seite (Arbeitsbereich, Founder-Leiste, obere Leiste), waehrend die Antwort unterwegs ist, wird dieses
+ * Fenster abgebaut - die naechste Instanz zeigt die Mitteilung dann, statt dass sie verloren geht.
+ */
+let handedOver: PendingAnnouncement | null = null;
+
 export function AnnouncementPopup() {
   const t = useTranslations("notices.announcements");
   const router = useRouter();
   const [item, setItem] = useState<PendingAnnouncement | null>(null);
-  const started = useRef(false);
   const closeButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
+    // Eine Mitteilung, die die vorige Instanz noch abgeholt, aber nicht mehr zeigen konnte.
+    if (handedOver) {
+      const rescued = handedOver;
+      handedOver = null;
+      setItem(rescued);
+      return;
+    }
     let cancelled = false;
     let attempts = 0;
 
@@ -48,7 +59,9 @@ export function AnnouncementPopup() {
         return;
       }
       const next = await getPendingAnnouncementAction().catch(() => null);
-      if (!cancelled && next) setItem(next);
+      if (!next) return;
+      if (cancelled) handedOver = next;
+      else setItem(next);
     };
     let timer = window.setTimeout(tryFetch, 2500);
     return () => {

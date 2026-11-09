@@ -17,6 +17,7 @@ import {
   type FounderNavPrefs,
 } from "@/features/navigation/founder/founderNav";
 import { Count, Palette } from "@/features/navigation/workspace/WorkspaceChrome";
+import { useFocusTrap } from "@/features/ui/useFocusTrap";
 
 type Slots = {
   profile: React.ReactNode;
@@ -59,6 +60,9 @@ export function FounderChrome({
   const tf = useTranslations("navigation.founder");
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+  // Das Blatt "Mehr" ist ein Dialog: Fokus hinein, Tab kreist darin, Fokus kehrt zurueck.
+  useFocusTrap(moreOpen, moreRef);
   const [searchOpen, setSearchOpen] = useState(false);
   // Von Hand auf- oder zugeklappt, bis man weitergeht. Ohne Eingriff ist offen, was aktiv ist.
   const [folded, setFolded] = useState<Record<string, boolean>>({});
@@ -325,7 +329,7 @@ export function FounderChrome({
       {moreOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button type="button" aria-label={tf("moreClose")} onClick={() => setMoreOpen(false)} className="absolute inset-0 bg-[#14152B]/45" />
-          <div role="dialog" aria-modal="true" aria-label={tf("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white">
+          <div ref={moreRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={tf("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white outline-none">
             <div className="flex items-center justify-between px-5 pb-1 pt-3">
               <span aria-hidden="true" className="mx-auto h-1.5 w-10 rounded-full bg-slate-300" />
             </div>

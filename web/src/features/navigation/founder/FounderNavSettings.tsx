@@ -17,7 +17,7 @@ const LABEL: Record<FounderAreaKey, "areaStart" | "areaAlign" | "areaFind" | "ar
  * schieben. "Start" bleibt immer. Reine Darstellung: ein ausgeblendeter Bereich bleibt ueber die Suche (⌘K) und
  * Links erreichbar.
  */
-export async function FounderNavSettings({ hasConnect, prefs }: { hasConnect: boolean; prefs: FounderNavPrefs | null }) {
+export async function FounderNavSettings({ hasConnect, prefs, error = false }: { hasConnect: boolean; prefs: FounderNavPrefs | null; error?: boolean }) {
   const t = await getTranslations("navigation");
   const ts = await getTranslations("navigation.settings");
   const available = FOUNDER_AREA_KEYS.filter((key) => key !== "connect" || hasConnect);
@@ -31,6 +31,7 @@ export async function FounderNavSettings({ hasConnect, prefs }: { hasConnect: bo
         <h2 id="founder-nav-settings-title" className="font-brand text-[24px] font-semibold leading-tight text-slate-950">{ts("title")}</h2>
         <p className="mt-1 max-w-2xl text-[14.5px] leading-6 text-slate-700">{ts("founderText")}</p>
       </div>
+      {error ? <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-900">{ts("error")}</p> : null}
       <div className="rounded-2xl border border-slate-200 bg-white p-4">
         <ul className="grid gap-1.5">
           <li className="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2">

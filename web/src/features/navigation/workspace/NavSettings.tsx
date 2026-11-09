@@ -9,7 +9,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
  * "Heute" und "Einrichten" bleiben immer. Reine Darstellung: ausgeblendete Stationen bleiben ueber die Suche (⌘K) und
  * Links erreichbar. Im Onboarding ein Schritt, sonst unter "Seitenleiste anpassen".
  */
-export async function NavSettings({ hasOrg, prefs, orgId, back }: { hasOrg: boolean; prefs: NavPrefs | null; orgId: string | null; back?: "setup" }) {
+export async function NavSettings({ hasOrg, prefs, orgId, back, error = false }: { hasOrg: boolean; prefs: NavPrefs | null; orgId: string | null; back?: "setup"; error?: boolean }) {
   const t = await getTranslations("navigation.workspace");
   const ts = await getTranslations("navigation.settings");
   const nav = buildWorkspaceNav({ hasOrg });
@@ -32,6 +32,7 @@ export async function NavSettings({ hasOrg, prefs, orgId, back }: { hasOrg: bool
         <h2 id="nav-settings-title" className="font-brand text-[24px] font-semibold leading-tight text-slate-950">{ts("title")}</h2>
         <p className="mt-1 max-w-2xl text-[14.5px] leading-6 text-slate-700">{ts("text")}</p>
       </div>
+      {error ? <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-900">{ts("error")}</p> : null}
       {[{ key: "home", items: [nav.home] }, ...groups].map((group) => (
         <div key={group.key} className="rounded-2xl border border-slate-200 bg-white p-4">
           {group.key !== "home" ? <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-slate-600">{t(`groups.${group.key}`)}</h3> : null}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type Ref } from "react";
 import { UserText } from "@/features/ui/UserText";
+import { useFocusTrap } from "@/features/ui/useFocusTrap";
 import { announcementTeaser, type AnnouncementDisplay } from "@/features/announcements/announcementModel";
 
 /**
@@ -77,6 +78,9 @@ export function AnnouncementView(props: AnnouncementViewProps) {
 
 function Card({ compact, frame, eyebrow, title, body, ctaLabel, dismissLabel, closeLabel, laterNote, onCta, onDismiss, closeRef, titleId }: AnnouncementViewProps) {
   const live = frame === "page";
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Die Karte haelt die Seite an: Tab kreist in ihr (nur das echte Pop-up, nicht die Vorschau im Admin-Bereich).
+  useFocusTrap(live, dialogRef);
   return (
     // Das aeussere Feld scrollt: Auf einem kleinen Bildschirm darf kein Teil der Karte abgeschnitten sein.
     <div
@@ -85,6 +89,7 @@ function Card({ compact, frame, eyebrow, title, body, ctaLabel, dismissLabel, cl
     >
       <div className={`flex min-h-full w-full ${compact ? "items-end" : "mx-auto max-w-[27.5rem] items-center px-4 py-8"}`}>
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}

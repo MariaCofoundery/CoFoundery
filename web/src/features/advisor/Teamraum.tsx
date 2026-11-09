@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { ChipChoice, ChipMultiChoice } from "@/features/ui/ChipChoice";
@@ -164,7 +165,8 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
   const { dayOf } = helpers(ctx);
   // Ein Startup verknuepfen kann man nur mit Teams, die man sieht. Eine bestehende fremde Verknuepfung bleibt still erhalten.
   const keepsHiddenProgram = Boolean(task?.programId && !ctx.programs.some((program) => program.programId === task.programId));
-  const upcoming = ctx.events.filter((event) => event.startsAt.slice(0, 10) >= addDays(ctx.today, -14) || event.eventId === task?.eventId);
+  // Auch ein schon lange vergangener Termin bleibt waehlbar, wenn die Aufgabe zu ihm gehoert oder von seinem Panel kommt.
+  const upcoming = ctx.events.filter((event) => berlinDayOf(event.startsAt) >= addDays(ctx.today, -14) || event.eventId === task?.eventId || event.eventId === defaultEventId);
   const people = [
     ...ctx.members.filter((member) => member.isSelf).map((member) => ({ value: member.userId, label: t("form.meShort") })),
     ...ctx.members.filter((member) => !member.isSelf).map((member) => ({ value: member.userId, label: member.name })),
@@ -226,7 +228,7 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
               <select name="eventId" defaultValue={task?.eventId ?? defaultEventId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
                 <option value="">{t("form.noEvent")}</option>
                 {upcoming.map((event) => (
-                  <option key={event.eventId} value={event.eventId}>{`${dayOf(event.startsAt.slice(0, 10))} · ${event.title}`}</option>
+                  <option key={event.eventId} value={event.eventId}>{`${dayOf(berlinDayOf(event.startsAt))} · ${event.title}`}</option>
                 ))}
               </select>
             </label>
@@ -561,7 +563,7 @@ async function TaskCalendar({ ctx, tasks, filter, month }: { ctx: TeamraumContex
         {grid.map((week) => (
           <div key={week[0].day} className="grid grid-cols-7 border-b border-slate-100 last:border-b-0">
             {week.map((cell) => (
-              <DropDay key={cell.day} day={cell.day} kind="task" move={moveTaskDueAction} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`min-h-28 border-r border-slate-100 p-1.5 last:border-r-0 ${cell.inMonth ? "" : "bg-slate-50/70"}`}>
+              <DropDay key={cell.day} day={cell.day} kind="task" move={moveTaskDueAction} failedLabel={t("dragFailed")} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`min-h-28 border-r border-slate-100 p-1.5 last:border-r-0 ${cell.inMonth ? "" : "bg-slate-50/70"}`}>
                 <span className={`grid h-7 min-w-7 place-items-center rounded-full px-1 text-xs font-semibold ${cell.day === ctx.today ? "bg-violet-600 text-white" : cell.inMonth ? "text-slate-700" : "text-slate-400"}`}>{Number(cell.day.slice(8))}</span>
                 <div className="mt-1 grid gap-1">{(byDay.get(cell.day) ?? []).map(chip)}</div>
               </DropDay>
@@ -804,7 +806,7 @@ export async function TeamraumWeek({
   const clock = new Intl.DateTimeFormat(ctx.locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
   const week = myWeek(ctx.tasks, ctx.me, ctx.today);
   const horizon = addDays(ctx.today, 7);
-  const events = ctx.events.filter((event) => event.startsAt.slice(0, 10) >= ctx.today && event.startsAt.slice(0, 10) <= horizon);
+  const events = ctx.events.filter((event) => berlinDayOf(event.startsAt) >= ctx.today && berlinDayOf(event.startsAt) <= horizon);
   const unassigned = unassignedTasks(ctx.tasks);
   // Gespraeche zum Stand und Wiedervorlagen nur fuer Teams, die man sieht und die bald dran sind.
   const talks = nextCheckIns.filter((entry) => entry.nextOn <= horizon && programOf(entry.programId));

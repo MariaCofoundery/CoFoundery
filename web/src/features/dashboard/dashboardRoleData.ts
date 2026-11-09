@@ -29,7 +29,8 @@ export type DashboardRoleViews = {
   /** Einzige Organisation, in der die Person allein aktiv ist: im Menue "Mein Programm" statt Organisationsname. */
   advisorSoloOrg?: boolean;
   /** Dieselben Organisationen mit Kennung, nach Namen sortiert - fuer den Programm-Umschalter in der Seitenleiste. */
-  advisorOrgList?: { id: string; name: string }[];
+  /** `isOwner`: nur die Inhaberin legt Termine an (Anzeige - die Datenbank prueft es). */
+  advisorOrgList?: { id: string; name: string; isOwner?: boolean }[];
 };
 
 type AdvisorAccessRow = {
@@ -288,7 +289,7 @@ export async function getDashboardRoleViews(userId: string): Promise<DashboardRo
 async function listActiveAdvisorOrgs(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-): Promise<{ names: string[]; solo: boolean; list: { id: string; name: string }[] }> {
+): Promise<{ names: string[]; solo: boolean; list: { id: string; name: string; isOwner?: boolean }[] }> {
   try {
     const { data: memberships } = await supabase
       .from("advisor_org_members")
@@ -302,7 +303,7 @@ async function listActiveAdvisorOrgs(
       .map((org) => String(org.name ?? "").trim())
       .filter((name) => name.length > 0);
     const list = (orgs ?? [])
-      .map((org) => ({ id: String(org.id), name: String(org.name ?? "").trim() }))
+      .map((org) => ({ id: String(org.id), name: String(org.name ?? "").trim(), isOwner: (memberships ?? []).some((row) => row.org_id === org.id && row.role === "owner") }))
       .filter((org) => org.name.length > 0)
       .sort((a, b) => a.name.localeCompare(b.name, "de"));
     let solo = false;

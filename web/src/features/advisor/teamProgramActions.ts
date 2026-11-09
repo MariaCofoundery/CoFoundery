@@ -465,9 +465,9 @@ export async function createEventChecklistAction(formData: FormData) {
   const title = String(formData.get("title") ?? "").slice(0, 160);
   const day = /^\d{4}-\d{2}-\d{2}$/.test(String(formData.get("day") ?? "")) ? String(formData.get("day")) : "";
   const { count } = await client.from("advisor_org_tasks").select("id", { count: "exact", head: true }).eq("org_id", orgId).eq("event_id", eventId);
-  if (UUID_RE.test(eventId) && day && !count) await createOrgaChecklist(client, orgId, eventId, title, day);
+  const failed = UUID_RE.test(eventId) && day && !count ? Boolean((await createOrgaChecklist(client, orgId, eventId, title, day)).error) : false;
   revalidatePath("/advisor/teamraum", "layout");
-  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(eventId)}&reiter=aufgaben`));
+  redirect(orgPlanTab(orgId, `&open=${encodeURIComponent(eventId)}&reiter=aufgaben${failed ? "&planError=1" : ""}`));
 }
 
 /** Programmplan: Veranstaltung anlegen oder aendern. Nur der Inhaber; die Datenbank prueft das. */

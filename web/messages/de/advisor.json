@@ -1849,7 +1849,8 @@
     },
     "nobodyShort": "niemand zuständig",
     "checklistOf": "{done} von {total} erledigt",
-    "privateBadge": "Privat"
+    "privateBadge": "Privat",
+    "dragFailed": "Verschieben hat nicht geklappt."
   },
   "funding": {
     "title": "Förderauflagen",
@@ -2324,7 +2325,8 @@
       "finish": "Fertig",
       "end": "Einrichtung beenden"
     },
-    "prevStep": "Zurück"
+    "prevStep": "Zurück",
+    "error": "Das hat gerade nicht geklappt. Bitte versuch es noch einmal."
   },
   "calendar": {
     "title": "Kalender",
@@ -2449,7 +2451,8 @@
       "restore": "Wiederherstellen",
       "archived": "Der Termin ist im Archiv. Teilnahme und Zusagen bleiben, die Auswertung zählt ihn weiter.",
       "restored": "Der Termin ist wieder im Plan."
-    }
+    },
+    "dragFailed": "Verschieben hat nicht geklappt."
   },
   "people": {
     "title": "Wer ist wer",

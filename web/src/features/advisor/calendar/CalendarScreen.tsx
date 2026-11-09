@@ -121,7 +121,9 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const selectedId = UUID.test(query.termin ?? "") ? (query.termin as string) : null;
   const editId = UUID.test(query.bearbeiten ?? "") ? (query.bearbeiten as string) : null;
   const postId = UUID.test(query.post ?? "") ? (query.post as string) : null;
-  const sheet = editId ? "edit" : query.neu === "termin" ? "new" : query.neu === "liste" ? "bulk" : postId ? "post" : query.neu === "post" ? "post-new" : null;
+  // Termine anlegen und aendern darf nur die Inhaberin; wer die Adresse trotzdem oeffnet, sieht das Formular nicht (statt eines Formulars, dessen Eingaben die Datenbank verwirft).
+  const planningSheet = editId ? "edit" : query.neu === "termin" ? "new" : query.neu === "liste" ? "bulk" : null;
+  const sheet = planningSheet ? (isOwner ? planningSheet : null) : postId ? "post" : query.neu === "post" ? "post-new" : null;
   const tab = tabOf(query.reiter);
   const range = visibleRange(view, month, week);
 
@@ -389,7 +391,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
                       const list = byDay.get(cell.day) ?? [];
                       const weekend = new Date(`${cell.day}T00:00:00Z`).getUTCDay() % 6 === 0;
                       return (
-                        <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${cell.inMonth ? (weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
+                        <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} failedLabel={t("dragFailed")} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${cell.inMonth ? (weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
                           <div className="flex items-center justify-between">
                             <span className={`grid h-[26px] min-w-[26px] place-items-center rounded-full px-1 text-[13px] font-semibold ${cell.day === today ? "bg-[#6D49E0] text-white" : cell.inMonth ? "text-slate-950" : "text-slate-500"}`}>{Number(cell.day.slice(8))}</span>
                             {isOwner ? <Link href={linkOrg({ neu: "termin", tag: cell.day })} aria-label={t("addOn", { day: dayLong.format(new Date(`${cell.day}T00:00:00Z`)) })} className="grid h-6 w-6 place-items-center rounded-full text-sm text-slate-500 opacity-0 hover:bg-violet-50 hover:text-violet-800 focus:opacity-100 group-hover:opacity-100">+</Link> : null}

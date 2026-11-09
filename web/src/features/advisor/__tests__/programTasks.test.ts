@@ -34,7 +34,8 @@ test("Teamraum-Aufgaben der Organisation bleiben fuer Startups unsichtbar: eigen
 test("Rueckweg wird zusammengesetzt, nie uebernommen: Startup-Seite oder Teamseite der Organisation", () => {
   const actions = read("src/features/advisor/programTaskActions.ts");
   assert.match(actions, /formData\.get\("side"\) === "org" && programId\) return `\/advisor\/programm\/\$\{programId\}\?tab=\$\{goals \? "ziele" : "aufgaben"\}/);
-  assert.match(actions, /return `\/programm\$\{extra/);
+  // Bei mehreren Programmen sagt der Rückweg, welches (program=<id>) und springt zu dessen Bereich.
+  assert.match(actions, /return `\/programm\$\{query \? `\?\$\{query\}` : ""\}#/);
   assert.match(actions, /p_visibility: !taskId && formData\.get\("visibility"\) === "private" \? "private" : "shared"/);
   for (const fn of ["save_program_task", "move_program_task", "delete_program_task", "set_program_task_visibility"]) assert.match(actions, new RegExp(fn));
 });

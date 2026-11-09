@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { UserText } from "@/features/ui/UserText";
@@ -100,7 +101,7 @@ async function PageEditor({
             <select name="eventId" defaultValue={page?.eventId ?? ""} className={INPUT}>
               <option value="">{t("eventNone")}</option>
               {ctx.events.map((event) => (
-                <option key={event.eventId} value={event.eventId}>{`${dayOf(event.startsAt.slice(0, 10))} · ${event.title}`}</option>
+                <option key={event.eventId} value={event.eventId}>{`${dayOf(berlinDayOf(event.startsAt))} · ${event.title}`}</option>
               ))}
             </select>
           </label>
@@ -142,7 +143,7 @@ async function PageView({ ctx, page, pages }: { ctx: TeamraumContext; page: OrgP
     <article className={`${CARD} min-w-0 p-6 sm:p-9`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
-          {event ? <span className={`${CHIP} bg-amber-100 text-amber-900`}>{t("belongsTo", { title: event.title, date: dayOf(event.startsAt.slice(0, 10)) })}</span> : null}
+          {event ? <span className={`${CHIP} bg-amber-100 text-amber-900`}>{t("belongsTo", { title: event.title, date: dayOf(berlinDayOf(event.startsAt)) })}</span> : null}
           {page.isTemplate ? <span className={`${CHIP} bg-sky-100 text-sky-800`}>{t("template")}</span> : null}
           {page.visibility === "private" ? (
             <span className={`${CHIP} bg-sky-100 text-sky-900`}>{t("onlyYou")}</span>

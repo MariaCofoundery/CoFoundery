@@ -51,7 +51,7 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
 
   // Der angemeldete Zugang, nicht der privilegierte.
   const client = await createClient();
-  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, allOrgs, programFollowUps, allMyTasks] = await Promise.all([
+  const [roleViews, teams, profile, pendingInvites, dueFollowUps, accompanied, personInvites, allOrgs, programFollowUps] = await Promise.all([
     getDashboardRoleViews(user.id),
     getAdvisorDashboardTeams(user.id),
     getAdvisorDashboardProfile(user.id),
@@ -61,15 +61,14 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     client.from("advisor_person_invites").select("id, status").eq("status", "sent"),
     getMyAdvisorOrgs(client),
     listDueProgramFollowUps(client),
-    listMyOpenOrgTasks(client, user.id),
   ]);
   // Wer in mehreren Programmen ist, sieht hier nur das gewaehlte (06.11.2026): die erste Organisation ist die aus der
   // Seitenleiste, Aufgaben und Termine der anderen bleiben ausgeblendet.
   const orgs = allOrgs.slice(0, 1);
-  const myTasks = allMyTasks.filter((task) => orgs.some((org) => org.id === task.orgId));
+  const myTasks = orgs.length > 0 ? await listMyOpenOrgTasks(client, user.id, orgs[0].id) : [];
   // Aufgaben (Teamraum): was im Team ansteht, und die Namen der Mitglieder fuer "wer".
   const [upcomingTasks, memberLists] = await Promise.all([
-    orgs.length > 0 ? listUpcomingOrgTasks(client).then((tasks) => tasks.filter((task) => orgs.some((org) => org.id === task.orgId))) : Promise.resolve([]),
+    orgs.length > 0 ? listUpcomingOrgTasks(client, 7, orgs[0].id) : Promise.resolve([]),
     Promise.all(orgs.slice(0, 5).map((org) => getOrgMembers(client, org.id))),
   ]);
   const memberNames = new Map(memberLists.flat().map((member) => [member.userId, member.displayName ?? t("kinds.unnamed")] as const));
@@ -148,6 +147,8 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
     )
     .sort((a, b) => (a.event.startsAt < b.event.startsAt ? -1 : 1));
   const nextPlan = planSoon[0]?.event ?? null;
+  // Die Zaehler im Wochenband kommen aus der ganzen Liste, nicht aus den vier, die darunter stehen.
+  const needPosts = planSoon.filter(({ org, event, hasPosts }) => !(hasPosts || event.audience === "internal" || org.status !== "active"));
   const dayShort = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "Europe/Berlin" });
   const tStart = await getTranslations("advisor.area.start");
   const startTiles: StartTile[] = [
@@ -282,9 +283,9 @@ export default async function AdvisorStartPage({ searchParams }: { searchParams?
             <StartWeekBand
               nextTitle={startEvents.find((entry) => !entry.ecosystem)?.title ?? null}
               items={[
-                { key: "events", count: startEvents.filter((entry) => !entry.ecosystem && Date.parse(entry.startsAt) <= nowMs + 7 * 86_400_000).length, href: calendarHref(orgs[0].id, { ansicht: "woche" }) },
+                { key: "events", count: planSoon.filter(({ event }) => Date.parse(event.startsAt) <= nowMs + 7 * 86_400_000).length, href: calendarHref(orgs[0].id, { ansicht: "woche" }) },
                 { key: "tasks", count: myTasks.filter((task) => task.status !== "done").length, href: "/advisor/teamraum/aufgaben" },
-                { key: "posts", count: startEvents.filter((entry) => entry.needsPosts).length, href: startEvents.find((entry) => entry.needsPosts)?.needsPosts ?? calendarHref(orgs[0].id) },
+                { key: "posts", count: needPosts.length, href: needPosts[0] ? calendarHref(needPosts[0].org.id, { termin: needPosts[0].event.eventId, reiter: "social" }) : calendarHref(orgs[0].id) },
               ]}
             />
           ) : null}

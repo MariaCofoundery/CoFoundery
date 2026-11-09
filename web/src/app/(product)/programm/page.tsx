@@ -38,7 +38,7 @@ import { UserText } from "@/features/ui/UserText";
  * Programm: in welchen Programmen ist mein Team, und wer liest mit? Die
  * Zustimmung steht hier, damit jede Person im Team sie selbst gibt.
  */
-export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string; taskSaved?: string; taskError?: string; goalSaved?: string; goalError?: string }> }) {
+export default async function TeamProgramPage({ searchParams }: { searchParams?: Promise<{ neu?: string; code?: string; program?: string; taskSaved?: string; taskError?: string; goalSaved?: string; goalError?: string }> }) {
   const t = await getTranslations("advisor.teamProgram");
   const tEvent = await getTranslations("advisor.teamProgram.event");
   const locale = await getLocale();
@@ -209,6 +209,9 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
               <p className="mt-1 text-xs text-slate-500">{t("endHint")}</p>
               {program.isActive ? (
                 <>
+                {/* Aeltere Links (/programm#aufgaben, #ziele - Hinweise, Start) fuehren zum ersten Programm. */}
+                {programs[0]?.programId === program.programId ? <span id="aufgaben" className="scroll-mt-24" /> : null}
+                {programs[0]?.programId === program.programId ? <span id="ziele" className="scroll-mt-24" /> : null}
                 <div className="mt-5 border-t border-slate-100 pt-4">
                   <ProgramGoals
                     programId={program.programId}
@@ -219,8 +222,8 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                     isOrgOwner={false}
                     locale={getPresentationLocale(locale)}
                     today={berlinToday()}
-                    saved={query.goalSaved === "1"}
-                    error={query.goalError === "1"}
+                    saved={query.program === program.programId && query.goalSaved === "1"}
+                    error={query.program === program.programId && query.goalError === "1"}
                   />
                 </div>
                 <div className="mt-5 border-t border-slate-100 pt-4">
@@ -234,8 +237,8 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
                     isOrgOwner={false}
                     locale={getPresentationLocale(locale)}
                     today={berlinToday()}
-                    saved={query.taskSaved === "1"}
-                    error={query.taskError === "1"}
+                    saved={query.program === program.programId && query.taskSaved === "1"}
+                    error={query.program === program.programId && query.taskError === "1"}
                   />
                 </div>
                 <div className="mt-5 border-t border-slate-100 pt-4">

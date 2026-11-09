@@ -1849,7 +1849,8 @@
     },
     "nobodyShort": "nobody assigned",
     "checklistOf": "{done} of {total} done",
-    "privateBadge": "Private"
+    "privateBadge": "Private",
+    "dragFailed": "Moving did not work."
   },
   "funding": {
     "title": "Funding requirements",
@@ -2324,7 +2325,8 @@
       "finish": "Done",
       "end": "End setup"
     },
-    "prevStep": "Back"
+    "prevStep": "Back",
+    "error": "That did not work just now. Please try again."
   },
   "calendar": {
     "title": "Calendar",
@@ -2449,7 +2451,8 @@
       "restore": "Restore",
       "archived": "The event is in the archive. Attendance and RSVPs are kept and the report still counts it.",
       "restored": "The event is back in the plan."
-    }
+    },
+    "dragFailed": "Moving did not work."
   },
   "people": {
     "title": "Who is who",

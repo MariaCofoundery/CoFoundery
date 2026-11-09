@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ACTIVE_ORG_COOKIE, orgColor } from "@/features/advisor/activeOrg";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SetupBar } from "@/features/advisor/setup/SetupSessionClient";
+import { useFocusTrap } from "@/features/ui/useFocusTrap";
 import { WorkspaceIcon } from "@/features/navigation/workspace/WorkspaceIcon";
 import {
   MOBILE_TAB_KEYS,
@@ -61,7 +62,7 @@ export function WorkspaceChrome({
   hasOrg: boolean;
   orgLabel: string;
   /** Alle Programme der Person (nach Namen) und das gewaehlte - der Umschalter oben in der Seitenleiste. */
-  orgs: { id: string; name: string }[];
+  orgs: { id: string; name: string; isOwner?: boolean }[];
   activeOrgId: string | null;
   chatUnread: number;
   messagesCount: number;
@@ -79,6 +80,9 @@ export function WorkspaceChrome({
   const queryOrg = params.get("org");
   const activeIndex = Math.max(0, orgs.findIndex((entry) => entry.id === (orgs.some((o) => o.id === queryOrg) ? queryOrg : activeOrgId)));
   const active = orgs[activeIndex] ?? null;
+  // Termine legt nur die Inhaberin an: Wer nur mitarbeitet, bekommt "Termin" und "Mehrere Termine" gar nicht erst angeboten.
+  const canPlan = active?.isOwner !== false;
+  const creates = QUICK_CREATE.filter((entry) => canPlan || (entry.key !== "event" && entry.key !== "events"));
   const color = orgColor(activeIndex);
   const writeActive = (id: string) => {
     document.cookie = `${ACTIVE_ORG_COOKIE}=${id}; path=/; samesite=lax`;
@@ -99,6 +103,9 @@ export function WorkspaceChrome({
   const [createOpen, setCreateOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const createRef = useRef<HTMLDivElement | null>(null);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+  // Das Blatt "Mehr" ist ein Dialog: Fokus hinein, Tab kreist darin, Fokus kehrt zurueck.
+  useFocusTrap(moreOpen, moreRef);
 
   // Nach jedem Wechsel des Ortes alles zu - sonst verdeckt ein offenes Panel die Seite, auf der man ankam.
   useEffect(() => {
@@ -197,7 +204,7 @@ export function WorkspaceChrome({
 
   const searchEntries = [
     ...allStations.map((item) => ({ key: `s-${item.key}`, group: "stations" as const, label: label(item.key), href: item.href })),
-    ...(hasOrg ? QUICK_CREATE.map((entry) => ({ key: `c-${entry.key}`, group: "actions" as const, label: tw(`create.${entry.key}.label`), href: entry.href, hint: tw(`create.${entry.key}.hint`) })) : []),
+    ...(hasOrg ? creates.map((entry) => ({ key: `c-${entry.key}`, group: "actions" as const, label: tw(`create.${entry.key}.label`), href: entry.href, hint: tw(`create.${entry.key}.hint`) })) : []),
   ];
 
   return (
@@ -283,7 +290,7 @@ export function WorkspaceChrome({
               {createOpen ? (
                 <div role="menu" aria-label={tw("create.menuLabel")} className="absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_40px_rgba(23,23,58,0.16)]">
                   <p className="mx-2.5 mb-1.5 mt-1.5 text-xs font-semibold uppercase tracking-[0.06em] text-slate-600">{tw("create.title")}</p>
-                  {QUICK_CREATE.map((entry) => (
+                  {creates.map((entry) => (
                     <Link key={entry.key} href={entry.href} role="menuitem" className="flex min-h-12 items-center gap-3 rounded-[10px] px-2.5 hover:bg-slate-50">
                       <span aria-hidden="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-violet-100 text-[13px] font-bold text-violet-800">{tw(`create.${entry.key}.label`).slice(0, 1)}</span>
                       <span className="flex min-w-0 flex-col">
@@ -350,7 +357,7 @@ export function WorkspaceChrome({
       {moreOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button type="button" aria-label={tw("moreClose")} onClick={() => setMoreOpen(false)} className="absolute inset-0 bg-[#14152B]/45" />
-          <div role="dialog" aria-modal="true" aria-label={tw("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white">
+          <div ref={moreRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={tw("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white outline-none">
             <div className="flex items-center justify-between px-5 pb-1 pt-3">
               <span aria-hidden="true" className="mx-auto h-1.5 w-10 rounded-full bg-slate-300" />
             </div>
@@ -402,6 +409,28 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
     window.addEventListener("pointerdown", onDown);
     return () => window.removeEventListener("pointerdown", onDown);
   }, [open]);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  // Tastatur im Menue: beim Oeffnen auf das gewaehlte Programm, Pfeile wechseln, Escape schliesst und kehrt zurueck.
+  useEffect(() => {
+    if (!open) return;
+    const items = ref.current?.querySelectorAll<HTMLElement>('[role="menuitemradio"]');
+    (ref.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]') ?? items?.[0])?.focus();
+  }, [open]);
+  const onMenuKey = (event: React.KeyboardEvent) => {
+    if (!open) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      triggerRef.current?.focus();
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      const items = [...(ref.current?.querySelectorAll<HTMLElement>('[role="menuitemradio"]') ?? [])];
+      if (items.length === 0) return;
+      event.preventDefault();
+      const at = items.indexOf(document.activeElement as HTMLElement);
+      items[(at + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus();
+    }
+  };
   const dark = tone === "dark";
   const body = (
     <>
@@ -415,8 +444,8 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
   const frame = `flex min-h-12 w-full items-center gap-2.5 rounded-xl px-3 ${dark ? "bg-white/[0.08] text-white" : "border border-slate-200 bg-white text-slate-950"}`;
   if (orgs.length < 2) return <div className={frame}>{body}</div>;
   return (
-    <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen((current) => !current)} aria-haspopup="menu" aria-expanded={open} className={`${frame} ${dark ? "hover:bg-white/[0.12]" : "hover:bg-slate-50"}`}>
+    <div ref={ref} className="relative" onKeyDown={onMenuKey}>
+      <button ref={triggerRef} type="button" onClick={() => setOpen((current) => !current)} aria-haspopup="menu" aria-expanded={open} className={`${frame} ${dark ? "hover:bg-white/[0.12]" : "hover:bg-slate-50"}`}>
         {body}
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
       </button>
@@ -448,6 +477,8 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
 export function Palette({ entries, onClose, ns = "navigation.workspace" }: { entries: { key: string; group: "stations" | "actions"; label: string; href: string; hint?: string }[]; onClose: () => void; ns?: "navigation.workspace" | "navigation.founder" }) {
   const tw = useTranslations(ns);
   const router = useRouter();
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  useFocusTrap(true, panelRef);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const needle = query.trim().toLowerCase();
@@ -459,7 +490,7 @@ export function Palette({ entries, onClose, ns = "navigation.workspace" }: { ent
   return (
     <div className="fixed inset-0 z-[60] flex items-start justify-center px-3 pt-[12vh] print:hidden">
       <button type="button" aria-label={tw("search.close")} onClick={onClose} className="absolute inset-0 bg-[#14152B]/45" />
-      <div role="dialog" aria-modal="true" aria-label={tw("search.label")} className="relative w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(20,21,43,0.3)]">
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-label={tw("search.label")} className="relative w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(20,21,43,0.3)]">
         <input
           autoFocus
           value={query}

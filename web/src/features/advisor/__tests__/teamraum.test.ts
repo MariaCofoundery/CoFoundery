@@ -155,7 +155,7 @@ test("Teamraum: eigener Bereich im Hauptmenue, auf dem Advisor-Start und im Kont
   assert.match(shell, /\.\.\.\(advisorOrgNames\.length > 0\s*\? \[\s*\{\s*href: TEAMRAUM_BASE,/);
   const start = readFileSync("src/app/(product)/advisor/dashboard/page.tsx", "utf8");
   // Seit 05.11.2026 ein eigener Bereich "Aufgaben" auf dem Start: "Fuer mich" und "Steht an".
-  assert.match(start, /listMyOpenOrgTasks\(client, user\.id\)/);
+  assert.match(start, /listMyOpenOrgTasks\(client, user\.id, orgs\[0\]\.id\)/);
   assert.match(start, /<StartTasks/);
   const exported = readFileSync("src/features/account/accountExport.ts", "utf8");
   for (const table of ["advisor_org_tasks", "advisor_org_task_comments", "advisor_org_member_presence", "advisor_org_task_assignees"]) assert.match(exported, new RegExp(`table: "${table}"`));

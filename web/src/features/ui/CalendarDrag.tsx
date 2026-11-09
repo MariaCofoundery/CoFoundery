@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type ReactNode } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 
 /**
  * Ziehen und Ablegen im Kalender (Aufgaben, Social Media): ein Eintrag wird auf einen anderen Tag gezogen,
@@ -31,6 +31,7 @@ export function DropDay({
   kind,
   move,
   label,
+  failedLabel,
   children,
   className,
 }: {
@@ -39,10 +40,18 @@ export function DropDay({
   /** Server-Aktion: Eintrag `id` auf `day` legen. */
   move: (id: string, day: string) => Promise<{ ok: boolean }>;
   label: string;
+  /** Was steht, wenn das Verschieben nicht geklappt hat - sonst springt der Eintrag wortlos zurueck. */
+  failedLabel?: string;
   children: ReactNode;
   className?: string;
 }) {
   const router = useRouter();
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!failed) return;
+    const timer = window.setTimeout(() => setFailed(false), 5000);
+    return () => window.clearTimeout(timer);
+  }, [failed]);
   const [over, setOver] = useState(false);
   const [pending, startTransition] = useTransition();
   return (
@@ -70,13 +79,15 @@ export function DropDay({
         if (item.kind !== kind || typeof item.id !== "string") return;
         const id = item.id;
         startTransition(async () => {
-          const result = await move(id, day);
+          const result = await move(id, day).catch(() => ({ ok: false }));
           if (result.ok) router.refresh();
+          else setFailed(true);
         });
       }}
       className={`${className ?? ""} ${over ? "bg-violet-50 ring-2 ring-inset ring-violet-400" : ""} ${pending ? "opacity-60" : ""}`}
     >
       {children}
+      {failed && failedLabel ? <p role="alert" className="rounded-md bg-rose-50 px-1.5 py-1 text-[11.5px] font-semibold leading-4 text-rose-800">{failedLabel}</p> : null}
     </div>
   );
 }
