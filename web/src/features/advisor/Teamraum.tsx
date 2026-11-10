@@ -127,11 +127,13 @@ function Hidden({ ctx, tab, filter, taskId }: { ctx: TeamraumContext; tab: "week
   );
 }
 
-async function Feedback({ ctx }: { ctx: TeamraumContext }) {
+/** `savedInPanel`: Ist eine Aufgabe als Panel offen, sagt das Panel selbst "Gespeichert" - der Streifen nur noch bei Fehlern und Loeschen. */
+async function Feedback({ ctx, savedInPanel = false }: { ctx: TeamraumContext; savedInPanel?: boolean }) {
   const t = await getTranslations("advisor.teamraum");
   if (ctx.feedback.error) {
     return <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{t(`errors.${["member", "program", "tooMany"].includes(ctx.feedback.error) ? ctx.feedback.error : "failed"}`)}</p>;
   }
+  if (savedInPanel && ctx.feedback.saved && !ctx.feedback.deleted && ctx.feedback.created === null) return null;
   if (ctx.feedback.saved || ctx.feedback.deleted) {
     return (
       <p role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
@@ -354,14 +356,14 @@ async function TaskPanel({ ctx, task, filter, comments, back = {}, closeHref }: 
   const progress = checklistProgress(task);
   const chip = "inline-flex min-h-10 items-center rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold text-slate-950 disabled:opacity-60";
   const formId = "task-form";
-  const flash = ctx.feedback.saved ? t("panel.saved") : ctx.feedback.error ? t("panel.error") : "";
+  const flash = ctx.feedback.saved && !ctx.feedback.error ? t("panel.saved") : "";
   return (
     <SidePanel
       variant="column"
       closeHref={closeHref}
       closeLabel={t("detail.close")}
       titleId="task-panel-title"
-      eyebrow={<>{t("detail.eyebrow")}{flash ? <span role={ctx.feedback.error ? "alert" : "status"} className={`ml-3 text-[12.5px] normal-case tracking-normal ${ctx.feedback.error ? "text-rose-700" : "text-emerald-800"}`}>{flash}</span> : null}</>}
+      eyebrow={<>{t("detail.eyebrow")}{flash ? <span role="status" className="ml-3 text-[12.5px] normal-case tracking-normal text-emerald-800">{flash}</span> : null}</>}
       footer={
         <div className="flex flex-wrap items-center gap-2.5">
           {canDelete ? (
@@ -791,7 +793,7 @@ export async function TeamraumBoard({
   return (
     <div className={selected ? "lg:flex lg:items-start lg:gap-5" : ""}>
     <div className="min-w-0 flex-1">
-      <Feedback ctx={ctx} />
+      <Feedback ctx={ctx} savedInPanel={Boolean(selected)} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex w-full flex-wrap items-center gap-3 md:w-auto">
