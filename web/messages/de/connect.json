@@ -277,7 +277,9 @@
     "success": {
       "accepted": "Kontakt hergestellt.",
       "declined": "Anfrage wurde nicht angenommen.",
-      "canceled": "Anfrage zurückgezogen."
+      "canceled": "Anfrage zurückgezogen.",
+      "snoozed": "Zurückgestellt. Die Anfrage bleibt offen, steht aber unten.",
+      "outcome": "Danke. Deine Antwort bleibt privat."
     },
     "profileRequiredTitle": "Zuerst dein Connect-Profil",
     "profileRequiredText": "Bevor du jemanden anschreibst, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an und veröffentliche es – danach landest du wieder hier.",
@@ -523,7 +525,9 @@
     "publish_conflict": "Der Beitrag wurde inzwischen geändert. Lade die Seite neu und prüfe den aktuellen Stand.",
     "publish_membership": "Du brauchst eine aktive CONNECT-Mitgliedschaft, um diesen Beitrag zu veröffentlichen.",
     "problem_too_long": "Beschreibung und „Schon versucht\" sind zusammen zu lang. Kürze eines von beiden.",
-    "listing_summary_too_long": "Kontext und Leitfragen sind zusammen zu lang. Kürze eines der Felder."
+    "listing_summary_too_long": "Kontext und Leitfragen sind zusammen zu lang. Kürze eines der Felder.",
+    "intro_limit": "Du hast schon zwei Vorstellungen offen. Warte auf eine Antwort oder ziehe eine zurück.",
+    "intro_paused": "Diese Person nimmt gerade keine Vorstellungen an."
   },
   "problems": {
     "title": "Ungelöstes, das jemand sieht",
@@ -1470,6 +1474,27 @@
     },
     "prefill": "Hallo {name}, ich suche Zugang zu: {type}{sector}{region}. Wofür und warum, in zwei Sätzen: ",
     "ownTitle": "Deine Türen",
-    "previewEmpty": "Noch keine Tür"
+    "previewEmpty": "Noch keine Tür",
+    "introduction": {
+      "context": "Vorstellung zu: {type}",
+      "hint": "Schreib, wofür und warum, in zwei Sätzen. Die Person sieht deinen Namen, dein Profil und diesen Text; die dritte Person erfährt nichts, bis sie Ja sagt. Du kannst zwei Vorstellungen gleichzeitig offen haben."
+    }
+  },
+  "introductions": {
+    "label": "Vorstellung",
+    "forType": "Vorstellung: {type}",
+    "yes": "Ja, ich frage nach",
+    "later": "Später, ich melde mich",
+    "no": "Lieber nicht",
+    "snoozedTag": "Zurückgestellt",
+    "outcomeTitle": "Hat es geklappt?",
+    "outcomeText": "Vorstellung zu „{type}“ mit {name}. Hat sich daraus ein Gespräch ergeben?",
+    "outcome": {
+      "yes": "Ja",
+      "not_yet": "Noch nicht",
+      "no": "Nein"
+    },
+    "outcomeNote": "Deine Antwort bleibt privat und fließt in keine Liste und keinen Wert ein.",
+    "closedHint": "Nach 14 Tagen ohne Antwort schließt sich eine Vorstellung still."
   }
 }

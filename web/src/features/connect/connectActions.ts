@@ -288,6 +288,55 @@ export async function requestConnectPersonContactAction(formData: FormData) {
   redirect(`${back}?contact=sent`);
 }
 
+/**
+ * Eine Vorstellung anfragen (Tueren, Stufe 2): dieselbe Kontaktanfrage an die Inhaberin der Tuer, nur mit der Art von Mensch dabei.
+ * Hoechstens zwei offene; bei pausierten Tueren geht nichts raus. Die dritte Person wird nie angesprochen.
+ */
+export async function requestConnectIntroductionAction(formData: FormData) {
+  const { client, user } = await context();
+  const recipientUserId = String(formData.get("recipient_user_id") ?? "").trim();
+  const doorId = String(formData.get("door_id") ?? "").trim();
+  const message = normalizeConnectContactMessage(formData.get("message"));
+  const back = `/connect/people/${recipientUserId}`;
+  const here = `${back}/contact?tuer=${encodeURIComponent(doorId)}`;
+  if (!recipientUserId || !doorId) redirect("/connect/people?error=contact");
+  if (!message) redirect(`${here}&error=message`);
+  const { data: requestId, error } = await client.rpc("request_network_introduction", { p_door_id: doorId, p_message: message });
+  if (error) {
+    const reason = error.message.includes("introduction_limit") ? "intro_limit"
+      : error.message.includes("introduction_paused") ? "intro_paused"
+      : error.message.includes("sender_profile_required") ? "contact_profile"
+      : error.message.includes("introduction_unavailable") || error.message.includes("interaction_blocked") || error.message.includes("recipient_unavailable") ? "contact_unavailable"
+      : "contact";
+    redirect(`${here}&error=${reason}`);
+  }
+  if (requestId) {
+    const sender = await getOwnConnectProfile(client, user.id);
+    await notifyConnectContactRequest(client, String(requestId), recipientUserId, sender?.display_name ?? null);
+  }
+  refreshContacts();
+  redirect(`${back}?contact=sent`);
+}
+
+/** "Spaeter, ich melde mich": die Anfrage bleibt offen, steht aber unten und zaehlt nicht mehr am Reiter. */
+export async function snoozeConnectIntroductionAction(formData: FormData) {
+  const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
+  if (!id) redirect("/connect/contacts?error=response");
+  const { error } = await client.rpc("snooze_network_introduction", { p_request_id: id });
+  if (error) redirect("/connect/contacts?error=response");
+  refreshContacts(); redirect("/connect/contacts?changed=snoozed");
+}
+
+/** "Hat es geklappt?" - ja, nein oder noch nicht. Die Antwort sieht nur, wer sie gibt. */
+export async function answerConnectIntroductionOutcomeAction(formData: FormData) {
+  const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
+  const outcome = String(formData.get("outcome") ?? "");
+  if (!id || !["yes", "no", "not_yet"].includes(outcome)) redirect("/connect/contacts?error=response");
+  const { error } = await client.rpc("answer_network_introduction_outcome", { p_request_id: id, p_outcome: outcome });
+  if (error) redirect("/connect/contacts?error=response");
+  refreshContacts(); redirect("/connect/contacts?changed=outcome");
+}
+
 export async function respondConnectContactAction(formData: FormData) {
   const { client } = await context(); const id = String(formData.get("id") ?? "").trim();
   const response = String(formData.get("response") ?? "");

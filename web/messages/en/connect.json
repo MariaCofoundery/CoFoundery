@@ -277,7 +277,9 @@
     "success": {
       "accepted": "Contact established.",
       "declined": "Request not accepted.",
-      "canceled": "Request withdrawn."
+      "canceled": "Request withdrawn.",
+      "snoozed": "Postponed. The request stays open but moves to the bottom.",
+      "outcome": "Thanks. Your answer stays private."
     },
     "profileRequiredTitle": "Your Connect profile comes first",
     "profileRequiredText": "Before you message someone, the other side needs something to look at. Create your Connect profile and publish it – you will come back here afterwards.",
@@ -523,7 +525,9 @@
     "publish_conflict": "This contribution has changed. Reload the page and review its current state.",
     "publish_membership": "You need active CONNECT membership to publish this contribution.",
     "problem_too_long": "The description and “Already tried” are too long together. Shorten one of them.",
-    "listing_summary_too_long": "Context and guiding questions are too long together. Shorten one of the fields."
+    "listing_summary_too_long": "Context and guiding questions are too long together. Shorten one of the fields.",
+    "intro_limit": "You already have two introductions open. Wait for an answer or withdraw one.",
+    "intro_paused": "This person is not taking introductions right now."
   },
   "problems": {
     "title": "What people see unsolved",
@@ -1470,6 +1474,27 @@
     },
     "prefill": "Hello {name}, I am looking for access to: {type}{sector}{region}. What for and why, in two sentences: ",
     "ownTitle": "Your doors",
-    "previewEmpty": "No door yet"
+    "previewEmpty": "No door yet",
+    "introduction": {
+      "context": "Introduction to: {type}",
+      "hint": "Write what for and why, in two sentences. The person sees your name, your profile and this text; the third person learns nothing until they say yes. You can have two introductions open at a time."
+    }
+  },
+  "introductions": {
+    "label": "Introduction",
+    "forType": "Introduction: {type}",
+    "yes": "Yes, I will ask",
+    "later": "Later, I will get back",
+    "no": "Rather not",
+    "snoozedTag": "Postponed",
+    "outcomeTitle": "Did it work?",
+    "outcomeText": "Introduction to “{type}” with {name}. Did it lead to a conversation?",
+    "outcome": {
+      "yes": "Yes",
+      "not_yet": "Not yet",
+      "no": "No"
+    },
+    "outcomeNote": "Your answer stays private and goes into no list and no value.",
+    "closedHint": "After 14 days without an answer an introduction closes quietly."
   }
 }

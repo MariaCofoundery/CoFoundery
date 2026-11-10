@@ -93,6 +93,9 @@ export async function getConnectContactRequests(client: Client, userId: string) 
 }
 
 export async function getIncomingPendingConnectContactCount(client: Client, userId: string) {
+  // Ohne die zurueckgestellten Vorstellungen (20270418120000); fehlt die Funktion noch, gilt die alte Zahl.
+  const viaRpc = await client.rpc("count_network_incoming_pending");
+  if (!viaRpc.error && typeof viaRpc.data === "number") return viaRpc.data;
   const { count, error } = await client.from("network_contact_requests").select("id", { count: "exact", head: true }).eq("recipient_user_id", userId).eq("status", "pending");
   if (error) return 0;
   return count ?? 0;

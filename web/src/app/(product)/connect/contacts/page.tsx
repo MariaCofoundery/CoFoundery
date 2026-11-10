@@ -13,6 +13,9 @@ import { LinkedInLink } from "@/features/profile/LinkedInLink";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_CONTACT_KEYS, CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
 import { UserText } from "@/features/ui/UserText";
+import { IntroductionActions, IntroductionOutcomeCard } from "@/features/connect/introductions/IntroductionBits";
+import { listIntroductions, outcomeDue, type Introduction } from "@/features/connect/introductions/introductionsData";
+import { doorTitle } from "@/features/connect/doors/doorLabels";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function safetyCopy(t: T) { return {
@@ -22,7 +25,7 @@ function safetyCopy(t: T) { return {
   spam: t("safety.categories.spam"), harassment: t("safety.categories.harassment"), misleading: t("safety.categories.misleading"), other: t("safety.categories.other"),
 }; }
 
-function ContactCard({ request, direction, t, locale, profile, blockState }: { request: ConnectContactRequest; direction: "incoming" | "outgoing"; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState }) {
+function ContactCard({ request, direction, t, locale, profile, blockState, intro }: { intro?: Introduction; request: ConnectContactRequest; direction: "incoming" | "outgoing"; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState }) {
   const counterpart = direction === "incoming" ? request.sender_display_name_snapshot : request.recipient_display_name_snapshot;
   const counterpartId = direction === "incoming" ? request.sender_user_id : request.recipient_user_id;
   return <article className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -30,11 +33,11 @@ function ContactCard({ request, direction, t, locale, profile, blockState }: { r
       <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t(`contact.status.${request.status}`)}</p>
       <div className="mt-2 flex items-center gap-3"><ConnectAvatar profile={profile} displayName={counterpart} /><h3 className="text-lg font-semibold text-slate-950">{counterpart}</h3></div>
       {direction === "incoming" && request.sender_headline_snapshot ? <p className="mt-1 text-sm text-slate-500">{request.sender_headline_snapshot}</p> : null}
-      <p className="mt-3 text-sm font-semibold text-violet-800">{request.listing_title_snapshot}</p>
+      <p className="mt-3 text-sm font-semibold text-violet-800">{intro ? t("introductions.forType", { type: doorTitle((key, values) => t(`doors.${key}`, values), { typeKey: intro.typeKey, otherLabel: intro.otherLabel }) }) : request.listing_title_snapshot}{intro?.snoozedAt && direction === "incoming" ? <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-700">{t("introductions.snoozedTag")}</span> : null}</p>
       <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={request.message} /></p>
       <p className="mt-3 text-xs text-slate-500">{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(request.created_at))}</p>
       <ConnectSafetyActions otherUserId={counterpartId} contactRequestId={request.id} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} />
-    </div>{request.status === "pending" && !blockState.interaction_blocked ? <ConnectContactActions id={request.id} direction={direction} t={t} /> : null}</div>
+    </div>{request.status === "pending" && !blockState.interaction_blocked ? (intro && direction === "incoming" ? <IntroductionActions id={request.id} snoozed={Boolean(intro.snoozedAt)} t={t} /> : <ConnectContactActions id={request.id} direction={direction} t={t} />) : null}</div>
   </article>;
 }
 
@@ -69,11 +72,15 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState, lin
 export default async function ConnectContactsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const [t, locale, query] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]);
   const { client, user } = await requireConnectMember("/connect/contacts");
-  const [requests, conversations, blocks] = await Promise.all([
+  const [requests, conversations, blocks, introductions] = await Promise.all([
     getConnectContactRequests(client, user.id),
     getConnectConversations(client),
     getOwnConnectBlocks(client),
+    listIntroductions(client),
   ]);
+  const introOf = new Map(introductions.map((entry) => [entry.requestId, entry]));
+  const doorLabel = (intro: Introduction) => doorTitle((key, values) => t(`doors.${key}`, values), { typeKey: intro.typeKey, otherLabel: intro.otherLabel });
+  const outcomesDue = introductions.filter((entry) => outcomeDue(entry));
   const counterpartIds = [...new Set([
     ...requests.map((request) => request.sender_user_id === user.id ? request.recipient_user_id : request.sender_user_id),
     ...conversations.map((conversation) => conversation.counterpart_user_id),
@@ -86,7 +93,8 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
   ]);
   const states = new Map(stateRows);
   const stateFor = (id: string) => states.get(id) ?? { interaction_blocked: true, blocked_by_current_user: false };
-  const incoming = requests.filter((request) => request.recipient_user_id === user.id && request.status !== "accepted");
+  // Zurueckgestellte Vorstellungen stehen unten.
+  const incoming = requests.filter((request) => request.recipient_user_id === user.id && request.status !== "accepted").sort((a, b) => Number(Boolean(introOf.get(a.id)?.snoozedAt)) - Number(Boolean(introOf.get(b.id)?.snoozedAt)));
   const outgoing = requests.filter((request) => request.sender_user_id === user.id && request.status !== "accepted");
 
   return <main className="mx-auto max-w-5xl px-5 py-10">
@@ -95,8 +103,9 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     {knownKey(query.changed, CONNECT_CONTACT_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`contact.success.${knownKey(query.changed, CONNECT_CONTACT_KEYS)}`)}</p> : null}
     {query.error ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(query.error === "report" ? "safety.reportError" : "contact.error")}</p> : null}
     {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
-    <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
-    <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
+    {outcomesDue.length > 0 ? <section className="mt-8 space-y-3" aria-label={t("introductions.outcomeTitle")}>{outcomesDue.map((entry) => { const request = requests.find((row) => row.id === entry.requestId); const name = request ? (request.sender_user_id === user.id ? request.recipient_display_name_snapshot : request.sender_display_name_snapshot) : ""; return <IntroductionOutcomeCard key={entry.requestId} id={entry.requestId} title={doorLabel(entry)} name={name} t={t} />; })}</section> : null}
+    <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} intro={introOf.get(request.id)} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
+    <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} intro={introOf.get(request.id)} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} linkedInUrl={conversation.counterpart_user_id ? linkedInUrls.get(conversation.counterpart_user_id) : undefined} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
     {blocks.length ? <section className="mt-10"><h2 className="text-xl font-semibold">{t("safety.blockedPeople")}</h2><div className="mt-3 space-y-2">{blocks.map((block) => <div key={block.blocked_user_id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-medium">{block.display_name}</p><form action={unblockConnectUserAction}><input type="hidden" name="other_user_id" value={block.blocked_user_id} /><input type="hidden" name="return_to" value="/connect/contacts" /><ConnectSubmitButton label={t("safety.unblock")} pendingLabel={t("safety.unblocking")} className="min-h-11 text-sm font-semibold underline" /></form></div>)}</div></section> : null}
   </main>;

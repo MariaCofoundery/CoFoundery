@@ -56,3 +56,38 @@ test("Schaltflaeche mit Serverfunktion trägt keinen eigenen name/value (React u
     for (const line of read(file).split("\n")) if (/<button[^>]*formAction=\{/.test(line)) assert.doesNotMatch(line, /\bname="/, file);
   }
 });
+
+test("Vorstellungen (Stufe 2): Kontaktanfrage mit Seitentabelle, Limit zwei, Spaeter, Rueckfrage nach 14 Tagen, stilles Schliessen im Tageslauf", () => {
+  const sql = read("../supabase/migrations/20270418120000_connect_introductions.sql");
+  assert.match(sql, /request_network_person_contact\(v_door\.user_id, p_message\)/);
+  assert.match(sql, /if v_count >= 2 then/);
+  assert.match(sql, /interval '14 days'/);
+  assert.match(sql, /grant execute on function public\.close_stale_introductions\(\) to service_role;/);
+  assert.match(sql, /create policy network_introduction_outcomes_own_read[\s\S]*user_id = auth\.uid\(\)/);
+  const actions = read("src/features/connect/connectActions.ts");
+  assert.match(actions, /rpc\("request_network_introduction"/);
+  assert.match(actions, /rpc\("snooze_network_introduction"/);
+  assert.match(actions, /rpc\("answer_network_introduction_outcome"/);
+  assert.match(read("src/app/api/cron/connect-suggestions/route.ts"), /closeStaleIntroductions\(\)/);
+  const page = read("src/app/(product)/connect/contacts/page.tsx");
+  assert.match(page, /<IntroductionActions/);
+  assert.match(page, /<IntroductionOutcomeCard/);
+  // Die Antwort auf "Hat es geklappt?" geht in keine Liste und keinen Wert.
+  const bits = read("src/features/connect/introductions/IntroductionBits.tsx");
+  assert.doesNotMatch(bits.replace(/\/\*\*[\s\S]*?\*\//g, ""), /score|ranking|percent/i);
+  for (const locale of ["de", "en"]) {
+    const m = JSON.parse(read(`messages/${locale}/connect.json`));
+    for (const key of ["yes", "later", "no", "outcomeTitle", "outcomeNote"]) assert.ok(m.introductions[key], `${locale} ${key}`);
+    assert.ok(m.errors.intro_limit && m.errors.intro_paused, locale);
+  }
+});
+
+test("Hat es geklappt: erst 14 Tage nach der Annahme, nur einmal je Person", async () => {
+  const { outcomeDue } = await import("@/features/connect/introductions/introductionsData");
+  const base = { requestId: "r", role: "sender" as const, typeKey: "angel", otherLabel: null, sectorKey: null, region: null, snoozedAt: null, status: "accepted", createdAt: "2026-11-01T00:00:00Z", respondedAt: "2026-11-02T00:00:00Z", answered: false };
+  const now = Date.parse("2026-11-20T00:00:00Z");
+  assert.equal(outcomeDue(base, now), true);
+  assert.equal(outcomeDue({ ...base, respondedAt: "2026-11-10T00:00:00Z" }, now), false);
+  assert.equal(outcomeDue({ ...base, answered: true }, now), false);
+  assert.equal(outcomeDue({ ...base, status: "pending", respondedAt: null }, now), false);
+});

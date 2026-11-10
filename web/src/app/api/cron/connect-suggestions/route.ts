@@ -5,6 +5,7 @@ import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
 import { runEcosystemEventImport } from "@/features/events/eventsImport";
+import { closeStaleIntroductions } from "@/features/connect/introductions/closeStaleIntroductions";
 import { recordCronHeartbeat } from "@/features/admin/cronHeartbeat";
 import { sendCronFailureAlert } from "@/features/privacy/sendCronFailureAlert";
 
@@ -69,6 +70,8 @@ export async function GET(request: NextRequest) {
   // Event-Kalender (20270323120000): eingeschaltete Quellen abrufen. Ein Fehler bei einer Quelle steht an der
   // Quelle (Admin), nicht hier - nur wenn der Lauf gar nicht starten kann, gilt er als fehlgeschlagen.
   const events = await runEcosystemEventImport().catch(() => ({ ok: false as const, reason: "list_failed" as const }));
+  // Vorstellungen (20270418120000): was seit 14 Tagen unbeantwortet ist, schliesst sich still. Ein Fehler hier haelt den Lauf nicht auf.
+  const introductions = await closeStaleIntroductions().catch(() => ({ ok: false as const }));
   const result = await runSuggestionNotifications(BATCH);
   await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok);
   if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok) {
@@ -78,5 +81,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events, introductions }, { status: 200 });
 }

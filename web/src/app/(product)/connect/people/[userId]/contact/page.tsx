@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { requireConnectMember } from "@/features/connect/connectAccess";
-import { requestConnectPersonContactAction } from "@/features/connect/connectActions";
+import { requestConnectIntroductionAction, requestConnectPersonContactAction } from "@/features/connect/connectActions";
 import { hasActiveConnectProfile } from "@/features/connect/connectData";
 import { getConnectPerson } from "@/features/connect/connectPeopleData";
 import { ConnectProfileRequired } from "@/features/connect/ConnectProfileRequired";
@@ -102,8 +102,10 @@ export default async function ConnectPersonContactPage({
               }}
             />
           ) : (
-            <form action={requestConnectPersonContactAction} className="mt-6">
+            <form action={door ? requestConnectIntroductionAction : requestConnectPersonContactAction} className="mt-6">
               <input type="hidden" name="recipient_user_id" value={person.user_id} />
+              {door ? <input type="hidden" name="door_id" value={door.id} /> : null}
+              {door ? <p className="mb-4 rounded-2xl bg-violet-50 px-4 py-3 text-sm leading-6 text-violet-950"><b>{tDoors("introduction.context", { type: doorTitle((key, values) => tDoors(key, values), door) })}</b> {tDoors("introduction.hint")}</p> : null}
               <label className="block text-sm font-medium text-slate-900">
                 {t("contact.messageLabel")}
                 <textarea
