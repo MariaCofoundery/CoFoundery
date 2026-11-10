@@ -1638,6 +1638,19 @@
     "questionGeneral": "How do we notice when one of our values gets neglected in daily work?",
     "toSetup": "To the Founder Setup as a topic →",
     "privacy": "The questions arise from the named values by fixed rules. There is no score, no fit and no ranking. An agreement in the Founder Setup only exists once everyone on the team confirms it.",
-    "onlyOne": "So far one person has shared. As soon as a second person shares their values, you will see similarities and differences here."
+    "onlyOne": "So far one person has shared. As soon as a second person shares their values, you will see similarities and differences here.",
+    "setupCard": {
+      "title": "Your shared values",
+      "shared": "Several of you name: {names}. Do you want to turn that into a guideline? You decide that here in conversation.",
+      "noneShared": "So far you name different terms. That is not a contradiction – look at what is behind them.",
+      "onlyOne": "So far one person has shared their values with the team.",
+      "note": "This is only a hint. An agreement only exists through a revision and everyone on the team confirming it.",
+      "peek": "Quick look at the values",
+      "peekTitle": "What you shared",
+      "close": "Close",
+      "all": "All values side by side →",
+      "someone": "Someone",
+      "place": "Place {place}"
+    }
   }
 }

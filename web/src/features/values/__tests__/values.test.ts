@@ -63,6 +63,15 @@ test("Oberflaeche: sortieren per Maus und Tastatur, Verlinkung im Profil, im Tea
   assert.match(read("src/app/(product)/connect/people/[userId]/page.tsx"), /getConnectValues\(client, userId\)/);
 });
 
+test("Founder Setup: beim Thema Vision und Ziele ein Hinweis und ein schneller Blick - nichts wird uebernommen", () => {
+  const page = read("src/app/(product)/teams/[teamId]/setup/[itemKey]/page.tsx");
+  assert.match(page, /itemKey === "vision_goals" \? <SetupValuesCard client=\{supabase\} teamId=\{teamId\} \/>/);
+  const card = read("src/features/values/SetupValuesCard.tsx");
+  assert.match(card, /if \(rows\.length === 0\) return null/);
+  assert.doesNotMatch(card, /\.rpc\(|insert|propose|confirm/);
+  assert.match(read("src/features/values/ValuesPeek.tsx"), /showModal\(\)/);
+});
+
 test("Texte in beiden Sprachen", () => {
   const keys = (value: unknown, prefix = ""): string[] =>
     typeof value === "object" && value !== null ? Object.entries(value).flatMap(([key, inner]) => keys(inner, `${prefix}${key}.`)) : [prefix.slice(0, -1)];

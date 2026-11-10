@@ -1638,6 +1638,19 @@
     "questionGeneral": "Woran merken wir, wenn einer unserer Werte im Alltag zu kurz kommt?",
     "toSetup": "Als Gesprächsthema ins Founder Setup →",
     "privacy": "Die Fragen entstehen aus den genannten Werten nach festen Regeln. Es gibt keine Punktzahl, keine Passung und keine Rangfolge. Eine Vereinbarung im Founder Setup entsteht erst, wenn alle im Team sie bestätigen.",
-    "onlyOne": "Bisher hat eine Person geteilt. Sobald eine zweite Person ihre Werte teilt, seht ihr hier Gemeinsamkeiten und Unterschiede."
+    "onlyOne": "Bisher hat eine Person geteilt. Sobald eine zweite Person ihre Werte teilt, seht ihr hier Gemeinsamkeiten und Unterschiede.",
+    "setupCard": {
+      "title": "Eure geteilten Werte",
+      "shared": "Das nennen mehrere von euch: {names}. Wollt ihr daraus eine Leitplanke machen? Das entscheidet ihr hier im Gespräch.",
+      "noneShared": "Bisher nennt ihr verschiedene Begriffe. Das ist kein Gegensatz – schaut, was dahinter steckt.",
+      "onlyOne": "Bisher hat eine Person ihre Werte mit dem Team geteilt.",
+      "note": "Das ist nur ein Hinweis. Eine Vereinbarung entsteht erst durch eine Revision und die Bestätigung aller im Team.",
+      "peek": "Schneller Blick auf die Werte",
+      "peekTitle": "Was ihr geteilt habt",
+      "close": "Schließen",
+      "all": "Alle Werte nebeneinander →",
+      "someone": "Jemand",
+      "place": "Platz {place}"
+    }
   }
 }

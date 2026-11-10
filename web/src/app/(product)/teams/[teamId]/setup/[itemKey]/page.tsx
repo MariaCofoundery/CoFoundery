@@ -1,3 +1,4 @@
+import { SetupValuesCard } from "@/features/values/SetupValuesCard";
 import { workstyleSetupHandoff } from "@/features/reporting/workstyle/setupHandoff";
 import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { notFound, redirect } from "next/navigation";
@@ -282,6 +283,8 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
               {/* VOR DER BESPRECHUNG, NICHT DANACH: Was im Lab markiert wurde, ist
                   der Anlass fuer das, was hier gleich getippt wird. */}
               <ConversationPointsCard points={conversationPoints} />
+              {/* Werte (10.11.2026): nur beim Thema "Vision und Ziele", nur ein Hinweis und ein schneller Blick. */}
+              {itemKey === "vision_goals" ? <SetupValuesCard client={supabase} teamId={teamId} /> : null}
               <section className={CARD} aria-labelledby="discussion-title">
                 <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{t("discussion.visibility")}</p>
