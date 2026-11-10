@@ -653,6 +653,7 @@ export function ProductShell({
       // Die Arbeitsraeume gehoeren seit 05.11.2026 zum Bereich "Probleme".
       { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/(problems|workspaces)(?:\/|$)/.test(path) },
       { href: "/connect/ventures", label: tConnect("tabs.ventures"), isActive: (path: string) => path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine") },
+      { href: "/connect/empfehlungen", label: tConnect("tabs.recommendations"), isActive: (path: string) => path.startsWith("/connect/empfehlungen") },
       {
         href: "/connect/contacts",
         label: t("connectContacts"),

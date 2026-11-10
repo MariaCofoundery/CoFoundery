@@ -13,6 +13,7 @@ export function isProductChromePath(pathname: string) {
     pathname === "/admin/moderation" ||
     pathname === "/admin/highlights" ||
     pathname === "/admin/events" ||
+    pathname === "/admin/empfehlungen" ||
     // Event-Kalender (20270323120000): Liste und "Event vorschlagen".
     pathname === "/einladungen" ||
     pathname === "/events" ||

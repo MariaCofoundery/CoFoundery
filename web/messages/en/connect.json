@@ -819,7 +819,8 @@
     "people": "People",
     "listings": "Discover",
     "problems": "Problems",
-    "ventures": "Companies & projects"
+    "ventures": "Companies & projects",
+    "recommendations": "Recommendations"
   },
   "people": {
     "title": "People in the network",
@@ -1168,5 +1169,169 @@
     "mineText": "What you described on the problem board – drafts included. From a published problem you can start a private workspace.",
     "mineCount": "{count, plural, one {# problem described} other {# problems described}}",
     "mineLink": "View"
+  },
+  "recommendations": {
+    "title": "Recommendations",
+    "intro": "What and whom the network recommends: tools, people, organizations and projects. A person on the team reviews every entry before it appears. There are no stars and no ranking.",
+    "back": "Back to recommendations",
+    "mineLink": "My recommendations",
+    "giveLink": "Recommend something",
+    "reported": "Thanks for the heads-up. The team will take a look. From the second report on, the entry is hidden until then.",
+    "kinds": {
+      "software": "Software",
+      "person": "Person",
+      "org": "Organization",
+      "project": "Project"
+    },
+    "topics": {
+      "ki": "AI & automation",
+      "recht": "Legal & privacy",
+      "finanzen": "Finance & funding",
+      "marketing": "Marketing & brand",
+      "vertrieb": "Sales",
+      "produkt": "Product & tech",
+      "team": "Team & collaboration",
+      "gesundheit": "Health",
+      "nachhaltigkeit": "Sustainability",
+      "design": "Design"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Name, keyword or a word from the comment",
+      "kind": "What",
+      "topic": "Topic",
+      "region": "Region",
+      "all": "All regions",
+      "when": "Recommended",
+      "anytime": "Any time",
+      "since": {
+        "30": "Last 30 days",
+        "90": "Last 3 months",
+        "365": "Last year"
+      },
+      "sort": "Sort",
+      "sortNew": "Newest first",
+      "sortAlpha": "By name",
+      "apply": "Show",
+      "applying": "Loading …",
+      "reset": "Reset filters"
+    },
+    "count": "{count, plural, =0 {No recommendations} one {One recommendation} other {# recommendations}} on this page",
+    "empty": "No recommendations yet. Be the first and recommend something that helped you.",
+    "emptyFiltered": "Nothing matches. Remove a filter or search differently.",
+    "opensNew": "(opens in a new tab)",
+    "by": "Recommended by",
+    "you": "you",
+    "pages": "Pages",
+    "prev": "Back",
+    "next": "Next",
+    "report": {
+      "open": "Something wrong? Report it",
+      "category": "What is it about?",
+      "categories": {
+        "discrimination": "Discriminatory or demeaning",
+        "misleading": "Misleading or false",
+        "harmful": "Harmful or unethical",
+        "spam": "Advertising or spam",
+        "other": "Something else"
+      },
+      "note": "Short explanation (optional)",
+      "hint": "Your name is shown to the team, not to the person who recommended it. After two reports the entry is hidden until it has been reviewed.",
+      "send": "Report",
+      "sending": "Sending …"
+    },
+    "footnote": "Recommendations are personal experiences of individual members, not an assessment by MADE2FOUND. There is no quality seal. The team checks entries for discrimination, misleading claims and harm, and removes them if they apply. Each recommendation expires after a year unless it is renewed.",
+    "mine": {
+      "title": "My recommendations",
+      "given": "Given by me",
+      "givenNone": "You haven't recommended anything yet.",
+      "declinedNote": "“Not published” only means it does not appear. For people, you do not see a reason.",
+      "about": "Recommending me or my projects",
+      "aboutHint": "Here you see who wants to recommend you or one of your projects. When it is you as a person, you decide whether it appears.",
+      "aboutNone": "Nobody wants to recommend you right now.",
+      "wants": "{name} wants to recommend you",
+      "someone": "Someone",
+      "preview": "How it would appear",
+      "previewNote": "Only your name, your short line from Connect and the comment are shown. It is visible only after you agree and the team has reviewed it.",
+      "accept": "Agree",
+      "decline": "Decline",
+      "declineNote": "Declining only tells the person “not published”, with no reason. You can remove a published recommendation at any time later.",
+      "removeMine": "Have it removed",
+      "withdraw": "Withdraw",
+      "renew": "Extend by a year",
+      "saving": "Saving …",
+      "saved": "Saved.",
+      "createdConsent": "Sent. The person will be asked. Until they agree, the recommendation is not visible anywhere.",
+      "createdReview": "Sent. The team will take a quick look, then it appears."
+    },
+    "status": {
+      "pending_consent": "Waiting for consent",
+      "review": "Under review",
+      "published": "Visible",
+      "declined": "Not published",
+      "withdrawn": "Withdrawn",
+      "removed": "Removed by the team"
+    },
+    "give": {
+      "title": "Recommend something",
+      "kind": "What do you want to recommend?",
+      "pick": {
+        "person": "Whom do you recommend? Search in Connect",
+        "project": "Which project? Search in Connect"
+      },
+      "search": "Name",
+      "searchBtn": "Search",
+      "searching": "Searching …",
+      "noMatch": "Nobody with a visible profile matches in Connect.",
+      "searchFirst": "Search for a name first.",
+      "who": "Person",
+      "which": "Project",
+      "personNote": "The person is asked before the recommendation appears. Name and short line come from their Connect profile.",
+      "projectNote": "The project's team will see the recommendation. The text comes from the project profile.",
+      "orgNote": "The organization is not asked; its program page stays as it is. The team reviews the recommendation.",
+      "name": "Name",
+      "url": "Website (https)",
+      "sub": "What is it? (optional, one line)",
+      "topics": "Topic (up to three, so others can find it)",
+      "topicsHint": "More than three are not kept.",
+      "region": "Region (optional)",
+      "regionPlaceholder": "For example: Leipzig, Berlin, Remote",
+      "comment": "Your words (at most {max} characters)",
+      "commentHint": "Write from your own experience what was good. Nothing demeaning about others.",
+      "rulesTitle": "Our rules for recommendations",
+      "rules": {
+        "a": "I recommend from my own experience and tell the truth.",
+        "b": "Nothing discriminatory, demeaning or inciting, not even about others.",
+        "c": "I only recommend what I can stand behind ethically, and I disclose any personal interest.",
+        "d": "I know the team reviews entries and can remove them."
+      },
+      "rulesAccept": "I have read the rules and will follow them.",
+      "submit": "Send recommendation",
+      "submitPerson": "Send for consent",
+      "submitting": "Sending …",
+      "afterPerson": "Until they agree, the recommendation is not visible anywhere.",
+      "afterOther": "The team takes a quick look, then it appears.",
+      "footnote": "Your name appears with the recommendation. You can withdraw it at any time. There are no stars and no ratings.",
+      "errors": {
+        "guidelines": "Please confirm the rules first.",
+        "profile": "You need a visible Connect profile to recommend.",
+        "url": "The address must start with https://.",
+        "invalid": "That didn't work. Check name, comment and selection."
+      }
+    },
+    "admin": {
+      "back": "Back to overview",
+      "title": "Review recommendations",
+      "intro": "New and reported entries. Nothing appears unless a person approves it. Reported entries stay hidden until you decide.",
+      "count": "{count, plural, =0 {Nothing to review.} one {One entry is waiting.} other {# entries are waiting.}}",
+      "reports": "{count, plural, one {1 report} other {# reports}}",
+      "new": "New",
+      "checkHint": "Check for: discriminatory or demeaning content, misleading claims, harm, spam. Take a quick look at the address before approving.",
+      "note": "Note for the record (optional)",
+      "approve": "Approve",
+      "remove": "Remove",
+      "saving": "Saving …",
+      "done": "Decision saved."
+    }
   }
 }

@@ -819,7 +819,8 @@
     "people": "Menschen",
     "listings": "Entdecken",
     "problems": "Probleme",
-    "ventures": "Unternehmen & Projekte"
+    "ventures": "Unternehmen & Projekte",
+    "recommendations": "Empfehlungen"
   },
   "people": {
     "title": "Menschen im Netzwerk",
@@ -1168,5 +1169,169 @@
     "mineText": "Was du auf dem Problembrett geschildert hast – auch Entwürfe. Aus einem veröffentlichten Problem kannst du einen privaten Arbeitsraum starten.",
     "mineCount": "{count, plural, one {# Problem geschildert} other {# Probleme geschildert}}",
     "mineLink": "Ansehen"
+  },
+  "recommendations": {
+    "title": "Empfehlungen",
+    "intro": "Was und wen das Netzwerk empfiehlt: Werkzeuge, Menschen, Organisationen und Projekte. Jeder Eintrag wird von einem Menschen im Team geprüft, bevor er erscheint. Es gibt keine Sterne und keine Rangfolge.",
+    "back": "Zur Empfehlungsseite",
+    "mineLink": "Meine Empfehlungen",
+    "giveLink": "Etwas empfehlen",
+    "reported": "Danke für den Hinweis. Das Team schaut es sich an. Ab der zweiten Meldung ist der Eintrag bis dahin nicht mehr zu sehen.",
+    "kinds": {
+      "software": "Software",
+      "person": "Person",
+      "org": "Organisation",
+      "project": "Projekt"
+    },
+    "topics": {
+      "ki": "KI & Automatisierung",
+      "recht": "Recht & Datenschutz",
+      "finanzen": "Finanzen & Förderung",
+      "marketing": "Marketing & Marke",
+      "vertrieb": "Vertrieb",
+      "produkt": "Produkt & Technik",
+      "team": "Team & Zusammenarbeit",
+      "gesundheit": "Gesundheit",
+      "nachhaltigkeit": "Nachhaltigkeit",
+      "design": "Design"
+    },
+    "filters": {
+      "search": "Suche",
+      "searchPlaceholder": "Name, Stichwort oder Wort aus dem Kommentar",
+      "kind": "Was",
+      "topic": "Thema",
+      "region": "Region",
+      "all": "Alle Regionen",
+      "when": "Wann empfohlen",
+      "anytime": "Egal",
+      "since": {
+        "30": "Letzte 30 Tage",
+        "90": "Letzte 3 Monate",
+        "365": "Letztes Jahr"
+      },
+      "sort": "Sortieren",
+      "sortNew": "Neueste zuerst",
+      "sortAlpha": "Nach Name",
+      "apply": "Anzeigen",
+      "applying": "Lädt …",
+      "reset": "Filter zurücksetzen"
+    },
+    "count": "{count, plural, =0 {Keine Empfehlungen} one {Eine Empfehlung} other {# Empfehlungen}} auf dieser Seite",
+    "empty": "Noch keine Empfehlungen. Sei die erste Person und empfiehl etwas, das dir geholfen hat.",
+    "emptyFiltered": "Dazu gibt es nichts. Nimm einen Filter heraus oder suche anders.",
+    "opensNew": "(öffnet in neuem Tab)",
+    "by": "Empfohlen von",
+    "you": "dir",
+    "pages": "Seiten",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "report": {
+      "open": "Etwas stimmt nicht? Melden",
+      "category": "Worum geht es?",
+      "categories": {
+        "discrimination": "Diskriminierend oder herabwürdigend",
+        "misleading": "Irreführend oder falsch",
+        "harmful": "Schädlich oder unethisch",
+        "spam": "Werbung oder Spam",
+        "other": "Etwas anderes"
+      },
+      "note": "Kurze Erklärung (optional)",
+      "hint": "Dein Name wird dem Team gezeigt, nicht der empfehlenden Person. Nach zwei Meldungen ist der Eintrag bis zur Prüfung nicht mehr sichtbar.",
+      "send": "Melden",
+      "sending": "Sendet …"
+    },
+    "footnote": "Empfehlungen sind persönliche Erfahrungen einzelner Mitglieder, keine Bewertung durch MADE2FOUND. Es gibt kein Gütesiegel. Das Team prüft Einträge auf Diskriminierung, Irreführung und Schädliches und nimmt sie heraus, wenn das zutrifft. Jede Empfehlung läuft nach einem Jahr aus, wenn sie nicht erneuert wird.",
+    "mine": {
+      "title": "Meine Empfehlungen",
+      "given": "Von mir abgegeben",
+      "givenNone": "Du hast noch nichts empfohlen.",
+      "declinedNote": "„Nicht erschienen“ heißt nur, dass sie nicht erscheint. Bei Personen siehst du keinen Grund.",
+      "about": "Mich oder meine Projekte empfohlen",
+      "aboutHint": "Hier siehst du, wer dich oder ein Projekt von dir empfehlen möchte. Bei dir als Person entscheidest du, ob es erscheint.",
+      "aboutNone": "Niemand möchte dich gerade empfehlen.",
+      "wants": "{name} möchte dich empfehlen",
+      "someone": "Jemand",
+      "preview": "So würde es erscheinen",
+      "previewNote": "Angezeigt werden nur dein Name, deine Kurzzeile aus Connect und der Kommentar. Erst nach deiner Zustimmung und der Prüfung durch das Team ist es zu sehen.",
+      "accept": "Zustimmen",
+      "decline": "Ablehnen",
+      "declineNote": "Ablehnen sagt der Person nur „nicht erschienen“, ohne Grund. Eine erschienene Empfehlung kannst du später jederzeit entfernen.",
+      "removeMine": "Entfernen lassen",
+      "withdraw": "Zurückziehen",
+      "renew": "Um ein Jahr verlängern",
+      "saving": "Speichert …",
+      "saved": "Gespeichert.",
+      "createdConsent": "Abgeschickt. Die Person wird gefragt. Bis zur Zustimmung ist die Empfehlung nirgends sichtbar.",
+      "createdReview": "Abgeschickt. Das Team prüft sie kurz, danach erscheint sie."
+    },
+    "status": {
+      "pending_consent": "Wartet auf Zustimmung",
+      "review": "In Prüfung",
+      "published": "Sichtbar",
+      "declined": "Nicht erschienen",
+      "withdrawn": "Zurückgezogen",
+      "removed": "Vom Team entfernt"
+    },
+    "give": {
+      "title": "Etwas empfehlen",
+      "kind": "Was möchtest du empfehlen?",
+      "pick": {
+        "person": "Wen empfiehlst du? Suche in Connect",
+        "project": "Welches Projekt? Suche in Connect"
+      },
+      "search": "Name",
+      "searchBtn": "Suchen",
+      "searching": "Sucht …",
+      "noMatch": "Dazu gibt es in Connect niemanden mit sichtbarem Profil.",
+      "searchFirst": "Such zuerst nach einem Namen.",
+      "who": "Person",
+      "which": "Projekt",
+      "personNote": "Die Person wird gefragt, bevor die Empfehlung erscheint. Name und Kurzzeile kommen aus ihrem Connect-Profil.",
+      "projectNote": "Das Team des Projekts sieht die Empfehlung. Der Text kommt aus dem Projektprofil.",
+      "orgNote": "Die Organisation wird nicht gefragt; ihre Programmseite bleibt, wie sie ist. Das Team prüft die Empfehlung.",
+      "name": "Name",
+      "url": "Webseite (https)",
+      "sub": "Worum geht es? (optional, eine Zeile)",
+      "topics": "Thema (bis zu drei, damit andere es finden)",
+      "topicsHint": "Mehr als drei werden nicht übernommen.",
+      "region": "Region (optional)",
+      "regionPlaceholder": "Zum Beispiel: Leipzig, Berlin, Remote",
+      "comment": "Dein Wort dazu (höchstens {max} Zeichen)",
+      "commentHint": "Schreib aus eigener Erfahrung, was gut war. Nichts Abwertendes über andere.",
+      "rulesTitle": "Unsere Regeln für Empfehlungen",
+      "rules": {
+        "a": "Ich empfehle aus eigener Erfahrung und sage die Wahrheit.",
+        "b": "Nichts Diskriminierendes, Herabwürdigendes oder Hetzerisches, auch nicht gegen andere.",
+        "c": "Ich empfehle nur, was ich auch ethisch vertreten kann, und lege Eigeninteresse offen, wenn es eins gibt.",
+        "d": "Ich weiß, dass das Team prüft und Einträge herausnehmen kann."
+      },
+      "rulesAccept": "Ich habe die Regeln gelesen und halte sie ein.",
+      "submit": "Empfehlung abschicken",
+      "submitPerson": "Zur Zustimmung abschicken",
+      "submitting": "Schickt ab …",
+      "afterPerson": "Bis zur Zustimmung ist die Empfehlung nirgends sichtbar.",
+      "afterOther": "Das Team prüft sie kurz, danach erscheint sie.",
+      "footnote": "Dein Name steht bei der Empfehlung. Du kannst sie jederzeit zurückziehen. Es gibt keine Sterne und keine Bewertung.",
+      "errors": {
+        "guidelines": "Bitte bestätige zuerst die Regeln.",
+        "profile": "Für Empfehlungen brauchst du ein sichtbares Connect-Profil.",
+        "url": "Die Adresse muss mit https:// beginnen.",
+        "invalid": "Das hat nicht geklappt. Prüf Name, Kommentar und Auswahl."
+      }
+    },
+    "admin": {
+      "back": "Zur Übersicht",
+      "title": "Empfehlungen prüfen",
+      "intro": "Neue Einträge und gemeldete Einträge. Nichts erscheint, ohne dass ein Mensch es freigibt. Gemeldete Einträge sind bis zu deiner Entscheidung nicht sichtbar.",
+      "count": "{count, plural, =0 {Nichts zu prüfen.} one {Ein Eintrag wartet.} other {# Einträge warten.}}",
+      "reports": "{count, plural, one {1 Meldung} other {# Meldungen}}",
+      "new": "Neu",
+      "checkHint": "Prüfen auf: diskriminierende oder herabwürdigende Inhalte, Irreführung, Schädliches, Spam. Die Adresse vor dem Freigeben kurz ansehen.",
+      "note": "Notiz für das Protokoll (optional)",
+      "approve": "Freigeben",
+      "remove": "Entfernen",
+      "saving": "Speichert …",
+      "done": "Entscheidung gespeichert."
+    }
   }
 }
