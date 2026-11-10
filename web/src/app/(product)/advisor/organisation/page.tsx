@@ -20,7 +20,6 @@ import { EventFormats } from "@/features/advisor/EventFormats";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 import { OrgRewards } from "@/features/advisor/OrgRewards";
 import { OrgOutcomeCatalog } from "@/features/advisor/OrgOutcomeCatalog";
-import { OrgProgramExperts } from "@/features/advisor/OrgProgramExperts";
 import { OrgFeaturesForm } from "@/features/advisor/OrgFeaturesForm";
 import { hasOrgFeature, tabEnabled } from "@/features/advisor/orgFeatures";
 import { OrgProgramLearning } from "@/features/advisor/ProgramLearning";
@@ -34,7 +33,7 @@ import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
 import { OrgContentReport } from "@/features/advisor/contentReport/OrgContentReport";
 import { OrgPartners } from "@/features/advisor/partners/OrgPartners";
 import { parseReportRange } from "@/features/advisor/programReport";
-import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramExperts, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
+import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
   countOrgSeatsUsed,
   getAccompaniedPeople,
@@ -48,7 +47,7 @@ import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
 import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
-const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -58,12 +57,12 @@ type Tab = (typeof TABS)[number];
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
   { key: "care", tabs: ["overview", "program", "report", "contentReport", "funding"] },
-  { key: "content", tabs: ["materials", "learning", "experts", "partners"] },
+  { key: "content", tabs: ["materials", "learning", "partners"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
 // Alte Adressen: "settings" (bis 31.10.2026) -> Mitglieder, "success" -> Funktionen & Erfolge.
 const TAB_OF = (value: string | undefined): Tab =>
-  value === "settings" ? "members" : value === "success" ? "features" : TABS.find((tab) => tab === value) ?? "overview";
+  value === "settings" ? "members" : value === "success" ? "features" : value === "experts" ? "partners" : TABS.find((tab) => tab === value) ?? "overview";
 // Was frueher hier stand und jetzt unter "Begleitung" lebt.
 const MOVED_TO_FOLLOW: Record<string, string> = { teams: "/advisor/begleitung?art=teams", people: "/advisor/begleitung?art=personen" };
 // Der Teamraum (Diese Woche, Aufgaben, Chat, Social Media, Seiten, Wer macht was) ist seit dem 05.11.2026 ein
@@ -161,7 +160,7 @@ export default async function AdvisorOrganisationPage({
   const suggestions = tab === "members" && org.role !== "guest" ? await getOrgInviteSuggestions(client, org.id) : [];
   const needsPeople = tab === "learning";
   const needsPrograms = tab === "funding" || tab === "program" || tab === "enroll" || tab === "overview" || tab === "access" || tab === "learning";
-  const [seatsUsed, people, programs, invites, deadlines, access, codes, materials, experts, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
+  const [seatsUsed, people, programs, invites, deadlines, access, codes, materials, outcomeCatalog, orgRewards, programStars, outcomeCounts, learning, moduleShares] = await Promise.all([
     countOrgSeatsUsed(client, org.id),
     needsPeople ? withAccompaniedNames(client, await getAccompaniedPeople(client)) : Promise.resolve([]),
     needsPrograms ? getOrgTeamPrograms(client, org.id) : Promise.resolve([]),
@@ -170,7 +169,6 @@ export default async function AdvisorOrganisationPage({
     tab === "access" ? getProgramAccess(client, org.id) : Promise.resolve([]),
     tab === "enroll" && canTeams ? listTeamProgramCodes(client, org.id) : Promise.resolve([]),
     tab === "materials" ? listProgramMaterials(client, org.id) : Promise.resolve([]),
-    tab === "experts" ? listProgramExperts(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOutcomeCatalog(client, org.id) : Promise.resolve([]),
     tab === "features" && hasOrgFeature(org, "success") ? getOrgRewards(client, org.id) : Promise.resolve([]),
     tab === "program" ? getOrgProgramStars(client, org.id) : Promise.resolve([]),
@@ -393,13 +391,6 @@ export default async function AdvisorOrganisationPage({
             )}
             {canProfile ? <OrgAiTipForm orgId={org.id} tip={await getOrgAiTip(client, org.id)} /> : null}
           </div>
-        ) : null}
-
-        {tab === "experts" && !tabOff ? (
-          <>
-            {query.expertError ? <p role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{tAdvisor("teamProgram.expertsError")}</p> : null}
-            <OrgProgramExperts orgId={org.id} isOwner={canPlan} experts={experts} query={(query.q ?? "").slice(0, 80)} />
-          </>
         ) : null}
 
         {/* Auswertung (Feedback an Maria, 04.11.2026): Zahlen zu Veranstaltungen, Teilnahme und Gespraechen. */}

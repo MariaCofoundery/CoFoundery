@@ -35,7 +35,7 @@ import {
 import { HOLIDAY_STATES } from "@/features/advisor/calendar/holidaysData";
 import { HOLIDAY_COOKIE, holidayMarks, holidayName, parseHolidayPrefs, type DayMarks } from "@/features/advisor/calendar/holidaysModel";
 import { setCalendarHolidaysAction } from "@/features/advisor/calendar/holidayActions";
-import { listEventPartners } from "@/features/advisor/partners/partnersData";
+import { listEventContacts } from "@/features/advisor/partners/partnersData";
 import { PlanView } from "@/features/advisor/calendar/PlanView";
 import { EventPanel } from "@/features/advisor/calendar/EventPanel";
 import { EventSheet } from "@/features/advisor/calendar/EventSheet";
@@ -43,7 +43,7 @@ import { PostSheet } from "@/features/advisor/calendar/PostSheet";
 import { DraggableItem, DropDay } from "@/features/ui/CalendarDrag";
 import { movePostToDayAction } from "@/features/advisor/socialCalendarActions";
 import { EventFormats } from "@/features/advisor/EventFormats";
-import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventExperts, listEventFormats, listProgramEventsSplit, listProgramExperts } from "@/features/advisor/teamProgramData";
+import { getEventAttendance, getEventRsvps, getOrgTeamPrograms, listEventFormats, listProgramEventsSplit } from "@/features/advisor/teamProgramData";
 import { listEventCountingRequirements } from "@/features/advisor/fundingData";
 import { getContentDefaults, getOrgPost, listContentItems, listLinkableTasks, listPostTasks, listOrgCampaigns, listOrgEventPosts, listOrgPosts, listPostTemplates } from "@/features/advisor/socialCalendarData";
 import { BRAND_COLOR_STYLE, POST_STATUSES, isoWeekNumber } from "@/features/advisor/socialCalendarModel";
@@ -188,18 +188,14 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const editing = editId ? events.find((event) => event.eventId === editId) ?? null : null;
   const needPosts = canWrite ? eventsNeedingPosts(events, eventPosts, today) : [];
 
-  // Nur fuer den geoeffneten Termin: Teilnahme, Zusagen, Speaker.
-  const withSpeakers = hasOrgFeature(org, "experts");
+  // Nur fuer den geoeffneten Termin: Teilnahme, Zusagen, Speaker (aus der einen Liste "Partner", nur mit dem Recht "Personen").
+  const withSpeakers = hasOrgFeature(org, "experts") && org.rights.people;
   const needsTeams = Boolean(selected && tab === "teams" && selected.audience !== "internal");
-  const [attendance, rsvps, assignedSpeakers, speakerChoices] = await Promise.all([
+  const [attendance, rsvps, speakers] = await Promise.all([
     selected && needsTeams ? getEventAttendance(client, selected.eventId) : Promise.resolve([]),
     selected && needsTeams ? getEventRsvps(client, selected.eventId) : Promise.resolve([]),
-    selected && tab === "details" && withSpeakers ? listEventExperts(client, org.id) : Promise.resolve([]),
-    selected && tab === "details" && withSpeakers && isOwner ? listProgramExperts(client, org.id) : Promise.resolve([]),
+    selected && tab === "details" && withSpeakers ? listEventContacts(client, org.id, selected.eventId) : Promise.resolve(null),
   ]);
-  // Aus der Partnerliste: nur mit dem Recht "Personen" (die Zeilensicherheit der Tabelle gilt ohnehin).
-  const eventPartners = selected && tab === "details" && org.rights.people ? await listEventPartners(client, org.id, selected.eventId) : [];
-  const speakers = selected && tab === "details" && withSpeakers ? { assigned: assignedSpeakers, choices: speakerChoices.filter((entry) => !entry.archived) } : null;
 
   const dayLong = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
   const short = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
@@ -321,7 +317,6 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
       rsvps={rsvps}
       requirements={requirements}
       speakers={speakers}
-      partners={eventPartners}
       feedback={{ postsCreated: /^\d{1,2}$/.test(query.postsCreated ?? "") ? Number(query.postsCreated) : null, postsError: query.postsError === "1", saved: query.planSaved === "1" }}
     />
   ) : null;

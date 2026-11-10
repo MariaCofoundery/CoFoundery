@@ -487,8 +487,8 @@
       "materialsText": "Links zu euren Ablagen: Ordner, Folien, Aufzeichnungen. Die Teams sehen sie.",
       "learningTitle": "Lernbereich",
       "learningText": "Module mit Lektionen als Links, sichtbar für alle Teams, einzelne Teams oder einzelne Begleitete.",
-      "expertsTitle": "Experten und Speaker",
-      "expertsText": "Eine interne Liste mit Kontaktdaten und Themen. Teams sehen sie nie.",
+      "expertsTitle": "Partner, Experten und Speaker",
+      "expertsText": "Eine interne Liste mit Kontaktdaten, Themen und Rollen. Teams sehen sie nie.",
       "orgdataTitle": "Stammdaten der Startups",
       "orgdataText": "Firmenname, Adresse, Ansprechperson und mehr, von euch gepflegt. Das Team sieht sie nur lesend.",
       "successTitle": "Erfolge",
@@ -556,7 +556,7 @@
       },
       "plan": {
         "label": "Termine, Formate und Materialien pflegen",
-        "hint": "Kalender, Programmplan, Materialien, Experten und Lernbereich ändern."
+        "hint": "Kalender, Programmplan, Materialien und Lernbereich ändern."
       },
       "teams": {
         "label": "Startups aufnehmen und Ansprechpersonen festlegen",
@@ -903,7 +903,7 @@
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betreuen | Inhalte für die Teams | Einrichten",
       "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil | Content-Report | Partner",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil | Content-Report | Partner",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
       "statTeams": "Teams im Programm",
@@ -1125,7 +1125,7 @@
     "planAttendanceOpen": "Teams anzeigen",
     "planSpeakers": "Speaker",
     "planSpeakersEdit": "Speaker zuordnen",
-    "planSpeakersNone": "Noch keine Person in der Liste. Unter „Experten“ anlegen, dann hier auswählen.",
+    "planSpeakersNone": "Noch niemand in der Liste. Unter „Partner“ anlegen, dann hier auswählen.",
     "planSpeakersNote": "Nur ihr seht diese Zuordnung. Die Teams sehen die Veranstaltung, aber keine Namen von Speakern.",
     "planAttendanceEmpty": "Keine Teams mit aktivem Programm.",
     "attend_present": "Da",
@@ -1286,30 +1286,6 @@
     "myLearningText": "Lerninhalte, die eure Organisation oder eure Begleitung für euch freigeschaltet hat. Ein Klick öffnet die Adresse in einem neuen Tab, dort gelten die Regeln des jeweiligen Dienstes.",
     "myMaterialsTitle": "Unterlagen zum Programm",
     "myMaterialsText": "Diese Links hat eure Organisation für das Programm abgelegt.",
-    "expertsTitle": "Experten und Speaker",
-    "expertsText": "Eure interne Liste: Kontakt, Thema und der Link zur Ablage für Angebote und Rechnungen. Die Teams im Programm sehen sie nicht.",
-    "expertsPrivacy": "Hier stehen Daten von Dritten, die kein Konto bei Made2Found haben. Für diese Daten seid ihr als Organisation selbst verantwortlich: Informiert die Personen, haltet eure Datenschutzerklärung aktuell und löscht Angaben auf Wunsch. Made2Found stellt nur das Feld bereit und übernimmt das nicht für euch. Tragt nur ein, was ihr braucht, und keine Preise oder Rechnungen, nur den Link zur Ablage.",
-    "expertsSearch": "Suchen (Name, Thema, Firma, Notiz)",
-    "expertsSearchGo": "Suchen",
-    "expertsEmpty": "Noch niemand eingetragen.",
-    "expertsNone": "Nichts gefunden.",
-    "expertsNew": "Person hinzufügen",
-    "expertsEdit": "Bearbeiten",
-    "expertsSave": "Speichern",
-    "expertsDelete": "Person löschen",
-    "expertsArchive": "Als nicht aktiv markieren",
-    "expertsRestore": "Wieder aktiv setzen",
-    "expertsArchived": "Nicht aktiv ({count})",
-    "expertsName": "Name",
-    "expertsTopic": "Themengebiet",
-    "expertsCompany": "Firma",
-    "expertsWebsite": "Webseite",
-    "expertsEmail": "E-Mail",
-    "expertsPhone": "Telefon",
-    "expertsOfferLink": "Ablage für Angebote und Rechnungen",
-    "expertsOfferLinkHint": "Nur ein Link zu eurer eigenen Ablage. Made2Found speichert keine Dateien und keine Beträge.",
-    "expertsNote": "Notiz (zum Beispiel: weitere Angebote wie 1:1-Coaching)",
-    "expertsError": "Die Angaben konnten nicht gespeichert werden. Der Name ist nötig, Adressen müssen mit https:// beginnen, und nur die Inhaberin oder der Inhaber darf eintragen.",
     "rsvpQuestion": "Kommst du?",
     "rsvp_yes": "Ich komme",
     "rsvp_no": "Ich kann nicht",
@@ -1440,8 +1416,7 @@
     "teamTasks": "Aufgaben zu diesem Team",
     "teamDates": "Termine und Teilnahme",
     "tabTasks": "Aufgaben",
-    "tabGoals": "Ziele",
-    "planPartners": "Aus der Partnerliste"
+    "tabGoals": "Ziele"
   },
   "programPage": {
     "title": "Programmseite",
@@ -2897,8 +2872,8 @@
     "footnote": "Der Report liest nur, was schon eingetragen ist. Er bewertet keine Personen; Ergebnisse sind freiwillige Zahlen zum Beitrag."
   },
   "partners": {
-    "title": "Partner, Investoren, Speaker",
-    "intro": "Eure interne Liste. Nur Mitglieder mit dem Recht „Personen“ sehen sie. Teams, Gäste und andere Organisationen sehen sie nie, und nichts davon erscheint in Connect.",
+    "title": "Partner, Experten, Speaker",
+    "intro": "Eure eine interne Liste für alle, mit denen ihr zusammenarbeitet: Partner, Investoren, Speaker, Mentoren und Experten. Nur Mitglieder mit dem Recht „Personen“ sehen sie. Teams, Gäste und andere Organisationen sehen sie nie, und nichts davon erscheint in Connect.",
     "add": "Eintrag",
     "noRight": "Die Partnerliste ist nur für Mitglieder mit dem Recht „Personen“ sichtbar. Die Admins der Organisation können es dir geben.",
     "unnamed": "Ohne Namen",
@@ -2913,7 +2888,8 @@
       "investor": "Investoren",
       "speaker": "Speaker",
       "mentor": "Mentoren",
-      "other": "Sonstige"
+      "other": "Sonstige",
+      "expert": "Experten"
     },
     "kindsHint": "Bis zu drei Arten je Eintrag.",
     "statuses": {
@@ -2934,7 +2910,12 @@
       "status": "Stand",
       "owner": "Kümmert sich",
       "nobody": "Niemand",
-      "notes": "Notiz"
+      "notes": "Notiz",
+      "topic": "Thema oder Schwerpunkt",
+      "topicPlaceholder": "Zum Beispiel: Datenschutz, Energie, Frühphasen-Finanzierung",
+      "more": "Mehr: Ablage für Angebote und Rechnungen",
+      "offerLink": "Ablage für Angebote und Rechnungen",
+      "offerLinkHint": "Nur ein Link zu eurer eigenen Ablage. Made2Found speichert keine Dateien und keine Beträge."
     },
     "save": "Speichern",
     "close": "Schließen",
@@ -2951,6 +2932,6 @@
     "eventRemove": "Lösen",
     "hiddenEvent": "Event",
     "ownerLine": "Kümmert sich: {name}",
-    "footnote": "Kein Verlauf, keine Bewertung, keine Rangfolge. Es sind persönliche Daten: Sie liegen nur hier und lassen sich jederzeit löschen."
+    "footnote": "Kein Verlauf, keine Bewertung, keine Rangfolge. Hier stehen Daten von Dritten, die kein Konto bei Made2Found haben. Für diese Daten seid ihr als Organisation selbst verantwortlich: Informiert die Personen, haltet eure Datenschutzerklärung aktuell und löscht Angaben auf Wunsch. Tragt nur ein, was ihr braucht, und keine Preise oder Rechnungen, nur den Link zur Ablage."
   }
 }

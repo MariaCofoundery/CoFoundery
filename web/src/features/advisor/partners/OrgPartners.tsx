@@ -21,7 +21,7 @@ export async function OrgPartners({ client, orgId, query, canUse, locale }: { cl
   if (!canUse) return <p role="note" className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-[15px] text-slate-800">{t("noRight")}</p>;
 
   const [contactsResult, linksResult, eventsResult, members] = await Promise.all([
-    client.from("advisor_org_contacts").select("id, name, kinds, company, email, phone, url, notes, status, owner_user_id").eq("org_id", orgId).limit(1000),
+    client.from("advisor_org_contacts").select("id, name, kinds, company, email, phone, url, notes, status, owner_user_id, topic, offer_link").eq("org_id", orgId).limit(1000),
     client.from("advisor_org_contact_events").select("contact_id, event_id, role").eq("org_id", orgId).limit(2000),
     listProgramEventsSplit(client, orgId),
     getOrgMembers(client, orgId),
@@ -101,6 +101,7 @@ export async function OrgPartners({ client, orgId, query, canUse, locale }: { cl
                 <p className="mt-1 text-xs text-slate-600">{t("kindsHint")}</p>
               </fieldset>
               <label className={LABEL}>{t("fields.company")}<input name="company" maxLength={120} defaultValue={form.contact?.company ?? ""} className={FIELD} /></label>
+              <label className={LABEL}>{t("fields.topic")}<input name="topic" maxLength={200} defaultValue={form.contact?.topic ?? ""} placeholder={t("fields.topicPlaceholder")} className={FIELD} /></label>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className={LABEL}>{t("fields.email")}<input type="email" name="email" maxLength={200} defaultValue={form.contact?.email ?? ""} className={FIELD} /></label>
                 <label className={LABEL}>{t("fields.phone")}<input name="phone" maxLength={60} defaultValue={form.contact?.phone ?? ""} className={FIELD} /></label>
@@ -110,6 +111,10 @@ export async function OrgPartners({ client, orgId, query, canUse, locale }: { cl
                 <label className={LABEL}>{t("fields.status")}<select name="status" defaultValue={form.contact?.status ?? "asked"} className={FIELD}>{CONTACT_STATUSES.map((entry) => <option key={entry} value={entry}>{t(`statuses.${entry}`)}</option>)}</select></label>
                 <label className={LABEL}>{t("fields.owner")}<select name="owner" defaultValue={form.contact?.ownerUserId ?? ""} className={FIELD}><option value="">{t("fields.nobody")}</option>{memberList.map((member) => <option key={member.userId} value={member.userId}>{member.name}</option>)}</select></label>
               </div>
+              <details open={Boolean(form.contact?.offerLink)}>
+                <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center text-[14.5px] font-semibold text-violet-800">{t("fields.more")}</summary>
+                <label className={`${LABEL} mt-1`}>{t("fields.offerLink")}<input name="offerLink" maxLength={500} defaultValue={form.contact?.offerLink ?? ""} placeholder="https://" className={FIELD} /><span className="mt-1 block text-xs font-normal text-slate-600">{t("fields.offerLinkHint")}</span></label>
+              </details>
               <label className={LABEL}>{t("fields.notes")}<textarea name="notes" rows={4} maxLength={2000} defaultValue={form.contact?.notes ?? ""} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-[15px] font-normal" /></label>
               <div className="flex flex-wrap items-center gap-3">
                 <SubmitButton label={t("save")} pendingLabel="…" className="inline-flex min-h-11 items-center rounded-xl bg-[#6D49E0] px-5 text-sm font-semibold text-white hover:bg-[#5B36D6]" />

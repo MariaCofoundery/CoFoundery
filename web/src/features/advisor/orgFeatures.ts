@@ -18,6 +18,8 @@ export const FEATURE_OF_TAB: Partial<Record<string, OrgFeature>> = {
   materials: "materials",
   learning: "learning",
   experts: "experts",
+  // Die Partnerliste (ehemals Experten-Liste, 20270416120000) haengt am selben Bereich.
+  partners: "experts",
   // Foerderauflagen (20270314120000): nur fuer gefoerderte Programme, standardmaessig aus.
   funding: "funding",
 };

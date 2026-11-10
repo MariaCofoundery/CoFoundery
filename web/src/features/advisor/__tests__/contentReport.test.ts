@@ -48,7 +48,7 @@ test("CSV: Semikolon, Anfuehrungszeichen verdoppelt, Formeln entschaerft", () =>
 });
 
 test("Partnerliste: Filter nach Art und Suche, nach Name sortiert", () => {
-  const c = (patch: Partial<OrgContact>): OrgContact => ({ id: "x", name: "N", kinds: ["partner"], company: null, email: null, phone: null, url: null, notes: null, status: "asked", ownerUserId: null, ...patch });
+  const c = (patch: Partial<OrgContact>): OrgContact => ({ id: "x", name: "N", kinds: ["partner"], company: null, email: null, phone: null, url: null, notes: null, status: "asked", ownerUserId: null, topic: null, offerLink: null, ...patch });
   const list = [c({ id: "1", name: "Zoe", kinds: ["investor"] }), c({ id: "2", name: "Anna", kinds: ["speaker", "partner"], company: "Stadtwerke" })];
   assert.deepEqual(filterContacts(list, null, "").map((x) => x.id), ["2", "1"]);
   assert.deepEqual(filterContacts(list, "investor", "").map((x) => x.id), ["1"]);

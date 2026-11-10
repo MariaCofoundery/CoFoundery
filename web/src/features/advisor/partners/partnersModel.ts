@@ -1,5 +1,5 @@
 /** Partnerliste (20270415120000): Arten und Stand. Kein Verlauf, keine Bewertung, keine Rangfolge. */
-export const CONTACT_KINDS = ["partner", "investor", "speaker", "mentor", "other"] as const;
+export const CONTACT_KINDS = ["partner", "investor", "speaker", "mentor", "expert", "other"] as const;
 export type ContactKind = (typeof CONTACT_KINDS)[number];
 export const CONTACT_STATUSES = ["asked", "talking", "committed", "active", "paused"] as const;
 export type ContactStatus = (typeof CONTACT_STATUSES)[number];
@@ -7,6 +7,8 @@ export type ContactStatus = (typeof CONTACT_STATUSES)[number];
 export type OrgContact = {
   id: string; name: string; kinds: ContactKind[]; company: string | null; email: string | null; phone: string | null; url: string | null;
   notes: string | null; status: ContactStatus; ownerUserId: string | null;
+  /** Thema oder Schwerpunkt (Experte, Speaker, Mentor, Investor) und Link zur Ablage fuer Angebote und Rechnungen. */
+  topic: string | null; offerLink: string | null;
 };
 export type ContactEventLink = { contactId: string; eventId: string; role: string | null };
 
@@ -25,6 +27,8 @@ export function contactOf(row: Record<string, unknown>): OrgContact {
     notes: (row.notes as string | null) ?? null,
     status: isContactStatus(row.status) ? row.status : "asked",
     ownerUserId: (row.owner_user_id as string | null) ?? null,
+    topic: (row.topic as string | null) ?? null,
+    offerLink: (row.offer_link as string | null) ?? null,
   };
 }
 
@@ -33,8 +37,8 @@ export function filterContacts(contacts: OrgContact[], kind: ContactKind | null,
   const needle = q.trim().toLocaleLowerCase("de");
   return contacts
     .filter((contact) => !kind || contact.kinds.includes(kind))
-    .filter((contact) => !needle || `${contact.name} ${contact.company ?? ""} ${contact.notes ?? ""}`.toLocaleLowerCase("de").includes(needle))
+    .filter((contact) => !needle || `${contact.name} ${contact.company ?? ""} ${contact.topic ?? ""} ${contact.notes ?? ""}`.toLocaleLowerCase("de").includes(needle))
     .sort((a, b) => a.name.localeCompare(b.name, "de"));
 }
 
-export const cleanHttps = (value: string): string | null => (/^https:\/\/[^\s]+$/.test(value.trim()) && value.trim().length <= 300 ? value.trim() : null);
+export const cleanHttps = (value: string, max = 300): string | null => (/^https:\/\/[^\s]+$/.test(value.trim()) && value.trim().length <= max ? value.trim() : null);

@@ -73,7 +73,7 @@ export const isInvitePath = (pathname: string) =>
   pathname === "/advisor/einladen" || pathname === "/team-intake" || pathname.startsWith("/team-intake/") || pathname.startsWith("/advisor/intake");
 
 const SETUP_TABS = ["enroll", "page", "features", "members", "access", "profile", "settings", "success"];
-const CONTENT_TABS = ["materials", "learning", "experts", "partners"];
+const CONTENT_TABS = ["materials", "learning", "partners"];
 const onOrg = (pathname: string) => pathname === ORG;
 
 /** Welche Seiten tragen die Seitenleiste: der Advisor-Bereich, Events, Team-Runden, Postfach und Konto. */

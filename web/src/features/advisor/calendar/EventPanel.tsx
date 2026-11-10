@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { archiveProgramEventAction, createEventChecklistAction, setEventExpertsAction, setProgramAttendanceAction } from "@/features/advisor/teamProgramActions";
-import type { EventAttendanceRow, EventExpert, EventRsvp, ProgramEvent, ProgramExpert } from "@/features/advisor/teamProgramData";
+import { archiveProgramEventAction, createEventChecklistAction, setProgramAttendanceAction } from "@/features/advisor/teamProgramActions";
+import { setEventContactsAction } from "@/features/advisor/partners/partnersActions";
+import type { EventContacts } from "@/features/advisor/partners/partnersData";
+import type { EventAttendanceRow, EventRsvp, ProgramEvent } from "@/features/advisor/teamProgramData";
 import { EventPostSuggestions } from "@/features/advisor/EventPostSuggestions";
 import { PANEL_TABS, calendarHref, tabParam, type PanelTab } from "@/features/advisor/calendar/calendarModel";
 import { CHANNEL_STYLE, type OrgPost } from "@/features/advisor/socialCalendarModel";
@@ -38,7 +40,6 @@ export async function EventPanel({
   rsvps,
   requirements,
   speakers,
-  partners,
   feedback,
 }: {
   orgId: string;
@@ -60,9 +61,8 @@ export async function EventPanel({
   attendance: EventAttendanceRow[];
   rsvps: EventRsvp[];
   requirements: Requirement[];
-  speakers: { assigned: EventExpert[]; choices: ProgramExpert[] } | null;
-  /** Aus der Partnerliste zugeordnet (nur fuer Mitglieder mit dem Recht "Personen"). */
-  partners: { name: string; role: string | null }[];
+  /** Speaker aus der Liste "Partner" (nur fuer Mitglieder mit dem Recht "Personen"); sonst null. */
+  speakers: EventContacts | null;
   feedback: { postsCreated: number | null; postsError: boolean; saved: boolean };
 }) {
   const t = await getTranslations("advisor.calendar.panel");
@@ -89,7 +89,7 @@ export async function EventPanel({
   };
   const sortedPosts = [...posts].sort((a, b) => (a.plannedOn < b.plannedOn ? -1 : a.plannedOn > b.plannedOn ? 1 : 0));
   const counts = requirements.filter((entry) => (entry.formatId === null || entry.formatId === event.formatId) && (entry.eventKind === null || entry.eventKind === event.kind) && (entry.formatId !== null || entry.eventKind !== null));
-  const mine = speakers?.assigned.filter((entry) => entry.eventId === event.eventId) ?? [];
+  const mine = speakers?.assigned ?? [];
   const rsvpSummary = { yes: rsvps.filter((row) => row.response === "yes").length, no: rsvps.filter((row) => row.response === "no").length, open: rsvps.filter((row) => row.response === null).length };
 
   return (
@@ -294,38 +294,31 @@ export async function EventPanel({
               {requirements.length > 0 ? (
                 <div><dt className="inline font-bold">{tp("event.fundingTitle")}: </dt><dd className="inline">{counts.length === 0 ? tp("event.fundingNone") : counts.map((entry) => tp("event.fundingCounts", { title: entry.title, grant: entry.grantName })).join(" · ")}</dd></div>
               ) : null}
-              {partners.length > 0 ? <div><dt className="inline font-bold">{tp("planPartners")}: </dt><dd className="inline">{partners.map((entry) => (entry.role ? `${entry.name} (${entry.role})` : entry.name)).join(", ")}</dd></div> : null}
-              {mine.length > 0 ? <div><dt className="inline font-bold">{tp("planSpeakers")}: </dt><dd className="inline">{mine.map((entry) => entry.name).join(", ")}</dd></div> : null}
+              {mine.length > 0 ? <div><dt className="inline font-bold">{tp("planSpeakers")}: </dt><dd className="inline">{mine.map((entry) => (entry.role ? `${entry.name} (${entry.role})` : entry.name)).join(", ")}</dd></div> : null}
             </dl>
-            {speakers && isOwner ? (
+            {speakers ? (
               <details className="border-t border-slate-100 pt-2">
                 <summary className="inline-flex min-h-11 cursor-pointer items-center text-[13.5px] font-semibold text-slate-700">{tp("planSpeakersEdit")}</summary>
-                {(() => {
-                  const options = [
-                    ...speakers.choices.map((entry) => ({ id: entry.expertId, label: entry.name, topic: entry.topic })),
-                    ...mine.filter((entry) => !speakers.choices.some((choice) => choice.expertId === entry.expertId)).map((entry) => ({ id: entry.expertId, label: entry.name, topic: entry.topic })),
-                  ];
-                  return options.length === 0 ? (
-                    <p className="mt-2 text-sm text-slate-700">{tp("planSpeakersNone")}</p>
-                  ) : (
-                    <form action={setEventExpertsAction} className="mt-2 grid gap-2">
-                      <input type="hidden" name="orgId" value={orgId} />
-                      <input type="hidden" name="eventId" value={event.eventId} />
-                      <ul className="grid gap-1">
-                        {options.map((option) => (
-                          <li key={option.id}>
-                            <label className="flex min-h-11 items-center gap-3 text-sm text-slate-900">
-                              <input type="checkbox" name="expertId" value={option.id} defaultChecked={mine.some((entry) => entry.expertId === option.id)} className="size-5" />
-                              <span>{option.label}{option.topic ? <span className="text-slate-700"> · {option.topic}</span> : null}</span>
-                            </label>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="text-xs leading-5 text-slate-700">{tp("planSpeakersNote")}</p>
-                      <SubmitButton label={tp("planSave")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white" />
-                    </form>
-                  );
-                })()}
+                {speakers.choices.length === 0 ? (
+                  <p className="mt-2 text-sm text-slate-700">{tp("planSpeakersNone")}</p>
+                ) : (
+                  <form action={setEventContactsAction} className="mt-2 grid gap-2">
+                    <input type="hidden" name="orgId" value={orgId} />
+                    <input type="hidden" name="eventId" value={event.eventId} />
+                    <ul className="grid gap-1">
+                      {speakers.choices.map((option) => (
+                        <li key={option.contactId}>
+                          <label className="flex min-h-11 items-center gap-3 text-sm text-slate-900">
+                            <input type="checkbox" name="contactId" value={option.contactId} defaultChecked={mine.some((entry) => entry.contactId === option.contactId)} className="size-5" />
+                            <span>{option.name}{option.topic ? <span className="text-slate-700"> · {option.topic}</span> : null}</span>
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-xs leading-5 text-slate-700">{tp("planSpeakersNote")}</p>
+                    <SubmitButton label={tp("planSave")} pendingLabel="…" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white" />
+                  </form>
+                )}
               </details>
             ) : null}
             {isOwner ? (

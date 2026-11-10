@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 
 const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
 
-test("die Organisationsseite hat sechzehn Reiter und waehlt zwischen mehreren Organisationen", () => {
-  assert.match(page, /\["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"\]/);
+test("die Organisationsseite hat fuenfzehn Reiter und waehlt zwischen mehreren Organisationen", () => {
+  assert.match(page, /\["overview", "program", "plan", "report", "funding", "materials", "learning", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"\]/);
   // "Teams" und "Personen" (die eigene Begleitung) leben unter "Begleitung"; alte Adressen fuehren dorthin.
   assert.match(page, /teams: "\/advisor\/begleitung\?art=teams", people: "\/advisor\/begleitung\?art=personen"/);
   assert.match(page, /value === "success" \? "features"/);
@@ -376,11 +376,11 @@ test("Erfolge sind optional: standardmaessig aus, Teams sehen bei aus nichts, de
   assert.match(privacy, /Funktion „Erfolge“ einschaltet \(sie ist freiwillig und standardmäßig aus\)/);
 });
 
-test("Organisation: die sechzehn Reiter stehen in drei Gruppen, jeder Reiter genau einmal", () => {
+test("Organisation: die fuenfzehn Reiter stehen in drei Gruppen, jeder Reiter genau einmal", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   const block = page.slice(page.indexOf("const AREA_GROUPS"), page.indexOf("\n];", page.indexOf("const AREA_GROUPS")));
   const used = [...block.matchAll(/"([a-zA-Z]+)"/g)].map((match) => match[1]).filter((key) => !["care", "content", "setup"].includes(key));
-  const tabs = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"];
+  const tabs = ["overview", "program", "plan", "report", "funding", "materials", "learning", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"];
   // "plan" ist seit dem 05.11.2026 der Kalender: kein Reiter mehr, die alte Adresse leitet dorthin (Beschriftungen bleiben an ihrer Stelle).
   assert.deepEqual([...used].sort(), tabs.filter((tab) => tab !== "plan").sort());
   assert.match(page, /if \(query\.tab === "plan"\) \{[\s\S]*redirect\(\s*calendarHref\(/);
@@ -579,55 +579,40 @@ test("Programmunterlagen: nur Links (https), der Inhaber schreibt, das Team lies
   assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
 });
 
-test("Experten und Speaker: interne Liste, Inhaber schreibt, Teams sehen nichts, Datenschutz-Hinweis ist da", () => {
-  const ui = readFileSync("src/features/advisor/OrgProgramExperts.tsx", "utf8");
-  const actions = readFileSync("src/features/advisor/teamProgramActions.ts", "utf8");
-  assert.match(actions, /rpc\("save_program_expert"/);
-  assert.match(page, /<OrgProgramExperts/);
+test("Eine Liste fuer Partner, Experten und Speaker: Recht Personen, Teams sehen nichts, Verantwortungs-Hinweis ist da", () => {
+  const ui = readFileSync("src/features/advisor/partners/OrgPartners.tsx", "utf8");
+  const actions = readFileSync("src/features/advisor/partners/partnersActions.ts", "utf8");
+  assert.match(actions, /rpc\("save_org_contact"/);
+  assert.match(page, /<OrgPartners/);
+  // Die alte Experten-Liste gibt es nicht mehr; ihre Adresse leitet auf die Partnerliste.
+  assert.doesNotMatch(page, /OrgProgramExperts|listProgramExperts/);
+  assert.match(page, /value === "experts" \? "partners"/);
   // Die Liste gibt es nur in der Organisation, nie auf der Team-Seite oder im Team-Programm.
-  assert.doesNotMatch(readFileSync("src/app/(product)/programm/page.tsx", "utf8"), /Expert/);
-  assert.match(ui, /expertsPrivacy/);
-  assert.match(ui, /rel="noopener noreferrer"/);
+  assert.doesNotMatch(readFileSync("src/app/(product)/programm/page.tsx", "utf8"), /Expert|partners/);
   // Keine Preise, keine Dateien, keine Bewertung; sortiert wird nach Name.
   assert.doesNotMatch(ui, /type="file"|price|preis|betrag|score|rank|percent|compatib/i);
-  const sql = readFileSync("../supabase/migrations/20270217120000_program_experts.sql", "utf8");
-  assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
-  assert.match(sql, /order by e\.archived, lower\(e\.name\)/);
+  const sql = readFileSync("../supabase/migrations/20270416120000_unified_contact_list.sql", "utf8");
+  assert.match(sql, /org_has_right\(v_org, 'people'\)/);
+  assert.match(sql, /drop table public\.team_program_experts;/);
   for (const locale of ["de", "en"]) {
     const messages = JSON.parse(readFileSync(`messages/${locale}/advisor.json`, "utf8"));
-    assert.ok(messages.teamProgram.expertsPrivacy, locale);
-    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 16, locale);
+    assert.ok(messages.partners.footnote.length > 100 && /third|Dritte/.test(messages.partners.footnote), locale);
+    assert.equal(messages.area.orgPage.tabs.split(" | ").length, 15, locale);
   }
 });
 
-test("Ergebnisse je Batch: nur Zaehlungen bestaetigter Ergebnisse, keine Sterne, keine Namen, Hinweis fuer Teams", () => {
-  const ui = readFileSync("src/features/advisor/OrgProgramOverview.tsx", "utf8");
-  assert.match(ui, /dashOutcomesOf/);
-  assert.doesNotMatch(ui, /stars|sort\([^)]*(done|teamsDone)/i);
-  const sql = readFileSync("../supabase/migrations/20270218120000_program_outcome_counts.sql", "utf8");
-  assert.match(sql, /confirmed_at is not null/);
-  assert.match(sql, /org_success_enabled\(p_org_id\)/);
-  assert.match(sql, /is_advisor_org_owner_of\(p_org_id\)/);
-  assert.doesNotMatch(sql, /stars|team_name|founder_teams/);
-  const team = readFileSync("src/features/advisor/ProgramOutcomes.tsx", "utf8");
-  assert.match(team, /mode === "team" \? <p[^>]*>\{t\("outcomesCountedNote"\)\}/);
-  const de = readFileSync("messages/de/advisor.json", "utf8");
-  assert.match(de, /"outcomesCountedNote": "Eure bestätigten Ergebnisse fließen ohne Teamnamen/);
-});
-
-test("Speaker an Veranstaltungen: nur Inhaber ordnen zu, Teams sehen keine Namen", () => {
-  const sql = readFileSync("../supabase/migrations/20270219120000_program_event_experts.sql", "utf8");
-  assert.match(sql, /is_advisor_org_owner_of\(v_org\)/);
-  assert.match(sql, /expert_not_in_org/);
-  assert.match(sql, /on delete cascade/);
+test("Speaker an Veranstaltungen: nur mit dem Recht Personen, Teams sehen keine Namen", () => {
+  const sql = readFileSync("../supabase/migrations/20270416120000_unified_contact_list.sql", "utf8");
+  assert.match(sql, /create or replace function public\.set_event_contacts/);
+  assert.match(sql, /org_has_right\(v_org, 'people'\)/);
   const plan = readFileSync("src/features/advisor/calendar/EventPanel.tsx", "utf8");
-  assert.match(plan, /setEventExpertsAction/);
+  assert.match(plan, /setEventContactsAction/);
   assert.match(plan, /planSpeakersNote/);
   // Die Team-Seite und die Team-Funktion kennen keine Speaker.
   const team = readFileSync("src/app/(product)/programm/page.tsx", "utf8");
-  assert.doesNotMatch(team, /Speaker|listEventExperts|planSpeakers/);
+  assert.doesNotMatch(team, /Speaker|listEventContacts|planSpeakers/);
   const events = readFileSync("../supabase/migrations/20270208120000_program_plan.sql", "utf8");
-  assert.doesNotMatch(events.slice(events.indexOf("get_my_program_events")), /event_experts/);
+  assert.doesNotMatch(events.slice(events.indexOf("get_my_program_events")), /event_experts|contact_events/);
 });
 
 test("Lernbereich: nur Links, nur der Inhaber schreibt, Teams sehen nur Veroeffentlichtes, keine Auswertung", () => {
@@ -667,7 +652,7 @@ test("Lernbereich fuer Teams und Personen: Freigabe der Person ist die Vorausset
 test("Planen und Lernen: Termine, Unterlagen und Lernbereich sind je ein eigener Reiter mit eigener Rueckkehr", () => {
   const page = readFileSync("src/app/(product)/advisor/organisation/page.tsx", "utf8");
   assert.match(page, /\{ key: "care", tabs: \["overview", "program", "report", "contentReport", "funding"\] \}/);
-  assert.match(page, /\{ key: "content", tabs: \["materials", "learning", "experts", "partners"\] \}/);
+  assert.match(page, /\{ key: "content", tabs: \["materials", "learning", "partners"\] \}/);
   assert.match(page, /tab === "materials" && !tabOff \? \(/);
   assert.match(page, /tab === "learning" && !tabOff \? \(/);
   // Jeder Reiter liest nur seine eigenen Daten.

@@ -487,8 +487,8 @@
       "materialsText": "Links to your storage: folders, slides, recordings. The teams see them.",
       "learningTitle": "Learning area",
       "learningText": "Modules with lessons as links, visible to all teams, selected teams or selected people you support.",
-      "expertsTitle": "Experts and speakers",
-      "expertsText": "An internal list with contact details and topics. Teams never see it.",
+      "expertsTitle": "Partners, experts and speakers",
+      "expertsText": "An internal list with contact details, topics and roles. Teams never see it.",
       "orgdataTitle": "Startup master data",
       "orgdataText": "Company name, address, contact person and more, kept by you. The team sees it read-only.",
       "successTitle": "Results",
@@ -556,7 +556,7 @@
       },
       "plan": {
         "label": "Manage events, formats and materials",
-        "hint": "Change the calendar, program plan, materials, experts and learning area."
+        "hint": "Change the calendar, program plan, materials and learning area."
       },
       "teams": {
         "label": "Admit startups and set contact people",
@@ -903,7 +903,7 @@
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Care | Content for the teams | Set up",
       "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile | Content report | Partners",
+      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile | Content report | Partners",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
       "statTeams": "Teams in the program",
@@ -1125,7 +1125,7 @@
     "planAttendanceOpen": "Show teams",
     "planSpeakers": "Speakers",
     "planSpeakersEdit": "Assign speakers",
-    "planSpeakersNone": "No one in the list yet. Add people under \"Experts\", then choose here.",
+    "planSpeakersNone": "Nobody in the list yet. Add people under “Partners”, then choose here.",
     "planSpeakersNote": "Only your organization sees this. Teams see the event, but no speaker names.",
     "planAttendanceEmpty": "No teams with an active program.",
     "attend_present": "Present",
@@ -1286,30 +1286,6 @@
     "myLearningText": "Learning content that your organization or your advisor has unlocked for you. A click opens the address in a new tab, where the rules of that service apply.",
     "myMaterialsTitle": "Program materials",
     "myMaterialsText": "Your organization linked these for the program.",
-    "expertsTitle": "Experts and speakers",
-    "expertsText": "Your internal list: contact, topic and the link to the storage for offers and invoices. The teams in the program do not see it.",
-    "expertsPrivacy": "This holds data of third parties who have no Made2Found account. As an organization you are responsible for this data yourselves: inform the people, keep your privacy policy up to date and delete entries on request. Made2Found only provides the field and does not do this for you. Enter only what you need, and no prices or invoices, only the link to your storage.",
-    "expertsSearch": "Search (name, topic, company, note)",
-    "expertsSearchGo": "Search",
-    "expertsEmpty": "Nobody added yet.",
-    "expertsNone": "Nothing found.",
-    "expertsNew": "Add a person",
-    "expertsEdit": "Edit",
-    "expertsSave": "Save",
-    "expertsDelete": "Delete person",
-    "expertsArchive": "Mark as not active",
-    "expertsRestore": "Set active again",
-    "expertsArchived": "Not active ({count})",
-    "expertsName": "Name",
-    "expertsTopic": "Topic",
-    "expertsCompany": "Company",
-    "expertsWebsite": "Website",
-    "expertsEmail": "Email",
-    "expertsPhone": "Phone",
-    "expertsOfferLink": "Storage for offers and invoices",
-    "expertsOfferLinkHint": "Only a link to your own storage. Made2Found stores no files and no amounts.",
-    "expertsNote": "Note (for example: other offers such as 1:1 coaching)",
-    "expertsError": "The entry could not be saved. A name is required, addresses must start with https://, and only the owner can add entries.",
     "rsvpQuestion": "Are you coming?",
     "rsvp_yes": "I'm coming",
     "rsvp_no": "I can't make it",
@@ -1440,8 +1416,7 @@
     "teamTasks": "Tasks for this team",
     "teamDates": "Dates and attendance",
     "tabTasks": "Tasks",
-    "tabGoals": "Goals",
-    "planPartners": "From the partner list"
+    "tabGoals": "Goals"
   },
   "programPage": {
     "title": "Program page",
@@ -2897,8 +2872,8 @@
     "footnote": "The report only reads what has been entered. It does not rate people; results are optional numbers about the post."
   },
   "partners": {
-    "title": "Partners, investors, speakers",
-    "intro": "Your internal list. Only members with the “People” right see it. Teams, guests and other organizations never do, and nothing from it appears in Connect.",
+    "title": "Partners, experts, speakers",
+    "intro": "Your one internal list for everyone you work with: partners, investors, speakers, mentors and experts. Only members with the “People” right see it. Teams, guests and other organizations never do, and nothing from it appears in Connect.",
     "add": "Entry",
     "noRight": "The partner list is only visible to members with the “People” right. The organization's admins can give it to you.",
     "unnamed": "Unnamed",
@@ -2913,7 +2888,8 @@
       "investor": "Investors",
       "speaker": "Speakers",
       "mentor": "Mentors",
-      "other": "Other"
+      "other": "Other",
+      "expert": "Experts"
     },
     "kindsHint": "Up to three types per entry.",
     "statuses": {
@@ -2934,7 +2910,12 @@
       "status": "Status",
       "owner": "Looked after by",
       "nobody": "Nobody",
-      "notes": "Note"
+      "notes": "Note",
+      "topic": "Topic or focus",
+      "topicPlaceholder": "For example: data protection, energy, early-stage funding",
+      "more": "More: storage for offers and invoices",
+      "offerLink": "Storage for offers and invoices",
+      "offerLinkHint": "Just a link to your own storage. Made2Found stores no files and no amounts."
     },
     "save": "Save",
     "close": "Close",
@@ -2951,6 +2932,6 @@
     "eventRemove": "Remove",
     "hiddenEvent": "Event",
     "ownerLine": "Looked after by: {name}",
-    "footnote": "No history, no rating, no ranking. This is personal data: it lives only here and can be deleted at any time."
+    "footnote": "No history, no rating, no ranking. This holds data of third parties who have no Made2Found account. As an organization you are responsible for this data yourselves: inform the people, keep your privacy policy up to date and delete entries on request. Enter only what you need, and no prices or invoices, only the link to your storage."
   }
 }

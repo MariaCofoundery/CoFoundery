@@ -65,7 +65,7 @@ test("jede Seite markiert genau eine Station", () => {
     ["/advisor/einladen", null, "follow"],
     ["/team-intake/abc", null, "follow"],
     ["/advisor/organisation", "materials", "content"],
-    ["/advisor/organisation", "experts", "content"],
+    ["/advisor/organisation", "partners", "content"],
     ["/events", null, "events"],
     ["/events/neu", null, "events"],
     ["/advisor/organisation", "members", "setup"],

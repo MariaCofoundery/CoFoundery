@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(16);
+select extensions.plan(21);
 
 -- 1 Admin (Inhaber), 2 Advisor (Recht people ausgeschaltet), 3 Fremde.
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
@@ -46,19 +46,34 @@ select extensions.is((select key_dates -> 0 ->> 'label' from public.advisor_org_
 select extensions.throws_ok($$select public.set_org_campaign_details('ef200000-0000-4000-8000-0000000000c0', 'ef200000-0000-4000-8000-0000000000e1', null, null, '[]'::jsonb)$$, '22023', 'org_post_invalid', 'a brand of another organization is refused');
 
 -- Partnerliste: nur mit dem Recht people.
-select extensions.throws_ok($$select public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'Lena Roth', array['investor'], null, null, null, null, null, 'asked', null)$$, '42501', 'contact_not_yours', 'an advisor without the people right cannot add contacts');
+select extensions.throws_ok($$select public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'Lena Roth', array['investor'], null, null, null, null, null, 'asked', null, null, null)$$, '42501', 'contact_not_yours', 'an advisor without the people right cannot add contacts');
 
 set local request.jwt.claims = '{"sub":"ef200000-0000-4000-8000-000000000001","role":"authenticated"}';
 create temp table ids (key text primary key, id uuid);
 grant select, insert on ids to authenticated;
-insert into ids values ('c', public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'Lena Roth', array['investor','speaker'], 'Nordkapital', 'lena@example.com', null, 'https://nordkapital.example', 'Notiz', 'talking', 'ef200000-0000-4000-8000-000000000001'));
+insert into ids values ('c', public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'Lena Roth', array['investor','speaker'], 'Nordkapital', 'lena@example.com', null, 'https://nordkapital.example', 'Notiz', 'talking', 'ef200000-0000-4000-8000-000000000001', 'Energie', 'https://ablage.example/x'));
 select extensions.is((select count(*)::int from public.advisor_org_contacts), 1, 'the owner reads and writes the list');
-select extensions.throws_ok($$select public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'X', array['gott'], null, null, null, null, null, 'asked', null)$$, '22023', 'contact_invalid', 'only known kinds');
+select extensions.throws_ok($$select public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'X', array['gott'], null, null, null, null, null, 'asked', null, null, null)$$, '22023', 'contact_invalid', 'only known kinds');
 
 set local request.jwt.claims = '{"sub":"ef200000-0000-4000-8000-000000000002","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.advisor_org_contacts), 0, 'members without the people right do not see the list');
 set local request.jwt.claims = '{"sub":"ef200000-0000-4000-8000-000000000003","role":"authenticated"}';
 select extensions.is((select count(*)::int from public.advisor_org_contacts), 0, 'other organizations do not see the list');
+
+-- Eine Liste: Rolle "Experte", Thema und Ablage-Link, Speaker je Veranstaltung.
+reset role;
+insert into public.team_program_events(id, org_id, title, starts_at) values ('ef200000-0000-4000-8000-0000000000f1', 'ef200000-0000-4000-8000-0000000000a0', 'Demo Day', now() + interval '10 days');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"ef200000-0000-4000-8000-000000000001","role":"authenticated"}';
+insert into ids values ('x', public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'Experte Eins', array['expert'], 'Kanzlei', null, null, null, null, 'active', null, 'Datenschutz', 'https://ablage.example/rechnung'));
+select extensions.is((select topic from public.advisor_org_contacts where id = (select id from ids where key = 'x')), 'Datenschutz', 'the expert role keeps topic');
+select extensions.throws_ok($$select public.save_org_contact(null, 'ef200000-0000-4000-8000-0000000000a0', 'X', array['expert'], null, null, null, null, null, 'active', null, null, 'http://unsicher.example')$$, '22023', 'contact_invalid', 'the offer link must be https');
+select public.set_event_contacts('ef200000-0000-4000-8000-0000000000f1', array[(select id from ids where key = 'c'), (select id from ids where key = 'x')]);
+select extensions.is((select count(*)::int from public.advisor_org_contact_events where event_id = 'ef200000-0000-4000-8000-0000000000f1'), 2, 'speakers are assigned to the event');
+select public.set_event_contacts('ef200000-0000-4000-8000-0000000000f1', array[(select id from ids where key = 'x')]);
+select extensions.is((select count(*)::int from public.advisor_org_contact_events where event_id = 'ef200000-0000-4000-8000-0000000000f1'), 1, 'assigning again replaces the set');
+set local request.jwt.claims = '{"sub":"ef200000-0000-4000-8000-000000000002","role":"authenticated"}';
+select extensions.throws_ok($$select public.set_event_contacts('ef200000-0000-4000-8000-0000000000f1', array[]::uuid[])$$, '42501', 'contact_not_yours', 'members without the people right cannot assign speakers');
 
 select * from extensions.finish();
 rollback;
