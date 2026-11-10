@@ -101,7 +101,9 @@
       "radar": "{count, plural, one {neues Signal im Problem-Radar zu prüfen} other {neue Signale im Problem-Radar zu prüfen}}",
       "highlights": "{count, plural, one {Highlight läuft in 3 Tagen aus} other {Highlights laufen in 3 Tagen aus}}",
       "open": "Öffnen",
-      "events": "{count, plural, one {Event-Vorschlag wartet auf Freigabe} other {Event-Vorschläge warten auf Freigabe}}"
+      "events": "{count, plural, one {Event-Vorschlag wartet auf Freigabe} other {Event-Vorschläge warten auf Freigabe}}",
+      "recommendationsReported": "{count, plural, one {gemeldete Empfehlung ist vom Netz und wartet auf Entscheidung} other {gemeldete Empfehlungen sind vom Netz und warten auf Entscheidung}}",
+      "recommendationsNew": "{count, plural, one {neue Empfehlung wartet auf Prüfung} other {neue Empfehlungen warten auf Prüfung}}"
     },
     "areas": {
       "title": "Bereiche",

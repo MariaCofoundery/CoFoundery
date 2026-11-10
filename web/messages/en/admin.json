@@ -101,7 +101,9 @@
       "radar": "{count, plural, one {new signal in the problem radar to review} other {new signals in the problem radar to review}}",
       "highlights": "{count, plural, one {highlight ends in 3 days} other {highlights end in 3 days}}",
       "open": "Open",
-      "events": "{count, plural, one {event suggestion waiting for approval} other {event suggestions waiting for approval}}"
+      "events": "{count, plural, one {event suggestion waiting for approval} other {event suggestions waiting for approval}}",
+      "recommendationsReported": "{count, plural, one {reported recommendation is hidden and awaits a decision} other {reported recommendations are hidden and await a decision}}",
+      "recommendationsNew": "{count, plural, one {new recommendation awaits review} other {new recommendations await review}}"
     },
     "areas": {
       "title": "Areas",
