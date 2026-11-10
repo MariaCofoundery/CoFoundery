@@ -2,9 +2,11 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectProfile } from "@/features/connect/connectData";
+import { DoorsSection } from "@/features/connect/doors/DoorsSection";
+import { listOwnDoors } from "@/features/connect/doors/doorsData";
 import { saveConnectProfileAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
-import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_REACH_MAX, CONNECT_REACH_MIN, CONNECT_ROLES } from "@/features/connect/connectTypes";
+import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_ROLES } from "@/features/connect/connectTypes";
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectCardFlow } from "@/features/connect/ConnectCardFlow";
 import { getIdentityGaps } from "@/features/profile/identityReadiness";
@@ -37,13 +39,13 @@ const ERROR_KEYS = [
 
 export default async function ConnectProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/profile");
-  const [profile, params, resources, core, tCap] = await Promise.all([getOwnConnectProfile(client, user.id), searchParams, getOwnPersonResources(client), getPersonCore(client, user.id).catch(() => null), getTranslations("capability")]);
+  const [profile, params, resources, core, tCap, doors] = await Promise.all([getOwnConnectProfile(client, user.id), searchParams, getOwnPersonResources(client), getPersonCore(client, user.id).catch(() => null), getTranslations("capability"), listOwnDoors(client, user.id)]);
   // Name, Headline und Text ueber dich kommen aus dem Kernprofil, nicht aus diesem Formular.
   const identityGaps = getIdentityGaps(core);
   const onePage = Boolean(profile);
   const sectionDone = {
     role: Boolean(profile?.network_roles?.length),
-    reach: Boolean(profile?.network_reach?.trim()),
+    reach: doors.length > 0,
     open: Boolean(profile?.open_to_formats?.length),
   };
   const continuation = params.next?.startsWith("/connect") && !params.next.includes("\\") && !params.next.startsWith("//") ? params.next : "";
@@ -75,12 +77,16 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
     <div className={onePage ? "mt-6 grid gap-6 lg:grid-cols-[170px_minmax(0,1fr)_300px]" : ""}>
     {onePage ? (
       <nav aria-label={t("profile.sections.label")} className="hidden flex-col gap-1 self-start lg:sticky lg:top-6 lg:flex">
-        {([["role", sectionDone.role], ["reach", sectionDone.reach], ["open", sectionDone.open], ["show", true]] as const).map(([id, done]) => (
+        {([["role", sectionDone.role], ["open", sectionDone.open], ["show", true]] as const).map(([id, done]) => (
           <a key={id} href={`#abschnitt-${id}`} className="flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
             <span aria-hidden="true" className={done ? "text-emerald-700" : "text-amber-700"}>{done ? "✓" : "○"}</span>
             {t(`profile.flow.titles.${id}`)}
           </a>
         ))}
+        <a href="#tueren" className="flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
+          <span aria-hidden="true" className={doors.length > 0 ? "text-emerald-700" : "text-slate-500"}>{doors.length > 0 ? "✓" : "○"}</span>
+          {t("doors.title")}
+        </a>
       </nav>
     ) : null}
     <form action={saveConnectProfileAction} noValidate className={onePage ? "min-w-0 space-y-6" : "mt-6 space-y-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6"}>
@@ -118,30 +124,6 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           {t("ventures.title")} →
         </Link>
       </section>
-
-            </div>
-          ) },
-          { id: "reach", node: (
-            <div className="grid gap-4">
-      <label className="block text-sm font-medium">
-        <span className="block text-xl font-semibold text-slate-950">{t("profile.flow.reachQ")}</span>
-        <textarea
-          name="network_reach"
-          rows={3}
-          minLength={CONNECT_REACH_MIN}
-          maxLength={CONNECT_REACH_MAX}
-          defaultValue={profile?.network_reach ?? ""}
-          className={field}
-          placeholder={t("profile.reachPlaceholder")}
-        />
-        <span className={hint}>{t("profile.reachHint")}</span>
-        {/* Abgesetzt, weil es keine Bitte um Stil ist, sondern um die Rechte
-            Dritter: Wer hier Namen nennt, traegt Angaben ueber Menschen ein,
-            die davon nichts wissen. */}
-        <span className="mt-2 block rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
-          {t("profile.reachNoNames")}
-        </span>
-      </label>
 
             </div>
           ) },
@@ -210,7 +192,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           back: t("profile.flow.back"),
           next: t("profile.flow.next"),
           stepOf: t("profile.flow.stepOf", { current: "{current}", total: "{total}" }),
-          cardTitles: { role: t("profile.flow.titles.role"), reach: t("profile.flow.titles.reach"), open: t("profile.flow.titles.open"), show: t("profile.flow.titles.show") },
+          cardTitles: { role: t("profile.flow.titles.role"), open: t("profile.flow.titles.open"), show: t("profile.flow.titles.show") },
           showTitle: t("profile.flow.showTitle"),
           missingTitle: t("profile.flow.missingTitle"),
           missingNote: t("profile.flow.missingNote"),
@@ -226,8 +208,19 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         }}
       />
     </form>
-    {onePage && profile ? <ConnectProfilePreview profile={profile} /> : null}
+    {onePage && profile ? <ConnectProfilePreview profile={profile} doors={doors} /> : null}
     </div>
+
+    {/* Tueren (Entwurf 10.11.2026): "Wen kannst du erreichen?" ersetzt das Freitextfeld. Eigene Formulare, deshalb neben dem Profilformular. */}
+    <DoorsSection
+      doors={doors}
+      doorsOpen={profile?.doors_open !== false}
+      hasProfile={Boolean(profile)}
+      status={["saved", "limit", "duplicate", "error"].includes(params.tuer ?? "") ? (params.tuer as string) : null}
+      editId={/^[0-9a-f-]{36}$/.test(params.tuer_bearbeiten ?? "") ? (params.tuer_bearbeiten as string) : null}
+      creating={params.tuer_neu === "1"}
+      oldText={profile?.network_reach?.trim() || null}
+    />
 
     {/* Die Zugaenge stehen NEBEN dem Formular und nicht darin: Sie sind keine
         Angabe, die man abschickt, sondern eine Entscheidung je Vorschlag. */}

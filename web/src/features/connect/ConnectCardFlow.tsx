@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-type CardId = "role" | "reach" | "open";
+type CardId = "role" | "open";
 type IdentityGap = "displayName" | "headline" | "bio";
 
 type Copy = {

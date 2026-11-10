@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { doorTitle } from "@/features/connect/doors/doorLabels";
+import { getDoor } from "@/features/connect/doors/doorsData";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
@@ -41,6 +43,17 @@ export default async function ConnectPersonContactPage({
   if (person.user_id === user.id) redirect("/connect/profile");
 
   const errorKey = knownKey(query.error, CONNECT_ERROR_KEYS);
+  // Kommt man von einer Tuer ("Vorstellung anfragen"), beginnt die Nachricht mit dem, wozu man Zugang sucht (aenderbar).
+  const door = /^[0-9a-f-]{36}$/.test(query.tuer ?? "") ? await getDoor(client, userId, query.tuer as string) : null;
+  const tDoors = await getTranslations("connect.doors");
+  const prefill = door
+    ? tDoors("prefill", {
+        name: person.display_name.split(" ")[0] ?? person.display_name,
+        type: doorTitle((key, values) => tDoors(key, values), door),
+        sector: door.sectorKey ? `, ${tDoors(`sectors.${door.sectorKey}`)}` : "",
+        region: door.region ? `, ${door.region}` : "",
+      })
+    : "";
 
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-9">
@@ -99,6 +112,7 @@ export default async function ConnectPersonContactPage({
                   minLength={10}
                   maxLength={500}
                   rows={6}
+                  defaultValue={prefill}
                   className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-slate-100"
                 />
                 {/* Ohne Anzeige fehlt der Anlass, den die andere Person sonst

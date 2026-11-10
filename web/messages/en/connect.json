@@ -357,7 +357,7 @@
     "more": "More: pause, end, renew",
     "todo": {
       "title": "Still open in your profile",
-      "reach": "Who you reach – a sentence or two",
+      "reach": "Whom you can reach – add a door",
       "open": "What you are open to",
       "note": "Not required: your profile is already visible. This only helps people find you."
     }
@@ -427,7 +427,6 @@
       "showTitle": "Should Connect show you?",
       "titles": {
         "role": "Who you are",
-        "reach": "Who you know",
         "open": "Open to",
         "show": "Show"
       },
@@ -1334,5 +1333,143 @@
       "done": "Decision saved."
     },
     "pendingCount": "{count, plural, one {# recommendation is waiting for your answer} other {# recommendations are waiting for your answer}}"
+  },
+  "doors": {
+    "title": "Whom can you reach?",
+    "intro": "Add a door: what kind of people do you know, where, and how well? No names. Only if someone asks and you say yes does it go any further. This is optional.",
+    "count": "My doors · {count} of {max}",
+    "empty": "No door yet. Even one is a start.",
+    "add": "Add a door",
+    "addAnother": "Another door",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save door",
+    "cancel": "Cancel",
+    "step1": "1 · Whom do you know? First the function …",
+    "step1b": "… then the kind of person",
+    "step2": "2 · Where?",
+    "regionPlaceholder": "For example: Leipzig, Saxony, nationwide",
+    "sector": "Industry (optional)",
+    "sectorNone": "Any",
+    "step3": "3 · How close?",
+    "note": "One sentence on it (optional, 140 characters)",
+    "noteHint": "Please no names of people or companies. This is about the kind of person, not specific people. The people named have not agreed.",
+    "otherLabel": "What kind of people? (short)",
+    "pickType": "Pick a function first.",
+    "limit": "You have five doors. Delete one to add another.",
+    "error": "That did not work. Choose a kind of person and how close.",
+    "duplicate": "You already have this door.",
+    "saved": "Saved.",
+    "open": {
+      "label": "Accept introductions",
+      "on": "On: others can ask for an introduction.",
+      "off": "Paused: your doors stay visible, but nobody can ask.",
+      "pause": "Pause",
+      "resume": "Accept again"
+    },
+    "oldText": "Your earlier text for “Whom do you know?”",
+    "oldTextHint": "It is no longer shown. Move it into doors; after that you can forget it.",
+    "closeness": {
+      "personal": {
+        "label": "Persönlich",
+        "text": "We know each other, I can write directly."
+      },
+      "introduce": {
+        "label": "Introduction possible",
+        "text": "I know the person well enough to introduce you."
+      },
+      "via": {
+        "label": "Through someone",
+        "text": "I know how to get there, but not directly."
+      }
+    },
+    "groups": {
+      "money": "Money",
+      "customers": "Customers & purchasing",
+      "programs": "Programs & network",
+      "legal": "Legal, tax & protection",
+      "team": "Team & talent",
+      "tech": "Tech & product",
+      "reach": "Market & reach",
+      "research": "Research & knowledge",
+      "public": "Public sector",
+      "international": "International",
+      "exit": "Growth & exit",
+      "peers": "Peers"
+    },
+    "types": {
+      "angel": "Business angel",
+      "vc_early": "Venture capital team (early stage)",
+      "funding_body": "Funding body or project agency",
+      "bank": "Bank, savings bank or guarantee bank",
+      "purchasing_midsize": "Purchasing at a mid-sized company",
+      "corporate_innovation": "Corporate innovation",
+      "public_procurement": "Public procurement",
+      "pilot_customer": "Pilot customer",
+      "accelerator": "Accelerator or incubator",
+      "university_hub": "University founder center",
+      "mentor": "Mentor",
+      "lawyer": "Startup lawyer",
+      "tax": "Tax advisor",
+      "privacy": "Data protection",
+      "recruiting": "Recruiting",
+      "coaching": "Team and leadership coaching",
+      "cto_level": "CTO level",
+      "ai_expert": "AI expertise",
+      "certification": "Certification and regulation",
+      "trade_press": "Trade press",
+      "podcast_newsletter": "Podcast and newsletter",
+      "trade_association": "Trade association",
+      "chair_institute": "Chair or institute",
+      "transfer_office": "Technology transfer office",
+      "city_admin": "City administration",
+      "state_ministry": "State ministry",
+      "chamber": "Chamber (IHK, HWK)",
+      "export_support": "Export support",
+      "ma_advisor": "M&A advisory",
+      "board": "Advisory or supervisory board",
+      "founders_in_sector": "Founders in my industry",
+      "serial_founder": "Serial founder",
+      "program_alumni": "Alumni of a program",
+      "other": "Other"
+    },
+    "sectors": {
+      "health": "Health and care",
+      "industry": "Industry",
+      "energy": "Energy",
+      "mobility": "Mobility",
+      "education": "Education",
+      "construction": "Construction and real estate",
+      "agri_food": "Agriculture and food",
+      "finance": "Finance",
+      "retail": "Retail",
+      "media_culture": "Media and culture",
+      "public_sector": "Public sector",
+      "software": "Software in general",
+      "sustainability": "Sustainability and climate"
+    },
+    "card": {
+      "ask": "Ask for an introduction",
+      "paused": "Paused right now · not taking introductions"
+    },
+    "search": {
+      "title": "Access to …",
+      "hint": "Choose whom you want access to. You see who knows someone there and ask for an introduction. Sorted by recency, never by fit.",
+      "group": "Function",
+      "type": "Kind of person",
+      "allTypes": "All kinds in the group",
+      "region": "Region",
+      "show": "Show doors",
+      "reset": "Reset",
+      "results": "{count, plural, =0 {No doors} one {One door} other {# doors}} in the network, newest first",
+      "none": "No door matches yet. Try another kind or fewer filters.",
+      "footnote": "You never see whom someone knows. You only see the kind of person, the area and how close."
+    },
+    "person": {
+      "title": "Can open doors"
+    },
+    "prefill": "Hello {name}, I am looking for access to: {type}{sector}{region}. What for and why, in two sentences: ",
+    "ownTitle": "Your doors",
+    "previewEmpty": "No door yet"
   }
 }

@@ -20,10 +20,13 @@ test("das Formular bleibt eines: Karten werden versteckt, nicht entfernt", () =>
 
 test("alle bisherigen Felder und Zustimmungen sind noch im Formular, jede für sich", () => {
   const page = code(PAGE);
-  for (const name of ["network_roles", "network_reach", "open_to_formats", "suggestable", "highlightable", "contact_note"]) {
+  for (const name of ["network_roles", "open_to_formats", "suggestable", "highlightable", "contact_note"]) {
     assert.match(page, new RegExp(`name="${name}"`), `${name} fehlt`);
   }
   assert.match(page, /<ConnectVisibilityField/);
+  // "Wen kennst du?" steht nicht mehr im Formular, sondern als Tueren daneben (eigene Formulare).
+  assert.match(page, /<DoorsSection/);
+  assert.doesNotMatch(page, /name="network_reach"/);
   // Keine Zustimmung wird aus einer anderen abgeleitet.
   assert.doesNotMatch(code(FLOW), /suggestable|highlightable|visibility|confirm_public/);
 });

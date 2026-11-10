@@ -5,6 +5,9 @@ import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { getConnectPeople } from "@/features/connect/connectPeopleData";
+import { parseDoorFilters } from "@/features/connect/doors/doorCatalog";
+import { DoorSearch } from "@/features/connect/doors/DoorSearch";
+import { searchDoors } from "@/features/connect/doors/doorsData";
 import {
   CONNECT_OPEN_TO_FORMATS,
   CONNECT_REMOTE_MODES,
@@ -34,7 +37,10 @@ export default async function ConnectPeoplePage({
   const [t, filters] = await Promise.all([getTranslations("connect"), searchParams]);
   const { client, user } = await requireConnectMember("/connect/people");
 
-  const peopleRows = await getConnectPeople(client, user.id, filters);
+  // "Zugang zu ..." (Tueren): ist der Filter gesetzt, zeigt die Seite Tueren statt Personen.
+  const doorFilters = parseDoorFilters(filters);
+  const doorResults = doorFilters ? await searchDoors(client, doorFilters) : null;
+  const peopleRows = doorFilters ? [] : await getConnectPeople(client, user.id, filters);
   const people = peopleRows.slice(0, CONNECT_PAGE_SIZE);
 
   const activeFilters = FILTER_KEYS.filter((key) => (filters[key] ?? "").trim().length > 0);
@@ -50,6 +56,10 @@ export default async function ConnectPeoplePage({
           </div>
         </header>
 
+        <DoorSearch filters={doorFilters} results={doorResults} />
+
+        {doorFilters ? null : (
+        <>
         <form className={card}>
           <input
             name="q"
@@ -248,8 +258,10 @@ export default async function ConnectPeoplePage({
             )}
           </section>
         )}
+        </>
+        )}
       </div>
-    <ConnectPagination path="/connect/people" filters={filters} count={peopleRows.length} />
+    {doorFilters ? null : <ConnectPagination path="/connect/people" filters={filters} count={peopleRows.length} />}
 </main>
   );
 }

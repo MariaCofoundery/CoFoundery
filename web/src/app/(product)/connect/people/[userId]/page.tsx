@@ -1,4 +1,6 @@
 import { getConnectValues } from "@/features/values/valuesData";
+import { PersonDoors } from "@/features/connect/doors/PersonDoors";
+import { listDoorsOf } from "@/features/connect/doors/doorsData";
 import { valueName } from "@/features/values/valuesModel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -167,6 +169,9 @@ export default async function ConnectPersonPage({
           ) : null}
         </section>
       ) : null}
+
+      {/* Tueren: wen diese Person erreichen kann, jede mit "Vorstellung anfragen". */}
+      {!isOwn ? <PersonDoors userId={person.user_id} doors={await listDoorsOf(client, person.user_id)} card={card} label={LABEL} /> : null}
 
       {/* -------------------------------------------------------------------
           Die Unternehmen. Auf der Personenkarte stand bisher "2 Unternehmen"

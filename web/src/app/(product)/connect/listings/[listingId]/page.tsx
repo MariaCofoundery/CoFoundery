@@ -1,4 +1,6 @@
 import Link from "next/link"; import { notFound } from "next/navigation"; import { getLocale, getTranslations } from "next-intl/server";
+import { doorTitle } from "@/features/connect/doors/doorLabels";
+import { listDoorsOf } from "@/features/connect/doors/doorsData";
 import { requireConnectMember } from "@/features/connect/connectAccess"; import { getConnectBlockState, getConnectListing, countContactRequestsForListing, getOwnContactRequestForListing, hasActiveConnectProfile } from "@/features/connect/connectData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
 import type { ConnectProfile } from "@/features/connect/connectTypes";
@@ -13,7 +15,7 @@ import { ListingAiSection } from "@/features/connect/ListingAiSection";
 import { UserText } from "@/features/ui/UserText";
 export default async function ListingDetail({ params, searchParams }: { params: Promise<{listingId:string}>; searchParams: Promise<Record<string,string|undefined>> }) {
   const { listingId } = await params; const [t, locale, query] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]); const { client, user } = await requireConnectMember(`/connect/listings/${listingId}`); const listing = await getConnectListing(client, listingId); if (!listing) notFound();
-  const profileValue = listing.network_profiles; const profile = (Array.isArray(profileValue) ? profileValue[0] : profileValue) as ConnectProfile | null;
+  const profileValue = listing.network_profiles; const tDoors = await getTranslations("connect.doors"); const profile = (Array.isArray(profileValue) ? profileValue[0] : profileValue) as ConnectProfile | null; const ownerDoors = profile ? await listDoorsOf(client, profile.user_id) : [];
   const own = listing.owner_user_id === user.id;
   // Bedingungen prueft get_disclosed_capability; nur beim eigenen Eintrag wird gar nicht gefragt.
   const disclosedCapability = own ? [] : await getDisclosedCapability(client, listing.owner_user_id, "connect");
@@ -130,10 +132,12 @@ export default async function ListingDetail({ params, searchParams }: { params: 
                   </div>
                 </div>
               ) : null}
-              {profile.network_reach ? (
+              {ownerDoors.length > 0 ? (
                 <div>
-                  <p className={LABEL}>{t("profile.reachHeading")}</p>
-                  <p className="mt-1 text-[15px] leading-7 text-[#0b1f3a]">{profile.network_reach}</p>
+                  <p className={LABEL}>{tDoors("person.title")}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {ownerDoors.map((door) => <span key={door.id} className="rounded-full bg-[#efeafd] px-2.5 py-0.5 text-[13px] font-semibold text-[#4a2fb8]">{doorTitle((key, values) => tDoors(key, values), door)}</span>)}
+                  </div>
                 </div>
               ) : null}
               {profile.contact_note ? (

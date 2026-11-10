@@ -79,24 +79,28 @@ test("they stay inside: the public projection does not carry them", () => {
 
 test("they are shown where the decision to write is made", () => {
   const listing = source("src/app/(product)/connect/listings/[listingId]/page.tsx");
-  for (const field of ["open_to_formats", "network_reach", "contact_note"]) {
+  for (const field of ["open_to_formats", "contact_note"]) {
     assert.match(listing, new RegExp(`profile\\.${field}`), `${field} fehlt an der Anzeige`);
   }
+  // Statt "Kennt Menschen aus" (Freitext) stehen die Tueren der Person da.
+  assert.match(listing, /listDoorsOf\(client, profile\.user_id\)/);
+  assert.doesNotMatch(listing, /network_reach/);
 });
 
-test("the reach field asks for kinds of people, not names", () => {
-  const page = source("src/app/(product)/connect/profile/page.tsx");
-  assert.match(page, /profile\.reachNoNames/);
-  // Abgesetzt dargestellt: Es ist keine Stilbitte, sondern eine Frage der
-  // Rechte Dritter - wer hier Namen nennt, traegt Angaben ueber Menschen ein,
-  // die davon nichts wissen.
-  assert.match(page, /reachNoNames[\s\S]{0,80}|bg-amber-50[\s\S]{0,120}reachNoNames/);
+test("the doors ask for kinds of people, not names - the note says why", () => {
+  const form = source("src/features/connect/doors/DoorForm.tsx");
+  assert.match(form, /copy\.noteHint/);
+  // Abgesetzt dargestellt: Es ist keine Stilbitte, sondern eine Frage der Rechte Dritter.
+  assert.match(form, /bg-amber-50[\s\S]{0,160}copy\.noteHint/);
+  // Das alte Freitextfeld wird nicht mehr geschrieben und nicht mehr angezeigt.
+  assert.doesNotMatch(source("src/features/connect/connectValidation.ts").replace(/\/\/.*$/gm, ""), /network_reach/);
+  assert.doesNotMatch(source("src/features/connect/ConnectProfilePreview.tsx"), /network_reach/);
 
   for (const locale of ["de", "en"]) {
-    const profile = readJson(`messages/${locale}/connect.json`).profile as Record<string, string>;
-    assert.equal(typeof profile.reachNoNames, "string", `${locale}: Hinweis fehlt`);
+    const doors = readJson(`messages/${locale}/connect.json`).doors as Record<string, string>;
+    assert.equal(typeof doors.noteHint, "string", `${locale}: Hinweis fehlt`);
   }
-  const de = (readJson("messages/de/connect.json").profile as Record<string, string>).reachNoNames;
+  const de = (readJson("messages/de/connect.json").doors as Record<string, string>).noteHint;
   assert.match(de, /keine Namen/);
   assert.match(de, /nicht zugestimmt/, "der Grund gehoert dazu, nicht nur das Verbot");
 });

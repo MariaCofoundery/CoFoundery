@@ -357,7 +357,7 @@
     "more": "Mehr: pausieren, beenden, verlängern",
     "todo": {
       "title": "Noch offen im Profil",
-      "reach": "Wen du erreichst – ein, zwei Sätze",
+      "reach": "Wen du erreichen kannst – eine Tür anlegen",
       "open": "Wofür du offen bist",
       "note": "Kein Zwang: Dein Profil ist schon sichtbar. Das hilft nur beim Finden."
     }
@@ -427,7 +427,6 @@
       "showTitle": "Soll Connect dich zeigen?",
       "titles": {
         "role": "Wer du bist",
-        "reach": "Wen du kennst",
         "open": "Ansprechbar",
         "show": "Zeigen"
       },
@@ -1334,5 +1333,143 @@
       "done": "Entscheidung gespeichert."
     },
     "pendingCount": "{count, plural, one {# Empfehlung wartet auf deine Antwort} other {# Empfehlungen warten auf deine Antwort}}"
+  },
+  "doors": {
+    "title": "Wen kannst du erreichen?",
+    "intro": "Lege eine Tür an: Was für Menschen kennst du, wo, und wie gut? Keine Namen. Nur wenn jemand anfragt und du Ja sagst, geht es weiter. Das ist freiwillig.",
+    "count": "Meine Türen · {count} von {max}",
+    "empty": "Noch keine Tür. Mit einer ist schon etwas gewonnen.",
+    "add": "Tür anlegen",
+    "addAnother": "Noch eine Tür",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "save": "Tür speichern",
+    "cancel": "Abbrechen",
+    "step1": "1 · Wen kennst du? Erst die Funktion …",
+    "step1b": "… dann die Art von Mensch",
+    "step2": "2 · Wo?",
+    "regionPlaceholder": "Zum Beispiel: Leipzig, Sachsen, Deutschlandweit",
+    "sector": "Branche (optional)",
+    "sectorNone": "Egal",
+    "step3": "3 · Wie nah?",
+    "note": "Ein Satz dazu (freiwillig, 140 Zeichen)",
+    "noteHint": "Bitte keine Namen von Personen oder Firmen. Es geht um die Art von Mensch, nicht um konkrete Menschen. Die Genannten haben nicht zugestimmt.",
+    "otherLabel": "Was für Menschen? (kurz)",
+    "pickType": "Wähle zuerst eine Funktion.",
+    "limit": "Du hast fünf Türen. Lösche eine, um eine neue anzulegen.",
+    "error": "Das hat nicht geklappt. Wähle eine Art von Mensch und eine Nähe.",
+    "duplicate": "Diese Tür gibt es schon.",
+    "saved": "Gespeichert.",
+    "open": {
+      "label": "Vorstellungen annehmen",
+      "on": "An: andere können eine Vorstellung anfragen.",
+      "off": "Pausiert: deine Türen bleiben sichtbar, aber niemand kann anfragen.",
+      "pause": "Pausieren",
+      "resume": "Wieder annehmen"
+    },
+    "oldText": "Dein bisheriger Text zu „Wen kennst du?“",
+    "oldTextHint": "Er wird nicht mehr angezeigt. Übertrage ihn in Türen; danach kannst du ihn vergessen.",
+    "closeness": {
+      "personal": {
+        "label": "Persönlich",
+        "text": "Wir kennen uns, ich kann direkt schreiben."
+      },
+      "introduce": {
+        "label": "Vorstellung möglich",
+        "text": "Ich kenne die Person gut genug, um dich vorzustellen."
+      },
+      "via": {
+        "label": "Über jemanden",
+        "text": "Ich weiß, wie man hinkommt, aber nicht direkt."
+      }
+    },
+    "groups": {
+      "money": "Geld",
+      "customers": "Kunden & Einkauf",
+      "programs": "Programme & Netzwerk",
+      "legal": "Recht, Steuern & Schutz",
+      "team": "Team & Talente",
+      "tech": "Technik & Produkt",
+      "reach": "Markt & Reichweite",
+      "research": "Forschung & Wissen",
+      "public": "Öffentliche Hand",
+      "international": "International",
+      "exit": "Wachstum & Exit",
+      "peers": "Peers"
+    },
+    "types": {
+      "angel": "Business Angel",
+      "vc_early": "Venture-Capital-Team (früh)",
+      "funding_body": "Förderstelle oder Projektträger",
+      "bank": "Bank, Sparkasse oder Bürgschaftsbank",
+      "purchasing_midsize": "Einkauf im Mittelstand",
+      "corporate_innovation": "Konzern-Innovation",
+      "public_procurement": "Öffentliche Beschaffung",
+      "pilot_customer": "Pilotkunde",
+      "accelerator": "Accelerator oder Inkubator",
+      "university_hub": "Gründungszentrum Hochschule",
+      "mentor": "Mentor:in",
+      "lawyer": "Startup-Anwält:in",
+      "tax": "Steuerberatung",
+      "privacy": "Datenschutz",
+      "recruiting": "Recruiting",
+      "coaching": "Coaching für Team und Führung",
+      "cto_level": "CTO-Ebene",
+      "ai_expert": "KI-Expertise",
+      "certification": "Zertifizierung und Regulatorik",
+      "trade_press": "Fachpresse",
+      "podcast_newsletter": "Podcast und Newsletter",
+      "trade_association": "Branchenverband",
+      "chair_institute": "Lehrstuhl oder Institut",
+      "transfer_office": "Transferstelle",
+      "city_admin": "Stadtverwaltung",
+      "state_ministry": "Landesministerium",
+      "chamber": "Kammer (IHK, HWK)",
+      "export_support": "Exportförderung",
+      "ma_advisor": "M&A-Beratung",
+      "board": "Beirat oder Aufsichtsrat",
+      "founders_in_sector": "Gründer:innen in meiner Branche",
+      "serial_founder": "Serial Founder",
+      "program_alumni": "Alumni eines Programms",
+      "other": "Anderes"
+    },
+    "sectors": {
+      "health": "Gesundheit und Pflege",
+      "industry": "Industrie",
+      "energy": "Energie",
+      "mobility": "Mobilität",
+      "education": "Bildung",
+      "construction": "Bau und Immobilien",
+      "agri_food": "Landwirtschaft und Ernährung",
+      "finance": "Finanzen",
+      "retail": "Handel",
+      "media_culture": "Medien und Kultur",
+      "public_sector": "Öffentlicher Sektor",
+      "software": "Software allgemein",
+      "sustainability": "Nachhaltigkeit und Klima"
+    },
+    "card": {
+      "ask": "Vorstellung anfragen",
+      "paused": "Gerade pausiert · nimmt keine Vorstellungen an"
+    },
+    "search": {
+      "title": "Zugang zu …",
+      "hint": "Wähle, zu wem du Zugang suchst. Du siehst, wer dort jemanden kennt, und fragst eine Vorstellung an. Sortiert wird nach Aktualität, nie nach Passung.",
+      "group": "Funktion",
+      "type": "Art von Mensch",
+      "allTypes": "Alle Arten der Gruppe",
+      "region": "Region",
+      "show": "Türen zeigen",
+      "reset": "Zurücksetzen",
+      "results": "{count, plural, =0 {Keine Türen} one {Eine Tür} other {# Türen}} im Netzwerk, neueste zuerst",
+      "none": "Dazu gibt es noch keine Tür. Versuch eine andere Art oder weniger Filter.",
+      "footnote": "Du siehst nie, wen jemand kennt. Du siehst nur die Art von Mensch, die Gegend und wie nah."
+    },
+    "person": {
+      "title": "Kann Türen öffnen"
+    },
+    "prefill": "Hallo {name}, ich suche Zugang zu: {type}{sector}{region}. Wofür und warum, in zwei Sätzen: ",
+    "ownTitle": "Deine Türen",
+    "previewEmpty": "Noch keine Tür"
   }
 }

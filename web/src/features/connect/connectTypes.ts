@@ -42,7 +42,10 @@ export type ConnectProfile = {
   photo_source: "profile_avatar" | "network_upload" | null;
   photo_avatar_id: string | null; photo_path: string | null;
   visibility: ConnectVisibility; public_slug: string;
+  /** Frueheres Freitextfeld "Wen kennst du?" - wird nicht mehr angezeigt (Tueren ersetzen es, 20270417120000). */
   network_reach: string | null;
+  /** Pausenschalter der Tueren: false = sichtbar, aber ohne Anfrage. */
+  doors_open?: boolean;
   open_to_formats: ConnectOpenToFormat[];
   /** Ob diese Person anderen vorgeschlagen werden darf. */
   suggestable: boolean;

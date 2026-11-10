@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listOwnDoors } from "@/features/connect/doors/doorsData";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getOwnConnectListings, getOwnConnectProfile } from "@/features/connect/connectData";
@@ -19,7 +20,7 @@ type Group = (typeof GROUPS)[number];
  */
 export default async function MyConnectPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/my");
-  const [listings, problems, profile, params] = await Promise.all([getOwnConnectListings(client, user.id), getOwnConnectProblems(client, user.id), getOwnConnectProfile(client, user.id), searchParams]);
+  const [listings, problems, profile, params, ownDoors] = await Promise.all([getOwnConnectListings(client, user.id), getOwnConnectProblems(client, user.id), getOwnConnectProfile(client, user.id), searchParams, listOwnDoors(client, user.id)]);
   const now = new Date();
   const expired = (listing: (typeof listings)[number]) => listing.status === "active" && Boolean(listing.expires_at && new Date(listing.expires_at) <= now);
   const groupOf = (listing: (typeof listings)[number]): Group => (listing.status === "completed" || expired(listing) ? "completed" : (listing.status as Group));
@@ -29,7 +30,7 @@ export default async function MyConnectPage({ searchParams }: { searchParams: Pr
   const current: Group = requested ?? (counts.active > 0 ? "active" : GROUPS.find((group) => counts[group] > 0) ?? "active");
   const rows = listings.filter((listing) => groupOf(listing) === current);
   const open = profile ? [
-    !profile.network_reach?.trim() ? t("my.todo.reach") : null,
+    ownDoors.length === 0 ? t("my.todo.reach") : null,
     !profile.open_to_formats?.length ? t("my.todo.open") : null,
   ].filter(Boolean) as string[] : [];
   const here = (status: Group) => `/connect/my?status=${status}`;

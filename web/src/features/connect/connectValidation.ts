@@ -67,7 +67,7 @@ export function parseConnectProfile(formData: FormData, identity: ConnectIdentit
     // wer anfaengt zu schreiben und es sich anders ueberlegt, soll nicht an
     // einer Fehlermeldung haengen bleiben. Die Bedingung in der Datenbank
     // faengt den Rest ab.
-    network_reach: optionalLongText(formData.get("network_reach"), 20, 400),
+    // "Wen kennst du?" als Freitext gibt es nicht mehr (Tueren, 20270417120000): die Spalte wird nicht mehr geschrieben.
     open_to_formats: formData
       .getAll("open_to_formats")
       .filter((value): value is string => isOneOf(CONNECT_OPEN_TO_FORMATS, value))
