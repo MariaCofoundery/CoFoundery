@@ -2743,5 +2743,19 @@
     "plan": "Program plan",
     "numbers": "Numbers",
     "note": "Guests do not see individual startups, people or the team room."
+  },
+  "aiTip": {
+    "title": "Tip for your startups",
+    "text": "Give the teams in your program the AI checklist – with your own note and links you recommend.",
+    "enabled": "Show the checklist to startups",
+    "enabledHint": "Teams in your active program see it with your note on their program page. Off: they see nothing of it; each team can still open the checklist itself.",
+    "note": "Your note (optional)",
+    "notePlaceholder": "For example: We recommend picking one workflow in the first month and showing it at the check-in.",
+    "links": "Tips and links",
+    "linkLabel": "Label",
+    "linkUrl": "Address",
+    "linksHint": "Only https links, up to eight.",
+    "save": "Save tip",
+    "privacy": "You do not see what your startups ticked – the checklist stays the team's business."
   }
 }

@@ -218,6 +218,11 @@
         "title": "Programm",
         "text": "Einen Programmcode eintragen oder sehen, in welchem Programm ihr seid und wer mitliest.",
         "open": "Zum Programm"
+      },
+      "aiStart": {
+        "title": "So startet ihr KI-nativ",
+        "text": "Acht Fragen zum Start, eure Werkzeuge und Abläufe: wer macht was, was läuft von allein.",
+        "open": "Checkliste öffnen"
       }
     },
     "shareDetails": "Teamfreigabe"
@@ -1498,5 +1503,112 @@
       }
     },
     "prepTitle": "Fragen für den Termin"
+  },
+  "aiStart": {
+    "title": "So startet ihr KI-nativ",
+    "eyebrow": "Team · KI",
+    "intro": "Acht Fragen, die man am Anfang einmal klärt – nicht später mühsam nachholt. Keine Pflicht, kein Ergebnis, nur eine Gedankenstütze für euer Team. Das Tool ruft dafür keine KI auf.",
+    "progress": "{done} von {total} geklärt",
+    "progressNote": "Die Leiste zeigt nur den Stand, keine Bewertung.",
+    "note": "Eure Notiz (optional)",
+    "markDone": "Erledigt",
+    "update": "Notiz speichern",
+    "markSkip": "Nicht relevant",
+    "reopen": "Wieder offen",
+    "toTools": "Zu den Werkzeugen ↓",
+    "edit": "Bearbeiten",
+    "remove": "Entfernen",
+    "save": "Speichern",
+    "saved": "Gespeichert.",
+    "error": "Das hat nicht geklappt. Bitte prüfe die Angaben.",
+    "privacy": "Haken, Notizen, Werkzeuge und Abläufe sehen nur Mitglieder eures Teams. Eine Organisation sieht sie nicht, auch wenn ihr in ihrem Programm seid.",
+    "items": {
+      "repeat": {
+        "title": "Wiederkehrendes finden",
+        "hint": "Schreibt fünf Aufgaben auf, die ihr jede Woche macht. Dort lohnt sich Automatisierung zuerst.",
+        "placeholder": "Zum Beispiel: Angebote schreiben, Termine abstimmen"
+      },
+      "data": {
+        "title": "Daten an einen Ort",
+        "hint": "Wo liegen Kundendaten, Verträge und Wissen? Ein Ort mit klaren Zugriffen ist die Grundlage für alles Weitere.",
+        "placeholder": "Zum Beispiel: gemeinsamer Ordner, CRM"
+      },
+      "owner": {
+        "title": "Eine Person verantwortlich",
+        "hint": "Wer im Team kümmert sich darum, dass KI-Abläufe gepflegt und geprüft werden?",
+        "placeholder": "Name oder Rolle"
+      },
+      "rules": {
+        "title": "Eine Teamregel, was nicht hinein darf",
+        "hint": "Personenbezogene Daten, Geschäftsgeheimnisse, Verträge: Was geben wir KI-Werkzeugen nicht?",
+        "placeholder": "Zum Beispiel: keine Kundennamen"
+      },
+      "small": {
+        "title": "Klein anfangen",
+        "hint": "Einen Ablauf wählen, zwei Wochen testen, die gesparte Zeit festhalten. Dann entscheiden, ob es bleibt.",
+        "placeholder": "Welcher Ablauf zuerst?"
+      },
+      "document": {
+        "title": "Abläufe festhalten",
+        "hint": "Gute Anweisungen und Schritte aufschreiben, damit alle im Team sie nutzen können.",
+        "placeholder": "Wo sammelt ihr sie?"
+      },
+      "review": {
+        "title": "Ergebnisse prüfen",
+        "hint": "Wer schaut vor dem Versenden oder Veröffentlichen drüber? Ein Mensch bleibt in der Verantwortung.",
+        "placeholder": "Wer prüft was?"
+      },
+      "tools": {
+        "title": "Welche Werkzeuge nutzen wir schon?",
+        "hint": "Was nutzt ihr, wer kommt wo dran, was läuft von Hand und was von allein? Das tragt ihr unten bei „Werkzeuge“ und „Abläufe“ ein.",
+        "placeholder": "Was fällt euch dabei auf?"
+      }
+    },
+    "modes": {
+      "hand": "Von Hand",
+      "part": "Teils automatisch",
+      "auto": "Automatisch"
+    },
+    "stepModes": {
+      "hand": "Von Hand",
+      "auto": "Automatisch"
+    },
+    "tools": {
+      "title": "Eure Werkzeuge",
+      "intro": "Was nutzt ihr, wofür, wer kommt dran – und wie läuft es: von Hand, teils oder ganz automatisch? Daraus seht ihr, was sich als Nächstes verbinden lässt.",
+      "none": "Noch kein Werkzeug eingetragen.",
+      "add": "Werkzeug hinzufügen",
+      "name": "Werkzeug",
+      "purpose": "Wofür",
+      "runs": "Läuft",
+      "connected": "Verbunden mit",
+      "access": "Wer kommt dran",
+      "accessNone": "niemand eingetragen",
+      "accessHint": "Nur Personen aus eurem Team. Keine Zugangsdaten eintragen.",
+      "discussTitle": "Zum Besprechen:",
+      "discuss": "Auf diese Werkzeuge kommt nur eine Person: {names}. Fällt sie aus, kommt niemand ran. Das ist keine Wertung, nur ein Gesprächsanlass."
+    },
+    "flows": {
+      "title": "Eure Abläufe: wer macht was?",
+      "intro": "Ein Ablauf besteht aus Schritten. Jeder Schritt hat eine Person oder „System“ und ist von Hand oder automatisch. So seht ihr, wo die meiste Handarbeit steckt.",
+      "add": "Ablauf hinzufügen",
+      "name": "Name des Ablaufs",
+      "namePlaceholder": "Zum Beispiel: Angebot an eine Praxis schicken",
+      "stepPlaceholder": "Schritt {number}",
+      "who": "Wer",
+      "how": "Wie",
+      "system": "System",
+      "nobody": "Niemand festgelegt",
+      "counts": "{hand, plural, one {# Schritt} other {# Schritte}} von Hand · {auto, plural, one {# läuft} other {# laufen}} automatisch"
+    },
+    "tip": {
+      "label": "Tipp von {org}",
+      "eyebrow": "Tipp von {org}",
+      "title": "So startet ihr KI-nativ",
+      "progress": "{done} von {total} geklärt",
+      "open": "Checkliste öffnen",
+      "links": "Tipps und Links",
+      "privacy": "Die Organisation sieht nicht, was ihr abgehakt habt. Sie gibt nur den Hinweis und die Links mit."
+    }
   }
 }

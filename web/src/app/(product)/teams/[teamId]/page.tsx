@@ -420,6 +420,12 @@ export default async function TeamHomebasePage({ params, searchParams }: TeamHom
               <Link href={financingHref(teamId)} className={QUIET_LINK}>{financingT("card.open")}</Link>
             </article>
             <FounderLibraryHomebaseCard teamId={teamId} />
+            <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-ai-start-title">
+              <div className="flex items-center justify-between gap-2"><IconTile name="flask" tone="teal" /></div>
+              <h3 id="team-ai-start-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("extras.aiStart.title")}</h3>
+              <p className="text-sm leading-6 text-slate-700">{t("extras.aiStart.text")}</p>
+              <Link href={`/teams/${team64}/ki-start`} className={QUIET_LINK}>{t("extras.aiStart.open")}</Link>
+            </article>
             <article className="card-lift flex flex-col gap-3 rounded-[24px] border border-[#e4e2f0] bg-white p-6" aria-labelledby="team-program-title">
               <div className="flex items-center justify-between gap-2"><IconTile name="globe" tone="blue" /></div>
               <h3 id="team-program-title" className="text-xl font-semibold leading-tight text-[#0b1f3a]">{t("extras.program.title")}</h3>

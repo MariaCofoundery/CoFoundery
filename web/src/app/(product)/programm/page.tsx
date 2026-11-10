@@ -1,3 +1,4 @@
+import { AiTipCards } from "@/features/aiStart/AiTipCards";
 import Link from "next/link";
 import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
@@ -155,6 +156,7 @@ export default async function TeamProgramPage({ searchParams }: { searchParams?:
       <TeamProgramMaterials materials={materials} />
       <TeamProgramLearning modules={learning} />
       <ProgramPeople people={programPeople} />
+      <AiTipCards client={client} />
 
       {programs.length === 0 ? (
         <p className="mt-6 text-sm text-slate-600">{t("pageEmpty")}</p>

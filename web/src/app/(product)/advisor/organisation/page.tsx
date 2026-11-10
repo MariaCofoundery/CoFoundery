@@ -1,3 +1,5 @@
+import { OrgAiTipForm } from "@/features/aiStart/OrgAiTipForm";
+import { getOrgAiTip } from "@/features/aiStart/aiStartData";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -387,6 +389,7 @@ export default async function AdvisorOrganisationPage({
             ) : (
               <p className="text-sm text-slate-600">{tAdvisor("programPage.ownerOnly")}</p>
             )}
+            {canProfile ? <OrgAiTipForm orgId={org.id} tip={await getOrgAiTip(client, org.id)} /> : null}
           </div>
         ) : null}
 

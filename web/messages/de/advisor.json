@@ -2743,5 +2743,19 @@
     "plan": "Programmplan",
     "numbers": "Zahlen",
     "note": "Gäste sehen keine einzelnen Startups, keine Personen und keinen Teamraum."
+  },
+  "aiTip": {
+    "title": "Tipp an eure Startups",
+    "text": "Gebt den Teams in eurem Programm die KI-Checkliste mit auf den Weg – mit eurem eigenen Hinweis und Links, die ihr empfehlt.",
+    "enabled": "Checkliste den Startups zeigen",
+    "enabledHint": "Teams in eurem aktiven Programm sehen sie mit eurem Hinweis auf ihrer Programmseite. Aus: Sie sehen nichts davon; jedes Team kann die Checkliste trotzdem selbst öffnen.",
+    "note": "Euer Hinweis dazu (optional)",
+    "notePlaceholder": "Zum Beispiel: Wir empfehlen, im ersten Monat einen Ablauf auszuwählen und ihn im Check-in zu zeigen.",
+    "links": "Tipps und Links",
+    "linkLabel": "Beschriftung",
+    "linkUrl": "Adresse",
+    "linksHint": "Nur https-Links, bis zu acht.",
+    "save": "Tipp speichern",
+    "privacy": "Ihr seht nicht, was eure Startups abgehakt haben – die Checkliste bleibt Sache des Teams."
   }
 }

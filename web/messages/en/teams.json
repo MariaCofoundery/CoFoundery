@@ -218,6 +218,11 @@
         "title": "Program",
         "text": "Enter a program code or see which program you are in and who reads along.",
         "open": "Go to program"
+      },
+      "aiStart": {
+        "title": "How to start AI-native",
+        "text": "Eight questions for the start, your tools and workflows: who does what, what runs by itself.",
+        "open": "Open the checklist"
       }
     },
     "shareDetails": "Team sharing"
@@ -1498,5 +1503,112 @@
       }
     },
     "prepTitle": "Questions for the meeting"
+  },
+  "aiStart": {
+    "title": "How to start AI-native",
+    "eyebrow": "Team · AI",
+    "intro": "Eight questions to settle once at the start – not to catch up on painfully later. Not mandatory, no result, just a prompt for your team. The tool does not call any AI for this.",
+    "progress": "{done} of {total} settled",
+    "progressNote": "The bar only shows progress, not a rating.",
+    "note": "Your note (optional)",
+    "markDone": "Done",
+    "update": "Save note",
+    "markSkip": "Not relevant",
+    "reopen": "Reopen",
+    "toTools": "To the tools ↓",
+    "edit": "Edit",
+    "remove": "Remove",
+    "save": "Save",
+    "saved": "Saved.",
+    "error": "That did not work. Please check your entries.",
+    "privacy": "Ticks, notes, tools and workflows are visible only to members of your team. An organization does not see them, even if you are in its program.",
+    "items": {
+      "repeat": {
+        "title": "Find what repeats",
+        "hint": "Write down five tasks you do every week. That is where automation pays off first.",
+        "placeholder": "For example: writing quotes, scheduling meetings"
+      },
+      "data": {
+        "title": "Data in one place",
+        "hint": "Where do customer data, contracts and knowledge live? One place with clear access is the basis for everything else.",
+        "placeholder": "For example: shared folder, CRM"
+      },
+      "owner": {
+        "title": "One person responsible",
+        "hint": "Who on the team makes sure AI workflows are maintained and checked?",
+        "placeholder": "Name or role"
+      },
+      "rules": {
+        "title": "A team rule for what must not go in",
+        "hint": "Personal data, trade secrets, contracts: what do we not give to AI tools?",
+        "placeholder": "For example: no customer names"
+      },
+      "small": {
+        "title": "Start small",
+        "hint": "Pick one workflow, test it for two weeks, note the time saved. Then decide whether it stays.",
+        "placeholder": "Which workflow first?"
+      },
+      "document": {
+        "title": "Write workflows down",
+        "hint": "Write down good instructions and steps so everyone on the team can use them.",
+        "placeholder": "Where do you collect them?"
+      },
+      "review": {
+        "title": "Check the results",
+        "hint": "Who looks over the result before it is sent or published? A person stays responsible.",
+        "placeholder": "Who checks what?"
+      },
+      "tools": {
+        "title": "Which tools do we already use?",
+        "hint": "What do you use, who can get into what, what runs by hand and what runs by itself? Enter that below under \"Tools\" and \"Workflows\".",
+        "placeholder": "What do you notice?"
+      }
+    },
+    "modes": {
+      "hand": "By hand",
+      "part": "Partly automatic",
+      "auto": "Automatic"
+    },
+    "stepModes": {
+      "hand": "By hand",
+      "auto": "Automatic"
+    },
+    "tools": {
+      "title": "Your tools",
+      "intro": "What do you use, for what, who can get in – and how does it run: by hand, partly or fully automatic? That shows what you could connect next.",
+      "none": "No tool entered yet.",
+      "add": "Add tool",
+      "name": "Tool",
+      "purpose": "What for",
+      "runs": "Runs",
+      "connected": "Connected to",
+      "access": "Who has access",
+      "accessNone": "nobody entered",
+      "accessHint": "Only people from your team. Do not enter credentials.",
+      "discussTitle": "To discuss:",
+      "discuss": "Only one person has access to these tools: {names}. If they are out, nobody can get in. This is not a judgment, just a prompt for a conversation."
+    },
+    "flows": {
+      "title": "Your workflows: who does what?",
+      "intro": "A workflow consists of steps. Each step has a person or \"system\" and is manual or automatic. That shows where most of the manual work is.",
+      "add": "Add workflow",
+      "name": "Name of the workflow",
+      "namePlaceholder": "For example: Send a quote to a practice",
+      "stepPlaceholder": "Step {number}",
+      "who": "Who",
+      "how": "How",
+      "system": "System",
+      "nobody": "Nobody set",
+      "counts": "{hand, plural, one {# step} other {# steps}} by hand · {auto, plural, one {# runs} other {# run}} automatically"
+    },
+    "tip": {
+      "label": "Tip from {org}",
+      "eyebrow": "Tip from {org}",
+      "title": "How to start AI-native",
+      "progress": "{done} of {total} settled",
+      "open": "Open the checklist",
+      "links": "Tips and links",
+      "privacy": "The organization does not see what you ticked. It only shares the note and the links."
+    }
   }
 }
