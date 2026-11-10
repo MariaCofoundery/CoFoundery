@@ -21,12 +21,29 @@ export const isValueKey = (value: unknown): value is ValueKey => (VALUE_KEYS as 
 export const valueName = (value: Pick<PersonValue, "key" | "label">, catalog: (key: ValueKey) => string): string =>
   value.key === "custom" ? value.label ?? "" : catalog(value.key);
 
-/** Ein Wert gilt als "gemeinsam", wenn mindestens zwei Personen denselben Katalogwert nennen. Eigene Werte zaehlen nie als gemeinsam. */
-export function sharedKeys(rows: TeamValueRow[]): ValueKey[] {
-  const byKey = new Map<ValueKey, Set<string>>();
-  for (const row of rows) if (row.key !== "custom") byKey.set(row.key, (byKey.get(row.key) ?? new Set()).add(row.userId));
-  return [...byKey.entries()].filter(([, users]) => users.size >= 2).map(([key]) => key);
+/** Gleicher Begriff heisst: gleich geschrieben, ohne Beachtung von Gross-/Kleinschreibung, Leerzeichen und Akzenten. Ein eigener Wert "ehrlichkeit" ist derselbe Begriff wie der Katalogwert Ehrlichkeit. */
+export const normalizeValueName = (name: string): string =>
+  name.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+export type ValueGroup = { name: string; rows: TeamValueRow[] };
+
+/** Die Werte des Teams nach Begriff gruppiert. */
+export function groupByName(rows: TeamValueRow[], catalog: (key: ValueKey) => string): ValueGroup[] {
+  const groups = new Map<string, ValueGroup>();
+  for (const row of rows) {
+    const name = valueName(row, catalog).trim();
+    if (!name) continue;
+    const id = normalizeValueName(name);
+    const group = groups.get(id) ?? { name, rows: [] };
+    group.rows.push(row);
+    groups.set(id, group);
+  }
+  return [...groups.values()];
 }
+
+/** Gemeinsam: mindestens zwei verschiedene Personen nennen denselben Begriff - auch wenn einer ein eigener Wert ist. */
+export const sharedGroups = (rows: TeamValueRow[], catalog: (key: ValueKey) => string): ValueGroup[] =>
+  groupByName(rows, catalog).filter((group) => new Set(group.rows.map((row) => row.userId)).size >= 2);
 
 /** Eine Person nach der anderen, jede in ihrer eigenen Reihenfolge. */
 export function groupByUser(rows: TeamValueRow[]): Map<string, TeamValueRow[]> {
@@ -35,9 +52,9 @@ export function groupByUser(rows: TeamValueRow[]): Map<string, TeamValueRow[]> {
   return grouped;
 }
 
-/** Regeln fuer die Gespraechsfragen: aus den genannten Werten, nach festen Mustern. Kein Modell, keine Bewertung. */
-export function conversationKeys(rows: TeamValueRow[]): { shared: ValueKey[]; single: ValueKey[] } {
-  const shared = sharedKeys(rows);
-  const single = [...new Set(rows.filter((row) => row.key !== "custom" && !shared.includes(row.key)).map((row) => row.key as ValueKey))];
-  return { shared, single };
+/** Regeln fuer die Gespraechsfragen: aus den genannten Begriffen, nach festen Mustern. Kein Modell, keine Bewertung. */
+export function conversationNames(rows: TeamValueRow[], catalog: (key: ValueKey) => string): { shared: string[]; single: string[] } {
+  const groups = groupByName(rows, catalog);
+  const shared = groups.filter((group) => new Set(group.rows.map((row) => row.userId)).size >= 2);
+  return { shared: shared.map((group) => group.name), single: groups.filter((group) => !shared.includes(group)).map((group) => group.name) };
 }

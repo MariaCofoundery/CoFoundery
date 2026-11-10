@@ -5,7 +5,7 @@ import { TeamUnavailable } from "@/features/access/TeamUnavailable";
 import { TeamPageHeader, getTeamLabel } from "@/features/teams/TeamPageHeader";
 import { getFounderSetup } from "@/features/teams/founderSetupData";
 import { getTeamValues } from "@/features/values/valuesData";
-import { conversationKeys, groupByUser, sharedKeys, valueName, type TeamValueRow, type ValueKey } from "@/features/values/valuesModel";
+import { conversationNames, groupByUser, sharedGroups, valueName, type ValueKey } from "@/features/values/valuesModel";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 const CARD = "rounded-3xl border border-[#e4e2f0] bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.035)] sm:p-6";
@@ -27,9 +27,8 @@ export default async function TeamValuesPage({ params }: { params: Promise<{ tea
   const catalog = (key: ValueKey) => tv(`names.${key}`);
   const nameOf = (userId: string) => data.sharing.find((entry) => entry.userId === userId)?.name || t("someone");
   const byUser = groupByUser(data.rows);
-  const sharedList = sharedKeys(data.rows);
-  const { single } = conversationKeys(data.rows);
-  const rowsOf = (key: ValueKey) => data.rows.filter((row: TeamValueRow) => row.key === key);
+  const sharedList = sharedGroups(data.rows, catalog);
+  const { shared: sharedNames, single } = conversationNames(data.rows, catalog);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-6">
@@ -56,11 +55,11 @@ export default async function TeamValuesPage({ params }: { params: Promise<{ tea
           {sharedList.length > 0 ? (
             <section aria-labelledby="shared-values" className={`${CARD} grid gap-4`}>
               <h2 id="shared-values" className="text-xl font-semibold text-[#0b1f3a]">{t("bothTitle")}</h2>
-              {sharedList.map((key) => (
-                <div key={key} className="grid gap-2 border-t border-slate-100 pt-3 sm:grid-cols-[10rem_minmax(0,1fr)]">
-                  <b className="text-[16px]">{catalog(key)}</b>
+              {sharedList.map((group) => (
+                <div key={group.name} className="grid gap-2 border-t border-slate-100 pt-3 sm:grid-cols-[10rem_minmax(0,1fr)]">
+                  <b className="text-[16px]">{group.name}</b>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {rowsOf(key).map((row) => (
+                    {group.rows.map((row) => (
                       <div key={`${row.userId}-${row.slot}`} className="rounded-xl bg-[#f7f6fb] px-3.5 py-3">
                         <b className="text-xs uppercase tracking-wide text-slate-600">{t("place", { name: nameOf(row.userId), place: row.slot })}</b>
                         <p className="mt-1 text-[14px] leading-5">{row.meaning || t("noMeaning")}</p>
@@ -96,8 +95,8 @@ export default async function TeamValuesPage({ params }: { params: Promise<{ tea
           <section aria-labelledby="values-questions" className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
             <h2 id="values-questions" className="text-xl font-semibold text-amber-950">{t("questionsTitle")}</h2>
             <ul className="mt-3 grid gap-2 pl-5 text-[14.5px] leading-6 text-amber-950 [list-style:disc]">
-              {sharedList.map((key) => <li key={`s-${key}`}>{t("questionShared", { value: catalog(key) })}</li>)}
-              {byUser.size >= 2 ? single.map((key) => <li key={`o-${key}`}>{t("questionSingle", { value: catalog(key) })}</li>) : null}
+              {sharedNames.map((name) => <li key={`s-${name}`}>{t("questionShared", { value: name })}</li>)}
+              {byUser.size >= 2 ? single.map((name) => <li key={`o-${name}`}>{t("questionSingle", { value: name })}</li>) : null}
               <li>{t("questionGeneral")}</li>
             </ul>
             <Link href={`/teams/${teamId}/setup`} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{t("toSetup")}</Link>

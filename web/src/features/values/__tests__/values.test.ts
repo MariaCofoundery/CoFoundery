@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { VALUES_MAX, VALUES_MIN, VALUE_KEYS, conversationKeys, groupByUser, sharedKeys, valueName, type TeamValueRow } from "@/features/values/valuesModel";
+import { VALUES_MAX, VALUES_MIN, VALUE_KEYS, conversationNames, groupByUser, normalizeValueName, sharedGroups, valueName, type TeamValueRow } from "@/features/values/valuesModel";
 
 /**
  * Werte (20270413120000): drei bis fuenf, eigene Reihenfolge, eigene Worte, getrennte Freigaben, keine Punkte.
@@ -24,11 +24,16 @@ test("Katalog und Grenzen gleich in Datenbank und Oberflaeche", () => {
   }
 });
 
-test("gemeinsam heisst: mindestens zwei Personen nennen denselben Katalogwert; eigene Werte zaehlen nie", () => {
-  const rows = [row("a", 1, "ehrlichkeit"), row("b", 3, "ehrlichkeit"), row("a", 2, "sinnhaftigkeit"), row("b", 1, "custom", "Freude"), row("a", 3, "custom", "Freude")];
-  assert.deepEqual(sharedKeys(rows), ["ehrlichkeit"]);
-  assert.deepEqual(conversationKeys(rows), { shared: ["ehrlichkeit"], single: ["sinnhaftigkeit"] });
+test("gemeinsam heisst: mindestens zwei Personen nennen denselben Begriff - auch als eigener Wert, ohne Gross-/Kleinschreibung und Akzente", () => {
+  const catalog = (key: string) => ({ ehrlichkeit: "Ehrlichkeit", sinnhaftigkeit: "Sinnhaftigkeit" })[key] ?? key;
+  const rows = [row("a", 1, "ehrlichkeit"), row("b", 3, "custom", " ehrlichkeit "), row("a", 2, "sinnhaftigkeit"), row("b", 1, "custom", "Freude"), row("a", 3, "custom", "FREUDE"), row("c", 1, "custom", "Einzig")];
+  assert.deepEqual(sharedGroups(rows, catalog).map((group) => group.name), ["Ehrlichkeit", "Freude"]);
+  assert.deepEqual(conversationNames(rows, catalog), { shared: ["Ehrlichkeit", "Freude"], single: ["Sinnhaftigkeit", "Einzig"] });
+  assert.equal(normalizeValueName("  Verlässlichkeit "), normalizeValueName("verlaesslichkeit"));
+  assert.equal(normalizeValueName("Qualité"), normalizeValueName("qualite"));
   assert.equal(valueName({ key: "custom", label: "Freude" }, () => "x"), "Freude");
+  // Zweimal derselbe Begriff bei einer Person zaehlt nicht als gemeinsam.
+  assert.deepEqual(sharedGroups([row("a", 1, "custom", "Mut"), row("a", 2, "custom", "mut")], catalog), []);
 });
 
 test("jede Person bleibt in ihrer eigenen Reihenfolge; Plaetze werden nirgends verglichen oder verrechnet", () => {
