@@ -223,6 +223,11 @@
         "title": "How to start AI-native",
         "text": "Eight questions for the start, your tools and workflows: who does what, what runs by itself.",
         "open": "Open the checklist"
+      },
+      "values": {
+        "title": "Your values",
+        "text": "What matters to each of you, side by side – without rating, with questions for conversation.",
+        "open": "View values"
       }
     },
     "shareDetails": "Team sharing"
@@ -1610,5 +1615,29 @@
       "links": "Tips and links",
       "privacy": "The organization does not see what you ticked. It only shares the note and the links."
     }
+  },
+  "values": {
+    "title": "Your values side by side",
+    "eyebrow": "Team · values",
+    "intro": "These are the values of the people who shared them with this team. The tool shows similarities and differences but does not rate them. Whether something fits is for you to decide in conversation.",
+    "shared": "{name}: shared",
+    "notShared": "{name}: nothing shared",
+    "you": "You",
+    "someone": "Someone",
+    "manage": "My values and sharing",
+    "empty": "Nobody has shared values with this team yet. Each person decides if and when.",
+    "bothTitle": "Several name this",
+    "place": "{name} · place {place} for this person",
+    "noMeaning": "No sentence added.",
+    "bothNote": "Same word, perhaps similar meaning. The places are each person's own order – the tool does not compare them and calculates nothing from them.",
+    "singleTitle": "Each person in their own order",
+    "singleNote": "A difference in emphasis is not a contradiction.",
+    "questionsTitle": "Questions for your conversation",
+    "questionShared": "What does \"{value}\" mean concretely for your next decision?",
+    "questionSingle": "Only one person names \"{value}\": how does it show in daily work, and what do they need from you?",
+    "questionGeneral": "How do we notice when one of our values gets neglected in daily work?",
+    "toSetup": "To the Founder Setup as a topic →",
+    "privacy": "The questions arise from the named values by fixed rules. There is no score, no fit and no ranking. An agreement in the Founder Setup only exists once everyone on the team confirms it.",
+    "onlyOne": "So far one person has shared. As soon as a second person shares their values, you will see similarities and differences here."
   }
 }

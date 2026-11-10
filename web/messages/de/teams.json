@@ -223,6 +223,11 @@
         "title": "So startet ihr KI-nativ",
         "text": "Acht Fragen zum Start, eure Werkzeuge und Abläufe: wer macht was, was läuft von allein.",
         "open": "Checkliste öffnen"
+      },
+      "values": {
+        "title": "Eure Werte",
+        "text": "Was jedem wichtig ist, nebeneinander – ohne Wertung, mit Fragen fürs Gespräch.",
+        "open": "Werte ansehen"
       }
     },
     "shareDetails": "Teamfreigabe"
@@ -1610,5 +1615,29 @@
       "links": "Tipps und Links",
       "privacy": "Die Organisation sieht nicht, was ihr abgehakt habt. Sie gibt nur den Hinweis und die Links mit."
     }
+  },
+  "values": {
+    "title": "Eure Werte nebeneinander",
+    "eyebrow": "Team · Werte",
+    "intro": "Hier stehen die Werte der Personen, die sie mit diesem Team geteilt haben. Das Tool zeigt Gemeinsamkeiten und Unterschiede, bewertet sie aber nicht. Ob etwas passt, entscheidet ihr im Gespräch.",
+    "shared": "{name}: geteilt",
+    "notShared": "{name}: nichts geteilt",
+    "you": "Du",
+    "someone": "Jemand",
+    "manage": "Meine Werte und Freigaben",
+    "empty": "Noch hat niemand Werte mit diesem Team geteilt. Jede Person entscheidet selbst, ob und wann.",
+    "bothTitle": "Das nennen mehrere",
+    "place": "{name} · bei dieser Person Platz {place}",
+    "noMeaning": "Ohne eigene Worte.",
+    "bothNote": "Gleiches Wort, vielleicht ähnliche Bedeutung. Die Plätze sind die eigene Reihenfolge jeder Person – das Tool vergleicht sie nicht und rechnet nichts daraus.",
+    "singleTitle": "Jede Person in ihrer Reihenfolge",
+    "singleNote": "Ein Unterschied in der Betonung ist kein Gegensatz.",
+    "questionsTitle": "Fragen für euer Gespräch",
+    "questionShared": "Was bedeutet „{value}“ konkret für eure nächste Entscheidung?",
+    "questionSingle": "„{value}“ nennt nur eine Person: Wie zeigt sich das im Alltag, und was braucht sie dafür von euch?",
+    "questionGeneral": "Woran merken wir, wenn einer unserer Werte im Alltag zu kurz kommt?",
+    "toSetup": "Als Gesprächsthema ins Founder Setup →",
+    "privacy": "Die Fragen entstehen aus den genannten Werten nach festen Regeln. Es gibt keine Punktzahl, keine Passung und keine Rangfolge. Eine Vereinbarung im Founder Setup entsteht erst, wenn alle im Team sie bestätigen.",
+    "onlyOne": "Bisher hat eine Person geteilt. Sobald eine zweite Person ihre Werte teilt, seht ihr hier Gemeinsamkeiten und Unterschiede."
   }
 }

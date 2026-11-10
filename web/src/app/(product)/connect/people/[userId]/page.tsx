@@ -1,3 +1,5 @@
+import { getConnectValues } from "@/features/values/valuesData";
+import { valueName } from "@/features/values/valuesModel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -41,15 +43,17 @@ export default async function ConnectPersonPage({
   const { userId } = await params;
   const { client, user } = await requireConnectMember(`/connect/people/${userId}`);
   const t = await getTranslations("connect");
+  const tValues = await getTranslations("profile.values");
 
   const person = await getConnectPerson(client, userId);
   if (!person) notFound();
 
   const isOwn = person.user_id === user.id;
-  const [ventures, listings, problems] = await Promise.all([
+  const [ventures, listings, problems, connectValues] = await Promise.all([
     getConnectVentures(client, userId),
     getActiveConnectListingsByOwner(client, userId),
     getActiveConnectProblemsByAuthor(client, userId),
+    getConnectValues(client, userId),
   ]);
 
   // Verborgene Unternehmen sieht nur die eigene Person - das entscheidet die
@@ -116,6 +120,15 @@ export default async function ConnectPersonPage({
       {person.bio ? (
         <section className={`${card} mt-6`}>
           <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]"><UserText text={person.bio} /></p>
+        </section>
+      ) : null}
+
+      {connectValues.length > 0 ? (
+        <section className={`${card} mt-4`} aria-label={tValues("connectTitle")}>
+          <h2 className={LABEL}>{tValues("connectTitle")}</h2>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {connectValues.map((value, index) => <li key={index} className="rounded-full bg-violet-50 px-3 py-1 text-[13.5px] font-semibold text-violet-900">{valueName(value, (key) => tValues(`names.${key}`))}</li>)}
+          </ul>
         </section>
       ) : null}
 

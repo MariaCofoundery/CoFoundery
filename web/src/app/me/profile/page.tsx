@@ -153,6 +153,7 @@ export default async function FounderProfilePage({
   // DIE DATEN LIEGEN WOANDERS - seit dem 01.10.2026 in `profileReadModel.ts`.
   // Diese Seite und die Druckfassung zeigen dasselbe Bild; zweimal geladen
   // hiesse, zwei Staende derselben Sache zu pflegen, und zwar lautlos.
+  const tValues = await getTranslations("profile.values");
   const [t, tCapability, tDirection, tNote, modell] = await Promise.all([
     getTranslations("profile.founderProfile"),
     getTranslations("capability"),
@@ -980,6 +981,13 @@ export default async function FounderProfilePage({
           )
         )}
       </ProfilePart>
+
+      {/* Werte (10.11.2026): eigene Seite - die Freigabe ist einzeln und steht dort. */}
+      <section aria-labelledby="profile-values-title" className="mt-8 rounded-[24px] border border-[#e4e2f0] bg-white p-6 print:hidden">
+        <h2 id="profile-values-title" className="text-xl font-semibold text-[#0b1f3a]">{tValues("title")}</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-700">{tValues("profileText")}</p>
+        <Link href="/me/profile/werte" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{tValues("profileOpen")}</Link>
+      </section>
 
       {/* ==================================================================
           ANHANG: wer was sieht, Details & Methodik, fruehere Fassungen
