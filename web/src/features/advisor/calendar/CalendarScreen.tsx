@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -31,6 +32,9 @@ import {
   type CalendarLayer,
   type CalendarView,
 } from "@/features/advisor/calendar/calendarModel";
+import { HOLIDAY_STATES } from "@/features/advisor/calendar/holidaysData";
+import { HOLIDAY_COOKIE, holidayMarks, holidayName, parseHolidayPrefs, type DayMarks } from "@/features/advisor/calendar/holidaysModel";
+import { setCalendarHolidaysAction } from "@/features/advisor/calendar/holidayActions";
 import { PlanView } from "@/features/advisor/calendar/PlanView";
 import { EventPanel } from "@/features/advisor/calendar/EventPanel";
 import { EventSheet } from "@/features/advisor/calendar/EventSheet";
@@ -201,6 +205,15 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
   const weekLabel = t("weekLabel", { number: isoWeekNumber(week), from: short.format(new Date(`${weekDays[0]}T00:00:00Z`)), to: short.format(new Date(`${weekDays[6]}T00:00:00Z`)) });
   const weekdayNames = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, 10, 2 + index))));
   const grid = monthGrid(month);
+  // Feiertage und Ferien (nur wenn die Person sie gewaehlt hat): Bundesland und Auswahl stehen in einem Cookie.
+  const holidayPrefs = parseHolidayPrefs((await cookies()).get(HOLIDAY_COOKIE)?.value);
+  const marks = holidayMarks(holidayPrefs, view === "week" ? week : grid[0][0].day, view === "week" ? addDays(week, 6) : grid[grid.length - 1][6].day);
+  const markLabels = (mark: DayMarks | undefined, showSchool: boolean) => (
+    <>
+      {mark?.holiday ? <span className="block min-w-0 truncate rounded-[6px] bg-rose-50 px-1.5 py-0.5 text-[11.5px] font-semibold leading-4 text-rose-900" title={holidayName(mark.holiday, locale)}>{holidayName(mark.holiday, locale)}</span> : null}
+      {mark?.school && showSchool ? <span className="block min-w-0 truncate rounded-[6px] bg-teal-50 px-1.5 py-0.5 text-[11.5px] font-semibold leading-4 text-teal-900" title={holidayName(mark.school, locale)}>{holidayName(mark.school, locale)}</span> : null}
+    </>
+  );
 
   const prevHref = view === "week" ? link({ woche: addDays(week, -7), monat: null }) : link({ monat: shiftMonth(month, -1) });
   const nextHref = view === "week" ? link({ woche: addDays(week, 7), monat: null }) : link({ monat: shiftMonth(month, 1) });
@@ -265,7 +278,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
 
   const agendaDays = (from: string, to: string) => {
     const days: string[] = [];
-    for (let day = from; day <= to; day = addDays(day, 1)) if (byDay.has(day) && (view !== "month" || day.startsWith(month))) days.push(day);
+    for (let day = from; day <= to; day = addDays(day, 1)) if ((byDay.has(day) || marks.get(day)?.holiday) && (view !== "month" || day.startsWith(month))) days.push(day);
     return days;
   };
   const agenda = (days: string[]) =>
@@ -279,7 +292,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
               <p className={`text-[14px] font-bold ${day === today ? "text-violet-800" : "text-slate-950"}`}>{dayLong.format(new Date(`${day}T00:00:00Z`))}</p>
               {isOwner ? <Link href={linkOrg({ neu: "termin", tag: day })} aria-label={t("addOn", { day: dayLong.format(new Date(`${day}T00:00:00Z`)) })} className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50">+</Link> : null}
             </div>
-            <div className="mt-2 grid gap-1.5">{(byDay.get(day) ?? []).map((item) => chip(item, true))}</div>
+            <div className="mt-2 grid gap-1.5">{markLabels(marks.get(day), true)}{(byDay.get(day) ?? []).map((item) => chip(item, true))}</div>
           </li>
         ))}
       </ol>
@@ -372,6 +385,24 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
           })}
           <Link href={calendarHref(orgs.length > 1 ? org.id : null, { ...keep, nur: onlyPosts ? null : "posts" })} aria-pressed={onlyPosts} className={`ml-1 inline-flex min-h-9 items-center rounded-full border px-3 text-[13.5px] font-semibold ${onlyPosts ? "border-pink-500 bg-pink-50 text-pink-950" : "border-slate-300 bg-white text-slate-900 hover:bg-slate-50"}`}>{t("onlyPosts")}</Link>
           <span className="ml-1 text-[13px] text-slate-700">{t("layersHint")}</span>
+          <details className="group ml-1">
+            <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-full border border-slate-300 bg-white px-3 text-[13.5px] font-semibold text-slate-900 hover:bg-slate-50">
+              <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-[3px] ${holidayPrefs ? "bg-teal-500" : "bg-slate-400"}`} />
+              {t("holidays.button")}{holidayPrefs ? ` · ${t(`holidays.states.${holidayPrefs.state}`)}` : ""}
+            </summary>
+            <form action={setCalendarHolidaysAction} className="mt-2 grid max-w-sm gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+              <input type="hidden" name="back" value={link()} />
+              <label className="block text-sm font-semibold text-slate-900">{t("holidays.state")}
+                <select name="state" defaultValue={holidayPrefs?.state ?? "BE"} className="mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px] font-normal">
+                  {HOLIDAY_STATES.map((code) => <option key={code} value={code}>{t(`holidays.states.${code}`)}</option>)}
+                </select>
+              </label>
+              <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-slate-900"><input type="checkbox" name="publicHolidays" defaultChecked={holidayPrefs?.publicHolidays ?? true} className="h-5 w-5" />{t("holidays.public")}</label>
+              <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-slate-900"><input type="checkbox" name="school" defaultChecked={holidayPrefs?.school ?? false} className="h-5 w-5" />{t("holidays.school")}</label>
+              <p className="text-xs leading-5 text-slate-600">{t("holidays.hint")}</p>
+              <button type="submit" className="inline-flex min-h-11 w-fit items-center rounded-xl bg-[#6D49E0] px-5 text-sm font-semibold text-white hover:bg-[#5B36D6]">{t("holidays.save")}</button>
+            </form>
+          </details>
         </div>
       ) : null}
 
@@ -433,12 +464,14 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
                     {row.map((cell) => {
                       const list = byDay.get(cell.day) ?? [];
                       const weekend = new Date(`${cell.day}T00:00:00Z`).getUTCDay() % 6 === 0;
+                      const mark = marks.get(cell.day);
                       return (
-                        <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} failedLabel={t("dragFailed")} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${cell.inMonth ? (weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
+                        <DropDay key={cell.day} day={cell.day} kind="post" move={movePostToDayAction} failedLabel={t("dragFailed")} label={dayLong.format(new Date(`${cell.day}T00:00:00Z`))} className={`group relative flex min-h-[116px] min-w-0 flex-col gap-[3px] border-b border-r border-slate-100 p-1.5 ${mark?.school ? "border-t-[3px] border-t-teal-300" : ""} ${cell.inMonth ? (mark?.holiday ? "bg-rose-50/40" : weekend ? "bg-slate-50/70" : "bg-white") : "bg-slate-50 text-slate-500"}`}>
                           <div className="flex items-center justify-between">
                             <span className={`grid h-[26px] min-w-[26px] place-items-center rounded-full px-1 text-[13px] font-semibold ${cell.day === today ? "bg-[#6D49E0] text-white" : cell.inMonth ? "text-slate-950" : "text-slate-500"}`}>{Number(cell.day.slice(8))}</span>
                             {isOwner ? <Link href={linkOrg({ neu: "termin", tag: cell.day })} aria-label={t("addOn", { day: dayLong.format(new Date(`${cell.day}T00:00:00Z`)) })} className="grid h-6 w-6 place-items-center rounded-full text-sm text-slate-500 opacity-0 hover:bg-violet-50 hover:text-violet-800 focus:opacity-100 group-hover:opacity-100">+</Link> : null}
                           </div>
+                          {markLabels(mark, mark?.schoolStarts === true || new Date(`${cell.day}T00:00:00Z`).getUTCDay() === 1)}
                           {list.slice(0, 3).map((item) => chip(item))}
                           {list.length > 3 ? <Link href={calendarHref(orgs.length > 1 ? org.id : null, { ansicht: "woche", woche: weekOf(cell.day, today), ...(hidden.size > 0 ? { aus: hiddenParam(hidden) } : {}) })} className="pl-1.5 text-[12px] font-semibold text-slate-700 hover:underline">{t("moreCount", { count: list.length - 3 })}</Link> : null}
                         </DropDay>
@@ -457,6 +490,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
                 {weekDays.map((day) => (
                   <div key={day} className="min-h-64 min-w-0 border-r border-slate-100 p-2 last:border-r-0">
                     <p className={`mb-2 text-[12px] font-bold uppercase tracking-[0.06em] ${day === today ? "text-violet-800" : "text-slate-600"}`}>{dayLong.format(new Date(`${day}T00:00:00Z`)).split(",")[0]}<span className={`ml-1.5 inline-grid h-7 min-w-7 place-items-center rounded-full text-[14px] ${day === today ? "bg-[#6D49E0] text-white" : "text-slate-950"}`}>{Number(day.slice(8))}</span></p>
+                    <div className="mb-1.5 grid gap-1">{markLabels(marks.get(day), true)}</div>
                     <div className="grid gap-1.5">{(byDay.get(day) ?? []).map((item) => chip(item, true))}</div>
                   </div>
                 ))}

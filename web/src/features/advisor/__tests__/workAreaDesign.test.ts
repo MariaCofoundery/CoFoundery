@@ -28,8 +28,10 @@ test("Aufgaben: Inhalt zuerst - das Formular steht nur nach \"+ Neue Aufgabe\" d
   const board = read("src/features/advisor/Teamraum.tsx");
   assert.match(board, /ctx\.canWrite && options\.newOpen \?/);
   assert.match(board, /fixed inset-x-0 bottom-0 z-50[^"]*md:static/);
-  // Ohne gewaehlte Ansicht: Board am Rechner, nach Stand gruppierte Liste am Telefon.
-  assert.match(board, /<div className="hidden md:block">\{board\}<\/div>\s*<TaskList [^>]*mobileOnly \/>/);
+  // Ohne gewaehlte Ansicht: Board am Rechner, nach Faelligkeit gruppierte Liste am Telefon - mit Haken zum Abhaken.
+  assert.match(board, /<div className="hidden md:block">\{board\}<\/div>\s*<TaskList [^>]*mobileOnly[^>]*\/>/);
+  assert.match(board, /async function TaskCheck/);
+  assert.match(board, /name="status" value=\{done \? "open" : "done"\}/);
   // Wer und bis wann zum Antippen; die Werte gehen als dieselben Felder an dieselbe Aktion.
   // Mehrere Zustaendige (20270322120000): jede gewaehlte Person ein eigenes Feld "assignee".
   assert.match(board, /<ChipMultiChoice name="assignee"[^>]*max=\{6\}/);

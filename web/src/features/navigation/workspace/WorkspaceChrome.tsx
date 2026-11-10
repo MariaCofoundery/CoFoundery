@@ -257,11 +257,13 @@ export function WorkspaceChrome({
           <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="mr-1 shrink-0 min-[700px]:hidden">
             <BrandLogo className="h-7" priority sizes="112px" />
           </Link>
+          {/* Handy: wer in mehreren Programmen ist, wechselt hier direkt (am Rechner steht der Umschalter in der Seitenleiste). */}
+          {hasOrg && active && orgs.length > 1 ? <div className="min-w-0 max-w-[58%] flex-1 min-[700px]:hidden">{programSwitcher("light")}</div> : null}
           {hasOrg && active ? (
             <Link
               href="/advisor/organisation"
               title={tw("org")}
-              className="inline-flex min-h-11 min-w-0 max-w-[40%] items-center gap-2 rounded-xl border px-3 text-[14px] font-semibold hover:brightness-95 sm:max-w-[16rem]"
+              className={`${orgs.length > 1 ? "max-[699px]:hidden " : ""}inline-flex min-h-11 min-w-0 max-w-[40%] items-center gap-2 rounded-xl border px-3 text-[14px] font-semibold hover:brightness-95 sm:max-w-[16rem]`}
               style={{ background: color.soft, borderColor: color.dot, color: color.text }}
             >
               <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: color.dot }} />

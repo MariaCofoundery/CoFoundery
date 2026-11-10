@@ -1899,7 +1899,15 @@
     },
     "list": {
       "task": "Aufgabe",
-      "done": "{count, plural, one {Eine erledigte Aufgabe} other {# erledigte Aufgaben}}"
+      "done": "{count, plural, one {Eine erledigte Aufgabe} other {# erledigte Aufgaben}}",
+      "check": "Erledigen",
+      "groups": {
+        "overdue": "Überfällig",
+        "today": "Heute",
+        "week": "Diese Woche",
+        "later": "Später",
+        "nodate": "Ohne Datum"
+      }
     },
     "calendar": {
       "monthNav": "Monat wählen",
@@ -1929,7 +1937,11 @@
     "nobodyShort": "niemand zuständig",
     "checklistOf": "{done} von {total} erledigt",
     "privateBadge": "Privat",
-    "dragFailed": "Verschieben hat nicht geklappt."
+    "dragFailed": "Verschieben hat nicht geklappt.",
+    "check": {
+      "done": "„{task}“ abhaken",
+      "reopen": "„{task}“ wieder öffnen"
+    }
   },
   "funding": {
     "title": "Förderauflagen",
@@ -2610,6 +2622,32 @@
       "statusAll": "Stand: alle",
       "apply": "Filtern",
       "reset": "Filter zurücksetzen"
+    },
+    "holidays": {
+      "button": "Feiertage & Ferien",
+      "state": "Bundesland",
+      "public": "Gesetzliche Feiertage zeigen",
+      "school": "Schulferien zeigen",
+      "hint": "Gilt nur für dich und wird auf diesem Gerät gemerkt. Daten für 2026 bis 2028; ohne Haken erscheint nichts.",
+      "save": "Übernehmen",
+      "states": {
+        "BW": "Baden-Württemberg",
+        "BY": "Bayern",
+        "BE": "Berlin",
+        "BB": "Brandenburg",
+        "HB": "Bremen",
+        "HH": "Hamburg",
+        "HE": "Hessen",
+        "MV": "Mecklenburg-Vorpommern",
+        "NI": "Niedersachsen",
+        "NW": "Nordrhein-Westfalen",
+        "RP": "Rheinland-Pfalz",
+        "SL": "Saarland",
+        "SN": "Sachsen",
+        "ST": "Sachsen-Anhalt",
+        "SH": "Schleswig-Holstein",
+        "TH": "Thüringen"
+      }
     }
   },
   "people": {

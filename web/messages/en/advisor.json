@@ -1899,7 +1899,15 @@
     },
     "list": {
       "task": "Task",
-      "done": "{count, plural, one {One done task} other {# done tasks}}"
+      "done": "{count, plural, one {One done task} other {# done tasks}}",
+      "check": "Done",
+      "groups": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "week": "This week",
+        "later": "Later",
+        "nodate": "No date"
+      }
     },
     "calendar": {
       "monthNav": "Choose month",
@@ -1929,7 +1937,11 @@
     "nobodyShort": "nobody assigned",
     "checklistOf": "{done} of {total} done",
     "privateBadge": "Private",
-    "dragFailed": "Moving did not work."
+    "dragFailed": "Moving did not work.",
+    "check": {
+      "done": "Mark “{task}” as done",
+      "reopen": "Reopen “{task}”"
+    }
   },
   "funding": {
     "title": "Funding requirements",
@@ -2610,6 +2622,32 @@
       "statusAll": "Status: all",
       "apply": "Filter",
       "reset": "Reset filters"
+    },
+    "holidays": {
+      "button": "Public holidays & school breaks",
+      "state": "State",
+      "public": "Show public holidays",
+      "school": "Show school breaks",
+      "hint": "Applies to you only and is remembered on this device. Data for 2026 to 2028; with nothing ticked, nothing is shown.",
+      "save": "Apply",
+      "states": {
+        "BW": "Baden-Wuerttemberg",
+        "BY": "Bavaria",
+        "BE": "Berlin",
+        "BB": "Brandenburg",
+        "HB": "Bremen",
+        "HH": "Hamburg",
+        "HE": "Hesse",
+        "MV": "Mecklenburg-Western Pomerania",
+        "NI": "Lower Saxony",
+        "NW": "North Rhine-Westphalia",
+        "RP": "Rhineland-Palatinate",
+        "SL": "Saarland",
+        "SN": "Saxony",
+        "ST": "Saxony-Anhalt",
+        "SH": "Schleswig-Holstein",
+        "TH": "Thuringia"
+      }
     }
   },
   "people": {

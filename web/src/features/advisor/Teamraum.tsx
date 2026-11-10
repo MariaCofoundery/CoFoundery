@@ -264,6 +264,23 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
   );
 }
 
+/** Der Haken vor jeder Aufgabe: ein Tipp erledigt sie, bei einer erledigten holt er sie zurueck. Wer nur lesen darf, sieht den Kreis ohne Knopf. */
+async function TaskCheck({ ctx, task, filter, size = "h-11 w-11" }: { ctx: TeamraumContext; task: OrgTask; filter?: TaskFilter; size?: string }) {
+  const t = await getTranslations("advisor.teamraum");
+  const done = task.status === "done";
+  const circle = (
+    <span aria-hidden="true" className={`grid h-[24px] w-[24px] place-items-center rounded-full border-2 text-[14px] font-bold leading-none ${done ? "border-emerald-700 bg-emerald-700 text-white" : "border-slate-400 bg-white group-hover:border-violet-600"}`}>{done ? "✓" : null}</span>
+  );
+  if (!ctx.canWrite) return <span className={`grid ${size} shrink-0 place-items-center`}>{circle}</span>;
+  return (
+    <form action={moveOrgTaskAction} className="shrink-0">
+      <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+      <input type="hidden" name="status" value={done ? "open" : "done"} />
+      <button type="submit" aria-label={t(done ? "check.reopen" : "check.done", { task: task.title })} className={`group grid ${size} place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500`}>{circle}</button>
+    </form>
+  );
+}
+
 async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; selected: boolean; back: Record<string, string> }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf, peopleOf, programOf, eventOf, href } = helpers(ctx);
@@ -274,9 +291,12 @@ async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumCo
   const overdue = isOverdue(task, ctx.today);
   return (
     <article className={`grid gap-2 rounded-[14px] border bg-white px-3.5 py-3 ${selected ? "border-violet-400 ring-2 ring-violet-200" : "border-slate-200"} ${task.status === "done" ? "opacity-75" : ""}`}>
-      <h4 className="text-[14.5px] font-semibold leading-snug text-slate-950">
-        <Link href={`${href("tasks", { ...back, task: task.id })}#task-detail`} className={`underline-offset-4 hover:underline ${task.status === "done" ? "line-through" : ""}`}>{task.title}</Link>
-      </h4>
+      <div className="-ml-2 -mt-1 flex items-start gap-0.5">
+        <TaskCheck ctx={ctx} task={task} filter={filter} size="h-10 w-10" />
+        <h4 className="min-w-0 flex-1 pt-2 text-[14.5px] font-semibold leading-snug text-slate-950">
+          <Link href={`${href("tasks", { ...back, task: task.id })}#task-detail`} className={`underline-offset-4 hover:underline ${task.status === "done" ? "line-through" : ""}`}>{task.title}</Link>
+        </h4>
+      </div>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-slate-600">
         {people.length > 0 ? (
           <span className="inline-flex items-center gap-1.5">
@@ -438,7 +458,7 @@ export type TaskView = (typeof TASK_VIEWS)[number];
 export const taskViewOf = (value: unknown): TaskView => ((TASK_VIEWS as readonly unknown[]).includes(value) ? (value as TaskView) : "board");
 
 /** Aufgaben als Liste: am Rechner eine Tabelle nach Faelligkeit, am Telefon nach Stand gruppiert zum Aufklappen. */
-async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: TeamraumContext; tasks: OrgTask[]; back: Record<string, string>; mobileOnly?: boolean }) {
+async function TaskList({ ctx, tasks, back, mobileOnly = false, filterOf }: { ctx: TeamraumContext; tasks: OrgTask[]; back: Record<string, string>; mobileOnly?: boolean; filterOf?: TaskFilter }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf, peopleOf, programOf, href } = helpers(ctx);
   const open = tasks.filter((task) => task.status !== "done").sort(byDue);
@@ -449,6 +469,7 @@ async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: Teamrau
     const overdue = isOverdue(task, ctx.today);
     return (
       <tr key={task.id} className="border-t border-slate-100">
+        <td className="w-12 py-1 pr-1"><TaskCheck ctx={ctx} task={task} filter={filterOf} /></td>
         <td className="py-3 pr-3">
           <Link href={link(task)} className={`font-medium text-slate-950 underline-offset-4 hover:underline ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</Link>
         </td>
@@ -466,18 +487,21 @@ async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: Teamrau
     const team = task.programId ? programOf(task.programId)?.name ?? t("hiddenProgram") : t("internal");
     const due = task.dueOn ? (overdue ? t("overdueSince", { date: dayOf(task.dueOn) }) : dayOf(task.dueOn)) : null;
     return (
-      <li key={task.id} className={index > 0 ? "border-t border-slate-100" : ""}>
-        <Link href={link(task)} className="flex min-h-14 items-center gap-3 px-4 py-3">
-          {assignee ? <Avatar userId={assignee.userId} name={assignee.name} size="h-[30px] w-[30px] text-[11px]" /> : <span aria-hidden="true" className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full border border-dashed border-slate-300 text-xs text-slate-500">?</span>}
+      <li key={task.id} className={`flex items-center ${index > 0 ? "border-t border-slate-100" : ""}`}>
+        <span className="pl-1.5"><TaskCheck ctx={ctx} task={task} filter={filterOf} /></span>
+        <Link href={link(task)} className="flex min-h-14 min-w-0 flex-1 items-center gap-3 py-3 pr-4">
           <span className="min-w-0 flex-1">
             <span className={`block text-[15px] font-medium text-slate-950 ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>{task.title}</span>
-            <span className={`mt-0.5 block text-[13px] ${overdue ? "text-rose-700" : "text-slate-600"}`}>{[due, team, people.length > 1 ? people.map((person) => (person.isSelf ? t("form.meShort") : person.name)).join(", ") : null, assignee ? null : t("nobodyShort")].filter(Boolean).join(" · ")}</span>
+            <span className={`mt-0.5 block text-[13px] ${overdue ? "text-rose-700" : "text-slate-600"}`}>{[due, task.status === "doing" || task.status === "waiting" ? t(`status.${task.status}`) : null, team, people.length > 0 ? people.map((person) => (person.isSelf ? t("form.meShort") : person.name)).join(", ") : t("nobodyShort")].filter(Boolean).join(" · ")}</span>
           </span>
         </Link>
       </li>
     );
   };
-  const groups = TASK_STATUSES.map((status) => ({ status, items: (status === "done" ? done : open.filter((task) => task.status === status)) }));
+  // Am Telefon nach Faelligkeit statt nach Stand: was jetzt dran ist, steht oben.
+  const weekEnd = addDays(ctx.today, 7);
+  const bucketOf = (task: OrgTask) => (!task.dueOn ? "nodate" : task.dueOn < ctx.today ? "overdue" : task.dueOn === ctx.today ? "today" : task.dueOn <= weekEnd ? "week" : "later");
+  const groups = (["overdue", "today", "week", "later", "nodate"] as const).map((key) => ({ key, items: open.filter((task) => bucketOf(task) === key) })).filter((group) => group.items.length > 0);
   return (
     <>
       {mobileOnly ? null : (
@@ -485,6 +509,7 @@ async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: Teamrau
           <table className="w-full min-w-[640px] border-collapse text-[14px]">
             <thead>
               <tr className="text-left text-[12.5px] text-slate-600">
+                <th className="w-12 py-2 pr-1"><span className="sr-only">{t("list.check")}</span></th>
                 <th className="py-2 pr-3 font-semibold">{t("list.task")}</th>
                 <th className="py-2 pr-3 font-semibold">{t("form.status")}</th>
                 <th className="py-2 pr-3 font-semibold">{t("form.assignee")}</th>
@@ -504,19 +529,23 @@ async function TaskList({ ctx, tasks, back, mobileOnly = false }: { ctx: Teamrau
         </div>
       )}
       <div className="mt-4 grid gap-1 md:hidden">
-        {groups.map(({ status, items }) => (
-          <details key={status} open={status === "open"} className="group">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-1 text-[15px] font-semibold text-slate-950">
-              <span className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} />{t(`status.${status}`)}</span>
-              <span className="text-sm font-medium text-slate-600">{items.length} <span aria-hidden="true" className="inline-block transition group-open:rotate-90">›</span></span>
-            </summary>
-            {items.length === 0 ? (
-              <p className="px-1 pb-3 text-sm text-slate-600">{t(`empty.${status}`)}</p>
-            ) : (
-              <ul className="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{items.map(mobileRow)}</ul>
-            )}
-          </details>
+        {groups.length === 0 ? <p className="px-1 py-3 text-sm text-slate-600">{t("empty.open")}</p> : null}
+        {groups.map(({ key, items }) => (
+          <section key={key} aria-labelledby={`due-${key}`}>
+            <h3 id={`due-${key}`} className={`flex min-h-10 items-center justify-between px-1 text-[13px] font-bold uppercase tracking-[0.06em] ${key === "overdue" ? "text-rose-700" : "text-slate-600"}`}>
+              <span>{t(`list.groups.${key}`)}</span><span className="font-semibold">{items.length}</span>
+            </h3>
+            <ul className="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{items.map(mobileRow)}</ul>
+          </section>
         ))}
+        {done.length > 0 ? (
+          <details className="group">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-1 text-[13px] font-bold uppercase tracking-[0.06em] text-slate-600">
+              <span>{t("list.done", { count: done.length })}</span><span aria-hidden="true" className="inline-block transition group-open:rotate-90">›</span>
+            </summary>
+            <ul className="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{done.map(mobileRow)}</ul>
+          </details>
+        ) : null}
       </div>
     </>
   );
@@ -766,12 +795,12 @@ export async function TeamraumBoard({
       ) : null}
 
       {view === "calendar" && options.viewChosen ? <TaskCalendar ctx={ctx} tasks={filtered} filter={filter} month={calendarMonth} /> : null}
-      {view === "list" && options.viewChosen ? <TaskList ctx={ctx} tasks={filtered} back={keep} /> : null}
+      {view === "list" && options.viewChosen ? <TaskList ctx={ctx} tasks={filtered} back={keep} filterOf={filter} /> : null}
       {view === "board" && options.viewChosen ? board : null}
       {!options.viewChosen ? (
         <>
           <div className="hidden md:block">{board}</div>
-          <TaskList ctx={ctx} tasks={filtered} back={keep} mobileOnly />
+          <TaskList ctx={ctx} tasks={filtered} back={keep} mobileOnly filterOf={filter} />
         </>
       ) : null}
 
