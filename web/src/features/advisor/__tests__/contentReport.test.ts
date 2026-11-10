@@ -75,3 +75,17 @@ test("Texte: Reiter, Bereiche und Spalten in beiden Sprachen", () => {
     for (const kind of ["partner", "investor", "speaker", "mentor", "other"]) assert.ok(m.partners.kinds[kind], `${locale} ${kind}`);
   }
 });
+
+test("Termine liest man ueber list_program_events, nie direkt aus der Tabelle (sie ist fuer Mitglieder nicht lesbar)", () => {
+  for (const file of ["src/features/advisor/contentReport/contentReportData.ts", "src/features/advisor/partners/OrgPartners.tsx", "src/features/advisor/partners/partnersData.ts"]) {
+    assert.doesNotMatch(read(file), /from\("team_program_events"\)/, file);
+  }
+  assert.match(read("src/features/advisor/contentReport/contentReportData.ts"), /listProgramEventsSplit/);
+});
+
+test("Handy: der Programmwechsel steht in einer eigenen Zeile unter der Leiste; die Empfehlungs-Zahl kommt aus dem Layout", () => {
+  const chrome = read("src/features/navigation/workspace/WorkspaceChrome.tsx");
+  assert.match(chrome, /<\/header>\s*\{\/\*[^]*?\*\/\}\s*\{hasOrg && active && orgs\.length > 1 \? <div className="[^"]*min-\[700px\]:hidden">\{programSwitcher\("light"\)\}/);
+  assert.match(read("src/app/layout.tsx"), /pendingRecommendationCount=\{pendingRecommendationCount\}/);
+  assert.match(read("src/features/recommendations/recommendationsData.ts"), /eq\("status", "pending_consent"\)/);
+});

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getTranslations } from "next-intl/server";
 import { getOrgMembers } from "@/features/advisor/orgData";
+import { listProgramEventsSplit } from "@/features/advisor/teamProgramData";
 import { deleteContactAction, saveContactAction, setContactEventAction } from "@/features/advisor/partners/partnersActions";
 import { CONTACT_KINDS, CONTACT_STATUSES, contactOf, filterContacts, isContactKind, type ContactEventLink, type OrgContact } from "@/features/advisor/partners/partnersModel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -22,12 +23,13 @@ export async function OrgPartners({ client, orgId, query, canUse, locale }: { cl
   const [contactsResult, linksResult, eventsResult, members] = await Promise.all([
     client.from("advisor_org_contacts").select("id, name, kinds, company, email, phone, url, notes, status, owner_user_id").eq("org_id", orgId).limit(1000),
     client.from("advisor_org_contact_events").select("contact_id, event_id, role").eq("org_id", orgId).limit(2000),
-    client.from("team_program_events").select("id, title, starts_at").eq("org_id", orgId).order("starts_at", { ascending: false }).limit(300),
+    listProgramEventsSplit(client, orgId),
     getOrgMembers(client, orgId),
   ]);
   const contacts = Array.isArray(contactsResult.data) ? (contactsResult.data as Record<string, unknown>[]).map(contactOf) : [];
   const links: ContactEventLink[] = Array.isArray(linksResult.data) ? (linksResult.data as { contact_id: string; event_id: string; role: string | null }[]).map((row) => ({ contactId: row.contact_id, eventId: row.event_id, role: row.role })) : [];
-  const events = Array.isArray(eventsResult.data) ? (eventsResult.data as { id: string; title: string; starts_at: string }[]) : [];
+  // Termine liest man nur ueber die Funktion list_program_events (die Tabelle ist nicht direkt lesbar).
+  const events = [...eventsResult.active].sort((a, b) => (a.startsAt < b.startsAt ? 1 : -1)).map((event) => ({ id: event.eventId, title: event.title, starts_at: event.startsAt }));
   const memberList = members.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? t("unnamed") }));
   const memberName = new Map(memberList.map((member) => [member.userId, member.name]));
   const day = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Europe/Berlin" });

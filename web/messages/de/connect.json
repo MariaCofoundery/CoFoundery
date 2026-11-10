@@ -1332,6 +1332,7 @@
       "remove": "Entfernen",
       "saving": "Speichert …",
       "done": "Entscheidung gespeichert."
-    }
+    },
+    "pendingCount": "{count, plural, one {# Empfehlung wartet auf deine Antwort} other {# Empfehlungen warten auf deine Antwort}}"
   }
 }

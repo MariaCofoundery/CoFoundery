@@ -59,6 +59,8 @@ type Props = {
   incomingConnectContactCount: number;
   /** Wie viele Vorschlaege auf eine Entscheidung warten. */
   newConnectSuggestionCount?: number;
+  /** Empfehlungen, die auf die Zustimmung dieser Person warten. */
+  pendingRecommendationCount?: number;
   unreadConnectMessageCount: number;
   /** Hinweise, die auf eine Antwort warten - siehe inAppNotice.ts. */
   waitingNoticeCount: number;
@@ -306,6 +308,7 @@ export function ProductShell({
   incomingOpenRequestCount,
   incomingConnectContactCount,
   newConnectSuggestionCount = 0,
+  pendingRecommendationCount = 0,
   unreadConnectMessageCount,
   waitingNoticeCount,
   researchConsentState: initialResearchConsentState,
@@ -653,7 +656,13 @@ export function ProductShell({
       // Die Arbeitsraeume gehoeren seit 05.11.2026 zum Bereich "Probleme".
       { href: "/connect/problems", label: tConnect("tabs.problems"), isActive: (path: string) => /^\/connect\/(problems|workspaces)(?:\/|$)/.test(path) },
       { href: "/connect/ventures", label: tConnect("tabs.ventures"), isActive: (path: string) => path.startsWith("/connect/ventures") && !path.startsWith("/connect/ventures/mine") },
-      { href: "/connect/empfehlungen", label: tConnect("tabs.recommendations"), isActive: (path: string) => path.startsWith("/connect/empfehlungen") },
+      {
+        href: "/connect/empfehlungen",
+        label: tConnect("tabs.recommendations"),
+        isActive: (path: string) => path.startsWith("/connect/empfehlungen"),
+        // Eine Person soll erfahren, dass jemand sie empfehlen will - ohne Zahl wuerde es niemand finden.
+        ...(pendingRecommendationCount > 0 ? { count: { value: pendingRecommendationCount, label: tConnect("recommendations.pendingCount", { count: pendingRecommendationCount }) } } : {}),
+      },
       {
         href: "/connect/contacts",
         label: t("connectContacts"),

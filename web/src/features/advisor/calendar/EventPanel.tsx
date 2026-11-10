@@ -38,6 +38,7 @@ export async function EventPanel({
   rsvps,
   requirements,
   speakers,
+  partners,
   feedback,
 }: {
   orgId: string;
@@ -60,6 +61,8 @@ export async function EventPanel({
   rsvps: EventRsvp[];
   requirements: Requirement[];
   speakers: { assigned: EventExpert[]; choices: ProgramExpert[] } | null;
+  /** Aus der Partnerliste zugeordnet (nur fuer Mitglieder mit dem Recht "Personen"). */
+  partners: { name: string; role: string | null }[];
   feedback: { postsCreated: number | null; postsError: boolean; saved: boolean };
 }) {
   const t = await getTranslations("advisor.calendar.panel");
@@ -291,6 +294,7 @@ export async function EventPanel({
               {requirements.length > 0 ? (
                 <div><dt className="inline font-bold">{tp("event.fundingTitle")}: </dt><dd className="inline">{counts.length === 0 ? tp("event.fundingNone") : counts.map((entry) => tp("event.fundingCounts", { title: entry.title, grant: entry.grantName })).join(" · ")}</dd></div>
               ) : null}
+              {partners.length > 0 ? <div><dt className="inline font-bold">{tp("planPartners")}: </dt><dd className="inline">{partners.map((entry) => (entry.role ? `${entry.name} (${entry.role})` : entry.name)).join(", ")}</dd></div> : null}
               {mine.length > 0 ? <div><dt className="inline font-bold">{tp("planSpeakers")}: </dt><dd className="inline">{mine.map((entry) => entry.name).join(", ")}</dd></div> : null}
             </dl>
             {speakers && isOwner ? (

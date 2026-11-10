@@ -5,6 +5,7 @@ import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { getIncomingOpenDiscoveryIntroRequestCount } from "@/features/discovery/discoveryIntroData";
 import { getIncomingPendingConnectContactCount, getUnreadConnectMessageCount } from "@/features/connect/connectData";
 import { countNewConnectSuggestions } from "@/features/connect/connectSuggestionData";
+import { countPendingRecommendationConsents } from "@/features/recommendations/recommendationsData";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnProfileImage } from "@/features/profile/profileData";
 import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
@@ -216,6 +217,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     user?.email?.split("@")[0] ||
     null;
 
+  // Empfehlungen, die auf die Zustimmung dieser Person warten (nur mit Connect-Zugang).
+  const pendingRecommendationCount = user && hasConnect ? await countPendingRecommendationConsents(supabase as unknown as SupabaseClient, user.id).catch(() => 0) : 0;
+
   return (
     <html lang={locale} className={`${spectral.variable} ${unbounded.variable} ${inter.variable}`}>
       <body>
@@ -239,6 +243,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             incomingOpenRequestCount={incomingOpenRequestCount}
             incomingConnectContactCount={incomingConnectContactCount}
             newConnectSuggestionCount={newConnectSuggestionCount}
+            pendingRecommendationCount={pendingRecommendationCount}
             unreadConnectMessageCount={unreadConnectMessageCount}
             waitingNoticeCount={waitingNoticeCount}
             researchConsentState={researchConsentState}

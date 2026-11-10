@@ -17,11 +17,11 @@ const FIELD = "mt-1.5 min-h-11 w-full rounded-xl border border-slate-300 bg-whit
  */
 export default async function NewRecommendationPage({ searchParams }: { searchParams: Promise<{ art?: string; suche?: string; fehler?: string; person?: string; projekt?: string }> }) {
   const sp = await searchParams;
-  const { client } = await requireConnectMember("/connect/empfehlungen/neu");
+  const { client, user } = await requireConnectMember("/connect/empfehlungen/neu");
   const t = await getTranslations("connect.recommendations");
   const kind = isRecKind(sp.art) ? sp.art : "software";
   const q = (sp.suche ?? "").trim();
-  const people = kind === "person" ? await searchPeople(client, q) : [];
+  const people = kind === "person" ? await searchPeople(client, q, user.id) : [];
   const ventures = kind === "project" ? await searchVentures(client, q) : [];
   const needsPick = kind === "person" || kind === "project";
 

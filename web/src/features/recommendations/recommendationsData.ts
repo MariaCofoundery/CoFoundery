@@ -42,10 +42,10 @@ export async function listOwnRecommendations(client: SupabaseClient, userId: str
   return { given: rows.filter((r) => r.author_user_id === userId).map(map), aboutMe: rows.filter((r) => r.subject_user_id === userId && r.author_user_id !== userId).map(map) };
 }
 
-export async function searchPeople(client: SupabaseClient, q: string): Promise<{ userId: string; name: string; sub: string }[]> {
+export async function searchPeople(client: SupabaseClient, q: string, exceptUserId: string): Promise<{ userId: string; name: string; sub: string }[]> {
   const term = q.replace(/[%_,()]/g, "").trim();
   if (term.length < 2) return [];
-  const { data } = await client.from("network_profiles").select("user_id, display_name, headline").eq("status", "active").ilike("display_name", `%${term}%`).limit(8);
+  const { data } = await client.from("network_profiles").select("user_id, display_name, headline").eq("status", "active").ilike("display_name", `%${term}%`).neq("user_id", exceptUserId).limit(8);
   return ((data ?? []) as { user_id: string; display_name: string | null; headline: string | null }[]).filter((r) => r.display_name).map((r) => ({ userId: r.user_id, name: r.display_name ?? "", sub: r.headline ?? "" }));
 }
 
@@ -60,4 +60,10 @@ export type AdminRecommendation = { id: string; kind: RecKind; title: string; su
 export async function adminListRecommendations(client: SupabaseClient, status: string): Promise<AdminRecommendation[]> {
   const { data } = await client.rpc("admin_list_recommendations", { p_status: status });
   return ((data ?? []) as { id: string; kind: RecKind; title: string; sub: string | null; url: string | null; comment: string; topics: string[] | null; region: string | null; status: string; created_at: string; author_name: string | null; report_count: number | string }[]).map((r) => ({ id: r.id, kind: r.kind, title: r.title, sub: r.sub, url: r.url, comment: r.comment, topics: r.topics ?? [], region: r.region, status: r.status, createdAt: r.created_at, authorName: r.author_name ?? "", reportCount: Number(r.report_count) }));
+}
+
+/** Wie viele Empfehlungen auf die Zustimmung dieser Person warten - die Zahl am Reiter "Empfehlungen". */
+export async function countPendingRecommendationConsents(client: SupabaseClient, userId: string): Promise<number> {
+  const { count } = await client.from("network_recommendations").select("id", { count: "exact", head: true }).eq("subject_user_id", userId).eq("status", "pending_consent");
+  return count ?? 0;
 }

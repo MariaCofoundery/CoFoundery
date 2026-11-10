@@ -35,6 +35,7 @@ import {
 import { HOLIDAY_STATES } from "@/features/advisor/calendar/holidaysData";
 import { HOLIDAY_COOKIE, holidayMarks, holidayName, parseHolidayPrefs, type DayMarks } from "@/features/advisor/calendar/holidaysModel";
 import { setCalendarHolidaysAction } from "@/features/advisor/calendar/holidayActions";
+import { listEventPartners } from "@/features/advisor/partners/partnersData";
 import { PlanView } from "@/features/advisor/calendar/PlanView";
 import { EventPanel } from "@/features/advisor/calendar/EventPanel";
 import { EventSheet } from "@/features/advisor/calendar/EventSheet";
@@ -196,6 +197,8 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
     selected && tab === "details" && withSpeakers ? listEventExperts(client, org.id) : Promise.resolve([]),
     selected && tab === "details" && withSpeakers && isOwner ? listProgramExperts(client, org.id) : Promise.resolve([]),
   ]);
+  // Aus der Partnerliste: nur mit dem Recht "Personen" (die Zeilensicherheit der Tabelle gilt ohnehin).
+  const eventPartners = selected && tab === "details" && org.rights.people ? await listEventPartners(client, org.id, selected.eventId) : [];
   const speakers = selected && tab === "details" && withSpeakers ? { assigned: assignedSpeakers, choices: speakerChoices.filter((entry) => !entry.archived) } : null;
 
   const dayLong = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
@@ -318,6 +321,7 @@ export async function CalendarScreen({ searchParams }: { searchParams?: Promise<
       rsvps={rsvps}
       requirements={requirements}
       speakers={speakers}
+      partners={eventPartners}
       feedback={{ postsCreated: /^\d{1,2}$/.test(query.postsCreated ?? "") ? Number(query.postsCreated) : null, postsError: query.postsError === "1", saved: query.planSaved === "1" }}
     />
   ) : null;

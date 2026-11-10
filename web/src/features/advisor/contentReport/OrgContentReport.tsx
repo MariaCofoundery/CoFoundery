@@ -107,7 +107,7 @@ export async function OrgContentReport({
                 {table.rows.map((row) => (
                   <tr key={row.key} className="border-t border-slate-100 align-top">
                     {row.cells.map((_, index) => (
-                      <td key={index} className={`px-2.5 py-3 ${index === 0 || (filters.area === "veroeffentlicht" && index === 3) ? "font-semibold text-slate-950" : "text-slate-800"}`}>
+                      <td key={index} className={`px-2.5 py-3 ${index === 0 && filters.area === "geplant" ? "whitespace-nowrap" : ""} ${index === 0 || (filters.area === "veroeffentlicht" && index === 3) ? "font-semibold text-slate-950" : "text-slate-800"}`}>
                         {row.href && index === (filters.area === "geplant" ? 0 : -1) ? <Link href={row.href} className="text-violet-800 underline underline-offset-2">{row.cells[index]}</Link> : cellContent(row, index)}
                       </td>
                     ))}

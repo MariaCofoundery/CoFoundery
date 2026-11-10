@@ -200,9 +200,9 @@ export function WorkspaceChrome({
   };
 
 
-  const programSwitcher = (tone: "dark" | "light") =>
+  const programSwitcher = (tone: "dark" | "light", compactTrigger = false) =>
     active ? (
-      <ProgramSwitcher orgs={orgs} activeId={active.id} color={color} onSwitch={switchTo} tone={tone} label={tw("program")} />
+      <ProgramSwitcher orgs={orgs} activeId={active.id} color={color} onSwitch={switchTo} tone={tone} label={tw("program")} compact={compactTrigger} />
     ) : null;
 
   const phoneTabs = hasOrg
@@ -257,8 +257,6 @@ export function WorkspaceChrome({
           <Link href="/advisor/dashboard" aria-label={t("logoLabel")} className="mr-1 shrink-0 min-[700px]:hidden">
             <BrandLogo className="h-7" priority sizes="112px" />
           </Link>
-          {/* Handy: wer in mehreren Programmen ist, wechselt hier direkt (am Rechner steht der Umschalter in der Seitenleiste). */}
-          {hasOrg && active && orgs.length > 1 ? <div className="min-w-0 max-w-[58%] flex-1 min-[700px]:hidden">{programSwitcher("light")}</div> : null}
           {hasOrg && active ? (
             <Link
               href="/advisor/organisation"
@@ -340,6 +338,8 @@ export function WorkspaceChrome({
             {slots.profile}
           </div>
         </header>
+        {/* Handy: wer in mehreren Programmen ist, wechselt hier direkt - eine eigene Zeile, in der Leiste ist kein Platz (am Rechner steht der Umschalter in der Seitenleiste). */}
+        {hasOrg && active && orgs.length > 1 ? <div className="border-b border-slate-200 bg-white px-3 pb-2 min-[700px]:hidden">{programSwitcher("light")}</div> : null}
 
         <div id="workspace-content" className="min-w-0 flex-1 pb-24 min-[700px]:pb-0">
           {children}
@@ -417,7 +417,7 @@ export function WorkspaceChrome({
 type OrgColor = ReturnType<typeof orgColor>;
 
 /** Das Programm, in dem man arbeitet: Name mit Farbpunkt; bei mehreren Programmen ein Umschalter. */
-function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { orgs: { id: string; name: string }[]; activeId: string; color: OrgColor; onSwitch: (id: string) => void; tone: "dark" | "light"; label: string }) {
+function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label, compact = false }: { orgs: { id: string; name: string }[]; activeId: string; color: OrgColor; onSwitch: (id: string) => void; tone: "dark" | "light"; label: string; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const active = orgs.find((entry) => entry.id === activeId) ?? orgs[0];
@@ -456,12 +456,12 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
     <>
       <span aria-hidden="true" className="h-3 w-3 shrink-0 rounded-[4px]" style={{ background: color.dot }} />
       <span className="flex min-w-0 flex-1 flex-col text-left">
-        <span className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#9A9DC4]" : "text-slate-600"}`}>{label}</span>
+        {compact ? <span className="sr-only">{label}</span> : <span className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#9A9DC4]" : "text-slate-600"}`}>{label}</span>}
         <span className="truncate text-[14.5px] font-semibold">{active.name}</span>
       </span>
     </>
   );
-  const frame = `flex min-h-12 w-full items-center gap-2.5 rounded-xl px-3 ${dark ? "bg-white/[0.08] text-white" : "border border-slate-200 bg-white text-slate-950"}`;
+  const frame = `flex ${compact ? "min-h-11" : "min-h-12"} w-full items-center gap-2.5 rounded-xl px-3 ${dark ? "bg-white/[0.08] text-white" : "border border-slate-200 bg-white text-slate-950"}`;
   if (orgs.length < 2) return <div className={frame}>{body}</div>;
   return (
     <div ref={ref} className="relative" onKeyDown={onMenuKey}>
@@ -470,7 +470,7 @@ function ProgramSwitcher({ orgs, activeId, color, onSwitch, tone, label }: { org
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {open ? (
-        <div role="menu" className="absolute inset-x-0 z-50 mt-1.5 rounded-xl border border-slate-200 bg-white p-1.5 text-slate-950 shadow-[0_18px_40px_rgba(23,23,58,0.2)]">
+        <div role="menu" className={`absolute z-50 mt-1.5 rounded-xl ${compact ? "left-0 w-[min(18rem,calc(100vw-1.5rem))]" : "inset-x-0"} border border-slate-200 bg-white p-1.5 text-slate-950 shadow-[0_18px_40px_rgba(23,23,58,0.2)]`}>
           {orgs.map((entry, index) => (
             <button
               key={entry.id}

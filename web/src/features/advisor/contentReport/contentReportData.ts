@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getOrgMembers } from "@/features/advisor/orgData";
+import { listProgramEventsSplit } from "@/features/advisor/teamProgramData";
 import { listContentItems, listOrgCampaigns } from "@/features/advisor/socialCalendarData";
 import { postOf, type ContentItem, type OrgCampaign, type OrgPost } from "@/features/advisor/socialCalendarModel";
 import { lookupOf, type ReportLookup } from "@/features/advisor/contentReport/contentReportModel";
@@ -16,10 +17,11 @@ export async function loadContentReport(client: SupabaseClient, orgId: string, u
     listOrgCampaigns(client, orgId),
     listContentItems(client, orgId),
     getOrgMembers(client, orgId),
-    client.from("team_program_events").select("id, title").eq("org_id", orgId).limit(1000),
+    listProgramEventsSplit(client, orgId),
   ]);
   const posts = Array.isArray(postsResult.data) ? (postsResult.data as Record<string, unknown>[]).map(postOf) : [];
   const members = memberList.filter((member) => member.status === "active").map((member) => ({ userId: member.userId, name: member.displayName ?? unnamed }));
-  const events = Array.isArray(eventsResult.data) ? (eventsResult.data as { id: string; title: string }[]) : [];
+  // Termine liest man nur ueber die Funktion list_program_events (die Tabelle ist nicht direkt lesbar).
+  const events = [...eventsResult.active, ...eventsResult.archived].map((event) => ({ id: event.eventId, title: event.title }));
   return { posts, campaigns, content, members, lookup: lookupOf(content, members, campaigns, events) };
 }

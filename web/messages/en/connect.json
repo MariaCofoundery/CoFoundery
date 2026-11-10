@@ -1332,6 +1332,7 @@
       "remove": "Remove",
       "saving": "Saving …",
       "done": "Decision saved."
-    }
+    },
+    "pendingCount": "{count, plural, one {# recommendation is waiting for your answer} other {# recommendations are waiting for your answer}}"
   }
 }
