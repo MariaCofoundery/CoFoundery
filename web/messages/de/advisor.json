@@ -1941,6 +1941,16 @@
     "check": {
       "done": "„{task}“ abhaken",
       "reopen": "„{task}“ wieder öffnen"
+    },
+    "panel": {
+      "saved": "Gespeichert",
+      "error": "Das hat nicht geklappt",
+      "statusLabel": "Stand",
+      "statusHint": "Speichert sofort.",
+      "addItem": "Neuer Punkt",
+      "addItemPlaceholder": "+ Punkt hinzufügen",
+      "removeItem": "Punkt „{item}“ entfernen",
+      "more": "Team und Veranstaltung"
     }
   },
   "funding": {

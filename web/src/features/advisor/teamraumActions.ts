@@ -38,6 +38,16 @@ function backTo(formData: FormData, extra: Record<string, string> = {}) {
   const params = new URLSearchParams();
   const filter = taskFilterOf(formData.get("filter"));
   if (tab === "tasks" && filter !== "all") params.set("filter", filter);
+  // Ansicht, Suche, Monat und "Erledigte zeigen" der Liste bleiben erhalten (Felder back_view usw.).
+  const view = String(formData.get("back_view") ?? "");
+  if (tab === "tasks" && (view === "board" || view === "list" || view === "calendar")) params.set("view", view);
+  const month = String(formData.get("back_month") ?? "");
+  if (tab === "tasks" && /^\d{4}-\d{2}$/.test(month)) params.set("month", month);
+  const q = String(formData.get("back_q") ?? "").trim().slice(0, 80);
+  if (tab === "tasks" && q) params.set("q", q);
+  if (tab === "tasks" && formData.get("back_done") === "1") params.set("done", "1");
+  const team = uuidOrNull(formData.get("back_team"));
+  if (tab === "tasks" && team) params.set("team", team);
   for (const [key, value] of Object.entries(extra)) params.set(key, value);
   return teamraumHref(tab, orgId, Object.fromEntries(params));
 }
@@ -61,6 +71,25 @@ function finish(path: string) {
 }
 
 /** Anlegen oder bearbeiten - dasselbe Formular, mit oder ohne taskId. */
+/**
+ * Die Checkliste aus dem Formular. Im Panel (Feld checkPanel) steht jeder Punkt als Feld checkText/checkDone; "toggleItem" kehrt
+ * den Haken eines Punktes um, "removeItem" nimmt ihn heraus, "newItem" haengt einen an. Das alte Formular schickt einen Text.
+ */
+function checklistOf(formData: FormData) {
+  if (formData.get("checkPanel") !== "1") return parseChecklist(String(formData.get("checklist") ?? ""));
+  const texts = formData.getAll("checkText").map(String);
+  const dones = formData.getAll("checkDone").map(String);
+  const toggle = Number.parseInt(String(formData.get("toggleItem") ?? ""), 10);
+  const remove = Number.parseInt(String(formData.get("removeItem") ?? ""), 10);
+  const items = texts.flatMap((text, index) => {
+    if (index === remove) return [];
+    const done = dones[index] === "yes";
+    return [{ text: text.trim().slice(0, 200), done: index === toggle ? !done : done }];
+  });
+  const added = String(formData.get("newItem") ?? "").trim().slice(0, 200);
+  return [...items, ...(added ? [{ text: added, done: false }] : [])].filter((item) => item.text.length > 0).slice(0, 30);
+}
+
 export async function saveOrgTaskAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const taskId = uuidOrNull(formData.get("taskId"));
@@ -79,13 +108,25 @@ export async function saveOrgTaskAction(formData: FormData) {
     p_due_on: dateOrNull(formData.get("dueOn")),
     p_program_id: isPrivate ? null : uuidOrNull(formData.get("programId")),
     p_event_id: uuidOrNull(formData.get("eventId")),
-    p_checklist: parseChecklist(String(formData.get("checklist") ?? "")),
+    p_checklist: checklistOf(formData),
     p_visibility: isPrivate ? "private" : "team",
   });
   if (error) finish(backTo(formData, { ...(taskId ? { task: taskId } : {}), taskError: errorOf(error.message) }));
   // Wer neu zustaendig ist, hat den Hinweis schon (Datenbank); hier noch die Mitteilung aufs Geraet.
   if (typeof savedId === "string") await pushOrgTaskNotices(client, savedId, "org_task_assigned");
   finish(backTo(formData, taskId ? { task: taskId, taskSaved: "1" } : { taskSaved: "1" }));
+}
+
+/**
+ * Speichern mit einem Handgriff: Stand, Haken oder Punkt entfernen. Ein Knopf mit Serverfunktion als formAction kann seinen eigenen
+ * Wert nicht mitschicken (React ueberschreibt den Namen) - deshalb wird der Handgriff an die Funktion gebunden (bind), und alles,
+ * was gerade im Formular steht, geht mit.
+ */
+export async function saveOrgTaskWithAction(op: { status?: string; toggle?: number; remove?: number }, formData: FormData) {
+  if (op.status && isTaskStatus(op.status)) formData.set("status", op.status);
+  if (typeof op.toggle === "number") formData.set("toggleItem", String(op.toggle));
+  if (typeof op.remove === "number") formData.set("removeItem", String(op.remove));
+  return saveOrgTaskAction(formData);
 }
 
 /** Eine eigene Aufgabe privat machen oder mit dem Team teilen - nur, wer sie angelegt hat (die Datenbank prueft das). */

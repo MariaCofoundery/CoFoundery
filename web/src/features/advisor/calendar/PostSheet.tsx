@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
-import { addPostTaskAction, deletePostAction, savePostAction, savePostResultAction, unlinkPostTaskAction } from "@/features/advisor/socialCalendarActions";
+import { addPostTaskAction, deletePostAction, savePostAction, savePostResultAction, unlinkPostTaskByIdAction } from "@/features/advisor/socialCalendarActions";
 import { CHANNELS, CHANNEL_STYLE, POST_STATUSES, type ContentDefaults, type ContentItem, type OrgCampaign, type OrgPost, postNoLabel, type PostTask } from "@/features/advisor/socialCalendarModel";
 import { SidePanel } from "@/features/ui/SidePanel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -194,7 +194,7 @@ export async function PostSheet({
                   <span aria-hidden="true" className={task.status === "done" ? "text-emerald-700" : "text-slate-500"}>{task.status === "done" ? "✓" : "○"}</span>
                   <span className={`min-w-0 flex-1 truncate ${task.status === "done" ? "text-slate-500 line-through" : "font-medium"}`}>{task.title}</span>
                   {task.dueOn ? <span className="shrink-0 text-xs text-slate-600">{task.dueOn.slice(5).split("-").reverse().join(".")}</span> : null}
-                  <button type="submit" formAction={unlinkPostTaskAction} formNoValidate name="unlinkTaskId" value={task.taskId} className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-slate-600 hover:text-rose-800">{t("form.taskUnlink")}</button>
+                  <button type="submit" formAction={unlinkPostTaskByIdAction.bind(null, task.taskId)} formNoValidate className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-slate-600 hover:text-rose-800">{t("form.taskUnlink")}</button>
                 </li>
               ))}
             </ul>

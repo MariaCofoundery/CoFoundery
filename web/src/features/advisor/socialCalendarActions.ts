@@ -162,6 +162,12 @@ export async function savePostResultAction(formData: FormData) {
   finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: postId as string, ...(error ? { socialError: "1" } : { socialSaved: "1" }) }));
 }
 
+/** Wie unlinkPostTaskAction, die Aufgabe als gebundenes Argument (ein Knopf mit formAction kann keinen eigenen Wert mitschicken). */
+export async function unlinkPostTaskByIdAction(taskId: string, formData: FormData) {
+  formData.set("unlinkTaskId", taskId);
+  return unlinkPostTaskAction(formData);
+}
+
 export async function unlinkPostTaskAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const postId = uuidOrNull(formData.get("postId"));

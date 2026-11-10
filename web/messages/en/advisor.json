@@ -1941,6 +1941,16 @@
     "check": {
       "done": "Mark “{task}” as done",
       "reopen": "Reopen “{task}”"
+    },
+    "panel": {
+      "saved": "Saved",
+      "error": "That did not work",
+      "statusLabel": "Status",
+      "statusHint": "Saves right away.",
+      "addItem": "New item",
+      "addItemPlaceholder": "+ Add item",
+      "removeItem": "Remove item “{item}”",
+      "more": "Team and event"
     }
   },
   "funding": {

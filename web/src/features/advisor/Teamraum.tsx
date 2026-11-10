@@ -3,6 +3,7 @@ import { type OrgRole, isLeadRole } from "@/features/advisor/orgRights";
 import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { SidePanel } from "@/features/ui/SidePanel";
 import { ChipChoice, ChipMultiChoice } from "@/features/ui/ChipChoice";
 import { UserText } from "@/features/ui/UserText";
 import { DictateTasks } from "@/features/advisor/DictateTasks";
@@ -16,6 +17,7 @@ import {
   deleteOrgTaskCommentAction,
   moveOrgTaskAction,
   saveOrgTaskAction,
+  saveOrgTaskWithAction,
   setMyOrgPresenceAction,
   setOrgTaskVisibilityAction,
   takeOrgTaskAction,
@@ -181,13 +183,6 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
         <span className={LABEL}>{t("form.titleQuestion")}</span>
         <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} className={INPUT} disabled={!ctx.canWrite} />
       </label>
-      {!task ? (
-        <div>
-          <span className={`${LABEL} mb-2`}>{t("form.visibilityQuestion")}</span>
-          <ChipChoice name="visibility" label={t("form.visibilityQuestion")} options={[{ value: "team", label: t("form.visibilityTeam") }, { value: "private", label: t("form.visibilityPrivate") }]} defaultValue="team" disabled={!ctx.canWrite} />
-          <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.visibilityHint")}</span>
-        </div>
-      ) : null}
       <div>
         <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
         {/* Mehrere moeglich (20270322120000), hoechstens sechs. */}
@@ -204,6 +199,9 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
         <span className={`${LABEL} mb-2`}>{t("form.dueQuestion")}</span>
         <ChipChoice name="dueOn" label={t("form.dueQuestion")} options={dueChoices(ctx.today, t)} defaultValue={task?.dueOn ?? ""} allowEmpty customDate={{ label: t("form.pickDate"), inputLabel: t("form.due") }} disabled={!ctx.canWrite} />
       </div>
+      <details open={hasMore} className="group">
+        <summary className="flex min-h-10 w-fit cursor-pointer list-none items-center text-[15px] font-medium text-violet-800 group-open:hidden">{t("form.more")}</summary>
+        <div className="grid gap-5">
       <label className="block">
         <span className={LABEL}>{t("form.program")}</span>
         {keepsHiddenProgram ? (
@@ -220,9 +218,13 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
           </select>
         )}
       </label>
-      <details open={hasMore} className="group">
-        <summary className="flex min-h-10 w-fit cursor-pointer list-none items-center text-[15px] font-medium text-violet-800 group-open:hidden">{t("form.more")}</summary>
-        <div className="grid gap-5">
+      {!task ? (
+        <div>
+          <span className={`${LABEL} mb-2`}>{t("form.visibilityQuestion")}</span>
+          <ChipChoice name="visibility" label={t("form.visibilityQuestion")} options={[{ value: "team", label: t("form.visibilityTeam") }, { value: "private", label: t("form.visibilityPrivate") }]} defaultValue="team" disabled={!ctx.canWrite} />
+          <span className="mt-1.5 block text-[13px] text-slate-600">{t("form.visibilityHint")}</span>
+        </div>
+      ) : null}
           <div className="grid gap-5 sm:grid-cols-2">
             <label>
               <span className={LABEL}>{t("form.event")}</span>
@@ -333,78 +335,151 @@ async function TaskCard({ ctx, task, filter, selected, back }: { ctx: TeamraumCo
   );
 }
 
-async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; comments: TaskComment[]; back?: Record<string, string> }) {
+/**
+ * Eine Aufgabe als Panel (Entwurf 10.11.2026, ersetzt die Ansicht unter dem Board): am Rechner neben der Liste, am Handy als Blatt von
+ * unten. Alles steht offen da, kein "Bearbeiten"-Schalter. Stand und Checkliste speichern sofort - dabei geht alles mit, was gerade
+ * im Formular steht (dieselbe Funktion wie "Speichern"). Kommentare und Loeschen sind eigene Formulare unter dem Formular.
+ */
+async function TaskPanel({ ctx, task, filter, comments, back = {}, closeHref }: { ctx: TeamraumContext; task: OrgTask; filter: TaskFilter; comments: TaskComment[]; back?: Record<string, string>; closeHref: string }) {
   const t = await getTranslations("advisor.teamraum");
-  const { memberOf, timeOf, href } = helpers(ctx);
+  const { memberOf, timeOf, dayOf } = helpers(ctx);
   const creator = memberOf(task.createdByUserId);
   const canDelete = ctx.canWrite && (task.createdByUserId === ctx.me || ctx.isOwner);
+  const keepsHiddenProgram = Boolean(task.programId && !ctx.programs.some((program) => program.programId === task.programId));
+  const upcoming = ctx.events.filter((event) => berlinDayOf(event.startsAt) >= addDays(ctx.today, -14) || event.eventId === task.eventId);
+  const people = [
+    ...ctx.members.filter((member) => member.isSelf).map((member) => ({ value: member.userId, label: t("form.meShort") })),
+    ...ctx.members.filter((member) => !member.isSelf).map((member) => ({ value: member.userId, label: member.name })),
+  ];
+  const progress = checklistProgress(task);
+  const chip = "inline-flex min-h-10 items-center rounded-full border-[1.5px] px-3.5 text-[13.5px] font-semibold text-slate-950 disabled:opacity-60";
+  const formId = "task-form";
+  const flash = ctx.feedback.saved ? t("panel.saved") : ctx.feedback.error ? t("panel.error") : "";
   return (
-    <section id="task-detail" aria-labelledby="task-detail-title" className={`${CARD} mt-6 scroll-mt-24 border-violet-200`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[13px] font-semibold text-violet-800">{t("detail.eyebrow")}</p>
-          <h2 id="task-detail-title" className="mt-1 text-xl font-semibold text-slate-950">{task.title}</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            {t("detail.meta", { name: creator?.name ?? t("formerMember"), date: timeOf(task.createdAt) })}
-          </p>
-        </div>
-        <Link href={href("tasks", { ...back, ...(filter !== "all" ? { filter } : {}) })} className={QUIET}>{t("detail.close")}</Link>
-      </div>
-
-      {task.details ? (
-        <div className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-800">
-          <UserText text={task.details} />
-        </div>
-      ) : null}
-
-      {task.checklist.length > 0 ? (
-        <div className="mt-5">
-          <h3 className="text-sm font-semibold text-slate-900">{t("detail.checklist", checklistProgress(task))}</h3>
-          <ul className="mt-2 grid gap-1.5">
-            {task.checklist.map((item, index) => (
-              <li key={`${index}-${item.text}`}>
-                <form action={checkOrgTaskItemAction} className="flex items-center gap-3">
-                  <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
-                  <input type="hidden" name="index" value={index} />
-                  <input type="hidden" name="done" value={item.done ? "no" : "yes"} />
-                  <button
-                    type="submit"
-                    disabled={!ctx.canWrite}
-                    aria-label={item.done ? t("detail.uncheck", { item: item.text }) : t("detail.check", { item: item.text })}
-                    className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg border-2 text-sm ${item.done ? "border-violet-600 bg-violet-600 text-white" : "border-slate-300 bg-white text-transparent hover:border-violet-400"}`}
-                  >
-                    ✓
-                  </button>
-                  <span className={`text-sm ${item.done ? "text-slate-500 line-through" : "text-slate-900"}`}>{item.text}</span>
-                </form>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {task.visibility === "private" || (task.createdByUserId === ctx.me && ctx.canWrite) ? (
-        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-          <p className="min-w-0 flex-1 text-[14px] leading-6 text-slate-800">{task.visibility === "private" ? t("detail.privateNote") : t("detail.teamNote")}</p>
-          {task.createdByUserId === ctx.me && ctx.canWrite ? (
-            <form action={setOrgTaskVisibilityAction}>
+    <SidePanel
+      variant="column"
+      closeHref={closeHref}
+      closeLabel={t("detail.close")}
+      titleId="task-panel-title"
+      eyebrow={<>{t("detail.eyebrow")}{flash ? <span role={ctx.feedback.error ? "alert" : "status"} className={`ml-3 text-[12.5px] normal-case tracking-normal ${ctx.feedback.error ? "text-rose-700" : "text-emerald-800"}`}>{flash}</span> : null}</>}
+      footer={
+        <div className="flex flex-wrap items-center gap-2.5">
+          {canDelete ? (
+            <form action={deleteOrgTaskAction}>
               <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
-              <input type="hidden" name="visibility" value={task.visibility === "private" ? "team" : "private"} />
-              <SubmitButton label={task.visibility === "private" ? t("detail.shareWithTeam") : t("detail.makePrivate")} pendingLabel="…" className={QUIET} />
+              <BackFields back={back} />
+              <SubmitButton label={t("detail.delete")} pendingLabel="…" className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-rose-700 underline-offset-4 hover:underline" />
             </form>
           ) : null}
+          <span className="flex-1" />
+          <Link href={closeHref} className="hidden min-h-11 items-center rounded-xl px-4 text-sm font-semibold text-slate-800 hover:bg-slate-100 sm:inline-flex">{t("form.cancel")}</Link>
+          {ctx.canWrite ? <button type="submit" form={formId} className={`${PRIMARY} max-sm:min-h-[52px] max-sm:flex-1 max-sm:justify-center`}>{t("form.save")}</button> : null}
         </div>
-      ) : null}
+      }
+    >
+      <div className="grid gap-5 px-5 pb-6 pt-2 sm:px-7">
+        <form id={formId} action={saveOrgTaskAction} className="grid gap-5">
+          <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+          <BackFields back={back} />
+          <input type="hidden" name="checkPanel" value="1" />
+          {/* Enter im Titel soll speichern, nicht den ersten Stand-Knopf druecken: dieser unsichtbare Knopf steht zuerst. */}
+          <input type="hidden" name="status" value={task.status} />
+          <button type="submit" tabIndex={-1} aria-hidden="true" className="sr-only" />
+          <label className="block">
+            <span className="sr-only">{t("form.titleQuestion")}</span>
+            <input id="task-panel-title" name="title" required maxLength={200} defaultValue={task.title} disabled={!ctx.canWrite} className="font-brand w-full border-0 border-b-2 border-slate-200 bg-transparent pb-2.5 pt-1 text-[24px] font-semibold leading-tight text-slate-950 outline-none focus:border-violet-500" />
+          </label>
+          <p className="-mt-3 text-xs text-slate-500">{t("detail.meta", { name: creator?.name ?? t("formerMember"), date: timeOf(task.createdAt) })}</p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-        <details className="self-start rounded-2xl border border-slate-200 bg-white/70 p-4" open={ctx.feedback.error !== null}>
-          <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-slate-900">{t("detail.edit")}</summary>
-          <div className="mt-3">
-            <TaskForm ctx={ctx} tab="tasks" filter={filter} task={task} />
+          <div>
+            <span className={`${LABEL} mb-2`}>{t("panel.statusLabel")}</span>
+            <div className="flex flex-wrap gap-1.5">
+              {TASK_STATUSES.map((status) => (
+                <button key={status} type="submit" formAction={saveOrgTaskWithAction.bind(null, { status })} formNoValidate disabled={!ctx.canWrite} aria-pressed={task.status === status} className={`${chip} ${task.status === status ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}>
+                  {t(`status.${status}`)}
+                </button>
+              ))}
+            </div>
+            {ctx.canWrite ? <span className="mt-1.5 block text-xs text-slate-600">{t("panel.statusHint")}</span> : null}
           </div>
-        </details>
 
-        <section aria-labelledby="task-comments-title">
+          <div>
+            <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
+            {people.length <= 12 ? (
+              <ChipMultiChoice name="assignee" label={t("form.assigneeQuestion")} options={people} defaultValues={task.assigneeUserIds} noneLabel={t("form.nobodyYet")} max={6} disabled={!ctx.canWrite} />
+            ) : (
+              <select name="assignee" multiple size={6} aria-label={t("form.assigneeQuestion")} defaultValue={task.assigneeUserIds} className={`${INPUT} py-2`} disabled={!ctx.canWrite}>
+                {people.map((person) => <option key={person.value} value={person.value}>{person.label}</option>)}
+              </select>
+            )}
+          </div>
+          <div>
+            <span className={`${LABEL} mb-2`}>{t("form.dueQuestion")}</span>
+            <ChipChoice name="dueOn" label={t("form.dueQuestion")} options={dueChoices(ctx.today, t)} defaultValue={task.dueOn ?? ""} allowEmpty customDate={{ label: t("form.pickDate"), inputLabel: t("form.due") }} disabled={!ctx.canWrite} />
+          </div>
+          <label className="block">
+            <span className={LABEL}>{t("form.details")}</span>
+            <textarea name="details" rows={4} maxLength={4000} defaultValue={task.details ?? ""} disabled={!ctx.canWrite} className={`${INPUT} py-2`} />
+          </label>
+
+          <fieldset className="grid gap-1">
+            <legend className={LABEL}>{t("detail.checklist", progress)}</legend>
+            {task.checklist.map((item, index) => (
+              <div key={`${index}-${item.text}`} className="flex items-center gap-1">
+                <input type="hidden" name="checkText" value={item.text} />
+                <input type="hidden" name="checkDone" value={item.done ? "yes" : "no"} />
+                <button type="submit" formAction={saveOrgTaskWithAction.bind(null, { toggle: index })} formNoValidate disabled={!ctx.canWrite} aria-label={item.done ? t("detail.uncheck", { item: item.text }) : t("detail.check", { item: item.text })} className="grid h-11 w-11 shrink-0 place-items-center">
+                  <span aria-hidden="true" className={`grid h-6 w-6 place-items-center rounded-md border-2 text-[13px] font-bold ${item.done ? "border-emerald-700 bg-emerald-700 text-white" : "border-slate-400 bg-white text-transparent"}`}>✓</span>
+                </button>
+                <span className={`min-w-0 flex-1 break-words text-[14.5px] ${item.done ? "text-slate-500 line-through" : "text-slate-900"}`}>{item.text}</span>
+                {ctx.canWrite ? <button type="submit" formAction={saveOrgTaskWithAction.bind(null, { remove: index })} formNoValidate aria-label={t("panel.removeItem", { item: item.text })} className="grid h-11 w-11 shrink-0 place-items-center text-lg text-slate-500 hover:text-rose-700">×</button> : null}
+              </div>
+            ))}
+            {ctx.canWrite ? <input name="newItem" maxLength={200} aria-label={t("panel.addItem")} placeholder={t("panel.addItemPlaceholder")} className={INPUT} /> : null}
+          </fieldset>
+
+          <details open={Boolean(task.eventId || task.programId)} className="group">
+            <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center text-[14.5px] font-semibold text-violet-800">{t("panel.more")}</summary>
+            <div className="mt-2 grid gap-4 sm:grid-cols-2">
+              <label>
+                <span className={LABEL}>{t("form.program")}</span>
+                {keepsHiddenProgram ? (
+                  <>
+                    <input type="hidden" name="programId" value={task.programId ?? ""} />
+                    <span className="mt-1 flex min-h-11 items-center text-sm text-slate-600">{t("hiddenProgram")}</span>
+                  </>
+                ) : (
+                  <select name="programId" defaultValue={task.programId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
+                    <option value="">{t("form.internal")}</option>
+                    {ctx.programs.map((program) => <option key={program.programId} value={program.programId}>{program.name}</option>)}
+                  </select>
+                )}
+              </label>
+              <label>
+                <span className={LABEL}>{t("form.event")}</span>
+                <select name="eventId" defaultValue={task.eventId ?? ""} className={INPUT} disabled={!ctx.canWrite}>
+                  <option value="">{t("form.noEvent")}</option>
+                  {upcoming.map((event) => <option key={event.eventId} value={event.eventId}>{`${dayOf(berlinDayOf(event.startsAt))} · ${event.title}`}</option>)}
+                </select>
+              </label>
+            </div>
+          </details>
+        </form>
+
+        {task.visibility === "private" || (task.createdByUserId === ctx.me && ctx.canWrite) ? (
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+            <p className="min-w-0 flex-1 text-[14px] leading-6 text-slate-800">{task.visibility === "private" ? t("detail.privateNote") : t("detail.teamNote")}</p>
+            {task.createdByUserId === ctx.me && ctx.canWrite ? (
+              <form action={setOrgTaskVisibilityAction}>
+                <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
+                <input type="hidden" name="visibility" value={task.visibility === "private" ? "team" : "private"} />
+                <SubmitButton label={task.visibility === "private" ? t("detail.shareWithTeam") : t("detail.makePrivate")} pendingLabel="…" className={QUIET} />
+              </form>
+            ) : null}
+          </div>
+        ) : null}
+
+        <section aria-labelledby="task-comments-title" className="border-t border-slate-100 pt-4">
           <h3 id="task-comments-title" className="text-sm font-semibold text-slate-900">{t("detail.comments", { count: comments.length })}</h3>
           <ul className="mt-2 grid gap-3">
             {comments.map((comment) => {
@@ -413,15 +488,13 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
                 <li key={comment.id} className="flex gap-2.5">
                   <Avatar userId={comment.authorUserId} name={author?.name ?? t("formerMember")} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-slate-500">
-                      <span className="font-semibold text-slate-800">{author?.name ?? t("formerMember")}</span> · {timeOf(comment.createdAt)}
-                    </p>
+                    <p className="text-xs text-slate-500"><span className="font-semibold text-slate-800">{author?.name ?? t("formerMember")}</span> · {timeOf(comment.createdAt)}</p>
                     <p className="whitespace-pre-line text-sm leading-6 text-slate-800"><UserText text={comment.body} /></p>
                     {comment.authorUserId === ctx.me ? (
                       <form action={deleteOrgTaskCommentAction}>
                         <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
                         <input type="hidden" name="commentId" value={comment.id} />
-                        <SubmitButton label={t("detail.deleteComment")} pendingLabel="…" className="text-xs text-slate-500 underline-offset-4 hover:underline" />
+                        <SubmitButton label={t("detail.deleteComment")} pendingLabel="…" className="min-h-9 text-xs text-slate-500 underline-offset-4 hover:underline" />
                       </form>
                     ) : null}
                   </div>
@@ -441,14 +514,18 @@ async function TaskDetail({ ctx, task, filter, comments, back = {} }: { ctx: Tea
           ) : null}
         </section>
       </div>
+    </SidePanel>
+  );
+}
 
-      {canDelete ? (
-        <form action={deleteOrgTaskAction} className="mt-6 border-t border-slate-100 pt-4">
-          <Hidden ctx={ctx} tab="tasks" filter={filter} taskId={task.id} />
-          <SubmitButton label={t("detail.delete")} pendingLabel="…" className="text-sm font-medium text-rose-700 underline-offset-4 hover:underline" />
-        </form>
-      ) : null}
-    </section>
+/** Ansicht, Suche und Monat der Liste gehen als versteckte Felder mit, damit man nach dem Speichern dort wieder landet. */
+function BackFields({ back }: { back: Record<string, string> }) {
+  return (
+    <>
+      {Object.entries(back)
+        .filter(([key]) => ["view", "month", "q", "done", "team"].includes(key))
+        .map(([key, value]) => <input key={key} type="hidden" name={`back_${key}`} value={value} />)}
+    </>
   );
 }
 
@@ -682,7 +759,7 @@ export async function TeamraumBoard({
   );
   const doneCount = columns.done.length + columns.doneHidden;
   const board = (
-    <div className="mt-5 grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className={`mt-5 grid items-start gap-4 md:grid-cols-2 ${selected ? "2xl:grid-cols-4" : "xl:grid-cols-4"}`}>
       {TASK_STATUSES.map((status) => (
         <section key={status} aria-labelledby={`col-${status}`} className="grid content-start gap-2.5 rounded-2xl bg-[#ECEDF6] p-3">
           <h3 id={`col-${status}`} className="mx-1 my-0.5 flex items-center justify-between text-sm font-semibold text-slate-950">
@@ -712,7 +789,8 @@ export async function TeamraumBoard({
   );
 
   return (
-    <div>
+    <div className={selected ? "lg:flex lg:items-start lg:gap-5" : ""}>
+    <div className="min-w-0 flex-1">
       <Feedback ctx={ctx} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -814,7 +892,9 @@ export async function TeamraumBoard({
         </Link>
       ) : null}
 
-      {selected ? <TaskDetail ctx={ctx} task={selected} filter={filter} comments={comments} back={keep} /> : null}
+      
+    </div>
+    {selected ? <TaskPanel ctx={ctx} task={selected} filter={filter} comments={comments} back={keep} closeHref={closeHref} /> : null}
     </div>
   );
 }
