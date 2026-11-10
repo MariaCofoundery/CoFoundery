@@ -1,6 +1,6 @@
 /**
  * Feiertage und Schulferien der 16 Bundeslaender, 2026 bis 2028 - fest eingebaut, kein Fremddienst beim Aufruf des Kalenders.
- * Quelle: openholidaysapi.org (Abruf 10.11.2026; Schulferien allgemeinbildender Schulen, in Mecklenburg-Vorpommern ohne die
+ * Quelle: openholidaysapi.org, Daten unter der Open Database License (ODbL) - Namensnennung steht im Kalender (Abruf 10.11.2026; Schulferien allgemeinbildender Schulen, in Mecklenburg-Vorpommern ohne die
  * berufsbildenden). Ortsbezogene Feiertage (z. B. Augsburger Friedensfest) sind bewusst nicht dabei. Der Reformationstag in
  * Brandenburg fehlte in der Quelle und wurde ergaenzt. Fuer 2029 und spaeter muss die Liste neu erzeugt werden.
  */

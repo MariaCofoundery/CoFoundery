@@ -903,7 +903,7 @@
       "tabsLabel": "Bereiche der Organisation",
       "groupLabels": "Betreuen | Inhalte für die Teams | Einrichten",
       "groupHints": "Die tägliche Arbeit mit den Teams im Programm: Überblick, Teams, Termine, Auswertung und Förderauflagen. | Was eure Teams lesen, lernen und wen sie fragen können. | Einmal einrichten, selten wieder anfassen: aufnehmen, Programmseite, Funktionen, Mitglieder, Freigaben und Profil.",
-      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil",
+      "tabs": "Übersicht | Teams im Programm | Programmplan | Auswertung | Förderauflagen | Unterlagen | Lernbereich | Experten | Teams aufnehmen | Programmseite | Funktionen & Erfolge | Mitglieder & Rollen | Freigaben | Profil | Content-Report | Partner",
       "seatsLimited": "{used} von {limit} Plätzen belegt",
       "seatsOpen": "{used} Plätze belegt, ohne Obergrenze",
       "statTeams": "Teams im Programm",
@@ -2204,7 +2204,15 @@
       "taskDue": "Fällig am",
       "taskExisting": "Oder eine vorhandene Teamaufgabe verknüpfen",
       "taskAdd": "Aufgabe hinzufügen",
-      "taskHint": "Der Beitrag wird dabei mitgespeichert. Private Aufgaben lassen sich nicht verknüpfen."
+      "taskHint": "Der Beitrag wird dabei mitgespeichert. Private Aufgaben lassen sich nicht verknüpfen.",
+      "resultTitle": "Link und Ergebnisse (freiwillig)",
+      "publishedUrl": "Link zum veröffentlichten Beitrag (https)",
+      "resultViews": "Aufrufe",
+      "resultReactions": "Reaktionen",
+      "resultClicks": "Klicks",
+      "resultNote": "Notiz",
+      "resultSave": "Link und Ergebnisse speichern",
+      "resultHint": "Alles ist freiwillig. Leere Felder bleiben leer und erscheinen im Report als „Noch nichts eingetragen“."
     },
     "plan": {
       "title": "Kampagne planen – reinsprechen oder tippen",
@@ -2628,7 +2636,7 @@
       "state": "Bundesland",
       "public": "Gesetzliche Feiertage zeigen",
       "school": "Schulferien zeigen",
-      "hint": "Gilt nur für dich und wird auf diesem Gerät gemerkt. Daten für 2026 bis 2028; ohne Haken erscheint nichts.",
+      "hint": "Gilt nur für dich und wird auf diesem Gerät gemerkt. Daten für 2026 bis 2028 aus der OpenHolidays API (ODbL); ohne Haken erscheint nichts.",
       "save": "Übernehmen",
       "states": {
         "BW": "Baden-Württemberg",
@@ -2795,5 +2803,143 @@
     "linksHint": "Nur https-Links, bis zu acht.",
     "save": "Tipp speichern",
     "privacy": "Ihr seht nicht, was eure Startups abgehakt haben – die Checkliste bleibt Sache des Teams."
+  },
+  "contentReport": {
+    "title": "Content-Report",
+    "intro": "Drei Bereiche aus dem, was im Kalender schon steht. Niemand pflegt den Report extra.",
+    "download": "Als Tabelle herunterladen (CSV)",
+    "areasLabel": "Bereiche des Reports",
+    "areas": {
+      "geplant": "Geplante Einzelbeiträge",
+      "kampagnen": "Events & Kampagnen",
+      "veroeffentlicht": "Veröffentlicht"
+    },
+    "columns": {
+      "geplant": "ID | Titel | Datum | Marke | Kanal | Säule | Format | Stand | Kampagne / Event | Material | Offene Informationen | Freigabe",
+      "kampagnen": "Titel | Zeitraum | Marke | Ziel | Ansprechpartner | Wichtige Termine | Verknüpfte Beiträge",
+      "veroeffentlicht": "Marke | Kanal | Veröffentlicht | Beitragstitel | Beitragslink | Ergebnisse (optional)"
+    },
+    "hints": {
+      "geplant": "Alles, was noch nicht draußen ist: Ideen, Entwürfe, Freigaben, Geplantes. Die ID öffnet den Beitrag im Kalender.",
+      "kampagnen": "Events und Kampagnen mit Ziel, Ansprechpartner und den Terminen, auf die hingearbeitet wird. Die Beiträge dazu sind verknüpft.",
+      "veroeffentlicht": "Was schon draußen ist, mit Link zum Beitrag. Ergebnisse sind freiwillig und stehen nur da, wenn jemand sie einträgt."
+    },
+    "empty": {
+      "geplant": "Im gewählten Zeitraum ist nichts geplant.",
+      "kampagnen": "Im gewählten Zeitraum gibt es keine Kampagnen.",
+      "veroeffentlicht": "Im gewählten Zeitraum wurde nichts als veröffentlicht eingetragen."
+    },
+    "filters": {
+      "from": "Von",
+      "to": "Bis",
+      "brand": "Marke",
+      "channel": "Kanal",
+      "all": "Alle",
+      "apply": "Anzeigen"
+    },
+    "status": {
+      "idea": "Idee",
+      "draft": "In Arbeit",
+      "review": "Zur Freigabe",
+      "planned": "Freigegeben",
+      "published": "Veröffentlicht"
+    },
+    "channels": {
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "x": "X",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "newsletter": "Newsletter",
+      "website": "Website",
+      "other": "Sonstiges"
+    },
+    "words": {
+      "views": "Aufrufe",
+      "reactions": "Reaktionen",
+      "clicks": "Klicks"
+    },
+    "noResults": "Noch nichts eingetragen",
+    "link": "Link",
+    "opensNew": "(öffnet in neuem Tab)",
+    "postsCount": "{count, plural, =0 {Keine Beiträge} one {1 Beitrag} other {# Beiträge}}",
+    "unnamed": "Ohne Namen",
+    "edit": "Bearbeiten",
+    "saved": "Gespeichert.",
+    "error": "Das hat nicht geklappt. Prüf die Angaben.",
+    "campaign": {
+      "title": "{name}: Ziel, Ansprechpartner, Termine",
+      "brand": "Marke",
+      "contact": "Ansprechpartner",
+      "none": "Keine Angabe",
+      "goal": "Ziel (ein Satz)",
+      "goalPlaceholder": "Zum Beispiel: 200 Gäste, 10 Investoren am Tisch",
+      "keyDates": "Wichtige Termine",
+      "keyDay": "Tag {n}",
+      "keyLabel": "Bezeichnung {n}",
+      "keyPlaceholder": "Zum Beispiel: Einladung raus",
+      "keyHint": "Leere Zeilen werden nicht gespeichert. Höchstens zehn Termine, sortiert nach Tag.",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "footnote": "Der Report liest nur, was schon eingetragen ist. Er bewertet keine Personen; Ergebnisse sind freiwillige Zahlen zum Beitrag."
+  },
+  "partners": {
+    "title": "Partner, Investoren, Speaker",
+    "intro": "Eure interne Liste. Nur Mitglieder mit dem Recht „Personen“ sehen sie. Teams, Gäste und andere Organisationen sehen sie nie, und nichts davon erscheint in Connect.",
+    "add": "Eintrag",
+    "noRight": "Die Partnerliste ist nur für Mitglieder mit dem Recht „Personen“ sichtbar. Die Admins der Organisation können es dir geben.",
+    "unnamed": "Ohne Namen",
+    "all": "Alle",
+    "kindsLabel": "Art",
+    "search": "Suche",
+    "empty": "Noch keine Einträge. Fang mit einer Person oder einer Organisation an, mit der ihr zusammenarbeitet.",
+    "emptyFiltered": "Dazu gibt es keinen Eintrag.",
+    "pickHint": "Wähle links einen Eintrag oder lege einen neuen an.",
+    "kinds": {
+      "partner": "Partner",
+      "investor": "Investoren",
+      "speaker": "Speaker",
+      "mentor": "Mentoren",
+      "other": "Sonstige"
+    },
+    "kindsHint": "Bis zu drei Arten je Eintrag.",
+    "statuses": {
+      "asked": "Angefragt",
+      "talking": "Im Gespräch",
+      "committed": "Zugesagt",
+      "active": "Aktiv",
+      "paused": "Ruht"
+    },
+    "newTitle": "Neuer Eintrag",
+    "fields": {
+      "name": "Name",
+      "kinds": "Art",
+      "company": "Firma oder Organisation",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "url": "Link (https)",
+      "status": "Stand",
+      "owner": "Kümmert sich",
+      "nobody": "Niemand",
+      "notes": "Notiz"
+    },
+    "save": "Speichern",
+    "close": "Schließen",
+    "delete": "Eintrag löschen",
+    "saved": "Gespeichert.",
+    "deleted": "Eintrag gelöscht.",
+    "error": "Das hat nicht geklappt. Prüf die Angaben.",
+    "errorUrl": "Der Link muss mit https:// beginnen.",
+    "eventsTitle": "Spricht bei",
+    "eventsNone": "Noch keinem Event zugeordnet.",
+    "eventPick": "Event wählen",
+    "eventRole": "Rolle (z. B. Keynote)",
+    "eventAdd": "Zuordnen",
+    "eventRemove": "Lösen",
+    "hiddenEvent": "Event",
+    "ownerLine": "Kümmert sich: {name}",
+    "footnote": "Kein Verlauf, keine Bewertung, keine Rangfolge. Es sind persönliche Daten: Sie liegen nur hier und lassen sich jederzeit löschen."
   }
 }

@@ -73,7 +73,7 @@ export const isInvitePath = (pathname: string) =>
   pathname === "/advisor/einladen" || pathname === "/team-intake" || pathname.startsWith("/team-intake/") || pathname.startsWith("/advisor/intake");
 
 const SETUP_TABS = ["enroll", "page", "features", "members", "access", "profile", "settings", "success"];
-const CONTENT_TABS = ["materials", "learning", "experts"];
+const CONTENT_TABS = ["materials", "learning", "experts", "partners"];
 const onOrg = (pathname: string) => pathname === ORG;
 
 /** Welche Seiten tragen die Seitenleiste: der Advisor-Bereich, Events, Team-Runden, Postfach und Konto. */
@@ -157,7 +157,7 @@ export function buildWorkspaceNav({ hasOrg, chatUnread = 0 }: { hasOrg: boolean;
           // Der Programmplan: alle Termine als Liste, hier traegt man sie ein (einzeln, mehrere auf einmal, Formate).
           { key: "plan", href: `${CALENDAR_PATH}?ansicht=${PLAN_VIEW}`, icon: "plan", match: (pathname, _tab, view) => pathname === CALENDAR_PATH && view === PLAN_VIEW },
           { key: "social", href: teamraumPath("social"), icon: "social", match: (pathname) => inTeamraum(pathname, ["social"]) },
-          { key: "report", href: tabHref("report"), icon: "report", match: (pathname, tab) => onOrg(pathname) && tab === "report" },
+          { key: "report", href: tabHref("report"), icon: "report", match: (pathname, tab) => onOrg(pathname) && (tab === "report" || tab === "contentReport") },
           { key: "funding", href: tabHref("funding"), icon: "funding", match: (pathname, tab) => (onOrg(pathname) && tab === "funding") || pathname === "/advisor/organisation/foerderung" },
         ],
       },

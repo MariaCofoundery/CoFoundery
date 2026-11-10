@@ -139,6 +139,29 @@ export async function addPostTaskAction(formData: FormData) {
   finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: postId as string, socialSaved: "1" }));
 }
 
+/** Link zum veroeffentlichten Beitrag und freiwillige Ergebnisse. Leere Zahlen bleiben leer. Der Beitrag selbst wird mit gespeichert. */
+export async function savePostResultAction(formData: FormData) {
+  const client = await requireUser(backTo(formData));
+  const plannedOn = dateOrNull(formData.get("plannedOn"));
+  const saved = await persistPost(client, formData);
+  const postId = typeof saved.data === "string" ? saved.data : uuidOrNull(formData.get("postId"));
+  if (saved.error || !postId) finish(backTo(formData, { ...(postId ? { post: postId } : {}), socialError: "1" }));
+  const count = (name: string) => {
+    const text = String(formData.get(name) ?? "").trim();
+    return /^\d{1,10}$/.test(text) ? Number(text) : null;
+  };
+  const url = String(formData.get("publishedUrl") ?? "").trim();
+  const { error } = await client.rpc("set_org_post_result", {
+    p_post_id: postId,
+    p_published_url: url ? url.slice(0, 500) : null,
+    p_views: count("resultViews"),
+    p_reactions: count("resultReactions"),
+    p_clicks: count("resultClicks"),
+    p_note: String(formData.get("resultNote") ?? "").trim().slice(0, 300) || null,
+  });
+  finish(backTo(formData, { ...(plannedOn ? { month: plannedOn.slice(0, 7) } : {}), post: postId as string, ...(error ? { socialError: "1" } : { socialSaved: "1" }) }));
+}
+
 export async function unlinkPostTaskAction(formData: FormData) {
   const client = await requireUser(backTo(formData));
   const postId = uuidOrNull(formData.get("postId"));
@@ -301,4 +324,26 @@ export async function createEventPostsAction(formData: FormData) {
     redirect(back(created > 0 ? { postsCreated: String(created) } : { postsError: "1" }));
   }
   finish(back(created > 0 ? { socialCreated: String(created) } : { socialError: "1" }));
+}
+
+/**
+ * Kampagne: Marke, Ziel, Ansprechpartner und wichtige Termine (20270415120000). Kommt aus dem Content-Report und geht dorthin
+ * zurueck; die Datenbank prueft Recht und Zugehoerigkeit.
+ */
+export async function setCampaignDetailsAction(formData: FormData) {
+  const orgId = uuidOrNull(formData.get("orgId"));
+  const back = orgId ? `/advisor/organisation?${new URLSearchParams({ org: orgId, tab: "contentReport", bereich: "kampagnen" }).toString()}` : "/advisor/organisation";
+  const client = await requireUser(back);
+  const days = formData.getAll("keyDay").map(String);
+  const labels = formData.getAll("keyLabel").map(String);
+  const keyDates = days.flatMap((day, index) => (dateOrNull(day) && (labels[index] ?? "").trim() ? [{ on: day, label: (labels[index] ?? "").trim().slice(0, 80) }] : [])).slice(0, 10);
+  const { error } = await client.rpc("set_org_campaign_details", {
+    p_campaign_id: uuidOrNull(formData.get("campaignId")),
+    p_brand_id: uuidOrNull(formData.get("brandId")),
+    p_goal: String(formData.get("goal") ?? "").trim().slice(0, 200) || null,
+    p_contact_user_id: uuidOrNull(formData.get("contact")),
+    p_key_dates: keyDates,
+  });
+  revalidatePath("/advisor/organisation");
+  redirect(`${back}&${error ? "fehler=1" : "gespeichert=1"}`);
 }

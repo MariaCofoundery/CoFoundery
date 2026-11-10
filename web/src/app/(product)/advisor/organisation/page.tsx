@@ -31,6 +31,8 @@ import { ProgramPageEditor } from "@/features/advisor/ProgramPageEditor";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 import { ProgramAccessTable } from "@/features/advisor/ProgramAccess";
 import { OrgProgramReport } from "@/features/advisor/OrgProgramReport";
+import { OrgContentReport } from "@/features/advisor/contentReport/OrgContentReport";
+import { OrgPartners } from "@/features/advisor/partners/OrgPartners";
 import { parseReportRange } from "@/features/advisor/programReport";
 import { getOrgMilestoneDeadlines, getOrgOutcomeCounts, getOrgTeamPrograms, getOrgProgramStars, getOrgRewards, getOutcomeCatalog, getProgramAccess, listLearning, listModuleShares, listProgramExperts, listProgramMaterials, listEventFormats, listProgramUpdates, listTeamProgramCodes, listTeamProgramInvites } from "@/features/advisor/teamProgramData";
 import {
@@ -46,7 +48,7 @@ import { OrgPeopleCards } from "@/features/advisor/OrgPeopleCards";
 import { listOrgMemberCards } from "@/features/advisor/orgPeopleData";
 import { AreaTips } from "@/features/advisor/setup/AreaTips";
 
-const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile"] as const;
+const TABS = ["overview", "program", "plan", "report", "funding", "materials", "learning", "experts", "enroll", "page", "features", "members", "access", "profile", "contentReport", "partners"] as const;
 type Tab = (typeof TABS)[number];
 
 /**
@@ -55,8 +57,8 @@ type Tab = (typeof TABS)[number];
  * und ist jetzt nur noch dort. "Erfolge" hatte einen zweiten Schalter; er steht jetzt unter "Funktionen & Erfolge".
  */
 const AREA_GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "care", tabs: ["overview", "program", "report", "funding"] },
-  { key: "content", tabs: ["materials", "learning", "experts"] },
+  { key: "care", tabs: ["overview", "program", "report", "contentReport", "funding"] },
+  { key: "content", tabs: ["materials", "learning", "experts", "partners"] },
   { key: "setup", tabs: ["enroll", "page", "features", "members", "access", "profile"] },
 ];
 // Alte Adressen: "settings" (bis 31.10.2026) -> Mitglieder, "success" -> Funktionen & Erfolge.
@@ -194,7 +196,7 @@ export default async function AdvisorOrganisationPage({
   const areaGroups = AREA_GROUPS.map((group, groupIndex) => ({
     key: group.key,
     label: t("orgPage.groupLabels").split(" | ")[groupIndex] ?? group.key,
-    tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry) && (org.role !== "guest" || entry === "report")).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
+    tabs: group.tabs.filter((entry) => (!soloOrg || !SOLO_HIDDEN.includes(entry)) && tabEnabled(org, entry) && (org.role !== "guest" || entry === "report") && (entry !== "contentReport" || org.rights.results) && (entry !== "partners" || org.rights.people)).map((entry) => ({ key: entry, label: tabLabels[TABS.indexOf(entry)] ?? entry, href: base(entry) })),
   })).filter((group) => group.tabs.length > 0);
   // Teams im Programm (Entwurf 05.11.2026): je Team der naechste Meilenstein und das letzte Update. Nur Teams, die
   // diese Person sieht - die Abfragen laufen unter ihren Rechten.
@@ -403,6 +405,14 @@ export default async function AdvisorOrganisationPage({
         {/* Auswertung (Feedback an Maria, 04.11.2026): Zahlen zu Veranstaltungen, Teilnahme und Gespraechen. */}
         {tab === "report" ? (
           <OrgProgramReport orgId={org.id} isOwner={org.isLead} guest={org.role === "guest"} range={parseReportRange(query.from, query.to)} />
+        ) : null}
+
+        {tab === "contentReport" && org.role !== "guest" && org.rights.results ? (
+          <OrgContentReport client={client} orgId={org.id} query={query} locale={getPresentationLocale(await getLocale())} canEditCampaigns={org.rights.room && orgActive} />
+        ) : null}
+
+        {tab === "partners" && org.role !== "guest" ? (
+          <OrgPartners client={client} orgId={org.id} query={query} canUse={org.rights.people && orgActive} locale={getPresentationLocale(await getLocale())} />
         ) : null}
 
         {tab === "materials" && !tabOff ? (

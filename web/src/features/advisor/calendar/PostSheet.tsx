@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
-import { addPostTaskAction, deletePostAction, savePostAction, unlinkPostTaskAction } from "@/features/advisor/socialCalendarActions";
-import { CHANNELS, CHANNEL_STYLE, POST_STATUSES, type ContentDefaults, type ContentItem, type OrgCampaign, type OrgPost, type PostTask } from "@/features/advisor/socialCalendarModel";
+import { addPostTaskAction, deletePostAction, savePostAction, savePostResultAction, unlinkPostTaskAction } from "@/features/advisor/socialCalendarActions";
+import { CHANNELS, CHANNEL_STYLE, POST_STATUSES, type ContentDefaults, type ContentItem, type OrgCampaign, type OrgPost, postNoLabel, type PostTask } from "@/features/advisor/socialCalendarModel";
 import { SidePanel } from "@/features/ui/SidePanel";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { TILE, TILE_INPUT, TILE_LABEL } from "@/features/ui/FormControls";
@@ -68,7 +68,7 @@ export async function PostSheet({
       closeHref={closeHref}
       closeLabel={tc("close")}
       titleId="post-sheet-title"
-      eyebrow={post ? tc("postEditEyebrow") : tc("postNewEyebrow")}
+      eyebrow={post ? `${postNoLabel(post.postNo)} · ${tc("postEditEyebrow")}` : tc("postNewEyebrow")}
       formAction={savePostAction}
       footer={
         <div className="flex flex-wrap items-center gap-2.5">
@@ -167,6 +167,23 @@ export async function PostSheet({
           <span className={TILE_LABEL}>{t("form.body")}</span>
           <textarea name="body" rows={7} maxLength={5000} defaultValue={post?.body ?? ""} placeholder={t("form.bodyPlaceholder")} className={`${TILE_INPUT} resize-y font-normal leading-6`} />
         </label>
+
+        {post ? (
+          <details open={post.status === "published" || Boolean(post.publishedUrl)} className="rounded-2xl border border-slate-200 p-4">
+            <summary className="flex min-h-11 cursor-pointer items-center text-[14.5px] font-bold text-slate-900">{t("form.resultTitle")}</summary>
+            <div className="mt-2 grid gap-3">
+              <label className={TILE}><span className={TILE_LABEL}>{t("form.publishedUrl")}</span><input type="url" name="publishedUrl" maxLength={500} defaultValue={post.publishedUrl ?? ""} placeholder="https://" className={TILE_INPUT} /></label>
+              <div className="grid grid-cols-3 gap-2.5">
+                <label className={TILE}><span className={TILE_LABEL}>{t("form.resultViews")}</span><input name="resultViews" inputMode="numeric" pattern="[0-9]*" maxLength={10} defaultValue={post.resultViews ?? ""} className={TILE_INPUT} /></label>
+                <label className={TILE}><span className={TILE_LABEL}>{t("form.resultReactions")}</span><input name="resultReactions" inputMode="numeric" pattern="[0-9]*" maxLength={10} defaultValue={post.resultReactions ?? ""} className={TILE_INPUT} /></label>
+                <label className={TILE}><span className={TILE_LABEL}>{t("form.resultClicks")}</span><input name="resultClicks" inputMode="numeric" pattern="[0-9]*" maxLength={10} defaultValue={post.resultClicks ?? ""} className={TILE_INPUT} /></label>
+              </div>
+              <label className={TILE}><span className={TILE_LABEL}>{t("form.resultNote")}</span><input name="resultNote" maxLength={300} defaultValue={post.resultNote ?? ""} className={TILE_INPUT} /></label>
+              <SubmitButton formAction={savePostResultAction} formNoValidate label={t("form.resultSave")} pendingLabel="…" className="inline-flex min-h-11 items-center justify-center self-start rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-violet-800 hover:bg-violet-50" />
+              <p className="text-xs leading-5 text-slate-600">{t("form.resultHint")}</p>
+            </div>
+          </details>
+        ) : null}
 
         <section aria-labelledby="post-tasks-title" className="grid gap-3 rounded-2xl border border-slate-200 p-4">
           <h3 id="post-tasks-title" className="text-[14.5px] font-bold text-slate-900">{t("form.tasksTitle")}</h3>

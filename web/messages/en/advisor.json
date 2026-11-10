@@ -903,7 +903,7 @@
       "tabsLabel": "Sections of the organization",
       "groupLabels": "Care | Content for the teams | Set up",
       "groupHints": "Daily work with the teams in the program: overview, teams, dates, report and funding requirements. | What your teams read, learn and whom they can ask. | Set up once, rarely touched again: enrolling, program page, features, members, approvals and profile.",
-      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile",
+      "tabs": "Overview | Teams in the program | Program plan | Report | Funding requirements | Materials | Learning area | Experts | Enroll teams | Program page | Features & achievements | Members & roles | Approvals | Profile | Content report | Partners",
       "seatsLimited": "{used} of {limit} seats used",
       "seatsOpen": "{used} seats used, no upper limit",
       "statTeams": "Teams in the program",
@@ -2204,7 +2204,15 @@
       "taskDue": "Due on",
       "taskExisting": "Or link an existing team task",
       "taskAdd": "Add task",
-      "taskHint": "The post is saved along with it. Private tasks cannot be linked."
+      "taskHint": "The post is saved along with it. Private tasks cannot be linked.",
+      "resultTitle": "Link and results (optional)",
+      "publishedUrl": "Link to the published post (https)",
+      "resultViews": "Views",
+      "resultReactions": "Reactions",
+      "resultClicks": "Clicks",
+      "resultNote": "Note",
+      "resultSave": "Save link and results",
+      "resultHint": "All optional. Empty fields stay empty and show as “Nothing entered yet” in the report."
     },
     "plan": {
       "title": "Plan a campaign – dictate or type",
@@ -2628,7 +2636,7 @@
       "state": "State",
       "public": "Show public holidays",
       "school": "Show school breaks",
-      "hint": "Applies to you only and is remembered on this device. Data for 2026 to 2028; with nothing ticked, nothing is shown.",
+      "hint": "Applies to you only and is remembered on this device. Data for 2026 to 2028 from the OpenHolidays API (ODbL); with nothing ticked, nothing is shown.",
       "save": "Apply",
       "states": {
         "BW": "Baden-Wuerttemberg",
@@ -2795,5 +2803,143 @@
     "linksHint": "Only https links, up to eight.",
     "save": "Save tip",
     "privacy": "You do not see what your startups ticked – the checklist stays the team's business."
+  },
+  "contentReport": {
+    "title": "Content report",
+    "intro": "Three areas built from what is already in the calendar. Nobody maintains the report separately.",
+    "download": "Download as table (CSV)",
+    "areasLabel": "Report areas",
+    "areas": {
+      "geplant": "Planned posts",
+      "kampagnen": "Events & campaigns",
+      "veroeffentlicht": "Published"
+    },
+    "columns": {
+      "geplant": "ID | Title | Date | Brand | Channel | Pillar | Format | Status | Campaign / event | Material | Open information | Approval",
+      "kampagnen": "Title | Period | Brand | Goal | Contact | Key dates | Linked posts",
+      "veroeffentlicht": "Brand | Channel | Published | Post title | Post link | Results (optional)"
+    },
+    "hints": {
+      "geplant": "Everything that is not out yet: ideas, drafts, approvals, planned posts. The ID opens the post in the calendar.",
+      "kampagnen": "Events and campaigns with goal, contact and the dates you work towards. Their posts are linked.",
+      "veroeffentlicht": "What is already out, with a link to the post. Results are optional and only show if someone enters them."
+    },
+    "empty": {
+      "geplant": "Nothing is planned in the chosen period.",
+      "kampagnen": "There are no campaigns in the chosen period.",
+      "veroeffentlicht": "Nothing was marked as published in the chosen period."
+    },
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "brand": "Brand",
+      "channel": "Channel",
+      "all": "All",
+      "apply": "Show"
+    },
+    "status": {
+      "idea": "Idea",
+      "draft": "In progress",
+      "review": "For approval",
+      "planned": "Approved",
+      "published": "Published"
+    },
+    "channels": {
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "x": "X",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "newsletter": "Newsletter",
+      "website": "Website",
+      "other": "Other"
+    },
+    "words": {
+      "views": "views",
+      "reactions": "reactions",
+      "clicks": "clicks"
+    },
+    "noResults": "Nothing entered yet",
+    "link": "Link",
+    "opensNew": "(opens in a new tab)",
+    "postsCount": "{count, plural, =0 {No posts} one {1 post} other {# posts}}",
+    "unnamed": "Unnamed",
+    "edit": "Edit",
+    "saved": "Saved.",
+    "error": "That did not work. Check the details.",
+    "campaign": {
+      "title": "{name}: goal, contact, dates",
+      "brand": "Brand",
+      "contact": "Contact",
+      "none": "Not set",
+      "goal": "Goal (one sentence)",
+      "goalPlaceholder": "For example: 200 guests, 10 investors at the table",
+      "keyDates": "Key dates",
+      "keyDay": "Day {n}",
+      "keyLabel": "Label {n}",
+      "keyPlaceholder": "For example: invitation goes out",
+      "keyHint": "Empty rows are not saved. At most ten dates, sorted by day.",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "footnote": "The report only reads what has been entered. It does not rate people; results are optional numbers about the post."
+  },
+  "partners": {
+    "title": "Partners, investors, speakers",
+    "intro": "Your internal list. Only members with the “People” right see it. Teams, guests and other organizations never do, and nothing from it appears in Connect.",
+    "add": "Entry",
+    "noRight": "The partner list is only visible to members with the “People” right. The organization's admins can give it to you.",
+    "unnamed": "Unnamed",
+    "all": "All",
+    "kindsLabel": "Type",
+    "search": "Search",
+    "empty": "No entries yet. Start with a person or organization you work with.",
+    "emptyFiltered": "No entry matches.",
+    "pickHint": "Pick an entry on the left or add a new one.",
+    "kinds": {
+      "partner": "Partners",
+      "investor": "Investors",
+      "speaker": "Speakers",
+      "mentor": "Mentors",
+      "other": "Other"
+    },
+    "kindsHint": "Up to three types per entry.",
+    "statuses": {
+      "asked": "Asked",
+      "talking": "In conversation",
+      "committed": "Confirmed",
+      "active": "Active",
+      "paused": "On hold"
+    },
+    "newTitle": "New entry",
+    "fields": {
+      "name": "Name",
+      "kinds": "Type",
+      "company": "Company or organization",
+      "email": "Email",
+      "phone": "Phone",
+      "url": "Link (https)",
+      "status": "Status",
+      "owner": "Looked after by",
+      "nobody": "Nobody",
+      "notes": "Note"
+    },
+    "save": "Save",
+    "close": "Close",
+    "delete": "Delete entry",
+    "saved": "Saved.",
+    "deleted": "Entry deleted.",
+    "error": "That did not work. Check the details.",
+    "errorUrl": "The link must start with https://.",
+    "eventsTitle": "Speaks at",
+    "eventsNone": "Not assigned to an event yet.",
+    "eventPick": "Choose event",
+    "eventRole": "Role (e.g. keynote)",
+    "eventAdd": "Assign",
+    "eventRemove": "Remove",
+    "hiddenEvent": "Event",
+    "ownerLine": "Looked after by: {name}",
+    "footnote": "No history, no rating, no ranking. This is personal data: it lives only here and can be deleted at any time."
   }
 }

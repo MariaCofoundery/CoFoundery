@@ -47,6 +47,13 @@ export type OrgPost = {
   materialUrl: string | null;
   approverUserId: string | null;
   openInfo: string | null;
+  /** Content-Report (20270415120000): laufende Nummer je Organisation, Link zum veroeffentlichten Beitrag, freiwillige Ergebnisse. */
+  postNo: number;
+  publishedUrl: string | null;
+  resultViews: number | null;
+  resultReactions: number | null;
+  resultClicks: number | null;
+  resultNote: string | null;
 };
 
 export const CONTENT_KINDS = ["brand", "pillar", "format"] as const;
@@ -73,7 +80,22 @@ export type ContentDefaults = {
   status: PostStatus | null;
 };
 export type PostTask = { taskId: string; title: string; status: string; dueOn: string | null };
-export type OrgCampaign = { id: string; name: string; startsOn: string | null; endsOn: string | null; notes: string | null };
+export type CampaignKeyDate = { on: string; label: string };
+export type OrgCampaign = {
+  id: string; name: string; startsOn: string | null; endsOn: string | null; notes: string | null;
+  /** Content-Report (20270415120000): Marke, Ziel, Ansprechpartner, wichtige Termine. */
+  brandId: string | null; goal: string | null; contactUserId: string | null; keyDates: CampaignKeyDate[];
+};
+
+/** Beitrags-Nummer als Text: B-014. */
+export const postNoLabel = (postNo: number) => `B-${String(postNo).padStart(3, "0")}`;
+
+export function keyDatesOf(value: unknown): CampaignKeyDate[] {
+  return (Array.isArray(value) ? value : []).flatMap((entry) => {
+    const row = entry && typeof entry === "object" ? (entry as Record<string, unknown>) : null;
+    return row && typeof row.on === "string" && /^\d{4}-\d{2}-\d{2}$/.test(row.on) && typeof row.label === "string" && row.label.trim() ? [{ on: row.on, label: row.label.trim().slice(0, 80) }] : [];
+  }).slice(0, 10);
+}
 export type CalendarEvent = { eventId: string; title: string; startsAt: string };
 
 export const isChannel = (value: unknown): value is Channel => (CHANNELS as readonly unknown[]).includes(value);
@@ -98,6 +120,12 @@ export function postOf(row: Record<string, unknown>): OrgPost {
     materialUrl: (row.material_url as string | null) ?? null,
     approverUserId: (row.approver_user_id as string | null) ?? null,
     openInfo: (row.open_info as string | null) ?? null,
+    postNo: typeof row.post_no === "number" ? row.post_no : 0,
+    publishedUrl: (row.published_url as string | null) ?? null,
+    resultViews: typeof row.result_views === "number" ? row.result_views : null,
+    resultReactions: typeof row.result_reactions === "number" ? row.result_reactions : null,
+    resultClicks: typeof row.result_clicks === "number" ? row.result_clicks : null,
+    resultNote: (row.result_note as string | null) ?? null,
   };
 }
 

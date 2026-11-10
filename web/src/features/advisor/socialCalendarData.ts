@@ -1,12 +1,12 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isBrandColor, isChannel, isPostStatus, postOf, type ContentDefaults, type ContentItem, type ContentKind, type OrgCampaign, type OrgPost, type PostTask } from "@/features/advisor/socialCalendarModel";
+import { isBrandColor, isChannel, isPostStatus, keyDatesOf, postOf, type ContentDefaults, type ContentItem, type ContentKind, type OrgCampaign, type OrgPost, type PostTask } from "@/features/advisor/socialCalendarModel";
 import { stepsOf, type PostTemplate } from "@/features/advisor/postPlanning";
 
 /** Social-Media-Kalender lesen - normaler Zugang, die Zeilensicherheit entscheidet (20270319120000). */
 
-const POST_COLUMNS = "id, title, body, channels, planned_on, planned_time, status, campaign_id, event_id, assignee_user_id, created_by_user_id, brand_id, pillar_id, format_id, material_url, approver_user_id, open_info";
+const POST_COLUMNS = "id, title, body, channels, planned_on, planned_time, status, campaign_id, event_id, assignee_user_id, created_by_user_id, brand_id, pillar_id, format_id, material_url, approver_user_id, open_info, post_no, published_url, result_views, result_reactions, result_clicks, result_note";
 
 export async function listOrgPosts(client: SupabaseClient, orgId: string, from: string, to: string): Promise<OrgPost[]> {
   const { data, error } = await client.from("advisor_org_posts").select(POST_COLUMNS).eq("org_id", orgId).gte("planned_on", from).lte("planned_on", to).order("planned_on").limit(1000);
@@ -28,14 +28,18 @@ export async function getOrgPost(client: SupabaseClient, orgId: string, postId: 
 }
 
 export async function listOrgCampaigns(client: SupabaseClient, orgId: string): Promise<OrgCampaign[]> {
-  const { data, error } = await client.from("advisor_org_campaigns").select("id, name, starts_on, ends_on, notes").eq("org_id", orgId).order("starts_on", { ascending: false, nullsFirst: false }).limit(200);
+  const { data, error } = await client.from("advisor_org_campaigns").select("id, name, starts_on, ends_on, notes, brand_id, goal, contact_user_id, key_dates").eq("org_id", orgId).order("starts_on", { ascending: false, nullsFirst: false }).limit(200);
   if (error || !Array.isArray(data)) return [];
-  return (data as { id: string; name: string; starts_on: string | null; ends_on: string | null; notes: string | null }[]).map((row) => ({
+  return (data as { id: string; name: string; starts_on: string | null; ends_on: string | null; notes: string | null; brand_id: string | null; goal: string | null; contact_user_id: string | null; key_dates: unknown }[]).map((row) => ({
     id: row.id,
     name: row.name,
     startsOn: row.starts_on,
     endsOn: row.ends_on,
     notes: row.notes,
+    brandId: row.brand_id,
+    goal: row.goal,
+    contactUserId: row.contact_user_id,
+    keyDates: keyDatesOf(row.key_dates),
   }));
 }
 
