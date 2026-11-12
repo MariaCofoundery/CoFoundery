@@ -241,3 +241,55 @@ Kurz: **Konzept und Fragen mit dem stärksten Modell, Bauen mit Sonnet.** Die Fr
 - **Vorschlag für die Brücke Align → Find ohne neue Datenflüsse:** „Lücke → Suche“. Die Teamkarte im Raum „Unser Vorhaben“ zeigt beschreibend, was im Team da ist und was fehlt. Daraus kann man mit einem Klick eine Find-Suche vorbefüllen. Das ist eine Handlung der Person, kein Datenfluss. Wer Stärken oder Arbeitsweise **für das Matching** nutzen will, braucht einen eigenen, neuen Zustimmungsvertrag (nicht aus der Teamzugehörigkeit abgeleitet).
 
 **Gesamtbericht „Ich, Du, Unser Startup“:** Am Ende soll ein hochwertiger Bericht stehen: ein Gesamtbild aus drei Kapiteln. *Ich* (Arbeitsweise, Können, Stärken, Richtung, Werte), *Du/Wir* (nur, was die andere Person ausdrücklich geteilt hat; Gemeinsamkeiten und Unterschiede als Gesprächsstoff, nie als Passung), *Unser Startup* (Vorhaben, Teamkarte, Setup-Übergabe). Beschreibend, ohne Zahl und Typ, lesbar am Bildschirm und als PDF, jedes Kapitel mit „wer sieht das“. Er baut auf den vorhandenen Berichten auf (`IndividualWorkstyle`, `TeamWorkstyleReport`, Stärken, Setup-Handoff) und ist **Teil des Entwurfs**, nicht ein späteres Anhängsel.
+
+---
+
+## 11. Bauplan nach dem Entwurf (12.11.2026, abends)
+
+Entwurf (Canvas): https://claude.ai/artifact/4YbTMz4LBgpfod8s7DanHG. Maria hat Align-Übersicht, Stärken entdecken (Intro, Szenen, eine Szene, Zwischenstand) und Gesamtbild im neuen Look freigegeben.
+
+**Grundsätze für den Bau**
+- Kein neuer Datenfluss zu Find. „Lücke → Suche“ füllt nur das Suchformular vor.
+- Jede Freigabe bleibt ihr eigener Vertrag. Das Gesamtbild liest nur über die vorhandenen Lesewege (Arbeitsweise-Teamfreigabe, `team_shares`, `get_team_strengths_overview`).
+- Bewegung nur mit CSS, keine neue Bibliothek. Bei „weniger Bewegung“ im Gerät läuft nichts.
+- Die Bausteine des dunklen Kopfbereichs (Sterne, Schimmer, Ringe) entstehen einmal als gemeinsame Komponenten und werden auf allen drei Seiten genutzt.
+
+### Reihenfolge
+
+**B1. Align-Übersicht (`/align`)**, klein, zuerst, weil sie den Look als Bausteine anlegt.
+- Neue Seite `app/(product)/align/page.tsx`. Die Stände kommen aus vorhandenen Ladern: Profilteile wie in `DashboardAside`, Team über `getFounderTeamHomebase`, Setup-Stand.
+- Menü: Align führt nach `/align`. Zweite Reihe: Übersicht · Ich · Wir · Unser Vorhaben. Programm hängt unter Wir.
+- Teamkarte: nur Felder mit `ownership_wish = own` aus geteilten Fähigkeiten. Freie Felder verlinken auf Find mit vorbefülltem Feld. Find kann das heute noch nicht (die Seite kennt nur `page`, `searchResult`, `mode`), das kommt als kleiner Zusatz an die Suchmaske.
+- Tests: Die Menütests (`ProductShell`) bekommen die neue Reihe. Die Verbote bleiben: keine Zahl als Bewertung, kein Score.
+
+**B2. Stärken entdecken**, der größte Teil.
+- **Leitfaden v3** in `strengthsInterviewGuide.ts`: zwölf Szenen, Runde 3 mit Energie, Blick von außen und den Gegenfragen. Die IDs der bestehenden Fragen bleiben, wo die Szene dieselbe Lage meint (`took_charge`, `hard_won`, `won_over` …). Neu ist nur „Ordnung ins Durcheinander“ und die Energie-Frage. Die Sitzung merkt sich die Leitfaden-Fassung. Alte Gespräche zeigen weiter ihre alten Texte.
+- **Migration** (eine, append-only):
+  - `capability_interview_turns.answer_parts jsonb`: die drei Schritte. Das Feld `answer` bleibt und wird aus den drei Teilen zusammengesetzt, damit die Auswertung und ihre Zitat-Prüfung unverändert funktionieren.
+  - `happened_when` mit drei erlaubten Werten. Geht nicht in die Auswertung.
+  - `guide_version` an der Sitzung.
+  - Stichworte aus dem Intro an der Sitzung. Nur für die Person, gehen nicht in die Auswertung.
+- **Intro:** Client-Komponente mit fünf Teilen, Anhalten, Überspringen. Die Stimme ist eine fertige Tonspur über `tts:build` (Schlüssel bleibt auf Marias Rechner). Sie kommt erst, wenn die Texte endgültig sind.
+- **Szenen wählen:** 5 bis 6 Karten. Beim Weitergehen entstehen die Gesprächsschritte in der gewählten Reihenfolge.
+- **Eine Szene:** drei Schritte, Zeitanker, Beispiel, Diktat (`features/dictation/useDictation.ts` gibt es schon). Eine Nachfrage nur bei sehr kurzer Antwort, als Regel im Code, ohne KI.
+- **Name:** überall „Stärken entdecken“. Die Adresse `/profile/strengths-interview` bleibt wegen gespeicherter Links.
+- **Tests:** Der Test, der jeden Fragetext prüft, bekommt die neue Regel (echtes Fragezeichen, Zeitanker, eine Idee). Der bekannte rote pgTAP-Test `strength_interview_transition` wird dabei angesehen.
+
+**B3. Gesamtbild (`/teams/[teamId]/gesamtbild`)**
+- Liegt im Team, weil „Du“ und „Unser Startup“ ein Team brauchen. Align und die Teamseite verlinken dorthin.
+- Wird bei jedem Aufruf frisch gelesen, nichts wird gespeichert. Zieht jemand eine Freigabe zurück, verschwindet der Teil sofort.
+- **Ich:** eigene Arbeitsweise v4, eigenes Können, eigene Stärken und Richtung.
+- **Du:** nur über die Freigaben. **Korrektur zum Entwurf:** Stärken und Richtung sind heute *eine* Freigabe (`strengths_direction`). „Stärken geteilt, Richtung nicht“ kann es also nicht geben. Der Text im Bericht richtet sich danach.
+- **Unser Startup:** Vorhaben-Vergleich (Beta), Teamkarte, vereinbarte Setup-Themen.
+- **„Worüber ihr sprechen könnt“:** fest aus Regeln abgeleitet, ohne KI. Arbeitsweise-Unterschiede über die vorhandene Zuordnung in `setupHandoff.ts`, freie Felder der Teamkarte, verschiedene Vorhaben-Antworten.
+- **PDF:** über Druckansicht wie bei `teams/[teamId]/setup/document`.
+- **Tests:** keine Zahl als Bewertung, jedes Kapitel nennt, wer es sieht, nicht geteilte Teile fehlen ganz, kein Aufruf von Find-Daten.
+
+### Zu entscheiden vor dem Bau
+1. Wohin führen „Wir“ und „Unser Vorhaben“ im Menü? Vorschlag: zum zuletzt genutzten Team (Teamseite bzw. Setup), ohne Team zu `/connections`.
+2. Zwischenstand nach Runde 2: Die Stärken-Vorschläge kommen heute von der KI auf Marias Rechner (`ai:worker`). Läuft der nicht, gäbe es keinen Zwischenstand. Vorschlag: immer die eigenen Kernsätze je Szene zeigen, KI-Hinweise dazu, wenn sie schon da sind.
+3. Abschluss: ab 5 Szenen möglich, Runde 3 angeboten, aber nicht Pflicht?
+4. Commitment Lab, Read My Mind und Founder in the Wild im Gesamtbild: erst einmal weglassen (eigene Verträge, nur Paare)?
+
+### Modell
+Bauen mit Sonnet. Die Datenwege des Gesamtbilds (Freigaben) sieht sich vor dem Merge Opus noch einmal an.
