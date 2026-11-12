@@ -14,6 +14,7 @@ import { ProductFeedbackEntry } from "@/features/feedback/ProductFeedbackEntry";
 import { AnnouncementPopup } from "@/features/announcements/AnnouncementPopup";
 import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
+import { alignRoomHref, alignRoomOfPath } from "@/features/align/alignModel";
 import { getConnectAttentionCount, getMessagesAttentionCount } from "@/features/connect/connectPresentation";
 import { LOCALE_COOKIE_NAME, SUPPORTED_LOCALES, type AppLocale } from "@/i18n/config";
 import { ResearchConsentNotice } from "@/features/research/ResearchConsentNotice";
@@ -49,7 +50,8 @@ type Props = {
   hasConnect: boolean;
   hasConnectAccount: boolean;
   /** Ein eigenes Team ist in einem Programm oder dazu eingeladen - nur dann steht "Programm" im Menue. */
-  hasTeamProgram?: boolean;
+  /** Das zuletzt benutzte Team: dorthin fuehren "Wir" und "Unser Vorhaben" in der zweiten Reihe von Align. */
+  alignTeamId?: string | null;
   /** Ungelesene Nachrichten im Teamraum-Chat (alle eigenen Chats, stummgeschaltete nicht). */
   advisorChatUnread?: number;
   displayName: string | null;
@@ -300,7 +302,7 @@ export function ProductShell({
   founderNavPrefs = null,
   hasConnect,
   hasConnectAccount,
-  hasTeamProgram = false,
+  alignTeamId = null,
   advisorChatUnread = 0,
   displayName,
   avatarId = null,
@@ -452,48 +454,51 @@ export function ProductShell({
     },
     {
       key: "align",
-      href: hasFounder ? "/me/profile" : "/connections",
+      // Align hat eine eigene Uebersicht (Entwurf vom 12.11.2026): Ich, Wir, Unser Vorhaben.
+      href: hasFounder ? "/align" : "/connections",
       label: t("areaAlign"),
       isActive: (currentPathname) =>
+        currentPathname === "/align" ||
         isQuestionnairesArea(currentPathname) ||
         isProfileArea(currentPathname) ||
         isTeamsArea(currentPathname) ||
         isLibraryArea(currentPathname) ||
         isProgramArea(currentPathname),
-      // DIE REIHENFOLGE IST EIN WEG, KEINE ABLAGE: erst das eigene Bild, dann das Team.
-      //
-      // SEIT 04.11.2026 NUR NOCH DAS (Feedback an Maria: Kern vorn, Ergaenzung erreichbar). Die
-      // Fragebögen erreicht man ueber das Profil und die Startseite, die Library ueber Teamseite und
-      // Founder Setup - beide Bereiche halten den Reiter, unter dem sie jetzt stehen, aktiv.
-      subItems: [
-        ...(hasFounder
-          ? [
-              {
-                href: "/me/profile",
-                label: t("alignProfile"),
-                isActive: (currentPathname: string) => isProfileArea(currentPathname) || isQuestionnairesArea(currentPathname),
-              },
-            ]
-          : []),
-        // Das Team gilt auch ohne Founder-Rolle - sonst waere die zweite Reihe
-        // fuer diese Menschen leer.
-        {
-          href: "/connections",
-          label: t("alignTeam"),
-          isActive: (currentPathname: string) =>
-            isTeamsArea(currentPathname) || isLibraryArea(currentPathname) || (!hasTeamProgram && isProgramArea(currentPathname)),
-        },
-        // Das Programm einer Organisation: nur, wenn ein eigenes Team darin ist oder eingeladen wurde.
-        ...(hasFounder && hasTeamProgram
-          ? [
-              {
-                href: "/programm",
-                label: t("alignProgram"),
-                isActive: isProgramArea,
-              },
-            ]
-          : []),
-      ],
+      // DREI RAEUME, EIN WEG: erst das eigene Bild, dann das Team, dann das gemeinsame Vorhaben.
+      // Das Programm liegt im Raum "Wir" (die Uebersicht verlinkt es dort); die Fragebögen erreicht man
+      // ueber das Profil, die Library ueber Teamseite und Founder Setup.
+      subItems: hasFounder
+        ? [
+            {
+              href: "/align",
+              label: t("alignOverview"),
+              isActive: (currentPathname: string) => alignRoomOfPath(currentPathname) === "overview",
+            },
+            {
+              href: alignRoomHref("ich", alignTeamId),
+              label: t("alignMe"),
+              isActive: (currentPathname: string) => alignRoomOfPath(currentPathname) === "ich",
+            },
+            {
+              href: alignRoomHref("wir", alignTeamId),
+              label: t("alignWe"),
+              isActive: (currentPathname: string) => alignRoomOfPath(currentPathname) === "wir",
+            },
+            {
+              href: alignRoomHref("vorhaben", alignTeamId),
+              label: t("alignVenture"),
+              isActive: (currentPathname: string) => alignRoomOfPath(currentPathname) === "vorhaben",
+            },
+          ]
+        : [
+            // Das Team gilt auch ohne Founder-Rolle - sonst waere die zweite Reihe leer.
+            {
+              href: "/connections",
+              label: t("alignTeam"),
+              isActive: (currentPathname: string) =>
+                isTeamsArea(currentPathname) || isLibraryArea(currentPathname) || isProgramArea(currentPathname),
+            },
+          ],
     },
   ];
 

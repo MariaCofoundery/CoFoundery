@@ -101,5 +101,6 @@ test("der Align-Eintrag bleibt, wo er war", () => {
   // nichts weg.
   const shell = source(SHELL);
   const subItems = shell.slice(shell.indexOf("subItems:"), shell.indexOf("const findItem"));
-  assert.match(subItems, /href: "\/me\/profile"/);
+  // Seit 12.11.2026 ueber alignRoomHref("ich") - es fuehrt weiter zu /me/profile.
+  assert.match(subItems, /alignRoomHref\("ich"/);
 });

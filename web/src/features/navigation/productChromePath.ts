@@ -32,6 +32,8 @@ export function isProductChromePath(pathname: string) {
     pathname === "/fragebogen" ||
     pathname.startsWith("/fragebogen/") ||
     pathname === "/connections" ||
+    // Align: die Uebersicht ueber Ich, Wir und Unser Vorhaben.
+    pathname === "/align" ||
     // Das Postfach ist ein Querschnitt, kein Bereich - es traegt Gespraeche
     // aus Connect UND aus Find.
     pathname === "/messages" ||

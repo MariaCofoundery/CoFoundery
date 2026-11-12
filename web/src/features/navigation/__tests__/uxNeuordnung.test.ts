@@ -21,8 +21,9 @@ test("Align fasst Profil und Team zusammen - als zweite Reihe unter den vier Ber
   // Genau ein Align-Bereich im Founder-Baum (statt Profil und Teams & Verbindungen einzeln).
   assert.equal([...founder.matchAll(/label: t\("area[A-Za-z]+"\)/g)].length, 2, "Start und Align");
   assert.match(founder, /label: t\("areaAlign"\)/);
-  const order = ["alignProfile", "alignTeam"].map((k) => founder.indexOf(`t("${k}")`));
-  assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), "Weg: Profil, Team");
+  // Seit 12.11.2026: Uebersicht, Ich, Wir, Unser Vorhaben (Rueckfall ohne Founder-Rolle: Team).
+  const order = ["alignOverview", "alignMe", "alignWe", "alignVenture"].map((k) => founder.indexOf(`t("${k}")`));
+  assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), "Weg: Uebersicht, Ich, Wir, Vorhaben");
   // Seit 04.11.2026 keine eigenen Eintraege mehr fuer Fragebögen und Library.
   assert.doesNotMatch(founder, /t\("alignQuestionnaires"\)|t\("alignLibrary"\)/);
   // Die Bereiche der Leiste: Start, Align, Find, Connect.

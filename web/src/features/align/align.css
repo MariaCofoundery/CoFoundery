@@ -1,0 +1,127 @@
+/* Align, Stärken entdecken und Gesamtbild teilen sich einen Look (Entwurf vom 12.11.2026, freigegeben):
+   dunkler Kopf mit Sternen, ein Schimmer, Ringe, die sich zeichnen, weiche Karten. Bewegung nur mit CSS.
+   Bei "weniger Bewegung" im Gerät steht alles still (ganz unten). */
+
+.align-dots {
+  background-color: #f6f5fb;
+  background-image: radial-gradient(#dcd8ee 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.align-hero {
+  position: relative;
+  overflow: hidden;
+  background: #0b0c1a;
+  color: #fff;
+}
+
+@keyframes align-twinkle { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.8; } }
+.align-twinkle { animation: align-twinkle 4.5s ease-in-out infinite; }
+
+@keyframes align-glow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+.align-glow { animation: align-glow 5s ease-in-out infinite; }
+
+@keyframes align-fade-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.align-fade-up { animation: align-fade-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes align-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+.align-rise { animation: align-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+
+/* Die Ringe zeichnen sich beim Laden. */
+@keyframes align-draw { from { stroke-dashoffset: 1300; } to { stroke-dashoffset: 0; } }
+.align-ring {
+  stroke-dasharray: 1300;
+  animation: align-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  transition: stroke 0.4s, stroke-width 0.4s;
+}
+.align-ring-ich { stroke: #6f5bc9; }
+.align-ring-wir { stroke: #4a3a9e; }
+.align-ring-vorhaben { stroke: #33296f; }
+
+@keyframes align-spin { to { transform: rotate(360deg); } }
+.align-orbit-a { transform-origin: 220px 220px; animation: align-spin 26s linear infinite; }
+.align-orbit-b { transform-origin: 220px 220px; animation: align-spin 48s linear infinite reverse; }
+.align-orbit-c { transform-origin: 220px 220px; animation: align-spin 80s linear infinite; }
+
+@keyframes align-breathe { 0%, 100% { transform: scale(0.9); } 50% { transform: scale(1.08); } }
+.align-core { transform-box: fill-box; transform-origin: center; animation: align-breathe 5s ease-in-out infinite; }
+
+.align-label-bg { fill: #24254a; transition: fill 0.3s; }
+
+/* Raum-Karten und Ringe hängen zusammen: Fährt man über eine Karte (oder ihr Etikett im Kopf),
+   leuchtet der passende Ring. Reines CSS über :has() - ohne Skript. */
+.align-stage:has([data-room="ich"]:hover, [data-room="ich"]:focus-within) .align-ring-ich,
+.align-stage:has([data-room="wir"]:hover, [data-room="wir"]:focus-within) .align-ring-wir,
+.align-stage:has([data-room="vorhaben"]:hover, [data-room="vorhaben"]:focus-within) .align-ring-vorhaben {
+  stroke: #c9bbf7;
+  stroke-width: 3;
+}
+.align-stage:has([data-room="ich"]:hover, [data-room="ich"]:focus-within) .align-label-ich,
+.align-stage:has([data-room="wir"]:hover, [data-room="wir"]:focus-within) .align-label-wir,
+.align-stage:has([data-room="vorhaben"]:hover, [data-room="vorhaben"]:focus-within) .align-label-vorhaben {
+  fill: #6d49e0;
+}
+
+.align-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-height: 38px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #3a3c66;
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.align-pill-dot { width: 8px; height: 8px; border-radius: 50%; background: #9c86f0; }
+.align-stage:has([data-room="ich"]:hover) .align-pill[data-room="ich"],
+.align-stage:has([data-room="wir"]:hover) .align-pill[data-room="wir"],
+.align-stage:has([data-room="vorhaben"]:hover) .align-pill[data-room="vorhaben"],
+.align-pill:hover,
+.align-pill:focus-visible { background: #fff; color: #14152b; border-color: #fff; }
+
+.align-room {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
+}
+.align-room:hover,
+.align-room:focus-within {
+  transform: translateY(-6px);
+  border-color: #9c86f0;
+  box-shadow: 0 30px 60px -30px rgba(46, 30, 120, 0.45);
+}
+
+.align-row-link { color: #14152b; transition: color 0.2s; }
+.align-row-link:hover { color: #5b36d4; }
+
+.align-gap-tile { transition: background-color 0.2s, border-color 0.2s; }
+.align-gap-tile:hover { background: #f4f1fe; border-color: #6d49e0; }
+
+/* Drei Kapitelseiten, leicht gefächert und schwebend (Band "Gesamtbild"). */
+@keyframes align-float {
+  0%, 100% { transform: translateY(0) rotate(var(--r)); }
+  50% { transform: translateY(-8px) rotate(var(--r)); }
+}
+.align-page { animation: align-float 6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .align-twinkle,
+  .align-glow,
+  .align-fade-up,
+  .align-rise,
+  .align-ring,
+  .align-orbit-a,
+  .align-orbit-b,
+  .align-orbit-c,
+  .align-core,
+  .align-page { animation: none !important; }
+  .align-room,
+  .align-ring,
+  .align-pill,
+  .align-gap-tile,
+  .align-label-bg { transition: none !important; }
+  .align-room:hover,
+  .align-room:focus-within { transform: none; }
+}

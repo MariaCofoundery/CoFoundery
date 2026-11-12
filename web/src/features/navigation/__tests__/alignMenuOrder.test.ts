@@ -11,11 +11,11 @@ test("die zweite Reihe unter Align liest sich als Weg", () => {
   // Nachlesen. Vorher stand "Verbindungen" vorn - man faengt aber bei sich
   // selbst an.
   const reihenfolge = [...shell.matchAll(/label: t\("(align[A-Za-z]+)"\)/g)].map((m) => m[1]);
-  // Seit 04.11.2026 (Raster Kern / Ergaenzung / Hintergrund): Profil (das eigene Bild) -> Team
-  // (vergleichen und vereinbaren) -> Programm (nur, wenn ein eigenes Team darin ist oder eingeladen
-  // wurde). Fragebögen und Library sind Ergaenzungen: ueber Profil, Startseite und Teamseite erreichbar.
-  assert.deepEqual(reihenfolge, ["alignProfile", "alignTeam", "alignProgram"]);
-  assert.match(shell, /\.\.\.\(hasFounder && hasTeamProgram/);
+  // Seit 12.11.2026 (Entwurf Align): Uebersicht -> Ich -> Wir -> Unser Vorhaben. Das Programm ist kein
+  // eigener Reiter mehr, sondern liegt im Raum "Wir" (die Uebersicht verlinkt es dort). "alignTeam" steht nur
+  // noch im Rueckfall fuer Menschen ohne Founder-Rolle.
+  assert.deepEqual(reihenfolge, ["alignOverview", "alignMe", "alignWe", "alignVenture", "alignTeam"]);
+  assert.doesNotMatch(shell, /t\("alignProgram"\)/);
 });
 
 test("Verbindungen steht auch ohne Founder-Rolle da", () => {
@@ -23,16 +23,16 @@ test("Verbindungen steht auch ohne Founder-Rolle da", () => {
   // aber Verbindungen. Stuende es im selben hasFounder-Block, waere die
   // zweite Reihe fuer diese Menschen leer.
   const zweiteReihe = shell.slice(
-    shell.indexOf("DIE REIHENFOLGE IST EIN WEG"),
+    shell.indexOf("DREI RAEUME, EIN WEG"),
     shell.indexOf("const findItem"),
   );
+  const founderZweig = zweiteReihe.indexOf("subItems: hasFounder");
+  const rueckfall = zweiteReihe.indexOf(": [", zweiteReihe.indexOf('label: t("alignVenture")'));
   const verbindungen = zweiteReihe.indexOf('label: t("alignTeam")');
-  const blockEnde = zweiteReihe.indexOf("...(hasFounder", verbindungen);
 
-  assert.ok(verbindungen > 0, "Verbindungen fehlt");
-  // Nach Verbindungen beginnt ein neuer hasFounder-Block - Verbindungen liegt
-  // also ausserhalb des vorherigen.
-  assert.ok(blockEnde > verbindungen, "Verbindungen haengt an der Founder-Rolle");
+  assert.ok(founderZweig > 0, "die drei Raeume haengen nicht an der Founder-Rolle");
+  assert.ok(verbindungen > rueckfall && rueckfall > 0, "Verbindungen steht im Founder-Zweig statt im Rueckfall");
+  assert.match(zweiteReihe.slice(rueckfall), /href: "\/connections"/);
 });
 
 test("die neue Fassung bleibt unter Fragebögen aktiv, egal auf welcher ihrer Seiten man steht", () => {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { alignRoomHref, alignRoomOfPath } from "@/features/align/alignModel";
 
 const source = (path: string) => readFileSync(path, "utf8");
 const codeOnly = (path: string) =>
@@ -53,13 +54,15 @@ test("das eigene Gesamtprofil hängt nicht vom alten v1-Report ab", () => {
 test("und von jeder Align-Seite aus, nicht nur vom Dashboard", () => {
   const shell = codeOnly(SHELL);
   const subItems = shell.slice(shell.indexOf("const founderItems"), shell.indexOf("const advisorItems"));
-  assert.match(subItems, /href: "\/me\/profile"/);
-  assert.match(subItems, /label: t\("alignProfile"\)/);
+  // Seit 12.11.2026 fuehrt "Ich" ueber alignRoomHref("ich") zu /me/profile.
+  assert.match(subItems, /alignRoomHref\("ich", alignTeamId\)/);
+  assert.match(subItems, /label: t\("alignMe"\)/);
+  assert.equal(alignRoomHref("ich", null), "/me/profile");
   // Und nicht zweimal dasselbe: Der alte Eintrag ist ersetzt, nicht ergaenzt.
   assert.doesNotMatch(subItems, /href: "\/me\/report"/);
 
   // Nur mit Founder-Zugang.
-  assert.match(subItems, /hasFounder\s*\?\s*\[[\s\S]{0,400}\/me\/profile/);
+  assert.match(subItems, /subItems: hasFounder\s*\?\s*\[[\s\S]{0,600}alignRoomHref\("ich"/);
 });
 
 test("der Reiter loest sich nicht auf, wenn man ihn anklickt", () => {
@@ -71,7 +74,8 @@ test("der Reiter loest sich nicht auf, wenn man ihn anklickt", () => {
   // Seit 19.10.2026 unter Align: der Reiter „Profil" in der zweiten Reihe.
   const profileActive = shell.slice(shell.indexOf("const isProfileArea"), shell.indexOf("const isQuestionnairesArea"));
   assert.match(profileActive, /currentPathname\.startsWith\("\/me\/"\)/);
-  assert.match(shell, /label: t\("alignProfile"\),\s*isActive: \(currentPathname: string\) => isProfileArea\(currentPathname\)/);
+  assert.match(shell, /label: t\("alignMe"\),\s*isActive: \(currentPathname: string\) => alignRoomOfPath\(currentPathname\) === "ich"/);
+  assert.equal(alignRoomOfPath("/me/profile"), "ich");
 
   // Und die Seite traegt die Produktleiste ueberhaupt.
   assert.match(codeOnly(CHROME), /pathname\.startsWith\("\/me\/"\)/);

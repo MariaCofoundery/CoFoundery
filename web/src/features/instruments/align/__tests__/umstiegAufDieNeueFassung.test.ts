@@ -55,7 +55,9 @@ test("die neue Fassung steht im Menü, nicht nur auf einer Karte", () => {
   // „Fragebögen" keinen eigenen Eintrag mehr - die Seiten halten „Profil" aktiv, und das Profil
   // verlinkt die Bibliothek.
   assert.match(shell, /isQuestionnairesArea[\s\S]{0,600}workstyle-pretest/);
-  assert.match(shell, /isProfileArea\(currentPathname\) \|\| isQuestionnairesArea\(currentPathname\)/);
+  // Seit 12.11.2026 entscheidet alignRoomOfPath: Fragebogen-Seiten halten den Raum "Ich" aktiv.
+  assert.match(shell, /alignRoomOfPath\(currentPathname\) === "ich"/);
+  assert.match(shell, /isQuestionnairesArea\(currentPathname\)/);
   const bibliothek = readFileSync(join("src", "app", "(product)", "fragebogen", "page.tsx"), "utf8");
   assert.match(bibliothek, /MODULE_REGISTRY/);
 });

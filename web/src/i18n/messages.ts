@@ -22,6 +22,7 @@ import deCommon from "../../messages/de/common.json";
 import deCollaborationLab from "../../messages/de/collaborationLab.json";
 import deDashboard from "../../messages/de/dashboard.json";
 import deDirection from "../../messages/de/direction.json";
+import deAlign from "../../messages/de/align.json";
 import deStrengths from "../../messages/de/strengths.json";
 import deModules from "../../messages/de/modules.json";
 import deVentureTradeoffs from "../../messages/de/ventureTradeoffs.json";
@@ -54,6 +55,7 @@ import enCommon from "../../messages/en/common.json";
 import enCollaborationLab from "../../messages/en/collaborationLab.json";
 import enDashboard from "../../messages/en/dashboard.json";
 import enDirection from "../../messages/en/direction.json";
+import enAlign from "../../messages/en/align.json";
 import enStrengths from "../../messages/en/strengths.json";
 import enModules from "../../messages/en/modules.json";
 import enVentureTradeoffs from "../../messages/en/ventureTradeoffs.json";
@@ -95,6 +97,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     collaborationLab: deCollaborationLab,
     dashboard: deDashboard,
     direction: deDirection,
+    align: deAlign,
     strengths: deStrengths,
     modules: deModules,
     ventureTradeoffs: deVentureTradeoffs,
@@ -135,6 +138,7 @@ const messagesByLocale: Record<AppLocale, AbstractIntlMessages> = {
     collaborationLab: enCollaborationLab,
     dashboard: enDashboard,
     direction: enDirection,
+    align: enAlign,
     strengths: enStrengths,
     modules: enModules,
     ventureTradeoffs: enVentureTradeoffs,

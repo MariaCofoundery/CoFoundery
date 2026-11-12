@@ -28,8 +28,9 @@ test("Align hat eigene Unterseiten in der Leiste", () => {
   const shell = source(SHELL);
   assert.match(shell, /subItems/);
   assert.match(shell, /href: "\/connections"/);
-  // Die Library steht seit 04.11.2026 nicht mehr in der Leiste, sondern auf der Teamseite; ihre Seiten
-  // halten "Team" aktiv.
+  // Seit 12.11.2026: Uebersicht, Ich, Wir, Unser Vorhaben. Die Library steht nicht in der Leiste, sondern auf
+  // der Teamseite; ihre Seiten halten den Raum "Wir" aktiv (alignRoomOfPath).
+  assert.match(shell, /alignRoomOfPath\(currentPathname\) === "wir"/);
   assert.match(shell, /isTeamsArea\(currentPathname\) \|\| isLibraryArea\(currentPathname\)/);
   assert.match(shell, /activeAreaSubItems/);
 });
@@ -102,8 +103,8 @@ test("die Advisor-Ansicht bekommt die Founder-Unterseiten nicht", () => {
 test("alle drei Bereiche tragen ihre Ziele in der Leiste", () => {
   const shell = source(SHELL);
   for (const href of [
-    // Align
-    "/me/profile",
+    // Align (Ich, Wir und Unser Vorhaben fuehren ueber alignRoomHref zum zuletzt benutzten Team)
+    "/align",
     "/connections",
     // Find
     "/discovery",

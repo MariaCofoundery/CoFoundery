@@ -1,0 +1,148 @@
+{
+  "overview": {
+    "pageTitle": "Align",
+    "eyebrow": "Align",
+    "title": "Who you are and how you work together",
+    "text": "Three rooms that build on each other: first you, then the two of you, then your venture. Nothing here is graded. There are no scores and no types. What others see is your decision, part by part.",
+    "ringsLabel": "Three rooms as circles: Me in the center, around it We, outside Our venture",
+    "next": "Up next",
+    "rooms": {
+      "ich": {
+        "title": "Me",
+        "text": "How you work, what you can do and what drives you. This belongs to you, no matter who you found with.",
+        "footer": "View your profile",
+        "progress": "{done} of {total} done"
+      },
+      "wir": {
+        "title": "We",
+        "text": "Who you found with and how you work together. You only see what each person explicitly shares.",
+        "footer": "To the team room",
+        "switchTeam": "Choose another team"
+      },
+      "vorhaben": {
+        "title": "Our venture",
+        "text": "What you are building and what you put in writing together. Your agreements are made here.",
+        "footer": "All agreements",
+        "noTeam": "The venture and your agreements are built with your team. Once you are on a team, you will find them here."
+      }
+    },
+    "parts": {
+      "work": "Work style",
+      "can": "Skills",
+      "strengths": "Strengths",
+      "direction": "Direction",
+      "workstyleTeam": "Work style in the team",
+      "values": "Values",
+      "roles": "Roles",
+      "strengthsTeam": "Strengths in the team",
+      "program": "Program",
+      "venture": "Venture",
+      "setup": "Founder Setup",
+      "funding": "Funding",
+      "tradeoffs": "Goal conflicts",
+      "testProject": "Test project"
+    },
+    "status": {
+      "done": "Done",
+      "started": "Started",
+      "open": "Not started",
+      "reportReady": "Report ready",
+      "reportWaiting": "Waiting for shares",
+      "setupSettled": "{count} topics agreed",
+      "setupAwaiting": "{count} waiting for confirmation",
+      "programHint": "Dates, tasks"
+    },
+    "pair": {
+      "title": "As a pair",
+      "note": "only the two of you see this",
+      "commitment": "Commitment Lab",
+      "readMyMind": "Read My Mind",
+      "inTheWild": "Founder in the Wild"
+    },
+    "nextStep": {
+      "work": {
+        "title": "Work style",
+        "text": "Short questions about how you work. Only you see the result until you share it.",
+        "start": "Get started",
+        "continue": "Continue"
+      },
+      "can": {
+        "title": "Skills",
+        "text": "Where you are at home and what you want to own yourself.",
+        "start": "Add them"
+      },
+      "strengths": {
+        "title": "Discover your strengths",
+        "text": "You tell short situations from your life, and we show you what they reveal.",
+        "start": "Get started"
+      },
+      "direction": {
+        "title": "Direction",
+        "text": "What keeps drawing you in, in your own words.",
+        "start": "Write it down"
+      },
+      "allDone": {
+        "title": "Your profile is complete",
+        "text": "You can view and change it any time.",
+        "start": "View profile"
+      },
+      "invite": {
+        "title": "Invite a co-founder",
+        "text": "We starts with a second person. An invitation goes out as a link.",
+        "start": "Invite"
+      },
+      "reportReady": {
+        "title": "View the team report",
+        "text": "The shared work style report is ready.",
+        "start": "Open report"
+      },
+      "reportWaiting": {
+        "title": "Work style in the team",
+        "text": "The shared report is still missing answers or shares. There you can see what is missing.",
+        "start": "To the comparison"
+      },
+      "noTeam": {
+        "title": "A team first",
+        "text": "The venture and your agreements are built with your team.",
+        "start": "To teams"
+      },
+      "setupConfirm": {
+        "title": "Confirm agreements",
+        "text": "{count} agreements are waiting for your confirmation.",
+        "start": "View"
+      },
+      "setupContinue": {
+        "title": "Continue Founder Setup",
+        "text": "{count} topics are agreed.",
+        "start": "Continue setup"
+      },
+      "setupStart": {
+        "title": "Start Founder Setup",
+        "text": "This is where you put down how you work together, topic by topic.",
+        "start": "Open setup"
+      }
+    },
+    "teamMap": {
+      "title": "Team map",
+      "heldBy": "taken by {names}",
+      "free": "Nobody yet",
+      "findLink": "Search in Find",
+      "note": "Clicking an open field only prepares a search in Find. Find receives nothing from Align.",
+      "empty": "Once you share your skills with the team, your team map appears here.",
+      "emptyLink": "To the roles"
+    },
+    "seen": {
+      "title": "Who sees what",
+      "ich": { "title": "Me", "text": "Only you, until you share something." },
+      "wir": { "title": "We", "text": "Only what each person explicitly shares." },
+      "vorhaben": { "title": "Our venture", "text": "Everyone on the team. Advisors only with their own permission." }
+    },
+    "gesamtbild": {
+      "eyebrow": "Overall picture",
+      "title": "Me, You, Our Startup",
+      "text": "Everything from the three rooms in one report. It describes, it does not grade. To read on screen and as a PDF.",
+      "open": "Open overall picture"
+    },
+    "unnamed": "Founder"
+  }
+}

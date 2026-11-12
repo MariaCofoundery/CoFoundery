@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
+import { ALIGN_PART_HREF as PART_HREF } from "@/features/align/alignModel";
 
 export type ProfileParts = { work: boolean; can: boolean; strengths: boolean; direction: boolean };
 
@@ -45,7 +45,6 @@ export async function DashboardAside({
   const open = keys.filter((key) => !parts[key]).map((key) => t(`stand.parts.${key}`));
   const teamPath = team ? `/teams/${encodeURIComponent(team.id)}` : null;
   // Jeder offene Teil fuehrt direkt dorthin (statt eines allgemeinen "Zum Profil").
-  const PART_HREF = { work: CURRENT_WORKSTYLE_HREF, can: "/profile?step=areas", strengths: "/profile/strengths-interview", direction: "/profile/direction" } as const;
   const openParts = keys.filter((key) => !parts[key]);
 
   return (

@@ -11,6 +11,8 @@ import { getOwnProfileImage } from "@/features/profile/profileData";
 import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
 import { WelcomeLetterGate } from "@/features/profile/WelcomeLetterGate";
 import { ProductShell } from "@/features/navigation/ProductShell";
+import { teamIdFromPath } from "@/features/align/alignModel";
+import { LAST_PLACE_COOKIE } from "@/features/navigation/lastPlace";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
@@ -201,11 +203,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .then(({ data }) => (data ? { hidden: (data.hidden as string[]) ?? [], order: (data.item_order as string[]) ?? [] } : null))
         .catch(() => null)
     : null;
-  const hasTeamProgram = user
-    ? await Promise.resolve(supabase.rpc("get_my_team_programs"))
-        .then(({ data }) => Array.isArray(data) && data.length > 0)
-        .catch(() => false)
-    : false;
+  // Das zuletzt benutzte Team fuer "Wir" und "Unser Vorhaben" in der zweiten Reihe von Align: der gemerkte Ort der
+  // App, sonst die juengste Mitgliedschaft. Ohne Team fuehren beide zur Teamliste.
+  const alignTeamId = user && roleViews.hasFounder
+    ? (teamIdFromPath(cookieStore.get(LAST_PLACE_COOKIE)?.value) ??
+        (await Promise.resolve(
+          supabase.from("founder_team_members").select("team_id").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
+        )
+          .then(({ data }) => (data?.[0]?.team_id as string | undefined) ?? null)
+          .catch(() => null)))
+    : null;
   // Der Kern ist die einzige Datenquelle fuer den Namen; vorher konkurrierten
   // hier profiles und network_profiles. Die beiden Auth-Metadaten-Stufen und
   // das E-Mail-Praefix bleiben als reine Anzeige-Rueckfaelle fuer Menschen,
@@ -235,7 +242,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             founderNavPrefs={founderNavPrefs}
             hasConnect={hasConnect}
             hasConnectAccount={hasConnectAccount}
-            hasTeamProgram={hasTeamProgram}
+            alignTeamId={alignTeamId}
             advisorChatUnread={advisorChatUnread}
             displayName={displayName}
             avatarId={profileImage.avatarId}

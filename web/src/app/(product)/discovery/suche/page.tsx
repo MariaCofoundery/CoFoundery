@@ -7,6 +7,7 @@ import { saveDiscoveryV2SearchPreferencesAction } from "@/features/discovery/dis
 import { getOwnSearchPreferences } from "@/features/discovery/discoveryData";
 import { PracticalSearchForm } from "@/features/find/PracticalSearchForm";
 import { CapabilityPicker } from "@/features/find/CapabilityPicker";
+import { prefillCapabilityAreas } from "@/features/find/prefillAreas";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { DISCOVERY_SELECTION_LIMITS } from "@/features/discovery/discoveryConfig";
 import type { DiscoveryMustHaves } from "@/features/discovery/discoveryTypes";
@@ -54,9 +55,9 @@ const LEERE_KRITERIEN: DiscoveryMustHaves = {
 export default async function SearchPreferencesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ gespeichert?: string; workstyle?: string }>;
+  searchParams: Promise<{ gespeichert?: string; workstyle?: string; familie?: string }>;
 }) {
-  const { gespeichert, workstyle } = await searchParams;
+  const { gespeichert, workstyle, familie } = await searchParams;
   const { data: auth } = await getRequestUser();
   if (!auth?.user?.id) {
     redirect(`/login?next=${encodeURIComponent("/discovery/suche")}`);
@@ -88,6 +89,13 @@ export default async function SearchPreferencesPage({
   const tCapability = await getTranslations("capability");
   const vocabulary = await getCapabilityVocabulary(supabase);
   const kriterien = searchPreferences?.mustHaves ?? LEERE_KRITERIEN;
+  // Ein freies Feld der Teamkarte in Align fuehrt mit ?familie= hierher: nur vorbefuellt, gespeichert wird erst durch die Person.
+  const vorbefuellteBereiche = prefillCapabilityAreas(
+    kriterien.requiredCapabilityAreasAny,
+    familie,
+    vocabulary.areas,
+    DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas,
+  );
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-6 py-12">
@@ -193,7 +201,7 @@ export default async function SearchPreferencesPage({
                         familyId: family.family_id,
                         label: tCapability(`families.${family.family_id}`),
                       }))}
-                    initial={kriterien.requiredCapabilityAreasAny}
+                    initial={vorbefuellteBereiche}
                     max={DISCOVERY_SELECTION_LIMITS.requiredCapabilityAreas}
                     copy={{
                       searchPlaceholder: t("skillsSearchPlaceholder"),

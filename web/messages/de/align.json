@@ -1,0 +1,148 @@
+{
+  "overview": {
+    "pageTitle": "Align",
+    "eyebrow": "Align",
+    "title": "Wer ihr seid und wie ihr zusammenarbeitet",
+    "text": "Drei Räume, die aufeinander aufbauen: erst du, dann ihr, dann euer Vorhaben. Hier wird nichts bewertet, es gibt keine Punkte und keine Typen. Was andere sehen, entscheidest du für jeden Teil selbst.",
+    "ringsLabel": "Drei Räume als Kreise: Ich in der Mitte, darum Wir, außen Unser Vorhaben",
+    "next": "Als Nächstes",
+    "rooms": {
+      "ich": {
+        "title": "Ich",
+        "text": "Wie du arbeitest, was du kannst und was dich antreibt. Das gehört dir, egal mit wem du gründest.",
+        "footer": "Dein Profil ansehen",
+        "progress": "{done} von {total} fertig"
+      },
+      "wir": {
+        "title": "Wir",
+        "text": "Mit wem du gründest und wie ihr zusammenarbeitet. Ihr seht nur, was jede Person ausdrücklich teilt.",
+        "footer": "Zum Teamraum",
+        "switchTeam": "Anderes Team wählen"
+      },
+      "vorhaben": {
+        "title": "Unser Vorhaben",
+        "text": "Was ihr baut und was ihr miteinander festhaltet. Hier entstehen eure Vereinbarungen.",
+        "footer": "Alle Vereinbarungen",
+        "noTeam": "Vorhaben und Vereinbarungen entstehen mit eurem Team. Sobald du in einem Team bist, findest du sie hier."
+      }
+    },
+    "parts": {
+      "work": "Arbeitsweise",
+      "can": "Können",
+      "strengths": "Stärken",
+      "direction": "Richtung",
+      "workstyleTeam": "Arbeitsweise im Team",
+      "values": "Werte",
+      "roles": "Rollen",
+      "strengthsTeam": "Stärken im Team",
+      "program": "Programm",
+      "venture": "Vorhaben",
+      "setup": "Founder Setup",
+      "funding": "Finanzierung",
+      "tradeoffs": "Zielkonflikte",
+      "testProject": "Testprojekt"
+    },
+    "status": {
+      "done": "Fertig",
+      "started": "Angefangen",
+      "open": "Noch offen",
+      "reportReady": "Bericht bereit",
+      "reportWaiting": "Wartet auf Freigaben",
+      "setupSettled": "{count} Themen vereinbart",
+      "setupAwaiting": "{count} warten auf Bestätigung",
+      "programHint": "Termine, Aufgaben"
+    },
+    "pair": {
+      "title": "Zu zweit",
+      "note": "nur ihr zwei seht das",
+      "commitment": "Commitment Lab",
+      "readMyMind": "Read My Mind",
+      "inTheWild": "Founder in the Wild"
+    },
+    "nextStep": {
+      "work": {
+        "title": "Arbeitsweise",
+        "text": "Kurze Fragen dazu, wie du arbeitest. Das Ergebnis siehst nur du, bis du es teilst.",
+        "start": "Loslegen",
+        "continue": "Weitermachen"
+      },
+      "can": {
+        "title": "Können",
+        "text": "Wo du dich auskennst und was du selbst verantworten willst.",
+        "start": "Angeben"
+      },
+      "strengths": {
+        "title": "Stärken entdecken",
+        "text": "Du erzählst kurze Situationen aus deinem Leben, wir zeigen dir, was sich darin zeigt.",
+        "start": "Loslegen"
+      },
+      "direction": {
+        "title": "Richtung",
+        "text": "Was dich immer wieder anzieht, in deinen eigenen Sätzen.",
+        "start": "Aufschreiben"
+      },
+      "allDone": {
+        "title": "Dein Profil ist vollständig",
+        "text": "Du kannst es jederzeit ansehen und ändern.",
+        "start": "Profil ansehen"
+      },
+      "invite": {
+        "title": "Co-Founder einladen",
+        "text": "Wir beginnt mit einer zweiten Person. Eine Einladung geht per Link.",
+        "start": "Einladen"
+      },
+      "reportReady": {
+        "title": "Teambericht ansehen",
+        "text": "Der gemeinsame Bericht zur Arbeitsweise ist bereit.",
+        "start": "Bericht öffnen"
+      },
+      "reportWaiting": {
+        "title": "Arbeitsweise im Team",
+        "text": "Für den gemeinsamen Bericht fehlen noch Antworten oder Freigaben. Dort siehst du, was fehlt.",
+        "start": "Zum Vergleich"
+      },
+      "noTeam": {
+        "title": "Zuerst ein Team",
+        "text": "Vorhaben und Vereinbarungen entstehen mit deinem Team.",
+        "start": "Zu Teams"
+      },
+      "setupConfirm": {
+        "title": "Vereinbarungen bestätigen",
+        "text": "{count} Vereinbarungen warten auf eure Bestätigung.",
+        "start": "Ansehen"
+      },
+      "setupContinue": {
+        "title": "Founder Setup weiterführen",
+        "text": "{count} Themen sind vereinbart.",
+        "start": "Weiter im Setup"
+      },
+      "setupStart": {
+        "title": "Founder Setup beginnen",
+        "text": "Hier haltet ihr fest, wie ihr zusammenarbeitet, Thema für Thema.",
+        "start": "Setup öffnen"
+      }
+    },
+    "teamMap": {
+      "title": "Teamkarte",
+      "heldBy": "übernimmt {names}",
+      "free": "Noch niemand",
+      "findLink": "In Find suchen",
+      "note": "Ein Klick auf ein freies Feld bereitet nur eine Suche in Find vor. Find bekommt nichts aus Align.",
+      "empty": "Sobald ihr eure Fähigkeiten für das Team freigebt, erscheint hier eure Teamkarte.",
+      "emptyLink": "Zu den Rollen"
+    },
+    "seen": {
+      "title": "Wer sieht was",
+      "ich": { "title": "Ich", "text": "Nur du, bis du etwas teilst." },
+      "wir": { "title": "Wir", "text": "Nur, was jede Person ausdrücklich teilt." },
+      "vorhaben": { "title": "Unser Vorhaben", "text": "Alle im Team. Advisor nur mit eigener Freigabe." }
+    },
+    "gesamtbild": {
+      "eyebrow": "Gesamtbild",
+      "title": "Ich, Du, Unser Startup",
+      "text": "Alles aus den drei Räumen in einem Bericht. Er beschreibt, er bewertet nicht. Zum Lesen am Bildschirm und als PDF.",
+      "open": "Gesamtbild öffnen"
+    },
+    "unnamed": "Founder"
+  }
+}
