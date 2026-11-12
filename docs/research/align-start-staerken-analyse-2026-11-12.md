@@ -285,11 +285,11 @@ Entwurf (Canvas): https://claude.ai/artifact/4YbTMz4LBgpfod8s7DanHG. Maria hat A
 - **PDF:** über Druckansicht wie bei `teams/[teamId]/setup/document`.
 - **Tests:** keine Zahl als Bewertung, jedes Kapitel nennt, wer es sieht, nicht geteilte Teile fehlen ganz, kein Aufruf von Find-Daten.
 
-### Zu entscheiden vor dem Bau
-1. Wohin führen „Wir“ und „Unser Vorhaben“ im Menü? Vorschlag: zum zuletzt genutzten Team (Teamseite bzw. Setup), ohne Team zu `/connections`.
-2. Zwischenstand nach Runde 2: Die Stärken-Vorschläge kommen heute von der KI auf Marias Rechner (`ai:worker`). Läuft der nicht, gäbe es keinen Zwischenstand. Vorschlag: immer die eigenen Kernsätze je Szene zeigen, KI-Hinweise dazu, wenn sie schon da sind.
-3. Abschluss: ab 5 Szenen möglich, Runde 3 angeboten, aber nicht Pflicht?
-4. Commitment Lab, Read My Mind und Founder in the Wild im Gesamtbild: erst einmal weglassen (eigene Verträge, nur Paare)?
+### Entschieden vor dem Bau (Maria, 12.11.2026)
+1. „Wir“ führt zur Teamseite des zuletzt genutzten Teams, „Unser Vorhaben“ zu dessen Founder Setup. Ohne Team führen beide zu `/connections`.
+2. Der Zwischenstand zeigt immer die eigenen Kernsätze je Szene, KI-Hinweise dazu, sobald sie da sind.
+3. Abschluss ab 5 Szenen. Runde 3 wird angeboten, ist aber keine Pflicht.
+4. Commitment Lab, Read My Mind und Founder in the Wild kommen nicht in die erste Fassung des Gesamtbilds.
 
 ### Modell
 Bauen mit Sonnet. Die Datenwege des Gesamtbilds (Freigaben) sieht sich vor dem Merge Opus noch einmal an.
