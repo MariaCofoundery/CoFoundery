@@ -559,7 +559,7 @@
     }
   },
   "coFounderInvitePage": {
-    "backToDashboard": "Zurück zum Dashboard",
+    "backToDashboard": "Zurück zum Start",
     "backToTeam": "Zurück zum Team",
     "title": "Co-Founder einladen",
     "lead": "Schick deiner Co-Founderin oder deinem Co-Founder eine Einladung per E-Mail. Ihr entscheidet danach beide selbst, was ihr miteinander teilt.",
@@ -629,7 +629,7 @@
       "success": "Link kopiert.",
       "error": "Kopieren nicht möglich. Bitte Link manuell kopieren."
     },
-    "dashboardCta": "Zum Dashboard",
+    "dashboardCta": "Zum Start",
     "sharingTitle": "Was geteilt wird",
     "sharingNote": "Mit der Einladung wird nichts automatisch geteilt. Nach der Annahme entscheidet jede Person selbst, was sie für die andere freigibt. Euer gemeinsamer Bericht erscheint erst, wenn alle ihre Arbeitsweise füreinander freigegeben haben, dann für alle gleichzeitig.",
     "optionalName": "Team oder Projekt benennen (optional)",
@@ -789,7 +789,7 @@
       "complete_profile": {
         "title": "Profil vervollständigen",
         "text": "Ein paar Basisangaben fehlen noch – sie dauern nur einen Moment.",
-        "action": "Zum Profil"
+        "action": "Basisangaben ausfüllen"
       },
       "workstyle_start": {
         "title": "Beschreib, wie du arbeitest",
@@ -926,7 +926,9 @@
       "maybe": "Wenn ihr mögt",
       "financing": "Finanzierungs-Wegweiser",
       "tradeoffs": "Werte & Zielkonflikte",
-      "otherTeams": "Andere Teams"
+      "otherTeams": "Andere Teams",
+      "continueWith": "Weitermachen mit:",
+      "allQuestionnaires": "Alle Fragebögen und Gespräche"
     },
     "talk": {
       "title": "Für euer nächstes Gespräch",

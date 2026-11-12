@@ -316,12 +316,12 @@ export default async function FounderProfilePage({
     <main className="report-print-root mx-auto min-h-screen w-full max-w-6xl px-6 py-10 print:max-w-none print:px-0 print:py-0">
       <div className="no-print mb-8 flex items-center justify-between">
         {/* `min-h-11`: 44 px, gemessen statt angenommen. Vorher 38. */}
-        <a
+        <Link
           href="/dashboard"
           className="inline-flex min-h-11 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-700"
         >
           {t("backToDashboard")}
-        </a>
+        </Link>
       </div>
 
       {/* ------------------------------------------------------------------

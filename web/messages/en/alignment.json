@@ -1,6 +1,6 @@
 {
   "shell": {
-    "backToDashboard": "Back to dashboard",
+    "backToDashboard": "Back to Start",
     "draftNotice": "Test version. This questionnaire is not evaluated yet.",
     "progress": "{answered} of {total} answered",
     "saving": "Saving…",

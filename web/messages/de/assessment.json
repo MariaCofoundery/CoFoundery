@@ -1,6 +1,6 @@
 {
   "base": {
-    "backToDashboard": "Zurück zum Dashboard",
+    "backToDashboard": "Zurück zum Start",
     "intro": "Hier legt ihr die Grundlage für euren Matching-Report.",
     "title": "Basis-Fragebogen",
     "subtitle": "Selbstprofil",
@@ -8,7 +8,7 @@
     "missingChoices": "Antwortoptionen konnten nicht geladen werden. Bitte neu laden."
   },
   "values": {
-    "backToDashboard": "Zurück zum Dashboard",
+    "backToDashboard": "Zurück zum Start",
     "intro": {
       "line1": "Das Werteprofil ist optional.",
       "line2": "Es hilft euch zu klären, was für euch unter Druck wirklich zählt und wo ihr klare Grenzen zieht.",
@@ -61,7 +61,7 @@
     },
     "actions": {
       "individualReport": "Individuellen Report ansehen",
-      "dashboard": "Zum Dashboard",
+      "dashboard": "Zum Start",
       "startValues": "Werteprofil starten",
       "viewReportNow": "Report jetzt ansehen",
       "continueLater": "Später weitermachen"
@@ -75,7 +75,7 @@
     "highlight": "Basisprofil und Werteprofil greifen jetzt sauber ineinander.",
     "actions": {
       "individualReport": "Individuellen Report ansehen",
-      "dashboard": "Zum Dashboard"
+      "dashboard": "Zum Start"
     }
   }
 }

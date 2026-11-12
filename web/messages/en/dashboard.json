@@ -559,7 +559,7 @@
     }
   },
   "coFounderInvitePage": {
-    "backToDashboard": "Back to dashboard",
+    "backToDashboard": "Back to Start",
     "backToTeam": "Back to the team",
     "title": "Invite a co-founder",
     "lead": "Send your co-founder an invitation by email. After that, you each decide for yourselves what to share with each other.",
@@ -629,7 +629,7 @@
       "success": "Link copied.",
       "error": "Copying is not possible. Please copy the link manually."
     },
-    "dashboardCta": "Go to dashboard",
+    "dashboardCta": "Go to Start",
     "sharingTitle": "What is shared",
     "sharingNote": "The invitation shares nothing automatically. After accepting, each person decides for themselves what to share with the other. Your shared report only appears once everyone has shared their work style with each other, then for all of you at the same time.",
     "optionalName": "Name your team or project (optional)",
@@ -789,7 +789,7 @@
       "complete_profile": {
         "title": "Complete your profile",
         "text": "A few basic details are still missing – it only takes a moment.",
-        "action": "Go to profile"
+        "action": "Fill in the basics"
       },
       "workstyle_start": {
         "title": "Describe how you work",
@@ -926,7 +926,9 @@
       "maybe": "If you like",
       "financing": "Financing guide",
       "tradeoffs": "Values & trade-offs",
-      "otherTeams": "Other teams"
+      "otherTeams": "Other teams",
+      "continueWith": "Continue with:",
+      "allQuestionnaires": "All questionnaires and conversations"
     },
     "talk": {
       "title": "For your next conversation",

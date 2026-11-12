@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 
 export type ProfileParts = { work: boolean; can: boolean; strengths: boolean; direction: boolean };
 
@@ -43,6 +44,9 @@ export async function DashboardAside({
   const done = keys.filter((key) => parts[key]).map((key) => t(`stand.parts.${key}`));
   const open = keys.filter((key) => !parts[key]).map((key) => t(`stand.parts.${key}`));
   const teamPath = team ? `/teams/${encodeURIComponent(team.id)}` : null;
+  // Jeder offene Teil fuehrt direkt dorthin (statt eines allgemeinen "Zum Profil").
+  const PART_HREF = { work: CURRENT_WORKSTYLE_HREF, can: "/profile?step=areas", strengths: "/profile/strengths-interview", direction: "/profile/direction" } as const;
+  const openParts = keys.filter((key) => !parts[key]);
 
   return (
     <aside aria-label={t("stand.title")} className="flex min-w-0 flex-col gap-4">
@@ -102,7 +106,21 @@ export async function DashboardAside({
             </div>
           ) : null}
         </dl>
-        <Link href="/me/profile" className="mt-3.5 inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
+        {openParts.length > 0 ? (
+          <p className="mt-3.5 flex flex-wrap items-center gap-x-1 text-[15px]">
+            <span className="text-[#33325e]">{t("stand.continueWith")}</span>
+            {openParts.map((key, index) => (
+              <span key={key}>
+                {index > 0 ? " · " : " "}
+                <Link href={PART_HREF[key]} className="inline-flex min-h-10 items-center text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
+              </span>
+            ))}
+          </p>
+        ) : null}
+        <p className="flex flex-wrap items-center gap-x-4">
+          <Link href="/me/profile" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
+          <Link href="/fragebogen" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
+        </p>
       </section>
 
       {conversation && teamPath ? (

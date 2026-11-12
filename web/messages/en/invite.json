@@ -21,7 +21,7 @@
     "missingInvitationDescription": "No invitation was found.",
     "expiredHint": "If the link has expired, please ask the inviting person for a new invitation.",
     "technicalHint": "Technical note: {detail}",
-    "toDashboard": "Go to dashboard",
+    "toDashboard": "Go to Start",
     "fallback": "Loading invitation…",
     "choice": {
       "eyebrow": "Invitation",
@@ -55,7 +55,7 @@
       "loadFailed": "The invitation could not be loaded."
     },
     "technicalHint": "Technical note: {detail}",
-    "toDashboard": "Go to dashboard",
+    "toDashboard": "Go to Start",
     "title": "You are invited.",
     "invitedBy": "{name} invited you.",
     "context": {
@@ -122,7 +122,7 @@
     "activateCta": "Accept invitation",
     "waitingTitle": "Waiting for the second founder",
     "waitingText": "Your slot is already connected. Once {counterpart} has started as well, your shared matching context will activate automatically.",
-    "toDashboard": "Go to dashboard",
+    "toDashboard": "Go to Start",
     "recoveryTitle": "The setup has not finished yet.",
     "recoveryText": "Your consent is saved, but the connection with your advisor has not been fully set up yet. You can restart the final step here – no new consent is needed.",
     "recoveryCta": "Restart final step"
@@ -143,9 +143,9 @@
     "actions": {
       "matchingReport": "View matching report",
       "valuesModule": "Continue to values module",
-      "dashboard": "Back to dashboard",
+      "dashboard": "Back to Start",
       "individualReport": "View individual report",
-      "toDashboard": "Go to dashboard",
+      "toDashboard": "Go to Start",
       "useExisting": "Use existing profile",
       "refresh": "Answer again"
     },

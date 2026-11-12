@@ -21,7 +21,7 @@
     "missingInvitationDescription": "Es wurde keine Einladung gefunden.",
     "expiredHint": "Falls der Link wirklich abgelaufen ist, bitte die einladende Person um eine neue Einladung.",
     "technicalHint": "Technischer Hinweis: {detail}",
-    "toDashboard": "Zum Dashboard",
+    "toDashboard": "Zum Start",
     "fallback": "Lade Einladung…",
     "choice": {
       "eyebrow": "Einladung",
@@ -55,7 +55,7 @@
       "loadFailed": "Die Einladung konnte nicht geladen werden."
     },
     "technicalHint": "Technischer Hinweis: {detail}",
-    "toDashboard": "Zum Dashboard",
+    "toDashboard": "Zum Start",
     "title": "Du bist eingeladen.",
     "invitedBy": "{name} hat dich eingeladen.",
     "context": {
@@ -122,7 +122,7 @@
     "activateCta": "Einladung annehmen",
     "waitingTitle": "Wartet auf den zweiten Founder",
     "waitingText": "Dein Platz ist bereits verknüpft. Sobald auch {counterpart} gestartet ist, wird euer gemeinsamer Matching-Kontext automatisch aktiviert.",
-    "toDashboard": "Zum Dashboard",
+    "toDashboard": "Zum Start",
     "recoveryTitle": "Der Abschluss ist noch nicht durchgelaufen.",
     "recoveryText": "Deine Zustimmung ist gespeichert, aber die Verbindung mit eurem Advisor ist noch nicht fertig eingerichtet. Du kannst den Abschluss hier erneut anstoßen – eine neue Zustimmung braucht es dafür nicht.",
     "recoveryCta": "Abschluss erneut anstoßen"
@@ -143,9 +143,9 @@
     "actions": {
       "matchingReport": "Matching-Report ansehen",
       "valuesModule": "Weiter zum Werte-Modul",
-      "dashboard": "Zurück zum Dashboard",
+      "dashboard": "Zurück zum Start",
       "individualReport": "Individuellen Report ansehen",
-      "toDashboard": "Zum Dashboard",
+      "toDashboard": "Zum Start",
       "useExisting": "Bestehendes Profil verwenden",
       "refresh": "Neu beantworten"
     },

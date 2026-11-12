@@ -20,6 +20,7 @@ import { resolvePostAuthRedirectPath } from "@/features/auth/postAuthRedirect";
 import { LAST_PLACE_COOKIE, resumablePath } from "@/features/navigation/lastPlace";
 import { getRequestLocale } from "@/i18n/getLocale";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
+import { signOutAction } from "@/app/(product)/dashboard/actions";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
@@ -113,6 +114,21 @@ export default async function StartPage({
     if (lastPlace) redirect(lastPlace);
     const destination = await resolvePostAuthRedirectPath(supabase, nextPath);
     if (destination !== "/start") redirect(destination);
+    // Angemeldet, aber noch keinem Bereich zugeordnet (kein Founder, kein Advisor, kein Connect): hier stand bisher das
+    // Anmeldeformular fuer jemanden, der schon angemeldet ist. Jetzt sagt die Seite, wo man steht, und bietet zwei Wege an.
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-xl px-5 py-14 md:px-8">
+        <section className="rounded-2xl border border-[color:var(--line)] bg-white p-6 shadow-[0_20px_40px_rgba(16,26,42,0.1)] md:p-8">
+          <h1 className="text-3xl font-semibold text-[color:var(--ink)]">{t("start.signedIn.title")}</h1>
+          <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{t("start.signedIn.text")}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <a href={getBetaAccessRequestHref()} className="inline-flex min-h-11 items-center rounded-xl bg-[color:var(--brand-primary)] px-5 text-sm font-semibold">{t("start.signedIn.contact")}</a>
+            <Link href="/account" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-900">{t("start.signedIn.account")}</Link>
+            <form action={signOutAction}><button type="submit" className="inline-flex min-h-11 items-center px-3 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">{t("start.signedIn.signOut")}</button></form>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   async function sendStartMagicLinkAction(formData: FormData) {

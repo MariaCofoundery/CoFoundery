@@ -1,6 +1,6 @@
 {
   "base": {
-    "backToDashboard": "Back to dashboard",
+    "backToDashboard": "Back to Start",
     "intro": "This is where you set the foundation for your matching report.",
     "title": "Base questions",
     "subtitle": "Self profile",
@@ -8,7 +8,7 @@
     "missingChoices": "Answer options could not be loaded. Please reload."
   },
   "values": {
-    "backToDashboard": "Back to dashboard",
+    "backToDashboard": "Back to Start",
     "intro": {
       "line1": "The values profile is optional.",
       "line2": "It helps you clarify what really matters under pressure and where you draw clear boundaries.",
@@ -61,7 +61,7 @@
     },
     "actions": {
       "individualReport": "View individual report",
-      "dashboard": "Go to dashboard",
+      "dashboard": "Go to Start",
       "startValues": "Start values profile",
       "viewReportNow": "View report now",
       "continueLater": "Continue later"
@@ -75,7 +75,7 @@
     "highlight": "Your base profile and values profile now work together.",
     "actions": {
       "individualReport": "View individual report",
-      "dashboard": "Go to dashboard"
+      "dashboard": "Go to Start"
     }
   }
 }

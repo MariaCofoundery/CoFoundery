@@ -1,6 +1,6 @@
 {
   "shell": {
-    "backToDashboard": "Zurück zum Dashboard",
+    "backToDashboard": "Zurück zum Start",
     "draftNotice": "Testfassung. Dieser Fragebogen wird noch nicht ausgewertet.",
     "progress": "{answered} von {total} beantwortet",
     "saving": "Wird gespeichert …",
