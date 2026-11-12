@@ -133,9 +133,18 @@
     },
     "seen": {
       "title": "Who sees what",
-      "ich": { "title": "Me", "text": "Only you, until you share something." },
-      "wir": { "title": "We", "text": "Only what each person explicitly shares." },
-      "vorhaben": { "title": "Our venture", "text": "Everyone on the team. Advisors only with their own permission." }
+      "ich": {
+        "title": "Me",
+        "text": "Only you, until you share something."
+      },
+      "wir": {
+        "title": "We",
+        "text": "Only what each person explicitly shares."
+      },
+      "vorhaben": {
+        "title": "Our venture",
+        "text": "Everyone on the team. Advisors only with their own permission."
+      }
     },
     "gesamtbild": {
       "eyebrow": "Overall picture",
@@ -144,5 +153,112 @@
       "open": "Open overall picture"
     },
     "unnamed": "Founder"
+  },
+  "report": {
+    "pageTitle": "Overall picture",
+    "back": "← Align",
+    "pdf": "Save as PDF",
+    "cover": {
+      "eyebrow": "MADE2FOUND · Overall picture",
+      "line1": "Me,",
+      "line2": "You,",
+      "line3": "Our Startup",
+      "meta": "{team} · As of {date} · read by {name}",
+      "intro": "This overall picture describes how you work, what you bring and what you have already put in writing together. It does not grade: no score, no type, no statement about whether you fit. It is material for your conversations.",
+      "contents": "Contents",
+      "ringsLabel": "Two overlapping circles, Me and You, surrounded by a ring: Our Startup"
+    },
+    "who": "Who sees this:",
+    "chapters": {
+      "ich": {
+        "title": "Me",
+        "text": "Work style, skills, strengths, direction",
+        "who": "only you"
+      },
+      "du": {
+        "title": "You",
+        "text": "What the others shared for this team, and where you work alike or differently",
+        "who": "the team, only what each person shared"
+      },
+      "startup": {
+        "title": "Our Startup",
+        "text": "Team map, venture, agreements",
+        "who": "the whole team, advisors only with your setup permission"
+      }
+    },
+    "ich": {
+      "workstyleTitle": "How you work",
+      "fullReport": "Full report",
+      "workstyleMissing": "Your work style is not filled in yet. It will appear here once you have answered.",
+      "workstyleStart": "Fill in work style",
+      "workstyleOlder": "This is your work style from an earlier version. Only the current one counts for the team comparison.",
+      "capabilityTitle": "What you bring",
+      "capabilityEmpty": "You have not added any skills yet.",
+      "capabilityStart": "Add skills",
+      "groups": {
+        "own": "You want to own yourself",
+        "grow": "You want to grow into",
+        "handOff": "You would rather hand off or bring in help"
+      },
+      "directionTitle": "What keeps drawing you in",
+      "directionEmpty": "You have not written anything about your direction yet.",
+      "directionStart": "Write down your direction",
+      "strengthsTitle": "Your strengths",
+      "strengthsEmpty": "You have not saved any strengths yet.",
+      "strengthsStart": "Discover your strengths"
+    },
+    "du": {
+      "sharedLabel": "{name} shared:",
+      "parts": {
+        "workstyle": "Work style",
+        "capability": "Skills",
+        "strengths": "Strengths and direction"
+      },
+      "notShared": "What was not shared or not entered does not appear here.",
+      "alone": "There is no second person on this team yet whose parts could appear here.",
+      "waiting": "The work style comparison is not possible yet: answers or shares are missing. There you can see what is missing.",
+      "waitingLink": "To work style in the team",
+      "similarTitle": "Where you work alike",
+      "differentTitle": "Where you work differently",
+      "noDifferences": "Everyone's answers show no clear differences.",
+      "talkPrompt": "For your conversation",
+      "toSetup": "Discuss in setup",
+      "strengthsTitle": "Your strengths side by side",
+      "strengthsNote": "These are sentences each person confirmed themselves and shared for the team. There is no ranking and no fit.",
+      "strengthsNone": "Nobody has shared strengths for the team yet.",
+      "labsNote": "Results from Commitment Lab, Read My Mind and Founder in the Wild do not appear here. They apply to two people only and have their own permissions."
+    },
+    "startup": {
+      "ventureTitle": "Venture comparison",
+      "ventureReady": "The venture comparison is ready: everyone has submitted and shared.",
+      "ventureWaiting": "The venture comparison is still missing prerequisites.",
+      "ventureUnknown": "The state of the venture comparison cannot be read right now.",
+      "ventureLink": "To the venture",
+      "teamMapTitle": "Team map",
+      "teamMapText": "Who wants to own which field, from what each person shared.",
+      "teamMapEmpty": "Once you share your skills with the team, your team map appears here.",
+      "teamMapEmptyLink": "To the roles",
+      "freeFieldNote": "Open fields are not assigned to anyone yet. A click only prepares the search; Find and Connect receive nothing from this report.",
+      "findLink": "Search in Find",
+      "connectLink": "Contact in Connect",
+      "heldBy": "taken by {names}",
+      "free": "nobody yet",
+      "agreedTitle": "What you have already agreed",
+      "agreedEmpty": "No topic is agreed yet.",
+      "awaiting": "{count, plural, one {One topic is} other {# topics are}} waiting for your confirmation.",
+      "toSetup": "To Founder Setup"
+    },
+    "next": {
+      "eyebrow": "From this picture",
+      "title": "What you could talk about next",
+      "empty": "Once more is shared, topics for your conversation appear here.",
+      "freeField": "{family}: Who takes care of it until someone joins?",
+      "workstyleLead": "You answer differently:",
+      "toSetup": "To Founder Setup"
+    },
+    "footer": {
+      "basis": "Basis: work style, skills, discovering strengths, venture, Founder Setup. As of {date}.",
+      "private": "This picture contains only what you may see on screen. If someone changes a share, this picture changes too."
+    }
   }
 }

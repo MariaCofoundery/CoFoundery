@@ -620,5 +620,8 @@ test("das Produkt benutzt die Modulschicht nur an wenigen, bewussten Stellen: de
     // Die Fragebogen-Bibliothek (Align) listet die Module aus der Registry.
     join("src", "app", "(product)", "fragebogen", "page.tsx"),
     join("src", "app", "me", "profile", "page.tsx"),
+    // Gesamtbild (12.11.2026): liest NUR den Stand des Vorhaben-Vergleichs (`loadBetaReadiness`: bereit oder nicht,
+    // keine Namen, keine Antworten) und verlinkt auf die Seite des Vergleichs.
+    join("src", "features", "gesamtbild", "gesamtbildData.ts"),
   ].sort());
 });

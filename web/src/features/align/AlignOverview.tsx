@@ -44,15 +44,14 @@ const PART_TONE: Record<AlignPartState, Tone> = { done: "done", started: "progre
 export async function AlignOverview({
   data,
   hasTeamProgram,
-  gesamtbildHref = null,
 }: {
   data: AlignOverviewData;
   hasTeamProgram: boolean;
-  /** Der Link zum Gesamtbild. Ohne Link erscheint das Band nicht - kein Knopf ins Leere. */
-  gesamtbildHref?: string | null;
 }) {
   const [t, tCapability] = await Promise.all([getTranslations("align.overview"), getTranslations("capability")]);
   const team = data.team;
+  // Das Gesamtbild gibt es fuer ein Team; ohne Team erscheint das Band nicht - kein Knopf ins Leere.
+  const gesamtbildHref = team ? `/teams/${encodeURIComponent(team.id)}/gesamtbild` : null;
 
   const ownDone = ownPartsDone(data.own);
   const ownRows: Row[] = ALIGN_PART_KEYS.map((key) => ({

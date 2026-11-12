@@ -173,3 +173,51 @@
   .sd-card:hover { transform: none; }
   .sd-draw, .sd-draw-line { stroke-dasharray: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   Gesamtbild "Ich, Du, Unser Startup" (Entwurf vom 12.11.2026): Titelseite, Kapitel, PDF.
+   --------------------------------------------------------------------------- */
+.gb-outline-num {
+  font-family: var(--font-body), var(--font-body-fallback);
+  font-weight: 300;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #9c86f0;
+}
+.gb-tile { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; }
+.gb-tile:hover { transform: translateY(-4px); box-shadow: 0 22px 40px -26px rgba(46, 30, 120, 0.5); }
+
+@keyframes gb-drift-l { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(18px); } }
+@keyframes gb-drift-r { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-18px); } }
+.gb-drift-l { animation: gb-drift-l 7s ease-in-out infinite; }
+.gb-drift-r { animation: gb-drift-r 7s ease-in-out infinite; }
+@keyframes gb-draw-ring { from { stroke-dashoffset: 1400; } to { stroke-dashoffset: 0; } }
+.gb-ring { stroke-dasharray: 1400; animation: gb-draw-ring 2.6s 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+@keyframes gb-orbit { to { transform: rotate(360deg); } }
+.gb-orbit { transform-origin: 240px 240px; animation: gb-orbit 60s linear infinite; }
+
+/* Kapitelinhalte gleiten beim Scrollen herein (wo der Browser es kann; sonst stehen sie einfach da). */
+@supports (animation-timeline: view()) {
+  .gb-reveal { animation: align-fade-up linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-drift-l, .gb-drift-r, .gb-ring, .gb-orbit, .gb-reveal { animation: none !important; }
+  .gb-tile { transition: none !important; }
+  .gb-tile:hover { transform: none; }
+}
+
+/* Druck: hell, ohne Bewegung und ohne Knöpfe. Es steht nur drin, was am Bildschirm stand. */
+@media print {
+  .gb-screen-only { display: none !important; }
+  .gb-cover { background: #fff !important; color: #14152b !important; }
+  .gb-cover * { color: #14152b !important; }
+  .gb-cover-deco { display: none !important; }
+  .gb-dark-band { background: #f4f1fe !important; color: #14152b !important; }
+  .gb-dark-band * { color: #14152b !important; }
+  .gb-page { background: #fff !important; }
+  /* Im Druck gibt es kein Scrollen: Alles steht sofort da. */
+  .gb-reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .gb-section { break-inside: avoid-page; }
+  .gb-tile { break-inside: avoid; box-shadow: none !important; }
+}

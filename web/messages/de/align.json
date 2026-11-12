@@ -133,9 +133,18 @@
     },
     "seen": {
       "title": "Wer sieht was",
-      "ich": { "title": "Ich", "text": "Nur du, bis du etwas teilst." },
-      "wir": { "title": "Wir", "text": "Nur, was jede Person ausdrücklich teilt." },
-      "vorhaben": { "title": "Unser Vorhaben", "text": "Alle im Team. Advisor nur mit eigener Freigabe." }
+      "ich": {
+        "title": "Ich",
+        "text": "Nur du, bis du etwas teilst."
+      },
+      "wir": {
+        "title": "Wir",
+        "text": "Nur, was jede Person ausdrücklich teilt."
+      },
+      "vorhaben": {
+        "title": "Unser Vorhaben",
+        "text": "Alle im Team. Advisor nur mit eigener Freigabe."
+      }
     },
     "gesamtbild": {
       "eyebrow": "Gesamtbild",
@@ -144,5 +153,112 @@
       "open": "Gesamtbild öffnen"
     },
     "unnamed": "Founder"
+  },
+  "report": {
+    "pageTitle": "Gesamtbild",
+    "back": "← Align",
+    "pdf": "Als PDF speichern",
+    "cover": {
+      "eyebrow": "MADE2FOUND · Gesamtbild",
+      "line1": "Ich,",
+      "line2": "Du,",
+      "line3": "Unser Startup",
+      "meta": "{team} · Stand {date} · gelesen von {name}",
+      "intro": "Dieses Gesamtbild beschreibt, wie ihr arbeitet, was ihr mitbringt und was ihr schon miteinander festgehalten habt. Es bewertet nicht: keine Punktzahl, kein Typ, keine Aussage darüber, ob ihr passt. Es ist Stoff für eure Gespräche.",
+      "contents": "Inhalt",
+      "ringsLabel": "Zwei Kreise, Ich und Du, die sich überschneiden, umgeben von einem Ring: Unser Startup"
+    },
+    "who": "Wer sieht das:",
+    "chapters": {
+      "ich": {
+        "title": "Ich",
+        "text": "Arbeitsweise, Können, Stärken, Richtung",
+        "who": "nur du"
+      },
+      "du": {
+        "title": "Du",
+        "text": "Was die anderen für dieses Team geteilt haben, und wo ihr ähnlich oder verschieden arbeitet",
+        "who": "das Team, nur was jede Person geteilt hat"
+      },
+      "startup": {
+        "title": "Unser Startup",
+        "text": "Teamkarte, Vorhaben, Vereinbarungen",
+        "who": "das ganze Team, Advisor nur mit eurer Setup-Freigabe"
+      }
+    },
+    "ich": {
+      "workstyleTitle": "Wie du arbeitest",
+      "fullReport": "Ganzer Bericht",
+      "workstyleMissing": "Deine Arbeitsweise ist noch nicht ausgefüllt. Sobald du sie beantwortet hast, steht sie hier.",
+      "workstyleStart": "Arbeitsweise ausfüllen",
+      "workstyleOlder": "Das ist deine Arbeitsweise aus einer früheren Fassung. Für den Vergleich im Team zählt nur die aktuelle.",
+      "capabilityTitle": "Was du einbringst",
+      "capabilityEmpty": "Du hast noch keine Fähigkeiten angegeben.",
+      "capabilityStart": "Fähigkeiten angeben",
+      "groups": {
+        "own": "Willst du selbst verantworten",
+        "grow": "Willst du hineinwachsen",
+        "handOff": "Gibst du lieber ab oder holst du dazu"
+      },
+      "directionTitle": "Was dich immer wieder anzieht",
+      "directionEmpty": "Du hast noch nichts zu deiner Richtung aufgeschrieben.",
+      "directionStart": "Richtung aufschreiben",
+      "strengthsTitle": "Deine Stärken",
+      "strengthsEmpty": "Du hast noch keine Stärken festgehalten.",
+      "strengthsStart": "Stärken entdecken"
+    },
+    "du": {
+      "sharedLabel": "{name} hat geteilt:",
+      "parts": {
+        "workstyle": "Arbeitsweise",
+        "capability": "Können",
+        "strengths": "Stärken und Richtung"
+      },
+      "notShared": "Was nicht geteilt wurde oder nicht eingetragen ist, steht hier nicht.",
+      "alone": "In diesem Team gibt es noch keine zweite Person, deren Teile hier stehen könnten.",
+      "waiting": "Der Vergleich der Arbeitsweise ist noch nicht möglich: Es fehlen Antworten oder Freigaben. Dort siehst du, was fehlt.",
+      "waitingLink": "Zur Arbeitsweise im Team",
+      "similarTitle": "Wo ihr ähnlich arbeitet",
+      "differentTitle": "Wo ihr verschieden arbeitet",
+      "noDifferences": "In den Antworten aller zeigen sich keine deutlichen Unterschiede.",
+      "talkPrompt": "Für euer Gespräch",
+      "toSetup": "Im Setup besprechen",
+      "strengthsTitle": "Eure Stärken nebeneinander",
+      "strengthsNote": "Das sind Sätze, die jede Person selbst bestätigt und für das Team geteilt hat. Es gibt keine Rangfolge und keine Passung.",
+      "strengthsNone": "Noch hat niemand Stärken für das Team geteilt.",
+      "labsNote": "Ergebnisse aus Commitment Lab, Read My Mind und Founder in the Wild stehen hier nicht. Sie gelten nur für zwei Personen und haben eigene Freigaben."
+    },
+    "startup": {
+      "ventureTitle": "Vorhaben-Vergleich",
+      "ventureReady": "Der Vergleich zum Vorhaben ist bereit: Alle haben abgegeben und freigegeben.",
+      "ventureWaiting": "Für den Vergleich zum Vorhaben fehlen noch Voraussetzungen.",
+      "ventureUnknown": "Der Stand des Vorhaben-Vergleichs ist gerade nicht lesbar.",
+      "ventureLink": "Zum Vorhaben",
+      "teamMapTitle": "Teamkarte",
+      "teamMapText": "Wer welches Feld verantworten will, aus dem, was jede Person geteilt hat.",
+      "teamMapEmpty": "Sobald ihr eure Fähigkeiten für das Team freigebt, erscheint hier eure Teamkarte.",
+      "teamMapEmptyLink": "Zu den Rollen",
+      "freeFieldNote": "Freie Felder sind noch niemandem zugeordnet. Ein Klick bereitet nur die Suche vor, Find und Connect bekommen nichts aus diesem Bericht.",
+      "findLink": "In Find suchen",
+      "connectLink": "Kontakt in Connect",
+      "heldBy": "übernimmt {names}",
+      "free": "noch niemand",
+      "agreedTitle": "Was ihr schon vereinbart habt",
+      "agreedEmpty": "Noch ist kein Thema vereinbart.",
+      "awaiting": "{count, plural, one {Ein Thema wartet} other {# Themen warten}} auf eure Bestätigung.",
+      "toSetup": "Zum Founder Setup"
+    },
+    "next": {
+      "eyebrow": "Aus diesem Bild",
+      "title": "Worüber ihr als Nächstes sprechen könnt",
+      "empty": "Sobald mehr geteilt ist, erscheinen hier Themen für euer Gespräch.",
+      "freeField": "{family}: Wer kümmert sich darum, bis jemand dazukommt?",
+      "workstyleLead": "Ihr antwortet verschieden:",
+      "toSetup": "Ins Founder Setup"
+    },
+    "footer": {
+      "basis": "Grundlage: Arbeitsweise, Fähigkeiten, Stärken entdecken, Vorhaben, Founder Setup. Stand {date}.",
+      "private": "Dieses Bild enthält nur, was du am Bildschirm sehen darfst. Ändert jemand eine Freigabe, ändert sich auch dieses Bild."
+    }
   }
 }

@@ -53,6 +53,35 @@ async function countOwn(client: Client, table: string, userId: string) {
   return error ? 0 : count ?? 0;
 }
 
+/**
+ * Die Teamkarte: wer welches Feld verantworten will - und welche Felder frei sind.
+ * Gelesen ueber `get_team_capability` (teamgenau); wer nicht geteilt hat, erscheint nicht.
+ */
+export async function loadTeamMap(client: Client, teamId: string, userId: string, unnamed: string): Promise<AlignTeamView["teamMap"]> {
+  const [capability, vocabulary] = await Promise.all([
+    getTeamCapabilityForTeam(client, teamId, userId, unnamed).catch(() => null),
+    getCapabilityVocabulary(client).catch(() => null),
+  ]);
+  if (!capability || !vocabulary) return null;
+  const readout = buildCapabilityTeamReadout(
+    capability.people.map((person) => ({
+      userId: person.person_id,
+      name: person.name,
+      entries: person.capabilities.map((entry) => ({
+        areaId: entry.area_id,
+        applicationLevel: entry.application_level,
+        ownershipWish: entry.ownership_wish,
+      })),
+    })),
+    vocabulary.areas,
+    vocabulary.families,
+  );
+  return {
+    tiles: teamMapTiles(readout.families),
+    memberNames: Object.fromEntries(readout.members.map((member) => [member.userId, member.name])),
+  };
+}
+
 export async function getAlignOverview(params: {
   client: Client;
   userId: string;
@@ -87,33 +116,11 @@ export async function getAlignOverview(params: {
   const otherTeams = realTeams.filter((team) => team.id !== selected?.id).map((team) => ({ id: team.id, name: teamName(team) }));
   if (!selected) return { own, team: null, otherTeams };
 
-  const [teamState, product, capability, vocabulary] = await Promise.all([
+  const [teamState, product, teamMap] = await Promise.all([
     getStartTeamState({ client, userId, teamId: selected.id, venture: "open" }).catch(() => null),
     getProductTeam(client, selected.id).catch(() => null),
-    getTeamCapabilityForTeam(client, selected.id, userId, params.unnamed).catch(() => null),
-    getCapabilityVocabulary(client).catch(() => null),
+    loadTeamMap(client, selected.id, userId, params.unnamed),
   ]);
-
-  let teamMap: AlignTeamView["teamMap"] = null;
-  if (capability && vocabulary) {
-    const readout = buildCapabilityTeamReadout(
-      capability.people.map((person) => ({
-        userId: person.person_id,
-        name: person.name,
-        entries: person.capabilities.map((entry) => ({
-          areaId: entry.area_id,
-          applicationLevel: entry.application_level,
-          ownershipWish: entry.ownership_wish,
-        })),
-      })),
-      vocabulary.areas,
-      vocabulary.families,
-    );
-    teamMap = {
-      tiles: teamMapTiles(readout.families),
-      memberNames: Object.fromEntries(readout.members.map((member) => [member.userId, member.name])),
-    };
-  }
 
   return {
     own,

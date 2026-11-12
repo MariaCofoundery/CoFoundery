@@ -66,6 +66,8 @@ export function alignRoomOfPath(pathname: string): AlignRoom | "overview" | null
   if (pathname === "/align") return "overview";
 
   const teamPage = /^\/teams\/[^/]+\/([^/]+)/.exec(pathname);
+  // Das Gesamtbild gehoert zu allen drei Raeumen und liegt deshalb unter der Uebersicht.
+  if (teamPage?.[1] === "gesamtbild") return "overview";
   if (teamPage && VENTURE_TEAM_PAGES.includes(teamPage[1])) return "vorhaben";
   if (startsWithSegment(pathname, "/founder-alignment/vorhaben")) return "vorhaben";
 

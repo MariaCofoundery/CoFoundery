@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { resumablePath } from "@/features/navigation/lastPlace";
@@ -36,10 +36,11 @@ test("Die Uebersicht legt nichts an und schreibt nichts", () => {
   }
 });
 
-test("Kein Knopf ins Leere: das Gesamtbild erscheint nur mit Adresse", () => {
+test("Kein Knopf ins Leere: das Gesamtbild erscheint nur mit Team und fuehrt zu seiner Seite", () => {
   const view = code(VIEW);
   assert.match(view, /gesamtbildHref \? <GesamtbildBand/);
-  assert.doesNotMatch(code(PAGE), /gesamtbildHref/);
+  assert.match(view, /\/gesamtbild`/);
+  assert.ok(existsSync("src/app/(product)/teams/[teamId]/gesamtbild/page.tsx"));
 });
 
 test("Find bekommt nichts aus Align: freie Felder fuehren nur zu einer vorbefuellten Suche", () => {

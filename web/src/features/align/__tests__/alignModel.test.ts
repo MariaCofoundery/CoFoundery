@@ -45,6 +45,7 @@ test("Reiter: jede Adresse gehoert genau einem Raum", () => {
   assert.equal(alignRoomOfPath(`/teams/${TEAM}/finanzierung`), "vorhaben");
   assert.equal(alignRoomOfPath("/founder-alignment/vorhaben"), "vorhaben");
   assert.equal(alignRoomOfPath("/founder-alignment/profil"), "ich");
+  assert.equal(alignRoomOfPath(`/teams/${TEAM}/gesamtbild`), "overview");
   assert.equal(alignRoomOfPath("/discovery"), null);
   assert.equal(alignRoomOfPath("/dashboard"), null);
 });
