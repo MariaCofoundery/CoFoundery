@@ -56,11 +56,20 @@ export async function DashboardAside({
           <div>
             <dt className="font-semibold text-[#0b1f3a]">{t("stand.profile")}</dt>
             <dd className="mt-0.5 text-[#33325e]">
-              {open.length === 0
-                ? t("stand.profileAllDone")
-                : [done.length > 0 ? t("stand.profileDone", { done: done.join(", ") }) : null, t("stand.profileOpen", { open: open.join(", ") })]
-                    .filter(Boolean)
-                    .join(" ")}
+              {open.length === 0 ? (
+                t("stand.profileAllDone")
+              ) : (
+                <>
+                  {done.length > 0 ? `${t("stand.profileDone", { done: done.join(", ") })} ` : null}
+                  {t("stand.openLabel")}{" "}
+                  {openParts.map((key, index) => (
+                    <span key={key}>
+                      {index > 0 ? ", " : null}
+                      <Link href={PART_HREF[key]} className="text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
+                    </span>
+                  ))}
+                </>
+              )}
             </dd>
           </div>
           {team ? (
@@ -106,18 +115,7 @@ export async function DashboardAside({
             </div>
           ) : null}
         </dl>
-        {openParts.length > 0 ? (
-          <p className="mt-3.5 flex flex-wrap items-center gap-x-1 text-[15px]">
-            <span className="text-[#33325e]">{t("stand.continueWith")}</span>
-            {openParts.map((key, index) => (
-              <span key={key}>
-                {index > 0 ? " · " : " "}
-                <Link href={PART_HREF[key]} className="inline-flex min-h-10 items-center text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
-              </span>
-            ))}
-          </p>
-        ) : null}
-        <p className="flex flex-wrap items-center gap-x-4">
+        <p className="mt-2.5 flex flex-wrap items-center gap-x-4">
           <Link href="/me/profile" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
           <Link href="/fragebogen" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
         </p>

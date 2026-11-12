@@ -927,8 +927,8 @@
       "financing": "Finanzierungs-Wegweiser",
       "tradeoffs": "Werte & Zielkonflikte",
       "otherTeams": "Andere Teams",
-      "continueWith": "Weitermachen mit:",
-      "allQuestionnaires": "Alle Fragebögen und Gespräche"
+      "allQuestionnaires": "Alle Fragebögen und Gespräche",
+      "openLabel": "Noch offen:"
     },
     "talk": {
       "title": "Für euer nächstes Gespräch",

@@ -927,8 +927,8 @@
       "financing": "Financing guide",
       "tradeoffs": "Values & trade-offs",
       "otherTeams": "Other teams",
-      "continueWith": "Continue with:",
-      "allQuestionnaires": "All questionnaires and conversations"
+      "allQuestionnaires": "All questionnaires and conversations",
+      "openLabel": "Still open:"
     },
     "talk": {
       "title": "For your next conversation",
