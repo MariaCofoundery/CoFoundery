@@ -214,3 +214,13 @@ Kurz: **Konzept und Fragen mit dem stärksten Modell, Bauen mit Sonnet.** Die Fr
 - Nicht gelesen: englische Texte, `founderStartData.ts`, `/welcome`, das Innere von `ProductShell` und `FounderChrome`, `/discovery/*`, `/connect/*`, die Team-Seiten, die Berichte `pilot/report`, `pilot/compare`, `bestaetigen`, `zielkonflikte`, die Datei `docs/CoFoundery_Align_v2_1_Items.json` (v2.1 ist archiviert) und die Bodies von Können/Stärken/Richtung im Profil-Editor.
 - **Zu klären:** Die Anzahl der Founder-Setup-Themen. `CLAUDE.md` und `messages/de/questionnaires.json` nennen 20 beziehungsweise 23; ich habe sie nicht abgeglichen.
 - Die Sackgasse bei `/start` für Konten ohne Rolle ist aus dem Quelltext gelesen, nicht nachgestellt.
+
+---
+
+## 9. Entscheidungen von Maria (12.11.2026) und was sich am Plan ändert
+
+- **„Start“** ist das Wort für das Zuhause (Nav, Logo, Rücklinks). `/start` bleibt die Anmeldung.
+- **Vorhaben v1 (42 Fragen) fliegt aus Bibliothek und Navigation**, die Beta wird die einzige Fassung. Die Daten bleiben lesbar.
+- **Stärken entdecken** mit Szenenkarten und drei Runden: Entwurf folgt. Fragetexte schreibt Maria selbst als Gutachterin ab. Gearbeitet wird mit Opus 5.5 (hohe Denktiefe).
+- **Arbeitsweise v5 entfällt.** Die 29 Fragen der Fassung 4 sind abgestimmt (03.11.2026) und bleiben. Die Beobachtungen aus 4.3 sind nur Notizen. Offen bleiben nur Dinge, die die Fragen nicht verändern (ehrliche Zeitangabe, eventuell mehrere Fragen pro Bildschirm, bessere Enden). Etappe C6 ist gestrichen.
+- **„Align“ bleibt als Name.** Das Problem war nie der Name, sondern dass es keine eigene Seite gibt und das Wort im Editor ein zweites Mal als Reitername auftaucht. Etappe A3 wird deshalb zu: **Align bekommt eine eigene Einstiegsseite** (Ich, Wir, Unser Vorhaben), im Menü stehen darunter diese drei statt „Profil, Team, Programm“. Entwurf folgt.
