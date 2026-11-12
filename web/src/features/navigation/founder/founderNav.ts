@@ -81,7 +81,7 @@ export function splitConnectTabs<T extends { href: string }>(children: T[]): { t
 export function searchTargets(items: FounderNavItem[]): { key: string; label: string; href: string; parent?: string }[] {
   return items.flatMap((item) => [
     { key: item.key, label: item.label, href: item.href },
-    ...(item.children ?? []).map((child) => ({ key: `${item.key}-${child.href}`, label: child.label, href: child.href, parent: item.label })),
+    ...(item.children ?? []).map((child) => ({ key: `${item.key}-${child.href}-${child.label}`, label: child.label, href: child.href, parent: item.label })),
   ]);
 }
 

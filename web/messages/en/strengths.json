@@ -1,6 +1,6 @@
 {
   "eyebrow": "Your strengths",
-  "title": "Strengths interview",
+  "title": "Discover your strengths",
   "text": "You tell us about concrete situations – what you did, not how you rate yourself. From that, strength themes can arise, each with the passage from your answer it rests on. You decide what fits you.",
   "backToStrengths": "Back to your strengths",
   "guidance": {
@@ -12,7 +12,7 @@
     "private": "Nobody but you sees your answers. They are only analyzed if you explicitly ask for it at the end.",
     "noTest": "This is not a test and not a typology. There are no points and no right answers."
   },
-  "start": "Start the strengths interview",
+  "start": "Discover your strengths",
   "startPending": "Preparing …",
   "progress": {
     "atQuestion": "Question {index} of {total}",
@@ -33,10 +33,12 @@
     "complete": "The interview could not be finished. Please try again.",
     "too_few": "You need at least three answers to finish.",
     "ask": "The analysis could not be requested. Please try again.",
-    "proposal": "The suggestion could not be saved. Please try again."
+    "proposal": "The suggestion could not be saved. Please try again.",
+    "scenes": "Choose five or six scenes.",
+    "too_few_scenes": "We need at least five scenes to analyze. You cannot skip this one."
   },
   "done": {
-    "title": "Your strengths interview is finished",
+    "title": "You have discovered your strengths",
     "text": "{count, plural, one {One answer} other {# answers}} from this conversation.",
     "askText": "An AI on a Made2Found computer – not at an outside service – reads your answers and assigns strength themes to them. Each suggestion names the passage from your answer it rests on. The counter-questions are not analysed. Anything that cannot be backed up is not suggested.",
     "ask": "Get suggestions",
@@ -71,8 +73,8 @@
     "text": "What you shared in this conversation."
   },
   "again": {
-    "text": "You can do another strengths interview – for example with other situations.",
-    "cta": "Start another strengths interview"
+    "text": "You can discover your strengths again – for example with other scenes.",
+    "cta": "Discover your strengths again"
   },
   "interview": {
     "answerLabel": "Your answer",
@@ -212,6 +214,115 @@
       "others_better": {
         "title": "When did you notice that others do something better than you – and how did you notice?",
         "hint": "A concrete occasion where you saw: someone else does this better."
+      },
+      "sc_unsure": {
+        "title": "When did you last pull something off that you were not sure would work?",
+        "scene": "I pulled something off even though I was not sure it would work.",
+        "short": "Not sure it would work",
+        "hint": "A venture, an exam, a project",
+        "followUps": {}
+      },
+      "sc_nobody": {
+        "title": "Was there a recent situation where nobody was in charge and you took it on?",
+        "scene": "Nobody was in charge, so I took it on.",
+        "short": "Nobody was in charge",
+        "hint": "On a team, in a club, in the family",
+        "followUps": {}
+      },
+      "sc_fast_decision": {
+        "title": "When did you last have to decide quickly without knowing everything?",
+        "scene": "I had to decide quickly without knowing everything.",
+        "short": "Decided quickly",
+        "hint": "Under time pressure, with little information",
+        "followUps": {}
+      },
+      "sc_stuck_problem": {
+        "title": "Which problem did you recently solve that others had been stuck on?",
+        "scene": "I solved a problem others got stuck on.",
+        "short": "Solved a problem",
+        "hint": "Technical, organizational, between people",
+        "followUps": {}
+      },
+      "sc_from_zero": {
+        "title": "What have you built from scratch?",
+        "scene": "I built something from scratch.",
+        "short": "Built from scratch",
+        "hint": "A product, a meetup, a process, a group",
+        "followUps": {}
+      },
+      "sc_convinced": {
+        "title": "Whom have you convinced of something who was skeptical at first?",
+        "scene": "I convinced someone who was skeptical at first.",
+        "short": "Convinced someone",
+        "hint": "A customer, a boss, a roommate, an investor",
+        "followUps": {}
+      },
+      "sc_uncomfortable": {
+        "title": "When did you last bring up something uncomfortable?",
+        "scene": "I brought up something uncomfortable.",
+        "short": "Said the uncomfortable thing",
+        "hint": "Something everyone saw and nobody said",
+        "followUps": {}
+      },
+      "sc_helped_grow": {
+        "title": "Whom have you helped get better?",
+        "scene": "I helped someone get better.",
+        "short": "Helped someone grow",
+        "hint": "Onboarding, coaching, giving feedback",
+        "followUps": {}
+      },
+      "sc_connected": {
+        "title": "Whom have you connected with someone who could help them?",
+        "scene": "I brought two people together.",
+        "short": "Connected people",
+        "hint": "And it helped them both",
+        "followUps": {}
+      },
+      "sc_learned_fast": {
+        "title": "What did you recently have to learn quickly?",
+        "scene": "I had to learn something new quickly.",
+        "short": "Got up to speed",
+        "hint": "A topic, a tool, an industry",
+        "followUps": {}
+      },
+      "sc_order": {
+        "title": "Where did you recently bring order to a mess?",
+        "scene": "I brought order to a mess.",
+        "short": "Created order",
+        "hint": "Processes, filing, responsibilities",
+        "followUps": {}
+      },
+      "sc_asked_for": {
+        "title": "What do people keep asking you for help with? When was the last time?",
+        "scene": "People keep asking me for help with the same thing.",
+        "short": "Asked again and again",
+        "hint": "What do people come to you for?",
+        "followUps": {}
+      },
+      "r3_flow": {
+        "title": "What work makes you lose track of time? Describe the last time.",
+        "hint": "What were you doing, and what drew you in?",
+        "followUps": {}
+      },
+      "r3_thanked": {
+        "title": "What do people thank you for? When was the last time?",
+        "hint": "What do they say when they thank you?",
+        "followUps": {}
+      },
+      "r3_put_off": {
+        "title": "What do you tend to put off? Give an example from recently.",
+        "hint": "This is not a weakness check. It shows where you may need support. It is not analyzed.",
+        "followUps": {}
+      },
+      "r3_hand_over": {
+        "title": "What would you most like to hand off? And why?",
+        "hint": "It is not analyzed. You will see your words later in the report.",
+        "followUps": {}
+      },
+      "r3_others_better": {
+        "title": "What are others better at than you, and what do you learn from them?",
+        "hint": "It is not analyzed. You will see your words later in the report.",
+        "followUps": {}
       }
     }
   },
@@ -452,12 +563,167 @@
       "title": "Other statements from you",
       "text": "Strengths you formulated yourself or accepted earlier."
     },
-    "emptyTitle": "Your strengths picture comes from the strengths interview",
+    "emptyTitle": "Your strengths picture comes from \"Discover your strengths\"",
     "emptyText": "You have not accepted any strength themes yet. In the interview you tell about ten situations; suggestions arise from that, and you confirm them.",
-    "start": "Start the strengths interview",
-    "again": "Run the strengths interview again",
+    "start": "Discover your strengths",
+    "again": "Discover your strengths again",
     "back": "Back to your profile",
     "open": "View your strengths picture"
   },
-  "levelNoteShort": "How well supported – not how strong."
+  "levelNoteShort": "How well supported – not how strong.",
+  "discover": {
+    "controls": {
+      "play": "Play",
+      "pause": "Pause",
+      "prev": "Back",
+      "next": "Next",
+      "skip": "Skip",
+      "tapNext": "Tap for next",
+      "part": "Part {n}"
+    },
+    "intro": {
+      "round": "Round 1 of 3 · Settling in",
+      "steps": {
+        "s1": {
+          "title": "Take a moment.",
+          "text": "About a minute. You do not need to write anything down. Take a breath."
+        },
+        "s2": {
+          "title": "Go back in your mind.",
+          "text": "A few weeks. A few months. Maybe a few years."
+        },
+        "s3": {
+          "title": "Where were you really strong?",
+          "text": "What do you like to look back on? What are you proud of, even if hardly anyone saw it?"
+        },
+        "s4": {
+          "title": "What have others praised you for?",
+          "text": "When did people come to you because you simply can?"
+        },
+        "s5": {
+          "title": "In there is what you are really good at.",
+          "text": "Your superpower, if you like. These are exactly the moments we will look at together now."
+        }
+      },
+      "timeline": {
+        "years": "years ago",
+        "months": "months ago",
+        "weeks": "weeks ago",
+        "today": "today"
+      },
+      "bubbles": {
+        "b1": "Thank you!",
+        "b2": "How did you do that?",
+        "b3": "Can you take a look?",
+        "b4": "That was really good."
+      },
+      "endTitle": "Do you have a few moments in mind?",
+      "endText": "Note them down if you like. A few words are enough. You will see them again when you choose scenes.",
+      "notesLabel": "Keywords, optional",
+      "notesPlaceholder": "e.g. won the pilot customer",
+      "addNote": "Note it",
+      "removeNote": "Remove {note}",
+      "continue": "On to the scenes",
+      "continuePending": "Getting ready …",
+      "replay": "Replay intro",
+      "outline": {
+        "o1": "1 Settling in",
+        "o2": "2 Scenes: 5 to 6, 2 to 3 minutes each",
+        "o3": "3 Energy and an outside view, about 8 minutes"
+      },
+      "private": "Only you see your answers. They are only analyzed if you explicitly ask for it at the end.",
+      "noTest": "This is not a test and not a typology. There are no points and no right answers."
+    },
+    "pick": {
+      "round": "Round 2 of 3",
+      "roundShort": "2 · Scenes",
+      "roundThree": "3 · Energy and an outside view",
+      "warmup": "Settling in",
+      "title": "Which of these scenes do you know from your life?",
+      "text": "Choose 5 or 6. Work, studies, a club, volunteering or family all count. After that we ask you one question about each scene.",
+      "yourNotes": "Your keywords from the intro",
+      "whichFits": "Which scene fits them?",
+      "question": "Question: {question}",
+      "selected": "{count, plural, one {# scene} other {# scenes}} chosen",
+      "need": "Choose {count} more",
+      "go": "Continue with {count} scenes",
+      "goPending": "Getting ready …",
+      "limit": "More than 6 scenes are not needed. Remove one to choose another.",
+      "tip": "About 2 to 3 minutes per scene. Your progress is saved after every step.",
+      "pauseLink": "Take a break",
+      "backToIntro": "← Intro"
+    },
+    "scene": {
+      "counter": "Scene {index} of {total}",
+      "minutes": "about 2 to 3 minutes",
+      "whenLegend": "About when was that?",
+      "when": {
+        "year": "This year",
+        "few": "1 to 3 years ago",
+        "long": "Longer ago"
+      },
+      "stepsLabel": "Steps",
+      "steps": {
+        "situation": {
+          "title": "What was going on?",
+          "help": "Who was involved, what was it about, and what made it hard?",
+          "placeholder": "For example: who, where, what it was about",
+          "example": "At university our student council wanted to introduce a learning platform. The program director thought it was unnecessary."
+        },
+        "action": {
+          "title": "What did you do?",
+          "help": "What did you say or do? Describe your part, not the team's.",
+          "placeholder": "For example: First I …, then I …",
+          "example": "First I asked what exactly bothered him. Then I brought two people from the cohort who told the problem themselves, and proposed a four-week test."
+        },
+        "outcome": {
+          "title": "What came of it?",
+          "help": "How did it turn out? Half a success counts too.",
+          "placeholder": "For example: In the end …",
+          "example": "He agreed to the test. After four weeks the platform was adopted for the whole program."
+        }
+      },
+      "showExample": "See an example",
+      "hideExample": "Hide example",
+      "exampleLabel": "Example from someone else",
+      "lengthHint": "2 to 5 sentences are enough. Keywords work too.",
+      "followUpTitle": "Would you like to add something?",
+      "followUp": "Would you like to say what you said or did first?",
+      "followUpKeep": "Leave it",
+      "back": "Back",
+      "next": "Next",
+      "save": "Save scene",
+      "savePending": "Saving …",
+      "skip": "Skip scene",
+      "skipPending": "Skipping …",
+      "whyTitle": "Why three steps?",
+      "why": "First the situation, then your part, then the result. That makes visible what exactly you contributed. That is where the signs of your strengths are.",
+      "tooShort": "Write at least a few words for \"What was going on?\" or \"What did you do?\".",
+      "private": "Only you see your answers.",
+      "changePick": "Scenes are chosen"
+    },
+    "interim": {
+      "eyebrow": "Interim view",
+      "title": "What you have told so far",
+      "text": "On the left your scenes, each with the sentence in which you describe what you did. After the last round you can have hints about strengths worked out. You decide on every suggestion yourself: fits me, does not fit, or say it differently.",
+      "scenesLabel": "Your scenes",
+      "skipped": "skipped",
+      "nextEyebrow": "One more round, about 8 minutes",
+      "nextTitle": "Energy and an outside view",
+      "nextText": "Three short questions about energy and thanks from others, then three counter-questions. The counter-questions are not analyzed.",
+      "continue": "On to round 3",
+      "continuePending": "Getting ready …",
+      "finishNow": "Finish now",
+      "later": "Continue later",
+      "saved": "Your progress stays saved."
+    },
+    "round3": {
+      "round": "Round 3 of 3",
+      "counter": "Question {index} of {total}",
+      "title": "Energy and an outside view",
+      "text": "Short and honest. A few sentences are enough.",
+      "counterNote": "This question is not analyzed.",
+      "skip": "Skip this question"
+    }
+  }
 }

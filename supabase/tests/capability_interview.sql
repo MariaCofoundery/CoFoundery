@@ -150,12 +150,18 @@ select extensions.throws_ok(
 -- das war, und sie kann der Sitzung nicht widersprechen (zusammengesetzter
 -- Fremdschluessel auf (id, kind)). Kein Gedankengang, keine Bewertung, keine
 -- Aufnahme.
+--
+-- DAZUGEKOMMEN AM 12.11.2026 („Staerken entdecken“, Migration 20270419120000): `answer_parts` und
+-- `happened_when`. Auch das ist keine Bewertung und kein Gedankengang: `answer_parts` ist dieselbe
+-- Antwort in ihren drei Teilen (oder die Markierung „uebersprungen“), `happened_when` die eigene
+-- Zeitangabe der Person. Beides gibt die Person ein; nichts davon entsteht durch eine Auswertung und
+-- nichts davon geht in sie ein (`strengthsDiscover.test.ts` haelt das fest).
 select extensions.set_eq(
   $$select column_name::text from information_schema.columns
     where table_schema = 'public' and table_name = 'capability_interview_turns'$$,
   $$values ('id'), ('session_id'), ('kind'), ('sort_order'), ('question_source'),
            ('question_id'), ('question_text'), ('answer'), ('answered_at'),
-           ('evidence_id'), ('created_at')$$,
+           ('evidence_id'), ('created_at'), ('answer_parts'), ('happened_when')$$,
   'the turn holds question and answer - and nothing else'
 );
 

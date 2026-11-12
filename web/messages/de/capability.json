@@ -775,7 +775,7 @@
     "text": "Persönliche Stärken, die sich in deinem Verhalten zeigen – aus Situationen, die du erzählt hast. Zu jeder kannst du zwei Dinge sagen: wie oft sie sich bei dir zeigt, und was Menschen sagen würden, die dich erlebt haben.",
     "proposalsTitle": "Vorschläge aus deinen Antworten",
     "proposalsText": "Mit der Stelle, auf die sie sich berufen. Nichts davon gilt, bis du es übernimmst — und du kannst es umschreiben.",
-    "empty": "Noch nichts festgehalten. Erzähl im Stärken-Interview von Situationen, oder schreib selbst etwas auf.",
+    "empty": "Noch nichts festgehalten. Erzähl bei „Stärken entdecken“ von Situationen, oder schreib selbst etwas auf.",
     "addTitle": "Selbst festhalten",
     "addLabel": "In einem Satz",
     "addPlaceholder": "Zum Beispiel: Bleibt dran, wenn eine Absprache nicht hält",
@@ -807,9 +807,9 @@
       "others_see_more": "Hier vermutest du mehr bei anderen als bei dir selbst. Das ist kein Fehler — es ist die Stelle, an der du dir vielleicht etwas zutrauen könntest, das andere längst sehen.",
       "others_see_less": "Hier siehst du mehr bei dir als bei anderen. Auch das ist kein Fehler — vielleicht zeigst du es nur an Stellen, die niemand mitbekommt."
     },
-    "interviewTitle": "Stärken-Interview",
+    "interviewTitle": "Stärken entdecken",
     "interviewText": "Du erzählst von konkreten Situationen – etwas, das du übernommen, gelöst oder angestoßen hast. Daraus können Vorschläge für persönliche Stärken entstehen, jeweils mit der Stelle aus deiner Antwort. Du entscheidest, ob du sie übernimmst, umschreibst oder verwirfst.",
-    "interviewCta": "Stärken-Interview starten"
+    "interviewCta": "Stärken entdecken"
   },
   "sourcing": {
     "internal_only": "gehört ins Team",

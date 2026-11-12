@@ -112,7 +112,7 @@ export function FounderChrome({
 
   const childLink = (child: FounderNavChild) => (
     <Link
-      key={child.href}
+      key={`${child.href}:${child.label}`}
       href={child.href}
       aria-current={child.active ? "page" : undefined}
       className={`flex min-h-9 items-center gap-2 rounded-[9px] px-3 text-[13.5px] ${FOCUS} ${
@@ -193,7 +193,7 @@ export function FounderChrome({
               {compact ? null : <p className="mx-3 mb-1.5 mt-2 text-[11px] font-semibold uppercase tracking-[0.09em] text-[#9A9DC4]">{t("areaConnect")}</p>}
               {connectChildren.map((child) => (
                 <Link
-                  key={child.href}
+                  key={`${child.href}:${child.label}`}
                   href={child.href}
                   aria-current={child.active ? "page" : undefined}
                   title={compact ? child.label : undefined}
@@ -301,7 +301,7 @@ export function FounderChrome({
             <nav aria-label={tf("subLabel", { name: activeArea?.label ?? "" })} className="flex gap-1.5 overflow-x-auto px-3 pb-2.5 [scrollbar-width:none] sm:px-5 min-[700px]:hidden [&::-webkit-scrollbar]:hidden">
               {chips.map((chip) => (
                 <Link
-                  key={chip.href}
+                  key={`${chip.href}:${chip.label}`}
                   href={chip.href}
                   aria-current={chip.active ? "page" : undefined}
                   className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] ${

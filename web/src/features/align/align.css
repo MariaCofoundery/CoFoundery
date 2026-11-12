@@ -125,3 +125,51 @@
   .align-room:hover,
   .align-room:focus-within { transform: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   Stärken entdecken (Entwurf vom 12.11.2026): Intro, Szenenkarten, drei Schritte.
+   --------------------------------------------------------------------------- */
+@keyframes sd-breathe { 0%, 100% { transform: scale(0.82); opacity: 0.45; } 50% { transform: scale(1.12); opacity: 1; } }
+.sd-breathe, .sd-breathe-slow { transform-box: fill-box; transform-origin: center; animation: sd-breathe 5s ease-in-out infinite; }
+.sd-breathe-slow { animation-delay: 1.2s; }
+
+@keyframes sd-travel { from { transform: translateX(0); } to { transform: translateX(-680px); } }
+.sd-travel { animation: sd-travel 6s cubic-bezier(0.45, 0, 0.25, 1) forwards; }
+
+@keyframes sd-pop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.sd-pop { transform-box: fill-box; transform-origin: center; animation: sd-pop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes sd-draw { from { stroke-dashoffset: 1200; } to { stroke-dashoffset: 0; } }
+.sd-draw { stroke-dasharray: 1200; animation: sd-draw 2.6s 0.4s ease-out both; }
+
+@keyframes sd-bubble { 0% { opacity: 0; transform: translateY(18px); } 12% { opacity: 1; transform: translateY(0); } 100% { opacity: 1; transform: translateY(-12px); } }
+.sd-bubble { animation: sd-bubble 6s ease-out both; }
+
+/* Szenenkarten */
+.sd-card { transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s, border-color 0.2s, background-color 0.2s; }
+.sd-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -12px rgba(46, 30, 120, 0.28); }
+@keyframes sd-check { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.sd-check { animation: sd-check 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes sd-fade { from { opacity: 0; } to { opacity: 1; } }
+.sd-fade { animation: sd-fade 0.5s ease both; }
+@keyframes sd-tray { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+.sd-tray { animation: sd-tray 0.8s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+/* Eine Szene in drei Schritten */
+@keyframes sd-slide { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+.sd-slide { animation: sd-slide 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes sd-spin { to { transform: rotate(360deg); } }
+.sd-spin { transform-origin: center; animation: sd-spin 40s linear infinite; }
+@keyframes sd-draw-line { from { stroke-dashoffset: 420; } to { stroke-dashoffset: 0; } }
+.sd-draw-line { stroke-dasharray: 420; animation: sd-draw-line 1.2s ease-out both; }
+@keyframes sd-slide-left { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
+.sd-slide-left { animation: sd-slide-left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sd-slide-right { animation: sd-slide 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-breathe, .sd-breathe-slow, .sd-travel, .sd-pop, .sd-draw, .sd-bubble, .sd-check, .sd-fade, .sd-tray,
+  .sd-slide, .sd-spin, .sd-draw-line, .sd-slide-left, .sd-slide-right { animation: none !important; }
+  .sd-card { transition: none !important; }
+  .sd-card:hover { transform: none; }
+  .sd-draw, .sd-draw-line { stroke-dasharray: none; }
+}

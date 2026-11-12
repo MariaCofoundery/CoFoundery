@@ -1,6 +1,6 @@
 {
   "eyebrow": "Deine Stärken",
-  "title": "Stärken-Interview",
+  "title": "Stärken entdecken",
   "text": "Du erzählst von konkreten Situationen – was du getan hast, nicht wie du dich einschätzt. Daraus können Stärken-Themen entstehen, jeweils mit der Stelle aus deiner Antwort, auf die sie sich stützen. Du entscheidest, was davon zu dir passt.",
   "backToStrengths": "Zurück zu deinen Stärken",
   "guidance": {
@@ -12,7 +12,7 @@
     "private": "Deine Antworten sieht niemand außer dir. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
     "noTest": "Das ist kein Test und keine Typologie. Es gibt keine Punkte und keine richtigen Antworten."
   },
-  "start": "Stärken-Interview beginnen",
+  "start": "Stärken entdecken beginnen",
   "startPending": "Wird vorbereitet …",
   "progress": {
     "atQuestion": "Frage {index} von {total}",
@@ -33,10 +33,12 @@
     "complete": "Das Interview konnte nicht abgeschlossen werden. Bitte versuch es noch einmal.",
     "too_few": "Zum Abschließen braucht es mindestens drei Antworten.",
     "ask": "Die Auswertung konnte nicht angefordert werden. Bitte versuch es noch einmal.",
-    "proposal": "Der Vorschlag konnte nicht gespeichert werden. Bitte versuch es noch einmal."
+    "proposal": "Der Vorschlag konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+    "scenes": "Wähle fünf oder sechs Szenen.",
+    "too_few_scenes": "Zum Auswerten brauchen wir mindestens fünf Szenen. Diese kannst du nicht überspringen."
   },
   "done": {
-    "title": "Dein Stärken-Interview ist abgeschlossen",
+    "title": "Du hast deine Stärken entdeckt",
     "text": "{count, plural, one {Eine Antwort} other {# Antworten}} aus diesem Gespräch.",
     "askText": "Eine KI auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest deine Antworten und ordnet ihnen Stärken-Themen zu. Jeder Vorschlag nennt die Stelle aus deiner Antwort, auf die er sich stützt. Die Gegenfragen werden nicht ausgewertet. Was sich nicht belegen lässt, wird nicht vorgeschlagen.",
     "ask": "Vorschläge erstellen lassen",
@@ -71,8 +73,8 @@
     "text": "Was du in diesem Gespräch erzählt hast."
   },
   "again": {
-    "text": "Du kannst ein weiteres Stärken-Interview führen – etwa mit anderen Situationen.",
-    "cta": "Weiteres Stärken-Interview beginnen"
+    "text": "Du kannst Stärken noch einmal entdecken – etwa mit anderen Szenen.",
+    "cta": "Weiteres Stärken entdecken beginnen"
   },
   "interview": {
     "answerLabel": "Deine Antwort",
@@ -212,6 +214,115 @@
       "others_better": {
         "title": "Woran hast du schon einmal gemerkt, dass andere etwas besser machen als du – und woran?",
         "hint": "Eine konkrete Gelegenheit, bei der du gesehen hast: Das kann jemand anderes besser."
+      },
+      "sc_unsure": {
+        "title": "Wann hast du zuletzt etwas hinbekommen, bei dem du nicht sicher warst, ob es klappt?",
+        "scene": "Ich habe etwas hinbekommen, obwohl ich nicht sicher war, ob es klappt.",
+        "short": "Nicht sicher, ob es klappt",
+        "hint": "Ein Vorhaben, eine Prüfung, ein Projekt",
+        "followUps": {}
+      },
+      "sc_nobody": {
+        "title": "Gab es zuletzt eine Lage, in der niemand zuständig war und du es in die Hand genommen hast?",
+        "scene": "Niemand war zuständig, also habe ich es in die Hand genommen.",
+        "short": "Niemand war zuständig",
+        "hint": "Im Team, im Verein, in der Familie",
+        "followUps": {}
+      },
+      "sc_fast_decision": {
+        "title": "Wann musstest du zuletzt schnell entscheiden, obwohl du nicht alles wusstest?",
+        "scene": "Ich musste schnell entscheiden, ohne alles zu wissen.",
+        "short": "Schnell entschieden",
+        "hint": "Unter Zeitdruck, mit wenig Information",
+        "followUps": {}
+      },
+      "sc_stuck_problem": {
+        "title": "Welches Problem hast du zuletzt gelöst, an dem andere hängengeblieben waren?",
+        "scene": "Ich habe ein Problem gelöst, an dem andere hängen blieben.",
+        "short": "Problem gelöst",
+        "hint": "Technisch, organisatorisch, zwischen Menschen",
+        "followUps": {}
+      },
+      "sc_from_zero": {
+        "title": "Was hast du schon einmal von null aufgebaut?",
+        "scene": "Ich habe etwas von null aufgebaut.",
+        "short": "Von null aufgebaut",
+        "hint": "Ein Produkt, ein Treffen, einen Ablauf, eine Gruppe",
+        "followUps": {}
+      },
+      "sc_convinced": {
+        "title": "Wen hast du schon einmal von etwas überzeugt, der erst skeptisch war?",
+        "scene": "Ich habe jemanden überzeugt, der erst skeptisch war.",
+        "short": "Jemanden überzeugt",
+        "hint": "Kundin, Chef, Mitbewohner, Investorin",
+        "followUps": {}
+      },
+      "sc_uncomfortable": {
+        "title": "Wann hast du zuletzt etwas Unbequemes angesprochen?",
+        "scene": "Ich habe etwas Unbequemes angesprochen.",
+        "short": "Unbequemes angesprochen",
+        "hint": "Etwas, das alle sahen und niemand sagte",
+        "followUps": {}
+      },
+      "sc_helped_grow": {
+        "title": "Wem hast du schon einmal geholfen, besser zu werden?",
+        "scene": "Ich habe jemandem geholfen, besser zu werden.",
+        "short": "Jemanden gefördert",
+        "hint": "Einarbeiten, anleiten, Feedback geben",
+        "followUps": {}
+      },
+      "sc_connected": {
+        "title": "Wen hast du schon einmal mit jemandem zusammengebracht, der ihm weiterhelfen konnte?",
+        "scene": "Ich habe zwei Menschen zusammengebracht.",
+        "short": "Menschen verbunden",
+        "hint": "Und es hat beiden weitergeholfen",
+        "followUps": {}
+      },
+      "sc_learned_fast": {
+        "title": "Was musstest du dir zuletzt schnell neu aneignen?",
+        "scene": "Ich musste mir schnell etwas Neues aneignen.",
+        "short": "Schnell eingearbeitet",
+        "hint": "Ein Thema, ein Werkzeug, eine Branche",
+        "followUps": {}
+      },
+      "sc_order": {
+        "title": "Wo hast du zuletzt Ordnung in ein Durcheinander gebracht?",
+        "scene": "Ich habe Ordnung in ein Durcheinander gebracht.",
+        "short": "Ordnung geschaffen",
+        "hint": "Abläufe, Ablage, Zuständigkeiten",
+        "followUps": {}
+      },
+      "sc_asked_for": {
+        "title": "Wofür fragen dich andere immer wieder um Hilfe? Wann war das zuletzt?",
+        "scene": "Andere fragen mich immer wieder um Hilfe bei derselben Sache.",
+        "short": "Immer wieder gefragt",
+        "hint": "Wofür kommt man zu dir?",
+        "followUps": {}
+      },
+      "r3_flow": {
+        "title": "Bei welcher Arbeit vergisst du die Zeit? Beschreib das letzte Mal.",
+        "hint": "Was hast du gemacht, und was daran hat dich gepackt?",
+        "followUps": {}
+      },
+      "r3_thanked": {
+        "title": "Wofür bedanken sich Leute bei dir? Wann war das zuletzt?",
+        "hint": "Was sagen sie, wenn sie sich bedanken?",
+        "followUps": {}
+      },
+      "r3_put_off": {
+        "title": "Was schiebst du gern vor dir her? Nenn ein Beispiel aus letzter Zeit.",
+        "hint": "Das ist keine Schwächenabfrage, sondern zeigt, wo du Unterstützung brauchen kannst. Es wird nicht ausgewertet.",
+        "followUps": {}
+      },
+      "r3_hand_over": {
+        "title": "Was würdest du am liebsten abgeben? Und warum?",
+        "hint": "Es wird nicht ausgewertet. Du siehst deine Worte später im Bericht.",
+        "followUps": {}
+      },
+      "r3_others_better": {
+        "title": "Wobei sind andere besser als du, und was lernst du von ihnen?",
+        "hint": "Es wird nicht ausgewertet. Du siehst deine Worte später im Bericht.",
+        "followUps": {}
       }
     }
   },
@@ -452,12 +563,167 @@
       "title": "Weitere Sätze von dir",
       "text": "Stärken, die du selbst formuliert oder früher übernommen hast."
     },
-    "emptyTitle": "Dein Stärkenbild entsteht aus dem Stärken-Interview",
+    "emptyTitle": "Dein Stärkenbild entsteht aus „Stärken entdecken“",
     "emptyText": "Noch hast du keine Stärken-Themen übernommen. Im Interview erzählst du von zehn Situationen, daraus entstehen Vorschläge, die du bestätigst.",
-    "start": "Stärken-Interview beginnen",
-    "again": "Stärken-Interview erneut führen",
+    "start": "Stärken entdecken beginnen",
+    "again": "Stärken noch einmal entdecken",
     "back": "Zurück zu deinem Profil",
     "open": "Dein Stärkenbild ansehen"
   },
-  "levelNoteShort": "Wie gut belegt – nicht, wie stark."
+  "levelNoteShort": "Wie gut belegt – nicht, wie stark.",
+  "discover": {
+    "controls": {
+      "play": "Abspielen",
+      "pause": "Anhalten",
+      "prev": "Zurück",
+      "next": "Weiter",
+      "skip": "Überspringen",
+      "tapNext": "Tippen für weiter",
+      "part": "Teil {n}"
+    },
+    "intro": {
+      "round": "Runde 1 von 3 · Einstimmen",
+      "steps": {
+        "s1": {
+          "title": "Nimm dir einen Moment.",
+          "text": "Etwa eine Minute. Du musst nichts aufschreiben. Atme einmal durch."
+        },
+        "s2": {
+          "title": "Geh in Gedanken zurück.",
+          "text": "Ein paar Wochen. Ein paar Monate. Vielleicht ein paar Jahre."
+        },
+        "s3": {
+          "title": "Wo warst du richtig stark?",
+          "text": "Woran denkst du gern zurück? Worauf bist du stolz, auch wenn es kaum jemand gesehen hat?"
+        },
+        "s4": {
+          "title": "Wofür haben andere dich gelobt?",
+          "text": "Wann kamen Leute zu dir, weil du es einfach kannst?"
+        },
+        "s5": {
+          "title": "Darin steckt, was du richtig gut kannst.",
+          "text": "Deine Superkraft, wenn du so willst. Genau diese Momente schauen wir uns jetzt gemeinsam an."
+        }
+      },
+      "timeline": {
+        "years": "vor Jahren",
+        "months": "vor Monaten",
+        "weeks": "vor Wochen",
+        "today": "heute"
+      },
+      "bubbles": {
+        "b1": "Danke dir!",
+        "b2": "Wie hast du das gemacht?",
+        "b3": "Kannst du mal draufschauen?",
+        "b4": "Das war richtig gut."
+      },
+      "endTitle": "Hast du ein paar Momente im Kopf?",
+      "endText": "Halt sie kurz fest, wenn du magst. Ein paar Wörter reichen. Beim Wählen der Szenen siehst du sie wieder.",
+      "notesLabel": "Stichworte, freiwillig",
+      "notesPlaceholder": "z. B. Pilotkundin gewonnen",
+      "addNote": "Festhalten",
+      "removeNote": "{note} entfernen",
+      "continue": "Weiter zu den Szenen",
+      "continuePending": "Wird vorbereitet …",
+      "replay": "Intro nochmal",
+      "outline": {
+        "o1": "1 Einstimmen",
+        "o2": "2 Szenen: 5 bis 6, je 2 bis 3 Minuten",
+        "o3": "3 Energie und Blick von außen, etwa 8 Minuten"
+      },
+      "private": "Deine Antworten sieht nur du. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
+      "noTest": "Das ist kein Test und keine Typologie. Es gibt keine Punkte und keine richtigen Antworten."
+    },
+    "pick": {
+      "round": "Runde 2 von 3",
+      "roundShort": "2 · Szenen",
+      "roundThree": "3 · Energie und Blick von außen",
+      "warmup": "Einstimmen",
+      "title": "Welche dieser Szenen kennst du aus deinem Leben?",
+      "text": "Wähle 5 oder 6. Job, Studium, Verein, Ehrenamt oder Familie zählen genauso. Zu jeder Szene stellen wir dir danach eine Frage.",
+      "yourNotes": "Deine Stichworte aus dem Intro",
+      "whichFits": "Welche Szene passt dazu?",
+      "question": "Frage: {question}",
+      "selected": "{count, plural, one {# Szene} other {# Szenen}} gewählt",
+      "need": "Noch {count} wählen",
+      "go": "Mit {count} Szenen weiter",
+      "goPending": "Wird vorbereitet …",
+      "limit": "Mehr als 6 Szenen sind nicht nötig. Nimm eine heraus, um eine andere zu wählen.",
+      "tip": "Etwa 2 bis 3 Minuten pro Szene. Gespeichert wird nach jedem Schritt.",
+      "pauseLink": "Pause machen",
+      "backToIntro": "← Intro"
+    },
+    "scene": {
+      "counter": "Szene {index} von {total}",
+      "minutes": "etwa 2 bis 3 Minuten",
+      "whenLegend": "Wann war das ungefähr?",
+      "when": {
+        "year": "In diesem Jahr",
+        "few": "Vor 1 bis 3 Jahren",
+        "long": "Länger her"
+      },
+      "stepsLabel": "Schritte",
+      "steps": {
+        "situation": {
+          "title": "Was war los?",
+          "help": "Wer war beteiligt, worum ging es, und was war schwierig daran?",
+          "placeholder": "Zum Beispiel: wer, wo, worum ging es",
+          "example": "Im Studium wollte unsere Fachschaft eine Lernplattform einführen. Die Studiengangsleitung fand das unnötig."
+        },
+        "action": {
+          "title": "Was hast du getan?",
+          "help": "Was hast du gesagt oder getan? Beschreib deinen Teil, nicht den des Teams.",
+          "placeholder": "Zum Beispiel: Ich habe zuerst …, dann …",
+          "example": "Ich habe zuerst gefragt, was genau ihn stört. Dann habe ich zwei Leute aus dem Jahrgang mitgebracht, die das Problem selbst erzählt haben, und einen Test über vier Wochen vorgeschlagen."
+        },
+        "outcome": {
+          "title": "Was kam heraus?",
+          "help": "Wie ging es aus? Auch ein halber Erfolg zählt.",
+          "placeholder": "Zum Beispiel: Am Ende …",
+          "example": "Er hat dem Test zugestimmt. Nach vier Wochen wurde die Plattform für den ganzen Studiengang übernommen."
+        }
+      },
+      "showExample": "Beispiel ansehen",
+      "hideExample": "Beispiel ausblenden",
+      "exampleLabel": "Beispiel von jemand anderem",
+      "lengthHint": "2 bis 5 Sätze reichen. Stichworte auch.",
+      "followUpTitle": "Magst du noch etwas ergänzen?",
+      "followUp": "Magst du noch sagen, was du als Erstes gesagt oder getan hast?",
+      "followUpKeep": "So lassen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "save": "Szene speichern",
+      "savePending": "Wird gespeichert …",
+      "skip": "Szene überspringen",
+      "skipPending": "Wird übersprungen …",
+      "whyTitle": "Warum drei Schritte?",
+      "why": "Erst die Lage, dann dein Anteil, dann das Ergebnis. So wird sichtbar, was genau du beigetragen hast. Darin liegen die Hinweise auf deine Stärken.",
+      "tooShort": "Schreib mindestens ein paar Wörter zu „Was war los?“ oder „Was hast du getan?“.",
+      "private": "Deine Antworten sieht nur du.",
+      "changePick": "Szenen sind gewählt"
+    },
+    "interim": {
+      "eyebrow": "Zwischenstand",
+      "title": "Das hast du bisher erzählt",
+      "text": "Links deine Szenen, jeweils mit dem Satz, in dem du beschreibst, was du getan hast. Nach der letzten Runde kannst du dir Hinweise auf Stärken herausarbeiten lassen. Du entscheidest bei jedem Vorschlag selbst: passt zu mir, passt nicht, oder anders sagen.",
+      "scenesLabel": "Deine Szenen",
+      "skipped": "übersprungen",
+      "nextEyebrow": "Noch eine Runde, etwa 8 Minuten",
+      "nextTitle": "Energie und Blick von außen",
+      "nextText": "Drei kurze Fragen zu Energie und Dank von anderen, danach drei Gegenfragen. Die Gegenfragen werden nicht ausgewertet.",
+      "continue": "Weiter mit Runde 3",
+      "continuePending": "Wird vorbereitet …",
+      "finishNow": "Jetzt abschließen",
+      "later": "Später weitermachen",
+      "saved": "Dein Stand bleibt gespeichert."
+    },
+    "round3": {
+      "round": "Runde 3 von 3",
+      "counter": "Frage {index} von {total}",
+      "title": "Energie und Blick von außen",
+      "text": "Kurz und ehrlich. Ein paar Sätze reichen.",
+      "counterNote": "Diese Frage wird nicht ausgewertet.",
+      "skip": "Diese Frage überspringen"
+    }
+  }
 }

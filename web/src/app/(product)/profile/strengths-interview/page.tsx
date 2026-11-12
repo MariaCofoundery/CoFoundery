@@ -5,14 +5,24 @@ import { getPendingStrengthProposals } from "@/features/capability/strengthData"
 import { ProposalWatcher } from "@/features/capability/ProposalWatcher";
 import { getAiAvailability } from "@/features/direction/directionProposalData";
 import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
+import { SceneCards } from "@/features/strengths/SceneCards";
+import { SceneForm } from "@/features/strengths/SceneForm";
 import { StrengthProposalCards } from "@/features/strengths/StrengthProposalCards";
+import { StrengthsInterim } from "@/features/strengths/StrengthsInterim";
+import { StrengthsIntro } from "@/features/strengths/StrengthsIntro";
+import {
+  autosaveRoundThreeDraftAction,
+  saveRoundThreeAnswerAction,
+  skipRoundThreeAction,
+} from "@/features/strengths/strengthsDiscoverActions";
+import { canSkipScene, DISCOVER_MAX_LENGTH, DISCOVER_MIN_LENGTH, ROUND_THREE_IDS, isSceneId } from "@/features/strengths/strengthsDiscoverGuide";
+import "@/features/align/align.css";
 import {
   autosaveStrengthsAnswerAction,
   completeStrengthsInterviewAction,
   requestStrengthProposalsAction,
   saveStrengthsAnswerAction,
   skipStrengthsQuestionAction,
-  startStrengthsInterviewAction,
 } from "@/features/strengths/strengthsInterviewActions";
 import {
   countDecidedStrengthProposals,
@@ -48,7 +58,7 @@ import { UserText } from "@/features/ui/UserText";
 export default async function StrengthsInterviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string; neu?: string }>;
 }) {
   const query = await searchParams;
   const {
@@ -70,7 +80,7 @@ export default async function StrengthsInterviewPage({
       ])
     : [[], 0];
 
-  const knownErrors = ["start", "save", "short", "long", "stale", "complete", "too_few", "ask", "proposal"];
+  const knownErrors = ["start", "save", "short", "long", "stale", "complete", "too_few", "ask", "proposal", "scenes", "too_few_scenes"];
   const knownNotices = ["paused", "completed", "reading"];
   const error = query.error && knownErrors.includes(query.error) ? query.error : null;
   const notice = query.notice && knownNotices.includes(query.notice) ? query.notice : null;
@@ -83,6 +93,107 @@ export default async function StrengthsInterviewPage({
         audio: null,
       }))
     : [];
+
+  // ---------------------------------------------------------------------------
+  // Stärken entdecken (Fassung 3): Intro, Szenen wählen, eine Szene, Zwischenstand, Runde 3.
+  // Ein offenes Gespräch der Fassung 2 läuft unten weiter wie bisher.
+  // ---------------------------------------------------------------------------
+  const isDiscover = state ? state.guideVersion >= 3 : !completed || query.neu === "1";
+  if (isDiscover) {
+    const phase = state?.phase ?? null;
+    const sceneTurns = state ? state.turns.filter((entry) => isSceneId(entry.questionId)) : [];
+    const roundThreeTurns = state ? state.turns.filter((entry) => ROUND_THREE_IDS.includes(entry.questionId)) : [];
+    const currentTurn = state && phase && (phase.phase === "scene" || phase.phase === "round3") ? state.turns[phase.index] : null;
+    const roundTwoDone = phase?.phase === "interim" || phase?.phase === "round3";
+    const tabClass = "rounded-full px-3.5 py-1.5 text-[13px]";
+
+    return (
+      <main className="mx-auto max-w-6xl px-5 py-8 md:px-8">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Link
+            href="/profile?step=strengths"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+          >
+            ← {t("backToStrengths")}
+          </Link>
+          {state ? (
+            <ol aria-label={t("discover.pick.round")} className="m-0 ml-auto flex list-none gap-1 rounded-full bg-[#efedf7] p-1">
+              <li className={`${tabClass} font-medium text-[#0b5f57]`}>✓ {t("discover.pick.warmup")}</li>
+              <li
+                aria-current={phase?.phase === "pick" || phase?.phase === "scene" ? "step" : undefined}
+                className={`${tabClass} ${phase?.phase === "pick" || phase?.phase === "scene" ? "bg-white font-semibold text-[#4b2bb8] shadow-sm" : roundTwoDone ? "font-medium text-[#0b5f57]" : "text-[#4a4d68]"}`}
+              >
+                {roundTwoDone ? "✓ " : ""}{t("discover.pick.roundShort")}
+              </li>
+              <li
+                aria-current={phase?.phase === "round3" ? "step" : undefined}
+                className={`${tabClass} ${phase?.phase === "round3" ? "bg-white font-semibold text-[#4b2bb8] shadow-sm" : "text-[#4a4d68]"}`}
+              >
+                {t("discover.pick.roundThree")}
+              </li>
+            </ol>
+          ) : null}
+        </div>
+
+        {error ? (
+          <p role="alert" className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">{t(`errors.${error}`)}</p>
+        ) : null}
+        {notice ? (
+          <p role="status" className="mt-4 rounded-xl bg-violet-50 px-4 py-3 text-sm text-violet-950">{t(`notice.${notice}`)}</p>
+        ) : null}
+
+        <div className="mt-5">
+          {!state ? (
+            <StrengthsIntro />
+          ) : phase?.phase === "pick" ? (
+            <SceneCards introNotes={state.introNotes} />
+          ) : phase?.phase === "scene" && currentTurn ? (
+            <SceneForm
+              key={currentTurn.id}
+              sessionId={state.sessionId}
+              turnId={currentTurn.id}
+              sceneId={currentTurn.questionId}
+              index={sceneTurns.indexOf(currentTurn) + 1}
+              total={sceneTurns.length}
+              savedParts={currentTurn.parts}
+              savedWhen={currentTurn.when}
+              canSkip={canSkipScene(state.turns.map((entry) => ({ questionId: entry.questionId, answered: entry.answer !== null, skipped: entry.skipped })))}
+            />
+          ) : phase?.phase === "interim" ? (
+            <StrengthsInterim turns={sceneTurns} />
+          ) : phase?.phase === "round3" && currentTurn ? (
+            <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[.14em] text-violet-700">
+                {t("discover.round3.round")} · {t("discover.round3.counter", { index: roundThreeTurns.indexOf(currentTurn) + 1, total: roundThreeTurns.length })}
+              </p>
+              <h2 className="mt-3 text-xl font-semibold leading-8 text-slate-950">{t(`interview.questions.${currentTurn.questionId}.title`)}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{t(`interview.questions.${currentTurn.questionId}.hint`)}</p>
+              {findStrengthsQuestion(currentTurn.questionId)?.kind === "counter" ? (
+                <p className="mt-1 text-sm font-medium text-slate-700">{t("discover.round3.counterNote")}</p>
+              ) : null}
+              <div className="mt-5">
+                <InterviewAnswerForm
+                  namespace="strengths"
+                  actions={{
+                    autosave: autosaveRoundThreeDraftAction,
+                    save: saveRoundThreeAnswerAction,
+                    skip: skipRoundThreeAction,
+                  }}
+                  minLength={DISCOVER_MIN_LENGTH}
+                  maxLength={DISCOVER_MAX_LENGTH}
+                  sessionId={state.sessionId}
+                  turnId={currentTurn.id}
+                  savedAnswer={currentTurn.draft}
+                  followUps={[]}
+                  isLastQuestion={roundThreeTurns.filter((entry) => entry.answer === null && !entry.skipped).length <= 1}
+                />
+              </div>
+            </section>
+          ) : null}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 md:px-8">
@@ -155,29 +266,7 @@ export default async function StrengthsInterviewPage({
             </form>
           ) : null}
         </section>
-      ) : !completed ? (
-        /* ------------------------------------------------------------------
-           1. Der Einstieg
-           ------------------------------------------------------------------ */
-        <section className="mt-8 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 className="text-xl font-semibold">{t("guidance.title")}</h2>
-          <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-            <li>{t("guidance.time")}</li>
-            <li>{t("guidance.stories")}</li>
-            <li>{t("guidance.notCapability")}</li>
-            <li>{t("guidance.save")}</li>
-            <li className="font-medium text-slate-900">{t("guidance.private")}</li>
-            <li className="font-medium text-slate-900">{t("guidance.noTest")}</li>
-          </ul>
-          <form action={startStrengthsInterviewAction} className="mt-6">
-            <SubmitButton
-              label={t("start")}
-              pendingLabel={t("startPending")}
-              className="inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white"
-            />
-          </form>
-        </section>
-      ) : (
+      ) : completed ? (
         /* ------------------------------------------------------------------
            3. Abgeschlossen - und die Auswertung
            ------------------------------------------------------------------ */
@@ -224,7 +313,7 @@ export default async function StrengthsInterviewPage({
             {t("done.toStrengths")} →
           </Link>
         </section>
-      )}
+      ) : null}
 
       {completed?.job === "open" ? <ProposalWatcher>{null}</ProposalWatcher> : null}
 
@@ -261,14 +350,15 @@ export default async function StrengthsInterviewPage({
       ) : null}
 
       {!state && completed ? (
-        <form action={startStrengthsInterviewAction} className="mt-10 border-t border-slate-200 pt-6">
+        <div className="mt-10 border-t border-slate-200 pt-6">
           <p className="text-sm leading-6 text-slate-600">{t("again.text")}</p>
-          <SubmitButton
-            label={t("again.cta")}
-            pendingLabel={t("startPending")}
+          <Link
+            href="/profile/strengths-interview?neu=1"
             className="mt-3 inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
-          />
-        </form>
+          >
+            {t("again.cta")}
+          </Link>
+        </div>
       ) : null}
     </main>
   );

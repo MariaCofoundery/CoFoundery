@@ -1170,7 +1170,7 @@ export function ProductShell({
                     {item.isActive(pathname)
                       ? (item.subItems ?? []).map((subItem) => (
                           <MobileMenuLink
-                            key={subItem.href}
+                            key={`${subItem.href}:${subItem.label}`}
                             href={subItem.href}
                             active={subItem.isActive(pathname)}
                             onNavigate={closeMenu}
@@ -1257,7 +1257,7 @@ export function ProductShell({
               <nav aria-label={t("subNavLabel")} className="flex flex-wrap items-center gap-1">
                 {activeAreaSubItems.map((subItem) => (
                   <Link
-                    key={subItem.href}
+                    key={`${subItem.href}:${subItem.label}`}
                     href={subItem.href}
                     aria-current={subItem.isActive(pathname) ? "page" : undefined}
                     className={`inline-flex min-h-9 items-center rounded-full px-3 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-accent)]/40 ${

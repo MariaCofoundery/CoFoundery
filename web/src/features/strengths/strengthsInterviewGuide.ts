@@ -31,6 +31,8 @@
  *               sieht ihre eigenen Worte im Bericht.
  * `outside`   - der Blick von außen; Grundlage der Auswertung wie eine Situation.
  */
+import { DISCOVER_QUESTIONS } from "@/features/strengths/strengthsDiscoverGuide";
+
 export type StrengthsQuestionKind = "situation" | "counter" | "outside";
 
 export type StrengthsQuestion = {
@@ -85,6 +87,8 @@ export function findStrengthsQuestion(id: string) {
   return (
     STRENGTHS_QUESTIONS.find((question) => question.id === id) ??
     LEGACY_STRENGTHS_QUESTIONS.find((question) => question.id === id) ??
+    // Fassung 3 („Stärken entdecken“, 12.11.2026): Szenen und die dritte Runde.
+    DISCOVER_QUESTIONS.find((question) => question.id === id) ??
     null
   );
 }
