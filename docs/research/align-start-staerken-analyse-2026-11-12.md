@@ -224,3 +224,20 @@ Kurz: **Konzept und Fragen mit dem stärksten Modell, Bauen mit Sonnet.** Die Fr
 - **Stärken entdecken** mit Szenenkarten und drei Runden: Entwurf folgt. Fragetexte schreibt Maria selbst als Gutachterin ab. Gearbeitet wird mit Opus 5.5 (hohe Denktiefe).
 - **Arbeitsweise v5 entfällt.** Die 29 Fragen der Fassung 4 sind abgestimmt (03.11.2026) und bleiben. Die Beobachtungen aus 4.3 sind nur Notizen. Offen bleiben nur Dinge, die die Fragen nicht verändern (ehrliche Zeitangabe, eventuell mehrere Fragen pro Bildschirm, bessere Enden). Etappe C6 ist gestrichen.
 - **„Align“ bleibt als Name.** Das Problem war nie der Name, sondern dass es keine eigene Seite gibt und das Wort im Editor ein zweites Mal als Reitername auftaucht. Etappe A3 wird deshalb zu: **Align bekommt eine eigene Einstiegsseite** (Ich, Wir, Unser Vorhaben), im Menü stehen darunter diese drei statt „Profil, Team, Programm“. Entwurf folgt.
+
+---
+
+## 10. Nachtrag (12.11.2026, später): Räume, Find, Wahrscheinlichkeitsfragen, Gesamtbericht
+
+**Drei Räume bestätigt:** Ich, Wir, Unser Vorhaben (siehe Abschnitt 9). Die Leiste: Start · Align · Find · Connect · Events.
+
+**Wahrscheinlichkeitsfragen: Version 5 doch, aber eng.** Maria will sozial erwünschtes Antworten so weit wie möglich verhindern. Betroffen sind die 13 Fragen im Format „Wie wahrscheinlich ist es, dass du …?“ (darunter alle fünf VOICE-Fragen). Die 7 vergleichenden Fragen (A/B mit „deutlich eher A … deutlich eher B“), die 5 Einfluss-Fragen und die 4 Unbehagen-Fragen bleiben zunächst. Ansätze für den Entwurf: (1) Gegenüberstellung zweier gleichwertiger Verhaltensweisen statt einer „guten“; (2) Rückblick statt Absicht („Wann hast du zuletzt …?“ mit Häufigkeit); (3) Begründungen anbieten, warum man etwas bewusst nicht tut; (4) Situationen mit mehreren sinnvollen Reaktionen. Offen: ob bei v5 nur die geänderten Fragen erneut beantwortet werden müssen (unveränderte Antworten übernehmen), sofern die Architektur das zulässt. Das ist vor dem Bau zu prüfen. Teams vergleichen nur identische Fassungen.
+
+**Find und Align (was ich gelesen habe):**
+- Der Matching-Prototyp (`matching-engine-v0.1-spec.md`) zieht **nicht** aus Align. Eingaben: Branchen, Expertise, Ort, Remote, Suchabsicht, Startzeitraum, Phase, Zielgruppe und **Capability nur mit ausdrücklicher Matching-Freigabe**.
+- **Workstyle hat keinen Einfluss** auf Gate, Relevanz, Reihenfolge oder Confidence. Er erscheint nur als Gesprächskontext **nach** dem Matching, **nur bei beidseitiger Zustimmung** (`workstyle_discovery_enabled`).
+- **Nie im Matcher:** Research-Items, Venture-Alignment, Founder Setup, Stärken, Direction, Interview-Antworten, `person_resources`, Advisor- und Team-only-Daten. Ein Test hält das fest.
+- Im Code steht, der Matcher sei ein nicht-produktiver Prototyp, der nur als Schatten läuft. **Wie die Find-Reihenfolge heute tatsächlich entsteht, habe ich nicht geprüft.** Das ist der nächste Schritt dieser Frage.
+- **Vorschlag für die Brücke Align → Find ohne neue Datenflüsse:** „Lücke → Suche“. Die Teamkarte im Raum „Unser Vorhaben“ zeigt beschreibend, was im Team da ist und was fehlt. Daraus kann man mit einem Klick eine Find-Suche vorbefüllen. Das ist eine Handlung der Person, kein Datenfluss. Wer Stärken oder Arbeitsweise **für das Matching** nutzen will, braucht einen eigenen, neuen Zustimmungsvertrag (nicht aus der Teamzugehörigkeit abgeleitet).
+
+**Gesamtbericht „Ich, Du, Unser Startup“:** Am Ende soll ein hochwertiger Bericht stehen: ein Gesamtbild aus drei Kapiteln. *Ich* (Arbeitsweise, Können, Stärken, Richtung, Werte), *Du/Wir* (nur, was die andere Person ausdrücklich geteilt hat; Gemeinsamkeiten und Unterschiede als Gesprächsstoff, nie als Passung), *Unser Startup* (Vorhaben, Teamkarte, Setup-Übergabe). Beschreibend, ohne Zahl und Typ, lesbar am Bildschirm und als PDF, jedes Kapitel mit „wer sieht das“. Er baut auf den vorhandenen Berichten auf (`IndividualWorkstyle`, `TeamWorkstyleReport`, Stärken, Setup-Handoff) und ist **Teil des Entwurfs**, nicht ein späteres Anhängsel.
