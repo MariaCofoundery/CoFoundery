@@ -292,7 +292,9 @@ test("die Nummern zaehlen nur sichtbare Abschnitte - keine Spruenge", () => {
 test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existiert", () => {
   const page = codeOnly(PAGE);
   const leer = page.slice(page.indexOf('title={t("strengthsSection.empty")}'));
-  assert.match(leer, /^title=\{t\("strengthsSection\.empty"\)\}\s*text=\{t\("strengthsSection\.emptyText"\)\}\s*href="\/profile\?step=strengths"\s*cta=\{t\("strengthsSection\.emptyCta"\)\}/);
+  assert.match(leer, /^title=\{t\("strengthsSection\.empty"\)\}\s*text=\{t\("strengthsSection\.emptyText"\)\}\s*href="\/profile\/strengths-interview\?neu=1"\s*cta=\{t\("strengthsSection\.interviewCta"\)\}/);
+  // Von Hand festhalten bleibt als zweiter, leiserer Weg.
+  assert.match(leer, /secondary=\{\{ href: "\/profile\?step=strengths", cta: t\("strengthsSection\.emptyCta"\) \}\}/);
   const de = bundle("de").strengthsSection as Record<string, string>;
   const en = bundle("en").strengthsSection as Record<string, string>;
   assert.equal(de.empty, "Du hast deine Stärken noch nicht festgehalten.");
@@ -307,7 +309,6 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
   // Der Interview-Weg als zweite Aktion - SEIT DEM 18.10.2026 das eigene
   // Staerken-Interview, nicht mehr das Capability-Interview (/profile/interview),
   // das am Ende in Funktionsbereiche einordnet.
-  assert.match(leer, /secondary=\{\{ href: "\/profile\/strengths-interview", cta: t\("strengthsSection\.interviewCta"\) \}\}/);
   assert.doesNotMatch(leer, /href: "\/profile\/interview"/);
   assert.ok(existsSync(join("src", "app", "(product)", "profile", "strengths-interview", "page.tsx")), "das Staerken-Interview gibt es nicht");
   for (const locale of ["de", "en"]) {

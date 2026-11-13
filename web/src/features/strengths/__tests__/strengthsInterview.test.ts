@@ -352,7 +352,7 @@ test("die Seite ist das Stärken-Interview - ohne Einordnung in Bereiche", () =>
   assert.match(page, /completed\.answers\.length > 0 && aiAvailable/);
   // Beide Einstiege führen hierher, nicht ins Capability-Interview.
   assert.match(codeOnly("src/features/capability/StrengthsSection.tsx"), /href="\/profile\/strengths-interview"/);
-  assert.match(codeOnly("src/app/me/profile/page.tsx"), /href: "\/profile\/strengths-interview"/);
+  assert.match(codeOnly("src/app/me/profile/page.tsx"), /href="\/profile\/strengths-interview\?neu=1"/);
   for (const locale of ["de", "en"]) {
     const bundle = JSON.parse(read(`messages/${locale}/strengths.json`));
     assert.match(JSON.stringify(bundle), /Capability/, `${locale}: der Unterschied zum Capability-Interview wird nicht erklärt`);

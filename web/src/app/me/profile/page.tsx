@@ -777,11 +777,11 @@ export default async function FounderProfilePage({
             <MissingSection
               title={t("strengthsSection.empty")}
               text={t("strengthsSection.emptyText")}
-              href="/profile?step=strengths"
-              cta={t("strengthsSection.emptyCta")}
+              href="/profile/strengths-interview?neu=1"
+              cta={t("strengthsSection.interviewCta")}
               // Das Stärken-Interview - ein eigenes Gespräch, nicht das
               // Capability-Interview (bis 18.10.2026 führte dieser Link dorthin).
-              secondary={{ href: "/profile/strengths-interview", cta: t("strengthsSection.interviewCta") }}
+              secondary={{ href: "/profile?step=strengths", cta: t("strengthsSection.emptyCta") }}
             />
           )
         )}

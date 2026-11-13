@@ -96,7 +96,7 @@ export const STRENGTHS_MODULE: ModuleDefinition = {
   versions: [{ versionId: "strengths@1", compatGroup: "strengths-1" }],
   completion: { source: "person_strengths + person_section_marks (staerken): fertig ist, was die Person selbst markiert" },
   sharing: { ceiling: "answers", sensitivity: "standard", bindsTo: "existing_contract" },
-  renderers: { profileCard: "me-profile:staerken", detail: "/profile?step=strengths" },
+  renderers: { profileCard: "me-profile:staerken", detail: "/profile/strengths-interview" },
   i18n: { namespace: "modules" },
 };
 
