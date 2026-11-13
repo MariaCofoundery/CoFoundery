@@ -113,7 +113,8 @@ function foundationNext(input: StartInput, venture: StartTeamInput["venture"]): 
   if (input.work !== "completed") return { kind: "workstyle_start" };
   if (input.capabilityAreas === 0) return { kind: "capability" };
   if (venture === "inProgress") return { kind: "venture_continue", teamId: team?.id ?? null };
-  if (venture === "open") return { kind: "venture_start", teamId: team?.id ?? null };
+  // Die Beta legt kein Vorhaben an: Ohne Team gibt es nichts zu beantworten, also geht es mit dem Einladen weiter.
+  if (venture === "open" && team) return { kind: "venture_start", teamId: team.id };
   if (!team) return { kind: "invite" };
   const setup = team.setup;
   if (setup && setup.awaitingConfirmation > 0) {
@@ -149,8 +150,8 @@ export function startStepHref(next: StartNextStep): string {
     case "venture_start":
     case "venture_continue":
       return next.teamId
-        ? `/founder-alignment/vorhaben?venture=${encodeURIComponent(next.teamId)}`
-        : "/founder-alignment/vorhaben";
+        ? `/founder-alignment/vorhaben/beta?venture=${encodeURIComponent(next.teamId)}`
+        : "/founder-alignment/vorhaben/beta";
     case "invite":
       return "/invite/new";
     case "setup_confirm":

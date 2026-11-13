@@ -52,10 +52,9 @@ test("die Grundlagen in fester Reihenfolge: Bereiche, Vorhaben, dann einladen", 
     kind: "venture_continue",
     teamId: "team-1",
   });
-  assert.deepEqual(resolveFounderStart(input({ team: null, ventureWithoutTeam: "open" })).next, {
-    kind: "venture_start",
-    teamId: null,
-  });
+  // Seit 12.11.2026 gibt es nur noch die Beta, und sie legt kein Vorhaben an: Ohne Team geht es mit dem Einladen weiter.
+  assert.deepEqual(resolveFounderStart(input({ team: null, ventureWithoutTeam: "open" })).next, { kind: "invite" });
+  assert.deepEqual(resolveFounderStart(input({ team: team({ venture: "open" }) })).next, { kind: "venture_start", teamId: "team-1" });
   const solo = resolveFounderStart(input({ team: null }));
   assert.deepEqual(solo.next, { kind: "invite" });
   assert.deepEqual(
@@ -129,8 +128,8 @@ test("jeder Schritt fuehrt an eine bestehende Stelle", () => {
   assert.equal(startStepHref({ kind: "complete_profile" }), "#dashboard-block-profile-data");
   assert.match(startStepHref({ kind: "workstyle_start" }), /^\/research\/workstyle-pretest\?version=8\.5a-v4/);
   assert.equal(startStepHref({ kind: "capability" }), "/profile?step=areas");
-  assert.equal(startStepHref({ kind: "venture_start", teamId: null }), "/founder-alignment/vorhaben");
-  assert.equal(startStepHref({ kind: "venture_continue", teamId: "a b" }), "/founder-alignment/vorhaben?venture=a%20b");
+  assert.equal(startStepHref({ kind: "venture_start", teamId: null }), "/founder-alignment/vorhaben/beta");
+  assert.equal(startStepHref({ kind: "venture_continue", teamId: "a b" }), "/founder-alignment/vorhaben/beta?venture=a%20b");
   assert.equal(startStepHref({ kind: "invite" }), "/invite/new");
   assert.equal(startStepHref({ kind: "setup_confirm", teamId: "t", count: 1 }), "/teams/t/setup");
   assert.equal(startStepHref({ kind: "test_project", teamId: "t", running: false }), "/teams/t/test-project");

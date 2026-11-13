@@ -233,7 +233,7 @@ export function TeamWorkstyleReport({
             {canDiscuss ? (
               <>
                 {" "}
-                <Link className="underline" href={`/founder-alignment/vorhaben?venture=${team.team_id}`}>
+                <Link className="underline" href={`/founder-alignment/vorhaben/beta?venture=${team.team_id}`}>
                   {reportText(locale, "Zum Fragebogen", "Go to questionnaire")}
                 </Link>
               </>

@@ -102,7 +102,7 @@ test("nach dem Absenden passiert etwas", () => {
     "utf8");
   assert.match(ziel, /erstellt === "1"/);
   assert.match(ziel, /Weiter: Was du aufbauen willst/);
-  assert.match(ziel, /href="\/founder-alignment\/vorhaben"/);
+  assert.match(ziel, /href="\/founder-alignment\/vorhaben\/beta"/);
 });
 
 test("der zweite Bereich heißt überall gleich", () => {

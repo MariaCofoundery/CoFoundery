@@ -241,7 +241,7 @@ test("die Regel der Teamseite steht im Quelltext, wie die Referenz sie annimmt",
     "neueste Zeile je Vorhaben und Instrument"
   );
   assert.ok(quelle.includes("`/founder-alignment/vorhaben/antworten?venture=${venture}`"));
-  assert.ok(quelle.includes("`/founder-alignment/vorhaben?venture=${venture}`"));
+  assert.ok(quelle.includes("`/founder-alignment/vorhaben/beta?venture=${venture}`"));
 });
 
 test("Venture: Status je Vorhaben folgt der Teamseite", () => {
@@ -623,5 +623,7 @@ test("das Produkt benutzt die Modulschicht nur an wenigen, bewussten Stellen: de
     // Gesamtbild (12.11.2026): liest NUR den Stand des Vorhaben-Vergleichs (`loadBetaReadiness`: bereit oder nicht,
     // keine Namen, keine Antworten) und verlinkt auf die Seite des Vergleichs.
     join("src", "features", "gesamtbild", "gesamtbildData.ts"),
+    // Startseite (12.11.2026): Der Schritt „Vorhaben“ zaehlt nur noch in der Beta und liest deren Stand je Team.
+    join("src", "app", "(product)", "dashboard", "page.tsx"),
   ].sort());
 });

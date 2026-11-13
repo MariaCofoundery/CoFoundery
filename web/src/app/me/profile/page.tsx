@@ -271,8 +271,8 @@ export default async function FounderProfilePage({
     ? await getVentureSnapshot(supabase, user.id, aktuellesVorhaben.id, locale as AppLocale)
     : { status: "none" };
   const fragebogenHref = aktuellesVorhaben
-    ? `/founder-alignment/vorhaben?venture=${encodeURIComponent(aktuellesVorhaben.id)}`
-    : "/founder-alignment/vorhaben";
+    ? `/founder-alignment/vorhaben/beta?venture=${encodeURIComponent(aktuellesVorhaben.id)}`
+    : "/founder-alignment/vorhaben/beta";
 
   /**
    * Ein Abschnitt - oder nichts, wenn es dazu nichts zu zeigen gibt.

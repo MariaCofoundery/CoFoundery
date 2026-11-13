@@ -67,7 +67,7 @@ export function ventureHref(teamId: string, state: AssessmentState) {
   const venture = encodeURIComponent(teamId);
   return state === "present"
     ? `/founder-alignment/vorhaben/antworten?venture=${venture}`
-    : `/founder-alignment/vorhaben?venture=${venture}`;
+    : `/founder-alignment/vorhaben/beta?venture=${venture}`;
 }
 
 /** Kompakte Statuszeile: Name, Zustand als Text (nie nur Farbe), ein Link. */

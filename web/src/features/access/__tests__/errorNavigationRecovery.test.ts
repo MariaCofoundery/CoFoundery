@@ -197,7 +197,7 @@ test("K/L: Login behaelt venture, snapshot und ansicht", () => {
   );
 
   assert.match(read(`${TEAM_DIR}/workstyle/page.tsx`), /buildLoginRedirectPath\(`\/teams\/\$\{teamId\}\/workstyle`, \{ snapshot: query\.snapshot, ansicht: query\.ansicht \}\)/);
-  for (const page of ["vorhaben", "vorhaben/antworten", "vorhaben/bestaetigen"]) {
+  for (const page of ["vorhaben/antworten", "vorhaben/bestaetigen"]) {
     assert.match(read(`src/app/(product)/founder-alignment/${page}/page.tsx`), /buildLoginRedirectPath\("\/founder-alignment\/vorhaben[a-z/]*", \{ venture: \(await searchParams\)\.venture \}\)/, page);
   }
   assert.match(read("src/app/me/profile/print/page.tsx"), /buildLoginRedirectPath\("\/me\/profile\/print", await searchParams\)/);
@@ -341,10 +341,9 @@ test("R: leere Zustaende bieten einen passenden naechsten Schritt", () => {
 test("Navigation: konkrete Ziele statt allgemeiner Listen", () => {
   assert.match(read("src/app/(product)/connections/page.tsx"), /`\/teams\/\$\{encodeURIComponent\(team\.id\)\}\$\{sub\}`/);
   // Phase 1.1: „So willst du gründen" fuehrt in das aktuell gewaehlte Vorhaben.
-  assert.match(read("src/app/me/profile/page.tsx"), /\/founder-alignment\/vorhaben\?venture=\$\{encodeURIComponent\(aktuellesVorhaben\.id\)\}/);
-  assert.match(read("src/app/(product)/founder-alignment/vorhaben/page.tsx"), /state=\{navState\} teamId=\{venture\.id\}/);
-  const vorhaben = read("src/app/(product)/founder-alignment/vorhaben/page.tsx");
-  assert.match(vorhaben, /if \(gewaehlt && \(await loadTeamAccessView\(gewaehlt\)\)\)/);
+  // Seit 12.11.2026 fuehrt es in die Beta; das fruehere v1 leitet nur noch dorthin weiter.
+  assert.match(read("src/app/me/profile/page.tsx"), /\/founder-alignment\/vorhaben\/beta\?venture=\$\{encodeURIComponent\(aktuellesVorhaben\.id\)\}/);
+  assert.match(read("src/app/(product)/founder-alignment/vorhaben/page.tsx"), /redirect\(`\/founder-alignment\/vorhaben\/beta/);
   assert.match(read("src/app/(product)/invite/new/page.tsx"), /targetTeam \? `\/teams\/\$\{encodeURIComponent\(targetTeam\.id\)\}` : "\/dashboard"/);
   assert.match(read(`${TEAM_DIR}/collaboration-lab/founder-in-the-wild/page.tsx`), /#founder-in-the-wild/);
   assert.match(read("src/features/founderInTheWild/FounderInTheWildHomebaseCard.tsx"), /id="founder-in-the-wild"/);

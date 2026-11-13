@@ -176,9 +176,8 @@ test("nach dem Namen wird auf der Startseite gefragt, nicht im Kopf der Seite", 
   // Durchklicken am 30.09.2026 stand oben klein „Ohne Namen — benennen" und
   // darunter groß „Wie heißt dein Vorhaben?" - die kleine Frage zuerst.
   assert.match(kopf, /introAsks/);
-  const seite = readFileSync(
-    join("src", "app", "(product)", "founder-alignment", "vorhaben", "page.tsx"), "utf8");
-  assert.match(seite, /introAsks=\{!venture\.name && Object\.keys\(initialAnswers\)\.length === 0\}/);
+  // Die Seite des fruehen v1-Fragebogens gibt es seit 12.11.2026 nicht mehr (sie leitet in die Beta weiter);
+  // der Kopf und die Namensfrage selbst bleiben, wie sie waren.
 
   // Und das Arbeitsprofil hat keine: Es gehört zu keinem Vorhaben.
   assert.equal(set.nameQuestion, null);

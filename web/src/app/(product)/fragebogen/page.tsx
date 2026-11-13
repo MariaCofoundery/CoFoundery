@@ -94,8 +94,10 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
       return null;
     }
   };
+  // Das fruehere Vorhaben (v1, 42 Fragen) wird nicht mehr angeboten (12.11.2026): Die Beta ist die einzige Fassung.
+  // Die Definition bleibt in der Registry - sie traegt die Daten, die Profilkarte und die Antwortseite.
   const products = MODULE_REGISTRY.filter(
-    (def) => def.usage === "product" && def.scope !== "team"
+    (def) => def.usage === "product" && def.scope !== "team" && def.moduleId !== "venture_core"
   );
   const cards = (filter: (def: ModuleDefinition) => boolean) =>
     products.filter(filter).map(cardOf).filter((card): card is Card => card !== null);
@@ -117,7 +119,7 @@ export default async function QuestionnairesPage({ searchParams }: { searchParam
 
   // „Beginne hier": EIN naechster Schritt, in einer festen Reihenfolge. Der Rest steht leiser
   // darunter ("Danach") und in den Gruppen unten - kein Fortschrittsbalken, keine Zaehler.
-  const ORDER = ["workstyle", "capability", "venture_core_beta", "venture_core"];
+  const ORDER = ["workstyle", "capability", "venture_core_beta"];
   const open = ORDER.map((id) => groups.flatMap((group) => group.cards).find((card) => card.def.moduleId === id))
     .filter((card): card is Card => card !== undefined && card.state !== "done_for_now");
   const first = open[0] ?? null;

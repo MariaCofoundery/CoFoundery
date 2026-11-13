@@ -55,7 +55,7 @@ export function VersionChoiceView({ hasPrevious, hasNext, archived = false }: Pr
             wie du arbeitest
           </Link>{" "}
           und{" "}
-          <Link href="/founder-alignment/vorhaben" className="underline">
+          <Link href="/founder-alignment/vorhaben/beta" className="underline">
             was dir bei eurem Vorhaben wichtig ist
           </Link>
           .

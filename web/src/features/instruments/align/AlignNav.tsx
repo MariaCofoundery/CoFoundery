@@ -69,7 +69,7 @@ export async function AlignNav({
     {
       href: state.ventureSubmitted
         ? `/founder-alignment/vorhaben/antworten${venture}`
-        : `/founder-alignment/vorhaben${venture}`,
+        : `/founder-alignment/vorhaben/beta${venture}`,
       // "Euer Vorhaben" setzt ein Wir voraus, das es oft noch nicht gibt -
       // Solo-Foundernde und Leute vor der Co-Founder-Suche fielen damit
       // durch. UX-Review Teil 2 vom 30.09.2026.

@@ -421,12 +421,11 @@ test("die neuen Bögen holen ihre FRAGEN aus den eigenen Registraturen", () => {
   // Sie duerfen v2.1-Bausteine benutzen - Pruefung, Eingabefeld,
   // Lesbarmachung. Die Fragen aus v2.1 zu ziehen waere etwas anderes: Dann
   // stuenden dort 36 statt 16, und die Teilung waere Dekoration.
-  for (const seite of ["vorhaben"]) {
-    const page = readFileSync(
-      join("src", "app", "(product)", "founder-alignment", seite, "page.tsx"), "utf8");
-    assert.match(page, /instruments\/align\//, seite);
-    assert.ok(!/getItemsV21|getSectionsV21|REGISTRY_V21/.test(page), `${seite} zieht v2.1-Fragen`);
-  }
+  // Seit 12.11.2026 ist die Seite des v1-Vorhabens nur noch eine Weiterleitung in die Beta - sie zieht gar keine Fragen.
+  const page = readFileSync(
+    join("src", "app", "(product)", "founder-alignment", "vorhaben", "page.tsx"), "utf8");
+  assert.ok(!/getItemsV21|getSectionsV21|REGISTRY_V21/.test(page), "vorhaben zieht v2.1-Fragen");
+  assert.match(page, /redirect\(`\/founder-alignment\/vorhaben\/beta/);
 });
 
 test("die Testfassung wird nur von den bewusst eingetragenen Stellen erreicht", () => {

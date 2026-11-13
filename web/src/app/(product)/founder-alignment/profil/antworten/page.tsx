@@ -63,7 +63,7 @@ export default async function ProfileAnswersPage({
              {copy("Unten siehst du, was du geantwortet hast — und oben auf einen Blick, wie sich das verteilt.")} </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
-              href="/founder-alignment/vorhaben"
+              href="/founder-alignment/vorhaben/beta"
               className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white"
             >
                {copy("Weiter: Was du aufbauen willst")} </Link>

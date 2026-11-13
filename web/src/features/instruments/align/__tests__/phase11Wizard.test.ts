@@ -109,8 +109,7 @@ test("R02 ist eine Zahl mit Einheit - und die Datenbank nimmt sie an", () => {
   assert.match(FIELD, /patch\(\{\s*number: event\.target\.value === "" \? undefined : Number\(event\.target\.value\),\s*unit,\s*\}\)/);
   // EN hat eine eigene Fassung.
   assert.notEqual(alignmentDisplayText(r02.prompt, "en"), r02.prompt);
-  // Die Seite reicht keinen Namen mehr hinein.
-  assert.match(read("src", "app", "(product)", "founder-alignment", "vorhaben", "page.tsx"), /sections=\{buildSections\("venture_alignment"\)\}/);
+  // (Die Seite des v1-Fragebogens leitet seit 12.11.2026 in die Beta weiter; die Registratur reicht ohnehin keinen Namen hinein.)
 });
 
 // ---------------------------------------------------------------------------

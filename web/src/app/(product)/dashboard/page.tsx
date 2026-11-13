@@ -18,6 +18,7 @@ import {
   resolveFounderStart,
   type StartInput,
 } from "@/features/dashboard/founderStart";
+import { loadBetaReadiness } from "@/features/modules/ventureBeta/teamData";
 import { getStartConversationPrompt, getStartTeamState } from "@/features/dashboard/founderStartData";
 import { berlinDayNumber } from "@/features/dashboard/quoteDayIndex";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
@@ -167,13 +168,14 @@ export default async function DashboardPage({
     team.name?.trim() || team.members.map((member) => member.displayName ?? "Founder").join(" + ");
   const realTeams = founderTeams.filter((team) => team.members.length >= 2);
   const selectedTeam = realTeams.find((team) => team.id === params.team) ?? realTeams[0] ?? null;
-  const ventureOf = (venture: { started: boolean; submitted: boolean } | undefined) =>
-    venture?.submitted ? ("present" as const) : venture?.started ? ("inProgress" as const) : ("open" as const);
-  const ventureWithoutTeam = alignState.ventures.some((venture) => venture.submitted)
-    ? ("present" as const)
-    : alignState.ventures.some((venture) => venture.started)
-      ? ("inProgress" as const)
-      : ("open" as const);
+  // Das Vorhaben zaehlt seit 12.11.2026 nur noch in der Beta (venture-alignment-v2-beta1); das fruehere v1 wird nicht
+  // mehr angeboten und zaehlt nicht mehr fuer den Weg. Gelesen ueber die Bereitschaft des Teams - nichts wird angelegt.
+  const betaVentureState = async (ventureId: string | undefined) => {
+    if (!ventureId) return "open" as const;
+    const readiness = await loadBetaReadiness(supabase, ventureId).catch(() => null);
+    return readiness?.own.state === "completed" ? ("present" as const) : readiness?.own.state === "in_progress" ? ("inProgress" as const) : ("open" as const);
+  };
+  const ventureWithoutTeam = await betaVentureState(alignState.ventures[0]?.id);
 
   const [teamState, capabilityCount, strengthCount, directionCount, dashboardTasks] = await Promise.all([
     selectedTeam
@@ -181,7 +183,7 @@ export default async function DashboardPage({
           client: supabase,
           userId: user.id,
           teamId: selectedTeam.id,
-          venture: ventureOf(alignState.ventures.find((venture) => venture.id === selectedTeam.id)),
+          venture: await betaVentureState(selectedTeam.id),
         })
       : Promise.resolve(null),
     countOwn(supabase, "person_capability_entries", user.id),
