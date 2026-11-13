@@ -12,9 +12,7 @@ import {
 } from "@/features/capability/capabilityActions";
 import { CapabilityAreasEditor } from "@/features/capability/CapabilityAreasEditor";
 import { CapabilityReadoutSection } from "@/features/capability/CapabilityReadoutSection";
-import { StrengthsSection } from "@/features/capability/StrengthsSection";
 import {
-  getPendingStrengthProposals,
   getPersonStrengths,
 } from "@/features/capability/strengthData";
 import {
@@ -171,7 +169,7 @@ export default async function ProfilePage({
   } = await getRequestUser();
   if (!user) redirect("/login?next=/profile");
 
-  const [t, tDirection, tProfile, locale, params, vocabulary, strengths, strengthProposals, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, basisProfil, comparablePeople, unsortedAnswers, resources] = await Promise.all([
+  const [t, tDirection, tProfile, locale, params, vocabulary, strengths, entries, core, disclosure, connectProfile, isConnectMember, hasDiscovery, basisProfil, comparablePeople, unsortedAnswers, resources] = await Promise.all([
     getTranslations("capability"),
     getTranslations("direction"),
     // DIESELBEN SAETZE WIE AUF „DAS BIST DU". Die Deckungskarte, die
@@ -183,7 +181,6 @@ export default async function ProfilePage({
     searchParams,
     getCapabilityVocabulary(supabase),
     getPersonStrengths(supabase),
-    getPendingStrengthProposals(supabase),
     getOwnCapabilityEntries(supabase, user.id),
     getPersonCore(supabase, user.id),
     Promise.resolve(supabase.from("person_core").select("capability_disclosure").eq("user_id", user.id).maybeSingle())
@@ -230,6 +227,8 @@ export default async function ProfilePage({
     const back = parseIdentityReturnPath(params.next);
     redirect(back ? `/profile?step=areas&next=${encodeURIComponent(back)}` : "/profile?step=areas");
   }
+  // Die alte Staerken-Seite gibt es nicht mehr: Staerken entdecken ist der eine Weg (alte Adressen leiten dorthin).
+  if (params.step === "strengths") redirect("/profile/strengths-interview");
   const step = isPageStep(params.step) ? params.step : null;
   // CAPABILITY-MATCHING-FREIGABE (E3c): nur im Schritt Sichtbarkeit, nur mit FIND-Zugang
   // und nur, wenn FIND hier tatsächlich mit Matching v0.1 rankt (Server-Flag).
@@ -696,24 +695,6 @@ export default async function ProfilePage({
             }}
           />
         </div>
-      ) : null}
-
-      {/* DEINE STAERKEN. Dieselbe Komponente wie vorher, nur an einer eigenen
-          Adresse: Sie ist Erfassung und Ergebnis in einem - die Vorschlaege
-          stehen oben, die bestaetigten Saetze darunter. */}
-      {step === "strengths" ? (
-        <>
-          <StrengthsSection strengths={strengths} proposals={strengthProposals} />
-          <SectionMarkToggle
-            section="staerken"
-            marked={facts.marks.has("staerken")}
-            copy={{
-              markedNote: t("aboutYou.mark.markedNote"),
-              mark: t("aboutYou.mark.mark"),
-              unmark: t("aboutYou.mark.unmark"),
-            }}
-          />
-        </>
       ) : null}
 
       {/* NETZWERK, ZUGAENGE UND ANGEBOTE.

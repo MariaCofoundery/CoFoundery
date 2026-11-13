@@ -29,15 +29,16 @@ import { createClient } from "@/lib/supabase/server";
  * Hinzufuegen einer Staerke auf der Uebersicht und muesste sich den Weg
  * zurueck selbst suchen.
  */
-const PATH = "/profile?step=strengths";
+const PATH = "/profile/strengths-interview";
 const ANCHOR = "#strengths";
 
 function back(error: string): never {
-  revalidatePath("/profile");
-  redirect(`${PATH}&error=${encodeURIComponent(error)}${ANCHOR}`);
+  revalidatePath(PATH);
+  redirect(`${PATH}?error=${encodeURIComponent(error)}${ANCHOR}`);
 }
 
 function done(): never {
+  revalidatePath(PATH);
   revalidatePath("/profile");
   revalidatePath("/me/profile");
   redirect(`${PATH}${ANCHOR}`);
@@ -78,20 +79,6 @@ async function requireUser() {
   } = await client.auth.getUser();
   if (!user?.id) redirect(`/login?next=${encodeURIComponent(PATH)}`);
   return { client, userId: user.id };
-}
-
-export async function addStrengthAction(formData: FormData) {
-  const { client, userId } = await requireUser();
-  const statement = String(formData.get("statement") ?? "").trim();
-  if (statement.length < 3 || statement.length > 200) back("strength_length");
-
-  const { error } = await client.from("person_strengths").insert({
-    user_id: userId,
-    statement,
-    origin: "own_words",
-  });
-  if (error) back("save");
-  done();
 }
 
 export async function removeStrengthAction(formData: FormData) {

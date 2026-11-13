@@ -766,7 +766,7 @@ export default async function FounderProfilePage({
                   </Link>
                 </p>
               ) : null}
-              <EditLink href="/profile?step=strengths" label={t("edit")} />
+              <EditLink href="/profile/strengths-interview" label={t("edit")} />
             </>
           ) : (
             // EIN WEG, DIREKT: `/profile?step=strengths` ist ein eigener Schritt
@@ -779,9 +779,6 @@ export default async function FounderProfilePage({
               text={t("strengthsSection.emptyText")}
               href="/profile/strengths-interview?neu=1"
               cta={t("strengthsSection.interviewCta")}
-              // Das Stärken-Interview - ein eigenes Gespräch, nicht das
-              // Capability-Interview (bis 18.10.2026 führte dieser Link dorthin).
-              secondary={{ href: "/profile?step=strengths", cta: t("strengthsSection.emptyCta") }}
             />
           )
         )}

@@ -272,7 +272,7 @@ export function SceneForm({
               className="min-h-11 text-sm text-[#4a4d68] underline-offset-4 hover:underline"
             />
           ) : null}
-          <Link href="/profile?step=strengths" className="inline-flex min-h-11 items-center text-sm text-[#4a4d68] underline-offset-4 hover:underline">
+          <Link href="/me/profile" className="inline-flex min-h-11 items-center text-sm text-[#4a4d68] underline-offset-4 hover:underline">
             {t("discover.pick.pauseLink")}
           </Link>
           <div className="ml-auto flex gap-3">

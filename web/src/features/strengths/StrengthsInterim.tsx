@@ -74,7 +74,7 @@ export async function StrengthsInterim({ turns }: { turns: StrengthsTurn[] }) {
               className="flex min-h-12 w-full items-center justify-center rounded-[14px] border border-[#3a3c66] px-5 font-semibold text-white hover:bg-white/10"
             />
           </form>
-          <Link href="/profile?step=strengths" className="min-h-11 text-center text-sm leading-[2.75rem] text-[#a9abcb] hover:text-white">
+          <Link href="/me/profile" className="min-h-11 text-center text-sm leading-[2.75rem] text-[#a9abcb] hover:text-white">
             {t("discover.interim.later")}
           </Link>
           <p className="text-center text-[13px] text-[#a9abcb]">{t("discover.interim.saved")}</p>

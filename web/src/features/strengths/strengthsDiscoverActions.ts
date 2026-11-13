@@ -77,7 +77,10 @@ async function complete(client: Client, sessionId: string): Promise<never> {
 /** Nach dem Intro: das Gespräch anlegen - oder bei einem offenen dort weitermachen. */
 export async function startDiscoverAction(formData: FormData) {
   const { client, userId } = await requireUser();
-  if (await getActiveStrengthsInterview(client)) onward();
+  const open = await getActiveStrengthsInterview(client);
+  if (open && open.guideVersion >= DISCOVER_GUIDE_VERSION) onward();
+  // Ein offenes Gespraech der frueheren Fassung wird beendet (seine Antworten bleiben), damit ein neues beginnen kann.
+  if (open) await complete(client, open.sessionId);
 
   let notes: string[] = [];
   try {

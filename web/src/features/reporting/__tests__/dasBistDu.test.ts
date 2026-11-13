@@ -293,19 +293,18 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
   const page = codeOnly(PAGE);
   const leer = page.slice(page.indexOf('title={t("strengthsSection.empty")}'));
   assert.match(leer, /^title=\{t\("strengthsSection\.empty"\)\}\s*text=\{t\("strengthsSection\.emptyText"\)\}\s*href="\/profile\/strengths-interview\?neu=1"\s*cta=\{t\("strengthsSection\.interviewCta"\)\}/);
-  // Von Hand festhalten bleibt als zweiter, leiserer Weg.
-  assert.match(leer, /secondary=\{\{ href: "\/profile\?step=strengths", cta: t\("strengthsSection\.emptyCta"\) \}\}/);
+  // Es gibt nur diesen einen Weg: Stärken entdecken (kein zweiter "von Hand festhalten").
+  assert.doesNotMatch(leer.slice(0, 400), /secondary=/);
   const de = bundle("de").strengthsSection as Record<string, string>;
   const en = bundle("en").strengthsSection as Record<string, string>;
   assert.equal(de.empty, "Du hast deine Stärken noch nicht festgehalten.");
   assert.equal(de.emptyCta, "Stärken festhalten");
   assert.equal(en.empty, "You haven't recorded your strengths yet.");
   assert.ok(de.emptyText && en.emptyText && en.emptyCta);
-  // Das Ziel ist ein echter Schritt des Editors - mit Formular, nicht nur ein Anker.
+  // Das Ziel ist die Seite "Stärken entdecken"; der alte Editor-Schritt leitet dorthin um.
   const editor = source(join("src", "app", "(product)", "profile", "page.tsx"));
-  assert.match(editor, /const PAGE_STEPS = \[[\s\S]*?"strengths"[\s\S]*?\]/);
-  assert.match(editor, /\{step === "strengths" \? \(/);
-  assert.match(editor, /<StrengthsSection/);
+  assert.match(editor, /params\.step === "strengths"\) redirect\("\/profile\/strengths-interview"\)/);
+  assert.doesNotMatch(editor, /<StrengthsSection/);
   // Der Interview-Weg als zweite Aktion - SEIT DEM 18.10.2026 das eigene
   // Staerken-Interview, nicht mehr das Capability-Interview (/profile/interview),
   // das am Ende in Funktionsbereiche einordnet.
@@ -313,14 +312,10 @@ test("Staerken: ein klarer Leerzustand mit genau einem Weg, und der Weg existier
   assert.ok(existsSync(join("src", "app", "(product)", "profile", "strengths-interview", "page.tsx")), "das Staerken-Interview gibt es nicht");
   for (const locale of ["de", "en"]) {
     assert.ok((bundle(locale).strengthsSection as Record<string, string>).interviewCta, `${locale}: interviewCta`);
-    const strengths = JSON.parse(source(join("messages", locale, "capability.json"))).strengths;
-    assert.ok(strengths.interviewTitle && strengths.interviewText && strengths.interviewCta, `${locale}: Interview-Copy im Editor`);
-    assert.doesNotMatch(strengths.interviewText, /werden automatisch|will automatically|garantiert|guaranteed/i);
   }
+  // Der Editor hat keinen eigenen Interview-Block und kein Von-Hand-Formular mehr.
   const editorSection = source(join("src", "features", "capability", "StrengthsSection.tsx"));
-  assert.match(editorSection, /href="\/profile\/strengths-interview"/);
-  assert.doesNotMatch(editorSection, /href="\/profile\/interview"/);
-  assert.match(editorSection, /t\("interviewCta"\)/);
+  assert.doesNotMatch(editorSection, /href="\/profile\/interview"|addStrengthAction|interviewCta/);
 });
 
 test("Vorhaben: ohne Archiv, eindeutig beschriftet, nie der Knopftext als Name", () => {

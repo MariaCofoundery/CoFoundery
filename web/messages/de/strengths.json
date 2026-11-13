@@ -43,11 +43,11 @@
     "askText": "Eine KI auf einem Rechner von Made2Found – nicht bei einem fremden Dienst – liest deine Antworten und ordnet ihnen Stärken-Themen zu. Jeder Vorschlag nennt die Stelle aus deiner Antwort, auf die er sich stützt. Die Gegenfragen werden nicht ausgewertet. Was sich nicht belegen lässt, wird nicht vorgeschlagen.",
     "ask": "Vorschläge erstellen lassen",
     "askPending": "Wird angefordert …",
-    "unavailable": "Die Auswertung ist gerade nicht erreichbar. Deine Antworten bleiben gespeichert – du kannst die Vorschläge später anfordern. Eigene Sätze kannst du jederzeit bei deinen Stärken festhalten.",
+    "unavailable": "Die Auswertung ist gerade nicht erreichbar. Deine Antworten bleiben gespeichert – du kannst die Vorschläge später anfordern.",
     "reading": "Deine Antworten werden gelesen …",
     "failed": "Das Lesen hat nicht geklappt. Du kannst es noch einmal versuchen.",
     "retry": "Noch einmal versuchen",
-    "noneFound": "Aus diesem Gespräch ließ sich keine Stärke ausreichend belegen. Das sagt nichts über dich – nur, dass die Antworten dafür nicht genug Verhalten beschreiben. Du kannst ein weiteres Interview führen oder selbst etwas festhalten.",
+    "noneFound": "Aus diesem Gespräch ließ sich keine Stärke ausreichend belegen. Das sagt nichts über dich – nur, dass die Antworten dafür nicht genug Verhalten beschreiben. Du kannst Stärken noch einmal entdecken, etwa mit anderen Szenen.",
     "allDecided": "Du hast über alle Vorschläge aus diesem Gespräch entschieden.",
     "toStrengths": "Zu deinen Stärken"
   },

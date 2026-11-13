@@ -137,7 +137,7 @@ export function SceneCards({ introNotes }: { introNotes: string[] }) {
       </div>
       <p className="text-center text-[13px] text-[#4a4d68]">
         {t("discover.pick.tip")} ·{" "}
-        <Link href="/profile?step=strengths" className="underline underline-offset-4">{t("discover.pick.pauseLink")}</Link>
+        <Link href="/me/profile" className="underline underline-offset-4">{t("discover.pick.pauseLink")}</Link>
       </p>
     </form>
   );

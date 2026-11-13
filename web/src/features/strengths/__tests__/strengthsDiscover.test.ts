@@ -158,9 +158,11 @@ test("Die Stichworte und der Zeitanker gehen nicht in die Auswertung", () => {
   assert.doesNotMatch(code("src/features/strengths/strengthsDiscoverActions.ts"), /request_strength_proposals|ai_jobs|strengthAnalysis/);
 });
 
-test("Ein offenes Gespräch der Fassung 2 läuft weiter wie bisher", () => {
+test("Das alte Gespräch (Fassung 2) gibt es nicht mehr: ein offenes wird beim Start beendet, seine Antworten bleiben", () => {
   const page = code("src/app/(product)/profile/strengths-interview/page.tsx");
-  assert.match(page, /state\.guideVersion >= 3/);
-  assert.match(page, /autosaveStrengthsAnswerAction/);
-  assert.match(page, /saveStrengthsAnswerAction/);
+  assert.match(page, /activeState\.guideVersion >= 3/);
+  assert.doesNotMatch(page, /autosaveStrengthsAnswerAction|saveStrengthsAnswerAction|skipStrengthsQuestionAction|completeStrengthsInterviewAction/);
+  const start = code("src/features/strengths/strengthsDiscoverActions.ts");
+  assert.match(start, /if \(open\) await complete\(client, open\.sessionId\)/);
+  assert.doesNotMatch(code("src/features/strengths/strengthsInterviewActions.ts"), /startStrengthsInterviewAction|saveStrengthsAnswerAction/);
 });

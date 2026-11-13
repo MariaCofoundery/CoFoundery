@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
-  addStrengthAction,
   assessStrengthAction,
   removeStrengthAction,
 } from "@/features/capability/strengthActions";
@@ -167,46 +165,6 @@ export async function StrengthsSection({
           })}
         </ul>
       )}
-
-      {/* DER ZWEITE WEG: das Stärken-Interview - ein eigenes Gespräch mit
-          eigenen Fragen, NICHT das Capability-Interview. Bis zum 18.10.2026
-          führte dieser Link dorthin, und am Ende stand eine Einordnung in
-          Funktionsbereiche. Vorschläge entstehen nur, wenn die Person sie
-          anfordert und die Auswertung erreichbar ist - deshalb „können". */}
-      <div className="mt-6 rounded-2xl border border-violet-200 bg-violet-50/40 p-5">
-        <h3 className="text-sm font-semibold text-slate-900">{t("interviewTitle")}</h3>
-        <p className="mt-1 text-sm leading-6 text-slate-600">{t("interviewText")}</p>
-        <Link
-          href="/profile/strengths-interview"
-          className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-violet-300 bg-white px-4 text-sm font-medium text-slate-900"
-        >
-          {t("interviewCta")}
-        </Link>
-      </div>
-
-      <form action={addStrengthAction} className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
-        <h3 className="text-sm font-semibold text-slate-900">{t("addTitle")}</h3>
-        <label className="mt-3 block">
-          <span className="block text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-            {t("addLabel")}
-          </span>
-          <input
-            type="text"
-            name="statement"
-            required
-            minLength={3}
-            maxLength={200}
-            placeholder={t("addPlaceholder")}
-            className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm"
-          />
-        </label>
-        <p className="mt-2 text-xs leading-5 text-slate-500">{t("addHint")}</p>
-        <SubmitButton
-          label={t("add")}
-          pendingLabel={t("pending")}
-          className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-semibold text-white"
-        />
-      </form>
     </section>
   );
 }

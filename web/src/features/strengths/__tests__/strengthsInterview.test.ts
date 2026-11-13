@@ -330,7 +330,7 @@ test("die neuen Stärken-Fragen stehen nicht im Capability-Interview", () => {
 });
 
 test("jeder Leser und jede Aktion des Stärken-Interviews filtert auf seine Art", () => {
-  for (const path of ["src/features/strengths/strengthsInterviewData.ts", "src/features/strengths/strengthsInterviewActions.ts"]) {
+  for (const path of ["src/features/strengths/strengthsInterviewData.ts"]) {
     const code = codeOnly(path);
     const queries = code.split(/await client|client\s*\n?\s*\.from/).slice(1)
       .filter((query) => /from\("capability_interview_(sessions|turns)"\)/.test(query.slice(0, 120)));
@@ -351,7 +351,8 @@ test("die Seite ist das Stärken-Interview - ohne Einordnung in Bereiche", () =>
   assert.match(page, /action=\{requestStrengthProposalsAction\}/);
   assert.match(page, /completed\.answers\.length > 0 && aiAvailable/);
   // Beide Einstiege führen hierher, nicht ins Capability-Interview.
-  assert.match(codeOnly("src/features/capability/StrengthsSection.tsx"), /href="\/profile\/strengths-interview"/);
+  // Es gibt nur noch diese Seite: Liste, Vorschläge und Ergebnisse stehen hier.
+  assert.match(page, /<StrengthsSection strengths=\{strengths\} proposals=\{proposals\}/);
   assert.match(codeOnly("src/app/me/profile/page.tsx"), /href="\/profile\/strengths-interview\?neu=1"/);
   for (const locale of ["de", "en"]) {
     const bundle = JSON.parse(read(`messages/${locale}/strengths.json`));

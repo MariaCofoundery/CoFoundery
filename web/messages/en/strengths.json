@@ -43,11 +43,11 @@
     "askText": "An AI on a Made2Found computer – not at an outside service – reads your answers and assigns strength themes to them. Each suggestion names the passage from your answer it rests on. The counter-questions are not analysed. Anything that cannot be backed up is not suggested.",
     "ask": "Get suggestions",
     "askPending": "Requesting …",
-    "unavailable": "The analysis is not available right now. Your answers stay saved – you can ask for suggestions later. You can always record your own sentences under your strengths.",
+    "unavailable": "The analysis is not available right now. Your answers stay saved – you can ask for suggestions later.",
     "reading": "Your answers are being read …",
     "failed": "Reading did not work. You can try again.",
     "retry": "Try again",
-    "noneFound": "No strength could be backed up well enough from this conversation. That says nothing about you – only that the answers do not describe enough behavior for it. You can do another interview or record something yourself.",
+    "noneFound": "No strength could be backed up well enough from this conversation. That says nothing about you – only that the answers do not describe enough behavior for it. You can discover your strengths again, for example with other scenes.",
     "allDecided": "You have decided on all suggestions from this conversation.",
     "toStrengths": "Go to your strengths"
   },

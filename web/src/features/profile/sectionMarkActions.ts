@@ -46,6 +46,7 @@ export async function markSectionDoneAction(formData: FormData): Promise<void> {
     .upsert({ user_id: ctx.user.id, section }, { onConflict: "user_id,section", ignoreDuplicates: true });
 
   revalidatePath("/profile");
+  revalidatePath("/profile/strengths-interview");
 }
 
 export async function unmarkSectionAction(formData: FormData): Promise<void> {
@@ -61,5 +62,5 @@ export async function unmarkSectionAction(formData: FormData): Promise<void> {
     .eq("user_id", ctx.user.id)
     .eq("section", section);
 
-  revalidatePath("/profile");
+  revalidatePath("/profile");  revalidatePath("/profile/strengths-interview");
 }
