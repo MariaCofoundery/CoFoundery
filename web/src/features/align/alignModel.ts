@@ -27,6 +27,15 @@ export const ALIGN_PART_HREF: Record<AlignPartKey, string> = {
   direction: "/profile/direction",
 };
 
+/**
+ * Wohin ein Teil fuehrt, je nach Stand. Ist "Staerken" noch offen, soll "Staerken entdecken" starten - auch wenn
+ * es von frueher ein abgeschlossenes altes Gespraech gibt (ohne `neu=1` zeigte die Seite dann dessen Ergebnisse).
+ * Eine laufende Runde setzt die Seite von selbst fort; ein fertiger Teil fuehrt zu seinen Ergebnissen.
+ */
+export function alignPartHref(key: AlignPartKey, state: AlignPartState): string {
+  return key === "strengths" && state !== "done" ? `${ALIGN_PART_HREF.strengths}?neu=1` : ALIGN_PART_HREF[key];
+}
+
 /** Der erste noch offene Teil - in der Reihenfolge des Wegs. Ein angefangener zaehlt als offen. */
 export function nextOwnPart(states: Record<AlignPartKey, AlignPartState>): AlignPartKey | null {
   return ALIGN_PART_KEYS.find((key) => states[key] !== "done") ?? null;

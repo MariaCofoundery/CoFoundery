@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import {
-  ALIGN_PART_HREF,
+  alignPartHref,
   ALIGN_PART_KEYS,
   initialOf,
   nextOwnPart,
@@ -57,7 +57,7 @@ export async function AlignOverview({
   const ownRows: Row[] = ALIGN_PART_KEYS.map((key) => ({
     key,
     name: t(`parts.${key}`),
-    href: ALIGN_PART_HREF[key],
+    href: alignPartHref(key, data.own[key]),
     status: { label: t(`status.${data.own[key]}`), tone: PART_TONE[data.own[key]] },
   }));
   const ownNext = nextStepForOwn(t, data.own);
@@ -261,7 +261,7 @@ function nextText(t: T, key: string, href: string, values?: Record<string, strin
 function nextStepForOwn(t: T, states: Record<AlignPartKey, AlignPartState>): Next {
   const key = nextOwnPart(states);
   if (!key) return nextText(t, "allDone", "/me/profile");
-  const next = nextText(t, key, ALIGN_PART_HREF[key]);
+  const next = nextText(t, key, alignPartHref(key, states[key]));
   if (key === "work" && states.work === "started") return { ...next, cta: t("nextStep.work.continue") };
   return next;
 }

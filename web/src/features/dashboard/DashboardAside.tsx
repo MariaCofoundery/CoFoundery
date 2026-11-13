@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ALIGN_PART_HREF as PART_HREF } from "@/features/align/alignModel";
+import { alignPartHref } from "@/features/align/alignModel";
 
 export type ProfileParts = { work: boolean; can: boolean; strengths: boolean; direction: boolean };
 
@@ -64,7 +64,7 @@ export async function DashboardAside({
                   {openParts.map((key, index) => (
                     <span key={key}>
                       {index > 0 ? ", " : null}
-                      <Link href={PART_HREF[key]} className="text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
+                      <Link href={alignPartHref(key, "open")} className="text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
                     </span>
                   ))}
                 </>
