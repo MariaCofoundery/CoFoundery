@@ -48,7 +48,7 @@ export async function ProfileTabs({
       : state.group === "align"
         ? [
             { key: "capability", href: "/profile?step=areas", label: t("profileTabs.sub.capability") },
-            { key: "strengths", href: "/profile?step=strengths", label: t("profileTabs.sub.strengths") },
+            { key: "strengths", href: "/profile/strengths-interview", label: t("profileTabs.sub.strengths") },
             { key: "direction", href: "/profile/direction", label: t("profileTabs.sub.direction") },
           ]
         : null;

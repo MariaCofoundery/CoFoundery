@@ -225,7 +225,7 @@ function stepHref(id: StepId, facts: AboutYouFacts): string {
     case "verantwortung":
       return "/profile?step=areas";
     case "staerken":
-      return "/profile?step=strengths";
+      return "/profile/strengths-interview";
     case "antrieb":
       return "/profile/direction";
     case "ressourcen":

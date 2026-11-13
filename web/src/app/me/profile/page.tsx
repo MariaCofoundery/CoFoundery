@@ -388,7 +388,7 @@ export default async function FounderProfilePage({
           basis: "/profile?step=identity",
           work: workstyleV04 ? "/me/profile/workstyle" : CURRENT_WORKSTYLE_HREF,
           can: "/profile?step=areas",
-          strengths: "/profile?step=strengths",
+          strengths: "/profile/strengths-interview",
           direction: "/profile/direction",
           venture: fragebogenHref,
         }}
