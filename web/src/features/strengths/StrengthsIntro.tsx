@@ -13,6 +13,8 @@ import "@/features/align/align.css";
 /** Wie lange jeder der fünf Teile steht (Millisekunden). Zusammen etwa eine halbe Minute. */
 const DURATIONS = [5000, 6500, 7000, 7000, 7500];
 const TICK = 250;
+/** Mit Ton: Zeit zum Nachdenken NACH dem gesprochenen Satz (Millisekunden) - je Teil, die fragenden etwas laenger. */
+const REFLECT_AFTER_SPEECH = [6000, 5000, 8000, 7000, 5000];
 const MOMENT_X = [190, 300, 450, 560, 700];
 const MOMENT_RAISED_Y = [120, 160, 80, 140, 100];
 const BUBBLE_X = [190, 450, 560, 700];
@@ -47,16 +49,28 @@ export function StrengthsIntro() {
   const clips = stepKeys.map((_, index) => spokenText(locale, `strengths_intro.s${index + 1}`));
   const hasSound = clips.every(Boolean);
   const [sound, setSound] = useState(false);
-  const durationOf = (index: number) => (sound && clips[index] ? Math.max(DURATIONS[index], Math.ceil(clips[index]!.seconds * 1000) + 900) : DURATIONS[index]);
+  // Mit Ton laeuft ein Teil: gesprochener Satz + Zeit zum Nachdenken. Er geht erst weiter, wenn der Satz wirklich zu Ende
+  // gesprochen ist (clipDone) - auch wenn die Datei langsam laedt. So bricht der Ton nie ab.
+  const durationOf = (index: number) => (sound && clips[index] ? Math.ceil(clips[index]!.seconds * 1000) + REFLECT_AFTER_SPEECH[index] : DURATIONS[index]);
+  const [clipDone, setClipDone] = useState(true);
   const player = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
     player.current?.pause();
     player.current = null;
     const clip = sound && playing && !atEnd ? clips[step] : null;
-    if (!clip) return;
+    if (!clip) {
+      setClipDone(true);
+      return;
+    }
+    setClipDone(false);
     const audio = new Audio(clip.src);
     player.current = audio;
-    void audio.play().catch(() => setSound(false));
+    audio.addEventListener("ended", () => setClipDone(true));
+    audio.addEventListener("error", () => setClipDone(true));
+    void audio.play().catch(() => {
+      setSound(false);
+      setClipDone(true);
+    });
     return () => {
       audio.pause();
     };
@@ -67,6 +81,8 @@ export function StrengthsIntro() {
     if (!playing || atEnd) return;
     const timer = setInterval(() => {
       setElapsed((value) => {
+        // Mit Ton erst weiter, wenn der Satz zu Ende gesprochen ist.
+        if (value + TICK >= durationOf(step) && !clipDone) return value;
         if (value + TICK >= durationOf(step)) {
           setStep((current) => current + 1);
           return 0;
@@ -76,7 +92,7 @@ export function StrengthsIntro() {
     }, TICK);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, atEnd, step, sound]);
+  }, [playing, atEnd, step, sound, clipDone]);
 
   const go = (next: number) => {
     setStep(Math.max(0, Math.min(DURATIONS.length, next)));
