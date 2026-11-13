@@ -842,7 +842,8 @@
       "dictationStart": "Diktat starten",
       "dictationStop": "Diktat stoppen",
       "dictationListening": "Diktat läuft …",
-      "dictationUnavailable": "Diktat ist in diesem Browser gerade nicht verfügbar."
+      "dictationUnavailable": "Diktat ist in diesem Browser gerade nicht verfügbar.",
+      "handoffNote": "Gesprächsimpuls aus „Euer Zusammenspiel“. Bearbeitet und speichert ihn bewusst als Diskussionsbeitrag. Eine Vereinbarung entsteht erst durch eine separate Revision und eure Bestätigung."
     },
     "detail": {
       "workStatus": "Wo steht ihr gerade?",

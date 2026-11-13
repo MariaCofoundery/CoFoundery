@@ -288,7 +288,7 @@ export default async function FounderSetupItemPage({ params, searchParams }: Pro
               <section className={CARD} aria-labelledby="discussion-title">
                 <h2 id="discussion-title" className="text-xl font-semibold text-slate-950">{t("discussion.title")}</h2>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{t("discussion.visibility")}</p>
-                {handoff && <p className="mt-3 text-sm">Gesprächsimpuls aus „Euer Zusammenspiel“. Bearbeitet und speichert ihn bewusst als Diskussionsbeitrag. Eine Vereinbarung entsteht erst durch eine separate Revision und eure Bestätigung.</p>}
+                {handoff && <p className="mt-3 text-sm">{t("discussion.handoffNote")}</p>}
                 {discussionThreads.length > 0 ? (
                   <ol className="mt-4 grid gap-3">
                     {discussionThreads.map((thread) => (

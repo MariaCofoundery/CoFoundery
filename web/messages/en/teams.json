@@ -842,7 +842,8 @@
       "dictationStart": "Start dictation",
       "dictationStop": "Stop dictation",
       "dictationListening": "Dictation is active…",
-      "dictationUnavailable": "Dictation is currently unavailable in this browser."
+      "dictationUnavailable": "Dictation is currently unavailable in this browser.",
+      "handoffNote": "Conversation prompt from “Your teamwork”. Edit it and save it deliberately as a discussion contribution. An agreement only comes about through a separate revision and your confirmation."
     },
     "detail": {
       "workStatus": "Where are you right now?",
