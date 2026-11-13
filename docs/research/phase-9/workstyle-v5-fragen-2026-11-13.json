@@ -1,0 +1,398 @@
+{
+  "version": "8.5a-v5",
+  "status": "Entwurf Fassung 5, Stand 13.11.2026 (vor Vortest)",
+  "instruction": {
+    "de": "Wähle bei den folgenden Fragen jeweils die Option, die im Arbeitsalltag eher zu dir passt – nicht die, die du grundsätzlich für besser hältst. Beide Vorgehensweisen sind sinnvoll.",
+    "en": "For each of the following questions, choose the option that fits you better in everyday work – not the one you think is better in general. Both ways of working make sense."
+  },
+  "poles": {
+    "EVI": {
+      "stehen_lassen": "left",
+      "genauer": "right"
+    },
+    "EL": {
+      "klaeren": "left",
+      "ausprobieren": "right"
+    },
+    "VOICE": {
+      "abwarten": "left",
+      "ansprechen": "right"
+    },
+    "ORG": {
+      "flexibel": "left",
+      "stabil": "right"
+    }
+  },
+  "facets": {
+    "ORG": {
+      "vorbereitung_rhythmus": {
+        "direction": false,
+        "poles": [
+          "struktur",
+          "fluss"
+        ]
+      },
+      "fokus_planstabilitaet": {
+        "direction": true,
+        "poles": [
+          "flexibel",
+          "stabil"
+        ]
+      }
+    }
+  },
+  "items": [
+    {
+      "key": "ORG-01",
+      "format": "comparative",
+      "prompt": "Du stehst vor einem größeren Vorhaben. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich lege mir zuerst konkrete Schritte zurecht, bevor ich richtig loslege.",
+        "Ich starte direkt mit einem Einstieg, um Schwung aufzunehmen, und sortiere den Rest unterwegs."
+      ],
+      "poles": {
+        "A": "struktur",
+        "B": "fluss"
+      },
+      "facet": "vorbereitung_rhythmus"
+    },
+    {
+      "key": "EXP-01",
+      "format": "influence",
+      "prompt": "Jemand schlägt euch ein neues Vorgehen vor. Du hast sofort das Gefühl: ‚Das kenne ich, so etwas habe ich schon einmal erlebt‘ – kannst es im Moment aber noch nicht genau begründen. Wie stark beeinflusst dieser erste Eindruck deine Einschätzung?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "VOICE-01",
+      "format": "comparative",
+      "prompt": "Ihr seid euch bei einer Entscheidung im Team eigentlich schon einig, doch dir fällt noch ein möglicher Gegenpunkt auf. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich bringe den Gegenpunkt direkt noch ein, bevor die Runde das Thema abschließt.",
+        "Ich halte den Punkt zurück, um den Schwung nicht wegen eines Zweifels auszubremsen."
+      ],
+      "poles": {
+        "A": "ansprechen",
+        "B": "abwarten"
+      },
+      "facet": null
+    },
+    {
+      "key": "AMB-01",
+      "format": "ambiguity_unrest",
+      "prompt": "Du bekommst zu einer neuen Idee unterschiedliche Rückmeldungen und kannst noch nicht einschätzen, welches Feedback relevanter ist. Wie viel Unruhe löst das bei dir aus?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "EL-01",
+      "format": "comparative",
+      "prompt": "Du schwankst zwischen zwei Wegen, die sich beide im Kleinen ausprobieren ließen. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich teste erst eine kleine Variante in der Praxis, bevor ich mich festlege.",
+        "Ich wäge beide Wege gründlich gegeneinander ab und entscheide mich dann für einen."
+      ],
+      "poles": {
+        "A": "ausprobieren",
+        "B": "klaeren"
+      },
+      "facet": null
+    },
+    {
+      "key": "EVI-01",
+      "format": "comparative",
+      "prompt": "Du hast drei Möglichkeiten vor dir und eine davon gefällt dir spontan am besten. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich suche vor der Festlegung gezielt nach Gegenargumenten, um Schwächen früh zu sehen.",
+        "Ich starte mit meinem Favoriten, um voranzukommen, und achte unterwegs auf handfeste Gegengründe."
+      ],
+      "poles": {
+        "A": "genauer",
+        "B": "stehen_lassen"
+      },
+      "facet": null
+    },
+    {
+      "key": "EXP-02",
+      "format": "influence",
+      "prompt": "Ein Konzept wirkt auf dem Papier schlüssig, aber deine Erfahrung aus früheren Situationen lässt dich zögern. Wie stark beeinflusst diese Vorerfahrung dein Urteil über den Plan?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "ORG-03",
+      "format": "comparative",
+      "prompt": "Mehrere wichtige Aufgaben konkurrieren gleichzeitig um deine Aufmerksamkeit. Was beschreibt deine Arbeitsweise eher?",
+      "alternatives": [
+        "Ich halte mehrere Themen parallel in Bewegung, damit nichts ganz stehen bleibt.",
+        "Ich konzentriere mich auf wenige Dinge und akzeptiere, dass anderes warten muss."
+      ],
+      "poles": {
+        "A": "flexibel",
+        "B": "stabil"
+      },
+      "facet": "fokus_planstabilitaet"
+    },
+    {
+      "key": "AMB-02",
+      "format": "ambiguity_unrest",
+      "prompt": "Ein Problem tritt auf und es gibt mehrere plausible Erklärungen, aber vorerst keine Möglichkeit herauszufinden, welche wirklich stimmt. Wie viel Unruhe löst diese Unklarheit bei dir aus?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "VOICE-02",
+      "format": "comparative",
+      "prompt": "Dir fällt ein heikler Punkt auf, der für eure gemeinsame Arbeit wichtig ist, aber die Stimmung belasten könnte. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich warte einen ruhigen Moment ab und sortiere meine Gedanken, bevor ich es anspreche.",
+        "Ich spreche das Thema zeitnah und offen im Team an, damit es geklärt ist."
+      ],
+      "poles": {
+        "A": "abwarten",
+        "B": "ansprechen"
+      },
+      "facet": null
+    },
+    {
+      "key": "EVI-02",
+      "format": "comparative",
+      "prompt": "Euer nächster Schritt stützt sich auf eine Annahme, für die es noch keine Belege gibt. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich prüfe die Annahme vorab gezielt mit Daten oder Fakten, bevor ich mich festlege.",
+        "Ich gehe von meiner Einschätzung aus, um nicht in Prüfschleifen zu landen, und korrigiere bei neuen Fakten."
+      ],
+      "poles": {
+        "A": "genauer",
+        "B": "stehen_lassen"
+      },
+      "facet": null
+    },
+    {
+      "key": "EXP-03",
+      "format": "influence",
+      "prompt": "Zwei Optionen wirken rein sachlich gleich gut. Bei einer davon hast du jedoch ein starkes Wiedererkennen aus früheren Situationen. Wie stark gibt diese persönliche Erfahrung den Ausschlag für deine Wahl?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "AMB-04",
+      "format": "ambiguity_unrest",
+      "prompt": "Ihr analysiert ein Problem, aber jede neue Information macht das Gesamtbild nur noch verworrener und wirft weitere Fragen auf. Wie viel Unruhe löst das bei dir aus?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "ORG-04",
+      "format": "comparative",
+      "prompt": "Eine Aufgabe dauert deutlich länger als gedacht. Was beschreibt deine Arbeitsweise eher?",
+      "alternatives": [
+        "Ich ziehe die begonnene Aufgabe erst wie geplant durch, bevor ich den Zeitplan sortiere.",
+        "Ich passe meinen Zeitplan frühzeitig an die Verzögerung an, bevor ich weitermache."
+      ],
+      "poles": {
+        "A": "stabil",
+        "B": "flexibel"
+      },
+      "facet": "fokus_planstabilitaet"
+    },
+    {
+      "key": "EL-02",
+      "format": "comparative",
+      "prompt": "Ihr habt im Team zwei plausible Ansätze und kommt im Gespräch gerade nicht weiter. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich durchdenke die offenen Punkte im Gespräch sauber, bis wir eine gemeinsame Linie haben.",
+        "Ich schlage vor, das Gespräch abzukürzen und beide Ansätze im Kleinen zu testen."
+      ],
+      "poles": {
+        "A": "klaeren",
+        "B": "ausprobieren"
+      },
+      "facet": null
+    },
+    {
+      "key": "EXP-04",
+      "format": "influence",
+      "prompt": "Du stehst vor einer Herausforderung, die du in ähnlicher Form schon mehrfach erlebt hast. Wie stark greifst du auf diese Erfahrungen zurück, um einzuschätzen, worauf es diesmal ankommt?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "VOICE-03",
+      "format": "comparative",
+      "prompt": "Ein schwieriges Thema wurde vertagt und nicht wieder aufgegriffen, obwohl für dich noch etwas offen ist. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich gebe dem Thema Zeit und spreche es an, sobald im Alltag klar wird, dass es relevant ist.",
+        "Ich hole das Thema von mir aus aktiv wieder auf die Agenda, um es zeitnah zu klären."
+      ],
+      "poles": {
+        "A": "abwarten",
+        "B": "ansprechen"
+      },
+      "facet": null
+    },
+    {
+      "key": "EL-05",
+      "format": "comparative",
+      "prompt": "Ein erster Versuch bringt noch keine klare Antwort. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich verändere gezielt einen Punkt und starte direkt den nächsten praktischen Versuch.",
+        "Ich gehe einen Schritt zurück und prüfe grundsätzlich, ob unser Ansatz so passt."
+      ],
+      "poles": {
+        "A": "ausprobieren",
+        "B": "klaeren"
+      },
+      "facet": null
+    },
+    {
+      "key": "AMB-05",
+      "format": "ambiguity_unrest",
+      "prompt": "Ihr müsst mit einem Thema weiterarbeiten, obwohl eine wichtige Frage noch offen ist. Wie viel Unruhe löst das bei dir aus?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "ORG-02",
+      "format": "comparative",
+      "prompt": "Eine Aufgabe läuft über mehrere Wochen ohne feste Zwischentermine von außen. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich arbeite in meinem Rhythmus auf das Ziel zu und merke an der Sache selbst, ob ich im Plan bin.",
+        "Ich setze mir selbst feste Zwischenziele, um regelmäßig zu prüfen, ob ich noch im Zeitplan liege."
+      ],
+      "poles": {
+        "A": "fluss",
+        "B": "struktur"
+      },
+      "facet": "vorbereitung_rhythmus"
+    },
+    {
+      "key": "EVI-03",
+      "format": "comparative",
+      "prompt": "Du hast dich entschieden. Kurz darauf tauchen neue Informationen auf, die gegen deine Entscheidung sprechen. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich nehme die Entscheidung direkt wieder auf und prüfe, ob ich umsteuern sollte.",
+        "Ich bleibe zunächst bei der Entscheidung und prüfe, ob die Infos schwer genug zum Umsteuern wiegen."
+      ],
+      "poles": {
+        "A": "genauer",
+        "B": "stehen_lassen"
+      },
+      "facet": null
+    },
+    {
+      "key": "EL-04",
+      "format": "comparative",
+      "prompt": "Du bist unsicher, wie andere auf eine neue Idee oder ein Angebot reagieren. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich arbeite das Konzept erst in Ruhe stimmig aus, bevor ich es nach außen gebe.",
+        "Ich zeige frühzeitig eine einfache erste Version, um schnell echte Reaktionen zu bekommen."
+      ],
+      "poles": {
+        "A": "klaeren",
+        "B": "ausprobieren"
+      },
+      "facet": null
+    },
+    {
+      "key": "VOICE-04",
+      "format": "comparative",
+      "prompt": "Im Team zeichnet sich eine Entscheidung ab, die du fachlich anders einschätzt. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich mache meinen fachlichen Einwand deutlich, bevor die Entscheidung im Team endgültig steht.",
+        "Ich trage die Entscheidung mit, um das Team handlungsfähig zu halten, und melde Bedenken in der Umsetzung."
+      ],
+      "poles": {
+        "A": "ansprechen",
+        "B": "abwarten"
+      },
+      "facet": null
+    },
+    {
+      "key": "EVI-05",
+      "format": "comparative",
+      "prompt": "Jemand im Team sieht eine Sache anders als du und bringt einen nachvollziehbaren Punkt ein. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich prüfe den Punkt erst an weiteren Hinweisen und behalte meine Einschätzung bis dahin bei.",
+        "Ich gehe den Punkt sofort mit durch und stelle meine Einschätzung dabei in Frage."
+      ],
+      "poles": {
+        "A": "stehen_lassen",
+        "B": "genauer"
+      },
+      "facet": null
+    },
+    {
+      "key": "EXP-06",
+      "format": "influence",
+      "prompt": "Ihr müsst eine Entscheidung treffen, für die euch noch einige Informationen fehlen. Du kennst das Themenfeld aber sehr gut. Wie stark stützt du dich bei deiner Wahl auf dein eigenes Erfahrungswissen?",
+      "alternatives": null,
+      "poles": null,
+      "facet": null
+    },
+    {
+      "key": "VOICE-05",
+      "format": "comparative",
+      "prompt": "Die Runde möchte ein Thema abschließen, aber für dich ist ein Punkt noch nicht ganz rund. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich stoppe den Abschluss und sage offen, dass ich an diesem Punkt noch nicht so weit bin.",
+        "Ich lasse den Abschluss zu, damit wir vorankommen, und kläre meinen Punkt direkt nach der Runde."
+      ],
+      "poles": {
+        "A": "ansprechen",
+        "B": "abwarten"
+      },
+      "facet": null
+    },
+    {
+      "key": "ORG-07",
+      "format": "comparative",
+      "prompt": "Du arbeitest gerade konzentriert an einem wichtigen Thema und eine ebenfalls wichtige neue Anfrage kommt rein. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich unterbreche relativ schnell und kümmere mich direkt um die neue Anfrage.",
+        "Ich halte erst an meiner aktuellen Aufgabe fest und schiebe das Neue nach hinten."
+      ],
+      "poles": {
+        "A": "flexibel",
+        "B": "stabil"
+      },
+      "facet": "fokus_planstabilitaet"
+    },
+    {
+      "key": "EVI-06",
+      "format": "comparative",
+      "prompt": "Zwei verlässliche Quellen kommen bei einer Frage zu unterschiedlichen Einschätzungen. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich wäge ab, welche Einschätzung besser zu unserer Lage passt, und arbeite damit weiter.",
+        "Ich gehe dem Widerspruch genauer nach, um zu verstehen, woher der Unterschied kommt."
+      ],
+      "poles": {
+        "A": "stehen_lassen",
+        "B": "genauer"
+      },
+      "facet": null
+    },
+    {
+      "key": "ORG-08",
+      "format": "comparative",
+      "prompt": "Dein Plan funktioniert grundsätzlich noch, aber mehrere kleinere Dinge laufen anders als gedacht. Was beschreibt dich eher?",
+      "alternatives": [
+        "Ich ändere meinen Plan erst, wenn die Abweichungen wirklich spürbar ins Gewicht fallen.",
+        "Ich passe meinen Plan lieber schon bei kleineren Veränderungen laufend an."
+      ],
+      "poles": {
+        "A": "stabil",
+        "B": "flexibel"
+      },
+      "facet": "fokus_planstabilitaet"
+    }
+  ]
+}

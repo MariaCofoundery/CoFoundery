@@ -24,10 +24,10 @@ insert into public.founder_team_members(team_id,user_id) select 'e8771000-0000-4
 do $$ declare p record;i record;id uuid;begin
  for p in select * from ts_people where n in(1,2,3,4,7,8) loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v5()->>'assessment_id')::uuid;
   update ts_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
-   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v5' order by position loop
+   perform public.save_workstyle_v5(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
@@ -143,7 +143,7 @@ select pg_temp.check_team(exists(select 1 from jsonb_array_elements(pg_temp.team
 -- Forschung nie: nur die 29 aktuellen v4-Core-Antworten, v4 hat keine Forschungsantworten, Forschungstabelle fuer Mitglieder unsichtbar.
 select pg_temp.check_team(not exists(select 1 from jsonb_array_elements(pg_temp.team_for(1)->'people') p where jsonb_array_length(p->'workstyle'->'answers')<>29),'C: only 29 core answers');
 select pg_temp.check_team(not exists(select 1 from jsonb_array_elements(pg_temp.team_for(1)->'people') p, jsonb_array_elements(p->'workstyle'->'answers') a
- where not exists(select 1 from public.workstyle_item_versions i where i.instrument_id='founder-workstyle-pretest-8-5a-v4'
+ where not exists(select 1 from public.workstyle_item_versions i where i.instrument_id='founder-workstyle-pretest-8-5a-v5'
   and i.item_key=a->>'item_key' and i.item_version=a->>'item_version' and i.definition->>'usage'='core')),'C: only current v4 core items in team report');
 select pg_temp.check_team(not exists(select 1 from public.workstyle_research_responses r where r.assessment_id=(select assessment from ts_people where n=1)),'C: v4 fixture has no research answers');
 select pg_temp.check_team(not has_table_privilege('authenticated','public.workstyle_research_responses','select'),'C: research table not readable by clients at all');

@@ -94,8 +94,8 @@ test("Fragebogen: Fortschritt in Markenfarben mit echter Zahl, Scroll unter der 
   assert.match(ui, /scroll-mt-36/);
   assert.match(ui, /focus\(\{ preventScroll: true \}\)/);
   assert.match(ui, />\s*Zurück\s*</);
-  // Aktueller Ablauf (v4): warm, mit echter Anzahl, ohne erfundene Minuten.
-  const flow = code("src/features/instruments/workstyle/WorkstyleV4Flow.tsx");
+  // Aktueller Ablauf (v5): warm, mit echter Anzahl, ohne erfundene Minuten.
+  const flow = code("src/features/instruments/workstyle/WorkstyleV5Flow.tsx");
   assert.match(flow, /Mach’s dir kurz bequem\./);
   assert.match(flow, /Dein Arbeitsprofil basiert auf\s+\{items\.length\}\s+Situationen\./);
   assert.match(flow, /Später weitermachen/);

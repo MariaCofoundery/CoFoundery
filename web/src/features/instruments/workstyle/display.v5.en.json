@@ -1,0 +1,171 @@
+{
+  "items": {
+    "ORG-01": {
+      "prompt": "You are facing a larger undertaking. Which describes you better?",
+      "alternatives": {
+        "A": "I first work out concrete steps before I really get going.",
+        "B": "I start right away with a first foothold to build momentum, and sort out the rest along the way."
+      }
+    },
+    "EXP-01": {
+      "prompt": "Someone suggests a new approach to your team. You immediately feel: ‘I know this, I have been through something like it before’ – but you cannot explain why just yet. How strongly does this first impression influence your assessment?"
+    },
+    "VOICE-01": {
+      "prompt": "Your team has more or less agreed on a decision, but you notice a possible counterpoint. Which describes you better?",
+      "alternatives": {
+        "A": "I raise the counterpoint right away, before the group closes the topic.",
+        "B": "I hold the point back so as not to slow the momentum because of a single doubt."
+      }
+    },
+    "AMB-01": {
+      "prompt": "You receive different feedback on a new idea and cannot yet tell which feedback is more relevant. How much unease does this cause you?"
+    },
+    "EL-01": {
+      "prompt": "You are torn between two paths, both of which could be tried on a small scale. Which describes you better?",
+      "alternatives": {
+        "A": "I first test a small version in practice before I commit.",
+        "B": "I weigh both paths carefully against each other and then decide on one."
+      }
+    },
+    "EVI-01": {
+      "prompt": "You have three options and one of them immediately appeals to you most. Which describes you better?",
+      "alternatives": {
+        "A": "Before committing, I deliberately look for counterarguments so I can spot weaknesses early.",
+        "B": "I start with my favorite to make progress and watch for solid reasons against it along the way."
+      }
+    },
+    "EXP-02": {
+      "prompt": "A concept looks coherent on paper, but your experience from earlier situations makes you hesitate. How strongly does this prior experience influence your judgment of the plan?"
+    },
+    "ORG-03": {
+      "prompt": "Several important tasks compete for your attention at the same time. Which describes the way you work better?",
+      "alternatives": {
+        "A": "I keep several topics moving in parallel so that nothing comes to a complete stop.",
+        "B": "I focus on a few things and accept that others must wait."
+      }
+    },
+    "AMB-02": {
+      "prompt": "A problem comes up and there are several plausible explanations, but for now no way to find out which one is true. How much unease does this uncertainty cause you?"
+    },
+    "VOICE-02": {
+      "prompt": "You notice a delicate point that matters for your shared work but could strain the mood. Which describes you better?",
+      "alternatives": {
+        "A": "I wait for a calm moment and gather my thoughts before I bring it up.",
+        "B": "I raise the topic promptly and openly in the team so that it gets settled."
+      }
+    },
+    "EVI-02": {
+      "prompt": "Your next step rests on an assumption for which there is no evidence yet. Which describes you better?",
+      "alternatives": {
+        "A": "I check the assumption beforehand with data or facts before I commit.",
+        "B": "I go with my own assessment so as not to end up in endless checking, and correct course when new facts appear."
+      }
+    },
+    "EXP-03": {
+      "prompt": "Two options seem equally good on the facts. For one of them, however, you strongly recognize something from earlier situations. How strongly does this personal experience tip your choice?"
+    },
+    "AMB-04": {
+      "prompt": "You are analyzing a problem, but every new piece of information only makes the overall picture more confusing and raises further questions. How much unease does this cause you?"
+    },
+    "ORG-04": {
+      "prompt": "A task takes much longer than expected. Which describes the way you work better?",
+      "alternatives": {
+        "A": "I finish the task I started as planned before I rearrange the schedule.",
+        "B": "I adjust my schedule early to the delay before I carry on."
+      }
+    },
+    "EL-02": {
+      "prompt": "Your team has two plausible approaches and the discussion is not getting anywhere. Which describes you better?",
+      "alternatives": {
+        "A": "I think the open points through properly in the discussion until we have a common line.",
+        "B": "I suggest cutting the discussion short and testing both approaches on a small scale."
+      }
+    },
+    "EXP-04": {
+      "prompt": "You face a challenge you have experienced in a similar form several times. How strongly do you draw on these experiences to judge what matters this time?"
+    },
+    "VOICE-03": {
+      "prompt": "A difficult topic was postponed and never picked up again, although something is still open for you. Which describes you better?",
+      "alternatives": {
+        "A": "I give the topic time and bring it up once it becomes clear in everyday work that it matters.",
+        "B": "I put the topic back on the agenda myself to settle it promptly."
+      }
+    },
+    "EL-05": {
+      "prompt": "A first attempt does not yet give a clear answer. Which describes you better?",
+      "alternatives": {
+        "A": "I deliberately change one thing and start the next practical attempt right away.",
+        "B": "I take a step back and check fundamentally whether our approach fits."
+      }
+    },
+    "AMB-05": {
+      "prompt": "You have to keep working on a topic although an important question is still open. How much unease does this cause you?"
+    },
+    "ORG-02": {
+      "prompt": "A task runs over several weeks without fixed interim deadlines from outside. Which describes you better?",
+      "alternatives": {
+        "A": "I work toward the goal in my own rhythm and notice from the work itself whether I am on track.",
+        "B": "I set myself fixed interim goals to check regularly whether I am still on schedule."
+      }
+    },
+    "EVI-03": {
+      "prompt": "You have made a decision. Shortly afterwards new information appears that speaks against your decision. Which describes you better?",
+      "alternatives": {
+        "A": "I reopen the decision right away and check whether I should change course.",
+        "B": "I stay with the decision at first and check whether the new information is weighty enough to change course."
+      }
+    },
+    "EL-04": {
+      "prompt": "You are unsure how others will react to a new idea or offer. Which describes you better?",
+      "alternatives": {
+        "A": "I first work the concept out coherently in peace before I share it.",
+        "B": "I show a simple first version early to get real reactions quickly."
+      }
+    },
+    "VOICE-04": {
+      "prompt": "A decision is taking shape in your team that you assess differently on professional grounds. Which describes you better?",
+      "alternatives": {
+        "A": "I make my professional objection clear before the decision is final in the team.",
+        "B": "I support the decision to keep the team able to act, and raise concerns during implementation."
+      }
+    },
+    "EVI-05": {
+      "prompt": "Someone on the team sees something differently than you and raises a comprehensible point. Which describes you better?",
+      "alternatives": {
+        "A": "I first check the point against further evidence and keep my assessment until then.",
+        "B": "I go through the point right away and question my own assessment while doing so."
+      }
+    },
+    "EXP-06": {
+      "prompt": "You have to make a decision for which some information is still missing. But you know the field very well. How strongly do you rely on your own experience when choosing?"
+    },
+    "VOICE-05": {
+      "prompt": "The group wants to close a topic, but one point is not quite settled for you. Which describes you better?",
+      "alternatives": {
+        "A": "I stop the closing and say openly that I am not there yet on this point.",
+        "B": "I allow the closing so that we make progress, and settle my point right after the meeting."
+      }
+    },
+    "ORG-07": {
+      "prompt": "You are working in a focused way on an important topic and an equally important new request comes in. Which describes you better?",
+      "alternatives": {
+        "A": "I interrupt fairly quickly and take care of the new request right away.",
+        "B": "I first hold on to my current task and push the new one back."
+      }
+    },
+    "EVI-06": {
+      "prompt": "Two reliable sources come to different assessments on a question. Which describes you better?",
+      "alternatives": {
+        "A": "I weigh which assessment fits our situation better and keep working with it.",
+        "B": "I look into the contradiction more closely to understand where the difference comes from."
+      }
+    },
+    "ORG-08": {
+      "prompt": "Your plan basically still works, but several smaller things are going differently than expected. Which describes you better?",
+      "alternatives": {
+        "A": "I only change my plan when the deviations really start to matter.",
+        "B": "I prefer to adjust my plan continuously, even for smaller changes."
+      }
+    }
+  }
+}

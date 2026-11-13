@@ -80,11 +80,14 @@ do $$ begin
  begin perform public.start_workstyle_pretest('workstyle_research_v2','{"founder_experience":"1","team_size":"solo"}',true); raise exception 'new v2 start'; exception when object_not_in_prerequisite_state then null; end;
 end $$;
 reset role;
-select pg_temp.ok(not exists(select 1 from public.assessments where user_id=pg_temp.person(1) and instrument_id like 'founder-workstyle-pretest-8-5a-v_' and instrument_id<>'founder-workstyle-pretest-8-5a-v4'),'1: no v1/v2/v3 participation was created');
--- v4 bleibt der Weg fuer neue Arbeitsprofile.
+select pg_temp.ok(not exists(select 1 from public.assessments where user_id=pg_temp.person(1) and instrument_id like 'founder-workstyle-pretest-8-5a-v_' and instrument_id<>'founder-workstyle-pretest-8-5a-v5'),'1: no v1/v2/v3/v4 participation was created');
+-- v5 ist der Weg fuer neue Arbeitsprofile; v4 ist seit Fassung 5 ebenfalls zu.
 select pg_temp.act(1);
 set local role authenticated;
-select pg_temp.ok(public.start_workstyle_v4()->>'assessment_version'='8.5a-v4','1: a new start goes to v4');
+do $$ begin
+ begin perform public.start_workstyle_v4(); raise exception 'new v4 start'; exception when object_not_in_prerequisite_state then null; end;
+end $$;
+select pg_temp.ok(public.start_workstyle_v5()->>'assessment_version'='8.5a-v5','1: a new start goes to v5');
 reset role;
 select pg_temp.ok(pg_temp.v3_count(1)=0,'1: still no v3 participation');
 

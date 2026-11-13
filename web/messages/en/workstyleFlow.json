@@ -134,5 +134,6 @@
   "v4_previous_version_note": "We have revised the questions. Your previous workstyle profile stays visible to you. For your team, sharing, and FIND, only the new version counts from now on.",
   "go_to_current_version": "Answer the new version",
   "v3_research_closed_title": "No new development questions in this version",
-  "v3_research_closed_body": "We no longer accept new participation in the development questions for the earlier version of the workstyle profile. Your workstyle profile is not affected."
+  "v3_research_closed_body": "We no longer accept new participation in the development questions for the earlier version of the workstyle profile. Your workstyle profile is not affected.",
+  "v5_choice_hint": "Choose what fits you better in everyday work – not what you think is better."
 }

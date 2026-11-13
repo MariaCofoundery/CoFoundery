@@ -1,4 +1,4 @@
-import { WORKSTYLE_PRETEST_V4, workstyleItemFor, type WorkstyleForm, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
+import { WORKSTYLE_PRETEST_V4, WORKSTYLE_PRETEST_V5, workstyleItemFor, type WorkstyleForm, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { workstyleV3Item } from "@/features/instruments/workstyle/researchSets";
 
 export type WorkstyleAnswerValue =
@@ -19,7 +19,7 @@ export function parseWorkstyleAnswer(
   input: unknown,
 ): VersionedWorkstyleAnswer {
   if (identity.assessment_version === "8.5a-v1" ? !assignedForm || !["A", "B", "C"].includes(assignedForm) : assignedForm !== null) throw new Error("unknown_workstyle_form");
-  if (identity.assessment_version === "8.5a-v3" || identity.assessment_version === "8.5a-v4") throw new Error("workstyle_v3_answer_parser_required");
+  if (identity.assessment_version === "8.5a-v3" || identity.assessment_version === "8.5a-v4" || identity.assessment_version === "8.5a-v5") throw new Error("workstyle_v3_answer_parser_required");
   const item = workstyleItemFor(identity.item_key, identity.item_version, identity.assessment_version);
   if (item.research_only && item.form !== assignedForm) throw new Error("workstyle_item_not_assigned");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("invalid_workstyle_answer");
@@ -39,7 +39,7 @@ export function parseWorkstyleAnswer(
 
 export type WorkstyleV3Answer = Readonly<{
   assessment_key: "founder-workstyle-pretest";
-  assessment_version: "8.5a-v3" | "8.5a-v4";
+  assessment_version: "8.5a-v3" | "8.5a-v4" | "8.5a-v5";
   item_key: string;
   item_version: string;
   response_value: number | null;
@@ -52,6 +52,11 @@ export type WorkstyleV3Answer = Readonly<{
 export function parseWorkstyleV3Answer(itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
   // Phase 11.6C: auch die Welle-1-Ueberarbeitungen (EVI-04r, EL-03r, EL-06r).
   return parseCategoricalAnswer(workstyleV3Item(itemKey), "8.5a-v3", itemKey, itemVersion, input);
+}
+
+/** v5: dieselbe Antwortform wie v4 (Zweierwahl als Option, Skalen 1-5), die 29 Produktfragen der Fassung 5. */
+export function parseWorkstyleV5Answer(itemKey: string, itemVersion: string, input: unknown): WorkstyleV3Answer {
+  return parseCategoricalAnswer(WORKSTYLE_PRETEST_V5.items.find(item => item.item_key === itemKey), "8.5a-v5", itemKey, itemVersion, input);
 }
 
 /** v4: dieselbe Antwortform wie v3, nur die 29 Produktfragen der eigenen Fassung. */

@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import type { WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import type { ResearchAnswer } from "@/features/instruments/workstyle/data";
 
-/** Gemeinsame Bausteine aller Workstyle-Fragebogen (aktuell v4, frueher v2/v3): Fortschritt und Fragekarte. */
+/** Gemeinsame Bausteine aller Workstyle-Fragebogen (aktuell v5, frueher v2/v3/v4): Fortschritt und Fragekarte. */
 const button =
   "inline-flex min-h-12 items-center justify-center rounded-full bg-violet-800 px-6 py-3 font-semibold text-white transition hover:bg-violet-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 disabled:opacity-50";
 const secondary =
@@ -69,6 +69,7 @@ export function WorkstyleQuestion({ item: sourceItem, initial, pending, last, ca
           <span className="block text-lg leading-8 text-slate-600">{item.prompt.slice(0, split)}</span>
           <span className="mt-3 block text-2xl font-semibold leading-9 tracking-[-0.01em] text-slate-950">{item.prompt.slice(split)}</span>
         </legend>
+        {item.response_format === "comparative" && item.assessment_version === "8.5a-v5" && <p className="mb-3 text-sm text-slate-600" data-workstyle-choice-hint>{t("v5_choice_hint")}</p>}
         {item.response_format === "comparative" && <div className="mb-6 grid gap-3" aria-label={t("comparative_label")}>
           {item.alternatives?.map(alternative => <p key={alternative.option_id} className="flex gap-3 rounded-2xl bg-slate-50 p-4 leading-7 text-slate-800">
             <span aria-hidden="true" className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-violet-800 ring-1 ring-violet-200">{alternative.option_id}</span>

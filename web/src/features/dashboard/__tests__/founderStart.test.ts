@@ -126,7 +126,7 @@ test("der Dauerzustand folgt dem Check-in", () => {
 
 test("jeder Schritt fuehrt an eine bestehende Stelle", () => {
   assert.equal(startStepHref({ kind: "complete_profile" }), "#dashboard-block-profile-data");
-  assert.match(startStepHref({ kind: "workstyle_start" }), /^\/research\/workstyle-pretest\?version=8\.5a-v4/);
+  assert.match(startStepHref({ kind: "workstyle_start" }), /^\/research\/workstyle-pretest\?version=8\.5a-v5/);
   assert.equal(startStepHref({ kind: "capability" }), "/profile?step=areas");
   assert.equal(startStepHref({ kind: "venture_start", teamId: null }), "/founder-alignment/vorhaben/beta");
   assert.equal(startStepHref({ kind: "venture_continue", teamId: "a b" }), "/founder-alignment/vorhaben/beta?venture=a%20b");

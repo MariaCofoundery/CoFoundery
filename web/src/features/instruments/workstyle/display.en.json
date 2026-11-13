@@ -271,6 +271,13 @@
       "Sometimes uncomfortable, sometimes not",
       "Quite uncomfortable",
       "Very uncomfortable"
+    ],
+    "ambiguity_unrest": [
+      "None at all",
+      "A little",
+      "Some",
+      "Quite a lot",
+      "A lot"
     ]
   },
   "cannot_assess": "I cannot assess this yet"

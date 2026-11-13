@@ -61,7 +61,7 @@ test("Schwerpunkt, Absicht und Interessen folgen dem bisherigen Einstieg", () =>
 });
 
 test("der Abschluss führt in den ersten Bereich, der jetzt etwas zu tun hat", () => {
-  assert.equal(nextPathFor({ areas: ["align", "find"], alignPlan: "first" }), "/research/workstyle-pretest?version=8.5a-v4");
+  assert.equal(nextPathFor({ areas: ["align", "find"], alignPlan: "first" }), "/research/workstyle-pretest?version=8.5a-v5");
   assert.equal(nextPathFor({ areas: ["align", "find"], alignPlan: "later" }), "/discovery/profile");
   assert.equal(nextPathFor({ areas: ["connect"], alignPlan: "first" }), "/connect/profile");
   assert.equal(nextPathFor({ areas: ["align"], alignPlan: "later" }), "/dashboard");

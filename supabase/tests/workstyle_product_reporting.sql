@@ -15,10 +15,10 @@ insert into public.founder_team_members(team_id,user_id) select 'e8541000-0000-4
 do $$ declare p record;i record;id uuid;begin
  for p in select * from report_people where n<=4 loop
   perform set_config('request.jwt.claims',jsonb_build_object('sub',p.person,'role','authenticated')::text,true);
-  id:=(public.start_workstyle_v4()->>'assessment_id')::uuid;
+  id:=(public.start_workstyle_v5()->>'assessment_id')::uuid;
   update report_people set assessment=id where person=p.person;
-  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v4' order by position loop
-   perform public.save_workstyle_v4(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
+  for i in select * from public.workstyle_item_versions where instrument_id='founder-workstyle-pretest-8-5a-v5' order by position loop
+   perform public.save_workstyle_v5(id,i.item_key,i.item_version,null,null,'cannot_assess',nullif(i.definition->'rendered_order','null'::jsonb));
   end loop;
  end loop;
 end $$;
@@ -164,7 +164,7 @@ do $$declare aid uuid;i record;begin
  update public.assessments set created_at=clock_timestamp()+interval '1 minute' where public.assessments.id=aid;
 end $$;
 set local role authenticated;
-select pg_temp.check_report(public.get_workstyle_product_profile(auth.uid())->>'assessment_version'='8.5a-v4','newer historical completion does not replace v4');
+select pg_temp.check_report(public.get_workstyle_product_profile(auth.uid())->>'assessment_version'='8.5a-v5','newer historical completion does not replace v4');
 select pg_temp.check_report(not has_table_privilege('authenticated','public.workstyle_product_snapshots','SELECT'),'snapshots RPC only');
 reset role;
 -- A v3 profile is an older version: readable by its owner only, never through a share.

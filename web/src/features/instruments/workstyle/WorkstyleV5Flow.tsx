@@ -5,21 +5,25 @@ import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
-import { workstyleSessionItems, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
-import { saveWorkstyleV4, startWorkstyleV4 } from "@/features/instruments/workstyle/actions";
+import { workstyleSessionItems, WORKSTYLE_PRETEST_V5, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
+import { saveWorkstyleV5, startWorkstyleV5 } from "@/features/instruments/workstyle/actions";
 import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstyleQuestion";
 import type { PretestSession } from "@/features/instruments/workstyle/data";
 
 /**
- * Aktueller Ablauf (8.5a-v4): die 29 Produktfragen der Endfassung.
+ * Aktueller Ablauf (8.5a-v5, seit 13.11.2026): die 29 Produktfragen der Zweierwahl-Fassung.
  *
  * Kein Forschungsteil, keine Einwilligung, kein Kontext, keine Antwortzeiten.
  * Das Arbeitsprofil ist mit der 29. Antwort fertig (submitted_at, gesetzt von
  * der DB). Die Reihenfolge kommt aus dem Manifest; die DB nimmt eine Antwort nur
  * an, wenn alle vorherigen schon da sind. Ein frueheres v3-Profil bleibt fuer
- * die Person selbst lesbar, zaehlt aber nicht mehr fuer Teams, Freigaben und FIND.
+ * die Person selbst lesbar, zaehlt aber nicht mehr fuer Teams, Freigaben und FIND. Eine frühere Fassung (v4, v3) wird
+ * von hier aus nicht fortgesetzt; wer dort etwas offen hat, beginnt Fassung 5.
+ *
+ * VOR DER ERSTEN FRAGE steht die Anleitung aus dem Manifest („Wähle … was im Arbeitsalltag eher zu dir passt – nicht
+ * die, die du für besser hältst“); bei jeder Zweierwahl erinnert eine Zeile daran (WorkstyleQuestion).
  */
-const items = workstyleSessionItems("8.5a-v4", null);
+const items = workstyleSessionItems("8.5a-v5", null);
 
 const button =
   "inline-flex min-h-12 items-center justify-center rounded-full bg-violet-800 px-6 py-3 font-semibold text-white transition hover:bg-violet-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 disabled:opacity-50";
@@ -33,7 +37,7 @@ function firstOpen(session: PretestSession | null) {
   return index === -1 ? items.length - 1 : index;
 }
 
-export function WorkstyleV4Flow({ initialSession, context = null, previousVersion = false }: {
+export function WorkstyleV5Flow({ initialSession, context = null, previousVersion = false }: {
   initialSession: PretestSession | null; context?: WorkstyleCompletionContext | null; previousVersion?: boolean;
 }) {
   const t = useTranslations("workstyleFlow");
@@ -62,7 +66,7 @@ export function WorkstyleV4Flow({ initialSession, context = null, previousVersio
     <form className={`space-y-6 ${card}`} onSubmit={event => {
       event.preventDefault();
       run(async () => {
-        const result = await startWorkstyleV4();
+        const result = await startWorkstyleV5();
         if (!result.ok) return setError(serverError(result.error));
         setSession(result.session); setStarted(true); setPosition(firstOpen(result.session));
       });
@@ -71,6 +75,7 @@ export function WorkstyleV4Flow({ initialSession, context = null, previousVersio
         <h2 className="text-2xl font-semibold tracking-[-0.01em]">{t("take_a_moment_to_settle_in")}</h2>
         <p className="leading-7 text-slate-700">{t("feel_free_to_grab_a_coffee_tea")}</p>
         <p className="leading-7 text-slate-700">{t("there_are_no_right_or_wrong_answers")}</p>
+        <p className="rounded-2xl bg-violet-50/60 p-4 font-medium leading-7 text-slate-900" data-workstyle-instruction>{WORKSTYLE_PRETEST_V5.instruction?.[locale === "en" ? "en" : "de"]}</p>
         <p className="leading-7 text-slate-700">{t("each_response_is_saved_straight_away_you")}</p>
       </div>
       <div className="space-y-3 rounded-2xl bg-violet-50/60 p-5">
@@ -91,7 +96,7 @@ export function WorkstyleV4Flow({ initialSession, context = null, previousVersio
         last={open === 1 && !answered(s, items[position])} canGoBack={position > 0} onBack={() => setPosition(position - 1)}
         onSave={value => run(async () => {
           const item = items[position];
-          const result = await saveWorkstyleV4(s.assessment_id, item.item_key, {
+          const result = await saveWorkstyleV5(s.assessment_id, item.item_key, {
             response_value: typeof value === "number" ? value : null,
             response_option: typeof value === "string" && value !== "cannot_assess" ? value : null,
             missing_reason: value === "cannot_assess" ? "cannot_assess" : null,
@@ -128,7 +133,7 @@ export function WorkstyleV4Flow({ initialSession, context = null, previousVersio
             <p>{t("you_will_answer_the_situations_again_your")}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <button className={secondary} disabled={pending} onClick={() => run(async () => {
-                const result = await startWorkstyleV4(true); if (!result.ok) return setError(serverError(result.error));
+                const result = await startWorkstyleV5(true); if (!result.ok) return setError(serverError(result.error));
                 setSession(result.session); setPosition(0); setConfirmRetake(false); setStarted(true);
               })}>{t("start_again")}</button>
               <button className={secondary} onClick={() => setConfirmRetake(false)}>{t("cancel_m097")}</button>

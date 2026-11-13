@@ -1,7 +1,9 @@
 import {
   WORKSTYLE_PRETEST_V3,
   WORKSTYLE_PRETEST_V4,
+  WORKSTYLE_PRETEST_V5,
   workstyleResponseOptions,
+  type WorkstyleItem,
   type WorkstyleRegistry,
 } from "@/features/instruments/workstyle/registry";
 import { CURRENT_WORKSTYLE_INSTRUMENT } from "@/features/instruments/workstyle/current";
@@ -20,12 +22,15 @@ const productItemsOf = (registry: WorkstyleRegistry) =>
       !i.research_only &&
       i.area_status === "development_area",
   );
-/** Aktuelle Fassung (v4): gilt fuer Teams, Freigaben, FIND und Advisor-Sichten. */
-export const PRODUCT_ITEMS = productItemsOf(WORKSTYLE_PRETEST_V4);
+/** Aktuelle Fassung (v5): gilt fuer Teams, Freigaben, FIND und Advisor-Sichten. */
+export const PRODUCT_ITEMS = productItemsOf(WORKSTYLE_PRETEST_V5);
+/** Fruehere Fassung (v4): nur noch der eigene Bericht der Person. */
+export const PRODUCT_ITEMS_V4 = productItemsOf(WORKSTYLE_PRETEST_V4);
 /** Fruehere Fassung (v3): nur noch der eigene Bericht der Person. */
 export const PRODUCT_ITEMS_V3 = productItemsOf(WORKSTYLE_PRETEST_V3);
 const REPORT_VERSIONS = [
-  { instrument: "founder-workstyle-pretest-8-5a-v4", manifest: "4.0.0", item: "v4.0", items: PRODUCT_ITEMS },
+  { instrument: "founder-workstyle-pretest-8-5a-v5", manifest: "5.0.0", item: "v5.0", items: PRODUCT_ITEMS },
+  { instrument: "founder-workstyle-pretest-8-5a-v4", manifest: "4.0.0", item: "v4.0", items: PRODUCT_ITEMS_V4 },
   { instrument: "founder-workstyle-pretest-8-5a-v3", manifest: "3.0.0", item: "8.4-v0.4", items: PRODUCT_ITEMS_V3 },
 ] as const;
 /** Die Fragen genau der Fassung, aus der das Profil stammt. Kein Rueckfall auf eine andere Fassung. */
@@ -33,6 +38,41 @@ export function productItemsFor(profile: Pick<ProductProfile, "instrument_id">) 
   const version = REPORT_VERSIONS.find((v) => v.instrument === profile.instrument_id);
   if (!version) throw new Error("unknown_workstyle_report_version");
   return version.items;
+}
+/** Aus welcher Generation ein Profil stammt - bestimmt, welche Texte zu seinen Fragen passen. */
+export function workstyleGeneration(profile: Pick<ProductProfile, "instrument_id">): "v3" | "v4" | "v5" {
+  if (profile.instrument_id.endsWith("-v5")) return "v5";
+  return profile.instrument_id.endsWith("-v4") ? "v4" : "v3";
+}
+/**
+ * Fassung 5: Zweierwahlen mit Gegenpolen. Je Bereich steht in `pole_sides`, welcher Pol links und welcher rechts
+ * liegt (rechts = oberes Ende, wie bei den Skalenfragen). Facette A von ORG (Struktur/Fluss) hat keine Achse.
+ */
+const POLE_SIDES = WORKSTYLE_PRETEST_V5.pole_sides ?? {};
+export function isPoleAxisItem(item: WorkstyleItem) {
+  const sides = POLE_SIDES[item.area_key ?? ""];
+  return item.response_format === "comparative" && !!item.poles && !!sides?.[item.poles.A] && !!sides?.[item.poles.B];
+}
+/** Der Name des gewaehlten Pols (z. B. "ausprobieren") einer Zweierwahl - sonst null. */
+export function chosenPole(profile: ProductProfile, key: string): { pole: string; strong: boolean } | null {
+  const item = productItemsFor(profile).find((i) => i.item_key === key);
+  const choice = rawChoice(profile, key);
+  if (!item?.poles || !choice || typeof choice.value !== "string") return null;
+  const a = choice.value.endsWith("_a");
+  if (!a && !choice.value.endsWith("_b")) return null;
+  return { pole: a ? item.poles.A : item.poles.B, strong: choice.value.startsWith("strong_") };
+}
+/**
+ * Position einer Pol-Zweierwahl auf der Achse links -> rechts: 0 und 1 links, 3 und 4 rechts, die Mitte (2) bleibt
+ * leer, weil es bei einer Zweierwahl keine Mitte gibt. Gleiche Teilung wie bei den Skalenfragen (5 Marken).
+ */
+export function poleSpot(profile: ProductProfile, key: string): 0 | 1 | 3 | 4 | null {
+  const item = productItemsFor(profile).find((i) => i.item_key === key);
+  if (!item || !isPoleAxisItem(item)) return null;
+  const picked = chosenPole(profile, key);
+  const side = picked ? POLE_SIDES[item.area_key ?? ""]?.[picked.pole] : null;
+  if (!picked || !side) return null;
+  return side === "left" ? (picked.strong ? 0 : 1) : picked.strong ? 4 : 3;
 }
 /** Ein Profil der frueheren Fassung: fuer die Person selbst lesbar, fuer niemanden sonst. */
 export function isOlderWorkstyleProfile(profile: Pick<ProductProfile, "instrument_id">) {
@@ -230,6 +270,9 @@ export function responseBand(
 ): string | null {
   const c = rawChoice(profile, key);
   if (!c) return null;
+  // Fassung 5: eine Zweierwahl mit Gegenpolen zaehlt als untere/obere Seite ihres Bereichs (je nach Pol, nicht nach A/B).
+  const spot = poleSpot(profile, key);
+  if (spot !== null) return spot <= 1 ? "lower" : "upper";
   return typeof c.value === "string"
     ? c.value.endsWith("_a")
       ? "A"

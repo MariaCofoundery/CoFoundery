@@ -6,14 +6,18 @@ import manifestV3 from "../../../../docs/founder-workstyle-pretest-8.5a-v3.json"
 
 import manifestV4 from "../../../../docs/founder-workstyle-pretest-8.5a-v4.json";
 
+import manifestV5 from "../../../../docs/founder-workstyle-pretest-8.5a-v5.json";
+
 export type WorkstyleForm = "A" | "B" | "C";
-export type WorkstyleResponseFormat = "frequency" | "experience_weight" | "ambiguity_comfort" | "ambiguity_discomfort" | "likelihood" | "influence" | "seriousness" | "comparative" | "behavioral";
+export type WorkstyleResponseFormat = "frequency" | "experience_weight" | "ambiguity_comfort" | "ambiguity_discomfort" | "likelihood" | "influence" | "seriousness" | "comparative" | "behavioral" | "ambiguity_unrest";
 export type WorkstyleSourceType = "live_reference" | "adapted" | "new";
 
 export type WorkstyleItem = Readonly<{
   area_key?: string;
   area_status?: "development_area" | "candidate_area" | "research_facet";
   scientific_status?: "core" | "core_research" | "candidate_core" | "research";
+  /** Fassung 5, Zweierwahl: zu welchem Pol des Bereichs (oder der ORG-Facette) Option A und B gehoeren. */
+  poles?: Readonly<{ A: string; B: string }>;
   options?: readonly Readonly<{ option_id: string; label: string }>[];
   alternatives?: readonly Readonly<{ option_id: string; label: string }>[];
   rendered_order?: readonly string[] | null;
@@ -52,6 +56,10 @@ export type WorkstyleRegistry = Readonly<{
   design?: "fixed";
   item_order?: readonly string[];
   presentation_variant?: string;
+  /** Fassung 5: Text vor der ersten Frage (de/en). */
+  instruction?: Readonly<{ de: string; en: string }>;
+  /** Fassung 5: Pol -> Seite der Bereichsskala (links = unteres, rechts = oberes Ende). */
+  pole_sides?: Readonly<Record<string, Readonly<Record<string, "left" | "right">>>>;
   scientific_counts?: Readonly<Record<string, number>>;
   forms: Readonly<Record<string, readonly string[]>>;
   response_formats: Readonly<Record<string, readonly Readonly<{ value: number; label: string }>[]>>;
@@ -69,11 +77,12 @@ export function validateWorkstyleRegistry(registry: WorkstyleRegistry): void {
   if (registry.assessment_key !== "founder-workstyle-pretest" || !registry.assessment_version || !registry.pool_version) fail("version");
   if (Object.values(registry.scoring).some(value => value !== false)) fail("unsupported_scoring");
   if (!["candidate_for_pretest", "archived"].includes(registry.status)) fail("status");
-  // v4: die 29 Produktfragen der Endfassung, kein Forschungsteil; A/B wie in v3.
+  // v4/v5: die 29 Produktfragen der Endfassung, kein Forschungsteil; A/B wie in v3.
   const v4 = registry.assessment_version === "8.5a-v4";
-  const categorical = v4 || registry.assessment_version === "8.5a-v3";
+  const v5 = registry.assessment_version === "8.5a-v5";
+  const categorical = v4 || v5 || registry.assessment_version === "8.5a-v3";
   const fixed = categorical || registry.assessment_version === "8.5a-v2";
-  const contract = v4 ? { pool: 29, core: 29, research: 0, item: "v4.0" } : categorical ? { pool: 52, core: 29, research: 23, item: "8.4-v0.4" } : { pool: 36, core: 30, research: 6, item: "8.4-v0.3" };
+  const contract = v5 ? { pool: 29, core: 29, research: 0, item: "v5.0" } : v4 ? { pool: 29, core: 29, research: 0, item: "v4.0" } : categorical ? { pool: 52, core: 29, research: 23, item: "8.4-v0.4" } : { pool: 36, core: 30, research: 6, item: "8.4-v0.3" };
   const assigned = fixed ? [...(registry.item_order ?? [])] : [...registry.core_item_keys, ...FORMS.flatMap(form => registry.forms[form])];
   if (fixed && (registry.design !== "fixed" || Object.keys(registry.forms).length || assigned.length !== contract.pool || registry.core_item_keys.length !== contract.core || registry.actual_counts.research_only !== contract.research)) fail("fixed_design");
   if (new Set(assigned).size !== assigned.length) fail("duplicate_assignment");
@@ -92,7 +101,13 @@ export function validateWorkstyleRegistry(registry: WorkstyleRegistry): void {
     if (!item.prompt.trim() || !item.construct || (!registry.response_formats[item.response_format] && !(categorical && ["comparative", "behavioral"].includes(item.response_format)))) fail("item_content");
     if (!["live_reference", "adapted", "new"].includes(item.source_type) || item.source_status !== item.source_type) fail("source_type");
     if (fixed && (item.item_version !== contract.item || item.missing_reasons.length !== 1 || item.stem !== null || item.form !== null)) fail("v2_item_contract");
-    if (v4 && (item.scientific_status !== "core" || item.area_status !== "development_area" || item.response_format === "behavioral")) fail("v4_product_only");
+    if ((v4 || v5) && (item.scientific_status !== "core" || item.area_status !== "development_area" || item.response_format === "behavioral")) fail("v4_product_only");
+    if (v5) {
+      // Fassung 5: nur Zweierwahl, Einfluss und Unruhe; jede Zweierwahl nennt die Pole beider Optionen.
+      if (!["comparative", "influence", "ambiguity_unrest"].includes(item.response_format)) fail("v5_format");
+      if ((item.response_format === "comparative") !== Boolean(item.poles)) fail("v5_poles");
+      if (item.poles && (item.poles.A === item.poles.B || !item.poles.A || !item.poles.B)) fail("v5_poles_distinct");
+    }
     if (item.missing_reasons.some(reason => reason !== "cannot_assess")) fail("missing_reason");
     if (categorical) {
       if (!["core", "core_research", "candidate_core", "research"].includes(item.scientific_status ?? "")) fail("scientific_status");
@@ -131,9 +146,12 @@ validateWorkstyleRegistry(manifestV3 as WorkstyleRegistry);
 export const WORKSTYLE_PRETEST_V3 = freezeDeep(manifestV3 as WorkstyleRegistry);
 validateWorkstyleRegistry(manifestV4 as WorkstyleRegistry);
 export const WORKSTYLE_PRETEST_V4 = freezeDeep(manifestV4 as WorkstyleRegistry);
+validateWorkstyleRegistry(manifestV5 as WorkstyleRegistry);
+export const WORKSTYLE_PRETEST_V5 = freezeDeep(manifestV5 as WorkstyleRegistry);
 
 /** Exact resolution; never reinterpret an unknown historical version as the newest. */
 export function workstyleRegistryFor(assessmentVersion: string): WorkstyleRegistry {
+  if (assessmentVersion === WORKSTYLE_PRETEST_V5.assessment_version) return WORKSTYLE_PRETEST_V5;
   if (assessmentVersion === WORKSTYLE_PRETEST_V4.assessment_version) return WORKSTYLE_PRETEST_V4;
   if (assessmentVersion === WORKSTYLE_PRETEST_V3.assessment_version) return WORKSTYLE_PRETEST_V3;
   if (assessmentVersion === WORKSTYLE_PRETEST_V2.assessment_version) return WORKSTYLE_PRETEST_V2;

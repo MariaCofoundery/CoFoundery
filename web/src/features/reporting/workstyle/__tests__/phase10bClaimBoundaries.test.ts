@@ -1,3 +1,4 @@
+import { optionOnSide } from "@/features/reporting/workstyle/__tests__/v5Fixture";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -36,15 +37,15 @@ function profile(id: string, fallback: V, overrides: Record<string, V> = {}): Pr
   return {
     person_id: id,
     assessment_id: `a-${id}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v4",
-    manifest_version: "4.0.0",
-    item_version: "v4.0",
+    instrument_id: "founder-workstyle-pretest-8-5a-v5",
+    manifest_version: "5.0.0",
+    item_version: "v5.0",
     completed_at: "2026-10-05",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = i.item_key in overrides ? overrides[i.item_key] : fallback;
       if (v === null) return { item_key: i.item_key, item_version: i.item_version, value: null, missing_reason: "cannot_assess" };
       const option =
-        v === "A" ? "lean_a" : v === "a" ? "strong_a" : v === "B" ? "lean_b" : v === "b" ? "strong_b" : v >= 3 ? "lean_b" : "lean_a";
+        v === "A" ? "lean_a" : v === "a" ? "strong_a" : v === "B" ? "lean_b" : v === "b" ? "strong_b" : optionOnSide(i, v >= 3 ? "right" : "left");
       return {
         item_key: i.item_key,
         item_version: i.item_version,
@@ -135,7 +136,7 @@ test("mixed erzeugt keine Richtung, insufficient keine Deutung", () => {
     // Phase 11.7B: Alltagssprache statt "beantwortest du unterschiedlich".
     // Phase 1 (Profil): konkret je Pol ("Manches ..., anderes ...") statt nur
     // "haengt von der Situation ab" - weiterhin ausdruecklich KEINE Richtung.
-    assert.match(m.core, /^(Manch|In manchen|Bei manch|Manchmal)/, area);
+    assert.match(m.core, /^(Manch|In manchen|Bei manch|Manchmal|Mal )/, area);
     assert.doesNotMatch(m.core, /^Je nach Situation\.?$/, area);
     assert.equal(m.exception, null, area);
     assert.equal(m.claim, `${area}.MIXED`);
@@ -160,11 +161,16 @@ test("Missing wird nie als Mitte behandelt", () => {
   assert.equal(n.exception, null);
   // 2 x oben + 3 x Missing reicht nicht (mindestens drei beantwortete Situationen).
   assert.equal(areaPattern(withArea("EXP", [5, 5, null, null, null]), "EXP").kind, "insufficient");
-  // EVI: eine von zwei Skalenfragen reicht nicht, auch wenn die Zweierwahlen beantwortet sind.
-  const evi = areaNarrative(withArea("EVI", [5, null], 5), "EVI");
+  // EVI (seit v5 fuenf Zweierwahlen mit Achse): eine beantwortete Situation reicht nicht.
+  const evi = areaNarrative(withArea("EVI", [5, null, null, null, null], 5), "EVI");
   assert.equal(evi.pattern.kind, "insufficient");
-  assert.equal(evi.itemNotes.length, 3);
-  assert.match(evi.core, /Zu unsicheren Annahmen und widersprüchlichen Quellen liegen zu wenige Antworten vor/);
+  assert.equal(evi.itemNotes.length, 0);
+  assert.match(evi.core, /zu wenige Antworten/);
+  // ORG: Fokus/Planstabilitaet tragen die Richtung; die beiden Struktur-/Fluss-Fragen bleiben Einzelantworten.
+  const org1 = areaNarrative(withArea("ORG", [5, null, null, null], 5), "ORG");
+  assert.equal(org1.pattern.kind, "insufficient");
+  assert.equal(org1.itemNotes.length, 2);
+  assert.match(org1.core, /Zu Prioritäten und Planänderungen liegen zu wenige Antworten vor/);
   // Team: eine fehlende Antwort nimmt die Situation aus dem Vergleich, statt sie als Mitte zu werten.
   const people: TeamMemberInput[] = [
     { person_id: "1", name: "A", profile: profile("1", 5) },
@@ -175,29 +181,35 @@ test("Missing wird nie als Mitte behandelt", () => {
   assert.ok(f.situations.every((s) => s.item !== "EVI-01"));
 });
 
-test("Zweierwahlen (EVI, ORG) werden nicht mit Skalen verrechnet; EXP-01 zaehlt seit v4 zur Richtung", () => {
-  // v4: EXP-01 ist eine Einfluss-Frage wie EXP-02 bis -06.
+test("Fassung 5: Zweierwahlen mit Gegenpolen tragen die Richtung ihres Bereichs; Struktur/Fluss bleibt Einzelantwort", () => {
+  // EXP: fuenf Einfluss-Fragen, unveraendert.
   const exp = profile("1", 3, { "EXP-01": 5, "EXP-02": 5, "EXP-03": 5, "EXP-04": 4, "EXP-06": 5 });
   const n = areaNarrative(exp, "EXP");
   assert.equal(n.claim, "EXP.DIRECTION.UPPER.ALL");
   assert.deepEqual(n.itemNotes, []);
   assert.deepEqual(patternItems("EXP").map((i) => i.item_key).sort(), ["EXP-01", "EXP-02", "EXP-03", "EXP-04", "EXP-06"]);
   assert.equal(areaNarrative(profile("1", 3, { "EXP-01": 1, "EXP-02": 5, "EXP-03": 5, "EXP-04": 4, "EXP-06": 5 }), "EXP").pattern.kind, "mixed");
-  // v4: EVI-01/-03/-05 sind Zweierwahlen; die Richtung tragen nur EVI-02 und EVI-06.
-  assert.deepEqual(patternItems("EVI").map((i) => i.item_key), ["EVI-02", "EVI-06"]);
-  const evi = areaNarrative(profile("3", 5, { "EVI-01": "a", "EVI-03": "B", "EVI-05": "A" }), "EVI");
+  // EVI, EL, VOICE: alle Fragen sind Zweierwahlen mit Achse; ORG: nur Fokus/Planstabilitaet.
+  assert.deepEqual(patternItems("EVI").map((i) => i.item_key).sort(), ["EVI-01", "EVI-02", "EVI-03", "EVI-05", "EVI-06"]);
+  assert.deepEqual(patternItems("ORG").map((i) => i.item_key), ["ORG-03", "ORG-04", "ORG-07", "ORG-08"]);
+  // Die Seite zaehlt, nicht A/B: Wer bei jeder EVI-Frage den Pol "genauer pruefen" waehlt, hat dieselbe Richtung,
+  // auch wenn dieser Pol mal A und mal B ist.
+  const evi = areaNarrative(profile("3", 5), "EVI");
   assert.equal(evi.claim, "EVI.DIRECTION.UPPER.ALL");
-  assert.match(evi.core, /unsicheren Annahme oder widersprechen sich seriöse Quellen/);
-  assert.doesNotMatch(evi.core, /Gegenargument/, "EVI-01 ist keine Skalenfrage mehr");
-  assert.deepEqual(evi.itemNotes.map((x) => x.claim), ["EVI.ITEM.EVI-01", "EVI.ITEM.EVI-03", "EVI.ITEM.EVI-05"]);
-  assert.match(evi.itemNotes[0].text, /deutlich eher vor der Festlegung gezielt nach Gegenargumenten/);
-  assert.match(evi.itemNotes[1].text, /bleibst du eher zunächst dabei/);
-  for (const area of AREAS.map((a) => a.key)) assert.ok(!patternItems(area).some((i) => i.response_format === "comparative"), area);
-  const org = profile("2", 5, { "ORG-03": "a", "ORG-04": "b", "ORG-07": "A", "ORG-08": "B" });
-  const o = areaNarrative(org, "ORG");
-  assert.equal(o.claim, "ORG.DIRECTION.UPPER.ALL");
-  assert.equal(o.itemNotes.length, 4);
-  assert.match(o.itemNotes[0].text, /deutlich eher mehrere davon parallel/);
+  assert.match(evi.core, /noch einmal genauer hin/);
+  assert.deepEqual(evi.itemNotes, []);
+  assert.equal(areaNarrative(profile("3", 1), "EVI").claim, "EVI.DIRECTION.LOWER.ALL");
+  // Ein Gegenpol kippt "alle" in "gemischt" - es gibt keine Mitte, die als Ausnahme zaehlt.
+  assert.equal(areaPattern(profile("3", 5, { "EVI-01": 1 }), "EVI").kind, "mixed");
+  const org = areaNarrative(profile("2", 5), "ORG");
+  assert.equal(org.claim, "ORG.DIRECTION.UPPER.ALL");
+  assert.match(org.core, /Kurs/);
+  assert.deepEqual(org.itemNotes.map((x) => x.claim), ["ORG.ITEM.ORG-01", "ORG.ITEM.ORG-02"]);
+  // Marken: Zweierwahlen liegen links/rechts, "deutlich eher" aussen, nie in der Mitte.
+  const strong = profile("4", 5, { "EVI-01": "a" });
+  const mark = overviewMark(strong, "EVI");
+  assert.ok(mark.kind === "point" && [3, 4].includes(mark.position));
+  assert.ok(situationDots(strong, "EVI").every((d) => d.position !== 2));
 });
 
 test("Teamunterschied erzeugt keine Konfliktprognose, Ähnlichkeit keinen Vorteil", () => {

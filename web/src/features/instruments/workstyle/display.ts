@@ -1,12 +1,13 @@
 /** Display-only overlay. Persisted IDs, versions, order and response values stay unchanged. */
 import en from "./display.en.json";
 import enV4 from "./display.v4.en.json";
+import enV5 from "./display.v5.en.json";
 import type { AppLocale } from "@/i18n/config";
 import { workstyleResponseOptions, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 
 type ItemCopy = { prompt: string; alternatives?: Record<string, string>; options?: Record<string, string> };
 /** Each version has its own wording; scales and A/B labels are shared. */
-const ITEMS: Record<string, Record<string, ItemCopy>> = { "8.5a-v3": en.items, "8.5a-v4": enV4.items };
+const ITEMS: Record<string, Record<string, ItemCopy>> = { "8.5a-v3": en.items, "8.5a-v4": enV4.items, "8.5a-v5": enV5.items };
 
 export function workstyleDisplayItem(item: WorkstyleItem, locale: AppLocale): WorkstyleItem {
   const items = ITEMS[item.assessment_version];

@@ -1,3 +1,4 @@
+import { optionOnSide } from "@/features/reporting/workstyle/__tests__/v5Fixture";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -36,9 +37,9 @@ function profile(id: string, fallback: number, overrides: Values = {}): ProductP
   return {
     person_id: id,
     assessment_id: `a-${id}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v4",
-    manifest_version: "4.0.0",
-    item_version: "v4.0",
+    instrument_id: "founder-workstyle-pretest-8-5a-v5",
+    manifest_version: "5.0.0",
+    item_version: "v5.0",
     completed_at: "2026-10-04",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = overrides[i.item_key] ?? fallback;
@@ -47,7 +48,7 @@ function profile(id: string, fallback: number, overrides: Values = {}): ProductP
         item_version: i.item_version,
         value:
           i.response_format === "comparative"
-            ? { optionId: v === "B" || (typeof v === "number" && v >= 3) ? "lean_b" : "lean_a" }
+            ? { optionId: optionOnSide(i, v === "B" || (typeof v === "number" && v >= 3) ? "right" : "left") }
             : { scale: typeof v === "number" ? v : 3 },
         missing_reason: null,
       };
@@ -94,7 +95,8 @@ test("Interaktionshypothesen nur bei echten Gegenpolen - und immer als Moeglichk
   for (const a of AREAS) assert.notEqual(teamAreaFinding(similar, a.key).kind, "opposite");
 
   const nuance = [person("1", "Anna", profile("1", 3)), person("2", "Ben", profile("2", 5))];
-  const f = teamAreaFinding(nuance, "EVI");
+  // Zweierwahlen haben keine Mitte - eine Nuance gibt es nur bei Skalenfragen (EXP: mittlere gegen klare Antwort).
+  const f = teamAreaFinding(nuance, "EXP");
   assert.equal(f.kind, "nuance");
   assert.equal(f.hypothesis, null, "eine Nuance ist kein Konflikt");
   assert.equal(f.question, null);

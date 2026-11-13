@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { WORKSTYLE_PRETEST_V3, WORKSTYLE_PRETEST_V4, workstyleRegistryFor, workstyleSessionItems, type WorkstyleRegistry } from "@/features/instruments/workstyle/registry";
 import { parseWorkstyleV3Answer, parseWorkstyleV4Answer } from "@/features/instruments/workstyle/answers";
 import { workstyleDisplayItem, workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
-import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_INSTRUMENT, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
+import { CURRENT_WORKSTYLE_HREF } from "@/features/instruments/workstyle/current";
 import { withWorkstyleCopy } from "@/features/instruments/workstyle/__tests__/localizedSource";
 
 const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
@@ -87,15 +87,12 @@ test("v4 item identities never collide with v3", () => {
 // ---------------------------------------------------------------------------
 const code = (path: string) => withWorkstyleCopy(readFileSync(path, "utf8")).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/\{\/\*[\s\S]*?\*\/\}/g, " ").replace(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("the app registry validates v4 and resolves it exactly; v3 stays its own version", () => {
+test("the app registry still resolves v4 exactly (an earlier version since v5); v3 stays its own version", () => {
   assert.equal(workstyleRegistryFor("8.5a-v4"), WORKSTYLE_PRETEST_V4);
   assert.equal(workstyleRegistryFor("8.5a-v3"), WORKSTYLE_PRETEST_V3);
   assert.equal(workstyleSessionItems("8.5a-v4", null).length, 29);
   assert.deepEqual(workstyleSessionItems("8.5a-v4", null).map(i => i.item_key), registry.item_order);
   assert.throws(() => workstyleSessionItems("8.5a-v4", "A"), /unexpected_workstyle_form/);
-  assert.equal(CURRENT_WORKSTYLE_INSTRUMENT, "founder-workstyle-pretest-8-5a-v4");
-  assert.equal(CURRENT_WORKSTYLE_VERSION, "8.5a-v4");
-  assert.equal(CURRENT_WORKSTYLE_HREF, "/research/workstyle-pretest?version=8.5a-v4");
 });
 
 test("v4 answers: own item version, A/B as options with presentation, scales 1-5, no v3 crossover", () => {
@@ -130,34 +127,6 @@ test("English display covers all 29 v4 questions and their A/B options without c
     if (source.find(entry => entry.key === item.item_key)!.unchanged) assert.equal(display.prompt, v3en[item.item_key].prompt);
     assert.equal(workstyleDisplayItem(item, "de"), item);
   }
-});
-
-test("questionnaire: 29 questions, no research part, no consent, no context, no timings", () => {
-  const flow = code("src/features/instruments/workstyle/WorkstyleV4Flow.tsx");
-  assert.match(flow, /const items = workstyleSessionItems\("8\.5a-v4", null\);/);
-  assert.match(flow, /startWorkstyleV4\(\)/);
-  assert.match(flow, /saveWorkstyleV4\(s\.assessment_id, item\.item_key/);
-  assert.doesNotMatch(flow, /consent|Einwilligung|startWorkstyleResearch|startWorkstyleProduct|saveWorkstyleV3|saveWorkstyleFeedback|ContextFields|research|Forschung|elapsed|response_time/i);
-  const actions = code("src/features/instruments/workstyle/actions.ts");
-  const v4 = actions.slice(actions.indexOf("export async function startWorkstyleV4"));
-  assert.match(v4, /client\.rpc\("start_workstyle_v4", \{ p_new: newAssessment \}\)/);
-  assert.match(v4, /client\.rpc\("save_workstyle_v4", \{/);
-  assert.doesNotMatch(v4, /consent|context|response_time|p_finalize/);
-});
-
-test("route: the current version opens the v4 questionnaire; v3 only resumes and points to v4 for a new start", () => {
-  const page = code("src/app/(product)/research/workstyle-pretest/page.tsx");
-  assert.match(page, /const version = query\.version \?\? CURRENT_WORKSTYLE_VERSION;/);
-  assert.match(page, /if \(version === "8\.5a-v4"\) \{/);
-  assert.match(page, /<WorkstyleV4Flow initialSession=\{session\} context=\{completionContext\} previousVersion=\{Boolean\(previous\?\.submitted_at\)\} \/>/);
-  // Earlier versions only for people who already have a participation there; an empty v3 one has nothing to resume.
-  assert.match(page, /const earlier = version !== CURRENT_WORKSTYLE_VERSION && user \? await getMyWorkstylePretest\(version\) : null;/);
-  assert.match(page, /if \(version !== CURRENT_WORKSTYLE_VERSION && \(!earlier \|\| \(version === "8\.5a-v3" && !earlier\.submitted_at && !earlier\.consent_version && earlier\.answers\.length === 0\)\)\) \{/);
-  const v3 = code("src/features/instruments/workstyle/WorkstyleProfileFlow.tsx");
-  assert.doesNotMatch(v3, /startWorkstyleProduct\(true\)/);
-  assert.match(v3, /<Link href=\{CURRENT_WORKSTYLE_HREF\}[^>]*>\s*Neue Fassung beantworten\s*<\/Link>/);
-  const actions = code("src/features/instruments/workstyle/actions.ts");
-  assert.match(actions, /if \(newAssessment \|\| !\(await getMyWorkstylePretest\("8\.5a-v3"\)\)\)/);
 });
 
 test("own report: a v3 profile is marked as the earlier version and cannot be shared from the page", () => {

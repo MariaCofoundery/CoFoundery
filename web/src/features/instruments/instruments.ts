@@ -80,6 +80,8 @@ export const INSTRUMENT_IDS = [
   "founder-workstyle-pretest-8-5a-v3",
   /** Seit 03.11.2026: die 29 Produktfragen in der Endfassung, ohne Forschungsteil. */
   "founder-workstyle-pretest-8-5a-v4",
+  /** Seit 13.11.2026: dieselben 29 Fragen als Zweierwahl-Fassung (20 A/B, 5 Einfluss, 4 Unruhe), ohne Forschungsteil. */
+  "founder-workstyle-pretest-8-5a-v5",
   /**
    * Seit 19.10.2026, Status `draft`: „Werte & Zielkonflikte", das erste echte
    * Vertiefungsmodul (Module Architecture v1.0, Phase D). Vier Situationen

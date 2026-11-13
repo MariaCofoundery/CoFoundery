@@ -1,3 +1,4 @@
+import { optionOnSide } from "@/features/reporting/workstyle/__tests__/v5Fixture";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -172,9 +173,9 @@ function profile(overrides: Record<string, V>, fallback: V = 3): ProductProfile 
   return {
     person_id: "p",
     assessment_id: "a-p",
-    instrument_id: "founder-workstyle-pretest-8-5a-v4",
-    manifest_version: "4.0.0",
-    item_version: "v4.0",
+    instrument_id: "founder-workstyle-pretest-8-5a-v5",
+    manifest_version: "5.0.0",
+    item_version: "v5.0",
     completed_at: "2026-10-05",
     answers: PRODUCT_ITEMS.map((i) => {
       const v = i.item_key in overrides ? overrides[i.item_key] : fallback;
@@ -182,7 +183,7 @@ function profile(overrides: Record<string, V>, fallback: V = 3): ProductProfile 
       return {
         item_key: i.item_key,
         item_version: i.item_version,
-        value: i.response_format === "comparative" ? { optionId: v >= 3 ? "lean_b" : "lean_a" } : { scale: v },
+        value: i.response_format === "comparative" ? { optionId: optionOnSide(i, v >= 3 ? "right" : "left") } : { scale: v },
         missing_reason: null,
       };
     }),
@@ -210,6 +211,8 @@ test("gemischt: der Satz nennt nur die Pole, die in den Antworten vorkommen", ()
     for (const [profileX, expect] of [[upperMiddle, "upper"], [lowerMiddle, "lower"], [both, "both"]] as const) {
       const pattern = areaPattern(profileX, area);
       if (pattern.kind !== "mixed") continue; // z. B. ORG mit 2 Items: kein „Mitte+Pol“-Mix moeglich
+      // Zweierwahlen (seit v5: EVI, EL, VOICE, ORG) haben keine Mitte - dort gibt es nur "beide Pole".
+      if (expect !== "both" && patternItems(area).every((i) => i.response_format === "comparative")) continue;
       const present = { upper: pattern.upper.length > 0, lower: pattern.lower.length > 0 };
       assert.equal(expect === "both" ? present.upper && present.lower : expect === "upper" ? present.upper && !present.lower : present.lower && !present.upper, true, `${area} ${expect}`);
       for (const locale of ["de", "en"] as const) {
@@ -228,7 +231,8 @@ test("gemischt: die drei Saetze je Bereich sind verschieden und in beiden Sprach
   const en = read("src/features/reporting/workstyle/displayCopyEn.ts");
   for (const source of [de, en]) {
     const blocks = [...source.matchAll(/mixedBy: \{ both: "([^"]+)", upper: "([^"]+)", lower: "([^"]+)" \}/g)];
-    assert.equal(blocks.length, 6);
+    // sechs Bereiche in den bisherigen Texten plus ORG in Fassung 5 (EVI uebernimmt die drei Saetze und ersetzt nur "both")
+    assert.equal(blocks.length, 7);
     for (const [, both, upper, lower] of blocks) assert.equal(new Set([both, upper, lower]).size, 3);
   }
   assert.doesNotMatch(de, /short: \{[^}]*mixed:/, "der leere Kurzsatz ist zurueck");

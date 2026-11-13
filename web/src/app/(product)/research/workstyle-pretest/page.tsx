@@ -7,7 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { CURRENT_WORKSTYLE_HREF, CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
 import { WorkstylePretestV2 } from "@/features/instruments/workstyle/WorkstylePretestV2";
 import { WorkstyleProfileFlow } from "@/features/instruments/workstyle/WorkstyleProfileFlow";
-import { WorkstyleV4Flow } from "@/features/instruments/workstyle/WorkstyleV4Flow";
+import { WorkstyleV5Flow } from "@/features/instruments/workstyle/WorkstyleV5Flow";
 import { getFounderTeamHomebase } from "@/features/teams/founderTeamHomebaseData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { getMyWorkstylePretest } from "@/features/instruments/workstyle/data";
@@ -23,14 +23,14 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
   const [locale, t] = await Promise.all([getRequestLocale(), getTranslations("workstyleFlow")]);
   const query = await searchParams;
   const version = query.version ?? CURRENT_WORKSTYLE_VERSION;
-  if (!["8.5a-v1", "8.5a-v2", "8.5a-v3", "8.5a-v4"].includes(version)) notFound();
+  if (!["8.5a-v1", "8.5a-v2", "8.5a-v3", "8.5a-v4", "8.5a-v5"].includes(version)) notFound();
   const { data: { user } } = await getRequestUser();
   // Phase 10 - Cutover: Fruehere Fassungen nur noch fuer Menschen, die dort
   // schon eine Teilnahme haben (HISTORICAL). Alle anderen - auch ohne
   // Anmeldung - landen in der aktuellen Fassung.
   // Seit v4: eine leere v3-Teilnahme (nichts beantwortet, keine Einwilligung) hat nichts fortzusetzen.
   const earlier = version !== CURRENT_WORKSTYLE_VERSION && user ? await getMyWorkstylePretest(version) : null;
-  if (version !== CURRENT_WORKSTYLE_VERSION && (!earlier || (version === "8.5a-v3" && !earlier.submitted_at && !earlier.consent_version && earlier.answers.length === 0))) {
+  if (version !== CURRENT_WORKSTYLE_VERSION && (version === "8.5a-v4" || !earlier || (version === "8.5a-v3" && !earlier.submitted_at && !earlier.consent_version && earlier.answers.length === 0))) {
     redirect(query.invitationId ? `${CURRENT_WORKSTYLE_HREF}&invitationId=${encodeURIComponent(query.invitationId)}` : CURRENT_WORKSTYLE_HREF);
   }
   const teamId = user && query.invitationId ? await currentTeamForInvitation(await createClient(), user.id, query.invitationId) : null;
@@ -43,14 +43,15 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
     : null;
   const research = version === "8.5a-v3" && query.teil === "forschung";
   // Aktuelle Fassung: nur die 29 Produktfragen, kein Forschungsteil.
-  if (version === "8.5a-v4") {
-    const [session, previous] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v3")]) : [null, null];
+  if (version === "8.5a-v5") {
+    const [session, previousV4, previousV3] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v4"), getMyWorkstylePretest("8.5a-v3")]) : [null, null, null];
+    const previous = previousV4?.submitted_at ? previousV4 : previousV3;
     return <main lang={locale} className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">
       <h1 className="text-3xl font-semibold">{t("entry_title")}</h1>
       {teamId && <p className="mt-4"><Link className="underline" href={`/teams/${teamId}/workstyle`}>{t("entry_back")}</Link> · {t("entry_sharing")}</p>}
-      {user ? <WorkstyleV4Flow initialSession={session} context={completionContext} previousVersion={Boolean(previous?.submitted_at)} />
+      {user ? <WorkstyleV5Flow initialSession={session} context={completionContext} previousVersion={Boolean(previous?.submitted_at)} />
         : <div className="mt-6 space-y-4"><p>{t("entry_intro")}</p><p>{t("entry_answer")}</p><p>{t("entry_no_right")}</p><Link className="underline" href={`/login?next=${encodeURIComponent(`/research/workstyle-pretest?version=${version}`)}`}>{t("entry_login")}</Link></div>}
-      {previous && !previous.withdrawn_at && <p className="mt-8"><Link className="underline" href="/research/workstyle-pretest?version=8.5a-v3">{t("entry_previous")}</Link></p>}
+      {previous && !previous.withdrawn_at && <p className="mt-8"><Link className="underline" href="/me/profile/workstyle">{t("entry_previous")}</Link></p>}
     </main>;
   }
   if (version === "8.5a-v2" || version === "8.5a-v3") {

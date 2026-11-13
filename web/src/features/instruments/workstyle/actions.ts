@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { parseWorkstyleAnswer, parseWorkstyleV3Answer, parseWorkstyleV4Answer } from "@/features/instruments/workstyle/answers";
+import { parseWorkstyleAnswer, parseWorkstyleV3Answer, parseWorkstyleV5Answer } from "@/features/instruments/workstyle/answers";
 import { assertWorkstylePretestReady, workstyleRegistryFor } from "@/features/instruments/workstyle/registry";
 import { getMyWorkstylePretest, type ResearchContext, type ResearchFeedback } from "@/features/instruments/workstyle/data";
 import { CURRENT_WORKSTYLE_VERSION } from "@/features/instruments/workstyle/current";
@@ -150,25 +150,29 @@ export async function saveWorkstyleV3(assessmentId: string, itemKey: string, inp
   return { ok: true as const, answer: saved.answer, submitted_at: saved.submitted_at, completed_at: saved.completed_at };
 }
 
-/** v4: Arbeitsprofil starten oder fortsetzen. Kein Forschungsteil, keine Einwilligung, keine Antwortzeiten. */
-export async function startWorkstyleV4(newAssessment = false) {
+/**
+ * v5 (seit 13.11.2026): Arbeitsprofil starten oder fortsetzen. Kein Forschungsteil, keine Einwilligung, keine
+ * Antwortzeiten. v4 wird nicht mehr neu begonnen und von der Oberflaeche auch nicht mehr fortgesetzt; wer dort
+ * etwas offen hat, beginnt Fassung 5 (die DB laesst das Fortsetzen von v4 weiterhin zu).
+ */
+export async function startWorkstyleV5(newAssessment = false) {
   const client = await createClient();
-  const { data, error } = await client.rpc("start_workstyle_v4", { p_new: newAssessment });
+  const { data, error } = await client.rpc("start_workstyle_v5", { p_new: newAssessment });
   if (error) return failure;
   revalidatePath(root);
   revalidatePath("/me/profile/workstyle");
   return { ok: true as const, session: data as NonNullable<Awaited<ReturnType<typeof getMyWorkstylePretest>>> };
 }
 
-export async function saveWorkstyleV4(assessmentId: string, itemKey: string, input: unknown) {
-  const session = await getMyWorkstylePretest("8.5a-v4");
+export async function saveWorkstyleV5(assessmentId: string, itemKey: string, input: unknown) {
+  const session = await getMyWorkstylePretest("8.5a-v5");
   if (!session || session.assessment_id !== assessmentId) return failure;
   let answer;
   try {
-    answer = parseWorkstyleV4Answer(itemKey, workstyleRegistryFor("8.5a-v4").pool_version, input);
+    answer = parseWorkstyleV5Answer(itemKey, workstyleRegistryFor("8.5a-v5").pool_version, input);
   } catch { return failure; }
   const client = await createClient();
-  const { data, error } = await client.rpc("save_workstyle_v4", {
+  const { data, error } = await client.rpc("save_workstyle_v5", {
     p_assessment_id: assessmentId, p_item_key: answer.item_key, p_item_version: answer.item_version,
     p_response_value: answer.response_value, p_response_option: answer.response_option, p_missing_reason: answer.missing_reason,
     p_rendered_order: answer.rendered_order,

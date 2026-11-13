@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { optionOnSide } from "@/features/reporting/workstyle/__tests__/v5Fixture";
 import {
   PRODUCT_ITEMS,
   PRODUCT_ITEMS_V3,
@@ -25,16 +26,16 @@ const member = (n: number, value = 4): ProductMember => ({
   workstyle: {
     person_id: String(n),
     assessment_id: `a${n}`,
-    instrument_id: "founder-workstyle-pretest-8-5a-v4",
-    manifest_version: "4.0.0",
-    item_version: "v4.0",
+    instrument_id: "founder-workstyle-pretest-8-5a-v5",
+    manifest_version: "5.0.0",
+    item_version: "v5.0",
     completed_at: "2026-10-04",
     answers: PRODUCT_ITEMS.map((i) => ({
       item_key: i.item_key,
       item_version: i.item_version,
       value:
         i.response_format === "comparative"
-          ? { optionId: value < 3 ? "lean_a" : "lean_b" }
+          ? { optionId: optionOnSide(i, value < 3 ? "left" : "right") }
           : { scale: value },
       missing_reason: null,
     })),
@@ -85,7 +86,10 @@ test("29 explicit core items, all six areas, raw missing and FC semantics", () =
   assert.equal(validProductProfile(p), true);
   assert.equal(individualAreas(p).length, 6);
   const a = p.answers.find((a) => a.item_key === "ORG-03")!;
-  assert.equal(responseBand(p, a.item_key), "B");
+  // Fassung 5: eine Zweierwahl zaehlt nach dem gewaehlten Pol (ORG-03: B = stabil = rechts = oben), nicht nach A/B.
+  assert.equal(responseBand(p, a.item_key), "upper");
+  // Struktur/Fluss hat keine Achse und bleibt A/B.
+  assert.equal(responseBand(p, "ORG-01"), "B");
   a.value = null;
   a.missing_reason = "cannot_assess";
   assert.equal(rawChoice(p, a.item_key), null);
@@ -209,7 +213,8 @@ test("product views share a raw-item signature; no research read path or externa
 
 test("overview is a lower ordinal median of eligible core answers, with no missing imputation", () => {
   const p = member(0).workstyle;
-  assert.equal(displayPosition(p, "EVI")?.value, 4);
+  // EVI besteht in Fassung 5 nur aus Zweierwahlen: keine Skalenmitte, die Darstellung laeuft ueber overviewMark.
+  assert.equal(displayPosition(p, "EVI"), null);
   const exp = p.answers.filter((a) =>
     ["EXP-02", "EXP-03", "EXP-04", "EXP-06"].includes(a.item_key),
   );
@@ -243,7 +248,7 @@ test("v3 stays readable for the owner only: valid profile, never part of a team,
   assert.equal(individualAreas(v3).length, 6);
   // v4 answers under a v3 identity (or the reverse) are rejected, no silent fallback.
   assert.equal(validProductProfile({ ...member(9).workstyle, instrument_id: v3.instrument_id, manifest_version: "3.0.0", item_version: "8.4-v0.4" }), false);
-  assert.equal(validProductProfile({ ...v3, instrument_id: "founder-workstyle-pretest-8-5a-v4", manifest_version: "4.0.0", item_version: "v4.0" }), false);
+  assert.equal(validProductProfile({ ...v3, instrument_id: "founder-workstyle-pretest-8-5a-v5", manifest_version: "5.0.0", item_version: "v5.0" }), false);
   const t = team(2);
   t.people[1] = { ...t.people[1], workstyle: { ...v3, person_id: t.people[1].person_id } };
   assert.equal(validProductTeam(t), false, "a team never mixes versions");

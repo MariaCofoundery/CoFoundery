@@ -33,12 +33,18 @@ export const SITUATIONS_EN: Record<string, string> = {
   "AMB-05": "continuing work with an important question still open",
   "ORG-01": "clarifying next steps before starting a larger project",
   "ORG-02": "setting your own checkpoints for longer tasks",
+  "ORG-03": "several important tasks competing for your attention at once",
+  "ORG-04": "a task that takes longer than expected",
+  "ORG-07": "an important new request in the middle of focused work",
+  "ORG-08": "several small things turning out differently than planned",
 };
 export const PREFERENCES_EN: Record<string, { context: string; A: string; B: string }> = {
   // v4: EVI-01, -03 and -05 are A/B choices.
   "EVI-01": { context: "When one of several options immediately appeals to you most", A: "you {preference} look for counterarguments before committing", B: "you {preference} start with your favorite and watch for solid reasons against it along the way" },
   "EVI-03": { context: "When new information argues against a decision you have made", A: "you {preference} reopen the decision right away and check whether to change course", B: "you {preference} stick with it for now and check whether the information carries enough weight" },
   "EVI-05": { context: "When someone on the team raises a point that makes sense", A: "you {preference} go through it right away and question your own assessment", B: "you {preference} stick with your assessment for now and look for further evidence" },
+  "ORG-01": { context: "When you are facing a larger undertaking", A: "you {preference} first work out concrete steps before really getting going", B: "you {preference} start right away with a first foothold and sort out the rest along the way" },
+  "ORG-02": { context: "When a task runs for several weeks without fixed external checkpoints", A: "you {preference} work toward the goal at your own rhythm and sense from the work itself whether you are on track", B: "you {preference} set yourself fixed intermediate goals to check whether you are on schedule" },
   "ORG-03": { context: "When several important tasks compete", A: "you {preference} keep several moving in parallel", B: "you {preference} focus on fewer tasks and let others wait" },
   "ORG-04": { context: "When a task takes longer than expected", A: "you {preference} finish it as planned first", B: "you {preference} adjust your remaining plan early" },
   "ORG-07": { context: "When an important new request arrives during focused work", A: "you {preference} interrupt your work and take care of it", B: "you {preference} stay with your current work" },
@@ -50,7 +56,7 @@ export const POLES_EN = {
   EL: { left: "clarify first", right: "try it first" },
   VOICE: { left: "wait and see", right: "raise it right away" },
   AMB: { left: "uncertainty feels okay", right: "uncertainty feels uncomfortable" },
-  ORG: { left: "get started", right: "clarify the steps first" },
+  ORG: { left: "adapt flexibly", right: "hold a steady course" },
 };
 export const COPY_EN = {
   EVI: {
@@ -100,7 +106,7 @@ export const COPY_EN = {
 };
 export const TEAM_EN = {
   EVI: {
-    similar: { upper: { text: "You {all} prefer another close look before a decision is final.", question: "How do you decide when information remains incomplete, and who starts putting the decision into practice?" }, lower: { text: "You {all} tend not to check uncertain assumptions or conflicting sources more closely before deciding.", question: "How do you recognize when a decision should be revisited?" } },
+    similar: { upper: { text: "You {all} prefer another close look before a decision is final.", question: "How do you decide when information remains incomplete, and who starts putting the decision into practice?" }, lower: { text: "You {all} tend to let an assessment stand rather than checking everything more closely up front.", question: "How do you recognize when a decision should be revisited?" } },
     differs: { summary: "In some situations your responses are close, and in others you would respond differently. This is most visible when it comes to revisiting a decision.", text: "When deciding together, one person may want to check an assessment again while another wants to move forward. You may see differently when a decision is final. These approaches could complement each other if you agree in advance when to revisit a decision.", question: "What new information would lead you to revisit a decision, and who can initiate that?" },
     card: { label: "Decisions", question: "When do we revisit a decision, and when do we deliberately let it stand?" },
   },
@@ -125,7 +131,7 @@ export const TEAM_EN = {
     card: { label: "Open questions", question: "How long do we leave an important question open before continuing anyway?" },
   },
   ORG: {
-    similar: { upper: { text: "For larger tasks, you {all} like to clarify next steps and set checkpoints first.", question: "Who adjusts your shared plan when circumstances change?" }, lower: { text: "For larger tasks, you {all} tend to get started rather than first setting out the next steps.", question: "How much shared planning do you need before starting?" } },
+    similar: { upper: { text: "With several tasks or deviations, you {all} tend to hold a steady course: few things at a time and plan changes only when they matter.", question: "Who adjusts your shared plan if circumstances do change?" }, lower: { text: "You {all} tend to stay flexible: several things in parallel and plans adjusted early.", question: "How do others know where they stand with you when plans change often?" } },
     differs: { summary: "For larger tasks, you would sometimes take different approaches: one person wants to clarify the steps first, another would prefer getting started.", text: "For larger projects, one person may clarify next steps first while another prefers getting started. You may expect different amounts of shared planning before starting.", question: "How much shared planning do you need before starting?" },
     card: { label: "Organizing work", question: "How much planning do we need before starting, and when do we adjust it?" },
   },
@@ -139,3 +145,32 @@ export const ORG_DIFFERS_EN: Record<string, { summary: string; text: string; que
 
 /** Earlier version (v3): EVI-01, -03 and -05 were likelihood questions and part of the direction. */
 export const EVI_DIRECTION_V3_EN = { upper: "When a decision is coming up, you prefer to take another close look: you look for counterarguments, check uncertain assumptions, and follow up on information that points the other way.", lower: "Once you've made an assessment, you tend to let it stand. In these situations, deliberately looking for counterarguments or investigating contrary information is less likely to be your next step.", middle: "In most situations, you leave it open whether you would review an assessment again: sometimes yes, sometimes no." };
+
+/** Fassung 5: neue Texte fuer EVI und ORG (Zweierwahlen mit Gegenpolen); die uebrigen Bereiche wie COPY_EN. */
+export const COPY_V5_EN = {
+  ...COPY_EN,
+  EVI: {
+    ...COPY_EN.EVI,
+    direction: {
+      upper: "When a decision is coming up or something argues against it, you prefer to take another close look: you check assumptions, look for counterarguments and follow up on contradictions before you commit.",
+      lower: "You tend to let an assessment stand rather than checking everything up front: you start with what you have and watch along the way for solid reasons against it and new facts.",
+      middle: COPY_EN.EVI.direction.middle,
+    },
+    mixedBy: { ...COPY_EN.EVI.mixedBy, both: "Sometimes you take another close look, sometimes you tend to let an assessment stand." },
+  },
+  ORG: {
+    direction: {
+      upper: "With several tasks or deviations, you tend to hold a steady course: you focus on a few things, stay with the work in progress and change your plan only when deviations matter.",
+      lower: "You tend to stay flexible: you keep several things moving in parallel, react quickly to new things and adjust your plan early.",
+      middle: "Whether you hold your course or adjust your plan, you mostly leave open.",
+    },
+    mixedBy: { both: "Sometimes you hold a steady course, sometimes you adjust your plan flexibly.", upper: "On some things you hold a steady course; on others you don't lean either way.", lower: "On some things you adjust flexibly; on others you don't lean either way." },
+    short: { upper: "You tend to hold a steady course.", lower: "You tend to stay flexible.", middle: "Usually somewhere in between." },
+    bands: { upper: "Here you tend to hold your course", middle: "Here it depends", lower: "Here you tend to adjust flexibly" },
+    question: {
+      upper: "When is a steady course helpful, and how do you recognize that it should be adjusted?",
+      lower: "How much reliability do others need from your plan when you stay flexible?",
+      open: "When do you hold your course, and when do you prefer to adjust your plan?",
+    },
+  },
+};

@@ -1,5 +1,5 @@
 import type { AppLocale } from "@/i18n/config";
-import { COPY_EN, SITUATIONS_EN, PREFERENCES_EN, TEAM_EN, ORG_DIFFERS_EN, EVI_DIRECTION_V3_EN } from "@/features/reporting/workstyle/displayCopyEn";
+import { COPY_EN, COPY_V5_EN, POLES_EN, SITUATIONS_EN, PREFERENCES_EN, TEAM_EN, ORG_DIFFERS_EN, EVI_DIRECTION_V3_EN } from "@/features/reporting/workstyle/displayCopyEn";
 import { workstyleDisplayOptions } from "@/features/instruments/workstyle/display";
 /**
  * Report-Aussagen fuer workstyle-report/1.0.0 - deterministisch, ohne LLM.
@@ -38,10 +38,13 @@ import { workstyleDisplayOptions } from "@/features/instruments/workstyle/displa
 import {
   AREAS,
   PRODUCT_ITEMS,
-  isOlderWorkstyleProfile,
+  chosenPole,
+  isPoleAxisItem,
+  poleSpot,
   productItemsFor,
   rawChoice,
   responseBand,
+  workstyleGeneration,
   type AreaKey,
   type ProductProfile,
 } from "@/features/reporting/workstyle/model";
@@ -81,6 +84,10 @@ export const SITUATIONS: Record<string, string> = {
   "AMB-05": "mit einer wichtigen offenen Frage weiterarbeiten",
   "ORG-01": "vor einem größeren Vorhaben zuerst nächste Schritte klären",
   "ORG-02": "dir bei langen Aufgaben selbst Zwischenpunkte setzen",
+  "ORG-03": "mehrere wichtige Aufgaben, die gleichzeitig um deine Aufmerksamkeit konkurrieren",
+  "ORG-04": "eine Aufgabe, die länger dauert als gedacht",
+  "ORG-07": "eine wichtige neue Anfrage mitten in konzentrierter Arbeit",
+  "ORG-08": "mehrere kleine Dinge, die anders laufen als geplant",
 };
 
 /**
@@ -110,7 +117,7 @@ type AreaCopy = {
   note?: string;
 };
 
-const COPY: Record<AreaKey, AreaCopy> = {
+const COPY_LEGACY: Record<AreaKey, AreaCopy> = {
   EVI: {
     direction: {
       // v4: nur EVI-02 unsichere Annahme und -06 widersprüchliche Quellen; EVI-01/-03/-05 sind Zweierwahlen
@@ -217,6 +224,45 @@ const COPY: Record<AreaKey, AreaCopy> = {
 };
 
 /**
+ * Fassung 5: EVI und ORG haben neue Fragen (Zweierwahlen mit Gegenpolen; ORG: Fokus und Planstabilitaet).
+ * Die uebrigen Bereiche behalten ihre Texte. Aeltere Profile (v3, v4) lesen weiter COPY_LEGACY.
+ */
+const COPY: Record<AreaKey, AreaCopy> = {
+  ...COPY_LEGACY,
+  EVI: {
+    ...COPY_LEGACY.EVI,
+    direction: {
+      upper: "Wenn eine Entscheidung ansteht oder etwas dagegen spricht, schaust du lieber noch einmal genauer hin: Du prüfst Annahmen, suchst Gegenargumente und gehst Widersprüchen nach, bevor du dich festlegst.",
+      lower: "Eine Einschätzung lässt du eher stehen, statt vorab alles zu prüfen: Du startest mit dem, was du hast, und achtest unterwegs auf handfeste Gegengründe und neue Fakten.",
+      middle: COPY_LEGACY.EVI.direction.middle,
+    },
+    mixedBy: { ...COPY_LEGACY.EVI.mixedBy, both: "Manchmal prüfst du noch einmal genauer, manchmal lässt du eine Einschätzung eher stehen." },
+  },
+  ORG: {
+    direction: {
+      upper: "Bei mehreren Aufgaben oder Abweichungen hältst du eher Kurs: Du konzentrierst dich auf wenige Dinge, bleibst bei der laufenden Arbeit und änderst deinen Plan erst, wenn Abweichungen ins Gewicht fallen.",
+      lower: "Du bleibst eher beweglich: Du hältst mehrere Dinge parallel in Bewegung, reagierst schnell auf Neues und passt deinen Plan früh an.",
+      middle: "Ob du Kurs hältst oder deinen Plan anpasst, lässt du meistens offen.",
+    },
+    mixedBy: { both: "Mal hältst du eher Kurs, mal passt du deinen Plan eher flexibel an.", upper: "Bei manchem hältst du Kurs, bei anderem legst du dich nicht fest.", lower: "Bei manchem passt du eher flexibel an, bei anderem legst du dich nicht fest." },
+    short: { upper: "Du hältst eher Kurs.", lower: "Du bleibst eher flexibel.", middle: "Meist irgendwo dazwischen." },
+    bands: { upper: "Hier hältst du eher Kurs", middle: "Hier kommt es darauf an", lower: "Hier passt du eher flexibel an" },
+    question: {
+      upper: "Wann ist ein stabiler Kurs hilfreich – und woran erkennst du, dass er angepasst werden sollte?",
+      lower: "Wie viel Verlässlichkeit brauchen andere von deinem Plan, wenn du flexibel bleibst?",
+      open: "Wann hältst du Kurs – und wann passt du deinen Plan lieber an?",
+    },
+  },
+};
+
+/** Welche Texte zu welchem Profil gehoeren: die der Fassung, aus der es stammt. */
+function areaCopy(profile: ProductProfile, area: AreaKey, locale: AppLocale): AreaCopy {
+  const current = workstyleGeneration(profile) === "v5";
+  if (locale === "en") return current ? COPY_V5_EN[area] : COPY_EN[area];
+  return current ? COPY[area] : COPY_LEGACY[area];
+}
+
+/**
  * Kurze, gleichwertige Pole fuer die Bereichskarten (Phase 11.7B). Rechts
  * steht immer das obere Ende der Antwortskala - dieselbe Richtung wie
  * `overviewMark`.
@@ -227,7 +273,7 @@ export const AREA_POLES: Record<AreaKey, { left: string; right: string }> = {
   EL: { left: "erst klären", right: "erst ausprobieren" },
   VOICE: { left: "eher abwarten", right: "gleich ansprechen" },
   AMB: { left: "offen ist okay", right: "offen ist unbequem" },
-  ORG: { left: "einfach anfangen", right: "erst Schritte klären" },
+  ORG: { left: "flexibel anpassen", right: "Kurs stabil halten" },
 };
 
 /** Fruehere Fassung (v3): EVI-01/-03/-05 waren Wahrscheinlichkeitsfragen und gehoerten zur Richtung. */
@@ -243,6 +289,8 @@ const PREFERENCES: Record<string, { context: string; A: string; B: string }> = {
   "EVI-01": { context: "Wenn dir eine von mehreren Möglichkeiten spontan am besten gefällt", A: "suchst du {eher} vor der Festlegung gezielt nach Gegenargumenten", B: "startest du {eher} mit deinem Favoriten und achtest unterwegs auf handfeste Gegengründe" },
   "EVI-03": { context: "Wenn nach einer Entscheidung neue Informationen dagegen sprechen", A: "nimmst du die Entscheidung {eher} direkt wieder auf und prüfst, ob du umsteuerst", B: "bleibst du {eher} zunächst dabei und prüfst, ob die neuen Informationen schwer genug wiegen" },
   "EVI-05": { context: "Wenn jemand im Team einen nachvollziehbaren Gegenpunkt einbringt", A: "gehst du den Punkt {eher} direkt durch und hinterfragst deine Einschätzung", B: "bleibst du {eher} zunächst bei deiner Einschätzung und suchst weitere Hinweise" },
+  "ORG-01": { context: "Wenn du vor einem größeren Vorhaben stehst", A: "legst du dir {eher} zuerst konkrete Schritte zurecht, bevor du richtig loslegst", B: "startest du {eher} direkt mit einem Einstieg und sortierst den Rest unterwegs" },
+  "ORG-02": { context: "Wenn eine Aufgabe über mehrere Wochen ohne feste Zwischentermine läuft", A: "arbeitest du {eher} in deinem Rhythmus auf das Ziel zu und merkst an der Sache selbst, ob du im Plan bist", B: "setzt du dir {eher} selbst feste Zwischenziele, um zu prüfen, ob du im Zeitplan liegst" },
   "ORG-03": { context: "Wenn mehrere wichtige Aufgaben konkurrieren", A: "hältst du {eher} mehrere davon parallel in Bewegung", B: "konzentrierst du dich {eher} auf wenige und lässt anderes warten" },
   "ORG-04": { context: "Wenn eine Aufgabe länger dauert als gedacht", A: "bringst du sie {eher} zunächst wie geplant zu Ende", B: "passt du deinen weiteren Plan {eher} früh an" },
   "ORG-07": { context: "Wenn während konzentrierter Arbeit eine wichtige neue Anfrage kommt", A: "unterbrichst du {eher} und kümmerst dich um das Neue", B: "bleibst du {eher} bei dem, woran du gerade arbeitest" },
@@ -256,8 +304,10 @@ const PREFERENCES: Record<string, { context: string; A: string; B: string }> = {
  * Ohne Profil gilt die aktuelle Fassung.
  */
 export function patternItems(area: AreaKey, items: readonly WorkstyleItem[] = PRODUCT_ITEMS) {
+  // Fassung 5: Zweierwahlen mit Gegenpolen tragen die Richtung (EVI, EL, VOICE, ORG Fokus/Planstabilitaet). Ohne Achse
+  // (ORG Struktur/Fluss, alle Zweierwahlen aelterer Fassungen) bleiben sie Einzelantworten.
   return items.filter(
-    (i) => i.area_key === area && !["comparative", "behavioral", "seriousness"].includes(i.response_format),
+    (i) => i.area_key === area && (isPoleAxisItem(i) || !["comparative", "behavioral", "seriousness"].includes(i.response_format)),
   );
 }
 
@@ -306,7 +356,7 @@ function itemNotes(profile: ProductProfile, area: AreaKey, locale: AppLocale): {
   }
   return Object.entries(PREFERENCES).flatMap(([key, copy]) => {
     const item = items.find((i) => i.item_key === key);
-    if (item?.area_key !== area || item.response_format !== "comparative") return [];
+    if (item?.area_key !== area || item.response_format !== "comparative" || isPoleAxisItem(item)) return [];
     const choice = rawChoice(profile, key);
     if (!choice || typeof choice.value !== "string") return [];
     const side = choice.value.endsWith("_a") ? "A" : choice.value.endsWith("_b") ? "B" : null;
@@ -336,7 +386,7 @@ export type AreaNarrative = {
 };
 
 export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): AreaNarrative {
-  const copy: AreaCopy = locale === "en" ? COPY_EN[area] : COPY[area];
+  const copy = areaCopy(profile, area, locale);
   const pattern = areaPattern(profile, area);
   const notes = itemNotes(profile, area, locale);
   const missing = productItemsFor(profile).filter((i) => i.area_key === area && !rawChoice(profile, i.item_key)).length;
@@ -346,7 +396,9 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
       ...base,
       claim: `${area}.INSUFFICIENT`,
       core:
-        area === "ORG" && notes.length
+        area === "ORG" && workstyleGeneration(profile) === "v5"
+          ? locale === "en" ? "There are not enough responses about priorities and plan changes to describe a pattern yet." : "Zu Prioritäten und Planänderungen liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
+          : area === "ORG" && notes.length
           ? locale === "en" ? "There are not enough responses about next steps and checkpoints to describe a pattern yet." : "Zu nächsten Schritten und eigenen Zwischenpunkten liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
           : area === "EVI" && notes.length
             ? locale === "en" ? "There are not enough responses about uncertain assumptions and conflicting sources to describe a pattern yet." : "Zu unsicheren Annahmen und widersprüchlichen Quellen liegen zu wenige Antworten vor, um etwas daraus abzuleiten."
@@ -365,7 +417,7 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
   return {
     ...base,
     claim: `${area}.DIRECTION.${pattern.band.toUpperCase()}.${pattern.strength.toUpperCase()}`,
-    core: area === "EVI" && isOlderWorkstyleProfile(profile) ? (locale === "en" ? EVI_DIRECTION_V3_EN : EVI_DIRECTION_V3)[pattern.band] : copy.direction[pattern.band],
+    core: area === "EVI" && workstyleGeneration(profile) === "v3" ? (locale === "en" ? EVI_DIRECTION_V3_EN : EVI_DIRECTION_V3)[pattern.band] : copy.direction[pattern.band],
     exception: pattern.exception
       ? locale === "en" ? `In one situation you are less definite: ${SITUATIONS_EN[pattern.exception]}.` : `Nur in einer Situation legst du dich weniger fest: ${SITUATIONS[pattern.exception]}.`
       : null,
@@ -378,7 +430,7 @@ export function areaNarrative(profile: ProductProfile, area: AreaKey, locale: Ap
 export function glanceSentence(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): string {
   const pattern = areaPattern(profile, area);
   if (pattern.kind === "insufficient") return locale === "en" ? "Not enough responses yet." : "Noch zu wenige Antworten.";
-  const copy: AreaCopy = locale === "en" ? COPY_EN[area] : COPY[area];
+  const copy = areaCopy(profile, area, locale);
   return pattern.kind === "mixed" ? copy.mixedBy[mixedVariant(pattern)] : copy.short[pattern.band];
 }
 
@@ -425,23 +477,44 @@ export type OverviewMark =
   | { kind: "range"; from: number; to: number; fromLabel: string; toLabel: string; options: readonly { label: string }[] }
   | { kind: "none" };
 
+/** Beschriftung der fuenf Marken einer Pol-Achse (Fassung 5): links/rechts je "deutlich eher" und "eher", Mitte leer. */
+function axisOptions(area: AreaKey, locale: AppLocale): { label: string }[] {
+  const poles = (locale === "en" ? POLES_EN : AREA_POLES)[area];
+  const strong = locale === "en" ? "clearly more: " : "deutlich eher: ";
+  const lean = locale === "en" ? "more: " : "eher: ";
+  return [{ label: strong + poles.left }, { label: lean + poles.left }, { label: "" }, { label: lean + poles.right }, { label: strong + poles.right }];
+}
+
+/**
+ * Die beantworteten Situationen eines Bereichs mit ihrer Stelle auf der Skala. Skalenfragen: die gewaehlte Stufe.
+ * Zweierwahlen mit Gegenpolen (Fassung 5): die Seite des gewaehlten Pols, "deutlich eher" aussen, "eher" innen.
+ */
+function placedChoices(profile: ProductProfile, area: AreaKey, locale: AppLocale) {
+  const items = patternItems(area, productItemsFor(profile));
+  const axis = items.length > 0 && items.every(isPoleAxisItem);
+  const options: readonly { label: string }[] = axis ? axisOptions(area, locale) : items[0] ? workstyleDisplayOptions(items[0], locale) : [];
+  const spots = items
+    .flatMap((item) => {
+      if (axis) {
+        const position = poleSpot(profile, item.item_key);
+        return position === null ? [] : [{ item, position }];
+      }
+      const choice = rawChoice(profile, item.item_key);
+      return choice && typeof choice.value === "number" ? [{ item, position: choice.position }] : [];
+    })
+    .sort((x, y) => x.position - y.position);
+  return { options, spots };
+}
+
 export function overviewMark(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): OverviewMark {
   const pattern = areaPattern(profile, area);
   if (pattern.kind === "insufficient") return { kind: "none" };
-  const items = patternItems(area, productItemsFor(profile));
-  const choices = items
-    .flatMap((i) => {
-      const c = rawChoice(profile, i.item_key);
-      return c && typeof c.value === "number" ? [c] : [];
-    })
-    .sort((a, b) => a.position - b.position);
-  const firstItem = items[0];
-  const options = workstyleDisplayOptions(firstItem, locale);
+  const { options, spots } = placedChoices(profile, area, locale);
   if (pattern.kind === "direction") {
-    const median = choices[Math.floor((choices.length - 1) / 2)];
+    const median = spots[Math.floor((spots.length - 1) / 2)];
     return { kind: "point", position: median.position, label: options[median.position].label, options };
   }
-  const from = choices[0], to = choices.at(-1)!;
+  const from = spots[0], to = spots.at(-1)!;
   return { kind: "range", from: from.position, to: to.position, fromLabel: options[from.position].label, toLabel: options[to.position].label, options };
 }
 
@@ -457,18 +530,9 @@ export type SituationDot = { itemKey: string; position: number; situation: strin
 
 export function situationDots(profile: ProductProfile, area: AreaKey, locale: AppLocale = "de"): SituationDot[] {
   if (areaPattern(profile, area).kind === "insufficient") return [];
-  const items = patternItems(area, productItemsFor(profile));
-  const firstItem = items[0];
-  if (!firstItem) return [];
-  const options = workstyleDisplayOptions(firstItem, locale);
+  const { options, spots } = placedChoices(profile, area, locale);
   const situations = locale === "en" ? SITUATIONS_EN : SITUATIONS;
-  return items
-    .flatMap((item) => {
-      const choice = rawChoice(profile, item.item_key);
-      if (!choice || typeof choice.value !== "number") return [];
-      return [{ itemKey: item.item_key, position: choice.position, situation: situations[item.item_key] ?? item.item_key, answer: options[choice.position]?.label ?? "" }];
-    })
-    .sort((a, b) => a.position - b.position);
+  return spots.map(({ item, position }) => ({ itemKey: item.item_key, position, situation: situations[item.item_key] ?? item.item_key, answer: options[position]?.label ?? "" }));
 }
 
 // ---------------------------------------------------------------------------
@@ -500,7 +564,7 @@ const TEAM_COPY: Record<AreaKey, TeamCopy> = {
   EVI: {
     similar: {
       upper: { text: "Ihr schaut {alle} lieber noch einmal genauer hin, bevor eine Entscheidung steht.", question: "Wie entscheidet ihr, wenn Informationen unvollständig bleiben – und wer stößt dann die Umsetzung an?" },
-      lower: { text: "Unsichere Annahmen und widersprüchliche Quellen prüft ihr {alle} vor einer Entscheidung eher nicht noch einmal genauer nach.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
+      lower: { text: "Eine Einschätzung lasst ihr {alle} eher stehen, statt vorab alles noch einmal genauer zu prüfen.", question: "Woran erkennt ihr, dass eine Entscheidung noch einmal geöffnet werden sollte?" },
     },
     differs: {
       summary: "Bei manchen Situationen liegt ihr nah beieinander, bei anderen würdet ihr eher unterschiedlich reagieren. Besonders sichtbar wird das bei der Frage, wann eine Entscheidung noch einmal geöffnet werden sollte.",
@@ -559,8 +623,8 @@ const TEAM_COPY: Record<AreaKey, TeamCopy> = {
   },
   ORG: {
     similar: {
-      upper: { text: "Bei größeren Aufgaben klärt ihr {alle} gern zuerst die nächsten Schritte und setzt euch Zwischenpunkte.", question: "Wer passt euren gemeinsamen Plan an, wenn sich die Lage ändert?" },
-      lower: { text: "Bei größeren Aufgaben fangt ihr {alle} eher einfach an, statt zuerst die nächsten Schritte festzulegen.", question: "Wie viel gemeinsamer Plan ist nötig, bevor ihr startet?" },
+      upper: { text: "Bei mehreren Aufgaben oder Abweichungen haltet ihr {alle} eher Kurs: wenige Dinge zugleich und Planänderungen erst, wenn sie ins Gewicht fallen.", question: "Wer passt euren gemeinsamen Plan an, wenn sich die Lage doch ändert?" },
+      lower: { text: "Ihr bleibt {alle} eher beweglich: mehrere Dinge parallel und Pläne früh angepasst.", question: "Woran erkennen andere, woran sie bei euch sind, wenn sich Pläne oft ändern?" },
     },
     differs: {
       summary: "Bei größeren Aufgaben würdet ihr teils unterschiedlich vorgehen: Mal will jemand von euch erst die Schritte klären, jemand anderes lieber einfach anfangen.",
@@ -621,7 +685,7 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale
     item: i.item_key,
     // Zweierwahlen mit ihrem Anlass, Skalenfragen mit der Situation.
     label: i.response_format === "comparative"
-      ? (locale === "en" ? PREFERENCES_EN : PREFERENCES)[i.item_key]?.context ?? i.prompt
+      ? (locale === "en" ? PREFERENCES_EN : PREFERENCES)[i.item_key]?.context ?? (locale === "en" ? SITUATIONS_EN : SITUATIONS)[i.item_key] ?? i.prompt
       : (locale === "en" ? SITUATIONS_EN : SITUATIONS)[i.item_key] ?? i.prompt,
     groups: [...new Set(bandsOf(i.item_key))]
       .sort((a, b) => BAND_ORDER.indexOf(a) - BAND_ORDER.indexOf(b))
@@ -680,9 +744,23 @@ export function teamAreaFinding(people: TeamMemberInput[], area: AreaKey, locale
   };
 }
 
+const FACET_POLES: Record<string, { de: string; en: string }> = {
+  struktur: { de: "zuerst Struktur", en: "structure first" },
+  fluss: { de: "im Fluss arbeiten", en: "working in flow" },
+};
+
 /** Localize the selected label without changing its value or position. */
 export function displayChoiceLabel(profile: ProductProfile, key: string, locale: AppLocale) {
   const choice = rawChoice(profile, key);
   const item = productItemsFor(profile).find(i => i.item_key === key);
-  return choice && item ? workstyleDisplayOptions(item, locale)[choice.position].label : null;
+  if (!choice || !item) return null;
+  // Fassung 5: statt "deutlich eher A" der Pol, den die Person gewaehlt hat.
+  const picked = chosenPole(profile, key);
+  if (picked && item.area_key) {
+    const spot = poleSpot(profile, key);
+    const poles = (locale === "en" ? POLES_EN : AREA_POLES)[item.area_key as AreaKey];
+    const text = spot === null ? FACET_POLES[picked.pole]?.[locale === "en" ? "en" : "de"] : spot <= 1 ? poles.left : poles.right;
+    if (text) return `${locale === "en" ? (picked.strong ? "clearly more: " : "more: ") : picked.strong ? "deutlich eher: " : "eher: "}${text}`;
+  }
+  return workstyleDisplayOptions(item, locale)[choice.position].label;
 }

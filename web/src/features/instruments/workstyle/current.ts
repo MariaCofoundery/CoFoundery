@@ -1,7 +1,7 @@
 /** Current journey only. Historical instrument readers retain their own IDs. */
-export const CURRENT_WORKSTYLE_INSTRUMENT = "founder-workstyle-pretest-8-5a-v4";
-export const CURRENT_WORKSTYLE_VERSION = "8.5a-v4";
-export const CURRENT_WORKSTYLE_HREF = "/research/workstyle-pretest?version=8.5a-v4";
+export const CURRENT_WORKSTYLE_INSTRUMENT = "founder-workstyle-pretest-8-5a-v5";
+export const CURRENT_WORKSTYLE_VERSION = "8.5a-v5";
+export const CURRENT_WORKSTYLE_HREF = "/research/workstyle-pretest?version=8.5a-v5";
 export const CURRENT_WORKSTYLE_REPORT_HREF = "/me/profile/workstyle";
 
 /**

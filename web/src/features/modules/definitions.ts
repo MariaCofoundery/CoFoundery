@@ -63,11 +63,11 @@ export const WORKSTYLE_MODULE: ModuleDefinition = {
       versionId: CURRENT_WORKSTYLE_VERSION,
       // Pflicht bei storage = assessments; der Adapter filtert danach.
       instrumentId: CURRENT_WORKSTYLE_INSTRUMENT,
-      compatGroup: "workstyle-8.5a-v4",
+      compatGroup: "workstyle-8.5a-v5",
     },
   ],
   completion: {
-    source: "assessments.submitted_at des aktuellen Instruments; die DB (workstyle_v4_sync_completion) setzt es, sobald alle 29 Fragen beantwortet sind",
+    source: "assessments.submitted_at des aktuellen Instruments; die DB (workstyle_v5_sync_completion) setzt es, sobald alle 29 Fragen beantwortet sind",
   },
   sharing: { ceiling: "answers", sensitivity: "standard", bindsTo: "existing_contract" },
   renderers: { profileCard: "me-profile:arbeitsweise", detail: "/me/profile/workstyle" },

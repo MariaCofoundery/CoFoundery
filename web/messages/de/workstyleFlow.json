@@ -134,5 +134,6 @@
   "v4_previous_version_note": "Wir haben die Fragen überarbeitet. Dein bisheriges Arbeitsprofil bleibt für dich sichtbar. Für dein Team, Freigaben und FIND zählt ab jetzt nur die neue Fassung.",
   "go_to_current_version": "Neue Fassung beantworten",
   "v3_research_closed_title": "Keine neuen Entwicklungsfragen in dieser Fassung",
-  "v3_research_closed_body": "Für die frühere Fassung des Arbeitsprofils nehmen wir keine neuen Teilnahmen an den Entwicklungsfragen mehr an. Dein Arbeitsprofil bleibt davon unberührt."
+  "v3_research_closed_body": "Für die frühere Fassung des Arbeitsprofils nehmen wir keine neuen Teilnahmen an den Entwicklungsfragen mehr an. Dein Arbeitsprofil bleibt davon unberührt.",
+  "v5_choice_hint": "Wähle, was im Alltag eher zu dir passt – nicht, was du für besser hältst."
 }

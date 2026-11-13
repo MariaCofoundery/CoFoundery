@@ -20,7 +20,7 @@ export function checkWorkstyleTeamReadiness(input: WorkstyleTeamInputs): Worksty
     try { registry = workstyleRegistryFor(person.assessment_version); } catch { return { status: "not_ready" }; }
     if (person.assessment_version !== first.assessment_version || person.instrument_id !== workstyleInstrumentId(person.assessment_version)
       || person.instrument_id !== first.instrument_id || person.manifest_version !== registry.registry_version || person.manifest_version !== first.manifest_version || person.venture_instrument !== "venture-alignment-v1" || person.access_status !== "explicit_share_or_owner") return { status: "not_ready" };
-    if (["8.5a-v3", "8.5a-v4"].includes(person.assessment_version) && registry.core_item_keys.some(key => {
+    if (["8.5a-v3", "8.5a-v4", "8.5a-v5"].includes(person.assessment_version) && registry.core_item_keys.some(key => {
       const item = registry.items.find(item => item.item_key === key);
       return !item || item.scientific_status !== "core" || item.research_only || item.area_status !== "development_area";
     })) return { status: "not_ready" };
