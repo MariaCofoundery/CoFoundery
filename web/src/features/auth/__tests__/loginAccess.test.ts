@@ -130,8 +130,8 @@ test("a rate limit is named, while account existence stays hidden", () => {
   // Das Limit sagt nichts darueber aus, ob es das Konto gibt - es darf also
   // benannt werden. Vorher sah es aus wie Erfolg, und man wartete auf eine
   // Mail, die nie kommt.
-  assert.match(form, /isRateLimited\(error\)/);
-  assert.match(form, /error\.status === 429/);
+  assert.match(form, /authRateLimit\(error\)/);
+  assert.match(source("src/features/auth/authRateLimit.ts"), /error\.status === 429/);
   assert.match(form, /t\("rateLimited"\)/);
 
   // Alles andere bleibt neutral: sonst laesst sich damit abfragen, wer
