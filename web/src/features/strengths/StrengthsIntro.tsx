@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
+import { spokenText } from "@/features/interviews/interviewAudio";
 import { SpaceBackdrop } from "@/features/align/SpaceBackdrop";
 import { INTRO_NOTES_MAX, INTRO_NOTE_MAX_LENGTH } from "@/features/strengths/strengthsDiscoverGuide";
 import { startDiscoverAction } from "@/features/strengths/strengthsDiscoverActions";
@@ -27,6 +28,7 @@ const BUBBLE_X = [190, 450, 560, 700];
  * Bei „weniger Bewegung“ im Gerät stehen die Bilder still (align.css); die Texte laufen weiter.
  */
 export function StrengthsIntro() {
+  const locale = useLocale();
   const t = useTranslations("strengths.discover");
   const tRoot = useTranslations("strengths");
   const [step, setStep] = useState(0);
@@ -40,11 +42,32 @@ export function StrengthsIntro() {
   const outline = ["o1", "o2", "o3"].map((key) => t(`intro.outline.${key}`));
   const atEnd = step >= DURATIONS.length;
 
+  // Ton: nur, wenn fuer die Sprache eine Aufnahme vorliegt (scripts/tts-build.ts). Er ist aus, bis man ihn anschaltet -
+  // der Browser erlaubt Ton ohnehin erst nach einem Klick. Mit Ton wartet jeder Teil, bis sein Satz zu Ende gesprochen ist.
+  const clips = stepKeys.map((_, index) => spokenText(locale, `strengths_intro.s${index + 1}`));
+  const hasSound = clips.every(Boolean);
+  const [sound, setSound] = useState(false);
+  const durationOf = (index: number) => (sound && clips[index] ? Math.max(DURATIONS[index], Math.ceil(clips[index]!.seconds * 1000) + 900) : DURATIONS[index]);
+  const player = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    player.current?.pause();
+    player.current = null;
+    const clip = sound && playing && !atEnd ? clips[step] : null;
+    if (!clip) return;
+    const audio = new Audio(clip.src);
+    player.current = audio;
+    void audio.play().catch(() => setSound(false));
+    return () => {
+      audio.pause();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sound, playing, atEnd, step]);
+
   useEffect(() => {
     if (!playing || atEnd) return;
     const timer = setInterval(() => {
       setElapsed((value) => {
-        if (value + TICK >= DURATIONS[step]) {
+        if (value + TICK >= durationOf(step)) {
           setStep((current) => current + 1);
           return 0;
         }
@@ -52,7 +75,8 @@ export function StrengthsIntro() {
       });
     }, TICK);
     return () => clearInterval(timer);
-  }, [playing, atEnd, step]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, atEnd, step, sound]);
 
   const go = (next: number) => {
     setStep(Math.max(0, Math.min(DURATIONS.length, next)));
@@ -75,8 +99,8 @@ export function StrengthsIntro() {
 
       <div className="relative flex flex-col gap-4 px-6 pt-6 sm:px-10">
         <div className="flex gap-1.5" aria-hidden="true">
-          {DURATIONS.map((duration, index) => {
-            const pct = step > index ? 100 : step === index ? Math.min(100, (elapsed / duration) * 100) : 0;
+          {DURATIONS.map((_duration, index) => {
+            const pct = step > index ? 100 : step === index ? Math.min(100, (elapsed / durationOf(index)) * 100) : 0;
             return (
               <button key={index} type="button" tabIndex={-1} onClick={() => go(index)} className="flex h-3.5 flex-1 items-center">
                 <span className="block h-[3px] w-full overflow-hidden rounded-sm bg-[#2a2c4a]">
@@ -92,6 +116,11 @@ export function StrengthsIntro() {
             <span className="text-[13px] text-[#a9abcb]">{t("intro.round")}</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            {hasSound ? (
+              <button type="button" onClick={() => setSound(!sound)} aria-pressed={sound} className={`${control} w-auto px-3.5 text-[13px]`}>
+                {sound ? t("controls.soundOff") : t("controls.soundOn")}
+              </button>
+            ) : null}
             <button type="button" onClick={() => go(step - 1)} aria-label={t("controls.prev")} className={control}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
             </button>

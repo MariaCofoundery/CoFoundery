@@ -206,6 +206,15 @@ function textsFor(locale: string): { key: string; text: string }[] {
       texts.push({ key: `${id}.followUps.${followUpId}`, text: followUp });
     }
   }
+
+  // Das Intro von "Stärken entdecken": fünf kurze Teile, je Titel und Text als ein Satzstück. Schlüssel
+  // `strengths_intro.s1` ... `s5`, ausgeliefert wie die Interviewfragen.
+  const strengths = JSON.parse(readFileSync(`messages/${locale}/strengths.json`, "utf8")) as {
+    discover: { intro: { steps: Record<string, { title: string; text: string }> } };
+  };
+  for (const [id, step] of Object.entries(strengths.discover.intro.steps)) {
+    texts.push({ key: `strengths_intro.${id}`, text: `${step.title} ${step.text}` });
+  }
   return texts;
 }
 

@@ -463,7 +463,7 @@
         "consistent": "Durchgehend in eine Richtung: {areas}",
         "mixed": "{count, plural, one {Bei einem Bereich hängt es von der Situation ab.} other {Bei # Bereichen hängt es von der Situation ab.}}",
         "ready": "Dein Arbeitsprofil steht.",
-        "empty": "Die Fragen dazu dauern etwa 12 Minuten. Danach siehst du hier dein Arbeitsprofil.",
+        "empty": "Die Fragen dazu dauern nur ein paar Minuten. Danach siehst du hier dein Arbeitsprofil.",
         "cta": "Fragebogen starten"
       },
       "strengths": {
@@ -858,7 +858,7 @@
       "minutes": "ca. {minutes} Min",
       "first": {
         "name": "Erst nur die Arbeitsweise",
-        "text": "Etwa 12 Minuten. Den Rest holst du später nach. Unser Vorschlag."
+        "text": "Ein paar Minuten. Den Rest holst du später nach. Unser Vorschlag."
       },
       "all": {
         "name": "Alles jetzt, mit Ruhe",

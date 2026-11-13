@@ -463,7 +463,7 @@
         "consistent": "Consistently in one direction: {areas}",
         "mixed": "{count, plural, one {For one area it depends on the situation.} other {For # areas it depends on the situation.}}",
         "ready": "Your work profile is complete.",
-        "empty": "The questions take about 12 minutes. After that your work profile appears here.",
+        "empty": "The questions only take a few minutes. After that your work profile appears here.",
         "cta": "Start questionnaire"
       },
       "strengths": {
@@ -858,7 +858,7 @@
       "minutes": "approx. {minutes} min",
       "first": {
         "name": "Just the work style first",
-        "text": "About 12 minutes. You catch up on the rest later. Our suggestion."
+        "text": "A few minutes. You catch up on the rest later. Our suggestion."
       },
       "all": {
         "name": "Everything now, calmly",

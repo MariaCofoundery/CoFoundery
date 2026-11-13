@@ -579,7 +579,9 @@
       "next": "Next",
       "skip": "Skip",
       "tapNext": "Tap for next",
-      "part": "Part {n}"
+      "part": "Part {n}",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off"
     },
     "intro": {
       "round": "Round 1 of 3 · Settling in",

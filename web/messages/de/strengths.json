@@ -579,7 +579,9 @@
       "next": "Weiter",
       "skip": "Überspringen",
       "tapNext": "Tippen für weiter",
-      "part": "Teil {n}"
+      "part": "Teil {n}",
+      "soundOn": "Ton an",
+      "soundOff": "Ton aus"
     },
     "intro": {
       "round": "Runde 1 von 3 · Einstimmen",

@@ -17,7 +17,7 @@ const de = {
   kicker: "„Wir verstehen uns super“ ist keine Gründungsgrundlage.",
   headline: ["Erst ", "reden.", "Dann gründen."],
   lead: "Finde raus, wie du arbeitest. Seht, wo ihr verschieden tickt. Dann Nägel mit Köpfen: Rollen, Zeit, Geld, Entscheidungen.",
-  fineStart: "Der Start dauert etwa 12 Minuten. Deine Antworten sieht erst mal nur du.",
+  fineStart: "Der Start dauert nur ein paar Minuten. Deine Antworten sieht erst mal nur du.",
   fineBeta: "Closed Beta: Du brauchst einen Zugangscode.", fineRequest: "Zugang anfragen",
   deckLabel: "Fragen, die ihr besser vor der Gründung klärt",
   deck: [
@@ -71,7 +71,7 @@ const en: typeof de = {
   kicker: "“We get along great” is not a basis for a company.",
   headline: ["Talk ", "first.", "Then found."],
   lead: "Find out how you work. See where you tick differently. Then get specific: roles, time, money, decisions.",
-  fineStart: "Getting started takes about 12 minutes. For now, only you see your answers.",
+  fineStart: "Getting started takes just a few minutes. For now, only you see your answers.",
   fineBeta: "Closed beta: you need an access code.", fineRequest: "Request access",
   deckLabel: "Questions you are better off settling before you found",
   deck: [

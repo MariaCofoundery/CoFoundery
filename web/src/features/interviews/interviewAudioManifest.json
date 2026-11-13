@@ -191,6 +191,36 @@
       "seconds": 3.75,
       "wav": "want_to_own_followUps_whatYouWouldNeed.wav",
       "mp3": "want_to_own_followUps_whatYouWouldNeed.mp3"
+    },
+    "strengths_intro.s1": {
+      "hash": "5514050668dc7f81",
+      "seconds": 6.4,
+      "wav": "strengths_intro_s1.wav",
+      "mp3": "strengths_intro_s1.mp3"
+    },
+    "strengths_intro.s2": {
+      "hash": "3a9ef72eefad3d12",
+      "seconds": 6.25,
+      "wav": "strengths_intro_s2.wav",
+      "mp3": "strengths_intro_s2.mp3"
+    },
+    "strengths_intro.s3": {
+      "hash": "560438f0043911e2",
+      "seconds": 6.74,
+      "wav": "strengths_intro_s3.wav",
+      "mp3": "strengths_intro_s3.mp3"
+    },
+    "strengths_intro.s4": {
+      "hash": "0f9091e5e7b9837e",
+      "seconds": 6.27,
+      "wav": "strengths_intro_s4.wav",
+      "mp3": "strengths_intro_s4.mp3"
+    },
+    "strengths_intro.s5": {
+      "hash": "efa752a81d946fb4",
+      "seconds": 9.09,
+      "wav": "strengths_intro_s5.wav",
+      "mp3": "strengths_intro_s5.mp3"
     }
   }
 }
