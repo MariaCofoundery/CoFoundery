@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { authLanguageMetadata } from "@/features/auth/authLanguage";
+import { authRateLimit } from "@/features/auth/authRateLimit";
 import { normalizeNextPath } from "@/features/auth/authRedirects";
 import {
   BETA_ACCESS_REQUEST_EMAIL,
@@ -80,6 +81,13 @@ function statusMessage(status: string | undefined, t: AuthT) {
     return {
       tone: "error" as const,
       text: t("start.status.connectFailed"),
+    };
+  }
+
+  if (status === "rate_limited" || status === "cooldown") {
+    return {
+      tone: "error" as const,
+      text: t(status === "cooldown" ? "start.status.cooldown" : "start.status.rateLimited"),
     };
   }
 
@@ -179,7 +187,8 @@ export default async function StartPage({
     });
 
     if (error) {
-      redirect(buildStartHref("send_failed", redirectNextPath));
+      const limit = authRateLimit(error);
+      redirect(buildStartHref(limit ? (limit.kind === "cooldown" ? "cooldown" : "rate_limited") : "send_failed", redirectNextPath));
     }
 
     // Damit das Codefeld nach der Weiterleitung weiss, wen es fragt. Im Cookie

@@ -4,6 +4,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
 import { authLanguageMetadata } from "@/features/auth/authLanguage";
+import { authRateLimit } from "@/features/auth/authRateLimit";
 import { EmailCodeForm } from "@/features/auth/EmailCodeForm";
 import { getPublicAppOrigin, isLocalDevelopmentOrigin } from "@/lib/publicAppOrigin";
 
@@ -75,9 +76,10 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
     // Stundenlimit fuer Mails reisst, bekam "Wir senden dir einen Link" und
     // wartete auf eine Mail, die nie kommt. Das Limit sagt nichts darueber
     // aus, ob das Konto existiert - es darf also benannt werden.
-    if (error && isRateLimited(error)) {
+    const limit = authRateLimit(error);
+    if (limit) {
       setStatus("error");
-      setMessage(t("rateLimited"));
+      setMessage(limit.kind === "cooldown" ? t("rateLimitedCooldown", { seconds: limit.seconds }) : t("rateLimited"));
       return;
     }
 
@@ -142,17 +144,4 @@ export function MagicLinkForm({ nextPath = "/dashboard", shouldCreateUser = fals
     {status === "sent" ? <EmailCodeForm defaultEmail={email} nextPath={nextPath} /> : null}
     </>
   );
-}
-
-
-/**
- * Ob Supabase wegen des Stundenlimits abgelehnt hat.
- *
- * Geprueft wird der Status, nicht der Text: Die Meldung ist nicht stabil und
- * nicht uebersetzt. `code` gibt es erst in neueren Fassungen, deshalb beides.
- */
-function isRateLimited(error: { status?: number; code?: string; message?: string }) {
-  if (error.status === 429) return true;
-  if (error.code === "over_email_send_rate_limit") return true;
-  return /rate limit/i.test(error.message ?? "");
 }
