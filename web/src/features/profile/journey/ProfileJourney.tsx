@@ -4,7 +4,12 @@ import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
 import { FOCUS_HUES, FOCUS_ICONS } from "@/features/profile/journey/focusVisuals";
-import { completeJourneyAction } from "@/features/profile/journey/journeyActions";
+import {
+  completeJourneyAction,
+  completeJourneyToSetupAction,
+  finishSetupAction,
+  saveSetupProgressAction,
+} from "@/features/profile/journey/journeyActions";
 import {
   JOURNEY_ALIGN_PLANS,
   JOURNEY_AREAS,
@@ -12,6 +17,7 @@ import {
   JOURNEY_REMOTE_MODES,
   nextPathFor,
   startAreaFor,
+  type SetupStep,
   type JourneyAlignPlan,
   type JourneyArea,
   type JourneyFocus,
@@ -28,6 +34,19 @@ function Check({ on }: { on: boolean }) {
     <span aria-hidden="true" className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 transition ${on ? "border-violet-600 bg-violet-600 text-white" : "border-slate-300 text-transparent"}`}>
       <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
     </span>
+  );
+}
+
+/** "Erst mein Profil einrichten": derselbe Abschluss, nur mit der Liste der kleinen Schritte als Ziel. */
+function SetupFirstButton({ label, hint }: { label: string; hint: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <>
+      <button type="submit" formAction={completeJourneyToSetupAction} disabled={pending} className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-violet-300 bg-white px-6 text-base font-semibold text-violet-900 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+        {label}
+      </button>
+      <span className="text-center text-xs text-slate-500">{hint}</span>
+    </>
   );
 }
 
@@ -54,8 +73,17 @@ export function ProfileJourney({
   initialAreas = [],
   next,
   error,
+  mode = "start",
+  setup,
 }: {
   initialName: string;
+  /**
+   * "start": zwei Karten (Bereiche, Name) und der Abschluss - danach ist man drin.
+   * "setup": die kleinen Profilschritte, jeder wird beim Weitergehen sofort gespeichert.
+   */
+  mode?: "start" | "setup";
+  /** Nur im Setup: was schon gespeichert ist und welche Schritte noch offen sind. */
+  setup?: { headline: string; bio: string; where: JourneyRemoteMode | ""; openSteps: SetupStep[] };
   /** Vorbelegt nur, wenn ein Magic Link ausdruecklich eine Rolle mitbringt. */
   initialAreas?: JourneyArea[];
   next: string;
@@ -66,20 +94,20 @@ export function ProfileJourney({
   const [start, setStart] = useState<JourneyArea | "">("");
   const [infoOpen, setInfoOpen] = useState<JourneyArea | null>(null);
   const [name, setName] = useState(initialName);
-  const [headline, setHeadline] = useState("");
-  const [bio, setBio] = useState("");
+  const [headline, setHeadline] = useState(setup?.headline ?? "");
+  const [bio, setBio] = useState(setup?.bio ?? "");
   const [foci, setFoci] = useState<JourneyFocus[]>([]);
   const [subs, setSubs] = useState<Partial<Record<JourneyFocus, string[]>>>({});
   const [openOne, setOpenOne] = useState<JourneyFocus | null>(null);
-  const [where, setWhere] = useState<JourneyRemoteMode | "">("");
+  const [where, setWhere] = useState<JourneyRemoteMode | "">(setup?.where ?? "");
   const [alignPlan, setAlignPlan] = useState<JourneyAlignPlan>("first");
   const [index, setIndex] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
 
-  const steps = useMemo<StepId[]>(
-    () => ["areas", "name", "headline", "about", "can", "where", ...(areas.includes("align") ? (["alignPlan"] as StepId[]) : []), "done"],
-    [areas]
-  );
+  const isSetup = mode === "setup";
+  const setupSteps = useMemo<StepId[]>(() => (setup?.openSteps ?? []).map((item) => (item === "headline" ? "headline" : item === "about" ? "about" : item === "can" ? "can" : "where")), [setup]);
+  // Der Start besteht nur aus zwei Karten und dem Abschluss; Align-Plan und Profilfragen gibt es erst danach.
+  const steps = useMemo<StepId[]>(() => (isSetup ? setupSteps : ["areas", "name", "done"]), [isSetup, setupSteps]);
   const step = steps[Math.min(index, steps.length - 1)];
 
   const expertise = useMemo(() => {
@@ -93,12 +121,15 @@ export function ProfileJourney({
   }, [foci, subs, t]);
 
   const effectiveStart = startAreaFor(areas, start);
-  const payload = JSON.stringify({ areas, name, headline, bio, foci, expertise, where, alignPlan, start: effectiveStart });
+  const payload = JSON.stringify(isSetup ? { headline, bio, expertise, where } : { areas, name, headline, bio, foci, expertise, where, alignPlan, start: effectiveStart });
   const nextPath = nextPathFor({ areas, alignPlan, start: effectiveStart });
   const canNext = step === "areas" ? areas.length > 0 : step === "name" ? name.trim().length > 0 : true;
   const isDone = step === "done";
+  const isLastSetupStep = isSetup && index >= steps.length - 1;
 
   function go(to: number) {
+    // Im Setup wird beim Weitergehen gespeichert - nicht erst am Ende. Ein Fehler hier stoert den Weg nicht.
+    if (isSetup && to > index) void saveSetupProgressAction(payload);
     setIndex(Math.max(0, Math.min(steps.length - 1, to)));
     scroller.current?.scrollTo({ top: 0 });
   }
@@ -148,7 +179,7 @@ export function ProfileJourney({
             : t("done.nextAlign");
 
   return (
-    <form action={completeJourneyAction} onKeyDown={onKeyDown} className="mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,.3)]">
+    <form action={isSetup ? finishSetupAction : completeJourneyAction} onKeyDown={onKeyDown} className="mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,.3)]">
       <input type="hidden" name="payload" value={payload} />
       <input type="hidden" name="next" value={next} />
 
@@ -341,14 +372,16 @@ export function ProfileJourney({
       </div>
 
       <div className="grid gap-1.5 border-t border-slate-200 px-6 pb-5 pt-3">
-        {isDone ? (
-          <FinishButton label={t("finish")} pendingLabel={t("finishing")} />
+        {isDone || isLastSetupStep ? (
+          <FinishButton label={isSetup ? t("setup.finish") : t("finish")} pendingLabel={t("finishing")} />
         ) : (
           <button type="button" disabled={!canNext} onClick={() => go(index + 1)} className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
             {t("next")}
           </button>
         )}
-        {!isDone && step !== "areas" && step !== "name" ? (
+        {isDone && !isSetup ? (
+          <SetupFirstButton label={t("done.setupCta")} hint={t("done.setupHint")} />
+        ) : !isDone && !isLastSetupStep && step !== "areas" && step !== "name" ? (
           <button type="button" onClick={() => go(index + 1)} className="min-h-10 text-sm font-semibold text-slate-500 hover:text-slate-900">{t("skip")}</button>
         ) : <span className="min-h-10" />}
       </div>

@@ -928,7 +928,8 @@
       "tradeoffs": "Werte & Zielkonflikte",
       "otherTeams": "Andere Teams",
       "allQuestionnaires": "Alle Fragebögen und Gespräche",
-      "openLabel": "Noch offen:"
+      "openLabel": "Noch offen:",
+      "setupProfile": "Profil einrichten"
     },
     "talk": {
       "title": "Für euer nächstes Gespräch",

@@ -879,7 +879,14 @@
       "nextDashboard": "Dein Überblick",
       "startQ": "Womit möchtest du anfangen?",
       "startHint": "Die anderen Bereiche findest du danach jederzeit im Menü.",
-      "nextAdvise": "Dein Advisor-Bereich"
+      "nextAdvise": "Dein Advisor-Bereich",
+      "setupCta": "Erst mein Profil einrichten",
+      "setupHint": "Vier kurze Schritte, jeder wird sofort gespeichert."
+    },
+    "setup": {
+      "finish": "Fertig",
+      "later": "Später weitermachen",
+      "autosave": "Alles wird beim Weitergehen gespeichert. Du kannst jederzeit aufhören."
     }
   },
   "values": {

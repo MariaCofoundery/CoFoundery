@@ -8,6 +8,7 @@ import { ProductNavigationOverride } from "@/features/navigation/ProductShell";
 import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardNextStep } from "@/features/dashboard/DashboardNextStep";
 import { DashboardWaiting, type RunningEntry, type WaitingCard } from "@/features/dashboard/DashboardWaiting";
+import { openSetupSteps } from "@/features/profile/journey/journeyModel";
 import { DashboardAside } from "@/features/dashboard/DashboardAside";
 import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
@@ -112,6 +113,9 @@ export default async function DashboardPage({
     redirect(hasConnect === true ? "/connect" : "/start");
   }
   const alignState = await getAlignDashboardState(user.id);
+  // Offene Schritte des Profil-Setups (Zeile, zwei Saetze, Staerken, Arbeitsort): ein stiller Link in "Dein Stand".
+  const { data: setupCore } = await supabase.from("person_core").select("headline, bio, expertise, remote_mode").eq("user_id", user.id).maybeSingle();
+  const setupOpen = setupCore ? openSetupSteps(setupCore).length > 0 : false;
 
   let invitationRows = initialInvitationRows;
   const currentTeamEntries = await Promise.all(invitationRows.filter(i => i.status === "accepted").map(async i => [i.id, await currentTeamForInvitation(supabase, user.id, i.id)] as const));
@@ -368,6 +372,7 @@ export default async function DashboardPage({
           otherTeams={realTeams.filter((team) => team.id !== selectedTeam?.id).map((team) => ({ id: team.id, name: teamName(team) }))}
           conversation={conversation}
           showInvite={start.next.kind !== "invite"}
+          setupOpen={setupOpen}
         />
       </div>
 

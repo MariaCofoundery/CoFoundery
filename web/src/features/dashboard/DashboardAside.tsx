@@ -31,6 +31,7 @@ export async function DashboardAside({
   otherTeams,
   conversation,
   showInvite = true,
+  setupOpen = false,
 }: {
   parts: ProfileParts;
   team: StandTeam | null;
@@ -38,6 +39,8 @@ export async function DashboardAside({
   conversation: { label: string; question: string } | null;
   /** Ist "Co-Founder einladen" schon der naechste Schritt, steht es hier nicht noch einmal. */
   showInvite?: boolean;
+  /** Das Profil-Setup hat noch offene Schritte: ein stiller Link dorthin. */
+  setupOpen?: boolean;
 }) {
   const t = await getTranslations("dashboard.start");
   const keys = ["work", "can", "strengths", "direction"] as const;
@@ -115,6 +118,7 @@ export async function DashboardAside({
           ) : null}
         </dl>
         <p className="mt-2.5 flex flex-wrap items-center gap-x-4">
+          {setupOpen ? <Link href="/welcome/profil" className="inline-flex min-h-10 items-center text-[15px] font-semibold text-violet-800 hover:underline">{t("stand.setupProfile")}</Link> : null}
           <Link href="/me/profile" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
           <Link href="/fragebogen" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
         </p>

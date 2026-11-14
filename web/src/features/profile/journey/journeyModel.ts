@@ -172,3 +172,38 @@ export function nextPathFor(payload: Pick<JourneyPayload, "areas" | "alignPlan">
   }
   return "/dashboard";
 }
+
+/** Die Schritte des Profil-Setups, in dieser Reihenfolge. Jeder wird einzeln gespeichert. */
+export const SETUP_STEPS = ["headline", "about", "can", "where"] as const;
+export type SetupStep = (typeof SETUP_STEPS)[number];
+
+export type SetupPayload = { headline: string; bio: string; expertise: string[]; where: JourneyRemoteMode | "" };
+
+/** Streng gelesen wie die Reise: nur bekannte Felder, begrenzte Laengen, nichts anderes. */
+export function parseSetupPayload(raw: unknown): SetupPayload | null {
+  if (typeof raw !== "string" || raw.length > 20000) return null;
+  let input: Record<string, unknown>;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    input = parsed as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+  const expertise = Array.isArray(input.expertise)
+    ? [...new Set(input.expertise.map((item) => text(item, JOURNEY_LIMITS.expertiseItem)).filter((item) => item.length > 0 && !item.includes(",")))].slice(0, JOURNEY_LIMITS.expertise)
+    : [];
+  return {
+    headline: text(input.headline, JOURNEY_LIMITS.headline),
+    bio: text(input.bio, JOURNEY_LIMITS.bio),
+    expertise,
+    where: (JOURNEY_REMOTE_MODES as readonly string[]).includes(input.where as string) ? (input.where as JourneyRemoteMode) : "",
+  };
+}
+
+/** Welche Schritte noch offen sind - aus dem, was schon gespeichert ist. */
+export function openSetupSteps(core: { headline?: string | null; bio?: string | null; expertise?: readonly string[] | null; remote_mode?: string | null }): SetupStep[] {
+  return SETUP_STEPS.filter((step) =>
+    step === "headline" ? !core.headline?.trim() : step === "about" ? !core.bio?.trim() : step === "can" ? !(core.expertise && core.expertise.length > 0) : !core.remote_mode,
+  );
+}

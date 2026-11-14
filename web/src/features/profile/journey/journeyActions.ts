@@ -11,6 +11,7 @@ import {
   interestsFor,
   nextPathFor,
   parseJourneyPayload,
+  parseSetupPayload,
   rolesFor,
 } from "@/features/profile/journey/journeyModel";
 import { markOnboardingComplete } from "@/features/profile/onboardingCompletion";
@@ -18,6 +19,7 @@ import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/
 import { createClient } from "@/lib/supabase/server";
 
 const BACK = "/welcome/reise";
+const SETUP = "/welcome/profil";
 
 /**
  * Der Abschluss der Kartenreise.
@@ -43,7 +45,7 @@ const BACK = "/welcome/reise";
  * Markierung. Bricht es dazwischen ab, bekommt die Person den Einstieg noch
  * einmal - und landet nicht ohne Bereich ausserhalb des Produkts.
  */
-export async function completeJourneyAction(formData: FormData) {
+async function finishJourney(formData: FormData, toSetup: boolean) {
   const client = await createClient();
   const {
     data: { user },
@@ -106,7 +108,53 @@ export async function completeJourneyAction(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/connect", "layout");
 
+  // Wer das Profil gleich einrichten will, geht dorthin; sonst bleibt ein eigenes Ziel (Einladung und
+  // Aehnliches), sonst kommt der erste Bereich.
+  if (toSetup) redirect(SETUP);
   const requested = normalizeNextPath(String(formData.get("next") ?? ""));
-  // Ein eigenes Ziel (Einladung und Aehnliches) bleibt; sonst der erste Bereich.
   redirect(requested !== "/dashboard" ? requested : nextPathFor(payload));
+}
+
+export async function completeJourneyAction(formData: FormData) {
+  return finishJourney(formData, false);
+}
+
+/** "Erst mein Profil einrichten": derselbe Abschluss, aber das Ziel ist die Liste der kleinen Schritte. */
+export async function completeJourneyToSetupAction(formData: FormData) {
+  return finishJourney(formData, true);
+}
+
+/**
+ * Ein Schritt des Profil-Setups, sofort gespeichert.
+ *
+ * Wird vom Browser nach JEDER Karte aufgerufen (Weiter oder Ueberspringen), nicht erst am Ende - wer mitten
+ * drin aufhoert, hat das Bisherige. Nur Felder aus dem Setup, nur was ausgefuellt wurde: ein leeres Feld
+ * ueberschreibt nichts, und es wird nichts veroeffentlicht (Sichtbarkeit, Freigaben, Foto bleiben unberuehrt).
+ */
+export async function saveSetupProgressAction(rawPayload: string): Promise<{ ok: boolean }> {
+  const client = await createClient();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user?.id) return { ok: false };
+  const payload = parseSetupPayload(rawPayload);
+  if (!payload) return { ok: false };
+
+  const core: Record<string, unknown> = {};
+  if (payload.headline) core.headline = payload.headline;
+  if (payload.bio) core.bio = payload.bio;
+  if (payload.expertise.length > 0) core.expertise = payload.expertise;
+  if (payload.where) core.remote_mode = payload.where;
+  if (Object.keys(core).length === 0) return { ok: true };
+
+  const { error, count } = await client.from("person_core").update(core, { count: "exact" }).eq("user_id", user.id);
+  if (error || count === 0) return { ok: false };
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+/** Das Ende des Setups: noch einmal alles speichern (nur Gefuelltes), dann zur Uebersicht. */
+export async function finishSetupAction(formData: FormData) {
+  await saveSetupProgressAction(String(formData.get("payload") ?? ""));
+  redirect("/dashboard");
 }

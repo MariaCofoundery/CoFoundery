@@ -928,7 +928,8 @@
       "tradeoffs": "Values & trade-offs",
       "otherTeams": "Other teams",
       "allQuestionnaires": "All questionnaires and conversations",
-      "openLabel": "Still open:"
+      "openLabel": "Still open:",
+      "setupProfile": "Set up your profile"
     },
     "talk": {
       "title": "For your next conversation",

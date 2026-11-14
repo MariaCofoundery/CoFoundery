@@ -879,7 +879,14 @@
       "nextDashboard": "Your overview",
       "startQ": "Where would you like to start?",
       "startHint": "You can find the other areas in the menu any time afterwards.",
-      "nextAdvise": "Your advisor area"
+      "nextAdvise": "Your advisor area",
+      "setupCta": "Set up my profile first",
+      "setupHint": "Four short steps, each saved right away."
+    },
+    "setup": {
+      "finish": "Done",
+      "later": "Continue later",
+      "autosave": "Everything is saved as you go. You can stop at any time."
     }
   },
   "values": {
