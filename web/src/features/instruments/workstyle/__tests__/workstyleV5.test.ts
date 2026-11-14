@@ -157,3 +157,34 @@ test("route: the current version opens the v5 questionnaire; v4 is no longer res
   assert.match(page, /version === "8\.5a-v4" \|\| !earlier/);
   assert.match(page, /\["8\.5a-v1", "8\.5a-v2", "8\.5a-v3", "8\.5a-v4", "8\.5a-v5"\]/);
 });
+
+test("Zwischenstand nach drei Antworten: die gewählten Aussagen in den Worten der Person, ohne Deutung", async () => {
+  const { interimRows, INTERIM_AFTER } = await import("@/features/instruments/workstyle/interim");
+  assert.equal(INTERIM_AFTER, 3);
+  const items = workstyleSessionItems("8.5a-v5", null);
+  const answers = [
+    { item_key: "ORG-01", response_value: null, response_option: "strong_b", missing_reason: null },
+    { item_key: "EXP-01", response_value: null, response_option: null, missing_reason: "cannot_assess" as const },
+    { item_key: "VOICE-01", response_value: null, response_option: "lean_a", missing_reason: null },
+    { item_key: "AMB-01", response_value: 4, response_option: null, missing_reason: null },
+  ];
+  const de = interimRows(answers, items, "de", { strong: "Deutlich eher", lean: "Eher" });
+  // "Kann ich noch nicht einschätzen" erscheint nicht; es bleiben die drei beantworteten.
+  assert.deepEqual(de.map(row => row.itemKey), ["ORG-01", "VOICE-01", "AMB-01"]);
+  assert.match(de[0].text, /^Deutlich eher: Ich starte direkt mit einem Einstieg/);
+  assert.match(de[1].text, /^Eher: Ich bringe den Gegenpunkt direkt noch ein/);
+  assert.doesNotMatch(de[0].context, /Was beschreibt dich eher\?/);
+  assert.match(de[0].context, /größeren Vorhaben/);
+  const en = interimRows(answers, items, "en", { strong: "Clearly more", lean: "More" });
+  assert.doesNotMatch(JSON.stringify(en), /[äöüÄÖÜß]/);
+  assert.match(en[0].text, /^Clearly more: I start right away/);
+  // Keine Punkte, kein Typ, keine Richtung im Text.
+  assert.doesNotMatch(JSON.stringify(de), /Punkte|Typ|Score|Prozent/);
+  const flow = code("src/features/instruments/workstyle/WorkstyleV5Flow.tsx");
+  assert.match(flow, /saved\.answers\.length >= INTERIM_AFTER && !saved\.submitted_at/);
+  assert.match(flow, /data-workstyle-interim/);
+  for (const locale of ["de", "en"]) {
+    const bundle = read(`messages/${locale}/workstyleFlow.json`);
+    for (const key of ["interim_title", "interim_text", "interim_note", "interim_continue", "interim_strong", "interim_lean"]) assert.ok(bundle[key], `${locale}: ${key}`);
+  }
+});

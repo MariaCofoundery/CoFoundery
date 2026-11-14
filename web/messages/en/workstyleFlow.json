@@ -135,5 +135,12 @@
   "go_to_current_version": "Answer the new version",
   "v3_research_closed_title": "No new development questions in this version",
   "v3_research_closed_body": "We no longer accept new participation in the development questions for the earlier version of the workstyle profile. Your workstyle profile is not affected.",
-  "v5_choice_hint": "Choose what fits you better in everyday work – not what you think is better."
+  "v5_choice_hint": "Choose what fits you better in everyday work – not what you think is better.",
+  "interim_eyebrow": "Along the way",
+  "interim_title": "Here is what you've said so far.",
+  "interim_text": "Three situations, in your words. More answers make the picture more precise.",
+  "interim_note": "A glimpse of three of {total} situations. No scores, no type – only what you said.",
+  "interim_continue": "Continue",
+  "interim_strong": "Clearly more",
+  "interim_lean": "More"
 }

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { workstyleSessionItems, WORKSTYLE_PRETEST_V5, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
+import { INTERIM_AFTER, interimRows } from "@/features/instruments/workstyle/interim";
 import { saveWorkstyleV5, startWorkstyleV5 } from "@/features/instruments/workstyle/actions";
 import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstyleQuestion";
 import type { PretestSession } from "@/features/instruments/workstyle/data";
@@ -50,6 +51,9 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
   // Nach "Los geht's" sofort zur ersten Frage - auch bevor es eine Antwort gibt.
   const [started, setStarted] = useState(false);
   const [confirmRetake, setConfirmRetake] = useState(false);
+  // Einmal nach der dritten Antwort: "Das hast du bisher gesagt" - der erste Moment, in dem etwas zurueckkommt.
+  const [interim, setInterim] = useState(false);
+  const [interimSeen, setInterimSeen] = useState(() => (initialSession?.answers.length ?? 0) >= INTERIM_AFTER);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   function run(action: () => Promise<void>) {
@@ -90,7 +94,21 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
   return <section className="mt-8">
     {error && <p role="alert" className="mb-5 rounded-xl bg-red-50 p-4 text-red-900">{error}</p>}
 
-    {open > 0 && <>
+    {open > 0 && interim && <div className={card} data-workstyle-interim>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">{t("interim_eyebrow")}</p>
+      <h2 className="mt-2 text-2xl font-semibold tracking-[-0.01em]">{t("interim_title")}</h2>
+      <p className="mt-3 leading-7 text-slate-700">{t("interim_text")}</p>
+      <ul className="mt-5 space-y-3">
+        {interimRows(s.answers, items, locale === "en" ? "en" : "de", { strong: t("interim_strong"), lean: t("interim_lean") }).map(row => <li key={row.itemKey} className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-violet-700">{row.context}</p>
+          <p className="mt-1 leading-7 text-slate-900">{row.text}</p>
+        </li>)}
+      </ul>
+      <p className="mt-4 text-sm leading-6 text-slate-600">{t("interim_note", { total: items.length })}</p>
+      <button className={`${button} mt-6`} onClick={() => setInterim(false)}>{t("interim_continue")}</button>
+    </div>}
+
+    {open > 0 && !interim && <>
       <WorkstyleProgress position={position} total={items.length} noun={t("question")} ariaLabel={t("workstyle_profile_progress")} />
       <WorkstyleQuestion key={items[position].item_key} item={items[position]} initial={s.answers.find(answer => answer.item_key === items[position].item_key)} pending={pending}
         last={open === 1 && !answered(s, items[position])} canGoBack={position > 0} onBack={() => setPosition(position - 1)}
@@ -106,6 +124,7 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
           const saved = { ...s, submitted_at: result.submitted_at,
             answers: [...s.answers.filter(answer => answer.item_key !== result.answer.item_key), result.answer] };
           setSession(saved);
+          if (!interimSeen && saved.answers.length >= INTERIM_AFTER && !saved.submitted_at) { setInterim(true); setInterimSeen(true); }
           // Naechste offene Frage nach der aktuellen, sonst die erste offene.
           const next = items.findIndex((candidate, index) => index > position && !answered(saved, candidate));
           setPosition(next !== -1 ? next : firstOpen(saved));

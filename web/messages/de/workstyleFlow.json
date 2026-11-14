@@ -135,5 +135,12 @@
   "go_to_current_version": "Neue Fassung beantworten",
   "v3_research_closed_title": "Keine neuen Entwicklungsfragen in dieser Fassung",
   "v3_research_closed_body": "Für die frühere Fassung des Arbeitsprofils nehmen wir keine neuen Teilnahmen an den Entwicklungsfragen mehr an. Dein Arbeitsprofil bleibt davon unberührt.",
-  "v5_choice_hint": "Wähle, was im Alltag eher zu dir passt – nicht, was du für besser hältst."
+  "v5_choice_hint": "Wähle, was im Alltag eher zu dir passt – nicht, was du für besser hältst.",
+  "interim_eyebrow": "Zwischendurch",
+  "interim_title": "Das hast du bisher gesagt.",
+  "interim_text": "Drei Situationen, in deinen Worten. Mehr Antworten machen das Bild genauer.",
+  "interim_note": "Ein Ausschnitt aus drei von {total} Situationen. Keine Punkte, kein Typ – nur das, was du gesagt hast.",
+  "interim_continue": "Weiter",
+  "interim_strong": "Deutlich eher",
+  "interim_lean": "Eher"
 }
