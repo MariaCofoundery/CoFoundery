@@ -19,7 +19,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
  * heisst hier wie ueberall still, nicht kaputt.
  */
 
-type PreparedRow = { recipient_user_id: string; reminder_round: number; next_step: "workstyle" | "setup"; source: "later" | "midway"; areas: string[] | null };
+type PreparedRow = { recipient_user_id: string; reminder_round: number; next_step: "workstyle" | "find" | "connect" | "advise" | "setup"; source: "later" | "midway"; areas: string[] | null };
 
 export type OnboardingReminderResult =
   | { ok: true; prepared: number; mailed: number }
@@ -32,8 +32,12 @@ function privilegedClient() {
   return createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
 }
 
-export function reminderTargetPath(step: "workstyle" | "setup") {
-  return step === "workstyle" ? CURRENT_WORKSTYLE_HREF : "/welcome/profil";
+export function reminderTargetPath(step: PreparedRow["next_step"]) {
+  if (step === "workstyle") return CURRENT_WORKSTYLE_HREF;
+  if (step === "find") return "/discovery/profile";
+  if (step === "connect") return "/connect/profile";
+  if (step === "advise") return "/advisor/los-gehts";
+  return "/welcome/profil";
 }
 
 export async function runOnboardingReminders(limit = 50): Promise<OnboardingReminderResult> {

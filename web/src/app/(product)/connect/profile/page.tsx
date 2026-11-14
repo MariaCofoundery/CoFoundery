@@ -16,6 +16,7 @@ import { ConnectProfilePreview } from "@/features/connect/ConnectProfilePreview"
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
 import { ResourceProposalSection } from "@/features/ai/ResourceProposalSection";
 import { getOwnPersonResources } from "@/features/ai/personResources";
+import { ReminderAskSlot } from "@/features/onboarding/ReminderAskSlot";
 
 const hint = "mt-1 block text-xs leading-5 text-slate-500";
 const field =
@@ -52,6 +53,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
   return <main className={`mx-auto px-5 py-10 ${onePage ? "max-w-6xl" : "max-w-4xl"}`}>
+    <ReminderAskSlot />
     <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("mine.back")}</Link>
     <header className="brand-panel mt-3 rounded-[24px] p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">

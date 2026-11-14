@@ -900,6 +900,14 @@
       "meanwhileText": "nichts. Niemand sieht dich, und du musst nichts tun. Wenn du doch gleich Lust hast, kannst du jederzeit weitermachen.",
       "doNow": "Doch gleich loslegen",
       "note": "Du bekommst höchstens zwei Mails von uns. Abmelden geht in jeder Mail mit einem Klick."
+    },
+    "reminderAsk": {
+      "title": "Soll ich dich morgen erinnern?",
+      "text": "Eine kurze, freundliche Mail, falls du nicht fertig wirst. Höchstens zwei, danach nie wieder. Abmelden geht mit einem Klick.",
+      "yes": "Ja, gern erinnern",
+      "no": "Nein danke",
+      "thanksYes": "Alles klar, ich schicke dir morgen eine kurze Mail.",
+      "thanksNo": "Alles klar, keine Erinnerung."
     }
   },
   "values": {

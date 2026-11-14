@@ -140,3 +140,43 @@ test("die Datenbank: Tabelle nur lesbar, Funktionen nur für die Richtigen, Test
   assert.ok(sql.indexOf("update public.onboarding_reminders r") < sql.indexOf("select s.user_id, s.rnd::smallint"));
   assert.ok(existsSync("../supabase/tests/onboarding_reminders.sql"));
 });
+
+test("Find, Connect und Advisor: die Frage steht auf der ersten Seite des Bereichs, einmal, und nur kurz nach dem Einstieg", () => {
+  for (const page of ["src/app/(product)/discovery/profile/page.tsx", "src/app/(product)/connect/profile/page.tsx", "src/app/(product)/advisor/los-gehts/page.tsx"]) {
+    assert.match(read(page), /<ReminderAskSlot \/>/, page);
+  }
+  const slot = code("src/features/onboarding/ReminderAskSlot.tsx");
+  // Nur, wenn es noch keine Antwort gibt und der Einstieg hoechstens drei Tage zurueckliegt; liest nur, schreibt nichts.
+  assert.match(slot, /if \(decided \|\| Number\.isNaN\(completedAt\) \|\| Date\.now\(\) - completedAt > ASK_WITHIN_MS\) return null/);
+  assert.match(slot, /ASK_WITHIN_MS = 3 \* 24 \* 60 \* 60 \* 1000/);
+  assert.doesNotMatch(slot, /\.insert\(|\.update\(|\.upsert\(|\.delete\(|rpc\(/);
+  const ask = code("src/features/onboarding/ReminderAsk.tsx");
+  assert.match(ask, /answerReminderAction\(wants\)/);
+  assert.match(ask, /choose\(true\)[\s\S]*choose\(false\)/, "zwei gleichwertige Antworten");
+  assert.doesNotMatch(ask, /type="checkbox"/);
+  for (const locale of ["de", "en"]) {
+    const bundle = JSON.parse(read(`messages/${locale}/profile.json`)).journey.reminderAsk;
+    for (const key of ["title", "text", "yes", "no", "thanksYes", "thanksNo"]) assert.ok(bundle[key], `${locale}: ${key}`);
+  }
+});
+
+test("der Knopf der Mail führt dorthin, wo wirklich noch etwas offen ist - je Bereich", () => {
+  for (const [step, de, en] of [
+    ["workstyle", /Arbeitsweise/, /workstyle/],
+    ["find", /Suchprofil/, /search profile/],
+    ["connect", /Connect-Profil/, /Connect profile/],
+    ["advise", /Gründende einladen/, /Invite founders/],
+    ["setup", /Profil weiter einrichten/, /setting up your profile/],
+  ] as const) {
+    assert.match(getOnboardingReminderCopy("de", { round: 1, nextStep: step, name: null }).cta, de, `de ${step}`);
+    assert.match(getOnboardingReminderCopy("en", { round: 1, nextStep: step, name: null }).cta, en, `en ${step}`);
+  }
+  const runner = code("src/features/onboarding/onboardingReminders.ts");
+  for (const target of ["/discovery/profile", "/connect/profile", "/advisor/los-gehts", "/welcome/profil"]) assert.match(runner, new RegExp(target.replace(/\//g, "\\/")), target);
+  const sql = read("../supabase/migrations/20270422120000_onboarding_reminders_areas.sql");
+  assert.match(sql, /create or replace function public\.prepare_onboarding_reminders\(p_limit integer default 50\)/);
+  assert.match(sql, /founder_discovery_profiles f[\s\S]*?f\.status in \('active', 'paused'\)/);
+  assert.match(sql, /network_profiles n[\s\S]*?n\.status = 'active'/);
+  // Gestempelt wird weiterhin vor der Rueckgabe.
+  assert.ok(sql.indexOf("update public.onboarding_reminders r") < sql.indexOf("select s.user_id, s.rnd::smallint"));
+});

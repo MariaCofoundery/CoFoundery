@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(17);
+select extensions.plan(18);
 
 -- ---------------------------------------------------------------------------
 -- Erinnerung nach dem Einstieg: Zustimmung, Auswahl, Stempel, Abmelden
@@ -73,21 +73,32 @@ select extensions.is(
 );
 reset role;
 
--- Wer alles erledigt hat, bekommt keine Mail (und wird nicht gestempelt).
+-- Profil vollstaendig; Advisor allein hat hier nichts Ablesbares offen: keine Mail (und kein Stempel).
 update public.onboarding_reminders set first_sent_at = null, second_sent_at = null, consent_at = now() - interval '2 days'
  where user_id = 'd1000000-0000-4000-8000-000000000001';
 update public.person_core set headline = 'Gruenderin', bio = 'Ich baue Vertrieb auf.', expertise = array['Vertrieb'], remote_mode = 'remote',
-       interests = array['find']
+       interests = array['advise']
  where user_id = 'd1000000-0000-4000-8000-000000000001';
 set local role service_role;
 select extensions.is(
   (select count(*)::int from public.prepare_onboarding_reminders(50) where recipient_user_id = 'd1000000-0000-4000-8000-000000000001'),
   0,
-  'with the profile filled in and Align not chosen, there is nothing left to remind about'
+  'with the profile filled in and only the advisor area chosen, nothing is left to remind about'
+);
+reset role;
+
+-- Find gewaehlt, noch kein Find-Profil: der Knopf fuehrt dorthin.
+update public.person_core set interests = array['find'] where user_id = 'd1000000-0000-4000-8000-000000000001';
+set local role service_role;
+select extensions.is(
+  (select next_step from public.prepare_onboarding_reminders(50) where recipient_user_id = 'd1000000-0000-4000-8000-000000000001'),
+  'find',
+  'with Find chosen and no Find profile yet, the button leads there'
 );
 reset role;
 
 -- Align gewaehlt und der Fragebogen offen: die Erinnerung kommt, mit den gewaehlten Bereichen.
+update public.onboarding_reminders set first_sent_at = null where user_id = 'd1000000-0000-4000-8000-000000000001';
 update public.person_core set interests = array['align', 'find'] where user_id = 'd1000000-0000-4000-8000-000000000001';
 set local role service_role;
 select extensions.is(

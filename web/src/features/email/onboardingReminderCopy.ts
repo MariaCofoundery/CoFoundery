@@ -1,6 +1,24 @@
 import type { AppLocale } from "@/i18n/config";
 
-export type OnboardingReminderStep = "workstyle" | "setup";
+export type OnboardingReminderStep = "workstyle" | "find" | "connect" | "advise" | "setup";
+
+/** Knopf und Hinweis je naechstem Schritt - der Knopf fuehrt dorthin, wo wirklich noch etwas offen ist. */
+const STEP_TEXT: Record<"de" | "en", Record<OnboardingReminderStep, { cta: string; hint: string }>> = {
+  de: {
+    workstyle: { cta: "Fragen zur Arbeitsweise weitermachen", hint: "Nach drei Antworten siehst du schon, was du gesagt hast." },
+    find: { cta: "Mit deinem Suchprofil weitermachen", hint: "Du bestimmst selbst, wann du für andere sichtbar wirst." },
+    connect: { cta: "Mit deinem Connect-Profil weitermachen", hint: "Ein paar Tipps genügen für den Anfang." },
+    advise: { cta: "Gründende einladen", hint: "Du siehst nur, was sie dir freigeben." },
+    setup: { cta: "Profil weiter einrichten", hint: "Eine Karte nach der anderen, jede wird sofort gespeichert." },
+  },
+  en: {
+    workstyle: { cta: "Continue the workstyle questions", hint: "After three answers you'll already see what you've said." },
+    find: { cta: "Continue with your search profile", hint: "You decide when you become visible to others." },
+    connect: { cta: "Continue with your Connect profile", hint: "A few taps are enough to start." },
+    advise: { cta: "Invite founders", hint: "You only see what they share with you." },
+    setup: { cta: "Continue setting up your profile", hint: "One card at a time, each saved right away." },
+  },
+};
 export type OnboardingReminderSource = "later" | "midway";
 
 const AREA_ORDER = ["align", "find", "connect", "advise"] as const;
@@ -58,7 +76,7 @@ export function getOnboardingReminderCopy(
 ): OnboardingReminderCopy {
   const name = input.name?.trim() || null;
   const first = input.round === 1;
-  const step = input.nextStep === "workstyle";
+  const stepText = STEP_TEXT[locale === "en" ? "en" : "de"][input.nextStep];
   const later = (input.source ?? "midway") === "later";
   const valueFor = (locale: "de" | "en", privacy: string) => [...chosenAreas(input.areas).map((area) => AREA_VALUE[locale][area]), privacy];
   if (locale === "en") {
@@ -80,8 +98,8 @@ export function getOnboardingReminderCopy(
             "After just three answers you can already see what you've said so far.",
             "Everything stays private until you share something yourself.",
           ],
-      cta: step ? "Continue the workstyle questions" : "Continue setting up your profile",
-      ctaHint: step ? "After three answers you'll already see what you've said." : "One card at a time, each saved right away.",
+      cta: stepText.cta,
+      ctaHint: stepText.hint,
       signoff: "Talk soon,\nMaria | Made2Found",
       why: "You're getting this email because you started signing up for Made2Found and haven't finished yet. There are at most two reminders.",
       unsubscribe: "No more reminders",
@@ -106,8 +124,8 @@ export function getOnboardingReminderCopy(
           "Schon nach drei Antworten siehst du, was du bisher gesagt hast.",
           "Alles bleibt privat, bis du selbst etwas freigibst.",
         ],
-    cta: step ? "Fragen zur Arbeitsweise weitermachen" : "Profil weiter einrichten",
-    ctaHint: step ? "Nach drei Antworten siehst du schon, was du gesagt hast." : "Eine Karte nach der anderen, jede wird sofort gespeichert.",
+    cta: stepText.cta,
+    ctaHint: stepText.hint,
     signoff: "Bis gleich,\nMaria | Made2Found",
     why: "Du bekommst diese Mail, weil du dich bei Made2Found angemeldet hast und noch nicht fertig bist. Es kommen höchstens zwei Erinnerungen.",
     unsubscribe: "Keine Erinnerungen mehr",
