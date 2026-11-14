@@ -27,7 +27,7 @@ grant select, insert on ids to authenticated;
 -- Pia (1) gibt eine Aufgabe an Ben (2) und Carla (3).
 set local request.jwt.claims = '{"sub":"e7000000-0000-4000-8000-000000000001","role":"authenticated"}';
 set local role authenticated;
-insert into ids values ('two', public.save_org_task(null, 'e7000000-0000-4000-8000-0000000000a0', 'Demo Day planen', null, 'open', null, current_date, null, null, '[]',
+insert into ids values ('two', public.save_org_task(null, 'e7000000-0000-4000-8000-0000000000a0', 'Demo Day planen', null, 'open', null, (now() at time zone 'Europe/Berlin')::date, null, null, '[]',
   array['e7000000-0000-4000-8000-000000000002', 'e7000000-0000-4000-8000-000000000003']::uuid[]));
 select extensions.is((select count(*)::int from public.advisor_org_task_assignees where task_id = (select id from ids where key = 'two')), 2, 'a task can have two people');
 select extensions.is((select assignee_user_id from public.advisor_org_tasks where id = (select id from ids where key = 'two')), 'e7000000-0000-4000-8000-000000000002'::uuid, 'the old field mirrors the first person');
@@ -53,7 +53,7 @@ insert into ids values ('one', public.save_org_task(null, 'e7000000-0000-4000-80
 select extensions.is((select array_agg(user_id) from public.advisor_org_task_assignees where task_id = (select id from ids where key = 'one')), array['e7000000-0000-4000-8000-000000000003']::uuid[], 'one person still works');
 
 -- Bearbeiten: Ben raus, Pia rein. Bens ungelesener Hinweis geht mit.
-select public.save_org_task((select id from ids where key = 'two'), null, 'Demo Day planen', null, 'open', null, current_date, null, null, '[]',
+select public.save_org_task((select id from ids where key = 'two'), null, 'Demo Day planen', null, 'open', null, (now() at time zone 'Europe/Berlin')::date, null, null, '[]',
   array['e7000000-0000-4000-8000-000000000003', 'e7000000-0000-4000-8000-000000000001']::uuid[]);
 select extensions.is(
   (select array_agg(user_id order by user_id) from public.advisor_org_task_assignees where task_id = (select id from ids where key = 'two')),

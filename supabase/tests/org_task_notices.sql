@@ -25,8 +25,8 @@ set local role authenticated;
 
 -- Pia (1) teilt Ben (2) eine Aufgabe zu, und sich selbst eine.
 set local request.jwt.claims = '{"sub":"e6000000-0000-4000-8000-000000000001","role":"authenticated"}';
-insert into ids values ('t', public.save_org_task(null, 'e6000000-0000-4000-8000-0000000000a0', 'Raum buchen', null, 'open', 'e6000000-0000-4000-8000-000000000002', current_date, null, null, '[]'));
-insert into ids values ('mine', public.save_org_task(null, 'e6000000-0000-4000-8000-0000000000a0', 'Selbst', null, 'open', 'e6000000-0000-4000-8000-000000000001', current_date, null, null, '[]'));
+insert into ids values ('t', public.save_org_task(null, 'e6000000-0000-4000-8000-0000000000a0', 'Raum buchen', null, 'open', 'e6000000-0000-4000-8000-000000000002', (now() at time zone 'Europe/Berlin')::date, null, null, '[]'));
+insert into ids values ('mine', public.save_org_task(null, 'e6000000-0000-4000-8000-0000000000a0', 'Selbst', null, 'open', 'e6000000-0000-4000-8000-000000000001', (now() at time zone 'Europe/Berlin')::date, null, null, '[]'));
 reset role;
 select extensions.is((select count(*)::int from public.in_app_notices where kind = 'org_task_assigned' and recipient_user_id = 'e6000000-0000-4000-8000-000000000002'), 1, 'the assignee is told');
 select extensions.is((select count(*)::int from public.in_app_notices where kind = 'org_task_assigned' and recipient_user_id = 'e6000000-0000-4000-8000-000000000001'), 0, 'nobody is told about their own assignment');
