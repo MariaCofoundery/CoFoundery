@@ -104,6 +104,9 @@ async function finishJourney(formData: FormData, toSetup: boolean) {
 
   await writeInterests(client, user.id, interestsFor(payload.areas));
   await markOnboardingComplete(client, user.id);
+  // Die ausdrueckliche Zustimmung zu den zwei Erinnerungs-Mails: nur, wenn der Haken gesetzt wurde (nicht vorbelegt).
+  // Scheitert das, bleibt der Einstieg trotzdem abgeschlossen - eine Erinnerung ist kein Muss.
+  if (formData.get("reminder") === "on") await client.rpc("set_onboarding_reminder", { p_wants: true });
 
   revalidatePath("/dashboard");
   revalidatePath("/connect", "layout");

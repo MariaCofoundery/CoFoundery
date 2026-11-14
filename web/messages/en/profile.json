@@ -881,7 +881,9 @@
       "startHint": "You can find the other areas in the menu any time afterwards.",
       "nextAdvise": "Your advisor area",
       "setupCta": "Set up my profile first",
-      "setupHint": "Four short steps, each saved right away."
+      "setupHint": "Four short steps, each saved right away.",
+      "reminderLabel": "Remind me by email if I don't continue",
+      "reminderHint": "At most two friendly emails, with a button straight to the next step. You can stop them any time with one click."
     },
     "setup": {
       "finish": "Done",

@@ -881,7 +881,9 @@
       "startHint": "Die anderen Bereiche findest du danach jederzeit im Menü.",
       "nextAdvise": "Dein Advisor-Bereich",
       "setupCta": "Erst mein Profil einrichten",
-      "setupHint": "Vier kurze Schritte, jeder wird sofort gespeichert."
+      "setupHint": "Vier kurze Schritte, jeder wird sofort gespeichert.",
+      "reminderLabel": "Erinnere mich per Mail, falls ich nicht weitermache",
+      "reminderHint": "Höchstens zwei freundliche Mails, mit einem Knopf direkt zum nächsten Schritt. Abmelden geht jederzeit mit einem Klick."
     },
     "setup": {
       "finish": "Fertig",

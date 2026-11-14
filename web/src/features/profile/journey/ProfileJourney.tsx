@@ -365,6 +365,11 @@ export function ProfileJourney({
                   <p className="text-sm text-slate-500">{t("done.startHint")}</p>
                 </div>
               ) : null}
+              {/* Nicht vorbelegt: Die Erinnerung ist eine Zustimmung, die man selbst gibt. */}
+              <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left">
+                <input type="checkbox" name="reminder" value="on" className="mt-1 h-5 w-5 shrink-0 accent-violet-700" />
+                <span className="text-sm leading-6 text-slate-800"><strong className="block text-slate-950">{t("done.reminderLabel")}</strong>{t("done.reminderHint")}</span>
+              </label>
               <div className="rounded-2xl bg-slate-100 p-4"><span className="text-[11px] font-bold uppercase tracking-[.08em] text-slate-500">{t("done.next")}</span><p className="mt-1 text-base font-semibold text-slate-950">{nextLabel}</p></div>
             </>
           ) : null}
