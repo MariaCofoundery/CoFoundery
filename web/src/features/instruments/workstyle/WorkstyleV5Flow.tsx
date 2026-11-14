@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 
 import { workstyleSessionItems, WORKSTYLE_PRETEST_V5, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
 import { INTERIM_AFTER, interimRows } from "@/features/instruments/workstyle/interim";
+import { answerReminderAction } from "@/features/onboarding/reminderActions";
 import { saveWorkstyleV5, startWorkstyleV5 } from "@/features/instruments/workstyle/actions";
 import { WorkstyleProgress, WorkstyleQuestion, type WorkstyleCompletionContext } from "@/features/instruments/workstyle/WorkstyleQuestion";
 import type { PretestSession } from "@/features/instruments/workstyle/data";
@@ -38,8 +39,10 @@ function firstOpen(session: PretestSession | null) {
   return index === -1 ? items.length - 1 : index;
 }
 
-export function WorkstyleV5Flow({ initialSession, context = null, previousVersion = false }: {
+export function WorkstyleV5Flow({ initialSession, context = null, previousVersion = false, reminderDecided = true }: {
   initialSession: PretestSession | null; context?: WorkstyleCompletionContext | null; previousVersion?: boolean;
+  /** Hat die Person die Erinnerungsfrage schon beantwortet (Ja oder Nein)? Dann kommt sie nicht noch einmal. */
+  reminderDecided?: boolean;
 }) {
   const t = useTranslations("workstyleFlow");
   const locale = useLocale();
@@ -53,6 +56,7 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
   const [confirmRetake, setConfirmRetake] = useState(false);
   // Einmal nach der dritten Antwort: "Das hast du bisher gesagt" - der erste Moment, in dem etwas zurueckkommt.
   const [interim, setInterim] = useState(false);
+  const [reminderAsked, setReminderAsked] = useState(reminderDecided);
   const [interimSeen, setInterimSeen] = useState(() => (initialSession?.answers.length ?? 0) >= INTERIM_AFTER);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -105,7 +109,14 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
         </li>)}
       </ul>
       <p className="mt-4 text-sm leading-6 text-slate-600">{t("interim_note", { total: items.length })}</p>
-      <button className={`${button} mt-6`} onClick={() => setInterim(false)}>{t("interim_continue")}</button>
+      {!reminderAsked ? <div className="mt-6 rounded-2xl border-2 border-violet-600 bg-white p-5" data-workstyle-reminder>
+        <p className="text-lg font-semibold text-slate-950">{t("interim_reminder_title")}</p>
+        <p className="mt-1 leading-7 text-slate-700">{t("interim_reminder_text")}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <button className={button} disabled={pending} onClick={() => run(async () => { await answerReminderAction(true); setReminderAsked(true); setInterim(false); })}>{t("interim_reminder_yes")}</button>
+          <button className={secondary} disabled={pending} onClick={() => run(async () => { await answerReminderAction(false); setReminderAsked(true); setInterim(false); })}>{t("interim_reminder_no")}</button>
+        </div>
+      </div> : <button className={`${button} mt-6`} onClick={() => setInterim(false)}>{t("interim_continue")}</button>}
     </div>}
 
     {open > 0 && !interim && <>

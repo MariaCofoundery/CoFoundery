@@ -116,7 +116,7 @@ test("der Abschluss veröffentlicht nichts und markiert zuletzt", () => {
   assert.doesNotMatch(action, /formData\.get\("roles"\)/);
 });
 
-test("die Reise gibt dieselbe Pforte wie der Einstieg; der Start besteht nur aus Bereichen und Name", () => {
+test("die Reise gibt dieselbe Pforte wie der Einstieg; der Start ist eine Willkommensseite mit Name und Bereichen", () => {
   const page = code("src/app/welcome/reise/page.tsx");
   assert.match(page, /redirect\(`\/login\?next=/);
   assert.match(page, /onboarding_completed_at\) redirect\(next\)/);
@@ -124,7 +124,7 @@ test("die Reise gibt dieselbe Pforte wie der Einstieg; der Start besteht nur aus
   assert.doesNotMatch(ui, /localStorage|sessionStorage/);
   assert.match(ui, /action=\{isSetup \? finishSetupAction : completeJourneyAction\}/);
   // Zwei Karten und der Abschluss - Profilfragen und Align-Plan gibt es erst danach.
-  assert.match(ui, /isSetup \? setupSteps : \["areas", "name", "done"\]/);
+  assert.match(ui, /isSetup \? setupSteps : \["welcome"\]/);
 });
 
 test("das Setup speichert jeden Schritt sofort, nur Gefülltes, und veröffentlicht nichts", () => {

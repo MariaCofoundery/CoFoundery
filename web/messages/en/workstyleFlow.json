@@ -142,5 +142,9 @@
   "interim_note": "A glimpse of three of {total} situations. No scores, no type – only what you said.",
   "interim_continue": "Continue",
   "interim_strong": "Clearly more",
-  "interim_lean": "More"
+  "interim_lean": "More",
+  "interim_reminder_title": "Shall I remind you tomorrow?",
+  "interim_reminder_text": "A short, friendly email in case you don't continue. At most two, never again after that. You can stop them with one click.",
+  "interim_reminder_yes": "Yes, please remind me",
+  "interim_reminder_no": "No thanks, continue"
 }

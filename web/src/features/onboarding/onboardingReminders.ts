@@ -19,7 +19,7 @@ import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
  * heisst hier wie ueberall still, nicht kaputt.
  */
 
-type PreparedRow = { recipient_user_id: string; reminder_round: number; next_step: "workstyle" | "setup" };
+type PreparedRow = { recipient_user_id: string; reminder_round: number; next_step: "workstyle" | "setup"; source: "later" | "midway"; areas: string[] | null };
 
 export type OnboardingReminderResult =
   | { ok: true; prepared: number; mailed: number }
@@ -61,6 +61,8 @@ export async function runOnboardingReminders(limit = 50): Promise<OnboardingRemi
         round: row.reminder_round === 2 ? 2 : 1,
         nextStep: row.next_step,
         name,
+        areas: row.areas ?? [],
+        source: row.source,
         url: `${origin}${reminderTargetPath(row.next_step)}`,
         unsubscribeUrl: `${origin}/abmelden/erinnerung?u=${row.recipient_user_id}&t=${token}`,
         locale: recipient.locale,

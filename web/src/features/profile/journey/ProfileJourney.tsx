@@ -6,17 +6,14 @@ import { useTranslations } from "next-intl";
 import { FOCUS_HUES, FOCUS_ICONS } from "@/features/profile/journey/focusVisuals";
 import {
   completeJourneyAction,
-  completeJourneyToSetupAction,
-  completeJourneyWithoutReminderAction,
+  completeJourneyLaterAction,
   finishSetupAction,
   saveSetupProgressAction,
 } from "@/features/profile/journey/journeyActions";
 import {
-  JOURNEY_ALIGN_PLANS,
   JOURNEY_AREAS,
   JOURNEY_FOCI,
   JOURNEY_REMOTE_MODES,
-  nextPathFor,
   startAreaFor,
   type SetupStep,
   type JourneyAlignPlan,
@@ -25,7 +22,7 @@ import {
   type JourneyRemoteMode,
 } from "@/features/profile/journey/journeyModel";
 
-type StepId = "areas" | "name" | "headline" | "about" | "can" | "where" | "alignPlan" | "done";
+type StepId = "welcome" | "headline" | "about" | "can" | "where";
 
 const ICONS = FOCUS_ICONS;
 const HUES = FOCUS_HUES;
@@ -39,24 +36,24 @@ function Check({ on }: { on: boolean }) {
 }
 
 /**
- * "Erst mein Profil einrichten" und die Gegenwahl "Ohne Erinnerungen".
+ * Die zwei Wege der Willkommensseite.
  *
- * Die Zustimmung zu den (hoechstens zwei) Erinnerungs-Mails steckt in den beiden Knoepfen "Los geht's" und "Erst mein
- * Profil einrichten"; der Hinweis darueber sagt das ausdruecklich. Wer das nicht will, drueckt "Ohne Erinnerungen":
- * eine echte Wahl zwischen zwei Wegen, nichts ist vorangekreuzt und die Zustimmung ist nicht Bedingung fuers Weitermachen.
+ * "Los geht's" fuehrt direkt in den echten ersten Schritt des gewaehlten Bereichs. "Gerade keine Zeit? Erinnere mich
+ * morgen" speichert dasselbe, schaltet die Erinnerung ein und verabschiedet sich bis morgen - der Knopf IST die
+ * ausdrueckliche Zustimmung, der Satz darunter sagt es offen. Beide Wege sind gleichwertig; nichts ist vorangekreuzt,
+ * und ohne Zustimmung gibt es keine Mail.
  */
-function SetupFirstButton({ label, hint, reminderNote, withoutLabel }: { label: string; hint: string; reminderNote: string; withoutLabel: string }) {
+function WelcomeButtons({ canFinish, startLabel, laterLabel, laterNote }: { canFinish: boolean; startLabel: string; laterLabel: string; laterNote: string }) {
   const { pending } = useFormStatus();
   return (
     <>
-      <button type="submit" formAction={completeJourneyToSetupAction} disabled={pending} className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-violet-300 bg-white px-6 text-base font-semibold text-violet-900 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
-        {label}
+      <button type="submit" disabled={pending || !canFinish} className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+        {startLabel}
       </button>
-      <span className="text-center text-xs text-slate-500">{hint}</span>
-      <p className="text-center text-xs leading-5 text-slate-600" data-reminder-note>{reminderNote}</p>
-      <button type="submit" formAction={completeJourneyWithoutReminderAction} disabled={pending} className="min-h-10 text-sm font-semibold text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline disabled:opacity-60">
-        {withoutLabel}
+      <button type="submit" formAction={completeJourneyLaterAction} disabled={pending || !canFinish} className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 text-base font-semibold text-slate-900 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+        {laterLabel}
       </button>
+      <p className="text-center text-xs leading-5 text-slate-600" data-reminder-note>{laterNote}</p>
     </>
   );
 }
@@ -102,7 +99,7 @@ export function ProfileJourney({
 }) {
   const t = useTranslations("profile.journey");
   const [areas, setAreas] = useState<JourneyArea[]>(initialAreas);
-  const [start, setStart] = useState<JourneyArea | "">("");
+  const start: JourneyArea | "" = "";
   const [infoOpen, setInfoOpen] = useState<JourneyArea | null>(null);
   const [name, setName] = useState(initialName);
   const [headline, setHeadline] = useState(setup?.headline ?? "");
@@ -111,14 +108,14 @@ export function ProfileJourney({
   const [subs, setSubs] = useState<Partial<Record<JourneyFocus, string[]>>>({});
   const [openOne, setOpenOne] = useState<JourneyFocus | null>(null);
   const [where, setWhere] = useState<JourneyRemoteMode | "">(setup?.where ?? "");
-  const [alignPlan, setAlignPlan] = useState<JourneyAlignPlan>("first");
+  const alignPlan: JourneyAlignPlan = "first";
   const [index, setIndex] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
 
   const isSetup = mode === "setup";
   const setupSteps = useMemo<StepId[]>(() => (setup?.openSteps ?? []).map((item) => (item === "headline" ? "headline" : item === "about" ? "about" : item === "can" ? "can" : "where")), [setup]);
-  // Der Start besteht nur aus zwei Karten und dem Abschluss; Align-Plan und Profilfragen gibt es erst danach.
-  const steps = useMemo<StepId[]>(() => (isSetup ? setupSteps : ["areas", "name", "done"]), [isSetup, setupSteps]);
+  // Der Start ist EINE Willkommensseite (Name, Anliegen, zwei Wege); Profilfragen und Align-Plan gibt es erst danach.
+  const steps = useMemo<StepId[]>(() => (isSetup ? setupSteps : ["welcome"]), [isSetup, setupSteps]);
   const step = steps[Math.min(index, steps.length - 1)];
 
   const expertise = useMemo(() => {
@@ -133,9 +130,7 @@ export function ProfileJourney({
 
   const effectiveStart = startAreaFor(areas, start);
   const payload = JSON.stringify(isSetup ? { headline, bio, expertise, where } : { areas, name, headline, bio, foci, expertise, where, alignPlan, start: effectiveStart });
-  const nextPath = nextPathFor({ areas, alignPlan, start: effectiveStart });
-  const canNext = step === "areas" ? areas.length > 0 : step === "name" ? name.trim().length > 0 : true;
-  const isDone = step === "done";
+  const canFinish = areas.length > 0 && name.trim().length > 0;
   const isLastSetupStep = isSetup && index >= steps.length - 1;
 
   function go(to: number) {
@@ -174,20 +169,9 @@ export function ProfileJourney({
     const target = event.target as HTMLElement;
     if (event.key === "Enter" && target.tagName === "INPUT") {
       event.preventDefault();
-      if (!isDone && canNext) go(index + 1);
+      if (isSetup && !isLastSetupStep) go(index + 1);
     }
   }
-
-  const nextLabel =
-    nextPath === "/dashboard"
-      ? t("done.nextDashboard")
-      : nextPath === "/discovery/profile"
-        ? t("done.nextFind")
-        : nextPath === "/connect/profile"
-          ? t("done.nextConnect")
-          : nextPath === "/advisor/dashboard"
-            ? t("done.nextAdvise")
-            : t("done.nextAlign");
 
   return (
     <form action={isSetup ? finishSetupAction : completeJourneyAction} onKeyDown={onKeyDown} className="mx-auto flex w-full max-w-xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_80px_-30px_rgba(60,40,180,.3)]">
@@ -212,10 +196,17 @@ export function ProfileJourney({
         {error ? <p role="alert" className="mb-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(`errors.${["areas", "name", "save", "join"].includes(error) ? error : "save"}`)}</p> : null}
         <div key={step} className="grid gap-4">
           <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-tight text-slate-950">
-            {step === "done" ? t("done.q") : step === "alignPlan" ? t("alignPlan.q") : t(`${step}.q`)}
+            {isSetup ? t(`${step}.q`) : t("welcome.title")}
           </h1>
 
-          {step === "areas" ? (
+          {!isSetup ? (
+            <>
+              <input name="journeyName" value={name} onChange={(event) => setName(event.target.value)} maxLength={80} autoFocus autoComplete="name" placeholder={t("name.placeholder")} className="min-h-14 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-violet-600 focus:ring-4 focus:ring-violet-100" />
+              <p className="text-sm text-slate-500">{t("name.hint")}</p>
+            </>
+          ) : null}
+
+          {!isSetup ? (
             <>
               <p className="text-sm leading-6 text-slate-600">{t("areas.hint")}</p>
               <div className="grid gap-2.5">
@@ -249,13 +240,6 @@ export function ProfileJourney({
                 })}
               </div>
               <a href="/welcome?classic=1" className="text-sm font-medium text-slate-600 underline underline-offset-4 hover:text-slate-900">{t("classic")}</a>
-            </>
-          ) : null}
-
-          {step === "name" ? (
-            <>
-              <input name="journeyName" value={name} onChange={(event) => setName(event.target.value)} maxLength={80} autoFocus autoComplete="name" placeholder={t("name.placeholder")} className="min-h-14 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-violet-600 focus:ring-4 focus:ring-violet-100" />
-              <p className="text-sm text-slate-500">{t("name.hint")}</p>
             </>
           ) : null}
 
@@ -333,68 +317,26 @@ export function ProfileJourney({
               })}
             </div>
           ) : null}
-
-          {step === "alignPlan" ? (
-            <>
-              <div className="grid gap-1.5 text-sm">
-                {([["workstyle", 12], ["strengths", 10], ["drive", 5]] as const).map(([row, minutes]) => (
-                  <div key={row} className="flex items-center justify-between rounded-xl bg-slate-100 px-3 py-2.5"><b className="font-bold text-slate-900">{t(`alignPlan.rows.${row}`)}</b><span className="font-semibold text-slate-500">{t("alignPlan.minutes", { minutes })}</span></div>
-                ))}
-              </div>
-              <p className="text-sm leading-6 text-slate-600">{t("alignPlan.hint")}</p>
-              <div className="grid gap-2.5">
-                {JOURNEY_ALIGN_PLANS.map((plan) => {
-                  const on = alignPlan === plan;
-                  return (
-                    <button key={plan} type="button" aria-pressed={on} onClick={() => setAlignPlan(plan)} className={`flex min-h-16 items-center justify-between gap-3 rounded-2xl border-[1.5px] p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${on ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
-                      <span><strong className="block text-base text-slate-950">{t(`alignPlan.${plan}.name`)}</strong><span className="mt-0.5 block text-sm leading-5 text-slate-600">{t(`alignPlan.${plan}.text`)}</span></span>
-                      <Check on={on} />
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          ) : null}
-
-          {step === "done" ? (
-            <>
-              <p className="text-base leading-7 text-slate-700">{t("done.text")}</p>
-              {areas.length > 1 ? (
-                <div className="grid gap-2">
-                  <p className="text-sm font-bold text-slate-900">{t("done.startQ")}</p>
-                  <div className="grid gap-2">
-                    {JOURNEY_AREAS.filter((area) => areas.includes(area)).map((area) => {
-                      const on = effectiveStart === area;
-                      return (
-                        <button key={area} type="button" aria-pressed={on} onClick={() => setStart(area)} className={`flex min-h-12 items-center justify-between gap-3 rounded-2xl border-[1.5px] px-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${on ? "border-violet-600 bg-violet-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
-                          <strong className="text-base text-slate-950">{t(`areas.${area}.name`)}</strong>
-                          <Check on={on} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p className="text-sm text-slate-500">{t("done.startHint")}</p>
-                </div>
-              ) : null}
-              <div className="rounded-2xl bg-slate-100 p-4"><span className="text-[11px] font-bold uppercase tracking-[.08em] text-slate-500">{t("done.next")}</span><p className="mt-1 text-base font-semibold text-slate-950">{nextLabel}</p></div>
-            </>
-          ) : null}
         </div>
       </div>
 
       <div className="grid gap-1.5 border-t border-slate-200 px-6 pb-5 pt-3">
-        {isDone || isLastSetupStep ? (
-          <FinishButton label={isSetup ? t("setup.finish") : t("finish")} pendingLabel={t("finishing")} />
+        {isSetup ? (
+          <>
+            {isLastSetupStep ? (
+              <FinishButton label={t("setup.finish")} pendingLabel={t("finishing")} />
+            ) : (
+              <button type="button" onClick={() => go(index + 1)} className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
+                {t("next")}
+              </button>
+            )}
+            {!isLastSetupStep ? (
+              <button type="button" onClick={() => go(index + 1)} className="min-h-10 text-sm font-semibold text-slate-500 hover:text-slate-900">{t("skip")}</button>
+            ) : <span className="min-h-10" />}
+          </>
         ) : (
-          <button type="button" disabled={!canNext} onClick={() => go(index + 1)} className="brand-cta inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
-            {t("next")}
-          </button>
+          <WelcomeButtons canFinish={canFinish} startLabel={t("welcome.start")} laterLabel={t("welcome.later")} laterNote={t("welcome.laterNote")} />
         )}
-        {isDone && !isSetup ? (
-          <SetupFirstButton label={t("done.setupCta")} hint={t("done.setupHint")} reminderNote={t("done.reminderNote")} withoutLabel={t("done.withoutReminder")} />
-        ) : !isDone && !isLastSetupStep && step !== "areas" && step !== "name" ? (
-          <button type="button" onClick={() => go(index + 1)} className="min-h-10 text-sm font-semibold text-slate-500 hover:text-slate-900">{t("skip")}</button>
-        ) : <span className="min-h-10" />}
       </div>
     </form>
   );

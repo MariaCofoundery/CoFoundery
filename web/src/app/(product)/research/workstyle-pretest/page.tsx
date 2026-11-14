@@ -46,10 +46,12 @@ export default async function WorkstylePretestPage({ searchParams }: { searchPar
   if (version === "8.5a-v5") {
     const [session, previousV4, previousV3] = user ? await Promise.all([getMyWorkstylePretest(version), getMyWorkstylePretest("8.5a-v4"), getMyWorkstylePretest("8.5a-v3")]) : [null, null, null];
     const previous = previousV4?.submitted_at ? previousV4 : previousV3;
+    // Die Erinnerungsfrage kommt einmal: Wer schon Ja oder Nein gesagt hat (eine Zeile), wird nicht noch einmal gefragt.
+    const { data: reminderRow } = user ? await (await createClient()).from("onboarding_reminders").select("user_id").maybeSingle() : { data: null };
     return <main lang={locale} className="mx-auto max-w-2xl px-5 py-8 text-slate-900 sm:px-8 sm:py-12">
       <h1 className="text-3xl font-semibold">{t("entry_title")}</h1>
       {teamId && <p className="mt-4"><Link className="underline" href={`/teams/${teamId}/workstyle`}>{t("entry_back")}</Link> · {t("entry_sharing")}</p>}
-      {user ? <WorkstyleV5Flow initialSession={session} context={completionContext} previousVersion={Boolean(previous?.submitted_at)} />
+      {user ? <WorkstyleV5Flow initialSession={session} context={completionContext} previousVersion={Boolean(previous?.submitted_at)} reminderDecided={Boolean(reminderRow)} />
         : <div className="mt-6 space-y-4"><p>{t("entry_intro")}</p><p>{t("entry_answer")}</p><p>{t("entry_no_right")}</p><Link className="underline" href={`/login?next=${encodeURIComponent(`/research/workstyle-pretest?version=${version}`)}`}>{t("entry_login")}</Link></div>}
       {previous && !previous.withdrawn_at && <p className="mt-8"><Link className="underline" href="/me/profile/workstyle">{t("entry_previous")}</Link></p>}
     </main>;

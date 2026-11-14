@@ -19,7 +19,7 @@ import { getProfileBasicsRow, upsertProfileBasicsRow } from "@/features/profile/
 import { createClient } from "@/lib/supabase/server";
 
 const BACK = "/welcome/reise";
-const SETUP = "/welcome/profil";
+const LATER = "/welcome/morgen";
 
 /**
  * Der Abschluss der Kartenreise.
@@ -45,7 +45,7 @@ const SETUP = "/welcome/profil";
  * Markierung. Bricht es dazwischen ab, bekommt die Person den Einstieg noch
  * einmal - und landet nicht ohne Bereich ausserhalb des Produkts.
  */
-async function finishJourney(formData: FormData, toSetup: boolean, withReminder: boolean) {
+async function finishJourney(formData: FormData, later: boolean) {
   const client = await createClient();
   const {
     data: { user },
@@ -104,33 +104,28 @@ async function finishJourney(formData: FormData, toSetup: boolean, withReminder:
 
   await writeInterests(client, user.id, interestsFor(payload.areas));
   await markOnboardingComplete(client, user.id);
-  // Die Zustimmung zu den zwei Erinnerungs-Mails steckt im Knopf, den die Person drueckt - neben ihm steht die Gegenwahl
-  // "Ohne Erinnerungen". Beides ist eine ausdrueckliche Entscheidung, nichts ist vorangekreuzt.
+  // Die Zustimmung zu den (hoechstens zwei) Erinnerungs-Mails steckt im Knopf "Gerade keine Zeit? Erinnere mich morgen".
+  // Daneben steht der gleichwertige Weg "Los geht's" - nichts ist vorangekreuzt.
   // Scheitert das, bleibt der Einstieg trotzdem abgeschlossen - eine Erinnerung ist kein Muss.
-  if (withReminder) await client.rpc("set_onboarding_reminder", { p_wants: true });
+  if (later) await client.rpc("set_onboarding_reminder", { p_wants: true, p_source: "later" });
 
   revalidatePath("/dashboard");
   revalidatePath("/connect", "layout");
 
-  // Wer das Profil gleich einrichten will, geht dorthin; sonst bleibt ein eigenes Ziel (Einladung und
-  // Aehnliches), sonst kommt der erste Bereich.
-  if (toSetup) redirect(SETUP);
+  // "Gerade keine Zeit": verabschieden, bis morgen. Sonst bleibt ein eigenes Ziel (Einladung und Aehnliches), sonst
+  // kommt der erste Bereich.
+  if (later) redirect(LATER);
   const requested = normalizeNextPath(String(formData.get("next") ?? ""));
   redirect(requested !== "/dashboard" ? requested : nextPathFor(payload));
 }
 
 export async function completeJourneyAction(formData: FormData) {
-  return finishJourney(formData, false, true);
+  return finishJourney(formData, false);
 }
 
-/** Die ausdrueckliche Gegenwahl: derselbe Abschluss, aber ohne Erinnerungs-Mails. */
-export async function completeJourneyWithoutReminderAction(formData: FormData) {
-  return finishJourney(formData, false, false);
-}
-
-/** "Erst mein Profil einrichten": derselbe Abschluss, aber das Ziel ist die Liste der kleinen Schritte. */
-export async function completeJourneyToSetupAction(formData: FormData) {
-  return finishJourney(formData, true, true);
+/** "Gerade keine Zeit? Erinnere mich morgen": derselbe Abschluss, dazu die ausdrueckliche Zustimmung zur Erinnerung. */
+export async function completeJourneyLaterAction(formData: FormData) {
+  return finishJourney(formData, true);
 }
 
 /**

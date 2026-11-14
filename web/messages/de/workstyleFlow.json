@@ -142,5 +142,9 @@
   "interim_note": "Ein Ausschnitt aus drei von {total} Situationen. Keine Punkte, kein Typ – nur das, was du gesagt hast.",
   "interim_continue": "Weiter",
   "interim_strong": "Deutlich eher",
-  "interim_lean": "Eher"
+  "interim_lean": "Eher",
+  "interim_reminder_title": "Soll ich dich morgen erinnern?",
+  "interim_reminder_text": "Eine kurze, freundliche Mail, falls du nicht weitermachst. Höchstens zwei, danach nie wieder. Abmelden geht mit einem Klick.",
+  "interim_reminder_yes": "Ja, gern erinnern",
+  "interim_reminder_no": "Nein danke, weiter"
 }

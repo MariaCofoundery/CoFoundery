@@ -23,7 +23,7 @@ test("zwei Mails, beide freundlich, mit dem Gesamtwert von Made2Found in wenigen
     for (const round of [1, 2] as const) {
       const copy = getOnboardingReminderCopy(locale, { round, nextStep: "workstyle", name: "Lena" });
       assert.match(copy.headline, /Lena/);
-      assert.ok(copy.values.length >= 3 && copy.values.length <= 4, `${locale} ${round}: wenige Punkte`);
+      assert.ok(copy.values.length >= 3 && copy.values.length <= 5, `${locale} ${round}: wenige Punkte`);
       assert.ok(copy.values.every((value) => value.length < 140), `${locale} ${round}: kurz`);
       assert.ok(copy.cta && copy.ctaHint && /Maria \| Made2Found/.test(copy.signoff), `${locale} ${round}`);
       // Keine Bewertung, kein Versprechen, keine Zahl.
@@ -66,27 +66,53 @@ test("die Mail nennt den Grund, hat Abmelden und enthält nichts aus dem Konto a
   assert.doesNotMatch(html, /<b>/, "Eingaben werden maskiert");
 });
 
-test("die Zustimmung steckt in den Knöpfen, mit einer echten Gegenwahl - kein Haken, nichts vorangekreuzt", () => {
+test("die Zustimmung steckt im Knopf „Gerade keine Zeit“ oder in der Frage nach dem ersten Erfolg - kein Haken, nichts vorangekreuzt", () => {
   const ui = code("src/features/profile/journey/ProfileJourney.tsx");
-  assert.doesNotMatch(ui, /type="checkbox"[^>]*reminder|name="reminder"/);
-  // Beide Hauptwege tragen die Zustimmung, "Ohne Erinnerungen" ist der gleichwertige Gegenweg.
-  assert.match(ui, /formAction=\{completeJourneyWithoutReminderAction\}/);
+  assert.doesNotMatch(ui, /type="checkbox"|name="reminder"/);
+  // Zwei gleichwertige Wege auf der Willkommensseite; nur der zweite erlaubt Mails.
+  assert.match(ui, /formAction=\{completeJourneyLaterAction\}/);
   assert.match(ui, /data-reminder-note/);
   const action = code("src/features/profile/journey/journeyActions.ts");
-  assert.match(action, /if \(withReminder\) await client\.rpc\("set_onboarding_reminder", \{ p_wants: true \}\)/);
-  assert.match(action, /export async function completeJourneyAction[\s\S]*?finishJourney\(formData, false, true\)/);
-  assert.match(action, /export async function completeJourneyToSetupAction[\s\S]*?finishJourney\(formData, true, true\)/);
-  assert.match(action, /export async function completeJourneyWithoutReminderAction[\s\S]*?finishJourney\(formData, false, false\)/);
+  assert.match(action, /if \(later\) await client\.rpc\("set_onboarding_reminder", \{ p_wants: true, p_source: "later" \}\)/);
+  assert.match(action, /export async function completeJourneyAction[\s\S]*?finishJourney\(formData, false\)/);
+  assert.match(action, /export async function completeJourneyLaterAction[\s\S]*?finishJourney\(formData, true\)/);
+  assert.match(action, /if \(later\) redirect\(LATER\)/);
   // Erst nach der Markierung "eingefuehrt", und ein Fehler macht den Einstieg nicht rueckgaengig.
   assert.ok(action.indexOf("markOnboardingComplete(client") < action.indexOf("set_onboarding_reminder"));
+  // Die zweite Stelle: nach dem ersten Erfolg im Fragebogen, einmal, Ja oder Nein danke.
+  const flow = code("src/features/instruments/workstyle/WorkstyleV5Flow.tsx");
+  assert.match(flow, /data-workstyle-reminder/);
+  assert.match(flow, /answerReminderAction\(true\)[\s\S]*?answerReminderAction\(false\)/);
+  assert.match(code("src/features/onboarding/reminderActions.ts"), /p_source: "midway"/);
+  assert.match(code("src/app/(product)/research/workstyle-pretest/page.tsx"), /from\("onboarding_reminders"\)/);
   for (const locale of ["de", "en"]) {
-    const done = JSON.parse(read(`messages/${locale}/profile.json`)).journey.done;
-    assert.ok(done.reminderNote && done.withoutReminder, locale);
+    const profile = JSON.parse(read(`messages/${locale}/profile.json`)).journey;
+    for (const key of ["start", "later", "laterNote", "title"]) assert.ok(profile.welcome[key], `${locale}: welcome.${key}`);
+    for (const key of ["title", "text", "doNow", "note"]) assert.ok(profile.later[key], `${locale}: later.${key}`);
+    const flowText = JSON.parse(read(`messages/${locale}/workstyleFlow.json`));
+    for (const key of ["interim_reminder_title", "interim_reminder_text", "interim_reminder_yes", "interim_reminder_no"]) assert.ok(flowText[key], `${locale}: ${key}`);
   }
   const runner = code("src/features/onboarding/onboardingReminders.ts");
   assert.match(runner, /prepare_onboarding_reminders/);
   assert.match(runner, /if \(!secret\) return \{ ok: true, prepared: 0, mailed: 0 \}/);
   assert.match(code("src/app/api/cron/connect-suggestions/route.ts"), /runOnboardingReminders\(\)/);
+});
+
+test("die Mail nennt nur die gewählten Bereiche und spricht je nach Grund anders an", () => {
+  const find = getOnboardingReminderCopy("de", { round: 1, nextStep: "setup", name: "Lena", areas: ["find", "connect"], source: "later" });
+  assert.equal(find.values.length, 3, "zwei Bereiche und der Satz zur Privatsphaere");
+  assert.match(find.values.join(" "), /Mitgründer/);
+  assert.match(find.values.join(" "), /Netzwerk/);
+  assert.doesNotMatch(find.values.join(" "), /wie du arbeitest|begleitest/, "Align und Advisor nur, wenn gewählt");
+  assert.match(find.headline, /gestern hattest du keine Zeit/);
+  const midway = getOnboardingReminderCopy("de", { round: 1, nextStep: "workstyle", name: "Lena", areas: ["align"], source: "midway" });
+  assert.match(midway.headline, /schön, dass du angefangen hast/);
+  assert.match(midway.values.join(" "), /wie du arbeitest/);
+  const advisor = getOnboardingReminderCopy("en", { round: 1, nextStep: "setup", name: null, areas: ["advise"], source: "later" });
+  assert.match(advisor.values.join(" "), /Support founders/);
+  // Ohne Angabe: die drei, die fast alle brauchen.
+  assert.equal(getOnboardingReminderCopy("de", { round: 1, nextStep: "setup", name: null }).values.length, 4);
+  assert.doesNotMatch(JSON.stringify(advisor), /[äöüÄÖÜß]/);
 });
 
 test("Abmelden: ein Abruf ändert nichts, erst der Knopf; die Unterschrift wird geprüft", () => {
@@ -107,7 +133,7 @@ test("die Datenbank: Tabelle nur lesbar, Funktionen nur für die Richtigen, Test
   assert.ok(migration);
   const sql = read(`../supabase/migrations/${migration}`);
   assert.match(sql, /revoke all on table public\.onboarding_reminders from public, anon, authenticated;\ngrant select on table public\.onboarding_reminders to authenticated;/);
-  assert.match(sql, /grant execute on function public\.set_onboarding_reminder\(boolean\) to authenticated;/);
+  assert.match(sql, /grant execute on function public\.set_onboarding_reminder\(boolean, text\) to authenticated;/);
   assert.match(sql, /revoke all on function public\.prepare_onboarding_reminders\(integer\) from public, anon, authenticated;\ngrant execute on function public\.prepare_onboarding_reminders\(integer\) to service_role;/);
   assert.match(sql, /constraint onboarding_reminders_consent check \(not wants_email or consent_at is not null\)/);
   // Gestempelt wird vor der Rueckgabe.

@@ -879,16 +879,27 @@
       "nextDashboard": "Your overview",
       "startQ": "Where would you like to start?",
       "startHint": "You can find the other areas in the menu any time afterwards.",
-      "nextAdvise": "Your advisor area",
-      "setupCta": "Set up my profile first",
-      "setupHint": "Four short steps, each saved right away.",
-      "reminderNote": "We'll send you up to two friendly reminders by email if you don't continue. By choosing “Let’s go” or “Set up my profile first” you agree to that. You can stop them any time with one click.",
-      "withoutReminder": "Continue without reminders"
+      "nextAdvise": "Your advisor area"
     },
     "setup": {
       "finish": "Done",
       "later": "Continue later",
       "autosave": "Everything is saved as you go. You can stop at any time."
+    },
+    "welcome": {
+      "title": "Great that you're here.",
+      "start": "Let’s go",
+      "later": "No time right now? Remind me tomorrow",
+      "laterNote": "By choosing “Remind me tomorrow” you agree to a short email from us, at most two. Your profile stays private until you share something."
+    },
+    "later": {
+      "saved": "All saved",
+      "title": "All set, see you tomorrow.",
+      "text": "Your spot is reserved and your account is already here. Tomorrow morning I'll send you a short email with a button that picks up exactly where you left off.",
+      "meanwhileTitle": "What happens until then:",
+      "meanwhileText": "nothing. Nobody sees you, and you don't have to do anything. If you feel like it after all, you can continue any time.",
+      "doNow": "Start right away after all",
+      "note": "You'll get at most two emails from us. You can stop them with one click in every email."
     }
   },
   "values": {

@@ -1,7 +1,7 @@
 import { PRODUCT_NAME } from "@/features/brand";
 import { getEmailLogoUrl, getEmailPrivacyUrl } from "@/features/email/emailMessages";
 import { resolveEmailLocale, type EmailLocaleInput } from "@/features/email/emailLocale";
-import { getOnboardingReminderCopy, type OnboardingReminderStep } from "@/features/email/onboardingReminderCopy";
+import { getOnboardingReminderCopy, type OnboardingReminderSource, type OnboardingReminderStep } from "@/features/email/onboardingReminderCopy";
 
 function escapeHtml(value: string) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
@@ -21,6 +21,8 @@ type Params = {
   round: 1 | 2;
   nextStep: OnboardingReminderStep;
   name: string | null;
+  areas?: readonly string[];
+  source?: OnboardingReminderSource;
   url: string;
   unsubscribeUrl: string;
   locale?: EmailLocaleInput;
@@ -29,7 +31,7 @@ type Params = {
 /** Der Text als HTML-Mail. Eigene Vorlage, weil die Netzwerk-Benachrichtigungen bewusst knapp sind; hier soll es warm sein. */
 export function buildOnboardingReminderHtml(params: Params) {
   const locale = resolveEmailLocale(params.locale);
-  const copy = getOnboardingReminderCopy(locale, { round: params.round, nextStep: params.nextStep, name: params.name });
+  const copy = getOnboardingReminderCopy(locale, { round: params.round, nextStep: params.nextStep, name: params.name, areas: params.areas, source: params.source });
   const values = copy.values
     .map((pain) => `<li style="margin:0 0 8px;font-size:16px;line-height:25px;color:#334155;">${escapeHtml(pain)}</li>`)
     .join("");
@@ -66,7 +68,7 @@ export async function sendOnboardingReminderEmail(params: Params): Promise<{ ok:
   if (!from) return { ok: false, error: "missing_resend_from_email" };
 
   const locale = resolveEmailLocale(params.locale);
-  const copy = getOnboardingReminderCopy(locale, { round: params.round, nextStep: params.nextStep, name: params.name });
+  const copy = getOnboardingReminderCopy(locale, { round: params.round, nextStep: params.nextStep, name: params.name, areas: params.areas, source: params.source });
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },

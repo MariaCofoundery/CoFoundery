@@ -879,16 +879,27 @@
       "nextDashboard": "Dein Überblick",
       "startQ": "Womit möchtest du anfangen?",
       "startHint": "Die anderen Bereiche findest du danach jederzeit im Menü.",
-      "nextAdvise": "Dein Advisor-Bereich",
-      "setupCta": "Erst mein Profil einrichten",
-      "setupHint": "Vier kurze Schritte, jeder wird sofort gespeichert.",
-      "reminderNote": "Wir schicken dir bis zu zwei freundliche Erinnerungen per Mail, falls du nicht weitermachst. Mit „Los geht’s“ oder „Erst mein Profil einrichten“ stimmst du dem zu. Abmelden geht jederzeit mit einem Klick.",
-      "withoutReminder": "Ohne Erinnerungen weiter"
+      "nextAdvise": "Dein Advisor-Bereich"
     },
     "setup": {
       "finish": "Fertig",
       "later": "Später weitermachen",
       "autosave": "Alles wird beim Weitergehen gespeichert. Du kannst jederzeit aufhören."
+    },
+    "welcome": {
+      "title": "Schön, dass du da bist.",
+      "start": "Los geht’s",
+      "later": "Gerade keine Zeit? Erinnere mich morgen",
+      "laterNote": "Mit „Erinnere mich morgen“ stimmst du einer kurzen Mail von uns zu, höchstens zwei. Dein Profil bleibt privat, bis du etwas freigibst."
+    },
+    "later": {
+      "saved": "Alles gespeichert",
+      "title": "Alles klar, bis morgen.",
+      "text": "Dein Platz ist reserviert, und dein Account ist schon da. Morgen früh schicke ich dir eine kurze Mail mit einem Knopf, der genau dort weitermacht, wo du aufgehört hast.",
+      "meanwhileTitle": "Was bis dahin passiert:",
+      "meanwhileText": "nichts. Niemand sieht dich, und du musst nichts tun. Wenn du doch gleich Lust hast, kannst du jederzeit weitermachen.",
+      "doNow": "Doch gleich loslegen",
+      "note": "Du bekommst höchstens zwei Mails von uns. Abmelden geht in jeder Mail mit einem Klick."
     }
   },
   "values": {

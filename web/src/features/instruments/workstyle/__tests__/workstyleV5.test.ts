@@ -153,7 +153,7 @@ test("route: the current version opens the v5 questionnaire; v4 is no longer res
   const page = code("src/app/(product)/research/workstyle-pretest/page.tsx");
   assert.match(page, /const version = query\.version \?\? CURRENT_WORKSTYLE_VERSION;/);
   assert.match(page, /if \(version === "8\.5a-v5"\) \{/);
-  assert.match(page, /<WorkstyleV5Flow initialSession=\{session\} context=\{completionContext\} previousVersion=\{Boolean\(previous\?\.submitted_at\)\} \/>/);
+  assert.match(page, /<WorkstyleV5Flow initialSession=\{session\} context=\{completionContext\} previousVersion=\{Boolean\(previous\?\.submitted_at\)\} reminderDecided=\{Boolean\(reminderRow\)\} \/>/);
   assert.match(page, /version === "8\.5a-v4" \|\| !earlier/);
   assert.match(page, /\["8\.5a-v1", "8\.5a-v2", "8\.5a-v3", "8\.5a-v4", "8\.5a-v5"\]/);
 });
