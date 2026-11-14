@@ -3,12 +3,13 @@ begin;
 /*
  * Erinnerung nach dem Einstieg (14.11.2026).
  *
- * Wer beim Start "Erinnere mich per Mail" ankreuzt, bekommt nach einem und nach drei Tagen je EINE freundliche
- * Mail - aber nur, solange das Profil noch Luecken hat. Danach nichts mehr.
+ * Wer sich anmeldet und den Einstieg abschliesst, bekommt nach einem und nach drei Tagen je EINE freundliche Mail - aber
+ * nur, solange das Profil noch Luecken hat. Danach nichts mehr.
  *
- * DIE ZUSTIMMUNG IST AUSDRUECKLICH: Die Zeile entsteht nur, wenn die Person es selbst anschaltet
- * (`set_onboarding_reminder(true)`); der Haken steht beim Start nicht vorbelegt. `consent_at` haelt fest, seit wann.
- * Abmelden geht jederzeit, auch aus der Mail ohne Anmeldung (`stopped_at`).
+ * DIE ZUSTIMMUNG IST EINE ENTSCHEIDUNG, KEIN HAKEN: Der Abschluss bietet zwei Wege mit Erinnerung ("Los geht's",
+ * "Erst mein Profil einrichten") und den gleichwertigen Gegenweg "Ohne Erinnerungen". Nur ein Weg mit Erinnerung ruft
+ * `set_onboarding_reminder(true)` auf; `consent_at` haelt fest, seit wann. Abmelden geht jederzeit, auch aus der Mail
+ * ohne Anmeldung (`stopped_at`).
  *
  * KEIN DIREKTER SCHREIBZUGRIFF fuer Personen: Die Tabelle ist nur lesbar (die eigene Zeile); geschrieben wird ueber
  * die Funktion. Gestempelt wird, BEVOR gesendet wird (`prepare_onboarding_reminders`) - hoechstens eine Mail je

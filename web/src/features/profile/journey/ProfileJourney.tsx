@@ -7,6 +7,7 @@ import { FOCUS_HUES, FOCUS_ICONS } from "@/features/profile/journey/focusVisuals
 import {
   completeJourneyAction,
   completeJourneyToSetupAction,
+  completeJourneyWithoutReminderAction,
   finishSetupAction,
   saveSetupProgressAction,
 } from "@/features/profile/journey/journeyActions";
@@ -37,8 +38,14 @@ function Check({ on }: { on: boolean }) {
   );
 }
 
-/** "Erst mein Profil einrichten": derselbe Abschluss, nur mit der Liste der kleinen Schritte als Ziel. */
-function SetupFirstButton({ label, hint }: { label: string; hint: string }) {
+/**
+ * "Erst mein Profil einrichten" und die Gegenwahl "Ohne Erinnerungen".
+ *
+ * Die Zustimmung zu den (hoechstens zwei) Erinnerungs-Mails steckt in den beiden Knoepfen "Los geht's" und "Erst mein
+ * Profil einrichten"; der Hinweis darueber sagt das ausdruecklich. Wer das nicht will, drueckt "Ohne Erinnerungen":
+ * eine echte Wahl zwischen zwei Wegen, nichts ist vorangekreuzt und die Zustimmung ist nicht Bedingung fuers Weitermachen.
+ */
+function SetupFirstButton({ label, hint, reminderNote, withoutLabel }: { label: string; hint: string; reminderNote: string; withoutLabel: string }) {
   const { pending } = useFormStatus();
   return (
     <>
@@ -46,6 +53,10 @@ function SetupFirstButton({ label, hint }: { label: string; hint: string }) {
         {label}
       </button>
       <span className="text-center text-xs text-slate-500">{hint}</span>
+      <p className="text-center text-xs leading-5 text-slate-600" data-reminder-note>{reminderNote}</p>
+      <button type="submit" formAction={completeJourneyWithoutReminderAction} disabled={pending} className="min-h-10 text-sm font-semibold text-slate-500 underline-offset-4 hover:text-slate-900 hover:underline disabled:opacity-60">
+        {withoutLabel}
+      </button>
     </>
   );
 }
@@ -365,11 +376,6 @@ export function ProfileJourney({
                   <p className="text-sm text-slate-500">{t("done.startHint")}</p>
                 </div>
               ) : null}
-              {/* Nicht vorbelegt: Die Erinnerung ist eine Zustimmung, die man selbst gibt. */}
-              <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left">
-                <input type="checkbox" name="reminder" value="on" className="mt-1 h-5 w-5 shrink-0 accent-violet-700" />
-                <span className="text-sm leading-6 text-slate-800"><strong className="block text-slate-950">{t("done.reminderLabel")}</strong>{t("done.reminderHint")}</span>
-              </label>
               <div className="rounded-2xl bg-slate-100 p-4"><span className="text-[11px] font-bold uppercase tracking-[.08em] text-slate-500">{t("done.next")}</span><p className="mt-1 text-base font-semibold text-slate-950">{nextLabel}</p></div>
             </>
           ) : null}
@@ -385,7 +391,7 @@ export function ProfileJourney({
           </button>
         )}
         {isDone && !isSetup ? (
-          <SetupFirstButton label={t("done.setupCta")} hint={t("done.setupHint")} />
+          <SetupFirstButton label={t("done.setupCta")} hint={t("done.setupHint")} reminderNote={t("done.reminderNote")} withoutLabel={t("done.withoutReminder")} />
         ) : !isDone && !isLastSetupStep && step !== "areas" && step !== "name" ? (
           <button type="button" onClick={() => go(index + 1)} className="min-h-10 text-sm font-semibold text-slate-500 hover:text-slate-900">{t("skip")}</button>
         ) : <span className="min-h-10" />}

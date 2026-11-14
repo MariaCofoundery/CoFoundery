@@ -45,7 +45,7 @@ const SETUP = "/welcome/profil";
  * Markierung. Bricht es dazwischen ab, bekommt die Person den Einstieg noch
  * einmal - und landet nicht ohne Bereich ausserhalb des Produkts.
  */
-async function finishJourney(formData: FormData, toSetup: boolean) {
+async function finishJourney(formData: FormData, toSetup: boolean, withReminder: boolean) {
   const client = await createClient();
   const {
     data: { user },
@@ -104,9 +104,10 @@ async function finishJourney(formData: FormData, toSetup: boolean) {
 
   await writeInterests(client, user.id, interestsFor(payload.areas));
   await markOnboardingComplete(client, user.id);
-  // Die ausdrueckliche Zustimmung zu den zwei Erinnerungs-Mails: nur, wenn der Haken gesetzt wurde (nicht vorbelegt).
+  // Die Zustimmung zu den zwei Erinnerungs-Mails steckt im Knopf, den die Person drueckt - neben ihm steht die Gegenwahl
+  // "Ohne Erinnerungen". Beides ist eine ausdrueckliche Entscheidung, nichts ist vorangekreuzt.
   // Scheitert das, bleibt der Einstieg trotzdem abgeschlossen - eine Erinnerung ist kein Muss.
-  if (formData.get("reminder") === "on") await client.rpc("set_onboarding_reminder", { p_wants: true });
+  if (withReminder) await client.rpc("set_onboarding_reminder", { p_wants: true });
 
   revalidatePath("/dashboard");
   revalidatePath("/connect", "layout");
@@ -119,12 +120,17 @@ async function finishJourney(formData: FormData, toSetup: boolean) {
 }
 
 export async function completeJourneyAction(formData: FormData) {
-  return finishJourney(formData, false);
+  return finishJourney(formData, false, true);
+}
+
+/** Die ausdrueckliche Gegenwahl: derselbe Abschluss, aber ohne Erinnerungs-Mails. */
+export async function completeJourneyWithoutReminderAction(formData: FormData) {
+  return finishJourney(formData, false, false);
 }
 
 /** "Erst mein Profil einrichten": derselbe Abschluss, aber das Ziel ist die Liste der kleinen Schritte. */
 export async function completeJourneyToSetupAction(formData: FormData) {
-  return finishJourney(formData, true);
+  return finishJourney(formData, true, true);
 }
 
 /**

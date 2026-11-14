@@ -18,13 +18,14 @@ test("der Abmelde-Link ist unterschrieben: nur die richtige Person mit dem richt
   assert.equal(isValidReminderToken("user-1", token, ""), false, "ohne Geheimnis nie");
 });
 
-test("zwei Mails, beide freundlich, mit Schmerzpunkten und dem, was Made2Found daran löst", () => {
+test("zwei Mails, beide freundlich, mit dem Gesamtwert von Made2Found in wenigen Zeilen", () => {
   for (const locale of ["de", "en"] as const) {
     for (const round of [1, 2] as const) {
       const copy = getOnboardingReminderCopy(locale, { round, nextStep: "workstyle", name: "Lena" });
       assert.match(copy.headline, /Lena/);
-      assert.equal(copy.pains.length, 3, `${locale} ${round}: drei Punkte`);
-      assert.ok(copy.solution.length > 30 && copy.cta && copy.ctaHint && copy.signoff, `${locale} ${round}`);
+      assert.ok(copy.values.length >= 3 && copy.values.length <= 4, `${locale} ${round}: wenige Punkte`);
+      assert.ok(copy.values.every((value) => value.length < 140), `${locale} ${round}: kurz`);
+      assert.ok(copy.cta && copy.ctaHint && /Maria \| Made2Found/.test(copy.signoff), `${locale} ${round}`);
       // Keine Bewertung, kein Versprechen, keine Zahl.
       assert.doesNotMatch(JSON.stringify(copy), /Punktzahl|Prozent|your score|\d\s*%|garantiert|guaranteed|kompatibel|compatible|Typ\b/i, `${locale} ${round}`);
     }
@@ -58,20 +59,30 @@ test("die Mail nennt den Grund, hat Abmelden und enthält nichts aus dem Konto a
     unsubscribeUrl: "https://made2found.test/abmelden/erinnerung?u=1&t=2",
     locale: "de",
   });
-  assert.match(html, /Du bekommst diese Mail, weil du beim Start Erinnerungen angeschaltet hast/);
+  assert.match(html, /Du bekommst diese Mail, weil du dich bei Made2Found angemeldet hast und noch nicht fertig bist/);
+  assert.match(code("src/lib/email/sendOnboardingReminderEmail.ts"), /Maria \| \$\{PRODUCT_NAME\}/);
   assert.match(html, /abmelden\/erinnerung\?u=1&amp;t=2/);
   assert.match(html, /workstyle-pretest\?version=8\.5a-v5/);
   assert.doesNotMatch(html, /<b>/, "Eingaben werden maskiert");
 });
 
-test("die Zustimmung ist ausdrücklich und nicht vorbelegt, und der Lauf braucht sie", () => {
+test("die Zustimmung steckt in den Knöpfen, mit einer echten Gegenwahl - kein Haken, nichts vorangekreuzt", () => {
   const ui = code("src/features/profile/journey/ProfileJourney.tsx");
-  assert.match(ui, /<input type="checkbox" name="reminder" value="on"/);
-  assert.doesNotMatch(ui, /name="reminder"[^>]*(defaultChecked|checked)/);
+  assert.doesNotMatch(ui, /type="checkbox"[^>]*reminder|name="reminder"/);
+  // Beide Hauptwege tragen die Zustimmung, "Ohne Erinnerungen" ist der gleichwertige Gegenweg.
+  assert.match(ui, /formAction=\{completeJourneyWithoutReminderAction\}/);
+  assert.match(ui, /data-reminder-note/);
   const action = code("src/features/profile/journey/journeyActions.ts");
-  assert.match(action, /formData\.get\("reminder"\) === "on"\) await client\.rpc\("set_onboarding_reminder", \{ p_wants: true \}\)/);
+  assert.match(action, /if \(withReminder\) await client\.rpc\("set_onboarding_reminder", \{ p_wants: true \}\)/);
+  assert.match(action, /export async function completeJourneyAction[\s\S]*?finishJourney\(formData, false, true\)/);
+  assert.match(action, /export async function completeJourneyToSetupAction[\s\S]*?finishJourney\(formData, true, true\)/);
+  assert.match(action, /export async function completeJourneyWithoutReminderAction[\s\S]*?finishJourney\(formData, false, false\)/);
   // Erst nach der Markierung "eingefuehrt", und ein Fehler macht den Einstieg nicht rueckgaengig.
   assert.ok(action.indexOf("markOnboardingComplete(client") < action.indexOf("set_onboarding_reminder"));
+  for (const locale of ["de", "en"]) {
+    const done = JSON.parse(read(`messages/${locale}/profile.json`)).journey.done;
+    assert.ok(done.reminderNote && done.withoutReminder, locale);
+  }
   const runner = code("src/features/onboarding/onboardingReminders.ts");
   assert.match(runner, /prepare_onboarding_reminders/);
   assert.match(runner, /if \(!secret\) return \{ ok: true, prepared: 0, mailed: 0 \}/);

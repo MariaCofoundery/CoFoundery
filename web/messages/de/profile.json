@@ -882,8 +882,8 @@
       "nextAdvise": "Dein Advisor-Bereich",
       "setupCta": "Erst mein Profil einrichten",
       "setupHint": "Vier kurze Schritte, jeder wird sofort gespeichert.",
-      "reminderLabel": "Erinnere mich per Mail, falls ich nicht weitermache",
-      "reminderHint": "Höchstens zwei freundliche Mails, mit einem Knopf direkt zum nächsten Schritt. Abmelden geht jederzeit mit einem Klick."
+      "reminderNote": "Wir schicken dir bis zu zwei freundliche Erinnerungen per Mail, falls du nicht weitermachst. Mit „Los geht’s“ oder „Erst mein Profil einrichten“ stimmst du dem zu. Abmelden geht jederzeit mit einem Klick.",
+      "withoutReminder": "Ohne Erinnerungen weiter"
     },
     "setup": {
       "finish": "Fertig",

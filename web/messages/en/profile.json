@@ -882,8 +882,8 @@
       "nextAdvise": "Your advisor area",
       "setupCta": "Set up my profile first",
       "setupHint": "Four short steps, each saved right away.",
-      "reminderLabel": "Remind me by email if I don't continue",
-      "reminderHint": "At most two friendly emails, with a button straight to the next step. You can stop them any time with one click."
+      "reminderNote": "We'll send you up to two friendly reminders by email if you don't continue. By choosing “Let’s go” or “Set up my profile first” you agree to that. You can stop them any time with one click.",
+      "withoutReminder": "Continue without reminders"
     },
     "setup": {
       "finish": "Done",

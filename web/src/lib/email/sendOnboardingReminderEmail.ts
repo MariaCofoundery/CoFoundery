@@ -7,10 +7,13 @@ function escapeHtml(value: string) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
+/** Die Absenderin ist Maria - "Maria | Made2Found" -, nicht der allgemeine Absendername des Produkts. */
+const SENDER_NAME = `Maria | ${PRODUCT_NAME}`;
+
 function buildFromAddress() {
   const fromEmail = process.env.RESEND_FROM_EMAIL?.trim();
   if (!fromEmail) return null;
-  return `${process.env.RESEND_FROM_NAME?.trim() || PRODUCT_NAME} <${fromEmail}>`;
+  return `${SENDER_NAME} <${fromEmail}>`;
 }
 
 type Params = {
@@ -27,7 +30,7 @@ type Params = {
 export function buildOnboardingReminderHtml(params: Params) {
   const locale = resolveEmailLocale(params.locale);
   const copy = getOnboardingReminderCopy(locale, { round: params.round, nextStep: params.nextStep, name: params.name });
-  const pains = copy.pains
+  const values = copy.values
     .map((pain) => `<li style="margin:0 0 8px;font-size:16px;line-height:25px;color:#334155;">${escapeHtml(pain)}</li>`)
     .join("");
   return `<!DOCTYPE html>
@@ -41,10 +44,8 @@ export function buildOnboardingReminderHtml(params: Params) {
           <tr><td style="padding:24px 32px 32px;">
             <h1 style="margin:0 0 16px;font-size:26px;line-height:33px;color:#0f172a;">${escapeHtml(copy.headline)}</h1>
             <p style="margin:0 0 22px;font-size:16px;line-height:26px;color:#334155;">${escapeHtml(copy.intro)}</p>
-            <p style="margin:0 0 10px;font-size:13px;line-height:20px;letter-spacing:.08em;text-transform:uppercase;color:#6d28d9;font-weight:bold;">${escapeHtml(copy.painTitle)}</p>
-            <ul style="margin:0 0 22px;padding-left:20px;">${pains}</ul>
-            <p style="margin:0 0 6px;font-size:16px;line-height:24px;color:#0f172a;font-weight:bold;">${escapeHtml(copy.solutionTitle)}</p>
-            <p style="margin:0 0 26px;font-size:16px;line-height:26px;color:#334155;">${escapeHtml(copy.solution)}</p>
+            <p style="margin:0 0 10px;font-size:13px;line-height:20px;letter-spacing:.08em;text-transform:uppercase;color:#6d28d9;font-weight:bold;">${escapeHtml(copy.valueTitle)}</p>
+            <ul style="margin:0 0 26px;padding-left:20px;">${values}</ul>
             <p style="margin:0 0 8px;"><a href="${escapeHtml(params.url)}" style="display:inline-block;padding:15px 24px;border-radius:999px;background:#6d28d9;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;">${escapeHtml(copy.cta)}</a></p>
             <p style="margin:0 0 26px;font-size:14px;line-height:22px;color:#64748b;">${escapeHtml(copy.ctaHint)}</p>
             <p style="margin:0 0 24px;font-size:16px;line-height:26px;color:#334155;white-space:pre-line;">${escapeHtml(copy.signoff)}</p>
