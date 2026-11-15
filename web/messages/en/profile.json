@@ -908,6 +908,13 @@
       "no": "No thanks",
       "thanksYes": "All set, I'll send you a short email tomorrow.",
       "thanksNo": "All set, no reminder."
+    },
+    "explainer": {
+      "alt": "A short explanation of the four areas: Align, Find, Connect and Advisor",
+      "align": "How do you tick, and how does your team? Find out together.",
+      "find": "Meet the people you want to found with.",
+      "connect": "Your network: people, offers and ideas in one place.",
+      "advise": "Support startups and teams, on your own or as an accelerator."
     }
   },
   "values": {

@@ -908,6 +908,13 @@
       "no": "Nein danke",
       "thanksYes": "Alles klar, ich schicke dir morgen eine kurze Mail.",
       "thanksNo": "Alles klar, keine Erinnerung."
+    },
+    "explainer": {
+      "alt": "Kurze Erklärung der vier Bereiche: Align, Find, Connect und Advisor",
+      "align": "Wie tickst du, wie tickt ihr als Team? Findet es gemeinsam heraus.",
+      "find": "Finde die Menschen, mit denen du gründen willst.",
+      "connect": "Dein Netzwerk: Menschen, Angebote und Ideen an einem Ort.",
+      "advise": "Begleite Startups und Teams, allein oder als Accelerator."
     }
   },
   "values": {

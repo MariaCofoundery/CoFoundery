@@ -2479,7 +2479,10 @@
       "end": "End setup"
     },
     "prevStep": "Back",
-    "error": "That did not work just now. Please try again."
+    "error": "That did not work just now. Please try again.",
+    "exampleTitle": "Take a look at what it looks like first",
+    "exampleText": "An example view with a made-up program and made-up teams, so you can see where this is going.",
+    "exampleCta": "View the example"
   },
   "calendar": {
     "title": "Calendar",

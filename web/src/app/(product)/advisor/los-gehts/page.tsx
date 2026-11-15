@@ -17,6 +17,7 @@ import { getOrgMembers } from "@/features/advisor/orgData";
 import { NavSettings } from "@/features/navigation/workspace/NavSettings";
 import { SetupSessionEnd, SetupSessionWriter } from "@/features/advisor/setup/SetupSessionClient";
 import { SubmitButton } from "@/features/ui/SubmitButton";
+import { AreaPayoff } from "@/features/onboarding/AreaPayoff";
 import { ReminderAskSlot } from "@/features/onboarding/ReminderAskSlot";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 
@@ -56,7 +57,11 @@ export default async function SetupPage({ searchParams }: { searchParams?: Promi
 
   return (
     <main className="work-ui mx-auto grid w-full max-w-6xl gap-6 px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start lg:px-8">
-      <div className="order-0 lg:col-span-2"><ReminderAskSlot /></div>
+      <div className="order-0 lg:col-span-2">
+        <ReminderAskSlot />
+        {/* Der erste Erfolg: sehen, wie es aussieht - mit der vorhandenen Beispielansicht (erfundenes Programm), solange noch nichts erledigt ist. */}
+        {done === 0 ? <AreaPayoff title={t("exampleTitle")} text={t("exampleText")} cta={t("exampleCta")} href="/advisor/beispiel" /> : null}
+      </div>
       <aside className="order-2 rounded-[20px] border border-slate-200 bg-white p-5 lg:order-1">
         <p className="text-[13px] text-slate-600">{org.name}</p>
         <h1 className="font-brand mt-1 text-[30px] font-semibold leading-tight text-slate-950">{t("title")}</h1>

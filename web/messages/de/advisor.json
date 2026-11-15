@@ -2479,7 +2479,10 @@
       "end": "Einrichtung beenden"
     },
     "prevStep": "Zurück",
-    "error": "Das hat gerade nicht geklappt. Bitte versuch es noch einmal."
+    "error": "Das hat gerade nicht geklappt. Bitte versuch es noch einmal.",
+    "exampleTitle": "Schau dir erst an, wie es aussieht",
+    "exampleText": "Eine Beispielansicht mit erfundenem Programm und erfundenen Teams, damit du siehst, wohin die Reise geht.",
+    "exampleCta": "Beispiel ansehen"
   },
   "calendar": {
     "title": "Kalender",

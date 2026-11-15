@@ -1032,5 +1032,11 @@
       "parts": "Community | Netzwerk aufbauen & halten | Moderation & Gespräche führen"
     }
   },
-  "roleHelpOpen": "Was gehört dazu?"
+  "roleHelpOpen": "Was gehört dazu?",
+  "payoff": {
+    "title": "So sieht die Suche aus",
+    "text": "Wirf einen Blick auf die Suche, bevor du dein Profil fertig machst.",
+    "cta": "Zur Suche",
+    "note": "Du bist noch unsichtbar, bis du dein Profil selbst veröffentlichst."
+  }
 }

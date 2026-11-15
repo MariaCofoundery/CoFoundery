@@ -54,6 +54,7 @@ import { CapabilityMatchingPermissionSection } from "@/features/capability/Capab
 import { getCapabilityMatchingPermission } from "@/features/capability/capabilityMatchingPermission";
 import { getOwnCapabilityEntries } from "@/features/capability/capabilityData";
 import { isFindV01RankingEnabled } from "@/features/discovery/findV01RankingFlag";
+import { AreaPayoff } from "@/features/onboarding/AreaPayoff";
 import { ReminderAskSlot } from "@/features/onboarding/ReminderAskSlot";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
@@ -402,6 +403,8 @@ export default async function DiscoveryProfilePage({
   return (
     <main className="min-h-screen px-5 py-7 text-slate-950 md:px-8 md:py-8">
       <ReminderAskSlot />
+      {/* Der erste Erfolg: sehen, wie die Suche aussieht - solange das eigene Profil noch nicht aktiv ist (dann ist man noch unsichtbar). */}
+      {(profile.status ?? "draft") !== "active" ? <div className="mx-auto w-full max-w-6xl"><AreaPayoff title={t("payoff.title")} text={t("payoff.text")} cta={t("payoff.cta")} href="/discovery/suche" note={t("payoff.note")} /></div> : null}
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <Link
           href="/discovery"

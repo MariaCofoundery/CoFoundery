@@ -1496,5 +1496,10 @@
     },
     "outcomeNote": "Your answer stays private and goes into no list and no value.",
     "closedHint": "After 14 days without an answer an introduction closes quietly."
+  },
+  "payoff": {
+    "title": "See what others are looking for and offering right now",
+    "text": "A look at the network before you fill in your profile.",
+    "cta": "Look at the network"
   }
 }

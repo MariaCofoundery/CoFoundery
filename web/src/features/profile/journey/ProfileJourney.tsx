@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
+import { AreasExplainer } from "@/features/onboarding/AreasExplainer";
 import { FOCUS_HUES, FOCUS_ICONS } from "@/features/profile/journey/focusVisuals";
 import {
   completeJourneyAction,
@@ -198,6 +199,8 @@ export function ProfileJourney({
           <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-tight text-slate-950">
             {isSetup ? t(`${step}.q`) : t("welcome.title")}
           </h1>
+
+          {!isSetup ? <AreasExplainer /> : null}
 
           {!isSetup ? (
             <>

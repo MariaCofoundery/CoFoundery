@@ -1032,5 +1032,11 @@
       "parts": "Community | Building and keeping a network | Moderating & leading conversations"
     }
   },
-  "roleHelpOpen": "What does it include?"
+  "roleHelpOpen": "What does it include?",
+  "payoff": {
+    "title": "Here's what the search looks like",
+    "text": "Take a look at the search before you finish your profile.",
+    "cta": "Go to the search",
+    "note": "You stay invisible until you publish your profile yourself."
+  }
 }

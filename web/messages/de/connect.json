@@ -1496,5 +1496,10 @@
     },
     "outcomeNote": "Deine Antwort bleibt privat und fließt in keine Liste und keinen Wert ein.",
     "closedHint": "Nach 14 Tagen ohne Antwort schließt sich eine Vorstellung still."
+  },
+  "payoff": {
+    "title": "Schau, was andere gerade suchen und anbieten",
+    "text": "Ein Blick ins Netzwerk, bevor du dein Profil ausfüllst.",
+    "cta": "Ins Netzwerk schauen"
   }
 }

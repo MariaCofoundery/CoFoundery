@@ -140,8 +140,10 @@ test("der private Block verweist auf „Deine Suche“ statt eigener Kategorien"
   // NICHT im Formular fuer das oeffentliche Profil.
   const page = source(PAGE);
   const profileForm = page.indexOf("<form action={saveProfileDraft}");
-  const hinweis = page.indexOf('href="/discovery/suche"');
   const formEnd = page.indexOf("</form>", profileForm);
+  // Seit 15.11.2026 steht oben zusaetzlich der "erste Erfolg" (Link zur Suche); der Weg zur eigenen Suche, um den es hier geht,
+  // steht NACH dem Formular.
+  const hinweis = page.indexOf('href="/discovery/suche"', formEnd);
   assert.ok(hinweis > 0, "kein Weg zur eigenen Suche");
   assert.ok(formEnd < hinweis, "der private Block liegt im Profilformular");
 
