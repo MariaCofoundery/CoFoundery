@@ -9,10 +9,10 @@ const CONTACTS = "/connect/contacts";
 export async function sendThanksAction(formData: FormData) {
   const { client } = await requireConnectMember(CONTACTS);
   const parsed = parseThanksForm(formData);
-  const id = String(formData.get("request_id") ?? "").trim();
+  const id = String(formData.get("conversation_id") ?? "").trim();
   if (!parsed) redirect(`/connect/danke/${encodeURIComponent(id)}?error=invalid`);
   const { error } = await client.rpc("send_network_thanks", {
-    p_request_id: parsed.requestId, p_help_types: parsed.helpTypes, p_outcome: parsed.outcome ?? "", p_body: parsed.body ?? "", p_show: parsed.show,
+    p_conversation_id: parsed.conversationId, p_help_types: parsed.helpTypes, p_outcome: parsed.outcome ?? "", p_body: parsed.body ?? "", p_show: parsed.show,
   });
   if (error) redirect(`${CONTACTS}?error=thanks`);
   revalidatePath(CONTACTS);

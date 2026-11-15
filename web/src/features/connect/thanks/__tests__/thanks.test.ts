@@ -7,24 +7,24 @@ const read = (path: string) => readFileSync(new URL(`../../../../../${path}`, im
 function form(entries: [string, string][]) { const f = new FormData(); for (const [k, v] of entries) f.append(k, v); return f; }
 
 test("a thanks needs at least one kind of help", () => {
-  assert.equal(parseThanksForm(form([["request_id", "r1"]])), null);
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "nonsense"]])), null);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"]])), null);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "nonsense"]])), null);
 });
 
 test("kinds, outcome and words are read; unknown values are dropped", () => {
-  const parsed = parseThanksForm(form([["request_id", "r1"], ["help_type", "knowledge"], ["help_type", "knowledge"], ["help_type", "contact"], ["outcome", "meeting"], ["body", "  Danke!  "]]));
-  assert.deepEqual(parsed, { requestId: "r1", helpTypes: ["knowledge", "contact"], outcome: "meeting", body: "Danke!", show: false });
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "time"], ["outcome", "x"]]))?.outcome, null);
+  const parsed = parseThanksForm(form([["conversation_id", "r1"], ["help_type", "knowledge"], ["help_type", "knowledge"], ["help_type", "contact"], ["outcome", "meeting"], ["body", "  Danke!  "]]));
+  assert.deepEqual(parsed, { conversationId: "r1", helpTypes: ["knowledge", "contact"], outcome: "meeting", body: "Danke!", show: false });
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "time"], ["outcome", "x"]]))?.outcome, null);
 });
 
 test("showing on the profile needs words and the thanker's own yes", () => {
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "time"], ["show", "on"]]))?.show, false);
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "time"], ["body", "Danke"], ["show", "on"]]))?.show, true);
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "time"], ["body", "Danke"]]))?.show, false);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "time"], ["show", "on"]]))?.show, false);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "time"], ["body", "Danke"], ["show", "on"]]))?.show, true);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "time"], ["body", "Danke"]]))?.show, false);
 });
 
 test("words are limited to 280 characters", () => {
-  assert.equal(parseThanksForm(form([["request_id", "r1"], ["help_type", "time"], ["body", "x".repeat(THANKS_BODY_MAX + 1)]])), null);
+  assert.equal(parseThanksForm(form([["conversation_id", "r1"], ["help_type", "time"], ["body", "x".repeat(THANKS_BODY_MAX + 1)]])), null);
 });
 
 test("the heart is a sign, never a number: no counting, ranking or sorting by thanks", () => {
@@ -64,4 +64,13 @@ test("after answering a request the page thanks warmly, without points or a prom
   }
   const notice = JSON.parse(read("messages/de/notices.json"));
   assert.ok(notice.kinds?.connect_thanks ?? JSON.stringify(notice).includes("connect_thanks"));
+});
+
+test("thanks hang on the conversation, so requests and answered problems both work", () => {
+  const sql = read("../supabase/migrations/20270425120000_connect_thanks_conversation.sql");
+  assert.match(sql, /unique \(conversation_id, thanker_user_id\)/);
+  assert.match(sql, /participant_a_user_id, v_conv\.participant_b_user_id/);
+  const contacts = read("src/app/(product)/connect/contacts/page.tsx");
+  assert.match(contacts, /\/connect\/danke\/\$\{conversation\.conversation_id\}/);
+  assert.doesNotMatch(contacts, /danke\/\$\{conversation\.contact_request_id\}/);
 });

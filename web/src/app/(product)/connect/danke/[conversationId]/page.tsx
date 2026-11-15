@@ -2,23 +2,22 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
-import { getConnectContactRequests } from "@/features/connect/connectData";
+import { getConnectConversation } from "@/features/connect/connectData";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { sendThanksAction } from "@/features/connect/thanks/thanksActions";
 import { listMyThanks } from "@/features/connect/thanks/thanksData";
 import { HELP_TYPES, THANKS_BODY_MAX, THANKS_OUTCOMES } from "@/features/connect/thanks/thanksModel";
 
 /** Danke sagen: zwei Fragen und ein Satz, alles freiwillig bis auf "Wobei?". Das Herz entsteht erst durch dieses Danke. */
-export default async function ThanksPage({ params, searchParams }: { params: Promise<{ requestId: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
-  const { requestId } = await params;
+export default async function ThanksPage({ params, searchParams }: { params: Promise<{ conversationId: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
+  const { conversationId } = await params;
   const query = await searchParams;
-  const { client, user } = await requireConnectMember(`/connect/danke/${requestId}`);
+  const { client } = await requireConnectMember(`/connect/danke/${conversationId}`);
   const t = await getTranslations("connect");
-  const [requests, thanks] = await Promise.all([getConnectContactRequests(client, user.id), listMyThanks(client)]);
-  const request = requests.find((row) => row.id === requestId && row.status === "accepted");
-  if (!request) notFound();
-  if (thanks.some((row) => row.requestId === requestId && row.direction === "sent")) redirect("/connect/contacts");
-  const name = request.sender_user_id === user.id ? request.recipient_display_name_snapshot : request.sender_display_name_snapshot;
+  const [conversation, thanks] = await Promise.all([getConnectConversation(client, conversationId), listMyThanks(client)]);
+  if (!conversation || !conversation.counterpart_user_id) notFound();
+  if (thanks.some((row) => row.conversationId === conversationId && row.direction === "sent")) redirect("/connect/contacts");
+  const name = conversation.counterpart_display_name ?? "";
 
   const chip = "flex min-h-11 cursor-pointer items-center rounded-full border border-slate-300 bg-white px-4 text-[15px] has-[:checked]:border-violet-700 has-[:checked]:bg-violet-700 has-[:checked]:font-semibold has-[:checked]:text-white";
   return (
@@ -28,7 +27,7 @@ export default async function ThanksPage({ params, searchParams }: { params: Pro
       <p className="mt-2 text-base leading-7 text-slate-700">{t("thanks.lead")}</p>
       {query.error ? <p role="alert" className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t("thanks.invalid")}</p> : null}
       <form action={sendThanksAction} className="mt-6 space-y-6">
-        <input type="hidden" name="request_id" value={requestId} />
+        <input type="hidden" name="conversation_id" value={conversationId} />
         <fieldset>
           <legend className="text-[15px] font-semibold">{t("thanks.whatFor")} <span className="font-normal text-slate-600">{t("thanks.severalOk")}</span></legend>
           <div className="mt-2 flex flex-wrap gap-2">

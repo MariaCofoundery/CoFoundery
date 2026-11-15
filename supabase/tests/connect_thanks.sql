@@ -15,19 +15,22 @@ insert into public.network_contact_requests(id, listing_id, sender_user_id, reci
 ('f4200000-0000-4000-8000-0000000000c1', null, 'f4200000-0000-4000-8000-000000000002', 'f4200000-0000-4000-8000-000000000001', 'Eine Frage zu deinem Gebiet bitte.', 'accepted', null, 'Person2', 'Zeile 2', 'Person1', now()),
 ('f4200000-0000-4000-8000-0000000000c2', null, 'f4200000-0000-4000-8000-000000000004', 'f4200000-0000-4000-8000-000000000001', 'Noch eine Frage an dich bitte.', 'pending', null, 'Person4', 'Zeile 4', 'Person1', null);
 
+insert into public.network_conversations(id, contact_request_id, participant_a_user_id, participant_b_user_id)
+values ('f4200000-0000-4000-8000-0000000000e1', 'f4200000-0000-4000-8000-0000000000c1', 'f4200000-0000-4000-8000-000000000002', 'f4200000-0000-4000-8000-000000000001');
+
 create temp table ids (key text primary key, id uuid);
 grant select, insert on ids to authenticated;
 set local role authenticated;
 
 set local request.jwt.claims = '{"sub":"f4200000-0000-4000-8000-000000000002","role":"authenticated"}';
 select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000001'), false, 'no heart before any thanks');
-select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000c2', array['knowledge'], null, null, false)$$, '42501', 'thanks_not_allowed', 'no thanks on a request that was not accepted');
-select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000c1', array['nonsense'], null, null, false)$$, '23514', null, 'only the six kinds of help');
-insert into ids values ('t1', public.send_network_thanks('f4200000-0000-4000-8000-0000000000c1', array['knowledge','contact'], 'meeting', 'Danke, das hat mir den Pitch gerettet.', true));
-select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000c1', array['time'], null, null, false)$$, '23505', 'thanks_exists', 'one thanks per request and person');
+select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000e2', array['knowledge'], null, null, false)$$, '42501', 'thanks_not_allowed', 'no thanks without a conversation');
+select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000e1', array['nonsense'], null, null, false)$$, '23514', null, 'only the six kinds of help');
+insert into ids values ('t1', public.send_network_thanks('f4200000-0000-4000-8000-0000000000e1', array['knowledge','contact'], 'meeting', 'Danke, das hat mir den Pitch gerettet.', true));
+select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000e1', array['time'], null, null, false)$$, '23505', 'thanks_exists', 'one thanks per request and person');
 
 set local request.jwt.claims = '{"sub":"f4200000-0000-4000-8000-000000000003","role":"authenticated"}';
-select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000c1', array['time'], null, null, false)$$, '42501', 'thanks_not_allowed', 'strangers cannot thank on someone else''s request');
+select extensions.throws_ok($$select public.send_network_thanks('f4200000-0000-4000-8000-0000000000e1', array['time'], null, null, false)$$, '42501', 'thanks_not_allowed', 'strangers cannot thank on someone else''s request');
 select extensions.is((select count(*)::int from public.network_thanks), 0, 'strangers read no thanks');
 select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000001'), true, 'but any member sees the heart');
 
