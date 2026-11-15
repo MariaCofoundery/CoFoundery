@@ -128,7 +128,17 @@ export default async function ConnectProblemPage({
         {isAuthor && isPublished && <Link href={`/connect/workspaces/new?problem=${problem.id}`} className="problem-btn problem-btn--ghost">{workspaceText("new")}</Link>}
       </div>
 
-      {saved ? (
+      {saved === "approach" || saved === "interest" ? (
+        <section role="status" data-connect-answer-thanks className="mt-5 rounded-[20px] border-2 border-violet-500 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0a6b52" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+            <h2 className="text-xl font-bold text-[#0b1f3a]">{t("problems.answerThanks.title")}</h2>
+          </div>
+          <p className="mt-3 text-[17px] leading-7 text-slate-800">{t(saved === "approach" ? "problems.answerThanks.approach" : "problems.answerThanks.interest")}</p>
+          <p className="mt-2 text-[15px] leading-6 text-slate-600">{t("problems.answerThanks.note")}</p>
+          <Link href="/connect/problems" className="mt-4 inline-flex min-h-11 items-center justify-center rounded-2xl bg-[linear-gradient(90deg,#5b3df5,#0a88c2)] px-5 text-base font-bold text-white">{t("problems.answerThanks.more")}</Link>
+        </section>
+      ) : saved ? (
         <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
           {t(
             query.saved === "approach"

@@ -52,3 +52,16 @@ test("words reach the profile only if shared and not hidden (SQL)", () => {
   assert.match(sql, /network_thanks_show_needs_body/);
   assert.match(sql, /revoke all on public\.network_thanks from anon, authenticated/);
 });
+
+test("after answering a request the page thanks warmly, without points or a promised heart", () => {
+  const page = read("src/app/(product)/connect/problems/[problemId]/page.tsx");
+  assert.match(page, /data-connect-answer-thanks/);
+  for (const lang of ["de", "en"]) {
+    const messages = JSON.parse(read(`messages/${lang}/connect.json`));
+    const copy = JSON.stringify(messages.problems.answerThanks);
+    assert.doesNotMatch(copy, /Herz|heart/i);
+    assert.ok(messages.problems.answerThanks.title);
+  }
+  const notice = JSON.parse(read("messages/de/notices.json"));
+  assert.ok(notice.kinds?.connect_thanks ?? JSON.stringify(notice).includes("connect_thanks"));
+});

@@ -718,6 +718,13 @@
       "noReplyTitle": "Nobody replies personally here",
       "noReplyText": "This entry comes from a public source and was not posted by a member. You can say “I know this too” or describe how you would approach it. There is no “I would work on this” here, because it would not reach anyone.",
       "boardNote": "Entries with a dashed border come from public sources, not from members."
+    },
+    "answerThanks": {
+      "title": "Thanks for answering!",
+      "approach": "Your approach now stands with the problem. The person will see it and get in touch if it helps.",
+      "interest": "Your response has arrived. If the person starts a conversation, you will find it under Messages.",
+      "note": "Answering itself earns no points. What counts is what really helped.",
+      "more": "See more requests"
     }
   },
   "searches": {

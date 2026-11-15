@@ -718,6 +718,13 @@
       "noReplyTitle": "Hier antwortet niemand persönlich",
       "noReplyText": "Dieser Eintrag stammt aus einer öffentlichen Quelle und wurde nicht von einem Mitglied eingestellt. Du kannst „Kenne ich auch“ sagen oder beschreiben, wie du es angehen würdest. Eine Meldung „Ich würde daran arbeiten“ gibt es hier nicht, weil sie niemanden erreichen würde.",
       "boardNote": "Einträge mit gestricheltem Rand stammen aus öffentlichen Quellen, nicht von Mitgliedern."
+    },
+    "answerThanks": {
+      "title": "Danke fürs Antworten!",
+      "approach": "Dein Ansatz steht jetzt beim Problem. Die Person sieht ihn und meldet sich, wenn er weiterhilft.",
+      "interest": "Deine Rückmeldung ist angekommen. Wenn die Person ein Gespräch beginnt, findest du es unter Nachrichten.",
+      "note": "Antworten selbst gibt keine Punkte. So zählt, was wirklich weitergeholfen hat.",
+      "more": "Weitere Gesuche ansehen"
     }
   },
   "searches": {
