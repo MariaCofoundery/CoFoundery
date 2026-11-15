@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(14);
 
 -- 1 Geholfene, 2 Dankende, 3 Fremde, 4 Dritte mit offener (nicht angenommener) Anfrage.
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
@@ -37,6 +37,11 @@ select extensions.throws_ok($$update public.network_thanks set helper_hidden = t
 select extensions.ok(public.set_network_thanks_hidden((select id from ids where key = 't1'), true), 'the helped person can hide a shared thanks');
 select extensions.is((select count(*)::int from public.list_profile_thanks('f4200000-0000-4000-8000-000000000001')), 0, 'hidden words disappear from the profile');
 select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000001'), true, 'the heart stays');
+
+reset role;
+select extensions.is((select count(*)::int from public.in_app_notices where recipient_user_id = 'f4200000-0000-4000-8000-000000000001' and kind = 'connect_thanks' and path = '/connect/contacts'), 1, 'the helped person gets one notice');
+delete from public.network_contact_requests where id = 'f4200000-0000-4000-8000-0000000000c1';
+select extensions.is((select count(*)::int from public.in_app_notices where kind = 'connect_thanks'), 0, 'deleting the request removes the notice with the thanks');
 
 select * from extensions.finish();
 rollback;

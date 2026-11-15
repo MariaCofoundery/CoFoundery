@@ -28,6 +28,7 @@
     "advisor_person_invited": "An advisor asks for insight into parts of your profile. You decide under Invitations – accepting only means the request reaches you.",
     "founder_invited": "A co-founder has invited you. You decide on your dashboard.",
     "program_task_assigned": "A task in the program was assigned to you. Check the shared task list.",
+    "connect_thanks": "Someone thanked you. Take a look at your contacts.",
     "program_task_comment": "New comment on a task in the program."
   },
   "announcements": {
