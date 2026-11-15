@@ -279,7 +279,10 @@
       "declined": "Anfrage wurde nicht angenommen.",
       "canceled": "Anfrage zurückgezogen.",
       "snoozed": "Zurückgestellt. Die Anfrage bleibt offen, steht aber unten.",
-      "outcome": "Danke. Deine Antwort bleibt privat."
+      "outcome": "Danke. Deine Antwort bleibt privat.",
+      "thanked": "Danke verschickt. Du kannst ruhig stolz sein: So wird Hilfe sichtbar.",
+      "thanks_hidden": "Der Dank ist auf deinem Profil ausgeblendet.",
+      "thanks_shown": "Der Dank steht wieder auf deinem Profil."
     },
     "profileRequiredTitle": "Zuerst dein Connect-Profil",
     "profileRequiredText": "Bevor du jemanden anschreibst, braucht die andere Seite etwas, worauf sie schauen kann. Leg dein Connect-Profil an und veröffentliche es – danach landest du wieder hier.",
@@ -1501,5 +1504,56 @@
     "title": "Schau, was andere gerade suchen und anbieten",
     "text": "Ein Blick ins Netzwerk, bevor du dein Profil ausfüllst.",
     "cta": "Ins Netzwerk schauen"
+  },
+  "thanks": {
+    "title": "Hat dir {name} weitergeholfen?",
+    "lead": "Ein Danke kostet dich einen Tipp und macht ihr oder ihm den Tag.",
+    "whatFor": "Wobei?",
+    "severalOk": "Mehrere sind möglich.",
+    "whatBecame": "Was ist daraus geworden?",
+    "optional": "Freiwillig.",
+    "words": "Ein paar Worte für {name}",
+    "placeholder": "Zum Beispiel: Danke, das hat mir den Pitch gerettet.",
+    "showTitle": "Mein Dank darf auf dem Profil von {name} stehen",
+    "showNote": "Nur mit deinem Ja, nur mit deinem Vornamen. Ohne Worte gibt es nichts zu zeigen.",
+    "send": "Danke schicken",
+    "notNow": "Gerade nicht",
+    "invalid": "Bitte wähle mindestens eine Art der Hilfe aus. Die Worte dürfen höchstens 280 Zeichen lang sein.",
+    "types": {
+      "knowledge": "Wissen",
+      "feedback": "Feedback",
+      "contact": "Kontakt",
+      "time": "Zeit",
+      "resource": "Ressource",
+      "collaboration": "Mitarbeit"
+    },
+    "outcomeChoice": {
+      "meeting": "Es gab ein Treffen",
+      "introduction": "Es gab eine Vermittlung",
+      "open": "Noch offen"
+    },
+    "outcomes": {
+      "meeting": "Es gab ein Treffen",
+      "introduction": "Es gab eine Vermittlung",
+      "open": "Noch offen"
+    },
+    "thankYou": "Danke sagen",
+    "alreadyThanked": "Du hast Danke gesagt.",
+    "section": "Dank für dich",
+    "received": "Jemand hat sich bei dir bedankt",
+    "receivedFrom": "{name} hat sich bei dir bedankt",
+    "allowedNote": "Der Dank darf auf deinem Profil stehen, mit dem Vornamen der dankenden Person.",
+    "hiddenNote": "Du hast diesen Dank auf deinem Profil ausgeblendet.",
+    "privateNote": "Dieser Dank ist nur für dich geschrieben.",
+    "hide": "Auf meinem Profil ausblenden",
+    "show": "Auf meinem Profil wieder zeigen",
+    "heart": "hat geholfen",
+    "profileTitle": "Das sagen andere",
+    "profileNote": "Nur Worte, die die dankende Person ausdrücklich zum Zeigen freigegeben hat. Du kannst jeden Dank jederzeit ausblenden.",
+    "sentOk": "Danke verschickt. Du kannst ruhig stolz sein: So wird Hilfe sichtbar.",
+    "hiddenOk": "Der Dank ist auf deinem Profil ausgeblendet.",
+    "shownOk": "Der Dank steht wieder auf deinem Profil.",
+    "errorGeneric": "Das Danke konnte nicht verschickt werden.",
+    "error": "Das Danke konnte nicht verschickt werden."
   }
 }

@@ -52,6 +52,6 @@ export const CONNECT_PUBLICATION_KEYS = ["draft", "published"] as const;
 
 export const CONNECT_LIFECYCLE_KEYS = ["publish", "pause", "renew", "complete", "delete"] as const;
 
-export const CONNECT_CONTACT_KEYS = ["accepted", "declined", "canceled", "snoozed", "outcome"] as const;
+export const CONNECT_CONTACT_KEYS = ["accepted", "declined", "canceled", "snoozed", "outcome", "thanked", "thanks_hidden", "thanks_shown"] as const;
 
 export const CONNECT_SAFETY_KEYS = ["blocked", "unblocked", "reported"] as const;

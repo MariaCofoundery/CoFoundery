@@ -279,7 +279,10 @@
       "declined": "Request not accepted.",
       "canceled": "Request withdrawn.",
       "snoozed": "Postponed. The request stays open but moves to the bottom.",
-      "outcome": "Thanks. Your answer stays private."
+      "outcome": "Thanks. Your answer stays private.",
+      "thanked": "Thanks sent. This is how help becomes visible.",
+      "thanks_hidden": "The thanks is hidden on your profile.",
+      "thanks_shown": "The thanks is back on your profile."
     },
     "profileRequiredTitle": "Your Connect profile comes first",
     "profileRequiredText": "Before you message someone, the other side needs something to look at. Create your Connect profile and publish it – you will come back here afterwards.",
@@ -1501,5 +1504,56 @@
     "title": "See what others are looking for and offering right now",
     "text": "A look at the network before you fill in your profile.",
     "cta": "Look at the network"
+  },
+  "thanks": {
+    "title": "Did {name} help you?",
+    "lead": "A thank-you takes one tap and makes their day.",
+    "whatFor": "With what?",
+    "severalOk": "You can pick more than one.",
+    "whatBecame": "What came of it?",
+    "optional": "Optional.",
+    "words": "A few words for {name}",
+    "placeholder": "For example: Thanks, that saved my pitch.",
+    "showTitle": "My thanks may appear on {name}'s profile",
+    "showNote": "Only with your yes, only with your first name. Without words there is nothing to show.",
+    "send": "Send thanks",
+    "notNow": "Not right now",
+    "invalid": "Please pick at least one kind of help. Your words can be up to 280 characters.",
+    "types": {
+      "knowledge": "Knowledge",
+      "feedback": "Feedback",
+      "contact": "Contact",
+      "time": "Time",
+      "resource": "Resource",
+      "collaboration": "Collaboration"
+    },
+    "outcomeChoice": {
+      "meeting": "We met",
+      "introduction": "An introduction happened",
+      "open": "Still open"
+    },
+    "outcomes": {
+      "meeting": "We met",
+      "introduction": "An introduction happened",
+      "open": "Still open"
+    },
+    "thankYou": "Say thanks",
+    "alreadyThanked": "You said thanks.",
+    "section": "Thanks for you",
+    "received": "Someone thanked you",
+    "receivedFrom": "{name} thanked you",
+    "allowedNote": "This thanks may appear on your profile, with the thanker's first name.",
+    "hiddenNote": "You hid this thanks on your profile.",
+    "privateNote": "This thanks was written only for you.",
+    "hide": "Hide on my profile",
+    "show": "Show on my profile again",
+    "heart": "has helped",
+    "profileTitle": "What others say",
+    "profileNote": "Only words the thanker explicitly allowed to be shown. You can hide any thanks at any time.",
+    "sentOk": "Thanks sent. This is how help becomes visible.",
+    "hiddenOk": "The thanks is hidden on your profile.",
+    "shownOk": "The thanks is back on your profile.",
+    "errorGeneric": "The thanks could not be sent.",
+    "error": "The thanks could not be sent."
   }
 }

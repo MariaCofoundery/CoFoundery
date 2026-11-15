@@ -15,6 +15,8 @@ import { CONNECT_CONTACT_KEYS, CONNECT_SAFETY_KEYS } from "@/features/connect/co
 import { UserText } from "@/features/ui/UserText";
 import { IntroductionActions, IntroductionOutcomeCard } from "@/features/connect/introductions/IntroductionBits";
 import { listIntroductions, outcomeDue, type Introduction } from "@/features/connect/introductions/introductionsData";
+import { ReceivedThanksCard } from "@/features/connect/thanks/ThanksBits";
+import { listMyThanks } from "@/features/connect/thanks/thanksData";
 import { doorTitle } from "@/features/connect/doors/doorLabels";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
@@ -41,7 +43,7 @@ function ContactCard({ request, direction, t, locale, profile, blockState, intro
   </article>;
 }
 
-function AcceptedContactCard({ conversation, t, locale, profile, blockState, linkedInUrl }: { conversation: ConnectConversation; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState; linkedInUrl?: string }) {
+function AcceptedContactCard({ conversation, t, locale, profile, blockState, linkedInUrl, canThank }: { canThank?: boolean; conversation: ConnectConversation; t: T; locale: string; profile?: ConnectProfile; blockState: ConnectBlockState; linkedInUrl?: string }) {
   // Kein Name mehr heisst: Die Person ist gegangen. Kein geratener Name, kein
   // leeres Feld - ein Zustand, der sich benennen laesst.
   const counterpartName = conversation.counterpart_display_name ?? t("messages.formerMember");
@@ -62,7 +64,10 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState, lin
             richtig so. */}
         {linkedInUrl ? <LinkedInLink url={linkedInUrl} label={t("linkedin.linkLabel")} hint={t("linkedin.openHint")} /> : null}
       </div>
-      <Link href={`/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        {canThank && conversation.contact_request_id ? <Link href={`/connect/danke/${conversation.contact_request_id}`} prefetch={false} data-connect-thank-link className="inline-flex min-h-11 items-center justify-center rounded-full border border-pink-300 bg-pink-50 px-5 py-2 text-sm font-semibold text-pink-900">{t("thanks.thankYou")}</Link> : null}
+        <Link href={`/messages/${conversation.conversation_id}`} prefetch={false} className="inline-flex min-h-11 items-center justify-center rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">{t("messages.open")}</Link>
+      </div>
     </div>
     {/* Wer gegangen ist, laesst sich weder blockieren noch melden. */}
     {conversation.counterpart_user_id ? <ConnectSafetyActions otherUserId={conversation.counterpart_user_id} contactRequestId={conversation.contact_request_id ?? ""} conversationId={conversation.conversation_id} returnTo="/connect/contacts" blockedByMe={blockState.blocked_by_current_user} interactionBlocked={blockState.interaction_blocked} copy={safetyCopy(t)} /> : null}
@@ -72,12 +77,15 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState, lin
 export default async function ConnectContactsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const [t, locale, query] = await Promise.all([getTranslations("connect"), getLocale(), searchParams]);
   const { client, user } = await requireConnectMember("/connect/contacts");
-  const [requests, conversations, blocks, introductions] = await Promise.all([
+  const [requests, conversations, blocks, introductions, allThanks] = await Promise.all([
     getConnectContactRequests(client, user.id),
     getConnectConversations(client),
     getOwnConnectBlocks(client),
     listIntroductions(client),
+    listMyThanks(client),
   ]);
+  const receivedThanks = allThanks.filter((entry) => entry.direction === "received");
+  const thankedRequests = new Set(allThanks.filter((entry) => entry.direction === "sent").map((entry) => entry.requestId));
   const introOf = new Map(introductions.map((entry) => [entry.requestId, entry]));
   const doorLabel = (intro: Introduction) => doorTitle((key, values) => t(`doors.${key}`, values), { typeKey: intro.typeKey, otherLabel: intro.otherLabel });
   const outcomesDue = introductions.filter((entry) => outcomeDue(entry));
@@ -104,9 +112,10 @@ export default async function ConnectContactsPage({ searchParams }: { searchPara
     {query.error ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(query.error === "report" ? "safety.reportError" : "contact.error")}</p> : null}
     {knownKey(query.safety, CONNECT_SAFETY_KEYS) ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`safety.success.${knownKey(query.safety, CONNECT_SAFETY_KEYS)}`)}</p> : null}
     {outcomesDue.length > 0 ? <section className="mt-8 space-y-3" aria-label={t("introductions.outcomeTitle")}>{outcomesDue.map((entry) => { const request = requests.find((row) => row.id === entry.requestId); const name = request ? (request.sender_user_id === user.id ? request.recipient_display_name_snapshot : request.sender_display_name_snapshot) : ""; return <IntroductionOutcomeCard key={entry.requestId} id={entry.requestId} title={doorLabel(entry)} name={name} t={t} />; })}</section> : null}
+    {receivedThanks.length > 0 ? <section className="mt-8 space-y-3" aria-label={t("thanks.section")}><h2 className="text-xl font-semibold">{t("thanks.section")}</h2>{receivedThanks.map((entry) => <ReceivedThanksCard key={entry.id} thanks={entry} t={t} />)}</section> : null}
     <section className="mt-8"><h2 className="text-xl font-semibold">{t("contact.incoming")}</h2><div className="mt-3 space-y-3">{incoming.length ? incoming.map((request) => { const id = request.sender_user_id; return <ContactCard key={request.id} intro={introOf.get(request.id)} request={request} direction="incoming" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyIncoming")}</p>}</div></section>
     <section className="mt-10"><h2 className="text-xl font-semibold">{t("contact.outgoing")}</h2><div className="mt-3 space-y-3">{outgoing.length ? outgoing.map((request) => { const id = request.recipient_user_id; return <ContactCard key={request.id} intro={introOf.get(request.id)} request={request} direction="outgoing" t={t} locale={locale} profile={profiles.get(id)} blockState={stateFor(id)} />; }) : <p className="text-sm text-slate-500">{t("contact.emptyOutgoing")}</p>}</div></section>
-    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} linkedInUrl={conversation.counterpart_user_id ? linkedInUrls.get(conversation.counterpart_user_id) : undefined} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
+    <section className="mt-10"><h2 className="text-xl font-semibold">{t("messages.acceptedContacts")}</h2><div className="mt-3 space-y-3">{conversations.length ? conversations.map((conversation) => <AcceptedContactCard key={conversation.conversation_id} conversation={conversation} t={t} locale={locale} profile={conversation.counterpart_user_id ? profiles.get(conversation.counterpart_user_id) : undefined} blockState={stateFor(conversation.counterpart_user_id ?? "")} linkedInUrl={conversation.counterpart_user_id ? linkedInUrls.get(conversation.counterpart_user_id) : undefined} canThank={Boolean(conversation.counterpart_user_id) && Boolean(conversation.contact_request_id) && !thankedRequests.has(conversation.contact_request_id ?? "")} />) : <p className="text-sm text-slate-500">{t("messages.emptyContacts")}</p>}</div></section>
     {blocks.length ? <section className="mt-10"><h2 className="text-xl font-semibold">{t("safety.blockedPeople")}</h2><div className="mt-3 space-y-2">{blocks.map((block) => <div key={block.blocked_user_id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-medium">{block.display_name}</p><form action={unblockConnectUserAction}><input type="hidden" name="other_user_id" value={block.blocked_user_id} /><input type="hidden" name="return_to" value="/connect/contacts" /><ConnectSubmitButton label={t("safety.unblock")} pendingLabel={t("safety.unblocking")} className="min-h-11 text-sm font-semibold underline" /></form></div>)}</div></section> : null}
   </main>;
 }

@@ -13,6 +13,8 @@ import {
   getConnectPerson,
 } from "@/features/connect/connectPeopleData";
 import { getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
+import { HeartBadge, ProfileThanksList } from "@/features/connect/thanks/ThanksBits";
+import { hasHeart, listProfileThanks } from "@/features/connect/thanks/thanksData";
 import { UserText } from "@/features/ui/UserText";
 
 /**
@@ -51,6 +53,7 @@ export default async function ConnectPersonPage({
   if (!person) notFound();
 
   const isOwn = person.user_id === user.id;
+  const [heart, profileThanks] = await Promise.all([hasHeart(client, userId), listProfileThanks(client, userId)]);
   const [ventures, listings, problems, connectValues] = await Promise.all([
     getConnectVentures(client, userId),
     getActiveConnectListingsByOwner(client, userId),
@@ -88,6 +91,7 @@ export default async function ConnectPersonPage({
           <h1 className="text-[32px] font-semibold leading-tight sm:text-[34px]">
             {person.display_name}
           </h1>
+          {heart ? <p className="mt-1.5"><HeartBadge label={t("thanks.heart")} /></p> : null}
           {person.headline ? (
             <p className="mt-1.5 text-base leading-7 text-white opacity-95">{person.headline}</p>
           ) : null}
@@ -124,6 +128,8 @@ export default async function ConnectPersonPage({
           <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]"><UserText text={person.bio} /></p>
         </section>
       ) : null}
+
+      <ProfileThanksList items={profileThanks} t={t} label={t("thanks.profileTitle")} />
 
       {connectValues.length > 0 ? (
         <section className={`${card} mt-4`} aria-label={tValues("connectTitle")}>
