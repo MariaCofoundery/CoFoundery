@@ -944,6 +944,34 @@
       "findText": "In Find you meet people who want to build something similar.",
       "findCta": "Find co-founders"
     },
-    "privacy": "How we handle your data"
+    "privacy": "How we handle your data",
+    "areas": {
+      "title": "Your areas",
+      "state": {
+        "open": "Still open",
+        "started": "Started",
+        "done": "Set up"
+      },
+      "setup": "Set up",
+      "continue": "Continue",
+      "view": "View",
+      "moreTitle": "More areas",
+      "align": {
+        "name": "Align",
+        "also": "Want to find out how you work?"
+      },
+      "find": {
+        "name": "Find",
+        "also": "Want to find co-founders?"
+      },
+      "connect": {
+        "name": "Connect",
+        "also": "Want to use the network?"
+      },
+      "advise": {
+        "name": "Advisor",
+        "also": "Want to support teams?"
+      }
+    }
   }
 }

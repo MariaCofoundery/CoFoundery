@@ -944,6 +944,34 @@
       "findText": "In Find lernst du Menschen kennen, die etwas Ähnliches aufbauen wollen.",
       "findCta": "Co-Founder finden"
     },
-    "privacy": "So gehen wir mit deinen Daten um"
+    "privacy": "So gehen wir mit deinen Daten um",
+    "areas": {
+      "title": "Deine Bereiche",
+      "state": {
+        "open": "Noch offen",
+        "started": "Angefangen",
+        "done": "Steht"
+      },
+      "setup": "Einrichten",
+      "continue": "Weitermachen",
+      "view": "Ansehen",
+      "moreTitle": "Weitere Bereiche",
+      "align": {
+        "name": "Align",
+        "also": "Du willst wissen, wie du arbeitest?"
+      },
+      "find": {
+        "name": "Find",
+        "also": "Du willst Mitgründer:innen finden?"
+      },
+      "connect": {
+        "name": "Connect",
+        "also": "Du willst das Netzwerk nutzen?"
+      },
+      "advise": {
+        "name": "Advisor",
+        "also": "Du willst Teams begleiten?"
+      }
+    }
   }
 }

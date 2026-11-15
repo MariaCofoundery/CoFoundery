@@ -9,6 +9,8 @@ import { DashboardDevSection } from "@/features/dashboard/DashboardDevSection";
 import { DashboardNextStep } from "@/features/dashboard/DashboardNextStep";
 import { DashboardWaiting, type RunningEntry, type WaitingCard } from "@/features/dashboard/DashboardWaiting";
 import { openSetupSteps } from "@/features/profile/journey/journeyModel";
+import { areaCards } from "@/features/dashboard/areasModel";
+import { getFindAndConnectStates } from "@/features/dashboard/areaStates";
 import { DashboardAside } from "@/features/dashboard/DashboardAside";
 import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
@@ -116,6 +118,7 @@ export default async function DashboardPage({
   // Offene Schritte des Profil-Setups (Zeile, zwei Saetze, Staerken, Arbeitsort): ein stiller Link in "Dein Stand".
   const { data: setupCore } = await supabase.from("person_core").select("headline, bio, expertise, remote_mode").eq("user_id", user.id).maybeSingle();
   const setupOpen = setupCore ? openSetupSteps(setupCore).length > 0 : false;
+  const findConnect = await getFindAndConnectStates(supabase, user.id);
 
   let invitationRows = initialInvitationRows;
   const currentTeamEntries = await Promise.all(invitationRows.filter(i => i.status === "accepted").map(async i => [i.id, await currentTeamForInvitation(supabase, user.id, i.id)] as const));
@@ -352,6 +355,12 @@ export default async function DashboardPage({
         </div>
 
         <DashboardAside
+          areas={areaCards({
+            alignParts: { work: workProfileState === "completed", can: capabilityCount > 0, strengths: strengthCount > 0, direction: directionCount > 0 },
+            find: findConnect.find,
+            connect: findConnect.connect,
+            hasAdvisor: roleViews.hasAdvisor,
+          })}
           parts={{
             work: workProfileState === "completed",
             can: capabilityCount > 0,
