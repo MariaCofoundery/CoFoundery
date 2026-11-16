@@ -23,7 +23,7 @@ Gründer:innen ganz am Anfang. Entweder noch nie gegründet, oder schon einmal a
 - Lösungsorientiert: ein Absatz Problem, der Rest Lösung. Nicht im Problem wälzen.
 - Freundlich, menschenfreundlich, gründungsfreundlich, informierend.
 - Ehrlich über eigene Fehler (Beichte statt Pose). Humor ja, Spott über Menschen nein.
-- Du-Ansprache. Inklusive Sprache, Bias so weit wie möglich vermeiden. Nie diskriminierend.
+- Du-Ansprache. Inklusive und geschlechtsneutrale Sprache: „die Person“, „Co-Founder“, „Gründer:innen“, nicht „er oder sie“. Bias so weit wie möglich vermeiden. Nie diskriminierend.
 
 ## Nach einem halben Jahr soll jemand denken
 „Das ist echt hilfreich, total nett, eine gute, coole Plattform.“

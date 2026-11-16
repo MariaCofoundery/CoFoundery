@@ -8,7 +8,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-type Row = { id: string; title: string; subject: string; status: "draft" | "scheduled" | "sending" | "sent"; scheduled_for: string | null; sent_at: string | null; updated_at: string; delivered: number };
+type Row = { id: string; title: string; subject: string; status: "draft" | "scheduled" | "sending" | "sent"; scheduled_for: string | null; sent_at: string | null; updated_at: string; delivered: number; origin: "manual" | "auto"; variant: string };
 
 const PILL: Record<Row["status"], string> = { draft: "bg-amber-100 text-amber-900", scheduled: "bg-sky-100 text-sky-900", sending: "bg-violet-100 text-violet-900", sent: "bg-emerald-100 text-emerald-900" };
 
@@ -65,6 +65,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
             <li key={row.id}>
               <Link href={`/admin/newsletter/${row.id}`} className="flex flex-wrap items-center gap-3 rounded-2xl border border-[#d9dcec] bg-white px-4 py-3 hover:bg-[#faf9fe]">
                 <span className="min-w-0 flex-1 font-semibold">{row.title || row.subject || t("untitled")}</span>
+                {row.origin === "auto" ? <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-bold text-violet-900">{row.variant ? t("autoVariant", { variant: row.variant }) : t("auto")}</span> : null}
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${PILL[row.status]}`}>{t(`status.${row.status}`)}</span>
                 <span className="text-sm text-slate-600">
                   {row.status === "scheduled" && row.scheduled_for ? fmt.format(new Date(row.scheduled_for)) : row.status === "sent" && row.sent_at ? t("sentOn", { date: fmt.format(new Date(row.sent_at)), count: row.delivered }) : row.status === "sending" ? t("sendingProgress", { count: row.delivered }) : fmt.format(new Date(row.updated_at))}

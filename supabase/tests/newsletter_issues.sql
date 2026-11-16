@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(17);
+select extensions.plan(22);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
 select '00000000-0000-0000-0000-000000000000', ('f4400000-0000-4000-8000-00000000000' || n)::uuid, 'authenticated', 'authenticated', 'nl' || n || '@example.com', '', now(), '{}', '{}', now(), now() from generate_series(1, 4) n;
@@ -59,6 +59,18 @@ select extensions.is((select count(*)::int from public.due_newsletter_issues()),
 select extensions.is((select count(*)::int from public.claim_newsletter_batch((select v from ids where k = 'i1'), 1)), 1, 'the first batch picks one confirmed person');
 select extensions.is((select count(*)::int from public.claim_newsletter_batch((select v from ids where k = 'i1'), 10)), 1, 'the next batch picks the rest - never the same person twice, never an unconfirmed one');
 select extensions.ok(public.finish_newsletter_if_done((select v from ids where k = 'i1')), 'when nobody is left the issue counts as sent');
+
+-- Automatische Entwuerfe: nur der Dienst, immer als Entwurf, mit Tagesgrenze.
+select extensions.isnt(public.service_create_newsletter_draft('{"subject":"Auto","blocks":[]}'::jsonb, 'A', gen_random_uuid(), 'Quellen'), null, 'the service creates an automatic draft');
+reset role;
+select extensions.is((select status || ':' || origin from public.newsletter_issues where variant = 'A'), 'draft:auto', 'it is a draft and marked automatic, never scheduled or sent');
+set local role service_role;
+select extensions.is((select count(public.service_create_newsletter_draft('{"subject":"Auto"}'::jsonb, 'B', null, ''))::int from generate_series(1, 8)), 8, 'up to nine automatic drafts a day');
+select extensions.throws_ok($$select public.service_create_newsletter_draft('{"subject":"Zu viel"}'::jsonb, 'C', null, '')$$, '54000', 'newsletter_auto_limit', 'the tenth in a day is refused');
+reset role;
+set local role authenticated;
+select extensions.throws_ok($$select public.service_create_newsletter_draft('{"subject":"x"}'::jsonb, 'A', null, '')$$, '42501', null, 'members cannot create automatic drafts');
+reset role;
 
 select * from extensions.finish();
 rollback;

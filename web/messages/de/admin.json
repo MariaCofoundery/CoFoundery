@@ -363,7 +363,10 @@
     "importInvalid": "Das ist kein gültiges JSON. Bitte kopiere den ganzen Entwurf vom Skill.",
     "importTooBig": "Der Entwurf ist zu lang.",
     "importNoContent": "Der Entwurf braucht einen Betreff und mindestens einen Baustein.",
-    "importSave": "Das Anlegen hat nicht geklappt. Bitte versuch es noch einmal."
+    "importSave": "Das Anlegen hat nicht geklappt. Bitte versuch es noch einmal.",
+    "auto": "Automatisch",
+    "autoVariant": "Automatisch, Variante {variant}",
+    "notesTitle": "Hinweise zur Recherche (nur für dich, nicht in der Mail)"
   },
   "eventsQr": {
     "back": "Zurück zum Admin",

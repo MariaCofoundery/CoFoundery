@@ -28,6 +28,12 @@ export default async function NewsletterIssuePage({ params }: { params: Promise<
     <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
       <Link href="/admin/newsletter" className="text-sm text-slate-600 underline">{"← "}{t("title")}</Link>
       <h1 className="mt-4 mb-5 text-2xl font-semibold text-slate-950">{(row.title as string) || (row.subject as string) || t("untitled")}</h1>
+      {typeof row.notes === "string" && row.notes.trim() ? (
+        <section className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4" aria-labelledby="notes-title">
+          <h2 id="notes-title" className="text-sm font-bold text-violet-950">{t("notesTitle")}</h2>
+          <p className="mt-1 whitespace-pre-line text-sm leading-6 text-violet-950">{row.notes}</p>
+        </section>
+      ) : null}
       <NewsletterEditor
         issueId={issueId}
         initial={issueFromRow(row)}

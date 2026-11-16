@@ -1,6 +1,6 @@
 {
   "title": "Ausgabe 1: Drei Fragen vor dem Ja",
-  "subject": "Er war so sympathisch. Das war das Problem.",
+  "subject": "So sympathisch. Das war das Problem.",
   "preheader": "Drei Fragen, die du stellst, bevor du mit jemandem gründest.",
   "look": "light",
   "accent": "#5b3df5",
@@ -17,7 +17,7 @@
     {
       "id": "idee",
       "type": "text",
-      "text": "# Drei Fragen, bevor du Ja sagst\n\nSympathie ist ein wunderbarer Anfang. Sie sagt dir, wie sich ein Gespräch anfühlt. Sie sagt dir nicht, wie jemand entscheidet, wenn das Geld knapp wird, oder was er oder sie unter Verantwortung versteht. Das merkst du sonst erst, wenn es teuer ist.\n\nDie gute Nachricht: Du kannst es vorher herausfinden. Drei Fragen reichen für den Anfang.\n\n## 1. Wer hat schon mit dir oder ihr gearbeitet?\n\nFrag jemanden, der die Person aus der Praxis kennt, am besten aus der Szene. Nicht um zu richten, sondern für ein zweites Bild. Ein Telefonat von zehn Minuten reicht oft. Wenn du nicht aus der Startup-Bubble kommst, ist das noch wichtiger: Du musst nicht alles glauben, was gut erzählt ist.\n\n## 2. Wie entscheiden wir, wenn wir uns nicht einig sind?\n\nStell diese Frage, bevor es einen Streit gibt. Die Antwort zeigt dir mehr als jede Lebenslauf-Zeile. Wer sich dabei windet oder ausweicht, verrät dir etwas über später.\n\n## 3. Was passiert, wenn einer von uns aussteigt?\n\nUnromantisch, ja. Aber wer das offen bespricht, zeigt, dass er dich ernst nimmt. Und ihr schreibt es auf, solange noch alle freundlich zueinander sind.\n\nWenn ihr das alles in Ruhe durchgehen wollt: Dafür gibt es Align. Keine Punkte, kein „passt“ oder „passt nicht“, sondern ein ehrliches Gespräch mit einer guten Grundlage."
+      "text": "# Drei Fragen, bevor du Ja sagst\n\nSympathie ist ein wunderbarer Anfang. Sie sagt dir, wie sich ein Gespräch anfühlt. Sie sagt dir nicht, wie jemand entscheidet, wenn das Geld knapp wird, oder was die Person unter Verantwortung versteht. Das merkst du sonst erst, wenn es teuer ist.\n\nDie gute Nachricht: Du kannst es vorher herausfinden. Drei Fragen reichen für den Anfang.\n\n## 1. Wer hat schon mit dir oder ihr gearbeitet?\n\nFrag jemanden, der die Person aus der Praxis kennt, am besten aus der Szene. Nicht um zu richten, sondern für ein zweites Bild. Ein Telefonat von zehn Minuten reicht oft. Wenn du nicht aus der Startup-Bubble kommst, ist das noch wichtiger: Du musst nicht alles glauben, was gut erzählt ist.\n\n## 2. Wie entscheiden wir, wenn wir uns nicht einig sind?\n\nStell diese Frage, bevor es einen Streit gibt. Die Antwort zeigt dir mehr als jede Lebenslauf-Zeile. Wer sich dabei windet oder ausweicht, verrät dir etwas über später.\n\n## 3. Was passiert, wenn einer von uns aussteigt?\n\nUnromantisch, ja. Aber wer das offen bespricht, zeigt, dass er dich ernst nimmt. Und ihr schreibt es auf, solange noch alle freundlich zueinander sind.\n\nWenn ihr das alles in Ruhe durchgehen wollt: Dafür gibt es Align. Keine Punkte, kein „passt“ oder „passt nicht“, sondern ein ehrliches Gespräch mit einer guten Grundlage."
     },
     {
       "id": "frage",

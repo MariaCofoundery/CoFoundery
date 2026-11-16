@@ -32,3 +32,18 @@ test("draft import: errors are named, nothing is guessed", () => {
   assert.deepEqual(parseDraftJson(JSON.stringify({ subject: "", blocks: [] })), { ok: false, error: "no_content" });
   assert.deepEqual(parseDraftJson("x".repeat(100_001)), { ok: false, error: "too_big" });
 });
+
+import { readFileSync } from "node:fs";
+const read = (path: string) => readFileSync(new URL(`../../../../${path}`, import.meta.url), "utf8");
+
+test("auto drafts: the route only creates drafts, needs the secret, never sends or schedules", () => {
+  const route = read("src/app/api/newsletter/drafts/route.ts");
+  assert.match(route, /secret\.length < 32/);
+  assert.match(route, /timingSafeEqual/);
+  assert.match(route, /service_create_newsletter_draft/);
+  assert.doesNotMatch(route, /admin_set_newsletter_status|runNewsletterSend|sendNewsletter|claim_newsletter_batch/);
+  const sql = read("../supabase/migrations/20270503120000_newsletter_auto_drafts.sql");
+  assert.match(sql, /grant execute on function public\.service_create_newsletter_draft\(jsonb, text, uuid, text\) to service_role/);
+  assert.doesNotMatch(sql, /to (authenticated|anon)\b[^;]*service_create/);
+  assert.match(sql, />= 9 then\s+raise exception 'newsletter_auto_limit'/);
+});

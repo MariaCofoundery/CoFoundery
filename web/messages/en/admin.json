@@ -363,7 +363,10 @@
     "importInvalid": "That is not valid JSON. Please copy the whole draft from the skill.",
     "importTooBig": "The draft is too long.",
     "importNoContent": "The draft needs a subject and at least one block.",
-    "importSave": "Creating it did not work. Please try again."
+    "importSave": "Creating it did not work. Please try again.",
+    "auto": "Automatic",
+    "autoVariant": "Automatic, variant {variant}",
+    "notesTitle": "Research notes (for you only, not in the email)"
   },
   "eventsQr": {
     "back": "Back to admin",
