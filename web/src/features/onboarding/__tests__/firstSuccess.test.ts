@@ -46,3 +46,16 @@ test("the public home page carries the small areas explainer further down, insid
   assert.match(page, /<section id="bereiche"[\s\S]*data-home-areas-explainer[\s\S]*<AreasExplainer \/>[\s\S]*areaGrid/);
   assert.ok(page.indexOf("heroWrap") < page.indexOf("<AreasExplainer"), "not in the first view");
 });
+
+test("the profile setup ends with an optional photo step, only when there is no photo yet, and Connect no longer shows a second upload form", () => {
+  const actions = read("src/features/profile/journey/journeyActions.ts");
+  assert.match(actions, /redirect\("\/welcome\/foto"\)[\s\S]*redirect\("\/dashboard"\)/);
+  const page = read("src/app/welcome/foto/page.tsx");
+  assert.match(page, /ProfilePhotoField/);
+  assert.match(page, /returnPath="\/welcome\/foto"/);
+  assert.match(page, /\/dashboard/, "a way to skip");
+  const connectField = read("src/features/connect/ConnectPhotoField.tsx");
+  assert.match(connectField, /pickingUpload \|\| choice === "upload" \? \(\s*<label/, "the file chooser only appears when 'a different picture' is chosen");
+  const keys = (v: unknown, p = ""): string[] => (v && typeof v === "object" ? Object.entries(v as Record<string, unknown>).flatMap(([k, x]) => keys(x, `${p}${k}.`)) : [p]);
+  assert.deepEqual(keys(JSON.parse(read("messages/de/profile.json")).journey.photo).sort(), keys(JSON.parse(read("messages/en/profile.json")).journey.photo).sort());
+});

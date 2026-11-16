@@ -84,10 +84,13 @@ test("a missing core is all gaps, not a crash", () => {
 // ---------------------------------------------------------------------------
 // Der Rueckweg
 // ---------------------------------------------------------------------------
-test("only the two known return paths are accepted", () => {
+test("only the three known return paths are accepted", () => {
   assert.equal(parseIdentityReturnPath("/connect/profile"), "/connect/profile");
   assert.equal(parseIdentityReturnPath("/discovery/profile"), "/discovery/profile");
-  assert.deepEqual([...IDENTITY_RETURN_PATHS], ["/connect/profile", "/discovery/profile"]);
+  // Seit 16.11.2026: der freiwillige Foto-Schritt am Ende des Profil-Setups.
+  assert.equal(parseIdentityReturnPath("/welcome/foto"), "/welcome/foto");
+  assert.equal(parseIdentityReturnPath("/welcome/foto/../x"), null);
+  assert.deepEqual([...IDENTITY_RETURN_PATHS], ["/connect/profile", "/discovery/profile", "/welcome/foto"]);
 });
 
 test("nothing else becomes a redirect", () => {

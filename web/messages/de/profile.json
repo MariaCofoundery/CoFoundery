@@ -915,6 +915,15 @@
       "find": "Finde die Menschen, mit denen du gründen willst.",
       "connect": "Dein Netzwerk: Menschen, Angebote und Ideen an einem Ort.",
       "advise": "Begleite Startups und Teams, allein oder als Accelerator."
+    },
+    "photo": {
+      "step": "Letzter Schritt, freiwillig",
+      "title": "Ein Gesicht macht es persönlicher",
+      "text": "Menschen schreiben lieber an jemanden, den sie sehen. Du kannst ein Foto hochladen oder eine Illustration wählen, jederzeit änderbar.",
+      "saved": "Gespeichert.",
+      "who": "Wer es sehen darf, stellst du später unter „Dein Profil“ ein. Bis dahin sieht es niemand außer dir.",
+      "next": "Weiter",
+      "skip": "Überspringen, später"
     }
   },
   "values": {

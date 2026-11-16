@@ -54,6 +54,7 @@ export async function PhotoUsagePanel({
             existingHint: c("profile.photo.existingHint"),
             none: c("profile.photo.none"),
             upload: c("profile.photo.upload"),
+            choose: c("profile.photo.choose"),
           }}
         />
       ) : null}

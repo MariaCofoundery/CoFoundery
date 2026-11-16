@@ -160,5 +160,12 @@ export async function saveSetupProgressAction(rawPayload: string): Promise<{ ok:
 /** Das Ende des Setups: noch einmal alles speichern (nur Gefuelltes), dann zur Uebersicht. */
 export async function finishSetupAction(formData: FormData) {
   await saveSetupProgressAction(String(formData.get("payload") ?? ""));
+  // Noch kein Foto? Dann kommt als Letztes der freiwillige Foto-Schritt (Entwurf 16.11.2026). Wer schon eins hat, geht gleich weiter.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user?.id) {
+    const { data: basics } = await supabase.from("profiles").select("avatar_id, avatar_url").eq("user_id", user.id).maybeSingle();
+    if (!basics?.avatar_id && !basics?.avatar_url) redirect("/welcome/foto");
+  }
   redirect("/dashboard");
 }

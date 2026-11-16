@@ -383,14 +383,15 @@
     "privacyLink": "Datenschutz ansehen",
     "publish": "Connect-Profil veröffentlichen",
     "photo": {
-      "title": "Profilbild",
-      "helper": "Dein Profilbild erscheint innerhalb von Made2Found bei deinem Connect-Profil und deinen Connect-Einträgen.",
+      "title": "Dein Bild in Connect",
+      "helper": "Hier entscheidest du nur, was in Connect zu sehen ist. Das Bild selbst änderst du oben.",
       "fallbackName": "Connect-Mitglied",
       "keep": "Aktuelles Connect-Bild beibehalten",
-      "existing": "Mein vorhandenes Profilfoto verwenden",
+      "existing": "Mein Profilfoto von oben zeigen",
       "existingHint": "Connect bekommt davon eine eigene Kopie. Änderst oder entfernst du dein Foto unter „Über dich“, zieht Connect nach.",
-      "none": "Kein Profilbild",
-      "upload": "Anderes Bild verwenden"
+      "none": "In Connect kein Bild zeigen",
+      "upload": "Ein anderes Bild nur für Connect",
+      "choose": "Bild auswählen (JPG, PNG oder WebP)"
     },
     "identityTitle": "Name, Headline und Über mich",
     "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",

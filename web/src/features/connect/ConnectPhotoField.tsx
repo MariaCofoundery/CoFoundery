@@ -26,6 +26,8 @@ export function ConnectPhotoField({
   const hasExisting = Boolean(existingAvatarId || existingImageUrl);
   const [choice, setChoice] = useState<Choice>(hasCurrent ? "keep" : "none");
   const [uploaded, setUploaded] = useState("");
+  // "Ein anderes Bild nur fuer Connect": Die Dateiauswahl erscheint erst, wenn man das waehlt - sonst sieht dieser Block aus wie ein zweites Foto-Formular.
+  const [pickingUpload, setPickingUpload] = useState(false);
   const preview = choice === "existing"
     ? { avatarId: existingAvatarId, imageUrl: existingAvatarId ? null : existingImageUrl }
     : choice === "upload"
@@ -49,15 +51,18 @@ export function ConnectPhotoField({
     <div className="mt-4 flex items-center gap-4">
       <ProfileAvatar displayName={displayName || copy.fallbackName} avatarId={preview.avatarId} imageUrl={preview.imageUrl} className="h-16 w-16 rounded-full object-cover" fallbackClassName="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700" />
       <div className="grid flex-1 gap-2 text-sm">
-        {hasCurrent ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "keep"} onChange={() => setChoice("keep")} />{copy.keep}</label> : null}
-        {hasExisting ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "existing"} onChange={() => setChoice("existing")} />{copy.existing}</label> : null}
-        {hasExisting && choice === "existing" && copy.existingHint ? <p className="-mt-1 pl-7 text-xs leading-5 text-slate-500">{copy.existingHint}</p> : null}
-        <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "none"} onChange={() => setChoice("none")} />{copy.none}</label>
+        {hasExisting ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "existing" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("existing"); }} />{copy.existing}</label> : null}
+        {hasExisting && choice === "existing" && !pickingUpload && copy.existingHint ? <p className="-mt-1 pl-7 text-xs leading-5 text-slate-500">{copy.existingHint}</p> : null}
+        {hasCurrent ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "keep" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("keep"); }} />{copy.keep}</label> : null}
+        <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "none" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("none"); }} />{copy.none}</label>
+        <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={pickingUpload || choice === "upload"} onChange={() => setPickingUpload(true)} />{copy.upload}</label>
       </div>
     </div>
-    <label className="mt-4 block text-sm font-medium text-slate-800">{copy.upload}
-      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onUpload} className="mt-2 block min-h-11 w-full rounded-xl border border-slate-200 p-2 text-sm" />
-    </label>
+    {pickingUpload || choice === "upload" ? (
+      <label className="mt-3 block text-sm font-medium text-slate-800">{copy.choose}
+        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onUpload} className="mt-2 block min-h-11 w-full rounded-xl border border-slate-200 p-2 text-sm" />
+      </label>
+    ) : null}
     {cropFile ? (
       <ImageCropDialog
         file={cropFile}
@@ -67,6 +72,7 @@ export function ConnectPhotoField({
         onConfirm={(dataUrl) => {
           setUploaded(dataUrl);
           setChoice("upload");
+          setPickingUpload(false);
           setCropFile(null);
         }}
       />

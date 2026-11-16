@@ -915,6 +915,15 @@
       "find": "Meet the people you want to found with.",
       "connect": "Your network: people, offers and ideas in one place.",
       "advise": "Support startups and teams, on your own or as an accelerator."
+    },
+    "photo": {
+      "step": "Last step, optional",
+      "title": "A face makes it more personal",
+      "text": "People prefer to write to someone they can see. You can upload a photo or choose an illustration, and change it any time.",
+      "saved": "Saved.",
+      "who": "You set who may see it later under \"Your profile\". Until then nobody but you sees it.",
+      "next": "Continue",
+      "skip": "Skip, later"
     }
   },
   "values": {

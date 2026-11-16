@@ -67,7 +67,7 @@ export function isIdentityPublishReady(core: IdentityCoreValues | null) {
  * Weiterleitung, sobald er mehr zulaesst als noetig. Zwei Seiten schicken
  * Menschen zur Identitaet, also gibt es zwei erlaubte Rueckwege.
  */
-const RETURN_PATHS = ["/connect/profile", "/discovery/profile"] as const;
+const RETURN_PATHS = ["/connect/profile", "/discovery/profile", "/welcome/foto"] as const;
 
 export type IdentityReturnPath = (typeof RETURN_PATHS)[number];
 
