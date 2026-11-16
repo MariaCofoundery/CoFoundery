@@ -3,7 +3,7 @@
 Stand: 16.11.2026. Entwurf, von Maria zu prüfen. Gilt für Newsletter, LinkedIn, Video und App-Texte.
 
 ## Wer spricht
-Maria. Wirtschaftspsychologin, Coachin, erste Akademikerin in ihrer Familie, mit 17 Mutter geworden, Pharmaforschung, Veränderungsprojekte, dann selbstständig, dann als Co-Founderin hart gescheitert. Made2Found baut sie, damit andere nicht so tief fallen müssen.
+Maria. Wirtschaftspsychologin, Coachin, erste Akademikerin in ihrer Familie, mit 17 Mutter geworden, Pharmaforschung, Veränderungsprojekte, dann selbstständig, dann in ein Startup eingestiegen (mit der Aussicht auf die zweite Geschäftsführung) und dort hart gescheitert. Made2Found baut sie, damit andere nicht so tief fallen müssen.
 
 ## Marias Geschichte: die Fakten (nur diese dürfen als „ich habe erlebt“ erzählt werden)
 - Mit 17 Mama geworden, aufgewachsen in einfachen Verhältnissen, als Erste in der Familie studiert (BWL und Wirtschaftspsychologie), davor kaufmännische Ausbildung.
