@@ -30,13 +30,15 @@ import { ACCOUNT_CARD, ACCOUNT_SECONDARY, AccountHead } from "@/features/account
 import { DeleteAccountSection } from "@/features/account/DeleteAccountSection";
 import { getDashboardRoleViews } from "@/features/dashboard/dashboardRoleData";
 import { createClient, getRequestUser } from "@/lib/supabase/server";
+import { NewsletterAsk } from "@/features/newsletter/NewsletterAsk";
+import { getNewsletterState } from "@/features/newsletter/newsletterData";
 import { QuietHoursSection, getMyQuietHours } from "@/features/notifications/QuietHoursSection";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; connectError?: string; quiet?: string }>;
+  searchParams: Promise<{ status?: string; connectError?: string; quiet?: string; newsletter?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -46,6 +48,7 @@ export default async function AccountPage({
   if (!user) redirect("/login?next=/account");
 
   const phoneT = await getTranslations("profile.welcomeLetter.phone");
+  const newsletterT = await getTranslations("dashboard");
   const [
     params,
     roleViews,
@@ -175,6 +178,12 @@ export default async function AccountPage({
             showAdvisorKinds={roleViews.hasAdvisor}
             status={status}
           />
+
+          {/* Der Newsletter "Aus dem Netzwerk": eigene Zustimmung, nie vorangekreuzt, mit Bestaetigung per Mail. */}
+          <div className={`${ACCOUNT_CARD} mt-5`} id="newsletter">
+            {["asked", "stopped", "error"].includes(params.newsletter ?? "") ? <p role="status" className={`mb-3 rounded-2xl p-3 text-sm ${params.newsletter === "error" ? "bg-amber-50 text-amber-900" : "bg-emerald-50 text-emerald-900"}`}>{newsletterT(`newsletter.${params.newsletter}`)}</p> : null}
+            <NewsletterAsk state={await getNewsletterState(supabase, user.id)} source="settings" returnTo="/account" t={newsletterT} tone="plain" />
+          </div>
 
           {/* Feierabend (20270317120000): direkt nach den Benachrichtigungen, dort sucht man ihn. */}
           <QuietHoursSection quiet={await getMyQuietHours(supabase)} status={params.quiet ?? null} locale={getPresentationLocale(accountLocale ?? "de")} />

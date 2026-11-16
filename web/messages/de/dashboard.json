@@ -973,5 +973,18 @@
         "also": "Du willst Teams begleiten?"
       }
     }
+  },
+  "newsletter": {
+    "title": "„Aus dem Netzwerk“: der Newsletter",
+    "text": "Alle zwei Wochen ein paar neue Gesuche und Angebote (ohne Namen), eine Geschichte und Dank, der geholfen hat. Nur, wenn du es willst.",
+    "yes": "Ja, ich möchte den Newsletter",
+    "note": "Du bekommst zuerst eine Mail zum Bestätigen. Abmelden geht jederzeit mit einem Klick.",
+    "pendingText": "Fast geschafft: Wir haben dir eine Mail geschickt. Bitte klicke darin auf den Knopf, damit es gilt. Schau auch im Spam-Ordner nach.",
+    "resend": "Mail noch einmal schicken",
+    "confirmedText": "Du bekommst den Newsletter, etwa alle zwei Wochen. Danke!",
+    "stop": "Newsletter beenden",
+    "asked": "Wir haben dir eine Mail geschickt. Bitte bestätige sie.",
+    "stopped": "Der Newsletter ist beendet.",
+    "error": "Das hat nicht geklappt. Bitte versuch es noch einmal."
   }
 }

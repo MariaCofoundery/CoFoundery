@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { NewsletterAsk } from "@/features/newsletter/NewsletterAsk";
+import { getNewsletterState } from "@/features/newsletter/newsletterData";
 import { PublicLanguageSwitcher } from "@/features/i18n/PublicLanguageSwitcher";
 import { nextPathFor } from "@/features/profile/journey/journeyModel";
 import { parseInterests } from "@/features/profile/interests";
@@ -23,6 +25,8 @@ export default async function WelcomeLaterPage() {
   if (!core?.onboarding_completed_at) redirect("/welcome");
 
   const t = await getTranslations("profile.journey.later");
+  const dashT = await getTranslations("dashboard");
+  const newsletterState = await getNewsletterState(supabase, user.id);
   const goNow = nextPathFor({ areas: parseInterests((core.interests as unknown[] | null) ?? []), alignPlan: "first" });
 
   return (
@@ -45,6 +49,7 @@ export default async function WelcomeLaterPage() {
           </p>
           <Link href={goNow} className="brand-cta mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-2xl px-6 text-base font-semibold">{t("doNow")}</Link>
           <p className="mt-3 text-center text-xs leading-5 text-slate-600">{t("note")}</p>
+          {newsletterState !== "confirmed" ? <div className="mt-6"><NewsletterAsk state={newsletterState} source="welcome" returnTo="/welcome/morgen" t={dashT} /></div> : null}
         </section>
       </div>
     </main>

@@ -973,5 +973,18 @@
         "also": "Want to support teams?"
       }
     }
+  },
+  "newsletter": {
+    "title": "\"From the network\": the newsletter",
+    "text": "Every two weeks a few new requests and offers (without names), a story, and thanks that helped. Only if you want it.",
+    "yes": "Yes, I want the newsletter",
+    "note": "You get an email first to confirm. You can unsubscribe with one click at any time.",
+    "pendingText": "Almost done: we sent you an email. Please click the button in it so it counts. Check your spam folder too.",
+    "resend": "Send the email again",
+    "confirmedText": "You get the newsletter, about every two weeks. Thank you!",
+    "stop": "Stop the newsletter",
+    "asked": "We sent you an email. Please confirm it.",
+    "stopped": "The newsletter is stopped.",
+    "error": "That did not work. Please try again."
   }
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { alignPartHref } from "@/features/align/alignModel";
+import { NewsletterAsk, type NewsletterState } from "@/features/newsletter/NewsletterAsk";
 import type { AreaCard } from "@/features/dashboard/areasModel";
 
 export type ProfileParts = { work: boolean; can: boolean; strengths: boolean; direction: boolean };
@@ -34,6 +35,7 @@ export async function DashboardAside({
   showInvite = true,
   setupOpen = false,
   areas = [],
+  newsletter = null,
 }: {
   parts: ProfileParts;
   team: StandTeam | null;
@@ -45,8 +47,11 @@ export async function DashboardAside({
   setupOpen?: boolean;
   /** Deine Bereiche: je Bereich der Stand und ein Knopf (areasModel.ts). */
   areas?: AreaCard[];
+  /** Stand des Newsletters; null = Karte nicht zeigen (bestaetigt: nichts mehr zu fragen). */
+  newsletter?: NewsletterState | null;
 }) {
   const t = await getTranslations("dashboard.start");
+  const tDash = await getTranslations("dashboard");
   const keys = ["work", "can", "strengths", "direction"] as const;
   const done = keys.filter((key) => parts[key]).map((key) => t(`stand.parts.${key}`));
   const open = keys.filter((key) => !parts[key]).map((key) => t(`stand.parts.${key}`));
@@ -186,6 +191,7 @@ export async function DashboardAside({
           </section>
         </>
       ) : null}
+          {newsletter && newsletter !== "confirmed" ? <NewsletterAsk state={newsletter} source="dashboard" returnTo="/dashboard" t={tDash} /> : null}
     </aside>
   );
 }

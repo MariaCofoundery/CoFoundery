@@ -11,6 +11,7 @@ import { DashboardWaiting, type RunningEntry, type WaitingCard } from "@/feature
 import { openSetupSteps } from "@/features/profile/journey/journeyModel";
 import { areaCards } from "@/features/dashboard/areasModel";
 import { getFindAndConnectStates } from "@/features/dashboard/areaStates";
+import { getNewsletterState } from "@/features/newsletter/newsletterData";
 import { DashboardAside } from "@/features/dashboard/DashboardAside";
 import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
@@ -382,6 +383,7 @@ export default async function DashboardPage({
           conversation={conversation}
           showInvite={start.next.kind !== "invite"}
           setupOpen={setupOpen}
+          newsletter={await getNewsletterState(supabase, user.id).catch(() => null)}
         />
       </div>
 
