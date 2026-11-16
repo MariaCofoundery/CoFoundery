@@ -461,9 +461,9 @@ export function getNetworkNotificationEmailCopy(
       },
       connect_thanks: {
         subject: `${name} thanked you`,
-        headline: "Someone said thank you",
-        intro: `${name} thanked you for your help. Have a look at what it was for.`,
-        cta: "See the thanks",
+        headline: "A thank-you, just for you",
+        intro: `${name} thanked you. You helped, and it landed. Take a look at what it was for and enjoy the moment. Thank you for sharing what you know.`,
+        cta: "See my thank-you",
       },
       discovery_intro_accepted: {
         subject: `${name} said yes`,
@@ -557,9 +557,9 @@ export function getNetworkNotificationEmailCopy(
     },
     connect_thanks: {
       subject: `${name} hat sich bei dir bedankt`,
-      headline: "Jemand sagt Danke",
-      intro: `${name} hat sich für deine Hilfe bei dir bedankt. Schau, wobei du geholfen hast.`,
-      cta: "Dank ansehen",
+      headline: "Ein Danke, nur für dich",
+      intro: `${name} hat sich bei dir bedankt. Du hast geholfen, und das ist angekommen. Schau nach, wobei, und freu dich ein bisschen. Danke, dass du dein Wissen teilst.`,
+      cta: "Mein Danke ansehen",
     },
     discovery_intro_accepted: {
       subject: `${name} hat zugesagt`,
