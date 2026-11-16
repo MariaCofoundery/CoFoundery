@@ -49,3 +49,17 @@ export async function generateEventQrCode(
     return { ok: false };
   }
 }
+
+/** Ein groesserer QR-Code fuer Aushang und Druck (Standard 640 Pixel, Rand ja). Gleiche Pruefung wie oben: nur ein echtes PNG kommt zurueck. */
+export async function generateQrPng(
+  value: string,
+  width = 640,
+  encoder: EventQrCodeEncoder = defaultEncoder
+): Promise<EventQrCodeResult> {
+  try {
+    const dataUrl = await encoder(value, { type: "image/png", width, margin: 2, errorCorrectionLevel: "M" });
+    return isPngDataUrl(dataUrl) ? { ok: true, dataUrl } : { ok: false };
+  } catch {
+    return { ok: false };
+  }
+}

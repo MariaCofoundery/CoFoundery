@@ -47,6 +47,10 @@ select extensions.plan(7);
 -- Magic Link bekommt. GEPRUEFT UND KEIN LECK: Token-Hash mit 192 Bit, Antwort nur ja/nein, keine
 -- Organisation und keine Adresse; beitreten kann man danach nur mit der Adresse der Einladung.
 --
+-- DAZUGEKOMMEN AM 16.11.2026: get_public_event_name. Die Seite hinter dem QR-Code einer Veranstaltung zeigt damit deren Namen. GEPRUEFT UND
+-- KEIN LECK: sie nimmt den Adressnamen (slug) und antwortet NUR mit dem Namen - kein Status, keine Zeiten, keine Teilnehmenden. Wer einen
+-- Adressnamen errät, erfährt einen Veranstaltungsnamen, den die Veranstalterin ohnehin auf den QR-Code druckt.
+--
 -- Der Wachhund hat also nicht gebellt, weil etwas offen war, sondern weil eine
 -- Ausnahme hinzukam, ueber die ein Mensch entscheiden muss. Das ist seine
 -- Aufgabe - und deshalb bleibt die Liste eine Liste und wird keine Regel
@@ -70,7 +74,8 @@ select extensions.is(
        'get_public_program_page',
        'is_valid_team_program_invite',
        'is_valid_team_program_code',
-       'is_valid_advisor_org_invite'
+       'is_valid_advisor_org_invite',
+       'get_public_event_name'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');

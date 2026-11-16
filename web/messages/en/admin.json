@@ -116,7 +116,8 @@
       "announcements": "Announcements",
       "events": "Review events",
       "recommendations": "Review recommendations",
-      "newsletter": "Newsletter"
+      "newsletter": "Newsletter",
+      "eventsQr": "Events and QR"
     },
     "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
     "teamChecks": {
@@ -347,6 +348,65 @@
       "error_too_big": "The image is larger than 1 MB.",
       "error_type": "JPG or PNG only.",
       "error_upload": "The upload did not work."
+    }
+  },
+  "eventsQr": {
+    "back": "Back to admin",
+    "title": "Events and QR codes",
+    "intro": "Create events here and get two QR codes for each: one for signing up and one for the event check. The page behind the QR code shows the event name.",
+    "new": "New event",
+    "list": "Events",
+    "empty": "No event yet.",
+    "noDate": "no date",
+    "participants": "{count, plural, =0 {no participants} one {# participant} other {# participants}}",
+    "status": {
+      "draft": "Draft",
+      "live": "Live",
+      "closed": "Closed"
+    },
+    "form": {
+      "name": "Event name",
+      "namePlaceholder": "For example: Founders evening Leipzig",
+      "slug": "Address name",
+      "slugPlaceholder": "founders-evening-leipzig",
+      "slugHint": "Lower case letters, digits and hyphens. Leave empty and it is made from the name.",
+      "status": "Status",
+      "statusHint": "A draft needs no end, everything else does.",
+      "starts": "Start (Berlin time)",
+      "ends": "End (Berlin time)",
+      "endsHint": "24 hours after the end the event check data is deleted.",
+      "create": "Create event",
+      "save": "Save"
+    },
+    "qr": {
+      "signup": {
+        "title": "QR code for sign-up",
+        "text": "Leads to \"Great that you are here\" with the event name and the button \"Get started\"."
+      },
+      "check": {
+        "title": "QR code for the event check",
+        "text": "Leads to the event check of this event (compare how you work, no account needed)."
+      },
+      "alt": "QR code for {name}",
+      "download": "Save as image",
+      "address": "Address",
+      "failed": "The QR code could not be created."
+    },
+    "delete": "Delete event",
+    "deleteBlocked": "An event with participants cannot be deleted. The data disappears by itself 24 hours after the end.",
+    "saved": {
+      "created": "Event created.",
+      "updated": "Saved.",
+      "deleted": "Event deleted."
+    },
+    "errors": {
+      "event_slug_invalid": "The address name may only contain lower case letters, digits and hyphens (3 to 60 characters).",
+      "event_slug_taken": "This address name already exists. Choose another.",
+      "event_name_invalid": "The name needs 2 to 120 characters.",
+      "event_end_required": "Everything except a draft needs an end.",
+      "event_time_invalid": "The end is before the start.",
+      "event_has_participants": "An event with participants cannot be deleted.",
+      "save": "That did not work. Please try again."
     }
   }
 }

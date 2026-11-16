@@ -116,7 +116,8 @@
       "announcements": "Mitteilungen",
       "events": "Events prüfen",
       "recommendations": "Empfehlungen prüfen",
-      "newsletter": "Newsletter"
+      "newsletter": "Newsletter",
+      "eventsQr": "Veranstaltungen und QR"
     },
     "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
     "teamChecks": {
@@ -347,6 +348,65 @@
       "error_too_big": "Das Bild ist größer als 1 MB.",
       "error_type": "Nur JPG oder PNG.",
       "error_upload": "Das Hochladen hat nicht geklappt."
+    }
+  },
+  "eventsQr": {
+    "back": "Zurück zum Admin",
+    "title": "Veranstaltungen und QR-Codes",
+    "intro": "Hier legst du Veranstaltungen an und bekommst zu jeder zwei QR-Codes: einen für die Anmeldung und einen für den Event-Check. Die Seite hinter dem QR-Code zeigt den Namen der Veranstaltung.",
+    "new": "Neue Veranstaltung",
+    "list": "Veranstaltungen",
+    "empty": "Noch keine Veranstaltung.",
+    "noDate": "ohne Datum",
+    "participants": "{count, plural, =0 {keine Teilnahmen} one {# Teilnahme} other {# Teilnahmen}}",
+    "status": {
+      "draft": "Entwurf",
+      "live": "läuft",
+      "closed": "beendet"
+    },
+    "form": {
+      "name": "Name der Veranstaltung",
+      "namePlaceholder": "Zum Beispiel: Gründungsabend Leipzig",
+      "slug": "Adressname",
+      "slugPlaceholder": "gruendungsabend-leipzig",
+      "slugHint": "Kleinbuchstaben, Ziffern und Bindestriche. Leer lassen, dann entsteht er aus dem Namen.",
+      "status": "Status",
+      "statusHint": "Ein Entwurf braucht kein Ende, alles andere schon.",
+      "starts": "Beginn (Berliner Zeit)",
+      "ends": "Ende (Berliner Zeit)",
+      "endsHint": "24 Stunden nach dem Ende werden die Daten des Event-Checks gelöscht.",
+      "create": "Veranstaltung anlegen",
+      "save": "Speichern"
+    },
+    "qr": {
+      "signup": {
+        "title": "QR-Code für die Anmeldung",
+        "text": "Führt auf „Schön, dass du da bist“ mit dem Namen der Veranstaltung und dem Knopf „Jetzt starten“."
+      },
+      "check": {
+        "title": "QR-Code für den Event-Check",
+        "text": "Führt auf den Event-Check dieser Veranstaltung (Arbeitsweise vergleichen, ohne Konto)."
+      },
+      "alt": "QR-Code für {name}",
+      "download": "Als Bild speichern",
+      "address": "Adresse",
+      "failed": "Der QR-Code konnte nicht erzeugt werden."
+    },
+    "delete": "Veranstaltung löschen",
+    "deleteBlocked": "Mit Teilnahmen lässt sich die Veranstaltung nicht löschen. Die Daten verschwinden 24 Stunden nach dem Ende von selbst.",
+    "saved": {
+      "created": "Veranstaltung angelegt.",
+      "updated": "Gespeichert.",
+      "deleted": "Veranstaltung gelöscht."
+    },
+    "errors": {
+      "event_slug_invalid": "Der Adressname darf nur Kleinbuchstaben, Ziffern und Bindestriche enthalten (3 bis 60 Zeichen).",
+      "event_slug_taken": "Diesen Adressnamen gibt es schon. Nimm einen anderen.",
+      "event_name_invalid": "Der Name braucht 2 bis 120 Zeichen.",
+      "event_end_required": "Alles außer einem Entwurf braucht ein Ende.",
+      "event_time_invalid": "Das Ende liegt vor dem Beginn.",
+      "event_has_participants": "Mit Teilnahmen lässt sich die Veranstaltung nicht löschen.",
+      "save": "Das hat nicht geklappt. Bitte versuch es noch einmal."
     }
   }
 }
