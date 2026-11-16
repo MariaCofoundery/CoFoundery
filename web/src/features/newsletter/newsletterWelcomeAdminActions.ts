@@ -20,6 +20,7 @@ export async function sendWelcomeTestAction(formData: FormData) {
     locale,
     photoUrl: toPublicAppUrl("/brand/maria.jpg"),
     miaUrl: toPublicAppUrl("/brand/mia.png"),
+    logoUrl: toPublicAppUrl("/brand/made2found-symbol.png"),
     ctaUrl: toPublicAppUrl("/me/profile"),
     unsubscribeUrl: `${origin}/abmelden/newsletter?u=${encodeURIComponent(user.id)}&t=${newsletterToken(user.id, "unsubscribe", secret)}`,
     privacyUrl: toPublicAppUrl("/datenschutz"),

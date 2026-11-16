@@ -15,6 +15,7 @@ export type WelcomeParams = {
   /** Absolute Adressen, vom Aufrufer gebaut (die App-Adresse kennt nur der Server). */
   photoUrl: string;
   miaUrl: string;
+  logoUrl: string;
   ctaUrl: string;
   unsubscribeUrl: string;
   privacyUrl: string;
@@ -35,7 +36,7 @@ export function buildNewsletterWelcomeHtml(params: WelcomeParams) {
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:20px 10px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fbf8f3;">
-          <tr><td align="center" bgcolor="#5b3df5" style="background-color:#5b3df5;background-image:linear-gradient(110deg,#4b2bb8,#6d28d9 45%,#0a9ec2);padding:30px 12px;font-family:Arial,sans-serif;font-size:24px;font-weight:bold;letter-spacing:3px;color:#ffffff;">MADE2FOUND</td></tr>
+          <tr><td align="center" bgcolor="#5b3df5" style="background-color:#5b3df5;background-image:linear-gradient(110deg,#4b2bb8,#6d28d9 45%,#0a9ec2);padding:26px 12px 24px;font-family:Arial,sans-serif;font-size:24px;font-weight:bold;letter-spacing:3px;color:#ffffff;"><table role="presentation" align="center" cellspacing="0" cellpadding="0" style="margin:0 auto 12px;"><tr><td bgcolor="#ffffff" style="background:#ffffff;border-radius:36px;padding:8px;"><img src="${esc(params.logoUrl)}" alt="" width="56" height="56" style="display:block;width:56px;height:56px;"></td></tr></table>MADE2FOUND</td></tr>
           <tr><td style="padding:30px 28px 8px;">
             <h1 style="margin:0 0 14px;font-family:${SERIF};font-size:28px;line-height:34px;color:#4b2bb8;">${esc(copy.headline)}</h1>
             ${p(copy.intro)}

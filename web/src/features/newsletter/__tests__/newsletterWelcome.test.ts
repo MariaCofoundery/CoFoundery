@@ -10,6 +10,7 @@ const params: WelcomeParams = {
   locale: "de",
   photoUrl: "https://app.test/brand/maria.jpg",
   miaUrl: "https://app.test/brand/mia.png",
+  logoUrl: "https://app.test/brand/made2found-symbol.png",
   ctaUrl: "https://app.test/me/profile",
   unsubscribeUrl: "https://app.test/abmelden/newsletter?u=1&t=2",
   privacyUrl: "https://app.test/datenschutz",
@@ -21,6 +22,7 @@ test("welcome mail: German version carries Maria's story, photo, Mia, one button
   assert.match(html, /Ich bin schon einmal|zweite Geschäftsführerin/);
   assert.match(html, /src="https:\/\/app\.test\/brand\/maria\.jpg"/);
   assert.match(html, /src="https:\/\/app\.test\/brand\/mia\.png"/);
+  assert.match(html, /made2found-symbol\.png/);
   assert.equal((html.match(/href="https:\/\/app\.test\/me\/profile"/g) ?? []).length, 1);
   assert.match(html, /abmelden\/newsletter\?u=1&amp;t=2/);
   assert.doesNotMatch(html, /Gehalt/);
@@ -30,7 +32,7 @@ test("welcome mail: no scores, no tracking pixel", () => {
   const html = buildNewsletterWelcomeHtml(params);
   assert.doesNotMatch(html, /<img[^>]+width="1"[^>]+height="1"/i);
   assert.doesNotMatch(html, /Prozent|Punkte:|Score/i);
-  assert.equal((html.match(/<img /g) ?? []).length, 2);
+  assert.equal((html.match(/<img /g) ?? []).length, 3);
 });
 
 test("welcome mail: English version has the same shape and no German characters", () => {

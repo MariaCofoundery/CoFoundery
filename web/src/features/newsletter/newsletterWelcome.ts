@@ -21,6 +21,7 @@ export async function sendWelcomeAfterConfirm(client: SupabaseClient, userId: st
           locale: recipient.locale,
           photoUrl: toPublicAppUrl("/brand/maria.jpg"),
           miaUrl: toPublicAppUrl("/brand/mia.png"),
+          logoUrl: toPublicAppUrl("/brand/made2found-symbol.png"),
           ctaUrl: toPublicAppUrl("/me/profile"),
           unsubscribeUrl: `${origin}/abmelden/newsletter?u=${encodeURIComponent(userId)}&t=${newsletterToken(userId, "unsubscribe", secret)}`,
           privacyUrl: toPublicAppUrl("/datenschutz"),
