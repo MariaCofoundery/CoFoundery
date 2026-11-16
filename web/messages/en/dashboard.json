@@ -962,19 +962,23 @@
       "moreTitle": "More areas",
       "align": {
         "name": "Align",
-        "also": "Want to find out how you work?"
+        "also": "Want to find out how you work?",
+        "line": "How do you work, how does your team work?"
       },
       "find": {
         "name": "Find",
-        "also": "Want to find co-founders?"
+        "also": "Want to find co-founders?",
+        "line": "Find the people you want to found with."
       },
       "connect": {
         "name": "Connect",
-        "also": "Want to use the network?"
+        "also": "Want to use the network?",
+        "line": "People, offers and ideas in one place."
       },
       "advise": {
         "name": "Advisor",
-        "also": "Want to support teams?"
+        "also": "Want to support teams?",
+        "line": "Support startups and teams."
       }
     }
   },

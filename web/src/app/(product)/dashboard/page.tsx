@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
@@ -12,6 +13,7 @@ import { openSetupSteps } from "@/features/profile/journey/journeyModel";
 import { areaCards } from "@/features/dashboard/areasModel";
 import { getFindAndConnectStates } from "@/features/dashboard/areaStates";
 import { getNewsletterState } from "@/features/newsletter/newsletterData";
+import { AreaTiles } from "@/features/dashboard/AreaTiles";
 import { DashboardAside } from "@/features/dashboard/DashboardAside";
 import type { DashboardTaskPresentation } from "@/features/dashboard/DashboardTaskList";
 import { getFounderDashboardTasks } from "@/features/dashboard/founderDashboardTaskData";
@@ -292,10 +294,14 @@ export default async function DashboardPage({
         </p>
       ) : null}
 
-      <p className="mb-5 text-lg text-[#5f5e7a]">{t("hero.greeting", { name: displayName })}</p>
+      {/* Mia, die Figur der Marke: ganz leise neben der Begruessung, still, ohne Bewegung. */}
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <p className="text-lg text-[#5f5e7a] sm:text-xl">{t("hero.greeting", { name: displayName })}</p>
+        <Image src="/brand/mia.png" alt="" width={203} height={286} priority className="h-[84px] w-auto shrink-0 rounded-2xl border border-white/80 shadow-[0_8px_22px_rgba(76,29,149,.12)] sm:h-[112px]" />
+      </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-start-1">
           <MyProgramTasks
             tasks={myProgramTasks}
             labelOf={(programId) => myPrograms.find((program) => program.programId === programId)?.orgName ?? null}
@@ -342,6 +348,9 @@ export default async function DashboardPage({
             </section>
           ) : null}
 
+        </div>
+
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
           <DashboardWaiting
             cards={waitingCards}
             running={running}
@@ -355,13 +364,18 @@ export default async function DashboardPage({
           />
         </div>
 
-        <DashboardAside
+        <AreaTiles
+          className="lg:col-start-1 lg:row-start-2"
           areas={areaCards({
             alignParts: { work: workProfileState === "completed", can: capabilityCount > 0, strengths: strengthCount > 0, direction: directionCount > 0 },
             find: findConnect.find,
             connect: findConnect.connect,
             hasAdvisor: roleViews.hasAdvisor,
           })}
+        />
+
+        <DashboardAside
+          className="lg:col-start-2 lg:row-start-2"
           parts={{
             work: workProfileState === "completed",
             can: capabilityCount > 0,

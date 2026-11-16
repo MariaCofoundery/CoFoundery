@@ -1446,3 +1446,50 @@ body {
   border-radius: 20px;
   box-shadow: 0 1px 2px rgba(40, 30, 110, 0.06), 0 8px 24px -12px rgba(40, 30, 110, 0.18);
 }
+
+
+/* Startseite: der naechste Schritt im dunklen Look der Startseite (Entwurf 17.11.2026): tiefes Indigo, ein tuerkiser und ein violetter Lichtschein,
+   die ganz langsam wandern. Bei "Bewegung reduzieren" stehen sie still. */
+.dashboard-hero-night {
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  background-color: #17173a;
+  background-image: radial-gradient(120% 140% at 8% 0%, #2c2470 0%, #17173a 62%);
+}
+.dashboard-hero-night::before,
+.dashboard-hero-night::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 0;
+}
+.dashboard-hero-night::before {
+  right: -80px;
+  top: -90px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.34), transparent 70%);
+  animation: hero-glow-drift 15s ease-in-out infinite alternate;
+}
+.dashboard-hero-night::after {
+  left: -70px;
+  bottom: -110px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(124, 92, 255, 0.34), transparent 70%);
+  animation: hero-glow-drift 19s ease-in-out infinite alternate-reverse;
+}
+.dashboard-hero-night > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes hero-glow-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-34px, 26px, 0) scale(1.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-hero-night::before,
+  .dashboard-hero-night::after { animation: none; }
+}

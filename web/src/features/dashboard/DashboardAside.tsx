@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { alignPartHref } from "@/features/align/alignModel";
 import { NewsletterAsk, type NewsletterState } from "@/features/newsletter/NewsletterAsk";
-import type { AreaCard } from "@/features/dashboard/areasModel";
 
 export type ProfileParts = { work: boolean; can: boolean; strengths: boolean; direction: boolean };
 
@@ -34,8 +33,8 @@ export async function DashboardAside({
   conversation,
   showInvite = true,
   setupOpen = false,
-  areas = [],
   newsletter = null,
+  className = "",
 }: {
   parts: ProfileParts;
   team: StandTeam | null;
@@ -45,8 +44,8 @@ export async function DashboardAside({
   showInvite?: boolean;
   /** Das Profil-Setup hat noch offene Schritte: ein stiller Link dorthin. */
   setupOpen?: boolean;
-  /** Deine Bereiche: je Bereich der Stand und ein Knopf (areasModel.ts). */
-  areas?: AreaCard[];
+  /** Platz im Raster der Startseite (Entwurf 17.11.2026). */
+  className?: string;
   /** Stand des Newsletters; null = Karte nicht zeigen (bestaetigt: nichts mehr zu fragen). */
   newsletter?: NewsletterState | null;
 }) {
@@ -60,40 +59,7 @@ export async function DashboardAside({
   const openParts = keys.filter((key) => !parts[key]);
 
   return (
-    <aside aria-label={t("stand.title")} className="flex min-w-0 flex-col gap-4">
-      {areas.length > 0 ? (
-        <section aria-labelledby="dashboard-areas-title" className={BOX} data-dashboard-areas>
-          <h2 id="dashboard-areas-title" className={BOX_TITLE}>{t("areas.title")}</h2>
-          <ul className="mt-3.5 flex flex-col gap-2.5">
-            {areas.filter((area) => area.chosen).map((area) => (
-              <li key={area.key} className="flex items-center justify-between gap-3 rounded-2xl border border-[#e4e2f0] bg-white px-4 py-3">
-                <span className="min-w-0">
-                  <span className="block text-base font-semibold text-[#0b1f3a]">{t(`areas.${area.key}.name`)}</span>
-                  <span className="block text-sm text-[#5f5e7a]">{t(`areas.state.${area.state}`)}</span>
-                </span>
-                <Link href={area.href} className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-violet-300 px-4 text-[15px] font-semibold text-violet-800 hover:bg-violet-50">
-                  {t(area.state === "open" ? "areas.setup" : area.state === "started" ? "areas.continue" : "areas.view")}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {areas.some((area) => !area.chosen) ? (
-            <>
-              <p className="mt-4 text-sm font-semibold text-[#33325e]">{t("areas.moreTitle")}</p>
-              <ul className="mt-2 flex flex-col gap-1">
-                {areas.filter((area) => !area.chosen).map((area) => (
-                  <li key={area.key}>
-                    <Link href={area.href} className="flex min-h-11 items-center justify-between gap-3 text-[15px] text-[#33325e] hover:text-violet-800">
-                      <span>{t(`areas.${area.key}.also`)}</span>
-                      <span className="shrink-0 font-semibold text-violet-800 underline underline-offset-4">{t("areas.setup")}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </section>
-      ) : null}
+    <aside aria-label={t("stand.title")} className={`flex min-w-0 flex-col gap-4 ${className}`}>
       <section aria-labelledby="dashboard-stand-title" className={BOX}>
         <h2 id="dashboard-stand-title" className={BOX_TITLE}>{t("stand.title")}</h2>
         <dl className="mt-3.5 flex flex-col gap-3 text-base leading-snug">

@@ -962,19 +962,23 @@
       "moreTitle": "Weitere Bereiche",
       "align": {
         "name": "Align",
-        "also": "Du willst wissen, wie du arbeitest?"
+        "also": "Du willst wissen, wie du arbeitest?",
+        "line": "Wie tickst du, wie tickt ihr als Team?"
       },
       "find": {
         "name": "Find",
-        "also": "Du willst Mitgründer:innen finden?"
+        "also": "Du willst Mitgründer:innen finden?",
+        "line": "Finde die Menschen, mit denen du gründen willst."
       },
       "connect": {
         "name": "Connect",
-        "also": "Du willst das Netzwerk nutzen?"
+        "also": "Du willst das Netzwerk nutzen?",
+        "line": "Menschen, Angebote und Ideen an einem Ort."
       },
       "advise": {
         "name": "Advisor",
-        "also": "Du willst Teams begleiten?"
+        "also": "Du willst Teams begleiten?",
+        "line": "Begleite Startups und Teams."
       }
     }
   },

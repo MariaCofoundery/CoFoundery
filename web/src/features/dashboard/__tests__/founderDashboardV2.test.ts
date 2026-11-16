@@ -48,14 +48,15 @@ test("dashboard no longer renders a global roadmap, profile percentage, or workb
 test("die Startseite 04.11.2026: Begruessung, naechster Schritt, Wartet auf dich, leise Spalte, Datenschutz", () => {
   assert.match(dashboardSource, /t\("hero\.greeting"/);
   assert.doesNotMatch(dashboardSource, /hero\.headline|<QuoteOfTheDay|<HeroCarousel/);
-  const order = ["t(\"hero.greeting\"", "<DashboardNextStep", "<DashboardWaiting", "<DashboardAside", "t(\"start.privacy\")"].map((marker) =>
+  // Seit 17.11.2026: Mia neben der Begruessung, die Bereiche als vier Kacheln zwischen "Wartet auf dich" und der leisen Spalte.
+  const order = ["t(\"hero.greeting\"", "<DashboardNextStep", "<DashboardWaiting", "<AreaTiles", "<DashboardAside", "t(\"start.privacy\")"].map((marker) =>
     dashboardSource.indexOf(marker)
   );
   for (const at of order) assert.ok(at > -1, "ein Bereich fehlt");
   assert.deepEqual([...order].sort((a, b) => a - b), order, "die Reihenfolge stimmt nicht");
-  // Ein Schritt, ein Knopf, die Marken-Flaeche mit den Kreisen von vorher.
-  assert.match(nextStepSource, /brand-panel/);
-  assert.equal(nextStepSource.match(/className="orb /g)?.length, 3);
+  // Ein Schritt, ein Knopf, die dunkle Flaeche mit dem langsamen Lichtschein (17.11.2026).
+  assert.match(nextStepSource, /dashboard-hero-night/);
+  assert.doesNotMatch(nextStepSource, /className="orb /);
   assert.equal(nextStepSource.match(/href=\{startStepHref\(next\)\}/g)?.length, 1);
   assert.match(nextStepSource, /aria-current=\{step\.state === "current" \? "step" : undefined\}/);
   assert.match(nextStepSource, /sr-only/);

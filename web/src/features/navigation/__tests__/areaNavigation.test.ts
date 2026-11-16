@@ -94,10 +94,9 @@ test("exactly one point is filled: the one you are standing on", () => {
   assert.match(
     // Seit 04.11.2026 in eigenem Baustein: "Dein naechster Schritt".
     readFileSync("src/features/dashboard/DashboardNextStep.tsx", "utf8"),
-    /brand-panel/,
-    // Seit der UX-Neuordnung (19.10.2026) ist der Hauptweg eine Marken-Flaeche (derselbe Verlauf, gross, weisse
-    // Schrift) - eine Klasse in globals.css, nicht kopiert.
-    "der Hauptweg im Kopfbereich nutzt die Marken-Flaeche"
+    /dashboard-hero-night/,
+    // Seit 17.11.2026 ist der Hauptweg die dunkle Flaeche der Startseite (tiefes Indigo, Lichtschein) - eine Klasse in globals.css, nicht kopiert.
+    "der Hauptweg im Kopfbereich nutzt die dunkle Flaeche"
   );
   assert.doesNotMatch(
     shell,

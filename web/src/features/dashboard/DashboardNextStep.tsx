@@ -45,13 +45,8 @@ export async function DashboardNextStep({
       id="dashboard-block-next"
       data-dashboard-hero
       aria-labelledby="dashboard-next-title"
-      className="brand-panel relative overflow-hidden rounded-[28px] px-6 py-8 sm:px-9 sm:py-9"
+      className="dashboard-hero-night rounded-[28px] px-6 py-8 sm:px-9 sm:py-9"
     >
-      {/* Schwebende Kreise: reiner Schmuck, stehen still bei „Bewegung reduzieren". */}
-      <span aria-hidden="true" className="orb -right-8 -top-10 h-28 w-28 sm:h-44 sm:w-44" />
-      <span aria-hidden="true" className="orb bottom-16 right-28 hidden h-24 w-24 sm:block" style={{ animationDelay: "0.8s" }} />
-      <span aria-hidden="true" className="orb right-6 top-20 h-7 w-7 bg-white/20 sm:right-16 sm:top-24 sm:h-10 sm:w-10" style={{ animationDelay: "0.3s" }} />
-
       <div className="relative">
         <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{t("eyebrow")}</p>
         <h1 id="dashboard-next-title" className="mt-2.5 max-w-xl pr-6 text-[26px] font-semibold leading-[1.15] sm:text-[32px]">

@@ -38,14 +38,15 @@ test("wo schon etwas getan wurde, zählt der Bereich als aktiv", () => {
 });
 
 test("die Karte zeigt nur Worte, keine Zahl, keinen Wert, keine Rangfolge", () => {
-  const aside = code("src/features/dashboard/DashboardAside.tsx");
-  assert.match(aside, /data-dashboard-areas/);
-  assert.doesNotMatch(aside.slice(aside.indexOf("data-dashboard-areas")), /\bscore\b|percent|%|\bvon\s+\d/i);
+  // Seit 17.11.2026 als vier Kacheln in der Hauptspalte (AreaTiles), nicht mehr in der leisen Spalte.
+  const tiles = code("src/features/dashboard/AreaTiles.tsx");
+  assert.match(tiles, /data-dashboard-areas/);
+  assert.doesNotMatch(tiles.slice(tiles.indexOf("data-dashboard-areas")), /\bscore\b|percent|%|\bvon\s+\d/i);
   for (const locale of ["de", "en"]) {
     const bundle = JSON.parse(readFileSync(`messages/${locale}/dashboard.json`, "utf8")).start.areas;
-    for (const key of ["title", "setup", "continue", "view", "moreTitle"]) assert.ok(bundle[key], `${locale}: ${key}`);
+    for (const key of ["title", "setup", "continue", "view"]) assert.ok(bundle[key], `${locale}: ${key}`);
     for (const state of ["open", "started", "done"]) assert.ok(bundle.state[state], `${locale}: state ${state}`);
-    for (const area of ["align", "find", "connect", "advise"]) assert.ok(bundle[area].name && bundle[area].also, `${locale}: ${area}`);
+    for (const area of ["align", "find", "connect", "advise"]) assert.ok(bundle[area].name && bundle[area].line, `${locale}: ${area}`);
     assert.doesNotMatch(JSON.stringify(bundle), /%|Prozent|percent|Punkte|points/i, locale);
   }
   assert.doesNotMatch(readFileSync("messages/en/dashboard.json", "utf8").match(/"areas": \{[\s\S]*?"advise": \{[\s\S]*?\}\s*\}/)?.[0] ?? "", /[äöüÄÖÜß]/);
@@ -55,4 +56,19 @@ test("die Karte zeigt nur Worte, keine Zahl, keinen Wert, keine Rangfolge", () =
   const states = code("src/features/dashboard/areaStates.ts");
   assert.match(states, /\.eq\("user_id", userId\)/);
   assert.doesNotMatch(states, /\.insert\(|\.update\(|\.delete\(|rpc\(/);
+});
+
+test("Startseite 17.11.2026: dunkler Schritt mit langsamem Lichtschein (steht still bei reduzierter Bewegung), Bereiche als Kacheln, Mia still neben der Begrüßung", () => {
+  const css = readFileSync("src/app/globals.css", "utf8");
+  assert.match(css, /\.dashboard-hero-night \{[^}]*#17173a/);
+  assert.match(css, /@keyframes hero-glow-drift/);
+  assert.match(css, /prefers-reduced-motion: reduce\) \{\s*\.dashboard-hero-night::before,\s*\.dashboard-hero-night::after \{ animation: none; \}/);
+  const page = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
+  assert.match(page, /src="\/brand\/mia\.png" alt=""/, "Mia is decoration: empty alt, no animation");
+  assert.doesNotMatch(page, /mia[^\n]*(animate|motion|transition)/i);
+  const tiles = readFileSync("src/features/dashboard/AreaTiles.tsx", "utf8");
+  assert.doesNotMatch(tiles, /%|percent|score/i);
+  assert.match(tiles, /areas\.state\.\$\{area\.state\}/);
+  const aside = readFileSync("src/features/dashboard/DashboardAside.tsx", "utf8");
+  assert.doesNotMatch(aside, /data-dashboard-areas/, "the areas moved out of the quiet column");
 });
