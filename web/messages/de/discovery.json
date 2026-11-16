@@ -1038,5 +1038,12 @@
     "text": "Wirf einen Blick auf die Suche, bevor du dein Profil fertig machst.",
     "cta": "Zur Suche",
     "note": "Du bist noch unsichtbar, bis du dein Profil selbst veröffentlichst."
+  },
+  "newest": {
+    "title": "Neu in Find",
+    "lead": "Die drei neuesten Suchenden, nach Datum sortiert. Namen siehst du, sobald dein Profil sichtbar ist.",
+    "someone": "Jemand",
+    "seeks": "Sucht: {roles}",
+    "note": "Es gibt keine Punkte und keine Rangfolge nach Passung."
   }
 }

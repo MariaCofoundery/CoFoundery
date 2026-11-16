@@ -1632,5 +1632,16 @@
     "on": "Dein Eintrag darf, ohne deinen Namen, im Newsletter „Aus dem Netzwerk“ erscheinen. Das kannst du jederzeit wieder ausschalten.",
     "allow": "Ja, darf erscheinen",
     "stop": "Nicht mehr erlauben"
+  },
+  "newest": {
+    "title": "Das passiert gerade im Netzwerk",
+    "lead": "Die neuesten Einträge von anderen. Vielleicht kennst du jemanden.",
+    "empty": "Noch ist es ruhig. Du bist früh dabei. Sag uns, was du suchst, dann melden wir uns, wenn jemand etwas einstellt.",
+    "seeking": "Sucht",
+    "offering": "Bietet",
+    "since": "{days, plural, =0 {Seit heute} =1 {Seit gestern} other {Seit # Tagen}}",
+    "ideaCta": "Hast du eine Idee?",
+    "viewCta": "Ansehen",
+    "note": "Antworten geben keine Punkte und keine Rangliste. Wenn es geholfen hat, kommt ein Danke zurück."
   }
 }

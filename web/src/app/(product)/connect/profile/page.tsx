@@ -10,6 +10,7 @@ import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FOR
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectCardFlow } from "@/features/connect/ConnectCardFlow";
 import { getConnectIdentityGaps } from "@/features/profile/identityReadiness";
+import { NewestEntries } from "@/features/connect/NewestEntries";
 import { ConnectFirstProfile } from "@/features/connect/ConnectFirstProfile";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConsentSwitch } from "@/features/connect/ConsentSwitch";
@@ -97,6 +98,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
         </ul>
       </section>
     ) : null}
+    {justPublished ? <NewestEntries client={client} userId={user.id} /> : null}
     {firstFlow ? null : <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} />}
     {/* Wer schon ein Profil hat, sieht alle Abschnitte auf einer Seite, mit Vorschau; der Assistent in Schritten bleibt dem ersten Anlegen. */}
     {firstFlow ? (

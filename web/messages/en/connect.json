@@ -1632,5 +1632,16 @@
     "on": "Your entry may appear in the newsletter \"From the network\", without your name. You can switch this off again at any time.",
     "allow": "Yes, it may appear",
     "stop": "Stop allowing"
+  },
+  "newest": {
+    "title": "What is happening in the network",
+    "lead": "The newest entries from others. Maybe you know someone.",
+    "empty": "It is still quiet. You are early. Tell us what you are looking for and we will let you know when someone posts something.",
+    "seeking": "Looking for",
+    "offering": "Offering",
+    "since": "{days, plural, =0 {Since today} =1 {Since yesterday} other {For # days}}",
+    "ideaCta": "Got an idea?",
+    "viewCta": "Take a look",
+    "note": "Answering earns no points and no ranking. If it helped, a thank-you comes back."
   }
 }

@@ -1038,5 +1038,12 @@
     "text": "Take a look at the search before you finish your profile.",
     "cta": "Go to the search",
     "note": "You stay invisible until you publish your profile yourself."
+  },
+  "newest": {
+    "title": "New in Find",
+    "lead": "The three newest people searching, sorted by date. You see names once your profile is visible.",
+    "someone": "Someone",
+    "seeks": "Looking for: {roles}",
+    "note": "There are no points and no ranking by fit."
   }
 }
