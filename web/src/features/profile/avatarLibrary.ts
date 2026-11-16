@@ -29,6 +29,19 @@ const AVATAR_IDS = [
   "avatar-28",
   "avatar-29",
   "avatar-30",
+  // Die Figuren Mia, Alex, Sam und Robin in drei Stilen (modern, abstrakt, warm), ab 16.11.2026.
+  "avatar-31",
+  "avatar-32",
+  "avatar-33",
+  "avatar-34",
+  "avatar-35",
+  "avatar-36",
+  "avatar-37",
+  "avatar-38",
+  "avatar-39",
+  "avatar-40",
+  "avatar-41",
+  "avatar-42",
 ] as const;
 
 export type AvatarId = (typeof AVATAR_IDS)[number];
