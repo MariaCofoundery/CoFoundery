@@ -47,6 +47,14 @@ export function getIdentityGaps(core: IdentityCoreValues | null): IdentityGap[] 
   return gaps;
 }
 
+/**
+ * Die Luecken fuer ein CONNECT-Profil: Name und Zeile. Der Text ueber dich ist dort seit 20270430 freiwillig (Find behaelt seine
+ * eigenen Regeln mit getIdentityGaps).
+ */
+export function getConnectIdentityGaps(core: IdentityCoreValues | null): IdentityGap[] {
+  return getIdentityGaps(core).filter((gap) => gap !== "bio");
+}
+
 export function isIdentityPublishReady(core: IdentityCoreValues | null) {
   return getIdentityGaps(core).length === 0;
 }

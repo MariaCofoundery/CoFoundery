@@ -459,6 +459,44 @@
     },
     "sections": {
       "label": "Profile sections"
+    },
+    "first": {
+      "titleRole": "Who are you in the network?",
+      "leadRole": "The essentials take a minute. You can add everything else later.",
+      "nameLabel": "Your name",
+      "headlineLabel": "One line about you",
+      "headlineHint": "It appears under your name, for example: Founder, building sales for B2B software.",
+      "rolesLabel": "Your role",
+      "rolesHint": "At least one.",
+      "mustHint": "Only these three things are required.",
+      "titleOpen": "What are you open to?",
+      "leadOpen": "This helps others approach you the right way.",
+      "noteLabel": "One sentence about it",
+      "skip": "Skip, later",
+      "optional": "Optional.",
+      "more": "More settings: suggestions, highlights",
+      "previewTitle": "How others see you",
+      "previewEmpty": "still empty",
+      "previewLater": "You add a photo, company and doors later.",
+      "showQuestion": "Who may see you?",
+      "publishHint": "With \"Make visible\" you see who else is in Connect. You can go back to draft at any time.",
+      "publish": "Make visible",
+      "missing": "Still missing:",
+      "missingName": "Your name (at least 2 characters)",
+      "missingHeadline": "One line about you"
+    },
+    "done": {
+      "badge": "You are visible",
+      "title": "You're in, {name}!",
+      "text": "Your profile is up. Every step makes you easier to find. Start with what you are looking for.",
+      "search": "Tell us what you are looking for",
+      "network": "Look around the network",
+      "later": "Add later",
+      "items": {
+        "photo": "Profile photo",
+        "reach": "Who you can reach",
+        "venture": "Your company"
+      }
     }
   },
   "safety": {

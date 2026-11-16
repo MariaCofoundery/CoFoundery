@@ -9,7 +9,8 @@ import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 import { CONNECT_CONTACT_NOTE_MAX, CONNECT_CONTACT_NOTE_MIN, CONNECT_OPEN_TO_FORMATS, CONNECT_ROLES } from "@/features/connect/connectTypes";
 import { IdentityInlineCard } from "@/features/profile/IdentityInlineCard";
 import { ConnectCardFlow } from "@/features/connect/ConnectCardFlow";
-import { getIdentityGaps } from "@/features/profile/identityReadiness";
+import { getConnectIdentityGaps } from "@/features/profile/identityReadiness";
+import { ConnectFirstProfile } from "@/features/connect/ConnectFirstProfile";
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { ConsentSwitch } from "@/features/connect/ConsentSwitch";
 import { ConnectProfilePreview } from "@/features/connect/ConnectProfilePreview";
@@ -43,8 +44,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const t = await getTranslations("connect"); const { client, user } = await requireConnectMember("/connect/profile");
   const [profile, params, resources, core, tCap, doors] = await Promise.all([getOwnConnectProfile(client, user.id), searchParams, getOwnPersonResources(client), getPersonCore(client, user.id).catch(() => null), getTranslations("capability"), listOwnDoors(client, user.id)]);
   // Name, Headline und Text ueber dich kommen aus dem Kernprofil, nicht aus diesem Formular.
-  const identityGaps = getIdentityGaps(core);
+  const identityGaps = getConnectIdentityGaps(core);
   const onePage = Boolean(profile);
+  // Wer noch nie sichtbar war, bekommt das kurze erste Anlegen (Entwurf 16.11.2026): erst das Noetige, der Rest spaeter.
+  const firstFlow = !profile || profile.status !== "active";
   const sectionDone = {
     role: Boolean(profile?.network_roles?.length),
     reach: doors.length > 0,
@@ -53,10 +56,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const continuation = params.next?.startsWith("/connect") && !params.next.includes("\\") && !params.next.startsWith("//") ? params.next : "";
   const saved = SAVED_KEYS.includes(params.saved ?? "") ? params.saved : null;
   const errorKey = ERROR_KEYS.includes(params.error ?? "") ? params.error : null;
-  return <main className={`mx-auto px-5 py-10 ${onePage ? "max-w-6xl" : "max-w-4xl"}`}>
+  const justPublished = profile?.status === "active" && params.saved === "published" && Boolean(profile.published_at) && Date.now() - new Date(profile.published_at as string).getTime() < 120_000;
+  return <main className="mx-auto max-w-6xl px-5 py-10">
     <ReminderAskSlot />
     {/* Der erste Erfolg: sehen, was andere im Netzwerk suchen und anbieten - solange das eigene Profil noch nicht aktiv ist. */}
-    {profile?.status !== "active" ? <AreaPayoff title={t("payoff.title")} text={t("payoff.text")} cta={t("payoff.cta")} href="/connect" /> : null}
     <Link href="/connect/my" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← {t("mine.back")}</Link>
     <header className="brand-panel mt-3 rounded-[24px] p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -70,16 +73,68 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           {t(`profile.flow.status.${profile?.status === "active" ? "active" : "draft"}`)}
         </span>
       </div>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-white">{t("profile.text")}</p>
+      {firstFlow ? null : <p className="mt-2 max-w-2xl text-sm leading-6 text-white">{t("profile.text")}</p>}
     </header>
     {params.returned === "1" ? <p role="status" className="my-4 rounded-xl bg-slate-50 p-4">{t("lifecycle.returnHint")}</p> : null}
     {saved ? <p role="status" className="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t(`success.profile.${saved}`)}</p> : null}
     {errorKey ? <p role="alert" className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{t(`errors.${errorKey}`)}</p> : null}
     {/* Die Identitaet (Name, Headline, Bio, Ort, ...) steht einmal im Profil und ist hier direkt bearbeitbar -
         ausserhalb dieses Formulars, weil Formulare sich nicht verschachteln lassen. */}
-    <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} />
+    {justPublished ? (
+      <section data-connect-profile-done role="status" className="mt-6 rounded-3xl border-2 border-violet-400 bg-white p-6">
+        <p className="inline-flex items-center gap-2 text-sm font-bold text-emerald-800"><span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full bg-emerald-100"><svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>{t("profile.done.badge")}</p>
+        <h2 className="mt-3 text-3xl font-semibold text-[#0b1f3a]">{t("profile.done.title", { name: profile.display_name.split(" ")[0] ?? "" })}</h2>
+        <p className="mt-2 max-w-xl text-base leading-7 text-slate-700">{t("profile.done.text")}</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/connect" className="brand-cta inline-flex min-h-12 items-center rounded-2xl px-6 text-base font-semibold">{t("profile.done.search")}</Link>
+          <Link href="/connect/people" className="inline-flex min-h-12 items-center rounded-2xl border border-slate-300 bg-white px-6 text-base font-semibold text-slate-900">{t("profile.done.network")}</Link>
+        </div>
+        <p className="mt-5 text-sm font-semibold text-slate-800">{t("profile.done.later")}</p>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+          {([["photo", "#identity"], ["reach", "#tueren"], ["venture", "/connect/ventures/mine"]] as const).map(([key, href]) => (
+            <li key={key}><Link href={href} className="flex min-h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-900"><span aria-hidden="true" className="text-slate-400">○</span>{t(`profile.done.items.${key}`)}</Link></li>
+          ))}
+        </ul>
+      </section>
+    ) : null}
+    {firstFlow ? null : <IdentityInlineCard client={client} userId={user.id} returnPath="/connect/profile" params={params} />}
     {/* Wer schon ein Profil hat, sieht alle Abschnitte auf einer Seite, mit Vorschau; der Assistent in Schritten bleibt dem ersten Anlegen. */}
-    <div className={onePage ? "mt-6 grid gap-6 lg:grid-cols-[170px_minmax(0,1fr)_300px]" : ""}>
+    {firstFlow ? (
+      <form action={saveConnectProfileAction} noValidate className="mt-6">
+        {continuation ? <input type="hidden" name="next" value={continuation} /> : null}
+        <ConnectFirstProfile
+          initial={{ name: core?.display_name ?? "", headline: core?.headline ?? "", roles: profile?.network_roles ?? [], open: profile?.open_to_formats ?? [], contactNote: profile?.contact_note ?? "" }}
+          roles={CONNECT_ROLES.map((role) => ({ value: role, label: t(`roles.${role}`) }))}
+          openFormats={CONNECT_OPEN_TO_FORMATS.map((format) => ({ value: format, label: t(`profile.openTo.${format}`) }))}
+          noteMin={CONNECT_CONTACT_NOTE_MIN} noteMax={CONNECT_CONTACT_NOTE_MAX}
+          visibilityNode={<ConnectVisibilityField initial={profile?.visibility} copy={{
+            title: t("visibility.profileTitle"), membersOnly: t("visibility.membersOnly"), public: t("visibility.public"),
+            publicHint: t("visibility.profilePublicHint"), confirm: t("visibility.profileConfirm"),
+            previewTitle: t("visibility.publicFields"), previewItems: t("visibility.profileFields"),
+          }} />}
+          moreNode={<>
+            <ConsentSwitch name="suggestable" title={t("profile.suggestableLabel")} effect={t("profile.suggestableHint")} offEffect={t("profile.suggestableOffHint")} defaultChecked={profile?.suggestable ?? true} />
+            <ConsentSwitch name="highlightable" title={t("profile.highlightableLabel")} effect={t("profile.highlightableHint")} offEffect={t("profile.highlightableOffHint")} defaultChecked={profile?.highlight_prompt_answered_at ? profile.highlightable : true} />
+            <p className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">{t("profile.membersOnlyNote")}</p>
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{t("profile.consent")} <Link href="/datenschutz" className="font-semibold underline underline-offset-2">{t("profile.privacyLink")}</Link></p>
+          </>}
+          draftNode={<ConnectSubmitButton intent="draft" label={t("actions.saveDraft")} pendingLabel={t("pending.save")} className="min-h-12 rounded-2xl border border-slate-300 bg-white px-6 text-base font-semibold" />}
+          publishNode={<ConnectSubmitButton intent="publish" label={t("profile.first.publish")} pendingLabel={t("pending.publish")} className="min-h-[52px] rounded-2xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-8 text-lg font-bold text-white" />}
+          copy={{
+            stepOf: t("profile.flow.stepOf", { current: "{current}", total: "{total}" }), back: t("profile.flow.back"), next: t("profile.flow.next"),
+            titleRole: t("profile.first.titleRole"), leadRole: t("profile.first.leadRole"), nameLabel: t("profile.first.nameLabel"), headlineLabel: t("profile.first.headlineLabel"),
+            headlineHint: t("profile.first.headlineHint"), rolesLabel: t("profile.first.rolesLabel"), rolesHint: t("profile.first.rolesHint"), mustHint: t("profile.first.mustHint"),
+            titleOpen: t("profile.first.titleOpen"), leadOpen: t("profile.first.leadOpen"), noteLabel: t("profile.first.noteLabel"), notePlaceholder: t("profile.contactNotePlaceholder"),
+            skip: t("profile.first.skip"), optional: t("profile.first.optional"), titleShow: t("profile.first.more"), previewTitle: t("profile.first.previewTitle"),
+            previewEmpty: t("profile.first.previewEmpty"), previewLater: t("profile.first.previewLater"), showQuestion: t("profile.first.showQuestion"), publishHint: t("profile.first.publishHint"),
+            missing: t("profile.first.missing"), missingName: t("profile.first.missingName"), missingHeadline: t("profile.first.missingHeadline"), missingRole: t("profile.flow.roleMissing"),
+          }}
+        />
+      </form>
+    ) : null}
+    {/* Der erste Erfolg: sehen, was andere im Netzwerk suchen und anbieten - solange das eigene Profil noch nicht aktiv ist. Unter dem Formular, damit das Nötige oben steht. */}
+    {profile?.status !== "active" ? <AreaPayoff title={t("payoff.title")} text={t("payoff.text")} cta={t("payoff.cta")} href="/connect" /> : null}
+    {firstFlow ? null : <div className={onePage ? "mt-6 grid gap-6 lg:grid-cols-[170px_minmax(0,1fr)_300px]" : ""}>
     {onePage ? (
       <nav aria-label={t("profile.sections.label")} className="hidden flex-col gap-1 self-start lg:sticky lg:top-6 lg:flex">
         {([["role", sectionDone.role], ["open", sectionDone.open], ["show", true]] as const).map(([id, done]) => (
@@ -214,10 +269,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
       />
     </form>
     {onePage && profile ? <ConnectProfilePreview profile={profile} doors={doors} /> : null}
-    </div>
+    </div>}
 
     {/* Tueren (Entwurf 10.11.2026): "Wen kannst du erreichen?" ersetzt das Freitextfeld. Eigene Formulare, deshalb neben dem Profilformular. */}
-    <DoorsSection
+    {firstFlow ? null : <DoorsSection
       doors={doors}
       doorsOpen={profile?.doors_open !== false}
       hasProfile={Boolean(profile)}
@@ -225,10 +280,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
       editId={/^[0-9a-f-]{36}$/.test(params.tuer_bearbeiten ?? "") ? (params.tuer_bearbeiten as string) : null}
       creating={params.tuer_neu === "1"}
       oldText={profile?.network_reach?.trim() || null}
-    />
+    />}
 
     {/* Die Zugaenge stehen NEBEN dem Formular und nicht darin: Sie sind keine
         Angabe, die man abschickt, sondern eine Entscheidung je Vorschlag. */}
-    <ResourceProposalSection proposals={resources} />
+    {firstFlow ? null : <ResourceProposalSection proposals={resources} />}
   </main>;
 }

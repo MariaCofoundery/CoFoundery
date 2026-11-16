@@ -459,6 +459,44 @@
     },
     "sections": {
       "label": "Abschnitte des Profils"
+    },
+    "first": {
+      "titleRole": "Wer bist du im Netzwerk?",
+      "leadRole": "Das Nötige dauert eine Minute. Alles andere kannst du später ergänzen.",
+      "nameLabel": "Dein Name",
+      "headlineLabel": "Eine Zeile über dich",
+      "headlineHint": "Das steht unter deinem Namen, zum Beispiel: Gründerin, baut Vertrieb für B2B-Software auf.",
+      "rolesLabel": "Deine Rolle",
+      "rolesHint": "Mindestens eine.",
+      "mustHint": "Pflicht sind nur diese drei Dinge.",
+      "titleOpen": "Wofür bist du ansprechbar?",
+      "leadOpen": "Das hilft anderen, dich richtig anzusprechen.",
+      "noteLabel": "Ein Satz dazu",
+      "skip": "Überspringen, später",
+      "optional": "Freiwillig.",
+      "more": "Weitere Einstellungen: Vorschläge, Highlights",
+      "previewTitle": "So sehen andere dich",
+      "previewEmpty": "noch leer",
+      "previewLater": "Foto, Unternehmen und Türen fügst du später hinzu.",
+      "showQuestion": "Wer darf dich sehen?",
+      "publishHint": "Mit „Sichtbar machen“ siehst du in Connect, wer noch dabei ist. Du kannst jederzeit zurück in den Entwurf.",
+      "publish": "Sichtbar machen",
+      "missing": "Dafür fehlt noch:",
+      "missingName": "Dein Name (mindestens 2 Zeichen)",
+      "missingHeadline": "Eine Zeile über dich"
+    },
+    "done": {
+      "badge": "Du bist sichtbar",
+      "title": "Schon dabei, {name}!",
+      "text": "Dein Profil steht. Mit jedem Schritt wirst du leichter gefunden. Fang damit an, was du suchst.",
+      "search": "Sag uns, was du suchst",
+      "network": "Ins Netzwerk schauen",
+      "later": "Später ergänzen",
+      "items": {
+        "photo": "Profilfoto",
+        "reach": "Wen du erreichst",
+        "venture": "Dein Unternehmen"
+      }
     }
   },
   "safety": {

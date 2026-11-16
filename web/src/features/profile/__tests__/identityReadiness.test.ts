@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   IDENTITY_RETURN_PATHS,
   IDENTITY_THRESHOLDS,
+  getConnectIdentityGaps,
   getIdentityGaps,
   isIdentityPublishReady,
   parseIdentityReturnPath,
@@ -31,15 +32,19 @@ const core = (over: Partial<{ display_name: string; headline: string; bio: strin
 test("the thresholds match what Connect actually enforces when publishing", () => {
   // Zwei Listen, die auseinanderlaufen koennen: Der Hinweis wuerde sonst
   // etwas anderes verlangen als die Pruefung, und das ist schlimmer als kein
-  // Hinweis.
+  // Hinweis. Seit 20270430 ist der Text ueber dich fuer Connect freiwillig; die Schwelle fuer den Text gilt nur noch fuer Find.
   const validation = source("src/features/connect/connectValidation.ts");
-  const clause =
-    validation.match(/display_name\.length >= (\d+) && p\.headline\.length >= (\d+) && p\.bio\.length >= (\d+)/) ??
-    [];
+  const clause = validation.match(/display_name\.length >= (\d+) && p\.headline\.length >= (\d+) && p\.network_roles/) ?? [];
 
   assert.equal(Number(clause[1]), IDENTITY_THRESHOLDS.displayName);
   assert.equal(Number(clause[2]), IDENTITY_THRESHOLDS.headline);
-  assert.equal(Number(clause[3]), IDENTITY_THRESHOLDS.bio);
+  assert.doesNotMatch(validation, /p\.bio\.length/, "Connect verlangt keinen Text ueber dich mehr");
+});
+
+test("for Connect only name and line are gaps; the text about you stays a Find rule", () => {
+  assert.deepEqual(getConnectIdentityGaps(core({ bio: "" })), []);
+  assert.deepEqual(getConnectIdentityGaps(core({ display_name: "M", headline: "hi", bio: "" })), ["displayName", "headline"]);
+  assert.deepEqual(getIdentityGaps(core({ bio: "" })), ["bio"]);
 });
 
 test("a complete core has no gaps", () => {

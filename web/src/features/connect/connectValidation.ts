@@ -106,7 +106,8 @@ export function parseConnectListing(formData: FormData) {
 }
 
 export function profilePublishable(p: ReturnType<typeof parseConnectProfile>) {
-  return p.display_name.length >= 2 && p.headline.length >= 3 && p.bio.length >= 20 && p.network_roles.length > 0;
+  // Der Text ueber dich (bio) ist seit 20270430 freiwillig.
+  return p.display_name.length >= 2 && p.headline.length >= 3 && p.network_roles.length > 0;
 }
 export function listingPublishable(p: ReturnType<typeof parseConnectListing>) {
   return p.title.length >= 5 && p.summary.length >= 20 && !(p.starts_on && p.ends_on && p.ends_on < p.starts_on);

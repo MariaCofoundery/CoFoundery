@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfileBasicsRow } from "@/features/profile/profileData";
-import { getIdentityGaps } from "@/features/profile/identityReadiness";
+import { getConnectIdentityGaps } from "@/features/profile/identityReadiness";
 import { getConnectListing, getOwnConnectProfile } from "@/features/connect/connectData";
 import { decodePhotoData } from "@/features/connect/connectPhotoData";
 import { notifySavedSearchMatches } from "@/features/connect/savedSearchNotifications";
@@ -52,6 +52,14 @@ export async function saveConnectProfileAction(formData: FormData) {
   // Identitaet kommt aus dem Kern, nicht aus diesem Formular - sie wird auf
   // /profile gepflegt. Ohne Kernangaben bleibt das Profil speicherbar, aber
   // nicht veroeffentlichbar; profilePublishable faengt das ab.
+  // Das erste Anlegen fragt Name und Zeile gleich hier mit (Entwurf 16.11.2026). Nur diese zwei Felder werden geschrieben, und nur, wenn
+  // etwas drinsteht - alles andere im Kernprofil bleibt, wie es ist.
+  const nameIn = String(formData.get("identity_display_name") ?? "").trim().slice(0, 80);
+  const headlineIn = String(formData.get("identity_headline") ?? "").trim().slice(0, 160);
+  const corePatch: Record<string, string> = {};
+  if (nameIn) corePatch.display_name = nameIn;
+  if (headlineIn) corePatch.headline = headlineIn;
+  if (Object.keys(corePatch).length) await client.from("person_core").update(corePatch).eq("user_id", user.id);
   const identity = await getPersonCore(client, user.id);
   let values: ReturnType<typeof parseConnectProfile>;
   try { values = parseConnectProfile(formData, identity); }
@@ -61,7 +69,7 @@ export async function saveConnectProfileAction(formData: FormData) {
     // "Ergaenze alle notwendigen Angaben" hat niemandem geholfen: Die
     // Identitaet wird auf /profile gepflegt, die Rollen hier. Ohne zu sagen,
     // welches von beiden fehlt, schickt die Meldung Leute im Kreis.
-    const identityGaps = getIdentityGaps({
+    const identityGaps = getConnectIdentityGaps({
       display_name: values.display_name, headline: values.headline, bio: values.bio,
     });
     redirect(`/connect/profile?error=${identityGaps.length ? "identity_incomplete" : "roles_missing"}`);
