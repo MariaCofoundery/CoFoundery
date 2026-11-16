@@ -1,3 +1,4 @@
+import { AreasExplainer } from "@/features/onboarding/AreasExplainer";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HomepageNav } from "@/components/marketing/HomepageNav";
@@ -128,6 +129,8 @@ export default async function Page() {
         <section id="bereiche" className={`${styles.container} ${styles.block}`} aria-labelledby="areas-title">
           <h2 id="areas-title" className={styles.h2Small}>{content.areasTitle}</h2>
           <p className={styles.muted}>{content.areasLead}</p>
+          {/* Die kleine Erklärung der vier Bereiche, 16 Sekunden, still (Entwurf 15.11.2026): weiter unten, nicht im ersten Blick. */}
+          <div data-home-areas-explainer style={{ maxWidth: 440, margin: "20px 0 8px" }}><AreasExplainer /></div>
           <div className={styles.areaGrid}>
             {content.areas.map((area) => (
               <article key={area.id} id={area.id} className={styles.area}>

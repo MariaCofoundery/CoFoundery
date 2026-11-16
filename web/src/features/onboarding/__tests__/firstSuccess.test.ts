@@ -40,3 +40,9 @@ test("German and English have the same keys for both previews", () => {
     assert.doesNotMatch(JSON.stringify(en), /[äöüÄÖÜß]/);
   }
 });
+
+test("the public home page carries the small areas explainer further down, inside the areas section", () => {
+  const page = read("src/app/(marketing)/page.tsx");
+  assert.match(page, /<section id="bereiche"[\s\S]*data-home-areas-explainer[\s\S]*<AreasExplainer \/>[\s\S]*areaGrid/);
+  assert.ok(page.indexOf("heroWrap") < page.indexOf("<AreasExplainer"), "not in the first view");
+});
