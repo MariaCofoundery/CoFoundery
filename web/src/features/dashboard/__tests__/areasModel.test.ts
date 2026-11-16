@@ -64,8 +64,9 @@ test("Startseite 17.11.2026: dunkler Schritt mit langsamem Lichtschein (steht st
   assert.match(css, /@keyframes hero-glow-drift/);
   assert.match(css, /prefers-reduced-motion: reduce\) \{\s*\.dashboard-hero-night::before,\s*\.dashboard-hero-night::after \{ animation: none; \}/);
   const page = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
-  assert.match(page, /src="\/brand\/mia\.png" alt=""/, "Mia is decoration: empty alt, no animation");
-  assert.doesNotMatch(page, /mia[^\n]*(animate|motion|transition)/i);
+  const asideSrc = readFileSync("src/features/dashboard/DashboardAside.tsx", "utf8");
+  assert.match(asideSrc, /src="\/brand\/mia\.png" alt=""/, "Mia is decoration: empty alt, no animation");
+  assert.doesNotMatch(asideSrc, /mia[^\n]*(animate|motion|transition)/i);
   const tiles = readFileSync("src/features/dashboard/AreaTiles.tsx", "utf8");
   assert.doesNotMatch(tiles, /%|percent|score/i);
   assert.match(tiles, /areas\.state\.\$\{area\.state\}/);
@@ -73,13 +74,29 @@ test("Startseite 17.11.2026: dunkler Schritt mit langsamem Lichtschein (steht st
   assert.doesNotMatch(aside, /data-dashboard-areas/, "the areas moved out of the quiet column");
 });
 
-test("Startseite 17.11.2026: Mia klein und links neben der Begrüßung; Wartendes als Liste; Stand als Team-Karte und Profil-Chips", () => {
-  const page = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
-  assert.match(page, /<Image src="\/brand\/mia\.png"[\s\S]*h-\[64px\][\s\S]*<p className="text-lg[^>]*>\{t\("hero\.greeting"/, "Mia sits before the greeting and is small");
-  const waiting = readFileSync("src/features/dashboard/DashboardWaiting.tsx", "utf8");
-  assert.ok(!waiting.startsWith('"use client"'), "no client code needed any more");
+test("Startseite 17.11.2026 Version 2: ein getöntes Feld rechts (Stand mit Mia, Team, Wartet auf dich), Wartendes bis fünf Zeilen, Bereiche mit Stand in Worten", () => {
   const aside = readFileSync("src/features/dashboard/DashboardAside.tsx", "utf8");
-  assert.match(aside, /data-dashboard-team/);
+  assert.match(aside, /data-dashboard-panel/);
+  assert.ok(aside.indexOf("dashboard-stand-title") < aside.indexOf("dashboard-team-title") && aside.indexOf("dashboard-team-title") < aside.indexOf("{waiting ?"), "Stand, then Team, then Wartet auf dich");
   assert.match(aside, /rounded-full bg-emerald-50/, "finished profile parts are chips");
   assert.doesNotMatch(aside, /<dl\b/, "the old definition list is gone");
+  const waiting = readFileSync("src/features/dashboard/DashboardWaiting.tsx", "utf8");
+  assert.ok(!waiting.startsWith('"use client"'));
+  assert.match(waiting, /const SHOWN = 5;/);
+  const tiles = readFileSync("src/features/dashboard/AreaTiles.tsx", "utf8");
+  assert.match(tiles, /border-dashed/, "areas not in use are a quiet invitation");
+  assert.match(tiles, /areas\.status\.align\.some/);
+  assert.doesNotMatch(tiles, /%|percent|score/i);
+  const next = readFileSync("src/features/dashboard/DashboardNextStep.tsx", "utf8");
+  assert.match(next, /<ol aria-label=[^>]*className="sr-only"/, "the path stays available as text for screen readers");
+});
+
+test("areaCards names the finished and missing Align parts and the exact Find and Connect state", () => {
+  const cards = areaCards({ alignParts: { work: true, can: true, strengths: false, direction: false }, find: "draft", connect: "active", hasAdvisor: false });
+  const align = cards.find((card) => card.key === "align");
+  assert.deepEqual(align?.doneParts, ["work", "can"]);
+  assert.deepEqual(align?.missingParts, ["strengths", "direction"]);
+  assert.equal(cards.find((card) => card.key === "find")?.detail, "draft");
+  assert.equal(cards.find((card) => card.key === "connect")?.detail, "active");
+  assert.equal(cards.find((card) => card.key === "advise")?.chosen, false);
 });

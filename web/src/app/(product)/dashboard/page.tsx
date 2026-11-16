@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { berlinToday } from "@/lib/berlinTime";
 import { redirect } from "next/navigation";
@@ -294,13 +293,9 @@ export default async function DashboardPage({
         </p>
       ) : null}
 
-      {/* Mia, die Figur der Marke: ganz leise neben der Begruessung, still, ohne Bewegung. */}
-      <div className="mb-5 flex items-center gap-3.5">
-        <Image src="/brand/mia.png" alt="" width={203} height={286} priority className="h-[64px] w-auto shrink-0 rounded-xl border border-white/80 shadow-[0_6px_18px_rgba(76,29,149,.12)] sm:h-[80px]" />
-        <p className="text-lg text-[#5f5e7a] sm:text-xl">{t("hero.greeting", { name: displayName })}</p>
-      </div>
+      <p className="mb-5 text-lg text-[#5f5e7a] sm:text-xl">{t("hero.greeting", { name: displayName })}</p>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-start-1">
           <MyProgramTasks
             tasks={myProgramTasks}
@@ -314,6 +309,12 @@ export default async function DashboardPage({
             setupTotal={teamState?.setup?.total ?? 0}
             locale={locale}
           />
+
+          {waitingCards.length > 0 ? (
+            <a href="#dashboard-block-tasks" className="inline-flex min-h-11 items-center self-start rounded-full border border-[#ddd3fb] bg-white px-4 text-[14px] font-bold text-[#5b3df5] lg:hidden">
+              {t("start.waiting.hint", { count: waitingCards.length })} ↓
+            </a>
+          ) : null}
 
           {needsOnboarding ? (
             <section id="dashboard-block-profile" className="scroll-mt-28 rounded-[24px] border border-[#e4e2f0] bg-white p-5 sm:p-6">
@@ -350,19 +351,6 @@ export default async function DashboardPage({
 
         </div>
 
-        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
-          <DashboardWaiting
-            cards={waitingCards}
-            running={running}
-            labels={{
-              title: t("start.waiting.title"),
-              count: t("start.waiting.count", { count: waitingCards.length }),
-              more: t("start.waiting.more", { count: waitingCards.length }),
-              running: t("start.waiting.running"),
-            }}
-          />
-        </div>
-
         <AreaTiles
           className="lg:col-start-1 lg:row-start-2"
           areas={areaCards({
@@ -374,7 +362,19 @@ export default async function DashboardPage({
         />
 
         <DashboardAside
-          className="lg:col-start-2 lg:row-start-2"
+          className="lg:col-start-2 lg:row-start-1 lg:row-span-2"
+          waiting={
+            <DashboardWaiting
+                        cards={waitingCards}
+                        running={running}
+                        labels={{
+                          title: t("start.waiting.title"),
+                          count: t("start.waiting.count", { count: waitingCards.length }),
+                          more: t("start.waiting.more", { count: waitingCards.length }),
+                          running: t("start.waiting.running"),
+                        }}
+                      />
+          }
           parts={{
             work: workProfileState === "completed",
             can: capabilityCount > 0,

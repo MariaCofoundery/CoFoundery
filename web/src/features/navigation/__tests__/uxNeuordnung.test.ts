@@ -80,7 +80,7 @@ test("Startseite: der naechste Schritt als Marken-Flaeche, der Weg darin, die le
   assert.doesNotMatch(dashboard, /hero\.headline|<QuoteOfTheDay|<HeroCarousel|<DashboardPath|<DashboardDeepen|<DashboardAreas|<DashboardTeamCard/);
   // Die Profilangaben (4 Karten) sind von der Startseite ins Menue gewandert.
   assert.doesNotMatch(dashboard, /aboutYou\./);
-  const order = ["<DashboardNextStep", "<DashboardWaiting", "<AreaTiles", "<DashboardAside", 't("start.privacy")'].map((m) => dashboard.indexOf(m));
+  const order = ["<DashboardNextStep", "<AreaTiles", "<DashboardAside", "<DashboardWaiting", 't("start.privacy")'].map((m) => dashboard.indexOf(m));
   assert.ok(order.every((i) => i > 0) && [...order].sort((a, b) => a - b).join() === order.join(), order.join());
   for (const source of [next, aside, code("src/features/dashboard/DashboardWaiting.tsx"), code("src/features/dashboard/AreaTiles.tsx")]) {
     assert.doesNotMatch(source, /%|percent|von\s+\d|\bscore\b/i);

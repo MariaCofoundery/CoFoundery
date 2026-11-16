@@ -11,7 +11,14 @@ import { INTEREST_AREAS, type InterestArea } from "@/features/profile/interests"
  * "angefangen" und "steht".
  */
 export type AreaState = "open" | "started" | "done";
-export type AreaCard = { key: InterestArea; chosen: boolean; state: AreaState; href: string };
+/** Wie viele der vier Align-Teile fertig sind und welche - fuer den Satz auf der Kachel. */
+export type AreaCard = {
+  key: InterestArea; chosen: boolean; state: AreaState; href: string;
+  /** Nur Find und Connect: der genaue Stand des Profils. */
+  detail: "draft" | "active" | "paused" | null;
+  /** Nur Align: die fertigen und die fehlenden Teile. */
+  doneParts: AlignPartKey[]; missingParts: AlignPartKey[];
+};
 
 type Input = {
   /** Die vier Align-Teile: Arbeitsweise, Koennen, Staerken, Richtung. */
@@ -42,5 +49,11 @@ export function areaCards(input: Input): AreaCard[] {
     advise: { state: input.hasAdvisor ? "started" : "open", href: "/advisor/los-gehts" },
   };
   // "Aktiv" ist ein Bereich, in dem schon etwas getan wurde.
-  return INTEREST_AREAS.map((key) => ({ key, chosen: states[key].state !== "open", ...states[key] }));
+  const detail = (key: InterestArea): AreaCard["detail"] => (key === "find" ? input.find : key === "connect" ? input.connect : null);
+  const doneParts = ALIGN_PART_KEYS.filter((key) => input.alignParts[key]);
+  const missingParts = ALIGN_PART_KEYS.filter((key) => !input.alignParts[key]);
+  return INTEREST_AREAS.map((key) => ({
+    key, chosen: states[key].state !== "open", ...states[key], detail: detail(key),
+    doneParts: key === "align" ? [...doneParts] : [], missingParts: key === "align" ? [...missingParts] : [],
+  }));
 }

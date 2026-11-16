@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { startStepHref, type FounderStart, type StepState } from "@/features/dashboard/founderStart";
+import { startStepHref, type FounderStart } from "@/features/dashboard/founderStart";
 
 /**
  * "Dein naechster Schritt" in der Marken-Flaeche der Startseite: der Verlauf
@@ -52,7 +52,7 @@ export async function DashboardNextStep({
         <h1 id="dashboard-next-title" className="mt-2.5 max-w-xl pr-6 text-[26px] font-semibold leading-[1.15] sm:text-[32px]">
           {t(`next.${copyKey}.title`, values)}
         </h1>
-        <p className="mt-3.5 max-w-xl text-[17px] leading-7 text-white sm:text-lg">{t(`next.${copyKey}.text`, values)}</p>
+        <p className="mt-3 max-w-xl text-[16px] leading-6 text-[#d7d3f7] sm:text-[17px]">{t(`next.${copyKey}.text`, values)}</p>
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
             href={startStepHref(next)}
@@ -65,49 +65,22 @@ export async function DashboardNextStep({
               {secondary.label}
             </Link>
           ) : null}
+          <span aria-hidden="true" className="flex items-center gap-1.5">
+            {start.steps.map((step) => (
+              <span key={step.key} className={`h-2 rounded-full ${step.state === "current" ? "w-7 bg-white" : step.state === "done" ? "w-2.5 bg-white" : "w-2.5 bg-white/35"}`} />
+            ))}
+          </span>
         </div>
 
-        <div className="mt-8 border-t border-white/30 pt-5">
-          {start.phase === "everyday" ? (
-            <>
-              <p className="flex items-center gap-2 text-[15px] text-white opacity-90">
-                <StepIcon state="done" small />
-                {t("path.foundationDone")}
-              </p>
-              <p className="mt-4 text-[13px] font-semibold uppercase tracking-[0.1em] text-white opacity-90">{t("path.everydayTitle")}</p>
-            </>
-          ) : null}
-          <ol
-            aria-label={start.phase === "everyday" ? t("path.everydayTitle") : t("path.label")}
-            className={`grid gap-2.5 ${start.phase === "everyday" ? "mt-2.5 md:grid-cols-3" : "md:grid-cols-4"} md:gap-3`}
-          >
-            {start.steps.map((step) => (
-              <li
-                key={step.key}
-                aria-current={step.state === "current" ? "step" : undefined}
-                className={`flex items-start gap-2.5 text-[15px] leading-snug text-white ${step.state === "current" ? "font-semibold" : step.state === "open" ? "opacity-85" : ""}`}
-              >
-                <StepIcon state={step.state} />
-                <span>
-                  {start.phase === "everyday" ? t(`path.everyday.${step.key}`) : t(`path.foundation.${step.key}`)}
-                  <span className="sr-only"> – {t(`path.state.${step.state}`)}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
+        {/* Der Weg: vier Punkte fuers Auge, die Liste mit Stand als Text fuer Screenreader (nie nur ein Zeichen). */}
+        <ol aria-label={start.phase === "everyday" ? t("path.everydayTitle") : t("path.label")} className="sr-only">
+          {start.steps.map((step) => (
+            <li key={step.key} aria-current={step.state === "current" ? "step" : undefined}>
+              {start.phase === "everyday" ? t(`path.everyday.${step.key}`) : t(`path.foundation.${step.key}`)} – {t(`path.state.${step.state}`)}
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
-  );
-}
-
-function StepIcon({ state, small = false }: { state: StepState; small?: boolean }) {
-  const size = small ? 18 : 22;
-  return (
-    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
-      <circle cx="12" cy="12" r="10" strokeDasharray={state === "open" ? "3 3" : undefined} />
-      {state === "done" ? <path d="m8 12 3 3 5-6" /> : null}
-      {state === "current" ? <circle cx="12" cy="12" r="5" fill="#ffffff" stroke="none" /> : null}
-    </svg>
   );
 }

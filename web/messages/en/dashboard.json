@@ -909,7 +909,8 @@
         "text": "Someone new has joined “{team}”. Do your venture answers still fit?",
         "action": "Confirm"
       },
-      "more": "See all {count}"
+      "more": "See all {count}",
+      "hint": "{count, plural, one {One thing is waiting} other {# things are waiting}}"
     },
     "stand": {
       "title": "Where you stand",
@@ -938,7 +939,8 @@
       "teamTitle": "Your team",
       "toTeam": "Go to the team",
       "partDone": "done",
-      "partOpen": "open"
+      "partOpen": "open",
+      "openCount": "{count, plural, one {One more step in your profile} other {# more steps in your profile}}"
     },
     "talk": {
       "title": "For your next conversation",
@@ -984,6 +986,27 @@
         "name": "Advisor",
         "also": "Want to support teams?",
         "line": "Support startups and teams."
+      },
+      "notSetUp": "Not set up yet",
+      "partsDone": "{done, plural, =0 {No part finished yet} one {# part finished} other {# parts finished}}",
+      "status": {
+        "align": {
+          "none": "Nothing filled in yet. Start with the questionnaire about how you work.",
+          "some": "Finished: {done}. Still missing: {missing}.",
+          "all": "All finished: how you work, what you can do, strengths and direction."
+        },
+        "find": {
+          "draft": "Your profile is saved but not visible yet.",
+          "active": "Your profile is visible to co-founders.",
+          "paused": "Your profile is paused."
+        },
+        "connect": {
+          "draft": "Your profile is not visible yet. Name, line and role are enough.",
+          "active": "Members can see your profile."
+        },
+        "advise": {
+          "started": "You are set up as an advisor."
+        }
       }
     }
   },

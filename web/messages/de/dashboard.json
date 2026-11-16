@@ -909,7 +909,8 @@
         "text": "Jemand ist neu in „{team}“. Passen deine Antworten zum Vorhaben noch?",
         "action": "Bestätigen"
       },
-      "more": "Alle {count} ansehen"
+      "more": "Alle {count} ansehen",
+      "hint": "{count, plural, one {Ein Ding wartet} other {# Dinge warten}}"
     },
     "stand": {
       "title": "Dein Stand",
@@ -938,7 +939,8 @@
       "teamTitle": "Dein Team",
       "toTeam": "Zum Team",
       "partDone": "erledigt",
-      "partOpen": "offen"
+      "partOpen": "offen",
+      "openCount": "{count, plural, one {Noch ein Schritt im Profil} other {Noch # Schritte im Profil}}"
     },
     "talk": {
       "title": "Für euer nächstes Gespräch",
@@ -984,6 +986,27 @@
         "name": "Advisor",
         "also": "Du willst Teams begleiten?",
         "line": "Begleite Startups und Teams."
+      },
+      "notSetUp": "Noch nicht eingerichtet",
+      "partsDone": "{done, plural, =0 {Noch kein Teil fertig} one {# Teil fertig} other {# Teile fertig}}",
+      "status": {
+        "align": {
+          "none": "Noch nichts ausgefüllt. Starte mit dem Fragebogen zur Arbeitsweise.",
+          "some": "Fertig: {done}. Es fehlen noch: {missing}.",
+          "all": "Alles fertig: Arbeitsweise, Können, Stärken und Richtung."
+        },
+        "find": {
+          "draft": "Dein Profil ist gespeichert, aber noch unsichtbar.",
+          "active": "Dein Profil ist für Mitgründer:innen sichtbar.",
+          "paused": "Dein Profil ist pausiert."
+        },
+        "connect": {
+          "draft": "Dein Profil ist noch unsichtbar. Name, Zeile und Rolle genügen.",
+          "active": "Mitglieder sehen dein Profil."
+        },
+        "advise": {
+          "started": "Du bist als Advisor eingerichtet."
+        }
       }
     }
   },

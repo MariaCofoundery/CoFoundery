@@ -10,20 +10,21 @@ export type WaitingCard = {
 
 export type RunningEntry = { id: string; title: string; href: string };
 
-const SHOWN = 3;
+const SHOWN = 5;
 
 function Row({ card }: { card: WaitingCard }) {
   return (
     <li>
       <Link
         href={card.href}
-        className="flex min-h-[64px] items-center gap-3 rounded-2xl border border-[#dcdff0] bg-white px-4 py-3 transition hover:border-violet-300 hover:shadow-[0_8px_22px_rgba(76,29,149,.08)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
+        className="flex min-h-[52px] items-center gap-3 rounded-xl px-1.5 py-2 transition hover:bg-white/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200"
       >
+        <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#b9a9f5]" />
         <span className="min-w-0 flex-1">
-          <span className="block text-[13px] text-[#5f5e7a]">{card.label}</span>
-          <span className="block text-[16px] font-semibold leading-snug text-[#0b1f3a]">{card.title}</span>
+          <span className="block text-[16px] font-semibold leading-snug text-[#14152b]">{card.label}</span>
+          <span className="line-clamp-1 block text-[13px] text-[#5f5e7a]">{card.title}</span>
         </span>
-        <span className="shrink-0 text-[14px] font-bold text-violet-800">{card.action}</span>
+        <span className="sr-only">{card.action}</span>
         <span aria-hidden="true" className="shrink-0 text-xl leading-none text-[#9a9cb8]">&rsaquo;</span>
       </Link>
     </li>
@@ -59,18 +60,18 @@ export function DashboardWaiting({
         <>
           <h2 id="dashboard-waiting-title" className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#6d28d9]">
             {labels.title}
-            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-violet-100 px-2 text-[13px] font-bold normal-case tracking-normal text-violet-800">
+            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[#5b3df5] px-2 text-[13px] font-bold normal-case tracking-normal text-white">
               <span aria-hidden="true">{cards.length}</span>
               <span className="sr-only">{labels.count}</span>
             </span>
           </h2>
-          <ul className="mt-3 flex flex-col gap-2.5">
+          <ul className="mt-2 flex flex-col divide-y divide-[#e4def8]">
             {first.map((card) => <Row key={card.id} card={card} />)}
           </ul>
           {rest.length > 0 ? (
-            <details className="mt-2.5">
+            <details className="mt-1.5">
               <summary className="inline-flex min-h-11 cursor-pointer items-center text-[15px] font-semibold text-violet-800">{labels.more}</summary>
-              <ul className="mt-2 flex flex-col gap-2.5">
+              <ul className="mt-1 flex flex-col divide-y divide-[#e4def8]">
                 {rest.map((card) => <Row key={card.id} card={card} />)}
               </ul>
             </details>
@@ -78,7 +79,7 @@ export function DashboardWaiting({
         </>
       ) : null}
       {running.length > 0 ? (
-        <p className={`text-[15px] leading-6 text-[#5f5e7a] ${cards.length > 0 ? "mt-3.5 border-t border-[#dcdff0] pt-3.5" : ""}`}>
+        <p className={`text-[15px] leading-6 text-[#5f5e7a] ${cards.length > 0 ? "mt-3.5 border-t border-[#d9d0f5] pt-3.5" : ""}`}>
           <span className="font-semibold">{labels.running}</span>{" "}
           {running.map((entry, index) => (
             <span key={entry.id}>

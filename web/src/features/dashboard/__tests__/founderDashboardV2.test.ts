@@ -48,8 +48,8 @@ test("dashboard no longer renders a global roadmap, profile percentage, or workb
 test("die Startseite 04.11.2026: Begruessung, naechster Schritt, Wartet auf dich, leise Spalte, Datenschutz", () => {
   assert.match(dashboardSource, /t\("hero\.greeting"/);
   assert.doesNotMatch(dashboardSource, /hero\.headline|<QuoteOfTheDay|<HeroCarousel/);
-  // Seit 17.11.2026: Mia neben der Begruessung, die Bereiche als vier Kacheln zwischen "Wartet auf dich" und der leisen Spalte.
-  const order = ["t(\"hero.greeting\"", "<DashboardNextStep", "<DashboardWaiting", "<AreaTiles", "<DashboardAside", "t(\"start.privacy\")"].map((marker) =>
+  // Seit 17.11.2026 (Version 2): Schritt, Bereiche als Kacheln, rechts EIN getoentes Feld (Stand mit Mia, Team, Wartet auf dich).
+  const order = ["t(\"hero.greeting\"", "<DashboardNextStep", "<AreaTiles", "<DashboardAside", "<DashboardWaiting", "t(\"start.privacy\")"].map((marker) =>
     dashboardSource.indexOf(marker)
   );
   for (const at of order) assert.ok(at > -1, "ein Bereich fehlt");

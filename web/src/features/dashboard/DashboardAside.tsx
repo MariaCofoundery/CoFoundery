@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { alignPartHref } from "@/features/align/alignModel";
@@ -14,7 +15,7 @@ export type StandTeam = {
 };
 
 const BOX = "rounded-[20px] border border-[#dcdff0] bg-white px-5 py-5 sm:px-[22px]";
-const CHIP_LINK = "inline-flex min-h-9 items-center rounded-full bg-violet-50 px-3 text-[14px] font-semibold text-violet-800 hover:bg-violet-100";
+const CHIP_LINK = "inline-flex min-h-9 items-center rounded-full bg-white px-3 text-[14px] font-semibold text-violet-800 hover:bg-violet-100";
 const BOX_TITLE = "text-[13px] font-semibold uppercase tracking-[0.08em] text-[#6d28d9]";
 
 /**
@@ -36,6 +37,7 @@ export async function DashboardAside({
   setupOpen = false,
   newsletter = null,
   className = "",
+  waiting = null,
 }: {
   parts: ProfileParts;
   team: StandTeam | null;
@@ -47,6 +49,8 @@ export async function DashboardAside({
   setupOpen?: boolean;
   /** Platz im Raster der Startseite (Entwurf 17.11.2026). */
   className?: string;
+  /** "Wartet auf dich": steht als letzter Abschnitt im getoenten Feld. */
+  waiting?: React.ReactNode;
   /** Stand des Newsletters; null = Karte nicht zeigen (bestaetigt: nichts mehr zu fragen). */
   newsletter?: NewsletterState | null;
 }) {
@@ -60,74 +64,85 @@ export async function DashboardAside({
   const openParts = keys.filter((key) => !parts[key]);
 
   return (
-    <aside aria-label={t("stand.title")} className={`flex min-w-0 flex-col gap-4 ${className}`}>
-      {team ? (
-        <section aria-labelledby="dashboard-team-title" className={BOX} data-dashboard-team>
-          <h2 id="dashboard-team-title" className={BOX_TITLE}>{t("stand.teamTitle")}</h2>
-          <div className="mt-3 flex items-center gap-3">
-            <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-100 text-lg font-bold text-violet-800">{team.name.trim()[0]?.toUpperCase() ?? "T"}</span>
+    <aside aria-label={t("stand.title")} className={`flex min-w-0 flex-col gap-5 ${className}`}>
+      <div className="rounded-[26px] bg-[#ede7fb] p-5 sm:p-[22px]" data-dashboard-panel>
+        <section aria-labelledby="dashboard-stand-title">
+          <div className="flex items-center gap-3.5">
+            <Image src="/brand/mia.png" alt="" width={203} height={286} className="h-[76px] w-auto shrink-0 rounded-xl border border-white/80 shadow-[0_6px_18px_rgba(76,29,149,.12)]" />
             <div className="min-w-0">
-              <Link href={teamPath!} className="block truncate text-[19px] font-bold leading-tight text-[#0b1f3a] hover:underline">{team.name}</Link>
-              <p className="mt-0.5 text-[15px] leading-snug text-[#4a4d68]">
-                {team.everyday
-                  ? [t("stand.teamAllSettled"), team.testProjectClosed ? t("stand.testProjectClosed") : null].filter(Boolean).join(" · ")
-                  : team.setup
-                    ? [
-                        t("stand.teamSettled", { settled: team.setup.settled }),
-                        team.setup.awaitingConfirmation > 0 ? t("stand.teamAwaiting", { count: team.setup.awaitingConfirmation }) : null,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")
-                    : null}
-              </p>
+              <h2 id="dashboard-stand-title" className={BOX_TITLE}>{t("stand.title")}</h2>
+              <p className="mt-1 text-[19px] font-bold leading-6 text-[#0b1f3a]">{open.length === 0 ? t("stand.profileAllDone") : t("stand.openCount", { count: open.length })}</p>
             </div>
           </div>
-          {team.everyday ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.maybe")}</span>
-              <Link href={`${teamPath}/finanzierung`} className={CHIP_LINK}>{t("stand.financing")}</Link>
-              <Link href={`${teamPath}/zielkonflikte`} className={CHIP_LINK}>{t("stand.tradeoffs")}</Link>
-            </div>
-          ) : null}
-          {otherTeams.length > 0 ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.otherTeams")}</span>
-              {otherTeams.map((other) => (
-                <Link key={other.id} href={`/dashboard?team=${encodeURIComponent(other.id)}`} className={CHIP_LINK}>{other.name}</Link>
-              ))}
-            </div>
-          ) : null}
-          <Link href={teamPath!} className="mt-3 inline-flex min-h-11 items-center text-[15px] font-bold text-violet-800 hover:underline">{t("stand.toTeam")} →</Link>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {keys.map((key) => (
+              <li key={key}>
+                {parts[key] ? (
+                  <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-emerald-50 px-3 text-[14px] font-semibold text-emerald-900">
+                    <span aria-hidden="true">✓</span>{t(`stand.parts.${key}`)}
+                    <span className="sr-only"> – {t("stand.partDone")}</span>
+                  </span>
+                ) : (
+                  <Link href={alignPartHref(key, "open")} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border-[1.5px] border-dashed border-[#b9a9f5] px-3 text-[14px] font-semibold text-[#5b3df5] hover:bg-white/70">
+                    <span aria-hidden="true">○</span>{t(`stand.parts.${key}`)}
+                    <span className="sr-only"> – {t("stand.partOpen")}</span>
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 flex flex-wrap items-center gap-x-4">
+            {setupOpen ? <Link href="/welcome/profil" className="inline-flex min-h-11 items-center text-[15px] font-bold text-violet-800 hover:underline">{t("stand.setupProfile")}</Link> : null}
+            <Link href="/me/profile" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
+            <Link href="/fragebogen" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
+          </p>
         </section>
-      ) : null}
 
-      <section aria-labelledby="dashboard-stand-title" className={BOX}>
-        <h2 id="dashboard-stand-title" className={BOX_TITLE}>{t("stand.title")}</h2>
-        <p className="mt-3 text-[15px] font-semibold text-[#0b1f3a]">{t("stand.profile")}</p>
-        <ul className="mt-2 flex flex-wrap gap-2">
-          {keys.map((key) => (
-            <li key={key}>
-              {parts[key] ? (
-                <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-emerald-50 px-3 text-[14px] font-semibold text-emerald-900">
-                  <span aria-hidden="true">✓</span>{t(`stand.parts.${key}`)}
-                  <span className="sr-only"> – {t("stand.partDone")}</span>
+        {team ? (
+          <>
+            <hr className="my-4 border-[#d9d0f5]" />
+            <section aria-labelledby="dashboard-team-title" data-dashboard-team>
+              <h2 id="dashboard-team-title" className={BOX_TITLE}>{t("stand.teamTitle")}</h2>
+              <Link href={teamPath!} className="mt-2.5 flex items-center gap-3 rounded-xl py-1 hover:bg-white/60">
+                <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-lg font-bold text-violet-800">{team.name.trim()[0]?.toUpperCase() ?? "T"}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[18px] font-bold leading-tight text-[#0b1f3a]">{team.name}</span>
+                  <span className="block text-[14px] leading-snug text-[#4a4d68]">
+                    {team.everyday
+                      ? [t("stand.teamAllSettled"), team.testProjectClosed ? t("stand.testProjectClosed") : null].filter(Boolean).join(" · ")
+                      : team.setup
+                        ? [
+                            t("stand.teamSettled", { settled: team.setup.settled }),
+                            team.setup.awaitingConfirmation > 0 ? t("stand.teamAwaiting", { count: team.setup.awaitingConfirmation }) : null,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")
+                        : null}
+                  </span>
                 </span>
-              ) : (
-                <Link href={alignPartHref(key, "open")} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-dashed border-violet-300 px-3 text-[14px] font-semibold text-violet-800 hover:bg-violet-50">
-                  <span aria-hidden="true">○</span>{t(`stand.parts.${key}`)}
-                  <span className="sr-only"> – {t("stand.partOpen")}</span>
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-        {open.length === 0 ? <p className="mt-2.5 text-[14px] text-[#4a4d68]">{t("stand.profileAllDone")}</p> : null}
-        <p className="mt-3 flex flex-wrap items-center gap-x-4">
-          {setupOpen ? <Link href="/welcome/profil" className="inline-flex min-h-11 items-center text-[15px] font-bold text-violet-800 hover:underline">{t("stand.setupProfile")}</Link> : null}
-          <Link href="/me/profile" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
-          <Link href="/fragebogen" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
-        </p>
-      </section>
+                <span aria-hidden="true" className="text-xl text-[#9a9cb8]">&rsaquo;</span>
+              </Link>
+              {team.everyday ? (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.maybe")}</span>
+                  <Link href={`${teamPath}/finanzierung`} className={CHIP_LINK}>{t("stand.financing")}</Link>
+                  <Link href={`${teamPath}/zielkonflikte`} className={CHIP_LINK}>{t("stand.tradeoffs")}</Link>
+                </div>
+              ) : null}
+              {otherTeams.length > 0 ? (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.otherTeams")}</span>
+                  {otherTeams.map((other) => (
+                    <Link key={other.id} href={`/dashboard?team=${encodeURIComponent(other.id)}`} className={CHIP_LINK}>{other.name}</Link>
+                  ))}
+                </div>
+              ) : null}
+            </section>
+          </>
+        ) : null}
+
+        {waiting ? (<><hr className="my-4 border-[#d9d0f5]" />{waiting}</>) : null}
+      </div>
 
       {conversation && teamPath ? (
         <section aria-labelledby="dashboard-talk-title" className="rounded-[20px] border border-[#ddd3fb] bg-[#f3efff] px-5 py-5 sm:px-[22px]">
