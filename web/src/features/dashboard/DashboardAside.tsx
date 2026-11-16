@@ -13,8 +13,9 @@ export type StandTeam = {
   testProjectClosed: boolean;
 };
 
-const BOX = "rounded-[20px] border border-[#e4e2f0] bg-[#f8f9fc] px-5 py-5 sm:px-[22px]";
-const BOX_TITLE = "text-[15px] font-semibold uppercase tracking-[0.06em] text-[#5f5e7a]";
+const BOX = "rounded-[20px] border border-[#dcdff0] bg-white px-5 py-5 sm:px-[22px]";
+const CHIP_LINK = "inline-flex min-h-9 items-center rounded-full bg-violet-50 px-3 text-[14px] font-semibold text-violet-800 hover:bg-violet-100";
+const BOX_TITLE = "text-[13px] font-semibold uppercase tracking-[0.08em] text-[#6d28d9]";
 
 /**
  * Die leise Spalte neben dem naechsten Schritt. Alles hier ist freiwillig:
@@ -60,34 +61,14 @@ export async function DashboardAside({
 
   return (
     <aside aria-label={t("stand.title")} className={`flex min-w-0 flex-col gap-4 ${className}`}>
-      <section aria-labelledby="dashboard-stand-title" className={BOX}>
-        <h2 id="dashboard-stand-title" className={BOX_TITLE}>{t("stand.title")}</h2>
-        <dl className="mt-3.5 flex flex-col gap-3 text-base leading-snug">
-          <div>
-            <dt className="font-semibold text-[#0b1f3a]">{t("stand.profile")}</dt>
-            <dd className="mt-0.5 text-[#33325e]">
-              {open.length === 0 ? (
-                t("stand.profileAllDone")
-              ) : (
-                <>
-                  {done.length > 0 ? `${t("stand.profileDone", { done: done.join(", ") })} ` : null}
-                  {t("stand.openLabel")}{" "}
-                  {openParts.map((key, index) => (
-                    <span key={key}>
-                      {index > 0 ? ", " : null}
-                      <Link href={alignPartHref(key, "open")} className="text-violet-800 underline underline-offset-4">{t(`stand.parts.${key}`)}</Link>
-                    </span>
-                  ))}
-                </>
-              )}
-            </dd>
-          </div>
-          {team ? (
-            <div>
-              <dt className="font-semibold text-[#0b1f3a]">
-                <Link href={teamPath!} className="hover:underline">{team.name}</Link>
-              </dt>
-              <dd className="mt-0.5 text-[#33325e]">
+      {team ? (
+        <section aria-labelledby="dashboard-team-title" className={BOX} data-dashboard-team>
+          <h2 id="dashboard-team-title" className={BOX_TITLE}>{t("stand.teamTitle")}</h2>
+          <div className="mt-3 flex items-center gap-3">
+            <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-violet-100 text-lg font-bold text-violet-800">{team.name.trim()[0]?.toUpperCase() ?? "T"}</span>
+            <div className="min-w-0">
+              <Link href={teamPath!} className="block truncate text-[19px] font-bold leading-tight text-[#0b1f3a] hover:underline">{team.name}</Link>
+              <p className="mt-0.5 text-[15px] leading-snug text-[#4a4d68]">
                 {team.everyday
                   ? [t("stand.teamAllSettled"), team.testProjectClosed ? t("stand.testProjectClosed") : null].filter(Boolean).join(" · ")
                   : team.setup
@@ -98,42 +79,58 @@ export async function DashboardAside({
                         .filter(Boolean)
                         .join(", ")
                     : null}
-              </dd>
+              </p>
             </div>
-          ) : null}
-          {team?.everyday ? (
-            <div>
-              <dt className="font-semibold text-[#0b1f3a]">{t("stand.maybe")}</dt>
-              <dd className="mt-0.5 text-[#33325e]">
-                <Link href={`${teamPath}/finanzierung`} className="text-violet-800 underline underline-offset-4">{t("stand.financing")}</Link>
-                {" · "}
-                <Link href={`${teamPath}/zielkonflikte`} className="text-violet-800 underline underline-offset-4">{t("stand.tradeoffs")}</Link>
-              </dd>
+          </div>
+          {team.everyday ? (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.maybe")}</span>
+              <Link href={`${teamPath}/finanzierung`} className={CHIP_LINK}>{t("stand.financing")}</Link>
+              <Link href={`${teamPath}/zielkonflikte`} className={CHIP_LINK}>{t("stand.tradeoffs")}</Link>
             </div>
           ) : null}
           {otherTeams.length > 0 ? (
-            <div>
-              <dt className="font-semibold text-[#0b1f3a]">{t("stand.otherTeams")}</dt>
-              <dd className="mt-0.5">
-                {otherTeams.map((other, index) => (
-                  <span key={other.id}>
-                    {index > 0 ? " · " : null}
-                    <Link href={`/dashboard?team=${encodeURIComponent(other.id)}`} className="text-violet-800 underline underline-offset-4">{other.name}</Link>
-                  </span>
-                ))}
-              </dd>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[13px] font-semibold text-[#5f5e7a]">{t("stand.otherTeams")}</span>
+              {otherTeams.map((other) => (
+                <Link key={other.id} href={`/dashboard?team=${encodeURIComponent(other.id)}`} className={CHIP_LINK}>{other.name}</Link>
+              ))}
             </div>
           ) : null}
-        </dl>
-        <p className="mt-2.5 flex flex-wrap items-center gap-x-4">
-          {setupOpen ? <Link href="/welcome/profil" className="inline-flex min-h-10 items-center text-[15px] font-semibold text-violet-800 hover:underline">{t("stand.setupProfile")}</Link> : null}
-          <Link href="/me/profile" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
-          <Link href="/fragebogen" className="inline-flex min-h-10 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
+          <Link href={teamPath!} className="mt-3 inline-flex min-h-11 items-center text-[15px] font-bold text-violet-800 hover:underline">{t("stand.toTeam")} →</Link>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="dashboard-stand-title" className={BOX}>
+        <h2 id="dashboard-stand-title" className={BOX_TITLE}>{t("stand.title")}</h2>
+        <p className="mt-3 text-[15px] font-semibold text-[#0b1f3a]">{t("stand.profile")}</p>
+        <ul className="mt-2 flex flex-wrap gap-2">
+          {keys.map((key) => (
+            <li key={key}>
+              {parts[key] ? (
+                <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-emerald-50 px-3 text-[14px] font-semibold text-emerald-900">
+                  <span aria-hidden="true">✓</span>{t(`stand.parts.${key}`)}
+                  <span className="sr-only"> – {t("stand.partDone")}</span>
+                </span>
+              ) : (
+                <Link href={alignPartHref(key, "open")} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-dashed border-violet-300 px-3 text-[14px] font-semibold text-violet-800 hover:bg-violet-50">
+                  <span aria-hidden="true">○</span>{t(`stand.parts.${key}`)}
+                  <span className="sr-only"> – {t("stand.partOpen")}</span>
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+        {open.length === 0 ? <p className="mt-2.5 text-[14px] text-[#4a4d68]">{t("stand.profileAllDone")}</p> : null}
+        <p className="mt-3 flex flex-wrap items-center gap-x-4">
+          {setupOpen ? <Link href="/welcome/profil" className="inline-flex min-h-11 items-center text-[15px] font-bold text-violet-800 hover:underline">{t("stand.setupProfile")}</Link> : null}
+          <Link href="/me/profile" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.toProfile")}</Link>
+          <Link href="/fragebogen" className="inline-flex min-h-11 items-center text-[15px] text-violet-800 hover:underline">{t("stand.allQuestionnaires")}</Link>
         </p>
       </section>
 
       {conversation && teamPath ? (
-        <section aria-labelledby="dashboard-talk-title" className={BOX}>
+        <section aria-labelledby="dashboard-talk-title" className="rounded-[20px] border border-[#ddd3fb] bg-[#f3efff] px-5 py-5 sm:px-[22px]">
           <h2 id="dashboard-talk-title" className={BOX_TITLE}>{t("talk.title")}</h2>
           <p className="mt-3 text-[17px] leading-relaxed text-[#0b1f3a]">{conversation.question}</p>
           <p className="mt-2 text-sm text-[#5f5e7a]">{t("talk.from", { label: conversation.label })}</p>

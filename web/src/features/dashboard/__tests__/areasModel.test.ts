@@ -72,3 +72,14 @@ test("Startseite 17.11.2026: dunkler Schritt mit langsamem Lichtschein (steht st
   const aside = readFileSync("src/features/dashboard/DashboardAside.tsx", "utf8");
   assert.doesNotMatch(aside, /data-dashboard-areas/, "the areas moved out of the quiet column");
 });
+
+test("Startseite 17.11.2026: Mia klein und links neben der Begrüßung; Wartendes als Liste; Stand als Team-Karte und Profil-Chips", () => {
+  const page = readFileSync("src/app/(product)/dashboard/page.tsx", "utf8");
+  assert.match(page, /<Image src="\/brand\/mia\.png"[\s\S]*h-\[64px\][\s\S]*<p className="text-lg[^>]*>\{t\("hero\.greeting"/, "Mia sits before the greeting and is small");
+  const waiting = readFileSync("src/features/dashboard/DashboardWaiting.tsx", "utf8");
+  assert.ok(!waiting.startsWith('"use client"'), "no client code needed any more");
+  const aside = readFileSync("src/features/dashboard/DashboardAside.tsx", "utf8");
+  assert.match(aside, /data-dashboard-team/);
+  assert.match(aside, /rounded-full bg-emerald-50/, "finished profile parts are chips");
+  assert.doesNotMatch(aside, /<dl\b/, "the old definition list is gone");
+});

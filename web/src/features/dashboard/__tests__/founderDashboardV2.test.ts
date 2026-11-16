@@ -125,10 +125,11 @@ test("Wartet auf dich: ruhige Karten, nichts versteckt, Uebungen zu zweit nur al
   assert.match(dashboardSource, /\.filter\(isShownOnStart\)/);
   assert.match(dashboardSource, /\.filter\(\(task\) => !duplicatesNextStep\(task, start\.next\)\)/);
   assert.match(dashboardSource, /task\.kind === "NEEDS_YOU"/);
-  // Die Zahl steht sichtbar neben der Ueberschrift; die Liste wischt, sie klappt nicht zu.
+  // Seit 17.11.2026 eine ruhige Liste: Die Zahl steht sichtbar neben der Ueberschrift, die ersten drei Zeilen stehen da,
+  // der Rest klappt unter "Alle ansehen" auf (ein Detail-Element, kein Karussell, nichts ohne Weg dorthin).
   assert.match(waitingSource, /\{cards\.length\}/);
-  assert.match(waitingSource, /snap-x/);
-  assert.doesNotMatch(waitingSource, /showAll|aria-expanded|slice\(0, 3\)/);
+  assert.match(waitingSource, /<details/);
+  assert.doesNotMatch(waitingSource, /snap-x|scrollBy|useRef/);
   // Keine Dringlichkeitsfarben je Karte.
   assert.doesNotMatch(waitingSource, /amber|red-|rose-/);
 });

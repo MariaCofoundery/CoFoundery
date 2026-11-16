@@ -295,9 +295,9 @@ export default async function DashboardPage({
       ) : null}
 
       {/* Mia, die Figur der Marke: ganz leise neben der Begruessung, still, ohne Bewegung. */}
-      <div className="mb-5 flex items-center justify-between gap-4">
+      <div className="mb-5 flex items-center gap-3.5">
+        <Image src="/brand/mia.png" alt="" width={203} height={286} priority className="h-[64px] w-auto shrink-0 rounded-xl border border-white/80 shadow-[0_6px_18px_rgba(76,29,149,.12)] sm:h-[80px]" />
         <p className="text-lg text-[#5f5e7a] sm:text-xl">{t("hero.greeting", { name: displayName })}</p>
-        <Image src="/brand/mia.png" alt="" width={203} height={286} priority className="h-[84px] w-auto shrink-0 rounded-2xl border border-white/80 shadow-[0_8px_22px_rgba(76,29,149,.12)] sm:h-[112px]" />
       </div>
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
@@ -357,8 +357,7 @@ export default async function DashboardPage({
             labels={{
               title: t("start.waiting.title"),
               count: t("start.waiting.count", { count: waitingCards.length }),
-              previous: t("start.waiting.previous"),
-              next: t("start.waiting.next"),
+              more: t("start.waiting.more", { count: waitingCards.length }),
               running: t("start.waiting.running"),
             }}
           />

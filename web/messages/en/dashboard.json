@@ -908,7 +908,8 @@
         "label": "Venture",
         "text": "Someone new has joined “{team}”. Do your venture answers still fit?",
         "action": "Confirm"
-      }
+      },
+      "more": "See all {count}"
     },
     "stand": {
       "title": "Where you stand",
@@ -933,7 +934,11 @@
       "otherTeams": "Other teams",
       "allQuestionnaires": "All questionnaires and conversations",
       "openLabel": "Still open:",
-      "setupProfile": "Set up your profile"
+      "setupProfile": "Set up your profile",
+      "teamTitle": "Your team",
+      "toTeam": "Go to the team",
+      "partDone": "done",
+      "partOpen": "open"
     },
     "talk": {
       "title": "For your next conversation",

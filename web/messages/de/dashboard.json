@@ -908,7 +908,8 @@
         "label": "Vorhaben",
         "text": "Jemand ist neu in „{team}“. Passen deine Antworten zum Vorhaben noch?",
         "action": "Bestätigen"
-      }
+      },
+      "more": "Alle {count} ansehen"
     },
     "stand": {
       "title": "Dein Stand",
@@ -933,7 +934,11 @@
       "otherTeams": "Andere Teams",
       "allQuestionnaires": "Alle Fragebögen und Gespräche",
       "openLabel": "Noch offen:",
-      "setupProfile": "Profil einrichten"
+      "setupProfile": "Profil einrichten",
+      "teamTitle": "Dein Team",
+      "toTeam": "Zum Team",
+      "partDone": "erledigt",
+      "partOpen": "offen"
     },
     "talk": {
       "title": "Für euer nächstes Gespräch",
