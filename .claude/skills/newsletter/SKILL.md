@@ -23,10 +23,12 @@ Du schreibst den Entwurf. Maria prüft, ändert und sendet im Admin (`/admin/new
 Die Rubrik „Aus dem Netzwerk“ (anonyme Einträge) und Danke-Zitate baust Maria im Editor ein, weil sie echte Einträge und Erlaubnisse braucht. Setze dort einen Hinweis in deine Antwort, keinen Baustein.
 
 ## Regeln für den Text
+- **Nie etwas über Maria erfinden.** Wenn du aus ihrem Leben erzählst, nimm nur die Fakten aus dem Abschnitt „Marias Geschichte“ in `marketing/MARKENSTIMME.md`, mit richtigen Rollen und Geschlechtern. Brauchst du eine Szene oder ein Detail, das dort nicht steht, frage Maria oder schreibe den Absatz allgemein („viele Gründer:innen kennen das“). Die Willkommensmail erzählt ihre Geschichte schon: wiederhole sie nicht, sondern gehe weiter.
+- **Keine Platzhalter im Text.** Offene Punkte stehen nur in deiner Antwort an Maria, nie als „[PRÜFEN]“ im JSON.
 - Du-Ansprache, kurz, locker, lösungsorientiert, inklusive Sprache. Keine Scores, kein „kompatibel/inkompatibel“, keine Erfolgsversprechen, kein Hinweis auf Öffnungszählung.
 - Betreff höchstens 50 Zeichen, konkret und neugierig. Vorschauzeile höchstens 90 Zeichen, ergänzt den Betreff.
 - Keine erkennbaren realen Personen oder Firmen in negativem Zusammenhang. Keine Namen oder Daten von Mitgliedern.
-- Zahlen, Studien und Zitate nur, wenn du sie mit einer Quelle belegen kannst (WebSearch/WebFetch). Echte Links, nie erfundene. Nicht belegbar heißt: weglassen oder als „[PRÜFEN]“ markieren.
+- Zahlen, Studien und Zitate nur, wenn du sie mit einer Quelle belegen kannst (WebSearch/WebFetch). Echte Links, nie erfundene. Nicht belegbar heißt: weglassen und Maria in der Antwort sagen.
 - Englisch: American spelling, keine deutschen Sonderzeichen, nicht wörtlich übersetzen.
 
 ## Ausgabeformat
@@ -63,4 +65,4 @@ Gib Maria für die Rubrik „Comic“:
 - **Text unter dem Bild:** die Pointe als Text für den Baustein davor oder danach und ein Alternativtext (viele Mailprogramme blenden Bilder zuerst aus).
 
 ## Nach dem Schreiben
-Sag Maria in wenigen Zeilen: was das Thema ist, was sie noch ergänzen muss (Netzwerk-Einträge, Foto, Comic-Bild, Danke-Zitat mit Erlaubnis, Quellen mit [PRÜFEN]) und dass nichts gesendet wurde. Trage das behandelte Thema in `marketing/newsletter/THEMEN.md` unter „Bereits behandelt“ ein, sobald Maria die Ausgabe freigibt.
+Sag Maria in wenigen Zeilen: was das Thema ist, was sie noch ergänzen muss (Netzwerk-Einträge, Foto, Comic-Bild, Danke-Zitat mit Erlaubnis, Quellen, die du nicht belegen konntest) und dass nichts gesendet wurde. Trage das behandelte Thema in `marketing/newsletter/THEMEN.md` unter „Bereits behandelt“ ein, sobald Maria die Ausgabe freigibt.

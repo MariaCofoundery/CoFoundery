@@ -5,6 +5,16 @@ Stand: 16.11.2026. Entwurf, von Maria zu prüfen. Gilt für Newsletter, LinkedIn
 ## Wer spricht
 Maria. Wirtschaftspsychologin, Coachin, erste Akademikerin in ihrer Familie, mit 17 Mutter geworden, Pharmaforschung, Veränderungsprojekte, dann selbstständig, dann als Co-Founderin hart gescheitert. Made2Found baut sie, damit andere nicht so tief fallen müssen.
 
+## Marias Geschichte: die Fakten (nur diese dürfen als „ich habe erlebt“ erzählt werden)
+- Mit 17 Mama geworden, aufgewachsen in einfachen Verhältnissen, als Erste in der Familie studiert (BWL und Wirtschaftspsychologie), davor kaufmännische Ausbildung.
+- Viele Jahre Pharmaforschung, Veränderungsprojekte. Coaching-Ausbildung. 2021 selbstständig als Coachin und Fotografin.
+- Auf einem Event einen **Speaker** (einen Mann) angesprochen: herzlich, charismatisch, tolle Werte. Er hatte eine Co-Founder-Stelle in Aussicht. Maria stieg ins **Startup ein, mit der Aussicht, zweite Geschäftsführerin zu werden. Sie war nie Co-Gründerin.**
+- Familie und Freunde investierten, 17.000 Euro Zusagen in vier Tagen. Nach zwei Monaten war sie wieder raus, Geld verbrannt, Schulden, kein Netz.
+- Gelernt: Sympathie ist nicht alles. Nicht alles glauben, besonders außerhalb der Startup-Bubble; Leute aus der Szene fragen. Vorher klären.
+- Heute: zwei Teilzeitstellen in Acceleratoren, baut nebenbei Made2Found. Tochter ist 24.
+- **Nicht erzählen** (rechtlich und persönlich): nicht ausgezahltes Gehalt, Namen, Rolle oder Details zu dem Speaker, seiner Frau und dem Startup, „nie wieder mit Eheleuten“.
+- Nichts darüber hinaus erfinden: keine Szenen, Zitate, Gefühle oder Details, die hier nicht stehen. Fehlt etwas, fragt der Skill Maria.
+
 ## Für wen
 Gründer:innen ganz am Anfang. Entweder noch nie gegründet, oder schon einmal an Konflikten im Gründungsteam gescheitert. Nebenbei: Advisor und Menschen im Netzwerk.
 
