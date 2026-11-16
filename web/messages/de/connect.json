@@ -384,14 +384,20 @@
     "publish": "Connect-Profil veröffentlichen",
     "photo": {
       "title": "Dein Bild in Connect",
-      "helper": "Hier entscheidest du nur, was in Connect zu sehen ist. Das Bild selbst änderst du oben.",
+      "helper": "",
       "fallbackName": "Connect-Mitglied",
       "keep": "Aktuelles Connect-Bild beibehalten",
       "existing": "Mein Profilfoto von oben zeigen",
       "existingHint": "Connect bekommt davon eine eigene Kopie. Änderst oder entfernst du dein Foto unter „Über dich“, zieht Connect nach.",
       "none": "In Connect kein Bild zeigen",
       "upload": "Ein anderes Bild nur für Connect",
-      "choose": "Bild auswählen (JPG, PNG oder WebP)"
+      "choose": "Bild auswählen (JPG, PNG oder WebP)",
+      "change": "Ändern",
+      "stateKeep": "In Connect ist ein eigenes Bild zu sehen.",
+      "stateExisting": "In Connect zeigen wir dein Profilfoto von oben. Das bleibt so, wenn du hier nichts änderst.",
+      "stateNone": "In Connect ist kein Bild zu sehen.",
+      "stateNoneOffer": "Du kannst dort dein Profilfoto zeigen.",
+      "stateUpload": "Dieses andere Bild wird in Connect gezeigt, sobald du speicherst."
     },
     "identityTitle": "Name, Headline und Über mich",
     "identityText": "Diese Angaben pflegst du an einem Ort in deinem Profil. Änderungen dort erscheinen hier sofort.",
@@ -484,7 +490,9 @@
       "publish": "Sichtbar machen",
       "missing": "Dafür fehlt noch:",
       "missingName": "Dein Name (mindestens 2 Zeichen)",
-      "missingHeadline": "Eine Zeile über dich"
+      "missingHeadline": "Eine Zeile über dich",
+      "photoShow": "Mein Profilfoto in Connect zeigen",
+      "photoHint": "Mit einem Klick auszuschalten. Ein anderes Bild wählst du später im Profil."
     },
     "done": {
       "badge": "Du bist sichtbar",

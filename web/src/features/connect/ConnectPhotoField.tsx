@@ -45,24 +45,28 @@ export function ConnectPhotoField({
     setCropFile(file);
   }
 
-  return <fieldset className="rounded-2xl border border-slate-200 p-5">
+  // Zugeklappt sagt der Block nur kurz, was gilt (Rueckmeldung von Maria 16.11.2026: "immer noch zu viel"); die Auswahl steht dahinter.
+  const state = pickingUpload || choice === "upload" ? copy.stateUpload : choice === "existing" ? copy.stateExisting : choice === "keep" ? copy.stateKeep : hasExisting ? `${copy.stateNone} ${copy.stateNoneOffer}` : copy.stateNone;
+  return <fieldset className="rounded-2xl border border-slate-200 p-4">
     <legend className="px-1 text-sm font-semibold text-slate-900">{copy.title}</legend>
-    <p className="mt-1 text-sm leading-6 text-slate-600">{copy.helper}</p>
-    <div className="mt-4 flex items-center gap-4">
-      <ProfileAvatar displayName={displayName || copy.fallbackName} avatarId={preview.avatarId} imageUrl={preview.imageUrl} className="h-16 w-16 rounded-full object-cover" fallbackClassName="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700" />
-      <div className="grid flex-1 gap-2 text-sm">
+    <div className="flex items-center gap-3">
+      <ProfileAvatar displayName={displayName || copy.fallbackName} avatarId={preview.avatarId} imageUrl={preview.imageUrl} className="h-12 w-12 shrink-0 rounded-full object-cover" fallbackClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700" />
+      <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700">{state}</p>
+    </div>
+    <details className="mt-2">
+      <summary className="inline-flex min-h-11 cursor-pointer items-center text-sm font-semibold text-violet-800">{copy.change}</summary>
+      <div className="grid gap-1 pt-1 text-sm">
         {hasExisting ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "existing" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("existing"); }} />{copy.existing}</label> : null}
-        {hasExisting && choice === "existing" && !pickingUpload && copy.existingHint ? <p className="-mt-1 pl-7 text-xs leading-5 text-slate-500">{copy.existingHint}</p> : null}
         {hasCurrent ? <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "keep" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("keep"); }} />{copy.keep}</label> : null}
         <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={choice === "none" && !pickingUpload} onChange={() => { setPickingUpload(false); setChoice("none"); }} />{copy.none}</label>
         <label className="flex min-h-11 items-center gap-3"><input type="radio" name="photo_choice_ui" checked={pickingUpload || choice === "upload"} onChange={() => setPickingUpload(true)} />{copy.upload}</label>
+        {pickingUpload || choice === "upload" ? (
+          <label className="block pl-7 text-sm font-medium text-slate-800">{copy.choose}
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onUpload} className="mt-2 block min-h-11 w-full rounded-xl border border-slate-200 p-2 text-sm" />
+          </label>
+        ) : null}
       </div>
-    </div>
-    {pickingUpload || choice === "upload" ? (
-      <label className="mt-3 block text-sm font-medium text-slate-800">{copy.choose}
-        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onUpload} className="mt-2 block min-h-11 w-full rounded-xl border border-slate-200 p-2 text-sm" />
-      </label>
-    ) : null}
+    </details>
     {cropFile ? (
       <ImageCropDialog
         file={cropFile}

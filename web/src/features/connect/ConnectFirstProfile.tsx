@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { ProfileAvatar } from "@/features/profile/ProfileAvatar";
 
 type Copy = {
   stepOf: string; back: string; next: string;
@@ -8,6 +9,7 @@ type Copy = {
   titleOpen: string; leadOpen: string; noteLabel: string; notePlaceholder: string; skip: string; optional: string;
   titleShow: string; previewTitle: string; previewEmpty: string; previewLater: string; showQuestion: string; publishHint: string;
   missing: string; missingName: string; missingHeadline: string; missingRole: string;
+  photoShow: string; photoHint: string;
 };
 
 type Props = {
@@ -16,6 +18,8 @@ type Props = {
   openFormats: { value: string; label: string }[];
   noteMin: number; noteMax: number;
   visibilityNode: ReactNode; moreNode: ReactNode; draftNode: ReactNode; publishNode: ReactNode;
+  /** Dein Profilfoto, wenn es eins gibt und Connect noch kein eigenes Bild hat: Es wird standardmaessig mitgezeigt (Haken, jederzeit aus). */
+  basePhoto?: { avatarId: string | null; imageUrl: string | null } | null;
   copy: Copy;
 };
 
@@ -29,12 +33,13 @@ const CHIP = "flex min-h-11 cursor-pointer items-center rounded-full border bord
  * DAS FORMULAR BLEIBT EINS: Alle Felder stehen die ganze Zeit im Dokument (nicht gezeigte Schritte sind nur ausgeblendet), Speichern und
  * Veroeffentlichen laufen ueber `saveConnectProfileAction`; die Pruefung des Servers bleibt massgeblich. Die Sperre am Knopf ist Hilfe, kein Schutz.
  */
-export function ConnectFirstProfile({ initial, roles, openFormats, noteMin, noteMax, visibilityNode, moreNode, draftNode, publishNode, copy }: Props) {
+export function ConnectFirstProfile({ initial, roles, openFormats, noteMin, noteMax, visibilityNode, moreNode, draftNode, publishNode, basePhoto = null, copy }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState(initial.name);
   const [headline, setHeadline] = useState(initial.headline);
   const [chosenRoles, setChosenRoles] = useState<string[]>(initial.roles);
   const [chosenOpen, setChosenOpen] = useState<string[]>(initial.open);
+  const [showPhoto, setShowPhoto] = useState(true);
   const total = 3;
   const toggle = (list: string[], set: (v: string[]) => void, value: string) => set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
 
@@ -47,7 +52,11 @@ export function ConnectFirstProfile({ initial, roles, openFormats, noteMin, note
       <p className="text-xs font-bold uppercase tracking-[.08em] text-violet-800">{copy.previewTitle}</p>
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(76,29,149,.10)]">
         <div className="flex items-center gap-4">
-          <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-violet-100 text-2xl font-bold text-violet-800">{initialLetter}</span>
+          {basePhoto && showPhoto ? (
+            <ProfileAvatar displayName={name.trim() || "?"} avatarId={basePhoto.avatarId} imageUrl={basePhoto.imageUrl} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" fallbackClassName="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-violet-100 text-2xl font-bold text-violet-800" />
+          ) : (
+            <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-violet-100 text-2xl font-bold text-violet-800">{initialLetter}</span>
+          )}
           <div className="min-w-0">
             <p className="break-words text-xl font-bold text-slate-950">{name.trim() || copy.previewEmpty}</p>
             <p className="break-words text-[15px] leading-6 text-slate-600">{headline.trim() || copy.previewEmpty}</p>
@@ -59,13 +68,20 @@ export function ConnectFirstProfile({ initial, roles, openFormats, noteMin, note
             {chosenOpen.map((value) => <li key={value} className="rounded-full bg-slate-100 px-3 py-1 text-[13px] text-slate-800">{openFormats.find((r) => r.value === value)?.label}</li>)}
           </ul>
         ) : null}
-        <p className="mt-4 border-t border-slate-100 pt-3 text-sm text-slate-600">{copy.previewLater}</p>
+        {basePhoto ? (
+          <label className="mt-4 flex min-h-11 cursor-pointer items-start gap-3 border-t border-slate-100 pt-3 text-sm text-slate-800">
+            <input type="checkbox" checked={showPhoto} onChange={(e) => setShowPhoto(e.target.checked)} className="mt-1 h-5 w-5" />
+            <span><strong>{copy.photoShow}</strong><br /><span className="text-[13px] text-slate-600">{copy.photoHint}</span></span>
+          </label>
+        ) : null}
+        <p className={`${basePhoto ? "mt-3" : "mt-4 border-t border-slate-100 pt-3"} text-sm text-slate-600`}>{copy.previewLater}</p>
       </section>
     </aside>
   );
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-9">
+      {basePhoto ? <input type="hidden" name="photo_choice" value={showPhoto ? "existing" : "none"} /> : null}
       <div className="grid gap-5">
         <div className="grid gap-2 lg:hidden">
           <span className="text-[13px] font-bold text-slate-600">{copy.stepOf.replace("{current}", String(step + 1)).replace("{total}", String(total))}</span>

@@ -13,6 +13,7 @@ import { getConnectIdentityGaps } from "@/features/profile/identityReadiness";
 import { NewestEntries } from "@/features/connect/NewestEntries";
 import { ConnectFirstProfile } from "@/features/connect/ConnectFirstProfile";
 import { getPersonCore } from "@/features/profile/personCoreData";
+import { getProfileBasicsRow } from "@/features/profile/profileData";
 import { ConsentSwitch } from "@/features/connect/ConsentSwitch";
 import { ConnectProfilePreview } from "@/features/connect/ConnectProfilePreview";
 import { ConnectVisibilityField } from "@/features/connect/ConnectVisibilityField";
@@ -49,6 +50,10 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
   const onePage = Boolean(profile);
   // Wer noch nie sichtbar war, bekommt das kurze erste Anlegen (Entwurf 16.11.2026): erst das Noetige, der Rest spaeter.
   const firstFlow = !profile || profile.status !== "active";
+  // Dein Profilfoto wird beim ersten Anlegen standardmaessig mitgezeigt (sichtbarer Haken, jederzeit aus) - aber nur, wenn es eins gibt und Connect noch kein eigenes Bild hat.
+  const basics = firstFlow ? await getProfileBasicsRow(client, user.id).catch(() => null) : null;
+  const hasBasePhoto = Boolean(basics?.avatar_id || basics?.avatar_url);
+  const firstFlowPhoto = firstFlow && hasBasePhoto && !profile?.photo_source ? { avatarId: basics?.avatar_id ?? null, imageUrl: basics?.avatar_url ?? null } : null;
   const sectionDone = {
     role: Boolean(profile?.network_roles?.length),
     reach: doors.length > 0,
@@ -109,6 +114,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
           roles={CONNECT_ROLES.map((role) => ({ value: role, label: t(`roles.${role}`) }))}
           openFormats={CONNECT_OPEN_TO_FORMATS.map((format) => ({ value: format, label: t(`profile.openTo.${format}`) }))}
           noteMin={CONNECT_CONTACT_NOTE_MIN} noteMax={CONNECT_CONTACT_NOTE_MAX}
+          basePhoto={firstFlowPhoto}
           visibilityNode={<ConnectVisibilityField initial={profile?.visibility} copy={{
             title: t("visibility.profileTitle"), membersOnly: t("visibility.membersOnly"), public: t("visibility.public"),
             publicHint: t("visibility.profilePublicHint"), confirm: t("visibility.profileConfirm"),
@@ -129,6 +135,7 @@ export default async function ConnectProfilePage({ searchParams }: { searchParam
             titleOpen: t("profile.first.titleOpen"), leadOpen: t("profile.first.leadOpen"), noteLabel: t("profile.first.noteLabel"), notePlaceholder: t("profile.contactNotePlaceholder"),
             skip: t("profile.first.skip"), optional: t("profile.first.optional"), titleShow: t("profile.first.more"), previewTitle: t("profile.first.previewTitle"),
             previewEmpty: t("profile.first.previewEmpty"), previewLater: t("profile.first.previewLater"), showQuestion: t("profile.first.showQuestion"), publishHint: t("profile.first.publishHint"),
+            photoShow: t("profile.first.photoShow"), photoHint: t("profile.first.photoHint"),
             missing: t("profile.first.missing"), missingName: t("profile.first.missingName"), missingHeadline: t("profile.first.missingHeadline"), missingRole: t("profile.flow.roleMissing"),
           }}
         />

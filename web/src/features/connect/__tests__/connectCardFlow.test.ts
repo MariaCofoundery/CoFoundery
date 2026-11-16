@@ -85,3 +85,14 @@ test("deutsch und englisch haben dieselben Schlüssel für das erste Anlegen", (
     assert.deepEqual(keys(de).sort(), keys(en).sort());
   }
 });
+
+test("Connect-Foto: zugeklappt mit einem Satz, dein Profilfoto wird beim ersten Anlegen standardmäßig mitgezeigt (Haken, jederzeit aus)", () => {
+  const field = code("src/features/connect/ConnectPhotoField.tsx");
+  assert.match(field, /<details className="mt-2">[\s\S]*copy\.change/, "the choice sits behind 'Ändern'");
+  assert.doesNotMatch(field, /<details[^>]*\bopen\b/, "closed by default");
+  assert.match(field, /stateExisting/);
+  const first = code("src/features/connect/ConnectFirstProfile.tsx");
+  assert.match(first, /name="photo_choice" value=\{showPhoto \? "existing" : "none"\}/);
+  assert.match(first, /useState\(true\)/);
+  assert.match(code(PAGE), /firstFlow && hasBasePhoto && !profile\?\.photo_source/, "only without a Connect picture of its own");
+});

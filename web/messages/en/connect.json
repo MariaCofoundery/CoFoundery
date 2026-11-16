@@ -384,14 +384,20 @@
     "publish": "Publish Connect profile",
     "photo": {
       "title": "Your picture in Connect",
-      "helper": "Here you only decide what is shown in Connect. You change the picture itself above.",
+      "helper": "",
       "fallbackName": "Connect member",
       "keep": "Keep current Connect photo",
       "existing": "Show my profile photo from above",
       "existingHint": "Connect gets its own copy. If you change or remove your photo under “About you”, Connect follows.",
       "none": "Show no picture in Connect",
       "upload": "A different picture just for Connect",
-      "choose": "Choose a picture (JPG, PNG or WebP)"
+      "choose": "Choose a picture (JPG, PNG or WebP)",
+      "change": "Change",
+      "stateKeep": "Connect shows a picture of its own.",
+      "stateExisting": "Connect shows your profile photo from above. That stays so unless you change it here.",
+      "stateNone": "Connect shows no picture.",
+      "stateNoneOffer": "You can show your profile photo there.",
+      "stateUpload": "This different picture will be shown in Connect once you save."
     },
     "identityTitle": "Name, headline and about you",
     "identityText": "You maintain these details in one place in your profile. Changes there appear here immediately.",
@@ -484,7 +490,9 @@
       "publish": "Make visible",
       "missing": "Still missing:",
       "missingName": "Your name (at least 2 characters)",
-      "missingHeadline": "One line about you"
+      "missingHeadline": "One line about you",
+      "photoShow": "Show my profile photo in Connect",
+      "photoHint": "One click turns it off. You can choose a different picture later in your profile."
     },
     "done": {
       "badge": "You are visible",

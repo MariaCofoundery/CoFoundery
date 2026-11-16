@@ -55,6 +55,12 @@ export async function PhotoUsagePanel({
             none: c("profile.photo.none"),
             upload: c("profile.photo.upload"),
             choose: c("profile.photo.choose"),
+            change: c("profile.photo.change"),
+            stateKeep: c("profile.photo.stateKeep"),
+            stateExisting: c("profile.photo.stateExisting"),
+            stateNone: c("profile.photo.stateNone"),
+            stateNoneOffer: c("profile.photo.stateNoneOffer"),
+            stateUpload: c("profile.photo.stateUpload"),
           }}
         />
       ) : null}
