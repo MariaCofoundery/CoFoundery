@@ -1,5 +1,6 @@
 import { ProblemLifecycleControls } from "@/features/connect/ProblemLifecycleControls";
 import Link from "next/link";
+import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requireConnectMember } from "@/features/connect/connectAccess";
@@ -126,6 +127,7 @@ export default async function ConnectProblemPage({
           ← {t("problems.backToBoard")}
         </Link>
         {isAuthor && isPublished && <Link href={`/connect/workspaces/new?problem=${problem.id}`} className="problem-btn problem-btn--ghost">{workspaceText("new")}</Link>}
+        {!isAuthor && problem.author_user_id ? <span className="ml-auto"><ThanksHeart userId={problem.author_user_id} via="problem" viaId={problem.id} label={t("thanks.heartButton")} hint={t("thanks.heartHint")} /></span> : null}
       </div>
 
       {saved === "approach" || saved === "interest" ? (

@@ -6,6 +6,7 @@ import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getConnectVenture, getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
+import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { UserText } from "@/features/ui/UserText";
 
 /**
@@ -91,7 +92,9 @@ export default async function ConnectVenturePage({
           >
             {t("actions.edit")}
           </Link>
-        ) : null}
+        ) : (
+          <ThanksHeart userId={venture.owner_user_id} via="venture" viaId={venture.id} label={t("thanks.heartButton")} hint={t("thanks.heartHint")} />
+        )}
       </header>
 
       <section className={`${card} mt-6`}>

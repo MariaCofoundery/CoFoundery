@@ -13,7 +13,7 @@ import {
   getConnectPerson,
 } from "@/features/connect/connectPeopleData";
 import { getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
-import { HeartBadge, ProfileThanksList } from "@/features/connect/thanks/ThanksBits";
+import { HeartBadge, ProfileThanksList, ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { hasHeart, listProfileThanks } from "@/features/connect/thanks/thanksData";
 import { UserText } from "@/features/ui/UserText";
 
@@ -41,8 +41,10 @@ import { UserText } from "@/features/ui/UserText";
  */
 export default async function ConnectPersonPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ userId: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const { userId } = await params;
   const { client, user } = await requireConnectMember(`/connect/people/${userId}`);
@@ -53,6 +55,7 @@ export default async function ConnectPersonPage({
   if (!person) notFound();
 
   const isOwn = person.user_id === user.id;
+  const thankedNow = (await searchParams).thanked === "1";
   const [heart, profileThanks] = await Promise.all([hasHeart(client, userId), listProfileThanks(client, userId)]);
   const [ventures, listings, problems, connectValues] = await Promise.all([
     getConnectVentures(client, userId),
@@ -79,6 +82,8 @@ export default async function ConnectPersonPage({
       >
         ← {t("tabs.people")}
       </Link>
+
+      {thankedNow ? <p role="status" className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{t("thanks.thankedOk")}</p> : null}
 
       <header className="brand-panel relative mt-4 flex flex-col gap-4 overflow-hidden rounded-[28px] px-6 py-8 sm:flex-row sm:items-center sm:px-9">
         <span aria-hidden="true" className="orb -top-16 right-60 hidden h-40 w-40 md:block" />
@@ -114,12 +119,15 @@ export default async function ConnectPersonPage({
           /* Seit dem 21.09.2026 geht das auch ohne Anzeige. Der Knopf steht
              oben und nicht am Ende der Seite: Er ist der Grund, warum man hier
              ist. */
-          <Link
-            href={`/connect/people/${person.user_id}/contact`}
-            className={BTN_ON_BRAND}
-          >
-            {t("contact.cta")}
-          </Link>
+          <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
+            <ThanksHeart userId={person.user_id} via="person" label={t("thanks.heartButton")} hint={t("thanks.heartHint")} />
+            <Link
+              href={`/connect/people/${person.user_id}/contact`}
+              className={BTN_ON_BRAND.replace("sm:ml-auto", "")}
+            >
+              {t("contact.cta")}
+            </Link>
+          </div>
         )}
       </header>
 

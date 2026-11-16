@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireConnectMember } from "@/features/connect/connectAccess";
-import { parseThanksForm } from "./thanksModel";
+import { parseDirectThanksForm, parseThanksForm, thanksHref } from "./thanksModel";
 
 const CONTACTS = "/connect/contacts";
 
@@ -28,4 +28,25 @@ export async function setThanksHiddenAction(formData: FormData) {
   if (error) redirect(`${CONTACTS}?error=thanks`);
   revalidatePath(CONTACTS);
   redirect(`${CONTACTS}?changed=${hidden ? "thanks_hidden" : "thanks_shown"}`);
+}
+
+/** Dank ohne Gespraech. Fehler kommen als Schluessel zurueck, damit die Seite sagen kann, was los ist. */
+export async function sendDirectThanksAction(formData: FormData) {
+  const { client } = await requireConnectMember(CONTACTS);
+  const parsed = parseDirectThanksForm(formData);
+  const helper = String(formData.get("helper_user_id") ?? "").trim();
+  const via = String(formData.get("via") ?? "person");
+  const viaId = String(formData.get("via_id") ?? "").trim();
+  const back = (error: string) => {
+    const base = thanksHref(helper, via === "listing" || via === "problem" || via === "venture" ? via : "person", viaId);
+    redirect(`${base}${base.includes("?") ? "&" : "?"}error=${error}`);
+  };
+  if (!parsed) back("invalid");
+  const { error } = await client.rpc("send_network_thanks_direct", {
+    p_helper_user_id: parsed!.helperUserId, p_via_kind: parsed!.via, p_via_id: parsed!.viaId, p_help_types: parsed!.helpTypes,
+    p_outcome: parsed!.outcome ?? "", p_body: parsed!.body ?? "", p_show: parsed!.show,
+  });
+  if (error) back(error.message.includes("thanks_recent") ? "recent" : error.message.includes("thanks_limit") ? "limit" : "failed");
+  revalidatePath(CONTACTS);
+  redirect(`/connect/people/${encodeURIComponent(parsed!.helperUserId)}?thanked=1`);
 }

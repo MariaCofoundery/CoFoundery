@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(14);
+select extensions.plan(22);
 
 -- 1 Geholfene, 2 Dankende, 3 Fremde, 4 Dritte mit offener (nicht angenommener) Anfrage.
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
@@ -41,10 +41,27 @@ select extensions.ok(public.set_network_thanks_hidden((select id from ids where 
 select extensions.is((select count(*)::int from public.list_profile_thanks('f4200000-0000-4000-8000-000000000001')), 0, 'hidden words disappear from the profile');
 select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000001'), true, 'the heart stays');
 
+-- Direkter Dank (ohne Gespraech) - Person 3 an Person 1, vom Profil aus.
+set local request.jwt.claims = '{"sub":"f4200000-0000-4000-8000-000000000003","role":"authenticated"}';
+select extensions.lives_ok($$select public.send_network_thanks_direct('f4200000-0000-4000-8000-000000000001', 'person', null, array['knowledge'], null, 'Dein Beitrag hat mir geholfen.', true)$$, 'a member can thank someone without a conversation');
+select extensions.throws_ok($$select public.send_network_thanks_direct('f4200000-0000-4000-8000-000000000001', 'person', null, array['time'], null, null, false)$$, '23505', 'thanks_recent', 'the same person only once every 90 days');
+select extensions.throws_ok($$select public.send_network_thanks_direct('f4200000-0000-4000-8000-000000000003', 'person', null, array['time'], null, null, false)$$, '42501', 'thanks_not_allowed', 'no thanks to yourself');
+select extensions.throws_ok($$select public.send_network_thanks_direct('f4200000-0000-4000-8000-000000000001', 'venture', 'f4200000-0000-4000-8000-0000000000ff', array['time'], null, null, false)$$, '22023', 'thanks_invalid', 'a venture that is not theirs is rejected');
+select extensions.is((select count(*)::int from public.network_thanks), 1, 'the sender reads only their own thanks');
+
 reset role;
-select extensions.is((select count(*)::int from public.in_app_notices where recipient_user_id = 'f4200000-0000-4000-8000-000000000001' and kind = 'connect_thanks' and path = '/connect/contacts'), 1, 'the helped person gets one notice');
+select extensions.is((select verified from public.network_thanks where thanker_user_id = 'f4200000-0000-4000-8000-000000000003'), false, 'a direct thanks is internally marked as not verified');
+insert into public.network_blocks(blocker_user_id, blocked_user_id) values ('f4200000-0000-4000-8000-000000000001', 'f4200000-0000-4000-8000-000000000004');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"f4200000-0000-4000-8000-000000000004","role":"authenticated"}';
+select extensions.throws_ok($$select public.send_network_thanks_direct('f4200000-0000-4000-8000-000000000001', 'person', null, array['time'], null, null, false)$$, '42501', 'thanks_not_allowed', 'blocked people cannot send thanks');
+set local request.jwt.claims = '{"sub":"f4200000-0000-4000-8000-000000000001","role":"authenticated"}';
+select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000001'), true, 'the heart shows for direct thanks too');
+
+reset role;
+select extensions.is((select count(*)::int from public.in_app_notices where recipient_user_id = 'f4200000-0000-4000-8000-000000000001' and kind = 'connect_thanks' and path = '/connect/contacts'), 2, 'the helped person gets one notice per thanks');
 delete from public.network_contact_requests where id = 'f4200000-0000-4000-8000-0000000000c1';
-select extensions.is((select count(*)::int from public.in_app_notices where kind = 'connect_thanks'), 0, 'deleting the request removes the notice with the thanks');
+select extensions.is((select count(*)::int from public.in_app_notices where kind = 'connect_thanks'), 1, 'deleting the request removes the notice of its thanks, the direct one stays');
 
 select * from extensions.finish();
 rollback;

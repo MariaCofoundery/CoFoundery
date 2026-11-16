@@ -2,6 +2,7 @@ import { ConnectPagination } from "@/features/connect/ConnectPagination";
 import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getActiveConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
@@ -29,7 +30,7 @@ export default async function ConnectVentureDirectoryPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const [t, params] = await Promise.all([getTranslations("connect"), searchParams]);
-  const { client } = await requireConnectMember("/connect/ventures");
+  const { client, user } = await requireConnectMember("/connect/ventures");
 
   const term = (params.q ?? "").trim();
   const venturesRows = await getActiveConnectVentures(client, term, params.page);
@@ -101,7 +102,7 @@ export default async function ConnectVentureDirectoryPage({
                       className="h-12 w-12 shrink-0 rounded-2xl border border-slate-200 object-contain"
                     />
                   ) : null}
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <h2 className="break-words text-lg font-semibold text-slate-950">
                       <Link href={`/connect/ventures/${venture.id}`} className="hover:underline">
                         {venture.name}
@@ -111,6 +112,7 @@ export default async function ConnectVentureDirectoryPage({
                       <p className="truncate text-sm text-slate-500">{venture.role_label}</p>
                     ) : null}
                   </div>
+                  {venture.owner_user_id !== user.id ? <ThanksHeart userId={venture.owner_user_id} via="venture" viaId={venture.id} label={t("thanks.heartButton")} hint={t("thanks.heartHint")} /> : null}
                 </div>
 
                 <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-700">{venture.what_it_does}</p>

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { MyThanks, ProfileThanks } from "./thanksData";
+import { thanksHref, type DirectVia } from "./thanksModel";
 import { setThanksHiddenAction } from "./thanksActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
 
@@ -12,6 +14,18 @@ export function HeartBadge({ label }: { label: string }) {
     <span title={label} data-connect-heart className="inline-flex items-center gap-1.5 rounded-full bg-[#fde7f0] py-0.5 pl-2 pr-2.5 text-[13px] font-semibold text-[#a81f55]">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="#d4286b" aria-hidden="true"><path d={HEART_PATH} /></svg>{label}
     </span>
+  );
+}
+
+/** Das kleine Herz an jeder Karte. Am Rechner zeigt es beim Darueberfahren "Danke sagen", am Handy steht das Wort daneben. */
+export function ThanksHeart({ userId, via = "person", viaId, label, hint }: { userId: string; via?: DirectVia; viaId?: string | null; label: string; hint: string }) {
+  return (
+    <Link href={thanksHref(userId, via, viaId)} prefetch={false} aria-label={hint} data-connect-thanks-heart
+      className="group relative inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-[#f1b9d0] bg-white px-3 text-[13px] font-semibold text-[#a81f55] hover:bg-[#fde7f0] focus-visible:bg-[#fde7f0] sm:px-0 sm:w-11">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#d4286b" strokeWidth="2" className="group-hover:fill-[#d4286b] group-focus-visible:fill-[#d4286b]" aria-hidden="true"><path d={HEART_PATH} /></svg>
+      <span className="sm:hidden">{label}</span>
+      <span role="tooltip" className="pointer-events-none absolute bottom-[52px] right-0 hidden whitespace-nowrap rounded-[10px] bg-[#14152b] px-2.5 py-1.5 text-[13px] font-semibold text-white group-hover:sm:block group-focus-visible:sm:block">{hint}</span>
+    </Link>
   );
 }
 
@@ -35,7 +49,7 @@ export function ProfileThanksList({ items, t, label }: { items: ProfileThanks[];
           <li key={index}>
             <Chips types={item.helpTypes} outcome={item.outcome} t={t} />
             <p className="mt-2 text-[17px] italic leading-7 text-[#14152b]">„{item.body}“</p>
-            {item.firstName ? <p className="mt-1 text-[13px] text-[#4a4d68]">{item.firstName}</p> : null}
+            {item.firstName ? <p className="mt-1 text-[13px] text-[#4a4d68]">{item.firstName}{item.viaLabel ? ` · ${t("thanks.forVia", { label: item.viaLabel })}` : ""}</p> : null}
           </li>
         ))}
       </ul>
@@ -53,6 +67,7 @@ export function ReceivedThanksCard({ thanks, t }: { thanks: MyThanks; t: T }) {
         <h3 className="text-base font-semibold text-slate-950">{thanks.otherName ? t("thanks.receivedFrom", { name: thanks.otherName }) : t("thanks.received")}</h3>
       </div>
       <div className="mt-3"><Chips types={thanks.helpTypes} outcome={thanks.outcome} t={t} /></div>
+      {thanks.viaLabel ? <p className="mt-2 text-sm text-slate-600">{t("thanks.forVia", { label: thanks.viaLabel })}</p> : null}
       {thanks.body ? <p className="mt-3 text-[17px] italic leading-7 text-slate-900">„{thanks.body}“</p> : null}
       {thanks.showOnProfile ? (
         <form action={setThanksHiddenAction} className="mt-3">

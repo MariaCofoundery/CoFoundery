@@ -2,6 +2,7 @@ import { ConnectPagination } from "@/features/connect/ConnectPagination";
 import { CONNECT_PAGE_SIZE } from "@/features/connect/connectBrowsePage";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
 import { getConnectPeople } from "@/features/connect/connectPeopleData";
@@ -177,6 +178,7 @@ export default async function ConnectPeoplePage({
                     <h2 className="text-xl font-semibold">{person.display_name}</h2>
                     <p className="mt-1 text-sm leading-6 text-slate-600">{person.headline}</p>
                   </div>
+                  {person.user_id !== user.id ? <ThanksHeart userId={person.user_id} via="person" label={t("thanks.heartButton")} hint={t("thanks.heartHint")} /> : null}
                 </div>
 
                 {/* Der Unterschied zu jedem anderen Verzeichnis: Man sieht,

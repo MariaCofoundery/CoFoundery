@@ -1561,6 +1561,19 @@
     "hiddenOk": "The thanks is hidden on your profile.",
     "shownOk": "The thanks is back on your profile.",
     "errorGeneric": "The thanks could not be sent.",
-    "error": "The thanks could not be sent."
+    "error": "The thanks could not be sent.",
+    "errors": {
+      "invalid": "Please pick at least one kind of help. Your words can be up to 280 characters.",
+      "recent": "You already thanked this person. You can do it again after 90 days.",
+      "limit": "You already said thanks five times today. Come back tomorrow.",
+      "failed": "The thanks could not be sent."
+    },
+    "directTitle": "Say thanks to {name}",
+    "directLead": "Even if you have not written to each other. For example, because a post or profile helped you.",
+    "directNote": "{name} sees your first name. This does not connect you, and {name} decides whether to get in touch.",
+    "heartButton": "Thanks",
+    "heartHint": "Say thanks",
+    "forVia": "for \"{label}\"",
+    "thankedOk": "Thanks sent."
   }
 }

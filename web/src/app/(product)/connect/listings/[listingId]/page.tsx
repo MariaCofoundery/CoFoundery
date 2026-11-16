@@ -1,4 +1,5 @@
-import Link from "next/link"; import { notFound } from "next/navigation"; import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { ThanksHeart } from "@/features/connect/thanks/ThanksBits"; import { notFound } from "next/navigation"; import { getLocale, getTranslations } from "next-intl/server";
 import { doorTitle } from "@/features/connect/doors/doorLabels";
 import { listDoorsOf } from "@/features/connect/doors/doorsData";
 import { requireConnectMember } from "@/features/connect/connectAccess"; import { getConnectBlockState, getConnectListing, countContactRequestsForListing, getOwnContactRequestForListing, hasActiveConnectProfile } from "@/features/connect/connectData";
@@ -67,7 +68,7 @@ export default async function ListingDetail({ params, searchParams }: { params: 
               {isPublicLive ? <Link href={`/connect/l/${listing.public_slug}`} className={BTN_ON_BRAND}>{t("visibility.openPublicPage")}</Link> : null}
               <Link href={`/connect/listings/${listing.id}/edit`} className={BTN_ON_BRAND}>{t("actions.edit")}</Link>
             </div>
-          ) : null}
+          ) : <ThanksHeart userId={listing.owner_user_id} via="listing" viaId={listing.id} label={t("thanks.heartButton")} hint={t("thanks.heartHint")} />}
         </div>
         <h1 className="mt-3 max-w-3xl text-[30px] font-semibold leading-[1.2] sm:text-[34px]">{listing.title}</h1>
         {framework.length ? <p className="mt-3 text-[15px] text-white opacity-95">{framework.join(" · ")}</p> : null}

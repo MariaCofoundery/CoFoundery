@@ -74,3 +74,37 @@ test("thanks hang on the conversation, so requests and answered problems both wo
   assert.match(contacts, /\/connect\/danke\/\$\{conversation\.conversation_id\}/);
   assert.doesNotMatch(contacts, /danke\/\$\{conversation\.contact_request_id\}/);
 });
+
+import { parseDirectThanksForm, thanksHref } from "@/features/connect/thanks/thanksModel";
+
+test("a direct thanks needs a member, a known origin and one kind of help", () => {
+  assert.equal(parseDirectThanksForm(form([["helper_user_id", "u1"], ["via", "person"]])), null);
+  assert.equal(parseDirectThanksForm(form([["helper_user_id", "u1"], ["via", "hack"], ["help_type", "time"]])), null);
+  assert.equal(parseDirectThanksForm(form([["helper_user_id", "u1"], ["via", "venture"], ["help_type", "time"]])), null);
+  assert.deepEqual(parseDirectThanksForm(form([["helper_user_id", "u1"], ["via", "venture"], ["via_id", "v9"], ["help_type", "time"]])), { helperUserId: "u1", via: "venture", viaId: "v9", helpTypes: ["time"], outcome: null, body: null, show: false });
+  assert.equal(parseDirectThanksForm(form([["helper_user_id", "u1"], ["help_type", "time"]]))?.via, "person");
+});
+
+test("the heart link points at the direct thanks page", () => {
+  assert.equal(thanksHref("u1"), "/connect/danke/an/u1");
+  assert.equal(thanksHref("u1", "listing", "l1"), "/connect/danke/an/u1?via=listing&id=l1");
+});
+
+test("the heart sits on people, requests, problems and ventures - and never on your own card", () => {
+  for (const [path, needle] of [
+    ["src/app/(product)/connect/people/[userId]/page.tsx", /<ThanksHeart/],
+    ["src/app/(product)/connect/people/page.tsx", /person\.user_id !== user\.id \? <ThanksHeart/],
+    ["src/app/(product)/connect/ventures/page.tsx", /venture\.owner_user_id !== user\.id \? <ThanksHeart/],
+    ["src/app/(product)/connect/ventures/[ventureId]/page.tsx", /<ThanksHeart/],
+    ["src/app/(product)/connect/listings/[listingId]/page.tsx", /<ThanksHeart/],
+    ["src/app/(product)/connect/problems/[problemId]/page.tsx", /!isAuthor && problem\.author_user_id \? <span className="ml-auto"><ThanksHeart/],
+  ] as const) assert.match(read(path), needle, path);
+});
+
+test("direct thanks have limits in the database: once per person per 90 days, five a day, no blocked, no self", () => {
+  const sql = read("../supabase/migrations/20270426120000_connect_thanks_direct.sql");
+  assert.match(sql, /interval '90 days'/);
+  assert.match(sql, />= 5/);
+  assert.match(sql, /is_network_interaction_blocked/);
+  assert.match(sql, /p_helper_user_id = v_me/);
+});

@@ -1561,6 +1561,19 @@
     "hiddenOk": "Der Dank ist auf deinem Profil ausgeblendet.",
     "shownOk": "Der Dank steht wieder auf deinem Profil.",
     "errorGeneric": "Das Danke konnte nicht verschickt werden.",
-    "error": "Das Danke konnte nicht verschickt werden."
+    "error": "Das Danke konnte nicht verschickt werden.",
+    "errors": {
+      "invalid": "Bitte wähle mindestens eine Art der Hilfe aus. Die Worte dürfen höchstens 280 Zeichen lang sein.",
+      "recent": "Du hast dich bei dieser Person schon bedankt. Nach 90 Tagen geht das wieder.",
+      "limit": "Heute hast du schon fünfmal Danke gesagt. Morgen geht es weiter.",
+      "failed": "Das Danke konnte nicht verschickt werden."
+    },
+    "directTitle": "Danke an {name} sagen",
+    "directLead": "Auch wenn ihr euch nicht geschrieben habt. Zum Beispiel, weil ein Beitrag oder Profil dir geholfen hat.",
+    "directNote": "{name} sieht deinen Vornamen. Ihr seid dadurch nicht verbunden, {name} entscheidet selbst, ob sie oder er sich meldet.",
+    "heartButton": "Danke",
+    "heartHint": "Danke sagen",
+    "forVia": "für „{label}“",
+    "thankedOk": "Danke verschickt."
   }
 }
